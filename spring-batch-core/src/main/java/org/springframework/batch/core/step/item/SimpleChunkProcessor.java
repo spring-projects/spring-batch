@@ -27,8 +27,9 @@ import org.springframework.beans.factory.InitializingBean;
 import org.springframework.util.Assert;
 
 /**
- * Simple implementation of the {@link ChunkProcessor} interface that handles basic
- * item writing and processing.  Any exceptions encountered will be rethrown.
+ * Simple implementation of the {@link ChunkProcessor} interface that handles
+ * basic item writing and processing. Any exceptions encountered will be
+ * rethrown.
  * 
  * @see ChunkOrientedTasklet
  */
@@ -157,41 +158,83 @@ public class SimpleChunkProcessor<I, O> implements ChunkProcessor<I>, Initializi
 
 	public final void process(StepContribution contribution, Chunk<I> inputs) throws Exception {
 
-		/*
-		 * Need to remember the write skips across transactions, otherwise they
-		 * keep coming back. Since we register skips with the inputs they will
-		 * not be processed again but the output skips need to be saved for
-		 * registration later with the listeners. The inputs are going to be the
-		 * same for all transactions processing the same chunk, but the outputs
-		 * are not, so we stash them in user data on the inputs.
-		 */
-
-		@SuppressWarnings("unchecked")
-		Chunk<O> skips = (Chunk<O>) inputs.getUserData();
-		if (skips == null) {
-			skips = new Chunk<O>();
-		}
+		// Allow temporary state to be stored in the user data field
+		initializeUserData(inputs);
 
 		// If there is no input we don't have to do anything more
-		if (inputs.isEmpty() && skips.getSkips().isEmpty()) {
+		if (isComplete(inputs)) {
 			return;
 		}
 
-		int inputsSize = inputs.size();
-
+		// Make the transformation, calling remove() on the inputs iterator if
+		// any items are filtered. Might throw exception and cause rollback.
 		Chunk<O> outputs = transform(contribution, inputs);
 
-		contribution.incrementFilterCount(inputsSize  - outputs.size() - inputs.getSkips().size());
+		// Adjust the filter count based on available data
+		contribution.incrementFilterCount(getFilterCount(inputs, outputs));
 
-		boolean busy = skips.isBusy();
-		outputs = new Chunk<O>(outputs.getItems(), skips.getSkips());
-		outputs.setBusy(busy);
+		// Adjust the outputs if necessary for housekeeping purposes, and then
+		// write them out...
+		write(contribution, inputs, getAdjustedOutputs(inputs, outputs));
 
-		// Remember for next time if there are skips accumulating
-		inputs.setUserData(outputs);
+	}
 
-		write(contribution, inputs, outputs);
+	/**
+	 * Extension point for subclasses to allow them to memorise the contents of
+	 * the inputs, in case they are needed for accounting purposes later. The
+	 * default implementation sets up some user data to remember the original
+	 * size of the inputs. If this method is overridden then some or all of
+	 * {@link #isComplete(Chunk)}, {@link #getFilterCount(Chunk, Chunk)} and
+	 * {@link #getAdjustedOutputs(Chunk, Chunk)} might also need to be, to
+	 * ensure that the user data is handled consistently.
+	 * 
+	 * @param inputs the inputs for the process
+	 */
+	protected void initializeUserData(Chunk<I> inputs) {
+		inputs.setUserData(inputs.size());
+	}
 
+	/**
+	 * Extension point for subclasses to calculate the filter count. Defaults to
+	 * the difference between input size and output size.
+	 * 
+	 * @param inputs the inputs after transformation
+	 * @param outputs the outputs after transformation
+	 * 
+	 * @return the difference in sizes
+	 * 
+	 * @see #initializeUserData(Chunk)
+	 */
+	protected int getFilterCount(Chunk<I> inputs, Chunk<O> outputs) {
+		return (Integer) inputs.getUserData() - outputs.size();
+	}
+
+	/**
+	 * Extension point for subclasses that want to store additional data in the
+	 * inputs. Default just checks if inputs are empty.
+	 * 
+	 * @param inputs the input chunk
+	 * @return true if it is empty
+	 * 
+	 * @see #initializeUserData(Chunk)
+	 */
+	protected boolean isComplete(Chunk<I> inputs) {
+		return inputs.isEmpty();
+	}
+
+	/**
+	 * Extension point for subclasses that want to adjust the outputs based on
+	 * additional saved data in the inputs. Default implementation just returns
+	 * the outputs unchanged.
+	 * 
+	 * @param inputs the inputs for the transformation
+	 * @param outputs the result of the transformation
+	 * @return the outputs unchanged
+	 * 
+	 * @see #initializeUserData(Chunk)
+	 */
+	protected Chunk<O> getAdjustedOutputs(Chunk<I> inputs, Chunk<O> outputs) {
+		return outputs;
 	}
 
 	/**

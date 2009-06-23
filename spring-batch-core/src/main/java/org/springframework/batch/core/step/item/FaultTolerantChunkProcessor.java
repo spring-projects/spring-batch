@@ -122,13 +122,68 @@ public class FaultTolerantChunkProcessor<I, O> extends SimpleChunkProcessor<I, O
 	}
 
 	@Override
+	protected void initializeUserData(Chunk<I> inputs) {
+		@SuppressWarnings("unchecked")
+		UserData<O> data = (UserData<O>) inputs.getUserData();
+		if (data == null) {
+			data = new UserData<O>(inputs.size());
+			inputs.setUserData(data);
+			data.setOutputs(new Chunk<O>());
+		}
+	}
+
+	@Override
+	protected int getFilterCount(Chunk<I> inputs, Chunk<O> outputs) {
+		@SuppressWarnings("unchecked")
+		UserData<O> data = (UserData<O>) inputs.getUserData();
+		return data.size() - outputs.size() - inputs.getSkips().size();
+	}
+
+	@Override
+	protected boolean isComplete(Chunk<I> inputs) {
+
+		/*
+		 * Need to remember the write skips across transactions, otherwise they
+		 * keep coming back. Since we register skips with the inputs they will
+		 * not be processed again but the output skips need to be saved for
+		 * registration later with the listeners. The inputs are going to be the
+		 * same for all transactions processing the same chunk, but the outputs
+		 * are not, so we stash them in user data on the inputs.
+		 */
+
+		@SuppressWarnings("unchecked")
+		UserData<O> data = (UserData<O>) inputs.getUserData();
+		Chunk<O> previous = data.getOutputs();
+
+		return inputs.isEmpty() && previous.getSkips().isEmpty();
+
+	}
+
+	@Override
+	protected Chunk<O> getAdjustedOutputs(Chunk<I> inputs, Chunk<O> outputs) {
+
+		@SuppressWarnings("unchecked")
+		UserData<O> data = (UserData<O>) inputs.getUserData();
+		Chunk<O> previous = data.getOutputs();
+
+		Chunk<O> next = new Chunk<O>(outputs.getItems(), previous.getSkips());
+		next.setBusy(previous.isBusy());
+
+		// Remember for next time if there are skips accumulating
+		data.setOutputs(next);
+
+		return next;
+
+	}
+
+	@Override
 	protected Chunk<O> transform(final StepContribution contribution, Chunk<I> inputs) throws Exception {
 
 		Chunk<O> outputs = new Chunk<O>();
-		Object userData = inputs.getUserData();
 		@SuppressWarnings("unchecked")
-		final Chunk<O> cache = (userData instanceof Chunk) ? (Chunk<O>) userData : null;
-		final Chunk<O>.ChunkIterator cacheIterator = (cache != null) ? cache.iterator() : null;
+		UserData<O> data = (UserData<O>) inputs.getUserData();
+		Chunk<O> cache = data.getOutputs();
+		final Chunk<O>.ChunkIterator cacheIterator =  cache.isEmpty() ? null : cache.iterator();
 		final AtomicInteger count = new AtomicInteger(0);
 
 		for (final Chunk<I>.ChunkIterator iterator = inputs.iterator(); iterator.hasNext();) {
@@ -141,7 +196,7 @@ public class FaultTolerantChunkProcessor<I, O> extends SimpleChunkProcessor<I, O
 					O output = null;
 					try {
 						count.incrementAndGet();
-						O cached = (cache != null) ? cacheIterator.next() : null;
+						O cached = (cacheIterator != null) ? cacheIterator.next() : null;
 						if (cached != null && count.get() > 1) {
 							/*
 							 * If there is a cached chunk then we must be
@@ -284,7 +339,7 @@ public class FaultTolerantChunkProcessor<I, O> extends SimpleChunkProcessor<I, O
 
 			};
 
-			logger.debug("Attempting to write: "+inputs);
+			logger.debug("Attempting to write: " + inputs);
 			batchRetryTemplate.execute(retryCallback, recoveryCallback, new DefaultRetryState(inputs,
 					rollbackClassifier));
 
@@ -361,7 +416,7 @@ public class FaultTolerantChunkProcessor<I, O> extends SimpleChunkProcessor<I, O
 	private void scan(final StepContribution contribution, final Chunk<I> inputs, final Chunk<O> outputs,
 			ChunkMonitor chunkMonitor) throws Exception {
 
-		logger.debug("Scanning for failed item on write: "+inputs);
+		logger.debug("Scanning for failed item on write: " + inputs);
 		if (outputs.isEmpty()) {
 			inputs.setBusy(false);
 			return;
@@ -391,6 +446,30 @@ public class FaultTolerantChunkProcessor<I, O> extends SimpleChunkProcessor<I, O
 			inputs.setBusy(false);
 			chunkMonitor.resetOffset();
 		}
+	}
+
+	private static class UserData<O> {
+
+		private final int size;
+
+		private Chunk<O> outputs;
+
+		public UserData(int size) {
+			this.size = size;
+		}
+
+		public int size() {
+			return size;
+		}
+
+		public Chunk<O> getOutputs() {
+			return outputs;
+		}
+
+		public void setOutputs(Chunk<O> outputs) {
+			this.outputs = outputs;
+		}
+
 	}
 
 }

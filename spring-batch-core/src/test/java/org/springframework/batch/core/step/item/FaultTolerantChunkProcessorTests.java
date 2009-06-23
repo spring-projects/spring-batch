@@ -77,10 +77,13 @@ public class FaultTolerantChunkProcessorTests {
 				if (item.equals("1")) {
 					throw new RuntimeException("Skippable");
 				}
+				if (item.equals("3")) {
+					return null;
+				}
 				return item;
 			}
 		});
-		Chunk<String> inputs = new Chunk<String>(Arrays.asList("1", "2"));
+		Chunk<String> inputs = new Chunk<String>(Arrays.asList("3", "1", "2"));
 		try {
 			processor.process(contribution, inputs);
 			fail("Expected Exception");
@@ -90,7 +93,7 @@ public class FaultTolerantChunkProcessorTests {
 		processor.process(contribution, inputs);
 		assertEquals(1, list.size());
 		assertEquals(1, contribution.getSkipCount());
-		assertEquals(0, contribution.getFilterCount());
+		assertEquals(1, contribution.getFilterCount());
 	}
 
 	@Test
