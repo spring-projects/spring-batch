@@ -175,6 +175,35 @@ public class ExecutionContextPromotionListenerTests {
 	}
 
 	/**
+	 * CONDITION: strict = true. keys = {key, key2}. Only {key} exists in the
+	 * ExecutionContext.
+	 * 
+	 * EXPECTED: IllegalArgumentException
+	 */
+	@Test(expected = IllegalArgumentException.class)
+	public void promoteEntries_keyNotFound_strict() throws Exception {
+		ExecutionContextPromotionListener listener = new ExecutionContextPromotionListener();
+		listener.setStrict(true);
+
+		JobExecution jobExecution = new JobExecution(1L);
+		StepExecution stepExecution = jobExecution.createStepExecution("step1");
+		stepExecution.setExitStatus(ExitStatus.COMPLETED);
+
+		Assert.state(jobExecution.getExecutionContext().isEmpty());
+		Assert.state(stepExecution.getExecutionContext().isEmpty());
+
+		stepExecution.getExecutionContext().putString(key, value);
+
+		listener.setKeys(new String[] { key, key2 });
+		listener.afterPropertiesSet();
+
+		listener.afterStep(stepExecution);
+
+		assertEquals(value, jobExecution.getExecutionContext().getString(key));
+		assertFalse(jobExecution.getExecutionContext().containsKey(key2));
+	}
+
+	/**
 	 * CONDITION: keys = NULL
 	 * 
 	 * EXPECTED: IllegalArgumentException

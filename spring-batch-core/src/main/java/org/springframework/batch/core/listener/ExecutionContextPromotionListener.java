@@ -45,6 +45,8 @@ public class ExecutionContextPromotionListener extends StepExecutionListenerSupp
 
 	private String[] statuses = new String[] { ExitStatus.COMPLETED.getExitCode() };
 
+	private boolean strict = false;
+
 	public ExitStatus afterStep(StepExecution stepExecution) {
 		ExecutionContext stepContext = stepExecution.getExecutionContext();
 		ExecutionContext jobContext = stepExecution.getJobExecution().getExecutionContext();
@@ -52,6 +54,10 @@ public class ExecutionContextPromotionListener extends StepExecutionListenerSupp
 		for (String statusPattern : statuses) {
 			if (PatternMatcher.match(statusPattern, exitCode)) {
 				for (String key : keys) {
+					if (strict) {
+						Assert.isTrue(stepContext.containsKey(key), "The key [" + key
+								+ "] was not found in the Step's ExecutionContext.");
+					}
 					jobContext.put(key, stepContext.get(key));
 				}
 				break;
@@ -84,4 +90,15 @@ public class ExecutionContextPromotionListener extends StepExecutionListenerSupp
 	public void setStatuses(String[] statuses) {
 		this.statuses = statuses;
 	}
+
+	/**
+	 * If set to TRUE, the listener will throw an exception if any 'key' is not
+	 * found in the Step {@link ExecutionContext}. FALSE by default.
+	 * 
+	 * @param strict
+	 */
+	public void setStrict(boolean strict) {
+		this.strict = strict;
+	}
+
 }
