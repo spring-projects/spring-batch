@@ -209,19 +209,15 @@
     private BigDecimal totalAmount = BigDecimal.ZERO;
 
     public void write(List&lt;? extends Trade&gt; items) {
+        BigDecimal chunkTotal = BigDecimal.ZERO;
         for (Trade trade : items) {
-            // There must be an amount to total
-            Assert.notNull(trade.getAmount());
+            chunkTotal = chunkTotal.add(trade.getAmount());
         }
 
         delegate.write(items);
-    }
 
-    @AfterWrite
-    public void updateTotalPrice(List&lt;Trade&gt; trades) {
-        for (Trade trade : trades) {
-            totalAmount = totalAmount.add(trade.getAmount());
-        }
+        // After successfully writing all items
+        totalAmount = totalAmount.add(chunkTotal);
     }
 
     public void writeFooter(Writer writer) throws IOException {
@@ -237,15 +233,14 @@
       After the last <classname>Trade</classname> is processed, the framework
       will call <methodname>writeFooter</methodname>, which will put that
       <code>totalAmount</code> into the file. Note that the
-      <property>totalAmount</property> is <emphasis>not</emphasis> updated in
-      the <methodname>write</methodname> method; it is updated in the
-      <classname>AfterWrite</classname> method. This is done to ensure that if
-      a skip occurs in the <methodname>write</methodname> method, that the
-      <property>totalAmount</property> will be left unchanged. The
-      <methodname>write</methodname> method also validates that the
-      <property>amount</property> on each <classname>Trade</classname> is not
-      null; this guarantees that no exceptions will be thrown by the
-      <classname>AfterWrite</classname> method.</para>
+      <methodname>write</methodname> method makes use of a temporary variable,
+      <varname>chunkTotalAmount</varname>, that stores the total of the trades
+      in the chunk. This is done to ensure that if a skip occurs in the
+      <methodname>write</methodname> method, that the
+      <property>totalAmount</property> will be left unchanged. It is only at
+      the end of the <methodname>write</methodname> method, once we are
+      guaranteed that no exceptions will be thrown, that we update the
+      <varname>totalAmount</varname>.</para>
 
       <para>In order for the <methodname>writeFooter</methodname> method to be
       called, the <classname>TradeItemWriter</classname> (which implements
@@ -273,16 +268,14 @@
       with the methods <methodname>open</methodname> and
       <methodname>update</methodname>:</para>
 
-      <programlisting>private static final String TOTAL_AMOUNT_KEY = "total.amount";
-
-public void open(ExecutionContext executionContext) {
-    if (executionContext.containsKey(TOTAL_AMOUNT_KEY) {
-        totalAmount = (BigDecimal) executionContext.get(TOTAL_AMOUNT_KEY);
+      <programlisting>public void open(ExecutionContext executionContext) {
+    if (executionContext.containsKey("total.amount") {
+        totalAmount = (BigDecimal) executionContext.get("total.amount");
     }
 }
 
 public void update(ExecutionContext executionContext) {
-    executionContext.put(TOTAL_AMOUNT_KEY, totalAmount);
+    executionContext.put("total.amount", totalAmount);
 }</programlisting>
 
       <para>The <methodname>update</methodname> method will store the most
