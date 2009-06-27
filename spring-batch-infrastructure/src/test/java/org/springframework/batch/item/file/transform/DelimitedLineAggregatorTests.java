@@ -15,8 +15,9 @@
  */
 package org.springframework.batch.item.file.transform;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 
+import org.junit.Before;
 import org.junit.Test;
 
 /**
@@ -25,7 +26,19 @@ import org.junit.Test;
  */
 public class DelimitedLineAggregatorTests {
 
-	private DelimitedLineAggregator<String[]> aggregator = new DelimitedLineAggregator<String[]>();
+	private static DelimitedLineAggregator<String[]> aggregator;
+
+	private FieldExtractor<String[]> defaultFieldExtractor = new FieldExtractor<String[]>() {
+		public Object[] extract(String[] item) {
+			return item;
+		}
+	};
+
+	@Before
+	public void setup() {
+		aggregator = new DelimitedLineAggregator<String[]>();
+		aggregator.setFieldExtractor(defaultFieldExtractor);
+	}
 
 	@Test
 	public void testSetDelimiter() {
@@ -38,4 +51,8 @@ public class DelimitedLineAggregatorTests {
 		assertEquals("foo,bar", aggregator.aggregate(new String[] { "foo", "bar" }));
 	}
 
+	@Test
+	public void testAggregateWithNull() {
+		assertEquals("foo,,bar", aggregator.aggregate(new String[] { "foo", null, "bar" }));
+	}
 }

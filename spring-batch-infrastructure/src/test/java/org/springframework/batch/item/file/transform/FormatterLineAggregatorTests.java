@@ -19,6 +19,7 @@ package org.springframework.batch.item.file.transform;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
 
+import org.junit.Before;
 import org.junit.Test;
 
 /**
@@ -29,7 +30,19 @@ import org.junit.Test;
 public class FormatterLineAggregatorTests {
 
 	// object under test
-	private FormatterLineAggregator<String[]> aggregator = new FormatterLineAggregator<String[]>();
+	private FormatterLineAggregator<String[]> aggregator;
+
+	private FieldExtractor<String[]> defaultFieldExtractor = new FieldExtractor<String[]>() {
+		public Object[] extract(String[] item) {
+			return item;
+		}
+	};
+
+	@Before
+	public void setup() {
+		aggregator = new FormatterLineAggregator<String[]>();
+		aggregator.setFieldExtractor(defaultFieldExtractor);
+	}
 
 	/**
 	 * If no ranges are specified, IllegalArgumentException is thrown
@@ -110,17 +123,18 @@ public class FormatterLineAggregatorTests {
 		aggregator.setMaximumLength(25);
 
 		aggregator.setFieldExtractor(new FieldExtractor<String[]>() {
-			private int[] widths = new int[] {13,12};
+			private int[] widths = new int[] { 13, 12 };
+
 			public Object[] extract(String[] item) {
 				String[] strings = new String[item.length];
 				for (int i = 0; i < strings.length; i++) {
 					strings[i] = item[i];
-					if (item[i].length()<widths[i]) {
+					if (item[i].length() < widths[i]) {
 						StringBuffer buffer = new StringBuffer(strings[i]);
-						for (int j = 0; j<(widths[i]-item[i].length()+1)/2; j++) {
+						for (int j = 0; j < (widths[i] - item[i].length() + 1) / 2; j++) {
 							buffer.append(" ");
 						}
-						strings[i] = buffer.toString(); 
+						strings[i] = buffer.toString();
 					}
 				}
 				return strings;
@@ -143,17 +157,18 @@ public class FormatterLineAggregatorTests {
 		aggregator.setMaximumLength(24);
 
 		aggregator.setFieldExtractor(new FieldExtractor<String[]>() {
-			private int[] widths = new int[] {13,11};
+			private int[] widths = new int[] { 13, 11 };
+
 			public Object[] extract(String[] item) {
 				String[] strings = new String[item.length];
 				for (int i = 0; i < strings.length; i++) {
 					strings[i] = item[i];
-					if (item[i].length()<widths[i]) {
+					if (item[i].length() < widths[i]) {
 						StringBuffer buffer = new StringBuffer(strings[i]);
-						for (int j = 0; j<widths[i]-item[i].length(); j++) {
+						for (int j = 0; j < widths[i] - item[i].length(); j++) {
 							buffer.append(".");
 						}
-						strings[i] = buffer.toString(); 
+						strings[i] = buffer.toString();
 					}
 				}
 				return strings;
@@ -181,8 +196,9 @@ public class FormatterLineAggregatorTests {
 	 */
 	@Test
 	public void testAggregateNullArgument() {
-		String[] args = { null };
-		aggregator.setFormat("%3s");
-		assertEquals("   ", aggregator.aggregate(args));
+		String[] args = { "foo", null, "bar" };
+		aggregator.setFormat("%3s%3s%3s");
+		assertEquals("foo   bar", aggregator.aggregate(args));
 	}
+
 }

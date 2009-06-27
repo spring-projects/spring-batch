@@ -39,7 +39,7 @@ public class PassThroughFieldExtractorTests {
 	public void testExtractArray() {
 		PassThroughFieldExtractor<String[]> extractor = new PassThroughFieldExtractor<String[]>();
 		Object[] result = extractor.extract(new String[] { "a", "b", null, "d" });
-		assertTrue(Arrays.equals(new Object[] { "a", "b", "", "d" }, result));
+		assertTrue(Arrays.equals(new Object[] { "a", "b", null, "d" }, result));
 	}
 
 	@Test
@@ -53,6 +53,6 @@ public class PassThroughFieldExtractorTests {
 	public void testExtractCollection() {
 		PassThroughFieldExtractor<List<String>> extractor = new PassThroughFieldExtractor<List<String>>();
 		Object[] result = extractor.extract(Arrays.asList("a", "b", null, "d"));
-		assertTrue(Arrays.equals(new Object[] { "a", "b", "", "d" }, result));
+		assertTrue(Arrays.equals(new Object[] { "a", "b", null, "d" }, result));
 	}
 }

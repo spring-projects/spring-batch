@@ -43,13 +43,29 @@ public abstract class ExtractorLineAggregator<T> implements LineAggregator<T> {
 
 	/**
 	 * Extract fields from the given item using the {@link FieldExtractor} and
-	 * then aggregate them.  Null items are not allowed.
+	 * then aggregate them. Any null field returned by the extractor will be
+	 * replaced by an empty String. Null items are not allowed.
 	 * 
 	 * @see org.springframework.batch.item.file.transform.LineAggregator#aggregate(java.lang.Object)
 	 */
 	public String aggregate(T item) {
 		Assert.notNull(item);
-		return this.doAggregate(this.fieldExtractor.extract(item));
+		Object[] fields = this.fieldExtractor.extract(item);
+
+		//
+		// Replace nulls with empty strings
+		//
+		Object[] args = new Object[fields.length];
+		for (int i = 0; i < fields.length; i++) {
+			if (fields[i] == null) {
+				args[i] = "";
+			}
+			else {
+				args[i] = fields[i];
+			}
+		}
+
+		return this.doAggregate(args);
 	}
 
 	/**

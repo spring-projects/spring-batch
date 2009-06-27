@@ -34,31 +34,13 @@ public class PassThroughFieldExtractor<T> implements FieldExtractor<T> {
 	public Object[] extract(T item) {
 
 		if (item.getClass().isArray()) {
-			Object[] items = (Object[]) item;
-			Object[] args = new Object[items.length];
-			for (int i = 0; i < items.length; i++) {
-				if (items[i] == null)
-					args[i] = "";
-				else
-					args[i] = items[i];
-			}
-			return args;
+			return (Object[]) item;
 		}
 
 		if (item instanceof Collection<?>) {
-			Collection<?> items = (Collection<?>) item;
-			Object[] args = new Object[items.size()];
-			int i = 0;
-			for (Object object : items) {
-				if (object == null)
-					args[i] = "";
-				else
-					args[i] = object;
-				i++;
-			}
-			return args;
+			return ((Collection<?>) item).toArray();
 		}
-		
+
 		if (item instanceof FieldSet) {
 			return ((FieldSet) item).getValues();
 		}

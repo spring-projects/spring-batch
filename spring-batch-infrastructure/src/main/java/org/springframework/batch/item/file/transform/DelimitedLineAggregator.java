@@ -22,12 +22,12 @@ import org.springframework.util.StringUtils;
  * delimited list of strings. The default delimiter is a comma.
  * 
  * @author Dave Syer
- *
+ * 
  */
 public class DelimitedLineAggregator<T> extends ExtractorLineAggregator<T> {
 
 	private String delimiter = ",";
-	
+
 	/**
 	 * Public setter for the delimiter.
 	 * @param delimiter the delimiter to set
@@ -36,11 +36,9 @@ public class DelimitedLineAggregator<T> extends ExtractorLineAggregator<T> {
 		this.delimiter = delimiter;
 	}
 
-	/**
-	 * @see org.springframework.batch.item.file.transform.ExtractorLineAggregator#doAggregate(java.lang.Object[])
-	 */
-	public String doAggregate(Object[] item) {
-		return StringUtils.arrayToDelimitedString(item, this.delimiter);
+	@Override
+	public String doAggregate(Object[] fields) {
+		return StringUtils.arrayToDelimitedString(fields, this.delimiter);
 	}
 
 }

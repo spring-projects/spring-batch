@@ -67,7 +67,6 @@ public class FormatterLineAggregator<T> extends ExtractorLineAggregator<T> {
 		this.format = format;
 	}
 
-
 	/**
 	 * Public setter for the locale.
 	 * @param locale the locale to set
@@ -76,9 +75,7 @@ public class FormatterLineAggregator<T> extends ExtractorLineAggregator<T> {
 		this.locale = locale;
 	}
 
-	/**
-	 * @see org.springframework.batch.item.file.transform.ExtractorLineAggregator#doAggregate(java.lang.Object[])
-	 */
+	@Override
 	protected String doAggregate(Object[] fields) {
 
 		Assert.notNull(format);
