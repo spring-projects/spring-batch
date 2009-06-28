@@ -30,17 +30,12 @@ import org.springframework.batch.core.job.flow.JobExecutionDecider;
 public class LimitDecider implements JobExecutionDecider {
 
 	private int count = 0;
+
 	private int limit = 1;
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.springframework.batch.core.job.flow.support.state.JobExecutionDecider#decide(org.springframework.batch.core.JobExecution,
-	 *      org.springframework.batch.core.StepExecution)
-	 */
 	public FlowExecutionStatus decide(JobExecution jobExecution, StepExecution stepExecution) {
 		if (++count >= limit) {
-			return new FlowExecutionStatus("COMPLETE");
+			return new FlowExecutionStatus("COMPLETED");
 		}
 		else {
 			return new FlowExecutionStatus("CONTINUE");

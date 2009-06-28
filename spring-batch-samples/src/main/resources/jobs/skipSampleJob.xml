@@ -25,7 +25,7 @@
 			<tasklet ref="errorLogTasklet"/>
 		</step>
 
-		<step id="step2" parent="secondPass" next="skipCheckingDecision"/>
+		<step id="step2" parent="step2parent" next="skipCheckingDecision"/>
 
 		<decision id="skipCheckingDecision" decider="skipCheckingDecider">
 			<end on="*"/>
@@ -38,7 +38,7 @@
 		</step>
 	</job>
 
-	<step id="secondPass" parent="t2" xmlns="http://www.springframework.org/schema/batch">
+	<step id="step2parent" parent="t2" xmlns="http://www.springframework.org/schema/batch">
 		<tasklet>
 			<chunk writer="itemTrackingWriter">
 				<skippable-exception-classes merge="true">
@@ -99,17 +99,6 @@
 		<property name="sql" value="SELECT isin, quantity, price, customer from TRADE" />
 		<property name="rowMapper">
 			<bean class="org.springframework.batch.sample.domain.trade.internal.TradeRowMapper" />
-		</property>
-	</bean>
-
-	<bean id="customerReportItemWriter" class="org.springframework.batch.sample.domain.trade.internal.FlatFileCustomerCreditDao">
-		<property name="itemWriter">
-			<bean id="customerFlatFileOutputSource" class="org.springframework.batch.item.file.FlatFileItemWriter">
-				<property name="resource" value="target/test-outputs/20070122.testStream.CustomerReportStep.TEMP.txt" />
-				<property name="lineAggregator">
-					<bean class="org.springframework.batch.item.file.transform.PassThroughLineAggregator" />
-				</property>
-			</bean>
 		</property>
 	</bean>
 

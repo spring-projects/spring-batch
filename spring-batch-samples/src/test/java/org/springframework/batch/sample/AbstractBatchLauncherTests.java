@@ -18,7 +18,9 @@ package org.springframework.batch.sample;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.junit.Assert;
 import org.junit.Test;
+import org.springframework.batch.core.BatchStatus;
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.JobParameters;
@@ -38,19 +40,18 @@ import org.springframework.context.ApplicationContextAware;
  */
 public abstract class AbstractBatchLauncherTests implements ApplicationContextAware {
 
-	/** Logger  */
+	/** Logger */
 	protected final Log logger = LogFactory.getLog(getClass());
 
 	protected ApplicationContext applicationContext;
 
 	private JobLauncher launcher;
-	
+
 	private JobExecution jobExecution;
 
 	private Job job;
 
 	private JobParameters jobParameters = new JobParameters();
-
 
 	public void setApplicationContext(ApplicationContext applicationContext) {
 		this.applicationContext = applicationContext;
@@ -65,7 +66,7 @@ public abstract class AbstractBatchLauncherTests implements ApplicationContextAw
 	public void setJob(Job job) {
 		this.job = job;
 	}
-	
+
 	public JobExecution getJobExecution() {
 		return jobExecution;
 	}
@@ -84,7 +85,8 @@ public abstract class AbstractBatchLauncherTests implements ApplicationContextAw
 
 	@Test
 	public void testLaunchJob() throws Exception {
-		jobExecution  = getLauncher().run(job, jobParameters);
+		jobExecution = getLauncher().run(job, jobParameters);
+		Assert.assertEquals(BatchStatus.COMPLETED, jobExecution.getStatus());
 	}
 
 	/**

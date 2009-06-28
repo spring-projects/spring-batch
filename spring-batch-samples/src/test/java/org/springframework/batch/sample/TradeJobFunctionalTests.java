@@ -31,7 +31,6 @@ import javax.sql.DataSource;
 
 import org.junit.After;
 import org.junit.Before;
-import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.batch.sample.domain.trade.Trade;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -39,7 +38,6 @@ import org.springframework.jdbc.core.RowCallbackHandler;
 import org.springframework.jdbc.core.simple.SimpleJdbcTemplate;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
-
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration()
@@ -74,14 +72,7 @@ public class TradeJobFunctionalTests extends AbstractValidatingBatchLauncherTest
 		simpleJdbcTemplate.update("delete from TRADE");
 	}
 
-	@Test
-	public void testLaunchJob() throws Exception{
-		super.testLaunchJob();
-	}
-
 	protected void validatePostConditions() {
-		
-		// assertTrue(((Resource)applicationContext.getBean("customerFileLocator")).exists());
 		
 		customers = Arrays.asList(new Customer("customer1", (credits.get("customer1") - 98.34)),
 				new Customer("customer2", (credits.get("customer2") - 18.12 - 12.78)),
@@ -126,9 +117,6 @@ public class TradeJobFunctionalTests extends AbstractValidatingBatchLauncherTest
 		// check content of the output file
 	}
 
-	protected void validatePreConditions() {
-	}
-
 	private static class Customer {
 		private String name;
 		private double credit;
@@ -166,9 +154,7 @@ public class TradeJobFunctionalTests extends AbstractValidatingBatchLauncherTest
 			this.name = name;
 		}
 
-		/* (non-Javadoc)
-		 * @see java.lang.Object#hashCode()
-		 */
+		@Override
 		public int hashCode() {
 			final int PRIME = 31;
 			int result = 1;
@@ -179,9 +165,7 @@ public class TradeJobFunctionalTests extends AbstractValidatingBatchLauncherTest
 			return result;
 		}
 
-		/* (non-Javadoc)
-		 * @see java.lang.Object#equals(java.lang.Object)
-		 */
+		@Override
 		public boolean equals(Object obj) {
 			if (this == obj)
 				return true;
