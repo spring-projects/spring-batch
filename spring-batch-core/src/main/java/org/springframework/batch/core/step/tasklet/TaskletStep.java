@@ -106,14 +106,17 @@ public class TaskletStep extends AbstractStep {
 	public TaskletStep(String name) {
 		super(name);
 	}
-	
-	/* (non-Javadoc)
-	 * @see org.springframework.batch.core.step.AbstractStep#afterPropertiesSet()
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.springframework.batch.core.step.AbstractStep#afterPropertiesSet()
 	 */
 	@Override
 	public void afterPropertiesSet() throws Exception {
 		super.afterPropertiesSet();
-		Assert.notNull(transactionManager, "TransactionManager is mandatory");		
+		Assert.notNull(transactionManager, "TransactionManager is mandatory");
 	}
 
 	/**
@@ -239,7 +242,8 @@ public class TaskletStep extends AbstractStep {
 		stepOperations.iterate(new StepContextRepeatCallback(stepExecution) {
 
 			@Override
-			public RepeatStatus doInChunkContext(RepeatContext repeatContext, ChunkContext chunkContext) throws Exception {
+			public RepeatStatus doInChunkContext(RepeatContext repeatContext, ChunkContext chunkContext)
+					throws Exception {
 
 				StepExecution stepExecution = chunkContext.getStepContext().getStepExecution();
 
@@ -252,7 +256,7 @@ public class TaskletStep extends AbstractStep {
 				RepeatStatus result = RepeatStatus.CONTINUABLE;
 
 				TransactionStatus transaction = transactionManager.getTransaction(transactionAttribute);
-				
+
 				chunkListener.beforeChunk();
 
 				boolean locked = false;
@@ -262,7 +266,8 @@ public class TaskletStep extends AbstractStep {
 					try {
 						try {
 							result = tasklet.execute(contribution, chunkContext);
-						} catch (Exception e) {
+						}
+						catch (Exception e) {
 							if (transactionAttribute.rollbackOn(e)) {
 								throw e;
 							}
@@ -276,7 +281,6 @@ public class TaskletStep extends AbstractStep {
 						stepExecution.apply(contribution);
 
 					}
-
 
 					// If the step operations are asynchronous then we need
 					// to synchronize changes to the step execution (at a
@@ -306,19 +310,24 @@ public class TaskletStep extends AbstractStep {
 				}
 				catch (FatalException e) {
 					try {
-						logger.debug("Rollback for FatalException: "+e.getClass().getName()+": "+e.getMessage());
+						logger.debug("Rollback for FatalException: " + e.getClass().getName() + ": " + e.getMessage());
 						rollback(stepExecution, transaction);
 					}
 					catch (Exception rollbackException) {
-						// propagate the original fatal failure, only log the
-						// failed rollback
-						logger.error("Rollback caused by fatal failure failed", rollbackException);
+						/*
+						 * Propagate the original fatal failure; only log the
+						 * failed rollback. The failure can be caused by
+						 * attempting a rollback when the commit has already
+						 * succeeded (which is normal so only logged at debug
+						 * level)
+						 */
+						logger.debug("Rollback caused by fatal failure failed", rollbackException);
 					}
 					throw e;
 				}
 				catch (Error e) {
 					try {
-						logger.debug("Rollback for Error: "+e.getClass().getName()+": "+e.getMessage());
+						logger.debug("Rollback for Error: " + e.getClass().getName() + ": " + e.getMessage());
 						rollback(stepExecution, transaction);
 					}
 					catch (Exception rollbackException) {
@@ -330,7 +339,7 @@ public class TaskletStep extends AbstractStep {
 				}
 				catch (Exception e) {
 					try {
-						logger.debug("Rollback for Exception: "+e.getClass().getName()+": "+e.getMessage());
+						logger.debug("Rollback for Exception: " + e.getClass().getName() + ": " + e.getMessage());
 						rollback(stepExecution, transaction);
 					}
 					catch (Exception rollbackException) {
