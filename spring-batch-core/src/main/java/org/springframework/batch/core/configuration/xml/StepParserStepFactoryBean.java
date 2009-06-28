@@ -16,9 +16,7 @@
 
 package org.springframework.batch.core.configuration.xml;
 
-import java.util.ArrayList;
 import java.util.Collection;
-import java.util.List;
 
 import org.springframework.batch.core.Step;
 import org.springframework.batch.core.StepExecutionListener;
@@ -145,6 +143,7 @@ class StepParserStepFactoryBean<I, O> implements FactoryBean, BeanNameAware {
 			Assert.isNull(tasklet, "Step [" + name
 					+ "] has both a <chunk/> element and a 'ref' attribute  referencing a Tasklet.");
 
+			validateFaultTolerantSettings();
 			if (isFaultTolerant()) {
 				FaultTolerantStepFactoryBean<I, O> fb = new FaultTolerantStepFactoryBean<I, O>();
 				configureSimple(fb);
@@ -152,7 +151,6 @@ class StepParserStepFactoryBean<I, O> implements FactoryBean, BeanNameAware {
 				return fb.getObject();
 			}
 			else {
-				validateSimpleStep();
 				SimpleStepFactoryBean<I, O> fb = new SimpleStepFactoryBean<I, O>();
 				configureSimple(fb);
 				return fb.getObject();
@@ -311,44 +309,29 @@ class StepParserStepFactoryBean<I, O> implements FactoryBean, BeanNameAware {
 		}
 	}
 
-	private void validateSimpleStep() {
-		PropertyNamePair[] notPermitted = new PropertyNamePair[] {
-				new PropertyNamePair(retryListeners, "retry-listeners"),
-				new PropertyNamePair(skippableExceptionClasses, "skippable-exception-classes"),
-				new PropertyNamePair(retryableExceptionClasses, "retryable-exception-classes"),
-				new PropertyNamePair(fatalExceptionClasses, "fatal-exception-classes") };
+	private void validateFaultTolerantSettings() {
+		validateDependency("skippable-exception-classes", skippableExceptionClasses, "skip-limit", skipLimit, true);
+		validateDependency("retryable-exception-classes", retryableExceptionClasses, "retry-limit", retryLimit, true);
+		validateDependency("retry-listeners", retryListeners, "retry-limit", retryLimit, false);
+	}
 
-		List<String> wrong = new ArrayList<String>();
-		for (PropertyNamePair field : notPermitted) {
-			if (field.getProperty() != null) {
-				wrong.add(field.getName());
-			}
+	private void validateDependency(String dependantName, Object dependantValue, String name, Object value,
+			boolean twoWayDependency) {
+		if (isPresent(dependantValue) && !isPresent(value)) {
+			throw new IllegalArgumentException("The field '" + dependantName + "' is not permitted on the step ["
+					+ this.name + "] because there is no '" + name + "'.");
 		}
-		if (!wrong.isEmpty()) {
-			throw new IllegalArgumentException("The field" + (wrong.size() > 1 ? "s " : " ") + wrong
-					+ (wrong.size() == 1 ? " is" : " are") + " not permitted on the simple step [" + name + "].  "
-					+ (wrong.size() == 1 ? "It" : "They") + " can only be specified for fault-tolerant "
-					+ "configurations providing skip-limit, retry-limit, or cache-capacity");
+		if (twoWayDependency && isPresent(value) && !isPresent(dependantValue)) {
+			throw new IllegalArgumentException("The field '" + name + "' is not permitted on the step [" + this.name
+					+ "] because there is no '" + dependantName + "'.");
 		}
 	}
 
-	private static class PropertyNamePair {
-		private Object property;
-
-		private String name;
-
-		public PropertyNamePair(Object property, String name) {
-			this.property = property;
-			this.name = name;
+	private boolean isPresent(Object o) {
+		if (o instanceof Integer) {
+			return isPositive((Integer) o);
 		}
-
-		public Object getProperty() {
-			return property;
-		}
-
-		public String getName() {
-			return name;
-		}
+		return o != null;
 	}
 
 	private boolean isFaultTolerant() {

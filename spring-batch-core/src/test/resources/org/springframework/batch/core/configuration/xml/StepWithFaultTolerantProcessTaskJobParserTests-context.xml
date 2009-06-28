@@ -21,6 +21,9 @@
 					<skippable-exception-classes>
 						org.springframework.dao.DataIntegrityViolationException
 					</skippable-exception-classes>
+					<retryable-exception-classes>
+						org.springframework.dao.DeadlockLoserDataAccessException
+					</retryable-exception-classes>
 				</chunk>
 				<transaction-attributes propagation="REQUIRED" isolation="DEFAULT" timeout="10" />
 				<no-rollback-exception-classes>

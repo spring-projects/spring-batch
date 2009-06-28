@@ -9,13 +9,16 @@
 	<job id="job">
 		<step id="s1" parent="baseStep" next="s2">
 			<tasklet>
-				<chunk reader="reader" writer="writer" commit-interval="5" skip-limit="5">
+				<chunk reader="reader" writer="writer" commit-interval="5" skip-limit="5" retry-limit="3">
 					<skippable-exception-classes merge="true">
 						java.lang.NullPointerException
 					</skippable-exception-classes>
 		        	<fatal-exception-classes merge="true">
 		        		org.springframework.dao.CannotAcquireLockException
 		        	</fatal-exception-classes>
+					<retryable-exception-classes>
+						org.springframework.dao.DeadlockLoserDataAccessException
+					</retryable-exception-classes>
 		        	<streams merge="true">
 		        		<stream ref="stream1"/>
 		        	</streams>
@@ -28,13 +31,16 @@
 
 		<step id="s2" parent="baseStep">
 			<tasklet>
-				<chunk reader="reader" writer="writer" commit-interval="5" skip-limit="5">
+				<chunk reader="reader" writer="writer" commit-interval="5" skip-limit="5" retry-limit="3">
 					<skippable-exception-classes>
 						java.lang.NullPointerException
 					</skippable-exception-classes>
 		        	<fatal-exception-classes>
 		        		org.springframework.dao.CannotAcquireLockException
 		        	</fatal-exception-classes>
+					<retryable-exception-classes>
+						org.springframework.dao.DeadlockLoserDataAccessException
+					</retryable-exception-classes>
 		        	<streams>
 		        		<stream ref="stream1"/>
 		        	</streams>
