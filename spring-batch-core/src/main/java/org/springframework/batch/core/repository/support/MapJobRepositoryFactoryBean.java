@@ -33,7 +33,9 @@ import org.springframework.beans.factory.FactoryBean;
  * implementations. This repository is only really intended for use in testing
  * and rapid prototyping. In such settings you might find that
  * {@link ResourcelessTransactionManager} is useful (as long as your business
- * logic does not use a relational database).
+ * logic does not use a relational database).  Not suited for use in
+ * multi-threaded jobs with splits, although it should be safe to use in a
+ * multi-threaded step.
  * 
  * @author Robert Kasanicky
  */

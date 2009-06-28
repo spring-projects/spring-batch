@@ -2,42 +2,61 @@
 <!DOCTYPE chapter PUBLIC "-//OASIS//DTD DocBook XML V4.4//EN"
 "http://www.oasis-open.org/docbook/xml/4.4/docbookx.dtd">
 <chapter id="configureJob">
-  <title>Configuring and Running a Job</title>
+	<title>Configuring and Running a Job</title>
 
-  <para>In <xref linkend="domain" />, the overall architecture design was
-  discussed, using the following diagram as a guide:</para>
+	<para>
+		In
+		<xref linkend="domain" />
+		, the overall architecture design was
+		discussed, using the following diagram as a guide:
+	</para>
 
-  <mediaobject>
-    <imageobject role="html">
-      <imagedata align="center"
-                 fileref="images/spring-batch-reference-model.png"
-                 format="PNG" scale="100" />
-    </imageobject>
+	<mediaobject>
+		<imageobject role="html">
+			<imagedata align="center" fileref="images/spring-batch-reference-model.png"
+				format="PNG" scale="100" />
+		</imageobject>
 
-    <imageobject role="fo">
-      <imagedata align="center"
-                 fileref="images/spring-batch-reference-model.png"
-                 format="PNG" scale="55" />
-    </imageobject>
-  </mediaobject>
+		<imageobject role="fo">
+			<imagedata align="center" fileref="images/spring-batch-reference-model.png"
+				format="PNG" scale="55" />
+		</imageobject>
+	</mediaobject>
 
-  <para>While the <classname>Job</classname> object may seem like a simple
-  container for steps, there are many configuration options of which a
-  developers must be aware . Furthermore, there are many considerations for
-  how a <classname>Job</classname> will be run and how its meta-data will be
-  stored during that run. This chapter will explain the various configuration
-  options and runtime concerns of a <classname>Job</classname>.</para>
+	<para>
+		While the
+		<classname>Job</classname>
+		object may seem like a simple
+		container for steps, there are many configuration options of which a
+		developers must be aware . Furthermore, there are many considerations for
+		how a
+		<classname>Job</classname>
+		will be run and how its meta-data will be
+		stored during that run. This chapter will explain the various configuration
+		options and runtime concerns of a
+		<classname>Job</classname>
+		.
+	</para>
 
-  <section id="configuringAJob">
-    <title>Configuring a Job</title>
+	<section id="configuringAJob">
+		<title>Configuring a Job</title>
 
-    <para>There are multiple implementations of the <link
-    linkend="job"><classname>Job</classname></link> interface, however, the
-    namespace abstracts away the differences in configuration. It has only
-    three required dependencies: a name, <classname>JobRepository</classname>,
-    and a list of <classname>Step</classname>s.</para>
+		<para>
+			There are multiple implementations of the
+			<link linkend="job">
+				<classname>Job</classname>
+			</link>
+			interface, however, the
+			namespace abstracts away the differences in configuration. It has only
+			three required dependencies: a name,
+			<classname>JobRepository</classname>
+			,
+			and a list of
+			<classname>Step</classname>
+			s.
+		</para>
 
-    <programlisting>&lt;job id="footballJob"&gt;
+		<programlisting>&lt;job id="footballJob"&gt;
     &lt;step id="playerload"          parent="s1" next="gameLoad"/&gt;
     &lt;step id="gameLoad"            parent="s2" next="playerSummarization"/&gt;
     &lt;step id="playerSummarization" parent="s3"/&gt;
@@ -334,9 +353,9 @@ catch (JobRestartException e) {
 
       <para>Note that the in-memory repository is volatile and so does not
       allow restart between JVM instances. It also cannot guarantee that two
-      job instances with the same parameters are launched simultaneously. So
-      use the database version of the repository wherever you need quality of
-      service.</para>
+      job instances with the same parameters are launched simultaneously, and 
+      is not suitable for use in a multi-threaded Job, or a locally partitioned Step. So
+      use the database version of the repository wherever you need those features.</para>
 
       <para>However it does require a transaction manager to be defined
       because there are rollback semantics within the repository, and because

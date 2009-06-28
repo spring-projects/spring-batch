@@ -44,7 +44,7 @@ public class MapJobExplorerFactoryBean extends AbstractJobExplorerFactoryBean {
 	protected JobInstanceDao createJobInstanceDao() throws Exception {
 		return new MapJobInstanceDao();
 	}
-	
+
 	@Override
 	protected StepExecutionDao createStepExecutionDao() throws Exception {
 		return new MapStepExecutionDao();
@@ -54,9 +54,10 @@ public class MapJobExplorerFactoryBean extends AbstractJobExplorerFactoryBean {
 	protected ExecutionContextDao createExecutionContextDao() throws Exception {
 		return new MapExecutionContextDao();
 	}
-	
+
 	public Object getObject() throws Exception {
-		return new SimpleJobExplorer(createJobInstanceDao(), createJobExecutionDao(), createStepExecutionDao(), createExecutionContextDao());
+		return new SimpleJobExplorer(createJobInstanceDao(), createJobExecutionDao(), createStepExecutionDao(),
+				createExecutionContextDao());
 	}
 
 }

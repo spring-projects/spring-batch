@@ -41,7 +41,9 @@ import org.springframework.transaction.support.TransactionSynchronizationManager
  * Works well with collections and maps for testing transactional behaviour
  * without needing a database. The base implementation handles lists, sets and
  * maps. Subclasses can implement {@link #begin(Object)} and
- * {@link #commit(Object, Object)} to provide support for other resources.
+ * {@link #commit(Object, Object)} to provide support for other resources.<br/>
+ * 
+ * Not intended for multi-threaded use.
  * 
  * @author Dave Syer
  * 
