@@ -1,47 +1,44 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<beans xmlns:batch="http://www.springframework.org/schema/batch" 
-	xmlns="http://www.springframework.org/schema/beans" 
+<beans xmlns="http://www.springframework.org/schema/beans"
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xmlns:aop="http://www.springframework.org/schema/aop"
-	xsi:schemaLocation="http://www.springframework.org/schema/beans
-       	http://www.springframework.org/schema/beans/spring-beans-2.0.xsd
-		http://www.springframework.org/schema/batch 
-		http://www.springframework.org/schema/batch/spring-batch-2.0.xsd
-       	http://www.springframework.org/schema/aop
- 		http://www.springframework.org/schema/aop/spring-aop-2.0.xsd">
+	xsi:schemaLocation="http://www.springframework.org/schema/batch http://www.springframework.org/schema/batch/spring-batch-2.0.xsd
+		http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd">
 
-	<batch:job id="multilineJob">
-		<batch:step id="step1">
-			<batch:tasklet>
-				<batch:chunk reader="reader" writer="writer" commit-interval="1">
-					<batch:streams>
-						<batch:stream ref="fileItemReader"/>
-					</batch:streams>
-				</batch:chunk>
-			</batch:tasklet>
-		</batch:step>
-	</batch:job>
+	<job id="multilineJob" xmlns="http://www.springframework.org/schema/batch">
+		<step id="step1">
+			<tasklet>
+				<chunk reader="reader" writer="writer" commit-interval="1">
+					<streams>
+						<stream ref="fileItemReader" />
+					</streams>
+				</chunk>
+			</tasklet>
+		</step>
+	</job>
 
-	<bean id="reader" class="org.springframework.batch.sample.domain.multiline.AggregateItemReader">
+	<bean id="reader"
+		class="org.springframework.batch.sample.domain.multiline.AggregateItemReader">
 		<property name="itemReader" ref="fileItemReader" />
 	</bean>
 
 	<bean id="writer" class="org.springframework.batch.item.file.FlatFileItemWriter">
-		<property name="resource" value="file:target/test-outputs/20070122.testStream.multilineStep.txt" />
+		<property name="resource"
+			value="file:target/test-outputs/20070122.testStream.multilineStep.txt" />
 		<property name="lineAggregator">
-			<bean class="org.springframework.batch.item.file.transform.PassThroughLineAggregator"/>
+			<bean
+				class="org.springframework.batch.item.file.transform.PassThroughLineAggregator" />
 		</property>
 	</bean>
 
-	<bean id="fileItemReader"
-		class="org.springframework.batch.item.file.FlatFileItemReader">
+	<bean id="fileItemReader" class="org.springframework.batch.item.file.FlatFileItemReader">
 		<property name="resource"
 			value="classpath:data/multilineJob/input/20070122.teststream.multilineStep.txt" />
 		<property name="lineMapper">
 			<bean class="org.springframework.batch.item.file.mapping.DefaultLineMapper">
 				<property name="lineTokenizer" ref="fixedFileDescriptor" />
 				<property name="fieldSetMapper">
-					<bean class="org.springframework.batch.sample.domain.multiline.AggregateItemFieldSetMapper">
+					<bean
+						class="org.springframework.batch.sample.domain.multiline.AggregateItemFieldSetMapper">
 						<property name="delegate" ref="tradeLineMapper" />
 					</bean>
 				</property>

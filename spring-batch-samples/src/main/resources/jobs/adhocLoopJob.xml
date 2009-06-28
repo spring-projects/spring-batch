@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<beans:beans xmlns="http://www.springframework.org/schema/batch"
-	xmlns:beans="http://www.springframework.org/schema/beans"
+<beans
+	xmlns="http://www.springframework.org/schema/beans"
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xmlns:aop="http://www.springframework.org/schema/aop"
 	xsi:schemaLocation="http://www.springframework.org/schema/beans 
@@ -13,7 +13,7 @@
 	<!-- The tasklet used in this job will run in an infinite loop.  This is useful for testing graceful shutdown from
 		multiple environments. -->
 
-	<job id="loopJob" incrementer="jobParametersIncrementer">
+	<job id="loopJob" incrementer="jobParametersIncrementer" xmlns="http://www.springframework.org/schema/batch">
 		<step id="step1">
 			<tasklet>
 				<chunk reader="reader" writer="writer" commit-interval="3"/>
@@ -21,10 +21,10 @@
 		</step>
 	</job>
 
-	<beans:bean id="reader" class="org.springframework.batch.sample.common.InfiniteLoopReader" />
-	<beans:bean id="writer" class="org.springframework.batch.sample.common.InfiniteLoopWriter" />
+	<bean id="reader" class="org.springframework.batch.sample.common.InfiniteLoopReader" />
+	<bean id="writer" class="org.springframework.batch.sample.common.InfiniteLoopWriter" />
 	
-	<beans:bean id="jobParametersIncrementer" 
+	<bean id="jobParametersIncrementer" 
 	            class="org.springframework.batch.sample.common.InfiniteLoopIncrementer"/>
 
 	<aop:config>
@@ -41,4 +41,4 @@
 		</aop:aspect>
 	</aop:config>
 
-</beans:beans>
+</beans>

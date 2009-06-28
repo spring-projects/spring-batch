@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<beans xmlns="http://www.springframework.org/schema/beans" xmlns:batch="http://www.springframework.org/schema/batch" 
+<beans xmlns="http://www.springframework.org/schema/beans" 
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:aop="http://www.springframework.org/schema/aop" 
 	xsi:schemaLocation="http://www.springframework.org/schema/beans
        	http://www.springframework.org/schema/beans/spring-beans-2.0.xsd
@@ -12,18 +12,18 @@
 	<import resource="multilineOrderOutputAggregators.xml" />
 	<import resource="multilineOrderValidator.xml" />
 
-	<batch:job id="multilineOrderJob">
-		<batch:step id="step1">
-			<batch:tasklet>
-				<batch:chunk reader="reader" processor="processor" writer="fileItemWriter" commit-interval="5">
-					<batch:streams>
-						<batch:stream ref="fileItemReader"/>
-						<batch:stream ref="fileItemWriter"/>
-					</batch:streams>
-				</batch:chunk>
-			</batch:tasklet>
-		</batch:step>
-	</batch:job>
+	<job id="multilineOrderJob" xmlns="http://www.springframework.org/schema/batch">
+		<step id="step1">
+			<tasklet>
+				<chunk reader="reader" processor="processor" writer="fileItemWriter" commit-interval="5">
+					<streams>
+						<stream ref="fileItemReader"/>
+						<stream ref="fileItemWriter"/>
+					</streams>
+				</chunk>
+			</tasklet>
+		</step>
+	</job>
 
 	<bean id="reader" class="org.springframework.batch.sample.domain.order.internal.OrderItemReader">
 		<property name="fieldSetReader" ref="fileItemReader" />

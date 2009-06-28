@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<beans:beans xmlns="http://www.springframework.org/schema/batch" xmlns:beans="http://www.springframework.org/schema/beans"
+<beans xmlns="http://www.springframework.org/schema/beans"
 	xmlns:aop="http://www.springframework.org/schema/aop" xmlns:tx="http://www.springframework.org/schema/tx"
 	xmlns:p="http://www.springframework.org/schema/p" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="
@@ -8,14 +8,14 @@
 		http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-2.0.xsd
 		http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-2.0.xsd">
 
-	<beans:description>
+	<description>
 	<![CDATA[Sample showing usage of CompositeItemWriter.
 		Note that when two writers of the same class are used simultaneously 
 		they need to be distinguished using the 'name' property 
 		(see the two FlatFileItemWriters used in this example).]]>
-	</beans:description>
+	</description>
 
-	<job id="compositeItemWriterJob">
+	<job id="compositeItemWriterJob" xmlns="http://www.springframework.org/schema/batch" >
 		<step id="step1">
 			<tasklet>
 				<chunk reader="fileItemReader" processor="processor" writer="compositeWriter" 
@@ -32,78 +32,78 @@
 
 	<!-- INFRASTRUCTURE SETUP -->
 
-	<beans:bean id="compositeWriter" class="org.springframework.batch.item.support.CompositeItemWriter">
-		<beans:property name="delegates">
-			<beans:list>
-				<beans:bean class="org.springframework.batch.sample.domain.trade.internal.TradeWriter">
-					<beans:property name="dao" ref="tradeDao" />
-				</beans:bean>
-				<beans:ref bean="fileItemWriter1" />
-				<beans:ref bean="fileItemWriter2" />
-			</beans:list>
-		</beans:property>
-	</beans:bean>
+	<bean id="compositeWriter" class="org.springframework.batch.item.support.CompositeItemWriter">
+		<property name="delegates">
+			<list>
+				<bean class="org.springframework.batch.sample.domain.trade.internal.TradeWriter">
+					<property name="dao" ref="tradeDao" />
+				</bean>
+				<ref bean="fileItemWriter1" />
+				<ref bean="fileItemWriter2" />
+			</list>
+		</property>
+	</bean>
 
-	<beans:bean id="processor" class="org.springframework.batch.item.validator.ValidatingItemProcessor">
-		<beans:constructor-arg ref="fixedValidator" />
-	</beans:bean>
+	<bean id="processor" class="org.springframework.batch.item.validator.ValidatingItemProcessor">
+		<constructor-arg ref="fixedValidator" />
+	</bean>
 
-	<beans:bean id="fileItemReader" class="org.springframework.batch.item.file.FlatFileItemReader">
-		<beans:property name="resource"
+	<bean id="fileItemReader" class="org.springframework.batch.item.file.FlatFileItemReader">
+		<property name="resource"
 			value="classpath:data/fixedLengthImportJob/input/20070122.teststream.ImportTradeDataStep.txt" />
-		<beans:property name="lineMapper">
-			<beans:bean class="org.springframework.batch.item.file.mapping.DefaultLineMapper">
-				<beans:property name="lineTokenizer" ref="fixedFileTokenizer" />
-				<beans:property name="fieldSetMapper" ref="fieldSetMapper" />
-			</beans:bean>
-		</beans:property>
-	</beans:bean>
+		<property name="lineMapper">
+			<bean class="org.springframework.batch.item.file.mapping.DefaultLineMapper">
+				<property name="lineTokenizer" ref="fixedFileTokenizer" />
+				<property name="fieldSetMapper" ref="fieldSetMapper" />
+			</bean>
+		</property>
+	</bean>
 
-	<beans:bean id="fixedFileTokenizer" class="org.springframework.batch.item.file.transform.FixedLengthTokenizer">
-		<beans:property name="names" value="ISIN, Quantity, Price, Customer" />
-		<beans:property name="columns" value="1-12, 13-15, 16-20, 21-29" />
-	</beans:bean>
+	<bean id="fixedFileTokenizer" class="org.springframework.batch.item.file.transform.FixedLengthTokenizer">
+		<property name="names" value="ISIN, Quantity, Price, Customer" />
+		<property name="columns" value="1-12, 13-15, 16-20, 21-29" />
+	</bean>
 
-	<beans:bean id="fixedValidator" class="org.springframework.batch.item.validator.SpringValidator">
-		<beans:property name="validator">
-			<beans:bean id="tradeValidator" class="org.springmodules.validation.valang.ValangValidator">
-				<beans:property name="valang">
-					<beans:value>
+	<bean id="fixedValidator" class="org.springframework.batch.item.validator.SpringValidator">
+		<property name="validator">
+			<bean id="tradeValidator" class="org.springmodules.validation.valang.ValangValidator">
+				<property name="valang">
+					<value>
 						<![CDATA[
 						{ isin : length(?) < 13 : 'ISIN too long' : 'isin_length' : 12}
 					]]>
-					</beans:value>
-				</beans:property>
-			</beans:bean>
-		</beans:property>
-	</beans:bean>
+					</value>
+				</property>
+			</bean>
+		</property>
+	</bean>
 
-	<beans:bean id="tradeDao" class="org.springframework.batch.sample.domain.trade.internal.JdbcTradeDao">
-		<beans:property name="dataSource" ref="dataSource" />
-		<beans:property name="incrementer">
-			<beans:bean parent="incrementerParent">
-				<beans:property name="incrementerName" value="TRADE_SEQ" />
-			</beans:bean>
+	<bean id="tradeDao" class="org.springframework.batch.sample.domain.trade.internal.JdbcTradeDao">
+		<property name="dataSource" ref="dataSource" />
+		<property name="incrementer">
+			<bean parent="incrementerParent">
+				<property name="incrementerName" value="TRADE_SEQ" />
+			</bean>
 
-		</beans:property>
-	</beans:bean>
+		</property>
+	</bean>
 
-	<beans:bean id="fileItemWriter1" class="org.springframework.batch.item.file.FlatFileItemWriter">
-		<beans:property name="name" value="fw1" />
-		<beans:property name="resource" value="file:target/test-outputs/CustomerReport1.txt" />
-		<beans:property name="lineAggregator">
-			<beans:bean class="org.springframework.batch.item.file.transform.PassThroughLineAggregator" />
-		</beans:property>
-	</beans:bean>
+	<bean id="fileItemWriter1" class="org.springframework.batch.item.file.FlatFileItemWriter">
+		<property name="name" value="fw1" />
+		<property name="resource" value="file:target/test-outputs/CustomerReport1.txt" />
+		<property name="lineAggregator">
+			<bean class="org.springframework.batch.item.file.transform.PassThroughLineAggregator" />
+		</property>
+	</bean>
 
-	<beans:bean id="fileItemWriter2" class="org.springframework.batch.item.file.FlatFileItemWriter">
-		<beans:property name="name" value="fw2" />
-		<beans:property name="resource" value="file:target/test-outputs/CustomerReport2.txt" />
-		<beans:property name="lineAggregator">
-			<beans:bean class="org.springframework.batch.item.file.transform.PassThroughLineAggregator" />
-		</beans:property>
-	</beans:bean>
+	<bean id="fileItemWriter2" class="org.springframework.batch.item.file.FlatFileItemWriter">
+		<property name="name" value="fw2" />
+		<property name="resource" value="file:target/test-outputs/CustomerReport2.txt" />
+		<property name="lineAggregator">
+			<bean class="org.springframework.batch.item.file.transform.PassThroughLineAggregator" />
+		</property>
+	</bean>
 	
-	<beans:bean id="fieldSetMapper" class="org.springframework.batch.sample.domain.trade.internal.TradeFieldSetMapper" />
+	<bean id="fieldSetMapper" class="org.springframework.batch.sample.domain.trade.internal.TradeFieldSetMapper" />
 
-</beans:beans>
+</beans>

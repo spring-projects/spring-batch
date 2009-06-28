@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<beans:beans xmlns="http://www.springframework.org/schema/batch" xmlns:beans="http://www.springframework.org/schema/beans"
+<beans xmlns="http://www.springframework.org/schema/beans"
 	xmlns:aop="http://www.springframework.org/schema/aop" xmlns:tx="http://www.springframework.org/schema/tx"
 	xmlns:p="http://www.springframework.org/schema/p" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="
@@ -8,9 +8,9 @@
 		http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-2.5.xsd
 		http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-2.5.xsd">
 
-	<beans:description>Example for Hibernate integration.</beans:description>
+	<description>Example for Hibernate integration.</description>
 
-	<job id="hibernateJob" restartable="false">
+	<job id="hibernateJob" restartable="false" xmlns="http://www.springframework.org/schema/batch">
 		<step id="step1">
 			<tasklet>
 				<chunk reader="hibernateItemReader" 
@@ -26,24 +26,24 @@
 		</step>
 	</job>
 
-	<beans:bean id="creditIncreaseProcessor" 
+	<bean id="creditIncreaseProcessor" 
 	            class="org.springframework.batch.sample.domain.trade.internal.CustomerCreditIncreaseProcessor" />
 
-	<beans:bean id="hibernateCreditWriter"
+	<bean id="hibernateCreditWriter"
 		        class="org.springframework.batch.sample.domain.trade.internal.HibernateAwareCustomerCreditItemWriter">
-		<beans:property name="sessionFactory" ref="sessionFactory" />
-		<beans:property name="dao" ref="customerCreditDao" />
-	</beans:bean>
+		<property name="sessionFactory" ref="sessionFactory" />
+		<property name="dao" ref="customerCreditDao" />
+	</bean>
 
-	<beans:bean id="customerCreditDao"
+	<bean id="customerCreditDao"
 		class="org.springframework.batch.sample.domain.trade.internal.HibernateCreditDao">
-		<beans:property name="sessionFactory" ref="sessionFactory" />
-	</beans:bean>
+		<property name="sessionFactory" ref="sessionFactory" />
+	</bean>
 
-	<beans:bean id="hibernateItemReader"
+	<bean id="hibernateItemReader"
 		class="org.springframework.batch.item.database.HibernateCursorItemReader">
-		<beans:property name="queryString" value="from CustomerCredit" />
-		<beans:property name="sessionFactory" ref="sessionFactory" />
-	</beans:bean>
+		<property name="queryString" value="from CustomerCredit" />
+		<property name="sessionFactory" ref="sessionFactory" />
+	</bean>
 
-</beans:beans>
+</beans>

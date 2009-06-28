@@ -1,17 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<beans:beans xmlns="http://www.springframework.org/schema/batch"
-	xmlns:beans="http://www.springframework.org/schema/beans"
+<beans xmlns="http://www.springframework.org/schema/beans"
 	xmlns:aop="http://www.springframework.org/schema/aop"
-	xmlns:tx="http://www.springframework.org/schema/tx"
 	xmlns:p="http://www.springframework.org/schema/p"
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="
-		http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd
+	xsi:schemaLocation="http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-2.0.xsd
 		http://www.springframework.org/schema/batch http://www.springframework.org/schema/batch/spring-batch-2.0.xsd
-		http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-2.0.xsd
-		http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-2.0.xsd">
+		http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd">
 
-	<job id="footballJob">
+	<job id="footballJob" xmlns="http://www.springframework.org/schema/batch">
 		<step id="playerload" next="gameLoad">
 			<tasklet>
 				<chunk reader="playerFileItemReader" writer="playerWriter" 
@@ -27,77 +23,77 @@
 		<step id="playerSummarization" parent="summarizationStep" />
 	</job>
 
-	<step id="summarizationStep">
+	<step id="summarizationStep" xmlns="http://www.springframework.org/schema/batch">
 		<tasklet>
 			<chunk reader="playerSummarizationSource" writer="summaryWriter" 
                    commit-interval="${job.commit.interval}" />
 		</tasklet>
 	</step>
 
-	<beans:bean id="playerWriter" class="org.springframework.batch.sample.domain.football.internal.PlayerItemWriter">
-		<beans:property name="playerDao">
-			<beans:bean class="org.springframework.batch.sample.domain.football.internal.JdbcPlayerDao">
-				<beans:property name="dataSource" ref="dataSource" />
-			</beans:bean>
-		</beans:property>
-	</beans:bean>
+	<bean id="playerWriter" class="org.springframework.batch.sample.domain.football.internal.PlayerItemWriter">
+		<property name="playerDao">
+			<bean class="org.springframework.batch.sample.domain.football.internal.JdbcPlayerDao">
+				<property name="dataSource" ref="dataSource" />
+			</bean>
+		</property>
+	</bean>
 	
-	<beans:bean id="gameWriter" class="org.springframework.batch.sample.domain.football.internal.JdbcGameDao">
-		<beans:property name="dataSource" ref="dataSource" />
-	</beans:bean>
+	<bean id="gameWriter" class="org.springframework.batch.sample.domain.football.internal.JdbcGameDao">
+		<property name="dataSource" ref="dataSource" />
+	</bean>
 	
-	<beans:bean id="summaryWriter" class="org.springframework.batch.sample.domain.football.internal.JdbcPlayerSummaryDao">
-		<beans:property name="dataSource" ref="dataSource" />
-	</beans:bean>
+	<bean id="summaryWriter" class="org.springframework.batch.sample.domain.football.internal.JdbcPlayerSummaryDao">
+		<property name="dataSource" ref="dataSource" />
+	</bean>
 				
-	<beans:bean id="playerFileItemReader" class="org.springframework.batch.item.file.FlatFileItemReader">
-		<beans:property name="resource" value="classpath:data/footballjob/input/${player.file.name}" />
-		<beans:property name="lineMapper">
-			<beans:bean class="org.springframework.batch.item.file.mapping.DefaultLineMapper">
-				<beans:property name="lineTokenizer">
-					<beans:bean class="org.springframework.batch.item.file.transform.DelimitedLineTokenizer">
-						<beans:property name="names" value="ID,lastName,firstName,position,birthYear,debutYear" />
-					</beans:bean>
-				</beans:property>
-				<beans:property name="fieldSetMapper">
-					<beans:bean class="org.springframework.batch.sample.domain.football.internal.PlayerFieldSetMapper" />
-				</beans:property>
-			</beans:bean>
-		</beans:property>
-	</beans:bean>
+	<bean id="playerFileItemReader" class="org.springframework.batch.item.file.FlatFileItemReader">
+		<property name="resource" value="classpath:data/footballjob/input/${player.file.name}" />
+		<property name="lineMapper">
+			<bean class="org.springframework.batch.item.file.mapping.DefaultLineMapper">
+				<property name="lineTokenizer">
+					<bean class="org.springframework.batch.item.file.transform.DelimitedLineTokenizer">
+						<property name="names" value="ID,lastName,firstName,position,birthYear,debutYear" />
+					</bean>
+				</property>
+				<property name="fieldSetMapper">
+					<bean class="org.springframework.batch.sample.domain.football.internal.PlayerFieldSetMapper" />
+				</property>
+			</bean>
+		</property>
+	</bean>
 
-	<beans:bean id="gameFileItemReader" class="org.springframework.batch.item.file.FlatFileItemReader">
-		<beans:property name="resource" value="classpath:data/footballjob/input/${games.file.name}" />
-		<beans:property name="lineMapper">
-			<beans:bean class="org.springframework.batch.item.file.mapping.DefaultLineMapper">
-				<beans:property name="lineTokenizer">
-					<beans:bean class="org.springframework.batch.item.file.transform.DelimitedLineTokenizer">
-						<beans:property name="names" value="id,year,team,week,opponent,completes,attempts,passingYards,passingTd,interceptions,rushes,rushYards,receptions,receptionYards,totalTd" />
-					</beans:bean>
-				</beans:property>
-				<beans:property name="fieldSetMapper">
-					<beans:bean class="org.springframework.batch.sample.domain.football.internal.GameFieldSetMapper" />
-				</beans:property>
-			</beans:bean>
-		</beans:property>
-	</beans:bean>
+	<bean id="gameFileItemReader" class="org.springframework.batch.item.file.FlatFileItemReader">
+		<property name="resource" value="classpath:data/footballjob/input/${games.file.name}" />
+		<property name="lineMapper">
+			<bean class="org.springframework.batch.item.file.mapping.DefaultLineMapper">
+				<property name="lineTokenizer">
+					<bean class="org.springframework.batch.item.file.transform.DelimitedLineTokenizer">
+						<property name="names" value="id,year,team,week,opponent,completes,attempts,passingYards,passingTd,interceptions,rushes,rushYards,receptions,receptionYards,totalTd" />
+					</bean>
+				</property>
+				<property name="fieldSetMapper">
+					<bean class="org.springframework.batch.sample.domain.football.internal.GameFieldSetMapper" />
+				</property>
+			</bean>
+		</property>
+	</bean>
 
-	<beans:bean id="playerSummarizationSource" class="org.springframework.batch.item.database.JdbcCursorItemReader">
-		<beans:property name="dataSource" ref="dataSource" />
-		<beans:property name="rowMapper">
-			<beans:bean class="org.springframework.batch.sample.domain.football.internal.PlayerSummaryMapper" />
-		</beans:property>
-		<beans:property name="sql">
-			<beans:value>
+	<bean id="playerSummarizationSource" class="org.springframework.batch.item.database.JdbcCursorItemReader">
+		<property name="dataSource" ref="dataSource" />
+		<property name="rowMapper">
+			<bean class="org.springframework.batch.sample.domain.football.internal.PlayerSummaryMapper" />
+		</property>
+		<property name="sql">
+			<value>
 				SELECT games.player_id, games.year_no, SUM(COMPLETES),
 				SUM(ATTEMPTS), SUM(PASSING_YARDS), SUM(PASSING_TD),
 				SUM(INTERCEPTIONS), SUM(RUSHES), SUM(RUSH_YARDS),
 				SUM(RECEPTIONS), SUM(RECEPTIONS_YARDS), SUM(TOTAL_TD)
 				from games, players where players.player_id =
 				games.player_id group by games.player_id, games.year_no
-			</beans:value>
-		</beans:property>
-	</beans:bean>
+			</value>
+		</property>
+	</bean>
 
 	<aop:config>
 		<aop:aspect id="moduleLogging" ref="logAdvice">
@@ -118,17 +114,17 @@
 		</aop:aspect>
 	</aop:config>
 
-	<beans:bean id="footballProperties" class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
-		<beans:property name="properties">
-			<beans:value>
+	<bean id="footballProperties" class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+		<property name="properties">
+			<value>
 				games.file.name=games-small.csv
 				player.file.name=player-small1.csv
 				job.commit.interval=2
-			</beans:value>
-		</beans:property>
-		<beans:property name="systemPropertiesModeName" value="SYSTEM_PROPERTIES_MODE_OVERRIDE" />
-		<beans:property name="ignoreUnresolvablePlaceholders" value="true" />
-		<beans:property name="order" value="1" />
-	</beans:bean>
+			</value>
+		</property>
+		<property name="systemPropertiesModeName" value="SYSTEM_PROPERTIES_MODE_OVERRIDE" />
+		<property name="ignoreUnresolvablePlaceholders" value="true" />
+		<property name="order" value="1" />
+	</bean>
 
-</beans:beans>
+</beans>

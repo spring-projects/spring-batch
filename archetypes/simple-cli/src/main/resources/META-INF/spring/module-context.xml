@@ -1,19 +1,19 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <beans xmlns="http://www.springframework.org/schema/beans"
-	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:batch="http://www.springframework.org/schema/batch"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://www.springframework.org/schema/batch http://www.springframework.org/schema/batch/spring-batch-2.0.xsd
 		http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.5.xsd">
 
 	<description>Example job to get you started. It provides a
 		skeleton for a typical batch application.</description>
 
-	<batch:job id="job1">
-		<batch:step id="step1" parent="simpleStep">
-			<batch:tasklet>
-				<batch:chunk reader="reader" writer="writer"/>
-			</batch:tasklet>
-		</batch:step>
-	</batch:job>
+	<job id="job1" xmlns="http://www.springframework.org/schema/batch">
+		<step id="step1" parent="simpleStep">
+			<tasklet>
+				<chunk reader="reader" writer="writer" />
+			</tasklet>
+		</step>
+	</job>
 
 	<bean id="reader" class="example.ExampleItemReader" />
 	<bean id="writer" class="example.ExampleItemWriter" />
