@@ -311,6 +311,7 @@ class StepParserStepFactoryBean<I, O> implements FactoryBean, BeanNameAware {
 
 	private void validateFaultTolerantSettings() {
 		validateDependency("skippable-exception-classes", skippableExceptionClasses, "skip-limit", skipLimit, true);
+		validateDependency("fatal-exception-classes", fatalExceptionClasses, "skip-limit", skipLimit, false);
 		validateDependency("retryable-exception-classes", retryableExceptionClasses, "retry-limit", retryLimit, true);
 		validateDependency("retry-listeners", retryListeners, "retry-limit", retryLimit, false);
 	}
