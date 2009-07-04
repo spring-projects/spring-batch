@@ -27,7 +27,7 @@ import org.springframework.util.Assert;
  * @author Dan Garrette
  * @since 2.0.1
  */
-public class SkipReaderStub<T> extends ExceptionThrowingItemHandlerStub<T> implements ItemReader<T> {
+public class SkipReaderStub<T> extends AbstractExceptionThrowingItemHandlerStub<T> implements ItemReader<T> {
 
 	private T[] items;
 
@@ -35,10 +35,12 @@ public class SkipReaderStub<T> extends ExceptionThrowingItemHandlerStub<T> imple
 
 	private int counter = -1;
 
-	public SkipReaderStub() {
+	public SkipReaderStub() throws Exception {
+		super();
 	}
 
-	public SkipReaderStub(T... items) {
+	public SkipReaderStub(T... items) throws Exception {
+		super();
 		this.items = items;
 	}
 
@@ -52,7 +54,6 @@ public class SkipReaderStub<T> extends ExceptionThrowingItemHandlerStub<T> imple
 	}
 
 	public void clear() {
-		super.clear();
 		counter = -1;
 		read.clear();
 	}

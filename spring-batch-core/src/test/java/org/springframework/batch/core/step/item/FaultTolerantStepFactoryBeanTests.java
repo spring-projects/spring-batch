@@ -59,11 +59,11 @@ public class FaultTolerantStepFactoryBeanTests {
 
 	private FaultTolerantStepFactoryBean<String, String> factory;
 
-	private SkipReaderStub<String> reader = new SkipReaderStub<String>();
+	private SkipReaderStub<String> reader;
 
-	private SkipProcessorStub<String> processor = new SkipProcessorStub<String>();;
+	private SkipProcessorStub<String> processor;
 
-	private SkipWriterStub<String> writer = new SkipWriterStub<String>();
+	private SkipWriterStub<String> writer;
 
 	private JobExecution jobExecution;
 
@@ -74,6 +74,12 @@ public class FaultTolerantStepFactoryBeanTests {
 	private boolean opened = false;
 
 	private boolean closed = false;
+
+	public FaultTolerantStepFactoryBeanTests() throws Exception {
+		reader = new SkipReaderStub<String>();
+		processor = new SkipProcessorStub<String>();
+		writer = new SkipWriterStub<String>();
+	}
 
 	@Before
 	public void setUp() throws Exception {
@@ -783,12 +789,6 @@ public class FaultTolerantStepFactoryBeanTests {
 
 		public boolean isFilterEncountered() {
 			return filterEncountered;
-		}
-	}
-
-	private static class FatalRuntimeException extends SkippableRuntimeException {
-		public FatalRuntimeException(String message) {
-			super(message);
 		}
 	}
 

@@ -15,6 +15,8 @@
  */
 package org.springframework.batch.core.step.item;
 
+import java.lang.reflect.Constructor;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
@@ -26,34 +28,33 @@ import org.apache.commons.logging.LogFactory;
  * @author Dan Garrette
  * @since 2.0.1
  */
-public abstract class ExceptionThrowingItemHandlerStub<T> {
-	
+public abstract class AbstractExceptionThrowingItemHandlerStub<T> {
+
 	protected Log logger = LogFactory.getLog(getClass());
 
 	private Collection<T> failures = Collections.emptyList();
 
-	private boolean runtimeException = false;
+	private Constructor<? extends Exception> exception;
+
+	public AbstractExceptionThrowingItemHandlerStub() throws Exception {
+		exception = SkippableRuntimeException.class.getConstructor(String.class);
+	}
 
 	public void setFailures(T... failures) {
-		this.failures = Arrays.asList(failures);
+		this.failures = new ArrayList<T>(Arrays.asList(failures));
 	}
 
-	public void setRuntimeException(boolean runtimeException) {
-		this.runtimeException = runtimeException;
+	public void setExceptionType(Class<? extends Exception> exceptionType) throws Exception {
+		exception = exceptionType.getConstructor(String.class);
 	}
 
-	public void clear() {
+	public void clearFailures() {
 		failures.clear();
 	}
 
 	protected void checkFailure(T item) throws Exception {
 		if (isFailure(item)) {
-			if (runtimeException) {
-				throw new SkippableRuntimeException("Intended Failure: "+item);
-			}
-			else {
-				throw new SkippableException("Intended Failure: "+item);
-			}
+			throw exception.newInstance("Intended Failure: " + item);
 		}
 	}
 

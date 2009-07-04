@@ -25,11 +25,15 @@ import org.springframework.batch.support.transaction.TransactionAwareProxyFactor
  * @author Dan Garrette
  * @since 2.0.1
  */
-public class SkipWriterStub<T> extends ExceptionThrowingItemHandlerStub<T> implements ItemWriter<T> {
-	
+public class SkipWriterStub<T> extends AbstractExceptionThrowingItemHandlerStub<T> implements ItemWriter<T> {
+
 	private List<T> written = new ArrayList<T>();
 
 	private List<T> committed = TransactionAwareProxyFactory.createTransactionalList();
+
+	public SkipWriterStub() throws Exception {
+		super();
+	}
 
 	public List<T> getWritten() {
 		return written;
@@ -40,13 +44,12 @@ public class SkipWriterStub<T> extends ExceptionThrowingItemHandlerStub<T> imple
 	}
 
 	public void clear() {
-		super.clear();
 		written.clear();
 		committed.clear();
 	}
 
 	public void write(List<? extends T> items) throws Exception {
-		logger.debug("Writing: "+items);
+		logger.debug("Writing: " + items);
 		for (T item : items) {
 			written.add(item);
 			checkFailure(item);

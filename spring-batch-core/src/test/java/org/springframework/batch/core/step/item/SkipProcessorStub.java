@@ -25,13 +25,17 @@ import org.springframework.batch.support.transaction.TransactionAwareProxyFactor
  * @author Dan Garrette
  * @since 2.0.1
  */
-public class SkipProcessorStub<T> extends ExceptionThrowingItemHandlerStub<T> implements ItemProcessor<T, T> {
+public class SkipProcessorStub<T> extends AbstractExceptionThrowingItemHandlerStub<T> implements ItemProcessor<T, T> {
 
 	private List<T> processed = new ArrayList<T>();
 
 	private List<T> committed = TransactionAwareProxyFactory.createTransactionalList();
 
 	private boolean filter = false;
+
+	public SkipProcessorStub() throws Exception {
+		super();
+	}
 
 	public List<T> getProcessed() {
 		return processed;
@@ -46,7 +50,6 @@ public class SkipProcessorStub<T> extends ExceptionThrowingItemHandlerStub<T> im
 	}
 
 	public void clear() {
-		super.clear();
 		processed.clear();
 		committed.clear();
 		filter = false;

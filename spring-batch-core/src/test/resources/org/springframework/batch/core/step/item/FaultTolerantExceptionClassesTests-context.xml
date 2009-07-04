@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans 
+	xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.springframework.org/schema/batch http://www.springframework.org/schema/batch/spring-batch-2.0.xsd
+	http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.5.xsd">
+
+	<step id="nonSkippableStep" xmlns="http://www.springframework.org/schema/batch">
+		<tasklet>
+			<chunk reader="reader" writer="writer" commit-interval="4"/>
+		</tasklet>
+	</step>
+
+	<step id="skippableStep" xmlns="http://www.springframework.org/schema/batch">
+		<tasklet>
+			<chunk reader="reader" writer="writer" commit-interval="4" skip-limit="1">
+				<skippable-exception-classes>
+					org.springframework.batch.core.step.item.SkippableRuntimeException
+				</skippable-exception-classes>
+				<fatal-exception-classes>
+					org.springframework.batch.core.step.item.FatalRuntimeException
+				</fatal-exception-classes>
+			</chunk>
+		</tasklet>
+	</step>
+	
+	<step id="retryable" xmlns="http://www.springframework.org/schema/batch">
+		<tasklet>
+			<chunk reader="reader" writer="writer" commit-interval="4" skip-limit="5" retry-limit="2">
+				<skippable-exception-classes>
+					org.springframework.batch.core.step.item.SkippableRuntimeException
+				</skippable-exception-classes>
+				<fatal-exception-classes>
+					org.springframework.batch.core.step.item.FatalRuntimeException
+				</fatal-exception-classes>
+				<retryable-exception-classes>
+					java.lang.Exception
+				</retryable-exception-classes>
+			</chunk>
+		</tasklet>
+	</step>
+
+	<bean id="reader" class="org.springframework.batch.core.step.item.SkipReaderStub">
+		<property name="items">
+			<list>
+				<value>1</value>
+				<value>2</value>
+				<value>3</value>
+				<value>4</value>
+			</list>
+		</property>
+	</bean>
+
+	<bean id="writer" class="org.springframework.batch.core.step.item.SkipWriterStub">
+		<property name="failures">
+			<list>
+				<value>3</value>
+			</list>
+		</property>
+	</bean>
+	
+	<bean id="jobLauncher" class="org.springframework.batch.core.launch.support.SimpleJobLauncher">
+		<property name="jobRepository" ref="jobRepository" />
+	</bean>
+
+	<bean id="jobRepository" class="org.springframework.batch.core.repository.support.MapJobRepositoryFactoryBean">
+		<property name="transactionManager" ref="transactionManager" />
+	</bean>
+
+	<bean id="transactionManager" class="org.springframework.batch.support.transaction.ResourcelessTransactionManager" />
+
+</beans>
