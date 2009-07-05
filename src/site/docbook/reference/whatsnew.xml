@@ -266,10 +266,10 @@ itemWriter.write(items);</programlisting>
       class="org.springframework.batch.core.job.SimpleJob"&gt;
     &lt;property name="steps"&gt;
         &lt;list&gt;
-            &lt;!-- Step Bean details ommitted for clarity --&gt;
-            &lt;bean id="playerload" parent="simpleStep" /&gt;
-            &lt;bean id="gameLoad" parent="simpleStep" /&gt;
-            &lt;bean id="playerSummarization" parent="simpleStep" /&gt;
+            &lt;!-- Step bean details ommitted for clarity --&gt;
+            &lt;bean id="playerload"/&gt;
+            &lt;bean id="gameLoad"/&gt;
+            &lt;bean id="playerSummarization"/&gt;
         &lt;/list&gt;
     &lt;/property&gt;
     &lt;property name="jobRepository" ref="jobRepository" /&gt;
@@ -278,6 +278,7 @@ itemWriter.write(items);</programlisting>
     <para>In 2.0, the equivalent would be:</para>
 
     <programlisting>&lt;job id="footballJob"&gt;
+    &lt;!-- Step bean details ommitted for clarity --&gt;
     &lt;step id="playerload" next="gameLoad"/&gt;
     &lt;step id="gameLoad" next="playerSummarization"/&gt;
     &lt;step id="playerSummarization"/&gt;
