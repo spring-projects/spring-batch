@@ -16,9 +16,11 @@
 			<chunk reader="reader" writer="writer" commit-interval="4" skip-limit="1">
 				<skippable-exception-classes>
 					org.springframework.batch.core.step.item.SkippableRuntimeException
+					org.springframework.batch.core.step.item.SkippableException
 				</skippable-exception-classes>
 				<fatal-exception-classes>
 					org.springframework.batch.core.step.item.FatalRuntimeException
+					org.springframework.batch.core.step.item.FatalException
 				</fatal-exception-classes>
 			</chunk>
 		</tasklet>
@@ -29,14 +31,42 @@
 			<chunk reader="reader" writer="writer" commit-interval="4" skip-limit="5" retry-limit="2">
 				<skippable-exception-classes>
 					org.springframework.batch.core.step.item.SkippableRuntimeException
+					org.springframework.batch.core.step.item.SkippableException
 				</skippable-exception-classes>
 				<fatal-exception-classes>
 					org.springframework.batch.core.step.item.FatalRuntimeException
+					org.springframework.batch.core.step.item.FatalException
 				</fatal-exception-classes>
 				<retryable-exception-classes>
 					java.lang.Exception
 				</retryable-exception-classes>
 			</chunk>
+		</tasklet>
+	</step>
+	
+	<step id="noRollback" xmlns="http://www.springframework.org/schema/batch">
+		<tasklet>
+			<chunk reader="reader" writer="writer" commit-interval="4" skip-limit="1">
+				<skippable-exception-classes>
+					org.springframework.batch.core.step.item.SkippableRuntimeException
+					org.springframework.batch.core.step.item.SkippableException
+				</skippable-exception-classes>
+				<fatal-exception-classes>
+					org.springframework.batch.core.step.item.FatalRuntimeException
+					org.springframework.batch.core.step.item.FatalException
+				</fatal-exception-classes>
+			</chunk>
+			<no-rollback-exception-classes>
+				org.springframework.batch.core.step.item.SkippableRuntimeException
+			</no-rollback-exception-classes>
+		</tasklet>
+	</step>
+
+	<step id="noRollbackTasklet" xmlns="http://www.springframework.org/schema/batch">
+		<tasklet ref="tasklet">
+			<no-rollback-exception-classes>
+				org.springframework.batch.core.step.item.SkippableRuntimeException
+			</no-rollback-exception-classes>
 		</tasklet>
 	</step>
 
@@ -58,6 +88,8 @@
 			</list>
 		</property>
 	</bean>
+	
+	<bean id="tasklet" class="org.springframework.batch.core.step.item.ExceptionThrowingTaskletStub"/>
 	
 	<bean id="jobLauncher" class="org.springframework.batch.core.launch.support.SimpleJobLauncher">
 		<property name="jobRepository" ref="jobRepository" />

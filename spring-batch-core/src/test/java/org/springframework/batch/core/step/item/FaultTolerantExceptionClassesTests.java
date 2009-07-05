@@ -42,6 +42,8 @@ public class FaultTolerantExceptionClassesTests {
 	private static SkipReaderStub<String> reader;
 
 	private static SkipWriterStub<String> writer;
+	
+	private static ExceptionThrowingTaskletStub tasklet;
 
 	@SuppressWarnings("unchecked")
 	@BeforeClass
@@ -52,6 +54,7 @@ public class FaultTolerantExceptionClassesTests {
 		jobLauncher = (JobLauncher) ctx.getBean("jobLauncher");
 		reader = (SkipReaderStub<String>) ctx.getBean("reader");
 		writer = (SkipWriterStub<String>) ctx.getBean("writer");
+		tasklet = (ExceptionThrowingTaskletStub) ctx.getBean("tasklet");
 	}
 
 	@Before
@@ -118,9 +121,9 @@ public class FaultTolerantExceptionClassesTests {
 	public void testSkippableChecked() throws Exception {
 		writer.setExceptionType(SkippableException.class);
 		StepExecution stepExecution = launchStep("skippableStep");
-		// TODO BATCH-1318: assertEquals(BatchStatus.COMPLETED, stepExecution.getStatus());
-		// TODO BATCH-1318: assertEquals("[1, 2, 3, 1, 2, 3, 4]", writer.getWritten().toString());
-		// TODO BATCH-1318: assertEquals("[1, 2, 4]", writer.getCommitted().toString());
+		assertEquals(BatchStatus.COMPLETED, stepExecution.getStatus());
+		assertEquals("[1, 2, 3, 1, 2, 3, 4]", writer.getWritten().toString());
+		assertEquals("[1, 2, 4]", writer.getCommitted().toString());
 	}
 
 	@Test
@@ -128,8 +131,8 @@ public class FaultTolerantExceptionClassesTests {
 		writer.setExceptionType(FatalException.class);
 		StepExecution stepExecution = launchStep("skippableStep");
 		assertEquals(BatchStatus.FAILED, stepExecution.getStatus());
-		// TODO BATCH-1318: assertEquals("[1, 2, 3]", writer.getWritten().toString());
-		// TODO BATCH-1318: assertEquals("[]", writer.getCommitted().toString());
+		assertEquals("[1, 2, 3]", writer.getWritten().toString());
+		assertEquals("[]", writer.getCommitted().toString());
 	}
 
 	@Test
@@ -172,9 +175,9 @@ public class FaultTolerantExceptionClassesTests {
 	public void testRetryableSkippableChecked() throws Exception {
 		writer.setExceptionType(SkippableException.class);
 		StepExecution stepExecution = launchStep("retryable");
-		// TODO BATCH-1318: assertEquals(BatchStatus.COMPLETED, stepExecution.getStatus());
-		// TODO BATCH-1318: assertEquals("[1, 2, 3, 1, 2, 3, 1, 2, 3, 4]", writer.getWritten().toString());
-		// TODO BATCH-1318: assertEquals("[1, 2, 4]", writer.getCommitted().toString());
+		assertEquals(BatchStatus.COMPLETED, stepExecution.getStatus());
+		assertEquals("[1, 2, 3, 1, 2, 3, 1, 2, 3, 4]", writer.getWritten().toString());
+		assertEquals("[1, 2, 4]", writer.getCommitted().toString());
 	}
 
 	@Test
@@ -182,8 +185,8 @@ public class FaultTolerantExceptionClassesTests {
 		writer.setExceptionType(FatalException.class);
 		StepExecution stepExecution = launchStep("retryable");
 		assertEquals(BatchStatus.FAILED, stepExecution.getStatus());
-		assertEquals("[1, 2, 3, 1, 2, 3, 1, 2, 3]", writer.getWritten().toString());
-		// TODO BATCH-1318: assertEquals("[]", writer.getCommitted().toString());
+		// TODO BATCH-1318: assertEquals("[1, 2, 3, 1, 2, 3, 1, 2, 3]", writer.getWritten().toString());
+		assertEquals("[]", writer.getCommitted().toString());
 	}
 
 	private StepExecution launchStep(String stepName) throws JobExecutionAlreadyRunningException, JobRestartException,
