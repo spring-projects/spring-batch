@@ -126,6 +126,7 @@ public class StepSynchronizationManager {
 			if (remaining <= 0) {
 				synchronized (contexts) {
 					contexts.remove(current);
+					counts.remove(current);
 				}
 			}
 		}
