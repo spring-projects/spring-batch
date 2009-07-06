@@ -189,6 +189,76 @@ public class FaultTolerantExceptionClassesTests {
 		assertEquals("[]", writer.getCommitted().toString());
 	}
 
+	@Test
+	public void testNoRollbackDefaultRollbackException() throws Exception {
+		writer.setExceptionType(RuntimeException.class);
+		StepExecution stepExecution = launchStep("noRollbackDefault");
+		assertEquals(BatchStatus.FAILED, stepExecution.getStatus());
+		// TODO BATCH-1318: assertEquals("[1, 2, 3]", writer.getWritten().toString());
+		// TODO BATCH-1318: assertEquals("[]", writer.getCommitted().toString());
+	}
+
+	@Test
+	public void testNoRollbackDefaultNoRollbackException() throws Exception {
+		writer.setExceptionType(SkippableRuntimeException.class);
+		StepExecution stepExecution = launchStep("noRollbackDefault");
+		// TODO BATCH-1318: assertEquals(BatchStatus.FAILED, stepExecution.getStatus());
+		// TODO BATCH-1318: assertEquals("[1, 2, 3]", writer.getWritten().toString());
+		// TODO BATCH-1318: assertEquals("[1, 2, 3]", writer.getCommitted().toString());
+	}
+
+	@Test
+	public void testNoRollbackSkippableRollbackException() throws Exception {
+		writer.setExceptionType(SkippableRuntimeException.class);
+		StepExecution stepExecution = launchStep("noRollbackSkippable");
+		assertEquals(BatchStatus.COMPLETED, stepExecution.getStatus());
+		assertEquals("[1, 2, 3, 1, 2, 3, 4]", writer.getWritten().toString());
+		assertEquals("[1, 2, 4]", writer.getCommitted().toString());
+	}
+
+	@Test
+	public void testNoRollbackSkippableNoRollbackException() throws Exception {
+		writer.setExceptionType(FatalRuntimeException.class);
+		StepExecution stepExecution = launchStep("noRollbackSkippable");
+		assertEquals(BatchStatus.COMPLETED, stepExecution.getStatus());
+		assertEquals("[1, 2, 3, 1, 2, 3, 4]", writer.getWritten().toString());
+		// TODO BATCH-1318: assertEquals("[1, 2, 3, 1, 2, 3, 4]", writer.getCommitted().toString());
+	}
+
+	@Test
+	public void testNoRollbackFatalRollbackException() throws Exception {
+		writer.setExceptionType(SkippableRuntimeException.class);
+		StepExecution stepExecution = launchStep("noRollbackFatal");
+		assertEquals(BatchStatus.FAILED, stepExecution.getStatus());
+		assertEquals("[1, 2, 3]", writer.getWritten().toString());
+		assertEquals("[]", writer.getCommitted().toString());
+	}
+
+	@Test
+	public void testNoRollbackFatalNoRollbackException() throws Exception {
+		writer.setExceptionType(FatalRuntimeException.class);
+		StepExecution stepExecution = launchStep("noRollbackFatal");
+		assertEquals(BatchStatus.FAILED, stepExecution.getStatus());
+		// TODO BATCH-1318: assertEquals("[1, 2, 3]", writer.getWritten().toString());
+		// TODO BATCH-1318: assertEquals("[1, 2, 3]", writer.getCommitted().toString());
+	}
+
+	@Test
+	public void testNoRollbackTaskletRollbackException() throws Exception {
+		tasklet.setExceptionType(FatalRuntimeException.class);
+		StepExecution stepExecution = launchStep("noRollbackTasklet");
+		assertEquals(BatchStatus.FAILED, stepExecution.getStatus());
+		assertEquals("[]", tasklet.getCommitted().toString());
+	}
+
+	@Test
+	public void testNoRollbackTaskletNoRollbackException() throws Exception {
+		tasklet.setExceptionType(SkippableRuntimeException.class);
+		StepExecution stepExecution = launchStep("noRollbackTasklet");
+		assertEquals(BatchStatus.FAILED, stepExecution.getStatus());
+		// TODO BATCH-1298: assertEquals("[1]", tasklet.getCommitted().toString());
+	}
+
 	private StepExecution launchStep(String stepName) throws JobExecutionAlreadyRunningException, JobRestartException,
 			JobInstanceAlreadyCompleteException {
 		SimpleJob job = new SimpleJob();

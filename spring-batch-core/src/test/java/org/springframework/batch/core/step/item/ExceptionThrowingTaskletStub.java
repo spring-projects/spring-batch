@@ -50,6 +50,10 @@ public class ExceptionThrowingTaskletStub implements Tasklet {
 		return committed;
 	}
 
+	public void clear() {
+		committed.clear();
+	}
+
 	public RepeatStatus execute(StepContribution contribution, ChunkContext chunkContext) throws Exception {
 		committed.add(1);
 		throw exception.newInstance("Expected exception");

@@ -52,8 +52,8 @@ public class SkipWriterStub<T> extends AbstractExceptionThrowingItemHandlerStub<
 		logger.debug("Writing: " + items);
 		for (T item : items) {
 			written.add(item);
-			checkFailure(item);
 			committed.add(item);
+			checkFailure(item);
 		}
 	}
 }

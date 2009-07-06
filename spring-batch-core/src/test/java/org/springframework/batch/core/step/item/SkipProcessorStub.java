@@ -57,6 +57,7 @@ public class SkipProcessorStub<T> extends AbstractExceptionThrowingItemHandlerSt
 
 	public T process(T item) throws Exception {
 		processed.add(item);
+		committed.add(item);
 		try {
 			checkFailure(item);
 		}
@@ -68,7 +69,6 @@ public class SkipProcessorStub<T> extends AbstractExceptionThrowingItemHandlerSt
 				throw e;
 			}
 		}
-		committed.add(item);
 		return item;
 	}
 }

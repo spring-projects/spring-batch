@@ -44,20 +44,50 @@
 		</tasklet>
 	</step>
 	
-	<step id="noRollback" xmlns="http://www.springframework.org/schema/batch">
+	<step id="noRollbackDefault" xmlns="http://www.springframework.org/schema/batch">
+		<tasklet>
+			<chunk reader="reader" writer="writer" commit-interval="4" skip-limit="1">
+				<skippable-exception-classes>
+					org.springframework.batch.core.step.item.FatalRuntimeException
+				</skippable-exception-classes>
+			</chunk>
+			<no-rollback-exception-classes>
+				org.springframework.batch.core.step.item.SkippableRuntimeException
+			</no-rollback-exception-classes>
+		</tasklet>
+	</step>
+	
+	<step id="noRollbackSkippable" xmlns="http://www.springframework.org/schema/batch">
 		<tasklet>
 			<chunk reader="reader" writer="writer" commit-interval="4" skip-limit="1">
 				<skippable-exception-classes>
 					org.springframework.batch.core.step.item.SkippableRuntimeException
 					org.springframework.batch.core.step.item.SkippableException
+					org.springframework.batch.core.step.item.FatalRuntimeException
+					org.springframework.batch.core.step.item.FatalException
+				</skippable-exception-classes>
+			</chunk>
+			<no-rollback-exception-classes>
+				org.springframework.batch.core.step.item.FatalRuntimeException
+			</no-rollback-exception-classes>
+		</tasklet>
+	</step>
+
+	<step id="noRollbackFatal" xmlns="http://www.springframework.org/schema/batch">
+		<tasklet>
+			<chunk reader="reader" writer="writer" commit-interval="4" skip-limit="1">
+				<skippable-exception-classes>
+					java.lang.Exception
 				</skippable-exception-classes>
 				<fatal-exception-classes>
+					org.springframework.batch.core.step.item.SkippableRuntimeException
+					org.springframework.batch.core.step.item.SkippableException
 					org.springframework.batch.core.step.item.FatalRuntimeException
 					org.springframework.batch.core.step.item.FatalException
 				</fatal-exception-classes>
 			</chunk>
 			<no-rollback-exception-classes>
-				org.springframework.batch.core.step.item.SkippableRuntimeException
+				org.springframework.batch.core.step.item.FatalRuntimeException
 			</no-rollback-exception-classes>
 		</tasklet>
 	</step>
