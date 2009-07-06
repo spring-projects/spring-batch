@@ -64,8 +64,8 @@ public class SkipReaderStub<T> extends AbstractExceptionThrowingItemHandlerStub<
 			return null;
 		}
 		T item = items[counter];
-		read.add(item);
 		checkFailure(item);
+		read.add(item);
 		return item;
 	}
 }

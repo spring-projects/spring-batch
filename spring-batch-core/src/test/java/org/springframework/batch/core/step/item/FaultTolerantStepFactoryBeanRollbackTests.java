@@ -339,7 +339,7 @@ public class FaultTolerantStepFactoryBeanRollbackTests {
 		assertEquals(BatchStatus.COMPLETED, stepExecution.getStatus());
 
 		assertEquals("[1, 2, 3, 4, 5]", processor.getProcessed().toString());
-		assertEquals("[1, 2, 3, 5]", processor.getCommitted().toString());
+		assertEquals("[1, 2, 3, 4, 5]", processor.getCommitted().toString());
 		assertEquals("[1, 2, 3, 5]", writer.getWritten().toString());
 		assertEquals("[1, 2, 3, 5]", writer.getCommitted().toString());
 	}
