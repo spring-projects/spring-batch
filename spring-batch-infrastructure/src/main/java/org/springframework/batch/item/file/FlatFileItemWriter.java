@@ -259,7 +259,7 @@ public class FlatFileItemWriter<T> extends ExecutionContextUserSupport implement
 			if (headerCallback != null) {
 				try {
 					headerCallback.writeHeader(outputState.outputBufferedWriter);
-					outputState.write("\n");
+					outputState.write(lineSeparator);
 				}
 				catch (IOException e) {
 					throw new ItemStreamException("Could not write headers.  The file may be corrupt.", e);

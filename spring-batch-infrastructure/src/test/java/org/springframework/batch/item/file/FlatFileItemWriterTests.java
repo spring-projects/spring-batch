@@ -85,6 +85,7 @@ public class FlatFileItemWriterTests {
 		outputFile = File.createTempFile("flatfile-test-output-", ".tmp");
 
 		writer.setResource(new FileSystemResource(outputFile));
+		writer.setLineSeparator("\n");
 		writer.setLineAggregator(new PassThroughLineAggregator<String>());
 		writer.afterPropertiesSet();
 		writer.setSaveState(true);
