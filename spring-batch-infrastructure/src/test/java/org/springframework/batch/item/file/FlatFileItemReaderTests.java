@@ -104,6 +104,84 @@ public class FlatFileItemReaderTests {
 	}
 
 	@Test
+	public void testCurrentItemCount() throws Exception {
+
+		reader.setCurrentItemCount(2);
+		reader.open(executionContext);
+
+		// read some records
+		reader.read();
+		reader.read();
+		// get restart data
+		reader.update(executionContext);
+
+		assertEquals(4, executionContext.getInt(ClassUtils.getShortName(FlatFileItemReader.class) + ".read.count"));
+		// close input
+		reader.close();
+
+	}
+
+	@Test
+	public void testMaxItemCount() throws Exception {
+
+		reader.setMaxItemCount(2);
+		reader.open(executionContext);
+
+		// read some records
+		reader.read();
+		reader.read();
+		// get restart data
+		reader.update(executionContext);
+		assertNull(reader.read());
+
+		assertEquals(2, executionContext.getInt(ClassUtils.getShortName(FlatFileItemReader.class) + ".read.count"));
+		// close input
+		reader.close();
+
+	}
+
+	@Test
+	public void testMaxItemCountFromContext() throws Exception {
+
+		reader.setMaxItemCount(2);
+		executionContext.putInt(reader.getClass().getSimpleName()+".read.count.max", Integer.MAX_VALUE);
+		reader.open(executionContext);
+		// read some records
+		reader.read();
+		reader.read();
+		assertNotNull(reader.read());
+		// close input
+		reader.close();
+
+	}
+
+	@Test
+	public void testCurrentItemCountFromContext() throws Exception {
+
+		reader.setCurrentItemCount(2);
+		executionContext.putInt(reader.getClass().getSimpleName()+".read.count", 3);
+		reader.open(executionContext);
+		// read some records
+		assertEquals("testLine4", reader.read());
+		// close input
+		reader.close();
+
+	}
+
+	@Test
+	public void testMaxAndCurrentItemCount() throws Exception {
+
+		reader.setMaxItemCount(2);
+		reader.setCurrentItemCount(2);
+		reader.open(executionContext);
+		// read some records
+		assertNull(reader.read());
+		// close input
+		reader.close();
+
+	}
+
+	@Test
 	public void testNonExistentResource() throws Exception {
 
 		Resource resource = new NonExistentResource();
