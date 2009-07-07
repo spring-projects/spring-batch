@@ -30,21 +30,21 @@ import org.springframework.context.support.ClassPathXmlApplicationContext;
  */
 public class AutoRegisteringStepScopeTests {
 	
-	@SuppressWarnings("unchecked")
 	@Test
 	public void testJobElement() throws Exception {
 		ConfigurableApplicationContext ctx = 
 			new ClassPathXmlApplicationContext("org/springframework/batch/core/configuration/xml/AutoRegisteringStepScopeForJobElementTests-context.xml");
-		Map<String, Object> beans = ctx.getBeansOfType(StepScope.class);
+		@SuppressWarnings("unchecked")
+		Map<String, StepScope> beans = ctx.getBeansOfType(StepScope.class);
 		assertTrue("StepScope not defined properly", beans.size() == 1);
 	}
 
-	@SuppressWarnings("unchecked")
 	@Test
 	public void testStepElement() throws Exception {
 		ConfigurableApplicationContext ctx = 
 			new ClassPathXmlApplicationContext("org/springframework/batch/core/configuration/xml/AutoRegisteringStepScopeForStepElementTests-context.xml");
-		Map<String, Object> beans = ctx.getBeansOfType(StepScope.class);
+		@SuppressWarnings("unchecked")
+		Map<String, StepScope> beans = ctx.getBeansOfType(StepScope.class);
 		assertTrue("StepScope not defined properly", beans.size() == 1);
 	}
 

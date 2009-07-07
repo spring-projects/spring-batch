@@ -174,7 +174,7 @@ public class ChunkElementParserTests {
 
 	@SuppressWarnings("unchecked")
 	private Set<Class<?>> getExceptionClasses(String stepName, String type, ApplicationContext ctx) throws Exception {
-		Map<String, Object> beans = ctx.getBeansOfType(Step.class);
+		Map<String, Step> beans = ctx.getBeansOfType(Step.class);
 		assertTrue(beans.containsKey(stepName));
 		Object step = ctx.getBean(stepName);
 		assertTrue(step instanceof TaskletStep);
@@ -190,7 +190,7 @@ public class ChunkElementParserTests {
 
 	@SuppressWarnings("unchecked")
 	private Collection<ItemStream> getStreams(String stepName, ApplicationContext ctx) throws Exception {
-		Map<String, Object> beans = ctx.getBeansOfType(Step.class);
+		Map<String, Step> beans = ctx.getBeansOfType(Step.class);
 		assertTrue(beans.containsKey(stepName));
 		Object step = ctx.getBean(stepName);
 		assertTrue(step instanceof TaskletStep);
@@ -201,7 +201,7 @@ public class ChunkElementParserTests {
 
 	@SuppressWarnings("unchecked")
 	private Collection<RetryListener> getRetryListeners(String stepName, ApplicationContext ctx) throws Exception {
-		Map<String, Object> beans = ctx.getBeansOfType(Step.class);
+		Map<String, Step> beans = ctx.getBeansOfType(Step.class);
 		assertTrue(beans.containsKey(stepName));
 		Object step = ctx.getBean(stepName);
 		assertTrue(step instanceof TaskletStep);

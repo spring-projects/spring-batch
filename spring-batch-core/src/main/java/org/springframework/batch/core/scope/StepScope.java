@@ -111,6 +111,12 @@ public class StepScope implements Scope, BeanFactoryPostProcessor, Ordered {
 	public void setProxyTargetClass(boolean proxyTargetClass) {
 		this.proxyTargetClass = proxyTargetClass;
 	}
+	
+	// Implement missing method from Spring 3.0 SPI.
+	public Object resolveContextualObject(String key) {
+		StepContext context = getContext();
+		return context.getAttribute(key);
+	}
 
 	/**
 	 * @see Scope#get(String, ObjectFactory)

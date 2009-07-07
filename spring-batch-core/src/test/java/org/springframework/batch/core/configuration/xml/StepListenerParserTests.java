@@ -89,7 +89,7 @@ public class StepListenerParserTests {
 
 	@SuppressWarnings("unchecked")
 	private List<?> getListeners(String stepName, ApplicationContext ctx) throws Exception {
-		Map<String, Object> beans = ctx.getBeansOfType(Step.class);
+		Map<String, Step> beans = ctx.getBeansOfType(Step.class);
 		assertTrue(beans.containsKey(stepName));
 		Object step = ctx.getBean(stepName);
 		assertTrue(step instanceof TaskletStep);

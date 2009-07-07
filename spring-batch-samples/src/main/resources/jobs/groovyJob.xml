@@ -6,7 +6,7 @@
 		http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
 		http://www.springframework.org/schema/lang http://www.springframework.org/schema/lang/spring-lang.xsd">
 
-	<job id="tradeJob" xmlns="http://www.springframework.org/schema/batch">
+	<job id="groovyJob" xmlns="http://www.springframework.org/schema/batch">
 		<step id="unzip-step" next="zip-step">
 			<tasklet ref="unzip" />
 		</step>

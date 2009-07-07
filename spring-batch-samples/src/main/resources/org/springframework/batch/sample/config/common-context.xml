@@ -10,19 +10,7 @@
 	<bean id="customEditorConfigurer" class="org.springframework.beans.factory.config.CustomEditorConfigurer">
 		<property name="customEditors">
 			<map>
-				<entry key="int[]">
-					<bean class="org.springframework.batch.support.IntArrayPropertyEditor" />
-				</entry>
-				<entry key="java.util.Date">
-					<bean class="org.springframework.beans.propertyeditors.CustomDateEditor">
-						<constructor-arg>
-							<bean class="java.text.SimpleDateFormat">
-								<constructor-arg value="yyyyMMdd" />
-							</bean>
-						</constructor-arg>
-						<constructor-arg value="false" />
-					</bean>
-				</entry>
+				<entry key="int[]" value="org.springframework.batch.support.IntArrayPropertyEditor" />
 			</map>
 		</property>
 	</bean>

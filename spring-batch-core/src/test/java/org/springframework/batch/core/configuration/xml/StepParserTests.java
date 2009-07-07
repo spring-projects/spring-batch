@@ -61,25 +61,26 @@ public class StepParserTests {
 				"org/springframework/batch/core/configuration/xml/StepParserParentAttributeTests-context.xml");
 	}
 
-	@SuppressWarnings("unchecked")
 	@Test
 	public void testTaskletStepAttributes() throws Exception {
 		ConfigurableApplicationContext ctx = new ClassPathXmlApplicationContext(
 				"org/springframework/batch/core/configuration/xml/StepParserTaskletAttributesTests-context.xml");
-		Map<String, Object> beans = ctx.getBeansOfType(StepParserStepFactoryBean.class);
+		@SuppressWarnings("unchecked")
+		Map<String, StepParserStepFactoryBean> beans = ctx.getBeansOfType(StepParserStepFactoryBean.class);
 		String factoryName = (String) beans.keySet().toArray()[0];
+		@SuppressWarnings("unchecked")
 		StepParserStepFactoryBean<Object, Object> factory = (StepParserStepFactoryBean<Object, Object>) beans
 				.get(factoryName);
 		TaskletStep bean = (TaskletStep) factory.getObject();
 		assertEquals("wrong start-limit:", 25, bean.getStartLimit());
 	}
 
-	@SuppressWarnings("unchecked")
 	@Test
 	public void testStepParserBeanName() throws Exception {
 		ConfigurableApplicationContext ctx = new ClassPathXmlApplicationContext(
 				"org/springframework/batch/core/configuration/xml/StepParserBeanNameTests-context.xml");
-		Map<String, Object> beans = ctx.getBeansOfType(Step.class);
+		@SuppressWarnings("unchecked")
+		Map<String, Step> beans = ctx.getBeansOfType(Step.class);
 		assertTrue("'s1' bean not found", beans.containsKey("s1"));
 		Step s1 = (Step) ctx.getBean("s1");
 		assertEquals("wrong name", "s1", s1.getName());
@@ -91,12 +92,12 @@ public class StepParserTests {
 				"org/springframework/batch/core/configuration/xml/StepParserCommitIntervalCompletionPolicyTests-context.xml");
 	}
 
-	@SuppressWarnings("unchecked")
 	@Test
 	public void testStepParserCommitInterval() throws Exception {
 		ConfigurableApplicationContext ctx = new ClassPathXmlApplicationContext(
 				"org/springframework/batch/core/configuration/xml/StepParserCommitIntervalTests-context.xml");
-		Map<String, Object> beans = ctx.getBeansOfType(Step.class);
+		@SuppressWarnings("unchecked")
+		Map<String, Step> beans = ctx.getBeansOfType(Step.class);
 		assertTrue("'s1' bean not found", beans.containsKey("s1"));
 		Step s1 = (Step) ctx.getBean("s1");
 		CompletionPolicy completionPolicy = getCompletionPolicy(s1);
@@ -104,12 +105,12 @@ public class StepParserTests {
 		assertEquals(25, ReflectionTestUtils.getField(completionPolicy, "chunkSize"));
 	}
 
-	@SuppressWarnings("unchecked")
 	@Test
 	public void testStepParserCompletionPolicy() throws Exception {
 		ConfigurableApplicationContext ctx = new ClassPathXmlApplicationContext(
 				"org/springframework/batch/core/configuration/xml/StepParserCompletionPolicyTests-context.xml");
-		Map<String, Object> beans = ctx.getBeansOfType(Step.class);
+		@SuppressWarnings("unchecked")
+		Map<String, Step> beans = ctx.getBeansOfType(Step.class);
 		assertTrue("'s1' bean not found", beans.containsKey("s1"));
 		Step s1 = (Step) ctx.getBean("s1");
 		CompletionPolicy completionPolicy = getCompletionPolicy(s1);

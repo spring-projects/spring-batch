@@ -23,19 +23,25 @@
 	</bean>
 
 	<bean class="org.springframework.beans.factory.config.CustomEditorConfigurer">
-		<property name="customEditors">
-			<map>
-				<entry key="java.util.Date">
-					<bean class="org.springframework.beans.propertyeditors.CustomDateEditor">
-						<constructor-arg>
-							<bean class="java.text.SimpleDateFormat">
-								<constructor-arg value="yyyy/MM/dd" />
+		<property name="propertyEditorRegistrars">
+			<bean
+				class="org.springframework.batch.support.DefaultPropertyEditorRegistrar">
+				<property name="customEditors">
+					<map>
+						<entry key="java.util.Date">
+							<bean
+								class="org.springframework.beans.propertyeditors.CustomDateEditor">
+								<constructor-arg>
+									<bean class="java.text.SimpleDateFormat">
+										<constructor-arg value="yyyy/MM/dd" />
+									</bean>
+								</constructor-arg>
+								<constructor-arg value="false" />
 							</bean>
-						</constructor-arg>
-						<constructor-arg value="false"/>
-					</bean>
-				</entry>
-			</map>
+						</entry>
+					</map>
+				</property>
+			</bean>
 		</property>
 	</bean>
 
