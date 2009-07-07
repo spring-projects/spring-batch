@@ -62,7 +62,7 @@ public class JobRepositoryTestUtils implements InitializingBean {
 	};
 
 	private SimpleJdbcOperations jdbcTemplate;
-	
+
 	/**
 	 * @see InitializingBean#afterPropertiesSet()
 	 */
@@ -121,7 +121,10 @@ public class JobRepositoryTestUtils implements InitializingBean {
 		List<JobExecution> list = new ArrayList<JobExecution>();
 		JobParameters jobParameters = new JobParameters();
 		for (int i = 0; i < count; i++) {
-			list.add(jobRepository.createJobExecution("job", jobParametersIncrementer.getNext(jobParameters)));
+			JobExecution jobExecution = jobRepository.createJobExecution("job", jobParametersIncrementer
+					.getNext(jobParameters));
+			list.add(jobExecution);
+			jobRepository.add(jobExecution.createStepExecution("step"));
 		}
 		return list;
 	}
