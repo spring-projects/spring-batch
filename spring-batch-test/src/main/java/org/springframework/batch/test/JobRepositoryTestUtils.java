@@ -25,13 +25,16 @@ import java.util.List;
 import javax.sql.DataSource;
 
 import org.springframework.batch.core.JobExecution;
+import org.springframework.batch.core.JobInstance;
 import org.springframework.batch.core.JobParameter;
 import org.springframework.batch.core.JobParameters;
 import org.springframework.batch.core.JobParametersIncrementer;
+import org.springframework.batch.core.StepExecution;
 import org.springframework.batch.core.repository.JobExecutionAlreadyRunningException;
 import org.springframework.batch.core.repository.JobInstanceAlreadyCompleteException;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.repository.JobRestartException;
+import org.springframework.batch.core.repository.dao.AbstractJdbcBatchMetadataDao;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.simple.ParameterizedRowMapper;
@@ -47,7 +50,7 @@ import org.springframework.util.Assert;
  * 
  * @author Dave Syer
  */
-public class JobRepositoryTestUtils implements InitializingBean {
+public class JobRepositoryTestUtils extends AbstractJdbcBatchMetadataDao implements InitializingBean {
 
 	private JobRepository jobRepository;
 
@@ -110,27 +113,48 @@ public class JobRepositoryTestUtils implements InitializingBean {
 
 	/**
 	 * Use the {@link JobRepository} to create some {@link JobExecution}
-	 * instances.
+	 * instances each with the given job name and each having step executions
+	 * with the given step names.
 	 * 
-	 * @param count the required number of instances
+	 * @param jobName the name of the job
+	 * @param stepNames the names of the step executions
+	 * @param count the required number of instances of {@link JobExecution} to
+	 * create
 	 * @return a collection of {@link JobExecution}
 	 * @throws Exception if there is a problem in the {@link JobRepository}
 	 */
-	public List<JobExecution> createJobExecutions(int count) throws JobExecutionAlreadyRunningException,
-			JobRestartException, JobInstanceAlreadyCompleteException {
+	public List<JobExecution> createJobExecutions(String jobName, String[] stepNames, int count)
+			throws JobExecutionAlreadyRunningException, JobRestartException, JobInstanceAlreadyCompleteException {
 		List<JobExecution> list = new ArrayList<JobExecution>();
 		JobParameters jobParameters = new JobParameters();
 		for (int i = 0; i < count; i++) {
-			JobExecution jobExecution = jobRepository.createJobExecution("job", jobParametersIncrementer
+			JobExecution jobExecution = jobRepository.createJobExecution(jobName, jobParametersIncrementer
 					.getNext(jobParameters));
 			list.add(jobExecution);
-			jobRepository.add(jobExecution.createStepExecution("step"));
+			for (String stepName : stepNames) {
+				jobRepository.add(jobExecution.createStepExecution(stepName));
+			}
 		}
 		return list;
 	}
 
 	/**
-	 * Remove the {@link JobExecution} instances provided from the standard
+	 * Use the {@link JobRepository} to create some {@link JobExecution}
+	 * instances each with a single step execution.
+	 * 
+	 * @param count the required number of instances of {@link JobExecution} to
+	 * create
+	 * @return a collection of {@link JobExecution}
+	 * @throws Exception if there is a problem in the {@link JobRepository}
+	 */
+	public List<JobExecution> createJobExecutions(int count) throws JobExecutionAlreadyRunningException,
+			JobRestartException, JobInstanceAlreadyCompleteException {
+		return createJobExecutions("job", new String[] { "step" }, count);
+	}
+
+	/**
+	 * Remove the {@link JobExecution} instances, and all associated
+	 * {@link JobInstance} and {@link StepExecution} instances from the standard
 	 * RDBMS locations used by Spring Batch.
 	 * 
 	 * @param list a list of {@link JobExecution}
@@ -139,23 +163,46 @@ public class JobRepositoryTestUtils implements InitializingBean {
 	public void removeJobExecutions(Collection<JobExecution> list) throws DataAccessException {
 		for (JobExecution jobExecution : list) {
 			List<Long> stepExecutionIds = jdbcTemplate.query(
-					"select STEP_EXECUTION_ID from BATCH_STEP_EXECUTION where JOB_EXECUTION_ID=?",
+					getQuery("select STEP_EXECUTION_ID from %PREFIX%STEP_EXECUTION where JOB_EXECUTION_ID=?"),
 					new ParameterizedRowMapper<Long>() {
 						public Long mapRow(ResultSet rs, int rowNum) throws SQLException {
 							return rs.getLong(1);
 						}
 					}, jobExecution.getId());
 			for (Long stepExecutionId : stepExecutionIds) {
-				jdbcTemplate.update("delete from BATCH_STEP_EXECUTION_CONTEXT where STEP_EXECUTION_ID=?",
+				jdbcTemplate.update(getQuery("delete from %PREFIX%STEP_EXECUTION_CONTEXT where STEP_EXECUTION_ID=?"),
 						stepExecutionId);
-				jdbcTemplate.update("delete from BATCH_STEP_EXECUTION where STEP_EXECUTION_ID=?", stepExecutionId);
+				jdbcTemplate.update(getQuery("delete from %PREFIX%STEP_EXECUTION where STEP_EXECUTION_ID=?"),
+						stepExecutionId);
 			}
-			jdbcTemplate.update("delete from BATCH_JOB_EXECUTION_CONTEXT where JOB_EXECUTION_ID=?", jobExecution
+			jdbcTemplate.update(getQuery("delete from %PREFIX%JOB_EXECUTION_CONTEXT where JOB_EXECUTION_ID=?"),
+					jobExecution.getId());
+			jdbcTemplate.update(getQuery("delete from %PREFIX%JOB_EXECUTION where JOB_EXECUTION_ID=?"), jobExecution
 					.getId());
-			jdbcTemplate.update("delete from BATCH_JOB_EXECUTION where JOB_EXECUTION_ID=?", jobExecution.getId());
-			jdbcTemplate.update("delete from BATCH_JOB_PARAMS where JOB_INSTANCE_ID=?", jobExecution.getJobId());
-			jdbcTemplate.update("delete from BATCH_JOB_INSTANCE where JOB_INSTANCE_ID=?", jobExecution.getJobId());
+			jdbcTemplate.update(getQuery("delete from %PREFIX%JOB_PARAMS where JOB_INSTANCE_ID=?"), jobExecution
+					.getJobId());
+			jdbcTemplate.update(getQuery("delete from %PREFIX%JOB_INSTANCE where JOB_INSTANCE_ID=?"), jobExecution
+					.getJobId());
 		}
+	}
+
+	/**
+	 * Remove all the {@link JobExecution} instances, and all associated
+	 * {@link JobInstance} and {@link StepExecution} instances from the standard
+	 * RDBMS locations used by Spring Batch.
+	 * 
+	 * @param list a list of {@link JobExecution}
+	 * @throws DataAccessException if there is a problem
+	 */
+	public void removeJobExecutions() throws DataAccessException {
+
+		jdbcTemplate.update(getQuery("delete from %PREFIX%STEP_EXECUTION_CONTEXT"));
+		jdbcTemplate.update(getQuery("delete from %PREFIX%STEP_EXECUTION"));
+		jdbcTemplate.update(getQuery("delete from %PREFIX%JOB_EXECUTION_CONTEXT"));
+		jdbcTemplate.update(getQuery("delete from %PREFIX%JOB_EXECUTION"));
+		jdbcTemplate.update(getQuery("delete from %PREFIX%JOB_PARAMS"));
+		jdbcTemplate.update(getQuery("delete from %PREFIX%JOB_INSTANCE"));
+
 	}
 
 }
