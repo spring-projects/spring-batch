@@ -202,7 +202,7 @@
 				<artifactId>maven-jar-plugin</artifactId>
 				<configuration>
 					<archive>
-						<index>true</index>
+						<index>false</index>
 						<manifest>
 							<mainClass>org.springframework.batch.core.launch.support.CommandLineJobRunner</mainClass>
 							<addClasspath>true</addClasspath>
