@@ -32,10 +32,10 @@ import org.springframework.batch.core.repository.JobRestartException;
 import org.springframework.batch.core.step.StepHolder;
 
 /**
- * Implementation of the {@link Job} interface that allows for complex flows
- * of steps, rather than requiring sequential execution.  In general, this
- * job implementation was designed to be used behind a parser, allowing for
- * a namespace to abstract away details.
+ * Implementation of the {@link Job} interface that allows for complex flows of
+ * steps, rather than requiring sequential execution. In general, this job
+ * implementation was designed to be used behind a parser, allowing for a
+ * namespace to abstract away details.
  * 
  * @author Dave Syer
  * @since 2.0
@@ -61,8 +61,7 @@ public class FlowJob extends AbstractJob {
 	/**
 	 * Public setter for the flow.
 	 * 
-	 * @param flow
-	 *            the flow to set
+	 * @param flow the flow to set
 	 */
 	public void setFlow(Flow flow) {
 		this.flow = flow;
@@ -79,14 +78,14 @@ public class FlowJob extends AbstractJob {
 		}
 		return null;
 	}
-	
+
 	/**
 	 * {@inheritDoc}
 	 */
 	@Override
 	public Collection<String> getStepNames() {
 		Collection<String> steps = new HashSet<String>();
-		for (State state: flow.getStates()) {
+		for (State state : flow.getStates()) {
 			if (state instanceof StepHolder) {
 				steps.add(state.getName());
 			}
@@ -98,17 +97,16 @@ public class FlowJob extends AbstractJob {
 	 * @see AbstractJob#doExecute(JobExecution)
 	 */
 	@Override
-	protected void doExecute(final JobExecution execution)
-			throws JobExecutionException {
+	protected void doExecute(final JobExecution execution) throws JobExecutionException {
 		try {
 			JobFlowExecutor executor = new JobFlowExecutor(execution);
 			executor.updateJobExecutionStatus(flow.start(executor).getStatus());
-		} catch (FlowExecutionException e) {
+		}
+		catch (FlowExecutionException e) {
 			if (e.getCause() instanceof JobExecutionException) {
 				throw (JobExecutionException) e.getCause();
 			}
-			throw new JobExecutionException(
-					"Flow execution ended unexpectedly", e);
+			throw new JobExecutionException("Flow execution ended unexpectedly", e);
 		}
 	}
 
@@ -132,24 +130,22 @@ public class FlowJob extends AbstractJob {
 			stepExecutionHolder.set(null);
 		}
 
-		public String executeStep(Step step) throws JobInterruptedException,
-				JobRestartException, StartLimitExceededException {
+		public String executeStep(Step step) throws JobInterruptedException, JobRestartException,
+				StartLimitExceededException {
 			StepExecution stepExecution = handleStep(step, execution);
 			stepExecutionHolder.set(stepExecution);
-			return stepExecution == null ? ExitStatus.COMPLETED.getExitCode()
-					: stepExecution.getExitStatus().getExitCode();
+			return stepExecution == null ? ExitStatus.COMPLETED.getExitCode() : stepExecution.getExitStatus()
+					.getExitCode();
 		}
 
 		public void abandonStepExecution() {
 			StepExecution lastStepExecution = stepExecutionHolder.get();
-			if (lastStepExecution != null
-					&& lastStepExecution.getStatus().isGreaterThan(
-							BatchStatus.STOPPING)) {
+			if (lastStepExecution != null && lastStepExecution.getStatus().isGreaterThan(BatchStatus.STOPPING)) {
 				lastStepExecution.upgradeStatus(BatchStatus.ABANDONED);
 				updateStepExecution(lastStepExecution);
 			}
 		}
-		
+
 		public void updateJobExecutionStatus(FlowExecutionStatus status) {
 			execution.setStatus(findBatchStatus(status));
 			exitStatus = exitStatus.and(new ExitStatus(status.getName()));
@@ -167,11 +163,19 @@ public class FlowJob extends AbstractJob {
 		public void close(FlowExecution result) {
 			stepExecutionHolder.set(null);
 		}
-		
+
 		public boolean isRestart() {
+			if (getStepExecution() != null && getStepExecution().getStatus() == BatchStatus.ABANDONED) {
+				/*
+				 * This is assumed to be the last step execution and it was
+				 * marked abandoned, so we are in a restart of a stopped step.
+				 * TODO: mark the step execution in some more definitive way?
+				 */
+				return true;
+			}
 			return execution.getStepExecutions().isEmpty();
 		}
-		
+
 		public void addExitStatus(String code) {
 			exitStatus = exitStatus.and(new ExitStatus(code));
 		}

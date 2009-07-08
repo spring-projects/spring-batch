@@ -43,7 +43,7 @@ public class StopAndRestartFailedJobParserTests extends AbstractJobParserTests {
 		//
 		// First Launch
 		//
-		JobExecution jobExecution = launchAndAssert("[s1]");
+		JobExecution jobExecution = launchAndAssert("[s0, s1]");
 		StepExecution stepExecution = getStepExecution(jobExecution, "s1");
 		assertEquals(BatchStatus.ABANDONED, stepExecution.getStatus());
 		assertEquals(ExitStatus.FAILED.getExitCode(), stepExecution.getExitStatus().getExitCode());
@@ -52,7 +52,7 @@ public class StopAndRestartFailedJobParserTests extends AbstractJobParserTests {
 		// Second Launch
 		//
 		stepNamesList.clear();
-		jobExecution = launchAndAssert("[s2]");
+		jobExecution = launchAndAssert("[s0, s2]");
 		stepExecution = getStepExecution(jobExecution, "s2");
 		assertEquals(BatchStatus.COMPLETED, stepExecution.getStatus());
 		assertEquals(ExitStatus.COMPLETED.getExitCode(), stepExecution.getExitStatus().getExitCode());

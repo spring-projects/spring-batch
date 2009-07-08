@@ -353,6 +353,8 @@ public abstract class AbstractJob implements Job, StepLocator, BeanNameAware, In
 				throw new JobInterruptedException("Job interrupted by step execution");
 			}
 
+		} else {
+			// currentStepExecution.setExitStatus(ExitStatus.NOOP);
 		}
 
 		return currentStepExecution;
