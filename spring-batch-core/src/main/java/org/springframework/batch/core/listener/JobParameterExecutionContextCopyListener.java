@@ -19,10 +19,9 @@ import java.util.Arrays;
 import java.util.Collection;
 
 import org.springframework.batch.core.JobParameters;
+import org.springframework.batch.core.Step;
 import org.springframework.batch.core.StepExecution;
 import org.springframework.batch.item.ExecutionContext;
-
-import com.sun.org.apache.xerces.internal.impl.xpath.XPath.Step;
 
 /**
  * This class can be used to automatically copy items from the

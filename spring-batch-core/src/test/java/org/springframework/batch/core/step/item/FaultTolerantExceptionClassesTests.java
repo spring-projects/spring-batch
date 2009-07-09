@@ -50,7 +50,7 @@ public class FaultTolerantExceptionClassesTests implements ApplicationContextAwa
 
 	@Autowired
 	private SkipWriterStub<String> writer;
-	
+
 	@Autowired
 	private ExceptionThrowingTaskletStub tasklet;
 
@@ -59,7 +59,7 @@ public class FaultTolerantExceptionClassesTests implements ApplicationContextAwa
 	public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
 		this.applicationContext = applicationContext;
 	}
-	
+
 	@Before
 	public void setup() {
 		reader.clear();
@@ -89,8 +89,10 @@ public class FaultTolerantExceptionClassesTests implements ApplicationContextAwa
 		writer.setExceptionType(RuntimeException.class);
 		StepExecution stepExecution = launchStep("skippableStep");
 		assertEquals(BatchStatus.FAILED, stepExecution.getStatus());
-		// TODO BATCH-1318: assertEquals("[1, 2, 3]", writer.getWritten().toString());
-		// TODO BATCH-1318: assertEquals("[]", writer.getCommitted().toString());
+		// TODO BATCH-1318: assertEquals("[1, 2, 3]",
+		// writer.getWritten().toString());
+		// TODO BATCH-1318: assertEquals("[]",
+		// writer.getCommitted().toString());
 	}
 
 	@Test
@@ -116,8 +118,10 @@ public class FaultTolerantExceptionClassesTests implements ApplicationContextAwa
 		writer.setExceptionType(Exception.class);
 		StepExecution stepExecution = launchStep("skippableStep");
 		assertEquals(BatchStatus.FAILED, stepExecution.getStatus());
-		// TODO BATCH-1318: assertEquals("[1, 2, 3]", writer.getWritten().toString());
-		// TODO BATCH-1318: assertEquals("[]", writer.getCommitted().toString());
+		// TODO BATCH-1318: assertEquals("[1, 2, 3]",
+		// writer.getWritten().toString());
+		// TODO BATCH-1318: assertEquals("[]",
+		// writer.getCommitted().toString());
 	}
 
 	@Test
@@ -144,7 +148,8 @@ public class FaultTolerantExceptionClassesTests implements ApplicationContextAwa
 		StepExecution stepExecution = launchStep("retryable");
 		assertEquals(BatchStatus.FAILED, stepExecution.getStatus());
 		assertEquals("[1, 2, 3, 1, 2, 3, 1, 2, 3]", writer.getWritten().toString());
-		// TODO BATCH-1318: assertEquals("[]", writer.getCommitted().toString());
+		// TODO BATCH-1318: assertEquals("[]",
+		// writer.getCommitted().toString());
 	}
 
 	@Test
@@ -161,7 +166,8 @@ public class FaultTolerantExceptionClassesTests implements ApplicationContextAwa
 		writer.setExceptionType(FatalRuntimeException.class);
 		StepExecution stepExecution = launchStep("retryable");
 		assertEquals(BatchStatus.FAILED, stepExecution.getStatus());
-		// TODO BATCH-1318: assertEquals("[1, 2, 3, 1, 2, 3, 1, 2, 3]", writer.getWritten().toString());
+		// TODO BATCH-1318: assertEquals("[1, 2, 3, 1, 2, 3, 1, 2, 3]",
+		// writer.getWritten().toString());
 		assertEquals("[]", writer.getCommitted().toString());
 	}
 
@@ -171,7 +177,8 @@ public class FaultTolerantExceptionClassesTests implements ApplicationContextAwa
 		StepExecution stepExecution = launchStep("retryable");
 		assertEquals(BatchStatus.FAILED, stepExecution.getStatus());
 		assertEquals("[1, 2, 3, 1, 2, 3, 1, 2, 3]", writer.getWritten().toString());
-		// TODO BATCH-1318: assertEquals("[]", writer.getCommitted().toString());
+		// TODO BATCH-1318: assertEquals("[]",
+		// writer.getCommitted().toString());
 	}
 
 	@Test
@@ -188,7 +195,8 @@ public class FaultTolerantExceptionClassesTests implements ApplicationContextAwa
 		writer.setExceptionType(FatalException.class);
 		StepExecution stepExecution = launchStep("retryable");
 		assertEquals(BatchStatus.FAILED, stepExecution.getStatus());
-		// TODO BATCH-1318: assertEquals("[1, 2, 3, 1, 2, 3, 1, 2, 3]", writer.getWritten().toString());
+		// TODO BATCH-1318: assertEquals("[1, 2, 3, 1, 2, 3, 1, 2, 3]",
+		// writer.getWritten().toString());
 		assertEquals("[]", writer.getCommitted().toString());
 	}
 
@@ -197,8 +205,10 @@ public class FaultTolerantExceptionClassesTests implements ApplicationContextAwa
 		writer.setExceptionType(RuntimeException.class);
 		StepExecution stepExecution = launchStep("noRollbackDefault");
 		assertEquals(BatchStatus.FAILED, stepExecution.getStatus());
-		// TODO BATCH-1318: assertEquals("[1, 2, 3]", writer.getWritten().toString());
-		// TODO BATCH-1318: assertEquals("[]", writer.getCommitted().toString());
+		// TODO BATCH-1318: assertEquals("[1, 2, 3]",
+		// writer.getWritten().toString());
+		// TODO BATCH-1318: assertEquals("[]",
+		// writer.getCommitted().toString());
 	}
 
 	@Test
@@ -206,9 +216,12 @@ public class FaultTolerantExceptionClassesTests implements ApplicationContextAwa
 		writer.setExceptionType(SkippableRuntimeException.class);
 		StepExecution stepExecution = launchStep("noRollbackDefault");
 		assertNotNull(stepExecution);
-		// TODO BATCH-1318: assertEquals(BatchStatus.FAILED, stepExecution.getStatus());
-		// TODO BATCH-1318: assertEquals("[1, 2, 3]", writer.getWritten().toString());
-		// TODO BATCH-1318: assertEquals("[1, 2, 3]", writer.getCommitted().toString());
+		// TODO BATCH-1318: assertEquals(BatchStatus.FAILED,
+		// stepExecution.getStatus());
+		// TODO BATCH-1318: assertEquals("[1, 2, 3]",
+		// writer.getWritten().toString());
+		// TODO BATCH-1318: assertEquals("[1, 2, 3]",
+		// writer.getCommitted().toString());
 	}
 
 	@Test
@@ -226,7 +239,8 @@ public class FaultTolerantExceptionClassesTests implements ApplicationContextAwa
 		StepExecution stepExecution = launchStep("noRollbackSkippable");
 		assertEquals(BatchStatus.COMPLETED, stepExecution.getStatus());
 		assertEquals("[1, 2, 3, 1, 2, 3, 4]", writer.getWritten().toString());
-		// TODO BATCH-1318: assertEquals("[1, 2, 3, 1, 2, 3, 4]", writer.getCommitted().toString());
+		// TODO BATCH-1318: assertEquals("[1, 2, 3, 1, 2, 3, 4]",
+		// writer.getCommitted().toString());
 	}
 
 	@Test
@@ -243,13 +257,15 @@ public class FaultTolerantExceptionClassesTests implements ApplicationContextAwa
 		writer.setExceptionType(FatalRuntimeException.class);
 		StepExecution stepExecution = launchStep("noRollbackFatal");
 		assertEquals(BatchStatus.FAILED, stepExecution.getStatus());
-		// TODO BATCH-1318: assertEquals("[1, 2, 3]", writer.getWritten().toString());
-		// TODO BATCH-1318: assertEquals("[1, 2, 3]", writer.getCommitted().toString());
+		// TODO BATCH-1318: assertEquals("[1, 2, 3]",
+		// writer.getWritten().toString());
+		// TODO BATCH-1318: assertEquals("[1, 2, 3]",
+		// writer.getCommitted().toString());
 	}
 
 	@Test
 	public void testNoRollbackTaskletRollbackException() throws Exception {
-		tasklet.setExceptionType(FatalRuntimeException.class);
+		tasklet.setExceptionType(RuntimeException.class);
 		StepExecution stepExecution = launchStep("noRollbackTasklet");
 		assertEquals(BatchStatus.FAILED, stepExecution.getStatus());
 		assertEquals("[]", tasklet.getCommitted().toString());
@@ -259,8 +275,10 @@ public class FaultTolerantExceptionClassesTests implements ApplicationContextAwa
 	public void testNoRollbackTaskletNoRollbackException() throws Exception {
 		tasklet.setExceptionType(SkippableRuntimeException.class);
 		StepExecution stepExecution = launchStep("noRollbackTasklet");
-		assertEquals(BatchStatus.FAILED, stepExecution.getStatus());
-		// TODO BATCH-1298: assertEquals("[1]", tasklet.getCommitted().toString());
+		// assertEquals(BatchStatus.FAILED, stepExecution.getStatus());
+		// BATCH-1298:
+		assertEquals(BatchStatus.COMPLETED, stepExecution.getStatus());
+		assertEquals("[1, 1, 1, 1]", tasklet.getCommitted().toString());
 	}
 
 	private StepExecution launchStep(String stepName) throws JobExecutionAlreadyRunningException, JobRestartException,

@@ -17,13 +17,12 @@ package org.springframework.batch.core.listener;
 
 import org.springframework.batch.core.ExitStatus;
 import org.springframework.batch.core.Job;
+import org.springframework.batch.core.Step;
 import org.springframework.batch.core.StepExecution;
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.support.PatternMatcher;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.util.Assert;
-
-import com.sun.org.apache.xerces.internal.impl.xpath.XPath.Step;
 
 /**
  * This class can be used to automatically promote items from the {@link Step}

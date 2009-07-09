@@ -18,6 +18,7 @@ package org.springframework.batch.core.configuration.xml;
 
 import java.util.Collection;
 
+import org.springframework.batch.classify.BinaryExceptionClassifier;
 import org.springframework.batch.core.Step;
 import org.springframework.batch.core.StepExecutionListener;
 import org.springframework.batch.core.StepListener;
@@ -282,7 +283,7 @@ class StepParserStepFactoryBean<I, O> implements FactoryBean, BeanNameAware {
 			}
 			ts.setStepExecutionListeners((StepExecutionListener[]) newListeners);
 		}
-		if (transactionTimeout != null || propagation != null || isolation != null) {
+		if (transactionTimeout != null || propagation != null || isolation != null || noRollbackExceptionClasses!=null) {
 			DefaultTransactionAttribute attribute = new DefaultTransactionAttribute();
 			if (propagation != null) {
 				attribute.setPropagationBehavior(propagation.value());
@@ -293,18 +294,12 @@ class StepParserStepFactoryBean<I, O> implements FactoryBean, BeanNameAware {
 			if (transactionTimeout != null) {
 				attribute.setTimeout(transactionTimeout);
 			}
+			final BinaryExceptionClassifier classifier = new BinaryExceptionClassifier(noRollbackExceptionClasses, false);
 			ts.setTransactionAttribute(new DefaultTransactionAttribute(attribute) {
-
-				/**
-				 * Ignore the default behaviour and rollback on all exceptions
-				 * that bubble up to the tasklet level. The tasklet has to deal
-				 * with the rollback rules internally.
-				 */
 				@Override
 				public boolean rollbackOn(Throwable ex) {
-					return true;
+					return classifier.classify(ex);
 				}
-
 			});
 		}
 	}

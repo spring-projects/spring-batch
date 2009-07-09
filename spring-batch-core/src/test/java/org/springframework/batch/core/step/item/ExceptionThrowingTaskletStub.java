@@ -31,6 +31,8 @@ import org.springframework.batch.support.transaction.TransactionAwareProxyFactor
  * @since 2.0.2
  */
 public class ExceptionThrowingTaskletStub implements Tasklet {
+	
+	private int maxTries = 4;
 
 	protected Log logger = LogFactory.getLog(getClass());
 
@@ -56,6 +58,9 @@ public class ExceptionThrowingTaskletStub implements Tasklet {
 
 	public RepeatStatus execute(StepContribution contribution, ChunkContext chunkContext) throws Exception {
 		committed.add(1);
+		if (committed.size()>=maxTries) {
+			return RepeatStatus.FINISHED;
+		}
 		throw exception.newInstance("Expected exception");
 	}
 }

@@ -46,6 +46,8 @@ import org.springframework.batch.retry.policy.RetryContextCache;
 import org.springframework.batch.retry.policy.SimpleRetryPolicy;
 import org.springframework.core.task.SyncTaskExecutor;
 import org.springframework.core.task.TaskExecutor;
+import org.springframework.transaction.interceptor.DefaultTransactionAttribute;
+import org.springframework.transaction.interceptor.TransactionAttribute;
 
 /**
  * Factory bean for step that provides options for configuring skip behaviour.
@@ -242,6 +244,25 @@ public class FaultTolerantStepFactoryBean<T, S> extends SimpleStepFactoryBean<T,
 	 */
 	protected Classifier<Throwable, Boolean> getRollbackClassifier() {
 		return new BinaryExceptionClassifier(noRollbackExceptionClasses, false);
+	}
+
+	/**
+	 * Getter for the {@link TransactionAttribute} for subclasses only.
+	 * @return the transactionAttribute
+	 */
+	@Override
+	protected TransactionAttribute getTransactionAttribute() {
+
+		TransactionAttribute attribute = super.getTransactionAttribute();
+		final Classifier<Throwable, Boolean> classifier = getRollbackClassifier();
+		return new DefaultTransactionAttribute(attribute) {
+			@Override
+			public boolean rollbackOn(Throwable ex) {
+				return classifier.classify(ex);
+			}
+
+		};
+
 	}
 
 	@Override

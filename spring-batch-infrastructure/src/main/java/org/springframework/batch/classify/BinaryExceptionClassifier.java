@@ -60,7 +60,7 @@ public class BinaryExceptionClassifier extends SubclassClassifier<Throwable, Boo
 	 */
 	public BinaryExceptionClassifier(Collection<Class<? extends Throwable>> exceptionClasses, boolean value) {
 		this(!value);
-		setTypes(exceptionClasses);
+		if (exceptionClasses!=null) setTypes(exceptionClasses);
 	}
 
 	/**
