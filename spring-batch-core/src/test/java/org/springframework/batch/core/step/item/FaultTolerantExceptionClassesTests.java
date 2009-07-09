@@ -1,14 +1,15 @@
 package org.springframework.batch.core.step.item;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
 import org.junit.Before;
-import org.junit.BeforeClass;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.springframework.batch.core.BatchStatus;
 import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.JobParametersBuilder;
@@ -20,42 +21,54 @@ import org.springframework.batch.core.repository.JobExecutionAlreadyRunningExcep
 import org.springframework.batch.core.repository.JobInstanceAlreadyCompleteException;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.repository.JobRestartException;
+import org.springframework.beans.BeansException;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
-import org.springframework.context.support.ClassPathXmlApplicationContext;
+import org.springframework.context.ApplicationContextAware;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 /**
  * @author Dan Garrette
  * @since 2.0.2
  */
-public class FaultTolerantExceptionClassesTests {
+@ContextConfiguration
+@RunWith(SpringJUnit4ClassRunner.class)
+public class FaultTolerantExceptionClassesTests implements ApplicationContextAware {
 
 	//
 	// TODO BATCH-1318: Commented out tests are related to this issue
 	//
+	@Autowired
+	private JobRepository jobRepository;
 
-	private static ApplicationContext ctx;
+	@Autowired
+	private JobLauncher jobLauncher;
 
-	private static JobRepository jobRepository;
+	@Autowired
+	private SkipReaderStub<String> reader;
 
-	private static JobLauncher jobLauncher;
-
-	private static SkipReaderStub<String> reader;
-
-	private static SkipWriterStub<String> writer;
+	@Autowired
+	private SkipWriterStub<String> writer;
 	
-	private static ExceptionThrowingTaskletStub tasklet;
+	@Autowired
+	private ExceptionThrowingTaskletStub tasklet;
 
-	@SuppressWarnings("unchecked")
-	@BeforeClass
-	public static void setCtx() {
-		ctx = new ClassPathXmlApplicationContext(
-				"/org/springframework/batch/core/step/item/FaultTolerantExceptionClassesTests-context.xml");
-		jobRepository = (JobRepository) ctx.getBean("jobRepository");
-		jobLauncher = (JobLauncher) ctx.getBean("jobLauncher");
-		reader = (SkipReaderStub<String>) ctx.getBean("reader");
-		writer = (SkipWriterStub<String>) ctx.getBean("writer");
-		tasklet = (ExceptionThrowingTaskletStub) ctx.getBean("tasklet");
+	private ApplicationContext applicationContext;
+
+	public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
+		this.applicationContext = applicationContext;
 	}
+
+//	public static void setCtx() {
+//		ctx = new ClassPathXmlApplicationContext(
+//				"/org/springframework/batch/core/step/item/FaultTolerantExceptionClassesTests-context.xml");
+//		jobRepository = (JobRepository) ctx.getBean("jobRepository");
+//		jobLauncher = (JobLauncher) ctx.getBean("jobLauncher");
+//		reader = (SkipReaderStub<String>) ctx.getBean("reader");
+//		writer = (SkipWriterStub<String>) ctx.getBean("writer");
+//		tasklet = (ExceptionThrowingTaskletStub) ctx.getBean("tasklet");
+//	}
 
 	@Before
 	public void setup() {
@@ -202,6 +215,7 @@ public class FaultTolerantExceptionClassesTests {
 	public void testNoRollbackDefaultNoRollbackException() throws Exception {
 		writer.setExceptionType(SkippableRuntimeException.class);
 		StepExecution stepExecution = launchStep("noRollbackDefault");
+		assertNotNull(stepExecution);
 		// TODO BATCH-1318: assertEquals(BatchStatus.FAILED, stepExecution.getStatus());
 		// TODO BATCH-1318: assertEquals("[1, 2, 3]", writer.getWritten().toString());
 		// TODO BATCH-1318: assertEquals("[1, 2, 3]", writer.getCommitted().toString());
@@ -266,7 +280,7 @@ public class FaultTolerantExceptionClassesTests {
 		job.setJobRepository(jobRepository);
 
 		List<Step> stepsToExecute = new ArrayList<Step>();
-		stepsToExecute.add((Step) ctx.getBean(stepName));
+		stepsToExecute.add((Step) applicationContext.getBean(stepName));
 		job.setSteps(stepsToExecute);
 
 		JobExecution jobExecution = jobLauncher.run(job, new JobParametersBuilder().addLong("timestamp",
