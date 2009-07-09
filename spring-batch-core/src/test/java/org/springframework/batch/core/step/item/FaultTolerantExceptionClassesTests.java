@@ -59,17 +59,7 @@ public class FaultTolerantExceptionClassesTests implements ApplicationContextAwa
 	public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
 		this.applicationContext = applicationContext;
 	}
-
-//	public static void setCtx() {
-//		ctx = new ClassPathXmlApplicationContext(
-//				"/org/springframework/batch/core/step/item/FaultTolerantExceptionClassesTests-context.xml");
-//		jobRepository = (JobRepository) ctx.getBean("jobRepository");
-//		jobLauncher = (JobLauncher) ctx.getBean("jobLauncher");
-//		reader = (SkipReaderStub<String>) ctx.getBean("reader");
-//		writer = (SkipWriterStub<String>) ctx.getBean("writer");
-//		tasklet = (ExceptionThrowingTaskletStub) ctx.getBean("tasklet");
-//	}
-
+	
 	@Before
 	public void setup() {
 		reader.clear();
