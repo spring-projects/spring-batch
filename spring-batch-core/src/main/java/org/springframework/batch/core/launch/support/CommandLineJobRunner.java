@@ -71,19 +71,17 @@ import org.springframework.util.StringUtils;
  * </p>
  * 
  * <p>
- * The arguments to this class are roughly as follows:
+ * The arguments to this class are as follows:
  * </p>
  * 
  * <code>
- * java jobPath jobName jobLauncherPath jobParameters...
+ * jobPath jobName (jobParameters)*
  * </code>
  * 
  * <p>
  * <ul>
  * <li>jobPath: the xml application context containing a {@link Job}
  * <li>jobName: the bean id of the job.
- * <li>jobLauncherPath: the xml application context containing a
- * {@link JobLauncher}
  * <li>jobParameters: 0 to many parameters that will be used to launch a job.
  * </ul>
  * </p>
