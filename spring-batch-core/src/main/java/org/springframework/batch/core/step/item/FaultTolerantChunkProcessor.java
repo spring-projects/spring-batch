@@ -32,6 +32,7 @@ import org.springframework.batch.core.step.skip.SkipListenerFailedException;
 import org.springframework.batch.core.step.skip.SkipPolicy;
 import org.springframework.batch.item.ItemProcessor;
 import org.springframework.batch.item.ItemWriter;
+import org.springframework.batch.retry.ExhaustedRetryException;
 import org.springframework.batch.retry.RecoveryCallback;
 import org.springframework.batch.retry.RetryCallback;
 import org.springframework.batch.retry.RetryContext;
@@ -183,7 +184,7 @@ public class FaultTolerantChunkProcessor<I, O> extends SimpleChunkProcessor<I, O
 		@SuppressWarnings("unchecked")
 		UserData<O> data = (UserData<O>) inputs.getUserData();
 		Chunk<O> cache = data.getOutputs();
-		final Chunk<O>.ChunkIterator cacheIterator =  cache.isEmpty() ? null : cache.iterator();
+		final Chunk<O>.ChunkIterator cacheIterator = cache.isEmpty() ? null : cache.iterator();
 		final AtomicInteger count = new AtomicInteger(0);
 
 		for (final Chunk<I>.ChunkIterator iterator = inputs.iterator(); iterator.hasNext();) {
@@ -279,7 +280,24 @@ public class FaultTolerantChunkProcessor<I, O> extends SimpleChunkProcessor<I, O
 
 				if (!inputs.isBusy()) {
 					chunkMonitor.setChunkSize(inputs.size());
-					doWrite(outputs.getItems());
+					try {
+						doWrite(outputs.getItems());
+					}
+					catch (Exception e) {
+						if (rollbackClassifier.classify(e)) {
+							throw e;
+						}
+						/*
+						 * If the exception is marked as no-rollback, we might
+						 * need to override that if it is also skippable,
+						 * otherwise there's no way to honour the skip listener
+						 * contract.
+						 */
+						if (itemWriteSkipPolicy.shouldSkip(e, -1)) {
+							throw new ForceRollbackForWriteSkipException(
+									"Force rollback on skippable exception so that skipped item can be located.", e);
+						}
+					}
 					contribution.incrementWriteCount(outputs.size());
 				}
 				else {
@@ -332,6 +350,17 @@ public class FaultTolerantChunkProcessor<I, O> extends SimpleChunkProcessor<I, O
 			RecoveryCallback<Object> recoveryCallback = new RecoveryCallback<Object>() {
 
 				public Object recover(RetryContext context) throws Exception {
+
+					/*
+					 * If the last exception was not skippable we don't need to
+					 * do any scanning. We can just bomb out with a retry
+					 * exhausted.
+					 */
+					if (!itemWriteSkipPolicy.shouldSkip(context.getLastThrowable(), -1)) {
+						throw new ExhaustedRetryException("Retry exhausted after last attempt in recovery path, but exception is not skippable.",
+								context.getLastThrowable());
+					}
+
 					inputs.setBusy(true);
 					scan(contribution, inputs, outputs, chunkMonitor);
 					return null;
@@ -426,12 +455,15 @@ public class FaultTolerantChunkProcessor<I, O> extends SimpleChunkProcessor<I, O
 		Chunk<O>.ChunkIterator outputIterator = outputs.iterator();
 
 		List<O> items = Collections.singletonList(outputIterator.next());
+		inputIterator.next();
 		try {
 			writeItems(items);
 			// If successful we are going to return and allow
 			// the driver to commit...
 			doAfterWrite(items);
 			contribution.incrementWriteCount(1);
+			inputIterator.remove();
+			outputIterator.remove();
 		}
 		catch (Exception e) {
 			checkSkipPolicy(inputIterator, outputIterator, e, contribution);
@@ -439,8 +471,6 @@ public class FaultTolerantChunkProcessor<I, O> extends SimpleChunkProcessor<I, O
 				throw e;
 			}
 		}
-		inputIterator.remove();
-		outputIterator.remove();
 		chunkMonitor.incrementOffset();
 		if (outputs.isEmpty()) {
 			inputs.setBusy(false);

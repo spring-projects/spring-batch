@@ -471,7 +471,7 @@ public class FaultTolerantStepFactoryBeanRetryTests {
 		// [b]
 		assertEquals("[b]", provided.toString());
 		// [b]
-		assertEquals("[b, b]", processed.toString());
+		assertEquals("[b]", processed.toString());
 		// []
 		assertEquals(0, recovered.size());
 		assertEquals(1, stepExecution.getReadCount());

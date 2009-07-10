@@ -18,6 +18,17 @@
 					org.springframework.batch.core.step.item.SkippableRuntimeException
 					org.springframework.batch.core.step.item.SkippableException
 				</skippable-exception-classes>
+			</chunk>
+		</tasklet>
+	</step>
+	
+	<step id="skippableFatalStep" xmlns="http://www.springframework.org/schema/batch">
+		<tasklet>
+			<chunk reader="reader" writer="writer" commit-interval="4" skip-limit="1">
+				<skippable-exception-classes>
+					org.springframework.batch.core.step.item.SkippableRuntimeException
+					org.springframework.batch.core.step.item.SkippableException
+				</skippable-exception-classes>
 				<fatal-exception-classes>
 					org.springframework.batch.core.step.item.FatalRuntimeException
 					org.springframework.batch.core.step.item.FatalException

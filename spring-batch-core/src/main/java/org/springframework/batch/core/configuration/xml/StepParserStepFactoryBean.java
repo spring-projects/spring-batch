@@ -17,6 +17,8 @@
 package org.springframework.batch.core.configuration.xml;
 
 import java.util.Collection;
+import java.util.Collections;
+import java.util.HashSet;
 
 import org.springframework.batch.classify.BinaryExceptionClassifier;
 import org.springframework.batch.core.Step;
@@ -283,7 +285,8 @@ class StepParserStepFactoryBean<I, O> implements FactoryBean, BeanNameAware {
 			}
 			ts.setStepExecutionListeners((StepExecutionListener[]) newListeners);
 		}
-		if (transactionTimeout != null || propagation != null || isolation != null || noRollbackExceptionClasses!=null) {
+		if (transactionTimeout != null || propagation != null || isolation != null
+				|| noRollbackExceptionClasses != null) {
 			DefaultTransactionAttribute attribute = new DefaultTransactionAttribute();
 			if (propagation != null) {
 				attribute.setPropagationBehavior(propagation.value());
@@ -294,7 +297,9 @@ class StepParserStepFactoryBean<I, O> implements FactoryBean, BeanNameAware {
 			if (transactionTimeout != null) {
 				attribute.setTimeout(transactionTimeout);
 			}
-			final BinaryExceptionClassifier classifier = new BinaryExceptionClassifier(noRollbackExceptionClasses, false);
+			Collection<Class<? extends Throwable>> exceptions = noRollbackExceptionClasses == null ? new HashSet<Class<? extends Throwable>>()
+					: noRollbackExceptionClasses;
+			final BinaryExceptionClassifier classifier = new BinaryExceptionClassifier(exceptions, false);
 			ts.setTransactionAttribute(new DefaultTransactionAttribute(attribute) {
 				@Override
 				public boolean rollbackOn(Throwable ex) {

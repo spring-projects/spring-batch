@@ -243,7 +243,25 @@ public class FaultTolerantStepFactoryBean<T, S> extends SimpleStepFactoryBean<T,
 	 * cause rollback
 	 */
 	protected Classifier<Throwable, Boolean> getRollbackClassifier() {
-		return new BinaryExceptionClassifier(noRollbackExceptionClasses, false);
+
+		Classifier<Throwable, Boolean> classifier = new BinaryExceptionClassifier(noRollbackExceptionClasses, false);
+
+		// Try to avoid pathological cases where we cannot froce a rollback
+		// where necessary (should be pretty uncommon):
+		if (!classifier.classify(new ForceRollbackForWriteSkipException("test", new RuntimeException()))) {
+			final Classifier<Throwable, Boolean> binary = classifier;
+			classifier = new Classifier<Throwable, Boolean>() {
+				public Boolean classify(Throwable classifiable) {
+					if (ForceRollbackForWriteSkipException.class.isAssignableFrom(classifiable.getClass())) {
+						return true;
+					}
+					return binary.classify(classifiable);
+				}
+			};
+		}
+
+		return classifier;
+
 	}
 
 	/**
@@ -355,6 +373,7 @@ public class FaultTolerantStepFactoryBean<T, S> extends SimpleStepFactoryBean<T,
 	private Collection<Class<? extends Throwable>> getSkippableExceptionClasses() {
 		HashSet<Class<? extends Throwable>> set = new HashSet<Class<? extends Throwable>>(skippableExceptionClasses);
 		set.addAll(noRollbackExceptionClasses);
+		set.add(ForceRollbackForWriteSkipException.class);
 		return set;
 	}
 
@@ -365,7 +384,9 @@ public class FaultTolerantStepFactoryBean<T, S> extends SimpleStepFactoryBean<T,
 
 		if (retryPolicy == null) {
 			SimpleRetryPolicy simpleRetryPolicy = new SimpleRetryPolicy(retryLimit);
-			simpleRetryPolicy.setRetryableExceptionClasses(retryableExceptionClasses);
+			HashSet<Class<? extends Throwable>> set = new HashSet<Class<? extends Throwable>>(retryableExceptionClasses);
+			set.add(ForceRollbackForWriteSkipException.class);
+			simpleRetryPolicy.setRetryableExceptionClasses(set);
 			retryPolicy = simpleRetryPolicy;
 		}
 

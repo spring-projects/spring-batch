@@ -50,7 +50,7 @@ public class ChunkElementParserTests {
 	public void testInheritSkippable() throws Exception {
 		Collection<Class<?>> skippable = getExceptionClasses("s1", "skippable",
 				chunkElementParentAttributeParserTestsContext);
-		assertEquals(2, skippable.size());
+		assertEquals(3, skippable.size());
 		boolean e = false;
 		boolean f = false;
 		for (Class<?> cls : skippable) {
@@ -115,10 +115,10 @@ public class ChunkElementParserTests {
 	}
 
 	@Test
-	public void testInheritSkippable_NoMerge() throws Exception {
+	public void testInheritSkippableWithNoMerge() throws Exception {
 		Collection<Class<?>> skippable = getExceptionClasses("s2", "skippable",
 				chunkElementParentAttributeParserTestsContext);
-		assertEquals(1, skippable.size());
+		assertEquals(2, skippable.size());
 		boolean e = false;
 		for (Class<?> cls : skippable) {
 			if (cls.equals(NullPointerException.class)) {
@@ -129,7 +129,7 @@ public class ChunkElementParserTests {
 	}
 
 	@Test
-	public void testInheritFatal_NoMerge() throws Exception {
+	public void testInheritFatalWithNoMerge() throws Exception {
 		Collection<Class<?>> fatal = getExceptionClasses("s2", "fatal", chunkElementParentAttributeParserTestsContext);
 		boolean a = false;
 		boolean b = false;
@@ -146,7 +146,7 @@ public class ChunkElementParserTests {
 	}
 
 	@Test
-	public void testInheritStreams_NoMerge() throws Exception {
+	public void testInheritStreamsWithNoMerge() throws Exception {
 		Collection<ItemStream> streams = getStreams("s2", chunkElementParentAttributeParserTestsContext);
 		assertEquals(1, streams.size());
 		boolean c = false;
@@ -159,7 +159,7 @@ public class ChunkElementParserTests {
 	}
 
 	@Test
-	public void testInheritRetryListeners_NoMerge() throws Exception {
+	public void testInheritRetryListenersWithNoMerge() throws Exception {
 		Collection<RetryListener> retryListeners = getRetryListeners("s2",
 				chunkElementParentAttributeParserTestsContext);
 		assertEquals(1, retryListeners.size());
