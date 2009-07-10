@@ -164,13 +164,13 @@ public class FaultTolerantExceptionClassesTests implements ApplicationContextAwa
 	@Test
 	public void testRetryableFatal() throws Exception {
 		// User wants all exceptions to be retried, but only some are skippable
-		// FatalRuntimeException is not skippable, but is a subclass of another
-		// skippable
+		// FatalRuntimeException is not skippable because it is fatal, but is a
+		// subclass of another skippable
 		writer.setExceptionType(FatalRuntimeException.class);
 		StepExecution stepExecution = launchStep("retryable");
 		assertEquals(BatchStatus.FAILED, stepExecution.getStatus());
-		// TODO BATCH-1333: assertEquals("[1, 2, 3, 1, 2, 3, 1, 2, 3]",
-		// writer.getWritten().toString());
+		// BATCH-1333:
+		assertEquals("[1, 2, 3, 1, 2, 3]", writer.getWritten().toString());
 		assertEquals("[]", writer.getCommitted().toString());
 	}
 
@@ -198,9 +198,10 @@ public class FaultTolerantExceptionClassesTests implements ApplicationContextAwa
 		writer.setExceptionType(FatalException.class);
 		StepExecution stepExecution = launchStep("retryable");
 		assertEquals(BatchStatus.FAILED, stepExecution.getStatus());
-		// TODO BATCH-1333: assertEquals("[1, 2, 3, 1, 2, 3, 1, 2, 3]",
-		// writer.getWritten().toString());
+		// BATCH-1333:
+		assertEquals("[1, 2, 3, 1, 2, 3]", writer.getWritten().toString());
 		assertEquals("[]", writer.getCommitted().toString());
+		assertEquals(0, stepExecution.getWriteSkipCount());
 	}
 
 	@Test
@@ -259,11 +260,11 @@ public class FaultTolerantExceptionClassesTests implements ApplicationContextAwa
 		writer.setExceptionType(FatalRuntimeException.class);
 		StepExecution stepExecution = launchStep("noRollbackSkippable");
 		assertEquals(BatchStatus.COMPLETED, stepExecution.getStatus());
+		// BATCH-1332:
 		assertEquals("[1, 2, 3, 1, 2, 3, 4]", writer.getWritten().toString());
-		// BATCH-1332: 
+		// TODO BATCH-1334:
+		// Skipped but also committed (because it was marked as no-rollback)
 		assertEquals("[1, 2, 3, 4]", writer.getCommitted().toString());
-		// TODO BATCH-1334: 
-		// Not skipped but also committed (because it was marked as no-rollback)
 		assertEquals(1, stepExecution.getWriteSkipCount());
 	}
 
@@ -279,16 +280,17 @@ public class FaultTolerantExceptionClassesTests implements ApplicationContextAwa
 	@Test
 	public void testNoRollbackFatalNoRollbackException() throws Exception {
 		// User has asked for no rollback on a fatal exception. What should the
-		// outcome be?
+		// outcome be?  As per BATCH-1333 it is interpreted as not skippable, but
+		// retryable if requested.  Here it was not requested to be retried, but
+		// it was marked as no-rollback.  As per BATCH-1334 this has to be ignored
+		// so that the failed item can be isolated.
 		writer.setExceptionType(FatalRuntimeException.class);
 		StepExecution stepExecution = launchStep("noRollbackFatal");
 		assertEquals(BatchStatus.COMPLETED, stepExecution.getStatus());
-		// TODO BATCH-1331: assertEquals(BatchStatus.FAILED,
-		// stepExecution.getStatus());
-		// TODO BATCH-1331: assertEquals("[1, 2, 3]",
-		// writer.getWritten().toString());
-		// TODO BATCH-1331: assertEquals("[1, 2, 3]",
-		// writer.getCommitted().toString());
+		// BATCH-1331: 
+		assertEquals("[1, 2, 3, 1, 2, 3, 4]", writer.getWritten().toString());
+		// BATCH-1331: 
+		assertEquals("[1, 2, 3, 4]", writer.getCommitted().toString());
 	}
 
 	@Test

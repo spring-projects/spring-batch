@@ -279,8 +279,9 @@ public class FaultTolerantStepFactoryBeanTests {
 	}
 
 	/**
-	 * Fatal exception should cause immediate termination regardless of other
-	 * skip settings (note the fatal exception is also classified as rollback).
+	 * Fatal exception should cause immediate termination provided the exception
+	 * is not skippable (note the fatal exception is also classified as
+	 * rollback).
 	 */
 	@Test
 	public void testFatalException() throws Exception {
@@ -296,7 +297,8 @@ public class FaultTolerantStepFactoryBeanTests {
 		Step step = (Step) factory.getObject();
 
 		step.execute(stepExecution);
-		assertTrue(stepExecution.getFailureExceptions().get(0).getMessage().equals("Ouch!"));
+		String message = stepExecution.getFailureExceptions().get(0).getCause().getMessage();
+		assertTrue("Wrong message: " + message, message.equals("Ouch!"));
 		assertStepExecutionsAreEqual(stepExecution, repository.getLastStepExecution(jobExecution.getJobInstance(), step
 				.getName()));
 	}

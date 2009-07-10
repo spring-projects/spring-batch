@@ -18,11 +18,14 @@ package org.springframework.batch.core.step.item;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.batch.classify.BinaryExceptionClassifier;
 import org.springframework.batch.classify.Classifier;
+import org.springframework.batch.classify.SubclassClassifier;
 import org.springframework.batch.core.JobInterruptedException;
 import org.springframework.batch.core.Step;
 import org.springframework.batch.core.step.skip.LimitCheckingItemSkipPolicy;
@@ -76,6 +79,8 @@ public class FaultTolerantStepFactoryBean<T, S> extends SimpleStepFactoryBean<T,
 	private Collection<Class<? extends Throwable>> noRollbackExceptionClasses = new HashSet<Class<? extends Throwable>>();
 
 	private Collection<Class<? extends Throwable>> fatalExceptionClasses = new HashSet<Class<? extends Throwable>>();
+
+	private Collection<Class<? extends Throwable>> nonRetryableExceptionClasses = new HashSet<Class<? extends Throwable>>();
 
 	private Collection<Class<? extends Throwable>> retryableExceptionClasses = new HashSet<Class<? extends Throwable>>();
 
@@ -228,7 +233,7 @@ public class FaultTolerantStepFactoryBean<T, S> extends SimpleStepFactoryBean<T,
 	}
 
 	/**
-	 * Exception classes that should cause immediate failure.
+	 * Exception classes that are not skippable (but may be retryable).
 	 * 
 	 * @param fatalExceptionClasses {@link Error} by default
 	 */
@@ -296,6 +301,8 @@ public class FaultTolerantStepFactoryBean<T, S> extends SimpleStepFactoryBean<T,
 
 		addFatalExceptionIfMissing(SkipLimitExceededException.class, NonSkippableReadException.class,
 				SkipListenerFailedException.class, RetryException.class, JobInterruptedException.class);
+		addNonRetryableExceptionIfMissing(SkipLimitExceededException.class, NonSkippableReadException.class,
+				SkipListenerFailedException.class, RetryException.class, JobInterruptedException.class);
 
 		super.applyConfiguration(step);
 
@@ -358,14 +365,14 @@ public class FaultTolerantStepFactoryBean<T, S> extends SimpleStepFactoryBean<T,
 	@Override
 	protected SimpleChunkProcessor<T, S> configureChunkProcessor() {
 
-
 		BatchRetryTemplate batchRetryTemplate = configureRetry();
 
 		FaultTolerantChunkProcessor<T, S> chunkProcessor = new FaultTolerantChunkProcessor<T, S>(getItemProcessor(),
 				getItemWriter(), batchRetryTemplate);
 		chunkProcessor.setBuffering(!isReaderTransactionalQueue());
 
-		SkipPolicy writeSkipPolicy = new LimitCheckingItemSkipPolicy(skipLimit, getSkippableExceptionClasses(), fatalExceptionClasses);
+		SkipPolicy writeSkipPolicy = new LimitCheckingItemSkipPolicy(skipLimit, getSkippableExceptionClasses(),
+				fatalExceptionClasses);
 		chunkProcessor.setWriteSkipPolicy(writeSkipPolicy);
 		chunkProcessor.setProcessSkipPolicy(writeSkipPolicy);
 		chunkProcessor.setRollbackClassifier(getRollbackClassifier());
@@ -412,7 +419,7 @@ public class FaultTolerantStepFactoryBean<T, S> extends SimpleStepFactoryBean<T,
 		RepeatOperations stepOperations = getStepOperations();
 		if (stepOperations instanceof RepeatTemplate) {
 			SimpleRetryExceptionHandler exceptionHandler = new SimpleRetryExceptionHandler(retryPolicyWrapper,
-					getExceptionHandler(), fatalExceptionClasses);
+					getExceptionHandler(), nonRetryableExceptionClasses);
 			((RepeatTemplate) stepOperations).setExceptionHandler(exceptionHandler);
 		}
 
@@ -433,39 +440,52 @@ public class FaultTolerantStepFactoryBean<T, S> extends SimpleStepFactoryBean<T,
 
 	/**
 	 * Wrap the provided {@link #setRetryPolicy(RetryPolicy)} so that it never
-	 * retries fatal exceptions.
+	 * retries explicitly non-retryable exceptions.
 	 */
 	private RetryPolicy fatalExceptionAwareProxy(final RetryPolicy retryPolicy) {
 
-		final NeverRetryPolicy neverRetryPolicy = new NeverRetryPolicy();
+		NeverRetryPolicy neverRetryPolicy = new NeverRetryPolicy();
+		Map<Class<? extends Throwable>, RetryPolicy> map = new HashMap<Class<? extends Throwable>, RetryPolicy>();
+		for (Class<? extends Throwable> fatal : nonRetryableExceptionClasses) {
+			map.put(fatal, neverRetryPolicy);
+		}
+
+		SubclassClassifier<Throwable, RetryPolicy> classifier = new SubclassClassifier<Throwable, RetryPolicy>(
+				retryPolicy);
+		classifier.setTypeMap(map);
+
 		ExceptionClassifierRetryPolicy retryPolicyWrapper = new ExceptionClassifierRetryPolicy();
-		retryPolicyWrapper.setExceptionClassifier(new Classifier<Throwable, RetryPolicy>() {
-
-			public RetryPolicy classify(Throwable classifiable) {
-
-				for (Class<? extends Throwable> fatal : fatalExceptionClasses) {
-					if (fatal.isAssignableFrom(classifiable.getClass())) {
-						return neverRetryPolicy;
-					}
-				}
-				return retryPolicy;
-			}
-		});
+		retryPolicyWrapper.setExceptionClassifier(classifier);
 		return retryPolicyWrapper;
+
 	}
 
 	@SuppressWarnings("unchecked")
 	private void addFatalExceptionIfMissing(Class... cls) {
-		List fatalExceptionList = new ArrayList<Class<? extends Throwable>>();
+		List exceptions = new ArrayList<Class<? extends Throwable>>();
 		for (Class exceptionClass : fatalExceptionClasses) {
-			fatalExceptionList.add(exceptionClass);
+			exceptions.add(exceptionClass);
 		}
 		for (Class fatal : cls) {
-			if (!fatalExceptionList.contains(fatal)) {
-				fatalExceptionList.add(fatal);
+			if (!exceptions.contains(fatal)) {
+				exceptions.add(fatal);
 			}
 		}
-		fatalExceptionClasses = fatalExceptionList;
+		fatalExceptionClasses = exceptions;
+	}
+
+	@SuppressWarnings("unchecked")
+	private void addNonRetryableExceptionIfMissing(Class... cls) {
+		List exceptions = new ArrayList<Class<? extends Throwable>>();
+		for (Class exceptionClass : nonRetryableExceptionClasses) {
+			exceptions.add(exceptionClass);
+		}
+		for (Class fatal : cls) {
+			if (!exceptions.contains(fatal)) {
+				exceptions.add(fatal);
+			}
+		}
+		nonRetryableExceptionClasses = exceptions;
 	}
 
 }
