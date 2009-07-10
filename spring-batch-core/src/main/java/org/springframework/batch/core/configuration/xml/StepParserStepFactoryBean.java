@@ -17,7 +17,6 @@
 package org.springframework.batch.core.configuration.xml;
 
 import java.util.Collection;
-import java.util.Collections;
 import java.util.HashSet;
 
 import org.springframework.batch.classify.BinaryExceptionClassifier;
