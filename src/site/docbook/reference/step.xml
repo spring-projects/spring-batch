@@ -487,10 +487,9 @@ itemWriter.write(items);</programlisting>
       <para>In this example, a <classname>FlatFileItemReader</classname> is
       used, and if at any point a
       <classname>FlatFileParseException</classname> is thrown, it will be
-      skipped and counted against the total skip limit of 10. It should be
-      noted that any failures encountered while reading will not count against
-      the skip limit. In other words, the skip limit is only incremented on
-      writes (regardless of success or failure).</para>
+      skipped and counted against the total skip limit of 10. Separate counts
+      are made of skips on read, process and write inside the step execution,
+      and the limit applies across all.</para>
     </section>
 
     <section id="fatalExceptions">
@@ -518,7 +517,8 @@ itemWriter.write(items);</programlisting>
       <para>By setting the skippable exceptions to
       <classname>java.lang.Exception</classname>, any exception that is thrown
       will be skipped. However, the second list, 'fatal-exception-classes',
-      contains specific exceptions that should be fatal if encountered.</para>
+      contains specific exceptions that should be fatal if encountered (i.e.
+      not skipped).</para>
     </section>
 
     <section id="retryLogic">
