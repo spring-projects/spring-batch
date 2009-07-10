@@ -288,15 +288,13 @@ public class FaultTolerantChunkProcessor<I, O> extends SimpleChunkProcessor<I, O
 							throw e;
 						}
 						/*
-						 * If the exception is marked as no-rollback, we might
-						 * need to override that if it is also skippable,
-						 * otherwise there's no way to honour the skip listener
+						 * If the exception is marked as no-rollback, we need to
+						 * override that, otherwise there's no way to write the
+						 * rest of the chunk or to honour the skip listener
 						 * contract.
 						 */
-						if (itemWriteSkipPolicy.shouldSkip(e, -1)) {
-							throw new ForceRollbackForWriteSkipException(
-									"Force rollback on skippable exception so that skipped item can be located.", e);
-						}
+						throw new ForceRollbackForWriteSkipException(
+								"Force rollback on skippable exception so that skipped item can be located.", e);
 					}
 					contribution.incrementWriteCount(outputs.size());
 				}
@@ -357,7 +355,8 @@ public class FaultTolerantChunkProcessor<I, O> extends SimpleChunkProcessor<I, O
 					 * exhausted.
 					 */
 					if (!itemWriteSkipPolicy.shouldSkip(context.getLastThrowable(), -1)) {
-						throw new ExhaustedRetryException("Retry exhausted after last attempt in recovery path, but exception is not skippable.",
+						throw new ExhaustedRetryException(
+								"Retry exhausted after last attempt in recovery path, but exception is not skippable.",
 								context.getLastThrowable());
 					}
 
@@ -466,7 +465,13 @@ public class FaultTolerantChunkProcessor<I, O> extends SimpleChunkProcessor<I, O
 			outputIterator.remove();
 		}
 		catch (Exception e) {
-			checkSkipPolicy(inputIterator, outputIterator, e, contribution);
+			if (!itemWriteSkipPolicy.shouldSkip(e, -1) && !rollbackClassifier.classify(e)) {
+				inputIterator.remove();
+				outputIterator.remove();
+			}
+			else {
+				checkSkipPolicy(inputIterator, outputIterator, e, contribution);
+			}
 			if (rollbackClassifier.classify(e)) {
 				throw e;
 			}

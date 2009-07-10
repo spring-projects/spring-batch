@@ -16,6 +16,8 @@
 
 package org.springframework.batch.core.step.item;
 
+import org.springframework.batch.classify.BinaryExceptionClassifier;
+import org.springframework.batch.classify.Classifier;
 import org.springframework.batch.core.StepContribution;
 import org.springframework.batch.core.step.skip.LimitCheckingItemSkipPolicy;
 import org.springframework.batch.core.step.skip.NonSkippableReadException;
@@ -26,13 +28,15 @@ import org.springframework.batch.repeat.RepeatOperations;
 
 /**
  * FaultTolerant implementation of the {@link ChunkProcessor} interface, that
- * allows for skipping or retry of items that cause exceptions during reading
- * or processing. 
+ * allows for skipping or retry of items that cause exceptions during reading or
+ * processing.
  * 
  */
 public class FaultTolerantChunkProvider<I> extends SimpleChunkProvider<I> {
 
 	private SkipPolicy skipPolicy = new LimitCheckingItemSkipPolicy(0);
+
+	private Classifier<Throwable, Boolean> rollbackClassifier = new BinaryExceptionClassifier(true);
 
 	public FaultTolerantChunkProvider(ItemReader<? extends I> itemReader, RepeatOperations repeatOperations) {
 		super(itemReader, repeatOperations);
@@ -44,6 +48,17 @@ public class FaultTolerantChunkProvider<I> extends SimpleChunkProvider<I> {
 	 */
 	public void setSkipPolicy(SkipPolicy SkipPolicy) {
 		this.skipPolicy = SkipPolicy;
+	}
+
+	/**
+	 * Classifier to determine whether exceptions have been marked as
+	 * no-rollback (as opposed to skippable). If ecnounterd they are simply
+	 * ignored, unless also skippable.
+	 * 
+	 * @param rollbackClassifier the rollback classifier to set
+	 */
+	public void setRollbackClassifier(Classifier<Throwable, Boolean> rollbackClassifier) {
+		this.rollbackClassifier = rollbackClassifier;
 	}
 
 	@Override
@@ -62,7 +77,10 @@ public class FaultTolerantChunkProvider<I> extends SimpleChunkProvider<I> {
 					logger.debug("Skipping failed input", e);
 				}
 				else {
-					throw new NonSkippableReadException("Non-skippable exception during read", e);
+					if (rollbackClassifier.classify(e)) {
+						throw new NonSkippableReadException("Non-skippable exception during read", e);
+					}
+					logger.debug("No-rollback for non-skippable exception (ignored)", e);
 				}
 
 			}

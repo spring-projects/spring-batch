@@ -20,14 +20,14 @@ import static org.junit.Assert.assertEquals;
 
 import org.junit.Test;
 
-public abstract class AbstractExceptionTests extends AbstractExceptionWithCauseTests {
+public abstract class AbstractExceptionWithCauseTests {
 
 	@Test
-	public void testExceptionString() throws Exception {
-		Exception exception = getException("foo");
-		assertEquals("foo", exception.getMessage());
+	public void testExceptionStringThrowable() throws Exception {
+		Exception exception = getException("foo", new IllegalStateException());
+		assertEquals("foo", exception.getMessage().substring(0, 3));
 	}
 
-	public abstract Exception getException(String msg) throws Exception;
+	public abstract Exception getException(String msg, Throwable t) throws Exception;
 
 }

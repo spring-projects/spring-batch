@@ -59,11 +59,25 @@
 		<tasklet>
 			<chunk reader="reader" writer="writer" commit-interval="4" skip-limit="1">
 				<skippable-exception-classes>
-					org.springframework.batch.core.step.item.FatalRuntimeException
+					<!-- this is a subclass of IllegalStateException (no-rollback) -->
+					java.util.FormatterClosedException
 				</skippable-exception-classes>
 			</chunk>
 			<no-rollback-exception-classes>
-				org.springframework.batch.core.step.item.SkippableRuntimeException
+				java.lang.IllegalStateException
+			</no-rollback-exception-classes>
+		</tasklet>
+	</step>
+	
+	<step id="noRollbackPathology" xmlns="http://www.springframework.org/schema/batch">
+		<tasklet>
+			<chunk reader="reader" writer="writer" commit-interval="4" skip-limit="1">
+				<skippable-exception-classes>
+					java.lang.IllegalStateException
+				</skippable-exception-classes>
+			</chunk>
+			<no-rollback-exception-classes>
+				java.lang.RuntimeException
 			</no-rollback-exception-classes>
 		</tasklet>
 	</step>

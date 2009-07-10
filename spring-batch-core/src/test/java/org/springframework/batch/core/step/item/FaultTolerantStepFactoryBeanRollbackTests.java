@@ -152,7 +152,7 @@ public class FaultTolerantStepFactoryBeanRollbackTests {
 
 		step.execute(stepExecution);
 		assertEquals(BatchStatus.COMPLETED, stepExecution.getStatus());
-		assertEquals(2, stepExecution.getSkipCount());
+		assertEquals(0, stepExecution.getSkipCount());
 		assertEquals(0, stepExecution.getRollbackCount());
 	}
 

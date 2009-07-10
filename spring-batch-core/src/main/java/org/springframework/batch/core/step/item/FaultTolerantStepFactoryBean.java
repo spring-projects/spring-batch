@@ -35,6 +35,7 @@ import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.ItemStream;
 import org.springframework.batch.repeat.RepeatOperations;
 import org.springframework.batch.repeat.support.RepeatTemplate;
+import org.springframework.batch.retry.ExhaustedRetryException;
 import org.springframework.batch.retry.RetryException;
 import org.springframework.batch.retry.RetryListener;
 import org.springframework.batch.retry.RetryPolicy;
@@ -246,18 +247,25 @@ public class FaultTolerantStepFactoryBean<T, S> extends SimpleStepFactoryBean<T,
 
 		Classifier<Throwable, Boolean> classifier = new BinaryExceptionClassifier(noRollbackExceptionClasses, false);
 
-		// Try to avoid pathological cases where we cannot froce a rollback
-		// where necessary (should be pretty uncommon):
-		if (!classifier.classify(new ForceRollbackForWriteSkipException("test", new RuntimeException()))) {
+		// Try to avoid pathological cases where we cannot force a rollback
+		// (should be pretty uncommon):
+		if (!classifier.classify(new ForceRollbackForWriteSkipException("test", new RuntimeException()))
+				|| !classifier.classify(new ExhaustedRetryException("test"))) {
+
 			final Classifier<Throwable, Boolean> binary = classifier;
+
+			Collection<Class<? extends Throwable>> types = new HashSet<Class<? extends Throwable>>();
+			types.add(ForceRollbackForWriteSkipException.class);
+			types.add(ExhaustedRetryException.class);
+			final Classifier<Throwable, Boolean> panic = new BinaryExceptionClassifier(types, true);
+
 			classifier = new Classifier<Throwable, Boolean>() {
 				public Boolean classify(Throwable classifiable) {
-					if (ForceRollbackForWriteSkipException.class.isAssignableFrom(classifiable.getClass())) {
-						return true;
-					}
-					return binary.classify(classifiable);
+					// Rollback if either the user's list or our own applies
+					return panic.classify(classifiable) || binary.classify(classifiable);
 				}
 			};
+
 		}
 
 		return classifier;
@@ -338,6 +346,7 @@ public class FaultTolerantStepFactoryBean<T, S> extends SimpleStepFactoryBean<T,
 		FaultTolerantChunkProvider<T> chunkProvider = new FaultTolerantChunkProvider<T>(getItemReader(),
 				getChunkOperations());
 		chunkProvider.setSkipPolicy(readSkipPolicy);
+		chunkProvider.setRollbackClassifier(getRollbackClassifier());
 
 		return chunkProvider;
 
@@ -349,14 +358,14 @@ public class FaultTolerantStepFactoryBean<T, S> extends SimpleStepFactoryBean<T,
 	@Override
 	protected SimpleChunkProcessor<T, S> configureChunkProcessor() {
 
-		SkipPolicy writeSkipPolicy = new LimitCheckingItemSkipPolicy(skipLimit, getSkippableExceptionClasses(),
-				fatalExceptionClasses);
 
 		BatchRetryTemplate batchRetryTemplate = configureRetry();
 
 		FaultTolerantChunkProcessor<T, S> chunkProcessor = new FaultTolerantChunkProcessor<T, S>(getItemProcessor(),
 				getItemWriter(), batchRetryTemplate);
 		chunkProcessor.setBuffering(!isReaderTransactionalQueue());
+
+		SkipPolicy writeSkipPolicy = new LimitCheckingItemSkipPolicy(skipLimit, getSkippableExceptionClasses(), fatalExceptionClasses);
 		chunkProcessor.setWriteSkipPolicy(writeSkipPolicy);
 		chunkProcessor.setProcessSkipPolicy(writeSkipPolicy);
 		chunkProcessor.setRollbackClassifier(getRollbackClassifier());
@@ -372,7 +381,6 @@ public class FaultTolerantStepFactoryBean<T, S> extends SimpleStepFactoryBean<T,
 	 */
 	private Collection<Class<? extends Throwable>> getSkippableExceptionClasses() {
 		HashSet<Class<? extends Throwable>> set = new HashSet<Class<? extends Throwable>>(skippableExceptionClasses);
-		set.addAll(noRollbackExceptionClasses);
 		set.add(ForceRollbackForWriteSkipException.class);
 		return set;
 	}
@@ -386,6 +394,8 @@ public class FaultTolerantStepFactoryBean<T, S> extends SimpleStepFactoryBean<T,
 			SimpleRetryPolicy simpleRetryPolicy = new SimpleRetryPolicy(retryLimit);
 			HashSet<Class<? extends Throwable>> set = new HashSet<Class<? extends Throwable>>(retryableExceptionClasses);
 			set.add(ForceRollbackForWriteSkipException.class);
+			// set.addAll(noRollbackExceptionClasses); // should only be
+			// retryable on write
 			simpleRetryPolicy.setRetryableExceptionClasses(set);
 			retryPolicy = simpleRetryPolicy;
 		}

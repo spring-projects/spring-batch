@@ -13,21 +13,23 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+package org.springframework.batch.core.step.skip;
 
-package org.springframework.batch.core;
+import org.springframework.batch.core.AbstractExceptionWithCauseTests;
 
-import static org.junit.Assert.assertEquals;
 
-import org.junit.Test;
+/**
+ * @author Dave Syer
+ *
+ */
+public class NonSkippableReadExceptionTests extends AbstractExceptionWithCauseTests {
 
-public abstract class AbstractExceptionTests extends AbstractExceptionWithCauseTests {
-
-	@Test
-	public void testExceptionString() throws Exception {
-		Exception exception = getException("foo");
-		assertEquals("foo", exception.getMessage());
+	/* (non-Javadoc)
+	 * @see org.springframework.batch.core.listener.AbstractDoubleExceptionTests#getException(java.lang.String, java.lang.RuntimeException, java.lang.Throwable)
+	 */
+	@Override
+	public Exception getException(String msg, Throwable e) throws Exception {
+		return new NonSkippableReadException(msg, e);
 	}
-
-	public abstract Exception getException(String msg) throws Exception;
 
 }

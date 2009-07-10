@@ -118,9 +118,9 @@ public class FaultTolerantExceptionClassesTests implements ApplicationContextAwa
 		writer.setExceptionType(Exception.class);
 		StepExecution stepExecution = launchStep("skippableFatalStep");
 		assertEquals(BatchStatus.FAILED, stepExecution.getStatus());
-		// BATCH-1327: 
+		// BATCH-1327:
 		assertEquals("[1, 2, 3]", writer.getWritten().toString());
-		// BATCH-1327: 
+		// BATCH-1327:
 		assertEquals("[]", writer.getCommitted().toString());
 	}
 
@@ -163,10 +163,13 @@ public class FaultTolerantExceptionClassesTests implements ApplicationContextAwa
 
 	@Test
 	public void testRetryableFatal() throws Exception {
+		// User wants all exceptions to be retried, but only some are skippable
+		// FatalRuntimeException is not skippable, but is a subclass of another
+		// skippable
 		writer.setExceptionType(FatalRuntimeException.class);
 		StepExecution stepExecution = launchStep("retryable");
 		assertEquals(BatchStatus.FAILED, stepExecution.getStatus());
-		// TODO BATCH-1318: assertEquals("[1, 2, 3, 1, 2, 3, 1, 2, 3]",
+		// TODO BATCH-1333: assertEquals("[1, 2, 3, 1, 2, 3, 1, 2, 3]",
 		// writer.getWritten().toString());
 		assertEquals("[]", writer.getCommitted().toString());
 	}
@@ -195,32 +198,51 @@ public class FaultTolerantExceptionClassesTests implements ApplicationContextAwa
 		writer.setExceptionType(FatalException.class);
 		StepExecution stepExecution = launchStep("retryable");
 		assertEquals(BatchStatus.FAILED, stepExecution.getStatus());
-		// TODO BATCH-1318: assertEquals("[1, 2, 3, 1, 2, 3, 1, 2, 3]",
+		// TODO BATCH-1333: assertEquals("[1, 2, 3, 1, 2, 3, 1, 2, 3]",
 		// writer.getWritten().toString());
 		assertEquals("[]", writer.getCommitted().toString());
 	}
 
 	@Test
 	public void testNoRollbackDefaultRollbackException() throws Exception {
-		writer.setExceptionType(RuntimeException.class);
+		// Exception is neither no-rollback nor skippable
+		writer.setExceptionType(Exception.class);
 		StepExecution stepExecution = launchStep("noRollbackDefault");
 		assertEquals(BatchStatus.FAILED, stepExecution.getStatus());
 		// BATCH-1318:
 		assertEquals("[1, 2, 3]", writer.getWritten().toString());
 		// BATCH-1318:
 		assertEquals("[]", writer.getCommitted().toString());
+		assertEquals(0, stepExecution.getWriteSkipCount());
 	}
 
 	@Test
 	public void testNoRollbackDefaultNoRollbackException() throws Exception {
-		writer.setExceptionType(SkippableRuntimeException.class);
+		// Exception is no-rollback and not skippable
+		writer.setExceptionType(IllegalStateException.class);
 		StepExecution stepExecution = launchStep("noRollbackDefault");
 		assertNotNull(stepExecution);
-		// TODO BATCH-1318: assertEquals(BatchStatus.FAILED, stepExecution.getStatus());
-		// TODO BATCH-1318: assertEquals("[1, 2, 3]",
-		// writer.getWritten().toString());
-		// TODO BATCH-1318: assertEquals("[1, 2, 3]",
-		// writer.getCommitted().toString());
+		assertEquals(BatchStatus.COMPLETED, stepExecution.getStatus());
+		// BATCH-1334:
+		assertEquals("[1, 2, 3, 1, 2, 3, 4]", writer.getWritten().toString());
+		// BATCH-1334:
+		assertEquals("[1, 2, 3, 4]", writer.getCommitted().toString());
+		// BATCH-1334:
+		assertEquals(0, stepExecution.getWriteSkipCount());
+	}
+
+	@Test
+	public void testNoRollbackPathology() throws Exception {
+		// Exception is neither no-rollback nor skippable and no-rollback is
+		// RuntimeException (potentially pathological because other obviously
+		// rollback signalling Exceptions also extend RuntimeException)
+		writer.setExceptionType(Exception.class);
+		StepExecution stepExecution = launchStep("noRollbackPathology");
+		assertEquals(BatchStatus.FAILED, stepExecution.getStatus());
+		// BATCH-1335:
+		assertEquals("[1, 2, 3]", writer.getWritten().toString());
+		// BATCH-1335:
+		assertEquals("[]", writer.getCommitted().toString());
 	}
 
 	@Test
@@ -238,8 +260,10 @@ public class FaultTolerantExceptionClassesTests implements ApplicationContextAwa
 		StepExecution stepExecution = launchStep("noRollbackSkippable");
 		assertEquals(BatchStatus.COMPLETED, stepExecution.getStatus());
 		assertEquals("[1, 2, 3, 1, 2, 3, 4]", writer.getWritten().toString());
-		// TODO BATCH-1332: assertEquals("[1, 2, 4]", writer.getCommitted().toString());
-		// Skipped but also committed!
+		// BATCH-1332: 
+		assertEquals("[1, 2, 3, 4]", writer.getCommitted().toString());
+		// TODO BATCH-1334: 
+		// Not skipped but also committed (because it was marked as no-rollback)
 		assertEquals(1, stepExecution.getWriteSkipCount());
 	}
 
