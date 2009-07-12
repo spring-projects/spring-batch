@@ -18,17 +18,28 @@ package org.springframework.batch.core.launch.support;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Date;
+import java.util.List;
 import java.util.Properties;
+import java.util.Set;
 
 import org.junit.After;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
+import org.springframework.batch.core.BatchStatus;
 import org.springframework.batch.core.ExitStatus;
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.JobExecution;
+import org.springframework.batch.core.JobInstance;
 import org.springframework.batch.core.JobParameters;
+import org.springframework.batch.core.JobParametersBuilder;
+import org.springframework.batch.core.StepExecution;
 import org.springframework.batch.core.converter.DefaultJobParametersConverter;
 import org.springframework.batch.core.converter.JobParametersConverter;
+import org.springframework.batch.core.explore.JobExplorer;
 import org.springframework.batch.core.launch.JobLauncher;
 import org.springframework.batch.core.repository.JobExecutionAlreadyRunningException;
 import org.springframework.util.ClassUtils;
@@ -78,12 +89,20 @@ public class CommandLineJobRunnerTests {
 		assertEquals(1, StubSystemExiter.status);
 	}
 
-	// can't test because it will cause the system to exit.
-	// public void testInvalidArgs(){
-	//		
-	// String[] args = new String[]{jobPath, jobName};
-	// CommandLineJobRunner.main(args);
-	// }
+	@Test
+	@Ignore
+	public void testInvalidArgs() {
+		String[] args = new String[] {};
+		CommandLineJobRunner.main(args);
+		assertEquals(1, StubSystemExiter.status);
+	}
+
+	@Test
+	public void testWrongJobName() {
+		String[] args = new String[] { jobPath, "no-such-job" };
+		CommandLineJobRunner.main(args);
+		assertEquals(1, StubSystemExiter.status);
+	}
 
 	@Test
 	public void testWithNoParameters() throws Throwable {
@@ -91,6 +110,27 @@ public class CommandLineJobRunnerTests {
 		CommandLineJobRunner.main(args);
 		assertEquals(0, StubSystemExiter.status);
 		assertEquals(new JobParameters(), StubJobLauncher.jobParameters);
+	}
+
+	@Test
+	public void testRestart() throws Throwable {
+		String[] args = new String[] { jobPath, "-restart", jobName };
+		JobParameters jobParameters = new JobParametersBuilder().addString("foo", "bar").toJobParameters();
+		StubJobExplorer.jobInstances = Arrays.asList(new JobInstance(0L, jobParameters, jobName));
+		CommandLineJobRunner.main(args);
+		assertEquals(0, StubSystemExiter.status);
+		assertEquals(jobParameters, StubJobLauncher.jobParameters);
+	}
+
+	@Test
+	public void testNext() throws Throwable {
+		String[] args = new String[] { jobPath, "-next", jobName };
+		JobParameters jobParameters = new JobParametersBuilder().addString("foo", "bar").toJobParameters();
+		StubJobExplorer.jobInstances = Arrays.asList(new JobInstance(1L, jobParameters, jobName));
+		CommandLineJobRunner.main(args);
+		assertEquals(0, StubSystemExiter.status);
+		jobParameters = new JobParametersBuilder().addString("foo", "spam").toJobParameters();
+		assertEquals(jobParameters, StubJobLauncher.jobParameters);
 	}
 
 	@Test
@@ -118,7 +158,7 @@ public class CommandLineJobRunnerTests {
 		}
 	}
 
-	private static class StubJobLauncher implements JobLauncher {
+	public static class StubJobLauncher implements JobLauncher {
 
 		public static JobExecution jobExecution;
 
@@ -151,7 +191,48 @@ public class CommandLineJobRunnerTests {
 		}
 	}
 
-	private static class StubJobParametersConverter implements JobParametersConverter {
+	public static class StubJobExplorer implements JobExplorer {
+
+		static List<JobInstance> jobInstances = new ArrayList<JobInstance>();
+
+		public Set<JobExecution> findRunningJobExecutions(String jobName) {
+			throw new UnsupportedOperationException();
+		}
+
+		public JobExecution getJobExecution(Long executionId) {
+			throw new UnsupportedOperationException();
+		}
+
+		public List<JobExecution> getJobExecutions(JobInstance jobInstance) {
+			if (jobInstance.getId() == 0) {
+				return Arrays.asList(createJobInstance(jobInstance, BatchStatus.FAILED));
+			}
+			return Arrays.asList(createJobInstance(jobInstance, BatchStatus.COMPLETED));
+		}
+
+		private JobExecution createJobInstance(JobInstance jobInstance, BatchStatus status) {
+			JobExecution jobExecution = new JobExecution(jobInstance, 1L);
+			jobExecution.setStatus(status);
+			jobExecution.setStartTime(new Date());
+			jobExecution.setEndTime(new Date());
+			return jobExecution;
+		}
+
+		public JobInstance getJobInstance(Long instanceId) {
+			throw new UnsupportedOperationException();
+		}
+
+		public List<JobInstance> getJobInstances(String jobName, int start, int count) {
+			return jobInstances;
+		}
+
+		public StepExecution getStepExecution(Long jobExecutionId, Long stepExecutionId) {
+			throw new UnsupportedOperationException();
+		}
+
+	}
+
+	public static class StubJobParametersConverter implements JobParametersConverter {
 
 		JobParametersConverter delegate = new DefaultJobParametersConverter();
 

@@ -16,8 +16,10 @@
 package org.springframework.batch.core.launch.support;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
 
@@ -28,6 +30,7 @@ import org.springframework.batch.core.ExitStatus;
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.JobInstance;
+import org.springframework.batch.core.JobParameter;
 import org.springframework.batch.core.JobParameters;
 import org.springframework.batch.core.JobParametersIncrementer;
 import org.springframework.batch.core.configuration.JobLocator;
@@ -35,7 +38,6 @@ import org.springframework.batch.core.converter.DefaultJobParametersConverter;
 import org.springframework.batch.core.converter.JobParametersConverter;
 import org.springframework.batch.core.explore.JobExplorer;
 import org.springframework.batch.core.launch.JobLauncher;
-import org.springframework.batch.core.launch.JobOperator;
 import org.springframework.batch.core.launch.JobParametersNotFoundException;
 import org.springframework.beans.factory.BeanDefinitionStoreException;
 import org.springframework.beans.factory.config.AutowireCapableBeanFactory;
@@ -63,17 +65,18 @@ import org.springframework.util.StringUtils;
  * command line launcher can be used to load the job and its context from a
  * single location. All dependencies of the launcher will then be satisfied by
  * autowiring by type from the combined application context. Default values are
- * provided for all fields except the {@link JobLauncher} and {@link JobLocator}.
- * Therefore, if autowiring fails to set it (it should be noted that dependency
- * checking is disabled because most of the fields have default values and thus
- * don't require dependencies to be fulfilled via autowiring) then an exception
- * will be thrown. It should also be noted that even if an exception is thrown
- * by this class, it will be mapped to an integer and returned.
+ * provided for all fields except the {@link JobLauncher} and {@link JobLocator}
+ * . Therefore, if autowiring fails to set it (it should be noted that
+ * dependency checking is disabled because most of the fields have default
+ * values and thus don't require dependencies to be fulfilled via autowiring)
+ * then an exception will be thrown. It should also be noted that even if an
+ * exception is thrown by this class, it will be mapped to an integer and
+ * returned.
  * </p>
  * 
  * <p>
- * Notice a property is available to set the {@link SystemExiter}. This class
- * is used to exit from the main method, rather than calling System.exit()
+ * Notice a property is available to set the {@link SystemExiter}. This class is
+ * used to exit from the main method, rather than calling System.exit()
  * directly. This is because unit testing a class the calls System.exit() is
  * impossible without kicking off the test within a new Jvm, which it is
  * possible to do, however it is a complex solution, much more so than
@@ -85,38 +88,52 @@ import org.springframework.util.StringUtils;
  * </p>
  * 
  * <code>
- * jobPath jobName (jobParameters)*
+ * jobPath <options> jobName (jobParameters)*
  * </code>
  * 
  * <p>
+ * The command line options are as follows
  * <ul>
  * <li>jobPath: the xml application context containing a {@link Job}
+ * <li>-restart: (optional) to restart the last failed execution</li>
+ * <li>-next: (optional) to start the next in a sequence according to the
+ * {@link JobParametersIncrementer} in the {@link Job}</li>
  * <li>jobName: the bean id of the job.
  * <li>jobParameters: 0 to many parameters that will be used to launch a job.
  * </ul>
  * </p>
  * 
  * <p>
+ * If the <code>-next</code> option is used the parameters on the command line
+ * (if any) are appended to those retrieved from the incrementer, overriding any
+ * with the same key.
+ * </p>
+ * 
+ * <p>
  * The combined application context must contain only one instance of
- * {@link JobLauncher}. The job parameters passed in to the command line will
- * be converted to {@link Properties} by assuming that each individual element
- * is one parameter that is separated by an equals sign. For example,
+ * {@link JobLauncher}. The job parameters passed in to the command line will be
+ * converted to {@link Properties} by assuming that each individual element is
+ * one parameter that is separated by an equals sign. For example,
  * "vendor.id=290232". Below is an example arguments list: "
  * 
  * <p>
  * <code>
  * java org.springframework.batch.execution.bootstrap.support.CommandLineJobRunner testJob.xml 
  * testJob schedule.date=2008/01/24 vendor.id=3902483920 
- * <code></p>
+ * <code>
+ * </p>
  * 
- * <p>Once arguments have been successfully parsed, autowiring will be used to set 
- * various dependencies.  The {@JobLauncher} for example, will be loaded this way.  If
- * none is contained in the bean factory (it searches by type) then a 
- * {@link BeanDefinitionStoreException} will be thrown.  The same exception will also
- * be thrown if there is more than one present.  Assuming the JobLauncher has been
- * set correctly, the jobName argument will be used to obtain an actual {@link Job}.
- * If a {@link JobLocator} has been set, then it will be used, if not the beanFactory
- * will be asked, using the jobName as the bean id.</p>
+ * <p>
+ * Once arguments have been successfully parsed, autowiring will be used to set
+ * various dependencies. The {@JobLauncher} for example, will be
+ * loaded this way. If none is contained in the bean factory (it searches by
+ * type) then a {@link BeanDefinitionStoreException} will be thrown. The same
+ * exception will also be thrown if there is more than one present. Assuming the
+ * JobLauncher has been set correctly, the jobName argument will be used to
+ * obtain an actual {@link Job}. If a {@link JobLocator} has been set, then it
+ * will be used, if not the beanFactory will be asked, using the jobName as the
+ * bean id.
+ * </p>
  * 
  * @author Dave Syer
  * @author Lucas Ward
@@ -146,7 +163,7 @@ public class CommandLineJobRunner {
 	public void setLauncher(JobLauncher launcher) {
 		this.launcher = launcher;
 	}
-	
+
 	/**
 	 * Injection setter for {@link JobExplorer}.
 	 * 
@@ -155,7 +172,7 @@ public class CommandLineJobRunner {
 	public void setJobExplorer(JobExplorer jobExplorer) {
 		this.jobExplorer = jobExplorer;
 	}
-	
+
 	/**
 	 * Injection setter for the {@link ExitCodeMapper}.
 	 * 
@@ -192,6 +209,10 @@ public class CommandLineJobRunner {
 		systemExiter.exit(status);
 	}
 
+	/**
+	 * {@link JobLocator} to find a job to run.
+	 * @param jobLocator a {@link JobLocator}
+	 */
 	public void setJobLocator(JobLocator jobLocator) {
 		this.jobLocator = jobLocator;
 	}
@@ -209,10 +230,12 @@ public class CommandLineJobRunner {
 			context = new ClassPathXmlApplicationContext(jobPath);
 			context.getAutowireCapableBeanFactory().autowireBeanProperties(this,
 					AutowireCapableBeanFactory.AUTOWIRE_BY_TYPE, false);
-			
-			Assert.notNull(launcher,"A JobLauncher must be provided.  Please add one to the configuration.");
-			if (opts.contains("-restart") || opts.contains("-next")) {				
-				Assert.notNull(jobExplorer,"A JobExplorer must be provided for a restart or start next operation.  Please add one to the configuration.");
+
+			Assert.notNull(launcher, "A JobLauncher must be provided.  Please add one to the configuration.");
+			if (opts.contains("-restart") || opts.contains("-next")) {
+				Assert
+						.notNull(jobExplorer,
+								"A JobExplorer must be provided for a restart or start next operation.  Please add one to the configuration.");
 			}
 
 			Job job;
@@ -222,14 +245,18 @@ public class CommandLineJobRunner {
 			else {
 				job = (Job) context.getBean(jobName);
 			}
-			
+
 			JobParameters jobParameters = jobParametersConverter.getJobParameters(StringUtils
 					.splitArrayElementsIntoProperties(parameters, "="));
 
 			if (opts.contains("-restart")) {
 				jobParameters = getLastFailedJobParameters(jobName);
-			} else if (opts.contains("-next")) {
-				jobParameters = getNextJobParameters(jobName, job);
+			}
+			else if (opts.contains("-next")) {
+				JobParameters nextParameters = getNextJobParameters(job);
+				Map<String, JobParameter> map = new HashMap<String, JobParameter>(nextParameters.getParameters());
+				map.putAll(jobParameters.getParameters());
+				jobParameters = new JobParameters(map);
 			}
 
 			JobExecution jobExecution = launcher.run(job, jobParameters);
@@ -250,31 +277,31 @@ public class CommandLineJobRunner {
 	/**
 	 * @param jobName
 	 * @return
-	 * @throws JobParametersNotFoundException 
+	 * @throws JobParametersNotFoundException
 	 */
 	private JobParameters getLastFailedJobParameters(String jobName) throws JobParametersNotFoundException {
 
 		int start = 0;
 		int count = 100;
 		List<JobInstance> lastInstances = jobExplorer.getJobInstances(jobName, start, count);
-		
+
 		JobParameters jobParameters = null;
 
 		while (!lastInstances.isEmpty()) {
 
 			for (JobInstance jobInstance : lastInstances) {
 				List<JobExecution> jobExecutions = jobExplorer.getJobExecutions(jobInstance);
-				if (jobExecutions==null || jobExecutions.isEmpty()) {
+				if (jobExecutions == null || jobExecutions.isEmpty()) {
 					continue;
 				}
-				JobExecution jobExecution = jobExecutions.get(jobExecutions.size()-1);
+				JobExecution jobExecution = jobExecutions.get(jobExecutions.size() - 1);
 				if (jobExecution.getStatus().isGreaterThan(BatchStatus.STOPPING)) {
 					jobParameters = jobInstance.getJobParameters();
 					break;
 				}
 			}
-			
-			if (jobParameters!=null) {
+
+			if (jobParameters != null) {
 				break;
 			}
 
@@ -283,20 +310,20 @@ public class CommandLineJobRunner {
 
 		}
 
-		if (jobParameters==null) {
-			throw new JobParametersNotFoundException("No job parameters found for failed execution of job=" + jobName);			
+		if (jobParameters == null) {
+			throw new JobParametersNotFoundException("No job parameters found for failed execution of job=" + jobName);
 		}
 		return jobParameters;
 
 	}
 
 	/**
-	 * @param jobName
-	 * @param job
-	 * @return
-	 * @throws JobParametersNotFoundException
+	 * @param job the job that we need to find the next parameters for
+	 * @return the next job parameters if they can be located
+	 * @throws JobParametersNotFoundException if there is a problem
 	 */
-	private JobParameters getNextJobParameters(String jobName, Job job) throws JobParametersNotFoundException {
+	private JobParameters getNextJobParameters(Job job) throws JobParametersNotFoundException {
+		String jobName = job.getName();
 		JobParameters jobParameters;
 		List<JobInstance> lastInstances = jobExplorer.getJobInstances(jobName, 0, 1);
 
@@ -308,7 +335,8 @@ public class CommandLineJobRunner {
 		if (lastInstances.isEmpty()) {
 			jobParameters = incrementer.getNext(new JobParameters());
 			if (jobParameters == null) {
-				throw new JobParametersNotFoundException("No bootstrap parameters found from incrementer for job=" + jobName);
+				throw new JobParametersNotFoundException("No bootstrap parameters found from incrementer for job="
+						+ jobName);
 			}
 		}
 		else {
@@ -323,26 +351,32 @@ public class CommandLineJobRunner {
 	 * such contexts. No exception are thrown from this method, rather
 	 * exceptions are logged and an integer returned through the exit status in
 	 * a {@link JvmSystemExiter} (which can be overridden by defining one in the
-	 * Spring context).<br/> Parameters can be provided in the form key=value,
-	 * and will be converted using the injected {@link JobParametersConverter}.
+	 * Spring context).<br/>
+	 * Parameters can be provided in the form key=value, and will be converted
+	 * using the injected {@link JobParametersConverter}.
 	 * 
-	 * @param args
-	 * <p>
+	 * @param args <p>
 	 * <ul>
+	 * <li>-restart: (optional) if the job has failed or stopped and the most
+	 * recent execution should be restarted</li>
+	 * <li>-next: (optional) if the job has a {@link JobParametersIncrementer}
+	 * that can be used to launch the next in a sequence</li>
 	 * <li>jobPath: the xml application context containing a {@link Job}
 	 * <li>jobName: the bean id of the job.
 	 * <li>jobParameters: 0 to many parameters that will be used to launch a
 	 * job.
 	 * </ul>
+	 * The options (<code>-restart, -next</code>) can occur anywhere in the
+	 * command line.
 	 * </p>
 	 */
 	public static void main(String[] args) {
 
 		CommandLineJobRunner command = new CommandLineJobRunner();
-		
+
 		Set<String> opts = new HashSet<String>();
 		List<String> params = new ArrayList<String>();
-		
+
 		int count = 0;
 		String jobPath = null;
 		String jobName = null;
@@ -350,13 +384,14 @@ public class CommandLineJobRunner {
 		for (String arg : args) {
 			if (arg.startsWith("-")) {
 				opts.add(arg);
-			} else {
+			}
+			else {
 				switch (count) {
 				case 0:
-					jobPath = arg;					
+					jobPath = arg;
 					break;
 				case 1:
-					jobName = arg;					
+					jobName = arg;
 					break;
 				default:
 					params.add(arg);
@@ -366,7 +401,7 @@ public class CommandLineJobRunner {
 			}
 		}
 
-		if (jobPath==null || jobName==null) {
+		if (jobPath == null || jobName == null) {
 			logger.error("At least 2 arguments are required: JobPath and JobName.");
 			command.exit(1);
 		}

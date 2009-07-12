@@ -13,6 +13,8 @@
 
 	<bean class="org.springframework.batch.core.launch.support.SimpleJvmExitCodeMapper" />
 
+	<bean class="org.springframework.batch.core.launch.support.CommandLineJobRunnerTests$StubJobExplorer" />
+
 	<bean class="org.springframework.batch.core.launch.support.CommandLineJobRunnerTests$StubSystemExiter" />
 
 	<bean class="org.springframework.batch.core.launch.support.CommandLineJobRunnerTests$StubJobParametersConverter" />
