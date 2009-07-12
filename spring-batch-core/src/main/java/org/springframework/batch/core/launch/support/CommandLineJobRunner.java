@@ -15,18 +15,28 @@
  */
 package org.springframework.batch.core.launch.support;
 
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
 import java.util.Properties;
+import java.util.Set;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.springframework.batch.core.BatchStatus;
 import org.springframework.batch.core.ExitStatus;
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.JobExecution;
+import org.springframework.batch.core.JobInstance;
 import org.springframework.batch.core.JobParameters;
+import org.springframework.batch.core.JobParametersIncrementer;
 import org.springframework.batch.core.configuration.JobLocator;
 import org.springframework.batch.core.converter.DefaultJobParametersConverter;
 import org.springframework.batch.core.converter.JobParametersConverter;
+import org.springframework.batch.core.explore.JobExplorer;
 import org.springframework.batch.core.launch.JobLauncher;
+import org.springframework.batch.core.launch.JobOperator;
+import org.springframework.batch.core.launch.JobParametersNotFoundException;
 import org.springframework.beans.factory.BeanDefinitionStoreException;
 import org.springframework.beans.factory.config.AutowireCapableBeanFactory;
 import org.springframework.context.ConfigurableApplicationContext;
@@ -126,6 +136,8 @@ public class CommandLineJobRunner {
 
 	private JobParametersConverter jobParametersConverter = new DefaultJobParametersConverter();
 
+	private JobExplorer jobExplorer;
+
 	/**
 	 * Injection setter for the {@link JobLauncher}.
 	 * 
@@ -134,7 +146,16 @@ public class CommandLineJobRunner {
 	public void setLauncher(JobLauncher launcher) {
 		this.launcher = launcher;
 	}
-
+	
+	/**
+	 * Injection setter for {@link JobExplorer}.
+	 * 
+	 * @param jobExplorer the {@link JobExplorer} to set
+	 */
+	public void setJobExplorer(JobExplorer jobExplorer) {
+		this.jobExplorer = jobExplorer;
+	}
+	
 	/**
 	 * Injection setter for the {@link ExitCodeMapper}.
 	 * 
@@ -180,7 +201,7 @@ public class CommandLineJobRunner {
 	 * job paths. If a JobLocator has been set, then use it to obtain an actual
 	 * job, if not ask the context for it.
 	 */
-	int start(String jobPath, String jobName, String[] parameters) {
+	int start(String jobPath, String jobName, String[] parameters, Set<String> opts) {
 
 		ConfigurableApplicationContext context = null;
 
@@ -190,6 +211,9 @@ public class CommandLineJobRunner {
 					AutowireCapableBeanFactory.AUTOWIRE_BY_TYPE, false);
 			
 			Assert.notNull(launcher,"A JobLauncher must be provided.  Please add one to the configuration.");
+			if (opts.contains("-restart") || opts.contains("-next")) {				
+				Assert.notNull(jobExplorer,"A JobExplorer must be provided for a restart or start next operation.  Please add one to the configuration.");
+			}
 
 			Job job;
 			if (jobLocator != null) {
@@ -198,12 +222,19 @@ public class CommandLineJobRunner {
 			else {
 				job = (Job) context.getBean(jobName);
 			}
-
+			
 			JobParameters jobParameters = jobParametersConverter.getJobParameters(StringUtils
 					.splitArrayElementsIntoProperties(parameters, "="));
 
+			if (opts.contains("-restart")) {
+				jobParameters = getLastFailedJobParameters(jobName);
+			} else if (opts.contains("-next")) {
+				jobParameters = getNextJobParameters(jobName, job);
+			}
+
 			JobExecution jobExecution = launcher.run(job, jobParameters);
 			return exitCodeMapper.intValue(jobExecution.getExitStatus().getExitCode());
+
 		}
 		catch (Throwable e) {
 			logger.error("Job Terminated in error:", e);
@@ -214,6 +245,76 @@ public class CommandLineJobRunner {
 				context.close();
 			}
 		}
+	}
+
+	/**
+	 * @param jobName
+	 * @return
+	 * @throws JobParametersNotFoundException 
+	 */
+	private JobParameters getLastFailedJobParameters(String jobName) throws JobParametersNotFoundException {
+
+		int start = 0;
+		int count = 100;
+		List<JobInstance> lastInstances = jobExplorer.getJobInstances(jobName, start, count);
+		
+		JobParameters jobParameters = null;
+
+		while (!lastInstances.isEmpty()) {
+
+			for (JobInstance jobInstance : lastInstances) {
+				List<JobExecution> jobExecutions = jobExplorer.getJobExecutions(jobInstance);
+				if (jobExecutions==null || jobExecutions.isEmpty()) {
+					continue;
+				}
+				JobExecution jobExecution = jobExecutions.get(jobExecutions.size()-1);
+				if (jobExecution.getStatus().isGreaterThan(BatchStatus.STOPPING)) {
+					jobParameters = jobInstance.getJobParameters();
+					break;
+				}
+			}
+			
+			if (jobParameters!=null) {
+				break;
+			}
+
+			start += count;
+			lastInstances = jobExplorer.getJobInstances(jobName, start, count);
+
+		}
+
+		if (jobParameters==null) {
+			throw new JobParametersNotFoundException("No job parameters found for failed execution of job=" + jobName);			
+		}
+		return jobParameters;
+
+	}
+
+	/**
+	 * @param jobName
+	 * @param job
+	 * @return
+	 * @throws JobParametersNotFoundException
+	 */
+	private JobParameters getNextJobParameters(String jobName, Job job) throws JobParametersNotFoundException {
+		JobParameters jobParameters;
+		List<JobInstance> lastInstances = jobExplorer.getJobInstances(jobName, 0, 1);
+
+		JobParametersIncrementer incrementer = job.getJobParametersIncrementer();
+		if (incrementer == null) {
+			throw new JobParametersNotFoundException("No job parameters incrementer found for job=" + jobName);
+		}
+
+		if (lastInstances.isEmpty()) {
+			jobParameters = incrementer.getNext(new JobParameters());
+			if (jobParameters == null) {
+				throw new JobParametersNotFoundException("No bootstrap parameters found from incrementer for job=" + jobName);
+			}
+		}
+		else {
+			jobParameters = incrementer.getNext(lastInstances.get(0).getJobParameters());
+		}
+		return jobParameters;
 	}
 
 	/**
@@ -238,18 +339,41 @@ public class CommandLineJobRunner {
 	public static void main(String[] args) {
 
 		CommandLineJobRunner command = new CommandLineJobRunner();
+		
+		Set<String> opts = new HashSet<String>();
+		List<String> params = new ArrayList<String>();
+		
+		int count = 0;
+		String jobPath = null;
+		String jobName = null;
 
-		if (args.length < 2) {
+		for (String arg : args) {
+			if (arg.startsWith("-")) {
+				opts.add(arg);
+			} else {
+				switch (count) {
+				case 0:
+					jobPath = arg;					
+					break;
+				case 1:
+					jobName = arg;					
+					break;
+				default:
+					params.add(arg);
+					break;
+				}
+				count++;
+			}
+		}
+
+		if (jobPath==null || jobName==null) {
 			logger.error("At least 2 arguments are required: JobPath and JobName.");
 			command.exit(1);
 		}
 
-		String jobPath = args[0];
-		String jobName = args[1];
-		String[] parameters = new String[args.length - 2];
-		System.arraycopy(args, 2, parameters, 0, args.length - 2);
+		String[] parameters = params.toArray(new String[params.size()]);
 
-		int result = command.start(jobPath, jobName, parameters);
+		int result = command.start(jobPath, jobName, parameters, opts);
 		command.exit(result);
 	}
 
