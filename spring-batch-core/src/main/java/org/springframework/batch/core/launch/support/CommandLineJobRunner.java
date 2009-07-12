@@ -78,7 +78,7 @@ import org.springframework.util.StringUtils;
  * Notice a property is available to set the {@link SystemExiter}. This class is
  * used to exit from the main method, rather than calling System.exit()
  * directly. This is because unit testing a class the calls System.exit() is
- * impossible without kicking off the test within a new Jvm, which it is
+ * impossible without kicking off the test within a new JVM, which it is
  * possible to do, however it is a complex solution, much more so than
  * strategizing the exiter.
  * </p>
