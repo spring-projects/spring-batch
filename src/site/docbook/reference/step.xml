@@ -696,6 +696,17 @@ itemWriter.write(items);</programlisting>
     &lt;/tasklet&gt;
 &lt;/step&gt;</programlisting>
 
+      <para>An <classname>ItemReader</classname>, <classname>ItemWriter</classname>
+      or <classname>ItemProcessor</classname> that itself implements
+      one of the <classname>StepListener</classname> interfaces will
+      be registered automatically with the <classname>Step</classname>
+      if using the namespace <literal>&lt;step&gt;</literal> element,
+      or one of the the <classname>*StepFactoryBean</classname>
+      factories.  This only applies to components directly injected
+      into the <classname>Step</classname>: if the listener is nested
+      inside another component, it needs to be explicitly registered
+      (as described above).</para>
+
       <para>In addition to the <classname>StepListener</classname> interfaces,
       annotations are provided to address the same concerns.</para>
 
