@@ -79,7 +79,7 @@ public class CommandLineJobRunnerTests {
 
 	@Test
 	public void testWithJobLocator() {
-		jobPath = ClassUtils.addResourcePathToPackagePath(CommandLineJobRunnerTests.class, "job-with-locator.xml");
+		jobPath = ClassUtils.addResourcePathToPackagePath(CommandLineJobRunnerTests.class, "launcher-with-locator.xml");
 		CommandLineJobRunner.main(new String[] { jobPath, jobName, jobKey });
 		assertTrue("Injected JobParametersConverter not used instead of default", StubJobParametersConverter.called);
 		assertEquals(0, StubSystemExiter.getStatus());

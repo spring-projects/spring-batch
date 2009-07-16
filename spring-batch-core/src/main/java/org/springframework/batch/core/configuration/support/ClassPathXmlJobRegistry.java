@@ -20,6 +20,8 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.configuration.DuplicateJobException;
 import org.springframework.batch.core.configuration.JobFactory;
@@ -40,6 +42,8 @@ import org.springframework.core.io.Resource;
  * @since 2.0
  */
 public class ClassPathXmlJobRegistry implements ListableJobRegistry, ApplicationContextAware, InitializingBean {
+	
+	private static Log logger = LogFactory.getLog(ClassPathXmlJobRegistry.class);
 
 	private List<Resource> jobPaths;
 
@@ -68,16 +72,12 @@ public class ClassPathXmlJobRegistry implements ListableJobRegistry, Application
 			ApplicationContext context = applicationContextFactory.createApplicationContext();
 			String[] names = context.getBeanNamesForType(Job.class);
 
-			if (names.length > 1) {
-				throw new DuplicateJobException("More than one Job found for resource: [" + resource + "]");
+			for (String name : names) {
+				logger.debug("Registering job: "+name+" from context: "+resource);
+				ApplicationContextJobFactory jobFactory = new ApplicationContextJobFactory(applicationContextFactory,
+						name);
+				jobRegistry.register(jobFactory);
 			}
-			else if (names.length == 0) {
-				throw new NoSuchJobException("No Jobs found in resource: [" + resource + "]");
-			}
-
-			ApplicationContextJobFactory jobFactory = new ApplicationContextJobFactory(applicationContextFactory,
-					names[0]);
-			jobRegistry.register(jobFactory);
 		}
 
 	}
