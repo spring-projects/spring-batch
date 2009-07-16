@@ -176,7 +176,7 @@ public class CommandLineJobRunnerTests {
 
 	@Test
 	public void testNextWithNoParameters() {
-		jobPath = ClassUtils.addResourcePathToPackagePath(CommandLineJobRunnerTests.class, "job-with-locator.xml");
+		jobPath = ClassUtils.addResourcePathToPackagePath(CommandLineJobRunnerTests.class, "launcher-with-locator.xml");
 		CommandLineJobRunner.main(new String[] { jobPath, "-next", "test-job2", jobKey });
 		assertEquals(1, StubSystemExiter.getStatus());
 		String errorMessage = CommandLineJobRunner.getErrorMessage();
