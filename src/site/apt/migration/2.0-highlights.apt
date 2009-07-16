@@ -13,7 +13,7 @@ Spring Batch 2.0 Highlights
 
   The four main themes of the new release are
 
-    * Java 5 and Spring 3.0
+    * Java 5 (mandatory) and Spring 3.0 (optional)
 
     * Non-sequential execution
 
@@ -28,6 +28,8 @@ Spring Batch 2.0 Highlights
 * Java 5
 
   As you may know, Spring 3.0 is going to be the first major release of Spring to target Java 5 exclusively (I'll leave it to Juergen and Arjen to clarify that in more detail).  Now that Sun has put an "{{{http://java.dzone.com/articles/rip%E2%80%A6jdk-14}End of Service Life}}" stamp on the JDK 1.4 it seems appropriate, and there are some great new features on Spring 3.0 that we want to take advantage of.
+
+  Since Spring 3.0 took a little longer to release than we had initially hoped we did some work in 2.0.0 to provide the late binding features independent of Spring 3.0.  The 2.0.0 and 2.0.1 releases of Spring Batch actually do not work with Spring 3.0, but 2.0.2 should.  The expressions in step scoped beans will use the weaker, but very similar, expression language from Spring Batch instead of the full Spring EL.  In a future release of Spring Batch we will be able to fully support Spring EL in late binding expressions.
 
 ** Type Safety
 
