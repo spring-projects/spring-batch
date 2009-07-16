@@ -149,7 +149,10 @@ public class CommandLineJobRunner {
 
 	private JobLocator jobLocator;
 
-	private SystemExiter systemExiter = new JvmSystemExiter();
+	// Package private for unit test
+	private static SystemExiter systemExiter = new JvmSystemExiter();
+
+	private static String message = "";
 
 	private JobParametersConverter jobParametersConverter = new DefaultJobParametersConverter();
 
@@ -183,12 +186,34 @@ public class CommandLineJobRunner {
 	}
 
 	/**
+	 * Static setter for the {@link SystemExiter} so it can be adjusted before
+	 * dependency injection. Typically overridden by
+	 * {@link #setSystemExiter(SystemExiter)}.
+	 * 
+	 * @param systemExitor
+	 */
+	public static void presetSystemExiter(SystemExiter systemExiter) {
+		CommandLineJobRunner.systemExiter = systemExiter;
+	}
+
+	/**
+	 * Retrieve the error message set by an instance of
+	 * {@link CommandLineJobRunner} as it exits. Empty if the last job launched
+	 * was successful.
+	 * 
+	 * @return the error message
+	 */
+	public static String getErrorMessage() {
+		return message;
+	}
+
+	/**
 	 * Injection setter for the {@link SystemExiter}.
 	 * 
 	 * @param systemExitor
 	 */
-	public void setSystemExiter(SystemExiter systemExitor) {
-		this.systemExiter = systemExitor;
+	public void setSystemExiter(SystemExiter systemExiter) {
+		CommandLineJobRunner.systemExiter = systemExiter;
 	}
 
 	/**
@@ -231,10 +256,10 @@ public class CommandLineJobRunner {
 			context.getAutowireCapableBeanFactory().autowireBeanProperties(this,
 					AutowireCapableBeanFactory.AUTOWIRE_BY_TYPE, false);
 
-			Assert.notNull(launcher, "A JobLauncher must be provided.  Please add one to the configuration.");
+			Assert.state(launcher != null, "A JobLauncher must be provided.  Please add one to the configuration.");
 			if (opts.contains("-restart") || opts.contains("-next")) {
 				Assert
-						.notNull(jobExplorer,
+						.state(jobExplorer != null,
 								"A JobExplorer must be provided for a restart or start next operation.  Please add one to the configuration.");
 			}
 
@@ -264,7 +289,9 @@ public class CommandLineJobRunner {
 
 		}
 		catch (Throwable e) {
-			logger.error("Job Terminated in error:", e);
+			String message = "Job Terminated in error: " + e.getMessage();
+			logger.error(message, e);
+			CommandLineJobRunner.message = message;
 			return exitCodeMapper.intValue(ExitStatus.FAILED.getExitCode());
 		}
 		finally {
@@ -287,6 +314,10 @@ public class CommandLineJobRunner {
 
 		JobParameters jobParameters = null;
 
+		if (lastInstances.isEmpty()) {
+			throw new JobParametersNotFoundException("No job instance found for job=" + jobName);			
+		}
+
 		while (!lastInstances.isEmpty()) {
 
 			for (JobInstance jobInstance : lastInstances) {
@@ -308,10 +339,10 @@ public class CommandLineJobRunner {
 			start += count;
 			lastInstances = jobExplorer.getJobInstances(jobName, start, count);
 
-		}
+		} 
 
 		if (jobParameters == null) {
-			throw new JobParametersNotFoundException("No job parameters found for failed execution of job=" + jobName);
+			throw new JobParametersNotFoundException("No failed or stopped execution found for job=" + jobName);
 		}
 		return jobParameters;
 
@@ -402,7 +433,9 @@ public class CommandLineJobRunner {
 		}
 
 		if (jobPath == null || jobName == null) {
-			logger.error("At least 2 arguments are required: JobPath and JobName.");
+			String message = "At least 2 arguments are required: JobPath and JobName.";
+			logger.error(message);
+			CommandLineJobRunner.message = message;
 			command.exit(1);
 		}
 

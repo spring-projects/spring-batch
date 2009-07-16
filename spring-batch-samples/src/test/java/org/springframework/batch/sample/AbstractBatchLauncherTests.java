@@ -16,6 +16,8 @@
 
 package org.springframework.batch.sample;
 
+import static org.junit.Assert.assertEquals;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.junit.Assert;
@@ -87,6 +89,7 @@ public abstract class AbstractBatchLauncherTests implements ApplicationContextAw
 	public void testLaunchJob() throws Exception {
 		jobExecution = getLauncher().run(job, jobParameters);
 		Assert.assertEquals(BatchStatus.COMPLETED, jobExecution.getStatus());
+		assertEquals(BatchStatus.COMPLETED, jobExecution.getStatus());
 	}
 
 	/**
