@@ -77,6 +77,8 @@ public class FlatFileItemWriter<T> extends ExecutionContextUserSupport implement
 
 	private boolean shouldDeleteIfExists = true;
 
+	private boolean shouldDeleteIfEmpty = false;
+
 	private String encoding = OutputState.DEFAULT_CHARSET;
 
 	private FlatFileHeaderCallback headerCallback;
@@ -134,10 +136,25 @@ public class FlatFileItemWriter<T> extends ExecutionContextUserSupport implement
 	}
 
 	/**
-	 * @param shouldDeleteIfExists the shouldDeleteIfExists to set
+	 * Flag to indicate that the target file should be deleted if it already
+	 * exists, otherwise it will be appended. If headers are emitted then
+	 * appending will cause them to show up in the middle of the file. Defaults
+	 * to true (so no appending except on restart).
+	 * 
+	 * @param shouldDeleteIfExists the flag value to set
 	 */
 	public void setShouldDeleteIfExists(boolean shouldDeleteIfExists) {
 		this.shouldDeleteIfExists = shouldDeleteIfExists;
+	}
+
+	/**
+	 * Flag to indicate that the target file should be deleted if no lines have
+	 * been written (other than header and footer) on close. Defaults to false.
+	 * 
+	 * @param shouldDeleteIfEmpty the flag value to set
+	 */
+	public void setShouldDeleteIfEmpty(boolean shouldDeleteIfEmpty) {
+		this.shouldDeleteIfEmpty = shouldDeleteIfEmpty;
 	}
 
 	/**
@@ -220,10 +237,18 @@ public class FlatFileItemWriter<T> extends ExecutionContextUserSupport implement
 				}
 			}
 			catch (IOException e) {
-				throw new ItemStreamException("Failed to writer footer before closing", e);
+				throw new ItemStreamException("Failed to write footer before closing", e);
 			}
 			finally {
-				getOutputState().close();
+				state.close();
+				if (state.linesWritten == 0 && shouldDeleteIfEmpty) {
+					try {
+						resource.getFile().delete();
+					}
+					catch (IOException e) {
+						throw new ItemStreamException("Failed to delete empty file on close", e);
+					}
+				}
 				state = null;
 			}
 		}
@@ -350,7 +375,7 @@ public class FlatFileItemWriter<T> extends ExecutionContextUserSupport implement
 			}
 
 			outputBufferedWriter.flush();
-			pos = fileChannel.position() + ((TransactionAwareBufferedWriter)outputBufferedWriter).getBufferSize();
+			pos = fileChannel.position() + ((TransactionAwareBufferedWriter) outputBufferedWriter).getBufferSize();
 
 			return pos;
 
@@ -386,15 +411,32 @@ public class FlatFileItemWriter<T> extends ExecutionContextUserSupport implement
 			initialized = false;
 			restarted = false;
 			try {
-				if (outputBufferedWriter == null) {
-					return;
+				if (outputBufferedWriter != null) {
+					outputBufferedWriter.close();
 				}
-				outputBufferedWriter.close();
-				fileChannel.close();
-				os.close();
 			}
 			catch (IOException ioe) {
 				throw new ItemStreamException("Unable to close the the ItemWriter", ioe);
+			}
+			finally {
+				try {
+					if (fileChannel != null) {
+						fileChannel.close();
+					}
+				}
+				catch (IOException ioe) {
+					throw new ItemStreamException("Unable to close the the ItemWriter", ioe);
+				}
+				finally {
+					try {
+						if (os != null) {
+							os.close();
+						}
+					}
+					catch (IOException ioe) {
+						throw new ItemStreamException("Unable to close the the ItemWriter", ioe);
+					}
+				}
 			}
 		}
 

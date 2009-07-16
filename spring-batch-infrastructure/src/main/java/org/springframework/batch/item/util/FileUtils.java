@@ -61,7 +61,9 @@ public class FileUtils {
 					if (!overwriteOutputFile) {
 						throw new ItemStreamException("File already exists: [" + file.getAbsolutePath() + "]");
 					}
-					file.delete();
+					if (!file.delete()) {
+						throw new IOException("Could not delete file: "+file);
+					}
 				}
 
 				if (file.getParent() != null) {

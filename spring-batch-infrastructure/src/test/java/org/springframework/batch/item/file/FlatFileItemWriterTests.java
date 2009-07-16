@@ -370,19 +370,26 @@ public class FlatFileItemWriterTests {
 	@Test
 	public void testWriteStringWithBogusEncoding() throws Exception {
 		writer.setEncoding("BOGUS");
+		// writer.setShouldDeleteIfEmpty(true);
 		try {
 			writer.open(executionContext);
-			fail("Expecyted ItemStreamException");
+			fail("Expected ItemStreamException");
 		}
 		catch (ItemStreamException e) {
 			assertTrue(e.getCause() instanceof UnsupportedCharsetException);
 		}
 		writer.close();
+		// Try and write after the exception on open:
+		writer.setEncoding("UTF-8");
+		writer.open(executionContext);
+		writer.write(Collections.singletonList(TEST_STRING));
 	}
 
 	@Test
 	public void testWriteStringWithEncodingAfterClose() throws Exception {
-		testWriteStringWithBogusEncoding();
+		writer.open(executionContext);
+		writer.write(Collections.singletonList(TEST_STRING));
+		writer.close();
 		writer.setEncoding("UTF-8");
 		writer.open(executionContext);
 		writer.write(Collections.singletonList(TEST_STRING));
@@ -426,6 +433,22 @@ public class FlatFileItemWriterTests {
 		assertEquals("b", lineFromFile);
 		lineFromFile = readLine();
 		assertEquals(TEST_STRING, lineFromFile);
+	}
+
+	@Test
+	public void testWriteHeaderAndDeleteOnExit() throws Exception {
+		writer.setHeaderCallback(new FlatFileHeaderCallback() {
+
+			public void writeHeader(Writer writer) throws IOException {
+				writer.write("a\nb");
+			}
+
+		});
+		writer.setShouldDeleteIfEmpty(true);
+		writer.open(executionContext);
+		assertTrue(outputFile.exists());
+		writer.close();
+		assertFalse(outputFile.exists());
 	}
 
 	@Test
