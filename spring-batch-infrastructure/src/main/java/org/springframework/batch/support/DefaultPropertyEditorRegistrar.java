@@ -28,7 +28,10 @@ import org.springframework.util.ClassUtils;
 /**
  * A re-usable {@link PropertyEditorRegistrar} that can be used wherever one
  * needs to register custom {@link PropertyEditor} instances with a
- * {@link PropertyEditorRegistry} (like a bean wrapper, or a type converter).
+ * {@link PropertyEditorRegistry} (like a bean wrapper, or a type converter). It
+ * is not thread safe, but useful where one is confident that binding or
+ * initialisation can only be single threaded (e.g in a standalone application
+ * with no threads).
  * 
  * @author Dave Syer
  * 
