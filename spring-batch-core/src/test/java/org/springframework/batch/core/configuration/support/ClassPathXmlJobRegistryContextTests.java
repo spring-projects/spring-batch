@@ -29,7 +29,7 @@ public class ClassPathXmlJobRegistryContextTests {
 	public void testLocateJob() throws Exception{
 		
 		Collection<String> names = registry.getJobNames();
-		assertEquals(1, names.size());
+		assertEquals(2, names.size());
 		assertTrue(names.contains("test-job"));
 		
 		Job job = registry.getJob("test-job");

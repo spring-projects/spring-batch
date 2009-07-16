@@ -7,7 +7,6 @@ import java.util.Collection;
 
 import org.junit.Test;
 import org.springframework.batch.core.Job;
-import org.springframework.batch.core.configuration.DuplicateJobException;
 import org.springframework.batch.core.launch.NoSuchJobException;
 import org.springframework.context.support.GenericApplicationContext;
 import org.springframework.core.io.ClassPathResource;
@@ -59,7 +58,7 @@ public class ClassPathXmlJobRegistryTests {
 		registry.afterPropertiesSet();
 	}
 
-	@Test(expected = DuplicateJobException.class)
+	@Test
 	public void testDuplicateJobsInFile() throws Exception {
 
 		Resource[] jobPaths = new Resource[] { new ClassPathResource(
@@ -69,5 +68,6 @@ public class ClassPathXmlJobRegistryTests {
 		applicationContext.refresh();
 		registry.setApplicationContext(applicationContext);
 		registry.afterPropertiesSet();
+		assertEquals(2, registry.getJobNames().size());
 	}
 }

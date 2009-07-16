@@ -50,7 +50,7 @@ import org.springframework.util.ClassUtils;
 public class CommandLineJobRunnerTests {
 
 	private String jobPath = ClassUtils.addResourcePathToPackagePath(CommandLineJobRunnerTests.class,
-			"job-with-environment.xml");
+			"launcher-with-environment.xml");
 
 	private String jobName = "test-job";
 

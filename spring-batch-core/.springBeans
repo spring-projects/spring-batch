@@ -12,7 +12,6 @@
 		<config>src/test/resources/org/springframework/batch/core/launch/support/test-environment.xml</config>
 		<config>src/test/resources/org/springframework/batch/core/launch/support/2jobs.xml</config>
 		<config>src/test/resources/org/springframework/batch/core/repository/dao/data-source-context.xml</config>
-		<config>src/test/resources/org/springframework/batch/core/launch/support/job-with-environment.xml</config>
 		<config>src/test/resources/org/springframework/batch/core/launch/support/job2.xml</config>
 		<config>src/test/resources/org/springframework/batch/core/repository/dao/sql-dao-test.xml</config>
 		<config>src/test/resources/org/springframework/batch/core/launch/support/test-environment-with-registry.xml</config>

@@ -20,6 +20,8 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 
+import javax.print.attribute.standard.JobName;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.batch.core.Job;
@@ -78,6 +80,10 @@ public class ClassPathXmlJobRegistry implements ListableJobRegistry, Application
 						name);
 				jobRegistry.register(jobFactory);
 			}
+		}
+		
+		if (jobRegistry.getJobNames().isEmpty()) {
+			throw new NoSuchJobException("Could not locate any jobs in resources provided.");
 		}
 
 	}
