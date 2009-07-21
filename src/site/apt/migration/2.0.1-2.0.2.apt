@@ -1,0 +1,122 @@
+Spring Batch 2.0.2.RELEASE Release Notes
+
+
+* Sub-task
+
+  *{{{http://jira.springsource.org/browse/BATCH-1327}[BATCH-1327]}} -         Prevent re-processing and re-writing on rollback after non-skippable and non-retryable exception
+
+  * {{{http://jira.springsource.org/browse/BATCH-1331}[BATCH-1331]}} -         Fatal exceptions that are also marked as no-rollback
+
+  * {{{http://jira.springsource.org/browse/BATCH-1332}[BATCH-1332]}} -         Skippable exceptions on write that are also marked as no-rollback cause a rollback, and double processing of item (writer and skip listener)
+
+  * {{{http://jira.springsource.org/browse/BATCH-1333}[BATCH-1333]}} -         Support for retry of non-skippable subclasses of skippable exceptions
+
+  * {{{http://jira.springsource.org/browse/BATCH-1334}[BATCH-1334]}} -         Exception marked as no-rollback but not skippable should not cause skips
+
+  * {{{http://jira.springsource.org/browse/BATCH-1335}[BATCH-1335]}} -         Pathological cases of no-rollback-for-exceptions on framework panic exceptions
+
+
+    
+* Bug
+
+  * {{{http://jira.springsource.org/browse/BATCH-1232}[BATCH-1232]}} -         Sybase 12.5 compatiblity when writing to the spring batch context tables
+
+  * {{{http://jira.springsource.org/browse/BATCH-1264}[BATCH-1264]}} -         NPE in StepParserStepFactoryBean#configureTaskletStep() #289 when omitting &quot;isolation&quot; for &lt;transaction-attributes&gt;
+
+  * {{{http://jira.springsource.org/browse/BATCH-1272}[BATCH-1272]}} -         Write skips do not work in a multi-threaded step
+
+  * {{{http://jira.springsource.org/browse/BATCH-1278}[BATCH-1278]}} -         RepeatTemplate aborts early if multiple threads throw ignorable exceptions
+
+  * {{{http://jira.springsource.org/browse/BATCH-1280}[BATCH-1280]}} -         JobParserJobFactoryBean should be a singleton
+
+  * {{{http://jira.springsource.org/browse/BATCH-1282}[BATCH-1282]}} -         JobRegistryBeanPostProcessor skips jobs in XML namespace unless they are injected as dependency
+
+  * {{{http://jira.springsource.org/browse/BATCH-1284}[BATCH-1284]}} -         Partition Step Stop is incorrectly setting the BatchStatus to COMPLETED.
+
+  * {{{http://jira.springsource.org/browse/BATCH-1287}[BATCH-1287]}} -         JobRegistryBeanPostProcessor is checking for Job instead of JobParserJobFactoryBean
+
+  * {{{http://jira.springsource.org/browse/BATCH-1289}[BATCH-1289]}} -         Null pointer in CoreNamespaceUtils.rangeArrayEditorAlreadyDefined()
+
+  * {{{http://jira.springsource.org/browse/BATCH-1301}[BATCH-1301]}} -         ItemStream is not being opened correctly for multi-threaded Step when scope=&quot;step&quot;
+
+  * {{{http://jira.springsource.org/browse/BATCH-1304}[BATCH-1304]}} -         Filter counter not incremented whenever there's a skip
+
+  * {{{http://jira.springsource.org/browse/BATCH-1308}[BATCH-1308]}} -         FixedLengthTokenizer's 'names' property may not have spaces
+
+  * {{{http://jira.springsource.org/browse/BATCH-1313}[BATCH-1313]}} -         loopFlowSample's LimitDecider returns &quot;COMPLETE&quot; instead of &quot;COMPLETED&quot;
+
+  * {{{http://jira.springsource.org/browse/BATCH-1314}[BATCH-1314]}} -         FFIW in tradeJob is pointing to classpath instead of the target
+
+  * {{{http://jira.springsource.org/browse/BATCH-1315}[BATCH-1315]}} -         Section 2.3 Configuration Enhancements contains invalid example
+
+  * {{{http://jira.springsource.org/browse/BATCH-1318}[BATCH-1318]}} -         Ensure exception classes are behaving correctly
+
+  * {{{http://jira.springsource.org/browse/BATCH-1319}[BATCH-1319]}} -         Small memory leak in StepSynchronizationManager
+
+
+    
+* Improvement
+
+  * {{{http://jira.springsource.org/browse/BATCH-1262}[BATCH-1262]}} -         org.springframework.batch.item.file.transform.DefaultFieldSet#readBigDecimal doesn't use supplied numberFormat
+
+  * {{{http://jira.springsource.org/browse/BATCH-1267}[BATCH-1267]}} -         Make sure jmsTemplate is not null in JmsItemReader
+
+  * {{{http://jira.springsource.org/browse/BATCH-1268}[BATCH-1268]}} -         Remove dependency on commons lang
+
+  * {{{http://jira.springsource.org/browse/BATCH-1270}[BATCH-1270]}} -         Update documentation for formatting consistency
+
+  * {{{http://jira.springsource.org/browse/BATCH-1275}[BATCH-1275]}} -         ExecutionContextPromotionListener contains duplicate assertion
+
+  * {{{http://jira.springsource.org/browse/BATCH-1276}[BATCH-1276]}} -         Change Common Pattern &quot;Writing a Summary Footer&quot; to use AfterWrite for updating total.
+
+  * {{{http://jira.springsource.org/browse/BATCH-1285}[BATCH-1285]}} -         Raise an exception if a step cannot be reached.
+
+  * {{{http://jira.springsource.org/browse/BATCH-1299}[BATCH-1299]}} -         Add processSkipCount in StepExecution#getSummary()
+
+  * {{{http://jira.springsource.org/browse/BATCH-1302}[BATCH-1302]}} -         Tidy up samples - remove prefixes for namespaces like beans:
+
+  * {{{http://jira.springsource.org/browse/BATCH-1305}[BATCH-1305]}} -         Add download page link to the batch home page
+
+  * {{{http://jira.springsource.org/browse/BATCH-1310}[BATCH-1310]}} -         SimpleJobExplorer should return null when a StepExecution cannot be found
+
+  * {{{http://jira.springsource.org/browse/BATCH-1311}[BATCH-1311]}} -         SimpleJobExplorer should return null when a StepExecution cannot be found
+
+  * {{{http://jira.springsource.org/browse/BATCH-1312}[BATCH-1312]}} -         Improve error messages for skip/retry configurations
+
+
+    
+* New Feature
+
+  * {{{http://jira.springsource.org/browse/BATCH-1253}[BATCH-1253]}} -         Ability to throttle the number of rows returned by a HibernateCursorItemReader
+
+  * {{{http://jira.springsource.org/browse/BATCH-1279}[BATCH-1279]}} -         Add default constructor to ValidatingItemProcessor for those preferring setter injection
+
+  * {{{http://jira.springsource.org/browse/BATCH-1288}[BATCH-1288]}} -         Typo in CallableTaskletAdapter JavaDoc
+
+  * {{{http://jira.springsource.org/browse/BATCH-1295}[BATCH-1295]}} -         Provide ability to pass job's ExecutionContext into AbstractJobTests.launchStep()
+
+  * {{{http://jira.springsource.org/browse/BATCH-1297}[BATCH-1297]}} -         Add null check for FlatFileItemReader in case resource exists on close, but not on open(!)
+
+  * {{{http://jira.springsource.org/browse/BATCH-1303}[BATCH-1303]}} -         Support Spring 3.0 expression language in beans that are not step scoped
+
+  * {{{http://jira.springsource.org/browse/BATCH-1306}[BATCH-1306]}} -         DelimitedLineAggregator might skip null objects
+
+  * {{{http://jira.springsource.org/browse/BATCH-1309}[BATCH-1309]}} -         Added a 'strict' property to ExecutionContextPromotionListener to ensure the key is present
+
+  * {{{http://jira.springsource.org/browse/BATCH-1317}[BATCH-1317]}} -         Add flag to FlatFileItemWriter to delete empty files
+
+  * {{{http://jira.springsource.org/browse/BATCH-1320}[BATCH-1320]}} -         New line special character in Header
+
+  * {{{http://jira.springsource.org/browse/BATCH-1321}[BATCH-1321]}} -         Upgrade MANIFEST to allow Spring 3.0 to be used optionally
+
+  * {{{http://jira.springsource.org/browse/BATCH-1325}[BATCH-1325]}} -         Add more convenience methods to JobRepositoryTestUtils
+
+  * {{{http://jira.springsource.org/browse/BATCH-1336}[BATCH-1336]}} -         Add -restart and -next options to CommandLineJobRunner
+
+
+        
+* Task
+
+  * {{{http://jira.springsource.org/browse/BATCH-1271}[BATCH-1271]}} -         Add a note about bean scope for batch parameters usage
+
+
