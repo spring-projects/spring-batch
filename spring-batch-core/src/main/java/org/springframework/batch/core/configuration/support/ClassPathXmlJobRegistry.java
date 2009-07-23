@@ -20,8 +20,6 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 
-import javax.print.attribute.standard.JobName;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.batch.core.Job;
@@ -44,7 +42,7 @@ import org.springframework.core.io.Resource;
  * @since 2.0
  */
 public class ClassPathXmlJobRegistry implements ListableJobRegistry, ApplicationContextAware, InitializingBean {
-	
+
 	private static Log logger = LogFactory.getLog(ClassPathXmlJobRegistry.class);
 
 	private List<Resource> jobPaths;
@@ -75,13 +73,13 @@ public class ClassPathXmlJobRegistry implements ListableJobRegistry, Application
 			String[] names = context.getBeanNamesForType(Job.class);
 
 			for (String name : names) {
-				logger.debug("Registering job: "+name+" from context: "+resource);
+				logger.debug("Registering job: " + name + " from context: " + resource);
 				ApplicationContextJobFactory jobFactory = new ApplicationContextJobFactory(applicationContextFactory,
 						name);
 				jobRegistry.register(jobFactory);
 			}
 		}
-		
+
 		if (jobRegistry.getJobNames().isEmpty()) {
 			throw new NoSuchJobException("Could not locate any jobs in resources provided.");
 		}
