@@ -71,7 +71,7 @@ public abstract class AbstractStepParser {
 	 * @param stepElement The &lt;step/&gt; element
 	 * @param parserContext
 	 * @param jobFactoryRef the reference to the {@link JobParserJobFactoryBean}
-	 *        from the enclosing tag. Use 'null' if unknown.
+	 * from the enclosing tag. Use 'null' if unknown.
 	 */
 	protected AbstractBeanDefinition parseStep(Element stepElement, ParserContext parserContext, String jobFactoryRef) {
 
@@ -81,7 +81,7 @@ public abstract class AbstractStepParser {
 		List<Element> taskletElements = (List<Element>) DomUtils.getChildElementsByTagName(stepElement, TASKLET_ELE);
 		if (taskletElements.size() == 1) {
 			boolean stepUnderspecified = CoreNamespaceUtils.isUnderspecified(stepElement);
-			parseTasklet(taskletElements.get(0), bd, parserContext, stepUnderspecified);
+			parseTasklet(stepElement, taskletElements.get(0), bd, parserContext, stepUnderspecified);
 		}
 		else if (taskletElements.size() > 1) {
 			parserContext.getReaderContext().error(
@@ -107,7 +107,7 @@ public abstract class AbstractStepParser {
 
 	}
 
-	private void parseTasklet(Element taskletElement, AbstractBeanDefinition bd, ParserContext parserContext,
+	private void parseTasklet(Element stepElement, Element taskletElement, AbstractBeanDefinition bd, ParserContext parserContext,
 			boolean stepUnderspecified) {
 
 		bd.setBeanClass(StepParserStepFactoryBean.class);
@@ -130,8 +130,9 @@ public abstract class AbstractStepParser {
 		}
 		else if (!stepUnderspecified) {
 			parserContext.getReaderContext().error(
-					"Step [" + taskletElement.getAttribute(ID_ATTR) + "] has neither a <" + CHUNK_ELE
-							+ "/> element nor a '" + TASKLET_REF_ATTR + "' attribute.", taskletElement);
+					"Step [" + stepElement.getAttribute(ID_ATTR) + "] has neither a <" + CHUNK_ELE
+							+ "/> element nor a '" + TASKLET_REF_ATTR + "' attribute referencing a Tasklet.",
+					taskletElement);
 		}
 
 		setUpBeanDefinitionForTaskletStep(taskletElement, bd, parserContext);
