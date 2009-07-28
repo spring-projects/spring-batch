@@ -23,6 +23,7 @@ public class IbatisPagingItemReaderCommonTests extends AbstractDatabaseItemStrea
 
 		IbatisPagingItemReader reader = new IbatisPagingItemReader();
 		reader.setQueryId("getPagedFoos");
+		reader.setPageSize(2);
 		reader.setSqlMapClient(sqlMapClient);
 		reader.setSaveState(true);
 

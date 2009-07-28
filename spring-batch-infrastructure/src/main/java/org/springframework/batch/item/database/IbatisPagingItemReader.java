@@ -26,21 +26,42 @@ import java.util.HashMap;
 import com.ibatis.sqlmap.client.SqlMapClient;
 
 /**
- * {@link org.springframework.batch.item.ItemReader} for reading database records using iBATIS in a paging
- * fashion.
- *
- * It executes the query specified as the {@link #setQueryId(String)} to retrieve requested data.
- * The query is executed using paged requests of a size specified in {@link #setPageSize(int)}.
- * Additional pages are requested when needed as {@link #read()} method is called, returning an
- * object corresponding to current position.
- *
+ * <p>
+ * {@link org.springframework.batch.item.ItemReader} for reading database
+ * records using iBATIS in a paging fashion.
+ * </p>
+ * 
+ * <p>
+ * It executes the query specified as the {@link #setQueryId(String)} to
+ * retrieve requested data. The query is executed using paged requests of a size
+ * specified in {@link #setPageSize(int)}. Additional pages are requested when
+ * needed as {@link #read()} method is called, returning an object corresponding
+ * to current position. Some standard query parameters are provided by the
+ * reader and the SQL in the named query must use some or all of these parameters
+ * (depending on the SQL variant) to construct a result set of the required
+ * size. The parameters are:
+ * <ul>
+ * <li><code>_page</code>: the page number to be read (starting at 0)</li>
+ * <li><code>_pagesize</code>: the size of the pages, i.e. the number of rows to
+ * return</li>
+ * <li><code>_skiprows</code>: the product of <code>_page</code> and
+ * <code>_pagesize</code></li>
+ * </ul>
+ * Failure to write the correct platform-specific SQL often results in an
+ * infinite loop in the reader because it keeps asking for the next page and
+ * gets the same result set over and over.
+ * </p>
+ * 
+ * <p>
  * The performance of the paging depends on the iBATIS implementation.
- *
- * Setting a fairly large page size and using a commit interval that matches the page size should provide
- * better performance.
- *
+ * Setting a fairly large page size and using a commit interval that matches the
+ * page size should provide better performance.
+ * </p>
+ * 
+ * <p>
  * The implementation is *not* thread-safe.
- *
+ * </p>
+ * 
  * @author Thomas Risberg
  * @since 2.0
  */
@@ -68,13 +89,13 @@ public class IbatisPagingItemReader<T> extends AbstractPagingItemReader<T> {
 
 	/**
 	 * The parameter values to be used for the query execution.
-	 *
-	 * @param parameterValues the values keyed by the parameter named used in the query string.
+	 * 
+	 * @param parameterValues the values keyed by the parameter named used in
+	 * the query string.
 	 */
 	public void setParameterValues(Map<String, Object> parameterValues) {
 		this.parameterValues = parameterValues;
 	}
-
 
 	/**
 	 * Check mandatory properties.
