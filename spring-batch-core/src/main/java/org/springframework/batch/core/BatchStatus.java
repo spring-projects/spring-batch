@@ -16,14 +16,12 @@
 
 package org.springframework.batch.core;
 
-
 /**
  * Enumeration representing the status of a an Execution.
  * 
  * @author Lucas Ward
  * @author Dave Syer
  */
-
 public enum BatchStatus {
 
 	/**
@@ -40,14 +38,7 @@ public enum BatchStatus {
 	COMPLETED, STARTING, STARTED, STOPPING, STOPPED, FAILED, ABANDONED, UNKNOWN;
 
 	public static BatchStatus max(BatchStatus status1, BatchStatus status2) {
-		if (status1.isLessThan(status2)) {
-			return status2;
-		}
-		if (status1.isGreaterThan(status2)) {
-			return status1;
-		}
-		else
-			return status1;
+		return status1.isGreaterThan(status2) ? status1 : status2;
 	}
 
 	/**
@@ -85,9 +76,7 @@ public enum BatchStatus {
 			return max(this, other);
 		}
 		// Both less than or equal to STARTED
-		if (this == COMPLETED)
-			return COMPLETED;
-		if (other == COMPLETED)
+		if (this == COMPLETED || other == COMPLETED)
 			return COMPLETED;
 		return max(this, other);
 	}
@@ -117,8 +106,8 @@ public enum BatchStatus {
 	}
 
 	/**
-	 * Find a BatchStatus that matches the beginning of the given value.  If 
-	 * no match is found, return COMPLETED as the default because has is low
+	 * Find a BatchStatus that matches the beginning of the given value. If no
+	 * match is found, return COMPLETED as the default because has is low
 	 * precedence.
 	 * 
 	 * @param value a string representing a status
