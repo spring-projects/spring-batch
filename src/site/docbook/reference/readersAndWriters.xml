@@ -1716,20 +1716,14 @@ staxItemWriter.write(trade);</programlisting>
   <section id="database">
     <title id="infrastructure.2.2">Database</title>
 
-    <para>Like most enterprise application styles, a database is the central
-    storage mechanism for batch. However, batch differs from other application
-    styles due to the sheer size of the datasets with which the system must
-    work. The Spring Core <classname>JdbcTemplate</classname> illustrates this
-    problem well. If you use <classname>JdbcTemplate</classname> with a
-    <classname>RowMapper</classname>, the <classname>RowMapper</classname>
-    will be called once for every result returned from the provided query.
-    This causes few issues in scenarios where the dataset is small, but the
-    large datasets often necessary for batch processing would cause any JVM to
-    crash quickly. If the SQL statement returns 1 million rows, the
-    <classname>RowMapper</classname> will be called 1 million times, holding
-    all returned results in memory until all rows have been read. Spring Batch
-    provides two types of solutions for this problem: Cursor and Paging
-    database ItemReaders.</para>
+    <para>Like most enterprise application styles, a database is the
+    central storage mechanism for batch. However, batch differs from
+    other application styles due to the sheer size of the datasets
+    with which the system must work. If a SQL statement returns 1
+    million rows, the result set probably holds all returned results
+    in memory until all rows have been read. Spring Batch provides two
+    types of solutions for this problem: Cursor and Paging database
+    ItemReaders.</para>
 
     <section id="cursorBasedItemReaders">
       <title>Cursor Based ItemReaders</title>
