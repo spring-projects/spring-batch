@@ -9,7 +9,7 @@ Snapshot Builds
 
   These builds are provided for testing and development purposes only. They are built by a Bamboo process automatically using the latest snapshot from Subversion.
 	
-  Snapshots are deployed in Maven Central format every night to the {{{http://s3browse.com/explore/maven.springframework.org/milestone/org/springframework/batch}SpringSource Maven Repository}}, so use this in your POM (inside a \<repositories\> element):
+  Snapshots are deployed in Maven Central format every night to the {{{http://s3browse.com/explore/maven.springframework.org/snapshot/org/springframework/batch}SpringSource Maven Repository}}, so use this in your POM (inside a \<repositories\> element):
 
 +---
 <repository>
