@@ -144,4 +144,106 @@
 	<beans:bean id="dummyTxMgr" class="org.springframework.batch.core.configuration.xml.DummyPlatformTransactionManager"/>
 	<beans:bean id="dummyTxMgr2" class="org.springframework.batch.core.configuration.xml.DummyPlatformTransactionManager"/>
 	
+	
+	<step id="baseStepWithLists" abstract="true">
+		<tasklet>
+			<chunk>
+				<skippable-exception-classes>
+					org.springframework.batch.core.step.item.SkippableRuntimeException
+				</skippable-exception-classes>
+				<fatal-exception-classes>
+					org.springframework.batch.core.step.item.FatalRuntimeException
+				</fatal-exception-classes>
+				<retryable-exception-classes>
+					org.springframework.dao.DeadlockLoserDataAccessException
+				</retryable-exception-classes>
+				<streams>
+					<stream ref="stream1"/>
+				</streams>
+				<retry-listeners>
+					<listener class="org.springframework.batch.retry.listener.RetryListenerSupport"/>
+				</retry-listeners>
+			</chunk>
+			<listeners>
+				<listener class="org.springframework.batch.core.listener.StepExecutionListenerSupport"/>
+			</listeners>
+			<no-rollback-exception-classes>
+				org.springframework.batch.core.step.item.FatalRuntimeException
+			</no-rollback-exception-classes>
+		</tasklet>
+	</step>
+	
+	<step id="stepWithListsMerge" parent="baseStepWithLists">
+		<tasklet>
+			<chunk reader="reader" writer="writer" commit-interval="10">
+				<skippable-exception-classes merge="true">
+					org.springframework.batch.core.step.item.SkippableException
+				</skippable-exception-classes>
+				<fatal-exception-classes merge="true">
+					org.springframework.batch.core.step.item.FatalException
+				</fatal-exception-classes>
+				<retryable-exception-classes merge="true">
+					org.springframework.batch.core.step.item.FatalException
+				</retryable-exception-classes>
+				<streams merge="true">
+					<stream ref="stream2"/>
+				</streams>
+				<retry-listeners merge="true">
+					<listener class="org.springframework.batch.core.configuration.xml.DummyRetryListener"/>
+				</retry-listeners>
+			</chunk>
+			<listeners merge="true">
+				<listener class="org.springframework.batch.core.listener.CompositeStepExecutionListener"/>
+			</listeners>
+			<no-rollback-exception-classes merge="true">
+				org.springframework.batch.core.step.item.SkippableRuntimeException
+			</no-rollback-exception-classes>
+		</tasklet>
+	</step>
+	
+	<step id="stepWithListsNoMerge" parent="baseStepWithLists">
+		<tasklet>
+			<chunk reader="reader" writer="writer" commit-interval="10">
+				<skippable-exception-classes>
+					org.springframework.batch.core.step.item.SkippableException
+				</skippable-exception-classes>
+				<fatal-exception-classes>
+					org.springframework.batch.core.step.item.FatalException
+				</fatal-exception-classes>
+				<retryable-exception-classes>
+					org.springframework.batch.core.step.item.FatalException
+				</retryable-exception-classes>
+				<streams>
+					<stream ref="stream2"/>
+				</streams>
+				<retry-listeners>
+					<listener class="org.springframework.batch.core.configuration.xml.DummyRetryListener"/>
+				</retry-listeners>
+			</chunk>
+			<listeners>
+				<listener class="org.springframework.batch.core.listener.CompositeStepExecutionListener"/>
+			</listeners>
+			<no-rollback-exception-classes>
+				org.springframework.batch.core.step.item.SkippableRuntimeException
+			</no-rollback-exception-classes>
+		</tasklet>
+	</step>
+	
+	<step id="stepWithListsOverrideWithEmpty" parent="baseStepWithLists">
+		<tasklet>
+			<chunk reader="reader" writer="writer" commit-interval="10">
+				<skippable-exception-classes/>
+				<fatal-exception-classes/>
+				<retryable-exception-classes/>
+				<!--TODO BATCH-1357: <streams/>-->
+				<!--TODO BATCH-1357: <retry-listeners/>-->
+			</chunk>
+			<!--TODO BATCH-1357: <listeners/>-->
+			<no-rollback-exception-classes/>
+		</tasklet>
+	</step>
+	
+	<beans:bean id="stream1" class="org.springframework.batch.core.configuration.xml.TestReader"/>
+	<beans:bean id="stream2" class="org.springframework.batch.item.support.CompositeItemStream"/>
+
 </beans:beans>

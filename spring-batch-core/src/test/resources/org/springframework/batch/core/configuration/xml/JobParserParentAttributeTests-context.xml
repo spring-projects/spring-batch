@@ -4,9 +4,6 @@
 	xsi:schemaLocation="http://www.springframework.org/schema/batch http://www.springframework.org/schema/batch/spring-batch-2.0.xsd
 	http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.5.xsd">
 
-	<!-- Ensure that no error is thrown from CoreNamespaceUtils due to an empty configurer -->
-    <beans:bean class="org.springframework.beans.factory.config.CustomEditorConfigurer"/>
-    
 	<beans:import resource="common-context.xml" />
 
 	<job id="job1" parent="baseJob">
@@ -69,4 +66,9 @@
 
 	<beans:bean id="dummyJobRepository" class="org.springframework.batch.core.configuration.xml.DummyJobRepository"/>
 
+	<job id="listenerClearingJob" parent="baseJob">
+		<step id="listenerClearingJobStep"><tasklet ref="dummyTasklet"/></step>
+		<!--TODO BATCH-1357: <listeners/>-->
+	</job>
+	
 </beans:beans>

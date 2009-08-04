@@ -107,8 +107,8 @@ public abstract class AbstractStepParser {
 
 	}
 
-	private void parseTasklet(Element stepElement, Element taskletElement, AbstractBeanDefinition bd, ParserContext parserContext,
-			boolean stepUnderspecified) {
+	private void parseTasklet(Element stepElement, Element taskletElement, AbstractBeanDefinition bd,
+			ParserContext parserContext, boolean stepUnderspecified) {
 
 		bd.setBeanClass(StepParserStepFactoryBean.class);
 		bd.setAttribute("isNamespaceStep", true);
@@ -205,16 +205,12 @@ public abstract class AbstractStepParser {
 		if (children.size() == 1) {
 			Element child = children.get(0);
 			String exceptions = DomUtils.getTextValue(child);
-			if (StringUtils.hasLength(exceptions)) {
-				String[] exceptionArray = StringUtils.tokenizeToStringArray(exceptions, ",\n");
-				if (exceptionArray.length > 0) {
-					ManagedList managedList = new ManagedList();
-					managedList.setMergeEnabled(child.hasAttribute(MERGE_ATTR)
-							&& Boolean.valueOf(child.getAttribute(MERGE_ATTR)));
-					managedList.addAll(Arrays.asList(exceptionArray));
-					propertyValues.addPropertyValue(propertyName, managedList);
-				}
-			}
+			String[] exceptionArray = StringUtils.tokenizeToStringArray(exceptions, ",\n");
+			ManagedList managedList = new ManagedList();
+			managedList.setMergeEnabled(child.hasAttribute(MERGE_ATTR)
+					&& Boolean.valueOf(child.getAttribute(MERGE_ATTR)));
+			managedList.addAll(Arrays.asList(exceptionArray));
+			propertyValues.addPropertyValue(propertyName, managedList);
 		}
 		else if (children.size() > 1) {
 			parserContext.getReaderContext().error(

@@ -18,6 +18,9 @@ package org.springframework.batch.core.configuration.xml;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
@@ -26,15 +29,25 @@ import org.junit.Test;
 import org.springframework.aop.framework.Advised;
 import org.springframework.batch.core.Step;
 import org.springframework.batch.core.StepExecutionListener;
+import org.springframework.batch.core.StepListener;
 import org.springframework.batch.core.job.AbstractJob;
+import org.springframework.batch.core.listener.CompositeStepExecutionListener;
 import org.springframework.batch.core.listener.StepExecutionListenerSupport;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.repository.support.SimpleJobRepository;
 import org.springframework.batch.core.step.AbstractStep;
+import org.springframework.batch.core.step.item.FatalException;
+import org.springframework.batch.core.step.item.FatalRuntimeException;
+import org.springframework.batch.core.step.item.SkippableException;
+import org.springframework.batch.core.step.item.SkippableRuntimeException;
 import org.springframework.batch.core.step.tasklet.Tasklet;
 import org.springframework.batch.core.step.tasklet.TaskletStep;
+import org.springframework.batch.item.ItemStream;
+import org.springframework.batch.item.support.CompositeItemStream;
 import org.springframework.batch.repeat.CompletionPolicy;
 import org.springframework.batch.repeat.policy.SimpleCompletionPolicy;
+import org.springframework.batch.retry.RetryListener;
+import org.springframework.batch.retry.listener.RetryListenerSupport;
 import org.springframework.batch.support.transaction.ResourcelessTransactionManager;
 import org.springframework.beans.factory.parsing.BeanDefinitionParsingException;
 import org.springframework.beans.factory.xml.XmlBeanFactory;
@@ -42,6 +55,7 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 import org.springframework.core.io.ClassPathResource;
+import org.springframework.dao.DeadlockLoserDataAccessException;
 import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.TransactionDefinition;
@@ -196,7 +210,7 @@ public class StepParserTests {
 	}
 
 	@SuppressWarnings("unchecked")
-	private StepExecutionListener getListener(String stepName, ApplicationContext ctx) throws Exception {
+	private List<StepExecutionListener> getListeners(String stepName, ApplicationContext ctx) throws Exception {
 		assertTrue(ctx.containsBean(stepName));
 		Step step = (Step) ctx.getBean(stepName);
 		assertTrue(step instanceof TaskletStep);
@@ -204,13 +218,20 @@ public class StepParserTests {
 		Object composite = ReflectionTestUtils.getField(compositeListener, "list");
 		List<StepExecutionListener> list = (List<StepExecutionListener>) ReflectionTestUtils
 				.getField(composite, "list");
-
-		assertEquals(1, list.size());
-		StepExecutionListener listener = list.get(0);
-		if (listener instanceof Advised) {
-			listener = (StepExecutionListener) ((Advised) listener).getTargetSource().getTarget();
+		List<StepExecutionListener> unwrappedList = new ArrayList<StepExecutionListener>();
+		for (StepExecutionListener listener : list) {
+			while (listener instanceof Advised) {
+				listener = (StepExecutionListener) ((Advised) listener).getTargetSource().getTarget();
+			}
+			unwrappedList.add(listener);
 		}
-		return listener;
+		return unwrappedList;
+	}
+
+	private StepExecutionListener getListener(String stepName, ApplicationContext ctx) throws Exception {
+		List<StepExecutionListener> list = getListeners(stepName, ctx);
+		assertEquals(1, list.size());
+		return list.get(0);
 	}
 
 	private DefaultTransactionAttribute getTransactionAttribute(ApplicationContext ctx, String stepName) {
@@ -392,5 +413,121 @@ public class StepParserTests {
 		assertTrue(ctx.containsBean("dummyStep"));
 		Object dummyStep = ctx.getBean("dummyStep");
 		assertTrue(dummyStep instanceof DummyStep);
+	}
+
+	@SuppressWarnings("unchecked")
+	@Test
+	public void testStepWithListsMerge() throws Exception {
+		ApplicationContext ctx = stepParserParentAttributeTestsCtx;
+
+		List<Class<? extends Exception>> skippable = Arrays.asList(SkippableRuntimeException.class,
+				SkippableException.class);
+		Collection<Class<? extends Exception>> fatal = Arrays.asList(FatalRuntimeException.class, FatalException.class);
+		Collection<Class<? extends Exception>> retryable = Arrays.asList(DeadlockLoserDataAccessException.class,
+				FatalException.class);
+		List<Class<? extends ItemStream>> streams = Arrays.asList(CompositeItemStream.class, TestReader.class);
+		List<Class<? extends RetryListener>> retryListeners = Arrays.asList(RetryListenerSupport.class,
+				DummyRetryListener.class);
+		List<Class<? extends StepExecutionListener>> stepListeners = Arrays.asList(StepExecutionListenerSupport.class,
+				CompositeStepExecutionListener.class);
+		List<Class<? extends SkippableRuntimeException>> noRollback = Arrays.asList(FatalRuntimeException.class,
+				SkippableRuntimeException.class);
+
+		StepParserStepFactoryBean<?, ?> fb = (StepParserStepFactoryBean<?, ?>) ctx.getBean("&stepWithListsMerge");
+
+		Collection<Class<? extends Throwable>> skippableFound = getExceptionList(fb, "skippableExceptionClasses");
+		Collection<Class<? extends Throwable>> fatalFound = getExceptionList(fb, "fatalExceptionClasses");
+		Collection<Class<? extends Throwable>> retryableFound = getExceptionList(fb, "retryableExceptionClasses");
+		ItemStream[] streamsFound = (ItemStream[]) ReflectionTestUtils.getField(fb, "streams");
+		RetryListener[] retryListenersFound = (RetryListener[]) ReflectionTestUtils.getField(fb, "retryListeners");
+		StepListener[] stepListenersFound = (StepListener[]) ReflectionTestUtils.getField(fb, "listeners");
+		Collection<Class<? extends Throwable>> noRollbackFound = getExceptionList(fb, "noRollbackExceptionClasses");
+
+		assertSameCollections(skippable, skippableFound);
+		assertSameCollections(fatal, fatalFound);
+		assertSameCollections(retryable, retryableFound);
+		assertSameCollections(streams, toClassCollection(streamsFound));
+		assertSameCollections(retryListeners, toClassCollection(retryListenersFound));
+		assertSameCollections(stepListeners, toClassCollection(stepListenersFound));
+		assertSameCollections(noRollback, noRollbackFound);
+	}
+
+	@SuppressWarnings("unchecked")
+	@Test
+	public void testStepWithListsNoMerge() throws Exception {
+		ApplicationContext ctx = stepParserParentAttributeTestsCtx;
+
+		List<Class<SkippableException>> skippable = Arrays.asList(SkippableException.class);
+		List<Class<FatalException>> fatal = Arrays.asList(FatalException.class);
+		List<Class<FatalException>> retryable = Arrays.asList(FatalException.class);
+		List<Class<CompositeItemStream>> streams = Arrays.asList(CompositeItemStream.class);
+		List<Class<DummyRetryListener>> retryListeners = Arrays.asList(DummyRetryListener.class);
+		List<Class<CompositeStepExecutionListener>> stepListeners = Arrays.asList(CompositeStepExecutionListener.class);
+		List<Class<SkippableRuntimeException>> noRollback = Arrays.asList(SkippableRuntimeException.class);
+
+		StepParserStepFactoryBean<?, ?> fb = (StepParserStepFactoryBean<?, ?>) ctx.getBean("&stepWithListsNoMerge");
+
+		Collection<Class<? extends Throwable>> skippableFound = getExceptionList(fb, "skippableExceptionClasses");
+		Collection<Class<? extends Throwable>> fatalFound = getExceptionList(fb, "fatalExceptionClasses");
+		Collection<Class<? extends Throwable>> retryableFound = getExceptionList(fb, "retryableExceptionClasses");
+		ItemStream[] streamsFound = (ItemStream[]) ReflectionTestUtils.getField(fb, "streams");
+		RetryListener[] retryListenersFound = (RetryListener[]) ReflectionTestUtils.getField(fb, "retryListeners");
+		StepListener[] stepListenersFound = (StepListener[]) ReflectionTestUtils.getField(fb, "listeners");
+		Collection<Class<? extends Throwable>> noRollbackFound = getExceptionList(fb, "noRollbackExceptionClasses");
+
+		assertSameCollections(skippable, skippableFound);
+		assertSameCollections(fatal, fatalFound);
+		assertSameCollections(retryable, retryableFound);
+		assertSameCollections(streams, toClassCollection(streamsFound));
+		assertSameCollections(retryListeners, toClassCollection(retryListenersFound));
+		assertSameCollections(stepListeners, toClassCollection(stepListenersFound));
+		assertSameCollections(noRollback, noRollbackFound);
+	}
+
+	@Test
+	public void testStepWithListsOverrideWithEmpty() throws Exception {
+		ApplicationContext ctx = stepParserParentAttributeTestsCtx;
+
+		StepParserStepFactoryBean<?, ?> fb = (StepParserStepFactoryBean<?, ?>) ctx
+				.getBean("&stepWithListsOverrideWithEmpty");
+
+		assertEquals(0, getExceptionList(fb, "skippableExceptionClasses").size());
+		assertEquals(0, getExceptionList(fb, "fatalExceptionClasses").size());
+		assertEquals(0, getExceptionList(fb, "retryableExceptionClasses").size());
+		// TODO BATCH-1357:
+		// assertEquals(0, ((ItemStream[]) ReflectionTestUtils.getField(fb, "streams")).length);
+		// TODO BATCH-1357:
+		// assertEquals(0, ((RetryListener[]) ReflectionTestUtils.getField(fb, "retryListeners")).length);
+		// TODO BATCH-1357:
+		// assertEquals(0, ((StepListener[]) ReflectionTestUtils.getField(fb, "listeners")).length);
+		assertEquals(0, getExceptionList(fb, "noRollbackExceptionClasses").size());
+	}
+
+	@SuppressWarnings("unchecked")
+	private Collection<Class<? extends Throwable>> getExceptionList(StepParserStepFactoryBean<?, ?> fb,
+			String propertyName) {
+		return (Collection<Class<? extends Throwable>>) ReflectionTestUtils.getField(fb, propertyName);
+	}
+
+	private <T, S extends T> void assertSameCollections(Collection<S> expected, Collection<T> actual) {
+		assertEquals(expected.size(), actual.size());
+		assertTrue(expected.containsAll(actual));
+	}
+
+	private <T> Collection<Class<? extends T>> toClassCollection(T[] in) throws Exception {
+		return toClassCollection(Arrays.asList(in));
+	}
+
+	@SuppressWarnings("unchecked")
+	private <T> Collection<Class<? extends T>> toClassCollection(Collection<T> in) throws Exception {
+		Collection<Class<? extends T>> out = new ArrayList<Class<? extends T>>();
+		for (T item : in) {
+			while (item instanceof Advised) {
+				item = (T) ((Advised) item).getTargetSource().getTarget();
+			}
+			Class<? extends T> cls = (Class<? extends T>) item.getClass();
+			out.add(cls);
+		}
+		return out;
 	}
 }

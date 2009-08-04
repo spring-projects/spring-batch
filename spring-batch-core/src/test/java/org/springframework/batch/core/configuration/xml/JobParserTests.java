@@ -181,4 +181,11 @@ public class JobParserTests {
 			assertTrue(e.getMessage().contains("Missing state for [StateTransition: [state=s2, pattern=*, next=s3]]"));
 		}
 	}
+
+	@Test
+	public void testListenerClearingJob() throws Exception {
+		// TODO BATCH-1357:
+		// assertEquals(0, getListeners("listenerClearingJob", jobParserParentAttributeTestsCtx).size());
+	}
+
 }
