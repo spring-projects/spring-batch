@@ -1,11 +1,12 @@
 package org.springframework.batch.item.database;
 
+import org.junit.Test;
+import org.junit.internal.runners.JUnit4ClassRunner;
+import org.junit.runner.RunWith;
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.item.ItemReader;
+import org.springframework.batch.item.ReaderNotOpenException;
 import org.springframework.batch.item.sample.Foo;
-import org.junit.runner.RunWith;
-import org.junit.internal.runners.JUnit4ClassRunner;
-import org.junit.Test;
 
 @RunWith(JUnit4ClassRunner.class)
 public class JdbcCursorItemReaderCommonTests extends AbstractDatabaseItemStreamItemReaderTests {
@@ -45,4 +46,10 @@ public class JdbcCursorItemReaderCommonTests extends AbstractDatabaseItemStreamI
 		reader.open(new ExecutionContext());		
 	}
 
+	@Test(expected=ReaderNotOpenException.class)
+	public void testReadBeforeOpen() throws Exception {
+		tested = getItemReader();
+		tested.read();
+	}
+	
 }

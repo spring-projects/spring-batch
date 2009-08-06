@@ -29,6 +29,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.item.ItemStream;
+import org.springframework.batch.item.ReaderNotOpenException;
 import org.springframework.batch.item.support.AbstractItemCountingItemStreamItemReader;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.dao.InvalidDataAccessApiUsageException;
@@ -469,6 +470,10 @@ public class JdbcCursorItemReader<T> extends AbstractItemCountingItemStreamItemR
 	 */
 	@SuppressWarnings("unchecked")
 	protected T doRead() throws Exception {
+		if (rs == null) {
+			throw new ReaderNotOpenException("Reader must be open before it can be read.");
+		}
+
 		try {
 			if (!rs.next()) {
 				return null;
