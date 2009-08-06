@@ -36,6 +36,7 @@ import org.springframework.batch.core.ItemWriteListener;
 import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.JobParameters;
 import org.springframework.batch.core.Step;
+import org.springframework.batch.core.StepExecution;
 import org.springframework.batch.core.StepListener;
 import org.springframework.batch.core.job.SimpleJob;
 import org.springframework.batch.core.listener.ItemListenerSupport;
@@ -112,19 +113,18 @@ public class SimpleStepFactoryBeanTests {
 	@Test
 	public void testSimpleConcurrentJob() throws Exception {
 
-		job.setSteps(new ArrayList<Step>());
 		SimpleStepFactoryBean<String, String> factory = getStepFactory("foo", "bar");
 		factory.setTaskExecutor(new SimpleAsyncTaskExecutor());
 		factory.setThrottleLimit(1);
 
 		AbstractStep step = (AbstractStep) factory.getObject();
 		step.setName("step1");
-		job.addStep(step);
 
 		JobExecution jobExecution = repository.createJobExecution(job.getName(), new JobParameters());
-
-		job.execute(jobExecution);
-		assertEquals(BatchStatus.COMPLETED, jobExecution.getStatus());
+		StepExecution stepExecution = jobExecution.createStepExecution(step.getName());
+		repository.add(stepExecution);
+		step.execute(stepExecution);
+		assertEquals(BatchStatus.COMPLETED, stepExecution.getStatus());
 		assertEquals(2, written.size());
 		assertTrue(written.contains("foo"));
 	}
