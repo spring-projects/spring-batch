@@ -31,7 +31,8 @@ public class JobRepositorySupport implements JobRepository {
 	 * @see org.springframework.batch.container.common.repository.JobRepository#findOrCreateJob(org.springframework.batch.container.common.domain.JobConfiguration)
 	 */
 	public JobExecution createJobExecution(String jobName, JobParameters jobParameters) {
-		return null;
+		JobInstance jobInstance = new JobInstance(0L, jobParameters, jobName);
+		return new JobExecution(jobInstance, 11L);
 	}
 
 	/* (non-Javadoc)
