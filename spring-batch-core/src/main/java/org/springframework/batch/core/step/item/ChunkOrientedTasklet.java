@@ -16,6 +16,8 @@
 
 package org.springframework.batch.core.step.item;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.springframework.batch.core.StepContribution;
 import org.springframework.batch.core.scope.context.ChunkContext;
 import org.springframework.batch.core.step.tasklet.Tasklet;
@@ -38,6 +40,8 @@ public class ChunkOrientedTasklet<I> implements Tasklet {
 	private final ChunkProvider<I> chunkProvider;
 
 	private boolean buffering = true;
+
+	private static Log logger = LogFactory.getLog(ChunkOrientedTasklet.class);
 
 	public ChunkOrientedTasklet(ChunkProvider<I> chunkProvider, ChunkProcessor<I> chunkProcessor) {
 		this.chunkProvider = chunkProvider;
@@ -73,12 +77,14 @@ public class ChunkOrientedTasklet<I> implements Tasklet {
 		// Allow a message coming back from the processor to say that we
 		// are not done yet
 		if (inputs.isBusy()) {
+			logger.debug("Inputs still busy");
 			return RepeatStatus.CONTINUABLE;
 		}
 
 		chunkContext.removeAttribute(INPUTS_KEY);
 		chunkContext.setComplete();
 
+		logger.debug("Inputs not busy, ended: "+inputs.isEnd());
 		return RepeatStatus.continueIf(!inputs.isEnd());
 
 	}
