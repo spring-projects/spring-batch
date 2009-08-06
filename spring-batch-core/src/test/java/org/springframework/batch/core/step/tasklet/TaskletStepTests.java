@@ -843,6 +843,24 @@ public class TaskletStepTests {
 
 	}
 
+	@Test
+	public void testTaskletExecuteReturnNull() throws Exception {
+		step.setTasklet(new Tasklet() {
+			public RepeatStatus execute(StepContribution contribution, ChunkContext chunkContext) throws Exception {
+				return null;
+			}
+		});
+		JobExecution jobExecutionContext = new JobExecution(jobInstance);
+		StepExecution stepExecution = new StepExecution(step.getName(), jobExecutionContext);
+		step.execute(stepExecution);
+		assertEquals(BatchStatus.FAILED, stepExecution.getStatus());
+		List<Throwable> exceptions = stepExecution.getFailureExceptions();
+		assertEquals(1, exceptions.size());
+		Throwable exception = exceptions.get(0);
+		assertTrue(exception instanceof IllegalStateException);
+		assertEquals("Tasklet execution must return a non-null RepeatStatus.", exception.getMessage());
+	}
+	
 	private static class JobRepositoryStub extends JobRepositorySupport {
 
 		private int updateCount = 0;
