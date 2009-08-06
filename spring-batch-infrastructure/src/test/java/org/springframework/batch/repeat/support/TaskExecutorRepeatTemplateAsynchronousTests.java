@@ -23,11 +23,14 @@ import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 import org.junit.Test;
+import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.repeat.RepeatCallback;
 import org.springframework.batch.repeat.RepeatContext;
 import org.springframework.batch.repeat.RepeatStatus;
@@ -124,7 +127,7 @@ public class TaskExecutorRepeatTemplateAsynchronousTests extends AbstractTradeBa
 				return super.doInIteration(context);
 			}
 		});
-	
+
 		assertTrue("Too few attempts: " + count, count >= 1);
 		assertTrue("Too many attempts: " + count, count <= 10);
 
@@ -165,22 +168,35 @@ public class TaskExecutorRepeatTemplateAsynchronousTests extends AbstractTradeBa
 
 	@Test
 	public void testThrottleLimit() throws Exception {
+
+		int throttleLimit = 600;
+
 		TaskExecutorRepeatTemplate template = new TaskExecutorRepeatTemplate();
 		SimpleAsyncTaskExecutor taskExecutor = new SimpleAsyncTaskExecutor();
-		taskExecutor.setConcurrencyLimit(3);
+		taskExecutor.setConcurrencyLimit(300);
 		template.setTaskExecutor(taskExecutor);
-		template.setThrottleLimit(12);
+		template.setThrottleLimit(throttleLimit);
 
 		final String threadName = Thread.currentThread().getName();
 		final Set<String> threadNames = new HashSet<String>();
+		final List<String> items = new ArrayList<String>();
 
 		final RepeatCallback callback = new RepeatCallback() {
 			public RepeatStatus doInIteration(RepeatContext context) throws Exception {
 				assertNotSame(threadName, Thread.currentThread().getName());
-				threadNames.add(Thread.currentThread().getName());
 				Trade item = provider.read();
+				threadNames.add(Thread.currentThread().getName() + " : " + item);
+				items.add("" + item);
 				if (item != null) {
 					processor.write(Collections.singletonList(item));
+					// Do some more I/O
+					for (int i = 0; i < 10; i++) {
+						TradeItemReader provider = new TradeItemReader(resource);
+						provider.open(new ExecutionContext());
+						while (provider.read() != null)
+							continue;
+						provider.close();
+					}
 				}
 				return RepeatStatus.continueIf(item != null);
 			}
@@ -191,6 +207,10 @@ public class TaskExecutorRepeatTemplateAsynchronousTests extends AbstractTradeBa
 		// Thread.sleep(500);
 		assertEquals(NUMBER_OF_ITEMS, processor.count);
 		assertTrue(threadNames.size() > 1);
+		int frequency = Collections.frequency(items, "null");
+		// System.err.println("Frequency: "+frequency);
+		assertTrue(frequency <= throttleLimit);
+		assertTrue(frequency > 1);
 	}
 
 	/**
@@ -215,6 +235,10 @@ public class TaskExecutorRepeatTemplateAsynchronousTests extends AbstractTradeBa
 				assertNotSame(threadName, Thread.currentThread().getName());
 				threadNames.add(Thread.currentThread().getName());
 				Thread.sleep(100);
+				TradeItemReader provider = new TradeItemReader(resource);
+				provider.open(new ExecutionContext());
+				while (provider.read() != null)
+					;
 				return super.doInIteration(context);
 			}
 		};
