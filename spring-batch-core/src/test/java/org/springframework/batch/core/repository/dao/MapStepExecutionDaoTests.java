@@ -33,7 +33,7 @@ public class MapStepExecutionDaoTests extends AbstractStepExecutionDaoTests {
 	@Test
 	public void testPersistentCopy() {
 		StepExecutionDao tested = new MapStepExecutionDao();
-		JobExecution jobExecution = new JobExecution((long) 77);
+		JobExecution jobExecution = new JobExecution(77L);
 		StepExecution stepExecution = new StepExecution("stepName", jobExecution);
 		
 		assertNull(stepExecution.getEndTime());
