@@ -67,13 +67,12 @@ public class AsyncTaskletStepTests {
 		ResourcelessTransactionManager transactionManager = new ResourcelessTransactionManager();
 		step.setTransactionManager(transactionManager);
 
-		List<String> items = Arrays
-				.asList(StringUtils
-						.commaDelimitedListToStringArray("1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25"));
+		List<String> items = Arrays.asList(StringUtils
+				.commaDelimitedListToStringArray("1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25"));
 		RepeatTemplate chunkTemplate = new RepeatTemplate();
 		chunkTemplate.setCompletionPolicy(new SimpleCompletionPolicy(2));
-		step.setTasklet(new TestingChunkOrientedTasklet<String>(
-				new ListItemReader<String>(items), itemWriter, chunkTemplate));
+		step.setTasklet(new TestingChunkOrientedTasklet<String>(new ListItemReader<String>(items), itemWriter,
+				chunkTemplate));
 
 		jobRepository = new JobRepositorySupport();
 		step.setJobRepository(jobRepository);
@@ -102,10 +101,8 @@ public class AsyncTaskletStepTests {
 	@Test
 	public void testStepExecutionUpdates() throws Exception {
 
-		JobExecution jobExecution = jobRepository.createJobExecution("JOB",
-				new JobParameters());
-		StepExecution stepExecution = jobExecution.createStepExecution(step
-				.getName());
+		JobExecution jobExecution = jobRepository.createJobExecution("JOB", new JobParameters());
+		StepExecution stepExecution = jobExecution.createStepExecution(step.getName());
 
 		step.execute(stepExecution);
 
@@ -114,11 +111,14 @@ public class AsyncTaskletStepTests {
 		assertEquals(25, processed.size());
 
 		// System.err.println(stepExecution.getCommitCount());
+		// System.err.println(processed);
 		// Check commit count didn't spin out of control waiting for other
 		// threads to finish...
-		assertTrue(stepExecution.getCommitCount() > processed.size());
-		assertTrue(stepExecution.getCommitCount() <= processed.size()
-				+ throttleLimit + 1);
+		assertTrue("Not enough commits: " + stepExecution.getCommitCount(), stepExecution.getCommitCount() > processed
+				.size() / 2);
+		assertTrue("Too many commits: " + stepExecution.getCommitCount(), stepExecution.getCommitCount() <= processed
+				.size()
+				/ 2 + throttleLimit + 1);
 
 	}
 
