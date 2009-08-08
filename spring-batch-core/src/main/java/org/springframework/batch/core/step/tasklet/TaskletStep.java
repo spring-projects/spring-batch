@@ -266,7 +266,9 @@ public class TaskletStep extends AbstractStep {
 					try {
 						try {
 							result = tasklet.execute(contribution, chunkContext);
-							Assert.state(result != null, "Tasklet execution must return a non-null RepeatStatus.");
+							if(result == null) {
+								result = RepeatStatus.FINISHED;
+							}
 						}
 						catch (Exception e) {
 							if (transactionAttribute.rollbackOn(e)) {

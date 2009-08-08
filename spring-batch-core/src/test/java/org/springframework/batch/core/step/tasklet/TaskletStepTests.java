@@ -26,6 +26,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import org.apache.commons.lang.mutable.MutableInt;
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.batch.core.BatchStatus;
@@ -853,12 +854,7 @@ public class TaskletStepTests {
 		JobExecution jobExecutionContext = new JobExecution(jobInstance);
 		StepExecution stepExecution = new StepExecution(step.getName(), jobExecutionContext);
 		step.execute(stepExecution);
-		assertEquals(BatchStatus.FAILED, stepExecution.getStatus());
-		List<Throwable> exceptions = stepExecution.getFailureExceptions();
-		assertEquals(1, exceptions.size());
-		Throwable exception = exceptions.get(0);
-		assertTrue(exception instanceof IllegalStateException);
-		assertEquals("Tasklet execution must return a non-null RepeatStatus.", exception.getMessage());
+		assertEquals(BatchStatus.COMPLETED, stepExecution.getStatus());
 	}
 	
 	private static class JobRepositoryStub extends JobRepositorySupport {
