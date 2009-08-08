@@ -17,6 +17,7 @@
 package org.springframework.batch.core.step.tasklet;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 import java.util.Arrays;
 import java.util.List;
@@ -26,13 +27,9 @@ import org.junit.Before;
 import org.junit.Test;
 import org.springframework.batch.core.BatchStatus;
 import org.springframework.batch.core.JobExecution;
-import org.springframework.batch.core.JobInstance;
 import org.springframework.batch.core.JobParameters;
 import org.springframework.batch.core.StepExecution;
-import org.springframework.batch.core.job.JobSupport;
-import org.springframework.batch.core.repository.dao.MapJobExecutionDao;
-import org.springframework.batch.core.repository.dao.MapJobInstanceDao;
-import org.springframework.batch.core.repository.dao.MapStepExecutionDao;
+import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.step.JobRepositorySupport;
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.item.ItemStreamSupport;
@@ -51,35 +48,41 @@ public class AsyncTaskletStepTests {
 
 	private TaskletStep step;
 
-	private JobInstance jobInstance;
+	private int throttleLimit = 20;
 
 	ItemWriter<String> itemWriter = new ItemWriter<String>() {
 		public void write(List<? extends String> data) throws Exception {
+			// Thread.sleep(100L);
 			processed.addAll(data);
 		}
 	};
 
+	private JobRepository jobRepository;
+
 	@Before
 	public void setUp() throws Exception {
-		MapJobInstanceDao.clear();
-		MapStepExecutionDao.clear();
-		MapJobExecutionDao.clear();
 
 		step = new TaskletStep("stepName");
 
 		ResourcelessTransactionManager transactionManager = new ResourcelessTransactionManager();
 		step.setTransactionManager(transactionManager);
 
-		List<String> items = Arrays.asList(StringUtils
-				.commaDelimitedListToStringArray("1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25"));
+		List<String> items = Arrays
+				.asList(StringUtils
+						.commaDelimitedListToStringArray("1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25"));
 		RepeatTemplate chunkTemplate = new RepeatTemplate();
 		chunkTemplate.setCompletionPolicy(new SimpleCompletionPolicy(2));
-		step.setTasklet(new TestingChunkOrientedTasklet<String>(new ListItemReader<String>(items), itemWriter, chunkTemplate));
+		step.setTasklet(new TestingChunkOrientedTasklet<String>(
+				new ListItemReader<String>(items), itemWriter, chunkTemplate));
 
-		step.setJobRepository(new JobRepositorySupport());
+		jobRepository = new JobRepositorySupport();
+		step.setJobRepository(jobRepository);
 
 		TaskExecutorRepeatTemplate template = new TaskExecutorRepeatTemplate();
-		template.setTaskExecutor(new SimpleAsyncTaskExecutor());
+		template.setThrottleLimit(throttleLimit);
+		SimpleAsyncTaskExecutor taskExecutor = new SimpleAsyncTaskExecutor();
+		taskExecutor.setConcurrencyLimit(300);
+		template.setTaskExecutor(taskExecutor);
 		step.setStepOperations(template);
 
 		step.registerStream(new ItemStreamSupport() {
@@ -91,9 +94,6 @@ public class AsyncTaskletStepTests {
 			}
 		});
 
-		JobSupport job = new JobSupport("FOO");
-		jobInstance = new JobInstance(0L, new JobParameters(), job.getName());
-
 	}
 
 	/**
@@ -102,14 +102,23 @@ public class AsyncTaskletStepTests {
 	@Test
 	public void testStepExecutionUpdates() throws Exception {
 
-		JobExecution jobExecution = new JobExecution(jobInstance);
-		StepExecution stepExecution = jobExecution.createStepExecution(step.getName());
+		JobExecution jobExecution = jobRepository.createJobExecution("JOB",
+				new JobParameters());
+		StepExecution stepExecution = jobExecution.createStepExecution(step
+				.getName());
 
 		step.execute(stepExecution);
 
 		assertEquals(BatchStatus.COMPLETED, stepExecution.getStatus());
 		assertEquals(25, stepExecution.getReadCount());
 		assertEquals(25, processed.size());
+
+		// System.err.println(stepExecution.getCommitCount());
+		// Check commit count didn't spin out of control waiting for other
+		// threads to finish...
+		assertTrue(stepExecution.getCommitCount() > processed.size());
+		assertTrue(stepExecution.getCommitCount() <= processed.size()
+				+ throttleLimit + 1);
 
 	}
 

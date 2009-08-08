@@ -17,7 +17,6 @@ package org.springframework.batch.core.scope.context;
 
 import java.util.Queue;
 import java.util.concurrent.LinkedBlockingQueue;
-import java.util.concurrent.atomic.AtomicInteger;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -39,8 +38,6 @@ public abstract class StepContextRepeatCallback implements RepeatCallback {
 
 	private final Queue<ChunkContext> attributeQueue = new LinkedBlockingQueue<ChunkContext>();
 	
-	private final AtomicInteger workerCount = new AtomicInteger(0);
-
 	private final StepExecution stepExecution;
 
 	private final Log logger = LogFactory.getLog(StepContextRepeatCallback.class);
@@ -64,8 +61,6 @@ public abstract class StepContextRepeatCallback implements RepeatCallback {
 	 */
 	public RepeatStatus doInIteration(RepeatContext context) throws Exception {
 		
-		workerCount.incrementAndGet();
-
 		// The StepContext has to be the same for all chunks,
 		// otherwise step-scoped beans will be re-initialised for each chunk.
 		StepContext stepContext = StepSynchronizationManager.register(stepExecution);
@@ -77,12 +72,10 @@ public abstract class StepContextRepeatCallback implements RepeatCallback {
 		}
 
 		try {
-			logger.debug("Chunk execution starting: worker count="+workerCount.get()+", queue size="+attributeQueue.size());
-			return RepeatStatus.continueIf(doInChunkContext(context, chunkContext).isContinuable()
-					|| !attributeQueue.isEmpty() || workerCount.get()>1);
+			logger.debug("Chunk execution starting: queue size="+attributeQueue.size());
+			return doInChunkContext(context, chunkContext);
 		}
 		finally {
-			workerCount.decrementAndGet();
 			// Still some stuff to do with the data in this chunk,
 			// pass it back.
 			if (!chunkContext.isComplete()) {

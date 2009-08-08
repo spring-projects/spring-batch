@@ -16,11 +16,14 @@
 
 package org.springframework.batch.repeat.support;
 
-import org.springframework.batch.repeat.RepeatStatus;
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicInteger;
+
 import org.springframework.batch.repeat.RepeatCallback;
 import org.springframework.batch.repeat.RepeatContext;
 import org.springframework.batch.repeat.RepeatException;
 import org.springframework.batch.repeat.RepeatOperations;
+import org.springframework.batch.repeat.RepeatStatus;
 import org.springframework.core.task.SyncTaskExecutor;
 import org.springframework.core.task.TaskExecutor;
 import org.springframework.util.Assert;
@@ -56,9 +59,15 @@ public class TaskExecutorRepeatTemplate extends RepeatTemplate {
 	 */
 	public static final int DEFAULT_THROTTLE_LIMIT = 4;
 
+	private static final String ACTIVE_COUNT = TaskExecutorRepeatTemplate.class.getName() + ".ACTIVE_COUNT";
+
+	private static final String PAUSED = TaskExecutorRepeatTemplate.class.getName() + ".PAUSED";
+
 	private int throttleLimit = DEFAULT_THROTTLE_LIMIT;
 
 	private TaskExecutor taskExecutor = new SyncTaskExecutor();
+
+	private static final Object lock = new Object();
 
 	/**
 	 * Setter for task executor to be used to run the individual item callbacks.
@@ -85,6 +94,11 @@ public class TaskExecutorRepeatTemplate extends RepeatTemplate {
 		ExecutingRunnable runnable = null;
 
 		ResultQueue<ResultHolder> queue = ((ResultQueueInternalState) state).getResultQueue();
+
+		if (!context.hasAttribute(ACTIVE_COUNT)) {
+			context.setAttribute(ACTIVE_COUNT, new AtomicInteger());
+			context.setAttribute(PAUSED, new AtomicBoolean(false));
+		}
 
 		do {
 
@@ -145,6 +159,11 @@ public class TaskExecutorRepeatTemplate extends RepeatTemplate {
 
 		while (queue.isExpecting()) {
 
+			synchronized (lock) {
+				logger.debug("Notifying other waiting callbacks while waiting for results.");
+				lock.notifyAll();
+			}
+
 			/*
 			 * Careful that no runnables that are not going to finish ever get
 			 * onto the queue, else this may block forever.
@@ -185,7 +204,7 @@ public class TaskExecutorRepeatTemplate extends RepeatTemplate {
 	 * @author Dave Syer
 	 * 
 	 */
-	private static class ExecutingRunnable implements Runnable, ResultHolder {
+	private class ExecutingRunnable implements Runnable, ResultHolder {
 
 		private final RepeatCallback callback;
 
@@ -197,6 +216,10 @@ public class TaskExecutorRepeatTemplate extends RepeatTemplate {
 
 		private volatile Throwable error;
 
+		private final AtomicInteger active;
+
+		private final AtomicBoolean paused;
+
 		public ExecutingRunnable(RepeatCallback callback, RepeatContext context, ResultQueue<ResultHolder> queue) {
 
 			super();
@@ -204,6 +227,8 @@ public class TaskExecutorRepeatTemplate extends RepeatTemplate {
 			this.callback = callback;
 			this.context = context;
 			this.queue = queue;
+			this.active = (AtomicInteger) context.getAttribute(ACTIVE_COUNT);
+			this.paused = (AtomicBoolean) context.getAttribute(PAUSED);
 
 		}
 
@@ -233,16 +258,63 @@ public class TaskExecutorRepeatTemplate extends RepeatTemplate {
 					clearContext = true;
 					RepeatSynchronizationManager.register(context);
 				}
+
+				active.incrementAndGet();
+				paused.set(false);
+
 				result = callback.doInIteration(context);
+
 			}
 			catch (Exception e) {
 				error = e;
 			}
 			finally {
+
+				boolean stillActive = active.decrementAndGet()>0 || paused.get();
+
 				if (clearContext) {
 					RepeatSynchronizationManager.clear();
 				}
+
+
+				if (logger.isDebugEnabled()) {
+					logger.debug("Completed callback with result = " + result + ", and " + stillActive
+							+ " active callbacks.");
+				}
+
+				if (result == RepeatStatus.FINISHED) {
+					if (stillActive) {
+						synchronized (lock) {
+							logger.debug("Waiting for other active callbacks to finish.");
+							try {
+								lock.wait();
+							}
+							catch (InterruptedException e) {
+								logger.info("Interrupted waiting for active callbacks");
+								Thread.currentThread().interrupt();
+							}
+						}
+					}
+					else {
+						synchronized (lock) {
+							logger.debug("Notifying other waiting callbacks on finish.");
+							lock.notifyAll();
+						}
+					}
+				}
+				else {
+					if (isComplete(context)) {
+						synchronized (lock) {
+							logger.debug("Notifying other waiting callbacks on policy based completion.");
+							lock.notifyAll();
+						}
+					} else {
+						paused.set(true);
+					}
+				}
+
 				queue.put(this);
+
 			}
 		}
 

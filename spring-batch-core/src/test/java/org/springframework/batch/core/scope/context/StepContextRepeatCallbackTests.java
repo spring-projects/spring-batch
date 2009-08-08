@@ -15,25 +15,17 @@
  */
 package org.springframework.batch.core.scope.context;
 
-import static org.junit.Assert.fail;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
-import java.util.concurrent.CountDownLatch;
-
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.junit.After;
 import org.junit.Test;
 import org.springframework.batch.core.ExitStatus;
 import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.StepExecution;
-import org.springframework.batch.core.scope.context.StepContextRepeatCallback;
-import org.springframework.batch.core.scope.context.StepSynchronizationManager;
 import org.springframework.batch.repeat.RepeatContext;
 import org.springframework.batch.repeat.RepeatStatus;
-import org.springframework.batch.repeat.context.RepeatContextSupport;
 
 /**
  * @author Dave Syer
@@ -85,39 +77,6 @@ public class StepContextRepeatCallbackTests {
 		assertTrue(removedAttribute);
 		callback.doInIteration(null);
 		assertFalse(removedAttribute);
-	}
-
-	@Test
-	public void testUnfinishedWork() throws Exception {
-		StepSynchronizationManager.register(stepExecution);
-		final CountDownLatch background = new CountDownLatch(1);
-		final CountDownLatch foreground = new CountDownLatch(1);
-		final StepContextRepeatCallback callback = new StepContextRepeatCallback(stepExecution) {
-			private Log logger = LogFactory.getLog(getClass());
-			@Override
-			public RepeatStatus doInChunkContext(RepeatContext context, ChunkContext chunkContext) throws Exception {
-				foreground.countDown();
-				if (context==null) {
-					logger.debug("Waiting for latch");
-					background.await();
-					logger.debug("Released");
-				}
-				return RepeatStatus.FINISHED;
-			}
-		};
-		new Thread(new Runnable() {
-			public void run() {
-				try {
-					callback.doInIteration(null);
-				}
-				catch (Exception e) {
-					fail(e.getMessage());
-				}
-			}
-		}).start();
-		foreground.await();
-		assertEquals(RepeatStatus.CONTINUABLE, callback.doInIteration(new RepeatContextSupport(null)));
-		background.countDown();
 	}
 
 }
