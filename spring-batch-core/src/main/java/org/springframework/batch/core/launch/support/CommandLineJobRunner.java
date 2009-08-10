@@ -16,6 +16,7 @@
 package org.springframework.batch.core.launch.support;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -273,6 +274,9 @@ public class CommandLineJobRunner {
 
 			JobParameters jobParameters = jobParametersConverter.getJobParameters(StringUtils
 					.splitArrayElementsIntoProperties(parameters, "="));
+			Assert.isTrue(parameters == null || parameters.length == 0 || !jobParameters.isEmpty(),
+					"Invalid JobParameters " + Arrays.asList(parameters)
+							+ ". If parameters are provided they should be in the form name=value (no whitespace).");
 
 			if (opts.contains("-restart")) {
 				jobParameters = getLastFailedJobParameters(jobName);
@@ -315,7 +319,7 @@ public class CommandLineJobRunner {
 		JobParameters jobParameters = null;
 
 		if (lastInstances.isEmpty()) {
-			throw new JobParametersNotFoundException("No job instance found for job=" + jobName);			
+			throw new JobParametersNotFoundException("No job instance found for job=" + jobName);
 		}
 
 		while (!lastInstances.isEmpty()) {
@@ -339,7 +343,7 @@ public class CommandLineJobRunner {
 			start += count;
 			lastInstances = jobExplorer.getJobInstances(jobName, start, count);
 
-		} 
+		}
 
 		if (jobParameters == null) {
 			throw new JobParametersNotFoundException("No failed or stopped execution found for job=" + jobName);

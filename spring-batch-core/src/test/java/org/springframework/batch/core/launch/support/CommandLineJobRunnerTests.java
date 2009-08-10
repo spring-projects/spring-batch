@@ -121,6 +121,16 @@ public class CommandLineJobRunnerTests {
 	}
 
 	@Test
+	public void testWithInvalidParameters() throws Throwable {
+		String[] args = new String[] { jobPath, jobName, "foo" };
+		CommandLineJobRunner.main(args);
+		assertEquals(1, StubSystemExiter.status);
+		String errorMessage = CommandLineJobRunner.getErrorMessage();
+		assertTrue("Wrong error message: " + errorMessage, errorMessage
+				.contains("in the form name=value"));
+	}
+
+	@Test
 	public void testRestart() throws Throwable {
 		String[] args = new String[] { jobPath, "-restart", jobName };
 		JobParameters jobParameters = new JobParametersBuilder().addString("foo", "bar").toJobParameters();
