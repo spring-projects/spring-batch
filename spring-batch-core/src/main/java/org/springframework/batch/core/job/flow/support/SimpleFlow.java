@@ -143,6 +143,10 @@ public class SimpleFlow implements Flow, InitializingBean {
 				logger.debug("Handling state="+stateName);
 				status = state.handle(executor);
 			}
+			catch (FlowExecutionException e) {
+				executor.close(new FlowExecution(stateName, status));
+				throw e;
+			}
 			catch (Exception e) {
 				executor.close(new FlowExecution(stateName, status));
 				throw new FlowExecutionException(String.format("Ended flow=%s at state=%s with exception", name,

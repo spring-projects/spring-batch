@@ -21,6 +21,7 @@ import static org.junit.Assert.assertNull;
 import static org.junit.Assert.fail;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import org.junit.Before;
@@ -37,6 +38,7 @@ import org.springframework.batch.core.job.flow.support.SimpleFlow;
 import org.springframework.batch.core.job.flow.support.StateTransition;
 import org.springframework.batch.core.job.flow.support.state.DecisionState;
 import org.springframework.batch.core.job.flow.support.state.EndState;
+import org.springframework.batch.core.job.flow.support.state.SplitState;
 import org.springframework.batch.core.job.flow.support.state.StepState;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.repository.dao.JobExecutionDao;
@@ -206,6 +208,41 @@ public class FlowJobTests {
 		transitions.add(StateTransition.createEndStateTransition(new EndState(FlowExecutionStatus.COMPLETED, "end0")));
 		flow.setStateTransitions(transitions);
 		flow.afterPropertiesSet();
+		job.setFlow(flow);
+		job.afterPropertiesSet();
+		job.execute(jobExecution);
+		assertEquals(BatchStatus.STOPPED, jobExecution.getStatus());
+		checkRepository(BatchStatus.STOPPED, ExitStatus.STOPPED);
+		assertEquals(1, jobExecution.getAllFailureExceptions().size());
+		assertEquals(JobInterruptedException.class, jobExecution.getFailureExceptions().get(0).getClass());
+	}
+
+	@Test
+	public void testInterruptedSplit() throws Exception {
+		SimpleFlow flow = new SimpleFlow("job");
+		SimpleFlow flow1 = new SimpleFlow("flow1");
+		SimpleFlow flow2 = new SimpleFlow("flow2");
+
+		List<StateTransition> transitions = new ArrayList<StateTransition>();
+		transitions.add(StateTransition.createStateTransition(new StepState(new StubStep("step1") {
+			@Override
+			public void execute(StepExecution stepExecution) throws JobInterruptedException {
+				stepExecution.setStatus(BatchStatus.STOPPING);
+				jobRepository.update(stepExecution);
+			}	
+		}), "end0"));
+		transitions.add(StateTransition.createEndStateTransition(new EndState(FlowExecutionStatus.COMPLETED, "end0")));
+		flow1.setStateTransitions(new ArrayList<StateTransition>(transitions));
+		flow1.afterPropertiesSet();
+		flow2.setStateTransitions(new ArrayList<StateTransition>(transitions));
+		flow2.afterPropertiesSet();
+
+		transitions = new ArrayList<StateTransition>();
+		transitions.add(StateTransition.createStateTransition(new SplitState(Arrays.<Flow>asList(flow1, flow2), "split"), "end0"));
+		transitions.add(StateTransition.createEndStateTransition(new EndState(FlowExecutionStatus.COMPLETED, "end0")));
+		flow.setStateTransitions(transitions);
+		flow.afterPropertiesSet();
+
 		job.setFlow(flow);
 		job.afterPropertiesSet();
 		job.execute(jobExecution);

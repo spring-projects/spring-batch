@@ -18,6 +18,7 @@ package org.springframework.batch.core.job.flow.support.state;
 import static org.junit.Assert.assertEquals;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 
 import org.easymock.EasyMock;
@@ -62,13 +63,10 @@ public class SplitStateTests {
 	@Test
 	public void testConcurrentHandling() throws Exception {
 
-		Collection<Flow> flows  = new ArrayList<Flow>();
 		Flow flow1 = EasyMock.createMock(Flow.class);
 		Flow flow2 = EasyMock.createMock(Flow.class);
-		flows.add(flow1);
-		flows.add(flow2);
 
-		SplitState state = new SplitState(flows, "foo");
+		SplitState state = new SplitState(Arrays.asList(flow1, flow2), "foo");
 		state.setTaskExecutor(new SimpleAsyncTaskExecutor());
 
 		EasyMock.expect(flow1.start(executor)).andReturn(new FlowExecution("step1", FlowExecutionStatus.COMPLETED));
