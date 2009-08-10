@@ -16,9 +16,8 @@
 
 package org.springframework.batch.repeat.support;
 
-import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.concurrent.atomic.AtomicInteger;
-
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.springframework.batch.repeat.RepeatCallback;
 import org.springframework.batch.repeat.RepeatContext;
 import org.springframework.batch.repeat.RepeatException;
@@ -59,15 +58,25 @@ public class TaskExecutorRepeatTemplate extends RepeatTemplate {
 	 */
 	public static final int DEFAULT_THROTTLE_LIMIT = 4;
 
-	private static final String ACTIVE_COUNT = TaskExecutorRepeatTemplate.class.getName() + ".ACTIVE_COUNT";
-
-	private static final String PAUSED = TaskExecutorRepeatTemplate.class.getName() + ".PAUSED";
-
 	private int throttleLimit = DEFAULT_THROTTLE_LIMIT;
 
 	private TaskExecutor taskExecutor = new SyncTaskExecutor();
 
-	private static final Object lock = new Object();
+	/**
+	 * Public setter for the throttle limit. The throttle limit is the largest
+	 * number of concurrent tasks that can be executing at one time - if a new
+	 * task arrives and the throttle limit is breached we wait for one of the
+	 * executing tasks to finish before submitting the new one to the
+	 * {@link TaskExecutor}. Default value is {@link #DEFAULT_THROTTLE_LIMIT}.
+	 * N.B. when used with a thread pooled {@link TaskExecutor} the thread pool
+	 * might prevent the throttle limit actually being reached (so make the core
+	 * pool size larger than the throttle limit if possible).
+	 * 
+	 * @param throttleLimit the throttleLimit to set.
+	 */
+	public void setThrottleLimit(int throttleLimit) {
+		this.throttleLimit = throttleLimit;
+	}
 
 	/**
 	 * Setter for task executor to be used to run the individual item callbacks.
@@ -94,11 +103,7 @@ public class TaskExecutorRepeatTemplate extends RepeatTemplate {
 		ExecutingRunnable runnable = null;
 
 		ResultQueue<ResultHolder> queue = ((ResultQueueInternalState) state).getResultQueue();
-
-		if (!context.hasAttribute(ACTIVE_COUNT)) {
-			context.setAttribute(ACTIVE_COUNT, new AtomicInteger());
-			context.setAttribute(PAUSED, new AtomicBoolean(false));
-		}
+		ActivityBarrier lock = ((ResultQueueInternalState) state).getLock();
 
 		do {
 
@@ -106,7 +111,7 @@ public class TaskExecutorRepeatTemplate extends RepeatTemplate {
 			 * Wrap the callback in a runnable that will add its result to the
 			 * queue when it is ready.
 			 */
-			runnable = new ExecutingRunnable(callback, context, queue);
+			runnable = new ExecutingRunnable(callback, context, queue, lock);
 
 			/**
 			 * Tell the runnable that it can expect a result. This could have
@@ -154,15 +159,13 @@ public class TaskExecutorRepeatTemplate extends RepeatTemplate {
 	protected boolean waitForResults(RepeatInternalState state) {
 
 		ResultQueue<ResultHolder> queue = ((ResultQueueInternalState) state).getResultQueue();
+		ActivityBarrier lock = ((ResultQueueInternalState) state).getLock();
 
 		boolean result = true;
 
 		while (queue.isExpecting()) {
 
-			synchronized (lock) {
-				logger.debug("Notifying other waiting callbacks while waiting for results.");
-				lock.notifyAll();
-			}
+			lock.release();
 
 			/*
 			 * Careful that no runnables that are not going to finish ever get
@@ -216,19 +219,17 @@ public class TaskExecutorRepeatTemplate extends RepeatTemplate {
 
 		private volatile Throwable error;
 
-		private final AtomicInteger active;
+		private final ActivityBarrier lock;
 
-		private final AtomicBoolean paused;
-
-		public ExecutingRunnable(RepeatCallback callback, RepeatContext context, ResultQueue<ResultHolder> queue) {
+		public ExecutingRunnable(RepeatCallback callback, RepeatContext context, ResultQueue<ResultHolder> queue,
+				ActivityBarrier lock) {
 
 			super();
 
 			this.callback = callback;
 			this.context = context;
 			this.queue = queue;
-			this.active = (AtomicInteger) context.getAttribute(ACTIVE_COUNT);
-			this.paused = (AtomicBoolean) context.getAttribute(PAUSED);
+			this.lock = lock;
 
 		}
 
@@ -259,9 +260,7 @@ public class TaskExecutorRepeatTemplate extends RepeatTemplate {
 					RepeatSynchronizationManager.register(context);
 				}
 
-				active.incrementAndGet();
-				paused.set(false);
-
+				lock.acquire();
 				result = callback.doInIteration(context);
 
 			}
@@ -270,47 +269,10 @@ public class TaskExecutorRepeatTemplate extends RepeatTemplate {
 			}
 			finally {
 
-				boolean stillActive = active.decrementAndGet()>0 || paused.get();
+				lock.release(isComplete(context), result);
 
 				if (clearContext) {
 					RepeatSynchronizationManager.clear();
-				}
-
-
-				if (logger.isDebugEnabled()) {
-					logger.debug("Completed callback with result = " + result + ", and " + stillActive
-							+ " active callbacks.");
-				}
-
-				if (result == RepeatStatus.FINISHED) {
-					if (stillActive) {
-						synchronized (lock) {
-							logger.debug("Waiting for other active callbacks to finish.");
-							try {
-								lock.wait();
-							}
-							catch (InterruptedException e) {
-								logger.info("Interrupted waiting for active callbacks");
-								Thread.currentThread().interrupt();
-							}
-						}
-					}
-					else {
-						synchronized (lock) {
-							logger.debug("Notifying other waiting callbacks on finish.");
-							lock.notifyAll();
-						}
-					}
-				}
-				else {
-					if (isComplete(context)) {
-						synchronized (lock) {
-							logger.debug("Notifying other waiting callbacks on policy based completion.");
-							lock.notifyAll();
-						}
-					} else {
-						paused.set(true);
-					}
 				}
 
 				queue.put(this);
@@ -351,19 +313,26 @@ public class TaskExecutorRepeatTemplate extends RepeatTemplate {
 
 		private final ResultQueue<ResultHolder> results;
 
+		private final ActivityBarrier lock;
+
 		/**
 		 * @param throttleLimit the throttle limit for the result queue
 		 */
 		public ResultQueueInternalState(int throttleLimit) {
 			super();
 			this.results = new ThrottleLimitResultQueue<ResultHolder>(throttleLimit);
+			this.lock = new ActivityBarrier();
 		}
 
-		/*
-		 * (non-Javadoc)
-		 * 
-		 * @seeorg.springframework.batch.repeat.support.RepeatInternalState#
-		 * getResultQueue()
+		/**
+		 * @return the lock instance
+		 */
+		public ActivityBarrier getLock() {
+			return lock;
+		}
+
+		/**
+		 * @return the result queue
 		 */
 		public ResultQueue<ResultHolder> getResultQueue() {
 			return results;
@@ -372,18 +341,125 @@ public class TaskExecutorRepeatTemplate extends RepeatTemplate {
 	}
 
 	/**
-	 * Public setter for the throttle limit. The throttle limit is the largest
-	 * number of concurrent tasks that can be executing at one time - if a new
-	 * task arrives and the throttle limit is breached we wait for one of the
-	 * executing tasks to finish before submitting the new one to the
-	 * {@link TaskExecutor}. Default value is {@link #DEFAULT_THROTTLE_LIMIT}.
-	 * N.B. when used with a thread pooled {@link TaskExecutor} it doesn't make
-	 * sense for the throttle limit to be less than the thread pool size.
+	 * <p>
+	 * Encapsulates the locking concerns needed when waiting for concurrent
+	 * repeat tasks to complete. Some tasks may return FINISHED before the rest
+	 * have completed, and furthermore one or more of the rest might be
+	 * CONTINUABLE or might have ended in an error and still have more work to
+	 * do.
+	 * </p>
 	 * 
-	 * @param throttleLimit the throttleLimit to set.
+	 * <p>
+	 * Uses wait and notify to co-ordinate the end of the repeat iterations, so
+	 * that the process can end only when either the completion policy signals
+	 * completion, or all workers have signalled that they are FINISHED (and had
+	 * a chance to accept more work if they are initially CONTINUABLE).
+	 * </p>
+	 * 
+	 * <p>
+	 * The net effect of using this lock protocol is that all workers (up to the
+	 * throttle limit) may perform no work for the last iteration and return
+	 * FINISHED. Contrast this with the single threaded case where the only one
+	 * call resulting in FINISHED is made to the repeat callback.
+	 * </p>
+	 * 
+	 * @author Dave Syer
 	 */
-	public void setThrottleLimit(int throttleLimit) {
-		this.throttleLimit = throttleLimit;
+	private static class ActivityBarrier {
+
+		private static Log logger = LogFactory.getLog(ActivityBarrier.class);
+
+		private volatile int active = 0;
+
+		private volatile boolean paused = false;
+
+		private final Object lock = new Object();
+
+		/**
+		 * Atomic acquisition of resources needed to track concurrent execution.
+		 * Call this method before every repeat callback execution.
+		 */
+		public void acquire() {
+			synchronized (lock) {
+				active++;
+				paused = false;
+			}
+		}
+
+		/**
+		 * <p>
+		 * Release the resources acquired in {@link #acquire()}. Call this
+		 * method in a finally block after every repeat callback execution.
+		 * </p>
+		 * 
+		 * @param complete true if we know from the completion policy that the
+		 * iteration should end
+		 * @param result the latest result from a callback
+		 */
+		public void release(boolean complete, RepeatStatus result) {
+
+			boolean stillActive = false;
+
+			synchronized (lock) {
+
+				
+				active--;
+				stillActive = active > 0 || paused;
+
+				if (logger.isDebugEnabled()) {
+					logger.debug("Completed callback with result = " + result + ", " + active
+							+ " active callbacks, and paused=" + paused);
+				}
+
+			}
+
+			if (result == RepeatStatus.FINISHED) {
+				if (stillActive) {
+					logger.debug("Waiting for other active callbacks to finish.");
+					synchronized (lock) {
+						try {
+							lock.wait();
+						}
+						catch (InterruptedException e) {
+							logger.info("Interrupted waiting for active callbacks");
+							Thread.currentThread().interrupt();
+						}
+					}
+				}
+				else {
+					synchronized (lock) {
+						logger.debug("Notifying other waiting callbacks on finish.");
+						paused = false;
+						lock.notifyAll();
+					}
+				}
+			}
+			else {
+				if (complete) {
+					synchronized (lock) {
+						logger.debug("Notifying other waiting callbacks on policy based completion.");
+						paused = false;
+						lock.notifyAll();
+					}
+				} else {
+					synchronized (lock) {						
+						paused = true;
+					}
+				}
+			}
+
+		}
+
+		/**
+		 * Release all waiting workers unconditionally. Call this method when
+		 * iteration has ended in case any workers are still waiting.
+		 */
+		public void release() {
+			synchronized (lock) {
+				lock.notifyAll();
+			}
+		}
+
 	}
 
 }

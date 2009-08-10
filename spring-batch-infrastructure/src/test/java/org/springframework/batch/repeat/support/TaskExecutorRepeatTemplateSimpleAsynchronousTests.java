@@ -26,84 +26,55 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.junit.Before;
 import org.junit.Test;
-import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.repeat.RepeatCallback;
 import org.springframework.batch.repeat.RepeatContext;
 import org.springframework.batch.repeat.RepeatStatus;
 import org.springframework.batch.repeat.policy.SimpleCompletionPolicy;
-import org.springframework.batch.repeat.support.AbstractTradeBatchTests.TradeItemReader;
-import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.task.SimpleAsyncTaskExecutor;
 
+/**
+ * Simple tests for concurrent behaviour in repeat template, in particular the
+ * barrier at the end of the iteration. N.B. these tests may fail if
+ * insufficient threads are available (e.g. on a single-core machine, or under
+ * load). They shouldn't deadlock though.
+ * 
+ * @author Dave Syer
+ * 
+ */
 public class TaskExecutorRepeatTemplateSimpleAsynchronousTests {
 
-	static Log logger = LogFactory
-			.getLog(TaskExecutorRepeatTemplateSimpleAsynchronousTests.class);
+	static Log logger = LogFactory.getLog(TaskExecutorRepeatTemplateSimpleAsynchronousTests.class);
 
 	private static int TOTAL = 100;
 
-	@Test
-	public void testThrottleLimit() throws Exception {
+	private int throttleLimit = 30;
 
-		int throttleLimit = 20;
+	private volatile int early = Integer.MAX_VALUE;
 
-		TaskExecutorRepeatTemplate template = new TaskExecutorRepeatTemplate();
+	private TaskExecutorRepeatTemplate template;
+
+	private RepeatCallback callback;
+
+	private List<String> items;
+
+	@Before
+	public void setUp() {
+
+		template = new TaskExecutorRepeatTemplate();
 		SimpleAsyncTaskExecutor taskExecutor = new SimpleAsyncTaskExecutor();
 		taskExecutor.setConcurrencyLimit(300);
 		template.setTaskExecutor(taskExecutor);
 		template.setThrottleLimit(throttleLimit);
 
-		final List<String> items = Collections
-				.synchronizedList(new ArrayList<String>());
+		items = Collections.synchronizedList(new ArrayList<String>());
 
-		final RepeatCallback callback = new RepeatCallback() {
-
-			private volatile int count = 0;
-
-			public RepeatStatus doInIteration(RepeatContext context)
-					throws Exception {
-				String item = count < TOTAL ? "" + count : null;
-				count++;
-				items.add("" + item);
-				if (item != null) {
-					beBusy();
-				}
-				return RepeatStatus.continueIf(item != null);
-			}
-		};
-
-		template.iterate(callback);
-		int frequency = Collections.frequency(items, "null");
-//		System.err.println(items);
-//		System.err.println("Frequency: " + frequency);
-		assertEquals(TOTAL, items.size() - frequency);
-		assertTrue(frequency > 1);
-		assertTrue(frequency <= throttleLimit + 1);
-	}
-
-	@Test
-	public void testThrottleLimitWithRetry() throws Exception {
-
-		int throttleLimit = 30;
-
-		TaskExecutorRepeatTemplate template = new TaskExecutorRepeatTemplate();
-		SimpleAsyncTaskExecutor taskExecutor = new SimpleAsyncTaskExecutor();
-		taskExecutor.setConcurrencyLimit(300);
-		template.setTaskExecutor(taskExecutor);
-		template.setThrottleLimit(throttleLimit);
-
-		final List<String> items = Collections
-				.synchronizedList(new ArrayList<String>());
-
-		final RepeatCallback callback = new RepeatCallback() {
+		callback = new RepeatCallback() {
 
 			private volatile AtomicInteger count = new AtomicInteger(0);
-			private volatile int early = 2;
 
-			public RepeatStatus doInIteration(RepeatContext context)
-					throws Exception {
-
+			public RepeatStatus doInIteration(RepeatContext context) throws Exception {
 				int position = count.incrementAndGet();
 				String item = position <= TOTAL ? "" + count : null;
 				items.add("" + item);
@@ -117,75 +88,87 @@ public class TaskExecutorRepeatTemplateSimpleAsynchronousTests {
 				 * happens for instance if there is a failure and you want to
 				 * retry the work.)
 				 */
-				RepeatStatus result = RepeatStatus.continueIf(position != early
-						&& item != null);
+				RepeatStatus result = RepeatStatus.continueIf(position != early && item != null);
 				logger.debug("Returning " + result + " for count=" + position);
 				return result;
 			}
 		};
 
-		template.iterate(callback);
-		int frequency = Collections.frequency(items, "null");
-		assertEquals(TOTAL, items.size() - frequency);
-		// System.err.println("Frequency: " + frequency);
-		assertTrue(frequency > 1);
-		assertTrue(frequency <= throttleLimit + 1);
 	}
 
 	@Test
-	public void testThrottleLimitWithRetryAndEarlyCompletion() throws Exception {
+	public void testThrottleLimit() throws Exception {
 
-		int throttleLimit = 30;
+		template.iterate(callback);
+		int frequency = Collections.frequency(items, "null");
+		// System.err.println(items);
+		// System.err.println("Frequency: " + frequency);
+		assertEquals(TOTAL, items.size() - frequency);
+		assertTrue(frequency > 1);
+		assertTrue(frequency <= throttleLimit + 1);
 
-		TaskExecutorRepeatTemplate template = new TaskExecutorRepeatTemplate();
+	}
+
+	@Test
+	public void testThrottleLimitEarlyFinish() throws Exception {
+
+		early = 2;
+
+		template.iterate(callback);
+		int frequency = Collections.frequency(items, "null");
+		// System.err.println("Frequency: " + frequency);
+		// System.err.println("Items: " + items);
+		assertEquals(TOTAL, items.size() - frequency);
+		assertTrue(frequency > 1);
+		assertTrue(frequency <= throttleLimit + 1);
+
+	}
+
+	@Test
+	public void testThrottleLimitEarlyFinishOneThread() throws Exception {
+
+		early = 2;
 		SimpleAsyncTaskExecutor taskExecutor = new SimpleAsyncTaskExecutor();
-		taskExecutor.setConcurrencyLimit(300);
-		template.setCompletionPolicy(new SimpleCompletionPolicy(10));
+		taskExecutor.setConcurrencyLimit(1);
 		template.setTaskExecutor(taskExecutor);
-		template.setThrottleLimit(throttleLimit);
 
-		final List<String> items = Collections
-				.synchronizedList(new ArrayList<String>());
+		template.iterate(callback);
+		int frequency = Collections.frequency(items, "null");
+		// System.err.println("Frequency: " + frequency);
+		// System.err.println("Items: " + items);
+		// One extra task will be submitted before the termination is detected
+		assertEquals(early + 1, items.size() - frequency);
+		assertEquals(0, frequency);
 
-		final RepeatCallback callback = new RepeatCallback() {
+	}
 
-			private volatile AtomicInteger count = new AtomicInteger(0);
-			private volatile int early = 2;
+	@Test
+	public void testThrottleLimitWithEarlyCompletion() throws Exception {
 
-			public RepeatStatus doInIteration(RepeatContext context)
-					throws Exception {
-
-				int position = count.incrementAndGet();
-				String item = position <= TOTAL ? "" + count : null;
-				items.add("" + item);
-				if (item != null) {
-					beBusy();
-				}
-				RepeatStatus result = RepeatStatus.continueIf(position != early
-						&& item != null);
-				logger.debug("Returning " + result + " for count=" + position);
-				return result;
-			}
-		};
+		early = 2;
+		template.setCompletionPolicy(new SimpleCompletionPolicy(10));
 
 		template.iterate(callback);
 		int frequency = Collections.frequency(items, "null");
 		assertEquals(10, items.size() - frequency);
 		// System.err.println("Frequency: " + frequency);
 		assertEquals(0, frequency);
+
 	}
 
+	/**
+	 * Slightly flakey convenience method. If this doesn't do something that
+	 * lasts sufficiently long for another worker to be launched while it is
+	 * busy, the early completion tests will fail. "Sufficiently long" is the
+	 * problem so we try and block until we know someone else is busy?
+	 * 
+	 * @throws Exception
+	 */
 	private void beBusy() throws Exception {
-		// Do some more I/O
-		for (int i = 0; i < 10; i++) {
-			TradeItemReader provider = new TradeItemReader(
-					new ClassPathResource("trades.csv", getClass()));
-			provider.open(new ExecutionContext());
-			while (provider.read() != null)
-				continue;
-			provider.close();
+		synchronized (this) {
+			wait(100L);
+			notifyAll();
 		}
-
 	}
 
 }
