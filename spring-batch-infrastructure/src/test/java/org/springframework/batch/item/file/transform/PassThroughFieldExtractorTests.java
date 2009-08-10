@@ -18,7 +18,9 @@ package org.springframework.batch.item.file.transform;
 import static junit.framework.Assert.assertTrue;
 
 import java.util.Arrays;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.junit.Test;
 
@@ -55,4 +57,17 @@ public class PassThroughFieldExtractorTests {
 		Object[] result = extractor.extract(Arrays.asList("a", "b", null, "d"));
 		assertTrue(Arrays.equals(new Object[] { "a", "b", null, "d" }, result));
 	}
+
+	@Test
+	public void testExtractMap() {
+		PassThroughFieldExtractor<Map<String, String>> extractor = new PassThroughFieldExtractor<Map<String, String>>();
+		Map<String, String> map = new LinkedHashMap<String, String>();
+		map.put("A", "a");
+		map.put("B", "b");
+		map.put("C", null);
+		map.put("D", "d");
+		Object[] result = extractor.extract(map);
+		assertTrue(Arrays.equals(new Object[] { "a", "b", null, "d" }, result));
+	}
+
 }
