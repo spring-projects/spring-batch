@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <beansProjectDescription>
 	<version>1</version>
-	<pluginVersion><![CDATA[2.2.4.RELEASE]]></pluginVersion>
+	<pluginVersion><![CDATA[2.2.6.200908051215-RELEASE]]></pluginVersion>
 	<configSuffixes>
 		<configSuffix><![CDATA[xml]]></configSuffix>
 	</configSuffixes>
@@ -61,6 +61,8 @@
 		<config>src/test/resources/org/springframework/batch/core/configuration/xml/JobRegistryJobParserTests-context.xml</config>
 		<config>src/test/resources/org/springframework/batch/core/launch/JobLauncherIntegrationTests-context.xml</config>
 		<config>src/test/resources/org/springframework/batch/core/configuration/xml/StopCustomStatusJobParserTests-context.xml</config>
+		<config>src/test/resources/org/springframework/batch/core/scope/util/PlaceholderTargetSourceCustomEditorTests-context.xml</config>
+		<config>src/test/resources/org/springframework/batch/core/scope/util/PlaceholderTargetSourceErrorTests-context.xml</config>
 	</configs>
 	<configSets>
 		<configSet>

@@ -10,6 +10,7 @@ import java.util.Map;
 
 import org.apache.commons.io.IOUtils;
 import org.junit.Test;
+import org.springframework.beans.factory.BeanCreationException;
 import org.springframework.beans.factory.xml.XmlBeanDefinitionReader;
 import org.springframework.context.support.GenericApplicationContext;
 import org.springframework.core.io.ByteArrayResource;
@@ -74,8 +75,15 @@ public class PlaceholderTargetSourceErrorTests extends ContextFactorySupport {
 
 	@Test
 	public void testPartialReplaceMissingProperty() throws Exception {
-		Node target = (Node) createValue("name", "%{garbage}-bar").getTarget();
-		assertEquals("%{garbage}-bar", target.getName());
+		try {
+			Node target = (Node) createValue("name", "%{garbage}-bar").getTarget();
+			assertEquals("%{garbage}-bar", target.getName());
+			fail("Expected IllegalStateException");
+		}
+		catch (IllegalStateException e) {
+			String message = e.getMessage();
+			assertTrue("Wrong message: " + message, message.toLowerCase().contains("cannot bind"));
+		}
 	}
 
 	@Test
@@ -91,7 +99,7 @@ public class PlaceholderTargetSourceErrorTests extends ContextFactorySupport {
 			assertEquals("bar", target.getName());
 			fail("Expected IllegalStateException");
 		}
-		catch (Exception e) {
+		catch (BeanCreationException e) {
 			String message = e.getMessage();
 			assertTrue("Wrong message: " + message, message.toLowerCase().contains("cannot bind"));
 		}
@@ -99,8 +107,8 @@ public class PlaceholderTargetSourceErrorTests extends ContextFactorySupport {
 
 	@Test
 	public void testPartialReplaceIntegerToString() throws Exception {
-		Node target = (Node) createValue("name", "foo-%{integer}").getTarget();
-		assertEquals("foo-4321", target.getName());
+			Node target = (Node) createValue("name", "foo-%{integer}").getTarget();
+			assertEquals("foo-4321", target.getName());
 	}
 
 	@Test

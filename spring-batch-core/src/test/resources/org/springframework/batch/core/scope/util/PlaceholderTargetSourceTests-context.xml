@@ -58,6 +58,18 @@
 		<property name="targetBeanName" value="withListTarget" />
 	</bean>
 
+	<bean id="withLiteralList"
+		class="org.springframework.batch.core.scope.util.PlaceholderTargetSource">
+		<property name="contextFactory" ref="context" />
+		<property name="targetBeanName" value="withLiteralListTarget" />
+	</bean>
+
+	<bean id="withMap"
+		class="org.springframework.batch.core.scope.util.PlaceholderTargetSource">
+		<property name="contextFactory" ref="context" />
+		<property name="targetBeanName" value="withMapTarget" />
+	</bean>
+
 	<bean id="withMultiple"
 		class="org.springframework.batch.core.scope.util.PlaceholderTargetSource">
 		<property name="contextFactory" ref="context" />
@@ -135,6 +147,24 @@
 		</property>
 	</bean>
 
+	<bean id="withLiteralListTarget"
+		class="org.springframework.batch.core.scope.util.PlaceholderTargetSourceTests$Foo"
+		lazy-init="true">
+		<property name="list" value="%{list}"/>
+	</bean>
+
+	<bean id="withMapTarget"
+		class="org.springframework.batch.core.scope.util.PlaceholderTargetSourceTests$Foo"
+		lazy-init="true">
+		<property name="map">
+			<map value-type="java.lang.Object">
+				<entry key="foo" value="%{foo}"/>
+				<entry key="bar" value="foo-%{integer}"/>
+				<entry key="spam" value="%{list}"/>
+			</map>
+		</property>
+	</bean>
+
 	<bean id="withMultipleTarget"
 		class="org.springframework.batch.core.scope.util.PlaceholderTargetSourceTests$Foo"
 		lazy-init="true">
@@ -157,29 +187,6 @@
 		class="org.springframework.batch.core.scope.util.PlaceholderTargetSourceTests$Foo"
 		lazy-init="true">
 		<property name="date" value="%{date}" />
-	</bean>
-
-	<bean class="org.springframework.beans.factory.config.CustomEditorConfigurer">
-		<property name="propertyEditorRegistrars">
-			<bean
-				class="org.springframework.batch.support.DefaultPropertyEditorRegistrar">
-				<property name="customEditors">
-					<map>
-						<entry key="java.util.Date">
-							<bean
-								class="org.springframework.beans.propertyeditors.CustomDateEditor">
-								<constructor-arg>
-									<bean class="java.text.SimpleDateFormat">
-										<constructor-arg value="yyyy/MM/dd" />
-									</bean>
-								</constructor-arg>
-								<constructor-arg value="false" />
-							</bean>
-						</entry>
-					</map>
-				</property>
-			</bean>
-		</property>
 	</bean>
 
 </beans>

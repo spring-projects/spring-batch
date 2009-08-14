@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:aop="http://www.springframework.org/schema/aop" xmlns:tx="http://www.springframework.org/schema/tx"
+	xmlns:p="http://www.springframework.org/schema/p" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="
+		http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop.xsd
+		http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx.xsd">
+
+	<bean id="context"
+		class="org.springframework.batch.core.scope.util.PlaceholderTargetSourceCustomEditorTests" />
+
+	<bean id="withEmbeddedDate"
+		class="org.springframework.batch.core.scope.util.PlaceholderTargetSource">
+		<property name="contextFactory" ref="context" />
+		<property name="targetBeanName" value="withEmbeddedDateTarget" />
+	</bean>
+
+	<bean id="withEmbeddedDateTarget"
+		class="org.springframework.batch.core.scope.util.PlaceholderTargetSourceCustomEditorTests$Foo"
+		lazy-init="true">
+		<property name="name" value="bar-%{date}" />
+	</bean>
+
+	<bean class="org.springframework.beans.factory.config.CustomEditorConfigurer">
+		<property name="propertyEditorRegistrars">
+			<bean
+				class="org.springframework.batch.support.DefaultPropertyEditorRegistrar">
+				<property name="customEditors">
+					<map>
+						<entry key="java.util.Date">
+							<bean
+								class="org.springframework.beans.propertyeditors.CustomDateEditor">
+								<constructor-arg>
+									<bean class="java.text.SimpleDateFormat">
+										<constructor-arg value="yyyy/MM/dd" />
+									</bean>
+								</constructor-arg>
+								<constructor-arg value="false" />
+							</bean>
+						</entry>
+					</map>
+				</property>
+			</bean>
+		</property>
+	</bean>
+
+</beans>

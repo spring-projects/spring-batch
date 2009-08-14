@@ -39,14 +39,14 @@ import org.springframework.util.StringValueResolver;
 /**
  * A {@link TargetSource} that lazily initializes its target, replacing bean
  * definition properties dynamically if they are marked as placeholders. String
- * values with embedded <code>#{key}</code> patterns will be replaced with the
+ * values with embedded <code>%{key}</code> patterns will be replaced with the
  * corresponding value from the injected context (which must also be a String).
  * This includes dynamically locating a bean reference (e.g.
- * <code>ref="#{foo}"</code>), and partial replacement of patterns (e.g.
- * <code>value="#{foo}-bar-#{spam}"</code>). These replacements work for context
+ * <code>ref="%{foo}"</code>), and partial replacement of patterns (e.g.
+ * <code>value="%{foo}-bar-%{spam}"</code>). These replacements work for context
  * values that are primitive (String, Long, Integer). You can also replace
  * non-primitive values directly by making the whole bean property value into a
- * placeholder (e.g. <code>value="#{foo}"</code> where <code>foo</code> is a
+ * placeholder (e.g. <code>value="%{foo}"</code> where <code>foo</code> is a
  * property in the context).
  * 
  * @author Dave Syer
@@ -116,7 +116,7 @@ public class PlaceholderTargetSource extends SimpleBeanTargetSource implements I
 					String key = (String) value;
 					if (key.startsWith(PLACEHOLDER_PREFIX) && key.endsWith(PLACEHOLDER_SUFFIX)) {
 						key = extractKey(key);
-						result = convertFromContext(key, requiredType, typeConverter);
+						result = convertFromContext(key, requiredType);
 						if (result == null) {
 							Object property = getPropertyFromContext(key);
 							// Give the normal type converter a chance by
@@ -126,10 +126,14 @@ public class PlaceholderTargetSource extends SimpleBeanTargetSource implements I
 								if (property != null) {
 									value = property;
 								}
+								logger.debug(String.format("Bound %%{%s} to String value [%s]", key, result));
 							}
 							else {
 								throw new IllegalStateException("Cannot bind to placeholder: " + key);
 							}
+						}
+						else {
+							logger.debug(String.format("Bound %%{%s} to [%s]", key, result));
 						}
 					}
 				}
@@ -165,30 +169,7 @@ public class PlaceholderTargetSource extends SimpleBeanTargetSource implements I
 					.getMergedBeanDefinition(targetBeanName));
 			logger.debug("Rehydrating scoped target: [" + targetBeanName + "]");
 
-			BeanDefinitionVisitor visitor = new BeanDefinitionVisitor(new StringValueResolver() {
-				public String resolveStringValue(String strVal) {
-					if (!strVal.contains(PLACEHOLDER_PREFIX)) {
-						return strVal;
-					}
-					return replacePlaceholders(strVal, contextTypeConverter);
-				}
-			}) {
-				protected Object resolveValue(Object value) {
-					if (value instanceof TypedStringValue) {
-						TypedStringValue typedStringValue = (TypedStringValue) value;
-						String stringValue = typedStringValue.getValue();
-						if (stringValue != null) {
-							String visitedString = resolveStringValue(stringValue);
-							value = new TypedStringValue(visitedString);
-						}
-					}
-					else {
-						value = super.resolveValue(value);
-					}
-					return value;
-				}
-
-			};
+			BeanDefinitionVisitor visitor = new PlaceholderBeanDefinitionVisitor(contextTypeConverter);
 
 			beanFactory.registerBeanDefinition(beanName, beanDefinition);
 			// Make the replacements before the target is hydrated
@@ -266,10 +247,9 @@ public class PlaceholderTargetSource extends SimpleBeanTargetSource implements I
 	/**
 	 * @param value
 	 * @param requiredType
-	 * @param typeConverter
 	 * @return
 	 */
-	private Object convertFromContext(String key, Class<?> requiredType, TypeConverter typeConverter) {
+	private Object convertFromContext(String key, Class<?> requiredType) {
 		Object result = null;
 		Object property = getPropertyFromContext(key);
 		if (property == null || requiredType.isAssignableFrom(property.getClass())) {
@@ -287,57 +267,141 @@ public class PlaceholderTargetSource extends SimpleBeanTargetSource implements I
 	}
 
 	private String extractKey(String value) {
-		if (value.startsWith(PLACEHOLDER_PREFIX)) {
-			value = value.substring(PLACEHOLDER_PREFIX.length());
-			value = value.substring(0, value.length() - PLACEHOLDER_SUFFIX.length());
-		}
-		return value;
+		return value.substring(value.indexOf(PLACEHOLDER_PREFIX) + PLACEHOLDER_PREFIX.length(), value
+				.indexOf(PLACEHOLDER_SUFFIX));
 	}
 
 	/**
-	 * @param typeConverter
-	 * @param strVal
-	 * @return
+	 * Determine whether the input is a whole key in the form
+	 * <code>%{...}</code>, i.e. starting with the correct prefix, ending with
+	 * the correct suffix and containing only one of each.
+	 * 
+	 * @param value a String with placeholder patterns
+	 * @return true if the value is a key
 	 */
-	private String replacePlaceholders(String value, TypeConverter typeConverter) {
+	private boolean isKey(String value) {
+		return value.indexOf(PLACEHOLDER_PREFIX) == value.lastIndexOf(PLACEHOLDER_PREFIX)
+				&& value.startsWith(PLACEHOLDER_PREFIX) && value.endsWith(PLACEHOLDER_SUFFIX);
+	}
 
-		StringBuilder result = new StringBuilder(value);
+	/**
+	 * A {@link BeanDefinitionVisitor} that will replace embedded placeholders
+	 * with values from the provided context.
+	 * 
+	 * @author Dave Syer
+	 * 
+	 */
+	private final class PlaceholderBeanDefinitionVisitor extends BeanDefinitionVisitor {
 
-		int first = result.indexOf(PLACEHOLDER_PREFIX);
-		int next = result.indexOf(PLACEHOLDER_SUFFIX, first + 1);
-
-		while (first >= 0) {
-
-			Assert.state(next > 0, String.format("Placeholder key incorrectly specified: use %skey%s (in %s)",
-					PLACEHOLDER_PREFIX, PLACEHOLDER_SUFFIX, value));
-
-			String key = result.substring(first + PLACEHOLDER_PREFIX.length(), next);
-
-			boolean replaced = replaceIfTypeMatches(result, first, next, key, String.class, typeConverter);
-			replaced |= replaceIfTypeMatches(result, first, next, key, Long.class, typeConverter);
-			replaced |= replaceIfTypeMatches(result, first, next, key, Integer.class, typeConverter);
-			replaced |= replaceIfTypeMatches(result, first, next, key, Date.class, typeConverter);
-			if (!replaced) {
-				logger.debug("Cannot bind to placeholder: " + key);
-			}
-			first = result.indexOf(PLACEHOLDER_PREFIX, first + 1);
-			next = result.indexOf(PLACEHOLDER_SUFFIX, first + 1);
-
+		public PlaceholderBeanDefinitionVisitor(final TypeConverter typeConverter) {
+			super(new PlaceholderStringValueResolver(typeConverter));
 		}
 
-		logger.debug(String.format("Replaced [%s] with [%s]", value, result));
-		return result.toString();
+		protected Object resolveValue(Object value) {
+
+			if (value instanceof TypedStringValue) {
+
+				TypedStringValue typedStringValue = (TypedStringValue) value;
+				String stringValue = typedStringValue.getValue();
+				if (stringValue != null) {
+					
+					// If the value is a whole key, try to simply replace it from context. 
+					if (isKey(stringValue)) {
+						Object result = getPropertyFromContext(extractKey(stringValue));
+						if (result != null) {
+							value = result;
+						}
+					}
+					else {
+						// Otherwise it might contain embedded keys so we try to replace those
+						String visitedString = resolveStringValue(stringValue);
+						typedStringValue.setValue(visitedString);
+					}
+				}
+
+			}
+			else {
+
+				value = super.resolveValue(value);
+
+			}
+
+			return value;
+
+		}
 
 	}
 
-	private boolean replaceIfTypeMatches(StringBuilder result, int first, int next, String key, Class<?> requiredType,
-			TypeConverter typeConverter) {
-		Object property = convertFromContext(key, requiredType, typeConverter);
-		if (property != null) {
-			result.replace(first, next + 1, (String) typeConverter.convertIfNecessary(property, String.class));
-			return true;
+	private final class PlaceholderStringValueResolver implements StringValueResolver {
+
+		private final TypeConverter typeConverter;
+
+		private PlaceholderStringValueResolver(TypeConverter typeConverter) {
+			this.typeConverter = typeConverter;
 		}
-		return false;
+
+		public String resolveStringValue(String strVal) {
+			if (!strVal.contains(PLACEHOLDER_PREFIX)) {
+				return strVal;
+			}
+			return replacePlaceholders(strVal, typeConverter);
+		}
+
+		/**
+		 * Convenience method to replace all the placeholders in the input.
+		 * 
+		 * @param typeConverter a {@link TypeConverter} that can be used to
+		 * convert placeholder keys to context values
+		 * @param value the value to replace placeholders in
+		 * @return the input with placeholders replaced
+		 */
+		private String replacePlaceholders(String value, TypeConverter typeConverter) {
+
+			StringBuilder result = new StringBuilder(value);
+
+			int first = result.indexOf(PLACEHOLDER_PREFIX);
+			int next = result.indexOf(PLACEHOLDER_SUFFIX, first + 1);
+
+			while (first >= 0) {
+
+				Assert.state(next > 0, String.format("Placeholder key incorrectly specified: use %skey%s (in %s)",
+						PLACEHOLDER_PREFIX, PLACEHOLDER_SUFFIX, value));
+
+				String key = result.substring(first + PLACEHOLDER_PREFIX.length(), next);
+
+				boolean replaced = replaceIfTypeMatches(result, first, next, key, String.class, typeConverter);
+				replaced |= replaceIfTypeMatches(result, first, next, key, Long.class, typeConverter);
+				replaced |= replaceIfTypeMatches(result, first, next, key, Integer.class, typeConverter);
+				replaced |= replaceIfTypeMatches(result, first, next, key, Date.class, typeConverter);
+				if (!replaced) {
+					if (!value.startsWith(PLACEHOLDER_PREFIX) || !value.endsWith(PLACEHOLDER_SUFFIX)) {
+						throw new IllegalStateException(String.format("Cannot bind to partial key %%{%s} in %s", key,
+								value));
+					}
+					logger.debug(String.format("Deferring binding of placeholder: %%{%s}", key));
+				}
+				else {
+					logger.debug(String.format("Bound %%{%s} to obtain [%s]", key, result));
+				}
+				first = result.indexOf(PLACEHOLDER_PREFIX, first + 1);
+				next = result.indexOf(PLACEHOLDER_SUFFIX, first + 1);
+
+			}
+
+			return result.toString();
+
+		}
+
+		private boolean replaceIfTypeMatches(StringBuilder result, int first, int next, String key,
+				Class<?> requiredType, TypeConverter typeConverter) {
+			Object property = convertFromContext(key, requiredType);
+			if (property != null) {
+				result.replace(first, next + 1, (String) typeConverter.convertIfNecessary(property, String.class));
+				return true;
+			}
+			return false;
+		}
+
 	}
 
 }

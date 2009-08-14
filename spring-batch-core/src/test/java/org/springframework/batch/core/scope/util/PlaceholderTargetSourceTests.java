@@ -3,7 +3,7 @@ package org.springframework.batch.core.scope.util;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
 
-import java.text.SimpleDateFormat;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
@@ -39,6 +39,14 @@ public class PlaceholderTargetSourceTests extends ContextFactorySupport {
 	@Autowired
 	@Qualifier("withList")
 	private PlaceholderTargetSource withList;
+
+	@Autowired
+	@Qualifier("withLiteralList")
+	private PlaceholderTargetSource withLiteralList;
+
+	@Autowired
+	@Qualifier("withMap")
+	private PlaceholderTargetSource withMap;
 
 	@Autowired
 	@Qualifier("withMultiple")
@@ -82,6 +90,10 @@ public class PlaceholderTargetSourceTests extends ContextFactorySupport {
 
 	public Map<String, Object> getMap() {
 		return map;
+	}
+
+	public List<String> getList() {
+		return Arrays.asList("bar", "spam");
 	}
 
 	public Node getParent() {
@@ -166,6 +178,20 @@ public class PlaceholderTargetSourceTests extends ContextFactorySupport {
 	}
 
 	@Test
+	public void testGetLiteralList() {
+		Node target = (Node) withLiteralList.getTarget();
+		assertEquals(2, target.getList().size());
+		assertEquals("[bar, spam]", target.getList().toString());
+	}
+
+	@Test
+	public void testGetMap() {
+		Node target = (Node) withMap.getTarget();
+		assertEquals(3, target.getMap().size());
+		assertEquals("{foo=bar, bar=foo-4321, spam=[bar, spam]}", target.getMap().toString());
+	}
+
+	@Test
 	public void testGetMultiple() {
 		Node target = (Node) withMultiple.getTarget();
 		assertEquals("bar-4321-4321", target.getName());
@@ -180,16 +206,14 @@ public class PlaceholderTargetSourceTests extends ContextFactorySupport {
 	@Test
 	public void testGetEmbeddedDate() {
 		Node target = (Node) withEmbeddedDate.getTarget();
-		String date = new SimpleDateFormat("yyyy/MM/dd").format(new Date(1L));
+		String date = new Date(1L).toString();
 		assertEquals("bar-"+date, target.getName());
 	}
 
 	@Test
 	public void testGetDate() {
 		Node target = (Node) withDate.getTarget();
-		SimpleDateFormat sdf = new SimpleDateFormat("yyyy/MM/dd");
-		String date = sdf.format(new Date(1L));
-		assertEquals(date, sdf.format(target.getDate()));
+		assertEquals(new Date(1L), target.getDate());
 	}
 
 	public static interface Node {
@@ -200,6 +224,8 @@ public class PlaceholderTargetSourceTests extends ContextFactorySupport {
 		Node getParent();
 		
 		List<String> getList();
+		
+		Map<String, Object> getMap();
 	}
 
 	public static class Foo implements Node {
@@ -211,6 +237,8 @@ public class PlaceholderTargetSourceTests extends ContextFactorySupport {
 		private Node parent;
 		
 		private List<String> list;
+
+		private Map<String, Object> map;
 
 		public Foo() {
 		}
@@ -249,6 +277,14 @@ public class PlaceholderTargetSourceTests extends ContextFactorySupport {
 
 		public List<String> getList() {
 			return list;
+		}
+
+		public Map<String, Object> getMap() {
+			return map;
+		}
+
+		public void setMap(Map<String, Object> map) {
+			this.map = map;
 		}
 
 	}
