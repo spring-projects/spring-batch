@@ -402,7 +402,6 @@ public class TaskExecutorRepeatTemplate extends RepeatTemplate {
 
 			synchronized (lock) {
 
-				
 				active--;
 				stillActive = active > 0 || paused;
 
@@ -417,12 +416,23 @@ public class TaskExecutorRepeatTemplate extends RepeatTemplate {
 				if (stillActive) {
 					logger.debug("Waiting for other active callbacks to finish.");
 					synchronized (lock) {
-						try {
-							lock.wait();
-						}
-						catch (InterruptedException e) {
-							logger.info("Interrupted waiting for active callbacks");
-							Thread.currentThread().interrupt();
+						while (stillActive) {
+							try {
+								/*
+								 * Need a timed wait here to avoid deadlock in
+								 * the case that stillActive changed its value
+								 * between where it was computed and this wait.
+								 * In that case another thread might have
+								 * already sent the notify() message and then we
+								 * would miss it here.
+								 */
+								lock.wait(2000L);
+								stillActive = active > 0 || paused;
+							}
+							catch (InterruptedException e) {
+								logger.info("Interrupted waiting for active callbacks");
+								Thread.currentThread().interrupt();
+							}
 						}
 					}
 				}
@@ -441,8 +451,9 @@ public class TaskExecutorRepeatTemplate extends RepeatTemplate {
 						paused = false;
 						lock.notifyAll();
 					}
-				} else {
-					synchronized (lock) {						
+				}
+				else {
+					synchronized (lock) {
 						paused = true;
 					}
 				}
