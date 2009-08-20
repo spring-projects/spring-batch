@@ -3,29 +3,31 @@ Spring Batch 2.0.2.RELEASE Release Notes
 
 * Bug
 
-  * {{{http://jira.springsource.org/browse/BATCH-1341}BATCH-1341}} -         DataSourceInitializer throws ArrayOutOfBoundException when any destroyScript is specified
+  * {{{http://jira.springsource.org/browse/BATCH-1341}[BATCH-1341]}} -         DataSourceInitializer throws ArrayOutOfBoundException when any destroyScript is specified
 
-  * {{{http://jira.springsource.org/browse/BATCH-1345}BATCH-1345}} -         Fix error message for when &lt;tasklet/&gt; has no ref= or &lt;chunk/&gt;
+  * {{{http://jira.springsource.org/browse/BATCH-1345}[BATCH-1345]}} -         Fix error message for when &lt;tasklet/&gt; has no ref= or &lt;chunk/&gt;
 
-  * {{{http://jira.springsource.org/browse/BATCH-1351}BATCH-1351}} -         An empty &lt;*-exception-classes/&gt; list does not override parent's list
+  * {{{http://jira.springsource.org/browse/BATCH-1351}[BATCH-1351]}} -         An empty &lt;*-exception-classes/&gt; list does not override parent's list
 
-  * {{{http://jira.springsource.org/browse/BATCH-1354}BATCH-1354}} -         Infinite loop caused by throwing an Error from the ItemWriter of a skippable step
+  * {{{http://jira.springsource.org/browse/BATCH-1354}[BATCH-1354]}} -         Infinite loop caused by throwing an Error from the ItemWriter of a skippable step
 
-  * {{{http://jira.springsource.org/browse/BATCH-1355}BATCH-1355}} -         Step scope causes type= attribute of &lt;value/&gt; to be ignored
+  * {{{http://jira.springsource.org/browse/BATCH-1355}[BATCH-1355]}} -         Step scope causes type= attribute of &lt;value/&gt; to be ignored
 
-  * {{{http://jira.springsource.org/browse/BATCH-1363}BATCH-1363}} -         Job stopped in split state does not finish with status = STOPPED
+  * {{{http://jira.springsource.org/browse/BATCH-1362}[BATCH-1362]}} - Threads spinning doing nothing at end of multi-threaded Step
+
+  * {{{http://jira.springsource.org/browse/BATCH-1363}[BATCH-1363]}} -         Job stopped in split state does not finish with status = STOPPED
     
 * Improvement
 
-  * {{{http://jira.springsource.org/browse/BATCH-1342}BATCH-1342}} -         Check for valid parameter arguments in CommandLineJobRunner
+  * {{{http://jira.springsource.org/browse/BATCH-1342}[BATCH-1342]}} -         Check for valid parameter arguments in CommandLineJobRunner
 
-  * {{{http://jira.springsource.org/browse/BATCH-1359}BATCH-1359}} -         Throw helpful error from JdbcCursorItemReader if read() called before open()
+  * {{{http://jira.springsource.org/browse/BATCH-1359}[BATCH-1359]}} -         Throw helpful error from JdbcCursorItemReader if read() called before open()
 
-  * {{{http://jira.springsource.org/browse/BATCH-1360}BATCH-1360}} -         Throw helpful error from if Tasklet.execute() returns null
+  * {{{http://jira.springsource.org/browse/BATCH-1360}[BATCH-1360]}} -         Throw helpful error from if Tasklet.execute() returns null
     
 * New Feature
 
-  * {{{http://jira.springsource.org/browse/BATCH-1361}BATCH-1361}} -         Support for maps in PassThroughFieldExtractor
+  * {{{http://jira.springsource.org/browse/BATCH-1361}[BATCH-1361]}} -         Support for maps in PassThroughFieldExtractor
 
-  * {{{http://jira.springsource.org/browse/BATCH-1370}BATCH-1370}} -         Bind to non-scalar map entry values in step scope
+  * {{{http://jira.springsource.org/browse/BATCH-1370}[BATCH-1370]}} -         Bind to non-scalar map entry values in step scope
 
