@@ -1,6 +1,7 @@
 package org.springframework.batch.core.step.item;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.fail;
 
 import java.util.ArrayList;
@@ -87,7 +88,8 @@ public class FaultTolerantChunkProcessorTests {
 		try {
 			processor.process(contribution, inputs);
 			fail("Expected Exception");
-		} catch (Exception e) {
+		}
+		catch (Exception e) {
 			assertEquals("Skippable", e.getMessage());
 		}
 		processor.process(contribution, inputs);
@@ -97,15 +99,77 @@ public class FaultTolerantChunkProcessorTests {
 	}
 
 	@Test
+	public void testWriteSkipOnError() throws Exception {
+		processor.setWriteSkipPolicy(new AlwaysSkipItemSkipPolicy());
+		processor.setItemWriter(new ItemWriter<String>() {
+			public void write(List<? extends String> items) throws Exception {
+				if (items.contains("fail")) {
+					assertFalse("Expected Error!", true);
+				}
+			}
+		});
+		Chunk<String> inputs = new Chunk<String>(Arrays.asList("3", "fail", "2"));
+		try {
+			processor.process(contribution, inputs);
+			fail("Expected Error");
+		}
+		catch (IllegalStateException e) {
+			assertEquals("Expected Error!", e.getCause().getMessage());
+		}
+		processor.process(contribution, inputs);
+		try {
+			processor.process(contribution, inputs);
+			fail("Expected Error");
+		}
+		catch (IllegalStateException e) {
+			assertEquals("Expected Error!", e.getCause().getMessage());
+		}
+		assertEquals(1, contribution.getSkipCount());
+		assertEquals(1, contribution.getWriteCount());
+	}
+
+	@Test
+	public void testWriteSkipOnException() throws Exception {
+		processor.setWriteSkipPolicy(new AlwaysSkipItemSkipPolicy());
+		processor.setItemWriter(new ItemWriter<String>() {
+			public void write(List<? extends String> items) throws Exception {
+				if (items.contains("fail")) {
+					throw new RuntimeException("Expected Exception!");
+				}
+			}
+		});
+		Chunk<String> inputs = new Chunk<String>(Arrays.asList("3", "fail", "2"));
+		try {
+			processor.process(contribution, inputs);
+			fail("Expected RuntimeException");
+		}
+		catch (RuntimeException e) {
+			assertEquals("Expected Exception!", e.getMessage());
+		}
+		processor.process(contribution, inputs);
+		try {
+			processor.process(contribution, inputs);
+			fail("Expected RuntimeException");
+		}
+		catch (RuntimeException e) {
+			assertEquals("Expected Exception!", e.getMessage());
+		}
+		assertEquals(1, contribution.getSkipCount());
+		assertEquals(1, contribution.getWriteCount());
+	}
+
+	@Test
 	public void testTransformWithExceptionAndNoRollback() throws Exception {
 		processor.setItemProcessor(new ItemProcessor<String, String>() {
 			public String process(String item) throws Exception {
-				if (item.equals("1")) throw new DataIntegrityViolationException("Planned");
+				if (item.equals("1"))
+					throw new DataIntegrityViolationException("Planned");
 				return item;
 			}
 		});
 		processor.setProcessSkipPolicy(new AlwaysSkipItemSkipPolicy());
-		processor.setRollbackClassifier(new BinaryExceptionClassifier(Collections.<Class<? extends Throwable>> singleton(DataIntegrityViolationException.class), false));
+		processor.setRollbackClassifier(new BinaryExceptionClassifier(Collections
+				.<Class<? extends Throwable>> singleton(DataIntegrityViolationException.class), false));
 		Chunk<String> inputs = new Chunk<String>(Arrays.asList("1", "2"));
 		processor.process(contribution, inputs);
 		assertEquals(1, list.size());

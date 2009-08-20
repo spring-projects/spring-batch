@@ -283,8 +283,11 @@ public class FaultTolerantChunkProcessor<I, O> extends SimpleChunkProcessor<I, O
 					try {
 						doWrite(outputs.getItems());
 					}
-					catch (Exception e) {
-						if (rollbackClassifier.classify(e)) {
+					catch (Throwable t) {
+						Exception e = (t instanceof Exception) ? (Exception) t : new IllegalStateException(
+								"Unexpected non-Exception Throwable", t);
+
+						if (rollbackClassifier.classify(t)) {
 							throw e;
 						}
 						/*
@@ -312,7 +315,7 @@ public class FaultTolerantChunkProcessor<I, O> extends SimpleChunkProcessor<I, O
 
 				public Object recover(RetryContext context) throws Exception {
 
-					Exception e = (Exception) context.getLastThrowable();
+					Exception e = context.getLastThrowable();
 					if (outputs.size() > 1 && !rollbackClassifier.classify(e)) {
 						throw new RetryException("Invalid retry state during write caused by "
 								+ "exception that does not classify for rollback: ", e);
@@ -384,7 +387,7 @@ public class FaultTolerantChunkProcessor<I, O> extends SimpleChunkProcessor<I, O
 			if (item == null) {
 				continue;
 			}
-			Exception e = wrapper.getException();
+			Throwable e = wrapper.getException();
 			try {
 				getListener().onSkipInProcess(item, e);
 			}
@@ -394,7 +397,7 @@ public class FaultTolerantChunkProcessor<I, O> extends SimpleChunkProcessor<I, O
 		}
 
 		for (SkipWrapper<O> wrapper : outputs.getSkips()) {
-			Exception e = wrapper.getException();
+			Throwable e = wrapper.getException();
 			try {
 				getListener().onSkipInWrite(wrapper.getItem(), e);
 			}
@@ -464,16 +467,20 @@ public class FaultTolerantChunkProcessor<I, O> extends SimpleChunkProcessor<I, O
 			inputIterator.remove();
 			outputIterator.remove();
 		}
-		catch (Exception e) {
-			if (!itemWriteSkipPolicy.shouldSkip(e, -1) && !rollbackClassifier.classify(e)) {
+		catch (Throwable t) {
+
+			Exception e = (t instanceof Exception) ? (Exception) t : new IllegalStateException(
+					"Unexpected non-Exception Throwable", t);
+
+			if (!itemWriteSkipPolicy.shouldSkip(e, -1) && !rollbackClassifier.classify(t)) {
 				inputIterator.remove();
 				outputIterator.remove();
 			}
 			else {
 				checkSkipPolicy(inputIterator, outputIterator, e, contribution);
 			}
-			if (rollbackClassifier.classify(e)) {
-				throw e;
+			if (rollbackClassifier.classify(t)) {
+			throw e;
 			}
 		}
 		chunkMonitor.incrementOffset();
