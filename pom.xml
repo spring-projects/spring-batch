@@ -503,12 +503,5 @@
 			<name>SpringSource Enterprise Bundle Repository - SpringSource Bundle Snapshots</name>
 			<url>http://repository.springsource.com/maven/bundles/snapshot</url>
 		</pluginRepository>
-		<pluginRepository>
-			<id>agilejava</id>
-			<url>http://agilejava.com/maven</url>
-			<snapshots>
-				<enabled>false</enabled>
-			</snapshots>
-		</pluginRepository>
 	</pluginRepositories>
 </project>
