@@ -240,6 +240,22 @@ public class FaultTolerantStepFactoryBeanRollbackTests {
 	 * Scenario: Exception in writer that should not cause rollback and scan
 	 */
 	@Test
+	public void testWriterDefaultRollbackOnError() throws Exception {
+		writer.setFailures("2", "3");
+		writer.setExceptionType(AssertionError.class);
+
+		Step step = (Step) factory.getObject();
+
+		step.execute(stepExecution);
+		assertEquals(BatchStatus.FAILED, stepExecution.getStatus());
+		assertEquals(0, stepExecution.getSkipCount());
+		assertEquals(1, stepExecution.getRollbackCount());
+	}
+
+	/**
+	 * Scenario: Exception in writer that should not cause rollback and scan
+	 */
+	@Test
 	public void testWriterDefaultRollbackOnRuntimeException() throws Exception {
 		writer.setFailures("2", "3");
 		writer.setExceptionType(SkippableRuntimeException.class);

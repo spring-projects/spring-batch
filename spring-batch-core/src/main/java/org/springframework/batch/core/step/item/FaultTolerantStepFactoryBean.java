@@ -300,9 +300,9 @@ public class FaultTolerantStepFactoryBean<T, S> extends SimpleStepFactoryBean<T,
 	protected void applyConfiguration(TaskletStep step) {
 
 		addFatalExceptionIfMissing(SkipLimitExceededException.class, NonSkippableReadException.class,
-				SkipListenerFailedException.class, RetryException.class, JobInterruptedException.class);
+				SkipListenerFailedException.class, RetryException.class, JobInterruptedException.class, Error.class);
 		addNonRetryableExceptionIfMissing(SkipLimitExceededException.class, NonSkippableReadException.class,
-				SkipListenerFailedException.class, RetryException.class, JobInterruptedException.class);
+				SkipListenerFailedException.class, RetryException.class, JobInterruptedException.class, Error.class);
 
 		super.applyConfiguration(step);
 

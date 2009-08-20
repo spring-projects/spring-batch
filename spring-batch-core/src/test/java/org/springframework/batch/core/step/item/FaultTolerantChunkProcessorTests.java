@@ -98,7 +98,11 @@ public class FaultTolerantChunkProcessorTests {
 		assertEquals(1, contribution.getFilterCount());
 	}
 
-	@Test
+	/**
+	 * An Error pops right back up (no skips, no retry)
+	 * @throws Exception
+	 */
+	@Test(expected=AssertionError.class)
 	public void testWriteSkipOnError() throws Exception {
 		processor.setWriteSkipPolicy(new AlwaysSkipItemSkipPolicy());
 		processor.setItemWriter(new ItemWriter<String>() {
@@ -113,19 +117,10 @@ public class FaultTolerantChunkProcessorTests {
 			processor.process(contribution, inputs);
 			fail("Expected Error");
 		}
-		catch (IllegalStateException e) {
-			assertEquals("Expected Error!", e.getCause().getMessage());
+		catch (Error e) {
+			assertEquals("Expected Error!", e.getMessage());
 		}
 		processor.process(contribution, inputs);
-		try {
-			processor.process(contribution, inputs);
-			fail("Expected Error");
-		}
-		catch (IllegalStateException e) {
-			assertEquals("Expected Error!", e.getCause().getMessage());
-		}
-		assertEquals(1, contribution.getSkipCount());
-		assertEquals(1, contribution.getWriteCount());
 	}
 
 	@Test

@@ -34,7 +34,7 @@ public abstract class AbstractExceptionThrowingItemHandlerStub<T> {
 
 	private Collection<T> failures = Collections.emptyList();
 
-	private Constructor<? extends Exception> exception;
+	private Constructor<? extends Throwable> exception;
 
 	public AbstractExceptionThrowingItemHandlerStub() throws Exception {
 		exception = SkippableRuntimeException.class.getConstructor(String.class);
@@ -44,8 +44,12 @@ public abstract class AbstractExceptionThrowingItemHandlerStub<T> {
 		this.failures = new ArrayList<T>(Arrays.asList(failures));
 	}
 
-	public void setExceptionType(Class<? extends Exception> exceptionType) throws Exception {
-		exception = exceptionType.getConstructor(String.class);
+	public void setExceptionType(Class<? extends Throwable> exceptionType) throws Exception {
+		try {
+			exception = exceptionType.getConstructor(String.class);
+		} catch (NoSuchMethodException e) {
+			exception = exceptionType.getConstructor(Object.class);
+		}
 	}
 
 	public void clearFailures() {
@@ -54,7 +58,14 @@ public abstract class AbstractExceptionThrowingItemHandlerStub<T> {
 
 	protected void checkFailure(T item) throws Exception {
 		if (isFailure(item)) {
-			throw exception.newInstance("Intended Failure: " + item);
+			Throwable t = exception.newInstance("Intended Failure: " + item);
+			if (t instanceof Exception) {
+				throw (Exception) t;
+			}
+			if (t instanceof Error) {
+				throw (Error) t;
+			}
+			throw new IllegalStateException("Unexpected non-Error Throwable");
 		}
 	}
 
