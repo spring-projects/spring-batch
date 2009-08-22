@@ -173,7 +173,7 @@ public class DelimitedLineTokenizer extends AbstractLineTokenizer {
 	}
 
 	/**
-	 * Is this string surrounded by quite characters?
+	 * Is this string surrounded by quote characters?
 	 * 
 	 * @param value
 	 * @return true if the value starts and ends with the {@link #quoteCharacter}
