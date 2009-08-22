@@ -19,6 +19,7 @@ import static org.junit.Assert.assertEquals;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -55,6 +56,10 @@ public class MultipleContextPlaceholderTargetSourceTests {
 	@Autowired
 	@Qualifier("list")
 	private TestBean list;
+
+	@Autowired
+	@Qualifier("map")
+	private TestBean map;
 
 	@After
 	public void removeContext() {
@@ -100,6 +105,23 @@ public class MultipleContextPlaceholderTargetSourceTests {
 
 	}
 
+	@Test
+	public void testMultipleValueInMap() throws Exception {
+
+		for (int i = 0; i < 4; i++) {
+			final String value = "foo" + i;
+			contextFactory.setContext(this);
+			attributes = Collections.singletonMap("foo", value);
+			try {
+				assertEquals("foo" + i, map.getMap().get("foo"));
+			}
+			finally {
+				contextFactory.clearContext();
+			}
+		}
+
+	}
+
 	@Override
 	public String toString() {
 		return "Test context: attributes=" + attributes;
@@ -109,6 +131,8 @@ public class MultipleContextPlaceholderTargetSourceTests {
 		private String name;
 
 		private List<String> names = new ArrayList<String>();
+
+		private Map<String, String> map = new HashMap<String, String>();
 
 		public String getName() {
 			return name;
@@ -125,6 +149,15 @@ public class MultipleContextPlaceholderTargetSourceTests {
 		public void setNames(List<String> names) {
 			this.names.addAll(names);
 		}
+
+		public Map<String, String> getMap() {
+			return new HashMap<String, String>(map);
+		}
+
+		public void setMap(Map<String, String> map) {
+			this.map.putAll(map);
+		}
+		
 	}
 
 	public static class SimpleContextFactory extends ContextFactorySupport {

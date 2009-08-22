@@ -17,6 +17,9 @@ package org.springframework.batch.core.scope.util;
 
 import java.beans.PropertyEditor;
 import java.util.Date;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import org.springframework.aop.TargetSource;
 import org.springframework.aop.target.SimpleBeanTargetSource;
@@ -31,6 +34,9 @@ import org.springframework.beans.factory.config.BeanDefinitionVisitor;
 import org.springframework.beans.factory.config.TypedStringValue;
 import org.springframework.beans.factory.support.DefaultListableBeanFactory;
 import org.springframework.beans.factory.support.GenericBeanDefinition;
+import org.springframework.beans.factory.support.ManagedList;
+import org.springframework.beans.factory.support.ManagedMap;
+import org.springframework.beans.factory.support.ManagedSet;
 import org.springframework.core.AttributeAccessor;
 import org.springframework.core.MethodParameter;
 import org.springframework.util.Assert;
@@ -259,7 +265,11 @@ public class PlaceholderTargetSource extends SimpleBeanTargetSource implements I
 	}
 
 	private Object getPropertyFromContext(String key) {
-		BeanWrapper wrapper = new BeanWrapperImpl(contextFactory.getContext());
+		Object context = contextFactory.getContext();
+		if (context==null) {
+			throw new IllegalStateException("No context available while replacing placeholders.");
+		}
+		BeanWrapper wrapper = new BeanWrapperImpl(context);
 		if (wrapper.isReadableProperty(key)) {
 			return wrapper.getPropertyValue(key);
 		}
@@ -297,6 +307,7 @@ public class PlaceholderTargetSource extends SimpleBeanTargetSource implements I
 			super(new PlaceholderStringValueResolver(typeConverter));
 		}
 
+		@SuppressWarnings("unchecked")
 		protected Object resolveValue(Object value) {
 
 			if (value instanceof TypedStringValue) {
@@ -304,21 +315,49 @@ public class PlaceholderTargetSource extends SimpleBeanTargetSource implements I
 				TypedStringValue typedStringValue = (TypedStringValue) value;
 				String stringValue = typedStringValue.getValue();
 				if (stringValue != null) {
-					
-					// If the value is a whole key, try to simply replace it from context. 
+
+					// If the value is a whole key, try to simply replace it
+					// from context.
 					if (isKey(stringValue)) {
-						Object result = getPropertyFromContext(extractKey(stringValue));
+						String key = extractKey(stringValue);
+						Object result = getPropertyFromContext(key);
 						if (result != null) {
 							value = result;
+							logger.debug(String.format("Resolved %%{%s} to obtain [%s]", key, result));
 						}
 					}
 					else {
-						// Otherwise it might contain embedded keys so we try to replace those
+						// Otherwise it might contain embedded keys so we try to
+						// replace those
 						String visitedString = resolveStringValue(stringValue);
 						typedStringValue.setValue(visitedString);
 					}
 				}
 
+			} else if (value instanceof Map) {
+				
+				Map map = (Map) value;
+				Map newValue = new ManagedMap(map.size());
+				newValue.putAll(map);
+				super.visitMap(newValue);
+				value = newValue;
+				
+			} else if (value instanceof List) {
+				
+				List list = (List) value;
+				List newValue = new ManagedList(list.size());
+				newValue.addAll(list);
+				super.visitList(newValue);
+				value = newValue;
+				
+			}  else if (value instanceof Set) {
+				
+				Set list = (Set) value;
+				Set newValue = new ManagedSet(list.size());
+				newValue.addAll(list);
+				super.visitSet(newValue);
+				value = newValue;
+				
 			}
 			else {
 
