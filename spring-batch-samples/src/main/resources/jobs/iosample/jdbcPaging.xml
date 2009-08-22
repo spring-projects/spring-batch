@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:aop="http://www.springframework.org/schema/aop" xmlns:tx="http://www.springframework.org/schema/tx"
+	xmlns:p="http://www.springframework.org/schema/p" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:util="http://www.springframework.org/schema/util"
+	xsi:schemaLocation="
+		http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd
+		http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-2.0.xsd
+		http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-2.0.xsd
+		http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-2.0.xsd">
+
+	<bean id="itemReaderForTest" class="org.springframework.batch.item.database.JdbcCursorItemReader">
+		<property name="dataSource" ref="dataSource"/>
+		<property name="sql" value="select ID, NAME, CREDIT from CUSTOMER"/>
+		<property name="rowMapper">
+			<bean class="org.springframework.batch.sample.domain.trade.internal.CustomerCreditRowMapper"/>
+		</property>
+	</bean>
+
+	<bean id="itemReader"
+		class="org.springframework.batch.item.database.JdbcPagingItemReader" autowire-candidate="false"
+				scope="step">
+		<property name="dataSource" ref="dataSource" />
+		<property name="rowMapper">
+			<bean
+				class="org.springframework.batch.sample.domain.trade.internal.CustomerCreditRowMapper" />
+		</property>
+		<property name="queryProvider">
+			<bean
+				class="org.springframework.batch.item.database.support.SqlPagingQueryProviderFactoryBean">
+				<property name="dataSource" ref="dataSource" />
+				<property name="sortKey" value="ID" />
+				<property name="selectClause" value="select ID, NAME, CREDIT"/>
+				<property name="fromClause" value="FROM CUSTOMER" />
+				<property name="whereClause"
+					value="WHERE CREDIT > :credit" />
+			</bean>
+		</property>
+		<property name="pageSize" value="10" />
+		<property name="parameterValues">
+			<map>
+				<entry key="statusCode" value="PE" />
+				<entry key="credit" value="#{jobParameters[credit]}" />
+				<entry key="type" value="COLLECTION" />
+			</map>
+		</property>
+	</bean>
+
+	<bean id="itemWriter"
+		class="org.springframework.batch.item.database.JdbcBatchItemWriter">
+		<property name="assertUpdates" value="true" />
+		<property name="itemSqlParameterSourceProvider">
+			<bean
+				class="org.springframework.batch.item.database.BeanPropertyItemSqlParameterSourceProvider" />
+		</property>
+		<property name="sql"
+			value="UPDATE customer set credit = :credit where id = :id" />
+		<property name="dataSource" ref="dataSource" />
+	</bean>
+
+</beans>

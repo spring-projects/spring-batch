@@ -33,7 +33,7 @@
 		<property name="resource" value="#{jobParameters[fileName]}" />
 	</bean>
 
-	<bean id="itemReaderForTest" parent="itemReaderParent" >
+	<bean id="itemReaderForTest" parent="itemReaderParent" scope="prototype" >
 		<property name="resource" value="data/iosample/input/delimited.csv" />
 	</bean>
 
