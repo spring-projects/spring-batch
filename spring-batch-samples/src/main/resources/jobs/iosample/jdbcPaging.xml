@@ -9,7 +9,7 @@
 		http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-2.0.xsd
 		http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-2.0.xsd">
 
-	<bean id="itemReaderForTest" class="org.springframework.batch.item.database.JdbcCursorItemReader">
+	<bean id="itemReaderForTest" class="org.springframework.batch.item.database.JdbcCursorItemReader" scope="prototype">
 		<property name="dataSource" ref="dataSource"/>
 		<property name="sql" value="select ID, NAME, CREDIT from CUSTOMER"/>
 		<property name="rowMapper">
