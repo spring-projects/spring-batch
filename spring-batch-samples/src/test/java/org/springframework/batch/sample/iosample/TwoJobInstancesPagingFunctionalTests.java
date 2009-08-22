@@ -17,8 +17,11 @@
 package org.springframework.batch.sample.iosample;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotSame;
 
 import java.util.Date;
+
+import javax.sql.DataSource;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -29,6 +32,7 @@ import org.springframework.batch.core.JobParametersBuilder;
 import org.springframework.batch.core.job.AbstractJob;
 import org.springframework.batch.core.launch.JobLauncher;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.jdbc.core.simple.SimpleJdbcTemplate;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
@@ -46,15 +50,25 @@ public class TwoJobInstancesPagingFunctionalTests {
 
 	@Autowired
 	private AbstractJob job;
+	
+	private SimpleJdbcTemplate jdbcTemplate;
+	
+	@Autowired
+	public void setDataSource(DataSource dataSource) {
+		jdbcTemplate = new SimpleJdbcTemplate(dataSource);
+	}
 
 	@Test
 	public void testLaunchJobTwice() throws Exception {
+		int first = jdbcTemplate.queryForInt("select count(0) from CUSTOMER where credit>1000");
 		JobExecution jobExecution = launcher.run(this.job, getJobParameters(1000.));
 		assertEquals(BatchStatus.COMPLETED, jobExecution.getStatus());
-		assertEquals(4, jobExecution.getStepExecutions().iterator().next().getWriteCount());
+		assertEquals(first, jobExecution.getStepExecutions().iterator().next().getWriteCount());
+		int second = jdbcTemplate.queryForInt("select count(0) from CUSTOMER where credit>1000000");
+		assertNotSame("The number of records above the threshold did not change", first, second);
 		jobExecution = launcher.run(this.job, getJobParameters(1000000.));
 		assertEquals(BatchStatus.COMPLETED, jobExecution.getStatus());
-		assertEquals(0, jobExecution.getStepExecutions().iterator().next().getWriteCount());
+		assertEquals(second, jobExecution.getStepExecutions().iterator().next().getWriteCount());
 	}
 
 	protected JobParameters getJobParameters(double amount) {
