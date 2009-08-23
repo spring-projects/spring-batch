@@ -19,6 +19,7 @@ package org.springframework.batch.jms;
 import static org.junit.Assert.assertEquals;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import javax.sql.DataSource;
@@ -109,7 +110,8 @@ public class ExternalRetryInBatchTests {
 	public void testExternalRetryRecoveryInBatch() throws Exception {
 		assertInitialState();
 
-		retryTemplate.setRetryPolicy(new SimpleRetryPolicy(1));
+		retryTemplate.setRetryPolicy(new SimpleRetryPolicy(1, Collections
+				.<Class<? extends Throwable>, Boolean> singletonMap(Exception.class, true)));
 
 		repeatTemplate.setCompletionPolicy(new SimpleCompletionPolicy(2));
 
