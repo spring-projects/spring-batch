@@ -478,7 +478,7 @@ itemWriter.write(items);</programlisting>
         &lt;chunk reader="flatFileItemReader" writer="itemWriter" 
                commit-interval="10" <emphasis role="bold">skip-limit="10"</emphasis>&gt;
             <emphasis role="bold">&lt;skippable-exception-classes&gt;
-                org.springframework.batch.item.file.FlatFileParseException
+                &lt;include class="org.springframework.batch.item.file.FlatFileParseException"/&gt;
             &lt;/skippable-exception-classes&gt;</emphasis>
         &lt;/chunk&gt;
     &lt;/tasklet&gt;
@@ -489,11 +489,8 @@ itemWriter.write(items);</programlisting>
       <classname>FlatFileParseException</classname> is thrown, it will be
       skipped and counted against the total skip limit of 10. Separate counts
       are made of skips on read, process and write inside the step execution,
-      and the limit applies across all.</para>
-    </section>
-
-    <section id="fatalExceptions">
-      <title>Configuring Fatal Exceptions</title>
+      and the limit applies across all. Once the skip limit is reached, the
+      next exception found will cause the step to fail.</para>
 
       <para>One problem with the example above is that any other exception
       besides a <classname>FlatFileParseException</classname> will cause the
@@ -505,20 +502,27 @@ itemWriter.write(items);</programlisting>
         &lt;chunk reader="flatFileItemReader" writer="itemWriter" 
                commit-interval="10" <emphasis role="bold">skip-limit="10"</emphasis>&gt;
 <emphasis role="bold">            &lt;skippable-exception-classes&gt;
-                java.lang.Exception
+                &lt;include class="java.lang.Exception"/&gt;
+                &lt;exclude class="java.io.FileNotFoundException"/&gt;
             &lt;/skippable-exception-classes&gt;
-            &lt;fatal-exception-classes&gt;
-                java.io.FileNotFoundException
-            &lt;/fatal-exception-classes&gt;
 </emphasis>        &lt;/chunk&gt;
     &lt;/tasklet&gt;
 &lt;/step&gt;</programlisting></para>
 
-      <para>By setting the skippable exceptions to
-      <classname>java.lang.Exception</classname>, any exception that is thrown
-      will be skipped. However, the second list, 'fatal-exception-classes',
-      contains specific exceptions that should be fatal if encountered (i.e.
-      not skipped).</para>
+      <para>By 'including' <classname>java.lang.Exception</classname> as a
+      skippable exception class, the configuration indicates that all
+      <classname>Exception</classname>s are skippable. However, by 'excluding'
+      <classname>java.io.FileNotFoundException</classname>, the configuration
+      refines the list of skippable exception classes to be all
+      <classname>Exception</classname>s <emphasis>except</emphasis>
+      <classname>FileNotFoundException</classname>. Any excluded exception
+      calsses will be fatal if encountered (i.e. not skipped). </para>
+
+      <para>For any exception encountered, the skippability will be determined
+      by the nearest superclass in the class hierarchy. Any unclassifed
+      exception will be treated as 'fatal'. The order of the
+      <code>&lt;include/&gt;</code> and <code>&lt;exclude/&gt;</code> elements
+      does not matter.</para>
     </section>
 
     <section id="retryLogic">
@@ -540,7 +544,7 @@ itemWriter.write(items);</programlisting>
         &lt;chunk reader="itemReader" writer="itemWriter" 
                commit-interval="2" <emphasis role="bold">retry-limit="3"</emphasis>&gt;
             <emphasis role="bold">&lt;retryable-exception-classes&gt;
-                org.springframework.dao.DeadlockLoserDataAccessException
+                &lt;include class="org.springframework.dao.DeadlockLoserDataAccessException"/&gt;
             &lt;/retryable-exception-classes&gt;</emphasis>
         &lt;/chunk&gt;
     &lt;/tasklet&gt;
@@ -549,7 +553,7 @@ itemWriter.write(items);</programlisting>
       <para>The <classname>Step</classname> allows a limit for the number of
       times an individual item can be retried, and a list of exceptions that
       are 'retryable'. More details on how retry works can be found in <xref
-      linkend="retry" /></para>
+      linkend="retry" />.</para>
     </section>
 
     <section id="controllingRollback">
@@ -564,15 +568,13 @@ itemWriter.write(items);</programlisting>
       <classname>ItemWriter</classname> should not cause a rollback because no
       action has taken place to invalidate the transaction. For this reason,
       the <classname>Step</classname> can be configured with a list of
-      exceptions that should not cause rollback. The
-      no-rollback-exception-classes element is a list of transaction
-      attributes, separated by commas or newlines.</para>
+      exceptions that should not cause rollback.</para>
 
       <programlisting>&lt;step id="step1"&gt;
     &lt;tasklet&gt;
         &lt;chunk reader="itemReader" writer="itemWriter" commit-interval="2"/&gt;
         &lt;no-rollback-exception-classes&gt;
-            org.springframework.batch.item.validator.ValidationException
+            &lt;include class="org.springframework.batch.item.validator.ValidationException"/&gt;
         &lt;/no-rollback-exception-classes&gt;
     &lt;/tasklet&gt;
 &lt;/step&gt;</programlisting>
