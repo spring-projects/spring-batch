@@ -25,7 +25,7 @@
 	<bean id="writer" class="org.springframework.batch.sample.common.InfiniteLoopWriter" />
 	
 	<bean id="jobParametersIncrementer" 
-	            class="org.springframework.batch.sample.common.InfiniteLoopIncrementer"/>
+	            class="org.springframework.batch.core.launch.support.RunIdIncrementer"/>
 
 	<aop:config>
 		<aop:aspect ref="eventAdvice">

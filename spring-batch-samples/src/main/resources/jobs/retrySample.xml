@@ -12,7 +12,7 @@
 			           commit-interval="1"
 			           retry-limit="3">
 				    <retryable-exception-classes>
-				    	java.lang.Exception
+				    	<include class="java.lang.Exception"/>
 				    </retryable-exception-classes>
 				</chunk>
 			</tasklet>

@@ -33,7 +33,7 @@ public class CompositeItemProcessorTests {
 		processor1 = createMock(ItemProcessor.class);
 		processor2 = createMock(ItemProcessor.class);
 		
-		composite.setItemProcessors(new ArrayList<ItemProcessor>() {{ 
+		composite.setDelegates(new ArrayList<ItemProcessor<Object,Object>>() {{ 
 			add(processor1); add(processor2); 
 		}});
 		
@@ -67,12 +67,11 @@ public class CompositeItemProcessorTests {
 	 * The list of transformers must not be null or empty and 
 	 * can contain only instances of {@link ItemProcessor}.
 	 */
-	@SuppressWarnings("unchecked")
 	@Test
 	public void testAfterPropertiesSet() throws Exception {
 		
 		// value not set
-		composite.setItemProcessors(null);
+		composite.setDelegates(null);
 		try {
 			composite.afterPropertiesSet();
 			fail();
@@ -82,7 +81,7 @@ public class CompositeItemProcessorTests {
 		}
 		
 		// empty list
-		composite.setItemProcessors(new ArrayList<ItemProcessor>());
+		composite.setDelegates(new ArrayList<ItemProcessor<Object,Object>>());
 		try {
 			composite.afterPropertiesSet();
 			fail();

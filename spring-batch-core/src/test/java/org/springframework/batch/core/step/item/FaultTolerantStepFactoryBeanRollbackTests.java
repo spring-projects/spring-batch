@@ -6,8 +6,9 @@ import static org.junit.Assert.assertTrue;
 
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.HashSet;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -55,6 +56,7 @@ public class FaultTolerantStepFactoryBeanRollbackTests {
 		writer = new SkipWriterStub<String>();
 	}
 
+	@SuppressWarnings("unchecked")
 	@Before
 	public void setUp() throws Exception {
 		factory = new FaultTolerantStepFactoryBean<String, String>();
@@ -73,7 +75,7 @@ public class FaultTolerantStepFactoryBeanRollbackTests {
 
 		factory.setSkipLimit(2);
 
-		factory.setSkippableExceptionClasses(getExceptionList(Exception.class));
+		factory.setSkippableExceptionClasses(getExceptionMap(Exception.class));
 
 		MapJobRepositoryFactoryBean.clear();
 		MapJobRepositoryFactoryBean repositoryFactory = new MapJobRepositoryFactoryBean();
@@ -137,6 +139,7 @@ public class FaultTolerantStepFactoryBeanRollbackTests {
 	/**
 	 * Scenario: Exception in reader that should not cause rollback
 	 */
+	@SuppressWarnings("unchecked")
 	@Test
 	public void testReaderAttributesOverrideSkippableNoRollback() throws Exception {
 		reader.setFailures("2", "3");
@@ -144,7 +147,7 @@ public class FaultTolerantStepFactoryBeanRollbackTests {
 		reader.setExceptionType(SkippableException.class);
 
 		// No skips by default
-		factory.setSkippableExceptionClasses(new HashSet<Class<? extends Throwable>>());
+		factory.setSkippableExceptionClasses(getExceptionMap());
 		// But this one is explicit in the tx-attrs so it should be skipped
 		factory.setNoRollbackExceptionClasses(getExceptionList(SkippableException.class));
 
@@ -416,4 +419,12 @@ public class FaultTolerantStepFactoryBeanRollbackTests {
 		return Arrays.<Class<? extends Throwable>> asList(arg);
 	}
 
+	private Map<Class<? extends Throwable>, Boolean> getExceptionMap(Class<? extends Throwable>... args) {
+		Map<Class<? extends Throwable>, Boolean> map = new HashMap<Class<? extends Throwable>, Boolean>();
+		for (Class<? extends Throwable> arg : args) {
+			map.put(arg, true);
+		}
+		return map;
+	}
+	
 }

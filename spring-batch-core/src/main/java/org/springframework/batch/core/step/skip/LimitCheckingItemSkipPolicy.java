@@ -16,8 +16,8 @@
 package org.springframework.batch.core.step.skip;
 
 import java.io.FileNotFoundException;
-import java.util.Collection;
 import java.util.Collections;
+import java.util.Map;
 
 import org.springframework.batch.classify.BinaryExceptionClassifier;
 import org.springframework.batch.classify.Classifier;
@@ -40,81 +40,59 @@ import org.springframework.batch.item.file.FlatFileParseException;
  * Furthermore, it is also likely that you only want to skip certain exceptions.
  * {@link FlatFileParseException} is a good example of an exception you will
  * likely want to skip, but a {@link FileNotFoundException} should cause
- * immediate termination of the {@link Step}. Because it would be impossible for
- * a general purpose policy to determine all the types of exceptions that should
- * be skipped from those that shouldn't, two lists are passed in, with all
- * of the exceptions that are 'fatal' and 'skippable'. The two lists are not
- * enforced to be exclusive, they are prioritized instead - exceptions that are
- * fatal will never be skipped, regardless whether the exception can also be
- * classified as skippable.
+ * immediate termination of the {@link Step}. A {@link Classifier} is used to
+ * determine whether a particular exception is skippable or not.
  * </p>
  * 
  * @author Ben Hale
  * @author Lucas Ward
  * @author Robert Kasanicky
  * @author Dave Syer
+ * @author Dan Garrette
  */
 public class LimitCheckingItemSkipPolicy implements SkipPolicy {
 
 	private final int skipLimit;
 
-	private final Classifier<Throwable, Boolean> fatalExceptionClassifier;
-
 	private final Classifier<Throwable, Boolean> skippableExceptionClassifier;
 
 	/**
-	 * Convenience constructor that assumes all exception types are skippable
-	 * and none are fatal.
-	 * @param skipLimit the number of exceptions allowed to skip
+	 * Convenience constructor that assumes all exception types are fatal.
 	 */
-	public LimitCheckingItemSkipPolicy(int skipLimit) {
-		this(skipLimit, Collections.<Class<? extends Throwable>> singleton(Exception.class), Collections
-				.<Class<? extends Throwable>> emptyList());
+	public LimitCheckingItemSkipPolicy() {
+		this(0, Collections.<Class<? extends Throwable>, Boolean> emptyMap());
 	}
 
 	/**
-	 * 
 	 * @param skipLimit the number of skippable exceptions that are allowed to
 	 * be skipped
 	 * @param skippableExceptions exception classes that can be skipped
 	 * (non-critical)
-	 * @param fatalExceptions exception classes that should never be skipped
 	 */
-	public LimitCheckingItemSkipPolicy(int skipLimit, Collection<Class<? extends Throwable>> skippableExceptions,
-			Collection<Class<? extends Throwable>> fatalExceptions) {
-		this(skipLimit, new BinaryExceptionClassifier(skippableExceptions), new BinaryExceptionClassifier(
-				fatalExceptions));
+	public LimitCheckingItemSkipPolicy(int skipLimit, Map<Class<? extends Throwable>, Boolean> skippableExceptions) {
+		this(skipLimit, new BinaryExceptionClassifier(skippableExceptions));
 	}
 
 	/**
-	 * 
 	 * @param skipLimit the number of skippable exceptions that are allowed to
 	 * be skipped
 	 * @param skippableExceptionClassifier exception classifier for those that
 	 * can be skipped (non-critical)
-	 * @param fatalExceptionClassifier exception classifier for classes that
-	 * should never be skipped
 	 */
-	public LimitCheckingItemSkipPolicy(int skipLimit, Classifier<Throwable, Boolean> skippableExceptionClassifier,
-			Classifier<Throwable, Boolean> fatalExceptionClassifier) {
+	public LimitCheckingItemSkipPolicy(int skipLimit, Classifier<Throwable, Boolean> skippableExceptionClassifier) {
 		this.skipLimit = skipLimit;
 		this.skippableExceptionClassifier = skippableExceptionClassifier;
-		this.fatalExceptionClassifier = fatalExceptionClassifier;
 	}
 
 	/**
 	 * Given the provided exception and skip count, determine whether or not
 	 * processing should continue for the given exception. If the exception is
-	 * not within the list of 'skippable exceptions' or belongs to the list of
-	 * 'fatal exceptions', false will be returned. If the exception is within
-	 * the skippable list (and not in the fatal list), and {@link StepExecution}
+	 * not classified as skippable in the classifier, false will be returned. If
+	 * the exception is classified as skippable and {@link StepExecution}
 	 * skipCount is greater than the skipLimit, then a
 	 * {@link SkipLimitExceededException} will be thrown.
 	 */
 	public boolean shouldSkip(Throwable t, int skipCount) {
-		if (fatalExceptionClassifier.classify(t)) {
-			return false;
-		}
 		if (skippableExceptionClassifier.classify(t)) {
 			if (skipCount < skipLimit) {
 				return true;

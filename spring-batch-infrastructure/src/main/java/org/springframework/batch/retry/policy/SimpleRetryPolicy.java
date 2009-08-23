@@ -16,8 +16,7 @@
 
 package org.springframework.batch.retry.policy;
 
-import java.util.Collection;
-import java.util.HashSet;
+import java.util.Map;
 
 import org.springframework.batch.classify.BinaryExceptionClassifier;
 import org.springframework.batch.retry.RetryContext;
@@ -43,44 +42,26 @@ import org.springframework.batch.retry.context.RetryContextSupport;
  */
 public class SimpleRetryPolicy implements RetryPolicy {
 
-	/**
-	 * The default limit to the number of attempts for a new policy.
-	 */
-	public final static int DEFAULT_MAX_ATTEMPTS = 3;
-
 	private volatile int maxAttempts;
 
-	private BinaryExceptionClassifier retryableClassifier = new BinaryExceptionClassifier();
-
-	private BinaryExceptionClassifier fatalClassifier = new BinaryExceptionClassifier();
-
-	/**
-	 * Create a {@link SimpleRetryPolicy} with the default number of retry
-	 * attempts.
-	 */
-	public SimpleRetryPolicy() {
-		this(DEFAULT_MAX_ATTEMPTS);
-	}
+	private BinaryExceptionClassifier retryableClassifier = new BinaryExceptionClassifier(false);
 
 	/**
 	 * Create a {@link SimpleRetryPolicy} with the specified number of retry
-	 * attempts, and default exceptions to retry.
+	 * attempts.
 	 * 
-	 * @param maxAttempts number of allowed attempts (typically >= 1)
+	 * @param maxAttempts
+	 * @param retryableExceptions
 	 */
-	public SimpleRetryPolicy(int maxAttempts) {
+	public SimpleRetryPolicy(int maxAttempts, Map<Class<? extends Throwable>, Boolean> retryableExceptions) {
 		super();
-		Collection<Class<? extends Throwable>> classes;
-		classes = new HashSet<Class<? extends Throwable>>();
-		classes.add(Exception.class);
-		setRetryableExceptionClasses(classes);
-		classes = new HashSet<Class<? extends Throwable>>();
-		setFatalExceptionClasses(classes);
 		this.maxAttempts = maxAttempts;
+		this.retryableClassifier = new BinaryExceptionClassifier(retryableExceptions);
 	}
 
 	/**
 	 * Setter for retry attempts.
+	 * 
 	 * @param retryAttempts the number of attempts before a retry becomes
 	 * impossible.
 	 */
@@ -90,6 +71,7 @@ public class SimpleRetryPolicy implements RetryPolicy {
 
 	/**
 	 * Test for retryable operation based on the status.
+	 * 
 	 * @see org.springframework.batch.retry.RetryPolicy#canRetry(org.springframework.batch.retry.RetryContext)
 	 * 
 	 * @return true if the last exception was retryable and the number of
@@ -98,27 +80,6 @@ public class SimpleRetryPolicy implements RetryPolicy {
 	public boolean canRetry(RetryContext context) {
 		Throwable t = context.getLastThrowable();
 		return (t == null || retryForException(t)) && context.getRetryCount() < maxAttempts;
-	}
-
-	/**
-	 * Set the retryable exceptions. Any exception on the list, or subclasses
-	 * thereof, will be retryable. Others will be re-thrown without retry.
-	 * 
-	 * @param retryableExceptionClasses defaults to {@link Exception}.
-	 */
-	public final void setRetryableExceptionClasses(Collection<Class<? extends Throwable>> retryableExceptionClasses) {
-		retryableClassifier.setTypes(retryableExceptionClasses);
-	}
-
-	/**
-	 * Set the fatal exceptions. Any exception on the list, or subclasses
-	 * thereof, will be re-thrown without retry. This list takes precedence over
-	 * the retryable list.
-	 * 
-	 * @param fatalExceptionClasses defaults to {@link Exception}.
-	 */
-	public final void setFatalExceptionClasses(Collection<Class<? extends Throwable>> fatalExceptionClasses) {
-		fatalClassifier.setTypes(fatalExceptionClasses);
 	}
 
 	/**
@@ -142,6 +103,7 @@ public class SimpleRetryPolicy implements RetryPolicy {
 	 * Get a status object that can be used to track the current operation
 	 * according to this policy. Has to be aware of the latest exception and the
 	 * number of attempts.
+	 * 
 	 * @see org.springframework.batch.retry.RetryPolicy#open(RetryContext)
 	 */
 	public RetryContext open(RetryContext parent) {
@@ -162,6 +124,6 @@ public class SimpleRetryPolicy implements RetryPolicy {
 	 * retryable.
 	 */
 	private boolean retryForException(Throwable ex) {
-		return !fatalClassifier.classify(ex) && retryableClassifier.classify(ex);
+		return retryableClassifier.classify(ex);
 	}
 }

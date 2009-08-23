@@ -52,14 +52,14 @@ public class JobParser extends AbstractSingleBeanDefinitionParser {
 	 * elements are delegated to an {@link InlineStepParser}.
 	 * 
 	 * @see AbstractSingleBeanDefinitionParser#doParse(Element, ParserContext,
-	 *      BeanDefinitionBuilder)
+	 * BeanDefinitionBuilder)
 	 */
 	@SuppressWarnings("unchecked")
 	@Override
 	protected void doParse(Element element, ParserContext parserContext, BeanDefinitionBuilder builder) {
 
 		CoreNamespaceUtils.autoregisterBeansForNamespace(parserContext, parserContext.extractSource(element));
-		
+
 		String jobName = element.getAttribute("id");
 		builder.addConstructorArgValue(jobName);
 
@@ -110,8 +110,7 @@ public class JobParser extends AbstractSingleBeanDefinitionParser {
 			ManagedList listeners = new ManagedList();
 			listeners.setMergeEnabled(listenersElement.hasAttribute(MERGE_ATTR)
 					&& Boolean.valueOf(listenersElement.getAttribute(MERGE_ATTR)));
-			List<Element> listenerElements = (List<Element>) DomUtils.getChildElementsByTagName(listenersElement,
-					"listener");
+			List<Element> listenerElements = DomUtils.getChildElementsByTagName(listenersElement, "listener");
 			for (Element listenerElement : listenerElements) {
 				listeners.add(jobListenerParser.parse(listenerElement, parserContext));
 			}

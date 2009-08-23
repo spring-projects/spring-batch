@@ -21,8 +21,10 @@ import static org.junit.Assert.assertTrue;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -83,8 +85,7 @@ public class StepParserTests {
 		Map<String, StepParserStepFactoryBean> beans = ctx.getBeansOfType(StepParserStepFactoryBean.class);
 		String factoryName = (String) beans.keySet().toArray()[0];
 		@SuppressWarnings("unchecked")
-		StepParserStepFactoryBean<Object, Object> factory = (StepParserStepFactoryBean<Object, Object>) beans
-				.get(factoryName);
+		StepParserStepFactoryBean<Object, Object> factory = beans.get(factoryName);
 		TaskletStep bean = (TaskletStep) factory.getObject();
 		assertEquals("wrong start-limit:", 25, bean.getStartLimit());
 	}
@@ -420,11 +421,14 @@ public class StepParserTests {
 	public void testStepWithListsMerge() throws Exception {
 		ApplicationContext ctx = stepParserParentAttributeTestsCtx;
 
-		List<Class<? extends Exception>> skippable = Arrays.asList(SkippableRuntimeException.class,
-				SkippableException.class);
-		Collection<Class<? extends Exception>> fatal = Arrays.asList(FatalRuntimeException.class, FatalException.class);
-		Collection<Class<? extends Exception>> retryable = Arrays.asList(DeadlockLoserDataAccessException.class,
-				FatalException.class);
+		Map<Class<? extends Throwable>, Boolean> skippable = new HashMap<Class<? extends Throwable>, Boolean>();
+		skippable.put(SkippableRuntimeException.class, true);
+		skippable.put(SkippableException.class, true);
+		skippable.put(FatalRuntimeException.class, false);
+		skippable.put(FatalException.class, false);
+		Map<Class<? extends Throwable>, Boolean> retryable = new HashMap<Class<? extends Throwable>, Boolean>();
+		retryable.put(DeadlockLoserDataAccessException.class, true);
+		retryable.put(FatalException.class, true);
 		List<Class<? extends ItemStream>> streams = Arrays.asList(CompositeItemStream.class, TestReader.class);
 		List<Class<? extends RetryListener>> retryListeners = Arrays.asList(RetryListenerSupport.class,
 				DummyRetryListener.class);
@@ -435,17 +439,15 @@ public class StepParserTests {
 
 		StepParserStepFactoryBean<?, ?> fb = (StepParserStepFactoryBean<?, ?>) ctx.getBean("&stepWithListsMerge");
 
-		Collection<Class<? extends Throwable>> skippableFound = getExceptionList(fb, "skippableExceptionClasses");
-		Collection<Class<? extends Throwable>> fatalFound = getExceptionList(fb, "fatalExceptionClasses");
-		Collection<Class<? extends Throwable>> retryableFound = getExceptionList(fb, "retryableExceptionClasses");
+		Map<Class<? extends Throwable>, Boolean> skippableFound = getExceptionMap(fb, "skippableExceptionClasses");
+		Map<Class<? extends Throwable>, Boolean> retryableFound = getExceptionMap(fb, "retryableExceptionClasses");
 		ItemStream[] streamsFound = (ItemStream[]) ReflectionTestUtils.getField(fb, "streams");
 		RetryListener[] retryListenersFound = (RetryListener[]) ReflectionTestUtils.getField(fb, "retryListeners");
 		StepListener[] stepListenersFound = (StepListener[]) ReflectionTestUtils.getField(fb, "listeners");
 		Collection<Class<? extends Throwable>> noRollbackFound = getExceptionList(fb, "noRollbackExceptionClasses");
 
-		assertSameCollections(skippable, skippableFound);
-		assertSameCollections(fatal, fatalFound);
-		assertSameCollections(retryable, retryableFound);
+		assertSameMaps(skippable, skippableFound);
+		assertSameMaps(retryable, retryableFound);
 		assertSameCollections(streams, toClassCollection(streamsFound));
 		assertSameCollections(retryListeners, toClassCollection(retryListenersFound));
 		assertSameCollections(stepListeners, toClassCollection(stepListenersFound));
@@ -457,9 +459,11 @@ public class StepParserTests {
 	public void testStepWithListsNoMerge() throws Exception {
 		ApplicationContext ctx = stepParserParentAttributeTestsCtx;
 
-		List<Class<SkippableException>> skippable = Arrays.asList(SkippableException.class);
-		List<Class<FatalException>> fatal = Arrays.asList(FatalException.class);
-		List<Class<FatalException>> retryable = Arrays.asList(FatalException.class);
+		Map<Class<? extends Throwable>, Boolean> skippable = new HashMap<Class<? extends Throwable>, Boolean>();
+		skippable.put(SkippableException.class, true);
+		skippable.put(FatalException.class, false);
+		Map<Class<? extends Throwable>, Boolean> retryable = new HashMap<Class<? extends Throwable>, Boolean>();
+		retryable.put(FatalException.class, true);
 		List<Class<CompositeItemStream>> streams = Arrays.asList(CompositeItemStream.class);
 		List<Class<DummyRetryListener>> retryListeners = Arrays.asList(DummyRetryListener.class);
 		List<Class<CompositeStepExecutionListener>> stepListeners = Arrays.asList(CompositeStepExecutionListener.class);
@@ -467,17 +471,15 @@ public class StepParserTests {
 
 		StepParserStepFactoryBean<?, ?> fb = (StepParserStepFactoryBean<?, ?>) ctx.getBean("&stepWithListsNoMerge");
 
-		Collection<Class<? extends Throwable>> skippableFound = getExceptionList(fb, "skippableExceptionClasses");
-		Collection<Class<? extends Throwable>> fatalFound = getExceptionList(fb, "fatalExceptionClasses");
-		Collection<Class<? extends Throwable>> retryableFound = getExceptionList(fb, "retryableExceptionClasses");
+		Map<Class<? extends Throwable>, Boolean> skippableFound = getExceptionMap(fb, "skippableExceptionClasses");
+		Map<Class<? extends Throwable>, Boolean> retryableFound = getExceptionMap(fb, "retryableExceptionClasses");
 		ItemStream[] streamsFound = (ItemStream[]) ReflectionTestUtils.getField(fb, "streams");
 		RetryListener[] retryListenersFound = (RetryListener[]) ReflectionTestUtils.getField(fb, "retryListeners");
 		StepListener[] stepListenersFound = (StepListener[]) ReflectionTestUtils.getField(fb, "listeners");
 		Collection<Class<? extends Throwable>> noRollbackFound = getExceptionList(fb, "noRollbackExceptionClasses");
 
-		assertSameCollections(skippable, skippableFound);
-		assertSameCollections(fatal, fatalFound);
-		assertSameCollections(retryable, retryableFound);
+		assertSameMaps(skippable, skippableFound);
+		assertSameMaps(retryable, retryableFound);
 		assertSameCollections(streams, toClassCollection(streamsFound));
 		assertSameCollections(retryListeners, toClassCollection(retryListenersFound));
 		assertSameCollections(stepListeners, toClassCollection(stepListenersFound));
@@ -491,15 +493,11 @@ public class StepParserTests {
 		StepParserStepFactoryBean<?, ?> fb = (StepParserStepFactoryBean<?, ?>) ctx
 				.getBean("&stepWithListsOverrideWithEmpty");
 
-		assertEquals(0, getExceptionList(fb, "skippableExceptionClasses").size());
-		assertEquals(0, getExceptionList(fb, "fatalExceptionClasses").size());
-		assertEquals(0, getExceptionList(fb, "retryableExceptionClasses").size());
-		// TODO BATCH-1357:
-		// assertEquals(0, ((ItemStream[]) ReflectionTestUtils.getField(fb, "streams")).length);
-		// TODO BATCH-1357:
-		// assertEquals(0, ((RetryListener[]) ReflectionTestUtils.getField(fb, "retryListeners")).length);
-		// TODO BATCH-1357:
-		// assertEquals(0, ((StepListener[]) ReflectionTestUtils.getField(fb, "listeners")).length);
+		assertEquals(0, getExceptionMap(fb, "skippableExceptionClasses").size());
+		assertEquals(0, getExceptionMap(fb, "retryableExceptionClasses").size());
+		assertEquals(0, ((ItemStream[]) ReflectionTestUtils.getField(fb, "streams")).length);
+		assertEquals(0, ((RetryListener[]) ReflectionTestUtils.getField(fb, "retryListeners")).length);
+		assertEquals(0, ((StepListener[]) ReflectionTestUtils.getField(fb, "listeners")).length);
 		assertEquals(0, getExceptionList(fb, "noRollbackExceptionClasses").size());
 	}
 
@@ -509,9 +507,23 @@ public class StepParserTests {
 		return (Collection<Class<? extends Throwable>>) ReflectionTestUtils.getField(fb, propertyName);
 	}
 
+	@SuppressWarnings("unchecked")
+	private Map<Class<? extends Throwable>, Boolean> getExceptionMap(StepParserStepFactoryBean<?, ?> fb,
+			String propertyName) {
+		return (Map<Class<? extends Throwable>, Boolean>) ReflectionTestUtils.getField(fb, propertyName);
+	}
+
 	private <T, S extends T> void assertSameCollections(Collection<S> expected, Collection<T> actual) {
 		assertEquals(expected.size(), actual.size());
 		assertTrue(expected.containsAll(actual));
+	}
+
+	private <T, S> void assertSameMaps(Map<T, S> expected, Map<T, S> actual) {
+		assertEquals(expected.size(), actual.size());
+		for (Entry<T, S> e : expected.entrySet()) {
+			assertTrue(actual.containsKey(e.getKey()));
+			assertEquals(e.getValue(), actual.get(e.getKey()));
+		}
 	}
 
 	private <T> Collection<Class<? extends T>> toClassCollection(T[] in) throws Exception {

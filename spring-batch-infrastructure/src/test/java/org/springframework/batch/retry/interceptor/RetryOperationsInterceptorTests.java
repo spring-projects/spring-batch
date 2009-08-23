@@ -19,6 +19,7 @@ package org.springframework.batch.retry.interceptor;
 import java.lang.reflect.AccessibleObject;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import junit.framework.TestCase;
@@ -28,7 +29,6 @@ import org.aopalliance.intercept.MethodInvocation;
 import org.springframework.aop.framework.Advised;
 import org.springframework.aop.framework.ProxyFactory;
 import org.springframework.aop.target.SingletonTargetSource;
-import org.springframework.batch.retry.interceptor.RetryOperationsInterceptor;
 import org.springframework.batch.retry.policy.NeverRetryPolicy;
 import org.springframework.batch.retry.policy.SimpleRetryPolicy;
 import org.springframework.batch.retry.support.RetryTemplate;
@@ -44,7 +44,7 @@ public class RetryOperationsInterceptorTests extends TestCase {
 	private Service service;
 
 	private ServiceImpl target;
-	
+
 	private static int count;
 
 	private static int transactionCount;
@@ -53,8 +53,7 @@ public class RetryOperationsInterceptorTests extends TestCase {
 		super.setUp();
 		interceptor = new RetryOperationsInterceptor();
 		target = new ServiceImpl();
-		service = (Service) ProxyFactory.getProxy(Service.class,
-				new SingletonTargetSource(target));
+		service = (Service) ProxyFactory.getProxy(Service.class, new SingletonTargetSource(target));
 		count = 0;
 		transactionCount = 0;
 	}
@@ -75,7 +74,8 @@ public class RetryOperationsInterceptorTests extends TestCase {
 			}
 		});
 		RetryTemplate template = new RetryTemplate();
-		template.setRetryPolicy(new SimpleRetryPolicy(2));
+		template.setRetryPolicy(new SimpleRetryPolicy(2, Collections
+				.<Class<? extends Throwable>, Boolean> singletonMap(Exception.class, true)));
 		interceptor.setRetryOperations(template);
 		service.service();
 		assertEquals(2, count);
@@ -90,20 +90,20 @@ public class RetryOperationsInterceptorTests extends TestCase {
 		try {
 			service.service();
 			fail("Expected Exception.");
-		} catch (Exception e) {
+		}
+		catch (Exception e) {
 			assertTrue(e.getMessage().startsWith("Not enough calls"));
 		}
 		assertEquals(1, count);
 	}
 
 	public void testOutsideTransaction() throws Exception {
-		ClassPathXmlApplicationContext context = new ClassPathXmlApplicationContext(
-				ClassUtils.addResourcePathToPackagePath(getClass(),
-						"retry-transaction-test.xml"));
+		ClassPathXmlApplicationContext context = new ClassPathXmlApplicationContext(ClassUtils
+				.addResourcePathToPackagePath(getClass(), "retry-transaction-test.xml"));
 		Object object = context.getBean("bean");
 		assertNotNull(object);
 		assertTrue(object instanceof Service);
-		Service bean = (Service) object ;
+		Service bean = (Service) object;
 		bean.doTansactional();
 		assertEquals(2, count);
 		// Expect 2 separate transactions...
@@ -134,20 +134,21 @@ public class RetryOperationsInterceptorTests extends TestCase {
 				}
 			});
 			fail("IllegalStateException expected");
-		} catch (IllegalStateException e) {
-			assertTrue("Exception message should contain MethodInvocation: "
-					+ e.getMessage(), e.getMessage()
-					.indexOf("MethodInvocation") >= 0);
+		}
+		catch (IllegalStateException e) {
+			assertTrue("Exception message should contain MethodInvocation: " + e.getMessage(), e.getMessage().indexOf(
+					"MethodInvocation") >= 0);
 		}
 	}
 
 	public static interface Service {
 		void service() throws Exception;
+
 		void doTansactional() throws Exception;
 	}
 
 	public static class ServiceImpl implements Service {
-		
+
 		private boolean enteredTransaction = false;
 
 		public void service() throws Exception {
@@ -156,6 +157,7 @@ public class RetryOperationsInterceptorTests extends TestCase {
 				throw new Exception("Not enough calls: " + count);
 			}
 		}
+
 		public void doTansactional() throws Exception {
 			if (TransactionSynchronizationManager.isActualTransactionActive() && !enteredTransaction) {
 				transactionCount++;
@@ -164,10 +166,10 @@ public class RetryOperationsInterceptorTests extends TestCase {
 						enteredTransaction = false;
 					}
 				});
-				enteredTransaction  = true;
+				enteredTransaction = true;
 			}
 			count++;
-			if (count==1) {
+			if (count == 1) {
 				throw new RuntimeException("Rollback please");
 			}
 		}

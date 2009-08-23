@@ -10,8 +10,12 @@
 		<step id="s1" parent="step1"/>
 		<listeners>
 			<listener after-job-method="afterJob" ref="testListener"/>
-			<listener after-job-method="afterJob" class="org.springframework.batch.core.configuration.xml.TestJobListener"/>
-			<listener class="org.springframework.batch.core.configuration.xml.JobExecutionListenerParserTests$TestComponent"/>
+			<listener after-job-method="afterJob">
+				<beans:bean class="org.springframework.batch.core.configuration.xml.TestJobListener"/>
+			</listener>
+			<listener>
+				<beans:bean class="org.springframework.batch.core.configuration.xml.JobExecutionListenerParserTests$TestComponent"/>
+			</listener>
 		</listeners>
 	</job>
 

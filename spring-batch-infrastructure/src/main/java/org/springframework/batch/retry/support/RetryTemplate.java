@@ -18,6 +18,7 @@ package org.springframework.batch.retry.support;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 import org.apache.commons.logging.Log;
@@ -73,7 +74,8 @@ public class RetryTemplate implements RetryOperations {
 
 	private volatile BackOffPolicy backOffPolicy = new NoBackOffPolicy();
 
-	private volatile RetryPolicy retryPolicy = new SimpleRetryPolicy();
+	private volatile RetryPolicy retryPolicy = new SimpleRetryPolicy(3, Collections
+			.<Class<? extends Throwable>, Boolean> singletonMap(Exception.class, true));
 
 	private volatile RetryListener[] listeners = new RetryListener[0];
 
@@ -81,6 +83,7 @@ public class RetryTemplate implements RetryOperations {
 
 	/**
 	 * Public setter for the {@link RetryContextCache}.
+	 * 
 	 * @param retryContextCache the {@link RetryContextCache} to set.
 	 */
 	public void setRetryContextCache(RetryContextCache retryContextCache) {
@@ -91,6 +94,7 @@ public class RetryTemplate implements RetryOperations {
 	 * Setter for listeners. The listeners are executed before and after a retry
 	 * block (i.e. before and after all the attempts), and on an error (every
 	 * attempt).
+	 * 
 	 * @param listeners
 	 * @see RetryListener
 	 */
@@ -100,6 +104,7 @@ public class RetryTemplate implements RetryOperations {
 
 	/**
 	 * Register an additional listener.
+	 * 
 	 * @param listener
 	 * @see #setListeners(RetryListener[])
 	 */
@@ -111,6 +116,7 @@ public class RetryTemplate implements RetryOperations {
 
 	/**
 	 * Setter for {@link BackOffPolicy}.
+	 * 
 	 * @param backOffPolicy
 	 */
 	public void setBackOffPolicy(BackOffPolicy backOffPolicy) {
@@ -195,7 +201,7 @@ public class RetryTemplate implements RetryOperations {
 
 		// Allow the retry policy to initialise itself...
 		RetryContext context = open(retryPolicy, state);
-		logger.debug("RetryContext retrieved: "+context);
+		logger.debug("RetryContext retrieved: " + context);
 
 		// Make sure the context is available globally for clients who need
 		// it...

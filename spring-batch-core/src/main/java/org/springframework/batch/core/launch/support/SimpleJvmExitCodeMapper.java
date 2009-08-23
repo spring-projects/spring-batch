@@ -72,7 +72,7 @@ public class SimpleJvmExitCodeMapper implements ExitCodeMapper {
 		Integer statusCode = null;
 
 		try {
-			statusCode = (Integer) mapping.get(exitCode);
+			statusCode = mapping.get(exitCode);
 		}
 		catch (RuntimeException ex) {
 			// We still need to return an exit code, even if there is an issue

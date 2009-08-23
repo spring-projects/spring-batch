@@ -143,7 +143,7 @@ public class DefaultJobParametersConverterTests extends TestCase {
 
 		JobParameters props = factory.getJobParameters(StringUtils.splitArrayElementsIntoProperties(args, "="));
 		assertNotNull(props);
-		assertEquals((double) 1.0, props.getDouble("value"), Double.MIN_VALUE);
+		assertEquals(1.0, props.getDouble("value"), Double.MIN_VALUE);
 	}
 	public void testGetProperties() throws Exception {
 

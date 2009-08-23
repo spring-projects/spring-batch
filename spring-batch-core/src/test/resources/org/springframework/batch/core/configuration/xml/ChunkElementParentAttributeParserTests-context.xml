@@ -11,19 +11,19 @@
 			<tasklet>
 				<chunk reader="reader" writer="writer" commit-interval="5" skip-limit="5" retry-limit="3">
 					<skippable-exception-classes merge="true">
-						java.lang.NullPointerException
+						<include class="java.lang.NullPointerException"/>
+						<exclude class="org.springframework.dao.CannotAcquireLockException"/>
 					</skippable-exception-classes>
-		        	<fatal-exception-classes merge="true">
-		        		org.springframework.dao.CannotAcquireLockException
-		        	</fatal-exception-classes>
 					<retryable-exception-classes>
-						org.springframework.dao.DeadlockLoserDataAccessException
+						<include class="org.springframework.dao.DeadlockLoserDataAccessException"/>
 					</retryable-exception-classes>
 		        	<streams merge="true">
 		        		<stream ref="stream1"/>
 		        	</streams>
 					<retry-listeners merge="true">
-						<listener class="org.springframework.batch.core.configuration.xml.DummyRetryListener"/>
+						<listener>
+							<beans:bean class="org.springframework.batch.core.configuration.xml.DummyRetryListener"/>
+						</listener>
 					</retry-listeners>
 				</chunk>
 			</tasklet>
@@ -33,19 +33,19 @@
 			<tasklet>
 				<chunk reader="reader" writer="writer" commit-interval="5" skip-limit="5" retry-limit="3">
 					<skippable-exception-classes>
-						java.lang.NullPointerException
+						<include class="java.lang.NullPointerException"/>
+						<exclude class="org.springframework.dao.CannotAcquireLockException"/>
 					</skippable-exception-classes>
-		        	<fatal-exception-classes>
-		        		org.springframework.dao.CannotAcquireLockException
-		        	</fatal-exception-classes>
 					<retryable-exception-classes>
-						org.springframework.dao.DeadlockLoserDataAccessException
+						<include class="org.springframework.dao.DeadlockLoserDataAccessException"/>
 					</retryable-exception-classes>
 		        	<streams>
 		        		<stream ref="stream1"/>
 		        	</streams>
 					<retry-listeners>
-						<listener class="org.springframework.batch.core.configuration.xml.DummyRetryListener"/>
+						<listener>
+							<beans:bean class="org.springframework.batch.core.configuration.xml.DummyRetryListener"/>
+						</listener>
 					</retry-listeners>
 				</chunk>
 			</tasklet>
@@ -56,16 +56,16 @@
 		<tasklet>
 				<chunk>
 					<skippable-exception-classes>
-						java.lang.ArithmeticException
+						<include class="java.lang.ArithmeticException"/>
+						<exclude class="org.springframework.dao.DeadlockLoserDataAccessException"/>
 					</skippable-exception-classes>
-					<fatal-exception-classes>
-						org.springframework.dao.DeadlockLoserDataAccessException
-					</fatal-exception-classes>
 					<streams>
 						<stream ref="stream2"/>
 					</streams>
 					<retry-listeners>
-						<listener class="org.springframework.batch.retry.listener.RetryListenerSupport"/>
+						<listener>
+							<beans:bean class="org.springframework.batch.retry.listener.RetryListenerSupport"/>
+						</listener>
 					</retry-listeners>
 				</chunk>
 		</tasklet>

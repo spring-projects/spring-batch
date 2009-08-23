@@ -78,7 +78,7 @@ public class MapJobRegistry implements ListableJobRegistry {
 			if (!map.containsKey(name)) {
 				throw new NoSuchJobException("No job configuration with the name [" + name + "] was registered");
 			}
-			return (Job) ((JobFactory) map.get(name)).createJob();
+			return map.get(name).createJob();
 		}
 	}
 

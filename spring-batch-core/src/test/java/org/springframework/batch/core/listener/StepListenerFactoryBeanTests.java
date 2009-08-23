@@ -272,8 +272,7 @@ public class StepListenerFactoryBeanTests {
 	public void testNonListener() throws Exception {
 		Object delegate = new Object();
 		factoryBean.setDelegate(delegate);
-		StepListener listener = (StepListener) factoryBean.getObject();
-		assertTrue(listener instanceof StepListener);
+		assertTrue(factoryBean.getObject() instanceof StepListener);
 	}
 
 	@Test

@@ -229,7 +229,7 @@ public class JdbcJobExecutionDao extends AbstractJdbcBatchMetadataDao implements
 			return null;
 		}
 		else {
-			return (JobExecution) executions.get(0);
+			return executions.get(0);
 		}
 	}
 

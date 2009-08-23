@@ -5,6 +5,7 @@ import static org.easymock.EasyMock.expectLastCall;
 import static org.easymock.EasyMock.replay;
 import static org.easymock.EasyMock.verify;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
@@ -21,37 +22,35 @@ public class CompositeItemWriterTests extends TestCase {
 
 	// object under test
 	private CompositeItemWriter<Object> itemProcessor = new CompositeItemWriter<Object>();
-	
+
 	/**
-	 * Regular usage scenario.
-	 * All injected processors should be called.
+	 * Regular usage scenario. All injected processors should be called.
 	 */
-	
+
 	public void testProcess() throws Exception {
-		
+
 		final int NUMBER_OF_WRITERS = 10;
 		List<Object> data = Collections.singletonList(new Object());
-		
-		@SuppressWarnings("unchecked")
-		ItemWriter<Object>[] writers = new ItemWriter[NUMBER_OF_WRITERS];
-		
+
+		List<ItemWriter<? super Object>> writers = new ArrayList<ItemWriter<? super Object>>();
+
 		for (int i = 0; i < NUMBER_OF_WRITERS; i++) {
 			@SuppressWarnings("unchecked")
 			ItemWriter<Object> writer = createStrictMock(ItemWriter.class);
-			
+
 			writer.write(data);
 			expectLastCall().once();
 			replay(writer);
-			
-			writers[i] = writer;
+
+			writers.add(writer);
 		}
-		
+
 		itemProcessor.setDelegates(writers);
 		itemProcessor.write(data);
-		
+
 		for (ItemWriter<Object> writer : writers) {
 			verify(writer);
 		}
 	}
-	
+
 }

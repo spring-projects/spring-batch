@@ -20,8 +20,8 @@ import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
 import java.io.FileNotFoundException;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -41,10 +41,9 @@ public class LimitCheckingItemSkipPolicyTests {
 
 	@Before
 	public void setUp() throws Exception {
-		List<Class<? extends Throwable>> skippableExceptions = new ArrayList<Class<? extends Throwable>>();
-		skippableExceptions.add(FlatFileParseException.class);
-		List<Class<? extends Throwable>> fatalExceptions = new ArrayList<Class<? extends Throwable>>();
-		failurePolicy = new LimitCheckingItemSkipPolicy(1, skippableExceptions, fatalExceptions);
+		Map<Class<? extends Throwable>, Boolean> skippableExceptions = new HashMap<Class<? extends Throwable>, Boolean>();
+		skippableExceptions.put(FlatFileParseException.class, true);
+		failurePolicy = new LimitCheckingItemSkipPolicy(1, skippableExceptions);
 	}
 
 	@Test
@@ -68,11 +67,10 @@ public class LimitCheckingItemSkipPolicyTests {
 	}
 
 	private LimitCheckingItemSkipPolicy getSkippableSubsetSkipPolicy() {
-		List<Class<? extends Throwable>> skippableExceptions = new ArrayList<Class<? extends Throwable>>();
-		skippableExceptions.add(WriteFailedException.class);
-		List<Class<? extends Throwable>> fatalExceptions = new ArrayList<Class<? extends Throwable>>();
-		fatalExceptions.add(ItemWriterException.class);
-		return new LimitCheckingItemSkipPolicy(1, skippableExceptions, fatalExceptions);
+		Map<Class<? extends Throwable>, Boolean> skippableExceptions = new HashMap<Class<? extends Throwable>, Boolean>();
+		skippableExceptions.put(WriteFailedException.class, true);
+		skippableExceptions.put(ItemWriterException.class, false);
+		return new LimitCheckingItemSkipPolicy(1, skippableExceptions);
 	}
 
 	/**
@@ -88,11 +86,11 @@ public class LimitCheckingItemSkipPolicyTests {
 	/**
 	 * condition: skippable < fatal; exception is skippable
 	 * 
-	 * expected: false; fatal overrides skippable
+	 * expected: true
 	 */
 	@Test
 	public void testSkippableSubset_skippable() {
-		assertFalse(getSkippableSubsetSkipPolicy().shouldSkip(new WriteFailedException(""), 0));
+		assertTrue(getSkippableSubsetSkipPolicy().shouldSkip(new WriteFailedException(""), 0));
 	}
 
 	/**
@@ -106,11 +104,10 @@ public class LimitCheckingItemSkipPolicyTests {
 	}
 
 	private LimitCheckingItemSkipPolicy getFatalSubsetSkipPolicy() {
-		List<Class<? extends Throwable>> skippableExceptions = new ArrayList<Class<? extends Throwable>>();
-		skippableExceptions.add(ItemWriterException.class);
-		List<Class<? extends Throwable>> fatalExceptions = new ArrayList<Class<? extends Throwable>>();
-		fatalExceptions.add(WriteFailedException.class);
-		return new LimitCheckingItemSkipPolicy(1, skippableExceptions, fatalExceptions);
+		Map<Class<? extends Throwable>, Boolean> skippableExceptions = new HashMap<Class<? extends Throwable>, Boolean>();
+		skippableExceptions.put(WriteFailedException.class, false);
+		skippableExceptions.put(ItemWriterException.class, true);
+		return new LimitCheckingItemSkipPolicy(1, skippableExceptions);
 	}
 
 	/**

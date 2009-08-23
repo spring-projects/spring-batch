@@ -85,7 +85,9 @@
 		<tasklet>
 			<transaction-attributes timeout="10"/>
 			<listeners>
-				<listener class="org.springframework.batch.core.listener.StepExecutionListenerSupport" />
+				<listener>
+					<beans:bean class="org.springframework.batch.core.listener.StepExecutionListenerSupport" />
+				</listener>
 			</listeners>
 		</tasklet>
 	</step>
@@ -149,26 +151,28 @@
 		<tasklet>
 			<chunk>
 				<skippable-exception-classes>
-					org.springframework.batch.core.step.item.SkippableRuntimeException
+					<include class="org.springframework.batch.core.step.item.SkippableRuntimeException"/>
+					<exclude class="org.springframework.batch.core.step.item.FatalRuntimeException"/>
 				</skippable-exception-classes>
-				<fatal-exception-classes>
-					org.springframework.batch.core.step.item.FatalRuntimeException
-				</fatal-exception-classes>
 				<retryable-exception-classes>
-					org.springframework.dao.DeadlockLoserDataAccessException
+					<include class="org.springframework.dao.DeadlockLoserDataAccessException"/>
 				</retryable-exception-classes>
 				<streams>
 					<stream ref="stream1"/>
 				</streams>
 				<retry-listeners>
-					<listener class="org.springframework.batch.retry.listener.RetryListenerSupport"/>
+					<listener>
+						<beans:bean class="org.springframework.batch.retry.listener.RetryListenerSupport"/>
+					</listener>
 				</retry-listeners>
 			</chunk>
 			<listeners>
-				<listener class="org.springframework.batch.core.listener.StepExecutionListenerSupport"/>
+				<listener>
+					<beans:bean class="org.springframework.batch.core.listener.StepExecutionListenerSupport"/>
+				</listener>
 			</listeners>
 			<no-rollback-exception-classes>
-				org.springframework.batch.core.step.item.FatalRuntimeException
+				<include class="org.springframework.batch.core.step.item.FatalRuntimeException"/>
 			</no-rollback-exception-classes>
 		</tasklet>
 	</step>
@@ -177,26 +181,28 @@
 		<tasklet>
 			<chunk reader="reader" writer="writer" commit-interval="10">
 				<skippable-exception-classes merge="true">
-					org.springframework.batch.core.step.item.SkippableException
+					<include class="org.springframework.batch.core.step.item.SkippableException"/>
+					<exclude class="org.springframework.batch.core.step.item.FatalException"/>
 				</skippable-exception-classes>
-				<fatal-exception-classes merge="true">
-					org.springframework.batch.core.step.item.FatalException
-				</fatal-exception-classes>
 				<retryable-exception-classes merge="true">
-					org.springframework.batch.core.step.item.FatalException
+					<include class="org.springframework.batch.core.step.item.FatalException"/>
 				</retryable-exception-classes>
 				<streams merge="true">
 					<stream ref="stream2"/>
 				</streams>
 				<retry-listeners merge="true">
-					<listener class="org.springframework.batch.core.configuration.xml.DummyRetryListener"/>
+					<listener>
+						<beans:bean class="org.springframework.batch.core.configuration.xml.DummyRetryListener"/>
+					</listener>
 				</retry-listeners>
 			</chunk>
 			<listeners merge="true">
-				<listener class="org.springframework.batch.core.listener.CompositeStepExecutionListener"/>
+				<listener>
+					<beans:bean class="org.springframework.batch.core.listener.CompositeStepExecutionListener"/>
+				</listener>
 			</listeners>
 			<no-rollback-exception-classes merge="true">
-				org.springframework.batch.core.step.item.SkippableRuntimeException
+				<include class="org.springframework.batch.core.step.item.SkippableRuntimeException"/>
 			</no-rollback-exception-classes>
 		</tasklet>
 	</step>
@@ -205,26 +211,28 @@
 		<tasklet>
 			<chunk reader="reader" writer="writer" commit-interval="10">
 				<skippable-exception-classes>
-					org.springframework.batch.core.step.item.SkippableException
+					<include class="org.springframework.batch.core.step.item.SkippableException"/>
+					<exclude class="org.springframework.batch.core.step.item.FatalException"/>
 				</skippable-exception-classes>
-				<fatal-exception-classes>
-					org.springframework.batch.core.step.item.FatalException
-				</fatal-exception-classes>
 				<retryable-exception-classes>
-					org.springframework.batch.core.step.item.FatalException
+					<include class="org.springframework.batch.core.step.item.FatalException"/>
 				</retryable-exception-classes>
 				<streams>
 					<stream ref="stream2"/>
 				</streams>
 				<retry-listeners>
-					<listener class="org.springframework.batch.core.configuration.xml.DummyRetryListener"/>
+					<listener>
+						<beans:bean class="org.springframework.batch.core.configuration.xml.DummyRetryListener"/>
+					</listener>
 				</retry-listeners>
 			</chunk>
 			<listeners>
-				<listener class="org.springframework.batch.core.listener.CompositeStepExecutionListener"/>
+				<listener>
+					<beans:bean class="org.springframework.batch.core.listener.CompositeStepExecutionListener"/>
+				</listener>
 			</listeners>
 			<no-rollback-exception-classes>
-				org.springframework.batch.core.step.item.SkippableRuntimeException
+				<include class="org.springframework.batch.core.step.item.SkippableRuntimeException"/>
 			</no-rollback-exception-classes>
 		</tasklet>
 	</step>
@@ -233,12 +241,11 @@
 		<tasklet>
 			<chunk reader="reader" writer="writer" commit-interval="10">
 				<skippable-exception-classes/>
-				<fatal-exception-classes/>
 				<retryable-exception-classes/>
-				<!--TODO BATCH-1357: <streams/>-->
-				<!--TODO BATCH-1357: <retry-listeners/>-->
+				<streams/>
+				<retry-listeners/>
 			</chunk>
-			<!--TODO BATCH-1357: <listeners/>-->
+			<listeners/>
 			<no-rollback-exception-classes/>
 		</tasklet>
 	</step>

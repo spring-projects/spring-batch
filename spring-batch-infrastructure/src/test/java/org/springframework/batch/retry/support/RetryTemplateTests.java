@@ -55,7 +55,8 @@ public class RetryTemplateTests {
 			MockRetryCallback callback = new MockRetryCallback();
 			callback.setAttemptsBeforeSuccess(x);
 			RetryTemplate retryTemplate = new RetryTemplate();
-			retryTemplate.setRetryPolicy(new SimpleRetryPolicy(x));
+			retryTemplate.setRetryPolicy(new SimpleRetryPolicy(x, Collections
+					.<Class<? extends Throwable>, Boolean> singletonMap(Exception.class, true)));
 			retryTemplate.execute(callback);
 			assertEquals(x, callback.attempts);
 		}
@@ -66,7 +67,8 @@ public class RetryTemplateTests {
 		MockRetryCallback callback = new MockRetryCallback();
 		callback.setAttemptsBeforeSuccess(3);
 		RetryTemplate retryTemplate = new RetryTemplate();
-		retryTemplate.setRetryPolicy(new SimpleRetryPolicy(2));
+		retryTemplate.setRetryPolicy(new SimpleRetryPolicy(2, Collections
+				.<Class<? extends Throwable>, Boolean> singletonMap(Exception.class, true)));
 		final Object value = new Object();
 		Object result = retryTemplate.execute(callback, new RecoveryCallback<Object>() {
 			public Object recover(RetryContext context) throws Exception {
@@ -94,7 +96,8 @@ public class RetryTemplateTests {
 		callback.setAttemptsBeforeSuccess(Integer.MAX_VALUE);
 		RetryTemplate retryTemplate = new RetryTemplate();
 		int retryAttempts = 2;
-		retryTemplate.setRetryPolicy(new SimpleRetryPolicy(retryAttempts));
+		retryTemplate.setRetryPolicy(new SimpleRetryPolicy(retryAttempts, Collections
+				.<Class<? extends Throwable>, Boolean> singletonMap(Exception.class, true)));
 		try {
 			retryTemplate.execute(callback);
 			fail("Expected IllegalArgumentException");
@@ -115,7 +118,8 @@ public class RetryTemplateTests {
 		callback.setExceptionToThrow(new IllegalArgumentException());
 
 		RetryTemplate retryTemplate = new RetryTemplate();
-		retryTemplate.setRetryPolicy(new SimpleRetryPolicy(attempts));
+		retryTemplate.setRetryPolicy(new SimpleRetryPolicy(attempts, Collections
+				.<Class<? extends Throwable>, Boolean> singletonMap(Exception.class, true)));
 		retryTemplate.execute(callback);
 		assertEquals(attempts, callback.attempts);
 	}
@@ -128,7 +132,8 @@ public class RetryTemplateTests {
 		callback.setExceptionToThrow(new IllegalArgumentException());
 
 		RetryTemplate retryTemplate = new RetryTemplate();
-		retryTemplate.setRetryPolicy(new SimpleRetryPolicy(attempts));
+		retryTemplate.setRetryPolicy(new SimpleRetryPolicy(attempts, Collections
+				.<Class<? extends Throwable>, Boolean> singletonMap(Exception.class, true)));
 		BinaryExceptionClassifier classifier = new BinaryExceptionClassifier(Collections
 				.<Class<? extends Throwable>> singleton(IllegalArgumentException.class), false);
 		retryTemplate.execute(callback, new DefaultRetryState("foo", classifier));
@@ -138,9 +143,9 @@ public class RetryTemplateTests {
 	@Test
 	public void testSetExceptions() throws Exception {
 		RetryTemplate template = new RetryTemplate();
-		SimpleRetryPolicy policy = new SimpleRetryPolicy();
+		SimpleRetryPolicy policy = new SimpleRetryPolicy(3, Collections
+				.<Class<? extends Throwable>, Boolean> singletonMap(RuntimeException.class, true));
 		template.setRetryPolicy(policy);
-		policy.setRetryableExceptionClasses(Collections.<Class<? extends Throwable>> singleton(RuntimeException.class));
 
 		int attempts = 3;
 
@@ -168,7 +173,8 @@ public class RetryTemplateTests {
 			callback.setAttemptsBeforeSuccess(x);
 			RetryTemplate retryTemplate = new RetryTemplate();
 			retryTemplate.setBackOffPolicy(backOff);
-			retryTemplate.setRetryPolicy(new SimpleRetryPolicy(x));
+			retryTemplate.setRetryPolicy(new SimpleRetryPolicy(x, Collections
+					.<Class<? extends Throwable>, Boolean> singletonMap(Exception.class, true)));
 			retryTemplate.execute(callback);
 			assertEquals(x, callback.attempts);
 			assertEquals(1, backOff.startCalls);
@@ -264,9 +270,10 @@ public class RetryTemplateTests {
 	 */
 	@Test
 	public void testBackOffForRethrownException() throws Exception {
-		
+
 		RetryTemplate tested = new RetryTemplate();
-		tested.setRetryPolicy(new SimpleRetryPolicy(1));
+		tested.setRetryPolicy(new SimpleRetryPolicy(1, Collections.<Class<? extends Throwable>, Boolean> singletonMap(
+				Exception.class, true)));
 
 		BackOffPolicy bop = createStrictMock(BackOffPolicy.class);
 		BackOffContext backOffContext = new BackOffContext() {
@@ -298,7 +305,7 @@ public class RetryTemplateTests {
 		catch (Exception expected) {
 			assertEquals("maybe next time!", expected.getMessage());
 		}
-		
+
 		verify(bop);
 	}
 

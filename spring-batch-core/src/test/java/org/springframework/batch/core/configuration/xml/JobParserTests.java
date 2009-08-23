@@ -184,8 +184,7 @@ public class JobParserTests {
 
 	@Test
 	public void testListenerClearingJob() throws Exception {
-		// TODO BATCH-1357:
-		// assertEquals(0, getListeners("listenerClearingJob", jobParserParentAttributeTestsCtx).size());
+		assertEquals(0, getListeners("listenerClearingJob", jobParserParentAttributeTestsCtx).size());
 	}
 
 }

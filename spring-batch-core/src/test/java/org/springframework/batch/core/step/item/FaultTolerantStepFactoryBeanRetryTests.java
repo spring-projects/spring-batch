@@ -20,10 +20,11 @@ import static org.junit.Assert.assertTrue;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collection;
+import java.util.Collections;
 import java.util.Date;
-import java.util.HashSet;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -89,6 +90,7 @@ public class FaultTolerantStepFactoryBeanRetryTests {
 		}
 	};
 
+	@SuppressWarnings("unchecked")
 	@Before
 	public void setUp() throws Exception {
 
@@ -103,17 +105,10 @@ public class FaultTolerantStepFactoryBeanRetryTests {
 		factory.setItemWriter(writer);
 		factory.setJobRepository(repository);
 		factory.setTransactionManager(new ResourcelessTransactionManager());
-		factory.setRetryableExceptionClasses(new HashSet<Class<? extends Throwable>>() {
-			{
-				add(Exception.class);
-			}
-		});
+		factory.setRetryableExceptionClasses(getExceptionMap(Exception.class));
 		factory.setCommitInterval(1); // trivial by default
 
-		@SuppressWarnings("unchecked")
-		Collection<Class<? extends Throwable>> skippableExceptions = Arrays
-				.<Class<? extends Throwable>> asList(Exception.class);
-		factory.setSkippableExceptionClasses(skippableExceptions);
+		factory.setSkippableExceptionClasses(getExceptionMap(Exception.class));
 
 		JobParameters jobParameters = new JobParametersBuilder().addString("statefulTest", "make_this_unique")
 				.toJobParameters();
@@ -140,6 +135,7 @@ public class FaultTolerantStepFactoryBeanRetryTests {
 	 * 
 	 * @throws Exception
 	 */
+	@SuppressWarnings("unchecked")
 	@Test
 	public void testSuccessfulRetryWithReadFailure() throws Exception {
 		ItemReader<String> provider = new ListItemReader<String>(Arrays.asList("a", "b", "c")) {
@@ -155,7 +151,7 @@ public class FaultTolerantStepFactoryBeanRetryTests {
 		};
 		factory.setItemReader(provider);
 		factory.setRetryLimit(10);
-		factory.setSkippableExceptionClasses(new HashSet<Class<? extends Throwable>>());
+		factory.setSkippableExceptionClasses(getExceptionMap());
 		Step step = (Step) factory.getObject();
 
 		StepExecution stepExecution = new StepExecution(step.getName(), jobExecution);
@@ -263,6 +259,7 @@ public class FaultTolerantStepFactoryBeanRetryTests {
 		assertEquals(4, stepExecution.getReadCount());
 	}
 
+	@SuppressWarnings("unchecked")
 	@Test
 	public void testSkipAndRetryWithWriteFailure() throws Exception {
 
@@ -296,11 +293,7 @@ public class FaultTolerantStepFactoryBeanRetryTests {
 		factory.setItemReader(provider);
 		factory.setItemWriter(itemWriter);
 		factory.setRetryLimit(5);
-		factory.setRetryableExceptionClasses(new HashSet<Class<? extends Throwable>>() {
-			{
-				add(RuntimeException.class);
-			}
-		});
+		factory.setRetryableExceptionClasses(getExceptionMap(RuntimeException.class));
 		AbstractStep step = (AbstractStep) factory.getObject();
 		step.setName("mytest");
 		StepExecution stepExecution = new StepExecution(step.getName(), jobExecution);
@@ -319,6 +312,7 @@ public class FaultTolerantStepFactoryBeanRetryTests {
 		assertEquals("[b, d]", recovered.toString());
 	}
 
+	@SuppressWarnings("unchecked")
 	@Test
 	public void testSkipAndRetryWithWriteFailureAndNonTrivialCommitInterval() throws Exception {
 
@@ -353,11 +347,7 @@ public class FaultTolerantStepFactoryBeanRetryTests {
 		factory.setItemReader(provider);
 		factory.setItemWriter(itemWriter);
 		factory.setRetryLimit(5);
-		factory.setRetryableExceptionClasses(new HashSet<Class<? extends Throwable>>() {
-			{
-				add(RuntimeException.class);
-			}
-		});
+		factory.setRetryableExceptionClasses(getExceptionMap(RuntimeException.class));
 		AbstractStep step = (AbstractStep) factory.getObject();
 		step.setName("mytest");
 		StepExecution stepExecution = new StepExecution(step.getName(), jobExecution);
@@ -425,17 +415,14 @@ public class FaultTolerantStepFactoryBeanRetryTests {
 		assertEquals(1, stepExecution.getReadCount());
 	}
 
+	@SuppressWarnings("unchecked")
 	@Test
 	public void testNonSkippableException() throws Exception {
 
 		// Very specific skippable exception
-		factory.setSkippableExceptionClasses(new HashSet<Class<? extends Throwable>>() {
-			{
-				add(UnsupportedOperationException.class);
-			}
-		});
+		factory.setSkippableExceptionClasses(getExceptionMap(UnsupportedOperationException.class));
 		// ...which is not retryable...
-		factory.setRetryableExceptionClasses(new HashSet<Class<? extends Throwable>>());
+		factory.setRetryableExceptionClasses(getExceptionMap());
 
 		factory.setSkipLimit(1);
 		ItemReader<String> provider = new ListItemReader<String>(Arrays.asList("b")) {
@@ -479,7 +466,8 @@ public class FaultTolerantStepFactoryBeanRetryTests {
 
 	@Test
 	public void testRetryPolicy() throws Exception {
-		factory.setRetryPolicy(new SimpleRetryPolicy(4));
+		factory.setRetryPolicy(new SimpleRetryPolicy(4, Collections
+				.<Class<? extends Throwable>, Boolean> singletonMap(Exception.class, true)));
 		factory.setSkipLimit(0);
 		ItemReader<String> provider = new ListItemReader<String>(Arrays.asList("b")) {
 			public String read() {
@@ -563,5 +551,13 @@ public class FaultTolerantStepFactoryBeanRetryTests {
 		assertEquals(3, processed.size());
 		// []
 		assertEquals(0, recovered.size());
+	}
+
+	private Map<Class<? extends Throwable>, Boolean> getExceptionMap(Class<? extends Throwable>... args) {
+		Map<Class<? extends Throwable>, Boolean> map = new HashMap<Class<? extends Throwable>, Boolean>();
+		for (Class<? extends Throwable> arg : args) {
+			map.put(arg, true);
+		}
+		return map;
 	}
 }

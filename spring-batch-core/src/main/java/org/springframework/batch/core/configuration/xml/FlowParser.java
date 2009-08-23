@@ -191,14 +191,14 @@ public class FlowParser extends AbstractSingleBeanDefinitionParser {
 		}
 
 		@SuppressWarnings("unchecked")
-		List<Element> nextElements = (List<Element>) DomUtils.getChildElementsByTagName(element, NEXT_ELE);
+		List<Element> nextElements = DomUtils.getChildElementsByTagName(element, NEXT_ELE);
 		for (Element nextElement : nextElements) {
 			String toAttribute = nextElement.getAttribute(TO_ATTR);
 			reachableElements.add(toAttribute);
 		}
 
 		@SuppressWarnings("unchecked")
-		List<Element> stopElements = (List<Element>) DomUtils.getChildElementsByTagName(element, STOP_ELE);
+		List<Element> stopElements = DomUtils.getChildElementsByTagName(element, STOP_ELE);
 		for (Element stopElement : stopElements) {
 			String restartAttribute = stopElement.getAttribute(RESTART_ATTR);
 			reachableElements.add(restartAttribute);
@@ -266,8 +266,7 @@ public class FlowParser extends AbstractSingleBeanDefinitionParser {
 		List<String> patterns = new ArrayList<String>();
 		for (String transitionName : new String[] { NEXT_ELE, STOP_ELE, END_ELE, FAIL_ELE }) {
 			@SuppressWarnings("unchecked")
-			List<Element> transitionElements = (List<Element>) DomUtils.getChildElementsByTagName(element,
-					transitionName);
+			List<Element> transitionElements = DomUtils.getChildElementsByTagName(element, transitionName);
 			for (Element transitionElement : transitionElements) {
 				verifyUniquePattern(transitionElement, patterns, element, parserContext);
 				list.addAll(parseTransitionElement(transitionElement, stepId, stateDef, parserContext));

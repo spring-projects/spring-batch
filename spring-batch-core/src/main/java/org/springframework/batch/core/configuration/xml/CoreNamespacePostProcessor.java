@@ -66,7 +66,7 @@ public class CoreNamespacePostProcessor implements BeanPostProcessor, BeanFactor
 	private void injectJobRepositoryIntoSteps(String beanName, ConfigurableListableBeanFactory beanFactory) {
 		BeanDefinition bd = beanFactory.getBeanDefinition(beanName);
 		if (bd.hasAttribute(JOB_FACTORY_PROPERTY_NAME)) {
-			MutablePropertyValues pvs = (MutablePropertyValues) bd.getPropertyValues();
+			MutablePropertyValues pvs = bd.getPropertyValues();
 			if (beanFactory.isTypeMatch(beanName, AbstractStep.class)) {
 				String jobName = (String) bd.getAttribute(JOB_FACTORY_PROPERTY_NAME);
 				PropertyValue jobRepository = BeanDefinitionUtils.getPropertyValue(jobName,

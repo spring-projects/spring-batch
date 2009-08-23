@@ -22,6 +22,8 @@ import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
+import java.util.Collections;
+
 import org.junit.Test;
 import org.springframework.batch.retry.ExhaustedRetryException;
 import org.springframework.batch.retry.RetryState;
@@ -45,7 +47,8 @@ public class StatefulRetryIntegrationTests {
 		RetryTemplate retryTemplate = new RetryTemplate();
 		MapRetryContextCache cache = new MapRetryContextCache();
 		retryTemplate.setRetryContextCache(cache);
-		retryTemplate.setRetryPolicy(new SimpleRetryPolicy(1));
+		retryTemplate.setRetryPolicy(new SimpleRetryPolicy(1, Collections
+				.<Class<? extends Throwable>, Boolean> singletonMap(Exception.class, true)));
 
 		assertFalse(cache.containsKey("foo"));
 
@@ -86,7 +89,8 @@ public class StatefulRetryIntegrationTests {
 		RetryTemplate retryTemplate = new RetryTemplate();
 		MapRetryContextCache cache = new MapRetryContextCache();
 		retryTemplate.setRetryContextCache(cache);
-		retryTemplate.setRetryPolicy(new SimpleRetryPolicy(2));
+		retryTemplate.setRetryPolicy(new SimpleRetryPolicy(2, Collections
+				.<Class<? extends Throwable>, Boolean> singletonMap(Exception.class, true)));
 
 		assertFalse(cache.containsKey("foo"));
 

@@ -36,9 +36,6 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 @RunWith(SpringJUnit4ClassRunner.class)
 public class FaultTolerantExceptionClassesTests implements ApplicationContextAware {
 
-	//
-	// TODO BATCH-1318: Commented out tests are related to this issue
-	//
 	@Autowired
 	private JobRepository jobRepository;
 

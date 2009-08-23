@@ -34,7 +34,7 @@ import org.springframework.batch.repeat.RepeatOperations;
  */
 public class FaultTolerantChunkProvider<I> extends SimpleChunkProvider<I> {
 
-	private SkipPolicy skipPolicy = new LimitCheckingItemSkipPolicy(0);
+	private SkipPolicy skipPolicy = new LimitCheckingItemSkipPolicy();
 
 	private Classifier<Throwable, Boolean> rollbackClassifier = new BinaryExceptionClassifier(true);
 

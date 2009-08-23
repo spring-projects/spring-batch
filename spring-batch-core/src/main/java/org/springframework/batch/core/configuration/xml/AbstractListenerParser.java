@@ -5,14 +5,15 @@ import java.util.List;
 
 import org.springframework.batch.core.listener.AbstractListenerFactoryBean;
 import org.springframework.batch.core.listener.ListenerMetaData;
+import org.springframework.beans.BeanMetadataElement;
+import org.springframework.beans.factory.config.RuntimeBeanReference;
 import org.springframework.beans.factory.support.AbstractBeanDefinition;
 import org.springframework.beans.factory.support.BeanDefinitionBuilder;
 import org.springframework.beans.factory.support.ManagedMap;
-import org.springframework.beans.factory.support.RootBeanDefinition;
 import org.springframework.beans.factory.xml.ParserContext;
 import org.springframework.util.StringUtils;
+import org.springframework.util.xml.DomUtils;
 import org.w3c.dom.Element;
-import org.w3c.dom.NamedNodeMap;
 
 /**
  * @author Dan Garrette
@@ -23,10 +24,12 @@ import org.w3c.dom.NamedNodeMap;
 public abstract class AbstractListenerParser {
 
 	private static final String ID_ATTR = "id";
-	
+
 	private static final String REF_ATTR = "ref";
-	
-	private static final String CLASS_ATTR = "class";
+
+	private static final String BEAN_ELE = "bean";
+
+	private static final String REF_ELE = "ref";
 
 	public AbstractBeanDefinition parse(Element element, ParserContext parserContext) {
 		BeanDefinitionBuilder builder = BeanDefinitionBuilder.genericBeanDefinition(getBeanClass());
@@ -36,23 +39,7 @@ public abstract class AbstractListenerParser {
 
 	@SuppressWarnings("unchecked")
 	public void doParse(Element element, ParserContext parserContext, BeanDefinitionBuilder builder) {
-		String id = element.getAttribute(ID_ATTR);
-		String listenerRef = element.getAttribute(REF_ATTR);
-		String className = element.getAttribute(CLASS_ATTR);
-		checkListenerElementAttributes(parserContext, element, id, listenerRef, className);
-
-		if (StringUtils.hasText(listenerRef)) {
-			builder.addPropertyReference("delegate", listenerRef);
-		}
-		else if (StringUtils.hasText(className)) {
-			RootBeanDefinition beanDef = new RootBeanDefinition(className, null, null);
-			builder.addPropertyValue("delegate", beanDef);
-		}
-		else {
-			parserContext.getReaderContext().error(
-					"Neither '" + REF_ATTR + "' or '" + CLASS_ATTR + "' specified for <" + element.getTagName()
-							+ "> element", element);
-		}
+		builder.addPropertyValue("delegate", parseListenerElement(element, parserContext));
 
 		ManagedMap metaDataMap = new ManagedMap();
 		for (String metaDataPropertyName : getMethodNameAttributes()) {
@@ -64,20 +51,57 @@ public abstract class AbstractListenerParser {
 		builder.addPropertyValue("metaDataMap", metaDataMap);
 	}
 
-	private void checkListenerElementAttributes(ParserContext parserContext, Element element, String id,
-			String listenerRef, String className) {
-		if (StringUtils.hasText(className) && StringUtils.hasText(listenerRef)) {
-			NamedNodeMap attributeNodes = element.getAttributes();
-			StringBuilder attributes = new StringBuilder();
-			for (int i = 0; i < attributeNodes.getLength(); i++) {
-				if (i > 0) {
-					attributes.append(" ");
-				}
-				attributes.append(attributeNodes.item(i));
+	@SuppressWarnings("unchecked")
+	public static BeanMetadataElement parseListenerElement(Element element, ParserContext parserContext) {
+		String listenerRef = element.getAttribute(REF_ATTR);
+		List<Element> beanElements = DomUtils.getChildElementsByTagName(element, BEAN_ELE);
+		List<Element> refElements = DomUtils.getChildElementsByTagName(element, REF_ELE);
+
+		verifyListenerAttributesAndSubelements(listenerRef, beanElements, refElements, element, parserContext);
+
+		if (StringUtils.hasText(listenerRef)) {
+			return new RuntimeBeanReference(listenerRef);
+		}
+		else if (beanElements.size() == 1) {
+			return parserContext.getDelegate().parseBeanDefinitionElement(beanElements.get(0));
+		}
+		else {
+			return (BeanMetadataElement) parserContext.getDelegate().parsePropertySubElement(refElements.get(0), null);
+		}
+	}
+
+	private static void verifyListenerAttributesAndSubelements(String listenerRef, List<Element> beanElements,
+			List<Element> refElements, Element element, ParserContext parserContext) {
+		int total = (StringUtils.hasText(listenerRef) ? 1 : 0) + beanElements.size() + refElements.size();
+		if (total != 1) {
+			StringBuilder found = new StringBuilder();
+			if (total == 0) {
+				found.append("None");
 			}
+			else {
+				if (StringUtils.hasText(listenerRef)) {
+					found.append("'" + REF_ATTR + "' attribute, ");
+				}
+				if (beanElements.size() == 1) {
+					found.append("<" + BEAN_ELE + "/> element, ");
+				}
+				else if (beanElements.size() > 1) {
+					found.append(beanElements.size() + " <" + BEAN_ELE + "/> elements, ");
+				}
+				if (refElements.size() == 1) {
+					found.append("<" + REF_ELE + "/> element, ");
+				}
+				else if (refElements.size() > 1) {
+					found.append(refElements.size() + " <" + REF_ELE + "/> elements, ");
+				}
+				found.delete(found.length() - 2, found.length());
+			}
+
+			String id = element.getAttribute(ID_ATTR);
 			parserContext.getReaderContext().error(
-					"Either '" + REF_ATTR + "' or '" + CLASS_ATTR + "' may be specified, but not both; <"
-							+ element.getTagName() + "> element specified with attributes: " + attributes, element);
+					"The <" + element.getTagName() + (StringUtils.hasText(id) ? " id=\"" + id + "\"" : "")
+							+ "/> element must have exactly one of: '" + REF_ATTR + "' attribute, <" + BEAN_ELE
+							+ "/> attribute, or <" + REF_ELE + "/> element.  Found: " + found + ".", element);
 		}
 	}
 

@@ -46,9 +46,9 @@ import org.springframework.batch.retry.support.DefaultRetryState;
  */
 public class FaultTolerantChunkProcessor<I, O> extends SimpleChunkProcessor<I, O> {
 
-	private SkipPolicy itemProcessSkipPolicy = new LimitCheckingItemSkipPolicy(0);
+	private SkipPolicy itemProcessSkipPolicy = new LimitCheckingItemSkipPolicy();
 
-	private SkipPolicy itemWriteSkipPolicy = new LimitCheckingItemSkipPolicy(0);
+	private SkipPolicy itemWriteSkipPolicy = new LimitCheckingItemSkipPolicy();
 
 	private final BatchRetryTemplate batchRetryTemplate;
 
@@ -245,7 +245,7 @@ public class FaultTolerantChunkProcessor<I, O> extends SimpleChunkProcessor<I, O
 			RecoveryCallback<O> recoveryCallback = new RecoveryCallback<O>() {
 
 				public O recover(RetryContext context) throws Exception {
-					Exception e = (Exception) context.getLastThrowable();
+					Exception e = context.getLastThrowable();
 					if (itemProcessSkipPolicy.shouldSkip(e, contribution.getStepSkipCount())) {
 						contribution.incrementProcessSkipCount();
 						iterator.remove(e);
@@ -312,7 +312,7 @@ public class FaultTolerantChunkProcessor<I, O> extends SimpleChunkProcessor<I, O
 
 				public Object recover(RetryContext context) throws Exception {
 
-					Exception e = (Exception) context.getLastThrowable();
+					Exception e = context.getLastThrowable();
 					if (outputs.size() > 1 && !rollbackClassifier.classify(e)) {
 						throw new RetryException("Invalid retry state during write caused by "
 								+ "exception that does not classify for rollback: ", e);

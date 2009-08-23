@@ -16,8 +16,9 @@
 					</streams>
 				</chunk>
 				<listeners>
-					 <listener class="org.springframework.batch.core.configuration.xml.TestListener"
-						       after-step-method="destroy"/> 
+					 <listener after-step-method="destroy">
+							<beans:bean class="org.springframework.batch.core.configuration.xml.TestListener"/>
+					</listener>
 					<listener ref="listener"/>
 				</listeners>
 			</tasklet>

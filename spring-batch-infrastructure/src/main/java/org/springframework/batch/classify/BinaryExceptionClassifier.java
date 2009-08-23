@@ -34,9 +34,7 @@ import java.util.Map;
 public class BinaryExceptionClassifier extends SubclassClassifier<Throwable, Boolean> {
 
 	/**
-	 * Create a binary exception classifier with the provided default value. All
-	 * exceptions will classify as this value unless
-	 * {@link #setTypes(Collection)} is used to narrow the field.
+	 * Create a binary exception classifier with the provided default value.
 	 * 
 	 * @param defaultValue defaults to false
 	 */
@@ -45,22 +43,21 @@ public class BinaryExceptionClassifier extends SubclassClassifier<Throwable, Boo
 	}
 
 	/**
-	 * Create a binary exception classifier with the default value (false). All
-	 * exceptions will classify as false.
-	 */
-	public BinaryExceptionClassifier() {
-		this(false);
-	}
-
-	/**
 	 * Create a binary exception classifier with the provided classes and their
 	 * subclasses. The mapped value for these exceptions will be the one
 	 * provided (which will be the opposite of the default).
+	 * 
 	 * @param value
 	 */
 	public BinaryExceptionClassifier(Collection<Class<? extends Throwable>> exceptionClasses, boolean value) {
 		this(!value);
-		if (exceptionClasses!=null) setTypes(exceptionClasses);
+		if (exceptionClasses != null) {
+			Map<Class<? extends Throwable>, Boolean> map = new HashMap<Class<? extends Throwable>, Boolean>();
+			for (Class<? extends Throwable> type : exceptionClasses) {
+				map.put(type, !getDefault());
+			}
+			setTypeMap(map);
+		}
 	}
 
 	/**
@@ -72,17 +69,23 @@ public class BinaryExceptionClassifier extends SubclassClassifier<Throwable, Boo
 	}
 
 	/**
-	 * Set of Throwable class types to keys for the classifier. Any subclass of
-	 * the type provided will be classified as of non-default type.
+	 * Create a binary exception classifier using the given classification map
+	 * and a default classification of false.
 	 * 
-	 * @param types the types to classify as non-default
+	 * @param typeMap
 	 */
-	public final void setTypes(Collection<Class<? extends Throwable>> types) {
-		Map<Class<? extends Throwable>, Boolean> map = new HashMap<Class<? extends Throwable>, Boolean>();
-		for (Class<? extends Throwable> type : types) {
-			map.put(type, !getDefault());
-		}
-		setTypeMap(map);
+	public BinaryExceptionClassifier(Map<Class<? extends Throwable>, Boolean> typeMap) {
+		this(typeMap, false);
+	}
+
+	/**
+	 * Create a binary exception classifier using the given classification map
+	 * and a default classification of false.
+	 * 
+	 * @param typeMap
+	 */
+	public BinaryExceptionClassifier(Map<Class<? extends Throwable>, Boolean> typeMap, boolean defaultValue) {
+		super(typeMap, defaultValue);
 	}
 
 }

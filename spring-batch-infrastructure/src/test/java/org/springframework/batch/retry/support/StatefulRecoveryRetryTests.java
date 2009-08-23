@@ -94,7 +94,8 @@ public class StatefulRecoveryRetryTests {
 
 	@Test
 	public void testRecover() throws Exception {
-		retryTemplate.setRetryPolicy(new SimpleRetryPolicy(1));
+		retryTemplate.setRetryPolicy(new SimpleRetryPolicy(1, Collections
+				.<Class<? extends Throwable>, Boolean> singletonMap(Exception.class, true)));
 		final String input = "foo";
 		RetryState state = new DefaultRetryState(input);
 		RetryCallback<String> callback = new RetryCallback<String>() {
@@ -126,14 +127,15 @@ public class StatefulRecoveryRetryTests {
 
 	@Test
 	public void testSwitchToStatelessForNoRollback() throws Exception {
-		retryTemplate.setRetryPolicy(new SimpleRetryPolicy(1));
+		retryTemplate.setRetryPolicy(new SimpleRetryPolicy(1, Collections
+				.<Class<? extends Throwable>, Boolean> singletonMap(Exception.class, true)));
 		// Roll back for these:
 		BinaryExceptionClassifier classifier = new BinaryExceptionClassifier(Collections
 				.<Class<? extends Throwable>> singleton(DataAccessException.class));
 		// ...but not these:
 		assertFalse(classifier.classify(new RuntimeException()));
 		final String input = "foo";
-		RetryState state = new DefaultRetryState(input,classifier);
+		RetryState state = new DefaultRetryState(input, classifier);
 		RetryCallback<String> callback = new RetryCallback<String>() {
 			public String doWithRetry(RetryContext context) throws Exception {
 				throw new RuntimeException("Barf!");
@@ -156,7 +158,8 @@ public class StatefulRecoveryRetryTests {
 
 	@Test
 	public void testExhaustedClearsHistoryAfterLastAttempt() throws Exception {
-		RetryPolicy retryPolicy = new SimpleRetryPolicy(1);
+		RetryPolicy retryPolicy = new SimpleRetryPolicy(1, Collections
+				.<Class<? extends Throwable>, Boolean> singletonMap(Exception.class, true));
 		retryTemplate.setRetryPolicy(retryPolicy);
 
 		final String input = "foo";
@@ -191,7 +194,8 @@ public class StatefulRecoveryRetryTests {
 	@Test
 	public void testKeyGeneratorNotConsistentAfterFailure() throws Throwable {
 
-		RetryPolicy retryPolicy = new SimpleRetryPolicy(3);
+		RetryPolicy retryPolicy = new SimpleRetryPolicy(3, Collections
+				.<Class<? extends Throwable>, Boolean> singletonMap(Exception.class, true));
 		retryTemplate.setRetryPolicy(retryPolicy);
 		final StringHolder item = new StringHolder("bar");
 		RetryState state = new DefaultRetryState(item);
@@ -235,7 +239,8 @@ public class StatefulRecoveryRetryTests {
 	@Test
 	public void testCacheCapacity() throws Exception {
 
-		retryTemplate.setRetryPolicy(new SimpleRetryPolicy(1));
+		retryTemplate.setRetryPolicy(new SimpleRetryPolicy(1, Collections
+				.<Class<? extends Throwable>, Boolean> singletonMap(Exception.class, true)));
 		retryTemplate.setRetryContextCache(new MapRetryContextCache(1));
 
 		RetryCallback<Object> callback = new RetryCallback<Object>() {
@@ -266,7 +271,8 @@ public class StatefulRecoveryRetryTests {
 	@Test
 	public void testCacheCapacityNotReachedIfRecovered() throws Exception {
 
-		SimpleRetryPolicy retryPolicy = new SimpleRetryPolicy(1);
+		SimpleRetryPolicy retryPolicy = new SimpleRetryPolicy(1, Collections
+				.<Class<? extends Throwable>, Boolean> singletonMap(Exception.class, true));
 		retryTemplate.setRetryPolicy(retryPolicy);
 		retryTemplate.setRetryContextCache(new MapRetryContextCache(2));
 		final StringHolder item = new StringHolder("foo");

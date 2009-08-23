@@ -25,40 +25,38 @@ import org.springframework.util.Assert;
 /**
  * Composite {@link ItemProcessor} that passes the item through a sequence of
  * injected <code>ItemTransformer</code>s (return value of previous
- * transformation is the entry value of the next).<br/><br/>
+ * transformation is the entry value of the next).<br/>
+ * <br/>
  * 
- * Note the user is responsible for injecting a chain of {@link ItemProcessor}
- * s that conforms to declared input and output types.
+ * Note the user is responsible for injecting a chain of {@link ItemProcessor} s
+ * that conforms to declared input and output types.
  * 
  * @author Robert Kasanicky
  */
-@SuppressWarnings("unchecked")
 public class CompositeItemProcessor<I, O> implements ItemProcessor<I, O>, InitializingBean {
 
-	private List<ItemProcessor> itemProcessors;
+	private List<ItemProcessor<Object, Object>> delegates;
 
+	@SuppressWarnings("unchecked")
 	public O process(I item) throws Exception {
 		Object result = item;
-	
-		for(ItemProcessor transformer: itemProcessors){
-			if(result == null){
+
+		for (ItemProcessor<Object, Object> delegate : delegates) {
+			if (result == null) {
 				return null;
 			}
-			result = transformer.process(result);
+			result = delegate.process(result);
 		}
 		return (O) result;
 	}
 
 	public void afterPropertiesSet() throws Exception {
-		Assert.notEmpty(itemProcessors);
+		Assert.notNull(delegates, "The 'delgates' may not be null");
+		Assert.notEmpty(delegates, "The 'delgates' may not be empty");
 	}
 
-	/**
-	 * @param itemProcessors will be chained to produce a composite
-	 * transformation.
-	 */
-	public void setItemProcessors(List<ItemProcessor> itemProcessors) {
-		this.itemProcessors = itemProcessors;
+	public void setDelegates(List<ItemProcessor<Object, Object>> delegates) {
+		this.delegates = delegates;
 	}
 
 }

@@ -18,6 +18,7 @@ package org.springframework.batch.core.configuration.xml;
 
 import java.util.Collection;
 import java.util.HashSet;
+import java.util.Map;
 
 import org.springframework.batch.classify.BinaryExceptionClassifier;
 import org.springframework.batch.core.Step;
@@ -122,11 +123,9 @@ class StepParserStepFactoryBean<I, O> implements FactoryBean, BeanNameAware {
 	//
 	private RetryListener[] retryListeners;
 
-	private Collection<Class<? extends Throwable>> skippableExceptionClasses;
+	private Map<Class<? extends Throwable>, Boolean> skippableExceptionClasses;
 
-	private Collection<Class<? extends Throwable>> retryableExceptionClasses;
-
-	private Collection<Class<? extends Throwable>> fatalExceptionClasses;
+	private Map<Class<? extends Throwable>, Boolean> retryableExceptionClasses;
 
 	private ItemStream[] streams;
 
@@ -248,9 +247,6 @@ class StepParserStepFactoryBean<I, O> implements FactoryBean, BeanNameAware {
 		if (retryableExceptionClasses != null) {
 			fb.setRetryableExceptionClasses(retryableExceptionClasses);
 		}
-		if (fatalExceptionClasses != null) {
-			fb.setFatalExceptionClasses(fatalExceptionClasses);
-		}
 		if (noRollbackExceptionClasses != null) {
 			fb.setNoRollbackExceptionClasses(noRollbackExceptionClasses);
 		}
@@ -282,7 +278,7 @@ class StepParserStepFactoryBean<I, O> implements FactoryBean, BeanNameAware {
 			for (StepListener listener : listeners) {
 				newListeners[i++] = (StepExecutionListener) listener;
 			}
-			ts.setStepExecutionListeners((StepExecutionListener[]) newListeners);
+			ts.setStepExecutionListeners(newListeners);
 		}
 		if (transactionTimeout != null || propagation != null || isolation != null
 				|| noRollbackExceptionClasses != null) {
@@ -310,7 +306,6 @@ class StepParserStepFactoryBean<I, O> implements FactoryBean, BeanNameAware {
 
 	private void validateFaultTolerantSettings() {
 		validateDependency("skippable-exception-classes", skippableExceptionClasses, "skip-limit", skipLimit, true);
-		validateDependency("fatal-exception-classes", fatalExceptionClasses, "skip-limit", skipLimit, false);
 		validateDependency("retryable-exception-classes", retryableExceptionClasses, "retry-limit", retryLimit, true);
 		validateDependency("retry-listeners", retryListeners, "retry-limit", retryLimit, false);
 	}
@@ -622,7 +617,7 @@ class StepParserStepFactoryBean<I, O> implements FactoryBean, BeanNameAware {
 	 * 
 	 * @param exceptionClasses
 	 */
-	public void setSkippableExceptionClasses(Collection<Class<? extends Throwable>> exceptionClasses) {
+	public void setSkippableExceptionClasses(Map<Class<? extends Throwable>, Boolean> exceptionClasses) {
 		this.skippableExceptionClasses = exceptionClasses;
 	}
 
@@ -631,17 +626,8 @@ class StepParserStepFactoryBean<I, O> implements FactoryBean, BeanNameAware {
 	 * 
 	 * @param retryableExceptionClasses the retryableExceptionClasses to set
 	 */
-	public void setRetryableExceptionClasses(Collection<Class<? extends Throwable>> retryableExceptionClasses) {
+	public void setRetryableExceptionClasses(Map<Class<? extends Throwable>, Boolean> retryableExceptionClasses) {
 		this.retryableExceptionClasses = retryableExceptionClasses;
-	}
-
-	/**
-	 * Public setter for exception classes that should cause immediate failure.
-	 * 
-	 * @param fatalExceptionClasses
-	 */
-	public void setFatalExceptionClasses(Collection<Class<? extends Throwable>> fatalExceptionClasses) {
-		this.fatalExceptionClasses = fatalExceptionClasses;
 	}
 
 	/**

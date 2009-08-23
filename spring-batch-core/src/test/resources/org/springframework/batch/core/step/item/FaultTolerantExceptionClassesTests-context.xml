@@ -15,8 +15,8 @@
 		<tasklet>
 			<chunk reader="reader" writer="writer" commit-interval="4" skip-limit="1">
 				<skippable-exception-classes>
-					org.springframework.batch.core.step.item.SkippableRuntimeException
-					org.springframework.batch.core.step.item.SkippableException
+					<include class="org.springframework.batch.core.step.item.SkippableRuntimeException"/>
+					<include class="org.springframework.batch.core.step.item.SkippableException"/>
 				</skippable-exception-classes>
 			</chunk>
 		</tasklet>
@@ -26,13 +26,11 @@
 		<tasklet>
 			<chunk reader="reader" writer="writer" commit-interval="4" skip-limit="1">
 				<skippable-exception-classes>
-					org.springframework.batch.core.step.item.SkippableRuntimeException
-					org.springframework.batch.core.step.item.SkippableException
+					<include class="org.springframework.batch.core.step.item.SkippableRuntimeException"/>
+					<include class="org.springframework.batch.core.step.item.SkippableException"/>
+					<exclude class="org.springframework.batch.core.step.item.FatalRuntimeException"/>
+					<exclude class="org.springframework.batch.core.step.item.FatalException"/>
 				</skippable-exception-classes>
-				<fatal-exception-classes>
-					org.springframework.batch.core.step.item.FatalRuntimeException
-					org.springframework.batch.core.step.item.FatalException
-				</fatal-exception-classes>
 			</chunk>
 		</tasklet>
 	</step>
@@ -41,15 +39,13 @@
 		<tasklet>
 			<chunk reader="reader" writer="writer" commit-interval="4" skip-limit="5" retry-limit="2">
 				<skippable-exception-classes>
-					org.springframework.batch.core.step.item.SkippableRuntimeException
-					org.springframework.batch.core.step.item.SkippableException
+					<include class="org.springframework.batch.core.step.item.SkippableRuntimeException"/>
+					<include class="org.springframework.batch.core.step.item.SkippableException"/>
+					<exclude class="org.springframework.batch.core.step.item.FatalRuntimeException"/>
+					<exclude class="org.springframework.batch.core.step.item.FatalException"/>
 				</skippable-exception-classes>
-				<fatal-exception-classes>
-					org.springframework.batch.core.step.item.FatalRuntimeException
-					org.springframework.batch.core.step.item.FatalException
-				</fatal-exception-classes>
 				<retryable-exception-classes>
-					java.lang.Exception
+					<include class="java.lang.Exception"/>
 				</retryable-exception-classes>
 			</chunk>
 		</tasklet>
@@ -60,11 +56,11 @@
 			<chunk reader="reader" writer="writer" commit-interval="4" skip-limit="1">
 				<skippable-exception-classes>
 					<!-- this is a subclass of IllegalStateException (no-rollback) -->
-					java.util.FormatterClosedException
+					<include class="java.util.FormatterClosedException"/>
 				</skippable-exception-classes>
 			</chunk>
 			<no-rollback-exception-classes>
-				java.lang.IllegalStateException
+				<include class="java.lang.IllegalStateException"/>
 			</no-rollback-exception-classes>
 		</tasklet>
 	</step>
@@ -73,11 +69,11 @@
 		<tasklet>
 			<chunk reader="reader" writer="writer" commit-interval="4" skip-limit="1">
 				<skippable-exception-classes>
-					java.lang.IllegalStateException
+					<include class="java.lang.IllegalStateException"/>
 				</skippable-exception-classes>
 			</chunk>
 			<no-rollback-exception-classes>
-				java.lang.RuntimeException
+				<include class="java.lang.RuntimeException"/>
 			</no-rollback-exception-classes>
 		</tasklet>
 	</step>
@@ -86,14 +82,14 @@
 		<tasklet>
 			<chunk reader="reader" writer="writer" commit-interval="4" skip-limit="1">
 				<skippable-exception-classes>
-					org.springframework.batch.core.step.item.SkippableRuntimeException
-					org.springframework.batch.core.step.item.SkippableException
-					org.springframework.batch.core.step.item.FatalRuntimeException
-					org.springframework.batch.core.step.item.FatalException
+					<include class="org.springframework.batch.core.step.item.SkippableRuntimeException"/>
+					<include class="org.springframework.batch.core.step.item.SkippableException"/>
+					<include class="org.springframework.batch.core.step.item.FatalRuntimeException"/>
+					<include class="org.springframework.batch.core.step.item.FatalException"/>
 				</skippable-exception-classes>
 			</chunk>
 			<no-rollback-exception-classes>
-				org.springframework.batch.core.step.item.FatalRuntimeException
+				<include class="org.springframework.batch.core.step.item.FatalRuntimeException"/>
 			</no-rollback-exception-classes>
 		</tasklet>
 	</step>
@@ -102,17 +98,15 @@
 		<tasklet>
 			<chunk reader="reader" writer="writer" commit-interval="4" skip-limit="1">
 				<skippable-exception-classes>
-					java.lang.Exception
+					<include class="java.lang.Exception"/>
+					<exclude class="org.springframework.batch.core.step.item.SkippableRuntimeException"/>
+					<exclude class="org.springframework.batch.core.step.item.SkippableException"/>
+					<exclude class="org.springframework.batch.core.step.item.FatalRuntimeException"/>
+					<exclude class="org.springframework.batch.core.step.item.FatalException"/>
 				</skippable-exception-classes>
-				<fatal-exception-classes>
-					org.springframework.batch.core.step.item.SkippableRuntimeException
-					org.springframework.batch.core.step.item.SkippableException
-					org.springframework.batch.core.step.item.FatalRuntimeException
-					org.springframework.batch.core.step.item.FatalException
-				</fatal-exception-classes>
 			</chunk>
 			<no-rollback-exception-classes>
-				org.springframework.batch.core.step.item.FatalRuntimeException
+				<include class="org.springframework.batch.core.step.item.FatalRuntimeException"/>
 			</no-rollback-exception-classes>
 		</tasklet>
 	</step>
@@ -120,7 +114,7 @@
 	<step id="noRollbackTasklet" xmlns="http://www.springframework.org/schema/batch">
 		<tasklet ref="tasklet">
 			<no-rollback-exception-classes>
-				org.springframework.batch.core.step.item.SkippableRuntimeException
+				<include class="org.springframework.batch.core.step.item.SkippableRuntimeException"/>
 			</no-rollback-exception-classes>
 		</tasklet>
 	</step>

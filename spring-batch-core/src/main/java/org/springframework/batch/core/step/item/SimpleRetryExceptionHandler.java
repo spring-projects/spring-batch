@@ -63,8 +63,7 @@ public class SimpleRetryExceptionHandler extends RetryListenerSupport implements
 	public SimpleRetryExceptionHandler(RetryPolicy retryPolicy, ExceptionHandler exceptionHandler, Collection<Class<? extends Throwable>> fatalExceptionClasses) {
 		this.retryPolicy = retryPolicy;
 		this.exceptionHandler = exceptionHandler;
-		this.fatalExceptionClassifier = new BinaryExceptionClassifier();
-		fatalExceptionClassifier.setTypes(fatalExceptionClasses);
+		this.fatalExceptionClassifier = new BinaryExceptionClassifier(fatalExceptionClasses);
 	}
 
 	/**

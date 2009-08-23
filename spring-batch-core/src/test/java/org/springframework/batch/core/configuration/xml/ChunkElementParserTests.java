@@ -16,12 +16,12 @@
 package org.springframework.batch.core.configuration.xml;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Map;
-import java.util.Set;
 
 import org.junit.Test;
 import org.springframework.batch.core.Step;
@@ -48,38 +48,30 @@ public class ChunkElementParserTests {
 
 	@Test
 	public void testInheritSkippable() throws Exception {
-		Collection<Class<?>> skippable = getExceptionClasses("s1", "skippable",
+		Map<Class<? extends Throwable>, Boolean> skippable = getExceptionClasses("s1",
 				chunkElementParentAttributeParserTestsContext);
-		assertEquals(3, skippable.size());
-		boolean e = false;
-		boolean f = false;
-		for (Class<?> cls : skippable) {
-			if (cls.equals(NullPointerException.class)) {
-				e = true;
-			}
-			else if (cls.equals(ArithmeticException.class)) {
-				f = true;
-			}
-		}
-		assertTrue(e);
-		assertTrue(f);
+		assertEquals(11, skippable.size());
+		containsClassified(skippable, NullPointerException.class, true);
+		containsClassified(skippable, ArithmeticException.class, true);
+		containsClassified(skippable, CannotAcquireLockException.class, false);
+		containsClassified(skippable, DeadlockLoserDataAccessException.class, false);
 	}
 
 	@Test
-	public void testInheritFatal() throws Exception {
-		Collection<Class<?>> fatal = getExceptionClasses("s1", "fatal", chunkElementParentAttributeParserTestsContext);
-		boolean a = false;
-		boolean b = false;
-		for (Class<?> cls : fatal) {
-			if (cls.equals(CannotAcquireLockException.class)) {
-				a = true;
-			}
-			else if (cls.equals(DeadlockLoserDataAccessException.class)) {
-				b = true;
-			}
-		}
-		assertTrue(a);
-		assertTrue(b);
+	public void testInheritSkippableWithNoMerge() throws Exception {
+		Map<Class<? extends Throwable>, Boolean> skippable = getExceptionClasses("s2",
+				chunkElementParentAttributeParserTestsContext);
+		assertEquals(9, skippable.size());
+		containsClassified(skippable, NullPointerException.class, true);
+		assertFalse(skippable.containsKey(ArithmeticException.class));
+		containsClassified(skippable, CannotAcquireLockException.class, false);
+		assertFalse(skippable.containsKey(DeadlockLoserDataAccessException.class));
+	}
+
+	private void containsClassified(Map<Class<? extends Throwable>, Boolean> classified,
+			Class<? extends Throwable> cls, boolean include) {
+		assertTrue(classified.containsKey(cls));
+		assertEquals(include, classified.get(cls));
 	}
 
 	@Test
@@ -115,37 +107,6 @@ public class ChunkElementParserTests {
 	}
 
 	@Test
-	public void testInheritSkippableWithNoMerge() throws Exception {
-		Collection<Class<?>> skippable = getExceptionClasses("s2", "skippable",
-				chunkElementParentAttributeParserTestsContext);
-		assertEquals(2, skippable.size());
-		boolean e = false;
-		for (Class<?> cls : skippable) {
-			if (cls.equals(NullPointerException.class)) {
-				e = true;
-			}
-		}
-		assertTrue(e);
-	}
-
-	@Test
-	public void testInheritFatalWithNoMerge() throws Exception {
-		Collection<Class<?>> fatal = getExceptionClasses("s2", "fatal", chunkElementParentAttributeParserTestsContext);
-		boolean a = false;
-		boolean b = false;
-		for (Class<?> cls : fatal) {
-			if (cls.equals(CannotAcquireLockException.class)) {
-				a = true;
-			}
-			else if (cls.equals(DeadlockLoserDataAccessException.class)) {
-				b = true;
-			}
-		}
-		assertTrue(a);
-		assertTrue(!b);
-	}
-
-	@Test
 	public void testInheritStreamsWithNoMerge() throws Exception {
 		Collection<ItemStream> streams = getStreams("s2", chunkElementParentAttributeParserTestsContext);
 		assertEquals(1, streams.size());
@@ -173,7 +134,8 @@ public class ChunkElementParserTests {
 	}
 
 	@SuppressWarnings("unchecked")
-	private Set<Class<?>> getExceptionClasses(String stepName, String type, ApplicationContext ctx) throws Exception {
+	private Map<Class<? extends Throwable>, Boolean> getExceptionClasses(String stepName, ApplicationContext ctx)
+			throws Exception {
 		Map<String, Step> beans = ctx.getBeansOfType(Step.class);
 		assertTrue(beans.containsKey(stepName));
 		Object step = ctx.getBean(stepName);
@@ -182,10 +144,8 @@ public class ChunkElementParserTests {
 		Object tasklet = ReflectionTestUtils.getField(step, "tasklet");
 		Object chunkProvider = ReflectionTestUtils.getField(tasklet, "chunkProvider");
 		Object skipPolicy = ReflectionTestUtils.getField(chunkProvider, "skipPolicy");
-		Object classifier = ReflectionTestUtils.getField(skipPolicy, type + "ExceptionClassifier");
-		Map<Class<?>, ?> classified = (Map<Class<?>, ?>) ReflectionTestUtils.getField(classifier, "classified");
-
-		return classified.keySet();
+		Object classifier = ReflectionTestUtils.getField(skipPolicy, "skippableExceptionClassifier");
+		return (Map<Class<? extends Throwable>, Boolean>) ReflectionTestUtils.getField(classifier, "classified");
 	}
 
 	@SuppressWarnings("unchecked")

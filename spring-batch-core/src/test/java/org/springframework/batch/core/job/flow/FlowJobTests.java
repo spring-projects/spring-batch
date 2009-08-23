@@ -548,7 +548,7 @@ public class FlowJobTests {
 	private void checkRepository(BatchStatus status, ExitStatus exitStatus) {
 		// because map dao stores in memory, it can be checked directly
 		JobInstance jobInstance = jobExecution.getJobInstance();
-		JobExecution other = (JobExecution) jobExecutionDao.findJobExecutions(jobInstance).get(0);
+		JobExecution other = jobExecutionDao.findJobExecutions(jobInstance).get(0);
 		assertEquals(jobInstance.getId(), other.getJobId());
 		assertEquals(status, other.getStatus());
 		if (exitStatus != null) {

@@ -107,7 +107,7 @@ public class CoreNamespaceUtils {
 							}
 						}
 						else if (entry.getKey() instanceof String) {
-							if (RANGE_ARRAY_CLASS_NAME.equals((String) entry.getKey())) {
+							if (RANGE_ARRAY_CLASS_NAME.equals(entry.getKey())) {
 								return true;
 							}
 						}

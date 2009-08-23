@@ -6,29 +6,28 @@
 
 	<job id="job">
 		<step id="step">
-			<tasklet start-limit="25" allow-start-if-complete="true">
+			<tasklet start-limit="25" allow-start-if-complete="true" task-executor="taskExecutor">
 				<chunk reader="reader" processor="processor" writer="writer" commit-interval="10" skip-limit="20"
-						retry-limit="3" cache-capacity="100" is-reader-transactional-queue="true" 
-						task-executor="taskExecutor">
+						retry-limit="3" cache-capacity="100" is-reader-transactional-queue="true">
 					<retry-listeners>
-						<listener class="org.springframework.batch.core.configuration.xml.TestRetryListener" />
+						<listener>
+							<beans:bean class="org.springframework.batch.core.configuration.xml.TestRetryListener" />
+						</listener>
 					</retry-listeners>
 					<streams>
 						<stream ref="reader" />
 					</streams>
-					<fatal-exception-classes>
-						org.springframework.jdbc.BadSqlGrammarException
-					</fatal-exception-classes>
 					<skippable-exception-classes>
-						org.springframework.dao.DataIntegrityViolationException
+						<include class="org.springframework.dao.DataIntegrityViolationException"/>
+						<exclude class="org.springframework.jdbc.BadSqlGrammarException"/>
 					</skippable-exception-classes>
 					<retryable-exception-classes>
-						org.springframework.dao.DeadlockLoserDataAccessException
+						<include class="org.springframework.dao.DeadlockLoserDataAccessException"/>
 					</retryable-exception-classes>
 				</chunk>
 				<transaction-attributes propagation="REQUIRED" isolation="DEFAULT" timeout="10" />
 				<no-rollback-exception-classes>
-						org.springframework.dao.DataIntegrityViolationException
+					<include class="org.springframework.dao.DataIntegrityViolationException"/>
 				</no-rollback-exception-classes>
 				<listeners>
 					<listener ref="listener" />

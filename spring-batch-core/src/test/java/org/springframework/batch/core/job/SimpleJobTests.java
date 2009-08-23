@@ -467,7 +467,7 @@ public class SimpleJobTests {
 	private void checkRepository(BatchStatus status, ExitStatus exitStatus) {
 		assertEquals(jobInstance, jobInstanceDao.getJobInstance(job.getName(), jobParameters));
 		// because map dao stores in memory, it can be checked directly
-		JobExecution jobExecution = (JobExecution) jobExecutionDao.findJobExecutions(jobInstance).get(0);
+		JobExecution jobExecution = jobExecutionDao.findJobExecutions(jobInstance).get(0);
 		assertEquals(jobInstance.getId(), jobExecution.getJobId());
 		assertEquals(status, jobExecution.getStatus());
 		if (exitStatus != null) {

@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.springframework.batch.sample.common;
+package org.springframework.batch.core.launch.support;
 
 import org.springframework.batch.core.JobParameters;
 import org.springframework.batch.core.JobParametersBuilder;
@@ -21,19 +21,20 @@ import org.springframework.batch.core.JobParametersIncrementer;
 
 /**
  * @author Dave Syer
- *
  */
-public class InfiniteLoopIncrementer implements JobParametersIncrementer {
+public class RunIdIncrementer implements JobParametersIncrementer {
+
+	private static String RUN_ID_KEY = "run.id";
 
 	/**
 	 * Increment the run.id parameter.
 	 */
 	public JobParameters getNext(JobParameters parameters) {
-		if (parameters==null || parameters.isEmpty()) {
-			return new JobParametersBuilder().addLong("run.id", 1L).toJobParameters();
+		if (parameters == null || parameters.isEmpty()) {
+			return new JobParametersBuilder().addLong(RUN_ID_KEY, 1L).toJobParameters();
 		}
-		long id = parameters.getLong("run.id",1L) + 1;
-		return new JobParametersBuilder().addLong("run.id", id).toJobParameters();
+		long id = parameters.getLong(RUN_ID_KEY, 1L) + 1;
+		return new JobParametersBuilder().addLong(RUN_ID_KEY, id).toJobParameters();
 	}
 
 }

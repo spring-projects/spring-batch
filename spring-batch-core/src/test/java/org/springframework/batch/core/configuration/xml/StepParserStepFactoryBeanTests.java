@@ -19,10 +19,10 @@ package org.springframework.batch.core.configuration.xml;
 import static org.junit.Assert.assertTrue;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 
 import org.junit.Test;
 import org.springframework.batch.core.StepListener;
-import org.springframework.batch.core.configuration.xml.StepParserStepFactoryBean;
 import org.springframework.batch.core.listener.StepExecutionListenerSupport;
 import org.springframework.batch.core.step.JobRepositorySupport;
 import org.springframework.batch.core.step.item.ChunkOrientedTasklet;
@@ -147,9 +147,8 @@ public class StepParserStepFactoryBeanTests {
 		fb.setRetryLimit(5);
 		fb.setSkipLimit(100);
 		fb.setRetryListeners(new RetryListenerSupport());
-		fb.setSkippableExceptionClasses(new ArrayList<Class<? extends Throwable>>());
-		fb.setRetryableExceptionClasses(new ArrayList<Class<? extends Throwable>>());
-		fb.setFatalExceptionClasses(new ArrayList<Class<? extends Throwable>>());
+		fb.setSkippableExceptionClasses(new HashMap<Class<? extends Throwable>, Boolean>());
+		fb.setRetryableExceptionClasses(new HashMap<Class<? extends Throwable>, Boolean>());
 
 		Object step = fb.getObject();
 		assertTrue(step instanceof TaskletStep);
@@ -204,9 +203,8 @@ public class StepParserStepFactoryBeanTests {
 		fb.setRetryLimit(5);
 		fb.setSkipLimit(100);
 		fb.setRetryListeners(new RetryListenerSupport());
-		fb.setSkippableExceptionClasses(new ArrayList<Class<? extends Throwable>>());
-		fb.setRetryableExceptionClasses(new ArrayList<Class<? extends Throwable>>());
-		fb.setFatalExceptionClasses(new ArrayList<Class<? extends Throwable>>());
+		fb.setSkippableExceptionClasses(new HashMap<Class<? extends Throwable>, Boolean>());
+		fb.setRetryableExceptionClasses(new HashMap<Class<? extends Throwable>, Boolean>());
 
 		Object step = fb.getObject();
 		assertTrue(step instanceof TaskletStep);

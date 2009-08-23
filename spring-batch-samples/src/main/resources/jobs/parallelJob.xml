@@ -16,12 +16,11 @@
 			</tasklet>
 		</step>
 		<step id="loading">
-			<tasklet>
+			<tasklet task-executor="taskExecutor">
 				<chunk reader="stagingReader" 
 			           processor="stagingProcessor" 
 			           writer="tradeWriter" 
-			           commit-interval="1" 
-			           task-executor="taskExecutor"/>
+			           commit-interval="1"/>
 			</tasklet>
 		</step>
 	</job>

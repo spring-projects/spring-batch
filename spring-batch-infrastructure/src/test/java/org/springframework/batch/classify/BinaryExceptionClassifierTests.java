@@ -16,15 +16,14 @@
 
 package org.springframework.batch.classify;
 
+import java.util.Collection;
 import java.util.Collections;
-
-import org.springframework.batch.classify.BinaryExceptionClassifier;
 
 import junit.framework.TestCase;
 
 public class BinaryExceptionClassifierTests extends TestCase {
 
-	BinaryExceptionClassifier classifier = new BinaryExceptionClassifier();
+	BinaryExceptionClassifier classifier = new BinaryExceptionClassifier(false);
 
 	public void testClassifyNullIsDefault() {
 		assertFalse(classifier.classify(null));
@@ -44,8 +43,9 @@ public class BinaryExceptionClassifierTests extends TestCase {
 	}
 
 	public void testClassifyExactMatch() {
-		classifier.setTypes(Collections.<Class<? extends Throwable>> singleton(IllegalStateException.class));
-		assertTrue(classifier.classify(new IllegalStateException("Foo")));
+		Collection<Class<? extends Throwable>> set = Collections
+				.<Class<? extends Throwable>> singleton(IllegalStateException.class);
+		assertTrue(new BinaryExceptionClassifier(set).classify(new IllegalStateException("Foo")));
 	}
 
 	public void testTypesProvidedInConstructor() {

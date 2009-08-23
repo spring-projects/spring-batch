@@ -16,11 +16,16 @@
 
 package org.springframework.batch.retry.policy;
 
-import static org.junit.Assert.*;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashSet;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNotSame;
+import static org.junit.Assert.assertSame;
+import static org.junit.Assert.assertTrue;
 
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.junit.Test;
 import org.springframework.batch.retry.RetryContext;
@@ -29,7 +34,8 @@ public class SimpleRetryPolicyTests {
 
 	@Test
 	public void testCanRetryIfNoException() throws Exception {
-		SimpleRetryPolicy policy = new SimpleRetryPolicy();
+		SimpleRetryPolicy policy = new SimpleRetryPolicy(3, Collections
+				.<Class<? extends Throwable>, Boolean> singletonMap(Exception.class, true));
 		RetryContext context = policy.open(null);
 		assertTrue(policy.canRetry(context));
 	}
@@ -37,12 +43,10 @@ public class SimpleRetryPolicyTests {
 	@Test
 	public void testEmptyExceptionsNeverRetry() throws Exception {
 
-		SimpleRetryPolicy policy = new SimpleRetryPolicy();
-		RetryContext context = policy.open(null);
-
 		// We can't retry any exceptions...
-		Collection<Class<? extends Throwable>> empty = Collections.emptySet();
-		policy.setRetryableExceptionClasses(empty);
+		SimpleRetryPolicy policy = new SimpleRetryPolicy(3, Collections
+				.<Class<? extends Throwable>, Boolean> emptyMap());
+		RetryContext context = policy.open(null);
 
 		// ...so we can't retry this one...
 		policy.registerThrowable(context, new IllegalStateException());
@@ -51,7 +55,8 @@ public class SimpleRetryPolicyTests {
 
 	@Test
 	public void testRetryLimitInitialState() throws Exception {
-		SimpleRetryPolicy policy = new SimpleRetryPolicy();
+		SimpleRetryPolicy policy = new SimpleRetryPolicy(3, Collections
+				.<Class<? extends Throwable>, Boolean> singletonMap(Exception.class, true));
 		RetryContext context = policy.open(null);
 		assertTrue(policy.canRetry(context));
 		policy.setMaxAttempts(0);
@@ -61,7 +66,8 @@ public class SimpleRetryPolicyTests {
 
 	@Test
 	public void testRetryLimitSubsequentState() throws Exception {
-		SimpleRetryPolicy policy = new SimpleRetryPolicy();
+		SimpleRetryPolicy policy = new SimpleRetryPolicy(3, Collections
+				.<Class<? extends Throwable>, Boolean> singletonMap(Exception.class, true));
 		RetryContext context = policy.open(null);
 		policy.setMaxAttempts(2);
 		assertTrue(policy.canRetry(context));
@@ -73,7 +79,8 @@ public class SimpleRetryPolicyTests {
 
 	@Test
 	public void testRetryCount() throws Exception {
-		SimpleRetryPolicy policy = new SimpleRetryPolicy();
+		SimpleRetryPolicy policy = new SimpleRetryPolicy(3, Collections
+				.<Class<? extends Throwable>, Boolean> singletonMap(Exception.class, true));
 		RetryContext context = policy.open(null);
 		assertNotNull(context);
 		policy.registerThrowable(context, null);
@@ -85,28 +92,20 @@ public class SimpleRetryPolicyTests {
 
 	@Test
 	public void testFatalOverridesRetryable() throws Exception {
-		SimpleRetryPolicy policy = new SimpleRetryPolicy();
-		policy.setFatalExceptionClasses(getClasses(Exception.class));
-		policy.setRetryableExceptionClasses(getClasses(RuntimeException.class));
+		Map<Class<? extends Throwable>, Boolean> map = new HashMap<Class<? extends Throwable>, Boolean>();
+		map.put(Exception.class, false);
+		map.put(RuntimeException.class, true);
+		SimpleRetryPolicy policy = new SimpleRetryPolicy(3, map);
 		RetryContext context = policy.open(null);
 		assertNotNull(context);
 		policy.registerThrowable(context, new RuntimeException("foo"));
-		assertFalse(policy.canRetry(context));
-	}
-
-	/**
-	 * @param cls
-	 * @return
-	 */
-	private Collection<Class<? extends Throwable>> getClasses(Class<? extends Throwable> cls) {
-		Collection<Class<? extends Throwable>> classes = new HashSet<Class<? extends Throwable>>();
-		classes.add(cls);
-		return classes;
+		assertTrue(policy.canRetry(context));
 	}
 
 	@Test
 	public void testParent() throws Exception {
-		SimpleRetryPolicy policy = new SimpleRetryPolicy();
+		SimpleRetryPolicy policy = new SimpleRetryPolicy(3, Collections
+				.<Class<? extends Throwable>, Boolean> singletonMap(Exception.class, true));
 		RetryContext context = policy.open(null);
 		RetryContext child = policy.open(context);
 		assertNotSame(child, context);

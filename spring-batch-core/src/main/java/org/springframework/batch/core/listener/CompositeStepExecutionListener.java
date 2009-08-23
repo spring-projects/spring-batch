@@ -58,7 +58,7 @@ public class CompositeStepExecutionListener implements StepExecutionListener {
 	public ExitStatus afterStep(StepExecution stepExecution) {
 		ExitStatus status = null;
 		for (Iterator<StepExecutionListener> iterator = list.reverse(); iterator.hasNext();) {
-			StepExecutionListener listener = (StepExecutionListener) iterator.next();
+			StepExecutionListener listener = iterator.next();
 			ExitStatus close = listener.afterStep(stepExecution);
 			status = status != null ? status.and(close) : close;
 		}
@@ -72,7 +72,7 @@ public class CompositeStepExecutionListener implements StepExecutionListener {
 	 */
 	public void beforeStep(StepExecution stepExecution) {
 		for (Iterator<StepExecutionListener> iterator = list.iterator(); iterator.hasNext();) {
-			StepExecutionListener listener = (StepExecutionListener) iterator.next();
+			StepExecutionListener listener = iterator.next();
 			listener.beforeStep(stepExecution);
 		}
 	}

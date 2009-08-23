@@ -218,7 +218,7 @@ public class JdbcStepExecutionDao extends AbstractJdbcBatchMetadataDao implement
 			return null;
 		}
 		else {
-			return (StepExecution) executions.get(0);
+			return executions.get(0);
 		}
 	}
 

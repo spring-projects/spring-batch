@@ -16,8 +16,8 @@
 
 package org.springframework.batch.retry.policy;
 
-import java.util.Arrays;
-import java.util.List;
+import java.util.HashMap;
+import java.util.Map;
 
 import junit.framework.TestCase;
 
@@ -34,15 +34,15 @@ public class FatalExceptionRetryPolicyTests extends TestCase {
 		callback.setExceptionToThrow(new IllegalArgumentException());
 
 		RetryTemplate retryTemplate = new RetryTemplate();
-		// Allow multiple attempts in general...
-		SimpleRetryPolicy policy = new SimpleRetryPolicy(3);
-		retryTemplate.setRetryPolicy(policy);
 
-		// ...but make sure certain exceptions are fatal
-		@SuppressWarnings("unchecked")
-		List<Class<? extends Throwable>> list = Arrays.<Class<? extends Throwable>> asList(IllegalArgumentException.class,
-				IllegalStateException.class);
-		policy.setFatalExceptionClasses(list);
+		// Make sure certain exceptions are fatal...
+		Map<Class<? extends Throwable>, Boolean> map = new HashMap<Class<? extends Throwable>, Boolean>();
+		map.put(IllegalArgumentException.class, false);
+		map.put(IllegalStateException.class, false);
+
+		// ... and allow multiple attempts
+		SimpleRetryPolicy policy = new SimpleRetryPolicy(3, map);
+		retryTemplate.setRetryPolicy(policy);
 		RecoveryCallback<String> recoveryCallback = new RecoveryCallback<String>() {
 			public String recover(RetryContext context) throws Exception {
 				return "bar";
@@ -67,13 +67,14 @@ public class FatalExceptionRetryPolicyTests extends TestCase {
 		callback.setExceptionToThrow(new IllegalArgumentException());
 
 		RetryTemplate retryTemplate = new RetryTemplate();
-		SimpleRetryPolicy policy = new SimpleRetryPolicy(3);
+
+		Map<Class<? extends Throwable>, Boolean> map = new HashMap<Class<? extends Throwable>, Boolean>();
+		map.put(IllegalArgumentException.class, false);
+		map.put(IllegalStateException.class, false);
+
+		SimpleRetryPolicy policy = new SimpleRetryPolicy(3, map);
 		retryTemplate.setRetryPolicy(policy);
 
-		@SuppressWarnings("unchecked")
-		List<Class<? extends Throwable>> list = Arrays.<Class<? extends Throwable>> asList(
-				IllegalArgumentException.class, IllegalStateException.class);
-		policy.setFatalExceptionClasses(list);
 		RecoveryCallback<String> recoveryCallback = new RecoveryCallback<String>() {
 			public String recover(RetryContext context) throws Exception {
 				return "bar";

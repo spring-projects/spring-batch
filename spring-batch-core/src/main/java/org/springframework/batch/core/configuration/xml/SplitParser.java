@@ -77,7 +77,7 @@ public class SplitParser {
 		}
 
 		@SuppressWarnings("unchecked")
-		List<Element> flowElements = (List<Element>) DomUtils.getChildElementsByTagName(element, "flow");
+		List<Element> flowElements = DomUtils.getChildElementsByTagName(element, "flow");
 
 		if (flowElements.size() < 2) {
 			parserContext.getReaderContext().error("A <split/> must contain at least two 'flow' elements.", element);

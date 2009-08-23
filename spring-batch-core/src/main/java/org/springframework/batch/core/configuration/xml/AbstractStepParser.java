@@ -15,7 +15,6 @@
  */
 package org.springframework.batch.core.configuration.xml;
 
-import java.util.Arrays;
 import java.util.List;
 
 import org.springframework.beans.MutablePropertyValues;
@@ -78,7 +77,7 @@ public abstract class AbstractStepParser {
 		AbstractBeanDefinition bd = new GenericBeanDefinition();
 
 		@SuppressWarnings("unchecked")
-		List<Element> taskletElements = (List<Element>) DomUtils.getChildElementsByTagName(stepElement, TASKLET_ELE);
+		List<Element> taskletElements = DomUtils.getChildElementsByTagName(stepElement, TASKLET_ELE);
 		if (taskletElements.size() == 1) {
 			boolean stepUnderspecified = CoreNamespaceUtils.isUnderspecified(stepElement);
 			parseTasklet(stepElement, taskletElements.get(0), bd, parserContext, stepUnderspecified);
@@ -115,7 +114,7 @@ public abstract class AbstractStepParser {
 
 		String taskletRef = taskletElement.getAttribute(TASKLET_REF_ATTR);
 		@SuppressWarnings("unchecked")
-		List<Element> chunkElements = (List<Element>) DomUtils.getChildElementsByTagName(taskletElement, CHUNK_ELE);
+		List<Element> chunkElements = DomUtils.getChildElementsByTagName(taskletElement, CHUNK_ELE);
 		if (StringUtils.hasText(taskletRef)) {
 			if (chunkElements.size() > 0) {
 				parserContext.getReaderContext().error(
@@ -135,7 +134,7 @@ public abstract class AbstractStepParser {
 					taskletElement);
 		}
 
-		setUpBeanDefinitionForTaskletStep(taskletElement, bd, parserContext);
+		handleTaskletElement(taskletElement, bd, parserContext);
 	}
 
 	private void parseTaskletRef(String taskletRef, MutablePropertyValues propertyValues) {
@@ -145,40 +144,18 @@ public abstract class AbstractStepParser {
 		}
 	}
 
-	private void setUpBeanDefinitionForTaskletStep(Element taskletElement, AbstractBeanDefinition bd,
-			ParserContext parserContext) {
-
+	private void handleTaskletElement(Element taskletElement, AbstractBeanDefinition bd, ParserContext parserContext) {
 		MutablePropertyValues propertyValues = bd.getPropertyValues();
-
-		checkStepAttributes(taskletElement, propertyValues);
-
-		String jobRepositoryRef = taskletElement.getAttribute(JOB_REPO_ATTR);
-		if (StringUtils.hasText(jobRepositoryRef)) {
-			RuntimeBeanReference jobRepositoryBeanRef = new RuntimeBeanReference(jobRepositoryRef);
-			propertyValues.addPropertyValue("jobRepository", jobRepositoryBeanRef);
-		}
-
-		String transactionManagerRef = taskletElement.getAttribute("transaction-manager");
-		if (StringUtils.hasText(transactionManagerRef)) {
-			RuntimeBeanReference transactionManagerBeanRef = new RuntimeBeanReference(transactionManagerRef);
-			propertyValues.addPropertyValue("transactionManager", transactionManagerBeanRef);
-		}
-
-		handleTransactionAttributesElement(taskletElement, propertyValues, parserContext);
-
+		handleTaskletAttributes(taskletElement, propertyValues);
+		handleTransactionAttributesElement(taskletElement, propertyValues);
 		handleListenersElement(taskletElement, propertyValues, parserContext);
-
 		handleExceptionElement(taskletElement, parserContext, propertyValues, "no-rollback-exception-classes",
 				"noRollbackExceptionClasses");
-
 		bd.setRole(BeanDefinition.ROLE_SUPPORT);
-
 		bd.setSource(parserContext.extractSource(taskletElement));
-
 	}
 
-	private void handleTransactionAttributesElement(Element stepElement, MutablePropertyValues propertyValues,
-			ParserContext parserContext) {
+	private void handleTransactionAttributesElement(Element stepElement, MutablePropertyValues propertyValues) {
 		@SuppressWarnings("unchecked")
 		List<Element> txAttrElements = DomUtils.getChildElementsByTagName(stepElement, TX_ATTRIBUTES_ELE);
 		if (txAttrElements.size() == 1) {
@@ -199,35 +176,72 @@ public abstract class AbstractStepParser {
 	}
 
 	@SuppressWarnings("unchecked")
-	public static void handleExceptionElement(Element element, ParserContext parserContext,
-			MutablePropertyValues propertyValues, String subElementName, String propertyName) {
-		List<Element> children = DomUtils.getChildElementsByTagName(element, subElementName);
+	private void handleExceptionElement(Element element, ParserContext parserContext,
+			MutablePropertyValues propertyValues, String exceptionListName, String propertyName) {
+		List<Element> children = DomUtils.getChildElementsByTagName(element, exceptionListName);
 		if (children.size() == 1) {
-			Element child = children.get(0);
-			String exceptions = DomUtils.getTextValue(child);
-			String[] exceptionArray = StringUtils.tokenizeToStringArray(exceptions, ",\n");
-			ManagedList managedList = new ManagedList();
-			managedList.setMergeEnabled(child.hasAttribute(MERGE_ATTR)
-					&& Boolean.valueOf(child.getAttribute(MERGE_ATTR)));
-			managedList.addAll(Arrays.asList(exceptionArray));
-			propertyValues.addPropertyValue(propertyName, managedList);
+			Element exceptionClassesElement = children.get(0);
+			ManagedList list = new ManagedList();
+			list.setMergeEnabled(exceptionClassesElement.hasAttribute(MERGE_ATTR)
+					&& Boolean.valueOf(exceptionClassesElement.getAttribute(MERGE_ATTR)));
+			addExceptionClasses("include", exceptionClassesElement, list, parserContext);
+			propertyValues.addPropertyValue(propertyName, list);
 		}
 		else if (children.size() > 1) {
 			parserContext.getReaderContext().error(
-					"The <" + subElementName + "/> element may not appear more than once in a single <"
+					"The <" + exceptionListName + "/> element may not appear more than once in a single <"
 							+ element.getNodeName() + "/>.", element);
 		}
-
 	}
 
-	private void checkStepAttributes(Element stepElement, MutablePropertyValues propertyValues) {
-		String startLimit = stepElement.getAttribute("start-limit");
+	@SuppressWarnings("unchecked")
+	private void addExceptionClasses(String elementName, Element exceptionClassesElement, ManagedList list,
+			ParserContext parserContext) {
+		for (Element child : (List<Element>) DomUtils.getChildElementsByTagName(exceptionClassesElement, elementName)) {
+			String className = child.getAttribute("class");
+			try {
+				Class<Object> cls = (Class<Object>) Class.forName(className);
+				if (!Throwable.class.isAssignableFrom(cls)) {
+					parserContext.getReaderContext().error(
+							"Non-Throwable class \'" + className + "\' found in <"
+									+ exceptionClassesElement.getNodeName() + "/> element.", exceptionClassesElement);
+				}
+				if (list.contains(cls)) {
+					parserContext.getReaderContext().error(
+							"Duplicate entry for class \'" + className + "\' found in <"
+									+ exceptionClassesElement.getNodeName() + "/> element.", exceptionClassesElement);
+				}
+				list.add(cls);
+			}
+			catch (ClassNotFoundException e) {
+				parserContext.getReaderContext().error(
+						"Cannot find class \'" + className + "\', given as an attribute of the <" + elementName
+								+ "/> element.", child);
+			}
+		}
+	}
+
+	private void handleTaskletAttributes(Element taskletElement, MutablePropertyValues propertyValues) {
+		String jobRepositoryRef = taskletElement.getAttribute(JOB_REPO_ATTR);
+		if (StringUtils.hasText(jobRepositoryRef)) {
+			propertyValues.addPropertyValue("jobRepository", new RuntimeBeanReference(jobRepositoryRef));
+		}
+		String transactionManagerRef = taskletElement.getAttribute("transaction-manager");
+		if (StringUtils.hasText(transactionManagerRef)) {
+			propertyValues.addPropertyValue("transactionManager", new RuntimeBeanReference(transactionManagerRef));
+		}
+		String startLimit = taskletElement.getAttribute("start-limit");
 		if (StringUtils.hasText(startLimit)) {
 			propertyValues.addPropertyValue("startLimit", startLimit);
 		}
-		String allowStartIfComplete = stepElement.getAttribute("allow-start-if-complete");
+		String allowStartIfComplete = taskletElement.getAttribute("allow-start-if-complete");
 		if (StringUtils.hasText(allowStartIfComplete)) {
 			propertyValues.addPropertyValue("allowStartIfComplete", allowStartIfComplete);
+		}
+		String taskExecutorBeanId = taskletElement.getAttribute("task-executor");
+		if (StringUtils.hasText(taskExecutorBeanId)) {
+			RuntimeBeanReference taskExecutorRef = new RuntimeBeanReference(taskExecutorBeanId);
+			propertyValues.addPropertyValue("taskExecutor", taskExecutorRef);
 		}
 	}
 

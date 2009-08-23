@@ -9,8 +9,9 @@ import static org.junit.Assert.assertFalse;
 
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.HashSet;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -36,10 +37,6 @@ public class FaultTolerantStepFactoryBeanNonBufferingTests {
 
 	private FaultTolerantStepFactoryBean<String, String> factory = new FaultTolerantStepFactoryBean<String, String>();
 
-	@SuppressWarnings("unchecked")
-	private Collection<Class<? extends Throwable>> skippableExceptions = new HashSet<Class<? extends Throwable>>(Arrays
-			.<Class<? extends Throwable>> asList(SkippableException.class, SkippableRuntimeException.class));
-
 	private List<String> items = Arrays.asList(new String[] { "1", "2", "3", "4", "5" });
 
 	private ListItemReader<String> reader = new ListItemReader<String>(TransactionAwareProxyFactory
@@ -61,6 +58,9 @@ public class FaultTolerantStepFactoryBeanNonBufferingTests {
 		factory.setCommitInterval(2);
 		factory.setItemReader(reader);
 		factory.setItemWriter(writer);
+		Map<Class<? extends Throwable>, Boolean> skippableExceptions = new HashMap<Class<? extends Throwable>, Boolean>();
+		skippableExceptions.put(SkippableException.class, true);
+		skippableExceptions.put(SkippableRuntimeException.class, true);
 		factory.setSkippableExceptionClasses(skippableExceptions);
 		factory.setSkipLimit(2);
 		factory.setIsReaderTransactionalQueue(true);

@@ -6,9 +6,9 @@ import static org.junit.Assert.assertTrue;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.aopalliance.intercept.MethodInterceptor;
 import org.aopalliance.intercept.MethodInvocation;
@@ -81,6 +81,7 @@ public class FaultTolerantStepFactoryBeanTests {
 		writer = new SkipWriterStub<String>();
 	}
 
+	@SuppressWarnings("unchecked")
 	@Before
 	public void setUp() throws Exception {
 		factory = new FaultTolerantStepFactoryBean<String, String>();
@@ -99,10 +100,8 @@ public class FaultTolerantStepFactoryBeanTests {
 
 		factory.setSkipLimit(2);
 
-		@SuppressWarnings("unchecked")
-		Collection<Class<? extends Throwable>> skippableExceptions = Arrays.<Class<? extends Throwable>> asList(
-				SkippableException.class, SkippableRuntimeException.class);
-		factory.setSkippableExceptionClasses(skippableExceptions);
+		factory
+				.setSkippableExceptionClasses(getExceptionMap(SkippableException.class, SkippableRuntimeException.class));
 
 		MapJobRepositoryFactoryBean.clear();
 		MapJobRepositoryFactoryBean repositoryFactory = new MapJobRepositoryFactoryBean();
@@ -118,15 +117,16 @@ public class FaultTolerantStepFactoryBeanTests {
 
 	/**
 	 * Non-skippable (and non-fatal) exception causes failure immediately.
+	 * 
 	 * @throws Exception
 	 */
+	@SuppressWarnings("unchecked")
 	@Test
 	public void testNonSkippableExceptionOnRead() throws Exception {
 		reader.setFailures("2");
 
 		// nothing is skippable
-		Collection<Class<? extends Throwable>> empty = Collections.emptySet();
-		factory.setSkippableExceptionClasses(empty);
+		factory.setSkippableExceptionClasses(getExceptionMap());
 
 		Step step = (Step) factory.getObject();
 
@@ -139,11 +139,11 @@ public class FaultTolerantStepFactoryBeanTests {
 				.getName()));
 	}
 
+	@SuppressWarnings("unchecked")
 	@Test
 	public void testNonSkippableException() throws Exception {
 		// nothing is skippable
-		Collection<Class<? extends Throwable>> empty = Collections.emptySet();
-		factory.setSkippableExceptionClasses(empty);
+		factory.setSkippableExceptionClasses(getExceptionMap());
 		factory.setCommitInterval(1);
 
 		// no failures on read
@@ -287,7 +287,11 @@ public class FaultTolerantStepFactoryBeanTests {
 	public void testFatalException() throws Exception {
 		reader.setFailures("2");
 
-		factory.setFatalExceptionClasses(getExceptionList(FatalRuntimeException.class));
+		Map<Class<? extends Throwable>, Boolean> map = new HashMap<Class<? extends Throwable>, Boolean>();
+		map.put(SkippableException.class, true);
+		map.put(SkippableRuntimeException.class, true);
+		map.put(FatalRuntimeException.class, false);
+		factory.setSkippableExceptionClasses(map);
 		factory.setItemWriter(new ItemWriter<String>() {
 			public void write(List<? extends String> items) {
 				throw new FatalRuntimeException("Ouch!");
@@ -298,7 +302,7 @@ public class FaultTolerantStepFactoryBeanTests {
 
 		step.execute(stepExecution);
 		String message = stepExecution.getFailureExceptions().get(0).getCause().getMessage();
-		assertTrue("Wrong message: " + message, message.equals("Ouch!"));
+		assertEquals("Wrong message: ", "Ouch!", message);
 		assertStepExecutionsAreEqual(stepExecution, repository.getLastStepExecution(jobExecution.getJobInstance(), step
 				.getName()));
 	}
@@ -333,6 +337,7 @@ public class FaultTolerantStepFactoryBeanTests {
 	/**
 	 * Check items causing errors are skipped as expected.
 	 */
+	@SuppressWarnings("unchecked")
 	@Test
 	public void testSkipOverLimitOnRead() throws Exception {
 		reader.setItems(StringUtils.commaDelimitedListToStringArray("1,2,3,4,5,6"));
@@ -341,7 +346,7 @@ public class FaultTolerantStepFactoryBeanTests {
 		writer.setFailures("4");
 
 		factory.setSkipLimit(3);
-		factory.setSkippableExceptionClasses(getExceptionList(Exception.class));
+		factory.setSkippableExceptionClasses(getExceptionMap(Exception.class));
 
 		Step step = (Step) factory.getObject();
 
@@ -366,6 +371,7 @@ public class FaultTolerantStepFactoryBeanTests {
 	/**
 	 * Check items causing errors are skipped as expected.
 	 */
+	@SuppressWarnings("unchecked")
 	@Test
 	public void testSkipListenerFailsOnRead() throws Exception {
 		reader.setItems(StringUtils.commaDelimitedListToStringArray("1,2,3,4,5,6"));
@@ -380,7 +386,7 @@ public class FaultTolerantStepFactoryBeanTests {
 				throw new RuntimeException("oops");
 			}
 		} });
-		factory.setSkippableExceptionClasses(getExceptionList(Exception.class));
+		factory.setSkippableExceptionClasses(getExceptionMap(Exception.class));
 
 		Step step = (Step) factory.getObject();
 
@@ -401,6 +407,7 @@ public class FaultTolerantStepFactoryBeanTests {
 	/**
 	 * Check items causing errors are skipped as expected.
 	 */
+	@SuppressWarnings("unchecked")
 	@Test
 	public void testSkipListenerFailsOnWrite() throws Exception {
 		reader.setItems(StringUtils.commaDelimitedListToStringArray("1,2,3,4,5,6"));
@@ -414,7 +421,7 @@ public class FaultTolerantStepFactoryBeanTests {
 				throw new RuntimeException("oops");
 			}
 		} });
-		factory.setSkippableExceptionClasses(getExceptionList(Exception.class));
+		factory.setSkippableExceptionClasses(getExceptionMap(Exception.class));
 
 		Step step = (Step) factory.getObject();
 
@@ -485,12 +492,13 @@ public class FaultTolerantStepFactoryBeanTests {
 				.getName()));
 	}
 
+	@SuppressWarnings("unchecked")
 	@Test
 	public void testDefaultSkipPolicy() throws Exception {
 		reader.setItems("a", "b", "c");
 		reader.setFailures("b");
 
-		factory.setSkippableExceptionClasses(getExceptionList(Exception.class));
+		factory.setSkippableExceptionClasses(getExceptionMap(Exception.class));
 		factory.setSkipLimit(1);
 
 		Step step = (Step) factory.getObject();
@@ -506,6 +514,7 @@ public class FaultTolerantStepFactoryBeanTests {
 	/**
 	 * Check items causing errors are skipped as expected.
 	 */
+	@SuppressWarnings("unchecked")
 	@Test
 	public void testSkipOverLimitOnReadWithAllSkipsAtEnd() throws Exception {
 		reader.setItems(StringUtils.commaDelimitedListToStringArray("1,2,3,4,5,6,7,8,9,10,11,12,13,14,15"));
@@ -515,7 +524,7 @@ public class FaultTolerantStepFactoryBeanTests {
 
 		factory.setCommitInterval(5);
 		factory.setSkipLimit(3);
-		factory.setSkippableExceptionClasses(getExceptionList(Exception.class));
+		factory.setSkippableExceptionClasses(getExceptionMap(Exception.class));
 
 		Step step = (Step) factory.getObject();
 
@@ -826,11 +835,11 @@ public class FaultTolerantStepFactoryBeanTests {
 	/**
 	 * condition: skippable < fatal; exception is skippable
 	 * 
-	 * expected: false; fatal overrides skippable
+	 * expected: true
 	 */
 	@Test
 	public void testSkippableSubset_skippable() throws Exception {
-		assertFalse(getSkippableSubsetSkipPolicy().shouldSkip(new WriteFailedException(""), 0));
+		assertTrue(getSkippableSubsetSkipPolicy().shouldSkip(new WriteFailedException(""), 0));
 	}
 
 	/**
@@ -874,34 +883,34 @@ public class FaultTolerantStepFactoryBeanTests {
 	}
 
 	private SkipPolicy getSkippableSubsetSkipPolicy() throws Exception {
-		List<Class<? extends Throwable>> skippableExceptions = new ArrayList<Class<? extends Throwable>>();
-		skippableExceptions.add(WriteFailedException.class);
-		List<Class<? extends Throwable>> fatalExceptions = new ArrayList<Class<? extends Throwable>>();
-		fatalExceptions.add(ItemWriterException.class);
+		Map<Class<? extends Throwable>, Boolean> skippableExceptions = new HashMap<Class<? extends Throwable>, Boolean>();
+		skippableExceptions.put(WriteFailedException.class, true);
+		skippableExceptions.put(ItemWriterException.class, false);
 		factory.setSkippableExceptionClasses(skippableExceptions);
-		factory.setFatalExceptionClasses(fatalExceptions);
 		return getSkipPolicy(factory);
 	}
 
 	private SkipPolicy getFatalSubsetSkipPolicy() throws Exception {
-		List<Class<? extends Throwable>> skippableExceptions = new ArrayList<Class<? extends Throwable>>();
-		skippableExceptions.add(ItemWriterException.class);
-		List<Class<? extends Throwable>> fatalExceptions = new ArrayList<Class<? extends Throwable>>();
-		fatalExceptions.add(WriteFailedException.class);
+		Map<Class<? extends Throwable>, Boolean> skippableExceptions = new HashMap<Class<? extends Throwable>, Boolean>();
+		skippableExceptions.put(ItemWriterException.class, true);
+		skippableExceptions.put(WriteFailedException.class, false);
 		factory.setSkippableExceptionClasses(skippableExceptions);
-		factory.setFatalExceptionClasses(fatalExceptions);
 		return getSkipPolicy(factory);
 	}
 
-	private SkipPolicy getSkipPolicy(FactoryBean stepFactoryBean) throws Exception {
+	private SkipPolicy getSkipPolicy(FactoryBean factory) throws Exception {
 		Object step = factory.getObject();
 		Object tasklet = ReflectionTestUtils.getField(step, "tasklet");
 		Object chunkProvider = ReflectionTestUtils.getField(tasklet, "chunkProvider");
 		return (SkipPolicy) ReflectionTestUtils.getField(chunkProvider, "skipPolicy");
 	}
 
-	@SuppressWarnings("unchecked")
-	private Collection<Class<? extends Throwable>> getExceptionList(Class<? extends Throwable> args) {
-		return Arrays.<Class<? extends Throwable>> asList(args);
+	private Map<Class<? extends Throwable>, Boolean> getExceptionMap(Class<? extends Throwable>... args) {
+		Map<Class<? extends Throwable>, Boolean> map = new HashMap<Class<? extends Throwable>, Boolean>();
+		for (Class<? extends Throwable> arg : args) {
+			map.put(arg, true);
+		}
+		return map;
 	}
+
 }
