@@ -36,7 +36,7 @@ public class CompositeItemWriterTests extends TestCase {
 
 		for (int i = 0; i < NUMBER_OF_WRITERS; i++) {
 			@SuppressWarnings("unchecked")
-			ItemWriter<Object> writer = createStrictMock(ItemWriter.class);
+			ItemWriter<? super Object> writer = createStrictMock(ItemWriter.class);
 
 			writer.write(data);
 			expectLastCall().once();
@@ -48,7 +48,7 @@ public class CompositeItemWriterTests extends TestCase {
 		itemWriter.setDelegates(writers);
 		itemWriter.write(data);
 
-		for (ItemWriter<Object> writer : writers) {
+		for (ItemWriter<? super Object> writer : writers) {
 			verify(writer);
 		}
 	}
