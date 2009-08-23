@@ -56,7 +56,9 @@
     <programlisting>&lt;step id="simpleStep"&gt;
     ...
     &lt;listeners&gt;
-        &lt;listener class="org.example...ItemFailureLoggerListener"/&gt;
+        &lt;listener&gt;
+            &lt;bean class="org.example...ItemFailureLoggerListener"/&gt;
+        &lt;/listener&gt;
     &lt;/listeners&gt;
 &lt;/step&gt;</programlisting>
 
