@@ -21,7 +21,7 @@ import org.springframework.batch.item.ItemWriter;
 public class CompositeItemWriterTests extends TestCase {
 
 	// object under test
-	private CompositeItemWriter<Object> itemProcessor = new CompositeItemWriter<Object>();
+	private CompositeItemWriter<Object> itemWriter = new CompositeItemWriter<Object>();
 
 	/**
 	 * Regular usage scenario. All injected processors should be called.
@@ -45,8 +45,8 @@ public class CompositeItemWriterTests extends TestCase {
 			writers.add(writer);
 		}
 
-		itemProcessor.setDelegates(writers);
-		itemProcessor.write(data);
+		itemWriter.setDelegates(writers);
+		itemWriter.write(data);
 
 		for (ItemWriter<Object> writer : writers) {
 			verify(writer);
