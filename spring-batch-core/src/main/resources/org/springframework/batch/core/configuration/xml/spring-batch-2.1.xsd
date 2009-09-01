@@ -34,7 +34,7 @@
 					</xsd:annotation>
 					<xsd:complexType>
 						<xsd:sequence>
-							<xsd:element name="listener" type="jobExecutionListenerType" minOccurs="1" maxOccurs="unbounded" />
+							<xsd:element name="listener" type="jobExecutionListenerType" minOccurs="0" maxOccurs="unbounded" />
 						</xsd:sequence>
 						<xsd:attributeGroup ref="mergeAttribute" />
 					</xsd:complexType>
@@ -292,11 +292,8 @@
 					</xsd:documentation>
 				</xsd:annotation>
 				<xsd:complexType>
-					<xsd:simpleContent>
-						<xsd:extension base="xsd:string">
-							<xsd:attributeGroup ref="mergeAttribute" />
-						</xsd:extension>
-					</xsd:simpleContent>
+					<xsd:group ref="includeElementGroup" minOccurs="0" maxOccurs="unbounded"/>
+					<xsd:attributeGroup ref="mergeAttribute" />
 				</xsd:complexType>
 			</xsd:element>
 			<xsd:element name="listeners" type="stepListenersType" minOccurs="0" maxOccurs="1"/>
@@ -339,6 +336,18 @@
 					<tool:annotation kind="ref">
 						<tool:expected-type
 							type="org.springframework.transaction.PlatformTransactionManager" />
+					</tool:annotation>
+				</xsd:appinfo>
+			</xsd:annotation>
+		</xsd:attribute>
+		<xsd:attribute name="task-executor" type="xsd:string" use="optional">
+			<xsd:annotation>
+				<xsd:documentation source="java:org.springframework.core.task.TaskExecutor"><![CDATA[
+				The task executor responsible for executing the task.
+				]]></xsd:documentation>
+				<xsd:appinfo>
+					<tool:annotation kind="ref">
+						<tool:expected-type type="org.springframework.core.task.TaskExecutor" />
 					</tool:annotation>
 				</xsd:appinfo>
 			</xsd:annotation>
@@ -390,8 +399,51 @@
 		</xsd:restriction>
 	</xsd:simpleType>
 
+	<xsd:group name="beanElementGroup">
+		<xsd:choice>
+			<xsd:element ref="beans:bean"/>
+			<xsd:element ref="beans:ref"/>
+		</xsd:choice>
+	</xsd:group>
+
 	<xsd:complexType name="chunkTaskletType">
 		<xsd:all>
+			<xsd:element name="reader" minOccurs="0" maxOccurs="1">
+				<xsd:annotation>
+					<xsd:documentation><![CDATA[
+					The ItemReader used by the step.
+					]]>
+					</xsd:documentation>
+				</xsd:annotation>
+				<xsd:complexType>
+					<xsd:group ref="beanElementGroup" minOccurs="0" maxOccurs="1"/>
+					<xsd:attributeGroup ref="adapterMethodAttribute"/>
+				</xsd:complexType>
+			</xsd:element>
+			<xsd:element name="processor" minOccurs="0" maxOccurs="1">
+				<xsd:annotation>
+					<xsd:documentation><![CDATA[
+					The ItemProcessor used by the step.
+					]]>
+					</xsd:documentation>
+				</xsd:annotation>
+				<xsd:complexType>
+					<xsd:group ref="beanElementGroup" minOccurs="0" maxOccurs="1"/>
+					<xsd:attributeGroup ref="adapterMethodAttribute"/>
+				</xsd:complexType>
+			</xsd:element>
+			<xsd:element name="writer" minOccurs="0" maxOccurs="1">
+				<xsd:annotation>
+					<xsd:documentation><![CDATA[
+					The ItemWriter used by the step.
+					]]>
+					</xsd:documentation>
+				</xsd:annotation>
+				<xsd:complexType>
+					<xsd:group ref="beanElementGroup" minOccurs="0" maxOccurs="1"/>
+					<xsd:attributeGroup ref="adapterMethodAttribute"/>
+				</xsd:complexType>
+			</xsd:element>
 			<xsd:element name="retry-listeners" minOccurs="0" maxOccurs="1">
 				<xsd:annotation>
 					<xsd:documentation><![CDATA[
@@ -401,7 +453,7 @@
 				</xsd:annotation>
 				<xsd:complexType>
 					<xsd:sequence>
-						<xsd:element name="listener" type="listenerType" minOccurs="1" maxOccurs="unbounded" />
+						<xsd:element name="listener" type="listenerType" minOccurs="0" maxOccurs="unbounded" />
 					</xsd:sequence>
 					<xsd:attributeGroup ref="mergeAttribute" />
 				</xsd:complexType>
@@ -415,7 +467,7 @@
 				</xsd:annotation>
 				<xsd:complexType>
 					<xsd:sequence>
-						<xsd:element name="stream" minOccurs="1" maxOccurs="unbounded">
+						<xsd:element name="stream" minOccurs="0" maxOccurs="unbounded">
 							<xsd:complexType>
 								<xsd:attribute name="ref" type="xsd:string">
 									<xsd:annotation>
@@ -438,18 +490,15 @@
 			<xsd:element name="skippable-exception-classes" minOccurs="0" maxOccurs="1">
 				<xsd:annotation>
 					<xsd:documentation><![CDATA[
-					List of exception classes that are skippable.  Exceptions that are already marked as no-rollback
+					List of exception classes that are skippable.  
+					Exceptions that are already marked as no-rollback
 					are automatically skippable (but it doesn't hurt to add them again here).
-					Separate each attribute with a comma or a newline.
 					]]>
 					</xsd:documentation>
 				</xsd:annotation>
 				<xsd:complexType>
-					<xsd:simpleContent>
-						<xsd:extension base="xsd:string">
-							<xsd:attributeGroup ref="mergeAttribute" />
-						</xsd:extension>
-					</xsd:simpleContent>
+					<xsd:group ref="includeExcludeElementGroup" minOccurs="0" maxOccurs="unbounded"/>
+					<xsd:attributeGroup ref="mergeAttribute" />
 				</xsd:complexType>
 			</xsd:element>
 			<xsd:element name="retryable-exception-classes" minOccurs="0" maxOccurs="1">
@@ -461,27 +510,8 @@
 					</xsd:documentation>
 				</xsd:annotation>
 				<xsd:complexType>
-					<xsd:simpleContent>
-						<xsd:extension base="xsd:string">
-							<xsd:attributeGroup ref="mergeAttribute" />
-						</xsd:extension>
-					</xsd:simpleContent>
-				</xsd:complexType>
-			</xsd:element>
-			<xsd:element name="fatal-exception-classes" minOccurs="0" maxOccurs="1">
-				<xsd:annotation>
-					<xsd:documentation><![CDATA[
-					List of exception classes that are fatal.
-					Separate each attribute with a newline or a comma.
-					]]>
-					</xsd:documentation>
-				</xsd:annotation>
-				<xsd:complexType>
-					<xsd:simpleContent>
-						<xsd:extension base="xsd:string">
-							<xsd:attributeGroup ref="mergeAttribute" />
-						</xsd:extension>
-					</xsd:simpleContent>
+					<xsd:group ref="includeElementGroup" minOccurs="0" maxOccurs="unbounded"/>
+					<xsd:attributeGroup ref="mergeAttribute" />
 				</xsd:complexType>
 			</xsd:element>
 		</xsd:all>
@@ -555,18 +585,6 @@
 				]]></xsd:documentation>
 			</xsd:annotation>
 		</xsd:attribute>
-		<xsd:attribute name="task-executor" type="xsd:string" use="optional">
-			<xsd:annotation>
-				<xsd:documentation source="java:org.springframework.core.task.TaskExecutor"><![CDATA[
-				The task executor responsible for executing the task.
-				]]></xsd:documentation>
-				<xsd:appinfo>
-					<tool:annotation kind="ref">
-						<tool:expected-type type="org.springframework.core.task.TaskExecutor" />
-					</tool:annotation>
-				</xsd:appinfo>
-			</xsd:annotation>
-		</xsd:attribute>
 		<xsd:attribute name="throttle-limit" type="xsd:string" use="optional">
 			<xsd:annotation>
 				<xsd:documentation><![CDATA[
@@ -604,29 +622,63 @@
 		</xsd:attribute>
 	</xsd:attributeGroup>
 
-	<xsd:complexType name="listenerType">
-		<xsd:attribute name="ref" type="xsd:string">
+	<xsd:attributeGroup name="classAttribute">
+		<xsd:attribute name="class" type="xsd:string" use="required">
 			<xsd:annotation>
 				<xsd:documentation>
-					A reference to a listener, a POJO with a
-					listener-annotated method, or a POJO with
-					a method
-					referenced by a *-method attribute.
-				</xsd:documentation>
-				<xsd:appinfo>
-					<tool:annotation kind="ref" />
-				</xsd:appinfo>
-			</xsd:annotation>
-		</xsd:attribute>
-		<xsd:attribute name="class" type="xsd:string">
-			<xsd:annotation>
-				<xsd:documentation>
-					A class name used to create a listener from the default constructor.
+					A class name.
 				</xsd:documentation>
 				<xsd:appinfo>
 					<tool:annotation kind="direct">
 						<tool:expected-type type="java.lang.Class" />
 					</tool:annotation>
+				</xsd:appinfo>
+			</xsd:annotation>
+		</xsd:attribute>
+	</xsd:attributeGroup>
+
+	<xsd:group name="includeElementGroup">
+		<xsd:choice>
+			<xsd:element name="include">
+				<xsd:annotation>
+					<xsd:documentation>
+						Classify an exception as "included" in the set.
+					</xsd:documentation>
+				</xsd:annotation>
+				<xsd:complexType>
+					<xsd:attributeGroup ref="classAttribute"/>
+				</xsd:complexType>
+			</xsd:element>
+		</xsd:choice>
+	</xsd:group>
+
+	<xsd:group name="includeExcludeElementGroup">
+		<xsd:choice>
+			<xsd:group ref="includeElementGroup"/>
+			<xsd:element name="exclude">
+				<xsd:annotation>
+					<xsd:documentation>
+						Classify an exception as "excluded" from the set.
+					</xsd:documentation>
+				</xsd:annotation>
+				<xsd:complexType>
+					<xsd:attributeGroup ref="classAttribute"/>
+				</xsd:complexType>
+			</xsd:element>
+		</xsd:choice>
+	</xsd:group>
+
+	<xsd:complexType name="listenerType">
+		<xsd:group ref="beanElementGroup" minOccurs="0" maxOccurs="1"/>
+		<xsd:attribute name="ref" type="xsd:string">
+			<xsd:annotation>
+				<xsd:documentation>
+					A reference to a listener, a POJO with a
+					listener-annotated method, or a POJO with
+					a method referenced by a *-method attribute.
+				</xsd:documentation>
+				<xsd:appinfo>
+					<tool:annotation kind="ref" />
 				</xsd:appinfo>
 			</xsd:annotation>
 		</xsd:attribute>
@@ -672,7 +724,7 @@
 			</xsd:documentation>
 		</xsd:annotation>
 		<xsd:sequence>
-			<xsd:element name="listener" type="stepListenerType" minOccurs="1" maxOccurs="unbounded" />
+			<xsd:element name="listener" type="stepListenerType" minOccurs="0" maxOccurs="unbounded" />
 		</xsd:sequence>
 		<xsd:attributeGroup ref="mergeAttribute" />
 	</xsd:complexType>
@@ -825,6 +877,17 @@
 				<xsd:documentation>
 					Should this list be merged with the corresponding list provided 
 					by the parent?  If not, it will overwrite the parent list.
+				</xsd:documentation>
+			</xsd:annotation>
+		</xsd:attribute>
+	</xsd:attributeGroup>
+
+	<xsd:attributeGroup name="adapterMethodAttribute">
+		<xsd:attribute name="adapter-method" type="xsd:string" use="optional">
+			<xsd:annotation>
+				<xsd:documentation>
+					This attribute indicates the method from the class that should 
+					be used to dynamically create a proxy.
 				</xsd:documentation>
 			</xsd:annotation>
 		</xsd:attribute>
