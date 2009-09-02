@@ -16,6 +16,7 @@
 
 package org.springframework.batch.retry.policy;
 
+import java.util.Collections;
 import java.util.Map;
 
 import org.springframework.batch.classify.BinaryExceptionClassifier;
@@ -42,9 +43,22 @@ import org.springframework.batch.retry.context.RetryContextSupport;
  */
 public class SimpleRetryPolicy implements RetryPolicy {
 
+	/**
+	 * The default limit to the number of attempts for a new policy.
+	 */
+	public final static int DEFAULT_MAX_ATTEMPTS = 3;
+
 	private volatile int maxAttempts;
 
 	private BinaryExceptionClassifier retryableClassifier = new BinaryExceptionClassifier(false);
+
+	/**
+	 * Create a {@link SimpleRetryPolicy} with the default number of retry
+	 * attempts.
+	 */
+	public SimpleRetryPolicy() {
+		this(DEFAULT_MAX_ATTEMPTS, Collections.<Class<? extends Throwable>, Boolean>singletonMap(Exception.class, true));
+	}
 
 	/**
 	 * Create a {@link SimpleRetryPolicy} with the specified number of retry

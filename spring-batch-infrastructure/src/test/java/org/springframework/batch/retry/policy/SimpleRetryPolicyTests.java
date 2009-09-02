@@ -34,8 +34,7 @@ public class SimpleRetryPolicyTests {
 
 	@Test
 	public void testCanRetryIfNoException() throws Exception {
-		SimpleRetryPolicy policy = new SimpleRetryPolicy(3, Collections
-				.<Class<? extends Throwable>, Boolean> singletonMap(Exception.class, true));
+		SimpleRetryPolicy policy = new SimpleRetryPolicy();
 		RetryContext context = policy.open(null);
 		assertTrue(policy.canRetry(context));
 	}
@@ -55,8 +54,7 @@ public class SimpleRetryPolicyTests {
 
 	@Test
 	public void testRetryLimitInitialState() throws Exception {
-		SimpleRetryPolicy policy = new SimpleRetryPolicy(3, Collections
-				.<Class<? extends Throwable>, Boolean> singletonMap(Exception.class, true));
+		SimpleRetryPolicy policy = new SimpleRetryPolicy();
 		RetryContext context = policy.open(null);
 		assertTrue(policy.canRetry(context));
 		policy.setMaxAttempts(0);
@@ -66,8 +64,7 @@ public class SimpleRetryPolicyTests {
 
 	@Test
 	public void testRetryLimitSubsequentState() throws Exception {
-		SimpleRetryPolicy policy = new SimpleRetryPolicy(3, Collections
-				.<Class<? extends Throwable>, Boolean> singletonMap(Exception.class, true));
+		SimpleRetryPolicy policy = new SimpleRetryPolicy();
 		RetryContext context = policy.open(null);
 		policy.setMaxAttempts(2);
 		assertTrue(policy.canRetry(context));
@@ -79,8 +76,7 @@ public class SimpleRetryPolicyTests {
 
 	@Test
 	public void testRetryCount() throws Exception {
-		SimpleRetryPolicy policy = new SimpleRetryPolicy(3, Collections
-				.<Class<? extends Throwable>, Boolean> singletonMap(Exception.class, true));
+		SimpleRetryPolicy policy = new SimpleRetryPolicy();
 		RetryContext context = policy.open(null);
 		assertNotNull(context);
 		policy.registerThrowable(context, null);
@@ -104,8 +100,7 @@ public class SimpleRetryPolicyTests {
 
 	@Test
 	public void testParent() throws Exception {
-		SimpleRetryPolicy policy = new SimpleRetryPolicy(3, Collections
-				.<Class<? extends Throwable>, Boolean> singletonMap(Exception.class, true));
+		SimpleRetryPolicy policy = new SimpleRetryPolicy();
 		RetryContext context = policy.open(null);
 		RetryContext child = policy.open(context);
 		assertNotSame(child, context);
