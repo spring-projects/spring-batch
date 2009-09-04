@@ -28,10 +28,12 @@ import org.springframework.util.ClassUtils;
  * Abstract {@link org.springframework.batch.item.ItemReader} for to extend when
  * reading database records in a paging fashion.
  * 
+ * <p>
  * Implementations should execute queries using paged requests of a size
  * specified in {@link #setPageSize(int)}. Additional pages are requested when
  * needed as {@link #read()} method is called, returning an object corresponding
  * to current position.
+ * </p>
  * 
  * @author Thomas Risberg
  * @since 2.0
@@ -134,10 +136,12 @@ public abstract class AbstractPagingItemReader<T> extends AbstractItemCountingIt
 	@Override
 	protected void doClose() throws Exception {
 
-		initialized = false;
-		current = 0;
-		page = 0;
-		results = null;
+		synchronized (lock) {
+			initialized = false;
+			current = 0;
+			page = 0;
+			results = null;
+		}
 
 	}
 
