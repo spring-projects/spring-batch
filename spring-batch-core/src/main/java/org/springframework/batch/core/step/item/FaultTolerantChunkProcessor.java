@@ -223,6 +223,9 @@ public class FaultTolerantChunkProcessor<I, O> extends SimpleChunkProcessor<I, O
 							// this is skippable
 							contribution.incrementProcessSkipCount();
 							logger.debug("Skipping after failed process with no rollback", e);
+							// If not re-throwing then the listener will not be
+							// called in next chunk.
+							callProcessSkipListener(item, e);
 						}
 						else {
 							// If it's not skippable that's an error in
@@ -385,12 +388,7 @@ public class FaultTolerantChunkProcessor<I, O> extends SimpleChunkProcessor<I, O
 				continue;
 			}
 			Exception e = wrapper.getException();
-			try {
-				getListener().onSkipInProcess(item, e);
-			}
-			catch (RuntimeException ex) {
-				throw new SkipListenerFailedException("Fatal exception in SkipListener.", ex, e);
-			}
+			callProcessSkipListener(item, e);
 		}
 
 		for (SkipWrapper<O> wrapper : outputs.getSkips()) {
@@ -407,6 +405,22 @@ public class FaultTolerantChunkProcessor<I, O> extends SimpleChunkProcessor<I, O
 		outputs.clearSkips();
 		inputs.clearSkips();
 
+	}
+
+	/**
+	 * Convenience method for calling process skip listener, so that it can be
+	 * called from multiple places.
+	 * 
+	 * @param item the item that is skipped
+	 * @param e the cause of the skip
+	 */
+	private void callProcessSkipListener(I item, Exception e) {
+		try {
+			getListener().onSkipInProcess(item, e);
+		}
+		catch (RuntimeException ex) {
+			throw new SkipListenerFailedException("Fatal exception in SkipListener.", ex, e);
+		}
 	}
 
 	private Object getInputKey(I item) {
