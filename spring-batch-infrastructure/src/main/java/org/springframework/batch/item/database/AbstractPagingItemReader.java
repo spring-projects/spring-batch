@@ -15,47 +15,68 @@
  */
 package org.springframework.batch.item.database;
 
-import org.springframework.batch.item.support.AbstractItemCountingItemStreamItemReader;
-import org.springframework.beans.factory.InitializingBean;
-import org.springframework.util.ClassUtils;
-import org.springframework.util.Assert;
+import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-
-import java.util.List;
+import org.springframework.batch.item.support.AbstractItemCountingItemStreamItemReader;
+import org.springframework.beans.factory.InitializingBean;
+import org.springframework.util.Assert;
+import org.springframework.util.ClassUtils;
 
 /**
- * Abstract {@link org.springframework.batch.item.ItemReader} for to extend when reading database records in a paging
- * fashion.
- *
- * Implementations should execute queries using paged requests of a size specified in {@link #setPageSize(int)}.
- * Additional pages are requested when needed as {@link #read()} method is called, returning an
- * object corresponding to current position.
- *
+ * Abstract {@link org.springframework.batch.item.ItemReader} for to extend when
+ * reading database records in a paging fashion.
+ * 
+ * Implementations should execute queries using paged requests of a size
+ * specified in {@link #setPageSize(int)}. Additional pages are requested when
+ * needed as {@link #read()} method is called, returning an object corresponding
+ * to current position.
+ * 
  * @author Thomas Risberg
  * @since 2.0
  */
-public abstract class AbstractPagingItemReader<T> extends AbstractItemCountingItemStreamItemReader<T> implements InitializingBean {
+public abstract class AbstractPagingItemReader<T> extends AbstractItemCountingItemStreamItemReader<T> implements
+		InitializingBean {
 
 	protected Log logger = LogFactory.getLog(getClass());
 
-	protected boolean initialized = false;
+	private volatile boolean initialized = false;
 
-	protected int current = 0;
+	private int pageSize = 10;
 
-	protected int page = 0;
+	private volatile AtomicInteger current = new AtomicInteger(0);
 
-	protected int pageSize = 10;
+	private volatile int page = 0;
 
-	protected List<T> results;
+	protected volatile List<T> results;
+
+	private Object lock = new Object();
 
 	public AbstractPagingItemReader() {
 		setName(ClassUtils.getShortName(AbstractPagingItemReader.class));
 	}
 
 	/**
-	 * The number of rows to retreive at a time.
-	 *
+	 * The current page number.
+	 * @return the current page
+	 */
+	public int getPage() {
+		return page;
+	}
+	
+	/**
+	 * The page size configured for this reader.
+	 * @return the page size
+	 */
+	public int getPageSize() {
+		return pageSize;
+	}
+
+	/**
+	 * The number of rows to retrieve at a time.
+	 * 
 	 * @param pageSize the number of rows to fetch per page
 	 */
 	public void setPageSize(int pageSize) {
@@ -73,22 +94,26 @@ public abstract class AbstractPagingItemReader<T> extends AbstractItemCountingIt
 	@Override
 	protected T doRead() throws Exception {
 
-		if (results == null || current >= pageSize) {
+		if (results == null || current.get() >= pageSize) {
 
 			if (logger.isDebugEnabled()) {
-				logger.debug("Reading page " + page);
+				logger.debug("Reading page " + getPage());
 			}
 
-			doReadPage();
-
-			if (current >= pageSize) {
-				current = 0;
+			synchronized (lock) {
+				if (results == null || current.get() >= pageSize) {
+					doReadPage();
+					page++;
+					current.set(0);
+				}
 			}
-			page++;
+
+
 		}
 
-		if (current < results.size()) {
-			return results.get(current++);
+		int next = current.getAndIncrement();
+		if (next < results.size()) {
+			return results.get(next);
 		}
 		else {
 			return null;
@@ -102,7 +127,6 @@ public abstract class AbstractPagingItemReader<T> extends AbstractItemCountingIt
 	protected void doOpen() throws Exception {
 
 		Assert.state(!initialized, "Cannot open an already opened ItemReader, call close first");
-
 		initialized = true;
 
 	}
@@ -111,22 +135,22 @@ public abstract class AbstractPagingItemReader<T> extends AbstractItemCountingIt
 	protected void doClose() throws Exception {
 
 		initialized = false;
-		current = 0;
+		current.set(0);
 		page = 0;
 		results = null;
-	}
 
+	}
 
 	@Override
 	protected void jumpToItem(int itemIndex) throws Exception {
 
 		page = itemIndex / pageSize;
-		current = itemIndex % pageSize;
+		current.set(itemIndex % pageSize);
 
 		doJumpToPage(itemIndex);
 
 		if (logger.isDebugEnabled()) {
-			logger.debug("Jumping to page " + page + " and index " + current);
+			logger.debug("Jumping to page " + getPage() + " and index " + current);
 		}
 
 	}

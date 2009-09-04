@@ -22,6 +22,7 @@ import org.springframework.orm.ibatis.SqlMapClientTemplate;
 
 import java.util.Map;
 import java.util.HashMap;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 import com.ibatis.sqlmap.client.SqlMapClient;
 
@@ -59,7 +60,9 @@ import com.ibatis.sqlmap.client.SqlMapClient;
  * </p>
  * 
  * <p>
- * The implementation is *not* thread-safe.
+ * The implementation is thread-safe, but remember to use
+ * <code>saveState=false</code> if used in a multi-threaded client (no restart
+ * available).
  * </p>
  * 
  * @author Thomas Risberg
@@ -115,10 +118,16 @@ public class IbatisPagingItemReader<T> extends AbstractPagingItemReader<T> {
 		if (parameterValues != null) {
 			parameters.putAll(parameterValues);
 		}
-		parameters.put("_page", page);
-		parameters.put("_pagesize", pageSize);
-		parameters.put("_skiprows", page * pageSize);
-		results = sqlMapClientTemplate.queryForList(queryId, parameters);
+		parameters.put("_page", getPage());
+		parameters.put("_pagesize", getPageSize());
+		parameters.put("_skiprows", getPage() * getPageSize());
+		if (results == null) {
+			results = new CopyOnWriteArrayList<T>();
+		}
+		else {
+			results.clear();
+		}
+		results.addAll(sqlMapClientTemplate.queryForList(queryId, parameters));
 	}
 
 	@Override

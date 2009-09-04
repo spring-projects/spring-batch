@@ -16,42 +16,58 @@
 
 package org.springframework.batch.item.database;
 
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.SortedMap;
+import java.util.TreeMap;
+import java.util.concurrent.CopyOnWriteArrayList;
+
+import javax.sql.DataSource;
+
 import org.springframework.beans.factory.InitializingBean;
-import org.springframework.util.ClassUtils;
-import org.springframework.util.Assert;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowCallbackHandler;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.simple.SimpleJdbcTemplate;
-
-import javax.sql.DataSource;
-import java.util.ArrayList;
-import java.util.Map;
-import java.util.List;
-import java.util.LinkedHashMap;
-import java.util.SortedMap;
-import java.util.TreeMap;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import org.springframework.util.Assert;
+import org.springframework.util.ClassUtils;
 
 /**
- * {@link org.springframework.batch.item.ItemReader} for reading database records using JDBC in a paging
- * fashion.
- *
- * It executes the SQL built by the {@link PagingQueryProvider} to retrieve requested data.
- * The query is executed using paged requests of a size specified in {@link #setPageSize(int)}.
- * Additional pages are requested when needed as {@link #read()} method is called, returning an
- * object corresponding to current position.
- *
- * The performance of the paging depends on the database specific features available to limit the number
- * of returned rows.
- *
- * Setting a fairly large page size and using a commit interval that matches the page size should provide
- * better performance.
- *
- * The implementation is *not* thread-safe.
- *
+ * <p>
+ * {@link org.springframework.batch.item.ItemReader} for reading database
+ * records using JDBC in a paging fashion.
+ * </p>
+ * 
+ * <p>
+ * It executes the SQL built by the {@link PagingQueryProvider} to retrieve
+ * requested data. The query is executed using paged requests of a size
+ * specified in {@link #setPageSize(int)}. Additional pages are requested when
+ * needed as {@link #read()} method is called, returning an object corresponding
+ * to current position.
+ * </p>
+ * 
+ * <p>
+ * The performance of the paging depends on the database specific features
+ * available to limit the number of returned rows.
+ * </p>
+ * 
+ * <p>
+ * Setting a fairly large page size and using a commit interval that matches the
+ * page size should provide better performance.
+ * </p>
+ * 
+ * <p>
+ * The implementation is thread-safe, but remember to use
+ * <code>saveState=false</code> if used in a multi-threaded client (no restart
+ * available).
+ * </p>
+ * 
  * @author Thomas Risberg
+ * @author Dave Syer
  * @since 2.0
  */
 public class JdbcPagingItemReader<T> extends AbstractPagingItemReader<T> implements InitializingBean {
@@ -103,20 +119,24 @@ public class JdbcPagingItemReader<T> extends AbstractPagingItemReader<T> impleme
 
 	/**
 	 * The row mapper implementation to be used by this reader
-	 *
-	 * @param rowMapper a {@link org.springframework.jdbc.core.simple.ParameterizedRowMapper} implementation
+	 * 
+	 * @param rowMapper a
+	 * {@link org.springframework.jdbc.core.simple.ParameterizedRowMapper}
+	 * implementation
 	 */
 	public void setRowMapper(RowMapper rowMapper) {
 		this.rowMapper = rowMapper;
 	}
 
 	/**
-	 * The parameter values to be used for the query execution.  If you use named parameters then the
-	 * key should be the name used in the query clause.  If you use "?" placeholders then the key should be
-	 * the relative index that the parameter appears in the query string built using the select, from and
-	 * where cluases specified.
-	 *
-	 * @param parameterValues the values keyed by the parameter named/index used in the query string.
+	 * The parameter values to be used for the query execution. If you use named
+	 * parameters then the key should be the name used in the query clause. If
+	 * you use "?" placeholders then the key should be the relative index that
+	 * the parameter appears in the query string built using the select, from
+	 * and where cluases specified.
+	 * 
+	 * @param parameterValues the values keyed by the parameter named/index used
+	 * in the query string.
 	 */
 	public void setParameterValues(Map<String, Object> parameterValues) {
 		this.parameterValues = parameterValues;
@@ -133,49 +153,34 @@ public class JdbcPagingItemReader<T> extends AbstractPagingItemReader<T> impleme
 		if (fetchSize != VALUE_NOT_SET) {
 			jdbcTemplate.setFetchSize(fetchSize);
 		}
-		jdbcTemplate.setMaxRows(pageSize);
+		jdbcTemplate.setMaxRows(getPageSize());
 		this.simpleJdbcTemplate = new SimpleJdbcTemplate(jdbcTemplate);
 		Assert.notNull(queryProvider);
 		queryProvider.init(dataSource);
-		this.firstPageSql = queryProvider.generateFirstPageQuery(pageSize);
-		this.remainingPagesSql = queryProvider.generateRemainingPagesQuery(pageSize);
+		this.firstPageSql = queryProvider.generateFirstPageQuery(getPageSize());
+		this.remainingPagesSql = queryProvider.generateRemainingPagesQuery(getPageSize());
 	}
 
 	@Override
 	protected void doReadPage() {
 
-		if (results == null) {
-			results = new ArrayList<T>();
-		}
-		else {
-			results.clear();
-		}
-
-		if (page == 0) {
+		PagingRowCallbackHandler rowCallback = new PagingRowCallbackHandler();
+		if (getPage() == 0) {
 			if (logger.isDebugEnabled()) {
 				logger.debug("SQL used for reading first page: [" + firstPageSql + "]");
 			}
 			if (parameterValues != null && parameterValues.size() > 0) {
 				if (this.queryProvider.isUsingNamedParameters()) {
 					simpleJdbcTemplate.getNamedParameterJdbcOperations().query(firstPageSql,
-							getParameterMap(parameterValues, null),
-							new RowCallbackHandler() {
-								@SuppressWarnings("unchecked")
-								public void processRow(ResultSet rs) throws SQLException {
-									startAfterValue = rs.getObject(1);
-									results.add((T) rowMapper.mapRow(rs, results.size()));
-								}
-							});
+							getParameterMap(parameterValues, null), rowCallback);
 				}
 				else {
 					simpleJdbcTemplate.getJdbcOperations().query(firstPageSql,
-							getParameterList(parameterValues, null).toArray(),
-							new PagingRowCallbackHandler());
+							getParameterList(parameterValues, null).toArray(), rowCallback);
 				}
 			}
 			else {
-				simpleJdbcTemplate.getJdbcOperations().query(firstPageSql,
-						new PagingRowCallbackHandler());
+				simpleJdbcTemplate.getJdbcOperations().query(firstPageSql, rowCallback);
 			}
 
 		}
@@ -185,36 +190,41 @@ public class JdbcPagingItemReader<T> extends AbstractPagingItemReader<T> impleme
 			}
 			if (this.queryProvider.isUsingNamedParameters()) {
 				simpleJdbcTemplate.getNamedParameterJdbcOperations().query(remainingPagesSql,
-						getParameterMap(parameterValues, startAfterValue),
-						new PagingRowCallbackHandler());
+						getParameterMap(parameterValues, startAfterValue), rowCallback);
 			}
 			else {
 				simpleJdbcTemplate.getJdbcOperations().query(remainingPagesSql,
-						getParameterList(parameterValues, startAfterValue).toArray(),
-						new PagingRowCallbackHandler());
+						getParameterList(parameterValues, startAfterValue).toArray(), rowCallback);
 			}
 		}
+
+		if (results == null) {
+			results = new CopyOnWriteArrayList<T>();
+		}
+		else {
+			results.clear();
+		}
+		results.addAll(rowCallback.getResults());
 
 	}
 
 	@Override
 	protected void doJumpToPage(int itemIndex) {
 
-		if (page > 0) {
+		if (getPage() > 0) {
 
 			String jumpToItemSql;
-			jumpToItemSql = queryProvider.generateJumpToItemQuery(itemIndex, pageSize);
+			jumpToItemSql = queryProvider.generateJumpToItemQuery(itemIndex, getPageSize());
 
 			if (logger.isDebugEnabled()) {
 				logger.debug("SQL used for jumping: [" + jumpToItemSql + "]");
 			}
 
-			startAfterValue = simpleJdbcTemplate.getJdbcOperations().queryForObject(jumpToItemSql,
-					new RowMapper() {
-						public Object mapRow(ResultSet rs, int i) throws SQLException {
-							 return rs.getObject(1);
-						}
-					});
+			startAfterValue = simpleJdbcTemplate.getJdbcOperations().queryForObject(jumpToItemSql, new RowMapper() {
+				public Object mapRow(ResultSet rs, int i) throws SQLException {
+					return rs.getObject(1);
+				}
+			});
 
 		}
 
@@ -251,6 +261,12 @@ public class JdbcPagingItemReader<T> extends AbstractPagingItemReader<T> impleme
 	}
 
 	private class PagingRowCallbackHandler implements RowCallbackHandler {
+		private final List<T> results = new ArrayList<T>();
+
+		public List<T> getResults() {
+			return results;
+		}
+
 		@SuppressWarnings("unchecked")
 		public void processRow(ResultSet rs) throws SQLException {
 			startAfterValue = rs.getObject(1);
