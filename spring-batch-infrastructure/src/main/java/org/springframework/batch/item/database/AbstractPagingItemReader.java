@@ -16,7 +16,6 @@
 package org.springframework.batch.item.database;
 
 import java.util.List;
-import java.util.concurrent.atomic.AtomicInteger;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -46,7 +45,7 @@ public abstract class AbstractPagingItemReader<T> extends AbstractItemCountingIt
 
 	private int pageSize = 10;
 
-	private volatile AtomicInteger current = new AtomicInteger(0);
+	private volatile int current = 0;
 
 	private volatile int page = 0;
 
@@ -96,7 +95,7 @@ public abstract class AbstractPagingItemReader<T> extends AbstractItemCountingIt
 
 		synchronized (lock) {
 
-			if (results == null || current.get() >= pageSize) {
+			if (results == null || current >= pageSize) {
 
 				if (logger.isDebugEnabled()) {
 					logger.debug("Reading page " + getPage());
@@ -104,13 +103,13 @@ public abstract class AbstractPagingItemReader<T> extends AbstractItemCountingIt
 
 				doReadPage();
 				page++;
-				if (current.get() >= pageSize) {
-					current.set(0);
+				if (current >= pageSize) {
+					current = 0;
 				}
 
 			}
 
-			int next = current.getAndIncrement();
+			int next = current++;
 			if (next < results.size()) {
 				return results.get(next);
 			}
@@ -136,7 +135,7 @@ public abstract class AbstractPagingItemReader<T> extends AbstractItemCountingIt
 	protected void doClose() throws Exception {
 
 		initialized = false;
-		current.set(0);
+		current = 0;
 		page = 0;
 		results = null;
 
@@ -147,7 +146,7 @@ public abstract class AbstractPagingItemReader<T> extends AbstractItemCountingIt
 
 		synchronized (lock) {
 			page = itemIndex / pageSize;
-			current.set(itemIndex % pageSize);
+			current = itemIndex % pageSize;
 		}
 
 		doJumpToPage(itemIndex);
