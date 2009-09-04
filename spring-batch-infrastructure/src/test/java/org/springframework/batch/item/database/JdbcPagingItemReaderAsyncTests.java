@@ -6,7 +6,9 @@ import static org.junit.Assert.assertNotNull;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.concurrent.Callable;
 import java.util.concurrent.CompletionService;
 import java.util.concurrent.ExecutionException;
@@ -118,14 +120,17 @@ public class JdbcPagingItemReaderAsyncTests {
 			});
 		}
 		int count = 0;
+		Set<Foo> results = new HashSet<Foo>();
 		for (int i = 0; i < THREAD_COUNT; i++) {
 			List<Foo> items = completionService.take().get();
 			count += items.size();
 			logger.debug("Finished items count: " + items.size());
 			logger.debug("Finished items: " + items);
 			assertNotNull(items);
+			results.addAll(items);
 		}
 		assertEquals(ITEM_COUNT, count);
+		assertEquals(ITEM_COUNT, results.size());
 	}
 
 	protected ItemReader<Foo> getItemReader() throws Exception {

@@ -4,7 +4,9 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.concurrent.Callable;
 import java.util.concurrent.CompletionService;
 import java.util.concurrent.ExecutionException;
@@ -101,7 +103,7 @@ public class IbatisPagingItemReaderAsyncTests {
 					Foo next = null;
 					do {
 						next = reader.read();
-						Thread.sleep(10L);
+						Thread.sleep(10L); // try to make it fairer
 						logger.debug("Reading item: " + next);
 						if (next != null) {
 							list.add(next);
@@ -112,14 +114,17 @@ public class IbatisPagingItemReaderAsyncTests {
 			});
 		}
 		int count = 0;
+		Set<Foo> results = new HashSet<Foo>();
 		for (int i = 0; i < THREAD_COUNT; i++) {
 			List<Foo> items = completionService.take().get();
 			count += items.size();
 			logger.debug("Finished items count: " + items.size());
 			logger.debug("Finished items: " + items);
 			assertNotNull(items);
+			results.addAll(items);
 		}
 		assertEquals(ITEM_COUNT, count);
+		assertEquals(ITEM_COUNT, results.size());
 		reader.close();
 	}
 
@@ -148,6 +153,5 @@ public class IbatisPagingItemReaderAsyncTests {
 		factory.afterPropertiesSet();
 		return (SqlMapClient) factory.getObject();
 	}
-
 
 }

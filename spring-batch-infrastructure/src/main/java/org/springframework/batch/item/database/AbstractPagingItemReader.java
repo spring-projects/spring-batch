@@ -94,30 +94,30 @@ public abstract class AbstractPagingItemReader<T> extends AbstractItemCountingIt
 	@Override
 	protected T doRead() throws Exception {
 
-		if (results == null || current.get() >= pageSize) {
+		synchronized (lock) {
 
-			if (logger.isDebugEnabled()) {
-				logger.debug("Reading page " + getPage());
-			}
+			if (results == null || current.get() >= pageSize) {
 
-			synchronized (lock) {
-				if (results == null || current.get() >= pageSize) {
-					doReadPage();
-					page++;
-					if (current.get() >= pageSize) {
-						current.set(0);
-					}
+				if (logger.isDebugEnabled()) {
+					logger.debug("Reading page " + getPage());
 				}
+
+				doReadPage();
+				page++;
+				if (current.get() >= pageSize) {
+					current.set(0);
+				}
+
 			}
 
-		}
+			int next = current.getAndIncrement();
+			if (next < results.size()) {
+				return results.get(next);
+			}
+			else {
+				return null;
+			}
 
-		int next = current.getAndIncrement();
-		if (next < results.size()) {
-			return results.get(next);
-		}
-		else {
-			return null;
 		}
 
 	}
