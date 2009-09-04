@@ -122,6 +122,11 @@ public class ChunkElementParser {
 			propertyValues.addPropertyValue("retryLimit", retryLimit);
 		}
 
+		String throttleLimit = element.getAttribute("throttle-limit");
+		if (StringUtils.hasText(throttleLimit)) {
+			propertyValues.addPropertyValue("throttleLimit", throttleLimit);
+		}
+		
 		String cacheCapacity = element.getAttribute("cache-capacity");
 		if (StringUtils.hasText(cacheCapacity)) {
 			propertyValues.addPropertyValue("cacheCapacity", cacheCapacity);

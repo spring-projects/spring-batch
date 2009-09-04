@@ -9,7 +9,7 @@
 			<tasklet start-limit="25" allow-start-if-complete="true">
 				<chunk reader="reader" processor="processor" writer="writer" commit-interval="10" skip-limit="20"
 						retry-limit="3" cache-capacity="100" is-reader-transactional-queue="true" 
-						task-executor="taskExecutor">
+						task-executor="taskExecutor" throttle-limit="10">
 					<retry-listeners>
 						<listener class="org.springframework.batch.core.configuration.xml.TestRetryListener" />
 					</retry-listeners>

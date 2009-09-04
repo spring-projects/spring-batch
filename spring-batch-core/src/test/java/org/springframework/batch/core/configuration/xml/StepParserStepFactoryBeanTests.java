@@ -17,6 +17,7 @@
 package org.springframework.batch.core.configuration.xml;
 
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.assertEquals;
 
 import java.util.ArrayList;
 
@@ -172,6 +173,7 @@ public class StepParserStepFactoryBeanTests {
 		fb.setPropagation(Propagation.REQUIRED);
 		fb.setChunkCompletionPolicy(new DummyCompletionPolicy());
 		fb.setTaskExecutor(new SyncTaskExecutor());
+		fb.setThrottleLimit(10);
 		fb.setItemReader(new DummyItemReader());
 		fb.setItemProcessor(new PassThroughItemProcessor<Object>());
 		fb.setItemWriter(new DummyItemWriter());
@@ -181,6 +183,8 @@ public class StepParserStepFactoryBeanTests {
 		assertTrue(step instanceof TaskletStep);
 		Object tasklet = ReflectionTestUtils.getField(step, "tasklet");
 		assertTrue(tasklet instanceof ChunkOrientedTasklet);
+		Object throttleLimit = ReflectionTestUtils.getField(ReflectionTestUtils.getField(step, "stepOperations"), "throttleLimit");
+		assertEquals(new Integer(10), throttleLimit);
 	}
 
 	@Test
@@ -195,6 +199,7 @@ public class StepParserStepFactoryBeanTests {
 		fb.setListeners(new StepListener[] { new StepExecutionListenerSupport() });
 		fb.setChunkCompletionPolicy(new DummyCompletionPolicy());
 		fb.setTaskExecutor(new SyncTaskExecutor());
+		fb.setThrottleLimit(10);
 		fb.setItemReader(new DummyItemReader());
 		fb.setItemProcessor(new PassThroughItemProcessor<Object>());
 		fb.setItemWriter(new DummyItemWriter());
@@ -212,5 +217,7 @@ public class StepParserStepFactoryBeanTests {
 		assertTrue(step instanceof TaskletStep);
 		Object tasklet = ReflectionTestUtils.getField(step, "tasklet");
 		assertTrue(tasklet instanceof ChunkOrientedTasklet);
+		Object throttleLimit = ReflectionTestUtils.getField(ReflectionTestUtils.getField(step, "stepOperations"), "throttleLimit");
+		assertEquals(new Integer(10), throttleLimit);
 	}
 }
