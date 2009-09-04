@@ -57,7 +57,9 @@ public class ExecutionContextPromotionListener extends StepExecutionListenerSupp
 						Assert.isTrue(stepContext.containsKey(key), "The key [" + key
 								+ "] was not found in the Step's ExecutionContext.");
 					}
-					jobContext.put(key, stepContext.get(key));
+					if (stepContext.containsKey(key)) {
+						jobContext.put(key, stepContext.get(key));
+					}
 				}
 				break;
 			}

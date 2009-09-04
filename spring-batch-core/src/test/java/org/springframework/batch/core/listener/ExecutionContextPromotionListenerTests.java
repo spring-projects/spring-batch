@@ -35,7 +35,7 @@ public class ExecutionContextPromotionListenerTests {
 	 * EXPECTED: key is promoted. key2 is not.
 	 */
 	@Test
-	public void promoteEntry_nullStatuses() throws Exception {
+	public void promoteEntryNullStatuses() throws Exception {
 		ExecutionContextPromotionListener listener = new ExecutionContextPromotionListener();
 
 		JobExecution jobExecution = new JobExecution(1L);
@@ -64,7 +64,7 @@ public class ExecutionContextPromotionListenerTests {
 	 * EXPECTED: key is promoted. key2 is not.
 	 */
 	@Test
-	public void promoteEntry_statusFound() throws Exception {
+	public void promoteEntryStatusFound() throws Exception {
 		ExecutionContextPromotionListener listener = new ExecutionContextPromotionListener();
 
 		JobExecution jobExecution = new JobExecution(1L);
@@ -94,7 +94,7 @@ public class ExecutionContextPromotionListenerTests {
 	 * EXPECTED: no promotions.
 	 */
 	@Test
-	public void promoteEntry_statusNotFound() throws Exception {
+	public void promoteEntryStatusNotFound() throws Exception {
 		ExecutionContextPromotionListener listener = new ExecutionContextPromotionListener();
 
 		JobExecution jobExecution = new JobExecution(1L);
@@ -124,7 +124,7 @@ public class ExecutionContextPromotionListenerTests {
 	 * EXPECTED: key is promoted. key2 is not.
 	 */
 	@Test
-	public void promoteEntry_statusWildcardFound() throws Exception {
+	public void promoteEntryStatusWildcardFound() throws Exception {
 		ExecutionContextPromotionListener listener = new ExecutionContextPromotionListener();
 
 		JobExecution jobExecution = new JobExecution(1L);
@@ -153,7 +153,7 @@ public class ExecutionContextPromotionListenerTests {
 	 * EXPECTED: key is promoted. key2 is not.
 	 */
 	@Test
-	public void promoteEntries_keyNotFound() throws Exception {
+	public void promoteEntriesKeyNotFound() throws Exception {
 		ExecutionContextPromotionListener listener = new ExecutionContextPromotionListener();
 
 		JobExecution jobExecution = new JobExecution(1L);
@@ -175,13 +175,39 @@ public class ExecutionContextPromotionListenerTests {
 	}
 
 	/**
+	 * CONDITION: keys = {key}. key is already in job but not in step.
+	 * 
+	 * EXPECTED: key is not erased.
+	 */
+	@Test
+	public void promoteEntriesKeyNotFoundInStep() throws Exception {
+		ExecutionContextPromotionListener listener = new ExecutionContextPromotionListener();
+
+		JobExecution jobExecution = new JobExecution(1L);
+		StepExecution stepExecution = jobExecution.createStepExecution("step1");
+		stepExecution.setExitStatus(ExitStatus.COMPLETED);
+
+		Assert.state(jobExecution.getExecutionContext().isEmpty());
+		Assert.state(stepExecution.getExecutionContext().isEmpty());
+
+		jobExecution.getExecutionContext().putString(key, value);
+
+		listener.setKeys(new String[] { key });
+		listener.afterPropertiesSet();
+
+		listener.afterStep(stepExecution);
+
+		assertEquals(value, jobExecution.getExecutionContext().getString(key));
+	}
+
+	/**
 	 * CONDITION: strict = true. keys = {key, key2}. Only {key} exists in the
 	 * ExecutionContext.
 	 * 
 	 * EXPECTED: IllegalArgumentException
 	 */
 	@Test(expected = IllegalArgumentException.class)
-	public void promoteEntries_keyNotFound_strict() throws Exception {
+	public void promoteEntriesKeyNotFoundStrict() throws Exception {
 		ExecutionContextPromotionListener listener = new ExecutionContextPromotionListener();
 		listener.setStrict(true);
 
