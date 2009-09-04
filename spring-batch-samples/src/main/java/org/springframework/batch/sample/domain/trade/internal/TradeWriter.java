@@ -40,7 +40,7 @@ public class TradeWriter extends ItemStreamSupport implements ItemWriter<Trade> 
 
 	private static Log log = LogFactory.getLog(TradeWriter.class);
 
-	private static final String TOTAL_AMOUNT_KEY = "TOTAL_AMOUNT";
+	public static final String TOTAL_AMOUNT_KEY = "TOTAL_AMOUNT";
 
 	private TradeDao dao;
 

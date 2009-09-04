@@ -21,17 +21,36 @@ import org.springframework.util.Assert;
 public class ErrorLogTasklet implements Tasklet, StepExecutionListener {
 
 	protected final Log logger = LogFactory.getLog(getClass());
+
 	private SimpleJdbcTemplate simpleJdbcTemplate;
 
 	private String jobName;
+
+	private StepExecution stepExecution;
+
 	private String stepName;
 
 	public RepeatStatus execute(StepContribution contribution, ChunkContext chunkContext) throws Exception {
 		Assert.notNull(this.stepName, "Step name not set.  Either this class was not registered as a listener "
 				+ "or the key 'stepName' was not found in the Job's ExecutionContext.");
-		this.simpleJdbcTemplate.update("insert into ERROR_LOG values (?, ?, 'Some records were skipped!')", jobName,
-				stepName);
+		this.simpleJdbcTemplate.update("insert into ERROR_LOG values (?, ?, '"+getSkipCount()+" records were skipped!')",
+				jobName, stepName);
 		return RepeatStatus.FINISHED;
+	}
+
+	/**
+	 * @return
+	 */
+	private int getSkipCount() {
+		if (stepExecution == null || stepName == null) {
+			return 0;
+		}
+		for (StepExecution execution : stepExecution.getJobExecution().getStepExecutions()) {
+			if (execution.getStepName().equals(stepName)) {
+				return execution.getSkipCount();
+			}
+		}
+		return 0;
 	}
 
 	public void setDataSource(DataSource dataSource) {
@@ -41,6 +60,7 @@ public class ErrorLogTasklet implements Tasklet, StepExecutionListener {
 	public void beforeStep(StepExecution stepExecution) {
 		this.jobName = stepExecution.getJobExecution().getJobInstance().getJobName().trim();
 		this.stepName = (String) stepExecution.getJobExecution().getExecutionContext().get("stepName");
+		this.stepExecution = stepExecution;
 		stepExecution.getJobExecution().getExecutionContext().remove("stepName");
 	}
 

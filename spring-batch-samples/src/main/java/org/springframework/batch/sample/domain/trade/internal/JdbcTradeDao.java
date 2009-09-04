@@ -16,14 +16,14 @@
 
 package org.springframework.batch.sample.domain.trade.internal;
 
+import javax.sql.DataSource;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.batch.sample.domain.trade.Trade;
 import org.springframework.batch.sample.domain.trade.TradeDao;
 import org.springframework.jdbc.core.simple.SimpleJdbcTemplate;
 import org.springframework.jdbc.support.incrementer.DataFieldMaxValueIncrementer;
-
-import javax.sql.DataSource;
 
 
 /**
@@ -36,7 +36,7 @@ public class JdbcTradeDao implements TradeDao {
     /**
      * template for inserting a row
      */
-    private static final String INSERT_TRADE_RECORD = "INSERT INTO trade (id, isin, quantity, price, customer) VALUES (?, ?, ? ,?, ?)";
+    private static final String INSERT_TRADE_RECORD = "INSERT INTO trade (id, version, isin, quantity, price, customer) VALUES (?, 0, ?, ? ,?, ?)";
 
     /**
      * handles the processing of sql query
@@ -44,7 +44,7 @@ public class JdbcTradeDao implements TradeDao {
     private SimpleJdbcTemplate simpleJdbcTemplate;
 
     /**
-     * database is not expected to be setup for autoincrementation
+     * database is not expected to be setup for autoincrement
      */
     private DataFieldMaxValueIncrementer incrementer;
 

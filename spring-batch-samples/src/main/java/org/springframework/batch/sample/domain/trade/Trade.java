@@ -31,6 +31,8 @@ public class Trade implements Serializable {
     private long quantity = 0;
     private BigDecimal price = new BigDecimal(0);
     private String customer = "";
+	private Long id;
+	private long version = 0;
 
     public Trade() {
     }
@@ -42,7 +44,30 @@ public class Trade implements Serializable {
     	this.customer = customer;
     }
 
-    public void setCustomer(String customer) {
+    /**
+	 * @param id
+	 */
+	public Trade(long id) {
+		this.id = id;
+	}
+	
+	public long getId() {
+		return id;
+	}
+	
+	public void setId(long id) {
+		this.id = id;
+	}
+
+	public long getVersion() {
+		return version;
+	}
+
+	public void setVersion(long version) {
+		this.version = version;
+	}
+
+	public void setCustomer(String customer) {
 		this.customer = customer;
 	}
 
