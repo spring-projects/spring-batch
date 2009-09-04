@@ -20,6 +20,7 @@ import org.springframework.batch.core.launch.NoSuchJobException;
 import org.springframework.batch.core.repository.JobExecutionAlreadyRunningException;
 import org.springframework.batch.core.repository.JobInstanceAlreadyCompleteException;
 import org.springframework.batch.core.repository.JobRestartException;
+import org.springframework.batch.sample.common.SkipCheckingListener;
 import org.springframework.batch.sample.domain.trade.internal.TradeWriter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.simple.SimpleJdbcTemplate;
@@ -163,6 +164,9 @@ public class SkipSampleFunctionalTests {
 		// to output
 		// System.err.println(simpleJdbcTemplate.queryForList("SELECT * FROM TRADE"));
 		assertEquals(5, simpleJdbcTemplate.queryForInt("SELECT COUNT(*) from TRADE where VERSION=?", 1));
+		
+		// 1 record skipped in processing second step
+		assertEquals(1, SkipCheckingListener.getProcessSkips());
 
 		// Both steps contained skips
 		assertEquals(2, SimpleJdbcTestUtils.countRowsInTable(simpleJdbcTemplate, "ERROR_LOG"));
@@ -208,6 +212,7 @@ public class SkipSampleFunctionalTests {
 	 * @return JobExecution, so that the test may validate the exit status
 	 */
 	public long launchJobWithIncrementer() {
+		SkipCheckingListener.resetProcessSkips();
 		try {
 			return this.jobOperator.startNextInstance("skipJob");
 		}

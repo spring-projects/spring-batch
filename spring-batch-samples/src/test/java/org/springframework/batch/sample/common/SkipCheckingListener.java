@@ -17,6 +17,7 @@ import org.springframework.batch.sample.domain.trade.Trade;
 public class SkipCheckingListener {
 
 	private static final Log logger = LogFactory.getLog(SkipCheckingListener.class);
+	private static int processSkips;
 
 	@AfterStep
 	public ExitStatus checkForSkips(StepExecution stepExecution) {
@@ -28,6 +29,21 @@ public class SkipCheckingListener {
 			return null;
 		}
 	}
+	
+	/**
+	 * Convenience method for testing
+	 * @return the processSkips
+	 */
+	public static int getProcessSkips() {
+		return processSkips;
+	}
+
+	/**
+	 * Convenience method for testing
+	 */
+	public static void resetProcessSkips() {
+		processSkips = 0;
+	}
 
 	@OnSkipInWrite
 	public void skipWrite(Trade trade, Throwable t) {
@@ -37,6 +53,7 @@ public class SkipCheckingListener {
 	@OnSkipInProcess
 	public void skipProcess(Trade trade, Throwable t) {
 		logger.debug("Skipped processing " + trade);
+		processSkips++;
 	}
 
 	@BeforeStep
