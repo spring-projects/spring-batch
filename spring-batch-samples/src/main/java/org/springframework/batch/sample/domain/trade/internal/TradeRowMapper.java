@@ -38,7 +38,7 @@ public class TradeRowMapper implements RowMapper {
 		trade.setQuantity(rs.getLong(QUANTITY_COLUMN));
 		trade.setPrice(rs.getBigDecimal(PRICE_COLUMN));
 		trade.setCustomer(rs.getString(CUSTOMER_COLUMN));
-		trade.setVersion(rs.getLong(VERSION_COLUMN));
+		trade.setVersion(rs.getInt(VERSION_COLUMN));
 		
 		return trade;
 	}

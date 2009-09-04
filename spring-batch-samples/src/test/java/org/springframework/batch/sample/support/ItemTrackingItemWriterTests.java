@@ -18,6 +18,7 @@ package org.springframework.batch.sample.support;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
 
+import java.io.IOException;
 import java.util.Arrays;
 
 import org.junit.Test;
@@ -58,7 +59,7 @@ public class ItemTrackingItemWriterTests {
 			writer.write(Arrays.asList(a, b, c));
 			fail("Expected Write Failure Exception");
 		}
-		catch (RuntimeException e) {
+		catch (IOException e) {
 			// expected
 		}
 		// the failed item is removed

@@ -43,7 +43,7 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 @ContextConfiguration()
 public class TradeJobFunctionalTests extends AbstractValidatingBatchLauncherTests {
 
-	private static final String GET_TRADES = "select ISIN, QUANTITY, PRICE, CUSTOMER from TRADE order by ISIN";
+	private static final String GET_TRADES = "select ISIN, QUANTITY, PRICE, CUSTOMER, ID, VERSION from TRADE order by ISIN";
 	private static final String GET_CUSTOMERS = "select NAME, CREDIT from CUSTOMER order by NAME";
 	
 	private List<Customer> customers;

@@ -1,6 +1,6 @@
 package org.springframework.batch.sample.domain.trade.internal;
 
-import static org.easymock.EasyMock.*;
+import static org.easymock.EasyMock.expect;
 
 import java.math.BigDecimal;
 import java.sql.ResultSet;
@@ -31,10 +31,12 @@ public class TradeRowMapperTests extends AbstractRowMapperTests {
 	}
 
 	protected void setUpResultSetMock(ResultSet rs) throws SQLException {
+		expect(rs.getLong(TradeRowMapper.ID_COLUMN)).andReturn(12L);
 		expect(rs.getString(TradeRowMapper.ISIN_COLUMN)).andReturn(ISIN);
 		expect(rs.getLong(TradeRowMapper.QUANTITY_COLUMN)).andReturn(QUANTITY);
 		expect(rs.getBigDecimal(TradeRowMapper.PRICE_COLUMN)).andReturn(PRICE);
 		expect(rs.getString(TradeRowMapper.CUSTOMER_COLUMN)).andReturn(CUSTOMER);
+		expect(rs.getInt(TradeRowMapper.VERSION_COLUMN)).andReturn(0);
 	}
 
 }
