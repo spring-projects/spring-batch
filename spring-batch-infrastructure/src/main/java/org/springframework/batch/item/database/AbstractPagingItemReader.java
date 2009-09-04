@@ -65,7 +65,7 @@ public abstract class AbstractPagingItemReader<T> extends AbstractItemCountingIt
 	public int getPage() {
 		return page;
 	}
-	
+
 	/**
 	 * The page size configured for this reader.
 	 * @return the page size
@@ -104,10 +104,11 @@ public abstract class AbstractPagingItemReader<T> extends AbstractItemCountingIt
 				if (results == null || current.get() >= pageSize) {
 					doReadPage();
 					page++;
-					current.set(0);
+					if (current.get() >= pageSize) {
+						current.set(0);
+					}
 				}
 			}
-
 
 		}
 
@@ -144,8 +145,10 @@ public abstract class AbstractPagingItemReader<T> extends AbstractItemCountingIt
 	@Override
 	protected void jumpToItem(int itemIndex) throws Exception {
 
-		page = itemIndex / pageSize;
-		current.set(itemIndex % pageSize);
+		synchronized (lock) {
+			page = itemIndex / pageSize;
+			current.set(itemIndex % pageSize);
+		}
 
 		doJumpToPage(itemIndex);
 
