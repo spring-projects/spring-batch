@@ -287,7 +287,6 @@
 					<xsd:documentation><![CDATA[
 					List of exception classes that should not cause rollback if possible.  This list
 					is only a hint and has to be interpreted by the step to make sense in context.  
-					Separate each attribute with a comma or a newline.
 					]]>
 					</xsd:documentation>
 				</xsd:annotation>
@@ -514,7 +513,6 @@
 				<xsd:annotation>
 					<xsd:documentation><![CDATA[
 					List of exception classes that are retryable.
-					Separate each attribute with a newline or a comma.
 					]]>
 					</xsd:documentation>
 				</xsd:annotation>
