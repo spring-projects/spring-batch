@@ -243,6 +243,10 @@ public abstract class AbstractStepParser {
 			RuntimeBeanReference taskExecutorRef = new RuntimeBeanReference(taskExecutorBeanId);
 			propertyValues.addPropertyValue("taskExecutor", taskExecutorRef);
 		}
+		String throttleLimit = taskletElement.getAttribute("throttle-limit");
+		if (StringUtils.hasText(throttleLimit)) {
+		       propertyValues.addPropertyValue("throttleLimit", throttleLimit);
+		}
 	}
 
 	@SuppressWarnings("unchecked")

@@ -16,9 +16,9 @@
 
 package org.springframework.batch.core.configuration.xml;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 
 import org.junit.Test;
@@ -125,7 +125,7 @@ public class StepParserStepFactoryBeanTests {
 	}
 
 	@Test(expected = IllegalStateException.class)
-	public void testFaultTolerantStep_All() throws Exception {
+	public void testFaultTolerantStepAll() throws Exception {
 		StepParserStepFactoryBean<Object, Object> fb = new StepParserStepFactoryBean<Object, Object>();
 		fb.setBeanName("step1");
 		fb.setAllowStartIfComplete(true);
@@ -202,13 +202,17 @@ public class StepParserStepFactoryBeanTests {
 		fb.setIsReaderTransactionalQueue(true);
 		fb.setRetryLimit(5);
 		fb.setSkipLimit(100);
+		fb.setThrottleLimit(10);
 		fb.setRetryListeners(new RetryListenerSupport());
 		fb.setSkippableExceptionClasses(new HashMap<Class<? extends Throwable>, Boolean>());
 		fb.setRetryableExceptionClasses(new HashMap<Class<? extends Throwable>, Boolean>());
 
 		Object step = fb.getObject();
 		assertTrue(step instanceof TaskletStep);
+		Object throttleLimit = ReflectionTestUtils.getField(ReflectionTestUtils.getField(step, "stepOperations"), "throttleLimit");
+		assertEquals(new Integer(10), throttleLimit);
 		Object tasklet = ReflectionTestUtils.getField(step, "tasklet");
 		assertTrue(tasklet instanceof ChunkOrientedTasklet);
 	}
+
 }

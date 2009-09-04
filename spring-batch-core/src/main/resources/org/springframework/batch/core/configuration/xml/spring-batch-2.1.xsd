@@ -352,6 +352,15 @@
 				</xsd:appinfo>
 			</xsd:annotation>
 		</xsd:attribute>
+		<xsd:attribute name="throttle-limit" type="xsd:string" use="optional">
+			<xsd:annotation>
+				<xsd:documentation><![CDATA[
+				This limits the number of tasks queued for concurrent 
+				processing to prevent thread pools from being overwhelmed. 
+				Default is 4.
+				]]></xsd:documentation>
+			</xsd:annotation>
+		</xsd:attribute>
 	</xsd:complexType>
 
 	<xsd:complexType name="transaction-attributesType">
@@ -582,15 +591,6 @@
 				<xsd:documentation><![CDATA[
 				Whether the reader is a transactional queue. If it is then items read should not be cached 
 				in the event of a rollback since they will be returned to the queue.
-				]]></xsd:documentation>
-			</xsd:annotation>
-		</xsd:attribute>
-		<xsd:attribute name="throttle-limit" type="xsd:string" use="optional">
-			<xsd:annotation>
-				<xsd:documentation><![CDATA[
-				This limits the number of tasks queued for concurrent 
-				processing to prevent thread pools from being overwhelmed. 
-				Default is 4.
 				]]></xsd:documentation>
 			</xsd:annotation>
 		</xsd:attribute>

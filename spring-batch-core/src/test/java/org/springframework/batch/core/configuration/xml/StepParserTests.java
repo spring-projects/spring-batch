@@ -88,6 +88,8 @@ public class StepParserTests {
 		StepParserStepFactoryBean<Object, Object> factory = beans.get(factoryName);
 		TaskletStep bean = (TaskletStep) factory.getObject();
 		assertEquals("wrong start-limit:", 25, bean.getStartLimit());
+		Object throttleLimit = ReflectionTestUtils.getField(factory, "throttleLimit");
+		assertEquals(new Integer(10), throttleLimit);
 	}
 
 	@Test
