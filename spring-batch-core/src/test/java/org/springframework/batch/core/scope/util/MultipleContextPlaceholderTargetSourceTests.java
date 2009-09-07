@@ -54,6 +54,10 @@ public class MultipleContextPlaceholderTargetSourceTests {
 	private TestBean simple;
 
 	@Autowired
+	@Qualifier("nested")
+	private TestBean nested;
+
+	@Autowired
 	@Qualifier("list")
 	private TestBean list;
 
@@ -84,6 +88,17 @@ public class MultipleContextPlaceholderTargetSourceTests {
 			final String value = "foo" + i;
 			attributes = Collections.singletonMap("foo", value);
 			assertEquals("foo" + i, simple.getName());
+		}
+
+	}
+
+	@Test
+	public void testMultipleNestedValueFromProperties() throws Exception {
+
+		for (int i = 0; i < 4; i++) {
+			final String value = "bar" + i;
+			attributes = Collections.singletonMap("foo", value);
+			assertEquals("foo-bar" + i, nested.getName());
 		}
 
 	}
