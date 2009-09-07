@@ -24,8 +24,15 @@ import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.osgi.context.BundleContextAware;
 import org.springframework.osgi.context.support.OsgiBundleXmlApplicationContext;
 
-public class OsgiBundleXmlApplicationContextFactory implements BundleContextAware,
-		ApplicationContextFactory, ApplicationContextAware {
+/**
+ * @author Dave Syer
+ * 
+ * @deprecated with no plans to replace (stateful creation of application
+ * context should no longer be required as it was in Spring Batch 1.1.x)
+ * 
+ */
+public class OsgiBundleXmlApplicationContextFactory implements BundleContextAware, ApplicationContextFactory,
+		ApplicationContextAware {
 
 	private BundleContext bundleContext;
 
@@ -36,13 +43,12 @@ public class OsgiBundleXmlApplicationContextFactory implements BundleContextAwar
 	private String displayName;
 
 	/**
-	 * @param path
-	 *            the resource path to the xml to load for the child context.
+	 * @param path the resource path to the xml to load for the child context.
 	 */
 	public void setPath(String path) {
 		this.path = path;
 	}
-	
+
 	/**
 	 * @param displayName the display name for the application context created.
 	 */
@@ -55,8 +61,7 @@ public class OsgiBundleXmlApplicationContextFactory implements BundleContextAwar
 	 * 
 	 * @see org.springframework.context.ApplicationContextAware#setApplicationContext(org.springframework.context.ApplicationContext)
 	 */
-	public void setApplicationContext(ApplicationContext applicationContext)
-			throws BeansException {
+	public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
 		parent = applicationContext;
 	}
 
@@ -78,8 +83,7 @@ public class OsgiBundleXmlApplicationContextFactory implements BundleContextAwar
 	 * @see ApplicationContextFactory#createApplicationContext()
 	 */
 	public ConfigurableApplicationContext createApplicationContext() {
-		OsgiBundleXmlApplicationContext context = new OsgiBundleXmlApplicationContext(
-				new String[] { path }, parent);
+		OsgiBundleXmlApplicationContext context = new OsgiBundleXmlApplicationContext(new String[] { path }, parent);
 		String displayName = bundleContext.getBundle().getSymbolicName() + ":" + this.displayName;
 		context.setDisplayName(displayName);
 		context.setBundleContext(bundleContext);
