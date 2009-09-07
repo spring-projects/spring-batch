@@ -36,6 +36,7 @@ import org.springframework.util.ClassUtils;
  * </p>
  * 
  * @author Thomas Risberg
+ * @author Dave Syer
  * @since 2.0
  */
 public abstract class AbstractPagingItemReader<T> extends AbstractItemCountingItemStreamItemReader<T> implements

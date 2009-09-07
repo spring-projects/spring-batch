@@ -18,6 +18,7 @@ package org.springframework.batch.item.database;
 
 import org.springframework.util.ClassUtils;
 import org.springframework.util.Assert;
+import org.springframework.batch.item.ExecutionContext;
 import org.springframework.orm.ibatis.SqlMapClientTemplate;
 
 import java.util.Map;
@@ -60,12 +61,14 @@ import com.ibatis.sqlmap.client.SqlMapClient;
  * </p>
  * 
  * <p>
- * The implementation is thread-safe, but remember to use
+ * The implementation is thread-safe in between calls to
+ * {@link #open(ExecutionContext)}, but remember to use
  * <code>saveState=false</code> if used in a multi-threaded client (no restart
  * available).
  * </p>
  * 
  * @author Thomas Risberg
+ * @author Dave Syer
  * @since 2.0
  */
 public class IbatisPagingItemReader<T> extends AbstractPagingItemReader<T> {

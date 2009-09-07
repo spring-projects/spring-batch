@@ -28,6 +28,7 @@ import java.util.concurrent.CopyOnWriteArrayList;
 
 import javax.sql.DataSource;
 
+import org.springframework.batch.item.ExecutionContext;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowCallbackHandler;
@@ -61,7 +62,8 @@ import org.springframework.util.ClassUtils;
  * </p>
  * 
  * <p>
- * The implementation is thread-safe, but remember to use
+ * The implementation is thread-safe in between calls to
+ * {@link #open(ExecutionContext)}, but remember to use
  * <code>saveState=false</code> if used in a multi-threaded client (no restart
  * available).
  * </p>

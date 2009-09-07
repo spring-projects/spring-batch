@@ -25,6 +25,7 @@ import javax.persistence.EntityManagerFactory;
 import javax.persistence.EntityTransaction;
 import javax.persistence.Query;
 
+import org.springframework.batch.item.ExecutionContext;
 import org.springframework.dao.DataAccessResourceFailureException;
 import org.springframework.util.Assert;
 import org.springframework.util.ClassUtils;
@@ -68,13 +69,15 @@ import org.springframework.util.ClassUtils;
  * </p>
  * 
  * <p>
- * The implementation is thread-safe, but remember to use
+ * The implementation is thread-safe in between calls to
+ * {@link #open(ExecutionContext)}, but remember to use
  * <code>saveState=false</code> if used in a multi-threaded client (no restart
  * available).
  * </p>
  * 
  * 
  * @author Thomas Risberg
+ * @author Dave Syer
  * @since 2.0
  */
 public class JpaPagingItemReader<T> extends AbstractPagingItemReader<T> {
