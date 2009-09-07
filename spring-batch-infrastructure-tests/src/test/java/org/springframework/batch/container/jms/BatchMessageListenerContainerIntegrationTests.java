@@ -63,6 +63,7 @@ public class BatchMessageListenerContainerIntegrationTests {
 		while(jmsTemplate.receiveAndConvert("queue")!=null) {
 			// do nothing
 		}
+		count = 0;
 	}
 
 	@AfterClass
