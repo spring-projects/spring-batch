@@ -16,6 +16,16 @@
 		</property>
 	</bean>
 
+	<bean id="nested" class="org.springframework.aop.framework.ProxyFactoryBean">
+		<property name="targetSource">
+			<bean
+				class="org.springframework.batch.core.scope.util.PlaceholderTargetSource">
+				<property name="contextFactory" ref="context" />
+				<property name="targetBeanName" value="nestedTarget" />
+			</bean>
+		</property>
+	</bean>
+
 	<bean id="list" class="org.springframework.aop.framework.ProxyFactoryBean">
 		<property name="targetSource">
 			<bean
@@ -39,6 +49,11 @@
 	<bean id="simpleTarget"
 		class="org.springframework.batch.core.scope.util.MultipleContextPlaceholderTargetSourceTests$TestBean">
 		<property name="name" value="%{attributes[foo]}" />
+	</bean>
+
+	<bean id="nestedTarget"
+		class="org.springframework.batch.core.scope.util.MultipleContextPlaceholderTargetSourceTests$TestBean">
+		<property name="name" value="foo-%{attributes[foo]}" />
 	</bean>
 
 	<bean id="listTarget"

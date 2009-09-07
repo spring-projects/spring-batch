@@ -330,7 +330,7 @@ public class PlaceholderTargetSource extends SimpleBeanTargetSource implements I
 						// Otherwise it might contain embedded keys so we try to
 						// replace those
 						String visitedString = resolveStringValue(stringValue);
-						typedStringValue.setValue(visitedString);
+						value = new TypedStringValue(visitedString);
 					}
 				}
 
