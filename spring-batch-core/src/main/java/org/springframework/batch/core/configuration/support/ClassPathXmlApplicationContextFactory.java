@@ -25,10 +25,12 @@ import org.springframework.core.io.Resource;
 import org.springframework.util.Assert;
 
 /**
- * {@link ApplicationContextFactory} implementation that takes a parent context and a path 
- * to the context to create.  Each time the createApplicationContext method is called, a new
- * {@link ApplicationContext} will be returned.  It should be noted that if a path isn't
- * set, the parent will always be returned.
+ * {@link ApplicationContextFactory} implementation that takes a parent context
+ * and a path to the context to create. When createApplicationContext method is
+ * called, the child {@link ApplicationContext} will be returned. The child
+ * context is not re-created every time it is requested, it is lazily
+ * initialized and cached. Clients should ensure that it is closed when it is no
+ * longer needed. If a path is not set, the parent will always be returned.
  * 
  */
 public class ClassPathXmlApplicationContextFactory implements ApplicationContextFactory, ApplicationContextAware {
@@ -37,10 +39,14 @@ public class ClassPathXmlApplicationContextFactory implements ApplicationContext
 
 	private Resource path;
 
+	private ResourceXmlApplicationContext context;
+
+	private final Object lock = new Object();
+
 	/**
 	 * Setter for the path to the xml to load to create an
-	 * {@link ApplicationContext}. Use imports to centralise the configuration in
-	 * one file.
+	 * {@link ApplicationContext}. Use imports to centralise the configuration
+	 * in one file.
 	 * 
 	 * @param path the resource path to the xml to load for the child context.
 	 */
@@ -64,10 +70,21 @@ public class ClassPathXmlApplicationContextFactory implements ApplicationContext
 	 * @see ApplicationContextFactory#createApplicationContext()
 	 */
 	public ConfigurableApplicationContext createApplicationContext() {
+
 		if (path == null) {
 			return parent;
 		}
-		return new ResourceXmlApplicationContext(parent);
+
+		if (context == null) {
+			// Lazy initialization of cached context
+			synchronized (lock) {
+				if (context == null) {
+					context = new ResourceXmlApplicationContext(parent);
+				}
+			}
+		}
+		return context;
+
 	}
 
 	/**
@@ -84,7 +101,7 @@ public class ClassPathXmlApplicationContextFactory implements ApplicationContext
 		}
 
 		protected Resource[] getConfigResources() {
-			return new Resource[] {path};
+			return new Resource[] { path };
 		}
 	}
 

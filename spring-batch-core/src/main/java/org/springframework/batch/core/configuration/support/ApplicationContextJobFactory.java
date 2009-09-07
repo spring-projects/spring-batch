@@ -54,7 +54,7 @@ public class ApplicationContextJobFactory implements JobFactory {
 	public Job createJob() {
 		ConfigurableApplicationContext context = applicationContextFactory.createApplicationContext();
 		Job job = (Job) context.getBean(jobName, Job.class);
-		return new ContextClosingJob(job, context);
+		return new ContextAwareJob(job);
 	}
 
 	/**
@@ -72,19 +72,15 @@ public class ApplicationContextJobFactory implements JobFactory {
 	 * @author Dave Syer
 	 * 
 	 */
-	private static class ContextClosingJob implements Job {
+	private static class ContextAwareJob implements Job {
 		private Job delegate;
-
-		private ConfigurableApplicationContext context;
 
 		/**
 		 * @param delegate
-		 * @param context
 		 */
-		public ContextClosingJob(Job delegate, ConfigurableApplicationContext context) {
+		public ContextAwareJob(Job delegate) {
 			super();
 			this.delegate = delegate;
-			this.context = context;
 		}
 
 		/**
@@ -92,12 +88,7 @@ public class ApplicationContextJobFactory implements JobFactory {
 		 * @see org.springframework.batch.core.Job#execute(org.springframework.batch.core.JobExecution)
 		 */
 		public void execute(JobExecution execution) {
-			try {
-				delegate.execute(execution);
-			}
-			finally {
-				context.close();
-			}
+			delegate.execute(execution);
 		}
 
 		/**

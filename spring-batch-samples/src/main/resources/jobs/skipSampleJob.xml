@@ -88,13 +88,13 @@
 		</property>
 	</bean>
 
-	<bean id="tradeProcessor" class="org.springframework.batch.sample.domain.trade.internal.TradeProcessor" />
+	<bean id="tradeProcessor" class="org.springframework.batch.sample.domain.trade.internal.TradeProcessor" scope="step"/>
 
-	<bean id="tradeProcessorFailure" class="org.springframework.batch.sample.domain.trade.internal.TradeProcessor">
+	<bean id="tradeProcessorFailure" class="org.springframework.batch.sample.domain.trade.internal.TradeProcessor" scope="step">
 		<property name="validationFailure" value="7" />
 	</bean>
 
-	<bean id="tradeWriter" class="org.springframework.batch.sample.domain.trade.internal.TradeWriter">
+	<bean id="tradeWriter" class="org.springframework.batch.sample.domain.trade.internal.TradeWriter" scope="step">
 		<property name="dao">
 			<bean class="org.springframework.batch.sample.domain.trade.internal.JdbcTradeDao">
 				<property name="dataSource" ref="dataSource" />
@@ -112,12 +112,12 @@
 		</property>
 	</bean>
 
-	<bean id="itemTrackingWriter" class="org.springframework.batch.sample.domain.trade.internal.ItemTrackingTradeItemWriter">
+	<bean id="itemTrackingWriter" class="org.springframework.batch.sample.domain.trade.internal.ItemTrackingTradeItemWriter" scope="step">
 		<property name="writeFailureISIN" value="UK21341EAH47" />
 		<property name="dataSource" ref="dataSource" />
 	</bean>
 
-	<bean id="tradeSqlItemReader" class="org.springframework.batch.item.database.JdbcCursorItemReader">
+	<bean id="tradeSqlItemReader" class="org.springframework.batch.item.database.JdbcCursorItemReader" scope="step">
 		<property name="dataSource" ref="dataSource" />
 		<property name="sql" value="SELECT isin, quantity, price, customer, id, version from TRADE" />
 		<property name="rowMapper">
@@ -125,7 +125,7 @@
 		</property>
 	</bean>
 
-	<bean id="errorLogTasklet" class="org.springframework.batch.sample.common.ErrorLogTasklet">
+	<bean id="errorLogTasklet" class="org.springframework.batch.sample.common.ErrorLogTasklet" scope="step">
 		<property name="dataSource" ref="dataSource" />
 	</bean>
 

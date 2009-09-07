@@ -70,4 +70,18 @@ public class ClassPathXmlJobRegistryTests {
 		registry.afterPropertiesSet();
 		assertEquals(2, registry.getJobNames().size());
 	}
+
+	@Test
+	public void testDestroy() throws Exception {
+
+		Resource[] jobPaths = new Resource[] { new ClassPathResource(
+				"org/springframework/batch/core/launch/support/2jobs.xml") };
+		registry.setJobPaths(jobPaths);
+		registry.afterPropertiesSet();
+		assertEquals(2, registry.getJobNames().size());
+		registry.destroy();
+		assertEquals(0, registry.getJobNames().size());
+
+	}
+
 }
