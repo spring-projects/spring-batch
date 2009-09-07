@@ -49,14 +49,20 @@ public class BatchMessageListenerContainerTests {
 		template.setCompletionPolicy(new SimpleCompletionPolicy(2));
 		container = getContainer(template);
 
-		Session session = EasyMock.createMock(Session.class);
+		container.setMessageListener(new MessageListener() {
+			public void onMessage(Message arg0) {
+			}
+		});
+
+		Session session = EasyMock.createNiceMock(Session.class);
 		MessageConsumer consumer = EasyMock.createMock(MessageConsumer.class);
 		Message message = EasyMock.createMock(Message.class);
 
 		// Expect two calls to consumer (chunk size)...
+		EasyMock.expect(session.getTransacted()).andReturn(true).anyTimes();
 		EasyMock.expect(consumer.receive(1000)).andReturn(message).times(2);
 
-		EasyMock.replay(consumer);
+		EasyMock.replay(consumer, session);
 
 		boolean received = doExecute(session, consumer);
 		assertTrue("Message not received", received);
@@ -109,7 +115,7 @@ public class BatchMessageListenerContainerTests {
 		template.setCompletionPolicy(new SimpleCompletionPolicy(2));
 		container = getContainer(template);
 		container.setSessionTransacted(false);
-		boolean received = doTestWithException(new IllegalStateException("No way!"), false, 1);
+		boolean received = doTestWithException(new IllegalStateException("No way!"), false, 2);
 		assertTrue("Message not received but listener not transactional so this should be true", received);
 	}
 
@@ -120,7 +126,7 @@ public class BatchMessageListenerContainerTests {
 		container = getContainer(template);
 		container.setSessionTransacted(false);
 		try {
-			boolean received = doTestWithException(new RuntimeException("No way!"), false, 1);
+			boolean received = doTestWithException(new RuntimeException("No way!"), false, 2);
 			assertTrue("Message not received but listener not transactional so this should be true", received);
 		}
 		catch (RuntimeException e) {
@@ -164,7 +170,9 @@ public class BatchMessageListenerContainerTests {
 		MessageConsumer consumer = EasyMock.createMock(MessageConsumer.class);
 		Message message = EasyMock.createMock(Message.class);
 
-		EasyMock.expect(session.getTransacted()).andReturn(true).times(expectGetTransactionCount);
+		if (expectGetTransactionCount>0) {
+			EasyMock.expect(session.getTransacted()).andReturn(true).times(expectGetTransactionCount);
+		}
 
 		// Expect only one call to consumer (chunk size is 2, but first one
 		// rolls back terminating batch)...
