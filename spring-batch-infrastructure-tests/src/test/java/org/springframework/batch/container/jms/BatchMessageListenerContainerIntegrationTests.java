@@ -17,10 +17,17 @@ package org.springframework.batch.container.jms;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.fail;
 
+import java.util.SortedSet;
+import java.util.TreeSet;
+import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.TimeUnit;
+
+import javax.jms.JMSException;
 import javax.jms.Message;
 import javax.jms.MessageListener;
+import javax.jms.TextMessage;
 
 import org.junit.After;
 import org.junit.AfterClass;
@@ -45,25 +52,25 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(locations = "/org/springframework/batch/jms/jms-context.xml")
 public class BatchMessageListenerContainerIntegrationTests {
-	
+
 	@Autowired
 	private JmsTemplate jmsTemplate;
 
 	@Autowired
 	private BatchMessageListenerContainer container;
 
-	private int recovered;
+	private volatile BlockingQueue<String> recovered = new LinkedBlockingQueue<String>();
 
-	private volatile int count;
+	private volatile BlockingQueue<String> processed = new LinkedBlockingQueue<String>();
 
 	@After
 	@Before
 	public void drainQueue() throws Exception {
 		container.stop();
-		while(jmsTemplate.receiveAndConvert("queue")!=null) {
+		while (jmsTemplate.receiveAndConvert("queue") != null) {
 			// do nothing
 		}
-		count = 0;
+		processed.clear();
 	}
 
 	@AfterClass
@@ -80,39 +87,43 @@ public class BatchMessageListenerContainerIntegrationTests {
 	public void testSendAndReceive() throws Exception {
 		container.setMessageListener(new MessageListener() {
 			public void onMessage(Message msg) {
-				count++;
+				try {
+					processed.add(((TextMessage) msg).getText());
+				}
+				catch (JMSException e) {
+					throw new IllegalStateException(e);
+				}
 			}
 		});
 		container.initializeProxy();
 		container.start();
 		jmsTemplate.convertAndSend("queue", "foo");
 		jmsTemplate.convertAndSend("queue", "bar");
-		int waiting = 0;
-		while (count < 2 && waiting++ < 20) {
-			Thread.sleep(100L);
+		SortedSet<String> result = new TreeSet<String>();
+		for (int i = 0; i < 2; i++) {
+			result.add(processed.poll(1, TimeUnit.SECONDS));
 		}
-		if (count < 2) {
-			fail("Expected message to be processed.");
-		}
+		assertEquals("[bar, foo]", result.toString());
 	}
 
 	@Test
 	public void testFailureAndRepresent() throws Exception {
 		container.setMessageListener(new MessageListener() {
 			public void onMessage(Message msg) {
-				count++;
+				try {
+					processed.add(((TextMessage) msg).getText());
+				}
+				catch (JMSException e) {
+					throw new IllegalStateException(e);
+				}
 				throw new RuntimeException("planned failure for represent: " + msg);
 			}
 		});
 		container.initializeProxy();
 		container.start();
 		jmsTemplate.convertAndSend("queue", "foo");
-		int waiting = 0;
-		while (count < 2 && waiting++ < 20) {
-			Thread.sleep(100L);
-		}
-		if (count < 2) {
-			fail("Expected message to be processed twice.");
+		for (int i = 0; i < 2; i++) {
+			assertEquals("foo", processed.poll(1, TimeUnit.SECONDS));
 		}
 	}
 
@@ -125,13 +136,23 @@ public class BatchMessageListenerContainerIntegrationTests {
 				try {
 					RetryCallback<Message> callback = new RetryCallback<Message>() {
 						public Message doWithRetry(RetryContext context) throws Exception {
-							count++;
+							try {
+								processed.add(((TextMessage) msg).getText());
+							}
+							catch (JMSException e) {
+								throw new IllegalStateException(e);
+							}
 							throw new RuntimeException("planned failure: " + msg);
 						}
 					};
 					RecoveryCallback<Message> recoveryCallback = new RecoveryCallback<Message>() {
 						public Message recover(RetryContext context) {
-							recovered++;
+							try {
+								recovered.add(((TextMessage) msg).getText());
+							}
+							catch (JMSException e) {
+								throw new IllegalStateException(e);
+							}
 							return msg;
 						}
 					};
@@ -145,12 +166,8 @@ public class BatchMessageListenerContainerIntegrationTests {
 		container.initializeProxy();
 		container.start();
 		jmsTemplate.convertAndSend("queue", "foo");
-		int waiting = 0;
-		while ((count < 1 || recovered < 1) && waiting++ < 1000) {
-			Thread.sleep(100L);
-		}
-		assertEquals(1, count);
-		assertEquals(1, recovered);
+		assertEquals("foo", processed.poll(2, TimeUnit.SECONDS));
+		assertEquals("foo", recovered.poll(2, TimeUnit.SECONDS));
 	}
 
 }
