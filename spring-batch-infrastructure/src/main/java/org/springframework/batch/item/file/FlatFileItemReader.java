@@ -18,7 +18,6 @@ package org.springframework.batch.item.file;
 
 import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.nio.charset.Charset;
 
 import org.apache.commons.logging.Log;
@@ -71,6 +70,8 @@ public class FlatFileItemReader<T> extends AbstractItemCountingItemStreamItemRea
 
 	private boolean strict = true;
 
+	private BufferedReaderFactory bufferedReaderFactory = new DefaultBufferedReaderFactory();
+
 	public FlatFileItemReader() {
 		setName(ClassUtils.getShortName(FlatFileItemReader.class));
 	}
@@ -84,7 +85,7 @@ public class FlatFileItemReader<T> extends AbstractItemCountingItemStreamItemRea
 	public void setStrict(boolean strict) {
 		this.strict = strict;
 	}
-	
+
 	/**
 	 * @param skippedLinesCallback will be called for each one of the initial
 	 * skipped lines before any items are read.
@@ -122,6 +123,18 @@ public class FlatFileItemReader<T> extends AbstractItemCountingItemStreamItemRea
 	 */
 	public void setEncoding(String encoding) {
 		this.encoding = encoding;
+	}
+
+	/**
+	 * Factory for the {@link BufferedReader} that will be used to extract lines
+	 * from the file. The default is fine for plain text files, but this is a
+	 * useful strategy for binary files where the standard BufferedReaader from
+	 * java.io is limiting.
+	 * 
+	 * @param bufferedReaderFactory the bufferedReaderFactory to set
+	 */
+	public void setBufferedReaderFactory(BufferedReaderFactory bufferedReaderFactory) {
+		this.bufferedReaderFactory = bufferedReaderFactory;
 	}
 
 	/**
@@ -175,12 +188,12 @@ public class FlatFileItemReader<T> extends AbstractItemCountingItemStreamItemRea
 			return null;
 		}
 		else {
-			try{
+			try {
 				return lineMapper.mapLine(logicalLine, lineCount);
 			}
-			catch(Exception ex){
-				logger.error("Parsing error at line: " + lineCount + " in resource=" + 
-						resource.getDescription() + ", input=[" + line + "]", ex);
+			catch (Exception ex) {
+				logger.error("Parsing error at line: " + lineCount + " in resource=" + resource.getDescription()
+						+ ", input=[" + line + "]", ex);
 				throw ex;
 			}
 		}
@@ -229,7 +242,7 @@ public class FlatFileItemReader<T> extends AbstractItemCountingItemStreamItemRea
 	@Override
 	protected void doClose() throws Exception {
 		lineCount = 0;
-		if (reader!=null) {
+		if (reader != null) {
 			reader.close();
 		}
 	}
@@ -242,14 +255,14 @@ public class FlatFileItemReader<T> extends AbstractItemCountingItemStreamItemRea
 		noInput = false;
 		if (!resource.exists()) {
 			if (strict) {
-				throw new IllegalStateException("Input resource must exist (reader is in 'strict' mode): "+resource);
+				throw new IllegalStateException("Input resource must exist (reader is in 'strict' mode): " + resource);
 			}
 			noInput = true;
 			logger.warn("Input resource does not exist " + resource.getDescription());
 			return;
 		}
 
-		reader = new BufferedReader(new InputStreamReader(resource.getInputStream(), encoding));
+		reader = bufferedReaderFactory.create(resource, encoding);
 		for (int i = 0; i < linesToSkip; i++) {
 			String line = readLine();
 			if (skippedLinesCallback != null) {
