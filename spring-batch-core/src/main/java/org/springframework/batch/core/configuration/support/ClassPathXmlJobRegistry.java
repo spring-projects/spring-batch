@@ -44,7 +44,10 @@ import org.springframework.core.io.Resource;
  * 
  * @author Lucas Ward
  * @author Dave Syer
+ * 
  * @since 2.0
+ * @since 2.1 this class does not implement {@link JobRegistry}: it is a
+ * {@link ListableJobLocator}
  */
 public class ClassPathXmlJobRegistry implements ListableJobLocator, ApplicationContextAware, InitializingBean,
 		DisposableBean {
@@ -114,8 +117,9 @@ public class ClassPathXmlJobRegistry implements ListableJobLocator, ApplicationC
 
 			for (String name : names) {
 				logger.debug("Registering job: " + name + " from context: " + resource);
-				ApplicationContextJobFactory jobFactory = new ApplicationContextJobFactory(applicationContextFactory,
-						name);
+				String groupName = getGroupName(context, resource, name);
+				ApplicationContextJobFactory jobFactory = new ApplicationContextJobFactory(groupName, name,
+						applicationContextFactory);
 				jobRegistry.register(jobFactory);
 			}
 		}
@@ -124,6 +128,20 @@ public class ClassPathXmlJobRegistry implements ListableJobLocator, ApplicationC
 			throw new NoSuchJobException("Could not locate any jobs in resources provided.");
 		}
 
+	}
+
+	/**
+	 * Determine a group name for the job to be registered. Default
+	 * implementation does nothing, but provides an extension point for
+	 * specialised subclasses.
+	 * 
+	 * @param context the application context containing the job
+	 * @param resource the resource that was used to create the context
+	 * @param jobName the jobName
+	 * @return a group name for the job (or null if not needed)
+	 */
+	protected String getGroupName(ApplicationContext context, Resource resource, String jobName) {
+		return null;
 	}
 
 	/**

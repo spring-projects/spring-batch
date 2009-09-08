@@ -15,10 +15,14 @@
  */
 package org.springframework.batch.core.configuration.support;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
 import java.util.Collection;
 
-import junit.framework.TestCase;
-
+import org.junit.Test;
 import org.springframework.batch.core.configuration.DuplicateJobException;
 import org.springframework.batch.core.job.JobSupport;
 import org.springframework.batch.core.launch.NoSuchJobException;
@@ -29,11 +33,12 @@ import org.springframework.context.support.ClassPathXmlApplicationContext;
  * @author Dave Syer
  * 
  */
-public class JobRegistryBeanPostProcessorTests extends TestCase {
+public class JobRegistryBeanPostProcessorTests {
 
 	private JobRegistryBeanPostProcessor processor = new JobRegistryBeanPostProcessor();
 
-	public void testInitialization() throws Exception {
+	@Test
+	public void testInitializationFails() throws Exception {
 		try {
 			processor.afterPropertiesSet();
 			fail("Expected IllegalArgumentException");
@@ -44,33 +49,48 @@ public class JobRegistryBeanPostProcessorTests extends TestCase {
 		}
 	}
 
+	@Test
 	public void testBeforeInitialization() throws Exception {
 		// should be a no-op
-		assertEquals("foo", processor.postProcessAfterInitialization("foo", "bar"));
+		assertEquals("foo", processor.postProcessBeforeInitialization("foo", "bar"));
 	}
 
+	@Test
 	public void testAfterInitializationWithWrongType() throws Exception {
 		// should be a no-op
 		assertEquals("foo", processor.postProcessAfterInitialization("foo", "bar"));
 	}
 
+	@Test
 	public void testAfterInitializationWithCorrectType() throws Exception {
 		MapJobRegistry registry = new MapJobRegistry();
 		processor.setJobRegistry(registry);
-		JobSupport configuration = new JobSupport();
-		configuration.setBeanName("foo");
-		assertEquals(configuration, processor.postProcessAfterInitialization(configuration, "bar"));
-		assertEquals(configuration.getName(), registry.getJob("foo").getName());
+		JobSupport job = new JobSupport();
+		job.setBeanName("foo");
+		assertEquals(job, processor.postProcessAfterInitialization(job, "bar"));
+		assertEquals(job.getName(), registry.getJob("foo").getName());
 	}
 
+	@Test
+	public void testAfterInitializationWithGroupName() throws Exception {
+		MapJobRegistry registry = new MapJobRegistry();
+		processor.setJobRegistry(registry);
+		processor.setGroupName("jobs");
+		JobSupport job = new JobSupport();
+		job.setBeanName("foo");
+		assertEquals(job, processor.postProcessAfterInitialization(job, "bar"));
+		assertEquals("[jobs$foo]", registry.getJobNames().toString());
+	}
+
+	@Test
 	public void testAfterInitializationWithDuplicate() throws Exception {
 		MapJobRegistry registry = new MapJobRegistry();
 		processor.setJobRegistry(registry);
-		JobSupport configuration = new JobSupport();
-		configuration.setBeanName("foo");
-		processor.postProcessAfterInitialization(configuration, "bar");
+		JobSupport job = new JobSupport();
+		job.setBeanName("foo");
+		processor.postProcessAfterInitialization(job, "bar");
 		try {
-			processor.postProcessAfterInitialization(configuration, "spam");
+			processor.postProcessAfterInitialization(job, "spam");
 			fail("Expected FatalBeanException");
 		}
 		catch (FatalBeanException e) {
@@ -79,12 +99,13 @@ public class JobRegistryBeanPostProcessorTests extends TestCase {
 		}
 	}
 
+	@Test
 	public void testUnregisterOnDestroy() throws Exception {
 		MapJobRegistry registry = new MapJobRegistry();
 		processor.setJobRegistry(registry);
-		JobSupport configuration = new JobSupport();
-		configuration.setBeanName("foo");
-		assertEquals(configuration, processor.postProcessAfterInitialization(configuration, "bar"));
+		JobSupport job = new JobSupport();
+		job.setBeanName("foo");
+		assertEquals(job, processor.postProcessAfterInitialization(job, "bar"));
 		processor.destroy();
 		try {
 			assertEquals(null, registry.getJob("foo"));
@@ -95,6 +116,7 @@ public class JobRegistryBeanPostProcessorTests extends TestCase {
 		}
 	}
 
+	@Test
 	public void testExecutionWithApplicationContext() throws Exception {
 		ClassPathXmlApplicationContext context = new ClassPathXmlApplicationContext("test-context.xml", getClass());
 		MapJobRegistry registry = (MapJobRegistry) context.getBean("registry");
@@ -117,4 +139,5 @@ public class JobRegistryBeanPostProcessorTests extends TestCase {
 		assertEquals(context.getBean("test-job-with-concrete-parent-and-name"), registry.getJob("oof"));
 		assertEquals(context.getBean("test-job-with-concrete-parent-and-bean-name"), registry.getJob("rab"));
 	}
+
 }

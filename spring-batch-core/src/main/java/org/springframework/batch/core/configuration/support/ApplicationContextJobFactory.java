@@ -32,12 +32,26 @@ public class ApplicationContextJobFactory extends AbstractGroupAwareJobFactory {
 	final ApplicationContextFactory applicationContextFactory;
 
 	/**
+	 * @param groupName the name of the group that the job belongs to
 	 * @param jobName the id of the {@link Job} in the application context to be
 	 * created
+	 * @param applicationContextFactory a factory for an application context
+	 * containing a job with the job name provided
 	 */
-	public ApplicationContextJobFactory(ApplicationContextFactory applicationContextFactory, String jobName) {
-		super(jobName);
+	public ApplicationContextJobFactory(String groupName, String jobName,
+			ApplicationContextFactory applicationContextFactory) {
+		super(groupName, jobName);
 		this.applicationContextFactory = applicationContextFactory;
+	}
+
+	/**
+	 * @param jobName the id of the {@link Job} in the application context to be
+	 * created
+	 * @param applicationContextFactory a factory for an application context
+	 * containing a job with the job name provided
+	 */
+	public ApplicationContextJobFactory(String jobName, ApplicationContextFactory applicationContextFactory) {
+		this(null, jobName, applicationContextFactory);
 	}
 
 	/**

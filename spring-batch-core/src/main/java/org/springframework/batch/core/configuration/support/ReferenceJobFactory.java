@@ -30,11 +30,19 @@ public class ReferenceJobFactory extends AbstractGroupAwareJobFactory {
 	private Job job;
 
 	/**
+	 * @param groupName the name of the group that this job belongs to
+	 * @param job the {@link Job} to return from {@link #createJob()}.
+	 */
+	public ReferenceJobFactory(String groupName, Job job) {
+		super(groupName, job.getName());
+		this.job = job;
+	}
+
+	/**
 	 * @param job the {@link Job} to return from {@link #createJob()}.
 	 */
 	public ReferenceJobFactory(Job job) {
-		super(job.getName());
-		this.job = job;
+		this(null, job);
 	}
 
 	/**
