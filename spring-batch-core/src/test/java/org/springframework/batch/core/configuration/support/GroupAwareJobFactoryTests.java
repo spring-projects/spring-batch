@@ -50,7 +50,7 @@ public class GroupAwareJobFactoryTests {
 			}
 		};
 		assertEquals(factory.getJobName(), factory.createJob().getName());
-		assertEquals("jobs$foo", factory.getJobName());
+		assertEquals("jobs.foo", factory.getJobName());
 	}
 
 }

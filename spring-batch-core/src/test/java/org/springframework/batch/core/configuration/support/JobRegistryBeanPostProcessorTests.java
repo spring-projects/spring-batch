@@ -79,7 +79,7 @@ public class JobRegistryBeanPostProcessorTests {
 		JobSupport job = new JobSupport();
 		job.setBeanName("foo");
 		assertEquals(job, processor.postProcessAfterInitialization(job, "bar"));
-		assertEquals("[jobs$foo]", registry.getJobNames().toString());
+		assertEquals("[jobs.foo]", registry.getJobNames().toString());
 	}
 
 	@Test

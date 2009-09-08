@@ -26,7 +26,7 @@ import org.springframework.batch.core.configuration.JobFactory;
  * job might be <code>overnightJob</code> and the group
  * <code>financeDepartment</code>, which would result in a {@link Job} with
  * identical functionality but named <code>financeDepartment$overnightJob</code>
- * . The use of a "$" separator for elements is deliberate, since it is a "safe"
+ * . The use of a "." separator for elements is deliberate, since it is a "safe"
  * character in a <a href="http://www.w3.org/Addressing/URL">URL</a>.
  * 
  * 
@@ -35,6 +35,11 @@ import org.springframework.batch.core.configuration.JobFactory;
  */
 public abstract class AbstractGroupAwareJobFactory implements JobFactory {
 	
+	/**
+	 * 
+	 */
+	private static final String SEPARATOR = ".";
+
 	private final String groupName;
 
 	private final String jobName;
@@ -88,7 +93,7 @@ public abstract class AbstractGroupAwareJobFactory implements JobFactory {
 	 * @see org.springframework.batch.core.configuration.JobFactory#getJobName()
 	 */
 	public final String getJobName() {
-		return groupName == null ? jobName : groupName + "$" + jobName;
+		return groupName == null ? jobName : groupName + SEPARATOR + jobName;
 	}
 
 	/**
@@ -122,7 +127,7 @@ public abstract class AbstractGroupAwareJobFactory implements JobFactory {
 		 * @see org.springframework.batch.core.Job#getName()
 		 */
 		public String getName() {
-			return groupName + "$" + delegate.getName();
+			return groupName + SEPARATOR + delegate.getName();
 		}
 
 		public boolean isRestartable() {

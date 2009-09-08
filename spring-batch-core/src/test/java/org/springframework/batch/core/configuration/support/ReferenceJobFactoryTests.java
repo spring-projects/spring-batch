@@ -29,7 +29,7 @@ public class ReferenceJobFactoryTests {
 	@Test
 	public void testGroupName() throws Exception {
 		ReferenceJobFactory factory = new ReferenceJobFactory("jobs", new JobSupport("foo"));
-		assertEquals("jobs$foo", factory.getJobName());
+		assertEquals("jobs.foo", factory.getJobName());
 	}
 
 }

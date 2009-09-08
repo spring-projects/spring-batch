@@ -21,7 +21,7 @@ public class ApplicationContextJobFactoryTests {
 	public void testGroupName() throws Exception {
 		ApplicationContextJobFactory factory = new ApplicationContextJobFactory("jobs", "job",
 				new StubApplicationContextFactory());
-		assertEquals("jobs$job", factory.getJobName());
+		assertEquals("jobs.job", factory.getJobName());
 	}
 
 	private static class StubApplicationContextFactory implements ApplicationContextFactory {
