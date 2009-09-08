@@ -25,7 +25,6 @@ import org.springframework.batch.core.Job;
 import org.springframework.batch.core.configuration.DuplicateJobException;
 import org.springframework.batch.core.configuration.JobFactory;
 import org.springframework.batch.core.configuration.JobRegistry;
-import org.springframework.batch.core.configuration.ListableJobRegistry;
 import org.springframework.batch.core.launch.NoSuchJobException;
 import org.springframework.util.Assert;
 
@@ -36,7 +35,7 @@ import org.springframework.util.Assert;
  * @author Dave Syer
  * 
  */
-public class MapJobRegistry implements ListableJobRegistry {
+public class MapJobRegistry implements JobRegistry {
 
 	private Map<String, JobFactory> map = new HashMap<String, JobFactory>();
 

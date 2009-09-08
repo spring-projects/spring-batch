@@ -25,37 +25,24 @@ import org.springframework.batch.core.configuration.JobFactory;
  * @author Dave Syer
  * 
  */
-public class ReferenceJobFactory implements JobFactory {
+public class ReferenceJobFactory extends AbstractGroupAwareJobFactory {
 
 	private Job job;
-
-	private String name;
 
 	/**
 	 * @param job the {@link Job} to return from {@link #createJob()}.
 	 */
 	public ReferenceJobFactory(Job job) {
-		super();
+		super(job.getName());
 		this.job = job;
-		this.name = job.getName();
 	}
 
 	/**
 	 * Just return the instance passed in on initialization.
-	 * 
-	 * @see org.springframework.batch.core.configuration.JobFactory#createJob()
 	 */
-	public Job createJob() {
+	@Override
+	protected Job doCreateJob(String jobName) {
 		return job;
-	}
-
-	/**
-	 * Returns the job name as passed in on initialization.
-	 * 
-	 * @see org.springframework.batch.core.configuration.JobFactory#getJobName()
-	 */
-	public String getJobName() {
-		return name;
 	}
 
 }

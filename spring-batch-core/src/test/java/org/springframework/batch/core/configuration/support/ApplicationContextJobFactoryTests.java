@@ -9,7 +9,7 @@ import org.springframework.context.support.StaticApplicationContext;
 
 public class ApplicationContextJobFactoryTests {
 
-	private ApplicationContextJobFactory factory = new ApplicationContextJobFactory(
+	private AbstractGroupAwareJobFactory factory = new ApplicationContextJobFactory(
 			new StubApplicationContextFactory(), "job");
 
 	@Test

@@ -42,7 +42,7 @@ import org.springframework.util.Assert;
 public class JobRegistryBeanPostProcessor implements BeanPostProcessor, InitializingBean, DisposableBean {
 
 	// It doesn't make sense for this to have a default value...
-	private JobRegistry jobConfigurationRegistry = null;
+	private JobRegistry jobRegistry = null;
 
 	private Collection<String> jobNames = new HashSet<String>();
 
@@ -52,7 +52,7 @@ public class JobRegistryBeanPostProcessor implements BeanPostProcessor, Initiali
 	 * @param jobRegistry the jobConfigurationRegistry to set
 	 */
 	public void setJobRegistry(JobRegistry jobRegistry) {
-		this.jobConfigurationRegistry = jobRegistry;
+		this.jobRegistry = jobRegistry;
 	}
 
 	/**
@@ -61,7 +61,7 @@ public class JobRegistryBeanPostProcessor implements BeanPostProcessor, Initiali
 	 * @see org.springframework.beans.factory.InitializingBean#afterPropertiesSet()
 	 */
 	public void afterPropertiesSet() throws Exception {
-		Assert.notNull(jobConfigurationRegistry, "JobConfigurationRegistry must not be null");
+		Assert.notNull(jobRegistry, "JobRegistry must not be null");
 	}
 
 	/**
@@ -71,7 +71,7 @@ public class JobRegistryBeanPostProcessor implements BeanPostProcessor, Initiali
 	 */
 	public void destroy() throws Exception {
 		for (String name : jobNames) {
-			jobConfigurationRegistry.unregister(name);
+			jobRegistry.unregister(name);
 		}
 		jobNames.clear();
 	}
@@ -88,7 +88,7 @@ public class JobRegistryBeanPostProcessor implements BeanPostProcessor, Initiali
 		if (bean instanceof Job) {
 			Job job = (Job) bean;
 			try {
-				jobConfigurationRegistry.register(new ReferenceJobFactory(job));
+				jobRegistry.register(new ReferenceJobFactory(job));
 				jobNames.add(job.getName());
 			}
 			catch (DuplicateJobException e) {

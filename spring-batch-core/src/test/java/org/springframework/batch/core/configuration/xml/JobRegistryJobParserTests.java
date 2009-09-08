@@ -20,7 +20,7 @@ import static org.junit.Assert.assertEquals;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.batch.core.Job;
-import org.springframework.batch.core.configuration.ListableJobRegistry;
+import org.springframework.batch.core.configuration.ListableJobLocator;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
@@ -38,7 +38,7 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 public class JobRegistryJobParserTests implements ApplicationContextAware {
 	
 	@Autowired
-	private ListableJobRegistry jobRegistry;
+	private ListableJobLocator jobRegistry;
 
 	private ApplicationContext applicationContext;
 	

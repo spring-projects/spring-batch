@@ -20,7 +20,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.springframework.batch.core.Job;
-import org.springframework.batch.core.configuration.ListableJobRegistry;
+import org.springframework.batch.core.configuration.ListableJobLocator;
 import org.springframework.batch.core.launch.NoSuchJobException;
 import org.springframework.beans.BeanWrapperImpl;
 import org.springframework.beans.BeansException;
@@ -32,7 +32,7 @@ import org.springframework.util.Assert;
 
 public class DefaultJobLoader implements JobLoader, ApplicationContextAware {
 
-	private ListableJobRegistry registry;
+	private ListableJobLocator registry;
 
 	private ApplicationContext applicationContext;
 
@@ -42,7 +42,7 @@ public class DefaultJobLoader implements JobLoader, ApplicationContextAware {
 		this.applicationContext = applicationContext;
 	}
 
-	public void setRegistry(ListableJobRegistry registry) {
+	public void setRegistry(ListableJobLocator registry) {
 		this.registry = registry;
 	}
 

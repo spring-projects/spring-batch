@@ -16,32 +16,27 @@
 package org.springframework.batch.core.configuration.support;
 
 import org.springframework.batch.core.Job;
-import org.springframework.batch.core.JobExecution;
-import org.springframework.batch.core.JobParametersIncrementer;
 import org.springframework.batch.core.configuration.JobFactory;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ConfigurableApplicationContext;
 
 /**
- * A {@link JobFactory} that creates its own {@link ApplicationContext} from a
- * path supplied, and pulls a bean out when asked to create a {@link Job}.
+ * A {@link JobFactory} that creates its own {@link ApplicationContext} and
+ * pulls a bean out when asked to create a {@link Job}.
  * 
  * @author Dave Syer
  * 
  */
-public class ApplicationContextJobFactory implements JobFactory {
+public class ApplicationContextJobFactory extends AbstractGroupAwareJobFactory {
 
-	final private String jobName;
-
-	final private ApplicationContextFactory applicationContextFactory;
+	final ApplicationContextFactory applicationContextFactory;
 
 	/**
 	 * @param jobName the id of the {@link Job} in the application context to be
 	 * created
 	 */
 	public ApplicationContextJobFactory(ApplicationContextFactory applicationContextFactory, String jobName) {
-		super();
-		this.jobName = jobName;
+		super(jobName);
 		this.applicationContextFactory = applicationContextFactory;
 	}
 
@@ -51,67 +46,11 @@ public class ApplicationContextJobFactory implements JobFactory {
 	 * 
 	 * @see org.springframework.batch.core.configuration.JobFactory#createJob()
 	 */
-	public Job createJob() {
+	@Override
+	protected Job doCreateJob(String jobName) {
 		ConfigurableApplicationContext context = applicationContextFactory.createApplicationContext();
 		Job job = (Job) context.getBean(jobName, Job.class);
-		return new ContextAwareJob(job);
-	}
-
-	/**
-	 * Return the bean name of the job in the application context. N.B. this is
-	 * usually the name of the job as well, but it needn't be. The important
-	 * thing is that the job can be located by this name.
-	 * 
-	 * @see org.springframework.batch.core.configuration.JobFactory#getJobName()
-	 */
-	public String getJobName() {
-		return jobName;
-	}
-
-	/**
-	 * @author Dave Syer
-	 * 
-	 */
-	private static class ContextAwareJob implements Job {
-		private Job delegate;
-
-		/**
-		 * @param delegate
-		 */
-		public ContextAwareJob(Job delegate) {
-			super();
-			this.delegate = delegate;
-		}
-
-		/**
-		 * @param execution
-		 * @see org.springframework.batch.core.Job#execute(org.springframework.batch.core.JobExecution)
-		 */
-		public void execute(JobExecution execution) {
-			delegate.execute(execution);
-		}
-
-		/**
-		 * @see org.springframework.batch.core.Job#getName()
-		 */
-		public String getName() {
-			return delegate.getName();
-		}
-
-		/**
-		 * @see org.springframework.batch.core.Job#isRestartable()
-		 */
-		public boolean isRestartable() {
-			return delegate.isRestartable();
-		}
-
-		/**
-		 * @see org.springframework.batch.core.Job#getJobParametersIncrementer()
-		 */
-		public JobParametersIncrementer getJobParametersIncrementer() {
-			return delegate.getJobParametersIncrementer();
-		}
-
+		return job;
 	}
 
 }

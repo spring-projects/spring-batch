@@ -20,8 +20,6 @@ import java.util.Collection;
 import junit.framework.TestCase;
 
 import org.springframework.batch.core.configuration.DuplicateJobException;
-import org.springframework.batch.core.configuration.support.JobRegistryBeanPostProcessor;
-import org.springframework.batch.core.configuration.support.MapJobRegistry;
 import org.springframework.batch.core.job.JobSupport;
 import org.springframework.batch.core.launch.NoSuchJobException;
 import org.springframework.beans.FatalBeanException;
@@ -39,22 +37,21 @@ public class JobRegistryBeanPostProcessorTests extends TestCase {
 		try {
 			processor.afterPropertiesSet();
 			fail("Expected IllegalArgumentException");
-		} catch (IllegalArgumentException e) {
+		}
+		catch (IllegalArgumentException e) {
 			// expected
-			assertTrue(e.getMessage().indexOf("JobConfigurationRegistry") >= 0);
+			assertTrue(e.getMessage().contains("JobRegistry"));
 		}
 	}
 
 	public void testBeforeInitialization() throws Exception {
 		// should be a no-op
-		assertEquals("foo", processor.postProcessAfterInitialization("foo",
-				"bar"));
+		assertEquals("foo", processor.postProcessAfterInitialization("foo", "bar"));
 	}
 
 	public void testAfterInitializationWithWrongType() throws Exception {
 		// should be a no-op
-		assertEquals("foo", processor.postProcessAfterInitialization("foo",
-				"bar"));
+		assertEquals("foo", processor.postProcessAfterInitialization("foo", "bar"));
 	}
 
 	public void testAfterInitializationWithCorrectType() throws Exception {
@@ -62,9 +59,8 @@ public class JobRegistryBeanPostProcessorTests extends TestCase {
 		processor.setJobRegistry(registry);
 		JobSupport configuration = new JobSupport();
 		configuration.setBeanName("foo");
-		assertEquals(configuration, processor.postProcessAfterInitialization(
-				configuration, "bar"));
-		assertEquals(configuration, registry.getJob("foo"));
+		assertEquals(configuration, processor.postProcessAfterInitialization(configuration, "bar"));
+		assertEquals(configuration.getName(), registry.getJob("foo").getName());
 	}
 
 	public void testAfterInitializationWithDuplicate() throws Exception {
@@ -76,7 +72,8 @@ public class JobRegistryBeanPostProcessorTests extends TestCase {
 		try {
 			processor.postProcessAfterInitialization(configuration, "spam");
 			fail("Expected FatalBeanException");
-		} catch (FatalBeanException e) {
+		}
+		catch (FatalBeanException e) {
 			// Expected
 			assertTrue(e.getCause() instanceof DuplicateJobException);
 		}
@@ -87,22 +84,20 @@ public class JobRegistryBeanPostProcessorTests extends TestCase {
 		processor.setJobRegistry(registry);
 		JobSupport configuration = new JobSupport();
 		configuration.setBeanName("foo");
-		assertEquals(configuration, processor.postProcessAfterInitialization(
-				configuration, "bar"));
+		assertEquals(configuration, processor.postProcessAfterInitialization(configuration, "bar"));
 		processor.destroy();
 		try {
 			assertEquals(null, registry.getJob("foo"));
 			fail("Expected NoSuchJobConfigurationException");
-		} catch (NoSuchJobException e) {
+		}
+		catch (NoSuchJobException e) {
 			// expected
 		}
 	}
 
 	public void testExecutionWithApplicationContext() throws Exception {
-		ClassPathXmlApplicationContext context = new ClassPathXmlApplicationContext(
-				"test-context.xml", getClass());
-		MapJobRegistry registry = (MapJobRegistry) context
-				.getBean("registry");
+		ClassPathXmlApplicationContext context = new ClassPathXmlApplicationContext("test-context.xml", getClass());
+		MapJobRegistry registry = (MapJobRegistry) context.getBean("registry");
 		Collection<String> configurations = registry.getJobNames();
 		// System.err.println(configurations);
 		String[] names = context.getBeanNamesForType(JobSupport.class);
@@ -114,20 +109,12 @@ public class JobRegistryBeanPostProcessorTests extends TestCase {
 		// child beans will have the same name and will be re-registered (and
 		// override, if the registry supports that).
 		assertNotNull(registry.getJob("test-job"));
-		assertEquals(context.getBean("test-job-with-name"), registry
-				.getJob("foo"));
-		assertEquals(context.getBean("test-job-with-bean-name"), registry
-				.getJob("bar"));
-		assertEquals(context.getBean("test-job-with-parent-and-name"), registry
-				.getJob("spam"));
-		assertEquals(context.getBean("test-job-with-parent-and-bean-name"),
-				registry.getJob("bucket"));
-		assertEquals(context.getBean("test-job-with-concrete-parent"), registry
-				.getJob("maps"));
-		assertEquals(context.getBean("test-job-with-concrete-parent-and-name"),
-				registry.getJob("oof"));
-		assertEquals(context
-				.getBean("test-job-with-concrete-parent-and-bean-name"),
-				registry.getJob("rab"));
+		assertEquals(context.getBean("test-job-with-name"), registry.getJob("foo"));
+		assertEquals(context.getBean("test-job-with-bean-name"), registry.getJob("bar"));
+		assertEquals(context.getBean("test-job-with-parent-and-name"), registry.getJob("spam"));
+		assertEquals(context.getBean("test-job-with-parent-and-bean-name"), registry.getJob("bucket"));
+		assertEquals(context.getBean("test-job-with-concrete-parent"), registry.getJob("maps"));
+		assertEquals(context.getBean("test-job-with-concrete-parent-and-name"), registry.getJob("oof"));
+		assertEquals(context.getBean("test-job-with-concrete-parent-and-bean-name"), registry.getJob("rab"));
 	}
 }

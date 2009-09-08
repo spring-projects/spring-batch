@@ -18,12 +18,12 @@ package org.springframework.batch.core.configuration;
 import java.util.Collection;
 
 /**
- * A listable extension of {@link JobRegistry}.
+ * A listable extension of {@link JobLocator}.
  * 
  * @author Dave Syer
  * 
  */
-public interface ListableJobRegistry extends JobRegistry {
+public interface ListableJobLocator extends JobLocator {
 
 	/**
 	 * Provides the currently registered job names. The return value is

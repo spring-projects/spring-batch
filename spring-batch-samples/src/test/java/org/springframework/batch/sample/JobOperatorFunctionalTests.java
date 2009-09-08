@@ -16,7 +16,7 @@ import org.junit.runner.RunWith;
 import org.springframework.batch.core.BatchStatus;
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.JobParametersBuilder;
-import org.springframework.batch.core.configuration.ListableJobRegistry;
+import org.springframework.batch.core.configuration.JobRegistry;
 import org.springframework.batch.core.configuration.support.ReferenceJobFactory;
 import org.springframework.batch.core.launch.JobOperator;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -36,7 +36,7 @@ public class JobOperatorFunctionalTests {
 	private Job job;
 
 	@Autowired
-	private ListableJobRegistry jobRegistry;
+	private JobRegistry jobRegistry;
 
 	@Before
 	public void setUp() throws Exception {

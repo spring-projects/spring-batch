@@ -34,7 +34,7 @@ import org.springframework.batch.core.JobParametersIncrementer;
 import org.springframework.batch.core.StepExecution;
 import org.springframework.batch.core.UnexpectedJobExecutionException;
 import org.springframework.batch.core.configuration.JobRegistry;
-import org.springframework.batch.core.configuration.ListableJobRegistry;
+import org.springframework.batch.core.configuration.ListableJobLocator;
 import org.springframework.batch.core.converter.DefaultJobParametersConverter;
 import org.springframework.batch.core.converter.JobParametersConverter;
 import org.springframework.batch.core.explore.JobExplorer;
@@ -79,7 +79,7 @@ public class SimpleJobOperator implements JobOperator, InitializingBean {
 	private static final String ILLEGAL_STATE_MSG = "Illegal state (only happens on a race condition): "
 			+ "%s with name=%s and parameters=%s";
 
-	private ListableJobRegistry jobRegistry;
+	private ListableJobLocator jobRegistry;
 
 	private JobExplorer jobExplorer;
 
@@ -112,10 +112,10 @@ public class SimpleJobOperator implements JobOperator, InitializingBean {
 	}
 
 	/**
-	 * Public setter for the {@link ListableJobRegistry}.
-	 * @param jobRegistry the {@link ListableJobRegistry} to set
+	 * Public setter for the {@link ListableJobLocator}.
+	 * @param jobRegistry the {@link ListableJobLocator} to set
 	 */
-	public void setJobRegistry(ListableJobRegistry jobRegistry) {
+	public void setJobRegistry(ListableJobLocator jobRegistry) {
 		this.jobRegistry = jobRegistry;
 	}
 

@@ -24,7 +24,7 @@ import org.springframework.batch.core.Job;
  * @author Dave Syer
  * 
  */
-public interface JobRegistry extends JobLocator {
+public interface JobRegistry extends ListableJobLocator {
 
 	/**
 	 * Registers a {@link Job} at runtime.

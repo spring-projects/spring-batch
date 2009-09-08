@@ -24,9 +24,8 @@ import java.util.List;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.batch.core.Job;
-import org.springframework.batch.core.configuration.DuplicateJobException;
-import org.springframework.batch.core.configuration.JobFactory;
-import org.springframework.batch.core.configuration.ListableJobRegistry;
+import org.springframework.batch.core.configuration.JobRegistry;
+import org.springframework.batch.core.configuration.ListableJobLocator;
 import org.springframework.batch.core.launch.NoSuchJobException;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.DisposableBean;
@@ -37,7 +36,7 @@ import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.core.io.Resource;
 
 /**
- * Implementation of the {@link ListableJobRegistry} interface that assumes all
+ * Implementation of the {@link ListableJobLocator} interface that assumes all
  * Jobs will be loaded from class path xml resources. Each resource provided is
  * loaded as an application context with the current context as its parent, and
  * then all the jobs from the child context are registered under their bean
@@ -47,7 +46,7 @@ import org.springframework.core.io.Resource;
  * @author Dave Syer
  * @since 2.0
  */
-public class ClassPathXmlJobRegistry implements ListableJobRegistry, ApplicationContextAware, InitializingBean,
+public class ClassPathXmlJobRegistry implements ListableJobLocator, ApplicationContextAware, InitializingBean,
 		DisposableBean {
 
 	private static Log logger = LogFactory.getLog(ClassPathXmlJobRegistry.class);
@@ -56,7 +55,7 @@ public class ClassPathXmlJobRegistry implements ListableJobRegistry, Application
 
 	private ApplicationContext parent;
 
-	private ListableJobRegistry jobRegistry = new MapJobRegistry();
+	private JobRegistry jobRegistry = new MapJobRegistry();
 
 	private Collection<ConfigurableApplicationContext> contexts = new HashSet<ConfigurableApplicationContext>();
 
@@ -134,37 +133,18 @@ public class ClassPathXmlJobRegistry implements ListableJobRegistry, Application
 	 */
 	public void destroy() throws Exception {
 
-		try {
-
-			for (ConfigurableApplicationContext context : contexts) {
-
-				String[] names = context.getBeanNamesForType(Job.class);
-
-				try {
-					for (String name : names) {
-						unregister(name);
-					}
-				}
-				finally {
-					context.close();
-				}
-
-			}
+		for (ConfigurableApplicationContext context : contexts) {
+			context.close();
 		}
-		finally {
-			contexts.clear();
+		for (String jobName : jobRegistry.getJobNames()) {
+			jobRegistry.unregister(jobName);
 		}
+		contexts.clear();
+
 	}
 
 	public Collection<String> getJobNames() {
 		return jobRegistry.getJobNames();
 	}
 
-	public void register(JobFactory jobFactory) throws DuplicateJobException {
-		jobRegistry.register(jobFactory);
-	}
-
-	public void unregister(String jobName) {
-		jobRegistry.unregister(jobName);
-	}
 }
