@@ -117,7 +117,7 @@ public class ClassPathXmlJobLoaderTests {
 		loader.setJobPaths(jobPaths);
 		loader.initialize();
 		assertEquals(2, registry.getJobNames().size());
-		loader.destroy();
+		loader.clear();
 		assertEquals(0, registry.getJobNames().size());
 
 	}

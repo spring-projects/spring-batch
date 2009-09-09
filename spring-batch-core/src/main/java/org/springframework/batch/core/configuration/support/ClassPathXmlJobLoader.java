@@ -47,9 +47,7 @@ import org.springframework.util.Assert;
  * Jobs will be loaded from class path xml resources. Each resource provided is
  * loaded as an application context with the current context as its parent, and
  * then all the jobs from the child context are registered under their bean
- * names. A {@link JobRegistry} is required, but if there is a unique one
- * available in the current application context, then that will be used by
- * default.
+ * names. A {@link JobRegistry} is required.
  * 
  * @author Lucas Ward
  * @author Dave Syer
@@ -57,8 +55,7 @@ import org.springframework.util.Assert;
  * @since 2.0
  * @since 2.1 this class does not implement {@link JobRegistry}
  */
-public class ClassPathXmlJobLoader implements ApplicationContextAware, InitializingBean, DisposableBean,
-		ApplicationListener {
+public class ClassPathXmlJobLoader implements ApplicationContextAware, ApplicationListener, InitializingBean {
 
 	private static Log logger = LogFactory.getLog(ClassPathXmlJobLoader.class);
 
@@ -105,39 +102,34 @@ public class ClassPathXmlJobLoader implements ApplicationContextAware, Initializ
 	}
 
 	/**
-	 * Initialize the {@link JobRegistry} if not already injected. Attempts to
-	 * discover a registry from the application context, searching for a unique
-	 * bean of type {@link JobRegistry}.
-	 * 
 	 * @throws Exception
 	 */
 	public void afterPropertiesSet() throws Exception {
-
-		if (jobRegistry == null) {
-			String[] names = parent.getBeanNamesForType(JobRegistry.class);
-			Assert.state(names.length == 1, "Precisely one bean of type JobRegistry is required.  Found = "
-					+ names.length);
-			jobRegistry = (JobRegistry) parent.getBean(names[0]);
-		}
-
+		Assert.state(jobRegistry != null, "A JobRegistry must be provided");
 	}
 
 	/**
-	 * Create all the application contexts required and set up job registry
-	 * entries with all the instances of {@link Job} found therein.
+	 * Creates all the application contexts required and set up job registry
+	 * entries with all the instances of {@link Job} found therein. Also closes
+	 * the contexts when their parent is closed.
 	 * 
 	 * @see InitializingBean#afterPropertiesSet()
 	 */
 	public final void onApplicationEvent(ApplicationEvent event) {
-		if (event instanceof ContextRefreshedEvent && event.getSource() == parent) {
-			try {
-				initialize();
+		if (event.getSource() == parent) {
+			if (event instanceof ContextRefreshedEvent) {
+				try {
+					initialize();
+				}
+				catch (DuplicateJobException e) {
+					throw new IllegalStateException(e);
+				}
+				catch (NoSuchJobException e) {
+					throw new IllegalStateException(e);
+				}
 			}
-			catch (DuplicateJobException e) {
-				throw new IllegalStateException(e);
-			}
-			catch (NoSuchJobException e) {
-				throw new IllegalStateException(e);
+			else if (event instanceof ContextRefreshedEvent) {
+				clear();
 			}
 		}
 	}
@@ -168,7 +160,7 @@ public class ClassPathXmlJobLoader implements ApplicationContextAware, Initializ
 
 		}
 
-		if (jobRegistry.getJobNames().isEmpty()) {
+		if (!jobPaths.isEmpty() && jobRegistry.getJobNames().isEmpty()) {
 			throw new NoSuchJobException("Could not locate any jobs in resources provided.");
 		}
 
@@ -198,7 +190,7 @@ public class ClassPathXmlJobLoader implements ApplicationContextAware, Initializ
 	 * 
 	 * @see DisposableBean#destroy()
 	 */
-	public void destroy() throws Exception {
+	protected void clear() {
 
 		for (ConfigurableApplicationContext context : contexts) {
 			if (context.isActive()) {
