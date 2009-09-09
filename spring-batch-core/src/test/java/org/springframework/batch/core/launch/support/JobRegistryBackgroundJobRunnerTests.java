@@ -33,7 +33,18 @@ public class JobRegistryBackgroundJobRunnerTests {
 	 * {@link org.springframework.batch.core.launch.support.JobRegistryBackgroundJobRunner#main(java.lang.String[])}.
 	 */
 	@Test
-	public void testMain() {
+	public void testMain() throws Exception {
+		JobRegistryBackgroundJobRunner.main(
+				ClassUtils.addResourcePathToPackagePath(getClass(), "test-environment-with-registry.xml"), ClassUtils
+						.addResourcePathToPackagePath(getClass(), "job.xml"));
+		assertEquals(0, JobRegistryBackgroundJobRunner.getErrors().size());
+	}
+
+	@Test
+	public void testMainWithAutoRegister() throws Exception {
+		JobRegistryBackgroundJobRunner.main(
+				ClassUtils.addResourcePathToPackagePath(getClass(), "test-environment-with-registry-and-auto-register.xml"), ClassUtils
+						.addResourcePathToPackagePath(getClass(), "job.xml"));
 		assertEquals(0, JobRegistryBackgroundJobRunner.getErrors().size());
 	}
 
@@ -41,9 +52,6 @@ public class JobRegistryBackgroundJobRunnerTests {
 	public void setUp() throws Exception {
 		JobRegistryBackgroundJobRunner.getErrors().clear();
 		System.setProperty(JobRegistryBackgroundJobRunner.EMBEDDED, "");
-		JobRegistryBackgroundJobRunner.main(
-				ClassUtils.addResourcePathToPackagePath(getClass(), "test-environment-with-registry.xml"), ClassUtils
-						.addResourcePathToPackagePath(getClass(), "job.xml"));
 	}
 
 	@After
