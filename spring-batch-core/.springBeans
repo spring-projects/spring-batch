@@ -54,7 +54,6 @@
 		<config>src/test/resources/org/springframework/batch/core/configuration/xml/StopIncompleteJobParserTests-context.xml</config>
 		<config>src/test/resources/org/springframework/batch/core/configuration/xml/AutoRegisteringStepScopeForJobElementTests-context.xml</config>
 		<config>src/test/resources/org/springframework/batch/core/configuration/xml/AutoRegisteringStepScopeForStepElementTests-context.xml</config>
-		<config>src/test/resources/org/springframework/batch/core/configuration/support/ClassPathXmlJobRegistryContextTests-context.xml</config>
 		<config>src/test/resources/org/springframework/batch/core/configuration/xml/StopAndRestartJobParserTests-context.xml</config>
 		<config>src/test/resources/org/springframework/batch/core/configuration/xml/StopRestartOnCompletedStepJobParserTests-context.xml</config>
 		<config>src/test/resources/org/springframework/batch/core/configuration/xml/StopRestartOnFailedStepJobParserTests-context.xml</config>

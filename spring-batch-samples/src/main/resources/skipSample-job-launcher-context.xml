@@ -30,9 +30,11 @@
 	<bean id="jobExplorer" class="org.springframework.batch.core.explore.support.JobExplorerFactoryBean" 
 		p:dataSource-ref="dataSource" />
 		
-	<bean id="jobRegistry" class="org.springframework.batch.core.configuration.support.ClassPathXmlJobRegistry" >
+	<bean id="jobLoader" class="org.springframework.batch.core.configuration.support.ClassPathXmlJobLoader" >
 	 	<property name="jobPaths" value="jobs/skipSampleJob.xml" />
 	</bean>
+
+	<bean id="jobRegistry" class="org.springframework.batch.core.configuration.support.MapJobRegistry" />
 	
 	<bean id="jdbcTemplate" class="org.springframework.jdbc.core.JdbcTemplate">
 		<property name="dataSource" ref="dataSource" />
