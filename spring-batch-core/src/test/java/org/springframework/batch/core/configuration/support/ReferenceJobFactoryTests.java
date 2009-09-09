@@ -15,7 +15,7 @@
  */
 package org.springframework.batch.core.configuration.support;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 
 import org.junit.Test;
 import org.springframework.batch.core.job.JobSupport;
@@ -28,8 +28,8 @@ public class ReferenceJobFactoryTests {
 	
 	@Test
 	public void testGroupName() throws Exception {
-		ReferenceJobFactory factory = new ReferenceJobFactory("jobs", new JobSupport("foo"));
-		assertEquals("jobs.foo", factory.getJobName());
+		ReferenceJobFactory factory = new ReferenceJobFactory(new JobSupport("foo"));
+		assertEquals("foo", factory.getJobName());
 	}
 
 }

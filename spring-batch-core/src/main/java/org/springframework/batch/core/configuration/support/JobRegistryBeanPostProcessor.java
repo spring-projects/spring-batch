@@ -126,13 +126,15 @@ public class JobRegistryBeanPostProcessor implements BeanPostProcessor, BeanFact
 				if (beanFactory != null) {
 					groupName = getGroupName(beanFactory.getBeanDefinition(beanName), job);
 				}
-				ReferenceJobFactory jobFactory = new ReferenceJobFactory(groupName, job);
+				job = groupName==null ? job : new GroupAwareJob(groupName, job);
+				ReferenceJobFactory jobFactory = new ReferenceJobFactory(job);
 				jobRegistry.register(jobFactory);
 				jobNames.add(jobFactory.getJobName());
 			}
 			catch (DuplicateJobException e) {
 				throw new FatalBeanException("Cannot register job configuration", e);
 			}
+			return job;
 		}
 		return bean;
 	}

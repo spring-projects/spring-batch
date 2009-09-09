@@ -24,6 +24,8 @@ import java.util.List;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.batch.core.Job;
+import org.springframework.batch.core.configuration.DuplicateJobException;
+import org.springframework.batch.core.configuration.JobLocator;
 import org.springframework.batch.core.configuration.JobRegistry;
 import org.springframework.batch.core.configuration.ListableJobLocator;
 import org.springframework.batch.core.launch.NoSuchJobException;
@@ -32,7 +34,10 @@ import org.springframework.beans.factory.DisposableBean;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
+import org.springframework.context.ApplicationEvent;
+import org.springframework.context.ApplicationListener;
 import org.springframework.context.ConfigurableApplicationContext;
+import org.springframework.context.event.ContextRefreshedEvent;
 import org.springframework.core.io.Resource;
 
 /**
@@ -49,8 +54,8 @@ import org.springframework.core.io.Resource;
  * @since 2.1 this class does not implement {@link JobRegistry}: it is a
  * {@link ListableJobLocator}
  */
-public class ClassPathXmlJobRegistry implements ListableJobLocator, ApplicationContextAware, InitializingBean,
-		DisposableBean {
+public class ClassPathXmlJobRegistry implements ListableJobLocator, ApplicationContextAware, DisposableBean,
+		ApplicationListener {
 
 	private static Log logger = LogFactory.getLog(ClassPathXmlJobRegistry.class);
 
@@ -97,13 +102,41 @@ public class ClassPathXmlJobRegistry implements ListableJobLocator, ApplicationC
 		return jobRegistry.getJob(name);
 	}
 
+	public Collection<String> getJobNames() {
+		return jobRegistry.getJobNames();
+	}
+
 	/**
 	 * Create all the application contexts required and set up job registry
 	 * entries with all the instances of {@link Job} found therein.
 	 * 
 	 * @see InitializingBean#afterPropertiesSet()
 	 */
-	public void afterPropertiesSet() throws Exception {
+	public void onApplicationEvent(ApplicationEvent event) {
+		if (event instanceof ContextRefreshedEvent && event.getSource() == parent) {
+			try {
+				initialize();
+			}
+			catch (DuplicateJobException e) {
+				throw new IllegalStateException(e);
+			}
+			catch (NoSuchJobException e) {
+				throw new IllegalStateException(e);
+			}
+		}
+	}
+
+	/**
+	 * Create jobs as instructed and register them so they can be accessed via
+	 * the {@link JobLocator} interface. Normally called from
+	 * {@link #onApplicationEvent(ApplicationEvent)} when the parent context is
+	 * refreshed.
+	 * 
+	 * @throws DuplicateJobException if the job registry detects a duplicate job
+	 * @throws NoSuchJobException if no jobs are registered, since this is
+	 * usually an error
+	 */
+	protected void initialize() throws DuplicateJobException, NoSuchJobException {
 
 		for (Resource resource : jobPaths) {
 			ClassPathXmlApplicationContextFactory applicationContextFactory = new ClassPathXmlApplicationContextFactory();
@@ -117,8 +150,7 @@ public class ClassPathXmlJobRegistry implements ListableJobLocator, ApplicationC
 
 			for (String name : names) {
 				logger.debug("Registering job: " + name + " from context: " + resource);
-				String groupName = getGroupName(context, resource, name);
-				ApplicationContextJobFactory jobFactory = new ApplicationContextJobFactory(groupName, name,
+				ApplicationContextJobFactory jobFactory = new ApplicationContextJobFactory(name,
 						applicationContextFactory);
 				jobRegistry.register(jobFactory);
 			}
@@ -131,20 +163,6 @@ public class ClassPathXmlJobRegistry implements ListableJobLocator, ApplicationC
 	}
 
 	/**
-	 * Determine a group name for the job to be registered. Default
-	 * implementation does nothing, but provides an extension point for
-	 * specialised subclasses.
-	 * 
-	 * @param context the application context containing the job
-	 * @param resource the resource that was used to create the context
-	 * @param jobName the jobName
-	 * @return a group name for the job (or null if not needed)
-	 */
-	protected String getGroupName(ApplicationContext context, Resource resource, String jobName) {
-		return null;
-	}
-
-	/**
 	 * Close the contexts that were created in {@link #afterPropertiesSet()}.
 	 * 
 	 * @see DisposableBean#destroy()
@@ -152,17 +170,15 @@ public class ClassPathXmlJobRegistry implements ListableJobLocator, ApplicationC
 	public void destroy() throws Exception {
 
 		for (ConfigurableApplicationContext context : contexts) {
-			context.close();
+			if (context.isActive()) {
+				context.close();
+			}
 		}
 		for (String jobName : jobRegistry.getJobNames()) {
 			jobRegistry.unregister(jobName);
 		}
 		contexts.clear();
 
-	}
-
-	public Collection<String> getJobNames() {
-		return jobRegistry.getJobNames();
 	}
 
 }

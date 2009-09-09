@@ -27,22 +27,9 @@ import org.springframework.context.ConfigurableApplicationContext;
  * @author Dave Syer
  * 
  */
-public class ApplicationContextJobFactory extends AbstractGroupAwareJobFactory {
+public class ApplicationContextJobFactory implements JobFactory {
 
-	final ApplicationContextFactory applicationContextFactory;
-
-	/**
-	 * @param groupName the name of the group that the job belongs to
-	 * @param jobName the id of the {@link Job} in the application context to be
-	 * created
-	 * @param applicationContextFactory a factory for an application context
-	 * containing a job with the job name provided
-	 */
-	public ApplicationContextJobFactory(String groupName, String jobName,
-			ApplicationContextFactory applicationContextFactory) {
-		super(groupName, jobName);
-		this.applicationContextFactory = applicationContextFactory;
-	}
+	private final Job job;
 
 	/**
 	 * @param jobName the id of the {@link Job} in the application context to be
@@ -51,7 +38,8 @@ public class ApplicationContextJobFactory extends AbstractGroupAwareJobFactory {
 	 * containing a job with the job name provided
 	 */
 	public ApplicationContextJobFactory(String jobName, ApplicationContextFactory applicationContextFactory) {
-		this(null, jobName, applicationContextFactory);
+		ConfigurableApplicationContext context = applicationContextFactory.createApplicationContext();
+		this.job = (Job) context.getBean(jobName, Job.class);
 	}
 
 	/**
@@ -60,11 +48,17 @@ public class ApplicationContextJobFactory extends AbstractGroupAwareJobFactory {
 	 * 
 	 * @see org.springframework.batch.core.configuration.JobFactory#createJob()
 	 */
-	@Override
-	protected Job doCreateJob(String jobName) {
-		ConfigurableApplicationContext context = applicationContextFactory.createApplicationContext();
-		Job job = (Job) context.getBean(jobName, Job.class);
+	public final Job createJob() {
 		return job;
+	}
+	
+	/**
+	 * Just return the name of instance passed in on initialization.
+	 * 
+	 * @see JobFactory#getJobName()
+	 */
+	public String getJobName() {
+		return job.getName();
 	}
 
 }

@@ -15,7 +15,7 @@
  */
 package org.springframework.batch.core.configuration.support;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 
 import org.junit.Test;
 import org.springframework.batch.core.Job;
@@ -23,34 +23,22 @@ import org.springframework.batch.core.job.JobSupport;
 
 /**
  * @author Dave Syer
- *
+ * 
  */
-public class GroupAwareJobFactoryTests {
-	
+public class GroupAwareJobTests {
+
 	private Job job = new JobSupport("foo");
 
 	@Test
 	public void testCreateJob() {
-		AbstractGroupAwareJobFactory factory = new AbstractGroupAwareJobFactory(job.getName()) {
-			@Override
-			protected Job doCreateJob(String jobName) {
-				return job;
-			}
-		};
-		assertEquals(factory.getJobName(), factory.createJob().getName());
-		assertEquals(job, factory.createJob());
+		GroupAwareJob result = new GroupAwareJob(job);
+		assertEquals("foo", result.getName());
 	}
 
 	@Test
 	public void testGetJobName() {
-		AbstractGroupAwareJobFactory factory = new AbstractGroupAwareJobFactory("jobs", job.getName()) {
-			@Override
-			protected Job doCreateJob(String jobName) {
-				return job;
-			}
-		};
-		assertEquals(factory.getJobName(), factory.createJob().getName());
-		assertEquals("jobs.foo", factory.getJobName());
+		GroupAwareJob result = new GroupAwareJob("jobs", job);
+		assertEquals("jobs.foo", result.getName());
 	}
 
 }

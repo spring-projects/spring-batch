@@ -25,7 +25,6 @@ import java.util.Collection;
 import org.junit.Test;
 import org.springframework.batch.core.configuration.DuplicateJobException;
 import org.springframework.batch.core.job.JobSupport;
-import org.springframework.batch.core.launch.NoSuchJobException;
 import org.springframework.beans.FatalBeanException;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
@@ -67,8 +66,8 @@ public class JobRegistryBeanPostProcessorTests {
 		processor.setJobRegistry(registry);
 		JobSupport job = new JobSupport();
 		job.setBeanName("foo");
-		assertEquals(job, processor.postProcessAfterInitialization(job, "bar"));
-		assertEquals(job.getName(), registry.getJob("foo").getName());
+		assertNotNull(processor.postProcessAfterInitialization(job, "bar"));
+		assertEquals("[foo]", registry.getJobNames().toString());
 	}
 
 	@Test
@@ -78,7 +77,7 @@ public class JobRegistryBeanPostProcessorTests {
 		processor.setGroupName("jobs");
 		JobSupport job = new JobSupport();
 		job.setBeanName("foo");
-		assertEquals(job, processor.postProcessAfterInitialization(job, "bar"));
+		assertNotNull(processor.postProcessAfterInitialization(job, "bar"));
 		assertEquals("[jobs.foo]", registry.getJobNames().toString());
 	}
 
@@ -105,15 +104,9 @@ public class JobRegistryBeanPostProcessorTests {
 		processor.setJobRegistry(registry);
 		JobSupport job = new JobSupport();
 		job.setBeanName("foo");
-		assertEquals(job, processor.postProcessAfterInitialization(job, "bar"));
+		assertNotNull(processor.postProcessAfterInitialization(job, "bar"));
 		processor.destroy();
-		try {
-			assertEquals(null, registry.getJob("foo"));
-			fail("Expected NoSuchJobConfigurationException");
-		}
-		catch (NoSuchJobException e) {
-			// expected
-		}
+		assertEquals("[]", registry.getJobNames().toString());
 	}
 
 	@Test
