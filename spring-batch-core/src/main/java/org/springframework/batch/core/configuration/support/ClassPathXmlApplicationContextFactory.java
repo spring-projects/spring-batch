@@ -17,6 +17,8 @@
 package org.springframework.batch.core.configuration.support;
 
 import org.springframework.beans.BeansException;
+import org.springframework.beans.factory.config.BeanFactoryPostProcessor;
+import org.springframework.beans.factory.support.DefaultListableBeanFactory;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 import org.springframework.context.ConfigurableApplicationContext;
@@ -41,6 +43,10 @@ public class ClassPathXmlApplicationContextFactory implements ApplicationContext
 
 	private ResourceXmlApplicationContext context;
 
+	private boolean copyConfiguration = true;
+
+	private boolean copyBeanFactoryPostProcessors = true;
+
 	private final Object lock = new Object();
 
 	/**
@@ -52,6 +58,27 @@ public class ClassPathXmlApplicationContextFactory implements ApplicationContext
 	 */
 	public void setPath(Resource path) {
 		this.path = path;
+	}
+
+	/**
+	 * Flag to indicate that configuration such as bean post processors and
+	 * custom editors should be copied from the parent context. Defaults to
+	 * true;
+	 * 
+	 * @param copyConfiguration the flag value to set
+	 */
+	public void setCopyConfiguration(boolean copyConfiguration) {
+		this.copyConfiguration = copyConfiguration;
+	}
+
+	/**
+	 * Flag to indicate that bean factory post processors (like property
+	 * placeholders) should be copied from the parent context. Defaults to true;
+	 * 
+	 * @param copyBeanFactoryPostProcessors the flag value to set
+	 */
+	public void setCopyBeanFactoryPostProcessors(boolean copyBeanFactoryPostProcessors) {
+		this.copyBeanFactoryPostProcessors = copyBeanFactoryPostProcessors;
 	}
 
 	/**
@@ -92,16 +119,80 @@ public class ClassPathXmlApplicationContextFactory implements ApplicationContext
 	 * 
 	 */
 	private final class ResourceXmlApplicationContext extends AbstractXmlApplicationContext {
+
+		private final DefaultListableBeanFactory parentBeanFactory;
+
 		/**
 		 * @param parent
 		 */
-		private ResourceXmlApplicationContext(ApplicationContext parent) {
+		public ResourceXmlApplicationContext(ConfigurableApplicationContext parent) {
 			super(parent);
+			if (parent != null) {
+				Assert.isTrue(parent.getBeanFactory() instanceof DefaultListableBeanFactory,
+						"The parent application context must have a bean factory of type DefaultListableBeanFactory");
+				parentBeanFactory = (DefaultListableBeanFactory) parent.getBeanFactory();
+				refreshBeanFactory();
+				prepareContext(parent, this);
+			}
+			else {
+				parentBeanFactory = null;
+			}
 			refresh();
 		}
 
+		@Override
+		protected void customizeBeanFactory(DefaultListableBeanFactory beanFactory) {
+			super.customizeBeanFactory(beanFactory);
+			if (parentBeanFactory != null) {
+				ClassPathXmlApplicationContextFactory.this.prepareBeanFactory(parentBeanFactory, beanFactory);
+			}
+		}
+
+		@Override
 		protected Resource[] getConfigResources() {
 			return new Resource[] { path };
+		}
+
+	}
+
+	/**
+	 * Extension point for special subclasses that want to do more complex
+	 * things with the context prior to refresh. The default implementation
+	 * copies bean factory post processors according to the flag set. The bean
+	 * factory for the context will be available if needed through
+	 * {@link ConfigurableApplicationContext#getBeanFactory()
+	 * context.getBeanFactory()}.
+	 * 
+	 * @param parent the parent for the new application context
+	 * @param context the new application context before it is refreshed, but
+	 * after bean factory is initialized
+	 * 
+	 * @see ClassPathXmlApplicationContextFactory#setCopyBeanFactoryPostProcessors(boolean)
+	 */
+	protected void prepareContext(ConfigurableApplicationContext parent, ConfigurableApplicationContext context) {
+		if (copyBeanFactoryPostProcessors) {
+			for (String name : parent.getBeanNamesForType(BeanFactoryPostProcessor.class)) {
+				context.addBeanFactoryPostProcessor((BeanFactoryPostProcessor) parent.getBean(name));
+			}
+		}
+	}
+
+	/**
+	 * Extension point for special subclasses that want to do more complex
+	 * things with the bean factory prior to refresh. The default implementation
+	 * copies all configuration from the parent according to the flag set.
+	 * 
+	 * @param parent the parent bean factory for the new context (will never be
+	 * null)
+	 * @param beanFactory the new bean factory before bean definitions are
+	 * loaded
+	 * 
+	 * @see ClassPathXmlApplicationContextFactory#setCopyConfiguration(boolean)
+	 * @see DefaultListableBeanFactory#copyConfigurationFrom(ConfigurableBeanFactory)
+	 */
+	protected void prepareBeanFactory(DefaultListableBeanFactory parent, DefaultListableBeanFactory beanFactory) {
+		if (copyConfiguration && parent != null) {
+			beanFactory.copyConfigurationFrom(parent);
 		}
 	}
 
