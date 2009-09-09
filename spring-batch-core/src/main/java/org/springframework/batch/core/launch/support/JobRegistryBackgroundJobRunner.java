@@ -18,7 +18,9 @@ package org.springframework.batch.core.launch.support;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
 
 import org.apache.commons.logging.Log;
@@ -27,14 +29,14 @@ import org.springframework.batch.core.Job;
 import org.springframework.batch.core.configuration.DuplicateJobException;
 import org.springframework.batch.core.configuration.JobFactory;
 import org.springframework.batch.core.configuration.JobRegistry;
-import org.springframework.batch.core.configuration.support.ApplicationContextJobFactory;
 import org.springframework.batch.core.configuration.support.ClassPathXmlApplicationContextFactory;
+import org.springframework.batch.core.configuration.support.JobRegistryBeanPostProcessor;
+import org.springframework.batch.core.configuration.support.ReferenceJobFactory;
 import org.springframework.batch.core.launch.JobLauncher;
 import org.springframework.beans.factory.BeanFactory;
 import org.springframework.beans.factory.config.AutowireCapableBeanFactory;
-import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
-import org.springframework.beans.factory.xml.XmlBeanFactory;
 import org.springframework.context.ApplicationContext;
+import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 import org.springframework.core.io.Resource;
 import org.springframework.util.Assert;
@@ -80,6 +82,8 @@ public class JobRegistryBackgroundJobRunner {
 
 	final private String parentContextPath;
 
+	private Collection<ConfigurableApplicationContext> contexts = new HashSet<ConfigurableApplicationContext>();
+
 	private static List<Exception> errors = Collections.synchronizedList(new ArrayList<Exception>());
 
 	/**
@@ -113,6 +117,7 @@ public class JobRegistryBackgroundJobRunner {
 
 		for (int i = 0; i < paths.length; i++) {
 
+			boolean postProcessorExists = parentContext.getBeanNamesForType(JobRegistryBeanPostProcessor.class).length > 0;
 			Resource[] resources = parentContext.getResources(paths[i]);
 
 			for (int j = 0; j < resources.length; j++) {
@@ -120,22 +125,44 @@ public class JobRegistryBackgroundJobRunner {
 				Resource path = resources[j];
 				logger.info("Registering Job definitions from " + Arrays.toString(resources));
 
-				ConfigurableListableBeanFactory beanFactory = new XmlBeanFactory(path, parentContext
-						.getAutowireCapableBeanFactory());
-				String[] names = beanFactory.getBeanNamesForType(Job.class);
+				ConfigurableApplicationContext context = createApplicationContext(parentContext, path);
+				contexts.add(context);
+				String[] names = context.getBeanNamesForType(Job.class);
 
-				for (int k = 0; k < names.length; k++) {
-					ClassPathXmlApplicationContextFactory factory = new ClassPathXmlApplicationContextFactory();
-					factory.setApplicationContext(parentContext);
-					factory.setPath(path);
-					logger.info("Registering Job definition: " + names[k]);
-					registry.register(new ApplicationContextJobFactory(names[k], factory));
+				Collection<String> registered = registry.getJobNames();
+				// If there is a JobRegistryBeanPostProcessor in there already
+				// then they can be registered automatically
+				for (String name : names) {
+					if (!registered.contains(name) && postProcessorExists) {
+						logger.debug("Registering job: " + name + " from context: " + path);
+						JobFactory jobFactory = new ReferenceJobFactory((Job) context.getBean(name));
+						registry.register(jobFactory);
+					}
 				}
 
 			}
 
 		}
 
+	}
+
+	/**
+	 * Create an application context from the resource provided. Extension point
+	 * for subclasses if they need to customize the context in any way. The
+	 * default uses a {@link ClassPathXmlApplicationContextFactory}.
+	 * 
+	 * @param parent the parent application context (or null if there is none)
+	 * @param resource the location of the XML configuration
+	 * 
+	 * @return an application context containing jobs
+	 */
+	protected ConfigurableApplicationContext createApplicationContext(ApplicationContext parent, Resource resource) {
+		ClassPathXmlApplicationContextFactory applicationContextFactory = new ClassPathXmlApplicationContextFactory();
+		applicationContextFactory.setPath(resource);
+		if (parent != null) {
+			applicationContextFactory.setApplicationContext(parent);
+		}
+		return applicationContextFactory.createApplicationContext();
 	}
 
 	/**
@@ -194,7 +221,7 @@ public class JobRegistryBackgroundJobRunner {
 			}
 		}
 		errors.clear();
-		
+
 		// Paths to individual job configurations.
 		final String[] paths = new String[args.length - 1];
 		System.arraycopy(args, 1, paths, 0, paths.length);
@@ -203,6 +230,7 @@ public class JobRegistryBackgroundJobRunner {
 		launcher.register(paths);
 
 		if (System.getProperty(EMBEDDED) != null) {
+			launcher.destroy();
 			return;
 		}
 
@@ -211,7 +239,25 @@ public class JobRegistryBackgroundJobRunner {
 					.println("Started application.  Interrupt (CTRL-C) or call JobRegistryBackgroundJobRunner.stop() to exit.");
 			JobRegistryBackgroundJobRunner.class.wait();
 		}
+		launcher.destroy();
 
+	}
+
+	/**
+	 * De-register all the {@link Job} instances that were regsistered by this
+	 * post processor.
+	 * @see org.springframework.beans.factory.DisposableBean#destroy()
+	 */
+	private void destroy() throws Exception {
+		for (ConfigurableApplicationContext context : contexts) {
+			if (context.isActive()) {
+				context.close();
+			}
+		}
+		for (String jobName : registry.getJobNames()) {
+			registry.unregister(jobName);
+		}
+		contexts.clear();
 	}
 
 	private void run() {

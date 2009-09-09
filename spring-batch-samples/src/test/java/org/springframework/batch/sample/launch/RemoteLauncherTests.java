@@ -58,7 +58,9 @@ public class RemoteLauncherTests {
 	@Test
 	public void testConnect() throws Exception {
 		String message = errors.isEmpty() ? "" : errors.get(0).getMessage();
-		assertEquals(message, 0, errors.size());
+		if (!errors.isEmpty()) {
+			fail(message);
+		}
 		assertTrue(isConnected());
 	}
 
@@ -94,11 +96,11 @@ public class RemoteLauncherTests {
 		// sleep long enough to avoid race conditions (serializable tx isolation
 		// doesn't work with HSQL)
 		Thread.sleep(SLEEP_INTERVAL);
-//		assertEquals(1, launcher.getRunningExecutions("loopJob").size());
+		// assertEquals(1, launcher.getRunningExecutions("loopJob").size());
 		launcher.stop(executionId);
 
 		Thread.sleep(SLEEP_INTERVAL);
-//		assertEquals(0, launcher.getRunningExecutions("loopJob").size());
+		// assertEquals(0, launcher.getRunningExecutions("loopJob").size());
 		logger.debug(launcher.getSummary(executionId));
 		long resumedId = launcher.restart(executionId);
 		assertNotSame("Picked up the same execution after pause and resume", executionId, resumedId);
@@ -107,7 +109,7 @@ public class RemoteLauncherTests {
 		launcher.stop(resumedId);
 		Thread.sleep(SLEEP_INTERVAL);
 
-//		assertEquals(0, launcher.getRunningExecutions("loopJob").size());
+		// assertEquals(0, launcher.getRunningExecutions("loopJob").size());
 		logger.debug(launcher.getSummary(resumedId));
 		long resumeId2 = launcher.restart(resumedId);
 		assertNotSame("Picked up the same execution after pause and resume", executionId, resumeId2);
@@ -131,6 +133,8 @@ public class RemoteLauncherTests {
 					JobRegistryBackgroundJobRunner.main("adhoc-job-launcher-context.xml", "jobs/adhocLoopJob.xml");
 				}
 				catch (Exception e) {
+					// e.printStackTrace();
+					logger.error(e);
 					errors.add(e);
 				}
 			}

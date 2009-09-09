@@ -25,6 +25,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.configuration.DuplicateJobException;
+import org.springframework.batch.core.configuration.JobFactory;
 import org.springframework.batch.core.configuration.JobLocator;
 import org.springframework.batch.core.configuration.JobRegistry;
 import org.springframework.batch.core.configuration.ListableJobLocator;
@@ -112,7 +113,7 @@ public class ClassPathXmlJobRegistry implements ListableJobLocator, ApplicationC
 	 * 
 	 * @see InitializingBean#afterPropertiesSet()
 	 */
-	public void onApplicationEvent(ApplicationEvent event) {
+	public final void onApplicationEvent(ApplicationEvent event) {
 		if (event instanceof ContextRefreshedEvent && event.getSource() == parent) {
 			try {
 				initialize();
@@ -139,27 +140,42 @@ public class ClassPathXmlJobRegistry implements ListableJobLocator, ApplicationC
 	protected void initialize() throws DuplicateJobException, NoSuchJobException {
 
 		for (Resource resource : jobPaths) {
-			ClassPathXmlApplicationContextFactory applicationContextFactory = new ClassPathXmlApplicationContextFactory();
-			applicationContextFactory.setPath(resource);
-			if (parent != null) {
-				applicationContextFactory.setApplicationContext(parent);
-			}
-			ConfigurableApplicationContext context = applicationContextFactory.createApplicationContext();
+
+			ConfigurableApplicationContext context = createApplicationContext(parent, resource);
 			contexts.add(context);
 			String[] names = context.getBeanNamesForType(Job.class);
 
 			for (String name : names) {
 				logger.debug("Registering job: " + name + " from context: " + resource);
-				ApplicationContextJobFactory jobFactory = new ApplicationContextJobFactory(name,
-						applicationContextFactory);
+				JobFactory jobFactory = new ReferenceJobFactory((Job) context.getBean(name));
 				jobRegistry.register(jobFactory);
 			}
+
 		}
 
 		if (jobRegistry.getJobNames().isEmpty()) {
 			throw new NoSuchJobException("Could not locate any jobs in resources provided.");
 		}
 
+	}
+
+	/**
+	 * Create an application context from the resource provided. Extension point
+	 * for subclasses if they need to customize the context in any way. The
+	 * default uses a {@link ClassPathXmlApplicationContextFactory}.
+	 * 
+	 * @param parent the parent application context (or null if there is none)
+	 * @param resource the location of the XML configuration
+	 * 
+	 * @return an application context containing jobs
+	 */
+	protected ConfigurableApplicationContext createApplicationContext(ApplicationContext parent, Resource resource) {
+		ClassPathXmlApplicationContextFactory applicationContextFactory = new ClassPathXmlApplicationContextFactory();
+		applicationContextFactory.setPath(resource);
+		if (parent != null) {
+			applicationContextFactory.setApplicationContext(parent);
+		}
+		return applicationContextFactory.createApplicationContext();
 	}
 
 	/**

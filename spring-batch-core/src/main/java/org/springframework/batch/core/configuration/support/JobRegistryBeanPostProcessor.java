@@ -123,7 +123,7 @@ public class JobRegistryBeanPostProcessor implements BeanPostProcessor, BeanFact
 			Job job = (Job) bean;
 			try {
 				String groupName = this.groupName;
-				if (beanFactory != null) {
+				if (beanFactory != null && beanFactory.containsBean(beanName)) {
 					groupName = getGroupName(beanFactory.getBeanDefinition(beanName), job);
 				}
 				job = groupName==null ? job : new GroupAwareJob(groupName, job);
