@@ -32,6 +32,7 @@
 		
 	<bean id="jobLoader" class="org.springframework.batch.core.configuration.support.ClassPathXmlJobLoader" >
 	 	<property name="jobPaths" value="jobs/skipSampleJob.xml" />
+	 	<property name="jobRegistry" ref="jobRegistry"/>
 	</bean>
 
 	<bean id="jobRegistry" class="org.springframework.batch.core.configuration.support.MapJobRegistry" />
