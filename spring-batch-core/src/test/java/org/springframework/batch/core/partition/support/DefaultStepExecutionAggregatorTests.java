@@ -12,9 +12,9 @@ import org.springframework.batch.core.ExitStatus;
 import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.StepExecution;
 
-public class StepExecutionAggregatorTests {
+public class DefaultStepExecutionAggregatorTests {
 
-	private StepExecutionAggregator aggregator = new StepExecutionAggregator();
+	private StepExecutionAggregator aggregator = new DefaultStepExecutionAggregator();
 
 	private JobExecution jobExecution = new JobExecution(11L);
 

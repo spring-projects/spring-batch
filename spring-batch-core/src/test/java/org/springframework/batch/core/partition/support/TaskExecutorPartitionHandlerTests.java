@@ -95,7 +95,7 @@ public class TaskExecutorPartitionHandlerTests {
 			}
 		});
 		Collection<StepExecution> executions = handler.handle(stepExecutionSplitter, stepExecution);
-		new StepExecutionAggregator().aggregate(stepExecution, executions);
+		new DefaultStepExecutionAggregator().aggregate(stepExecution, executions);
 		assertEquals(1, count);
 		assertEquals(ExitStatus.FAILED.getExitCode(), stepExecution.getExitStatus().getExitCode());
 	}

@@ -41,14 +41,27 @@ public class PartitionStep extends AbstractStep {
 
 	private PartitionHandler partitionHandler;
 
-	private StepExecutionAggregator aggregator = new StepExecutionAggregator();
+	private StepExecutionAggregator stepExecutionAggregator = new DefaultStepExecutionAggregator();
 
 	/**
-	 * Public setter for mandatory property {@link PartitionHandler}.
+	 * A {@link PartitionHandler} which can send out step executions for remote
+	 * processing and bring back the results.
+	 * 
 	 * @param partitionHandler the {@link PartitionHandler} to set
 	 */
 	public void setPartitionHandler(PartitionHandler partitionHandler) {
 		this.partitionHandler = partitionHandler;
+	}
+
+	/**
+	 * A {@link StepExecutionAggregator} that can aggregate step executions when
+	 * they come back from the handler. Defaults to a
+	 * {@link DefaultStepExecutionAggregator}.
+	 * 
+	 * @param stepExecutionAggregator the {@link StepExecutionAggregator} to set
+	 */
+	public void setStepExecutionAggregator(StepExecutionAggregator stepExecutionAggregator) {
+		this.stepExecutionAggregator = stepExecutionAggregator;
 	}
 
 	/**
@@ -90,7 +103,7 @@ public class PartitionStep extends AbstractStep {
 		// Wait for task completion and then aggregate the results
 		Collection<StepExecution> executions = partitionHandler.handle(stepExecutionSplitter, stepExecution);
 		stepExecution.upgradeStatus(BatchStatus.COMPLETED);
-		aggregator.aggregate(stepExecution, executions);
+		stepExecutionAggregator.aggregate(stepExecution, executions);
 
 		// If anything failed or had a problem we need to crap out
 		if (stepExecution.getStatus().isUnsuccessful()) {

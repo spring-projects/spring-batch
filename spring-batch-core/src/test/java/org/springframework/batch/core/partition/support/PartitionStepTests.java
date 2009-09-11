@@ -17,6 +17,7 @@ package org.springframework.batch.core.partition.support;
 
 import static org.junit.Assert.assertEquals;
 
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Set;
 
@@ -126,6 +127,30 @@ public class PartitionStepTests {
 		// one master and two workers
 		assertEquals(3, stepExecution.getJobExecution().getStepExecutions().size());
 		assertEquals(BatchStatus.STOPPED, stepExecution.getStatus());
+	}
+
+	@Test
+	public void testStepAggregator() throws Exception {
+		step.setStepExecutionAggregator(new DefaultStepExecutionAggregator() {
+			@Override
+			public void aggregate(StepExecution result, Collection<StepExecution> executions) {
+				super.aggregate(result, executions);
+				result.getExecutionContext().put("aggregated", true);
+			}
+		});
+		step.setStepExecutionSplitter(new SimpleStepExecutionSplitter(jobRepository, remote));
+		step.setPartitionHandler(new PartitionHandler() {
+			public Collection<StepExecution> handle(StepExecutionSplitter stepSplitter, StepExecution stepExecution)
+					throws Exception {
+				return Arrays.asList(stepExecution);
+			}
+		});
+		step.afterPropertiesSet();
+		JobExecution jobExecution = jobRepository.createJobExecution("vanillaJob", new JobParameters());
+		StepExecution stepExecution = jobExecution.createStepExecution("foo");
+		jobRepository.add(stepExecution);
+		step.execute(stepExecution);
+		assertEquals(true, stepExecution.getExecutionContext().get("aggregated"));
 	}
 
 }
