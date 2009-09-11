@@ -19,6 +19,7 @@ package org.springframework.batch.core.partition.support;
 import java.util.Collection;
 
 import org.springframework.batch.core.BatchStatus;
+import org.springframework.batch.core.ExitStatus;
 import org.springframework.batch.core.StepExecution;
 import org.springframework.util.Assert;
 
@@ -32,11 +33,14 @@ import org.springframework.util.Assert;
 public class DefaultStepExecutionAggregator implements StepExecutionAggregator {
 
 	/**
-	 * Aggregates the status and exit status using their built in combination
-	 * rules (i.e. {@link BatchStatus#max(BatchStatus, BatchStatus) max} and
-	 * {@link ExitStatus#and(ExitStatus) and} respectively), and the counters by
-	 * simple arithmetic.
-	 * 
+	 * Aggregates the input executions into the result {@link StepExecution}.
+	 * The aggregated fields are
+	 * <ul>
+	 * <li>status - choosing the highest value using
+	 * {@link BatchStatus#max(BatchStatus, BatchStatus)}</li>
+	 * <li>exitStatus - using {@link ExitStatus#and(ExitStatus)}</li>
+	 * <li>commitCount, rollbackCount, etc. - by arithmetic sum</li>
+	 * </ul>
 	 * @see StepExecutionAggregator #aggregate(StepExecution, Collection)
 	 */
 	public void aggregate(StepExecution result, Collection<StepExecution> executions) {
