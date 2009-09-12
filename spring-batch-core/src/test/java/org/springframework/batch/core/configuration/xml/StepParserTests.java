@@ -353,7 +353,7 @@ public class StepParserTests {
 
 		assertTrue(ctx.containsBean("&s12"));
 		Object factoryBean = ctx.getBean("&s12");
-		assertTrue(factoryBean instanceof StepParserStepFactoryBean);
+		assertTrue(factoryBean instanceof StepParserStepFactoryBean<?,?>);
 
 		assertTrue(ctx.containsBean("dummyStep"));
 		Object dummyStep = ctx.getBean("dummyStep");
@@ -370,7 +370,7 @@ public class StepParserTests {
 
 		assertTrue(ctx.containsBean("&s13"));
 		Object factoryBean = ctx.getBean("&s13");
-		assertTrue(factoryBean instanceof StepParserStepFactoryBean);
+		assertTrue(factoryBean instanceof StepParserStepFactoryBean<?,?>);
 
 		assertTrue(ctx.containsBean("s13"));
 		Object bean = ctx.getBean("s13");
@@ -378,7 +378,7 @@ public class StepParserTests {
 
 		assertTrue(ctx.containsBean("&dummyStepWithTaskletOnParent"));
 		Object dummyStepFb = ctx.getBean("&dummyStepWithTaskletOnParent");
-		assertTrue(dummyStepFb instanceof StepParserStepFactoryBean);
+		assertTrue(dummyStepFb instanceof StepParserStepFactoryBean<?,?>);
 
 		assertTrue(ctx.containsBean("dummyStepWithTaskletOnParent"));
 		Object dummyStep = ctx.getBean("dummyStepWithTaskletOnParent");
@@ -386,7 +386,7 @@ public class StepParserTests {
 
 		assertTrue(ctx.containsBean("&standaloneStepWithTasklet"));
 		Object standaloneStepFb = ctx.getBean("&standaloneStepWithTasklet");
-		assertTrue(standaloneStepFb instanceof StepParserStepFactoryBean);
+		assertTrue(standaloneStepFb instanceof StepParserStepFactoryBean<?,?>);
 
 		assertTrue(ctx.containsBean("standaloneStepWithTasklet"));
 		Object standaloneStep = ctx.getBean("standaloneStepWithTasklet");
@@ -399,7 +399,7 @@ public class StepParserTests {
 
 		assertTrue(ctx.containsBean("&s14"));
 		Object factoryBean = ctx.getBean("&s14");
-		assertTrue(factoryBean instanceof StepParserStepFactoryBean);
+		assertTrue(factoryBean instanceof StepParserStepFactoryBean<?,?>);
 
 		assertTrue(ctx.containsBean("s12"));
 		Object bean = ctx.getBean("s12");
@@ -407,7 +407,7 @@ public class StepParserTests {
 
 		assertTrue(ctx.containsBean("&standaloneStepWithTaskletAndDummyParent"));
 		Object standaloneWithTaskletFb = ctx.getBean("&standaloneStepWithTaskletAndDummyParent");
-		assertTrue(standaloneWithTaskletFb instanceof StepParserStepFactoryBean);
+		assertTrue(standaloneWithTaskletFb instanceof StepParserStepFactoryBean<?,?>);
 
 		assertTrue(ctx.containsBean("standaloneStepWithTaskletAndDummyParent"));
 		Object standaloneWithTasklet = ctx.getBean("standaloneStepWithTaskletAndDummyParent");

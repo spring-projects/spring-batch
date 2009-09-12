@@ -776,8 +776,6 @@ public class FaultTolerantStepFactoryBeanTests {
 
 	private static class ItemProcessListenerStub<T, S> implements ItemProcessListener<T, S> {
 
-		private boolean errorEncountered = false;
-
 		private boolean filterEncountered = false;
 
 		public void afterProcess(T item, S result) {
@@ -791,11 +789,7 @@ public class FaultTolerantStepFactoryBeanTests {
 		}
 
 		public void onProcessError(T item, Exception e) {
-			errorEncountered = true;
-		}
 
-		public boolean isErrorEncountered() {
-			return errorEncountered;
 		}
 
 		public boolean isFilterEncountered() {

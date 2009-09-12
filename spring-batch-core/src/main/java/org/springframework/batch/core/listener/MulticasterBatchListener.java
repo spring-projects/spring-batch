@@ -78,22 +78,22 @@ public class MulticasterBatchListener<T, S> implements StepExecutionListener, Ch
 		if (listener instanceof ChunkListener) {
 			this.chunkListener.register((ChunkListener) listener);
 		}
-		if (listener instanceof ItemReadListener) {
+		if (listener instanceof ItemReadListener<?>) {
 			@SuppressWarnings("unchecked")
 			ItemReadListener<T> itemReadListener = (ItemReadListener) listener;
 			this.itemReadListener.register(itemReadListener);
 		}
-		if (listener instanceof ItemProcessListener) {
+		if (listener instanceof ItemProcessListener<?,?>) {
 			@SuppressWarnings("unchecked")
 			ItemProcessListener<T,S> itemProcessListener = (ItemProcessListener) listener;
 			this.itemProcessListener.register(itemProcessListener);
 		}
-		if (listener instanceof ItemWriteListener) {
+		if (listener instanceof ItemWriteListener<?>) {
 			@SuppressWarnings("unchecked")
 			ItemWriteListener<S> itemWriteListener = (ItemWriteListener) listener;
 			this.itemWriteListener.register(itemWriteListener);
 		}
-		if (listener instanceof SkipListener) {
+		if (listener instanceof SkipListener<?,?>) {
 			@SuppressWarnings("unchecked")
 			SkipListener<T,S> skipListener = (SkipListener) listener;
 			this.skipListener.register(skipListener);

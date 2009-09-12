@@ -121,7 +121,7 @@ public class StepParserStepFactoryBeanTests {
 		Object step = fb.getObject();
 		assertTrue(step instanceof TaskletStep);
 		Object tasklet = ReflectionTestUtils.getField(step, "tasklet");
-		assertTrue(tasklet instanceof ChunkOrientedTasklet);
+		assertTrue(tasklet instanceof ChunkOrientedTasklet<?>);
 	}
 
 	@Test(expected = IllegalStateException.class)
@@ -153,7 +153,7 @@ public class StepParserStepFactoryBeanTests {
 		Object step = fb.getObject();
 		assertTrue(step instanceof TaskletStep);
 		Object tasklet = ReflectionTestUtils.getField(step, "tasklet");
-		assertTrue(tasklet instanceof ChunkOrientedTasklet);
+		assertTrue(tasklet instanceof ChunkOrientedTasklet<?>);
 	}
 
 	@Test
@@ -179,7 +179,7 @@ public class StepParserStepFactoryBeanTests {
 		Object step = fb.getObject();
 		assertTrue(step instanceof TaskletStep);
 		Object tasklet = ReflectionTestUtils.getField(step, "tasklet");
-		assertTrue(tasklet instanceof ChunkOrientedTasklet);
+		assertTrue(tasklet instanceof ChunkOrientedTasklet<?>);
 	}
 
 	@Test
@@ -212,7 +212,7 @@ public class StepParserStepFactoryBeanTests {
 		Object throttleLimit = ReflectionTestUtils.getField(ReflectionTestUtils.getField(step, "stepOperations"), "throttleLimit");
 		assertEquals(new Integer(10), throttleLimit);
 		Object tasklet = ReflectionTestUtils.getField(step, "tasklet");
-		assertTrue(tasklet instanceof ChunkOrientedTasklet);
+		assertTrue(tasklet instanceof ChunkOrientedTasklet<?>);
 	}
 
 }

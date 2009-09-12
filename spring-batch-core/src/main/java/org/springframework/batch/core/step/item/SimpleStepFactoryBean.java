@@ -301,6 +301,7 @@ public class SimpleStepFactoryBean<T, S> implements FactoryBean, BeanNameAware {
 	 * Getter for the {@link TransactionAttribute} for subclasses only.
 	 * @return the transactionAttribute
 	 */
+	@SuppressWarnings("serial")
 	protected TransactionAttribute getTransactionAttribute() {
 
 		DefaultTransactionAttribute attribute = new DefaultTransactionAttribute();
@@ -617,16 +618,16 @@ public class SimpleStepFactoryBean<T, S> implements FactoryBean, BeanNameAware {
 
 			if (StepListenerFactoryBean.isListener(itemHandler)) {
 				StepListener listener = StepListenerFactoryBean.getListener(itemHandler);
-				if (listener instanceof SkipListener) {
+				if (listener instanceof SkipListener<?,?>) {
 					chunkProvider.registerListener(listener);
 					chunkProcessor.registerListener(listener);
 					// already registered with both so avoid double-registering
 					continue;
 				}
-				if (listener instanceof ItemReadListener) {
+				if (listener instanceof ItemReadListener<?>) {
 					chunkProvider.registerListener(listener);
 				}
-				if (listener instanceof ItemProcessListener || listener instanceof ItemWriteListener) {
+				if (listener instanceof ItemProcessListener<?,?> || listener instanceof ItemWriteListener<?>) {
 					chunkProcessor.registerListener(listener);
 				}
 			}

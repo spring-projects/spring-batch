@@ -274,6 +274,7 @@ public class FaultTolerantStepFactoryBean<T, S> extends SimpleStepFactoryBean<T,
 	 * 
 	 * @return the transactionAttribute
 	 */
+	@SuppressWarnings("serial")
 	@Override
 	protected TransactionAttribute getTransactionAttribute() {
 
@@ -308,7 +309,7 @@ public class FaultTolerantStepFactoryBean<T, S> extends SimpleStepFactoryBean<T,
 		boolean streamIsReader = false;
 		ItemReader<? extends T> itemReader = getItemReader();
 		for (ItemStream stream : streams) {
-			if (stream instanceof ItemReader) {
+			if (stream instanceof ItemReader<?>) {
 				streamIsReader = true;
 				chunkMonitor.registerItemStream(stream);
 			}
