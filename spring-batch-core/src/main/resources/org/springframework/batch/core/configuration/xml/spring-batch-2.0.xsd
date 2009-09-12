@@ -1,7 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <xsd:schema xmlns="http://www.springframework.org/schema/batch" xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xmlns:beans="http://www.springframework.org/schema/beans" xmlns:tool="http://www.springframework.org/schema/tool"
 	targetNamespace="http://www.springframework.org/schema/batch" elementFormDefault="qualified" attributeFormDefault="unqualified"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.5.xsd
+	http://www.springframework.org/schema/tool http://www.springframework.org/schema/tool/spring-tool-2.5.xsd"
 	version="2.0">
 
 	<xsd:import namespace="http://www.springframework.org/schema/beans" />
@@ -84,14 +87,14 @@
 					<xsd:complexType>
 						<xsd:complexContent>
 							<xsd:extension base="taskletType">
-								<xsd:attributeGroup ref="jobRepositoryAttribute"/>
+								<xsd:attributeGroup ref="jobRepositoryAttribute" />
 							</xsd:extension>
 						</xsd:complexContent>
 					</xsd:complexType>
 				</xsd:element>
 			</xsd:choice>
 			<xsd:attribute name="id" type="xsd:ID" use="required" />
-			<xsd:attributeGroup ref="parentAttribute"/>
+			<xsd:attributeGroup ref="parentAttribute" />
 			<xsd:attributeGroup ref="abstractAttribute" />
 		</xsd:complexType>
 	</xsd:element>
@@ -155,16 +158,14 @@
 					</xsd:attribute>
 					<xsd:attribute name="transaction-manager" type="xsd:string" default="transactionManager">
 						<xsd:annotation>
-							<xsd:documentation
-								source="java:org.springframework.transaction.PlatformTransactionManager"><![CDATA[
+							<xsd:documentation source="java:org.springframework.transaction.PlatformTransactionManager"><![CDATA[
 							The bean name of the TransactionManager that is to be used. This attribute 
 							is not required, and only needs to be specified explicitly
 							if the bean name of the desired TransactionManager is not 'transactionManager'.
 							]]></xsd:documentation>
 							<xsd:appinfo>
 								<tool:annotation kind="ref">
-									<tool:expected-type
-										type="org.springframework.transaction.PlatformTransactionManager" />
+									<tool:expected-type type="org.springframework.transaction.PlatformTransactionManager" />
 								</tool:annotation>
 							</xsd:appinfo>
 						</xsd:annotation>
@@ -199,18 +200,19 @@
 					<xsd:documentation>
 						Defines a stage in job processing backed by a
 						Step. The id attribute must be specified. The
-						step requires either a chunk definition,
-						a tasklet reference, or a reference to a 
+						step
+						requires either a chunk definition,
+						a tasklet reference, or a reference to a
 						(possibly abstract) parent step.
 					</xsd:documentation>
 				</xsd:annotation>
 				<xsd:complexType>
 					<xsd:choice minOccurs="0" maxOccurs="unbounded">
-						<xsd:element name="tasklet" type="taskletType"/>
+						<xsd:element name="tasklet" type="taskletType" />
 						<xsd:group ref="transitions" />
 					</xsd:choice>
 					<xsd:attribute name="id" type="xsd:ID" use="required" />
-					<xsd:attributeGroup ref="parentAttribute"/>
+					<xsd:attributeGroup ref="parentAttribute" />
 					<xsd:attributeGroup ref="nextAttribute" />
 				</xsd:complexType>
 			</xsd:element>
@@ -280,8 +282,8 @@
 
 	<xsd:complexType name="taskletType">
 		<xsd:all>
-			<xsd:element name="chunk" type="chunkTaskletType" minOccurs="0" maxOccurs="1"/>
-			<xsd:element name="transaction-attributes" type="transaction-attributesType" minOccurs="0" maxOccurs="1"/>
+			<xsd:element name="chunk" type="chunkTaskletType" minOccurs="0" maxOccurs="1" />
+			<xsd:element name="transaction-attributes" type="transaction-attributesType" minOccurs="0" maxOccurs="1" />
 			<xsd:element name="no-rollback-exception-classes" minOccurs="0" maxOccurs="1">
 				<xsd:annotation>
 					<xsd:documentation><![CDATA[
@@ -299,16 +301,16 @@
 					</xsd:simpleContent>
 				</xsd:complexType>
 			</xsd:element>
-			<xsd:element name="listeners" type="stepListenersType" minOccurs="0" maxOccurs="1"/>
+			<xsd:element name="listeners" type="stepListenersType" minOccurs="0" maxOccurs="1" />
 		</xsd:all>
 		<xsd:attribute name="ref" type="xsd:string" use="optional">
 			<xsd:annotation>
 				<xsd:documentation>
-				The tasklet is a reference to another bean definition that implements the Tasklet interface.
+					The tasklet is a reference to another bean definition that implements the Tasklet interface.
 				</xsd:documentation>
 				<xsd:appinfo>
 					<tool:annotation kind="ref">
-						<tool:expected-type type="org.springframework.batch.core.step.tasklet.Tasklet"/>
+						<tool:expected-type type="org.springframework.batch.core.step.tasklet.Tasklet" />
 					</tool:annotation>
 				</xsd:appinfo>
 			</xsd:annotation>
@@ -329,16 +331,14 @@
 		</xsd:attribute>
 		<xsd:attribute name="transaction-manager" type="xsd:string">
 			<xsd:annotation>
-				<xsd:documentation
-					source="java:org.springframework.transaction.PlatformTransactionManager"><![CDATA[
+				<xsd:documentation source="java:org.springframework.transaction.PlatformTransactionManager"><![CDATA[
 				The bean name of the TransactionManager that is to be used. This attribute 
 				is not required, and only needs to be specified explicitly
 				if the bean name of the desired TransactionManager is not 'transactionManager'.
 				]]></xsd:documentation>
 				<xsd:appinfo>
 					<tool:annotation kind="ref">
-						<tool:expected-type
-							type="org.springframework.transaction.PlatformTransactionManager" />
+						<tool:expected-type type="org.springframework.transaction.PlatformTransactionManager" />
 					</tool:annotation>
 				</xsd:appinfo>
 			</xsd:annotation>
