@@ -5,6 +5,7 @@ package org.springframework.batch.core;
 
 import java.util.Date;
 import java.util.Iterator;
+import java.util.Map;
 
 import junit.framework.TestCase;
 
@@ -53,5 +54,13 @@ public class JobParametersBuilderTests extends TestCase {
 		assertEquals("foo", parameters.next());
 		assertEquals("bar", parameters.next());
 		assertEquals("spam", parameters.next());
+	}
+	
+	public void testAddJobParameter(){
+		JobParameter jobParameter = new JobParameter("bar");
+		parametersBuilder.addParameter("foo", jobParameter);
+		Map<String,JobParameter> parameters = parametersBuilder.toJobParameters().getParameters();
+		assertEquals(1, parameters.size());
+		assertEquals("bar", parameters.get("foo").getValue());
 	}
 }

@@ -110,9 +110,22 @@ public class JobParametersBuilder {
 	 * Conversion method that takes the current state of this builder and
 	 * returns it as a JobruntimeParameters object.
 	 * 
-	 * @return a valid JobParameters object.
+	 * @return a valid {@link JobParameters} object.
 	 */
 	public JobParameters toJobParameters() {
 		return new JobParameters(parameterMap);
+	}
+
+	/**
+	 * Add a new {@link JobParameter} for the given key.
+	 * 
+	 * @param key - parameter accessor
+	 * @param jobParameter - runtime parameter
+	 * @return a reference to this object.
+	 */
+	public JobParametersBuilder addParameter(String key, JobParameter jobParameter) {
+		Assert.notNull(jobParameter, "JobParameter must not be null");
+		parameterMap.put(key, jobParameter);
+		return this;
 	}
 }

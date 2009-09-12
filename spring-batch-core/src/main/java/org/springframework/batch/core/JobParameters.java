@@ -35,6 +35,7 @@ import java.util.Map;
  * @author Lucas Ward
  * @since 1.0
  */
+@SuppressWarnings("serial")
 public class JobParameters implements Serializable {
 
 	private final Map<String,JobParameter> parameters;
