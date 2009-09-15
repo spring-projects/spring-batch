@@ -38,6 +38,7 @@ import org.springframework.context.ApplicationContextAware;
 import org.springframework.context.ApplicationEvent;
 import org.springframework.context.ApplicationListener;
 import org.springframework.context.ConfigurableApplicationContext;
+import org.springframework.context.event.ContextClosedEvent;
 import org.springframework.context.event.ContextRefreshedEvent;
 import org.springframework.core.io.Resource;
 import org.springframework.util.Assert;
@@ -128,7 +129,7 @@ public class ClassPathXmlJobLoader implements ApplicationContextAware, Applicati
 					throw new IllegalStateException(e);
 				}
 			}
-			else if (event instanceof ContextRefreshedEvent) {
+			else if (event instanceof ContextClosedEvent) {
 				clear();
 			}
 		}

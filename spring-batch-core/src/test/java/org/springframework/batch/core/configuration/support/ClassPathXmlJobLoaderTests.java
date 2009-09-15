@@ -11,6 +11,8 @@ import org.junit.Test;
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.launch.NoSuchJobException;
 import org.springframework.beans.factory.BeanCreationException;
+import org.springframework.context.event.ContextClosedEvent;
+import org.springframework.context.event.ContextRefreshedEvent;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 import org.springframework.context.support.GenericApplicationContext;
 import org.springframework.core.io.ClassPathResource;
@@ -118,6 +120,37 @@ public class ClassPathXmlJobLoaderTests {
 		loader.initialize();
 		assertEquals(2, registry.getJobNames().size());
 		loader.clear();
+		assertEquals(0, registry.getJobNames().size());
+
+	}
+
+	@Test
+	public void testInitCalledOnContextRefreshed() throws Exception {
+
+		Resource[] jobPaths = new Resource[] { new ClassPathResource(
+				"org/springframework/batch/core/launch/support/2jobs.xml") };
+		loader.setApplicationContext(new ClassPathXmlApplicationContext(
+				"/org/springframework/batch/core/launch/support/test-environment-with-registry-and-auto-register.xml"));
+		loader.setJobPaths(jobPaths);
+		GenericApplicationContext applicationContext = new GenericApplicationContext();
+		applicationContext.refresh();
+		loader.setApplicationContext(applicationContext);
+		loader.onApplicationEvent(new ContextRefreshedEvent(applicationContext));
+		assertEquals(2, registry.getJobNames().size());
+	}
+
+	@Test
+	public void testDestroyCalledOnContextClosed() throws Exception {
+
+		Resource[] jobPaths = new Resource[] { new ClassPathResource(
+				"org/springframework/batch/core/launch/support/2jobs.xml") };
+		loader.setJobPaths(jobPaths);
+		GenericApplicationContext applicationContext = new GenericApplicationContext();
+		applicationContext.refresh();
+		loader.setApplicationContext(applicationContext);
+		loader.initialize();
+		assertEquals(2, registry.getJobNames().size());
+		loader.onApplicationEvent(new ContextClosedEvent(applicationContext));
 		assertEquals(0, registry.getJobNames().size());
 
 	}
