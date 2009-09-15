@@ -15,39 +15,55 @@
  */
 package example;
 
-import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.springframework.batch.core.Job;
-import org.springframework.batch.core.JobParameters;
-import org.springframework.batch.core.launch.JobLauncher;
+import org.springframework.batch.core.BatchStatus;
+import org.springframework.batch.core.JobExecution;
+import org.springframework.batch.core.JobInstance;
+import org.springframework.batch.core.launch.JobOperator;
+import org.springframework.batch.test.AbstractJobTests;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
-/**
- * @author Dave Syer
- *
- */
-@ContextConfiguration(locations={"/launch-context.xml"})
+@ContextConfiguration(locations = { "/launch-context.xml" })
 @RunWith(SpringJUnit4ClassRunner.class)
-public class ExampleJobConfigurationTests {
-	
-	@Autowired
-	private JobLauncher jobLauncher;
+public class ExampleJobConfigurationTests extends AbstractJobTests {
 
 	@Autowired
-	private Job job;
-	
-	@Test
-	public void testSimpleProperties() throws Exception {
-		assertNotNull(jobLauncher);
-	}
-	
+	private JobOperator jobOperator;
+
+	/**
+	 * Create a unique job instance and check it's execution completes
+	 * successfully - uses the convenience methods provided by the testing
+	 * superclass.
+	 */
 	@Test
 	public void testLaunchJob() throws Exception {
-		jobLauncher.run(job, new JobParameters());
+
+		JobExecution jobExecution = launchJob(getUniqueJobParameters());
+		assertEquals(BatchStatus.COMPLETED, jobExecution.getStatus());
 	}
-	
+
+	/**
+	 * Execute a fresh {@link JobInstance} using {@link JobOperator} - closer to
+	 * a remote invocation scenario.
+	 */
+	@Test
+	public void testLaunchByJobOperator() throws Exception {
+
+		// assumes the job has a JobIncrementer set
+		long jobExecutionId = jobOperator.startNextInstance(getJob().getName());
+
+		// no need to wait for job completion in this case, the job is launched
+		// synchronously
+
+		String result = jobOperator.getSummary(jobExecutionId);
+		assertTrue(result.contains("status=" + BatchStatus.COMPLETED));
+
+	}
+
 }
