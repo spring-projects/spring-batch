@@ -20,6 +20,7 @@ import static org.junit.Assert.assertNotNull;
 
 import org.junit.Test;
 import org.springframework.batch.core.Job;
+import org.springframework.beans.factory.config.BeanFactoryPostProcessor;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 import org.springframework.core.io.ClassPathResource;
@@ -59,7 +60,9 @@ public class ClassPathXmlApplicationContextFactoryTests {
 	public void testBeanFactoryPostProcessorsNotCopied() {
 		factory.setApplicationContext(new ClassPathXmlApplicationContext(ClassUtils.addResourcePathToPackagePath(getClass(), "parent-context.xml")));
 		factory.setPath(new ClassPathResource(ClassUtils.addResourcePathToPackagePath(getClass(), "child-context.xml")));
-		factory.setCopyBeanFactoryPostProcessors(false);
+		@SuppressWarnings("unchecked")
+		Class<? extends BeanFactoryPostProcessor>[] classes = (Class<? extends BeanFactoryPostProcessor>[]) new Class<?>[0];
+		factory.setBeanFactoryPostProcessorClasses(classes);
 		ConfigurableApplicationContext context = factory.createApplicationContext();
 		assertEquals("test-job", context.getBeanNamesForType(Job.class)[0]);
 		assertEquals("${foo}", ((Job) context.getBean("test-job", Job.class)).getName());

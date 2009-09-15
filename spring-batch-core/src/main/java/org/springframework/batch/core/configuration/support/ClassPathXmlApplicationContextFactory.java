@@ -16,8 +16,14 @@
 
 package org.springframework.batch.core.configuration.support;
 
+import java.util.ArrayList;
+import java.util.Collection;
+
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.config.BeanFactoryPostProcessor;
+import org.springframework.beans.factory.config.ConfigurableBeanFactory;
+import org.springframework.beans.factory.config.CustomEditorConfigurer;
+import org.springframework.beans.factory.config.PropertyPlaceholderConfigurer;
 import org.springframework.beans.factory.support.DefaultListableBeanFactory;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
@@ -45,9 +51,15 @@ public class ClassPathXmlApplicationContextFactory implements ApplicationContext
 
 	private boolean copyConfiguration = true;
 
-	private boolean copyBeanFactoryPostProcessors = true;
+	private Collection<Class<? extends BeanFactoryPostProcessor>> beanFactoryPostProcessorClasses;
 
 	private final Object lock = new Object();
+
+	public ClassPathXmlApplicationContextFactory() {
+		beanFactoryPostProcessorClasses = new ArrayList<Class<? extends BeanFactoryPostProcessor>>();
+		beanFactoryPostProcessorClasses.add(PropertyPlaceholderConfigurer.class);
+		beanFactoryPostProcessorClasses.add(CustomEditorConfigurer.class);
+	}
 
 	/**
 	 * Setter for the path to the xml to load to create an
@@ -63,7 +75,7 @@ public class ClassPathXmlApplicationContextFactory implements ApplicationContext
 	/**
 	 * Flag to indicate that configuration such as bean post processors and
 	 * custom editors should be copied from the parent context. Defaults to
-	 * true;
+	 * true.
 	 * 
 	 * @param copyConfiguration the flag value to set
 	 */
@@ -72,13 +84,39 @@ public class ClassPathXmlApplicationContextFactory implements ApplicationContext
 	}
 
 	/**
-	 * Flag to indicate that bean factory post processors (like property
-	 * placeholders) should be copied from the parent context. Defaults to true;
+	 * Protected access for subclasses to the flag determining whether
+	 * configuration should be copied from parent context.
+	 * 
+	 * @return the flag value
+	 */
+	protected final boolean isCopyConfiguration() {
+		return copyConfiguration;
+	}
+
+	/**
+	 * Determines which bean factory post processors (like property
+	 * placeholders) should be copied from the parent context. Defaults to
+	 * {@link PropertyPlaceholderConfigurer} and {@link CustomEditorConfigurer}.
 	 * 
 	 * @param copyBeanFactoryPostProcessors the flag value to set
 	 */
-	public void setCopyBeanFactoryPostProcessors(boolean copyBeanFactoryPostProcessors) {
-		this.copyBeanFactoryPostProcessors = copyBeanFactoryPostProcessors;
+
+	public void setBeanFactoryPostProcessorClasses(
+			Class<? extends BeanFactoryPostProcessor>[] beanFactoryPostProcessorClasses) {
+		this.beanFactoryPostProcessorClasses = new ArrayList<Class<? extends BeanFactoryPostProcessor>>();
+		for (int i = 0; i < beanFactoryPostProcessorClasses.length; i++) {
+			this.beanFactoryPostProcessorClasses.add(beanFactoryPostProcessorClasses[i]);
+		}
+	}
+
+	/**
+	 * Protected access to the list of bean factory post processor classes that
+	 * should be copied over to the context from the parent.
+	 * 
+	 * @return the classes for post processors that were nominated for copying
+	 */
+	protected final Collection<Class<? extends BeanFactoryPostProcessor>> getBeanFactoryPostProcessorClasses() {
+		return beanFactoryPostProcessorClasses;
 	}
 
 	/**
@@ -158,8 +196,8 @@ public class ClassPathXmlApplicationContextFactory implements ApplicationContext
 	/**
 	 * Extension point for special subclasses that want to do more complex
 	 * things with the context prior to refresh. The default implementation
-	 * copies bean factory post processors according to the flag set. The bean
-	 * factory for the context will be available if needed through
+	 * copies bean factory post processors according to the values requested.
+	 * The bean factory for the context will be available if needed through
 	 * {@link ConfigurableApplicationContext#getBeanFactory()
 	 * context.getBeanFactory()}.
 	 * 
@@ -167,11 +205,11 @@ public class ClassPathXmlApplicationContextFactory implements ApplicationContext
 	 * @param context the new application context before it is refreshed, but
 	 * after bean factory is initialized
 	 * 
-	 * @see ClassPathXmlApplicationContextFactory#setCopyBeanFactoryPostProcessors(boolean)
+	 * @see ClassPathXmlApplicationContextFactory#setBeanFactoryPostProcessorClasses(Class[])
 	 */
 	protected void prepareContext(ConfigurableApplicationContext parent, ConfigurableApplicationContext context) {
-		if (copyBeanFactoryPostProcessors) {
-			for (String name : parent.getBeanNamesForType(BeanFactoryPostProcessor.class)) {
+		for (Class<? extends BeanFactoryPostProcessor> cls : beanFactoryPostProcessorClasses) {
+			for (String name : parent.getBeanNamesForType(cls)) {
 				context.addBeanFactoryPostProcessor((BeanFactoryPostProcessor) parent.getBean(name));
 			}
 		}
