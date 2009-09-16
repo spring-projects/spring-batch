@@ -261,12 +261,15 @@ public class TaskletStep extends AbstractStep {
 
 				boolean locked = false;
 
+				Integer oldVersion = null;
+				boolean committed = true;
+
 				try {
 
 					try {
 						try {
 							result = tasklet.execute(contribution, chunkContext);
-							if(result == null) {
+							if (result == null) {
 								result = RepeatStatus.FINISHED;
 							}
 						}
@@ -275,9 +278,29 @@ public class TaskletStep extends AbstractStep {
 								throw e;
 							}
 						}
+
 						chunkListener.afterChunk();
+
 					}
 					finally {
+
+						// If the step operations are asynchronous then we need
+						// to synchronize changes to the step execution (at a
+						// minimum). Take the lock *before* changing the step
+						// execution.
+						try {
+							semaphore.acquire();
+							locked = true;
+						}
+						catch (InterruptedException e) {
+							stepExecution.setStatus(BatchStatus.STOPPED);
+							Thread.currentThread().interrupt();
+						}
+
+						// In case we need to push it back to its old value
+						// after a commit fails...
+						oldVersion = stepExecution.getVersion();
+
 						// Apply the contribution to the step
 						// even if unsuccessful
 						logger.debug("Applying contribution: " + contribution);
@@ -285,26 +308,26 @@ public class TaskletStep extends AbstractStep {
 
 					}
 
-					// If the step operations are asynchronous then we need
-					// to synchronize changes to the step execution (at a
-					// minimum).
-					try {
-						semaphore.acquire();
-						locked = true;
-					}
-					catch (InterruptedException e) {
-						stepExecution.setStatus(BatchStatus.STOPPED);
-						Thread.currentThread().interrupt();
-					}
-
 					stream.update(stepExecution.getExecutionContext());
 
 					try {
+						// Going to attempt a commit. If it fails this flag will
+						// stay false and we can use that later.
+						committed = false;
 						getJobRepository().updateExecutionContext(stepExecution);
-						transactionManager.commit(transaction);
 						stepExecution.incrementCommitCount();
-						logger.debug("Saving step execution after commit: " + stepExecution);
+						/*
+						 * The step execution has to be saved before commit
+						 * because otherwise there is a deadlock between the
+						 * data source pool and the semaphore. As long as only
+						 * one connection is used inside the section of this
+						 * callback that is locked with the semaphore, the
+						 * deadlock is avoided.
+						 */
+						logger.debug("Saving step execution before commit: " + stepExecution);
 						getJobRepository().update(stepExecution);
+						transactionManager.commit(transaction);
+						committed = true;
 					}
 					catch (Exception e) {
 						throw new FatalException("Fatal failure detected", e);
@@ -352,11 +375,19 @@ public class TaskletStep extends AbstractStep {
 					throw e;
 				}
 				finally {
+					if (!committed && oldVersion != null) {
+						// Wah! the commit failed. We need to rescue the step
+						// execution data.
+						stepExecution.setVersion(oldVersion);
+					}
 					// only release the lock if we acquired it
 					if (locked) {
 						semaphore.release();
 					}
 					locked = false;
+					if (!committed) {
+						getJobRepository().update(stepExecution);
+					}
 				}
 
 				// Check for interruption after transaction as well, so that

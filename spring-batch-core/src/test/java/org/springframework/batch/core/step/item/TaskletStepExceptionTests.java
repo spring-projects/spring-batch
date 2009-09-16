@@ -235,8 +235,8 @@ public class TaskletStepExceptionTests {
 
 		taskletStep.execute(stepExecution);
 		assertEquals(UNKNOWN, stepExecution.getStatus());
-		assertTrue(stepExecution.getFailureExceptions().contains(taskletException));
 		assertTrue(stepExecution.getFailureExceptions().contains(exception));
+		assertTrue(stepExecution.getFailureExceptions().contains(taskletException));
 	}
 
 	private static class ExceptionTasklet implements Tasklet {

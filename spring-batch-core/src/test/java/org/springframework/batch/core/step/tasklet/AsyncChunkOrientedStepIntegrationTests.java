@@ -17,12 +17,13 @@ package org.springframework.batch.core.step.tasklet;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
+import org.apache.commons.dbcp.BasicDataSource;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -34,18 +35,17 @@ import org.springframework.batch.core.JobParameters;
 import org.springframework.batch.core.StepExecution;
 import org.springframework.batch.core.job.JobSupport;
 import org.springframework.batch.core.repository.JobRepository;
-import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.ItemWriter;
 import org.springframework.batch.item.support.ListItemReader;
 import org.springframework.batch.repeat.policy.SimpleCompletionPolicy;
 import org.springframework.batch.repeat.support.RepeatTemplate;
+import org.springframework.batch.repeat.support.TaskExecutorRepeatTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.task.SimpleAsyncTaskExecutor;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.transaction.PlatformTransactionManager;
-import org.springframework.transaction.support.TransactionSynchronizationAdapter;
-import org.springframework.transaction.support.TransactionSynchronizationManager;
 
 /**
  * @author Dave Syer
@@ -53,14 +53,19 @@ import org.springframework.transaction.support.TransactionSynchronizationManager
  */
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(locations = "/org/springframework/batch/core/repository/dao/sql-dao-test.xml")
-public class ChunkOrientedStepIntegrationTests {
+public class AsyncChunkOrientedStepIntegrationTests {
 
 	private TaskletStep step;
 
 	private Job job;
 
+	private List<String> written = new ArrayList<String>();
+
 	@Autowired
 	private PlatformTransactionManager transactionManager;
+
+	@Autowired
+	private BasicDataSource dataSource;
 
 	@Autowired
 	private JobRepository jobRepository;
@@ -74,6 +79,10 @@ public class ChunkOrientedStepIntegrationTests {
 	@Before
 	public void onSetUp() throws Exception {
 
+		// Force deadlock with batch waiting for DB pool and vice versa
+		dataSource.setMaxActive(1);
+		dataSource.setMaxIdle(1);
+
 		step = new TaskletStep("stepName");
 		step.setJobRepository(jobRepository);
 		step.setTransactionManager(transactionManager);
@@ -84,50 +93,35 @@ public class ChunkOrientedStepIntegrationTests {
 
 		job = new JobSupport("FOO");
 
+		TaskExecutorRepeatTemplate repeatTemplate = new TaskExecutorRepeatTemplate();
+		repeatTemplate.setThrottleLimit(2);
+		repeatTemplate.setTaskExecutor(new SimpleAsyncTaskExecutor());
+		step.setStepOperations(repeatTemplate);
 		step.setTransactionManager(transactionManager);
 
 	}
 
 	@Test
-	public void testStatusForCommitFailedException() throws Exception {
+	public void testStatus() throws Exception {
 
-		step.setTasklet(new TestingChunkOrientedTasklet<String>(getReader(new String[] { "a", "b", "c" }),
-				new ItemWriter<String>() {
-					public void write(List<? extends String> data) throws Exception {
-						TransactionSynchronizationManager
-								.registerSynchronization(new TransactionSynchronizationAdapter() {
-									public void beforeCommit(boolean readOnly) {
-										throw new RuntimeException("Simulate commit failure");
-									}
-								});
-					}
-				}, chunkOperations));
+		step.setTasklet(new TestingChunkOrientedTasklet<String>(getReader(new String[] { "a", "b", "c", "a", "b", "c",
+				"a", "b", "c", "a", "b", "c" }), new ItemWriter<String>() {
+			public void write(List<? extends String> data) throws Exception {
+				written.addAll(data);
+			}
+		}, chunkOperations));
 
 		JobExecution jobExecution = jobRepository.createJobExecution(job.getName(), new JobParameters(Collections
 				.singletonMap("run.id", new JobParameter(getClass().getName() + ".1"))));
 		StepExecution stepExecution = new StepExecution(step.getName(), jobExecution);
 
-		stepExecution.setExecutionContext(new ExecutionContext() {
-			{
-				put("foo", "bar");
-			}
-		});
-
 		jobRepository.add(stepExecution);
 		step.execute(stepExecution);
-		assertEquals(BatchStatus.UNKNOWN, stepExecution.getStatus());
+		assertEquals(BatchStatus.COMPLETED, stepExecution.getStatus());
 		StepExecution lastStepExecution = jobRepository.getLastStepExecution(jobExecution.getJobInstance(), step
 				.getName());
 		assertEquals(lastStepExecution, stepExecution);
 		assertFalse(lastStepExecution == stepExecution);
-
-		// If the StepExecution is not saved after the failure it will be
-		// STARTED instead of UNKNOWN
-		assertEquals(BatchStatus.UNKNOWN, lastStepExecution.getStatus());
-		String msg = stepExecution.getExitStatus().getExitDescription();
-		assertTrue(msg.contains("Fatal failure detected"));
-		// The original rollback was caused by this one:
-		assertEquals("Simulate commit failure", stepExecution.getFailureExceptions().get(0).getCause().getMessage());
 
 	}
 
