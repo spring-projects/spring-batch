@@ -76,7 +76,7 @@ public class TaskExecutorRepeatTemplateSimpleAsynchronousTests {
 
 			public RepeatStatus doInIteration(RepeatContext context) throws Exception {
 				int position = count.incrementAndGet();
-				String item = position <= TOTAL ? "" + count : null;
+				String item = position <= TOTAL ? "" + position : null;
 				items.add("" + item);
 				if (item != null) {
 					beBusy();
@@ -120,6 +120,25 @@ public class TaskExecutorRepeatTemplateSimpleAsynchronousTests {
 		// System.err.println("Items: " + items);
 		assertEquals(TOTAL, items.size() - frequency);
 		assertTrue(frequency > 1);
+		assertTrue(frequency <= throttleLimit + 1);
+
+	}
+
+	@Test
+	public void testThrottleLimitEarlyFinishThreadStarvation() throws Exception {
+
+		early = 2;
+		SimpleAsyncTaskExecutor taskExecutor = new SimpleAsyncTaskExecutor();
+		// Set the concurrency limit below the throttle limit for possible starvation condition
+		taskExecutor.setConcurrencyLimit(20);
+		template.setTaskExecutor(taskExecutor);
+
+		template.iterate(callback);
+		int frequency = Collections.frequency(items, "null");
+		// System.err.println("Frequency: " + frequency);
+		// System.err.println("Items: " + items);
+		// One extra task will be submitted before the termination is detected
+		assertEquals(TOTAL, items.size() - frequency);
 		assertTrue(frequency <= throttleLimit + 1);
 
 	}

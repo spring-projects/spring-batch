@@ -260,6 +260,4 @@ public class TaskExecutorRepeatTemplateAsynchronousTests extends AbstractTradeBa
 		assertTrue(threadNames.size() >= 1);
 	}
 
-	// TODO: test transactional callback with async template.
-
 }
