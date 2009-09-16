@@ -126,7 +126,7 @@ public class JdbcStepExecutionDao extends AbstractJdbcBatchMetadataDao implement
 		getJdbcTemplate().getJdbcOperations().update(
 				getQuery(SAVE_STEP_EXECUTION),
 				parameters,
-				new int[] { Types.INTEGER, Types.INTEGER, Types.VARCHAR, Types.INTEGER, Types.TIMESTAMP,
+				new int[] { Types.BIGINT, Types.INTEGER, Types.VARCHAR, Types.BIGINT, Types.TIMESTAMP,
 						Types.TIMESTAMP, Types.VARCHAR, Types.INTEGER, Types.INTEGER, Types.INTEGER, Types.INTEGER,
 						Types.VARCHAR, Types.VARCHAR, Types.INTEGER, Types.INTEGER, Types.INTEGER, Types.INTEGER,
 						Types.TIMESTAMP });
@@ -176,7 +176,7 @@ public class JdbcStepExecutionDao extends AbstractJdbcBatchMetadataDao implement
 							new int[] { Types.TIMESTAMP, Types.TIMESTAMP, Types.VARCHAR, Types.INTEGER, Types.INTEGER,
 									Types.INTEGER, Types.INTEGER, Types.VARCHAR, Types.VARCHAR, Types.INTEGER,
 									Types.INTEGER, Types.INTEGER, Types.INTEGER, Types.INTEGER, Types.TIMESTAMP,
-									Types.INTEGER, Types.INTEGER });
+									Types.BIGINT, Types.INTEGER });
 
 			// Avoid concurrent modifications...
 			if (count == 0) {

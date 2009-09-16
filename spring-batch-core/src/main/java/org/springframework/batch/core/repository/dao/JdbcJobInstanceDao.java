@@ -117,7 +117,7 @@ public class JdbcJobInstanceDao extends AbstractJdbcBatchMetadataDao implements
 		getJdbcTemplate().getJdbcOperations().update(
 				getQuery(CREATE_JOB_INSTANCE),
 				parameters,
-				new int[] { Types.INTEGER, Types.VARCHAR, Types.VARCHAR,
+				new int[] { Types.BIGINT, Types.VARCHAR, Types.VARCHAR,
 						Types.INTEGER });
 
 		insertJobParameters(jobId, jobParameters);
