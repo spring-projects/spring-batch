@@ -60,7 +60,8 @@ public class CustomerFilterJobFunctionalTests extends AbstractJobTests {
 	public void onSetUp() throws Exception {
 		simpleJdbcTemplate.update("delete from TRADE");
 		simpleJdbcTemplate.update("delete from CUSTOMER where ID > 4");
-		List<Map<String, Object>> list = simpleJdbcTemplate.queryForList("select name, CREDIT from customer");
+		simpleJdbcTemplate.update("update CUSTOMER set credit=100000");
+		List<Map<String, Object>> list = simpleJdbcTemplate.queryForList("select name, CREDIT from CUSTOMER");
 		for (Map<String, Object> map : list) {
 			credits.put((String) map.get("NAME"), ((Number) map.get("CREDIT")).doubleValue());
 		}

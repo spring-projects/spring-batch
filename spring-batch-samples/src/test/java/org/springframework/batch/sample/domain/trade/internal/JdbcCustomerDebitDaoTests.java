@@ -51,7 +51,7 @@ public class JdbcCustomerDebitDaoTests {
 	public void testWrite() {
 
 		//insert customer credit 
-		simpleJdbcTemplate.getJdbcOperations().execute("INSERT INTO customer VALUES (99, 0, 'testName', 100)");
+		simpleJdbcTemplate.getJdbcOperations().execute("INSERT INTO CUSTOMER VALUES (99, 0, 'testName', 100)");
 
 		//create customer debit
 		CustomerDebit customerDebit = new CustomerDebit();
@@ -62,7 +62,7 @@ public class JdbcCustomerDebitDaoTests {
 		writer.write(customerDebit);
 
 		//verify customer credit
-		simpleJdbcTemplate.getJdbcOperations().query("SELECT name, credit FROM customer WHERE name = 'testName'",
+		simpleJdbcTemplate.getJdbcOperations().query("SELECT name, credit FROM CUSTOMER WHERE name = 'testName'",
 				new RowCallbackHandler() {
 					public void processRow(ResultSet rs) throws SQLException {
 						assertEquals(95, rs.getLong("credit"));

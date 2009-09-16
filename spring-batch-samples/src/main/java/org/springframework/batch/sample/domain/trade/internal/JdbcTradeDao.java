@@ -36,7 +36,7 @@ public class JdbcTradeDao implements TradeDao {
     /**
      * template for inserting a row
      */
-    private static final String INSERT_TRADE_RECORD = "INSERT INTO trade (id, version, isin, quantity, price, customer) VALUES (?, 0, ?, ? ,?, ?)";
+    private static final String INSERT_TRADE_RECORD = "INSERT INTO TRADE (id, version, isin, quantity, price, customer) VALUES (?, 0, ?, ? ,?, ?)";
 
     /**
      * handles the processing of sql query

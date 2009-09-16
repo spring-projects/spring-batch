@@ -25,7 +25,7 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 @ContextConfiguration()
 public class CompositeItemWriterSampleFunctionalTests extends AbstractValidatingBatchLauncherTests {
 
-	private static final String GET_TRADES = "SELECT isin, quantity, price, customer FROM trade order by isin";
+	private static final String GET_TRADES = "SELECT isin, quantity, price, customer FROM TRADE order by isin";
 
 	private static final String EXPECTED_OUTPUT_FILE = "Trade: [isin=UK21341EAH41,quantity=211,price=31.11,customer=customer1]"
 			+ "Trade: [isin=UK21341EAH42,quantity=212,price=32.11,customer=customer2]"

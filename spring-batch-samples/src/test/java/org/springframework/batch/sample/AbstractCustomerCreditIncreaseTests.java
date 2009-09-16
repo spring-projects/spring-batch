@@ -35,12 +35,12 @@ public abstract class AbstractCustomerCreditIncreaseTests extends AbstractValida
 
 	private static final BigDecimal CREDIT_INCREASE = CustomerCreditIncreaseProcessor.FIXED_AMOUNT;
 	
-	private static String[] customers = { "INSERT INTO customer (id, version, name, credit) VALUES (1, 0, 'customer1', 100000)",
-		"INSERT INTO customer (id, version, name, credit) VALUES (2, 0, 'customer2', 100000)",
-		"INSERT INTO customer (id, version, name, credit) VALUES (3, 0, 'customer3', 100000)",
-		"INSERT INTO customer (id, version, name, credit) VALUES (4, 0, 'customer4', 100000)"};
+	private static String[] customers = { "INSERT INTO CUSTOMER (id, version, name, credit) VALUES (1, 0, 'customer1', 100000)",
+		"INSERT INTO CUSTOMER (id, version, name, credit) VALUES (2, 0, 'customer2', 100000)",
+		"INSERT INTO CUSTOMER (id, version, name, credit) VALUES (3, 0, 'customer3', 100000)",
+		"INSERT INTO CUSTOMER (id, version, name, credit) VALUES (4, 0, 'customer4', 100000)"};
 	
-	private static String DELETE_CUSTOMERS = "DELETE FROM customer";
+	private static String DELETE_CUSTOMERS = "DELETE FROM CUSTOMER";
 
 	private static final String ALL_CUSTOMERS = "select * from CUSTOMER order by ID";
 

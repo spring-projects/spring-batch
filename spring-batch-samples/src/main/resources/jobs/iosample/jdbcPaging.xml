@@ -54,7 +54,7 @@
 				class="org.springframework.batch.item.database.BeanPropertyItemSqlParameterSourceProvider" />
 		</property>
 		<property name="sql"
-			value="UPDATE customer set credit = :credit where id = :id" />
+			value="UPDATE CUSTOMER set credit = :credit where id = :id" />
 		<property name="dataSource" ref="dataSource" />
 	</bean>
 

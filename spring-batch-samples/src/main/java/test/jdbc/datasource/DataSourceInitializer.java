@@ -76,16 +76,6 @@ public class DataSourceInitializer implements InitializingBean, DisposableBean {
 				DataSourceInitializer.class.getSimpleName() + "-context.xml"));
 	}
 
-	/**
-	 * @throws Throwable
-	 * @see java.lang.Object#finalize()
-	 */
-	protected void finalize() throws Throwable {
-		super.finalize();
-		initialized = false;
-		logger.debug("finalize called");
-	}
-
 	public void destroy() {
 		if (destroyScripts==null) return;
 		for (int i = 0; i < destroyScripts.length; i++) {
@@ -102,6 +92,7 @@ public class DataSourceInitializer implements InitializingBean, DisposableBean {
 				}
 			}
 		}
+		initialized = false;
 	}
 
 	public void afterPropertiesSet() throws Exception {

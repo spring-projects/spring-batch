@@ -61,7 +61,7 @@ public class TradeJobFunctionalTests extends AbstractValidatingBatchLauncherTest
 	@Before
 	public void onSetUp() throws Exception {
 		simpleJdbcTemplate.update("delete from TRADE");
-		List<Map<String, Object>> list = simpleJdbcTemplate.queryForList("select name, CREDIT from customer");
+		List<Map<String, Object>> list = simpleJdbcTemplate.queryForList("select name, CREDIT from CUSTOMER");
 		for (Map<String, Object> map : list) {
 			credits.put((String) map.get("NAME"), ((Number) map.get("CREDIT")).doubleValue());
 		}

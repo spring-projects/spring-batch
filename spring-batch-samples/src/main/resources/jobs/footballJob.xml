@@ -85,12 +85,12 @@
 		</property>
 		<property name="sql">
 			<value>
-				SELECT games.player_id, games.year_no, SUM(COMPLETES),
+				SELECT GAMES.player_id, GAMES.year_no, SUM(COMPLETES),
 				SUM(ATTEMPTS), SUM(PASSING_YARDS), SUM(PASSING_TD),
 				SUM(INTERCEPTIONS), SUM(RUSHES), SUM(RUSH_YARDS),
 				SUM(RECEPTIONS), SUM(RECEPTIONS_YARDS), SUM(TOTAL_TD)
-				from games, players where players.player_id =
-				games.player_id group by games.player_id, games.year_no
+				from GAMES, PLAYERS where PLAYERS.player_id =
+				GAMES.player_id group by GAMES.player_id, GAMES.year_no
 			</value>
 		</property>
 	</bean>

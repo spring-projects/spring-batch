@@ -32,7 +32,7 @@ import org.springframework.jdbc.core.simple.SimpleJdbcTemplate;
  */
 public class JdbcCustomerDebitDao implements CustomerDebitDao {
 	
-    private static final String UPDATE_CREDIT = "UPDATE customer SET credit= credit-? WHERE name=?";
+    private static final String UPDATE_CREDIT = "UPDATE CUSTOMER SET credit= credit-? WHERE name=?";
     
     private SimpleJdbcOperations simpleJdbcTemplate;
 

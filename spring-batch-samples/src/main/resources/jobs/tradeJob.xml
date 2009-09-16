@@ -55,7 +55,7 @@
 
 	<bean id="customerSqlItemReader" class="org.springframework.batch.item.database.JdbcCursorItemReader">
 		<property name="dataSource" ref="dataSource" />
-		<property name="sql" value="SELECT id, name, credit FROM customer " />
+		<property name="sql" value="SELECT id, name, credit FROM CUSTOMER " />
 		<property name="rowMapper">
 			<bean class="org.springframework.batch.sample.domain.trade.internal.CustomerCreditRowMapper" />
 		</property>
