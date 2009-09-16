@@ -138,7 +138,7 @@ public class JdbcJobExecutionDao extends AbstractJdbcBatchMetadataDao implements
 		getJdbcTemplate().getJdbcOperations().update(
 				getQuery(SAVE_JOB_EXECUTION),
 				parameters,
-				new int[] { Types.INTEGER, Types.INTEGER, Types.TIMESTAMP, Types.TIMESTAMP, Types.VARCHAR,
+				new int[] { Types.BIGINT, Types.BIGINT, Types.TIMESTAMP, Types.TIMESTAMP, Types.VARCHAR,
 						Types.VARCHAR, Types.VARCHAR, Types.INTEGER, Types.TIMESTAMP, Types.TIMESTAMP });
 	}
 
@@ -201,7 +201,7 @@ public class JdbcJobExecutionDao extends AbstractJdbcBatchMetadataDao implements
 					getQuery(UPDATE_JOB_EXECUTION),
 					parameters,
 					new int[] { Types.TIMESTAMP, Types.TIMESTAMP, Types.VARCHAR, Types.VARCHAR, Types.VARCHAR,
-							Types.INTEGER, Types.TIMESTAMP, Types.TIMESTAMP, Types.INTEGER, Types.INTEGER });
+							Types.INTEGER, Types.TIMESTAMP, Types.TIMESTAMP, Types.BIGINT, Types.INTEGER });
 
 			// Avoid concurrent modifications...
 			if (count == 0) {
