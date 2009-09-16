@@ -386,7 +386,7 @@ catch (JobRestartException e) {
     execution:</para>
 
     <programlisting>&lt;bean id="jobLauncher"
-      class="org.springframework.batch.execution.launch.SimpleJobLauncher"&gt;
+      class="org.springframework.batch.core.launch.support.SimpleJobLauncher"&gt;
     &lt;property name="jobRepository" ref="jobRepository" /&gt;
 &lt;/bean&gt;</programlisting>
 
@@ -433,7 +433,7 @@ catch (JobRestartException e) {
     <classname>TaskExecutor</classname>:</para>
 
     <programlisting>&lt;bean id="jobLauncher"
-      class="org.springframework.batch.execution.launch.SimpleJobLauncher"&gt;
+      class="org.springframework.batch.core.launch.support.SimpleJobLauncher"&gt;
     &lt;property name="jobRepository" ref="jobRepository" /&gt;
     &lt;property name="taskExecutor"&gt;
         &lt;bean class="org.springframework.core.task.SimpleAsyncTaskExecutor" /&gt;
