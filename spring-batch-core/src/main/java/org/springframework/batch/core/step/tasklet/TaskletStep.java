@@ -383,9 +383,6 @@ public class TaskletStep extends AbstractStep {
 						semaphore.release();
 					}
 					locked = false;
-					if (!committed) {
-						getJobRepository().update(stepExecution);
-					}
 				}
 
 				chunkListener.afterChunk();
