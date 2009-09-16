@@ -279,8 +279,6 @@ public class TaskletStep extends AbstractStep {
 							}
 						}
 
-						chunkListener.afterChunk();
-
 					}
 					finally {
 
@@ -389,6 +387,8 @@ public class TaskletStep extends AbstractStep {
 						getJobRepository().update(stepExecution);
 					}
 				}
+
+				chunkListener.afterChunk();
 
 				// Check for interruption after transaction as well, so that
 				// the interrupted exception is correctly propagated up to
