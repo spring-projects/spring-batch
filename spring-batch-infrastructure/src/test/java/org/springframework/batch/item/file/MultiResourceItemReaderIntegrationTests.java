@@ -3,13 +3,18 @@ package org.springframework.batch.item.file;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertSame;
+import static org.junit.Assert.fail;
 
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.Comparator;
 
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.batch.item.ExecutionContext;
+import org.springframework.batch.item.ItemStreamException;
 import org.springframework.batch.item.file.mapping.PassThroughLineMapper;
+import org.springframework.core.io.AbstractResource;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
@@ -79,7 +84,6 @@ public class MultiResourceItemReaderIntegrationTests {
 
 		tested.open(ctx);
 
-		assertSame(r1, tested.getCurrentResource());
 		assertEquals("1", tested.read());
 		assertSame(r1, tested.getCurrentResource());
 		assertEquals("2", tested.read());
@@ -263,6 +267,61 @@ public class MultiResourceItemReaderIntegrationTests {
 		assertNull(tested.read());
 		
 		tested.close();
+	}
+	
+	@Test
+	public void testMiddleResourceThrowsException() throws Exception{
+		
+		Resource badResource = new AbstractResource() {
+			
+			public InputStream getInputStream() throws IOException {
+				throw new RuntimeException();
+			}
+			
+			public String getDescription() {return null;}
+		};
+
+		tested.setResources(new Resource[] { r1, badResource, r3, r4, r5 });
+		
+		tested.open(ctx);
+
+		assertEquals("1", tested.read());
+		assertEquals("2", tested.read());
+		assertEquals("3", tested.read());
+		try{
+			assertEquals("4", tested.read());
+			fail();
+		}
+		catch(ItemStreamException ex){
+			//a try/catch was used to ensure the exception was thrown when reading
+			//the 4th item, rather than on open
+		}
+	}
+	
+	@Test
+	public void testFirstResourceThrowsExceptionOnRead() throws Exception{
+		
+		Resource badResource = new AbstractResource() {
+			
+			public InputStream getInputStream() throws IOException {
+				throw new RuntimeException();
+			}
+			
+			public String getDescription() {return null;}
+		};
+
+		tested.setResources(new Resource[] { badResource, r2, r3, r4, r5 });
+		
+		tested.open(ctx);
+
+		try{
+			assertEquals("1", tested.read());
+			fail();
+		}
+		catch(ItemStreamException ex){
+			//a try/catch was used to ensure the exception was thrown when reading
+			//the 1st item, rather than on open
+		}
 	}
 
 }

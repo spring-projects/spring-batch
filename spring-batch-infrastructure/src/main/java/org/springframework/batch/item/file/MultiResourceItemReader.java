@@ -40,14 +40,15 @@ import org.springframework.util.ClassUtils;
  * Input resources are ordered using {@link #setComparator(Comparator)} to make
  * sure resource ordering is preserved between job runs in restart scenario.
  * 
- * Reset (rollback) capability is implemented by item buffering.
- * 
  * 
  * @author Robert Kasanicky
+ * @author Lucas Ward
  */
 public class MultiResourceItemReader<T> implements ItemReader<T>, ItemStream {
 
 	private static final Log logger = LogFactory.getLog(MultiResourceItemReader.class);
+	
+	private static final String RESOURCE_KEY = "resourceIndex";
 
 	private final ExecutionContextUserSupport executionContextUserSupport = new ExecutionContextUserSupport();
 
@@ -55,9 +56,9 @@ public class MultiResourceItemReader<T> implements ItemReader<T>, ItemStream {
 
 	private Resource[] resources;
 
-	private MultiResourceIndex index = new MultiResourceIndex();
-
 	private boolean saveState = true;
+	
+	private int currentResource = -1;
 
 	// signals there are no resources to read -> just return null on first read
 	private boolean noInput;
@@ -85,11 +86,17 @@ public class MultiResourceItemReader<T> implements ItemReader<T>, ItemStream {
 		if (noInput) {
 			return null;
 		}
+		
+		//If there is no resource, then this is the first item, set the current
+		//resource to 0 and open the first delegate.
+		if(currentResource == -1){
+			currentResource = 0;
+			delegate.setResource(resources[currentResource]);
+			delegate.open(new ExecutionContext());
+		}
 
 		T item;
 		item = readNextItem();
-		index.incrementItemCount();
-
 		return item;
 	}
 
@@ -105,14 +112,14 @@ public class MultiResourceItemReader<T> implements ItemReader<T>, ItemStream {
 
 		while (item == null) {
 
-			index.incrementResourceCount();
+			currentResource++;
 
-			if (index.currentResource >= resources.length) {
+			if (currentResource >= resources.length) {
 				return null;
 			}
 
 			delegate.close();
-			delegate.setResource(resources[index.currentResource]);
+			delegate.setResource(resources[currentResource]);
 			delegate.open(new ExecutionContext());
 
 			item = delegate.read();
@@ -126,7 +133,6 @@ public class MultiResourceItemReader<T> implements ItemReader<T>, ItemStream {
 	 * and reset instance variable values.
 	 */
 	public void close() throws ItemStreamException {
-		index = new MultiResourceIndex();
 		delegate.close();
 		noInput = false;
 	}
@@ -148,19 +154,13 @@ public class MultiResourceItemReader<T> implements ItemReader<T>, ItemStream {
 
 		Arrays.sort(resources, comparator);
 
-		index.open(executionContext);
-
-		delegate.setResource(resources[index.currentResource]);
-
-		delegate.open(new ExecutionContext());
-
-		try {
-			for (int i = 0; i < index.currentItem; i++) {
-				delegate.read();
-			}
+		if (executionContext.containsKey(executionContextUserSupport.getKey(RESOURCE_KEY))) {
+			currentResource = executionContext.getInt(executionContextUserSupport.getKey(RESOURCE_KEY));
+			delegate.setResource(resources[currentResource]);
+			delegate.open(executionContext);
 		}
-		catch (Exception e) {
-			throw new ItemStreamException("Could not restore position on restart", e);
+		else{
+			currentResource = -1;
 		}
 	}
 
@@ -169,7 +169,8 @@ public class MultiResourceItemReader<T> implements ItemReader<T>, ItemStream {
 	 */
 	public void update(ExecutionContext executionContext) throws ItemStreamException {
 		if (saveState) {
-			index.update(executionContext);
+			executionContext.putInt(executionContextUserSupport.getKey(RESOURCE_KEY), currentResource);
+			delegate.update(executionContext);
 		}
 	}
 
@@ -207,62 +208,10 @@ public class MultiResourceItemReader<T> implements ItemReader<T>, ItemStream {
 	}
 
 	public Resource getCurrentResource() {
-		if (index.currentResource >= resources.length) {
+		if (currentResource >= resources.length) {
 			return null;
 		}
-		return resources[index.currentResource];
-	}
-
-	/**
-	 * Facilitates keeping track of the position within multi-resource input.
-	 */
-	private class MultiResourceIndex {
-
-		private static final String RESOURCE_KEY = "resourceIndex";
-
-		private static final String ITEM_KEY = "itemIndex";
-
-		private int currentResource = 0;
-
-		private int markedResource = 0;
-
-		private int currentItem = 0;
-
-		private int markedItem = 0;
-
-		public void incrementItemCount() {
-			currentItem++;
-		}
-
-		public void incrementResourceCount() {
-			currentResource++;
-			currentItem = 0;
-		}
-
-		public void mark() {
-			markedResource = currentResource;
-			markedItem = currentItem;
-		}
-
-		public void reset() {
-			currentResource = markedResource;
-			currentItem = markedItem;
-		}
-
-		public void open(ExecutionContext ctx) {
-			if (ctx.containsKey(executionContextUserSupport.getKey(RESOURCE_KEY))) {
-				currentResource = ctx.getInt(executionContextUserSupport.getKey(RESOURCE_KEY));
-			}
-
-			if (ctx.containsKey(executionContextUserSupport.getKey(ITEM_KEY))) {
-				currentItem = ctx.getInt(executionContextUserSupport.getKey(ITEM_KEY));
-			}
-		}
-
-		public void update(ExecutionContext ctx) {
-			ctx.putInt(executionContextUserSupport.getKey(RESOURCE_KEY), index.currentResource);
-			ctx.putInt(executionContextUserSupport.getKey(ITEM_KEY), index.currentItem);
-		}
+		return resources[currentResource];
 	}
 
 }
