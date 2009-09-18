@@ -31,7 +31,7 @@ public interface ChunkListener extends StepListener {
 	void beforeChunk();
 	
 	/**
-	 * Callback after the chunk is executed, but inside the transaction.
+	 * Callback after the chunk is executed, outside the transaction.
 	 */
 	void afterChunk();
 }

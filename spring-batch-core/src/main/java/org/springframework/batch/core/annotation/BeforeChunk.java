@@ -29,7 +29,7 @@ import org.springframework.batch.core.ChunkListener;
  * 
  * @author Lucas Ward
  * @since 2.0
- * @see ChunkListener
+ * @see ChunkListener#beforeChunk()
  */
 @Retention(RetentionPolicy.RUNTIME)
 @Target({ElementType.METHOD})

@@ -23,13 +23,13 @@ import java.lang.annotation.Target;
 import org.springframework.batch.core.ChunkListener;
 
 /**
- * Marks a method to be called after a chunk is executed. <br>
- * <br>
+ * Marks a method to be called after a chunk is executed.<br>
+ * <br/>
  * Expected signature: void afterChunk()
  * 
  * @author Lucas Ward
  * @since 2.0
- * @see ChunkListener
+ * @see ChunkListener#afterChunk()
  */
 @Retention(RetentionPolicy.RUNTIME)
 @Target({ElementType.METHOD})
