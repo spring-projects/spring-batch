@@ -40,6 +40,10 @@ public class StepScopePlaceholderIntegrationTests implements BeanFactoryAware {
 	private Collaborator ref;
 
 	@Autowired
+	@Qualifier("list")
+	private Collaborator list;
+
+	@Autowired
 	@Qualifier("bar")
 	private Collaborator bar;
 
@@ -99,6 +103,11 @@ public class StepScopePlaceholderIntegrationTests implements BeanFactoryAware {
 	@Test
 	public void testParentByValue() throws Exception {
 		assertEquals("bar", value.getParent().getName());
+	}
+
+	@Test
+	public void testList() throws Exception {
+		assertEquals("[bar]", list.getList().toString());
 	}
 
 }
