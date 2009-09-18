@@ -43,9 +43,9 @@ import org.springframework.core.task.SimpleAsyncTaskExecutor;
  * @author Dave Syer
  * 
  */
-public class TaskExecutorRepeatTemplateSimpleAsynchronousTests {
+public class TaskExecutorRepeatTemplateBulkAsynchronousTests {
 
-	static Log logger = LogFactory.getLog(TaskExecutorRepeatTemplateSimpleAsynchronousTests.class);
+	static Log logger = LogFactory.getLog(TaskExecutorRepeatTemplateBulkAsynchronousTests.class);
 
 	private static int TOTAL = 100;
 
@@ -89,7 +89,9 @@ public class TaskExecutorRepeatTemplateSimpleAsynchronousTests {
 				 * retry the work.)
 				 */
 				RepeatStatus result = RepeatStatus.continueIf(position != early && item != null);
-				logger.debug("Returning " + result + " for count=" + position);
+				if (!result.isContinuable()) {
+					logger.debug("Returning " + result + " for count=" + position);
+				}
 				return result;
 			}
 		};
@@ -137,7 +139,7 @@ public class TaskExecutorRepeatTemplateSimpleAsynchronousTests {
 		int frequency = Collections.frequency(items, "null");
 		// System.err.println("Frequency: " + frequency);
 		// System.err.println("Items: " + items);
-		// One extra task will be submitted before the termination is detected
+		// Extra tasks will be submitted before the termination is detected
 		assertEquals(TOTAL, items.size() - frequency);
 		assertTrue(frequency <= throttleLimit + 1);
 
