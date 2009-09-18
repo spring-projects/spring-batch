@@ -19,14 +19,6 @@
       <name>org.springframework.ide.eclipse.core.springbuilder</name>
       <arguments/>
     </buildCommand>
-    <buildCommand>
-      <name>org.eclipse.wst.validation.validationbuilder</name>
-      <arguments/>
-    </buildCommand>
-    <buildCommand>
-      <name>org.maven.ide.eclipse.maven2Builder</name>
-      <arguments/>
-    </buildCommand>
   </buildSpec>
   <natures>
     <nature>org.eclipse.jem.workbench.JavaEMFNature</nature>
