@@ -19,6 +19,7 @@ package org.springframework.batch.repeat.support;
 import java.util.NoSuchElementException;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.Semaphore;
 
 /**
  * An implementation of the {@link ResultQueue} that throttles the number of
@@ -32,21 +33,19 @@ public class ThrottleLimitResultQueue<T> implements ResultQueue<T> {
 	private final BlockingQueue<T> results;
 
 	// Accumulation of dummy objects flagging expected results in the future.
-	private volatile int waits = 0;
+	private final Semaphore waits;
 
 	private final Object lock = new Object();
 
 	private volatile int count = 0;
-
-	private final int throttleLimit;
 
 	/**
 	 * @param throttleLimit the maximum number of results that can be expected
 	 * at any given time.
 	 */
 	public ThrottleLimitResultQueue(int throttleLimit) {
-		this.throttleLimit = throttleLimit;
 		results = new LinkedBlockingQueue<T>();
+		waits = new Semaphore(throttleLimit);
 	}
 
 	public boolean isEmpty() {
@@ -61,7 +60,7 @@ public class ThrottleLimitResultQueue<T> implements ResultQueue<T> {
 	public boolean isExpecting() {
 		// Base the decision about whether we expect more results on a
 		// counter of the number of expected results actually collected.
-		// Do not synchronize! Otherwise put and expect can deadlock.
+		// Do not synchronize!  Otherwise put and expect can deadlock.
 		return count > 0;
 	}
 
@@ -74,10 +73,7 @@ public class ThrottleLimitResultQueue<T> implements ResultQueue<T> {
 	 */
 	public void expect() throws InterruptedException {
 		synchronized (lock) {
-			while (waits >= throttleLimit) {
-				lock.wait();
-			}
-			waits++;
+			waits.acquire();
 			count++;
 		}
 	}
@@ -88,12 +84,9 @@ public class ThrottleLimitResultQueue<T> implements ResultQueue<T> {
 		}
 		// There should be no need to block here, or to use offer()
 		results.add(holder);
-		// Take from the waits now to allow another result to
+		// Take from the waits queue now to allow another result to
 		// accumulate. But don't decrement the counter.
-		synchronized (lock) {
-			waits--;
-			lock.notifyAll();
-		}
+		waits.release();
 	}
 
 	public T take() throws NoSuchElementException, InterruptedException {
