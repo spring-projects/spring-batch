@@ -189,6 +189,40 @@ public class FaultTolerantStepFactoryBeanTests {
 		assertStepExecutionsAreEqual(stepExecution, repository.getLastStepExecution(jobExecution.getJobInstance(), step
 				.getName()));
 	}
+	
+	/**
+	 * Check to make sure that ItemStreamException can be skipped. (see BATCH-915)
+	 */
+	@Test
+	public void testReadSkipItemStreamException() throws Exception {
+		reader.setFailures("2");
+		reader.setExceptionType(ItemStreamException.class);
+
+		Map<Class<? extends Throwable>, Boolean> map = new HashMap<Class<? extends Throwable>, Boolean>();
+		map.put(ItemStreamException.class, true);
+		factory.setSkippableExceptionClasses(map);
+		
+		Step step = (Step) factory.getObject();
+
+		step.execute(stepExecution);
+
+		assertEquals(1, stepExecution.getSkipCount());
+		assertEquals(1, stepExecution.getReadSkipCount());
+		assertEquals(4, stepExecution.getReadCount());
+		assertEquals(0, stepExecution.getWriteSkipCount());
+		assertEquals(0, stepExecution.getRollbackCount());
+
+		// writer did not skip "2" as it never made it to writer, only "4" did
+		assertTrue(reader.getRead().contains("4"));
+		assertFalse(reader.getRead().contains("2"));
+
+		List<String> expectedOutput = Arrays.asList(StringUtils.commaDelimitedListToStringArray("1,3,4,5"));
+		assertEquals(expectedOutput, writer.getWritten());
+
+		assertEquals(BatchStatus.COMPLETED, stepExecution.getStatus());
+		assertStepExecutionsAreEqual(stepExecution, repository.getLastStepExecution(jobExecution.getJobInstance(), step
+				.getName()));
+	}
 
 	/**
 	 * Check items causing errors are skipped as expected.
