@@ -268,7 +268,7 @@ catch (JobRestartException e) {
       platform supports it. However, this can be overridden:</para>
 
       <para><programlisting>&lt;job-repository id="jobRepository"
-                <emphasis role="bold">isolation-level-for-create="ISOLATION_REPEATABLE_READ"</emphasis> /&gt;</programlisting></para>
+                <emphasis role="bold">isolation-level-for-create="REPEATABLE_READ"</emphasis> /&gt;</programlisting></para>
 
       <para>If the namespace or factory beans aren't used then it is also
       essential to configure the transactional behavior of the repository
