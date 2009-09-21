@@ -63,16 +63,13 @@ public class ResourcesItemReader extends ExecutionContextUserSupport implements 
 		return resources[index];
 	}
 
-	@Override
 	public void close() throws ItemStreamException {
 	}
 
-	@Override
 	public void open(ExecutionContext executionContext) throws ItemStreamException {
 		counter.set(executionContext.getInt(getKey("COUNT"), 0));
 	}
 
-	@Override
 	public void update(ExecutionContext executionContext) throws ItemStreamException {
 		executionContext.putInt(getKey("COUNT"), counter.get());
 	}
