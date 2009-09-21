@@ -536,7 +536,7 @@ public Trade read() throws Exception {
     during <classname>Step</classname> execution and if the
     <classname>Step</classname> fails, that data will be lost.</para>
 
-    <programlisting>public void SavingItemWriter implements ItemWriter&lt;Object&gt; {
+    <programlisting>public class SavingItemWriter implements ItemWriter&lt;Object&gt; {
     private StepExecution stepExecution;
 
     public void write(List&lt;? extends Object&gt; items) throws Exception {
