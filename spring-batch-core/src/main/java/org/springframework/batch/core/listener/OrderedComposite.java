@@ -24,6 +24,8 @@ import java.util.TreeSet;
 
 import org.springframework.core.Ordered;
 import org.springframework.core.annotation.AnnotationAwareOrderComparator;
+import org.springframework.core.annotation.AnnotationUtils;
+import org.springframework.core.annotation.Order;
 
 /**
  * @author Dave Syer
@@ -62,10 +64,13 @@ class OrderedComposite<S> {
 				ordered.add(item);
 			}
 		}
-		else {
-			if (!unordered.contains(item)) {
-				unordered.add(item);
+		else if (AnnotationUtils.isAnnotationDeclaredLocally(Order.class, item.getClass())) {
+			if (!ordered.contains(item)) {
+				ordered.add(item);
 			}
+		}
+		else if (!unordered.contains(item)) {
+			unordered.add(item);
 		}
 		list.clear();
 		list.addAll(ordered);
@@ -82,8 +87,8 @@ class OrderedComposite<S> {
 	}
 
 	/**
-	 * Public getter for the list of items in reverse. The {@link Ordered} items come
-	 * last, after any unordered ones.
+	 * Public getter for the list of items in reverse. The {@link Ordered} items
+	 * come last, after any unordered ones.
 	 * @return an iterator over the list of items
 	 */
 	public Iterator<S> reverse() {
