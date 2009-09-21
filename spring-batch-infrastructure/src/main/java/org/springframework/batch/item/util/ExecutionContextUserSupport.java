@@ -28,6 +28,15 @@ import org.springframework.util.Assert;
 public class ExecutionContextUserSupport {
 
 	private String name;
+	
+	public ExecutionContextUserSupport() {
+		super();
+	}
+
+	public ExecutionContextUserSupport(String name) {
+		super();
+		this.name = name;
+	}
 
 	/**
 	 * @return name used to uniquely identify this instance's entries in shared
