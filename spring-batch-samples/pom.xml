@@ -12,6 +12,10 @@
 		<version>2.1.0.CI-SNAPSHOT</version>
 		<relativePath>../spring-batch-parent</relativePath>
 	</parent>
+	<properties>
+		<!-- Override this with -Denvironment=XXXX to change database type -->
+		<environment>hsql</environment>
+	</properties>
 	<profiles>
 		<profile>
 			<id>tiger</id>
@@ -244,6 +248,17 @@
 	</dependencies>
 	<build>
 		<plugins>
+			<plugin>
+				<artifactId>maven-surefire-plugin</artifactId>
+				<configuration>
+					<systemProperties>
+						<property>
+							<name>org.springframework.batch.support.SystemPropertyInitializer.ENVIRONMENT</name>
+							<value>${environment}</value>
+						</property>
+					</systemProperties>
+				</configuration>
+			</plugin>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-antrun-plugin</artifactId>
