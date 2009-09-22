@@ -24,7 +24,7 @@
 
 	<bean name="customerFileUploadReader"
 		class="org.springframework.batch.item.file.FlatFileItemReader">
-		<property name="resource" ref="customerFileResource" />
+		<property name="resource" value="classpath:data/customerFilterJob/input/customers.txt" />
 		<property name="lineMapper">
 			<bean class="org.springframework.batch.item.file.mapping.DefaultLineMapper">
 				<property name="lineTokenizer" ref="customerTokenizer" />
@@ -66,10 +66,11 @@
 	<bean name="customerDao"
 		class="org.springframework.batch.sample.domain.trade.internal.JdbcCustomerDao">
 		<property name="dataSource" ref="dataSource" />
-	</bean>
-
-	<bean name="customerFileResource" class="org.springframework.core.io.ClassPathResource">
-		<constructor-arg value="data/customerFilterJob/input/customers.txt" />
+		<property name="incrementer">
+			<bean parent="${batch.database.incrementer.parent}">
+				<property name="incrementerName" value="CUSTOMER_SEQ"/>
+			</bean>
+		</property>
 	</bean>
 
 </beans>

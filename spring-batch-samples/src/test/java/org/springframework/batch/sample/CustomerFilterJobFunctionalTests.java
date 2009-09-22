@@ -40,7 +40,7 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration()
+@ContextConfiguration
 public class CustomerFilterJobFunctionalTests extends AbstractJobTests {
 
 	private static final String GET_CUSTOMERS = "select NAME, CREDIT from CUSTOMER order by NAME";

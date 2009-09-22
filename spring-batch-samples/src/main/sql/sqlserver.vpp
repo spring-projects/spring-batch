@@ -1,3 +1,4 @@
-#macro (sequence $name)CREATE TABLE ${name} (ID BIGINT IDENTITY);
+#macro (sequence $name $value)CREATE TABLE ${name} (ID BIGINT IDENTITY);
+INSERT INTO ${name} (ID) values (${value});
 #end
 #macro (notnull $name $type)ALTER COLUMN ${name} ${type} NOT NULL#end

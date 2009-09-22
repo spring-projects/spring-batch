@@ -25,6 +25,7 @@ import org.springframework.batch.sample.domain.trade.CustomerCredit;
 import org.springframework.batch.sample.domain.trade.CustomerDao;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.support.JdbcDaoSupport;
+import org.springframework.jdbc.support.incrementer.DataFieldMaxValueIncrementer;
 
 /**
  * @author Lucas Ward
@@ -33,8 +34,14 @@ import org.springframework.jdbc.core.support.JdbcDaoSupport;
 public class JdbcCustomerDao extends JdbcDaoSupport implements CustomerDao{
 
 	private static final String GET_CUSTOMER_BY_NAME = "SELECT ID, NAME, CREDIT from CUSTOMER where NAME = ?";
-	private static final String INSERT_CUSTOMER = "INSERT into CUSTOMER(NAME, CREDIT) values(?,?)";
+	private static final String INSERT_CUSTOMER = "INSERT into CUSTOMER(ID, NAME, CREDIT) values(?,?,?)";
 	private static final String UPDATE_CUSTOMER = "UPDATE CUSTOMER set CREDIT = ? where NAME = ?";
+	
+	private DataFieldMaxValueIncrementer incrementer;
+	
+	public void setIncrementer(DataFieldMaxValueIncrementer incrementer) {
+		this.incrementer = incrementer;
+	}
 	
 	public CustomerCredit getCustomerByName(String name) {
 		
@@ -64,7 +71,7 @@ public class JdbcCustomerDao extends JdbcDaoSupport implements CustomerDao{
 
 	public void insertCustomer(String name, BigDecimal credit) {
 		
-		getJdbcTemplate().update(INSERT_CUSTOMER, new Object[]{name, credit});
+		getJdbcTemplate().update(INSERT_CUSTOMER, new Object[]{incrementer.nextIntValue(), name, credit});
 	}
 
 	public void updateCustomer(String name, BigDecimal credit) {
