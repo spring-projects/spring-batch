@@ -183,9 +183,10 @@ public class RepeatTemplate implements RepeatOperations {
 		RepeatStatus result = RepeatStatus.CONTINUABLE;
 
 		RepeatInternalState state = createInternalState(context);
-		// This is the list of exceptions thrown by all active callbacks 
+		// This is the list of exceptions thrown by all active callbacks
 		Collection<Throwable> throwables = state.getThrowables();
-		// Keep a separate list of exceptions we handled that need to be rethrown 
+		// Keep a separate list of exceptions we handled that need to be
+		// rethrown
 		Collection<Throwable> deferred = new ArrayList<Throwable>();
 
 		try {
@@ -205,10 +206,8 @@ public class RepeatTemplate implements RepeatOperations {
 					running = running && !isMarkedComplete(context);
 				}
 
-				// Check that we are still running...
+				// Check that we are still running (should always be true) ...
 				if (running) {
-
-					logger.debug("Repeat operation about to start at count=" + context.getStartedCount());
 
 					try {
 
@@ -224,6 +223,7 @@ public class RepeatTemplate implements RepeatOperations {
 					if (isComplete(context, result) || isMarkedComplete(context) || !deferred.isEmpty()) {
 						running = false;
 					}
+
 				}
 
 			}
@@ -248,8 +248,8 @@ public class RepeatTemplate implements RepeatOperations {
 
 				if (!deferred.isEmpty()) {
 					Throwable throwable = (Throwable) deferred.iterator().next();
-					logger.debug("Handling fatal exception explicitly (rethrowing first of " + deferred.size()
-							+ "): " + throwable.getClass().getName() + ": " + throwable.getMessage());
+					logger.debug("Handling fatal exception explicitly (rethrowing first of " + deferred.size() + "): "
+							+ throwable.getClass().getName() + ": " + throwable.getMessage());
 					rethrow(throwable);
 				}
 
@@ -275,8 +275,7 @@ public class RepeatTemplate implements RepeatOperations {
 
 	}
 
-	private void doHandle(Throwable throwable, RepeatContext context,
-			Collection<Throwable> deferred) {
+	private void doHandle(Throwable throwable, RepeatContext context, Collection<Throwable> deferred) {
 		// An exception alone is not sufficient grounds for not
 		// continuing
 		Throwable unwrappedThrowable = unwrapIfRethrown(throwable);
@@ -286,8 +285,7 @@ public class RepeatTemplate implements RepeatOperations {
 				RepeatListener interceptor = listeners[i];
 				// This is not an error - only log at debug
 				// level.
-				logger.debug("Exception intercepted (" + (i + 1) + " of " + listeners.length + ")",
-						unwrappedThrowable);
+				logger.debug("Exception intercepted (" + (i + 1) + " of " + listeners.length + ")", unwrappedThrowable);
 				interceptor.onError(context, unwrappedThrowable);
 			}
 
@@ -364,6 +362,9 @@ public class RepeatTemplate implements RepeatOperations {
 	protected RepeatStatus getNextResult(RepeatContext context, RepeatCallback callback, RepeatInternalState state)
 			throws Throwable {
 		update(context);
+		if (logger.isDebugEnabled()) {
+			logger.debug("Repeat operation about to start at count=" + context.getStartedCount());
+		}
 		return callback.doInIteration(context);
 
 	}
