@@ -99,9 +99,9 @@ public class ExceptionClassifierRetryPolicy implements RetryPolicy {
 	 * Delegate to the policy currently activated in the context.
 	 * 
 	 * @see org.springframework.batch.retry.RetryPolicy#registerThrowable(org.springframework.batch.retry.RetryContext,
-	 * Exception)
+	 * Throwable)
 	 */
-	public void registerThrowable(RetryContext context, Exception throwable) {
+	public void registerThrowable(RetryContext context, Throwable throwable) {
 		RetryPolicy policy = (RetryPolicy) context;
 		policy.registerThrowable(context, throwable);
 		((RetryContextSupport) context).registerThrowable(throwable);
@@ -144,7 +144,7 @@ public class ExceptionClassifierRetryPolicy implements RetryPolicy {
 			return this;
 		}
 
-		public void registerThrowable(RetryContext context, Exception throwable) {
+		public void registerThrowable(RetryContext context, Throwable throwable) {
 			policy = exceptionClassifier.classify(throwable);
 			Assert.notNull(policy, "Could not locate policy for exception=[" + throwable + "].");
 			this.context = getContext(policy, context.getParent());

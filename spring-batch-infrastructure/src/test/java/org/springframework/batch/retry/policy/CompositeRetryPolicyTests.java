@@ -62,7 +62,7 @@ public class CompositeRetryPolicyTests extends TestCase {
 				return !errorRegistered;
 			}
 
-			public void registerThrowable(RetryContext context, Exception throwable) {
+			public void registerThrowable(RetryContext context, Throwable throwable) {
 				errorRegistered = true;
 			}
 		} });
@@ -70,7 +70,7 @@ public class CompositeRetryPolicyTests extends TestCase {
 		assertNotNull(context);
 		assertTrue(policy.canRetry(context));
 		policy.registerThrowable(context, null);
-		assertFalse(policy.canRetry(context));
+		assertFalse("Should be still able to retry", policy.canRetry(context));
 	}
 
 	public void testNonTrivialPoliciesClose() throws Exception {

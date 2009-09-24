@@ -107,7 +107,7 @@ public class CompositeRetryPolicy implements RetryPolicy {
 	 * 
 	 * @see org.springframework.batch.retry.RetryPolicy#close(org.springframework.batch.retry.RetryContext)
 	 */
-	public void registerThrowable(RetryContext context, Exception throwable) {
+	public void registerThrowable(RetryContext context, Throwable throwable) {
 		RetryContext[] contexts = ((CompositeRetryContext) context).contexts;
 		RetryPolicy[] policies = ((CompositeRetryContext) context).policies;
 		for (int i = 0; i < contexts.length; i++) {

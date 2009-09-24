@@ -24,7 +24,7 @@ package org.springframework.batch.core.step.item;
  */
 public class SkipWrapper<T> {
 
-	final private Exception exception;
+	final private Throwable exception;
 
 	final private T item;
 
@@ -38,12 +38,12 @@ public class SkipWrapper<T> {
 	/**
 	 * @param e
 	 */
-	public SkipWrapper(Exception e) {
+	public SkipWrapper(Throwable e) {
 		this(null, e);
 	}
 
 
-	public SkipWrapper(T item, Exception e) {
+	public SkipWrapper(T item, Throwable e) {
 		this.item = item;
 		this.exception = e;
 	}
@@ -52,7 +52,7 @@ public class SkipWrapper<T> {
 	 * Public getter for the exception.
 	 * @return the exception
 	 */
-	public Exception getException() {
+	public Throwable getException() {
 		return exception;
 	}
 

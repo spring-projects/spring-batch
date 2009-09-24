@@ -60,11 +60,11 @@ public class NeverRetryPolicy implements RetryPolicy {
 	}
 
 	/**
-	 * Do nothing.
+	 * Make the throwable available for downstream use through the context.
 	 * @see org.springframework.batch.retry.RetryPolicy#registerThrowable(org.springframework.batch.retry.RetryContext,
-	 * Exception)
+	 * Throwable)
 	 */
-	public void registerThrowable(RetryContext context, Exception throwable) {
+	public void registerThrowable(RetryContext context, Throwable throwable) {
 		((NeverRetryContext) context).setFinished();
 		((RetryContextSupport) context).registerThrowable(throwable);
 	}

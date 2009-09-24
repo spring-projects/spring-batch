@@ -55,6 +55,6 @@ public interface RetryState {
 	 * @param exception the exception that caused a retry attempt to fail
 	 * @return true if this exception should cause a rollback
 	 */
-	boolean rollbackFor(Exception exception);
+	boolean rollbackFor(Throwable exception);
 
 }

@@ -99,10 +99,10 @@ public class FaultTolerantChunkProcessorTests {
 	}
 
 	/**
-	 * An Error pops right back up (no skips, no retry)
+	 * An Error can be retried or skipped but by default it is just propagated
 	 * @throws Exception
 	 */
-	@Test(expected=AssertionError.class)
+	@Test
 	public void testWriteSkipOnError() throws Exception {
 		processor.setWriteSkipPolicy(new AlwaysSkipItemSkipPolicy());
 		processor.setItemWriter(new ItemWriter<String>() {

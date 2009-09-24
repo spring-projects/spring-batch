@@ -61,7 +61,7 @@ public class TimeoutRetryPolicy implements RetryPolicy {
 		return new TimeoutRetryContext(parent, timeout);
 	}
 
-	public void registerThrowable(RetryContext context, Exception throwable) {
+	public void registerThrowable(RetryContext context, Throwable throwable) {
 		((RetryContextSupport) context).registerThrowable(throwable);
 		// otherwise no-op - we only time out, otherwise retry everything...
 	}

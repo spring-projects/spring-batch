@@ -58,6 +58,6 @@ public interface RetryPolicy {
 	 * @param context the current status object.
 	 * 
 	 */
-	void registerThrowable(RetryContext context, Exception throwable);
+	void registerThrowable(RetryContext context, Throwable throwable);
 
 }

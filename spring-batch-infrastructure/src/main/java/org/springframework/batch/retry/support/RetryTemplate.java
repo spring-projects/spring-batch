@@ -23,6 +23,7 @@ import java.util.List;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.springframework.batch.repeat.RepeatException;
 import org.springframework.batch.retry.ExhaustedRetryException;
 import org.springframework.batch.retry.RecoveryCallback;
 import org.springframework.batch.retry.RetryCallback;
@@ -236,7 +237,7 @@ public class RetryTemplate implements RetryOperations {
 					lastException = null;
 					return retryCallback.doWithRetry(context);
 				}
-				catch (Exception e) {
+				catch (Throwable e) {
 
 					lastException = e;
 
@@ -258,7 +259,7 @@ public class RetryTemplate implements RetryOperations {
 					logger.debug("Checking for rethrow: count=" + context.getRetryCount());
 					if (shouldRethrow(retryPolicy, context, state)) {
 						logger.debug("Rethrow in retry for policy: count=" + context.getRetryCount());
-						throw e;
+						throw wrapIfNecessary(e);
 					}
 
 				}
@@ -327,7 +328,7 @@ public class RetryTemplate implements RetryOperations {
 	 * @param context
 	 * @param e
 	 */
-	protected void registerThrowable(RetryPolicy retryPolicy, RetryState state, RetryContext context, Exception e) {
+	protected void registerThrowable(RetryPolicy retryPolicy, RetryState state, RetryContext context, Throwable e) {
 		if (state != null) {
 			Object key = state.getKey();
 			if (context.getRetryCount() > 0 && !retryContextCache.containsKey(key)) {
@@ -415,7 +416,7 @@ public class RetryTemplate implements RetryOperations {
 			throw new ExhaustedRetryException("Retry exhausted after last attempt with no recovery path", context
 					.getLastThrowable());
 		}
-		throw context.getLastThrowable();
+		throw wrapIfNecessary(context.getLastThrowable());
 	}
 
 	/**
@@ -459,6 +460,22 @@ public class RetryTemplate implements RetryOperations {
 	private <T> void doOnErrorInterceptors(RetryCallback<T> callback, RetryContext context, Throwable throwable) {
 		for (int i = listeners.length; i-- > 0;) {
 			listeners[i].onError(context, callback, throwable);
+		}
+	}
+
+	/**
+	 * Re-throws the original throwable if it is unchecked, wraps checked
+	 * exceptions into {@link RepeatException}.
+	 */
+	private static Exception wrapIfNecessary(Throwable throwable) {
+		if (throwable instanceof Error) {
+			throw (Error) throwable;
+		}
+		else if (throwable instanceof Exception) {
+			return (Exception) throwable;
+		}
+		else {
+			return new RetryException("Exception in batch process", throwable);
 		}
 	}
 

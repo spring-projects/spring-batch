@@ -103,10 +103,10 @@ public class DefaultRetryState implements RetryState {
 	 * (non-Javadoc)
 	 * 
 	 * @see
-	 * org.springframework.batch.retry.IRetryState#rollbackFor(java.lang.Exception
+	 * org.springframework.batch.retry.RetryState#rollbackFor(java.lang.Throwable
 	 * )
 	 */
-	public boolean rollbackFor(Exception exception) {
+	public boolean rollbackFor(Throwable exception) {
 		if (rollbackClassifier == null) {
 			return true;
 		}

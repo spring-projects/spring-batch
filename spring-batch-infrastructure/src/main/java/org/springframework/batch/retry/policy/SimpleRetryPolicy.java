@@ -57,7 +57,8 @@ public class SimpleRetryPolicy implements RetryPolicy {
 	 * attempts.
 	 */
 	public SimpleRetryPolicy() {
-		this(DEFAULT_MAX_ATTEMPTS, Collections.<Class<? extends Throwable>, Boolean>singletonMap(Exception.class, true));
+		this(DEFAULT_MAX_ATTEMPTS, Collections
+				.<Class<? extends Throwable>, Boolean> singletonMap(Exception.class, true));
 	}
 
 	/**
@@ -105,10 +106,9 @@ public class SimpleRetryPolicy implements RetryPolicy {
 	/**
 	 * Update the status with another attempted retry and the latest exception.
 	 * 
-	 * @see org.springframework.batch.retry.RetryPolicy#registerThrowable(org.springframework.batch.retry.RetryContext,
-	 * Exception)
+	 * @see RetryPolicy#registerThrowable(RetryContext, Throwable)
 	 */
-	public void registerThrowable(RetryContext context, Exception throwable) {
+	public void registerThrowable(RetryContext context, Throwable throwable) {
 		SimpleRetryContext simpleContext = ((SimpleRetryContext) context);
 		simpleContext.registerThrowable(throwable);
 	}

@@ -222,7 +222,7 @@ public class Chunk<W> implements Iterable<W> {
 			return next;
 		}
 
-		public void remove(Exception e) {
+		public void remove(Throwable e) {
 			remove();
 			skips.add(new SkipWrapper<W>(next, e));
 		}

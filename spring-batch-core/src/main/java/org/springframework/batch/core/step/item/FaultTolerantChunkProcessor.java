@@ -248,7 +248,7 @@ public class FaultTolerantChunkProcessor<I, O> extends SimpleChunkProcessor<I, O
 			RecoveryCallback<O> recoveryCallback = new RecoveryCallback<O>() {
 
 				public O recover(RetryContext context) throws Exception {
-					Exception e = context.getLastThrowable();
+					Throwable e = context.getLastThrowable();
 					if (itemProcessSkipPolicy.shouldSkip(e, contribution.getStepSkipCount())) {
 						contribution.incrementProcessSkipCount();
 						iterator.remove(e);
@@ -315,7 +315,7 @@ public class FaultTolerantChunkProcessor<I, O> extends SimpleChunkProcessor<I, O
 
 				public Object recover(RetryContext context) throws Exception {
 
-					Exception e = context.getLastThrowable();
+					Throwable e = context.getLastThrowable();
 					if (outputs.size() > 1 && !rollbackClassifier.classify(e)) {
 						throw new RetryException("Invalid retry state during write caused by "
 								+ "exception that does not classify for rollback: ", e);
@@ -387,12 +387,12 @@ public class FaultTolerantChunkProcessor<I, O> extends SimpleChunkProcessor<I, O
 			if (item == null) {
 				continue;
 			}
-			Exception e = wrapper.getException();
+			Throwable e = wrapper.getException();
 			callProcessSkipListener(item, e);
 		}
 
 		for (SkipWrapper<O> wrapper : outputs.getSkips()) {
-			Exception e = wrapper.getException();
+			Throwable e = wrapper.getException();
 			try {
 				getListener().onSkipInWrite(wrapper.getItem(), e);
 			}
@@ -414,7 +414,7 @@ public class FaultTolerantChunkProcessor<I, O> extends SimpleChunkProcessor<I, O
 	 * @param item the item that is skipped
 	 * @param e the cause of the skip
 	 */
-	private void callProcessSkipListener(I item, Exception e) {
+	private void callProcessSkipListener(I item, Throwable e) {
 		try {
 			getListener().onSkipInProcess(item, e);
 		}
@@ -442,7 +442,7 @@ public class FaultTolerantChunkProcessor<I, O> extends SimpleChunkProcessor<I, O
 	}
 
 	private void checkSkipPolicy(Chunk<I>.ChunkIterator inputIterator, Chunk<O>.ChunkIterator outputIterator,
-			Exception e, StepContribution contribution) {
+			Throwable e, StepContribution contribution) {
 		logger.debug("Checking skip policy after failed write");
 		if (itemWriteSkipPolicy.shouldSkip(e, contribution.getStepSkipCount())) {
 			contribution.incrementWriteSkipCount();

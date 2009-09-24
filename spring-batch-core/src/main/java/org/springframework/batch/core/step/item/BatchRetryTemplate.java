@@ -123,7 +123,7 @@ public class BatchRetryTemplate implements RetryOperations {
 		}
 
 		@Override
-		protected void registerThrowable(RetryPolicy retryPolicy, RetryState state, RetryContext context, Exception e) {
+		protected void registerThrowable(RetryPolicy retryPolicy, RetryState state, RetryContext context, Throwable e) {
 
 			BatchRetryState batchState = (BatchRetryState) state;
 			BatchRetryContext batchContext = (BatchRetryContext) context;
