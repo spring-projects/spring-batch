@@ -3,7 +3,7 @@
                                     ------
                                     Dave Syer
                                     ------
-                                    March 2008
+                                    September 2009
 
   See the changes report generated from {{{issue-tracking.html}JIRA}}.
   
@@ -12,6 +12,8 @@
   You can also browse the upcoming releases and look at the {{{http://opensource.atlassian.com/projects/spring/browse/BATCH?report=com.atlassian.jira.plugin.system.project:roadmap-panel}Road Map}} query.
 
   Links:
+
+    * {{{2.0.x-2.1.0.M1.html}2.0.x to 2.1.0.M1}}
 
     * {{{2.0-highlights.html}Highlights of changes between 1.x and 2.0}}
   

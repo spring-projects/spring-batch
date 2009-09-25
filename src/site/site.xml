@@ -53,6 +53,8 @@
 				href="http://static.springframework.org/spring-batch/1.0.x/index.html" />
 			<item name="1.1.x"
 				href="http://static.springframework.org/spring-batch/1.1.x/index.html" />
+			<item name="2.0.x"
+				href="http://static.springframework.org/spring-batch/2.0.x/index.html" />
 		</menu>
 
 		<menu name="Modules" inherit="none">

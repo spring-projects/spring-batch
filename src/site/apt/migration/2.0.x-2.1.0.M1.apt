@@ -1,0 +1,78 @@
+Spring Batch 2.1.0.M1 Release Notes
+
+** Sub-task
+
+  * {{{http://jira.springsource.org/browse/BATCH-1298}[BATCH-1298]}} - no-rollback-exception-classes ignored by non-chunk-oriented TaskletStep
+
+  * {{{http://jira.springsource.org/browse/BATCH-1366}[BATCH-1366]}} - Syntactic sugar for CompositeItemProcessor and CompositeItemWriter in namespace
+
+  * {{{http://jira.springsource.org/browse/BATCH-1367}[BATCH-1367]}} - Syntactic sugar for Item*Adapter in namespace
+
+  * {{{http://jira.springsource.org/browse/BATCH-1368}[BATCH-1368]}} - Update docs to remove <listener class="..."/> syntax
+
+  * {{{http://jira.springsource.org/browse/BATCH-1381}[BATCH-1381]}} - Update docs for <include/> and <exclude/> in exception lists
+
+** Bug
+
+  * {{{http://jira.springsource.org/browse/BATCH-1390}[BATCH-1390]}} - ExecutionContextPromotionListener erases previous step
+
+  * {{{http://jira.springsource.org/browse/BATCH-1392}[BATCH-1392]}} - Throttle limit is not parsed in ChunkElementParser
+
+  * {{{http://jira.springsource.org/browse/BATCH-1397}[BATCH-1397]}} - Late binding only happens once per ApplicationContext if expression is in substring
+
+  * {{{http://jira.springsource.org/browse/BATCH-1408}[BATCH-1408]}} - SimpleJobLauncher Package wrong
+
+  * {{{http://jira.springsource.org/browse/BATCH-1410}[BATCH-1410]}} - Isolation Level in the Example is not supported
+
+  * {{{http://jira.springsource.org/browse/BATCH-1413}[BATCH-1413]}} - A typo in the 11.8 of reference documentation 
+
+** Improvement
+
+  * {{{http://jira.springsource.org/browse/BATCH-630}[BATCH-630]}} - Possibility to trim input line and fields in Fieldset in LineTokenizer
+
+  * {{{http://jira.springsource.org/browse/BATCH-742}[BATCH-742]}} - Inclusion of a ResourceItemReader that will return resources (such as files in a directory) instead of records from a single resource.
+
+  * {{{http://jira.springsource.org/browse/BATCH-915}[BATCH-915]}} - Call open() lazily in MultiResourceItemReader to allow resources to be skipped
+
+  * {{{http://jira.springsource.org/browse/BATCH-1323}[BATCH-1323]}} - Modify skip/retry/no-rollback exception class configurations to allow for exclude/include
+
+  * {{{http://jira.springsource.org/browse/BATCH-1339}[BATCH-1339]}} - Move task-executor attribute up from <chunk/> to <tasklet/>
+
+  * {{{http://jira.springsource.org/browse/BATCH-1357}[BATCH-1357]}} - Allow empty <listeners/>, <retry-listeners/>, and <streams/> lists
+
+  * {{{http://jira.springsource.org/browse/BATCH-1375}[BATCH-1375]}} - Give CompositeItemProcessor's and CompositeItemWriter's property the same name (delegates)
+
+  * {{{http://jira.springsource.org/browse/BATCH-1404}[BATCH-1404]}} - archetype update
+
+  * {{{http://jira.springsource.org/browse/BATCH-1409}[BATCH-1409]}} - More efficient use of pool threads in repeat template (hence multi-threaded steps)
+
+** New Feature
+
+  * {{{http://jira.springsource.org/browse/BATCH-1277}[BATCH-1277]}} - Add JobParametersBuilder.addJobParameter(String key, JobParameter parameter)
+
+  * {{{http://jira.springsource.org/browse/BATCH-1348}[BATCH-1348]}} - Allow inlining of reader/writer/processor into <chunk/>
+
+  * {{{http://jira.springsource.org/browse/BATCH-1350}[BATCH-1350]}} - Add back (much simplified) StepExecutionResourceProxy
+
+  * {{{http://jira.springsource.org/browse/BATCH-1356}[BATCH-1356]}} - Line reader for binary files
+
+  * {{{http://jira.springsource.org/browse/BATCH-1358}[BATCH-1358]}} - Copy InfiniteLoopIncrementer into core, and rename it to RunIdIncrementer
+
+  * {{{http://jira.springsource.org/browse/BATCH-1385}[BATCH-1385]}} - Composite elements do not honour @Order annotations
+
+  * {{{http://jira.springsource.org/browse/BATCH-1389}[BATCH-1389]}} - Thread safety in *PagingReader
+
+  * {{{http://jira.springsource.org/browse/BATCH-1406}[BATCH-1406]}} - Avoid deadlock with database pool and multithreaded step when throttle limit is too high.
+
+  * {{{http://jira.springsource.org/browse/BATCH-1415}[BATCH-1415]}} - Execution context cannot be saved on Oracle (UTF8) when context length is between 2000 and 2500 characters
+
+** Refactoring
+
+  * {{{http://jira.springsource.org/browse/BATCH-973}[BATCH-973]}} - Switch RetryPolicy back to Throwable instead of Exception as in 1.x
+
+  * {{{http://jira.springsource.org/browse/BATCH-1414}[BATCH-1414]}} - Move schema scripts to a package
+
+** Task
+
+  * {{{http://jira.springsource.org/browse/BATCH-1391}[BATCH-1391]}} - Tidy up skip sample.
+
