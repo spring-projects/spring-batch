@@ -33,11 +33,11 @@
 
 	<bean id="itemWriter" class="org.springframework.batch.sample.domain.trade.internal.ItemTrackingTradeItemWriter" />
 	
-	<bean id="limitDecider" class="org.springframework.batch.sample.loopFlow.LimitDecider">
+	<bean id="limitDecider" class="org.springframework.batch.sample.loop.LimitDecider">
 		<property name="limit" value="9" />
 	</bean>
 	
-	<bean id="resettingListener" class="org.springframework.batch.sample.loopFlow.GeneratingTradeResettingListener">
+	<bean id="resettingListener" class="org.springframework.batch.sample.loop.GeneratingTradeResettingListener">
 		<property name="reader" ref="itemGenerator" />
 	</bean>
 
