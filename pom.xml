@@ -294,6 +294,26 @@
 			</modules>
 		</profile>
 		<profile>
+			<id>milestone</id>
+			<distributionManagement>
+				<repository>
+					<id>spring-milestone</id>
+					<name>Spring Milestone Repository</name>
+					<url>s3://maven.springframework.org/milestone</url>
+				</repository>
+			</distributionManagement>
+		</profile>
+		<profile>
+			<id>central</id>
+			<distributionManagement>
+				<repository>
+					<id>spring-sourceforge</id>
+					<name>Spring Sourceforge Repository</name>
+					<url>https://springframework.svn.sourceforge.net/svnroot/springframework/repos/repo</url>
+				</repository>
+			</distributionManagement>
+		</profile>
+		<profile>
 			<id>staging</id>
 			<distributionManagement>
 				<site>
@@ -356,7 +376,7 @@
 			<url>scp://static.springframework.org/var/www/domains/springframework.org/static/htdocs/spring-batch/trunk</url>
 		</site>
 		<repository>
-			<id>spring-milestone</id>
+			<id>spring-release</id>
 			<name>Spring Release Repository</name>
 			<url>s3://maven.springframework.org/release</url>
 		</repository>
@@ -405,6 +425,15 @@
 				</plugin>
 			</plugins>
 		</pluginManagement>
+		<plugins>
+		  <plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-deploy-plugin</artifactId>
+				<configuration>
+					<skip>true</skip>
+				</configuration>
+		  </plugin>
+		</plugins>
 	</build>
 	<reporting>
 		<excludeDefaults>true</excludeDefaults>
