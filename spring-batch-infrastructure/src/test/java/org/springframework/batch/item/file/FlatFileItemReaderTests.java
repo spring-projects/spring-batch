@@ -71,6 +71,43 @@ public class FlatFileItemReaderTests {
 	}
 
 	@Test
+	public void testCustomRecordSeparatorPolicyEndOfFile() throws Exception {
+
+		reader.setRecordSeparatorPolicy(new RecordSeparatorPolicy() {
+			// 1 record = 2 lines
+			boolean pair = true;
+
+			public boolean isEndOfRecord(String line) {
+				pair = !pair;
+				return pair;
+			}
+
+			public String postProcess(String record) {
+				return record;
+			}
+
+			public String preProcess(String record) {
+				return record;
+			}
+		});
+
+		reader.setResource(getInputResource("testLine1\ntestLine2\ntestLine3\n"));
+		reader.open(executionContext);
+
+		assertEquals("testLine1testLine2", reader.read());
+		
+		try {
+			reader.read();
+			fail("Expected Exception");
+		} catch (FlatFileParseException e) {
+			// File ends in the middle of a record
+			assertEquals(3, e.getLineNumber());
+			assertEquals("testLine3", e.getInput());
+		}
+
+	}
+
+	@Test
 	public void testRestartWithSkippedLines() throws Exception {
 
 		reader.setLinesToSkip(2);

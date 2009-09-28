@@ -167,7 +167,11 @@ public class FlatFileItemReader<T> extends AbstractItemCountingItemStreamItemRea
 		String record = line;
 		if (line != null) {
 			while (line != null && !recordSeparatorPolicy.isEndOfRecord(record)) {
-				record = recordSeparatorPolicy.preProcess(record) + (line = readLine());
+				line = readLine();
+				if (line==null) {
+					throw new FlatFileParseException("Unexpected end of file before record complete", record, lineCount);
+				}
+				record = recordSeparatorPolicy.preProcess(record) + line;
 			}
 		}
 		String logicalLine = recordSeparatorPolicy.postProcess(record);
