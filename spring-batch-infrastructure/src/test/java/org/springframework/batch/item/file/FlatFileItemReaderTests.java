@@ -1,6 +1,9 @@
 package org.springframework.batch.item.file;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.fail;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -68,6 +71,43 @@ public class FlatFileItemReaderTests {
 		reader.open(executionContext);
 
 		assertEquals("testLine5testLine6", reader.read());
+	}
+
+	@Test
+	public void testCustomRecordSeparatorPolicyEndOfFile() throws Exception {
+
+		reader.setRecordSeparatorPolicy(new RecordSeparatorPolicy() {
+			// 1 record = 2 lines
+			boolean pair = true;
+
+			public boolean isEndOfRecord(String line) {
+				pair = !pair;
+				return pair;
+			}
+
+			public String postProcess(String record) {
+				return record;
+			}
+
+			public String preProcess(String record) {
+				return record;
+			}
+		});
+
+		reader.setResource(getInputResource("testLine1\ntestLine2\ntestLine3\n"));
+		reader.open(executionContext);
+
+		assertEquals("testLine1testLine2", reader.read());
+		
+		try {
+			reader.read();
+			fail("Expected Exception");
+		} catch (FlatFileParseException e) {
+			// File ends in the middle of a record
+			assertEquals(3, e.getLineNumber());
+			assertEquals("testLine3", e.getInput());
+		}
+
 	}
 
 	@Test
