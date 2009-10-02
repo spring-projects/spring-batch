@@ -15,6 +15,7 @@ import org.springframework.core.io.AbstractResource;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.Resource;
 import org.springframework.util.ClassUtils;
+import org.springframework.util.StringUtils;
 
 /**
  * Tests for {@link FlatFileItemReader}.
@@ -95,15 +96,76 @@ public class FlatFileItemReaderTests {
 		reader.open(executionContext);
 
 		assertEquals("testLine1testLine2", reader.read());
-		
+
 		try {
 			reader.read();
 			fail("Expected Exception");
-		} catch (FlatFileParseException e) {
+		}
+		catch (FlatFileParseException e) {
 			// File ends in the middle of a record
 			assertEquals(3, e.getLineNumber());
 			assertEquals("testLine3", e.getInput());
 		}
+
+	}
+
+	@Test
+	public void testCustomRecordSeparatorBlankLine() throws Exception {
+
+		reader.setRecordSeparatorPolicy(new RecordSeparatorPolicy() {
+
+			public boolean isEndOfRecord(String line) {
+				return StringUtils.hasText(line);
+			}
+
+			public String postProcess(String record) {
+				return StringUtils.hasText(record) ? record : null;
+			}
+
+			public String preProcess(String record) {
+				return record;
+			}
+		});
+
+		reader.setResource(getInputResource("testLine1\ntestLine2\ntestLine3\n\n"));
+		reader.open(executionContext);
+
+		assertEquals("testLine1", reader.read());
+		assertEquals("testLine2", reader.read());
+		assertEquals("testLine3", reader.read());
+		assertEquals(null, reader.read());
+
+	}
+
+	@Test
+	public void testCustomRecordSeparatorMultilineBlankLineAfterEnd() throws Exception {
+
+		reader.setRecordSeparatorPolicy(new RecordSeparatorPolicy() {
+
+			// 1 record = 2 lines
+			boolean pair = true;
+
+			public boolean isEndOfRecord(String line) {
+				if (StringUtils.hasText(line)) {
+					pair = !pair;
+				}
+				return pair;
+			}
+
+			public String postProcess(String record) {
+				return StringUtils.hasText(record) ? record : null;
+			}
+
+			public String preProcess(String record) {
+				return record;
+			}
+		});
+
+		reader.setResource(getInputResource("testLine1\ntestLine2\n\n"));
+		reader.open(executionContext);
+
+		assertEquals("testLine1testLine2", reader.read());
+		assertEquals(null, reader.read());
 
 	}
 
@@ -181,7 +243,7 @@ public class FlatFileItemReaderTests {
 	public void testMaxItemCountFromContext() throws Exception {
 
 		reader.setMaxItemCount(2);
-		executionContext.putInt(reader.getClass().getSimpleName()+".read.count.max", Integer.MAX_VALUE);
+		executionContext.putInt(reader.getClass().getSimpleName() + ".read.count.max", Integer.MAX_VALUE);
 		reader.open(executionContext);
 		// read some records
 		reader.read();
@@ -196,7 +258,7 @@ public class FlatFileItemReaderTests {
 	public void testCurrentItemCountFromContext() throws Exception {
 
 		reader.setCurrentItemCount(2);
-		executionContext.putInt(reader.getClass().getSimpleName()+".read.count", 3);
+		executionContext.putInt(reader.getClass().getSimpleName() + ".read.count", 3);
 		reader.open(executionContext);
 		// read some records
 		assertEquals("testLine4", reader.read());

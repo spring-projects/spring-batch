@@ -32,6 +32,7 @@ import org.springframework.beans.factory.InitializingBean;
 import org.springframework.core.io.Resource;
 import org.springframework.util.Assert;
 import org.springframework.util.ClassUtils;
+import org.springframework.util.StringUtils;
 
 /**
  * Restartable {@link ItemReader} that reads lines from input
@@ -219,11 +220,21 @@ public class FlatFileItemReader<T> extends AbstractItemCountingItemStreamItemRea
 		String record = line;
 		while (line != null && !recordSeparatorPolicy.isEndOfRecord(record)) {
 			line = this.reader.readLine();
-			if (line==null) {
-				throw new FlatFileParseException("Unexpected end of file before record complete", record, lineCount);
-			}
+			if (line == null) {
+				if (StringUtils.hasText(record)) {
+					// A record was partially complete since it hasn't ended but
+					// the line is null
+					throw new FlatFileParseException("Unexpected end of file before record complete", record, lineCount);
+				}
+				else {
+					// Record has no text but it might still be post processed
+					// to something (skipping preProcess since that was already done)
+					break;
+				}
+			} else {
+				lineCount++;
+            }
 			record = recordSeparatorPolicy.preProcess(record) + line;
-			lineCount++;
 		}
 		
 		return recordSeparatorPolicy.postProcess(record);
