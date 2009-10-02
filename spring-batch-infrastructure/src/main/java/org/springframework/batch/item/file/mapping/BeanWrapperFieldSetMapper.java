@@ -47,21 +47,24 @@ import org.springframework.validation.ObjectError;
  * to bean property paths in an instance of the desired type. The instance is
  * created and initialized either by referring to to a prototype object by bean
  * name in the enclosing BeanFactory, or by providing a class to instantiate
- * reflectively.<br/><br/>
+ * reflectively.<br/>
+ * <br/>
  * 
  * Nested property paths, including indexed properties in maps and collections,
  * can be referenced by the {@link FieldSet} names. They will be converted to
  * nested bean properties inside the prototype. The {@link FieldSet} and the
  * prototype are thus tightly coupled by the fields that are available and those
  * that can be initialized. If some of the nested properties are optional (e.g.
- * collection members) they need to be removed by a post processor.<br/><br/>
+ * collection members) they need to be removed by a post processor.<br/>
+ * <br/>
  * 
  * To customize the way that {@link FieldSet} values are converted to the
  * desired type for injecting into the prototype there are several choices. You
  * can inject {@link PropertyEditor} instances directly through the
  * {@link #setCustomEditors(Map) customEditors} property, or you can override
  * the {@link #createBinder(Object)} and {@link #initBinder(DataBinder)}
- * methods, or you can provide a custom {@link FieldSet} implementation.<br/><br/>
+ * methods, or you can provide a custom {@link FieldSet} implementation.<br/>
+ * <br/>
  * 
  * Property name matching is "fuzzy" in the sense that it tolerates close
  * matches, as long as the match is unique. For instance:
@@ -205,9 +208,9 @@ public class BeanWrapperFieldSetMapper<T> extends DefaultPropertyEditorRegistrar
 	 * binder settings such as the {@link DataBinder#initDirectFieldAccess()
 	 * direct field access}. Called by {@link #createBinder(Object)}.
 	 * <p>
-	 * Note that registration of custom property editors should be done in
-	 * {@link #registerCustomEditors(PropertyEditorRegistry)}, not here! This
-	 * method will only be called when a <b>new</b> data binder is created.
+	 * Note that registration of custom property editors can be done in
+	 * {@link #registerCustomEditors(PropertyEditorRegistry)}.
+	 * </p>
 	 * @param binder new binder instance
 	 * @see #createBinder(Object)
 	 */
