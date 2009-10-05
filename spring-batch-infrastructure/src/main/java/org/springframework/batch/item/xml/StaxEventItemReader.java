@@ -22,7 +22,9 @@ import javax.xml.namespace.QName;
 import javax.xml.stream.XMLEventReader;
 import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamException;
+import javax.xml.stream.events.EndElement;
 import javax.xml.stream.events.StartElement;
+import javax.xml.stream.events.XMLEvent;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -211,5 +213,49 @@ public class StaxEventItemReader<T> extends AbstractItemCountingItemStreamItemRe
 
 		return item;
 	}
-
+	
+	/*
+	 * jumpToItem is overridden because reading in and attempting to bind an entire fragment
+	 * is unacceptable in a restart scenario, and may cause exceptions to be thrown that
+	 * were already skipped in previous runs.
+	 */
+	@Override
+	protected void jumpToItem(int itemIndex) throws Exception {
+		for (int i = 0; i < itemIndex; i++) {
+			readToStartFragement();
+			readToEndFragment();
+		}
+	}
+	
+	/*
+	 * Read until the first StartElement tag that matches the provided 
+	 * fragmentRootElementName.  Because there may be any number of tags in between where the reader
+	 * is now and the fragment start, this is done in a loop until the element type and name 
+	 * match.
+	 */
+	private void readToStartFragement() throws XMLStreamException{
+		while(true){
+			XMLEvent nextEvent = eventReader.nextEvent();
+			if( nextEvent.isStartElement() &&
+				((StartElement)nextEvent).getName().getLocalPart().equals(fragmentRootElementName)){
+				return;
+			}
+		}
+	}
+	
+	/*
+	 * Read until the first EndElement tag that matches the provided 
+	 * fragmentRootElementName.  Because there may be any number of tags in between where the reader
+	 * is now and the fragment end tag, this is done in a loop until the element type and name 
+	 * match
+	 */
+	private void readToEndFragment() throws XMLStreamException{
+		while(true){
+			XMLEvent nextEvent = eventReader.nextEvent();
+			if( nextEvent.isEndElement() &&
+				((EndElement)nextEvent).getName().getLocalPart().equals(fragmentRootElementName)){
+				return;
+			}
+		}
+	}
 }
