@@ -594,7 +594,7 @@ public Trade read() throws Exception {
     }
 
     @BeforeStep
-    public void saveStepExecution(StepExecution stepExecution) {
+    public void retrieveInterstepData(StepExecution stepExecution) {
         JobExecution jobExecution = stepExecution.getJobExecution();
         ExecutionContext jobContext = jobExecution.getExecutionContext();
         this.someObject = jobContext.get("someKey");
