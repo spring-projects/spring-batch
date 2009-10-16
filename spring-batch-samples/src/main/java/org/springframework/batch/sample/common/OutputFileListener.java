@@ -30,6 +30,12 @@ public class OutputFileListener {
 
 	private String inputKeyName = "fileName";
 
+	private String path = "file:./target/output/";
+	
+	public void setPath(String path) {
+		this.path = path;
+	}
+
 	public void setOutputKeyName(String outputKeyName) {
 		this.outputKeyName = outputKeyName;
 	}
@@ -39,11 +45,15 @@ public class OutputFileListener {
 	}
 
 	@BeforeStep
-	public void CreateOutputNameFromInput(StepExecution stepExecution) {
+	public void createOutputNameFromInput(StepExecution stepExecution) {
 		ExecutionContext executionContext = stepExecution.getExecutionContext();
-		if (executionContext.containsKey(inputKeyName) && !executionContext.containsKey(outputKeyName)) {
-			String inputName = executionContext.getString(inputKeyName);
-			executionContext.putString(outputKeyName, "file:./target/output/" + FilenameUtils.getBaseName(inputName) + ".csv");
+		String inputName = stepExecution.getStepName().replace(":", "-");
+		if (executionContext.containsKey(inputKeyName)) {
+			inputName = executionContext.getString(inputKeyName);
+		}
+		if (!executionContext.containsKey(outputKeyName)) {
+			executionContext.putString(outputKeyName, path + FilenameUtils.getBaseName(inputName)
+					+ ".csv");
 		}
 	}
 

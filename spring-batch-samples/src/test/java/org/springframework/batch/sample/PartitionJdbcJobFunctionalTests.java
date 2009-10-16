@@ -20,7 +20,9 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
 import java.util.ArrayList;
+import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Set;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -39,11 +41,15 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration()
-public class PartitionJobFunctionalTests extends AbstractJobTests {
+public class PartitionJdbcJobFunctionalTests extends AbstractJobTests {
 
 	@Autowired
 	@Qualifier("inputTestReader")
 	private ItemReader<CustomerCredit> inputReader;
+
+	@Autowired
+	@Qualifier("outputTestReader")
+	private ItemReader<CustomerCredit> outputReader;
 
 	/**
 	 * Check the resulting credits correspond to inputs increased by fixed
@@ -56,23 +62,21 @@ public class PartitionJobFunctionalTests extends AbstractJobTests {
 				.containsBeanDefinition("outputTestReader"));
 
 		open(inputReader);
-		List<CustomerCredit> inputs = getCredits(inputReader);
+		List<CustomerCredit> inputs = new ArrayList<CustomerCredit>(getCredits(inputReader));
 		close(inputReader);
 
 		JobExecution jobExecution = this.launchJob();
 		assertEquals(BatchStatus.COMPLETED, jobExecution.getStatus());
 
-		@SuppressWarnings("unchecked")
-		ItemReader<CustomerCredit> outputReader = (ItemReader<CustomerCredit>) getApplicationContext().getBean(
-				"outputTestReader");
 		open(outputReader);
-		List<CustomerCredit> outputs = getCredits(outputReader);
+		List<CustomerCredit> outputs = new ArrayList<CustomerCredit>(getCredits(outputReader));
 		close(outputReader);
 
 		assertEquals(inputs.size(), outputs.size());
 		int itemCount = inputs.size();
 		assertTrue(itemCount > 0);
 
+		inputs.iterator();
 		for (int i = 0; i < itemCount; i++) {
 			assertEquals(inputs.get(i).getCredit().add(CustomerCreditIncreaseProcessor.FIXED_AMOUNT).intValue(),
 					outputs.get(i).getCredit().intValue());
@@ -83,9 +87,9 @@ public class PartitionJobFunctionalTests extends AbstractJobTests {
 	/**
 	 * Read all credits using the provided reader.
 	 */
-	private List<CustomerCredit> getCredits(ItemReader<CustomerCredit> reader) throws Exception {
+	private Set<CustomerCredit> getCredits(ItemReader<CustomerCredit> reader) throws Exception {
 		CustomerCredit credit;
-		List<CustomerCredit> result = new ArrayList<CustomerCredit>();
+		Set<CustomerCredit> result = new LinkedHashSet<CustomerCredit>();
 		while ((credit = reader.read()) != null) {
 			result.add(credit);
 		}

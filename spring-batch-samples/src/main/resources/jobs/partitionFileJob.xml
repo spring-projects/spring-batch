@@ -29,6 +29,7 @@
 					<bean class="org.springframework.core.task.SyncTaskExecutor" />
 				</property>
 				<property name="step" ref="step1" />
+				<property name="gridSize" value="2"/>
 			</bean>
 		</property>
 	</bean>
@@ -42,7 +43,10 @@
 		</tasklet>
 	</step>
 
-	<bean id="fileNameListener" class="org.springframework.batch.sample.common.OutputFileListener" scope="step"/>
+	<bean id="fileNameListener" class="org.springframework.batch.sample.common.OutputFileListener" scope="step">
+			<property name="path" value="file:./target/output/file/"/>
+	</bean>
+	
 
 	<bean id="itemReader" scope="step" autowire-candidate="false" parent="itemReaderParent">
 		<property name="resource" value="#{stepExecutionContext[fileName]}" />
@@ -54,7 +58,7 @@
 	</bean>
 
 	<bean id="outputTestReader" class="org.springframework.batch.item.file.MultiResourceItemReader" scope="prototype">
-		<property name="resources" value="file:target/output/delimited*.csv" />
+		<property name="resources" value="file:target/output/file/delimited*.csv" />
 		<property name="delegate" ref="testItemReader" />
 	</bean>
 

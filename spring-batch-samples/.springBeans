@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <beansProjectDescription>
 	<version>1</version>
-	<pluginVersion><![CDATA[2.2.7.200909172100-CI-R3407-B467]]></pluginVersion>
+	<pluginVersion><![CDATA[2.2.7.200909182116-CI-R3408-B468]]></pluginVersion>
 	<configSuffixes>
 		<configSuffix><![CDATA[xml]]></configSuffix>
 	</configSuffixes>
@@ -60,13 +60,11 @@
 		<config>src/test/resources/org/springframework/batch/sample/MultilineJobFunctionalTests-context.xml</config>
 		<config>src/test/resources/org/springframework/batch/sample/MultilineOrderJobFunctionalTests-context.xml</config>
 		<config>src/test/resources/org/springframework/batch/sample/ParallelJobFunctionalTests-context.xml</config>
-		<config>src/main/resources/jobs/partitionJob.xml</config>
 		<config>src/test/resources/org/springframework/batch/sample/RestartFunctionalTests-context.xml</config>
 		<config>src/test/resources/org/springframework/batch/sample/RetrySampleFunctionalTests-context.xml</config>
 		<config>src/test/resources/org/springframework/batch/sample/common/StagingItemReaderTests-context.xml</config>
 		<config>src/test/resources/org/springframework/batch/sample/common/StagingItemWriterTests-context.xml</config>
 		<config>src/test/resources/org/springframework/batch/sample/TradeJobFunctionalTests-context.xml</config>
-		<config>src/test/resources/org/springframework/batch/sample/PartitionJobFunctionalTests-context.xml</config>
 		<config>src/main/resources/jobs/multilineOrderValidator.xml</config>
 		<config>src/main/resources/jobs/restartFileSampleJob.xml</config>
 		<config>src/main/resources/jobs/taskletJob.xml</config>
@@ -75,6 +73,7 @@
 		<config>src/main/resources/jobs/iosample/jdbcPaging.xml</config>
 		<config>src/test/resources/org/springframework/batch/sample/GroovyJobFunctionalTests-context.xml</config>
 		<config>src/test/resources/org/springframework/batch/sample/TaskletJobFunctionalTests-context.xml</config>
+		<config>src/main/resources/jobs/partitionJdbcJob.xml</config>
 	</configs>
 	<configSets>
 		<configSet>
@@ -395,7 +394,6 @@
 			<incomplete>false</incomplete>
 			<configs>
 				<config>src/main/resources/data-source-context.xml</config>
-				<config>src/main/resources/jobs/partitionJob.xml</config>
 				<config>src/main/resources/simple-job-launcher-context.xml</config>
 			</configs>
 		</configSet>
