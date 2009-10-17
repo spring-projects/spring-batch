@@ -7,6 +7,7 @@ import static org.junit.Assert.fail;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.TreeSet;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -26,6 +27,8 @@ public class TaskExecutorPartitionHandlerTests {
 	private TaskExecutorPartitionHandler handler = new TaskExecutorPartitionHandler();
 
 	private int count = 0;
+	
+	private Collection<String> stepExecutions = new TreeSet<String>();
 
 	private StepExecution stepExecution = new StepExecution("step", new JobExecution(1L));
 
@@ -50,6 +53,7 @@ public class TaskExecutorPartitionHandlerTests {
 			@Override
 			public void execute(StepExecution stepExecution) throws JobInterruptedException {
 				count++;
+				stepExecutions.add(stepExecution.getStepName());
 			}
 		});
 		handler.afterPropertiesSet();
@@ -74,6 +78,7 @@ public class TaskExecutorPartitionHandlerTests {
 		handler.setGridSize(2);
 		handler.handle(stepExecutionSplitter, stepExecution);
 		assertEquals(2, count);
+		assertEquals("[foo0, foo1]", stepExecutions.toString());
 	}
 
 	@Test

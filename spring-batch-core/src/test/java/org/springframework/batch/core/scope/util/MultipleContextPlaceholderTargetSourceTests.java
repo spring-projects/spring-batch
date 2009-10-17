@@ -62,6 +62,10 @@ public class MultipleContextPlaceholderTargetSourceTests {
 	private TestBean list;
 
 	@Autowired
+	@Qualifier("nestedList")
+	private TestBean nestedList;
+
+	@Autowired
 	@Qualifier("map")
 	private TestBean map;
 
@@ -121,6 +125,23 @@ public class MultipleContextPlaceholderTargetSourceTests {
 	}
 
 	@Test
+	public void testMultipleValueInNestedList() throws Exception {
+
+		for (int i = 0; i < 4; i++) {
+			final String value = "foo" + i;
+			contextFactory.setContext(this);
+			attributes = Collections.singletonMap("foo", value);
+			try {
+				assertEquals("foo" + i, nestedList.getParent().getNames().get(0));
+			}
+			finally {
+				contextFactory.clearContext();
+			}
+		}
+
+	}
+
+	@Test
 	public void testMultipleValueInMap() throws Exception {
 
 		for (int i = 0; i < 4; i++) {
@@ -144,10 +165,20 @@ public class MultipleContextPlaceholderTargetSourceTests {
 
 	public static class TestBean {
 		private String name;
+		
+		private TestBean parent;
 
 		private List<String> names = new ArrayList<String>();
 
 		private Map<String, String> map = new HashMap<String, String>();
+		
+		public TestBean getParent() {
+			return parent;
+		}
+
+		public void setParent(TestBean parent) {
+			this.parent = parent;
+		}
 
 		public String getName() {
 			return name;

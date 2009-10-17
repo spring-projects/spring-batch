@@ -30,6 +30,8 @@ import org.springframework.beans.PropertyEditorRegistrySupport;
 import org.springframework.beans.TypeConverter;
 import org.springframework.beans.TypeMismatchException;
 import org.springframework.beans.factory.InitializingBean;
+import org.springframework.beans.factory.config.BeanDefinition;
+import org.springframework.beans.factory.config.BeanDefinitionHolder;
 import org.springframework.beans.factory.config.BeanDefinitionVisitor;
 import org.springframework.beans.factory.config.TypedStringValue;
 import org.springframework.beans.factory.support.DefaultListableBeanFactory;
@@ -266,7 +268,7 @@ public class PlaceholderTargetSource extends SimpleBeanTargetSource implements I
 
 	private Object getPropertyFromContext(String key) {
 		Object context = contextFactory.getContext();
-		if (context==null) {
+		if (context == null) {
 			throw new IllegalStateException("No context available while replacing placeholders.");
 		}
 		BeanWrapper wrapper = new BeanWrapperImpl(context);
@@ -334,30 +336,47 @@ public class PlaceholderTargetSource extends SimpleBeanTargetSource implements I
 					}
 				}
 
-			} else if (value instanceof Map) {
-				
+			}
+			else if (value instanceof Map) {
+
 				Map map = (Map) value;
 				Map newValue = new ManagedMap(map.size());
 				newValue.putAll(map);
 				super.visitMap(newValue);
 				value = newValue;
-				
-			} else if (value instanceof List) {
-				
+
+			}
+			else if (value instanceof List) {
+
 				List list = (List) value;
 				List newValue = new ManagedList(list.size());
 				newValue.addAll(list);
 				super.visitList(newValue);
 				value = newValue;
-				
-			}  else if (value instanceof Set) {
-				
+
+			}
+			else if (value instanceof Set) {
+
 				Set list = (Set) value;
 				Set newValue = new ManagedSet(list.size());
 				newValue.addAll(list);
 				super.visitSet(newValue);
 				value = newValue;
-				
+
+			}
+			else if (value instanceof BeanDefinition) {
+
+				BeanDefinition newValue = new GenericBeanDefinition((BeanDefinition) value);
+				visitBeanDefinition((BeanDefinition) newValue);
+				value = newValue;
+
+			}
+			else if (value instanceof BeanDefinitionHolder) {
+
+				BeanDefinition newValue = new GenericBeanDefinition(((BeanDefinitionHolder) value).getBeanDefinition());
+				visitBeanDefinition((BeanDefinition) newValue);
+				value = newValue;
+
 			}
 			else {
 
