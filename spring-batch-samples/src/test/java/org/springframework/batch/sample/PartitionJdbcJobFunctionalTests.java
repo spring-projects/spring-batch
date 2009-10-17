@@ -47,10 +47,6 @@ public class PartitionJdbcJobFunctionalTests extends AbstractJobTests {
 	@Qualifier("inputTestReader")
 	private ItemReader<CustomerCredit> inputReader;
 
-	@Autowired
-	@Qualifier("outputTestReader")
-	private ItemReader<CustomerCredit> outputReader;
-
 	/**
 	 * Check the resulting credits correspond to inputs increased by fixed
 	 * amount.
@@ -68,6 +64,8 @@ public class PartitionJdbcJobFunctionalTests extends AbstractJobTests {
 		JobExecution jobExecution = this.launchJob();
 		assertEquals(BatchStatus.COMPLETED, jobExecution.getStatus());
 
+		@SuppressWarnings("unchecked")
+		ItemReader<CustomerCredit> outputReader = (ItemReader<CustomerCredit>) getApplicationContext().getBean("outputTestReader");
 		open(outputReader);
 		List<CustomerCredit> outputs = new ArrayList<CustomerCredit>(getCredits(outputReader));
 		close(outputReader);

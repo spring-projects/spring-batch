@@ -1,6 +1,6 @@
 package org.springframework.batch.sample.common;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 
 import org.junit.Test;
 import org.springframework.batch.core.JobExecution;
@@ -38,7 +38,7 @@ public class OutputFileListenerTests {
 		listener.setInputKeyName("spam");
 		stepExecution.getExecutionContext().putString("spam", "bar");
 		listener.createOutputNameFromInput(stepExecution);
-		assertEquals("{outputFile=bar.csv, spam=bar}", stepExecution.getExecutionContext().toString());
+		assertEquals("bar.csv", stepExecution.getExecutionContext().getString("outputFile"));
 	}
 
 }
