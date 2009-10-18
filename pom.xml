@@ -6,7 +6,7 @@
 	<name>Spring Batch</name>
 	<description>Spring Batch provides tools for enterprise batch or bulk processing. It can be used to wire up jobs, and track
 	their execution, or simply as an optimization for repetitive processing in a transactional environment. Spring Batch is part of the Spring Portfolio.</description>
-	<version>2.0.4.RELEASE</version>
+	<version>2.0.5.CI-SNAPSHOT</version>
 	<packaging>pom</packaging>
 	<modules>
 		<module>spring-batch-parent</module>
@@ -20,9 +20,9 @@
 		<url>http://www.springsource.com</url>
 	</organization>
 	<scm>
-		<url>https://fisheye.springframework.org/browse/spring-batch/tags/2.0.4.RELEASE</url>
-		<connection>scm:svn:https://src.springframework.org/svn/spring-batch/tags/2.0.4.RELEASE</connection>
-		<developerConnection>scm:svn:https://src.springframework.org/svn/spring-batch/tags/2.0.4.RELEASE</developerConnection>
+		<url>https://fisheye.springframework.org/browse/spring-batch</url>
+		<connection>scm:svn:https://src.springframework.org/svn/spring-batch/trunk</connection>
+		<developerConnection>scm:svn:https://src.springframework.org/svn/spring-batch/trunk</developerConnection>
 	</scm>
 	<issueManagement>
 		<system>JIRA</system>
