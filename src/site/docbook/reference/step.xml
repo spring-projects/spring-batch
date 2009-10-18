@@ -54,13 +54,13 @@
     <para>Below is a code representation of the same concepts shown
     above:</para>
 
-    <programlisting>List items = new Arraylist();
-for(int i = 0; i &lt; commitInterval; i++){
+    <programlisting><![CDATA[List items = new Arraylist();
+for(int i = 0; i < commitInterval; i++){
     Object item = itemReader.read()
     Object processedItem = itemProcessor.process(item);
     items.add(processedItem);
 }
-itemWriter.write(items);</programlisting>
+itemWriter.write(items);]]></programlisting>
 
     <section id="configuringAStep">
       <title>Configuring a Step</title>
@@ -70,13 +70,13 @@ itemWriter.write(items);</programlisting>
       potentially contain many collaborators. In order to ease configuration,
       the Spring Batch namespace can be used:</para>
 
-      <programlisting>&lt;job id="sampleJob" job-repository="jobRepository"&gt;
-    &lt;step id="step1"&gt;
-        &lt;tasklet transaction-manager="transactionManager"&gt;
-            &lt;chunk reader="itemReader" writer="itemWriter" commit-interval="10"/&gt;
-        &lt;tasklet&gt;
-    &lt;/step&gt;
-&lt;/job&gt;</programlisting>
+      <programlisting><![CDATA[<job id="sampleJob" job-repository="jobRepository">
+    <step id="step1">
+        <tasklet transaction-manager="transactionManager">
+            <chunk reader="itemReader" writer="itemWriter" commit-interval="10"/>
+        <tasklet>
+    </step>
+</job>]]></programlisting>
 
       <para>The configuration above represents the only required dependencies
       to create a item-oriented step:<itemizedlist>
@@ -175,17 +175,17 @@ itemWriter.write(items);</programlisting>
       allowStartIfComplete=true. Additionally, the commitInterval will be '5'
       since it is overridden by the "concreteStep1":</para>
 
-      <programlisting>&lt;step id="parentStep"&gt;
-    &lt;tasklet allow-start-if-complete="true"&gt;
-        &lt;chunk reader="itemReader" writer="itemWriter" commit-interval="10"/&gt;
-    &lt;/tasklet&gt;
-&lt;/step&gt;
+      <programlisting><![CDATA[<step id="parentStep">
+    <tasklet allow-start-if-complete="true">
+        <chunk reader="itemReader" writer="itemWriter" commit-interval="10"/>
+    </tasklet>
+</step>
 
-&lt;step id="concreteStep1" parent="parentStep"&gt;
-    &lt;tasklet start-limit="5"&gt;
-        &lt;chunk processor="itemProcessor" commit-interval="5"/&gt;
-    &lt;/tasklet&gt;
-&lt;/step&gt;</programlisting>
+<step id="concreteStep1" parent="parentStep">
+    <tasklet start-limit="5">
+        <chunk processor="itemProcessor" commit-interval="5"/>
+    </tasklet>
+</step>]]></programlisting>
 
       <section id="abstractStep">
         <title>Abstract Step</title>
@@ -205,17 +205,17 @@ itemWriter.write(items);</programlisting>
         be abstract. The <classname>Step</classname> "concreteStep2" will have
         'itemReader', 'itemWriter', and commitInterval=10.</para>
 
-        <programlisting>&lt;step id="abstractParentStep" abstract="true"&gt;
-    &lt;tasklet&gt;
-        &lt;chunk commit-interval="10"/&gt;
-    &lt;/tasklet&gt;
-&lt;/step&gt;
+        <programlisting><![CDATA[<step id="abstractParentStep" abstract="true">
+    <tasklet>
+        <chunk commit-interval="10"/>
+    </tasklet>
+</step>
 
-&lt;step id="concreteStep2" parent="abstractParentStep"&gt;
-    &lt;tasklet&gt;
-        &lt;chunk reader="itemReader" writer="itemWriter"/&gt;
-    &lt;/tasklet&gt;
-&lt;/step&gt;</programlisting>
+<step id="concreteStep2" parent="abstractParentStep">
+    <tasklet>
+        <chunk reader="itemReader" writer="itemWriter"/>
+    </tasklet>
+</step>]]></programlisting>
       </section>
 
       <section id="mergingListsOnStep">
@@ -236,20 +236,20 @@ itemWriter.write(items);</programlisting>
         <classname>listenerOne</classname> and
         <classname>listenerTwo</classname>:</para>
 
-        <programlisting>&lt;step id="listenersParentStep" abstract="true"&gt;
-    &lt;listeners&gt;
-        &lt;listener ref="listenerOne"/&gt;
-    &lt;listeners&gt;
-&lt;/step&gt;
+        <programlisting><![CDATA[<step id="listenersParentStep" abstract="true">
+    <listeners>
+        <listener ref="listenerOne"/>
+    <listeners>
+</step>
 
-&lt;step id="concreteStep3" parent="listenersParentStep"&gt;
-    &lt;tasklet&gt;
-        &lt;chunk reader="itemReader" writer="itemWriter" commit-interval="5"/&gt;
-        &lt;listeners merge="true"&gt;
-            &lt;listener ref="listenerTwo"/&gt;
-        &lt;listeners&gt;
-    &lt;/tasklet&gt;
-&lt;/step&gt;</programlisting>
+<step id="concreteStep3" parent="listenersParentStep">
+    <tasklet>
+        <chunk reader="itemReader" writer="itemWriter" commit-interval="5"/>
+        <listeners merge="true">
+            <listener ref="listenerTwo"/>
+        <listeners>
+    </tasklet>
+</step>]]></programlisting>
       </section>
     </section>
 
@@ -341,26 +341,26 @@ itemWriter.write(items);</programlisting>
       <section id="stepRestartExample">
         <title>Step Restart Configuration Example</title>
 
-        <programlisting>&lt;job id="footballJob" restartable="true"&gt;
-    &lt;step id="playerload" next="gameLoad"&gt;
-        &lt;tasklet&gt;
-            &lt;chunk reader="playerFileItemReader" writer="playerWriter" 
-                   commit-interval="10" /&gt;
-        &lt;/tasklet&gt;
-    &lt;/step&gt;
-    &lt;step id="gameLoad" next="playerSummarization"&gt;
-        &lt;tasklet allow-start-if-complete="true"&gt;
-            &lt;chunk reader="gameFileItemReader" writer="gameWriter" 
-                   commit-interval="10"/&gt;
-        &lt;/tasklet&gt;
-    &lt;/step&gt;
-    &lt;step id="playerSummarization"&gt;
-        &lt;tasklet start-limit="3"&gt;
-            &lt;chunk reader="playerSummarizationSource" writer="summaryWriter" 
-                   commit-interval="10"/&gt;
-        &lt;/tasklet&gt;
-    &lt;/step&gt;
-&lt;/job&gt;</programlisting>
+        <programlisting><![CDATA[<job id="footballJob" restartable="true">
+    <step id="playerload" next="gameLoad">
+        <tasklet>
+            <chunk reader="playerFileItemReader" writer="playerWriter" 
+                   commit-interval="10" />
+        </tasklet>
+    </step>
+    <step id="gameLoad" next="playerSummarization">
+        <tasklet allow-start-if-complete="true">
+            <chunk reader="gameFileItemReader" writer="gameWriter" 
+                   commit-interval="10"/>
+        </tasklet>
+    </step>
+    <step id="playerSummarization">
+        <tasklet start-limit="3">
+            <chunk reader="playerSummarizationSource" writer="summaryWriter" 
+                   commit-interval="10"/>
+        </tasklet>
+    </step>
+</job>]]></programlisting>
 
         <para>The above example configuration is for a job that loads in
         information about football games and summarizes them. It contains
@@ -570,14 +570,14 @@ itemWriter.write(items);</programlisting>
       the <classname>Step</classname> can be configured with a list of
       exceptions that should not cause rollback.</para>
 
-      <programlisting>&lt;step id="step1"&gt;
-   &lt;tasklet&gt;
-      &lt;chunk reader="itemReader" writer="itemWriter" commit-interval="2"/&gt;
-      &lt;no-rollback-exception-classes&gt;
-         &lt;include class="org.springframework.batch.item.validator.ValidationException"/&gt;
-      &lt;/no-rollback-exception-classes&gt;
-   &lt;/tasklet&gt;
-&lt;/step&gt;</programlisting>
+      <programlisting><![CDATA[<step id="step1">
+   <tasklet>
+      <chunk reader="itemReader" writer="itemWriter" commit-interval="2"/>
+      <no-rollback-exception-classes>
+         <include class="org.springframework.batch.item.validator.ValidationException"/>
+      </no-rollback-exception-classes>
+   </tasklet>
+</step>]]></programlisting>
 
       <section id="transactionalReaders">
         <title>Transactional Readers</title>
@@ -609,14 +609,14 @@ itemWriter.write(items);</programlisting>
       transaction attributes can be found in the spring core
       documentation.</para>
 
-      <programlisting>&lt;step id="step1"&gt;
-    &lt;tasklet&gt;
-        &lt;chunk reader="itemReader" writer="itemWriter" commit-interval="2"/&gt;
-        &lt;transaction-attributes isolation="DEFAULT" 
+      <programlisting><![CDATA[<step id="step1">
+    <tasklet>
+        <chunk reader="itemReader" writer="itemWriter" commit-interval="2"/>
+        <transaction-attributes isolation="DEFAULT" 
                                 propagation="REQUIRED" 
-                                timeout="30"/&gt;
-    &lt;/tasklet&gt;
-&lt;/step&gt;</programlisting>
+                                timeout="30"/>
+    </tasklet>
+</step>]]></programlisting>
     </section>
 
     <section id="registeringItemStreams">
@@ -689,14 +689,14 @@ itemWriter.write(items);</programlisting>
       interface (or an extension thereof) can be applied to a step via the
       listeners element:</para>
 
-      <programlisting>&lt;step id="step1"&gt;
-    &lt;tasklet&gt;
-        &lt;chunk reader="reader" writer="writer" commit-interval="10"/&gt;
-        &lt;listeners&gt;
-            &lt;listener ref="stepListener"/&gt;
-        &lt;/listeners&gt;
-    &lt;/tasklet&gt;
-&lt;/step&gt;</programlisting>
+      <programlisting><![CDATA[<step id="step1">
+    <tasklet>
+        <chunk reader="reader" writer="writer" commit-interval="10"/>
+        <listeners>
+            <listener ref="stepListener"/>
+        </listeners>
+    </tasklet>
+</step>]]></programlisting>
 
       <para>An <classname>ItemReader</classname>,
       <classname>ItemWriter</classname> or
@@ -710,7 +710,15 @@ itemWriter.write(items);</programlisting>
       explicitly registered (as described above).</para>
 
       <para>In addition to the <classname>StepListener</classname> interfaces,
-      annotations are provided to address the same concerns.</para>
+      annotations are provided to address the same concerns. Plain old Java
+      objects can have methods with these annotations that are then converted
+      into the corresponding <classname>StepListener</classname> type. It is
+      also common to annotate custom implementations of chunk components like
+      <classname>ItemReader</classname> or <classname>ItemWriter</classname>
+      or <classname>Tasklet</classname>. The annotations are analysed by the
+      XML parser for the <code>&lt;listener/&gt;</code> elements, so all you
+      need to do is use the XML namespace to register the listeners with a
+      step.</para>
 
       <section id="stepExecutionListener">
         <title>StepExecutionListener</title>
@@ -720,13 +728,13 @@ itemWriter.write(items);</programlisting>
         for notification before a <classname>Step</classname> is started and
         after it has ends, whether it ended normally or failed:</para>
 
-        <programlisting>public interface StepExecutionListener extends StepListener {
+        <programlisting><![CDATA[public interface StepExecutionListener extends StepListener {
 
     void beforeStep(StepExecution stepExecution);
 
     ExitStatus afterStep(StepExecution stepExecution);
 
-}</programlisting>
+}]]></programlisting>
 
         <para><classname>ExitStatus</classname> is the return type of
         <methodname>afterStep</methodname> in order to allow listeners the
@@ -755,13 +763,13 @@ itemWriter.write(items);</programlisting>
         useful to perform logic before a chunk begins processing or after a
         chunk has completed:</para>
 
-        <programlisting>public interface ChunkListener extends StepListener {
+        <programlisting><![CDATA[public interface ChunkListener extends StepListener {
 
     void beforeChunk();
 
     void afterChunk();
 
-}</programlisting>
+}]]></programlisting>
 
         <para>The <methodname>beforeChunk</methodname> method is called after
         the transaction is started, but before <methodname>read</methodname>
@@ -790,7 +798,7 @@ itemWriter.write(items);</programlisting>
         <para>When discussing skip logic above, it was mentioned that it may
         be beneficial to log out skipped records, so that they can be deal
         with later. In the case of read errors, this can be done with an
-        <classname>ItemReaderListener:</classname><programlisting>public interface ItemReadListener&lt;T&gt; extends StepListener {
+        <classname>ItemReaderListener:</classname><programlisting><![CDATA[public interface ItemReadListener<T> extends StepListener {
   
     void beforeRead();
 
@@ -798,7 +806,7 @@ itemWriter.write(items);</programlisting>
     
     void onReadError(Exception ex);
 
-}</programlisting></para>
+}]]></programlisting></para>
 
         <para>The <methodname>beforeRead</methodname> method will be called
         before each call to <methodname>read</methodname> on the
@@ -833,7 +841,7 @@ itemWriter.write(items);</programlisting>
         <para>Just as with the <classname>ItemReadListener</classname>, the
         processing of an item can be 'listened' to:</para>
 
-        <programlisting>public interface ItemProcessListener&lt;T, S&gt; extends StepListener {
+        <programlisting><![CDATA[public interface ItemProcessListener<T, S> extends StepListener {
 
     void beforeProcess(T item);
 
@@ -841,7 +849,7 @@ itemWriter.write(items);</programlisting>
 
     void onProcessError(T item, Exception e);
 
-}</programlisting>
+}]]></programlisting>
 
         <para>The <methodname>beforeProcess</methodname> method will be called
         before <methodname>process</methodname> on the
@@ -876,15 +884,15 @@ itemWriter.write(items);</programlisting>
         <para>The writing of an item can be 'listened' to with the
         <classname>ItemWriteListener</classname>:</para>
 
-        <programlisting>  public interface ItemWriteListener&lt;S&gt; extends StepListener {
+        <programlisting><![CDATA[  public interface ItemWriteListener<S> extends StepListener {
 
-    void beforeWrite(List&lt;? extends S&gt; items);
+    void beforeWrite(List<? extends S> items);
 
-    void afterWrite(List&lt;? extends S&gt; items);
+    void afterWrite(List<? extends S> items);
 
-    void onWriteError(Exception exception, List&lt;? extends S&gt; items);
+    void onWriteError(Exception exception, List<? extends S> items);
 
-}</programlisting>
+}]]></programlisting>
 
         <para>The <methodname>beforeWrite</methodname> method will be called
         before <methodname>write</methodname> on the
@@ -924,8 +932,8 @@ itemWriter.write(items);</programlisting>
         this reason, there is a separate interface for tracking skipped
         items:</para>
 
-        <programlisting>
-  public interface SkipListener&lt;T,S&gt; extends StepListener {
+        <programlisting><![CDATA[
+  public interface SkipListener<T,S> extends StepListener {
 
     void onSkipInRead(Throwable t);
 
@@ -933,7 +941,7 @@ itemWriter.write(items);</programlisting>
 
     void onSkipInWrite(S item, Throwable t);
 
-}</programlisting>
+}]]></programlisting>
 
         <para><methodname>onSkipInRead</methodname> will be called whenever an
         item is skipped while reading. It should be noted that rollbacks may
@@ -1034,12 +1042,12 @@ itemWriter.write(items);</programlisting>
       this class without having to write an adapter for the
       <classname>Tasklet</classname> interface:</para>
 
-      <programlisting>&lt;bean id="myTasklet" class="org.springframework.batch.core.step.tasklet.TaskletAdapter"&gt;
-    &lt;property name="targetObject"&gt;
-        &lt;bean class="org.mycompany.FooDao"&gt;
-    &lt;/property&gt;
-    &lt;property name="targetMethod" value="updateFoo" /&gt;
-&lt;/bean&gt;</programlisting>
+      <programlisting><![CDATA[<bean id="myTasklet" class="org.springframework.batch.core.step.tasklet.TaskletAdapter">
+    <property name="targetObject">
+        <bean class="org.mycompany.FooDao">
+    </property>
+    <property name="targetMethod" value="updateFoo" />
+</bean>]]></programlisting>
     </section>
 
     <section id="exampleTaskletImplementation">
@@ -1054,7 +1062,7 @@ itemWriter.write(items);</programlisting>
       project, is a <classname>Tasklet</classname> implementation with just
       such a responsibility:</para>
 
-      <programlisting>public class FileDeletingTasklet implements Tasklet, InitializingBean {
+      <programlisting><![CDATA[public class FileDeletingTasklet implements Tasklet, InitializingBean {
 
     private Resource directory;
 
@@ -1064,7 +1072,7 @@ itemWriter.write(items);</programlisting>
         Assert.state(dir.isDirectory());
     
         File[] files = dir.listFiles();
-        for (int i = 0; i &lt; files.length; i++) {
+        for (int i = 0; i < files.length; i++) {
             boolean deleted = files[i].delete();
             if (!deleted) {
                 throw new UnexpectedJobExecutionException("Could not delete file " + 
@@ -1081,7 +1089,7 @@ itemWriter.write(items);</programlisting>
     public void afterPropertiesSet() throws Exception {
         Assert.notNull(directory, "directory must be set");
     }
-}</programlisting>
+}]]></programlisting>
 
       <para>The above <classname>Tasklet</classname> implementation will
       delete all files within a given directory. It should be noted that the
@@ -1089,21 +1097,21 @@ itemWriter.write(items);</programlisting>
       that is left is to reference the <classname>Tasklet</classname> from the
       <classname>Step</classname>:</para>
 
-      <programlisting>&lt;job id="taskletJob"&gt;
-    &lt;step id="deleteFilesInDir"&gt;
-       &lt;tasklet ref="fileDeletingTasklet"/&gt;
-    &lt;/step&gt;
-&lt;/job&gt;
+      <programlisting><![CDATA[<job id="taskletJob">
+    <step id="deleteFilesInDir">
+       <tasklet ref="fileDeletingTasklet"/>
+    </step>
+</job>
 
-&lt;beans:bean id="fileDeletingTasklet" 
-            class="org.springframework.batch.sample.tasklet.FileDeletingTasklet"&gt;
-    &lt;beans:property name="directoryResource"&gt;
-        &lt;beans:bean id="directory" 
-                    class="org.springframework.core.io.FileSystemResource"&gt;
-            &lt;beans:constructor-arg value="target/test-outputs/test-dir" /&gt;
-        &lt;/beans:bean&gt;
-    &lt;/beans:property&gt;
-&lt;/beans:bean&gt;</programlisting>
+<beans:bean id="fileDeletingTasklet" 
+            class="org.springframework.batch.sample.tasklet.FileDeletingTasklet">
+    <beans:property name="directoryResource">
+        <beans:bean id="directory" 
+                    class="org.springframework.core.io.FileSystemResource">
+            <beans:constructor-arg value="target/test-outputs/test-dir" />
+        </beans:bean>
+    </beans:property>
+</beans:bean>]]></programlisting>
     </section>
   </section>
 
@@ -1140,15 +1148,15 @@ itemWriter.write(items);</programlisting>
       <para>This can be achieved using the 'next' attribute of the step
       element:</para>
 
-      <para><programlisting>&lt;job id="job"&gt;
-    &lt;step id="stepA" parent="s1" next="stepB" /&gt;
-    &lt;step id="stepB" parent="s2" next="stepC"/&gt;
-    &lt;step id="stepC" parent="s3" /&gt;
-&lt;/job&gt;</programlisting>In the scenario above, 'step A' will execute
-      first because it is the first <classname>Step</classname> listed. If
-      'step A' completes normally, then 'step B' will execute, and so on.
-      However, if 'step A' fails, then the entire <classname>Job</classname>
-      will fail and 'step B' will not execute.</para>
+      <para><programlisting><![CDATA[<job id="job">
+    <step id="stepA" parent="s1" next="stepB" />
+    <step id="stepB" parent="s2" next="stepC"/>
+    <step id="stepC" parent="s3" />
+</job>]]></programlisting>In the scenario above, 'step A' will execute first
+      because it is the first <classname>Step</classname> listed. If 'step A'
+      completes normally, then 'step B' will execute, and so on. However, if
+      'step A' fails, then the entire <classname>Job</classname> will fail and
+      'step B' will not execute.</para>
 
       <note>
         <para>With the Spring Batch namespace, the first step listed in the
@@ -1206,14 +1214,14 @@ itemWriter.write(items);</programlisting>
       <para>The next element specifies a pattern to match and the step to
       execute next:</para>
 
-      <para><programlisting>&lt;job id="job"&gt;
-    &lt;step id="stepA" parent="s1"&gt;
-        &lt;next on="*" to="stepB" /&gt;
-        &lt;next on="FAILED" to="stepC" /&gt;
-    &lt;/step&gt;
-    &lt;step id="stepB" parent="s2" next="stepC" /&gt;
-    &lt;step id="stepC" parent="s3" /&gt;
-&lt;/job&gt;</programlisting></para>
+      <para><programlisting><![CDATA[<job id="job">
+    <step id="stepA" parent="s1">
+        <next on="*" to="stepB" />
+        <next on="FAILED" to="stepC" />
+    </step>
+    <step id="stepB" parent="s2" next="stepC" />
+    <step id="stepC" parent="s3" />
+</job>]]></programlisting></para>
 
       <para>The "on" attribute of a transition element uses a simple
       pattern-matching scheme to match the <classname>ExitStatus</classname>
@@ -1261,7 +1269,7 @@ itemWriter.write(items);</programlisting>
         it fails, and so on. The example above contains the following 'next'
         element:</para>
 
-        <programlisting>&lt;next on="FAILED" to="stepB" /&gt;</programlisting>
+        <programlisting><![CDATA[<next on="FAILED" to="stepB" />]]></programlisting>
 
         <para>At first glance, it would appear that the 'on' attribute
         references the <classname>BatchStatus</classname> of the
@@ -1278,11 +1286,11 @@ itemWriter.write(items);</programlisting>
         code needs to be different? A good example comes from the skip sample
         job within the samples project:</para>
 
-        <programlisting>&lt;step id="step1" parent="s1"&gt;
-    &lt;end on="FAILED" /&gt;
-    &lt;next on="COMPLETED WITH SKIPS" to="errorPrint1" /&gt;
-    &lt;next on="*" to="step2" /&gt;
-&lt;/step&gt;</programlisting>
+        <programlisting><![CDATA[<step id="step1" parent="s1">
+    <end on="FAILED" />
+    <next on="COMPLETED WITH SKIPS" to="errorPrint1" />
+    <next on="*" to="step2" />
+</step>]]></programlisting>
 
         <para>The above step has three possibilities:</para>
 
@@ -1308,12 +1316,12 @@ itemWriter.write(items);</programlisting>
         change the exit code based on the condition of the execution having
         skipped records:</para>
 
-        <programlisting>public class SkipCheckingListener extends StepExecutionListenerSupport {
+        <programlisting><![CDATA[public class SkipCheckingListener extends StepExecutionListenerSupport {
 
     public ExitStatus afterStep(StepExecution stepExecution) {
         String exitCode = stepExecution.getExitStatus().getExitCode();
-        if (!exitCode.equals(ExitStatus.FAILED.getExitCode()) &amp;&amp; 
-              stepExecution.getSkipCount() &gt; 0) {
+        if (!exitCode.equals(ExitStatus.FAILED.getExitCode()) && 
+              stepExecution.getSkipCount() > 0) {
             return new ExitStatus("COMPLETED WITH SKIPS");
         }
         else {
@@ -1321,7 +1329,7 @@ itemWriter.write(items);</programlisting>
         }
     }
 
-}</programlisting>
+}]]></programlisting>
 
         <para>The above code is a <classname>StepExecutionListener</classname>
         that first checks to make sure the <classname>Step</classname> was
@@ -1349,7 +1357,7 @@ itemWriter.write(items);</programlisting>
       after the following step executes, the <classname>Job</classname> will
       end:</para>
 
-      <para><programlisting>&lt;step id="stepC" parent="s3"/&gt;</programlisting></para>
+      <para><programlisting><![CDATA[<step id="stepC" parent="s3"/>]]></programlisting></para>
 
       <para>If no transitions are defined for a <classname>Step</classname>,
       then the <classname>Job</classname>'s statuses will be defined as
@@ -1408,14 +1416,14 @@ itemWriter.write(items);</programlisting>
         fails, the <classname>Job</classname> will not be restartable (because
         the status is COMPLETED).</para>
 
-        <programlisting>&lt;step id="step1" parent="s1" next="step2"&gt;
+        <programlisting><![CDATA[<step id="step1" parent="s1" next="step2">
 
-&lt;step id="step2" parent="s2"&gt;
-    &lt;end on="FAILED"/&gt;
-    &lt;next on="*" to="step3"/&gt;
-&lt;/step&gt;
+<step id="step2" parent="s2">
+    <end on="FAILED"/>
+    <next on="*" to="step3"/>
+</step>
 
-&lt;step id="step3" parent="s3"&gt;</programlisting>
+<step id="step3" parent="s3">]]></programlisting>
       </section>
 
       <section id="failElement">
@@ -1439,14 +1447,14 @@ itemWriter.write(items);</programlisting>
         Additionally, if step2 fails, and the <classname>Job</classname> is
         restarted, then execution will begin again on step2.</para>
 
-        <programlisting>&lt;step id="step1" parent="s1" next="step2"&gt;
+        <programlisting><![CDATA[<step id="step1" parent="s1" next="step2">
 
-&lt;step id="step2" parent="s2"&gt;
-    &lt;fail on="FAILED" exit-code="EARLY TERMINATION"/&gt;
-    &lt;next on="*" to="step3"/&gt;
-&lt;/step&gt;
+<step id="step2" parent="s2">
+    <fail on="FAILED" exit-code="EARLY TERMINATION"/>
+    <next on="*" to="step3"/>
+</step>
 
-&lt;step id="step3" parent="s3"&gt;</programlisting>
+<step id="step3" parent="s3">]]></programlisting>
       </section>
 
       <section id="stopElement">
@@ -1464,11 +1472,11 @@ itemWriter.write(items);</programlisting>
         the job will then stop. Once it is restarted, execution will begin on
         step2.</para>
 
-        <para><programlisting>&lt;step id="step1" parent="s1"&gt;
-    &lt;stop on="COMPLETED" restart="step2"/&gt;
-&lt;/step&gt;
+        <para><programlisting><![CDATA[<step id="step1" parent="s1">
+    <stop on="COMPLETED" restart="step2"/>
+</step>
 
-&lt;step id="step2" parent="s2"/&gt;</programlisting></para>
+<step id="step2" parent="s2"/>]]></programlisting></para>
       </section>
     </section>
 
@@ -1481,7 +1489,7 @@ itemWriter.write(items);</programlisting>
       <classname>JobExecutionDecider</classname> can be used to assist in the
       decision.</para>
 
-      <para><programlisting>public class MyDecider implements JobExecutionDecider {
+      <para><programlisting><![CDATA[public class MyDecider implements JobExecutionDecider {
     public String decide(JobExecution jobExecution, StepExecution stepExecution) {
         if (someCondition) {
             return "FAILED";
@@ -1490,24 +1498,24 @@ itemWriter.write(items);</programlisting>
             return "COMPLETED";
         }
     }
-}</programlisting></para>
+}]]></programlisting></para>
 
       <para>In the job configuration, a "decision" tag will specify the
       decider to use as well as all of the transitions.</para>
 
-      <para><programlisting>&lt;job id="job"&gt;
-    &lt;step id="step1" parent="s1" next="decision" /&gt;
+      <para><programlisting><![CDATA[<job id="job">
+    <step id="step1" parent="s1" next="decision" />
     
-    &lt;decision id="decision" decider="decider"&gt;
-        &lt;next on="FAILED" to="step2" /&gt;
-        &lt;next on="COMPLETED" to="step3" /&gt;
-    &lt;/decision&gt;
+    <decision id="decision" decider="decider">
+        <next on="FAILED" to="step2" />
+        <next on="COMPLETED" to="step3" />
+    </decision>
 
-    &lt;step id="step2" parent="s2" next="step3"/&gt;
-    &lt;step id="step3" parent="s3" /&gt;
-&lt;/job&gt;
+    <step id="step2" parent="s2" next="step3"/>
+    <step id="step3" parent="s3" />
+</job>
 
-&lt;beans:bean id="decider" class="com.MyDecider"/&gt;</programlisting></para>
+<beans:bean id="decider" class="com.MyDecider"/>]]></programlisting></para>
     </section>
 
     <section id="split-flows">
@@ -1524,16 +1532,16 @@ itemWriter.write(items);</programlisting>
       elements such as the 'next' attribute or the 'next', 'end', 'fail', or
       'pause' elements.</para>
 
-      <programlisting>&lt;split id="split1" next="step4"&gt;
-    &lt;flow&gt;
-        &lt;step id="step1" parent="s1" next="step2"/&gt;
-        &lt;step id="step2" parent="s2"/&gt;
-    &lt;/flow&gt;
-    &lt;flow&gt;
-        &lt;step id="step3" parent="s3"/&gt;
-    &lt;/flow&gt;
-&lt;/split&gt;
-&lt;step id="step4" parent="s4"/&gt;</programlisting>
+      <programlisting><![CDATA[<split id="split1" next="step4">
+    <flow>
+        <step id="step1" parent="s1" next="step2"/>
+        <step id="step2" parent="s2"/>
+    </flow>
+    <flow>
+        <step id="step3" parent="s3"/>
+    </flow>
+</split>
+<step id="step4" parent="s4"/>]]></programlisting>
     </section>
   </section>
 
@@ -1547,11 +1555,11 @@ itemWriter.write(items);</programlisting>
     Flat File resources can be configured using standard Spring
     constructs:</para>
 
-    <programlisting>&lt;bean id="flatFileItemReader"
-      class="org.springframework.batch.item.file.FlatFileItemReader"&gt;
-    &lt;property name="resource"
-              value="file://outputs/20070122.testStream.CustomerReportStep.TEMP.txt" /&gt;
-&lt;/bean&gt;</programlisting>
+    <programlisting><![CDATA[<bean id="flatFileItemReader"
+      class="org.springframework.batch.item.file.FlatFileItemReader">
+    <property name="resource"
+              value="file://outputs/20070122.testStream.CustomerReportStep.TEMP.txt" />
+</bean>]]></programlisting>
 
     <para>The above <classname>Resource</classname> will load the file from
     the file system location specified. Note that absolute locations have to
@@ -1561,10 +1569,10 @@ itemWriter.write(items);</programlisting>
     at runtime as a parameter to the job. This could be solved using '-D'
     parameters, i.e. a system property:</para>
 
-    <programlisting>&lt;bean id="flatFileItemReader"
-      class="org.springframework.batch.item.file.FlatFileItemReader"&gt;
-    &lt;property name="resource" value="${input.file.name}" /&gt;
-&lt;/bean&gt;</programlisting>
+    <programlisting><![CDATA[<bean id="flatFileItemReader"
+      class="org.springframework.batch.item.file.FlatFileItemReader">
+    <property name="resource" value="${input.file.name}" />
+</bean>]]></programlisting>
 
     <para>All that would be required for this solution to work would be a
     system argument (-Dinput.file.name="file://file.txt"). (Note that although
@@ -1624,17 +1632,17 @@ itemWriter.write(items);</programlisting>
       must be added explicitly, either by using the <literal>batch</literal>
       namespace:</para>
 
-      <programlisting>&lt;beans:beans xmlns="http://www.springframework.org/schema/beans" 
+      <programlisting><![CDATA[<beans:beans xmlns="http://www.springframework.org/schema/beans" 
        xmlns:batch="http://www.springframework.org/schema/batch" 
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-       xsi:schemaLocation="..."&gt;
+       xsi:schemaLocation="...">
 ...
-&lt;/beans:beans&gt;</programlisting>
+</beans:beans>]]></programlisting>
 
       <para>or by including a bean definition explicitly for
       the<classname>Step</classname> (but not both):</para>
 
-      <programlisting>&lt;bean class="org.springframework.batch.core.scope.StepScope" /&gt;</programlisting>
+      <programlisting><![CDATA[<bean class="org.springframework.batch.core.scope.StepScope" />]]></programlisting>
     </section>
   </section>
 </chapter>
