@@ -511,10 +511,6 @@
 		</dependencies>
 	</dependencyManagement>
 	<distributionManagement>
-		<site>
-			<id>static.springframework.org</id>
-			<url>scp://static.springframework.org/var/www/domains/springframework.org/static/htdocs/spring-batch/trunk</url>
-		</site>
 		<repository>
 			<id>spring-release</id>
 			<name>Spring Release Repository</name>
@@ -526,16 +522,6 @@
 			<url>s3://maven.springframework.org/snapshot</url>
 		</snapshotRepository>
 	</distributionManagement>
-	<repositories>
-		<repository>
-			<id>objectstyle</id>
-			<name>ObjectStyle.org Repository</name>
-			<url>http://objectstyle.org/maven2</url>
-			<snapshots>
-				<enabled>false</enabled>
-			</snapshots>
-		</repository>
-	</repositories>
 	<pluginRepositories>
 		<pluginRepository>
 			<id>com.springsource.repository.bundles.milestone</id>

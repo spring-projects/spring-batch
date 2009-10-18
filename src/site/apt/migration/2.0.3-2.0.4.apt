@@ -1,0 +1,19 @@
+Spring Batch 2.1.0.M1 Release Notes
+
+* Bug
+
+  * {{{http://jira.springframework.org/browse/BATCH-1392}[BATCH-1392]}} - Throttle limit is not parsed in ChunkElementParser
+
+  * {{{http://jira.springframework.org/browse/BATCH-1397}[BATCH-1397]}} - Late binding only happens once per ApplicationContext if expression is in substring
+
+  * {{{http://jira.springframework.org/browse/BATCH-1401}[BATCH-1401]}} - All inserts of JobId should be of Types.BIGINT
+
+  * {{{http://jira.springframework.org/browse/BATCH-1408}[BATCH-1408]}} - SimpleJobLauncher package wrong in user guide
+
+  * {{{http://jira.springframework.org/browse/BATCH-1410}[BATCH-1410]}} - Isolation Level in the example in user guide is not supported
+
+  * {{{http://jira.springframework.org/browse/BATCH-1417}[BATCH-1417]}} - Error in FlatFileItemReader when RecordSeparatorPolicy.preProcess readLine returns null
+
+  * {{{http://jira.springframework.org/browse/BATCH-1420}[BATCH-1420]}} - Late Binding only happens first time when using inner bean definition with collection property
+
+  * {{{http://jira.springframework.org/browse/BATCH-1423}[BATCH-1423]}} - Upon job restart, step with FlatFileItemReader doesn't honor skippable-exception-classes
