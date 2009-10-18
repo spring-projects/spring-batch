@@ -1,6 +1,6 @@
 Spring Batch 2.1.0.M1 Release Notes
 
-** Bug
+* Bug
 
   * {{{http://jira.springframework.org/browse/BATCH-1392}[BATCH-1392]}} - Throttle limit is not parsed in ChunkElementParser
 

@@ -1,6 +1,6 @@
 Spring Batch 2.1.0.M1 Release Notes
 
-** Sub-task
+* Sub-task
 
   * {{{http://jira.springsource.org/browse/BATCH-1298}[BATCH-1298]}} - no-rollback-exception-classes ignored by non-chunk-oriented TaskletStep
 
@@ -12,7 +12,7 @@ Spring Batch 2.1.0.M1 Release Notes
 
   * {{{http://jira.springsource.org/browse/BATCH-1381}[BATCH-1381]}} - Update docs for <include/> and <exclude/> in exception lists
 
-** Bug
+* Bug
 
   * {{{http://jira.springsource.org/browse/BATCH-1390}[BATCH-1390]}} - ExecutionContextPromotionListener erases previous step
 
@@ -26,7 +26,7 @@ Spring Batch 2.1.0.M1 Release Notes
 
   * {{{http://jira.springsource.org/browse/BATCH-1413}[BATCH-1413]}} - A typo in the 11.8 of reference documentation 
 
-** Improvement
+* Improvement
 
   * {{{http://jira.springsource.org/browse/BATCH-630}[BATCH-630]}} - Possibility to trim input line and fields in Fieldset in LineTokenizer
 
@@ -46,7 +46,7 @@ Spring Batch 2.1.0.M1 Release Notes
 
   * {{{http://jira.springsource.org/browse/BATCH-1409}[BATCH-1409]}} - More efficient use of pool threads in repeat template (hence multi-threaded steps)
 
-** New Feature
+* New Feature
 
   * {{{http://jira.springsource.org/browse/BATCH-1277}[BATCH-1277]}} - Add JobParametersBuilder.addJobParameter(String key, JobParameter parameter)
 
@@ -66,13 +66,13 @@ Spring Batch 2.1.0.M1 Release Notes
 
   * {{{http://jira.springsource.org/browse/BATCH-1415}[BATCH-1415]}} - Execution context cannot be saved on Oracle (UTF8) when context length is between 2000 and 2500 characters
 
-** Refactoring
+* Refactoring
 
   * {{{http://jira.springsource.org/browse/BATCH-973}[BATCH-973]}} - Switch RetryPolicy back to Throwable instead of Exception as in 1.x
 
   * {{{http://jira.springsource.org/browse/BATCH-1414}[BATCH-1414]}} - Move schema scripts to a package
 
-** Task
+* Task
 
   * {{{http://jira.springsource.org/browse/BATCH-1391}[BATCH-1391]}} - Tidy up skip sample.
 
