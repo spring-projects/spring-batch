@@ -75,8 +75,9 @@ public class ResultHolderResultQueue implements ResultQueue<ResultHolder> {
 	 * @see ResultQueue#expect()
 	 */
 	public void expect() throws InterruptedException {
+		waits.acquire();
+		// Don't acquire the lock in a synchronized block - might deadlock
 		synchronized (lock) {
-			waits.acquire();
 			count++;
 		}
 	}
