@@ -15,22 +15,33 @@
  */
 package org.springframework.batch.core.repository.support;
 
-import static junit.framework.Assert.*;
-import static org.easymock.EasyMock.*;
+import static junit.framework.Assert.assertEquals;
+import static junit.framework.Assert.assertTrue;
+import static junit.framework.Assert.fail;
+import static org.easymock.EasyMock.createMock;
+import static org.easymock.EasyMock.createNiceMock;
+import static org.easymock.EasyMock.expect;
+import static org.easymock.EasyMock.replay;
+import static org.easymock.EasyMock.verify;
 
+import java.sql.Connection;
+import java.sql.DatabaseMetaData;
+
+import javax.sql.DataSource;
+
+import org.junit.Before;
+import org.junit.Test;
 import org.springframework.batch.core.JobParameters;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.item.database.support.DataFieldMaxValueIncrementerFactory;
 import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.support.incrementer.DataFieldMaxValueIncrementer;
+import org.springframework.jdbc.support.lob.DefaultLobHandler;
+import org.springframework.jdbc.support.lob.LobHandler;
+import org.springframework.jdbc.support.lob.OracleLobHandler;
+import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.support.DefaultTransactionDefinition;
-import org.junit.Before;
-import org.junit.Test;
-
-import javax.sql.DataSource;
-import java.sql.Connection;
-import java.sql.DatabaseMetaData;
 
 /**
  * @author Lucas Ward
@@ -82,6 +93,46 @@ public class JobRepositoryFactoryBeanTests {
 		factory.getObject();
 
 		verify(incrementerFactory);
+		
+	}
+
+	@Test
+	public void testOracleLobHandler() throws Exception {
+
+		factory.setDatabaseType("ORACLE");
+		
+		incrementerFactory = createNiceMock(DataFieldMaxValueIncrementerFactory.class);
+		expect(incrementerFactory.isSupportedIncrementerType("ORACLE")).andReturn(true);
+		expect(incrementerFactory.getIncrementer("ORACLE", tablePrefix + "JOB_SEQ")).andReturn(new StubIncrementer());
+		expect(incrementerFactory.getIncrementer("ORACLE", tablePrefix + "JOB_EXECUTION_SEQ")).andReturn(new StubIncrementer());
+		expect(incrementerFactory.getIncrementer("ORACLE", tablePrefix + "STEP_EXECUTION_SEQ")).andReturn(new StubIncrementer());
+		replay(dataSource,incrementerFactory);
+		factory.setIncrementerFactory(incrementerFactory);
+
+		factory.afterPropertiesSet();
+		LobHandler lobHandler = (LobHandler) ReflectionTestUtils.getField(factory, "lobHandler");
+		assertTrue(lobHandler instanceof OracleLobHandler);
+		
+	}
+
+	@Test
+	public void testCustomLobHandler() throws Exception {
+
+		factory.setDatabaseType("ORACLE");
+		
+		incrementerFactory = createNiceMock(DataFieldMaxValueIncrementerFactory.class);
+		expect(incrementerFactory.isSupportedIncrementerType("ORACLE")).andReturn(true);
+		expect(incrementerFactory.getIncrementer("ORACLE", tablePrefix + "JOB_SEQ")).andReturn(new StubIncrementer());
+		expect(incrementerFactory.getIncrementer("ORACLE", tablePrefix + "JOB_EXECUTION_SEQ")).andReturn(new StubIncrementer());
+		expect(incrementerFactory.getIncrementer("ORACLE", tablePrefix + "STEP_EXECUTION_SEQ")).andReturn(new StubIncrementer());
+		replay(dataSource,incrementerFactory);
+		factory.setIncrementerFactory(incrementerFactory);
+		
+		LobHandler lobHandler = new DefaultLobHandler();
+		factory.setLobHandler(lobHandler);
+
+		factory.afterPropertiesSet();
+		assertEquals(lobHandler, ReflectionTestUtils.getField(factory, "lobHandler"));
 		
 	}
 

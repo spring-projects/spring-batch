@@ -51,6 +51,8 @@ public class JobRepositoryParser extends AbstractSingleBeanDefinitionParser {
         
         String tablePrefix = element.getAttribute("table-prefix");
         
+        String lobHandler = element.getAttribute("lob-handler");
+        
         RuntimeBeanReference ds = new RuntimeBeanReference(dataSource);
         builder.addPropertyValue("dataSource", ds);
         RuntimeBeanReference tx = new RuntimeBeanReference(transactionManager);
@@ -60,6 +62,9 @@ public class JobRepositoryParser extends AbstractSingleBeanDefinitionParser {
         }
         if (StringUtils.hasText(tablePrefix)) {
             builder.addPropertyValue("tablePrefix", tablePrefix);
+        }
+        if (StringUtils.hasText(lobHandler)) {
+            builder.addPropertyReference("lobHandler", lobHandler);
         }
 
         builder.setRole(BeanDefinition.ROLE_SUPPORT);

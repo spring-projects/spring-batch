@@ -40,6 +40,8 @@ import org.springframework.beans.factory.FactoryBean;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.jdbc.core.simple.SimpleJdbcOperations;
 import org.springframework.jdbc.core.simple.SimpleJdbcTemplate;
+import org.springframework.jdbc.support.lob.LobHandler;
+import org.springframework.jdbc.support.lob.OracleLobHandler;
 import org.springframework.util.Assert;
 import org.springframework.util.StringUtils;
 
@@ -67,6 +69,21 @@ public class JobRepositoryFactoryBean extends AbstractJobRepositoryFactoryBean i
 	private DataFieldMaxValueIncrementerFactory incrementerFactory;
 
 	private int exitMessageLength = AbstractJdbcBatchMetadataDao.DEFAULT_EXIT_MESSAGE_LENGTH;
+
+	private LobHandler lobHandler;
+
+	/**
+	 * A special handler for large objects. The default is usually fine, except
+	 * for some (usually older) versions of Oracle. The default is determined
+	 * from the data base type.
+	 * 
+	 * @param lobHandler the {@link LobHandler} to set
+	 * 
+	 * @see LobHandler
+	 */
+	public void setLobHandler(LobHandler lobHandler) {
+		this.lobHandler = lobHandler;
+	}
 
 	/**
 	 * Public setter for the exit message length in database. Do not set this if
@@ -122,6 +139,10 @@ public class JobRepositoryFactoryBean extends AbstractJobRepositoryFactoryBean i
 			databaseType = DatabaseType.fromMetaData(dataSource).name();
 			logger.info("No database type set, using meta data indicating: " + databaseType);
 		}
+		
+		if (lobHandler==null && databaseType.equalsIgnoreCase(DatabaseType.ORACLE.toString())) {
+			lobHandler = new OracleLobHandler();
+		}
 
 		Assert.isTrue(incrementerFactory.isSupportedIncrementerType(databaseType), "'" + databaseType
 				+ "' is an unsupported database type.  The supported database types are "
@@ -173,6 +194,9 @@ public class JobRepositoryFactoryBean extends AbstractJobRepositoryFactoryBean i
 		dao.setJdbcTemplate(jdbcTemplate);
 		dao.setTablePrefix(tablePrefix);
 		dao.setClobTypeToUse(determineClobTypeToUse(this.databaseType));
+		if (lobHandler != null) {
+			dao.setLobHandler(lobHandler);
+		}
 		dao.afterPropertiesSet();
 		return dao;
 	}
