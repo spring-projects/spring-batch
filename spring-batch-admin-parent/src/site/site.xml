@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<project name="${project.name}">
+  <bannerLeft>
+    <name>${project.name}</name>
+    <href>http://www.springframework.org/spring-batch</href>
+  </bannerLeft>
+  <bannerRight>
+    <src>images/shim.gif</src>
+  </bannerRight>
+  <poweredBy>
+	  <logo name="" href="" img="images/shim.gif"/>
+  </poweredBy>
+  <skin>
+    <groupId>org.springframework.maven.skins</groupId>
+    <artifactId>maven-spring-skin</artifactId>
+    <version>1.0.5</version>
+  </skin>
+	<body>
+		<links>
+			<item name="Home" href="http://static.springframework.org/spring-batch/index.html"/>
+		</links>
+	</body>
+</project>
