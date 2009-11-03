@@ -189,9 +189,10 @@ public class FaultTolerantStepFactoryBeanTests {
 		assertStepExecutionsAreEqual(stepExecution, repository.getLastStepExecution(jobExecution.getJobInstance(), step
 				.getName()));
 	}
-	
+
 	/**
-	 * Check to make sure that ItemStreamException can be skipped. (see BATCH-915)
+	 * Check to make sure that ItemStreamException can be skipped. (see
+	 * BATCH-915)
 	 */
 	@Test
 	public void testReadSkipItemStreamException() throws Exception {
@@ -201,7 +202,7 @@ public class FaultTolerantStepFactoryBeanTests {
 		Map<Class<? extends Throwable>, Boolean> map = new HashMap<Class<? extends Throwable>, Boolean>();
 		map.put(ItemStreamException.class, true);
 		factory.setSkippableExceptionClasses(map);
-		
+
 		Step step = (Step) factory.getObject();
 
 		step.execute(stepExecution);
@@ -400,6 +401,39 @@ public class FaultTolerantStepFactoryBeanTests {
 		assertEquals(expectedOutput, writer.getCommitted());
 		assertStepExecutionsAreEqual(stepExecution, repository.getLastStepExecution(jobExecution.getJobInstance(), step
 				.getName()));
+	}
+
+	/**
+	 * Check items causing errors are skipped as expected.
+	 */
+	@Test
+	public void testSkipOverLimitOnReadWithListener() throws Exception {
+		reader.setFailures("1", "3", "5");
+		writer.setFailures();
+
+		final List<Throwable> listenerCalls = new ArrayList<Throwable>();
+
+		factory.setListeners(new StepListener[] { new SkipListenerSupport<String, String>() {
+			@Override
+			public void onSkipInRead(Throwable t) {
+				listenerCalls.add(t);
+			}
+		} });
+		factory.setCommitInterval(2);
+		factory.setSkipLimit(2);
+
+		Step step = (Step) factory.getObject();
+
+		step.execute(stepExecution);
+
+		// 1,3 skipped inside a committed chunk. 5 tripped the skip
+		// limit but it was skipped in a chunk that rolled back, so 
+		// it will re-appear on a restart and the listener is not called.
+		assertEquals(2, listenerCalls.size());
+		assertEquals(2, stepExecution.getReadSkipCount());
+
+		assertEquals(BatchStatus.FAILED, stepExecution.getStatus());
+
 	}
 
 	/**
