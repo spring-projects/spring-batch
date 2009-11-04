@@ -75,6 +75,16 @@ public class DelimitedLineTokenizerTests extends TestCase {
 		}
 	}
 	
+	public void testTooFewNamesNotStrict() {
+		tokenizer.setNames(new String[] {"A", "B"});
+		tokenizer.setStrict(false);
+
+		FieldSet tokens = tokenizer.tokenize("a,b,c");
+		
+		assertTrue(TOKEN_MATCHES, tokens.readString(0).equals("a"));
+		assertTrue(TOKEN_MATCHES, tokens.readString(1).equals("b"));
+	}	
+	
 	public void testTooManyNames() {
 		tokenizer.setNames(new String[] {"A", "B", "C", "D"});
 		try{
@@ -86,6 +96,19 @@ public class DelimitedLineTokenizerTests extends TestCase {
 		}
 		
 	}
+	
+	public void testTooManyNamesNotStrict() {
+		tokenizer.setNames(new String[] {"A", "B", "C", "D","E"});
+		tokenizer.setStrict( false );
+
+		FieldSet tokens = tokenizer.tokenize("a,b,c");
+		
+		assertTrue(TOKEN_MATCHES, tokens.readString(0).equals("a"));
+		assertTrue(TOKEN_MATCHES, tokens.readString(1).equals("b"));
+		assertTrue(TOKEN_MATCHES, tokens.readString(2).equals("c"));
+		assertTrue(TOKEN_MATCHES, tokens.readString(3).equals(""));
+		assertTrue(TOKEN_MATCHES, tokens.readString(4).equals(""));		
+	}	
 
 	public void testDelimitedLineTokenizerChar() {
 		AbstractLineTokenizer tokenizer = new DelimitedLineTokenizer(' ');

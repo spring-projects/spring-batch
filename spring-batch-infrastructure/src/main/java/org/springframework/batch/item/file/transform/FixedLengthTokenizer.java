@@ -37,22 +37,6 @@ public class FixedLengthTokenizer extends AbstractLineTokenizer {
 
 	boolean open = false;
 
-	private boolean strict = true;
-
-	/**
-	 * Public setter for the strict flag. If true (the default) then lines must
-	 * be precisely the length specified by the columns. If false then shorter
-	 * lines will be tolerated and padded with empty columns, and longer strings
-	 * will simply be truncated.
-	 * 
-	 * @see #setColumns(Range[])
-	 * 
-	 * @param strict the strict to set
-	 */
-	public void setStrict(boolean strict) {
-		this.strict = strict;
-	}
-
 	/**
 	 * Set the column ranges. Used in conjunction with the
 	 * {@link RangeArrayPropertyEditor} this property can be set in the form of
@@ -118,11 +102,11 @@ public class FixedLengthTokenizer extends AbstractLineTokenizer {
 
 		lineLength = line.length();
 
-		if (lineLength < maxRange && strict) {
+		if (lineLength < maxRange && isStrict()) {
 			throw new IncorrectLineLengthException("Line is shorter than max range " + maxRange, maxRange, lineLength);
 		}
 
-		if (!open && lineLength > maxRange && strict) {
+		if (!open && lineLength > maxRange && isStrict()) {
 			throw new IncorrectLineLengthException("Line is longer than max range " + maxRange, maxRange, lineLength);
 		}
 

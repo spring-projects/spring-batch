@@ -32,8 +32,35 @@ public abstract class AbstractLineTokenizer implements LineTokenizer {
 
 	protected String[] names = new String[0];
 
+	private boolean strict = true;
+	
+	private String emptyToken = "";
+
 	private FieldSetFactory fieldSetFactory = new DefaultFieldSetFactory();
 
+	/**
+	 * Public setter for the strict flag. If true (the default) then number of 
+	 * tokens in line must match the number of tokens defined 
+	 * (by {@link Range}, columns, etc.) in {@link LineTokenizer}. 
+	 * If false then lines with less tokens will be tolerated and padded with 
+	 * empty columns, and lines with more tokens will 
+	 * simply be truncated.
+	 * 
+	 * @param strict the strict flag to set
+	 */
+	public void setStrict(boolean strict) {
+		this.strict = strict;
+	}
+	
+	/**
+	 * Provides access to the strict flag for subclasses if needed.
+	 * 
+	 * @return the strict flag value
+	 */
+	protected boolean isStrict() {
+		return strict;
+	}
+	
 	/**
 	 * Factory for {@link FieldSet} instances. Can be injected by clients to
 	 * customize the default number and date formats.
@@ -80,7 +107,12 @@ public abstract class AbstractLineTokenizer implements LineTokenizer {
 		}
 
 		List<String> tokens = new ArrayList<String>(doTokenize(line));
-
+		
+		// if names are set and strict flag is false
+		if ( ( names.length != 0 ) && ( ! strict ) ) {
+			adjustTokenCountIfNecessary( tokens );
+		}
+		
 		String[] values = (String[]) tokens.toArray(new String[tokens.size()]);
 
 		if (names.length == 0) {
@@ -93,5 +125,36 @@ public abstract class AbstractLineTokenizer implements LineTokenizer {
 	}
 
 	protected abstract List<String> doTokenize(String line);
+	
+	/**
+	 * Adds empty tokens or truncates existing token list to match expected 
+	 * (configured) number of tokens in {@link LineTokenizer}.
+	 * 
+	 * @param tokens - list of tokens
+	 */
+	private void adjustTokenCountIfNecessary( List<String> tokens ) {
+		
+		int nameLength = names.length;
+		int tokensSize = tokens.size();
+		
+		// if the number of tokens is not what expected
+		if ( nameLength != tokensSize ) {
+			
+			if ( nameLength > tokensSize ) {
 
+				// add empty tokens until the token list size matches
+				// the expected number of tokens
+				for ( int i = 0; i < ( nameLength - tokensSize ); i++ ) {
+					tokens.add( emptyToken );
+				}
+
+			} else {
+				// truncate token list to match the number of expected tokens
+				for ( int i = tokensSize - 1; i >= nameLength; i-- ) {
+					tokens.remove(i);
+				}
+			}
+				
+		}
+	}
 }
