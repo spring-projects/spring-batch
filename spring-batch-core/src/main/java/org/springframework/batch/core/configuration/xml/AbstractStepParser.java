@@ -101,6 +101,11 @@ public abstract class AbstractStepParser {
 		if (StringUtils.hasText(jobFactoryRef)) {
 			bd.setAttribute("jobParserJobFactoryBeanRef", jobFactoryRef);
 		}
+		
+		Element description = DomUtils.getChildElementByTagName(stepElement, "description");
+		if (description!=null) {
+			bd.setDescription(description.getTextContent());
+		}
 
 		return bd;
 

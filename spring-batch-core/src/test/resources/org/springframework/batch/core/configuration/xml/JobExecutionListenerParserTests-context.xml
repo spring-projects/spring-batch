@@ -7,7 +7,10 @@
 	<beans:import resource="common-context.xml" />
 	
 	<job id="job" incrementer="testIncrementer" job-repository="jobRepository">
-		<step id="s1" parent="step1"/>
+		<description>A job that executes step1</description>
+		<step id="s1" parent="step1">
+			<description>A step that does some stuff</description>
+		</step>
 		<listeners>
 			<listener after-job-method="afterJob" ref="testListener"/>
 			<listener after-job-method="afterJob">

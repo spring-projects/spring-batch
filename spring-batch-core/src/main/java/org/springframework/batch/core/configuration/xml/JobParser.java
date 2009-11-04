@@ -101,6 +101,11 @@ public class JobParser extends AbstractSingleBeanDefinitionParser {
 			builder.addPropertyValue("flow", flowDef);
 		}
 
+		Element description = DomUtils.getChildElementByTagName(element, "description");
+		if (description!=null) {
+			builder.getBeanDefinition().setDescription(description.getTextContent());
+		}
+
 		List<Element> listenersElements = DomUtils.getChildElementsByTagName(element, "listeners");
 		if (listenersElements.size() == 1) {
 			Element listenersElement = listenersElements.get(0);

@@ -26,23 +26,26 @@
 			</xsd:documentation>
 		</xsd:annotation>
 		<xsd:complexType>
-			<xsd:choice minOccurs="0" maxOccurs="unbounded">
-				<xsd:group ref="flowGroup" />
-				<xsd:element name="listeners">
-					<xsd:annotation>
-						<xsd:documentation><![CDATA[
-						List of all listeners for the job
-						]]>
-						</xsd:documentation>
-					</xsd:annotation>
-					<xsd:complexType>
-						<xsd:sequence>
-							<xsd:element name="listener" type="jobExecutionListenerType" minOccurs="0" maxOccurs="unbounded" />
-						</xsd:sequence>
-						<xsd:attributeGroup ref="mergeAttribute" />
-					</xsd:complexType>
-				</xsd:element>
-			</xsd:choice>
+			<xsd:sequence>
+				<xsd:element ref="description" minOccurs="0"/>
+				<xsd:choice minOccurs="0" maxOccurs="unbounded">
+					<xsd:group ref="flowGroup" />
+					<xsd:element name="listeners">
+						<xsd:annotation>
+							<xsd:documentation><![CDATA[
+							List of all listeners for the job
+							]]>
+							</xsd:documentation>
+						</xsd:annotation>
+						<xsd:complexType>
+							<xsd:sequence>
+								<xsd:element name="listener" type="jobExecutionListenerType" minOccurs="0" maxOccurs="unbounded" />
+							</xsd:sequence>
+							<xsd:attributeGroup ref="mergeAttribute" />
+						</xsd:complexType>
+					</xsd:element>
+				</xsd:choice>
+			</xsd:sequence>
 			<xsd:attribute name="id" type="xsd:ID" use="required" />
 			<xsd:attributeGroup ref="jobRepositoryAttribute" />
 			<xsd:attribute name="incrementer" type="xsd:string" use="optional">
@@ -82,17 +85,20 @@
 			</xsd:documentation>
 		</xsd:annotation>
 		<xsd:complexType>
-			<xsd:choice minOccurs="0" maxOccurs="1">
-				<xsd:element name="tasklet">
-					<xsd:complexType>
-						<xsd:complexContent>
-							<xsd:extension base="taskletType">
-								<xsd:attributeGroup ref="jobRepositoryAttribute"/>
-							</xsd:extension>
-						</xsd:complexContent>
-					</xsd:complexType>
-				</xsd:element>
-			</xsd:choice>
+			<xsd:sequence>
+				<xsd:element ref="description" minOccurs="0"/>
+				<xsd:choice minOccurs="0" maxOccurs="1">
+					<xsd:element name="tasklet">
+						<xsd:complexType>
+							<xsd:complexContent>
+								<xsd:extension base="taskletType">
+									<xsd:attributeGroup ref="jobRepositoryAttribute"/>
+								</xsd:extension>
+							</xsd:complexContent>
+						</xsd:complexType>
+					</xsd:element>
+				</xsd:choice>
+			</xsd:sequence>
 			<xsd:attribute name="id" type="xsd:ID" use="required" />
 			<xsd:attributeGroup ref="parentAttribute"/>
 			<xsd:attributeGroup ref="abstractAttribute" />
@@ -231,10 +237,13 @@
 					</xsd:documentation>
 				</xsd:annotation>
 				<xsd:complexType>
-					<xsd:choice minOccurs="0" maxOccurs="unbounded">
-						<xsd:element name="tasklet" type="taskletType"/>
-						<xsd:group ref="transitions" />
-					</xsd:choice>
+					<xsd:sequence>
+						<xsd:element ref="description" minOccurs="0"/>
+						<xsd:choice minOccurs="0" maxOccurs="unbounded">
+							<xsd:element name="tasklet" type="taskletType"/>
+							<xsd:group ref="transitions" />
+						</xsd:choice>
+					</xsd:sequence>
 					<xsd:attribute name="id" type="xsd:ID" use="required" />
 					<xsd:attributeGroup ref="parentAttribute"/>
 					<xsd:attributeGroup ref="nextAttribute" />
@@ -916,5 +925,17 @@
 			</xsd:annotation>
 		</xsd:attribute>
 	</xsd:attributeGroup>
+	
+	<xsd:element name="description">
+		<xsd:annotation>
+			<xsd:documentation><![CDATA[
+	Contains informative text describing the purpose of the enclosing element.
+	Used primarily for user documentation of XML bean definition documents.
+			]]></xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexType mixed="true">
+			<xsd:choice minOccurs="0" maxOccurs="unbounded"/>
+		</xsd:complexType>
+	</xsd:element>
 
 </xsd:schema>
