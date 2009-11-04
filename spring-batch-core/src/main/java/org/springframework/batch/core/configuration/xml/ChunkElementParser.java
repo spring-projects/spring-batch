@@ -113,7 +113,7 @@ public class ChunkElementParser {
 			propertyValues.addPropertyValue("cacheCapacity", cacheCapacity);
 		}
 
-		String isReaderTransactionalQueue = element.getAttribute("is-reader-transactional-queue");
+		String isReaderTransactionalQueue = element.getAttribute("reader-transactional-queue");
 		if (StringUtils.hasText(isReaderTransactionalQueue)) {
 			propertyValues.addPropertyValue("isReaderTransactionalQueue", isReaderTransactionalQueue);
 		}

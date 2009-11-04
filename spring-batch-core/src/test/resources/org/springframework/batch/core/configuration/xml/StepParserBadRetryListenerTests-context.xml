@@ -10,7 +10,7 @@
 		<step id="step">
 			<tasklet task-executor="taskExecutor">
 				<chunk reader="reader" processor="processor" writer="writer" commit-interval="10" skip-limit="20"
-						retry-limit="3" cache-capacity="100" is-reader-transactional-queue="true">
+						retry-limit="3" cache-capacity="100" reader-transactional-queue="true">
 					<retry-listeners>
 						<listener ref="retryListener">
 							<beans:bean class="org.springframework.batch.core.configuration.xml.TestRetryListener"/>

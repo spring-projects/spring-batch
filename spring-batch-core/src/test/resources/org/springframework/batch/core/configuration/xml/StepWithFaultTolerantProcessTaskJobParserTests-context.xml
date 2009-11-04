@@ -11,7 +11,7 @@
 			<tasklet task-executor="taskExecutor">
 				<chunk reader="reader" processor="processor" writer="writer"
 				       commit-interval="10" skip-limit="20" retry-limit="3" cache-capacity="100" 
-				       is-reader-transactional-queue="true">
+				       reader-transactional-queue="true">
 
 					<retry-listeners>
 						<listener ref="retryListener" />

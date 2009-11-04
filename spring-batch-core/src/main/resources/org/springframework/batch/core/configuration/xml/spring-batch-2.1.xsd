@@ -601,7 +601,7 @@
 				]]></xsd:documentation>
 			</xsd:annotation>
 		</xsd:attribute>
-		<xsd:attribute name="is-reader-transactional-queue" type="xsd:string" use="optional">
+		<xsd:attribute name="reader-transactional-queue" type="xsd:string" use="optional">
 			<xsd:annotation>
 				<xsd:documentation><![CDATA[
 				Whether the reader is a transactional queue. If it is then items read should not be cached 

@@ -96,7 +96,7 @@ public class StepWithFaultTolerantProcessTaskJobParserTests {
 				"isolation"));
 		assertEquals("wrong transaction-attribute:", 10, ReflectionTestUtils.getField(factory, "transactionTimeout"));
 		Object txq = ReflectionTestUtils.getField(factory, "isReaderTransactionalQueue");
-		assertEquals("wrong is-reader-transactional-queue:", true, txq);
+		assertEquals("wrong reader-transactional-queue:", true, txq);
 		Object te = ReflectionTestUtils.getField(factory, "taskExecutor");
 		assertEquals("wrong task-executor:", ConcurrentTaskExecutor.class, te.getClass());
 		Object listeners = ReflectionTestUtils.getField(factory, "listeners");
