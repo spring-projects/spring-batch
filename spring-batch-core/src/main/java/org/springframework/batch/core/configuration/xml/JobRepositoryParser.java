@@ -51,6 +51,8 @@ public class JobRepositoryParser extends AbstractSingleBeanDefinitionParser {
         
         String tablePrefix = element.getAttribute("table-prefix");
         
+        String maxVarCharLength = element.getAttribute("max-varchar-length");
+        
         String lobHandler = element.getAttribute("lob-handler");
         
         RuntimeBeanReference ds = new RuntimeBeanReference(dataSource);
@@ -65,6 +67,9 @@ public class JobRepositoryParser extends AbstractSingleBeanDefinitionParser {
         }
         if (StringUtils.hasText(lobHandler)) {
             builder.addPropertyReference("lobHandler", lobHandler);
+        }
+        if (StringUtils.hasText(maxVarCharLength)) {
+            builder.addPropertyValue("maxVarCharLength", maxVarCharLength);
         }
 
         builder.setRole(BeanDefinition.ROLE_SUPPORT);

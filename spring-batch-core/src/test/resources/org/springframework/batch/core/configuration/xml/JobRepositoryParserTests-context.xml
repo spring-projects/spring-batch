@@ -13,6 +13,6 @@
 	</beans:bean>
 	<beans:bean id="lobHandler" class="org.springframework.jdbc.support.lob.DefaultLobHandler"/>
 
-	<job-repository id="jobRepo1" data-source="dataSource" transaction-manager="transactionManager" lob-handler="lobHandler"/>
+	<job-repository id="jobRepo1" data-source="dataSource" transaction-manager="transactionManager" lob-handler="lobHandler" max-varchar-length="100"/>
 
 </beans:beans>

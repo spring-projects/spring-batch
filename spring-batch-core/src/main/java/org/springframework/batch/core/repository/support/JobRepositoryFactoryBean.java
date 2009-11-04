@@ -68,7 +68,7 @@ public class JobRepositoryFactoryBean extends AbstractJobRepositoryFactoryBean i
 
 	private DataFieldMaxValueIncrementerFactory incrementerFactory;
 
-	private int exitMessageLength = AbstractJdbcBatchMetadataDao.DEFAULT_EXIT_MESSAGE_LENGTH;
+	private int maxVarCharLength = AbstractJdbcBatchMetadataDao.DEFAULT_EXIT_MESSAGE_LENGTH;
 
 	private LobHandler lobHandler;
 
@@ -86,14 +86,19 @@ public class JobRepositoryFactoryBean extends AbstractJobRepositoryFactoryBean i
 	}
 
 	/**
-	 * Public setter for the exit message length in database. Do not set this if
-	 * you haven't modified the schema. Note this value will be used for both
-	 * {@link JdbcJobExecutionDao} and {@link JdbcStepExecutionDao}.
+	 * Public setter for the length of long string columns in database. Do not
+	 * set this if you haven't modified the schema. Note this value will be used
+	 * for the exit message in both {@link JdbcJobExecutionDao} and
+	 * {@link JdbcStepExecutionDao} and also the short version of the execution
+	 * context in {@link JdbcExecutionContextDao} . For databases with
+	 * multi-byte character sets this number can be smaller (by up to a factor
+	 * of 2 for 2-byte characters) than the declaration of the column length in
+	 * the DDL for the tables.
 	 * 
-	 * @param exitMessageLength the exitMessageLength to set
+	 * @param maxVarCharLength the exitMessageLength to set
 	 */
-	public void setExitMessageLength(int exitMessageLength) {
-		this.exitMessageLength = exitMessageLength;
+	public void setMaxVarCharLength(int maxVarCharLength) {
+		this.maxVarCharLength = maxVarCharLength;
 	}
 
 	/**
@@ -139,8 +144,8 @@ public class JobRepositoryFactoryBean extends AbstractJobRepositoryFactoryBean i
 			databaseType = DatabaseType.fromMetaData(dataSource).name();
 			logger.info("No database type set, using meta data indicating: " + databaseType);
 		}
-		
-		if (lobHandler==null && databaseType.equalsIgnoreCase(DatabaseType.ORACLE.toString())) {
+
+		if (lobHandler == null && databaseType.equalsIgnoreCase(DatabaseType.ORACLE.toString())) {
 			lobHandler = new OracleLobHandler();
 		}
 
@@ -170,7 +175,7 @@ public class JobRepositoryFactoryBean extends AbstractJobRepositoryFactoryBean i
 				+ "JOB_EXECUTION_SEQ"));
 		dao.setTablePrefix(tablePrefix);
 		dao.setClobTypeToUse(determineClobTypeToUse(this.databaseType));
-		dao.setExitMessageLength(exitMessageLength);
+		dao.setExitMessageLength(maxVarCharLength);
 		dao.afterPropertiesSet();
 		return dao;
 	}
@@ -183,7 +188,7 @@ public class JobRepositoryFactoryBean extends AbstractJobRepositoryFactoryBean i
 				+ "STEP_EXECUTION_SEQ"));
 		dao.setTablePrefix(tablePrefix);
 		dao.setClobTypeToUse(determineClobTypeToUse(this.databaseType));
-		dao.setExitMessageLength(exitMessageLength);
+		dao.setExitMessageLength(maxVarCharLength);
 		dao.afterPropertiesSet();
 		return dao;
 	}
@@ -198,6 +203,8 @@ public class JobRepositoryFactoryBean extends AbstractJobRepositoryFactoryBean i
 			dao.setLobHandler(lobHandler);
 		}
 		dao.afterPropertiesSet();
+		// Assume the same length.
+		dao.setShortContextLength(maxVarCharLength);
 		return dao;
 	}
 
