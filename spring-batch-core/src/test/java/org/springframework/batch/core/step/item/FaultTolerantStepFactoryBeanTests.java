@@ -391,6 +391,7 @@ public class FaultTolerantStepFactoryBeanTests {
 		assertEquals(3, stepExecution.getSkipCount());
 		assertEquals(2, stepExecution.getReadSkipCount());
 		assertEquals(1, stepExecution.getWriteSkipCount());
+		assertEquals(2, stepExecution.getReadCount());
 
 		// writer did not skip "2" as it never made it to writer, only "4" did
 		assertFalse(reader.getRead().contains("2"));
