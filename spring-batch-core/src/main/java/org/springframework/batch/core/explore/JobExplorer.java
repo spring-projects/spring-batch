@@ -80,4 +80,12 @@ public interface JobExplorer {
 	 */
 	Set<JobExecution> findRunningJobExecutions(String jobName);
 
+	/**
+	 * Query the repository for all unique {@link JobInstance} names (sorted
+	 * alphabetically).
+	 * 
+	 * @return the set of job names that have been executed
+	 */
+	List<String> getJobNames();
+
 }

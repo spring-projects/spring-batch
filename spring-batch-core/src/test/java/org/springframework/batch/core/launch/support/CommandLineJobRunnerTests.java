@@ -298,6 +298,10 @@ public class CommandLineJobRunnerTests {
 		public StepExecution getStepExecution(Long jobExecutionId, Long stepExecutionId) {
 			throw new UnsupportedOperationException();
 		}
+		
+		public List<String> getJobNames() {
+			throw new UnsupportedOperationException();
+		}
 
 	}
 

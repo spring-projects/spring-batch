@@ -174,4 +174,14 @@ public class SimpleJobExplorerTests extends TestCase {
 		verify(jobExecutionDao, jobInstanceDao, stepExecutionDao);
 	}
 
+	@Test
+	public void testGetJobNames() throws Exception {
+		jobInstanceDao.getJobNames();
+		EasyMock.expectLastCall().andReturn(
+				Collections.singletonList("foo"));
+		replay(jobExecutionDao, jobInstanceDao, stepExecutionDao);
+		jobExplorer.getJobNames();
+		verify(jobExecutionDao, jobInstanceDao, stepExecutionDao);
+	}
+
 }

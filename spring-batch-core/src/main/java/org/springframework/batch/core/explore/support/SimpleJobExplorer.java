@@ -159,6 +159,13 @@ public class SimpleJobExplorer implements JobExplorer {
 			int count) {
 		return jobInstanceDao.getJobInstances(jobName, start, count);
 	}
+	
+	/* (non-Javadoc)
+	 * @see org.springframework.batch.core.explore.JobExplorer#getJobNames()
+	 */
+	public List<String> getJobNames() {
+		return jobInstanceDao.getJobNames();
+	}
 
 	/*
 	 * Find all dependencies for a JobExecution, including JobInstance (which
