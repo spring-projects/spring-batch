@@ -26,6 +26,7 @@ import java.math.BigDecimal;
 import java.text.NumberFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.Locale;
 
 import org.junit.Before;
@@ -370,6 +371,13 @@ public class DefaultFieldSetTests {
 	}
 
 	@Test
+	public void testReadDateWithDefault() throws Exception {
+		Date date = null;
+		assertEquals(date, fieldSet.readDate(13, date));
+		assertEquals(date, fieldSet.readDate("BlankInput", date));
+	}
+
+	@Test
 	public void testReadDateWithFormat() throws Exception {
 		fieldSet = new DefaultFieldSet(new String[] {"13/01/1999"});
 		SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
@@ -413,6 +421,13 @@ public class DefaultFieldSetTests {
 		catch (IllegalArgumentException e) {
 			assertTrue(e.getMessage().indexOf("dd-MM-yyyy") > 0);
 		}
+	}
+
+	@Test
+	public void testReadDateWithPatternAndDefault() throws Exception {
+		Date date = null;
+		assertEquals(date, fieldSet.readDate(13, "dd-MM-yyyy", date));
+		assertEquals(date, fieldSet.readDate("BlankInput", "dd-MM-yyyy", date));
 	}
 
 	@Test

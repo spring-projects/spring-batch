@@ -316,6 +316,7 @@ public interface FieldSet {
 	 * value at index '<code>index</code>' is blank.
 	 * 
 	 * @param name the field name.
+	 * @param defaultValue the default value to use if the field is blank
 	 * @throws IllegalArgumentException if a column with given name is not
 	 * defined.
 	 */
@@ -345,6 +346,27 @@ public interface FieldSet {
 	 * designated column <code>index</code>.
 	 * 
 	 * @param index the field index.
+	 * @param defaultValue the default value to use if the field is blank
+	 * @throws IndexOutOfBoundsException if the index is out of bounds.
+	 */
+	Date readDate(int index, Date defaultValue);
+
+	/**
+	 * Read the <code>java.sql.Date</code> value in given format from column
+	 * with given <code>name</code>.
+	 * 
+	 * @param name the field name.
+	 * @param defaultValue the default value to use if the field is blank
+	 * @throws IllegalArgumentException if a column with given name is not
+	 * defined.
+	 */
+	Date readDate(String name, Date defaultValue);
+
+	/**
+	 * Read the <code>java.util.Date</code> value in default format at
+	 * designated column <code>index</code>.
+	 * 
+	 * @param index the field index.
 	 * @param pattern the pattern describing the date and time format
 	 * @throws IndexOutOfBoundsException if the index is out of bounds.
 	 * @throws IllegalArgumentException if the date cannot be parsed.
@@ -363,6 +385,32 @@ public interface FieldSet {
 	 * 
 	 */
 	Date readDate(String name, String pattern);
+
+	/**
+	 * Read the <code>java.util.Date</code> value in default format at
+	 * designated column <code>index</code>.
+	 * 
+	 * @param index the field index.
+	 * @param pattern the pattern describing the date and time format
+	 * @param defaultValue the default value to use if the field is blank
+	 * @throws IndexOutOfBoundsException if the index is out of bounds.
+	 * @throws IllegalArgumentException if the date cannot be parsed.
+	 * 
+	 */
+	Date readDate(int index, String pattern, Date defaultValue);
+
+	/**
+	 * Read the <code>java.sql.Date</code> value in given format from column
+	 * with given <code>name</code>.
+	 * 
+	 * @param name the field name.
+	 * @param pattern the pattern describing the date and time format
+	 * @param defaultValue the default value to use if the field is blank
+	 * @throws IllegalArgumentException if a column with given name is not
+	 * defined or if the specified field cannot be parsed
+	 * 
+	 */
+	Date readDate(String name, String pattern, Date defaultValue);
 
 	/**
 	 * Return the number of fields in this '<code>FieldSet</code>'.

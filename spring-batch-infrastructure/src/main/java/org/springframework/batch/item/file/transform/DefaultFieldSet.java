@@ -481,6 +481,17 @@ public class DefaultFieldSet implements FieldSet {
 		return parseDate(readAndTrim(index), dateFormat);
 	}
 
+	/* (non-Javadoc)
+	 * @see org.springframework.batch.item.file.transform.FieldSet#readDate(int, java.util.Date)
+	 */
+	public Date readDate(int index, Date defaultValue) {
+		try {
+			return readDate(index);
+		} catch (IllegalArgumentException e) {
+			return defaultValue;
+		}
+	}
+
 	/*
 	 * (non-Javadoc)
 	 * 
@@ -494,6 +505,17 @@ public class DefaultFieldSet implements FieldSet {
 		}
 		catch (IllegalArgumentException e) {
 			throw new IllegalArgumentException(e.getMessage() + ", name: [" + name + "]");
+		}
+	}
+
+	/* (non-Javadoc)
+	 * @see org.springframework.batch.item.file.transform.FieldSet#readDate(int, java.util.Date)
+	 */
+	public Date readDate(String name, Date defaultValue) {
+		try {
+			return readDate(name);
+		} catch (IllegalArgumentException e) {
+			return defaultValue;
 		}
 	}
 
@@ -512,6 +534,20 @@ public class DefaultFieldSet implements FieldSet {
 	/*
 	 * (non-Javadoc)
 	 * 
+	 * @see org.springframework.batch.item.file.mapping.IFieldSet#readDate(int,
+	 * java.lang.String)
+	 */
+	public Date readDate(int index, String pattern, Date defaultValue) {
+		try {
+			return readDate(index, pattern);
+		} catch (IllegalArgumentException e) {
+			return defaultValue;
+		}
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see
 	 * org.springframework.batch.item.file.mapping.IFieldSet#readDate(java.lang
 	 * .String, java.lang.String)
@@ -522,6 +558,20 @@ public class DefaultFieldSet implements FieldSet {
 		}
 		catch (IllegalArgumentException e) {
 			throw new IllegalArgumentException(e.getMessage() + ", name: [" + name + "]");
+		}
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.springframework.batch.item.file.mapping.IFieldSet#readDate(int,
+	 * java.lang.String)
+	 */
+	public Date readDate(String name, String pattern, Date defaultValue) {
+		try {
+			return readDate(name, pattern);
+		} catch (IllegalArgumentException e) {
+			return defaultValue;
 		}
 	}
 
