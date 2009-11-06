@@ -18,7 +18,6 @@ package org.springframework.batch.retry.support;
 
 import static org.easymock.EasyMock.createStrictMock;
 import static org.easymock.EasyMock.expect;
-import static org.easymock.EasyMock.expectLastCall;
 import static org.easymock.EasyMock.isA;
 import static org.easymock.EasyMock.replay;
 import static org.easymock.EasyMock.verify;
@@ -273,7 +272,7 @@ public class RetryTemplateTests {
 	 * re-thrown.
 	 */
 	@Test
-	public void testBackOffForRethrownException() throws Exception {
+	public void testNoBackOffForRethrownException() throws Exception {
 
 		RetryTemplate tested = new RetryTemplate();
 		tested.setRetryPolicy(new SimpleRetryPolicy(1, Collections.<Class<? extends Throwable>, Boolean> singletonMap(
@@ -285,8 +284,6 @@ public class RetryTemplateTests {
 		tested.setBackOffPolicy(bop);
 
 		expect(bop.start(isA(RetryContext.class))).andReturn(backOffContext);
-		bop.backOff(backOffContext);
-		expectLastCall().once();
 		replay(bop);
 
 		try {
