@@ -47,11 +47,13 @@
     attribute of the <literal>tasklet</literal>:</para>
 
     <programlisting>&lt;step id="loading"&gt;
-    &lt;tasklet reader="stagingReader" 
+	&lt;tasklet&gt;
+        &lt;chunk reader="stagingReader" 
              processor="stagingProcessor" 
              writer="tradeWriter" 
              commit-interval="1" 
              task-executor="taskExecutor"/&gt;
+    &lt;/tasklet&gt
 &lt;/step&gt;</programlisting>
 
     <para>In this example the taskExecutor is a reference to another bean
