@@ -53,7 +53,7 @@
              writer="tradeWriter" 
              commit-interval="1" 
              task-executor="taskExecutor"/&gt;
-    &lt;/tasklet&gt
+    &lt;/tasklet&gt;
 &lt;/step&gt;</programlisting>
 
     <para>In this example the taskExecutor is a reference to another bean
