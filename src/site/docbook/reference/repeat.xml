@@ -250,7 +250,7 @@ template.iterate(new RepeatCallback() {
     <classname>RepeatOperations</classname> for just this purpose. The
     <classname>RepeatOperationsInterceptor</classname> executes the
     intercepted method and repeats according to the
-    <classname>CompetionPolicy</classname> in the provided
+    <classname>CompletionPolicy</classname> in the provided
     <classname>RepeatTemplate</classname>.</para>
 
     <para>Here is an example of declarative iteration using the Spring AOP
