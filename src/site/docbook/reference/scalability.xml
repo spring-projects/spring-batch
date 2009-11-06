@@ -44,7 +44,7 @@
 
     <para>The simplest way to start parallel processing is to add a
     <classname>TaskExecutor</classname> to your Step configuration, e.g. as an
-    attribute of the <literal>tasklet</literal>:</para>
+    attribute of the <literal>chunk</literal>:</para>
 
     <programlisting>&lt;step id="loading"&gt;
 	&lt;tasklet&gt;
