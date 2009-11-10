@@ -1,0 +1,63 @@
+Spring Batch 2.1.0.M1 Release Notes
+
+
+Release Notes - Spring Batch - Version 2.1.0.M2
+
+* Sub-task
+
+  * {{{http://jira.springsource.org/browse/BATCH-1400}[BATCH-1400]}} - Specify schema location for imports in xsd
+
+
+* Bug
+
+  * {{{http://jira.springsource.org/browse/BATCH-1401}[BATCH-1401]}} - All inserts of JobId should be of Types.BIGINT
+
+  * {{{http://jira.springsource.org/browse/BATCH-1418}[BATCH-1418]}} - Upon job restart, step with FlatFileItemReader doesn't honor skippable-exception-classes
+
+  * {{{http://jira.springsource.org/browse/BATCH-1420}[BATCH-1420]}} - Late Binding only happens first time when using inner bean definition with collection property
+
+  * {{{http://jira.springsource.org/browse/BATCH-1427}[BATCH-1427]}} - SimpleRetryExceptionHandler treats AbstractStep$FatalException as non-fatal
+
+  * {{{http://jira.springsource.org/browse/BATCH-1432}[BATCH-1432]}} - Error in chpt. 7.1 "Multithreaded step"
+
+
+* Improvement
+
+  * {{{http://jira.springsource.org/browse/BATCH-1395}[BATCH-1395]}} - Remove or deprecate old application context creation pattern
+
+  * {{{http://jira.springsource.org/browse/BATCH-1398}[BATCH-1398]}} - Initialize ClassPathXmlJobRegistry only after application context is ready
+
+  * {{{http://jira.springsource.org/browse/BATCH-1424}[BATCH-1424]}} - Documentation of annotations in section 5.1.11 needs expanding
+
+  * {{{http://jira.springsource.org/browse/BATCH-1426}[BATCH-1426]}} - RetryTemplate calls BackOffPolicy even when retry will not occur.
+
+  * {{{http://jira.springsource.org/browse/BATCH-1429}[BATCH-1429]}} - Allow DelimitedLineTokenizer to handle malformed file/lines gracefully.
+
+
+* New Feature
+
+  * {{{http://jira.springsource.org/browse/BATCH-1265}[BATCH-1265]}} - Add default value support for Dates in FieldSet
+
+  * {{{http://jira.springsource.org/browse/BATCH-1300}[BATCH-1300]}} - Add description element to <job/> and <step/>
+
+  * {{{http://jira.springsource.org/browse/BATCH-1399}[BATCH-1399]}} - Expose StepExecutionAggregator as a strategy interface in PartitionStep
+
+  * {{{http://jira.springsource.org/browse/BATCH-1407}[BATCH-1407]}} - Integration tests for core (including multi-threaded long running tests)
+
+  * {{{http://jira.springsource.org/browse/BATCH-1416}[BATCH-1416]}} - Namespace support for max varchar length in execution context and execution daos
+
+  * {{{http://jira.springsource.org/browse/BATCH-1421}[BATCH-1421]}} - Add method to get all job names to JobExplorer
+
+  * {{{http://jira.springsource.org/browse/BATCH-1428}[BATCH-1428]}} - Add support for lobhandler in job repository name space / factory bean
+
+  * {{{http://jira.springsource.org/browse/BATCH-1433}[BATCH-1433]}} - IteratorItemReader
+
+
+* Refactoring
+
+  * {{{http://jira.springsource.org/browse/BATCH-1369}[BATCH-1369]}} - Change semantics of @AfterChunk to execute outside transaction
+
+  * {{{http://jira.springsource.org/browse/BATCH-1419}[BATCH-1419]}} - Change is-reader-transactional-queue to reader-transactional in <chunk/>
+
+
+
