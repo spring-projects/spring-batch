@@ -345,11 +345,21 @@ public abstract class AbstractJob implements Job, StepLocator, BeanNameAware, In
 			jobRepository.add(currentStepExecution);
 
 			logger.info("Executing step: [" + step + "]");
-			step.execute(currentStepExecution);
+			try {
+				step.execute(currentStepExecution);
+			} catch (JobInterruptedException e) {
+				// Ensure that the job gets the message that it is stopping
+				// and can pass it on to other steps that are executing 
+				// concurrently.
+				execution.setStatus(BatchStatus.STOPPING);
+				throw e;
+			}
 
 			jobRepository.updateExecutionContext(execution);
 
 			if (currentStepExecution.getStatus() == BatchStatus.STOPPING || currentStepExecution.getStatus() == BatchStatus.STOPPED) {
+				// Ensure that the job gets the message that it is stopping
+				execution.setStatus(BatchStatus.STOPPING);
 				throw new JobInterruptedException("Job interrupted by step execution");
 			}
 

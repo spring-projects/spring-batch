@@ -62,7 +62,7 @@ public class FlowJobTests {
 	private JobExecution jobExecution;
 
 	private JobRepository jobRepository;
-	
+
 	private boolean fail = false;
 
 	private JobExecutionDao jobExecutionDao;
@@ -74,7 +74,8 @@ public class FlowJobTests {
 		factory.setTransactionManager(new ResourcelessTransactionManager());
 		factory.afterPropertiesSet();
 		jobExecutionDao = new MapJobExecutionDao();
-		jobRepository = new SimpleJobRepository(new MapJobInstanceDao(), jobExecutionDao, new MapStepExecutionDao(), new MapExecutionContextDao());
+		jobRepository = new SimpleJobRepository(new MapJobInstanceDao(), jobExecutionDao, new MapStepExecutionDao(),
+				new MapExecutionContextDao());
 		jobRepository = (JobRepository) factory.getObject();
 		job.setJobRepository(jobRepository);
 		jobExecution = jobRepository.createJobExecution("job", new JobParameters());
@@ -203,7 +204,7 @@ public class FlowJobTests {
 			public void execute(StepExecution stepExecution) throws JobInterruptedException {
 				stepExecution.setStatus(BatchStatus.STOPPING);
 				jobRepository.update(stepExecution);
-			}	
+			}
 		}), "end0"));
 		transitions.add(StateTransition.createEndStateTransition(new EndState(FlowExecutionStatus.COMPLETED, "end0")));
 		flow.setStateTransitions(transitions);
@@ -227,9 +228,15 @@ public class FlowJobTests {
 		transitions.add(StateTransition.createStateTransition(new StepState(new StubStep("step1") {
 			@Override
 			public void execute(StepExecution stepExecution) throws JobInterruptedException {
-				stepExecution.setStatus(BatchStatus.STOPPING);
-				jobRepository.update(stepExecution);
-			}	
+				if (!stepExecution.getJobExecution().getExecutionContext().containsKey("STOPPED")) {
+					stepExecution.getJobExecution().getExecutionContext().put("STOPPED", true);
+					stepExecution.setStatus(BatchStatus.STOPPED);
+					jobRepository.update(stepExecution);
+				}
+				else {
+					fail("The Job should have stopped by now");
+				}
+			}
 		}), "end0"));
 		transitions.add(StateTransition.createEndStateTransition(new EndState(FlowExecutionStatus.COMPLETED, "end0")));
 		flow1.setStateTransitions(new ArrayList<StateTransition>(transitions));
@@ -238,7 +245,8 @@ public class FlowJobTests {
 		flow2.afterPropertiesSet();
 
 		transitions = new ArrayList<StateTransition>();
-		transitions.add(StateTransition.createStateTransition(new SplitState(Arrays.<Flow>asList(flow1, flow2), "split"), "end0"));
+		transitions.add(StateTransition.createStateTransition(new SplitState(Arrays.<Flow> asList(flow1, flow2),
+				"split"), "end0"));
 		transitions.add(StateTransition.createEndStateTransition(new EndState(FlowExecutionStatus.COMPLETED, "end0")));
 		flow.setStateTransitions(transitions);
 		flow.afterPropertiesSet();
@@ -250,6 +258,10 @@ public class FlowJobTests {
 		checkRepository(BatchStatus.STOPPED, ExitStatus.STOPPED);
 		assertEquals(1, jobExecution.getAllFailureExceptions().size());
 		assertEquals(JobInterruptedException.class, jobExecution.getFailureExceptions().get(0).getClass());
+		assertEquals(1, jobExecution.getStepExecutions().size());
+		for (StepExecution stepExecution : jobExecution.getStepExecutions()) {
+			assertEquals(BatchStatus.STOPPED, stepExecution.getStatus());
+		}
 	}
 
 	@Test
@@ -260,7 +272,7 @@ public class FlowJobTests {
 			@Override
 			public void execute(StepExecution stepExecution) throws JobInterruptedException {
 				throw new JobInterruptedException("Stopped");
-			}	
+			}
 		}), "end0"));
 		transitions.add(StateTransition.createEndStateTransition(new EndState(FlowExecutionStatus.COMPLETED, "end0")));
 		flow.setStateTransitions(transitions);
@@ -285,7 +297,7 @@ public class FlowJobTests {
 			@Override
 			public void execute(StepExecution stepExecution) throws JobInterruptedException {
 				throw new JobInterruptedException("Stopped");
-			}	
+			}
 		}), "end0"));
 		transitions.add(StateTransition.createEndStateTransition(new EndState(FlowExecutionStatus.COMPLETED, "end0")));
 		flow1.setStateTransitions(new ArrayList<StateTransition>(transitions));
@@ -294,7 +306,8 @@ public class FlowJobTests {
 		flow2.afterPropertiesSet();
 
 		transitions = new ArrayList<StateTransition>();
-		transitions.add(StateTransition.createStateTransition(new SplitState(Arrays.<Flow>asList(flow1, flow2), "split"), "end0"));
+		transitions.add(StateTransition.createStateTransition(new SplitState(Arrays.<Flow> asList(flow1, flow2),
+				"split"), "end0"));
 		transitions.add(StateTransition.createEndStateTransition(new EndState(FlowExecutionStatus.COMPLETED, "end0")));
 		flow.setStateTransitions(transitions);
 		flow.afterPropertiesSet();
