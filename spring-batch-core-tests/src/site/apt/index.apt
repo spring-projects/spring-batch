@@ -1,0 +1,15 @@
+                                    ------
+                                    Spring Batch Integration Tests
+                                    ------
+                                    Dave Syer
+                                    ------
+                                    March 2008
+
+Overview of the Spring Batch Integration Tests
+
+  This module contains integration tests for the Spring Batch Infrastructure module.  In the tests we exercise some extended and mostly realistic scenarios using the infrastructure components.
+
+    * Message-pipeline tests.  There are a bunch of tests using JMS and RDBMS in the same transaction, exercising various failure and retry scenarios.  The basic premise is that throughput in such systems is greatly increased by widening the transactio nboundaries to process more than one message in each transaction.  If there is a failure we may want to retry the operation in the next transaction.
+
+    * OXM integration tests.  There are also some tests of the XML reader and writers in Spring Batch with more extensive configuration than in the unit tests.
+ 

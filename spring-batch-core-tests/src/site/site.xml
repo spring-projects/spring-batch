@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<project name="Spring Batch: ${project.name}">
+
+	<body>
+
+		<links>
+			<item name="${project.name}" href="index.html"/>			
+		</links>
+		
+		<menu name="Spring Batch Integration Tests">
+			<item name="${project.name}" href="index.html"/>
+		</menu>
+
+		<menu ref="reports"/>
+
+	</body>
+</project>

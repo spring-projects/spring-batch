@@ -1,0 +1,23 @@
+#Tue Sep 22 11:04:01 BST 2009
+//org.springframework.ide.eclipse.beans.core.default.version.http\://www.springframework.org/schema/aop=
+//org.springframework.ide.eclipse.beans.core.default.version.http\://www.springframework.org/schema/batch=
+//org.springframework.ide.eclipse.beans.core.default.version.http\://www.springframework.org/schema/beans=
+//org.springframework.ide.eclipse.beans.core.default.version.http\://www.springframework.org/schema/context=
+//org.springframework.ide.eclipse.beans.core.default.version.http\://www.springframework.org/schema/faces=
+//org.springframework.ide.eclipse.beans.core.default.version.http\://www.springframework.org/schema/jdbc=
+//org.springframework.ide.eclipse.beans.core.default.version.http\://www.springframework.org/schema/jee=
+//org.springframework.ide.eclipse.beans.core.default.version.http\://www.springframework.org/schema/jms=
+//org.springframework.ide.eclipse.beans.core.default.version.http\://www.springframework.org/schema/lang=
+//org.springframework.ide.eclipse.beans.core.default.version.http\://www.springframework.org/schema/osgi=
+//org.springframework.ide.eclipse.beans.core.default.version.http\://www.springframework.org/schema/osgi-compendium=
+//org.springframework.ide.eclipse.beans.core.default.version.http\://www.springframework.org/schema/oxm=
+//org.springframework.ide.eclipse.beans.core.default.version.http\://www.springframework.org/schema/p=
+//org.springframework.ide.eclipse.beans.core.default.version.http\://www.springframework.org/schema/security=
+//org.springframework.ide.eclipse.beans.core.default.version.http\://www.springframework.org/schema/task=
+//org.springframework.ide.eclipse.beans.core.default.version.http\://www.springframework.org/schema/tx=
+//org.springframework.ide.eclipse.beans.core.default.version.http\://www.springframework.org/schema/util=
+//org.springframework.ide.eclipse.beans.core.default.version.http\://www.springframework.org/schema/webflow-config=
+eclipse.preferences.version=1
+org.springframework.ide.eclipse.beans.core.default.version.check.classpath=true
+org.springframework.ide.eclipse.beans.core.enable.namespace.versions=false
+org.springframework.ide.eclipse.beans.core.ignoreMissingNamespaceHandler=false
