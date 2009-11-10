@@ -38,7 +38,7 @@ import org.springframework.batch.core.listener.StepExecutionListenerSupport;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.repository.support.SimpleJobRepository;
 import org.springframework.batch.core.step.AbstractStep;
-import org.springframework.batch.core.step.item.FatalException;
+import org.springframework.batch.core.step.item.FatalSkippableException;
 import org.springframework.batch.core.step.item.FatalRuntimeException;
 import org.springframework.batch.core.step.item.SkippableException;
 import org.springframework.batch.core.step.item.SkippableRuntimeException;
@@ -427,10 +427,10 @@ public class StepParserTests {
 		skippable.put(SkippableRuntimeException.class, true);
 		skippable.put(SkippableException.class, true);
 		skippable.put(FatalRuntimeException.class, false);
-		skippable.put(FatalException.class, false);
+		skippable.put(FatalSkippableException.class, false);
 		Map<Class<? extends Throwable>, Boolean> retryable = new HashMap<Class<? extends Throwable>, Boolean>();
 		retryable.put(DeadlockLoserDataAccessException.class, true);
-		retryable.put(FatalException.class, true);
+		retryable.put(FatalSkippableException.class, true);
 		List<Class<? extends ItemStream>> streams = Arrays.asList(CompositeItemStream.class, TestReader.class);
 		List<Class<? extends RetryListener>> retryListeners = Arrays.asList(RetryListenerSupport.class,
 				DummyRetryListener.class);
@@ -463,9 +463,9 @@ public class StepParserTests {
 
 		Map<Class<? extends Throwable>, Boolean> skippable = new HashMap<Class<? extends Throwable>, Boolean>();
 		skippable.put(SkippableException.class, true);
-		skippable.put(FatalException.class, false);
+		skippable.put(FatalSkippableException.class, false);
 		Map<Class<? extends Throwable>, Boolean> retryable = new HashMap<Class<? extends Throwable>, Boolean>();
-		retryable.put(FatalException.class, true);
+		retryable.put(FatalSkippableException.class, true);
 		List<Class<CompositeItemStream>> streams = Arrays.asList(CompositeItemStream.class);
 		List<Class<DummyRetryListener>> retryListeners = Arrays.asList(DummyRetryListener.class);
 		List<Class<CompositeStepExecutionListener>> stepListeners = Arrays.asList(CompositeStepExecutionListener.class);

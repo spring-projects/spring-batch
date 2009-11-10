@@ -30,6 +30,7 @@ import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.scope.context.ChunkContext;
 import org.springframework.batch.core.scope.context.StepContextRepeatCallback;
 import org.springframework.batch.core.step.AbstractStep;
+import org.springframework.batch.core.step.FatalException;
 import org.springframework.batch.core.step.StepInterruptionPolicy;
 import org.springframework.batch.core.step.ThreadStepInterruptionPolicy;
 import org.springframework.batch.item.ExecutionContext;

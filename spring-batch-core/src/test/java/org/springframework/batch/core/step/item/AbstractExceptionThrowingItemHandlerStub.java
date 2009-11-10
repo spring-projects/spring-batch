@@ -47,8 +47,14 @@ public abstract class AbstractExceptionThrowingItemHandlerStub<T> {
 	public void setExceptionType(Class<? extends Throwable> exceptionType) throws Exception {
 		try {
 			exception = exceptionType.getConstructor(String.class);
-		} catch (NoSuchMethodException e) {
-			exception = exceptionType.getConstructor(Object.class);
+		}
+		catch (NoSuchMethodException e) {
+			try {
+				exception = exceptionType.getConstructor(String.class, Throwable.class);
+			}
+			catch (NoSuchMethodException ex) {
+				exception = exceptionType.getConstructor(Object.class);
+			}
 		}
 	}
 
@@ -58,7 +64,7 @@ public abstract class AbstractExceptionThrowingItemHandlerStub<T> {
 
 	protected void checkFailure(T item) throws Exception {
 		if (isFailure(item)) {
-			Throwable t = exception.newInstance("Intended Failure: " + item);
+			Throwable t = getException("Intended Failure: " + item);
 			if (t instanceof Exception) {
 				throw (Exception) t;
 			}
@@ -67,6 +73,13 @@ public abstract class AbstractExceptionThrowingItemHandlerStub<T> {
 			}
 			throw new IllegalStateException("Unexpected non-Error Throwable");
 		}
+	}
+
+	private Throwable getException(String string) throws Exception {
+		if (exception.getParameterTypes().length==1) {
+			return exception.newInstance(string);
+		}
+		return exception.newInstance(string, new RuntimeException("Planned"));
 	}
 
 	protected boolean isFailure(T item) {

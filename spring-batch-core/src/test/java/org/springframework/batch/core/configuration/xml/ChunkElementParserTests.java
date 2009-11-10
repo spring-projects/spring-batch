@@ -50,7 +50,7 @@ public class ChunkElementParserTests {
 	public void testInheritSkippable() throws Exception {
 		Map<Class<? extends Throwable>, Boolean> skippable = getExceptionClasses("s1",
 				chunkElementParentAttributeParserTestsContext);
-		assertEquals(11, skippable.size());
+		assertEquals(12, skippable.size());
 		containsClassified(skippable, NullPointerException.class, true);
 		containsClassified(skippable, ArithmeticException.class, true);
 		containsClassified(skippable, CannotAcquireLockException.class, false);
@@ -61,7 +61,7 @@ public class ChunkElementParserTests {
 	public void testInheritSkippableWithNoMerge() throws Exception {
 		Map<Class<? extends Throwable>, Boolean> skippable = getExceptionClasses("s2",
 				chunkElementParentAttributeParserTestsContext);
-		assertEquals(9, skippable.size());
+		assertEquals(10, skippable.size());
 		containsClassified(skippable, NullPointerException.class, true);
 		assertFalse(skippable.containsKey(ArithmeticException.class));
 		containsClassified(skippable, CannotAcquireLockException.class, false);

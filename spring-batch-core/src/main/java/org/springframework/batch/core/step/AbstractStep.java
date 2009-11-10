@@ -353,15 +353,4 @@ public abstract class AbstractStep implements Step, InitializingBean, BeanNameAw
 		return exitStatus;
 	}
 
-	/**
-	 * Signals a fatal exception - e.g. unable to persist batch metadata or
-	 * rollback transaction. Throwing this exception will result in storing
-	 * {@link BatchStatus#UNKNOWN} as step's status.
-	 */
-	protected static class FatalException extends RuntimeException {
-		public FatalException(String string, Throwable e) {
-			super(string, e);
-		}
-	}
-
 }

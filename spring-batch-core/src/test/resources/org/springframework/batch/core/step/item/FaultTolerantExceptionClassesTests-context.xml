@@ -29,7 +29,7 @@
 					<include class="org.springframework.batch.core.step.item.SkippableRuntimeException"/>
 					<include class="org.springframework.batch.core.step.item.SkippableException"/>
 					<exclude class="org.springframework.batch.core.step.item.FatalRuntimeException"/>
-					<exclude class="org.springframework.batch.core.step.item.FatalException"/>
+					<exclude class="org.springframework.batch.core.step.item.FatalSkippableException"/>
 				</skippable-exception-classes>
 			</chunk>
 		</tasklet>
@@ -42,7 +42,7 @@
 					<include class="org.springframework.batch.core.step.item.SkippableRuntimeException"/>
 					<include class="org.springframework.batch.core.step.item.SkippableException"/>
 					<exclude class="org.springframework.batch.core.step.item.FatalRuntimeException"/>
-					<exclude class="org.springframework.batch.core.step.item.FatalException"/>
+					<exclude class="org.springframework.batch.core.step.item.FatalSkippableException"/>
 				</skippable-exception-classes>
 				<retryable-exception-classes>
 					<include class="java.lang.Exception"/>
@@ -85,7 +85,7 @@
 					<include class="org.springframework.batch.core.step.item.SkippableRuntimeException"/>
 					<include class="org.springframework.batch.core.step.item.SkippableException"/>
 					<include class="org.springframework.batch.core.step.item.FatalRuntimeException"/>
-					<include class="org.springframework.batch.core.step.item.FatalException"/>
+					<include class="org.springframework.batch.core.step.item.FatalSkippableException"/>
 				</skippable-exception-classes>
 			</chunk>
 			<no-rollback-exception-classes>
@@ -102,7 +102,7 @@
 					<exclude class="org.springframework.batch.core.step.item.SkippableRuntimeException"/>
 					<exclude class="org.springframework.batch.core.step.item.SkippableException"/>
 					<exclude class="org.springframework.batch.core.step.item.FatalRuntimeException"/>
-					<exclude class="org.springframework.batch.core.step.item.FatalException"/>
+					<exclude class="org.springframework.batch.core.step.item.FatalSkippableException"/>
 				</skippable-exception-classes>
 			</chunk>
 			<no-rollback-exception-classes>
