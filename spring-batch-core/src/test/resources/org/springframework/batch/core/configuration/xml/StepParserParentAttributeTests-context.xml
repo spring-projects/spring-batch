@@ -182,10 +182,10 @@
 			<chunk reader="reader" writer="writer" commit-interval="10">
 				<skippable-exception-classes merge="true">
 					<include class="org.springframework.batch.core.step.item.SkippableException"/>
-					<exclude class="org.springframework.batch.core.step.item.FatalException"/>
+					<exclude class="org.springframework.batch.core.step.item.FatalSkippableException"/>
 				</skippable-exception-classes>
 				<retryable-exception-classes merge="true">
-					<include class="org.springframework.batch.core.step.item.FatalException"/>
+					<include class="org.springframework.batch.core.step.item.FatalSkippableException"/>
 				</retryable-exception-classes>
 				<streams merge="true">
 					<stream ref="stream2"/>
@@ -212,10 +212,10 @@
 			<chunk reader="reader" writer="writer" commit-interval="10">
 				<skippable-exception-classes>
 					<include class="org.springframework.batch.core.step.item.SkippableException"/>
-					<exclude class="org.springframework.batch.core.step.item.FatalException"/>
+					<exclude class="org.springframework.batch.core.step.item.FatalSkippableException"/>
 				</skippable-exception-classes>
 				<retryable-exception-classes>
-					<include class="org.springframework.batch.core.step.item.FatalException"/>
+					<include class="org.springframework.batch.core.step.item.FatalSkippableException"/>
 				</retryable-exception-classes>
 				<streams>
 					<stream ref="stream2"/>
