@@ -9,7 +9,12 @@ import org.springframework.batch.core.UnexpectedJobExecutionException;
  * result in the step having a status of {@link BatchStatus#UNKNOWN}.
  */
 public class FatalException extends UnexpectedJobExecutionException {
+
 	public FatalException(String string, Throwable e) {
 		super(string, e);
+	}
+
+	public FatalException(String string) {
+		super(string);
 	}
 }

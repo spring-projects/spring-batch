@@ -194,11 +194,14 @@ public class TaskletStepExceptionTests {
 	@Test
 	public void testCommitError() throws Exception {
 
-		final RuntimeException exception = new RuntimeException();
 		taskletStep.setTransactionManager(new ResourcelessTransactionManager() {
 			@Override
 			protected void doCommit(DefaultTransactionStatus status) throws TransactionException {
-				throw exception;
+				throw new RuntimeException("bar");
+			}
+			@Override
+			protected void doRollback(DefaultTransactionStatus status) throws TransactionException {
+				throw new RuntimeException("foo");
 			}
 		});
 
@@ -213,7 +216,7 @@ public class TaskletStepExceptionTests {
 		taskletStep.execute(stepExecution);
 		assertEquals(UNKNOWN, stepExecution.getStatus());
 		Throwable e = stepExecution.getFailureExceptions().get(0);
-		assertEquals(exception, e.getCause());
+		assertEquals("foo", e.getMessage());
 	}
 
 	@Test

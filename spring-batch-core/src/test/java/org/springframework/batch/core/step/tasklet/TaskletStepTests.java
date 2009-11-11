@@ -673,7 +673,7 @@ public class TaskletStepTests {
 		String msg = stepExecution.getExitStatus().getExitDescription();
 		assertTrue("Message does not contain ResetFailedException: " + msg, msg.contains("ResetFailedException"));
 		// The original rollback was caused by this one:
-		assertEquals("Bar", stepExecution.getFailureExceptions().get(0).getCause().getMessage());
+		assertEquals("Bar", stepExecution.getFailureExceptions().get(0).getMessage());
 	}
 
 	@Test
@@ -682,6 +682,10 @@ public class TaskletStepTests {
 		step.setTransactionManager(new ResourcelessTransactionManager() {
 			protected void doCommit(DefaultTransactionStatus status) throws TransactionException {
 				// Simulate failure on commit
+				throw new RuntimeException("Foo");
+			}
+			@Override
+			protected void doRollback(DefaultTransactionStatus status) throws TransactionException {
 				throw new RuntimeException("Bar");
 			}
 		});
@@ -695,12 +699,10 @@ public class TaskletStepTests {
 		step.execute(stepExecution);
 		assertEquals(BatchStatus.UNKNOWN, stepExecution.getStatus());
 		String msg = stepExecution.getExitStatus().getExitDescription();
-		assertTrue(msg.contains("Fatal failure detected"));
 		Throwable ex = stepExecution.getFailureExceptions().get(0);
 		msg = ex.getMessage();
-		assertTrue(msg.contains("Fatal failure detected"));
-		// The original rollback was caused by this one:
-		assertEquals("Bar", ex.getCause().getMessage());
+		// The original rollback failed because of this one:
+		assertEquals("Bar", ex.getMessage());
 	}
 
 	@Test

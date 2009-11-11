@@ -46,6 +46,11 @@ import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.TransactionStatus;
 import org.springframework.transaction.interceptor.DefaultTransactionAttribute;
 import org.springframework.transaction.interceptor.TransactionAttribute;
+import org.springframework.transaction.support.TransactionCallback;
+import org.springframework.transaction.support.TransactionSynchronization;
+import org.springframework.transaction.support.TransactionSynchronizationAdapter;
+import org.springframework.transaction.support.TransactionSynchronizationManager;
+import org.springframework.transaction.support.TransactionTemplate;
 import org.springframework.util.Assert;
 
 /**
@@ -248,142 +253,18 @@ public class TaskletStep extends AbstractStep {
 
 				StepExecution stepExecution = chunkContext.getStepContext().getStepExecution();
 
-				StepContribution contribution = stepExecution.createStepContribution();
-
 				// Before starting a new transaction, check for
 				// interruption.
 				interruptionPolicy.checkInterrupted(stepExecution);
 
-				RepeatStatus result = RepeatStatus.CONTINUABLE;
-
-				TransactionStatus transaction = transactionManager.getTransaction(transactionAttribute);
-
-				chunkListener.beforeChunk();
-
-				boolean locked = false;
-
-				Integer oldVersion = null;
-				boolean committed = true;
-
+				RepeatStatus result;
 				try {
-
-					try {
-						try {
-							result = tasklet.execute(contribution, chunkContext);
-							if (result == null) {
-								result = RepeatStatus.FINISHED;
-							}
-						}
-						catch (Exception e) {
-							if (transactionAttribute.rollbackOn(e)) {
-								throw e;
-							}
-						}
-
-					}
-					finally {
-
-						// If the step operations are asynchronous then we need
-						// to synchronize changes to the step execution (at a
-						// minimum). Take the lock *before* changing the step
-						// execution.
-						try {
-							semaphore.acquire();
-							locked = true;
-						}
-						catch (InterruptedException e) {
-							stepExecution.setStatus(BatchStatus.STOPPED);
-							Thread.currentThread().interrupt();
-						}
-
-						// In case we need to push it back to its old value
-						// after a commit fails...
-						oldVersion = stepExecution.getVersion();
-
-						// Apply the contribution to the step
-						// even if unsuccessful
-						logger.debug("Applying contribution: " + contribution);
-						stepExecution.apply(contribution);
-
-					}
-
-					stream.update(stepExecution.getExecutionContext());
-
-					try {
-						// Going to attempt a commit. If it fails this flag will
-						// stay false and we can use that later.
-						committed = false;
-						getJobRepository().updateExecutionContext(stepExecution);
-						stepExecution.incrementCommitCount();
-						/*
-						 * The step execution has to be saved before commit
-						 * because otherwise there is a deadlock between the
-						 * data source pool and the semaphore. As long as only
-						 * one connection is used inside the section of this
-						 * callback that is locked with the semaphore, the
-						 * deadlock is avoided.
-						 */
-						logger.debug("Saving step execution before commit: " + stepExecution);
-						getJobRepository().update(stepExecution);
-						transactionManager.commit(transaction);
-						committed = true;
-					}
-					catch (Exception e) {
-						throw new FatalException("Fatal failure detected", e);
-					}
-
+					result = (RepeatStatus) new TransactionTemplate(transactionManager, transactionAttribute)
+							.execute(new ChunkTransactionCallback(chunkContext));
 				}
-				catch (FatalException e) {
-					try {
-						logger.debug("Rollback for FatalException: " + e.getClass().getName() + ": " + e.getMessage());
-						rollback(stepExecution, transaction);
-					}
-					catch (Exception rollbackException) {
-						/*
-						 * Propagate the original fatal failure; only log the
-						 * failed rollback. The failure can be caused by
-						 * attempting a rollback when the commit has already
-						 * succeeded (which is normal so only logged at debug
-						 * level)
-						 */
-						logger.debug("Rollback caused by fatal failure failed", rollbackException);
-					}
-					throw e;
-				}
-				catch (Error e) {
-					try {
-						logger.debug("Rollback for Error: " + e.getClass().getName() + ": " + e.getMessage());
-						rollback(stepExecution, transaction);
-					}
-					catch (Exception rollbackException) {
-						logger.error("Fatal rollback failure, original exception that caused the rollback is", e);
-						throw new FatalException("Failed while processing rollback", rollbackException);
-					}
-					throw e;
-
-				}
-				catch (Exception e) {
-					try {
-						logger.debug("Rollback for Exception: " + e.getClass().getName() + ": " + e.getMessage());
-						rollback(stepExecution, transaction);
-					}
-					catch (Exception rollbackException) {
-						logger.error("Fatal rollback failure, original exception that caused the rollback is", e);
-						throw new FatalException("Failed while processing rollback", rollbackException);
-					}
-					throw e;
-				}
-				finally {
-					if (!committed && oldVersion != null) {
-						// Wah! the commit failed. We need to rescue the step
-						// execution data.
-						stepExecution.setVersion(oldVersion);
-					}
-					// only release the lock if we acquired it
-					if (locked) {
-						semaphore.release();
-					}
-					locked = false;
+				catch (TransactionException e) {
+					// Allow checked exceptions to be thrown inside callback
+					throw (Exception) e.getCause();
 				}
 
 				chunkListener.afterChunk();
@@ -408,8 +289,156 @@ public class TaskletStep extends AbstractStep {
 		stream.open(ctx);
 	}
 
-	private void rollback(StepExecution stepExecution, TransactionStatus transaction) {
-		transactionManager.rollback(transaction);
-		stepExecution.incrementRollbackCount();
+	private class ChunkTransactionCallback extends TransactionSynchronizationAdapter implements TransactionCallback {
+
+		private final StepExecution stepExecution;
+
+		private final ChunkContext chunkContext;
+
+		private boolean rolledBack = false;
+
+		private Integer oldVersion;
+
+		public ChunkTransactionCallback(ChunkContext chunkContext) {
+			this.chunkContext = chunkContext;
+			this.stepExecution = chunkContext.getStepContext().getStepExecution();
+		}
+
+		@Override
+		public void afterCompletion(int status) {
+			if (status != TransactionSynchronization.STATUS_COMMITTED) {
+				if (oldVersion != null) {
+					// Wah! the commit failed. We need to rescue the step
+					// execution data.
+					stepExecution.setVersion(oldVersion);
+				}				
+			}
+			if (status == TransactionSynchronization.STATUS_UNKNOWN) {
+				rollback(stepExecution);
+				stepExecution.upgradeStatus(BatchStatus.UNKNOWN);
+			}
+		}
+
+		public Object doInTransaction(TransactionStatus status) {
+
+			TransactionSynchronizationManager.registerSynchronization(this);
+
+			RepeatStatus result = RepeatStatus.CONTINUABLE;
+
+			StepContribution contribution = stepExecution.createStepContribution();
+
+			chunkListener.beforeChunk();
+
+			boolean locked = false;
+
+			try {
+
+				try {
+					try {
+						result = tasklet.execute(contribution, chunkContext);
+						if (result == null) {
+							result = RepeatStatus.FINISHED;
+						}
+					}
+					catch (Exception e) {
+						if (transactionAttribute.rollbackOn(e)) {
+							throw e;
+						}
+					}
+
+				}
+				finally {
+
+					// If the step operations are asynchronous then we need
+					// to synchronize changes to the step execution (at a
+					// minimum). Take the lock *before* changing the step
+					// execution.
+					try {
+						semaphore.acquire();
+						locked = true;
+					}
+					catch (InterruptedException e) {
+						stepExecution.setStatus(BatchStatus.STOPPED);
+						Thread.currentThread().interrupt();
+					}
+
+					// In case we need to push it back to its old value
+					// after a commit fails...
+					oldVersion = stepExecution.getVersion();
+
+					// Apply the contribution to the step
+					// even if unsuccessful
+					logger.debug("Applying contribution: " + contribution);
+					stepExecution.apply(contribution);
+
+				}
+
+				stream.update(stepExecution.getExecutionContext());
+
+				try {
+					// Going to attempt a commit. If it fails this flag will
+					// stay false and we can use that later.
+					getJobRepository().updateExecutionContext(stepExecution);
+					stepExecution.incrementCommitCount();
+					/*
+					 * The step execution has to be saved before commit because
+					 * otherwise there is a deadlock between the data source
+					 * pool and the semaphore. As long as only one connection is
+					 * used inside the section of this callback that is locked
+					 * with the semaphore, the deadlock is avoided.
+					 */
+					logger.debug("Saving step execution before commit: " + stepExecution);
+					getJobRepository().update(stepExecution);
+				}
+				catch (Exception e) {
+					throw new FatalException("Fatal failure detected", e);
+				}
+
+			}
+			catch (Error e) {
+				logger.debug("Rollback for Error: " + e.getClass().getName() + ": " + e.getMessage());
+				rollback(stepExecution);
+				throw e;
+
+			}
+			catch (RuntimeException e) {
+				logger.debug("Rollback for RuntimeException: " + e.getClass().getName() + ": " + e.getMessage());
+				rollback(stepExecution);
+				throw e;
+			}
+			catch (Exception e) {
+				logger.debug("Rollback for Exception: " + e.getClass().getName() + ": " + e.getMessage());
+				rollback(stepExecution);
+				// Allow checked exceptions
+				throw new TransactionException(e);
+			}
+			finally {
+				// only release the lock if we acquired it
+				if (locked) {
+					semaphore.release();
+				}
+				locked = false;
+			}
+
+			return result;
+
+		}
+
+		private void rollback(StepExecution stepExecution) {
+			if (!rolledBack) {
+				stepExecution.incrementRollbackCount();
+				rolledBack = true;
+			}
+		}
+
 	}
+
+	private static class TransactionException extends RuntimeException {
+
+		public TransactionException(Exception e) {
+			super(e);
+		}
+
+	}
+
 }

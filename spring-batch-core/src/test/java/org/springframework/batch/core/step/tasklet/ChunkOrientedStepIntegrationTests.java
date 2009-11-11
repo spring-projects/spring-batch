@@ -17,7 +17,6 @@ package org.springframework.batch.core.step.tasklet;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
 
 import java.util.Arrays;
 import java.util.Collections;
@@ -115,19 +114,18 @@ public class ChunkOrientedStepIntegrationTests {
 
 		jobRepository.add(stepExecution);
 		step.execute(stepExecution);
-		assertEquals(BatchStatus.UNKNOWN, stepExecution.getStatus());
+		// Exception on commit is not necessarily fatal: it should fail and rollback
+		assertEquals(BatchStatus.FAILED, stepExecution.getStatus());
 		StepExecution lastStepExecution = jobRepository.getLastStepExecution(jobExecution.getJobInstance(), step
 				.getName());
 		assertEquals(lastStepExecution, stepExecution);
 		assertFalse(lastStepExecution == stepExecution);
 
 		// If the StepExecution is not saved after the failure it will be
-		// STARTED instead of UNKNOWN
-		assertEquals(BatchStatus.UNKNOWN, lastStepExecution.getStatus());
-		String msg = stepExecution.getExitStatus().getExitDescription();
-		assertTrue(msg.contains("Fatal failure detected"));
+		// STARTED instead of FAILED
+		assertEquals(BatchStatus.FAILED, lastStepExecution.getStatus());
 		// The original rollback was caused by this one:
-		assertEquals("Simulate commit failure", stepExecution.getFailureExceptions().get(0).getCause().getMessage());
+		assertEquals("Simulate commit failure", stepExecution.getFailureExceptions().get(0).getMessage());
 
 	}
 
