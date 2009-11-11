@@ -272,10 +272,7 @@ public abstract class AbstractStep implements Step, InitializingBean, BeanNameAw
 	 * Determine the step status based on the exception.
 	 */
 	private static BatchStatus determineBatchStatus(Throwable e) {
-		if (e instanceof FatalException) {
-			return BatchStatus.UNKNOWN;
-		}
-		else if (e instanceof JobInterruptedException || e.getCause() instanceof JobInterruptedException) {
+		if (e instanceof JobInterruptedException || e.getCause() instanceof JobInterruptedException) {
 			return BatchStatus.STOPPED;
 		}
 		else {

@@ -21,7 +21,6 @@ import org.springframework.batch.core.repository.JobExecutionAlreadyRunningExcep
 import org.springframework.batch.core.repository.JobInstanceAlreadyCompleteException;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.repository.JobRestartException;
-import org.springframework.batch.core.step.FatalException;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
@@ -119,15 +118,6 @@ public class FaultTolerantExceptionClassesTests implements ApplicationContextAwa
 		// BATCH-1327:
 		assertEquals("[1, 2, 3]", writer.getWritten().toString());
 		// BATCH-1327:
-		assertEquals("[]", writer.getCommitted().toString());
-	}
-
-	@Test
-	public void testInternalFatalChecked() throws Exception {
-		writer.setExceptionType(FatalException.class);
-		StepExecution stepExecution = launchStep("skippableFatalStep");
-		assertEquals(BatchStatus.UNKNOWN, stepExecution.getStatus());
-		assertEquals("[1, 2, 3]", writer.getWritten().toString());
 		assertEquals("[]", writer.getCommitted().toString());
 	}
 

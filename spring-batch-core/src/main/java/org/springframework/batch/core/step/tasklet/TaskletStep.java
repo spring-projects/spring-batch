@@ -30,7 +30,6 @@ import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.scope.context.ChunkContext;
 import org.springframework.batch.core.scope.context.StepContextRepeatCallback;
 import org.springframework.batch.core.step.AbstractStep;
-import org.springframework.batch.core.step.FatalException;
 import org.springframework.batch.core.step.StepInterruptionPolicy;
 import org.springframework.batch.core.step.ThreadStepInterruptionPolicy;
 import org.springframework.batch.item.ExecutionContext;
@@ -289,6 +288,15 @@ public class TaskletStep extends AbstractStep {
 		stream.open(ctx);
 	}
 
+	/**
+	 * A callback for the transactional work inside a chunk. Also detects
+	 * failures in the transaction commit and rollback, only panicking if the
+	 * transaction status is unknown (i.e. if a commit failure leads to a clean
+	 * rollback then we assume the state is consistent).
+	 * 
+	 * @author Dave Syer
+	 * 
+	 */
 	private class ChunkTransactionCallback extends TransactionSynchronizationAdapter implements TransactionCallback {
 
 		private final StepExecution stepExecution;
@@ -311,11 +319,12 @@ public class TaskletStep extends AbstractStep {
 					// Wah! the commit failed. We need to rescue the step
 					// execution data.
 					stepExecution.setVersion(oldVersion);
-				}				
+				}
 			}
 			if (status == TransactionSynchronization.STATUS_UNKNOWN) {
 				rollback(stepExecution);
 				stepExecution.upgradeStatus(BatchStatus.UNKNOWN);
+				stepExecution.setTerminateOnly();
 			}
 		}
 
@@ -359,6 +368,7 @@ public class TaskletStep extends AbstractStep {
 					}
 					catch (InterruptedException e) {
 						stepExecution.setStatus(BatchStatus.STOPPED);
+						stepExecution.setTerminateOnly();
 						Thread.currentThread().interrupt();
 					}
 
@@ -380,18 +390,15 @@ public class TaskletStep extends AbstractStep {
 					// stay false and we can use that later.
 					getJobRepository().updateExecutionContext(stepExecution);
 					stepExecution.incrementCommitCount();
-					/*
-					 * The step execution has to be saved before commit because
-					 * otherwise there is a deadlock between the data source
-					 * pool and the semaphore. As long as only one connection is
-					 * used inside the section of this callback that is locked
-					 * with the semaphore, the deadlock is avoided.
-					 */
 					logger.debug("Saving step execution before commit: " + stepExecution);
 					getJobRepository().update(stepExecution);
 				}
 				catch (Exception e) {
-					throw new FatalException("Fatal failure detected", e);
+					// If we get to here there was a problem saving the step
+					// execution and we have to fail.
+					stepExecution.upgradeStatus(BatchStatus.UNKNOWN);
+					stepExecution.setTerminateOnly();
+					throw e;
 				}
 
 			}
@@ -433,6 +440,13 @@ public class TaskletStep extends AbstractStep {
 
 	}
 
+	/**
+	 * Convenience wrapper for a checked exception so that it can cause a
+	 * rollback and be extracted afterwards.
+	 * 
+	 * @author Dave Syer
+	 * 
+	 */
 	private static class TransactionException extends RuntimeException {
 
 		public TransactionException(Exception e) {

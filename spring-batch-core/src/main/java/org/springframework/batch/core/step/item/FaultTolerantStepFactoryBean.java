@@ -28,7 +28,6 @@ import org.springframework.batch.classify.Classifier;
 import org.springframework.batch.classify.SubclassClassifier;
 import org.springframework.batch.core.JobInterruptedException;
 import org.springframework.batch.core.Step;
-import org.springframework.batch.core.step.FatalException;
 import org.springframework.batch.core.step.skip.LimitCheckingItemSkipPolicy;
 import org.springframework.batch.core.step.skip.NonSkippableReadException;
 import org.springframework.batch.core.step.skip.SkipLimitExceededException;
@@ -294,9 +293,9 @@ public class FaultTolerantStepFactoryBean<T, S> extends SimpleStepFactoryBean<T,
 	@SuppressWarnings("unchecked")
 	@Override
 	protected void applyConfiguration(TaskletStep step) {
-		addFatalExceptionIfMissing(SkipLimitExceededException.class, NonSkippableReadException.class, FatalException.class,
+		addFatalExceptionIfMissing(SkipLimitExceededException.class, NonSkippableReadException.class,
 				SkipListenerFailedException.class, RetryException.class, JobInterruptedException.class, Error.class);
-		addNonRetryableExceptionIfMissing(SkipLimitExceededException.class, NonSkippableReadException.class, FatalException.class,
+		addNonRetryableExceptionIfMissing(SkipLimitExceededException.class, NonSkippableReadException.class,
 				SkipListenerFailedException.class, RetryException.class, JobInterruptedException.class, Error.class);
 
 		super.applyConfiguration(step);
