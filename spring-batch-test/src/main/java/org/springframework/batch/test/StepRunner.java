@@ -29,6 +29,7 @@ import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.JobExecutionListener;
 import org.springframework.batch.core.JobParameter;
 import org.springframework.batch.core.JobParameters;
+import org.springframework.batch.core.JobParametersInvalidException;
 import org.springframework.batch.core.Step;
 import org.springframework.batch.core.job.SimpleJob;
 import org.springframework.batch.core.launch.JobLauncher;
@@ -173,6 +174,9 @@ public class StepRunner {
 			throw new RuntimeException(e);
 		}
 		catch (JobInstanceAlreadyCompleteException e) {
+			throw new RuntimeException(e);
+		}
+		catch (JobParametersInvalidException e) {
 			throw new RuntimeException(e);
 		}
 	}
