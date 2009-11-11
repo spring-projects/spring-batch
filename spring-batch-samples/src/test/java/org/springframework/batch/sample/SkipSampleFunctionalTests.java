@@ -13,6 +13,8 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.batch.core.BatchStatus;
 import org.springframework.batch.core.JobExecution;
+import org.springframework.batch.core.JobParametersInvalidException;
+import org.springframework.batch.core.UnexpectedJobExecutionException;
 import org.springframework.batch.core.explore.JobExplorer;
 import org.springframework.batch.core.launch.JobOperator;
 import org.springframework.batch.core.launch.JobParametersNotFoundException;
@@ -229,6 +231,12 @@ public class SkipSampleFunctionalTests {
 			throw new RuntimeException(e);
 		}
 		catch (JobInstanceAlreadyCompleteException e) {
+			throw new RuntimeException(e);
+		}
+		catch (UnexpectedJobExecutionException e) {
+			throw new RuntimeException(e);
+		}
+		catch (JobParametersInvalidException e) {
 			throw new RuntimeException(e);
 		}
 	}
