@@ -31,6 +31,7 @@ import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.JobExecutionException;
 import org.springframework.batch.core.JobInterruptedException;
 import org.springframework.batch.core.JobParameters;
+import org.springframework.batch.core.JobParametersInvalidException;
 import org.springframework.batch.core.Step;
 import org.springframework.batch.core.StepExecution;
 import org.springframework.batch.core.repository.JobRepository;
@@ -42,7 +43,7 @@ import org.springframework.batch.support.transaction.ResourcelessTransactionMana
  * @author Dave Syer
  * 
  */
-public class AbstractJobTests {
+public class ExtendedAbstractJobTests {
 
 	AbstractJob job = new StubJob("job");
 
@@ -108,6 +109,28 @@ public class AbstractJobTests {
 		catch (IllegalArgumentException e) {
 			assertTrue(e.getMessage().contains("JobRepository"));
 		}
+	}
+	
+	@Test(expected=JobParametersInvalidException.class)
+	public void testValidatorWithNullParameters() throws Exception {
+		job.validate(null);
+	}
+
+	@Test
+	public void testValidatorWithNotNullParameters() throws Exception {
+		job.validate(new JobParameters());
+		// Should be free of side effects
+	}
+
+	@Test(expected=JobParametersInvalidException.class)
+	public void testSetValidator() throws Exception {
+		job.setJobParametersValidator(new DefaultJobParametersValidator() {
+			@Override
+			public void validate(JobParameters parameters) throws JobParametersInvalidException {
+				throw new JobParametersInvalidException("Expected");
+			}
+		});
+		job.validate(new JobParameters());
 	}
 
 	/**

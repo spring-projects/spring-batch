@@ -76,6 +76,11 @@ public class JobParser extends AbstractSingleBeanDefinitionParser {
 			builder.addPropertyReference("jobRepository", repositoryAttribute);
 		}
 
+		String parametersValidator = element.getAttribute("parameters-validator");
+		if (StringUtils.hasText(parametersValidator)) {
+			builder.addPropertyReference("jobParametersValidator", parametersValidator);
+		}
+
 		String restartableAttribute = element.getAttribute("restartable");
 		if (StringUtils.hasText(restartableAttribute)) {
 			builder.addPropertyValue("restartable", restartableAttribute);

@@ -17,10 +17,7 @@ import org.springframework.batch.core.Step;
 import org.springframework.batch.core.StepExecution;
 import org.springframework.batch.core.job.SimpleJob;
 import org.springframework.batch.core.launch.JobLauncher;
-import org.springframework.batch.core.repository.JobExecutionAlreadyRunningException;
-import org.springframework.batch.core.repository.JobInstanceAlreadyCompleteException;
 import org.springframework.batch.core.repository.JobRepository;
-import org.springframework.batch.core.repository.JobRestartException;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
@@ -308,8 +305,7 @@ public class FaultTolerantExceptionClassesTests implements ApplicationContextAwa
 		assertEquals("[1, 1, 1, 1]", tasklet.getCommitted().toString());
 	}
 
-	private StepExecution launchStep(String stepName) throws JobExecutionAlreadyRunningException, JobRestartException,
-			JobInstanceAlreadyCompleteException {
+	private StepExecution launchStep(String stepName) throws Exception {
 		SimpleJob job = new SimpleJob();
 		job.setName("job");
 		job.setJobRepository(jobRepository);

@@ -21,6 +21,7 @@ import org.springframework.batch.core.Job;
 import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.JobInstance;
 import org.springframework.batch.core.JobParameters;
+import org.springframework.batch.core.JobParametersInvalidException;
 import org.springframework.batch.core.launch.JobLauncher;
 import org.springframework.batch.core.repository.JobExecutionAlreadyRunningException;
 import org.springframework.batch.core.repository.JobInstanceAlreadyCompleteException;
@@ -74,12 +75,17 @@ public class SimpleJobLauncher implements JobLauncher, InitializingBean {
 	 * re-start is either not allowed or not needed.
 	 * @throws JobInstanceAlreadyCompleteException if this instance has already
 	 * completed successfully
+	 * @throws JobParametersInvalidException
 	 */
 	public JobExecution run(final Job job, final JobParameters jobParameters)
-			throws JobExecutionAlreadyRunningException, JobRestartException, JobInstanceAlreadyCompleteException {
+			throws JobExecutionAlreadyRunningException, JobRestartException, JobInstanceAlreadyCompleteException,
+			JobParametersInvalidException {
 
 		Assert.notNull(job, "The Job must not be null.");
 		Assert.notNull(jobParameters, "The JobParameters must not be null.");
+
+		// Allow the job to veto the execution
+		job.validate(jobParameters);
 
 		final JobExecution jobExecution;
 		JobExecution lastExecution = jobRepository.getLastJobExecution(job.getName(), jobParameters);
@@ -112,7 +118,8 @@ public class SimpleJobLauncher implements JobLauncher, InitializingBean {
 							+ "] and the following status: [" + jobExecution.getStatus() + "]");
 				}
 				catch (Throwable t) {
-					logger.info("Job: [" + job + "] failed unexpectedly and fatally with the following parameters: [" + jobParameters + "]", t);
+					logger.info("Job: [" + job + "] failed unexpectedly and fatally with the following parameters: ["
+							+ jobParameters + "]", t);
 					rethrow(t);
 				}
 			}

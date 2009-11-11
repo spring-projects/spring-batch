@@ -20,6 +20,7 @@ import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 import org.junit.BeforeClass;
@@ -28,6 +29,7 @@ import org.springframework.aop.framework.Advised;
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.JobExecutionListener;
 import org.springframework.batch.core.job.AbstractJob;
+import org.springframework.batch.core.job.DefaultJobParametersValidator;
 import org.springframework.batch.core.listener.JobExecutionListenerSupport;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.repository.support.SimpleJobRepository;
@@ -180,6 +182,18 @@ public class JobParserTests {
 		catch (BeanCreationException e) {
 			assertTrue(e.getMessage().contains("Missing state for [StateTransition: [state=s2, pattern=*, next=s3]]"));
 		}
+	}
+
+	@Test
+	public void testParametersValidator() {
+		ApplicationContext ctx = jobParserParentAttributeTestsCtx;
+		Job job = (Job) ctx.getBean("jobWithParametersValidator");
+		assertTrue(job instanceof AbstractJob);
+		Object validator = ReflectionTestUtils.getField(job, "jobParametersValidator");
+		assertTrue(validator instanceof DefaultJobParametersValidator);
+		@SuppressWarnings("unchecked")
+		Collection<String> keys = (Collection<String>) ReflectionTestUtils.getField(validator, "requiredKeys");
+		assertEquals(2, keys.size());
 	}
 
 	@Test

@@ -24,6 +24,7 @@ import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.JobInstance;
 import org.springframework.batch.core.JobParameters;
 import org.springframework.batch.core.JobParametersIncrementer;
+import org.springframework.batch.core.JobParametersInvalidException;
 import org.springframework.batch.core.StepExecution;
 import org.springframework.batch.core.UnexpectedJobExecutionException;
 import org.springframework.batch.core.repository.JobExecutionAlreadyRunningException;
@@ -31,10 +32,10 @@ import org.springframework.batch.core.repository.JobInstanceAlreadyCompleteExcep
 import org.springframework.batch.core.repository.JobRestartException;
 
 /**
- * Low level interface for inspecting and controlling jobs with access
- * only to primitive and collection types. Suitable for a command-line client
- * (e.g. that launches a new process for each operation), or a remote launcher
- * like a JMX console.
+ * Low level interface for inspecting and controlling jobs with access only to
+ * primitive and collection types. Suitable for a command-line client (e.g. that
+ * launches a new process for each operation), or a remote launcher like a JMX
+ * console.
  * 
  * @author Dave Syer
  * @since 2.0
@@ -98,8 +99,9 @@ public interface JobOperator {
 	 * name
 	 * @throws JobInstanceAlreadyExistsException if a job instance with this
 	 * name and parameters already exists
+	 * @throws JobParametersInvalidException 
 	 */
-	Long start(String jobName, String parameters) throws NoSuchJobException, JobInstanceAlreadyExistsException;
+	Long start(String jobName, String parameters) throws NoSuchJobException, JobInstanceAlreadyExistsException, JobParametersInvalidException;
 
 	/**
 	 * Restart a failed or stopped {@link JobExecution}. Fails with an exception
@@ -117,9 +119,11 @@ public interface JobOperator {
 	 * corresponding {@link Job} is no longer available for launching
 	 * @throws JobRestartException if there is a non-specific error with the
 	 * restart (e.g. corrupt or inconsistent restart data)
+	 * @throws JobParametersInvalidException if the parameters are not valid for
+	 * this job
 	 */
 	Long restart(long executionId) throws JobInstanceAlreadyCompleteException, NoSuchJobExecutionException,
-			NoSuchJobException, JobRestartException;
+			NoSuchJobException, JobRestartException, JobParametersInvalidException;
 
 	/**
 	 * Launch the next in a sequence of {@link JobInstance} determined by the
@@ -138,10 +142,12 @@ public interface JobOperator {
 	 * is launched
 	 * @throws NoSuchJobException if there is no such job definition available
 	 * @throws JobParametersNotFoundException if the parameters cannot be found
+	 * @throws JobParametersInvalidException 
+	 * @throws UnexpectedJobExecutionException 
 	 * @throws UnexpectedJobExecutionException if an unexpected condition arises
 	 */
 	Long startNextInstance(String jobName) throws NoSuchJobException, JobParametersNotFoundException,
-			JobRestartException, JobExecutionAlreadyRunningException, JobInstanceAlreadyCompleteException;
+			JobRestartException, JobExecutionAlreadyRunningException, JobInstanceAlreadyCompleteException, UnexpectedJobExecutionException, JobParametersInvalidException;
 
 	/**
 	 * Send a stop signal to the {@link JobExecution} with the supplied id. The

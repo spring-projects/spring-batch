@@ -17,6 +17,7 @@ package org.springframework.batch.core.configuration.xml;
 
 import org.springframework.batch.core.JobExecutionListener;
 import org.springframework.batch.core.JobParametersIncrementer;
+import org.springframework.batch.core.job.JobParametersValidator;
 import org.springframework.batch.core.job.flow.Flow;
 import org.springframework.batch.core.job.flow.FlowJob;
 import org.springframework.batch.core.repository.JobRepository;
@@ -42,6 +43,8 @@ class JobParserJobFactoryBean implements SmartFactoryBean {
 
 	private JobRepository jobRepository;
 
+	private JobParametersValidator jobParametersValidator;
+
 	private JobExecutionListener[] jobExecutionListeners;
 
 	private JobParametersIncrementer jobParametersIncrementer;
@@ -62,6 +65,10 @@ class JobParserJobFactoryBean implements SmartFactoryBean {
 
 		if (jobRepository != null) {
 			flowJob.setJobRepository(jobRepository);
+		}
+
+		if (jobParametersValidator != null) {
+			flowJob.setJobParametersValidator(jobParametersValidator);
 		}
 
 		if (jobExecutionListeners != null) {
@@ -86,6 +93,10 @@ class JobParserJobFactoryBean implements SmartFactoryBean {
 
 	public void setJobRepository(JobRepository jobRepository) {
 		this.jobRepository = jobRepository;
+	}
+	
+	public void setJobParametersValidator(JobParametersValidator jobParametersValidator) {
+		this.jobParametersValidator = jobParametersValidator;
 	}
 
 	public JobRepository getJobRepository() {

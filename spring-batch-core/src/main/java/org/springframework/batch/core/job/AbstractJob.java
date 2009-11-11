@@ -29,7 +29,9 @@ import org.springframework.batch.core.JobExecutionException;
 import org.springframework.batch.core.JobExecutionListener;
 import org.springframework.batch.core.JobInstance;
 import org.springframework.batch.core.JobInterruptedException;
+import org.springframework.batch.core.JobParameters;
 import org.springframework.batch.core.JobParametersIncrementer;
+import org.springframework.batch.core.JobParametersInvalidException;
 import org.springframework.batch.core.StartLimitExceededException;
 import org.springframework.batch.core.Step;
 import org.springframework.batch.core.StepExecution;
@@ -45,10 +47,10 @@ import org.springframework.util.Assert;
 import org.springframework.util.ClassUtils;
 
 /**
- * Abstract implementation of the {@link Job} interface.  Common dependencies such as a
- * {@link JobRepository}, {@link JobExecutionListener}s, and various configuration 
- * parameters are set here.  Therefore, common error handling and listener calling
- * activities are abstracted away from implementations.
+ * Abstract implementation of the {@link Job} interface. Common dependencies
+ * such as a {@link JobRepository}, {@link JobExecutionListener}s, and various
+ * configuration parameters are set here. Therefore, common error handling and
+ * listener calling activities are abstracted away from implementations.
  * 
  * @author Lucas Ward
  * @author Dave Syer
@@ -67,6 +69,8 @@ public abstract class AbstractJob implements Job, StepLocator, BeanNameAware, In
 
 	private JobParametersIncrementer jobParametersIncrementer;
 
+	private JobParametersValidator jobParametersValidator = new DefaultJobParametersValidator();
+
 	/**
 	 * Default constructor.
 	 */
@@ -83,6 +87,26 @@ public abstract class AbstractJob implements Job, StepLocator, BeanNameAware, In
 	public AbstractJob(String name) {
 		super();
 		this.name = name;
+	}
+
+	/**
+	 * A validator for job parameters. Defaults to a vanilla
+	 * {@link DefaultJobParametersValidator}.
+	 * 
+	 * @param jobParametersValidator a validator instance
+	 */
+	public void setJobParametersValidator(JobParametersValidator jobParametersValidator) {
+		this.jobParametersValidator = jobParametersValidator;
+	}
+
+	/**
+	 * Delegates to the {@link #setJobParametersValidator validator} supplied
+	 * (defaults to just checking for null parameters).
+	 * 
+	 * @see Job#validate(JobParameters)
+	 */
+	public void validate(JobParameters parameters) throws JobParametersInvalidException {
+		jobParametersValidator.validate(parameters);
 	}
 
 	/**
@@ -129,21 +153,21 @@ public abstract class AbstractJob implements Job, StepLocator, BeanNameAware, In
 	}
 
 	/**
-	 * Retrieve the step with the given name. If there is no Step with the
-	 * given name, then return null.
+	 * Retrieve the step with the given name. If there is no Step with the given
+	 * name, then return null.
 	 * 
 	 * @param stepName
 	 * @return the Step
 	 */
 	public abstract Step getStep(String stepName);
-	
+
 	/**
 	 * Retrieve the step names.
 	 * 
 	 * @return the step names
 	 */
 	public abstract Collection<String> getStepNames();
-	
+
 	/**
 	 * Boolean flag to prevent categorically a job from restarting, even if it
 	 * has failed previously.
@@ -235,7 +259,7 @@ public abstract class AbstractJob implements Job, StepLocator, BeanNameAware, In
 	 */
 	public final void execute(JobExecution execution) {
 
-		logger.debug("Job execution starting: "+execution);					
+		logger.debug("Job execution starting: " + execution);
 
 		try {
 
@@ -248,8 +272,9 @@ public abstract class AbstractJob implements Job, StepLocator, BeanNameAware, In
 
 				try {
 					doExecute(execution);
-					logger.debug("Job execution complete: "+execution);					
-				} catch (RepeatException e) {
+					logger.debug("Job execution complete: " + execution);
+				}
+				catch (RepeatException e) {
 					throw e.getCause();
 				}
 			}
@@ -259,7 +284,7 @@ public abstract class AbstractJob implements Job, StepLocator, BeanNameAware, In
 				// with it in the same way as any other interruption.
 				execution.setStatus(BatchStatus.STOPPED);
 				execution.setExitStatus(ExitStatus.COMPLETED);
-				logger.debug("Job execution was stopped: "+execution);					
+				logger.debug("Job execution was stopped: " + execution);
 
 			}
 
@@ -291,9 +316,9 @@ public abstract class AbstractJob implements Job, StepLocator, BeanNameAware, In
 			catch (Exception e) {
 				logger.error("Exception encountered in afterStep callback", e);
 			}
-			
+
 			jobRepository.update(execution);
-			
+
 		}
 
 	}
@@ -347,9 +372,10 @@ public abstract class AbstractJob implements Job, StepLocator, BeanNameAware, In
 			logger.info("Executing step: [" + step + "]");
 			try {
 				step.execute(currentStepExecution);
-			} catch (JobInterruptedException e) {
+			}
+			catch (JobInterruptedException e) {
 				// Ensure that the job gets the message that it is stopping
-				// and can pass it on to other steps that are executing 
+				// and can pass it on to other steps that are executing
 				// concurrently.
 				execution.setStatus(BatchStatus.STOPPING);
 				throw e;
@@ -357,13 +383,15 @@ public abstract class AbstractJob implements Job, StepLocator, BeanNameAware, In
 
 			jobRepository.updateExecutionContext(execution);
 
-			if (currentStepExecution.getStatus() == BatchStatus.STOPPING || currentStepExecution.getStatus() == BatchStatus.STOPPED) {
+			if (currentStepExecution.getStatus() == BatchStatus.STOPPING
+					|| currentStepExecution.getStatus() == BatchStatus.STOPPED) {
 				// Ensure that the job gets the message that it is stopping
 				execution.setStatus(BatchStatus.STOPPING);
 				throw new JobInterruptedException("Job interrupted by step execution");
 			}
 
-		} else {
+		}
+		else {
 			// currentStepExecution.setExitStatus(ExitStatus.NOOP);
 		}
 
@@ -411,11 +439,11 @@ public abstract class AbstractJob implements Job, StepLocator, BeanNameAware, In
 					+ "so it may be dangerous to proceed.  " + "Manual intervention is probably necessary.");
 		}
 
-		if ((stepStatus == BatchStatus.COMPLETED && step.isAllowStartIfComplete() == false) 
+		if ((stepStatus == BatchStatus.COMPLETED && step.isAllowStartIfComplete() == false)
 				|| stepStatus == BatchStatus.ABANDONED) {
 			// step is complete, false should be returned, indicating that the
 			// step should not be started
-			logger.info("Step already complete or not restartable, so no action to execute: "+lastStepExecution);
+			logger.info("Step already complete or not restartable, so no action to execute: " + lastStepExecution);
 			return false;
 		}
 

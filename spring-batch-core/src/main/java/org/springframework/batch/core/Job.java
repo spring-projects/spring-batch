@@ -34,7 +34,7 @@ public interface Job {
 	 * @return true if this job can be restarted after a failure
 	 */
 	boolean isRestartable();
-
+	
 	/**
 	 * Run the {@link JobExecution} and update the meta information like status
 	 * and statistics as necessary. This method should not throw any exceptions
@@ -53,5 +53,7 @@ public interface Job {
 	 * @return in incrementer to be used for creating new parameters
 	 */
 	JobParametersIncrementer getJobParametersIncrementer();
+
+	void validate(JobParameters parameters) throws JobParametersInvalidException;
 
 }

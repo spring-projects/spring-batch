@@ -31,6 +31,7 @@ import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.JobInstance;
 import org.springframework.batch.core.JobParameters;
 import org.springframework.batch.core.JobParametersIncrementer;
+import org.springframework.batch.core.JobParametersInvalidException;
 import org.springframework.batch.core.StepExecution;
 import org.springframework.batch.core.UnexpectedJobExecutionException;
 import org.springframework.batch.core.configuration.JobRegistry;
@@ -251,7 +252,7 @@ public class SimpleJobOperator implements JobOperator, InitializingBean {
 	 * org.springframework.batch.core.launch.JobOperator#resume(java.lang.Long)
 	 */
 	public Long restart(long executionId) throws JobInstanceAlreadyCompleteException, NoSuchJobExecutionException,
-			NoSuchJobException, JobRestartException {
+			NoSuchJobException, JobRestartException, JobParametersInvalidException {
 
 		logger.info("Checking status of job execution with id=" + executionId);
 
@@ -279,7 +280,7 @@ public class SimpleJobOperator implements JobOperator, InitializingBean {
 	 * org.springframework.batch.core.launch.JobOperator#start(java.lang.String,
 	 * java.lang.String)
 	 */
-	public Long start(String jobName, String parameters) throws NoSuchJobException, JobInstanceAlreadyExistsException {
+	public Long start(String jobName, String parameters) throws NoSuchJobException, JobInstanceAlreadyExistsException, JobParametersInvalidException {
 
 		logger.info("Checking status of job with name=" + jobName);
 
@@ -319,7 +320,7 @@ public class SimpleJobOperator implements JobOperator, InitializingBean {
 	 * @see JobOperator#startNextInstance(String )
 	 */
 	public Long startNextInstance(String jobName) throws NoSuchJobException, JobParametersNotFoundException,
-			UnexpectedJobExecutionException {
+			UnexpectedJobExecutionException, JobParametersInvalidException {
 
 		logger.info("Locating parameters for next instance of job with name=" + jobName);
 

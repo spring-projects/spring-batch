@@ -18,6 +18,7 @@ package org.springframework.batch.core.launch;
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.JobParameters;
+import org.springframework.batch.core.JobParametersInvalidException;
 import org.springframework.batch.core.repository.JobExecutionAlreadyRunningException;
 import org.springframework.batch.core.repository.JobInstanceAlreadyCompleteException;
 import org.springframework.batch.core.repository.JobRestartException;
@@ -42,8 +43,8 @@ public interface JobLauncher {
 	 * always be returned by this method, regardless of whether or not the
 	 * execution was successful. If there is a past {@link JobExecution} which
 	 * has paused, the same {@link JobExecution} is returned instead of a new
-	 * one created.  A exception will only be thrown if there is a failure to
-	 * start the job.  If the job encounters some error while processing, the
+	 * one created. A exception will only be thrown if there is a failure to
+	 * start the job. If the job encounters some error while processing, the
 	 * JobExecution will be returned, and the status will need to be inspected.
 	 * 
 	 * @return the {@link JobExecution} if it returns synchronously. If the
@@ -57,8 +58,10 @@ public interface JobLauncher {
 	 * circumstances that preclude a re-start.
 	 * @throws JobInstanceAlreadyCompleteException if the job has been run
 	 * before with the same parameters and completed successfully
+	 * @throws JobParametersInvalidException if the parameters are not valid for
+	 * this job
 	 */
 	public JobExecution run(Job job, JobParameters jobParameters) throws JobExecutionAlreadyRunningException,
-			JobRestartException, JobInstanceAlreadyCompleteException;
+			JobRestartException, JobInstanceAlreadyCompleteException, JobParametersInvalidException;
 
 }
