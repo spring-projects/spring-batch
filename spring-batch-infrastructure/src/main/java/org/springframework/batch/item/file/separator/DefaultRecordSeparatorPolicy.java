@@ -119,8 +119,8 @@ public class DefaultRecordSeparatorPolicy extends SimpleRecordSeparatorPolicy {
 	}
 
 	/**
-	 * Determine if the current line (or buffered concatenation of lines)
-	 * contains an unterminated quote, indicating that the record is continuing
+	 * Determine if the current line (or buffered concatenation of lines) ends
+	 * with the continuation marker, indicating that the record is continuing
 	 * onto the next line.
 	 * 
 	 * @param result
