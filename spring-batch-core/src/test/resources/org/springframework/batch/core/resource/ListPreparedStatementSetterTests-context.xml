@@ -5,7 +5,7 @@
 	xsi:schemaLocation="http://www.springframework.org/schema/beans
        		http://www.springframework.org/schema/beans/spring-beans-2.5.xsd
        		http://www.springframework.org/schema/batch
-       		http://www.springframework.org/schema/batch/spring-batch-2.0.xsd">
+       		http://www.springframework.org/schema/batch/spring-batch-2.1.xsd">
 
 	<job id="pssJob">
 		<step id="step1">
