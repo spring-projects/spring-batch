@@ -47,7 +47,7 @@
     attribute of the <literal>tasklet</literal>:</para>
 
     <programlisting>&lt;step id="loading"&gt;
-    &lt;tasklet task-executor="taskExecutor"&gt;...<&lt/tasklet&gt;
+    &lt;tasklet task-executor="taskExecutor"&gt;...<&lt;/tasklet&gt;
 &lt;/step&gt;</programlisting>
 
     <para>In this example the taskExecutor is a reference to another bean
