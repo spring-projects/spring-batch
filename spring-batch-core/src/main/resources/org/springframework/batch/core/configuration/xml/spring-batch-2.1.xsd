@@ -372,6 +372,8 @@
 			</xsd:element>
 			<xsd:element name="listeners" type="stepListenersType"
 				minOccurs="0" maxOccurs="1" />
+			<xsd:element ref="beans:bean" minOccurs="0" maxOccurs="1"/>
+			<xsd:element ref="beans:ref" minOccurs="0" maxOccurs="1"/>
 		</xsd:all>
 		<xsd:attribute name="ref" type="xsd:string" use="optional">
 			<xsd:annotation>

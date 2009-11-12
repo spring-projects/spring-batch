@@ -8,14 +8,28 @@
 	
 	<job id="job">
 		<step id="step1">
-			<tasklet ref="tasklet"/>
+			<tasklet ref="tasklet1"/>
 			<next on="*" to="step2" />
 		</step>
 		<step id="step2">
-			<tasklet ref="tasklet">
+			<tasklet ref="tasklet2">
 				<listeners>
 					<listener ref="listener"/>
 				</listeners>
+			</tasklet>
+			<next on="*" to="step3" />
+		</step>
+		<step id="step3">
+			<tasklet>
+				<beans:ref bean="tasklet3"/>
+			</tasklet>
+			<next on="*" to="step4" />
+		</step>
+		<step id="step4">
+			<tasklet>
+				<beans:bean class="org.springframework.batch.core.configuration.xml.TestTasklet">
+					<beans:property name="name" value="t4"/>
+				</beans:bean>
 			</tasklet>
 		</step>
 	</job>
@@ -24,6 +38,14 @@
 		<beans:qualifier value="listener" />
 	</beans:bean> 
 
-	<beans:bean id="tasklet" class="org.springframework.batch.core.configuration.xml.TestTasklet"  />
+	<beans:bean id="tasklet1" class="org.springframework.batch.core.configuration.xml.TestTasklet">
+		<beans:property name="name" value="t1"/>
+	</beans:bean>
+	<beans:bean id="tasklet2" class="org.springframework.batch.core.configuration.xml.TestTasklet">
+		<beans:property name="name" value="t2"/>
+	</beans:bean>
+	<beans:bean id="tasklet3" class="org.springframework.batch.core.configuration.xml.TestTasklet">
+		<beans:property name="name" value="t3"/>
+	</beans:bean>
 
 </beans:beans>

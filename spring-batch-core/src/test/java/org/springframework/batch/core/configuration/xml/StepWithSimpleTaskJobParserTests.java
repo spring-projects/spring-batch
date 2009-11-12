@@ -26,49 +26,70 @@ import org.springframework.batch.core.BatchStatus;
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.JobParameters;
+import org.springframework.batch.core.Step;
+import org.springframework.batch.core.job.flow.FlowJob;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.repository.support.MapJobRepositoryFactoryBean;
+import org.springframework.batch.core.step.tasklet.TaskletStep;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
-
+import org.springframework.test.util.ReflectionTestUtils;
 
 /**
  * @author Thomas Risberg
- *
  */
 @ContextConfiguration
 @RunWith(SpringJUnit4ClassRunner.class)
 public class StepWithSimpleTaskJobParserTests {
-	
+
 	@Autowired
 	private Job job;
 
 	@Autowired
 	private JobRepository jobRepository;
-	
-	@Autowired
-	@Qualifier("tasklet")
-	private AbstractTestComponent tasklet;
-	
+
 	@Autowired
 	@Qualifier("listener")
 	private TestListener listener;
-	
+
 	@Before
 	public void setUp() {
 		MapJobRepositoryFactoryBean.clear();
 	}
 
 	@Test
-	public void testStepWithTask() throws Exception {
+	public void testJob() throws Exception {
 		assertNotNull(job);
+		assertTrue(job instanceof FlowJob);
 		JobExecution jobExecution = jobRepository.createJobExecution(job.getName(), new JobParameters());
+
+		TestTasklet t1 = assertTasklet(job, "step1", "t1");
+		TestTasklet t2 = assertTasklet(job, "step2", "t2");
+		TestTasklet t3 = assertTasklet(job, "step3", "t3");
+		TestTasklet t4 = assertTasklet(job, "step4", "t4");
+
 		job.execute(jobExecution);
+
+		assertTrue(t1.isExecuted());
+		assertTrue(t2.isExecuted());
+		assertTrue(t3.isExecuted());
+		assertTrue(t4.isExecuted());
+
 		assertEquals(BatchStatus.COMPLETED, jobExecution.getStatus());
-		assertEquals(2, jobExecution.getStepExecutions().size());
-		assertTrue(tasklet.isExecuted());
+		assertEquals(4, jobExecution.getStepExecutions().size());
 		assertTrue(listener.isExecuted());
+	}
+
+	private TestTasklet assertTasklet(Job job, String stepName, String taskletName) {
+		Step step = ((FlowJob) job).getStep(stepName);
+		assertTrue(step instanceof TaskletStep);
+		Object tasklet = ReflectionTestUtils.getField(step, "tasklet");
+		assertTrue(tasklet instanceof TestTasklet);
+		TestTasklet testTasklet = (TestTasklet) tasklet;
+		assertEquals(taskletName, testTasklet.getName());
+		assertTrue(!testTasklet.isExecuted());
+		return testTasklet;
 	}
 }

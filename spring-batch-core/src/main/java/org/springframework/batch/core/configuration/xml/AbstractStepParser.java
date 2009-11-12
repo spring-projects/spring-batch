@@ -17,6 +17,7 @@ package org.springframework.batch.core.configuration.xml;
 
 import java.util.List;
 
+import org.springframework.beans.BeanMetadataElement;
 import org.springframework.beans.MutablePropertyValues;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.config.RuntimeBeanReference;
@@ -49,6 +50,10 @@ public abstract class AbstractStepParser {
 	private static final String PARENT_ATTR = "parent";
 
 	private static final String TASKLET_REF_ATTR = "ref";
+
+	private static final String BEAN_ELE = "bean";
+
+	private static final String REF_ELE = "ref";
 
 	private static final String TASKLET_ELE = "tasklet";
 
@@ -101,9 +106,9 @@ public abstract class AbstractStepParser {
 		if (StringUtils.hasText(jobFactoryRef)) {
 			bd.setAttribute("jobParserJobFactoryBeanRef", jobFactoryRef);
 		}
-		
+
 		Element description = DomUtils.getChildElementByTagName(stepElement, "description");
-		if (description!=null) {
+		if (description != null) {
 			bd.setDescription(description.getTextContent());
 		}
 
@@ -120,32 +125,88 @@ public abstract class AbstractStepParser {
 		String taskletRef = taskletElement.getAttribute(TASKLET_REF_ATTR);
 		@SuppressWarnings("unchecked")
 		List<Element> chunkElements = DomUtils.getChildElementsByTagName(taskletElement, CHUNK_ELE);
-		if (StringUtils.hasText(taskletRef)) {
-			if (chunkElements.size() > 0) {
-				parserContext.getReaderContext().error(
-						"The <" + CHUNK_ELE + "/> element can't be combined with the '" + TASKLET_REF_ATTR + "=\""
-								+ taskletRef + "\"' attribute specification for <" + taskletElement.getNodeName()
-								+ "/>", taskletElement);
-			}
-			parseTaskletRef(taskletRef, bd.getPropertyValues());
-		}
-		else if (chunkElements.size() == 1) {
+		@SuppressWarnings("unchecked")
+		List<Element> beanElements = DomUtils.getChildElementsByTagName(taskletElement, BEAN_ELE);
+		@SuppressWarnings("unchecked")
+		List<Element> refElements = DomUtils.getChildElementsByTagName(taskletElement, REF_ELE);
+
+		validateTaskletAttributesAndSubelements(taskletElement, parserContext, stepUnderspecified, taskletRef,
+				chunkElements, beanElements, refElements);
+
+		if (chunkElements.size() == 1) {
 			chunkElementParser.parse(chunkElements.get(0), bd, parserContext, stepUnderspecified);
 		}
-		else if (!stepUnderspecified) {
-			parserContext.getReaderContext().error(
-					"Step [" + stepElement.getAttribute(ID_ATTR) + "] has neither a <" + CHUNK_ELE
-							+ "/> element nor a '" + TASKLET_REF_ATTR + "' attribute referencing a Tasklet.",
-					taskletElement);
+		else {
+			BeanMetadataElement bme = null;
+			if (StringUtils.hasText(taskletRef)) {
+				bme = new RuntimeBeanReference(taskletRef);
+			}
+			else if (beanElements.size() == 1) {
+				bme = parserContext.getDelegate().parseBeanDefinitionElement(beanElements.get(0));
+			}
+			else if (refElements.size() == 1) {
+				bme = (BeanMetadataElement) parserContext.getDelegate().parsePropertySubElement(refElements.get(0),
+						null);
+			}
+
+			if (bme != null) {
+				bd.getPropertyValues().addPropertyValue("tasklet", bme);
+			}
 		}
 
 		handleTaskletElement(taskletElement, bd, parserContext);
 	}
 
-	private void parseTaskletRef(String taskletRef, MutablePropertyValues propertyValues) {
-		if (StringUtils.hasText(taskletRef)) {
-			RuntimeBeanReference taskletBeanRef = new RuntimeBeanReference(taskletRef);
-			propertyValues.addPropertyValue("tasklet", taskletBeanRef);
+	private void validateTaskletAttributesAndSubelements(Element taskletElement, ParserContext parserContext,
+			boolean stepUnderspecified, String taskletRef, List<Element> chunkElements, List<Element> beanElements,
+			List<Element> refElements) {
+		int total = (StringUtils.hasText(taskletRef) ? 1 : 0) + chunkElements.size() + beanElements.size()
+				+ refElements.size();
+
+		StringBuilder found = new StringBuilder();
+		if (total > 1) {
+			if (StringUtils.hasText(taskletRef)) {
+				found.append("'" + TASKLET_REF_ATTR + "' attribute, ");
+			}
+			if (chunkElements.size() == 1) {
+				found.append("<" + CHUNK_ELE + "/> element, ");
+			}
+			else if (chunkElements.size() > 1) {
+				found.append(chunkElements.size() + " <" + CHUNK_ELE + "/> elements, ");
+			}
+			if (beanElements.size() == 1) {
+				found.append("<" + BEAN_ELE + "/> element, ");
+			}
+			else if (beanElements.size() > 1) {
+				found.append(beanElements.size() + " <" + BEAN_ELE + "/> elements, ");
+			}
+			if (refElements.size() == 1) {
+				found.append("<" + REF_ELE + "/> element, ");
+			}
+			else if (refElements.size() > 1) {
+				found.append(refElements.size() + " <" + REF_ELE + "/> elements, ");
+			}
+			found.delete(found.length() - 2, found.length());
+		}
+		else {
+			found.append("None");
+		}
+
+		String error = null;
+		if (stepUnderspecified) {
+			if (total > 1) {
+				error = "may not have more than";
+			}
+		}
+		else if (total != 1) {
+			error = "must have exactly";
+		}
+
+		if (error != null) {
+			parserContext.getReaderContext().error(
+					"The <" + taskletElement.getTagName() + "/> element " + error + " one of: '" + TASKLET_REF_ATTR
+							+ "' attribute, <" + CHUNK_ELE + "/> element, <" + BEAN_ELE + "/> attribute, or <"
+							+ REF_ELE + "/> element.  Found: " + found + ".", taskletElement);
 		}
 	}
 
@@ -250,7 +311,7 @@ public abstract class AbstractStepParser {
 		}
 		String throttleLimit = taskletElement.getAttribute("throttle-limit");
 		if (StringUtils.hasText(throttleLimit)) {
-		       propertyValues.addPropertyValue("throttleLimit", throttleLimit);
+			propertyValues.addPropertyValue("throttleLimit", throttleLimit);
 		}
 	}
 
