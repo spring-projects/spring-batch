@@ -84,9 +84,6 @@ public class SimpleJobLauncher implements JobLauncher, InitializingBean {
 		Assert.notNull(job, "The Job must not be null.");
 		Assert.notNull(jobParameters, "The JobParameters must not be null.");
 
-		// Allow the job to veto the execution
-		job.validate(jobParameters);
-
 		final JobExecution jobExecution;
 		JobExecution lastExecution = jobRepository.getLastJobExecution(job.getName(), jobParameters);
 		if (lastExecution != null) {

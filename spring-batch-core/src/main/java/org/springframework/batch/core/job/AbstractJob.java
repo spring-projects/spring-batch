@@ -16,6 +16,8 @@
 
 package org.springframework.batch.core.job;
 
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.util.Collection;
 import java.util.Date;
 
@@ -29,12 +31,12 @@ import org.springframework.batch.core.JobExecutionException;
 import org.springframework.batch.core.JobExecutionListener;
 import org.springframework.batch.core.JobInstance;
 import org.springframework.batch.core.JobInterruptedException;
-import org.springframework.batch.core.JobParameters;
 import org.springframework.batch.core.JobParametersIncrementer;
-import org.springframework.batch.core.JobParametersInvalidException;
 import org.springframework.batch.core.StartLimitExceededException;
 import org.springframework.batch.core.Step;
 import org.springframework.batch.core.StepExecution;
+import org.springframework.batch.core.launch.NoSuchJobException;
+import org.springframework.batch.core.launch.support.ExitCodeMapper;
 import org.springframework.batch.core.listener.CompositeJobExecutionListener;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.repository.JobRestartException;
@@ -97,16 +99,6 @@ public abstract class AbstractJob implements Job, StepLocator, BeanNameAware, In
 	 */
 	public void setJobParametersValidator(JobParametersValidator jobParametersValidator) {
 		this.jobParametersValidator = jobParametersValidator;
-	}
-
-	/**
-	 * Delegates to the {@link #setJobParametersValidator validator} supplied
-	 * (defaults to just checking for null parameters).
-	 * 
-	 * @see Job#validate(JobParameters)
-	 */
-	public void validate(JobParameters parameters) throws JobParametersInvalidException {
-		jobParametersValidator.validate(parameters);
 	}
 
 	/**
@@ -263,6 +255,8 @@ public abstract class AbstractJob implements Job, StepLocator, BeanNameAware, In
 
 		try {
 
+			jobParametersValidator.validate(execution.getJobInstance().getJobParameters());
+
 			if (execution.getStatus() != BatchStatus.STOPPING) {
 
 				execution.setStartTime(new Date());
@@ -291,21 +285,23 @@ public abstract class AbstractJob implements Job, StepLocator, BeanNameAware, In
 		}
 		catch (JobInterruptedException e) {
 			logger.error("Encountered interruption executing job", e);
-			execution.setExitStatus(ExitStatus.STOPPED);
+			execution.setExitStatus(getDefaultExitStatusForFailure(e));
 			execution.setStatus(BatchStatus.STOPPED);
 			execution.addFailureException(e);
 		}
 		catch (Throwable t) {
 			logger.error("Encountered fatal error executing job", t);
-			execution.setExitStatus(ExitStatus.FAILED);
+			execution.setExitStatus(getDefaultExitStatusForFailure(t));
 			execution.setStatus(BatchStatus.FAILED);
 			execution.addFailureException(t);
 		}
 		finally {
 
-			if (execution.getStepExecutions().isEmpty()) {
-				execution.setExitStatus(ExitStatus.NOOP
-						.addExitDescription("All steps already completed or no steps configured for this job."));
+			if (execution.getStatus().isLessThanOrEqualTo(BatchStatus.STOPPED)
+					&& execution.getStepExecutions().isEmpty()) {
+				ExitStatus exitStatus = execution.getExitStatus();
+				execution.setExitStatus(exitStatus.and(ExitStatus.NOOP
+						.addExitDescription("All steps already completed or no steps configured for this job.")));
 			}
 
 			execution.setEndTime(new Date());
@@ -456,6 +452,30 @@ public abstract class AbstractJob implements Job, StepLocator, BeanNameAware, In
 			throw new StartLimitExceededException("Maximum start limit exceeded for step: " + step.getName()
 					+ "StartMax: " + step.getStartLimit());
 		}
+	}
+
+	/**
+	 * Default mapping from throwable to {@link ExitStatus}.
+	 * 
+	 * @param ex the cause of the failure
+	 * @return an {@link ExitStatus}
+	 */
+	private ExitStatus getDefaultExitStatusForFailure(Throwable ex) {
+		ExitStatus exitStatus;
+		if (ex instanceof JobInterruptedException || ex.getCause() instanceof JobInterruptedException) {
+			exitStatus = ExitStatus.STOPPED.addExitDescription(JobInterruptedException.class.getName());
+		}
+		else if (ex instanceof NoSuchJobException || ex.getCause() instanceof NoSuchJobException) {
+			exitStatus = new ExitStatus(ExitCodeMapper.NO_SUCH_JOB, ex.getClass().getName());
+		}
+		else {
+			StringWriter writer = new StringWriter();
+			ex.printStackTrace(new PrintWriter(writer));
+			String message = writer.toString();
+			exitStatus = ExitStatus.FAILED.addExitDescription(message);
+		}
+
+		return exitStatus;
 	}
 
 	private void updateStatus(JobExecution jobExecution, BatchStatus status) {

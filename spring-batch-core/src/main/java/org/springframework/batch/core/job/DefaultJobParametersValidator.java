@@ -3,6 +3,7 @@ package org.springframework.batch.core.job;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashSet;
+import java.util.Set;
 
 import org.springframework.batch.core.JobParameters;
 import org.springframework.batch.core.JobParametersInvalidException;
@@ -27,14 +28,19 @@ public class DefaultJobParametersValidator implements JobParametersValidator, In
 	 */
 	public void afterPropertiesSet() throws IllegalStateException {
 		for (String key : requiredKeys) {
-			Assert.state(!optionalKeys.contains(key), "Optional keys canot be required: "+key);
+			Assert.state(!optionalKeys.contains(key), "Optional keys canot be required: " + key);
 		}
 	}
 
 	/**
-	 * Check the parameters meet the specification provided.
+	 * Check the parameters meet the specification provided. If optional keys
+	 * are explicitly specified then all keys must be in that list, or in the
+	 * required list. Otherwise all keys that are specified as required must be
+	 * present.
 	 * 
 	 * @see JobParametersValidator#validate(JobParameters)
+	 * 
+	 * @throws JobParametersInvalidException if the parameters are not valid
 	 */
 	public void validate(JobParameters parameters) throws JobParametersInvalidException {
 
@@ -42,9 +48,28 @@ public class DefaultJobParametersValidator implements JobParametersValidator, In
 			throw new JobParametersInvalidException("The JobParameters can not be null");
 		}
 
+		Set<String> keys = parameters.getParameters().keySet();
+
+		// If there are explicit optional keys then all keys must be in that
+		// group, or in the required group.
+		if (!optionalKeys.isEmpty()) {
+
+			Collection<String> missingKeys = new HashSet<String>();
+			for (String key : keys) {
+				if (!optionalKeys.contains(key) && !requiredKeys.contains(key)) {
+					missingKeys.add(key);
+				}
+			}
+			if (!missingKeys.isEmpty()) {
+				throw new JobParametersInvalidException(
+						"The JobParameters contains keys that are not explicitly optional or required: " + missingKeys);
+			}
+
+		}
+
 		Collection<String> missingKeys = new HashSet<String>();
 		for (String key : requiredKeys) {
-			if (!parameters.getParameters().containsKey(key)) {
+			if (!keys.contains(key)) {
 				missingKeys.add(key);
 			}
 		}
@@ -55,18 +80,27 @@ public class DefaultJobParametersValidator implements JobParametersValidator, In
 	}
 
 	/**
-	 * The keys that are required in the parameters.
+	 * The keys that are required in the parameters. The default is empty,
+	 * meaning that all parameters are optional, unless optional keys are
+	 * explicitly specified.
 	 * 
 	 * @param requiredKeys the required key values
+	 * 
+	 * @see #setOptionalKeys(String[])
 	 */
 	public void setRequiredKeys(String[] requiredKeys) {
 		this.requiredKeys = new HashSet<String>(Arrays.asList(requiredKeys));
 	}
 
 	/**
-	 * The keys that are optional in the parameters.
+	 * The keys that are optional in the parameters. If any keys are explicitly
+	 * optional, then to be valid all other keys must be explicitly required.
+	 * The default is empty, meaning that all parameters that are not required
+	 * are optional.
 	 * 
 	 * @param optionalKeys the optional key values
+	 * 
+	 * @see #setRequiredKeys(String[])
 	 */
 	public void setOptionalKeys(String[] optionalKeys) {
 		this.optionalKeys = new HashSet<String>(Arrays.asList(optionalKeys));

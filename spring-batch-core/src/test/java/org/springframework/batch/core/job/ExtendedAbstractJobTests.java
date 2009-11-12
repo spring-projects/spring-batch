@@ -25,6 +25,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
 
+import org.junit.Before;
 import org.junit.Test;
 import org.springframework.batch.core.BatchStatus;
 import org.springframework.batch.core.JobExecution;
@@ -45,7 +46,16 @@ import org.springframework.batch.support.transaction.ResourcelessTransactionMana
  */
 public class ExtendedAbstractJobTests {
 
-	AbstractJob job = new StubJob("job");
+	private AbstractJob job;
+	private JobRepository jobRepository;
+	
+	@Before
+	public void setUp() throws Exception {
+		MapJobRepositoryFactoryBean factory = new MapJobRepositoryFactoryBean();
+		factory.setTransactionManager(new ResourcelessTransactionManager());
+		jobRepository = (JobRepository) factory.getObject();
+		job = new StubJob("job", jobRepository);
+	}
 
 	/**
 	 * Test method for
@@ -75,7 +85,7 @@ public class ExtendedAbstractJobTests {
 	 */
 	@Test
 	public void testSetBeanNameWithNullName() {
-		job = new StubJob(null);
+		job = new StubJob(null, null);
 		assertEquals(null, job.getName());
 		job.setBeanName("foo");
 		assertEquals("foo", job.getName());
@@ -111,26 +121,27 @@ public class ExtendedAbstractJobTests {
 		}
 	}
 	
-	@Test(expected=JobParametersInvalidException.class)
-	public void testValidatorWithNullParameters() throws Exception {
-		job.validate(null);
-	}
-
 	@Test
 	public void testValidatorWithNotNullParameters() throws Exception {
-		job.validate(new JobParameters());
+		JobExecution execution = jobRepository.createJobExecution("job", new JobParameters());
+		job.execute(execution);
 		// Should be free of side effects
 	}
 
-	@Test(expected=JobParametersInvalidException.class)
+	@Test
 	public void testSetValidator() throws Exception {
 		job.setJobParametersValidator(new DefaultJobParametersValidator() {
 			@Override
 			public void validate(JobParameters parameters) throws JobParametersInvalidException {
-				throw new JobParametersInvalidException("Expected");
+				throw new JobParametersInvalidException("FOO");
 			}
 		});
-		job.validate(new JobParameters());
+		JobExecution execution = jobRepository.createJobExecution("job", new JobParameters());
+		job.execute(execution);
+		assertEquals(BatchStatus.FAILED, execution.getStatus());
+		assertEquals("FOO", execution.getFailureExceptions().get(0).getMessage());
+		String description = execution.getExitStatus().getExitDescription();
+		assertTrue("Wrong description: "+description, description.contains("FOO"));
 	}
 
 	/**
@@ -183,9 +194,16 @@ public class ExtendedAbstractJobTests {
 	private static class StubJob extends AbstractJob {
 		/**
 		 * @param name
+		 * @param jobRepository 
 		 */
-		private StubJob(String name) {
+		private StubJob(String name, JobRepository jobRepository) {
 			super(name);
+			try {
+				setJobRepository(jobRepository);
+			}
+			catch (Exception e) {
+				throw new IllegalStateException(e);
+			}
 		}
 
 		/**

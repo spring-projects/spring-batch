@@ -697,9 +697,7 @@ public class TaskletStepTests {
 
 		step.execute(stepExecution);
 		assertEquals(BatchStatus.UNKNOWN, stepExecution.getStatus());
-		String msg = stepExecution.getExitStatus().getExitDescription();
 		Throwable ex = stepExecution.getFailureExceptions().get(0);
-		msg = ex.getMessage();
 		// The original rollback failed because of this one:
 		assertEquals("Bar", ex.getMessage());
 	}
@@ -890,14 +888,8 @@ public class TaskletStepTests {
 
 		private boolean restoreFromCalled = false;
 
-		private boolean restoreFromCalledWithSomeContext = false;
-
 		public String read() throws Exception {
 			return "item";
-		}
-
-		public boolean isRestoreFromCalledWithSomeContext() {
-			return restoreFromCalledWithSomeContext;
 		}
 
 		public void update(ExecutionContext executionContext) {
@@ -918,10 +910,6 @@ public class TaskletStepTests {
 		}
 
 		public void beforeStep(StepExecution stepExecution) {
-		}
-
-		public ExitStatus onErrorInStep(StepExecution stepExecution, Throwable e) {
-			return null;
 		}
 
 	}

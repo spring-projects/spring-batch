@@ -72,7 +72,10 @@ public class SimpleJobLauncherTests {
 
 	@Test
 	public void testRun() throws Exception {
+		run(ExitStatus.COMPLETED);
+	}
 
+	private void run(ExitStatus exitStatus) throws Exception {
 		JobExecution jobExecution = new JobExecution(null, null);
 
 		expect(jobRepository.getLastJobExecution(job.getName(), jobParameters)).andReturn(null);
@@ -80,10 +83,13 @@ public class SimpleJobLauncherTests {
 		replay(jobRepository);
 
 		jobLauncher.afterPropertiesSet();
-		jobLauncher.run(job, jobParameters);
-		assertEquals(ExitStatus.COMPLETED, jobExecution.getExitStatus());
-
-		verify(jobRepository);
+		try {
+			jobLauncher.run(job, jobParameters);
+		}
+		finally {
+			assertEquals(exitStatus, jobExecution.getExitStatus());
+			verify(jobRepository);
+		}
 	}
 
 	/*
@@ -142,7 +148,7 @@ public class SimpleJobLauncherTests {
 			}
 		};
 		try {
-			testRun();
+			run(ExitStatus.FAILED);
 			fail("Expected RuntimeException");
 		}
 		catch (RuntimeException e) {
@@ -159,7 +165,7 @@ public class SimpleJobLauncherTests {
 			}
 		};
 		try {
-			testRun();
+			run(ExitStatus.FAILED);
 			fail("Expected Error");
 		}
 		catch (RuntimeException e) {

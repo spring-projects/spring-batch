@@ -54,6 +54,4 @@ public interface Job {
 	 */
 	JobParametersIncrementer getJobParametersIncrementer();
 
-	void validate(JobParameters parameters) throws JobParametersInvalidException;
-
 }

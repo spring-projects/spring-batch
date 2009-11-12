@@ -15,6 +15,11 @@ public class DefaultJobParametersValidatorTests {
 	}
 
 	@Test
+	public void testValidateNoRequiredValues() throws Exception {
+		validator.validate(new JobParametersBuilder().addString("name", "foo").toJobParameters());
+	}
+
+	@Test
 	public void testValidateRequiredValues() throws Exception {
 		validator.setRequiredKeys(new String[] { "name", "value" });
 		validator
@@ -31,6 +36,19 @@ public class DefaultJobParametersValidatorTests {
 	public void testValidateOptionalValues() throws Exception {
 		validator.setOptionalKeys(new String[] { "name", "value" });
 		validator.validate(new JobParameters());
+	}
+
+	@Test(expected = JobParametersInvalidException.class)
+	public void testValidateOptionalWithImplicitRequiredKey() throws Exception {
+		validator.setOptionalKeys(new String[] { "name", "value" });
+		validator.validate(new JobParametersBuilder().addString("foo", "bar").toJobParameters());
+	}
+
+	@Test
+	public void testValidateOptionalWithExplicitRequiredKey() throws Exception {
+		validator.setOptionalKeys(new String[] { "name", "value" });
+		validator.setRequiredKeys(new String[] { "foo" });
+		validator.validate(new JobParametersBuilder().addString("foo", "bar").toJobParameters());
 	}
 
 	@Test(expected = IllegalStateException.class)
