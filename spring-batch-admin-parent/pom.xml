@@ -12,7 +12,7 @@
 		<maven.test.failure.ignore>true</maven.test.failure.ignore>
 		<spring.framework.version>3.0.0.RC1</spring.framework.version>
 		<bundlor.version>1.0.0.M2</bundlor.version>
-		<spring.batch.version>2.1.0.CI-SNAPSHOT</spring.batch.version>
+		<spring.batch.version>2.1.0.M2</spring.batch.version>
 	</properties>
 	<profiles>
 		<profile>
