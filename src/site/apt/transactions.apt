@@ -86,7 +86,7 @@ Batch Processing and Transactions
 +---
 
   The inner RETRY(4) block is marked as "stateful" - see the
-  {{{#Typical}typical}} use case for a description of an stateful
+  {{{#Typical}typical}} use case for a description of a stateful
   retry.  This means that if the the retry PROCESS(5) block fails, the
   behaviour of the RETRY(4) is as follows.
 
@@ -205,7 +205,7 @@ Batch Processing and Transactions
 Interactions Between Batching and Transaction Propagation
 
   There is a tighter coupling between batch-retry and TX management
-  than we would ideally like.  In particular an stateless retry cannot
+  than we would ideally like.  In particular a stateless retry cannot
   be used to retry database operations with a transaction manager that
   doesn't support NESTED propagation.
 
@@ -302,9 +302,9 @@ Interactions Between Batching and Transaction Propagation
 
 * Stateless Retry Cannot Recover
 
-  The distinction between an stateless and an stateful retry in the
+  The distinction between a stateless and a stateful retry in the
   {{{#Typical}typical}} example above is important.  It is actually
-  ultimately a transactional constraint that forces the distiction,
+  ultimately a transactional constraint that forces the distinction,
   and this constraint also makes it obvious why the distinction
   exists.
 
@@ -334,7 +334,7 @@ Interactions Between Batching and Transaction Propagation
     |  }
 +---
 
-  Here we have an stateless RETRY(3) with a RECOVER(5) path that kicks
+  Here we have a stateless RETRY(3) with a RECOVER(5) path that kicks
   in after the final attempt fails.  The "stateless" label just means
   that the block will be repeated without rethrowing any exception up
   to some limit.  This will only work if the transaction TX(4) has
