@@ -51,6 +51,7 @@ public class ExtendedAbstractJobTests {
 	
 	@Before
 	public void setUp() throws Exception {
+		MapJobRepositoryFactoryBean.clear();
 		MapJobRepositoryFactoryBean factory = new MapJobRepositoryFactoryBean();
 		factory.setTransactionManager(new ResourcelessTransactionManager());
 		jobRepository = (JobRepository) factory.getObject();
