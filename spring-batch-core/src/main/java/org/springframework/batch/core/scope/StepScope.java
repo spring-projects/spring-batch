@@ -365,11 +365,12 @@ public class StepScope implements Scope, BeanFactoryPostProcessor, Ordered {
 				definition = holder.getBeanDefinition();
 			}
 			if (definition != null) {
-				boolean scopeChange = !scope.equals(definition.getScope());
+				String otherScope = definition.getScope();
+				boolean scopeChange = !scope.equals(otherScope);
 				if (scopeChange) {
-					new ExpressionHider(definition.getScope(), !scoped).visitBeanDefinition(definition);
+					new ExpressionHider(otherScope==null?scope:otherScope, !scoped).visitBeanDefinition(definition);
 					// Exit here so that nested inner bean definitions are not
-					// analysed by both vistors
+					// analysed by both visitors
 					return value;
 				}
 			}
