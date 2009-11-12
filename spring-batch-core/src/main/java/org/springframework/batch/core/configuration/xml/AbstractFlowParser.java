@@ -42,11 +42,13 @@ import org.w3c.dom.NodeList;
  * @author Dave Syer
  * 
  */
-public class FlowParser extends AbstractSingleBeanDefinitionParser {
+public abstract class AbstractFlowParser extends AbstractSingleBeanDefinitionParser {
 
 	private static final String ID_ATTR = "id";
 
 	private static final String STEP_ELE = "step";
+
+	private static final String FLOW_ELE = "flow";
 
 	private static final String DECISION_ELE = "decision";
 
@@ -72,27 +74,36 @@ public class FlowParser extends AbstractSingleBeanDefinitionParser {
 
 	private static final InlineStepParser stepParser = new InlineStepParser();
 
+	private static final FlowElementParser flowParser = new FlowElementParser();
+
 	private static final DecisionParser decisionParser = new DecisionParser();
 
 	// For generating unique state names for end transitions
 	private static int endCounter = 0;
 
-	private final String flowName;
+	private String flowName;
 
-	private final String jobFactoryRef;
+	private String jobFactoryRef;
 
 	/**
-	 * Construct a {@link FlowParser} with the specified name and using the
-	 * provided job repository ref.
+	 * Convenience method for subclasses to set up the flow name for error
+	 * reporting.
 	 * 
-	 * @param flowName the name of the flow
-	 * @param jobFactoryRef the reference to the {@link JobParserJobFactoryBean}
-	 * from the enclosing tag
+	 * @param flowName
 	 */
-	public FlowParser(String flowName, String jobFactoryRef) {
+	protected void setFlowName(String flowName) {
 		this.flowName = flowName;
-		this.jobFactoryRef = jobFactoryRef;
+	}
 
+	/**
+	 * Convenience method for subclasses to set the job factory reference if it
+	 * is available (null is fine, but the quality of error reports is better if
+	 * it is available).
+	 * 
+	 * @param jobFactoryRef
+	 */
+	protected void setJobFactoryRef(String jobFactoryRef) {
+		this.jobFactoryRef = jobFactoryRef;
 	}
 
 	/*
@@ -111,6 +122,7 @@ public class FlowParser extends AbstractSingleBeanDefinitionParser {
 	 */
 	@Override
 	protected void doParse(Element element, ParserContext parserContext, BeanDefinitionBuilder builder) {
+
 		List<BeanDefinition> stateTransitions = new ArrayList<BeanDefinition>();
 
 		SplitParser splitParser = new SplitParser(jobFactoryRef);
@@ -134,6 +146,10 @@ public class FlowParser extends AbstractSingleBeanDefinitionParser {
 				else if (nodeName.equals(DECISION_ELE)) {
 					stateTransitions.addAll(decisionParser.parse(child, parserContext));
 				}
+				else if (nodeName.equals(FLOW_ELE)) {
+					stateTransitions.addAll(flowParser.parse(child, parserContext));
+					stepExists = true;
+				}
 				else if (nodeName.equals(SPLIT_ELE)) {
 					stateTransitions.addAll(splitParser
 							.parse(child, new ParserContext(parserContext.getReaderContext(), parserContext
@@ -141,7 +157,7 @@ public class FlowParser extends AbstractSingleBeanDefinitionParser {
 					stepExists = true;
 				}
 
-				if (Arrays.asList(STEP_ELE, DECISION_ELE, SPLIT_ELE).contains(nodeName)) {
+				if (Arrays.asList(STEP_ELE, DECISION_ELE, SPLIT_ELE, FLOW_ELE).contains(nodeName)) {
 					reachableElementMap.put(child.getAttribute(ID_ATTR), findReachableElements(child));
 					if (startElement == null) {
 						startElement = child.getAttribute(ID_ATTR);
@@ -169,10 +185,6 @@ public class FlowParser extends AbstractSingleBeanDefinitionParser {
 		@SuppressWarnings( { "unchecked", "unused" })
 		boolean dummy = managedList.addAll(stateTransitions);
 		builder.addPropertyValue("stateTransitions", managedList);
-
-		builder.setRole(BeanDefinition.ROLE_INFRASTRUCTURE);
-
-		parserContext.popAndRegisterContainingComponent();
 
 	}
 

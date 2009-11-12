@@ -30,6 +30,7 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.Date;
 import java.util.List;
 
 import org.junit.Before;
@@ -325,10 +326,30 @@ public class SimpleJobTests {
 	public void testStepAlreadyComplete() throws Exception {
 		stepExecution1.setStatus(BatchStatus.COMPLETED);
 		jobRepository.add(stepExecution1);
+		jobExecution.setEndTime(new Date());
+		jobRepository.update(jobExecution);
+		jobExecution = jobRepository.createJobExecution(job.getName(), jobParameters);
 		job.execute(jobExecution);
 		assertEquals(0, jobExecution.getFailureExceptions().size());
 		assertEquals(1, jobExecution.getStepExecutions().size());
 		assertEquals(stepExecution2.getStepName(), jobExecution.getStepExecutions().iterator().next().getStepName());
+	}
+
+	@Test
+	public void testStepAlreadyCompleteInSameExecution() throws Exception {
+		List<Step> steps = new ArrayList<Step>();
+		steps.add(step1);
+		steps.add(step2);
+		// Two steps with the same name should both be executed, since
+		// the user might actually want it to happen twice.  On a restart
+		// it would be executed twice again, even if it failed on the
+		// second execution.  This seems reasonable.
+		steps.add(step2);
+		job.setSteps(steps);
+		job.execute(jobExecution);
+		assertEquals(0, jobExecution.getFailureExceptions().size());
+		assertEquals(3, jobExecution.getStepExecutions().size());
+		assertEquals(stepExecution1.getStepName(), jobExecution.getStepExecutions().iterator().next().getStepName());
 	}
 
 	@Test
@@ -362,6 +383,7 @@ public class SimpleJobTests {
 		Throwable e = jobExecution.getAllFailureExceptions().get(0);
 		assertSame(exception, e);
 
+		jobExecution = jobRepository.createJobExecution(job.getName(), jobParameters);
 		job.execute(jobExecution);
 		e = jobExecution.getAllFailureExceptions().get(0);
 		assertSame(exception, e);

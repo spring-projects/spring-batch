@@ -347,6 +347,13 @@ public abstract class AbstractJob implements Job, StepLocator, BeanNameAware, In
 		JobInstance jobInstance = execution.getJobInstance();
 
 		StepExecution lastStepExecution = jobRepository.getLastStepExecution(jobInstance, step.getName());
+		if (stepExecutionPartOfExistingJobExecution(execution, lastStepExecution)) {
+			// If the last execution of this step was in the same job, it's probably
+			// intentional so we want to run it again...
+			logger.info(String.format("Duplicate step [%s] detected in execution of job=[%s]. " +
+					"If either step fails, both will be executed again on restart.", step.getName(), name));
+			lastStepExecution = null;
+		}
 		StepExecution currentStepExecution = lastStepExecution;
 
 		if (shouldStart(lastStepExecution, jobInstance, step)) {
@@ -396,6 +403,17 @@ public abstract class AbstractJob implements Job, StepLocator, BeanNameAware, In
 	}
 
 	/**
+	 * Detect whether a step execution belongs to this job execution.
+	 * @param jobExecution the current job execution
+	 * @param stepExecution an existing step execution
+	 * @return
+	 */
+	private boolean stepExecutionPartOfExistingJobExecution(JobExecution jobExecution, StepExecution stepExecution) {
+		return stepExecution != null && stepExecution.getJobExecutionId() != null
+				&& stepExecution.getJobExecutionId().equals(jobExecution.getId());
+	}
+
+	/**
 	 * Convenience method for subclasses so they can change the state of a
 	 * {@link StepExecution} if necessary. Use with care (and not at all
 	 * preferably) and only before or after a step is executed.
@@ -430,9 +448,9 @@ public abstract class AbstractJob implements Job, StepLocator, BeanNameAware, In
 		}
 
 		if (stepStatus == BatchStatus.UNKNOWN) {
-			throw new JobRestartException("Cannot restart step from UNKNOWN status.  "
+			throw new JobRestartException("Cannot restart step from UNKNOWN status. "
 					+ "The last execution ended with a failure that could not be rolled back, "
-					+ "so it may be dangerous to proceed.  " + "Manual intervention is probably necessary.");
+					+ "so it may be dangerous to proceed. Manual intervention is probably necessary.");
 		}
 
 		if ((stepStatus == BatchStatus.COMPLETED && step.isAllowStartIfComplete() == false)

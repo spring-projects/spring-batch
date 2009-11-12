@@ -221,7 +221,8 @@ public class SimpleFlow implements Flow, InitializingBean {
 
 		for (StateTransition stateTransition : stateTransitions) {
 			State state = stateTransition.getState();
-			stateMap.put(state.getName(), state);
+			String stateName = state.getName();
+			stateMap.put(stateName, state);
 		}
 
 		for (StateTransition stateTransition : stateTransitions) {

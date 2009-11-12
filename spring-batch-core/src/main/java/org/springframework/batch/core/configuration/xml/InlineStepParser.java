@@ -60,7 +60,7 @@ public class InlineStepParser extends AbstractStepParser {
 		parserContext.registerBeanComponent(new BeanComponentDefinition(bd, stepId));
 		stateBuilder.addConstructorArgReference(stepId);
 
-		return FlowParser.getNextElements(parserContext, stepId, stateBuilder.getBeanDefinition(), element);
+		return InlineFlowParser.getNextElements(parserContext, stepId, stateBuilder.getBeanDefinition(), element);
 
 	}
 

@@ -127,6 +127,24 @@
 		</xsd:complexType>
 	</xsd:element>
 
+	<xsd:element name="flow">
+		<xsd:annotation>
+			<xsd:documentation>
+				Defines a flow composed of a set of steps and
+				transitions between steps.
+			</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexType>
+			<xsd:sequence>
+				<xsd:element ref="description" minOccurs="0"/>
+				<xsd:choice minOccurs="0" maxOccurs="unbounded">
+					<xsd:group ref="flowGroup" />
+				</xsd:choice>
+			</xsd:sequence>
+			<xsd:attribute name="id" type="xsd:ID" use="required" />
+		</xsd:complexType>
+	</xsd:element>
+
 	<xsd:element name="job-listener">
 		<xsd:annotation>
 			<xsd:documentation>
@@ -295,6 +313,18 @@
 							</xsd:annotation>
 							<xsd:complexType>
 								<xsd:group ref="flowGroup" minOccurs="0" maxOccurs="unbounded" />
+								<xsd:attribute name="ref" type="xsd:string" use="optional">
+									<xsd:annotation>
+										<xsd:documentation source="java:org.springframework.batch.core.job.flow.Flow"><![CDATA[
+										The flow that will execute at this point in the job.
+										]]></xsd:documentation>
+										<xsd:appinfo>
+											<tool:annotation kind="ref">
+												<tool:expected-type type="org.springframework.batch.core.job.flow.Flow" />
+											</tool:annotation>
+										</xsd:appinfo>
+									</xsd:annotation>
+								</xsd:attribute>
 							</xsd:complexType>
 						</xsd:element>
 						<xsd:group ref="transitions" />
@@ -311,6 +341,30 @@
 								<tool:annotation kind="ref">
 									<tool:expected-type
 										type="org.springframework.core.task.TaskExecutor" />
+								</tool:annotation>
+							</xsd:appinfo>
+						</xsd:annotation>
+					</xsd:attribute>
+					<xsd:attributeGroup ref="nextAttribute" />
+				</xsd:complexType>
+			</xsd:element>
+			<xsd:element name="flow">
+				<xsd:annotation>
+					<xsd:documentation>
+						Declares job should include an externalized flow here.
+					</xsd:documentation>
+				</xsd:annotation>
+				<xsd:complexType>
+					<xsd:group ref="transitions" minOccurs="0" maxOccurs="unbounded" />
+					<xsd:attribute name="id" type="xsd:ID" use="required" />
+					<xsd:attribute name="ref" type="xsd:string" use="required">
+						<xsd:annotation>
+							<xsd:documentation source="java:org.springframework.batch.core.job.flow.Flow"><![CDATA[
+							The flow that will execute at this point in the job.
+							]]></xsd:documentation>
+							<xsd:appinfo>
+								<tool:annotation kind="ref">
+									<tool:expected-type type="org.springframework.batch.core.job.flow.Flow" />
 								</tool:annotation>
 							</xsd:appinfo>
 						</xsd:annotation>

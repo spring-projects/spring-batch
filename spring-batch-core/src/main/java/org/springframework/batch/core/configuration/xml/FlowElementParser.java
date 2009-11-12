@@ -24,23 +24,19 @@ import org.springframework.beans.factory.xml.ParserContext;
 import org.w3c.dom.Element;
 
 /**
- * Internal parser for the &lt;decision/&gt; elements inside a job. A decision
- * element references a bean definition for a 
- * {@link org.springframework.batch.core.job.flow.JobExecutionDecider} 
- * and goes on to list a set of transitions to other states with &lt;next
- * on="pattern" to="stepName"/&gt;. Used by the {@link JobParser}.
+ * Internal parser for the &lt;flow/&gt; elements inside a job..
  * 
  * @see JobParser
  * 
  * @author Dave Syer
  * 
  */
-public class DecisionParser {
+public class FlowElementParser {
 
 	/**
-	 * Parse the decision and turn it into a list of transitions.
+	 * Parse the flow and turn it into a list of transitions.
 	 * 
-	 * @param element the &lt;decision/gt; element to parse
+	 * @param element the &lt;flow/gt; element to parse
 	 * @param parserContext the parser context for the bean factory
 	 * @return a collection of bean definitions for 
 	 * {@link org.springframework.batch.core.job.flow.support.StateTransition}
@@ -48,11 +44,11 @@ public class DecisionParser {
 	 */
 	public Collection<BeanDefinition> parse(Element element, ParserContext parserContext) {
 
-		String refAttribute = element.getAttribute("decider");
+		String refAttribute = element.getAttribute("ref");
 		String idAttribute = element.getAttribute("id");
 
 		BeanDefinitionBuilder stateBuilder = 
-			BeanDefinitionBuilder.genericBeanDefinition("org.springframework.batch.core.job.flow.support.state.DecisionState");
+			BeanDefinitionBuilder.genericBeanDefinition("org.springframework.batch.core.job.flow.support.state.FlowState");
 		stateBuilder.addConstructorArgValue(new RuntimeBeanReference(refAttribute));
 		stateBuilder.addConstructorArgValue(idAttribute);
 		return InlineFlowParser.getNextElements(parserContext, stateBuilder.getBeanDefinition(), element);

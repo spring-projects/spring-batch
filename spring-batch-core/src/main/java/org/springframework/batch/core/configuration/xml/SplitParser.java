@@ -15,7 +15,6 @@
  */
 package org.springframework.batch.core.configuration.xml;
 
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
@@ -45,10 +44,11 @@ public class SplitParser {
 	private final String jobFactoryRef;
 
 	/**
-	 * Construct a {@link FlowParser} using the provided job repository ref.
+	 * Construct a {@link InlineFlowParser} using the provided job repository
+	 * ref.
 	 * 
 	 * @param jobFactoryRef the reference to the {@link JobParserJobFactoryBean}
-	 *        from the enclosing tag
+	 * from the enclosing tag
 	 */
 	public SplitParser(String jobFactoryRef) {
 		this.jobFactoryRef = jobFactoryRef;
@@ -60,8 +60,8 @@ public class SplitParser {
 	 * @param element the &lt;split/gt; element to parse
 	 * @param parserContext the parser context for the bean factory
 	 * @return a collection of bean definitions for
-	 *         {@link org.springframework.batch.core.job.flow.support.StateTransition}
-	 *         instances objects
+	 * {@link org.springframework.batch.core.job.flow.support.StateTransition}
+	 * instances objects
 	 */
 	public Collection<BeanDefinition> parse(Element element, ParserContext parserContext) {
 
@@ -83,21 +83,28 @@ public class SplitParser {
 			parserContext.getReaderContext().error("A <split/> must contain at least two 'flow' elements.", element);
 		}
 
-		Collection<BeanDefinition> flows = new ArrayList<BeanDefinition>();
+		@SuppressWarnings("unchecked")
+		Collection<Object> flows = new ManagedList();
 		int i = 0;
 		for (Element nextElement : flowElements) {
-			FlowParser flowParser = new FlowParser(idAttribute + "#" + i, jobFactoryRef);
-			flows.add(flowParser.parse(nextElement, parserContext));
+			InlineFlowParser flowParser = new InlineFlowParser(idAttribute + "#" + i, jobFactoryRef);
+			String ref = nextElement.getAttribute("ref");
+			if (StringUtils.hasText(ref)) {
+				if (nextElement.getElementsByTagName("*").getLength() > 0) {
+					parserContext.getReaderContext().error("A <flow/> in a <split/> must have ref= or nested <flow/>, but not both.", nextElement);
+				}
+				flows.add(new RuntimeBeanReference(ref));
+			}
+			else {
+				flows.add(flowParser.parse(nextElement, parserContext));
+			}
 			i++;
 		}
-		ManagedList managedList = new ManagedList();
-		@SuppressWarnings( { "unchecked", "unused" })
-		boolean dummy = managedList.addAll(flows);
 
-		stateBuilder.addConstructorArgValue(managedList);
+		stateBuilder.addConstructorArgValue(flows);
 		stateBuilder.addConstructorArgValue(idAttribute);
 
-		return FlowParser.getNextElements(parserContext, stateBuilder.getBeanDefinition(), element);
+		return InlineFlowParser.getNextElements(parserContext, stateBuilder.getBeanDefinition(), element);
 
 	}
 

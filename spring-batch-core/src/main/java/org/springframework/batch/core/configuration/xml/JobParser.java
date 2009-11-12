@@ -101,7 +101,7 @@ public class JobParser extends AbstractSingleBeanDefinitionParser {
 			}
 		}
 		else {
-			FlowParser flowParser = new FlowParser(jobName, jobName);
+			InlineFlowParser flowParser = new InlineFlowParser(jobName, jobName);
 			BeanDefinition flowDef = flowParser.parse(element, parserContext);
 			builder.addPropertyValue("flow", flowDef);
 		}
