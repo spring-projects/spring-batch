@@ -93,14 +93,16 @@ public class CustomerFilterJobFunctionalTests extends AbstractJobTests {
 			}
 		});
 
-		Map<String, Object> step1Execution = this.getStepExecution(jobExecution.getId(), "uploadCustomer");
+		Map<String, Object> step1Execution = this.getStepExecution(jobExecution, "uploadCustomer");
 		assertEquals(new Long(4), step1Execution.get("READ_COUNT"));
 		assertEquals(new Long(1), step1Execution.get("FILTER_COUNT"));
 		assertEquals(new Long(3), step1Execution.get("WRITE_COUNT"));
 
 	}
 
-	private Map<String, Object> getStepExecution(long jobExecutionId, String stepName) {
+	private Map<String, Object> getStepExecution(JobExecution jobExecution, String stepName) {
+		Long jobExecutionId = jobExecution.getId();
+		stepName = jobExecution.getJobInstance().getJobName()+"."+stepName;
 		return simpleJdbcTemplate.queryForMap(
 				"SELECT * from BATCH_STEP_EXECUTION where JOB_EXECUTION_ID = ? and STEP_NAME = ?", jobExecutionId,
 				stepName);

@@ -174,14 +174,14 @@ public class SkipSampleFunctionalTests {
 		assertEquals(2, SimpleJdbcTestUtils.countRowsInTable(simpleJdbcTemplate, "ERROR_LOG"));
 
 		assertEquals("2 records were skipped!", simpleJdbcTemplate.queryForObject(
-				"SELECT MESSAGE from ERROR_LOG where JOB_NAME = ? and STEP_NAME = ?", String.class, "skipJob", "step1"));
+				"SELECT MESSAGE from ERROR_LOG where JOB_NAME = ? and STEP_NAME = ?", String.class, "skipJob", "skipJob.step1"));
 		assertEquals("2 records were skipped!", simpleJdbcTemplate.queryForObject(
-				"SELECT MESSAGE from ERROR_LOG where JOB_NAME = ? and STEP_NAME = ?", String.class, "skipJob", "step2"));
+				"SELECT MESSAGE from ERROR_LOG where JOB_NAME = ? and STEP_NAME = ?", String.class, "skipJob", "skipJob.step2"));
 
 		System.err.println(jobExecution.getExecutionContext());
 		assertEquals(new BigDecimal("340.45"), jobExecution.getExecutionContext().get(TradeWriter.TOTAL_AMOUNT_KEY));
 
-		Map<String, Object> step1Execution = getStepExecutionAsMap(jobExecution.getId(), "step1");
+		Map<String, Object> step1Execution = getStepExecutionAsMap(jobExecution, "step1");
 		assertEquals(new Long(4), step1Execution.get("COMMIT_COUNT"));
 		assertEquals(new Long(8), step1Execution.get("READ_COUNT"));
 		assertEquals(new Long(7), step1Execution.get("WRITE_COUNT"));
@@ -202,7 +202,9 @@ public class SkipSampleFunctionalTests {
 
 	}
 
-	private Map<String, Object> getStepExecutionAsMap(long jobExecutionId, String stepName) {
+	private Map<String, Object> getStepExecutionAsMap(JobExecution jobExecution, String stepName) {
+		long jobExecutionId = jobExecution.getId();
+		stepName = jobExecution.getJobInstance().getJobName() + "." + stepName;
 		return simpleJdbcTemplate.queryForMap(
 				"SELECT * from BATCH_STEP_EXECUTION where JOB_EXECUTION_ID = ? and STEP_NAME = ?", jobExecutionId,
 				stepName);
