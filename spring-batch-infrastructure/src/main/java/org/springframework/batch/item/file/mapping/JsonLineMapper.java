@@ -1,4 +1,4 @@
-package org.springframework.batch.item.file.transform;
+package org.springframework.batch.item.file.mapping;
 
 import java.util.Map;
 

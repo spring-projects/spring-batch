@@ -1,4 +1,4 @@
-package org.springframework.batch.item.file.transform;
+package org.springframework.batch.item.file.mapping;
 
 import static org.junit.Assert.*;
 
@@ -6,6 +6,7 @@ import java.util.Map;
 
 import org.junit.Test;
 import org.springframework.batch.item.file.FlatFileParseException;
+import org.springframework.batch.item.file.mapping.JsonLineMapper;
 
 public class JsonLineMapperTests {
 	
