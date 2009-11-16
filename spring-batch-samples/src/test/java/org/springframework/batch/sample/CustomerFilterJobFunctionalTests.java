@@ -117,9 +117,6 @@ public class CustomerFilterJobFunctionalTests extends AbstractJobTests {
 			this.credit = credit;
 		}
 
-		public Customer() {
-		}
-
 		/**
 		 * @return the credit
 		 */
@@ -128,24 +125,10 @@ public class CustomerFilterJobFunctionalTests extends AbstractJobTests {
 		}
 
 		/**
-		 * @param credit the credit to set
-		 */
-		public void setCredit(double credit) {
-			this.credit = credit;
-		}
-
-		/**
 		 * @return the name
 		 */
 		public String getName() {
 			return name;
-		}
-
-		/**
-		 * @param name the name to set
-		 */
-		public void setName(String name) {
-			this.name = name;
 		}
 
 		/*
