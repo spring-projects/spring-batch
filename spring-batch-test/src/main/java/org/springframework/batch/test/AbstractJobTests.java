@@ -211,7 +211,7 @@ public abstract class AbstractJobTests implements ApplicationContextAware {
 	 * @return JobExecution
 	 */
 	public JobExecution launchStep(String stepName, JobParameters jobParameters, ExecutionContext jobExecutionContext) {
-		Step step = this.job.getStep(stepName);
+		Step step = this.job.getStep(job.getName()+"."+stepName);
 		if (step == null) {
 			throw new IllegalStateException("No Step found with name: [" + stepName + "]");
 		}
