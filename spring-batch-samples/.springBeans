@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <beansProjectDescription>
 	<version>1</version>
-	<pluginVersion><![CDATA[2.2.7.200909182116-CI-R3408-B468]]></pluginVersion>
+	<pluginVersion><![CDATA[2.2.7.200910202224-RELEASE]]></pluginVersion>
 	<configSuffixes>
 		<configSuffix><![CDATA[xml]]></configSuffix>
 	</configSuffixes>
@@ -74,6 +74,8 @@
 		<config>src/test/resources/org/springframework/batch/sample/GroovyJobFunctionalTests-context.xml</config>
 		<config>src/test/resources/org/springframework/batch/sample/TaskletJobFunctionalTests-context.xml</config>
 		<config>src/main/resources/jobs/partitionJdbcJob.xml</config>
+		<config>src/main/resources/jobs/jobStepSample.xml</config>
+		<config>src/main/resources/jobs/partitionFileJob.xml</config>
 	</configs>
 	<configSets>
 		<configSet>
