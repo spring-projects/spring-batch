@@ -18,6 +18,9 @@ package org.springframework.batch.core.configuration.xml;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -25,6 +28,7 @@ import org.springframework.batch.core.BatchStatus;
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.JobParameters;
+import org.springframework.batch.core.StepExecution;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.repository.support.MapJobRepositoryFactoryBean;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -71,7 +75,9 @@ public class FlowJobParserTests {
 		JobExecution jobExecution = jobRepository.createJobExecution(job1.getName(), new JobParameters());
 		job1.execute(jobExecution);
 		assertEquals(BatchStatus.COMPLETED, jobExecution.getStatus());
-		assertEquals(4, jobExecution.getStepExecutions().size());
+		List<String> stepNames = getStepNames(jobExecution);
+		assertEquals(4, stepNames.size());
+		assertEquals("[job1.s1, job1.flow.s2, job1.flow.s3, job1.s4]", stepNames.toString());
 	}
 
 	@Test
@@ -81,6 +87,9 @@ public class FlowJobParserTests {
 		job2.execute(jobExecution);
 		assertEquals(BatchStatus.COMPLETED, jobExecution.getStatus());
 		assertEquals(3, jobExecution.getStepExecutions().size());
+		List<String> stepNames = getStepNames(jobExecution);
+		assertEquals(3, stepNames.size());
+		assertEquals("[job2.flow.s2, job2.flow.s3, job2.s1]", stepNames.toString());
 	}
 
 	@Test
@@ -89,7 +98,9 @@ public class FlowJobParserTests {
 		JobExecution jobExecution = jobRepository.createJobExecution(job3.getName(), new JobParameters());
 		job3.execute(jobExecution);
 		assertEquals(BatchStatus.COMPLETED, jobExecution.getStatus());
-		assertEquals(2, jobExecution.getStepExecutions().size());
+		List<String> stepNames = getStepNames(jobExecution);
+		assertEquals(2, stepNames.size());
+		assertEquals("[job3.flow.s2, job3.flow.s3]", stepNames.toString());
 	}
 
 	@Test
@@ -98,7 +109,17 @@ public class FlowJobParserTests {
 		JobExecution jobExecution = jobRepository.createJobExecution(job4.getName(), new JobParameters());
 		job4.execute(jobExecution);
 		assertEquals(BatchStatus.COMPLETED, jobExecution.getStatus());
-		assertEquals(4, jobExecution.getStepExecutions().size());
+		List<String> stepNames = getStepNames(jobExecution);
+		assertEquals(4, stepNames.size());
+		assertEquals("[job4.split.0.s2, job4.split.0.s3, job4.split.1.s2, job4.split.1.s3]", stepNames.toString());
+	}
+
+	private List<String> getStepNames(JobExecution jobExecution) {
+		List<String> list = new ArrayList<String>();
+		for (StepExecution stepExecution : jobExecution.getStepExecutions()) {
+			list.add(stepExecution.getStepName());
+		}
+		return list;
 	}
 
 }

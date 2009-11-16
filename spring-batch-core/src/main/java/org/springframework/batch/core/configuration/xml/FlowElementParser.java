@@ -17,9 +17,11 @@ package org.springframework.batch.core.configuration.xml;
 
 import java.util.Collection;
 
+import org.springframework.beans.MutablePropertyValues;
 import org.springframework.beans.factory.config.BeanDefinition;
-import org.springframework.beans.factory.config.RuntimeBeanReference;
+import org.springframework.beans.factory.support.AbstractBeanDefinition;
 import org.springframework.beans.factory.support.BeanDefinitionBuilder;
+import org.springframework.beans.factory.support.GenericBeanDefinition;
 import org.springframework.beans.factory.xml.ParserContext;
 import org.w3c.dom.Element;
 
@@ -49,7 +51,12 @@ public class FlowElementParser {
 
 		BeanDefinitionBuilder stateBuilder = 
 			BeanDefinitionBuilder.genericBeanDefinition("org.springframework.batch.core.job.flow.support.state.FlowState");
-		stateBuilder.addConstructorArgValue(new RuntimeBeanReference(refAttribute));
+
+		AbstractBeanDefinition flowDefinition = new GenericBeanDefinition();
+		flowDefinition.setParentName(refAttribute);
+		MutablePropertyValues propertyValues = flowDefinition.getPropertyValues();
+		propertyValues.addPropertyValue("name", idAttribute);
+		stateBuilder.addConstructorArgValue(flowDefinition);
 		stateBuilder.addConstructorArgValue(idAttribute);
 		return InlineFlowParser.getNextElements(parserContext, stateBuilder.getBeanDefinition(), element);
 

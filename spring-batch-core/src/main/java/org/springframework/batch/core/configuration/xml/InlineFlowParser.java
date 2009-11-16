@@ -15,7 +15,6 @@
  */
 package org.springframework.batch.core.configuration.xml;
 
-import org.springframework.batch.core.job.flow.support.SimpleFlow;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.support.BeanDefinitionBuilder;
 import org.springframework.beans.factory.xml.ParserContext;
@@ -27,6 +26,8 @@ import org.w3c.dom.Element;
  */
 public class InlineFlowParser extends AbstractFlowParser {
 	
+	private final String flowName;
+
 	/**
 	 * Construct a {@link InlineFlowParser} with the specified name and using the
 	 * provided job repository ref.
@@ -36,19 +37,9 @@ public class InlineFlowParser extends AbstractFlowParser {
 	 * from the enclosing tag
 	 */
 	public InlineFlowParser(String flowName, String jobFactoryRef) {
-		setFlowName(flowName);
+		this.flowName = flowName;
 		setJobFactoryRef(jobFactoryRef);
 
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see AbstractSingleBeanDefinitionParser#getBeanClass(Element)
-	 */
-	@Override
-	protected Class<SimpleFlow> getBeanClass(Element element) {
-		return SimpleFlow.class;
 	}
 
 	/**
@@ -58,6 +49,8 @@ public class InlineFlowParser extends AbstractFlowParser {
 	@Override
 	protected void doParse(Element element, ParserContext parserContext, BeanDefinitionBuilder builder) {
 
+		builder.getRawBeanDefinition().setAttribute("flowName", flowName);
+		builder.addPropertyValue("name", flowName);
 		super.doParse(element, parserContext, builder);
 		builder.setRole(BeanDefinition.ROLE_INFRASTRUCTURE);
 		parserContext.popAndRegisterContainingComponent();

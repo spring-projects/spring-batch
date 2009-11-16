@@ -18,9 +18,12 @@ package org.springframework.batch.core.configuration.xml;
 import java.util.Collection;
 import java.util.List;
 
+import org.springframework.beans.MutablePropertyValues;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.config.RuntimeBeanReference;
+import org.springframework.beans.factory.support.AbstractBeanDefinition;
 import org.springframework.beans.factory.support.BeanDefinitionBuilder;
+import org.springframework.beans.factory.support.GenericBeanDefinition;
 import org.springframework.beans.factory.support.ManagedList;
 import org.springframework.beans.factory.xml.ParserContext;
 import org.springframework.util.StringUtils;
@@ -86,23 +89,28 @@ public class SplitParser {
 		@SuppressWarnings("unchecked")
 		Collection<Object> flows = new ManagedList();
 		int i = 0;
+		String prefix = idAttribute.startsWith(jobFactoryRef) ? idAttribute : jobFactoryRef+"."+idAttribute;
 		for (Element nextElement : flowElements) {
-			InlineFlowParser flowParser = new InlineFlowParser(idAttribute + "#" + i, jobFactoryRef);
 			String ref = nextElement.getAttribute("ref");
 			if (StringUtils.hasText(ref)) {
 				if (nextElement.getElementsByTagName("*").getLength() > 0) {
 					parserContext.getReaderContext().error("A <flow/> in a <split/> must have ref= or nested <flow/>, but not both.", nextElement);
 				}
-				flows.add(new RuntimeBeanReference(ref));
+				AbstractBeanDefinition flowDefinition = new GenericBeanDefinition();
+				flowDefinition.setParentName(ref);
+				MutablePropertyValues propertyValues = flowDefinition.getPropertyValues();
+				propertyValues.addPropertyValue("name", prefix + "." + i);
+				flows.add(flowDefinition);
 			}
 			else {
+				InlineFlowParser flowParser = new InlineFlowParser(prefix + "." + i, jobFactoryRef);
 				flows.add(flowParser.parse(nextElement, parserContext));
 			}
 			i++;
 		}
 
 		stateBuilder.addConstructorArgValue(flows);
-		stateBuilder.addConstructorArgValue(idAttribute);
+		stateBuilder.addConstructorArgValue(prefix);
 
 		return InlineFlowParser.getNextElements(parserContext, stateBuilder.getBeanDefinition(), element);
 

@@ -25,7 +25,6 @@ import java.util.Map;
 import java.util.Set;
 
 import org.springframework.batch.core.job.flow.FlowExecutionStatus;
-import org.springframework.batch.core.job.flow.support.SimpleFlow;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.parsing.CompositeComponentDefinition;
 import org.springframework.beans.factory.support.BeanDefinitionBuilder;
@@ -81,19 +80,7 @@ public abstract class AbstractFlowParser extends AbstractSingleBeanDefinitionPar
 	// For generating unique state names for end transitions
 	private static int endCounter = 0;
 
-	private String flowName;
-
 	private String jobFactoryRef;
-
-	/**
-	 * Convenience method for subclasses to set up the flow name for error
-	 * reporting.
-	 * 
-	 * @param flowName
-	 */
-	protected void setFlowName(String flowName) {
-		this.flowName = flowName;
-	}
 
 	/**
 	 * Convenience method for subclasses to set the job factory reference if it
@@ -112,8 +99,8 @@ public abstract class AbstractFlowParser extends AbstractSingleBeanDefinitionPar
 	 * @see AbstractSingleBeanDefinitionParser#getBeanClass(Element)
 	 */
 	@Override
-	protected Class<SimpleFlow> getBeanClass(Element element) {
-		return SimpleFlow.class;
+	protected Class<?> getBeanClass(Element element) {
+		return SimpleFlowFactoryBean.class;
 	}
 
 	/**
@@ -166,6 +153,7 @@ public abstract class AbstractFlowParser extends AbstractSingleBeanDefinitionPar
 			}
 		}
 
+		String flowName = (String) builder.getRawBeanDefinition().getAttribute("flowName");
 		if (!stepExists && !StringUtils.hasText(element.getAttribute("parent"))) {
 			parserContext.getReaderContext().error("The flow [" + flowName + "] must contain at least one step",
 					element);
@@ -180,7 +168,6 @@ public abstract class AbstractFlowParser extends AbstractSingleBeanDefinitionPar
 			}
 		}
 
-		builder.addConstructorArgValue(flowName);
 		ManagedList managedList = new ManagedList();
 		@SuppressWarnings( { "unchecked", "unused" })
 		boolean dummy = managedList.addAll(stateTransitions);

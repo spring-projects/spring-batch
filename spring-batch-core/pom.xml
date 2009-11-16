@@ -5,6 +5,7 @@
 	<packaging>jar</packaging>
 	<name>Core</name>
 	<description>Core domain for batch processing, expressing a domain of Jobs, Steps, Chunks, etc.</description>
+	<url>http://static.springframework.org/spring-batch/${project.artifactId}</url>
 	<parent>
 		<groupId>org.springframework.batch</groupId>
 		<artifactId>spring-batch-parent</artifactId>

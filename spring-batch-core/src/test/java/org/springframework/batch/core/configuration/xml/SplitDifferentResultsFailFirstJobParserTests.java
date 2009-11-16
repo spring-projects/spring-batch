@@ -41,17 +41,17 @@ public class SplitDifferentResultsFailFirstJobParserTests extends AbstractJobPar
 		JobExecution jobExecution = createJobExecution();
 		job.execute(jobExecution);
 		assertEquals(2, stepNamesList.size());
-		assertTrue(stepNamesList.contains("s1"));
-		assertTrue(stepNamesList.contains("fail"));
+		assertTrue("Wrong step names: "+stepNamesList, stepNamesList.contains("job.split1.1.s1"));
+		assertTrue(stepNamesList.contains("job.split1.0.fail"));
 
 		assertEquals(BatchStatus.FAILED, jobExecution.getStatus());
 		assertEquals(ExitStatus.FAILED, jobExecution.getExitStatus());
 
-		StepExecution stepExecution1 = getStepExecution(jobExecution, "s1");
+		StepExecution stepExecution1 = getStepExecution(jobExecution, "job.split1.1.s1");
 		assertEquals(BatchStatus.COMPLETED, stepExecution1.getStatus());
 		assertEquals(ExitStatus.COMPLETED, stepExecution1.getExitStatus());
 
-		StepExecution stepExecution2 = getStepExecution(jobExecution, "fail");
+		StepExecution stepExecution2 = getStepExecution(jobExecution, "job.split1.0.fail");
 		assertEquals(BatchStatus.FAILED, stepExecution2.getStatus());
 		assertEquals(ExitStatus.FAILED.getExitCode(), stepExecution2.getExitStatus().getExitCode());
 

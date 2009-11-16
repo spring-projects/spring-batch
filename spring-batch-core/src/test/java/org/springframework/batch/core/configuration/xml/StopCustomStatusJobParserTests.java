@@ -43,13 +43,13 @@ public class StopCustomStatusJobParserTests extends AbstractJobParserTests {
 		//
 		JobExecution jobExecution = createJobExecution();
 		job.execute(jobExecution);
-		assertTrue("Wrong steps executed: "+stepNamesList, stepNamesList.contains("stop"));
+		assertTrue("Wrong steps executed: "+stepNamesList, stepNamesList.contains("job.stop"));
 		assertEquals(1, stepNamesList.size());
 
 		assertEquals(BatchStatus.STOPPED, jobExecution.getStatus());
 		assertEquals(ExitStatus.STOPPED.getExitCode(), jobExecution.getExitStatus().getExitCode());
 
-		StepExecution stepExecution1 = getStepExecution(jobExecution, "stop");
+		StepExecution stepExecution1 = getStepExecution(jobExecution, "job.stop");
 		assertEquals(BatchStatus.COMPLETED, stepExecution1.getStatus());
 		assertEquals("FOO", stepExecution1.getExitStatus().getExitCode());
 
@@ -59,13 +59,13 @@ public class StopCustomStatusJobParserTests extends AbstractJobParserTests {
 		stepNamesList.clear();
 		jobExecution = createJobExecution();
 		job.execute(jobExecution);
-		assertTrue("Wrong steps executed: "+stepNamesList, stepNamesList.contains("s2"));
+		assertTrue("Wrong steps executed: "+stepNamesList, stepNamesList.contains("job.s2"));
 		assertEquals(1, stepNamesList.size()); // step1 is not executed
 
 		assertEquals(BatchStatus.COMPLETED, jobExecution.getStatus());
 		assertEquals(ExitStatus.COMPLETED, jobExecution.getExitStatus());
 
-		StepExecution stepExecution2 = getStepExecution(jobExecution, "s2");
+		StepExecution stepExecution2 = getStepExecution(jobExecution, "job.s2");
 		assertEquals(BatchStatus.COMPLETED, stepExecution2.getStatus());
 		assertEquals(ExitStatus.COMPLETED, stepExecution2.getExitStatus());
 

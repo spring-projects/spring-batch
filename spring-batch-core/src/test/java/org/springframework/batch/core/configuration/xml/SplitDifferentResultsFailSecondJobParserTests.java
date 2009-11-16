@@ -41,23 +41,23 @@ public class SplitDifferentResultsFailSecondJobParserTests extends AbstractJobPa
 		JobExecution jobExecution = createJobExecution();
 		job.execute(jobExecution);
 		assertEquals("Wrong step names: "+stepNamesList, 3, stepNamesList.size());
-		assertTrue(stepNamesList.contains("s1"));
-		assertTrue(stepNamesList.contains("fail"));
-		assertTrue(stepNamesList.contains("s3"));
+		assertTrue("Wrong step names: "+stepNamesList, stepNamesList.contains("job.split1.0.s1"));
+		assertTrue("Wrong step names: "+stepNamesList, stepNamesList.contains("job.split1.1.fail"));
+		assertTrue(stepNamesList.contains("job.s3"));
 
 		assertEquals(BatchStatus.COMPLETED, jobExecution.getStatus());
 		// You can't suppress a FAILED exit status
 		assertEquals(ExitStatus.FAILED, jobExecution.getExitStatus());
 
-		StepExecution stepExecution1 = getStepExecution(jobExecution, "s1");
+		StepExecution stepExecution1 = getStepExecution(jobExecution, "job.split1.0.s1");
 		assertEquals(BatchStatus.COMPLETED, stepExecution1.getStatus());
 		assertEquals(ExitStatus.COMPLETED, stepExecution1.getExitStatus());
 
-		StepExecution stepExecution2 = getStepExecution(jobExecution, "fail");
+		StepExecution stepExecution2 = getStepExecution(jobExecution, "job.split1.1.fail");
 		assertEquals(BatchStatus.FAILED, stepExecution2.getStatus());
 		assertEquals(ExitStatus.FAILED.getExitCode(), stepExecution2.getExitStatus().getExitCode());
 
-		StepExecution stepExecution3 = getStepExecution(jobExecution, "s3");
+		StepExecution stepExecution3 = getStepExecution(jobExecution, "job.s3");
 		assertEquals(BatchStatus.COMPLETED, stepExecution3.getStatus());
 		assertEquals(ExitStatus.COMPLETED, stepExecution3.getExitStatus());
 

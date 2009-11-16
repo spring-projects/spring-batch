@@ -67,7 +67,7 @@ public class BranchStepJobParserTests {
 		for (StepExecution stepExecution : jobExecution.getStepExecutions()) {
 			names.add(stepExecution.getStepName());
 		}
-		assertTrue(names.contains("s3"));
-		assertFalse(names.contains("s2"));
+		assertTrue(names.contains("job.s3"));
+		assertFalse(names.contains("job.s2"));
 	}
 }

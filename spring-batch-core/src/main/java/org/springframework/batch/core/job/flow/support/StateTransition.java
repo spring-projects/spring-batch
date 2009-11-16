@@ -65,6 +65,20 @@ public class StateTransition implements Comparable<StateTransition> {
 	}
 
 	/**
+	 * Convenience method to switch the origin and destination of a transition,
+	 * creating a new instance.
+	 * 
+	 * @param stateTransition an existing state transition
+	 * @param state the new state for the origin
+	 * @param next the new name for the destination
+	 * 
+	 * @return a {@link StateTransition}
+	 */
+	public static StateTransition switchOriginAndDestination(StateTransition stateTransition, State state, String next) {
+		return createStateTransition(state, stateTransition.pattern, next);
+	}
+
+	/**
 	 * Create a new state {@link StateTransition} specification with a wildcard
 	 * pattern that matches all outcomes.
 	 * 
@@ -101,7 +115,7 @@ public class StateTransition implements Comparable<StateTransition> {
 
 		Assert.notNull(state, "A state is required for a StateTransition");
 		if (state.isEndState() && StringUtils.hasText(next)) {
-			throw new IllegalStateException("End state cannot have next: "+state);
+			throw new IllegalStateException("End state cannot have next: " + state);
 		}
 
 		this.next = next;
@@ -182,8 +196,8 @@ public class StateTransition implements Comparable<StateTransition> {
 	 */
 	@Override
 	public String toString() {
-		return String.format("StateTransition: [state=%s, pattern=%s, next=%s]", state == null ? null : state.getName(),
-				pattern, next);
+		return String.format("StateTransition: [state=%s, pattern=%s, next=%s]",
+				state == null ? null : state.getName(), pattern, next);
 	}
 
 }
