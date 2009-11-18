@@ -96,6 +96,24 @@ public class StepScopePlaceholderIntegrationTests implements BeanFactoryAware {
 	}
 
 	@Test
+	public void testCompoundPropertyTwice() throws Exception {
+
+		assertEquals("bar-bar", compound.getName());
+
+		StepSynchronizationManager.close();
+		stepExecution = new StepExecution("foo", new JobExecution(11L), 123L);
+
+		ExecutionContext executionContext = new ExecutionContext();
+		executionContext.put("foo", "spam");
+
+		stepExecution.setExecutionContext(executionContext);
+		StepSynchronizationManager.register(stepExecution);
+
+		assertEquals("spam-bar", compound.getName());
+
+	}
+
+	@Test
 	public void testParentByRef() throws Exception {
 		assertEquals("bar", ref.getParent().getName());
 	}

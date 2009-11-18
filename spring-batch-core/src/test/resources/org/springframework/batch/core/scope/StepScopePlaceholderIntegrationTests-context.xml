@@ -5,6 +5,7 @@
 		http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
 		http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop.xsd
 		http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx.xsd">
+
 	<bean id="simple" class="org.springframework.batch.core.scope.TestCollaborator" scope="step">
 		<property name="name" value="#{stepExecutionContext[foo]}" />
 	</bean>
