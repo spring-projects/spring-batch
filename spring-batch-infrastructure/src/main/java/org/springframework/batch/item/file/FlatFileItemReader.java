@@ -221,13 +221,13 @@ public class FlatFileItemReader<T> extends AbstractItemCountingItemStreamItemRea
 		}
 
 		String line = null;
+
 		try {
 			line = this.reader.readLine();
 			if (line == null) {
 				return null;
 			}
 			lineCount++;
-			
 			while (isComment(line)) {
 				line = reader.readLine();
 				if (line == null) {
@@ -235,29 +235,11 @@ public class FlatFileItemReader<T> extends AbstractItemCountingItemStreamItemRea
 				}
 				lineCount++;
 			}
-			
-			line = applyRecordSeparatorPolicy(line);
 		}
 		catch (IOException e) {
 			throw new FlatFileParseException("Unable to read from resource: [" + resource + "]", e, line, lineCount);
 		}
 		return line;
-	}
-	
-	private String applyRecordSeparatorPolicy(String line) throws IOException{
-		
-		String record = line;
-		while (line != null && !recordSeparatorPolicy.isEndOfRecord(record)) {
-			line = this.reader.readLine();
-			if (line==null) {
-				throw new FlatFileParseException("Unexpected end of file before record complete", record, lineCount);
-			}
-			record = recordSeparatorPolicy.preProcess(record) + line;
-			lineCount++;
-		}
-		
-		return recordSeparatorPolicy.postProcess(record);
-		
 	}
 
 	private boolean isComment(String line) {
@@ -298,13 +280,6 @@ public class FlatFileItemReader<T> extends AbstractItemCountingItemStreamItemRea
 			if (skippedLinesCallback != null) {
 				skippedLinesCallback.handleLine(line);
 			}
-		}
-	}
-	
-	@Override
-	protected void jumpToItem(int itemIndex) throws Exception {
-		for (int i = 0; i < itemIndex; i++) {
-			readLine();
 		}
 	}
 
