@@ -35,6 +35,8 @@ import org.springframework.batch.item.support.CompositeItemStream;
 class ChunkMonitor implements ItemStream {
 	
 	private Log logger = LogFactory.getLog(getClass());
+	
+	private boolean streamsRegistered = false;
 
 	public static class ChunkMonitorData {
 		public int offset;
@@ -64,6 +66,7 @@ class ChunkMonitor implements ItemStream {
 	 * @param stream the stream to set
 	 */
 	public void registerItemStream(ItemStream stream) {
+		streamsRegistered = true;
 		this.stream.register(stream);
 	}
 
@@ -97,13 +100,13 @@ class ChunkMonitor implements ItemStream {
 
 	public void close() throws ItemStreamException {
 		holder.set(new ChunkMonitorData(0,0));
-		if (stream != null) {
+		if (streamsRegistered) {
 			stream.close();
 		}
 	}
 
 	public void open(ExecutionContext executionContext) throws ItemStreamException {
-		if (stream != null) {
+		if (streamsRegistered) {
 			stream.open(executionContext);
 			ChunkMonitorData data = new ChunkMonitorData(executionContext.getInt(OFFSET, 0), 0);
 			holder.set(data);
@@ -123,7 +126,7 @@ class ChunkMonitor implements ItemStream {
 	}
 
 	public void update(ExecutionContext executionContext) throws ItemStreamException {
-		if (stream != null) {
+		if (streamsRegistered) {
 			ChunkMonitorData data = getData();
 			if (data.offset == 0) {
 				// Only call the underlying update method if we are on a chunk
@@ -139,7 +142,7 @@ class ChunkMonitor implements ItemStream {
 	private ChunkMonitorData getData() {
 		ChunkMonitorData data = holder.get();
 		if (data==null) {
-			if (stream!=null) {
+			if (streamsRegistered) {
 				logger.warn("ItemStream was opened in a different thread.  Restart data could be compromised.");
 			}
 			data = new ChunkMonitorData(0,0);

@@ -134,4 +134,18 @@ public class ChunkMonitorTests {
 		assertEquals(1, executionContext.size());
 	}
 
+	@Test
+	public void testUpdateWithNoStream() throws Exception {
+		monitor = new ChunkMonitor();
+		monitor.setItemReader(new ItemReader<String>() {
+			public String read() throws Exception, UnexpectedInputException, ParseException {
+				return "" + (count++);
+			}
+		});
+		monitor.setChunkSize(CHUNK_SIZE);
+		monitor.incrementOffset();
+		ExecutionContext executionContext = new ExecutionContext();
+		monitor.update(executionContext);
+		assertEquals(0, executionContext.size());		
+	}
 }
