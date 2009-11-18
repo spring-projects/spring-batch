@@ -203,7 +203,14 @@ public class HibernateCursorItemReader<T> extends AbstractItemCountingItemStream
 		initialized = true;
 
 	}
-
+	
+	@Override
+	protected void jumpToItem(int itemIndex) throws Exception {
+		for(int i = 0; i < itemIndex; i++){
+			cursor.next();
+		}
+	}
+	
 	/**
 	 * Close the cursor and hibernate session.
 	 */
