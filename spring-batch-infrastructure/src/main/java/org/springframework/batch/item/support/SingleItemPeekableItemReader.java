@@ -85,7 +85,6 @@ public class SingleItemPeekableItemReader<T> implements ItemStreamReader<T>, Pee
 	 * 
 	 * @see PeekableItemReader#peek()
 	 */
-	@Override
 	public T peek() throws Exception, UnexpectedInputException, ParseException {
 		if (next == null) {
 			updateDelegate(executionContext);
