@@ -545,8 +545,8 @@
 	</dependencyManagement>
 	<distributionManagement>
 		<site>
-			<id>staging</id>
-			<url>file:///${user.dir}/target/staging</url>
+			<id>static.springframework.org</id>
+			<url>scp://static.springframework.org/var/www/domains/springframework.org/static/htdocs/spring-batch-admin/trunk</url>
 		</site>
 		<repository>
 			<id>spring-milestone</id>
