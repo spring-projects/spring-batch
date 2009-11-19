@@ -18,6 +18,7 @@ package org.springframework.batch.core.launch;
 
 import static org.easymock.EasyMock.createMock;
 import static org.easymock.EasyMock.expect;
+import static org.easymock.EasyMock.expectLastCall;
 import static org.easymock.EasyMock.replay;
 import static org.easymock.EasyMock.reset;
 import static org.easymock.EasyMock.verify;
@@ -30,6 +31,7 @@ import java.util.List;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.springframework.batch.core.BatchStatus;
 import org.springframework.batch.core.ExitStatus;
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.JobExecution;
@@ -40,6 +42,7 @@ import org.springframework.batch.core.launch.support.SimpleJobLauncher;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.repository.JobRestartException;
 import org.springframework.core.task.TaskExecutor;
+import org.springframework.core.task.TaskRejectedException;
 
 /**
  * @author Lucas Ward
@@ -137,6 +140,39 @@ public class SimpleJobLauncherTests {
 		});
 		testRun();
 		assertEquals(1, list.size());
+	}
+
+	@Test
+	public void testTaskExecutorRejects() throws Exception {
+
+		final List<String> list = new ArrayList<String>();
+		jobLauncher.setTaskExecutor(new TaskExecutor() {
+			public void execute(Runnable task) {
+				list.add("execute");
+				throw new TaskRejectedException("Planned failure");
+			}
+		});
+
+		JobExecution jobExecution = new JobExecution(null, null);
+
+		expect(jobRepository.getLastJobExecution(job.getName(), jobParameters)).andReturn(null);
+		expect(jobRepository.createJobExecution(job.getName(), jobParameters)).andReturn(jobExecution);
+		jobRepository.update(jobExecution);
+		expectLastCall();
+		replay(jobRepository);
+
+		jobLauncher.afterPropertiesSet();
+		try {
+			jobLauncher.run(job, jobParameters);
+		}
+		finally {
+			assertEquals(BatchStatus.FAILED, jobExecution.getStatus());
+			assertEquals(ExitStatus.FAILED.getExitCode(), jobExecution.getExitStatus().getExitCode());
+			verify(jobRepository);
+		}
+
+		assertEquals(1, list.size());
+
 	}
 
 	@Test

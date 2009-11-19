@@ -17,6 +17,8 @@ package org.springframework.batch.core.launch.support;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.springframework.batch.core.BatchStatus;
+import org.springframework.batch.core.ExitStatus;
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.JobInstance;
@@ -30,6 +32,7 @@ import org.springframework.batch.core.repository.JobRestartException;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.core.task.SyncTaskExecutor;
 import org.springframework.core.task.TaskExecutor;
+import org.springframework.core.task.TaskRejectedException;
 import org.springframework.util.Assert;
 
 /**
@@ -105,29 +108,40 @@ public class SimpleJobLauncher implements JobLauncher, InitializingBean {
 			jobExecution = jobRepository.createJobExecution(job.getName(), jobParameters);
 		}
 
-		taskExecutor.execute(new Runnable() {
+		try {
+			taskExecutor.execute(new Runnable() {
 
-			public void run() {
-				try {
-					logger.info("Job: [" + job + "] launched with the following parameters: [" + jobParameters + "]");
-					job.execute(jobExecution);
-					logger.info("Job: [" + job + "] completed with the following parameters: [" + jobParameters
-							+ "] and the following status: [" + jobExecution.getStatus() + "]");
+				public void run() {
+					try {
+						logger.info("Job: [" + job + "] launched with the following parameters: [" + jobParameters
+								+ "]");
+						job.execute(jobExecution);
+						logger.info("Job: [" + job + "] completed with the following parameters: [" + jobParameters
+								+ "] and the following status: [" + jobExecution.getStatus() + "]");
+					}
+					catch (Throwable t) {
+						logger.info("Job: [" + job
+								+ "] failed unexpectedly and fatally with the following parameters: [" + jobParameters
+								+ "]", t);
+						rethrow(t);
+					}
 				}
-				catch (Throwable t) {
-					logger.info("Job: [" + job + "] failed unexpectedly and fatally with the following parameters: ["
-							+ jobParameters + "]", t);
-					rethrow(t);
-				}
-			}
 
-			private void rethrow(Throwable t) {
-				if (t instanceof RuntimeException) {
-					throw (RuntimeException) t;
+				private void rethrow(Throwable t) {
+					if (t instanceof RuntimeException) {
+						throw (RuntimeException) t;
+					}
+					throw new RuntimeException(t);
 				}
-				throw new RuntimeException(t);
+			});
+		}
+		catch (TaskRejectedException e) {
+			jobExecution.upgradeStatus(BatchStatus.FAILED);
+			if (jobExecution.getExitStatus().equals(ExitStatus.UNKNOWN)) {
+				jobExecution.setExitStatus(ExitStatus.FAILED.addExitDescription(e));
 			}
-		});
+			jobRepository.update(jobExecution);
+		}
 
 		return jobExecution;
 	}
