@@ -15,8 +15,6 @@
  */
 package org.springframework.batch.core.step;
 
-import java.io.PrintWriter;
-import java.io.StringWriter;
 import java.util.Date;
 
 import org.apache.commons.logging.Log;
@@ -341,10 +339,7 @@ public abstract class AbstractStep implements Step, InitializingBean, BeanNameAw
 			exitStatus = new ExitStatus(ExitCodeMapper.NO_SUCH_JOB, ex.getClass().getName());
 		}
 		else {
-			StringWriter writer = new StringWriter();
-			ex.printStackTrace(new PrintWriter(writer));
-			String message = writer.toString();
-			exitStatus = ExitStatus.FAILED.addExitDescription(message);
+			exitStatus = ExitStatus.FAILED.addExitDescription(ex);
 		}
 
 		return exitStatus;

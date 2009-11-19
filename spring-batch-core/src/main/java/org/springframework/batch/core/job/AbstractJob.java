@@ -16,8 +16,6 @@
 
 package org.springframework.batch.core.job;
 
-import java.io.PrintWriter;
-import java.io.StringWriter;
 import java.util.Collection;
 import java.util.Date;
 
@@ -487,10 +485,7 @@ public abstract class AbstractJob implements Job, StepLocator, BeanNameAware, In
 			exitStatus = new ExitStatus(ExitCodeMapper.NO_SUCH_JOB, ex.getClass().getName());
 		}
 		else {
-			StringWriter writer = new StringWriter();
-			ex.printStackTrace(new PrintWriter(writer));
-			String message = writer.toString();
-			exitStatus = ExitStatus.FAILED.addExitDescription(message);
+			exitStatus = ExitStatus.FAILED.addExitDescription(ex);
 		}
 
 		return exitStatus;

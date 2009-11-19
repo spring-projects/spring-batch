@@ -188,6 +188,15 @@ public class ExitStatusTests {
 	}
 
 	@Test
+	public void testAddExitDescriptionWIthStacktrace() throws Exception {
+		ExitStatus status = ExitStatus.EXECUTING.addExitDescription(new RuntimeException("Foo"));
+		assertTrue(ExitStatus.EXECUTING != status);
+		String description = status.getExitDescription();
+		assertTrue("Wrong description: "+description, description.contains("Foo"));
+		assertTrue("Wrong description: "+description, description.contains("RuntimeException"));
+	}
+
+	@Test
 	public void testAddExitDescriptionToSameStatus() throws Exception {
 		ExitStatus status = ExitStatus.EXECUTING.addExitDescription("Foo").addExitDescription("Foo");
 		assertTrue(ExitStatus.EXECUTING != status);
@@ -196,7 +205,7 @@ public class ExitStatusTests {
 
 	@Test
 	public void testAddEmptyExitDescription() throws Exception {
-		ExitStatus status = ExitStatus.EXECUTING.addExitDescription("Foo").addExitDescription(null);
+		ExitStatus status = ExitStatus.EXECUTING.addExitDescription("Foo").addExitDescription((String)null);
 		assertEquals("Foo", status.getExitDescription());
 	}
 

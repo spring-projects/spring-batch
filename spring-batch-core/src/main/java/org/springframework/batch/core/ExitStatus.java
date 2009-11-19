@@ -15,7 +15,9 @@
  */
 package org.springframework.batch.core;
 
+import java.io.PrintWriter;
 import java.io.Serializable;
+import java.io.StringWriter;
 
 import org.springframework.util.StringUtils;
 
@@ -246,6 +248,20 @@ public class ExitStatus implements Serializable, Comparable<ExitStatus> {
 			buffer.append(description);
 		}
 		return new ExitStatus(exitCode, buffer.toString());
+	}
+
+	/**
+	 * Extract the stack trace from the throwable provided and append it to
+	 * the exist description.
+	 * 
+	 * @param throwable
+	 * @return a new ExitStatus with the stack trace appended
+	 */
+	public ExitStatus addExitDescription(Throwable throwable) {
+		StringWriter writer = new StringWriter();
+		throwable.printStackTrace(new PrintWriter(writer));
+		String message = writer.toString();
+		return addExitDescription(message);
 	}
 
 }
