@@ -16,20 +16,6 @@
 		<!-- Override this with -Denvironment=XXXX to change database type -->
 		<environment>hsql</environment>
 	</properties>
-	<profiles>
-		<profile>
-			<id>tiger</id>
-			<activation>
-				<jdk>1.5</jdk>
-			</activation>
-			<dependencies>
-				<dependency>
-					<groupId>stax</groupId>
-					<artifactId>stax</artifactId>
-				</dependency>
-			</dependencies>
-		</profile>
-	</profiles>
 	<dependencies>
 		<dependency>
 			<groupId>org.springframework.batch</groupId>
@@ -127,6 +113,10 @@
 		<dependency>
 			<groupId>com.thoughtworks.xstream</groupId>
 			<artifactId>xstream</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.codehaus.woodstox</groupId>
+			<artifactId>woodstox-core-asl</artifactId>	
 		</dependency>
 		<dependency>
 			<groupId>javax.servlet</groupId>

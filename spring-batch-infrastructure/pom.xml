@@ -16,20 +16,6 @@
 		<version>2.1.0.CI-SNAPSHOT</version>
 		<relativePath>../spring-batch-parent</relativePath>
 	</parent>
-	<profiles>
-		<profile>
-			<id>tiger</id>
-			<activation>
-				<jdk>1.5</jdk>
-			</activation>
-			<dependencies>
-				<dependency>
-					<groupId>stax</groupId>
-					<artifactId>stax</artifactId>
-				</dependency>
-			</dependencies>
-		</profile>
-	</profiles>
 	<build>
 		<plugins>
 			<plugin>
@@ -179,6 +165,10 @@
 			<groupId>org.springframework</groupId>
 			<artifactId>spring-tx</artifactId>
 			<optional>true</optional>
+		</dependency>
+		<dependency>
+			<groupId>org.codehaus.woodstox</groupId>
+			<artifactId>woodstox-core-asl</artifactId>	
 		</dependency>
 	</dependencies>
 	<reporting>

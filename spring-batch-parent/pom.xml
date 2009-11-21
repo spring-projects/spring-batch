@@ -288,9 +288,9 @@
 				<scope>test</scope>
 			</dependency>
 			<dependency>
-				<groupId>stax</groupId>
-				<artifactId>stax</artifactId>
-				<version>1.2.0</version>
+				<groupId>org.codehaus.woodstox</groupId>
+				<artifactId>woodstox-core-asl</artifactId>
+				<version>4.0.6</version>
 				<optional>true</optional>
 			</dependency>
 			<dependency>

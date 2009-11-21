@@ -176,7 +176,7 @@ public class StaxEventItemWriterTests {
 		writer.open(executionContext);
 		writer.write(items);
 		String content = outputFileContent();
-		assertTrue("Wrong content: " + content, content.contains(("<header></header>")));
+		assertTrue("Wrong content: " + content, content.contains(("<header/>")));
 		assertTrue("Wrong content: " + content, content.contains(TEST_STRING));
 	}
 
@@ -240,8 +240,8 @@ public class StaxEventItemWriterTests {
 		String content = outputFileContent();
 
 		assertTrue(content.contains("<testroot attribute=\"value\">"));
-		assertTrue(content.contains("<header></header>"));
-		assertTrue(content.contains("<footer></footer>"));
+		assertTrue(content.contains("<header/>"));
+		assertTrue(content.contains("<footer/>"));
 		assertTrue(content.endsWith("</testroot>"));
 	}
 

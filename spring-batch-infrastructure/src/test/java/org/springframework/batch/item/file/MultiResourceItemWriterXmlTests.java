@@ -88,8 +88,8 @@ public class MultiResourceItemWriterXmlTests extends AbstractMultiResourceItemWr
 		tested.update(executionContext);
 		tested.close();
 
-		assertEquals(xmlDocStart + "<prefix:4></prefix:4>" + xmlDocEnd, readFile(part2));
-		assertEquals(xmlDocStart + "<prefix:1></prefix:1><prefix:2></prefix:2><prefix:3></prefix:3>" + xmlDocEnd,
+		assertEquals(xmlDocStart + "<prefix:4/>" + xmlDocEnd, readFile(part2));
+		assertEquals(xmlDocStart + "<prefix:1/><prefix:2/><prefix:3/>" + xmlDocEnd,
 				readFile(part1));
 
 		tested.open(executionContext);
@@ -102,9 +102,9 @@ public class MultiResourceItemWriterXmlTests extends AbstractMultiResourceItemWr
 
 		tested.close();
 
-		assertEquals(xmlDocStart + "<prefix:4></prefix:4><prefix:5></prefix:5>" + xmlDocEnd, readFile(part2));
+		assertEquals(xmlDocStart + "<prefix:4/><prefix:5/>" + xmlDocEnd, readFile(part2));
 		assertEquals(xmlDocStart
-				+ "<prefix:6></prefix:6><prefix:7></prefix:7><prefix:8></prefix:8><prefix:9></prefix:9>" + xmlDocEnd,
+				+ "<prefix:6/><prefix:7/><prefix:8/><prefix:9/>" + xmlDocEnd,
 				readFile(part3));
 	}
 
