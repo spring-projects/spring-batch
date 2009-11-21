@@ -169,6 +169,7 @@
 		<dependency>
 			<groupId>org.codehaus.woodstox</groupId>
 			<artifactId>woodstox-core-asl</artifactId>	
+			<optional>true</optional>
 		</dependency>
 	</dependencies>
 	<reporting>
