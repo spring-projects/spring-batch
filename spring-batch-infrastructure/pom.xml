@@ -10,6 +10,7 @@
 	low-level components, interfaces and tools for batch processing 
 	applications and optimisations.]]>
   </description>
+	<url>http://static.springframework.org/spring-batch/${project.artifactId}</url>
 	<parent>
 		<groupId>org.springframework.batch</groupId>
 		<artifactId>spring-batch-parent</artifactId>
