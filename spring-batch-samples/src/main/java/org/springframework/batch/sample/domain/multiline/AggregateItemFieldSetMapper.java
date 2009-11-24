@@ -19,6 +19,7 @@ import org.springframework.batch.item.file.mapping.FieldSetMapper;
 import org.springframework.batch.item.file.transform.FieldSet;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.util.Assert;
+import org.springframework.validation.BindException;
 
 /**
  * Delegating mapper to convert form a vanilla {@link FieldSetMapper} to one
@@ -82,8 +83,9 @@ public class AggregateItemFieldSetMapper<T> implements FieldSetMapper<AggregateI
 	 * 
 	 * @return an {@link AggregateItem} that wraps the return value from the
 	 * delegate
+	 * @throws BindException if one of the delegates does
 	 */
-	public AggregateItem<T> mapFieldSet(FieldSet fieldSet) {
+	public AggregateItem<T> mapFieldSet(FieldSet fieldSet) throws BindException {
 
 		if (fieldSet.readString(0).equals(begin)) {
 			return AggregateItem.getHeader();

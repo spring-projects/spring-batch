@@ -21,9 +21,11 @@ import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
 import java.beans.PropertyEditor;
+import java.math.BigDecimal;
 import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
@@ -41,6 +43,7 @@ import org.springframework.beans.propertyeditors.PropertiesEditor;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 import org.springframework.context.support.StaticApplicationContext;
+import org.springframework.validation.BindException;
 import org.springframework.validation.DataBinder;
 
 public class BeanWrapperFieldSetMapperTests {
@@ -279,7 +282,7 @@ public class BeanWrapperFieldSetMapperTests {
 	// BeanWrapperFieldSetMapper doesn't currently support nesting with
 	// collections.
 	@Test
-	public void testNestedList() {
+	public void testNestedList() throws Exception {
 
 		TestNestedList nestedList = new TestNestedList();
 		List<Object> nestedC = new ArrayList<Object>();
@@ -366,6 +369,23 @@ public class BeanWrapperFieldSetMapperTests {
 
 		assertEquals(9876.1, bean.getVarDouble(), 0.01);
 		assertEquals(7890.1, bean.getVarFloat(), 0.01);
+	}
+
+	@Test
+	public void testBinderWithErrors() throws Exception {
+
+		BeanWrapperFieldSetMapper<TestObject> mapper = new BeanWrapperFieldSetMapper<TestObject>();
+		mapper.setTargetType(TestObject.class);
+
+		FieldSet fieldSet = new DefaultFieldSet(new String[] { "foo", "7890.1" }, new String[] { "varDouble", "varFloat" });
+		try {
+			mapper.mapFieldSet(fieldSet);
+			fail("Expected BindException");
+		} catch (BindException e) {
+			assertEquals(1, e.getErrorCount());
+			assertEquals("typeMismatch", e.getFieldError("varDouble").getCode());
+		}
+
 	}
 
 	@Test
@@ -543,5 +563,120 @@ public class BeanWrapperFieldSetMapperTests {
 			this.other = other;
 		}
 
+	}
+	
+	public static class TestObject {
+		String varString;
+
+		boolean varBoolean;
+
+		char varChar;
+
+		byte varByte;
+
+		short varShort;
+
+		int varInt;
+
+		long varLong;
+
+		float varFloat;
+
+		double varDouble;
+
+		BigDecimal varBigDecimal;
+
+		Date varDate;
+
+		public Date getVarDate() {
+			return (Date)varDate.clone();
+		}
+
+		public void setVarDate(Date varDate) {
+			this.varDate = varDate == null ? null : (Date)varDate.clone();
+		}
+
+		public TestObject() {
+		}
+
+		public BigDecimal getVarBigDecimal() {
+			return varBigDecimal;
+		}
+
+		public void setVarBigDecimal(BigDecimal varBigDecimal) {
+			this.varBigDecimal = varBigDecimal;
+		}
+
+		public boolean isVarBoolean() {
+			return varBoolean;
+		}
+
+		public void setVarBoolean(boolean varBoolean) {
+			this.varBoolean = varBoolean;
+		}
+
+		public byte getVarByte() {
+			return varByte;
+		}
+
+		public void setVarByte(byte varByte) {
+			this.varByte = varByte;
+		}
+
+		public char getVarChar() {
+			return varChar;
+		}
+
+		public void setVarChar(char varChar) {
+			this.varChar = varChar;
+		}
+
+		public double getVarDouble() {
+			return varDouble;
+		}
+
+		public void setVarDouble(double varDouble) {
+			this.varDouble = varDouble;
+		}
+
+		public float getVarFloat() {
+			return varFloat;
+		}
+
+		public void setVarFloat(float varFloat) {
+			this.varFloat = varFloat;
+		}
+
+		public long getVarLong() {
+			return varLong;
+		}
+
+		public void setVarLong(long varLong) {
+			this.varLong = varLong;
+		}
+
+		public short getVarShort() {
+			return varShort;
+		}
+
+		public void setVarShort(short varShort) {
+			this.varShort = varShort;
+		}
+
+		public String getVarString() {
+			return varString;
+		}
+
+		public void setVarString(String varString) {
+			this.varString = varString;
+		}
+
+		public int getVarInt() {
+			return varInt;
+		}
+
+		public void setVarInt(int varInt) {
+			this.varInt = varInt;
+		}
 	}
 }

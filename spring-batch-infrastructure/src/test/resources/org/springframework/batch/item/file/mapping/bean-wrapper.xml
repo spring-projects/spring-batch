@@ -9,6 +9,6 @@
 		<property name="prototypeBeanName" value="prototype"/>
 	</bean>
 
-	<bean id="prototype" class="org.springframework.batch.item.file.mapping.TestObject" scope="prototype" />
+	<bean id="prototype" class="org.springframework.batch.item.file.mapping.BeanWrapperFieldSetMapperTests$TestObject" scope="prototype" />
 
 </beans>

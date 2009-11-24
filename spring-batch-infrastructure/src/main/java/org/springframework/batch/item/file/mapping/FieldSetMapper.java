@@ -17,6 +17,7 @@
 package org.springframework.batch.item.file.mapping;
 
 import org.springframework.batch.item.file.transform.FieldSet;
+import org.springframework.validation.BindException;
 
 
 
@@ -34,6 +35,7 @@ public interface FieldSetMapper<T> {
 	 * Method used to map data obtained from a {@link FieldSet} into an object.
 	 * 
 	 * @param fieldSet the {@link FieldSet} to map
+	 * @throws BindException if there is a problem with the binding
 	 */
-	T mapFieldSet(FieldSet fieldSet);
+	T mapFieldSet(FieldSet fieldSet) throws BindException;
 }

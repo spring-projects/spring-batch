@@ -17,10 +17,8 @@
 package org.springframework.batch.item.file.mapping;
 
 import java.beans.PropertyEditor;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
@@ -38,8 +36,8 @@ import org.springframework.beans.factory.BeanFactoryAware;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.util.Assert;
 import org.springframework.util.ReflectionUtils;
+import org.springframework.validation.BindException;
 import org.springframework.validation.DataBinder;
-import org.springframework.validation.ObjectError;
 
 /**
  * {@link FieldSetMapper} implementation based on bean property paths. The
@@ -159,27 +157,20 @@ public class BeanWrapperFieldSetMapper<T> extends DefaultPropertyEditorRegistrar
 	 * Map the {@link FieldSet} to an object retrieved from the enclosing Spring
 	 * context, or to a new instance of the required type if no prototype is
 	 * available.
-	 * 
-	 * @throws NotWritablePropertyException if the {@link FieldSet} contains a
-	 * field that cannot be mapped to a bean property.
-	 * @throws BindingException if there is a type conversion or other error (if
+	 * @throws BindException if there is a type conversion or other error (if
 	 * the {@link DataBinder} from {@link #createBinder(Object)} has errors
 	 * after binding).
 	 * 
+	 * @throws NotWritablePropertyException if the {@link FieldSet} contains a
+	 * field that cannot be mapped to a bean property.
 	 * @see org.springframework.batch.item.file.mapping.FieldSetMapper#mapFieldSet(FieldSet)
 	 */
-	@SuppressWarnings("unchecked")
-	public T mapFieldSet(FieldSet fs) {
+	public T mapFieldSet(FieldSet fs) throws BindException {
 		T copy = getBean();
 		DataBinder binder = createBinder(copy);
 		binder.bind(new MutablePropertyValues(getBeanProperties(copy, fs.getProperties())));
 		if (binder.getBindingResult().hasErrors()) {
-			List<ObjectError> errors = binder.getBindingResult().getAllErrors();
-			List<String> messages = new ArrayList<String>(errors.size());
-			for (ObjectError error : errors) {
-				messages.add(error.getDefaultMessage());
-			}
-			throw new BindingException("" + messages);
+			throw new BindException(binder.getBindingResult());
 		}
 		return copy;
 	}
