@@ -55,7 +55,8 @@ public class JobParameters implements Serializable {
 	 * @return The <code>Long</code> value
 	 */
 	public long getLong(String key){
-		return ((Long)parameters.get(key).getValue()).longValue();
+		Object value = parameters.get(key).getValue();
+		return value==null ? 0L : ((Long)value).longValue();
 	}
 	
 	/**

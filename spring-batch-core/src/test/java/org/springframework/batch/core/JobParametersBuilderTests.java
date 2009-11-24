@@ -29,6 +29,16 @@ public class JobParametersBuilderTests extends TestCase {
 		assertEquals("string value", parameters.getString("STRING"));
 	}
 
+	public void testNullRuntimeParamters(){	
+		parametersBuilder.addDate("SCHEDULE_DATE", null);
+		parametersBuilder.addLong("LONG", null);
+		parametersBuilder.addString("STRING", null);
+		JobParameters parameters = parametersBuilder.toJobParameters();
+		assertEquals(null, parameters.getDate("SCHEDULE_DATE"));
+		assertEquals(0L, parameters.getLong("LONG"));
+		assertEquals(null, parameters.getString("STRING"));
+	}
+
 	public void testCopy(){	
 		parametersBuilder.addString("STRING", "string value");
 		parametersBuilder = new JobParametersBuilder(parametersBuilder.toJobParameters());

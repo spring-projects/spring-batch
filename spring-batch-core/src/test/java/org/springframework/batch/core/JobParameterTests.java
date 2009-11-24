@@ -24,6 +24,12 @@ public class JobParameterTests {
 	}
 	
 	@Test
+	public void testNullStringParameter(){
+		jobParameter = new JobParameter((String)null);
+		assertEquals(null, jobParameter.getValue());
+	}
+	
+	@Test
 	public void testLongParameter(){
 		jobParameter = new JobParameter(1L);
 		assertEquals(1L, jobParameter.getValue());
@@ -43,6 +49,12 @@ public class JobParameterTests {
 	}
 	
 	@Test
+	public void testNullDateParameter(){
+		jobParameter = new JobParameter((Date)null);
+		assertEquals(null, jobParameter.getValue());
+	}
+	
+	@Test
 	public void testDateParameterToString(){
 		Date epoch = new Date(0L);
 		jobParameter = new JobParameter(epoch);
@@ -54,6 +66,34 @@ public class JobParameterTests {
 		jobParameter = new JobParameter("test");
 		JobParameter testParameter = new JobParameter("test");
 		assertTrue(jobParameter.equals(testParameter));
+	}
+	
+	@Test
+	public void testHashcode(){
+		jobParameter = new JobParameter("test");
+		JobParameter testParameter = new JobParameter("test");
+		assertEquals(testParameter.hashCode(), jobParameter.hashCode());
+	}
+	
+	@Test
+	public void testEqualsWithNull(){
+		jobParameter = new JobParameter((String)null);
+		JobParameter testParameter = new JobParameter((String)null);
+		assertTrue(jobParameter.equals(testParameter));
+	}
+
+	@Test
+	public void testEqualsWithNullAndDifferentType(){
+		jobParameter = new JobParameter((String)null);
+		JobParameter testParameter = new JobParameter((Date)null);
+		assertFalse(jobParameter.equals(testParameter));
+	}
+
+	@Test
+	public void testHashcodeWithNull(){
+		jobParameter = new JobParameter((String)null);
+		JobParameter testParameter = new JobParameter((String)null);
+		assertEquals(testParameter.hashCode(), jobParameter.hashCode());
 	}
 	
 }

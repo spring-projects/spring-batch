@@ -62,7 +62,6 @@ public class JobParametersBuilder {
 	 * @return a refernece to this object.
 	 */
 	public JobParametersBuilder addString(String key, String parameter) {
-		Assert.notNull(parameter, "Parameter must not be null.");
 		parameterMap.put(key, new JobParameter(parameter));
 		return this;
 	}
@@ -75,7 +74,6 @@ public class JobParametersBuilder {
 	 * @return a refernece to this object.
 	 */
 	public JobParametersBuilder addDate(String key, Date parameter) {
-		Assert.notNull(parameter, "Parameter must not be null.");
 		parameterMap.put(key, new JobParameter(parameter));
 		return this;
 	}
@@ -88,7 +86,6 @@ public class JobParametersBuilder {
 	 * @return a reference to this object.
 	 */
 	public JobParametersBuilder addLong(String key, Long parameter) {
-		Assert.notNull(parameter, "Parameter must not be null.");
 		parameterMap.put(key, new JobParameter(parameter));
 		return this;
 	}
@@ -101,7 +98,6 @@ public class JobParametersBuilder {
 	 * @return a reference to this object.
 	 */
 	public JobParametersBuilder addDouble(String key, Double parameter) {
-		Assert.notNull(parameter, "Parameter must not be null.");
 		parameterMap.put(key, new JobParameter(parameter));
 		return this;
 	}

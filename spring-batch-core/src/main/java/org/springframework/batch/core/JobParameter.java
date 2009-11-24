@@ -57,7 +57,7 @@ public class JobParameter implements Serializable {
 	 * @param parameter
 	 */
 	public JobParameter(Date parameter) {
-		this.parameter = new Date(parameter.getTime());
+		this.parameter = parameter == null ? null : new Date(parameter.getTime());
 		parameterType = ParameterType.DATE;
 	}
 
@@ -76,7 +76,7 @@ public class JobParameter implements Serializable {
 	 */
 	public Object getValue() {
 
-		if (parameter.getClass().isInstance(Date.class)) {
+		if (parameter != null && parameter.getClass().isInstance(Date.class)) {
 			return new Date(((Date) parameter).getTime());
 		}
 		else {
@@ -102,16 +102,17 @@ public class JobParameter implements Serializable {
 		}
 
 		JobParameter rhs = (JobParameter) obj;
-		return this.parameter.equals(rhs.parameter);
+		return parameter==null ? rhs.parameter==null && parameterType==rhs.parameterType: parameter.equals(rhs.parameter);
 	}
 
 	@Override
 	public String toString() {
-		return parameterType == ParameterType.DATE ? "" + ((Date) parameter).getTime() : parameter.toString();
+		return parameter == null ? null : (parameterType == ParameterType.DATE ? "" + ((Date) parameter).getTime()
+				: parameter.toString());
 	}
 
 	public int hashCode() {
-		return 7 + 21 * parameter.hashCode();
+		return 7 + 21 * (parameter == null ? parameterType.hashCode() : parameter.hashCode());
 	}
 
 	/**
