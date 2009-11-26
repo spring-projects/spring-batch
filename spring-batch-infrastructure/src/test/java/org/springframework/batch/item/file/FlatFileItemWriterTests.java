@@ -254,6 +254,38 @@ public class FlatFileItemWriterTests {
 	}
 
 	@Test
+	public void testWriteStringTransactional() throws Exception {
+		writeStringTransactionCheck(null);
+		assertEquals(TEST_STRING, readLine());
+	}
+
+	@Test
+	public void testWriteStringNotTransactional() throws Exception {
+		writer.setTransactional(false);
+		writeStringTransactionCheck(TEST_STRING);
+	}
+
+	private void writeStringTransactionCheck(final String expectedInTransaction) {
+		PlatformTransactionManager transactionManager = new ResourcelessTransactionManager();
+		
+		writer.open(executionContext);
+		new TransactionTemplate(transactionManager).execute(new TransactionCallback() {
+			public Object doInTransaction(TransactionStatus status) {
+				try {
+					writer.write(Collections.singletonList(TEST_STRING));
+					assertEquals(expectedInTransaction, readLine());
+				}
+				catch (Exception e) {
+					throw new UnexpectedInputException("Could not write data", e);
+				}
+				
+				return null;
+			}
+		});
+		writer.close();
+	}
+
+	@Test
 	public void testTransactionalRestart() throws Exception {
 
 		writer.setFooterCallback(new FlatFileFooterCallback() {

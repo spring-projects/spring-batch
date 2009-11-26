@@ -16,6 +16,7 @@
 
 package org.springframework.batch.item.file;
 
+import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -59,6 +60,8 @@ import org.springframework.util.ClassUtils;
 public class FlatFileItemWriter<T> extends ExecutionContextUserSupport implements ResourceAwareItemWriterItemStream<T>,
 		InitializingBean {
 
+	private static final boolean DEFAULT_TRANSACTIONAL = true;
+
 	protected static final Log logger = LogFactory.getLog(JdbcBatchItemWriter.class);
 
 	private static final String DEFAULT_LINE_SEPARATOR = System.getProperty("line.separator");
@@ -86,6 +89,8 @@ public class FlatFileItemWriter<T> extends ExecutionContextUserSupport implement
 	private FlatFileFooterCallback footerCallback;
 
 	private String lineSeparator = DEFAULT_LINE_SEPARATOR;
+	
+	private boolean transactional = DEFAULT_TRANSACTIONAL;
 
 	public FlatFileItemWriter() {
 		setName(ClassUtils.getShortName(FlatFileItemWriter.class));
@@ -183,6 +188,14 @@ public class FlatFileItemWriter<T> extends ExecutionContextUserSupport implement
 	 */
 	public void setFooterCallback(FlatFileFooterCallback footerCallback) {
 		this.footerCallback = footerCallback;
+	}
+
+	/**
+	 * Flag to indicate that writing to the buffer should be delayed if a
+	 * transaction is active. Defaults to true.
+	 */
+	public void setTransactional(boolean transactional) {
+		this.transactional = transactional;
 	}
 
 	/**
@@ -375,7 +388,10 @@ public class FlatFileItemWriter<T> extends ExecutionContextUserSupport implement
 			}
 
 			outputBufferedWriter.flush();
-			pos = fileChannel.position() + ((TransactionAwareBufferedWriter) outputBufferedWriter).getBufferSize();
+			pos = fileChannel.position();
+			if (transactional) {
+				pos += ((TransactionAwareBufferedWriter) outputBufferedWriter).getBufferSize();
+			}
 
 			return pos;
 
@@ -500,9 +516,12 @@ public class FlatFileItemWriter<T> extends ExecutionContextUserSupport implement
 		 */
 		private Writer getBufferedWriter(FileChannel fileChannel, String encoding) {
 			try {
-				TransactionAwareBufferedWriter outputBufferedWriter = new TransactionAwareBufferedWriter(Channels
-						.newWriter(fileChannel, encoding), getName());
-				return outputBufferedWriter;
+				Writer writer = Channels.newWriter(fileChannel, encoding);
+				if (transactional) {
+					return new TransactionAwareBufferedWriter(writer, getName());
+				} else {
+					return new BufferedWriter(writer);
+				}
 			}
 			catch (UnsupportedCharsetException ucse) {
 				throw new ItemStreamException("Bad encoding configuration for output file " + fileChannel, ucse);
