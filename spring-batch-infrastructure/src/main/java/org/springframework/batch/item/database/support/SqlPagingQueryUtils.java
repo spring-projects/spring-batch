@@ -84,12 +84,12 @@ public class SqlPagingQueryUtils {
 	public static String generateRowNumSqlQuery(AbstractSqlPagingQueryProvider provider, boolean remainingPageQuery,
 			String rowNumClause) {
 		StringBuilder sql = new StringBuilder();
-		sql.append("SELECT ").append(provider.getSelectClause());
+		sql.append("SELECT * FROM (SELECT ").append(provider.getSelectClause());
 		sql.append(" FROM ").append(provider.getFromClause());
 		buildWhereClause(provider, remainingPageQuery, sql);
-		sql.append(provider.getWhereClause() != null || remainingPageQuery ? " AND " : " WHERE ").append(rowNumClause);
 		sql.append(" ORDER BY ").append(provider.getSortKey());
 		buildAscendingClause(provider, sql);
+		sql.append(") WHERE ").append(rowNumClause);
 
 		return sql.toString();
 

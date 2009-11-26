@@ -60,14 +60,14 @@ public class SqlPagingQueryUtilsTests {
 	@Test
 	public void testGenerateRowNumSqlQuery() {
 		AbstractSqlPagingQueryProvider qp = new TestSqlPagingQueryProvider("FOO", "BAR", "ID");
-		assertEquals("SELECT FOO FROM BAR WHERE ROWNUMBER <= 100 ORDER BY ID ASC", SqlPagingQueryUtils
+		assertEquals("SELECT * FROM (SELECT FOO FROM BAR ORDER BY ID ASC) WHERE ROWNUMBER <= 100", SqlPagingQueryUtils
 				.generateRowNumSqlQuery(qp, false, "ROWNUMBER <= 100"));
-		assertEquals("SELECT FOO FROM BAR WHERE ID > ? AND ROWNUMBER <= 100 ORDER BY ID ASC", SqlPagingQueryUtils
+		assertEquals("SELECT * FROM (SELECT FOO FROM BAR WHERE ID > ? ORDER BY ID ASC) WHERE ROWNUMBER <= 100", SqlPagingQueryUtils
 				.generateRowNumSqlQuery(qp, true, "ROWNUMBER <= 100"));
 		qp.setWhereClause("BAZ IS NOT NULL");
-		assertEquals("SELECT FOO FROM BAR WHERE BAZ IS NOT NULL AND ROWNUMBER <= 100 ORDER BY ID ASC",
+		assertEquals("SELECT * FROM (SELECT FOO FROM BAR WHERE BAZ IS NOT NULL ORDER BY ID ASC) WHERE ROWNUMBER <= 100",
 				SqlPagingQueryUtils.generateRowNumSqlQuery(qp, false, "ROWNUMBER <= 100"));
-		assertEquals("SELECT FOO FROM BAR WHERE BAZ IS NOT NULL AND ID > ? AND ROWNUMBER <= 100 ORDER BY ID ASC",
+		assertEquals("SELECT * FROM (SELECT FOO FROM BAR WHERE BAZ IS NOT NULL AND ID > ? ORDER BY ID ASC) WHERE ROWNUMBER <= 100",
 				SqlPagingQueryUtils.generateRowNumSqlQuery(qp, true, "ROWNUMBER <= 100"));
 	}
 
@@ -90,14 +90,14 @@ public class SqlPagingQueryUtilsTests {
 	public void testGenerateRowNumSqlQueryDescending() {
 		AbstractSqlPagingQueryProvider qp = new TestSqlPagingQueryProvider("FOO", "BAR", "ID");
 		qp.setAscending(false);
-		assertEquals("SELECT FOO FROM BAR WHERE ROWNUMBER <= 100 ORDER BY ID DESC", SqlPagingQueryUtils
+		assertEquals("SELECT * FROM (SELECT FOO FROM BAR ORDER BY ID DESC) WHERE ROWNUMBER <= 100", SqlPagingQueryUtils
 				.generateRowNumSqlQuery(qp, false, "ROWNUMBER <= 100"));
-		assertEquals("SELECT FOO FROM BAR WHERE ID < ? AND ROWNUMBER <= 100 ORDER BY ID DESC", SqlPagingQueryUtils
+		assertEquals("SELECT * FROM (SELECT FOO FROM BAR WHERE ID < ? ORDER BY ID DESC) WHERE ROWNUMBER <= 100", SqlPagingQueryUtils
 				.generateRowNumSqlQuery(qp, true, "ROWNUMBER <= 100"));
 		qp.setWhereClause("BAZ IS NOT NULL");
-		assertEquals("SELECT FOO FROM BAR WHERE BAZ IS NOT NULL AND ROWNUMBER <= 100 ORDER BY ID DESC",
+		assertEquals("SELECT * FROM (SELECT FOO FROM BAR WHERE BAZ IS NOT NULL ORDER BY ID DESC) WHERE ROWNUMBER <= 100",
 				SqlPagingQueryUtils.generateRowNumSqlQuery(qp, false, "ROWNUMBER <= 100"));
-		assertEquals("SELECT FOO FROM BAR WHERE BAZ IS NOT NULL AND ID < ? AND ROWNUMBER <= 100 ORDER BY ID DESC",
+		assertEquals("SELECT * FROM (SELECT FOO FROM BAR WHERE BAZ IS NOT NULL AND ID < ? ORDER BY ID DESC) WHERE ROWNUMBER <= 100",
 				SqlPagingQueryUtils.generateRowNumSqlQuery(qp, true, "ROWNUMBER <= 100"));
 	}
 

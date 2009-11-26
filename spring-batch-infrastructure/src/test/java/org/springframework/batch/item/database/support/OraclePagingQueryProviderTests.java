@@ -15,18 +15,18 @@ public class OraclePagingQueryProviderTests extends AbstractSqlPagingQueryProvid
 	@Test
 	@Override
 	public void testGenerateFirstPageQuery() {
-		String sql = "SELECT id, name, age FROM foo WHERE bar = 1 AND ROWNUM <= 100 ORDER BY id ASC";
+		String sql = "SELECT * FROM (SELECT id, name, age FROM foo WHERE bar = 1 ORDER BY id ASC) WHERE ROWNUM <= 100";
 		String s = pagingQueryProvider.generateFirstPageQuery(pageSize);
 		Assert.assertEquals("", sql, s);
 		pagingQueryProvider.setWhereClause("");
-		String sql2 = "SELECT id, name, age FROM foo WHERE ROWNUM <= 100 ORDER BY id ASC";
+		String sql2 = "SELECT * FROM (SELECT id, name, age FROM foo ORDER BY id ASC) WHERE ROWNUM <= 100";
 		String s2 = pagingQueryProvider.generateFirstPageQuery(pageSize);
 		Assert.assertEquals("", sql2, s2);
 	}
 
 	@Test @Override
 	public void testGenerateRemainingPagesQuery() {
-		String sql = "SELECT id, name, age FROM foo WHERE bar = 1 AND id > ? AND ROWNUM <= 100 ORDER BY id ASC";
+		String sql = "SELECT * FROM (SELECT id, name, age FROM foo WHERE bar = 1 AND id > ? ORDER BY id ASC) WHERE ROWNUM <= 100";
 		String s = pagingQueryProvider.generateRemainingPagesQuery(pageSize);
 		Assert.assertEquals("", sql, s);
 	}
