@@ -77,9 +77,7 @@ public class FaultTolerantStepFactoryBeanRollbackTests {
 
 		factory.setSkippableExceptionClasses(getExceptionMap(Exception.class));
 
-		MapJobRepositoryFactoryBean.clear();
 		MapJobRepositoryFactoryBean repositoryFactory = new MapJobRepositoryFactoryBean();
-		repositoryFactory.setTransactionManager(new ResourcelessTransactionManager());
 		repositoryFactory.afterPropertiesSet();
 		repository = (JobRepository) repositoryFactory.getObject();
 		factory.setJobRepository(repository);

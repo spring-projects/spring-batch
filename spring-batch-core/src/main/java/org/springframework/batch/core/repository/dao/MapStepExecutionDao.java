@@ -34,15 +34,15 @@ import org.springframework.util.Assert;
  */
 public class MapStepExecutionDao implements StepExecutionDao {
 
-	private static Map<Long, Map<Long, StepExecution>> executionsByJobExecutionId = TransactionAwareProxyFactory
+	private Map<Long, Map<Long, StepExecution>> executionsByJobExecutionId = TransactionAwareProxyFactory
 			.createTransactionalMap();
 
-	private static Map<Long, StepExecution> executionsByStepExecutionId = TransactionAwareProxyFactory
+	private Map<Long, StepExecution> executionsByStepExecutionId = TransactionAwareProxyFactory
 			.createTransactionalMap();
 
-	private static long currentId = 0;
+	private long currentId = 0;
 
-	public static void clear() {
+	public void clear() {
 		executionsByJobExecutionId.clear();
 		executionsByStepExecutionId.clear();
 	}

@@ -113,20 +113,32 @@ public abstract class AbstractJobRepositoryFactoryBean implements FactoryBean, I
 		this.transactionManager = transactionManager;
 	}
 
+	/**
+	 * The transaction manager used in this factory. Useful to inject into steps
+	 * and jobs, to ensure that they are using the same instance.
+	 * 
+	 * @return the transactionManager
+	 */
+	public PlatformTransactionManager getTransactionManager() {
+		return transactionManager;
+	}
+
 	private void initializeProxy() throws Exception {
-		proxyFactory = new ProxyFactory();
-		TransactionInterceptor advice = new TransactionInterceptor(transactionManager, PropertiesConverter
-				.stringToProperties("create*=PROPAGATION_REQUIRES_NEW," + isolationLevelForCreate
-						+ "\ngetLastJobExecution*=PROPAGATION_REQUIRES_NEW," + isolationLevelForCreate
-						+ "\n*=PROPAGATION_REQUIRED"));
-		DefaultPointcutAdvisor advisor = new DefaultPointcutAdvisor(advice);
-		NameMatchMethodPointcut pointcut = new NameMatchMethodPointcut();
-		pointcut.addMethodName("*");
-		advisor.setPointcut(pointcut);
-		proxyFactory.addAdvisor(advisor);
-		proxyFactory.setProxyTargetClass(false);
-		proxyFactory.addInterface(JobRepository.class);
-		proxyFactory.setTarget(getTarget());
+		if (proxyFactory == null) {
+			proxyFactory = new ProxyFactory();
+			TransactionInterceptor advice = new TransactionInterceptor(transactionManager, PropertiesConverter
+					.stringToProperties("create*=PROPAGATION_REQUIRES_NEW," + isolationLevelForCreate
+							+ "\ngetLastJobExecution*=PROPAGATION_REQUIRES_NEW," + isolationLevelForCreate
+							+ "\n*=PROPAGATION_REQUIRED"));
+			DefaultPointcutAdvisor advisor = new DefaultPointcutAdvisor(advice);
+			NameMatchMethodPointcut pointcut = new NameMatchMethodPointcut();
+			pointcut.addMethodName("*");
+			advisor.setPointcut(pointcut);
+			proxyFactory.addAdvisor(advisor);
+			proxyFactory.setProxyTargetClass(false);
+			proxyFactory.addInterface(JobRepository.class);
+			proxyFactory.setTarget(getTarget());
+		}
 	}
 
 	public void afterPropertiesSet() throws Exception {

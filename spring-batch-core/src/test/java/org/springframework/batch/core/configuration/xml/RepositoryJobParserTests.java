@@ -18,7 +18,6 @@ package org.springframework.batch.core.configuration.xml;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
-import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.batch.core.BatchStatus;
@@ -26,7 +25,6 @@ import org.springframework.batch.core.Job;
 import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.JobParameters;
 import org.springframework.batch.core.repository.JobRepository;
-import org.springframework.batch.core.repository.support.MapJobRepositoryFactoryBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.test.context.ContextConfiguration;
@@ -48,11 +46,6 @@ public class RepositoryJobParserTests {
 	@Autowired
 	private JobRepository jobRepository;
 	
-	@Before
-	public void setUp() {
-		MapJobRepositoryFactoryBean.clear();
-	}
-
 	@Test
 	public void testTaskletStepWithBadListener() throws Exception {
 		assertNotNull(job);

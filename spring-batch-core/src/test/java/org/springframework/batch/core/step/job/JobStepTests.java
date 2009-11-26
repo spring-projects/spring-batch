@@ -32,7 +32,6 @@ import org.springframework.batch.core.launch.support.SimpleJobLauncher;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.repository.support.MapJobRepositoryFactoryBean;
 import org.springframework.batch.item.ExecutionContext;
-import org.springframework.batch.support.transaction.ResourcelessTransactionManager;
 
 /**
  * @author Dave Syer
@@ -48,10 +47,8 @@ public class JobStepTests {
 
 	@Before
 	public void setUp() throws Exception {
-		MapJobRepositoryFactoryBean.clear();
 		step.setName("step");
 		MapJobRepositoryFactoryBean factory = new MapJobRepositoryFactoryBean();
-		factory.setTransactionManager(new ResourcelessTransactionManager());
 		jobRepository = (JobRepository) factory.getObject();
 		step.setJobRepository(jobRepository);
 		JobExecution jobExecution = jobRepository.createJobExecution("job", new JobParameters());

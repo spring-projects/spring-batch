@@ -20,9 +20,6 @@ public class MapStepExecutionDaoTests extends AbstractStepExecutionDaoTests {
 	}
 
 	protected JobRepository getJobRepository() {
-		MapJobInstanceDao.clear();
-		MapJobExecutionDao.clear();
-		MapStepExecutionDao.clear();
 		return new SimpleJobRepository(new MapJobInstanceDao(), new MapJobExecutionDao(), new MapStepExecutionDao(),
 				new MapExecutionContextDao());
 	}

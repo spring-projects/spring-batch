@@ -33,11 +33,11 @@ import org.springframework.util.Assert;
  */
 public class MapJobInstanceDao implements JobInstanceDao {
 
-	private static Collection<JobInstance> jobInstances = TransactionAwareProxyFactory.createTransactionalSet();
+	private Collection<JobInstance> jobInstances = TransactionAwareProxyFactory.createTransactionalSet();
 
-	private static long currentId = 0;
+	private long currentId = 0;
 
-	public static void clear() {
+	public void clear() {
 		jobInstances.clear();
 	}
 

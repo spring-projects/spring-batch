@@ -94,10 +94,6 @@ public class FaultTolerantStepFactoryBeanRetryTests {
 	@Before
 	public void setUp() throws Exception {
 
-		MapJobInstanceDao.clear();
-		MapJobExecutionDao.clear();
-		MapStepExecutionDao.clear();
-
 		factory = new FaultTolerantStepFactoryBean<String, String>();
 		factory.setBeanName("step");
 

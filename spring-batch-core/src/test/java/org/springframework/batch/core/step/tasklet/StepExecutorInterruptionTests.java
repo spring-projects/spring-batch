@@ -56,9 +56,6 @@ public class StepExecutorInterruptionTests extends TestCase {
 	private Field semaphore;
 
 	public void setUp() throws Exception {
-		MapJobInstanceDao.clear();
-		MapJobExecutionDao.clear();
-		MapStepExecutionDao.clear();
 
 		jobRepository = new SimpleJobRepository(new MapJobInstanceDao(), new MapJobExecutionDao(),
 				new MapStepExecutionDao(), new MapExecutionContextDao());

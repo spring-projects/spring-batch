@@ -117,6 +117,7 @@ public class CoreNamespacePostProcessor implements BeanPostProcessor, BeanFactor
 	 * @param bean
 	 * @return
 	 */
+	@SuppressWarnings("unchecked")
 	private Object injectDefaults(Object bean) {
 		if (bean instanceof JobParserJobFactoryBean) {
 			JobParserJobFactoryBean fb = (JobParserJobFactoryBean) bean;

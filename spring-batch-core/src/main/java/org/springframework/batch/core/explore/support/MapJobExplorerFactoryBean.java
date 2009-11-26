@@ -19,12 +19,11 @@ package org.springframework.batch.core.explore.support;
 import org.springframework.batch.core.repository.dao.ExecutionContextDao;
 import org.springframework.batch.core.repository.dao.JobExecutionDao;
 import org.springframework.batch.core.repository.dao.JobInstanceDao;
-import org.springframework.batch.core.repository.dao.MapExecutionContextDao;
-import org.springframework.batch.core.repository.dao.MapJobExecutionDao;
-import org.springframework.batch.core.repository.dao.MapJobInstanceDao;
-import org.springframework.batch.core.repository.dao.MapStepExecutionDao;
 import org.springframework.batch.core.repository.dao.StepExecutionDao;
+import org.springframework.batch.core.repository.support.MapJobRepositoryFactoryBean;
 import org.springframework.beans.factory.FactoryBean;
+import org.springframework.beans.factory.InitializingBean;
+import org.springframework.util.Assert;
 
 /**
  * A {@link FactoryBean} that automates the creation of a
@@ -33,26 +32,53 @@ import org.springframework.beans.factory.FactoryBean;
  * @author Dave Syer
  * @since 2.0
  */
-public class MapJobExplorerFactoryBean extends AbstractJobExplorerFactoryBean {
+public class MapJobExplorerFactoryBean extends AbstractJobExplorerFactoryBean implements InitializingBean {
+
+	private MapJobRepositoryFactoryBean repositoryFactory;
+
+	/**
+	 * Create an instance with the provided {@link MapJobRepositoryFactoryBean}
+	 * as a source of Dao instances.
+	 * @param repositoryFactory
+	 */
+	public MapJobExplorerFactoryBean(MapJobRepositoryFactoryBean repositoryFactory) {
+		this.repositoryFactory = repositoryFactory;
+	}
+
+	/**
+	 * Create a factory with no {@link MapJobRepositoryFactoryBean}. It must be
+	 * injected as a property.
+	 */
+	public MapJobExplorerFactoryBean() {
+	}
+
+	/**
+	 * @throws Exception
+	 * @see org.springframework.beans.factory.InitializingBean#afterPropertiesSet()
+	 */
+	public void afterPropertiesSet() throws Exception {
+		Assert.state(repositoryFactory!=null, "A MapJobExplorerFactoryBean must be provided");
+		repositoryFactory.afterPropertiesSet();
+	}
 
 	@Override
 	protected JobExecutionDao createJobExecutionDao() throws Exception {
-		return new MapJobExecutionDao();
+		return repositoryFactory.getJobExecutionDao();
 	}
 
 	@Override
 	protected JobInstanceDao createJobInstanceDao() throws Exception {
-		return new MapJobInstanceDao();
+		return repositoryFactory.getJobInstanceDao();
 	}
 
 	@Override
 	protected StepExecutionDao createStepExecutionDao() throws Exception {
-		return new MapStepExecutionDao();
+		return repositoryFactory.getStepExecutionDao();
 	}
 
 	@Override
 	protected ExecutionContextDao createExecutionContextDao() throws Exception {
-		return new MapExecutionContextDao();
+		return repositoryFactory.getExecutionContextDao();
 	}
 
 	public Object getObject() throws Exception {

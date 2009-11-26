@@ -17,19 +17,16 @@ public class MapExecutionContextDaoTests extends AbstractExecutionContextDaoTest
 
 	@Override
 	protected JobInstanceDao getJobInstanceDao() {
-		MapJobInstanceDao.clear();
 		return new MapJobInstanceDao();
 	}
 
 	@Override
 	protected JobExecutionDao getJobExecutionDao() {
-		MapJobExecutionDao.clear();
 		return new MapJobExecutionDao();
 	}
 
 	@Override
 	protected StepExecutionDao getStepExecutionDao() {
-		MapStepExecutionDao.clear();
 		return new MapStepExecutionDao();
 	}
 

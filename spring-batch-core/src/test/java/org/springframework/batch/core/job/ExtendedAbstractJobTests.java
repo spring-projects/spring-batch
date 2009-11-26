@@ -38,7 +38,6 @@ import org.springframework.batch.core.StepExecution;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.repository.support.MapJobRepositoryFactoryBean;
 import org.springframework.batch.core.step.StepSupport;
-import org.springframework.batch.support.transaction.ResourcelessTransactionManager;
 
 /**
  * @author Dave Syer
@@ -51,9 +50,7 @@ public class ExtendedAbstractJobTests {
 	
 	@Before
 	public void setUp() throws Exception {
-		MapJobRepositoryFactoryBean.clear();
 		MapJobRepositoryFactoryBean factory = new MapJobRepositoryFactoryBean();
-		factory.setTransactionManager(new ResourcelessTransactionManager());
 		jobRepository = (JobRepository) factory.getObject();
 		job = new StubJob("job", jobRepository);
 	}
@@ -166,9 +163,7 @@ public class ExtendedAbstractJobTests {
 			}
 		}
 		
-		MapJobRepositoryFactoryBean.clear();
 		MapJobRepositoryFactoryBean factory = new MapJobRepositoryFactoryBean();
-		factory.setTransactionManager(new ResourcelessTransactionManager());
 		factory.afterPropertiesSet();
 		JobRepository repository = (JobRepository) factory.getObject();
 		job.setJobRepository(repository);

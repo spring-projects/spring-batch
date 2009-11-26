@@ -17,7 +17,6 @@ import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.repository.support.MapJobRepositoryFactoryBean;
 import org.springframework.batch.core.step.tasklet.TaskletStep;
 import org.springframework.batch.item.ExecutionContext;
-import org.springframework.batch.support.transaction.ResourcelessTransactionManager;
 
 public class SimpleStepExecutionSplitterTests {
 
@@ -31,14 +30,13 @@ public class SimpleStepExecutionSplitterTests {
 	public void setUp() throws Exception {
 		step = new TaskletStep("step");
 		MapJobRepositoryFactoryBean factory = new MapJobRepositoryFactoryBean();
-		factory.setTransactionManager(new ResourcelessTransactionManager());
 		jobRepository = (JobRepository) factory.getObject();
 	}
 
 	@Test
 	public void testSimpleStepExecutionProviderJobRepositoryStep() throws Exception {
-		SimpleStepExecutionSplitter provider = new SimpleStepExecutionSplitter(jobRepository, step);
-		Set<StepExecution> execs = provider.split(stepExecution, 2);
+		SimpleStepExecutionSplitter splitter = new SimpleStepExecutionSplitter(jobRepository, step);
+		Set<StepExecution> execs = splitter.split(stepExecution, 2);
 		assertEquals(2, execs.size());
 		
 		for (StepExecution execution : execs) {
@@ -49,12 +47,12 @@ public class SimpleStepExecutionSplitterTests {
 	@Test
 	public void testSimpleStepExecutionProviderJobRepositoryStepPartitioner() throws Exception {
 		final Map<String, ExecutionContext> map = Collections.singletonMap("foo", new ExecutionContext());
-		SimpleStepExecutionSplitter provider = new SimpleStepExecutionSplitter(jobRepository, step, new Partitioner() {
+		SimpleStepExecutionSplitter splitter = new SimpleStepExecutionSplitter(jobRepository, step, new Partitioner() {
 			public Map<String, ExecutionContext> partition(int gridSize) {
 				return map;
 			}
 		});
-		assertEquals(1, provider.split(stepExecution, 2).size());
+		assertEquals(1, splitter.split(stepExecution, 2).size());
 	}
 
 	@Test

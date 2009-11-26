@@ -33,7 +33,6 @@ import org.springframework.batch.core.scope.context.ChunkContext;
 import org.springframework.batch.core.step.tasklet.Tasklet;
 import org.springframework.batch.core.step.tasklet.TaskletStep;
 import org.springframework.batch.repeat.RepeatStatus;
-import org.springframework.batch.support.transaction.ResourcelessTransactionManager;
 import org.springframework.core.task.SimpleAsyncTaskExecutor;
 
 /**
@@ -47,12 +46,8 @@ public class MapJobExplorerIntegrationTests {
 	@Test
 	public void testRunningJobExecution() throws Exception {
 
-		MapJobRepositoryFactoryBean.clear();
-
 		SimpleJobLauncher jobLauncher = new SimpleJobLauncher();
 		MapJobRepositoryFactoryBean repositoryFactory = new MapJobRepositoryFactoryBean();
-		ResourcelessTransactionManager transactionManager = new ResourcelessTransactionManager();
-		repositoryFactory.setTransactionManager(transactionManager);
 		repositoryFactory.afterPropertiesSet();
 		JobRepository jobRepository = (JobRepository) repositoryFactory.getObject();
 		jobLauncher.setJobRepository(jobRepository);
@@ -69,7 +64,7 @@ public class MapJobExplorerIntegrationTests {
 				return RepeatStatus.FINISHED;
 			}
 		});
-		step.setTransactionManager(transactionManager);
+		step.setTransactionManager(repositoryFactory.getTransactionManager());
 		step.setJobRepository(jobRepository);
 		step.afterPropertiesSet();
 		job.addStep(step);
@@ -79,7 +74,7 @@ public class MapJobExplorerIntegrationTests {
 		jobLauncher.run(job, new JobParametersBuilder().addString("test", getClass().getName()).toJobParameters());
 
 		Thread.sleep(500L);
-		JobExplorer explorer = (JobExplorer) new MapJobExplorerFactoryBean().getObject();
+		JobExplorer explorer = (JobExplorer) new MapJobExplorerFactoryBean(repositoryFactory).getObject();
 		Set<JobExecution> executions = explorer.findRunningJobExecutions("job");
 		assertEquals(1, executions.size());
 		assertEquals(1, executions.iterator().next().getStepExecutions().size());

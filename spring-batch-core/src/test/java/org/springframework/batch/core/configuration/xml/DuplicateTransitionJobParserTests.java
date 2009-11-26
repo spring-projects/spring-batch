@@ -16,18 +16,16 @@
 package org.springframework.batch.core.configuration.xml;
 
 import org.junit.Test;
-import org.junit.internal.runners.JUnit4ClassRunner;
-import org.junit.runner.RunWith;
 import org.springframework.beans.factory.BeanDefinitionStoreException;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 import org.springframework.util.ClassUtils;
 
 /**
  * @author Dan Garrette
+ * @author Dave Syer
  * @since 2.0
  */
-@RunWith(JUnit4ClassRunner.class)
-public class DuplicateTransitionJobParserTests extends AbstractJobParserTests {
+public class DuplicateTransitionJobParserTests {
 
 	@Test(expected = BeanDefinitionStoreException.class)
 	public void testNextAttributeWithNestedElement() throws Exception {

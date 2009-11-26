@@ -113,9 +113,6 @@ public class TaskletStepTests {
 
 	@Before
 	public void setUp() throws Exception {
-		MapJobInstanceDao.clear();
-		MapStepExecutionDao.clear();
-		MapJobExecutionDao.clear();
 
 		transactionManager = new ResourcelessTransactionManager();
 

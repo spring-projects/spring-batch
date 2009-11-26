@@ -42,14 +42,8 @@ import org.springframework.batch.core.job.flow.support.state.SplitState;
 import org.springframework.batch.core.job.flow.support.state.StepState;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.repository.dao.JobExecutionDao;
-import org.springframework.batch.core.repository.dao.MapExecutionContextDao;
-import org.springframework.batch.core.repository.dao.MapJobExecutionDao;
-import org.springframework.batch.core.repository.dao.MapJobInstanceDao;
-import org.springframework.batch.core.repository.dao.MapStepExecutionDao;
 import org.springframework.batch.core.repository.support.MapJobRepositoryFactoryBean;
-import org.springframework.batch.core.repository.support.SimpleJobRepository;
 import org.springframework.batch.core.step.StepSupport;
-import org.springframework.batch.support.transaction.ResourcelessTransactionManager;
 
 /**
  * @author Dave Syer
@@ -69,13 +63,9 @@ public class FlowJobTests {
 
 	@Before
 	public void setUp() throws Exception {
-		MapJobRepositoryFactoryBean.clear();
 		MapJobRepositoryFactoryBean factory = new MapJobRepositoryFactoryBean();
-		factory.setTransactionManager(new ResourcelessTransactionManager());
 		factory.afterPropertiesSet();
-		jobExecutionDao = new MapJobExecutionDao();
-		jobRepository = new SimpleJobRepository(new MapJobInstanceDao(), jobExecutionDao, new MapStepExecutionDao(),
-				new MapExecutionContextDao());
+		jobExecutionDao = factory.getJobExecutionDao();
 		jobRepository = (JobRepository) factory.getObject();
 		job.setJobRepository(jobRepository);
 		jobExecution = jobRepository.createJobExecution("job", new JobParameters());

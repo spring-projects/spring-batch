@@ -81,9 +81,6 @@ public class SimpleStepFactoryBeanTests {
 	public void setUp() throws Exception {
 		job.setJobRepository(repository);
 		job.setBeanName("simpleJob");
-		MapJobInstanceDao.clear();
-		MapJobExecutionDao.clear();
-		MapStepExecutionDao.clear();
 	}
 
 	@Test(expected = IllegalArgumentException.class)

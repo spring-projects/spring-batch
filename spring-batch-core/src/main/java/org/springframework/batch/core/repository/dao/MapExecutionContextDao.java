@@ -32,13 +32,13 @@ import org.springframework.batch.support.transaction.TransactionAwareProxyFactor
  */
 public class MapExecutionContextDao implements ExecutionContextDao {
 
-	private static Map<Long, ExecutionContext> contextsByStepExecutionId = TransactionAwareProxyFactory
+	private Map<Long, ExecutionContext> contextsByStepExecutionId = TransactionAwareProxyFactory
 			.createTransactionalMap();
 
-	private static Map<Long, ExecutionContext> contextsByJobExecutionId = TransactionAwareProxyFactory
+	private Map<Long, ExecutionContext> contextsByJobExecutionId = TransactionAwareProxyFactory
 			.createTransactionalMap();
 
-	public static void clear() {
+	public void clear() {
 		contextsByJobExecutionId.clear();
 		contextsByStepExecutionId.clear();
 	}

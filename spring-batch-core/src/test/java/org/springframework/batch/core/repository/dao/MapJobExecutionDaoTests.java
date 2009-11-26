@@ -16,8 +16,6 @@ public class MapJobExecutionDaoTests extends AbstractJobExecutionDaoTests {
 
 	@Override
 	protected JobExecutionDao getJobExecutionDao() {
-		MapJobExecutionDao.clear();
-		MapJobInstanceDao.clear();
 		return new MapJobExecutionDao();
 	}
 	

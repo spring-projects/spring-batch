@@ -34,7 +34,6 @@ import org.springframework.batch.core.partition.StepExecutionSplitter;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.repository.support.MapJobRepositoryFactoryBean;
 import org.springframework.batch.core.step.StepSupport;
-import org.springframework.batch.support.transaction.ResourcelessTransactionManager;
 
 /**
  * @author Dave Syer
@@ -50,9 +49,7 @@ public class PartitionStepTests {
 
 	@Before
 	public void setUp() throws Exception {
-		MapJobRepositoryFactoryBean.clear();
 		MapJobRepositoryFactoryBean factory = new MapJobRepositoryFactoryBean();
-		factory.setTransactionManager(new ResourcelessTransactionManager());
 		jobRepository = (JobRepository) factory.getObject();
 		step.setJobRepository(jobRepository);
 	}

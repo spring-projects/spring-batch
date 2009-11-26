@@ -36,11 +36,11 @@ import org.springframework.util.Assert;
  */
 public class MapJobExecutionDao implements JobExecutionDao {
 
-	private static Map<Long, JobExecution> executionsById = TransactionAwareProxyFactory.createTransactionalMap();
+	private Map<Long, JobExecution> executionsById = TransactionAwareProxyFactory.createTransactionalMap();
 
-	private static long currentId = 0;
+	private long currentId = 0;
 
-	public static void clear() {
+	public void clear() {
 		executionsById.clear();
 	}
 

@@ -1,25 +1,35 @@
 package org.springframework.batch.core.exlore.support;
 
+import static org.junit.Assert.assertEquals;
+
 import org.junit.Test;
+import org.springframework.batch.core.JobParameters;
 import org.springframework.batch.core.explore.JobExplorer;
 import org.springframework.batch.core.explore.support.MapJobExplorerFactoryBean;
+import org.springframework.batch.core.repository.JobRepository;
+import org.springframework.batch.core.repository.support.MapJobRepositoryFactoryBean;
 
 /**
  * Tests for {@link MapJobExplorerFactoryBean}.
  */
 public class MapJobExplorerFactoryBeanTests {
 
-	private MapJobExplorerFactoryBean tested = new MapJobExplorerFactoryBean();
-
 	/**
-	 * Use the factory to create repository and check the repository remembers
+	 * Use the factory to create repository and check the explorer remembers
 	 * created executions.
 	 */
 	@Test
-	public void testCreateRepository() throws Exception {
+	public void testCreateExplorer() throws Exception {
+
+		MapJobRepositoryFactoryBean repositoryFactory = new MapJobRepositoryFactoryBean();
+		((JobRepository)repositoryFactory.getObject()).createJobExecution("foo", new JobParameters());
+		
+		MapJobExplorerFactoryBean tested = new MapJobExplorerFactoryBean(repositoryFactory);
+		tested.afterPropertiesSet();
+
 		JobExplorer explorer = (JobExplorer) tested.getObject();
 
-		explorer.findRunningJobExecutions("foo");
+		assertEquals(1, explorer.findRunningJobExecutions("foo").size());
 
 	}
 

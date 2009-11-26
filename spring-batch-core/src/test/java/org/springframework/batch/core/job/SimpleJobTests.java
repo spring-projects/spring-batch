@@ -99,10 +99,6 @@ public class SimpleJobTests {
 	@Before
 	public void setUp() throws Exception {
 
-		MapJobInstanceDao.clear();
-		MapJobExecutionDao.clear();
-		MapStepExecutionDao.clear();
-		MapExecutionContextDao.clear();
 		jobInstanceDao = new MapJobInstanceDao();
 		jobExecutionDao = new MapJobExecutionDao();
 		stepExecutionDao = new MapStepExecutionDao();

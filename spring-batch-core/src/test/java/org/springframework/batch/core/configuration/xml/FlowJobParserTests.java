@@ -63,10 +63,13 @@ public class FlowJobParserTests {
 
 	@Autowired
 	private JobRepository jobRepository;
+
+	@Autowired
+	private MapJobRepositoryFactoryBean mapJobRepositoryFactoryBean;
 	
 	@Before
 	public void setUp() {
-		MapJobRepositoryFactoryBean.clear();
+		mapJobRepositoryFactoryBean.clear();
 	}
 
 	@Test
