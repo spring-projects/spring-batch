@@ -21,11 +21,11 @@ import org.springframework.batch.core.BatchStatus;
 import org.springframework.batch.core.ExitStatus;
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.JobExecution;
+import org.springframework.batch.core.JobExecutionException;
 import org.springframework.batch.core.JobInstance;
 import org.springframework.batch.core.JobParameters;
 import org.springframework.batch.core.JobParametersInvalidException;
 import org.springframework.batch.core.launch.JobLauncher;
-import org.springframework.batch.core.repository.JobExecutionAlreadyRunningException;
 import org.springframework.batch.core.repository.JobInstanceAlreadyCompleteException;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.repository.JobRestartException;
@@ -81,8 +81,7 @@ public class SimpleJobLauncher implements JobLauncher, InitializingBean {
 	 * @throws JobParametersInvalidException
 	 */
 	public JobExecution run(final Job job, final JobParameters jobParameters)
-			throws JobExecutionAlreadyRunningException, JobRestartException, JobInstanceAlreadyCompleteException,
-			JobParametersInvalidException {
+			throws JobExecutionException {
 
 		Assert.notNull(job, "The Job must not be null.");
 		Assert.notNull(jobParameters, "The JobParameters must not be null.");
