@@ -53,11 +53,20 @@ public class MapJobExplorerFactoryBean extends AbstractJobExplorerFactoryBean im
 	}
 
 	/**
+	 * The repository factory that can be used to create daos for the explorer.
+	 * 
+	 * @param repositoryFactory a {@link MapJobExplorerFactoryBean}
+	 */
+	public void setRepositoryFactory(MapJobRepositoryFactoryBean repositoryFactory) {
+		this.repositoryFactory = repositoryFactory;
+	}
+
+	/**
 	 * @throws Exception
 	 * @see org.springframework.beans.factory.InitializingBean#afterPropertiesSet()
 	 */
 	public void afterPropertiesSet() throws Exception {
-		Assert.state(repositoryFactory!=null, "A MapJobExplorerFactoryBean must be provided");
+		Assert.state(repositoryFactory != null, "A MapJobExplorerFactoryBean must be provided");
 		repositoryFactory.afterPropertiesSet();
 	}
 
