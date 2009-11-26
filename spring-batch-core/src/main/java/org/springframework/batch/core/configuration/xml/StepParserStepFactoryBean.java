@@ -102,7 +102,9 @@ class StepParserStepFactoryBean<I, O> implements FactoryBean, BeanNameAware {
 
 	private Integer commitInterval;
 
-	private Boolean isReaderTransactionalQueue;
+	private Boolean readerTransactionalQueue;
+
+	private Boolean processorTransactional;
 
 	private Integer retryLimit;
 
@@ -228,8 +230,11 @@ class StepParserStepFactoryBean<I, O> implements FactoryBean, BeanNameAware {
 		if (cacheCapacity != null) {
 			fb.setCacheCapacity(cacheCapacity);
 		}
-		if (isReaderTransactionalQueue != null) {
-			fb.setIsReaderTransactionalQueue(isReaderTransactionalQueue);
+		if (readerTransactionalQueue != null) {
+			fb.setIsReaderTransactionalQueue(readerTransactionalQueue);
+		}
+		if (processorTransactional != null) {
+			fb.setProcessorTransactional(processorTransactional);
 		}
 		if (retryLimit != null) {
 			fb.setRetryLimit(retryLimit);
@@ -307,7 +312,25 @@ class StepParserStepFactoryBean<I, O> implements FactoryBean, BeanNameAware {
 	private void validateFaultTolerantSettings() {
 		validateDependency("skippable-exception-classes", skippableExceptionClasses, "skip-limit", skipLimit, true);
 		validateDependency("retryable-exception-classes", retryableExceptionClasses, "retry-limit", retryLimit, true);
+		validateAtLeastOneDependency("processor-transactional", processorTransactional, "'retry-limit' or 'skip-limit'", retryLimit, skipLimit);
 		validateDependency("retry-listeners", retryListeners, "retry-limit", retryLimit, false);
+		if (isPresent(processorTransactional) && !processorTransactional && isPresent(readerTransactionalQueue) && readerTransactionalQueue) {
+			throw new IllegalArgumentException("The field 'processor-transactional' cannot be false if 'reader-transactional-queue' is true");
+		}
+	}
+
+	private void validateAtLeastOneDependency(String dependantName, Boolean dependantValue, String name, Object... values) {
+		boolean oneIsPresent = false;
+		for (Object value : values) {
+			if (isPresent(value)) {
+				oneIsPresent = true;
+				break;
+			}
+		}
+		if (isPresent(dependantValue) && !oneIsPresent) {
+			throw new IllegalArgumentException("The field '" + dependantName + "' is not permitted on the step ["
+					+ this.name + "] because " + name + " is not present.");
+		}
 	}
 
 	private void validateDependency(String dependantName, Object dependantValue, String name, Object value,
@@ -331,7 +354,7 @@ class StepParserStepFactoryBean<I, O> implements FactoryBean, BeanNameAware {
 
 	private boolean isFaultTolerant() {
 		return isPositive(skipLimit) || isPositive(retryLimit) || isPositive(cacheCapacity)
-				|| isTrue(isReaderTransactionalQueue);
+				|| isTrue(readerTransactionalQueue);
 	}
 
 	private boolean isTrue(Boolean b) {
@@ -527,7 +550,19 @@ class StepParserStepFactoryBean<I, O> implements FactoryBean, BeanNameAware {
 	 * @param isReaderTransactionalQueue the value of the flag
 	 */
 	public void setIsReaderTransactionalQueue(boolean isReaderTransactionalQueue) {
-		this.isReaderTransactionalQueue = isReaderTransactionalQueue;
+		this.readerTransactionalQueue = isReaderTransactionalQueue;
+	}
+
+	/**
+	 * Flag to signal that the processor is transactional, in which case it
+	 * should be called for every item in every transaction. If false then we
+	 * can cache the processor results between transactions in the case of a
+	 * rollback.
+	 * 
+	 * @param processorTransactional the value to set
+	 */
+	public void setProcessorTransactional(Boolean processorTransactional) {
+		this.processorTransactional = processorTransactional;
 	}
 
 	/**

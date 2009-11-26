@@ -744,6 +744,16 @@
 				]]></xsd:documentation>
 			</xsd:annotation>
 		</xsd:attribute>
+		<xsd:attribute name="processor-transactional" type="xsd:string"
+			use="optional">
+			<xsd:annotation>
+				<xsd:documentation><![CDATA[
+				Whether the processor is transaction aware. If it is then processed items should not be
+				cached in between transactions in case of a rollback.  N.B. if reader-transactional-queue
+				is true then so should this be.
+				]]></xsd:documentation>
+			</xsd:annotation>
+		</xsd:attribute>
 		<xsd:attribute name="chunk-completion-policy" type="xsd:string"
 			use="optional">
 			<xsd:annotation>

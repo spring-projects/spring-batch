@@ -275,6 +275,7 @@ public class FaultTolerantStepFactoryBeanRollbackTests {
 	 */
 	@Test
 	public void testWriterNoRollbackOnRuntimeException() throws Exception {
+
 		writer.setFailures("2", "3");
 		writer.setExceptionType(SkippableRuntimeException.class);
 
@@ -340,8 +341,23 @@ public class FaultTolerantStepFactoryBeanRollbackTests {
 		assertEquals("[1, 3, 5]", processor.getCommitted().toString());
 		assertEquals("[1, 3, 5]", writer.getWritten().toString());
 		assertEquals("[1, 3, 5]", writer.getCommitted().toString());
-		// TODO: Fix this with BATCH-1259?
 		assertEquals("[1, 2, 1, 3, 4, 1, 3, 5]", processor.getProcessed().toString());
+	}
+
+	@Test
+	public void testMultipleSkipsInNonTransactionalProcessor() throws Exception {
+		processor.setFailures("2", "4");
+		factory.setCommitInterval(30);
+		factory.setProcessorTransactional(false);
+
+		Step step = (Step) factory.getObject();
+
+		step.execute(stepExecution);
+		assertEquals(BatchStatus.COMPLETED, stepExecution.getStatus());
+
+		assertEquals("[1, 3, 5]", writer.getWritten().toString());
+		assertEquals("[1, 3, 5]", writer.getCommitted().toString());
+		assertEquals("[1, 2, 3, 4, 5]", processor.getProcessed().toString());
 	}
 
 	@Test
@@ -374,8 +390,23 @@ public class FaultTolerantStepFactoryBeanRollbackTests {
 		assertEquals("[1, 2, 3, 5]", processor.getCommitted().toString());
 		assertEquals("[1, 2, 3, 5]", writer.getCommitted().toString());
 		assertEquals("[1, 2, 3, 4, 1, 2, 3, 4, 5]", writer.getWritten().toString());
-		// TODO: Fix this with BATCH-1259?
 		assertEquals("[1, 2, 3, 4, 5, 1, 2, 3, 4, 5]", processor.getProcessed().toString());
+	}
+
+	@Test
+	public void testSkipInWriterNonTransactionalProcessor() throws Exception {
+		writer.setFailures("4");
+		factory.setCommitInterval(30);
+		factory.setProcessorTransactional(false);
+
+		Step step = (Step) factory.getObject();
+
+		step.execute(stepExecution);
+		assertEquals(BatchStatus.COMPLETED, stepExecution.getStatus());
+
+		assertEquals("[1, 2, 3, 5]", writer.getCommitted().toString());
+		assertEquals("[1, 2, 3, 4, 1, 2, 3, 4, 5]", writer.getWritten().toString());
+		assertEquals("[1, 2, 3, 4, 5]", processor.getProcessed().toString());
 	}
 
 	@Test
@@ -408,8 +439,23 @@ public class FaultTolerantStepFactoryBeanRollbackTests {
 		assertEquals("[1, 3, 5]", writer.getCommitted().toString());
 		assertEquals("[1, 2, 1, 2, 3, 4, 5]", writer.getWritten().toString());
 		assertEquals("[1, 3, 5]", processor.getCommitted().toString());
-		// TODO: Fix this with BATCH-1259?
 		assertEquals("[1, 2, 3, 4, 5, 1, 2, 3, 4, 5]", processor.getProcessed().toString());
+	}
+
+	@Test
+	public void testMultipleSkipsInWriterNonTransactionalProcessor() throws Exception {
+		writer.setFailures("2", "4");
+		factory.setCommitInterval(30);
+		factory.setProcessorTransactional(false);
+
+		Step step = (Step) factory.getObject();
+
+		step.execute(stepExecution);
+		assertEquals(BatchStatus.COMPLETED, stepExecution.getStatus());
+
+		assertEquals("[1, 3, 5]", writer.getCommitted().toString());
+		assertEquals("[1, 2, 1, 2, 3, 4, 5]", writer.getWritten().toString());
+		assertEquals("[1, 2, 3, 4, 5]", processor.getProcessed().toString());
 	}
 
 	@SuppressWarnings("unchecked")

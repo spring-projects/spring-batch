@@ -100,6 +100,8 @@ public class FaultTolerantStepFactoryBean<T, S> extends SimpleStepFactoryBean<T,
 
 	private ChunkMonitor chunkMonitor = new ChunkMonitor();
 
+	private boolean processorTransactional= true;
+
 	/**
 	 * The {@link KeyGenerator} to use to identify failed items across rollback.
 	 * Not used in the case of the
@@ -234,6 +236,13 @@ public class FaultTolerantStepFactoryBean<T, S> extends SimpleStepFactoryBean<T,
 	}
 
 	/**
+	 * @param processorTransactional
+	 */
+	public void setProcessorTransactional(boolean processorTransactional) {
+		this.processorTransactional = processorTransactional;
+	}
+
+	/**
 	 * Convenience method for subclasses to get an exception classifier based on
 	 * the provided transaction attributes.
 	 * 
@@ -362,6 +371,7 @@ public class FaultTolerantStepFactoryBean<T, S> extends SimpleStepFactoryBean<T,
 		FaultTolerantChunkProcessor<T, S> chunkProcessor = new FaultTolerantChunkProcessor<T, S>(getItemProcessor(),
 				getItemWriter(), batchRetryTemplate);
 		chunkProcessor.setBuffering(!isReaderTransactionalQueue());
+		chunkProcessor.setProcessorTransactional(processorTransactional);
 
 		SkipPolicy writeSkipPolicy = new LimitCheckingItemSkipPolicy(skipLimit, getSkippableExceptionClasses());
 		chunkProcessor.setWriteSkipPolicy(writeSkipPolicy);

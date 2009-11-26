@@ -18,6 +18,7 @@ package org.springframework.batch.core.step.item;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Iterator;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -61,6 +62,8 @@ public class FaultTolerantChunkProcessor<I, O> extends SimpleChunkProcessor<I, O
 	private KeyGenerator keyGenerator;
 
 	private ChunkMonitor chunkMonitor = new ChunkMonitor();
+
+	private boolean processorTransactional;
 
 	/**
 	 * The {@link KeyGenerator} to use to identify failed items across rollback.
@@ -107,13 +110,20 @@ public class FaultTolerantChunkProcessor<I, O> extends SimpleChunkProcessor<I, O
 	/**
 	 * A flag to indicate that items have been buffered and therefore will
 	 * always come back as a chunk after a rollback. Otherwise things are more
-	 * complicated because after a rollback the new chunk might or moght not
+	 * complicated because after a rollback the new chunk might or might not
 	 * contain items from the previous failed chunk.
 	 * 
 	 * @param buffering
 	 */
 	public void setBuffering(boolean buffering) {
 		this.buffering = buffering;
+	}
+
+	/**
+	 * @param processorTransactional
+	 */
+	public void setProcessorTransactional(boolean processorTransactional) {
+		this.processorTransactional = processorTransactional;
 	}
 
 	public FaultTolerantChunkProcessor(ItemProcessor<? super I, ? extends O> itemProcessor,
@@ -183,12 +193,13 @@ public class FaultTolerantChunkProcessor<I, O> extends SimpleChunkProcessor<I, O
 		Chunk<O> outputs = new Chunk<O>();
 		@SuppressWarnings("unchecked")
 		UserData<O> data = (UserData<O>) inputs.getUserData();
-		Chunk<O> cache = data.getOutputs();
-		final Chunk<O>.ChunkIterator cacheIterator = cache.isEmpty() ? null : cache.iterator();
+		final Chunk<O> cache = data.getOutputs();
+		final Iterator<O> cacheIterator = cache.isEmpty() ? null : new ArrayList<O>(cache.getItems()).iterator();
 		final AtomicInteger count = new AtomicInteger(0);
 
 		for (final Chunk<I>.ChunkIterator iterator = inputs.iterator(); iterator.hasNext();) {
 
+			final int scanLimit = processorTransactional ? 1 : 0;
 			final I item = iterator.next();
 
 			RetryCallback<O> retryCallback = new RetryCallback<O>() {
@@ -197,8 +208,8 @@ public class FaultTolerantChunkProcessor<I, O> extends SimpleChunkProcessor<I, O
 					O output = null;
 					try {
 						count.incrementAndGet();
-						O cached = (cacheIterator != null) ? cacheIterator.next() : null;
-						if (cached != null && count.get() > 1) {
+						O cached = (cacheIterator != null&& cacheIterator.hasNext()) ? cacheIterator.next() : null;
+						if (cached != null && count.get() > scanLimit) {
 							/*
 							 * If there is a cached chunk then we must be
 							 * scanning for errors in the writer, in which case
@@ -210,6 +221,9 @@ public class FaultTolerantChunkProcessor<I, O> extends SimpleChunkProcessor<I, O
 						}
 						else {
 							output = doProcess(item);
+							if (!processorTransactional) { 
+								cache.add(output);
+							}
 						}
 					}
 					catch (Exception e) {

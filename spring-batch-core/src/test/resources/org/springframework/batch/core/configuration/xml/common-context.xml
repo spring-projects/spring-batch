@@ -37,6 +37,7 @@
 
 	<bean id="reader" class="org.springframework.batch.core.configuration.xml.DummyItemReader"/>
 	<bean id="writer" class="org.springframework.batch.core.configuration.xml.DummyItemWriter"/>
+	<bean id="processor" class="org.springframework.batch.core.configuration.xml.DummyItemProcessor"/>
 
 	<bean id="dummyTasklet" class="org.springframework.batch.core.configuration.xml.DummyTasklet"/>
 

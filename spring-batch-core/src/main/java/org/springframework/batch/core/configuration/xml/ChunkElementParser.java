@@ -118,6 +118,11 @@ public class ChunkElementParser {
 			propertyValues.addPropertyValue("isReaderTransactionalQueue", isReaderTransactionalQueue);
 		}
 
+		String isProcessorTransactional = element.getAttribute("processor-transactional");
+		if (StringUtils.hasText(isProcessorTransactional)) {
+			propertyValues.addPropertyValue("processorTransactional", isProcessorTransactional);
+		}
+
 		handleExceptionElement(element, parserContext, propertyValues, "skippable-exception-classes",
 				"skippableExceptionClasses");
 
