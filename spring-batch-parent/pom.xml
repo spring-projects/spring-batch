@@ -48,6 +48,16 @@
 			</repositories>
 		</profile>
 		<profile>
+			<id>central</id>
+			<distributionManagement>
+				<repository>
+					<id>spring-sourceforge</id>
+					<name>Spring Sourceforge Repository</name>
+					<url>https://springframework.svn.sourceforge.net/svnroot/springframework/repos/repo</url>
+				</repository>
+			</distributionManagement>
+		</profile>
+		<profile>
 			<id>staging</id>
 			<distributionManagement>
 				<site>

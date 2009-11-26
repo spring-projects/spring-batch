@@ -367,6 +367,39 @@ public class FaultTolerantStepFactoryBeanTests {
 	 * Check items causing errors are skipped as expected.
 	 */
 	@Test
+	public void testSkipOverLimitOnReadWithListener() throws Exception {
+		reader.setFailures("1", "3", "5");
+		writer.setFailures();
+
+		final List<Throwable> listenerCalls = new ArrayList<Throwable>();
+
+		factory.setListeners(new StepListener[] { new SkipListenerSupport<String, String>() {
+			@Override
+			public void onSkipInRead(Throwable t) {
+				listenerCalls.add(t);
+			}
+		} });
+		factory.setCommitInterval(2);
+		factory.setSkipLimit(2);
+
+		Step step = (Step) factory.getObject();
+
+		step.execute(stepExecution);
+
+		// 1,3 skipped inside a committed chunk. 5 tripped the skip
+		// limit but it was skipped in a chunk that rolled back, so 
+		// it will re-appear on a restart and the listener is not called.
+		assertEquals(2, listenerCalls.size());
+		assertEquals(2, stepExecution.getReadSkipCount());
+
+		assertEquals(BatchStatus.FAILED, stepExecution.getStatus());
+
+	}
+
+	/**
+	 * Check items causing errors are skipped as expected.
+	 */
+	@Test
 	public void testSkipListenerFailsOnRead() throws Exception {
 		reader.setItems(StringUtils.commaDelimitedListToStringArray("1,2,3,4,5,6"));
 		reader.setFailures(StringUtils.commaDelimitedListToStringArray("2,3,5"));
@@ -767,8 +800,6 @@ public class FaultTolerantStepFactoryBeanTests {
 
 	private static class ItemProcessListenerStub<T, S> implements ItemProcessListener<T, S> {
 
-		private boolean errorEncountered = false;
-
 		private boolean filterEncountered = false;
 
 		public void afterProcess(T item, S result) {
@@ -782,11 +813,6 @@ public class FaultTolerantStepFactoryBeanTests {
 		}
 
 		public void onProcessError(T item, Exception e) {
-			errorEncountered = true;
-		}
-
-		public boolean isErrorEncountered() {
-			return errorEncountered;
 		}
 
 		public boolean isFilterEncountered() {
