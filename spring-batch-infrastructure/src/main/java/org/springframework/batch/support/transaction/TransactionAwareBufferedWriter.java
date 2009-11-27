@@ -22,9 +22,9 @@ import org.springframework.transaction.support.TransactionSynchronizationAdapter
 import org.springframework.transaction.support.TransactionSynchronizationManager;
 
 /**
- * Wrapper for a {@link Writer} that delays actually writing to the buffer if a
- * transaction is active. If a transaction is detected on the call to
- * {@link #write(String)} the parameter is buffered and passed on to the
+ * Wrapper for a {@link Writer} that delays actually writing to or closing the
+ * buffer if a transaction is active. If a transaction is detected on the call
+ * to {@link #write(String)} the parameter is buffered and passed on to the
  * underlying writer only when the transaction is committed.
  * 
  * @author Dave Syer
@@ -34,19 +34,30 @@ public class TransactionAwareBufferedWriter extends Writer {
 
 	private static final String BUFFER_KEY_PREFIX = TransactionAwareBufferedWriter.class.getName() + ".BUFFER_KEY";
 
+	private static final String CLOSE_KEY_PREFIX = TransactionAwareBufferedWriter.class.getName() + ".CLOSE_KEY";
+
 	private final String bufferKey;
+
+	private final String closeKey;
 
 	private Writer writer;
 
+	private final Runnable closeCallback;
+
 	/**
+	 * Create a new instance with the underlying writer provided, and a callback
+	 * to execute on close. The callback should clean up related resources like
+	 * output streams or channels.
+	 * 
 	 * @param writer actually writes to output
-	 * @param name used to identify the transactional buffer used by this
-	 * instance
+	 * @param closeCallback callback to execute on close
 	 */
-	public TransactionAwareBufferedWriter(Writer writer, String name) {
+	public TransactionAwareBufferedWriter(Writer writer, Runnable closeCallback) {
 		super();
 		this.writer = writer;
-		this.bufferKey = BUFFER_KEY_PREFIX + "." + name;
+		this.closeCallback = closeCallback;
+		this.bufferKey = BUFFER_KEY_PREFIX + "." + hashCode();
+		this.closeKey = CLOSE_KEY_PREFIX + "." + hashCode();
 	}
 
 	/**
@@ -61,18 +72,34 @@ public class TransactionAwareBufferedWriter extends Writer {
 			TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronizationAdapter() {
 				@Override
 				public void afterCompletion(int status) {
-					StringBuffer buffer = (StringBuffer) TransactionSynchronizationManager.getResource(bufferKey);
 					if (status == STATUS_COMMITTED) {
+						complete();
+					}
+				}
+
+				private void complete() {
+					StringBuffer buffer = (StringBuffer) TransactionSynchronizationManager.getResource(bufferKey);
+					if (buffer != null) {
 						try {
 							writer.write(buffer.toString());
 							writer.flush();
+							if (TransactionSynchronizationManager.hasResource(closeKey)) {
+								writer.close();
+								closeCallback.run();
+							}
 						}
 						catch (IOException e) {
 							throw new FlushFailedException("Could not write to output buffer", e);
 						}
+						finally {
+							TransactionSynchronizationManager.unbindResource(bufferKey);
+							if (TransactionSynchronizationManager.hasResource(closeKey)) {
+								TransactionSynchronizationManager.unbindResource(closeKey);
+							}
+						}
 					}
-					TransactionSynchronizationManager.unbindResource(bufferKey);
 				}
+
 			});
 
 		}
@@ -108,7 +135,14 @@ public class TransactionAwareBufferedWriter extends Writer {
 	 */
 	@Override
 	public void close() throws IOException {
+		if (transactionActive()) {
+			if (getCurrentBuffer().length() > 0) {
+				TransactionSynchronizationManager.bindResource(closeKey, Boolean.TRUE);
+			}
+			return;
+		}
 		writer.close();
+		closeCallback.run();
 	}
 
 	/*

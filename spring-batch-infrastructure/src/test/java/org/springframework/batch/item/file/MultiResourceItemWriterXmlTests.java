@@ -1,4 +1,7 @@
 package org.springframework.batch.item.file;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+
 import java.io.File;
 import java.io.IOException;
 import java.util.Arrays;
@@ -8,10 +11,8 @@ import javax.xml.stream.XMLEventWriter;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.transform.Result;
 
-import static org.junit.Assert.*;
 import org.junit.Before;
 import org.junit.Test;
-import org.springframework.batch.item.file.MultiResourceItemWriter;
 import org.springframework.batch.item.xml.StaxEventItemWriter;
 import org.springframework.oxm.Marshaller;
 import org.springframework.oxm.XmlMappingException;
@@ -28,21 +29,19 @@ public class MultiResourceItemWriterXmlTests extends AbstractMultiResourceItemWr
 
 	final static private String xmlDocEnd = "</root>";
 
-	@Override
+	private StaxEventItemWriter<String> delegate;
+
 	@Before
 	public void setUp() throws Exception {
-		delegate = new StaxEventItemWriter<String>() {
-			{
-				setMarshaller(new SimpleMarshaller());
-			}
-		};
-		super.setUp();
+		delegate = new StaxEventItemWriter<String>();
+		delegate.setMarshaller(new SimpleMarshaller());
 	}
 
 	/**
 	 * Writes object's toString representation as tag.
 	 */
 	private static class SimpleMarshaller implements Marshaller {
+		
 		public void marshal(Object graph, Result result) throws XmlMappingException, IOException {
 			Assert.isInstanceOf(StaxResult.class, result);
 
@@ -75,6 +74,8 @@ public class MultiResourceItemWriterXmlTests extends AbstractMultiResourceItemWr
 
 	@Test
 	public void multiResourceWritingWithRestart() throws Exception {
+		
+		setUp(delegate);
 
 		tested.write(Arrays.asList("1", "2", "3"));
 

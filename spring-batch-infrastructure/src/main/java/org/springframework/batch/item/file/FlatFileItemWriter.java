@@ -435,23 +435,29 @@ public class FlatFileItemWriter<T> extends ExecutionContextUserSupport implement
 				throw new ItemStreamException("Unable to close the the ItemWriter", ioe);
 			}
 			finally {
+				if (!transactional) {
+					closeStream();
+				}
+			}
+		}
+
+		private void closeStream() {
+			try {
+				if (fileChannel != null) {
+					fileChannel.close();
+				}
+			}
+			catch (IOException ioe) {
+				throw new ItemStreamException("Unable to close the the ItemWriter", ioe);
+			}
+			finally {
 				try {
-					if (fileChannel != null) {
-						fileChannel.close();
+					if (os != null) {
+						os.close();
 					}
 				}
 				catch (IOException ioe) {
 					throw new ItemStreamException("Unable to close the the ItemWriter", ioe);
-				}
-				finally {
-					try {
-						if (os != null) {
-							os.close();
-						}
-					}
-					catch (IOException ioe) {
-						throw new ItemStreamException("Unable to close the the ItemWriter", ioe);
-					}
 				}
 			}
 		}
@@ -518,7 +524,11 @@ public class FlatFileItemWriter<T> extends ExecutionContextUserSupport implement
 			try {
 				Writer writer = Channels.newWriter(fileChannel, encoding);
 				if (transactional) {
-					return new TransactionAwareBufferedWriter(writer, getName());
+					return new TransactionAwareBufferedWriter(writer, new Runnable() {
+						public void run() {
+							closeStream();
+						}
+					});
 				} else {
 					return new BufferedWriter(writer);
 				}

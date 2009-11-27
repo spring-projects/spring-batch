@@ -16,12 +16,13 @@
 
 package org.springframework.batch.item.xml;
 
+import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.io.UnsupportedEncodingException;
-import java.nio.ByteBuffer;
+import java.io.Writer;
 import java.nio.channels.FileChannel;
 import java.util.List;
 import java.util.Map;
@@ -65,8 +66,8 @@ import org.springframework.xml.transform.StaxResult;
  * @author Robert Kasanicky
  * 
  */
-public class StaxEventItemWriter<T> extends ExecutionContextUserSupport implements ResourceAwareItemWriterItemStream<T>,
-		InitializingBean {
+public class StaxEventItemWriter<T> extends ExecutionContextUserSupport implements
+		ResourceAwareItemWriterItemStream<T>, InitializingBean {
 
 	private static final Log log = LogFactory.getLog(StaxEventItemWriter.class);
 
@@ -126,7 +127,9 @@ public class StaxEventItemWriter<T> extends ExecutionContextUserSupport implemen
 
 	private StaxWriterCallback footerCallback;
 
-	private TransactionAwareBufferedWriter transactionAwareBufferedWriter;
+	private Writer bufferedWriter;
+
+	private boolean transactional = true;
 
 	public StaxEventItemWriter() {
 		setName(ClassUtils.getShortName(StaxEventItemWriter.class));
@@ -163,6 +166,16 @@ public class StaxEventItemWriter<T> extends ExecutionContextUserSupport implemen
 	 */
 	public void setFooterCallback(StaxWriterCallback footerCallback) {
 		this.footerCallback = footerCallback;
+	}
+
+	/**
+	 * Flag to indicate that writes should be deferred to the end of a
+	 * transaction if present. Defaults to true.
+	 * 
+	 * @param transactional the flag to set
+	 */
+	public void setTransactional(boolean transactional) {
+		this.transactional = transactional;
 	}
 
 	/**
@@ -324,11 +337,20 @@ public class StaxEventItemWriter<T> extends ExecutionContextUserSupport implemen
 			// http://jira.springframework.org/browse/BATCH-761.
 			outputFactory.setProperty("com.ctc.wstx.automaticEndElements", Boolean.FALSE);
 		}
-		
+
 		try {
-			transactionAwareBufferedWriter = new TransactionAwareBufferedWriter(
-					new OutputStreamWriter(os, encoding), getName());
-			delegateEventWriter = outputFactory.createXMLEventWriter(transactionAwareBufferedWriter);
+			if (transactional) {
+				bufferedWriter = new TransactionAwareBufferedWriter(new OutputStreamWriter(os, encoding),
+						new Runnable() {
+							public void run() {
+								closeStream();
+							}
+						});
+			}
+			else {
+				bufferedWriter = new BufferedWriter(new OutputStreamWriter(os, encoding));
+			}
+			delegateEventWriter = outputFactory.createXMLEventWriter(bufferedWriter);
 			eventWriter = new NoStartEndDocumentStreamWriter(delegateEventWriter);
 			if (!restarted) {
 				startDocument(delegateEventWriter);
@@ -390,9 +412,8 @@ public class StaxEventItemWriter<T> extends ExecutionContextUserSupport implemen
 		// writer.writeEndDocument(); <- this doesn't work after restart
 		// we need to write end tag of the root element manually
 
-		ByteBuffer bbuf = ByteBuffer.wrap(("</" + getRootTagName() + ">").getBytes());
 		try {
-			channel.write(bbuf);
+			bufferedWriter.write("</" + getRootTagName() + ">");
 		}
 		catch (IOException ioe) {
 			throw new DataAccessResourceFailureException("Unable to close file resource: [" + resource + "]", ioe);
@@ -433,18 +454,31 @@ public class StaxEventItemWriter<T> extends ExecutionContextUserSupport implemen
 			try {
 				eventWriter.close();
 			}
-			catch (XMLStreamException xse) {
-				log.error("Unable to close file resource: [" + resource + "] " + xse);
+			catch (XMLStreamException e) {
+				log.error("Unable to close file resource: [" + resource + "] " + e);
 			}
 			finally {
 				try {
-					channel.close();
+					bufferedWriter.close();
 				}
-				catch (IOException ioe) {
-					log.error("Unable to close file resource: [" + resource + "] " + ioe);
+				catch (IOException e) {
+					log.error("Unable to close file resource: [" + resource + "] " + e);
 				}
-
+				finally {
+					if (!transactional) {
+						closeStream();
+					}
+				}
 			}
+		}
+	}
+
+	private void closeStream() {
+		try {
+			channel.close();
+		}
+		catch (IOException ioe) {
+			log.error("Unable to close file resource: [" + resource + "] " + ioe);
 		}
 	}
 
@@ -499,7 +533,10 @@ public class StaxEventItemWriter<T> extends ExecutionContextUserSupport implemen
 
 		try {
 			eventWriter.flush();
-			position = channel.position() + transactionAwareBufferedWriter.getBufferSize();
+			position = channel.position();
+			if (bufferedWriter instanceof TransactionAwareBufferedWriter) {
+				position += ((TransactionAwareBufferedWriter) bufferedWriter).getBufferSize();
+			}
 		}
 		catch (Exception e) {
 			throw new DataAccessResourceFailureException("Unable to write to file resource: [" + resource + "]", e);

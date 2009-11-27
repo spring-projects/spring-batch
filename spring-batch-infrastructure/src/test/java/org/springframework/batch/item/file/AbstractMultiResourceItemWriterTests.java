@@ -4,7 +4,6 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 
-import org.junit.Before;
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.core.io.FileSystemResource;
 
@@ -22,12 +21,9 @@ public class AbstractMultiResourceItemWriterTests {
 
 	protected ResourceSuffixCreator suffixCreator = new SimpleResourceSuffixCreator();
 
-	protected ResourceAwareItemWriterItemStream<String> delegate;
-
 	protected ExecutionContext executionContext = new ExecutionContext();
 
-	@Before
-	public void setUp() throws Exception {
+	protected void setUp(ResourceAwareItemWriterItemStream<String> delegate) throws Exception {
 		file = File.createTempFile(MultiResourceItemWriterFlatFileTests.class.getSimpleName(), null);
 		tested.setResource(new FileSystemResource(file));
 		tested.setDelegate(delegate);

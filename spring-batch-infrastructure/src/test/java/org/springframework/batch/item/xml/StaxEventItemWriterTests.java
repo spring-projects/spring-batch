@@ -59,8 +59,8 @@ public class StaxEventItemWriterTests {
 
 	private List<? extends Object> items = Collections.singletonList(item);
 
-	private static final String TEST_STRING = "<!--" + ClassUtils.getShortName(StaxEventItemWriter.class)
-			+ "-testString-->";
+	private static final String TEST_STRING = "<" + ClassUtils.getShortName(StaxEventItemWriter.class)
+			+ "-testString/>";
 
 	@Before
 	public void setUp() throws Exception {
@@ -77,7 +77,7 @@ public class StaxEventItemWriterTests {
 		writer.open(executionContext);
 		writer.write(items);
 		writer.close();
-		String content = outputFileContent();
+		String content = getOutputFileContent();
 		assertTrue("Wrong content: " + content, content.contains(TEST_STRING));
 	}
 
@@ -100,9 +100,9 @@ public class StaxEventItemWriterTests {
 
 		// check the output is concatenation of 'before restart' and 'after
 		// restart' writes.
-		String outputFile = outputFileContent();
+		String outputFile = getOutputFileContent();
 		assertEquals(2, StringUtils.countOccurrencesOf(outputFile, TEST_STRING));
-		assertTrue(outputFile.contains("<root>" + TEST_STRING + TEST_STRING + "</root>"));
+		assertEquals("<root>" + TEST_STRING + TEST_STRING + "</root>", outputFile.replace(" ", ""));
 	}
 
 	@Test
@@ -147,7 +147,7 @@ public class StaxEventItemWriterTests {
 
 		// check the output is concatenation of 'before restart' and 'after
 		// restart' writes.
-		String outputFile = outputFileContent();
+		String outputFile = getOutputFileContent();
 		assertEquals(2, StringUtils.countOccurrencesOf(outputFile, TEST_STRING));
 		assertTrue(outputFile.contains("<root>" + TEST_STRING + TEST_STRING + "</root>"));
 	}
@@ -175,7 +175,7 @@ public class StaxEventItemWriterTests {
 		});
 		writer.open(executionContext);
 		writer.write(items);
-		String content = outputFileContent();
+		String content = getOutputFileContent();
 		assertTrue("Wrong content: " + content, content.contains(("<header/>")));
 		assertTrue("Wrong content: " + content, content.contains(TEST_STRING));
 	}
@@ -237,7 +237,7 @@ public class StaxEventItemWriterTests {
 		writer.setRootElementAttributes(Collections.<String, String> singletonMap("attribute", "value"));
 		writer.open(executionContext);
 		writer.close();
-		String content = outputFileContent();
+		String content = getOutputFileContent();
 
 		assertTrue(content.contains("<testroot attribute=\"value\">"));
 		assertTrue(content.contains("<header/>"));
@@ -272,7 +272,8 @@ public class StaxEventItemWriterTests {
 
 			StaxResult staxResult = (StaxResult) result;
 			try {
-				staxResult.getXMLEventWriter().add(XMLEventFactory.newInstance().createComment(graph.toString()));
+				staxResult.getXMLEventWriter().add(XMLEventFactory.newInstance().createStartElement("", "", graph.toString()));
+				staxResult.getXMLEventWriter().add(XMLEventFactory.newInstance().createEndElement("", "", graph.toString()));
 			}
 			catch (XMLStreamException e) {
 				throw new RuntimeException("Exception while writing to output file", e);
@@ -288,8 +289,10 @@ public class StaxEventItemWriterTests {
 	/**
 	 * @return output file content as String
 	 */
-	private String outputFileContent() throws IOException {
-		return FileUtils.readFileToString(resource.getFile(), null);
+	private String getOutputFileContent() throws IOException {
+		String value = FileUtils.readFileToString(resource.getFile(), null);
+		value = value.replace("<?xml version='1.0' encoding='UTF-8'?>", "");
+		return value;
 	}
 
 	/**

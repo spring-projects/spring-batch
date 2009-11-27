@@ -64,20 +64,26 @@ public class MultiResourceItemWriter<T> extends ExecutionContextUserSupport impl
 
 	private boolean saveState = true;
 
+	private boolean opened = false;
+
 	public MultiResourceItemWriter() {
 		setName(ClassUtils.getShortName(MultiResourceItemWriter.class));
 	}
 
 	public void write(List<? extends T> items) throws Exception {
+		if (!opened) {
+			delegate.open(new ExecutionContext());
+			opened = true;
+		}
+		delegate.write(items);
+		currentResourceItemCount += items.size();
 		if (currentResourceItemCount >= itemCountLimitPerResource) {
 			delegate.close();
 			resourceIndex++;
 			currentResourceItemCount = 0;
 			setResourceToDelegate();
-			delegate.open(new ExecutionContext());
+			opened = false;
 		}
-		delegate.write(items);
-		currentResourceItemCount += items.size();
 	}
 
 	/**
@@ -120,7 +126,9 @@ public class MultiResourceItemWriter<T> extends ExecutionContextUserSupport impl
 	public void close() throws ItemStreamException {
 		resourceIndex = 1;
 		currentResourceItemCount = 0;
-		delegate.close();
+		if (opened) {
+			delegate.close();
+		}
 	}
 
 	public void open(ExecutionContext executionContext) throws ItemStreamException {
@@ -131,14 +139,23 @@ public class MultiResourceItemWriter<T> extends ExecutionContextUserSupport impl
 			setResourceToDelegate();
 		}
 		catch (IOException e) {
-			throw new ItemStreamException("Couldn't open resource", e);
+			throw new ItemStreamException("Couldn't assign resource", e);
 		}
-		delegate.open(executionContext);
+
+		if (executionContext.containsKey(getKey(CURRENT_RESOURCE_ITEM_COUNT))) {
+			// It's a restart
+			delegate.open(executionContext);
+		}
+		else {
+			opened = false;
+		}
 	}
 
 	public void update(ExecutionContext executionContext) throws ItemStreamException {
 		if (saveState) {
-			delegate.update(executionContext);
+			if (opened) {
+				delegate.update(executionContext);
+			}
 			executionContext.putInt(getKey(CURRENT_RESOURCE_ITEM_COUNT), currentResourceItemCount);
 			executionContext.putInt(getKey(RESOURCE_INDEX_KEY), resourceIndex);
 		}

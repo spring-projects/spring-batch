@@ -37,7 +37,16 @@ public class TransactionAwareBufferedWriterTests {
 
 	private Writer stringWriter = new StringWriter();
 
-	private TransactionAwareBufferedWriter writer = new TransactionAwareBufferedWriter(stringWriter, "someName");
+	private TransactionAwareBufferedWriter writer = new TransactionAwareBufferedWriter(stringWriter, new Runnable() {
+		public void run() {
+			try {
+				stringWriter.append("c");
+			}
+			catch (IOException e) {
+				throw new IllegalStateException(e);
+			}
+		}
+	});
 
 	private PlatformTransactionManager transactionManager = new ResourcelessTransactionManager();
 
@@ -53,6 +62,7 @@ public class TransactionAwareBufferedWriterTests {
 	public void testWriteOutsideTransaction() throws Exception {
 		writer.write("foo");
 		writer.flush();
+		// Not closed yet
 		assertEquals("foo", stringWriter.toString());
 	}
 
@@ -66,7 +76,7 @@ public class TransactionAwareBufferedWriterTests {
 	public void testCloseOutsideTransaction() throws Exception {
 		writer.write("foo");
 		writer.close();
-		assertEquals("foo", stringWriter.toString());
+		assertEquals("fooc", stringWriter.toString());
 	}
 
 	@Test
@@ -86,7 +96,10 @@ public class TransactionAwareBufferedWriterTests {
 			public void write(char[] cbuf, int off, int len) throws IOException {
 			}
 		};
-		writer = new TransactionAwareBufferedWriter(mock, "someName");
+		writer = new TransactionAwareBufferedWriter(mock, new Runnable() {
+			public void run() {				
+			}
+		});
 		new TransactionTemplate(transactionManager).execute(new TransactionCallback() {
 			public Object doInTransaction(TransactionStatus status) {
 				try {
@@ -117,6 +130,7 @@ public class TransactionAwareBufferedWriterTests {
 				return null;
 			}
 		});
+		// Not closed in transaction
 		assertEquals("foo", stringWriter.toString());
 	}
 
