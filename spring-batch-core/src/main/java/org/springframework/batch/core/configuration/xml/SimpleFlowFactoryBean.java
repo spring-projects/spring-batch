@@ -174,6 +174,11 @@ public class SimpleFlowFactoryBean implements FactoryBean, InitializingBean {
 		public void execute(StepExecution stepExecution) throws JobInterruptedException {
 			step.execute(stepExecution);
 		}
+		
+		@Override
+		public String toString() {
+			return step.toString();
+		}
 	}
 
 }
