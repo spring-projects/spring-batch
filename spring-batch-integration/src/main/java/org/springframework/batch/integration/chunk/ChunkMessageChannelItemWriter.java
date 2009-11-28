@@ -145,10 +145,17 @@ public class ChunkMessageChannelItemWriter<T> extends StepExecutionListenerSuppo
 	}
 
 	/**
-	 * Get the next result if it is available within the timeout specified,
-	 * otherwise return null.
+	 * Get the next result if it is available (within the timeout specified in
+	 * the gateway), otherwise do nothing.
+	 * 
+	 * @throws AsynchronousFailureException If there is a response and it
+	 * contains a failed chunk response.
+	 * 
+	 * @throws IllegalStateException if the result contains the wrong job
+	 * instance id (maybe we are sharing a channel and we shouldn't be)
 	 */
 	private void getNextResult() {
+		// TODO: make sure this is transactional (should be if single threaded)
 		ChunkResponse payload = (ChunkResponse) messagingGateway.receive();
 		if (payload != null) {
 			Long jobInstanceId = payload.getJobId();

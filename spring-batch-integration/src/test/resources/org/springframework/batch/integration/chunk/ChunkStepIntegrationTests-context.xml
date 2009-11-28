@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:beans="http://www.springframework.org/schema/beans"
+	xmlns:integration="http://www.springframework.org/schema/integration"
+	xmlns:context="http://www.springframework.org/schema/context" xmlns:batch="http://www.springframework.org/schema/batch"
+	xsi:schemaLocation="http://www.springframework.org/schema/integration http://www.springframework.org/schema/integration/spring-integration-1.0.xsd
+		http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.5.xsd
+		http://www.springframework.org/schema/batch http://www.springframework.org/schema/batch/spring-batch-2.0.xsd
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-2.5.xsd">
+
+	<job id="job" xmlns="http://www.springframework.org/schema/batch">
+		<step id="step">
+			<tasklet>
+				<chunk reader="reader" writer="writer" commit-interval="2"/>
+			</tasklet>
+		</step>
+	</job>
+	
+	<bean id="reader" class="org.springframework.batch.integration.chunk.TestItemReader" scope="step">
+		<property name="items">
+			<list>
+				<value>1</value>
+				<value>2</value>
+				<value>3</value>
+				<value>4</value>
+				<value>5</value>
+				<value>6</value>
+				<value>7</value>
+				<value>8</value>
+				<value>9</value>
+			</list>
+		</property>
+	</bean>
+
+	<bean id="writer" class="org.springframework.batch.integration.chunk.ChunkMessageChannelItemWriter">
+		<property name="messagingGateway" ref="messagingGateway"/>
+	</bean>
+	
+	<bean id="messagingGateway" class="org.springframework.integration.gateway.SimpleMessagingGateway">
+		<property name="requestChannel" ref="requests"/>
+		<property name="replyChannel" ref="replies"/>
+		<property name="replyTimeout" value="1000"/>
+	</bean>
+	
+	<integration:annotation-config/>
+	<integration:channel id="requests" />
+	<integration:channel id="replies">
+		<integration:queue/>
+	</integration:channel>
+	<integration:service-activator input-channel="requests" output-channel="replies" ref="chunkHandler" />
+
+	<bean id="chunkHandler" class="org.springframework.batch.integration.chunk.ChunkProcessorChunkHandler">
+		<property name="chunkProcessor">
+			<bean class="org.springframework.batch.core.step.item.SimpleChunkProcessor">
+				<property name="itemWriter">
+					<bean class="org.springframework.batch.integration.chunk.TestItemWriter" />
+				</property>
+				<property name="itemProcessor">
+					<bean class="org.springframework.batch.item.support.PassThroughItemProcessor" />
+				</property>
+			</bean>
+		</property>
+	</bean>
+
+	<bean id="transactionManager" class="org.springframework.batch.support.transaction.ResourcelessTransactionManager" />
+	
+	<bean id="jobRepository" class="org.springframework.batch.core.repository.support.MapJobRepositoryFactoryBean">
+		<property name="transactionManager" ref="transactionManager"/>
+	</bean>
+	
+	<bean id="jobLauncher" class="org.springframework.batch.core.launch.support.SimpleJobLauncher">
+		<property name="jobRepository" ref="jobRepository"/>
+	</bean>
+	
+</beans>
