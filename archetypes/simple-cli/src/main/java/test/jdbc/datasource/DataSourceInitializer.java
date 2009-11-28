@@ -89,7 +89,7 @@ public class DataSourceInitializer implements InitializingBean, DisposableBean {
 	public void destroy() {
 		if (destroyScripts==null) return;
 		for (int i = 0; i < destroyScripts.length; i++) {
-			Resource destroyScript = initScripts[i];
+			Resource destroyScript = destroyScripts[i];
 			try {
 				doExecuteScript(destroyScript);
 			}
