@@ -7,7 +7,7 @@ import java.io.FileReader;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.springframework.batch.test.JobRunnerTestUtils;
+import org.springframework.batch.test.JobLauncherTestUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.core.io.Resource;
@@ -27,11 +27,11 @@ public class HeaderFooterSampleFunctionalTests {
 	private Resource output;
 	
 	@Autowired
-	private JobRunnerTestUtils jobRunnerUtils;
+	private JobLauncherTestUtils jobLauncherTestUtils;
 
 	@Test
 	public void testJob() throws Exception {
-		jobRunnerUtils.launchJob();
+		jobLauncherTestUtils.launchJob();
 
 		BufferedReader inputReader = new BufferedReader(new FileReader(input.getFile()));
 		BufferedReader outputReader = new BufferedReader(new FileReader(output.getFile()));

@@ -6,7 +6,7 @@
 	<import resource="classpath:/simple-job-launcher-context.xml" />
 	<import resource="classpath:/jobs/jobStepSample.xml" />
 	
-	<bean class="org.springframework.batch.test.JobRunnerTestUtils">
+	<bean class="org.springframework.batch.test.JobLauncherTestUtils">
 		<property name="job" ref="jobStepJob"/>
 	</bean>
 	

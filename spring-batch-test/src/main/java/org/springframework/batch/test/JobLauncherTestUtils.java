@@ -64,7 +64,7 @@ import org.springframework.context.ApplicationContext;
  * @author Dave Syer
  * @since 2.1
  */
-public class JobRunnerTestUtils {
+public class JobLauncherTestUtils {
 
 	/** Logger */
 	protected final Log logger = LogFactory.getLog(getClass());

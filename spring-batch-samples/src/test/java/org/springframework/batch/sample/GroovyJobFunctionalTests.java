@@ -26,7 +26,7 @@ import org.apache.commons.io.FileUtils;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.springframework.batch.test.JobRunnerTestUtils;
+import org.springframework.batch.test.JobLauncherTestUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
@@ -37,7 +37,7 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 public class GroovyJobFunctionalTests {
 
 	@Autowired
-	private JobRunnerTestUtils jobRunnerUtils;
+	private JobLauncherTestUtils jobLauncherTestUtils;
 
 	@Before
 	public void removeOldData() throws IOException {
@@ -47,7 +47,7 @@ public class GroovyJobFunctionalTests {
 	@Test
 	public void testLaunchJob() throws Exception {
 		assertFalse(new File("target/groovyJob/output/files.zip").exists());
-		jobRunnerUtils.launchJob();
+		jobLauncherTestUtils.launchJob();
 		assertTrue(new File("target/groovyJob/output/files.zip").exists());
 	}
 

@@ -32,7 +32,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.batch.core.JobExecution;
-import org.springframework.batch.test.JobRunnerTestUtils;
+import org.springframework.batch.test.JobLauncherTestUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.RowCallbackHandler;
 import org.springframework.jdbc.core.simple.SimpleJdbcTemplate;
@@ -52,7 +52,7 @@ public class CustomerFilterJobFunctionalTests {
 	private Map<String, Double> credits = new HashMap<String, Double>();
 
 	@Autowired
-	private JobRunnerTestUtils jobRunnerUtils;
+	private JobLauncherTestUtils jobLauncherTestUtils;
 
 	@Autowired
 	public void setDataSource(DataSource dataSource) {
@@ -79,7 +79,7 @@ public class CustomerFilterJobFunctionalTests {
 	@Test
 	public void testFilterJob() throws Exception {
 
-		JobExecution jobExecution = jobRunnerUtils.launchJob();
+		JobExecution jobExecution = jobLauncherTestUtils.launchJob();
 
 		customers = Arrays.asList(new Customer("customer1", (credits.get("customer1"))), new Customer("customer2",
 				(credits.get("customer2"))), new Customer("customer3", 100500), new Customer("customer4", credits

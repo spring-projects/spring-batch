@@ -28,7 +28,7 @@ import org.springframework.batch.core.BatchStatus;
 import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.JobParameters;
 import org.springframework.batch.core.JobParametersBuilder;
-import org.springframework.batch.test.JobRunnerTestUtils;
+import org.springframework.batch.test.JobLauncherTestUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
@@ -48,7 +48,7 @@ public class GracefulShutdownFunctionalTests {
 	private final Log logger = LogFactory.getLog(getClass());
 
 	@Autowired
-	private JobRunnerTestUtils jobRunnerUtils;
+	private JobLauncherTestUtils jobLauncherTestUtils;
 
 	@Test
 	public void testLaunchJob() throws Exception {
@@ -56,7 +56,7 @@ public class GracefulShutdownFunctionalTests {
 		final JobParameters jobParameters = new JobParametersBuilder().addLong("timestamp", System.currentTimeMillis())
 				.toJobParameters();
 
-		JobExecution jobExecution = jobRunnerUtils.launchJob(jobParameters);
+		JobExecution jobExecution = jobLauncherTestUtils.launchJob(jobParameters);
 
 		Thread.sleep(1000);
 

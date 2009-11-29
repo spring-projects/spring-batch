@@ -6,7 +6,7 @@ import static org.junit.Assert.assertTrue;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.batch.sample.domain.person.PersonService;
-import org.springframework.batch.test.JobRunnerTestUtils;
+import org.springframework.batch.test.JobLauncherTestUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
@@ -16,7 +16,7 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 public class DelegatingJobFunctionalTests {
 
 	@Autowired
-	private JobRunnerTestUtils jobRunnerUtils;
+	private JobLauncherTestUtils jobLauncherTestUtils;
 
 	@Autowired
 	private PersonService personService;
@@ -24,7 +24,7 @@ public class DelegatingJobFunctionalTests {
 	@Test
 	public void testLaunchJob() throws Exception {
 		
-		jobRunnerUtils.launchJob();
+		jobLauncherTestUtils.launchJob();
 		
 		assertTrue(personService.getReturnedCount() > 0);
 		assertEquals(personService.getReturnedCount(), personService.getReceivedCount());

@@ -20,7 +20,7 @@ import static org.junit.Assert.assertEquals;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.batch.sample.domain.trade.internal.ItemTrackingTradeItemWriter;
-import org.springframework.batch.test.JobRunnerTestUtils;
+import org.springframework.batch.test.JobLauncherTestUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
@@ -40,11 +40,11 @@ public class LoopFlowSampleFunctionalTests {
 	private ItemTrackingTradeItemWriter itemWriter;
 
 	@Autowired
-	private JobRunnerTestUtils jobRunnerUtils;
+	private JobLauncherTestUtils jobLauncherTestUtils;
 	
 	@Test
 	public void testJobLaunch() throws Exception {
-		jobRunnerUtils.launchJob();
+		jobLauncherTestUtils.launchJob();
 		// items processed = items read + 2 exceptions
 		assertEquals(10, itemWriter.getItems().size());
 	}

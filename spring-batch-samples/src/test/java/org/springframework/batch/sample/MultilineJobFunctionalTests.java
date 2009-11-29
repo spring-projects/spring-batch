@@ -21,7 +21,7 @@ import static org.junit.Assert.assertEquals;
 import org.apache.commons.io.IOUtils;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.springframework.batch.test.JobRunnerTestUtils;
+import org.springframework.batch.test.JobLauncherTestUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
@@ -35,7 +35,7 @@ import org.springframework.util.StringUtils;
 public class MultilineJobFunctionalTests {
 
 	@Autowired
-	private JobRunnerTestUtils jobRunnerUtils;
+	private JobLauncherTestUtils jobLauncherTestUtils;
 	
 	// The output is grouped together in two lines, instead of all the
 	// trades coming out on a single line.
@@ -46,7 +46,7 @@ public class MultilineJobFunctionalTests {
 
 	@Test
 	public void testJobLaunch() throws Exception {
-		jobRunnerUtils.launchJob();
+		jobLauncherTestUtils.launchJob();
 		assertEquals(EXPECTED_RESULT, StringUtils.replace(IOUtils.toString(output.getInputStream()), System
 				.getProperty("line.separator"), ""));
 	}

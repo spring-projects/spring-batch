@@ -15,7 +15,7 @@ import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.ItemStream;
 import org.springframework.batch.sample.domain.trade.CustomerCredit;
 import org.springframework.batch.sample.domain.trade.internal.CustomerCreditIncreaseProcessor;
-import org.springframework.batch.test.JobRunnerTestUtils;
+import org.springframework.batch.test.JobLauncherTestUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 
@@ -30,7 +30,7 @@ import org.springframework.test.context.ContextConfiguration;
 public abstract class AbstractIoSampleTests {
 
 	@Autowired
-	private JobRunnerTestUtils jobRunnerUtils;
+	private JobLauncherTestUtils jobLauncherTestUtils;
 
 	@Autowired
 	private ItemReader<CustomerCredit> reader;
@@ -46,7 +46,7 @@ public abstract class AbstractIoSampleTests {
 		List<CustomerCredit> inputs = getCredits(reader);
 		close(reader);
 
-		JobExecution jobExecution = jobRunnerUtils.launchJob(getUniqueJobParameters());
+		JobExecution jobExecution = jobLauncherTestUtils.launchJob(getUniqueJobParameters());
 		assertEquals(BatchStatus.COMPLETED, jobExecution.getStatus());
 
 		pointReaderToOutput(reader);
@@ -66,7 +66,7 @@ public abstract class AbstractIoSampleTests {
 	}
 
 	protected JobParameters getUniqueJobParameters() {
-		return jobRunnerUtils.getUniqueJobParameters();
+		return jobLauncherTestUtils.getUniqueJobParameters();
 	}
 
 	/**

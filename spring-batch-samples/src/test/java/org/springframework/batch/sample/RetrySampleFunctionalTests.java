@@ -6,7 +6,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.batch.sample.domain.trade.internal.GeneratingTradeItemReader;
 import org.springframework.batch.sample.support.RetrySampleItemWriter;
-import org.springframework.batch.test.JobRunnerTestUtils;
+import org.springframework.batch.test.JobLauncherTestUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
@@ -28,11 +28,11 @@ public class RetrySampleFunctionalTests {
 	private RetrySampleItemWriter<?> itemProcessor;
 	
 	@Autowired
-	private JobRunnerTestUtils jobRunnerUtils;
+	private JobLauncherTestUtils jobLauncherTestUtils;
 
 	@Test
 	public void testLaunchJob() throws Exception {
-		jobRunnerUtils.launchJob();
+		jobLauncherTestUtils.launchJob();
 		//items processed = items read + 2 exceptions
 		assertEquals(itemGenerator.getLimit()+2, itemProcessor.getCounter());
 	}

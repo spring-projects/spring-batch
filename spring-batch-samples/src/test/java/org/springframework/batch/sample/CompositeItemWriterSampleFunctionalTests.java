@@ -16,7 +16,7 @@ import org.apache.commons.io.IOUtils;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.batch.sample.domain.trade.Trade;
-import org.springframework.batch.test.JobRunnerTestUtils;
+import org.springframework.batch.test.JobLauncherTestUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.RowCallbackHandler;
 import org.springframework.jdbc.core.simple.SimpleJdbcTemplate;
@@ -38,7 +38,7 @@ public class CompositeItemWriterSampleFunctionalTests {
 	private SimpleJdbcTemplate simpleJdbcTemplate;
 
 	@Autowired
-	private JobRunnerTestUtils jobRunnerUtils;
+	private JobLauncherTestUtils jobLauncherTestUtils;
 
 	@Autowired
 	public void setDataSource(DataSource dataSource) {
@@ -51,7 +51,7 @@ public class CompositeItemWriterSampleFunctionalTests {
 		simpleJdbcTemplate.update("DELETE from TRADE");
 		int before = simpleJdbcTemplate.queryForInt("SELECT COUNT(*) from TRADE");
 
-		jobRunnerUtils.launchJob();
+		jobLauncherTestUtils.launchJob();
 
 		checkOutputFile("target/test-outputs/CustomerReport1.txt");
 		checkOutputFile("target/test-outputs/CustomerReport2.txt");

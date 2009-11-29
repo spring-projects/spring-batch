@@ -27,7 +27,7 @@ public abstract class AbstractSampleJobTests {
 	private SimpleJdbcTemplate jdbcTemplate;
 
 	@Autowired
-	private JobRunnerTestUtils jobRunnerUtils;
+	private JobLauncherTestUtils jobLauncherTestUtils;
 
 	@Autowired
 	@Qualifier("tasklet2")
@@ -51,25 +51,25 @@ public abstract class AbstractSampleJobTests {
 
 	@Test
 	public void testJob() throws Exception {
-		assertEquals(BatchStatus.COMPLETED, jobRunnerUtils.launchJob().getStatus());
+		assertEquals(BatchStatus.COMPLETED, jobLauncherTestUtils.launchJob().getStatus());
 		this.verifyTasklet(1);
 		this.verifyTasklet(2);
 	}
 
 	@Test(expected = IllegalStateException.class)
 	public void testNonExistentStep() {
-		jobRunnerUtils.launchStep("nonExistent");
+		jobLauncherTestUtils.launchStep("nonExistent");
 	}
 
 	@Test
 	public void testStep1Execution() {
-		assertEquals(BatchStatus.COMPLETED, jobRunnerUtils.launchStep("step1").getStatus());
+		assertEquals(BatchStatus.COMPLETED, jobLauncherTestUtils.launchStep("step1").getStatus());
 		this.verifyTasklet(1);
 	}
 
 	@Test
 	public void testStep2Execution() {
-		assertEquals(BatchStatus.COMPLETED, jobRunnerUtils.launchStep("step2").getStatus());
+		assertEquals(BatchStatus.COMPLETED, jobLauncherTestUtils.launchStep("step2").getStatus());
 		this.verifyTasklet(2);
 	}
 
@@ -77,7 +77,7 @@ public abstract class AbstractSampleJobTests {
 	public void testStepLaunchJobContextEntry() {
 		ExecutionContext jobContext = new ExecutionContext();
 		jobContext.put("key1", "value1");
-		assertEquals(BatchStatus.COMPLETED, jobRunnerUtils.launchStep("step2", jobContext).getStatus());
+		assertEquals(BatchStatus.COMPLETED, jobLauncherTestUtils.launchStep("step2", jobContext).getStatus());
 		this.verifyTasklet(2);
 		assertTrue(tasklet2.jobContextEntryFound);
 	}

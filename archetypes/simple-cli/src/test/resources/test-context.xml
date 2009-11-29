@@ -8,6 +8,6 @@
 	
 	<context:annotation-config/>
 	
-	<bean class="org.springframework.batch.test.JobRunnerTestUtils"/>
+	<bean class="org.springframework.batch.test.jobLauncherTestUtils"/>
 
 </beans>

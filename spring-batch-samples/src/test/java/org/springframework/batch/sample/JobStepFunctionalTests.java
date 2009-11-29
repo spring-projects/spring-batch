@@ -24,7 +24,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.batch.core.converter.DefaultJobParametersConverter;
 import org.springframework.batch.support.PropertiesConverter;
-import org.springframework.batch.test.JobRunnerTestUtils;
+import org.springframework.batch.test.JobLauncherTestUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.simple.SimpleJdbcTemplate;
 import org.springframework.test.context.ContextConfiguration;
@@ -40,7 +40,7 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 public class JobStepFunctionalTests {
 
 	@Autowired
-	private JobRunnerTestUtils jobRunnerUtils;
+	private JobLauncherTestUtils jobLauncherTestUtils;
 
 	// auto-injected attributes
 	private SimpleJdbcTemplate simpleJdbcTemplate;
@@ -55,7 +55,7 @@ public class JobStepFunctionalTests {
 
 		simpleJdbcTemplate.update("DELETE FROM TRADE");
 	
-		jobRunnerUtils.launchJob(new DefaultJobParametersConverter()
+		jobLauncherTestUtils.launchJob(new DefaultJobParametersConverter()
 				.getJobParameters(PropertiesConverter
 						.stringToProperties("run.id(long)=1,parameter=true,run.date=20070122,input.file=classpath:data/fixedLengthImportJob/input/20070122.teststream.ImportTradeDataStep.txt")));
 

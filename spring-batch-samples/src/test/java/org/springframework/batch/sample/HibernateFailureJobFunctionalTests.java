@@ -17,7 +17,7 @@ import org.springframework.batch.core.JobParameters;
 import org.springframework.batch.core.JobParametersBuilder;
 import org.springframework.batch.sample.domain.trade.internal.CustomerCreditIncreaseProcessor;
 import org.springframework.batch.sample.domain.trade.internal.HibernateCreditDao;
-import org.springframework.batch.test.JobRunnerTestUtils;
+import org.springframework.batch.test.JobLauncherTestUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.UncategorizedSQLException;
 import org.springframework.jdbc.core.RowCallbackHandler;
@@ -67,7 +67,7 @@ public class HibernateFailureJobFunctionalTests {
 	private List<BigDecimal> creditsBeforeUpdate;
 
 	@Autowired
-	private JobRunnerTestUtils jobRunnerUtils;
+	private JobLauncherTestUtils jobLauncherTestUtils;
 
 	@Autowired
 	public void setDataSource(DataSource dataSource) {
@@ -88,7 +88,7 @@ public class HibernateFailureJobFunctionalTests {
 		writer.setFailOnFlush(2);
 
 		try {
-			jobRunnerUtils.launchJob(params);
+			jobLauncherTestUtils.launchJob(params);
 		} catch (HibernateJdbcException e) {
 			// This is what would happen if the flush happened outside the
 			// RepeatContext:

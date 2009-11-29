@@ -34,7 +34,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.batch.sample.domain.trade.Trade;
-import org.springframework.batch.test.JobRunnerTestUtils;
+import org.springframework.batch.test.JobLauncherTestUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.RowCallbackHandler;
 import org.springframework.jdbc.core.simple.SimpleJdbcTemplate;
@@ -57,7 +57,7 @@ public class TradeJobFunctionalTests {
 	private Map<String, Double> credits = new HashMap<String, Double>();
 
 	@Autowired
-	private JobRunnerTestUtils jobRunnerUtils;
+	private JobLauncherTestUtils jobLauncherTestUtils;
 
 	@Autowired
 	public void setDataSource(DataSource dataSource) {
@@ -81,7 +81,7 @@ public class TradeJobFunctionalTests {
 	@Test
 	public void testLaunchJob() throws Exception {
 		
-		jobRunnerUtils.launchJob();
+		jobLauncherTestUtils.launchJob();
 		
 		customers = Arrays.asList(new Customer("customer1", (credits.get("customer1") - 98.34)),
 				new Customer("customer2", (credits.get("customer2") - 18.12 - 12.78)),

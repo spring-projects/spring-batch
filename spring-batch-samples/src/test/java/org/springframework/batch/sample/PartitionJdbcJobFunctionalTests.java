@@ -33,7 +33,7 @@ import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.ItemStream;
 import org.springframework.batch.sample.domain.trade.CustomerCredit;
 import org.springframework.batch.sample.domain.trade.internal.CustomerCreditIncreaseProcessor;
-import org.springframework.batch.test.JobRunnerTestUtils;
+import org.springframework.batch.test.JobLauncherTestUtils;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -52,7 +52,7 @@ public class PartitionJdbcJobFunctionalTests implements ApplicationContextAware 
 	private ItemReader<CustomerCredit> inputReader;
 
 	@Autowired
-	private JobRunnerTestUtils jobRunnerUtils;
+	private JobLauncherTestUtils jobLauncherTestUtils;
 
 	private ApplicationContext applicationContext;
 
@@ -74,7 +74,7 @@ public class PartitionJdbcJobFunctionalTests implements ApplicationContextAware 
 		List<CustomerCredit> inputs = new ArrayList<CustomerCredit>(getCredits(inputReader));
 		close(inputReader);
 
-		JobExecution jobExecution = jobRunnerUtils.launchJob();
+		JobExecution jobExecution = jobLauncherTestUtils.launchJob();
 		assertEquals(BatchStatus.COMPLETED, jobExecution.getStatus());
 
 		@SuppressWarnings("unchecked")

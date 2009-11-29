@@ -24,7 +24,7 @@ import org.springframework.batch.core.BatchStatus;
 import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.JobInstance;
 import org.springframework.batch.core.launch.JobOperator;
-import org.springframework.batch.test.JobRunnerTestUtils;
+import org.springframework.batch.test.JobLauncherTestUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
@@ -37,7 +37,7 @@ public class ExampleJobConfigurationTests {
 	private JobOperator jobOperator;
 
 	@Autowired
-	private JobRunnerTestUtils jobRunnerUtils;
+	private JobLauncherTestUtils jobLauncherTestUtils;
 
 	/**
 	 * Create a unique job instance and check it's execution completes
@@ -47,7 +47,7 @@ public class ExampleJobConfigurationTests {
 	@Test
 	public void testLaunchJob() throws Exception {
 
-		JobExecution jobExecution = jobRunnerUtils.launchJob(jobRunnerUtils.getUniqueJobParameters());
+		JobExecution jobExecution = jobLauncherTestUtils.launchJob(jobLauncherTestUtils.getUniqueJobParameters());
 		assertEquals(BatchStatus.COMPLETED, jobExecution.getStatus());
 	}
 
@@ -59,7 +59,7 @@ public class ExampleJobConfigurationTests {
 	public void testLaunchByJobOperator() throws Exception {
 
 		// assumes the job has a JobIncrementer set
-		long jobExecutionId = jobOperator.startNextInstance(jobRunnerUtils.getJob().getName());
+		long jobExecutionId = jobOperator.startNextInstance(jobLauncherTestUtils.getJob().getName());
 
 		// no need to wait for job completion in this case, the job is launched
 		// synchronously

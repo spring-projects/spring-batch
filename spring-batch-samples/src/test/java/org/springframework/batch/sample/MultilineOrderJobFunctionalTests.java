@@ -20,7 +20,7 @@ import static org.springframework.batch.test.AssertFile.assertFileEquals;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.springframework.batch.test.JobRunnerTestUtils;
+import org.springframework.batch.test.JobLauncherTestUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.FileSystemResource;
@@ -36,11 +36,11 @@ public class MultilineOrderJobFunctionalTests {
 	private static final String EXPECTED = "data/multilineOrderJob/result/multilineOrderOutput.txt";
 
 	@Autowired
-	private JobRunnerTestUtils jobRunnerUtils;
+	private JobLauncherTestUtils jobLauncherTestUtils;
 	
 	@Test
 	public void testJobLaunch() throws Exception {
-		jobRunnerUtils.launchJob();
+		jobLauncherTestUtils.launchJob();
 		assertFileEquals(new ClassPathResource(EXPECTED), new FileSystemResource(ACTUAL));
 	}
 

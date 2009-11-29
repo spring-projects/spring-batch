@@ -18,7 +18,7 @@ package org.springframework.batch.sample;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.springframework.batch.test.JobRunnerTestUtils;
+import org.springframework.batch.test.JobLauncherTestUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
@@ -29,12 +29,12 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 public class BeanWrapperMapperSampleJobFunctionalTests {
 	
 	@Autowired
-	private JobRunnerTestUtils jobRunnerUtils;
+	private JobLauncherTestUtils jobLauncherTestUtils;
 
 	@Test
 	public void testJobLaunch() throws Exception {
 
-		jobRunnerUtils.launchJob();
+		jobLauncherTestUtils.launchJob();
 
 	}
 	

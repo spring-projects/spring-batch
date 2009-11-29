@@ -23,7 +23,7 @@ import org.junit.runner.RunWith;
 import org.springframework.batch.core.BatchStatus;
 import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.JobParametersBuilder;
-import org.springframework.batch.test.JobRunnerTestUtils;
+import org.springframework.batch.test.JobLauncherTestUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
@@ -34,11 +34,11 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 public class TaskletJobFunctionalTests {
 
 	@Autowired
-	private JobRunnerTestUtils jobRunnerUtils;
+	private JobLauncherTestUtils jobLauncherTestUtils;
 
 	@Test
 	public void testLaunchJob() throws Exception {
-		JobExecution jobExecution = jobRunnerUtils.launchJob(new JobParametersBuilder().addString("value", "foo")
+		JobExecution jobExecution = jobLauncherTestUtils.launchJob(new JobParametersBuilder().addString("value", "foo")
 				.toJobParameters());
 		assertEquals(BatchStatus.COMPLETED, jobExecution.getStatus());
 	}

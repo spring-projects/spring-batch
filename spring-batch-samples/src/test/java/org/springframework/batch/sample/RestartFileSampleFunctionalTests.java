@@ -28,7 +28,7 @@ import org.springframework.batch.core.JobParameters;
 import org.springframework.batch.item.file.FlatFileItemWriter;
 import org.springframework.batch.sample.domain.trade.CustomerCredit;
 import org.springframework.batch.test.AssertFile;
-import org.springframework.batch.test.JobRunnerTestUtils;
+import org.springframework.batch.test.JobLauncherTestUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.Resource;
 import org.springframework.test.context.ContextConfiguration;
@@ -47,17 +47,17 @@ public class RestartFileSampleFunctionalTests {
 	private Resource outputResource;
 
 	@Autowired
-	private JobRunnerTestUtils jobRunnerUtils;
+	private JobLauncherTestUtils jobLauncherTestUtils;
 
 	@Test
 	public void runTest() throws Exception {
-		JobParameters jobParameters = jobRunnerUtils.getUniqueJobParameters();
+		JobParameters jobParameters = jobLauncherTestUtils.getUniqueJobParameters();
 
-		JobExecution je1 = jobRunnerUtils.launchJob(jobParameters);
+		JobExecution je1 = jobLauncherTestUtils.launchJob(jobParameters);
 		assertEquals(BatchStatus.FAILED, je1.getStatus());
 		AssertFile.assertLineCount(10, outputResource);
 
-		JobExecution je2 = jobRunnerUtils.launchJob(jobParameters);
+		JobExecution je2 = jobLauncherTestUtils.launchJob(jobParameters);
 		assertEquals(BatchStatus.COMPLETED, je2.getStatus());
 		AssertFile.assertLineCount(20, outputResource);
 	}

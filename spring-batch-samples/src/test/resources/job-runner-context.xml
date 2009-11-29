@@ -5,6 +5,6 @@
 		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-2.5.xsd">
 
 	<context:annotation-config/>
-	<bean class="org.springframework.batch.test.JobRunnerTestUtils"/>
+	<bean class="org.springframework.batch.test.JobLauncherTestUtils"/>
 
 </beans>
