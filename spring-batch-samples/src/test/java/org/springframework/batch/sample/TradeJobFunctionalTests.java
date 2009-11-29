@@ -31,8 +31,10 @@ import javax.sql.DataSource;
 
 import org.junit.After;
 import org.junit.Before;
+import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.batch.sample.domain.trade.Trade;
+import org.springframework.batch.test.JobRunnerTestUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.RowCallbackHandler;
 import org.springframework.jdbc.core.simple.SimpleJdbcTemplate;
@@ -40,8 +42,9 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration()
-public class TradeJobFunctionalTests extends AbstractValidatingBatchLauncherTests {
+@ContextConfiguration(locations = { "/simple-job-launcher-context.xml", "/jobs/tradeJob.xml",
+		"/job-runner-context.xml" })
+public class TradeJobFunctionalTests {
 
 	private static final String GET_TRADES = "select ISIN, QUANTITY, PRICE, CUSTOMER, ID, VERSION from TRADE order by ISIN";
 	private static final String GET_CUSTOMERS = "select NAME, CREDIT from CUSTOMER order by NAME";
@@ -54,6 +57,9 @@ public class TradeJobFunctionalTests extends AbstractValidatingBatchLauncherTest
 	private Map<String, Double> credits = new HashMap<String, Double>();
 
 	@Autowired
+	private JobRunnerTestUtils jobRunnerUtils;
+
+	@Autowired
 	public void setDataSource(DataSource dataSource) {
 		this.simpleJdbcTemplate = new SimpleJdbcTemplate(dataSource);
 	}
@@ -61,7 +67,7 @@ public class TradeJobFunctionalTests extends AbstractValidatingBatchLauncherTest
 	@Before
 	public void onSetUp() throws Exception {
 		simpleJdbcTemplate.update("delete from TRADE");
-		List<Map<String, Object>> list = simpleJdbcTemplate.queryForList("select name, CREDIT from CUSTOMER");
+		List<Map<String, Object>> list = simpleJdbcTemplate.queryForList("select NAME, CREDIT from CUSTOMER");
 		for (Map<String, Object> map : list) {
 			credits.put((String) map.get("NAME"), ((Number) map.get("CREDIT")).doubleValue());
 		}
@@ -72,7 +78,10 @@ public class TradeJobFunctionalTests extends AbstractValidatingBatchLauncherTest
 		simpleJdbcTemplate.update("delete from TRADE");
 	}
 
-	protected void validatePostConditions() {
+	@Test
+	public void testLaunchJob() throws Exception {
+		
+		jobRunnerUtils.launchJob();
 		
 		customers = Arrays.asList(new Customer("customer1", (credits.get("customer1") - 98.34)),
 				new Customer("customer2", (credits.get("customer2") - 18.12 - 12.78)),
@@ -98,7 +107,7 @@ public class TradeJobFunctionalTests extends AbstractValidatingBatchLauncherTest
 			}
 		});
 		
-		assertTrue(trades.size() == activeRow);
+		assertEquals(activeRow, trades.size());
 		
 		// check content of the customer table
 		activeRow = 0;
@@ -126,32 +135,18 @@ public class TradeJobFunctionalTests extends AbstractValidatingBatchLauncherTest
 			this.credit = credit;
 		}
 		
-		public Customer(){
-		}
-		
 		/**
 		 * @return the credit
 		 */
 		public double getCredit() {
 			return credit;
 		}
-		/**
-		 * @param credit the credit to set
-		 */
-		public void setCredit(double credit) {
-			this.credit = credit;
-		}
+
 		/**
 		 * @return the name
 		 */
 		public String getName() {
 			return name;
-		}
-		/**
-		 * @param name the name to set
-		 */
-		public void setName(String name) {
-			this.name = name;
 		}
 
 		@Override

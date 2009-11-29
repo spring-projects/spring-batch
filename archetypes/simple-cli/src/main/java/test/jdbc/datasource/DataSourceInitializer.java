@@ -27,7 +27,6 @@ import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.BeanInitializationException;
 import org.springframework.beans.factory.DisposableBean;
 import org.springframework.beans.factory.InitializingBean;
-import org.springframework.context.support.ClassPathXmlApplicationContext;
 import org.springframework.core.io.Resource;
 import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -36,7 +35,6 @@ import org.springframework.transaction.TransactionStatus;
 import org.springframework.transaction.support.TransactionCallback;
 import org.springframework.transaction.support.TransactionTemplate;
 import org.springframework.util.Assert;
-import org.springframework.util.ClassUtils;
 import org.springframework.util.StringUtils;
 
 /**
@@ -65,16 +63,6 @@ public class DataSourceInitializer implements InitializingBean, DisposableBean {
 	private boolean ignoreFailedDrop = true;
 
 	private static boolean initialized = false;
-
-	/**
-	 * Main method as convenient entry point.
-	 * 
-	 * @param args
-	 */
-	public static void main(String... args) {
-		new ClassPathXmlApplicationContext(ClassUtils.addResourcePathToPackagePath(DataSourceInitializer.class,
-				DataSourceInitializer.class.getSimpleName() + "-context.xml"));
-	}
 
 	/**
 	 * @throws Throwable

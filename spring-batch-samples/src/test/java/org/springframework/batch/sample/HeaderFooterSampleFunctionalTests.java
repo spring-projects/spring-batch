@@ -1,22 +1,37 @@
 package org.springframework.batch.sample;
 
+import static org.junit.Assert.assertTrue;
+
 import java.io.BufferedReader;
 import java.io.FileReader;
 
-import static org.junit.Assert.*;
+import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.springframework.batch.test.JobRunnerTestUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.core.io.Resource;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration
-public class HeaderFooterSampleFunctionalTests extends AbstractValidatingBatchLauncherTests {
+@ContextConfiguration(locations = { "/simple-job-launcher-context.xml", "/jobs/headerFooterSample.xml", "/job-runner-context.xml" })
+public class HeaderFooterSampleFunctionalTests {
 
-	@Override
-	protected void validatePostConditions() throws Exception {
-		Resource input = (Resource) applicationContext.getBean("inputResource", Resource.class);
-		Resource output = (Resource) applicationContext.getBean("outputResource", Resource.class);
+	@Autowired
+	@Qualifier("inputResource")
+	private Resource input;
+	
+	@Autowired
+	@Qualifier("outputResource")
+	private Resource output;
+	
+	@Autowired
+	private JobRunnerTestUtils jobRunnerUtils;
+
+	@Test
+	public void testJob() throws Exception {
+		jobRunnerUtils.launchJob();
 
 		BufferedReader inputReader = new BufferedReader(new FileReader(input.getFile()));
 		BufferedReader outputReader = new BufferedReader(new FileReader(output.getFile()));

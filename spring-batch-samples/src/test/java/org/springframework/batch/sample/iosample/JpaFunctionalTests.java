@@ -7,8 +7,7 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(locations = { "/simple-job-launcher-context.xml", "/jobs/ioSampleJob.xml",
-		"/jobs/iosample/jpa.xml" })
+@ContextConfiguration(locations = "/jobs/iosample/jpa.xml")
 public class JpaFunctionalTests extends AbstractIoSampleTests {
 
 	@Override

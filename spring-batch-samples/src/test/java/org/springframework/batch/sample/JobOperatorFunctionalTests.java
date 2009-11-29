@@ -24,7 +24,7 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration
+@ContextConfiguration(locations = { "/simple-job-launcher-context.xml", "/jobs/infiniteLoopJob.xml" })
 public class JobOperatorFunctionalTests {
 
 	private static final Log logger = LogFactory.getLog(JobOperatorFunctionalTests.class);
@@ -40,8 +40,9 @@ public class JobOperatorFunctionalTests {
 
 	@Before
 	public void setUp() throws Exception {
-		if (!jobRegistry.getJobNames().contains(job.getName()))
+		if (!jobRegistry.getJobNames().contains(job.getName())) {
 			jobRegistry.register(new ReferenceJobFactory(job));
+		}
 	}
 
 	@Test
@@ -78,8 +79,10 @@ public class JobOperatorFunctionalTests {
 		Thread.sleep(1000);
 
 		Set<Long> runningExecutions = operator.getRunningExecutions(job.getName());
-		assertTrue("Wrong executions: "+runningExecutions+" expected: "+executionId, runningExecutions.contains(executionId));
-		assertTrue("Wrong summary: "+operator.getSummary(executionId), operator.getSummary(executionId).contains(BatchStatus.STARTED.toString()));
+		assertTrue("Wrong executions: " + runningExecutions + " expected: " + executionId, runningExecutions
+				.contains(executionId));
+		assertTrue("Wrong summary: " + operator.getSummary(executionId), operator.getSummary(executionId).contains(
+				BatchStatus.STARTED.toString()));
 
 		operator.stop(executionId);
 
@@ -91,8 +94,10 @@ public class JobOperatorFunctionalTests {
 		}
 
 		runningExecutions = operator.getRunningExecutions(job.getName());
-		assertFalse("Wrong executions: "+runningExecutions+" expected: "+executionId, runningExecutions.contains(executionId));
-		assertTrue("Wrong summary: "+operator.getSummary(executionId), operator.getSummary(executionId).contains(BatchStatus.STOPPED.toString()));
+		assertFalse("Wrong executions: " + runningExecutions + " expected: " + executionId, runningExecutions
+				.contains(executionId));
+		assertTrue("Wrong summary: " + operator.getSummary(executionId), operator.getSummary(executionId).contains(
+				BatchStatus.STOPPED.toString()));
 
 		// there is just a single step in the test job
 		Map<Long, String> summaries = operator.getStepExecutionSummaries(executionId);
@@ -113,17 +118,19 @@ public class JobOperatorFunctionalTests {
 
 		assertTrue(exec1 != exec2);
 		assertTrue(operator.getParameters(exec1) != operator.getParameters(exec2));
-		
+
 		Set<Long> executions = operator.getRunningExecutions(jobName);
 		assertTrue(executions.contains(exec1));
 		assertTrue(executions.contains(exec2));
 		int count = 0;
-		boolean running = operator.getSummary(exec1).contains("STARTED") && operator.getSummary(exec2).contains("STARTED");
-		while (count++<10 && !running) {
+		boolean running = operator.getSummary(exec1).contains("STARTED")
+				&& operator.getSummary(exec2).contains("STARTED");
+		while (count++ < 10 && !running) {
 			Thread.sleep(100L);
-			running = operator.getSummary(exec1).contains("STARTED") && operator.getSummary(exec2).contains("STARTED");			
+			running = operator.getSummary(exec1).contains("STARTED") && operator.getSummary(exec2).contains("STARTED");
 		}
-		assertTrue(String.format("Jobs not started: [%s] and [%s]",operator.getSummary(exec1),operator.getSummary(exec1)), running);
+		assertTrue(String.format("Jobs not started: [%s] and [%s]", operator.getSummary(exec1), operator
+				.getSummary(exec1)), running);
 
 		operator.stop(exec1);
 		operator.stop(exec2);

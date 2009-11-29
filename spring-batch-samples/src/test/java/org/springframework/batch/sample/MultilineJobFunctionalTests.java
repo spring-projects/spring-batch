@@ -19,7 +19,10 @@ package org.springframework.batch.sample;
 import static org.junit.Assert.assertEquals;
 
 import org.apache.commons.io.IOUtils;
+import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.springframework.batch.test.JobRunnerTestUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
 import org.springframework.test.context.ContextConfiguration;
@@ -27,9 +30,13 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.util.StringUtils;
 
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration()
-public class MultilineJobFunctionalTests extends AbstractValidatingBatchLauncherTests {
+@ContextConfiguration(locations = { "/simple-job-launcher-context.xml", "/jobs/multilineJob.xml",
+		"/job-runner-context.xml" })
+public class MultilineJobFunctionalTests {
 
+	@Autowired
+	private JobRunnerTestUtils jobRunnerUtils;
+	
 	// The output is grouped together in two lines, instead of all the
 	// trades coming out on a single line.
 	private static final String EXPECTED_RESULT = "[Trade: [isin=UK21341EAH45,quantity=978,price=98.34,customer=customer1], Trade: [isin=UK21341EAH46,quantity=112,price=18.12,customer=customer2]]"
@@ -37,7 +44,9 @@ public class MultilineJobFunctionalTests extends AbstractValidatingBatchLauncher
 
 	private Resource output = new FileSystemResource("target/test-outputs/20070122.testStream.multilineStep.txt");
 
-	protected void validatePostConditions() throws Exception {
+	@Test
+	public void testJobLaunch() throws Exception {
+		jobRunnerUtils.launchJob();
 		assertEquals(EXPECTED_RESULT, StringUtils.replace(IOUtils.toString(output.getInputStream()), System
 				.getProperty("line.separator"), ""));
 	}

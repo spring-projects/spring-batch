@@ -16,17 +16,27 @@
 
 package org.springframework.batch.sample;
 
+import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.springframework.batch.test.JobRunnerTestUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
-
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration()
-public class BeanWrapperMapperSampleJobFunctionalTests extends AbstractValidatingBatchLauncherTests {
+@ContextConfiguration(locations = { "/simple-job-launcher-context.xml", "/jobs/beanWrapperMapperSampleJob.xml",
+		"/job-runner-context.xml" })
+public class BeanWrapperMapperSampleJobFunctionalTests {
 	
-	protected void validatePostConditions() {
-		// nothing to check, the job writes no output
+	@Autowired
+	private JobRunnerTestUtils jobRunnerUtils;
+
+	@Test
+	public void testJobLaunch() throws Exception {
+
+		jobRunnerUtils.launchJob();
+
 	}
+	
 
 }

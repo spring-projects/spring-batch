@@ -16,14 +16,19 @@
 
 package org.springframework.batch.sample;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.batch.core.BatchStatus;
 import org.springframework.batch.core.JobExecution;
-import org.springframework.batch.core.JobParameters;
 import org.springframework.batch.core.launch.JobOperator;
+import org.springframework.batch.test.JobRunnerTestUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
@@ -36,22 +41,22 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
  *
  */
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration()
-public class DatabaseShutdownFunctionalTests extends AbstractBatchLauncherTests {
+@ContextConfiguration(locations = { "/simple-job-launcher-context.xml", "/jobs/infiniteLoopJob.xml", "/job-runner-context.xml" })
+public class DatabaseShutdownFunctionalTests {
 	
+	/** Logger */
+	protected final Log logger = LogFactory.getLog(getClass());
+
+	@Autowired
 	private JobOperator jobOperator;
 	
 	@Autowired
-	public void setJobOperator(JobOperator jobOperator) {
-		this.jobOperator = jobOperator;
-	}
-	
+	private JobRunnerTestUtils jobRunnerUtils;
+		
 	@Test
 	public void testLaunchJob() throws Exception {
 
-		final JobParameters jobParameters = new JobParameters();
-		
-		JobExecution jobExecution = getLauncher().run(getJob(), jobParameters);
+		JobExecution jobExecution = jobRunnerUtils.launchJob();
 		
 		Thread.sleep(1000);
 

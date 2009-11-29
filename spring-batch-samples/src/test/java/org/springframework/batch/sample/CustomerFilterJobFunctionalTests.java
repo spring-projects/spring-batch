@@ -32,7 +32,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.batch.core.JobExecution;
-import org.springframework.batch.test.AbstractJobTests;
+import org.springframework.batch.test.JobRunnerTestUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.RowCallbackHandler;
 import org.springframework.jdbc.core.simple.SimpleJdbcTemplate;
@@ -40,8 +40,8 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration
-public class CustomerFilterJobFunctionalTests extends AbstractJobTests {
+@ContextConfiguration(locations = { "/simple-job-launcher-context.xml", "/jobs/customerFilterJob.xml", "/job-runner-context.xml" })
+public class CustomerFilterJobFunctionalTests {
 
 	private static final String GET_CUSTOMERS = "select NAME, CREDIT from CUSTOMER order by NAME";
 
@@ -50,6 +50,9 @@ public class CustomerFilterJobFunctionalTests extends AbstractJobTests {
 
 	private SimpleJdbcTemplate simpleJdbcTemplate;
 	private Map<String, Double> credits = new HashMap<String, Double>();
+
+	@Autowired
+	private JobRunnerTestUtils jobRunnerUtils;
 
 	@Autowired
 	public void setDataSource(DataSource dataSource) {
@@ -76,7 +79,7 @@ public class CustomerFilterJobFunctionalTests extends AbstractJobTests {
 	@Test
 	public void testFilterJob() throws Exception {
 
-		JobExecution jobExecution = this.launchJob();
+		JobExecution jobExecution = jobRunnerUtils.launchJob();
 
 		customers = Arrays.asList(new Customer("customer1", (credits.get("customer1"))), new Customer("customer2",
 				(credits.get("customer2"))), new Customer("customer3", 100500), new Customer("customer4", credits

@@ -12,6 +12,7 @@ import org.springframework.batch.test.sample.SampleTasklet;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.jdbc.core.simple.SimpleJdbcTemplate;
+import org.springframework.test.context.ContextConfiguration;
 
 /**
  * This is an abstract test class to be used by test classes to test the
@@ -20,9 +21,13 @@ import org.springframework.jdbc.core.simple.SimpleJdbcTemplate;
  * @author Dan Garrette
  * @since 2.0
  */
-public abstract class AbstractSampleJobTests extends AbstractJobTests {
+@ContextConfiguration(locations = { "/simple-job-launcher-context.xml", "/job-runner-context.xml" })
+public abstract class AbstractSampleJobTests {
 
 	private SimpleJdbcTemplate jdbcTemplate;
+
+	@Autowired
+	private JobRunnerTestUtils jobRunnerUtils;
 
 	@Autowired
 	@Qualifier("tasklet2")
@@ -46,25 +51,25 @@ public abstract class AbstractSampleJobTests extends AbstractJobTests {
 
 	@Test
 	public void testJob() throws Exception {
-		assertEquals(BatchStatus.COMPLETED, this.launchJob().getStatus());
+		assertEquals(BatchStatus.COMPLETED, jobRunnerUtils.launchJob().getStatus());
 		this.verifyTasklet(1);
 		this.verifyTasklet(2);
 	}
 
 	@Test(expected = IllegalStateException.class)
 	public void testNonExistentStep() {
-		launchStep("nonExistent");
+		jobRunnerUtils.launchStep("nonExistent");
 	}
 
 	@Test
 	public void testStep1Execution() {
-		assertEquals(BatchStatus.COMPLETED, this.launchStep("step1").getStatus());
+		assertEquals(BatchStatus.COMPLETED, jobRunnerUtils.launchStep("step1").getStatus());
 		this.verifyTasklet(1);
 	}
 
 	@Test
 	public void testStep2Execution() {
-		assertEquals(BatchStatus.COMPLETED, this.launchStep("step2").getStatus());
+		assertEquals(BatchStatus.COMPLETED, jobRunnerUtils.launchStep("step2").getStatus());
 		this.verifyTasklet(2);
 	}
 
@@ -72,7 +77,7 @@ public abstract class AbstractSampleJobTests extends AbstractJobTests {
 	public void testStepLaunchJobContextEntry() {
 		ExecutionContext jobContext = new ExecutionContext();
 		jobContext.put("key1", "value1");
-		assertEquals(BatchStatus.COMPLETED, this.launchStep("step2", jobContext).getStatus());
+		assertEquals(BatchStatus.COMPLETED, jobRunnerUtils.launchStep("step2", jobContext).getStatus());
 		this.verifyTasklet(2);
 		assertTrue(tasklet2.jobContextEntryFound);
 	}

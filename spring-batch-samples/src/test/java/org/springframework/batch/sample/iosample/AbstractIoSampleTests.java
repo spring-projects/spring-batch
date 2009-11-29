@@ -1,20 +1,23 @@
 package org.springframework.batch.sample.iosample;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+
 import java.util.ArrayList;
 import java.util.List;
-
-import static org.junit.Assert.*;
 
 import org.junit.Test;
 import org.springframework.batch.core.BatchStatus;
 import org.springframework.batch.core.JobExecution;
+import org.springframework.batch.core.JobParameters;
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.ItemStream;
 import org.springframework.batch.sample.domain.trade.CustomerCredit;
 import org.springframework.batch.sample.domain.trade.internal.CustomerCreditIncreaseProcessor;
-import org.springframework.batch.test.AbstractJobTests;
+import org.springframework.batch.test.JobRunnerTestUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.test.context.ContextConfiguration;
 
 /**
  * Base class for IoSample tests that increase input customer credit by fixed
@@ -23,7 +26,11 @@ import org.springframework.beans.factory.annotation.Autowired;
  * 
  * @author Robert Kasanicky
  */
-public abstract class AbstractIoSampleTests extends AbstractJobTests {
+@ContextConfiguration(locations = { "/simple-job-launcher-context.xml", "/job-runner-context.xml", "/jobs/ioSampleJob.xml" })
+public abstract class AbstractIoSampleTests {
+
+	@Autowired
+	private JobRunnerTestUtils jobRunnerUtils;
 
 	@Autowired
 	private ItemReader<CustomerCredit> reader;
@@ -39,7 +46,7 @@ public abstract class AbstractIoSampleTests extends AbstractJobTests {
 		List<CustomerCredit> inputs = getCredits(reader);
 		close(reader);
 
-		JobExecution jobExecution = this.launchJob();
+		JobExecution jobExecution = jobRunnerUtils.launchJob(getUniqueJobParameters());
 		assertEquals(BatchStatus.COMPLETED, jobExecution.getStatus());
 
 		pointReaderToOutput(reader);
@@ -50,12 +57,16 @@ public abstract class AbstractIoSampleTests extends AbstractJobTests {
 		assertEquals(inputs.size(), outputs.size());
 		int itemCount = inputs.size();
 		assertTrue(itemCount > 0);
-		
+
 		for (int i = 0; i < itemCount; i++) {
 			assertEquals(inputs.get(i).getCredit().add(CustomerCreditIncreaseProcessor.FIXED_AMOUNT).intValue(),
 					outputs.get(i).getCredit().intValue());
 		}
 
+	}
+
+	protected JobParameters getUniqueJobParameters() {
+		return jobRunnerUtils.getUniqueJobParameters();
 	}
 
 	/**

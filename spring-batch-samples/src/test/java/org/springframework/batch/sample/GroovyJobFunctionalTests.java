@@ -26,30 +26,29 @@ import org.apache.commons.io.FileUtils;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.springframework.batch.test.JobRunnerTestUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
-
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration()
-public class GroovyJobFunctionalTests extends AbstractValidatingBatchLauncherTests {
-	
+@ContextConfiguration(locations = { "/simple-job-launcher-context.xml", "/jobs/groovyJob.xml",
+		"/job-runner-context.xml" })
+public class GroovyJobFunctionalTests {
+
+	@Autowired
+	private JobRunnerTestUtils jobRunnerUtils;
+
 	@Before
 	public void removeOldData() throws IOException {
 		FileUtils.deleteDirectory(new File("target/groovyJob"));
 	}
 
 	@Test
-	public void testLaunchJob() throws Exception{
-		super.testLaunchJob();
+	public void testLaunchJob() throws Exception {
+		assertFalse(new File("target/groovyJob/output/files.zip").exists());
+		jobRunnerUtils.launchJob();
+		assertTrue(new File("target/groovyJob/output/files.zip").exists());
 	}
 
-	protected void validatePostConditions() {
-		assertTrue(new File("target/groovyJob/output/files.zip").exists());		
-	}
-
-	protected void validatePreConditions() {
-		assertFalse(new File("target/groovyJob/output/files.zip").exists());		
-	}
-	
 }

@@ -17,8 +17,10 @@ package org.springframework.batch.sample;
 
 import static org.junit.Assert.assertEquals;
 
+import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.batch.sample.domain.trade.internal.ItemTrackingTradeItemWriter;
+import org.springframework.batch.test.JobRunnerTestUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
@@ -30,13 +32,19 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
  * @since 2.0
  */
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(locations = { "/simple-job-launcher-context.xml", "/jobs/loopFlowSample.xml" })
-public class LoopFlowSampleFunctionalTests extends AbstractValidatingBatchLauncherTests {
+@ContextConfiguration(locations = { "/simple-job-launcher-context.xml", "/jobs/loopFlowSample.xml",
+		"/job-runner-context.xml" })
+public class LoopFlowSampleFunctionalTests {
 
 	@Autowired
 	private ItemTrackingTradeItemWriter itemWriter;
 
-	protected void validatePostConditions() throws Exception {
+	@Autowired
+	private JobRunnerTestUtils jobRunnerUtils;
+	
+	@Test
+	public void testJobLaunch() throws Exception {
+		jobRunnerUtils.launchJob();
 		// items processed = items read + 2 exceptions
 		assertEquals(10, itemWriter.getItems().size());
 	}

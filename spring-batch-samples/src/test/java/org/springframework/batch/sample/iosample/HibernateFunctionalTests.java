@@ -7,8 +7,7 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(locations = { "/simple-job-launcher-context.xml", "/hibernate-context.xml",
-		"/jobs/ioSampleJob.xml", "/jobs/iosample/hibernate.xml" })
+@ContextConfiguration(locations = { "/hibernate-context.xml", "/jobs/iosample/hibernate.xml" })
 public class HibernateFunctionalTests extends AbstractIoSampleTests {
 
 	@Override

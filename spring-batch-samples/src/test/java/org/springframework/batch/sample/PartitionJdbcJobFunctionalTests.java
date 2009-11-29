@@ -33,19 +33,32 @@ import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.ItemStream;
 import org.springframework.batch.sample.domain.trade.CustomerCredit;
 import org.springframework.batch.sample.domain.trade.internal.CustomerCreditIncreaseProcessor;
-import org.springframework.batch.test.AbstractJobTests;
+import org.springframework.batch.test.JobRunnerTestUtils;
+import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.ApplicationContextAware;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration()
-public class PartitionJdbcJobFunctionalTests extends AbstractJobTests {
+@ContextConfiguration(locations = { "/simple-job-launcher-context.xml", "/jobs/partitionFileJob.xml",
+		"/job-runner-context.xml" })
+public class PartitionJdbcJobFunctionalTests implements ApplicationContextAware {
 
 	@Autowired
 	@Qualifier("inputTestReader")
 	private ItemReader<CustomerCredit> inputReader;
+
+	@Autowired
+	private JobRunnerTestUtils jobRunnerUtils;
+
+	private ApplicationContext applicationContext;
+
+	public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
+		this.applicationContext = applicationContext;
+	}
 
 	/**
 	 * Check the resulting credits correspond to inputs increased by fixed
@@ -54,18 +67,19 @@ public class PartitionJdbcJobFunctionalTests extends AbstractJobTests {
 	@Test
 	public void testUpdateCredit() throws Exception {
 
-		assertTrue("Define a prototype bean called 'outputTestReader' to check the output", getApplicationContext()
+		assertTrue("Define a prototype bean called 'outputTestReader' to check the output", applicationContext
 				.containsBeanDefinition("outputTestReader"));
 
 		open(inputReader);
 		List<CustomerCredit> inputs = new ArrayList<CustomerCredit>(getCredits(inputReader));
 		close(inputReader);
 
-		JobExecution jobExecution = this.launchJob();
+		JobExecution jobExecution = jobRunnerUtils.launchJob();
 		assertEquals(BatchStatus.COMPLETED, jobExecution.getStatus());
 
 		@SuppressWarnings("unchecked")
-		ItemReader<CustomerCredit> outputReader = (ItemReader<CustomerCredit>) getApplicationContext().getBean("outputTestReader");
+		ItemReader<CustomerCredit> outputReader = (ItemReader<CustomerCredit>) applicationContext
+				.getBean("outputTestReader");
 		open(outputReader);
 		List<CustomerCredit> outputs = new ArrayList<CustomerCredit>(getCredits(outputReader));
 		close(outputReader);

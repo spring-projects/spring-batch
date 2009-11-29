@@ -33,91 +33,100 @@ import org.springframework.batch.core.job.flow.FlowJob;
 import org.springframework.batch.core.launch.JobLauncher;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.item.ExecutionContext;
-import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
-import org.springframework.context.ApplicationContextAware;
 
 /**
  * <p>
- * Base class for testing batch jobs. It provides methods for launching an
+ * Utility class for testing batch jobs. It provides methods for launching an
  * entire {@link AbstractJob}, allowing for end to end testing of individual
- * steps, without having to run every step in the job. Any test classes
- * inheriting from this class should make sure they are part of an
- * {@link ApplicationContext}, which is generally expected to be done as part of
- * the Spring test framework. Furthermore, the {@link ApplicationContext} in
- * which it is a part of is expected to have one {@link JobLauncher},
- * {@link JobRepository}, and a single {@link AbstractJob} implementation.
+ * steps, without having to run every step in the job. Any test classes using
+ * this utility can set up an instance in the {@link ApplicationContext} as part
+ * of the Spring test framework.
+ * </p>
  * 
  * <p>
  * This class also provides the ability to run {@link Step}s from a
  * {@link FlowJob} or {@link SimpleJob} individually. By launching {@link Step}s
  * within a {@link Job} on their own, end to end testing of individual steps can
  * be performed without having to run every step in the job.
+ * </p>
  * 
  * <p>
  * It should be noted that using any of the methods that don't contain
  * {@link JobParameters} in their signature, will result in one being created
  * with the current system time as a parameter. This will ensure restartability
  * when no parameters are provided.
+ * </p>
  * 
  * @author Lucas Ward
  * @author Dan Garrette
- * @since 2.0
- * 
- * @deprecated (from 2.1) use {@link JobRunnerTestUtils} instead
+ * @author Dave Syer
+ * @since 2.1
  */
-public abstract class AbstractJobTests implements ApplicationContextAware {
+public class JobRunnerTestUtils {
 
 	/** Logger */
 	protected final Log logger = LogFactory.getLog(getClass());
 
-	@Autowired
-	private JobLauncher launcher;
+	private JobLauncher jobLauncher;
 
-	@Autowired
 	private AbstractJob job;
 
-	@Autowired
 	private JobRepository jobRepository;
 
 	private StepRunner stepRunner;
 
-	private ApplicationContext applicationContext;
-
 	/**
-	 * {@inheritDoc}
+	 * The Job instance that can be manipulated (e.g. launched) in this utility.
+	 * 
+	 * @param job the {@link AbstractJob} to use
 	 */
-	public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
-		this.applicationContext = applicationContext;
+	@Autowired
+	public void setJob(AbstractJob job) {
+		this.job = job;
 	}
 
 	/**
-	 * @return the applicationContext
+	 * The {@link JobRepository} to use for creating new {@link JobExecution}
+	 * instances.
+	 * 
+	 * @param jobRepository a {@link JobRepository}
 	 */
-	protected ApplicationContext getApplicationContext() {
-		return applicationContext;
+	@Autowired
+	public void setJobRepository(JobRepository jobRepository) {
+		this.jobRepository = jobRepository;
 	}
 
 	/**
-	 * @return the job repository which is autowired by type
+	 * @return the job repository
 	 */
 	public JobRepository getJobRepository() {
 		return jobRepository;
 	}
 
 	/**
-	 * @return the job which is autowired by type
+	 * @return the job
 	 */
 	public AbstractJob getJob() {
 		return job;
 	}
+	
+	/**
+	 * A {@link JobLauncher} instance that can be used to launch jobs.
+	 * 
+	 * @param jobLauncher a job launcher
+	 */
+	@Autowired
+	public void setJobLauncher(JobLauncher jobLauncher) {
+		this.jobLauncher = jobLauncher;
+	}
 
 	/**
-	 * @return the launcher
+	 * @return the job launcher
 	 */
-	protected JobLauncher getJobLauncher() {
-		return launcher;
+	public JobLauncher getJobLauncher() {
+		return jobLauncher;
 	}
 
 	/**
@@ -126,7 +135,7 @@ public abstract class AbstractJobTests implements ApplicationContextAware {
 	 * @return JobExecution, so that the test can validate the exit status
 	 * @throws Exception
 	 */
-	protected JobExecution launchJob() throws Exception {
+	public JobExecution launchJob() throws Exception {
 		return this.launchJob(this.getUniqueJobParameters());
 	}
 
@@ -137,7 +146,7 @@ public abstract class AbstractJobTests implements ApplicationContextAware {
 	 * @return JobExecution, so that the test can validate the exit status
 	 * @throws Exception
 	 */
-	protected JobExecution launchJob(JobParameters jobParameters) throws Exception {
+	public JobExecution launchJob(JobParameters jobParameters) throws Exception {
 		return getJobLauncher().run(this.job, jobParameters);
 	}
 
@@ -145,7 +154,7 @@ public abstract class AbstractJobTests implements ApplicationContextAware {
 	 * @return a new JobParameters object containing only a parameter for the
 	 * current timestamp, to ensure that the job instance will be unique.
 	 */
-	protected JobParameters getUniqueJobParameters() {
+	public JobParameters getUniqueJobParameters() {
 		Map<String, JobParameter> parameters = new HashMap<String, JobParameter>();
 		parameters.put("timestamp", new JobParameter(new Date().getTime()));
 		return new JobParameters(parameters);

@@ -20,12 +20,16 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.batch.core.BatchStatus;
 import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.JobParameters;
 import org.springframework.batch.core.JobParametersBuilder;
+import org.springframework.batch.test.JobRunnerTestUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
@@ -37,17 +41,22 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
  * 
  */
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration()
-public class GracefulShutdownFunctionalTests extends AbstractBatchLauncherTests {
+@ContextConfiguration(locations = { "/simple-job-launcher-context.xml", "/jobs/infiniteLoopJob.xml", "/job-runner-context.xml" })
+public class GracefulShutdownFunctionalTests {
+
+	/** Logger */
+	private final Log logger = LogFactory.getLog(getClass());
+
+	@Autowired
+	private JobRunnerTestUtils jobRunnerUtils;
 
 	@Test
-	@Override
 	public void testLaunchJob() throws Exception {
 
 		final JobParameters jobParameters = new JobParametersBuilder().addLong("timestamp", System.currentTimeMillis())
 				.toJobParameters();
 
-		JobExecution jobExecution = getLauncher().run(getJob(), jobParameters);
+		JobExecution jobExecution = jobRunnerUtils.launchJob(jobParameters);
 
 		Thread.sleep(1000);
 

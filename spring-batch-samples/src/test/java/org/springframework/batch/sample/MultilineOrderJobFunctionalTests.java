@@ -20,22 +20,27 @@ import static org.springframework.batch.test.AssertFile.assertFileEquals;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.springframework.batch.test.AbstractJobTests;
+import org.springframework.batch.test.JobRunnerTestUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration()
-public class MultilineOrderJobFunctionalTests extends AbstractJobTests {
+@ContextConfiguration(locations = { "/simple-job-launcher-context.xml", "/jobs/multilineOrderJob.xml",
+		"/job-runner-context.xml" })
+public class MultilineOrderJobFunctionalTests {
 
 	private static final String ACTUAL = "target/test-outputs/multilineOrderOutput.txt";
 	private static final String EXPECTED = "data/multilineOrderJob/result/multilineOrderOutput.txt";
 
+	@Autowired
+	private JobRunnerTestUtils jobRunnerUtils;
+	
 	@Test
-	public void testJob() throws Exception {
-		this.launchJob();
+	public void testJobLaunch() throws Exception {
+		jobRunnerUtils.launchJob();
 		assertFileEquals(new ClassPathResource(EXPECTED), new FileSystemResource(ACTUAL));
 	}
 

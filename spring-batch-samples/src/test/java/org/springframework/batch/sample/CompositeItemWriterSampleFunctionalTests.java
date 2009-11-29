@@ -13,8 +13,10 @@ import java.util.List;
 import javax.sql.DataSource;
 
 import org.apache.commons.io.IOUtils;
+import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.batch.sample.domain.trade.Trade;
+import org.springframework.batch.test.JobRunnerTestUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.RowCallbackHandler;
 import org.springframework.jdbc.core.simple.SimpleJdbcTemplate;
@@ -22,8 +24,8 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration()
-public class CompositeItemWriterSampleFunctionalTests extends AbstractValidatingBatchLauncherTests {
+@ContextConfiguration(locations = { "/simple-job-launcher-context.xml", "/jobs/compositeItemWriterSampleJob.xml", "/job-runner-context.xml" })
+public class CompositeItemWriterSampleFunctionalTests {
 
 	private static final String GET_TRADES = "SELECT isin, quantity, price, customer FROM TRADE order by isin";
 
@@ -35,29 +37,29 @@ public class CompositeItemWriterSampleFunctionalTests extends AbstractValidating
 
 	private SimpleJdbcTemplate simpleJdbcTemplate;
 
-	private int activeRow = 0;
-
-	private int before;
+	@Autowired
+	private JobRunnerTestUtils jobRunnerUtils;
 
 	@Autowired
 	public void setDataSource(DataSource dataSource) {
 		this.simpleJdbcTemplate = new SimpleJdbcTemplate(dataSource);
 	}
 
-	@Override
-	protected void validatePreConditions() throws Exception {
-		simpleJdbcTemplate.update("DELETE from TRADE");
-		before = simpleJdbcTemplate.queryForInt("SELECT COUNT(*) from TRADE");
-	}
+	@Test
+	public void testJobLaunch() throws Exception {
 
-	@Override
-	protected void validatePostConditions() throws Exception {
+		simpleJdbcTemplate.update("DELETE from TRADE");
+		int before = simpleJdbcTemplate.queryForInt("SELECT COUNT(*) from TRADE");
+
+		jobRunnerUtils.launchJob();
+
 		checkOutputFile("target/test-outputs/CustomerReport1.txt");
 		checkOutputFile("target/test-outputs/CustomerReport2.txt");
-		checkOutputTable();
+		checkOutputTable(before);
+
 	}
 
-	private void checkOutputTable() {
+	private void checkOutputTable(int before) {
 		final List<Trade> trades = new ArrayList<Trade>() {
 			{
 				add(new Trade("UK21341EAH41", 211, new BigDecimal("31.11"), "customer1"));
@@ -71,8 +73,10 @@ public class CompositeItemWriterSampleFunctionalTests extends AbstractValidating
 		int after = simpleJdbcTemplate.queryForInt("SELECT COUNT(*) from TRADE");
 
 		assertEquals(before + 5, after);
+		
 
 		simpleJdbcTemplate.getJdbcOperations().query(GET_TRADES, new RowCallbackHandler() {
+			private int activeRow = 0;
 			public void processRow(ResultSet rs) throws SQLException {
 				Trade trade = trades.get(activeRow++);
 

@@ -29,8 +29,7 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
  * @since 2.0
  */
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(locations = { "/simple-job-launcher-context.xml", "/jobs/ioSampleJob.xml",
-		"/jobs/iosample/jdbcPaging.xml" })
+@ContextConfiguration(locations = "/jobs/iosample/jdbcPaging.xml")
 public class JdbcPagingFunctionalTests extends AbstractIoSampleTests {
 
 	@Override

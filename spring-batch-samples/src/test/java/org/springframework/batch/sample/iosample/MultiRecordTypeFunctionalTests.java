@@ -18,8 +18,9 @@ package org.springframework.batch.sample.iosample;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.springframework.batch.test.AbstractJobTests;
 import org.springframework.batch.test.AssertFile;
+import org.springframework.batch.test.JobRunnerTestUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
@@ -29,19 +30,23 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
  * @since 2.0
  */
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(locations = { "/simple-job-launcher-context.xml", "/jobs/iosample/multiRecordType.xml" })
-public class MultiRecordTypeFunctionalTests extends AbstractJobTests {
+@ContextConfiguration(locations = { "/simple-job-launcher-context.xml", "/jobs/iosample/multiRecordType.xml",
+		"/job-runner-context.xml" })
+public class MultiRecordTypeFunctionalTests {
 
 	private static final String OUTPUT_FILE = "target/test-outputs/multiRecordTypeOutput.txt";
 
 	private static final String INPUT_FILE = "src/main/resources/data/iosample/input/multiRecordType.txt";
+
+	@Autowired
+	private JobRunnerTestUtils jobRunnerUtils;
 
 	/**
 	 * Output should be the same as input
 	 */
 	@Test
 	public void testJob() throws Exception {
-		this.launchJob();
+		jobRunnerUtils.launchJob();
 		AssertFile.assertFileEquals(new FileSystemResource(INPUT_FILE), new FileSystemResource(OUTPUT_FILE));
 	}
 }

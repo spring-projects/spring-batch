@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <beansProjectDescription>
 	<version>1</version>
-	<pluginVersion><![CDATA[2.2.7.200910202224-RELEASE]]></pluginVersion>
+	<pluginVersion><![CDATA[2.2.8.200911091054-RELEASE]]></pluginVersion>
 	<configSuffixes>
 		<configSuffix><![CDATA[xml]]></configSuffix>
 	</configSuffixes>
@@ -45,37 +45,22 @@
 		<config>src/main/resources/jobs/hibernateJob.xml</config>
 		<config>src/main/resources/jobs/iosample/jpa.xml</config>
 		<config>src/main/resources/jobs/iosample/ibatis.xml</config>
-		<config>src/test/resources/org/springframework/batch/sample/JobOperatorFunctionalTests-context.xml</config>
-		<config>src/test/resources/org/springframework/batch/sample/BeanWrapperMapperSampleJobFunctionalTests-context.xml</config>
-		<config>src/test/resources/org/springframework/batch/sample/CompositeItemWriterSampleFunctionalTests-context.xml</config>
-		<config>src/test/resources/org/springframework/batch/sample/CustomerFilterJobFunctionalTests-context.xml</config>
-		<config>src/test/resources/org/springframework/batch/sample/DatabaseShutdownFunctionalTests-context.xml</config>
-		<config>src/test/resources/org/springframework/batch/sample/DelegatingJobFunctionalTests-context.xml</config>
-		<config>src/test/resources/org/springframework/batch/sample/FootballJobFunctionalTests-context.xml</config>
-		<config>src/test/resources/org/springframework/batch/sample/GracefulShutdownFunctionalTests-context.xml</config>
-		<config>src/test/resources/org/springframework/batch/sample/HeaderFooterSampleFunctionalTests-context.xml</config>
-		<config>src/test/resources/org/springframework/batch/sample/HibernateFailureJobFunctionalTests-context.xml</config>
 		<config>src/test/resources/org/springframework/batch/sample/domain/trade/internal/JdbcCustomerDebitDaoTests-context.xml</config>
 		<config>src/main/resources/jobs/loopFlowSample.xml</config>
-		<config>src/test/resources/org/springframework/batch/sample/MultilineJobFunctionalTests-context.xml</config>
-		<config>src/test/resources/org/springframework/batch/sample/MultilineOrderJobFunctionalTests-context.xml</config>
-		<config>src/test/resources/org/springframework/batch/sample/ParallelJobFunctionalTests-context.xml</config>
-		<config>src/test/resources/org/springframework/batch/sample/RestartFunctionalTests-context.xml</config>
-		<config>src/test/resources/org/springframework/batch/sample/RetrySampleFunctionalTests-context.xml</config>
 		<config>src/test/resources/org/springframework/batch/sample/common/StagingItemReaderTests-context.xml</config>
 		<config>src/test/resources/org/springframework/batch/sample/common/StagingItemWriterTests-context.xml</config>
-		<config>src/test/resources/org/springframework/batch/sample/TradeJobFunctionalTests-context.xml</config>
 		<config>src/main/resources/jobs/multilineOrderValidator.xml</config>
 		<config>src/main/resources/jobs/restartFileSampleJob.xml</config>
 		<config>src/main/resources/jobs/taskletJob.xml</config>
 		<config>src/main/resources/org/springframework/batch/sample/football-job-context.xml</config>
 		<config>src/main/resources/jobs/groovyJob.xml</config>
 		<config>src/main/resources/jobs/iosample/jdbcPaging.xml</config>
-		<config>src/test/resources/org/springframework/batch/sample/GroovyJobFunctionalTests-context.xml</config>
-		<config>src/test/resources/org/springframework/batch/sample/TaskletJobFunctionalTests-context.xml</config>
 		<config>src/main/resources/jobs/partitionJdbcJob.xml</config>
 		<config>src/main/resources/jobs/jobStepSample.xml</config>
 		<config>src/main/resources/jobs/partitionFileJob.xml</config>
+		<config>src/test/resources/org/springframework/batch/sample/common/ColumnRangePartitionerTests-context.xml</config>
+		<config>src/test/resources/job-runner-context.xml</config>
+		<config>src/test/resources/org/springframework/batch/sample/JobStepFunctionalTests-context.xml</config>
 	</configs>
 	<configSets>
 		<configSet>

@@ -23,22 +23,23 @@ import org.junit.runner.RunWith;
 import org.springframework.batch.core.BatchStatus;
 import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.JobParametersBuilder;
+import org.springframework.batch.test.JobRunnerTestUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration()
-public class TaskletJobFunctionalTests extends AbstractValidatingBatchLauncherTests {
+@ContextConfiguration(locations = { "/simple-job-launcher-context.xml", "/jobs/taskletJob.xml",
+		"/job-runner-context.xml" })
+public class TaskletJobFunctionalTests {
+
+	@Autowired
+	private JobRunnerTestUtils jobRunnerUtils;
 
 	@Test
 	public void testLaunchJob() throws Exception {
-		setJobParameters(new JobParametersBuilder().addString("value", "foo").toJobParameters());
-		super.testLaunchJob();
-	}
-
-	@Override
-	protected void validatePostConditions() throws Exception {
-		JobExecution jobExecution = getJobExecution();
+		JobExecution jobExecution = jobRunnerUtils.launchJob(new JobParametersBuilder().addString("value", "foo")
+				.toJobParameters());
 		assertEquals(BatchStatus.COMPLETED, jobExecution.getStatus());
 	}
 

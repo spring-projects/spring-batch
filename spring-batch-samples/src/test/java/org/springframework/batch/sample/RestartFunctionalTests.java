@@ -26,6 +26,7 @@ import org.springframework.batch.core.BatchStatus;
 import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.converter.DefaultJobParametersConverter;
 import org.springframework.batch.support.PropertiesConverter;
+import org.springframework.batch.test.JobRunnerTestUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.simple.SimpleJdbcTemplate;
 import org.springframework.test.context.ContextConfiguration;
@@ -39,8 +40,12 @@ import org.springframework.test.context.transaction.BeforeTransaction;
  * @author Dave Syer
  */
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration()
-public class RestartFunctionalTests extends AbstractBatchLauncherTests {
+@ContextConfiguration(locations = { "/simple-job-launcher-context.xml", "/jobs/restartSample.xml",
+		"/job-runner-context.xml" })
+public class RestartFunctionalTests {
+
+	@Autowired
+	private JobRunnerTestUtils jobRunnerUtils;
 
 	// auto-injected attributes
 	private SimpleJdbcTemplate simpleJdbcTemplate;
@@ -94,12 +99,10 @@ public class RestartFunctionalTests extends AbstractBatchLauncherTests {
 
 	// load the application context and launch the job
 	private JobExecution runJobForRestartTest() throws Exception {
-		return getLauncher()
-				.run(
-						getJob(),
-						new DefaultJobParametersConverter()
-								.getJobParameters(PropertiesConverter
-										.stringToProperties("run.id(long)=1,parameter=true,run.date=20070122,input.file=classpath:data/fixedLengthImportJob/input/20070122.teststream.ImportTradeDataStep.txt")));
+		return jobRunnerUtils
+				.launchJob(new DefaultJobParametersConverter()
+						.getJobParameters(PropertiesConverter
+								.stringToProperties("run.id(long)=1,parameter=true,run.date=20070122,input.file=classpath:data/fixedLengthImportJob/input/20070122.teststream.ImportTradeDataStep.txt")));
 	}
 
 }

@@ -2,9 +2,11 @@ package org.springframework.batch.sample;
 
 import static org.junit.Assert.assertEquals;
 
+import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.batch.sample.domain.trade.internal.GeneratingTradeItemReader;
 import org.springframework.batch.sample.support.RetrySampleItemWriter;
+import org.springframework.batch.test.JobRunnerTestUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
@@ -15,8 +17,9 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
  * @author Robert Kasanicky
  */
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration()
-public class RetrySampleFunctionalTests extends AbstractValidatingBatchLauncherTests {
+@ContextConfiguration(locations = { "/simple-job-launcher-context.xml", "/jobs/retrySample.xml",
+		"/job-runner-context.xml" })
+public class RetrySampleFunctionalTests {
 
 	@Autowired
 	private GeneratingTradeItemReader itemGenerator;
@@ -24,7 +27,12 @@ public class RetrySampleFunctionalTests extends AbstractValidatingBatchLauncherT
 	@Autowired
 	private RetrySampleItemWriter<?> itemProcessor;
 	
-	protected void validatePostConditions() throws Exception {
+	@Autowired
+	private JobRunnerTestUtils jobRunnerUtils;
+
+	@Test
+	public void testLaunchJob() throws Exception {
+		jobRunnerUtils.launchJob();
 		//items processed = items read + 2 exceptions
 		assertEquals(itemGenerator.getLimit()+2, itemProcessor.getCounter());
 	}

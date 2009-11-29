@@ -20,14 +20,12 @@ import static org.junit.Assert.assertEquals;
 
 import javax.sql.DataSource;
 
-import org.junit.After;
-import org.junit.Before;
+import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.springframework.batch.core.Job;
 import org.springframework.batch.core.converter.DefaultJobParametersConverter;
 import org.springframework.batch.support.PropertiesConverter;
+import org.springframework.batch.test.JobRunnerTestUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.jdbc.core.simple.SimpleJdbcTemplate;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
@@ -38,34 +36,32 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
  * @author Dave Syer
  */
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration()
-public class JobStepFunctionalTests extends AbstractBatchLauncherTests {
+@ContextConfiguration
+public class JobStepFunctionalTests {
+
+	@Autowired
+	private JobRunnerTestUtils jobRunnerUtils;
 
 	// auto-injected attributes
 	private SimpleJdbcTemplate simpleJdbcTemplate;
-
-	@Autowired
-	public void setJob(@Qualifier("jobStepJob") Job job) {
-		super.setJob(job);
-	}
 
 	@Autowired
 	public void setDataSource(DataSource dataSource) {
 		this.simpleJdbcTemplate = new SimpleJdbcTemplate(dataSource);
 	}
 
-	@Before
-	public void onTearDown() throws Exception {
+	@Test
+	public void testJobLaunch() throws Exception {
+
 		simpleJdbcTemplate.update("DELETE FROM TRADE");
-		setJobParameters(new DefaultJobParametersConverter()
+	
+		jobRunnerUtils.launchJob(new DefaultJobParametersConverter()
 				.getJobParameters(PropertiesConverter
 						.stringToProperties("run.id(long)=1,parameter=true,run.date=20070122,input.file=classpath:data/fixedLengthImportJob/input/20070122.teststream.ImportTradeDataStep.txt")));
-	}
 
-	@After
-	public void onSetUp() {
 		int after = simpleJdbcTemplate.queryForInt("SELECT COUNT(*) FROM TRADE");
 		assertEquals(5, after);
+
 	}
 
 }

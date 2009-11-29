@@ -27,8 +27,8 @@ import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.JobParameters;
 import org.springframework.batch.item.file.FlatFileItemWriter;
 import org.springframework.batch.sample.domain.trade.CustomerCredit;
-import org.springframework.batch.test.AbstractJobTests;
 import org.springframework.batch.test.AssertFile;
+import org.springframework.batch.test.JobRunnerTestUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.Resource;
 import org.springframework.test.context.ContextConfiguration;
@@ -39,21 +39,25 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
  * @since 2.0
  */
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(locations = { "/simple-job-launcher-context.xml", "/jobs/restartFileSampleJob.xml" })
-public class RestartFileSampleFunctionalTests extends AbstractJobTests {
+@ContextConfiguration(locations = { "/simple-job-launcher-context.xml", "/jobs/restartFileSampleJob.xml",
+		"/job-runner-context.xml" })
+public class RestartFileSampleFunctionalTests {
 
 	@Autowired
 	private Resource outputResource;
 
+	@Autowired
+	private JobRunnerTestUtils jobRunnerUtils;
+
 	@Test
 	public void runTest() throws Exception {
-		JobParameters jobParameters = getUniqueJobParameters();
+		JobParameters jobParameters = jobRunnerUtils.getUniqueJobParameters();
 
-		JobExecution je1 = this.launchJob(jobParameters);
+		JobExecution je1 = jobRunnerUtils.launchJob(jobParameters);
 		assertEquals(BatchStatus.FAILED, je1.getStatus());
 		AssertFile.assertLineCount(10, outputResource);
 
-		JobExecution je2 = this.launchJob(jobParameters);
+		JobExecution je2 = jobRunnerUtils.launchJob(jobParameters);
 		assertEquals(BatchStatus.COMPLETED, je2.getStatus());
 		AssertFile.assertLineCount(20, outputResource);
 	}
