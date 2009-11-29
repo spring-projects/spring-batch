@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<beans:beans xmlns="http://www.springframework.org/schema/batch" 
-	xmlns:beans="http://www.springframework.org/schema/beans" 
+<beans xmlns:batch="http://www.springframework.org/schema/batch" 
+	xmlns="http://www.springframework.org/schema/beans" 
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://www.springframework.org/schema/beans
        		http://www.springframework.org/schema/beans/spring-beans-2.5.xsd
        		http://www.springframework.org/schema/batch
        		http://www.springframework.org/schema/batch/spring-batch-2.1.xsd">
 
-	<job id="pssJob">
+	<job id="pssJob" xmlns="http://www.springframework.org/schema/batch">
 		<step id="step1">
 			<tasklet>
 				<chunk reader="reader" writer="writer" commit-interval="1"/>
@@ -15,30 +15,30 @@
 		</step>
 	</job>
 	
-	<job-repository id="jobRepository"/>
+	<batch:job-repository id="jobRepository"/>
 
-	<beans:bean id="jobLauncher" class="org.springframework.batch.core.launch.support.SimpleJobLauncher">
-		<beans:property name="jobRepository" ref="jobRepository" />
-	</beans:bean>
+	<bean id="jobLauncher" class="org.springframework.batch.core.launch.support.SimpleJobLauncher">
+		<property name="jobRepository" ref="jobRepository" />
+	</bean>
 
-	<beans:bean id="reader" class="org.springframework.batch.item.database.JdbcCursorItemReader">
-		<beans:property name="sql" value="select ID, NAME, VALUE from FOO where ID &gt;= ? and ID &lt;= ?"/>
-		<beans:property name="preparedStatementSetter" ref="pss"/>
-		<beans:property name="dataSource" ref="dataSource"/>
-		<beans:property name="rowMapper">
-			<beans:bean class="org.springframework.batch.core.resource.FooRowMapper"/>
-		</beans:property>
-	</beans:bean>
+	<bean id="reader" class="org.springframework.batch.item.database.JdbcCursorItemReader">
+		<property name="sql" value="select ID, NAME, VALUE from FOO where ID &gt;= ? and ID &lt;= ?"/>
+		<property name="preparedStatementSetter" ref="pss"/>
+		<property name="dataSource" ref="dataSource"/>
+		<property name="rowMapper">
+			<bean class="org.springframework.batch.core.resource.FooRowMapper"/>
+		</property>
+	</bean>
 
-	<beans:bean id="pss" class="org.springframework.batch.core.resource.ListPreparedStatementSetter" scope="step">
-		<beans:property name="parameters">
-			<beans:list>
-				<beans:value>#{jobParameters[min.id]}</beans:value>
-				<beans:value>#{jobParameters[max.id]}</beans:value>
-			</beans:list>
-		</beans:property>
-	</beans:bean>
+	<bean id="pss" class="org.springframework.batch.core.resource.ListPreparedStatementSetter" scope="step">
+		<property name="parameters">
+			<list>
+				<value>#{jobParameters['min.id']}</value>
+				<value>#{jobParameters['max.id']}</value>
+			</list>
+		</property>
+	</bean>
 
-	<beans:bean id="writer" class="org.springframework.batch.core.resource.ListPreparedStatementSetterTests$FooStoringItemWriter"/>
+	<bean id="writer" class="org.springframework.batch.core.resource.ListPreparedStatementSetterTests$FooStoringItemWriter"/>
 	
-</beans:beans>
+</beans>

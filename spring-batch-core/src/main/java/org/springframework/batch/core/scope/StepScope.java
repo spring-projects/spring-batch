@@ -17,10 +17,12 @@ package org.springframework.batch.core.scope;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.springframework.aop.scope.ScopedProxyUtils;
 import org.springframework.batch.core.scope.context.StepContext;
 import org.springframework.batch.core.scope.context.StepSynchronizationManager;
 import org.springframework.batch.core.scope.util.PlaceholderProxyFactoryBean;
 import org.springframework.beans.BeanWrapper;
+import org.springframework.beans.BeanWrapperImpl;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.ObjectFactory;
 import org.springframework.beans.factory.config.BeanDefinition;
@@ -33,6 +35,7 @@ import org.springframework.beans.factory.support.BeanDefinitionReaderUtils;
 import org.springframework.beans.factory.support.BeanDefinitionRegistry;
 import org.springframework.core.Ordered;
 import org.springframework.util.Assert;
+import org.springframework.util.ReflectionUtils;
 import org.springframework.util.StringValueResolver;
 
 /**
@@ -111,11 +114,17 @@ public class StepScope implements Scope, BeanFactoryPostProcessor, Ordered {
 	public void setProxyTargetClass(boolean proxyTargetClass) {
 		this.proxyTargetClass = proxyTargetClass;
 	}
-	
-	// Implement missing method from Spring 3.0 SPI.
+
+	/**
+	 * If Spring 3.0 is available, this will be used to resolve expressions in
+	 * step-scoped beans. This method is part of the Scope SPI in Spring 3.0,
+	 * but should just be ignored by earlier versions of Spring.
+	 */
 	public Object resolveContextualObject(String key) {
 		StepContext context = getContext();
-		return context.getAttribute(key);
+		// TODO: support for attributes as well maybe (setters not exposed yet
+		// so not urgent).
+		return new BeanWrapperImpl(context).getPropertyValue(key);
 	}
 
 	/**
@@ -210,11 +219,17 @@ public class StepScope implements Scope, BeanFactoryPostProcessor, Ordered {
 			Scopifier scopifier = new Scopifier(registry, name, proxyTargetClass, scoped);
 			scopifier.visitBeanDefinition(definition);
 			if (scoped) {
-				new ExpressionHider(name, scoped).visitBeanDefinition(definition);
+				if (!isSpringThree()) {
+					new ExpressionHider(name, scoped).visitBeanDefinition(definition);
+				}
 				createScopedProxy(beanName, definition, registry, proxyTargetClass);
 			}
 		}
 
+	}
+
+	private static boolean isSpringThree() {
+		return ReflectionUtils.findMethod(Scope.class, "resolveContextualObject", new Class<?>[] { String.class }) != null;
 	}
 
 	/**
@@ -249,10 +264,19 @@ public class StepScope implements Scope, BeanFactoryPostProcessor, Ordered {
 		// TODO: (for Batch 2.1) detect presence of Spring 3.0 and use
 		// ScopedProxyUtils instead
 
-		// Create the scoped proxy...
-		BeanDefinitionHolder proxyHolder = PlaceholderProxyFactoryBean.createScopedProxy(new BeanDefinitionHolder(
-				definition, beanName), registry, proxyTargetClass);
-		// ...and register it under the original target name
+		BeanDefinitionHolder proxyHolder;
+
+		if (isSpringThree()) {
+			proxyHolder = ScopedProxyUtils.createScopedProxy(new BeanDefinitionHolder(definition, beanName), registry,
+					proxyTargetClass);
+		}
+		else {
+
+			// Create the scoped proxy...
+			proxyHolder = PlaceholderProxyFactoryBean.createScopedProxy(new BeanDefinitionHolder(definition, beanName),
+					registry, proxyTargetClass);
+			// ...and register it under the original target name
+		}
 		registry.registerBeanDefinition(beanName, proxyHolder.getBeanDefinition());
 
 		return proxyHolder;
@@ -310,7 +334,7 @@ public class StepScope implements Scope, BeanFactoryPostProcessor, Ordered {
 				if (scopeChangeRequiresProxy) {
 					// Exit here so that nested inner bean definitions are not
 					// analysed
-					return createScopedProxy(beanName, definition, registry, proxyTargetClass);				
+					return createScopedProxy(beanName, definition, registry, proxyTargetClass);
 				}
 			}
 
@@ -368,7 +392,8 @@ public class StepScope implements Scope, BeanFactoryPostProcessor, Ordered {
 				String otherScope = definition.getScope();
 				boolean scopeChange = !scope.equals(otherScope);
 				if (scopeChange) {
-					new ExpressionHider(otherScope==null?scope:otherScope, !scoped).visitBeanDefinition(definition);
+					new ExpressionHider(otherScope == null ? scope : otherScope, !scoped)
+							.visitBeanDefinition(definition);
 					// Exit here so that nested inner bean definitions are not
 					// analysed by both visitors
 					return value;
