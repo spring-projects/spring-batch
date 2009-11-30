@@ -1,0 +1,48 @@
+Spring Batch 2.1.0.M1 Release Notes
+
+
+Release Notes - Spring Batch - Version 2.1.0.M3
+
+* Sub-task
+
+  * {{{http://jira.springsource.org/browse/BATCH-1439}[BATCH-1439]}} - Make step names unique inside a job
+  * {{{http://jira.springsource.org/browse/BATCH-1443}[BATCH-1443]}} - Add JobStep: a Step implementation that executes a Job
+
+* Bug
+
+  * {{{http://jira.springsource.org/browse/BATCH-1442}[BATCH-1442]}} - Stopping a job with two parallel steps is only stopping one of the steps
+  * {{{http://jira.springsource.org/browse/BATCH-1444}[BATCH-1444]}} - ChunkMonitor warning message about stream state is inaccurate
+  * {{{http://jira.springsource.org/browse/BATCH-1452}[BATCH-1452]}} - Stream closed exception when combining MultiResourceItemWriter and FlatFileItemWriter with footer callback
+  * {{{http://jira.springsource.org/browse/BATCH-1453}[BATCH-1453]}} - OraclePagingQueryProvider generates wrong queries for pages
+
+* Improvement
+
+  * {{{http://jira.springsource.org/browse/BATCH-509}[BATCH-509]}} - Add support for dates in ExecutionContext
+  * {{{http://jira.springsource.org/browse/BATCH-981}[BATCH-981]}} - Use Woodstox instead of ref impl of StaX
+  * {{{http://jira.springsource.org/browse/BATCH-1281}[BATCH-1281]}} - Make ItemProcessor semantics optionally non-transactional and run-once
+  * {{{http://jira.springsource.org/browse/BATCH-1316}[BATCH-1316]}} - JobParameters throws NullPointerException on missing key
+  * {{{http://jira.springsource.org/browse/BATCH-1434}[BATCH-1434]}} - Corner case: job with step that repeats via a transition in a flow only executes the step once
+  * {{{http://jira.springsource.org/browse/BATCH-1448}[BATCH-1448]}} - BeanWrapperFieldSetMapper should throw BindException (so the errors can be accessed)
+  * {{{http://jira.springsource.org/browse/BATCH-1449}[BATCH-1449]}} - Option to disable transactional behavior of FlatFileItemWriter
+
+* New Feature
+
+  * {{{http://jira.springsource.org/browse/BATCH-1246}[BATCH-1246]}} - Add support for a JSON Reader from text files which are JSON formatted
+  * {{{http://jira.springsource.org/browse/BATCH-1344}[BATCH-1344]}} - Allow autowired to be disabled in AbstractJobTests
+  * {{{http://jira.springsource.org/browse/BATCH-1347}[BATCH-1347]}} - Restartable look-ahead (peekable) ItemReader
+  * {{{http://jira.springsource.org/browse/BATCH-1380}[BATCH-1380]}} - Make <flow/> a top-level element, so it can be shared or strategised in a job
+  * {{{http://jira.springsource.org/browse/BATCH-1411}[BATCH-1411]}} - Allow a Job to specify its required JobParameters
+  * {{{http://jira.springsource.org/browse/BATCH-1436}[BATCH-1436]}} - Allow inner bean for configuration of tasklet
+  * {{{http://jira.springsource.org/browse/BATCH-1437}[BATCH-1437]}} - Support for CallbackPreferringPlatformTransactionManager (and for native TX in WAS)
+  * {{{http://jira.springsource.org/browse/BATCH-1446}[BATCH-1446]}} - Add convenience method to ExitStatus for capturing stack trace
+  * {{{http://jira.springsource.org/browse/BATCH-1447}[BATCH-1447]}} - Ensure that JobLauncher fails a job if the task executor cannot run it
+  * {{{http://jira.springsource.org/browse/BATCH-1454}[BATCH-1454]}} - Create a standard component that can poll for a step or job finishing
+
+Refactoring
+
+  * {{{http://jira.springsource.org/browse/BATCH-1394}[BATCH-1394]}} - Migrate StepScope to Spring 3.0.0
+  * {{{http://jira.springsource.org/browse/BATCH-1450}[BATCH-1450]}} - Make Map Daos store data in instance variables (instead of static)
+
+* Task
+
+  * {{{http://jira.springsource.org/browse/BATCH-1451}[BATCH-1451]}} - Upgrade Hibernate to 3.3
