@@ -4,6 +4,7 @@
 	<artifactId>spring-batch-core-tests</artifactId>
 	<name>Core Tests</name>
 	<description>Integration tests for the Spring Batch Core</description>
+	<url>http://static.springframework.org/spring-batch/${project.artifactId}</url>
 	<parent>
 		<groupId>org.springframework.batch</groupId>
 		<artifactId>spring-batch-parent</artifactId>
