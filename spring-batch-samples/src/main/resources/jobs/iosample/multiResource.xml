@@ -38,7 +38,7 @@
 	</bean>
 
 	<bean id="itemReader" parent="itemReaderParent" scope="step" autowire-candidate="false">
-		<property name="resources" value="#{jobParameters[file.path]}/delimited*.csv" />
+		<property name="resources" value="#{jobParameters['file.path']}/delimited*.csv" />
 	</bean>
 
 	<bean id="itemReaderForTest" parent="itemReaderParent">

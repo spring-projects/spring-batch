@@ -73,7 +73,7 @@
 	</step>
 
 	<bean id="fileItemReader" class="org.springframework.batch.item.file.FlatFileItemReader" scope="step">
-		<property name="resource" value="classpath:/data/skipJob/input/input#{jobParameters[run.id]}.txt" />
+		<property name="resource" value="classpath:/data/skipJob/input/input#{jobParameters['run.id']}.txt" />
 		<property name="lineMapper">
 			<bean class="org.springframework.batch.item.file.mapping.DefaultLineMapper">
 				<property name="lineTokenizer">
