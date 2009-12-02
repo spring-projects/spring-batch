@@ -8,9 +8,9 @@
 	<packaging>pom</packaging>
 	<properties>
 		<maven.test.failure.ignore>true</maven.test.failure.ignore>
-		<spring.framework.version>3.0.0.RC3</spring.framework.version>
+		<spring.framework.version>3.0.0.BUILD-SNAPSHOT</spring.framework.version>
 		<bundlor.version>1.0.0.M2</bundlor.version>
-		<spring.batch.version>2.1.0.M3</spring.batch.version>
+		<spring.batch.version>2.1.0.CI-SNAPSHOT</spring.batch.version>
 	</properties>
 	<profiles>
 		<profile>
@@ -561,7 +561,7 @@
 		<repository>
 			<id>spring-milestones</id>
 			<name>Spring Maven Milestone Repository</name>
-			<url>http://s3.amazonaws.com/maven.springframework.org/milestone</url>
+			<url>http://s3.amazonaws.com/maven.springframework.org/milestone/</url>
 			<snapshots>
 				<enabled>false</enabled>
 			</snapshots>
@@ -569,7 +569,7 @@
 		<repository>
 			<id>spring-snapshots</id>
 			<name>Spring Maven Snapshot Repository</name>
-			<url>http://s3.amazonaws.com/maven.springframework.org/snapshot</url>
+			<url>http://s3.amazonaws.com/maven.springframework.org/snapshot/</url>
 		</repository>
 		<repository>
 			<id>objectstyle</id>
@@ -580,19 +580,4 @@
 			</snapshots>
 		</repository>
 	</repositories>
-	<pluginRepositories>
-		<pluginRepository>
-			<id>com.springsource.repository.bundles.milestone</id>
-			<name>SpringSource Enterprise Bundle Repository - SpringSource Bundle Milestones</name>
-			<url>http://repository.springsource.com/maven/bundles/milestone</url>
-			<snapshots>
-				<enabled>false</enabled>
-			</snapshots>
-		</pluginRepository>
-		<pluginRepository>
-			<id>com.springsource.repository.bundles.snapshot</id>
-			<name>SpringSource Enterprise Bundle Repository - SpringSource Bundle Snapshots</name>
-			<url>http://repository.springsource.com/maven/bundles/snapshot</url>
-		</pluginRepository>
-	</pluginRepositories>
 </project>
