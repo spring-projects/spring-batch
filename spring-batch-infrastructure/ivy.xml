@@ -30,6 +30,7 @@
 		<dependency org="org.apache.commons" name="com.springsource.org.apache.commons.lang" rev="2.1.0" conf="optional->runtime,provided"/>
 		<dependency org="org.apache.commons" name="com.springsource.org.apache.commons.io" rev="1.4.0" conf="test->runtime,provided"/>
 		<dependency org="org.hsqldb" name="com.springsource.org.hsqldb" rev="1.8.0.9" conf="test->runtime,provided"/>
+		<dependency org="org.codehaus.jackson" name="com.springsource.org.codehaus.jackson.mapper" rev="1.0.0" conf="optional->compile"/>
 		<dependency org="org.hibernate" name="com.springsource.org.hibernate" rev="3.2.6.ga" conf="optional->runtime,provided"/>
 		<dependency org="org.hibernate" name="com.springsource.org.hibernate.ejb" rev="3.3.2.GA" conf="optional->runtime,provided"/>
 		<dependency org="org.hibernate" name="com.springsource.org.hibernate.annotations" rev="3.3.1.ga" conf="optional->runtime,provided"/>
