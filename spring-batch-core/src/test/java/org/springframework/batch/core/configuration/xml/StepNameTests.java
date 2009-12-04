@@ -46,7 +46,7 @@ public class StepNameTests {
 
 	public StepNameTests(Resource resource) throws Exception {
 		try {
-			context = new FileSystemXmlApplicationContext("file://"+resource.getFile().getAbsolutePath());
+			context = new FileSystemXmlApplicationContext("file:///"+resource.getFile().getAbsolutePath());
 		} catch (BeanDefinitionParsingException e) {
 			return;
 		} catch (BeanCreationException e) {
@@ -71,12 +71,15 @@ public class StepNameTests {
 	}
 
 	@Parameters
-	public static List<Object[]> data() {
+	public static List<Object[]> data() throws Exception {
 		List<Object[]> list = new ArrayList<Object[]>();
 		ResourceArrayPropertyEditor editor = new ResourceArrayPropertyEditor();
 		editor.setAsText("classpath*:"+ClassUtils.addResourcePathToPackagePath(StepNameTests.class, "*.xml"));
 		Resource[] resources = (Resource[]) editor.getValue();
 		for (Resource resource : resources) {
+			if (resource.getFile().getName().contains("WrongSchema")) {
+				continue;
+			}
 			list.add(new Object[] {resource});
 		}
 		return list;
