@@ -58,6 +58,14 @@ public class JobParser extends AbstractSingleBeanDefinitionParser {
 	@Override
 	protected void doParse(Element element, ParserContext parserContext, BeanDefinitionBuilder builder) {
 
+		if (!namespaceMatchesVersion(element)
+				|| !namespaceMatchesVersion(element.getOwnerDocument().getDocumentElement())) {
+			parserContext.getReaderContext().error(
+					"You cannot use spring-batch-2.0.xsd with Spring Batch 2.1.  Please upgrade your schema declarations "
+							+ "(or use the spring-batch.xsd alias if you are feeling lucky).", element);
+			return;
+		}
+
 		CoreNamespaceUtils.autoregisterBeansForNamespace(parserContext, parserContext.extractSource(element));
 
 		String jobName = element.getAttribute("id");
@@ -107,7 +115,7 @@ public class JobParser extends AbstractSingleBeanDefinitionParser {
 		}
 
 		Element description = DomUtils.getChildElementByTagName(element, "description");
-		if (description!=null) {
+		if (description != null) {
 			builder.getBeanDefinition().setDescription(description.getTextContent());
 		}
 
@@ -132,6 +140,23 @@ public class JobParser extends AbstractSingleBeanDefinitionParser {
 					"The '<listeners/>' element may not appear more than once in a single <job/>.", element);
 		}
 
+	}
+
+	/**
+	 * Check that the schema location declared in the source file being parsed
+	 * matches the Spring Batch version. (The old 2.0 schema is not 100%
+	 * compatible with the new parser, so it is an error to explicitly define
+	 * 2.0. It might be an error to declare spring-batch.xsd as an alias, but
+	 * you are only going to find that out when one of the sub parses breaks.)
+	 * 
+	 * @param element the element that is to be parsed next
+	 * @return true if we find a schema declaration that matches
+	 */
+	private boolean namespaceMatchesVersion(Element element) {
+		String schemaLocation = element.getAttributeNS("http://www.w3.org/2001/XMLSchema-instance", "schemaLocation");
+		return schemaLocation.matches("(?m).*spring-batch-2.1.xsd.*")
+				|| schemaLocation.matches("(?m).*spring-batch.xsd.*")
+				|| !schemaLocation.matches("(?m).*spring-batch.*");
 	}
 
 }

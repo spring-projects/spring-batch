@@ -1,2 +1,3 @@
 http\://www.springframework.org/schema/batch/spring-batch.xsd=/org/springframework/batch/core/configuration/xml/spring-batch-2.1.xsd
 http\://www.springframework.org/schema/batch/spring-batch-2.1.xsd=/org/springframework/batch/core/configuration/xml/spring-batch-2.1.xsd
+http\://www.springframework.org/schema/batch/spring-batch-2.0.xsd=/org/springframework/batch/core/configuration/xml/spring-batch-2.0-error.xsd

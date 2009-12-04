@@ -5,6 +5,7 @@ import static org.junit.Assert.fail;
 
 import org.junit.Test;
 import org.springframework.beans.factory.BeanCreationException;
+import org.springframework.beans.factory.BeanDefinitionStoreException;
 import org.springframework.beans.factory.parsing.BeanDefinitionParsingException;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
@@ -45,6 +46,22 @@ public class JobParserExceptionTests {
 		catch (BeanCreationException e) {
 			String message = e.getMessage();
 			assertTrue("Wrong message: "+message, message.matches(".*Missing state for \\[StateTransition: \\[state=.*s2, pattern=\\*, next=.*s3\\]\\]"));
+		}
+	}
+
+	@Test
+	public void testWrongSchemaInRoot() {
+		try {
+			new ClassPathXmlApplicationContext(
+					"org/springframework/batch/core/configuration/xml/JobParserWrongSchemaInRootTests-context.xml");
+			fail("Error expected");
+		}
+		catch (BeanDefinitionParsingException e) {
+			String message = e.getMessage();
+			assertTrue("Wrong message: "+message, message.matches("(?s).*You cannot use spring-batch-2.0.xsd.*"));
+		} catch (BeanDefinitionStoreException e) {
+			// Probably the internet is not available and the schema validation failed.
+			// We don't want an automated build to fail if that happens.
 		}
 	}
 
