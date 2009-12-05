@@ -38,7 +38,7 @@
 			<repositories>
 				<repository>
 					<id>spring-snapshots</id>
-					<url>http://s3.amazonaws.com/maven.springframework.org/snapshot</url>
+					<url>http://s3.amazonaws.com/maven.springframework.org/snapshot/</url>
 					<releases>
 						<enabled>false</enabled>
 					</releases>
@@ -120,14 +120,14 @@
 			<pluginRepositories>
 				<pluginRepository>
 					<id>apache-snapshots</id>
-					<url>http://people.apache.org/maven-snapshot-repository</url>
+					<url>http://people.apache.org/maven-snapshot-repository/</url>
 				</pluginRepository>
 			</pluginRepositories>
 			<repositories>
 				<repository>
 					<id>apache-snapshot</id>
 					<name>Apache Foundation Snapshot Repository</name>
-					<url>http://people.apache.org/maven-snapshot-repository</url>
+					<url>http://people.apache.org/maven-snapshot-repository/</url>
 				</repository>
 			</repositories>
 		</profile>
@@ -573,7 +573,7 @@
 		<repository>
 			<id>objectstyle</id>
 			<name>ObjectStyle.org Repository</name>
-			<url>http://objectstyle.org/maven2</url>
+			<url>http://objectstyle.org/maven2/</url>
 			<snapshots>
 				<enabled>false</enabled>
 			</snapshots>
@@ -583,7 +583,7 @@
 		<pluginRepository>
 			<id>com.springsource.repository.bundles.milestone</id>
 			<name>SpringSource Enterprise Bundle Repository - SpringSource Bundle Milestones</name>
-			<url>http://repository.springsource.com/maven/bundles/milestone</url>
+			<url>http://repository.springsource.com/maven/bundles/milestone/</url>
 			<snapshots>
 				<enabled>false</enabled>
 			</snapshots>
@@ -591,7 +591,7 @@
 		<pluginRepository>
 			<id>com.springsource.repository.bundles.snapshot</id>
 			<name>SpringSource Enterprise Bundle Repository - SpringSource Bundle Snapshots</name>
-			<url>http://repository.springsource.com/maven/bundles/snapshot</url>
+			<url>http://repository.springsource.com/maven/bundles/snapshot/</url>
 		</pluginRepository>
 	</pluginRepositories>
 </project>
