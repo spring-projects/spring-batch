@@ -161,4 +161,25 @@ public class CoreNamespaceUtils {
 		return StringUtils.hasText(abstractAttr) && Boolean.valueOf(abstractAttr);
 	}
 
+	/**
+	 * Check that the schema location declared in the source file being parsed
+	 * matches the Spring Batch version. (The old 2.0 schema is not 100%
+	 * compatible with the new parser, so it is an error to explicitly define
+	 * 2.0. It might be an error to declare spring-batch.xsd as an alias, but
+	 * you are only going to find that out when one of the sub parses breaks.)
+	 * 
+	 * @param element the element that is to be parsed next
+	 * @return true if we find a schema declaration that matches
+	 */
+	public static boolean namespaceMatchesVersion(Element element) {
+		return matchesVersionInternal(element) && matchesVersionInternal(element.getOwnerDocument().getDocumentElement());
+	}
+	
+	private static boolean matchesVersionInternal(Element element) {
+		String schemaLocation = element.getAttributeNS("http://www.w3.org/2001/XMLSchema-instance", "schemaLocation");
+		return schemaLocation.matches("(?m).*spring-batch-2.1.xsd.*")
+				|| schemaLocation.matches("(?m).*spring-batch.xsd.*")
+				|| !schemaLocation.matches("(?m).*spring-batch.*");
+	}
+
 }
