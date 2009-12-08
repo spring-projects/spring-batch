@@ -23,6 +23,7 @@ import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.config.RuntimeBeanReference;
 import org.springframework.beans.factory.parsing.CompositeComponentDefinition;
 import org.springframework.beans.factory.support.AbstractBeanDefinition;
+import org.springframework.beans.factory.support.BeanDefinitionBuilder;
 import org.springframework.beans.factory.support.GenericBeanDefinition;
 import org.springframework.beans.factory.support.ManagedList;
 import org.springframework.beans.factory.xml.ParserContext;
@@ -57,6 +58,8 @@ public abstract class AbstractStepParser {
 
 	private static final String TASKLET_ELE = "tasklet";
 
+	private static final String FLOW_ELE = "flow";
+
 	private static final String CHUNK_ELE = "chunk";
 
 	private static final String LISTENERS_ELE = "listeners";
@@ -79,18 +82,19 @@ public abstract class AbstractStepParser {
 	 */
 	protected AbstractBeanDefinition parseStep(Element stepElement, ParserContext parserContext, String jobFactoryRef) {
 
-		AbstractBeanDefinition bd = new GenericBeanDefinition();
+		BeanDefinitionBuilder builder = BeanDefinitionBuilder.genericBeanDefinition();
+		AbstractBeanDefinition bd = builder.getRawBeanDefinition();
 
-		@SuppressWarnings("unchecked")
-		List<Element> taskletElements = DomUtils.getChildElementsByTagName(stepElement, TASKLET_ELE);
-		if (taskletElements.size() == 1) {
+		Element taskletElement = DomUtils.getChildElementByTagName(stepElement, TASKLET_ELE);
+		if (taskletElement!=null) {
 			boolean stepUnderspecified = CoreNamespaceUtils.isUnderspecified(stepElement);
-			parseTasklet(stepElement, taskletElements.get(0), bd, parserContext, stepUnderspecified);
+			parseTasklet(stepElement, taskletElement, bd, parserContext, stepUnderspecified);
 		}
-		else if (taskletElements.size() > 1) {
-			parserContext.getReaderContext().error(
-					"The '<" + TASKLET_ELE + "/>' element may not appear more than once in a single <"
-							+ stepElement.getNodeName() + "/>.", stepElement);
+
+		Element flowElement = DomUtils.getChildElementByTagName(stepElement, FLOW_ELE);
+		if (flowElement!=null) {
+			boolean stepUnderspecified = CoreNamespaceUtils.isUnderspecified(stepElement);
+			parseFlow(stepElement, flowElement, bd, parserContext, stepUnderspecified);
 		}
 
 		String parentRef = stepElement.getAttribute(PARENT_ATTR);
@@ -101,6 +105,11 @@ public abstract class AbstractStepParser {
 		String isAbstract = stepElement.getAttribute("abstract");
 		if (StringUtils.hasText(isAbstract)) {
 			bd.setAbstract(Boolean.valueOf(isAbstract));
+		}
+
+		String jobRepositoryRef = stepElement.getAttribute(JOB_REPO_ATTR);
+		if (StringUtils.hasText(jobRepositoryRef)) {
+			builder.addPropertyReference("jobRepository", jobRepositoryRef);
 		}
 
 		if (StringUtils.hasText(jobFactoryRef)) {
@@ -155,6 +164,25 @@ public abstract class AbstractStepParser {
 		}
 
 		handleTaskletElement(taskletElement, bd, parserContext);
+	}
+
+	private void parseFlow(Element stepElement, Element flowElement, AbstractBeanDefinition bd,
+			ParserContext parserContext, boolean stepUnderspecified) {
+
+		bd.setBeanClass(StepParserStepFactoryBean.class);
+		bd.setAttribute("isNamespaceStep", true);
+		String flowRef = flowElement.getAttribute(PARENT_ATTR);
+		String idAttribute = stepElement.getAttribute(ID_ATTR);
+
+		BeanDefinition flowDefinition = new GenericBeanDefinition();
+		flowDefinition.setParentName(flowRef);
+		MutablePropertyValues propertyValues = flowDefinition.getPropertyValues();
+		if (StringUtils.hasText(idAttribute)) {
+			propertyValues.addPropertyValue("name", idAttribute);
+		}
+
+		bd.getPropertyValues().addPropertyValue("flow", flowDefinition);
+		
 	}
 
 	private void validateTaskletAttributesAndSubelements(Element taskletElement, ParserContext parserContext,
@@ -288,10 +316,6 @@ public abstract class AbstractStepParser {
 	}
 
 	private void handleTaskletAttributes(Element taskletElement, MutablePropertyValues propertyValues) {
-		String jobRepositoryRef = taskletElement.getAttribute(JOB_REPO_ATTR);
-		if (StringUtils.hasText(jobRepositoryRef)) {
-			propertyValues.addPropertyValue("jobRepository", new RuntimeBeanReference(jobRepositoryRef));
-		}
 		String transactionManagerRef = taskletElement.getAttribute("transaction-manager");
 		if (StringUtils.hasText(transactionManagerRef)) {
 			propertyValues.addPropertyValue("transactionManager", new RuntimeBeanReference(transactionManagerRef));

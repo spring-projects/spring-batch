@@ -17,6 +17,7 @@ package org.springframework.batch.core.configuration.xml;
 
 import org.springframework.beans.factory.support.BeanDefinitionBuilder;
 import org.springframework.beans.factory.xml.ParserContext;
+import org.springframework.util.StringUtils;
 import org.w3c.dom.Element;
 
 /**
@@ -27,6 +28,8 @@ public class TopLevelFlowParser extends AbstractFlowParser {
 
 	private static final String ID_ATTR = "id";
 
+	private static final String ABSTRACT_ATTR = "abstract";
+
 	/**
 	 * @param element the top level element containing a flow definition
 	 * @param parserContext the {@link ParserContext}
@@ -36,6 +39,10 @@ public class TopLevelFlowParser extends AbstractFlowParser {
 		String flowName = element.getAttribute(ID_ATTR);
 		builder.getRawBeanDefinition().setAttribute("flowName", flowName);
 		builder.addPropertyValue("name", flowName);
+		String abstractAttr = element.getAttribute(ABSTRACT_ATTR);
+		if (StringUtils.hasText(abstractAttr)) {
+			builder.setAbstract(abstractAttr.equals("true"));
+		}
 		super.doParse(element, parserContext, builder);
 	}
 

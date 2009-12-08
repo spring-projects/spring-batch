@@ -123,6 +123,16 @@ public abstract class AbstractJobRepositoryFactoryBean implements FactoryBean, I
 		return transactionManager;
 	}
 
+	/**
+	 * Convenience method for clients to grab the {@link JobRepository} without
+	 * a cast.
+	 * @return the {@link JobRepository} from {@link #getObject()}
+	 * @throws Exception if the repository could not be created
+	 */
+	public JobRepository getJobRepository() throws Exception {
+		return (JobRepository) getObject();
+	}
+
 	private void initializeProxy() throws Exception {
 		if (proxyFactory == null) {
 			proxyFactory = new ProxyFactory();

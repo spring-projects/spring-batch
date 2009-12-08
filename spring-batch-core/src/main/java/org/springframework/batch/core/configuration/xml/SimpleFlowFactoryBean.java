@@ -103,7 +103,7 @@ public class SimpleFlowFactoryBean implements FactoryBean, InitializingBean {
 		String stateName = prefix + oldName;
 		if (state instanceof StepState) {
 			Step step = ((StepState) state).getStep();
-			return new StepState(stateName, new DelegateStep(step, stateName));
+			return new StepState(stateName, new DelegateStep(stateName, step));
 		}
 		return new DelegateState(stateName, state);
 	}
@@ -154,7 +154,7 @@ public class SimpleFlowFactoryBean implements FactoryBean, InitializingBean {
 
 		private final String name;
 
-		private DelegateStep(Step step, String name) {
+		private DelegateStep(String name, Step step) {
 			this.step = step;
 			this.name = name;
 		}

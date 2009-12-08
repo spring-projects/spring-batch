@@ -8,12 +8,12 @@
 
 	<job id="job1">
 		<step id="s1" parent="step1" next="job1.flow"/>
-		<flow id="job1.flow" ref="flow" next="s4" />
+		<flow id="job1.flow" parent="flow" next="s4" />
 		<step id="s4" parent="step4" />
 	</job>
 
 	<job id="job2">
-		<flow id="job2.flow" ref="flow">
+		<flow id="job2.flow" parent="flow">
 			 <next on="*" to="job2.s1"/> 
 			 <next on="FAILED" to="job2.s2"/> 
 		</flow>
@@ -22,13 +22,13 @@
 	</job>
 
 	<job id="job3">
-		<flow id="job3.flow" ref="flow" />
+		<flow id="job3.flow" parent="flow" />
 	</job>
 
 	<job id="job4">
 		<split id="split">
-			<flow ref="flow" />
-			<flow ref="flow" />
+			<flow parent="flow" />
+			<flow parent="flow" />
 		</split>
 	</job>
 

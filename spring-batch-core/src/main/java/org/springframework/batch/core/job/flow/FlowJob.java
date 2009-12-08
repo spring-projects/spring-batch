@@ -18,17 +18,12 @@ package org.springframework.batch.core.job.flow;
 import java.util.Collection;
 import java.util.HashSet;
 
-import org.springframework.batch.core.BatchStatus;
-import org.springframework.batch.core.ExitStatus;
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.JobExecutionException;
-import org.springframework.batch.core.JobInterruptedException;
-import org.springframework.batch.core.StartLimitExceededException;
 import org.springframework.batch.core.Step;
-import org.springframework.batch.core.StepExecution;
 import org.springframework.batch.core.job.AbstractJob;
-import org.springframework.batch.core.repository.JobRestartException;
+import org.springframework.batch.core.job.SimpleStepHandler;
 import org.springframework.batch.core.step.StepHolder;
 
 /**
@@ -99,7 +94,8 @@ public class FlowJob extends AbstractJob {
 	@Override
 	protected void doExecute(final JobExecution execution) throws JobExecutionException {
 		try {
-			JobFlowExecutor executor = new JobFlowExecutor(execution);
+			JobFlowExecutor executor = new JobFlowExecutor(new SimpleStepHandler(getJobRepository()),
+					execution);
 			executor.updateJobExecutionStatus(flow.start(executor).getStatus());
 		}
 		catch (FlowExecutionException e) {
@@ -108,91 +104,6 @@ public class FlowJob extends AbstractJob {
 			}
 			throw new JobExecutionException("Flow execution ended unexpectedly", e);
 		}
-	}
-
-	/**
-	 * @author Dave Syer
-	 * 
-	 */
-	private class JobFlowExecutor implements FlowExecutor {
-
-		private final ThreadLocal<StepExecution> stepExecutionHolder = new ThreadLocal<StepExecution>();
-
-		private final JobExecution execution;
-
-		private ExitStatus exitStatus = ExitStatus.EXECUTING;
-
-		/**
-		 * @param execution
-		 */
-		private JobFlowExecutor(JobExecution execution) {
-			this.execution = execution;
-			stepExecutionHolder.set(null);
-		}
-
-		public String executeStep(Step step) throws JobInterruptedException, JobRestartException,
-				StartLimitExceededException {
-			StepExecution stepExecution = handleStep(step, execution);
-			stepExecutionHolder.set(stepExecution);
-			return stepExecution == null ? ExitStatus.COMPLETED.getExitCode() : stepExecution.getExitStatus()
-					.getExitCode();
-		}
-
-		public void abandonStepExecution() {
-			StepExecution lastStepExecution = stepExecutionHolder.get();
-			if (lastStepExecution != null && lastStepExecution.getStatus().isGreaterThan(BatchStatus.STOPPING)) {
-				lastStepExecution.upgradeStatus(BatchStatus.ABANDONED);
-				updateStepExecution(lastStepExecution);
-			}
-		}
-
-		public void updateJobExecutionStatus(FlowExecutionStatus status) {
-			execution.setStatus(findBatchStatus(status));
-			exitStatus = exitStatus.and(new ExitStatus(status.getName()));
-			execution.setExitStatus(exitStatus);
-		}
-
-		public JobExecution getJobExecution() {
-			return execution;
-		}
-
-		public StepExecution getStepExecution() {
-			return stepExecutionHolder.get();
-		}
-
-		public void close(FlowExecution result) {
-			stepExecutionHolder.set(null);
-		}
-
-		public boolean isRestart() {
-			if (getStepExecution() != null && getStepExecution().getStatus() == BatchStatus.ABANDONED) {
-				/*
-				 * This is assumed to be the last step execution and it was
-				 * marked abandoned, so we are in a restart of a stopped step.
-				 * TODO: mark the step execution in some more definitive way?
-				 */
-				return true;
-			}
-			return execution.getStepExecutions().isEmpty();
-		}
-
-		public void addExitStatus(String code) {
-			exitStatus = exitStatus.and(new ExitStatus(code));
-		}
-
-		/**
-		 * @param status
-		 * @return
-		 */
-		private BatchStatus findBatchStatus(FlowExecutionStatus status) {
-			for (BatchStatus batchStatus : BatchStatus.values()) {
-				if (status.getName().startsWith(batchStatus.toString())) {
-					return batchStatus;
-				}
-			}
-			return BatchStatus.UNKNOWN;
-		}
-
 	}
 
 }

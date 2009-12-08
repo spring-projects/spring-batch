@@ -27,7 +27,6 @@ import org.springframework.batch.core.Job;
 import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.JobExecutionException;
 import org.springframework.batch.core.JobExecutionListener;
-import org.springframework.batch.core.JobInstance;
 import org.springframework.batch.core.JobInterruptedException;
 import org.springframework.batch.core.JobParametersIncrementer;
 import org.springframework.batch.core.StartLimitExceededException;
@@ -39,7 +38,6 @@ import org.springframework.batch.core.listener.CompositeJobExecutionListener;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.repository.JobRestartException;
 import org.springframework.batch.core.step.StepLocator;
-import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.repeat.RepeatException;
 import org.springframework.beans.factory.BeanNameAware;
 import org.springframework.beans.factory.InitializingBean;
@@ -70,6 +68,8 @@ public abstract class AbstractJob implements Job, StepLocator, BeanNameAware, In
 	private JobParametersIncrementer jobParametersIncrementer;
 
 	private JobParametersValidator jobParametersValidator = new DefaultJobParametersValidator();
+
+	private StepHandler stepHandler;
 
 	/**
 	 * Default constructor.
@@ -224,6 +224,16 @@ public abstract class AbstractJob implements Job, StepLocator, BeanNameAware, In
 	 */
 	public void setJobRepository(JobRepository jobRepository) {
 		this.jobRepository = jobRepository;
+		stepHandler = new SimpleStepHandler(jobRepository);
+	}
+	
+	/**
+	 * Convenience method for subclasses to access the job repository.
+	 * 
+	 * @return the jobRepository
+	 */
+	protected JobRepository getJobRepository() {
+		return jobRepository;
 	}
 
 	/**
@@ -250,7 +260,7 @@ public abstract class AbstractJob implements Job, StepLocator, BeanNameAware, In
 	public final void execute(JobExecution execution) {
 
 		logger.debug("Job execution starting: " + execution);
-
+		
 		try {
 
 			jobParametersValidator.validate(execution.getJobInstance().getJobParameters());
@@ -338,77 +348,8 @@ public abstract class AbstractJob implements Job, StepLocator, BeanNameAware, In
 	 */
 	protected final StepExecution handleStep(Step step, JobExecution execution) throws JobInterruptedException,
 			JobRestartException, StartLimitExceededException {
-		if (execution.isStopping()) {
-			throw new JobInterruptedException("JobExecution interrupted.");
-		}
+		return stepHandler.handleStep(step, execution);
 
-		JobInstance jobInstance = execution.getJobInstance();
-
-		StepExecution lastStepExecution = jobRepository.getLastStepExecution(jobInstance, step.getName());
-		if (stepExecutionPartOfExistingJobExecution(execution, lastStepExecution)) {
-			// If the last execution of this step was in the same job, it's probably
-			// intentional so we want to run it again...
-			logger.info(String.format("Duplicate step [%s] detected in execution of job=[%s]. " +
-					"If either step fails, both will be executed again on restart.", step.getName(), name));
-			lastStepExecution = null;
-		}
-		StepExecution currentStepExecution = lastStepExecution;
-
-		if (shouldStart(lastStepExecution, jobInstance, step)) {
-
-			currentStepExecution = execution.createStepExecution(step.getName());
-
-			boolean isRestart = (lastStepExecution != null && !lastStepExecution.getStatus().equals(
-					BatchStatus.COMPLETED));
-
-			if (isRestart) {
-				currentStepExecution.setExecutionContext(lastStepExecution.getExecutionContext());
-			}
-			else {
-				currentStepExecution.setExecutionContext(new ExecutionContext());
-			}
-
-			jobRepository.add(currentStepExecution);
-
-			logger.info("Executing step: [" + step + "]");
-			try {
-				step.execute(currentStepExecution);
-			}
-			catch (JobInterruptedException e) {
-				// Ensure that the job gets the message that it is stopping
-				// and can pass it on to other steps that are executing
-				// concurrently.
-				execution.setStatus(BatchStatus.STOPPING);
-				throw e;
-			}
-
-			jobRepository.updateExecutionContext(execution);
-
-			if (currentStepExecution.getStatus() == BatchStatus.STOPPING
-					|| currentStepExecution.getStatus() == BatchStatus.STOPPED) {
-				// Ensure that the job gets the message that it is stopping
-				execution.setStatus(BatchStatus.STOPPING);
-				throw new JobInterruptedException("Job interrupted by step execution");
-			}
-
-		}
-		else {
-			// currentStepExecution.setExitStatus(ExitStatus.NOOP);
-		}
-
-		return currentStepExecution;
-
-	}
-
-	/**
-	 * Detect whether a step execution belongs to this job execution.
-	 * @param jobExecution the current job execution
-	 * @param stepExecution an existing step execution
-	 * @return
-	 */
-	private boolean stepExecutionPartOfExistingJobExecution(JobExecution jobExecution, StepExecution stepExecution) {
-		return stepExecution != null && stepExecution.getJobExecutionId() != null
-				&& stepExecution.getJobExecutionId().equals(jobExecution.getId());
 	}
 
 	/**
@@ -419,55 +360,7 @@ public abstract class AbstractJob implements Job, StepLocator, BeanNameAware, In
 	 * @param stepExecution
 	 */
 	protected void updateStepExecution(StepExecution stepExecution) {
-		jobRepository.update(stepExecution);
-	}
-
-	/**
-	 * Given a step and configuration, return true if the step should start,
-	 * false if it should not, and throw an exception if the job should finish.
-	 * @param lastStepExecution the last step execution
-	 * @param jobInstance
-	 * @param step
-	 * 
-	 * @throws StartLimitExceededException if the start limit has been exceeded
-	 * for this step
-	 * @throws JobRestartException if the job is in an inconsistent state from
-	 * an earlier failure
-	 */
-	private boolean shouldStart(StepExecution lastStepExecution, JobInstance jobInstance, Step step)
-			throws JobRestartException, StartLimitExceededException {
-
-		BatchStatus stepStatus;
-		if (lastStepExecution == null) {
-			stepStatus = BatchStatus.STARTING;
-		}
-		else {
-			stepStatus = lastStepExecution.getStatus();
-		}
-
-		if (stepStatus == BatchStatus.UNKNOWN) {
-			throw new JobRestartException("Cannot restart step from UNKNOWN status. "
-					+ "The last execution ended with a failure that could not be rolled back, "
-					+ "so it may be dangerous to proceed. Manual intervention is probably necessary.");
-		}
-
-		if ((stepStatus == BatchStatus.COMPLETED && step.isAllowStartIfComplete() == false)
-				|| stepStatus == BatchStatus.ABANDONED) {
-			// step is complete, false should be returned, indicating that the
-			// step should not be started
-			logger.info("Step already complete or not restartable, so no action to execute: " + lastStepExecution);
-			return false;
-		}
-
-		if (jobRepository.getStepExecutionCount(jobInstance, step.getName()) < step.getStartLimit()) {
-			// step start count is less than start max, return true
-			return true;
-		}
-		else {
-			// start max has been exceeded, throw an exception.
-			throw new StartLimitExceededException("Maximum start limit exceeded for step: " + step.getName()
-					+ "StartMax: " + step.getStartLimit());
-		}
+		stepHandler.updateStepExecution(stepExecution);
 	}
 
 	/**

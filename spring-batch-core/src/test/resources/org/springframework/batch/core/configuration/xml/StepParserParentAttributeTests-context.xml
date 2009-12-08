@@ -127,8 +127,8 @@
 		<tasklet ref="dummyTasklet"/>
 	</step>
 	
-	<step id="specifiedRepoStandaloneStep">
-		<tasklet job-repository="dummyJobRepository2" transaction-manager="dummyTxMgr" ref="dummyTasklet"/>
+	<step id="specifiedRepoStandaloneStep" job-repository="dummyJobRepository2">
+		<tasklet transaction-manager="dummyTxMgr" ref="dummyTasklet"/>
 	</step>
 
 	<job id="baseJobWithRepo" job-repository="dummyJobRepository2" abstract="true"/>

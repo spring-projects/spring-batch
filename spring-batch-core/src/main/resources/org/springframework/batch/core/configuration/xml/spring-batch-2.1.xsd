@@ -110,13 +110,23 @@
 			<xsd:sequence>
 				<xsd:element ref="description" minOccurs="0" />
 				<xsd:choice minOccurs="0" maxOccurs="1">
-					<xsd:element name="tasklet">
+					<xsd:element name="tasklet" type="taskletType" />
+					<xsd:element name="flow">
 						<xsd:complexType>
-							<xsd:complexContent>
-								<xsd:extension base="taskletType">
-									<xsd:attributeGroup ref="jobRepositoryAttribute" />
-								</xsd:extension>
-							</xsd:complexContent>
+							<xsd:attribute name="parent" type="xsd:string" use="required">
+								<xsd:annotation>
+									<xsd:documentation
+										source="java:org.springframework.batch.core.job.flow.Flow"><![CDATA[
+							The flow that will execute in this step.
+							]]></xsd:documentation>
+									<xsd:appinfo>
+										<tool:annotation kind="parent">
+											<tool:expected-type
+												type="org.springframework.batch.core.job.flow.Flow" />
+										</tool:annotation>
+									</xsd:appinfo>
+								</xsd:annotation>
+							</xsd:attribute>
 						</xsd:complexType>
 					</xsd:element>
 				</xsd:choice>
@@ -124,6 +134,7 @@
 			<xsd:attribute name="id" type="xsd:ID" use="required" />
 			<xsd:attributeGroup ref="parentAttribute" />
 			<xsd:attributeGroup ref="abstractAttribute" />
+			<xsd:attributeGroup ref="jobRepositoryAttribute" />
 		</xsd:complexType>
 	</xsd:element>
 
@@ -136,12 +147,13 @@
 		</xsd:annotation>
 		<xsd:complexType>
 			<xsd:sequence>
-				<xsd:element ref="description" minOccurs="0"/>
+				<xsd:element ref="description" minOccurs="0" />
 				<xsd:choice minOccurs="0" maxOccurs="unbounded">
 					<xsd:group ref="flowGroup" />
 				</xsd:choice>
 			</xsd:sequence>
 			<xsd:attribute name="id" type="xsd:ID" use="required" />
+			<xsd:attribute name="abstract" type="xsd:boolean" />
 		</xsd:complexType>
 	</xsd:element>
 
@@ -285,10 +297,28 @@
 				<xsd:complexType>
 					<xsd:sequence>
 						<xsd:element ref="description" minOccurs="0" />
-						<xsd:choice minOccurs="0" maxOccurs="unbounded">
+						<xsd:choice minOccurs="0" maxOccurs="1">
 							<xsd:element name="tasklet" type="taskletType" />
-							<xsd:group ref="transitions" />
+							<xsd:element name="flow">
+								<xsd:complexType>
+									<xsd:attribute name="parent" type="xsd:string" use="required">
+										<xsd:annotation>
+											<xsd:documentation
+												source="java:org.springframework.batch.core.job.flow.Flow"><![CDATA[
+							The flow that will execute in this step.
+							]]></xsd:documentation>
+											<xsd:appinfo>
+												<tool:annotation kind="parent">
+													<tool:expected-type
+														type="org.springframework.batch.core.job.flow.Flow" />
+												</tool:annotation>
+											</xsd:appinfo>
+										</xsd:annotation>
+									</xsd:attribute>
+								</xsd:complexType>
+							</xsd:element>
 						</xsd:choice>
+						<xsd:group ref="transitions" minOccurs="0" maxOccurs="unbounded" />
 					</xsd:sequence>
 					<xsd:attribute name="id" type="xsd:ID" use="required" />
 					<xsd:attributeGroup ref="parentAttribute" />
@@ -313,14 +343,16 @@
 							</xsd:annotation>
 							<xsd:complexType>
 								<xsd:group ref="flowGroup" minOccurs="0" maxOccurs="unbounded" />
-								<xsd:attribute name="ref" type="xsd:string" use="optional">
+								<xsd:attribute name="parent" type="xsd:string" use="optional">
 									<xsd:annotation>
-										<xsd:documentation source="java:org.springframework.batch.core.job.flow.Flow"><![CDATA[
+										<xsd:documentation
+											source="java:org.springframework.batch.core.job.flow.Flow"><![CDATA[
 										The flow that will execute at this point in the job.
 										]]></xsd:documentation>
 										<xsd:appinfo>
 											<tool:annotation kind="ref">
-												<tool:expected-type type="org.springframework.batch.core.job.flow.Flow" />
+												<tool:expected-type
+													type="org.springframework.batch.core.job.flow.Flow" />
 											</tool:annotation>
 										</xsd:appinfo>
 									</xsd:annotation>
@@ -351,20 +383,24 @@
 			<xsd:element name="flow">
 				<xsd:annotation>
 					<xsd:documentation>
-						Declares job should include an externalized flow here.
+						Declares job should include an externalized flow
+						here.
 					</xsd:documentation>
 				</xsd:annotation>
 				<xsd:complexType>
 					<xsd:group ref="transitions" minOccurs="0" maxOccurs="unbounded" />
 					<xsd:attribute name="id" type="xsd:ID" use="required" />
-					<xsd:attribute name="ref" type="xsd:string" use="required">
+					<xsd:attribute name="parent" type="xsd:string" use="required">
 						<xsd:annotation>
-							<xsd:documentation source="java:org.springframework.batch.core.job.flow.Flow"><![CDATA[
-							The flow that will execute at this point in the job.
+							<xsd:documentation
+								source="java:org.springframework.batch.core.job.flow.Flow"><![CDATA[
+							The flow that will execute at this point in the job specified as a 
+							parent bean definition id.
 							]]></xsd:documentation>
 							<xsd:appinfo>
 								<tool:annotation kind="ref">
-									<tool:expected-type type="org.springframework.batch.core.job.flow.Flow" />
+									<tool:expected-type
+										type="org.springframework.batch.core.job.flow.Flow" />
 								</tool:annotation>
 							</xsd:appinfo>
 						</xsd:annotation>
@@ -426,13 +462,14 @@
 			</xsd:element>
 			<xsd:element name="listeners" type="stepListenersType"
 				minOccurs="0" maxOccurs="1" />
-			<xsd:element ref="beans:bean" minOccurs="0" maxOccurs="1"/>
-			<xsd:element ref="beans:ref" minOccurs="0" maxOccurs="1"/>
+			<xsd:element ref="beans:bean" minOccurs="0" maxOccurs="1" />
+			<xsd:element ref="beans:ref" minOccurs="0" maxOccurs="1" />
 		</xsd:all>
 		<xsd:attribute name="ref" type="xsd:string" use="optional">
 			<xsd:annotation>
 				<xsd:documentation>
-					The tasklet is a reference to another bean definition that implements
+					The tasklet is a reference to another bean
+					definition that implements
 					the Tasklet interface.
 				</xsd:documentation>
 				<xsd:appinfo>
@@ -944,15 +981,18 @@
 						<xsd:annotation>
 							<xsd:documentation>A pattern to match against the exit status
 								code. Use * and ? as wildcard characters.
-								When a step finishes the most specific match will be chosen to
-								select the next step.</xsd:documentation>
+								When a step finishes
+								the most specific match will be chosen to
+								select the next step.
+							</xsd:documentation>
 						</xsd:annotation>
 					</xsd:attribute>
 					<xsd:attribute name="restart" type="xsd:string" use="required">
 						<xsd:annotation>
 							<xsd:documentation>The name of the step to start on when the
 								stopped job is restarted.
-								Must resolve to one of the other steps in this job.
+								Must resolve to one of the other steps
+								in this job.
 							</xsd:documentation>
 						</xsd:annotation>
 					</xsd:attribute>
@@ -963,7 +1003,8 @@
 					<xsd:documentation>
 						Declares job should end at this point, without
 						the possibility of restart.
-						BatchStatus will be COMPLETED. ExitStatus is configurable.
+						BatchStatus will be COMPLETED.
+						ExitStatus is configurable.
 					</xsd:documentation>
 				</xsd:annotation>
 				<xsd:complexType>
@@ -971,8 +1012,10 @@
 						<xsd:annotation>
 							<xsd:documentation>A pattern to match against the exit status
 								code. Use * and ? as wildcard characters.
-								When a step finishes the most specific match will be chosen to
-								select the next step.</xsd:documentation>
+								When a step finishes
+								the most specific match will be chosen to
+								select the next step.
+							</xsd:documentation>
 						</xsd:annotation>
 					</xsd:attribute>
 					<xsd:attribute name="exit-code" use="optional" type="xsd:string"
@@ -996,8 +1039,10 @@
 						<xsd:annotation>
 							<xsd:documentation>A pattern to match against the exit status
 								code. Use * and ? as wildcard characters.
-								When a step finishes the most specific match will be chosen to
-								select the next step.</xsd:documentation>
+								When a step finishes
+								the most specific match will be chosen to
+								select the next step.
+							</xsd:documentation>
 						</xsd:annotation>
 					</xsd:attribute>
 					<xsd:attribute name="exit-code" use="optional" type="xsd:string"
@@ -1058,8 +1103,10 @@
 					try to instantiate that particular bean
 					in any case.
 
-					Note: This attribute will not be inherited by child bean definitions.
-					Hence, it needs to be specified per abstract bean definition.
+					Note: This attribute will not be inherited by child
+					bean definitions.
+					Hence, it needs to be specified per abstract bean
+					definition.
 				</xsd:documentation>
 			</xsd:annotation>
 		</xsd:attribute>
@@ -1071,7 +1118,8 @@
 				<xsd:documentation>
 					Should this list be merged with the corresponding
 					list provided
-					by the parent? If not, it will overwrite the parent list.
+					by the parent? If not, it will overwrite the parent
+					list.
 				</xsd:documentation>
 			</xsd:annotation>
 		</xsd:attribute>

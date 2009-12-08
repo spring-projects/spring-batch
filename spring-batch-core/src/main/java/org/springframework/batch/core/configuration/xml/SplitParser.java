@@ -44,6 +44,10 @@ import org.w3c.dom.Element;
  */
 public class SplitParser {
 
+	/**
+	 * 
+	 */
+	private static final String PARENT_ATTR = "parent";
 	private final String jobFactoryRef;
 
 	/**
@@ -91,7 +95,7 @@ public class SplitParser {
 		int i = 0;
 		String prefix = idAttribute.startsWith(jobFactoryRef) ? idAttribute : jobFactoryRef+"."+idAttribute;
 		for (Element nextElement : flowElements) {
-			String ref = nextElement.getAttribute("ref");
+			String ref = nextElement.getAttribute(PARENT_ATTR);
 			if (StringUtils.hasText(ref)) {
 				if (nextElement.getElementsByTagName("*").getLength() > 0) {
 					parserContext.getReaderContext().error("A <flow/> in a <split/> must have ref= or nested <flow/>, but not both.", nextElement);

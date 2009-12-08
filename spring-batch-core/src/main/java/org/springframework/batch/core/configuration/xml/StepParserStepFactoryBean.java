@@ -24,6 +24,8 @@ import org.springframework.batch.classify.BinaryExceptionClassifier;
 import org.springframework.batch.core.Step;
 import org.springframework.batch.core.StepExecutionListener;
 import org.springframework.batch.core.StepListener;
+import org.springframework.batch.core.job.flow.Flow;
+import org.springframework.batch.core.job.flow.FlowStep;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.step.item.FaultTolerantStepFactoryBean;
 import org.springframework.batch.core.step.item.SimpleStepFactoryBean;
@@ -79,6 +81,11 @@ class StepParserStepFactoryBean<I, O> implements FactoryBean, BeanNameAware {
 	private Tasklet tasklet;
 
 	private PlatformTransactionManager transactionManager;
+	
+	//
+	// Floe Elements
+	//
+	private Flow flow;
 
 	//
 	// Tasklet Elements
@@ -162,6 +169,11 @@ class StepParserStepFactoryBean<I, O> implements FactoryBean, BeanNameAware {
 		else if (tasklet != null) {
 			TaskletStep ts = new TaskletStep();
 			configureTaskletStep(ts);
+			return ts;
+		}
+		else if (flow != null) {
+			FlowStep ts = new FlowStep();
+			configureFlowStep(ts);
 			return ts;
 		}
 		else {
@@ -309,6 +321,33 @@ class StepParserStepFactoryBean<I, O> implements FactoryBean, BeanNameAware {
 		}
 	}
 
+	@SuppressWarnings("serial")
+	private void configureFlowStep(FlowStep ts) {
+		if (name != null) {
+			ts.setName(name);
+		}
+		if (allowStartIfComplete != null) {
+			ts.setAllowStartIfComplete(allowStartIfComplete);
+		}
+		if (jobRepository != null) {
+			ts.setJobRepository(jobRepository);
+		}
+		if (startLimit != null) {
+			ts.setStartLimit(startLimit);
+		}
+		if (flow != null) {
+			ts.setFlow(flow);
+		}
+		if (listeners != null) {
+			int i = 0;
+			StepExecutionListener[] newListeners = new StepExecutionListener[listeners.length];
+			for (StepListener listener : listeners) {
+				newListeners[i++] = (StepExecutionListener) listener;
+			}
+			ts.setStepExecutionListeners(newListeners);
+		}
+	}
+
 	private void validateFaultTolerantSettings() {
 		validateDependency("skippable-exception-classes", skippableExceptionClasses, "skip-limit", skipLimit, true);
 		validateDependency("retryable-exception-classes", retryableExceptionClasses, "retry-limit", retryLimit, true);
@@ -387,6 +426,17 @@ class StepParserStepFactoryBean<I, O> implements FactoryBean, BeanNameAware {
 		if (this.name == null) {
 			this.name = name;
 		}
+	}
+	
+	// =========================================================
+	// Flow Attributes
+	// =========================================================
+
+	/**
+	 * @param flow the flow to set
+	 */
+	public void setFlow(Flow flow) {
+		this.flow = flow;
 	}
 
 	// =========================================================

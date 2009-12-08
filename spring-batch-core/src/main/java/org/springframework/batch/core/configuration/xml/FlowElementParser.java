@@ -35,22 +35,26 @@ import org.w3c.dom.Element;
  */
 public class FlowElementParser {
 
+	private static final String ID_ATTR = "id";
+
+	private static final String REF_ATTR = "parent";
+
 	/**
 	 * Parse the flow and turn it into a list of transitions.
 	 * 
 	 * @param element the &lt;flow/gt; element to parse
 	 * @param parserContext the parser context for the bean factory
-	 * @return a collection of bean definitions for 
+	 * @return a collection of bean definitions for
 	 * {@link org.springframework.batch.core.job.flow.support.StateTransition}
 	 * instances objects
 	 */
 	public Collection<BeanDefinition> parse(Element element, ParserContext parserContext) {
 
-		String refAttribute = element.getAttribute("ref");
-		String idAttribute = element.getAttribute("id");
+		String refAttribute = element.getAttribute(REF_ATTR);
+		String idAttribute = element.getAttribute(ID_ATTR);
 
-		BeanDefinitionBuilder stateBuilder = 
-			BeanDefinitionBuilder.genericBeanDefinition("org.springframework.batch.core.job.flow.support.state.FlowState");
+		BeanDefinitionBuilder stateBuilder = BeanDefinitionBuilder
+				.genericBeanDefinition("org.springframework.batch.core.job.flow.support.state.FlowState");
 
 		AbstractBeanDefinition flowDefinition = new GenericBeanDefinition();
 		flowDefinition.setParentName(refAttribute);

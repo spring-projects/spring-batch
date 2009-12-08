@@ -34,8 +34,8 @@
 		</property>
 	</bean>
 
-	<step id="step1" xmlns="http://www.springframework.org/schema/batch">
-		<tasklet job-repository="jobRepository" transaction-manager="transactionManager">
+	<step id="step1" xmlns="http://www.springframework.org/schema/batch" job-repository="jobRepository">
+		<tasklet transaction-manager="transactionManager">
 			<chunk writer="itemWriter" reader="itemReader" processor="itemProcessor" commit-interval="5" />
 			<listeners>
 				<listener ref="fileNameListener" />
