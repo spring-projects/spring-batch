@@ -32,22 +32,25 @@ import org.springframework.beans.factory.InitializingBean;
 import org.springframework.util.Assert;
 
 /**
+ * Implementation of {@link StepHandler} that manages repository and restart
+ * concerns.
+ * 
  * @author Dave Syer
- *
+ * 
  */
 public class SimpleStepHandler implements StepHandler, InitializingBean {
 
 	private static final Log logger = LogFactory.getLog(SimpleStepHandler.class);
 
 	private JobRepository jobRepository;
-	
+
 	/**
 	 * Convenient default constructor for configuration usage.
 	 */
 	public SimpleStepHandler() {
 		this(null);
 	}
-	
+
 	/**
 	 * @param jobRepository
 	 */
@@ -55,14 +58,14 @@ public class SimpleStepHandler implements StepHandler, InitializingBean {
 		super();
 		this.jobRepository = jobRepository;
 	}
-	
+
 	/**
 	 * Check mandatory properties (jobRepository).
 	 * 
 	 * @see InitializingBean#afterPropertiesSet()
 	 */
 	public void afterPropertiesSet() throws Exception {
-		Assert.state(jobRepository!=null, "A JobRepository must be provided");
+		Assert.state(jobRepository != null, "A JobRepository must be provided");
 	}
 
 	/**
@@ -82,10 +85,11 @@ public class SimpleStepHandler implements StepHandler, InitializingBean {
 
 		StepExecution lastStepExecution = jobRepository.getLastStepExecution(jobInstance, step.getName());
 		if (stepExecutionPartOfExistingJobExecution(execution, lastStepExecution)) {
-			// If the last execution of this step was in the same job, it's probably
-			// intentional so we want to run it again...
-			logger.info(String.format("Duplicate step [%s] detected in execution of job=[%s]. " +
-					"If either step fails, both will be executed again on restart.", step.getName(), jobInstance.getJobName()));
+			// If the last execution of this step was in the same job, it's
+			// probably intentional so we want to run it again...
+			logger.info(String.format("Duplicate step [%s] detected in execution of job=[%s]. "
+					+ "If either step fails, both will be executed again on restart.", step.getName(), jobInstance
+					.getJobName()));
 			lastStepExecution = null;
 		}
 		StepExecution currentStepExecution = lastStepExecution;
@@ -133,10 +137,6 @@ public class SimpleStepHandler implements StepHandler, InitializingBean {
 		}
 
 		return currentStepExecution;
-	}
-
-	public void updateStepExecution(StepExecution stepExecution) {
-		jobRepository.update(stepExecution);
 	}
 
 	/**

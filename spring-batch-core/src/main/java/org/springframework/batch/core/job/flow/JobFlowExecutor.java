@@ -24,6 +24,7 @@ import org.springframework.batch.core.StartLimitExceededException;
 import org.springframework.batch.core.Step;
 import org.springframework.batch.core.StepExecution;
 import org.springframework.batch.core.job.StepHandler;
+import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.repository.JobRestartException;
 
 /**
@@ -43,10 +44,13 @@ public class JobFlowExecutor implements FlowExecutor {
 
 	private final StepHandler stepHandler;
 
+	private final JobRepository jobRepository;
+
 	/**
 	 * @param execution
 	 */
-	public JobFlowExecutor(StepHandler stepHandler, JobExecution execution) {
+	public JobFlowExecutor(JobRepository jobRepository, StepHandler stepHandler, JobExecution execution) {
+		this.jobRepository = jobRepository;
 		this.stepHandler = stepHandler;
 		this.execution = execution;
 		stepExecutionHolder.set(null);
@@ -63,7 +67,7 @@ public class JobFlowExecutor implements FlowExecutor {
 		StepExecution lastStepExecution = stepExecutionHolder.get();
 		if (lastStepExecution != null && lastStepExecution.getStatus().isGreaterThan(BatchStatus.STOPPING)) {
 			lastStepExecution.upgradeStatus(BatchStatus.ABANDONED);
-			stepHandler.updateStepExecution(lastStepExecution);
+			jobRepository.update(lastStepExecution);
 		}
 	}
 

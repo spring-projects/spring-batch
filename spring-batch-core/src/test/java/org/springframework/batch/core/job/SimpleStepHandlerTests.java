@@ -16,7 +16,7 @@
 
 package org.springframework.batch.core.job;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -27,7 +27,6 @@ import org.springframework.batch.core.JobInterruptedException;
 import org.springframework.batch.core.JobParameters;
 import org.springframework.batch.core.StepExecution;
 import org.springframework.batch.core.repository.JobRepository;
-import org.springframework.batch.core.repository.dao.StepExecutionDao;
 import org.springframework.batch.core.repository.support.MapJobRepositoryFactoryBean;
 import org.springframework.batch.core.step.StepSupport;
 
@@ -43,13 +42,10 @@ public class SimpleStepHandlerTests {
 
 	private SimpleStepHandler stepHandler;
 
-	private StepExecutionDao stepExecutionDao;
-
 	@Before
 	public void setUp() throws Exception {
 		MapJobRepositoryFactoryBean jobRepositoryFactoryBean = new MapJobRepositoryFactoryBean();
 		jobRepository = jobRepositoryFactoryBean.getJobRepository();
-		stepExecutionDao = jobRepositoryFactoryBean.getStepExecutionDao();
 		jobExecution = jobRepository.createJobExecution("job", new JobParameters());
 		stepHandler = new SimpleStepHandler(jobRepository);
 		stepHandler.afterPropertiesSet();
@@ -73,20 +69,6 @@ public class SimpleStepHandlerTests {
 	public void testHandleStep() throws Exception {
 		StepExecution stepExecution = stepHandler.handleStep(new StubStep("step"), jobExecution);
 		assertEquals(BatchStatus.COMPLETED, stepExecution.getStatus());
-	}
-
-	/**
-	 * Test method for
-	 * {@link SimpleStepHandler#updateStepExecution(org.springframework.batch.core.StepExecution)}
-	 * 
-	 */
-	@Test
-	public void testUpdateStepExecution() {
-		StepExecution stepExecution = jobExecution.createStepExecution("step");
-		jobRepository.add(stepExecution);
-		stepExecution.setStatus(BatchStatus.FAILED);
-		stepHandler.updateStepExecution(stepExecution);
-		assertEquals(stepExecution, stepExecutionDao.getStepExecution(jobExecution, stepExecution.getId()));
 	}
 
 	private class StubStep extends StepSupport {

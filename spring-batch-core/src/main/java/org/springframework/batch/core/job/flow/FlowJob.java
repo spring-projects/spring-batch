@@ -94,7 +94,7 @@ public class FlowJob extends AbstractJob {
 	@Override
 	protected void doExecute(final JobExecution execution) throws JobExecutionException {
 		try {
-			JobFlowExecutor executor = new JobFlowExecutor(new SimpleStepHandler(getJobRepository()),
+			JobFlowExecutor executor = new JobFlowExecutor(getJobRepository(), new SimpleStepHandler(getJobRepository()),
 					execution);
 			executor.updateJobExecutionStatus(flow.start(executor).getStatus());
 		}

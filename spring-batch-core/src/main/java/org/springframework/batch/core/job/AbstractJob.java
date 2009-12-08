@@ -353,17 +353,6 @@ public abstract class AbstractJob implements Job, StepLocator, BeanNameAware, In
 	}
 
 	/**
-	 * Convenience method for subclasses so they can change the state of a
-	 * {@link StepExecution} if necessary. Use with care (and not at all
-	 * preferably) and only before or after a step is executed.
-	 * 
-	 * @param stepExecution
-	 */
-	protected void updateStepExecution(StepExecution stepExecution) {
-		stepHandler.updateStepExecution(stepExecution);
-	}
-
-	/**
 	 * Default mapping from throwable to {@link ExitStatus}.
 	 * 
 	 * @param ex the cause of the failure
