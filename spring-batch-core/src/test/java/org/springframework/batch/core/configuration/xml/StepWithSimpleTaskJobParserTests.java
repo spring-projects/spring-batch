@@ -76,8 +76,9 @@ public class StepWithSimpleTaskJobParserTests {
 	}
 
 	private TestTasklet assertTasklet(Job job, String stepName, String taskletName) {
-		Step step = (Step) ReflectionTestUtils.getField(((FlowJob) job).getStep(stepName), "step");
-		assertTrue(step instanceof TaskletStep);
+		System.err.println(((FlowJob) job).getStepNames());
+		Step step = ((FlowJob) job).getStep(stepName);
+		assertTrue("Wong type for step name="+stepName+": "+step, step instanceof TaskletStep);
 		Object tasklet = ReflectionTestUtils.getField(step, "tasklet");
 		assertTrue(tasklet instanceof TestTasklet);
 		TestTasklet testTasklet = (TestTasklet) tasklet;

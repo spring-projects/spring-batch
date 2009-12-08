@@ -3,9 +3,6 @@ package org.springframework.batch.core.configuration.xml;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.springframework.batch.core.JobInterruptedException;
-import org.springframework.batch.core.Step;
-import org.springframework.batch.core.StepExecution;
 import org.springframework.batch.core.job.flow.FlowExecutionStatus;
 import org.springframework.batch.core.job.flow.FlowExecutor;
 import org.springframework.batch.core.job.flow.State;
@@ -102,8 +99,7 @@ public class SimpleFlowFactoryBean implements FactoryBean, InitializingBean {
 		}
 		String stateName = prefix + oldName;
 		if (state instanceof StepState) {
-			Step step = ((StepState) state).getStep();
-			return new StepState(stateName, new DelegateStep(stateName, step));
+			return new StepState(stateName, ((StepState) state).getStep());
 		}
 		return new DelegateState(stateName, state);
 	}
@@ -138,46 +134,6 @@ public class SimpleFlowFactoryBean implements FactoryBean, InitializingBean {
 		@Override
 		public FlowExecutionStatus handle(FlowExecutor executor) throws Exception {
 			return state.handle(executor);
-		}
-	}
-
-	/**
-	 * A Step that proxies a delegate and changes its name but leaves its
-	 * behaviour unchanged.
-	 * 
-	 * @author Dave Syer
-	 * 
-	 */
-	private static class DelegateStep implements Step {
-
-		private final Step step;
-
-		private final String name;
-
-		private DelegateStep(String name, Step step) {
-			this.step = step;
-			this.name = name;
-		}
-
-		public boolean isAllowStartIfComplete() {
-			return step.isAllowStartIfComplete();
-		}
-
-		public int getStartLimit() {
-			return step.getStartLimit();
-		}
-
-		public String getName() {
-			return name;
-		}
-
-		public void execute(StepExecution stepExecution) throws JobInterruptedException {
-			step.execute(stepExecution);
-		}
-		
-		@Override
-		public String toString() {
-			return step.toString();
 		}
 	}
 

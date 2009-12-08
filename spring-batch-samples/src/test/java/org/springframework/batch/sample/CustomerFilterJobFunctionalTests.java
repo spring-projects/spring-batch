@@ -105,7 +105,6 @@ public class CustomerFilterJobFunctionalTests {
 
 	private Map<String, Object> getStepExecution(JobExecution jobExecution, String stepName) {
 		Long jobExecutionId = jobExecution.getId();
-		stepName = jobExecution.getJobInstance().getJobName()+"."+stepName;
 		return simpleJdbcTemplate.queryForMap(
 				"SELECT * from BATCH_STEP_EXECUTION where JOB_EXECUTION_ID = ? and STEP_NAME = ?", jobExecutionId,
 				stepName);

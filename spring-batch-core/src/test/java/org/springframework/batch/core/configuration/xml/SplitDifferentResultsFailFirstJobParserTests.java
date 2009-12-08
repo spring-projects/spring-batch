@@ -16,7 +16,6 @@
 package org.springframework.batch.core.configuration.xml;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -41,17 +40,16 @@ public class SplitDifferentResultsFailFirstJobParserTests extends AbstractJobPar
 		JobExecution jobExecution = createJobExecution();
 		job.execute(jobExecution);
 		assertEquals(2, stepNamesList.size());
-		assertTrue("Wrong step names: "+stepNamesList, stepNamesList.contains("job.split1.1.s1"));
-		assertTrue(stepNamesList.contains("job.split1.0.fail"));
+		assertEquals("Wrong step names: "+stepNamesList, "[fail, s1]", stepNamesList.toString());
 
 		assertEquals(BatchStatus.FAILED, jobExecution.getStatus());
 		assertEquals(ExitStatus.FAILED, jobExecution.getExitStatus());
 
-		StepExecution stepExecution1 = getStepExecution(jobExecution, "job.split1.1.s1");
+		StepExecution stepExecution1 = getStepExecution(jobExecution, "s1");
 		assertEquals(BatchStatus.COMPLETED, stepExecution1.getStatus());
 		assertEquals(ExitStatus.COMPLETED, stepExecution1.getExitStatus());
 
-		StepExecution stepExecution2 = getStepExecution(jobExecution, "job.split1.0.fail");
+		StepExecution stepExecution2 = getStepExecution(jobExecution, "fail");
 		assertEquals(BatchStatus.FAILED, stepExecution2.getStatus());
 		assertEquals(ExitStatus.FAILED.getExitCode(), stepExecution2.getExitStatus().getExitCode());
 

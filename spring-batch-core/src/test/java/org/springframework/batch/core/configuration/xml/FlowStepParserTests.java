@@ -72,18 +72,18 @@ public class FlowStepParserTests {
 		assertEquals(BatchStatus.COMPLETED, jobExecution.getStatus());
 		List<String> stepNames = getStepNames(jobExecution);
 		assertEquals(5, stepNames.size());
-		assertEquals("[job1.s1, job1.flow, job1.flow.s2, job1.flow.s3, job1.s4]", stepNames.toString());
+		assertEquals("[s1, job1.flow, s2, s3, s4]", stepNames.toString());
 	}
 
 	@Test
 	public void testFlowExternalStep() throws Exception {
 		assertNotNull(job2);
-		JobExecution jobExecution = jobRepository.createJobExecution(job1.getName(), new JobParameters());
+		JobExecution jobExecution = jobRepository.createJobExecution(job2.getName(), new JobParameters());
 		job2.execute(jobExecution);
 		assertEquals(BatchStatus.COMPLETED, jobExecution.getStatus());
 		List<String> stepNames = getStepNames(jobExecution);
 		assertEquals(5, stepNames.size());
-		assertEquals("[job2.s1, job2.flow, flow.step.s2, flow.step.s3, job2.s4]", stepNames.toString());
+		assertEquals("[job2.s1, job2.flow, s2, s3, job2.s4]", stepNames.toString());
 	}
 
 	private List<String> getStepNames(JobExecution jobExecution) {

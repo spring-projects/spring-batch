@@ -46,12 +46,12 @@ public class StopJobParserTests extends AbstractJobParserTests {
 		JobExecution jobExecution = createJobExecution();
 		job.execute(jobExecution);
 		assertEquals(1, stepNamesList.size());
-		assertTrue(stepNamesList.contains("job.s1"));
+		assertTrue(stepNamesList.contains("s1"));
 
 		assertEquals(BatchStatus.STOPPED, jobExecution.getStatus());
 		assertEquals(ExitStatus.STOPPED.getExitCode(), jobExecution.getExitStatus().getExitCode());
 
-		StepExecution stepExecution1 = getStepExecution(jobExecution, "job.s1");
+		StepExecution stepExecution1 = getStepExecution(jobExecution, "s1");
 		assertEquals(BatchStatus.COMPLETED, stepExecution1.getStatus());
 		assertEquals(ExitStatus.COMPLETED, stepExecution1.getExitStatus());
 
@@ -62,12 +62,12 @@ public class StopJobParserTests extends AbstractJobParserTests {
 		jobExecution = createJobExecution();
 		job.execute(jobExecution);
 		assertEquals(1, stepNamesList.size()); // step1 is not executed
-		assertTrue(stepNamesList.contains("job.s2"));
+		assertTrue(stepNamesList.contains("s2"));
 
 		assertEquals(BatchStatus.COMPLETED, jobExecution.getStatus());
 		assertEquals(ExitStatus.COMPLETED, jobExecution.getExitStatus());
 
-		StepExecution stepExecution2 = getStepExecution(jobExecution, "job.s2");
+		StepExecution stepExecution2 = getStepExecution(jobExecution, "s2");
 		assertEquals(BatchStatus.COMPLETED, stepExecution2.getStatus());
 		assertEquals(ExitStatus.COMPLETED, stepExecution2.getExitStatus());
 

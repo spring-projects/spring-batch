@@ -44,17 +44,17 @@ public class NextAttributeJobParserTests extends AbstractJobParserTests {
 		JobExecution jobExecution = createJobExecution();
 		job.execute(jobExecution);
 		assertEquals(2, stepNamesList.size()); //s2 is not executed
-		assertTrue(stepNamesList.contains("job.s1"));
-		assertTrue(stepNamesList.contains("job.fail"));
+		assertTrue(stepNamesList.contains("s1"));
+		assertTrue(stepNamesList.contains("fail"));
 
 		assertEquals(BatchStatus.FAILED, jobExecution.getStatus());
 		assertEquals("FAILED", jobExecution.getExitStatus().getExitCode());
 
-		StepExecution stepExecution1 = getStepExecution(jobExecution, "job.s1");
+		StepExecution stepExecution1 = getStepExecution(jobExecution, "s1");
 		assertEquals(BatchStatus.COMPLETED, stepExecution1.getStatus());
 		assertEquals(ExitStatus.COMPLETED, stepExecution1.getExitStatus());
 
-		StepExecution stepExecution2 = getStepExecution(jobExecution, "job.fail");
+		StepExecution stepExecution2 = getStepExecution(jobExecution, "fail");
 		assertEquals(BatchStatus.FAILED, stepExecution2.getStatus());
 		assertEquals(ExitStatus.FAILED.getExitCode(), stepExecution2.getExitStatus().getExitCode());
 
@@ -65,12 +65,12 @@ public class NextAttributeJobParserTests extends AbstractJobParserTests {
 		jobExecution = createJobExecution();
 		job.execute(jobExecution);
 		assertEquals(1, stepNamesList.size()); //s1,s2 are not executed
-		assertTrue(stepNamesList.contains("job.fail"));
+		assertTrue(stepNamesList.contains("fail"));
 
 		assertEquals(BatchStatus.FAILED, jobExecution.getStatus());
 		assertEquals("FAILED", jobExecution.getExitStatus().getExitCode());
 
-		StepExecution stepExecution3 = getStepExecution(jobExecution, "job.fail");
+		StepExecution stepExecution3 = getStepExecution(jobExecution, "fail");
 		assertEquals(BatchStatus.FAILED, stepExecution3.getStatus());
 		assertEquals(ExitStatus.FAILED.getExitCode(), stepExecution3.getExitStatus().getExitCode());
 		

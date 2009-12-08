@@ -80,7 +80,7 @@ public class FlowJobParserTests {
 		assertEquals(BatchStatus.COMPLETED, jobExecution.getStatus());
 		List<String> stepNames = getStepNames(jobExecution);
 		assertEquals(4, stepNames.size());
-		assertEquals("[job1.s1, job1.flow.s2, job1.flow.s3, job1.s4]", stepNames.toString());
+		assertEquals("[s1, s2, s3, s4]", stepNames.toString());
 	}
 
 	@Test
@@ -92,7 +92,7 @@ public class FlowJobParserTests {
 		assertEquals(3, jobExecution.getStepExecutions().size());
 		List<String> stepNames = getStepNames(jobExecution);
 		assertEquals(3, stepNames.size());
-		assertEquals("[job2.flow.s2, job2.flow.s3, job2.s1]", stepNames.toString());
+		assertEquals("[s2, s3, job2.s1]", stepNames.toString());
 	}
 
 	@Test
@@ -103,7 +103,7 @@ public class FlowJobParserTests {
 		assertEquals(BatchStatus.COMPLETED, jobExecution.getStatus());
 		List<String> stepNames = getStepNames(jobExecution);
 		assertEquals(2, stepNames.size());
-		assertEquals("[job3.flow.s2, job3.flow.s3]", stepNames.toString());
+		assertEquals("[s2, s3]", stepNames.toString());
 	}
 
 	@Test
@@ -114,7 +114,7 @@ public class FlowJobParserTests {
 		assertEquals(BatchStatus.COMPLETED, jobExecution.getStatus());
 		List<String> stepNames = getStepNames(jobExecution);
 		assertEquals(4, stepNames.size());
-		assertEquals("[job4.split.0.s2, job4.split.0.s3, job4.split.1.s2, job4.split.1.s3]", stepNames.toString());
+		assertEquals("[s2, s3, s2, s3]", stepNames.toString());
 	}
 
 	private List<String> getStepNames(JobExecution jobExecution) {

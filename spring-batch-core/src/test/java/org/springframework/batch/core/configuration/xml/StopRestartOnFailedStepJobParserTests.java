@@ -43,13 +43,13 @@ public class StopRestartOnFailedStepJobParserTests extends AbstractJobParserTest
 		//
 		// First Launch
 		//
-		launchAndAssert("[job.s0, job.fail]");
+		launchAndAssert("[s0, fail]");
 
 		//
 		// Second Launch
 		//
 		stepNamesList.clear();
-		launchAndAssert("[job.fail]");
+		launchAndAssert("[fail]");
 
 	}
 
@@ -62,7 +62,7 @@ public class StopRestartOnFailedStepJobParserTests extends AbstractJobParserTest
 		assertEquals(BatchStatus.STOPPED, jobExecution.getStatus());
 		assertEquals(ExitStatus.STOPPED.getExitCode(), jobExecution.getExitStatus().getExitCode());
 
-		StepExecution stepExecution1 = getStepExecution(jobExecution, "job.fail");
+		StepExecution stepExecution1 = getStepExecution(jobExecution, "fail");
 		assertEquals(BatchStatus.FAILED, stepExecution1.getStatus());
 		assertEquals(ExitStatus.FAILED.getExitCode(), stepExecution1.getExitStatus().getExitCode());
 	}

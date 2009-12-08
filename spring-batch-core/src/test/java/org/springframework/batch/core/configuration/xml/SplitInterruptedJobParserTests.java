@@ -52,9 +52,9 @@ public class SplitInterruptedJobParserTests extends AbstractJobParserTests {
 		assertEquals(BatchStatus.STOPPED, jobExecution.getStatus());
 		assertEquals(ExitStatus.STOPPED.getExitCode(), jobExecution.getExitStatus().getExitCode());
 
-		assertTrue("Wrong step names: "+stepNamesList, stepNamesList.contains("job.split1.0.stop"));
+		assertTrue("Wrong step names: "+stepNamesList, stepNamesList.contains("stop"));
 
-		StepExecution stepExecution = getStepExecution(jobExecution, "job.split1.0.stop");
+		StepExecution stepExecution = getStepExecution(jobExecution, "stop");
 		assertEquals(BatchStatus.STOPPED, stepExecution.getStatus());
 		assertEquals(ExitStatus.STOPPED.getExitCode(), stepExecution.getExitStatus().getExitCode());
 
