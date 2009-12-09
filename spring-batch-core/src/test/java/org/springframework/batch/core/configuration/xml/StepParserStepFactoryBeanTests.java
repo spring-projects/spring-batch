@@ -23,6 +23,8 @@ import java.util.HashMap;
 
 import org.junit.Test;
 import org.springframework.batch.core.StepListener;
+import org.springframework.batch.core.job.flow.FlowStep;
+import org.springframework.batch.core.job.flow.support.SimpleFlow;
 import org.springframework.batch.core.listener.StepExecutionListenerSupport;
 import org.springframework.batch.core.partition.support.PartitionStep;
 import org.springframework.batch.core.partition.support.SimplePartitioner;
@@ -237,6 +239,24 @@ public class StepParserStepFactoryBeanTests {
 		assertTrue(step instanceof PartitionStep);
 		Object handler = ReflectionTestUtils.getField(step, "partitionHandler");
 		assertTrue(handler instanceof TaskExecutorPartitionHandler);
+	}
+
+	@Test
+	public void testFlowStep() throws Exception {
+		StepParserStepFactoryBean<Object, Object> fb = new StepParserStepFactoryBean<Object, Object>();
+		fb.setBeanName("step1");
+		fb.setAllowStartIfComplete(true);
+		fb.setJobRepository(new JobRepositorySupport());
+		fb.setStartLimit(5);
+		fb.setListeners(new StepListener[] { new StepExecutionListenerSupport() });
+		fb.setTaskExecutor(new SyncTaskExecutor());
+
+		fb.setFlow(new SimpleFlow("foo"));
+
+		Object step = fb.getObject();
+		assertTrue(step instanceof FlowStep);
+		Object handler = ReflectionTestUtils.getField(step, "flow");
+		assertTrue(handler instanceof SimpleFlow);
 	}
 
 }
