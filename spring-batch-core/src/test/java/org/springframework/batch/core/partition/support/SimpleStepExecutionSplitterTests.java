@@ -1,6 +1,7 @@
 package org.springframework.batch.core.partition.support;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 
 import java.util.Collections;
 import java.util.Map;
@@ -11,8 +12,6 @@ import org.junit.Test;
 import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.Step;
 import org.springframework.batch.core.StepExecution;
-import org.springframework.batch.core.partition.support.Partitioner;
-import org.springframework.batch.core.partition.support.SimpleStepExecutionSplitter;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.repository.support.MapJobRepositoryFactoryBean;
 import org.springframework.batch.core.step.tasklet.TaskletStep;
@@ -35,10 +34,11 @@ public class SimpleStepExecutionSplitterTests {
 
 	@Test
 	public void testSimpleStepExecutionProviderJobRepositoryStep() throws Exception {
-		SimpleStepExecutionSplitter splitter = new SimpleStepExecutionSplitter(jobRepository, step);
+		SimpleStepExecutionSplitter splitter = new SimpleStepExecutionSplitter(jobRepository, step,
+				new SimplePartitioner());
 		Set<StepExecution> execs = splitter.split(stepExecution, 2);
 		assertEquals(2, execs.size());
-		
+
 		for (StepExecution execution : execs) {
 			assertNotNull("step execution partition is saved", execution.getId());
 		}
@@ -57,14 +57,16 @@ public class SimpleStepExecutionSplitterTests {
 
 	@Test
 	public void testRememberGridSize() throws Exception {
-		SimpleStepExecutionSplitter provider = new SimpleStepExecutionSplitter(jobRepository, step);
+		SimpleStepExecutionSplitter provider = new SimpleStepExecutionSplitter(jobRepository, step,
+				new SimplePartitioner());
 		assertEquals(2, provider.split(stepExecution, 2).size());
 		assertEquals(2, provider.split(stepExecution, 3).size());
 	}
 
 	@Test
 	public void testGetStepName() {
-		SimpleStepExecutionSplitter provider = new SimpleStepExecutionSplitter(jobRepository, step);
+		SimpleStepExecutionSplitter provider = new SimpleStepExecutionSplitter(jobRepository, step,
+				new SimplePartitioner());
 		assertEquals("step", provider.getStepName());
 	}
 

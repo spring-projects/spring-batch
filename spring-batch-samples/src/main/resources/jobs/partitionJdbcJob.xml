@@ -15,16 +15,16 @@
 		<property name="stepExecutionSplitter">
 			<bean
 				class="org.springframework.batch.core.partition.support.SimpleStepExecutionSplitter">
-				<constructor-arg ref="jobRepository" />
-				<constructor-arg ref="step1" />
-				<constructor-arg>
+				<property name="jobRepository" ref="jobRepository" />
+				<property name="stepName" value="step1" />
+				<property name="partitioner">
 					<bean
 						class="org.springframework.batch.sample.common.ColumnRangePartitioner">
 						<property name="dataSource" ref="dataSource" />
 						<property name="table" value="CUSTOMER" />
 						<property name="column" value="ID" />
 					</bean>
-				</constructor-arg>
+				</property>
 			</bean>
 		</property>
 		<property name="partitionHandler">
@@ -34,13 +34,13 @@
 					<bean class="org.springframework.core.task.SyncTaskExecutor" />
 				</property>
 				<property name="step" ref="step1" />
-				<property name="gridSize" value="2"/>
+				<property name="gridSize" value="2" />
 			</bean>
 		</property>
 	</bean>
 
 	<step id="step1" xmlns="http://www.springframework.org/schema/batch">
-		<tasklet job-repository="jobRepository" transaction-manager="transactionManager">
+		<tasklet transaction-manager="transactionManager">
 			<chunk writer="itemWriter" reader="itemReader" processor="itemProcessor"
 				commit-interval="5" />
 			<listeners>
@@ -52,7 +52,7 @@
 	<bean id="fileNameListener"
 		class="org.springframework.batch.sample.common.OutputFileListener"
 		scope="step">
-		<property name="path" value="file:./target/output/jdbc/"/>
+		<property name="path" value="file:./target/output/jdbc/" />
 	</bean>
 
 	<bean id="itemReader" scope="step" autowire-candidate="false"
@@ -89,14 +89,17 @@
 		<property name="lineMapper">
 			<bean class="org.springframework.batch.item.file.mapping.DefaultLineMapper">
 				<property name="lineTokenizer">
-					<bean class="org.springframework.batch.item.file.transform.DelimitedLineTokenizer">
+					<bean
+						class="org.springframework.batch.item.file.transform.DelimitedLineTokenizer">
 						<property name="delimiter" value="," />
 						<property name="names" value="id,name,credit" />
 					</bean>
 				</property>
 				<property name="fieldSetMapper">
-					<bean class="org.springframework.batch.item.file.mapping.BeanWrapperFieldSetMapper">
-						<property name="targetType" value="org.springframework.batch.sample.domain.trade.CustomerCredit" />
+					<bean
+						class="org.springframework.batch.item.file.mapping.BeanWrapperFieldSetMapper">
+						<property name="targetType"
+							value="org.springframework.batch.sample.domain.trade.CustomerCredit" />
 					</bean>
 				</property>
 			</bean>

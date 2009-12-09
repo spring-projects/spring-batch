@@ -56,7 +56,7 @@ public class PartitionStepTests {
 
 	@Test
 	public void testVanillaStepExecution() throws Exception {
-		step.setStepExecutionSplitter(new SimpleStepExecutionSplitter(jobRepository, remote));
+		step.setStepExecutionSplitter(new SimpleStepExecutionSplitter(jobRepository, remote, new SimplePartitioner()));
 		step.setPartitionHandler(new PartitionHandler() {
 			public Collection<StepExecution> handle(StepExecutionSplitter stepSplitter, StepExecution stepExecution)
 					throws Exception {
@@ -80,7 +80,7 @@ public class PartitionStepTests {
 
 	@Test
 	public void testFailedStepExecution() throws Exception {
-		step.setStepExecutionSplitter(new SimpleStepExecutionSplitter(jobRepository, remote));
+		step.setStepExecutionSplitter(new SimpleStepExecutionSplitter(jobRepository, remote, new SimplePartitioner()));
 		step.setPartitionHandler(new PartitionHandler() {
 			public Collection<StepExecution> handle(StepExecutionSplitter stepSplitter, StepExecution stepExecution)
 					throws Exception {
@@ -104,7 +104,7 @@ public class PartitionStepTests {
 
 	@Test
 	public void testStoppedStepExecution() throws Exception {
-		step.setStepExecutionSplitter(new SimpleStepExecutionSplitter(jobRepository, remote));
+		step.setStepExecutionSplitter(new SimpleStepExecutionSplitter(jobRepository, remote, new SimplePartitioner()));
 		step.setPartitionHandler(new PartitionHandler() {
 			public Collection<StepExecution> handle(StepExecutionSplitter stepSplitter, StepExecution stepExecution)
 					throws Exception {
@@ -135,7 +135,7 @@ public class PartitionStepTests {
 				result.getExecutionContext().put("aggregated", true);
 			}
 		});
-		step.setStepExecutionSplitter(new SimpleStepExecutionSplitter(jobRepository, remote));
+		step.setStepExecutionSplitter(new SimpleStepExecutionSplitter(jobRepository, remote, new SimplePartitioner()));
 		step.setPartitionHandler(new PartitionHandler() {
 			public Collection<StepExecution> handle(StepExecutionSplitter stepSplitter, StepExecution stepExecution)
 					throws Exception {

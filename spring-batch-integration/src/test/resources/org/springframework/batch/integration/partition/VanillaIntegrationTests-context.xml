@@ -68,8 +68,11 @@
 				<property name="stepExecutionSplitter">
 					<bean
 						class="org.springframework.batch.core.partition.support.SimpleStepExecutionSplitter">
-						<constructor-arg ref="jobRepository" />
-						<constructor-arg ref="step1" />
+						<property name="jobRepository" ref="jobRepository" />
+						<property name="stepName" ref="step1" />
+						<property name="partitioner">
+							<bean class="org.springframework.batch.core.partition.support.SimplePartitioner"/>
+						</property>
 					</bean>
 				</property>
 				<property name="jobRepository" ref="jobRepository" />

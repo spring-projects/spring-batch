@@ -30,6 +30,8 @@ import org.springframework.batch.core.StepExecution;
 import org.springframework.batch.core.partition.StepExecutionSplitter;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.item.ExecutionContext;
+import org.springframework.beans.factory.InitializingBean;
+import org.springframework.util.Assert;
 
 /**
  * Generic implementation of {@link StepExecutionSplitter} that delegates to a
@@ -44,20 +46,22 @@ import org.springframework.batch.item.ExecutionContext;
  * @author Dave Syer
  * @since 2.0
  */
-public class SimpleStepExecutionSplitter implements StepExecutionSplitter {
+public class SimpleStepExecutionSplitter implements StepExecutionSplitter, InitializingBean {
 
 	private static final String STEP_NAME_SEPARATOR = ":";
 
-	private final String stepName;
+	private String stepName;
 
-	private final Partitioner partitioner;
+	private Partitioner partitioner;
 
-	private final Step step;
+	private boolean allowStartIfComplete = false;
 
-	private final JobRepository jobRepository;
+	private JobRepository jobRepository;
 
-	public SimpleStepExecutionSplitter(JobRepository jobRepository, Step step) {
-		this(jobRepository, step, new SimplePartitioner());
+	/**
+	 * Default constructor for convenience in configuration.
+	 */
+	public SimpleStepExecutionSplitter() {
 	}
 
 	/**
@@ -65,15 +69,71 @@ public class SimpleStepExecutionSplitter implements StepExecutionSplitter {
 	 * properties.
 	 * 
 	 * @param jobRepository the {@link JobRepository}
-	 * @param step the target step (a local version of it)
+	 * @param step the target step (a local version of it), used to extract the
+	 * name and allowStartIfComplete flags
 	 * @param partitioner a {@link Partitioner} to use for generating input
 	 * parameters
 	 */
 	public SimpleStepExecutionSplitter(JobRepository jobRepository, Step step, Partitioner partitioner) {
 		this.jobRepository = jobRepository;
-		this.step = step;
+		this.allowStartIfComplete = step.isAllowStartIfComplete();
 		this.partitioner = partitioner;
 		this.stepName = step.getName();
+	}
+
+	/**
+	 * Check mandatory properties (step name, job repository and partitioner).
+	 * 
+	 * @see InitializingBean#afterPropertiesSet()
+	 */
+	public void afterPropertiesSet() throws Exception {
+		Assert.state(jobRepository != null, "A JobRepository is required");
+		Assert.state(stepName != null, "A step name is required");
+		Assert.state(partitioner != null, "A Partitioner is required");
+	}
+
+	/**
+	 * Flag to indicate that the partition target step is allowed to start if an
+	 * execution is complete. Should be the same as the value that would be
+	 * returned by the {@link Step} itself from its own properties. Defaults to
+	 * false.
+	 * 
+	 * @see Step#isAllowStartIfComplete()
+	 * 
+	 * @param allowStartIfComplete the value to set
+	 */
+	public void setAllowStartIfComplete(boolean allowStartIfComplete) {
+		this.allowStartIfComplete = allowStartIfComplete;
+	}
+
+	/**
+	 * The job repository that will be used to manage the persistence of the
+	 * delegate step executions.
+	 * 
+	 * @param jobRepository the JobRepository to set
+	 */
+	public void setJobRepository(JobRepository jobRepository) {
+		this.jobRepository = jobRepository;
+	}
+
+	/**
+	 * The {@link Partitioner} that will be used to generate step execution meta
+	 * data for the target step.
+	 * 
+	 * @param partitioner the partitioner to set
+	 */
+	public void setPartitioner(Partitioner partitioner) {
+		this.partitioner = partitioner;
+	}
+
+	/**
+	 * The name of the target step that will be executed across the partitions.
+	 * Mandatory with no default.
+	 * 
+	 * @param stepName the step name to set
+	 */
+	public void setStepName(String stepName) {
+		this.stepName = stepName;
 	}
 
 	/**
@@ -144,11 +204,12 @@ public class SimpleStepExecutionSplitter implements StepExecutionSplitter {
 			stepExecution.setExecutionContext(context);
 		}
 
-		return shouldStart(step, lastStepExecution) || isRestart;
+		return shouldStart(allowStartIfComplete, lastStepExecution) || isRestart;
 
 	}
 
-	private boolean shouldStart(Step step, StepExecution lastStepExecution) throws JobExecutionException {
+	private boolean shouldStart(boolean allowStartIfComplete, StepExecution lastStepExecution)
+			throws JobExecutionException {
 
 		if (lastStepExecution == null) {
 			return true;
@@ -162,7 +223,7 @@ public class SimpleStepExecutionSplitter implements StepExecutionSplitter {
 					+ "so it may be dangerous to proceed.  " + "Manual intervention is probably necessary.");
 		}
 
-		if (stepStatus == BatchStatus.COMPLETED && step.isAllowStartIfComplete() == false) {
+		if (stepStatus == BatchStatus.COMPLETED && !allowStartIfComplete) {
 			// step is complete, false should be returned, indicating that the
 			// step should not be started
 			return false;

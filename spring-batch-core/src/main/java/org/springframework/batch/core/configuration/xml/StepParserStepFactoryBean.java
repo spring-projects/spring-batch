@@ -26,7 +26,14 @@ import org.springframework.batch.core.StepExecutionListener;
 import org.springframework.batch.core.StepListener;
 import org.springframework.batch.core.job.flow.Flow;
 import org.springframework.batch.core.job.flow.FlowStep;
+import org.springframework.batch.core.partition.PartitionHandler;
+import org.springframework.batch.core.partition.support.PartitionStep;
+import org.springframework.batch.core.partition.support.Partitioner;
+import org.springframework.batch.core.partition.support.SimplePartitioner;
+import org.springframework.batch.core.partition.support.SimpleStepExecutionSplitter;
+import org.springframework.batch.core.partition.support.TaskExecutorPartitionHandler;
 import org.springframework.batch.core.repository.JobRepository;
+import org.springframework.batch.core.step.AbstractStep;
 import org.springframework.batch.core.step.item.FaultTolerantStepFactoryBean;
 import org.springframework.batch.core.step.item.SimpleStepFactoryBean;
 import org.springframework.batch.core.step.tasklet.Tasklet;
@@ -42,6 +49,7 @@ import org.springframework.batch.retry.RetryListener;
 import org.springframework.batch.retry.policy.MapRetryContextCache;
 import org.springframework.beans.factory.BeanNameAware;
 import org.springframework.beans.factory.FactoryBean;
+import org.springframework.core.task.SyncTaskExecutor;
 import org.springframework.core.task.TaskExecutor;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.annotation.Isolation;
@@ -81,11 +89,24 @@ class StepParserStepFactoryBean<I, O> implements FactoryBean, BeanNameAware {
 	private Tasklet tasklet;
 
 	private PlatformTransactionManager transactionManager;
-	
+
 	//
-	// Floe Elements
+	// Flow Elements
 	//
 	private Flow flow;
+
+	//
+	// Partition Elements
+	//
+	private Partitioner partitioner;
+
+	private static final int DEFAULT_GRID_SIZE = 6;
+
+	private Step step;
+
+	private PartitionHandler partitionHandler;
+
+	private int gridSize = DEFAULT_GRID_SIZE;
 
 	//
 	// Tasklet Elements
@@ -176,10 +197,60 @@ class StepParserStepFactoryBean<I, O> implements FactoryBean, BeanNameAware {
 			configureFlowStep(ts);
 			return ts;
 		}
+		else if (step != null) {
+			PartitionStep ts = new PartitionStep();
+			configurePartitionStep(ts);
+			return ts;
+		}
 		else {
 			throw new IllegalStateException("Step [" + name
 					+ "] has neither a <chunk/> element nor a 'ref' attribute referencing a Tasklet.");
 		}
+	}
+
+	private void configureAbstractStep(AbstractStep ts) {
+		if (name != null) {
+			ts.setName(name);
+		}
+		if (allowStartIfComplete != null) {
+			ts.setAllowStartIfComplete(allowStartIfComplete);
+		}
+		if (jobRepository != null) {
+			ts.setJobRepository(jobRepository);
+		}
+		if (startLimit != null) {
+			ts.setStartLimit(startLimit);
+		}
+		if (listeners != null) {
+			int i = 0;
+			StepExecutionListener[] newListeners = new StepExecutionListener[listeners.length];
+			for (StepListener listener : listeners) {
+				newListeners[i++] = (StepExecutionListener) listener;
+			}
+			ts.setStepExecutionListeners(newListeners);
+		}
+	}
+
+	private void configurePartitionStep(PartitionStep ts) {
+		Assert.state(partitioner != null, "A Partitioner must be provided for a partition step");
+		Assert.state(step != null, "A Step must be provided for a partition step");
+		configureAbstractStep(ts);
+		if (partitionHandler != null) {
+			ts.setPartitionHandler(partitionHandler);
+		}
+		else {
+			TaskExecutorPartitionHandler partitionHandler = new TaskExecutorPartitionHandler();
+			partitionHandler.setStep(step);
+			if (taskExecutor == null) {
+				taskExecutor = new SyncTaskExecutor();
+			}
+			partitionHandler.setGridSize(gridSize);
+			partitionHandler.setTaskExecutor(taskExecutor);
+			ts.setPartitionHandler(partitionHandler);
+		}
+		SimpleStepExecutionSplitter splitter = new SimpleStepExecutionSplitter(jobRepository, step,
+				new SimplePartitioner());
+		ts.setStepExecutionSplitter(splitter);
 	}
 
 	private void configureSimple(SimpleStepFactoryBean<I, O> fb) {
@@ -271,31 +342,12 @@ class StepParserStepFactoryBean<I, O> implements FactoryBean, BeanNameAware {
 
 	@SuppressWarnings("serial")
 	private void configureTaskletStep(TaskletStep ts) {
-		if (name != null) {
-			ts.setName(name);
-		}
-		if (allowStartIfComplete != null) {
-			ts.setAllowStartIfComplete(allowStartIfComplete);
-		}
-		if (jobRepository != null) {
-			ts.setJobRepository(jobRepository);
-		}
-		if (startLimit != null) {
-			ts.setStartLimit(startLimit);
-		}
+		configureAbstractStep(ts);
 		if (tasklet != null) {
 			ts.setTasklet(tasklet);
 		}
 		if (transactionManager != null) {
 			ts.setTransactionManager(transactionManager);
-		}
-		if (listeners != null) {
-			int i = 0;
-			StepExecutionListener[] newListeners = new StepExecutionListener[listeners.length];
-			for (StepListener listener : listeners) {
-				newListeners[i++] = (StepExecutionListener) listener;
-			}
-			ts.setStepExecutionListeners(newListeners);
 		}
 		if (transactionTimeout != null || propagation != null || isolation != null
 				|| noRollbackExceptionClasses != null) {
@@ -323,42 +375,27 @@ class StepParserStepFactoryBean<I, O> implements FactoryBean, BeanNameAware {
 
 	@SuppressWarnings("serial")
 	private void configureFlowStep(FlowStep ts) {
-		if (name != null) {
-			ts.setName(name);
-		}
-		if (allowStartIfComplete != null) {
-			ts.setAllowStartIfComplete(allowStartIfComplete);
-		}
-		if (jobRepository != null) {
-			ts.setJobRepository(jobRepository);
-		}
-		if (startLimit != null) {
-			ts.setStartLimit(startLimit);
-		}
+		configureAbstractStep(ts);
 		if (flow != null) {
 			ts.setFlow(flow);
-		}
-		if (listeners != null) {
-			int i = 0;
-			StepExecutionListener[] newListeners = new StepExecutionListener[listeners.length];
-			for (StepListener listener : listeners) {
-				newListeners[i++] = (StepExecutionListener) listener;
-			}
-			ts.setStepExecutionListeners(newListeners);
 		}
 	}
 
 	private void validateFaultTolerantSettings() {
 		validateDependency("skippable-exception-classes", skippableExceptionClasses, "skip-limit", skipLimit, true);
 		validateDependency("retryable-exception-classes", retryableExceptionClasses, "retry-limit", retryLimit, true);
-		validateAtLeastOneDependency("processor-transactional", processorTransactional, "'retry-limit' or 'skip-limit'", retryLimit, skipLimit);
+		validateAtLeastOneDependency("processor-transactional", processorTransactional,
+				"'retry-limit' or 'skip-limit'", retryLimit, skipLimit);
 		validateDependency("retry-listeners", retryListeners, "retry-limit", retryLimit, false);
-		if (isPresent(processorTransactional) && !processorTransactional && isPresent(readerTransactionalQueue) && readerTransactionalQueue) {
-			throw new IllegalArgumentException("The field 'processor-transactional' cannot be false if 'reader-transactional-queue' is true");
+		if (isPresent(processorTransactional) && !processorTransactional && isPresent(readerTransactionalQueue)
+				&& readerTransactionalQueue) {
+			throw new IllegalArgumentException(
+					"The field 'processor-transactional' cannot be false if 'reader-transactional-queue' is true");
 		}
 	}
 
-	private void validateAtLeastOneDependency(String dependantName, Boolean dependantValue, String name, Object... values) {
+	private void validateAtLeastOneDependency(String dependantName, Boolean dependantValue, String name,
+			Object... values) {
 		boolean oneIsPresent = false;
 		for (Object value : values) {
 			if (isPresent(value)) {
@@ -427,7 +464,7 @@ class StepParserStepFactoryBean<I, O> implements FactoryBean, BeanNameAware {
 			this.name = name;
 		}
 	}
-	
+
 	// =========================================================
 	// Flow Attributes
 	// =========================================================
@@ -437,6 +474,38 @@ class StepParserStepFactoryBean<I, O> implements FactoryBean, BeanNameAware {
 	 */
 	public void setFlow(Flow flow) {
 		this.flow = flow;
+	}
+
+	// =========================================================
+	// Partition Attributes
+	// =========================================================
+
+	/**
+	 * @param partitioner the partitioner to set
+	 */
+	public void setPartitioner(Partitioner partitioner) {
+		this.partitioner = partitioner;
+	}
+
+	/**
+	 * @param partitionHandler the partitionHandler to set
+	 */
+	public void setPartitionHandler(PartitionHandler partitionHandler) {
+		this.partitionHandler = partitionHandler;
+	}
+
+	/**
+	 * @param gridSize the gridSize to set
+	 */
+	public void setGridSize(int gridSize) {
+		this.gridSize = gridSize;
+	}
+
+	/**
+	 * @param step the step to set
+	 */
+	public void setStep(Step step) {
+		this.step = step;
 	}
 
 	// =========================================================

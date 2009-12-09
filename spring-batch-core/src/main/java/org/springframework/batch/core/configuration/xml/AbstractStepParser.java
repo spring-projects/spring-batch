@@ -21,6 +21,7 @@ import org.springframework.beans.BeanMetadataElement;
 import org.springframework.beans.MutablePropertyValues;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.config.RuntimeBeanReference;
+import org.springframework.beans.factory.config.TypedStringValue;
 import org.springframework.beans.factory.parsing.CompositeComponentDefinition;
 import org.springframework.beans.factory.support.AbstractBeanDefinition;
 import org.springframework.beans.factory.support.BeanDefinitionBuilder;
@@ -58,6 +59,20 @@ public abstract class AbstractStepParser {
 
 	private static final String TASKLET_ELE = "tasklet";
 
+	private static final String PARTITION_ELE = "partition";
+
+	private static final String STEP_ATTR = "step";
+
+	private static final String PARTITIONER_ATTR = "partitioner";
+
+	private static final String HANDLER_ATTR = "handler";
+
+	private static final String HANDLER_ELE = "handler";
+
+	private static final String TASK_EXECUTOR_ATTR = "task-executor";
+
+	private static final String GRID_SIZE_ATTR = "grid-size";
+
 	private static final String FLOW_ELE = "flow";
 
 	private static final String CHUNK_ELE = "chunk";
@@ -86,15 +101,21 @@ public abstract class AbstractStepParser {
 		AbstractBeanDefinition bd = builder.getRawBeanDefinition();
 
 		Element taskletElement = DomUtils.getChildElementByTagName(stepElement, TASKLET_ELE);
-		if (taskletElement!=null) {
+		if (taskletElement != null) {
 			boolean stepUnderspecified = CoreNamespaceUtils.isUnderspecified(stepElement);
 			parseTasklet(stepElement, taskletElement, bd, parserContext, stepUnderspecified);
 		}
 
 		Element flowElement = DomUtils.getChildElementByTagName(stepElement, FLOW_ELE);
-		if (flowElement!=null) {
+		if (flowElement != null) {
 			boolean stepUnderspecified = CoreNamespaceUtils.isUnderspecified(stepElement);
 			parseFlow(stepElement, flowElement, bd, parserContext, stepUnderspecified);
+		}
+
+		Element partitionElement = DomUtils.getChildElementByTagName(stepElement, PARTITION_ELE);
+		if (partitionElement != null) {
+			boolean stepUnderspecified = CoreNamespaceUtils.isUnderspecified(stepElement);
+			parsePartition(stepElement, partitionElement, bd, parserContext, stepUnderspecified);
 		}
 
 		String parentRef = stepElement.getAttribute(PARENT_ATTR);
@@ -122,6 +143,47 @@ public abstract class AbstractStepParser {
 		}
 
 		return bd;
+
+	}
+
+	private void parsePartition(Element stepElement, Element partitionElement, AbstractBeanDefinition bd,
+			ParserContext parserContext, boolean stepUnderspecified) {
+
+		bd.setBeanClass(StepParserStepFactoryBean.class);
+		bd.setAttribute("isNamespaceStep", true);
+		String stepRef = partitionElement.getAttribute(STEP_ATTR);
+		String partitionerRef = partitionElement.getAttribute(PARTITIONER_ATTR);
+		String handlerRef = partitionElement.getAttribute(HANDLER_ATTR);
+
+		if (!StringUtils.hasText(stepRef)) {
+			parserContext.getReaderContext().error("You must specify a step", partitionElement);
+			return;
+		}
+		if (!StringUtils.hasText(partitionerRef)) {
+			parserContext.getReaderContext().error("You must specify a partitioner", partitionElement);
+			return;
+		}
+
+		MutablePropertyValues propertyValues = bd.getPropertyValues();
+		propertyValues.addPropertyValue("step", new RuntimeBeanReference(stepRef));
+		propertyValues.addPropertyValue("partitioner", new RuntimeBeanReference(partitionerRef));
+
+		if (!StringUtils.hasText(handlerRef)) {
+			Element handlerElement = DomUtils.getChildElementByTagName(partitionElement, HANDLER_ELE);
+			if (handlerElement != null) {
+				String taskExecutorRef = partitionElement.getAttribute(TASK_EXECUTOR_ATTR);
+				if (StringUtils.hasText(taskExecutorRef)) {
+					propertyValues.addPropertyValue("taskExecutor", new RuntimeBeanReference(taskExecutorRef));
+				}
+				String gridSize = partitionElement.getAttribute(GRID_SIZE_ATTR);
+				if (StringUtils.hasText(gridSize)) {
+					propertyValues.addPropertyValue("gridSize", new TypedStringValue(gridSize));
+				}
+			}
+		}
+		else {
+			propertyValues.addPropertyValue("partitionHandler", new RuntimeBeanReference(handlerRef));
+		}
 
 	}
 
@@ -182,7 +244,7 @@ public abstract class AbstractStepParser {
 		}
 
 		bd.getPropertyValues().addPropertyValue("flow", flowDefinition);
-		
+
 	}
 
 	private void validateTaskletAttributesAndSubelements(Element taskletElement, ParserContext parserContext,
@@ -328,7 +390,7 @@ public abstract class AbstractStepParser {
 		if (StringUtils.hasText(allowStartIfComplete)) {
 			propertyValues.addPropertyValue("allowStartIfComplete", allowStartIfComplete);
 		}
-		String taskExecutorBeanId = taskletElement.getAttribute("task-executor");
+		String taskExecutorBeanId = taskletElement.getAttribute(TASK_EXECUTOR_ATTR);
 		if (StringUtils.hasText(taskExecutorBeanId)) {
 			RuntimeBeanReference taskExecutorRef = new RuntimeBeanReference(taskExecutorBeanId);
 			propertyValues.addPropertyValue("taskExecutor", taskExecutorRef);
