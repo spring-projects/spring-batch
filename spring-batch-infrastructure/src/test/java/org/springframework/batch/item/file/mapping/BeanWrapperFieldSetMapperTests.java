@@ -87,6 +87,18 @@ public class BeanWrapperFieldSetMapperTests {
 	}
 
 	@Test
+	public void testNullPropertyAutoCreated() throws Exception {
+		BeanWrapperFieldSetMapper<TestNestedA> mapper = new BeanWrapperFieldSetMapper<TestNestedA>();
+		mapper.setTargetType(TestNestedA.class);
+		mapper.afterPropertiesSet();
+
+		FieldSet fieldSet = new DefaultFieldSet(new String[] { "Foo", "Bar" }, new String[] { "valueA",
+				"testObjectB.valueA" });
+		TestNestedA result = mapper.mapFieldSet(fieldSet);
+		assertEquals("Bar", result.getTestObjectB().getValueA());
+	}
+
+	@Test
 	public void testMapperWithSingleton() throws Exception {
 		BeanWrapperFieldSetMapper<TestObject> mapper = new BeanWrapperFieldSetMapper<TestObject>();
 		StaticApplicationContext context = new StaticApplicationContext();
@@ -377,11 +389,13 @@ public class BeanWrapperFieldSetMapperTests {
 		BeanWrapperFieldSetMapper<TestObject> mapper = new BeanWrapperFieldSetMapper<TestObject>();
 		mapper.setTargetType(TestObject.class);
 
-		FieldSet fieldSet = new DefaultFieldSet(new String[] { "foo", "7890.1" }, new String[] { "varDouble", "varFloat" });
+		FieldSet fieldSet = new DefaultFieldSet(new String[] { "foo", "7890.1" }, new String[] { "varDouble",
+				"varFloat" });
 		try {
 			mapper.mapFieldSet(fieldSet);
 			fail("Expected BindException");
-		} catch (BindException e) {
+		}
+		catch (BindException e) {
 			assertEquals(1, e.getErrorCount());
 			assertEquals("typeMismatch", e.getFieldError("varDouble").getCode());
 		}
@@ -474,7 +488,7 @@ public class BeanWrapperFieldSetMapperTests {
 
 	}
 
-	private static class TestNestedA {
+	public static class TestNestedA {
 		private String valueA;
 
 		private int valueB;
@@ -507,7 +521,7 @@ public class BeanWrapperFieldSetMapperTests {
 
 	}
 
-	private static class TestNestedB {
+	public static class TestNestedB {
 		private String valueA;
 
 		private TestNestedC testObjectC;
@@ -530,6 +544,7 @@ public class BeanWrapperFieldSetMapperTests {
 
 	}
 
+	@SuppressWarnings("unused")
 	private static class TestNestedC {
 		private int value;
 
@@ -564,7 +579,7 @@ public class BeanWrapperFieldSetMapperTests {
 		}
 
 	}
-	
+
 	public static class TestObject {
 		String varString;
 
@@ -589,11 +604,11 @@ public class BeanWrapperFieldSetMapperTests {
 		Date varDate;
 
 		public Date getVarDate() {
-			return (Date)varDate.clone();
+			return (Date) varDate.clone();
 		}
 
 		public void setVarDate(Date varDate) {
-			this.varDate = varDate == null ? null : (Date)varDate.clone();
+			this.varDate = varDate == null ? null : (Date) varDate.clone();
 		}
 
 		public TestObject() {

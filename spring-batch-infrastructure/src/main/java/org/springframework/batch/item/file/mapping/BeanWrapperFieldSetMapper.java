@@ -264,6 +264,10 @@ public class BeanWrapperFieldSetMapper<T> extends DefaultPropertyEditorRegistrar
 
 	private String findPropertyName(Object bean, String key) {
 
+		if (bean == null) {
+			return null;
+		}
+
 		Class<?> cls = bean.getClass();
 
 		int index = PropertyAccessorUtils.getFirstNestedPropertySeparatorIndex(key);
@@ -280,7 +284,7 @@ public class BeanWrapperFieldSetMapper<T> extends DefaultPropertyEditorRegistrar
 				return null;
 			}
 
-			Object nestedValue = new BeanWrapperImpl(bean).getPropertyValue(nestedName);
+			Object nestedValue = getPropertyValue(bean, nestedName);
 			String nestedPropertyName = findPropertyName(nestedValue, suffix);
 			return nestedPropertyName == null ? null : nestedName + "." + nestedPropertyName;
 		}
@@ -314,6 +318,24 @@ public class BeanWrapperFieldSetMapper<T> extends DefaultPropertyEditorRegistrar
 			distance++;
 		}
 		return name;
+	}
+
+	private Object getPropertyValue(Object bean, String nestedName) {
+		BeanWrapperImpl wrapper = new BeanWrapperImpl(bean);
+		Object nestedValue = wrapper.getPropertyValue(nestedName);
+		if (nestedValue == null) {
+			try {
+				nestedValue = wrapper.getPropertyType(nestedName).newInstance();
+				wrapper.setPropertyValue(nestedName, nestedValue);
+			}
+			catch (InstantiationException e) {
+				ReflectionUtils.handleReflectionException(e);
+			}
+			catch (IllegalAccessException e) {
+				ReflectionUtils.handleReflectionException(e);
+			}
+		}
+		return nestedValue;
 	}
 
 	private void switchPropertyNames(Properties properties, String oldName, String newName) {
