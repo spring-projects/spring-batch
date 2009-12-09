@@ -60,6 +60,7 @@ public class AnnotationMethodResolverTests {
 	}
 
 
+	@SuppressWarnings("unused")
 	private static class SingleAnnotationTestBean {
 
 		@TestAnnotation
@@ -73,6 +74,7 @@ public class AnnotationMethodResolverTests {
 	}
 
 
+	@SuppressWarnings("unused")
 	private static class MultipleAnnotationTestBean {
 
 		@TestAnnotation
@@ -87,6 +89,7 @@ public class AnnotationMethodResolverTests {
 	}
 
 
+	@SuppressWarnings("unused")
 	private static class NoAnnotationTestBean {
 
 		public String upperCase(String s) {

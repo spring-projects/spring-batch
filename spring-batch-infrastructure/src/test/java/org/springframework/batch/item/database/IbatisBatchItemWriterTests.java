@@ -47,6 +47,7 @@ public class IbatisBatchItemWriterTests {
 	
 	private String statementId = "updateFoo";
 
+	@SuppressWarnings("unused")
 	private class Foo {
 		private Long id;
 		private String bar;

@@ -70,6 +70,7 @@ public class DefaultPropertEditorRegistrarTests {
 		mapper.setCustomEditors(Collections.singletonMap(new Object(), new CustomNumberEditor(Long.class, true)));
 	}
 
+	@SuppressWarnings("unused")
 	private static class BeanWithIntArray {
 		private int[] numbers;
 

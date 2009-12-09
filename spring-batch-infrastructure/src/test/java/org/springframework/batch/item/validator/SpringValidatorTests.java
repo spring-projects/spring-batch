@@ -119,6 +119,7 @@ public class SpringValidatorTests {
 		}
 	}
 
+	@SuppressWarnings("unused")
 	private static class TestBean {
 		private String foo;
 

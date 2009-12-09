@@ -45,11 +45,6 @@ public class ResultHolderResultQueueTests {
 			this.result = result;
 		}
 
-		public TestResultHolder(Throwable error) {
-			super();
-			this.error = error;
-		}
-
 		public RepeatContext getContext() {
 			return null;
 		}

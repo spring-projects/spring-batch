@@ -118,6 +118,7 @@ public class SimpleMethodInvokerTests {
 		assertEquals(methodInvoker, methodInvoker2);
 	}
 	
+	@SuppressWarnings("unused")
 	private class TestClass{
 		
 		boolean beforeCalled = false;
