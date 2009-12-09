@@ -24,7 +24,11 @@ import java.util.HashMap;
 import org.junit.Test;
 import org.springframework.batch.core.StepListener;
 import org.springframework.batch.core.listener.StepExecutionListenerSupport;
+import org.springframework.batch.core.partition.support.PartitionStep;
+import org.springframework.batch.core.partition.support.SimplePartitioner;
+import org.springframework.batch.core.partition.support.TaskExecutorPartitionHandler;
 import org.springframework.batch.core.step.JobRepositorySupport;
+import org.springframework.batch.core.step.StepSupport;
 import org.springframework.batch.core.step.item.ChunkOrientedTasklet;
 import org.springframework.batch.core.step.tasklet.TaskletStep;
 import org.springframework.batch.item.ItemStream;
@@ -213,6 +217,26 @@ public class StepParserStepFactoryBeanTests {
 		assertEquals(new Integer(10), throttleLimit);
 		Object tasklet = ReflectionTestUtils.getField(step, "tasklet");
 		assertTrue(tasklet instanceof ChunkOrientedTasklet<?>);
+	}
+
+	@Test
+	public void testPartitionStep() throws Exception {
+		StepParserStepFactoryBean<Object, Object> fb = new StepParserStepFactoryBean<Object, Object>();
+		fb.setBeanName("step1");
+		fb.setAllowStartIfComplete(true);
+		fb.setJobRepository(new JobRepositorySupport());
+		fb.setStartLimit(5);
+		fb.setListeners(new StepListener[] { new StepExecutionListenerSupport() });
+		fb.setTaskExecutor(new SyncTaskExecutor());
+
+		SimplePartitioner partitioner = new SimplePartitioner();
+		fb.setPartitioner(partitioner);
+		fb.setStep(new StepSupport("foo"));
+
+		Object step = fb.getObject();
+		assertTrue(step instanceof PartitionStep);
+		Object handler = ReflectionTestUtils.getField(step, "partitionHandler");
+		assertTrue(handler instanceof TaskExecutorPartitionHandler);
 	}
 
 }

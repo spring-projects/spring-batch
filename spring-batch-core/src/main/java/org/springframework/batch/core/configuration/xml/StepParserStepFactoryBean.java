@@ -29,7 +29,6 @@ import org.springframework.batch.core.job.flow.FlowStep;
 import org.springframework.batch.core.partition.PartitionHandler;
 import org.springframework.batch.core.partition.support.PartitionStep;
 import org.springframework.batch.core.partition.support.Partitioner;
-import org.springframework.batch.core.partition.support.SimplePartitioner;
 import org.springframework.batch.core.partition.support.SimpleStepExecutionSplitter;
 import org.springframework.batch.core.partition.support.TaskExecutorPartitionHandler;
 import org.springframework.batch.core.repository.JobRepository;
@@ -248,8 +247,7 @@ class StepParserStepFactoryBean<I, O> implements FactoryBean, BeanNameAware {
 			partitionHandler.setTaskExecutor(taskExecutor);
 			ts.setPartitionHandler(partitionHandler);
 		}
-		SimpleStepExecutionSplitter splitter = new SimpleStepExecutionSplitter(jobRepository, step,
-				new SimplePartitioner());
+		SimpleStepExecutionSplitter splitter = new SimpleStepExecutionSplitter(jobRepository, step, partitioner);
 		ts.setStepExecutionSplitter(splitter);
 	}
 
