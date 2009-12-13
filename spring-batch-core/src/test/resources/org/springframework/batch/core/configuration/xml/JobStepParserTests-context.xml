@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans:beans xmlns="http://www.springframework.org/schema/batch"
+	xmlns:beans="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.springframework.org/schema/batch http://www.springframework.org/schema/batch/spring-batch-2.1.xsd
+	http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.5.xsd">
+
+	<beans:import resource="common-context.xml" />
+
+	<job id="job1">
+		<step id="s1" parent="step1" next="job1.flow" />
+		<step id="job1.flow" next="s4">
+			<job ref="flow" />
+		</step>
+		<step id="s4" parent="step4" />
+	</job>
+
+	<job id="job2">
+		<step id="job2.s1" parent="step1" next="job2.flow" />
+		<step id="job2.flow" parent="flow.step" next="job2.s4" />
+		<step id="job2.s4" parent="step4" />
+	</job>
+
+	<job id="flow">
+		<step id="s2" parent="step2" next="s3" />
+		<step id="s3" parent="step3" />
+	</job>
+
+	<step id="flow.step" abstract="true">
+		<job ref="flow" job-launcher="jobLauncher" job-parameters-extractor="jobParametersExtractor"/>
+	</step>
+	
+	<beans:bean id="jobParametersExtractor" class="org.springframework.batch.core.step.job.DefaultJobParametersExtractor"/>
+	
+	<beans:bean id="jobLauncher" class="org.springframework.batch.core.launch.support.SimpleJobLauncher">
+		<beans:property name="jobRepository" ref="jobRepository"/>
+	</beans:bean>
+
+</beans:beans>

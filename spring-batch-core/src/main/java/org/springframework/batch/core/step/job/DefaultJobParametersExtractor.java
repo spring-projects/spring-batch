@@ -40,6 +40,8 @@ public class DefaultJobParametersExtractor implements JobParametersExtractor {
 
 	private Set<String> keys = new HashSet<String>();
 
+	private boolean useAllParentParameters = true;
+
 	/**
 	 * The key names to pull out of the execution context or job parameters, if
 	 * they exist. If a key doesn't exist in the execution context then the job
@@ -64,6 +66,11 @@ public class DefaultJobParametersExtractor implements JobParametersExtractor {
 		JobParametersBuilder builder = new JobParametersBuilder();
 		Map<String, JobParameter> jobParameters = stepExecution.getJobParameters().getParameters();
 		ExecutionContext executionContext = stepExecution.getExecutionContext();
+		if (useAllParentParameters) {
+			for (String key : jobParameters.keySet()) {
+				builder.addParameter(key, jobParameters.get(key));
+			}
+		}
 		for (String key : keys) {
 			if (key.endsWith("(long)")) {
 				key = key.replace("(long)", "");

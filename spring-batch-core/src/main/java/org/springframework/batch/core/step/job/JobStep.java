@@ -80,10 +80,8 @@ public class JobStep extends AbstractStep {
 	/**
 	 * The {@link JobParametersExtractor} is used to extract
 	 * {@link JobParametersExtractor} from the {@link StepExecution} to run the
-	 * {@link Job}. By default an instance will be provided that simply creates
-	 * empty {@link JobParameters}. This is unlikely to be very useful, since
-	 * the {@link Job} normally cannot be run with empty parameters more than
-	 * once.
+	 * {@link Job}. By default an instance will be provided that simply copies
+	 * the {@link JobParameters} from the parent job.
 	 * 
 	 * @param jobParametersExtractor the {@link JobParametersExtractor} to set
 	 */

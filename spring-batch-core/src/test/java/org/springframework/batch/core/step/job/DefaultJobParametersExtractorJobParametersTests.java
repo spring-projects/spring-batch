@@ -45,6 +45,14 @@ public class DefaultJobParametersExtractorJobParametersTests {
 	}
 	
 	@Test
+	public void testGetAllJobParameters() throws Exception {
+		StepExecution stepExecution = getStepExecution("foo=bar,spam=bucket");
+		extractor.setKeys(new String[] {"foo", "bar"});
+		JobParameters jobParameters = extractor.getJobParameters(null, stepExecution);
+		assertEquals("{spam=bucket, foo=bar}", jobParameters.toString());
+	}
+	
+	@Test
 	public void testGetNamedLongStringParameters() throws Exception {
 		StepExecution stepExecution = getStepExecution("foo=bar");
 		extractor.setKeys(new String[] {"foo(string)", "bar"});

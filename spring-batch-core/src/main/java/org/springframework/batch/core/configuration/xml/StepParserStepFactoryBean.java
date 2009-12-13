@@ -21,11 +21,14 @@ import java.util.HashSet;
 import java.util.Map;
 
 import org.springframework.batch.classify.BinaryExceptionClassifier;
+import org.springframework.batch.core.Job;
 import org.springframework.batch.core.Step;
 import org.springframework.batch.core.StepExecutionListener;
 import org.springframework.batch.core.StepListener;
 import org.springframework.batch.core.job.flow.Flow;
 import org.springframework.batch.core.job.flow.FlowStep;
+import org.springframework.batch.core.launch.JobLauncher;
+import org.springframework.batch.core.launch.support.SimpleJobLauncher;
 import org.springframework.batch.core.partition.PartitionHandler;
 import org.springframework.batch.core.partition.support.PartitionStep;
 import org.springframework.batch.core.partition.support.Partitioner;
@@ -35,6 +38,8 @@ import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.step.AbstractStep;
 import org.springframework.batch.core.step.item.FaultTolerantStepFactoryBean;
 import org.springframework.batch.core.step.item.SimpleStepFactoryBean;
+import org.springframework.batch.core.step.job.JobParametersExtractor;
+import org.springframework.batch.core.step.job.JobStep;
 import org.springframework.batch.core.step.tasklet.Tasklet;
 import org.springframework.batch.core.step.tasklet.TaskletStep;
 import org.springframework.batch.item.ItemProcessor;
@@ -93,6 +98,15 @@ class StepParserStepFactoryBean<I, O> implements FactoryBean, BeanNameAware {
 	// Flow Elements
 	//
 	private Flow flow;
+
+	//
+	// Job Elements
+	//
+	private Job job;
+
+	private JobLauncher jobLauncher;
+
+	private JobParametersExtractor jobParametersExtractor;
 
 	//
 	// Partition Elements
@@ -194,6 +208,11 @@ class StepParserStepFactoryBean<I, O> implements FactoryBean, BeanNameAware {
 		else if (flow != null) {
 			FlowStep ts = new FlowStep();
 			configureFlowStep(ts);
+			return ts;
+		}
+		else if (job != null) {
+			JobStep ts = new JobStep();
+			configureJobStep(ts);
 			return ts;
 		}
 		else if (step != null) {
@@ -379,6 +398,24 @@ class StepParserStepFactoryBean<I, O> implements FactoryBean, BeanNameAware {
 		}
 	}
 
+	@SuppressWarnings("serial")
+	private void configureJobStep(JobStep ts) throws Exception {
+		configureAbstractStep(ts);
+		if (job != null) {
+			ts.setJob(job);
+		}
+		if (jobParametersExtractor != null) {
+			ts.setJobParametersExtractor(jobParametersExtractor);
+		}
+		if (jobLauncher == null) {
+			SimpleJobLauncher jobLauncher = new SimpleJobLauncher();
+			jobLauncher.setJobRepository(jobRepository);
+			jobLauncher.afterPropertiesSet();
+			this.jobLauncher = jobLauncher;
+		}
+		ts.setJobLauncher(jobLauncher);
+	}
+
 	private void validateFaultTolerantSettings() {
 		validateDependency("skippable-exception-classes", skippableExceptionClasses, "skip-limit", skipLimit, true);
 		validateDependency("retryable-exception-classes", retryableExceptionClasses, "retry-limit", retryLimit, true);
@@ -472,6 +509,25 @@ class StepParserStepFactoryBean<I, O> implements FactoryBean, BeanNameAware {
 	 */
 	public void setFlow(Flow flow) {
 		this.flow = flow;
+	}
+
+	// =========================================================
+	// Job Attributes
+	// =========================================================
+
+	/**
+	 * @param flow the flow to set
+	 */
+	public void setJob(Job job) {
+		this.job = job;
+	}
+	
+	public void setJobParametersExtractor(JobParametersExtractor jobParametersExtractor) {
+		this.jobParametersExtractor = jobParametersExtractor;
+	}
+	
+	public void setJobLauncher(JobLauncher jobLauncher) {
+		this.jobLauncher = jobLauncher;
 	}
 
 	// =========================================================

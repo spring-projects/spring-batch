@@ -57,9 +57,17 @@ public abstract class AbstractStepParser {
 
 	private static final String REF_ELE = "ref";
 
+	private static final String REF_ATTR = "ref";
+
 	private static final String TASKLET_ELE = "tasklet";
 
 	private static final String PARTITION_ELE = "partition";
+
+	private static final String JOB_ELE = "job";
+	
+	private static final String JOB_PARAMS_EXTRACTOR_ATTR = "job-parameters-extractor";
+
+	private static final String JOB_LAUNCHER_ATTR = "job-launcher";
 
 	private static final String STEP_ATTR = "step";
 
@@ -116,6 +124,12 @@ public abstract class AbstractStepParser {
 		if (partitionElement != null) {
 			boolean stepUnderspecified = CoreNamespaceUtils.isUnderspecified(stepElement);
 			parsePartition(stepElement, partitionElement, bd, parserContext, stepUnderspecified);
+		}
+
+		Element jobElement = DomUtils.getChildElementByTagName(stepElement, JOB_ELE);
+		if (jobElement != null) {
+			boolean stepUnderspecified = CoreNamespaceUtils.isUnderspecified(stepElement);
+			parseJob(stepElement, jobElement, bd, parserContext, stepUnderspecified);
 		}
 
 		String parentRef = stepElement.getAttribute(PARENT_ATTR);
@@ -183,6 +197,33 @@ public abstract class AbstractStepParser {
 		}
 		else {
 			propertyValues.addPropertyValue("partitionHandler", new RuntimeBeanReference(handlerRef));
+		}
+
+	}
+
+	private void parseJob(Element stepElement, Element jobElement, AbstractBeanDefinition bd,
+			ParserContext parserContext, boolean stepUnderspecified) {
+
+		bd.setBeanClass(StepParserStepFactoryBean.class);
+		bd.setAttribute("isNamespaceStep", true);
+		String jobRef = jobElement.getAttribute(REF_ATTR);
+
+		if (!StringUtils.hasText(jobRef)) {
+			parserContext.getReaderContext().error("You must specify a job", jobElement);
+			return;
+		}
+
+		MutablePropertyValues propertyValues = bd.getPropertyValues();
+		propertyValues.addPropertyValue("job", new RuntimeBeanReference(jobRef));
+
+		String jobParametersExtractor = jobElement.getAttribute(JOB_PARAMS_EXTRACTOR_ATTR);
+		String jobLauncher = jobElement.getAttribute(JOB_LAUNCHER_ATTR);
+		
+		if (StringUtils.hasText(jobParametersExtractor)) {
+			propertyValues.addPropertyValue("jobParametersExtractor", new RuntimeBeanReference(jobParametersExtractor));
+		}
+		if (StringUtils.hasText(jobLauncher)) {
+			propertyValues.addPropertyValue("jobLauncher", new RuntimeBeanReference(jobLauncher));
 		}
 
 	}
