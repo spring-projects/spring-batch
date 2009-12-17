@@ -10,7 +10,7 @@
 	<properties>
 		<maven.test.failure.ignore>true</maven.test.failure.ignore>
 		<spring.batch.version>2.1.0.CI-SNAPSHOT</spring.batch.version>
-		<spring.framework.version>3.0.0.BUILD-SNAPSHOT</spring.framework.version>
+		<spring.framework.version>3.0.0.RELEASE</spring.framework.version>
 		<spring.integration.version>2.0.0.BUILD-SNAPSHOT</spring.integration.version>
 		<bundlor.version>1.0.0.M2</bundlor.version>
 	</properties>
