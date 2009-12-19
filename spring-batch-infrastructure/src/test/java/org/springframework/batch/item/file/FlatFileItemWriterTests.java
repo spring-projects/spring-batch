@@ -401,6 +401,7 @@ public class FlatFileItemWriterTests {
 
 	@Test
 	public void testWriteStringWithBogusEncoding() throws Exception {
+		writer.setTransactional(false);
 		writer.setEncoding("BOGUS");
 		// writer.setShouldDeleteIfEmpty(true);
 		try {
