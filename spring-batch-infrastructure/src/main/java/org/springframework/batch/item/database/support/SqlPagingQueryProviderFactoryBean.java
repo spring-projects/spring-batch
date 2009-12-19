@@ -19,6 +19,7 @@ import static org.springframework.batch.support.DatabaseType.DB2;
 import static org.springframework.batch.support.DatabaseType.DB2ZOS;
 import static org.springframework.batch.support.DatabaseType.DERBY;
 import static org.springframework.batch.support.DatabaseType.HSQL;
+import static org.springframework.batch.support.DatabaseType.H2;
 import static org.springframework.batch.support.DatabaseType.MYSQL;
 import static org.springframework.batch.support.DatabaseType.ORACLE;
 import static org.springframework.batch.support.DatabaseType.POSTGRES;
@@ -68,6 +69,7 @@ public class SqlPagingQueryProviderFactoryBean implements FactoryBean {
 		providers.put(DB2ZOS, new Db2PagingQueryProvider());
 		providers.put(DERBY,new DerbyPagingQueryProvider());
 		providers.put(HSQL,new HsqlPagingQueryProvider());
+		providers.put(H2,new H2PagingQueryProvider());
 		providers.put(MYSQL,new MySqlPagingQueryProvider());
 		providers.put(ORACLE,new OraclePagingQueryProvider());
 		providers.put(POSTGRES,new PostgresPagingQueryProvider());

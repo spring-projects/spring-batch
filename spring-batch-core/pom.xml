@@ -172,6 +172,19 @@
 									<config>
 										<context>
 											<property key="includes" value="src/main/sql" />
+											<property file="${basedir}/src/main/sql/h2.properties" />
+										</context>
+										<engine>
+											<property key="velocimacro.library" value="src/main/sql/h2.vpp" />
+										</engine>
+									</config>
+									<fileset dir="${basedir}/src/main/sql" includes="schema*.sql.vpp" />
+									<mapper type="glob" from="*.sql.vpp" to="*-h2.sql" />
+								</vppcopy>
+								<vppcopy todir="${basedir}/target/generated-resources" overwrite="true">
+									<config>
+										<context>
+											<property key="includes" value="src/main/sql" />
 											<property file="${basedir}/src/main/sql/db2.properties" />
 										</context>
 										<engine>

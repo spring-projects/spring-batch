@@ -17,7 +17,7 @@
 		</property>
 	</bean>
 
-	<bean id="dataSource" class="org.apache.commons.dbcp.BasicDataSource">
+	<bean id="dataSource" class="org.apache.commons.dbcp.BasicDataSource" destroy-method="close">
 		<property name="driverClassName" value="${batch.jdbc.driver}" />
 		<property name="url" value="${batch.jdbc.url}" />
 		<property name="username" value="${batch.jdbc.user}" />
@@ -55,8 +55,11 @@
 		<property name="order" value="1" />
 	</bean>
 
-	<bean id="columnIncrementerParent" class="${batch.database.incrementer.class}" abstract="true">
+	<bean id="sequenceIncrementerParent" class="${batch.database.incrementer.class}" abstract="true">
 		<property name="dataSource" ref="dataSource" />
+	</bean>
+
+	<bean id="columnIncrementerParent" class="${batch.database.incrementer.class}" abstract="true" parent="sequenceIncrementerParent">
 		<property name="columnName" value="ID" />
 	</bean>
 

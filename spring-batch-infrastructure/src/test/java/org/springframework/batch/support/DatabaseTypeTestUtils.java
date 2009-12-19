@@ -24,12 +24,21 @@ import java.sql.DatabaseMetaData;
 
 import javax.sql.DataSource;
 
+import org.apache.commons.dbcp.BasicDataSource;
+
 /**
  * @author Dave Syer
  *
  */
 public class DatabaseTypeTestUtils {
 	
+	public static DataSource getDataSource(Class<?> driver, String url) throws Exception {
+		BasicDataSource dataSource = new BasicDataSource();
+		dataSource.setDriverClassName(driver.getName());
+		dataSource.setUrl(url);
+		return dataSource;
+	}
+
 	public static DataSource getMockDataSource() throws Exception {
 		return getMockDataSource(DatabaseType.HSQL.getProductName());
 	}
