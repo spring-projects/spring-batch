@@ -31,7 +31,7 @@ public class DatabaseTypeIntegrationTests {
 	
 	@Test
 	public void testH2() throws Exception {
-		DataSource dataSource = DatabaseTypeTestUtils.getDataSource(org.h2.jdbc.JdbcConnection.class, "jdbc:h2:file:target/data/sample");
+		DataSource dataSource = DatabaseTypeTestUtils.getDataSource(org.h2.Driver.class, "jdbc:h2:file:target/data/sample");
 		assertEquals(DatabaseType.H2, DatabaseType.fromMetaData(dataSource));
 		dataSource.getConnection();
 	}
