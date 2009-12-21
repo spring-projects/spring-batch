@@ -11,6 +11,7 @@
 
 	<bean id="itemReaderForTest" class="org.springframework.batch.item.database.JdbcCursorItemReader" scope="prototype">
 		<property name="dataSource" ref="dataSource"/>
+		<property name="verifyCursorPosition" value="${batch.verify.cursor.position}"/>
 		<property name="sql" value="select ID, NAME, CREDIT from CUSTOMER"/>
 		<property name="rowMapper">
 			<bean class="org.springframework.batch.sample.domain.trade.internal.CustomerCreditRowMapper"/>

@@ -76,15 +76,32 @@ public class SqlPagingQueryUtils {
 	 * 
 	 * @param provider {@link AbstractSqlPagingQueryProvider} providing the
 	 * implementation specifics
-	 * @param remainingPageQuery is this query for the ramining pages (true) as
+	 * @param remainingPageQuery is this query for the remaining pages (true) as
 	 * opposed to the first page (false)
 	 * @param rowNumClause the implementation specific row num clause to be used
 	 * @return the generated query
 	 */
 	public static String generateRowNumSqlQuery(AbstractSqlPagingQueryProvider provider, boolean remainingPageQuery,
 			String rowNumClause) {
+
+		return generateRowNumSqlQuery(provider, provider.getSelectClause(), remainingPageQuery, rowNumClause);
+
+	}
+
+	/**
+	 * Generate SQL query string using a ROW_NUM condition
+	 * 
+	 * @param provider {@link AbstractSqlPagingQueryProvider} providing the
+	 * implementation specifics
+	 * @param remainingPageQuery is this query for the remaining pages (true) as
+	 * opposed to the first page (false)
+	 * @param rowNumClause the implementation specific row num clause to be used
+	 * @return the generated query
+	 */
+	public static String generateRowNumSqlQuery(AbstractSqlPagingQueryProvider provider, String selectClause, boolean remainingPageQuery,
+			String rowNumClause) {
 		StringBuilder sql = new StringBuilder();
-		sql.append("SELECT * FROM (SELECT ").append(provider.getSelectClause());
+		sql.append("SELECT * FROM (SELECT ").append(selectClause);
 		sql.append(" FROM ").append(provider.getFromClause());
 		buildWhereClause(provider, remainingPageQuery, sql);
 		sql.append(" ORDER BY ").append(provider.getSortKey());

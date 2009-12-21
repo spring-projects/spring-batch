@@ -28,16 +28,17 @@
 		<property name="dataSource" ref="dataSource" />
 	</bean>
 
-	<!-- Set up or detect a System property called "org.springframework.batch.support.SystemPropertyInitializer.ENVIRONMENT" used to construct a properties file on the classpath.  The default is "hsql".  -->
+	<!-- Set up or detect a System property called "ENVIRONMENT" used to construct a properties file on the classpath.  The default is "hsql".  -->
 	<bean id="environment"
 		class="org.springframework.batch.support.SystemPropertyInitializer">
 		<property name="defaultValue" value="hsql"/>
+		<property name="keyName" value="ENVIRONMENT"/>
 	</bean>
 
 	<!--  Use this to set additional properties on beans at run time -->
 	<bean id="overrideProperties" class="org.springframework.beans.factory.config.PropertyOverrideConfigurer"
 		depends-on="environment">
-		<property name="location" value="classpath:batch-${org.springframework.batch.support.SystemPropertyInitializer.ENVIRONMENT}.properties" />
+		<property name="location" value="classpath:batch-${ENVIRONMENT}.properties" />
 		<!-- Allow system properties (-D) to override those from file -->
 		<property name="localOverride" value="true" />
 		<property name="properties">
@@ -49,7 +50,7 @@
 
 	<bean id="placeholderProperties" class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer"
 		depends-on="environment">
-		<property name="location" value="classpath:batch-${org.springframework.batch.support.SystemPropertyInitializer.ENVIRONMENT}.properties" />
+		<property name="location" value="classpath:batch-${ENVIRONMENT}.properties" />
 		<property name="systemPropertiesModeName" value="SYSTEM_PROPERTIES_MODE_OVERRIDE" />
 		<property name="ignoreUnresolvablePlaceholders" value="true" />
 		<property name="order" value="1" />

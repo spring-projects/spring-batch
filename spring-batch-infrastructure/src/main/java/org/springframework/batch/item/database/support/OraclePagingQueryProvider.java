@@ -17,13 +17,14 @@
 package org.springframework.batch.item.database.support;
 
 /**
- * Oracle implementation of a {@link org.springframework.batch.item.database.PagingQueryProvider} using
+ * Oracle implementation of a
+ * {@link org.springframework.batch.item.database.PagingQueryProvider} using
  * database specific features.
- *
+ * 
  * @author Thomas Risberg
  * @since 2.0
  */
-public class OraclePagingQueryProvider extends SqlWindowingPagingQueryProvider {
+public class OraclePagingQueryProvider extends AbstractSqlPagingQueryProvider {
 
 	@Override
 	public String generateFirstPageQuery(int pageSize) {
@@ -34,6 +35,15 @@ public class OraclePagingQueryProvider extends SqlWindowingPagingQueryProvider {
 	@Override
 	public String generateRemainingPagesQuery(int pageSize) {
 		return SqlPagingQueryUtils.generateRowNumSqlQuery(this, true, buildRowNumClause(pageSize));
+	}
+
+	@Override
+	public String generateJumpToItemQuery(int itemIndex, int pageSize) {
+		int page = itemIndex / pageSize;
+		int offset = (page * pageSize);
+		offset = offset==0 ? 1 : offset;
+		return SqlPagingQueryUtils.generateRowNumSqlQuery(this, this.getSortKey() + " AS SORT_KEY", false,
+				"ROWNUM = " + offset);
 	}
 
 	private String buildRowNumClause(int pageSize) {

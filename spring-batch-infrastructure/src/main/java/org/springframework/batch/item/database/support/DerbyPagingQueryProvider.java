@@ -39,4 +39,15 @@ public class DerbyPagingQueryProvider extends SqlWindowingPagingQueryProvider {
 			throw new InvalidDataAccessResourceUsageException("Apache Derby version " + version + " is not supported by this class,  Only version 10.4.1.3 or later is supported");
 		}
 	}
+	
+	@Override
+	protected Object getSubQueryAlias() {
+		return "AS TMP_SUB ";
+	}
+	
+	@Override
+	protected String getOverClause() {
+		return "";
+	}
+
 }

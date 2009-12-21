@@ -32,11 +32,17 @@ import org.apache.commons.dbcp.BasicDataSource;
  */
 public class DatabaseTypeTestUtils {
 	
-	public static DataSource getDataSource(Class<?> driver, String url) throws Exception {
+	public static DataSource getDataSource(Class<?> driver, String url, String username, String password) throws Exception {
 		BasicDataSource dataSource = new BasicDataSource();
 		dataSource.setDriverClassName(driver.getName());
 		dataSource.setUrl(url);
+		dataSource.setUsername(username);
+		dataSource.setPassword(password);
 		return dataSource;
+	}
+	
+	public static DataSource getDataSource(Class<?> driver, String url) throws Exception {
+		return getDataSource(driver, url, null, null);
 	}
 
 	public static DataSource getMockDataSource() throws Exception {

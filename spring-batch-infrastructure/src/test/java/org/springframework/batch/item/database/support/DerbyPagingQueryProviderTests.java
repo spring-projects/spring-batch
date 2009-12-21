@@ -15,19 +15,21 @@
  */
 package org.springframework.batch.item.database.support;
 
-import static org.junit.Assert.fail;
 import static org.easymock.EasyMock.createMock;
 import static org.easymock.EasyMock.expect;
 import static org.easymock.EasyMock.replay;
 import static org.easymock.EasyMock.verify;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.fail;
 
-import org.junit.Test;
-import org.junit.Assert;
-import org.springframework.dao.InvalidDataAccessResourceUsageException;
+import java.sql.Connection;
+import java.sql.DatabaseMetaData;
 
 import javax.sql.DataSource;
-import java.sql.DatabaseMetaData;
-import java.sql.Connection;
+
+import org.junit.Assert;
+import org.junit.Test;
+import org.springframework.dao.InvalidDataAccessResourceUsageException;
 
 /**
  * @author Thomas Risberg
@@ -69,7 +71,8 @@ public class DerbyPagingQueryProviderTests extends AbstractSqlPagingQueryProvide
 		try {
 			pagingQueryProvider.init(ds);
 			fail();
-		} catch (InvalidDataAccessResourceUsageException e) {
+		}
+		catch (InvalidDataAccessResourceUsageException e) {
 			// expected
 		}
 		verify(ds);
@@ -80,30 +83,55 @@ public class DerbyPagingQueryProviderTests extends AbstractSqlPagingQueryProvide
 	@Test
 	@Override
 	public void testGenerateFirstPageQuery() {
-		String sql = "SELECT * FROM ( SELECT id, name, age, ROW_NUMBER() OVER (ORDER BY id ASC) AS ROW_NUMBER FROM foo WHERE bar = 1) WHERE ROW_NUMBER <= 100";
+		String sql = "SELECT * FROM ( SELECT id, name, age, ROW_NUMBER() OVER () AS ROW_NUMBER FROM foo WHERE bar = 1) AS TMP_SUB WHERE ROW_NUMBER <= 100";
 		String s = pagingQueryProvider.generateFirstPageQuery(pageSize);
 		Assert.assertEquals("", sql, s);
 	}
 
-	@Test @Override
+	@Test
+	@Override
 	public void testGenerateRemainingPagesQuery() {
-		String sql = "SELECT * FROM ( SELECT id, name, age, ROW_NUMBER() OVER (ORDER BY id ASC) AS ROW_NUMBER FROM foo WHERE bar = 1 AND id > ?) WHERE ROW_NUMBER <= 100";
+		String sql = "SELECT * FROM ( SELECT id, name, age, ROW_NUMBER() OVER () AS ROW_NUMBER FROM foo WHERE bar = 1 AND id > ?) AS TMP_SUB WHERE ROW_NUMBER <= 100";
 		String s = pagingQueryProvider.generateRemainingPagesQuery(pageSize);
 		Assert.assertEquals("", sql, s);
 	}
 
-	@Test @Override
+	@Test
+	@Override
 	public void testGenerateJumpToItemQuery() {
-		String sql = "SELECT SORT_KEY FROM ( SELECT id AS SORT_KEY, ROW_NUMBER() OVER (ORDER BY id ASC) AS ROW_NUMBER FROM foo WHERE bar = 1) WHERE ROW_NUMBER = 100";
+		String sql = "SELECT SORT_KEY FROM ( SELECT id AS SORT_KEY, ROW_NUMBER() OVER () AS ROW_NUMBER FROM foo WHERE bar = 1) AS TMP_SUB WHERE ROW_NUMBER = 100";
 		String s = pagingQueryProvider.generateJumpToItemQuery(145, pageSize);
 		Assert.assertEquals("", sql, s);
 	}
 
-	@Test @Override
+	@Test
+	@Override
 	public void testGenerateJumpToItemQueryForFirstPage() {
-		String sql = "SELECT SORT_KEY FROM ( SELECT id AS SORT_KEY, ROW_NUMBER() OVER (ORDER BY id ASC) AS ROW_NUMBER FROM foo WHERE bar = 1) WHERE ROW_NUMBER = 1";
+		String sql = "SELECT SORT_KEY FROM ( SELECT id AS SORT_KEY, ROW_NUMBER() OVER () AS ROW_NUMBER FROM foo WHERE bar = 1) AS TMP_SUB WHERE ROW_NUMBER = 1";
 		String s = pagingQueryProvider.generateJumpToItemQuery(45, pageSize);
 		Assert.assertEquals("", sql, s);
+	}
+
+	/**
+	 * Derby doesn't allow order by in the sub select (so it's pretty useless in
+	 * general for paging)
+	 */
+	@Test
+	@Override
+	public void testQueryContainsSortKey() {
+		String s = pagingQueryProvider.generateFirstPageQuery(pageSize).toLowerCase();
+		assertFalse("Wrong query: " + s, s.contains("id asc"));
+	}
+
+	/**
+	 * Derby doesn't allow order by in the sub select
+	 */
+	@Test
+	@Override
+	public void testQueryContainsSortKeyDesc() {
+		pagingQueryProvider.setAscending(false);
+		String s = pagingQueryProvider.generateFirstPageQuery(pageSize).toLowerCase();
+		assertFalse("Wrong query: " + s, s.contains("id desc"));
 	}
 
 }

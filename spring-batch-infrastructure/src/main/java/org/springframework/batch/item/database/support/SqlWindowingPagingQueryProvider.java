@@ -17,9 +17,10 @@
 package org.springframework.batch.item.database.support;
 
 /**
- * Generic Paging Query Provider using standard SQL:2003 windowing functions.  These features are supported by
- * DB2, Oracle, SQL Server 2005, Sybase and Apache Derby version 10.4.1.3
- *
+ * Generic Paging Query Provider using standard SQL:2003 windowing functions.
+ * These features are supported by DB2, Oracle, SQL Server 2005, Sybase and
+ * Apache Derby version 10.4.1.3
+ * 
  * @author Thomas Risberg
  * @since 2.0
  */
@@ -30,13 +31,17 @@ public class SqlWindowingPagingQueryProvider extends AbstractSqlPagingQueryProvi
 		StringBuilder sql = new StringBuilder();
 		sql.append("SELECT * FROM ( ");
 		sql.append("SELECT ").append(getSelectClause()).append(", ");
-		sql.append("ROW_NUMBER() OVER (ORDER BY ").append(getSortKey());
-		buildAscendingClause(sql);
+		sql.append("ROW_NUMBER() OVER (").append(getOverClause());
 		sql.append(") AS ROW_NUMBER");
-		sql.append(" FROM ").append(getFromClause()).append(getWhereClause() == null ? "" : " WHERE " + getWhereClause());
-		sql.append(") WHERE ROW_NUMBER <= ").append(pageSize);
+		sql.append(" FROM ").append(getFromClause()).append(
+				getWhereClause() == null ? "" : " WHERE " + getWhereClause());
+		sql.append(") ").append(getSubQueryAlias()).append("WHERE ROW_NUMBER <= ").append(pageSize);
 
 		return sql.toString();
+	}
+
+	protected Object getSubQueryAlias() {
+		return "";
 	}
 
 	@Override
@@ -44,8 +49,7 @@ public class SqlWindowingPagingQueryProvider extends AbstractSqlPagingQueryProvi
 		StringBuilder sql = new StringBuilder();
 		sql.append("SELECT * FROM ( ");
 		sql.append("SELECT ").append(getSelectClause()).append(", ");
-		sql.append("ROW_NUMBER() OVER (ORDER BY ").append(getSortKey());
-		buildAscendingClause(sql);
+		sql.append("ROW_NUMBER() OVER (").append(getOverClause());
 		sql.append(") AS ROW_NUMBER");
 		sql.append(" FROM ").append(getFromClause());
 		sql.append(" WHERE ");
@@ -61,7 +65,7 @@ public class SqlWindowingPagingQueryProvider extends AbstractSqlPagingQueryProvi
 			sql.append(" < ");
 		}
 		sql.append(getSortKeyPlaceHolder());
-		sql.append(") WHERE ROW_NUMBER <= ").append(pageSize);
+		sql.append(") ").append(getSubQueryAlias()).append("WHERE ROW_NUMBER <= ").append(pageSize);
 
 		return sql.toString();
 	}
@@ -70,28 +74,32 @@ public class SqlWindowingPagingQueryProvider extends AbstractSqlPagingQueryProvi
 	public String generateJumpToItemQuery(int itemIndex, int pageSize) {
 		int page = itemIndex / pageSize;
 		int lastRowNum = (page * pageSize);
-		if (lastRowNum<=0) {
+		if (lastRowNum <= 0) {
 			lastRowNum = 1;
 		}
 
 		StringBuilder sql = new StringBuilder();
 		sql.append("SELECT SORT_KEY FROM ( ");
 		sql.append("SELECT ").append(getSortKey()).append(" AS SORT_KEY, ");
-		sql.append("ROW_NUMBER() OVER (ORDER BY ").append(getSortKey());
-		buildAscendingClause(sql);
+		sql.append("ROW_NUMBER() OVER (").append(getOverClause());
 		sql.append(") AS ROW_NUMBER");
-		sql.append(" FROM ").append(getFromClause()).append(getWhereClause() == null ? "" : " WHERE " + getWhereClause());
-		sql.append(") WHERE ROW_NUMBER = ").append(lastRowNum);
+		sql.append(" FROM ").append(getFromClause()).append(
+				getWhereClause() == null ? "" : " WHERE " + getWhereClause());
+		sql.append(") ").append(getSubQueryAlias()).append("WHERE ROW_NUMBER = ").append(lastRowNum);
 
 		return sql.toString();
 	}
 
-	private void buildAscendingClause(StringBuilder sql) {
+	protected String getOverClause() {
+		return "ORDER BY " + getSortKey() + " " + getAscendingClause();
+	}
+
+	private String getAscendingClause() {
 		if (isAscending()) {
-			sql.append(" ASC");
+			return "ASC";
 		}
 		else {
-			sql.append(" DESC");
+			return "DESC";
 		}
 	}
 
