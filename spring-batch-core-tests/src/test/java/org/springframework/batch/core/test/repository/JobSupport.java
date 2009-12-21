@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.springframework.batch.sample.support;
+package org.springframework.batch.core.test.repository;
 
 import java.util.ArrayList;
 import java.util.List;

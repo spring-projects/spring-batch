@@ -1,12 +1,16 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <beansProjectDescription>
 	<version>1</version>
-	<pluginVersion><![CDATA[2.2.7.200909172100-CI-R3407-B467]]></pluginVersion>
+	<pluginVersion><![CDATA[2.2.8.200911091054-RELEASE]]></pluginVersion>
 	<configSuffixes>
 		<configSuffix><![CDATA[xml]]></configSuffix>
 	</configSuffixes>
 	<enableImports><![CDATA[false]]></enableImports>
 	<configs>
+		<config>src/test/resources/adhoc-job-launcher-context.xml</config>
+		<config>src/test/resources/jobs/adhocLoopJob.xml</config>
+		<config>src/test/resources/data-source-context.xml</config>
+		<config>src/test/resources/simple-job-launcher-context.xml</config>
 	</configs>
 	<configSets>
 		<configSet>

@@ -7,7 +7,7 @@
 	<!--  Initialise the database before every test case: -->
 	<bean id="dataSourceInitializer" class="test.jdbc.datasource.DataSourceInitializer">
 		<property name="dataSource" ref="dataSource"/>
-		<property name=""></property>
+		<property name="initialize" value="${batch.data.source.init}"/>
 		<property name="initScripts">
 			<list>
 				<value>${batch.drop.script}</value>
@@ -17,7 +17,7 @@
 		</property>
 	</bean>
 
-	<bean id="dataSource" class="org.apache.commons.dbcp.BasicDataSource">
+	<bean id="dataSource" class="org.apache.commons.dbcp.BasicDataSource" destroy-method="close">
 		<property name="driverClassName" value="${batch.jdbc.driver}" />
 		<property name="url" value="${batch.jdbc.url}" />
 		<property name="username" value="${batch.jdbc.user}" />
@@ -55,9 +55,16 @@
 		<property name="order" value="1" />
 	</bean>
 
-	<bean id="incrementerParent" class="${batch.database.incrementer.class}" abstract="true">
+	<bean id="sequenceIncrementerParent" class="${batch.database.incrementer.class}" abstract="true">
 		<property name="dataSource" ref="dataSource" />
-		<property name="incrementerName" value="ID" />
+	</bean>
+
+	<bean id="columnIncrementerParent" class="${batch.database.incrementer.class}" abstract="true" parent="sequenceIncrementerParent">
+		<property name="columnName" value="ID" />
+	</bean>
+
+	<bean id="incrementerParent" parent="${batch.database.incrementer.parent}">
+		<property name="incrementerName" value="DUMMY" />
 	</bean>
 
 	<!--import resource="alt-data-source-context.xml" /-->

@@ -63,6 +63,10 @@
 			<version>2.1.0.CI-SNAPSHOT </version>
 		</dependency>
 		<dependency>
+			<groupId>commons-dbcp</groupId>
+			<artifactId>commons-dbcp</artifactId>
+		</dependency>
+		<dependency>
 			<groupId>hsqldb</groupId>
 			<artifactId>hsqldb</artifactId>
 		</dependency>
