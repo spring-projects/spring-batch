@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<artifactId>spring-batch-core-tests</artifactId>
 	<name>Core Tests</name>
@@ -49,11 +50,34 @@
 						<groupId>org.apache.maven.plugins</groupId>
 						<artifactId>maven-surefire-plugin</artifactId>
 						<configuration>
-							<skip>false</skip>
+							<systemProperties>
+								<property>
+									<name>job.commit.interval</name>
+									<value>100</value>
+								</property>
+								<property>
+									<name>games.file.name</name>
+									<value>games.csv</value>
+								</property>
+								<property>
+									<name>player.file.name</name>
+									<value>player.csv</value>
+								</property>
+								<property>
+									<name>ENVIRONMENT</name>
+									<value>${environment}</value>
+								</property>
+							</systemProperties>
 						</configuration>
 					</plugin>
 				</plugins>
 			</build>
+		</profile>
+		<profile>
+			<id>derby</id>
+			<properties>
+				<environment>derby</environment>
+			</properties>
 		</profile>
 	</profiles>
 	<dependencies>
@@ -121,21 +145,21 @@
 			<groupId>org.springframework</groupId>
 			<artifactId>spring-aop</artifactId>
 		</dependency>
-                        <dependency>
-                                <groupId>org.aspectj</groupId>
-                                <artifactId>aspectjrt</artifactId>
-                                <optional>true</optional>
-                        </dependency>
-                        <dependency>
-                                <groupId>org.aspectj</groupId>
-                                <artifactId>aspectjweaver</artifactId>
-                                <optional>true</optional>
-                        </dependency>
-                        <dependency>
-                                <groupId>cglib</groupId>
-                                <artifactId>cglib-nodep</artifactId>
-                                <optional>true</optional>
-                        </dependency>
+		<dependency>
+			<groupId>org.aspectj</groupId>
+			<artifactId>aspectjrt</artifactId>
+			<optional>true</optional>
+		</dependency>
+		<dependency>
+			<groupId>org.aspectj</groupId>
+			<artifactId>aspectjweaver</artifactId>
+			<optional>true</optional>
+		</dependency>
+		<dependency>
+			<groupId>cglib</groupId>
+			<artifactId>cglib-nodep</artifactId>
+			<optional>true</optional>
+		</dependency>
 	</dependencies>
 	<build>
 		<pluginManagement>
@@ -150,4 +174,7 @@
 			</plugins>
 		</pluginManagement>
 	</build>
+	<properties>
+		<environment>hsql</environment>
+	</properties>
 </project>

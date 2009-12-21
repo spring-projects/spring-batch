@@ -29,6 +29,7 @@ import org.springframework.beans.factory.BeanInitializationException;
 import org.springframework.beans.factory.DisposableBean;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.core.io.Resource;
+import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.datasource.DataSourceTransactionManager;
 import org.springframework.transaction.TransactionStatus;
@@ -116,7 +117,13 @@ public class DataSourceInitializer implements InitializingBean, DisposableBean {
 				for (int i = 0; i < scripts.length; i++) {
 					String script = scripts[i].trim();
 					if (StringUtils.hasText(script)) {
-						jdbcTemplate.execute(scripts[i]);
+						try {
+							jdbcTemplate.execute(scripts[i]);
+						} catch (DataAccessException e) {
+							if (!script.toUpperCase().startsWith("DROP")) {
+								throw e;
+							}
+						}
 					}
 				}
 				return null;

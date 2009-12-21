@@ -53,8 +53,6 @@ import org.springframework.transaction.support.TransactionTemplate;
 @ContextConfiguration(locations = { "/simple-job-launcher-context.xml" })
 public class JdbcJobRepositoryTests {
 
-	private JobRepository repository;
-
 	private JobSupport job;
 
 	private Set<Long> jobExecutionIds = new HashSet<Long>();
@@ -65,6 +63,10 @@ public class JdbcJobRepositoryTests {
 
 	private SimpleJdbcTemplate simpleJdbcTemplate;
 
+	@Autowired
+	private JobRepository repository;
+	
+	@Autowired
 	private PlatformTransactionManager transactionManager;
 
 	/** Logger */
@@ -73,16 +75,6 @@ public class JdbcJobRepositoryTests {
 	@Autowired
 	public void setDataSource(DataSource dataSource) {
 		this.simpleJdbcTemplate = new SimpleJdbcTemplate(dataSource);
-	}
-
-	@Autowired
-	public void setTransactionManager(PlatformTransactionManager transactionManager) {
-		this.transactionManager = transactionManager;
-	}
-
-	@Autowired
-	public void setRepository(JobRepository repository) {
-		this.repository = repository;
 	}
 
 	@BeforeTransaction
