@@ -222,7 +222,7 @@ public class StaxEventItemReader<T> extends AbstractItemCountingItemStreamItemRe
 	@Override
 	protected void jumpToItem(int itemIndex) throws Exception {
 		for (int i = 0; i < itemIndex; i++) {
-			readToStartFragement();
+			readToStartFragment();
 			readToEndFragment();
 		}
 	}
@@ -233,7 +233,7 @@ public class StaxEventItemReader<T> extends AbstractItemCountingItemStreamItemRe
 	 * is now and the fragment start, this is done in a loop until the element type and name 
 	 * match.
 	 */
-	private void readToStartFragement() throws XMLStreamException{
+	private void readToStartFragment() throws XMLStreamException{
 		while(true){
 			XMLEvent nextEvent = eventReader.nextEvent();
 			if( nextEvent.isStartElement() &&
