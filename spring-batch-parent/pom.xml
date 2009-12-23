@@ -7,6 +7,7 @@
 	<name>Spring Batch Parent</name>
 	<description>Spring Batch parent project.  Defines dependencies and common configuration for the
 	build process.</description>
+	<url>http://static.springframework.org/spring-batch/2.0.x/${project.artifactId}</url>
 	<packaging>pom</packaging>
 	<properties>
 		<maven.test.failure.ignore>true</maven.test.failure.ignore>
@@ -31,21 +32,9 @@
 		<profile>
 			<id>spring3</id>
 			<properties>
-				<spring.framework.version>3.0.0.BUILD-SNAPSHOT</spring.framework.version>
-				<junit.version>4.6</junit.version>
+				<spring.framework.version>3.0.0.RELEASE</spring.framework.version>
+				<junit.version>4.7</junit.version>
 			</properties>
-			<repositories>
-				<repository>
-					<id>spring-snapshots</id>
-					<url>http://s3.amazonaws.com/maven.springframework.org/snapshot</url>
-					<releases>
-						<enabled>false</enabled>
-					</releases>
-					<snapshots>
-						<enabled>true</enabled>
-					</snapshots>
-				</repository>
-			</repositories>
 		</profile>
 		<profile>
 			<id>central</id>
@@ -72,6 +61,26 @@
 					<id>staging</id>
 					<url>file:///${user.dir}/target/staging</url>
 				</snapshotRepository>
+			</distributionManagement>
+		</profile>
+		<profile>
+			<id>milestone</id>
+			<distributionManagement>
+				<repository>
+					<id>spring-milestone</id>
+					<name>Spring Milestone Repository</name>
+					<url>s3://maven.springframework.org/milestone</url>
+				</repository>
+			</distributionManagement>
+		</profile>
+		<profile>
+			<id>central</id>
+			<distributionManagement>
+				<repository>
+					<id>spring-sourceforge</id>
+					<name>Spring Sourceforge Repository</name>
+					<url>https://springframework.svn.sourceforge.net/svnroot/springframework/repos/repo</url>
+				</repository>
 			</distributionManagement>
 		</profile>
 		<profile>
@@ -109,19 +118,26 @@
 			<pluginRepositories>
 				<pluginRepository>
 					<id>apache-snapshots</id>
-					<url>http://people.apache.org/maven-snapshot-repository</url>
+					<url>http://people.apache.org/maven-snapshot-repository/</url>
 				</pluginRepository>
 			</pluginRepositories>
 			<repositories>
 				<repository>
 					<id>apache-snapshot</id>
 					<name>Apache Foundation Snapshot Repository</name>
-					<url>http://people.apache.org/maven-snapshot-repository</url>
+					<url>http://people.apache.org/maven-snapshot-repository/</url>
 				</repository>
 			</repositories>
 		</profile>
 	</profiles>
 	<build>
+		<extensions>
+			<extension>
+				<groupId>org.springframework.build.aws</groupId>
+				<artifactId>org.springframework.build.aws.maven</artifactId>
+				<version>2.0.0.RELEASE</version>
+			</extension>
+		</extensions>
 		<pluginManagement>
 			<plugins>
 				<plugin>
@@ -521,6 +537,10 @@
 		</dependencies>
 	</dependencyManagement>
 	<distributionManagement>
+		<site>
+			<id>static.springframework.org</id>
+			<url>scp://static.springframework.org/var/www/domains/springframework.org/static/htdocs/spring-batch/2.0.x</url>
+		</site>
 		<repository>
 			<id>spring-release</id>
 			<name>Spring Release Repository</name>
@@ -536,7 +556,7 @@
 		<repository>
 			<id>objectstyle</id>
 			<name>ObjectStyle.org Repository</name>
-			<url>http://objectstyle.org/maven2</url>
+			<url>http://objectstyle.org/maven2/</url>
 			<snapshots>
 				<enabled>false</enabled>
 			</snapshots>
@@ -546,7 +566,7 @@
 		<pluginRepository>
 			<id>com.springsource.repository.bundles.milestone</id>
 			<name>SpringSource Enterprise Bundle Repository - SpringSource Bundle Milestones</name>
-			<url>http://repository.springsource.com/maven/bundles/milestone</url>
+			<url>http://repository.springsource.com/maven/bundles/milestone/</url>
 			<snapshots>
 				<enabled>false</enabled>
 			</snapshots>
@@ -554,7 +574,7 @@
 		<pluginRepository>
 			<id>com.springsource.repository.bundles.snapshot</id>
 			<name>SpringSource Enterprise Bundle Repository - SpringSource Bundle Snapshots</name>
-			<url>http://repository.springsource.com/maven/bundles/snapshot</url>
+			<url>http://repository.springsource.com/maven/bundles/snapshot/</url>
 		</pluginRepository>
 	</pluginRepositories>
 </project>

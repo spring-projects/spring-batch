@@ -294,6 +294,16 @@
 			</modules>
 		</profile>
 		<profile>
+			<id>milestone</id>
+			<distributionManagement>
+				<repository>
+					<id>spring-milestone</id>
+					<name>Spring Milestone Repository</name>
+					<url>s3://maven.springframework.org/milestone</url>
+				</repository>
+			</distributionManagement>
+		</profile>
+		<profile>
 			<id>central</id>
 			<distributionManagement>
 				<repository>
@@ -388,7 +398,7 @@
 			<plugins>
 				<plugin>
 					<artifactId>maven-site-plugin</artifactId>
-					<version>2.0</version>
+					<version>2.0.1</version>
 				</plugin>
 				<plugin>
 					<groupId>org.apache.maven.plugins</groupId>
@@ -415,10 +425,24 @@
 				</plugin>
 			</plugins>
 		</pluginManagement>
+		<plugins>
+		  <plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-deploy-plugin</artifactId>
+				<configuration>
+					<skip>true</skip>
+				</configuration>
+		  </plugin>
+		</plugins>
 	</build>
 	<reporting>
 		<excludeDefaults>true</excludeDefaults>
 		<plugins>
+		  <plugin>
+			<groupId>org.apache.maven.plugins</groupId>
+			<artifactId>maven-project-info-reports-plugin</artifactId>
+			<version>2.1.1</version>
+		  </plugin>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-surefire-report-plugin</artifactId>
@@ -503,7 +527,7 @@
 		<pluginRepository>
 			<id>com.springsource.repository.bundles.milestone</id>
 			<name> SpringSource Enterprise Bundle Repository - SpringSource Bundle Milestones</name>
-			<url>http://repository.springsource.com/maven/bundles/milestone</url>
+			<url>http://repository.springsource.com/maven/bundles/milestone/</url>
 			<snapshots>
 				<enabled>false</enabled>
 			</snapshots>
@@ -511,7 +535,7 @@
 		<pluginRepository>
 			<id>com.springsource.repository.bundles.snapshot</id>
 			<name>SpringSource Enterprise Bundle Repository - SpringSource Bundle Snapshots</name>
-			<url>http://repository.springsource.com/maven/bundles/snapshot</url>
+			<url>http://repository.springsource.com/maven/bundles/snapshot/</url>
 		</pluginRepository>
 	</pluginRepositories>
 </project>
