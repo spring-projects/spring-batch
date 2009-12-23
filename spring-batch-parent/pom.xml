@@ -33,21 +33,19 @@
 		<profile>
 			<id>spring3</id>
 			<properties>
-				<spring.framework.version>3.0.0.BUILD-SNAPSHOT</spring.framework.version>
-				<junit.version>4.6</junit.version>
+				<spring.framework.version>3.0.0.RELEASE</spring.framework.version>
+				<junit.version>4.7</junit.version>
 			</properties>
-			<repositories>
+		</profile>
+		<profile>
+			<id>central</id>
+			<distributionManagement>
 				<repository>
-					<id>spring-snapshots</id>
-					<url>http://s3.amazonaws.com/maven.springframework.org/snapshot/</url>
-					<releases>
-						<enabled>false</enabled>
-					</releases>
-					<snapshots>
-						<enabled>true</enabled>
-					</snapshots>
+					<id>spring-sourceforge</id>
+					<name>Spring Sourceforge Repository</name>
+					<url>https://springframework.svn.sourceforge.net/svnroot/springframework/repos/repo</url>
 				</repository>
-			</repositories>
+			</distributionManagement>
 		</profile>
 		<profile>
 			<id>staging</id>
