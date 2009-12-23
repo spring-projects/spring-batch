@@ -1,0 +1,36 @@
+Spring Batch 2.1.0.M4 Release Notes
+
+
+Release Notes - Spring Batch - Version 2.1.0.M4
+
+* Sub-task
+
+  * {{{http://jira.springsource.org/browse/BATCH-1456}[BATCH-1456]}} - Detect spring-batch-2.0.xsd and raise an exception in the namespace parsers
+
+  * {{{http://jira.springsource.org/browse/BATCH-1458}[BATCH-1458]}} - Add FlowStep: a Step implementation that executes a flow
+
+* Bug
+
+  * {{{http://jira.springsource.org/browse/BATCH-1460}[BATCH-1460]}} - Rownum clauses are illegal in DerbyPagingQueryProvider (plus additional fix to Oracle)
+
+* Improvement
+
+  * {{{http://jira.springsource.org/browse/BATCH-585}[BATCH-585]}} - Improve coverage of examples of listener implementations in user guide
+
+  * {{{http://jira.springsource.org/browse/BATCH-924}[BATCH-924]}} - BeanWrapperFieldSetMapper could create child objects if they are null when needed
+
+  * {{{http://jira.springsource.org/browse/BATCH-1259}[BATCH-1259]}} - Ensure that skips in the processor cause items to be reprocessed at most once.
+
+* New Feature
+
+  * {{{http://jira.springsource.org/browse/BATCH-992}[BATCH-992]}} - Alternative fault-tolerant step implementation
+
+  * {{{http://jira.springsource.org/browse/BATCH-1372}[BATCH-1372]}} - Namespace support for partitioning
+
+  * {{{http://jira.springsource.org/browse/BATCH-1407}[BATCH-1407]}} - Integration tests for core (including multi-threaded long running tests)
+
+* Task
+
+  * {{{http://jira.springsource.org/browse/BATCH-834}[BATCH-834]}} - Review stop signal handling at JobExecution
+
+  * {{{http://jira.springsource.org/browse/BATCH-1457}[BATCH-1457]}} - remove tiger profile from archetype's pom.xml
