@@ -32,6 +32,7 @@ import javax.xml.stream.XMLEventWriter;
 import javax.xml.stream.XMLOutputFactory;
 import javax.xml.stream.XMLStreamException;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.batch.item.ExecutionContext;
@@ -100,6 +101,12 @@ public class StaxEventItemWriter<T> extends ExecutionContextUserSupport implemen
 
 	// name of the root tag
 	private String rootTagName = DEFAULT_ROOT_TAG_NAME;
+
+	// namespace prefix of the root tag
+	private String rootTagNamespacePrefix = "";
+
+	// namespace of the root tag
+	private String rootTagNamespace = "";
 
 	// root element attributes
 	private Map<String, String> rootElementAttributes = null;
@@ -231,6 +238,43 @@ public class StaxEventItemWriter<T> extends ExecutionContextUserSupport implemen
 	 */
 	public void setRootTagName(String rootTagName) {
 		this.rootTagName = rootTagName;
+	}
+
+	/**
+	 * Get the namespace prefix of the root element. Empty by default.
+	 * 
+	 * @return the rootTagNamespacePrefix
+	 */
+	public String getRootTagNamespacePrefix() {
+		return rootTagNamespacePrefix;
+	}
+
+	/**
+	 * Set the namespace prefix of the root element. If not set, the namespace
+	 * prefix "xmlns" is used.
+	 * 
+	 * @param rootTagNamespacePrefix the rootTagNamespacePrefix to set
+	 */
+	public void setRootTagNamespacePrefix(String rootTagNamespacePrefix) {
+		this.rootTagNamespacePrefix = rootTagNamespacePrefix;
+	}
+
+	/**
+	 * Get the namespace of the root element.
+	 * 
+	 * @return the rootTagNamespace
+	 */
+	public String getRootTagNamespace() {
+		return rootTagNamespace;
+	}
+
+	/**
+	 * Set the namespace of the root element. If not set, no namespace is used.
+	 * 
+	 * @param rootTagNamespace the rootTagNamespace to set
+	 */
+	public void setRootTagNamespace(String rootTagNamespace) {
+		this.rootTagNamespace = rootTagNamespace;
 	}
 
 	/**
@@ -386,7 +430,10 @@ public class StaxEventItemWriter<T> extends ExecutionContextUserSupport implemen
 		writer.add(factory.createStartDocument(getEncoding(), getVersion()));
 
 		// write root tag
-		writer.add(factory.createStartElement("", "", getRootTagName()));
+		writer.add(factory.createStartElement(getRootTagNamespacePrefix(), getRootTagNamespace(), getRootTagName()));
+		if (!StringUtils.isBlank(getRootTagNamespace())) {
+			writer.add(factory.createNamespace(getRootTagNamespacePrefix(), getRootTagNamespace()));
+		}
 
 		// write root tag attributes
 		if (!CollectionUtils.isEmpty(getRootElementAttributes())) {
@@ -411,9 +458,10 @@ public class StaxEventItemWriter<T> extends ExecutionContextUserSupport implemen
 
 		// writer.writeEndDocument(); <- this doesn't work after restart
 		// we need to write end tag of the root element manually
-
+		
+		String nsPrefix = StringUtils.isBlank(getRootTagNamespacePrefix()) ? "" : getRootTagNamespacePrefix() + ":";
 		try {
-			bufferedWriter.write("</" + getRootTagName() + ">");
+			bufferedWriter.write("</" + nsPrefix + getRootTagName() + ">");
 		}
 		catch (IOException ioe) {
 			throw new DataAccessResourceFailureException("Unable to close file resource: [" + resource + "]", ioe);

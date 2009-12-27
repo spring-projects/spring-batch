@@ -272,8 +272,10 @@ public class StaxEventItemWriterTests {
 
 			StaxResult staxResult = (StaxResult) result;
 			try {
-				staxResult.getXMLEventWriter().add(XMLEventFactory.newInstance().createStartElement("", "", graph.toString()));
-				staxResult.getXMLEventWriter().add(XMLEventFactory.newInstance().createEndElement("", "", graph.toString()));
+				staxResult.getXMLEventWriter().add(
+						XMLEventFactory.newInstance().createStartElement("", "", graph.toString()));
+				staxResult.getXMLEventWriter().add(
+						XMLEventFactory.newInstance().createEndElement("", "", graph.toString()));
 			}
 			catch (XMLStreamException e) {
 				throw new RuntimeException("Exception while writing to output file", e);
@@ -315,4 +317,38 @@ public class StaxEventItemWriterTests {
 
 		return source;
 	}
+
+	/**
+	 * Item is written to the output file with namespace.
+	 */
+	@Test
+	public void testWriteRootTagWithNamespace() throws Exception {
+		writer.setRootTagNamespace("http://www.springframework.org/test");
+		writer.open(executionContext);
+		writer.write(items);
+		writer.close();
+		String content = getOutputFileContent();
+		assertTrue("Wrong content: " + content, content
+				.contains(("<root xmlns=\"http://www.springframework.org/test\">")));
+		assertTrue("Wrong content: " + content, content.contains(TEST_STRING));
+		assertTrue("Wrong content: " + content, content.contains(("</root>")));
+	}
+
+	/**
+	 * Item is written to the output file with namespace and prefix.
+	 */
+	@Test
+	public void testWriteRootTagWithNamespaceAndPrefix() throws Exception {
+		writer.setRootTagNamespacePrefix("ns");
+		writer.setRootTagNamespace("http://www.springframework.org/test");
+		writer.open(executionContext);
+		writer.write(items);
+		writer.close();
+		String content = getOutputFileContent();
+		assertTrue("Wrong content: " + content, content
+				.contains(("<ns:root xmlns:ns=\"http://www.springframework.org/test\">")));
+		assertTrue("Wrong content: " + content, content.contains(TEST_STRING));
+		assertTrue("Wrong content: " + content, content.contains(("</ns:root>")));
+	}
+	
 }
