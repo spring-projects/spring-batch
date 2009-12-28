@@ -4,6 +4,7 @@ import junit.framework.TestCase;
 
 import org.springframework.batch.item.adapter.AbstractMethodInvokingDelegator;
 import org.springframework.batch.item.adapter.DynamicMethodInvocationException;
+import org.springframework.batch.item.adapter.AbstractMethodInvokingDelegator.InvocationTargetThrowableWrapper;
 import org.springframework.batch.item.sample.Foo;
 import org.springframework.batch.item.sample.FooService;
 import org.springframework.util.Assert;
@@ -178,6 +179,39 @@ public class AbstractDelegatorTests extends TestCase {
 		}
 		catch (IllegalStateException e) {
 			// expected
+		}
+	}
+
+	/**
+	 * Exception scenario - target method is successfully invoked but throws
+	 * exception. Such 'business' exception should be re-thrown as is (without
+	 * wrapping).
+	 */
+	public void testDelegateException() throws Exception {
+		delegator.setTargetMethod("fail");
+		delegator.afterPropertiesSet();
+		try {
+			delegator.invokeDelegateMethod();
+			fail();
+		}
+		catch (Exception expected) {
+			assertEquals(Foo.FAILURE_MESSAGE, expected.getMessage());
+		}
+
+	}
+	
+	/**
+	 * Exception scenario - target method is successfully invoked but throws a {@link Throwable} (not an {@link Exception}).
+	 */
+	public void testDelegateThrowable() throws Exception {
+		delegator.setTargetMethod("failUgly");
+		delegator.afterPropertiesSet();
+		try {
+			delegator.invokeDelegateMethod();
+			fail();
+		}
+		catch (InvocationTargetThrowableWrapper expected) {
+			assertEquals(Foo.UGLY_FAILURE_MESSAGE, expected.getCause().getMessage());
 		}
 	}
 

@@ -31,6 +31,11 @@ import org.springframework.util.MethodInvoker;
  * injected object. Provides convenient API for dynamic method invocation
  * shielding subclasses from low-level details and exception handling.
  * 
+ * {@link Exception}s thrown by a successfully invoked delegate method are
+ * re-thrown without wrapping. In case the delegate method throws a
+ * {@link Throwable} that doesn't subclass {@link Exception} it will be wrapped
+ * by {@link InvocationTargetThrowableWrapper}.
+ * 
  * @author Robert Kasanicky
  */
 public abstract class AbstractMethodInvokingDelegator<T> implements InitializingBean {
@@ -48,7 +53,7 @@ public abstract class AbstractMethodInvokingDelegator<T> implements Initializing
 	 * @throws DynamicMethodInvocationException if the {@link MethodInvoker}
 	 * used throws exception
 	 */
-	protected T invokeDelegateMethod() {
+	protected T invokeDelegateMethod() throws Exception {
 		MethodInvoker invoker = createMethodInvoker(targetObject, targetMethod);
 		invoker.setArguments(arguments);
 		return doInvoke(invoker);
@@ -61,7 +66,7 @@ public abstract class AbstractMethodInvokingDelegator<T> implements Initializing
 	 * @throws DynamicMethodInvocationException if the {@link MethodInvoker}
 	 * used throws exception
 	 */
-	protected T invokeDelegateMethodWithArgument(Object object) {
+	protected T invokeDelegateMethodWithArgument(Object object) throws Exception {
 		MethodInvoker invoker = createMethodInvoker(targetObject, targetMethod);
 		invoker.setArguments(new Object[] { object });
 		return doInvoke(invoker);
@@ -74,7 +79,7 @@ public abstract class AbstractMethodInvokingDelegator<T> implements Initializing
 	 * @throws DynamicMethodInvocationException if the {@link MethodInvoker}
 	 * used throws exception
 	 */
-	protected T invokeDelegateMethodWithArguments(Object[] args) {
+	protected T invokeDelegateMethodWithArguments(Object[] args) throws Exception {
 		MethodInvoker invoker = createMethodInvoker(targetObject, targetMethod);
 		invoker.setArguments(args);
 		return doInvoke(invoker);
@@ -97,7 +102,7 @@ public abstract class AbstractMethodInvokingDelegator<T> implements Initializing
 	 * @return return value of the invoked method
 	 */
 	@SuppressWarnings("unchecked")
-	private T doInvoke(MethodInvoker invoker) {
+	private T doInvoke(MethodInvoker invoker) throws Exception {
 		try {
 			invoker.prepare();
 		}
@@ -112,7 +117,12 @@ public abstract class AbstractMethodInvokingDelegator<T> implements Initializing
 			return (T) invoker.invoke();
 		}
 		catch (InvocationTargetException e) {
-			throw new DynamicMethodInvocationException(e);
+			if (e.getCause() instanceof Exception) {
+				throw (Exception) e.getCause();
+			}
+			else {
+				throw new InvocationTargetThrowableWrapper(e.getCause());
+			}
 		}
 		catch (IllegalAccessException e) {
 			throw new DynamicMethodInvocationException(e);
@@ -132,14 +142,14 @@ public abstract class AbstractMethodInvokingDelegator<T> implements Initializing
 	 */
 	private boolean targetClassDeclaresTargetMethod() {
 		MethodInvoker invoker = createMethodInvoker(targetObject, targetMethod);
-		
+
 		Method[] memberMethods = invoker.getTargetClass().getMethods();
 		Method[] declaredMethods = invoker.getTargetClass().getDeclaredMethods();
-		
-		List<Method> allMethods = new ArrayList<Method>(); 
+
+		List<Method> allMethods = new ArrayList<Method>();
 		allMethods.addAll(Arrays.asList(memberMethods));
 		allMethods.addAll(Arrays.asList(declaredMethods));
-		
+
 		String targetMethodName = invoker.getTargetMethod();
 
 		for (Method method : allMethods) {
@@ -198,5 +208,19 @@ public abstract class AbstractMethodInvokingDelegator<T> implements Initializing
 	 */
 	public void setArguments(Object[] arguments) {
 		this.arguments = arguments;
+	}
+
+	/**
+	 * Used to wrap a {@link Throwable} (not an {@link Exception}) thrown by a
+	 * reflectively-invoked delegate.
+	 * 
+	 * @author Robert Kasanicky
+	 */
+	public static class InvocationTargetThrowableWrapper extends RuntimeException {
+
+		public InvocationTargetThrowableWrapper(Throwable cause) {
+			super(cause);
+		}
+
 	}
 }

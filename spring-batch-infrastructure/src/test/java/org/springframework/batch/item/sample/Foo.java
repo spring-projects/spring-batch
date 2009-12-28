@@ -14,6 +14,10 @@ import javax.persistence.Id;
 @Table(name = "T_FOOS")
 public class Foo {
 	
+	public static final String FAILURE_MESSAGE = "Foo Failure!";
+	
+	public static final String UGLY_FAILURE_MESSAGE = "Ugly Foo Failure!";
+	
 	@Id
 	private int id;
 	private String name;
@@ -56,6 +60,14 @@ public class Foo {
 	
 	public int hashCode() {
 		return HashCodeBuilder.reflectionHashCode(this);
+	}
+	
+	public void fail() throws Exception {
+		throw new Exception(FAILURE_MESSAGE);
+	}
+	
+	public void failUgly() throws Throwable {
+		throw new Throwable(UGLY_FAILURE_MESSAGE);
 	}
 
 }
