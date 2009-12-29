@@ -253,7 +253,7 @@
 				<configuration>
 					<systemProperties>
 						<property>
-							<name>org.springframework.batch.support.SystemPropertyInitializer.ENVIRONMENT</name>
+							<name>ENVIRONMENT</name>
 							<value>${environment}</value>
 						</property>
 					</systemProperties>
