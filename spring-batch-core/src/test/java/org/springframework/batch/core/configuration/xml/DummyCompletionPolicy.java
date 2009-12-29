@@ -22,7 +22,7 @@ public class DummyCompletionPolicy implements CompletionPolicy {
 		return null;
 	}
 
-	public void update(RepeatContext context) 
+	public void update(RepeatContext context) {
 	}
 
 }
