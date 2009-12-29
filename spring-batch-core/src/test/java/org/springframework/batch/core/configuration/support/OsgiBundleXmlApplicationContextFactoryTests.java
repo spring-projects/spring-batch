@@ -30,6 +30,7 @@ import org.springframework.util.ClassUtils;
  * @author Dave Syer
  *
  */
+@SuppressWarnings("deprecation")
 public class OsgiBundleXmlApplicationContextFactoryTests {
 	
 	private OsgiBundleXmlApplicationContextFactory factory = new OsgiBundleXmlApplicationContextFactory();
@@ -46,7 +47,6 @@ public class OsgiBundleXmlApplicationContextFactoryTests {
 		expect(bundleContext.getBundle()).andReturn(bundle).anyTimes();
 		replay(bundleContext, bundle);
 		factory.setBundleContext(bundleContext);
-		// TODO: mock out the OSGi bundle resource...
 		// factory.createApplicationContext();
 		verify(bundleContext, bundle);
 	}

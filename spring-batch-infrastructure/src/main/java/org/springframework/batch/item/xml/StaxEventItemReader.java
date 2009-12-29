@@ -101,7 +101,6 @@ public class StaxEventItemReader<T> extends AbstractItemCountingItemStreamItemRe
 
 	/**
 	 * @param fragmentRootElementName name of the root element of the fragment
-	 * TODO String can be ambiguous due to namespaces, use QName?
 	 */
 	public void setFragmentRootElementName(String fragmentRootElementName) {
 		this.fragmentRootElementName = fragmentRootElementName;

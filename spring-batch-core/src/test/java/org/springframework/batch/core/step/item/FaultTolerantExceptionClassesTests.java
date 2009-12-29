@@ -256,7 +256,7 @@ public class FaultTolerantExceptionClassesTests implements ApplicationContextAwa
 		assertEquals(BatchStatus.COMPLETED, stepExecution.getStatus());
 		// BATCH-1332:
 		assertEquals("[1, 2, 3, 1, 2, 3, 4]", writer.getWritten().toString());
-		// TODO BATCH-1334:
+		// BATCH-1334:
 		// Skipped but also committed (because it was marked as no-rollback)
 		assertEquals("[1, 2, 3, 4]", writer.getCommitted().toString());
 		assertEquals(1, stepExecution.getWriteSkipCount());

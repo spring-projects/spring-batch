@@ -11,23 +11,18 @@ import org.springframework.batch.repeat.RepeatStatus;
 public class DummyCompletionPolicy implements CompletionPolicy {
 
 	public boolean isComplete(RepeatContext context, RepeatStatus result) {
-		// TODO Auto-generated method stub
 		return false;
 	}
 
 	public boolean isComplete(RepeatContext context) {
-		// TODO Auto-generated method stub
 		return false;
 	}
 
 	public RepeatContext start(RepeatContext parent) {
-		// TODO Auto-generated method stub
 		return null;
 	}
 
-	public void update(RepeatContext context) {
-		// TODO Auto-generated method stub
-		
+	public void update(RepeatContext context) 
 	}
 
 }

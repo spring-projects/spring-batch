@@ -20,7 +20,7 @@ public abstract class AbstractStaxEventReaderItemReaderTests extends TestCase {
 	protected Resource resource = new ClassPathResource("org/springframework/batch/io/oxm/input.xml");
 
 	protected void setUp() throws Exception {
-		// TODO sensible resource allocation
+
 		source.setResource(resource);
 
 		source.setFragmentRootElementName("trade");

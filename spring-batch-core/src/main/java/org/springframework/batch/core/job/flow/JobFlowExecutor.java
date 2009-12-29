@@ -93,9 +93,9 @@ public class JobFlowExecutor implements FlowExecutor {
 		if (getStepExecution() != null && getStepExecution().getStatus() == BatchStatus.ABANDONED) {
 			/*
 			 * This is assumed to be the last step execution and it was marked
-			 * abandoned, so we are in a restart of a stopped step. TODO: mark
-			 * the step execution in some more definitive way?
+			 * abandoned, so we are in a restart of a stopped step. 
 			 */
+			// TODO: mark the step execution in some more definitive way?
 			return true;
 		}
 		return execution.getStepExecutions().isEmpty();

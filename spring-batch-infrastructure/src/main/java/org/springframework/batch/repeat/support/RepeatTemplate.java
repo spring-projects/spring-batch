@@ -263,7 +263,6 @@ public class RepeatTemplate implements RepeatOperations {
 					}
 				}
 				finally {
-					// TODO: extend this to the completion policy?
 					context.close();
 				}
 

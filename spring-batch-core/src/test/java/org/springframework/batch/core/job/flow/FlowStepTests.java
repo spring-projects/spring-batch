@@ -47,8 +47,6 @@ public class FlowStepTests {
 	private JobRepository jobRepository;
 	private JobExecution jobExecution;
 
-	// TODO: add XML support
-
 	@Before
 	public void setUp() throws Exception {
 		jobRepository = new MapJobRepositoryFactoryBean().getJobRepository();
