@@ -5,6 +5,7 @@ import org.springframework.batch.core.JobInterruptedException;
 import org.springframework.batch.core.Step;
 import org.springframework.batch.core.StepExecution;
 import org.springframework.batch.core.explore.JobExplorer;
+import org.springframework.batch.core.step.NoSuchStepException;
 import org.springframework.batch.core.step.StepLocator;
 import org.springframework.integration.annotation.MessageEndpoint;
 import org.springframework.integration.annotation.ServiceActivator;
@@ -50,15 +51,13 @@ public class StepExecutionRequestHandler {
 		Long stepExecutionId = request.getStepExecutionId();
 		StepExecution stepExecution = jobExplorer.getStepExecution(jobExecutionId, stepExecutionId);
 		if (stepExecution == null) {
-			// TODO: create new Exception
-			throw new IllegalStateException("No StepExecution could be located for this request: " + request);
+			throw new NoSuchStepException("No StepExecution could be located for this request: " + request);
 		}
 
 		String stepName = request.getStepName();
 		Step step = stepLocator.getStep(stepName);
 		if (step == null) {
-			// TODO: create new Exception
-			throw new IllegalStateException(String.format("No Step with name [%s] could be located.", stepName));
+			throw new NoSuchStepException(String.format("No Step with name [%s] could be located.", stepName));
 		}
 
 		try {
@@ -66,12 +65,12 @@ public class StepExecutionRequestHandler {
 		}
 		catch (JobInterruptedException e) {
 			stepExecution.setStatus(BatchStatus.STOPPED);
-			// TODO: maybe update stepExecution in repository
+			// The receiver should update the stepExecution in repository
 		}
 		catch (Throwable e) {
 			stepExecution.addFailureException(e);
 			stepExecution.setStatus(BatchStatus.FAILED);
-			// TODO: maybe update stepExecution in repository
+			// The receiver should update the stepExecution in repository
 		}
 
 		return stepExecution;
