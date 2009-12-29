@@ -19,6 +19,15 @@
 		<property name="parent" value="#{stepExecutionContext[parent]}" />
 	</bean>
 
+	<bean id="nested" class="org.springframework.batch.core.scope.TestCollaborator">
+		<property name="name" value="foo" />
+		<property name="parent">
+			<bean class="org.springframework.batch.core.scope.TestCollaborator" scope="step">
+				<property name="name" value="#{stepExecutionContext[foo]}" />
+			</bean>
+		</property>
+	</bean>
+
 	<bean id="list" class="org.springframework.batch.core.scope.TestCollaborator" scope="step">
 		<property name="name" value="foo" />
 		<property name="list">

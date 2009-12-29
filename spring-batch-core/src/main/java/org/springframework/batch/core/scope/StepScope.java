@@ -104,6 +104,10 @@ public class StepScope implements Scope, BeanFactoryPostProcessor, Ordered {
 
 	private boolean proxyTargetClass = false;
 
+	private static boolean springThreeDetected;
+
+	private static boolean cachedSpringThreeResult;
+
 	/**
 	 * Flag to indicate that proxies should use dynamic subclassing. This allows
 	 * classes with no interface to be proxied. Defaults to false.
@@ -229,7 +233,12 @@ public class StepScope implements Scope, BeanFactoryPostProcessor, Ordered {
 	}
 
 	private static boolean isSpringThree() {
-		return ReflectionUtils.findMethod(Scope.class, "resolveContextualObject", new Class<?>[] { String.class }) != null;
+		if (!cachedSpringThreeResult) {
+			springThreeDetected = ReflectionUtils.findMethod(Scope.class, "resolveContextualObject",
+					new Class<?>[] { String.class }) != null;
+			cachedSpringThreeResult = true;
+		}
+		return springThreeDetected;
 	}
 
 	/**
@@ -326,7 +335,9 @@ public class StepScope implements Scope, BeanFactoryPostProcessor, Ordered {
 			if (definition != null) {
 				boolean nestedScoped = scope.equals(definition.getScope());
 				boolean scopeChangeRequiresProxy = !scoped && nestedScoped;
-				new ExpressionHider(scope, nestedScoped).visitBeanDefinition(definition);
+				if (!isSpringThree()) {
+					new ExpressionHider(scope, nestedScoped).visitBeanDefinition(definition);
+				}
 				if (scopeChangeRequiresProxy) {
 					// Exit here so that nested inner bean definitions are not
 					// analysed

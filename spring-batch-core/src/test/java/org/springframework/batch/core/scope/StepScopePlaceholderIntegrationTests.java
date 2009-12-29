@@ -47,6 +47,10 @@ public class StepScopePlaceholderIntegrationTests implements BeanFactoryAware {
 	@Qualifier("bar")
 	private Collaborator bar;
 
+	@Autowired
+	@Qualifier("nested")
+	private Collaborator nested;
+
 	private StepExecution stepExecution;
 
 	private ListableBeanFactory beanFactory;
@@ -126,6 +130,11 @@ public class StepScopePlaceholderIntegrationTests implements BeanFactoryAware {
 	@Test
 	public void testList() throws Exception {
 		assertEquals("[bar]", list.getList().toString());
+	}
+
+	@Test
+	public void testNested() throws Exception {
+		assertEquals("bar", nested.getParent().getName());
 	}
 
 }
