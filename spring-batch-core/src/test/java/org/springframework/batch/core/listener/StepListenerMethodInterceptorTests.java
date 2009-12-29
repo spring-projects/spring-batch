@@ -71,6 +71,7 @@ public class StepListenerMethodInterceptorTests {
 		return invokerSet;
 	}
 	
+	@SuppressWarnings("unused")
 	private class TestClass{
 		
 		int method1Count = 0;
@@ -91,6 +92,7 @@ public class StepListenerMethodInterceptorTests {
 		}
 	}
 	
+	@SuppressWarnings("unused")
 	private class StubMethodInvocation implements MethodInvocation{
 
 		Method method;

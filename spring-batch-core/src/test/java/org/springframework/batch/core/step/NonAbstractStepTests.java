@@ -71,6 +71,7 @@ public class NonAbstractStepTests {
 	 * Fills the events list when listener methods are called, prefixed with the
 	 * name of the listener.
 	 */
+	@SuppressWarnings("unused")
 	private class EventTrackingListener implements StepExecutionListener {
 
 		private String name;

@@ -392,6 +392,7 @@ public class StepListenerFactoryBeanTests {
 
 	}
 
+	@SuppressWarnings("unused")
 	private class ThreeStepExecutionListener implements StepExecutionListener {
 
 		int callcount = 0;
@@ -417,6 +418,7 @@ public class StepListenerFactoryBeanTests {
 
 	}
 
+	@SuppressWarnings("unused")
 	private class TestListener implements SkipListener<String, Integer> {
 
 		boolean beforeStepCalled = false;

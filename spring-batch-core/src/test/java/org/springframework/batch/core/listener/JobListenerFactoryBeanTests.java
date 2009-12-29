@@ -252,6 +252,7 @@ public class JobListenerFactoryBeanTests {
 
 	}
 
+	@SuppressWarnings("unused")
 	private class AnnotatedTestClass {
 
 		boolean beforeJobCalled = false;

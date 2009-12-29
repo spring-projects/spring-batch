@@ -69,6 +69,7 @@ public class XStreamExecutionContextStringSerializerTests {
 		}
 	}
 
+	@SuppressWarnings("unused")
 	private static class ComplexObject {
 		private String name;
 		private BigDecimal number;
