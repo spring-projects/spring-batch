@@ -29,7 +29,6 @@ public class JobRequestConverter {
 
 	@ServiceActivator
 	public JobLaunchRequest convert(String jobName) {
-		// TODO: get these from message header
 		Properties properties = new Properties();
 		return new JobLaunchRequest(new JobSupport(jobName), new DefaultJobParametersConverter().getJobParameters(properties));
 	}
