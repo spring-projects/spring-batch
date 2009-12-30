@@ -3,6 +3,7 @@ package org.springframework.batch.item.file;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
 import java.io.IOException;
@@ -16,6 +17,7 @@ import org.springframework.batch.item.file.mapping.PassThroughLineMapper;
 import org.springframework.batch.item.file.separator.RecordSeparatorPolicy;
 import org.springframework.core.io.AbstractResource;
 import org.springframework.core.io.ByteArrayResource;
+import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
 import org.springframework.util.ClassUtils;
 import org.springframework.util.StringUtils;
@@ -298,6 +300,21 @@ public class FlatFileItemReaderTests {
 		reader.open(executionContext);
 		assertNull(reader.read());
 		reader.close();
+	}
+
+	@Test
+	public void testDirectoryResource() throws Exception {
+
+		FileSystemResource resource = new FileSystemResource("target/data");
+		resource.getFile().mkdirs();
+		assertTrue(resource.getFile().isDirectory());
+		reader.setResource(resource);
+		reader.afterPropertiesSet();
+
+		reader.setStrict(false);
+		reader.open(executionContext);
+		assertNull(reader.read());
+
 	}
 
 	@Test

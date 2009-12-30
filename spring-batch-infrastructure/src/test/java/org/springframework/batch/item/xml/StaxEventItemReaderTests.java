@@ -21,6 +21,7 @@ import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.item.ItemStreamException;
 import org.springframework.core.io.AbstractResource;
 import org.springframework.core.io.ByteArrayResource;
+import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
 import org.springframework.oxm.Unmarshaller;
 import org.springframework.oxm.XmlMappingException;
@@ -229,6 +230,21 @@ public class StaxEventItemReaderTests {
 	public void testNonExistentResource() throws Exception {
 
 		source.setResource(new NonExistentResource());
+		source.afterPropertiesSet();
+
+		source.setStrict(false);
+		source.open(executionContext);
+		assertNull(source.read());
+
+	}
+
+	@Test
+	public void testDirectoryResource() throws Exception {
+
+		FileSystemResource resource = new FileSystemResource("target/data");
+		resource.getFile().mkdirs();
+		assertTrue(resource.getFile().isDirectory());
+		source.setResource(resource);
 		source.afterPropertiesSet();
 
 		source.setStrict(false);

@@ -182,6 +182,14 @@ public class StaxEventItemReader<T> extends AbstractItemCountingItemStreamItemRe
 			logger.warn("Input resource does not exist " + resource.getDescription());
 			return;
 		}
+		if (!resource.isReadable()) {
+			if (strict) {
+				throw new IllegalStateException("Input resource must be readable (reader is in 'strict' mode)");
+			}
+			noInput = true;
+			logger.warn("Input resource is not readable " + resource.getDescription());
+			return;
+		}
 
 		inputStream = resource.getInputStream();
 		eventReader = XMLInputFactory.newInstance().createXMLEventReader(inputStream);

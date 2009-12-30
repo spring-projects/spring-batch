@@ -3,6 +3,7 @@ package org.springframework.batch.item.file;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertSame;
+import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
 import java.io.IOException;
@@ -261,6 +262,23 @@ public class MultiResourceItemReaderIntegrationTests {
 	@Test
 	public void testNonExistentResources() throws Exception {
 		tested.setResources(new Resource[] {new FileSystemResource("no/such/file.txt")});
+		itemReader.setStrict(false);
+		tested.open(new ExecutionContext());
+
+		assertNull(tested.read());
+		
+		tested.close();
+	}
+	
+	/**
+	 * Directory resource behaves as if it was empty.
+	 */
+	@Test
+	public void testDirectoryResources() throws Exception {
+		FileSystemResource resource = new FileSystemResource("target/data");
+		resource.getFile().mkdirs();
+		assertTrue(resource.getFile().isDirectory());
+		tested.setResources(new Resource[] {resource});
 		itemReader.setStrict(false);
 		tested.open(new ExecutionContext());
 

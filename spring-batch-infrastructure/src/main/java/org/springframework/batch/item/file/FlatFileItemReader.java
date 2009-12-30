@@ -260,6 +260,15 @@ public class FlatFileItemReader<T> extends AbstractItemCountingItemStreamItemRea
 			return;
 		}
 
+		if (!resource.isReadable()) {
+			if (strict) {
+				throw new IllegalStateException("Input resource must be readable (reader is in 'strict' mode): " + resource);
+			}
+			noInput = true;
+			logger.warn("Input resource is not readable " + resource.getDescription());
+			return;
+		}
+
 		reader = bufferedReaderFactory.create(resource, encoding);
 		for (int i = 0; i < linesToSkip; i++) {
 			String line = readLine();
