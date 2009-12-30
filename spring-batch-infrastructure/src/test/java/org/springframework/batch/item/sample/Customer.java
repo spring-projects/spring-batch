@@ -16,9 +16,6 @@
 
 package org.springframework.batch.item.sample;
 
-import org.apache.commons.lang.builder.EqualsBuilder;
-import org.apache.commons.lang.builder.HashCodeBuilder;
-import org.apache.commons.lang.builder.ToStringBuilder;
 
 /**
  * An XML customer.
@@ -76,15 +73,51 @@ public class Customer {
 		this.poo = poo;
 	}
 
-	public boolean equals(Object obj) {
-		return EqualsBuilder.reflectionEquals(obj, this);
-	}
-	
+	@Override
 	public int hashCode() {
-		return HashCodeBuilder.reflectionHashCode(this);
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + ((address == null) ? 0 : address.hashCode());
+		result = prime * result + age;
+		result = prime * result + moo;
+		result = prime * result + ((name == null) ? 0 : name.hashCode());
+		result = prime * result + poo;
+		return result;
 	}
 
-	public String toString() {
-		return ToStringBuilder.reflectionToString(this);
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		Customer other = (Customer) obj;
+		if (address == null) {
+			if (other.address != null)
+				return false;
+		}
+		else if (!address.equals(other.address))
+			return false;
+		if (age != other.age)
+			return false;
+		if (moo != other.moo)
+			return false;
+		if (name == null) {
+			if (other.name != null)
+				return false;
+		}
+		else if (!name.equals(other.name))
+			return false;
+		if (poo != other.poo)
+			return false;
+		return true;
 	}
+
+	@Override
+	public String toString() {
+		return "Customer [address=" + address + ", age=" + age + ", name=" + name + "]";
+	}
+
 }

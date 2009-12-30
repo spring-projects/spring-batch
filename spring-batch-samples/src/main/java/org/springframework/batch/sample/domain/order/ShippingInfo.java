@@ -16,44 +16,78 @@
 
 package org.springframework.batch.sample.domain.order;
 
-import org.apache.commons.lang.builder.EqualsBuilder;
-import org.apache.commons.lang.builder.HashCodeBuilder;
 
 public class ShippingInfo {
-    public static final String LINE_ID_SHIPPING_INFO = "SIN";
-    private String shipperId;
-    private String shippingTypeId;
-    private String shippingInfo;
+	public static final String LINE_ID_SHIPPING_INFO = "SIN";
 
-    public String getShipperId() {
-        return shipperId;
-    }
+	private String shipperId;
 
-    public void setShipperId(String shipperId) {
-        this.shipperId = shipperId;
-    }
+	private String shippingTypeId;
 
-    public String getShippingInfo() {
-        return shippingInfo;
-    }
+	private String shippingInfo;
 
-    public void setShippingInfo(String shippingInfo) {
-        this.shippingInfo = shippingInfo;
-    }
-
-    public String getShippingTypeId() {
-        return shippingTypeId;
-    }
-
-    public void setShippingTypeId(String shippingTypeId) {
-        this.shippingTypeId = shippingTypeId;
-    }
-    
-    public boolean equals(Object o) {
-		return EqualsBuilder.reflectionEquals(this, o);
+	public String getShipperId() {
+		return shipperId;
 	}
 
+	public void setShipperId(String shipperId) {
+		this.shipperId = shipperId;
+	}
+
+	public String getShippingInfo() {
+		return shippingInfo;
+	}
+
+	public void setShippingInfo(String shippingInfo) {
+		this.shippingInfo = shippingInfo;
+	}
+
+	public String getShippingTypeId() {
+		return shippingTypeId;
+	}
+
+	public void setShippingTypeId(String shippingTypeId) {
+		this.shippingTypeId = shippingTypeId;
+	}
+
+	@Override
 	public int hashCode() {
-		return HashCodeBuilder.reflectionHashCode(this);
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + ((shipperId == null) ? 0 : shipperId.hashCode());
+		result = prime * result + ((shippingInfo == null) ? 0 : shippingInfo.hashCode());
+		result = prime * result + ((shippingTypeId == null) ? 0 : shippingTypeId.hashCode());
+		return result;
 	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		ShippingInfo other = (ShippingInfo) obj;
+		if (shipperId == null) {
+			if (other.shipperId != null)
+				return false;
+		}
+		else if (!shipperId.equals(other.shipperId))
+			return false;
+		if (shippingInfo == null) {
+			if (other.shippingInfo != null)
+				return false;
+		}
+		else if (!shippingInfo.equals(other.shippingInfo))
+			return false;
+		if (shippingTypeId == null) {
+			if (other.shippingTypeId != null)
+				return false;
+		}
+		else if (!shippingTypeId.equals(other.shippingTypeId))
+			return false;
+		return true;
+	}
+
 }

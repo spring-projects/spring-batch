@@ -16,100 +16,156 @@
 
 package org.springframework.batch.sample.domain.order;
 
-import org.apache.commons.lang.builder.EqualsBuilder;
-import org.apache.commons.lang.builder.HashCodeBuilder;
-import org.apache.commons.lang.builder.ToStringBuilder;
 
 public class Customer {
-    public static final String LINE_ID_BUSINESS_CUST = "BCU";
-    public static final String LINE_ID_NON_BUSINESS_CUST = "NCU";
-    private boolean businessCustomer;
-    private boolean registered;
-    private long registrationId;
+	public static final String LINE_ID_BUSINESS_CUST = "BCU";
 
-    //non-business customer
-    private String firstName;
-    private String lastName;
-    private String middleName;
-    private boolean vip;
+	public static final String LINE_ID_NON_BUSINESS_CUST = "NCU";
 
-    //business customer
-    private String companyName;
+	private boolean businessCustomer;
 
-    public boolean isBusinessCustomer() {
-        return businessCustomer;
-    }
+	private boolean registered;
 
-    public void setBusinessCustomer(boolean bussinessCustomer) {
-        this.businessCustomer = bussinessCustomer;
-    }
+	private long registrationId;
 
-    public String getCompanyName() {
-        return companyName;
-    }
+	// non-business customer
+	private String firstName;
 
-    public void setCompanyName(String companyName) {
-        this.companyName = companyName;
-    }
+	private String lastName;
 
-    public String getFirstName() {
-        return firstName;
-    }
+	private String middleName;
 
-    public void setFirstName(String firstName) {
-        this.firstName = firstName;
-    }
+	private boolean vip;
 
-    public boolean isRegistered() {
-        return registered;
-    }
+	// business customer
+	private String companyName;
 
-    public void setRegistered(boolean registered) {
-        this.registered = registered;
-    }
-
-    public String getLastName() {
-        return lastName;
-    }
-
-    public void setLastName(String lastName) {
-        this.lastName = lastName;
-    }
-
-    public String getMiddleName() {
-        return middleName;
-    }
-
-    public void setMiddleName(String middleName) {
-        this.middleName = middleName;
-    }
-
-    public long getRegistrationId() {
-        return registrationId;
-    }
-
-    public void setRegistrationId(long registrationId) {
-        this.registrationId = registrationId;
-    }
-
-    public boolean isVip() {
-        return vip;
-    }
-
-    public void setVip(boolean vip) {
-        this.vip = vip;
-    }
-
-    public String toString() {
-    	return ToStringBuilder.reflectionToString(this);
-    }
-    
-    public boolean equals(Object o) {
-		return EqualsBuilder.reflectionEquals(this, o);
+	public boolean isBusinessCustomer() {
+		return businessCustomer;
 	}
 
+	public void setBusinessCustomer(boolean bussinessCustomer) {
+		this.businessCustomer = bussinessCustomer;
+	}
+
+	public String getCompanyName() {
+		return companyName;
+	}
+
+	public void setCompanyName(String companyName) {
+		this.companyName = companyName;
+	}
+
+	public String getFirstName() {
+		return firstName;
+	}
+
+	public void setFirstName(String firstName) {
+		this.firstName = firstName;
+	}
+
+	public boolean isRegistered() {
+		return registered;
+	}
+
+	public void setRegistered(boolean registered) {
+		this.registered = registered;
+	}
+
+	public String getLastName() {
+		return lastName;
+	}
+
+	public void setLastName(String lastName) {
+		this.lastName = lastName;
+	}
+
+	public String getMiddleName() {
+		return middleName;
+	}
+
+	public void setMiddleName(String middleName) {
+		this.middleName = middleName;
+	}
+
+	public long getRegistrationId() {
+		return registrationId;
+	}
+
+	public void setRegistrationId(long registrationId) {
+		this.registrationId = registrationId;
+	}
+
+	public boolean isVip() {
+		return vip;
+	}
+
+	public void setVip(boolean vip) {
+		this.vip = vip;
+	}
+
+	@Override
+	public String toString() {
+		return "Customer [companyName=" + companyName + ", firstName=" + firstName + ", lastName=" + lastName + "]";
+	}
+
+	@Override
 	public int hashCode() {
-		return HashCodeBuilder.reflectionHashCode(this);
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + (businessCustomer ? 1231 : 1237);
+		result = prime * result + ((companyName == null) ? 0 : companyName.hashCode());
+		result = prime * result + ((firstName == null) ? 0 : firstName.hashCode());
+		result = prime * result + ((lastName == null) ? 0 : lastName.hashCode());
+		result = prime * result + ((middleName == null) ? 0 : middleName.hashCode());
+		result = prime * result + (registered ? 1231 : 1237);
+		result = prime * result + (int) (registrationId ^ (registrationId >>> 32));
+		result = prime * result + (vip ? 1231 : 1237);
+		return result;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		Customer other = (Customer) obj;
+		if (businessCustomer != other.businessCustomer)
+			return false;
+		if (companyName == null) {
+			if (other.companyName != null)
+				return false;
+		}
+		else if (!companyName.equals(other.companyName))
+			return false;
+		if (firstName == null) {
+			if (other.firstName != null)
+				return false;
+		}
+		else if (!firstName.equals(other.firstName))
+			return false;
+		if (lastName == null) {
+			if (other.lastName != null)
+				return false;
+		}
+		else if (!lastName.equals(other.lastName))
+			return false;
+		if (middleName == null) {
+			if (other.middleName != null)
+				return false;
+		}
+		else if (!middleName.equals(other.middleName))
+			return false;
+		if (registered != other.registered)
+			return false;
+		if (registrationId != other.registrationId)
+			return false;
+		if (vip != other.vip)
+			return false;
+		return true;
 	}
 
 }

@@ -15,15 +15,17 @@
  */
 package org.springframework.batch.item;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
 import java.io.Serializable;
 
-import static org.junit.Assert.*;
-
-import org.apache.commons.lang.SerializationUtils;
-import org.apache.commons.lang.builder.EqualsBuilder;
-import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.junit.Before;
 import org.junit.Test;
+import org.springframework.batch.support.SerializationUtils;
 
 /**
  * @author Lucas Ward
@@ -172,12 +174,26 @@ public class ExecutionContextTests {
 
 		int value;
 
-		public boolean equals(Object obj) {
-			return EqualsBuilder.reflectionEquals(this, obj);
+		@Override
+		public int hashCode() {
+			final int prime = 31;
+			int result = 1;
+			result = prime * result + value;
+			return result;
 		}
 
-		public int hashCode() {
-			return HashCodeBuilder.reflectionHashCode(this);
+		@Override
+		public boolean equals(Object obj) {
+			if (this == obj)
+				return true;
+			if (obj == null)
+				return false;
+			if (getClass() != obj.getClass())
+				return false;
+			TestSerializable other = (TestSerializable) obj;
+			if (value != other.value)
+				return false;
+			return true;
 		}
 
 	}

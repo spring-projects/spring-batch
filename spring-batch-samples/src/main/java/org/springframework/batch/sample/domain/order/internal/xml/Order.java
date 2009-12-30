@@ -19,53 +19,55 @@ package org.springframework.batch.sample.domain.order.internal.xml;
 import java.util.Date;
 import java.util.List;
 
-import org.apache.commons.lang.builder.ToStringBuilder;
-
-
 /**
  * An XML order.
- *
+ * 
  * This is a complex type.
  */
 public class Order {
-    private Customer customer;
-    private Date date;
-    private List<LineItem> lineItems;
-    private Shipper shipper;
+	private Customer customer;
 
-    public Customer getCustomer() {
-        return customer;
-    }
+	private Date date;
 
-    public void setCustomer(Customer customer) {
-        this.customer = customer;
-    }
+	private List<LineItem> lineItems;
 
-    public Date getDate() {
-        return date;
-    }
+	private Shipper shipper;
 
-    public void setDate(Date date) {
-        this.date = date;
-    }
+	public Customer getCustomer() {
+		return customer;
+	}
 
-    public List<LineItem> getLineItems() {
-        return lineItems;
-    }
+	public void setCustomer(Customer customer) {
+		this.customer = customer;
+	}
 
-    public void setLineItems(List<LineItem> lineItems) {
-        this.lineItems = lineItems;
-    }
+	public Date getDate() {
+		return date;
+	}
 
-    public Shipper getShipper() {
-        return shipper;
-    }
+	public void setDate(Date date) {
+		this.date = date;
+	}
 
-    public void setShipper(Shipper shipper) {
-        this.shipper = shipper;
-    }
+	public List<LineItem> getLineItems() {
+		return lineItems;
+	}
 
-    public String toString() {
-    	return ToStringBuilder.reflectionToString(this);
-    }
+	public void setLineItems(List<LineItem> lineItems) {
+		this.lineItems = lineItems;
+	}
+
+	public Shipper getShipper() {
+		return shipper;
+	}
+
+	public void setShipper(Shipper shipper) {
+		this.shipper = shipper;
+	}
+
+	@Override
+	public String toString() {
+		return "Order [customer=" + customer + ", date=" + date + ", lineItems=" + lineItems + "]";
+	}
+
 }

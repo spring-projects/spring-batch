@@ -25,8 +25,8 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
-import org.apache.commons.lang.SerializationUtils;
 import org.junit.Test;
+import org.springframework.batch.support.SerializationUtils;
 
 /**
  * @author Dave Syer

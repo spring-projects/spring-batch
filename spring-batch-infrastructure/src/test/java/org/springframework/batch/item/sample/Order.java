@@ -19,10 +19,6 @@ package org.springframework.batch.item.sample;
 import java.util.Date;
 import java.util.List;
 
-import org.apache.commons.lang.builder.EqualsBuilder;
-import org.apache.commons.lang.builder.HashCodeBuilder;
-import org.apache.commons.lang.builder.ToStringBuilder;
-
 /**
  * An XML order.
  * 
@@ -68,16 +64,58 @@ public class Order {
 	public void setShipper(Shipper shipper) {
 		this.shipper = shipper;
 	}
-	
-	public boolean equals(Object obj) {
-		return EqualsBuilder.reflectionEquals(obj, this);
-	}
-	
+
+	@Override
 	public int hashCode() {
-		return HashCodeBuilder.reflectionHashCode(this);
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + ((customer == null) ? 0 : customer.hashCode());
+		result = prime * result + ((date == null) ? 0 : date.hashCode());
+		result = prime * result + ((lineItems == null) ? 0 : lineItems.hashCode());
+		result = prime * result + ((shipper == null) ? 0 : shipper.hashCode());
+		return result;
 	}
-	
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		Order other = (Order) obj;
+		if (customer == null) {
+			if (other.customer != null)
+				return false;
+		}
+		else if (!customer.equals(other.customer))
+			return false;
+		if (date == null) {
+			if (other.date != null)
+				return false;
+		}
+		else if (!date.equals(other.date))
+			return false;
+		if (lineItems == null) {
+			if (other.lineItems != null)
+				return false;
+		}
+		else if (!lineItems.equals(other.lineItems))
+			return false;
+		if (shipper == null) {
+			if (other.shipper != null)
+				return false;
+		}
+		else if (!shipper.equals(other.shipper))
+			return false;
+		return true;
+	}
+
+	@Override
 	public String toString() {
-		return ToStringBuilder.reflectionToString(this);
+		return "Order [customer=" + customer + ", date=" + date + ", lineItems=" + lineItems + ", shipper=" + shipper
+				+ "]";
 	}
+
 }

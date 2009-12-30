@@ -19,8 +19,6 @@ package org.springframework.batch.sample.domain.trade;
 import java.io.Serializable;
 import java.math.BigDecimal;
 
-import org.apache.commons.lang.builder.HashCodeBuilder;
-
 
 /**
  * @author Rob Harrop
@@ -103,23 +101,51 @@ public class Trade implements Serializable {
         return "Trade: [isin=" + this.isin + ",quantity=" + this.quantity + ",price="
             + this.price + ",customer=" + this.customer + "]";
     }
-    
-    public boolean equals(Object o) {
-    	if(!(o instanceof Trade)){
-    		return false;
-    	}
-    	
-    	if(o == this){
-    		return true;
-    		
-    	}
-    	
-    	Trade t = (Trade)o;
-		return isin.equals(t.getIsin()) && quantity == t.getQuantity() && 
-			price.equals(t.getPrice()) && customer.equals(t.getCustomer())  ;
+
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + ((customer == null) ? 0 : customer.hashCode());
+		result = prime * result + ((isin == null) ? 0 : isin.hashCode());
+		result = prime * result + ((price == null) ? 0 : price.hashCode());
+		result = prime * result + (int) (quantity ^ (quantity >>> 32));
+		result = prime * result + (int) (version ^ (version >>> 32));
+		return result;
 	}
 
-	public int hashCode() {
-		return HashCodeBuilder.reflectionHashCode(this);
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		Trade other = (Trade) obj;
+		if (customer == null) {
+			if (other.customer != null)
+				return false;
+		}
+		else if (!customer.equals(other.customer))
+			return false;
+		if (isin == null) {
+			if (other.isin != null)
+				return false;
+		}
+		else if (!isin.equals(other.isin))
+			return false;
+		if (price == null) {
+			if (other.price != null)
+				return false;
+		}
+		else if (!price.equals(other.price))
+			return false;
+		if (quantity != other.quantity)
+			return false;
+		if (version != other.version)
+			return false;
+		return true;
 	}
-}
+    
+ }

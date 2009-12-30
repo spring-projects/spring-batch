@@ -16,62 +16,65 @@
 
 package org.springframework.batch.sample.domain.order.internal.xml;
 
-import org.apache.commons.lang.builder.ToStringBuilder;
-
-
 /**
  * An XML customer.
- *
+ * 
  * This is a complex type.
  */
 public class Customer {
-    private String name;
-    private String address;
-    private int age;
-    private int moo;
-    private int poo;
+	private String name;
 
-    public String getAddress() {
-        return address;
-    }
+	private String address;
 
-    public void setAddress(String address) {
-        this.address = address;
-    }
+	private int age;
 
-    public int getAge() {
-        return age;
-    }
+	private int moo;
 
-    public void setAge(int age) {
-        this.age = age;
-    }
+	private int poo;
 
-    public String getName() {
-        return name;
-    }
+	public String getAddress() {
+		return address;
+	}
 
-    public void setName(String name) {
-        this.name = name;
-    }
+	public void setAddress(String address) {
+		this.address = address;
+	}
 
-    public int getMoo() {
-        return moo;
-    }
+	public int getAge() {
+		return age;
+	}
 
-    public void setMoo(int moo) {
-        this.moo = moo;
-    }
+	public void setAge(int age) {
+		this.age = age;
+	}
 
-    public int getPoo() {
-        return poo;
-    }
+	public String getName() {
+		return name;
+	}
 
-    public void setPoo(int poo) {
-        this.poo = poo;
-    }
+	public void setName(String name) {
+		this.name = name;
+	}
 
-    public String toString() {
-    	return ToStringBuilder.reflectionToString(this);
-    }
+	public int getMoo() {
+		return moo;
+	}
+
+	public void setMoo(int moo) {
+		this.moo = moo;
+	}
+
+	public int getPoo() {
+		return poo;
+	}
+
+	public void setPoo(int poo) {
+		this.poo = poo;
+	}
+
+	@Override
+	public String toString() {
+		return "Customer [address=" + address + ", age=" + age + ", name=" + name + "]";
+	}
+
 }

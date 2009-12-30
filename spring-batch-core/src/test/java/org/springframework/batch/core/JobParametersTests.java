@@ -10,7 +10,7 @@ import java.util.Map.Entry;
 
 import junit.framework.TestCase;
 
-import org.apache.commons.lang.SerializationUtils;
+import org.springframework.batch.support.SerializationUtils;
 
 /**
  * @author Lucas Ward

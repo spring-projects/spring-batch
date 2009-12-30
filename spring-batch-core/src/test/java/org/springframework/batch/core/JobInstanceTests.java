@@ -15,9 +15,9 @@
  */
 package org.springframework.batch.core;
 
-import org.apache.commons.lang.SerializationUtils;
-
 import junit.framework.TestCase;
+
+import org.springframework.batch.support.SerializationUtils;
 
 /**
  * @author dsyer

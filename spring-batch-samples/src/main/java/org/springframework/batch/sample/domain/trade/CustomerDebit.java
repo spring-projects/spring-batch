@@ -18,9 +18,6 @@ package org.springframework.batch.sample.domain.trade;
 
 import java.math.BigDecimal;
 
-import org.apache.commons.lang.builder.EqualsBuilder;
-import org.apache.commons.lang.builder.HashCodeBuilder;
-
 
 public class CustomerDebit {
     private String name;
@@ -53,12 +50,38 @@ public class CustomerDebit {
     public String toString() {
         return "CustomerDebit [name=" + name + ", debit=" + debit + "]";
     }
-    
-    public boolean equals(Object o) {
-		return EqualsBuilder.reflectionEquals(this, o);
+
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + ((debit == null) ? 0 : debit.hashCode());
+		result = prime * result + ((name == null) ? 0 : name.hashCode());
+		return result;
 	}
 
-	public int hashCode() {
-		return HashCodeBuilder.reflectionHashCode(this);
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		CustomerDebit other = (CustomerDebit) obj;
+		if (debit == null) {
+			if (other.debit != null)
+				return false;
+		}
+		else if (!debit.equals(other.debit))
+			return false;
+		if (name == null) {
+			if (other.name != null)
+				return false;
+		}
+		else if (!name.equals(other.name))
+			return false;
+		return true;
 	}
+    
 }

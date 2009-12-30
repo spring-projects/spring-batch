@@ -32,7 +32,6 @@ import javax.xml.stream.XMLEventWriter;
 import javax.xml.stream.XMLOutputFactory;
 import javax.xml.stream.XMLStreamException;
 
-import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.batch.item.ExecutionContext;
@@ -52,6 +51,7 @@ import org.springframework.oxm.XmlMappingException;
 import org.springframework.util.Assert;
 import org.springframework.util.ClassUtils;
 import org.springframework.util.CollectionUtils;
+import org.springframework.util.StringUtils;
 import org.springframework.xml.transform.StaxResult;
 
 /**
@@ -431,7 +431,7 @@ public class StaxEventItemWriter<T> extends ExecutionContextUserSupport implemen
 
 		// write root tag
 		writer.add(factory.createStartElement(getRootTagNamespacePrefix(), getRootTagNamespace(), getRootTagName()));
-		if (!StringUtils.isBlank(getRootTagNamespace())) {
+		if (StringUtils.hasText(getRootTagNamespace())) {
 			writer.add(factory.createNamespace(getRootTagNamespacePrefix(), getRootTagNamespace()));
 		}
 
@@ -458,8 +458,8 @@ public class StaxEventItemWriter<T> extends ExecutionContextUserSupport implemen
 
 		// writer.writeEndDocument(); <- this doesn't work after restart
 		// we need to write end tag of the root element manually
-		
-		String nsPrefix = StringUtils.isBlank(getRootTagNamespacePrefix()) ? "" : getRootTagNamespacePrefix() + ":";
+
+		String nsPrefix = !StringUtils.hasText(getRootTagNamespacePrefix()) ? "" : getRootTagNamespacePrefix() + ":";
 		try {
 			bufferedWriter.write("</" + nsPrefix + getRootTagName() + ">");
 		}

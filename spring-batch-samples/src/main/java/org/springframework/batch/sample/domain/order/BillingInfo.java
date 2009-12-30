@@ -16,42 +16,66 @@
 
 package org.springframework.batch.sample.domain.order;
 
-import org.apache.commons.lang.builder.EqualsBuilder;
-import org.apache.commons.lang.builder.HashCodeBuilder;
-import org.apache.commons.lang.builder.ToStringBuilder;
 
 public class BillingInfo {
-    public static final String LINE_ID_BILLING_INFO = "BIN";
-    private String paymentId;
-    private String paymentDesc;
+	public static final String LINE_ID_BILLING_INFO = "BIN";
 
-    public String getPaymentDesc() {
-        return paymentDesc;
-    }
+	private String paymentId;
 
-    public void setPaymentDesc(String paymentDesc) {
-        this.paymentDesc = paymentDesc;
-    }
+	private String paymentDesc;
 
-    public String getPaymentId() {
-        return paymentId;
-    }
-
-    public void setPaymentId(String paymentId) {
-        this.paymentId = paymentId;
-    }
-
-    public String toString() {
-    	return ToStringBuilder.reflectionToString(this);
-    }
-
-	public boolean equals(Object o) {
-		return EqualsBuilder.reflectionEquals(this, o);
+	public String getPaymentDesc() {
+		return paymentDesc;
 	}
 
+	public void setPaymentDesc(String paymentDesc) {
+		this.paymentDesc = paymentDesc;
+	}
+
+	public String getPaymentId() {
+		return paymentId;
+	}
+
+	public void setPaymentId(String paymentId) {
+		this.paymentId = paymentId;
+	}
+
+	@Override
+	public String toString() {
+		return "BillingInfo [paymentDesc=" + paymentDesc + ", paymentId=" + paymentId + "]";
+	}
+
+	@Override
 	public int hashCode() {
-		return HashCodeBuilder.reflectionHashCode(this);
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + ((paymentDesc == null) ? 0 : paymentDesc.hashCode());
+		result = prime * result + ((paymentId == null) ? 0 : paymentId.hashCode());
+		return result;
 	}
-    
-    
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		BillingInfo other = (BillingInfo) obj;
+		if (paymentDesc == null) {
+			if (other.paymentDesc != null)
+				return false;
+		}
+		else if (!paymentDesc.equals(other.paymentDesc))
+			return false;
+		if (paymentId == null) {
+			if (other.paymentId != null)
+				return false;
+		}
+		else if (!paymentId.equals(other.paymentId))
+			return false;
+		return true;
+	}
+
 }

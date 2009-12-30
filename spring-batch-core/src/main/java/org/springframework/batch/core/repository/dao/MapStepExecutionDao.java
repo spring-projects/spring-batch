@@ -21,10 +21,10 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.commons.lang.SerializationUtils;
 import org.springframework.batch.core.Entity;
 import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.StepExecution;
+import org.springframework.batch.support.SerializationUtils;
 import org.springframework.batch.support.transaction.TransactionAwareProxyFactory;
 import org.springframework.dao.OptimisticLockingFailureException;
 import org.springframework.util.Assert;

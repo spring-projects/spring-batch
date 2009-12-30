@@ -16,9 +16,6 @@
 
 package org.springframework.batch.item.sample;
 
-import org.apache.commons.lang.builder.EqualsBuilder;
-import org.apache.commons.lang.builder.HashCodeBuilder;
-import org.apache.commons.lang.builder.ToStringBuilder;
 
 /**
  * An XML shipper.
@@ -46,15 +43,40 @@ public class Shipper {
 		this.perOunceRate = perOunceRate;
 	}
 
-	public boolean equals(Object obj) {
-		return EqualsBuilder.reflectionEquals(obj, this);
-	}
-	
+	@Override
 	public int hashCode() {
-		return HashCodeBuilder.reflectionHashCode(this);
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + ((name == null) ? 0 : name.hashCode());
+		long temp;
+		temp = Double.doubleToLongBits(perOunceRate);
+		result = prime * result + (int) (temp ^ (temp >>> 32));
+		return result;
 	}
-	
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		Shipper other = (Shipper) obj;
+		if (name == null) {
+			if (other.name != null)
+				return false;
+		}
+		else if (!name.equals(other.name))
+			return false;
+		if (Double.doubleToLongBits(perOunceRate) != Double.doubleToLongBits(other.perOunceRate))
+			return false;
+		return true;
+	}
+
+	@Override
 	public String toString() {
-		return ToStringBuilder.reflectionToString(this);
+		return "Shipper [name=" + name + ", perOunceRate=" + perOunceRate + "]";
 	}
+
 }

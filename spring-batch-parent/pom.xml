@@ -363,7 +363,7 @@
 			<dependency>
 				<groupId>commons-lang</groupId>
 				<artifactId>commons-lang</artifactId>
-				<version>2.1</version>
+				<version>PLEASE DON'T USE COMMONS LANG</version>
 				<optional>true</optional>
 			</dependency>
 			<dependency>

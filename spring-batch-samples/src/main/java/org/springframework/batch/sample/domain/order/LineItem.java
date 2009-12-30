@@ -18,10 +18,6 @@ package org.springframework.batch.sample.domain.order;
 
 import java.math.BigDecimal;
 
-import org.apache.commons.lang.builder.EqualsBuilder;
-import org.apache.commons.lang.builder.HashCodeBuilder;
-import org.apache.commons.lang.builder.ToStringBuilder;
-
 
 public class LineItem {
     public static final String LINE_ID_ITEM = "LIT";
@@ -97,17 +93,35 @@ public class LineItem {
     public void setTotalPrice(BigDecimal totalPrice) {
         this.totalPrice = totalPrice;
     }
-    
-    public String toString() {
-    	return ToStringBuilder.reflectionToString(this);
-    }
-    
-    public boolean equals(Object o) {
-		return EqualsBuilder.reflectionEquals(this, o);
+
+	@Override
+	public String toString() {
+		return "LineItem [price=" + price + ", quantity=" + quantity + ", totalPrice=" + totalPrice + "]";
 	}
 
+	@Override
 	public int hashCode() {
-		return HashCodeBuilder.reflectionHashCode(this);
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + (int) (itemId ^ (itemId >>> 32));
+		result = prime * result + quantity;
+		return result;
 	}
-    
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		LineItem other = (LineItem) obj;
+		if (itemId != other.itemId)
+			return false;
+		if (quantity != other.quantity)
+			return false;
+		return true;
+	}
+        
 }

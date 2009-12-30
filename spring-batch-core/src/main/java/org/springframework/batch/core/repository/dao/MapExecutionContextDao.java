@@ -18,10 +18,10 @@ package org.springframework.batch.core.repository.dao;
 
 import java.util.Map;
 
-import org.apache.commons.lang.SerializationUtils;
 import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.StepExecution;
 import org.springframework.batch.item.ExecutionContext;
+import org.springframework.batch.support.SerializationUtils;
 import org.springframework.batch.support.transaction.TransactionAwareProxyFactory;
 
 /**
