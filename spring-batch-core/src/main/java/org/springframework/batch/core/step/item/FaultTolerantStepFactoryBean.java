@@ -100,7 +100,7 @@ public class FaultTolerantStepFactoryBean<T, S> extends SimpleStepFactoryBean<T,
 
 	private ChunkMonitor chunkMonitor = new ChunkMonitor();
 
-	private boolean processorTransactional= true;
+	private boolean processorTransactional = true;
 
 	/**
 	 * The {@link KeyGenerator} to use to identify failed items across rollback.
@@ -168,7 +168,8 @@ public class FaultTolerantStepFactoryBean<T, S> extends SimpleStepFactoryBean<T,
 	}
 
 	/**
-	 * Public setter for the Class[].
+	 * Public setter for the retryable exceptions classifier map (from throwable
+	 * class to boolean, true is retryable).
 	 * 
 	 * @param retryableExceptionClasses the retryableExceptionClasses to set
 	 */
@@ -337,7 +338,7 @@ public class FaultTolerantStepFactoryBean<T, S> extends SimpleStepFactoryBean<T,
 				chunkMonitor.setItemReader(itemReader);
 			}
 			else {
-				logger.warn("Synchronous TaskExecutor detected (" + taskExecutor.getClass()
+				logger.warn("Asynchronous TaskExecutor detected (" + taskExecutor.getClass()
 						+ ") with ItemStream reader.  This is probably an error, "
 						+ "and may lead to incorrect restart data being stored.");
 			}
