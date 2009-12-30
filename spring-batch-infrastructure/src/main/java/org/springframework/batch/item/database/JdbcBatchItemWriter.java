@@ -136,7 +136,7 @@ public class JdbcBatchItemWriter<T> implements ItemWriter<T>, InitializingBean {
 	 * Check mandatory properties - there must be a SimpleJdbcTemplate and an SQL statement plus a 
 	 * parameter source.
 	 */
-	public void afterPropertiesSet() throws Exception {
+	public void afterPropertiesSet() {
 		Assert.notNull(simpleJdbcTemplate, "A DataSource or a SimpleJdbcTemplate is required.");
 		Assert.notNull(sql, "An SQL statement is required.");
 		List<String> namedParameters = new ArrayList<String>();

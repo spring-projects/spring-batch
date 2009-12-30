@@ -66,7 +66,7 @@ public class HibernateItemWriter<T> implements ItemWriter<T>, InitializingBean {
 	/**
 	 * Check mandatory properties - there must be a hibernateTemplate.
 	 */
-	public void afterPropertiesSet() throws Exception {
+	public void afterPropertiesSet() {
 		Assert.notNull(hibernateTemplate, "HibernateItemWriter requires a HibernateOperations");
 	}
 
@@ -76,7 +76,7 @@ public class HibernateItemWriter<T> implements ItemWriter<T>, InitializingBean {
 	 * 
 	 * @see org.springframework.batch.item.ItemWriter#write(java.util.List)
 	 */
-	public final void write(List<? extends T> items) throws Exception {
+	public final void write(List<? extends T> items) {
 		doWrite(hibernateTemplate, items);
 		try {
 			hibernateTemplate.flush();
