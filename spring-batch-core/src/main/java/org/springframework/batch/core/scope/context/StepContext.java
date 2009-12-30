@@ -36,7 +36,12 @@ import org.springframework.batch.repeat.context.SynchronizedAttributeAccessor;
 import org.springframework.util.Assert;
 
 /**
- * Simple implementation of {@link StepContext}.
+ * A context object that can be used to interrogate the current
+ * {@link StepExecution} and some of its associated properties using expressions
+ * based on bean paths. Has public getters for the step execution and
+ * convenience methods for accessing commonly used properties like the
+ * {@link ExecutionContext} associated with the step or its enclosing job
+ * execution.
  * 
  * @author Dave Syer
  * 
@@ -205,6 +210,11 @@ public class StepContext extends SynchronizedAttributeAccessor {
 		}
 	}
 
+	/**
+	 * The current {@link StepExecution} that is active in this context.
+	 * 
+	 * @return the current {@link StepExecution}
+	 */
 	public StepExecution getStepExecution() {
 		return stepExecution;
 	}
