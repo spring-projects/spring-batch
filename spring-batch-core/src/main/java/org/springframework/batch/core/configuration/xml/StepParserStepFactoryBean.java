@@ -37,6 +37,7 @@ import org.springframework.batch.core.partition.support.TaskExecutorPartitionHan
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.step.AbstractStep;
 import org.springframework.batch.core.step.item.FaultTolerantStepFactoryBean;
+import org.springframework.batch.core.step.item.KeyGenerator;
 import org.springframework.batch.core.step.item.SimpleStepFactoryBean;
 import org.springframework.batch.core.step.job.JobParametersExtractor;
 import org.springframework.batch.core.step.job.JobStep;
@@ -51,7 +52,10 @@ import org.springframework.batch.repeat.CompletionPolicy;
 import org.springframework.batch.repeat.policy.SimpleCompletionPolicy;
 import org.springframework.batch.repeat.support.TaskExecutorRepeatTemplate;
 import org.springframework.batch.retry.RetryListener;
+import org.springframework.batch.retry.RetryPolicy;
+import org.springframework.batch.retry.backoff.BackOffPolicy;
 import org.springframework.batch.retry.policy.MapRetryContextCache;
+import org.springframework.batch.retry.policy.RetryContextCache;
 import org.springframework.beans.factory.BeanNameAware;
 import org.springframework.beans.factory.FactoryBean;
 import org.springframework.core.task.SyncTaskExecutor;
@@ -149,6 +153,14 @@ class StepParserStepFactoryBean<I, O> implements FactoryBean, BeanNameAware {
 	private Boolean processorTransactional;
 
 	private Integer retryLimit;
+
+	private BackOffPolicy backOffPolicy;
+
+	private RetryPolicy retryPolicy;
+
+	private RetryContextCache retryContextCache;
+
+	private KeyGenerator keyGenerator;
 
 	private Integer skipLimit;
 
@@ -348,6 +360,18 @@ class StepParserStepFactoryBean<I, O> implements FactoryBean, BeanNameAware {
 		if (skipPolicy != null) {
 			fb.setSkipPolicy(skipPolicy);
 		}
+		if (backOffPolicy != null) {
+			fb.setBackOffPolicy(backOffPolicy);
+		}
+		if (retryPolicy != null) {
+			fb.setRetryPolicy(retryPolicy);
+		}
+		if (retryContextCache != null) {
+			fb.setRetryContextCache(retryContextCache);
+		}
+		if (keyGenerator != null) {
+			fb.setKeyGenerator(keyGenerator);
+		}
 
 		if (retryListeners != null) {
 			fb.setRetryListeners(retryListeners);
@@ -441,7 +465,8 @@ class StepParserStepFactoryBean<I, O> implements FactoryBean, BeanNameAware {
 	 * 
 	 * @param dependantName the name of the first field
 	 * @param dependantValue the value of the first field
-	 * @param names the names of the other fields (used to construct an exception message)
+	 * @param names the names of the other fields (used to construct an
+	 * exception message)
 	 * @param values the other field values (one of which must be set if the
 	 * first field is)
 	 */
@@ -500,8 +525,8 @@ class StepParserStepFactoryBean<I, O> implements FactoryBean, BeanNameAware {
 	}
 
 	private boolean isFaultTolerant() {
-		return skipPolicy != null || isPositive(skipLimit) || isPositive(retryLimit) || isPositive(cacheCapacity)
-				|| isTrue(readerTransactionalQueue);
+		return backOffPolicy != null || skipPolicy != null || isPositive(skipLimit) || isPositive(retryLimit)
+				|| isPositive(cacheCapacity) || isTrue(readerTransactionalQueue);
 	}
 
 	private boolean isTrue(Boolean b) {
@@ -705,6 +730,47 @@ class StepParserStepFactoryBean<I, O> implements FactoryBean, BeanNameAware {
 	 */
 	public void setPropagation(Propagation propagation) {
 		this.propagation = propagation;
+	}
+
+	// =========================================================
+	// Parent Attributes - can be provided in parent bean but not namespace
+	// =========================================================
+
+	/**
+	 * A backoff policy to be applied to retry process.
+	 * 
+	 * @param backOffPolicy the {@link BackOffPolicy} to set
+	 */
+	public void setBackOffPolicy(BackOffPolicy backOffPolicy) {
+		this.backOffPolicy = backOffPolicy;
+	}
+
+	/**
+	 * A retry policy to apply when exceptions occur. If this is specified then
+	 * the retry limit and retryable exceptions will be ignored.
+	 * 
+	 * @param retryPolicy the {@link RetryPolicy} to set
+	 */
+	public void setRetryPolicy(RetryPolicy retryPolicy) {
+		this.retryPolicy = retryPolicy;
+	}
+
+	/**
+	 * @param retryContextCache the {@link RetryContextCache} to set
+	 */
+	public void setRetryContextCache(RetryContextCache retryContextCache) {
+		this.retryContextCache = retryContextCache;
+	}
+
+	/**
+	 * A key generator that can be used to compare items with previously
+	 * recorded items in a retry. Only used if the reader is a transactional
+	 * queue.
+	 * 
+	 * @param keyGenerator the {@link KeyGenerator} to set
+	 */
+	public void setKeyGenerator(KeyGenerator keyGenerator) {
+		this.keyGenerator = keyGenerator;
 	}
 
 	// =========================================================

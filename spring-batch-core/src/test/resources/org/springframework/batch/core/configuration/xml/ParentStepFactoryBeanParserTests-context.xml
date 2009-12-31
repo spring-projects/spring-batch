@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.springframework.org/schema/batch http://www.springframework.org/schema/batch/spring-batch-2.1.xsd
+	http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.5.xsd">
+
+	<import resource="common-context.xml" />
+
+	<bean id="stepParent" class="org.springframework.batch.core.step.item.FaultTolerantStepFactoryBean" abstract="true">
+		<property name="backOffPolicy">
+			<bean class="org.springframework.batch.retry.backoff.FixedBackOffPolicy" />
+		</property>
+		<property name="retryPolicy">
+			<bean class="org.springframework.batch.retry.policy.AlwaysRetryPolicy" />
+		</property>
+		<property name="keyGenerator">
+			<null/>
+		</property>
+		<property name="retryContextCache">
+			<bean class="org.springframework.batch.retry.policy.MapRetryContextCache">
+				<property name="capacity" value="128"/>
+			</bean>
+		</property>
+	</bean>
+
+	<job id="job" xmlns="http://www.springframework.org/schema/batch">
+		<step id="s1" parent="stepParent">
+			<tasklet>
+				<chunk reader="reader" writer="writer" processor="processor" commit-interval="5" />
+			</tasklet>
+		</step>
+	</job>
+
+</beans>
