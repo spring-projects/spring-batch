@@ -53,9 +53,9 @@ public class ChunkElementParserTests {
 	@Test
 	@SuppressWarnings("unchecked")
 	public void testSimpleAttributes() throws Exception {
-		ConfigurableApplicationContext chunkElementAttributeParserTestsContext = new ClassPathXmlApplicationContext(
+		ConfigurableApplicationContext context = new ClassPathXmlApplicationContext(
 				"org/springframework/batch/core/configuration/xml/ChunkElementSimpleAttributeParserTests-context.xml");
-		Object step = chunkElementAttributeParserTestsContext.getBean("s1", Step.class);
+		Object step = context.getBean("s1", Step.class);
 		assertNotNull("Step not parsed", step);
 		Object tasklet = ReflectionTestUtils.getField(step, "tasklet");
 		Object chunkProcessor = ReflectionTestUtils.getField(tasklet, "chunkProcessor");
@@ -63,10 +63,29 @@ public class ChunkElementParserTests {
 	}
 
 	@Test
+	public void testSkipPolicyAttribute() throws Exception {
+		ConfigurableApplicationContext context = new ClassPathXmlApplicationContext(
+				"org/springframework/batch/core/configuration/xml/ChunkElementSkipPolicyParserTests-context.xml");
+		Map<Class<? extends Throwable>, Boolean> skippable = getExceptionClasses("s1", context);
+		assertEquals(2, skippable.size());
+		containsClassified(skippable, NullPointerException.class, true);
+		containsClassified(skippable, ArithmeticException.class, true);
+	}
+
+	@Test
+	public void testSkipPolicyElement() throws Exception {
+		ConfigurableApplicationContext context = new ClassPathXmlApplicationContext(
+				"org/springframework/batch/core/configuration/xml/ChunkElementSkipPolicyParserTests-context.xml");
+		Map<Class<? extends Throwable>, Boolean> skippable = getExceptionClasses("s2", context);
+		assertEquals(1, skippable.size());
+		containsClassified(skippable, ArithmeticException.class, true);
+	}
+
+	@Test
 	public void testProcessorTransactionalAttributes() throws Exception {
-		ConfigurableApplicationContext chunkElementAttributeParserTestsContext = new ClassPathXmlApplicationContext(
+		ConfigurableApplicationContext context = new ClassPathXmlApplicationContext(
 				"org/springframework/batch/core/configuration/xml/ChunkElementTransactionalAttributeParserTests-context.xml");
-		Object step = chunkElementAttributeParserTestsContext.getBean("s1", Step.class);
+		Object step = context.getBean("s1", Step.class);
 		assertNotNull("Step not parsed", step);
 		Object tasklet = ReflectionTestUtils.getField(step, "tasklet");
 		Object chunkProcessor = ReflectionTestUtils.getField(tasklet, "chunkProcessor");
@@ -179,12 +198,6 @@ public class ChunkElementParserTests {
 		assertTrue(h);
 	}
 
-	private void containsClassified(Map<Class<? extends Throwable>, Boolean> classified,
-			Class<? extends Throwable> cls, boolean include) {
-		assertTrue(classified.containsKey(cls));
-		assertEquals(include, classified.get(cls));
-	}
-
 	@SuppressWarnings("unchecked")
 	private Map<Class<? extends Throwable>, Boolean> getExceptionClasses(String stepName, ApplicationContext ctx)
 			throws Exception {
@@ -201,6 +214,12 @@ public class ChunkElementParserTests {
 		Object limitPolicy = classifier.classify(new Exception());
 		Object limitClassifier = ReflectionTestUtils.getField(limitPolicy, "skippableExceptionClassifier");
 		return (Map<Class<? extends Throwable>, Boolean>) ReflectionTestUtils.getField(limitClassifier, "classified");
+	}
+
+	private void containsClassified(Map<Class<? extends Throwable>, Boolean> classified,
+			Class<? extends Throwable> cls, boolean include) {
+		assertTrue(classified.containsKey(cls));
+		assertEquals(include, classified.get(cls));
 	}
 
 	@SuppressWarnings("unchecked")

@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.springframework.org/schema/batch http://www.springframework.org/schema/batch/spring-batch-2.1.xsd
+	http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.5.xsd">
+
+	<import resource="common-context.xml" />
+
+	<job id="job" xmlns="http://www.springframework.org/schema/batch">
+		<step id="s1" next="s2">
+			<tasklet>
+				<chunk reader="reader" writer="writer" processor="processor" commit-interval="5" skip-policy="skipPolicy" />
+			</tasklet>
+		</step>
+		<step id="s2">
+			<tasklet>
+				<chunk reader="reader" writer="writer" processor="processor" commit-interval="5">
+					<skip-policy>
+						<bean class="org.springframework.batch.core.step.skip.LimitCheckingItemSkipPolicy" xmlns="http://www.springframework.org/schema/beans">
+							<property name="skipLimit" value="2" />
+							<property name="skippableExceptionMap">
+								<map key-type="java.lang.Class">
+									<entry key="java.lang.ArithmeticException" value="true" />
+								</map>
+							</property>
+						</bean>
+					</skip-policy>
+				</chunk>
+			</tasklet>
+		</step>
+	</job>
+
+	<bean id="skipPolicy" class="org.springframework.batch.core.step.skip.LimitCheckingItemSkipPolicy">
+		<property name="skipLimit" value="2" />
+		<property name="skippableExceptionMap">
+			<map key-type="java.lang.Class">
+				<entry key="java.lang.NullPointerException" value="true" />
+				<entry key="java.lang.ArithmeticException" value="true" />
+			</map>
+		</property>
+	</bean>
+
+</beans>

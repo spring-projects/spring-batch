@@ -367,6 +367,15 @@ public class FaultTolerantStepFactoryBean<T, S> extends SimpleStepFactoryBean<T,
 	@Override
 	protected SimpleChunkProvider<T> configureChunkProvider() {
 
+		if (skipPolicy != null) {
+			if (!skippableExceptionClasses.isEmpty()) {
+				logger.info("Skippable exceptions will be ignored because a SkipPolicy was specified explicitly");
+			}
+			if (skipLimit>0) {
+				logger.info("Skip limit will be ignored because a SkipPolicy was specified explicitly");
+			}
+		}
+
 		SkipPolicy readSkipPolicy = skipPolicy != null ? skipPolicy : new LimitCheckingItemSkipPolicy(skipLimit,
 				getSkippableExceptionClasses());
 		readSkipPolicy = getFatalExceptionAwareProxy(readSkipPolicy);

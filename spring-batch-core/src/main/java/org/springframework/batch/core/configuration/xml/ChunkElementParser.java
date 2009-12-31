@@ -103,6 +103,9 @@ public class ChunkElementParser {
 			propertyValues.addPropertyValue("skipLimit", skipLimit);
 		}
 
+		handleItemHandler("skip-policy", "skipPolicy", null, false, element, parserContext,
+				propertyValues, underspecified);
+
 		String retryLimit = element.getAttribute("retry-limit");
 		if (StringUtils.hasText(retryLimit)) {
 			propertyValues.addPropertyValue("retryLimit", retryLimit);

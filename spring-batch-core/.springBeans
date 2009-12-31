@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <beansProjectDescription>
 	<version>1</version>
-	<pluginVersion><![CDATA[2.2.8.200911091054-RELEASE]]></pluginVersion>
+	<pluginVersion><![CDATA[2.3.0.200912170948-RELEASE]]></pluginVersion>
 	<configSuffixes>
 		<configSuffix><![CDATA[xml]]></configSuffix>
 	</configSuffixes>
@@ -101,6 +101,8 @@
 		<config>src/test/resources/org/springframework/batch/core/configuration/xml/FlowStepParserTests-context.xml</config>
 		<config>src/test/resources/org/springframework/batch/core/configuration/xml/JobParserWrongSchemaInRootTests-context.xml</config>
 		<config>src/test/resources/org/springframework/batch/core/configuration/xml/PartitionStepParserTests-context.xml</config>
+		<config>src/test/resources/org/springframework/batch/core/configuration/xml/ChunkElementSkipPolicyParserTests-context.xml</config>
+		<config>src/test/resources/org/springframework/batch/core/configuration/xml/JobStepParserTests-context.xml</config>
 	</configs>
 	<configSets>
 		<configSet>

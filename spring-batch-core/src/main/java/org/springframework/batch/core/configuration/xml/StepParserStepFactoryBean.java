@@ -40,6 +40,7 @@ import org.springframework.batch.core.step.item.FaultTolerantStepFactoryBean;
 import org.springframework.batch.core.step.item.SimpleStepFactoryBean;
 import org.springframework.batch.core.step.job.JobParametersExtractor;
 import org.springframework.batch.core.step.job.JobStep;
+import org.springframework.batch.core.step.skip.SkipPolicy;
 import org.springframework.batch.core.step.tasklet.Tasklet;
 import org.springframework.batch.core.step.tasklet.TaskletStep;
 import org.springframework.batch.item.ItemProcessor;
@@ -150,6 +151,8 @@ class StepParserStepFactoryBean<I, O> implements FactoryBean, BeanNameAware {
 	private Integer retryLimit;
 
 	private Integer skipLimit;
+
+	private SkipPolicy skipPolicy;
 
 	private TaskExecutor taskExecutor;
 
@@ -342,6 +345,9 @@ class StepParserStepFactoryBean<I, O> implements FactoryBean, BeanNameAware {
 		if (skipLimit != null) {
 			fb.setSkipLimit(skipLimit);
 		}
+		if (skipPolicy != null) {
+			fb.setSkipPolicy(skipPolicy);
+		}
 
 		if (retryListeners != null) {
 			fb.setRetryListeners(retryListeners);
@@ -429,7 +435,17 @@ class StepParserStepFactoryBean<I, O> implements FactoryBean, BeanNameAware {
 		}
 	}
 
-	private void validateAtLeastOneDependency(String dependantName, Boolean dependantValue, String name,
+	/**
+	 * Check if a field is present then a second (at least one taken from a
+	 * list) is also.
+	 * 
+	 * @param dependantName the name of the first field
+	 * @param dependantValue the value of the first field
+	 * @param names the names of the other fields (used to construct an exception message)
+	 * @param values the other field values (one of which must be set if the
+	 * first field is)
+	 */
+	private void validateAtLeastOneDependency(String dependantName, Boolean dependantValue, String names,
 			Object... values) {
 		boolean oneIsPresent = false;
 		for (Object value : values) {
@@ -440,22 +456,42 @@ class StepParserStepFactoryBean<I, O> implements FactoryBean, BeanNameAware {
 		}
 		if (isPresent(dependantValue) && !oneIsPresent) {
 			throw new IllegalArgumentException("The field '" + dependantName + "' is not permitted on the step ["
-					+ this.name + "] because " + name + " is not present.");
+					+ this.name + "] because " + names + " is not present.");
 		}
 	}
 
-	private void validateDependency(String dependantName, Object dependantValue, String name, Object value,
+	/**
+	 * Check if a field is present then a second is also. If the
+	 * twoWayDependency flag is set then the opposite must also be true: if the
+	 * second value is present, the first must also be.
+	 * 
+	 * @param dependentName the name of the first field
+	 * @param dependentValue the value of the first field
+	 * @param name the name of the other field (which should be absent if the
+	 * first is present)
+	 * @param value the value of the other field
+	 * @param twoWayDependency true if both depend on each other
+	 * 
+	 * @throws IllegalArgumentException if eiether condition is violated
+	 */
+	private void validateDependency(String dependentName, Object dependentValue, String name, Object value,
 			boolean twoWayDependency) {
-		if (isPresent(dependantValue) && !isPresent(value)) {
-			throw new IllegalArgumentException("The field '" + dependantName + "' is not permitted on the step ["
+		if (isPresent(dependentValue) && !isPresent(value)) {
+			throw new IllegalArgumentException("The field '" + dependentName + "' is not permitted on the step ["
 					+ this.name + "] because there is no '" + name + "'.");
 		}
-		if (twoWayDependency && isPresent(value) && !isPresent(dependantValue)) {
+		if (twoWayDependency && isPresent(value) && !isPresent(dependentValue)) {
 			throw new IllegalArgumentException("The field '" + name + "' is not permitted on the step [" + this.name
-					+ "] because there is no '" + dependantName + "'.");
+					+ "] because there is no '" + dependentName + "'.");
 		}
 	}
 
+	/**
+	 * Is the object non-null (or if an Integer, non-zero)?
+	 * 
+	 * @param o an object
+	 * @return true if the object has a value
+	 */
 	private boolean isPresent(Object o) {
 		if (o instanceof Integer) {
 			return isPositive((Integer) o);
@@ -464,7 +500,7 @@ class StepParserStepFactoryBean<I, O> implements FactoryBean, BeanNameAware {
 	}
 
 	private boolean isFaultTolerant() {
-		return isPositive(skipLimit) || isPositive(retryLimit) || isPositive(cacheCapacity)
+		return skipPolicy != null || isPositive(skipLimit) || isPositive(retryLimit) || isPositive(cacheCapacity)
 				|| isTrue(readerTransactionalQueue);
 	}
 
@@ -521,11 +557,11 @@ class StepParserStepFactoryBean<I, O> implements FactoryBean, BeanNameAware {
 	public void setJob(Job job) {
 		this.job = job;
 	}
-	
+
 	public void setJobParametersExtractor(JobParametersExtractor jobParametersExtractor) {
 		this.jobParametersExtractor = jobParametersExtractor;
 	}
-	
+
 	public void setJobLauncher(JobLauncher jobLauncher) {
 		this.jobLauncher = jobLauncher;
 	}
@@ -760,6 +796,16 @@ class StepParserStepFactoryBean<I, O> implements FactoryBean, BeanNameAware {
 	 */
 	public void setSkipLimit(int skipLimit) {
 		this.skipLimit = skipLimit;
+	}
+
+	/**
+	 * Public setter for a skip policy. If this value is set then the skip limit
+	 * and skippable exceptions are ignored.
+	 * 
+	 * @param skipPolicy the {@link SkipPolicy} to set
+	 */
+	public void setSkipPolicy(SkipPolicy skipPolicy) {
+		this.skipPolicy = skipPolicy;
 	}
 
 	/**

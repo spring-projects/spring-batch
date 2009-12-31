@@ -15,6 +15,9 @@
  */
 package org.springframework.batch.core.step.skip;
 
+import java.util.Map;
+
+import org.springframework.batch.classify.Classifier;
 import org.springframework.batch.classify.SubclassClassifier;
 
 /**
@@ -36,6 +39,21 @@ public class ExceptionClassifierSkipPolicy implements SkipPolicy {
 	 */
 	public void setExceptionClassifier(SubclassClassifier<Throwable, SkipPolicy> classifier) {
 		this.classifier = classifier;
+	}
+
+	/**
+	 * Setter for policy map. This property should not be changed dynamically -
+	 * set it once, e.g. in configuration, and then don't change it during a
+	 * running application. Either this property or the exception classifier
+	 * directly should be set, but not both.
+	 * 
+	 * @param policyMap a map of String to {@link SkipPolicy} that will be used
+	 * to create a {@link Classifier} to locate a policy.
+	 */
+	public void setPolicyMap(Map<Class<? extends Throwable>, SkipPolicy> policyMap) {
+		SubclassClassifier<Throwable, SkipPolicy> subclassClassifier = new SubclassClassifier<Throwable, SkipPolicy>(
+				policyMap, new NeverSkipItemSkipPolicy());
+		this.classifier = subclassClassifier;
 	}
 
 	/**

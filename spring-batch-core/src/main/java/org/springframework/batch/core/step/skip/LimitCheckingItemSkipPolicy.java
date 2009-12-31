@@ -52,9 +52,9 @@ import org.springframework.batch.item.file.FlatFileParseException;
  */
 public class LimitCheckingItemSkipPolicy implements SkipPolicy {
 
-	private final int skipLimit;
+	private int skipLimit;
 
-	private final Classifier<Throwable, Boolean> skippableExceptionClassifier;
+	private Classifier<Throwable, Boolean> skippableExceptionClassifier;
 
 	/**
 	 * Convenience constructor that assumes all exception types are fatal.
@@ -82,6 +82,37 @@ public class LimitCheckingItemSkipPolicy implements SkipPolicy {
 	public LimitCheckingItemSkipPolicy(int skipLimit, Classifier<Throwable, Boolean> skippableExceptionClassifier) {
 		this.skipLimit = skipLimit;
 		this.skippableExceptionClassifier = skippableExceptionClassifier;
+	}
+
+	/**
+	 * The absolute number of skips (of skippable exceptions) that can be
+	 * tolerated before a failure.
+	 * 
+	 * @param skipLimit the skip limit to set
+	 */
+	public void setSkipLimit(int skipLimit) {
+		this.skipLimit = skipLimit;
+	}
+
+	/**
+	 * The classifier that will be used to decide on skippability. If an
+	 * exception classifies as "true" then it is skippable, and otherwise not.
+	 * 
+	 * @param skippableExceptionClassifier the skippableExceptionClassifier to
+	 * set
+	 */
+	public void setSkippableExceptionClassifier(Classifier<Throwable, Boolean> skippableExceptionClassifier) {
+		this.skippableExceptionClassifier = skippableExceptionClassifier;
+	}
+
+	/**
+	 * Set up the classifier through a convenient map from throwable class to
+	 * boolean (true if skippable).
+	 * 
+	 * @param skippableExceptions the skippable exceptions to set
+	 */
+	public void setSkippableExceptionMap(Map<Class<? extends Throwable>, Boolean> skippableExceptions) {
+		this.skippableExceptionClassifier = new BinaryExceptionClassifier(skippableExceptions);
 	}
 
 	/**

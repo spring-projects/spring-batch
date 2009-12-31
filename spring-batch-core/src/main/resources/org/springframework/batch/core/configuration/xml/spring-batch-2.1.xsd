@@ -738,6 +738,19 @@
 					<xsd:attributeGroup ref="adapterMethodAttribute" />
 				</xsd:complexType>
 			</xsd:element>
+			<xsd:element name="skip-policy" minOccurs="0" maxOccurs="1">
+				<xsd:annotation>
+					<xsd:documentation><![CDATA[
+					The SkipPolicy used by the step.  If specified then the skip limit and skippable exceptions are ignored
+					]]>
+					</xsd:documentation>
+				</xsd:annotation>
+				<xsd:complexType>
+					<xsd:group ref="beanElementGroup" minOccurs="0"
+						maxOccurs="1" />
+					<xsd:attributeGroup ref="adapterMethodAttribute" />
+				</xsd:complexType>
+			</xsd:element>
 			<xsd:element name="retry-listeners" minOccurs="0"
 				maxOccurs="1">
 				<xsd:annotation>
@@ -862,6 +875,17 @@
 				<xsd:documentation><![CDATA[
 				The maximum number of items that will be allowed to be skipped.
 				]]></xsd:documentation>
+			</xsd:annotation>
+		</xsd:attribute>
+		<xsd:attribute name="skip-policy" type="xsd:string" use="optional">
+			<xsd:annotation>
+				<xsd:documentation><![CDATA[
+				The skip policy to use.  If specified then the skip limit and skippable exceptions are ignored.
+				]]></xsd:documentation>
+				<xsd:appinfo>
+					<tool:annotation kind="ref" />
+					<tool:expected-type type="org.springframework.core.step.skip.SkipPolicy" />
+				</xsd:appinfo>
 			</xsd:annotation>
 		</xsd:attribute>
 		<xsd:attribute name="retry-limit" type="xsd:string" use="optional">
