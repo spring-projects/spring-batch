@@ -28,7 +28,9 @@ import org.springframework.batch.classify.Classifier;
 import org.springframework.batch.classify.SubclassClassifier;
 import org.springframework.batch.core.JobInterruptedException;
 import org.springframework.batch.core.Step;
+import org.springframework.batch.core.step.skip.ExceptionClassifierSkipPolicy;
 import org.springframework.batch.core.step.skip.LimitCheckingItemSkipPolicy;
+import org.springframework.batch.core.step.skip.NeverSkipItemSkipPolicy;
 import org.springframework.batch.core.step.skip.NonSkippableReadException;
 import org.springframework.batch.core.step.skip.SkipLimitExceededException;
 import org.springframework.batch.core.step.skip.SkipListenerFailedException;
@@ -76,6 +78,8 @@ public class FaultTolerantStepFactoryBean<T, S> extends SimpleStepFactoryBean<T,
 
 	private Map<Class<? extends Throwable>, Boolean> skippableExceptionClasses = new HashMap<Class<? extends Throwable>, Boolean>();
 
+	private Collection<Class<? extends Throwable>> nonSkippableExceptionClasses = new HashSet<Class<? extends Throwable>>();
+
 	private Collection<Class<? extends Throwable>> noRollbackExceptionClasses = new HashSet<Class<? extends Throwable>>();
 
 	private Map<Class<? extends Throwable>, Boolean> retryableExceptionClasses = new HashMap<Class<? extends Throwable>, Boolean>();
@@ -87,6 +91,8 @@ public class FaultTolerantStepFactoryBean<T, S> extends SimpleStepFactoryBean<T,
 	private int retryLimit = 0;
 
 	private int skipLimit = 0;
+
+	private SkipPolicy skipPolicy;
 
 	private BackOffPolicy backOffPolicy;
 
@@ -208,6 +214,18 @@ public class FaultTolerantStepFactoryBean<T, S> extends SimpleStepFactoryBean<T,
 	}
 
 	/**
+	 * A {@link SkipPolicy} that determines the outcome of an exception when
+	 * processing an item. Overrides the {@link #setSkipLimit(int) skipLimit}.
+	 * The {@link #setSkippableExceptionClasses(Map) skippableExceptionClasses}
+	 * are also ignored if this is set.
+	 * 
+	 * @param skipPolicy the {@link SkipPolicy} to set
+	 */
+	public void setSkipPolicy(SkipPolicy skipPolicy) {
+		this.skipPolicy = skipPolicy;
+	}
+
+	/**
 	 * Exception classes that when raised won't crash the job but will result in
 	 * the item which handling caused the exception being skipped. Any exception
 	 * which is marked for "no rollback" is also skippable, but not vice versa.
@@ -300,14 +318,12 @@ public class FaultTolerantStepFactoryBean<T, S> extends SimpleStepFactoryBean<T,
 
 	}
 
-	@SuppressWarnings("unchecked")
 	@Override
 	protected void applyConfiguration(TaskletStep step) {
-		addFatalExceptionIfMissing(SkipLimitExceededException.class, NonSkippableReadException.class,
+		addNonSkippableExceptionIfMissing(SkipLimitExceededException.class, NonSkippableReadException.class,
 				SkipListenerFailedException.class, RetryException.class, JobInterruptedException.class, Error.class);
 		addNonRetryableExceptionIfMissing(SkipLimitExceededException.class, NonSkippableReadException.class,
 				SkipListenerFailedException.class, RetryException.class, JobInterruptedException.class, Error.class);
-
 		super.applyConfiguration(step);
 	}
 
@@ -351,7 +367,9 @@ public class FaultTolerantStepFactoryBean<T, S> extends SimpleStepFactoryBean<T,
 	@Override
 	protected SimpleChunkProvider<T> configureChunkProvider() {
 
-		SkipPolicy readSkipPolicy = new LimitCheckingItemSkipPolicy(skipLimit, getSkippableExceptionClasses());
+		SkipPolicy readSkipPolicy = skipPolicy != null ? skipPolicy : new LimitCheckingItemSkipPolicy(skipLimit,
+				getSkippableExceptionClasses());
+		readSkipPolicy = getFatalExceptionAwareProxy(readSkipPolicy);
 		FaultTolerantChunkProvider<T> chunkProvider = new FaultTolerantChunkProvider<T>(getItemReader(),
 				getChunkOperations());
 		chunkProvider.setSkipPolicy(readSkipPolicy);
@@ -374,7 +392,9 @@ public class FaultTolerantStepFactoryBean<T, S> extends SimpleStepFactoryBean<T,
 		chunkProcessor.setBuffering(!isReaderTransactionalQueue());
 		chunkProcessor.setProcessorTransactional(processorTransactional);
 
-		SkipPolicy writeSkipPolicy = new LimitCheckingItemSkipPolicy(skipLimit, getSkippableExceptionClasses());
+		SkipPolicy writeSkipPolicy = skipPolicy != null ? skipPolicy : new LimitCheckingItemSkipPolicy(skipLimit,
+				getSkippableExceptionClasses());
+		writeSkipPolicy = getFatalExceptionAwareProxy(writeSkipPolicy);
 		chunkProcessor.setWriteSkipPolicy(writeSkipPolicy);
 		chunkProcessor.setProcessSkipPolicy(writeSkipPolicy);
 		chunkProcessor.setRollbackClassifier(getRollbackClassifier());
@@ -409,7 +429,7 @@ public class FaultTolerantStepFactoryBean<T, S> extends SimpleStepFactoryBean<T,
 			retryPolicy = new SimpleRetryPolicy(retryLimit, map);
 		}
 
-		RetryPolicy retryPolicyWrapper = fatalExceptionAwareProxy(retryPolicy);
+		RetryPolicy retryPolicyWrapper = getFatalExceptionAwareProxy(retryPolicy);
 
 		BatchRetryTemplate batchRetryTemplate = new BatchRetryTemplate();
 		if (backOffPolicy != null) {
@@ -444,7 +464,7 @@ public class FaultTolerantStepFactoryBean<T, S> extends SimpleStepFactoryBean<T,
 	 * Wrap the provided {@link #setRetryPolicy(RetryPolicy)} so that it never
 	 * retries explicitly non-retryable exceptions.
 	 */
-	private RetryPolicy fatalExceptionAwareProxy(final RetryPolicy retryPolicy) {
+	private RetryPolicy getFatalExceptionAwareProxy(RetryPolicy retryPolicy) {
 
 		NeverRetryPolicy neverRetryPolicy = new NeverRetryPolicy();
 		Map<Class<? extends Throwable>, RetryPolicy> map = new HashMap<Class<? extends Throwable>, RetryPolicy>();
@@ -462,15 +482,41 @@ public class FaultTolerantStepFactoryBean<T, S> extends SimpleStepFactoryBean<T,
 
 	}
 
-	private void addFatalExceptionIfMissing(Class<? extends Throwable>... classes) {
-		Map<Class<? extends Throwable>, Boolean> exceptions = new HashMap<Class<? extends Throwable>, Boolean>(
-				skippableExceptionClasses);
-		for (Class<? extends Throwable> cls : classes) {
-			if (!exceptions.containsKey(cls)) {
-				exceptions.put(cls, false);
+	/**
+	 * Wrap a {@link SkipPolicy} and make it consistent with known fatal
+	 * exceptions.
+	 * 
+	 * @param skipPolicy an existing skip policy
+	 * @return a skip policy that will not skip fatal exceptions
+	 */
+	private SkipPolicy getFatalExceptionAwareProxy(SkipPolicy skipPolicy) {
+
+		NeverSkipItemSkipPolicy neverSkipPolicy = new NeverSkipItemSkipPolicy();
+		Map<Class<? extends Throwable>, SkipPolicy> map = new HashMap<Class<? extends Throwable>, SkipPolicy>();
+		for (Class<? extends Throwable> fatal : nonSkippableExceptionClasses) {
+			map.put(fatal, neverSkipPolicy);
+		}
+
+		SubclassClassifier<Throwable, SkipPolicy> classifier = new SubclassClassifier<Throwable, SkipPolicy>(skipPolicy);
+		classifier.setTypeMap(map);
+
+		ExceptionClassifierSkipPolicy skipPolicyWrapper = new ExceptionClassifierSkipPolicy();
+		skipPolicyWrapper.setExceptionClassifier(classifier);
+		return skipPolicyWrapper;
+	}
+
+	@SuppressWarnings("unchecked")
+	private void addNonSkippableExceptionIfMissing(Class... cls) {
+		List exceptions = new ArrayList<Class<? extends Throwable>>();
+		for (Class exceptionClass : nonSkippableExceptionClasses) {
+			exceptions.add(exceptionClass);
+		}
+		for (Class fatal : cls) {
+			if (!exceptions.contains(fatal)) {
+				exceptions.add(fatal);
 			}
 		}
-		skippableExceptionClasses = exceptions;
+		nonSkippableExceptionClasses = exceptions;
 	}
 
 	@SuppressWarnings("unchecked")

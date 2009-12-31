@@ -26,8 +26,10 @@ import java.util.Collection;
 import java.util.Map;
 
 import org.junit.Test;
+import org.springframework.batch.classify.SubclassClassifier;
 import org.springframework.batch.core.Step;
 import org.springframework.batch.core.step.item.SimpleChunkProcessor;
+import org.springframework.batch.core.step.skip.SkipPolicy;
 import org.springframework.batch.core.step.tasklet.TaskletStep;
 import org.springframework.batch.item.ItemStream;
 import org.springframework.batch.item.support.CompositeItemStream;
@@ -103,7 +105,7 @@ public class ChunkElementParserTests {
 	@Test
 	public void testInheritSkippable() throws Exception {
 		Map<Class<? extends Throwable>, Boolean> skippable = getExceptionClasses("s1", getContext());
-		assertEquals(11, skippable.size());
+		assertEquals(5, skippable.size());
 		containsClassified(skippable, NullPointerException.class, true);
 		containsClassified(skippable, ArithmeticException.class, true);
 		containsClassified(skippable, CannotAcquireLockException.class, false);
@@ -113,7 +115,7 @@ public class ChunkElementParserTests {
 	@Test
 	public void testInheritSkippableWithNoMerge() throws Exception {
 		Map<Class<? extends Throwable>, Boolean> skippable = getExceptionClasses("s2", getContext());
-		assertEquals(9, skippable.size());
+		assertEquals(3, skippable.size());
 		containsClassified(skippable, NullPointerException.class, true);
 		assertFalse(skippable.containsKey(ArithmeticException.class));
 		containsClassified(skippable, CannotAcquireLockException.class, false);
@@ -194,8 +196,11 @@ public class ChunkElementParserTests {
 		Object tasklet = ReflectionTestUtils.getField(step, "tasklet");
 		Object chunkProvider = ReflectionTestUtils.getField(tasklet, "chunkProvider");
 		Object skipPolicy = ReflectionTestUtils.getField(chunkProvider, "skipPolicy");
-		Object classifier = ReflectionTestUtils.getField(skipPolicy, "skippableExceptionClassifier");
-		return (Map<Class<? extends Throwable>, Boolean>) ReflectionTestUtils.getField(classifier, "classified");
+		SubclassClassifier<Throwable, SkipPolicy> classifier = (SubclassClassifier<Throwable, SkipPolicy>) ReflectionTestUtils
+				.getField(skipPolicy, "classifier");
+		Object limitPolicy = classifier.classify(new Exception());
+		Object limitClassifier = ReflectionTestUtils.getField(limitPolicy, "skippableExceptionClassifier");
+		return (Map<Class<? extends Throwable>, Boolean>) ReflectionTestUtils.getField(limitClassifier, "classified");
 	}
 
 	@SuppressWarnings("unchecked")

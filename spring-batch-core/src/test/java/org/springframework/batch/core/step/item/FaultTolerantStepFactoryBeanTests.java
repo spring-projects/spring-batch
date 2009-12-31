@@ -6,6 +6,7 @@ import static org.junit.Assert.assertTrue;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -32,6 +33,7 @@ import org.springframework.batch.core.StepListener;
 import org.springframework.batch.core.listener.SkipListenerSupport;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.repository.support.MapJobRepositoryFactoryBean;
+import org.springframework.batch.core.step.skip.LimitCheckingItemSkipPolicy;
 import org.springframework.batch.core.step.skip.SkipPolicy;
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.item.ItemReader;
@@ -186,6 +188,18 @@ public class FaultTolerantStepFactoryBeanTests {
 		assertEquals(BatchStatus.COMPLETED, stepExecution.getStatus());
 		assertStepExecutionsAreEqual(stepExecution, repository.getLastStepExecution(jobExecution.getJobInstance(), step
 				.getName()));
+	}
+
+	/**
+	 * Check items causing errors are skipped as expected.
+	 */
+	@Test
+	public void testReadSkipWithPolicy() throws Exception {
+		// Should be ignored
+		factory.setSkipLimit(0);
+		factory.setSkipPolicy(new LimitCheckingItemSkipPolicy(2, Collections
+				.<Class<? extends Throwable>, Boolean> singletonMap(Exception.class, true)));
+		testReadSkip();
 	}
 
 	/**
@@ -426,7 +440,7 @@ public class FaultTolerantStepFactoryBeanTests {
 		step.execute(stepExecution);
 
 		// 1,3 skipped inside a committed chunk. 5 tripped the skip
-		// limit but it was skipped in a chunk that rolled back, so 
+		// limit but it was skipped in a chunk that rolled back, so
 		// it will re-appear on a restart and the listener is not called.
 		assertEquals(2, listenerCalls.size());
 		assertEquals(2, stepExecution.getReadSkipCount());
