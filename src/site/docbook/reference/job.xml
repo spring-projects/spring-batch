@@ -759,6 +759,34 @@ public class JobLauncherController {
       p:dataSource-ref="dataSource" <emphasis role="bold">p:tablePrefix="BATCH_" </emphasis>/&gt;</programlisting>
     </section>
 
+    <section>
+      <title>JobRegistry</title>
+
+      <para>A JobRegistry (and its parent interface JobLocator) is not
+      mandatory, but it can be useful if you want to keep track of which jobs
+      are available in the context. It is also useful for collecting jobs
+      centrally in an application context when they have been created
+      elsewhere (e.g. in child contexts). Custom JobRegistry implementations
+      can also be used to manipulate the names and other properties of the
+      jobs that are registered. There is only one implementation provided by
+      the framework and this is based on a simple map from job name to job
+      instance. It is configured simply like this:</para>
+
+      <programlisting>&lt;bean id="jobRegistry" class="org.spr...MapJobRegistry" /&gt;</programlisting>
+
+      <para>A common use case is to use this registry together with a bean
+      post-processor that can register all jobs as they are created:</para>
+
+      <programlisting>&lt;bean id="jobRegistryBeanPostProcessor" class="org.spr...JobRegistryBeanPostProcessor"&gt;
+    &lt;property name="jobRegistry" ref="jobRegistry"/&gt;
+&lt;/bean&gt;</programlisting>
+
+      <para>Athough it is not strictly necessary the post-processor in the
+      example has been given an id so that it can be included in child
+      contexts (e.g. as a parent bean definition) and cause all jobs created
+      there to also be regsistered automatically. </para>
+    </section>
+
     <section id="JobOperator">
       <title>JobOperator</title>
 
