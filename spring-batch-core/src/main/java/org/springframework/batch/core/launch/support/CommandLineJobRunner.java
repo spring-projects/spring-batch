@@ -38,6 +38,7 @@ import org.springframework.batch.core.configuration.JobLocator;
 import org.springframework.batch.core.converter.DefaultJobParametersConverter;
 import org.springframework.batch.core.converter.JobParametersConverter;
 import org.springframework.batch.core.explore.JobExplorer;
+import org.springframework.batch.core.launch.JobExecutionNotFailedException;
 import org.springframework.batch.core.launch.JobLauncher;
 import org.springframework.batch.core.launch.JobParametersNotFoundException;
 import org.springframework.beans.factory.BeanDefinitionStoreException;
@@ -89,7 +90,7 @@ import org.springframework.util.StringUtils;
  * </p>
  * 
  * <code>
- * jobPath <options> jobName (jobParameters)*
+ * jobPath <options> jobIdentifier (jobParameters)*
  * </code>
  * 
  * <p>
@@ -99,7 +100,7 @@ import org.springframework.util.StringUtils;
  * <li>-restart: (optional) to restart the last failed execution</li>
  * <li>-next: (optional) to start the next in a sequence according to the
  * {@link JobParametersIncrementer} in the {@link Job}</li>
- * <li>jobName: the bean id of the job.
+ * <li>jobIdentifier: the bean id of the job.
  * <li>jobParameters: 0 to many parameters that will be used to launch a job.
  * </ul>
  * </p>
@@ -130,10 +131,10 @@ import org.springframework.util.StringUtils;
  * loaded this way. If none is contained in the bean factory (it searches by
  * type) then a {@link BeanDefinitionStoreException} will be thrown. The same
  * exception will also be thrown if there is more than one present. Assuming the
- * JobLauncher has been set correctly, the jobName argument will be used to
- * obtain an actual {@link Job}. If a {@link JobLocator} has been set, then it
- * will be used, if not the beanFactory will be asked, using the jobName as the
- * bean id.
+ * JobLauncher has been set correctly, the jobIdentifier argument will be used
+ * to obtain an actual {@link Job}. If a {@link JobLocator} has been set, then
+ * it will be used, if not the beanFactory will be asked, using the
+ * jobIdentifier as the bean id.
  * </p>
  * 
  * @author Dave Syer
@@ -248,7 +249,7 @@ public class CommandLineJobRunner {
 	 * job paths. If a JobLocator has been set, then use it to obtain an actual
 	 * job, if not ask the context for it.
 	 */
-	int start(String jobPath, String jobName, String[] parameters, Set<String> opts) {
+	int start(String jobPath, String jobIdentifier, String[] parameters, Set<String> opts) {
 
 		ConfigurableApplicationContext context = null;
 
@@ -264,13 +265,7 @@ public class CommandLineJobRunner {
 								"A JobExplorer must be provided for a restart or start next operation.  Please add one to the configuration.");
 			}
 
-			Job job;
-			if (jobLocator != null) {
-				job = jobLocator.getJob(jobName);
-			}
-			else {
-				job = (Job) context.getBean(jobName);
-			}
+			String jobName = jobIdentifier;
 
 			JobParameters jobParameters = jobParametersConverter.getJobParameters(StringUtils
 					.splitArrayElementsIntoProperties(parameters, "="));
@@ -279,9 +274,23 @@ public class CommandLineJobRunner {
 							+ ". If parameters are provided they should be in the form name=value (no whitespace).");
 
 			if (opts.contains("-restart")) {
-				jobParameters = getLastFailedJobParameters(jobName);
+				JobExecution jobExecution = getLastFailedJobExecution(jobIdentifier);
+				if (jobExecution == null) {
+					throw new JobExecutionNotFailedException("No failed or stopped execution found for job=" + jobIdentifier);
+				}
+				jobParameters = jobExecution.getJobInstance().getJobParameters();
+				jobName = jobExecution.getJobInstance().getJobName();
 			}
-			else if (opts.contains("-next")) {
+
+			Job job;
+			if (jobLocator != null) {
+				job = jobLocator.getJob(jobName);
+			}
+			else {
+				job = (Job) context.getBean(jobName);
+			}
+
+			if (opts.contains("-next")) {
 				JobParameters nextParameters = getNextJobParameters(job);
 				Map<String, JobParameter> map = new HashMap<String, JobParameter>(nextParameters.getParameters());
 				map.putAll(jobParameters.getParameters());
@@ -306,21 +315,23 @@ public class CommandLineJobRunner {
 	}
 
 	/**
-	 * @param jobName
+	 * @param jobIdentifier
 	 * @return
 	 * @throws JobParametersNotFoundException
 	 */
-	private JobParameters getLastFailedJobParameters(String jobName) throws JobParametersNotFoundException {
+	private JobExecution getLastFailedJobExecution(String jobIdentifier) {
+
+		Long executionId = getLongIdentifier(jobIdentifier);
+		if (executionId != null) {
+			JobExecution jobExecution = jobExplorer.getJobExecution(executionId);
+			if (jobExecution.getStatus().isGreaterThan(BatchStatus.STOPPING)) {
+				return jobExecution;
+			}
+		}
 
 		int start = 0;
 		int count = 100;
-		List<JobInstance> lastInstances = jobExplorer.getJobInstances(jobName, start, count);
-
-		JobParameters jobParameters = null;
-
-		if (lastInstances.isEmpty()) {
-			throw new JobParametersNotFoundException("No job instance found for job=" + jobName);
-		}
+		List<JobInstance> lastInstances = jobExplorer.getJobInstances(jobIdentifier, start, count);
 
 		while (!lastInstances.isEmpty()) {
 
@@ -331,25 +342,27 @@ public class CommandLineJobRunner {
 				}
 				JobExecution jobExecution = jobExecutions.get(jobExecutions.size() - 1);
 				if (jobExecution.getStatus().isGreaterThan(BatchStatus.STOPPING)) {
-					jobParameters = jobInstance.getJobParameters();
-					break;
+					return jobExecution;
 				}
 			}
 
-			if (jobParameters != null) {
-				break;
-			}
-
 			start += count;
-			lastInstances = jobExplorer.getJobInstances(jobName, start, count);
+			lastInstances = jobExplorer.getJobInstances(jobIdentifier, start, count);
 
 		}
 
-		if (jobParameters == null) {
-			throw new JobParametersNotFoundException("No failed or stopped execution found for job=" + jobName);
-		}
-		return jobParameters;
+		return null;
 
+	}
+
+	private Long getLongIdentifier(String jobIdentifier) {
+		try {
+			return new Long(jobIdentifier);
+		}
+		catch (NumberFormatException e) {
+			// Not an ID - must be a name
+			return null;
+		}
 	}
 
 	/**
@@ -358,20 +371,20 @@ public class CommandLineJobRunner {
 	 * @throws JobParametersNotFoundException if there is a problem
 	 */
 	private JobParameters getNextJobParameters(Job job) throws JobParametersNotFoundException {
-		String jobName = job.getName();
+		String jobIdentifier = job.getName();
 		JobParameters jobParameters;
-		List<JobInstance> lastInstances = jobExplorer.getJobInstances(jobName, 0, 1);
+		List<JobInstance> lastInstances = jobExplorer.getJobInstances(jobIdentifier, 0, 1);
 
 		JobParametersIncrementer incrementer = job.getJobParametersIncrementer();
 		if (incrementer == null) {
-			throw new JobParametersNotFoundException("No job parameters incrementer found for job=" + jobName);
+			throw new JobParametersNotFoundException("No job parameters incrementer found for job=" + jobIdentifier);
 		}
 
 		if (lastInstances.isEmpty()) {
 			jobParameters = incrementer.getNext(new JobParameters());
 			if (jobParameters == null) {
 				throw new JobParametersNotFoundException("No bootstrap parameters found from incrementer for job="
-						+ jobName);
+						+ jobIdentifier);
 			}
 		}
 		else {
@@ -393,11 +406,14 @@ public class CommandLineJobRunner {
 	 * @param args <p>
 	 * <ul>
 	 * <li>-restart: (optional) if the job has failed or stopped and the most
-	 * recent execution should be restarted</li>
+	 * should be restarted. If specified then the jobIdentifier parameter can be
+	 * interpreted either as the name of the job or the id of teh job execution
+	 * that failed.</li>
 	 * <li>-next: (optional) if the job has a {@link JobParametersIncrementer}
 	 * that can be used to launch the next in a sequence</li>
 	 * <li>jobPath: the xml application context containing a {@link Job}
-	 * <li>jobName: the bean id of the job.
+	 * <li>jobIdentifier: the bean id of the job or id of the failed execution
+	 * in the case of a restart.
 	 * <li>jobParameters: 0 to many parameters that will be used to launch a
 	 * job.
 	 * </ul>
@@ -414,7 +430,7 @@ public class CommandLineJobRunner {
 
 		int count = 0;
 		String jobPath = null;
-		String jobName = null;
+		String jobIdentifier = null;
 
 		for (String arg : args) {
 			if (arg.startsWith("-")) {
@@ -426,7 +442,7 @@ public class CommandLineJobRunner {
 					jobPath = arg;
 					break;
 				case 1:
-					jobName = arg;
+					jobIdentifier = arg;
 					break;
 				default:
 					params.add(arg);
@@ -436,8 +452,8 @@ public class CommandLineJobRunner {
 			}
 		}
 
-		if (jobPath == null || jobName == null) {
-			String message = "At least 2 arguments are required: JobPath and JobName.";
+		if (jobPath == null || jobIdentifier == null) {
+			String message = "At least 2 arguments are required: JobPath and jobIdentifier.";
 			logger.error(message);
 			CommandLineJobRunner.message = message;
 			command.exit(1);
@@ -445,7 +461,7 @@ public class CommandLineJobRunner {
 
 		String[] parameters = params.toArray(new String[params.size()]);
 
-		int result = command.start(jobPath, jobName, parameters, opts);
+		int result = command.start(jobPath, jobIdentifier, parameters, opts);
 		command.exit(result);
 	}
 

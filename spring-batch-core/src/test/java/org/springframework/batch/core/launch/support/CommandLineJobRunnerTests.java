@@ -141,6 +141,18 @@ public class CommandLineJobRunnerTests {
 	}
 
 	@Test
+	public void testRestartExecution() throws Throwable {
+		String[] args = new String[] { jobPath, "-restart", "11" };
+		JobParameters jobParameters = new JobParametersBuilder().addString("foo", "bar").toJobParameters();
+		JobExecution jobExecution = new JobExecution(new JobInstance(0L, jobParameters, jobName), 11L);
+		jobExecution.setStatus(BatchStatus.FAILED);
+		StubJobExplorer.jobExecution = jobExecution;
+		CommandLineJobRunner.main(args);
+		assertEquals(0, StubSystemExiter.status);
+		assertEquals(jobParameters, StubJobLauncher.jobParameters);
+	}
+
+	@Test
 	public void testRestartNotFailed() throws Throwable {
 		String[] args = new String[] { jobPath, "-restart", jobName };
 		JobParameters jobParameters = new JobParametersBuilder().addString("foo", "bar").toJobParameters();
@@ -150,16 +162,6 @@ public class CommandLineJobRunnerTests {
 		String errorMessage = CommandLineJobRunner.getErrorMessage();
 		assertTrue("Wrong error message: " + errorMessage, errorMessage
 				.contains("No failed or stopped execution found"));
-	}
-
-	@Test
-	public void testRestartNoParameters() throws Throwable {
-		String[] args = new String[] { jobPath, "-restart", jobName };
-		StubJobExplorer.jobInstances = new ArrayList<JobInstance>();
-		CommandLineJobRunner.main(args);
-		assertEquals(1, StubSystemExiter.status);
-		String errorMessage = CommandLineJobRunner.getErrorMessage();
-		assertTrue("Wrong error message: " + errorMessage, errorMessage.contains("No job instance found for job"));
 	}
 
 	@Test
@@ -255,12 +257,16 @@ public class CommandLineJobRunnerTests {
 	public static class StubJobExplorer implements JobExplorer {
 
 		static List<JobInstance> jobInstances = new ArrayList<JobInstance>();
+		static JobExecution jobExecution;
 
 		public Set<JobExecution> findRunningJobExecutions(String jobName) {
 			throw new UnsupportedOperationException();
 		}
 
 		public JobExecution getJobExecution(Long executionId) {
+			if (jobExecution!=null) {
+				return jobExecution;
+			}
 			throw new UnsupportedOperationException();
 		}
 
