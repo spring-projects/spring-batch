@@ -18,9 +18,14 @@ package org.springframework.batch.core.configuration.support;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.BeansException;
+import org.springframework.beans.factory.BeanFactoryAware;
 import org.springframework.beans.factory.config.BeanFactoryPostProcessor;
+import org.springframework.beans.factory.config.BeanPostProcessor;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.beans.factory.config.CustomEditorConfigurer;
 import org.springframework.beans.factory.config.PropertyPlaceholderConfigurer;
@@ -43,22 +48,31 @@ import org.springframework.util.Assert;
  */
 public class ClassPathXmlApplicationContextFactory implements ApplicationContextFactory, ApplicationContextAware {
 
+	private static final Log logger = LogFactory.getLog(ClassPathXmlApplicationContextFactory.class);
+
+	private Resource resource;
+
 	private ConfigurableApplicationContext parent;
-
-	private Resource path;
-
-	private ResourceXmlApplicationContext context;
-
+	
 	private boolean copyConfiguration = true;
 
 	private Collection<Class<? extends BeanFactoryPostProcessor>> beanFactoryPostProcessorClasses;
 
-	private final Object lock = new Object();
+	private Collection<Class<?>> beanPostProcessorExcludeClasses;
 
 	public ClassPathXmlApplicationContextFactory() {
 		beanFactoryPostProcessorClasses = new ArrayList<Class<? extends BeanFactoryPostProcessor>>();
 		beanFactoryPostProcessorClasses.add(PropertyPlaceholderConfigurer.class);
 		beanFactoryPostProcessorClasses.add(CustomEditorConfigurer.class);
+		beanPostProcessorExcludeClasses = new ArrayList<Class<?>>();
+		/*
+		 * Assume that a BeanPostProcessor that is BeanFactoryAware must be
+		 * specific to the parent and remove it from the child (e.g. an
+		 * AutoProxyCreator will not work properly). Unfortunately there might
+		 * still be a a BeanPostProcessor with a dependency that itself is
+		 * BeanFactoryAware, but we can legislate for that here.
+		 */
+		beanPostProcessorExcludeClasses.add(BeanFactoryAware.class);
 	}
 
 	/**
@@ -66,10 +80,10 @@ public class ClassPathXmlApplicationContextFactory implements ApplicationContext
 	 * {@link ApplicationContext}. Use imports to centralise the configuration
 	 * in one file.
 	 * 
-	 * @param path the resource path to the xml to load for the child context.
+	 * @param resource the resource path to the xml to load for the child context.
 	 */
-	public void setPath(Resource path) {
-		this.path = path;
+	public void setResource(Resource resource) {
+		this.resource = resource;
 	}
 
 	/**
@@ -110,6 +124,23 @@ public class ClassPathXmlApplicationContextFactory implements ApplicationContext
 	}
 
 	/**
+	 * Determines by exclusion which bean post processors should be copied from
+	 * the parent context. Defaults to {@link BeanFactoryAware} (so any post
+	 * processors that have a reference to the parent bean factory are not
+	 * copied into the child). Note that these classes do not themselves have to
+	 * be {@link BeanPostProcessor} implementations or sub-interfaces.
+	 * 
+	 * @param beanPostProcessorExcludeClasses the classes to set
+	 */
+	public void setBeanPostProcessorExcludeClasses(Class<?>[] beanPostProcessorExcludeClasses) {
+		this.beanPostProcessorExcludeClasses = new ArrayList<Class<?>>();
+		for (int i = 0; i < beanPostProcessorExcludeClasses.length; i++) {
+			this.beanPostProcessorExcludeClasses.add(beanPostProcessorExcludeClasses[i]);
+		}
+
+	}
+
+	/**
 	 * Protected access to the list of bean factory post processor classes that
 	 * should be copied over to the context from the parent.
 	 * 
@@ -125,6 +156,9 @@ public class ClassPathXmlApplicationContextFactory implements ApplicationContext
 	 * @see org.springframework.context.ApplicationContextAware#setApplicationContext(org.springframework.context.ApplicationContext)
 	 */
 	public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
+		if (applicationContext==null) {
+			return;
+		}
 		Assert.isInstanceOf(ConfigurableApplicationContext.class, applicationContext);
 		parent = (ConfigurableApplicationContext) applicationContext;
 	}
@@ -136,19 +170,11 @@ public class ClassPathXmlApplicationContextFactory implements ApplicationContext
 	 */
 	public ConfigurableApplicationContext createApplicationContext() {
 
-		if (path == null) {
+		if (resource == null) {
 			return parent;
 		}
 
-		if (context == null) {
-			// Lazy initialization of cached context
-			synchronized (lock) {
-				if (context == null) {
-					context = new ResourceXmlApplicationContext(parent);
-				}
-			}
-		}
-		return context;
+		return new ResourceXmlApplicationContext(parent);
 
 	}
 
@@ -188,7 +214,7 @@ public class ClassPathXmlApplicationContextFactory implements ApplicationContext
 
 		@Override
 		protected Resource[] getConfigResources() {
-			return new Resource[] { path };
+			return new Resource[] { resource };
 		}
 
 	}
@@ -218,7 +244,8 @@ public class ClassPathXmlApplicationContextFactory implements ApplicationContext
 	/**
 	 * Extension point for special subclasses that want to do more complex
 	 * things with the bean factory prior to refresh. The default implementation
-	 * copies all configuration from the parent according to the flag set.
+	 * copies all configuration from the parent according to the
+	 * {@link #setCopyConfiguration(boolean) flag} set.
 	 * 
 	 * @param parent the parent bean factory for the new context (will never be
 	 * null)
@@ -231,7 +258,16 @@ public class ClassPathXmlApplicationContextFactory implements ApplicationContext
 	protected void prepareBeanFactory(DefaultListableBeanFactory parent, DefaultListableBeanFactory beanFactory) {
 		if (copyConfiguration && parent != null) {
 			beanFactory.copyConfigurationFrom(parent);
+			@SuppressWarnings("unchecked")
+			List<BeanPostProcessor> beanPostProcessors = beanFactory.getBeanPostProcessors();
+			for (BeanPostProcessor beanPostProcessor : new ArrayList<BeanPostProcessor>(beanPostProcessors)) {
+				for (Class<?> cls : beanPostProcessorExcludeClasses) {
+					if (cls.isAssignableFrom(beanPostProcessor.getClass())) {
+						logger.debug("Removing bean post processor: " + beanPostProcessor + " of type " + cls);
+						beanPostProcessors.remove(beanPostProcessor);
+					}
+				}
+			}
 		}
 	}
-
 }

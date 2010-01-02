@@ -1,16 +1,18 @@
 package org.springframework.batch.core.configuration.support;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
+import java.util.ArrayList;
 import java.util.Collection;
 
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.batch.core.Job;
-import org.springframework.batch.core.launch.NoSuchJobException;
 import org.springframework.beans.factory.BeanCreationException;
+import org.springframework.context.ApplicationContext;
 import org.springframework.context.event.ContextClosedEvent;
 import org.springframework.context.event.ContextRefreshedEvent;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
@@ -20,18 +22,21 @@ import org.springframework.core.io.Resource;
 
 /**
  * 
- * 
+ * @author Dave Syer
  * @author Lucas Ward
  * 
  */
-public class ClassPathXmlJobLoaderTests {
+public class AutomaticJobRegistrarTests {
 
-	private ClassPathXmlJobLoader loader = new ClassPathXmlJobLoader();
+	private AutomaticJobRegistrar registrar = new AutomaticJobRegistrar();
+
 	private MapJobRegistry registry = new MapJobRegistry();
-	
+
 	@Before
 	public void setUp() {
-		loader.setJobRegistry(registry);
+		DefaultJobLoader jobLoader = new DefaultJobLoader();
+		jobLoader.setJobRegistry(registry);
+		registrar.setJobLoader(jobLoader);
 	}
 
 	@Test
@@ -41,11 +46,11 @@ public class ClassPathXmlJobLoaderTests {
 				new ClassPathResource("org/springframework/batch/core/launch/support/job.xml"),
 				new ClassPathResource("org/springframework/batch/core/launch/support/job2.xml") };
 
-		loader.setJobPaths(jobPaths);
 		GenericApplicationContext applicationContext = new GenericApplicationContext();
 		applicationContext.refresh();
-		loader.setApplicationContext(applicationContext);
-		loader.initialize();
+		setUpApplicationContextFactories(jobPaths, applicationContext);
+		registrar.setApplicationContext(applicationContext);
+		registrar.start();
 
 		Collection<String> names = registry.getJobNames();
 		assertEquals(2, names.size());
@@ -58,16 +63,16 @@ public class ClassPathXmlJobLoaderTests {
 		assertEquals("test-job2", job.getName());
 	}
 
-	@Test(expected = NoSuchJobException.class)
+	@Test
 	public void testNoJobFound() throws Exception {
 
 		Resource[] jobPaths = new Resource[] { new ClassPathResource(
 				"org/springframework/batch/core/launch/support/test-environment.xml") };
-		loader.setJobPaths(jobPaths);
 		GenericApplicationContext applicationContext = new GenericApplicationContext();
 		applicationContext.refresh();
-		loader.setApplicationContext(applicationContext);
-		loader.initialize();
+		setUpApplicationContextFactories(jobPaths, applicationContext);
+		registrar.setApplicationContext(applicationContext);
+		registrar.start();
 	}
 
 	@Test
@@ -75,11 +80,11 @@ public class ClassPathXmlJobLoaderTests {
 
 		Resource[] jobPaths = new Resource[] { new ClassPathResource(
 				"org/springframework/batch/core/launch/support/2jobs.xml") };
-		loader.setJobPaths(jobPaths);
 		GenericApplicationContext applicationContext = new GenericApplicationContext();
 		applicationContext.refresh();
-		loader.setApplicationContext(applicationContext);
-		loader.initialize();
+		setUpApplicationContextFactories(jobPaths, applicationContext);
+		registrar.setApplicationContext(applicationContext);
+		registrar.start();
 		assertEquals(2, registry.getJobNames().size());
 	}
 
@@ -88,10 +93,11 @@ public class ClassPathXmlJobLoaderTests {
 
 		Resource[] jobPaths = new Resource[] { new ClassPathResource(
 				"org/springframework/batch/core/launch/support/2jobs.xml") };
-		loader.setApplicationContext(new ClassPathXmlApplicationContext(
-				"/org/springframework/batch/core/launch/support/test-environment-with-registry-and-auto-register.xml"));
-		loader.setJobPaths(jobPaths);
-		loader.initialize();
+		ClassPathXmlApplicationContext applicationContext = new ClassPathXmlApplicationContext(
+				"/org/springframework/batch/core/launch/support/test-environment-with-registry-and-auto-register.xml");
+		registrar.setApplicationContext(applicationContext);
+		setUpApplicationContextFactories(jobPaths, applicationContext);
+		registrar.start();
 		assertEquals(2, registry.getJobNames().size());
 	}
 
@@ -101,9 +107,9 @@ public class ClassPathXmlJobLoaderTests {
 		Resource[] jobPaths = new Resource[] {
 				new ClassPathResource("org/springframework/batch/core/launch/support/2jobs.xml"),
 				new ClassPathResource("org/springframework/batch/core/launch/support/error.xml") };
-		loader.setJobPaths(jobPaths);
+		setUpApplicationContextFactories(jobPaths, null);
 		try {
-			loader.initialize();
+			registrar.start();
 			fail("Expected BeanCreationException");
 		}
 		catch (BeanCreationException e) {
@@ -112,15 +118,30 @@ public class ClassPathXmlJobLoaderTests {
 	}
 
 	@Test
-	public void testDestroy() throws Exception {
+	public void testClear() throws Exception {
 
 		Resource[] jobPaths = new Resource[] { new ClassPathResource(
 				"org/springframework/batch/core/launch/support/2jobs.xml") };
-		loader.setJobPaths(jobPaths);
-		loader.initialize();
+		setUpApplicationContextFactories(jobPaths, null);
+		registrar.start();
 		assertEquals(2, registry.getJobNames().size());
-		loader.clear();
+		registrar.stop();
 		assertEquals(0, registry.getJobNames().size());
+
+	}
+
+	@Test
+	public void testStartStopRunning() throws Exception {
+
+		Resource[] jobPaths = new Resource[] { new ClassPathResource(
+				"org/springframework/batch/core/launch/support/2jobs.xml") };
+		setUpApplicationContextFactories(jobPaths, null);
+		registrar.start();
+		assertTrue(registrar.isRunning());
+		registrar.start();
+		assertEquals(2, registry.getJobNames().size());
+		registrar.stop();
+		assertFalse(registrar.isRunning());
 
 	}
 
@@ -129,30 +150,42 @@ public class ClassPathXmlJobLoaderTests {
 
 		Resource[] jobPaths = new Resource[] { new ClassPathResource(
 				"org/springframework/batch/core/launch/support/2jobs.xml") };
-		loader.setApplicationContext(new ClassPathXmlApplicationContext(
+		registrar.setApplicationContext(new ClassPathXmlApplicationContext(
 				"/org/springframework/batch/core/launch/support/test-environment-with-registry-and-auto-register.xml"));
-		loader.setJobPaths(jobPaths);
 		GenericApplicationContext applicationContext = new GenericApplicationContext();
 		applicationContext.refresh();
-		loader.setApplicationContext(applicationContext);
-		loader.onApplicationEvent(new ContextRefreshedEvent(applicationContext));
+		setUpApplicationContextFactories(jobPaths, applicationContext);
+		registrar.setApplicationContext(applicationContext);
+		registrar.onApplicationEvent(new ContextRefreshedEvent(applicationContext));
 		assertEquals(2, registry.getJobNames().size());
 	}
 
 	@Test
-	public void testDestroyCalledOnContextClosed() throws Exception {
+	public void testClearCalledOnContextClosed() throws Exception {
 
 		Resource[] jobPaths = new Resource[] { new ClassPathResource(
 				"org/springframework/batch/core/launch/support/2jobs.xml") };
-		loader.setJobPaths(jobPaths);
 		GenericApplicationContext applicationContext = new GenericApplicationContext();
 		applicationContext.refresh();
-		loader.setApplicationContext(applicationContext);
-		loader.initialize();
+		setUpApplicationContextFactories(jobPaths, applicationContext);
+		registrar.setApplicationContext(applicationContext);
+		registrar.start();
 		assertEquals(2, registry.getJobNames().size());
-		loader.onApplicationEvent(new ContextClosedEvent(applicationContext));
+		registrar.onApplicationEvent(new ContextClosedEvent(applicationContext));
 		assertEquals(0, registry.getJobNames().size());
 
+	}
+
+	private void setUpApplicationContextFactories(Resource[] jobPaths, ApplicationContext parent) {
+		Collection<ApplicationContextFactory> applicationContextFactories = new ArrayList<ApplicationContextFactory>();
+		for (Resource resource : jobPaths) {
+			ClassPathXmlApplicationContextFactory factory = new ClassPathXmlApplicationContextFactory();
+			factory.setResource(resource);
+			factory.setApplicationContext(parent);
+			applicationContextFactories.add(factory);
+		}
+		registrar.setApplicationContextFactories(applicationContextFactories
+				.toArray(new ApplicationContextFactory[jobPaths.length]));
 	}
 
 }

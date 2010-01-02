@@ -64,7 +64,6 @@
 		<config>src/test/resources/org/springframework/batch/core/scope/util/PlaceholderTargetSourceErrorTests-context.xml</config>
 		<config>src/test/resources/org/springframework/batch/core/configuration/support/child-context.xml</config>
 		<config>src/test/resources/org/springframework/batch/core/configuration/xml/ChunkElementParentAttributeParserTests-context.xml</config>
-		<config>src/test/resources/org/springframework/batch/core/configuration/support/ClassPathXmlJobLoaderContextTests-context.xml</config>
 		<config>src/test/resources/org/springframework/batch/core/configuration/xml/DuplicateTransitionJobParserTests-context.xml</config>
 		<config>src/test/resources/org/springframework/batch/core/launch/support/error.xml</config>
 		<config>src/test/resources/org/springframework/batch/core/step/item/FaultTolerantExceptionClassesTests-context.xml</config>
@@ -103,6 +102,7 @@
 		<config>src/test/resources/org/springframework/batch/core/configuration/xml/PartitionStepParserTests-context.xml</config>
 		<config>src/test/resources/org/springframework/batch/core/configuration/xml/ChunkElementSkipPolicyParserTests-context.xml</config>
 		<config>src/test/resources/org/springframework/batch/core/configuration/xml/JobStepParserTests-context.xml</config>
+		<config>src/test/resources/org/springframework/batch/core/configuration/support/AutomaticJobRegistrarContextTests-context.xml</config>
 	</configs>
 	<configSets>
 		<configSet>

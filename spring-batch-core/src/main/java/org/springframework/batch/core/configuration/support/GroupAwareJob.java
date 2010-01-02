@@ -24,7 +24,7 @@ import org.springframework.batch.core.JobParametersIncrementer;
  * to make it fit a naming convention for type or origin. E.g. the source job
  * might be <code>overnightJob</code> and the group
  * <code>financeDepartment</code>, which would result in a {@link Job} with
- * identical functionality but named <code>financeDepartment$overnightJob</code>
+ * identical functionality but named <code>financeDepartment.overnightJob</code>
  * . The use of a "." separator for elements is deliberate, since it is a "safe"
  * character in a <a href="http://www.w3.org/Addressing/URL">URL</a>.
  * 

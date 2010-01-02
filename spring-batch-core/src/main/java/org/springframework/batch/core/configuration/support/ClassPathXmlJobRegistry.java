@@ -5,7 +5,7 @@ package org.springframework.batch.core.configuration.support;
  * 
  * @author Dave Syer
  *
- * @deprecated in version 2.1, please us {@link ClassPathXmlJobLoader} instead
+ * @deprecated in version 2.1, please us {@link AutomaticJobRegistrar} instead
  */
 public abstract class ClassPathXmlJobRegistry {
 

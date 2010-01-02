@@ -25,10 +25,10 @@ import org.springframework.osgi.context.BundleContextAware;
 import org.springframework.osgi.context.support.OsgiBundleXmlApplicationContext;
 
 /**
- * @author Dave Syer
+ * {@link ApplicationContextFactory} that can be used to load a context from an
+ * XML location in a bundle.
  * 
- * @deprecated with no plans to replace (stateful creation of application
- * context should no longer be required as it was in Spring Batch 1.1.x)
+ * @author Dave Syer
  * 
  */
 public class OsgiBundleXmlApplicationContextFactory implements BundleContextAware, ApplicationContextFactory,

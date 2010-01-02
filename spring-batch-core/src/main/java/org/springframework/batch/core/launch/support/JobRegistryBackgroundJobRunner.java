@@ -18,9 +18,7 @@ package org.springframework.batch.core.launch.support;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.Collections;
-import java.util.HashSet;
 import java.util.List;
 
 import org.apache.commons.logging.Log;
@@ -30,13 +28,12 @@ import org.springframework.batch.core.configuration.DuplicateJobException;
 import org.springframework.batch.core.configuration.JobFactory;
 import org.springframework.batch.core.configuration.JobRegistry;
 import org.springframework.batch.core.configuration.support.ClassPathXmlApplicationContextFactory;
-import org.springframework.batch.core.configuration.support.JobRegistryBeanPostProcessor;
-import org.springframework.batch.core.configuration.support.ReferenceJobFactory;
+import org.springframework.batch.core.configuration.support.DefaultJobLoader;
+import org.springframework.batch.core.configuration.support.JobLoader;
 import org.springframework.batch.core.launch.JobLauncher;
 import org.springframework.beans.factory.BeanFactory;
 import org.springframework.beans.factory.config.AutowireCapableBeanFactory;
 import org.springframework.context.ApplicationContext;
-import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 import org.springframework.core.io.Resource;
 import org.springframework.util.Assert;
@@ -74,7 +71,7 @@ public class JobRegistryBackgroundJobRunner {
 
 	private static Log logger = LogFactory.getLog(JobRegistryBackgroundJobRunner.class);
 
-	private JobRegistry registry;
+	private JobLoader jobLoader;
 
 	private ApplicationContext parentContext = null;
 
@@ -82,7 +79,7 @@ public class JobRegistryBackgroundJobRunner {
 
 	final private String parentContextPath;
 
-	private Collection<ConfigurableApplicationContext> contexts = new HashSet<ConfigurableApplicationContext>();
+	private JobRegistry jobRegistry;
 
 	private static List<Exception> errors = Collections.synchronizedList(new ArrayList<Exception>());
 
@@ -95,11 +92,21 @@ public class JobRegistryBackgroundJobRunner {
 	}
 
 	/**
-	 * Public setter for the {@link JobRegistry}.
-	 * @param registry the registry to set
+	 * A loader for the jobs that are going to be registered.
+	 * 
+	 * @param jobLoader the {@link JobLoader} to set
 	 */
-	public void setRegistry(JobRegistry registry) {
-		this.registry = registry;
+	public void setJobLoader(JobLoader jobLoader) {
+		this.jobLoader = jobLoader;
+	}
+	
+	/**
+	 * A job registry that can be used to create a job loader (if none is provided).
+	 * 
+	 * @param jobRegistry the {@link JobRegistry} to set
+	 */
+	public void setJobRegistry(JobRegistry jobRegistry) {
+		this.jobRegistry = jobRegistry;
 	}
 
 	/**
@@ -115,9 +122,10 @@ public class JobRegistryBackgroundJobRunner {
 
 	private void register(String[] paths) throws DuplicateJobException, IOException {
 
+		maybeCreateJobLoader();
+
 		for (int i = 0; i < paths.length; i++) {
 
-			boolean postProcessorExists = parentContext.getBeanNamesForType(JobRegistryBeanPostProcessor.class).length > 0;
 			Resource[] resources = parentContext.getResources(paths[i]);
 
 			for (int j = 0; j < resources.length; j++) {
@@ -125,21 +133,10 @@ public class JobRegistryBackgroundJobRunner {
 				Resource path = resources[j];
 				logger.info("Registering Job definitions from " + Arrays.toString(resources));
 
-				ConfigurableApplicationContext context = createApplicationContext(parentContext, path);
-				contexts.add(context);
-				String[] names = context.getBeanNamesForType(Job.class);
-
-				Collection<String> registered = registry.getJobNames();
-				// If there is a JobRegistryBeanPostProcessor in there already
-				// then they can be registered automatically
-				for (String name : names) {
-					if (!registered.contains(name) && postProcessorExists) {
-						logger.debug("Registering job: " + name + " from context: " + path);
-						JobFactory jobFactory = new ReferenceJobFactory((Job) context.getBean(name));
-						registry.register(jobFactory);
-					}
-				}
-
+				ClassPathXmlApplicationContextFactory factory = new ClassPathXmlApplicationContextFactory();
+				factory.setApplicationContext(parentContext);
+				factory.setResource(path);
+				jobLoader.load(factory);
 			}
 
 		}
@@ -147,22 +144,30 @@ public class JobRegistryBackgroundJobRunner {
 	}
 
 	/**
-	 * Create an application context from the resource provided. Extension point
-	 * for subclasses if they need to customize the context in any way. The
-	 * default uses a {@link ClassPathXmlApplicationContextFactory}.
-	 * 
-	 * @param parent the parent application context (or null if there is none)
-	 * @param resource the location of the XML configuration
-	 * 
-	 * @return an application context containing jobs
+	 * If there is no {@link JobLoader} then try and create one from existing
+	 * bean definitions.
 	 */
-	protected ConfigurableApplicationContext createApplicationContext(ApplicationContext parent, Resource resource) {
-		ClassPathXmlApplicationContextFactory applicationContextFactory = new ClassPathXmlApplicationContextFactory();
-		applicationContextFactory.setPath(resource);
-		if (parent != null) {
-			applicationContextFactory.setApplicationContext(parent);
+	private void maybeCreateJobLoader() {
+
+		if (jobLoader != null) {
+			return;
 		}
-		return applicationContextFactory.createApplicationContext();
+
+		String[] names = parentContext.getBeanNamesForType(JobLoader.class);
+		if (names.length == 0) {
+			if (parentContext.containsBean("jobLoader")) {
+				jobLoader = (JobLoader) parentContext.getBean("jobLoader", JobLoader.class);
+				return;
+			}
+			if (jobRegistry != null) {
+				jobLoader = new DefaultJobLoader(jobRegistry);
+				return;
+			}
+		}
+
+		jobLoader = (JobLoader) parentContext.getBean(names[0], JobLoader.class);
+		return;
+
 	}
 
 	/**
@@ -249,15 +254,7 @@ public class JobRegistryBackgroundJobRunner {
 	 * @see org.springframework.beans.factory.DisposableBean#destroy()
 	 */
 	private void destroy() throws Exception {
-		for (ConfigurableApplicationContext context : contexts) {
-			if (context.isActive()) {
-				context.close();
-			}
-		}
-		for (String jobName : registry.getJobNames()) {
-			registry.unregister(jobName);
-		}
-		contexts.clear();
+		jobLoader.clear();
 	}
 
 	private void run() {

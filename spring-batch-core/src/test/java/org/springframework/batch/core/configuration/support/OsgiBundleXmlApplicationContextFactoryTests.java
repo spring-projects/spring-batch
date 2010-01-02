@@ -30,7 +30,6 @@ import org.springframework.util.ClassUtils;
  * @author Dave Syer
  *
  */
-@SuppressWarnings("deprecation")
 public class OsgiBundleXmlApplicationContextFactoryTests {
 	
 	private OsgiBundleXmlApplicationContextFactory factory = new OsgiBundleXmlApplicationContextFactory();

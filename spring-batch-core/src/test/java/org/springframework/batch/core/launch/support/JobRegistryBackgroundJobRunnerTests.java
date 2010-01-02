@@ -48,6 +48,14 @@ public class JobRegistryBackgroundJobRunnerTests {
 		assertEquals(0, JobRegistryBackgroundJobRunner.getErrors().size());
 	}
 
+	@Test
+	public void testMainWithJobLoader() throws Exception {
+		JobRegistryBackgroundJobRunner.main(
+				ClassUtils.addResourcePathToPackagePath(getClass(), "test-environment-with-loader.xml"), ClassUtils
+						.addResourcePathToPackagePath(getClass(), "job.xml"));
+		assertEquals(0, JobRegistryBackgroundJobRunner.getErrors().size());
+	}
+
 	@Before
 	public void setUp() throws Exception {
 		JobRegistryBackgroundJobRunner.getErrors().clear();
