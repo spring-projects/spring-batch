@@ -41,7 +41,7 @@ public class DefaultJobLoader implements JobLoader {
 	private Collection<ConfigurableApplicationContext> contexts = new HashSet<ConfigurableApplicationContext>();
 	
 	/**
-	 * Default constructor useful for decalarative configuration. 
+	 * Default constructor useful for declarative configuration. 
 	 */
 	public DefaultJobLoader() {
 		this(null);
