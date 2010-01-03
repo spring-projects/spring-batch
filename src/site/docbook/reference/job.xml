@@ -774,17 +774,81 @@ public class JobLauncherController {
 
       <programlisting>&lt;bean id="jobRegistry" class="org.spr...MapJobRegistry" /&gt;</programlisting>
 
-      <para>A common use case is to use this registry together with a bean
-      post-processor that can register all jobs as they are created:</para>
+      <para>There are two ways to populate a JobRegistry automatically: using
+      a bean post processor and using a registrar lifecycle component. These
+      two mechanisms are described in the following sections.</para>
 
-      <programlisting>&lt;bean id="jobRegistryBeanPostProcessor" class="org.spr...JobRegistryBeanPostProcessor"&gt;
+      <section>
+        <title>JobRegistryBeanPostProcessor</title>
+
+        <para>This is a bean post-processor that can register all jobs as they
+        are created:</para>
+
+        <programlisting>&lt;bean id="jobRegistryBeanPostProcessor" class="org.spr...JobRegistryBeanPostProcessor"&gt;
     &lt;property name="jobRegistry" ref="jobRegistry"/&gt;
 &lt;/bean&gt;</programlisting>
 
-      <para>Athough it is not strictly necessary the post-processor in the
-      example has been given an id so that it can be included in child
-      contexts (e.g. as a parent bean definition) and cause all jobs created
-      there to also be regsistered automatically. </para>
+        <para>Athough it is not strictly necessary the post-processor in the
+        example has been given an id so that it can be included in child
+        contexts (e.g. as a parent bean definition) and cause all jobs created
+        there to also be regsistered automatically.</para>
+      </section>
+
+      <section>
+        <title>AutomaticJobRegistrar</title>
+
+        <para>This is a lifecycle component that creates child contexts and
+        registers jobs from those contexts as they are created. One advantage
+        of doing this is that, while the job names in the child contexts still
+        have to be globally unique in the registry, their dependencies can
+        have "natural" names. So for example, you can create a set of XML
+        configuration files each having only one <classname>Job</classname>,
+        but all having different definitions of an
+        <classname>ItemReader</classname> with the same bean name, e.g.
+        "reader". If all those files were imported into the same context, the
+        reader definitions would clash and override one another, but with the
+        automatic regsistrar this is avoided. This makes it easier to
+        integrate jobs contributed from separate modules of an
+        application.</para>
+
+        <programlisting>&lt;bean class="org.spr...AutomaticJobRegistrar"&gt;
+   &lt;property name="applicationContextFactories"&gt;
+      &lt;bean class="org.spr...ClasspathXmlApplicationContextsFactoryBean"&gt;
+         &lt;property name="resources" value="classpath*:/config/job*.xml" /&gt;
+      &lt;/bean&gt;
+   &lt;/property&gt;
+   &lt;property name="jobLoader"&gt;
+      &lt;bean class="org.spr...DefaultJobLoader"&gt;
+         &lt;property name="jobRegistry" ref="jobRegistry" /&gt;
+      &lt;/bean&gt;
+   &lt;/property&gt;
+&lt;/bean&gt;</programlisting>
+
+        <para>The registrar has two mandatory properties, one is an array of
+        <classname>ApplicationContextFactory</classname> (here created from a
+        convenient factory bean), and the other is a
+        <classname>JobLoader</classname>. The <classname>JobLoader</classname>
+        is responsible for managing the lifecycle of the child contexts and
+        registering jobs in the <classname>JobRegistry</classname>.</para>
+
+        <para>The <classname>ApplicationContextFactory</classname> is
+        responsible for creating the child context and the most common usage
+        would be as above using a
+        <classname>ClassPathXmlApplicationContextFactory</classname>. One of
+        the features of this factory is that by default it copies some of the
+        configuration down from the parent context to the child. So for
+        instance you don't have to re-define the
+        <classname>PropertyPlaceholderConfigurer</classname> or AOP
+        configuration in the child, if it should be the same as the
+        parent.</para>
+
+        <para>The <classname>AutomaticJobRegistrar</classname> can be used in
+        conjunction with a <classname>JobRegistryBeanPostProcessor</classname>
+        if desired (as long as the <classname>DefaultJobLoader</classname> is
+        used as well). For instance this might be desirable if there are jobs
+        defined in the main parent context as well as in the child
+        locations.</para>
+      </section>
     </section>
 
     <section id="JobOperator">
