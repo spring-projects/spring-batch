@@ -53,14 +53,27 @@ public class ClassPathXmlApplicationContextFactory implements ApplicationContext
 	private Resource resource;
 
 	private ConfigurableApplicationContext parent;
-	
+
 	private boolean copyConfiguration = true;
 
 	private Collection<Class<? extends BeanFactoryPostProcessor>> beanFactoryPostProcessorClasses;
 
 	private Collection<Class<?>> beanPostProcessorExcludeClasses;
 
+	/**
+	 * Convenient constructor for configuration purposes.
+	 */
 	public ClassPathXmlApplicationContextFactory() {
+		this(null);
+	}
+
+	/**
+	 * Create a factory instance with the resource specified. The resource is a
+	 * Spring XML configuration file.
+	 */
+	public ClassPathXmlApplicationContextFactory(Resource resource) {
+
+		this.resource = resource;
 		beanFactoryPostProcessorClasses = new ArrayList<Class<? extends BeanFactoryPostProcessor>>();
 		beanFactoryPostProcessorClasses.add(PropertyPlaceholderConfigurer.class);
 		beanFactoryPostProcessorClasses.add(CustomEditorConfigurer.class);
@@ -80,7 +93,8 @@ public class ClassPathXmlApplicationContextFactory implements ApplicationContext
 	 * {@link ApplicationContext}. Use imports to centralise the configuration
 	 * in one file.
 	 * 
-	 * @param resource the resource path to the xml to load for the child context.
+	 * @param resource the resource path to the xml to load for the child
+	 * context.
 	 */
 	public void setResource(Resource resource) {
 		this.resource = resource;
@@ -156,7 +170,7 @@ public class ClassPathXmlApplicationContextFactory implements ApplicationContext
 	 * @see org.springframework.context.ApplicationContextAware#setApplicationContext(org.springframework.context.ApplicationContext)
 	 */
 	public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
-		if (applicationContext==null) {
+		if (applicationContext == null) {
 			return;
 		}
 		Assert.isInstanceOf(ConfigurableApplicationContext.class, applicationContext);
@@ -270,4 +284,24 @@ public class ClassPathXmlApplicationContextFactory implements ApplicationContext
 			}
 		}
 	}
+
+	@Override
+	public String toString() {
+		return "ClassPathXmlApplicationContextFactory [resource=" + resource + "]";
+	}
+
+	@Override
+	public int hashCode() {
+		return toString().hashCode();
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		return toString().equals(obj.toString());
+	}
+
 }

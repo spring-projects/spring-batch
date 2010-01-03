@@ -24,6 +24,7 @@ import org.springframework.beans.factory.config.BeanFactoryPostProcessor;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 import org.springframework.core.io.ClassPathResource;
+import org.springframework.core.io.Resource;
 import org.springframework.util.ClassUtils;
 
 /**
@@ -36,30 +37,36 @@ public class ClassPathXmlApplicationContextFactoryTests {
 
 	@Test
 	public void testCreateJob() {
-		factory.setResource(new ClassPathResource(ClassUtils.addResourcePathToPackagePath(getClass(), "trivial-context.xml")));
+		factory.setResource(new ClassPathResource(ClassUtils.addResourcePathToPackagePath(getClass(),
+				"trivial-context.xml")));
 		assertNotNull(factory.createApplicationContext());
 	}
 
 	@Test
 	public void testGetJobName() {
-		factory.setResource(new ClassPathResource(ClassUtils.addResourcePathToPackagePath(getClass(), "trivial-context.xml")));
+		factory.setResource(new ClassPathResource(ClassUtils.addResourcePathToPackagePath(getClass(),
+				"trivial-context.xml")));
 		assertEquals("test-job", factory.createApplicationContext().getBeanNamesForType(Job.class)[0]);
 	}
 
 	@Test
 	public void testParentConfigurationInherited() {
-		factory.setApplicationContext(new ClassPathXmlApplicationContext(ClassUtils.addResourcePathToPackagePath(getClass(), "parent-context.xml")));
-		factory.setResource(new ClassPathResource(ClassUtils.addResourcePathToPackagePath(getClass(), "child-context.xml")));
+		factory.setApplicationContext(new ClassPathXmlApplicationContext(ClassUtils.addResourcePathToPackagePath(
+				getClass(), "parent-context.xml")));
+		factory.setResource(new ClassPathResource(ClassUtils.addResourcePathToPackagePath(getClass(),
+				"child-context.xml")));
 		ConfigurableApplicationContext context = factory.createApplicationContext();
 		assertEquals("test-job", context.getBeanNamesForType(Job.class)[0]);
 		assertEquals("bar", ((Job) context.getBean("test-job", Job.class)).getName());
 		assertEquals(4, ((Foo) context.getBean("foo", Foo.class)).values[1], 0.01);
 	}
-	
+
 	@Test
 	public void testBeanFactoryPostProcessorsNotCopied() {
-		factory.setApplicationContext(new ClassPathXmlApplicationContext(ClassUtils.addResourcePathToPackagePath(getClass(), "parent-context.xml")));
-		factory.setResource(new ClassPathResource(ClassUtils.addResourcePathToPackagePath(getClass(), "child-context.xml")));
+		factory.setApplicationContext(new ClassPathXmlApplicationContext(ClassUtils.addResourcePathToPackagePath(
+				getClass(), "parent-context.xml")));
+		factory.setResource(new ClassPathResource(ClassUtils.addResourcePathToPackagePath(getClass(),
+				"child-context.xml")));
 		@SuppressWarnings("unchecked")
 		Class<? extends BeanFactoryPostProcessor>[] classes = (Class<? extends BeanFactoryPostProcessor>[]) new Class<?>[0];
 		factory.setBeanFactoryPostProcessorClasses(classes);
@@ -68,21 +75,36 @@ public class ClassPathXmlApplicationContextFactoryTests {
 		assertEquals("${foo}", ((Job) context.getBean("test-job", Job.class)).getName());
 		assertEquals(4, ((Foo) context.getBean("foo", Foo.class)).values[1], 0.01);
 	}
-	
+
 	@Test
 	public void testBeanFactoryConfigurationNotCopied() {
-		factory.setApplicationContext(new ClassPathXmlApplicationContext(ClassUtils.addResourcePathToPackagePath(getClass(), "parent-context.xml")));
-		factory.setResource(new ClassPathResource(ClassUtils.addResourcePathToPackagePath(getClass(), "child-context.xml")));
+		factory.setApplicationContext(new ClassPathXmlApplicationContext(ClassUtils.addResourcePathToPackagePath(
+				getClass(), "parent-context.xml")));
+		factory.setResource(new ClassPathResource(ClassUtils.addResourcePathToPackagePath(getClass(),
+				"child-context.xml")));
 		factory.setCopyConfiguration(false);
 		ConfigurableApplicationContext context = factory.createApplicationContext();
 		assertEquals("test-job", context.getBeanNamesForType(Job.class)[0]);
 		assertEquals("bar", ((Job) context.getBean("test-job", Job.class)).getName());
-		// The CustomEditorConfigurer is a BeanFactoryPostProcessor so the editor gets copied anyway!
+		// The CustomEditorConfigurer is a BeanFactoryPostProcessor so the
+		// editor gets copied anyway!
 		assertEquals(4, ((Foo) context.getBean("foo", Foo.class)).values[1], 0.01);
 	}
-	
+
+	@Test
+	public void testEquals() throws Exception {
+		Resource resource = new ClassPathResource(ClassUtils.addResourcePathToPackagePath(getClass(),
+				"child-context.xml"));
+		factory.setResource(resource);
+		ClassPathXmlApplicationContextFactory other = new ClassPathXmlApplicationContextFactory();
+		other.setResource(resource);
+		assertEquals(other, factory);
+		assertEquals(other.hashCode(), factory.hashCode());
+	}
+
 	public static class Foo {
 		private double[] values;
+
 		public void setValues(double[] values) {
 			this.values = values;
 		}

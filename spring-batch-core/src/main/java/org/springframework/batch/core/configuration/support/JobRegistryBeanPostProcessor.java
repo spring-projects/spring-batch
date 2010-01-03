@@ -18,6 +18,8 @@ package org.springframework.batch.core.configuration.support;
 import java.util.Collection;
 import java.util.HashSet;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.configuration.DuplicateJobException;
 import org.springframework.batch.core.configuration.JobLocator;
@@ -44,6 +46,8 @@ import org.springframework.util.Assert;
  */
 public class JobRegistryBeanPostProcessor implements BeanPostProcessor, BeanFactoryAware, InitializingBean,
 		DisposableBean {
+
+	private static Log logger = LogFactory.getLog(JobRegistryBeanPostProcessor.class);
 
 	// It doesn't make sense for this to have a default value...
 	private JobRegistry jobRegistry = null;
@@ -106,6 +110,7 @@ public class JobRegistryBeanPostProcessor implements BeanPostProcessor, BeanFact
 	 */
 	public void destroy() throws Exception {
 		for (String name : jobNames) {
+			logger.debug("Unregistering job: " + name);
 			jobRegistry.unregister(name);
 		}
 		jobNames.clear();
@@ -128,8 +133,10 @@ public class JobRegistryBeanPostProcessor implements BeanPostProcessor, BeanFact
 				}
 				job = groupName==null ? job : new GroupAwareJob(groupName, job);
 				ReferenceJobFactory jobFactory = new ReferenceJobFactory(job);
+				String name = jobFactory.getJobName();
+				logger.debug("Registering job: " + name);
 				jobRegistry.register(jobFactory);
-				jobNames.add(jobFactory.getJobName());
+				jobNames.add(name);
 			}
 			catch (DuplicateJobException e) {
 				throw new FatalBeanException("Cannot register job configuration", e);

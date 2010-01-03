@@ -91,4 +91,25 @@ public class OsgiBundleXmlApplicationContextFactory implements BundleContextAwar
 		return context;
 	}
 
+	@Override
+	public String toString() {
+		String bundleId = bundleContext == null ? null : (bundleContext.getBundle() == null ? bundleContext.toString()
+				: "" + bundleContext.getBundle().getBundleId());
+		return "OsgiBundleXmlApplicationContext [path=" + path + ", bundle=" + bundleId + "]";
+	}
+
+	@Override
+	public int hashCode() {
+		return toString().hashCode();
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		return toString().equals(obj.toString());
+	}
+
 }

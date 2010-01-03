@@ -20,6 +20,7 @@ import static org.easymock.EasyMock.createNiceMock;
 import static org.easymock.EasyMock.expect;
 import static org.easymock.EasyMock.replay;
 import static org.easymock.EasyMock.verify;
+import static org.junit.Assert.assertEquals;
 
 import org.junit.Test;
 import org.osgi.framework.Bundle;
@@ -48,6 +49,15 @@ public class OsgiBundleXmlApplicationContextFactoryTests {
 		factory.setBundleContext(bundleContext);
 		// factory.createApplicationContext();
 		verify(bundleContext, bundle);
+	}
+
+	@Test
+	public void testEquals() throws Exception {
+		factory.setPath("child-context.xml");
+		OsgiBundleXmlApplicationContextFactory other = new OsgiBundleXmlApplicationContextFactory();
+		other.setPath("child-context.xml");
+		assertEquals(other, factory);
+		assertEquals(other.hashCode(), factory.hashCode());
 	}
 
 	/**
