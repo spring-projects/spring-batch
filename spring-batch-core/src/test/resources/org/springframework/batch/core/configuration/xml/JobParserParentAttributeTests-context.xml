@@ -67,17 +67,6 @@
 		</step>
 	</job>
 
-	<job id="jobWithParametersValidator" parameters-validator="parametersValidator">
-		<step id="s8">
-			<tasklet ref="dummyTasklet" />
-		</step>
-	</job>
-	
-	<beans:bean id="parametersValidator"
-		class="org.springframework.batch.core.job.DefaultJobParametersValidator">
-		<beans:property name="requiredKeys" value="name,value"/>
-	</beans:bean>
-
 	<job id="baseSpecifiedRepoJob" abstract="true" job-repository="dummyJobRepository" />
 
 	<job id="baseJob" abstract="true">

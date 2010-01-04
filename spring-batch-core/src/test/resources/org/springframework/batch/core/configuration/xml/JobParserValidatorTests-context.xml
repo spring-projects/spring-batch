@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans:beans xmlns="http://www.springframework.org/schema/batch" xmlns:beans="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.springframework.org/schema/batch http://www.springframework.org/schema/batch/spring-batch-2.1.xsd
+	http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.5.xsd">
+
+	<beans:import resource="common-context.xml" />
+
+	<job id="job1">
+		<step id="s1">
+			<tasklet ref="dummyTasklet" />
+		</step>
+		<validator>
+			<beans:ref bean="parametersValidator" />
+		</validator>
+	</job>
+
+	<job id="job2">
+		<step id="s2">
+			<tasklet ref="dummyTasklet" />
+		</step>
+		<validator>
+			<beans:bean class="org.springframework.batch.core.job.DefaultJobParametersValidator">
+				<beans:property name="requiredKeys" value="name,value" />
+			</beans:bean>
+		</validator>
+	</job>
+
+	<job id="job3">
+		<step id="s3">
+			<tasklet ref="dummyTasklet" />
+		</step>
+		<validator ref="parametersValidator"/>
+	</job>
+
+	<beans:bean id="parametersValidator" class="org.springframework.batch.core.job.DefaultJobParametersValidator">
+		<beans:property name="requiredKeys" value="name,value" />
+	</beans:bean>
+
+</beans:beans>

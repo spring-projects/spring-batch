@@ -18,7 +18,9 @@ package org.springframework.batch.core.configuration.xml;
 import java.util.Arrays;
 import java.util.List;
 
+import org.springframework.beans.BeanMetadataElement;
 import org.springframework.beans.factory.config.BeanDefinition;
+import org.springframework.beans.factory.config.RuntimeBeanReference;
 import org.springframework.beans.factory.parsing.CompositeComponentDefinition;
 import org.springframework.beans.factory.support.BeanDefinitionBuilder;
 import org.springframework.beans.factory.support.ManagedList;
@@ -38,6 +40,12 @@ import org.w3c.dom.Element;
 public class JobParser extends AbstractSingleBeanDefinitionParser {
 
 	private static final String MERGE_ATTR = "merge";
+
+	private static final String REF_ATTR = "ref";
+
+	private static final String BEAN_ELE = "bean";
+
+	private static final String REF_ELE = "ref";
 
 	private static final JobExecutionListenerParser jobListenerParser = new JobExecutionListenerParser();
 
@@ -83,9 +91,9 @@ public class JobParser extends AbstractSingleBeanDefinitionParser {
 			builder.addPropertyReference("jobRepository", repositoryAttribute);
 		}
 
-		String parametersValidator = element.getAttribute("parameters-validator");
-		if (StringUtils.hasText(parametersValidator)) {
-			builder.addPropertyReference("jobParametersValidator", parametersValidator);
+		Element validator = DomUtils.getChildElementByTagName(element, "validator");
+		if (validator != null) {
+			builder.addPropertyValue("jobParametersValidator", parseBeanElement(validator, parserContext));
 		}
 
 		String restartableAttribute = element.getAttribute("restartable");
@@ -139,6 +147,26 @@ public class JobParser extends AbstractSingleBeanDefinitionParser {
 					"The '<listeners/>' element may not appear more than once in a single <job/>.", element);
 		}
 
+	}
+
+	public BeanMetadataElement parseBeanElement(Element element, ParserContext parserContext) {
+		String refAttribute = element.getAttribute(REF_ATTR);
+		Element beanElement = DomUtils.getChildElementByTagName(element, BEAN_ELE);
+		Element refElement = DomUtils.getChildElementByTagName(element, REF_ELE);
+
+		if (StringUtils.hasText(refAttribute)) {
+			return new RuntimeBeanReference(refAttribute);
+		}
+		else if (beanElement != null) {
+			return parserContext.getDelegate().parseBeanDefinitionElement(beanElement);
+		}
+		else if (refElement != null) {
+			return (BeanMetadataElement) parserContext.getDelegate().parsePropertySubElement(refElement, null);
+		}
+
+		parserContext.getReaderContext().error(
+				"One of ref attribute or a nested bean definition or ref element must be specified", element);
+		return null;
 	}
 
 }
