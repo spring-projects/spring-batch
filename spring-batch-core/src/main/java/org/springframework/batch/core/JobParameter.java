@@ -24,6 +24,7 @@ import java.util.Date;
  * can be parameters: String, Long, Date, and Double.
  * 
  * @author Lucas Ward
+ * @author Dave Syer
  * @since 2.0
  * 
  */
@@ -57,7 +58,7 @@ public class JobParameter implements Serializable {
 	 * @param parameter
 	 */
 	public JobParameter(Date parameter) {
-		this.parameter = parameter == null ? null : new Date(parameter.getTime());
+		this.parameter = parameter;
 		parameterType = ParameterType.DATE;
 	}
 
