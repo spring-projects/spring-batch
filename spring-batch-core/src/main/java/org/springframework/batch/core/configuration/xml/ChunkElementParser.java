@@ -19,6 +19,7 @@ import java.util.List;
 
 import org.springframework.beans.MutablePropertyValues;
 import org.springframework.beans.factory.config.RuntimeBeanReference;
+import org.springframework.beans.factory.config.TypedStringValue;
 import org.springframework.beans.factory.parsing.CompositeComponentDefinition;
 import org.springframework.beans.factory.support.AbstractBeanDefinition;
 import org.springframework.beans.factory.support.GenericBeanDefinition;
@@ -295,25 +296,7 @@ public class ChunkElementParser {
 			ManagedMap map, ParserContext parserContext) {
 		for (Element child : (List<Element>) DomUtils.getChildElementsByTagName(exceptionClassesElement, elementName)) {
 			String className = child.getAttribute("class");
-			try {
-				Class<Object> cls = (Class<Object>) Class.forName(className);
-				if (!Throwable.class.isAssignableFrom(cls)) {
-					parserContext.getReaderContext().error(
-							"Non-Throwable class \'" + className + "\' found in <"
-									+ exceptionClassesElement.getNodeName() + "/> element.", exceptionClassesElement);
-				}
-				if (map.containsKey(cls)) {
-					parserContext.getReaderContext().error(
-							"Duplicate entry for class \'" + className + "\' found in <"
-									+ exceptionClassesElement.getNodeName() + "/> element.", exceptionClassesElement);
-				}
-				map.put(cls, include);
-			}
-			catch (ClassNotFoundException e) {
-				parserContext.getReaderContext().error(
-						"Cannot find class \'" + className + "\', given as an attribute of the <" + elementName
-								+ "/> element.", child);
-			}
+				map.put(new TypedStringValue(className, Class.class), include);
 		}
 	}
 
