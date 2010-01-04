@@ -21,8 +21,15 @@ import javax.sql.DataSource;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.springframework.batch.core.BatchStatus;
+import org.springframework.batch.core.Job;
+import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.JobParameters;
-import org.springframework.batch.core.repository.JobRepository;
+import org.springframework.batch.core.StepContribution;
+import org.springframework.batch.core.launch.JobLauncher;
+import org.springframework.batch.core.scope.context.ChunkContext;
+import org.springframework.batch.core.step.tasklet.Tasklet;
+import org.springframework.batch.repeat.RepeatStatus;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.simple.SimpleJdbcTemplate;
 import org.springframework.test.context.ContextConfiguration;
@@ -34,7 +41,10 @@ import org.springframework.test.jdbc.SimpleJdbcTestUtils;
 public class TablePrefixTests {
 
 	@Autowired
-	private JobRepository jobRepository;
+	private JobLauncher jobLauncher;
+
+	@Autowired
+	private Job job;
 
 	private SimpleJdbcTemplate simpleJdbcTemplate;
 
@@ -45,7 +55,17 @@ public class TablePrefixTests {
 
 	@Test
 	public void testJobLaunch() throws Exception {
-		jobRepository.createJobExecution("prefix-test", new JobParameters());
+		JobExecution jobExecution = jobLauncher.run(job, new JobParameters());
+		assertEquals(BatchStatus.COMPLETED, jobExecution.getStatus());
 		assertEquals(1, SimpleJdbcTestUtils.countRowsInTable(simpleJdbcTemplate, "PREFIX_JOB_INSTANCE"));
 	}
+
+	public static class TestTasklet implements Tasklet {
+
+		public RepeatStatus execute(StepContribution contribution, ChunkContext chunkContext) throws Exception {
+			return RepeatStatus.FINISHED;
+		}
+
+	}
+
 }

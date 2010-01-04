@@ -5,6 +5,7 @@
 		<property name="dataSource" ref="dataSource" />
 		<property name="initScripts">
 			<list>
+				<value>org/springframework/batch/core/schema-drop-hsqldb.sql</value>
 				<value>org/springframework/batch/core/schema-hsqldb.sql</value>
 				<value>foo.sql</value>
 			</list>

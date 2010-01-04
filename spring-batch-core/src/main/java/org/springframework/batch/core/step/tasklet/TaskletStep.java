@@ -121,7 +121,7 @@ public class TaskletStep extends AbstractStep {
 	@Override
 	public void afterPropertiesSet() throws Exception {
 		super.afterPropertiesSet();
-		Assert.notNull(transactionManager, "TransactionManager is mandatory");
+		Assert.state(transactionManager!=null, "A transaction manager must be provided");
 	}
 
 	/**
