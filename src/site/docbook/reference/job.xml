@@ -4,8 +4,9 @@
 <chapter id="configureJob">
   <title>Configuring and Running a Job</title>
 
-  <para>In <xref linkend="domain" /> , the overall architecture design was
-  discussed, using the following diagram as a guide:</para>
+  <para>In the <link linkend="domain">domain section</link> , the
+  overall architecture design was discussed, using the following
+  diagram as a guide:</para>
 
   <mediaobject>
     <imageobject role="html">
@@ -35,7 +36,7 @@
     <classname>Job</classname> </link> interface, however, the namespace
     abstracts away the differences in configuration. It has only three
     required dependencies: a name, <classname>JobRepository</classname> , and
-    a list of <classname>Step</classname> s.</para>
+    a list of <classname>Step</classname>s.</para>
 
     <programlisting>&lt;job id="footballJob"&gt;
     &lt;step id="playerload"          parent="s1" next="gameLoad"/&gt;
@@ -43,15 +44,23 @@
     &lt;step id="playerSummarization" parent="s3"/&gt;
 &lt;/job&gt;</programlisting>
 
-    <para>The namespace defaults to referencing a repository with an id of
-    'jobRepository', which is a sensible default. However, this can be
-    overridden explicitly:</para>
+    <para>The examples here use a parent bean definition to create the steps;
+    see the section on <link linkend="configureStep">step configuration</link>
+    for more options declaring specific step details inline. The XML namespace
+    defaults to referencing a repository with an id of 'jobRepository', which
+    is a sensible default. However, this can be overridden explicitly:</para>
 
     <programlisting>&lt;job id="footballJob" <emphasis role="bold">job-repository="specialRepository"</emphasis>&gt;
     &lt;step id="playerload"          parent="s1" next="gameLoad"/&gt;
     &lt;step id="gameLoad"            parent="s3" next="playerSummarization"/&gt;
     &lt;step id="playerSummarization" parent="s3"/&gt;
 &lt;/job&gt;</programlisting>
+
+    <para>In addition to steps a job configuration can contain other elements
+    that help with parallelisation (<literal>&lt;split/&gt;</literal>),
+    declarative flow control (<literal>&lt;decision/&gt;</literal>) and
+    externalization of flow definitions
+    (<literal>&lt;flow/&gt;</literal>).</para>
 
     <section id="restartability">
       <title>Restartability</title>
@@ -194,31 +203,26 @@ catch (JobRestartException e) {
       for more detailed information.</para>
     </section>
 
-    <section id="jobFactoryAndStatefulComponentsInSteps">
-      <title>JobFactory and Stateful Components in Steps</title>
+    <section>
+      <title>JobParametersValidator</title>
 
-      <para>Unlike many traditional Spring applications, many of the
-      components of a batch application are stateful; the file readers and
-      writers are obvious examples. The recommended way to deal with this is
-      to create a fresh <classname>ApplicationContext</classname> for each job
-      execution. If the <classname>Job</classname> is launched from the
-      command line with <classname>CommandLineJobRunner</classname>, this is
-      trivial. For more complex launching scenarios where jobs are executed in
-      parallel or serially from the same process, some extra steps have to be
-      taken to ensure that the <classname>ApplicationContext</classname> is
-      refreshed. This is preferable to using prototype scope for the stateful
-      beans because then they would not receive lifecycle callbacks from the
-      container at the end of use. (e.g. through destroy-method in XML)</para>
+      <para>A job declared in the XML namespace or using any subclass of
+      AbstractJob can optionally declare a validator for the job parameters at
+      runtime. This is useful when for instance you need to assert that a job
+      is started with all its mandatory parameters. There is a
+      DefaultJobParametersValidator that can be used to constrain combinations
+      of simple mandatory and optional parameters, and for more complex
+      constraints you can implement the interface yourself. The configuration
+      of a validator is supported through the XML namespace through a child
+      element of the job, e.g&gt;:</para>
 
-      <para>The strategy provided by Spring Batch to deal with this scenario
-      is the <classname>JobFactory</classname>, and the samples provide an
-      example of a specialized implementation that can load an
-      <classname>ApplicationContext</classname> and close it properly when the
-      job is finished. A relevant examples is
-      <classname>ClassPathXmlApplicationContextJobFactory</classname> and its
-      use in the <code>adhoc-job-launcher-context.xml</code> and the
-      <code>quartz-job-launcher-context.xml</code>, which can be found in the
-      Samples project.</para>
+      <programlisting>&lt;job id="job1" parent="baseJob3"&gt;
+    &lt;step id="step1" parent="standaloneStep"/&gt;
+    &lt;validator ref="paremetersValidator"/&gt;
+&lt;/job&gt;</programlisting>
+
+      <para>The validator can be specified as a reference (as above) or as a
+      nested bean definition in the beans namespace.</para>
     </section>
   </section>
 
@@ -537,11 +541,13 @@ catch (JobRestartException e) {
 
         <screen><prompt>bash$</prompt> java CommandLineJobRunner endOfDayJob.xml endOfDay schedule.date(date)=2008/01/01</screen>
 
-        <para>In most cases you would want to use a manifest to declare your
-        main class in a jar, but for simplicity, the class was used directly.
-        This example is using the same 'EndOfDay' example from <xref
-        linkend="domain" />. The first argument is 'endOfDayJob.xml', which is
-        the Spring <classname>ApplicationContext</classname> containing the
+        <para>In most cases you would want to use a manifest to
+        declare your main class in a jar, but for simplicity, the
+        class was used directly.  This example is using the same
+        'EndOfDay' example from the <link linkend="domain">domain
+        section</link>. The first argument is 'endOfDayJob.xml', which
+        is the Spring <classname>ApplicationContext</classname>
+        containing the
         <classname>Job</classname>. The second argument, 'endOfDay' represents
         the job name. The final argument, 'schedule.date(date)=2008/01/01'
         will be converted into <classname>JobParameters</classname>. An
