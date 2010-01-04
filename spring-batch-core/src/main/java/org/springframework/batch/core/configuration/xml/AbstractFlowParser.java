@@ -155,7 +155,7 @@ public abstract class AbstractFlowParser extends AbstractSingleBeanDefinitionPar
 
 		String flowName = (String) builder.getRawBeanDefinition().getAttribute("flowName");
 		if (!stepExists && !StringUtils.hasText(element.getAttribute("parent"))) {
-			parserContext.getReaderContext().error("The flow [" + flowName + "] must contain at least one step",
+			parserContext.getReaderContext().error("The flow [" + flowName + "] must contain at least one step, flow or split",
 					element);
 		}
 
