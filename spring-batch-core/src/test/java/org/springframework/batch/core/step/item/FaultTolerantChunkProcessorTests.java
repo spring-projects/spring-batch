@@ -151,6 +151,7 @@ public class FaultTolerantChunkProcessorTests {
 		}
 		assertEquals(1, contribution.getSkipCount());
 		assertEquals(1, contribution.getWriteCount());
+		assertEquals(0, contribution.getFilterCount());
 	}
 
 	@Test

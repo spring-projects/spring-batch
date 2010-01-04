@@ -391,6 +391,11 @@ public class FaultTolerantStepFactoryBeanRollbackTests {
 		assertEquals("[1, 2, 3, 5]", writer.getCommitted().toString());
 		assertEquals("[1, 2, 3, 4, 1, 2, 3, 4, 5]", writer.getWritten().toString());
 		assertEquals("[1, 2, 3, 4, 5, 1, 2, 3, 4, 5]", processor.getProcessed().toString());
+
+		assertEquals(1, stepExecution.getWriteSkipCount());
+		assertEquals(5, stepExecution.getReadCount());
+		assertEquals(4, stepExecution.getWriteCount());
+		assertEquals(0, stepExecution.getFilterCount());
 	}
 
 	@Test
@@ -440,6 +445,11 @@ public class FaultTolerantStepFactoryBeanRollbackTests {
 		assertEquals("[1, 2, 1, 2, 3, 4, 5]", writer.getWritten().toString());
 		assertEquals("[1, 3, 5]", processor.getCommitted().toString());
 		assertEquals("[1, 2, 3, 4, 5, 1, 2, 3, 4, 5]", processor.getProcessed().toString());
+
+		assertEquals(2, stepExecution.getWriteSkipCount());
+		assertEquals(5, stepExecution.getReadCount());
+		assertEquals(3, stepExecution.getWriteCount());
+		assertEquals(0, stepExecution.getFilterCount());
 	}
 
 	@Test

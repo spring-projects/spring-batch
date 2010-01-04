@@ -137,7 +137,7 @@ public class FaultTolerantChunkProcessor<I, O> extends SimpleChunkProcessor<I, O
 		@SuppressWarnings("unchecked")
 		UserData<O> data = (UserData<O>) inputs.getUserData();
 		if (data == null) {
-			data = new UserData<O>(inputs.size());
+			data = new UserData<O>();
 			inputs.setUserData(data);
 			data.setOutputs(new Chunk<O>());
 		}
@@ -147,7 +147,7 @@ public class FaultTolerantChunkProcessor<I, O> extends SimpleChunkProcessor<I, O
 	protected int getFilterCount(Chunk<I> inputs, Chunk<O> outputs) {
 		@SuppressWarnings("unchecked")
 		UserData<O> data = (UserData<O>) inputs.getUserData();
-		return data.size() - outputs.size() - inputs.getSkips().size();
+		return data.filterCount;
 	}
 
 	@Override
@@ -192,7 +192,7 @@ public class FaultTolerantChunkProcessor<I, O> extends SimpleChunkProcessor<I, O
 
 		Chunk<O> outputs = new Chunk<O>();
 		@SuppressWarnings("unchecked")
-		UserData<O> data = (UserData<O>) inputs.getUserData();
+		final UserData<O> data = (UserData<O>) inputs.getUserData();
 		final Chunk<O> cache = data.getOutputs();
 		final Iterator<O> cacheIterator = cache.isEmpty() ? null : new ArrayList<O>(cache.getItems()).iterator();
 		final AtomicInteger count = new AtomicInteger(0);
@@ -253,6 +253,7 @@ public class FaultTolerantChunkProcessor<I, O> extends SimpleChunkProcessor<I, O
 					if (output == null) {
 						// No need to re-process filtered items
 						iterator.remove();
+						data.incrementFilterCount();
 					}
 					return output;
 				}
@@ -513,16 +514,12 @@ public class FaultTolerantChunkProcessor<I, O> extends SimpleChunkProcessor<I, O
 
 	private static class UserData<O> {
 
-		private final int size;
-
 		private Chunk<O> outputs;
 
-		public UserData(int size) {
-			this.size = size;
-		}
+		private int filterCount = 0;
 
-		public int size() {
-			return size;
+		public void incrementFilterCount() {
+			filterCount++;
 		}
 
 		public Chunk<O> getOutputs() {
