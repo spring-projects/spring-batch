@@ -5,7 +5,8 @@ import org.springframework.batch.core.JobParameters;
 import org.springframework.batch.core.JobParametersInvalidException;
 
 /**
- * Strategy interface for a {@link Job} to use in validating parameters.
+ * Strategy interface for a {@link Job} to use in validating its parameters for
+ * an execution.
  * 
  * @author Dave Syer
  * 
