@@ -64,7 +64,7 @@ public abstract class AbstractStepParser {
 	private static final String PARTITION_ELE = "partition";
 
 	private static final String JOB_ELE = "job";
-	
+
 	private static final String JOB_PARAMS_EXTRACTOR_ATTR = "job-parameters-extractor";
 
 	private static final String JOB_LAUNCHER_ATTR = "job-launcher";
@@ -218,7 +218,7 @@ public abstract class AbstractStepParser {
 
 		String jobParametersExtractor = jobElement.getAttribute(JOB_PARAMS_EXTRACTOR_ATTR);
 		String jobLauncher = jobElement.getAttribute(JOB_LAUNCHER_ATTR);
-		
+
 		if (StringUtils.hasText(jobParametersExtractor)) {
 			propertyValues.addPropertyValue("jobParametersExtractor", new RuntimeBeanReference(jobParametersExtractor));
 		}
@@ -396,25 +396,7 @@ public abstract class AbstractStepParser {
 			ParserContext parserContext) {
 		for (Element child : (List<Element>) DomUtils.getChildElementsByTagName(exceptionClassesElement, elementName)) {
 			String className = child.getAttribute("class");
-			try {
-				Class<Object> cls = (Class<Object>) Class.forName(className);
-				if (!Throwable.class.isAssignableFrom(cls)) {
-					parserContext.getReaderContext().error(
-							"Non-Throwable class \'" + className + "\' found in <"
-									+ exceptionClassesElement.getNodeName() + "/> element.", exceptionClassesElement);
-				}
-				if (list.contains(cls)) {
-					parserContext.getReaderContext().error(
-							"Duplicate entry for class \'" + className + "\' found in <"
-									+ exceptionClassesElement.getNodeName() + "/> element.", exceptionClassesElement);
-				}
-				list.add(cls);
-			}
-			catch (ClassNotFoundException e) {
-				parserContext.getReaderContext().error(
-						"Cannot find class \'" + className + "\', given as an attribute of the <" + elementName
-								+ "/> element.", child);
-			}
+			list.add(new TypedStringValue(className, Class.class));
 		}
 	}
 
