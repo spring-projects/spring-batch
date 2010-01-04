@@ -134,24 +134,30 @@ public class DefaultJobLoader implements JobLoader {
 		contexts.put(factory, context);
 		String[] names = context.getBeanNamesForType(Job.class);
 
-		Collection<Job> result = new ArrayList<Job>();
-
 		for (String name : names) {
 
 			if (!autoRegistrationDetected) {
 
+				Job job = (Job) context.getBean(name);
+				String jobName = job.getName();
+
 				// On reload try to unregister first
 				if (unregister) {
-					logger.debug("Unregistering job: " + name + " from context: " + context.getDisplayName());
-					jobRegistry.unregister(name);
+					logger.debug("Unregistering job: " + jobName + " from context: " + context.getDisplayName());
+					jobRegistry.unregister(jobName);
 				}
 
-				logger.debug("Registering job: " + name + " from context: " + context.getDisplayName());
-				JobFactory jobFactory = new ReferenceJobFactory((Job) context.getBean(name));
+				logger.debug("Registering job: " + jobName + " from context: " + context.getDisplayName());
+				JobFactory jobFactory = new ReferenceJobFactory(job);
 				jobRegistry.register(jobFactory);
-				jobsRegistered.add(name);
+				jobsRegistered.add(jobName);
 
 			}
+
+		}
+
+		Collection<Job> result = new ArrayList<Job>();
+		for (String name : jobsRegistered) {
 			try {
 				result.add(jobRegistry.getJob(name));
 			}
