@@ -3,20 +3,24 @@
  */
 package org.springframework.batch.core;
 
+import static org.junit.Assert.*;
+
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import junit.framework.TestCase;
-
+import org.junit.Before;
+import org.junit.Test;
 import org.springframework.batch.support.SerializationUtils;
 
 /**
  * @author Lucas Ward
+ * @author Dave Syer
  * 
  */
-public class JobParametersTests extends TestCase {
+public class JobParametersTests {
 
 	JobParameters parameters;
 
@@ -24,8 +28,8 @@ public class JobParametersTests extends TestCase {
 
 	Date date2 = new Date(7809089900L);
 
-	protected void setUp() throws Exception {
-		super.setUp();
+	@Before
+	public void setUp() throws Exception {
 		parameters = getNewParameters();
 	}
 
@@ -45,55 +49,79 @@ public class JobParametersTests extends TestCase {
 	}
 
 
+	@Test
 	public void testGetString() {
 		assertEquals("value1", parameters.getString("string.key1"));
 		assertEquals("value2", parameters.getString("string.key2"));
 	}
 
+	@Test
+	public void testGetNullString() {
+		parameters = new JobParameters(Collections.singletonMap("string.key1", new JobParameter((String)null)));
+		assertEquals(null, parameters.getDate("string.key1"));
+	}
+
+	@Test
 	public void testGetLong() {
 		assertEquals(1L, parameters.getLong("long.key1"));
 		assertEquals(2L, parameters.getLong("long.key2"));
 	}
 
+	@Test
 	public void testGetDouble() {
-		assertEquals(new Double(1.1), parameters.getDouble("double.key1"));
-		assertEquals(new Double(2.2), parameters.getDouble("double.key2"));
+		assertEquals(new Double(1.1), new Double(parameters.getDouble("double.key1")));
+		assertEquals(new Double(2.2), new Double(parameters.getDouble("double.key2")));
 	}
 
+	@Test
 	public void testGetDate() {
 		assertEquals(date1, parameters.getDate("date.key1"));
 		assertEquals(date2, parameters.getDate("date.key2"));
 	}
 
+	@Test
+	public void testGetNullDate() {
+		parameters = new JobParameters(Collections.singletonMap("date.key1", new JobParameter((Date)null)));
+		assertEquals(null, parameters.getDate("date.key1"));
+	}
+
+	@Test
 	public void testIsEmptyWhenEmpty() throws Exception {
 		assertTrue(new JobParameters().isEmpty());
 	}
 
+	@Test
 	public void testIsEmptyWhenNotEmpty() throws Exception {
 		assertFalse(parameters.isEmpty());
 	}
 
+	@Test
 	public void testEquals() {
 		JobParameters testParameters = getNewParameters();
 		assertTrue(testParameters.equals(parameters));
 	}
 
+	@Test
 	public void testEqualsSelf() {
 		assertTrue(parameters.equals(parameters));
 	}
 
+	@Test
 	public void testEqualsDifferent() {
 		assertFalse(parameters.equals(new JobParameters()));
 	}
 
+	@Test
 	public void testEqualsWrongType() {
 		assertFalse(parameters.equals("foo"));
 	}
 
+	@Test
 	public void testEqualsNull() {
 		assertFalse(parameters.equals(null));
 	}
 
+	@Test
 	public void testToStringOrder() {
 
 		Map<String, JobParameter> props = parameters.getParameters();
@@ -126,16 +154,19 @@ public class JobParametersTests extends TestCase {
 		assertEquals(string1, string2);
 	}
 
+	@Test
 	public void testHashCodeEqualWhenEmpty() throws Exception {
 		int code = new JobParameters().hashCode();
 		assertEquals(code, new JobParameters().hashCode());
 	}
 
+	@Test
 	public void testHashCodeEqualWhenNotEmpty() throws Exception {
 		int code = getNewParameters().hashCode();
 		assertEquals(code, parameters.hashCode());
 	}
 
+	@Test
 	public void testSerialization() {
 		JobParameters params = getNewParameters();
 
