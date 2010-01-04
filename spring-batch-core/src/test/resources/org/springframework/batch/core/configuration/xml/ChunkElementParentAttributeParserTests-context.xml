@@ -15,7 +15,8 @@
 						<exclude class="org.springframework.dao.CannotAcquireLockException"/>
 					</skippable-exception-classes>
 					<retryable-exception-classes>
-						<include class="org.springframework.dao.DeadlockLoserDataAccessException"/>
+						<include class="org.springframework.dao.PessimisticLockingFailureException"/>
+						<exclude class="org.springframework.dao.CannotSerializeTransactionException"/>
 					</retryable-exception-classes>
 		        	<streams merge="true">
 		        		<stream ref="stream1"/>

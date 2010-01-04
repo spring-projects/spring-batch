@@ -31,7 +31,7 @@
 			<xsd:sequence>
 				<xsd:element ref="description" minOccurs="0" />
 				<xsd:choice minOccurs="0" maxOccurs="unbounded">
-					<xsd:group ref="flowGroup" minOccurs="1" maxOccurs="unbounded"/>
+					<xsd:group ref="flowGroup" minOccurs="1" maxOccurs="unbounded" />
 					<xsd:element name="listeners">
 						<xsd:annotation>
 							<xsd:documentation><![CDATA[
@@ -54,7 +54,7 @@
 							</xsd:documentation>
 						</xsd:annotation>
 						<xsd:complexType>
-							<xsd:group ref="beanElementGroup" minOccurs="0" maxOccurs="1"/>
+							<xsd:group ref="beanElementGroup" minOccurs="0" maxOccurs="1" />
 							<xsd:attribute name="ref">
 								<xsd:annotation>
 									<xsd:documentation><![CDATA[
@@ -531,7 +531,9 @@
 				<xsd:annotation>
 					<xsd:documentation><![CDATA[
 					List of exception classes that should not cause rollback if possible.  This list
-					is only a hint and has to be interpreted by the step to make sense in context.  
+					is only a hint and has to be interpreted by the step to make sense in context (e.g.
+					it might not be possible to honour the hint during a write operation, so consider moving
+					code that throws these exceptions to a processor or validator).  
 					]]>
 					</xsd:documentation>
 				</xsd:annotation>
@@ -757,7 +759,8 @@
 			<xsd:element name="skippable-exception-classes" minOccurs="0" maxOccurs="1">
 				<xsd:annotation>
 					<xsd:documentation><![CDATA[
-					List of exception classes that are skippable.  
+					List of exception classes that are skippable.  Exceptions (and their subclasses) that
+					are declared as included take precedence over the same value if it is also excluded.  
 					Exceptions that are already marked as no-rollback
 					are automatically skippable (but it doesn't hurt to add them again here).
 					]]>
@@ -771,12 +774,13 @@
 			<xsd:element name="retryable-exception-classes" minOccurs="0" maxOccurs="1">
 				<xsd:annotation>
 					<xsd:documentation><![CDATA[
-					List of exception classes that are retryable.
+					List of exception classes that are retryable. Exceptions (and their subclasses) that
+					are declared as included take precedence over the same value if it is also excluded.
 					]]>
 					</xsd:documentation>
 				</xsd:annotation>
 				<xsd:complexType>
-					<xsd:group ref="includeElementGroup" minOccurs="0" maxOccurs="unbounded" />
+					<xsd:group ref="includeExcludeElementGroup" minOccurs="0" maxOccurs="unbounded" />
 					<xsd:attributeGroup ref="mergeAttribute" />
 				</xsd:complexType>
 			</xsd:element>
@@ -899,15 +903,16 @@
 		</xsd:attribute>
 	</xsd:attributeGroup>
 
-	<xsd:attributeGroup name="classAttribute">
+	<xsd:attributeGroup name="exceptionClassAttribute">
 		<xsd:attribute name="class" type="xsd:string" use="required">
 			<xsd:annotation>
 				<xsd:documentation>
-					A class name.
+					An exception class name.
 				</xsd:documentation>
 				<xsd:appinfo>
 					<tool:annotation kind="direct">
 						<tool:expected-type type="java.lang.Class" />
+						<tool:assignable-to type="java.lang.Throwable" />
 					</tool:annotation>
 				</xsd:appinfo>
 			</xsd:annotation>
@@ -919,11 +924,12 @@
 			<xsd:element name="include">
 				<xsd:annotation>
 					<xsd:documentation>
-						Classify an exception as "included" in the set.
+						Classify an exception as "included" in the set. Exceptions of this type or a subclass are
+						included.
 					</xsd:documentation>
 				</xsd:annotation>
 				<xsd:complexType>
-					<xsd:attributeGroup ref="classAttribute" />
+					<xsd:attributeGroup ref="exceptionClassAttribute" />
 				</xsd:complexType>
 			</xsd:element>
 		</xsd:choice>
@@ -936,11 +942,12 @@
 				<xsd:annotation>
 					<xsd:documentation>
 						Classify an exception as "excluded" from the
-						set.
+						set. Exceptions of this type or a subclass are
+						excluded
 					</xsd:documentation>
 				</xsd:annotation>
 				<xsd:complexType>
-					<xsd:attributeGroup ref="classAttribute" />
+					<xsd:attributeGroup ref="exceptionClassAttribute" />
 				</xsd:complexType>
 			</xsd:element>
 		</xsd:choice>
