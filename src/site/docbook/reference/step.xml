@@ -1577,24 +1577,24 @@ itemWriter.write(items);</programlisting>
       Here is an example:</para>
 
       <para><programlisting>&lt;job id="jobStepJob" restartable="true"&gt;
-   &lt;step id="jobStepJob.step1" parent="jobStep"/&gt;
+   &lt;step id="jobStepJob.step1"&gt;
+      &lt;job ref="<emphasis role="bold">job</emphasis>" job-launcher="jobLauncher" 
+          job-parameters-extractor="jobParametersExtractor"/&gt;
+   &lt;/step&gt;
 &lt;/job&gt;
 
 &lt;job id="<emphasis role="bold">job</emphasis>" restartable="true"&gt;...&lt;/job&gt;
 
-&lt;bean id="jobStep" class="org.springframework.batch.core.step.job.JobStep"&gt;
-   &lt;property name="jobRepository" ref="jobRepository"/&gt;
-   &lt;property name="jobLauncher" ref="jobLauncher"/&gt;
-   &lt;property name="job" ref="<emphasis role="bold">job</emphasis>"/&gt;
-   &lt;property name="jobParametersExtractor"&gt;
-      &lt;bean class="org.springframework.batch.core.step.job.DefaultJobParametersExtractor"&gt;
-         &lt;property name="keys" value="input.file"/&gt;
-      &lt;/bean&gt;
-   &lt;/property&gt;
+&lt;bean id="jobParametersExtractor" class="org.spr...DefaultJobParametersExtractor"&gt;
+   &lt;property name="keys" value="input.file"/&gt;
 &lt;/bean&gt;</programlisting></para>
 
-      <para>Again this is useful when you want to have more granular options
-      for monitoring and reporting on jobs and steps. Using
+      <para>The job parameters extractor is a strategy that determines how a
+      the <classname>ExecutionContext</classname> for the
+      <classname>Step</classname> is converted into
+      <classname>JobParameters</classname> for the Job that is executed. The
+      <classname>JobStep</classname> is useful when you want to have some more
+      granular options for monitoring and reporting on jobs and steps. Using
       <classname>JobStep</classname> is also often a good answer to the
       question: "How do I create dependencies between jobs?". It is a good way
       to break up a large system into smaller modules and control the flow of
