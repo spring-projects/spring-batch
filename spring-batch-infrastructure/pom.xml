@@ -141,7 +141,7 @@
 		</dependency>
 		<dependency>
 			<groupId>org.springframework.ws</groupId>
-			<artifactId>spring-oxm</artifactId>
+			<artifactId>spring-oxm-tiger</artifactId>
 			<optional>true</optional>
 		</dependency>
 		<dependency>

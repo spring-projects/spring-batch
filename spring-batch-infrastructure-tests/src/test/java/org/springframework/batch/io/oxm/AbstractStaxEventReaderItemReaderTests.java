@@ -1,11 +1,14 @@
 package org.springframework.batch.io.oxm;
 
+import static org.junit.Assert.assertEquals;
+
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
-import junit.framework.TestCase;
-
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
 import org.springframework.batch.io.oxm.domain.Trade;
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.item.xml.StaxEventItemReader;
@@ -13,28 +16,32 @@ import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;
 import org.springframework.oxm.Unmarshaller;
 
-public abstract class AbstractStaxEventReaderItemReaderTests extends TestCase {
+public abstract class AbstractStaxEventReaderItemReaderTests {
 
-	private StaxEventItemReader<Trade> source = new StaxEventItemReader<Trade>();
+	protected StaxEventItemReader<Trade> reader = new StaxEventItemReader<Trade>();
 
 	protected Resource resource = new ClassPathResource("org/springframework/batch/io/oxm/input.xml");
 
-	protected void setUp() throws Exception {
+	@Before
+	public void setUp() throws Exception {
 
-		source.setResource(resource);
+		reader.setResource(resource);
 
-		source.setFragmentRootElementName("trade");
+		reader.setFragmentRootElementName("trade");
 		
-		source.setUnmarshaller(getUnmarshaller());
+		reader.setUnmarshaller(getUnmarshaller());
 
-		source.open(new ExecutionContext());
+		reader.afterPropertiesSet();
+
+		reader.open(new ExecutionContext());
 
 	}
 
+	@Test
 	public void testRead() throws Exception {
 		Trade result;
 		List<Trade> results = new ArrayList<Trade>();
-		while ((result = source.read()) != null) {
+		while ((result = reader.read()) != null) {
 			results.add(result);
 		}
 		checkResults(results);
@@ -71,8 +78,9 @@ public abstract class AbstractStaxEventReaderItemReaderTests extends TestCase {
 		assertEquals("Customer3", trade3.getCustomer());
 	}
 
-	protected void tearDown() throws Exception {
-		source.close();
+	@After
+	public void tearDown() throws Exception {
+		reader.close();
 	}
 
 	public void setResource(Resource resource) {

@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<trades xmlns="urn:org.springframework.batch.io.oxm.domain" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="urn:org.springframework.batch.io.oxm.domain trade.xsd">
+	<trade>
+		<customer>Customer1</customer>
+		<isin>XYZ0001</isin>
+		<price>11.39</price>
+		<quantity>5</quantity>
+	</trade>
+	<trade>
+		<customer>Customer2</customer>
+		<isin>XYZ0002</isin>
+		<price>72.99</price>
+		<quantity>2</quantity>
+	</trade>
+	<trade>
+		<customer>Customer3</customer>
+		<isin>XYZ0003</isin>
+		<price>99.99</price>
+		<quantity>9</quantity>
+	</trade>
+</trades>

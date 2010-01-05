@@ -232,15 +232,17 @@ public class StaxEventItemWriter<T> extends ExecutionContextUserSupport implemen
 
 	/**
 	 * Set the tag name of the root element. If not set, default name is used
-	 * ("root").  Namespace URI and prefix can also be set optionally using the
+	 * ("root"). Namespace URI and prefix can also be set optionally using the
 	 * notation:
 	 * 
 	 * <pre>
 	 * {uri}prefix:root
 	 * </pre>
 	 * 
-	 * The prefix is optional (defaults to empty), but if it is specified then the 
-	 * uri must be provided.
+	 * The prefix is optional (defaults to empty), but if it is specified then
+	 * the uri must be provided. In addition you might want to declare other
+	 * namespaces using the {@link #setRootElementAttributes(Map) root
+	 * attributes}.
 	 * 
 	 * @param rootTagName the tag name to be used for the root element
 	 */
@@ -276,7 +278,8 @@ public class StaxEventItemWriter<T> extends ExecutionContextUserSupport implemen
 	}
 
 	/**
-	 * Set the root element attributes to be written.
+	 * Set the root element attributes to be written. If any of the key names
+	 * begin with "xmlns:" then they are treated as namespace declarations.
 	 * 
 	 * @param rootElementAttributes attributes of the root element
 	 */
@@ -307,8 +310,7 @@ public class StaxEventItemWriter<T> extends ExecutionContextUserSupport implemen
 		if (rootTagName.contains("{")) {
 			rootTagNamespace = rootTagName.replaceAll("\\{(.*)\\}.*", "$1");
 			rootTagName = rootTagName.replaceAll("\\{.*\\}(.*)", "$1");
-			if (rootTagName.contains(":"))
-			{
+			if (rootTagName.contains(":")) {
 				rootTagNamespacePrefix = rootTagName.replaceAll("(.*):.*", "$1");
 				rootTagName = rootTagName.replaceAll(".*:(.*)", "$1");
 			}
@@ -430,14 +432,29 @@ public class StaxEventItemWriter<T> extends ExecutionContextUserSupport implemen
 		// write root tag
 		writer.add(factory.createStartElement(getRootTagNamespacePrefix(), getRootTagNamespace(), getRootTagName()));
 		if (StringUtils.hasText(getRootTagNamespace())) {
-			writer.add(factory.createNamespace(getRootTagNamespacePrefix(), getRootTagNamespace()));
+			if (StringUtils.hasText(getRootTagNamespacePrefix())) {
+				writer.add(factory.createNamespace(getRootTagNamespacePrefix(), getRootTagNamespace()));
+			}
+			else {
+				writer.add(factory.createNamespace(getRootTagNamespace()));
+			}
 		}
 
 		// write root tag attributes
 		if (!CollectionUtils.isEmpty(getRootElementAttributes())) {
 
 			for (Map.Entry<String, String> entry : getRootElementAttributes().entrySet()) {
-				writer.add(factory.createAttribute(entry.getKey(), entry.getValue()));
+				String key = entry.getKey();
+				if (key.startsWith("xmlns")) {
+					String prefix = "";
+					if (key.contains(":")) {
+						prefix = key.substring(key.indexOf(":") + 1);
+					}
+					writer.add(factory.createNamespace(prefix, entry.getValue()));
+				}
+				else {
+					writer.add(factory.createAttribute(key, entry.getValue()));
+				}
 			}
 
 		}

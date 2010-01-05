@@ -546,7 +546,13 @@
 			<dependency>
 				<groupId>org.springframework.ws</groupId>
 				<artifactId>spring-oxm</artifactId>
-				<version>1.5.5</version>
+				<version>1.5.8</version>
+				<optional>true</optional>
+			</dependency>
+			<dependency>
+				<groupId>org.springframework.ws</groupId>
+				<artifactId>spring-oxm-tiger</artifactId>
+				<version>1.5.8</version>
 				<optional>true</optional>
 			</dependency>
 			<dependency>

@@ -62,9 +62,19 @@ public class StaxEventItemWriterTests {
 	private static final String TEST_STRING = "<" + ClassUtils.getShortName(StaxEventItemWriter.class)
 			+ "-testString/>";
 
+	private static final String NS_TEST_STRING = "<ns:" + ClassUtils.getShortName(StaxEventItemWriter.class)
+			+ "-testString/>";
+
+	private static final String FOO_TEST_STRING = "<foo:" + ClassUtils.getShortName(StaxEventItemWriter.class)
+			+ "-testString/>";
+
+	private SimpleMarshaller marshaller;
+
 	@Before
 	public void setUp() throws Exception {
-		resource = new FileSystemResource(File.createTempFile("StaxEventWriterOutputSourceTests", ".xml"));
+		File directory = new File("target/data");
+		directory.mkdirs();
+		resource = new FileSystemResource(File.createTempFile("StaxEventWriterOutputSourceTests", ".xml", directory));
 		writer = createItemWriter();
 		executionContext = new ExecutionContext();
 	}
@@ -287,29 +297,68 @@ public class StaxEventItemWriterTests {
 	public void testWriteRootTagWithNamespaceAndPrefix() throws Exception {
 		writer.setRootTagName("{http://www.springframework.org/test}ns:root");
 		writer.afterPropertiesSet();
+		marshaller.setNamespace(writer.getRootTagNamespace());
+		marshaller.setNamespacePrefix(writer.getRootTagNamespacePrefix());
 		writer.open(executionContext);
 		writer.write(items);
 		writer.close();
 		String content = getOutputFileContent();
 		assertTrue("Wrong content: " + content, content
 				.contains(("<ns:root xmlns:ns=\"http://www.springframework.org/test\">")));
-		assertTrue("Wrong content: " + content, content.contains(TEST_STRING));
+		assertTrue("Wrong content: " + content, content.contains(NS_TEST_STRING));
 		assertTrue("Wrong content: " + content, content.contains(("</ns:root>")));
+		assertTrue("Wrong content: " + content, content.contains(("<ns:root")));
+	}
+
+	/**
+	 * Item is written to the output file with additional namespaces and prefix.
+	 */
+	@Test
+	public void testWriteRootTagWithAdditionalNamespace() throws Exception {
+		writer.setRootTagName("{http://www.springframework.org/test}ns:root");
+		marshaller.setNamespace("urn:org.test.foo");
+		marshaller.setNamespacePrefix("foo");
+		writer.setRootElementAttributes(Collections.singletonMap("xmlns:foo", "urn:org.test.foo"));
+		writer.afterPropertiesSet();
+		writer.open(executionContext);
+		writer.write(items);
+		writer.close();
+		String content = getOutputFileContent();
+		System.err.println(content);
+		assertTrue("Wrong content: " + content, content
+				.contains(("<ns:root xmlns:ns=\"http://www.springframework.org/test\" "
+						+ "xmlns:foo=\"urn:org.test.foo\">")));
+		assertTrue("Wrong content: " + content, content.contains(FOO_TEST_STRING));
+		assertTrue("Wrong content: " + content, content.contains(("</ns:root>")));
+		assertTrue("Wrong content: " + content, content.contains(("<ns:root")));
 	}
 
 	/**
 	 * Writes object's toString representation as XML comment.
 	 */
 	private static class SimpleMarshaller implements Marshaller {
+
+		private String namespacePrefix = "";
+
+		private String namespace = "";
+
+		public void setNamespace(String namespace) {
+			this.namespace = namespace;
+		}
+
+		public void setNamespacePrefix(String namespacePrefix) {
+			this.namespacePrefix = namespacePrefix;
+		}
+
 		public void marshal(Object graph, Result result) throws XmlMappingException, IOException {
 			Assert.isInstanceOf(StaxResult.class, result);
 
 			StaxResult staxResult = (StaxResult) result;
 			try {
 				staxResult.getXMLEventWriter().add(
-						XMLEventFactory.newInstance().createStartElement("", "", graph.toString()));
+						XMLEventFactory.newInstance().createStartElement(namespacePrefix, namespace, graph.toString()));
 				staxResult.getXMLEventWriter().add(
-						XMLEventFactory.newInstance().createEndElement("", "", graph.toString()));
+						XMLEventFactory.newInstance().createEndElement(namespacePrefix, namespace, graph.toString()));
 			}
 			catch (XMLStreamException e) {
 				throw new RuntimeException("Exception while writing to output file", e);
@@ -338,7 +387,7 @@ public class StaxEventItemWriterTests {
 		StaxEventItemWriter<Object> source = new StaxEventItemWriter<Object>();
 		source.setResource(resource);
 
-		Marshaller marshaller = new SimpleMarshaller();
+		marshaller = new SimpleMarshaller();
 		source.setMarshaller(marshaller);
 
 		source.setEncoding("UTF-8");
@@ -351,5 +400,5 @@ public class StaxEventItemWriterTests {
 
 		return source;
 	}
-	
+
 }
