@@ -41,6 +41,10 @@ public class StaxEventItemReaderTests {
 	// test xml input
 	private String xml = "<root> <fragment> <misc1/> </fragment> <misc2/> <fragment> testString </fragment> </root>";
 
+	private String fooXml = "<root xmlns=\"urn:org.test.foo\"> <fragment> <misc1/> </fragment> <misc2/> <fragment> testString </fragment> </root>";
+
+	private String mixedXml = "<fragment xmlns=\"urn:org.test.foo\"> <fragment xmlns=\"urn:org.test.bar\"> <misc1/> </fragment> <misc2/> <fragment xmlns=\"urn:org.test.bar\"> testString </fragment> </fragment>";
+
 	private Unmarshaller unmarshaller = new MockFragmentUnmarshaller();
 
 	private static final String FRAGMENT_ROOT_ELEMENT = "fragment";
@@ -88,6 +92,35 @@ public class StaxEventItemReaderTests {
 	 */
 	@Test
 	public void testFragmentWrapping() throws Exception {
+		source.afterPropertiesSet();
+		source.open(executionContext);
+		// see asserts in the mock unmarshaller
+		assertNotNull(source.read());
+		assertNotNull(source.read());
+		assertNull(source.read()); // there are only two fragments
+
+		source.close();
+	}
+
+	@Test
+	public void testFragmentNamespace() throws Exception {
+		
+		source.setResource(new ByteArrayResource(fooXml.getBytes()));
+		source.afterPropertiesSet();
+		source.open(executionContext);
+		// see asserts in the mock unmarshaller
+		assertNotNull(source.read());
+		assertNotNull(source.read());
+		assertNull(source.read()); // there are only two fragments
+
+		source.close();
+	}
+
+	@Test
+	public void testFragmentMixedNamespace() throws Exception {
+		
+		source.setResource(new ByteArrayResource(mixedXml.getBytes()));
+		source.setFragmentRootElementName("{urn:org.test.bar}"+FRAGMENT_ROOT_ELEMENT);
 		source.afterPropertiesSet();
 		source.open(executionContext);
 		// see asserts in the mock unmarshaller

@@ -56,7 +56,7 @@ public class StaxEventItemReader<T> extends AbstractItemCountingItemStreamItemRe
 		ResourceAwareItemReaderItemStream<T>, InitializingBean {
 
 	private static final Log logger = LogFactory.getLog(StaxEventItemReader.class);
-	
+
 	private FragmentEventReader fragmentReader;
 
 	private XMLEventReader eventReader;
@@ -72,7 +72,9 @@ public class StaxEventItemReader<T> extends AbstractItemCountingItemStreamItemRe
 	private boolean noInput;
 
 	private boolean strict = true;
-	
+
+	private String fragmentRootElementNameSpace;
+
 	public StaxEventItemReader() {
 		setName(ClassUtils.getShortName(StaxEventItemReader.class));
 	}
@@ -92,8 +94,8 @@ public class StaxEventItemReader<T> extends AbstractItemCountingItemStreamItemRe
 	}
 
 	/**
-	 * @param unmarshaller maps xml fragments corresponding to
-	 * records to objects
+	 * @param unmarshaller maps xml fragments corresponding to records to
+	 * objects
 	 */
 	public void setUnmarshaller(Unmarshaller unmarshaller) {
 		this.unmarshaller = unmarshaller;
@@ -118,6 +120,10 @@ public class StaxEventItemReader<T> extends AbstractItemCountingItemStreamItemRe
 	public void afterPropertiesSet() throws Exception {
 		Assert.notNull(unmarshaller, "The Unmarshaller must not be null.");
 		Assert.hasLength(fragmentRootElementName, "The FragmentRootElementName must not be null");
+		if (fragmentRootElementName.contains("{")) {
+			fragmentRootElementNameSpace = fragmentRootElementName.replaceAll("\\{(.*)\\}.*", "$1");
+			fragmentRootElementName = fragmentRootElementName.replaceAll("\\{.*\\}(.*)", "$1");
+		}
 	}
 
 	/**
@@ -128,8 +134,8 @@ public class StaxEventItemReader<T> extends AbstractItemCountingItemStreamItemRe
 	 * does not care about element nesting. You will need to override this
 	 * method to correctly handle composite fragments.
 	 * 
-	 * @return <code>true</code> if next fragment was found,
-	 * <code>false</code> otherwise.
+	 * @return <code>true</code> if next fragment was found, <code>false</code>
+	 * otherwise.
 	 */
 	protected boolean moveCursorToNextFragment(XMLEventReader reader) {
 		try {
@@ -142,11 +148,12 @@ public class StaxEventItemReader<T> extends AbstractItemCountingItemStreamItemRe
 				}
 				QName startElementName = ((StartElement) reader.peek()).getName();
 				if (startElementName.getLocalPart().equals(fragmentRootElementName)) {
-					return true;
+					if (fragmentRootElementNameSpace==null || startElementName.getNamespaceURI().equals(fragmentRootElementNameSpace)) {
+						return true;
+					}
 				}
-				else {
-					reader.nextEvent();
-				}
+				reader.nextEvent();
+
 			}
 		}
 		catch (XMLStreamException e) {
@@ -172,7 +179,7 @@ public class StaxEventItemReader<T> extends AbstractItemCountingItemStreamItemRe
 
 	protected void doOpen() throws Exception {
 		Assert.notNull(resource, "The Resource must not be null.");
-		
+
 		noInput = false;
 		if (!resource.exists()) {
 			if (strict) {
@@ -201,30 +208,30 @@ public class StaxEventItemReader<T> extends AbstractItemCountingItemStreamItemRe
 	 * Move to next fragment and map it to item.
 	 */
 	protected T doRead() throws Exception {
-		
+
 		if (noInput) {
 			return null;
 		}
-		
+
 		T item = null;
 
 		if (moveCursorToNextFragment(fragmentReader)) {
 			fragmentReader.markStartFragment();
-			
+
 			@SuppressWarnings("unchecked")
 			T mappedFragment = (T) unmarshaller.unmarshal(new StaxSource(fragmentReader));
-			
+
 			item = mappedFragment;
 			fragmentReader.markFragmentProcessed();
 		}
 
 		return item;
 	}
-	
+
 	/*
-	 * jumpToItem is overridden because reading in and attempting to bind an entire fragment
-	 * is unacceptable in a restart scenario, and may cause exceptions to be thrown that
-	 * were already skipped in previous runs.
+	 * jumpToItem is overridden because reading in and attempting to bind an
+	 * entire fragment is unacceptable in a restart scenario, and may cause
+	 * exceptions to be thrown that were already skipped in previous runs.
 	 */
 	@Override
 	protected void jumpToItem(int itemIndex) throws Exception {
@@ -233,34 +240,34 @@ public class StaxEventItemReader<T> extends AbstractItemCountingItemStreamItemRe
 			readToEndFragment();
 		}
 	}
-	
+
 	/*
-	 * Read until the first StartElement tag that matches the provided 
-	 * fragmentRootElementName.  Because there may be any number of tags in between where the reader
-	 * is now and the fragment start, this is done in a loop until the element type and name 
-	 * match.
+	 * Read until the first StartElement tag that matches the provided
+	 * fragmentRootElementName. Because there may be any number of tags in
+	 * between where the reader is now and the fragment start, this is done in a
+	 * loop until the element type and name match.
 	 */
-	private void readToStartFragment() throws XMLStreamException{
-		while(true){
+	private void readToStartFragment() throws XMLStreamException {
+		while (true) {
 			XMLEvent nextEvent = eventReader.nextEvent();
-			if( nextEvent.isStartElement() &&
-				((StartElement)nextEvent).getName().getLocalPart().equals(fragmentRootElementName)){
+			if (nextEvent.isStartElement()
+					&& ((StartElement) nextEvent).getName().getLocalPart().equals(fragmentRootElementName)) {
 				return;
 			}
 		}
 	}
-	
+
 	/*
-	 * Read until the first EndElement tag that matches the provided 
-	 * fragmentRootElementName.  Because there may be any number of tags in between where the reader
-	 * is now and the fragment end tag, this is done in a loop until the element type and name 
-	 * match
+	 * Read until the first EndElement tag that matches the provided
+	 * fragmentRootElementName. Because there may be any number of tags in
+	 * between where the reader is now and the fragment end tag, this is done in
+	 * a loop until the element type and name match
 	 */
-	private void readToEndFragment() throws XMLStreamException{
-		while(true){
+	private void readToEndFragment() throws XMLStreamException {
+		while (true) {
 			XMLEvent nextEvent = eventReader.nextEvent();
-			if( nextEvent.isEndElement() &&
-				((EndElement)nextEvent).getName().getLocalPart().equals(fragmentRootElementName)){
+			if (nextEvent.isEndElement()
+					&& ((EndElement) nextEvent).getName().getLocalPart().equals(fragmentRootElementName)) {
 				return;
 			}
 		}
