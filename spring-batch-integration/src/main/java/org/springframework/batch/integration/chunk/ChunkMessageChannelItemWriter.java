@@ -48,6 +48,23 @@ public class ChunkMessageChannelItemWriter<T> extends StepExecutionListenerSuppo
 
 	private long throttleLimit = DEFAULT_THROTTLE_LIMIT;
 
+	private int DEFAULT_MAX_WAIT_TIMEOUTS = 40;
+
+	private int maxWaitTimeouts = DEFAULT_MAX_WAIT_TIMEOUTS;
+
+	/**
+	 * The maximum number of times to wait at the end of a step for a non-null
+	 * result from the remote workers. This is a multiplier on the receive
+	 * timeout set separately on the gateway. The ideal value is a compromise
+	 * between allowing slow workers time to finish, and responsiveness if there
+	 * is a dead worker.  Defaults to 40.
+	 * 
+	 * @param maxWaitTimeouts the maximum number of wait timeouts
+	 */
+	public void setMaxWaitTimeouts(int maxWaitTimeouts) {
+		this.maxWaitTimeouts = maxWaitTimeouts;
+	}
+
 	/**
 	 * Public setter for the throttle limit. This limits the number of pending
 	 * requests for chunk processing to avoid overwhelming the receivers.
@@ -135,9 +152,8 @@ public class ChunkMessageChannelItemWriter<T> extends StepExecutionListenerSuppo
 	 * @return true if successfully received a result, false if timed out
 	 */
 	private boolean waitForResults() {
-		// TODO: cumulative timeout, or throw an exception?
 		int count = 0;
-		int maxCount = 40;
+		int maxCount = maxWaitTimeouts;
 		while (localState.getExpecting() > 0 && count++ < maxCount) {
 			getNextResult();
 		}
@@ -155,7 +171,6 @@ public class ChunkMessageChannelItemWriter<T> extends StepExecutionListenerSuppo
 	 * instance id (maybe we are sharing a channel and we shouldn't be)
 	 */
 	private void getNextResult() {
-		// TODO: make sure this is transactional (should be if single threaded)
 		ChunkResponse payload = (ChunkResponse) messagingGateway.receive();
 		if (payload != null) {
 			Long jobInstanceId = payload.getJobId();

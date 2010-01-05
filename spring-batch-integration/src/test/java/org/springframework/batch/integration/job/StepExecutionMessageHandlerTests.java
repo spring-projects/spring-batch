@@ -165,11 +165,6 @@ public class StepExecutionMessageHandlerTests {
 			public StepExecution getLastStepExecution(JobInstance jobInstance, String stepName) {
 				StepExecution stepExecution = new StepExecution(stepName, new JobExecution(jobInstance));
 				stepExecution.setStatus(BatchStatus.COMPLETED);
-				stepExecution.setExecutionContext(new ExecutionContext() {
-					{
-						put("foo", "bar");
-					}
-				});
 				return stepExecution;
 			}
 		};
@@ -177,12 +172,8 @@ public class StepExecutionMessageHandlerTests {
 		JobExecution jobExecution = jobRepository.createJobExecution("job", new JobParameters());
 		JobExecutionRequest message = handler.handle(new JobExecutionRequest(jobExecution));
 		assertNotNull(message);
-		assertEquals(1, jobExecution.getStepExecutions().size());
-		StepExecution stepExecution = (StepExecution) jobExecution.getStepExecutions().iterator().next();
-		assertEquals(BatchStatus.COMPLETED, stepExecution.getStatus());
-		// We expect to get the context from the previous execution, even if we
-		// do not execute
-		assertTrue(stepExecution.getExecutionContext().containsKey("foo"));
+		assertEquals(0, jobExecution.getStepExecutions().size());
+		assertEquals(BatchStatus.STARTING, jobExecution.getStatus());
 	}
 
 	@Test
@@ -203,7 +194,7 @@ public class StepExecutionMessageHandlerTests {
 		JobExecution jobExecution = jobRepository.createJobExecution("job", new JobParameters());
 		JobExecutionRequest message = handler.handle(new JobExecutionRequest(jobExecution));
 		assertNotNull(message);
-		assertEquals(1, jobExecution.getStepExecutions().size());
+		assertEquals(0, jobExecution.getStepExecutions().size());
 		JobExecutionRequest payload = message;
 		assertEquals(BatchStatus.FAILED, payload.getStatus());
 		assertTrue(payload.hasErrors());

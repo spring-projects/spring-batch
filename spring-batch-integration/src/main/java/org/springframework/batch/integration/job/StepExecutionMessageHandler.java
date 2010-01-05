@@ -17,13 +17,10 @@ package org.springframework.batch.integration.job;
 
 import org.springframework.batch.core.BatchStatus;
 import org.springframework.batch.core.JobExecution;
-import org.springframework.batch.core.JobExecutionException;
-import org.springframework.batch.core.JobInstance;
-import org.springframework.batch.core.StartLimitExceededException;
 import org.springframework.batch.core.Step;
-import org.springframework.batch.core.StepExecution;
+import org.springframework.batch.core.job.SimpleStepHandler;
+import org.springframework.batch.core.job.StepHandler;
 import org.springframework.batch.core.repository.JobRepository;
-import org.springframework.batch.item.ExecutionContext;
 import org.springframework.beans.factory.annotation.Required;
 import org.springframework.integration.annotation.MessageEndpoint;
 import org.springframework.integration.annotation.ServiceActivator;
@@ -37,7 +34,7 @@ public class StepExecutionMessageHandler {
 
 	private Step step;
 
-	private JobRepository jobRepository;
+	private StepHandler stepHandler;
 
 	/**
 	 * Public setter for the {@link Step}.
@@ -57,7 +54,7 @@ public class StepExecutionMessageHandler {
 	 */
 	@Required
 	public void setJobRepository(JobRepository jobRepository) {
-		this.jobRepository = jobRepository;
+		stepHandler = new SimpleStepHandler(jobRepository);
 	}
 
 	@ServiceActivator
@@ -69,43 +66,10 @@ public class StepExecutionMessageHandler {
 		}
 
 		JobExecution jobExecution = request.getJobExecution();
-		JobInstance jobInstance = jobExecution.getJobInstance();
 
-		StepExecution stepExecution = jobExecution.createStepExecution(step.getName());
 		try {
-
-			StepExecution lastStepExecution = jobRepository.getLastStepExecution(jobInstance, step.getName());
-
-			// Even if it completed successfully we want to pass on the output
-			// attributes, so set up the execution context here if it is
-			// available.
-			if (lastStepExecution != null) {
-				stepExecution.setExecutionContext(lastStepExecution.getExecutionContext());
-			}
-
-			// If it is already complete and not restartable it will simply be
-			// skipped
-			if (shouldStart(lastStepExecution, step)) {
-
-				if (!isRestart(jobInstance, lastStepExecution)) {
-					stepExecution.setExecutionContext(new ExecutionContext());
-				}
-				jobRepository.add(stepExecution);
-				step.execute(stepExecution);
-
-			}
-			else if (lastStepExecution != null) {
-
-				/*
-				 * We only set these if the step is not going to execute. They
-				 * might be needed by the next step to receive the request, but
-				 * they won't be persisted because the step is not executed.
-				 */
-				stepExecution.setStatus(lastStepExecution.getStatus());
-				stepExecution.setExitStatus(lastStepExecution.getExitStatus());
-
-			}
-
+			
+			stepHandler.handleStep(step, jobExecution);
 			// (the job might actually not be complete, but the stage is).
 			request.setStatus(BatchStatus.COMPLETED);
 
@@ -120,15 +84,6 @@ public class StepExecutionMessageHandler {
 
 		return request;
 
-	}
-
-	/**
-	 * @param jobInstance
-	 * @param lastStepExecution
-	 * @return
-	 */
-	private boolean isRestart(JobInstance jobInstance, StepExecution lastStepExecution) {
-		return (lastStepExecution != null && !lastStepExecution.getStatus().equals(BatchStatus.COMPLETED));
 	}
 
 	/**
@@ -147,47 +102,6 @@ public class StepExecutionMessageHandler {
 	private void handleFailure(JobExecutionRequest request, Throwable e) {
 		request.registerThrowable(e);
 		request.setStatus(BatchStatus.FAILED);
-	}
-
-	/*
-	 * TODO: merge this with SimpleJob implementation.
-	 * 
-	 * Given a step and configuration, return true if the step should start,
-	 * false if it should not, and throw an exception if the job should finish.
-	 */
-	private boolean shouldStart(StepExecution lastStepExecution, Step step) throws JobExecutionException {
-
-		BatchStatus stepStatus;
-		// if the last execution is null, the step has never been executed.
-		if (lastStepExecution == null) {
-			return true;
-		}
-		else {
-			stepStatus = lastStepExecution.getStatus();
-		}
-
-		if (stepStatus == BatchStatus.UNKNOWN) {
-			throw new JobExecutionException("Cannot restart step from UNKNOWN status.  "
-					+ "The last execution may have ended with a failure that could not be rolled back, "
-					+ "so it may be dangerous to proceed.  " + "Manual intervention is probably necessary.");
-		}
-
-		if (stepStatus == BatchStatus.COMPLETED && step.isAllowStartIfComplete() == false) {
-			// step is complete, false should be returned, indicating that the
-			// step should not be started
-			return false;
-		}
-
-		if (jobRepository.getStepExecutionCount(lastStepExecution.getJobExecution().getJobInstance(), step.getName()) < step
-				.getStartLimit()) {
-			// step start count is less than start max, return true
-			return true;
-		}
-		else {
-			// start max has been exceeded, throw an exception.
-			throw new StartLimitExceededException("Maximum start limit exceeded for step: " + step.getName()
-					+ "StartMax: " + step.getStartLimit());
-		}
 	}
 
 }
