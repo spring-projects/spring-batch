@@ -110,8 +110,7 @@ public class MessageOrientedStep extends AbstractStep {
 		}
 		else {
 			executionContext.putString(WAITING, "true");
-			// TODO: need these two lines to be atomic
-			getJobRepository().update(stepExecution);
+			getJobRepository().updateExecutionContext(stepExecution);
 			outputChannel.send(new GenericMessage<JobExecutionRequest>(request));
 			waitForReply(request.getJobId());
 		}
@@ -130,7 +129,6 @@ public class MessageOrientedStep extends AbstractStep {
 
 		while (count++ < maxCount) {
 
-			// TODO: timeout?
 			@SuppressWarnings("unchecked")
 			Message<JobExecutionRequest> message = (Message<JobExecutionRequest>) source.receive(timeout);
 
@@ -146,8 +144,6 @@ public class MessageOrientedStep extends AbstractStep {
 					// One of the steps decided we were finished
 					// TODO: wait for all the other steps that might be
 					// executing concurrently?
-					// TODO: maybe *any* reply on this channel should
-					// mean the end of the step?
 					break;
 				}
 

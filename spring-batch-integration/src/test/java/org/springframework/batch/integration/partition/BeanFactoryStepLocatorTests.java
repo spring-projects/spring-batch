@@ -46,12 +46,10 @@ public class BeanFactoryStepLocatorTests {
 		}
 
 		public int getStartLimit() {
-			// TODO Auto-generated method stub
 			return 0;
 		}
 
 		public boolean isAllowStartIfComplete() {
-			// TODO Auto-generated method stub
 			return false;
 		}
 	}

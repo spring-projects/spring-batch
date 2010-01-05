@@ -26,7 +26,7 @@ import org.springframework.batch.core.StepExecution;
 public class StepSupport implements Step {
 
 	private String name;
-	private int startLimit;
+	private int startLimit = 1;
 
 	/**
 	 * @param name

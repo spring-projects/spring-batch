@@ -37,11 +37,11 @@ public class AsyncItemProcessorMessagingGatewayTests {
 		for (Future<String> future : list) {
 			String value = future.get();
 			/**
-			 * TODO: this delegate is a Spring Integration MessagingGateway. It
-			 * can easily return null because of a timeout, but that will be
-			 * treated by Batch as a filtered item, whereas it is really more
-			 * like a skip. Maybe we should have an option to throw an exception
-			 * in the processor if an unexpected null value comes back?
+			 * This delegate is a Spring Integration MessagingGateway. It can
+			 * easily return null because of a timeout, but that will be treated
+			 * by Batch as a filtered item, whereas it is really more like a
+			 * skip. So we have to throw an exception in the processor if an
+			 * unexpected null value comes back.
 			 */
 			assertNotNull(value);
 			assertTrue(value.matches("foo.*foo.*"));
