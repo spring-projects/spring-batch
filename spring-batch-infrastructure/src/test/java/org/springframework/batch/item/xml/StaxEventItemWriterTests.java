@@ -264,6 +264,40 @@ public class StaxEventItemWriterTests {
 	}
 
 	/**
+	 * Item is written to the output file with namespace.
+	 */
+	@Test
+	public void testWriteRootTagWithNamespace() throws Exception {
+		writer.setRootTagName("{http://www.springframework.org/test}root");
+		writer.afterPropertiesSet();
+		writer.open(executionContext);
+		writer.write(items);
+		writer.close();
+		String content = getOutputFileContent();
+		assertTrue("Wrong content: " + content, content
+				.contains(("<root xmlns=\"http://www.springframework.org/test\">")));
+		assertTrue("Wrong content: " + content, content.contains(TEST_STRING));
+		assertTrue("Wrong content: " + content, content.contains(("</root>")));
+	}
+
+	/**
+	 * Item is written to the output file with namespace and prefix.
+	 */
+	@Test
+	public void testWriteRootTagWithNamespaceAndPrefix() throws Exception {
+		writer.setRootTagName("{http://www.springframework.org/test}ns:root");
+		writer.afterPropertiesSet();
+		writer.open(executionContext);
+		writer.write(items);
+		writer.close();
+		String content = getOutputFileContent();
+		assertTrue("Wrong content: " + content, content
+				.contains(("<ns:root xmlns:ns=\"http://www.springframework.org/test\">")));
+		assertTrue("Wrong content: " + content, content.contains(TEST_STRING));
+		assertTrue("Wrong content: " + content, content.contains(("</ns:root>")));
+	}
+
+	/**
 	 * Writes object's toString representation as XML comment.
 	 */
 	private static class SimpleMarshaller implements Marshaller {
@@ -316,39 +350,6 @@ public class StaxEventItemWriterTests {
 		source.afterPropertiesSet();
 
 		return source;
-	}
-
-	/**
-	 * Item is written to the output file with namespace.
-	 */
-	@Test
-	public void testWriteRootTagWithNamespace() throws Exception {
-		writer.setRootTagNamespace("http://www.springframework.org/test");
-		writer.open(executionContext);
-		writer.write(items);
-		writer.close();
-		String content = getOutputFileContent();
-		assertTrue("Wrong content: " + content, content
-				.contains(("<root xmlns=\"http://www.springframework.org/test\">")));
-		assertTrue("Wrong content: " + content, content.contains(TEST_STRING));
-		assertTrue("Wrong content: " + content, content.contains(("</root>")));
-	}
-
-	/**
-	 * Item is written to the output file with namespace and prefix.
-	 */
-	@Test
-	public void testWriteRootTagWithNamespaceAndPrefix() throws Exception {
-		writer.setRootTagNamespacePrefix("ns");
-		writer.setRootTagNamespace("http://www.springframework.org/test");
-		writer.open(executionContext);
-		writer.write(items);
-		writer.close();
-		String content = getOutputFileContent();
-		assertTrue("Wrong content: " + content, content
-				.contains(("<ns:root xmlns:ns=\"http://www.springframework.org/test\">")));
-		assertTrue("Wrong content: " + content, content.contains(TEST_STRING));
-		assertTrue("Wrong content: " + content, content.contains(("</ns:root>")));
 	}
 	
 }

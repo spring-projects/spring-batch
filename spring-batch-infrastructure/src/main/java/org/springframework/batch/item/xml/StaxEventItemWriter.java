@@ -232,7 +232,15 @@ public class StaxEventItemWriter<T> extends ExecutionContextUserSupport implemen
 
 	/**
 	 * Set the tag name of the root element. If not set, default name is used
-	 * ("root").
+	 * ("root").  Namespace URI and prefix can also be set optionally using the
+	 * notation:
+	 * 
+	 * <pre>
+	 * {uri}prefix:root
+	 * </pre>
+	 * 
+	 * The prefix is optional (defaults to empty), but if it is specified then the 
+	 * uri must be provided.
 	 * 
 	 * @param rootTagName the tag name to be used for the root element
 	 */
@@ -250,31 +258,12 @@ public class StaxEventItemWriter<T> extends ExecutionContextUserSupport implemen
 	}
 
 	/**
-	 * Set the namespace prefix of the root element. If not set, the namespace
-	 * prefix "xmlns" is used.
-	 * 
-	 * @param rootTagNamespacePrefix the rootTagNamespacePrefix to set
-	 */
-	public void setRootTagNamespacePrefix(String rootTagNamespacePrefix) {
-		this.rootTagNamespacePrefix = rootTagNamespacePrefix;
-	}
-
-	/**
 	 * Get the namespace of the root element.
 	 * 
 	 * @return the rootTagNamespace
 	 */
 	public String getRootTagNamespace() {
 		return rootTagNamespace;
-	}
-
-	/**
-	 * Set the namespace of the root element. If not set, no namespace is used.
-	 * 
-	 * @param rootTagNamespace the rootTagNamespace to set
-	 */
-	public void setRootTagNamespace(String rootTagNamespace) {
-		this.rootTagNamespace = rootTagNamespace;
 	}
 
 	/**
@@ -315,6 +304,15 @@ public class StaxEventItemWriter<T> extends ExecutionContextUserSupport implemen
 	 */
 	public void afterPropertiesSet() throws Exception {
 		Assert.notNull(marshaller);
+		if (rootTagName.contains("{")) {
+			rootTagNamespace = rootTagName.replaceAll("\\{(.*)\\}.*", "$1");
+			rootTagName = rootTagName.replaceAll("\\{.*\\}(.*)", "$1");
+			if (rootTagName.contains(":"))
+			{
+				rootTagNamespacePrefix = rootTagName.replaceAll("(.*):.*", "$1");
+				rootTagName = rootTagName.replaceAll(".*:(.*)", "$1");
+			}
+		}
 	}
 
 	/**
