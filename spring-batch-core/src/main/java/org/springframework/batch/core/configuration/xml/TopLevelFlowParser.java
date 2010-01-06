@@ -36,6 +36,7 @@ public class TopLevelFlowParser extends AbstractFlowParser {
 	 */
 	@Override
 	protected void doParse(Element element, ParserContext parserContext, BeanDefinitionBuilder builder) {
+		CoreNamespaceUtils.autoregisterBeansForNamespace(parserContext, element);
 		String flowName = element.getAttribute(ID_ATTR);
 		builder.getRawBeanDefinition().setAttribute("flowName", flowName);
 		builder.addPropertyValue("name", flowName);

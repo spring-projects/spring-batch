@@ -18,6 +18,7 @@ public class TopLevelJobListenerParser extends AbstractSingleBeanDefinitionParse
 
 	@Override
 	protected void doParse(Element element, ParserContext parserContext, BeanDefinitionBuilder builder) {
+		CoreNamespaceUtils.autoregisterBeansForNamespace(parserContext, element);
 		jobListenerParser.doParse(element, parserContext, builder);
 	}
 

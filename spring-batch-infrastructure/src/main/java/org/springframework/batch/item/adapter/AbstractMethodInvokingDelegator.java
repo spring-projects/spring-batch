@@ -89,7 +89,7 @@ public abstract class AbstractMethodInvokingDelegator<T> implements Initializing
 	 * Create a new configured instance of {@link MethodInvoker}.
 	 */
 	private MethodInvoker createMethodInvoker(Object targetObject, String targetMethod) {
-		MethodInvoker invoker = new MethodInvoker();
+		HippyMethodInvoker invoker = new HippyMethodInvoker();
 		invoker.setTargetObject(targetObject);
 		invoker.setTargetMethod(targetMethod);
 		invoker.setArguments(arguments);

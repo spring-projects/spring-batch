@@ -29,7 +29,7 @@
 		</xsd:annotation>
 		<xsd:complexType>
 			<xsd:sequence>
-				<xsd:element ref="description" minOccurs="0" />
+				<xsd:element name="description" type="description" minOccurs="0" />
 				<xsd:choice minOccurs="0" maxOccurs="unbounded">
 					<xsd:group ref="flowGroup" minOccurs="1" maxOccurs="unbounded" />
 					<xsd:element name="listeners">
@@ -126,7 +126,7 @@
 		</xsd:annotation>
 		<xsd:complexType>
 			<xsd:sequence>
-				<xsd:element ref="description" minOccurs="0" />
+				<xsd:element name="description" type="description" minOccurs="0" />
 				<xsd:choice minOccurs="0" maxOccurs="unbounded">
 					<xsd:group ref="flowGroup" />
 				</xsd:choice>
@@ -385,7 +385,7 @@
 
 	<xsd:complexType name="stepType">
 		<xsd:sequence>
-			<xsd:element ref="description" minOccurs="0" />
+			<xsd:element name="description" type="description" minOccurs="0" />
 			<xsd:choice minOccurs="0" maxOccurs="1">
 				<xsd:element name="tasklet" type="taskletType" />
 				<xsd:element name="partition" type="partitionType" />
@@ -554,10 +554,18 @@
 					the Tasklet interface.
 				</xsd:documentation>
 				<xsd:appinfo>
-					<tool:annotation kind="ref">
-						<tool:expected-type type="org.springframework.batch.core.step.tasklet.Tasklet" />
-					</tool:annotation>
+					<tool:annotation kind="ref" />
 				</xsd:appinfo>
+			</xsd:annotation>
+		</xsd:attribute>
+		<xsd:attribute name="method" type="xsd:string" use="optional">
+			<xsd:annotation>
+				<xsd:documentation>
+					If the tasklet is specified as a bean definition, then a method can be specified and a POJO
+					will
+					be adapted to the Tasklet interface. The method suggested should have the same arguments
+					as Tasklet.execute (or a subset), and have a compatible return type (boolean, void or RepeatStatus).
+				</xsd:documentation>
 			</xsd:annotation>
 		</xsd:attribute>
 		<xsd:attribute name="start-limit" type="xsd:string" use="optional">
@@ -1227,16 +1235,14 @@
 		</xsd:attribute>
 	</xsd:attributeGroup>
 
-	<xsd:element name="description">
+	<xsd:simpleType name="description">
 		<xsd:annotation>
 			<xsd:documentation><![CDATA[
 	Contains informative text describing the purpose of the enclosing element.
 	Used primarily for user documentation of XML bean definition documents.
 			]]></xsd:documentation>
 		</xsd:annotation>
-		<xsd:complexType mixed="true">
-			<xsd:choice minOccurs="0" maxOccurs="unbounded" />
-		</xsd:complexType>
-	</xsd:element>
+		<xsd:restriction base="xsd:string" />
+	</xsd:simpleType>
 
 </xsd:schema>

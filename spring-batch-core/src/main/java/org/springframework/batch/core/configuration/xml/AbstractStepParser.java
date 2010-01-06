@@ -15,18 +15,13 @@
  */
 package org.springframework.batch.core.configuration.xml;
 
-import java.util.List;
-
-import org.springframework.beans.BeanMetadataElement;
 import org.springframework.beans.MutablePropertyValues;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.config.RuntimeBeanReference;
 import org.springframework.beans.factory.config.TypedStringValue;
-import org.springframework.beans.factory.parsing.CompositeComponentDefinition;
 import org.springframework.beans.factory.support.AbstractBeanDefinition;
 import org.springframework.beans.factory.support.BeanDefinitionBuilder;
 import org.springframework.beans.factory.support.GenericBeanDefinition;
-import org.springframework.beans.factory.support.ManagedList;
 import org.springframework.beans.factory.xml.ParserContext;
 import org.springframework.util.StringUtils;
 import org.springframework.util.xml.DomUtils;
@@ -50,12 +45,6 @@ public abstract class AbstractStepParser {
 	protected static final String ID_ATTR = "id";
 
 	private static final String PARENT_ATTR = "parent";
-
-	private static final String TASKLET_REF_ATTR = "ref";
-
-	private static final String BEAN_ELE = "bean";
-
-	private static final String REF_ELE = "ref";
 
 	private static final String REF_ATTR = "ref";
 
@@ -83,19 +72,7 @@ public abstract class AbstractStepParser {
 
 	private static final String FLOW_ELE = "flow";
 
-	private static final String CHUNK_ELE = "chunk";
-
-	private static final String LISTENERS_ELE = "listeners";
-
-	private static final String MERGE_ATTR = "merge";
-
-	private static final String TX_ATTRIBUTES_ELE = "transaction-attributes";
-
 	private static final String JOB_REPO_ATTR = "job-repository";
-
-	private static final ChunkElementParser chunkElementParser = new ChunkElementParser();
-
-	private static final StepListenerParser stepListenerParser = new StepListenerParser();
 
 	/**
 	 * @param stepElement The &lt;step/&gt; element
@@ -111,7 +88,7 @@ public abstract class AbstractStepParser {
 		Element taskletElement = DomUtils.getChildElementByTagName(stepElement, TASKLET_ELE);
 		if (taskletElement != null) {
 			boolean stepUnderspecified = CoreNamespaceUtils.isUnderspecified(stepElement);
-			parseTasklet(stepElement, taskletElement, bd, parserContext, stepUnderspecified);
+			new TaskletParser().parseTasklet(stepElement, taskletElement, bd, parserContext, stepUnderspecified);
 		}
 
 		Element flowElement = DomUtils.getChildElementByTagName(stepElement, FLOW_ELE);
@@ -228,46 +205,6 @@ public abstract class AbstractStepParser {
 
 	}
 
-	private void parseTasklet(Element stepElement, Element taskletElement, AbstractBeanDefinition bd,
-			ParserContext parserContext, boolean stepUnderspecified) {
-
-		bd.setBeanClass(StepParserStepFactoryBean.class);
-		bd.setAttribute("isNamespaceStep", true);
-
-		String taskletRef = taskletElement.getAttribute(TASKLET_REF_ATTR);
-		@SuppressWarnings("unchecked")
-		List<Element> chunkElements = DomUtils.getChildElementsByTagName(taskletElement, CHUNK_ELE);
-		@SuppressWarnings("unchecked")
-		List<Element> beanElements = DomUtils.getChildElementsByTagName(taskletElement, BEAN_ELE);
-		@SuppressWarnings("unchecked")
-		List<Element> refElements = DomUtils.getChildElementsByTagName(taskletElement, REF_ELE);
-
-		validateTaskletAttributesAndSubelements(taskletElement, parserContext, stepUnderspecified, taskletRef,
-				chunkElements, beanElements, refElements);
-
-		if (chunkElements.size() == 1) {
-			chunkElementParser.parse(chunkElements.get(0), bd, parserContext, stepUnderspecified);
-		}
-		else {
-			BeanMetadataElement bme = null;
-			if (StringUtils.hasText(taskletRef)) {
-				bme = new RuntimeBeanReference(taskletRef);
-			}
-			else if (beanElements.size() == 1) {
-				bme = parserContext.getDelegate().parseBeanDefinitionElement(beanElements.get(0));
-			}
-			else if (refElements.size() == 1) {
-				bme = (BeanMetadataElement) parserContext.getDelegate().parsePropertySubElement(refElements.get(0),
-						null);
-			}
-
-			if (bme != null) {
-				bd.getPropertyValues().addPropertyValue("tasklet", bme);
-			}
-		}
-
-		handleTaskletElement(taskletElement, bd, parserContext);
-	}
 
 	private void parseFlow(Element stepElement, Element flowElement, AbstractBeanDefinition bd,
 			ParserContext parserContext, boolean stepUnderspecified) {
@@ -286,165 +223,6 @@ public abstract class AbstractStepParser {
 
 		bd.getPropertyValues().addPropertyValue("flow", flowDefinition);
 
-	}
-
-	private void validateTaskletAttributesAndSubelements(Element taskletElement, ParserContext parserContext,
-			boolean stepUnderspecified, String taskletRef, List<Element> chunkElements, List<Element> beanElements,
-			List<Element> refElements) {
-		int total = (StringUtils.hasText(taskletRef) ? 1 : 0) + chunkElements.size() + beanElements.size()
-				+ refElements.size();
-
-		StringBuilder found = new StringBuilder();
-		if (total > 1) {
-			if (StringUtils.hasText(taskletRef)) {
-				found.append("'" + TASKLET_REF_ATTR + "' attribute, ");
-			}
-			if (chunkElements.size() == 1) {
-				found.append("<" + CHUNK_ELE + "/> element, ");
-			}
-			else if (chunkElements.size() > 1) {
-				found.append(chunkElements.size() + " <" + CHUNK_ELE + "/> elements, ");
-			}
-			if (beanElements.size() == 1) {
-				found.append("<" + BEAN_ELE + "/> element, ");
-			}
-			else if (beanElements.size() > 1) {
-				found.append(beanElements.size() + " <" + BEAN_ELE + "/> elements, ");
-			}
-			if (refElements.size() == 1) {
-				found.append("<" + REF_ELE + "/> element, ");
-			}
-			else if (refElements.size() > 1) {
-				found.append(refElements.size() + " <" + REF_ELE + "/> elements, ");
-			}
-			found.delete(found.length() - 2, found.length());
-		}
-		else {
-			found.append("None");
-		}
-
-		String error = null;
-		if (stepUnderspecified) {
-			if (total > 1) {
-				error = "may not have more than";
-			}
-		}
-		else if (total != 1) {
-			error = "must have exactly";
-		}
-
-		if (error != null) {
-			parserContext.getReaderContext().error(
-					"The <" + taskletElement.getTagName() + "/> element " + error + " one of: '" + TASKLET_REF_ATTR
-							+ "' attribute, <" + CHUNK_ELE + "/> element, <" + BEAN_ELE + "/> attribute, or <"
-							+ REF_ELE + "/> element.  Found: " + found + ".", taskletElement);
-		}
-	}
-
-	private void handleTaskletElement(Element taskletElement, AbstractBeanDefinition bd, ParserContext parserContext) {
-		MutablePropertyValues propertyValues = bd.getPropertyValues();
-		handleTaskletAttributes(taskletElement, propertyValues);
-		handleTransactionAttributesElement(taskletElement, propertyValues);
-		handleListenersElement(taskletElement, propertyValues, parserContext);
-		handleExceptionElement(taskletElement, parserContext, propertyValues, "no-rollback-exception-classes",
-				"noRollbackExceptionClasses");
-		bd.setRole(BeanDefinition.ROLE_SUPPORT);
-		bd.setSource(parserContext.extractSource(taskletElement));
-	}
-
-	private void handleTransactionAttributesElement(Element stepElement, MutablePropertyValues propertyValues) {
-		@SuppressWarnings("unchecked")
-		List<Element> txAttrElements = DomUtils.getChildElementsByTagName(stepElement, TX_ATTRIBUTES_ELE);
-		if (txAttrElements.size() == 1) {
-			Element txAttrElement = txAttrElements.get(0);
-			String propagation = txAttrElement.getAttribute("propagation");
-			if (StringUtils.hasText(propagation)) {
-				propertyValues.addPropertyValue("propagation", propagation);
-			}
-			String isolation = txAttrElement.getAttribute("isolation");
-			if (StringUtils.hasText(isolation)) {
-				propertyValues.addPropertyValue("isolation", isolation);
-			}
-			String timeout = txAttrElement.getAttribute("timeout");
-			if (StringUtils.hasText(timeout)) {
-				propertyValues.addPropertyValue("transactionTimeout", timeout);
-			}
-		}
-	}
-
-	@SuppressWarnings("unchecked")
-	private void handleExceptionElement(Element element, ParserContext parserContext,
-			MutablePropertyValues propertyValues, String exceptionListName, String propertyName) {
-		List<Element> children = DomUtils.getChildElementsByTagName(element, exceptionListName);
-		if (children.size() == 1) {
-			Element exceptionClassesElement = children.get(0);
-			ManagedList list = new ManagedList();
-			list.setMergeEnabled(exceptionClassesElement.hasAttribute(MERGE_ATTR)
-					&& Boolean.valueOf(exceptionClassesElement.getAttribute(MERGE_ATTR)));
-			addExceptionClasses("include", exceptionClassesElement, list, parserContext);
-			propertyValues.addPropertyValue(propertyName, list);
-		}
-		else if (children.size() > 1) {
-			parserContext.getReaderContext().error(
-					"The <" + exceptionListName + "/> element may not appear more than once in a single <"
-							+ element.getNodeName() + "/>.", element);
-		}
-	}
-
-	@SuppressWarnings("unchecked")
-	private void addExceptionClasses(String elementName, Element exceptionClassesElement, ManagedList list,
-			ParserContext parserContext) {
-		for (Element child : (List<Element>) DomUtils.getChildElementsByTagName(exceptionClassesElement, elementName)) {
-			String className = child.getAttribute("class");
-			list.add(new TypedStringValue(className, Class.class));
-		}
-	}
-
-	private void handleTaskletAttributes(Element taskletElement, MutablePropertyValues propertyValues) {
-		String transactionManagerRef = taskletElement.getAttribute("transaction-manager");
-		if (StringUtils.hasText(transactionManagerRef)) {
-			propertyValues.addPropertyValue("transactionManager", new RuntimeBeanReference(transactionManagerRef));
-		}
-		String startLimit = taskletElement.getAttribute("start-limit");
-		if (StringUtils.hasText(startLimit)) {
-			propertyValues.addPropertyValue("startLimit", startLimit);
-		}
-		String allowStartIfComplete = taskletElement.getAttribute("allow-start-if-complete");
-		if (StringUtils.hasText(allowStartIfComplete)) {
-			propertyValues.addPropertyValue("allowStartIfComplete", allowStartIfComplete);
-		}
-		String taskExecutorBeanId = taskletElement.getAttribute(TASK_EXECUTOR_ATTR);
-		if (StringUtils.hasText(taskExecutorBeanId)) {
-			RuntimeBeanReference taskExecutorRef = new RuntimeBeanReference(taskExecutorBeanId);
-			propertyValues.addPropertyValue("taskExecutor", taskExecutorRef);
-		}
-		String throttleLimit = taskletElement.getAttribute("throttle-limit");
-		if (StringUtils.hasText(throttleLimit)) {
-			propertyValues.addPropertyValue("throttleLimit", throttleLimit);
-		}
-	}
-
-	@SuppressWarnings("unchecked")
-	private void handleListenersElement(Element stepElement, MutablePropertyValues propertyValues,
-			ParserContext parserContext) {
-		List<Element> listenersElements = DomUtils.getChildElementsByTagName(stepElement, LISTENERS_ELE);
-		if (listenersElements.size() == 1) {
-			Element listenersElement = listenersElements.get(0);
-			CompositeComponentDefinition compositeDef = new CompositeComponentDefinition(listenersElement.getTagName(),
-					parserContext.extractSource(stepElement));
-			parserContext.pushContainingComponent(compositeDef);
-			ManagedList listenerBeans = new ManagedList();
-			listenerBeans.setMergeEnabled(listenersElement.hasAttribute(MERGE_ATTR)
-					&& Boolean.valueOf(listenersElement.getAttribute(MERGE_ATTR)));
-			List<Element> listenerElements = DomUtils.getChildElementsByTagName(listenersElement, "listener");
-			if (listenerElements != null) {
-				for (Element listenerElement : listenerElements) {
-					listenerBeans.add(stepListenerParser.parse(listenerElement, parserContext));
-				}
-			}
-			propertyValues.addPropertyValue("listeners", listenerBeans);
-			parserContext.popAndRegisterContainingComponent();
-		}
 	}
 
 }

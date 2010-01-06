@@ -18,6 +18,7 @@ public class TopLevelStepListenerParser extends AbstractSingleBeanDefinitionPars
 
 	@Override
 	protected void doParse(Element element, ParserContext parserContext, BeanDefinitionBuilder builder) {
+		CoreNamespaceUtils.autoregisterBeansForNamespace(parserContext, element);
 		stepListenerParser.doParse(element, parserContext, builder);
 	}
 

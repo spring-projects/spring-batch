@@ -19,13 +19,14 @@ import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.config.RuntimeBeanReference;
 import org.springframework.beans.factory.support.BeanDefinitionBuilder;
 import org.springframework.beans.factory.xml.AbstractSingleBeanDefinitionParser;
+import org.springframework.beans.factory.xml.ParserContext;
 import org.springframework.transaction.support.DefaultTransactionDefinition;
 import org.springframework.util.StringUtils;
 import org.w3c.dom.Element;
 
 /**
- * Parser for the lt;job-repository/gt; element in the Batch namespace. Sets up and returns
- * a JobRepositoryFactoryBean.
+ * Parser for the lt;job-repository/gt; element in the Batch namespace. Sets up
+ * and returns a JobRepositoryFactoryBean.
  * 
  * @author Thomas Risberg
  * @since 2.0
@@ -33,15 +34,19 @@ import org.w3c.dom.Element;
  */
 public class JobRepositoryParser extends AbstractSingleBeanDefinitionParser {
 
-    protected String getBeanClassName(Element element) {
-        return "org.springframework.batch.core.repository.support.JobRepositoryFactoryBean";
-    }
+	protected String getBeanClassName(Element element) {
+		return "org.springframework.batch.core.repository.support.JobRepositoryFactoryBean";
+	}
 
 	/**
-	 * Parse and create a bean definition for a 
-	 * {@link org.springframework.batch.core.repository.support.JobRepositoryFactoryBean}. 
+	 * Parse and create a bean definition for a
+	 * {@link org.springframework.batch.core.repository.support.JobRepositoryFactoryBean}
+	 * .
 	 */
-    protected void doParse(Element element, BeanDefinitionBuilder builder) {
+	@Override
+    protected void doParse(Element element, ParserContext parserContext, BeanDefinitionBuilder builder) {
+
+		CoreNamespaceUtils.autoregisterBeansForNamespace(parserContext, element);
 
         String dataSource = element.getAttribute("data-source");
 
@@ -75,5 +80,4 @@ public class JobRepositoryParser extends AbstractSingleBeanDefinitionParser {
         builder.setRole(BeanDefinition.ROLE_SUPPORT);
 
     }
-
 }
