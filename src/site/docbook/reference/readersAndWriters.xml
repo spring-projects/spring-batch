@@ -1939,7 +1939,7 @@ itemReader.close(executionContext);</programlisting>
                   saved in the <classname>ExecutionContext</classname>
                   provided by
                   <methodname>ItemStream#update</methodname>(<classname>ExecutionContext</classname>)
-                  The default value is false.</entry>
+                  The default value is true.</entry>
                 </row>
 
                 <row>
