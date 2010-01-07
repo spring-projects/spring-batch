@@ -19,20 +19,25 @@ package org.springframework.batch.sample.iosample;
 import static org.junit.Assert.assertEquals;
 
 import java.util.Date;
+import java.util.concurrent.Callable;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.batch.core.BatchStatus;
+import org.springframework.batch.core.Job;
 import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.JobParameters;
 import org.springframework.batch.core.JobParametersBuilder;
-import org.springframework.batch.core.job.AbstractJob;
+import org.springframework.batch.core.StepExecution;
 import org.springframework.batch.core.launch.JobLauncher;
 import org.springframework.batch.item.ExecutionContext;
-import org.springframework.batch.item.file.FlatFileItemReader;
+import org.springframework.batch.item.ItemReader;
+import org.springframework.batch.item.ItemStream;
 import org.springframework.batch.sample.domain.trade.CustomerCredit;
+import org.springframework.batch.test.MetaDataInstanceFactory;
+import org.springframework.batch.test.StepScopeTestUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.io.Resource;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
@@ -49,13 +54,14 @@ public class TwoJobInstancesDelimitedFunctionalTests {
 	private JobLauncher launcher;
 
 	@Autowired
-	private AbstractJob job;
+	private Job job;
 
 	@Autowired
-	private FlatFileItemReader<CustomerCredit> reader;
+	private ItemReader<CustomerCredit> reader;
 
 	@Autowired
-	private Resource outputResource;
+	@Qualifier("itemReader")
+	private ItemStream readerStream;
 
 	@Test
 	public void testLaunchJobTwice() throws Exception {
@@ -69,18 +75,31 @@ public class TwoJobInstancesDelimitedFunctionalTests {
 
 	private void verifyOutput(int expected) throws Exception {
 
-		reader.setResource(outputResource);
-		reader.open(new ExecutionContext());
+		JobParameters jobParameters = new JobParametersBuilder().addString("fileName",
+				"file:./target/test-outputs/delimitedOutput.csv").toJobParameters();
+		StepExecution stepExecution = MetaDataInstanceFactory.createStepExecution(jobParameters);
 
-		int count = 0;
-		try {
-			while (reader.read() != null) {
-				count++;
+		int count = StepScopeTestUtils.doInStepScope(stepExecution, new Callable<Integer>() {
+
+			public Integer call() throws Exception {
+
+				int count = 0;
+
+				readerStream.open(new ExecutionContext());
+
+				try {
+					while (reader.read() != null) {
+						count++;
+					}
+				}
+				finally {
+					readerStream.close();
+				}
+				return count;
+
 			}
-		}
-		finally {
-			reader.close();
-		}
+
+		});
 
 		assertEquals(expected, count);
 

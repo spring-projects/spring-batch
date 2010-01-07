@@ -22,6 +22,7 @@ import org.springframework.batch.core.JobInstance;
 import org.springframework.batch.core.JobParameters;
 import org.springframework.batch.core.StepExecution;
 import org.springframework.batch.core.converter.DefaultJobParametersConverter;
+import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.support.PropertiesConverter;
 
 /**
@@ -32,6 +33,31 @@ import org.springframework.batch.support.PropertiesConverter;
  * 
  */
 public class MetaDataInstanceFactory {
+
+	/**
+	 * The default name for a job ("job")
+	 */
+	public static final String DEFAULT_JOB_NAME = "job";
+
+	/**
+	 * The default id for a job instance (12L)
+	 */
+	public static final long DEFAULT_JOB_INSTANCE_ID = 12L;
+
+	/**
+	 * The default id for a job execution (123L)
+	 */
+	public static final long DEFAULT_JOB_EXECUTION_ID = 123L;
+
+	/**
+	 * The default name for a step ("step")
+	 */
+	public static final String DEFAULT_STEP_NAME = "step";
+
+	/**
+	 * The default id for a step execution (1234L)
+	 */
+	public static final long DEFAULT_STEP_EXECUTION_ID = 1234L;
 
 	/**
 	 * Create a {@link JobInstance} with the parameters provided.
@@ -73,20 +99,20 @@ public class MetaDataInstanceFactory {
 	/**
 	 * Create a {@link JobInstance} with default parameters.
 	 * 
-	 * @return a {@link JobInstance} with name="job", id=12L and empty
-	 * parameters
+	 * @return a {@link JobInstance} with name=DEFAULT_JOB_NAME,
+	 * id=DEFAULT_JOB_INSTANCE_ID and empty parameters
 	 */
 	public static JobInstance createJobInstance() {
-		return new JobInstance(12L, new JobParameters(), "job");
+		return new JobInstance(DEFAULT_JOB_INSTANCE_ID, new JobParameters(), DEFAULT_JOB_NAME);
 	}
 
 	/**
 	 * Create a {@link JobExecution} with default parameters.
 	 * 
-	 * @return a {@link JobExecution} with id=123L
+	 * @return a {@link JobExecution} with id=DEFAULT_JOB_EXECUTION_ID
 	 */
 	public static JobExecution createJobExecution() {
-		return createJobExecution(123L);
+		return createJobExecution(DEFAULT_JOB_EXECUTION_ID);
 	}
 
 	/**
@@ -96,7 +122,7 @@ public class MetaDataInstanceFactory {
 	 * @return a {@link JobExecution} with valid {@link JobInstance}
 	 */
 	public static JobExecution createJobExecution(Long executionId) {
-		return createJobExecution("job", 12L, executionId);
+		return createJobExecution(DEFAULT_JOB_NAME, DEFAULT_JOB_INSTANCE_ID, executionId);
 	}
 
 	/**
@@ -144,10 +170,11 @@ public class MetaDataInstanceFactory {
 	/**
 	 * Create a {@link StepExecution} with default parameters.
 	 * 
-	 * @return a {@link StepExecution} with stepName="step" and id=1234L
+	 * @return a {@link StepExecution} with stepName="step" and
+	 * id=DEFAULT_STEP_EXECUTION_ID
 	 */
 	public static StepExecution createStepExecution() {
-		return createStepExecution("step", 1234L);
+		return createStepExecution(DEFAULT_STEP_NAME, DEFAULT_STEP_EXECUTION_ID);
 	}
 
 	/**
@@ -185,13 +212,55 @@ public class MetaDataInstanceFactory {
 	 * with a unique id
 	 */
 	public static JobExecution createJobExecutionWithStepExecutions(Long executionId, Collection<String> stepNames) {
-		JobExecution jobExecution = createJobExecution("job", 12L, executionId);
-		Long stepExecutionId = 1234L;
+		JobExecution jobExecution = createJobExecution(DEFAULT_JOB_NAME, DEFAULT_JOB_INSTANCE_ID, executionId);
+		Long stepExecutionId = DEFAULT_STEP_EXECUTION_ID;
 		for (String stepName : stepNames) {
 			createStepExecution(jobExecution, stepName, stepExecutionId);
 			stepExecutionId++;
 		}
 		return jobExecution;
+	}
+
+	/**
+	 * Create a {@link StepExecution} and all its parent entities with default
+	 * values, but using the {@link ExecutionContext} and {@link JobParameters}
+	 * provided.
+	 * 
+	 * @param jobParameters come {@link JobParameters}
+	 * @param executionContext some {@link ExecutionContext}
+	 * 
+	 * @return a {@link StepExecution} with the execution context provided
+	 */
+	public static StepExecution createStepExecution(JobParameters jobParameters, ExecutionContext executionContext) {
+		StepExecution stepExecution = createStepExecution(jobParameters);
+		stepExecution.setExecutionContext(executionContext);
+		return stepExecution;
+	}
+
+	/**
+	 * Create a {@link StepExecution} and all its parent entities with default
+	 * values, but using the {@link JobParameters} provided.
+	 * 
+	 * @param jobParameters some {@link JobParameters}
+	 * @return a {@link StepExecution} with the job parameters provided
+	 */
+	public static StepExecution createStepExecution(JobParameters jobParameters) {
+		JobExecution jobExecution = createJobExecution(DEFAULT_JOB_NAME, DEFAULT_JOB_INSTANCE_ID,
+				DEFAULT_JOB_EXECUTION_ID, jobParameters);
+		return jobExecution.createStepExecution(DEFAULT_STEP_NAME);
+	}
+
+	/**
+	 * Create a {@link StepExecution} and all its parent entities with default
+	 * values, but using the {@link ExecutionContext} provided.
+	 * 
+	 * @param executionContext some {@link ExecutionContext}
+	 * @return a {@link StepExecution} with the execution context provided
+	 */
+	public static StepExecution createStepExecution(ExecutionContext executionContext) {
+		StepExecution stepExecution = createStepExecution();
+		stepExecution.setExecutionContext(executionContext);
+		return stepExecution;
 	}
 
 }

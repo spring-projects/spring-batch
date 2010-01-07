@@ -17,11 +17,13 @@
 package org.springframework.batch.sample.iosample;
 
 import org.junit.runner.RunWith;
+import org.springframework.batch.core.JobParameters;
+import org.springframework.batch.core.JobParametersBuilder;
+import org.springframework.batch.core.StepExecution;
+import org.springframework.batch.core.scope.context.StepSynchronizationManager;
 import org.springframework.batch.item.ItemReader;
-import org.springframework.batch.item.file.FlatFileItemReader;
 import org.springframework.batch.sample.domain.trade.CustomerCredit;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.io.Resource;
+import org.springframework.batch.test.MetaDataInstanceFactory;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
@@ -29,12 +31,20 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 @ContextConfiguration(locations = "/jobs/iosample/fixedLength.xml")
 public class FixedLengthFunctionalTests extends AbstractIoSampleTests {
 
-	@Autowired
-	private Resource outputResource;
-
 	@Override
 	protected void pointReaderToOutput(ItemReader<CustomerCredit> reader) {
-		FlatFileItemReader<?> fileReader = (FlatFileItemReader<?>) reader;
-		fileReader.setResource(outputResource);
+		JobParameters jobParameters = new JobParametersBuilder(super.getUniqueJobParameters()).addString("inputFile",
+				"file:./target/test-outputs/fixedLengthOutput.txt").toJobParameters();
+		StepExecution stepExecution = MetaDataInstanceFactory.createStepExecution(jobParameters);
+		StepSynchronizationManager.close();
+		StepSynchronizationManager.register(stepExecution);
 	}
+
+	@Override
+	protected JobParameters getUniqueJobParameters() {
+		return new JobParametersBuilder(super.getUniqueJobParameters()).addString("inputFile",
+				"data/iosample/input/fixedLength.txt").addString("outputFile",
+				"file:./target/test-outputs/fixedLengthOutput.txt").toJobParameters();
+	}
+
 }

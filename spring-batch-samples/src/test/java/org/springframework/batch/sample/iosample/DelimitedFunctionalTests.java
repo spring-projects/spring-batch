@@ -16,37 +16,40 @@
 
 package org.springframework.batch.sample.iosample;
 
-import java.util.Collections;
-import java.util.Map;
-
 import org.junit.runner.RunWith;
 import org.springframework.batch.core.JobParameters;
 import org.springframework.batch.core.JobParametersBuilder;
+import org.springframework.batch.core.StepExecution;
+import org.springframework.batch.core.scope.context.StepSynchronizationManager;
 import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.sample.domain.trade.CustomerCredit;
+import org.springframework.batch.test.MetaDataInstanceFactory;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 /**
  * @author Dan Garrette
+ * @author Dave Syer
  * @since 2.0
  */
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(locations = "/jobs/iosample/delimited.xml")
 public class DelimitedFunctionalTests extends AbstractIoSampleTests {
 
-	@SuppressWarnings("unused")
-	private Map<String, String> jobParameters = Collections.singletonMap("fileName",
-			"file:./target/test-outputs/delimitedOutput.csv");
-
 	@Override
 	protected void pointReaderToOutput(ItemReader<CustomerCredit> reader) {
+		JobParameters jobParameters = new JobParametersBuilder(super.getUniqueJobParameters()).addString("inputFile",
+				"file:./target/test-outputs/delimitedOutput.csv").toJobParameters();
+		StepExecution stepExecution = MetaDataInstanceFactory.createStepExecution(jobParameters);
+		StepSynchronizationManager.close();
+		StepSynchronizationManager.register(stepExecution);
 	}
 
 	@Override
 	protected JobParameters getUniqueJobParameters() {
-		return new JobParametersBuilder(super.getUniqueJobParameters()).addString("fileName",
-				"data/iosample/input/delimited.csv").toJobParameters();
+		return new JobParametersBuilder(super.getUniqueJobParameters()).addString("inputFile",
+				"data/iosample/input/delimited.csv").addString("outputFile",
+				"file:./target/test-outputs/delimitedOutput.csv").toJobParameters();
 	}
 
 }

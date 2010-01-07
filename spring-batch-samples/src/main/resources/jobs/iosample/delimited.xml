@@ -11,7 +11,7 @@
 		http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx.xsd
 		http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util.xsd">
 
-	<bean id="itemReaderParent" class="org.springframework.batch.item.file.FlatFileItemReader" abstract="true">
+	<bean id="itemReader" class="org.springframework.batch.item.file.FlatFileItemReader" scope="step">
 		<property name="lineMapper">
 			<bean class="org.springframework.batch.item.file.mapping.DefaultLineMapper">
 				<property name="lineTokenizer">
@@ -27,14 +27,11 @@
 				</property>
 			</bean>
 		</property>
+		<property name="resource" value="#{jobParameters[inputFile]}" />
 	</bean>
 
-	<bean id="itemReader" parent="itemReaderParent" scope="step">
-		<property name="resource" value="#{jobParameters[fileName]}" />
-	</bean>
-
-	<bean id="itemWriter" class="org.springframework.batch.item.file.FlatFileItemWriter">
-		<property name="resource" value="file:./target/test-outputs/delimitedOutput.csv" />
+	<bean id="itemWriter" class="org.springframework.batch.item.file.FlatFileItemWriter" scope="step">
+		<property name="resource" value="#{jobParameters[outputFile]}" />
 		<property name="lineAggregator">
 			<bean class="org.springframework.batch.item.file.transform.DelimitedLineAggregator">
 				<property name="delimiter" value=","/>

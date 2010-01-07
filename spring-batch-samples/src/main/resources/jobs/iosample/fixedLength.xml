@@ -9,8 +9,8 @@
 		http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx.xsd
 		http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util.xsd">
 
-	<bean id="itemReader" class="org.springframework.batch.item.file.FlatFileItemReader">
-		<property name="resource" value="data/iosample/input/fixedLength.txt" />
+	<bean id="itemReader" class="org.springframework.batch.item.file.FlatFileItemReader" scope="step">
+		<property name="resource" value="#{jobParameters[inputFile]}" />
 		<property name="lineMapper">
 			<bean class="org.springframework.batch.item.file.mapping.DefaultLineMapper">
 				<property name="lineTokenizer">
@@ -31,8 +31,8 @@
 		</property>
 	</bean>
 
-	<bean id="itemWriter" class="org.springframework.batch.item.file.FlatFileItemWriter">
-		<property name="resource" ref="outputResource" />
+	<bean id="itemWriter" class="org.springframework.batch.item.file.FlatFileItemWriter" scope="step">
+		<property name="resource" value="#{jobParameters[outputFile]}" />
 		<property name="lineAggregator">
 			<bean
 				class="org.springframework.batch.item.file.transform.FormatterLineAggregator">
@@ -45,10 +45,6 @@
 				<property name="format" value="%-9s%-2.0f" />
 			</bean>
 		</property>
-	</bean>
-	
-	<bean id="outputResource" class="org.springframework.core.io.FileSystemResource">
-		<constructor-arg value="target/test-outputs/fixedLengthOutput.txt" />	
 	</bean>
 
 </beans>

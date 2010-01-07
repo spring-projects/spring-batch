@@ -10,12 +10,14 @@ import org.junit.Test;
 import org.springframework.batch.core.BatchStatus;
 import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.JobParameters;
+import org.springframework.batch.core.StepExecution;
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.ItemStream;
 import org.springframework.batch.sample.domain.trade.CustomerCredit;
 import org.springframework.batch.sample.domain.trade.internal.CustomerCreditIncreaseProcessor;
 import org.springframework.batch.test.JobLauncherTestUtils;
+import org.springframework.batch.test.MetaDataInstanceFactory;
 import org.springframework.batch.test.StepScopeTestExecutionListener;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
@@ -29,8 +31,9 @@ import org.springframework.test.context.support.DependencyInjectionTestExecution
  * 
  * @author Robert Kasanicky
  */
-@ContextConfiguration(locations = { "/simple-job-launcher-context.xml", "/job-runner-context.xml", "/jobs/ioSampleJob.xml" })
-@TestExecutionListeners({DependencyInjectionTestExecutionListener.class, StepScopeTestExecutionListener.class})
+@ContextConfiguration(locations = { "/simple-job-launcher-context.xml", "/job-runner-context.xml",
+		"/jobs/ioSampleJob.xml" })
+@TestExecutionListeners( { DependencyInjectionTestExecutionListener.class, StepScopeTestExecutionListener.class })
 public abstract class AbstractIoSampleTests {
 
 	@Autowired
@@ -109,6 +112,16 @@ public abstract class AbstractIoSampleTests {
 		if (reader instanceof ItemStream) {
 			((ItemStream) reader).close();
 		}
+	}
+
+	/**
+	 * Create a {@link StepExecution} that can be used to satisfy step scoped
+	 * dependencies in the test itself (not in the job it launches).
+	 * 
+	 * @return a {@link StepExecution}
+	 */
+	protected StepExecution getStepExecution() {
+		return MetaDataInstanceFactory.createStepExecution(getUniqueJobParameters());
 	}
 
 }
