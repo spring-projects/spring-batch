@@ -15,38 +15,24 @@
  */
 package org.springframework.batch.test;
 
-import java.lang.reflect.Field;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Map.Entry;
+import java.lang.reflect.Method;
 
-import org.springframework.batch.core.JobExecution;
-import org.springframework.batch.core.JobParameter;
-import org.springframework.batch.core.JobParameters;
 import org.springframework.batch.core.StepExecution;
 import org.springframework.batch.core.scope.context.StepContext;
 import org.springframework.batch.core.scope.context.StepSynchronizationManager;
-import org.springframework.batch.item.ExecutionContext;
+import org.springframework.batch.item.adapter.HippyMethodInvoker;
 import org.springframework.test.context.TestContext;
 import org.springframework.test.context.TestExecutionListener;
-import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.util.ReflectionUtils;
-import org.springframework.util.ReflectionUtils.FieldCallback;
+import org.springframework.util.ReflectionUtils.MethodCallback;
 
 /**
  * A {@link TestExecutionListener} that sets up step-scope context for
  * dependency injection into unit tests. A {@link StepContext} will be created
  * for the duration of a test method and made available to any dependencies that
- * are injected. The default behaviour is just to create a {@link JobExecution}
- * and {@link StepExecution} with fixed properties. Alternatively they can be
- * provided by the test case as a field of the correct type. If those fields are
- * not provided then an {@link ExecutionContext} for the default step execution
- * can be specified as a field of type ExecutionContext, or a field of type Map
- * (those fields can have any name but to disambiguate you can use the special
- * name "executionContext". And finally, {@link JobParameters} can be specified
- * using the same convention: a field of that type or a Map (with the field name
- * "jobParameters" used to disambiguate). Example:
+ * are injected. The default behaviour is just to create a {@link StepExecution}
+ * with fixed properties. Alternatively it can be provided by the test case as a
+ * factory methods returning the correct type.  Example:
  * 
  * <pre>
  * &#064;ContextConfiguration
@@ -58,9 +44,16 @@ import org.springframework.util.ReflectionUtils.FieldCallback;
  * 	&#064;Autowired
  * 	private ItemReader&lt;String&gt; reader;
  * 
+ *  public StepExecution getStepExecution() {
+ *    StepExecution execution = MetaDataInstanceFactory.createStepExecution();
+ *    execution.getExecutionContext().putString("foo", "bar");
+ *    return execution;
+ *  }
+ * 
  * 	&#064;Test
  * 	public void testStepScopedReader() {
- * 		// Step context is active here so the reader can be used...
+ * 		// Step context is active here so the reader can be used,
+ *      // and the step execution context will contain foo=bar...
  * 		assertNotNull(reader.read());
  * 	}
  * 
@@ -123,138 +116,37 @@ public class StepScopeTestExecutionListener implements TestExecutionListener {
 
 		Object target = testContext.getTestInstance();
 
-		ExtractorFieldCallback extractor = new ExtractorFieldCallback(StepExecution.class, "stepExecution");
-		ReflectionUtils.doWithFields(target.getClass(), extractor);
-		if (extractor.getName() != null) {
-			return (StepExecution) ReflectionTestUtils.getField(target, extractor.getName());
-		}
-
-		StepExecution stepExecution = null;
-
-		extractor = new ExtractorFieldCallback(Map.class, "executionContext");
-		ReflectionUtils.doWithFields(target.getClass(), extractor);
-
-		Map<String, Object> map = null;
-
-		if (extractor.getName() == null) {
-			extractor = new ExtractorFieldCallback(ExecutionContext.class, "executionContext");
-			ReflectionUtils.doWithFields(target.getClass(), extractor);
-			if (extractor.getName() != null) {
-				map = new HashMap<String, Object>();
-				ExecutionContext executionContext = ((ExecutionContext) ReflectionTestUtils.getField(target, extractor
-						.getName()));
-				for (Entry<String, Object> entry : executionContext.entrySet()) {
-					map.put(entry.getKey(), entry.getValue());
-				}
+		ExtractorMethodCallback method = new ExtractorMethodCallback(StepExecution.class, "getStepExecution");
+		ReflectionUtils.doWithMethods(target.getClass(), method);
+		if (method.getName() != null) {
+			HippyMethodInvoker invoker = new HippyMethodInvoker();
+			invoker.setTargetObject(target);
+			invoker.setTargetMethod(method.getName());
+			try {
+				invoker.prepare();
+				return (StepExecution) invoker.invoke();
+			}
+			catch (Exception e) {
+				throw new IllegalArgumentException("Could not create step execution from method: " + method.getName(),
+						e);
 			}
 		}
-		else {
-			@SuppressWarnings("unchecked")
-			Map<String, Object> themap = (Map<String, Object>) ReflectionTestUtils
-					.getField(target, extractor.getName());
-			map = themap;
-		}
 
-		JobExecution jobExecution = getJobExecution(testContext);
-		if (map == null) {
-			map = new HashMap<String, Object>();
-		}
-		if (stepExecution == null) {
-			if (jobExecution != null) {
-				stepExecution = jobExecution.createStepExecution("step");
-			}
-			else {
-				stepExecution = MetaDataInstanceFactory.createStepExecution();
-			}
-		}
-		for (String key : map.keySet()) {
-			stepExecution.getExecutionContext().put(key, map.get(key));
-		}
-
-		return stepExecution;
-
+		return MetaDataInstanceFactory.createStepExecution();
 	}
 
 	/**
-	 * Discover a {@link JobExecution} as a field in the test case or create
-	 * one if none is available.
-	 * 
-	 * @param testContext the current test context
-	 * @return a {@link JobExecution}
+	 * Look for a method returning the type provided, preferring one with the
+	 * name provided.
 	 */
-	private JobExecution getJobExecution(TestContext testContext) {
-
-		Object target = testContext.getTestInstance();
-
-		ExtractorFieldCallback extractor = new ExtractorFieldCallback(JobExecution.class, "jobExecution");
-		ReflectionUtils.doWithFields(target.getClass(), extractor);
-		if (extractor.getName() != null) {
-			return (JobExecution) ReflectionTestUtils.getField(target, extractor.getName());
-		}
-
-		extractor = new ExtractorFieldCallback(Map.class, "jobParameters");
-		ReflectionUtils.doWithFields(target.getClass(), extractor);
-
-		Map<String, Object> map = null;
-
-		if (extractor.getName() == null) {
-			extractor = new ExtractorFieldCallback(JobParameters.class, "jobParameters");
-			ReflectionUtils.doWithFields(target.getClass(), extractor);
-			if (extractor.getName() != null) {
-				map = new HashMap<String, Object>();
-				JobParameters jobParameters = ((JobParameters) ReflectionTestUtils
-						.getField(target, extractor.getName()));
-				for (Entry<String, JobParameter> entry : jobParameters.getParameters().entrySet()) {
-					map.put(entry.getKey(), entry.getValue().getValue());
-				}
-			}
-		}
-		else {
-			@SuppressWarnings("unchecked")
-			Map<String, Object> themap = (Map<String, Object>) ReflectionTestUtils
-					.getField(target, extractor.getName());
-			map = themap;
-		}
-
-		if (map != null) {
-			Map<String, JobParameter> parameters = new HashMap<String, JobParameter>();
-			for (String key : map.keySet()) {
-				Object value = map.get(key);
-				if (value == null) {
-					parameters.put(key, new JobParameter((String) null));
-				}
-				else if (value instanceof String) {
-					parameters.put(key, new JobParameter((String) value));
-				}
-				else if (value instanceof Double) {
-					parameters.put(key, new JobParameter((Double) value));
-				}
-				else if (value instanceof Long) {
-					parameters.put(key, new JobParameter((Long) value));
-				}
-				else if (value instanceof Date) {
-					parameters.put(key, new JobParameter((Date) value));
-				}
-			}
-			return MetaDataInstanceFactory.createJobExecution("job", 11L, 123L, new JobParameters(parameters));
-		}
-
-		return null;
-
-	}
-
-	/**
-	 * Look for a Map in the fields provided, preferring one with the name
-	 * provided.
-	 */
-	private final class ExtractorFieldCallback implements FieldCallback {
+	private final class ExtractorMethodCallback implements MethodCallback {
 		private String preferredName;
 
 		private final Class<?> preferredType;
 
-		private Field result;
+		private Method result;
 
-		public ExtractorFieldCallback(Class<?> preferredType, String preferredName) {
+		public ExtractorMethodCallback(Class<?> preferredType, String preferredName) {
 			super();
 			this.preferredType = preferredType;
 			this.preferredName = preferredName;
@@ -264,11 +156,11 @@ public class StepScopeTestExecutionListener implements TestExecutionListener {
 			return result == null ? null : result.getName();
 		}
 
-		public void doWith(Field field) throws IllegalArgumentException, IllegalAccessException {
-			Class<?> type = field.getType();
+		public void doWith(Method method) throws IllegalArgumentException, IllegalAccessException {
+			Class<?> type = method.getReturnType();
 			if (preferredType.isAssignableFrom(type)) {
-				if (result == null || field.getName().equals(preferredName)) {
-					result = field;
+				if (result == null || method.getName().equals(preferredName)) {
+					result = method;
 				}
 			}
 		}

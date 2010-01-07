@@ -16,14 +16,14 @@
 
 package org.springframework.batch.sample.iosample;
 
+import java.util.Collections;
+import java.util.Map;
+
 import org.junit.runner.RunWith;
 import org.springframework.batch.core.JobParameters;
 import org.springframework.batch.core.JobParametersBuilder;
 import org.springframework.batch.item.ItemReader;
-import org.springframework.batch.item.file.FlatFileItemReader;
 import org.springframework.batch.sample.domain.trade.CustomerCredit;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.io.Resource;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
@@ -35,13 +35,12 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 @ContextConfiguration(locations = "/jobs/iosample/delimited.xml")
 public class DelimitedFunctionalTests extends AbstractIoSampleTests {
 
-	@Autowired
-	private Resource outputResource;
+	@SuppressWarnings("unused")
+	private Map<String, String> jobParameters = Collections.singletonMap("fileName",
+			"file:./target/test-outputs/delimitedOutput.csv");
 
 	@Override
 	protected void pointReaderToOutput(ItemReader<CustomerCredit> reader) {
-		FlatFileItemReader<CustomerCredit> fileReader = (FlatFileItemReader<CustomerCredit>) reader;
-		fileReader.setResource(outputResource);
 	}
 
 	@Override

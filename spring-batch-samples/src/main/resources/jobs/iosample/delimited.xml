@@ -29,16 +29,12 @@
 		</property>
 	</bean>
 
-	<bean id="itemReader" parent="itemReaderParent" scope="step" autowire-candidate="false">
+	<bean id="itemReader" parent="itemReaderParent" scope="step">
 		<property name="resource" value="#{jobParameters[fileName]}" />
 	</bean>
 
-	<bean id="itemReaderForTest" parent="itemReaderParent" scope="prototype" >
-		<property name="resource" value="data/iosample/input/delimited.csv" />
-	</bean>
-
 	<bean id="itemWriter" class="org.springframework.batch.item.file.FlatFileItemWriter">
-		<property name="resource" ref="outputResource" />
+		<property name="resource" value="file:./target/test-outputs/delimitedOutput.csv" />
 		<property name="lineAggregator">
 			<bean class="org.springframework.batch.item.file.transform.DelimitedLineAggregator">
 				<property name="delimiter" value=","/>
@@ -49,10 +45,6 @@
 				</property>
 			</bean>
 		</property>
-	</bean>
-	
-	<bean id="outputResource" class="org.springframework.core.io.FileSystemResource">
-		<constructor-arg value="target/test-outputs/delimitedOutput.csv" />	
 	</bean>
 
 </beans>

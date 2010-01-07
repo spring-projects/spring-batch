@@ -16,8 +16,11 @@ import org.springframework.batch.item.ItemStream;
 import org.springframework.batch.sample.domain.trade.CustomerCredit;
 import org.springframework.batch.sample.domain.trade.internal.CustomerCreditIncreaseProcessor;
 import org.springframework.batch.test.JobLauncherTestUtils;
+import org.springframework.batch.test.StepScopeTestExecutionListener;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.TestExecutionListeners;
+import org.springframework.test.context.support.DependencyInjectionTestExecutionListener;
 
 /**
  * Base class for IoSample tests that increase input customer credit by fixed
@@ -27,6 +30,7 @@ import org.springframework.test.context.ContextConfiguration;
  * @author Robert Kasanicky
  */
 @ContextConfiguration(locations = { "/simple-job-launcher-context.xml", "/job-runner-context.xml", "/jobs/ioSampleJob.xml" })
+@TestExecutionListeners({DependencyInjectionTestExecutionListener.class, StepScopeTestExecutionListener.class})
 public abstract class AbstractIoSampleTests {
 
 	@Autowired

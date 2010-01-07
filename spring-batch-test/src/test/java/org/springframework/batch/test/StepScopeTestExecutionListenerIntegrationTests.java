@@ -1,12 +1,11 @@
 package org.springframework.batch.test;
 
 import static org.junit.Assert.assertEquals;
-
-import java.util.Collections;
-import java.util.Map;
+import static org.junit.Assert.assertNotNull;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.springframework.batch.core.StepExecution;
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.ItemStream;
@@ -31,11 +30,13 @@ public class StepScopeTestExecutionListenerIntegrationTests {
 	@Autowired
 	private ItemStream stream;
 
-	protected Map<String, Object> executionContext;
-
-	public StepScopeTestExecutionListenerIntegrationTests() {
-		executionContext = Collections.singletonMap("input.file",
-				(Object) "classpath:/org/springframework/batch/test/simple.txt");
+	public StepExecution getStepExection() {
+		// Assert that dependencies are already injected...
+		assertNotNull(reader);
+		// Then create the execution for the step scope...
+		StepExecution execution = MetaDataInstanceFactory.createStepExecution();
+		execution.getExecutionContext().putString("input.file", "classpath:/org/springframework/batch/test/simple.txt");
+		return execution;
 	}
 
 	@Test
