@@ -75,7 +75,7 @@ public class TwoJobInstancesDelimitedFunctionalTests {
 
 	private void verifyOutput(int expected) throws Exception {
 
-		JobParameters jobParameters = new JobParametersBuilder().addString("fileName",
+		JobParameters jobParameters = new JobParametersBuilder().addString("inputFile",
 				"file:./target/test-outputs/delimitedOutput.csv").toJobParameters();
 		StepExecution stepExecution = MetaDataInstanceFactory.createStepExecution(jobParameters);
 
@@ -106,8 +106,8 @@ public class TwoJobInstancesDelimitedFunctionalTests {
 	}
 
 	protected JobParameters getJobParameters(String fileName) {
-		return new JobParametersBuilder().addLong("timestamp", new Date().getTime()).addString("fileName", fileName)
-				.toJobParameters();
+		return new JobParametersBuilder().addLong("timestamp", new Date().getTime()).addString("inputFile", fileName)
+				.addString("outputFile", "file:./target/test-outputs/delimitedOutput.csv").toJobParameters();
 	}
 
 }
