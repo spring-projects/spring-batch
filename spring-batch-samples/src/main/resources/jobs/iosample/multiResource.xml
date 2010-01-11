@@ -9,8 +9,8 @@
 		http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx.xsd
 		http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util.xsd">
 
-	<bean id="itemReaderParent"
-		class="org.springframework.batch.item.file.MultiResourceItemReader" abstract="true">
+	<bean id="itemReader"
+		class="org.springframework.batch.item.file.MultiResourceItemReader" scope="step">
 		<property name="delegate">
 			<bean class="org.springframework.batch.item.file.FlatFileItemReader">
 				<property name="lineMapper">
@@ -33,22 +33,14 @@
 					</bean>
 				</property>
 			</bean>
-
 		</property>
-	</bean>
-
-	<bean id="itemReader" parent="itemReaderParent" scope="step" autowire-candidate="false">
-		<property name="resources" value="#{jobParameters['file.path']}/delimited*.csv" />
-	</bean>
-
-	<bean id="itemReaderForTest" parent="itemReaderParent">
-		<property name="resources" value="classpath:data/iosample/input/delimited*.csv" />
+		<property name="resources" value="#{jobParameters['input.file.path']}" />
 	</bean>
 
 	<bean id="itemWriter"
-		class="org.springframework.batch.item.file.MultiResourceItemWriter">
+		class="org.springframework.batch.item.file.MultiResourceItemWriter" scope="step">
 		<property name="resource"
-			value="file:target/test-outputs/multiResourceOutput.csv" />
+			value="#{jobParameters['output.file.path']}" />
 		<property name="itemCountLimitPerResource" value="6" />
 		<property name="delegate" ref="delegateWriter" />
 	</bean>

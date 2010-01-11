@@ -19,11 +19,11 @@ package org.springframework.batch.sample.iosample;
 import org.junit.runner.RunWith;
 import org.springframework.batch.core.JobParameters;
 import org.springframework.batch.core.JobParametersBuilder;
+import org.springframework.batch.core.StepExecution;
+import org.springframework.batch.core.scope.context.StepSynchronizationManager;
 import org.springframework.batch.item.ItemReader;
-import org.springframework.batch.item.file.MultiResourceItemReader;
 import org.springframework.batch.sample.domain.trade.CustomerCredit;
-import org.springframework.core.io.FileSystemResource;
-import org.springframework.core.io.Resource;
+import org.springframework.batch.test.MetaDataInstanceFactory;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
@@ -37,17 +37,18 @@ public class MultiResourceFunctionalTests extends AbstractIoSampleTests {
 
 	@Override
 	protected void pointReaderToOutput(ItemReader<CustomerCredit> reader) {
-		MultiResourceItemReader<?> multiReader = (MultiResourceItemReader<?>) reader;
-		multiReader.setResources(new Resource[] {
-				new FileSystemResource("target/test-outputs/multiResourceOutput.csv.1"),
-				new FileSystemResource("target/test-outputs/multiResourceOutput.csv.2") });
-
+		JobParameters jobParameters = new JobParametersBuilder(super.getUniqueJobParameters()).addString(
+				"input.file.path", "file:target/test-outputs/multiResourceOutput.csv.*").toJobParameters();
+		StepExecution stepExecution = MetaDataInstanceFactory.createStepExecution(jobParameters);
+		StepSynchronizationManager.close();
+		StepSynchronizationManager.register(stepExecution);
 	}
-	
+
 	@Override
 	protected JobParameters getUniqueJobParameters() {
 		JobParametersBuilder builder = new JobParametersBuilder(super.getUniqueJobParameters());
-		return builder.addString("file.path", "classpath:data/iosample/input/").toJobParameters();
+		return builder.addString("input.file.path", "classpath:data/iosample/input/delimited*.csv").addString(
+				"output.file.path", "file:target/test-outputs/multiResourceOutput.csv").toJobParameters();
 	}
 
 }
