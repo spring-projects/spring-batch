@@ -105,6 +105,18 @@ public class StepScopeTestExecutionListener implements TestExecutionListener {
 		}
 	}
 
+	/*
+	 * Support for Spring 3.0 (empty).
+	 */
+	public void afterTestClass(TestContext testContext) throws Exception {
+	}
+
+	/*
+	 * Support for Spring 3.0 (empty).
+	 */
+	public void beforeTestClass(TestContext testContext) throws Exception {
+	}
+	
 	/**
 	 * Discover a {@link StepExecution} as a field in the test case or create
 	 * one if none is available.
@@ -165,4 +177,5 @@ public class StepScopeTestExecutionListener implements TestExecutionListener {
 			}
 		}
 	}
+
 }
