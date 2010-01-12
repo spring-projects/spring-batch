@@ -35,5 +35,5 @@ Import-Template:
  javax.sql.*;version="0";resolution:=optional,
  javax.jms;version="0";resolution:=optional,
  javax.persistence;version="0";resolution:=optional,
- javax.xml.*;version="0";resolution:=optional
+ javax.xml.*;version="0";resolution:=optional,
  javax.mail.*;version="0";resolution:=optional
