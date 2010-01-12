@@ -48,6 +48,10 @@ public class SplitInterruptedJobParserTests extends AbstractJobParserTests {
 		Thread.sleep(100L);
 		jobExecution.setStatus(BatchStatus.STOPPING);
 		Thread.sleep(200L);
+		int count = 0;
+		while(jobExecution.getStatus()==BatchStatus.STOPPING && count++<10) {
+			Thread.sleep(200L);
+		}
 		
 		assertEquals(BatchStatus.STOPPED, jobExecution.getStatus());
 		assertEquals(ExitStatus.STOPPED.getExitCode(), jobExecution.getExitStatus().getExitCode());
