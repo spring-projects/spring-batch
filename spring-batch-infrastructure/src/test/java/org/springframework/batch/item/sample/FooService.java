@@ -52,7 +52,6 @@ public class FooService {
 
 	public List<Foo> getProcessedFooNameValuePairs() {
 		return processedFooNameValuePairs;
-	}
-	
+	}	
 	
 }

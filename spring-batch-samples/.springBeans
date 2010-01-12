@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <beansProjectDescription>
 	<version>1</version>
-	<pluginVersion><![CDATA[2.2.8.200911091054-RELEASE]]></pluginVersion>
+	<pluginVersion><![CDATA[2.3.0.200912170948-RELEASE]]></pluginVersion>
 	<configSuffixes>
 		<configSuffix><![CDATA[xml]]></configSuffix>
 	</configSuffixes>
@@ -61,6 +61,7 @@
 		<config>src/test/resources/org/springframework/batch/sample/common/ColumnRangePartitionerTests-context.xml</config>
 		<config>src/test/resources/job-runner-context.xml</config>
 		<config>src/test/resources/org/springframework/batch/sample/JobStepFunctionalTests-context.xml</config>
+		<config>src/main/resources/jobs/mailJob.xml</config>
 	</configs>
 	<configSets>
 		<configSet>
