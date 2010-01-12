@@ -100,7 +100,6 @@ public class MimeMessageItemWriter implements ItemWriter<MimeMessage> {
 	 * @param items the items to send
 	 * @see ItemWriter#write(List)
 	 */
-	@Override
 	public void write(List<? extends MimeMessage> items) throws MailException {
 		try {
 			mailSender.send(items.toArray(new MimeMessage[items.size()]));
