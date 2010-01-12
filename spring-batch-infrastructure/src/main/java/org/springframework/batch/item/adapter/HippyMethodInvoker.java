@@ -36,38 +36,55 @@ public class HippyMethodInvoker extends MethodInvoker {
 	protected Method findMatchingMethod() {
 		String targetMethod = getTargetMethod();
 		Object[] arguments = getArguments();
-		Object[] transformedArguments = arguments;
 		int argCount = arguments.length;
 
 		Method[] candidates = ReflectionUtils.getAllDeclaredMethods(getTargetClass());
 		int minTypeDiffWeight = Integer.MAX_VALUE;
 		Method matchingMethod = null;
 
+		Object[] transformedArguments = null;
+		int transformedArgumentCount = 0;
+
 		for (int i = 0; i < candidates.length; i++) {
 			Method candidate = candidates[i];
 			if (candidate.getName().equals(targetMethod)) {
 				Class<?>[] paramTypes = candidate.getParameterTypes();
-				transformedArguments = new Object[paramTypes.length];
+				Object[] candidateArguments = new Object[paramTypes.length];
+				int assignedParameterCount = 0;
 				for (int j = 0; j < arguments.length; j++) {
 					for (int k = 0; k < paramTypes.length; k++) {
-						if (ClassUtils.isAssignableValue(paramTypes[k], arguments[j])) {
-							transformedArguments[k] = arguments[j];
+						// Pick the first assignable of the right type that
+						// matches this slot...
+						if (ClassUtils.isAssignableValue(paramTypes[k], arguments[j])
+								&& candidateArguments[k] == null) {
+							candidateArguments[k] = arguments[j];
+							assignedParameterCount++;
 						}
 					}
 				}
 				if (paramTypes.length <= argCount) {
-					int typeDiffWeight = getTypeDifferenceWeight(paramTypes, transformedArguments);
+					int typeDiffWeight = getTypeDifferenceWeight(paramTypes, candidateArguments);
 					if (typeDiffWeight < minTypeDiffWeight) {
 						minTypeDiffWeight = typeDiffWeight;
 						matchingMethod = candidate;
+						transformedArguments = candidateArguments;
+						transformedArgumentCount = assignedParameterCount;
 					}
 				}
 			}
+		}
+		
+		if (transformedArguments==null) {
+			throw new IllegalArgumentException("No matching arguments found for method: "+targetMethod);
+		}
+
+		if (transformedArgumentCount < transformedArguments.length) {
+			throw new IllegalArgumentException("Only " + transformedArgumentCount + " out of "
+					+ transformedArguments.length + " arguments could be assigned.");
 		}
 
 		setArguments(transformedArguments);
 		return matchingMethod;
 
 	}
-
 }

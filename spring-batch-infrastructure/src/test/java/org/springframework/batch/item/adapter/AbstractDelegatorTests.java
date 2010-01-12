@@ -1,12 +1,15 @@
 package org.springframework.batch.item.adapter;
 
-import junit.framework.TestCase;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.fail;
 
-import org.springframework.batch.item.adapter.AbstractMethodInvokingDelegator;
-import org.springframework.batch.item.adapter.DynamicMethodInvocationException;
+import java.util.ArrayList;
+import java.util.List;
+
+import org.junit.Before;
+import org.junit.Test;
 import org.springframework.batch.item.adapter.AbstractMethodInvokingDelegator.InvocationTargetThrowableWrapper;
-import org.springframework.batch.item.sample.Foo;
-import org.springframework.batch.item.sample.FooService;
 import org.springframework.util.Assert;
 
 /**
@@ -14,16 +17,17 @@ import org.springframework.util.Assert;
  * 
  * @author Robert Kasanicky
  */
-public class AbstractDelegatorTests extends TestCase {
+public class AbstractDelegatorTests {
 
 	private static class ConcreteDelegator extends AbstractMethodInvokingDelegator<Foo> {
 	}
 
 	private AbstractMethodInvokingDelegator<Foo> delegator = new ConcreteDelegator();
 
-	private Foo foo = new Foo(0, "foo", 1);
+	private Foo foo = new Foo("foo", 1);
 
-	protected void setUp() throws Exception {
+	@Before
+	public void setUp() throws Exception {
 		delegator.setTargetObject(foo);
 		delegator.setArguments(null);
 	}
@@ -32,6 +36,7 @@ public class AbstractDelegatorTests extends TestCase {
 	 * Regular use - calling methods directly and via delegator leads to same
 	 * results
 	 */
+	@Test
 	public void testDelegation() throws Exception {
 		delegator.setTargetMethod("getName");
 		delegator.afterPropertiesSet();
@@ -43,6 +48,7 @@ public class AbstractDelegatorTests extends TestCase {
 	 * Regular use - calling methods directly and via delegator leads to same
 	 * results
 	 */
+	@Test
 	public void testDelegationWithArgument() throws Exception {
 		delegator.setTargetMethod("setName");
 		final String NEW_FOO_NAME = "newFooName";
@@ -64,6 +70,7 @@ public class AbstractDelegatorTests extends TestCase {
 	 * Null argument value doesn't cause trouble when validating method
 	 * signature.
 	 */
+	@Test
 	public void testDelegationWithCheckedNullArgument() throws Exception {
 		delegator.setTargetMethod("setName");
 		delegator.setArguments(new Object[] { null });
@@ -76,6 +83,7 @@ public class AbstractDelegatorTests extends TestCase {
 	 * Regular use - calling methods directly and via delegator leads to same
 	 * results
 	 */
+	@Test
 	public void testDelegationWithMultipleArguments() throws Exception {
 		FooService fooService = new FooService();
 		delegator.setTargetObject(fooService);
@@ -85,7 +93,7 @@ public class AbstractDelegatorTests extends TestCase {
 		final String FOO_NAME = "fooName";
 		final int FOO_VALUE = 12345;
 
-		delegator.invokeDelegateMethodWithArguments(new Object[] { FOO_NAME, Integer.valueOf(FOO_VALUE) });
+		delegator.invokeDelegateMethodWithArguments(new Object[] { FOO_NAME, FOO_VALUE });
 		Foo foo = (Foo) fooService.getProcessedFooNameValuePairs().get(0);
 		assertEquals(FOO_NAME, foo.getName());
 		assertEquals(FOO_VALUE, foo.getValue());
@@ -94,12 +102,13 @@ public class AbstractDelegatorTests extends TestCase {
 	/**
 	 * Exception scenario - target method is not declared by target object.
 	 */
+	@Test
 	public void testInvalidMethodName() throws Exception {
 		delegator.setTargetMethod("not-existing-method-name");
 
 		try {
 			delegator.afterPropertiesSet();
-			fail();
+			fail("Expected IllegalStateException");
 		}
 		catch (IllegalStateException e) {
 			// expected
@@ -107,9 +116,9 @@ public class AbstractDelegatorTests extends TestCase {
 
 		try {
 			delegator.invokeDelegateMethod();
-			fail();
+			fail("Expected IllegalArgumentException");
 		}
-		catch (DynamicMethodInvocationException e) {
+		catch (IllegalArgumentException e) {
 			// expected
 		}
 	}
@@ -117,14 +126,15 @@ public class AbstractDelegatorTests extends TestCase {
 	/**
 	 * Exception scenario - target method is called with invalid arguments.
 	 */
+	@Test
 	public void testInvalidArgumentsForExistingMethod() throws Exception {
 		delegator.setTargetMethod("setName");
 		delegator.afterPropertiesSet();
 		try {
 			delegator.invokeDelegateMethodWithArgument(new Object());
-			fail();
+			fail("Expected IllegalArgumentException");
 		}
-		catch (DynamicMethodInvocationException e) {
+		catch (IllegalArgumentException e) {
 			// expected
 		}
 	}
@@ -133,31 +143,32 @@ public class AbstractDelegatorTests extends TestCase {
 	 * Exception scenario - target method is called with incorrect number of
 	 * arguments.
 	 */
-	public void testIncorrectArgumentCount() throws Exception {
+	@Test
+	public void testTooFewArguments() throws Exception {
 		delegator.setTargetMethod("setName");
 		delegator.afterPropertiesSet();
 		try {
 			// single argument expected but none provided
 			delegator.invokeDelegateMethod();
-			fail();
+			fail("Expected IllegalArgumentException");
 		}
-		catch (DynamicMethodInvocationException e) {
+		catch (IllegalArgumentException e) {
 			// expected
 		}
+	}
 
-		try {
-			// single argument expected but two provided
-			delegator.invokeDelegateMethodWithArguments(new Object[] { "name", "anotherName" });
-			fail();
-		}
-		catch (DynamicMethodInvocationException e) {
-			// expected
-		}
+	@Test
+	public void testTooManyArguments() throws Exception {
+		delegator.setTargetMethod("setName");
+		// single argument expected but two provided
+		delegator.invokeDelegateMethodWithArguments(new Object[] { "name", "anotherName" });
+		assertEquals("name", foo.getName());
 	}
 
 	/**
 	 * Exception scenario - incorrect static arguments set.
 	 */
+	@Test
 	public void testIncorrectNumberOfStaticArguments() throws Exception {
 		delegator.setTargetMethod("setName");
 
@@ -187,6 +198,7 @@ public class AbstractDelegatorTests extends TestCase {
 	 * exception. Such 'business' exception should be re-thrown as is (without
 	 * wrapping).
 	 */
+	@Test
 	public void testDelegateException() throws Exception {
 		delegator.setTargetMethod("fail");
 		delegator.afterPropertiesSet();
@@ -199,10 +211,12 @@ public class AbstractDelegatorTests extends TestCase {
 		}
 
 	}
-	
+
 	/**
-	 * Exception scenario - target method is successfully invoked but throws a {@link Throwable} (not an {@link Exception}).
+	 * Exception scenario - target method is successfully invoked but throws a
+	 * {@link Throwable} (not an {@link Exception}).
 	 */
+	@Test
 	public void testDelegateThrowable() throws Exception {
 		delegator.setTargetMethod("failUgly");
 		delegator.afterPropertiesSet();
@@ -213,6 +227,64 @@ public class AbstractDelegatorTests extends TestCase {
 		catch (InvocationTargetThrowableWrapper expected) {
 			assertEquals(Foo.UGLY_FAILURE_MESSAGE, expected.getCause().getMessage());
 		}
+	}
+
+	@SuppressWarnings("unused")
+	private static class Foo {
+
+		public static final String FAILURE_MESSAGE = "Foo Failure!";
+
+		public static final String UGLY_FAILURE_MESSAGE = "Ugly Foo Failure!";
+
+		private String name;
+
+		private int value;
+
+		public Foo(String name, int value) {
+			this.name = name;
+			this.value = value;
+		}
+
+		public String getName() {
+			return name;
+		}
+
+		public void setName(String name) {
+			this.name = name;
+		}
+
+		public int getValue() {
+			return value;
+		}
+
+		public void fail() throws Exception {
+			throw new Exception(FAILURE_MESSAGE);
+		}
+
+		public void failUgly() throws Throwable {
+			throw new Throwable(UGLY_FAILURE_MESSAGE);
+		}
+
+	}
+
+	private static class FooService {
+
+		private List<Foo> processedFooNameValuePairs = new ArrayList<Foo>();
+
+		@SuppressWarnings("unused")
+		public void processNameValuePair(String name, int value) {
+			processedFooNameValuePairs.add(new Foo(name, value));
+		}
+
+		@SuppressWarnings("unused")
+		public void processNameValuePair(String name, String value) {
+			processedFooNameValuePairs.add(new Foo(name, new Integer(value)));
+		}
+
+		public List<Foo> getProcessedFooNameValuePairs() {
+			return processedFooNameValuePairs;
+		}
+
 	}
 
 }
