@@ -157,6 +157,10 @@ public abstract class AbstractJob implements Job, StepLocator, BeanNameAware, In
 	 * @return the step names
 	 */
 	public abstract Collection<String> getStepNames();
+	
+	public JobParametersValidator getJobParametersValidator() {
+		return jobParametersValidator;
+	}
 
 	/**
 	 * Boolean flag to prevent categorically a job from restarting, even if it

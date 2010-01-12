@@ -33,10 +33,11 @@ import org.junit.Before;
 import org.junit.Test;
 import org.springframework.batch.core.BatchStatus;
 import org.springframework.batch.core.ExitStatus;
-import org.springframework.batch.core.Job;
 import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.JobInstance;
 import org.springframework.batch.core.JobParameters;
+import org.springframework.batch.core.JobParametersInvalidException;
+import org.springframework.batch.core.job.DefaultJobParametersValidator;
 import org.springframework.batch.core.job.JobSupport;
 import org.springframework.batch.core.launch.support.SimpleJobLauncher;
 import org.springframework.batch.core.repository.JobRepository;
@@ -52,7 +53,7 @@ public class SimpleJobLauncherTests {
 
 	private SimpleJobLauncher jobLauncher;
 
-	private Job job = new JobSupport("foo") {
+	private JobSupport job = new JobSupport("foo") {
 		@Override
 		public void execute(JobExecution execution) {
 			execution.setExitStatus(ExitStatus.COMPLETED);
@@ -78,11 +79,13 @@ public class SimpleJobLauncherTests {
 		run(ExitStatus.COMPLETED);
 	}
 
-	private void run(ExitStatus exitStatus) throws Exception {
-		JobExecution jobExecution = new JobExecution(null, null);
+	@Test(expected=JobParametersInvalidException.class)
+	public void testRunWithValidator() throws Exception {
+
+		job.setJobParametersValidator(new DefaultJobParametersValidator(new String[] { "missing-and-required" },
+				new String[0]));
 
 		expect(jobRepository.getLastJobExecution(job.getName(), jobParameters)).andReturn(null);
-		expect(jobRepository.createJobExecution(job.getName(), jobParameters)).andReturn(jobExecution);
 		replay(jobRepository);
 
 		jobLauncher.afterPropertiesSet();
@@ -90,9 +93,9 @@ public class SimpleJobLauncherTests {
 			jobLauncher.run(job, jobParameters);
 		}
 		finally {
-			assertEquals(exitStatus, jobExecution.getExitStatus());
 			verify(jobRepository);
 		}
+
 	}
 
 	/*
@@ -227,6 +230,23 @@ public class SimpleJobLauncherTests {
 		jobLauncher = new SimpleJobLauncher();
 		jobLauncher.setJobRepository(jobRepository);
 		jobLauncher.afterPropertiesSet(); // no error
+	}
+	
+	private void run(ExitStatus exitStatus) throws Exception {
+		JobExecution jobExecution = new JobExecution(null, null);
+
+		expect(jobRepository.getLastJobExecution(job.getName(), jobParameters)).andReturn(null);
+		expect(jobRepository.createJobExecution(job.getName(), jobParameters)).andReturn(jobExecution);
+		replay(jobRepository);
+
+		jobLauncher.afterPropertiesSet();
+		try {
+			jobLauncher.run(job, jobParameters);
+		}
+		finally {
+			assertEquals(exitStatus, jobExecution.getExitStatus());
+			verify(jobRepository);
+		}
 	}
 
 	private boolean contains(String str, String searchStr) {

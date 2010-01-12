@@ -52,7 +52,10 @@ import org.springframework.util.Assert;
  * Repository can reliably recreate it.
  * 
  * @author Lucas Ward
+ * @Author Dave Syer
+ * 
  * @since 1.0
+ * 
  * @see JobRepository
  * @see TaskExecutor
  */
@@ -93,20 +96,19 @@ public class SimpleJobLauncher implements JobLauncher, InitializingBean {
 			if (!job.isRestartable()) {
 				throw new JobRestartException("JobInstance already exists and is not restartable");
 			}
-			else {
-				/*
-				 * There is a very small probability that a non-restartable job
-				 * can be restarted, but only if another process or thread
-				 * manages to launch <i>and</i> fail a job execution for this
-				 * instance between the last assertion and the next method
-				 * returning successfully.
-				 */
-				jobExecution = jobRepository.createJobExecution(job.getName(), jobParameters);
-			}
 		}
-		else {
-			jobExecution = jobRepository.createJobExecution(job.getName(), jobParameters);
-		}
+
+		// Check the validity of the parameters before doing creating anything
+		// in the repository...
+		job.getJobParametersValidator().validate(jobParameters);
+
+		/*
+		 * There is a very small probability that a non-restartable job can be
+		 * restarted, but only if another process or thread manages to launch
+		 * <i>and</i> fail a job execution for this instance between the last
+		 * assertion and the next method returning successfully.
+		 */
+		jobExecution = jobRepository.createJobExecution(job.getName(), jobParameters);
 
 		try {
 			taskExecutor.execute(new Runnable() {

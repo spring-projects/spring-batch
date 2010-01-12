@@ -18,9 +18,32 @@ import org.springframework.util.Assert;
  */
 public class DefaultJobParametersValidator implements JobParametersValidator, InitializingBean {
 
-	private Collection<String> requiredKeys = new HashSet<String>();
+	private Collection<String> requiredKeys;
 
-	private Collection<String> optionalKeys = new HashSet<String>();
+	private Collection<String> optionalKeys;
+
+	/**
+	 * Convenient default constructor for unconstrained validation.
+	 */
+	public DefaultJobParametersValidator() {
+		this(new String[0], new String[0]);
+	}
+
+	/**
+	 * Create a new validator with the required and optional job parameter keys
+	 * provided.
+	 * 
+	 * @see DefaultJobParametersValidator#setOptionalKeys(String[])
+	 * @see DefaultJobParametersValidator#setRequiredKeys(String[])
+	 * 
+	 * @param requiredKeys the required keys
+	 * @param optionalKeys the optional keys
+	 */
+	public DefaultJobParametersValidator(String[] requiredKeys, String[] optionalKeys) {
+		super();
+		setRequiredKeys(requiredKeys);
+		setOptionalKeys(optionalKeys);
+	}
 
 	/**
 	 * Check that there are no overlaps between required and optional keys.

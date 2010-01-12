@@ -46,6 +46,8 @@ public class JobSupport implements BeanNameAware, Job {
 
 	private int startLimit = Integer.MAX_VALUE;
 
+	private DefaultJobParametersValidator jobParametersValidator = new DefaultJobParametersValidator();
+
 	/**
 	 * Default constructor.
 	 */
@@ -96,6 +98,13 @@ public class JobSupport implements BeanNameAware, Job {
 	 */
 	public String getName() {
 		return name;
+	}
+	
+	/**
+	 * @param jobParametersValidator the jobParametersValidator to set
+	 */
+	public void setJobParametersValidator(DefaultJobParametersValidator jobParametersValidator) {
+		this.jobParametersValidator = jobParametersValidator;
 	}
 
 	public void setSteps(List<Step> steps) {
@@ -157,4 +166,9 @@ public class JobSupport implements BeanNameAware, Job {
 	public JobParametersIncrementer getJobParametersIncrementer() {
 		return null;
 	}
+	
+	public JobParametersValidator getJobParametersValidator() {
+		return jobParametersValidator;
+	}
+
 }

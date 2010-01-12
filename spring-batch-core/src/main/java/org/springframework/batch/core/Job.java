@@ -15,6 +15,8 @@
  */
 package org.springframework.batch.core;
 
+import org.springframework.batch.core.job.JobParametersValidator;
+
 /**
  * Batch domain object representing a job. Job is an explicit abstraction
  * representing the configuration of a job specified by a developer. It should
@@ -34,7 +36,7 @@ public interface Job {
 	 * @return true if this job can be restarted after a failure
 	 */
 	boolean isRestartable();
-	
+
 	/**
 	 * Run the {@link JobExecution} and update the meta information like status
 	 * and statistics as necessary. This method should not throw any exceptions
@@ -53,5 +55,15 @@ public interface Job {
 	 * @return in incrementer to be used for creating new parameters
 	 */
 	JobParametersIncrementer getJobParametersIncrementer();
+
+	/**
+	 * A validator for the job parameters of a {@link JobExecution}. Clients of
+	 * a Job may need to validate the parameters for a launch, before or during
+	 * the execution.
+	 * 
+	 * @return a validator that can be used to check parameter values (never
+	 * null)
+	 */
+	JobParametersValidator getJobParametersValidator();
 
 }

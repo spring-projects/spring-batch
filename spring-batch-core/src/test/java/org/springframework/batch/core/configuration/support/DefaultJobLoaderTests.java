@@ -22,6 +22,7 @@ import org.springframework.batch.core.Job;
 import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.JobParametersIncrementer;
 import org.springframework.batch.core.configuration.JobRegistry;
+import org.springframework.batch.core.job.JobParametersValidator;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.ClassPathResource;
 
@@ -86,6 +87,10 @@ public class DefaultJobLoaderTests {
 
 		public boolean isRestartable() {
 			return false;
+		}
+
+		public JobParametersValidator getJobParametersValidator() {
+			return null;
 		}
 
 	}

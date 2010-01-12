@@ -18,6 +18,7 @@ package org.springframework.batch.core.configuration.support;
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.JobParametersIncrementer;
+import org.springframework.batch.core.job.JobParametersValidator;
 
 /**
  * A {@link Job} that can optionally prepend a group name to another job's name,
@@ -85,6 +86,10 @@ public class GroupAwareJob implements Job {
 
 	public JobParametersIncrementer getJobParametersIncrementer() {
 		return delegate.getJobParametersIncrementer();
+	}
+
+	public JobParametersValidator getJobParametersValidator() {
+		return delegate.getJobParametersValidator();
 	}
 
 	/*
