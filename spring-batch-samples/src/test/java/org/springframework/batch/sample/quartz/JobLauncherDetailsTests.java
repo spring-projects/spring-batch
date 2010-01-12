@@ -33,7 +33,9 @@ import org.quartz.SimpleTrigger;
 import org.quartz.spi.TriggerFiredBundle;
 import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.JobParameters;
+import org.springframework.batch.core.JobParametersIncrementer;
 import org.springframework.batch.core.configuration.JobLocator;
+import org.springframework.batch.core.job.JobParametersValidator;
 import org.springframework.batch.core.launch.JobLauncher;
 import org.springframework.batch.core.launch.NoSuchJobException;
 import org.springframework.batch.core.repository.JobExecutionAlreadyRunningException;
@@ -63,7 +65,7 @@ public class JobLauncherDetailsTests {
 		details.setJobLocator(new JobLocator() {
 			public org.springframework.batch.core.Job getJob(String name) throws NoSuchJobException {
 				list.add(name);
-				return new JobSupport("foo");
+				return new StubJob("foo");
 			}
 		});
 	}
@@ -155,6 +157,34 @@ public class JobLauncherDetailsTests {
 
 		private StubJobExecutionContext() {
 			super(createNiceMock(Scheduler.class), firedBundle, createNiceMock(Job.class));
+		}
+
+	}
+	
+	private static class StubJob implements org.springframework.batch.core.Job {
+
+		private final String name;
+
+		public StubJob(String name) {
+			this.name = name;
+		}
+
+		public void execute(JobExecution execution) {
+		}
+
+		public JobParametersIncrementer getJobParametersIncrementer() {
+			return null;
+		}
+		public JobParametersValidator getJobParametersValidator() {
+			return null;
+		}
+
+		public String getName() {
+			return name;
+		}
+
+		public boolean isRestartable() {
+			return false;
 		}
 
 	}
