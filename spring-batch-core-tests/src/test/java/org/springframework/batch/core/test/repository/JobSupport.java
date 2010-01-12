@@ -24,6 +24,8 @@ import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.JobParametersIncrementer;
 import org.springframework.batch.core.Step;
 import org.springframework.batch.core.UnexpectedJobExecutionException;
+import org.springframework.batch.core.job.DefaultJobParametersValidator;
+import org.springframework.batch.core.job.JobParametersValidator;
 import org.springframework.beans.factory.BeanNameAware;
 import org.springframework.util.ClassUtils;
 
@@ -45,6 +47,8 @@ public class JobSupport implements BeanNameAware, Job {
 	private boolean restartable = false;
 
 	private int startLimit = Integer.MAX_VALUE;
+
+	private JobParametersValidator jobParametersValidator = new DefaultJobParametersValidator();
 
 	/**
 	 * Default constructor.
@@ -97,6 +101,13 @@ public class JobSupport implements BeanNameAware, Job {
 		return name;
 	}
 	
+	/**
+	 * @param jobParametersValidator the jobParametersValidator to set
+	 */
+	public void setJobParametersValidator(JobParametersValidator jobParametersValidator) {
+		this.jobParametersValidator = jobParametersValidator;
+	}
+	
 	public void setSteps(List<Step> steps) {
 		this.steps.clear();
 		this.steps.addAll(steps);
@@ -137,6 +148,10 @@ public class JobSupport implements BeanNameAware, Job {
 	 */
 	public JobParametersIncrementer getJobParametersIncrementer() {
 		return null;
+	}
+	
+	public JobParametersValidator getJobParametersValidator() {
+		return jobParametersValidator;
 	}
 	
 	/* (non-Javadoc)
