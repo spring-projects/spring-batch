@@ -1,5 +1,7 @@
 package org.springframework.batch.item.database;
 
+import java.util.Collections;
+
 import org.junit.runner.RunWith;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.context.ContextConfiguration;
@@ -28,10 +30,11 @@ public class JpaPagingItemReaderIntegrationTests extends AbstractDataSourceItemR
 
 		EntityManagerFactory entityManagerFactory = factoryBean.getObject();
 
-		String jpqlQuery = "select f from Foo f";
+		String jpqlQuery = "select f from Foo f where name like :name";
 
 		JpaPagingItemReader<Foo> inputSource = new JpaPagingItemReader<Foo>();
 		inputSource.setQueryString(jpqlQuery);
+		inputSource.setParameterValues(Collections.singletonMap("name", (Object)"bar%"));
 		inputSource.setEntityManagerFactory(entityManagerFactory);
 		inputSource.setPageSize(3);
 		inputSource.afterPropertiesSet();

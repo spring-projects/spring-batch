@@ -15,6 +15,8 @@
  */
 package org.springframework.batch.item.database;
 
+import java.util.Map;
+
 import org.hibernate.Query;
 import org.hibernate.ScrollMode;
 import org.hibernate.ScrollableResults;
@@ -25,6 +27,7 @@ import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.ItemStream;
 import org.springframework.batch.item.ItemStreamException;
+import org.springframework.batch.item.database.support.AbstractHibernateQueryProvider;
 import org.springframework.batch.item.support.AbstractItemCountingItemStreamItemReader;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.util.Assert;
@@ -68,6 +71,10 @@ public class HibernateCursorItemReader<T> extends AbstractItemCountingItemStream
 
 	private String queryName = "";
 
+	private Map<String, Object> parameterValues;
+
+	private HibernateQueryProvider queryProvider;
+
 	private boolean useStatelessSession = true;
 
 	private boolean initialized = false;
@@ -77,29 +84,53 @@ public class HibernateCursorItemReader<T> extends AbstractItemCountingItemStream
 	public HibernateCursorItemReader() {
 		setName(ClassUtils.getShortName(HibernateCursorItemReader.class));
 	}
+	
+	/**
+	 * The parameter values to apply to a query (map of name:value).
+	 * 
+	 * @param parameterValues the parameter values to set
+	 */
+	public void setParameterValues(Map<String, Object> parameterValues) {
+		this.parameterValues = parameterValues;
+	}
 
 	/**
 	 * Open appropriate type of hibernate session and create the query.
 	 */
 	private Query createQuery() {
+
 		if (useStatelessSession) {
 			statelessSession = sessionFactory.openStatelessSession();
-			if (StringUtils.hasText(queryName)) {
-				return statelessSession.getNamedQuery(queryName);
+			if (queryProvider != null) {
+				queryProvider.setStatelessSession(statelessSession);
 			}
 			else {
-				return statelessSession.createQuery(queryString);
+				if (StringUtils.hasText(queryName)) {
+					return statelessSession.getNamedQuery(queryName);
+				}
+				else {
+					return statelessSession.createQuery(queryString);
+				}
 			}
 		}
 		else {
 			statefulSession = sessionFactory.openSession();
-			if (StringUtils.hasText(queryName)) {
-				return statefulSession.getNamedQuery(queryName);
+			if (queryProvider != null) {
+				queryProvider.setSession(statefulSession);
 			}
 			else {
-				return statefulSession.createQuery(queryString);
+				if (StringUtils.hasText(queryName)) {
+					return statefulSession.getNamedQuery(queryName);
+				}
+				else {
+					return statefulSession.createQuery(queryString);
+				}
 			}
 		}
+
+		// if queryProvider is set use it to create a query
+		return queryProvider.createQuery();
+
 	}
 
 	/**
@@ -110,10 +141,21 @@ public class HibernateCursorItemReader<T> extends AbstractItemCountingItemStream
 	}
 
 	public void afterPropertiesSet() throws Exception {
-		Assert.notNull(sessionFactory, "session factory must be set");
-		Assert.isTrue(fetchSize >= 0, "fetchSize must not be negative");
-		Assert.isTrue(StringUtils.hasText(queryString) ^ StringUtils.hasText(queryName),
-				"exactly one of queryString or queryName must be set");
+
+		Assert.state(sessionFactory!=null, "A SessionFactory must be provided");
+		Assert.state(fetchSize >= 0, "fetchSize must not be negative");
+
+		if (queryProvider == null) {
+			Assert.notNull(sessionFactory, "session factory must be set");
+			Assert.state(StringUtils.hasText(queryString) ^ StringUtils.hasText(queryName),
+					"queryString or queryName must be set");
+		}
+		// making sure that the appropriate (Hibernate) query provider is set
+		else {
+			Assert.state(queryProvider instanceof AbstractHibernateQueryProvider,
+					"Hibernate query provider must be set");
+		}
+
 	}
 
 	/**
@@ -128,6 +170,13 @@ public class HibernateCursorItemReader<T> extends AbstractItemCountingItemStream
 	 */
 	public void setQueryString(String queryString) {
 		this.queryString = queryString;
+	}
+
+	/**
+	 * @param queryProvider Hibernate query provider
+	 */
+	public void setQueryProvider(HibernateQueryProvider queryProvider) {
+		this.queryProvider = queryProvider;
 	}
 
 	/**
@@ -193,24 +242,27 @@ public class HibernateCursorItemReader<T> extends AbstractItemCountingItemStream
 
 	/**
 	 * Open hibernate session and create a forward-only cursor for the
-	 * {@link #setQueryString(String)}.
+	 * query.
 	 */
 	protected void doOpen() throws Exception {
 		Assert.state(!initialized, "Cannot open an already opened ItemReader, call close first");
 
-		cursor = createQuery().setFetchSize(fetchSize).scroll(ScrollMode.FORWARD_ONLY);
+		Query query = createQuery();
+		if (parameterValues!=null) {
+			query.setProperties(parameterValues);
+		}
+		cursor = query.setFetchSize(fetchSize).scroll(ScrollMode.FORWARD_ONLY);
 
 		initialized = true;
-
 	}
-	
+
 	@Override
 	protected void jumpToItem(int itemIndex) throws Exception {
-		for(int i = 0; i < itemIndex; i++){
+		for (int i = 0; i < itemIndex; i++) {
 			cursor.next();
 		}
 	}
-	
+
 	/**
 	 * Close the cursor and hibernate session.
 	 */
@@ -220,6 +272,7 @@ public class HibernateCursorItemReader<T> extends AbstractItemCountingItemStream
 		if (cursor != null) {
 			cursor.close();
 		}
+
 		if (useStatelessSession) {
 			if (statelessSession != null) {
 				statelessSession.close();

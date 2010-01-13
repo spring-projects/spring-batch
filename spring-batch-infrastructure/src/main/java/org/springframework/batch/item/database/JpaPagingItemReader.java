@@ -26,6 +26,7 @@ import javax.persistence.EntityTransaction;
 import javax.persistence.Query;
 
 import org.springframework.batch.item.ExecutionContext;
+import org.springframework.batch.item.database.support.AbstractJpaQueryProvider;
 import org.springframework.dao.DataAccessResourceFailureException;
 import org.springframework.util.Assert;
 import org.springframework.util.ClassUtils;
@@ -90,10 +91,25 @@ public class JpaPagingItemReader<T> extends AbstractPagingItemReader<T> {
 
 	private String queryString;
 
+	private JpaQueryProvider queryProvider;
+
 	private Map<String, Object> parameterValues;
 
 	public JpaPagingItemReader() {
 		setName(ClassUtils.getShortName(JpaPagingItemReader.class));
+	}
+
+	/**
+	 * Create a query using an appropriate query provider (entityManager OR
+	 * queryProvider).
+	 */
+	private Query createQuery() {
+		if (queryProvider == null) {
+			return entityManager.createQuery(queryString);
+		}
+		else {
+			return queryProvider.createQuery();
+		}
 	}
 
 	public void setEntityManagerFactory(EntityManagerFactory entityManagerFactory) {
@@ -112,8 +128,15 @@ public class JpaPagingItemReader<T> extends AbstractPagingItemReader<T> {
 
 	public void afterPropertiesSet() throws Exception {
 		super.afterPropertiesSet();
-		Assert.notNull(entityManagerFactory);
-		Assert.hasLength(queryString);
+
+		if (queryProvider == null) {
+			Assert.notNull(entityManagerFactory);
+			Assert.hasLength(queryString);
+		}
+		// making sure that the appropriate (JPA) query provider is set
+		else {
+			Assert.isTrue(queryProvider instanceof AbstractJpaQueryProvider, "JPA query provider must be set");
+		}
 	}
 
 	/**
@@ -123,13 +146,27 @@ public class JpaPagingItemReader<T> extends AbstractPagingItemReader<T> {
 		this.queryString = queryString;
 	}
 
+	/**
+	 * @param queryProvider JPA query provider
+	 */
+	public void setQueryProvider(JpaQueryProvider queryProvider) {
+		this.queryProvider = queryProvider;
+	}
+
 	@Override
 	protected void doOpen() throws Exception {
 		super.doOpen();
+
 		entityManager = entityManagerFactory.createEntityManager(jpaPropertyMap);
 		if (entityManager == null) {
 			throw new DataAccessResourceFailureException("Unable to obtain an EntityManager");
 		}
+		// set entityManager to queryProvider, so it participates
+		// in JpaPagingItemReader's managed transaction
+		if (queryProvider != null) {
+			queryProvider.setEntityManager(entityManager);
+		}
+
 	}
 
 	@Override
@@ -142,8 +179,7 @@ public class JpaPagingItemReader<T> extends AbstractPagingItemReader<T> {
 		entityManager.flush();
 		entityManager.clear();
 
-		Query query = entityManager.createQuery(queryString).setFirstResult(getPage() * getPageSize()).setMaxResults(
-				getPageSize());
+		Query query = createQuery().setFirstResult(getPage() * getPageSize()).setMaxResults(getPageSize());
 
 		if (parameterValues != null) {
 			for (Map.Entry<String, Object> me : parameterValues.entrySet()) {
