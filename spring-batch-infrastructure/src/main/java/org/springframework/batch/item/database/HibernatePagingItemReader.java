@@ -16,18 +16,15 @@
 package org.springframework.batch.item.database;
 
 import java.util.Map;
+import java.util.concurrent.CopyOnWriteArrayList;
 
-import org.hibernate.ScrollableResults;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.StatelessSession;
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.ItemStream;
-import org.springframework.batch.item.ItemStreamException;
-import org.springframework.batch.item.support.AbstractItemCountingItemStreamItemReader;
 import org.springframework.beans.factory.InitializingBean;
-import org.springframework.util.Assert;
 import org.springframework.util.ClassUtils;
 
 /**
@@ -47,25 +44,27 @@ import org.springframework.util.ClassUtils;
  * modifications are expected).
  * </p>
  * 
- * The implementation is <b>not</b> thread-safe.
+ * <p>
+ * The implementation is thread-safe in between calls to
+ * {@link #open(ExecutionContext)}, but remember to use
+ * <code>saveState=false</code> if used in a multi-threaded client (no restart
+ * available).
+ * </p>
  * 
- * @author Robert Kasanicky
  * @author Dave Syer
+ * 
+ * @since 2.1
  */
-public class HibernateCursorItemReader<T> extends AbstractItemCountingItemStreamItemReader<T> implements ItemStream,
-		InitializingBean {
+public class HibernatePagingItemReader<T> extends AbstractPagingItemReader<T> implements ItemStream, InitializingBean {
 
 	private HibernateItemReaderHelper<T> helper = new HibernateItemReaderHelper<T>();
 
-	public HibernateCursorItemReader() {
-		setName(ClassUtils.getShortName(HibernateCursorItemReader.class));
+	public HibernatePagingItemReader() {
+		setName(ClassUtils.getShortName(HibernatePagingItemReader.class));
 	}
 
-	private ScrollableResults cursor;
-
-	private boolean initialized = false;
-
 	public void afterPropertiesSet() throws Exception {
+		super.afterPropertiesSet();
 		helper.afterPropertiesSet();
 	}
 
@@ -132,79 +131,33 @@ public class HibernateCursorItemReader<T> extends AbstractItemCountingItemStream
 		helper.setUseStatelessSession(useStatelessSession);
 	}
 
-	protected T doRead() throws Exception {
-		if (cursor.next()) {
-			Object[] data = cursor.get();
-
-			if (data.length > 1) {
-				// If there are multiple items this must be a projection
-				// and T is an array type.
-				@SuppressWarnings("unchecked")
-				T item = (T) data;
-				return item;
-			}
-			else {
-				// Assume if there is only one item that it is the data the user
-				// wants.
-				// If there is only one item this is going to be a nasty shock
-				// if T is an array type but there's not much else we can do...
-				@SuppressWarnings("unchecked")
-				T item = (T) data[0];
-				return item;
-			}
-
-		}
-		return null;
-	}
-
-	/**
-	 * Open hibernate session and create a forward-only cursor for the query.
-	 */
+	@Override
 	protected void doOpen() throws Exception {
-		Assert.state(!initialized, "Cannot open an already opened ItemReader, call close first");
-		cursor = helper.getForwardOnlyCursor();
-		initialized = true;
+		super.doOpen();
 	}
-	
-	/**
-	 * Update the context and clear the session if stateful.
-	 * 
-	 * @param executionContext the current {@link ExecutionContext}
-	 * @throws ItemStreamException if there is a problem
-	 */
+
 	@Override
-	public void update(ExecutionContext executionContext) throws ItemStreamException {
-		super.update(executionContext);
-		helper.clear();
-	}
+	protected void doReadPage() {
 
-	/**
-	 * Wind forward through the result set to the item requested. Also clears
-	 * the session every now and then (if stateful) to avoid memory problems.
-	 * The frequency of session clearing is the larger of the fetch size (if
-	 * set) and 100.
-	 * 
-	 * @param itemIndex the first item to read
-	 * @throws Exception if there is a problem
-	 * @see AbstractItemCountingItemStreamItemReader#jumpToItem(int)
-	 */
-	@Override
-	protected void jumpToItem(int itemIndex) throws Exception {
-		helper.jumpToItem(cursor, itemIndex);
-	}
-
-	/**
-	 * Close the cursor and hibernate session.
-	 */
-	protected void doClose() throws Exception {
-
-		initialized = false;
-
-		if (cursor != null) {
-			cursor.close();
+		if (results == null) {
+			results = new CopyOnWriteArrayList<T>();
 		}
-
-		helper.close();
+		else {
+			results.clear();
+		}
+		
+		results.addAll(helper.readPage(getPage(), getPageSize()));
 
 	}
+
+	@Override
+	protected void doJumpToPage(int itemIndex) {
+	}
+
+	@Override
+	protected void doClose() throws Exception {
+		helper.close();
+		super.doClose();
+	}
+
 }
