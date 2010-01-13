@@ -35,8 +35,10 @@ import org.springframework.util.ClassUtils;
  * executes the HQL query when initialized iterates over the result set as
  * {@link #read()} method is called, returning an object corresponding to
  * current row. The query can be set directly using
- * {@link #setQueryString(String)} or a named query can be used by
- * {@link #setQueryName(String)}.
+ * {@link #setQueryString(String)}, a named query can be used by
+ * {@link #setQueryName(String)}, or a query provider strategy can be supplied
+ * via {@link #setQueryProvider(HibernateQueryProvider)}.
+ * 
  * 
  * <p>
  * The reader can be configured to use either {@link StatelessSession}
@@ -165,7 +167,7 @@ public class HibernateCursorItemReader<T> extends AbstractItemCountingItemStream
 		cursor = helper.getForwardOnlyCursor();
 		initialized = true;
 	}
-	
+
 	/**
 	 * Update the context and clear the session if stateful.
 	 * 

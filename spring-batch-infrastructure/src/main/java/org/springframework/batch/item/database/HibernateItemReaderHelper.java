@@ -26,16 +26,18 @@ import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.StatelessSession;
 import org.springframework.batch.item.database.support.AbstractHibernateQueryProvider;
+import org.springframework.beans.factory.InitializingBean;
 import org.springframework.util.Assert;
 import org.springframework.util.StringUtils;
 
 /**
- * Internal shared state helper for hibernate readers.
+ * Internal shared state helper for hibernate readers managing sessions and
+ * queries.
  * 
  * @author Dave Syer
  * 
  */
-class HibernateItemReaderHelper<T> {
+class HibernateItemReaderHelper<T> implements InitializingBean {
 
 	private SessionFactory sessionFactory;
 
@@ -170,7 +172,7 @@ class HibernateItemReaderHelper<T> {
 			}
 		}
 
-		// if queryProvider is set use it to create a query
+		// If queryProvider is set use it to create a query
 		return queryProvider.createQuery();
 
 	}
@@ -203,8 +205,11 @@ class HibernateItemReaderHelper<T> {
 	}
 
 	/**
-	 * @param page the page to read
-	 * @param pageSize the size of the page
+	 * Read a page of data, clearing the existing session (if necessary) first,
+	 * and creating a new session before executing the query.
+	 * 
+	 * @param page the page to read (starting at 0)
+	 * @param pageSize the size of the page or maximum number of items to read
 	 * @return a collection of items
 	 */
 	public Collection<? extends T> readPage(int page, int pageSize) {
@@ -225,7 +230,7 @@ class HibernateItemReaderHelper<T> {
 	 * Clear the session if stateful.
 	 */
 	public void clear() {
-		if (statefulSession!=null) {
+		if (statefulSession != null) {
 			statefulSession.clear();
 		}
 	}

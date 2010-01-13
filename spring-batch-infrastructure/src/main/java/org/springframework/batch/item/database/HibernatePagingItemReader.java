@@ -28,12 +28,13 @@ import org.springframework.beans.factory.InitializingBean;
 import org.springframework.util.ClassUtils;
 
 /**
- * {@link ItemReader} for reading database records built on top of Hibernate. It
- * executes the HQL query when initialized iterates over the result set as
- * {@link #read()} method is called, returning an object corresponding to
- * current row. The query can be set directly using
- * {@link #setQueryString(String)} or a named query can be used by
- * {@link #setQueryName(String)}.
+ * {@link ItemReader} for reading database records built on top of Hibernate and
+ * reading only up to a fixed number of items at a time. It executes an HQL
+ * query when initialized is paged as the {@link #read()} method is called. The
+ * query can be set directly using {@link #setQueryString(String)}, a named
+ * query can be used by {@link #setQueryName(String)}, or a query provider
+ * strategy can be supplied via
+ * {@link #setQueryProvider(HibernateQueryProvider)}.
  * 
  * <p>
  * The reader can be configured to use either {@link StatelessSession}
@@ -61,11 +62,6 @@ public class HibernatePagingItemReader<T> extends AbstractPagingItemReader<T> im
 
 	public HibernatePagingItemReader() {
 		setName(ClassUtils.getShortName(HibernatePagingItemReader.class));
-	}
-
-	public void afterPropertiesSet() throws Exception {
-		super.afterPropertiesSet();
-		helper.afterPropertiesSet();
 	}
 
 	/**
@@ -131,6 +127,11 @@ public class HibernatePagingItemReader<T> extends AbstractPagingItemReader<T> im
 		helper.setUseStatelessSession(useStatelessSession);
 	}
 
+	public void afterPropertiesSet() throws Exception {
+		super.afterPropertiesSet();
+		helper.afterPropertiesSet();
+	}
+
 	@Override
 	protected void doOpen() throws Exception {
 		super.doOpen();
@@ -145,7 +146,7 @@ public class HibernatePagingItemReader<T> extends AbstractPagingItemReader<T> im
 		else {
 			results.clear();
 		}
-		
+
 		results.addAll(helper.readPage(getPage(), getPageSize()));
 
 	}
