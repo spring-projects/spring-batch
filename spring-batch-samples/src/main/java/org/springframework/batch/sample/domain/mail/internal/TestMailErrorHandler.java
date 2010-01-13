@@ -22,7 +22,6 @@ import javax.mail.MessagingException;
 
 import org.springframework.batch.item.mail.MailErrorHandler;
 import org.springframework.mail.MailMessage;
-import org.springframework.mail.SimpleMailMessage;
 
 /**
  * This handler prints out failed messages with their exceptions. It also
@@ -36,7 +35,7 @@ import org.springframework.mail.SimpleMailMessage;
  */
 public class TestMailErrorHandler implements MailErrorHandler {
 
-	private List<SimpleMailMessage> failedMessages = new ArrayList<SimpleMailMessage>();
+	private List<MailMessage> failedMessages = new ArrayList<MailMessage>();
 
 	public void handle(MailMessage failedMessage, MessagingException ex) {
 		this.failedMessages.add(failedMessage);
@@ -44,7 +43,7 @@ public class TestMailErrorHandler implements MailErrorHandler {
 		System.out.println(ex);
 	}
 
-	public List<SimpleMailMessage> getFailedMessages() {
+	public List<MailMessage> getFailedMessages() {
 		return failedMessages;
 	}
 

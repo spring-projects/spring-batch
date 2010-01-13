@@ -33,6 +33,7 @@ import org.springframework.batch.sample.domain.mail.internal.TestMailSender;
 import org.springframework.batch.test.JobLauncherTestUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.simple.SimpleJdbcTemplate;
+import org.springframework.mail.MailMessage;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
@@ -109,9 +110,9 @@ public class MailJobFunctionalTests {
 		}
 
 		assertEquals(2, this.errorHandler.getFailedMessages().size());
-		Iterator<SimpleMailMessage> failureItr = this.errorHandler.getFailedMessages().iterator();
+		Iterator<MailMessage> failureItr = this.errorHandler.getFailedMessages().iterator();
 		for (Object[] record : new Object[][] { USER2_SKIP, USER4_SKIP }) {
-			SimpleMailMessage email = failureItr.next();
+			SimpleMailMessage email = (SimpleMailMessage) failureItr.next();
 			assertEquals("Hello " + record[1], email.getText());
 		}
 	}
