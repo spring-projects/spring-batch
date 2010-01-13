@@ -75,7 +75,7 @@ public class SimpleMailMessageItemWriterTests {
 
 		mailSender.send(EasyMock.aryEq(items));
 		EasyMock.expectLastCall().andThrow(
-				new MailSendException(Collections.singletonMap(foo, new MessagingException("FOO"))));
+				new MailSendException(Collections.singletonMap((Object)foo, (Exception)new MessagingException("FOO"))));
 		EasyMock.replay(mailSender);
 
 		writer.write(Arrays.asList(items));
@@ -100,7 +100,7 @@ public class SimpleMailMessageItemWriterTests {
 
 		mailSender.send(EasyMock.aryEq(items));
 		EasyMock.expectLastCall().andThrow(
-				new MailSendException(Collections.singletonMap(foo, new MessagingException("FOO"))));
+				new MailSendException(Collections.singletonMap((Object)foo, (Exception)new MessagingException("FOO"))));
 		EasyMock.replay(mailSender);
 
 		writer.write(Arrays.asList(items));

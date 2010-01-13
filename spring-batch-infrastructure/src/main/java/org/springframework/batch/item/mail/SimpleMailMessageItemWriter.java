@@ -102,9 +102,9 @@ public class SimpleMailMessageItemWriter implements ItemWriter<SimpleMailMessage
 		}
 		catch (MailSendException e) {
 			@SuppressWarnings("unchecked")
-			Map<SimpleMailMessage, MessagingException> failedMessages = e.getFailedMessages();
-			for (Entry<SimpleMailMessage, MessagingException> entry : failedMessages.entrySet()) {
-				mailErrorHandler.handle(entry.getKey(), entry.getValue());
+			Map<Object, Exception> failedMessages = e.getFailedMessages();
+			for (Entry<Object, Exception> entry : failedMessages.entrySet()) {
+				mailErrorHandler.handle((SimpleMailMessage) entry.getKey(), (MessagingException) entry.getValue());
 			}
 		}
 	}
