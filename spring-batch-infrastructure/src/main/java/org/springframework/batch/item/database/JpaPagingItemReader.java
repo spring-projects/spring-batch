@@ -26,7 +26,6 @@ import javax.persistence.EntityTransaction;
 import javax.persistence.Query;
 
 import org.springframework.batch.item.ExecutionContext;
-import org.springframework.batch.item.database.support.AbstractJpaQueryProvider;
 import org.springframework.dao.DataAccessResourceFailureException;
 import org.springframework.util.Assert;
 import org.springframework.util.ClassUtils;
@@ -135,7 +134,7 @@ public class JpaPagingItemReader<T> extends AbstractPagingItemReader<T> {
 		}
 		// making sure that the appropriate (JPA) query provider is set
 		else {
-			Assert.isTrue(queryProvider instanceof AbstractJpaQueryProvider, "JPA query provider must be set");
+			Assert.isTrue(queryProvider != null, "JPA query provider must be set");
 		}
 	}
 

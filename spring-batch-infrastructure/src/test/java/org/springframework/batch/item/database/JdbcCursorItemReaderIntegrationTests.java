@@ -1,10 +1,9 @@
 package org.springframework.batch.item.database;
 
+import org.junit.runner.RunWith;
 import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.sample.Foo;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
-import org.springframework.test.context.ContextConfiguration;
-import org.junit.runner.RunWith;
 
 /**
  * Tests for {@link JdbcCursorItemReader}
@@ -12,7 +11,6 @@ import org.junit.runner.RunWith;
  * @author Robert Kasanicky
  */
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(locations = "data-source-context.xml")
 public class JdbcCursorItemReaderIntegrationTests extends AbstractDataSourceItemReaderIntegrationTests {
 
 	protected ItemReader<Foo> createItemReader() throws Exception {

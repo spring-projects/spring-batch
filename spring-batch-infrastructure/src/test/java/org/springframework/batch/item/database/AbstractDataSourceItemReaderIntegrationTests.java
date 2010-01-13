@@ -1,20 +1,25 @@
 package org.springframework.batch.item.database;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.fail;
 
+import javax.sql.DataSource;
+
+import org.junit.Before;
+import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.ItemStream;
 import org.springframework.batch.item.sample.Foo;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.context.transaction.AfterTransaction;
-import org.springframework.util.Assert;
 import org.springframework.transaction.annotation.Transactional;
-import org.junit.Before;
-import org.junit.Test;
-
-import javax.sql.DataSource;
+import org.springframework.util.Assert;
 
 /**
  * Common scenarios for testing {@link ItemReader} implementations which read
@@ -23,6 +28,8 @@ import javax.sql.DataSource;
  * @author Lucas Ward
  * @author Robert Kasanicky
  */
+@RunWith(SpringJUnit4ClassRunner.class)
+@ContextConfiguration(locations = "data-source-context.xml")
 public abstract class AbstractDataSourceItemReaderIntegrationTests {
 
 	protected ItemReader<Foo> reader;
@@ -37,10 +44,6 @@ public abstract class AbstractDataSourceItemReaderIntegrationTests {
 	}
 
 	protected abstract ItemReader<Foo> createItemReader() throws Exception;
-
-//	protected String[] getConfigLocations() {
-//		return new String[] { "org/springframework/batch/item/database/data-source-context.xml" };
-//	}
 
 	@Before
 	public void onSetUpInTransaction() throws Exception {

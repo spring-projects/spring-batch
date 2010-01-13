@@ -49,7 +49,7 @@ public class HibernateCursorProjectionItemReaderIntegrationTests {
 		reader.open(new ExecutionContext());
 
 	}
-
+	
 	@Test
 	public void testMultipleItemsInProjection() throws Exception {
 		HibernateCursorItemReader<Object[]> reader = new HibernateCursorItemReader<Object[]>();

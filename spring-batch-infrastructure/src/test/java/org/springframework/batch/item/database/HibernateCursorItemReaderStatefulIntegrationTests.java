@@ -1,24 +1,24 @@
 package org.springframework.batch.item.database;
 
-import static org.easymock.EasyMock.*;
+import static org.easymock.EasyMock.createMock;
+import static org.easymock.EasyMock.createNiceMock;
+import static org.easymock.EasyMock.expect;
+import static org.easymock.EasyMock.replay;
+import static org.easymock.EasyMock.verify;
+
 import org.hibernate.Query;
 import org.hibernate.SessionFactory;
 import org.hibernate.classic.Session;
+import org.junit.Test;
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.item.sample.Foo;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
-import org.springframework.test.context.ContextConfiguration;
-import org.junit.runner.RunWith;
-import org.junit.Test;
 
 /**
  * Tests for {@link HibernateCursorItemReader} using standard hibernate {@link Session}.
  * 
  * @author Robert Kasanicky
  */
-@RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(locations = "data-source-context.xml")
-public class HibernateCursorItemReaderStatefulIntegrationTests extends HibernateCursorItemReaderIntegrationTests {
+public class HibernateCursorItemReaderStatefulIntegrationTests extends AbstractHibernateCursorItemReaderIntegrationTests {
 
 	protected boolean isUseStatelessSession() {
 		return false;
@@ -26,7 +26,7 @@ public class HibernateCursorItemReaderStatefulIntegrationTests extends Hibernate
 	
 	//Ensure close is called on the stateful session correctly.
 	@Test
-	public void testStatfulClose(){
+	public void testStatefulClose(){
 		
 		SessionFactory sessionFactory = createMock(SessionFactory.class);
 		Session session = createMock(Session.class);

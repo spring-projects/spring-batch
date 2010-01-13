@@ -2,23 +2,18 @@ package org.springframework.batch.item.database;
 
 import java.util.Collections;
 
-import org.junit.runner.RunWith;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.batch.item.sample.Foo;
+import javax.persistence.EntityManagerFactory;
+
 import org.springframework.batch.item.ItemReader;
+import org.springframework.batch.item.sample.Foo;
 import org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean;
 import org.springframework.orm.jpa.vendor.HibernateJpaVendorAdapter;
-
-import javax.persistence.EntityManagerFactory;
 
 /**
  * Tests for {@link org.springframework.batch.item.database.JpaPagingItemReader}.
  *
  * @author Thomas Risberg
  */
-@RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(locations = "data-source-context.xml")
 public class JpaPagingItemReaderIntegrationTests extends AbstractDataSourceItemReaderIntegrationTests {
 
 	protected ItemReader<Foo> createItemReader() throws Exception {
