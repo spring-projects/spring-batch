@@ -19,8 +19,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import javax.mail.MessagingException;
-
 import org.springframework.batch.item.ItemWriter;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.mail.MailException;
@@ -104,7 +102,7 @@ public class SimpleMailMessageItemWriter implements ItemWriter<SimpleMailMessage
 			@SuppressWarnings("unchecked")
 			Map<Object, Exception> failedMessages = e.getFailedMessages();
 			for (Entry<Object, Exception> entry : failedMessages.entrySet()) {
-				mailErrorHandler.handle((SimpleMailMessage) entry.getKey(), (MessagingException) entry.getValue());
+				mailErrorHandler.handle((SimpleMailMessage) entry.getKey(), entry.getValue());
 			}
 		}
 	}

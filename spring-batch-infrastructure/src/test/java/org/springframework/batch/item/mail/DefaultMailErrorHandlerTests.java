@@ -52,7 +52,7 @@ public class DefaultMailErrorHandlerTests {
 	}
 
 	/**
-	 * Test method for {@link DefaultMailErrorHandler#handle(MailMessage, MessagingException)}.
+	 * Test method for {@link DefaultMailErrorHandler#handle(MailMessage, Exception)}.
 	 */
 	@Test(expected=MailSendException.class)
 	public void testHandle() {

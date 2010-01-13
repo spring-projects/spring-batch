@@ -15,8 +15,6 @@
  */
 package org.springframework.batch.item.mail;
 
-import javax.mail.MessagingException;
-
 import org.springframework.mail.MailException;
 import org.springframework.mail.MailMessage;
 import org.springframework.mail.MailSendException;
@@ -48,14 +46,14 @@ public class DefaultMailErrorHandler implements MailErrorHandler {
 
 	/**
 	 * Wraps the input exception with a runtime {@link MailException}. The
-	 * exception message will contain the failed message.
+	 * exception message will contain the failed message (using toString).
 	 * 
 	 * @param message a failed message
 	 * @param exception a MessagingException
-	 * @throws MailException a translation of the MessagingException
-	 * @see MailErrorHandler#handle(MailMessage, MessagingException)
+	 * @throws MailException a translation of the Exception
+	 * @see MailErrorHandler#handle(MailMessage, Exception)
 	 */
-	public void handle(MailMessage message, MessagingException exception) throws MailException {
+	public void handle(MailMessage message, Exception exception) throws MailException {
 		String msg = message.toString();
 		throw new MailSendException("Mail server send failed: "
 				+ msg.substring(0, Math.min(maxMessageLength, msg.length())), exception);

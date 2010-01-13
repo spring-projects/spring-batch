@@ -15,8 +15,6 @@
  */
 package org.springframework.batch.item.mail;
 
-import javax.mail.MessagingException;
-
 import org.springframework.mail.MailException;
 import org.springframework.mail.MailMessage;
 
@@ -33,13 +31,14 @@ public interface MailErrorHandler {
 
 	/**
 	 * This method will be called for each message that failed sending in the
-	 * chunk. If an exception is thrown from this method, then it will propagate
-	 * to the caller.
-	 *  
+	 * chunk. If the failed message is needed by the handler it will need to be
+	 * downcast according to its runtime type. If an exception is thrown from
+	 * this method, then it will propagate to the caller.
+	 * 
 	 * @param message the failed message
 	 * @param exception the exception that caused the failure
 	 * @throws MailException if the exception cannot be handled
 	 */
-	public void handle(MailMessage message, MessagingException exception) throws MailException;
+	public void handle(MailMessage message, Exception exception) throws MailException;
 
 }

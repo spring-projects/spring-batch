@@ -19,7 +19,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import javax.mail.MessagingException;
 import javax.mail.internet.MimeMessage;
 
 import org.springframework.batch.item.ItemWriter;
@@ -108,7 +107,7 @@ public class MimeMessageItemWriter implements ItemWriter<MimeMessage> {
 			@SuppressWarnings("unchecked")
 			Map<Object, Exception> failedMessages = e.getFailedMessages();
 			for (Entry<Object, Exception> entry : failedMessages.entrySet()) {
-				mailErrorHandler.handle(new MimeMailMessage((MimeMessage)entry.getKey()), (MessagingException)entry.getValue());
+				mailErrorHandler.handle(new MimeMailMessage((MimeMessage)entry.getKey()), entry.getValue());
 			}
 		}
 	}

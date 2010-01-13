@@ -18,7 +18,6 @@ package org.springframework.batch.sample.domain.mail.internal;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.mail.MessagingException;
 
 import org.springframework.batch.item.mail.MailErrorHandler;
 import org.springframework.mail.MailMessage;
@@ -37,7 +36,7 @@ public class TestMailErrorHandler implements MailErrorHandler {
 
 	private List<MailMessage> failedMessages = new ArrayList<MailMessage>();
 
-	public void handle(MailMessage failedMessage, MessagingException ex) {
+	public void handle(MailMessage failedMessage, Exception ex) {
 		this.failedMessages.add(failedMessage);
 		System.out.println("Mail message failed: " + failedMessage);
 		System.out.println(ex);
