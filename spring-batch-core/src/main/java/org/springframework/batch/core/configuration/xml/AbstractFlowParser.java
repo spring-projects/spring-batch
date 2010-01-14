@@ -350,9 +350,7 @@ public abstract class AbstractFlowParser extends AbstractSingleBeanDefinitionPar
 
 		BeanDefinition endState = null;
 
-		// TODO: revise this for clarity
-		if (status == FlowExecutionStatus.STOPPED || status == FlowExecutionStatus.COMPLETED
-				|| status == FlowExecutionStatus.FAILED) {
+		if (status.isEnd()) {
 
 			BeanDefinitionBuilder endBuilder = BeanDefinitionBuilder
 					.genericBeanDefinition("org.springframework.batch.core.job.flow.support.state.EndState");

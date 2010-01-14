@@ -15,7 +15,6 @@
  */
 package org.springframework.batch.core.job.flow;
 
-
 /**
  * This class is used as a holder for a BatchStatus/ExitStatus pair.
  * 
@@ -70,7 +69,7 @@ public class FlowExecutionStatus implements Comparable<FlowExecutionStatus> {
 	public FlowExecutionStatus(String status) {
 		this.name = status;
 	}
-	
+
 	/**
 	 * @return true if the status starts with "STOPPED"
 	 */
@@ -84,7 +83,21 @@ public class FlowExecutionStatus implements Comparable<FlowExecutionStatus> {
 	public boolean isFail() {
 		return name.startsWith(FAILED.getName());
 	}
-	
+
+
+	/**
+	 * @return true if this status represents the end of a flow
+	 */
+	public boolean isEnd() {
+		return isStop() || isFail() || isComplete();
+	}
+
+	/**
+	 * @return true if the status starts with "COMPLETED"
+	 */
+	private boolean isComplete() {
+		return name.startsWith(COMPLETED.getName());
+	}
 	/**
 	 * Create an ordering on {@link FlowExecutionStatus} instances by comparing
 	 * their statuses.
@@ -120,7 +133,7 @@ public class FlowExecutionStatus implements Comparable<FlowExecutionStatus> {
 		FlowExecutionStatus other = (FlowExecutionStatus) object;
 		return name.equals(other.name);
 	}
-	
+
 	@Override
 	public int hashCode() {
 		return name.hashCode();
