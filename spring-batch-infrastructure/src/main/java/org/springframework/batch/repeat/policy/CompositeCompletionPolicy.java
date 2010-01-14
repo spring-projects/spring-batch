@@ -17,11 +17,12 @@
 package org.springframework.batch.repeat.policy;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import org.springframework.batch.repeat.CompletionPolicy;
-import org.springframework.batch.repeat.RepeatStatus;
 import org.springframework.batch.repeat.RepeatContext;
+import org.springframework.batch.repeat.RepeatStatus;
 import org.springframework.batch.repeat.context.RepeatContextSupport;
 
 /**
@@ -41,7 +42,7 @@ public class CompositeCompletionPolicy implements CompletionPolicy {
 	 * @param policies
 	 */
 	public void setPolicies(CompletionPolicy[] policies) {
-		this.policies = policies;
+		this.policies = Arrays.asList(policies).toArray(new CompletionPolicy[policies.length]);
 	}
 
 	/**

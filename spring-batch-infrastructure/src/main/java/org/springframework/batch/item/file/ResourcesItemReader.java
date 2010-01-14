@@ -1,5 +1,6 @@
 package org.springframework.batch.item.file;
 
+import java.util.Arrays;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import org.springframework.batch.item.ExecutionContext;
@@ -48,7 +49,7 @@ public class ResourcesItemReader extends ExecutionContextUserSupport implements 
 	 * @param resources the resources
 	 */
 	public void setResources(Resource[] resources) {
-		this.resources = resources;
+		this.resources = Arrays.asList(resources).toArray(new Resource[resources.length]);
 	}
 
 	/**

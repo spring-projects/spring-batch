@@ -76,7 +76,7 @@ public class ClassifierAdapter<C, T> implements Classifier<C, T> {
 	 * 
 	 * @param delegate an object with an annotated method
 	 */
-	public void setDelegate(Object delegate) {
+	public final void setDelegate(Object delegate) {
 		classifier = null;
 		invoker = MethodInvokerUtils.getMethodInvokerByAnnotation(
 				org.springframework.batch.support.annotation.Classifier.class, delegate);

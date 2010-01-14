@@ -64,7 +64,7 @@ public class DefaultFieldSet implements FieldSet {
 	 * US locale will be used ('.' as decimal place).
 	 * @param numberFormat the {@link NumberFormat} to use for number parsing
 	 */
-	public void setNumberFormat(NumberFormat numberFormat) {
+	public final void setNumberFormat(NumberFormat numberFormat) {
 		this.numberFormat = numberFormat;
 		if (numberFormat instanceof DecimalFormat) {
 			grouping = ""+((DecimalFormat)numberFormat).getDecimalFormatSymbols().getGroupingSeparator();

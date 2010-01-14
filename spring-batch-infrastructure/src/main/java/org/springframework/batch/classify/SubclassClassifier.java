@@ -63,7 +63,7 @@ public class SubclassClassifier<T, C> implements Classifier<T, C> {
 	 */
 	public SubclassClassifier(Map<Class<? extends T>, C> typeMap, C defaultValue) {
 		super();
-		setTypeMap(typeMap);
+		this.classified = new HashMap<Class<? extends T>, C>(typeMap);
 		this.defaultValue = defaultValue;
 	}
 

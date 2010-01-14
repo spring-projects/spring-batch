@@ -16,6 +16,7 @@
 
 package org.springframework.batch.repeat.exception;
 
+import java.util.Arrays;
 
 import org.springframework.batch.repeat.RepeatContext;
 
@@ -30,7 +31,7 @@ public class CompositeExceptionHandler implements ExceptionHandler {
 	private ExceptionHandler[] handlers = new ExceptionHandler[0];
 
 	public void setHandlers(ExceptionHandler[] handlers) {
-		this.handlers = handlers;
+		this.handlers = Arrays.asList(handlers).toArray(new ExceptionHandler[handlers.length]);
 	}
 
 	/**

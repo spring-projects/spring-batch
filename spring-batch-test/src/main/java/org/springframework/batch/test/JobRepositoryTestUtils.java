@@ -93,7 +93,7 @@ public class JobRepositoryTestUtils extends AbstractJdbcBatchMetadataDao impleme
 		setDataSource(dataSource);
 	}
 
-	public void setDataSource(DataSource dataSource) {
+	public final void setDataSource(DataSource dataSource) {
 		jdbcTemplate = new SimpleJdbcTemplate(dataSource);
 	}
 

@@ -24,12 +24,12 @@ import java.util.List;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.batch.repeat.CompletionPolicy;
-import org.springframework.batch.repeat.RepeatStatus;
 import org.springframework.batch.repeat.RepeatCallback;
 import org.springframework.batch.repeat.RepeatContext;
 import org.springframework.batch.repeat.RepeatException;
 import org.springframework.batch.repeat.RepeatListener;
 import org.springframework.batch.repeat.RepeatOperations;
+import org.springframework.batch.repeat.RepeatStatus;
 import org.springframework.batch.repeat.exception.DefaultExceptionHandler;
 import org.springframework.batch.repeat.exception.ExceptionHandler;
 import org.springframework.batch.repeat.policy.DefaultResultCompletionPolicy;
@@ -79,7 +79,7 @@ public class RepeatTemplate implements RepeatOperations {
 	 * @param listeners
 	 */
 	public void setListeners(RepeatListener[] listeners) {
-		this.listeners = listeners;
+		this.listeners = Arrays.asList(listeners).toArray(new RepeatListener[listeners.length]);
 	}
 
 	/**

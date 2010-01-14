@@ -17,6 +17,7 @@
 package org.springframework.batch.item.file.transform;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -49,7 +50,7 @@ public class FixedLengthTokenizer extends AbstractLineTokenizer {
 	 * @param ranges the column ranges expected in the input
 	 */
 	public void setColumns(Range[] ranges) {
-		this.ranges = ranges;
+		this.ranges = Arrays.asList(ranges).toArray(new Range[ranges.length]);
 		calculateMaxRange(ranges);
 	}
 

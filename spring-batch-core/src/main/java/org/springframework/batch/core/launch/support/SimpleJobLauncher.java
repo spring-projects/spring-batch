@@ -133,7 +133,10 @@ public class SimpleJobLauncher implements JobLauncher, InitializingBean {
 					if (t instanceof RuntimeException) {
 						throw (RuntimeException) t;
 					}
-					throw new RuntimeException(t);
+					else if (t instanceof Error) {
+						throw (Error) t;
+					}
+					throw new IllegalStateException(t);
 				}
 			});
 		}

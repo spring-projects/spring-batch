@@ -112,7 +112,7 @@ public class DefaultJobParametersValidator implements JobParametersValidator, In
 	 * 
 	 * @see #setOptionalKeys(String[])
 	 */
-	public void setRequiredKeys(String[] requiredKeys) {
+	public final void setRequiredKeys(String[] requiredKeys) {
 		this.requiredKeys = new HashSet<String>(Arrays.asList(requiredKeys));
 	}
 
@@ -126,7 +126,7 @@ public class DefaultJobParametersValidator implements JobParametersValidator, In
 	 * 
 	 * @see #setRequiredKeys(String[])
 	 */
-	public void setOptionalKeys(String[] optionalKeys) {
+	public final void setOptionalKeys(String[] optionalKeys) {
 		this.optionalKeys = new HashSet<String>(Arrays.asList(optionalKeys));
 	}
 

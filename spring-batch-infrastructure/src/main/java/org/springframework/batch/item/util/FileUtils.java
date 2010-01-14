@@ -27,7 +27,7 @@ import org.springframework.util.Assert;
  * 
  * @author Peter Zozom
  */
-public class FileUtils {
+public final class FileUtils {
 
 	// forbids instantiation
 	private FileUtils() {

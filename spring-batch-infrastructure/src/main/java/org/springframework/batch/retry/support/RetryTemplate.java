@@ -100,7 +100,7 @@ public class RetryTemplate implements RetryOperations {
 	 * @see RetryListener
 	 */
 	public void setListeners(RetryListener[] listeners) {
-		this.listeners = listeners;
+		this.listeners = Arrays.asList(listeners).toArray(new RetryListener[listeners.length]);
 	}
 
 	/**

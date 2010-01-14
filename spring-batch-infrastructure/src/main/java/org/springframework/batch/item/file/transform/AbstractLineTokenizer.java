@@ -17,6 +17,7 @@
 package org.springframework.batch.item.file.transform;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -78,7 +79,7 @@ public abstract class AbstractLineTokenizer implements LineTokenizer {
 	 * @param names
 	 */
 	public void setNames(String[] names) {
-		this.names = names;
+		this.names = Arrays.asList(names).toArray(new String[names.length]);
 	}
 
 	/**

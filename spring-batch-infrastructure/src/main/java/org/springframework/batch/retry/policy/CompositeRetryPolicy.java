@@ -17,6 +17,7 @@
 package org.springframework.batch.retry.policy;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import org.springframework.batch.retry.RetryContext;
@@ -40,7 +41,7 @@ public class CompositeRetryPolicy implements RetryPolicy {
 	 * @param policies
 	 */
 	public void setPolicies(RetryPolicy[] policies) {
-		this.policies = policies;
+		this.policies = Arrays.asList(policies).toArray(new RetryPolicy[policies.length]);
 	}
 
 	/**
@@ -77,12 +78,12 @@ public class CompositeRetryPolicy implements RetryPolicy {
 				policies[i].close(contexts[i]);
 			}
 			catch (RuntimeException e) {
-				if (exception==null) {
+				if (exception == null) {
 					exception = e;
 				}
 			}
 		}
-		if (exception!=null) {
+		if (exception != null) {
 			throw exception;
 		}
 	}

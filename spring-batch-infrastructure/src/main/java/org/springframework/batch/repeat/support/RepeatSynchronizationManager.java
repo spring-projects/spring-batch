@@ -33,7 +33,7 @@ import org.springframework.batch.repeat.RepeatOperations;
  * @author Dave Syer
  * 
  */
-public class RepeatSynchronizationManager {
+public final class RepeatSynchronizationManager {
 
 	private static final ThreadLocal<RepeatContext> contextHolder = new ThreadLocal<RepeatContext>();
 

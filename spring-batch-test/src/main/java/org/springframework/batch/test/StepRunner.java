@@ -31,6 +31,7 @@ import org.springframework.batch.core.JobParameter;
 import org.springframework.batch.core.JobParameters;
 import org.springframework.batch.core.JobParametersInvalidException;
 import org.springframework.batch.core.Step;
+import org.springframework.batch.core.UnexpectedJobExecutionException;
 import org.springframework.batch.core.job.SimpleJob;
 import org.springframework.batch.core.launch.JobLauncher;
 import org.springframework.batch.core.listener.JobExecutionListenerSupport;
@@ -168,16 +169,16 @@ public class StepRunner {
 			return this.launcher.run(job, jobParameters);
 		}
 		catch (JobExecutionAlreadyRunningException e) {
-			throw new RuntimeException(e);
+			throw new UnexpectedJobExecutionException("Step runner encountered exception.", e);
 		}
 		catch (JobRestartException e) {
-			throw new RuntimeException(e);
+			throw new UnexpectedJobExecutionException("Step runner encountered exception.", e);
 		}
 		catch (JobInstanceAlreadyCompleteException e) {
-			throw new RuntimeException(e);
+			throw new UnexpectedJobExecutionException("Step runner encountered exception.", e);
 		}
 		catch (JobParametersInvalidException e) {
-			throw new RuntimeException(e);
+			throw new UnexpectedJobExecutionException("Step runner encountered exception.", e);
 		}
 	}
 

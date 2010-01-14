@@ -16,6 +16,7 @@
 
 package org.springframework.batch.item.adapter;
 
+import java.util.Arrays;
 import java.util.List;
 
 import org.springframework.batch.item.ItemWriter;
@@ -68,7 +69,8 @@ public class PropertyExtractingDelegatingItemWriter<T> extends AbstractMethodInv
 	 * are supported, e.g. <code>address.city</code>
 	 */
 	public void setFieldsUsedAsTargetMethodArguments(String[] fieldsUsedAsMethodArguments) {
-		this.fieldsUsedAsTargetMethodArguments = fieldsUsedAsMethodArguments;
+		this.fieldsUsedAsTargetMethodArguments = Arrays.asList(fieldsUsedAsMethodArguments).toArray(
+				new String[fieldsUsedAsMethodArguments.length]);
 	}
 
 }

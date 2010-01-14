@@ -30,7 +30,7 @@ import org.springframework.util.StringUtils;
  * @author Dave Syer
  * @since 2.0
  */
-public class StateTransition implements Comparable<StateTransition> {
+public final class StateTransition implements Comparable<StateTransition> {
 
 	private final State state;
 

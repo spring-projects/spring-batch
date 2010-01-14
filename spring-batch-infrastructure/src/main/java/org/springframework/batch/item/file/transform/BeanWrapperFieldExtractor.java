@@ -17,6 +17,7 @@
 package org.springframework.batch.item.file.transform;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import org.springframework.beans.BeanWrapper;
@@ -40,7 +41,7 @@ public class BeanWrapperFieldExtractor<T> implements FieldExtractor<T>, Initiali
 	 * @param names field names to be extracted by the {@link #extract(Object)} method.
 	 */
 	public void setNames(String[] names) {
-		this.names = names;
+		this.names = Arrays.asList(names).toArray(new String[names.length]);
 	}
 
 	/**

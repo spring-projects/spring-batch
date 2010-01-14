@@ -34,7 +34,7 @@ import org.springframework.batch.retry.RetryOperations;
  * @author Dave Syer
  * 
  */
-public class RetrySynchronizationManager {
+public final class RetrySynchronizationManager {
 
 	private RetrySynchronizationManager() {}
 

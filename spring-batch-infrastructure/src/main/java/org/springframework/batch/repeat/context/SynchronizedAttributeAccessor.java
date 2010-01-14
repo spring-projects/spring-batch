@@ -148,7 +148,7 @@ public class SynchronizedAttributeAccessor implements AttributeAccessor {
 			String[] names = attributeNames();
 			for (int i = 0; i < names.length; i++) {
 				String name = names[i];
-				buffer.append(names[i] + "=" + getAttribute(name));
+				buffer.append(names[i]).append("=").append(getAttribute(name));
 				if (i < names.length - 1) {
 					buffer.append(", ");
 				}

@@ -47,7 +47,7 @@ import org.springframework.util.ClassUtils;
 public class MultiResourceItemReader<T> implements ItemReader<T>, ItemStream {
 
 	private static final Log logger = LogFactory.getLog(MultiResourceItemReader.class);
-	
+
 	private static final String RESOURCE_KEY = "resourceIndex";
 
 	private final ExecutionContextUserSupport executionContextUserSupport = new ExecutionContextUserSupport();
@@ -57,7 +57,7 @@ public class MultiResourceItemReader<T> implements ItemReader<T>, ItemStream {
 	private Resource[] resources;
 
 	private boolean saveState = true;
-	
+
 	private int currentResource = -1;
 
 	// signals there are no resources to read -> just return null on first read
@@ -86,10 +86,10 @@ public class MultiResourceItemReader<T> implements ItemReader<T>, ItemStream {
 		if (noInput) {
 			return null;
 		}
-		
-		//If there is no resource, then this is the first item, set the current
-		//resource to 0 and open the first delegate.
-		if(currentResource == -1){
+
+		// If there is no resource, then this is the first item, set the current
+		// resource to 0 and open the first delegate.
+		if (currentResource == -1) {
 			currentResource = 0;
 			delegate.setResource(resources[currentResource]);
 			delegate.open(new ExecutionContext());
@@ -159,7 +159,7 @@ public class MultiResourceItemReader<T> implements ItemReader<T>, ItemStream {
 			delegate.setResource(resources[currentResource]);
 			delegate.open(executionContext);
 		}
-		else{
+		else {
 			currentResource = -1;
 		}
 	}
@@ -194,7 +194,7 @@ public class MultiResourceItemReader<T> implements ItemReader<T>, ItemStream {
 
 	/**
 	 * @param comparator used to order the injected resources, by default
-	 *        compares {@link Resource#getFilename()} values.
+	 * compares {@link Resource#getFilename()} values.
 	 */
 	public void setComparator(Comparator<Resource> comparator) {
 		this.comparator = comparator;
@@ -204,7 +204,7 @@ public class MultiResourceItemReader<T> implements ItemReader<T>, ItemStream {
 	 * @param resources input resources
 	 */
 	public void setResources(Resource[] resources) {
-		this.resources = resources;
+		this.resources = Arrays.asList(resources).toArray(new Resource[resources.length]);
 	}
 
 	public Resource getCurrentResource() {

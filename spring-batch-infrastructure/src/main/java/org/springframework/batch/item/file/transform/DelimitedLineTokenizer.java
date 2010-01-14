@@ -96,7 +96,7 @@ public class DelimitedLineTokenizer extends AbstractLineTokenizer {
 	 * 
 	 * @see #DEFAULT_QUOTE_CHARACTER
 	 */
-	public void setQuoteCharacter(char quoteCharacter) {
+	public final void setQuoteCharacter(char quoteCharacter) {
 		this.quoteCharacter = quoteCharacter;
 		this.quoteString = "" + quoteCharacter;
 	}
@@ -167,9 +167,9 @@ public class DelimitedLineTokenizer extends AbstractLineTokenizer {
 			if (endLength == 0) {
 				endLength = 1;
 			}
-			string = value.substring(1, endLength);
+			value = value.substring(1, endLength);
 		}
-		return string;
+		return value;
 	}
 
 	/**
