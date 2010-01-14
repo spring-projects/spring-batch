@@ -18,7 +18,7 @@ package org.springframework.batch.core.configuration.support;
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.JobParametersIncrementer;
-import org.springframework.batch.core.job.JobParametersValidator;
+import org.springframework.batch.core.JobParametersValidator;
 
 /**
  * A {@link Job} that can optionally prepend a group name to another job's name,

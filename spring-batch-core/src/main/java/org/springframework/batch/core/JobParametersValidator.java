@@ -1,8 +1,5 @@
-package org.springframework.batch.core.job;
+package org.springframework.batch.core;
 
-import org.springframework.batch.core.Job;
-import org.springframework.batch.core.JobParameters;
-import org.springframework.batch.core.JobParametersInvalidException;
 
 /**
  * Strategy interface for a {@link Job} to use in validating its parameters for

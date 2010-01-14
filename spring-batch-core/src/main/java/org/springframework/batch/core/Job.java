@@ -15,8 +15,6 @@
  */
 package org.springframework.batch.core;
 
-import org.springframework.batch.core.job.JobParametersValidator;
-
 /**
  * Batch domain object representing a job. Job is an explicit abstraction
  * representing the configuration of a job specified by a developer. It should

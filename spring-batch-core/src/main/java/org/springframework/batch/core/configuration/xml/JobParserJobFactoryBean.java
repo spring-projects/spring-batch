@@ -17,7 +17,7 @@ package org.springframework.batch.core.configuration.xml;
 
 import org.springframework.batch.core.JobExecutionListener;
 import org.springframework.batch.core.JobParametersIncrementer;
-import org.springframework.batch.core.job.JobParametersValidator;
+import org.springframework.batch.core.JobParametersValidator;
 import org.springframework.batch.core.job.flow.Flow;
 import org.springframework.batch.core.job.flow.FlowJob;
 import org.springframework.batch.core.repository.JobRepository;
