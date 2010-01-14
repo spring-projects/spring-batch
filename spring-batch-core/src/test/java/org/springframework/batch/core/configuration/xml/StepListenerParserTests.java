@@ -20,31 +20,41 @@ import static org.junit.Assert.assertTrue;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.springframework.aop.framework.Advised;
 import org.springframework.batch.core.Step;
 import org.springframework.batch.core.StepExecutionListener;
 import org.springframework.batch.core.listener.CompositeStepExecutionListener;
 import org.springframework.batch.core.listener.StepExecutionListenerSupport;
 import org.springframework.batch.core.step.tasklet.TaskletStep;
-import org.springframework.context.ApplicationContext;
-import org.springframework.context.ConfigurableApplicationContext;
-import org.springframework.context.support.ClassPathXmlApplicationContext;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.util.ReflectionTestUtils;
 
 /**
  * @author Dan Garrette
  * @since 2.0
  */
+@ContextConfiguration
+@RunWith(SpringJUnit4ClassRunner.class)
 public class StepListenerParserTests {
+	
+	@Autowired
+	@Qualifier("s1")
+	private Step step1;
+
+	@Autowired
+	@Qualifier("s2")
+	private Step step2;
 
 	@Test
 	public void testInheritListeners() throws Exception {
-		ConfigurableApplicationContext ctx = new ClassPathXmlApplicationContext(
-				"org/springframework/batch/core/configuration/xml/StepListenerParserTests-context.xml");
-		List<?> list = getListeners("s1", ctx);
+
+		List<?> list = getListeners(step1);
 
 		assertEquals(3, list.size());
 		boolean a = false;
@@ -68,9 +78,8 @@ public class StepListenerParserTests {
 
 	@Test
 	public void testInheritListenersNoMerge() throws Exception {
-		ConfigurableApplicationContext ctx = new ClassPathXmlApplicationContext(
-				"org/springframework/batch/core/configuration/xml/StepListenerParserTests-context.xml");
-		List<?> list = getListeners("s2", ctx);
+
+		List<?> list = getListeners(step2);
 
 		assertEquals(2, list.size());
 		boolean a = false;
@@ -88,10 +97,7 @@ public class StepListenerParserTests {
 	}
 
 	@SuppressWarnings("unchecked")
-	private List<?> getListeners(String stepName, ApplicationContext ctx) throws Exception {
-		Map<String, Step> beans = ctx.getBeansOfType(Step.class);
-		assertTrue(beans.containsKey(stepName));
-		Object step = ctx.getBean(stepName);
+	private List<?> getListeners(Step step) throws Exception {
 		assertTrue(step instanceof TaskletStep);
 
 		Object compositeListener = ReflectionTestUtils.getField(step, "stepExecutionListener");
