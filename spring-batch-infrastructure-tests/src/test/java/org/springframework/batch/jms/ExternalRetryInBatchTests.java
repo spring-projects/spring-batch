@@ -78,7 +78,7 @@ public class ExternalRetryInBatchTests {
 	@Before
 	public void onSetUp() throws Exception {
 		getMessages(); // drain queue
-		jdbcTemplate.getJdbcOperations().execute("delete from T_FOOS");
+		jdbcTemplate.getJdbcOperations().execute("delete from T_BARS");
 		jmsTemplate.convertAndSend("queue", "foo");
 		jmsTemplate.convertAndSend("queue", "bar");
 		provider = new ItemReader<String>() {
@@ -94,11 +94,11 @@ public class ExternalRetryInBatchTests {
 	@After
 	public void onTearDown() throws Exception {
 		getMessages(); // drain queue
-		jdbcTemplate.getJdbcOperations().execute("delete from T_FOOS");
+		jdbcTemplate.getJdbcOperations().execute("delete from T_BARS");
 	}
 
 	private void assertInitialState() {
-		int count = jdbcTemplate.queryForInt("select count(*) from T_FOOS");
+		int count = jdbcTemplate.queryForInt("select count(*) from T_BARS");
 		assertEquals(0, count);
 	}
 
@@ -139,7 +139,7 @@ public class ExternalRetryInBatchTests {
 											// back. When it comes back for recovery this code is not
 											// executed...
 											jdbcTemplate.update(
-													"INSERT into T_FOOS (id,name,foo_date) values (?,?,null)", 
+													"INSERT into T_BARS (id,name,foo_date) values (?,?,null)", 
 													list.size(), item);
 											throw new RuntimeException("Rollback!");
 										}
@@ -188,7 +188,7 @@ public class ExternalRetryInBatchTests {
 		assertEquals(2, recovered.size());
 
 		// The database portion committed once...
-		int count = jdbcTemplate.queryForInt("select count(*) from T_FOOS");
+		int count = jdbcTemplate.queryForInt("select count(*) from T_BARS");
 		assertEquals(0, count);
 
 		// ... and so did the message session.

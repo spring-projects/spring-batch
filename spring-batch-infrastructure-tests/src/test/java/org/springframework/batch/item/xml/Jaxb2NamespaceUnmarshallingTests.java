@@ -1,4 +1,4 @@
-package org.springframework.batch.io.oxm;
+package org.springframework.batch.item.xml;
 
 import static org.junit.Assert.assertEquals;
 
@@ -12,20 +12,22 @@ import javax.xml.transform.stream.StreamSource;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-import org.springframework.batch.io.oxm.domain.QualifiedTrade;
-import org.springframework.batch.io.oxm.domain.Trade;
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.item.xml.StaxEventItemReader;
+import org.springframework.batch.item.xml.domain.QualifiedTrade;
+import org.springframework.batch.item.xml.domain.Trade;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;
 import org.springframework.oxm.Unmarshaller;
 import org.springframework.oxm.jaxb.Jaxb2Marshaller;
+import org.springframework.util.ClassUtils;
 
 public class Jaxb2NamespaceUnmarshallingTests {
 
 	private StaxEventItemReader<QualifiedTrade> reader = new StaxEventItemReader<QualifiedTrade>();
 
-	private Resource resource = new ClassPathResource("org/springframework/batch/io/oxm/domain/trades.xml");
+	private Resource resource = new ClassPathResource(ClassUtils.addResourcePathToPackagePath(getClass(),
+			"domain/trades.xml"));
 
 	@Before
 	public void setUp() throws Exception {
@@ -44,7 +46,8 @@ public class Jaxb2NamespaceUnmarshallingTests {
 
 	@Test
 	public void testUnmarshal() throws Exception {
-		QualifiedTrade trade = (QualifiedTrade) getUnmarshaller().unmarshal(new StreamSource(new StringReader(TRADE_XML)));
+		QualifiedTrade trade = (QualifiedTrade) getUnmarshaller().unmarshal(
+				new StreamSource(new StringReader(TRADE_XML)));
 		assertEquals("XYZ0001", trade.getIsin());
 		assertEquals(5, trade.getQuantity());
 		assertEquals(new BigDecimal("11.39"), trade.getPrice());

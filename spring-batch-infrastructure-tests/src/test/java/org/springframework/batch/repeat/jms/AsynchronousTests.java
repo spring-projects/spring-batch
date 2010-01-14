@@ -71,7 +71,7 @@ public class AsynchronousTests {
 			foo = (String) jmsTemplate.receiveAndConvert("queue");
 			count++;
 		}
-		simpleJdbcTemplate.getJdbcOperations().execute("delete from T_FOOS");
+		simpleJdbcTemplate.getJdbcOperations().execute("delete from T_BARS");
 
 		// Queue is now drained...
 		assertNull(foo);
@@ -98,7 +98,7 @@ public class AsynchronousTests {
 	private volatile List<String> list = new ArrayList<String>();
 
 	private void assertInitialState() {
-		int count = simpleJdbcTemplate.queryForInt("select count(*) from T_FOOS");
+		int count = simpleJdbcTemplate.queryForInt("select count(*) from T_BARS");
 		assertEquals(0, count);
 	}
 
@@ -111,7 +111,7 @@ public class AsynchronousTests {
 			public void onMessage(Message message, Session session) throws JMSException {
 				list.add(message.toString());
 				String text = ((TextMessage) message).getText();
-				simpleJdbcTemplate.update("INSERT into T_FOOS (id,name,foo_date) values (?,?,null)", list.size(), text);
+				simpleJdbcTemplate.update("INSERT into T_BARS (id,name,foo_date) values (?,?,null)", list.size(), text);
 			}
 		});
 
@@ -122,14 +122,14 @@ public class AsynchronousTests {
 		// Need to sleep for at least a second here...
 		waitFor(list,2,2000);
 
-		System.err.println(simpleJdbcTemplate.queryForList("select * from T_FOOS"));
+		System.err.println(simpleJdbcTemplate.queryForList("select * from T_BARS"));
 
 		assertEquals(2, list.size());
 
 		String foo = (String) jmsTemplate.receiveAndConvert("queue");
 		assertEquals(null, foo);
 
-		int count = simpleJdbcTemplate.queryForInt("select count(*) from T_FOOS");
+		int count = simpleJdbcTemplate.queryForInt("select count(*) from T_BARS");
 		assertEquals(2, count);
 
 	}
@@ -146,7 +146,7 @@ public class AsynchronousTests {
 			public void onMessage(Message message, Session session) throws JMSException {
 				list.add(message.toString());
 				final String text = ((TextMessage) message).getText();
-				simpleJdbcTemplate.update("INSERT into T_FOOS (id,name,foo_date) values (?,?,null)", list.size(), text);
+				simpleJdbcTemplate.update("INSERT into T_BARS (id,name,foo_date) values (?,?,null)", list.size(), text);
 				// This causes the DB to rollback but not the message
 				if (text.equals("bar")) {
 					throw new RuntimeException("Rollback!");
@@ -175,7 +175,7 @@ public class AsynchronousTests {
 			msgs.add(text);
 		}
 
-		int count = simpleJdbcTemplate.queryForInt("select count(*) from T_FOOS");
+		int count = simpleJdbcTemplate.queryForInt("select count(*) from T_BARS");
 		assertEquals(0, count);
 
 		assertTrue("Foo not on queue", msgs.contains("foo"));

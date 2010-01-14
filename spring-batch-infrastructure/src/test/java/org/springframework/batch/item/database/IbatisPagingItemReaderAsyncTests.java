@@ -39,12 +39,12 @@ public class IbatisPagingItemReaderAsyncTests {
 	/**
 	 * The number of items to read
 	 */
-	private static final int ITEM_COUNT = 100;
+	private static final int ITEM_COUNT = 10;
 
 	/**
 	 * The number of threads to create
 	 */
-	private static final int THREAD_COUNT = 5;
+	private static final int THREAD_COUNT = 3;
 
 	private static Log logger = LogFactory.getLog(IbatisPagingItemReaderAsyncTests.class);
 

@@ -1,4 +1,4 @@
-package org.springframework.batch.io.oxm;
+package org.springframework.batch.item.xml;
 
 import static org.junit.Assert.assertTrue;
 
@@ -11,7 +11,7 @@ import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.stream.StreamResult;
 
-import org.springframework.batch.io.oxm.domain.Trade;
+import org.springframework.batch.item.xml.domain.Trade;
 import org.springframework.oxm.Marshaller;
 import org.springframework.oxm.jaxb.Jaxb2Marshaller;
 

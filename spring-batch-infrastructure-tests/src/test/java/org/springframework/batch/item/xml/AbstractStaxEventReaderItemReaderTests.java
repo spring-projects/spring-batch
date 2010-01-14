@@ -1,4 +1,4 @@
-package org.springframework.batch.io.oxm;
+package org.springframework.batch.item.xml;
 
 import static org.junit.Assert.assertEquals;
 
@@ -9,18 +9,20 @@ import java.util.List;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-import org.springframework.batch.io.oxm.domain.Trade;
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.item.xml.StaxEventItemReader;
+import org.springframework.batch.item.xml.domain.Trade;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;
 import org.springframework.oxm.Unmarshaller;
+import org.springframework.util.ClassUtils;
 
 public abstract class AbstractStaxEventReaderItemReaderTests {
 
 	protected StaxEventItemReader<Trade> reader = new StaxEventItemReader<Trade>();
 
-	protected Resource resource = new ClassPathResource("org/springframework/batch/io/oxm/input.xml");
+	protected Resource resource = new ClassPathResource(ClassUtils
+			.addResourcePathToPackagePath(getClass(), "input.xml"));
 
 	@Before
 	public void setUp() throws Exception {
@@ -28,7 +30,7 @@ public abstract class AbstractStaxEventReaderItemReaderTests {
 		reader.setResource(resource);
 
 		reader.setFragmentRootElementName("trade");
-		
+
 		reader.setUnmarshaller(getUnmarshaller());
 
 		reader.afterPropertiesSet();

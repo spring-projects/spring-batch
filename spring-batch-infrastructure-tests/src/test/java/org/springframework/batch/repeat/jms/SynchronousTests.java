@@ -83,13 +83,13 @@ public class SynchronousTests implements ApplicationContextAware {
 			foo = (String) jmsTemplate.receiveAndConvert("queue");
 			count++;
 		}
-		simpleJdbcTemplate.getJdbcOperations().execute("delete from T_FOOS");
+		simpleJdbcTemplate.getJdbcOperations().execute("delete from T_BARS");
 		jmsTemplate.convertAndSend("queue", "foo");
 		jmsTemplate.convertAndSend("queue", "bar");
 	}
 
 	private void assertInitialState() {
-		int count = simpleJdbcTemplate.queryForInt("select count(*) from T_FOOS");
+		int count = simpleJdbcTemplate.queryForInt("select count(*) from T_BARS");
 		assertEquals(0, count);
 	}
 
@@ -105,12 +105,12 @@ public class SynchronousTests implements ApplicationContextAware {
 			public RepeatStatus doInIteration(RepeatContext context) throws Exception {
 				String text = (String) jmsTemplate.receiveAndConvert("queue");
 				list.add(text);
-				simpleJdbcTemplate.update("INSERT into T_FOOS (id,name,foo_date) values (?,?,null)", list.size(), text);
+				simpleJdbcTemplate.update("INSERT into T_BARS (id,name,foo_date) values (?,?,null)", list.size(), text);
 				return RepeatStatus.continueIf(text != null);
 			}
 		});
 
-		int count = simpleJdbcTemplate.queryForInt("select count(*) from T_FOOS");
+		int count = simpleJdbcTemplate.queryForInt("select count(*) from T_BARS");
 		assertEquals(2, count);
 
 		String text = (String) jmsTemplate.receiveAndConvert("queue");
@@ -129,7 +129,7 @@ public class SynchronousTests implements ApplicationContextAware {
 					public RepeatStatus doInIteration(RepeatContext context) throws Exception {
 						String text = (String) jmsTemplate.receiveAndConvert("queue");
 						list.add(text);
-						simpleJdbcTemplate.update("INSERT into T_FOOS (id,name,foo_date) values (?,?,null)", list.size(), text);
+						simpleJdbcTemplate.update("INSERT into T_BARS (id,name,foo_date) values (?,?,null)", list.size(), text);
 						return RepeatStatus.continueIf(text != null);
 					}
 				});
@@ -147,7 +147,7 @@ public class SynchronousTests implements ApplicationContextAware {
 		}
 
 		// The database portion rolled back...
-		int count = simpleJdbcTemplate.queryForInt("select count(*) from T_FOOS");
+		int count = simpleJdbcTemplate.queryForInt("select count(*) from T_BARS");
 		assertEquals(0, count);
 
 		// ... and so did the message session. The rollback should have restored
@@ -174,7 +174,7 @@ public class SynchronousTests implements ApplicationContextAware {
 					public RepeatStatus doInIteration(RepeatContext context) throws Exception {
 						String text = (String) txJmsTemplate.receiveAndConvert("queue");
 						list.add(text);
-						simpleJdbcTemplate.update("INSERT into T_FOOS (id,name,foo_date) values (?,?,null)", list.size(), text);
+						simpleJdbcTemplate.update("INSERT into T_BARS (id,name,foo_date) values (?,?,null)", list.size(), text);
 						return RepeatStatus.continueIf(text != null);
 					}
 				});
@@ -210,7 +210,7 @@ public class SynchronousTests implements ApplicationContextAware {
 		}
 
 		// The database portion committed...
-		int count = simpleJdbcTemplate.queryForInt("select count(*) from T_FOOS");
+		int count = simpleJdbcTemplate.queryForInt("select count(*) from T_BARS");
 		assertEquals(2, count);
 
 		// ...but the JMS session rolled back, so the message is still there

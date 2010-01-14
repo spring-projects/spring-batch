@@ -1,4 +1,4 @@
-package org.springframework.batch.io.oxm;
+package org.springframework.batch.item.xml;
 
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.oxm.Marshaller;

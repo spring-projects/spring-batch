@@ -22,6 +22,7 @@ import static org.junit.Assert.assertTrue;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import org.apache.commons.logging.Log;
@@ -33,6 +34,7 @@ import org.springframework.batch.repeat.RepeatContext;
 import org.springframework.batch.repeat.RepeatStatus;
 import org.springframework.batch.repeat.policy.SimpleCompletionPolicy;
 import org.springframework.core.task.SimpleAsyncTaskExecutor;
+import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 
 /**
  * Simple tests for concurrent behaviour in repeat template, in particular the
@@ -47,9 +49,9 @@ public class TaskExecutorRepeatTemplateBulkAsynchronousTests {
 
 	static Log logger = LogFactory.getLog(TaskExecutorRepeatTemplateBulkAsynchronousTests.class);
 
-	private int total = 20;
+	private int total = 1000;
 
-	private int throttleLimit = 8;
+	private int throttleLimit = 30;
 
 	private volatile int early = Integer.MAX_VALUE;
 
@@ -63,8 +65,11 @@ public class TaskExecutorRepeatTemplateBulkAsynchronousTests {
 	public void setUp() {
 
 		template = new TaskExecutorRepeatTemplate();
-		SimpleAsyncTaskExecutor taskExecutor = new SimpleAsyncTaskExecutor();
-		taskExecutor.setConcurrencyLimit(300);
+		ThreadPoolTaskExecutor taskExecutor = new ThreadPoolTaskExecutor();
+		taskExecutor.setMaxPoolSize(300);
+		taskExecutor.setCorePoolSize(10);
+		taskExecutor.setQueueCapacity(0);
+		taskExecutor.afterPropertiesSet();
 		template.setTaskExecutor(taskExecutor);
 		template.setThrottleLimit(throttleLimit);
 
@@ -130,10 +135,16 @@ public class TaskExecutorRepeatTemplateBulkAsynchronousTests {
 	public void testThrottleLimitEarlyFinishThreadStarvation() throws Exception {
 
 		early = 2;
-		SimpleAsyncTaskExecutor taskExecutor = new SimpleAsyncTaskExecutor();
+		ThreadPoolTaskExecutor taskExecutor = new ThreadPoolTaskExecutor();
 		// Set the concurrency limit below the throttle limit for possible
 		// starvation condition
-		taskExecutor.setConcurrencyLimit(20);
+		taskExecutor.setMaxPoolSize(20);
+		taskExecutor.setCorePoolSize(10);
+		taskExecutor.setQueueCapacity(0);
+		// This is the most sensible setting, otherwise the bookkeeping in
+		// ResultHolderResultQueue gets out of whack when tasks are aborted.
+		taskExecutor.setRejectedExecutionHandler(new ThreadPoolExecutor.CallerRunsPolicy());
+		taskExecutor.afterPropertiesSet();
 		template.setTaskExecutor(taskExecutor);
 
 		template.iterate(callback);
@@ -154,8 +165,8 @@ public class TaskExecutorRepeatTemplateBulkAsynchronousTests {
 		taskExecutor.setConcurrencyLimit(1);
 
 		// This is kind of slow with only one thread, so reduce size:
-		throttleLimit = 4;
-		total = 10;
+		throttleLimit = 10;
+		total = 20;
 
 		template.setThrottleLimit(throttleLimit);
 		template.setTaskExecutor(taskExecutor);

@@ -1,5 +1,5 @@
 <mapping>
-	<class name="org.springframework.batch.io.oxm.domain.Trade">
+	<class name="org.springframework.batch.item.xml.domain.Trade">
 	
 		<map-to xml="trade" />
 

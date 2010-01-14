@@ -1,8 +1,8 @@
-package org.springframework.batch.io.oxm;
+package org.springframework.batch.item.xml;
 
 import java.math.BigDecimal;
 
-import org.springframework.batch.io.oxm.domain.Trade;
+import org.springframework.batch.item.xml.domain.Trade;
 import org.springframework.oxm.Unmarshaller;
 import org.springframework.oxm.xstream.XStreamMarshaller;
 

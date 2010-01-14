@@ -25,7 +25,6 @@ import org.apache.commons.io.IOUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.BeanInitializationException;
-import org.springframework.beans.factory.DisposableBean;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 import org.springframework.core.io.Resource;
@@ -52,7 +51,7 @@ import org.springframework.util.StringUtils;
  * @author Dave Syer
  * 
  */
-public class DataSourceInitializer implements InitializingBean, DisposableBean {
+public class DataSourceInitializer implements InitializingBean {
 
 	private static final Log logger = LogFactory.getLog(DataSourceInitializer.class);
 
@@ -64,7 +63,7 @@ public class DataSourceInitializer implements InitializingBean, DisposableBean {
 
 	private boolean ignoreFailedDrop = true;
 
-	private static boolean initialized = false;
+	private boolean initialized = false;
 
 	/**
 	 * Main method as convenient entry point.
@@ -76,34 +75,6 @@ public class DataSourceInitializer implements InitializingBean, DisposableBean {
 				DataSourceInitializer.class.getSimpleName() + "-context.xml"));
 	}
 
-	/**
-	 * @throws Throwable
-	 * @see java.lang.Object#finalize()
-	 */
-	protected void finalize() throws Throwable {
-		super.finalize();
-		initialized = false;
-		logger.debug("finalize called");
-	}
-
-	public void destroy() {
-		if (destroyScripts==null) return;
-		for (int i = 0; i < destroyScripts.length; i++) {
-			Resource destroyScript = initScripts[i];
-			try {
-				doExecuteScript(destroyScript);
-			}
-			catch (Exception e) {
-				if (logger.isDebugEnabled()) {
-					logger.warn("Could not execute destroy script [" + destroyScript + "]", e);
-				}
-				else {
-					logger.warn("Could not execute destroy script [" + destroyScript + "]");
-				}
-			}
-		}
-	}
-
 	public void afterPropertiesSet() throws Exception {
 		Assert.notNull(dataSource);
 		initialize();
@@ -111,7 +82,12 @@ public class DataSourceInitializer implements InitializingBean, DisposableBean {
 
 	private void initialize() {
 		if (!initialized) {
-			destroy();
+			if (destroyScripts != null) {
+				for (int i = 0; i < destroyScripts.length; i++) {
+					Resource initScript = initScripts[i];
+					doExecuteScript(initScript);
+				}
+			}
 			if (initScripts != null) {
 				for (int i = 0; i < initScripts.length; i++) {
 					Resource initScript = initScripts[i];

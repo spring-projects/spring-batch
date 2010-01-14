@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE sqlMapConfig PUBLIC "-//ibatis.apache.org//DTD SQL Map Config 2.0//EN"
+	"http://ibatis.apache.org/dtd/sql-map-config-2.dtd">
+
+<sqlMapConfig>
+	<!-- lazy loading is enabled by default, but it is emphasized here - if it was set
+		to false, input source would load all data into memory! -->
+	<settings lazyLoadingEnabled="true"/>
+
+	<sqlMap resource="org/springframework/batch/item/database/ibatis-foo.xml" />
+
+</sqlMapConfig>

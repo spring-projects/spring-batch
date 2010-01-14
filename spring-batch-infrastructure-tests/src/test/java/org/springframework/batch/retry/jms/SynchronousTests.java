@@ -74,7 +74,7 @@ public class SynchronousTests {
 
 	@BeforeTransaction
 	public void onSetUpBeforeTransaction() throws Exception {
-		simpleJdbcTemplate.getJdbcOperations().execute("delete from T_FOOS");
+		simpleJdbcTemplate.getJdbcOperations().execute("delete from T_BARS");
 		jmsTemplate.convertAndSend("queue", "foo");
 		jmsTemplate.convertAndSend("queue", "foo");
 		final String text = (String) jmsTemplate.receiveAndConvert("queue");
@@ -94,11 +94,11 @@ public class SynchronousTests {
 			foo = (String) jmsTemplate.receiveAndConvert("queue");
 			count++;
 		}
-		simpleJdbcTemplate.getJdbcOperations().execute("delete from T_FOOS");
+		simpleJdbcTemplate.getJdbcOperations().execute("delete from T_BARS");
 	}
 
 	private void assertInitialState() {
-		int count = simpleJdbcTemplate.queryForInt("select count(*) from T_FOOS");
+		int count = simpleJdbcTemplate.queryForInt("select count(*) from T_BARS");
 		assertEquals(0, count);
 	}
 
@@ -134,7 +134,7 @@ public class SynchronousTests {
 
 						list.add(text);
 						System.err.println("Inserting: [" + list.size() + "," + text + "]");
-						simpleJdbcTemplate.update("INSERT into T_FOOS (id,name,foo_date) values (?,?,null)", list.size(), text);
+						simpleJdbcTemplate.update("INSERT into T_BARS (id,name,foo_date) values (?,?,null)", list.size(), text);
 						if (list.size() == 1) {
 							throw new RuntimeException("Rollback!");
 						}
@@ -151,7 +151,7 @@ public class SynchronousTests {
 		List<String> msgs = getMessages();
 
 		// The database portion committed once...
-		int count = simpleJdbcTemplate.queryForInt("select count(*) from T_FOOS");
+		int count = simpleJdbcTemplate.queryForInt("select count(*) from T_BARS");
 		assertEquals(1, count);
 
 		// ... and so did the message session.
@@ -184,7 +184,7 @@ public class SynchronousTests {
 
 						list.add(item);
 						System.err.println("Inserting: [" + list.size() + "," + item + "]");
-						simpleJdbcTemplate.update("INSERT into T_FOOS (id,name,foo_date) values (?,?,null)", list.size(), item);
+						simpleJdbcTemplate.update("INSERT into T_BARS (id,name,foo_date) values (?,?,null)", list.size(), item);
 						if (list.size() == 1) {
 							throw new RuntimeException("Rollback!");
 						}
@@ -202,7 +202,7 @@ public class SynchronousTests {
 		List<String> msgs = getMessages();
 
 		// The database portion committed once...
-		int count = simpleJdbcTemplate.queryForInt("select count(*) from T_FOOS");
+		int count = simpleJdbcTemplate.queryForInt("select count(*) from T_BARS");
 		assertEquals(1, count);
 
 		// ... and so did the message session.
@@ -245,7 +245,7 @@ public class SynchronousTests {
 
 									list.add(text);
 									System.err.println("Inserting: [" + list.size() + "," + text + "]");
-									simpleJdbcTemplate.update("INSERT into T_FOOS (id,name,foo_date) values (?,?,null)", list.size(), text);
+									simpleJdbcTemplate.update("INSERT into T_BARS (id,name,foo_date) values (?,?,null)", list.size(), text);
 									return text;
 
 								}
@@ -258,7 +258,7 @@ public class SynchronousTests {
 				}
 
 				// The nested database transaction has committed...
-				int count = simpleJdbcTemplate.queryForInt("select count(*) from T_FOOS");
+				int count = simpleJdbcTemplate.queryForInt("select count(*) from T_BARS");
 				assertEquals(1, count);
 
 				// force rollback...
@@ -273,7 +273,7 @@ public class SynchronousTests {
 		List<String> msgs = getMessages();
 
 		// The database portion rolled back...
-		int count = simpleJdbcTemplate.queryForInt("select count(*) from T_FOOS");
+		int count = simpleJdbcTemplate.queryForInt("select count(*) from T_BARS");
 		assertEquals(0, count);
 
 		// ... and so did the message session.
@@ -303,7 +303,7 @@ public class SynchronousTests {
 						// transaction...
 						final String text = (String) jmsTemplate.receiveAndConvert("queue");
 						list.add(text);
-						simpleJdbcTemplate.update("INSERT into T_FOOS (id,name,foo_date) values (?,?,null)", list.size(), text);
+						simpleJdbcTemplate.update("INSERT into T_BARS (id,name,foo_date) values (?,?,null)", list.size(), text);
 						if (list.size() == 1) {
 							throw new RuntimeException("Rollback!");
 						}
@@ -320,7 +320,7 @@ public class SynchronousTests {
 		List<String> msgs = getMessages();
 
 		// The database portion committed once...
-		int count = simpleJdbcTemplate.queryForInt("select count(*) from T_FOOS");
+		int count = simpleJdbcTemplate.queryForInt("select count(*) from T_BARS");
 		assertEquals(1, count);
 
 		// ... and so did the message session.
@@ -351,7 +351,7 @@ public class SynchronousTests {
 							// transaction...
 							final String text = (String) jmsTemplate.receiveAndConvert("queue");
 							list.add(text);
-							simpleJdbcTemplate.update("INSERT into T_FOOS (id,name,foo_date) values (?,?,null)", list.size(), text);
+							simpleJdbcTemplate.update("INSERT into T_BARS (id,name,foo_date) values (?,?,null)", list.size(), text);
 							throw new RuntimeException("Rollback!");
 
 						}
@@ -377,7 +377,7 @@ public class SynchronousTests {
 		List<String> msgs = getMessages();
 
 		// The database portion rolled back...
-		int count = simpleJdbcTemplate.queryForInt("select count(*) from T_FOOS");
+		int count = simpleJdbcTemplate.queryForInt("select count(*) from T_BARS");
 		assertEquals(0, count);
 
 		// ... and so did the message session.

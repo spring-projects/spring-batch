@@ -1,28 +1,37 @@
-package org.springframework.batch.io.oxm.domain;
+package org.springframework.batch.item.xml.domain;
 
 import java.math.BigDecimal;
 
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlType;
 
 /**
  * @author Rob Harrop
  */
-@XmlRootElement(name="trade")
+@XmlRootElement(name="trade", namespace="urn:org.springframework.batch.io.oxm.domain")
 @XmlType
-public class Trade {
+@XmlAccessorType(XmlAccessType.FIELD)
+public class QualifiedTrade {
+	
+	@XmlElement(namespace="urn:org.springframework.batch.io.oxm.domain")
 	private String isin = "";
 
+	@XmlElement(namespace="urn:org.springframework.batch.io.oxm.domain")
 	private long quantity = 0;
 
+	@XmlElement(namespace="urn:org.springframework.batch.io.oxm.domain")
 	private BigDecimal price = new BigDecimal(0);
 
+	@XmlElement(namespace="urn:org.springframework.batch.io.oxm.domain")
 	private String customer = "";
 
-	public Trade() {
+	public QualifiedTrade() {
 	}
 
-	public Trade(String isin, long quantity, BigDecimal price, String customer) {
+	public QualifiedTrade(String isin, long quantity, BigDecimal price, String customer) {
 		this.isin = isin;
 		this.quantity = quantity;
 		this.price = price;
@@ -85,7 +94,7 @@ public class Trade {
 			return false;
 		if (getClass() != obj.getClass())
 			return false;
-		Trade other = (Trade) obj;
+		QualifiedTrade other = (QualifiedTrade) obj;
 		if (customer == null) {
 			if (other.customer != null)
 				return false;

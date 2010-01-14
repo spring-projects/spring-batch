@@ -42,10 +42,10 @@ public class DatasourceTests {
 	@Transactional @Test
 	public void testTemplate() throws Exception {
 		System.err.println(System.getProperty("java.class.path"));
-		simpleJdbcTemplate.getJdbcOperations().execute("delete from T_FOOS");
-		int count = simpleJdbcTemplate.queryForInt("select count(*) from T_FOOS");
+		simpleJdbcTemplate.getJdbcOperations().execute("delete from T_BARS");
+		int count = simpleJdbcTemplate.queryForInt("select count(*) from T_BARS");
 		assertEquals(0, count);
 
-		simpleJdbcTemplate.update("INSERT into T_FOOS (id,name,foo_date) values (?,?,null)", 0, "foo");
+		simpleJdbcTemplate.update("INSERT into T_BARS (id,name,foo_date) values (?,?,null)", 0, "foo");
 	}
 }

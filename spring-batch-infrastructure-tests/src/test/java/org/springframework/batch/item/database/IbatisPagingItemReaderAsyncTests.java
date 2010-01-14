@@ -13,7 +13,6 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorCompletionService;
 import java.util.concurrent.Executors;
 
-import javax.persistence.EntityManagerFactory;
 import javax.sql.DataSource;
 
 import org.apache.commons.logging.Log;
@@ -22,35 +21,35 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.item.sample.Foo;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.ClassPathResource;
 import org.springframework.jdbc.core.simple.SimpleJdbcTemplate;
+import org.springframework.orm.ibatis.SqlMapClientFactoryBean;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.jdbc.SimpleJdbcTestUtils;
 
+import com.ibatis.sqlmap.client.SqlMapClient;
+
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(locations = "JpaPagingItemReaderCommonTests-context.xml")
-public class JpaPagingItemReaderAsyncTests {
+@ContextConfiguration(locations = "JdbcPagingItemReaderCommonTests-context.xml")
+public class IbatisPagingItemReaderAsyncTests {
 
 	/**
 	 * The number of items to read
 	 */
-	private static final int ITEM_COUNT = 10;
+	private static final int ITEM_COUNT = 100;
 
 	/**
 	 * The number of threads to create
 	 */
-	private static final int THREAD_COUNT = 3;
+	private static final int THREAD_COUNT = 5;
 
-	private static Log logger = LogFactory.getLog(JpaPagingItemReaderAsyncTests.class);
+	private static Log logger = LogFactory.getLog(IbatisPagingItemReaderAsyncTests.class);
 
 	@Autowired
 	private DataSource dataSource;
-
-	@Autowired
-	private EntityManagerFactory entityManagerFactory;
 
 	private int maxId;
 
@@ -94,7 +93,7 @@ public class JpaPagingItemReaderAsyncTests {
 	 * @throws ExecutionException
 	 */
 	private void doTest() throws Exception, InterruptedException, ExecutionException {
-		final JpaPagingItemReader<Foo> reader = getItemReader();
+		final IbatisPagingItemReader<Foo> reader = getItemReader();
 		CompletionService<List<Foo>> completionService = new ExecutorCompletionService<List<Foo>>(Executors
 				.newFixedThreadPool(THREAD_COUNT));
 		for (int i = 0; i < THREAD_COUNT; i++) {
@@ -104,7 +103,7 @@ public class JpaPagingItemReaderAsyncTests {
 					Foo next = null;
 					do {
 						next = reader.read();
-						Thread.sleep(10L);
+						Thread.sleep(10L); // try to make it fairer
 						logger.debug("Reading item: " + next);
 						if (next != null) {
 							list.add(next);
@@ -129,19 +128,30 @@ public class JpaPagingItemReaderAsyncTests {
 		reader.close();
 	}
 
-	private JpaPagingItemReader<Foo> getItemReader() throws Exception {
+	private IbatisPagingItemReader<Foo> getItemReader() throws Exception {
+		SqlMapClientFactoryBean factory = new SqlMapClientFactoryBean();
+		factory.setConfigLocation(new ClassPathResource("ibatis-config.xml", getClass()));
+		factory.setDataSource(dataSource);
+		factory.afterPropertiesSet();
+		SqlMapClient sqlMapClient = createSqlMapClient();
 
-		String jpqlQuery = "select f from Foo f";
+		IbatisPagingItemReader<Foo> reader = new IbatisPagingItemReader<Foo>();
+		reader.setQueryId("getPagedFoos");
+		reader.setPageSize(2);
+		reader.setSqlMapClient(sqlMapClient);
+		reader.setSaveState(true);
 
-		JpaPagingItemReader<Foo> reader = new JpaPagingItemReader<Foo>();
-		reader.setQueryString(jpqlQuery);
-		reader.setEntityManagerFactory(entityManagerFactory);
-		reader.setPageSize(3);
 		reader.afterPropertiesSet();
-		reader.setSaveState(false);
-		reader.open(new ExecutionContext());
 
 		return reader;
+	}
+
+	private SqlMapClient createSqlMapClient() throws Exception {
+		SqlMapClientFactoryBean factory = new SqlMapClientFactoryBean();
+		factory.setConfigLocation(new ClassPathResource("ibatis-config.xml", getClass()));
+		factory.setDataSource(dataSource);
+		factory.afterPropertiesSet();
+		return (SqlMapClient) factory.getObject();
 	}
 
 }

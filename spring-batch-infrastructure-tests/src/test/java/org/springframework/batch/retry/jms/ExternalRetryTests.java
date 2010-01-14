@@ -69,7 +69,7 @@ public class ExternalRetryTests {
 	@Before
 	public void onSetUp() throws Exception {
 		getMessages(); // drain queue
-		simpleJdbcTemplate.getJdbcOperations().execute("delete from T_FOOS");
+		simpleJdbcTemplate.getJdbcOperations().execute("delete from T_BARS");
 		jmsTemplate.convertAndSend("queue", "foo");
 		provider = new ItemReader<String>() {
 			public String read() {
@@ -82,7 +82,7 @@ public class ExternalRetryTests {
 	}
 
 	private void assertInitialState() {
-		int count = simpleJdbcTemplate.queryForInt("select count(*) from T_FOOS");
+		int count = simpleJdbcTemplate.queryForInt("select count(*) from T_BARS");
 		assertEquals(0, count);
 	}
 
@@ -104,7 +104,7 @@ public class ExternalRetryTests {
 
 				for (Object text : texts) {
 
-					simpleJdbcTemplate.update("INSERT into T_FOOS (id,name,foo_date) values (?,?,null)", list.size(),
+					simpleJdbcTemplate.update("INSERT into T_BARS (id,name,foo_date) values (?,?,null)", list.size(),
 							text);
 					if (list.size() == 1) {
 						throw new RuntimeException("Rollback!");
@@ -165,7 +165,7 @@ public class ExternalRetryTests {
 		List<String> msgs = getMessages();
 
 		// The database portion committed once...
-		int count = simpleJdbcTemplate.queryForInt("select count(*) from T_FOOS");
+		int count = simpleJdbcTemplate.queryForInt("select count(*) from T_BARS");
 		assertEquals(1, count);
 
 		// ... and so did the message session.
@@ -183,7 +183,7 @@ public class ExternalRetryTests {
 		final String item = provider.read();
 		final RetryCallback<String> callback = new RetryCallback<String>() {
 			public String doWithRetry(RetryContext context) throws Exception {
-				simpleJdbcTemplate.update("INSERT into T_FOOS (id,name,foo_date) values (?,?,null)", list.size(), item);
+				simpleJdbcTemplate.update("INSERT into T_BARS (id,name,foo_date) values (?,?,null)", list.size(), item);
 				throw new RuntimeException("Rollback!");
 			}
 		};
@@ -230,7 +230,7 @@ public class ExternalRetryTests {
 		assertEquals(1, recovered.size());
 
 		// The database portion committed once...
-		int count = simpleJdbcTemplate.queryForInt("select count(*) from T_FOOS");
+		int count = simpleJdbcTemplate.queryForInt("select count(*) from T_BARS");
 		assertEquals(0, count);
 
 		// ... and so did the message session.
