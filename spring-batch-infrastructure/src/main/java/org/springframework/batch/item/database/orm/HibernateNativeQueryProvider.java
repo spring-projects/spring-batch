@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.springframework.batch.item.database.support;
+package org.springframework.batch.item.database.orm;
 
 import org.hibernate.Query;
 import org.hibernate.SQLQuery;

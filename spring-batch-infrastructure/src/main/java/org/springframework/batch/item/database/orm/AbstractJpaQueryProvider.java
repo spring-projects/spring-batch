@@ -14,13 +14,11 @@
  * limitations under the License.
  */
 
-package org.springframework.batch.item.database.support;
+package org.springframework.batch.item.database.orm;
 
 import javax.persistence.EntityManager;
 import javax.persistence.Query;
 
-import org.springframework.batch.item.database.JpaQueryProvider;
-import org.springframework.batch.item.database.HibernateQueryProvider;
 import org.springframework.beans.factory.InitializingBean;
 
 /**

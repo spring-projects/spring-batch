@@ -25,6 +25,7 @@ import javax.persistence.EntityManager;
 import javax.persistence.Query;
 
 import org.junit.Test;
+import org.springframework.batch.item.database.orm.JpaNativeQueryProvider;
 import org.springframework.batch.item.sample.Foo;
 import org.springframework.util.Assert;
 

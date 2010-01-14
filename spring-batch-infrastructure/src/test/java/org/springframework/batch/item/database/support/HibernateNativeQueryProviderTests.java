@@ -25,6 +25,7 @@ import org.hibernate.SQLQuery;
 import org.hibernate.StatelessSession;
 import org.hibernate.classic.Session;
 import org.junit.Test;
+import org.springframework.batch.item.database.orm.HibernateNativeQueryProvider;
 import org.springframework.util.Assert;
 
 /**

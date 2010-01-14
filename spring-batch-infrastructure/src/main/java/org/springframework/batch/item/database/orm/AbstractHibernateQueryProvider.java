@@ -14,12 +14,11 @@
  * limitations under the License.
  */
 
-package org.springframework.batch.item.database.support;
+package org.springframework.batch.item.database.orm;
 
 import org.hibernate.Query;
 import org.hibernate.Session;
 import org.hibernate.StatelessSession;
-import org.springframework.batch.item.database.HibernateQueryProvider;
 
 /**
  * <p>Abstract Hibernate Query Provider to serve as a base class for all 

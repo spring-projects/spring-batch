@@ -25,7 +25,8 @@ import org.hibernate.ScrollableResults;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.StatelessSession;
-import org.springframework.batch.item.database.support.AbstractHibernateQueryProvider;
+import org.springframework.batch.item.database.orm.AbstractHibernateQueryProvider;
+import org.springframework.batch.item.database.orm.HibernateQueryProvider;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.util.Assert;
 import org.springframework.util.StringUtils;
@@ -37,7 +38,7 @@ import org.springframework.util.StringUtils;
  * @author Dave Syer
  * 
  */
-class HibernateItemReaderHelper<T> implements InitializingBean {
+public class HibernateItemReaderHelper<T> implements InitializingBean {
 
 	private SessionFactory sessionFactory;
 

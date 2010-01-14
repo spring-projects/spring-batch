@@ -26,6 +26,7 @@ import javax.persistence.Query;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.springframework.batch.item.database.orm.JpaNativeQueryProvider;
 import org.springframework.batch.item.sample.Foo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;

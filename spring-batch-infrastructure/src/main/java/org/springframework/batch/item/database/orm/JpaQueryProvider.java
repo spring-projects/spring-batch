@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.springframework.batch.item.database;
+package org.springframework.batch.item.database.orm;
 
 import javax.persistence.EntityManager;
 import javax.persistence.Query;

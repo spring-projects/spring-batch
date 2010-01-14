@@ -1,6 +1,6 @@
 package org.springframework.batch.item.database;
 
-import org.springframework.batch.item.database.support.HibernateNativeQueryProvider;
+import org.springframework.batch.item.database.orm.HibernateNativeQueryProvider;
 import org.springframework.batch.item.sample.Foo;
 
 /**

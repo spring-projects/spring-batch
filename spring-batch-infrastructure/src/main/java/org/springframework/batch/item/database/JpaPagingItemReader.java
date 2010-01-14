@@ -26,6 +26,7 @@ import javax.persistence.EntityTransaction;
 import javax.persistence.Query;
 
 import org.springframework.batch.item.ExecutionContext;
+import org.springframework.batch.item.database.orm.JpaQueryProvider;
 import org.springframework.dao.DataAccessResourceFailureException;
 import org.springframework.util.Assert;
 import org.springframework.util.ClassUtils;

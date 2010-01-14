@@ -6,7 +6,7 @@ import javax.persistence.EntityManagerFactory;
 
 import org.junit.runner.RunWith;
 import org.springframework.batch.item.ItemReader;
-import org.springframework.batch.item.database.support.JpaNativeQueryProvider;
+import org.springframework.batch.item.database.orm.JpaNativeQueryProvider;
 import org.springframework.batch.item.sample.Foo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
