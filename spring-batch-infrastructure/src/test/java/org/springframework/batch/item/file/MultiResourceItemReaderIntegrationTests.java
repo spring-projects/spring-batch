@@ -19,6 +19,7 @@ import org.springframework.core.io.AbstractResource;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
+import org.springframework.test.util.ReflectionTestUtils;
 
 /**
  * Tests for {@link MultiResourceItemReader}.
@@ -237,6 +238,8 @@ public class MultiResourceItemReaderIntegrationTests {
 		tested.setComparator(comp);
 		tested.setResources(resources);
 		tested.open(ctx);
+		
+		resources = (Resource[]) ReflectionTestUtils.getField(tested, "resources");
 
 		assertSame(r3, resources[0]);
 		assertSame(r1, resources[1]);

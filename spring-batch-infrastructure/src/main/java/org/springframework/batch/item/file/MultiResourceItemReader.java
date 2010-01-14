@@ -204,6 +204,7 @@ public class MultiResourceItemReader<T> implements ItemReader<T>, ItemStream {
 	 * @param resources input resources
 	 */
 	public void setResources(Resource[] resources) {
+		Assert.notNull(resources, "The resources must not be null");
 		this.resources = Arrays.asList(resources).toArray(new Resource[resources.length]);
 	}
 

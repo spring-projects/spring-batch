@@ -207,7 +207,7 @@ public abstract class AbstractMethodInvokingDelegator<T> implements Initializing
 	 * is assumed correct values will be supplied at runtime.
 	 */
 	public void setArguments(Object[] arguments) {
-		this.arguments = Arrays.asList(arguments).toArray();
+		this.arguments = arguments == null ? null : Arrays.asList(arguments).toArray();
 	}
 
 	/**

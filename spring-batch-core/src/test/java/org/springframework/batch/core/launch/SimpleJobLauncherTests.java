@@ -207,8 +207,8 @@ public class SimpleJobLauncherTests {
 			run(ExitStatus.FAILED);
 			fail("Expected Error");
 		}
-		catch (RuntimeException e) {
-			assertEquals("foo", e.getCause().getMessage());
+		catch (Error e) {
+			assertEquals("foo", e.getMessage());
 		}
 	}
 

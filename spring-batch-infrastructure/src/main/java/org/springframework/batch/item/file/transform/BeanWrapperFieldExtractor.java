@@ -41,6 +41,7 @@ public class BeanWrapperFieldExtractor<T> implements FieldExtractor<T>, Initiali
 	 * @param names field names to be extracted by the {@link #extract(Object)} method.
 	 */
 	public void setNames(String[] names) {
+		Assert.notNull(names, "Names must be non-null");
 		this.names = Arrays.asList(names).toArray(new String[names.length]);
 	}
 

@@ -79,7 +79,7 @@ public abstract class AbstractLineTokenizer implements LineTokenizer {
 	 * @param names
 	 */
 	public void setNames(String[] names) {
-		this.names = Arrays.asList(names).toArray(new String[names.length]);
+		this.names = names==null ? null : Arrays.asList(names).toArray(new String[names.length]);
 	}
 
 	/**
