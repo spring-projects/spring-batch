@@ -3,8 +3,8 @@ package org.springframework.batch.integration;
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.JobParametersIncrementer;
+import org.springframework.batch.core.JobParametersValidator;
 import org.springframework.batch.core.job.DefaultJobParametersValidator;
-import org.springframework.batch.core.job.JobParametersValidator;
 
 public class JobSupport implements Job {
 	
