@@ -1696,19 +1696,20 @@ itemWriter.write(items);</programlisting>
       <para>Using a scope of <classname>Step</classname> is required in order
       to use late binding since the bean cannot actually be instantiated until
       the <classname>Step</classname> starts, which allows the attributes to
-      be found. Because it is not part of the Spring container by default, it
-      must be added explicitly, either by using the <literal>batch</literal>
-      namespace:</para>
+      be found. Because it is not part of the Spring container by default, the
+      scope must be added explicitly, either by using the
+      <literal>batch</literal> namespace:</para>
 
-      <programlisting>&lt;beans:beans xmlns="http://www.springframework.org/schema/beans" 
+      <programlisting>&lt;beans xmlns="http://www.springframework.org/schema/beans" 
        xmlns:batch="http://www.springframework.org/schema/batch" 
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
        xsi:schemaLocation="..."&gt;
+&lt;batch:job .../&gt;
 ...
-&lt;/beans:beans&gt;</programlisting>
+&lt;/beans&gt;</programlisting>
 
-      <para>or by including a bean definition explicitly for
-      the<classname>Step</classname> (but not both):</para>
+      <para>or by including a bean definition explicitly for the<classname>
+      StepScope</classname> (but not both):</para>
 
       <programlisting>&lt;bean class="org.springframework.batch.core.scope.StepScope" /&gt;</programlisting>
     </section>
