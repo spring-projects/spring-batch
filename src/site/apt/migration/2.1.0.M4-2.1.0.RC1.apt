@@ -1,0 +1,97 @@
+Spring Batch 2.1.0.RC1 Release Notes
+
+* Sub-task
+
+  * {{{http://jira.springsource.org/browse/BATCH-873}[BATCH-873]}} - Ensure SkipPolicies are generic and extendable
+
+  * {{{http://jira.springsource.org/browse/BATCH-929}[BATCH-929]}} - Deferrable Constraints cause unrecoverable errors
+
+  * {{{http://jira.springsource.org/browse/BATCH-1382}[BATCH-1382]}} - Publish spring-batch-2.1.xsd
+
+  * {{{http://jira.springsource.org/browse/BATCH-1387}[BATCH-1387]}} - Fix validation errors in core and samples
+
+
+* Bug
+
+  * {{{http://jira.springsource.org/browse/BATCH-1371}[BATCH-1371]}} - Rename spring-batch-2.0.xsd to spring-batch-2.1.xsd
+
+  * {{{http://jira.springsource.org/browse/BATCH-1418}[BATCH-1418]}} - Upon job restart, step with FlatFileItemReader doesn't honor skippable-exception-classes
+
+  * {{{http://jira.springsource.org/browse/BATCH-1422}[BATCH-1422]}} - HibernateCursorItemReader causes OutOfMemoryError when skipping large sets of data
+
+  * {{{http://jira.springsource.org/browse/BATCH-1463}[BATCH-1463]}} - Late binding broken for inner beans with Spring 3.
+
+  * {{{http://jira.springsource.org/browse/BATCH-1467}[BATCH-1467]}} - Samples: environment switching does not work on command line (pom typo)
+
+  * {{{http://jira.springsource.org/browse/BATCH-1469}[BATCH-1469]}} - org.apache.commons.lang.SerializationException: java.lang.ClassNotFoundException using samples in WebLogic
+
+  * {{{http://jira.springsource.org/browse/BATCH-1471}[BATCH-1471]}} - Typo in FaultTolerantStepFactoryBean
+
+  * {{{http://jira.springsource.org/browse/BATCH-1473}[BATCH-1473]}} - Components that create application contexts should look for *Aware in the infrastructure beans it copies down to the child context
+
+  * {{{http://jira.springsource.org/browse/BATCH-1476}[BATCH-1476]}} - Filter counts too high when write skips happen
+
+  * {{{http://jira.springsource.org/browse/BATCH-1477}[BATCH-1477]}} - Allow excludes (as well as includes) in retryable exceptions
+
+  * {{{http://jira.springsource.org/browse/BATCH-1482}[BATCH-1482]}} - SaveState default value wrong in reference guide
+
+
+* Improvement
+
+  * {{{http://jira.springsource.org/browse/BATCH-1340}[BATCH-1340]}} - Add Support for Native Queries to Jpa/Hibernate readers
+
+  * {{{http://jira.springsource.org/browse/BATCH-1374}[BATCH-1374]}} - Mention the JobRegistryBeanPostProcessor in the reference guide
+
+  * {{{http://jira.springsource.org/browse/BATCH-1376}[BATCH-1376]}} - CommandLineJobRunner -restart should accept executionId as parameter.
+
+  * {{{http://jira.springsource.org/browse/BATCH-1462}[BATCH-1462]}} - MultiResourceItemReader / delegate should skip directories
+
+  * {{{http://jira.springsource.org/browse/BATCH-1464}[BATCH-1464]}} - Allow for use of PersistenceExceptionTranslator on JpaItemWriter
+
+  * {{{http://jira.springsource.org/browse/BATCH-1465}[BATCH-1465]}} - Unwrap exceptions in AbstractMethodInvokingDelegator
+
+  * {{{http://jira.springsource.org/browse/BATCH-1472}[BATCH-1472]}} - Allow for use of PersistenceExceptionTranslator on JpaItemWriter
+
+  * {{{http://jira.springsource.org/browse/BATCH-1478}[BATCH-1478]}} - Add auto registration of StepScope to all the top-level elements in XML
+
+
+* New Feature
+
+  * {{{http://jira.springsource.org/browse/BATCH-729}[BATCH-729]}} - Supporting stored procedures in an ItemReader
+
+  * {{{http://jira.springsource.org/browse/BATCH-1239}[BATCH-1239]}} - Add email-sending item writer
+
+  * {{{http://jira.springsource.org/browse/BATCH-1377}[BATCH-1377]}} - StaxEventItemWriter: Handle namespace for the root tag
+
+  * {{{http://jira.springsource.org/browse/BATCH-1430}[BATCH-1430]}} - StaxEventItemWriter: Declare additional namespaces at the top-level element
+
+  * {{{http://jira.springsource.org/browse/BATCH-1441}[BATCH-1441]}} - BackOffPolicy cannot be set on a parent of an XML (namespaced) 'step'
+
+  * {{{http://jira.springsource.org/browse/BATCH-1468}[BATCH-1468]}} - StaxEventItemReader: optionally provide QName or namespace declaration for fragment element
+
+  * {{{http://jira.springsource.org/browse/BATCH-1474}[BATCH-1474]}} - Add registry management features to JobLoader
+
+  * {{{http://jira.springsource.org/browse/BATCH-1475}[BATCH-1475]}} - Allow a JobParametersValidator to be specified as an inner bean definition (as well as a reference)
+
+  * {{{http://jira.springsource.org/browse/BATCH-1479}[BATCH-1479]}} - Make AbstractMethodInvokingDelegate more lax in the types of arguments it accepts
+
+  * {{{http://jira.springsource.org/browse/BATCH-1480}[BATCH-1480]}} - Allow method adapter for Tasklet to be configured in namespace
+
+  * {{{http://jira.springsource.org/browse/BATCH-1481}[BATCH-1481]}} - Support injection of step-scoped dependencies into unit tests
+
+  * {{{http://jira.springsource.org/browse/BATCH-1483}[BATCH-1483]}} - Make the JobParametersValidator instance accessible from the Job interface
+
+  * {{{http://jira.springsource.org/browse/BATCH-1484}[BATCH-1484]}} - Add a getter for JobParametersValidator in AbstractJob
+
+  * {{{http://jira.springsource.org/browse/BATCH-1486}[BATCH-1486]}} - Add HibernatePagingItemReader
+
+
+* Task
+
+  * {{{http://jira.springsource.org/browse/BATCH-724}[BATCH-724]}} - create tests for non-default table prefix
+
+  * {{{http://jira.springsource.org/browse/BATCH-1466}[BATCH-1466]}} - Migrate Spring Batch Integration into the Admin project
+
+  * {{{http://jira.springsource.org/browse/BATCH-1470}[BATCH-1470]}} - Remove commons-lang dependency
+
+
