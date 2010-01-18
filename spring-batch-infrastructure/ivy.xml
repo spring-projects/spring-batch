@@ -26,6 +26,7 @@
 		<dependency org="org.aspectj" name="com.springsource.org.aspectj.weaver" rev="1.5.4" conf="test->runtime,provided"/>
 		<dependency org="net.sourceforge.cglib" name="com.springsource.net.sf.cglib" rev="2.1.3" conf="optional->runtime,provided"/>
 		<dependency org="javax.jms" name="com.springsource.javax.jms" rev="1.1.0" conf="optional->runtime,provided"/>
+		<dependency org="javax.mail" name="com.springsource.javax.mail" rev="1.4.1" conf="optional->runtime,provided"/>
 		<dependency org="org.apache.commons" name="com.springsource.org.apache.commons.logging" rev="1.1.1" conf="compile->runtime,provided"/>
 		<dependency org="org.apache.commons" name="com.springsource.org.apache.commons.lang" rev="2.1.0" conf="optional->runtime,provided"/>
 		<dependency org="org.apache.commons" name="com.springsource.org.apache.commons.io" rev="1.4.0" conf="test->runtime,provided"/>
@@ -39,6 +40,7 @@
 		<dependency org="javax.persistence" name="com.springsource.javax.persistence" rev="1.0.0" conf="optional->runtime,provided"/>
 		<dependency org="org.springframework.ws" name="org.springframework.oxm" rev="1.5.5.A" conf="optional->runtime,provided"/>
 		<dependency org="org.springframework" name="org.springframework.aop" rev="2.5.6.A" conf="optional->runtime,provided"/>
+		<dependency org="org.springframework" name="org.springframework.context.support" rev="2.5.6.A" conf="compile->runtime,provided"/>
 		<dependency org="org.springframework" name="org.springframework.core" rev="2.5.6.A" conf="compile->runtime,provided"/>
 		<dependency org="org.springframework" name="org.springframework.jdbc" rev="2.5.6.A" conf="optional->runtime,provided"/>
 		<dependency org="org.springframework" name="org.springframework.jms" rev="2.5.6.A" conf="optional->runtime,provided"/>
