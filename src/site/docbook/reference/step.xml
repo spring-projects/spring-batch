@@ -1647,7 +1647,7 @@ itemWriter.write(items);</programlisting>
 
     <programlisting>&lt;bean id="flatFileItemReader" scope="step"
       class="org.springframework.batch.item.file.FlatFileItemReader"&gt;
-    &lt;property name="resource" value="<emphasis role="bold">#{jobParameters[input.file.name]}</emphasis>" /&gt;
+    &lt;property name="resource" value="<emphasis role="bold">#{jobParameters['input.file.name']}</emphasis>" /&gt;
 &lt;/bean&gt;</programlisting>
 
     <para>Both the <classname>JobExecution</classname> and
@@ -1657,18 +1657,29 @@ itemWriter.write(items);</programlisting>
 
     <programlisting>&lt;bean id="flatFileItemReader" scope="step"
       class="org.springframework.batch.item.file.FlatFileItemReader"&gt;
-    &lt;property name="resource" value="<emphasis role="bold">#{jobExecutionContext[input.file.name]}</emphasis>" /&gt;
+    &lt;property name="resource" value="<emphasis role="bold">#{jobExecutionContext['input.file.name']}</emphasis>" /&gt;
 &lt;/bean&gt;</programlisting>
 
     <programlisting>&lt;bean id="flatFileItemReader" scope="step"
       class="org.springframework.batch.item.file.FlatFileItemReader"&gt;
-    &lt;property name="resource" value="<emphasis role="bold">#{stepExecutionContext[input.file.name]}</emphasis>" /&gt;
+    &lt;property name="resource" value="<emphasis role="bold">#{stepExecutionContext['input.file.name']}</emphasis>" /&gt;
 &lt;/bean&gt;</programlisting>
 
     <note>
       <para>Any bean that uses late-binding must be declared with
       scope="step". See for <xref linkend="step-scope" /> more
       information.</para>
+    </note>
+
+    <note>
+      <para>If you are using Spring 3.0 (or above) the expressions in
+      step-scoped beans are in the Spring Expression Language, a powerful
+      general purpose language with many interesting features. To provide
+      backward compatibility, if Spring Batch detects the presence of older
+      versions of Spring it uses a native expression language that is less
+      powerful, and has slightly different parsing rules. The main difference
+      is that the map keys in the example above do not need to be quoted with
+      Spring 2.5, but the quotes are mandatory in Spring 3.0.</para>
     </note>
 
     <section id="step-scope">

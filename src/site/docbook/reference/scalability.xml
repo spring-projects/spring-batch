@@ -202,16 +202,21 @@
     the PartitionStep is shown driving the execution. The PartitionStep
     configuration looks like this:</para>
 
-    <para><programlisting>&lt;bean name="step1:master" class="org.sfw...PartitionStep"&gt;
-    &lt;property name="partitionHandler" ref="partitionHandler"/&gt;
-    &lt;property name="stepExecutionSplitter" ref="stepExecutionSplitter"/&gt;
-    &lt;property name="jobRepository" ref="jobRepository" /&gt;
-&lt;/bean&gt;</programlisting></para>
+    <para><programlisting>&lt;step id="step1.master"&gt;
+    &lt;partition step="step1" partitioner="partitioner"&gt;
+        &lt;handler grid-size="10" task-executor="taskExecutor"/&gt;
+    &lt;/partition&gt;
+&lt;/step&gt;</programlisting></para>
 
     <para>There is a simple example which can be copied and extended in the
-    unit test suite for Spring Batch Core (see
-    <classname>org.springframework.batch.core.partition</classname>
-    package).</para>
+    unit test suite for Spring Batch Samples (see
+    <classname>*PartitionJob.xml</classname> configuration). </para>
+
+    <para>Spring Batch creates step executions for the partitions called
+    "step1:partition0", etc., so many people prefer to call the master step
+    "step1:master" for consistency. With Spring 3.0 you can do this using an
+    alias for the step (specifying the <literal>name</literal> attribute
+    instead of the <literal>id</literal>). </para>
 
     <section id="partitionHandler">
       <title>PartitionHandler</title>
@@ -240,10 +245,15 @@
       separate threads of execution, using the
       <classname>TaskExecutor</classname> strategy from Spring. The
       implementation is called
-      <classname>TaskExecutorPartitionHandler</classname>, and it can be
-      configured like this:</para>
+      <classname>TaskExecutorPartitionHandler</classname>, and it is the
+      default for a step configured with the XML namespace as above. It can
+      also be configured explicitly like this:</para>
 
-      <para><programlisting>&lt;bean class="org.spr...TaskExecutorPartitionHandler"&gt;
+      <para><programlisting>&lt;step id="step1.master"&gt;
+    &lt;partition step="step1" handler="handler"/&gt;
+&lt;/step&gt;
+
+&lt;bean class="org.spr...TaskExecutorPartitionHandler"&gt;
     &lt;property name="taskExecutor" ref="taskExecutor"/&gt;
     &lt;property name="step" ref="step1" /&gt;
     &lt;property name="gridSize" value="10" /&gt;
@@ -257,38 +267,17 @@
 
       <para>The <classname>TaskExecutorPartitionHandler</classname> is quite
       useful for IO intensive Steps, like copying large numbers of files or
-      replicating filesystems into content management systems.</para>
+      replicating filesystems into content management systems. It can also be
+      used for remote execution by providing a Step implementation that is a
+      proxy for a remote invocation (e.g. using Spring Remoting).</para>
     </section>
 
     <section id="stepExecutionSplitter">
-      <title>StepExecutionSplitter</title>
+      <title>Partitioner</title>
 
-      <para>The <classname>StepExecutionSplitter</classname> is responsible
-      for splitting up a <classname>StepExecution</classname> into blocks of
-      work, and providing input parameters for the remote Slaves in the form
-      of an <classname>ExecutionContext</classname> for each one. The
-      principal method for this in the interface is</para>
-
-      <programlisting>public interface StepExecutionSplitter {
-    ...
-    Set&lt;StepExecution&gt; split(StepExecution stepExecution, int gridSize) 
-          throws JobExecutionException;
-}</programlisting>
-
-      <para>So an execution instance for the Master step is passed in, along
-      with a hint about the grid size, and the splitter has to create a set of
-      partitioned <classname>StepExecution</classname> instances, each with a
-      different <classname>ExecutionContext</classname>.</para>
-
-      <para>A convenient generic implementation of StepExecutionSplitter is
-      provided by Spring Batch, which handles concerns like interpreting the
-      grid size and handling restart. It is recommended that you use this
-      implementation (the <classname>SimpleStepExecutionSplitter</classname>)
-      and inject specific knowledge of the input data through its
-      <classname>Partitioner</classname> property. The Partitioner has a
-      simpler responsibility: to generate execution contexts as input
-      parameters for new step executions only (no need to worry about
-      restarts). It has a single method:</para>
+      <para>The Partitioner has a simpler responsibility: to generate
+      execution contexts as input parameters for new step executions only (no
+      need to worry about restarts). It has a single method:</para>
 
       <programlisting>public interface Partitioner {
     Map&lt;String, ExecutionContext&gt; partition(int gridSize);

@@ -62,7 +62,10 @@ public class SkipSampleFunctionalTests extends AbstractJobTests { ... }</program
     <programlisting>@RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(locations = { "/simple-job-launcher-context.xml", 
                                     "/jobs/skipSampleJob.xml" })
-public class SkipSampleFunctionalTests extends AbstractJobTests {
+public class SkipSampleFunctionalTests {
+
+    @Autowired
+    private JobLauncherTestUtils jobLauncherTestUtils;
 
     private SimpleJdbcTemplate simpleJdbcTemplate;
 
@@ -80,7 +83,8 @@ public class SkipSampleFunctionalTests extends AbstractJobTests {
                                       i, "customer" + i);
         }
 
-        JobExecution jobExecution = <emphasis role="bold">this.launchJob()</emphasis>;
+        JobExecution jobExecution = jobLauncherTestUtils.launchJob().getStatus();
+
 
         Assert.assertEquals("COMPLETED", jobExecution.getExitStatus());
     }
@@ -99,7 +103,81 @@ public class SkipSampleFunctionalTests extends AbstractJobTests {
     targeted tests by allowing the test to set up data for just that step and
     to validate its results directly.</para>
 
-    <programlisting>JobExecution jobExecution = this.launchStep("loadFileStep");</programlisting>
+    <programlisting>JobExecution jobExecution = jobLauncherTestUtils.launchStep("loadFileStep");</programlisting>
+  </section>
+
+  <section>
+    <title>Testing Step-Scoped Components</title>
+
+    <para>Often the components that are configured for your steps at runtime
+    use step scope and late binding to inject context from the step or job
+    execution. These are tricky to test as standalone components unless you
+    have a way to set the context as if they were in a step execution. That is
+    the goal of two components in Spring Batch: the
+    <classname>StepScopeTestExecutionListener</classname> and the
+    <classname>StepScopeTestUtils</classname>.</para>
+
+    <para>The listener is declared at the class level, and its job is to
+    create a step execution context for each test method. For example:</para>
+
+    <programlisting>@ContextConfiguration
+@TestExecutionListeners( { DependencyInjectionTestExecutionListener.class, 
+    StepScopeTestExecutionListener.class })
+@RunWith(SpringJUnit4ClassRunner.class)
+public class StepScopeTestExecutionListenerIntegrationTests {
+
+    // This component is defined step-scoped, so it cannot be injected unless
+    // a step is active...
+    @Autowired
+    private ItemReader&lt;String&gt; reader;
+
+    public StepExecution getStepExection() {
+        StepExecution execution = MetaDataInstanceFactory.createStepExecution();
+        execution.getExecutionContext().putString("input.data", "foo,bar,spam");
+        return execution;
+    }
+
+    @Test
+    public void testReader() {
+        // The reader is initialized and bound to the input data
+        assertNotNull(reader.read());
+    }
+    
+}</programlisting>
+
+    <para>There are two <classname>TestExecutionListeners</classname>, one
+    from the regular Spring Test framework and handles dependency injection
+    from the configured application context, injecting the reader, and the
+    other is the Spring Batch
+    <classname>StepScopeTestExecutionListener</classname>. It works by looking
+    for a factory method in the test case for a
+    <classname>StepExecution</classname>, and using that as the context for
+    the test method, as if that execution was active in a Step at runtime. The
+    factory method is detected by its signature (it just has to return a
+    <classname>StepExecution</classname>). If a factory method is not provided
+    then a default <classname>StepExecution</classname> is created.</para>
+
+    <para>The listener approach is convenient if you want the duration of the
+    step scope to be the execution of the test method. For a more flexible,
+    but more invasive approach you can use the
+    <classname>StepScopeTestUtils</classname>. For example, to count the
+    number of items available in the reader above:</para>
+
+    <programlisting>int count = StepScopeTestUtils.doInStepScope(stepExecution, 
+    new Callable&lt;Integer&gt;() {
+
+      public Integer call() throws Exception {
+
+        int count = 0;
+
+        while (reader.read() != null) {
+           count++;
+        }
+
+        return count;
+
+    }
+});</programlisting>
   </section>
 
   <section id="validatingOutputFiles">
