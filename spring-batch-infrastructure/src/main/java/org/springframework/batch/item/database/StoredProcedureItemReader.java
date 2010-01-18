@@ -21,13 +21,13 @@ import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Types;
+import java.util.Arrays;
 
 import org.springframework.jdbc.core.PreparedStatementSetter;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.SqlOutParameter;
 import org.springframework.jdbc.core.SqlParameter;
 import org.springframework.jdbc.core.metadata.CallMetaDataContext;
-import org.springframework.jdbc.object.SqlCall;
 import org.springframework.jdbc.support.JdbcUtils;
 import org.springframework.util.Assert;
 import org.springframework.util.ClassUtils;
@@ -160,8 +160,12 @@ public class StoredProcedureItemReader<T> extends AbstractCursorItemReader<T> {
 		callContext.setProcedureName(procedureName);
 		callContext.setFunction(function);
 		callContext.initializeMetaData(getDataSource());
-		SqlParameter cursorParameter = callContext.createReturnResultSetParameter("return", rowMapper);
-					
+		callContext.processParameters(Arrays.asList(parameters));
+		SqlParameter cursorParameter = callContext.createReturnResultSetParameter("cursor", rowMapper);
+		this.callString = callContext.createCallString();
+
+		log.debug("Call string is: " + callString);
+		
 		int cursorSqlType = Types.OTHER;
 		if (function) {
 			if (cursorParameter instanceof SqlOutParameter) {
@@ -174,13 +178,6 @@ public class StoredProcedureItemReader<T> extends AbstractCursorItemReader<T> {
 			}
 		}
 		
-		SqlCall call = new SqlCall(getDataSource(), procedureName){};
-		call.setParameters(parameters);
-		call.setFunction(function);
-		call.compile();
-		this.callString = call.getCallString();
-		call = null;
-
 		try {
 			if (isUseSharedExtendedConnection()) {
 				callableStatement = con.prepareCall(callString, ResultSet.TYPE_FORWARD_ONLY, ResultSet.CONCUR_READ_ONLY,
