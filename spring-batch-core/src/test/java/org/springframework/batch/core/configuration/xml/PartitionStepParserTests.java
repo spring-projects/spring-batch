@@ -72,8 +72,8 @@ public class PartitionStepParserTests {
 		job1.execute(jobExecution);
 		assertEquals(BatchStatus.COMPLETED, jobExecution.getStatus());
 		List<String> stepNames = getStepNames(jobExecution);
-		assertEquals(7, stepNames.size());
-		assertEquals("[s1, step1:partition0, step1:partition1, step1:partition2, step1:partition3, step1:partition4, step1:partition5]", stepNames.toString());
+		assertEquals(3, stepNames.size());
+		assertEquals("[s1, step1:partition0, step1:partition1]", stepNames.toString());
 	}
 
 	@Test
@@ -83,8 +83,8 @@ public class PartitionStepParserTests {
 		job2.execute(jobExecution);
 		assertEquals(BatchStatus.COMPLETED, jobExecution.getStatus());
 		List<String> stepNames = getStepNames(jobExecution);
-		assertEquals(3, stepNames.size());
-		assertEquals("[s2, s3, step1:partition0]", stepNames.toString());
+		assertEquals(5, stepNames.size());
+		assertEquals("[s2, s3, step1:partition0, step1:partition1, step1:partition2]", stepNames.toString());
 	}
 
 	private List<String> getStepNames(JobExecution jobExecution) {

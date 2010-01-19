@@ -162,11 +162,11 @@ public abstract class AbstractStepParser {
 		if (!StringUtils.hasText(handlerRef)) {
 			Element handlerElement = DomUtils.getChildElementByTagName(partitionElement, HANDLER_ELE);
 			if (handlerElement != null) {
-				String taskExecutorRef = partitionElement.getAttribute(TASK_EXECUTOR_ATTR);
+				String taskExecutorRef = handlerElement.getAttribute(TASK_EXECUTOR_ATTR);
 				if (StringUtils.hasText(taskExecutorRef)) {
 					propertyValues.addPropertyValue("taskExecutor", new RuntimeBeanReference(taskExecutorRef));
 				}
-				String gridSize = partitionElement.getAttribute(GRID_SIZE_ATTR);
+				String gridSize = handlerElement.getAttribute(GRID_SIZE_ATTR);
 				if (StringUtils.hasText(gridSize)) {
 					propertyValues.addPropertyValue("gridSize", new TypedStringValue(gridSize));
 				}

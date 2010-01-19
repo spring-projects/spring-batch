@@ -25,6 +25,7 @@
 		class="org.springframework.batch.core.partition.support.TaskExecutorPartitionHandler"
 		xmlns="http://www.springframework.org/schema/beans">
 		<property name="step" ref="step1"/>
+		<property name="gridSize" value="3"/>
 	</bean>
 
 	<beans:bean id="taskExecutor"
