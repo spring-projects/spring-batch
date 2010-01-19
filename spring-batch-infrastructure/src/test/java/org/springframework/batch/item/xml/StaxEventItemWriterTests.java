@@ -162,6 +162,60 @@ public class StaxEventItemWriterTests {
 		assertTrue(outputFile.contains("<root>" + TEST_STRING + TEST_STRING + "</root>"));
 	}
 
+	@Test
+	public void testTransactionalRestartFailOnFirstWrite() throws Exception {
+
+		PlatformTransactionManager transactionManager = new ResourcelessTransactionManager();
+
+		writer.open(executionContext);
+		try {
+			new TransactionTemplate(transactionManager).execute(new TransactionCallback() {
+				public Object doInTransaction(TransactionStatus status) {
+					try {
+						writer.write(items);
+					}
+					catch (Exception e) {
+						throw new IllegalStateException("Could not write data", e);
+					}
+					throw new UnexpectedInputException("Could not write data");
+				}
+			});
+		}
+		catch (UnexpectedInputException e) {
+			// expected
+		}
+		writer.close();
+		System.err.println(getOutputFileContent());
+		String outputFile = getOutputFileContent();
+		assertEquals("<root></root>", outputFile);
+
+		// create new writer from saved restart data and continue writing
+		writer = createItemWriter();
+		new TransactionTemplate(transactionManager).execute(new TransactionCallback() {
+			public Object doInTransaction(TransactionStatus status) {
+				writer.open(executionContext);
+				try {
+					writer.write(items);
+				}
+				catch (Exception e) {
+					throw new UnexpectedInputException("Could not write data", e);
+				}
+				// get restart data
+				writer.update(executionContext);
+				return null;
+			}
+		});
+		writer.close();
+
+		// check the output is concatenation of 'before restart' and 'after
+		// restart' writes.
+		outputFile = getOutputFileContent();
+		System.err.println(getOutputFileContent());
+		assertEquals(1, StringUtils.countOccurrencesOf(outputFile, TEST_STRING));
+		assertTrue(outputFile.contains("<root>" + TEST_STRING + "</root>"));
+		assertEquals("<root><StaxEventItemWriter-testString/></root>", outputFile);
+	}
+
 	/**
 	 * Item is written to the output file only after flush.
 	 */
@@ -324,7 +378,6 @@ public class StaxEventItemWriterTests {
 		writer.write(items);
 		writer.close();
 		String content = getOutputFileContent();
-		System.err.println(content);
 		assertTrue("Wrong content: " + content, content
 				.contains(("<ns:root xmlns:ns=\"http://www.springframework.org/test\" "
 						+ "xmlns:foo=\"urn:org.test.foo\">")));

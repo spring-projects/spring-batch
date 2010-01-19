@@ -459,6 +459,11 @@ public class StaxEventItemWriter<T> extends ExecutionContextUserSupport implemen
 
 		}
 
+		/*
+		 * This forces the flush to write the end of the root element and avoids
+		 * an off-by-one error on restart.
+		 */
+		writer.add(factory.createIgnorableSpace(""));
 		writer.flush();
 
 	}
