@@ -21,13 +21,17 @@ import org.springframework.util.ClassUtils;
 
 /**
  * Implementation of {@link BackOffPolicy} that increases the back off period
- * for each retry attempt in a given set using the
- * {@link Math#exp(double) exponential} function. <p/> This implementation is
- * thread-safe and suitable for concurrent access. Modifications to the
- * configuration do not affect any retry sets that are already in progress. <p/>
- * The {@link #setInitialInterval(long)} property controls the initial value passed to
- * {@link Math#exp(double)} and the {@link #setMultiplier(double)} property controls by
- * how much this value is increased for each subsequent attempt.
+ * for each retry attempt in a given set using the {@link Math#exp(double)
+ * exponential} function.
+ * <p/>
+ * This implementation is thread-safe and suitable for concurrent access.
+ * Modifications to the configuration do not affect any retry sets that are
+ * already in progress.
+ * <p/>
+ * The {@link #setInitialInterval(long)} property controls the initial value
+ * passed to {@link Math#exp(double)} and the {@link #setMultiplier(double)}
+ * property controls by how much this value is increased for each subsequent
+ * attempt.
  * 
  * @author Rob Harrop
  * @author Dave Syer
@@ -77,7 +81,7 @@ public class ExponentialBackOffPolicy implements BackOffPolicy {
 	}
 
 	/**
-	 * Set the initial sleep interval value. Default is <code>1</code>
+	 * Set the initial sleep interval value. Default is <code>100</code>
 	 * millisecond. Cannot be set to a value less than one.
 	 */
 	public void setInitialInterval(long initialInterval) {
@@ -85,7 +89,9 @@ public class ExponentialBackOffPolicy implements BackOffPolicy {
 	}
 
 	/**
-	 * Set the multiplier value. Default is '<code>1.0</code>'.
+	 * Set the multiplier value. Default is '<code>2.0</code>'. Hint: do not use
+	 * values much in excess of 1.0 (or the backoff will get very long very
+	 * fast).
 	 */
 	public void setMultiplier(double multiplier) {
 		this.multiplier = (multiplier > 1.0 ? multiplier : 1.0);
@@ -94,7 +100,8 @@ public class ExponentialBackOffPolicy implements BackOffPolicy {
 	/**
 	 * Setter for maximum back off period. Default is 30000 (30 seconds). the
 	 * value will be reset to 1 if this method is called with a value less than
-	 * 1.
+	 * 1. Set this to avoid infinite waits if backing off a large number of
+	 * times (or if the multiplier is set too high).
 	 * 
 	 * @param maxInterval in milliseconds.
 	 */
@@ -103,15 +110,43 @@ public class ExponentialBackOffPolicy implements BackOffPolicy {
 	}
 
 	/**
-	 * Returns a new instance of {@link BackOffContext} configured
-	 * with the 'expSeed' and 'increment' values.
+	 * The initial period to sleep on the first backoff.
+	 * @return the initial interval
+	 */
+	public long getInitialInterval() {
+		return initialInterval;
+	}
+
+	/**
+	 * The maximum interval to sleep for. Defaults to 30 seconds.
+	 * 
+	 * @return the maximum interval.
+	 */
+	public long getMaxInterval() {
+		return maxInterval;
+	}
+
+	/**
+	 * The multiplier to use to generate the next backoff interval from the
+	 * last.
+	 * 
+	 * @return the multiplier in use
+	 */
+	public double getMultiplier() {
+		return multiplier;
+	}
+
+	/**
+	 * Returns a new instance of {@link BackOffContext} configured with the
+	 * 'expSeed' and 'increment' values.
 	 */
 	public BackOffContext start(RetryContext context) {
 		return new ExponentialBackOffContext(this.initialInterval, this.multiplier, this.maxInterval);
 	}
 
 	/**
-	 * Pause for a length of time equal to '<code>exp(backOffContext.expSeed)</code>'.
+	 * Pause for a length of time equal to '
+	 * <code>exp(backOffContext.expSeed)</code>'.
 	 */
 	public void backOff(BackOffContext backOffContext) throws BackOffInterruptedException {
 		ExponentialBackOffContext context = (ExponentialBackOffContext) backOffContext;

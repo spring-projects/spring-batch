@@ -85,6 +85,15 @@ public class SimpleRetryPolicy implements RetryPolicy {
 	}
 
 	/**
+	 * The maximum number of retry attempts before failure.
+	 * 
+	 * @return the maximum number of attempts
+	 */
+	public int getMaxAttempts() {
+		return maxAttempts;
+	}
+
+	/**
 	 * Test for retryable operation based on the status.
 	 * 
 	 * @see org.springframework.batch.retry.RetryPolicy#canRetry(org.springframework.batch.retry.RetryContext)

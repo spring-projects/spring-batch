@@ -59,6 +59,14 @@ public class FixedBackOffPolicy extends StatelessBackOffPolicy {
 	}
 
 	/**
+	 * The backoff period in milliseconds.
+	 * @return the backoff period
+	 */
+	public long getBackOffPeriod() {
+		return backOffPeriod;
+	}
+
+	/**
 	 * Pause for the {@link #setBackOffPeriod(long)}.
 	 * @throws BackOffInterruptedException if interrupted during sleep.
 	 */
