@@ -37,12 +37,14 @@ public class JpaPagingItemReaderAsyncTests {
 	/**
 	 * The number of items to read
 	 */
-	private static final int ITEM_COUNT = 10;
+	private static final int ITEM_COUNT = 1000;
 
 	/**
 	 * The number of threads to create
 	 */
-	private static final int THREAD_COUNT = 3;
+	private static final int THREAD_COUNT = 10;
+
+	private static final int PAGE_SIZE = 10;
 
 	private static Log logger = LogFactory.getLog(JpaPagingItemReaderAsyncTests.class);
 
@@ -136,7 +138,7 @@ public class JpaPagingItemReaderAsyncTests {
 		JpaPagingItemReader<Foo> reader = new JpaPagingItemReader<Foo>();
 		reader.setQueryString(jpqlQuery);
 		reader.setEntityManagerFactory(entityManagerFactory);
-		reader.setPageSize(3);
+		reader.setPageSize(PAGE_SIZE);
 		reader.afterPropertiesSet();
 		reader.setSaveState(false);
 		reader.open(new ExecutionContext());

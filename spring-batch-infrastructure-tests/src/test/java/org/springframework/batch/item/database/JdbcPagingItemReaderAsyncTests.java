@@ -40,17 +40,17 @@ public class JdbcPagingItemReaderAsyncTests {
 	/**
 	 * The page size
 	 */
-	private static final int PAGE_SIZE = 2;
+	private static final int PAGE_SIZE = 10;
 
 	/**
 	 * The number of items to read
 	 */
-	private static final int ITEM_COUNT = 10;
+	private static final int ITEM_COUNT = 1000;
 
 	/**
 	 * The number of threads to create
 	 */
-	private static final int THREAD_COUNT = 3;
+	private static final int THREAD_COUNT = 10;
 
 	private static Log logger = LogFactory.getLog(JdbcPagingItemReaderAsyncTests.class);
 
