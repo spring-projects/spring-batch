@@ -25,6 +25,7 @@ import org.apache.commons.io.IOUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.BeanInitializationException;
+import org.springframework.beans.factory.DisposableBean;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 import org.springframework.core.io.Resource;
@@ -51,7 +52,7 @@ import org.springframework.util.StringUtils;
  * @author Dave Syer
  * 
  */
-public class DataSourceInitializer implements InitializingBean {
+public class DataSourceInitializer implements InitializingBean, DisposableBean {
 
 	private static final Log logger = LogFactory.getLog(DataSourceInitializer.class);
 
@@ -82,12 +83,6 @@ public class DataSourceInitializer implements InitializingBean {
 
 	private void initialize() {
 		if (!initialized) {
-			if (destroyScripts != null) {
-				for (int i = 0; i < destroyScripts.length; i++) {
-					Resource initScript = initScripts[i];
-					doExecuteScript(initScript);
-				}
-			}
 			if (initScripts != null) {
 				for (int i = 0; i < initScripts.length; i++) {
 					Resource initScript = initScripts[i];
@@ -162,6 +157,17 @@ public class DataSourceInitializer implements InitializingBean {
 
 	public void setIgnoreFailedDrop(boolean ignoreFailedDrop) {
 		this.ignoreFailedDrop = ignoreFailedDrop;
+	}
+
+	public void destroy() throws Exception {
+		if (initialized) {
+			if (destroyScripts != null) {
+				for (int i = 0; i < destroyScripts.length; i++) {
+					Resource destroyScript = destroyScripts[i];
+					doExecuteScript(destroyScript);
+				}
+			}
+		}
 	}
 
 }

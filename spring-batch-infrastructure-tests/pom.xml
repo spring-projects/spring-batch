@@ -66,7 +66,7 @@
 		</dependency>
 		<dependency>
 			<groupId>org.apache.activemq</groupId>
-			<artifactId>activemq-core</artifactId>
+			<artifactId>com.springsource.org.apache.activemq</artifactId>
 			<version>5.1.0</version>
 			<scope>test</scope>
 		</dependency>
