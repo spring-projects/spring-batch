@@ -26,6 +26,7 @@ import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.ItemStream;
 import org.springframework.batch.item.database.orm.HibernateQueryProvider;
 import org.springframework.beans.factory.InitializingBean;
+import org.springframework.util.Assert;
 import org.springframework.util.ClassUtils;
 
 /**
@@ -61,6 +62,10 @@ public class HibernatePagingItemReader<T> extends AbstractPagingItemReader<T> im
 
 	private HibernateItemReaderHelper<T> helper = new HibernateItemReaderHelper<T>();
 
+	private Map<String, Object> parameterValues;
+
+	private int fetchSize;
+
 	public HibernatePagingItemReader() {
 		setName(ClassUtils.getShortName(HibernatePagingItemReader.class));
 	}
@@ -71,7 +76,7 @@ public class HibernatePagingItemReader<T> extends AbstractPagingItemReader<T> im
 	 * @param parameterValues the parameter values to set
 	 */
 	public void setParameterValues(Map<String, Object> parameterValues) {
-		helper.setParameterValues(parameterValues);
+		this.parameterValues = parameterValues;
 	}
 
 	/**
@@ -84,6 +89,16 @@ public class HibernatePagingItemReader<T> extends AbstractPagingItemReader<T> im
 	 */
 	public void setQueryName(String queryName) {
 		helper.setQueryName(queryName);
+	}
+
+	/**
+	 * Fetch size used internally by Hibernate to limit amount of data fetched
+	 * from database per round trip.
+	 * 
+	 * @param fetchSize the fetch size to pass down to Hibernate
+	 */
+	public void setFetchSize(int fetchSize) {
+		this.fetchSize = fetchSize;
 	}
 
 	/**
@@ -130,6 +145,7 @@ public class HibernatePagingItemReader<T> extends AbstractPagingItemReader<T> im
 
 	public void afterPropertiesSet() throws Exception {
 		super.afterPropertiesSet();
+		Assert.state(fetchSize >= 0, "fetchSize must not be negative");
 		helper.afterPropertiesSet();
 	}
 
@@ -148,7 +164,7 @@ public class HibernatePagingItemReader<T> extends AbstractPagingItemReader<T> im
 			results.clear();
 		}
 
-		results.addAll(helper.readPage(getPage(), getPageSize()));
+		results.addAll(helper.readPage(getPage(), getPageSize(), fetchSize, parameterValues));
 
 	}
 

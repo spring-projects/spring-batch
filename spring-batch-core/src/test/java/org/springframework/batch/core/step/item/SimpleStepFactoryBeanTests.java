@@ -385,6 +385,46 @@ public class SimpleStepFactoryBeanTests {
 		}
 	}
 
+	@Test
+	public void testAutoRegisterItemListenersNoDoubleCounting() throws Exception {
+
+		SimpleStepFactoryBean<String, String> factory = getStepFactory(new String[] { "foo", "bar", "spam" });
+
+		final List<String> listenerCalls = new ArrayList<String>();
+
+		class TestItemListenerWriter implements ItemWriter<String>, ItemWriteListener<String> {
+			public void write(List<? extends String> items) throws Exception {
+			}
+
+			public void afterWrite(List<? extends String> items) {
+				listenerCalls.add("write");
+			}
+
+			public void beforeWrite(List<? extends String> items) {
+			}
+
+			public void onWriteError(Exception exception, List<? extends String> items) {
+			}
+
+		}
+
+		TestItemListenerWriter itemWriter = new TestItemListenerWriter();
+		factory.setListeners(new StepListener[] {itemWriter});
+		factory.setItemWriter(itemWriter);
+
+		Step step = (Step) factory.getObject();
+
+		job.setSteps(Collections.singletonList(step));
+
+		JobExecution jobExecution = repository.createJobExecution(job.getName(), new JobParameters());
+
+		job.execute(jobExecution);
+
+		assertEquals(BatchStatus.COMPLETED, jobExecution.getStatus());
+		assertEquals("[write, write, write]", listenerCalls.toString());
+
+	}
+
 	private SimpleStepFactoryBean<String, String> getStepFactory(String... args) throws Exception {
 		SimpleStepFactoryBean<String, String> factory = new SimpleStepFactoryBean<String, String>();
 

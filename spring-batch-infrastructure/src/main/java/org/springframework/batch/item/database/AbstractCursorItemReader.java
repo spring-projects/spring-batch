@@ -391,9 +391,12 @@ public abstract class AbstractCursorItemReader<T> extends AbstractItemCountingIt
 	/**
 	 * Execute the statement to open the cursor.
 	 */
-	protected void doOpen() throws Exception {
+	@Override
+	protected final void doOpen() throws Exception {
+
 		Assert.state(!initialized, "Stream is already initialized.  Close before re-opening.");
 		Assert.isNull(rs, "ResultSet still open!  Close before re-opening.");
+
 		initializeConnection();
 		openCursor(con);
 		initialized = true;

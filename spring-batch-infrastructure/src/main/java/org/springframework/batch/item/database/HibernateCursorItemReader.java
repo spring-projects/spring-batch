@@ -68,7 +68,12 @@ public class HibernateCursorItemReader<T> extends AbstractItemCountingItemStream
 
 	private boolean initialized = false;
 
+	private int fetchSize;
+
+	private Map<String, Object> parameterValues;
+
 	public void afterPropertiesSet() throws Exception {
+		Assert.state(fetchSize >= 0, "fetchSize must not be negative");
 		helper.afterPropertiesSet();
 	}
 
@@ -78,7 +83,7 @@ public class HibernateCursorItemReader<T> extends AbstractItemCountingItemStream
 	 * @param parameterValues the parameter values to set
 	 */
 	public void setParameterValues(Map<String, Object> parameterValues) {
-		helper.setParameterValues(parameterValues);
+		this.parameterValues = parameterValues;
 	}
 
 	/**
@@ -91,6 +96,16 @@ public class HibernateCursorItemReader<T> extends AbstractItemCountingItemStream
 	 */
 	public void setQueryName(String queryName) {
 		helper.setQueryName(queryName);
+	}
+
+	/**
+	 * Fetch size used internally by Hibernate to limit amount of data fetched
+	 * from database per round trip.
+	 * 
+	 * @param fetchSize the fetch size to pass down to Hibernate
+	 */
+	public void setFetchSize(int fetchSize) {
+		this.fetchSize = fetchSize;
 	}
 
 	/**
@@ -165,7 +180,7 @@ public class HibernateCursorItemReader<T> extends AbstractItemCountingItemStream
 	 */
 	protected void doOpen() throws Exception {
 		Assert.state(!initialized, "Cannot open an already opened ItemReader, call close first");
-		cursor = helper.getForwardOnlyCursor();
+		cursor = helper.getForwardOnlyCursor(fetchSize, parameterValues);
 		initialized = true;
 	}
 
@@ -193,7 +208,8 @@ public class HibernateCursorItemReader<T> extends AbstractItemCountingItemStream
 	 */
 	@Override
 	protected void jumpToItem(int itemIndex) throws Exception {
-		helper.jumpToItem(cursor, itemIndex);
+		int flushSize = Math.max(fetchSize, 100);
+		helper.jumpToItem(cursor, itemIndex, flushSize);
 	}
 
 	/**

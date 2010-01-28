@@ -23,6 +23,7 @@ public class HibernateCursorItemReaderCommonTests extends AbstractDatabaseItemSt
 		reader.setQueryString(hsqlQuery);
 		reader.setSessionFactory(sessionFactory);
 		reader.setUseStatelessSession(true);
+		reader.setFetchSize(10);
 		reader.afterPropertiesSet();
 		reader.setSaveState(true);
 

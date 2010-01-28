@@ -46,13 +46,9 @@ public class HibernateItemReaderHelper<T> implements InitializingBean {
 
 	private String queryName = "";
 
-	private Map<String, Object> parameterValues;
-
 	private HibernateQueryProvider queryProvider;
 
 	private boolean useStatelessSession = true;
-
-	private int fetchSize = 0;
 
 	private StatelessSession statelessSession;
 
@@ -93,15 +89,6 @@ public class HibernateItemReaderHelper<T> implements InitializingBean {
 	}
 
 	/**
-	 * The parameter values to apply to a query (map of name:value).
-	 * 
-	 * @param parameterValues the parameter values to set
-	 */
-	public void setParameterValues(Map<String, Object> parameterValues) {
-		this.parameterValues = parameterValues;
-	}
-
-	/**
 	 * @param sessionFactory hibernate session factory
 	 */
 	public void setSessionFactory(SessionFactory sessionFactory) {
@@ -111,7 +98,6 @@ public class HibernateItemReaderHelper<T> implements InitializingBean {
 	public void afterPropertiesSet() throws Exception {
 
 		Assert.state(sessionFactory != null, "A SessionFactory must be provided");
-		Assert.state(fetchSize >= 0, "fetchSize must not be negative");
 
 		if (queryProvider == null) {
 			Assert.notNull(sessionFactory, "session factory must be set");
@@ -129,9 +115,12 @@ public class HibernateItemReaderHelper<T> implements InitializingBean {
 	/**
 	 * Get a cursor over all of the results, with the forward-only flag set.
 	 * 
+	 * @param fetchSize the fetch size to use retrieving the results
+	 * @param parameterValues the parameter values to use (or null if none).
+	 * 
 	 * @return a forward-only {@link ScrollableResults}
 	 */
-	public ScrollableResults getForwardOnlyCursor() {
+	public ScrollableResults getForwardOnlyCursor(int fetchSize, Map<String, Object> parameterValues) {
 		Query query = createQuery();
 		if (parameterValues != null) {
 			query.setProperties(parameterValues);
@@ -142,7 +131,7 @@ public class HibernateItemReaderHelper<T> implements InitializingBean {
 	/**
 	 * Open appropriate type of hibernate session and create the query.
 	 */
-	private Query createQuery() {
+	public Query createQuery() {
 
 		if (useStatelessSession) {
 			statelessSession = sessionFactory.openStatelessSession();
@@ -183,11 +172,10 @@ public class HibernateItemReaderHelper<T> implements InitializingBean {
 	 * 
 	 * @param cursor the results to scroll over
 	 */
-	public void jumpToItem(ScrollableResults cursor, int itemIndex) {
-		int flushSize = Math.max(fetchSize, 100);
+	public void jumpToItem(ScrollableResults cursor, int itemIndex, int flushInterval) {
 		for (int i = 0; i < itemIndex; i++) {
 			cursor.next();
-			if (i % flushSize == 0 && !useStatelessSession) {
+			if (i % flushInterval == 0 && !useStatelessSession) {
 				statefulSession.clear(); // Clears in-memory cache
 			}
 		}
@@ -211,9 +199,12 @@ public class HibernateItemReaderHelper<T> implements InitializingBean {
 	 * 
 	 * @param page the page to read (starting at 0)
 	 * @param pageSize the size of the page or maximum number of items to read
+	 * @param fetchSize the fetch size to use
+	 * @param parameterValues the parameter values to use (if any, otherwise
+	 * null)
 	 * @return a collection of items
 	 */
-	public Collection<? extends T> readPage(int page, int pageSize) {
+	public Collection<? extends T> readPage(int page, int pageSize, int fetchSize, Map<String, Object> parameterValues) {
 
 		clear();
 

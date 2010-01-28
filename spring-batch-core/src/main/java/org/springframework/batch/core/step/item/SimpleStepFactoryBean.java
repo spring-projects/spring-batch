@@ -15,6 +15,9 @@
  */
 package org.springframework.batch.core.step.item;
 
+import java.util.Arrays;
+import java.util.List;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.batch.core.ChunkListener;
@@ -600,21 +603,28 @@ public class SimpleStepFactoryBean<T, S> implements FactoryBean, BeanNameAware {
 	 */
 	private void registerItemListeners(SimpleChunkProvider<T> chunkProvider, SimpleChunkProcessor<T, S> chunkProcessor) {
 
+		StepListener[] listeners = getListeners();
+
 		// explicitly set item listeners
-		chunkProvider.setListeners(BatchListenerFactoryHelper.<ItemReadListener<T>> getListeners(getListeners(),
+		chunkProvider.setListeners(BatchListenerFactoryHelper.<ItemReadListener<T>> getListeners(listeners,
 				ItemReadListener.class));
-		chunkProvider.setListeners(BatchListenerFactoryHelper.<SkipListener<T, S>> getListeners(getListeners(),
+		chunkProvider.setListeners(BatchListenerFactoryHelper.<SkipListener<T, S>> getListeners(listeners,
 				SkipListener.class));
 
-		chunkProcessor.setListeners(BatchListenerFactoryHelper.<ItemProcessListener<T, S>> getListeners(getListeners(),
+		chunkProcessor.setListeners(BatchListenerFactoryHelper.<ItemProcessListener<T, S>> getListeners(listeners,
 				ItemProcessListener.class));
-		chunkProcessor.setListeners(BatchListenerFactoryHelper.<ItemWriteListener<S>> getListeners(getListeners(),
+		chunkProcessor.setListeners(BatchListenerFactoryHelper.<ItemWriteListener<S>> getListeners(listeners,
 				ItemWriteListener.class));
-		chunkProcessor.setListeners(BatchListenerFactoryHelper.<SkipListener<T, S>> getListeners(getListeners(),
+		chunkProcessor.setListeners(BatchListenerFactoryHelper.<SkipListener<T, S>> getListeners(listeners,
 				SkipListener.class));
 
+		List<StepListener> listofListeners = Arrays.asList(listeners);
 		// auto-register reader, processor and writer
 		for (Object itemHandler : new Object[] { getItemReader(), getItemWriter(), getItemProcessor() }) {
+
+			if (listofListeners.contains(itemHandler)) {
+				continue;
+			}
 
 			if (StepListenerFactoryBean.isListener(itemHandler)) {
 				StepListener listener = StepListenerFactoryBean.getListener(itemHandler);
