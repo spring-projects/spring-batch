@@ -195,7 +195,9 @@ public class StoredProcedureItemReader<T> extends AbstractCursorItemReader<T> {
 				callableStatement.registerOutParameter(1, cursorSqlType);
 			}
 			else {
-				callableStatement.registerOutParameter(refCursorPosition, cursorSqlType);
+				if (refCursorPosition > 0) {
+					callableStatement.registerOutParameter(refCursorPosition, cursorSqlType);
+				}
 			}
 			boolean results = callableStatement.execute();
 			if (results) {

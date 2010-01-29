@@ -64,7 +64,7 @@ public class DataSourceInitializer implements InitializingBean, DisposableBean {
 
 	private boolean ignoreFailedDrop = true;
 
-	private static boolean initialized = false;
+	private boolean initialized = false;
 
 	/**
 	 * Main method as convenient entry point.
@@ -81,21 +81,26 @@ public class DataSourceInitializer implements InitializingBean, DisposableBean {
 	 * @see java.lang.Object#finalize()
 	 */
 	protected void finalize() throws Throwable {
+		logger.debug("finalize called for " + dataSource);
 		super.finalize();
 		initialized = false;
-		logger.debug("finalize called");
 	}
 
 	public void destroy() {
+		logger.info("destroy called for " + dataSource);
+		doDestroy();
+	}
+
+	public void doDestroy() {
 		if (destroyScripts==null) return;
 		for (int i = 0; i < destroyScripts.length; i++) {
-			Resource destroyScript = initScripts[i];
+			Resource destroyScript = destroyScripts[i];
 			try {
 				doExecuteScript(destroyScript);
 			}
 			catch (Exception e) {
 				if (logger.isDebugEnabled()) {
-					logger.warn("Could not execute destroy script [" + destroyScript + "]", e);
+					logger.debug("Could not execute destroy script [" + destroyScript + "]", e);
 				}
 				else {
 					logger.warn("Could not execute destroy script [" + destroyScript + "]");
@@ -111,7 +116,7 @@ public class DataSourceInitializer implements InitializingBean, DisposableBean {
 
 	private void initialize() {
 		if (!initialized) {
-			destroy();
+			doDestroy();
 			if (initScripts != null) {
 				for (int i = 0; i < initScripts.length; i++) {
 					Resource initScript = initScripts[i];
@@ -125,12 +130,13 @@ public class DataSourceInitializer implements InitializingBean, DisposableBean {
 	private void doExecuteScript(final Resource scriptResource) {
 		if (scriptResource == null || !scriptResource.exists())
 			return;
+		final JdbcTemplate jdbcTemplate = new JdbcTemplate(dataSource);
+
 		TransactionTemplate transactionTemplate = new TransactionTemplate(new DataSourceTransactionManager(dataSource));
 		transactionTemplate.execute(new TransactionCallback() {
 
 			@SuppressWarnings("unchecked")
 			public Object doInTransaction(TransactionStatus status) {
-				JdbcTemplate jdbcTemplate = new JdbcTemplate(dataSource);
 				String[] scripts;
 				try {
 					scripts = StringUtils.delimitedListToStringArray(stripComments(IOUtils.readLines(scriptResource

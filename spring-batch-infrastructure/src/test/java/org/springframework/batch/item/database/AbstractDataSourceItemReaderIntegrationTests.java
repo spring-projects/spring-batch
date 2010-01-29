@@ -8,15 +8,12 @@ import javax.sql.DataSource;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.junit.runner.RunWith;
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.ItemStream;
 import org.springframework.batch.item.sample.Foo;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.context.transaction.AfterTransaction;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.Assert;
@@ -27,9 +24,8 @@ import org.springframework.util.Assert;
  * 
  * @author Lucas Ward
  * @author Robert Kasanicky
+ * @author Thomas Risberg
  */
-@RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(locations = "data-source-context.xml")
 public abstract class AbstractDataSourceItemReaderIntegrationTests {
 
 	protected ItemReader<Foo> reader;
@@ -37,6 +33,10 @@ public abstract class AbstractDataSourceItemReaderIntegrationTests {
 	protected ExecutionContext executionContext;
 
 	protected DataSource dataSource;
+
+	public AbstractDataSourceItemReaderIntegrationTests() {
+		super();
+	}
 
 	@Autowired
 	public void setDataSource(DataSource dataSource) {
@@ -99,6 +99,8 @@ public abstract class AbstractDataSourceItemReaderIntegrationTests {
 		assertEquals(2, foo2.getValue());
 
 		getAsItemStream(reader).update(executionContext);
+	
+		getAsItemStream(reader).close();
 
 		// create new input source
 		reader = createItemReader();
@@ -124,6 +126,8 @@ public abstract class AbstractDataSourceItemReaderIntegrationTests {
 		assertEquals(2, foo2.getValue());
 
 		getAsItemStream(reader).update(executionContext);
+	
+		getAsItemStream(reader).close();
 
 		// create new input source
 		reader = createItemReader();
@@ -170,6 +174,8 @@ public abstract class AbstractDataSourceItemReaderIntegrationTests {
 
 		Foo foo3 = reader.read();
 		Assert.state(!foo2.equals(foo3));
+	
+		getAsItemStream(reader).close();
 
 		// create new input source
 		reader = createItemReader();
@@ -196,6 +202,8 @@ public abstract class AbstractDataSourceItemReaderIntegrationTests {
 
 		Foo foo3 = reader.read();
 		Assert.state(!foo2.equals(foo3));
+	
+		getAsItemStream(reader).close();
 
 		// create new input source
 		reader = createItemReader();
@@ -221,6 +229,8 @@ public abstract class AbstractDataSourceItemReaderIntegrationTests {
 
 		Foo foo3 = reader.read();
 		Assert.state(!foo2.equals(foo3));
+	
+		getAsItemStream(reader).close();
 
 		// create new input source
 		reader = createItemReader();
@@ -232,6 +242,8 @@ public abstract class AbstractDataSourceItemReaderIntegrationTests {
 		
 		getAsItemStream(reader).update(executionContext);
 		
+		getAsItemStream(reader).close();
+
 		// create new input source
 		reader = createItemReader();
 
@@ -243,11 +255,11 @@ public abstract class AbstractDataSourceItemReaderIntegrationTests {
 		assertEquals(5, foo5.getValue());
 	}
 
-	private ItemStream getAsItemStream(ItemReader<Foo> source) {
+	protected ItemStream getAsItemStream(ItemReader<Foo> source) {
 		return (ItemStream) source;
 	}
 
-	private InitializingBean getAsInitializingBean(ItemReader<Foo> source) {
+	protected InitializingBean getAsInitializingBean(ItemReader<Foo> source) {
 		return (InitializingBean) source;
 	}
 

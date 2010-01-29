@@ -14,7 +14,7 @@ import org.springframework.orm.jpa.vendor.HibernateJpaVendorAdapter;
  *
  * @author Thomas Risberg
  */
-public class JpaPagingItemReaderIntegrationTests extends AbstractDataSourceItemReaderIntegrationTests {
+public class JpaPagingItemReaderIntegrationTests extends AbstractGenericDataSourceItemReaderIntegrationTests {
 
 	protected ItemReader<Foo> createItemReader() throws Exception {
 		LocalContainerEntityManagerFactoryBean factoryBean = new LocalContainerEntityManagerFactoryBean();

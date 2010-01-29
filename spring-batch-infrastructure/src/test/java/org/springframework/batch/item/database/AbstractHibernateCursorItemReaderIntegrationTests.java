@@ -15,7 +15,7 @@ import org.springframework.orm.hibernate3.LocalSessionFactoryBean;
  * @author Dave Syer
  */
 public abstract class AbstractHibernateCursorItemReaderIntegrationTests extends
-		AbstractDataSourceItemReaderIntegrationTests {
+		AbstractGenericDataSourceItemReaderIntegrationTests {
 
 	protected ItemReader<Foo> createItemReader() throws Exception {
 

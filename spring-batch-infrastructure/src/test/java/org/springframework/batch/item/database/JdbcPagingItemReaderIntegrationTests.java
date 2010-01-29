@@ -13,7 +13,7 @@ import org.springframework.jdbc.core.simple.ParameterizedRowMapper;
  *
  * @author Thomas Risberg
  */
-public class JdbcPagingItemReaderIntegrationTests extends AbstractDataSourceItemReaderIntegrationTests {
+public class JdbcPagingItemReaderIntegrationTests extends AbstractGenericDataSourceItemReaderIntegrationTests {
 
 	protected ItemReader<Foo> createItemReader() throws Exception {
 

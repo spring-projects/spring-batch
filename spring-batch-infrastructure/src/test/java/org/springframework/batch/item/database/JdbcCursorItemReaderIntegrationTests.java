@@ -11,7 +11,7 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
  * @author Robert Kasanicky
  */
 @RunWith(SpringJUnit4ClassRunner.class)
-public class JdbcCursorItemReaderIntegrationTests extends AbstractDataSourceItemReaderIntegrationTests {
+public class JdbcCursorItemReaderIntegrationTests extends AbstractGenericDataSourceItemReaderIntegrationTests {
 
 	protected ItemReader<Foo> createItemReader() throws Exception {
 		JdbcCursorItemReader<Foo> result = new JdbcCursorItemReader<Foo>();
