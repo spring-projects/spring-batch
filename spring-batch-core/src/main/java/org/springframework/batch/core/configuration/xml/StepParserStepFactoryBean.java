@@ -525,7 +525,7 @@ class StepParserStepFactoryBean<I, O> implements FactoryBean, BeanNameAware {
 	}
 
 	private boolean isFaultTolerant() {
-		return backOffPolicy != null || skipPolicy != null || isPositive(skipLimit) || isPositive(retryLimit)
+		return backOffPolicy != null || skipPolicy != null || retryPolicy != null || isPositive(skipLimit) || isPositive(retryLimit)
 				|| isPositive(cacheCapacity) || isTrue(readerTransactionalQueue);
 	}
 

@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.springframework.org/schema/batch http://www.springframework.org/schema/batch/spring-batch-2.1.xsd
+	http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.5.xsd">
+
+	<import resource="common-context.xml" />
+
+	<job id="job" xmlns="http://www.springframework.org/schema/batch">
+		<step id="s1" next="s2">
+			<tasklet>
+				<chunk reader="reader" writer="writer" processor="processor" commit-interval="5" retry-policy="retryPolicy" />
+			</tasklet>
+		</step>
+		<step id="s2">
+			<tasklet>
+				<chunk reader="reader" writer="writer" processor="processor" commit-interval="5">
+					<retry-policy>
+						<bean class="org.springframework.batch.retry.policy.SimpleRetryPolicy" xmlns="http://www.springframework.org/schema/beans">
+							<property name="maxAttempts" value="2" />
+						</bean>
+					</retry-policy>
+				</chunk>
+			</tasklet>
+		</step>
+	</job>
+
+	<bean id="retryPolicy" class="org.springframework.batch.retry.policy.ExceptionClassifierRetryPolicy">
+		<property name="policyMap">
+			<map>
+				<entry key="java.lang.NullPointerException">
+					<bean class="org.springframework.batch.retry.policy.SimpleRetryPolicy">
+						<property name="maxAttempts" value="2" />
+					</bean>
+				</entry>
+				<entry key="java.lang.ArithmeticException">
+					<bean class="org.springframework.batch.retry.policy.SimpleRetryPolicy">
+						<property name="maxAttempts" value="4" />
+					</bean>
+				</entry>
+			</map>
+		</property>
+	</bean>
+
+</beans>

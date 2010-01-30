@@ -34,6 +34,7 @@ import org.springframework.batch.item.ItemStream;
 import org.springframework.batch.item.support.CompositeItemStream;
 import org.springframework.batch.retry.RetryListener;
 import org.springframework.batch.retry.listener.RetryListenerSupport;
+import org.springframework.batch.retry.policy.SimpleRetryPolicy;
 import org.springframework.beans.PropertyAccessorUtils;
 import org.springframework.beans.factory.BeanCreationException;
 import org.springframework.context.ApplicationContext;
@@ -63,6 +64,27 @@ public class ChunkElementParserTests {
 		Object tasklet = ReflectionTestUtils.getField(step, "tasklet");
 		Object chunkProcessor = ReflectionTestUtils.getField(tasklet, "chunkProcessor");
 		assertTrue("Wrong processor type", chunkProcessor instanceof SimpleChunkProcessor);
+	}
+
+	@Test
+	public void testRetryPolicyAttribute() throws Exception {
+		ConfigurableApplicationContext context = new ClassPathXmlApplicationContext(
+				"org/springframework/batch/core/configuration/xml/ChunkElementRetryPolicyParserTests-context.xml");
+		Map<Class<? extends Throwable>, Boolean> retryable = getNestedExceptionMap("s1", context,
+				"tasklet.chunkProcessor.batchRetryTemplate.regular.retryPolicy.exceptionClassifier",
+				"exceptionClassifier");
+		assertEquals(2, retryable.size());
+		assertTrue(retryable.containsKey(NullPointerException.class));
+		assertTrue(retryable.containsKey(ArithmeticException.class));
+	}
+
+	@Test
+	public void testRetryPolicyElement() throws Exception {
+		ConfigurableApplicationContext context = new ClassPathXmlApplicationContext(
+				"org/springframework/batch/core/configuration/xml/ChunkElementRetryPolicyParserTests-context.xml");
+		SimpleRetryPolicy policy = (SimpleRetryPolicy) getPolicy("s2", context,
+				"tasklet.chunkProcessor.batchRetryTemplate.regular.retryPolicy.exceptionClassifier");
+		assertEquals(2, policy.getMaxAttempts());
 	}
 
 	@Test
@@ -227,19 +249,44 @@ public class ChunkElementParserTests {
 	@SuppressWarnings("unchecked")
 	private Map<Class<? extends Throwable>, Boolean> getNestedExceptionMap(String stepName, ApplicationContext ctx,
 			String componentName, String classifierName) throws Exception {
+
+		Object policy = getPolicy(stepName, ctx, componentName);
+		Object exceptionClassifier = ReflectionTestUtils.getField(policy, classifierName);
+
+		return (Map<Class<? extends Throwable>, Boolean>) ReflectionTestUtils.getField(exceptionClassifier,
+				"classified");
+
+	}
+
+	private Object getPolicy(String stepName, ApplicationContext ctx, String componentName) throws Exception {
+		@SuppressWarnings("unchecked")
+		SubclassClassifier<Throwable, Object> classifier = (SubclassClassifier<Throwable, Object>) getNestedPathInStep(stepName, ctx, componentName);
+		Object policy = classifier.classify(new Exception());
+		return policy;
+	}
+
+	@SuppressWarnings("unchecked")
+	private Object getNestedPathInStep(String stepName, ApplicationContext ctx, String path) throws Exception {
 		Map<String, Step> beans = ctx.getBeansOfType(Step.class);
 		assertTrue(beans.containsKey(stepName));
 		Object step = ctx.getBean(stepName);
 		assertTrue(step instanceof TaskletStep);
 
-		Object policy = step;
-		String path = componentName;
+		return getNestedPath(step, path);
+	}
+
+	/**
+	 * @param object the target object
+	 * @param path the path to the required field
+	 * @return
+	 */
+	private Object getNestedPath(Object object, String path) {
 		while (StringUtils.hasText(path)) {
 			int index = PropertyAccessorUtils.getFirstNestedPropertySeparatorIndex(path);
 			if (index < 0) {
 				index = path.length();
 			}
-			policy = ReflectionTestUtils.getField(policy, path.substring(0, index));
+			object = ReflectionTestUtils.getField(object, path.substring(0, index));
 			if (index < path.length()) {
 				path = path.substring(index + 1);
 			}
@@ -247,13 +294,7 @@ public class ChunkElementParserTests {
 				path = "";
 			}
 		}
-
-		SubclassClassifier<Throwable, Object> classifier = (SubclassClassifier<Throwable, Object>) policy;
-		policy = classifier.classify(new Exception());
-		Object exceptionClassifier = ReflectionTestUtils.getField(policy, classifierName);
-
-		return (Map<Class<? extends Throwable>, Boolean>) ReflectionTestUtils.getField(exceptionClassifier,
-				"classified");
+		return object;
 	}
 
 	private void containsClassified(Map<Class<? extends Throwable>, Boolean> classified,

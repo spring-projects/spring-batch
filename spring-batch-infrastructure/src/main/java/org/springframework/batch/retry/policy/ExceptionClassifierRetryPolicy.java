@@ -40,13 +40,11 @@ public class ExceptionClassifierRetryPolicy implements RetryPolicy {
 			new NeverRetryPolicy());
 
 	/**
-	 * Setter for policy map. This property should not be changed dynamically -
-	 * set it once, e.g. in configuration, and then don't change it during a
-	 * running application. Either this property or the exception classifier
-	 * directly should be set, but not both.
+	 * Setter for policy map used to create a classifier. Either this property
+	 * or the exception classifier directly should be set, but not both.
 	 * 
-	 * @param policyMap a map of String to {@link RetryPolicy} that will be used
-	 * to create a {@link Classifier} to locate a policy.
+	 * @param policyMap a map of Throwable class to {@link RetryPolicy} that
+	 * will be used to create a {@link Classifier} to locate a policy.
 	 */
 	public void setPolicyMap(Map<Class<? extends Throwable>, RetryPolicy> policyMap) {
 		SubclassClassifier<Throwable, RetryPolicy> subclassClassifier = new SubclassClassifier<Throwable, RetryPolicy>(
