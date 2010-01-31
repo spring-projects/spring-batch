@@ -5,7 +5,6 @@ import java.util.Collections;
 import javax.persistence.EntityManagerFactory;
 
 import org.junit.runner.RunWith;
-import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.database.orm.JpaNativeQueryProvider;
 import org.springframework.batch.item.sample.Foo;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,7 +22,7 @@ public class JpaPagingItemReaderNativeQueryIntegrationTests extends AbstractPagi
     @Autowired
     private EntityManagerFactory entityManagerFactory;
 
-    protected ItemReader<Foo> getItemReader() throws Exception {
+    protected AbstractPagingItemReader<Foo> getItemReader() throws Exception {
 
         String sqlQuery = "select * from T_FOOS where value >= :limit";
 

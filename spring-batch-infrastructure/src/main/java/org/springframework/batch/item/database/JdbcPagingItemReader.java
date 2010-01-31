@@ -222,11 +222,19 @@ public class JdbcPagingItemReader<T> extends AbstractPagingItemReader<T> impleme
 				logger.debug("SQL used for jumping: [" + jumpToItemSql + "]");
 			}
 
-			startAfterValue = simpleJdbcTemplate.getJdbcOperations().queryForObject(jumpToItemSql, new RowMapper() {
+			RowMapper startMapper = new RowMapper() {
 				public Object mapRow(ResultSet rs, int i) throws SQLException {
 					return rs.getObject(1);
 				}
-			});
+			};
+			if (this.queryProvider.isUsingNamedParameters()) {
+				startAfterValue = simpleJdbcTemplate.getNamedParameterJdbcOperations().queryForObject(jumpToItemSql,
+						getParameterMap(parameterValues, startAfterValue), startMapper);
+			}
+			else {
+				startAfterValue = simpleJdbcTemplate.getJdbcOperations().queryForObject(jumpToItemSql,
+						getParameterList(parameterValues, startAfterValue).toArray(), startMapper);
+			}
 
 		}
 

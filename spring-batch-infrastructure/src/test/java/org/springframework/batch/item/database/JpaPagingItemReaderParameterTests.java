@@ -1,13 +1,14 @@
 package org.springframework.batch.item.database;
 
-import org.junit.runner.RunWith;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.batch.item.sample.Foo;
-import org.springframework.batch.item.ItemReader;
-import org.springframework.beans.factory.annotation.Autowired;
-import javax.persistence.EntityManagerFactory;
 import java.util.Collections;
+
+import javax.persistence.EntityManagerFactory;
+
+import org.junit.runner.RunWith;
+import org.springframework.batch.item.sample.Foo;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration
@@ -16,7 +17,7 @@ public class JpaPagingItemReaderParameterTests extends AbstractPagingItemReaderP
 	@Autowired
 	private EntityManagerFactory entityManagerFactory;
 
-	protected ItemReader<Foo> getItemReader() throws Exception {
+	protected AbstractPagingItemReader<Foo> getItemReader() throws Exception {
 
 		String jpqlQuery = "select f from Foo f where f.value >= :limit";
 

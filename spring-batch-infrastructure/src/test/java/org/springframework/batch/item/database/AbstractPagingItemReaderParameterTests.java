@@ -1,29 +1,31 @@
 package org.springframework.batch.item.database;
 
-import org.junit.Before;
-import org.junit.After;
-import org.junit.Test;
-import org.junit.Assert;
-import org.springframework.batch.item.ItemStream;
-import org.springframework.batch.item.ItemReader;
-import org.springframework.batch.item.ExecutionContext;
-import org.springframework.batch.item.sample.Foo;
-import org.springframework.beans.factory.annotation.Autowired;
 import javax.sql.DataSource;
 
+import org.junit.After;
+import org.junit.Assert;
+import org.junit.Before;
+import org.junit.Test;
+import org.springframework.batch.item.ExecutionContext;
+import org.springframework.batch.item.ItemStream;
+import org.springframework.batch.item.sample.Foo;
+import org.springframework.beans.factory.annotation.Autowired;
+
 /**
- * @author trisberg
+ * @author Thomas Risberg
+ * @author Dave Syer
  */
 public abstract class AbstractPagingItemReaderParameterTests {
-	protected ItemReader<Foo> tested;
+
+	protected AbstractPagingItemReader<Foo> tested;
 	protected ExecutionContext executionContext = new ExecutionContext();
+
 	@Autowired
 	protected DataSource dataSource;
 
 	@Before
 	public void setUp() throws Exception {
 		tested = getItemReader();
-		((ItemStream)tested).open(executionContext);
 	}
 
 	@After
@@ -33,6 +35,8 @@ public abstract class AbstractPagingItemReaderParameterTests {
 
 	@Test
 	public void testRead() throws Exception {
+
+		((ItemStream)tested).open(executionContext);
 
 		Foo foo3 = tested.read();
 		Assert.assertEquals(3, foo3.getValue());
@@ -47,5 +51,18 @@ public abstract class AbstractPagingItemReaderParameterTests {
 		Assert.assertNull(o);
 	}
 
-	protected abstract ItemReader<Foo> getItemReader() throws Exception;
+	@Test
+	public void testReadAfterJump() throws Exception {
+
+		executionContext.putInt(tested.getClass().getSimpleName()+".read.count", 2);
+		((ItemStream)tested).open(executionContext);
+
+		Foo foo5 = tested.read();
+		Assert.assertEquals(5, foo5.getValue());
+
+		Object o = tested.read();
+		Assert.assertNull(o);
+	}
+
+	protected abstract AbstractPagingItemReader<Foo> getItemReader() throws Exception;
 }

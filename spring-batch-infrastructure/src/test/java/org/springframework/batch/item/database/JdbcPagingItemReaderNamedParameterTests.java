@@ -5,7 +5,6 @@ import java.sql.SQLException;
 import java.util.Collections;
 
 import org.junit.runner.RunWith;
-import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.database.support.HsqlPagingQueryProvider;
 import org.springframework.batch.item.sample.Foo;
 import org.springframework.jdbc.core.simple.ParameterizedRowMapper;
@@ -16,7 +15,7 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 @ContextConfiguration(locations = "/org/springframework/batch/item/database/JdbcPagingItemReaderParameterTests-context.xml")
 public class JdbcPagingItemReaderNamedParameterTests extends AbstractPagingItemReaderParameterTests {
 
-	protected ItemReader<Foo> getItemReader() throws Exception {
+	protected AbstractPagingItemReader<Foo> getItemReader() throws Exception {
 
 		JdbcPagingItemReader<Foo> reader = new JdbcPagingItemReader<Foo>();
 		reader.setDataSource(dataSource);
