@@ -22,7 +22,7 @@
 				<property name="whereClause" value="WHERE CREDIT > :credit" />
 			</bean>
 		</property>
-		<property name="pageSize" value="10" />
+		<property name="pageSize" value="2" />
 		<property name="parameterValues">
 			<map>
 				<entry key="statusCode" value="PE" />

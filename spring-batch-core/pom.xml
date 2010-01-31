@@ -251,7 +251,7 @@
 											<property key="velocimacro.library" value="src/main/sql/sqlserver.vpp" />
 										</engine>
 									</config>
-									<fileset dir="${basedir}/src/main/sql" includes="schema.sql.vpp" />
+									<fileset dir="${basedir}/src/main/sql" includes="schema*.sql.vpp" />
 									<mapper type="glob" from="*.sql.vpp" to="*-sqlserver.sql" />
 								</vppcopy>
 								<vppcopy todir="${basedir}/target/generated-resources" overwrite="true">
@@ -264,7 +264,7 @@
 											<property key="velocimacro.library" value="src/main/sql/sybase.vpp" />
 										</engine>
 									</config>
-									<fileset dir="${basedir}/src/main/sql" includes="schema.sql.vpp" />
+									<fileset dir="${basedir}/src/main/sql" includes="schema*.sql.vpp" />
 									<mapper type="glob" from="*.sql.vpp" to="*-sybase.sql" />
 								</vppcopy>
 							</tasks>

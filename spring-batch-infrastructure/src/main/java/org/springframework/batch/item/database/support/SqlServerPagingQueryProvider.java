@@ -17,9 +17,10 @@
 package org.springframework.batch.item.database.support;
 
 /**
- * Sql Server implementation of a {@link org.springframework.batch.item.database.PagingQueryProvider} using
+ * Sql Server implementation of a
+ * {@link org.springframework.batch.item.database.PagingQueryProvider} using
  * database specific features.
- *
+ * 
  * @author Thomas Risberg
  * @since 2.0
  */
@@ -33,6 +34,11 @@ public class SqlServerPagingQueryProvider extends SqlWindowingPagingQueryProvide
 	@Override
 	public String generateRemainingPagesQuery(int pageSize) {
 		return SqlPagingQueryUtils.generateTopSqlQuery(this, true, buildTopClause(pageSize));
+	}
+
+	@Override
+	protected Object getSubQueryAlias() {
+		return "AS TMP_SUB ";
 	}
 
 	private String buildTopClause(int pageSize) {
