@@ -7,8 +7,8 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(locations = "StoredProcedureItemReaderTests-context.xml")
-public class StoredProcedureItemReaderTests 
+@ContextConfiguration(locations = "stored-procedure-context.xml")
+public class StoredProcedureItemReaderIntegrationTests 
 		extends AbstractDataSourceItemReaderIntegrationTests {
 
 	@Override

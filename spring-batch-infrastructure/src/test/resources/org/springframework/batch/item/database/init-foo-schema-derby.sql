@@ -18,3 +18,10 @@ CREATE PROCEDURE read_foos ()
     READS SQL DATA
     DYNAMIC RESULT SETS 1
     EXTERNAL NAME 'test.jdbc.proc.derby.TestProcedures.readFoos';
+
+CREATE PROCEDURE read_some_foos (from_id INTEGER, to_id INTEGER) 
+    PARAMETER STYLE JAVA 
+    LANGUAGE JAVA
+    READS SQL DATA
+    DYNAMIC RESULT SETS 1
+    EXTERNAL NAME 'test.jdbc.proc.derby.TestProcedures.readSomeFoos';

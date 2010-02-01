@@ -19,7 +19,7 @@
 		<config>src/test/resources/org/springframework/batch/item/database/JpaPagingItemReaderParameterTests-context.xml</config>
 		<config>src/test/resources/org/springframework/batch/item/adapter/pe-delegating-item-writer.xml</config>
 		<config>src/test/resources/org/springframework/batch/retry/interceptor/retry-transaction-test.xml</config>
-		<config>src/test/resources/org/springframework/batch/item/database/StoredProcedureItemReaderTests-context.xml</config>
+		<config>src/test/resources/org/springframework/batch/item/database/stored-procedure-context.xml</config>
 	</configs>
 	<configSets>
 	</configSets>

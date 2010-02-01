@@ -16,11 +16,11 @@ import org.junit.Test;
 
 public abstract class AbstractDatabaseItemStreamItemReaderTests extends AbstractItemStreamItemReaderTests {
 
-	private ClassPathXmlApplicationContext ctx;
+	protected ClassPathXmlApplicationContext ctx;
 
 	@Before
 	public void setUp() throws Exception {
-		ctx = new ClassPathXmlApplicationContext("org/springframework/batch/item/database/data-source-context.xml");
+		initializeContext();
 		super.setUp();
 	}
 
@@ -28,6 +28,14 @@ public abstract class AbstractDatabaseItemStreamItemReaderTests extends Abstract
 	public void tearDown() throws Exception {
 		super.tearDown();
 		ctx.close();
+	}
+
+	/**
+	 * Sub-classes can override this and create their own context.
+	 * @throws Exception
+	 */
+	protected void initializeContext() throws Exception {
+		ctx = new ClassPathXmlApplicationContext("org/springframework/batch/item/database/data-source-context.xml");
 	}
 
 	@Test
@@ -40,6 +48,7 @@ public abstract class AbstractDatabaseItemStreamItemReaderTests extends Abstract
 		while (count++<100 && item!=null) {
 			item = reader.read();
 		}
+		((ItemStream) reader).close();
 		assertEquals(7, count);
 	}
 

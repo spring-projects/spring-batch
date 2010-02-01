@@ -23,4 +23,12 @@ public class TestProcedures {
         rs[0] = ps1.executeQuery();
     }
 
+    public static void readSomeFoos(int fromId, int toId, ResultSet[] rs) throws SQLException {
+        String SQL = "SELECT id, name, value FROM T_FOOS WHERE id between ? and ?";
+        Connection conn = DriverManager.getConnection("jdbc:default:connection");
+        PreparedStatement ps2 = conn.prepareStatement(SQL);
+        ps2.setInt(1, fromId);
+        ps2.setInt(2, toId);
+        rs[0] = ps2.executeQuery();
+    }
 }

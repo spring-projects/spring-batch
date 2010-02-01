@@ -52,6 +52,8 @@ public abstract class AbstractItemStreamItemReaderTests extends AbstractItemRead
 
 		testedAsStream().update(executionContext);
 
+		testedAsStream().close();
+
 		// create new input source
 		tested = getItemReader();
 
@@ -81,6 +83,8 @@ public abstract class AbstractItemStreamItemReaderTests extends AbstractItemRead
 		
 		Foo foo3 = tested.read();
 		assertEquals(3, foo3.getValue());
+
+		testedAsStream().close();
 
 		// create new input source
 		tested = getItemReader();
