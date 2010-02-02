@@ -210,7 +210,7 @@ public class TaskExecutorRepeatTemplateAsynchronousTests extends AbstractTradeBa
 		int frequency = Collections.frequency(items, "null");
 		// System.err.println("Frequency: "+frequency);
 		assertTrue(frequency <= throttleLimit);
-		assertTrue(frequency > 1);
+		assertTrue(frequency >= 1);
 	}
 
 	/**
