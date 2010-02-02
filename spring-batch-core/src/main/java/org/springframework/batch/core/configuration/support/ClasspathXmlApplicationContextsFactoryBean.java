@@ -132,7 +132,7 @@ public class ClasspathXmlApplicationContextsFactoryBean implements FactoryBean, 
 	}
 
 	/**
-	 * The type of obkect returned by this factory - an array of
+	 * The type of object returned by this factory - an array of
 	 * {@link ApplicationContextFactory}.
 	 * 
 	 * @return array of {@link ApplicationContextFactory}
@@ -143,7 +143,7 @@ public class ClasspathXmlApplicationContextsFactoryBean implements FactoryBean, 
 	}
 
 	/**
-	 * Oprimization hint for bean factory.
+	 * Optimization hint for bean factory.
 	 * @return true
 	 * @see FactoryBean#isSingleton()
 	 */

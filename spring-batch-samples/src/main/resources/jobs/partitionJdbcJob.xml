@@ -22,7 +22,7 @@
 	<bean id="taskExecutor" class="org.springframework.core.task.SyncTaskExecutor" />
 	
 	<step id="step1" xmlns="http://www.springframework.org/schema/batch">
-		<tasklet transaction-manager="transactionManager">
+		<tasklet>
 			<chunk writer="itemWriter" reader="itemReader" processor="itemProcessor" commit-interval="5" />
 			<listeners>
 				<listener ref="fileNameListener" />

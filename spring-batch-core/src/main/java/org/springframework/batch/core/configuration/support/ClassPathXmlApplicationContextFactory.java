@@ -83,7 +83,7 @@ public class ClassPathXmlApplicationContextFactory implements ApplicationContext
 		 * specific to the parent and remove it from the child (e.g. an
 		 * AutoProxyCreator will not work properly). Unfortunately there might
 		 * still be a a BeanPostProcessor with a dependency that itself is
-		 * BeanFactoryAware, but we can legislate for that here.
+		 * BeanFactoryAware, but we can't legislate for that here.
 		 */
 		beanPostProcessorExcludeClasses.add(BeanFactoryAware.class);
 	}
