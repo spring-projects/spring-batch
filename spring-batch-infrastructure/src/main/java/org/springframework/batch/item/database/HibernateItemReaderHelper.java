@@ -134,7 +134,9 @@ public class HibernateItemReaderHelper<T> implements InitializingBean {
 	public Query createQuery() {
 
 		if (useStatelessSession) {
-			statelessSession = sessionFactory.openStatelessSession();
+			if (statelessSession==null) {
+				statelessSession = sessionFactory.openStatelessSession();				
+			}
 			if (queryProvider != null) {
 				queryProvider.setStatelessSession(statelessSession);
 			}
@@ -148,7 +150,9 @@ public class HibernateItemReaderHelper<T> implements InitializingBean {
 			}
 		}
 		else {
-			statefulSession = sessionFactory.openSession();
+			if (statefulSession==null) {				
+				statefulSession = sessionFactory.openSession();
+			}
 			if (queryProvider != null) {
 				queryProvider.setSession(statefulSession);
 			}
@@ -187,9 +191,11 @@ public class HibernateItemReaderHelper<T> implements InitializingBean {
 	public void close() {
 		if (statelessSession != null) {
 			statelessSession.close();
+			statelessSession = null;
 		}
 		if (statefulSession != null) {
 			statefulSession.close();
+			statefulSession = null;
 		}
 	}
 
