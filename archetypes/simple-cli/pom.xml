@@ -3,7 +3,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>org.springframework.batch</groupId>
 	<artifactId>spring-batch-simple-cli</artifactId>
-	<version>2.0.6.CI-SNAPSHOT</version>
+	<version>2.0.5.CI-SNAPSHOT</version>
 	<packaging>jar</packaging>
 	<name>Commandline</name>
 	<url>http://www.springframework.org/spring-batch/archetypes/simple-cli-archetype</url>
@@ -12,7 +12,7 @@
 	<properties>
 		<maven.test.failure.ignore>true</maven.test.failure.ignore>
 		<spring.framework.version>2.5.6</spring.framework.version>
-		<spring.batch.version>2.0.6.CI-SNAPSHOT</spring.batch.version>
+		<spring.batch.version>2.0.5.CI-SNAPSHOT</spring.batch.version>
 	</properties>
 	<profiles>
 		<profile>
