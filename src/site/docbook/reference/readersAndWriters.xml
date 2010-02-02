@@ -1716,14 +1716,13 @@ staxItemWriter.write(trade);</programlisting>
   <section id="database">
     <title id="infrastructure.2.2">Database</title>
 
-    <para>Like most enterprise application styles, a database is the
-    central storage mechanism for batch. However, batch differs from
-    other application styles due to the sheer size of the datasets
-    with which the system must work. If a SQL statement returns 1
-    million rows, the result set probably holds all returned results
-    in memory until all rows have been read. Spring Batch provides two
-    types of solutions for this problem: Cursor and Paging database
-    ItemReaders.</para>
+    <para>Like most enterprise application styles, a database is the central
+    storage mechanism for batch. However, batch differs from other application
+    styles due to the sheer size of the datasets with which the system must
+    work. If a SQL statement returns 1 million rows, the result set probably
+    holds all returned results in memory until all rows have been read. Spring
+    Batch provides two types of solutions for this problem: Cursor and Paging
+    database ItemReaders.</para>
 
     <section id="cursorBasedItemReaders">
       <title>Cursor Based ItemReaders</title>
@@ -2038,6 +2037,127 @@ itemReader.close(executionContext);</programlisting>
     &lt;property name="sessionFactory" ref="sessionFactory" /&gt;
     &lt;property name="queryString" value="from CustomerCredit" /&gt;
 &lt;/bean&gt;</programlisting>
+      </section>
+
+      <section id="StoredProcedureItemReader">
+        <title>StoredProcedureItemReader</title>
+
+        <para>Sometimes it is necessary to obtain the cursor data using a
+        stored procedure. The <classname>StoredProcedureItemReader</classname>
+        works like the <classname>JdbcCursorItemReader</classname> except that
+        instead of executing a query to obtain a cursor we execute a stored
+        procedure that returns a cursor. The stored procedure can return the
+        cursor in three different ways:</para>
+
+        <orderedlist>
+          <listitem>
+            <para>as a returned ResultSet (used by SQL Server, Sybase, DB2,
+            Derby and MySQL)</para>
+          </listitem>
+
+          <listitem>
+            <para>as a ref-cursor returned as an out parameter (used by Oracle
+            and PostgreSQL)</para>
+          </listitem>
+
+          <listitem>
+            <para>as the return value of a stored function call</para>
+          </listitem>
+        </orderedlist>
+
+        <para>Below is a basic example configuration using the same 'customer
+        credit' example as earlier:</para>
+
+        <programlisting>&lt;bean id="reader" class="org.springframework.batch.item.database.StoredProcedureItemReader"&gt;
+    &lt;property name="dataSource" ref="dataSource"/&gt;
+    &lt;property name="procedureName" value="sp_customer_credit"/&gt;
+    &lt;property name="rowMapper"&gt;
+        &lt;bean class="org.springframework.batch.sample.domain.CustomerCreditRowMapper"/&gt;
+    &lt;/property&gt;
+&lt;/bean&gt;
+</programlisting>
+
+        <para>This example relies on the stored procedure to provide a
+        ResultSet as a returned result (option 1 above). </para>
+
+        <para>If the stored procedure returned a ref-cursor (option 2) then we
+        would need to provide the position of the out parameter that is the
+        returned ref-cursor. Here is an example where the first parameter is
+        the returned ref-cursor:</para>
+
+        <programlisting>&lt;bean id="reader" class="org.springframework.batch.item.database.StoredProcedureItemReader"&gt;
+    &lt;property name="dataSource" ref="dataSource"/&gt;
+    &lt;property name="procedureName" value="sp_customer_credit"/&gt;
+    &lt;property name="refCursorPosition" value="1"/&gt;
+    &lt;property name="rowMapper"&gt;
+        &lt;bean class="org.springframework.batch.sample.domain.CustomerCreditRowMapper"/&gt;
+    &lt;/property&gt;
+&lt;/bean&gt;
+</programlisting>
+
+        <para>If the cursor was returned from a stored function (option 3) we
+        would need to set the property "<varname>function</varname>" to
+        <literal>true</literal>. It defaults to <literal>false</literal>. Here
+        is what that would look like:</para>
+
+        <programlisting>&lt;bean id="reader" class="org.springframework.batch.item.database.StoredProcedureItemReader"&gt;
+    &lt;property name="dataSource" ref="dataSource"/&gt;
+    &lt;property name="procedureName" value="sp_customer_credit"/&gt;
+    &lt;property name="function" value="true"/&gt;
+    &lt;property name="rowMapper"&gt;
+        &lt;bean class="org.springframework.batch.sample.domain.CustomerCreditRowMapper"/&gt;
+    &lt;/property&gt;
+&lt;/bean&gt;
+</programlisting>
+
+        <para>In all of these cases we need to define a
+        <classname>RowMapper</classname> as well as a
+        <classname>DataSource</classname> and the actual procedure
+        name.</para>
+
+        <para>If the stored procedure or function takes in parameter then they
+        must be declared and set via the parameters property. Here is an
+        example for Oracle that declares three parameters. The first one is
+        the out parameter that returns the ref-cursor, the second and third
+        are in parameters that takes a value of type INTEGER:</para>
+
+        <programlisting>&lt;bean id="reader" class="org.springframework.batch.item.database.StoredProcedureItemReader"&gt;
+    &lt;property name="dataSource" ref="dataSource"/&gt;
+    &lt;property name="procedureName" value="spring.cursor_func"/&gt;
+    &lt;property name="parameters"&gt;
+        &lt;list&gt;
+            &lt;bean class="org.springframework.jdbc.core.SqlOutParameter"&gt;
+                &lt;constructor-arg index="0" value="newid"/&gt;
+                &lt;constructor-arg index="1"&gt;
+                    &lt;util:constant static-field="oracle.jdbc.OracleTypes.CURSOR"/&gt;
+                &lt;/constructor-arg&gt;
+            &lt;/bean&gt;
+            &lt;bean class="org.springframework.jdbc.core.SqlParameter"&gt;
+                &lt;constructor-arg index="0" value="amount"/&gt;
+                &lt;constructor-arg index="1"&gt;
+                    &lt;util:constant static-field="java.sql.Types.INTEGER"/&gt;
+                &lt;/constructor-arg&gt;
+            &lt;/bean&gt;
+            &lt;bean class="org.springframework.jdbc.core.SqlParameter"&gt;
+                &lt;constructor-arg index="0" value="custid"/&gt;
+                &lt;constructor-arg index="1"&gt;
+                    &lt;util:constant static-field="java.sql.Types.INTEGER"/&gt;
+                &lt;/constructor-arg&gt;
+            &lt;/bean&gt;
+        &lt;/list&gt;
+    &lt;/property&gt;
+    &lt;property name="refCursorPosition" value="1"/&gt;
+    &lt;property name="rowMapper" ref="rowMapper"/&gt;
+    &lt;property name="preparedStatementSetter" ref="parameterSetter"/&gt;
+&lt;/bean&gt;</programlisting>
+
+        <para>In addition to the parameter declarations we need to specify a
+        <classname>PreparedStatementSetter</classname> implementation that
+        sets the parameter values for the call. This works the same as for the
+        <classname>JdbcCursorItemReader</classname> above. All the additional
+        properties listed in <xref linkend="JdbcCursorItemReaderProperties" />
+        apply to the <classname>StoredProcedureItemReader</classname> as well.
+        </para>
       </section>
     </section>
 
