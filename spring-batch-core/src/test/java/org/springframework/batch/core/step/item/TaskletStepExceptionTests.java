@@ -42,6 +42,7 @@ import org.springframework.transaction.support.DefaultTransactionStatus;
  * Tests for the behavior of TaskletStep in a failure scenario.
  * 
  * @author Lucas Ward
+ * @author Dave Syer
  * 
  */
 public class TaskletStepExceptionTests {
@@ -199,6 +200,7 @@ public class TaskletStepExceptionTests {
 			protected void doCommit(DefaultTransactionStatus status) throws TransactionException {
 				throw new RuntimeException("bar");
 			}
+
 			@Override
 			protected void doRollback(DefaultTransactionStatus status) throws TransactionException {
 				throw new RuntimeException("foo");
@@ -217,6 +219,44 @@ public class TaskletStepExceptionTests {
 		assertEquals(UNKNOWN, stepExecution.getStatus());
 		Throwable e = stepExecution.getFailureExceptions().get(0);
 		assertEquals("foo", e.getMessage());
+	}
+
+	@Test
+	public void testRepositoryError() throws Exception {
+
+		taskletStep.setTasklet(new Tasklet() {
+
+			public RepeatStatus execute(StepContribution contribution, ChunkContext attributes) throws Exception {
+				return RepeatStatus.FINISHED;
+			}
+
+		});
+
+		jobRepository.setFailOnUpdate(true);
+		taskletStep.execute(stepExecution);
+		assertEquals(UNKNOWN, stepExecution.getStatus());
+		Throwable e = stepExecution.getFailureExceptions().get(0);
+		assertEquals("Expected exception in step execution context persistence", e.getMessage());
+
+	}
+
+	@Test
+	public void testRepositoryErrorOnFailure() throws Exception {
+
+		taskletStep.setTasklet(new Tasklet() {
+
+			public RepeatStatus execute(StepContribution contribution, ChunkContext attributes) throws Exception {
+				throw new RuntimeException("Tasklet exception");
+			}
+
+		});
+
+		jobRepository.setFailOnUpdate(true);
+		taskletStep.execute(stepExecution);
+		assertEquals(UNKNOWN, stepExecution.getStatus());
+		Throwable e = stepExecution.getFailureExceptions().get(0);
+		assertEquals("Expected exception in step execution context persistence", e.getMessage());
+
 	}
 
 	@Test
@@ -261,6 +301,12 @@ public class TaskletStepExceptionTests {
 
 		private int updateCount = 0;
 
+		private boolean failOnUpdate = false;
+
+		public void setFailOnUpdate(boolean failOnUpdate) {
+			this.failOnUpdate = failOnUpdate;
+		}
+
 		public void add(StepExecution stepExecution) {
 		}
 
@@ -289,6 +335,9 @@ public class TaskletStepExceptionTests {
 		}
 
 		public void updateExecutionContext(StepExecution stepExecution) {
+			if (failOnUpdate) {
+				throw new RuntimeException("Expected exception in step execution context persistence");
+			}
 		}
 
 		public int getUpdateCount() {

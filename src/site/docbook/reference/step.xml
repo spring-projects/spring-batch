@@ -1522,7 +1522,7 @@ itemWriter.write(items);</programlisting>
 &lt;step id="step4" parent="s4"/&gt;</programlisting>
     </section>
 
-    <section id="split-flows">
+    <section id="external-flows">
       <title>Externalizing Flow Definitions and Dependencies Between
       Jobs</title>
 

@@ -43,7 +43,7 @@ public class XStreamExecutionContextStringSerializerTests {
 	public void testComplexObject() {
 		Map<String, Object> m1 = new HashMap<String, Object>();
 		ComplexObject o1 = new ComplexObject();
-		o1.setName("Test");
+		o1.setName("02345");
 		Map<String, Object> m = new HashMap<String, Object>();
 		m.put("object1", Long.valueOf(12345L));
 		m.put("object2", "OBJECT TWO");
@@ -131,5 +131,11 @@ public class XStreamExecutionContextStringSerializerTests {
 			result = 31 * result + (map != null ? map.hashCode() : 0);
 			return result;
 		}
+
+		@Override
+		public String toString() {
+			return "ComplexObject [name=" + name + ", number=" + number + "]";
+		}
+		
 	}
 }

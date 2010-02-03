@@ -1,0 +1,34 @@
+Spring Batch 2.1.0 Release Notes
+
+* Bug
+
+  * {{{http://jira.springsource.org/browse/BATCH-1490}[BATCH-1490]}} - StaxEventItemWriter outputs invalid xml if step handling is failed and retried when handling the first chunk of data
+
+  * {{{http://jira.springsource.org/browse/BATCH-1494}[BATCH-1494]}} - FetchSize not accessible in HibernateCursorItemReader
+
+  * {{{http://jira.springsource.org/browse/BATCH-1497}[BATCH-1497]}} - SqlServerPagingQueryProvider should use an alias for the inner query in a jump-to-item query
+
+  * {{{http://jira.springsource.org/browse/BATCH-1498}[BATCH-1498]}} - JdbcPagingItemReader does not apply parameter values correctly on restart
+
+  * {{{http://jira.springsource.org/browse/BATCH-1499}[BATCH-1499]}} - SqlServerPagingQueryProvider needs an alias in the jump to subquery
+
+  * {{{http://jira.springsource.org/browse/BATCH-1502}[BATCH-1502]}} - HibernatePagingItemReader doesn't close sessions
+
+* Improvement
+
+  * {{{http://jira.springsource.org/browse/BATCH-1402}[BATCH-1402]}} - MapJobRegistry throws DuplicateJobException when the same job factory instance is registered twice
+
+  * {{{http://jira.springsource.org/browse/BATCH-1493}[BATCH-1493]}} - Step listeners detected and invoked twice
+
+* New Feature
+
+  * {{{http://jira.springsource.org/browse/BATCH-1496}[BATCH-1496]}} - Expose retry-policy in namespace configuration
+
+* Refactoring
+
+  * {{{http://jira.springsource.org/browse/BATCH-1393}[BATCH-1393]}} - Migrate StepScope to Spring 3.0.0
+
+* Task
+
+  * {{{http://jira.springsource.org/browse/BATCH-1488}[BATCH-1488]}} - Tests and documentation for StoredProcedureItemReader
+

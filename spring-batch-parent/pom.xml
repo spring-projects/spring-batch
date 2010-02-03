@@ -5,8 +5,7 @@
 	<artifactId>spring-batch-parent</artifactId>
 	<version>2.1.0.CI-SNAPSHOT</version>
 	<name>Spring Batch Parent</name>
-	<description>Spring Batch parent project.  Defines dependencies and common configuration for the
-	build process.</description>
+	<description>Spring Batch parent project.  Defines dependencies and common configuration for the build process.</description>
 	<url>http://static.springframework.org/spring-batch/${project.artifactId}</url>
 	<packaging>pom</packaging>
 	<properties>
@@ -406,7 +405,7 @@
 			<dependency>
 				<groupId>org.codehaus.jettison</groupId>
 				<artifactId>jettison</artifactId>
-				<version>1.0</version>
+				<version>1.1</version>
 				<exclusions>
 					<exclusion>
 						<groupId>stax</groupId>
