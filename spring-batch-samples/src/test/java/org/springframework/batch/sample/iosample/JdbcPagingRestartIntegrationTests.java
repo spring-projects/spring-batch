@@ -19,6 +19,8 @@ package org.springframework.batch.sample.iosample;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 
+import javax.sql.DataSource;
+
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.batch.core.JobParametersBuilder;
@@ -30,10 +32,12 @@ import org.springframework.batch.sample.domain.trade.CustomerCredit;
 import org.springframework.batch.test.MetaDataInstanceFactory;
 import org.springframework.batch.test.StepScopeTestExecutionListener;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.jdbc.core.simple.SimpleJdbcTemplate;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.TestExecutionListeners;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.context.support.DependencyInjectionTestExecutionListener;
+import org.springframework.test.jdbc.SimpleJdbcTestUtils;
 
 /**
  * @author Dave Syer
@@ -47,6 +51,12 @@ public class JdbcPagingRestartIntegrationTests {
 
 	@Autowired
 	private ItemReader<CustomerCredit> reader;
+	private SimpleJdbcTemplate jdbcTemplate;
+	
+	@Autowired
+	public void setDataSource(DataSource dataSource) {
+		jdbcTemplate = new SimpleJdbcTemplate(dataSource);
+	}
 
 	public StepExecution getStepExecution() {
 		return MetaDataInstanceFactory.createStepExecution(new JobParametersBuilder().addDouble("credit", 10000.)
@@ -56,7 +66,8 @@ public class JdbcPagingRestartIntegrationTests {
 	@Test
 	public void testReader() throws Exception {
 		ExecutionContext executionContext = new ExecutionContext();
-		executionContext.putInt("JdbcPagingItemReader.read.count", 2);
+		int count = SimpleJdbcTestUtils.countRowsInTable(jdbcTemplate, "CUSTOMER")-2;
+		executionContext.putInt("JdbcPagingItemReader.read.count", count);
 		((ItemStream)reader).open(executionContext);
 		CustomerCredit item = reader.read();
 		// System.err.println(item);
