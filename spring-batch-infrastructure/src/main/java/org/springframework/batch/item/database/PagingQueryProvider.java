@@ -75,4 +75,11 @@ public interface PagingQueryProvider {
 	 */
 	boolean isUsingNamedParameters();
 
+	/**
+	 * The sort key (unique single column name).
+	 *  
+	 * @return the sort key used to order the query
+	 */
+	String getSortKey();
+
 }

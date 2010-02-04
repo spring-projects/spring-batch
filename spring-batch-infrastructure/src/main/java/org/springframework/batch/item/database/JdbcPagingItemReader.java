@@ -115,6 +115,12 @@ public class JdbcPagingItemReader<T> extends AbstractPagingItemReader<T> impleme
 		this.fetchSize = fetchSize;
 	}
 
+	/**
+	 * A {@link PagingQueryProvider}. Supplies all the platform dependent query
+	 * generation capabilities needed by the reader.
+	 * 
+	 * @param queryProvider the {@link PagingQueryProvider} to use
+	 */
 	public void setQueryProvider(PagingQueryProvider queryProvider) {
 		this.queryProvider = queryProvider;
 	}
@@ -135,7 +141,7 @@ public class JdbcPagingItemReader<T> extends AbstractPagingItemReader<T> impleme
 	 * parameters then the key should be the name used in the query clause. If
 	 * you use "?" placeholders then the key should be the relative index that
 	 * the parameter appears in the query string built using the select, from
-	 * and where cluases specified.
+	 * and where clauses specified.
 	 * 
 	 * @param parameterValues the values keyed by the parameter named/index used
 	 * in the query string.
@@ -279,7 +285,7 @@ public class JdbcPagingItemReader<T> extends AbstractPagingItemReader<T> impleme
 
 		@SuppressWarnings("unchecked")
 		public void processRow(ResultSet rs) throws SQLException {
-			startAfterValue = rs.getObject(1);
+			startAfterValue = rs.getObject(queryProvider.getSortKey());
 			results.add((T) rowMapper.mapRow(rs, results.size()));
 		}
 	}

@@ -141,7 +141,7 @@ public abstract class AbstractSqlPagingQueryProvider implements PagingQueryProvi
 	 * 
 	 * @return sortKey key to use to sort and limit page content
 	 */
-	protected String getSortKey() {
+	public String getSortKey() {
 		return sortKey;
 	}
 

@@ -17,6 +17,7 @@
 package org.springframework.batch.sample.iosample;
 
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -57,7 +58,15 @@ public class JdbcPagingRestartIntegrationTests {
 		ExecutionContext executionContext = new ExecutionContext();
 		executionContext.putInt("JdbcPagingItemReader.read.count", 2);
 		((ItemStream)reader).open(executionContext);
-		assertNotNull(reader.read());
+		CustomerCredit item = reader.read();
+		// System.err.println(item);
+		assertNotNull(item);
+		item = reader.read();
+		// System.err.println(item);
+		assertNotNull(item);
+		item = reader.read();
+		// System.err.println(item);
+		assertNull(item);
 	}
 
 }
