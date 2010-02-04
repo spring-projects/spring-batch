@@ -1,117 +1,146 @@
 Manifest-Version: 1.0
-Bundle-Name: Spring Batch Infrastructure
+Export-Package: org.springframework.batch.classify;version="2.1.0.RC1"
+ ,org.springframework.batch.item;version="2.1.0.RC1",org.springframewo
+ rk.batch.item.adapter;version="2.1.0.RC1";uses:="org.springframework.
+ batch.item,org.springframework.beans.factory,org.springframework.util
+ ",org.springframework.batch.item.database;version="2.1.0.RC1";uses:="
+ com.ibatis.sqlmap.client,javax.persistence,javax.sql,org.hibernate,or
+ g.springframework.batch.item,org.springframework.batch.item.database.
+ orm,org.springframework.batch.item.support,org.springframework.beans.
+ factory,org.springframework.dao,org.springframework.jdbc.core,org.spr
+ ingframework.jdbc.core.namedparam,org.springframework.jdbc.core.simpl
+ e,org.springframework.jdbc.datasource,org.springframework.jdbc.object
+ ,org.springframework.jdbc.support,org.springframework.orm.hibernate3,
+ org.springframework.orm.ibatis",org.springframework.batch.item.databa
+ se.orm;version="2.1.0.RC1";uses:="javax.persistence,org.hibernate,org
+ .springframework.beans.factory",org.springframework.batch.item.databa
+ se.support;version="2.1.0.RC1";uses:="javax.sql,org.springframework.b
+ atch.item.database,org.springframework.beans.factory,org.springframew
+ ork.jdbc.support.incrementer",org.springframework.batch.item.file;ver
+ sion="2.1.0.RC1";uses:="org.springframework.batch.item,org.springfram
+ ework.batch.item.file.separator,org.springframework.batch.item.file.t
+ ransform,org.springframework.batch.item.support,org.springframework.b
+ atch.item.util,org.springframework.beans.factory,org.springframework.
+ core.io",org.springframework.batch.item.file.mapping;version="2.1.0.R
+ C1";uses:="org.springframework.batch.item.file,org.springframework.ba
+ tch.item.file.transform,org.springframework.batch.support,org.springf
+ ramework.beans.factory,org.springframework.validation",org.springfram
+ ework.batch.item.file.separator;version="2.1.0.RC1",org.springframewo
+ rk.batch.item.file.transform;version="2.1.0.RC1";uses:="org.springfra
+ mework.beans.factory,org.springframework.core.enums",org.springframew
+ ork.batch.item.jms;version="2.1.0.RC1";uses:="org.springframework.bat
+ ch.item,org.springframework.batch.retry.interceptor,org.springframewo
+ rk.beans.factory,org.springframework.jms.core",org.springframework.ba
+ tch.item.mail;version="2.1.0.RC1";uses:="org.springframework.batch.it
+ em,org.springframework.beans.factory,org.springframework.mail",org.sp
+ ringframework.batch.item.mail.javamail;version="2.1.0.RC1";uses:="org
+ .springframework.batch.item,org.springframework.batch.item.mail,org.s
+ pringframework.mail,org.springframework.mail.javamail",org.springfram
+ ework.batch.item.support;version="2.1.0.RC1";uses:="org.springframewo
+ rk.batch.classify,org.springframework.batch.item,org.springframework.
+ beans.factory",org.springframework.batch.item.util;version="2.1.0.RC1
+ ",org.springframework.batch.item.validator;version="2.1.0.RC1";uses:=
+ "org.springframework.batch.item,org.springframework.beans.factory,org
+ .springframework.validation",org.springframework.batch.item.xml;versi
+ on="2.1.0.RC1";uses:="javax.xml.stream,org.springframework.batch.item
+ ,org.springframework.batch.item.file,org.springframework.batch.item.s
+ upport,org.springframework.batch.item.util,org.springframework.beans.
+ factory,org.springframework.core.io,org.springframework.oxm",org.spri
+ ngframework.batch.item.xml.stax;version="2.1.0.RC1";uses:="javax.xml.
+ namespace,javax.xml.stream,javax.xml.stream.events",org.springframewo
+ rk.batch.poller;version="2.1.0.RC1",org.springframework.batch.repeat;
+ version="2.1.0.RC1";uses:="org.springframework.core",org.springframew
+ ork.batch.repeat.callback;version="2.1.0.RC1";uses:="org.springframew
+ ork.batch.repeat",org.springframework.batch.repeat.context;version="2
+ .1.0.RC1";uses:="org.springframework.batch.repeat,org.springframework
+ .core",org.springframework.batch.repeat.exception;version="2.1.0.RC1"
+ ;uses:="org.springframework.batch.classify,org.springframework.batch.
+ repeat,org.springframework.beans.factory",org.springframework.batch.r
+ epeat.interceptor;version="2.1.0.RC1";uses:="org.aopalliance.intercep
+ t,org.springframework.batch.repeat",org.springframework.batch.repeat.
+ listener;version="2.1.0.RC1";uses:="org.springframework.batch.repeat"
+ ,org.springframework.batch.repeat.policy;version="2.1.0.RC1";uses:="o
+ rg.springframework.batch.repeat,org.springframework.batch.repeat.cont
+ ext",org.springframework.batch.repeat.support;version="2.1.0.RC1";use
+ s:="org.springframework.batch.repeat,org.springframework.batch.repeat
+ .exception,org.springframework.core.task",org.springframework.batch.r
+ etry;version="2.1.0.RC1";uses:="org.springframework.core",org.springf
+ ramework.batch.retry.backoff;version="2.1.0.RC1";uses:="org.springfra
+ mework.batch.retry",org.springframework.batch.retry.context;version="
+ 2.1.0.RC1";uses:="org.springframework.batch.retry,org.springframework
+ .core",org.springframework.batch.retry.interceptor;version="2.1.0.RC1
+ ";uses:="org.aopalliance.intercept,org.springframework.batch.retry",o
+ rg.springframework.batch.retry.listener;version="2.1.0.RC1";uses:="or
+ g.springframework.batch.retry",org.springframework.batch.retry.policy
+ ;version="2.1.0.RC1";uses:="org.springframework.batch.classify,org.sp
+ ringframework.batch.retry,org.springframework.batch.retry.context",or
+ g.springframework.batch.retry.support;version="2.1.0.RC1";uses:="org.
+ springframework.batch.classify,org.springframework.batch.retry,org.sp
+ ringframework.batch.retry.backoff,org.springframework.batch.retry.pol
+ icy",org.springframework.batch.support;version="2.1.0.RC1";uses:="jav
+ ax.sql,org.springframework.beans,org.springframework.beans.factory,or
+ g.springframework.core.io,org.springframework.jdbc.support,org.spring
+ framework.util",org.springframework.batch.support.annotation;version=
+ "2.1.0.RC1",org.springframework.batch.support.transaction;version="2.
+ 1.0.RC1";uses:="org.aopalliance.intercept,org.springframework.transac
+ tion,org.springframework.transaction.support"
 Bundle-Classpath: .
-Archiver-Version: Plexus Archiver
-Build-Jdk: 1.6.0_03
 Built-By: dsyer
+Bundle-Name: Spring Batch Infrastructure
 Created-By: Apache Maven
+Bundle-Vendor: Spring
+Bundle-Version: 2.1.0.RC1
+Build-Jdk: 1.6.0_16
+Bundle-ManifestVersion: 2
 Import-Package: com.ibatis.sqlmap.client;version="[2.3.0,3.0.0)";resol
  ution:=optional,com.ibatis.sqlmap.engine.execution;version="[2.3.0,3.
- 0.0)";resolution:=optional,javax.jms,javax.persistence,javax.sql,java
- x.xml.namespace,javax.xml.stream,javax.xml.stream.events,javax.xml.tr
- ansform,org.aopalliance.aop;version="[1.0.0, 2.0.0)",org.aopalliance.
- intercept;version="[1.0.0, 2.0.0)",org.apache.commons.logging;version
- ="[1.1.0, 2.0.0)",org.hibernate;version="[3.2.5.ga, 3.3.0.ga)";resolu
- tion:=optional,org.hibernate.classic;version="[3.2.5.ga, 3.3.0.ga)";r
- esolution:=optional,org.springframework.aop;version="[2.5.5, 3.0.0)",
- org.springframework.aop.framework;version="[2.5.5, 3.0.0)",org.spring
- framework.aop.support;version="[2.5.5, 3.0.0)",org.springframework.be
- ans;version="[2.5.5, 3.0.0)",org.springframework.beans.factory;versio
- n="[2.5.5, 3.0.0)",org.springframework.core;version="[2.5.5, 3.0.0)",
- org.springframework.core.enums;version="[2.5.5, 3.0.0)",org.springfra
- mework.core.io;version="[2.5.5, 3.0.0)",org.springframework.core.task
- ;version="[2.5.5, 3.0.0)",org.springframework.dao;version="[2.5.5, 3.
- 0.0)";resolution:=optional,org.springframework.jdbc;version="[2.5.5, 
- 3.0.0)";resolution:=optional,org.springframework.jdbc.core;version="[
- 2.5.5, 3.0.0)";resolution:=optional,org.springframework.jdbc.core.nam
- edparam;version="[2.5.5, 3.0.0)";resolution:=optional,org.springframe
- work.jdbc.core.simple;version="[2.5.5, 3.0.0)";resolution:=optional,o
- rg.springframework.jdbc.datasource;version="[2.5.5, 3.0.0)";resolutio
- n:=optional,org.springframework.jdbc.support;version="[2.5.5, 3.0.0)"
- ;resolution:=optional,org.springframework.jdbc.support.incrementer;ve
- rsion="[2.5.5, 3.0.0)";resolution:=optional,org.springframework.jms;v
- ersion="[2.5.5, 3.0.0)";resolution:=optional,org.springframework.jms.
- core;version="[2.5.5, 3.0.0)";resolution:=optional,org.springframewor
- k.orm.hibernate3;version="[2.5.5, 3.0.0)";resolution:=optional,org.sp
- ringframework.orm.ibatis;version="[2.5.5, 3.0.0)";resolution:=optiona
- l,org.springframework.orm.jpa;version="[2.5.5, 3.0.0)";resolution:=op
- tional,org.springframework.oxm;version="[1.5.5, 2.0.0)";resolution:=o
- ptional,org.springframework.transaction;version="[2.5.5, 3.0.0)";reso
- lution:=optional,org.springframework.transaction.support;version="[2.
- 5.5, 3.0.0)";resolution:=optional,org.springframework.util;version="[
- 2.5.5, 3.0.0)";resolution:=optional,org.springframework.validation;ve
- rsion="[2.5.5, 3.0.0)";resolution:=optional,org.springframework.xml.t
- ransform;version="[1.5.5, 2.0.0)";resolution:=optional
-Bundle-Vendor: Spring
+ 0.0)";resolution:=optional,javax.jms;version="0";resolution:=optional
+ ,javax.mail.internet;version="0";resolution:=optional,javax.persisten
+ ce;version="0";resolution:=optional,javax.sql;version="0";resolution:
+ =optional,javax.xml.namespace;version="0";resolution:=optional,javax.
+ xml.stream;version="0";resolution:=optional,javax.xml.stream.events;v
+ ersion="0";resolution:=optional,javax.xml.transform;version="0";resol
+ ution:=optional,org.aopalliance.aop;version="[1.0.0, 2.0.0)",org.aopa
+ lliance.intercept;version="[1.0.0, 2.0.0)",org.apache.commons.logging
+ ;version="[1.1.0, 2.0.0)",org.codehaus.jackson;version="[1.0.1,1.1)";
+ resolution:=optional,org.codehaus.jackson.map;version="[1.0.1,1.1)";r
+ esolution:=optional,org.hibernate;version="[3.2.5.ga, 3.3.0.ga)";reso
+ lution:=optional,org.hibernate.classic;version="[3.2.5.ga, 3.3.0.ga)"
+ ;resolution:=optional,org.springframework.aop;version="[2.5.5, 4.0.0)
+ ",org.springframework.aop.framework;version="[2.5.5, 4.0.0)",org.spri
+ ngframework.aop.support;version="[2.5.5, 4.0.0)",org.springframework.
+ beans;version="[2.5.5, 4.0.0)",org.springframework.beans.factory;vers
+ ion="[2.5.5, 4.0.0)",org.springframework.core;version="[2.5.5, 4.0.0)
+ ",org.springframework.core.annotation;version="[2.5.5, 4.0.0)",org.sp
+ ringframework.core.enums;version="[2.5.5, 4.0.0)",org.springframework
+ .core.io;version="[2.5.5, 4.0.0)",org.springframework.core.task;versi
+ on="[2.5.5, 4.0.0)",org.springframework.dao;version="[2.5.5, 4.0.0)";
+ resolution:=optional,org.springframework.jdbc;version="[2.5.5, 4.0.0)
+ ";resolution:=optional,org.springframework.jdbc.core;version="[2.5.5,
+  4.0.0)";resolution:=optional,org.springframework.jdbc.core.metadata;
+ version="[2.5.5, 4.0.0)";resolution:=optional,org.springframework.jdb
+ c.core.namedparam;version="[2.5.5, 4.0.0)";resolution:=optional,org.s
+ pringframework.jdbc.core.simple;version="[2.5.5, 4.0.0)";resolution:=
+ optional,org.springframework.jdbc.datasource;version="[2.5.5, 4.0.0)"
+ ;resolution:=optional,org.springframework.jdbc.object;version="[2.5.5
+ , 4.0.0)";resolution:=optional,org.springframework.jdbc.support;versi
+ on="[2.5.5, 4.0.0)";resolution:=optional,org.springframework.jdbc.sup
+ port.incrementer;version="[2.5.5, 4.0.0)";resolution:=optional,org.sp
+ ringframework.jms;version="[2.5.5, 4.0.0)";resolution:=optional,org.s
+ pringframework.jms.core;version="[2.5.5, 4.0.0)";resolution:=optional
+ ,org.springframework.mail;version="[2.5.5, 4.0.0)";resolution:=option
+ al,org.springframework.mail.javamail;version="[2.5.5, 4.0.0)";resolut
+ ion:=optional,org.springframework.orm.hibernate3;version="[2.5.5, 4.0
+ .0)";resolution:=optional,org.springframework.orm.ibatis;version="[2.
+ 5.5, 4.0.0)";resolution:=optional,org.springframework.orm.jpa;version
+ ="[2.5.5, 4.0.0)";resolution:=optional,org.springframework.oxm;versio
+ n="[1.5.5, 2.0.0)";resolution:=optional,org.springframework.transacti
+ on;version="[2.5.5, 4.0.0)";resolution:=optional,org.springframework.
+ transaction.support;version="[2.5.5, 4.0.0)";resolution:=optional,org
+ .springframework.util;version="[2.5.5, 4.0.0)";resolution:=optional,o
+ rg.springframework.validation;version="[2.5.5, 4.0.0)";resolution:=op
+ tional,org.springframework.xml.transform;version="[1.5.5, 2.0.0)";res
+ olution:=optional
 Bundle-SymbolicName: org.springframework.batch.infrastructure
-Export-Package: org.springframework.batch.item;version="0",org.springf
- ramework.batch.item.adapter;version="0";uses:="org.springframework.ba
- tch.item,org.springframework.beans.factory",org.springframework.batch
- .item.database;version="0";uses:="com.ibatis.sqlmap.client,javax.pers
- istence,javax.sql,org.hibernate,org.springframework.batch.item,org.sp
- ringframework.batch.item.support,org.springframework.beans.factory,or
- g.springframework.dao,org.springframework.jdbc.core,org.springframewo
- rk.jdbc.core.namedparam,org.springframework.jdbc.core.simple,org.spri
- ngframework.jdbc.datasource,org.springframework.jdbc.support,org.spri
- ngframework.orm.hibernate3,org.springframework.orm.ibatis",org.spring
- framework.batch.item.database.support;version="0";uses:="com.ibatis.s
- qlmap.client,javax.sql,org.springframework.batch.item,org.springframe
- work.batch.item.database,org.springframework.batch.item.util,org.spri
- ngframework.beans.factory,org.springframework.jdbc.core,org.springfra
- mework.jdbc.support.incrementer,org.springframework.orm.ibatis",org.s
- pringframework.batch.item.file;version="0";uses:="org.springframework
- .batch.item,org.springframework.batch.item.file.mapping,org.springfra
- mework.batch.item.file.separator,org.springframework.batch.item.file.
- transform,org.springframework.batch.item.support,org.springframework.
- batch.item.util,org.springframework.beans.factory,org.springframework
- .core.io",org.springframework.batch.item.file.mapping;version="0";use
- s:="org.springframework.batch.item.file.transform,org.springframework
- .batch.support,org.springframework.beans.factory,org.springframework.
- validation",org.springframework.batch.item.file.separator;version="0"
- ,org.springframework.batch.item.file.transform;version="0";uses:="org
- .springframework.beans.factory,org.springframework.core.enums",org.sp
- ringframework.batch.item.jms;version="0";uses:="org.springframework.b
- atch.item,org.springframework.batch.retry.interceptor,org.springframe
- work.jms.core",org.springframework.batch.item.support;version="0";use
- s:="org.springframework.batch.item,org.springframework.beans.factory"
- ,org.springframework.batch.item.util;version="0",org.springframework.
- batch.item.validator;version="0";uses:="org.springframework.batch.ite
- m,org.springframework.beans.factory,org.springframework.validation",o
- rg.springframework.batch.item.xml;version="0";uses:="javax.xml.stream
- ,org.springframework.batch.item,org.springframework.batch.item.file,o
- rg.springframework.batch.item.support,org.springframework.batch.item.
- util,org.springframework.beans.factory,org.springframework.core.io,or
- g.springframework.oxm",org.springframework.batch.item.xml.stax;versio
- n="0";uses:="javax.xml.namespace,javax.xml.stream,javax.xml.stream.ev
- ents",org.springframework.batch.repeat;version="0";uses:="org.springf
- ramework.core",org.springframework.batch.repeat.callback;version="0";
- uses:="org.springframework.batch.repeat",org.springframework.batch.re
- peat.context;version="0";uses:="org.springframework.batch.repeat,org.
- springframework.core",org.springframework.batch.repeat.exception;vers
- ion="0";uses:="org.springframework.batch.repeat,org.springframework.b
- atch.support,org.springframework.beans.factory",org.springframework.b
- atch.repeat.interceptor;version="0";uses:="org.aopalliance.intercept,
- org.springframework.batch.repeat",org.springframework.batch.repeat.li
- stener;version="0";uses:="org.springframework.batch.repeat",org.sprin
- gframework.batch.repeat.policy;version="0";uses:="org.springframework
- .batch.repeat,org.springframework.batch.repeat.context",org.springfra
- mework.batch.repeat.support;version="0";uses:="org.springframework.ba
- tch.repeat,org.springframework.batch.repeat.exception,org.springframe
- work.core.task",org.springframework.batch.retry;version="0";uses:="or
- g.springframework.core",org.springframework.batch.retry.backoff;versi
- on="0";uses:="org.springframework.batch.retry",org.springframework.ba
- tch.retry.context;version="0";uses:="org.springframework.batch.retry,
- org.springframework.core",org.springframework.batch.retry.interceptor
- ;version="0";uses:="org.aopalliance.intercept,org.springframework.bat
- ch.retry",org.springframework.batch.retry.listener;version="0";uses:=
- "org.springframework.batch.retry",org.springframework.batch.retry.pol
- icy;version="0";uses:="org.springframework.batch.retry,org.springfram
- ework.batch.retry.context,org.springframework.batch.support",org.spri
- ngframework.batch.retry.support;version="0";uses:="org.springframewor
- k.batch.retry,org.springframework.batch.retry.backoff,org.springframe
- work.batch.retry.policy,org.springframework.batch.support",org.spring
- framework.batch.support;version="0";uses:="javax.sql,org.springframew
- ork.beans,org.springframework.beans.factory,org.springframework.jdbc.
- support",org.springframework.batch.support.transaction;version="0";us
- es:="org.aopalliance.intercept,org.springframework.transaction,org.sp
- ringframework.transaction.support"
+Archiver-Version: Plexus Archiver
+
