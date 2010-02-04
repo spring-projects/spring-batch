@@ -7,7 +7,7 @@
 	<parent>
 		<groupId>org.springframework.batch</groupId>
 		<artifactId>spring-batch-parent</artifactId>
-		<version>2.1.0.RELEASE</version>
+		<version>2.1.1.CI-SNAPSHOT</version>
 		<relativePath>../spring-batch-parent</relativePath>
 	</parent>
 	<profiles>
@@ -74,7 +74,7 @@
 		<dependency>
 			<groupId>org.springframework.batch</groupId>
 			<artifactId>spring-batch-infrastructure</artifactId>
-			<version>2.1.0.RELEASE </version>
+			<version>2.1.1.CI-SNAPSHOT </version>
 		</dependency>
 		<dependency>
 			<groupId>hsqldb</groupId>
