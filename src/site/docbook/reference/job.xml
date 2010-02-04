@@ -242,8 +242,8 @@ catch (JobRestartException e) {
     available:</para>
 
     <programlisting>&lt;job-repository id="jobRepository"
-    dataSource="dataSource"
-    transactionManager="transactionManager"
+    data-source="dataSource"
+    transaction-manager="transactionManager"
     isolation-level-for-create="SERIALIZABLE"
     table-prefix="BATCH_"
 /&gt;</programlisting>

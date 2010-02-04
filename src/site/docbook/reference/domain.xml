@@ -6,7 +6,7 @@
 
   <para>To any experienced batch architect, the overall concepts of batch
   processing used in Spring Batch should be familiar and comfortable. There
-  are “Jobs” and “Steps” and developer supplied processing units called
+  are "Jobs" and "Steps" and developer supplied processing units called
   ItemReaders and ItemWriters. However, because of the Spring patterns,
   operations, templates, callbacks, and idioms, there are opportunities for
   the following:<itemizedlist>
