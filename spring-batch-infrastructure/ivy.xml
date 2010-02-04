@@ -40,7 +40,8 @@
 		<dependency org="javax.persistence" name="com.springsource.javax.persistence" rev="1.0.0" conf="optional->runtime,provided"/>
 		<dependency org="org.springframework.ws" name="org.springframework.oxm" rev="1.5.5.A" conf="optional->runtime,provided"/>
 		<dependency org="org.springframework" name="org.springframework.aop" rev="2.5.6.A" conf="optional->runtime,provided"/>
-		<dependency org="org.springframework" name="org.springframework.context.support" rev="2.5.6.A" conf="compile->runtime,provided"/>
+		<dependency org="org.springframework" name="org.springframework.context.support" rev="2.5.6.A" conf="optional->runtime,provided"/>
+		<dependency org="org.springframework" name="org.springframework.context.support" rev="2.5.6.A" conf="optional->runtime,provided"/>
 		<dependency org="org.springframework" name="org.springframework.core" rev="2.5.6.A" conf="compile->runtime,provided"/>
 		<dependency org="org.springframework" name="org.springframework.jdbc" rev="2.5.6.A" conf="optional->runtime,provided"/>
 		<dependency org="org.springframework" name="org.springframework.jms" rev="2.5.6.A" conf="optional->runtime,provided"/>
