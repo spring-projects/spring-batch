@@ -21,7 +21,7 @@
 		<dependency org="org.springframework.batch" name="org.springframework.batch.core" rev="latest.integration"
 			conf="compile->runtime,provided" />
 		<dependency org="org.junit" name="com.springsource.org.junit" rev="4.4.0" conf="compile->runtime,provided" />
-		<dependency org="org.springframework" name="org.springframework.test" rev="2.5.6.A" conf="test->runtime,provided" />
+		<dependency org="org.springframework" name="org.springframework.test" rev="2.5.6.A" conf="compile->runtime,provided" />
 		<dependency org="org.springframework" name="org.springframework.jdbc" rev="2.5.6.A" conf="compile->runtime,provided" />
 		<dependency org="org.apache.commons" name="com.springsource.org.apache.commons.io" rev="1.4.0"
 			conf="compile->runtime,provided" />
