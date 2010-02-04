@@ -151,8 +151,11 @@ public class StoredProcedureItemReader<T> extends AbstractCursorItemReader<T> {
 	protected void openCursor(Connection con) {	
 
 		Assert.state(procedureName != null, "Procedure Name must not be null.");
-		Assert.state(refCursorPosition == 0 || refCursorPosition > parameters.length, 
-				"refCursorPosition specified as " + refCursorPosition + " but there are only " + 
+		Assert.state(refCursorPosition >= 0, 
+				"invalid refCursorPosition specified as " + refCursorPosition + "; it can't be " +
+				"specified as a negative number.");
+		Assert.state(refCursorPosition == 0 || refCursorPosition > 0, 
+				"invalid refCursorPosition specified as " + refCursorPosition + "; there are " + 
 				parameters.length + " parameters defined.");
 
 		CallMetaDataContext callContext = new CallMetaDataContext();
