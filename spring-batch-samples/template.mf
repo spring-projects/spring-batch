@@ -1,0 +1,11 @@
+Manifest-Version: 1.0
+Bundle-SymbolicName: org.springframework.batch.samples
+Bundle-Name: Spring Batch Samples
+Bundle-Vendor: Spring
+Bundle-Version: ${version}
+Bundle-ManifestVersion: 2
+Ignored-Existing-Headers: 
+ Import-Package,
+ Export-Package
+Import-Template: 
+ *;version="0"
