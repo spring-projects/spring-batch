@@ -228,19 +228,12 @@
 			</snapshots>
 		</pluginRepository>
 		<pluginRepository>
-			<id>com.springsource.repository.bundles.milestone</id>
-			<name>        SpringSource Enterprise Bundle Repository -				SpringSource Bundle Milestones
-      </name>
-			<url>http://repository.springsource.com/maven/bundles/milestone</url>
+			<id>com.springsource.repository.bundles.release</id>
+			<name> SpringSource Enterprise Bundle Repository - SpringSource Bundle Releases</name>
+			<url>http://repository.springsource.com/maven/bundles/release</url>
 			<snapshots>
 				<enabled>false</enabled>
 			</snapshots>
-		</pluginRepository>
-		<pluginRepository>
-			<id>com.springsource.repository.bundles.snapshots</id>
-			<name>        SpringSource Enterprise Bundle Repository -				SpringSource Bundle Snapshots
-      </name>
-			<url>http://repository.springsource.com/maven/bundles/snapshot</url>
 		</pluginRepository>
 	</pluginRepositories>
 	<distributionManagement>
