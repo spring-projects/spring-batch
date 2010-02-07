@@ -8,8 +8,11 @@
 	<packaging>jar</packaging>
 	<name>Commandline</name>
 	<url>http://www.springframework.org/spring-batch/archetypes/simple-cli-archetype</url>
-	<description>    This project is a minimal command line batch sample from      Spring Batch.  Once installed you can use "mvn exec:java" to       see the job run; or if you ship the lib directory you can put      the project jar on the classpath and run the      CommandLineJobRunner directly or with "java -jar".
-  </description>
+	<description>This project is a minimal command line batch sample from
+	Spring Batch.  Once installed you can use "mvn exec:java" to
+	see the job run; or if you ship the lib directory you can put
+	the project jar on the classpath and run the
+	CommandLineJobRunner directly or with "java -jar".</description>
 	<properties>
 		<maven.test.failure.ignore>true</maven.test.failure.ignore>
 		<spring.framework.version>2.5.6</spring.framework.version>
@@ -125,15 +128,6 @@
 						<descriptorRefs>
 							<descriptorRef>project</descriptorRef>
 						</descriptorRefs>
-					</configuration>
-				</plugin>
-				<plugin>
-					<artifactId>maven-jar-plugin</artifactId>
-					<version>2.3</version>
-					<configuration>
-						<archive>
-							<manifestFile>${project.build.outputDirectory}/META-INF/MANIFEST.MF</manifestFile>
-						</archive>
 					</configuration>
 				</plugin>
 			</plugins>
