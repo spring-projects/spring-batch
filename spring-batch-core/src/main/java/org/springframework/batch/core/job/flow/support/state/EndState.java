@@ -16,6 +16,8 @@
 
 package org.springframework.batch.core.job.flow.support.state;
 
+import org.springframework.batch.core.BatchStatus;
+import org.springframework.batch.core.StepExecution;
 import org.springframework.batch.core.job.flow.FlowExecutionStatus;
 import org.springframework.batch.core.job.flow.FlowExecutor;
 import org.springframework.batch.core.job.flow.State;
@@ -72,7 +74,15 @@ public class EndState extends AbstractState {
 	 */
 	@Override
 	public FlowExecutionStatus handle(FlowExecutor executor) throws Exception {
+
 		synchronized (executor) {
+
+			// Special case. If the last step execution could not complete we
+			// are in an unknown state (possibly unrecoverable).
+			StepExecution stepExecution = executor.getStepExecution();
+			if (stepExecution != null && executor.getStepExecution().getStatus() == BatchStatus.UNKNOWN) {
+				return FlowExecutionStatus.UNKNOWN;
+			}
 
 			if (status.isStop()) {
 				if (!executor.isRestart()) {
@@ -104,7 +114,9 @@ public class EndState extends AbstractState {
 		}
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.springframework.batch.core.job.flow.State#isEndState()
 	 */
 	public boolean isEndState() {

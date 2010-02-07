@@ -29,7 +29,7 @@
 	</bean>
 
 	<beans:bean id="taskExecutor"
-		class="org.springframework.core.task.SimpleAsyncTaskExecutor" />
+		class="org.springframework.core.task.SyncTaskExecutor" />
 
 	<beans:bean id="partitioner"
 		class="org.springframework.batch.core.partition.support.SimplePartitioner" />
