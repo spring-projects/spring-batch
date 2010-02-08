@@ -69,13 +69,19 @@ public class FlowJob extends AbstractJob {
 	public Step getStep(String stepName) {
 		State state = this.flow.getState(stepName);
 		if (state instanceof StepHolder) {
-			return ((StepHolder) state).getStep();
+			Step step = ((StepHolder) state).getStep();
+			if (stepName.equals(step.getName())) {
+				return step;
+			}
 		}
 		// The state names can be prefixed with the job name for
 		// uniqueness...
-		state = this.flow.getState(getName()+"."+stepName);
+		state = this.flow.getState(getName() + "." + stepName);
 		if (state instanceof StepHolder) {
-			return ((StepHolder) state).getStep();
+			Step step = ((StepHolder) state).getStep();
+			if (stepName.equals(step.getName())) {
+				return step;
+			}
 		}
 		return null;
 	}
@@ -88,7 +94,8 @@ public class FlowJob extends AbstractJob {
 		Collection<String> steps = new HashSet<String>();
 		for (State state : flow.getStates()) {
 			if (state instanceof StepHolder) {
-				steps.add(state.getName());
+				String name = ((StepHolder) state).getStep().getName();
+				steps.add(name);
 			}
 		}
 		return steps;
@@ -100,8 +107,8 @@ public class FlowJob extends AbstractJob {
 	@Override
 	protected void doExecute(final JobExecution execution) throws JobExecutionException {
 		try {
-			JobFlowExecutor executor = new JobFlowExecutor(getJobRepository(), new SimpleStepHandler(getJobRepository()),
-					execution);
+			JobFlowExecutor executor = new JobFlowExecutor(getJobRepository(),
+					new SimpleStepHandler(getJobRepository()), execution);
 			executor.updateJobExecutionStatus(flow.start(executor).getStatus());
 		}
 		catch (FlowExecutionException e) {

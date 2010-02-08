@@ -536,6 +536,21 @@ public class FlowJobTests {
 	}
 
 	@Test
+	public void testGetStepNamesWithPrefix() throws Exception {
+		SimpleFlow flow = new SimpleFlow("job");
+		List<StateTransition> transitions = new ArrayList<StateTransition>();
+		transitions.add(StateTransition.createStateTransition(new StepState("job.step", new StubStep("step")), "end0"));
+		transitions.add(StateTransition.createEndStateTransition(new EndState(FlowExecutionStatus.COMPLETED, "end0")));
+		flow.setStateTransitions(transitions);
+		flow.afterPropertiesSet();
+		job.setFlow(flow);
+		job.setName(flow.getName());
+		job.afterPropertiesSet();
+
+		assertEquals("[step]", job.getStepNames().toString());
+	}
+
+	@Test
 	public void testGetStepNotExists() throws Exception {
 		SimpleFlow flow = new SimpleFlow("job");
 		List<StateTransition> transitions = new ArrayList<StateTransition>();
