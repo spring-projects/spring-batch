@@ -15,7 +15,7 @@
  */
 package org.springframework.batch.core.configuration.xml;
 
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.assertEquals;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -37,26 +37,28 @@ import org.springframework.core.io.Resource;
 import org.springframework.core.io.support.ResourceArrayPropertyEditor;
 import org.springframework.util.ClassUtils;
 
-
 @RunWith(Parameterized.class)
 public class StepNameTests {
-	
+
 	private Map<String, StepLocator> stepLocators = new HashMap<String, StepLocator>();
+
 	private ApplicationContext context;
 
 	public StepNameTests(Resource resource) throws Exception {
 		try {
-			context = new FileSystemXmlApplicationContext("file:///"+resource.getFile().getAbsolutePath());
-		} catch (BeanDefinitionParsingException e) {
+			context = new FileSystemXmlApplicationContext("file:///" + resource.getFile().getAbsolutePath());
+		}
+		catch (BeanDefinitionParsingException e) {
 			return;
-		} catch (BeanCreationException e) {
+		}
+		catch (BeanCreationException e) {
 			return;
 		}
 		@SuppressWarnings("unchecked")
-		Map<String,StepLocator> stepLocators = context.getBeansOfType(StepLocator.class);
+		Map<String, StepLocator> stepLocators = context.getBeansOfType(StepLocator.class);
 		this.stepLocators = stepLocators;
 	}
-	
+
 	@Test
 	public void testStepNames() throws Exception {
 		for (String name : stepLocators.keySet()) {
@@ -64,8 +66,10 @@ public class StepNameTests {
 			Collection<String> stepNames = stepLocator.getStepNames();
 			Job job = (Job) context.getBean(name);
 			String jobName = job.getName();
-			for (String stepName : stepNames) {
-				assertTrue("Step name does not start with job name: "+stepName+", "+jobName, stepName.startsWith(jobName));
+			for (String registeredName : stepNames) {
+				String stepName = stepLocator.getStep(registeredName).getName();
+				assertEquals("Step name not equal to registered value: " + stepName + "!=" + registeredName + ", " + jobName,
+						stepName, registeredName);
 			}
 		}
 	}
@@ -74,13 +78,13 @@ public class StepNameTests {
 	public static List<Object[]> data() throws Exception {
 		List<Object[]> list = new ArrayList<Object[]>();
 		ResourceArrayPropertyEditor editor = new ResourceArrayPropertyEditor();
-		editor.setAsText("classpath*:"+ClassUtils.addResourcePathToPackagePath(StepNameTests.class, "*.xml"));
+		editor.setAsText("classpath*:" + ClassUtils.addResourcePathToPackagePath(StepNameTests.class, "*.xml"));
 		Resource[] resources = (Resource[]) editor.getValue();
 		for (Resource resource : resources) {
 			if (resource.getFile().getName().contains("WrongSchema")) {
 				continue;
 			}
-			list.add(new Object[] {resource});
+			list.add(new Object[] { resource });
 		}
 		return list;
 	}
