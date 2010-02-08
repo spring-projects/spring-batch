@@ -58,10 +58,10 @@ public class StepWithSimpleTaskJobParserTests {
 		assertTrue(job instanceof FlowJob);
 		JobExecution jobExecution = jobRepository.createJobExecution(job.getName(), new JobParameters());
 
-		TestTasklet t1 = assertTasklet(job, "job.step1", "t1");
-		TestTasklet t2 = assertTasklet(job, "job.step2", "t2");
-		TestTasklet t3 = assertTasklet(job, "job.step3", "t3");
-		TestTasklet t4 = assertTasklet(job, "job.step4", "t4");
+		TestTasklet t1 = assertTasklet(job, "step1", "t1");
+		TestTasklet t2 = assertTasklet(job, "step2", "t2");
+		TestTasklet t3 = assertTasklet(job, "step3", "t3");
+		TestTasklet t4 = assertTasklet(job, "step4", "t4");
 
 		job.execute(jobExecution);
 
