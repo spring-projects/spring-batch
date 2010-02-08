@@ -71,6 +71,12 @@ public class FlowJob extends AbstractJob {
 		if (state instanceof StepHolder) {
 			return ((StepHolder) state).getStep();
 		}
+		// The state names can be prefixed with the job name for
+		// uniqueness...
+		state = this.flow.getState(getName()+"."+stepName);
+		if (state instanceof StepHolder) {
+			return ((StepHolder) state).getStep();
+		}
 		return null;
 	}
 
