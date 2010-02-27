@@ -25,7 +25,6 @@ import org.hibernate.ScrollableResults;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.StatelessSession;
-import org.springframework.batch.item.database.orm.AbstractHibernateQueryProvider;
 import org.springframework.batch.item.database.orm.HibernateQueryProvider;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.util.Assert;
@@ -106,8 +105,7 @@ public class HibernateItemReaderHelper<T> implements InitializingBean {
 		}
 		// making sure that the appropriate (Hibernate) query provider is set
 		else {
-			Assert.state(queryProvider instanceof AbstractHibernateQueryProvider,
-					"Hibernate query provider must be set");
+			Assert.state(queryProvider != null, "Hibernate query provider must be set");
 		}
 
 	}
@@ -134,8 +132,8 @@ public class HibernateItemReaderHelper<T> implements InitializingBean {
 	public Query createQuery() {
 
 		if (useStatelessSession) {
-			if (statelessSession==null) {
-				statelessSession = sessionFactory.openStatelessSession();				
+			if (statelessSession == null) {
+				statelessSession = sessionFactory.openStatelessSession();
 			}
 			if (queryProvider != null) {
 				queryProvider.setStatelessSession(statelessSession);
@@ -150,7 +148,7 @@ public class HibernateItemReaderHelper<T> implements InitializingBean {
 			}
 		}
 		else {
-			if (statefulSession==null) {				
+			if (statefulSession == null) {
 				statefulSession = sessionFactory.openSession();
 			}
 			if (queryProvider != null) {
