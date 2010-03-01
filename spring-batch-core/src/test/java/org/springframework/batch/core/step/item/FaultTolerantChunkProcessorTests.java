@@ -155,6 +155,30 @@ public class FaultTolerantChunkProcessorTests {
 	}
 
 	@Test
+	public void testWriteSkipOnExceptionWithTrivialChunk() throws Exception {
+		processor.setWriteSkipPolicy(new AlwaysSkipItemSkipPolicy());
+		processor.setItemWriter(new ItemWriter<String>() {
+			public void write(List<? extends String> items) throws Exception {
+				if (items.contains("fail")) {
+					throw new RuntimeException("Expected Exception!");
+				}
+			}
+		});
+		Chunk<String> inputs = new Chunk<String>(Arrays.asList("fail"));
+		try {
+			processor.process(contribution, inputs);
+			fail("Expected RuntimeException");
+		}
+		catch (RuntimeException e) {
+			assertEquals("Expected Exception!", e.getMessage());
+		}
+		processor.process(contribution, inputs);
+		assertEquals(1, contribution.getSkipCount());
+		assertEquals(0, contribution.getWriteCount());
+		assertEquals(0, contribution.getFilterCount());
+	}
+
+	@Test
 	public void testTransformWithExceptionAndNoRollback() throws Exception {
 		processor.setItemProcessor(new ItemProcessor<String, String>() {
 			public String process(String item) throws Exception {
@@ -200,11 +224,11 @@ public class FaultTolerantChunkProcessorTests {
 		assertEquals(1, chunk.getItems().size());
 		processor.process(contribution, chunk);
 		assertEquals(0, chunk.getItems().size());
-		// foo is written twice because the failure is detected on the second
-		// attempt when throttling
+		// foo is written once because it the failure is detected before it is
+		// committed the first time
 		assertEquals("[foo, bar]", list.toString());
-		// but the after listener is only called once, which is important
-		assertEquals(2, after.size());
+		// the after listener is called once per successful item, which is important
+		assertEquals("[foo, bar]", after.toString());
 	}
 
 	@Test

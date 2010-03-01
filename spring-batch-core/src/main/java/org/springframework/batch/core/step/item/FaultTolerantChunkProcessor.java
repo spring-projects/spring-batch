@@ -208,7 +208,7 @@ public class FaultTolerantChunkProcessor<I, O> extends SimpleChunkProcessor<I, O
 					O output = null;
 					try {
 						count.incrementAndGet();
-						O cached = (cacheIterator != null&& cacheIterator.hasNext()) ? cacheIterator.next() : null;
+						O cached = (cacheIterator != null && cacheIterator.hasNext()) ? cacheIterator.next() : null;
 						if (cached != null && count.get() > scanLimit) {
 							/*
 							 * If there is a cached chunk then we must be
@@ -221,7 +221,7 @@ public class FaultTolerantChunkProcessor<I, O> extends SimpleChunkProcessor<I, O
 						}
 						else {
 							output = doProcess(item);
-							if (!processorTransactional) { 
+							if (!processorTransactional) {
 								cache.add(output);
 							}
 						}
@@ -376,6 +376,12 @@ public class FaultTolerantChunkProcessor<I, O> extends SimpleChunkProcessor<I, O
 						throw new ExhaustedRetryException(
 								"Retry exhausted after last attempt in recovery path, but exception is not skippable.",
 								context.getLastThrowable());
+					}
+					
+					if (inputs.size()==1 && outputs.getSkips().isEmpty()) {
+						// Optimization for trivial chunk size: no need to scan
+						checkSkipPolicy(inputs.iterator(), outputs.iterator(), context.getLastThrowable(), contribution);
+						return null;
 					}
 
 					inputs.setBusy(true);
