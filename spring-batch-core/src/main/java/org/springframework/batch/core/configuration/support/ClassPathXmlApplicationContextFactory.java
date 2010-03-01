@@ -16,6 +16,7 @@
 
 package org.springframework.batch.core.configuration.support;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -205,6 +206,7 @@ public class ClassPathXmlApplicationContextFactory implements ApplicationContext
 		 */
 		public ResourceXmlApplicationContext(ConfigurableApplicationContext parent) {
 			super(parent);
+			setId(generateId(resource));
 			if (parent != null) {
 				Assert.isTrue(parent.getBeanFactory() instanceof DefaultListableBeanFactory,
 						"The parent application context must have a bean factory of type DefaultListableBeanFactory");
@@ -216,6 +218,19 @@ public class ClassPathXmlApplicationContextFactory implements ApplicationContext
 				parentBeanFactory = null;
 			}
 			refresh();
+		}
+
+		/**
+		 * @param resource
+		 * @return an identifier for the context
+		 */
+		private String generateId(Resource resource) {
+			try {
+				return resource.getURI().toString();
+			}
+			catch (IOException e) {
+				return resource.toString();
+			}
 		}
 
 		@Override

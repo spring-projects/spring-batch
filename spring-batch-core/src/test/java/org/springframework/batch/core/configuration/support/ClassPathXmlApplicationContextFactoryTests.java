@@ -17,6 +17,7 @@ package org.springframework.batch.core.configuration.support;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 import org.junit.Test;
 import org.springframework.batch.core.Job;
@@ -39,7 +40,9 @@ public class ClassPathXmlApplicationContextFactoryTests {
 	public void testCreateJob() {
 		factory.setResource(new ClassPathResource(ClassUtils.addResourcePathToPackagePath(getClass(),
 				"trivial-context.xml")));
-		assertNotNull(factory.createApplicationContext());
+		ConfigurableApplicationContext context = factory.createApplicationContext();
+		assertNotNull(context);
+		assertTrue("Wrong id: "+context, context.getId().contains("trivial-context.xml"));
 	}
 
 	@Test
