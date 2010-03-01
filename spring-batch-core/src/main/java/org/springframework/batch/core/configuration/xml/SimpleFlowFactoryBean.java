@@ -1,10 +1,14 @@
 package org.springframework.batch.core.configuration.xml;
 
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 
+import org.springframework.batch.core.job.flow.Flow;
 import org.springframework.batch.core.job.flow.FlowExecutionStatus;
 import org.springframework.batch.core.job.flow.FlowExecutor;
+import org.springframework.batch.core.job.flow.FlowHolder;
 import org.springframework.batch.core.job.flow.State;
 import org.springframework.batch.core.job.flow.support.SimpleFlow;
 import org.springframework.batch.core.job.flow.support.StateTransition;
@@ -68,7 +72,8 @@ public class SimpleFlowFactoryBean implements FactoryBean, InitializingBean {
 		List<StateTransition> updatedTransitions = new ArrayList<StateTransition>();
 		for (StateTransition stateTransition : stateTransitions) {
 			State state = getProxyState(stateTransition.getState());
-			updatedTransitions.add(StateTransition.switchOriginAndDestination(stateTransition, state, getNext(stateTransition.getNext())));
+			updatedTransitions.add(StateTransition.switchOriginAndDestination(stateTransition, state,
+					getNext(stateTransition.getNext())));
 		}
 
 		flow.setStateTransitions(updatedTransitions);
@@ -119,7 +124,7 @@ public class SimpleFlowFactoryBean implements FactoryBean, InitializingBean {
 	 * @author Dave Syer
 	 * 
 	 */
-	private static class DelegateState extends AbstractState {
+	private static class DelegateState extends AbstractState implements FlowHolder {
 		private final State state;
 
 		private DelegateState(String name, State state) {
@@ -135,6 +140,11 @@ public class SimpleFlowFactoryBean implements FactoryBean, InitializingBean {
 		public FlowExecutionStatus handle(FlowExecutor executor) throws Exception {
 			return state.handle(executor);
 		}
+
+		public Collection<Flow> getFlows() {
+			return (state instanceof FlowHolder) ? ((FlowHolder)state).getFlows() : Collections.<Flow>emptyList();
+		}
+		
 	}
 
 }

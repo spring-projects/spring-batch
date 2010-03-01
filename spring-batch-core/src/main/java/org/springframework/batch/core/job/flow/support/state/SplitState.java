@@ -27,6 +27,7 @@ import org.springframework.batch.core.job.flow.FlowExecution;
 import org.springframework.batch.core.job.flow.FlowExecutionException;
 import org.springframework.batch.core.job.flow.FlowExecutionStatus;
 import org.springframework.batch.core.job.flow.FlowExecutor;
+import org.springframework.batch.core.job.flow.FlowHolder;
 import org.springframework.batch.core.job.flow.State;
 import org.springframework.core.task.SyncTaskExecutor;
 import org.springframework.core.task.TaskExecutor;
@@ -39,7 +40,7 @@ import org.springframework.core.task.TaskRejectedException;
  * @author Dave Syer
  * @since 2.0
  */
-public class SplitState extends AbstractState {
+public class SplitState extends AbstractState implements FlowHolder {
 
 	private final Collection<Flow> flows;
 
@@ -61,6 +62,13 @@ public class SplitState extends AbstractState {
 	 */
 	public void setTaskExecutor(TaskExecutor taskExecutor) {
 		this.taskExecutor = taskExecutor;
+	}
+	
+	/**
+	 * @return the flows
+	 */
+	public Collection<Flow> getFlows() {
+		return flows;
 	}
 
 	/**

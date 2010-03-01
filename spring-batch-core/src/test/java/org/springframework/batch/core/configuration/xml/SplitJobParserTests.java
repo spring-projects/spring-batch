@@ -18,6 +18,9 @@ package org.springframework.batch.core.configuration.xml;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
+import java.util.ArrayList;
+import java.util.Collections;
+
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.batch.core.BatchStatus;
@@ -25,6 +28,7 @@ import org.springframework.batch.core.Job;
 import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.JobParameters;
 import org.springframework.batch.core.repository.JobRepository;
+import org.springframework.batch.core.step.StepLocator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.test.context.ContextConfiguration;
@@ -53,6 +57,9 @@ public class SplitJobParserTests {
 		job.execute(jobExecution);
 		assertEquals(BatchStatus.COMPLETED, jobExecution.getStatus());
 		assertEquals(4, jobExecution.getStepExecutions().size());
+		ArrayList<String> names = new ArrayList<String>(((StepLocator)job).getStepNames());
+		Collections.sort(names);
+		assertEquals("[s1, s2, s3, s4]", names.toString());
 	}
 
 }

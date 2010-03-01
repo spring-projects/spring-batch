@@ -16,7 +16,8 @@
 package org.springframework.batch.core.job.flow;
 
 import java.util.Collection;
-import java.util.HashSet;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.JobExecution;
@@ -25,6 +26,7 @@ import org.springframework.batch.core.Step;
 import org.springframework.batch.core.job.AbstractJob;
 import org.springframework.batch.core.job.SimpleStepHandler;
 import org.springframework.batch.core.step.StepHolder;
+import org.springframework.batch.core.step.StepLocator;
 
 /**
  * Implementation of the {@link Job} interface that allows for complex flows of
@@ -38,6 +40,10 @@ import org.springframework.batch.core.step.StepHolder;
 public class FlowJob extends AbstractJob {
 
 	private Flow flow;
+
+	private Map<String, Step> stepMap = new ConcurrentHashMap<String, Step>();
+
+	private volatile boolean initialized = false;
 
 	/**
 	 * Create a {@link FlowJob} with null name and no flow (invalid state).
@@ -67,23 +73,44 @@ public class FlowJob extends AbstractJob {
 	 */
 	@Override
 	public Step getStep(String stepName) {
-		State state = this.flow.getState(stepName);
-		if (state instanceof StepHolder) {
-			Step step = ((StepHolder) state).getStep();
-			if (stepName.equals(step.getName())) {
-				return step;
+		if (!initialized) {
+			init();
+		}
+		return stepMap.get(stepName);
+	}
+
+	/**
+	 * Initialize the step names
+	 */
+	private void init() {
+		findSteps(flow, stepMap);
+	}
+
+	/**
+	 * @param flow
+	 * @param map
+	 */
+	private void findSteps(Flow flow, Map<String, Step> map) {
+
+		for (State state : flow.getStates()) {
+			if (state instanceof StepHolder) {
+				Step step = ((StepHolder) state).getStep();
+				String name = step.getName();
+				stepMap.put(name, step);
+			}
+			else if (state instanceof FlowHolder) {
+				for (Flow subflow : ((FlowHolder) state).getFlows()) {
+					findSteps(subflow, map);
+				}
+			}
+			else if (state instanceof StepLocator) {
+				StepLocator locator = (StepLocator) state;
+				for (String name : locator.getStepNames()) {
+					map.put(name, locator.getStep(name));
+				}
 			}
 		}
-		// The state names can be prefixed with the job name for
-		// uniqueness...
-		state = this.flow.getState(getName() + "." + stepName);
-		if (state instanceof StepHolder) {
-			Step step = ((StepHolder) state).getStep();
-			if (stepName.equals(step.getName())) {
-				return step;
-			}
-		}
-		return null;
+
 	}
 
 	/**
@@ -91,14 +118,10 @@ public class FlowJob extends AbstractJob {
 	 */
 	@Override
 	public Collection<String> getStepNames() {
-		Collection<String> steps = new HashSet<String>();
-		for (State state : flow.getStates()) {
-			if (state instanceof StepHolder) {
-				String name = ((StepHolder) state).getStep().getName();
-				steps.add(name);
-			}
+		if (!initialized) {
+			init();
 		}
-		return steps;
+		return stepMap.keySet();
 	}
 
 	/**

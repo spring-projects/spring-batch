@@ -22,6 +22,7 @@ import static org.junit.Assert.fail;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 import org.junit.Before;
@@ -38,6 +39,7 @@ import org.springframework.batch.core.job.flow.support.SimpleFlow;
 import org.springframework.batch.core.job.flow.support.StateTransition;
 import org.springframework.batch.core.job.flow.support.state.DecisionState;
 import org.springframework.batch.core.job.flow.support.state.EndState;
+import org.springframework.batch.core.job.flow.support.state.FlowState;
 import org.springframework.batch.core.job.flow.support.state.SplitState;
 import org.springframework.batch.core.job.flow.support.state.StepState;
 import org.springframework.batch.core.repository.JobRepository;
@@ -582,6 +584,62 @@ public class FlowJobTests {
 		assertNull(step);
 	}
 
+	@Test
+	public void testGetStepNestedFlow() throws Exception {
+		SimpleFlow nested = new SimpleFlow("nested");
+		List<StateTransition> transitions = new ArrayList<StateTransition>();
+		transitions.add(StateTransition.createStateTransition(new StepState(new StubStep("step2")), "end1"));
+		transitions.add(StateTransition.createEndStateTransition(new EndState(FlowExecutionStatus.COMPLETED, "end1")));
+		nested.setStateTransitions(transitions);
+		nested.afterPropertiesSet();
+
+		SimpleFlow flow = new SimpleFlow("job");
+		transitions = new ArrayList<StateTransition>();
+		transitions.add(StateTransition.createStateTransition(new StepState(new StubStep("step1")), "nested"));
+		transitions.add(StateTransition.createStateTransition(new FlowState(nested, "nested"), "end0"));
+		transitions.add(StateTransition.createEndStateTransition(new EndState(FlowExecutionStatus.COMPLETED, "end0")));
+		flow.setStateTransitions(transitions);
+		flow.afterPropertiesSet();
+		job.setFlow(flow);
+		job.afterPropertiesSet();
+
+		List<String> names = new ArrayList<String>(job.getStepNames());
+		Collections.sort(names);
+		assertEquals("[step1, step2]", names.toString());
+	}
+
+	@Test
+	public void testGetStepSplitFlow() throws Exception {
+		SimpleFlow flow = new SimpleFlow("job");
+		SimpleFlow flow1 = new SimpleFlow("flow1");
+		SimpleFlow flow2 = new SimpleFlow("flow2");
+
+		List<StateTransition> transitions = new ArrayList<StateTransition>();
+		transitions.add(StateTransition.createStateTransition(new StepState(new StubStep("step1")), "end0"));
+		transitions.add(StateTransition.createEndStateTransition(new EndState(FlowExecutionStatus.COMPLETED, "end0")));
+		flow1.setStateTransitions(new ArrayList<StateTransition>(transitions));
+		flow1.afterPropertiesSet();
+		transitions = new ArrayList<StateTransition>();
+		transitions.add(StateTransition.createStateTransition(new StepState(new StubStep("step2")), "end1"));
+		transitions.add(StateTransition.createEndStateTransition(new EndState(FlowExecutionStatus.COMPLETED, "end1")));
+		flow2.setStateTransitions(new ArrayList<StateTransition>(transitions));
+		flow2.afterPropertiesSet();
+
+		transitions = new ArrayList<StateTransition>();
+		transitions.add(StateTransition.createStateTransition(new SplitState(Arrays.<Flow> asList(flow1, flow2),
+				"split"), "end2"));
+		transitions.add(StateTransition.createEndStateTransition(new EndState(FlowExecutionStatus.COMPLETED, "end2")));
+		flow.setStateTransitions(transitions);
+		flow.afterPropertiesSet();
+
+		job.setFlow(flow);
+		job.afterPropertiesSet();
+		List<String> names = new ArrayList<String>(job.getStepNames());
+		Collections.sort(names);
+		assertEquals("[step1, step2]", names.toString());
+	}
+
+	/**
 	/**
 	 * @author Dave Syer
 	 * 

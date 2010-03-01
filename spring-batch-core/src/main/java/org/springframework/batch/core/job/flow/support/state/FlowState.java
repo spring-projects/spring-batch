@@ -16,9 +16,13 @@
 
 package org.springframework.batch.core.job.flow.support.state;
 
+import java.util.Collection;
+import java.util.Collections;
+
 import org.springframework.batch.core.job.flow.Flow;
 import org.springframework.batch.core.job.flow.FlowExecutionStatus;
 import org.springframework.batch.core.job.flow.FlowExecutor;
+import org.springframework.batch.core.job.flow.FlowHolder;
 
 /**
  * State that delegates to a Flow
@@ -26,7 +30,7 @@ import org.springframework.batch.core.job.flow.FlowExecutor;
  * @author Dave Syer
  * @since 2.0
  */
-public class FlowState extends AbstractState {
+public class FlowState extends AbstractState implements FlowHolder {
 
 	private final Flow flow;
 
@@ -36,6 +40,13 @@ public class FlowState extends AbstractState {
 	public FlowState(Flow flow, String name) {
 		super(name);
 		this.flow = flow;
+	}
+	
+	/**
+	 * @return the flows
+	 */
+	public Collection<Flow> getFlows() {
+		return Collections.singleton(flow);
 	}
 
 	@Override

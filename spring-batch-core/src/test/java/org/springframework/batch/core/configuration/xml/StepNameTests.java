@@ -16,6 +16,7 @@
 package org.springframework.batch.core.configuration.xml;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -66,6 +67,7 @@ public class StepNameTests {
 			Collection<String> stepNames = stepLocator.getStepNames();
 			Job job = (Job) context.getBean(name);
 			String jobName = job.getName();
+			assertTrue("Job has no steps: "+jobName, !stepNames.isEmpty());
 			for (String registeredName : stepNames) {
 				String stepName = stepLocator.getStep(registeredName).getName();
 				assertEquals("Step name not equal to registered value: " + stepName + "!=" + registeredName + ", " + jobName,
