@@ -113,6 +113,13 @@ public class SimpleChunkProcessor<I, O> implements ChunkProcessor<I>, Initializi
 	 * @throws Exception
 	 */
 	protected final O doProcess(I item) throws Exception {
+
+		if (itemProcessor==null) {
+			@SuppressWarnings("unchecked")
+			O result = (O) item;
+			return result;
+		}
+
 		try {
 			listener.beforeProcess(item);
 			O result = itemProcessor.process(item);
@@ -123,6 +130,7 @@ public class SimpleChunkProcessor<I, O> implements ChunkProcessor<I>, Initializi
 			listener.onProcessError(item, e);
 			throw e;
 		}
+
 	}
 
 	/**
@@ -132,6 +140,11 @@ public class SimpleChunkProcessor<I, O> implements ChunkProcessor<I>, Initializi
 	 * @throws Exception
 	 */
 	protected final void doWrite(List<O> items) throws Exception {
+
+		if (itemWriter==null) {
+			return;
+		}
+
 		try {
 			listener.beforeWrite(items);
 			writeItems(items);
@@ -141,6 +154,7 @@ public class SimpleChunkProcessor<I, O> implements ChunkProcessor<I>, Initializi
 			listener.onWriteError(e, items);
 			throw e;
 		}
+
 	}
 
 	/**
@@ -153,7 +167,9 @@ public class SimpleChunkProcessor<I, O> implements ChunkProcessor<I>, Initializi
 	}
 
 	protected void writeItems(List<O> items) throws Exception {
-		itemWriter.write(items);
+		if (itemWriter!=null) {
+			itemWriter.write(items);
+		}
 	}
 
 	public final void process(StepContribution contribution, Chunk<I> inputs) throws Exception {

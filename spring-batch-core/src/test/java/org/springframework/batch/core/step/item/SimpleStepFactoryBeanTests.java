@@ -47,6 +47,7 @@ import org.springframework.batch.core.repository.dao.MapJobInstanceDao;
 import org.springframework.batch.core.repository.dao.MapStepExecutionDao;
 import org.springframework.batch.core.repository.support.SimpleJobRepository;
 import org.springframework.batch.core.step.AbstractStep;
+import org.springframework.batch.item.ItemProcessor;
 import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.ItemWriter;
 import org.springframework.batch.item.support.ListItemReader;
@@ -83,7 +84,7 @@ public class SimpleStepFactoryBeanTests {
 		job.setBeanName("simpleJob");
 	}
 
-	@Test(expected = IllegalArgumentException.class)
+	@Test(expected = IllegalStateException.class)
 	public void testMandatoryProperties() throws Exception {
 		new SimpleStepFactoryBean<String, String>().getObject();
 	}
@@ -325,9 +326,13 @@ public class SimpleStepFactoryBeanTests {
 
 		final List<String> listenerCalls = new ArrayList<String>();
 
-		class TestItemListenerWriter implements ItemWriter<String>, ItemReadListener<String>,
-				ItemWriteListener<String>, ItemProcessListener<String, String>, ChunkListener {
+		class TestItemListenerWriter implements ItemWriter<String>, ItemProcessor<String, String>,
+				ItemReadListener<String>, ItemWriteListener<String>, ItemProcessListener<String, String>, ChunkListener {
 			public void write(List<? extends String> items) throws Exception {
+			}
+
+			public String process(String item) throws Exception {
+				return item;
 			}
 
 			public void afterRead(String item) {
@@ -369,7 +374,9 @@ public class SimpleStepFactoryBeanTests {
 
 		}
 
-		factory.setItemWriter(new TestItemListenerWriter());
+		TestItemListenerWriter itemWriter = new TestItemListenerWriter();
+		factory.setItemWriter(itemWriter);
+		factory.setItemProcessor(itemWriter);
 
 		Step step = (Step) factory.getObject();
 
@@ -409,7 +416,7 @@ public class SimpleStepFactoryBeanTests {
 		}
 
 		TestItemListenerWriter itemWriter = new TestItemListenerWriter();
-		factory.setListeners(new StepListener[] {itemWriter});
+		factory.setListeners(new StepListener[] { itemWriter });
 		factory.setItemWriter(itemWriter);
 
 		Step step = (Step) factory.getObject();
@@ -422,6 +429,31 @@ public class SimpleStepFactoryBeanTests {
 
 		assertEquals(BatchStatus.COMPLETED, jobExecution.getStatus());
 		assertEquals("[write, write, write]", listenerCalls.toString());
+
+	}
+
+	@Test
+	public void testNullWriter() throws Exception {
+
+		SimpleStepFactoryBean<String, String> factory = getStepFactory(new String[] { "foo", "bar", "spam" });
+		factory.setItemWriter(null);
+		factory.setItemProcessor(new ItemProcessor<String, String>() {
+			public String process(String item) throws Exception {
+				written.add(item);
+				return null;
+			}
+		});
+
+		Step step = (Step) factory.getObject();
+
+		job.setSteps(Collections.singletonList(step));
+
+		JobExecution jobExecution = repository.createJobExecution(job.getName(), new JobParameters());
+
+		job.execute(jobExecution);
+
+		assertEquals(BatchStatus.COMPLETED, jobExecution.getStatus());
+		assertEquals("[foo, bar, spam]", written.toString());
 
 	}
 

@@ -77,6 +77,8 @@ public class SimpleStepFactoryBean<T, S> implements FactoryBean, BeanNameAware {
 
 	private ItemReader<? extends T> itemReader;
 
+	private ItemProcessor<? super T, ? extends S> itemProcessor;
+
 	private ItemWriter<? super S> itemWriter;
 
 	private PlatformTransactionManager transactionManager;
@@ -96,13 +98,6 @@ public class SimpleStepFactoryBean<T, S> implements FactoryBean, BeanNameAware {
 	private StepListener[] listeners = new StepListener[0];
 
 	protected final Log logger = LogFactory.getLog(getClass());
-
-	private ItemProcessor<? super T, ? extends S> itemProcessor = new ItemProcessor<T, S>() {
-		@SuppressWarnings("unchecked")
-		public S process(T item) throws Exception {
-			return (S) item;
-		}
-	};
 
 	private int commitInterval = 0;
 
@@ -469,9 +464,9 @@ public class SimpleStepFactoryBean<T, S> implements FactoryBean, BeanNameAware {
 	 */
 	protected void applyConfiguration(TaskletStep step) {
 
-		Assert.notNull(getItemReader(), "ItemReader must be provided");
-		Assert.notNull(getItemWriter(), "ItemWriter must be provided");
-		Assert.notNull(transactionManager, "TransactionManager must be provided");
+		Assert.state(getItemReader()!=null, "ItemReader must be provided");
+		Assert.state(getItemWriter()!=null || getItemProcessor()!=null, "ItemWriter or ItemProcessor must be provided");
+		Assert.state(transactionManager!=null, "TransactionManager must be provided");
 
 		step.setTransactionManager(transactionManager);
 		step.setTransactionAttribute(getTransactionAttribute());

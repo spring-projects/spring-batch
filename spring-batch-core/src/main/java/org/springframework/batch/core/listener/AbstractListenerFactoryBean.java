@@ -183,6 +183,9 @@ public abstract class AbstractListenerFactoryBean implements FactoryBean, Initia
 	 * interface, or contains the marker annotations
 	 */
 	public static boolean isListener(Object target, Class<?> listenerType, ListenerMetaData[] metaDataValues) {
+		if (target == null) {
+			return false;
+		}
 		if (listenerType.isInstance(target)) {
 			return true;
 		}
