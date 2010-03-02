@@ -29,6 +29,12 @@ import org.springframework.batch.support.SerializationUtils;
 public class ExitStatusTests {
 
 	@Test
+	public void testExitStatusNullDescription() {
+		ExitStatus status = new ExitStatus("10", null);
+		assertEquals("", status.getExitDescription());
+	}
+
+	@Test
 	public void testExitStatusBooleanInt() {
 		ExitStatus status = new ExitStatus("10");
 		assertEquals("10", status.getExitCode());

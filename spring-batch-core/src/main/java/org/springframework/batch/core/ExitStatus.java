@@ -80,7 +80,7 @@ public class ExitStatus implements Serializable, Comparable<ExitStatus> {
 	public ExitStatus(String exitCode, String exitDescription) {
 		super();
 		this.exitCode = exitCode;
-		this.exitDescription = exitDescription;
+		this.exitDescription = exitDescription == null ? "" : exitDescription;
 	}
 
 	/**
