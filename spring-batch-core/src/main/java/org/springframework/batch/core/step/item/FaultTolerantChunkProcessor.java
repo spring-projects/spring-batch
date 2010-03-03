@@ -382,12 +382,6 @@ public class FaultTolerantChunkProcessor<I, O> extends SimpleChunkProcessor<I, O
 								context.getLastThrowable());
 					}
 					
-					if (inputs.size()==1 && outputs.getSkips().isEmpty()) {
-						// Optimization for trivial chunk size: no need to scan
-						checkSkipPolicy(inputs.iterator(), outputs.iterator(), context.getLastThrowable(), contribution);
-						return null;
-					}
-
 					inputs.setBusy(true);
 					scan(contribution, inputs, outputs, chunkMonitor);
 					return null;
