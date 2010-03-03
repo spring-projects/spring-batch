@@ -63,7 +63,7 @@ public class FaultTolerantChunkProcessor<I, O> extends SimpleChunkProcessor<I, O
 
 	private ChunkMonitor chunkMonitor = new ChunkMonitor();
 
-	private boolean processorTransactional;
+	private boolean processorTransactional = true;
 
 	/**
 	 * The {@link KeyGenerator} to use to identify failed items across rollback.
@@ -120,7 +120,11 @@ public class FaultTolerantChunkProcessor<I, O> extends SimpleChunkProcessor<I, O
 	}
 
 	/**
-	 * @param processorTransactional
+	 * Flag to say that the {@link ItemProcessor} is transactional (defaults to
+	 * true). If false then the processor is only called once per item per
+	 * chunk, even if there are rollbacks with retries and skips.
+	 * 
+	 * @param processorTransactional the flag value to set
 	 */
 	public void setProcessorTransactional(boolean processorTransactional) {
 		this.processorTransactional = processorTransactional;
