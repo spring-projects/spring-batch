@@ -239,6 +239,11 @@ public class Chunk<W> implements Iterable<W> {
 			iterator.remove();
 		}
 
+		@Override
+		public String toString() {
+			return String.format("[items=%s, skips=%s]", items, skips);
+		}
+
 	}
 
 }

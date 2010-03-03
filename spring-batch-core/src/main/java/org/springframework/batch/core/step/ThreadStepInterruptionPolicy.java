@@ -30,10 +30,8 @@ import org.springframework.batch.core.StepExecution;
  */
 public class ThreadStepInterruptionPolicy implements StepInterruptionPolicy {
 
-	protected static final Log logger = LogFactory
-	.getLog(ThreadStepInterruptionPolicy.class);
+	protected static final Log logger = LogFactory.getLog(ThreadStepInterruptionPolicy.class);
 
-	
 	/**
 	 * Returns if the current job lifecycle has been interrupted by checking if
 	 * the current thread is interrupted.
@@ -43,7 +41,7 @@ public class ThreadStepInterruptionPolicy implements StepInterruptionPolicy {
 		if (isInterrupted(stepExecution)) {
 			throw new JobInterruptedException("Job interrupted status detected.");
 		}
-		
+
 	}
 
 	/**
@@ -51,9 +49,15 @@ public class ThreadStepInterruptionPolicy implements StepInterruptionPolicy {
 	 * @return true if the job has been interrupted
 	 */
 	private boolean isInterrupted(StepExecution stepExecution) {
-		boolean interrupted = (Thread.currentThread().isInterrupted() || stepExecution.isTerminateOnly());
-		if(interrupted){
-			logger.error("Step interrupted");
+		boolean interrupted = Thread.currentThread().isInterrupted();
+		if (interrupted) {
+			logger.info("Step interrupted through Thread API");
+		}
+		else {
+			interrupted = stepExecution.isTerminateOnly();
+			if (interrupted) {
+				logger.info("Step interrupted through StepExecution");
+			}
 		}
 		return interrupted;
 	}

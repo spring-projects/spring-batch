@@ -165,9 +165,9 @@ public class TransactionAwareProxyFactory<T> {
 
 	private class TargetSynchronization extends TransactionSynchronizationAdapter {
 
-		T cache;
+		private final T cache;
 
-		Object key;
+		private final Object key;
 
 		public TargetSynchronization(Object key, T cache) {
 			super();
