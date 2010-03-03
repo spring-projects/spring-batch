@@ -27,8 +27,8 @@ import org.springframework.util.Assert;
 
 /**
  * Batch domain object representation the execution of a step. Unlike
- * {@link JobExecution}, there are additional properties related the 
- * processing of items such as commit count, etc. 
+ * {@link JobExecution}, there are additional properties related the processing
+ * of items such as commit count, etc.
  * 
  * @author Lucas Ward
  * @author Dave Syer
@@ -507,8 +507,9 @@ public class StepExecution extends Entity {
 		return super.toString()
 				+ String.format(
 						", name=%s, status=%s, exitStatus=%s, readCount=%d, filterCount=%d, writeCount=%d readSkipCount=%d, writeSkipCount=%d"
-								+ ", processSkipCount=%d, commitCount=%d, rollbackCount=%d", stepName, status, exitStatus.getExitCode(),
-						readCount, filterCount, writeCount, readSkipCount, writeSkipCount, processSkipCount, commitCount, rollbackCount);
+								+ ", processSkipCount=%d, commitCount=%d, rollbackCount=%d", stepName, status,
+						exitStatus.getExitCode(), readCount, filterCount, writeCount, readSkipCount, writeSkipCount,
+						processSkipCount, commitCount, rollbackCount);
 	}
 
 }

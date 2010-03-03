@@ -307,6 +307,8 @@ public class TaskletStep extends AbstractStep {
 
 		private Integer oldVersion;
 
+		private boolean locked = false;
+
 		public ChunkTransactionCallback(ChunkContext chunkContext) {
 			this.chunkContext = chunkContext;
 			this.stepExecution = chunkContext.getStepContext().getStepExecution();
@@ -322,10 +324,16 @@ public class TaskletStep extends AbstractStep {
 				}
 			}
 			if (status == TransactionSynchronization.STATUS_UNKNOWN) {
+				logger.error("Rolling back with transaction in unknown state");
 				rollback(stepExecution);
 				stepExecution.upgradeStatus(BatchStatus.UNKNOWN);
 				stepExecution.setTerminateOnly();
 			}
+			// Only release the lock if we acquired it, and release as late as possible
+			if (locked) {
+				semaphore.release();
+			}
+			locked = false;
 		}
 
 		public Object doInTransaction(TransactionStatus status) {
@@ -337,8 +345,6 @@ public class TaskletStep extends AbstractStep {
 			StepContribution contribution = stepExecution.createStepContribution();
 
 			chunkListener.beforeChunk();
-
-			boolean locked = false;
 
 			try {
 
@@ -367,9 +373,11 @@ public class TaskletStep extends AbstractStep {
 						locked = true;
 					}
 					catch (InterruptedException e) {
+						logger.error("Thread interrupted while locking for repository update");
 						stepExecution.setStatus(BatchStatus.STOPPED);
 						stepExecution.setTerminateOnly();
 						Thread.currentThread().interrupt();
+						throw e;
 					}
 
 					// In case we need to push it back to its old value
@@ -396,6 +404,7 @@ public class TaskletStep extends AbstractStep {
 				catch (Exception e) {
 					// If we get to here there was a problem saving the step
 					// execution and we have to fail.
+					logger.error("JobRepository failure forcing exit with unknown status", e);
 					stepExecution.upgradeStatus(BatchStatus.UNKNOWN);
 					stepExecution.setTerminateOnly();
 					throw e;
@@ -418,13 +427,6 @@ public class TaskletStep extends AbstractStep {
 				rollback(stepExecution);
 				// Allow checked exceptions
 				throw new TransactionException(e);
-			}
-			finally {
-				// only release the lock if we acquired it
-				if (locked) {
-					semaphore.release();
-				}
-				locked = false;
 			}
 
 			return result;

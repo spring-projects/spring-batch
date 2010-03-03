@@ -20,6 +20,8 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.springframework.batch.core.BatchStatus;
 import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.JobInstance;
@@ -54,6 +56,8 @@ import org.springframework.util.Assert;
  * 
  */
 public class SimpleJobRepository implements JobRepository {
+
+	private static final Log logger = LogFactory.getLog(SimpleJobRepository.class);
 
 	private JobInstanceDao jobInstanceDao;
 
@@ -238,6 +242,7 @@ public class SimpleJobRepository implements JobRepository {
 		JobExecution jobExecution = stepExecution.getJobExecution();
 		jobExecutionDao.synchronizeStatus(jobExecution);
 		if (jobExecution.isStopping()) {
+			logger.info("Parent JobExecution is stopped, so passing message on to StepExecution");
 			stepExecution.setTerminateOnly();
 		}
 	}

@@ -8,9 +8,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import javax.sql.DataSource;
 
@@ -46,7 +44,7 @@ import org.springframework.util.Assert;
  */
 @ContextConfiguration(locations = "/simple-job-launcher-context.xml")
 @RunWith(SpringJUnit4ClassRunner.class)
-public class FaultTolerantStepFactoryBeanRollbackTests {
+public class FaultTolerantStepFactoryBeanTests {
 
 	private static final int MAX_COUNT = 1000;
 
@@ -73,7 +71,6 @@ public class FaultTolerantStepFactoryBeanRollbackTests {
 	@Autowired
 	private PlatformTransactionManager transactionManager;
 
-	@SuppressWarnings("unchecked")
 	@Before
 	public void setUp() throws Exception {
 
@@ -87,15 +84,12 @@ public class FaultTolerantStepFactoryBeanRollbackTests {
 		factory.setTransactionManager(transactionManager);
 		factory.setJobRepository(repository);
 		factory.setCommitInterval(3);
-		factory.setSkipLimit(10);
 		ThreadPoolTaskExecutor taskExecutor = new ThreadPoolTaskExecutor();
 		taskExecutor.setCorePoolSize(3);
 		taskExecutor.setMaxPoolSize(6);
 		taskExecutor.setQueueCapacity(0);
 		taskExecutor.afterPropertiesSet();
 		factory.setTaskExecutor(taskExecutor);
-		
-		factory.setSkippableExceptionClasses(getExceptionMap(Exception.class));
 
 	}
 	
@@ -115,26 +109,25 @@ public class FaultTolerantStepFactoryBeanRollbackTests {
 	}
 
 	@Test
-	public void testMultithreadedSkipInWriter() throws Throwable {
+	public void testMultithreadedSunnyDay() throws Throwable {
 
-		jobExecution = repository.createJobExecution("skipJob", new JobParameters());
+		jobExecution = repository.createJobExecution("vanillaJob", new JobParameters());
 
 		for (int i = 0; i < MAX_COUNT; i++) {
 
 			SimpleJdbcTemplate jdbcTemplate = new SimpleJdbcTemplate(dataSource);
+
+			reader.clear();
+			reader.setItems("1", "2", "3", "4", "5");
+			factory.setItemReader(reader);
+			writer.clear();
+			factory.setItemWriter(writer);
+			processor.clear();
+			factory.setItemProcessor(processor);
+
 			assertEquals(0, SimpleJdbcTestUtils.countRowsInTable(jdbcTemplate, "ERROR_LOG"));
 
 			try {
-
-				reader.clear();
-				reader.setItems("1", "2", "3", "4", "5");
-				factory.setItemReader(reader);
-				writer.clear();
-				factory.setItemWriter(writer);
-				processor.clear();
-				factory.setItemProcessor(processor);
-
-				writer.setFailures("1", "2", "3", "4", "5");
 
 				Step step = (Step) factory.getObject();
 
@@ -143,9 +136,13 @@ public class FaultTolerantStepFactoryBeanRollbackTests {
 				step.execute(stepExecution);
 				assertEquals(BatchStatus.COMPLETED, stepExecution.getStatus());
 
-				assertEquals("[]", writer.getCommitted().toString());
-				assertEquals("[]", processor.getCommitted().toString());
-				assertEquals(5, stepExecution.getSkipCount());
+				List<String> committed = new ArrayList<String>(writer.getCommitted());
+				Collections.sort(committed);
+				assertEquals("[1, 2, 3, 4, 5]", committed.toString());
+				List<String> processed = new ArrayList<String>(processor.getCommitted());
+				Collections.sort(processed);
+				assertEquals("[1, 2, 3, 4, 5]", processed.toString());
+				assertEquals(0, stepExecution.getSkipCount());
 
 			}
 			catch (Throwable e) {
@@ -155,14 +152,6 @@ public class FaultTolerantStepFactoryBeanRollbackTests {
 
 		}
 
-	}
-
-	private Map<Class<? extends Throwable>, Boolean> getExceptionMap(Class<? extends Throwable>... args) {
-		Map<Class<? extends Throwable>, Boolean> map = new HashMap<Class<? extends Throwable>, Boolean>();
-		for (Class<? extends Throwable> arg : args) {
-			map.put(arg, true);
-		}
-		return map;
 	}
 
 	private static class SkipReaderStub implements ItemReader<String> {
@@ -204,10 +193,6 @@ public class FaultTolerantStepFactoryBeanRollbackTests {
 
 		public SkipWriterStub(DataSource dataSource) {
 			jdbcTemplate = new SimpleJdbcTemplate(dataSource);
-		}
-
-		public void setFailures(String... failures) {
-			this.failures = Arrays.asList(failures);
 		}
 
 		public List<String> getCommitted() {
