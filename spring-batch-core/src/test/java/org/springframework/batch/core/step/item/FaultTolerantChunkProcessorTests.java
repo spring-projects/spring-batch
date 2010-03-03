@@ -172,6 +172,14 @@ public class FaultTolerantChunkProcessorTests {
 		catch (RuntimeException e) {
 			assertEquals("Expected Exception!", e.getMessage());
 		}
+		// BATCH-1518: ideally we would not want this to be necessary, but it still is...
+		try {
+			processor.process(contribution, inputs);
+			fail("Expected RuntimeException");
+		}
+		catch (RuntimeException e) {
+			assertEquals("Expected Exception!", e.getMessage());
+		}
 		processor.process(contribution, inputs);
 		assertEquals(1, contribution.getSkipCount());
 		assertEquals(0, contribution.getWriteCount());

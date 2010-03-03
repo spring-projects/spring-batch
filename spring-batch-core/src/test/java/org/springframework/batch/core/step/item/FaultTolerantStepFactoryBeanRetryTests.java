@@ -304,7 +304,7 @@ public class FaultTolerantStepFactoryBeanRetryTests {
 		assertEquals(expectedOutput, written);
 
 		assertEquals("[a, b, c, d, e, f, null]", provided.toString());
-		assertEquals("[a, b, b, b, b, b, c, d, d, d, d, d, e, f]", processed.toString());
+		assertEquals("[a, b, b, b, b, b, b, c, d, d, d, d, d, d, e, f]", processed.toString());
 		assertEquals("[b, d]", recovered.toString());
 	}
 
@@ -405,7 +405,7 @@ public class FaultTolerantStepFactoryBeanRetryTests {
 		assertEquals(1, provided.size());
 		// the failed items are tried up to the limit (but only precisely so if
 		// the commit interval is 1)
-		assertEquals("[b, b, b, b]", processed.toString());
+		assertEquals("[b, b, b, b, b]", processed.toString());
 		// []
 		assertEquals(0, recovered.size());
 		assertEquals(1, stepExecution.getReadCount());
@@ -496,7 +496,7 @@ public class FaultTolerantStepFactoryBeanRetryTests {
 		assertEquals(0, stepExecution.getSkipCount());
 		// [b]
 		assertEquals(1, provided.size());
-		assertEquals("[b, b, b, b]", processed.toString());
+		assertEquals("[b, b, b, b, b]", processed.toString());
 		// []
 		assertEquals(0, recovered.size());
 		assertEquals(1, stepExecution.getReadCount());
