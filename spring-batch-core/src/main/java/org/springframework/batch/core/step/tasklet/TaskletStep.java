@@ -377,7 +377,6 @@ public class TaskletStep extends AbstractStep {
 						stepExecution.setStatus(BatchStatus.STOPPED);
 						stepExecution.setTerminateOnly();
 						Thread.currentThread().interrupt();
-						throw e;
 					}
 
 					// In case we need to push it back to its old value

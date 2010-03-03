@@ -16,12 +16,16 @@
 
 package org.springframework.batch.core.step.tasklet;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+
 import java.lang.reflect.Field;
 import java.util.List;
 import java.util.concurrent.Semaphore;
 
-import junit.framework.TestCase;
-
+import org.junit.Before;
+import org.junit.Test;
 import org.springframework.batch.core.BatchStatus;
 import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.JobInterruptedException;
@@ -41,7 +45,7 @@ import org.springframework.batch.repeat.support.RepeatTemplate;
 import org.springframework.batch.support.transaction.ResourcelessTransactionManager;
 import org.springframework.util.ReflectionUtils;
 
-public class StepExecutorInterruptionTests extends TestCase {
+public class StepExecutorInterruptionTests {
 
 	private TaskletStep step;
 
@@ -55,6 +59,7 @@ public class StepExecutorInterruptionTests extends TestCase {
 	
 	private Field semaphore;
 
+	@Before
 	public void setUp() throws Exception {
 
 		jobRepository = new SimpleJobRepository(new MapJobInstanceDao(), new MapJobExecutionDao(),
@@ -75,6 +80,7 @@ public class StepExecutorInterruptionTests extends TestCase {
 		semaphore = ReflectionUtils.findField(step.getClass(), "semaphore");
 	}
 
+	@Test
 	public void testInterruptStep() throws Exception {
 
 		Thread processingThread = createThread(stepExecution);
@@ -115,6 +121,7 @@ public class StepExecutorInterruptionTests extends TestCase {
 
 	}
 
+	@Test
 	public void testInterruptOnInterruptedException() throws Exception {
 
 		Thread processingThread = createThread(stepExecution);
@@ -143,19 +150,6 @@ public class StepExecutorInterruptionTests extends TestCase {
 			}
 		});
 
-		// step.synchronizer = new Semaphore(1) {
-		//
-		// @Override
-		// public void acquire() throws InterruptedException {
-		// Thread.currentThread().interrupt();
-		// throw new InterruptedException();
-		// }
-		//
-		// @Override
-		// public void release() {
-		// }
-		// };
-
 		processingThread.start();
 		Thread.sleep(100);
 
@@ -171,6 +165,7 @@ public class StepExecutorInterruptionTests extends TestCase {
 
 	}
 
+	@Test
 	public void testLockNotReleasedIfChunkFails() throws Exception {
 
 		step.setTasklet(new TestingChunkOrientedTasklet<Object>(new ItemReader<Object>() {
