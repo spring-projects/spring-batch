@@ -54,11 +54,6 @@ class ChunkMonitor implements ItemStream {
 	private CompositeItemStream stream = new CompositeItemStream();
 
 	private ThreadLocal<ChunkMonitorData> holder = new ThreadLocal<ChunkMonitorData>();
-	{
-		// For testing purposes, make an instance of the offset data
-		// available:
-		holder.set(new ChunkMonitorData(0, 0));
-	}
 
 	private ItemReader<?> reader;
 
@@ -99,7 +94,7 @@ class ChunkMonitor implements ItemStream {
 	}
 
 	public void close() throws ItemStreamException {
-		holder.set(new ChunkMonitorData(0,0));
+		holder.set(null);
 		if (streamsRegistered) {
 			stream.close();
 		}
