@@ -15,20 +15,22 @@
  */
 package org.springframework.batch.core.launch;
 
-import static org.junit.Assert.assertEquals;
-
-import org.junit.Test;
+import org.springframework.batch.core.JobExecutionException;
 
 /**
+ * Checked exception to indicate that user asked for a job execution to be
+ * aborted when hasn't been stopped.
+ * 
  * @author Dave Syer
  * 
  */
-public class JobExecutionNotRunningExceptionTests {
+public class JobExecutionNotStoppedException extends JobExecutionException {
 
-	@Test
-	public void testExceptionString() throws Exception {
-		Exception exception = new JobExecutionNotRunningException("foo");
-		assertEquals("foo", exception.getMessage());
+	/**
+	 * Create an exception with the given message.
+	 */
+	public JobExecutionNotStoppedException(String msg) {
+		super(msg);
 	}
 
 }

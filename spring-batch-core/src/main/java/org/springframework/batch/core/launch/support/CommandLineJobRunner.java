@@ -39,8 +39,11 @@ import org.springframework.batch.core.converter.DefaultJobParametersConverter;
 import org.springframework.batch.core.converter.JobParametersConverter;
 import org.springframework.batch.core.explore.JobExplorer;
 import org.springframework.batch.core.launch.JobExecutionNotFailedException;
+import org.springframework.batch.core.launch.JobExecutionNotRunningException;
+import org.springframework.batch.core.launch.JobExecutionNotStoppedException;
 import org.springframework.batch.core.launch.JobLauncher;
 import org.springframework.batch.core.launch.JobParametersNotFoundException;
+import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.beans.factory.BeanDefinitionStoreException;
 import org.springframework.beans.factory.config.AutowireCapableBeanFactory;
 import org.springframework.context.ConfigurableApplicationContext;
@@ -98,9 +101,12 @@ import org.springframework.util.StringUtils;
  * <ul>
  * <li>jobPath: the xml application context containing a {@link Job}
  * <li>-restart: (optional) to restart the last failed execution</li>
+ * <li>-stop: (optional) to stop a running execution</li>
+ * <li>-abandon: (optional) to abandon a stopped execution</li>
  * <li>-next: (optional) to start the next in a sequence according to the
  * {@link JobParametersIncrementer} in the {@link Job}</li>
- * <li>jobIdentifier: the bean id of the job.
+ * <li>jobIdentifier: the name of the job or the id of a job execution (for
+ * -stop, -abandon or -restart).
  * <li>jobParameters: 0 to many parameters that will be used to launch a job.
  * </ul>
  * </p>
@@ -160,6 +166,8 @@ public class CommandLineJobRunner {
 
 	private JobExplorer jobExplorer;
 
+	private JobRepository jobRepository;
+
 	/**
 	 * Injection setter for the {@link JobLauncher}.
 	 * 
@@ -167,6 +175,13 @@ public class CommandLineJobRunner {
 	 */
 	public void setLauncher(JobLauncher launcher) {
 		this.launcher = launcher;
+	}
+
+	/**
+	 * @param jobRepository the jobRepository to set
+	 */
+	public void setJobRepository(JobRepository jobRepository) {
+		this.jobRepository = jobRepository;
 	}
 
 	/**
@@ -273,10 +288,35 @@ public class CommandLineJobRunner {
 					"Invalid JobParameters " + Arrays.asList(parameters)
 							+ ". If parameters are provided they should be in the form name=value (no whitespace).");
 
+			if (opts.contains("-stop")) {
+				List<JobExecution> jobExecutions = getRunningJobExecutions(jobIdentifier);
+				if (jobExecutions == null) {
+					throw new JobExecutionNotRunningException("No running execution found for job=" + jobIdentifier);
+				}
+				for (JobExecution jobExecution : jobExecutions) {
+					jobExecution.setStatus(BatchStatus.STOPPING);
+					jobRepository.update(jobExecution);
+				}
+				return exitCodeMapper.intValue(ExitStatus.COMPLETED.getExitCode());
+			}
+
+			if (opts.contains("-abandon")) {
+				List<JobExecution> jobExecutions = getStoppedJobExecutions(jobIdentifier);
+				if (jobExecutions == null) {
+					throw new JobExecutionNotStoppedException("No stopped execution found for job=" + jobIdentifier);
+				}
+				for (JobExecution jobExecution : jobExecutions) {
+					jobExecution.setStatus(BatchStatus.ABANDONED);
+					jobRepository.update(jobExecution);
+				}
+				return exitCodeMapper.intValue(ExitStatus.COMPLETED.getExitCode());
+			}
+
 			if (opts.contains("-restart")) {
 				JobExecution jobExecution = getLastFailedJobExecution(jobIdentifier);
 				if (jobExecution == null) {
-					throw new JobExecutionNotFailedException("No failed or stopped execution found for job=" + jobIdentifier);
+					throw new JobExecutionNotFailedException("No failed or stopped execution found for job="
+							+ jobIdentifier);
 				}
 				jobParameters = jobExecution.getJobInstance().getJobParameters();
 				jobName = jobExecution.getJobInstance().getJobName();
@@ -315,22 +355,23 @@ public class CommandLineJobRunner {
 	}
 
 	/**
-	 * @param jobIdentifier
+	 * @param jobIdentifier a job execution id or job name
+	 * @param minStatus the highest status to exclude from the result
 	 * @return
-	 * @throws JobParametersNotFoundException
 	 */
-	private JobExecution getLastFailedJobExecution(String jobIdentifier) {
+	private List<JobExecution> getJobExecutionsWithStatusGreaterThan(String jobIdentifier, BatchStatus minStatus) {
 
 		Long executionId = getLongIdentifier(jobIdentifier);
 		if (executionId != null) {
 			JobExecution jobExecution = jobExplorer.getJobExecution(executionId);
-			if (jobExecution.getStatus().isGreaterThan(BatchStatus.STOPPING)) {
-				return jobExecution;
+			if (jobExecution.getStatus().isGreaterThan(minStatus)) {
+				return Arrays.asList(jobExecution);
 			}
 		}
 
 		int start = 0;
 		int count = 100;
+		List<JobExecution> executions = new ArrayList<JobExecution>();
 		List<JobInstance> lastInstances = jobExplorer.getJobInstances(jobIdentifier, start, count);
 
 		while (!lastInstances.isEmpty()) {
@@ -341,8 +382,8 @@ public class CommandLineJobRunner {
 					continue;
 				}
 				JobExecution jobExecution = jobExecutions.get(jobExecutions.size() - 1);
-				if (jobExecution.getStatus().isGreaterThan(BatchStatus.STOPPING)) {
-					return jobExecution;
+				if (jobExecution.getStatus().isGreaterThan(minStatus)) {
+					executions.add(jobExecution);
 				}
 			}
 
@@ -351,8 +392,44 @@ public class CommandLineJobRunner {
 
 		}
 
-		return null;
+		return executions;
 
+	}
+
+	private JobExecution getLastFailedJobExecution(String jobIdentifier) {
+		List<JobExecution> jobExecutions = getJobExecutionsWithStatusGreaterThan(jobIdentifier, BatchStatus.STOPPING);
+		if (jobExecutions.isEmpty()) {
+			return null;
+		}
+		return jobExecutions.get(0);
+	}
+
+	private List<JobExecution> getStoppedJobExecutions(String jobIdentifier) {
+		List<JobExecution> jobExecutions = getJobExecutionsWithStatusGreaterThan(jobIdentifier, BatchStatus.STARTED);
+		if (jobExecutions.isEmpty()) {
+			return null;
+		}
+		List<JobExecution> result = new ArrayList<JobExecution>();
+		for (JobExecution jobExecution : jobExecutions) {
+			if (jobExecution.getStatus() != BatchStatus.ABANDONED) {
+				result.add(jobExecution);
+			}
+		}
+		return result.isEmpty() ? null : result;
+	}
+
+	private List<JobExecution> getRunningJobExecutions(String jobIdentifier) {
+		List<JobExecution> jobExecutions = getJobExecutionsWithStatusGreaterThan(jobIdentifier, BatchStatus.COMPLETED);
+		if (jobExecutions.isEmpty()) {
+			return null;
+		}
+		List<JobExecution> result = new ArrayList<JobExecution>();
+		for (JobExecution jobExecution : jobExecutions) {
+			if (jobExecution.isRunning()) {
+				result.add(jobExecution);
+			}
+		}
+		return result.isEmpty() ? null : result;
 	}
 
 	private Long getLongIdentifier(String jobIdentifier) {

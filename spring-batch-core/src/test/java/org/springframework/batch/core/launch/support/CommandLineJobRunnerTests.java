@@ -41,6 +41,7 @@ import org.springframework.batch.core.converter.JobParametersConverter;
 import org.springframework.batch.core.explore.JobExplorer;
 import org.springframework.batch.core.launch.JobLauncher;
 import org.springframework.batch.core.repository.JobExecutionAlreadyRunningException;
+import org.springframework.batch.core.step.JobRepositorySupport;
 import org.springframework.util.ClassUtils;
 
 /**
@@ -126,8 +127,52 @@ public class CommandLineJobRunnerTests {
 		CommandLineJobRunner.main(args);
 		assertEquals(1, StubSystemExiter.status);
 		String errorMessage = CommandLineJobRunner.getErrorMessage();
-		assertTrue("Wrong error message: " + errorMessage, errorMessage
-				.contains("in the form name=value"));
+		assertTrue("Wrong error message: " + errorMessage, errorMessage.contains("in the form name=value"));
+	}
+
+	@Test
+	public void testStop() throws Throwable {
+		String[] args = new String[] { jobPath, "-stop", jobName };
+		JobParameters jobParameters = new JobParametersBuilder().addString("foo", "bar").toJobParameters();
+		StubJobExplorer.jobInstances = Arrays.asList(new JobInstance(3L, jobParameters, jobName));
+		CommandLineJobRunner.main(args);
+		assertEquals(0, StubSystemExiter.status);
+	}
+
+	@Test
+	public void testStopFailed() throws Throwable {
+		String[] args = new String[] { jobPath, "-stop", jobName };
+		JobParameters jobParameters = new JobParametersBuilder().addString("foo", "bar").toJobParameters();
+		StubJobExplorer.jobInstances = Arrays.asList(new JobInstance(0L, jobParameters, jobName));
+		CommandLineJobRunner.main(args);
+		assertEquals(1, StubSystemExiter.status);
+	}
+
+	@Test
+	public void testAbandon() throws Throwable {
+		String[] args = new String[] { jobPath, "-abandon", jobName };
+		JobParameters jobParameters = new JobParametersBuilder().addString("foo", "bar").toJobParameters();
+		StubJobExplorer.jobInstances = Arrays.asList(new JobInstance(2L, jobParameters, jobName));
+		CommandLineJobRunner.main(args);
+		assertEquals(0, StubSystemExiter.status);
+	}
+
+	@Test
+	public void testAbandonRunning() throws Throwable {
+		String[] args = new String[] { jobPath, "-abandon", jobName };
+		JobParameters jobParameters = new JobParametersBuilder().addString("foo", "bar").toJobParameters();
+		StubJobExplorer.jobInstances = Arrays.asList(new JobInstance(3L, jobParameters, jobName));
+		CommandLineJobRunner.main(args);
+		assertEquals(1, StubSystemExiter.status);
+	}
+
+	@Test
+	public void testAbandonAbandoned() throws Throwable {
+		String[] args = new String[] { jobPath, "-abandon", jobName };
+		JobParameters jobParameters = new JobParametersBuilder().addString("foo", "bar").toJobParameters();
+		StubJobExplorer.jobInstances = Arrays.asList(new JobInstance(4L, jobParameters, jobName));
+		CommandLineJobRunner.main(args);
+		assertEquals(1, StubSystemExiter.status);
 	}
 
 	@Test
@@ -156,7 +201,7 @@ public class CommandLineJobRunnerTests {
 	public void testRestartNotFailed() throws Throwable {
 		String[] args = new String[] { jobPath, "-restart", jobName };
 		JobParameters jobParameters = new JobParametersBuilder().addString("foo", "bar").toJobParameters();
-		StubJobExplorer.jobInstances = Arrays.asList(new JobInstance(2L, jobParameters, jobName));
+		StubJobExplorer.jobInstances = Arrays.asList(new JobInstance(123L, jobParameters, jobName));
 		CommandLineJobRunner.main(args);
 		assertEquals(1, StubSystemExiter.status);
 		String errorMessage = CommandLineJobRunner.getErrorMessage();
@@ -253,10 +298,14 @@ public class CommandLineJobRunnerTests {
 			destroyed = false;
 		}
 	}
+	
+	public static class StubJobRepository extends JobRepositorySupport {
+	}
 
 	public static class StubJobExplorer implements JobExplorer {
 
 		static List<JobInstance> jobInstances = new ArrayList<JobInstance>();
+
 		static JobExecution jobExecution;
 
 		public Set<JobExecution> findRunningJobExecutions(String jobName) {
@@ -264,7 +313,7 @@ public class CommandLineJobRunnerTests {
 		}
 
 		public JobExecution getJobExecution(Long executionId) {
-			if (jobExecution!=null) {
+			if (jobExecution != null) {
 				return jobExecution;
 			}
 			throw new UnsupportedOperationException();
@@ -277,6 +326,15 @@ public class CommandLineJobRunnerTests {
 			if (jobInstance.getId() == 1) {
 				return null;
 			}
+			if (jobInstance.getId() == 2) {
+				return Arrays.asList(createJobInstance(jobInstance, BatchStatus.STOPPED));
+			}
+			if (jobInstance.getId() == 3) {
+				return Arrays.asList(createJobInstance(jobInstance, BatchStatus.STARTED));
+			}
+			if (jobInstance.getId() == 4) {
+				return Arrays.asList(createJobInstance(jobInstance, BatchStatus.ABANDONED));
+			}
 			return Arrays.asList(createJobInstance(jobInstance, BatchStatus.COMPLETED));
 		}
 
@@ -284,7 +342,9 @@ public class CommandLineJobRunnerTests {
 			JobExecution jobExecution = new JobExecution(jobInstance, 1L);
 			jobExecution.setStatus(status);
 			jobExecution.setStartTime(new Date());
-			jobExecution.setEndTime(new Date());
+			if (status != BatchStatus.STARTED) {
+				jobExecution.setEndTime(new Date());
+			}
 			return jobExecution;
 		}
 
@@ -304,7 +364,7 @@ public class CommandLineJobRunnerTests {
 		public StepExecution getStepExecution(Long jobExecutionId, Long stepExecutionId) {
 			throw new UnsupportedOperationException();
 		}
-		
+
 		public List<String> getJobNames() {
 			throw new UnsupportedOperationException();
 		}

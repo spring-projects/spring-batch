@@ -23,11 +23,11 @@ import org.junit.Test;
  * @author Dave Syer
  * 
  */
-public class JobExecutionNotRunningExceptionTests {
+public class JobExecutionNotStoppedExceptionTests {
 
 	@Test
 	public void testExceptionString() throws Exception {
-		Exception exception = new JobExecutionNotRunningException("foo");
+		Exception exception = new JobExecutionNotStoppedException("foo");
 		assertEquals("foo", exception.getMessage());
 	}
 

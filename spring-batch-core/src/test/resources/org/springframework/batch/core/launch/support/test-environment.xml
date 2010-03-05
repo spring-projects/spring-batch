@@ -7,9 +7,11 @@
 		http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-2.0.xsd
 		http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-2.0.xsd">
 
-	<bean id="simpleContainerLauncher"
+	<bean id="jobLauncher"
 		class="org.springframework.batch.core.launch.support.CommandLineJobRunnerTests$StubJobLauncher"
 		destroy-method="destroy" />
+		
+	<bean id="jobRepository" class="org.springframework.batch.core.launch.support.CommandLineJobRunnerTests$StubJobRepository"/>
 
 	<bean class="org.springframework.batch.core.launch.support.SimpleJvmExitCodeMapper" />
 
