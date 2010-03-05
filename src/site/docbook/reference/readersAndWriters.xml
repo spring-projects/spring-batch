@@ -1530,25 +1530,14 @@ assertEquals(born, values[2]);</programlisting>
         </itemizedlist></para>
 
       <para><programlisting>&lt;bean id="itemReader" class="org.springframework.batch.item.xml.StaxEventItemReader"&gt;
-    &lt;property name="fragmentRootElementName" value="customer" /&gt;
+    &lt;property name="fragmentRootElementName" value="trade" /&gt;
     &lt;property name="resource" value="data/iosample/input/input.xml" /&gt;
-    &lt;property name="unmarshaller" ref="customerCreditMarshaller" /&gt;
+    &lt;property name="unmarshaller" ref="tradeMarshaller" /&gt;
 &lt;/bean&gt;
-
-&lt;bean id="customerCreditMarshaller" 
-      class="org.springframework.oxm.xstream.XStreamMarshaller"&gt;
-    &lt;property name="aliases"&gt;
-        &lt;util:map id="aliases"&gt;
-            &lt;entry key="customer"
-                   value="org.springframework.batch.sample.domain.CustomerCredit" /&gt;
-            &lt;entry key="price" value="java.math.BigDecimal" /&gt;
-            &lt;entry key="name" value="java.lang.String" /&gt;
-        &lt;/util:map&gt;
-    &lt;/property&gt;
-&lt;/bean&gt;</programlisting></para>
+</programlisting></para>
 
       <para>Notice that in this example we have chosen to use an
-      <classname>XStreamMarshaller</classname> that requires an alias passed
+      <classname>XStreamMarshaller</classname> which accepts an alias passed
       in as a map with the first key and value being the name of the fragment
       (i.e. root element) and the object type to bind. Then, similar to a
       <classname>FieldSet</classname>, the names of the other elements that
@@ -1556,18 +1545,12 @@ assertEquals(born, values[2]);</programlisting>
       the map. In the configuration file we can use a Spring configuration
       utility to describe the required alias as follows:</para>
 
-      <para><programlisting>&lt;bean id="itemReader" class="org.springframework.batch.item.xml.StaxEventItemReader"&gt;
-    &lt;property name="fragmentRootElementName" value="customer" /&gt;
-    &lt;property name="resource" value="data/iosample/input/input.xml" /&gt;
-    &lt;property name="unmarshaller" ref="customerCreditMarshaller" /&gt;
-&lt;/bean&gt;
-
-&lt;bean id="customerCreditMarshaller" 
+      <para><programlisting>&lt;bean id="tradeMarshaller" 
       class="org.springframework.oxm.xstream.XStreamMarshaller"&gt;
     &lt;property name="aliases"&gt;
 <emphasis role="bold">        &lt;util:map id="aliases"&gt;
-            &lt;entry key="customer"
-                   value="org.springframework.batch.sample.domain.CustomerCredit" /&gt;
+            &lt;entry key="trade"
+                   value="org.springframework.batch.sample.domain.Trade" /&gt;
             &lt;entry key="price" value="java.math.BigDecimal" /&gt;
             &lt;entry key="name" value="java.lang.String" /&gt;
         &lt;/util:map&gt;</emphasis>
@@ -1590,14 +1573,14 @@ assertEquals(born, values[2]);</programlisting>
 Resource resource = new ByteArrayResource(xmlResource.getBytes()) 
 
 Map aliases = new HashMap();
-aliases.put("customer","org.springframework.batch.sample.domain.CustomerCredit");
+aliases.put("trade","org.springframework.batch.sample.domain.Trade");
 aliases.put("price","java.math.BigDecimal");
-aliases.put("name","java.lang.String");
+aliases.put("customer","java.lang.String");
 Marshaller marshaller = new XStreamMarshaller();
 marshaller.setAliases(aliases);
 xmlStaxEventItemReader.setUnmarshaller(marshaller);
 xmlStaxEventItemReader.setResource(resource);
-xmlStaxEventItemReader.setFragmentRootElementName("customer");
+xmlStaxEventItemReader.setFragmentRootElementName("trade");
 xmlStaxEventItemReader.open(new ExecutionContext());
 
 boolean hasNext = true
@@ -1620,8 +1603,8 @@ while (hasNext) {
 
       <para>Output works symmetrically to input. The
       <classname>StaxEventItemWriter</classname> needs a
-      <classname>Resource</classname>, a serializer, and a rootTagName. A Java
-      object is passed to a serializer (typically a wrapper around Spring OXM
+      <classname>Resource</classname>, a marshaller, and a <literal>rootTagName</literal>. A Java
+      object is passed to a marshaller (typically a standard Spring OXM
       <classname>Marshaller</classname>) which writes to a
       <classname>Resource</classname> using a custom event writer that filters
       the <classname>StartDocument</classname> and
@@ -1649,7 +1632,7 @@ while (hasNext) {
         &lt;util:map id="aliases"&gt;
             &lt;entry key="customer"
                    value="org.springframework.batch.sample.domain.CustomerCredit" /&gt;
-            &lt;entry key="price" value="java.math.BigDecimal" /&gt;
+            &lt;entry key="credit" value="java.math.BigDecimal" /&gt;
             &lt;entry key="name" value="java.lang.String" /&gt;
         &lt;/util:map&gt;
     &lt;/property&gt;
@@ -1664,7 +1647,7 @@ FileSystemResource resource = new FileSystemResource("data/outputFile.xml")
 
 Map aliases = new HashMap();
 aliases.put("customer","org.springframework.batch.sample.domain.CustomerCredit");
-aliases.put("price","java.math.BigDecimal");
+aliases.put("credit","java.math.BigDecimal");
 aliases.put("name","java.lang.String");
 Marshaller marshaller = new XStreamMarshaller();
 marshaller.setAliases(aliases);
