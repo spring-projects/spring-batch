@@ -539,7 +539,7 @@ catch (JobRestartException e) {
         name second. All arguments after these are considered to be
         JobParameters and must be in the format of 'name=value':</para>
 
-        <screen><prompt>bash$</prompt> java CommandLineJobRunner endOfDayJob.xml endOfDay schedule.date(date)=2008/01/01</screen>
+        <screen><prompt>bash$</prompt> java CommandLineJobRunner endOfDayJob.xml endOfDay schedule.date(date)=2007/05/05</screen>
 
         <para>In most cases you would want to use a manifest to
         declare your main class in a jar, but for simplicity, the
@@ -549,7 +549,7 @@ catch (JobRestartException e) {
         is the Spring <classname>ApplicationContext</classname>
         containing the
         <classname>Job</classname>. The second argument, 'endOfDay' represents
-        the job name. The final argument, 'schedule.date(date)=2008/01/01'
+        the job name. The final argument, 'schedule.date(date)=2007/05/05'
         will be converted into <classname>JobParameters</classname>. An
         example of the XML configuration is below:</para>
 
