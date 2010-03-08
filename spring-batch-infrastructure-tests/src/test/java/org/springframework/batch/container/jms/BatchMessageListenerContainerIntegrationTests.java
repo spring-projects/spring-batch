@@ -101,7 +101,7 @@ public class BatchMessageListenerContainerIntegrationTests {
 		jmsTemplate.convertAndSend("queue", "bar");
 		SortedSet<String> result = new TreeSet<String>();
 		for (int i = 0; i < 2; i++) {
-			result.add(processed.poll(1, TimeUnit.SECONDS));
+			result.add(processed.poll(5, TimeUnit.SECONDS));
 		}
 		assertEquals("[bar, foo]", result.toString());
 	}
@@ -123,7 +123,7 @@ public class BatchMessageListenerContainerIntegrationTests {
 		container.start();
 		jmsTemplate.convertAndSend("queue", "foo");
 		for (int i = 0; i < 2; i++) {
-			assertEquals("foo", processed.poll(1, TimeUnit.SECONDS));
+			assertEquals("foo", processed.poll(5, TimeUnit.SECONDS));
 		}
 	}
 
@@ -166,8 +166,8 @@ public class BatchMessageListenerContainerIntegrationTests {
 		container.initializeProxy();
 		container.start();
 		jmsTemplate.convertAndSend("queue", "foo");
-		assertEquals("foo", processed.poll(2, TimeUnit.SECONDS));
-		assertEquals("foo", recovered.poll(2, TimeUnit.SECONDS));
+		assertEquals("foo", processed.poll(5, TimeUnit.SECONDS));
+		assertEquals("foo", recovered.poll(5, TimeUnit.SECONDS));
 	}
 
 }
