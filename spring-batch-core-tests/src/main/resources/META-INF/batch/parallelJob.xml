@@ -7,7 +7,7 @@
 		http://www.springframework.org/schema/batch http://www.springframework.org/schema/batch/spring-batch-2.1.xsd
 		http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd">
 
-	<job id="parellelJob" xmlns="http://www.springframework.org/schema/batch">
+	<job id="parallelJob" xmlns="http://www.springframework.org/schema/batch">
 		<step id="playerload" next="gameLoadParallel">
 			<tasklet>
 				<chunk reader="playerFileItemReader" writer="playerWriter" 
