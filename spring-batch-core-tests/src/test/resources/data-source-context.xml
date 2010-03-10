@@ -28,7 +28,7 @@
 		<property name="dataSource" ref="dataSource" />
 	</bean>
 
-	<!-- Set up or detect a System property called "org.springframework.batch.support.SystemPropertyInitializer.ENVIRONMENT" used to construct a properties file on the classpath.  The default is "hsql".  -->
+	<!-- Set up or detect a System property called "ENVIRONMENT" used to construct a properties file on the classpath.  The default is "hsql".  -->
 	<bean id="environment"
 		class="org.springframework.batch.support.SystemPropertyInitializer">
 		<property name="defaultValue" value="hsql"/>
