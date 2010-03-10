@@ -244,7 +244,7 @@ class StepParserStepFactoryBean<I, O> implements FactoryBean, BeanNameAware {
 	public boolean requiresTransactionManager() {
 		// Currently all step implementations other than TaskletStep are
 		// AbstractStep and do not require a transaction manager
-		return tasklet != null;
+		return hasChunkElement || tasklet != null;
 	}
 
 	private void configureAbstractStep(AbstractStep ts) {
