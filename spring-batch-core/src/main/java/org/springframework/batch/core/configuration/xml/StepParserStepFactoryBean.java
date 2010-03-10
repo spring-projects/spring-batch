@@ -241,6 +241,12 @@ class StepParserStepFactoryBean<I, O> implements FactoryBean, BeanNameAware {
 		}
 	}
 
+	public boolean requiresTransactionManager() {
+		// Currently all step implementations other than TaskletStep are
+		// AbstractStep and do not require a transaction manager
+		return tasklet != null;
+	}
+
 	private void configureAbstractStep(AbstractStep ts) {
 		if (name != null) {
 			ts.setName(name);
@@ -525,8 +531,8 @@ class StepParserStepFactoryBean<I, O> implements FactoryBean, BeanNameAware {
 	}
 
 	private boolean isFaultTolerant() {
-		return backOffPolicy != null || skipPolicy != null || retryPolicy != null || isPositive(skipLimit) || isPositive(retryLimit)
-				|| isPositive(cacheCapacity) || isTrue(readerTransactionalQueue);
+		return backOffPolicy != null || skipPolicy != null || retryPolicy != null || isPositive(skipLimit)
+				|| isPositive(retryLimit) || isPositive(cacheCapacity) || isTrue(readerTransactionalQueue);
 	}
 
 	private boolean isTrue(Boolean b) {

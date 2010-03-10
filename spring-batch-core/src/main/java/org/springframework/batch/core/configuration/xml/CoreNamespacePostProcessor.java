@@ -133,7 +133,7 @@ public class CoreNamespacePostProcessor implements BeanPostProcessor, BeanFactor
 				fb.setJobRepository((JobRepository) applicationContext.getBean(DEFAULT_JOB_REPOSITORY_NAME));
 			}
 			PlatformTransactionManager transactionManager = fb.getTransactionManager();
-			if (transactionManager == null) {
+			if (transactionManager == null && fb.requiresTransactionManager()) {
 				fb.setTransactionManager((PlatformTransactionManager) applicationContext
 						.getBean(DEFAULT_TRANSACTION_MANAGER_NAME));
 			}

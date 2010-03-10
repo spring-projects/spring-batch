@@ -957,7 +957,7 @@ public class FaultTolerantStepFactoryBeanTests {
 	 * expected: false; default classification
 	 */
 	@Test
-	public void testFatalSubset_unclassified() throws Exception {
+	public void testFatalSubsetUnclassified() throws Exception {
 		assertFalse(getFatalSubsetSkipPolicy().shouldSkip(new RuntimeException(), 0));
 	}
 
@@ -967,7 +967,7 @@ public class FaultTolerantStepFactoryBeanTests {
 	 * expected: true
 	 */
 	@Test
-	public void testFatalSubset_skippable() throws Exception {
+	public void testFatalSubsetSkippable() throws Exception {
 		assertTrue(getFatalSubsetSkipPolicy().shouldSkip(new WriterNotOpenException(""), 0));
 	}
 
@@ -977,7 +977,7 @@ public class FaultTolerantStepFactoryBeanTests {
 	 * expected: false
 	 */
 	@Test
-	public void testFatalSubset_fatal() throws Exception {
+	public void testFatalSubsetFatal() throws Exception {
 		assertFalse(getFatalSubsetSkipPolicy().shouldSkip(new WriteFailedException(""), 0));
 	}
 

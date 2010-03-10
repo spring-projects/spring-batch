@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.springframework.org/schema/batch http://www.springframework.org/schema/batch/spring-batch-2.1.xsd
+	http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.5.xsd">
+
+	<job id="job" xmlns="http://www.springframework.org/schema/batch">
+		<step id="s1">
+			<partition step="step1" partitioner="partitioner">
+				<handler task-executor="taskExecutor" grid-size="2" />
+			</partition>
+		</step>
+	</job>
+
+	<bean id="taskExecutor" class="org.springframework.core.task.SyncTaskExecutor" />
+
+	<bean id="partitioner" class="org.springframework.batch.core.partition.support.SimplePartitioner" />
+
+	<bean id="customTransactionManager" class="org.springframework.batch.support.transaction.ResourcelessTransactionManager" />
+
+	<bean id="jobRepository" class="org.springframework.batch.core.repository.support.MapJobRepositoryFactoryBean">
+		<property name="transactionManager" ref="customTransactionManager" />
+	</bean>
+
+	<bean id="step1" class="org.springframework.batch.core.step.tasklet.TaskletStep">
+		<property name="jobRepository" ref="jobRepository" />
+		<property name="transactionManager" ref="customTransactionManager" />
+		<property name="tasklet" ref="dummyTasklet" />
+	</bean>
+
+	<bean id="dummyTasklet" class="org.springframework.batch.core.configuration.xml.DummyTasklet"/>
+
+</beans>
