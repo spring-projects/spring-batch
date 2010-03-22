@@ -337,7 +337,7 @@ template.execute(new RetryCallback&lt;Foo&gt;() {
 
     <programlisting>&lt;aop:config&gt;
     &lt;aop:pointcut id="transactional"
-        expression="execution(* com...*Service.remoteCall(..))" /&gt;
+        expression="execution(* com..*Service.remoteCall(..))" /&gt;
     &lt;aop:advisor pointcut-ref="transactional"
         advice-ref="retryAdvice" order="-1"/&gt;
 &lt;/aop:config&gt;

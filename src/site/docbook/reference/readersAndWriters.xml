@@ -249,7 +249,7 @@ public class FoobarWriter implements ItemWriter&lt;FooBar&gt;{
 List itemProcessors = new ArrayList();
 itemProcessors.add(new FooTransformer());
 itemProcessors.add(new BarTransformer());
-compositeProcessor.setItemProcessors(itemProcessors);</programlisting>
+compositeProcessor.setDelegates(itemProcessors);</programlisting>
 
       <para>Just as with the previous example, the composite processor can be
       configured into the <classname>Step</classname>:</para>
@@ -265,7 +265,7 @@ compositeProcessor.setItemProcessors(itemProcessors);</programlisting>
 
 &lt;bean id="compositeItemProcessor" 
       class="org.springframework.batch.item.support.CompositeItemProcessor"&gt;
-    &lt;property name="itemProcessors"&gt;
+    &lt;property name="delegates"&gt;
         &lt;list&gt;
             &lt;bean class="..FooProcessor" /&gt;
             &lt;bean class="..BarProcessor" /&gt;
