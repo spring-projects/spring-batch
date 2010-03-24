@@ -15,8 +15,10 @@
  */
 package org.springframework.batch.core.configuration.xml;
 
+import org.springframework.beans.factory.BeanDefinitionStoreException;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.config.RuntimeBeanReference;
+import org.springframework.beans.factory.support.AbstractBeanDefinition;
 import org.springframework.beans.factory.support.BeanDefinitionBuilder;
 import org.springframework.beans.factory.xml.AbstractSingleBeanDefinitionParser;
 import org.springframework.beans.factory.xml.ParserContext;
@@ -38,46 +40,60 @@ public class JobRepositoryParser extends AbstractSingleBeanDefinitionParser {
 		return "org.springframework.batch.core.repository.support.JobRepositoryFactoryBean";
 	}
 
+	@Override
+	protected String resolveId(Element element, AbstractBeanDefinition definition, ParserContext parserContext)
+			throws BeanDefinitionStoreException {
+
+		String id = element.getAttribute(ID_ATTRIBUTE);
+		if (!StringUtils.hasText(id)) {
+			id = "jobRepository";
+		}
+
+		return id;
+
+	}
+
 	/**
 	 * Parse and create a bean definition for a
 	 * {@link org.springframework.batch.core.repository.support.JobRepositoryFactoryBean}
 	 * .
 	 */
 	@Override
-    protected void doParse(Element element, ParserContext parserContext, BeanDefinitionBuilder builder) {
+	protected void doParse(Element element, ParserContext parserContext, BeanDefinitionBuilder builder) {
 
 		CoreNamespaceUtils.autoregisterBeansForNamespace(parserContext, element);
 
-        String dataSource = element.getAttribute("data-source");
+		String dataSource = element.getAttribute("data-source");
 
-        String transactionManager = element.getAttribute("transaction-manager");
+		String transactionManager = element.getAttribute("transaction-manager");
 
-        String isolationLevelForCreate = element.getAttribute("isolation-level-for-create");
-        
-        String tablePrefix = element.getAttribute("table-prefix");
-        
-        String maxVarCharLength = element.getAttribute("max-varchar-length");
-        
-        String lobHandler = element.getAttribute("lob-handler");
-        
-        RuntimeBeanReference ds = new RuntimeBeanReference(dataSource);
-        builder.addPropertyValue("dataSource", ds);
-        RuntimeBeanReference tx = new RuntimeBeanReference(transactionManager);
-        builder.addPropertyValue("transactionManager", tx);
-        if (StringUtils.hasText(isolationLevelForCreate)) {
-            builder.addPropertyValue("isolationLevelForCreate", DefaultTransactionDefinition.PREFIX_ISOLATION+isolationLevelForCreate);
-        }
-        if (StringUtils.hasText(tablePrefix)) {
-            builder.addPropertyValue("tablePrefix", tablePrefix);
-        }
-        if (StringUtils.hasText(lobHandler)) {
-            builder.addPropertyReference("lobHandler", lobHandler);
-        }
-        if (StringUtils.hasText(maxVarCharLength)) {
-            builder.addPropertyValue("maxVarCharLength", maxVarCharLength);
-        }
+		String isolationLevelForCreate = element.getAttribute("isolation-level-for-create");
 
-        builder.setRole(BeanDefinition.ROLE_SUPPORT);
+		String tablePrefix = element.getAttribute("table-prefix");
 
-    }
+		String maxVarCharLength = element.getAttribute("max-varchar-length");
+
+		String lobHandler = element.getAttribute("lob-handler");
+
+		RuntimeBeanReference ds = new RuntimeBeanReference(dataSource);
+		builder.addPropertyValue("dataSource", ds);
+		RuntimeBeanReference tx = new RuntimeBeanReference(transactionManager);
+		builder.addPropertyValue("transactionManager", tx);
+		if (StringUtils.hasText(isolationLevelForCreate)) {
+			builder.addPropertyValue("isolationLevelForCreate", DefaultTransactionDefinition.PREFIX_ISOLATION
+					+ isolationLevelForCreate);
+		}
+		if (StringUtils.hasText(tablePrefix)) {
+			builder.addPropertyValue("tablePrefix", tablePrefix);
+		}
+		if (StringUtils.hasText(lobHandler)) {
+			builder.addPropertyReference("lobHandler", lobHandler);
+		}
+		if (StringUtils.hasText(maxVarCharLength)) {
+			builder.addPropertyValue("maxVarCharLength", maxVarCharLength);
+		}
+
+		builder.setRole(BeanDefinition.ROLE_SUPPORT);
+
+	}
 }
