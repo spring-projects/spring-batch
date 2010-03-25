@@ -32,6 +32,7 @@ import org.springframework.batch.core.job.SimpleJob;
 import org.springframework.batch.core.job.flow.FlowJob;
 import org.springframework.batch.core.launch.JobLauncher;
 import org.springframework.batch.core.repository.JobRepository;
+import org.springframework.batch.core.step.StepLocator;
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
@@ -71,7 +72,7 @@ public class JobLauncherTestUtils {
 
 	private JobLauncher jobLauncher;
 
-	private AbstractJob job;
+	private Job job;
 
 	private JobRepository jobRepository;
 
@@ -83,7 +84,7 @@ public class JobLauncherTestUtils {
 	 * @param job the {@link AbstractJob} to use
 	 */
 	@Autowired
-	public void setJob(AbstractJob job) {
+	public void setJob(Job job) {
 		this.job = job;
 	}
 
@@ -108,10 +109,10 @@ public class JobLauncherTestUtils {
 	/**
 	 * @return the job
 	 */
-	public AbstractJob getJob() {
+	public Job getJob() {
 		return job;
 	}
-	
+
 	/**
 	 * A {@link JobLauncher} instance that can be used to launch jobs.
 	 * 
@@ -222,9 +223,14 @@ public class JobLauncherTestUtils {
 	 * @return JobExecution
 	 */
 	public JobExecution launchStep(String stepName, JobParameters jobParameters, ExecutionContext jobExecutionContext) {
-		Step step = this.job.getStep(stepName);
+		if (!(job instanceof StepLocator)) {
+			throw new UnsupportedOperationException("Cannot locate step from a Job that is not a StepLocator: job="
+					+ job.getName() + " does not implement StepLocator");
+		}
+		StepLocator locator = (StepLocator) this.job;
+		Step step = locator.getStep(stepName);
 		if (step == null) {
-			step = this.job.getStep(this.job.getName() + "." + stepName);
+			step = locator.getStep(this.job.getName() + "." + stepName);
 		}
 		if (step == null) {
 			throw new IllegalStateException("No Step found with name: [" + stepName + "]");
