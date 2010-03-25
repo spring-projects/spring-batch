@@ -318,7 +318,7 @@
       if the <classname>Partitioner</classname> creates
       <classname>ExecutionContext</classname> instances with an attribute key
       <literal>fileName</literal>, pointing to a different file (or
-      directlory) for each step invocation, the
+      directory) for each step invocation, the
       <classname>Partitioner</classname> output might look like this:</para>
 
       <table>
