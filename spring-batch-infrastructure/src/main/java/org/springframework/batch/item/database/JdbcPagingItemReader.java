@@ -233,10 +233,10 @@ public class JdbcPagingItemReader<T> extends AbstractPagingItemReader<T> impleme
 
 	@Override
 	public void open(ExecutionContext executionContext) {
-		super.open(executionContext);
 		if (isSaveState()) {
 			startAfterValue = executionContext.get(getExecutionContextUserSupport().getKey(START_AFTER_VALUE));
 		}
+		super.open(executionContext);
 	}
 
 	@Override
