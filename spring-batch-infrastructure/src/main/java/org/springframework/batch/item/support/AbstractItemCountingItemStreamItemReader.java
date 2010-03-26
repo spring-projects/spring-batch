@@ -34,8 +34,7 @@ import org.springframework.util.Assert;
  * 
  * @author Robert Kasanicky
  */
-public abstract class AbstractItemCountingItemStreamItemReader<T> implements
-		ItemReader<T>, ItemStream {
+public abstract class AbstractItemCountingItemStreamItemReader<T> implements ItemReader<T>, ItemStream {
 
 	private static final String READ_COUNT = "read.count";
 
@@ -78,8 +77,7 @@ public abstract class AbstractItemCountingItemStreamItemReader<T> implements
 		}
 	}
 
-	public final T read() throws Exception, UnexpectedInputException,
-			ParseException {
+	public final T read() throws Exception, UnexpectedInputException, ParseException {
 		if (currentItemCount >= maxItemCount) {
 			return null;
 		}
@@ -99,8 +97,7 @@ public abstract class AbstractItemCountingItemStreamItemReader<T> implements
 	 * 
 	 * @see #setName(String)
 	 * 
-	 * @param count
-	 *            the value of the current item count
+	 * @param count the value of the current item count
 	 */
 	public void setCurrentItemCount(int count) {
 		this.currentItemCount = count;
@@ -108,14 +105,14 @@ public abstract class AbstractItemCountingItemStreamItemReader<T> implements
 
 	/**
 	 * The maximum index of the items to be read. If the
-	 * {@link ExecutionContext} contains a key <code>[name].read.count.max</code>
-	 * (where <code>[name]</code> is the name of this component) the value from
-	 * the {@link ExecutionContext} will be used in preference.
+	 * {@link ExecutionContext} contains a key
+	 * <code>[name].read.count.max</code> (where <code>[name]</code> is the name
+	 * of this component) the value from the {@link ExecutionContext} will be
+	 * used in preference.
 	 * 
 	 * @see #setName(String)
 	 * 
-	 * @param count
-	 *            the value of the maximum item count
+	 * @param count the value of the maximum item count
 	 */
 	public void setMaxItemCount(int count) {
 		this.maxItemCount = count;
@@ -125,35 +122,34 @@ public abstract class AbstractItemCountingItemStreamItemReader<T> implements
 		currentItemCount = 0;
 		try {
 			doClose();
-		} catch (Exception e) {
+		}
+		catch (Exception e) {
 			throw new ItemStreamException("Error while closing item reader", e);
 		}
 	}
 
-	public void open(ExecutionContext executionContext)
-			throws ItemStreamException {
+	public void open(ExecutionContext executionContext) throws ItemStreamException {
 
 		try {
 			doOpen();
-		} catch (Exception e) {
+		}
+		catch (Exception e) {
 			throw new ItemStreamException("Failed to initialize the reader", e);
 		}
 
 		if (executionContext.containsKey(ecSupport.getKey(READ_COUNT_MAX))) {
-			maxItemCount = executionContext.getInt(ecSupport
-					.getKey(READ_COUNT_MAX));
+			maxItemCount = executionContext.getInt(ecSupport.getKey(READ_COUNT_MAX));
 		}
 
 		if (executionContext.containsKey(ecSupport.getKey(READ_COUNT))) {
-			int itemCount = executionContext.getInt(ecSupport
-					.getKey(READ_COUNT));
+			int itemCount = executionContext.getInt(ecSupport.getKey(READ_COUNT));
 
 			if (itemCount < maxItemCount) {
 				try {
 					jumpToItem(itemCount);
-				} catch (Exception e) {
-					throw new ItemStreamException(
-							"Could not move to stored position on restart", e);
+				}
+				catch (Exception e) {
+					throw new ItemStreamException("Could not move to stored position on restart", e);
 				}
 			}
 			currentItemCount = itemCount;
@@ -162,19 +158,19 @@ public abstract class AbstractItemCountingItemStreamItemReader<T> implements
 
 	}
 
-	public void update(ExecutionContext executionContext)
-			throws ItemStreamException {
+	public void update(ExecutionContext executionContext) throws ItemStreamException {
 		if (saveState) {
-			Assert.notNull(executionContext,
-					"ExecutionContext must not be null");
-			executionContext.putInt(ecSupport.getKey(READ_COUNT),
-					currentItemCount);
+			Assert.notNull(executionContext, "ExecutionContext must not be null");
+			executionContext.putInt(ecSupport.getKey(READ_COUNT), currentItemCount);
 			if (maxItemCount < Integer.MAX_VALUE) {
-				executionContext.putInt(ecSupport.getKey(READ_COUNT_MAX),
-						maxItemCount);
+				executionContext.putInt(ecSupport.getKey(READ_COUNT_MAX), maxItemCount);
 			}
 		}
 
+	}
+
+	protected ExecutionContextUserSupport getExecutionContextUserSupport() {
+		return ecSupport;
 	}
 
 	/**
@@ -182,8 +178,7 @@ public abstract class AbstractItemCountingItemStreamItemReader<T> implements
 	 * {@link ExecutionContext}. Subclasses should provide a default value, e.g.
 	 * the short form of the class name.
 	 * 
-	 * @param name
-	 *            the name for the component
+	 * @param name the name for the component
 	 */
 	public void setName(String name) {
 		ecSupport.setName(name);
@@ -193,12 +188,21 @@ public abstract class AbstractItemCountingItemStreamItemReader<T> implements
 	 * Set the flag that determines whether to save internal data for
 	 * {@link ExecutionContext}. Only switch this to false if you don't want to
 	 * save any state from this stream, and you don't need it to be restartable.
+	 * Always set it to false if the reader is being used in a concurrent
+	 * environment.
 	 * 
-	 * @param saveState
-	 *            flag value (default true).
+	 * @param saveState flag value (default true).
 	 */
 	public void setSaveState(boolean saveState) {
 		this.saveState = saveState;
+	}
+
+	/**
+	 * The flag that determines whether to save internal state for restarts.
+	 * @return true if the flag was set
+	 */
+	public boolean isSaveState() {
+		return saveState;
 	}
 
 }

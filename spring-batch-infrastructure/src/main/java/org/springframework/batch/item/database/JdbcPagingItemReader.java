@@ -29,6 +29,7 @@ import java.util.concurrent.CopyOnWriteArrayList;
 import javax.sql.DataSource;
 
 import org.springframework.batch.item.ExecutionContext;
+import org.springframework.batch.item.ItemStreamException;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowCallbackHandler;
@@ -48,17 +49,16 @@ import org.springframework.util.ClassUtils;
  * requested data. The query is executed using paged requests of a size
  * specified in {@link #setPageSize(int)}. Additional pages are requested when
  * needed as {@link #read()} method is called, returning an object corresponding
- * to current position.
+ * to current position. On restart it uses the last sort key value to locate the
+ * first page to read (so it doesn't matter if the successfully processed itmes
+ * have been removed or modified).
  * </p>
  * 
  * <p>
  * The performance of the paging depends on the database specific features
- * available to limit the number of returned rows.
- * </p>
- * 
- * <p>
- * Setting a fairly large page size and using a commit interval that matches the
- * page size should provide better performance.
+ * available to limit the number of returned rows. Setting a fairly large page
+ * size and using a commit interval that matches the page size should provide
+ * better performance.
  * </p>
  * 
  * <p>
@@ -73,6 +73,11 @@ import org.springframework.util.ClassUtils;
  * @since 2.0
  */
 public class JdbcPagingItemReader<T> extends AbstractPagingItemReader<T> implements InitializingBean {
+
+	/**
+	 * 
+	 */
+	private static final String START_AFTER_VALUE = "start.after";
 
 	public static final int VALUE_NOT_SET = -1;
 
@@ -126,7 +131,9 @@ public class JdbcPagingItemReader<T> extends AbstractPagingItemReader<T> impleme
 	}
 
 	/**
-	 * The row mapper implementation to be used by this reader
+	 * The row mapper implementation to be used by this reader. The row mapper
+	 * is used to convert result set rows into objects, which are then returned
+	 * by the reader.
 	 * 
 	 * @param rowMapper a
 	 * {@link org.springframework.jdbc.core.simple.ParameterizedRowMapper}
@@ -217,9 +224,28 @@ public class JdbcPagingItemReader<T> extends AbstractPagingItemReader<T> impleme
 	}
 
 	@Override
-	protected void doJumpToPage(int itemIndex) {
+	public void update(ExecutionContext executionContext) throws ItemStreamException {
+		super.update(executionContext);
+		if (isSaveState() && startAfterValue != null) {
+			executionContext.put(getExecutionContextUserSupport().getKey(START_AFTER_VALUE), startAfterValue);
+		}
+	}
 
-		if (getPage() > 0) {
+	@Override
+	public void open(ExecutionContext executionContext) {
+		super.open(executionContext);
+		if (isSaveState()) {
+			startAfterValue = executionContext.get(getExecutionContextUserSupport().getKey(START_AFTER_VALUE));
+		}
+	}
+
+	@Override
+	protected void doJumpToPage(int itemIndex) {
+		/*
+		 * Normally this would be false (the startAfterValue is enough
+		 * information to restart from.
+		 */
+		if (startAfterValue == null && getPage() > 0) {
 
 			String jumpToItemSql;
 			jumpToItemSql = queryProvider.generateJumpToItemQuery(itemIndex, getPageSize());
@@ -243,7 +269,6 @@ public class JdbcPagingItemReader<T> extends AbstractPagingItemReader<T> impleme
 			}
 
 		}
-
 	}
 
 	private Map<String, Object> getParameterMap(Map<String, Object> values, Object sortKeyValue) {

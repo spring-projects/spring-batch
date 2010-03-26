@@ -68,6 +68,7 @@ public class JdbcPagingRestartIntegrationTests {
 		ExecutionContext executionContext = new ExecutionContext();
 		int count = SimpleJdbcTestUtils.countRowsInTable(jdbcTemplate, "CUSTOMER")-2;
 		executionContext.putInt("JdbcPagingItemReader.read.count", count);
+		executionContext.putInt("JdbcPagingItemReader.start.after", 2);
 		((ItemStream)reader).open(executionContext);
 		CustomerCredit item = reader.read();
 		// System.err.println(item);
