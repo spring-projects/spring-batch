@@ -19,6 +19,9 @@ package org.springframework.batch.sample.iosample;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 
+import java.util.List;
+import java.util.Map;
+
 import javax.sql.DataSource;
 
 import org.junit.Test;
@@ -51,8 +54,9 @@ public class JdbcPagingRestartIntegrationTests {
 
 	@Autowired
 	private ItemReader<CustomerCredit> reader;
+
 	private SimpleJdbcTemplate jdbcTemplate;
-	
+
 	@Autowired
 	public void setDataSource(DataSource dataSource) {
 		jdbcTemplate = new SimpleJdbcTemplate(dataSource);
@@ -65,21 +69,36 @@ public class JdbcPagingRestartIntegrationTests {
 
 	@Test
 	public void testReader() throws Exception {
+
+		int total = SimpleJdbcTestUtils.countRowsInTable(jdbcTemplate, "CUSTOMER");
+		int pageSize = 2; // same as configured in reader
+		int count = (total / pageSize) * pageSize;
+		if (count >= pageSize) {
+			count -= pageSize;
+		}
+
 		ExecutionContext executionContext = new ExecutionContext();
-		int count = SimpleJdbcTestUtils.countRowsInTable(jdbcTemplate, "CUSTOMER")-2;
 		executionContext.putInt("JdbcPagingItemReader.read.count", count);
 		// Assume the primary keys are in order
-		executionContext.putInt("JdbcPagingItemReader.start.after", count);
-		((ItemStream)reader).open(executionContext);
+
+		List<Map<String, Object>> ids = jdbcTemplate
+				.queryForList("SELECT ID, CREDIT FROM CUSTOMER WHERE CREDIT > 10000 ORDER BY ID ASC");
+		// System.err.println(ids);
+		int startAfterValue = ((Long) ids.get(count - 1).get("ID")).intValue();
+		// System.err.println("Start after: " + startAfterValue);
+		executionContext.putInt("JdbcPagingItemReader.start.after", startAfterValue);
+		((ItemStream) reader).open(executionContext);
+
+		for (int i = count; i < total; i++) {
+			CustomerCredit item = reader.read();
+			// System.err.println("Item: " + item);
+			assertNotNull(item);
+		}
+
 		CustomerCredit item = reader.read();
-		// System.err.println(item);
-		assertNotNull(item);
-		item = reader.read();
-		// System.err.println(item);
-		assertNotNull(item);
-		item = reader.read();
-		// System.err.println(item);
+		// System.err.println("Item: " + item);
 		assertNull(item);
+
 	}
 
 }

@@ -25,7 +25,9 @@ import org.springframework.batch.core.repository.JobRestartException;
 import org.springframework.batch.sample.common.SkipCheckingListener;
 import org.springframework.batch.sample.domain.trade.internal.TradeWriter;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.jdbc.core.simple.SimpleJdbcTemplate;
+import org.springframework.jdbc.support.incrementer.DataFieldMaxValueIncrementer;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.jdbc.SimpleJdbcTestUtils;
@@ -50,6 +52,10 @@ public class SkipSampleFunctionalTests {
 	private JobOperator jobOperator;
 
 	@Autowired
+	@Qualifier("customerIncrementer")
+	private DataFieldMaxValueIncrementer incrementer;
+
+	@Autowired
 	public void setDataSource(DataSource dataSource) {
 		this.simpleJdbcTemplate = new SimpleJdbcTemplate(dataSource);
 	}
@@ -59,7 +65,7 @@ public class SkipSampleFunctionalTests {
 		simpleJdbcTemplate.update("DELETE from TRADE");
 		simpleJdbcTemplate.update("DELETE from CUSTOMER");
 		for (int i = 1; i < 10; i++) {
-			simpleJdbcTemplate.update("INSERT INTO CUSTOMER VALUES (" + i + ", 0, 'customer" + i + "', 100000)");
+			simpleJdbcTemplate.update("INSERT INTO CUSTOMER (ID, VERSION, NAME, CREDIT) VALUES (" + incrementer.nextIntValue() + ", 0, 'customer" + i + "', 100000)");
 		}
 		simpleJdbcTemplate.update("DELETE from ERROR_LOG");
 	}

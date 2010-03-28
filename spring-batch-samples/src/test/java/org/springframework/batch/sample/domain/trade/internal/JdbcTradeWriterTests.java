@@ -27,6 +27,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.batch.sample.domain.trade.Trade;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.jdbc.core.RowCallbackHandler;
 import org.springframework.jdbc.core.simple.SimpleJdbcTemplate;
 import org.springframework.jdbc.support.incrementer.AbstractDataFieldMaxValueIncrementer;
@@ -51,7 +52,7 @@ public class JdbcTradeWriterTests {
 	}
 
 	@Autowired
-	public void setIncrementer(AbstractDataFieldMaxValueIncrementer incrementer) {
+	public void setIncrementer(@Qualifier("incrementerParent") AbstractDataFieldMaxValueIncrementer incrementer) {
 		incrementer.setIncrementerName("TRADE_SEQ");
 		this.writer.setIncrementer(incrementer);
 	}

@@ -19,6 +19,7 @@ package org.springframework.batch.item.database;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -32,7 +33,6 @@ import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.item.ItemStreamException;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.jdbc.core.RowCallbackHandler;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.simple.SimpleJdbcTemplate;
 import org.springframework.util.Assert;
@@ -179,23 +179,34 @@ public class JdbcPagingItemReader<T> extends AbstractPagingItemReader<T> impleme
 	@Override
 	protected void doReadPage() {
 
-		PagingRowCallbackHandler rowCallback = new PagingRowCallbackHandler();
+		if (results == null) {
+			results = new CopyOnWriteArrayList<T>();
+		}
+		else {
+			results.clear();
+		}
+
+		PagingRowMapper rowCallback = new PagingRowMapper();
+
+		@SuppressWarnings("unchecked")
+		List query;
+
 		if (getPage() == 0) {
 			if (logger.isDebugEnabled()) {
 				logger.debug("SQL used for reading first page: [" + firstPageSql + "]");
 			}
 			if (parameterValues != null && parameterValues.size() > 0) {
 				if (this.queryProvider.isUsingNamedParameters()) {
-					simpleJdbcTemplate.getNamedParameterJdbcOperations().query(firstPageSql,
+					query = simpleJdbcTemplate.getNamedParameterJdbcOperations().query(firstPageSql,
 							getParameterMap(parameterValues, null), rowCallback);
 				}
 				else {
-					simpleJdbcTemplate.getJdbcOperations().query(firstPageSql,
+					query = simpleJdbcTemplate.getJdbcOperations().query(firstPageSql,
 							getParameterList(parameterValues, null).toArray(), rowCallback);
 				}
 			}
 			else {
-				simpleJdbcTemplate.getJdbcOperations().query(firstPageSql, rowCallback);
+				query = simpleJdbcTemplate.getJdbcOperations().query(firstPageSql, rowCallback);
 			}
 
 		}
@@ -204,22 +215,18 @@ public class JdbcPagingItemReader<T> extends AbstractPagingItemReader<T> impleme
 				logger.debug("SQL used for reading remaining pages: [" + remainingPagesSql + "]");
 			}
 			if (this.queryProvider.isUsingNamedParameters()) {
-				simpleJdbcTemplate.getNamedParameterJdbcOperations().query(remainingPagesSql,
+				query = simpleJdbcTemplate.getNamedParameterJdbcOperations().query(remainingPagesSql,
 						getParameterMap(parameterValues, startAfterValue), rowCallback);
 			}
 			else {
-				simpleJdbcTemplate.getJdbcOperations().query(remainingPagesSql,
+				query = simpleJdbcTemplate.getJdbcOperations().query(remainingPagesSql,
 						getParameterList(parameterValues, startAfterValue).toArray(), rowCallback);
 			}
 		}
-
-		if (results == null) {
-			results = new CopyOnWriteArrayList<T>();
-		}
-		else {
-			results.clear();
-		}
-		results.addAll(rowCallback.getResults());
+		
+		@SuppressWarnings("unchecked")
+		Collection<T> result = query;
+		results.addAll(result);
 
 	}
 
@@ -301,17 +308,10 @@ public class JdbcPagingItemReader<T> extends AbstractPagingItemReader<T> impleme
 		return parameterList;
 	}
 
-	private class PagingRowCallbackHandler implements RowCallbackHandler {
-		private final List<T> results = new ArrayList<T>();
-
-		public List<T> getResults() {
-			return results;
-		}
-
-		@SuppressWarnings("unchecked")
-		public void processRow(ResultSet rs) throws SQLException {
+	private class PagingRowMapper implements RowMapper {
+		public Object mapRow(ResultSet rs, int rowNum) throws SQLException {
 			startAfterValue = rs.getObject(queryProvider.getSortKey());
-			results.add((T) rowMapper.mapRow(rs, results.size()));
+			return rowMapper.mapRow(rs, rowNum);
 		}
 	}
 

@@ -65,7 +65,7 @@
 	</bean>
 
 	<bean id="incrementerParent" parent="${batch.database.incrementer.parent}">
-		<property name="incrementerName" value="DUMMY" />
+		<property name="incrementerName" value="DUMMY"/>
 	</bean>
 
 	<!--import resource="alt-data-source-context.xml" /-->
