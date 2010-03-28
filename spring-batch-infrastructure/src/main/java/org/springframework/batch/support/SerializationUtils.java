@@ -20,6 +20,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.io.OptionalDataException;
 
 
 /**
@@ -65,6 +66,9 @@ public class SerializationUtils {
 
 		try {
 			return new ObjectInputStream(new ByteArrayInputStream(bytes)).readObject();
+		}
+		catch (OptionalDataException e) {
+			throw new IllegalArgumentException("Could not deserialize object: eof="+e.eof+ " at length="+e.length, e);
 		}
 		catch (IOException e) {
 			throw new IllegalArgumentException("Could not deserialize object", e);

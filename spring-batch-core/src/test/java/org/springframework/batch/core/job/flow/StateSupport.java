@@ -16,7 +16,6 @@
 package org.springframework.batch.core.job.flow;
 
 import org.springframework.batch.core.JobExecution;
-import org.springframework.batch.core.StepExecution;
 import org.springframework.batch.core.job.flow.support.state.AbstractState;
 
 /**
@@ -42,7 +41,7 @@ public class StateSupport extends AbstractState {
 	public FlowExecutionStatus handle(FlowExecutor executor) throws Exception {
 		JobExecution jobExecution = executor.getJobExecution();
 		if (jobExecution != null) {
-			jobExecution.getStepExecutions().add(new StepExecution(getName(), jobExecution));
+			jobExecution.createStepExecution(getName());
 		}
 		return this.status;
 	}

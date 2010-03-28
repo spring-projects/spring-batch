@@ -21,6 +21,7 @@ import java.io.ObjectInputStream;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.util.Assert;
@@ -70,7 +71,7 @@ public class StepExecution extends Entity {
 
 	private volatile int filterCount;
 
-	private transient volatile List<Throwable> failureExceptions = new ArrayList<Throwable>();
+	private transient volatile List<Throwable> failureExceptions = new CopyOnWriteArrayList<Throwable>();
 
 	/**
 	 * Constructor with mandatory properties.

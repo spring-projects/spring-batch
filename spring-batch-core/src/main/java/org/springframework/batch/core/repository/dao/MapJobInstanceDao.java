@@ -21,11 +21,11 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
+import java.util.concurrent.CopyOnWriteArraySet;
 
 import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.JobInstance;
 import org.springframework.batch.core.JobParameters;
-import org.springframework.batch.support.transaction.TransactionAwareProxyFactory;
 import org.springframework.util.Assert;
 
 /**
@@ -33,7 +33,7 @@ import org.springframework.util.Assert;
  */
 public class MapJobInstanceDao implements JobInstanceDao {
 
-	private Collection<JobInstance> jobInstances = TransactionAwareProxyFactory.createTransactionalSet();
+	private Collection<JobInstance> jobInstances = new CopyOnWriteArraySet<JobInstance>();
 
 	private long currentId = 0;
 

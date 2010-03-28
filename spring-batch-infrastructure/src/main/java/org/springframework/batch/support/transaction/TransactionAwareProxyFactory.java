@@ -23,6 +23,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 
 import org.aopalliance.intercept.MethodInterceptor;
 import org.aopalliance.intercept.MethodInvocation;
@@ -74,7 +75,7 @@ public class TransactionAwareProxyFactory<T> {
 			return (T) new HashSet((Set) target);
 		}
 		else if (target instanceof Map) {
-			return (T) new HashMap((Map) target);
+			return (T) new ConcurrentHashMap((Map) target);
 		}
 		else {
 			throw new UnsupportedOperationException("Cannot copy target for this type: " + target.getClass());

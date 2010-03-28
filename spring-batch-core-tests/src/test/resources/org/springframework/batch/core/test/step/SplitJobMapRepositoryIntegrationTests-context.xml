@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:beans="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.5.xsd
+		http://www.springframework.org/schema/batch http://www.springframework.org/schema/batch/spring-batch-2.1.xsd">
+
+	<job id="job" xmlns="http://www.springframework.org/schema/batch">
+		<split id="split" task-executor="taskExecutor">
+			<flow>
+				<step id="step1" parent="step" />
+			</flow>
+			<flow>
+				<step id="step2" parent="step" />
+			</flow>
+		</split>
+	</job>
+	
+	<bean id="taskExecutor" class="org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor">
+		<property name="maxPoolSize" value="6"/>
+		<property name="queueCapacity" value="0"/>
+	</bean>
+
+	<step id="step" xmlns="http://www.springframework.org/schema/batch">
+		<tasklet>
+			<beans:bean class="org.springframework.batch.core.test.step.SplitJobMapRepositoryIntegrationTests$CountingTasklet" />
+		</tasklet>
+	</step>
+
+	<bean id="jobLauncher" class="org.springframework.batch.core.launch.support.SimpleJobLauncher">
+		<property name="jobRepository" ref="jobRepository" />
+	</bean>
+
+	<bean id="jobRepository" class="org.springframework.batch.core.repository.support.MapJobRepositoryFactoryBean">
+		<property name="transactionManager" ref="transactionManager" />
+	</bean>
+
+	<bean id="transactionManager" class="org.springframework.batch.support.transaction.ResourcelessTransactionManager" />
+
+</beans>

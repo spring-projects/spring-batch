@@ -9,7 +9,7 @@ import java.util.Set;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.springframework.batch.core.JobExecution;
+import org.springframework.batch.core.JobParameters;
 import org.springframework.batch.core.Step;
 import org.springframework.batch.core.StepExecution;
 import org.springframework.batch.core.repository.JobRepository;
@@ -23,13 +23,15 @@ public class SimpleStepExecutionSplitterTests {
 
 	private JobRepository jobRepository;
 
-	private StepExecution stepExecution = new StepExecution("bar", new JobExecution(11L));
+	private StepExecution stepExecution;
 
 	@Before
 	public void setUp() throws Exception {
 		step = new TaskletStep("step");
 		MapJobRepositoryFactoryBean factory = new MapJobRepositoryFactoryBean();
 		jobRepository = (JobRepository) factory.getObject();
+		stepExecution = jobRepository.createJobExecution("job", new JobParameters()).createStepExecution("bar");
+		jobRepository.add(stepExecution);
 	}
 
 	@Test

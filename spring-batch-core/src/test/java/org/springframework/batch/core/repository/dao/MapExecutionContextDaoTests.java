@@ -39,7 +39,7 @@ public class MapExecutionContextDaoTests extends AbstractExecutionContextDaoTest
 	public void testPersistentCopy() throws Exception {
 		MapExecutionContextDao tested = new MapExecutionContextDao();
 		JobExecution jobExecution = new JobExecution((long)1);
-		StepExecution stepExecution = new StepExecution("stepName", jobExecution);
+		StepExecution stepExecution = new StepExecution("stepName", jobExecution, 123L);
 		assertTrue(stepExecution.getExecutionContext().isEmpty());
 		
 		tested.updateExecutionContext(stepExecution);

@@ -136,7 +136,7 @@ public class FlowJobTests {
 			@Override
 			public FlowExecutionStatus handle(FlowExecutor executor) throws Exception {
 				JobExecution jobExecution = executor.getJobExecution();
-				jobExecution.getStepExecutions().add(new StepExecution(getName(), jobExecution));
+				jobExecution.createStepExecution(getName());
 				if (fail) {
 					return FlowExecutionStatus.FAILED;
 				}

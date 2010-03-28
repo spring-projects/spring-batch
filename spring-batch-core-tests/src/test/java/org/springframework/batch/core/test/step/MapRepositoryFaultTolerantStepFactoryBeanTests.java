@@ -2,18 +2,12 @@ package org.springframework.batch.core.test.step;
 
 import static org.junit.Assert.assertEquals;
 
-import java.sql.ResultSet;
-import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.concurrent.CopyOnWriteArrayList;
-
-import javax.sql.DataSource;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -26,6 +20,7 @@ import org.springframework.batch.core.JobParameters;
 import org.springframework.batch.core.Step;
 import org.springframework.batch.core.StepExecution;
 import org.springframework.batch.core.repository.JobRepository;
+import org.springframework.batch.core.repository.support.MapJobRepositoryFactoryBean;
 import org.springframework.batch.core.step.item.FaultTolerantStepFactoryBean;
 import org.springframework.batch.item.ItemProcessor;
 import org.springframework.batch.item.ItemReader;
@@ -33,12 +28,9 @@ import org.springframework.batch.item.ItemWriter;
 import org.springframework.batch.item.ParseException;
 import org.springframework.batch.item.UnexpectedInputException;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.jdbc.core.simple.ParameterizedRowMapper;
-import org.springframework.jdbc.core.simple.SimpleJdbcTemplate;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
-import org.springframework.test.jdbc.SimpleJdbcTestUtils;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.util.Assert;
 
@@ -47,7 +39,7 @@ import org.springframework.util.Assert;
  */
 @ContextConfiguration(locations = "/simple-job-launcher-context.xml")
 @RunWith(SpringJUnit4ClassRunner.class)
-public class FaultTolerantStepFactoryBeanRollbackTests {
+public class MapRepositoryFaultTolerantStepFactoryBeanTests {
 
 	private static final int MAX_COUNT = 1000;
 
@@ -65,22 +57,19 @@ public class FaultTolerantStepFactoryBeanRollbackTests {
 
 	private StepExecution stepExecution;
 
-	@Autowired
-	private DataSource dataSource;
-
-	@Autowired
 	private JobRepository repository;
 
 	@Autowired
 	private PlatformTransactionManager transactionManager;
 
-	@SuppressWarnings("unchecked")
 	@Before
 	public void setUp() throws Exception {
-
+		
+		repository = new MapJobRepositoryFactoryBean().getJobRepository();
+		
 		reader = new SkipReaderStub();
-		writer = new SkipWriterStub(dataSource);
-		processor = new SkipProcessorStub(dataSource);
+		writer = new SkipWriterStub();
+		processor = new SkipProcessorStub();
 
 		factory = new FaultTolerantStepFactoryBean<String, String>();
 
@@ -88,58 +77,50 @@ public class FaultTolerantStepFactoryBeanRollbackTests {
 		factory.setTransactionManager(transactionManager);
 		factory.setJobRepository(repository);
 		factory.setCommitInterval(3);
-		factory.setSkipLimit(10);
 		ThreadPoolTaskExecutor taskExecutor = new ThreadPoolTaskExecutor();
 		taskExecutor.setCorePoolSize(3);
 		taskExecutor.setMaxPoolSize(6);
 		taskExecutor.setQueueCapacity(0);
 		taskExecutor.afterPropertiesSet();
 		factory.setTaskExecutor(taskExecutor);
-		
-		factory.setSkippableExceptionClasses(getExceptionMap(Exception.class));
 
 	}
 	
 	@Test
 	public void testUpdatesNoRollback() throws Exception {
 
-		SimpleJdbcTemplate jdbcTemplate = new SimpleJdbcTemplate(dataSource);
-
 		writer.write(Arrays.asList("foo", "bar"));
 		processor.process("spam");
-		assertEquals(3, SimpleJdbcTestUtils.countRowsInTable(jdbcTemplate, "ERROR_LOG"));
+		assertEquals(2, writer.getWritten().size());
+		assertEquals(1, processor.getProcessed().size());
 
 		writer.clear();
 		processor.clear();
-		assertEquals(0, SimpleJdbcTestUtils.countRowsInTable(jdbcTemplate, "ERROR_LOG"));
+		assertEquals(0, processor.getProcessed().size());
 
 	}
 
 	@Test
-	public void testMultithreadedSkipInWriter() throws Throwable {
-
-		jobExecution = repository.createJobExecution("skipJob", new JobParameters());
+	public void testMultithreadedSunnyDay() throws Throwable {
 
 		for (int i = 0; i < MAX_COUNT; i++) {
-
+			
 			if (i%100==0) {
 				logger.info("Starting step: "+i);
+				repository = new MapJobRepositoryFactoryBean().getJobRepository();
+				factory.setJobRepository(repository);
+				jobExecution = repository.createJobExecution("vanillaJob", new JobParameters());
 			}
 
-			SimpleJdbcTemplate jdbcTemplate = new SimpleJdbcTemplate(dataSource);
-			assertEquals(0, SimpleJdbcTestUtils.countRowsInTable(jdbcTemplate, "ERROR_LOG"));
+			reader.clear();
+			reader.setItems("1", "2", "3", "4", "5");
+			factory.setItemReader(reader);
+			writer.clear();
+			factory.setItemWriter(writer);
+			processor.clear();
+			factory.setItemProcessor(processor);
 
 			try {
-
-				reader.clear();
-				reader.setItems("1", "2", "3", "4", "5");
-				factory.setItemReader(reader);
-				writer.clear();
-				factory.setItemWriter(writer);
-				processor.clear();
-				factory.setItemProcessor(processor);
-
-				writer.setFailures("1", "2", "3", "4", "5");
 
 				Step step = (Step) factory.getObject();
 
@@ -148,12 +129,13 @@ public class FaultTolerantStepFactoryBeanRollbackTests {
 				step.execute(stepExecution);
 				assertEquals(BatchStatus.COMPLETED, stepExecution.getStatus());
 
-				assertEquals("[]", writer.getCommitted().toString());
-				assertEquals("[]", processor.getCommitted().toString());
+				List<String> committed = new ArrayList<String>(writer.getWritten());
+				Collections.sort(committed);
+				assertEquals("[1, 2, 3, 4, 5]", committed.toString());
 				List<String> processed = new ArrayList<String>(processor.getProcessed());
 				Collections.sort(processed);
-				assertEquals("[1, 1, 2, 2, 3, 3, 4, 4, 5, 5]", processed.toString());
-				assertEquals(5, stepExecution.getSkipCount());
+				assertEquals("[1, 2, 3, 4, 5]", processed.toString());
+				assertEquals(0, stepExecution.getSkipCount());
 
 			}
 			catch (Throwable e) {
@@ -163,14 +145,6 @@ public class FaultTolerantStepFactoryBeanRollbackTests {
 
 		}
 
-	}
-
-	private Map<Class<? extends Throwable>, Boolean> getExceptionMap(Class<? extends Throwable>... args) {
-		Map<Class<? extends Throwable>, Boolean> map = new HashMap<Class<? extends Throwable>, Boolean>();
-		for (Class<? extends Throwable> arg : args) {
-			map.put(arg, true);
-		}
-		return map;
 	}
 
 	private static class SkipReaderStub implements ItemReader<String> {
@@ -208,34 +182,17 @@ public class FaultTolerantStepFactoryBeanRollbackTests {
 
 		private Collection<String> failures = Collections.emptySet();
 
-		private SimpleJdbcTemplate jdbcTemplate;
-
-		public SkipWriterStub(DataSource dataSource) {
-			jdbcTemplate = new SimpleJdbcTemplate(dataSource);
-		}
-
-		public void setFailures(String... failures) {
-			this.failures = Arrays.asList(failures);
-		}
-
-		public List<String> getCommitted() {
-			return jdbcTemplate.query("SELECT MESSAGE from ERROR_LOG where STEP_NAME='written'",
-					new ParameterizedRowMapper<String>() {
-						public String mapRow(ResultSet rs, int rowNum) throws SQLException {
-							return rs.getString(1);
-						}
-					});
+		public List<String> getWritten() {
+			return written;
 		}
 
 		public void clear() {
 			written.clear();
-			jdbcTemplate.update("DELETE FROM ERROR_LOG where STEP_NAME='written'");
 		}
 
 		public void write(List<? extends String> items) throws Exception {
 			for (String item : items) {
 				written.add(item);
-				jdbcTemplate.update("INSERT INTO ERROR_LOG (MESSAGE, STEP_NAME) VALUES (?, ?)", item, "written");
 				checkFailure(item);
 			}
 		}
@@ -252,41 +209,18 @@ public class FaultTolerantStepFactoryBeanRollbackTests {
 		private final Log logger = LogFactory.getLog(getClass());
 
 		private List<String> processed = new CopyOnWriteArrayList<String>();
-
-		private SimpleJdbcTemplate jdbcTemplate;
-
-		/**
-		 * @param dataSource
-		 */
-		public SkipProcessorStub(DataSource dataSource) {
-			jdbcTemplate = new SimpleJdbcTemplate(dataSource);
-		}
 		
-		/**
-		 * @return the processed
-		 */
 		public List<String> getProcessed() {
 			return processed;
 		}
 
-		public List<String> getCommitted() {
-			return jdbcTemplate.query("SELECT MESSAGE from ERROR_LOG where STEP_NAME='processed'",
-					new ParameterizedRowMapper<String>() {
-						public String mapRow(ResultSet rs, int rowNum) throws SQLException {
-							return rs.getString(1);
-						}
-					});
-		}
-
 		public void clear() {
 			processed.clear();
-			jdbcTemplate.update("DELETE FROM ERROR_LOG where STEP_NAME='processed'");
 		}
 
 		public String process(String item) throws Exception {
 			processed.add(item);
 			logger.debug("Processed item: "+item);
-			jdbcTemplate.update("INSERT INTO ERROR_LOG (MESSAGE, STEP_NAME) VALUES (?, ?)", item, "processed");
 			return item;
 		}
 	}

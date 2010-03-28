@@ -20,11 +20,13 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashSet;
-import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.concurrent.CopyOnWriteArraySet;
 
 import org.springframework.batch.item.ExecutionContext;
 
@@ -38,7 +40,7 @@ public class JobExecution extends Entity {
 
 	private JobInstance jobInstance;
 
-	private volatile Collection<StepExecution> stepExecutions = new LinkedHashSet<StepExecution>();
+	private volatile Collection<StepExecution> stepExecutions = new CopyOnWriteArraySet<StepExecution>();
 
 	private volatile BatchStatus status = BatchStatus.STARTING;
 
@@ -54,7 +56,7 @@ public class JobExecution extends Entity {
 
 	private volatile ExecutionContext executionContext = new ExecutionContext();
 
-	private transient volatile List<Throwable> failureExceptions = new ArrayList<Throwable>();
+	private transient volatile List<Throwable> failureExceptions = new CopyOnWriteArrayList<Throwable>();
 
 	/**
 	 * Because a JobExecution isn't valid unless the job is set, this
@@ -164,7 +166,7 @@ public class JobExecution extends Entity {
 	 * @return the step executions that were registered
 	 */
 	public Collection<StepExecution> getStepExecutions() {
-		return stepExecutions;
+		return Collections.unmodifiableList(new ArrayList<StepExecution>(stepExecutions));
 	}
 
 	/**
@@ -278,7 +280,7 @@ public class JobExecution extends Entity {
 	 * 
 	 * @param t
 	 */
-	public void addFailureException(Throwable t) {
+	public synchronized void addFailureException(Throwable t) {
 		this.failureExceptions.add(t);
 	}
 
@@ -289,7 +291,7 @@ public class JobExecution extends Entity {
 	 * @return List<Throwable> containing all exceptions causing failure for
 	 * this JobExecution.
 	 */
-	public List<Throwable> getAllFailureExceptions() {
+	public synchronized List<Throwable> getAllFailureExceptions() {
 
 		Set<Throwable> allExceptions = new HashSet<Throwable>(failureExceptions);
 		for (StepExecution stepExecution : stepExecutions) {
@@ -320,8 +322,8 @@ public class JobExecution extends Entity {
 	}
 
 	/**
-	 * Setter for the step executions.  For internal use only.
-	 * @param stepExecutions
+	 * Add some step executions.  For internal use only.
+	 * @param stepExecutions step executions to add to the current list
 	 */
 	public void addStepExecutions(List<StepExecution> stepExecutions) {
 		if (stepExecutions!=null) {

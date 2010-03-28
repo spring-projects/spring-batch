@@ -23,11 +23,11 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 
 import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.JobInstance;
 import org.springframework.batch.support.SerializationUtils;
-import org.springframework.batch.support.transaction.TransactionAwareProxyFactory;
 import org.springframework.dao.OptimisticLockingFailureException;
 import org.springframework.util.Assert;
 
@@ -36,7 +36,7 @@ import org.springframework.util.Assert;
  */
 public class MapJobExecutionDao implements JobExecutionDao {
 
-	private Map<Long, JobExecution> executionsById = TransactionAwareProxyFactory.createTransactionalMap();
+	private Map<Long, JobExecution> executionsById = new ConcurrentHashMap<Long, JobExecution>();
 
 	private long currentId = 0;
 

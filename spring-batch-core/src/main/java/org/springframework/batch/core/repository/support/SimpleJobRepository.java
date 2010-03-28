@@ -179,6 +179,8 @@ public class SimpleJobRepository implements JobRepository {
 	}
 
 	public void updateExecutionContext(StepExecution stepExecution) {
+		validateStepExecution(stepExecution);
+		Assert.notNull(stepExecution.getId(), "StepExecution must already be saved (have an id assigned)");
 		ecDao.updateExecutionContext(stepExecution);
 	}
 	

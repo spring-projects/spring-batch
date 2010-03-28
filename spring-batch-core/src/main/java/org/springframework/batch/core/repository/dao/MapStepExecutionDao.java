@@ -20,12 +20,13 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.atomic.AtomicLong;
 
 import org.springframework.batch.core.Entity;
 import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.StepExecution;
 import org.springframework.batch.support.SerializationUtils;
-import org.springframework.batch.support.transaction.TransactionAwareProxyFactory;
 import org.springframework.dao.OptimisticLockingFailureException;
 import org.springframework.util.Assert;
 
@@ -34,13 +35,11 @@ import org.springframework.util.Assert;
  */
 public class MapStepExecutionDao implements StepExecutionDao {
 
-	private Map<Long, Map<Long, StepExecution>> executionsByJobExecutionId = TransactionAwareProxyFactory
-			.createTransactionalMap();
+	private Map<Long, Map<Long, StepExecution>> executionsByJobExecutionId = new ConcurrentHashMap<Long, Map<Long, StepExecution>>();
 
-	private Map<Long, StepExecution> executionsByStepExecutionId = TransactionAwareProxyFactory
-			.createTransactionalMap();
+	private Map<Long, StepExecution> executionsByStepExecutionId = new ConcurrentHashMap<Long, StepExecution>();
 
-	private long currentId = 0;
+	private AtomicLong currentId = new AtomicLong();
 
 	public void clear() {
 		executionsByJobExecutionId.clear();
@@ -59,11 +58,11 @@ public class MapStepExecutionDao implements StepExecutionDao {
 
 		Map<Long, StepExecution> executions = executionsByJobExecutionId.get(stepExecution.getJobExecutionId());
 		if (executions == null) {
-			executions = TransactionAwareProxyFactory.createTransactionalMap();
+			executions = new ConcurrentHashMap<Long, StepExecution>();
 			executionsByJobExecutionId.put(stepExecution.getJobExecutionId(), executions);
 		}
-		
-		stepExecution.setId(currentId++);
+
+		stepExecution.setId(currentId.incrementAndGet());
 		stepExecution.incrementVersion();
 		StepExecution copy = copy(stepExecution);
 		executions.put(stepExecution.getId(), copy);
