@@ -288,8 +288,6 @@
 		<profile>
 			<id>samples</id>
 			<modules>
-				<module>spring-batch-infrastructure-tests</module>
-				<module>spring-batch-core-tests</module>
 				<module>spring-batch-samples</module>
 				<module>archetypes</module>
 			</modules>
