@@ -1,4 +1,4 @@
-#macro (sequence $name)CREATE TABLE ${name} (
+#macro (sequence $name $value)CREATE TABLE ${name} (
 	ID BIGINT IDENTITY
 );
 #end
