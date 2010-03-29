@@ -24,6 +24,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.simple.SimpleJdbcTemplate;
 import org.springframework.transaction.annotation.Transactional;
 import org.junit.runner.RunWith;
+import org.junit.AfterClass;
+import org.junit.BeforeClass;
 import org.junit.Test;
 
 import javax.sql.DataSource;
@@ -37,6 +39,16 @@ public class DatasourceTests {
 	@Autowired
 	public void setDataSource(DataSource dataSource) {
 		this.simpleJdbcTemplate = new SimpleJdbcTemplate(dataSource);
+	}
+	
+	@BeforeClass
+	public static void init() {
+		System.setProperty("batch.business.schema.script", "classpath:/org/springframework/batch/jms/init.sql");
+	}
+
+	@AfterClass
+	public static void cleanup() {
+		System.clearProperty("batch.business.schema.script");
 	}
 
 	@Transactional @Test

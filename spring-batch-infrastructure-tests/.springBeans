@@ -1,14 +1,17 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <beansProjectDescription>
 	<version>1</version>
-	<pluginVersion><![CDATA[2.0.5.v200805010412]]></pluginVersion>
+	<pluginVersion><![CDATA[2.3.1.201002090815-CI-R3692-B638]]></pluginVersion>
 	<configSuffixes>
 		<configSuffix><![CDATA[xml]]></configSuffix>
 	</configSuffixes>
 	<enableImports><![CDATA[false]]></enableImports>
 	<configs>
 		<config>src/test/resources/org/springframework/batch/jms/jms-context.xml</config>
-		<config>src/test/resources/data-source.xml</config>
+		<config>src/test/resources/data-source-context.xml</config>
+		<config>src/test/resources/org/springframework/batch/item/database/data-source-context.xml</config>
+		<config>src/test/resources/org/springframework/batch/item/database/JdbcPagingItemReaderCommonTests-context.xml</config>
+		<config>src/test/resources/org/springframework/batch/item/database/JpaPagingItemReaderCommonTests-context.xml</config>
 	</configs>
 	<configSets>
 		<configSet>
@@ -16,7 +19,7 @@
 			<allowBeanDefinitionOverriding>true</allowBeanDefinitionOverriding>
 			<incomplete>false</incomplete>
 			<configs>
-				<config>src/test/resources/data-source.xml</config>
+				<config>src/test/resources/data-source-context.xml</config>
 			</configs>
 		</configSet>
 		<configSet>
@@ -24,8 +27,8 @@
 			<allowBeanDefinitionOverriding>true</allowBeanDefinitionOverriding>
 			<incomplete>false</incomplete>
 			<configs>
-				<config>src/test/resources/data-source.xml</config>
 				<config>src/test/resources/org/springframework/batch/jms/jms-context.xml</config>
+				<config>src/test/resources/data-source-context.xml</config>
 			</configs>
 		</configSet>
 		<configSet>
@@ -33,7 +36,7 @@
 			<allowBeanDefinitionOverriding>true</allowBeanDefinitionOverriding>
 			<incomplete>false</incomplete>
 			<configs>
-				<config>src/test/resources/data-source.xml</config>
+				<config>src/test/resources/data-source-context.xml</config>
 			</configs>
 		</configSet>
 	</configSets>

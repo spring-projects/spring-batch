@@ -7,18 +7,7 @@
 		http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-2.0.xsd
 		http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-2.0.xsd">
 
-	<import resource="classpath:/data-source.xml" />
-
-	<!-- Transaction manager for a datasource -->
-	<bean id="transactionManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
-		<property name="dataSource" ref="dataSource" />
-	</bean>
-
-	<!-- Transaction manager for jms -->
-	<bean id="jmsTransactionManager" autowire-candidate="false"
-		class="org.springframework.jms.connection.JmsTransactionManager">
-		<property name="connectionFactory" ref="connectionFactory" />
-	</bean>
+	<import resource="classpath:/data-source-context.xml" />
 
 	<bean id="jmsTemplate" class="org.springframework.jms.core.JmsTemplate">
 		<property name="connectionFactory" ref="connectionFactory" />
@@ -97,6 +86,24 @@
 					</bean>
 				</property>
 			</bean>
+		</property>
+	</bean>
+
+	<bean id="brokerService" class="org.apache.activemq.broker.BrokerService" init-method="start"
+		destroy-method="stop">
+		<property name="brokerName" value="broker" />
+		<property name="useJmx" value="false"/>
+		<property name="transportConnectorURIs">
+			<list>
+				<value>vm://localhost</value>
+			</list>
+		</property>
+		<property name="persistenceAdapter">
+			<bean class="org.apache.activemq.store.memory.MemoryPersistenceAdapter"/>
+			<!-- bean class="org.apache.activemq.store.jdbc.JDBCPersistenceAdapter">
+				<property name="dataSource" ref="dataSource"/>
+				<property name="createTablesOnStartup" value="true" />
+			</bean-->
 		</property>
 	</bean>
 
