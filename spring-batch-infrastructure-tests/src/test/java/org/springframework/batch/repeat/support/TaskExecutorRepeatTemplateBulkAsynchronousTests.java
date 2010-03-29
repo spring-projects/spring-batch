@@ -27,6 +27,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.batch.repeat.RepeatCallback;
@@ -61,11 +62,13 @@ public class TaskExecutorRepeatTemplateBulkAsynchronousTests {
 
 	private List<String> items;
 
+	private ThreadPoolTaskExecutor taskExecutor;
+
 	@Before
 	public void setUp() {
 
 		template = new TaskExecutorRepeatTemplate();
-		ThreadPoolTaskExecutor taskExecutor = new ThreadPoolTaskExecutor();
+		taskExecutor = new ThreadPoolTaskExecutor();
 		taskExecutor.setMaxPoolSize(300);
 		taskExecutor.setCorePoolSize(10);
 		taskExecutor.setQueueCapacity(0);
@@ -116,6 +119,11 @@ public class TaskExecutorRepeatTemplateBulkAsynchronousTests {
 
 	}
 
+	@After
+	public void tearDown() {
+		taskExecutor.destroy();
+	}
+
 	@Test
 	public void testThrottleLimitEarlyFinish() throws Exception {
 
@@ -154,6 +162,8 @@ public class TaskExecutorRepeatTemplateBulkAsynchronousTests {
 		// Extra tasks will be submitted before the termination is detected
 		assertEquals(total, items.size() - frequency);
 		assertTrue(frequency <= throttleLimit + 1);
+		
+		taskExecutor.destroy();
 
 	}
 
