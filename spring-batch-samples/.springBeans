@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <beansProjectDescription>
 	<version>1</version>
-	<pluginVersion><![CDATA[2.3.0.200912170948-RELEASE]]></pluginVersion>
+	<pluginVersion><![CDATA[2.3.1.201002090815-CI-R3692-B638]]></pluginVersion>
 	<configSuffixes>
 		<configSuffix><![CDATA[xml]]></configSuffix>
 	</configSuffixes>
@@ -21,7 +21,6 @@
 		<config>src/main/resources/jobs/retrySample.xml</config>
 		<config>src/main/resources/simple-job-launcher-context.xml</config>
 		<config>src/main/resources/adhoc-job-launcher-context.xml</config>
-		<config>src/main/resources/alt-data-source-context.xml</config>
 		<config>src/main/resources/quartz-job-launcher-context.xml</config>
 		<config>src/main/resources/jobs/skipSampleJob.xml</config>
 		<config>src/main/resources/jobs/multilineOrderInputTokenizers.xml</config>

@@ -17,8 +17,8 @@
 package test.jdbc.datasource;
 
 import java.io.IOException;
-import java.util.List;
 import java.util.Arrays;
+import java.util.List;
 
 import javax.sql.DataSource;
 
@@ -50,7 +50,7 @@ public class DataSourceInitializer implements InitializingBean, DisposableBean {
 
 	private Log logger = LogFactory.getLog(getClass());
 
-	private static boolean initialized = false;
+	private boolean initialized = false;
 
 	public void setInitialize(boolean initialize) {
 		this.initialize = initialize;
