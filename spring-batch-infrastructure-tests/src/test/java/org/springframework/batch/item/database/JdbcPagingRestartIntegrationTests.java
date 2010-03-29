@@ -81,16 +81,38 @@ public class JdbcPagingRestartIntegrationTests {
 		jdbcTemplate.update("DELETE from T_FOOS where ID>?", maxId);
 	}
 
+	@Test
+	public void testReaderFromStart() throws Exception {
+
+		ItemReader<Foo> reader = getItemReader();
+
+		int total = SimpleJdbcTestUtils.countRowsInTable(jdbcTemplate, "T_FOOS");
+
+		ExecutionContext executionContext = new ExecutionContext();
+		((ItemStream) reader).open(executionContext);
+
+		for (int i = 0; i < total; i++) {
+			Foo item = reader.read();
+			logger.debug("Item: " + item);
+			assertNotNull(item);
+		}
+
+		Foo item = reader.read();
+		logger.debug("Item: " + item);
+		assertNull(item);
+
+	}
 
 	@Test
-	public void testReader() throws Exception {
+	public void testReaderOnRestart() throws Exception {
 
 		ItemReader<Foo> reader = getItemReader();
 
 		int total = SimpleJdbcTestUtils.countRowsInTable(jdbcTemplate, "T_FOOS");
 		int count = (total / pageSize) * pageSize;
-		if (count >= pageSize) {
-			count -= pageSize;
+		int pagesToRead = Math.min(3, total/pageSize);
+		if (count >= pagesToRead*pageSize) {
+			count -= pagesToRead*pageSize;
 		}
 
 		ExecutionContext executionContext = new ExecutionContext();
