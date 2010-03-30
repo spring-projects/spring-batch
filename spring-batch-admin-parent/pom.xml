@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>org.springframework.batch</groupId>
 	<artifactId>spring-batch-admin-parent</artifactId>
@@ -11,7 +12,7 @@
 		<spring.batch.version>2.1.0.RELEASE</spring.batch.version>
 		<spring.framework.version>3.0.1.RELEASE</spring.framework.version>
 		<spring.integration.version>1.0.3.RELEASE</spring.integration.version>
-		
+
 	</properties>
 	<profiles>
 		<profile>
@@ -108,14 +109,12 @@
 				<plugin>
 					<groupId>com.springsource.bundlor</groupId>
 					<artifactId>com.springsource.bundlor.maven</artifactId>
-					<version>${bundlor.version}</version>
 					<inherited>true</inherited>
 					<executions>
 						<execution>
 							<id>bundlor-transform</id>
-							<phase>package</phase>
 							<goals>
-								<goal>transform</goal>
+								<goal>bundlor</goal>
 							</goals>
 						</execution>
 					</executions>
@@ -619,4 +618,14 @@
 			</snapshots>
 		</repository>
 	</repositories>
+	<pluginRepositories>
+		<pluginRepository>
+			<id>spring-releases</id>
+			<name>Spring Maven Release Repository</name>
+			<url>http://repository.springsource.com/maven/bundles/release</url>
+			<snapshots>
+				<enabled>false</enabled>
+			</snapshots>
+		</pluginRepository>
+	</pluginRepositories>
 </project>
