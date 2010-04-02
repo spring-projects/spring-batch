@@ -67,7 +67,7 @@ public class TransactionAwareProxyFactory<T> {
 	 * @return an independent copy
 	 */
 	@SuppressWarnings("unchecked")
-	protected final T begin(T target) {
+	protected synchronized final T begin(T target) {
 		if (target instanceof List) {
 			return (T) new ArrayList((List) target);
 		}
@@ -91,7 +91,7 @@ public class TransactionAwareProxyFactory<T> {
 	 * @param target the original target of the factory.
 	 */
 	@SuppressWarnings("unchecked")
-	protected void commit(T copy, T target) {
+	protected synchronized void commit(T copy, T target) {
 		if (target instanceof Collection) {
 			((Collection) target).clear();
 			((Collection) target).addAll((Collection) copy);

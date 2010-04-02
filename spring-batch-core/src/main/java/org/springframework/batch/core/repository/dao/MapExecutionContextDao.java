@@ -27,8 +27,9 @@ import org.springframework.batch.support.transaction.TransactionAwareProxyFactor
 /**
  * In-memory implementation of {@link ExecutionContextDao} backed by static
  * maps.
- *
+ * 
  * @author Robert Kasanicky
+ * @author Dave Syer
  */
 public class MapExecutionContextDao implements ExecutionContextDao {
 
@@ -52,7 +53,10 @@ public class MapExecutionContextDao implements ExecutionContextDao {
 	}
 
 	public void updateExecutionContext(StepExecution stepExecution) {
-		contextsByStepExecutionId.put(stepExecution.getId(), copy(stepExecution.getExecutionContext()));
+		ExecutionContext executionContext = stepExecution.getExecutionContext();
+		if (executionContext != null) {
+			contextsByStepExecutionId.put(stepExecution.getId(), copy(executionContext));
+		}
 	}
 
 	public ExecutionContext getExecutionContext(JobExecution jobExecution) {
@@ -60,7 +64,10 @@ public class MapExecutionContextDao implements ExecutionContextDao {
 	}
 
 	public void updateExecutionContext(JobExecution jobExecution) {
-		contextsByJobExecutionId.put(jobExecution.getId(), copy(jobExecution.getExecutionContext()));
+		ExecutionContext executionContext = jobExecution.getExecutionContext();
+		if (executionContext != null) {
+			contextsByJobExecutionId.put(jobExecution.getId(), copy(executionContext));
+		}
 	}
 
 	public void saveExecutionContext(JobExecution jobExecution) {
