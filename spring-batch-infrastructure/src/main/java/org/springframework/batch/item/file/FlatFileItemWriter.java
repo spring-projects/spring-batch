@@ -62,7 +62,7 @@ public class FlatFileItemWriter<T> extends ExecutionContextUserSupport implement
 
 	private static final boolean DEFAULT_TRANSACTIONAL = true;
 
-	protected static final Log logger = LogFactory.getLog(JdbcBatchItemWriter.class);
+	protected static final Log logger = LogFactory.getLog(FlatFileItemWriter.class);
 
 	private static final String DEFAULT_LINE_SEPARATOR = System.getProperty("line.separator");
 
