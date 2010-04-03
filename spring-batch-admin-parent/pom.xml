@@ -12,7 +12,6 @@
 		<spring.batch.version>2.1.0.RELEASE</spring.batch.version>
 		<spring.framework.version>3.0.1.RELEASE</spring.framework.version>
 		<spring.integration.version>1.0.3.RELEASE</spring.integration.version>
-
 	</properties>
 	<profiles>
 		<profile>
