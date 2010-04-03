@@ -21,6 +21,7 @@ import static org.junit.Assert.assertEquals;
 import java.util.concurrent.Callable;
 import java.util.concurrent.CompletionService;
 import java.util.concurrent.ExecutorCompletionService;
+import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 import org.junit.Test;
@@ -74,8 +75,8 @@ public class ConcurrentMapExecutionContextDaoTests {
 	@Test
 	public void testConcurrentTransactionalSaveUpdate() throws Exception {
 
-		CompletionService<StepExecution> completionService = new ExecutorCompletionService<StepExecution>(Executors
-				.newFixedThreadPool(3));
+		ExecutorService executor = Executors.newFixedThreadPool(3);
+		CompletionService<StepExecution> completionService = new ExecutorCompletionService<StepExecution>(executor);
 
 		final int outerMax = 10;
 		final int innerMax = 100;
@@ -111,6 +112,8 @@ public class ConcurrentMapExecutionContextDaoTests {
 			completionService.take().get();
 
 		}
+		
+		executor.shutdown();
 
 	}
 

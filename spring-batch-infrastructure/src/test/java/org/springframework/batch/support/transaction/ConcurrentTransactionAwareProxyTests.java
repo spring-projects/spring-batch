@@ -28,8 +28,11 @@ import java.util.concurrent.Callable;
 import java.util.concurrent.CompletionService;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorCompletionService;
+import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
+import org.junit.After;
+import org.junit.Before;
 import org.junit.Test;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.TransactionStatus;
@@ -49,16 +52,31 @@ public class ConcurrentTransactionAwareProxyTests {
 
 	int innerMax = 10;
 
-	@Test(expected=Throwable.class)
+	private ExecutorService executor;
+
+	private CompletionService<List<String>> completionService;
+	
+	@Before
+	public void init() {
+		executor = Executors.newFixedThreadPool(outerMax);
+		completionService = new ExecutorCompletionService<List<String>>(executor);
+	}
+
+	@After
+	public void close() {
+		executor.shutdown();
+	}
+
+	@Test(expected = Throwable.class)
 	public void testConcurrentTransactionalSet() throws Exception {
-		 Set<String> set = TransactionAwareProxyFactory.createTransactionalSet();
-		 testSet(set);
+		Set<String> set = TransactionAwareProxyFactory.createTransactionalSet();
+		testSet(set);
 	}
 
 	@Test
 	public void testConcurrentTransactionalAppendOnlySet() throws Exception {
-		 Set<String> set = TransactionAwareProxyFactory.createAppendOnlyTransactionalSet();
-		 testSet(set);
+		Set<String> set = TransactionAwareProxyFactory.createAppendOnlyTransactionalSet();
+		testSet(set);
 	}
 
 	@Test
@@ -66,8 +84,8 @@ public class ConcurrentTransactionAwareProxyTests {
 		List<String> list = TransactionAwareProxyFactory.createAppendOnlyTransactionalList();
 		testList(list);
 	}
-	
-	@Test(expected=Throwable.class)
+
+	@Test(expected = Throwable.class)
 	public void testConcurrentTransactionalList() throws Exception {
 		List<String> list = TransactionAwareProxyFactory.createTransactionalList();
 		testList(list);
@@ -84,7 +102,7 @@ public class ConcurrentTransactionAwareProxyTests {
 		Map<Long, Map<String, String>> map = TransactionAwareProxyFactory.createTransactionalMap();
 		testMap(map);
 	}
-	
+
 	@Test
 	public void testTransactionalContains() throws Exception {
 		final Map<Long, Map<String, String>> map = TransactionAwareProxyFactory.createAppendOnlyTransactionalMap();
@@ -93,13 +111,10 @@ public class ConcurrentTransactionAwareProxyTests {
 				return map.containsKey("foo");
 			}
 		});
-		assertFalse(result);	
+		assertFalse(result);
 	}
-	
-	private void testSet(final Set<String> set) throws Exception {
 
-		CompletionService<List<String>> completionService = new ExecutorCompletionService<List<String>>(Executors
-				.newFixedThreadPool(outerMax));
+	private void testSet(final Set<String> set) throws Exception {
 
 		for (int i = 0; i < outerMax; i++) {
 
@@ -129,9 +144,6 @@ public class ConcurrentTransactionAwareProxyTests {
 
 	private void testList(final List<String> list) throws Exception {
 
-		CompletionService<List<String>> completionService = new ExecutorCompletionService<List<String>>(Executors
-				.newFixedThreadPool(outerMax));
-
 		for (int i = 0; i < outerMax; i++) {
 
 			completionService.submit(new Callable<List<String>>() {
@@ -159,29 +171,26 @@ public class ConcurrentTransactionAwareProxyTests {
 
 	private void testMap(final Map<Long, Map<String, String>> map) throws Exception {
 
-		CompletionService<List<String>> completionService = new ExecutorCompletionService<List<String>>(Executors
-				.newFixedThreadPool(outerMax));
-		
 		int numberOfKeys = outerMax;
 
 		for (int i = 0; i < outerMax; i++) {
 
-			for (int j=0; j<numberOfKeys; j++) { 
-			final long id = j*1000 + 123L + i;
+			for (int j = 0; j < numberOfKeys; j++) {
+				final long id = j * 1000 + 123L + i;
 
-			completionService.submit(new Callable<List<String>>() {
-				public List<String> call() throws Exception {
-					List<String> list = new ArrayList<String>();
-					for (int i = 0; i < innerMax; i++) {
-						String value = "bar" + i;
-						list.add(saveInMapAndAssert(map, id, value).get("foo"));
+				completionService.submit(new Callable<List<String>>() {
+					public List<String> call() throws Exception {
+						List<String> list = new ArrayList<String>();
+						for (int i = 0; i < innerMax; i++) {
+							String value = "bar" + i;
+							list.add(saveInMapAndAssert(map, id, value).get("foo"));
+						}
+						return list;
 					}
-					return list;
-				}
-			});
+				});
 			}
 
-			for (int j=0; j<numberOfKeys; j++) { 
+			for (int j = 0; j < numberOfKeys; j++) {
 				completionService.take().get();
 			}
 
