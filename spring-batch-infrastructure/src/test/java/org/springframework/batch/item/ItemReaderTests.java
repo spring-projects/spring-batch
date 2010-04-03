@@ -16,10 +16,12 @@
 
 package org.springframework.batch.item;
 
-import junit.framework.TestCase;
+import static org.junit.Assert.assertEquals;
+
+import org.junit.Test;
 
 
-public class ItemProviderTests extends TestCase {
+public class ItemReaderTests {
 
 	ItemReader<String> provider = new ItemReader<String>() {
 		public String read() {
@@ -27,6 +29,7 @@ public class ItemProviderTests extends TestCase {
 		}
 	};
 
+	@Test
 	public void testNext() throws Exception {
 		assertEquals("foo", provider.read());
 	}
