@@ -24,6 +24,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.concurrent.CopyOnWriteArraySet;
 
 import org.aopalliance.intercept.MethodInterceptor;
 import org.aopalliance.intercept.MethodInvocation;
@@ -33,28 +35,46 @@ import org.springframework.transaction.support.TransactionSynchronizationAdapter
 import org.springframework.transaction.support.TransactionSynchronizationManager;
 
 /**
+ * <p>
  * Factory for transaction aware objects (like lists, sets, maps). If a
  * transaction is active when a method is called on an instance created by the
  * factory, it makes a copy of the target object and carries out all operations
  * on the copy. Only when the transaction commits is the target re-initialised
- * with the copy.<br/>
+ * with the copy.
+ * </p>
  * 
+ * <p>
  * Works well with collections and maps for testing transactional behaviour
  * without needing a database. The base implementation handles lists, sets and
  * maps. Subclasses can implement {@link #begin(Object)} and
- * {@link #commit(Object, Object)} to provide support for other resources.<br/>
+ * {@link #commit(Object, Object)} to provide support for other resources.
+ * </p>
  * 
- * Not intended for multi-threaded use.
+ * <p>
+ * Generally not intended for multi-threaded use, but the
+ * {@link #createAppendOnlyTransactionalMap() append only version} of
+ * collections gives isolation between threads operating on different keys in a
+ * map, provided they only append to the map. (Threads are limited to removing
+ * entries that were created in the same transaction.)
+ * </p>
  * 
  * @author Dave Syer
  * 
  */
 public class TransactionAwareProxyFactory<T> {
 
-	private T target;
+	private final T target;
+
+	private final boolean appendOnly;
 
 	private TransactionAwareProxyFactory(T target) {
+		this(target, false);
+
+	}
+
+	private TransactionAwareProxyFactory(T target, boolean appendOnly) {
 		super();
+		this.appendOnly = appendOnly;
 		this.target = begin(target);
 	}
 
@@ -68,14 +88,25 @@ public class TransactionAwareProxyFactory<T> {
 	 */
 	@SuppressWarnings("unchecked")
 	protected synchronized final T begin(T target) {
+		// Unfortunately in Java 5 this method has to synchronized
+		// (works OK without in Java 6).
 		if (target instanceof List) {
+			if (appendOnly) {
+				return (T) new ArrayList();
+			}
 			return (T) new ArrayList((List) target);
 		}
 		else if (target instanceof Set) {
+			if (appendOnly) {
+				return (T) new HashSet();
+			}
 			return (T) new HashSet((Set) target);
 		}
 		else if (target instanceof Map) {
-			return (T) new ConcurrentHashMap((Map) target);
+			if (appendOnly) {
+				return (T) new HashMap();
+			}
+			return (T) new HashMap((Map) target);
 		}
 		else {
 			throw new UnsupportedOperationException("Cannot copy target for this type: " + target.getClass());
@@ -92,20 +123,27 @@ public class TransactionAwareProxyFactory<T> {
 	 */
 	@SuppressWarnings("unchecked")
 	protected synchronized void commit(T copy, T target) {
+		// Unfortunately in Java 5 this method has to synchronized
+		// (works OK without in Java 6).
 		if (target instanceof Collection) {
-			((Collection) target).clear();
+			if (!appendOnly) {
+				((Collection) target).clear();
+			}
 			((Collection) target).addAll((Collection) copy);
 		}
 		else {
-			((Map) target).clear();
+			if (!appendOnly) {
+				((Map) target).clear();
+			}
 			((Map) target).putAll((Map) copy);
 		}
 	}
 
 	private T createInstance() {
+
 		ProxyFactory factory = new ProxyFactory(target);
 		factory.addAdvice(new MethodInterceptor() {
-			
+
 			public Object invoke(MethodInvocation invocation) throws Throwable {
 
 				if (!TransactionSynchronizationManager.isActualTransactionActive()) {
@@ -125,7 +163,15 @@ public class TransactionAwareProxyFactory<T> {
 					cache = retrievedCache;
 				}
 
-				return invocation.getMethod().invoke(cache, invocation.getArguments());
+				Object result = invocation.getMethod().invoke(cache, invocation.getArguments());
+				
+				String methodName = invocation.getMethod().getName();
+				if (appendOnly && result==null && (methodName.equals("get") || methodName.equals("contains"))) {
+					// In appendOnly mode the result of a get might not be in the cache...
+					return invocation.proceed();
+				}
+
+				return result;
 
 			}
 		});
@@ -133,35 +179,50 @@ public class TransactionAwareProxyFactory<T> {
 		T instance = (T) factory.getProxy();
 		return instance;
 	}
-	
+
 	@SuppressWarnings("unchecked")
-	public static <K,V> Map<K,V> createTransactionalMap() {
-		return (Map<K,V>) new TransactionAwareProxyFactory(new HashMap<K,V>()).createInstance();
+	public static <K, V> Map<K, V> createTransactionalMap() {
+		return (Map<K, V>) new TransactionAwareProxyFactory(new ConcurrentHashMap<K, V>()).createInstance();
 	}
 
 	@SuppressWarnings("unchecked")
-	public static <K,V> Map<K,V> createTransactionalMap(Map<K,V> map) {
-		return (Map<K,V>) new TransactionAwareProxyFactory(map).createInstance();
+	public static <K, V> Map<K, V> createTransactionalMap(Map<K, V> map) {
+		return (Map<K, V>) new TransactionAwareProxyFactory(new ConcurrentHashMap<K, V>(map)).createInstance();
+	}
+
+	@SuppressWarnings("unchecked")
+	public static <K, V> Map<K, V> createAppendOnlyTransactionalMap() {
+		return (Map<K, V>) new TransactionAwareProxyFactory(new ConcurrentHashMap<K, V>(), true).createInstance();
+	}
+
+	@SuppressWarnings("unchecked")
+	public static <T> Set<T> createAppendOnlyTransactionalSet() {
+		return (Set<T>) new TransactionAwareProxyFactory(new CopyOnWriteArraySet<T>(), true).createInstance();
 	}
 
 	@SuppressWarnings("unchecked")
 	public static <T> Set<T> createTransactionalSet() {
-		return (Set<T>) new TransactionAwareProxyFactory(new HashSet<T>()).createInstance();
+		return (Set<T>) new TransactionAwareProxyFactory(new CopyOnWriteArraySet<T>()).createInstance();
 	}
 
 	@SuppressWarnings("unchecked")
 	public static <T> Set<T> createTransactionalSet(Set<T> set) {
-		return (Set<T>) new TransactionAwareProxyFactory(set).createInstance();
+		return (Set<T>) new TransactionAwareProxyFactory(new CopyOnWriteArraySet<T>(set)).createInstance();
+	}
+
+	@SuppressWarnings("unchecked")
+	public static <T> List<T> createAppendOnlyTransactionalList() {
+		return (List<T>) new TransactionAwareProxyFactory(new CopyOnWriteArrayList<T>(), true).createInstance();
 	}
 
 	@SuppressWarnings("unchecked")
 	public static <T> List<T> createTransactionalList() {
-		return (List<T>) new TransactionAwareProxyFactory(new ArrayList<T>()).createInstance();
+		return (List<T>) new TransactionAwareProxyFactory(new CopyOnWriteArrayList<T>()).createInstance();
 	}
 
 	@SuppressWarnings("unchecked")
 	public static <T> List<T> createTransactionalList(List<T> list) {
-		return (List<T>) new TransactionAwareProxyFactory(list).createInstance();
+		return (List<T>) new TransactionAwareProxyFactory(new CopyOnWriteArrayList<T>(list)).createInstance();
 	}
 
 	private class TargetSynchronization extends TransactionSynchronizationAdapter {

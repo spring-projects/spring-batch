@@ -22,7 +22,8 @@ import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
 import java.util.Arrays;
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -30,37 +31,37 @@ import org.springframework.transaction.TransactionStatus;
 import org.springframework.transaction.support.TransactionCallback;
 import org.springframework.transaction.support.TransactionTemplate;
 
-public class TransactionAwareListFactoryTests {
+public class TransactionAwareSetFactoryTests {
 
 	private TransactionTemplate transactionTemplate = new TransactionTemplate(new ResourcelessTransactionManager());
 
-	private List<String> list;
+	private Set<String> set;
 
 	@Before
 	public void setUp() throws Exception {
-		list = TransactionAwareProxyFactory.createTransactionalList(Arrays.asList("foo", "bar", "spam"));
+		set = TransactionAwareProxyFactory.createTransactionalSet(new HashSet<String>(Arrays.asList("foo", "bar", "spam")));
 	}
 
 	@Test
 	public void testAdd() {
-		assertEquals(3, list.size());
-		list.add("bucket");
-		assertTrue(list.contains("bucket"));
+		assertEquals(3, set.size());
+		set.add("bucket");
+		assertTrue(set.contains("bucket"));
 	}
 
 	@Test
 	public void testRemove() {
-		assertEquals(3, list.size());
-		assertTrue(list.contains("spam"));
-		list.remove("spam");
-		assertFalse(list.contains("spam"));
+		assertEquals(3, set.size());
+		assertTrue(set.contains("spam"));
+		set.remove("spam");
+		assertFalse(set.contains("spam"));
 	}
 
 	@Test
 	public void testClear() {
-		assertEquals(3, list.size());
-		list.clear();
-		assertEquals(0, list.size());
+		assertEquals(3, set.size());
+		set.clear();
+		assertEquals(0, set.size());
 	}
 
 	@Test
@@ -71,7 +72,7 @@ public class TransactionAwareListFactoryTests {
 				return null;
 			}
 		});
-		assertEquals(4, list.size());
+		assertEquals(4, set.size());
 	}
 
 	@Test
@@ -82,7 +83,7 @@ public class TransactionAwareListFactoryTests {
 				return null;
 			}
 		});
-		assertEquals(2, list.size());
+		assertEquals(2, set.size());
 	}
 
 	@Test
@@ -93,7 +94,7 @@ public class TransactionAwareListFactoryTests {
 				return null;
 			}
 		});
-		assertEquals(0, list.size());
+		assertEquals(0, set.size());
 	}
 
 	@Test
@@ -110,7 +111,7 @@ public class TransactionAwareListFactoryTests {
 		catch (RuntimeException e) {
 			assertEquals("Rollback!", e.getMessage());
 		}
-		assertEquals(3, list.size());
+		assertEquals(3, set.size());
 	}
 
 	@Test
@@ -127,7 +128,7 @@ public class TransactionAwareListFactoryTests {
 		catch (RuntimeException e) {
 			assertEquals("Rollback!", e.getMessage());
 		}
-		assertEquals(3, list.size());
+		assertEquals(3, set.size());
 	}
 
 	@Test
@@ -144,6 +145,6 @@ public class TransactionAwareListFactoryTests {
 		catch (RuntimeException e) {
 			assertEquals("Rollback!", e.getMessage());
 		}
-		assertEquals(3, list.size());
+		assertEquals(3, set.size());
 	}
 }

@@ -25,8 +25,7 @@ import org.springframework.batch.support.SerializationUtils;
 import org.springframework.batch.support.transaction.TransactionAwareProxyFactory;
 
 /**
- * In-memory implementation of {@link ExecutionContextDao} backed by static
- * maps.
+ * In-memory implementation of {@link ExecutionContextDao} backed by maps.
  * 
  * @author Robert Kasanicky
  * @author Dave Syer
@@ -34,10 +33,10 @@ import org.springframework.batch.support.transaction.TransactionAwareProxyFactor
 public class MapExecutionContextDao implements ExecutionContextDao {
 
 	private Map<Long, ExecutionContext> contextsByStepExecutionId = TransactionAwareProxyFactory
-			.createTransactionalMap();
+			.createAppendOnlyTransactionalMap();
 
 	private Map<Long, ExecutionContext> contextsByJobExecutionId = TransactionAwareProxyFactory
-			.createTransactionalMap();
+			.createAppendOnlyTransactionalMap();
 
 	public void clear() {
 		contextsByJobExecutionId.clear();
