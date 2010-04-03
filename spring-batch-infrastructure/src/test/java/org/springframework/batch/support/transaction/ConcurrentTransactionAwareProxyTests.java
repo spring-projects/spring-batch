@@ -17,6 +17,7 @@
 package org.springframework.batch.support.transaction;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -82,6 +83,17 @@ public class ConcurrentTransactionAwareProxyTests {
 	public void testConcurrentTransactionalMap() throws Exception {
 		Map<Long, Map<String, String>> map = TransactionAwareProxyFactory.createTransactionalMap();
 		testMap(map);
+	}
+	
+	@Test
+	public void testTransactionalContains() throws Exception {
+		final Map<Long, Map<String, String>> map = TransactionAwareProxyFactory.createAppendOnlyTransactionalMap();
+		boolean result = (Boolean) new TransactionTemplate(transactionManager).execute(new TransactionCallback() {
+			public Object doInTransaction(TransactionStatus status) {
+				return map.containsKey("foo");
+			}
+		});
+		assertFalse(result);	
 	}
 	
 	private void testSet(final Set<String> set) throws Exception {

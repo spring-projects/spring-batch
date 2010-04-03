@@ -164,11 +164,15 @@ public class TransactionAwareProxyFactory<T> {
 				}
 
 				Object result = invocation.getMethod().invoke(cache, invocation.getArguments());
-				
-				String methodName = invocation.getMethod().getName();
-				if (appendOnly && result==null && (methodName.equals("get") || methodName.equals("contains"))) {
-					// In appendOnly mode the result of a get might not be in the cache...
-					return invocation.proceed();
+
+				if (appendOnly) {
+					String methodName = invocation.getMethod().getName();
+					if ((result == null && methodName.equals("get"))
+							|| (Boolean.FALSE.equals(result) && methodName.startsWith("contains"))) {
+						// In appendOnly mode the result of a get might not be
+						// in the cache...
+						return invocation.proceed();
+					}
 				}
 
 				return result;
