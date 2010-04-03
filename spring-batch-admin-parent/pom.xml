@@ -241,13 +241,11 @@
 				<groupId>org.apache.geronimo.specs</groupId>
 				<artifactId>geronimo-jms_1.1_spec</artifactId>
 				<version>1.1</version>
-				<optional>true</optional>
 			</dependency>
 			<dependency>
 				<groupId>org.apache.geronimo.specs</groupId>
 				<artifactId>geronimo-jta_1.1_spec</artifactId>
 				<version>1.1</version>
-				<optional>true</optional>
 			</dependency>
 			<dependency>
 				<groupId>javax.annotation</groupId>
@@ -259,13 +257,11 @@
 				<groupId>stax</groupId>
 				<artifactId>stax</artifactId>
 				<version>1.2.0</version>
-				<optional>true</optional>
 			</dependency>
 			<dependency>
 				<groupId>org.hibernate</groupId>
 				<artifactId>hibernate-core</artifactId>
 				<version>3.3.1.GA</version>
-				<optional>true</optional>
 				<exclusions>
 					<exclusion>
 						<groupId>cglib</groupId>
@@ -289,7 +285,6 @@
 				<groupId>org.hibernate</groupId>
 				<artifactId>hibernate-entitymanager</artifactId>
 				<version>3.3.2.GA</version>
-				<optional>true</optional>
 				<exclusions>
 					<exclusion>
 						<groupId>edu.oswego.cs.concurrent</groupId>
@@ -301,13 +296,11 @@
 				<groupId>org.hibernate</groupId>
 				<artifactId>hibernate-annotations</artifactId>
 				<version>3.3.1.GA</version>
-				<optional>true</optional>
 			</dependency>
 			<dependency>
 				<groupId>cglib</groupId>
 				<artifactId>cglib-nodep</artifactId>
 				<version>2.1_3</version>
-				<optional>true</optional>
 			</dependency>
 			<dependency>
 				<groupId>commons-logging</groupId>
@@ -318,19 +311,16 @@
 				<groupId>commons-lang</groupId>
 				<artifactId>commons-lang</artifactId>
 				<version>2.1</version>
-				<optional>true</optional>
 			</dependency>
 			<dependency>
 				<groupId>commons-io</groupId>
 				<artifactId>commons-io</artifactId>
 				<version>1.4</version>
-				<optional>true</optional>
 			</dependency>
 			<dependency>
 				<groupId>commons-collections</groupId>
 				<artifactId>commons-collections</artifactId>
 				<version>3.2</version>
-				<optional>true</optional>
 			</dependency>
 			<dependency>
 				<groupId>commons-dbcp</groupId>
@@ -349,7 +339,6 @@
 				<artifactId>log4j</artifactId>
 				<version>1.2.14</version>
 				<scope>runtime</scope>
-				<optional>true</optional>
 			</dependency>
 			<dependency>
 				<groupId>hsqldb</groupId>
@@ -385,47 +374,40 @@
 				<groupId>org.apache.ibatis</groupId>
 				<artifactId>ibatis-sqlmap</artifactId>
 				<version>2.3.0</version>
-				<optional>true</optional>
 			</dependency>
 			<dependency>
 				<groupId>javax.persistence</groupId>
 				<artifactId>persistence-api</artifactId>
 				<version>1.0</version>
-				<optional>true</optional>
 			</dependency>
 			<dependency>
 				<groupId>org.osgi</groupId>
 				<artifactId>osgi_R4_core</artifactId>
 				<version>1.0</version>
-				<optional>true</optional>
 			</dependency>
 			<dependency>
 				<groupId>asm</groupId>
 				<artifactId>asm</artifactId>
 				<version>2.2.3</version>
 				<scope>runtime</scope>
-				<optional>true</optional>
 			</dependency>
 			<dependency>
 				<groupId>asm</groupId>
 				<artifactId>asm-attrs</artifactId>
 				<version>2.2.3</version>
 				<scope>runtime</scope>
-				<optional>true</optional>
 			</dependency>
 			<dependency>
 				<groupId>asm</groupId>
 				<artifactId>asm-commons</artifactId>
 				<version>2.2.3</version>
 				<scope>runtime</scope>
-				<optional>true</optional>
 			</dependency>
 			<dependency>
 				<groupId>javax.servlet</groupId>
 				<artifactId>servlet-api</artifactId>
 				<version>2.5</version>
 				<scope>provided</scope>
-				<optional>true</optional>
 			</dependency>
 			<dependency>
 				<groupId>org.freemarker</groupId>
