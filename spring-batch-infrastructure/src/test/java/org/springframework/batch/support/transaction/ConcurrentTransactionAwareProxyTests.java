@@ -50,7 +50,7 @@ public class ConcurrentTransactionAwareProxyTests {
 
 	int outerMax = 10;
 
-	int innerMax = 10;
+	int innerMax = 15;
 
 	private ExecutorService executor;
 

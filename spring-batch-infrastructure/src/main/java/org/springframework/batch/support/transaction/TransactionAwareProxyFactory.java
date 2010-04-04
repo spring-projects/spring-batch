@@ -74,8 +74,8 @@ public class TransactionAwareProxyFactory<T> {
 
 	private TransactionAwareProxyFactory(T target, boolean appendOnly) {
 		super();
-		this.appendOnly = appendOnly;
 		this.target = begin(target);
+		this.appendOnly = appendOnly;
 	}
 
 	/**
@@ -123,7 +123,7 @@ public class TransactionAwareProxyFactory<T> {
 	 */
 	@SuppressWarnings("unchecked")
 	protected synchronized void commit(T copy, T target) {
-		// Unfortunately in Java 5 this method has to synchronized
+		// Unfortunately in Java 5 this method has to be synchronized
 		// (works OK without in Java 6).
 		if (target instanceof Collection) {
 			if (!appendOnly) {
