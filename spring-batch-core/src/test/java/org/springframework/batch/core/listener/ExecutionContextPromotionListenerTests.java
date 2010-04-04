@@ -66,6 +66,7 @@ public class ExecutionContextPromotionListenerTests {
 	@Test
 	public void promoteEntryStatusFound() throws Exception {
 		ExecutionContextPromotionListener listener = new ExecutionContextPromotionListener();
+		listener.setStrict(true);
 
 		JobExecution jobExecution = new JobExecution(1L);
 		StepExecution stepExecution = jobExecution.createStepExecution("step1");

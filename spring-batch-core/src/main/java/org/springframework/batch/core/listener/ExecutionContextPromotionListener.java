@@ -54,11 +54,12 @@ public class ExecutionContextPromotionListener extends StepExecutionListenerSupp
 			if (PatternMatcher.match(statusPattern, exitCode)) {
 				for (String key : keys) {
 					if (stepContext.containsKey(key)) {
+						jobContext.put(key, stepContext.get(key));
+					} else {
 						if (strict) {
 							throw new IllegalArgumentException("The key [" + key
 									+ "] was not found in the Step's ExecutionContext.");
-						}
-						jobContext.put(key, stepContext.get(key));
+						}						
 					}
 				}
 				break;
