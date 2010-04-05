@@ -105,7 +105,7 @@ itemWriter.write(items);</programlisting>
             before committing). For an in-line &lt;step/&gt; (one defined
             within a &lt;job/&gt;) it is an attribute on the &lt;job/&gt;
             element; for a standalone step, it is defined as an attribute of
-            the on the &lt;tasklet/&gt;.</para>
+            the &lt;tasklet/&gt;.</para>
           </listitem>
 
           <listitem>
