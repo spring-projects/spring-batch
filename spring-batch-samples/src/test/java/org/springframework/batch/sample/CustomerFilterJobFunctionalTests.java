@@ -97,9 +97,9 @@ public class CustomerFilterJobFunctionalTests {
 		});
 
 		Map<String, Object> step1Execution = this.getStepExecution(jobExecution, "uploadCustomer");
-		assertEquals(new Long(4), step1Execution.get("READ_COUNT"));
-		assertEquals(new Long(1), step1Execution.get("FILTER_COUNT"));
-		assertEquals(new Long(3), step1Execution.get("WRITE_COUNT"));
+		assertEquals("4", step1Execution.get("READ_COUNT").toString());
+		assertEquals("1", step1Execution.get("FILTER_COUNT").toString());
+		assertEquals("3", step1Execution.get("WRITE_COUNT").toString());
 
 	}
 

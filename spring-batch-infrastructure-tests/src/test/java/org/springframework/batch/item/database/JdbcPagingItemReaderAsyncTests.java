@@ -24,7 +24,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.batch.item.ItemReader;
-import org.springframework.batch.item.database.support.HsqlPagingQueryProvider;
+import org.springframework.batch.item.database.support.SqlPagingQueryProviderFactoryBean;
 import org.springframework.batch.item.sample.Foo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.simple.ParameterizedRowMapper;
@@ -137,11 +137,12 @@ public class JdbcPagingItemReaderAsyncTests {
 
 		JdbcPagingItemReader<Foo> reader = new JdbcPagingItemReader<Foo>();
 		reader.setDataSource(dataSource);
-		HsqlPagingQueryProvider queryProvider = new HsqlPagingQueryProvider();
-		queryProvider.setSelectClause("select ID, NAME, VALUE");
-		queryProvider.setFromClause("from T_FOOS");
-		queryProvider.setSortKey("ID");
-		reader.setQueryProvider(queryProvider);
+		SqlPagingQueryProviderFactoryBean factory = new SqlPagingQueryProviderFactoryBean();
+		factory.setDataSource(dataSource);
+		factory.setSelectClause("select ID, NAME, VALUE");
+		factory.setFromClause("from T_FOOS");
+		factory.setSortKey("ID");
+		reader.setQueryProvider((PagingQueryProvider) factory.getObject());
 		reader.setRowMapper(new ParameterizedRowMapper<Foo>() {
 			public Foo mapRow(ResultSet rs, int i) throws SQLException {
 				Foo foo = new Foo();

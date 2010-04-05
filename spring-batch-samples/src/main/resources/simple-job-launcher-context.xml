@@ -20,7 +20,7 @@
 
 	<bean id="jobRepository"
 		class="org.springframework.batch.core.repository.support.JobRepositoryFactoryBean"
-		p:dataSource-ref="dataSource" p:transactionManager-ref="transactionManager" />
+		p:dataSource-ref="dataSource" p:transactionManager-ref="transactionManager" p:lobHandler-ref="lobHandler"/>
 
 	<bean id="mapJobRepository"
 		class="org.springframework.batch.core.repository.support.MapJobRepositoryFactoryBean"

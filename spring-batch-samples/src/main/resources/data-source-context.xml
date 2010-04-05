@@ -68,6 +68,6 @@
 		<property name="incrementerName" value="DUMMY"/>
 	</bean>
 
-	<!--import resource="alt-data-source-context.xml" /-->
+	<bean id="lobHandler" class="${batch.lob.handler.class}"/>
 
 </beans>

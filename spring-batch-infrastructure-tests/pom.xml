@@ -11,6 +11,10 @@
 		<version>2.1.1.CI-SNAPSHOT</version>
 		<relativePath>../spring-batch-parent</relativePath>
 	</parent>
+	<properties>
+		<!-- Override this with -Denvironment=XXXX to change database type -->
+		<environment>hsql</environment>
+	</properties>
 	<profiles>
 		<profile>
 			<id>tiger</id>
@@ -65,6 +69,12 @@
 						<artifactId>maven-surefire-plugin</artifactId>
 						<configuration>
 							<skip>false</skip>
+							<systemProperties>
+								<property>
+									<name>ENVIRONMENT</name>
+									<value>${environment}</value>
+								</property>
+							</systemProperties>
 						</configuration>
 					</plugin>
 				</plugins>
@@ -218,6 +228,19 @@
 		<dependency>
 			<groupId>org.springframework</groupId>
 			<artifactId>spring-aop</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>mysql</groupId>
+			<artifactId>mysql-connector-java</artifactId>
+			<version>5.1.6</version>
+			<scope>runtime</scope>
+		</dependency>
+		<dependency>
+			<groupId>com.oracle.jdbc</groupId>
+			<artifactId>com.springsource.oracle.jdbc</artifactId>
+			<version>10.2.0.2</version>
+			<optional>true</optional>
+			<scope>runtime</scope>
 		</dependency>
 	</dependencies>
 	<build>

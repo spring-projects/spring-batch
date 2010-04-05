@@ -36,7 +36,7 @@ import org.junit.runner.RunWith;
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.ItemStream;
-import org.springframework.batch.item.database.support.HsqlPagingQueryProvider;
+import org.springframework.batch.item.database.support.SqlPagingQueryProviderFactoryBean;
 import org.springframework.batch.item.sample.Foo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.simple.ParameterizedRowMapper;
@@ -122,7 +122,7 @@ public class JdbcPagingRestartIntegrationTests {
 		List<Map<String, Object>> ids = jdbcTemplate
 				.queryForList("SELECT ID,NAME FROM T_FOOS ORDER BY ID ASC");
 		logger.debug("Ids: "+ids);
-		int startAfterValue = ((Long) ids.get(count - 1).get("ID")).intValue();
+		int startAfterValue = (new Long(ids.get(count - 1).get("ID").toString())).intValue();
 		logger.debug("Start after: " + startAfterValue);
 		executionContext.putInt("JdbcPagingItemReader.start.after", startAfterValue);
 		((ItemStream) reader).open(executionContext);
@@ -143,11 +143,12 @@ public class JdbcPagingRestartIntegrationTests {
 
 		JdbcPagingItemReader<Foo> reader = new JdbcPagingItemReader<Foo>();
 		reader.setDataSource(dataSource);
-		HsqlPagingQueryProvider queryProvider = new HsqlPagingQueryProvider();
-		queryProvider.setSelectClause("select ID, NAME, VALUE");
-		queryProvider.setFromClause("from T_FOOS");
-		queryProvider.setSortKey("ID");
-		reader.setQueryProvider(queryProvider);
+		SqlPagingQueryProviderFactoryBean factory = new SqlPagingQueryProviderFactoryBean();
+		factory.setDataSource(dataSource);
+		factory.setSelectClause("select ID, NAME, VALUE");
+		factory.setFromClause("from T_FOOS");
+		factory.setSortKey("ID");
+		reader.setQueryProvider((PagingQueryProvider) factory.getObject());
 		reader.setRowMapper(new ParameterizedRowMapper<Foo>() {
 			public Foo mapRow(ResultSet rs, int i) throws SQLException {
 				Foo foo = new Foo();
