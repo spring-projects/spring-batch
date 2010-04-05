@@ -236,7 +236,7 @@ public class FaultTolerantChunkProcessor<I, O> extends SimpleChunkProcessor<I, O
 							// allows us to continue
 							throw e;
 						}
-						else if (itemProcessSkipPolicy.shouldSkip(e, contribution.getStepSkipCount())) {
+						else if (shouldSkip(itemProcessSkipPolicy, e, contribution.getStepSkipCount())) {
 							// If we are not re-throwing then we should check if
 							// this is skippable
 							contribution.incrementProcessSkipCount();
@@ -268,7 +268,7 @@ public class FaultTolerantChunkProcessor<I, O> extends SimpleChunkProcessor<I, O
 
 				public O recover(RetryContext context) throws Exception {
 					Throwable e = context.getLastThrowable();
-					if (itemProcessSkipPolicy.shouldSkip(e, contribution.getStepSkipCount())) {
+					if (shouldSkip(itemProcessSkipPolicy, e, contribution.getStepSkipCount())) {
 						contribution.incrementProcessSkipCount();
 						iterator.remove(e);
 						logger.debug("Skipping after failed process", e);
@@ -376,7 +376,7 @@ public class FaultTolerantChunkProcessor<I, O> extends SimpleChunkProcessor<I, O
 					 * do any scanning. We can just bomb out with a retry
 					 * exhausted.
 					 */
-					if (!itemWriteSkipPolicy.shouldSkip(context.getLastThrowable(), -1)) {
+					if (!shouldSkip(itemWriteSkipPolicy, context.getLastThrowable(), -1)) {
 						throw new ExhaustedRetryException(
 								"Retry exhausted after last attempt in recovery path, but exception is not skippable.",
 								context.getLastThrowable());
@@ -442,6 +442,23 @@ public class FaultTolerantChunkProcessor<I, O> extends SimpleChunkProcessor<I, O
 		}
 	}
 
+	/**
+	 * Convenience method for calling process skip policy, so that it can be
+	 * called from multiple places.
+	 * 
+	 * @param policy the skip policy
+	 * @param e the cause of the skip
+	 * @param skipCount the current skip count
+	 */
+	private boolean shouldSkip(SkipPolicy policy, Throwable e, int skipCount) {
+		try {
+			return policy.shouldSkip(e, skipCount);
+		}
+		catch (RuntimeException ex) {
+			throw new SkipListenerFailedException("Fatal exception in SkipPolicy.", ex, e);
+		}
+	}
+
 	private Object getInputKey(I item) {
 		if (keyGenerator == null) {
 			return item;
@@ -463,7 +480,7 @@ public class FaultTolerantChunkProcessor<I, O> extends SimpleChunkProcessor<I, O
 	private void checkSkipPolicy(Chunk<I>.ChunkIterator inputIterator, Chunk<O>.ChunkIterator outputIterator,
 			Throwable e, StepContribution contribution) {
 		logger.debug("Checking skip policy after failed write");
-		if (itemWriteSkipPolicy.shouldSkip(e, contribution.getStepSkipCount())) {
+		if (shouldSkip(itemWriteSkipPolicy, e, contribution.getStepSkipCount())) {
 			contribution.incrementWriteSkipCount();
 			inputIterator.remove();
 			outputIterator.remove(e);
@@ -498,7 +515,7 @@ public class FaultTolerantChunkProcessor<I, O> extends SimpleChunkProcessor<I, O
 			outputIterator.remove();
 		}
 		catch (Exception e) {
-			if (!itemWriteSkipPolicy.shouldSkip(e, -1) && !rollbackClassifier.classify(e)) {
+			if (!shouldSkip(itemWriteSkipPolicy, e, -1) && !rollbackClassifier.classify(e)) {
 				inputIterator.remove();
 				outputIterator.remove();
 			}

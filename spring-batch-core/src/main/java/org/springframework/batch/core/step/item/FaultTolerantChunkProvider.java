@@ -69,7 +69,7 @@ public class FaultTolerantChunkProvider<I> extends SimpleChunkProvider<I> {
 			}
 			catch (Exception e) {
 
-				if (skipPolicy.shouldSkip(e, contribution.getStepSkipCount())) {
+				if (shouldSkip(skipPolicy, e, contribution.getStepSkipCount())) {
 					// increment skip count and try again
 					contribution.incrementReadSkipCount();
 					chunk.skip(e);
@@ -96,6 +96,22 @@ public class FaultTolerantChunkProvider<I> extends SimpleChunkProvider<I> {
 			catch (RuntimeException ex) {
 				throw new SkipListenerFailedException("Fatal exception in SkipListener.", ex, e);
 			}
+		}
+	}
+
+	/**
+	 * Convenience method for calling process skip policy.
+	 * 
+	 * @param policy the skip policy
+	 * @param e the cause of the skip
+	 * @param skipCount the current skip count
+	 */
+	private boolean shouldSkip(SkipPolicy policy, Throwable e, int skipCount) {
+		try {
+			return policy.shouldSkip(e, skipCount);
+		}
+		catch (RuntimeException ex) {
+			throw new SkipListenerFailedException("Fatal exception in SkipPolicy.", ex, e);
 		}
 	}
 

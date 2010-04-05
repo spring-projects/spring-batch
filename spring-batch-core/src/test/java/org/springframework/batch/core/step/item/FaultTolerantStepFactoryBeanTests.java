@@ -34,6 +34,7 @@ import org.springframework.batch.core.listener.SkipListenerSupport;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.repository.support.MapJobRepositoryFactoryBean;
 import org.springframework.batch.core.step.skip.LimitCheckingItemSkipPolicy;
+import org.springframework.batch.core.step.skip.SkipLimitExceededException;
 import org.springframework.batch.core.step.skip.SkipPolicy;
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.item.ItemReader;
@@ -200,6 +201,60 @@ public class FaultTolerantStepFactoryBeanTests {
 		factory.setSkipPolicy(new LimitCheckingItemSkipPolicy(2, Collections
 				.<Class<? extends Throwable>, Boolean> singletonMap(Exception.class, true)));
 		testReadSkip();
+	}
+
+	/**
+	 * Check items causing errors are skipped as expected.
+	 */
+	@Test
+	public void testReadSkipWithPolicyExceptionInReader() throws Exception {
+
+		// Should be ignored
+		factory.setSkipLimit(0);
+
+		factory.setSkipPolicy(new SkipPolicy() {
+			public boolean shouldSkip(Throwable t, int skipCount) throws SkipLimitExceededException {
+				throw new  RuntimeException("Planned exception in SkipPolicy");
+			}
+		});
+
+		reader.setFailures("2");
+
+		Step step = (Step) factory.getObject();
+
+		step.execute(stepExecution);
+		
+		assertEquals(BatchStatus.FAILED, stepExecution.getStatus());
+		assertEquals(0, stepExecution.getReadSkipCount());
+		assertEquals(1, stepExecution.getReadCount());
+
+	}
+
+	/**
+	 * Check items causing errors are skipped as expected.
+	 */
+	@Test
+	public void testReadSkipWithPolicyExceptionInWriter() throws Exception {
+
+		// Should be ignored
+		factory.setSkipLimit(0);
+
+		factory.setSkipPolicy(new SkipPolicy() {
+			public boolean shouldSkip(Throwable t, int skipCount) throws SkipLimitExceededException {
+				throw new  RuntimeException("Planned exception in SkipPolicy");
+			}
+		});
+
+		writer.setFailures("2");
+
+		Step step = (Step) factory.getObject();
+
+		step.execute(stepExecution);
+		
+		assertEquals(BatchStatus.FAILED, stepExecution.getStatus());
+		assertEquals(0, stepExecution.getWriteSkipCount());
+		assertEquals(2, stepExecution.getReadCount());
+
 	}
 
 	/**

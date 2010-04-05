@@ -35,6 +35,7 @@ import org.springframework.batch.core.step.skip.NonSkippableReadException;
 import org.springframework.batch.core.step.skip.SkipLimitExceededException;
 import org.springframework.batch.core.step.skip.SkipListenerFailedException;
 import org.springframework.batch.core.step.skip.SkipPolicy;
+import org.springframework.batch.core.step.skip.SkipPolicyFailedException;
 import org.springframework.batch.core.step.tasklet.TaskletStep;
 import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.ItemStream;
@@ -321,9 +322,9 @@ public class FaultTolerantStepFactoryBean<T, S> extends SimpleStepFactoryBean<T,
 	@Override
 	protected void applyConfiguration(TaskletStep step) {
 		addNonSkippableExceptionIfMissing(SkipLimitExceededException.class, NonSkippableReadException.class,
-				SkipListenerFailedException.class, RetryException.class, JobInterruptedException.class, Error.class);
+				SkipListenerFailedException.class, SkipPolicyFailedException.class, RetryException.class, JobInterruptedException.class, Error.class);
 		addNonRetryableExceptionIfMissing(SkipLimitExceededException.class, NonSkippableReadException.class,
-				SkipListenerFailedException.class, RetryException.class, JobInterruptedException.class, Error.class);
+				SkipListenerFailedException.class, SkipPolicyFailedException.class, RetryException.class, JobInterruptedException.class, Error.class);
 		super.applyConfiguration(step);
 	}
 
