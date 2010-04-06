@@ -1223,11 +1223,11 @@ itemWriter.write(items);</programlisting>
       <classname>Step</classname>, if the <classname>Step</classname>'s
       execution results in an <classname>ExitStatus</classname> that is not
       covered by an element, then the framework will throw an exception and
-      the <classname>Job</classname> will fail. It is important to note that
-      the framework will automatically order transitions from most specific to
+      the <classname>Job</classname> will fail. The framework will 
+	  automatically order transitions from most specific to
       least specific. This means that even if the elements were swapped for
       "stepA" in the example above, an <classname>ExitStatus</classname> of
-      "FAILED" would still go to "stepB".</para>
+      "FAILED" would still go to "stepC".</para>
 
       <section id="batchStatusVsExitStatus">
         <title>Batch Status vs. Exit Status</title>
