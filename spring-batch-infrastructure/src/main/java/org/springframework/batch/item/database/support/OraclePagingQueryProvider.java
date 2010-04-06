@@ -43,7 +43,7 @@ public class OraclePagingQueryProvider extends AbstractSqlPagingQueryProvider {
 		int offset = (page * pageSize);
 		offset = offset==0 ? 1 : offset;
 		return SqlPagingQueryUtils.generateRowNumSqlQuery(this, this.getSortKey() + " AS SORT_KEY", false,
-				"ROWNUM = " + offset);
+				"TMP_ROW_NUM = " + offset);
 	}
 
 	private String buildRowNumClause(int pageSize) {

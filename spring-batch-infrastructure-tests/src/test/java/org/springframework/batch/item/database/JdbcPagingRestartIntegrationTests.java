@@ -53,7 +53,7 @@ import org.springframework.test.jdbc.SimpleJdbcTestUtils;
 @ContextConfiguration(locations = "JdbcPagingItemReaderCommonTests-context.xml")
 public class JdbcPagingRestartIntegrationTests {
 
-	private static Log logger = LogFactory.getLog(JdbcPagingItemReaderAsyncTests.class);
+	private static Log logger = LogFactory.getLog(JdbcPagingRestartIntegrationTests.class);
 
 	@Autowired
 	private DataSource dataSource;
@@ -160,7 +160,7 @@ public class JdbcPagingRestartIntegrationTests {
 		});
 		reader.setPageSize(pageSize);
 		reader.afterPropertiesSet();
-		reader.setSaveState(false);
+		reader.setSaveState(true);
 
 		return reader;
 	}

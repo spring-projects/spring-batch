@@ -136,6 +136,9 @@ public abstract class AbstractItemCountingItemStreamItemReader<T> implements Ite
 		catch (Exception e) {
 			throw new ItemStreamException("Failed to initialize the reader", e);
 		}
+		if (!isSaveState()) {
+			return;
+		}
 
 		if (executionContext.containsKey(ecSupport.getKey(READ_COUNT_MAX))) {
 			maxItemCount = executionContext.getInt(ecSupport.getKey(READ_COUNT_MAX));
