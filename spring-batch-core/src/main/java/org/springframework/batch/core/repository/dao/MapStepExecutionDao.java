@@ -15,6 +15,7 @@
  */
 package org.springframework.batch.core.repository.dao;
 
+import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -29,6 +30,7 @@ import org.springframework.batch.core.StepExecution;
 import org.springframework.batch.support.SerializationUtils;
 import org.springframework.dao.OptimisticLockingFailureException;
 import org.springframework.util.Assert;
+import org.springframework.util.ReflectionUtils;
 
 /**
  * In-memory implementation of {@link StepExecutionDao}.
@@ -48,6 +50,16 @@ public class MapStepExecutionDao implements StepExecutionDao {
 
 	private static StepExecution copy(StepExecution original) {
 		return (StepExecution) SerializationUtils.deserialize(SerializationUtils.serialize(original));
+	}
+	
+	private static void copy(final StepExecution sourceExecution, final StepExecution targetExecution) {
+		// Cheaper than full serialization is a reflective field copy, which is fine for volatile storage
+		ReflectionUtils.doWithFields(StepExecution.class, new ReflectionUtils.FieldCallback() {
+			public void doWith(Field field) throws IllegalArgumentException, IllegalAccessException {
+				field.setAccessible(true);
+				field.set(targetExecution, field.get(sourceExecution));
+			}
+		});		
 	}
 
 	public void saveStepExecution(StepExecution stepExecution) {
@@ -77,7 +89,7 @@ public class MapStepExecutionDao implements StepExecutionDao {
 		Map<Long, StepExecution> executions = executionsByJobExecutionId.get(stepExecution.getJobExecutionId());
 		Assert.notNull(executions, "step executions for given job execution are expected to be already saved");
 
-		StepExecution persistedExecution = executionsByStepExecutionId.get(stepExecution.getId());
+		final StepExecution persistedExecution = executionsByStepExecutionId.get(stepExecution.getId());
 		Assert.notNull(persistedExecution, "step execution is expected to be already saved");
 
 		synchronized (stepExecution) {
@@ -88,9 +100,8 @@ public class MapStepExecutionDao implements StepExecutionDao {
 			}
 
 			stepExecution.incrementVersion();
-			StepExecution copy = copy(stepExecution);
-			executions.put(stepExecution.getId(), copy);
-			executionsByStepExecutionId.put(stepExecution.getId(), copy);
+			copy(stepExecution, persistedExecution);
+			executions.put(stepExecution.getId(), persistedExecution);
 		}
 	}
 

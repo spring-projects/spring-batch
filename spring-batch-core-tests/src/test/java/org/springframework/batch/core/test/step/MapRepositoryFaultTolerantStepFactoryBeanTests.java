@@ -13,7 +13,6 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.junit.Before;
 import org.junit.Test;
-import org.junit.runner.RunWith;
 import org.springframework.batch.core.BatchStatus;
 import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.JobParameters;
@@ -27,18 +26,14 @@ import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.ItemWriter;
 import org.springframework.batch.item.ParseException;
 import org.springframework.batch.item.UnexpectedInputException;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.batch.support.transaction.ResourcelessTransactionManager;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.util.Assert;
 
 /**
  * Tests for {@link FaultTolerantStepFactoryBean}.
  */
-@ContextConfiguration(locations = "/simple-job-launcher-context.xml")
-@RunWith(SpringJUnit4ClassRunner.class)
 public class MapRepositoryFaultTolerantStepFactoryBeanTests {
 
 	private static final int MAX_COUNT = 1000;
@@ -59,13 +54,10 @@ public class MapRepositoryFaultTolerantStepFactoryBeanTests {
 
 	private JobRepository repository;
 
-	@Autowired
-	private PlatformTransactionManager transactionManager;
+	private PlatformTransactionManager transactionManager = new ResourcelessTransactionManager();
 
 	@Before
 	public void setUp() throws Exception {
-		
-		repository = new MapJobRepositoryFactoryBean().getJobRepository();
 		
 		reader = new SkipReaderStub();
 		writer = new SkipWriterStub();
@@ -75,7 +67,6 @@ public class MapRepositoryFaultTolerantStepFactoryBeanTests {
 
 		factory.setBeanName("stepName");
 		factory.setTransactionManager(transactionManager);
-		factory.setJobRepository(repository);
 		factory.setCommitInterval(3);
 		ThreadPoolTaskExecutor taskExecutor = new ThreadPoolTaskExecutor();
 		taskExecutor.setCorePoolSize(3);
@@ -107,7 +98,7 @@ public class MapRepositoryFaultTolerantStepFactoryBeanTests {
 			
 			if (i%100==0) {
 				logger.info("Starting step: "+i);
-				repository = new MapJobRepositoryFactoryBean().getJobRepository();
+				repository = new MapJobRepositoryFactoryBean(transactionManager).getJobRepository();
 				factory.setJobRepository(repository);
 				jobExecution = repository.createJobExecution("vanillaJob", new JobParameters());
 			}

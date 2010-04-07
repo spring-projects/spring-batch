@@ -51,11 +51,16 @@ public class SplitJobMapRepositoryIntegrationTests {
 		JobLauncher jobLauncher = null;
 		Job job = null;
 
+		ClassPathXmlApplicationContext context = null;
+
 		for (int i = 0; i < MAX_COUNT; i++) {
 
 			if (i % 100 == 0) {
+				if (context!=null) {
+					context.close();
+				}
 				logger.info("Starting job: " + i);
-				ClassPathXmlApplicationContext context = new ClassPathXmlApplicationContext(getClass().getSimpleName()
+				context = new ClassPathXmlApplicationContext(getClass().getSimpleName()
 						+ "-context.xml", getClass());
 				jobLauncher = (JobLauncher) context.getBean("jobLauncher", JobLauncher.class);
 				job = (Job) context.getBean("job", Job.class);

@@ -74,7 +74,7 @@ public class TransactionAwareProxyFactory<T> {
 
 	private TransactionAwareProxyFactory(T target, boolean appendOnly) {
 		super();
-		this.target = begin(target);
+		this.target = target;
 		this.appendOnly = appendOnly;
 	}
 
