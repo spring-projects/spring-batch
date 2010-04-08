@@ -200,7 +200,7 @@ public class ChunkMessageItemWriterIntegrationTests {
 	public void testEarlyCompletionSignalledInHandler() throws Exception {
 
 		factory.setItemReader(new ListItemReader<String>(Arrays.asList(StringUtils
-				.commaDelimitedListToStringArray("1,bad,3,4,5,6"))));
+				.commaDelimitedListToStringArray("1,fail,3,4,5,6"))));
 		factory.setCommitInterval(2);
 
 		Step step = (Step) factory.getObject();
@@ -210,7 +210,7 @@ public class ChunkMessageItemWriterIntegrationTests {
 		assertEquals(BatchStatus.FAILED, stepExecution.getStatus());
 		assertEquals(ExitStatus.FAILED.getExitCode(), stepExecution.getExitStatus().getExitCode());
 		String message = stepExecution.getExitStatus().getExitDescription();
-		assertTrue("Message does not contain 'bad': " + message, message.contains("bad"));
+		assertTrue("Message does not contain 'fail': " + message, message.contains("fail"));
 
 		waitForResults(2, 10);
 
@@ -262,7 +262,7 @@ public class ChunkMessageItemWriterIntegrationTests {
 	public void testFailureInStepListener() throws Exception {
 
 		factory.setItemReader(new ListItemReader<String>(Arrays.asList(StringUtils
-				.commaDelimitedListToStringArray("wait,bad,3,4,5,6"))));
+				.commaDelimitedListToStringArray("wait,fail,3,4,5,6"))));
 
 		Step step = (Step) factory.getObject();
 

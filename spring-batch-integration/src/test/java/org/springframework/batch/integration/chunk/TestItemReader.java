@@ -18,7 +18,7 @@ public class TestItemReader<T> implements ItemReader<T> {
 	/**
 	 * Counts the number of chunks processed in the handler.
 	 */
-	public volatile static int count = 0;
+	public volatile int count = 0;
 
 	/**
 	 * Item that causes failure in handler.
