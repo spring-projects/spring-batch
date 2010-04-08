@@ -285,7 +285,6 @@ public class ChunkMessageItemWriterIntegrationTests {
 
 	}
 
-	// TODO: test failure in chunk handler
 	// TODO : test non-dispatch of empty chunk
 
 	/**
