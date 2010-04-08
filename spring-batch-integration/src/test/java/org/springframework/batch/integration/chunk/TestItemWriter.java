@@ -20,7 +20,17 @@ public class TestItemWriter<T> implements ItemWriter<T> {
 	/**
 	 * Item that causes failure in handler.
 	 */
-	public final static String FAIL_ON = "bad";
+	public final static String FAIL_ON = "fail";
+
+	/**
+	 * Item that causes error in handler.
+	 */
+	public final static String UNSUPPORTED_ON = "unsupported";
+
+	/**
+	 * Item that causes error in handler.
+	 */
+	public final static String ERROR_ON = "error";
 
 	/**
 	 * Item that causes handler to wait to simulate delayed processing.
@@ -47,6 +57,14 @@ public class TestItemWriter<T> implements ItemWriter<T> {
 
 			if (item.equals(FAIL_ON)) {
 				throw new IllegalStateException("Planned failure on: " + FAIL_ON);
+			}
+
+			if (item.equals(UNSUPPORTED_ON)) {
+				throw new UnsupportedOperationException("Planned failure on: " + UNSUPPORTED_ON);
+			}
+
+			if (item.equals(ERROR_ON)) {
+				throw new Error("Planned failure on: " + ERROR_ON);
 			}
 
 		}

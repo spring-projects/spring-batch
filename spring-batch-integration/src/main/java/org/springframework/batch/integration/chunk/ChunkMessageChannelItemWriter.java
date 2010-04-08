@@ -16,7 +16,11 @@
 
 package org.springframework.batch.integration.chunk;
 
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
+import java.util.Queue;
+import java.util.concurrent.LinkedBlockingQueue;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -32,7 +36,8 @@ import org.springframework.batch.item.ItemWriter;
 import org.springframework.integration.gateway.MessagingGateway;
 import org.springframework.util.Assert;
 
-public class ChunkMessageChannelItemWriter<T> extends StepExecutionListenerSupport implements ItemWriter<T>, ItemStream {
+public class ChunkMessageChannelItemWriter<T> extends StepExecutionListenerSupport implements ItemWriter<T>,
+		ItemStream, StepContributionSource {
 
 	private static final Log logger = LogFactory.getLog(ChunkMessageChannelItemWriter.class);
 
@@ -57,7 +62,7 @@ public class ChunkMessageChannelItemWriter<T> extends StepExecutionListenerSuppo
 	 * result from the remote workers. This is a multiplier on the receive
 	 * timeout set separately on the gateway. The ideal value is a compromise
 	 * between allowing slow workers time to finish, and responsiveness if there
-	 * is a dead worker.  Defaults to 40.
+	 * is a dead worker. Defaults to 40.
 	 * 
 	 * @param maxWaitTimeouts the maximum number of wait timeouts
 	 */
@@ -119,6 +124,11 @@ public class ChunkMessageChannelItemWriter<T> extends StepExecutionListenerSuppo
 			stepExecution.setStatus(BatchStatus.FAILED);
 			return ExitStatus.FAILED.addExitDescription(e.getClass().getName() + ": " + e.getMessage());
 		}
+		finally {
+			for (StepContribution contribution : getStepContributions()) {
+				stepExecution.apply(contribution);
+			}
+		}
 		if (timedOut) {
 			stepExecution.setStatus(BatchStatus.FAILED);
 			throw new ItemStreamException("Timed out waiting for back log at end of step");
@@ -145,17 +155,32 @@ public class ChunkMessageChannelItemWriter<T> extends StepExecutionListenerSuppo
 		executionContext.putLong(ACTUAL, localState.actual);
 	}
 
+	public Collection<StepContribution> getStepContributions() {
+		return localState.pollContributions();
+	}
+
 	/**
 	 * Wait until all the results that are in the pipeline come back to the
 	 * reply channel.
 	 * 
 	 * @return true if successfully received a result, false if timed out
 	 */
-	private boolean waitForResults() {
+	private boolean waitForResults() throws AsynchronousFailureException {
 		int count = 0;
 		int maxCount = maxWaitTimeouts;
+		Throwable failure = null;
 		while (localState.getExpecting() > 0 && count++ < maxCount) {
-			getNextResult();
+			try {
+				getNextResult();
+			}
+			catch (Throwable t) {
+				logger.error("Detected error in remote result. Trying to recover " + localState.getExpecting()
+						+ " outstanding results before completing.", t);
+				failure = t;
+			}
+		}
+		if (failure != null) {
+			throw wrapIfNecessary(failure);
 		}
 		return count < maxCount;
 	}
@@ -178,11 +203,27 @@ public class ChunkMessageChannelItemWriter<T> extends StepExecutionListenerSuppo
 			Assert.state(jobInstanceId.equals(localState.getJobId()), "Message contained wrong job instance id ["
 					+ jobInstanceId + "] should have been [" + localState.getJobId() + "].");
 			localState.actual++;
-			// TODO: apply the skip count
+			localState.pushContribution(payload.getStepContribution());
 			if (!payload.isSuccessful()) {
 				throw new AsynchronousFailureException("Failure or interrupt detected in handler: "
 						+ payload.getMessage());
 			}
+		}
+	}
+
+	/**
+	 * Re-throws the original throwable if it is unchecked, wraps checked
+	 * exceptions into {@link AsynchronousFailureException}.
+	 */
+	private static AsynchronousFailureException wrapIfNecessary(Throwable throwable) {
+		if (throwable instanceof Error) {
+			throw (Error) throwable;
+		}
+		else if (throwable instanceof AsynchronousFailureException) {
+			return (AsynchronousFailureException) throwable;
+		}
+		else {
+			return new AsynchronousFailureException("Exception in remote process", throwable);
 		}
 	}
 
@@ -193,8 +234,24 @@ public class ChunkMessageChannelItemWriter<T> extends StepExecutionListenerSuppo
 
 		private StepExecution stepExecution;
 
+		private Queue<StepContribution> contributions = new LinkedBlockingQueue<StepContribution>();
+
 		public long getExpecting() {
 			return expected - actual;
+		}
+
+		public Collection<StepContribution> pollContributions() {
+			Collection<StepContribution> set = new ArrayList<StepContribution>();
+			StepContribution item = contributions.poll();
+			while (item != null) {
+				set.add(item);
+				item = contributions.poll();
+			}
+			return set;
+		}
+
+		public void pushContribution(StepContribution stepContribution) {
+			contributions.add(stepContribution);
 		}
 
 		public StepContribution createStepContribution() {

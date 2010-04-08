@@ -20,9 +20,9 @@
 		<config>src/test/resources/org/springframework/batch/integration/item/MessagingGatewayIntegrationTests-context.xml</config>
 		<config>src/test/resources/org/springframework/batch/integration/partition/VanillaIntegrationTests-context.xml</config>
 		<config>src/test/resources/org/springframework/batch/integration/async/AsyncItemProcessorMessagingGatewayTests-context.xml</config>
-		<config>src/test/resources/org/springframework/batch/integration/chunk/ChunkStepIntegrationTests-context.xml</config>
 		<config>src/test/resources/org/springframework/batch/integration/file/FileToMessagesJobIntegrationTests-context.xml</config>
 		<config>src/test/resources/org/springframework/batch/integration/step/StepGatewayIntegrationTests-context.xml</config>
+		<config>src/test/resources/org/springframework/batch/integration/chunk/RemoteChunkFaultTolerantStepIntegrationTests-context.xml</config>
 	</configs>
 	<configSets>
 	</configSets>
