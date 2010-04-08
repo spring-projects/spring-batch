@@ -13,24 +13,30 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.springframework.batch.integration.job;
+package org.springframework.batch.integration.step;
 
-import org.springframework.batch.core.UnexpectedJobExecutionException;
+import org.springframework.batch.core.StepContribution;
+import org.springframework.batch.core.scope.context.ChunkContext;
+import org.springframework.batch.core.step.tasklet.Tasklet;
+import org.springframework.batch.repeat.RepeatStatus;
 
 /**
  * @author Dave Syer
- *
+ * 
  */
-public class StepExecutionTimeoutException extends UnexpectedJobExecutionException {
+public class TestTasklet implements Tasklet {
+	
+	private boolean fail = false;
+	
+	public void setFail(boolean fail) {
+		this.fail = fail;
+	}
 
-	/**
-	 * Constructs a new instance.
-	 * 
-	 * @param msg the exception message.
-	 * 
-	 */
-	public StepExecutionTimeoutException(String msg) {
-		super(msg);
+	public RepeatStatus execute(StepContribution contribution, ChunkContext chunkContext) throws Exception {
+		if (fail) {
+			throw new IllegalStateException("Planned Tasklet failure");
+		}
+		return RepeatStatus.FINISHED;
 	}
 
 }

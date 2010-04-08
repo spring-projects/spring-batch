@@ -13,16 +13,19 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.springframework.batch.integration.job;
+package org.springframework.batch.integration.step;
 
 import static org.junit.Assert.assertEquals;
 
+import org.junit.After;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.batch.core.BatchStatus;
+import org.springframework.batch.core.ExitStatus;
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.JobParameters;
+import org.springframework.batch.core.JobParametersBuilder;
 import org.springframework.batch.core.launch.JobLauncher;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -35,7 +38,7 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
  */
 @ContextConfiguration()
 @RunWith(SpringJUnit4ClassRunner.class)
-public class MessageOrientedStepIntegrationTests {
+public class StepGatewayIntegrationTests {
 
 	@Autowired
 	private JobLauncher jobLauncher;
@@ -44,10 +47,27 @@ public class MessageOrientedStepIntegrationTests {
 	@Qualifier("job")
 	private Job job;
 	
+	@Autowired
+	private TestTasklet tasklet;
+	
+	@After
+	public void clear() {
+		tasklet.setFail(false);
+	}
+	
 	@Test
 	public void testLaunchJob() throws Exception {
 		JobExecution jobExecution = jobLauncher.run(job, new JobParameters());
 		assertEquals(BatchStatus.COMPLETED, jobExecution.getStatus());
+		assertEquals(ExitStatus.COMPLETED, jobExecution.getExitStatus());
+	}
+
+	@Test
+	public void testLaunchFailedJob() throws Exception {
+		tasklet.setFail(true);
+		JobExecution jobExecution = jobLauncher.run(job, new JobParametersBuilder().addLong("run.id", 2L).toJobParameters());
+		assertEquals(BatchStatus.FAILED, jobExecution.getStatus());
+		assertEquals(ExitStatus.FAILED, jobExecution.getExitStatus());
 	}
 
 }
