@@ -20,7 +20,6 @@ import static org.junit.Assert.assertNotNull;
 import java.util.Arrays;
 import java.util.List;
 
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -67,8 +66,7 @@ public class ResourceSplitterIntegrationTests {
 
 	@SuppressWarnings("unchecked")
 	@Test
-	@Ignore
-	// TODO: unignore this when Integration supports resource array conversion again...
+	// This broke with Integration 2.0 in a milestone, so watch out when upgrading...
 	public void testVanillaConversion() throws Exception {
 		resources.send(new GenericMessage<String>("classpath:*-context.xml"));
 		Message<Resource> message = (Message<Resource>) requests.receive(200L);
