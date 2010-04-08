@@ -26,7 +26,7 @@
 	</bean>
 	<bean id="step" parent="taskletStep">
 		<property name="tasklet">
-			<bean class="org.springframework.batch.integration.job.TestTasklet" />
+			<bean class="org.springframework.batch.integration.step.TestTasklet" />
 		</property>
 	</bean>
 </beans>
