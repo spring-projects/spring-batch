@@ -14,6 +14,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.springframework.util.StringUtils;
 
 @ContextConfiguration
 @RunWith(SpringJUnit4ClassRunner.class)
@@ -26,6 +27,10 @@ public class StepScopeDestructionCallbackIntegrationTests {
 	@Autowired
 	@Qualifier("nested")
 	private Step nested;
+
+	@Autowired
+	@Qualifier("ref")
+	private Step ref;
 
 	@Autowired
 	@Qualifier("foo")
@@ -42,14 +47,14 @@ public class StepScopeDestructionCallbackIntegrationTests {
 	public void testDisposableScopedProxy() throws Exception {
 		assertNotNull(proxied);
 		proxied.execute(new StepExecution("step", new JobExecution(0L), 1L));
-		assertEquals("destroyed", TestDisposableCollaborator.message);
+		assertEquals(1, StringUtils.countOccurrencesOf(TestDisposableCollaborator.message, "destroyed"));
 	}
 
 	@Test
 	public void testDisposableInnerScopedProxy() throws Exception {
 		assertNotNull(nested);
 		nested.execute(new StepExecution("step", new JobExecution(0L), 1L));
-		assertEquals("destroyed", TestDisposableCollaborator.message);
+		assertEquals(1, StringUtils.countOccurrencesOf(TestDisposableCollaborator.message, "destroyed"));
 	}
 
 	@Test
@@ -58,7 +63,18 @@ public class StepScopeDestructionCallbackIntegrationTests {
 		nested.execute(new StepExecution("step", new JobExecution(0L), 1L));
 		assertEquals(4, TestAdvice.names.size());
 		assertEquals("bar", TestAdvice.names.get(0));
-		assertEquals("destroyed", TestDisposableCollaborator.message);
+		assertEquals(1, StringUtils.countOccurrencesOf(TestDisposableCollaborator.message, "destroyed"));
+	}
+
+	@Test
+	public void testRefScopedProxy() throws Exception {
+		assertNotNull(ref);
+		ref.execute(new StepExecution("step", new JobExecution(0L), 1L));
+		assertEquals(4, TestAdvice.names.size());
+		assertEquals("spam", TestAdvice.names.get(0));
+		assertEquals(2, StringUtils.countOccurrencesOf(TestDisposableCollaborator.message, "destroyed"));
+		assertEquals(1, StringUtils.countOccurrencesOf(TestDisposableCollaborator.message, "bar:destroyed"));
+		assertEquals(1, StringUtils.countOccurrencesOf(TestDisposableCollaborator.message, "spam:destroyed"));
 	}
 
 	@Test

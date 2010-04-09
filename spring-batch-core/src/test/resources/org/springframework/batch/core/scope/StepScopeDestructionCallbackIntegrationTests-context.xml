@@ -21,6 +21,17 @@
 		</property>
 	</bean>
 
+	<bean id="ref" class="org.springframework.batch.core.scope.TestStep">
+		<property name="collaborator">
+			<bean
+				class="org.springframework.batch.core.scope.TestDisposableCollaborator"
+				scope="step">
+				<property name="name" value="spam" />
+				<property name="parent" ref="bar"/>
+			</bean>
+		</property>
+	</bean>
+
 	<bean id="nested" class="org.springframework.batch.core.scope.TestStep">
 		<property name="collaborator">
 			<bean class="org.springframework.batch.core.scope.TestCollaborator"
@@ -39,6 +50,11 @@
 	<bean id="foo"
 		class="org.springframework.batch.core.scope.TestDisposableCollaborator">
 		<property name="name" value="foo" />
+	</bean>
+
+	<bean id="bar"
+		class="org.springframework.batch.core.scope.TestDisposableCollaborator" scope="step">
+		<property name="name" value="bar" />
 	</bean>
 
 	<aop:aspectj-autoproxy />

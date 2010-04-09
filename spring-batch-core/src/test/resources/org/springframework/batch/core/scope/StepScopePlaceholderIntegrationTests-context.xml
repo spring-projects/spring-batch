@@ -42,8 +42,17 @@
 		<property name="parent" ref="#{stepExecutionContext[foo]}" />
 	</bean>
 
+	<bean id="scopedRef" class="org.springframework.batch.core.scope.TestCollaborator" scope="step">
+		<property name="name" value="foo" />
+		<property name="parent" ref="spam" />
+	</bean>
+
 	<bean id="bar" class="org.springframework.batch.core.scope.TestCollaborator">
 		<property name="name" value="bar" />
+	</bean>
+
+	<bean id="spam" class="org.springframework.batch.core.scope.TestCollaborator" scope="step">
+		<property name="name" value="#{stepExecutionContext[foo]}" />
 	</bean>
 
 	<bean class="org.springframework.batch.core.scope.StepScope" />

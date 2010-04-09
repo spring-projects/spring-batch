@@ -40,6 +40,10 @@ public class StepScopePlaceholderIntegrationTests implements BeanFactoryAware {
 	private Collaborator ref;
 
 	@Autowired
+	@Qualifier("scopedRef")
+	private Collaborator scopedRef;
+
+	@Autowired
 	@Qualifier("list")
 	private Collaborator list;
 
@@ -63,12 +67,16 @@ public class StepScopePlaceholderIntegrationTests implements BeanFactoryAware {
 
 	@Before
 	public void start() {
+		start("bar");
+	}
+
+	private void start(String foo) {
 
 		StepSynchronizationManager.close();
 		stepExecution = new StepExecution("foo", new JobExecution(11L), 123L);
 
 		ExecutionContext executionContext = new ExecutionContext();
-		executionContext.put("foo", "bar");
+		executionContext.put("foo", foo);
 		executionContext.put("parent", bar);
 
 		stepExecution.setExecutionContext(executionContext);
@@ -79,7 +87,7 @@ public class StepScopePlaceholderIntegrationTests implements BeanFactoryAware {
 	}
 
 	@After
-	public void cleanUp() {
+	public void stop() {
 		StepSynchronizationManager.close();
 		// Check that all temporary bean definitions are cleaned up
 		assertEquals(beanCount, beanFactory.getBeanDefinitionCount());
@@ -135,6 +143,14 @@ public class StepScopePlaceholderIntegrationTests implements BeanFactoryAware {
 	@Test
 	public void testNested() throws Exception {
 		assertEquals("bar", nested.getParent().getName());
+	}
+
+	@Test
+	public void testScopedRef() throws Exception {
+		assertEquals("bar", scopedRef.getParent().getName());
+		stop();
+		start("spam");
+		assertEquals("spam", scopedRef.getParent().getName());
 	}
 
 }
