@@ -17,7 +17,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 import org.springframework.context.Lifecycle;
-import org.springframework.integration.annotation.MessageEndpoint;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
@@ -25,7 +24,6 @@ import org.springframework.util.StringUtils;
 
 @ContextConfiguration
 @RunWith(SpringJUnit4ClassRunner.class)
-@MessageEndpoint
 public class RetryTransactionalPollingIntegrationTests implements ApplicationContextAware {
 
 	private Log logger = LogFactory.getLog(getClass());
@@ -57,12 +55,14 @@ public class RetryTransactionalPollingIntegrationTests implements ApplicationCon
 		if (list.isEmpty()) {
 			return null;
 		}
+		// This happens in a transaction and the list is transactional so if it rolls back the same item comes back
+		// again at the head of the list
 		return list.remove(0);
 	}
 
-	public void output(String message) {	
+	public void output(String message) {
 		count++;
-		logger.debug("Handled: " + message);		
+		logger.debug("Handled: " + message);
 	}
 
 	@Test
@@ -70,11 +70,10 @@ public class RetryTransactionalPollingIntegrationTests implements ApplicationCon
 	public void testSunnyDay() throws Exception {
 		list = TransactionAwareProxyFactory.createTransactionalList(Arrays.asList(StringUtils
 				.commaDelimitedListToStringArray("a,b,c,d,e,f,g,h,j,k")));
-		List<String> expected = TransactionAwareProxyFactory.createTransactionalList(Arrays.asList(StringUtils
-				.commaDelimitedListToStringArray("a,b,c,d")));
+		List<String> expected = Arrays.asList(StringUtils.commaDelimitedListToStringArray("a,b,c,d"));
 		service.setExpected(expected);
 		waitForResults(bus, expected.size(), 60);
-		assertEquals(4,service.getProcessed().size()); // a,b,c,d
+		assertEquals(4, service.getProcessed().size()); // a,b,c,d
 		assertEquals(expected, service.getProcessed());
 	}
 
@@ -84,13 +83,11 @@ public class RetryTransactionalPollingIntegrationTests implements ApplicationCon
 		list = TransactionAwareProxyFactory.createTransactionalList(Arrays.asList(StringUtils
 				.commaDelimitedListToStringArray("a,b,fail,d,e,f,g,h,j,k")));
 
-		List<String> expected = TransactionAwareProxyFactory.createTransactionalList(Arrays.asList(StringUtils
-				.commaDelimitedListToStringArray("a,b,fail,fail,d,e")));
+		List<String> expected = Arrays.asList(StringUtils.commaDelimitedListToStringArray("a,b,fail,fail,d,e"));
 		service.setExpected(expected);
-		waitForResults(bus, expected.size(), 60);
-		waitForResults(bus, 6, 100); // a, b, (fail, fail, [fail]), d, e
-		assertEquals(6,service.getProcessed().size()); // a,b,fail,fail,d,e
-		assertEquals(1,recoverer.getRecovered().size()); // fail
+		waitForResults(bus, expected.size(), 100); // a, b, (fail, fail, [fail]), d, e
+		assertEquals(6, service.getProcessed().size()); // a,b,fail,fail,d,e
+		assertEquals(1, recoverer.getRecovered().size()); // fail
 		assertEquals(expected, service.getProcessed());
 	}
 
