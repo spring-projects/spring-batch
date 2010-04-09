@@ -1020,9 +1020,9 @@ itemWriter.write(items);</programlisting>
       this class without having to write an adapter for the
       <classname>Tasklet</classname> interface:</para>
 
-      <programlisting>&lt;bean id="myTasklet" class="org.springframework.batch.core.step.tasklet.TaskletAdapter"&gt;
+      <programlisting>&lt;bean id="myTasklet" class="org.springframework.batch.core.step.tasklet.MethodInvokingTaskletAdapter"&gt;
     &lt;property name="targetObject"&gt;
-        &lt;bean class="org.mycompany.FooDao"&gt;
+        &lt;bean class="org.mycompany.FooDao"/&gt;
     &lt;/property&gt;
     &lt;property name="targetMethod" value="updateFoo" /&gt;
 &lt;/bean&gt;</programlisting>
