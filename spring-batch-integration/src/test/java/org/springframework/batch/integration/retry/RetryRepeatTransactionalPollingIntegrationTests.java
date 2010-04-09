@@ -45,7 +45,7 @@ public class RetryRepeatTransactionalPollingIntegrationTests implements Applicat
 	}
 
 	private static volatile int count = 0;
-	
+
 	@Before
 	public void clearLists() {
 		list.clear();
@@ -60,9 +60,9 @@ public class RetryRepeatTransactionalPollingIntegrationTests implements Applicat
 		return list.remove(0);
 	}
 
-	public void output(String message) {	
+	public void output(String message) {
 		count++;
-		logger.debug("Handled: " + message);		
+		logger.debug("Handled: " + message);
 	}
 
 	@Test
@@ -70,11 +70,10 @@ public class RetryRepeatTransactionalPollingIntegrationTests implements Applicat
 	public void testSunnyDay() throws Exception {
 		list = TransactionAwareProxyFactory.createTransactionalList(Arrays.asList(StringUtils
 				.commaDelimitedListToStringArray("a,b,c,d,e,f,g,h,j,k")));
-		List<String> expected = TransactionAwareProxyFactory.createTransactionalList(Arrays.asList(StringUtils
-				.commaDelimitedListToStringArray("a,b,c,d")));
+		List<String> expected = Arrays.asList(StringUtils.commaDelimitedListToStringArray("a,b,c,d"));
 		service.setExpected(expected);
 		waitForResults(lifecycle, expected.size(), 60);
-		assertEquals(4,service.getProcessed().size()); // a,b,c,d
+		assertEquals(4, service.getProcessed().size()); // a,b,c,d
 		assertEquals(expected, service.getProcessed());
 	}
 
@@ -83,13 +82,12 @@ public class RetryRepeatTransactionalPollingIntegrationTests implements Applicat
 	public void testRollback() throws Exception {
 		list = TransactionAwareProxyFactory.createTransactionalList(Arrays.asList(StringUtils
 				.commaDelimitedListToStringArray("a,b,fail,d,e,f,g,h,j,k")));
-		List<String> expected = TransactionAwareProxyFactory.createTransactionalList(Arrays.asList(StringUtils
-				.commaDelimitedListToStringArray("a,b,fail,fail,d,e,f")));
+		List<String> expected = Arrays.asList(StringUtils.commaDelimitedListToStringArray("a,b,fail,fail,d,e,f"));
 		service.setExpected(expected);
 		waitForResults(lifecycle, expected.size(), 60); // (a,b), (fail), (fail), ([fail],d), (e,f)
 		System.err.println(service.getProcessed());
-		assertEquals(7,service.getProcessed().size()); // a,b,fail,fail,d,e,f
-		assertEquals(1,recoverer.getRecovered().size()); // fail
+		assertEquals(7, service.getProcessed().size()); // a,b,fail,fail,d,e,f
+		assertEquals(1, recoverer.getRecovered().size()); // fail
 		assertEquals(expected, service.getProcessed());
 	}
 

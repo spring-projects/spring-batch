@@ -24,7 +24,6 @@ public class ChunkProcessorChunkHandlerTests {
 			}
 		});
 		StepContribution stepContribution = MetaDataInstanceFactory.createStepExecution().createStepContribution();
-		@SuppressWarnings("unchecked")
 		ChunkResponse response = handler.handleChunk(new ChunkRequest<Object>(StringUtils
 				.commaDelimitedListToSet("foo,bar"), 12L, stepContribution));
 		assertEquals(stepContribution, response.getStepContribution());

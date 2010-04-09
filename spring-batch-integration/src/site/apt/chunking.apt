@@ -1,0 +1,31 @@
+                                    ------
+                                    Remote Chunking
+                                    ------
+                                    Dave Syer
+                                    ------
+                                    March 2008
+
+Remote Chunking Implementation
+
+* Basic Use Case
+
+  Description:
+
+    [[1]] Step flushes chunk as message to outgoing channel (repeat up to throttle limit)
+
+    [[1]] Worker thread picks up chunk and processes it
+
+    [[1]] Worker thread replies to response channel
+ 
+    [[1]] Step picks up reply and aggregates the counts
+
+    [[1]] Step blocks until all the requests are satisfied
+
+* Implementation
+
+  A ChunkProcessor acts as an asynchronous Messaging Gateway.
+  Asynchronous Messaging Gateway isn't a pattern that is supported out
+  of the box with Spring Integration.  There is a
+  SimpleMessagingGateway that provides programmatic access to send and
+  receive payloads (instead of messages), so the pattern can be
+  manually implemented.

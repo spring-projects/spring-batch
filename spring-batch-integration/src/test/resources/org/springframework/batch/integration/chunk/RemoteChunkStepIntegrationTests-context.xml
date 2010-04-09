@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xmlns:beans="http://www.springframework.org/schema/beans"
-	xmlns:integration="http://www.springframework.org/schema/integration"
+	xmlns:beans="http://www.springframework.org/schema/beans" xmlns:integration="http://www.springframework.org/schema/integration"
 	xmlns:batch="http://www.springframework.org/schema/batch" xmlns:context="http://www.springframework.org/schema/context"
 	xsi:schemaLocation="http://www.springframework.org/schema/integration http://www.springframework.org/schema/integration/spring-integration-1.0.xsd
 		http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.5.xsd
@@ -11,7 +10,7 @@
 	<job id="job" xmlns="http://www.springframework.org/schema/batch">
 		<step id="step">
 			<tasklet>
-				<chunk reader="reader" writer="writer" commit-interval="2"/>
+				<chunk reader="reader" writer="writer" commit-interval="2" />
 			</tasklet>
 		</step>
 	</job>
@@ -44,11 +43,19 @@
 		<property name="replyTimeout" value="1000" />
 	</bean>
 
-	<integration:channel id="requests" />
+	<integration:poller default="true">
+		<integration:interval-trigger interval="50" />
+		<integration:transactional/>
+	</integration:poller>
+
+	<integration:channel id="requests">
+		<integration:queue />
+	</integration:channel>
 	<integration:channel id="replies">
 		<integration:queue />
 	</integration:channel>
-	<integration:service-activator input-channel="requests" output-channel="replies" ref="chunkHandler" />
+
+	<integration:service-activator input-channel="requests" output-channel="replies" ref="chunkHandler"/>
 
 	<bean id="chunkHandler" class="org.springframework.batch.integration.chunk.RemoteChunkHandlerFactoryBean">
 		<property name="chunkWriter" ref="chunkWriter" />
@@ -64,5 +71,5 @@
 	<bean id="jobLauncher" class="org.springframework.batch.core.launch.support.SimpleJobLauncher">
 		<property name="jobRepository" ref="jobRepository" />
 	</bean>
-	
+
 </beans>
