@@ -25,6 +25,7 @@ import org.springframework.batch.core.StepExecutionListener;
 import org.springframework.batch.core.step.item.Chunk;
 import org.springframework.batch.core.step.item.ChunkOrientedTasklet;
 import org.springframework.batch.core.step.item.ChunkProcessor;
+import org.springframework.batch.core.step.item.FaultTolerantChunkProcessor;
 import org.springframework.batch.core.step.item.SimpleChunkProcessor;
 import org.springframework.batch.core.step.tasklet.Tasklet;
 import org.springframework.batch.core.step.tasklet.TaskletStep;
@@ -114,12 +115,22 @@ public class RemoteChunkHandlerFactoryBean<T> implements FactoryBean<ChunkHandle
 		}
 
 		ChunkProcessorChunkHandler<T> handler = new ChunkProcessorChunkHandler<T>();
+		setNonBuffering(chunkProcessor);
 		handler.setChunkProcessor(chunkProcessor);
 		// TODO: create step context for the processor in case it has scope="step" dependencies
 		handler.afterPropertiesSet();
 
 		return handler;
 
+	}
+
+	/**
+	 * @param chunkProcessor
+	 */
+	private void setNonBuffering(ChunkProcessor<T> chunkProcessor) {
+		if (chunkProcessor instanceof FaultTolerantChunkProcessor<?, ?>) {
+			((FaultTolerantChunkProcessor<?, ?>)chunkProcessor).setBuffering(false);
+		}
 	}
 
 	/**

@@ -195,9 +195,12 @@ public class ChunkMessageChannelItemWriter<T> extends StepExecutionListenerSuppo
 	 * @throws IllegalStateException if the result contains the wrong job
 	 * instance id (maybe we are sharing a channel and we shouldn't be)
 	 */
-	private void getNextResult() {
+	private void getNextResult() throws AsynchronousFailureException {
 		ChunkResponse payload = (ChunkResponse) messagingGateway.receive();
 		if (payload != null) {
+			if (logger.isDebugEnabled()) {
+				logger.debug("Found result: "+payload);
+			}
 			Long jobInstanceId = payload.getJobId();
 			Assert.state(jobInstanceId != null, "Message did not contain job instance id.");
 			Assert.state(jobInstanceId.equals(localState.getJobId()), "Message contained wrong job instance id ["

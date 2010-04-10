@@ -22,7 +22,6 @@ import org.springframework.batch.core.JobInterruptedException;
 import org.springframework.batch.core.StepContribution;
 import org.springframework.batch.core.step.item.Chunk;
 import org.springframework.batch.core.step.item.ChunkProcessor;
-import org.springframework.batch.core.step.item.FaultTolerantChunkProcessor;
 import org.springframework.batch.core.step.skip.NonSkippableReadException;
 import org.springframework.batch.core.step.skip.SkipLimitExceededException;
 import org.springframework.batch.core.step.skip.SkipListenerFailedException;
@@ -63,23 +62,39 @@ public class ChunkProcessorChunkHandler<S> implements ChunkHandler<S>, Initializ
 	 * @see ChunkHandler#handleChunk(ChunkRequest)
 	 */
 	@ServiceActivator
-	public ChunkResponse handleChunk(ChunkRequest<S> chunkRequest) {
+	public ChunkResponse handleChunk(ChunkRequest<S> chunkRequest) throws Exception {
 
 		logger.debug("Handling chunk: " + chunkRequest);
 
 		StepContribution stepContribution = chunkRequest.getStepContribution();
+		Throwable failure = null;
 		try {
 			process(chunkRequest, stepContribution);
 		}
+		catch (SkipLimitExceededException e) {
+			failure = e;
+		}
+		catch (NonSkippableReadException e) {
+			failure = e;
+		}
+		catch (SkipListenerFailedException e) {
+			failure = e;
+		}
+		catch (RetryException e) {
+			failure = e;
+		}
+		catch (JobInterruptedException e) {
+			failure = e;
+		}
 		catch (Exception e) {
-			logger.debug("Failed chunk", e);
-			return new ChunkResponse(false, chunkRequest.getJobId(), stepContribution, e.getClass().getName() + ": "
-					+ e.getMessage());
-		} catch (Throwable e) {
-			// The handler might throw an Error or other non-exception
-			logger.debug("Failed chunk with non-exception", e);
-			return new ChunkResponse(false, chunkRequest.getJobId(), stepContribution, e.getClass().getName() + ": "
-					+ e.getMessage());			
+			// try again...
+			throw e;
+		}
+
+		if (failure != null) {
+			logger.debug("Failed chunk", failure);
+			return new ChunkResponse(false, chunkRequest.getJobId(), stepContribution, failure.getClass().getName()
+					+ ": " + failure.getMessage());
 		}
 
 		logger.debug("Completed chunk handling with " + stepContribution);
@@ -95,40 +110,7 @@ public class ChunkProcessorChunkHandler<S> implements ChunkHandler<S>, Initializ
 	private void process(ChunkRequest<S> chunkRequest, StepContribution stepContribution) throws Exception {
 
 		Chunk<S> chunk = new Chunk<S>(chunkRequest.getItems());
-
-		if (chunkProcessor instanceof FaultTolerantChunkProcessor<?, ?>) {
-
-			boolean processed = false;
-
-			while (!processed) {
-				try {
-					chunkProcessor.process(stepContribution, chunk);
-					processed = true;
-				}
-				catch (SkipLimitExceededException e) {
-					throw e;
-				}
-				catch (NonSkippableReadException e) {
-					throw e;
-				}
-				catch (SkipListenerFailedException e) {
-					throw e;
-				}
-				catch (RetryException e) {
-					throw e;
-				}
-				catch (JobInterruptedException e) {
-					throw e;
-				}
-				catch (Exception e) {
-					// try again...
-				}
-			}
-
-		}
-		else {
-			chunkProcessor.process(stepContribution, chunk);
-		}
+		chunkProcessor.process(stepContribution, chunk);
 
 	}
 }

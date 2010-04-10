@@ -17,7 +17,7 @@ public class ChunkProcessorChunkHandlerTests {
 	protected int count = 0;
 
 	@Test
-	public void testVanillaHandleChunk() {
+	public void testVanillaHandleChunk() throws Exception {
 		handler.setChunkProcessor(new ChunkProcessor<Object>() {
 			public void process(StepContribution contribution, Chunk<Object> chunk) throws Exception {
 				count += chunk.size();

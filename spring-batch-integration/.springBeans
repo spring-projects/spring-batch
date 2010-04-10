@@ -23,6 +23,9 @@
 		<config>src/test/resources/org/springframework/batch/integration/file/FileToMessagesJobIntegrationTests-context.xml</config>
 		<config>src/test/resources/org/springframework/batch/integration/step/StepGatewayIntegrationTests-context.xml</config>
 		<config>src/test/resources/org/springframework/batch/integration/chunk/RemoteChunkFaultTolerantStepIntegrationTests-context.xml</config>
+		<config>src/test/resources/jms-context.xml</config>
+		<config>src/test/resources/org/springframework/batch/integration/chunk/RemoteChunkFaultTolerantStepJmsIntegrationTests-context.xml</config>
+		<config>src/test/resources/org/springframework/batch/integration/chunk/RemoteChunkStepIntegrationTests-context.xml</config>
 	</configs>
 	<configSets>
 	</configSets>
