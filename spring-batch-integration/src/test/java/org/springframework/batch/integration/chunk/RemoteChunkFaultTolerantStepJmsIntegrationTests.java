@@ -20,7 +20,7 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 @ContextConfiguration
 @RunWith(SpringJUnit4ClassRunner.class)
-public class RemoteChunkFaultTolerantStepIntegrationTests {
+public class RemoteChunkFaultTolerantStepJmsIntegrationTests {
 
 	@Autowired
 	private JobLauncher jobLauncher;
@@ -68,7 +68,6 @@ public class RemoteChunkFaultTolerantStepIntegrationTests {
 		StepExecution stepExecution = jobExecution.getStepExecutions().iterator().next();
 		assertEquals(9, stepExecution.getReadCount());
 		assertEquals(7, stepExecution.getWriteCount());
-		// The whole chunk gets skipped...
 		assertEquals(2, stepExecution.getWriteSkipCount());
 	}
 }

@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:aop="http://www.springframework.org/schema/aop"
+	xmlns:p="http://www.springframework.org/schema/p" xmlns:tx="http://www.springframework.org/schema/tx"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="
+		http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd
+		http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-2.0.xsd
+		http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-2.0.xsd">
+
+	<bean id="jmsTemplate" class="org.springframework.jms.core.JmsTemplate">
+		<property name="connectionFactory" ref="connectionFactory" />
+		<property name="receiveTimeout" value="100" />
+		<!-- This is important... -->
+		<property name="sessionTransacted" value="true" />
+	</bean>
+
+	<bean id="connectionFactory" class="org.apache.activemq.ActiveMQConnectionFactory" depends-on="brokerService">
+		<property name="brokerURL">
+			<value>vm://localhost</value>
+		</property>
+	</bean>
+
+	<bean id="brokerService" class="org.apache.activemq.broker.BrokerService" init-method="start"
+		destroy-method="stop">
+		<property name="brokerName" value="localhost" />
+		<property name="useJmx" value="false"/>
+		<property name="transportConnectorURIs">
+			<list>
+				<value>vm://localhost</value>
+			</list>
+		</property>
+		<property name="persistenceAdapter">
+			<bean class="org.apache.activemq.store.memory.MemoryPersistenceAdapter"/>
+			<!-- bean class="org.apache.activemq.store.jdbc.JDBCPersistenceAdapter">
+				<property name="dataSource" ref="dataSource"/>
+				<property name="createTablesOnStartup" value="true" />
+			</bean-->
+		</property>
+	</bean>
+
+</beans>
