@@ -32,20 +32,26 @@ import org.springframework.integration.annotation.MessageEndpoint;
 import org.springframework.integration.annotation.ServiceActivator;
 import org.springframework.util.Assert;
 
+/**
+ * A {@link ChunkHandler} based on a {@link ChunkProcessor}. Knows how to distinguish between a processor that is fault
+ * tolerant, and one that is not. If the processor is fault tolerant then exceptions can be propagated on the assumption
+ * that there will be a roll back and the request will be re-delivered.
+ * 
+ * @author Dave Syer
+ * 
+ * @param <S> the type of the items in the chunk to be handled
+ */
 @MessageEndpoint
-public class ChunkProcessorChunkHandler<S> implements ChunkHandler<S>,
-		InitializingBean {
+public class ChunkProcessorChunkHandler<S> implements ChunkHandler<S>, InitializingBean {
 
-	private static final Log logger = LogFactory
-			.getLog(ChunkProcessorChunkHandler.class);
+	private static final Log logger = LogFactory.getLog(ChunkProcessorChunkHandler.class);
 
 	private ChunkProcessor<S> chunkProcessor;
 
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see
-	 * org.springframework.beans.factory.InitializingBean#afterPropertiesSet()
+	 * @see org.springframework.beans.factory.InitializingBean#afterPropertiesSet()
 	 */
 	public void afterPropertiesSet() throws Exception {
 		Assert.notNull(chunkProcessor, "A ChunkProcessor must be provided");
@@ -54,8 +60,7 @@ public class ChunkProcessorChunkHandler<S> implements ChunkHandler<S>,
 	/**
 	 * Public setter for the {@link ChunkProcessor}.
 	 * 
-	 * @param chunkProcessor
-	 *            the chunkProcessor to set
+	 * @param chunkProcessor the chunkProcessor to set
 	 */
 	public void setChunkProcessor(ChunkProcessor<S> chunkProcessor) {
 		this.chunkProcessor = chunkProcessor;
@@ -66,8 +71,7 @@ public class ChunkProcessorChunkHandler<S> implements ChunkHandler<S>,
 	 * @see ChunkHandler#handleChunk(ChunkRequest)
 	 */
 	@ServiceActivator
-	public ChunkResponse handleChunk(ChunkRequest<S> chunkRequest)
-			throws Exception {
+	public ChunkResponse handleChunk(ChunkRequest<S> chunkRequest) throws Exception {
 
 		logger.debug("Handling chunk: " + chunkRequest);
 
@@ -76,47 +80,48 @@ public class ChunkProcessorChunkHandler<S> implements ChunkHandler<S>,
 		Throwable failure = process(chunkRequest, stepContribution);
 		if (failure != null) {
 			logger.debug("Failed chunk", failure);
-			return new ChunkResponse(false, chunkRequest.getJobId(),
-					stepContribution, failure.getClass().getName() + ": "
-							+ failure.getMessage());
+			return new ChunkResponse(false, chunkRequest.getJobId(), stepContribution, failure.getClass().getName()
+					+ ": " + failure.getMessage());
 		}
 
 		logger.debug("Completed chunk handling with " + stepContribution);
-		return new ChunkResponse(true, chunkRequest.getJobId(),
-				stepContribution);
+		return new ChunkResponse(true, chunkRequest.getJobId(), stepContribution);
 
 	}
 
 	/**
-	 * @param chunkRequest
-	 *            the current request
-	 * @param stepContribution
-	 *            the step contribution to update
-	 * @throws Exception
-	 *             if there is a fatal exception
+	 * @param chunkRequest the current request
+	 * @param stepContribution the step contribution to update
+	 * @throws Exception if there is a fatal exception
 	 */
-	private Throwable process(ChunkRequest<S> chunkRequest,
-			StepContribution stepContribution) throws Exception {
+	private Throwable process(ChunkRequest<S> chunkRequest, StepContribution stepContribution) throws Exception {
 
 		Chunk<S> chunk = new Chunk<S>(chunkRequest.getItems());
 		Throwable failure = null;
 		try {
 			chunkProcessor.process(stepContribution, chunk);
-		} catch (SkipLimitExceededException e) {
+		}
+		catch (SkipLimitExceededException e) {
 			failure = e;
-		} catch (NonSkippableReadException e) {
+		}
+		catch (NonSkippableReadException e) {
 			failure = e;
-		} catch (SkipListenerFailedException e) {
+		}
+		catch (SkipListenerFailedException e) {
 			failure = e;
-		} catch (RetryException e) {
+		}
+		catch (RetryException e) {
 			failure = e;
-		} catch (JobInterruptedException e) {
+		}
+		catch (JobInterruptedException e) {
 			failure = e;
-		} catch (Exception e) {
+		}
+		catch (Exception e) {
 			if (chunkProcessor instanceof FaultTolerantChunkProcessor<?, ?>) {
 				// try again...
 				throw e;
-			} else {
+			}
+			else {
 				failure = e;
 			}
 		}
@@ -124,4 +129,5 @@ public class ChunkProcessorChunkHandler<S> implements ChunkHandler<S>,
 		return failure;
 
 	}
+
 }
