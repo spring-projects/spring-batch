@@ -21,10 +21,19 @@ import java.util.Collection;
 
 import org.springframework.batch.core.StepContribution;
 
+/**
+ * Encapsulation of a chunk of items to be processed remotely as part of a step execution.
+ * 
+ * @author Dave Syer
+ * 
+ * @param <T> the type of the items to process
+ */
 public class ChunkRequest<T> implements Serializable {
 
 	private final Long jobId;
+
 	private final Collection<? extends T> items;
+
 	private final StepContribution stepContribution;
 
 	public ChunkRequest(Collection<? extends T> items, Long jobId, StepContribution stepContribution) {
@@ -40,20 +49,21 @@ public class ChunkRequest<T> implements Serializable {
 	public Collection<? extends T> getItems() {
 		return items;
 	}
-	
+
 	/**
 	 * @return the {@link StepContribution} for this chunk
 	 */
 	public StepContribution getStepContribution() {
 		return stepContribution;
 	}
-	
+
 	/**
 	 * @see java.lang.Object#toString()
 	 */
 	@Override
 	public String toString() {
-		return getClass().getSimpleName()+": jobId="+jobId+", contribution="+stepContribution+", item count="+items.size();
+		return getClass().getSimpleName() + ": jobId=" + jobId + ", contribution=" + stepContribution + ", item count="
+				+ items.size();
 	}
 
 }

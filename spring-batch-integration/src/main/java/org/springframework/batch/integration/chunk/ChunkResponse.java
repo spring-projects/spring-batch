@@ -20,11 +20,20 @@ import java.io.Serializable;
 
 import org.springframework.batch.core.StepContribution;
 
+/**
+ * Encapsulates a response to processing a chunk of items, summarising the result as a {@link StepContribution}.
+ * 
+ * @author Dave Syer
+ * 
+ */
 public class ChunkResponse implements Serializable {
 
 	private final StepContribution stepContribution;
+
 	private final Long jobId;
+
 	private final boolean status;
+
 	private final String message;
 
 	public ChunkResponse(Long jobId, StepContribution stepContribution) {
@@ -63,7 +72,8 @@ public class ChunkResponse implements Serializable {
 	 */
 	@Override
 	public String toString() {
-		return getClass().getSimpleName()+": jobId="+jobId+", stepContribution="+stepContribution+", successful="+status;
+		return getClass().getSimpleName() + ": jobId=" + jobId + ", stepContribution=" + stepContribution
+				+ ", successful=" + status;
 	}
 
 }

@@ -21,6 +21,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Queue;
 import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -58,11 +59,9 @@ public class ChunkMessageChannelItemWriter<T> extends StepExecutionListenerSuppo
 	private int maxWaitTimeouts = DEFAULT_MAX_WAIT_TIMEOUTS;
 
 	/**
-	 * The maximum number of times to wait at the end of a step for a non-null
-	 * result from the remote workers. This is a multiplier on the receive
-	 * timeout set separately on the gateway. The ideal value is a compromise
-	 * between allowing slow workers time to finish, and responsiveness if there
-	 * is a dead worker. Defaults to 40.
+	 * The maximum number of times to wait at the end of a step for a non-null result from the remote workers. This is a
+	 * multiplier on the receive timeout set separately on the gateway. The ideal value is a compromise between allowing
+	 * slow workers time to finish, and responsiveness if there is a dead worker. Defaults to 40.
 	 * 
 	 * @param maxWaitTimeouts the maximum number of wait timeouts
 	 */
@@ -71,8 +70,8 @@ public class ChunkMessageChannelItemWriter<T> extends StepExecutionListenerSuppo
 	}
 
 	/**
-	 * Public setter for the throttle limit. This limits the number of pending
-	 * requests for chunk processing to avoid overwhelming the receivers.
+	 * Public setter for the throttle limit. This limits the number of pending requests for chunk processing to avoid
+	 * overwhelming the receivers.
 	 * @param throttleLimit the throttle limit to set
 	 */
 	public void setThrottleLimit(long throttleLimit) {
@@ -96,7 +95,7 @@ public class ChunkMessageChannelItemWriter<T> extends StepExecutionListenerSuppo
 			ChunkRequest<T> request = new ChunkRequest<T>(items, localState.getJobId(), localState
 					.createStepContribution());
 			messagingGateway.send(request);
-			localState.expected++;
+			localState.expected.incrementAndGet();
 
 		}
 
@@ -142,8 +141,7 @@ public class ChunkMessageChannelItemWriter<T> extends StepExecutionListenerSuppo
 
 	public void open(ExecutionContext executionContext) throws ItemStreamException {
 		if (executionContext.containsKey(EXPECTED)) {
-			localState.expected = executionContext.getLong(EXPECTED);
-			localState.actual = executionContext.getLong(ACTUAL);
+			localState.open(executionContext.getInt(EXPECTED), executionContext.getInt(ACTUAL));
 			if (!waitForResults()) {
 				throw new ItemStreamException("Timed out waiting for back log on open");
 			}
@@ -151,17 +149,16 @@ public class ChunkMessageChannelItemWriter<T> extends StepExecutionListenerSuppo
 	}
 
 	public void update(ExecutionContext executionContext) throws ItemStreamException {
-		executionContext.putLong(EXPECTED, localState.expected);
-		executionContext.putLong(ACTUAL, localState.actual);
+		executionContext.putInt(EXPECTED, localState.expected.intValue());
+		executionContext.putInt(ACTUAL, localState.actual.intValue());
 	}
 
 	public Collection<StepContribution> getStepContributions() {
-		return localState.pollContributions();
+		return localState.pollStepContributions();
 	}
 
 	/**
-	 * Wait until all the results that are in the pipeline come back to the
-	 * reply channel.
+	 * Wait until all the results that are in the pipeline come back to the reply channel.
 	 * 
 	 * @return true if successfully received a result, false if timed out
 	 */
@@ -169,6 +166,7 @@ public class ChunkMessageChannelItemWriter<T> extends StepExecutionListenerSuppo
 		int count = 0;
 		int maxCount = maxWaitTimeouts;
 		Throwable failure = null;
+		logger.error("Waiting for " + localState.getExpecting() + " results");
 		while (localState.getExpecting() > 0 && count++ < maxCount) {
 			try {
 				getNextResult();
@@ -186,27 +184,25 @@ public class ChunkMessageChannelItemWriter<T> extends StepExecutionListenerSuppo
 	}
 
 	/**
-	 * Get the next result if it is available (within the timeout specified in
-	 * the gateway), otherwise do nothing.
+	 * Get the next result if it is available (within the timeout specified in the gateway), otherwise do nothing.
 	 * 
-	 * @throws AsynchronousFailureException If there is a response and it
-	 * contains a failed chunk response.
+	 * @throws AsynchronousFailureException If there is a response and it contains a failed chunk response.
 	 * 
-	 * @throws IllegalStateException if the result contains the wrong job
-	 * instance id (maybe we are sharing a channel and we shouldn't be)
+	 * @throws IllegalStateException if the result contains the wrong job instance id (maybe we are sharing a channel
+	 * and we shouldn't be)
 	 */
 	private void getNextResult() throws AsynchronousFailureException {
 		ChunkResponse payload = (ChunkResponse) messagingGateway.receive();
 		if (payload != null) {
 			if (logger.isDebugEnabled()) {
-				logger.debug("Found result: "+payload);
+				logger.debug("Found result: " + payload);
 			}
 			Long jobInstanceId = payload.getJobId();
 			Assert.state(jobInstanceId != null, "Message did not contain job instance id.");
 			Assert.state(jobInstanceId.equals(localState.getJobId()), "Message contained wrong job instance id ["
 					+ jobInstanceId + "] should have been [" + localState.getJobId() + "].");
-			localState.actual++;
-			localState.pushContribution(payload.getStepContribution());
+			localState.actual.incrementAndGet();
+			localState.pushStepContribution(payload.getStepContribution());
 			if (!payload.isSuccessful()) {
 				throw new AsynchronousFailureException("Failure or interrupt detected in handler: "
 						+ payload.getMessage());
@@ -215,8 +211,8 @@ public class ChunkMessageChannelItemWriter<T> extends StepExecutionListenerSuppo
 	}
 
 	/**
-	 * Re-throws the original throwable if it is unchecked, wraps checked
-	 * exceptions into {@link AsynchronousFailureException}.
+	 * Re-throws the original throwable if it is unchecked, wraps checked exceptions into
+	 * {@link AsynchronousFailureException}.
 	 */
 	private static AsynchronousFailureException wrapIfNecessary(Throwable throwable) {
 		if (throwable instanceof Error) {
@@ -231,30 +227,40 @@ public class ChunkMessageChannelItemWriter<T> extends StepExecutionListenerSuppo
 	}
 
 	private static class LocalState {
-		private long actual;
 
-		private long expected;
+		private AtomicInteger actual = new AtomicInteger();
+
+		private AtomicInteger expected = new AtomicInteger();
 
 		private StepExecution stepExecution;
 
 		private Queue<StepContribution> contributions = new LinkedBlockingQueue<StepContribution>();
 
-		public long getExpecting() {
-			return expected - actual;
+		public int getExpecting() {
+			return expected.get() - actual.get();
 		}
 
-		public Collection<StepContribution> pollContributions() {
+		public void open(int expectedValue, int actualValue) {
+			actual.set(actualValue);
+			expected.set(expectedValue);
+		}
+
+		public Collection<StepContribution> pollStepContributions() {
 			Collection<StepContribution> set = new ArrayList<StepContribution>();
-			StepContribution item = contributions.poll();
-			while (item != null) {
-				set.add(item);
-				item = contributions.poll();
+			synchronized (contributions) {
+				StepContribution item = contributions.poll();
+				while (item != null) {
+					set.add(item);
+					item = contributions.poll();
+				}
 			}
 			return set;
 		}
 
-		public void pushContribution(StepContribution stepContribution) {
-			contributions.add(stepContribution);
+		public void pushStepContribution(StepContribution stepContribution) {
+			synchronized (contributions) {
+				contributions.add(stepContribution);
+			}
 		}
 
 		public StepContribution createStepContribution() {
@@ -270,7 +276,8 @@ public class ChunkMessageChannelItemWriter<T> extends StepExecutionListenerSuppo
 		}
 
 		public void reset() {
-			expected = actual = 0;
+			expected.set(0);
+			actual.set(0);
 		}
 	}
 

@@ -107,8 +107,8 @@ public class ChunkMessageItemWriterIntegrationTests {
 		ExecutionContext executionContext = new ExecutionContext();
 		writer.update(executionContext);
 		writer.open(executionContext);
-		assertEquals(0, executionContext.getLong(ChunkMessageChannelItemWriter.EXPECTED));
-		assertEquals(0, executionContext.getLong(ChunkMessageChannelItemWriter.ACTUAL));
+		assertEquals(0, executionContext.getInt(ChunkMessageChannelItemWriter.EXPECTED));
+		assertEquals(0, executionContext.getInt(ChunkMessageChannelItemWriter.ACTUAL));
 	}
 
 	@Test
@@ -140,8 +140,8 @@ public class ChunkMessageItemWriterIntegrationTests {
 		StepExecution stepExecution = getStepExecution(step);
 
 		// Set up context with two messages (chunks) in the backlog
-		stepExecution.getExecutionContext().putLong(ChunkMessageChannelItemWriter.EXPECTED, 6);
-		stepExecution.getExecutionContext().putLong(ChunkMessageChannelItemWriter.ACTUAL, 4);
+		stepExecution.getExecutionContext().putInt(ChunkMessageChannelItemWriter.EXPECTED, 6);
+		stepExecution.getExecutionContext().putInt(ChunkMessageChannelItemWriter.ACTUAL, 4);
 		// And make the back log real
 		requests.send(getSimpleMessage("foo", stepExecution.getJobExecution().getJobId()));
 		requests.send(getSimpleMessage("bar", stepExecution.getJobExecution().getJobId()));
@@ -165,8 +165,12 @@ public class ChunkMessageItemWriterIntegrationTests {
 		StepExecution stepExecution = getStepExecution(step);
 
 		// Set up context with two messages (chunks) in the backlog
-		stepExecution.getExecutionContext().putLong(ChunkMessageChannelItemWriter.EXPECTED, 3);
-		stepExecution.getExecutionContext().putLong(ChunkMessageChannelItemWriter.ACTUAL, 2);
+		stepExecution.getExecutionContext().putInt(ChunkMessageChannelItemWriter.EXPECTED, 3);
+		stepExecution.getExecutionContext().putInt(ChunkMessageChannelItemWriter.ACTUAL, 2);
+		
+		// Speed up the eventual failure
+		writer.setMaxWaitTimeouts(2);
+
 		// And make the back log real
 		requests.send(getSimpleMessage("foo", 4321L));
 		step.execute(stepExecution);
@@ -234,8 +238,11 @@ public class ChunkMessageItemWriterIntegrationTests {
 		StepExecution stepExecution = getStepExecution(step);
 
 		// Set up expectation of three messages (chunks) in the backlog
-		stepExecution.getExecutionContext().putLong(ChunkMessageChannelItemWriter.EXPECTED, 6);
-		stepExecution.getExecutionContext().putLong(ChunkMessageChannelItemWriter.ACTUAL, 3);
+		stepExecution.getExecutionContext().putInt(ChunkMessageChannelItemWriter.EXPECTED, 6);
+		stepExecution.getExecutionContext().putInt(ChunkMessageChannelItemWriter.ACTUAL, 3);
+		
+		writer.setMaxWaitTimeouts(2);
+
 		/*
 		 * With no backlog we process all the items, but the listener can't
 		 * reconcile the expected number of items with the actual. An infinite
