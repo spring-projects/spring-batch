@@ -2,8 +2,9 @@
 <beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xmlns:integration="http://www.springframework.org/schema/integration" xmlns:batch="http://www.springframework.org/schema/batch"
 	xmlns:context="http://www.springframework.org/schema/context" xmlns:int-jms="http://www.springframework.org/schema/integration/jms"
-	xmlns:jms="http://www.springframework.org/schema/jms"
-	xsi:schemaLocation="http://www.springframework.org/schema/jms http://www.springframework.org/schema/jms/spring-jms-3.0.xsd
+	xmlns:jms="http://www.springframework.org/schema/jms" xmlns:aop="http://www.springframework.org/schema/aop"
+	xsi:schemaLocation="http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-3.0.xsd
+		http://www.springframework.org/schema/jms http://www.springframework.org/schema/jms/spring-jms-3.0.xsd
 		http://www.springframework.org/schema/integration http://www.springframework.org/schema/integration/spring-integration-1.0.xsd
 		http://www.springframework.org/schema/integration/jms http://www.springframework.org/schema/integration/jms/spring-integration-jms-1.0.xsd
 		http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.5.xsd
@@ -54,14 +55,27 @@
 
 	<int-jms:outbound-channel-adapter connection-factory="connectionFactory" channel="requests"
 		destination-name="requests" />
-	<int-jms:message-driven-channel-adapter connection-factory="connectionFactory"
-		channel="replies" destination-name="replies" transaction-manager="transactionManager" acknowledge="transacted"/>
 	<integration:channel id="requests" />
-	<integration:channel id="replies">
-		<integration:queue />
-	</integration:channel>
+	<integration:thread-local-channel id="replies">
+		<integration:interceptors>
+			<bean id="pollerInterceptor" class="org.springframework.batch.integration.chunk.MessageSourcePollerInterceptor">
+				<property name="messageSource">
+					<bean class="org.springframework.integration.jms.JmsDestinationPollingSource">
+						<constructor-arg>
+							<bean class="org.springframework.jms.core.JmsTemplate">
+								<property name="connectionFactory" ref="connectionFactory" />
+								<property name="defaultDestinationName" value="replies" />
+								<property name="receiveTimeout" value="100" />
+							</bean>
+						</constructor-arg>
+					</bean>
+				</property>
+			</bean>
+		</integration:interceptors>
+	</integration:thread-local-channel>
 
-	<jms:listener-container connection-factory="connectionFactory" transaction-manager="transactionManager" acknowledge="transacted">
+	<jms:listener-container connection-factory="connectionFactory" transaction-manager="transactionManager"
+		acknowledge="transacted">
 		<jms:listener destination="requests" response-destination="replies" ref="chunkHandler" method="handleChunk" />
 	</jms:listener-container>
 
