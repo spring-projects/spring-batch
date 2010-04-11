@@ -22,6 +22,7 @@ import org.springframework.batch.core.JobInterruptedException;
 import org.springframework.batch.core.StepContribution;
 import org.springframework.batch.core.step.item.Chunk;
 import org.springframework.batch.core.step.item.ChunkProcessor;
+import org.springframework.batch.core.step.item.FaultTolerantChunkProcessor;
 import org.springframework.batch.core.step.skip.NonSkippableReadException;
 import org.springframework.batch.core.step.skip.SkipLimitExceededException;
 import org.springframework.batch.core.step.skip.SkipListenerFailedException;
@@ -32,9 +33,11 @@ import org.springframework.integration.annotation.ServiceActivator;
 import org.springframework.util.Assert;
 
 @MessageEndpoint
-public class ChunkProcessorChunkHandler<S> implements ChunkHandler<S>, InitializingBean {
+public class ChunkProcessorChunkHandler<S> implements ChunkHandler<S>,
+		InitializingBean {
 
-	private static final Log logger = LogFactory.getLog(ChunkProcessorChunkHandler.class);
+	private static final Log logger = LogFactory
+			.getLog(ChunkProcessorChunkHandler.class);
 
 	private ChunkProcessor<S> chunkProcessor;
 
@@ -51,7 +54,8 @@ public class ChunkProcessorChunkHandler<S> implements ChunkHandler<S>, Initializ
 	/**
 	 * Public setter for the {@link ChunkProcessor}.
 	 * 
-	 * @param chunkProcessor the chunkProcessor to set
+	 * @param chunkProcessor
+	 *            the chunkProcessor to set
 	 */
 	public void setChunkProcessor(ChunkProcessor<S> chunkProcessor) {
 		this.chunkProcessor = chunkProcessor;
@@ -62,55 +66,62 @@ public class ChunkProcessorChunkHandler<S> implements ChunkHandler<S>, Initializ
 	 * @see ChunkHandler#handleChunk(ChunkRequest)
 	 */
 	@ServiceActivator
-	public ChunkResponse handleChunk(ChunkRequest<S> chunkRequest) throws Exception {
+	public ChunkResponse handleChunk(ChunkRequest<S> chunkRequest)
+			throws Exception {
 
 		logger.debug("Handling chunk: " + chunkRequest);
 
 		StepContribution stepContribution = chunkRequest.getStepContribution();
-		Throwable failure = null;
-		try {
-			process(chunkRequest, stepContribution);
-		}
-		catch (SkipLimitExceededException e) {
-			failure = e;
-		}
-		catch (NonSkippableReadException e) {
-			failure = e;
-		}
-		catch (SkipListenerFailedException e) {
-			failure = e;
-		}
-		catch (RetryException e) {
-			failure = e;
-		}
-		catch (JobInterruptedException e) {
-			failure = e;
-		}
-		catch (Exception e) {
-			// try again...
-			throw e;
-		}
 
+		Throwable failure = process(chunkRequest, stepContribution);
 		if (failure != null) {
 			logger.debug("Failed chunk", failure);
-			return new ChunkResponse(false, chunkRequest.getJobId(), stepContribution, failure.getClass().getName()
-					+ ": " + failure.getMessage());
+			return new ChunkResponse(false, chunkRequest.getJobId(),
+					stepContribution, failure.getClass().getName() + ": "
+							+ failure.getMessage());
 		}
 
 		logger.debug("Completed chunk handling with " + stepContribution);
-		return new ChunkResponse(true, chunkRequest.getJobId(), stepContribution);
+		return new ChunkResponse(true, chunkRequest.getJobId(),
+				stepContribution);
 
 	}
 
 	/**
-	 * @param chunkRequest the current request
-	 * @param stepContribution the step contribution to update
-	 * @throws Exception if there is a fatal exception
+	 * @param chunkRequest
+	 *            the current request
+	 * @param stepContribution
+	 *            the step contribution to update
+	 * @throws Exception
+	 *             if there is a fatal exception
 	 */
-	private void process(ChunkRequest<S> chunkRequest, StepContribution stepContribution) throws Exception {
+	private Throwable process(ChunkRequest<S> chunkRequest,
+			StepContribution stepContribution) throws Exception {
 
 		Chunk<S> chunk = new Chunk<S>(chunkRequest.getItems());
-		chunkProcessor.process(stepContribution, chunk);
+		Throwable failure = null;
+		try {
+			chunkProcessor.process(stepContribution, chunk);
+		} catch (SkipLimitExceededException e) {
+			failure = e;
+		} catch (NonSkippableReadException e) {
+			failure = e;
+		} catch (SkipListenerFailedException e) {
+			failure = e;
+		} catch (RetryException e) {
+			failure = e;
+		} catch (JobInterruptedException e) {
+			failure = e;
+		} catch (Exception e) {
+			if (chunkProcessor instanceof FaultTolerantChunkProcessor<?, ?>) {
+				// try again...
+				throw e;
+			} else {
+				failure = e;
+			}
+		}
+
+		return failure;
 
 	}
 }
