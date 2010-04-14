@@ -49,7 +49,7 @@ Use Cases for Spring Batch
     * {{{scheduled.html}Scheduled Processing}}: Batch Jobs controlled
     by scheduler (e.g. start, stop, suspend, kill).  Spring Batch does
     not intend to implement the scheduler concerns, but needs
-    toprovide enough information that a scheduler can act
+    to provide enough information that a scheduler can act
     appropriately.
     
     * Non-Sequential Processing of Steps (Conditional Branching)
