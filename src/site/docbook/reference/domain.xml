@@ -979,13 +979,14 @@ ExecutionContext ecJob = jobExecution.getExecutionContext();
   <section id="domainItemWriter">
     <title id="s.5.1.2">Item Writer</title>
 
-    <para><classname>ItemWriter</classname> is an abstraction that represents
-    the output of a <classname>Step</classname>, one item at a time.
-    Generally, an item writer has no knowledge of the input it will receive
-    next, only the item that was passed in its current invocation. More
-    details about the <classname>ItemWriter</classname> interface and its
-    various implementations can be found in <xref
-    linkend="readersAndWriters" />.</para>
+    <para><classname>ItemWriter</classname> is an abstraction that
+    represents the output of a <classname>Step</classname>, one batch
+    or chunk of items at a time.  Generally, an item writer has no
+    knowledge of the input it will receive next, only the item that
+    was passed in its current invocation. More details about the
+    <classname>ItemWriter</classname> interface and its various
+    implementations can be found in <xref linkend="readersAndWriters"
+    />.</para>
   </section>
 
   <section id="domainItemProcessor">
