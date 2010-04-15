@@ -37,6 +37,11 @@ public class Db2PagingQueryProvider extends SqlWindowingPagingQueryProvider {
 		return SqlPagingQueryUtils.generateLimitSqlQuery(this, true, buildLimitClause(pageSize));
 	}
 
+	@Override
+	protected Object getSubQueryAlias() {
+		return "AS TMP_SUB ";
+	}
+
 	private String buildLimitClause(int pageSize) {
 		return new StringBuilder().append("FETCH FIRST ").append(pageSize).append(" ROWS ONLY").toString();
 	}
