@@ -56,6 +56,12 @@
 	<int-jms:outbound-channel-adapter connection-factory="connectionFactory" channel="requests"
 		destination-name="requests" />
 	<integration:channel id="requests" />
+	<integration:channel id="incoming" />
+	
+	<integration:transformer input-channel="incoming" output-channel="replies" ref="headerExtractor" method="extract"/>
+	
+	<bean id="headerExtractor" class="org.springframework.batch.integration.chunk.JmsRedeliveredExtractor"/>
+
 	<integration:thread-local-channel id="replies">
 		<integration:interceptors>
 			<bean id="pollerInterceptor" class="org.springframework.batch.integration.chunk.MessageSourcePollerInterceptor">
@@ -70,6 +76,7 @@
 						</constructor-arg>
 					</bean>
 				</property>
+				<property name="channel" ref="incoming"/>
 			</bean>
 		</integration:interceptors>
 	</integration:thread-local-channel>
