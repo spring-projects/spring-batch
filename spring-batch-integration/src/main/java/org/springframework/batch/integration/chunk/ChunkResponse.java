@@ -35,6 +35,8 @@ public class ChunkResponse implements Serializable {
 	private final boolean status;
 
 	private final String message;
+	
+	private final boolean redelivered;
 
 	public ChunkResponse(Long jobId, StepContribution stepContribution) {
 		this(true, jobId, stepContribution, null);
@@ -45,10 +47,19 @@ public class ChunkResponse implements Serializable {
 	}
 
 	public ChunkResponse(boolean status, Long jobId, StepContribution stepContribution, String message) {
+		this(status, jobId, stepContribution, message, false);
+	}
+
+	public ChunkResponse(ChunkResponse input, boolean redelivered) {
+		this(input.status, input.jobId, input.stepContribution, input.message, redelivered);
+	}
+
+	public ChunkResponse(boolean status, Long jobId, StepContribution stepContribution, String message, boolean redelivered) {
 		this.status = status;
 		this.jobId = jobId;
 		this.stepContribution = stepContribution;
 		this.message = message;
+		this.redelivered = redelivered;
 	}
 
 	public StepContribution getStepContribution() {
@@ -61,6 +72,10 @@ public class ChunkResponse implements Serializable {
 
 	public boolean isSuccessful() {
 		return status;
+	}
+	
+	public boolean isRedelivered() {
+		return redelivered;
 	}
 
 	public String getMessage() {

@@ -95,7 +95,7 @@ public class ChunkMessageChannelItemWriter<T> extends StepExecutionListenerSuppo
 			ChunkRequest<T> request = new ChunkRequest<T>(items, localState.getJobId(), localState
 					.createStepContribution());
 			messagingGateway.send(request);
-			localState.expected.incrementAndGet();
+			localState.incrementExpected();
 
 		}
 
@@ -201,8 +201,17 @@ public class ChunkMessageChannelItemWriter<T> extends StepExecutionListenerSuppo
 			Assert.state(jobInstanceId != null, "Message did not contain job instance id.");
 			Assert.state(jobInstanceId.equals(localState.getJobId()), "Message contained wrong job instance id ["
 					+ jobInstanceId + "] should have been [" + localState.getJobId() + "].");
-			localState.actual.incrementAndGet();
+			if (payload.isRedelivered()) {
+				logger
+						.warn("Redelivered result detected, which may indicate stale state. In the best case, we just picked up a timed out message "
+								+ "from a previous failed execution. In the worst case (and if this is not a restart), "
+								+ "the step may now timeout.  In that case if you believe that all messages "
+								+ "from workers have been sent, the business state "
+								+ "is probably inconsistent, and the step will fail.");
+				localState.incrementRedelivered();
+			}
 			localState.pushStepContribution(payload.getStepContribution());
+			localState.incrementActual();
 			if (!payload.isSuccessful()) {
 				throw new AsynchronousFailureException("Failure or interrupt detected in handler: "
 						+ payload.getMessage());
@@ -231,6 +240,8 @@ public class ChunkMessageChannelItemWriter<T> extends StepExecutionListenerSuppo
 		private AtomicInteger actual = new AtomicInteger();
 
 		private AtomicInteger expected = new AtomicInteger();
+
+		private AtomicInteger redelivered = new AtomicInteger();
 
 		private StepExecution stepExecution;
 
@@ -261,6 +272,18 @@ public class ChunkMessageChannelItemWriter<T> extends StepExecutionListenerSuppo
 			synchronized (contributions) {
 				contributions.add(stepContribution);
 			}
+		}
+
+		public void incrementRedelivered() {
+			redelivered.incrementAndGet();
+		}
+
+		public void incrementActual() {
+			actual.incrementAndGet();
+		}
+
+		public void incrementExpected() {
+			expected.incrementAndGet();
 		}
 
 		public StepContribution createStepContribution() {

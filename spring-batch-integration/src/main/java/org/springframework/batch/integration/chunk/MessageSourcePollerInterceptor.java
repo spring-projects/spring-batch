@@ -26,6 +26,8 @@ public class MessageSourcePollerInterceptor extends ChannelInterceptorAdapter im
 
 	private MessageSource<?> source;
 
+	private MessageChannel channel;
+
 	/**
 	 * Convenient default constructor for configuration purposes.
 	 */
@@ -37,6 +39,16 @@ public class MessageSourcePollerInterceptor extends ChannelInterceptorAdapter im
 	 */
 	public MessageSourcePollerInterceptor(MessageSource<?> source) {
 		this.source = source;
+	}
+
+	/**
+	 * Optional MessageChannel for injecting the message receieved from the source (defaults to the channel
+	 * intercepted in {@link #preReceive(MessageChannel)}).
+	 * 
+	 * @param channel the channel to set
+	 */
+	public void setChannel(MessageChannel channel) {
+		this.channel = channel;
 	}
 
 	/**
@@ -64,6 +76,9 @@ public class MessageSourcePollerInterceptor extends ChannelInterceptorAdapter im
 	public boolean preReceive(MessageChannel channel) {
 		Message<?> message = source.receive();
 		if (message != null) {
+			if (this.channel!=null) {
+				channel = this.channel;
+			}
 			channel.send(message);
 			if (logger.isDebugEnabled()) {
 				logger.debug("Sent " + message + " to channel " + channel.getName());
