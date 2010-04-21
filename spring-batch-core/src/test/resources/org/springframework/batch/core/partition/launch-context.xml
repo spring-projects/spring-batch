@@ -30,7 +30,7 @@
 						<property name="stepName" value="step1" />
 						<property name="partitioner">
 							<bean
-								class="org.springframework.batch.core.partition.support.SimplePartitioner" />
+								class="org.springframework.batch.core.partition.MinMaxPartitioner" />
 						</property>
 					</bean>
 				</property>
@@ -42,10 +42,8 @@
 		<property name="itemReader">
 			<bean class="org.springframework.batch.core.partition.ExampleItemReader"
 				scope="step">
-				<!--
-					<property name="resource"
-					value="#{stepAttributes[jobParameters['resource']]}"/>
-				-->
+				<property name="min" value="#{stepExecutionContext['min']}"/>
+				<property name="max" value="#{stepExecutionContext['max']}"/>
 			</bean>
 		</property>
 		<property name="itemWriter">

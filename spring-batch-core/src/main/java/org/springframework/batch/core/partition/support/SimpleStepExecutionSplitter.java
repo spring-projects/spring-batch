@@ -150,11 +150,7 @@ public class SimpleStepExecutionSplitter implements StepExecutionSplitter, Initi
 
 		JobExecution jobExecution = stepExecution.getJobExecution();
 
-		// If this is a restart we must retain the same grid size, ignoring the
-		// one passed in...
-		int splitSize = getSplitSize(stepExecution, gridSize);
-
-		Map<String, ExecutionContext> contexts = partitioner.partition(splitSize);
+		Map<String, ExecutionContext> contexts = getContexts(stepExecution, gridSize);
 		Set<StepExecution> set = new HashSet<StepExecution>(contexts.size());
 
 		for (Entry<String, ExecutionContext> context : contexts.entrySet()) {
@@ -177,14 +173,25 @@ public class SimpleStepExecutionSplitter implements StepExecutionSplitter, Initi
 
 	}
 
-	private int getSplitSize(StepExecution stepExecution, int gridSize) {
+	private Map<String, ExecutionContext> getContexts(StepExecution stepExecution, int gridSize) {
+
 		ExecutionContext context = stepExecution.getExecutionContext();
 		String key = SimpleStepExecutionSplitter.class.getSimpleName() + ".GRID_SIZE";
-		int result = (int) context.getLong(key, gridSize);
-		context.putLong(key, result);
+
+		// If this is a restart we must retain the same grid size, ignoring the
+		// one passed in...
+		int splitSize = (int) context.getLong(key, gridSize);
+		context.putLong(key, splitSize);
+
+		Map<String, ExecutionContext> result;
 		if (context.isDirty()) {
+			// The context changed so we didn't already know the partitions
 			jobRepository.updateExecutionContext(stepExecution);
+			result = partitioner.partition(splitSize);
+		} else {
+			result = new SimplePartitioner().partition(splitSize);
 		}
+
 		return result;
 	}
 

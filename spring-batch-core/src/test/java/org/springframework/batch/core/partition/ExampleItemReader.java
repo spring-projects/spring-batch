@@ -18,13 +18,31 @@ public class ExampleItemReader implements ItemReader<String>, ItemStream {
 
 	private int index = 0;
 
+	private int min = 0;
+
+	private int max = Integer.MAX_VALUE;
+
 	public static volatile boolean fail = false;
+
+	/**
+	 * @param min the min to set
+	 */
+	public void setMin(int min) {
+		this.min = min;
+	}
+
+	/**
+	 * @param max the max to set
+	 */
+	public void setMax(int max) {
+		this.max = max;
+	}
 
 	/**
 	 * Reads next record from input
 	 */
 	public String read() throws Exception {
-		if (index >= input.length) {
+		if (index >= input.length || index >= max) {
 			return null;
 		}
 		logger.info(String.format("Processing input index=%s, item=%s, in (%s)", index, input[index], this));
@@ -47,7 +65,7 @@ public class ExampleItemReader implements ItemReader<String>, ItemStream {
 	}
 
 	public void open(ExecutionContext executionContext) throws ItemStreamException {
-		index = (int) executionContext.getLong("POSITION", 0);
+		index = (int) executionContext.getLong("POSITION", min);
 	}
 
 	public void update(ExecutionContext executionContext) throws ItemStreamException {

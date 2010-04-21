@@ -77,9 +77,16 @@ public class RestartIntegrationTests {
 		int beforeMaster = jdbcTemplate.queryForInt("SELECT COUNT(*) from BATCH_STEP_EXECUTION where STEP_NAME='step1:master'");
 		int beforePartition = jdbcTemplate.queryForInt("SELECT COUNT(*) from BATCH_STEP_EXECUTION where STEP_NAME like 'step1:partition%'");
 
+		ExampleItemWriter.clear();
 		JobExecution execution = jobLauncher.run(job, jobParameters);
 		assertEquals(BatchStatus.FAILED,execution.getStatus());
+		// Only 4 because the others were in the failed step execution
+		assertEquals(4, ExampleItemWriter.getItems().size());
+
+		ExampleItemWriter.clear();
 		assertNotNull(jobLauncher.run(job, jobParameters));
+		// Only 4 because the others were processed in the first attempt
+		assertEquals(4, ExampleItemWriter.getItems().size());
 
 		int afterMaster = jdbcTemplate.queryForInt("SELECT COUNT(*) from BATCH_STEP_EXECUTION where STEP_NAME='step1:master'");
 		int afterPartition = jdbcTemplate.queryForInt("SELECT COUNT(*) from BATCH_STEP_EXECUTION where STEP_NAME like 'step1:partition%'");
