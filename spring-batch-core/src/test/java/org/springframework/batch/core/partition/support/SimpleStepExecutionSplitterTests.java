@@ -2,13 +2,17 @@ package org.springframework.batch.core.partition.support;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 import java.util.Collections;
+import java.util.Date;
 import java.util.Map;
 import java.util.Set;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.springframework.batch.core.BatchStatus;
+import org.springframework.batch.core.JobExecutionException;
 import org.springframework.batch.core.JobParameters;
 import org.springframework.batch.core.Step;
 import org.springframework.batch.core.StepExecution;
@@ -61,7 +65,9 @@ public class SimpleStepExecutionSplitterTests {
 	public void testRememberGridSize() throws Exception {
 		SimpleStepExecutionSplitter provider = new SimpleStepExecutionSplitter(jobRepository, step,
 				new SimplePartitioner());
-		assertEquals(2, provider.split(stepExecution, 2).size());
+		Set<StepExecution> split = provider.split(stepExecution, 2);
+		assertEquals(2, split.size());
+		stepExecution = update(split, stepExecution, BatchStatus.FAILED);
 		assertEquals(2, provider.split(stepExecution, 3).size());
 	}
 
@@ -70,6 +76,90 @@ public class SimpleStepExecutionSplitterTests {
 		SimpleStepExecutionSplitter provider = new SimpleStepExecutionSplitter(jobRepository, step,
 				new SimplePartitioner());
 		assertEquals("step", provider.getStepName());
+	}
+
+	@Test
+	public void testUnkownStatus() throws Exception {
+		SimpleStepExecutionSplitter provider = new SimpleStepExecutionSplitter(jobRepository, step,
+				new SimplePartitioner());
+		Set<StepExecution> split = provider.split(stepExecution, 2);
+		assertEquals(2, split.size());
+		stepExecution = update(split, stepExecution, BatchStatus.UNKNOWN);
+		try {
+			provider.split(stepExecution, 2);
+		}
+		catch (JobExecutionException e) {
+			String message = e.getMessage();
+			assertTrue("Wrong message: " + message, message.contains("UNKNOWN"));
+		}
+	}
+
+	@Test
+	public void testCompleteStatus() throws Exception {
+		SimpleStepExecutionSplitter provider = new SimpleStepExecutionSplitter(jobRepository, step,
+				new SimplePartitioner());
+		Set<StepExecution> split = provider.split(stepExecution, 2);
+		assertEquals(2, split.size());
+		stepExecution = update(split, stepExecution, BatchStatus.COMPLETED);
+		// If already complete we don't execute again
+		assertEquals(0, provider.split(stepExecution, 2).size());
+	}
+
+	@Test
+	public void testIncompleteStatus() throws Exception {
+		SimpleStepExecutionSplitter provider = new SimpleStepExecutionSplitter(jobRepository, step,
+				new SimplePartitioner());
+		Set<StepExecution> split = provider.split(stepExecution, 2);
+		assertEquals(2, split.size());
+		stepExecution = update(split, stepExecution, BatchStatus.STARTED);
+		// If not already complete we don't execute again
+		try {
+			provider.split(stepExecution, 2);
+		}
+		catch (JobExecutionException e) {
+			String message = e.getMessage();
+			assertTrue("Wrong message: " + message, message.contains("STARTED"));
+		}
+	}
+
+	@Test
+	public void testAbandonedStatus() throws Exception {
+		SimpleStepExecutionSplitter provider = new SimpleStepExecutionSplitter(jobRepository, step,
+				new SimplePartitioner());
+		Set<StepExecution> split = provider.split(stepExecution, 2);
+		assertEquals(2, split.size());
+		stepExecution = update(split, stepExecution, BatchStatus.ABANDONED);
+		// If not already complete we don't execute again
+		try {
+			provider.split(stepExecution, 2);
+		}
+		catch (JobExecutionException e) {
+			String message = e.getMessage();
+			assertTrue("Wrong message: " + message, message.contains("ABANDONED"));
+		}
+	}
+
+	private StepExecution update(Set<StepExecution> split, StepExecution stepExecution, BatchStatus status)
+			throws Exception {
+
+		ExecutionContext executionContext = stepExecution.getExecutionContext();
+
+		for (StepExecution child : split) {
+			child.setEndTime(new Date());
+			child.setStatus(status);
+			jobRepository.update(child);
+		}
+
+		stepExecution.setEndTime(new Date());
+		stepExecution.setStatus(status);
+		jobRepository.update(stepExecution);
+
+		stepExecution = stepExecution.getJobExecution().createStepExecution(stepExecution.getStepName());
+		stepExecution.setExecutionContext(executionContext);
+
+		jobRepository.add(stepExecution);
+		return stepExecution;
+
 	}
 
 }

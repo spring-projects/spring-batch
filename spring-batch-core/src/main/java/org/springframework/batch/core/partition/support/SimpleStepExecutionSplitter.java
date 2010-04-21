@@ -94,9 +94,8 @@ public class SimpleStepExecutionSplitter implements StepExecutionSplitter, Initi
 
 	/**
 	 * Flag to indicate that the partition target step is allowed to start if an
-	 * execution is complete. Should be the same as the value that would be
-	 * returned by the {@link Step} itself from its own properties. Defaults to
-	 * false.
+	 * execution is complete. Defaults to the same value as the underlying step.
+	 * Set this manually to override the underlying step properties.
 	 * 
 	 * @see Step#isAllowStartIfComplete()
 	 * 
@@ -188,7 +187,8 @@ public class SimpleStepExecutionSplitter implements StepExecutionSplitter, Initi
 			// The context changed so we didn't already know the partitions
 			jobRepository.updateExecutionContext(stepExecution);
 			result = partitioner.partition(splitSize);
-		} else {
+		}
+		else {
 			result = new SimplePartitioner().partition(splitSize);
 		}
 
@@ -230,13 +230,28 @@ public class SimpleStepExecutionSplitter implements StepExecutionSplitter, Initi
 					+ "so it may be dangerous to proceed.  " + "Manual intervention is probably necessary.");
 		}
 
-		if (stepStatus == BatchStatus.COMPLETED && !allowStartIfComplete) {
-			// step is complete, false should be returned, indicating that the
-			// step should not be started
-			return false;
+		if (stepStatus == BatchStatus.COMPLETED) {
+			if (!allowStartIfComplete) {
+				// step is complete, false should be returned, indicating that
+				// the step should not be started
+				return false;
+			}
+			else {
+				return true;
+			}
 		}
 
-		return true;
+		if (stepStatus == BatchStatus.STOPPED || stepStatus == BatchStatus.FAILED) {
+			return true;
+		}
+
+		if (stepStatus == BatchStatus.STARTED || stepStatus == BatchStatus.STARTING || stepStatus == BatchStatus.STOPPING) {
+			throw new JobExecutionException("Cannot restart step from " + stepStatus + " status.  "
+					+ "The old execution may still be executing, so you may need to verify manually that this is the case.");
+		}
+
+		throw new JobExecutionException("Cannot restart step from " + stepStatus + " status.  "
+				+ "We believe the old execution was abandoned and therefore has been marked as un-restartable.");
 
 	}
 
