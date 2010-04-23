@@ -1,0 +1,55 @@
+Spring Batch 2.1.1 Release Notes
+
+* Sub-task
+
+  * {{{http://jira.springsource.org/browse/BATCH-1520}[BATCH-1520]}} - Allow null ItemWriter as long as ItemProcessor is provided
+
+* Bug
+
+  * {{{http://jira.springsource.org/browse/BATCH-1503}[BATCH-1503]}} - JobExecution marked COMPLETE on failure to save step execution metadata
+  * {{{http://jira.springsource.org/browse/BATCH-1507}[BATCH-1507]}} - FlowJob.getStep() only looks at state names, not step names
+  * {{{http://jira.springsource.org/browse/BATCH-1510}[BATCH-1510]}} - List of stepnames incomplete for nested flow job
+  * {{{http://jira.springsource.org/browse/BATCH-1513}[BATCH-1513]}} - HibernateItemReaderHelper requires queryProvider field to be an instance of AbstractHibernateQueryProvider
+  * {{{http://jira.springsource.org/browse/BATCH-1522}[BATCH-1522]}} - Intermittent failure of FaultTolerantStepFactoryBean in multi-threaded test
+  * {{{http://jira.springsource.org/browse/BATCH-1525}[BATCH-1525]}} - ExitStatus description can be null when re-hyrated from Oracle
+  * {{{http://jira.springsource.org/browse/BATCH-1526}[BATCH-1526]}} - Memory leak in web deployments because ThreadLocal is not nulled out in ChunkMonitor
+  * {{{http://jira.springsource.org/browse/BATCH-1528}[BATCH-1528]}} - Namespace context partition element requires bean with name "transactionManager"
+  * {{{http://jira.springsource.org/browse/BATCH-1533}[BATCH-1533]}} - API change and is not reflected in API and documentation examples
+  * {{{http://jira.springsource.org/browse/BATCH-1540}[BATCH-1540]}} - Typo in the user guide: "directlory"
+  * {{{http://jira.springsource.org/browse/BATCH-1542}[BATCH-1542]}} - Thread safety in JobExecution and StepExecution collections
+  * {{{http://jira.springsource.org/browse/BATCH-1545}[BATCH-1545]}} - FlatFileItemWriter logs as JdbcBatchItemWriter
+  * {{{http://jira.springsource.org/browse/BATCH-1546}[BATCH-1546]}} - Some issues with pagination in Oracle
+  * {{{http://jira.springsource.org/browse/BATCH-1547}[BATCH-1547]}} - ExecutionContextPromotionListener strict flag misinterpreted in listener code
+  * {{{http://jira.springsource.org/browse/BATCH-1551}[BATCH-1551]}} - Db2PagingQueryProvider needs an alias in the jump to subquery
+  * {{{http://jira.springsource.org/browse/BATCH-1552}[BATCH-1552]}} - Typo on Use Case page of website
+
+* Defect
+
+  * {{{http://jira.springsource.org/browse/BATCH-1550}[BATCH-1550]}} - Section 5.2.1 references TaskletAdapter class, but it should be MethodInvokingTaskletAdapter
+
+* Improvement
+
+  * {{{http://jira.springsource.org/browse/BATCH-1530}[BATCH-1530]}} - Let job-repository assign id to itself by default.
+  * {{{http://jira.springsource.org/browse/BATCH-1531}[BATCH-1531]}} - Restart of a partitioned Step should not call Partitioner
+  * {{{http://jira.springsource.org/browse/BATCH-1535}[BATCH-1535]}} - Extend SQL scripts to provide exit code limit of 100 chars
+  * {{{http://jira.springsource.org/browse/BATCH-1536}[BATCH-1536]}} - Negative skip count in SkipPolicy
+  * {{{http://jira.springsource.org/browse/BATCH-1537}[BATCH-1537]}} - Modify JdbcPagingItemReader to use startAfterValue on restart
+  * {{{http://jira.springsource.org/browse/BATCH-1541}[BATCH-1541]}} - Make MapJobRepository work for multi-threaded steps and jobs
+  * {{{http://jira.springsource.org/browse/BATCH-1553}[BATCH-1553]}} - Restart of partitioned job should prevent starting multiple step execution instances for a partition
+
+* New Feature
+
+  * {{{http://jira.springsource.org/browse/BATCH-1307}[BATCH-1307]}} - MapJobRepository with multi-threaded parallel steps (split in job)
+  * {{{http://jira.springsource.org/browse/BATCH-1508}[BATCH-1508]}} - Make ApplicationContext ids unique and identifiable in ClasspathXmlApplicationContextsFactoryBean
+  * {{{http://jira.springsource.org/browse/BATCH-1527}[BATCH-1527]}} - Add "-stopAll" to CommandLineJobRunner
+  * {{{http://jira.springsource.org/browse/BATCH-1529}[BATCH-1529]}} - Explicit protection against exceptions in SkipPolicy to prevent infinite loop in RetryTemplate
+  * {{{http://jira.springsource.org/browse/BATCH-1559}[BATCH-1559]}} - Ability to promote FlowStep execution context to its constituent steps
+
+* Refactoring
+
+  * {{{http://jira.springsource.org/browse/BATCH-1534}[BATCH-1534]}} - JobLauncherTestUtils.setJob should take the interfacetype Job as argument rather than AbstractJob
+
+* Task
+
+  * {{{http://jira.springsource.org/browse/BATCH-1548}[BATCH-1548]}} - XMLStream Documentation Error
+
