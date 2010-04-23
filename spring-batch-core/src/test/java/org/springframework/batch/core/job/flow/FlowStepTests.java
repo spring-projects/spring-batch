@@ -98,6 +98,37 @@ public class FlowStepTests {
 	}
 
 	/**
+	 * Test method for {@link org.springframework.batch.core.job.flow.FlowStep#doExecute(org.springframework.batch.core.StepExecution)}.
+	 */
+	@Test
+	public void testExecuteWithParentContext() throws Exception {
+
+		FlowStep step = new FlowStep();
+		step.setJobRepository(jobRepository);
+
+		SimpleFlow flow = new SimpleFlow("job");
+		List<StateTransition> transitions = new ArrayList<StateTransition>();
+		transitions.add(StateTransition.createStateTransition(new StepState(new StubStep("step1")), "end0"));
+		transitions.add(StateTransition.createEndStateTransition(new EndState(FlowExecutionStatus.COMPLETED, "end0")));
+		flow.setStateTransitions(transitions);
+
+		step.setFlow(flow);
+		step.afterPropertiesSet();
+
+		StepExecution stepExecution = jobExecution.createStepExecution("step");
+		stepExecution.getExecutionContext().put("foo", "bar");
+		jobRepository.add(stepExecution);
+		step.execute(stepExecution);
+
+		stepExecution = getStepExecution(jobExecution, "step");
+		assertEquals(ExitStatus.COMPLETED, stepExecution.getExitStatus());
+		stepExecution = getStepExecution(jobExecution, "step1");
+		assertEquals(ExitStatus.COMPLETED, stepExecution.getExitStatus());
+		assertEquals("bar", stepExecution.getExecutionContext().get("foo"));
+
+	}
+
+	/**
 	 * @author Dave Syer
 	 * 
 	 */

@@ -44,6 +44,8 @@ public class SimpleStepHandler implements StepHandler, InitializingBean {
 
 	private JobRepository jobRepository;
 
+	private ExecutionContext executionContext;
+
 	/**
 	 * Convenient default constructor for configuration usage.
 	 */
@@ -55,8 +57,16 @@ public class SimpleStepHandler implements StepHandler, InitializingBean {
 	 * @param jobRepository
 	 */
 	public SimpleStepHandler(JobRepository jobRepository) {
-		super();
+		this(jobRepository, new ExecutionContext());
+	}
+
+	/**
+	 * @param jobRepository
+	 * @param executionContext
+	 */
+	public SimpleStepHandler(JobRepository jobRepository, ExecutionContext executionContext) {
 		this.jobRepository = jobRepository;
+		this.executionContext = executionContext;
 	}
 
 	/**
@@ -73,6 +83,16 @@ public class SimpleStepHandler implements StepHandler, InitializingBean {
 	 */
 	public void setJobRepository(JobRepository jobRepository) {
 		this.jobRepository = jobRepository;
+	}
+
+	/**
+	 * A context containing values to be added to the step execution before it
+	 * is handled.
+	 * 
+	 * @param executionContext the execution context to set
+	 */
+	public void setExecutionContext(ExecutionContext executionContext) {
+		this.executionContext = executionContext;
 	}
 
 	public StepExecution handleStep(Step step, JobExecution execution) throws JobInterruptedException,
@@ -105,12 +125,12 @@ public class SimpleStepHandler implements StepHandler, InitializingBean {
 				currentStepExecution.setExecutionContext(lastStepExecution.getExecutionContext());
 			}
 			else {
-				currentStepExecution.setExecutionContext(new ExecutionContext());
+				currentStepExecution.setExecutionContext(new ExecutionContext(executionContext));
 			}
 
 			jobRepository.add(currentStepExecution);
 
-			logger.info("Executing step: [" + step + "]");
+			logger.info("Executing step: [" + step.getName() + "]");
 			try {
 				step.execute(currentStepExecution);
 			}
