@@ -101,7 +101,7 @@
 		</dependency>
 		<dependency>
 			<groupId>org.apache.activemq</groupId>
-			<artifactId>com.springsource.org.apache.activemq</artifactId>
+			<artifactId>activemq-core</artifactId>
 			<version>5.1.0</version>
 			<scope>test</scope>
 		</dependency>
