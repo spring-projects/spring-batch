@@ -60,7 +60,13 @@ public class JobFlowExecutor implements FlowExecutor {
 			StartLimitExceededException {
 		StepExecution stepExecution = stepHandler.handleStep(step, execution);
 		stepExecutionHolder.set(stepExecution);
-		return stepExecution == null ? ExitStatus.COMPLETED.getExitCode() : stepExecution.getExitStatus().getExitCode();
+		if (stepExecution == null) {
+			return  ExitStatus.COMPLETED.getExitCode();			
+		}
+		if (stepExecution.isTerminateOnly()) {
+			throw new JobInterruptedException("Step requested termination: "+stepExecution);
+		}
+		return stepExecution.getExitStatus().getExitCode();
 	}
 
 	public void abandonStepExecution() {
@@ -93,7 +99,7 @@ public class JobFlowExecutor implements FlowExecutor {
 		if (getStepExecution() != null && getStepExecution().getStatus() == BatchStatus.ABANDONED) {
 			/*
 			 * This is assumed to be the last step execution and it was marked
-			 * abandoned, so we are in a restart of a stopped step. 
+			 * abandoned, so we are in a restart of a stopped step.
 			 */
 			// TODO: mark the step execution in some more definitive way?
 			return true;

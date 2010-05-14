@@ -46,16 +46,18 @@ public class SimpleJobFailureTests {
 
 	@Test
 	public void testStepStatusUnknown() throws Exception {
-		job.setSteps(Arrays.<Step> asList(new StepSupport("step") {
+		job.setSteps(Arrays.<Step> asList(new StepSupport("step1") {
 			@Override
 			public void execute(StepExecution stepExecution) throws JobInterruptedException,
 					UnexpectedJobExecutionException {
 				// This is what happens if the repository meta-data cannot be updated
 				stepExecution.setStatus(BatchStatus.UNKNOWN);
+				stepExecution.setTerminateOnly();
 			}
-		}));
+		}, new StepSupport("step2")));
 		job.execute(execution);
 		assertEquals(BatchStatus.UNKNOWN, execution.getStatus());
+		assertEquals(1, execution.getStepExecutions().size());
 	}
 
 }

@@ -209,6 +209,31 @@ public class FlowJobTests {
 	}
 
 	@Test
+	public void testUnknownStatusStopsJob() throws Exception {
+		SimpleFlow flow = new SimpleFlow("job");
+		List<StateTransition> transitions = new ArrayList<StateTransition>();
+		transitions.add(StateTransition.createStateTransition(new StepState(new StubStep("step1") {
+			@Override
+			public void execute(StepExecution stepExecution) throws JobInterruptedException {
+				stepExecution.setStatus(BatchStatus.UNKNOWN);
+				stepExecution.setTerminateOnly();
+				jobRepository.update(stepExecution);
+			}
+		}), "step2"));
+		transitions.add(StateTransition.createStateTransition(new StepState(new StubStep("step2")), "end0"));
+		transitions.add(StateTransition.createEndStateTransition(new EndState(FlowExecutionStatus.COMPLETED, "end0")));
+		flow.setStateTransitions(transitions);
+		flow.afterPropertiesSet();
+		job.setFlow(flow);
+		job.afterPropertiesSet();
+		job.execute(jobExecution);
+		assertEquals(BatchStatus.STOPPED, jobExecution.getStatus());
+		checkRepository(BatchStatus.STOPPED, ExitStatus.STOPPED);
+		assertEquals(1, jobExecution.getAllFailureExceptions().size());
+		assertEquals(JobInterruptedException.class, jobExecution.getFailureExceptions().get(0).getClass());
+	}
+
+	@Test
 	public void testInterruptedSplit() throws Exception {
 		SimpleFlow flow = new SimpleFlow("job");
 		SimpleFlow flow1 = new SimpleFlow("flow1");
