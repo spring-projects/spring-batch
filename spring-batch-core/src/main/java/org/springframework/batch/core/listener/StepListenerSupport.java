@@ -22,18 +22,19 @@ import org.springframework.batch.core.ExitStatus;
 import org.springframework.batch.core.ItemProcessListener;
 import org.springframework.batch.core.ItemReadListener;
 import org.springframework.batch.core.ItemWriteListener;
+import org.springframework.batch.core.SkipListener;
 import org.springframework.batch.core.StepExecution;
 import org.springframework.batch.core.StepExecutionListener;
 import org.springframework.batch.core.StepListener;
 
 /**
- * Basic no-op implementations of all {@link StepListener} implementations.
+ * Basic no-op implementations of all {@link StepListener} interfaces.
  * 
  * @author Lucas Ward
- *
+ * @author Robert Kasanicky
  */
 public class StepListenerSupport<T,S> implements StepExecutionListener, ChunkListener,
-		ItemReadListener<T>, ItemProcessListener<T,S>, ItemWriteListener<S> {
+		ItemReadListener<T>, ItemProcessListener<T,S>, ItemWriteListener<S>, SkipListener<T, S> {
 
 	/* (non-Javadoc)
 	 * @see org.springframework.batch.core.domain.StepListener#afterStep(StepExecution stepExecution)
@@ -119,6 +120,24 @@ public class StepListenerSupport<T,S> implements StepExecutionListener, ChunkLis
 	 * @see org.springframework.batch.core.ItemProcessListener#onProcessError(java.lang.Object, java.lang.Exception)
 	 */
 	public void onProcessError(T item, Exception e) {
+	}
+
+	/* (non-Javadoc)
+	 * @see org.springframework.batch.core.SkipListener#onSkipInProcess(java.lang.Object, java.lang.Throwable)
+	 */
+	public void onSkipInProcess(T item, Throwable t) {
+	}
+
+	/* (non-Javadoc)
+	 * @see org.springframework.batch.core.SkipListener#onSkipInRead(java.lang.Throwable)
+	 */
+	public void onSkipInRead(Throwable t) {
+	}
+
+	/* (non-Javadoc)
+	 * @see org.springframework.batch.core.SkipListener#onSkipInWrite(java.lang.Object, java.lang.Throwable)
+	 */
+	public void onSkipInWrite(S item, Throwable t) {
 	}
 
 }
