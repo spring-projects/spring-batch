@@ -3,7 +3,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>org.springframework.batch</groupId>
 	<artifactId>spring-batch-admin-parent</artifactId>
-	<version>1.0.0.BUILD-SNAPSHOT</version>
+	<version>1.0.0.RELEASE</version>
 	<name>Spring Batch Admin Parent</name>
 	<packaging>pom</packaging>
 	<properties>
