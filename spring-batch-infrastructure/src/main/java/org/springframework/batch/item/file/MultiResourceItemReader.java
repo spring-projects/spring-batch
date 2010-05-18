@@ -95,9 +95,7 @@ public class MultiResourceItemReader<T> implements ItemReader<T>, ItemStream {
 			delegate.open(new ExecutionContext());
 		}
 
-		T item;
-		item = readNextItem();
-		return item;
+		return readNextItem();
 	}
 
 	/**
@@ -209,7 +207,7 @@ public class MultiResourceItemReader<T> implements ItemReader<T>, ItemStream {
 	}
 
 	public Resource getCurrentResource() {
-		if (currentResource >= resources.length) {
+		if (currentResource >= resources.length || currentResource < 0) {
 			return null;
 		}
 		return resources[currentResource];

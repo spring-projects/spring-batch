@@ -344,5 +344,12 @@ public class MultiResourceItemReaderIntegrationTests {
 			//the 1st item, rather than on open
 		}
 	}
+	
+	@Test
+	public void testGetCurrentResourceBeforeRead() throws Exception {
+		tested.open(ctx);
+		assertNull("There is no 'current' resource before read is called", tested.getCurrentResource());
+		
+	}
 
 }
