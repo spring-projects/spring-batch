@@ -29,16 +29,16 @@ public class PostgresPagingQueryProviderTests extends AbstractSqlPagingQueryProv
 
 	@Test @Override
 	public void testGenerateJumpToItemQuery() {
-		String sql = "SELECT id AS SORT_KEY FROM foo WHERE bar = 1 ORDER BY id ASC LIMIT 99 1";
+		String sql = "SELECT id AS SORT_KEY FROM foo WHERE bar = 1 ORDER BY id ASC LIMIT 1 OFFSET 99";
 		String s = pagingQueryProvider.generateJumpToItemQuery(145, pageSize);
-		Assert.assertEquals("", sql, s);
+		Assert.assertEquals("Wrong SQL for jump to", sql, s);
 	}
 
 	@Test @Override
 	public void testGenerateJumpToItemQueryForFirstPage() {
-		String sql = "SELECT id AS SORT_KEY FROM foo WHERE bar = 1 ORDER BY id ASC LIMIT 0 1";
+		String sql = "SELECT id AS SORT_KEY FROM foo WHERE bar = 1 ORDER BY id ASC LIMIT 1 OFFSET 0";
 		String s = pagingQueryProvider.generateJumpToItemQuery(45, pageSize);
-		Assert.assertEquals("", sql, s);
+		Assert.assertEquals("Wrong SQL for first page", sql, s);
 	}
 
 }

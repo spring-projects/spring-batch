@@ -12,7 +12,7 @@
 		<property name="initialize" value="${batch.data.source.init}"/>
 		<property name="initScripts">
 			<list>
-				<value>classpath:org/springframework/batch/item/database/init-foo-schema-hsqldb.sql</value>
+				<value>${batch.schema.script}</value>
 			</list>
 		</property>
 	</bean>

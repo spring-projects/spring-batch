@@ -75,6 +75,7 @@ public class IbatisPagingItemReaderAsyncTests {
 		int max = 10;
 		for (int i = 0; i < max; i++) {
 			try {
+				logger.info("Testing asynch reader, iteration="+i);
 				doTest();
 			}
 			catch (Throwable e) {
@@ -136,7 +137,11 @@ public class IbatisPagingItemReaderAsyncTests {
 		SqlMapClient sqlMapClient = createSqlMapClient();
 
 		IbatisPagingItemReader<Foo> reader = new IbatisPagingItemReader<Foo>();
-		reader.setQueryId("getPagedFoos");
+		if ("postgres".equals(System.getProperty("ENVIRONMENT"))) {
+			reader.setQueryId("getPagedFoosPostgres");			
+		} else {
+			reader.setQueryId("getPagedFoos");
+		}
 		reader.setPageSize(2);
 		reader.setSqlMapClient(sqlMapClient);
 		reader.setSaveState(true);

@@ -26,12 +26,8 @@
   	select LIMIT #_skiprows# #_pagesize# ID, NAME, VALUE from T_FOOS order by ID
   </select>
 
-  <select id="getPagedFoos3AndUp" resultMap="fooResult">
-  	select LIMIT #_skiprows# #_pagesize# ID, NAME, VALUE from T_FOOS where VALUE >= #limit# order by ID
-  </select>
-
-  <select id="getFoos3AndUp" resultMap="fooResult">
-  	select ID, NAME, VALUE from T_FOOS where VALUE >= #limit#
+  <select id="getPagedFoosPostgres" resultMap="fooResult">
+  	select ID, NAME, VALUE from T_FOOS order by ID LIMIT #_pagesize# OFFSET #_skiprows# 
   </select>
 
   <select id="getAllFooIdsRestart" resultClass="int">

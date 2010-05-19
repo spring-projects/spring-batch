@@ -61,7 +61,7 @@ public class DataSourceInitializer implements InitializingBean, DisposableBean {
 			return;
 		}
 		try {
-			if (destroyScript!=null) {
+			if (destroyScript != null) {
 				doExecuteScript(destroyScript);
 				initialized = false;
 			}
@@ -78,7 +78,7 @@ public class DataSourceInitializer implements InitializingBean, DisposableBean {
 
 	public void afterPropertiesSet() throws Exception {
 		Assert.notNull(dataSource);
-        logger.info("Initializing with scripts: "+Arrays.asList(initScripts));
+		logger.info("Initializing with scripts: " + Arrays.asList(initScripts));
 		if (!initialized && initialize) {
 			try {
 				doExecuteScript(destroyScript);
@@ -89,7 +89,7 @@ public class DataSourceInitializer implements InitializingBean, DisposableBean {
 			if (initScripts != null) {
 				for (int i = 0; i < initScripts.length; i++) {
 					Resource initScript = initScripts[i];
-                    logger.info("Executing init script: "+initScript);
+					logger.info("Executing init script: " + initScript);
 					doExecuteScript(initScript);
 				}
 			}
@@ -100,36 +100,39 @@ public class DataSourceInitializer implements InitializingBean, DisposableBean {
 	private void doExecuteScript(final Resource scriptResource) {
 		if (scriptResource == null || !scriptResource.exists())
 			return;
-		TransactionTemplate transactionTemplate = new TransactionTemplate(new DataSourceTransactionManager(dataSource));
-		transactionTemplate.execute(new TransactionCallback() {
-
+		final JdbcTemplate jdbcTemplate = new JdbcTemplate(dataSource);
+		String[] scripts;
+		try {
 			@SuppressWarnings("unchecked")
-			public Object doInTransaction(TransactionStatus status) {
-				JdbcTemplate jdbcTemplate = new JdbcTemplate(dataSource);
-				String[] scripts;
-				try {
-					scripts = StringUtils.delimitedListToStringArray(stripComments(IOUtils.readLines(scriptResource
-							.getInputStream())), ";");
-				}
-				catch (IOException e) {
-					throw new BeanInitializationException("Cannot load script from [" + scriptResource + "]", e);
-				}
-				for (int i = 0; i < scripts.length; i++) {
-					String script = scripts[i].trim();
+			String[] list = StringUtils.delimitedListToStringArray(stripComments(IOUtils.readLines(scriptResource
+					.getInputStream())), ";");
+			scripts = list;
+		}
+		catch (IOException e) {
+			throw new BeanInitializationException("Cannot load script from [" + scriptResource + "]", e);
+		}
+		for (int i = 0; i < scripts.length; i++) {
+			final String script = scripts[i].trim();
+			TransactionTemplate transactionTemplate = new TransactionTemplate(new DataSourceTransactionManager(
+					dataSource));
+			transactionTemplate.execute(new TransactionCallback() {
+
+				public Object doInTransaction(TransactionStatus status) {
 					if (StringUtils.hasText(script)) {
 						try {
-							jdbcTemplate.execute(scripts[i]);
-						} catch (DataAccessException e) {
+							jdbcTemplate.execute(script);
+						}
+						catch (DataAccessException e) {
 							if (!script.toUpperCase().startsWith("DROP")) {
 								throw e;
 							}
 						}
 					}
+					return null;
 				}
-				return null;
-			}
 
-		});
+			});
+		}
 
 	}
 

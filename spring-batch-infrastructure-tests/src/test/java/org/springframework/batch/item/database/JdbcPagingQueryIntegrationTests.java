@@ -115,14 +115,20 @@ public class JdbcPagingQueryIntegrationTests {
 	public void testJumpToItem() throws Exception {
 
 		PagingQueryProvider queryProvider = getPagingQueryProvider();
+		
+		int minId = jdbcTemplate.queryForInt("SELECT MIN(ID) FROM T_FOOS");
 
 		List<Map<String, Object>> list = jdbcTemplate.queryForList(queryProvider.generateJumpToItemQuery(pageSize,
 				pageSize));
 		logger.debug("Jump to page result: " + list);
 		assertEquals(1, list.size());
+		String expected = "[{sort_key="+(minId+pageSize-1);
+		assertEquals(expected, list.toString().substring(0, expected.length()));
 		Object startAfterValue = list.get(0).entrySet().iterator().next().getValue();
 		list = jdbcTemplate.queryForList(queryProvider.generateRemainingPagesQuery(pageSize), startAfterValue);
 		assertEquals(pageSize, list.size());
+		expected = "[{id="+(minId+pageSize);
+		assertEquals(expected, list.toString().substring(0, expected.length()));
 
 	}
 

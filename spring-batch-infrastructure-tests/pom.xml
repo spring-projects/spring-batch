@@ -241,6 +241,13 @@
 			<optional>true</optional>
 			<scope>runtime</scope>
 		</dependency>
+		<dependency>
+			<groupId>postgresql</groupId>
+			<artifactId>postgresql</artifactId>
+			<version>8.3-603.jdbc3</version>
+			<optional>true</optional>
+			<scope>runtime</scope>
+		</dependency>
 	</dependencies>
 	<build>
 		<pluginManagement>
