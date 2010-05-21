@@ -74,7 +74,6 @@ public class SkipSampleFunctionalTests {
         this.simpleJdbcTemplate = new SimpleJdbcTemplate(dataSource);
     }
 
-    @Transactional
     @Test
     public void testJob() throws Exception {
         simpleJdbcTemplate.update("delete from CUSTOMER");
