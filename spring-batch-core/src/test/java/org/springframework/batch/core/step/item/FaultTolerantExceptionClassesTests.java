@@ -24,6 +24,7 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.springframework.transaction.UnexpectedRollbackException;
 
 /**
  * @author Dan Garrette
@@ -125,6 +126,15 @@ public class FaultTolerantExceptionClassesTests implements ApplicationContextAwa
 		assertEquals(BatchStatus.COMPLETED, stepExecution.getStatus());
 		assertEquals("[1, 2, 3, 1, 2, 3, 4]", writer.getWritten().toString());
 		assertEquals("[1, 2, 4]", writer.getCommitted().toString());
+	}
+
+	@Test
+	public void testNonSkippableUnchecked() throws Exception {
+		writer.setExceptionType(UnexpectedRollbackException.class);
+		StepExecution stepExecution = launchStep("skippableStep");
+		assertEquals(BatchStatus.FAILED, stepExecution.getStatus());
+		assertEquals("[1, 2, 3]", writer.getWritten().toString());
+		assertEquals("[]", writer.getCommitted().toString());
 	}
 
 	@Test
