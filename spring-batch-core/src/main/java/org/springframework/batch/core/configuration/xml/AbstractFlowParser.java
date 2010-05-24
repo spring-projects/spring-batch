@@ -15,15 +15,6 @@
  */
 package org.springframework.batch.core.configuration.xml;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
 import org.springframework.batch.core.job.flow.FlowExecutionStatus;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.parsing.CompositeComponentDefinition;
@@ -36,6 +27,8 @@ import org.springframework.util.xml.DomUtils;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
+
+import java.util.*;
 
 /**
  * @author Dave Syer
@@ -391,6 +384,7 @@ public abstract class AbstractFlowParser extends AbstractSingleBeanDefinitionPar
 	 * @return the BatchStatus corresponding to the transition name
 	 */
 	private static FlowExecutionStatus getBatchStatusFromEndTransitionName(String elementName) {
+        elementName = stripNamespace(elementName);
 		if (STOP_ELE.equals(elementName)) {
 			return FlowExecutionStatus.STOPPED;
 		}
@@ -404,6 +398,18 @@ public abstract class AbstractFlowParser extends AbstractSingleBeanDefinitionPar
 			return FlowExecutionStatus.UNKNOWN;
 		}
 	}
+
+    /**
+     * Strip the namespace from the element name if it exists.
+     */
+    private static String stripNamespace(String elementName){
+        if(elementName.startsWith("batch:")){
+            return elementName.substring(6);
+        }
+        else{
+            return elementName;
+        }
+    }
 
 	/**
 	 * @param parserContext the parser context

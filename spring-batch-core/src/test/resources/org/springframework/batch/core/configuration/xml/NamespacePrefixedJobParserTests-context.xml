@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+    xmlns:batch="http://www.springframework.org/schema/batch"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.springframework.org/schema/batch http://www.springframework.org/schema/batch/spring-batch-2.1.xsd
+	http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.5.xsd">
+
+	<import resource="common-context.xml" />
+
+	<batch:job id="job1">
+		<batch:step id="noopStep" parent="noopStep1">
+            <batch:next on="COMPLETED" to="step4" />
+            <batch:end on="NOOP" />
+            <batch:fail on="*" />
+        </batch:step>
+        <batch:step id="step4" parent="step45" />
+	</batch:job>
+
+    <batch:step id="noopStep1">
+        <batch:tasklet ref="noopTasklet" />
+    </batch:step>
+    
+    <!--<beans:bean id="noopStep1" class="org.springframework.batch.core.step.tasklet.TaskletStep">-->
+		<!--<beans:property name="jobRepository" ref="jobRepository"/>-->
+		<!--<beans:property name="transactionManager" ref="transactionManager"/>-->
+		<!--<beans:property name="tasklet" ref="noopTasklet"/>-->
+	<!--</beans:bean>-->
+
+    <bean id="noopTasklet" class="org.springframework.batch.core.configuration.xml.NoopTasklet" />
+
+    <bean id="step45" class="org.springframework.batch.core.step.tasklet.TaskletStep">
+		<property name="jobRepository" ref="jobRepository"/>
+		<property name="transactionManager" ref="transactionManager"/>
+		<property name="tasklet" ref="nameStoringTasklet"/>
+	</bean>
+
+	<bean id="nameStoringTasklet" class="org.springframework.batch.core.configuration.xml.NameStoringTasklet">
+		<property name="stepNamesList" ref="stepNamesList"/>
+	</bean>
+
+</beans>
