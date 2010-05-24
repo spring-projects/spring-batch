@@ -1468,7 +1468,7 @@ itemWriter.write(items);</programlisting>
       decision.</para>
 
       <para><programlisting>public class MyDecider implements JobExecutionDecider {
-    public String decide(JobExecution jobExecution, StepExecution stepExecution) {
+    public FlowExecutionStatus decide(JobExecution jobExecution, StepExecution stepExecution) {
         if (someCondition) {
             return "FAILED";
         }
