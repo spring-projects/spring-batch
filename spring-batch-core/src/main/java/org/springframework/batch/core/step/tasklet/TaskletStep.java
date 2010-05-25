@@ -96,7 +96,7 @@ public class TaskletStep extends AbstractStep {
 
 	private Tasklet tasklet;
 
-	private Semaphore semaphore = new Semaphore(1);
+	private final Semaphore semaphore = new Semaphore(1);
 
 	/**
 	 * Default constructor.
@@ -121,7 +121,7 @@ public class TaskletStep extends AbstractStep {
 	@Override
 	public void afterPropertiesSet() throws Exception {
 		super.afterPropertiesSet();
-		Assert.state(transactionManager!=null, "A transaction manager must be provided");
+		Assert.state(transactionManager != null, "A transaction manager must be provided");
 	}
 
 	/**
@@ -316,24 +316,29 @@ public class TaskletStep extends AbstractStep {
 
 		@Override
 		public void afterCompletion(int status) {
-			if (status != TransactionSynchronization.STATUS_COMMITTED) {
-				if (oldVersion != null) {
-					// Wah! the commit failed. We need to rescue the step
-					// execution data.
-					stepExecution.setVersion(oldVersion);
+			try {
+				if (status != TransactionSynchronization.STATUS_COMMITTED) {
+					if (oldVersion != null) {
+						// Wah! the commit failed. We need to rescue the step
+						// execution data.
+						stepExecution.setVersion(oldVersion);
+					}
+				}
+				if (status == TransactionSynchronization.STATUS_UNKNOWN) {
+					logger.error("Rolling back with transaction in unknown state");
+					rollback(stepExecution);
+					stepExecution.upgradeStatus(BatchStatus.UNKNOWN);
+					stepExecution.setTerminateOnly();
 				}
 			}
-			if (status == TransactionSynchronization.STATUS_UNKNOWN) {
-				logger.error("Rolling back with transaction in unknown state");
-				rollback(stepExecution);
-				stepExecution.upgradeStatus(BatchStatus.UNKNOWN);
-				stepExecution.setTerminateOnly();
+			finally {
+				// Only release the lock if we acquired it, and release as late
+				// as possible
+				if (locked) {
+					semaphore.release();
+				}
+				locked = false;
 			}
-			// Only release the lock if we acquired it, and release as late as possible
-			if (locked) {
-				semaphore.release();
-			}
-			locked = false;
 		}
 
 		public Object doInTransaction(TransactionStatus status) {

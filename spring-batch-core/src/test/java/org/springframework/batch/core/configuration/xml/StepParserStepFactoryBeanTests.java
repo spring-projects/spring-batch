@@ -36,8 +36,10 @@ import org.springframework.batch.core.step.tasklet.TaskletStep;
 import org.springframework.batch.item.ItemStream;
 import org.springframework.batch.item.file.FlatFileItemReader;
 import org.springframework.batch.item.support.PassThroughItemProcessor;
+import org.springframework.batch.repeat.support.TaskExecutorRepeatTemplate;
 import org.springframework.batch.retry.listener.RetryListenerSupport;
 import org.springframework.batch.support.transaction.ResourcelessTransactionManager;
+import org.springframework.core.task.SimpleAsyncTaskExecutor;
 import org.springframework.core.task.SyncTaskExecutor;
 import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.transaction.annotation.Isolation;
@@ -63,6 +65,17 @@ public class StepParserStepFactoryBeanTests {
 		assertTrue(step instanceof TaskletStep);
 		Object tasklet = ReflectionTestUtils.getField(step, "tasklet");
 		assertTrue(tasklet instanceof DummyTasklet);
+	}
+
+	@Test
+	public void testOnlyTaskletTaskExecutor() throws Exception {
+		StepParserStepFactoryBean<Object, Object> fb = new StepParserStepFactoryBean<Object, Object>();
+		fb.setTasklet(new DummyTasklet());
+		fb.setTaskExecutor(new SimpleAsyncTaskExecutor());
+		Object step = fb.getObject();
+		assertTrue(step instanceof TaskletStep);
+		Object stepOperations = ReflectionTestUtils.getField(step, "stepOperations");
+		assertTrue(stepOperations instanceof TaskExecutorRepeatTemplate);
 	}
 
 	@Test(expected = IllegalStateException.class)

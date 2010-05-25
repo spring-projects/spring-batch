@@ -399,6 +399,14 @@ class StepParserStepFactoryBean<I, O> implements FactoryBean, BeanNameAware {
 		if (tasklet != null) {
 			ts.setTasklet(tasklet);
 		}
+		if (taskExecutor != null) {
+			TaskExecutorRepeatTemplate repeatTemplate = new TaskExecutorRepeatTemplate();
+			repeatTemplate.setTaskExecutor(taskExecutor);
+			if (throttleLimit != null) {
+				repeatTemplate.setThrottleLimit(throttleLimit);
+			}
+			ts.setStepOperations(repeatTemplate);
+		}
 		if (transactionManager != null) {
 			ts.setTransactionManager(transactionManager);
 		}
