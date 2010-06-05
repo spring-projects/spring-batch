@@ -31,7 +31,7 @@ public enum BatchStatus {
 	 * execution are COMPLETED will the aggregate status be COMPLETED. A running
 	 * execution is expected to move from STARTING to STARTED to COMPLETED
 	 * (through the order defined by {@link #upgradeTo(BatchStatus)}). Higher
-	 * values than STARTED signify more serious failure. INCOMPLETE is used for
+	 * values than STARTED signify more serious failure. ABANDONED is used for
 	 * steps that have finished processing, but were not successful, and where
 	 * they should be skipped on a restart (so FAILED is the wrong status).
 	 */
