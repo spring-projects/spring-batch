@@ -139,6 +139,8 @@ public class IbatisPagingItemReaderAsyncTests {
 		IbatisPagingItemReader<Foo> reader = new IbatisPagingItemReader<Foo>();
 		if ("postgres".equals(System.getProperty("ENVIRONMENT"))) {
 			reader.setQueryId("getPagedFoosPostgres");			
+		} else if ("oracle".equals(System.getProperty("ENVIRONMENT"))) {
+			reader.setQueryId("getPagedFoosOracle");			
 		} else {
 			reader.setQueryId("getPagedFoos");
 		}

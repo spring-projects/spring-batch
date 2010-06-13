@@ -6,7 +6,7 @@
 
 	<import resource="classpath:/data-source-context.xml"/>
 
-	<!--  Initialise the database before every test case: -->
+	<!-- Override the default: -->
 	<bean id="dataSourceInitializer" class="test.jdbc.datasource.DataSourceInitializer">
 		<property name="dataSource" ref="dataSource"/>
 		<property name="initialize" value="${batch.data.source.init}"/>

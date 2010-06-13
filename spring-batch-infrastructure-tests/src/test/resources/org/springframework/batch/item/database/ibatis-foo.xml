@@ -30,6 +30,10 @@
   	select ID, NAME, VALUE from T_FOOS order by ID LIMIT #_pagesize# OFFSET #_skiprows# 
   </select>
 
+  <select id="getPagedFoosOracle" resultMap="fooResult">
+  	select * from (select ID, NAME, VALUE, ROWNUM as tmp from T_FOOS order by ID) where tmp &gt; #_skiprows# and tmp&lt;=(#_skiprows#+#_pagesize#) 
+  </select>
+
   <select id="getAllFooIdsRestart" resultClass="int">
   	select ID from T_FOOS where ID > #id#
   </select>

@@ -1,0 +1,3 @@
+#Mon May 17 10:38:33 BST 2010
+//com.springsource.sts.config.flow.coordinates\:http\://www.springframework.org/schema/batch\:/spring-batch-samples/src/main/resources/jobs/ioSampleJob.xml=<?xml version\="1.0" encoding\="UTF-8"?>\n<graph>\n<element type\="job">\n<structure end\="638" endstart\="632" start\="394" startend\="468"/>\n<bounds height\="118" width\="130" x\="15" y\="17"/>\n</element>\n</graph>
+eclipse.preferences.version=1
