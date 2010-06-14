@@ -58,9 +58,24 @@
     <classname>TaskExecutor</classname> is a
     <classname>SimpleAsyncTaskExecutor</classname>.</para>
 
-    <para>The result of the above configuration will be that the Step executes
-    by reading, processing and writing each chunk of items (each commit
-    interval) in a separate thread of execution.</para>
+    <para>The result of the above configuration will be that the Step
+    executes by reading, processing and writing each chunk of items
+    (each commit interval) in a separate thread of execution.  In
+    addition to any limits placed by the task executor (e.g. if it is
+    backed by a thread pool), there is a throttle limit in the tasklet
+    which defaults to 6.  You may need to increase this to ensure that
+    a thread pool is fully utililsed, e.g.</para>
+
+    <programlisting>&lt;step id="loading"&gt; &lt;tasklet
+    task-executor="taskExecutor"
+    throttle-limit="20"&gt;...&lt;/tasklet&gt;
+    &lt;/step&gt;</programlisting>
+
+    <para>Note also that there may be limits placed on concurrency by
+    any pooled resources used in your step, such as
+    a <classname>DataSource</classname>.  Be sure to make the pool in
+    those resources at least as large as the desired number of
+    concurrent threads in the step.</para>
 
     <para>There are some practical limitations of using multi-threaded Steps
     for some common Batch use cases. Many participants in a Step (e.g. readers
@@ -150,12 +165,10 @@
     options exist in the grid computing and shared memory product space (e.g.
     Java Spaces).</para>
 
-    <para>Spring Batch has a sub-project (Spring Batch Integration), providing
-    implementations of various patterns like this one using Spring
-    Integration. Spring Batch Integration is available in subversion for
-    people to use, but is not intended to be part of the official general
-    release of Spring Batch until it builds up more of a community of
-    users.</para>
+    <para>Spring Batch has a sister project Spring Batch Admin, which
+    provides(amongst other things) implementations of various patterns
+    like this one using Spring Integration. These are implemented in a
+    module called Spring Batch Integration.</para>
   </section>
 
   <section id="partitioning">
@@ -208,9 +221,13 @@
     &lt;/partition&gt;
 &lt;/step&gt;</programlisting></para>
 
+    <para>Similar to the multi-threaded step, there is a setting here
+    for a throttle limit, which prevents the task executor from being
+    saturated with requests from a single step.</para>
+
     <para>There is a simple example which can be copied and extended in the
     unit test suite for Spring Batch Samples (see
-    <classname>*PartitionJob.xml</classname> configuration). </para>
+    <classname>*PartitionJob.xml</classname> configuration).</para>
 
     <para>Spring Batch creates step executions for the partitions called
     "step1:partition0", etc., so many people prefer to call the master step
