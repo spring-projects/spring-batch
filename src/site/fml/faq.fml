@@ -74,6 +74,10 @@
 				</ul>
 			</answer>
 		</faq>
+		<faq id="threading-reader">
+		  <question>How can I make an item reader thread safe</question>
+		  <answer>You can synchronize the read() method (e.g. by wrapping it in a delegator that does the synchronization).  Remember that you will lose restartability, so best practice is to mark the step as not restartable and to be safe (and efficient) you can also set saveState=false on the reader.</answer>
+		</faq>
 		<faq id="flexible">
 			<question>
 				What is the Spring Batch philosophy on the use of
