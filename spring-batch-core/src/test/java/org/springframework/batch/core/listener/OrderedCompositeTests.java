@@ -16,6 +16,7 @@
 package org.springframework.batch.core.listener;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 
 import java.util.Arrays;
 import java.util.Iterator;
@@ -38,6 +39,14 @@ public class OrderedCompositeTests {
 		Iterator<Object> iterator = list.iterator();
 		assertEquals("1", iterator.next());
 		assertEquals("2", iterator.next());
+	}
+
+	@Test
+	public void testSetSameObject() {
+		list.setItems(Arrays.asList(new Object[] { "1", "1" }));
+		Iterator<Object> iterator = list.iterator();
+		assertEquals("1", iterator.next());
+		assertFalse(iterator.hasNext());
 	}
 
 	@Test
@@ -77,6 +86,25 @@ public class OrderedCompositeTests {
 		});
 		Iterator<Object> iterator = list.iterator();
 		assertEquals(0, ((Ordered) iterator.next()).getOrder());
+		assertEquals(1, ((Ordered) iterator.next()).getOrder());
+		assertEquals("1", iterator.next());
+	}
+
+	@Test
+	public void testAddDuplicateOrdered() {
+		list.setItems(Arrays.asList((Object) "1"));
+		list.add(new Ordered() {
+			public int getOrder() {
+				return 1;
+			}
+		});
+		list.add(new Ordered() {
+			public int getOrder() {
+				return 1;
+			}
+		});
+		Iterator<Object> iterator = list.iterator();
+		assertEquals(1, ((Ordered) iterator.next()).getOrder());
 		assertEquals(1, ((Ordered) iterator.next()).getOrder());
 		assertEquals("1", iterator.next());
 	}
