@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans:beans xmlns="http://www.springframework.org/schema/batch" xmlns:beans="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.springframework.org/schema/batch http://www.springframework.org/schema/batch/spring-batch-2.1.xsd
+	http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.5.xsd">
+
+	<beans:import resource="common-context.xml" />
+
+	<job id="job">
+		<step id="step">
+			<tasklet>
+				<chunk reader="reader" writer="writer"
+				       commit-interval="10">
+				</chunk>
+				<listeners>
+					<listener ref="listener" after-write-method="after"/>
+				</listeners>
+			</tasklet>
+		</step>
+	</job>
+
+	<beans:bean id="reader" class="org.springframework.batch.core.configuration.xml.TestReader" />
+	
+	<beans:bean id="writer" class="org.springframework.batch.core.configuration.xml.TestWriter" />
+
+	<beans:bean id="listener" class="org.springframework.batch.core.configuration.xml.TestPojoListener" />
+
+</beans:beans>
