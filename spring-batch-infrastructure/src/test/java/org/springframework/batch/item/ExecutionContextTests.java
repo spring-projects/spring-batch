@@ -90,6 +90,25 @@ public class ExecutionContextTests {
 	}
 
 	@Test
+	public void testNotDirtyWithDuplicate() {
+		context.putString("1", "test");
+		assertTrue(context.isDirty());
+		context.clearDirtyFlag();
+		context.putString("1", "test");
+		assertFalse(context.isDirty());
+	}
+
+	@Test
+	public void testNotDirtyWithRemoveMissing() {
+		context.putString("1", "test");
+		assertTrue(context.isDirty());
+		context.putString("1", null); // remove an item that was present
+		assertTrue(context.isDirty());
+		context.putString("1", null); // remove a non-existent item
+		assertFalse(context.isDirty());
+	}
+
+	@Test
 	public void testContains() {
 		context.putString("1", "testString");
 		assertTrue(context.containsKey("1"));

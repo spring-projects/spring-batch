@@ -125,12 +125,13 @@ public class ExecutionContext implements Serializable {
 	public void put(String key, Object value) {
 		if (value != null) {
 			Assert.isInstanceOf(Serializable.class, value, "Value: [ " + value + "must be serializable.");
-			map.put(key, value);
+			Object result = map.put(key, value);
+			dirty = result==null || result!=null && !result.equals(value);
 		}
 		else {
-			map.remove(key);
+			Object result = map.remove(key);
+			dirty = result!=null;
 		}
-		dirty = true;
 	}
 
 	/**
