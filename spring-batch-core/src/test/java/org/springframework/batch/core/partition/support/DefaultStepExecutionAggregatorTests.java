@@ -24,12 +24,12 @@ public class DefaultStepExecutionAggregatorTests {
 
 	private StepExecution stepExecution2 = jobExecution.createStepExecution("foo:2");
 
-	@Test(expected = IllegalArgumentException.class)
+	@Test
 	public void testAggregateEmpty() {
 		aggregator.aggregate(result, Collections.<StepExecution> emptySet());
 	}
 
-	@Test(expected = IllegalArgumentException.class)
+	@Test
 	public void testAggregateNull() {
 		aggregator.aggregate(result, null);
 	}

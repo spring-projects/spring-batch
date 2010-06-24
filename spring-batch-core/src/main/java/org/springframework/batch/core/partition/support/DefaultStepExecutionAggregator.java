@@ -45,8 +45,8 @@ public class DefaultStepExecutionAggregator implements StepExecutionAggregator {
 	 */
 	public void aggregate(StepExecution result, Collection<StepExecution> executions) {
 		Assert.notNull(result, "To aggregate into a result it must be non-null.");
-		if (executions == null || executions.isEmpty()) {
-			throw new IllegalArgumentException("Cannot aggregate empty or null executions: " + executions);
+		if (executions == null) {
+			return;
 		}
 		for (StepExecution stepExecution : executions) {
 			BatchStatus status = stepExecution.getStatus();
