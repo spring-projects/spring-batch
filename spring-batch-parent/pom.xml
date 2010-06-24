@@ -31,7 +31,7 @@
 		<profile>
 			<id>spring3</id>
 			<properties>
-				<spring.framework.version>3.0.2.RELEASE</spring.framework.version>
+				<spring.framework.version>3.0.3.BUILD-SNAPSHOT</spring.framework.version>
 				<junit.version>4.7</junit.version>
 			</properties>
 		</profile>
