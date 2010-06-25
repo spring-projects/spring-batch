@@ -56,7 +56,7 @@ public class DefaultFieldSetFactory implements FieldSetFactory {
 			fieldSet.setDateFormat(dateFormat);
 		}
 		if (numberFormat!=null) {
-			fieldSet.setDateFormat(dateFormat);
+			fieldSet.setNumberFormat(numberFormat);
 		}	
 		return fieldSet;
 	}
