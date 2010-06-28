@@ -84,7 +84,8 @@ public class JobParameters implements Serializable {
 	 * @return The <code>String</code> value
 	 */
 	public String getString(String key){
-		return parameters.get(key).toString();
+		JobParameter value = parameters.get(key);
+		return value==null ? null : value.toString();
 	}
 	
 	/**
