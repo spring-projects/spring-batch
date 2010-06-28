@@ -108,7 +108,7 @@ public abstract class AbstractListenerParser {
 	private List<String> getMethodNameAttributes() {
 		List<String> methodNameAttributes = new ArrayList<String>();
 		for (ListenerMetaData metaData : getMetaDataValues()) {
-			methodNameAttributes.add(metaData.getMethodName());
+			methodNameAttributes.add(metaData.getPropertyName());
 		}
 		return methodNameAttributes;
 	}

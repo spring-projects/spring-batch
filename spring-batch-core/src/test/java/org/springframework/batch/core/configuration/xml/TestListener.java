@@ -11,6 +11,11 @@ public class TestListener extends AbstractTestComponent implements StepExecution
 		return null;
 	}
 
+	public ExitStatus destroy(StepExecution stepExecution) {
+		executed = true;
+		return stepExecution.getExitStatus();
+	}
+
 	public void beforeStep(StepExecution stepExecution) {
 		executed = true;
 	}
