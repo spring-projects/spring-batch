@@ -37,23 +37,16 @@ public class StepListenerSupport<T,S> implements StepExecutionListener, ChunkLis
 		ItemReadListener<T>, ItemProcessListener<T,S>, ItemWriteListener<S>, SkipListener<T, S> {
 
 	/* (non-Javadoc)
-	 * @see org.springframework.batch.core.domain.StepListener#afterStep(StepExecution stepExecution)
+	 * @see org.springframework.batch.core.StepExecutionListener#afterStep(org.springframework.batch.core.StepExecution)
 	 */
 	public ExitStatus afterStep(StepExecution stepExecution) {
 		return null;
 	}
 
 	/* (non-Javadoc)
-	 * @see org.springframework.batch.core.domain.StepListener#beforeStep(org.springframework.batch.core.domain.StepExecution)
+	 * @see org.springframework.batch.core.StepExecutionListener#beforeStep(org.springframework.batch.core.StepExecution)
 	 */
 	public void beforeStep(StepExecution stepExecution) {
-	}
-
-	/* (non-Javadoc)
-	 * @see org.springframework.batch.core.domain.StepListener#onErrorInStep(java.lang.Throwable)
-	 */
-	public ExitStatus onErrorInStep(StepExecution stepExecution, Throwable e) {
-		return null;
 	}
 
 	/* (non-Javadoc)
