@@ -1,0 +1,47 @@
+Spring Batch 2.1.2 Release Notes
+
+* Bug
+
+  * {{{http://jira.springsource.org/browse/BATCH-1543}[BATCH-1543]}} - OrderedComposite cannot register two items with the same order
+
+  * {{{http://jira.springsource.org/browse/BATCH-1558}[BATCH-1558]}} - Error in Programmatic Flow Decisions documentation
+
+  * {{{http://jira.springsource.org/browse/BATCH-1564}[BATCH-1564]}} - incorrect apachemq artifactId
+
+  * {{{http://jira.springsource.org/browse/BATCH-1566}[BATCH-1566]}} - ExecutionContext.isDirty() is not very accurate
+
+  * {{{http://jira.springsource.org/browse/BATCH-1567}[BATCH-1567]}} - When step encounters error saving ExecutionContext it tries to stop the job but fails
+
+  * {{{http://jira.springsource.org/browse/BATCH-1571}[BATCH-1571]}} - PostgresPagingQueryProvider generateJumpToItemQuery generates bad SQL
+
+  * {{{http://jira.springsource.org/browse/BATCH-1573}[BATCH-1573]}} - End transition states will cause the batch job to finish with an Unknown status if the namespace prefix is used.
+
+  * {{{http://jira.springsource.org/browse/BATCH-1574}[BATCH-1574]}} - TaskExecutor configuration ignored in 2.1 namespace for <tasklet/> with no <chunk/>
+
+  * {{{http://jira.springsource.org/browse/BATCH-1587}[BATCH-1587]}} - DefaultFieldSetFactory is not setting the numberFormat in the enhance() call
+
+  * {{{http://jira.springsource.org/browse/BATCH-1588}[BATCH-1588]}} - Job Excecution Listener - XML Namespace parsing fails for methods named different to "beforeJob", "afterJob"
+
+  * {{{http://jira.springsource.org/browse/BATCH-1590}[BATCH-1590]}} - OraclePagingQueryProvider.generateJumpToItemQuery generates an incorrect query
+
+  * {{{http://jira.springsource.org/browse/BATCH-1591}[BATCH-1591]}} - Documentation: StepListener is a marker interface so it cannot be applied directly to a step
+
+  * {{{http://jira.springsource.org/browse/BATCH-1594}[BATCH-1594]}} - StepListenerSupport implements method onErrorInStep which is not declared in any of the implemented interfaces
+
+* Defect
+
+  * {{{http://jira.springsource.org/browse/BATCH-1569}[BATCH-1569]}} - MultiResourceItemReader.getCurrentResource cause java.lang.ArrayIndexOutOfBoundsException when .read() was not called
+
+  * {{{http://jira.springsource.org/browse/BATCH-1582}[BATCH-1582]}} - DefaultStepExecutionAggregator can simply ignore null or empty input
+
+* Improvement
+
+  * {{{http://jira.springsource.org/browse/BATCH-1568}[BATCH-1568]}} - Implement SkipListener in StepListenerSupport
+
+  * {{{http://jira.springsource.org/browse/BATCH-1575}[BATCH-1575]}} - Parallel job test case missing in 2.1
+
+  * {{{http://jira.springsource.org/browse/BATCH-1578}[BATCH-1578]}} - Mismatch between JavaDoc and enum elements in BatchStatus
+
+  * {{{http://jira.springsource.org/browse/BATCH-1589}[BATCH-1589]}} - Have RunIDIncrementer reuse given parameters
+
+  * {{{http://jira.springsource.org/browse/BATCH-1593}[BATCH-1593]}} - XML configuration: p-namespace does not work on inline tasklet bean element
