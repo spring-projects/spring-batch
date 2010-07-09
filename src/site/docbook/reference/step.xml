@@ -663,8 +663,10 @@ itemWriter.write(items);</programlisting>
       written. This can be accomplished with one of many
       <classname>Step</classname> scoped listeners.</para>
 
-      <para>Any class that implements the <classname>StepListener</classname>
-      interface (or an extension thereof) can be applied to a step via the
+      <para>Any class that implements one of 
+	  the extensions of <classname>StepListener</classname> (but not
+      that interface itself since it is empty) 
+      can be applied to a step via the
       listeners element:</para>
 
       <programlisting>&lt;step id="step1"&gt;
