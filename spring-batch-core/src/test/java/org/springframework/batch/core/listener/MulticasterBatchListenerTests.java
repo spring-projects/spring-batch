@@ -652,22 +652,6 @@ public class MulticasterBatchListenerTests {
 		 * (non-Javadoc)
 		 * 
 		 * @see
-		 * org.springframework.batch.core.listener.StepListenerSupport#onErrorInStep
-		 * (org.springframework.batch.core.StepExecution, java.lang.Throwable)
-		 */
-		@Override
-		public ExitStatus onErrorInStep(StepExecution stepExecution, Throwable e) {
-			count++;
-			if (error) {
-				throw new RuntimeException("listener error");
-			}
-			return super.onErrorInStep(stepExecution, e);
-		}
-
-		/*
-		 * (non-Javadoc)
-		 * 
-		 * @see
 		 * org.springframework.batch.core.listener.StepListenerSupport#onWriteError
 		 * (java.lang.Exception, java.util.List)
 		 */
