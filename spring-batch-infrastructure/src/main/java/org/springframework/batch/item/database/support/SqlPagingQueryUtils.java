@@ -98,12 +98,25 @@ public class SqlPagingQueryUtils {
 	 * @param rowNumClause the implementation specific row num clause to be used
 	 * @return the generated query
 	 */
-	public static String generateRowNumSqlQuery(AbstractSqlPagingQueryProvider provider, String selectClause, boolean remainingPageQuery,
-			String rowNumClause) {
+	public static String generateRowNumSqlQuery(AbstractSqlPagingQueryProvider provider, String selectClause,
+			boolean remainingPageQuery, String rowNumClause) {
 		StringBuilder sql = new StringBuilder();
-		// TODO: BATCH-1590 fix this little hack to extract the alias name for a jump to item query
-		String selectAlias = selectClause.replaceAll(".* (as|AS) (.*)", "$2");
-		sql.append("SELECT * FROM (SELECT ").append(selectAlias).append(", ROWNUM as TMP_ROW_NUM");
+		sql.append("SELECT * FROM (SELECT ").append(selectClause).append(", ROWNUM as TMP_ROW_NUM");
+		sql.append(" FROM ").append(provider.getFromClause());
+		buildWhereClause(provider, remainingPageQuery, sql);
+		sql.append(" ORDER BY ").append(provider.getSortKey());
+		buildAscendingClause(provider, sql);
+		sql.append(") WHERE ").append(rowNumClause);
+
+		return sql.toString();
+
+	}
+
+	public static String generateRowNumSqlQueryWithNesting(AbstractSqlPagingQueryProvider provider,
+			String selectClause, boolean remainingPageQuery, String rowNumClause) {
+
+		StringBuilder sql = new StringBuilder();
+		sql.append("SELECT * FROM (SELECT ").append(selectClause).append(", ROWNUM as TMP_ROW_NUM");
 		sql.append(" FROM (SELECT ").append(selectClause).append(" FROM ").append(provider.getFromClause());
 		buildWhereClause(provider, remainingPageQuery, sql);
 		sql.append(" ORDER BY ").append(provider.getSortKey());

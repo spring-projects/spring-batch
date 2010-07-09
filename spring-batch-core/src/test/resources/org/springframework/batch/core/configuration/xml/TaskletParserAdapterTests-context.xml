@@ -11,7 +11,7 @@
 	</job>
 
 	<job id="job2">
-		<step id="ste2">
+		<step id="step2">
 			<tasklet method="read">
 				<beans:bean class="org.springframework.batch.core.configuration.xml.TestReader" />
 			</tasklet>
