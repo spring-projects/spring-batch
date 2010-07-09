@@ -21,6 +21,7 @@ import org.springframework.batch.core.step.tasklet.MethodInvokingTaskletAdapter;
 import org.springframework.beans.BeanMetadataElement;
 import org.springframework.beans.MutablePropertyValues;
 import org.springframework.beans.factory.config.BeanDefinition;
+import org.springframework.beans.factory.config.BeanDefinitionHolder;
 import org.springframework.beans.factory.config.RuntimeBeanReference;
 import org.springframework.beans.factory.config.TypedStringValue;
 import org.springframework.beans.factory.parsing.CompositeComponentDefinition;
@@ -91,7 +92,10 @@ public class TaskletParser {
 					bme = new RuntimeBeanReference(taskletRef);
 			}
 			else if (beanElements.size() == 1) {
-				bme = parserContext.getDelegate().parseBeanDefinitionElement(beanElements.get(0));
+				Element beanElement = beanElements.get(0);
+				BeanDefinitionHolder beanDefinitionHolder = parserContext.getDelegate().parseBeanDefinitionElement(beanElement);
+				parserContext.getDelegate().decorateBeanDefinitionIfRequired(beanElement, beanDefinitionHolder);
+				bme = beanDefinitionHolder;
 			}
 			else if (refElements.size() == 1) {
 				bme = (BeanMetadataElement) parserContext.getDelegate().parsePropertySubElement(refElements.get(0),

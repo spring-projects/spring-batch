@@ -20,6 +20,7 @@ import java.util.List;
 
 import org.springframework.beans.BeanMetadataElement;
 import org.springframework.beans.factory.config.BeanDefinition;
+import org.springframework.beans.factory.config.BeanDefinitionHolder;
 import org.springframework.beans.factory.config.RuntimeBeanReference;
 import org.springframework.beans.factory.parsing.CompositeComponentDefinition;
 import org.springframework.beans.factory.support.BeanDefinitionBuilder;
@@ -158,7 +159,10 @@ public class JobParser extends AbstractSingleBeanDefinitionParser {
 			return new RuntimeBeanReference(refAttribute);
 		}
 		else if (beanElement != null) {
-			return parserContext.getDelegate().parseBeanDefinitionElement(beanElement);
+			BeanDefinitionHolder beanDefinitionHolder = parserContext.getDelegate().parseBeanDefinitionElement(
+					beanElement);
+			parserContext.getDelegate().decorateBeanDefinitionIfRequired(beanElement, beanDefinitionHolder);
+			return beanDefinitionHolder;
 		}
 		else if (refElement != null) {
 			return (BeanMetadataElement) parserContext.getDelegate().parsePropertySubElement(refElement, null);

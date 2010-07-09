@@ -18,6 +18,7 @@ package org.springframework.batch.core.configuration.xml;
 import java.util.List;
 
 import org.springframework.beans.MutablePropertyValues;
+import org.springframework.beans.factory.config.BeanDefinitionHolder;
 import org.springframework.beans.factory.config.RuntimeBeanReference;
 import org.springframework.beans.factory.config.TypedStringValue;
 import org.springframework.beans.factory.parsing.CompositeComponentDefinition;
@@ -104,11 +105,11 @@ public class ChunkElementParser {
 			propertyValues.addPropertyValue("skipLimit", skipLimit);
 		}
 
-		handleItemHandler("skip-policy", "skipPolicy", null, false, element, parserContext,
-				propertyValues, underspecified);
+		handleItemHandler("skip-policy", "skipPolicy", null, false, element, parserContext, propertyValues,
+				underspecified);
 
-		handleItemHandler("retry-policy", "retryPolicy", null, false, element, parserContext,
-				propertyValues, underspecified);
+		handleItemHandler("retry-policy", "retryPolicy", null, false, element, parserContext, propertyValues,
+				underspecified);
 
 		String retryLimit = element.getAttribute("retry-limit");
 		if (StringUtils.hasText(retryLimit)) {
@@ -188,8 +189,11 @@ public class ChunkElementParser {
 							+ "/> element or a <" + REF_ELE + "/> element.", element);
 		}
 		else if (beanElements.size() == 1) {
-			propertyValues.addPropertyValue(propertyName, parserContext.getDelegate().parseBeanDefinitionElement(
-					beanElements.get(0)));
+			Element beanElement = beanElements.get(0);
+			BeanDefinitionHolder beanDefinitionHolder = parserContext.getDelegate().parseBeanDefinitionElement(
+					beanElement);
+			parserContext.getDelegate().decorateBeanDefinitionIfRequired(beanElement, beanDefinitionHolder);
+			propertyValues.addPropertyValue(propertyName, beanDefinitionHolder);
 		}
 		else if (refElements.size() == 1) {
 			propertyValues.addPropertyValue(propertyName, parserContext.getDelegate().parsePropertySubElement(
@@ -299,7 +303,7 @@ public class ChunkElementParser {
 			ManagedMap map, ParserContext parserContext) {
 		for (Element child : (List<Element>) DomUtils.getChildElementsByTagName(exceptionClassesElement, elementName)) {
 			String className = child.getAttribute("class");
-				map.put(new TypedStringValue(className, Class.class), include);
+			map.put(new TypedStringValue(className, Class.class), include);
 		}
 	}
 

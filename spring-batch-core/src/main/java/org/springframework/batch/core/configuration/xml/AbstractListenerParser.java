@@ -6,6 +6,7 @@ import java.util.List;
 import org.springframework.batch.core.listener.AbstractListenerFactoryBean;
 import org.springframework.batch.core.listener.ListenerMetaData;
 import org.springframework.beans.BeanMetadataElement;
+import org.springframework.beans.factory.config.BeanDefinitionHolder;
 import org.springframework.beans.factory.config.RuntimeBeanReference;
 import org.springframework.beans.factory.support.AbstractBeanDefinition;
 import org.springframework.beans.factory.support.BeanDefinitionBuilder;
@@ -63,7 +64,11 @@ public abstract class AbstractListenerParser {
 			return new RuntimeBeanReference(listenerRef);
 		}
 		else if (beanElements.size() == 1) {
-			return parserContext.getDelegate().parseBeanDefinitionElement(beanElements.get(0));
+			Element beanElement = beanElements.get(0);
+			BeanDefinitionHolder beanDefinitionHolder = parserContext.getDelegate().parseBeanDefinitionElement(
+					beanElement);
+			parserContext.getDelegate().decorateBeanDefinitionIfRequired(beanElement, beanDefinitionHolder);
+			return beanDefinitionHolder;
 		}
 		else {
 			return (BeanMetadataElement) parserContext.getDelegate().parsePropertySubElement(refElements.get(0), null);
