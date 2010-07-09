@@ -122,23 +122,10 @@ public class StagingItemReader<T> implements ItemReader<ProcessIndicatorItemWrap
 
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * org.springframework.batch.core.domain.StepListener#afterStep(StepExecution
-	 * )
-	 */
 	public ExitStatus afterStep(StepExecution stepExecution) {
 		return null;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @seeorg.springframework.batch.core.domain.StepListener#beforeStep(org.
-	 * springframework.batch.core.domain.StepExecution)
-	 */
 	public void beforeStep(StepExecution stepExecution) {
 		this.stepExecution = stepExecution;
 		synchronized (lock) {
@@ -148,17 +135,6 @@ public class StagingItemReader<T> implements ItemReader<ProcessIndicatorItemWrap
 				initialized = true;
 			}
 		}
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * org.springframework.batch.core.domain.StepListener#onErrorInStep(java
-	 * .lang.Throwable)
-	 */
-	public ExitStatus onErrorInStep(StepExecution stepExecution, Throwable e) {
-		return null;
 	}
 
 }

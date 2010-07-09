@@ -71,7 +71,6 @@ public class NonAbstractStepTests {
 	 * Fills the events list when listener methods are called, prefixed with the
 	 * name of the listener.
 	 */
-	@SuppressWarnings("unused")
 	private class EventTrackingListener implements StepExecutionListener {
 
 		private String name;
@@ -88,13 +87,6 @@ public class NonAbstractStepTests {
 			assertSame(execution, stepExecution);
 			events.add(getEvent("afterStep("+stepExecution.getExitStatus().getExitCode()+")"));
 			stepExecution.getExecutionContext().putString("afterStep", "afterStep");
-			return stepExecution.getExitStatus();
-		}
-
-		public ExitStatus onErrorInStep(StepExecution stepExecution, Throwable e) {
-			assertSame(execution, stepExecution);
-			events.add(getEvent("onErrorInStep"));
-			stepExecution.getExecutionContext().putString("onErrorInStep", "onErrorInStep");
 			return stepExecution.getExitStatus();
 		}
 

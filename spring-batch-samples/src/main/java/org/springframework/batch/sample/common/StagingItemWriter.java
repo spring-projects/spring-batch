@@ -123,15 +123,4 @@ public class StagingItemWriter<T> extends JdbcDaoSupport implements StepExecutio
 		this.stepExecution = stepExecution;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * org.springframework.batch.core.domain.StepListener#onErrorInStep(java
-	 * .lang.Throwable)
-	 */
-	public ExitStatus onErrorInStep(StepExecution stepExecution, Throwable e) {
-		return null;
-	}
-
 }
