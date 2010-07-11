@@ -122,7 +122,8 @@ public class JdbcPagingQueryIntegrationTests {
 		List<Map<String, Object>> list = jdbcTemplate.queryForList(query);
 		logger.debug("Jump to page result: " + list);
 		assertEquals(1, list.size());
-		String expected = "[{value=" + (minId + pageSize - 1);
+		System.err.println(list);
+		String expected = "[{sort_key=" + (minId + pageSize - 1);
 		assertEquals(expected, list.toString().toLowerCase().substring(0, expected.length()));
 		Object startAfterValue = list.get(0).entrySet().iterator().next().getValue();
 		list = jdbcTemplate.queryForList(queryProvider.generateRemainingPagesQuery(pageSize), startAfterValue);

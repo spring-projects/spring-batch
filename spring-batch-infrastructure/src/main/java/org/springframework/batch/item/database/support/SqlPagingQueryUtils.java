@@ -114,10 +114,16 @@ public class SqlPagingQueryUtils {
 
 	public static String generateRowNumSqlQueryWithNesting(AbstractSqlPagingQueryProvider provider,
 			String selectClause, boolean remainingPageQuery, String rowNumClause) {
+		return generateRowNumSqlQueryWithNesting(provider, selectClause, selectClause, remainingPageQuery, rowNumClause);
+	}
+	
+	
+	public static String generateRowNumSqlQueryWithNesting(AbstractSqlPagingQueryProvider provider,
+			String innerSelectClause, String outerSelectClause, boolean remainingPageQuery, String rowNumClause) {
 
 		StringBuilder sql = new StringBuilder();
-		sql.append("SELECT * FROM (SELECT ").append(selectClause).append(", ROWNUM as TMP_ROW_NUM");
-		sql.append(" FROM (SELECT ").append(selectClause).append(" FROM ").append(provider.getFromClause());
+		sql.append("SELECT * FROM (SELECT ").append(outerSelectClause).append(", ROWNUM as TMP_ROW_NUM");
+		sql.append(" FROM (SELECT ").append(innerSelectClause).append(" FROM ").append(provider.getFromClause());
 		buildWhereClause(provider, remainingPageQuery, sql);
 		sql.append(" ORDER BY ").append(provider.getSortKey());
 		buildAscendingClause(provider, sql);

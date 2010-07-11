@@ -42,7 +42,7 @@ public class OraclePagingQueryProvider extends AbstractSqlPagingQueryProvider {
 		int page = itemIndex / pageSize;
 		int offset = (page * pageSize);
 		offset = offset == 0 ? 1 : offset;
-		return SqlPagingQueryUtils.generateRowNumSqlQueryWithNesting(this, this.getSortKey(), false, "TMP_ROW_NUM = "
+		return SqlPagingQueryUtils.generateRowNumSqlQueryWithNesting(this, this.getSortKey() + " AS SORT_KEY", "SORT_KEY", false, "TMP_ROW_NUM = "
 				+ offset);
 	}
 
