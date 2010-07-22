@@ -18,6 +18,8 @@ package org.springframework.batch.support.transaction;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -55,7 +57,7 @@ public class ConcurrentTransactionAwareProxyTests {
 	private ExecutorService executor;
 
 	private CompletionService<List<String>> completionService;
-	
+
 	@Before
 	public void init() {
 		executor = Executors.newFixedThreadPool(outerMax);
@@ -85,10 +87,21 @@ public class ConcurrentTransactionAwareProxyTests {
 		testList(list);
 	}
 
-	@Test(expected = Throwable.class)
+	@Test
 	public void testConcurrentTransactionalList() throws Exception {
 		List<String> list = TransactionAwareProxyFactory.createTransactionalList();
-		testList(list);
+		try {
+			testList(list);
+			fail("Expected ExecutionException or AssertionError (but don't panic if it didn't happen: it probably just means we got lucky for a change)");
+		}
+		catch (ExecutionException e) {
+			String message = e.getCause().getMessage();
+			assertTrue("Wrong message: " + message, message.startsWith("Lost update"));
+		}
+		catch (AssertionError e) {
+			String message = e.getMessage();
+			assertTrue("Wrong message: " + message, message.startsWith("Wrong number of results"));
+		}
 	}
 
 	@Test
@@ -162,10 +175,10 @@ public class ConcurrentTransactionAwareProxyTests {
 
 		for (int i = 0; i < outerMax; i++) {
 			List<String> result = completionService.take().get();
-			assertEquals(innerMax, result.size());
+			assertEquals("Wrong number of results in inner task", innerMax, result.size());
 		}
 
-		assertEquals(innerMax * outerMax, list.size());
+		assertEquals("Wrong number of results in aggregate", innerMax * outerMax, list.size());
 
 	}
 
