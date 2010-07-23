@@ -149,6 +149,25 @@ public class CommandLineJobRunnerTests {
 	}
 
 	@Test
+	public void testStopFailedAndRestarted() throws Throwable {
+		String[] args = new String[] { jobPath, "-stop", jobName };
+		JobParameters jobParameters = new JobParametersBuilder().addString("foo", "bar").toJobParameters();
+		StubJobExplorer.jobInstances = Arrays.asList(new JobInstance(5L, jobParameters, jobName));
+		CommandLineJobRunner.main(args);
+		assertEquals(0, StubSystemExiter.status);
+	}
+
+	@Test
+	public void testStopRestarted() throws Throwable {
+		String[] args = new String[] { jobPath, "-stop", jobName };
+		JobParameters jobParameters = new JobParametersBuilder().addString("foo", "bar").toJobParameters();
+		JobInstance jobInstance = new JobInstance(3L, jobParameters, jobName);
+		StubJobExplorer.jobInstances = Arrays.asList(jobInstance);
+		CommandLineJobRunner.main(args);
+		assertEquals(0, StubSystemExiter.status);
+	}
+
+	@Test
 	public void testAbandon() throws Throwable {
 		String[] args = new String[] { jobPath, "-abandon", jobName };
 		JobParameters jobParameters = new JobParametersBuilder().addString("foo", "bar").toJobParameters();
@@ -195,6 +214,18 @@ public class CommandLineJobRunnerTests {
 		CommandLineJobRunner.main(args);
 		assertEquals(0, StubSystemExiter.status);
 		assertEquals(jobParameters, StubJobLauncher.jobParameters);
+	}
+
+	@Test
+	public void testRestartExecutionNotFailed() throws Throwable {
+		String[] args = new String[] { jobPath, "-restart", "11" };
+		JobParameters jobParameters = new JobParametersBuilder().addString("foo", "bar").toJobParameters();
+		JobExecution jobExecution = new JobExecution(new JobInstance(0L, jobParameters, jobName), 11L);
+		jobExecution.setStatus(BatchStatus.COMPLETED);
+		StubJobExplorer.jobExecution = jobExecution;
+		CommandLineJobRunner.main(args);
+		assertEquals(1, StubSystemExiter.status);
+		assertEquals(null, StubJobLauncher.jobParameters);
 	}
 
 	@Test
@@ -321,24 +352,27 @@ public class CommandLineJobRunnerTests {
 
 		public List<JobExecution> getJobExecutions(JobInstance jobInstance) {
 			if (jobInstance.getId() == 0) {
-				return Arrays.asList(createJobInstance(jobInstance, BatchStatus.FAILED));
+				return Arrays.asList(createJobExecution(jobInstance, BatchStatus.FAILED));
 			}
 			if (jobInstance.getId() == 1) {
 				return null;
 			}
 			if (jobInstance.getId() == 2) {
-				return Arrays.asList(createJobInstance(jobInstance, BatchStatus.STOPPED));
+				return Arrays.asList(createJobExecution(jobInstance, BatchStatus.STOPPED));
 			}
 			if (jobInstance.getId() == 3) {
-				return Arrays.asList(createJobInstance(jobInstance, BatchStatus.STARTED));
+				return Arrays.asList(createJobExecution(jobInstance, BatchStatus.STARTED));
 			}
 			if (jobInstance.getId() == 4) {
-				return Arrays.asList(createJobInstance(jobInstance, BatchStatus.ABANDONED));
+				return Arrays.asList(createJobExecution(jobInstance, BatchStatus.ABANDONED));
 			}
-			return Arrays.asList(createJobInstance(jobInstance, BatchStatus.COMPLETED));
+			if (jobInstance.getId() == 5) {
+				return Arrays.asList(createJobExecution(jobInstance, BatchStatus.STARTED), createJobExecution(jobInstance, BatchStatus.FAILED));
+			}
+			return Arrays.asList(createJobExecution(jobInstance, BatchStatus.COMPLETED));
 		}
 
-		private JobExecution createJobInstance(JobInstance jobInstance, BatchStatus status) {
+		private JobExecution createJobExecution(JobInstance jobInstance, BatchStatus status) {
 			JobExecution jobExecution = new JobExecution(jobInstance, 1L);
 			jobExecution.setStatus(status);
 			jobExecution.setStartTime(new Date());

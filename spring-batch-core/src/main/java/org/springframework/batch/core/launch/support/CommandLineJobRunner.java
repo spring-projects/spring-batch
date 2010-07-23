@@ -349,6 +349,7 @@ public class CommandLineJobRunner {
 			if (jobExecution.getStatus().isGreaterThan(minStatus)) {
 				return Arrays.asList(jobExecution);
 			}
+			return Collections.emptyList();
 		}
 
 		int start = 0;
@@ -363,9 +364,10 @@ public class CommandLineJobRunner {
 				if (jobExecutions == null || jobExecutions.isEmpty()) {
 					continue;
 				}
-				JobExecution jobExecution = jobExecutions.get(jobExecutions.size() - 1);
-				if (jobExecution.getStatus().isGreaterThan(minStatus)) {
-					executions.add(jobExecution);
+				for (JobExecution jobExecution : jobExecutions) {
+					if (jobExecution.getStatus().isGreaterThan(minStatus)) {
+						executions.add(jobExecution);
+					}
 				}
 			}
 
