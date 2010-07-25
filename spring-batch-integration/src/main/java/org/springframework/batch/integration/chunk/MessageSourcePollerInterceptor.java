@@ -4,7 +4,6 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.integration.channel.ChannelInterceptor;
-import org.springframework.integration.channel.ThreadLocalChannel;
 import org.springframework.integration.channel.interceptor.ChannelInterceptorAdapter;
 import org.springframework.integration.core.Message;
 import org.springframework.integration.core.MessageChannel;
@@ -14,8 +13,8 @@ import org.springframework.util.Assert;
 /**
  * A {@link ChannelInterceptor} that turns a pollable channel into a "pass-thru channel": if a client calls
  * <code>receive()</code> on the channel it will delegate to a {@link MessageSource} to pull the message directly from
- * an external source. This is particularly useful in combination with a {@link ThreadLocalChannel}, in which case the
- * <code>receive()</code> can join a transaction which was started by the caller.
+ * an external source. This is particularly useful in combination with a message channel in thread scope, in which case
+ * the <code>receive()</code> can join a transaction which was started by the caller.
  * 
  * @author Dave Syer
  * 
@@ -42,8 +41,8 @@ public class MessageSourcePollerInterceptor extends ChannelInterceptorAdapter im
 	}
 
 	/**
-	 * Optional MessageChannel for injecting the message receieved from the source (defaults to the channel
-	 * intercepted in {@link #preReceive(MessageChannel)}).
+	 * Optional MessageChannel for injecting the message receieved from the source (defaults to the channel intercepted
+	 * in {@link #preReceive(MessageChannel)}).
 	 * 
 	 * @param channel the channel to set
 	 */
@@ -76,12 +75,12 @@ public class MessageSourcePollerInterceptor extends ChannelInterceptorAdapter im
 	public boolean preReceive(MessageChannel channel) {
 		Message<?> message = source.receive();
 		if (message != null) {
-			if (this.channel!=null) {
+			if (this.channel != null) {
 				channel = this.channel;
 			}
 			channel.send(message);
 			if (logger.isDebugEnabled()) {
-				logger.debug("Sent " + message + " to channel " + channel.getName());
+				logger.debug("Sent " + message + " to channel " + channel);
 			}
 			return true;
 		}

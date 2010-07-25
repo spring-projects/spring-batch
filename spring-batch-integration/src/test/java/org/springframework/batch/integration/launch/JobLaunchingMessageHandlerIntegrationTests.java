@@ -42,7 +42,10 @@ public class JobLaunchingMessageHandlerIntegrationTests {
 
 	@Before
 	public void setUp() {
-		responseChannel.purge(null);
+		Object message = "";
+		while (message!=null) {
+			message = responseChannel.receive(10L);
+		}
 	}
 
 	@Test
