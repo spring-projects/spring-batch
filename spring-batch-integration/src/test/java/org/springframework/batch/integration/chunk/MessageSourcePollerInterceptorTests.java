@@ -4,7 +4,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
 import org.junit.Test;
-import org.springframework.integration.channel.ThreadLocalChannel;
+import org.springframework.integration.channel.QueueChannel;
 import org.springframework.integration.core.Message;
 import org.springframework.integration.message.GenericMessage;
 import org.springframework.integration.message.MessageSource;
@@ -33,7 +33,7 @@ public class MessageSourcePollerInterceptorTests {
 	@Test
 	public void testPreReceive() throws Exception {
 		MessageSourcePollerInterceptor interceptor = new MessageSourcePollerInterceptor(new TestMessageSource("foo"));
-		ThreadLocalChannel channel = new ThreadLocalChannel();
+		QueueChannel channel = new QueueChannel();
 		assertTrue(interceptor.preReceive(channel));
 		assertEquals("foo", channel.receive(10L).getPayload());
 	}
