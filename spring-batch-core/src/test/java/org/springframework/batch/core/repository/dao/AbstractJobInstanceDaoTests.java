@@ -22,7 +22,7 @@ public abstract class AbstractJobInstanceDaoTests extends AbstractTransactionalJ
 
 	private static final long DATE = 777;
 
-	protected JobInstanceDao dao = new MapJobInstanceDao();
+	protected JobInstanceDao dao;
 
 	private String fooJob = "foo";
 
@@ -59,6 +59,29 @@ public abstract class AbstractJobInstanceDaoTests extends AbstractTransactionalJ
 		assertEquals(Double.MAX_VALUE, retrievedParams.getDouble("doubleKey"), 0.001);
 		assertEquals("stringValue", retrievedParams.getString("stringKey"));
 		assertEquals(new Date(DATE), retrievedParams.getDate("dateKey"));
+	}
+
+	/*
+	 * Create and retrieve a job instance.
+	 */
+	@Transactional
+	@Test
+	public void testCreateAndRetrieveWithNullParameter() throws Exception {
+
+		JobParameters jobParameters = new JobParametersBuilder().addString("foo", null).toJobParameters();
+		
+		JobInstance fooInstance = dao.createJobInstance(fooJob, jobParameters);
+		assertNotNull(fooInstance.getId());
+		assertEquals(fooJob, fooInstance.getJobName());
+		assertEquals(jobParameters, fooInstance.getJobParameters());
+
+		JobInstance retrievedInstance = dao.getJobInstance(fooJob, jobParameters);
+		JobParameters retrievedParams = retrievedInstance.getJobParameters();
+		assertEquals(fooInstance, retrievedInstance);
+		assertEquals(fooJob, retrievedInstance.getJobName());
+		assertEquals(jobParameters, retrievedParams);
+
+		assertEquals(null, retrievedParams.getString("foo"));
 	}
 
 	/*
@@ -211,7 +234,7 @@ public abstract class AbstractJobInstanceDaoTests extends AbstractTransactionalJ
 	}
 
 	public void testGetJobInstanceByExecutionId() {
-
+		// TODO: test this (or maybe the method isn't needed or has wrong signature)
 	}
 
 }

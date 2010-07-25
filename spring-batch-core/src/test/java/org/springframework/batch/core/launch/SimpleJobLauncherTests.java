@@ -79,7 +79,7 @@ public class SimpleJobLauncherTests {
 		run(ExitStatus.COMPLETED);
 	}
 
-	@Test(expected=JobParametersInvalidException.class)
+	@Test(expected = JobParametersInvalidException.class)
 	public void testRunWithValidator() throws Exception {
 
 		job.setJobParametersValidator(new DefaultJobParametersValidator(new String[] { "missing-and-required" },
@@ -96,6 +96,32 @@ public class SimpleJobLauncherTests {
 			verify(jobRepository);
 		}
 
+	}
+
+	@Test
+	public void testRunRestartableJobInstanceTwice() throws Exception {
+		job = new JobSupport("foo") {
+			@Override
+			public boolean isRestartable() {
+				return true;
+			}
+
+			@Override
+			public void execute(JobExecution execution) {
+				execution.setExitStatus(ExitStatus.COMPLETED);
+				return;
+			}
+		};
+
+		testRun();
+		reset(jobRepository);
+		expect(jobRepository.getLastJobExecution(job.getName(), jobParameters)).andReturn(
+				new JobExecution(new JobInstance(1L, jobParameters, job.getName())));
+		expect(jobRepository.createJobExecution(job.getName(), jobParameters)).andReturn(
+				new JobExecution(new JobInstance(1L, jobParameters, job.getName())));
+		replay(jobRepository);
+		jobLauncher.run(job, jobParameters);
+		verify(jobRepository);
 	}
 
 	/*
@@ -231,7 +257,7 @@ public class SimpleJobLauncherTests {
 		jobLauncher.setJobRepository(jobRepository);
 		jobLauncher.afterPropertiesSet(); // no error
 	}
-	
+
 	private void run(ExitStatus exitStatus) throws Exception {
 		JobExecution jobExecution = new JobExecution(null, null);
 
