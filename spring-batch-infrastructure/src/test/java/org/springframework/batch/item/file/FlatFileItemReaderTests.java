@@ -302,6 +302,37 @@ public class FlatFileItemReaderTests {
 		reader.close();
 	}
 
+    @Test
+    public void testOpenBadIOInput() throws Exception {
+
+        reader.setResource(new AbstractResource() {
+            public String getDescription() {
+                return null;
+            }
+
+            public InputStream getInputStream() throws IOException {
+                throw new IOException();
+            }
+
+            public boolean exists() {
+                return true;
+            }
+        });
+
+        try {
+            reader.open(executionContext);
+            fail();
+        }
+        catch (ItemStreamException ex) {
+            // expected
+        }
+        
+        // read() should then return a null
+        assertNull(reader.read());
+        reader.close();
+
+    }
+	
 	@Test
 	public void testDirectoryResource() throws Exception {
 

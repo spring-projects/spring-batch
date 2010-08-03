@@ -33,7 +33,6 @@ import org.springframework.batch.item.ItemStream;
 import org.springframework.batch.item.ItemStreamException;
 import org.springframework.batch.item.WriteFailedException;
 import org.springframework.batch.item.WriterNotOpenException;
-import org.springframework.batch.item.database.JdbcBatchItemWriter;
 import org.springframework.batch.item.file.transform.LineAggregator;
 import org.springframework.batch.item.util.ExecutionContextUserSupport;
 import org.springframework.batch.item.util.FileUtils;

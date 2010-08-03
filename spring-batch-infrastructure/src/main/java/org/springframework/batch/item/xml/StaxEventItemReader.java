@@ -148,7 +148,8 @@ public class StaxEventItemReader<T> extends AbstractItemCountingItemStreamItemRe
 				}
 				QName startElementName = ((StartElement) reader.peek()).getName();
 				if (startElementName.getLocalPart().equals(fragmentRootElementName)) {
-					if (fragmentRootElementNameSpace==null || startElementName.getNamespaceURI().equals(fragmentRootElementNameSpace)) {
+					if (fragmentRootElementNameSpace == null
+							|| startElementName.getNamespaceURI().equals(fragmentRootElementNameSpace)) {
 						return true;
 					}
 				}
@@ -180,12 +181,11 @@ public class StaxEventItemReader<T> extends AbstractItemCountingItemStreamItemRe
 	protected void doOpen() throws Exception {
 		Assert.notNull(resource, "The Resource must not be null.");
 
-		noInput = false;
+		noInput = true;
 		if (!resource.exists()) {
 			if (strict) {
 				throw new IllegalStateException("Input resource must exist (reader is in 'strict' mode)");
 			}
-			noInput = true;
 			logger.warn("Input resource does not exist " + resource.getDescription());
 			return;
 		}
@@ -193,7 +193,6 @@ public class StaxEventItemReader<T> extends AbstractItemCountingItemStreamItemRe
 			if (strict) {
 				throw new IllegalStateException("Input resource must be readable (reader is in 'strict' mode)");
 			}
-			noInput = true;
 			logger.warn("Input resource is not readable " + resource.getDescription());
 			return;
 		}
@@ -201,6 +200,7 @@ public class StaxEventItemReader<T> extends AbstractItemCountingItemStreamItemRe
 		inputStream = resource.getInputStream();
 		eventReader = XMLInputFactory.newInstance().createXMLEventReader(inputStream);
 		fragmentReader = new DefaultFragmentEventReader(eventReader);
+		noInput = false;
 
 	}
 

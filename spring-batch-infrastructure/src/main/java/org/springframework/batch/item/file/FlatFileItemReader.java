@@ -179,17 +179,17 @@ public class FlatFileItemReader<T> extends AbstractItemCountingItemStreamItemRea
 		}
 
 		String line = readLine();
-		
+
 		if (line == null) {
 			return null;
 		}
 		else {
-			try{
+			try {
 				return lineMapper.mapLine(line, lineCount);
 			}
-			catch(Exception ex){
-				logger.error("Parsing error at line: " + lineCount + " in resource=" + 
-						resource.getDescription() + ", input=[" + line + "]", ex);
+			catch (Exception ex) {
+				logger.error("Parsing error at line: " + lineCount + " in resource=" + resource.getDescription()
+						+ ", input=[" + line + "]", ex);
 				throw ex;
 			}
 		}
@@ -219,7 +219,7 @@ public class FlatFileItemReader<T> extends AbstractItemCountingItemStreamItemRea
 				}
 				lineCount++;
 			}
-			
+
 			line = applyRecordSeparatorPolicy(line);
 		}
 		catch (IOException e) {
@@ -250,21 +250,20 @@ public class FlatFileItemReader<T> extends AbstractItemCountingItemStreamItemRea
 		Assert.notNull(resource, "Input resource must be set");
 		Assert.notNull(recordSeparatorPolicy, "RecordSeparatorPolicy must be set");
 
-		noInput = false;
+		noInput = true;
 		if (!resource.exists()) {
 			if (strict) {
 				throw new IllegalStateException("Input resource must exist (reader is in 'strict' mode): " + resource);
 			}
-			noInput = true;
 			logger.warn("Input resource does not exist " + resource.getDescription());
 			return;
 		}
 
 		if (!resource.isReadable()) {
 			if (strict) {
-				throw new IllegalStateException("Input resource must be readable (reader is in 'strict' mode): " + resource);
+				throw new IllegalStateException("Input resource must be readable (reader is in 'strict' mode): "
+						+ resource);
 			}
-			noInput = true;
 			logger.warn("Input resource is not readable " + resource.getDescription());
 			return;
 		}
@@ -276,21 +275,22 @@ public class FlatFileItemReader<T> extends AbstractItemCountingItemStreamItemRea
 				skippedLinesCallback.handleLine(line);
 			}
 		}
+		noInput = false;
 	}
 
 	public void afterPropertiesSet() throws Exception {
 		Assert.notNull(lineMapper, "LineMapper is required");
 	}
-	
+
 	@Override
 	protected void jumpToItem(int itemIndex) throws Exception {
 		for (int i = 0; i < itemIndex; i++) {
 			readLine();
 		}
 	}
-	
-	private String applyRecordSeparatorPolicy(String line) throws IOException{
-		
+
+	private String applyRecordSeparatorPolicy(String line) throws IOException {
+
 		String record = line;
 		while (line != null && !recordSeparatorPolicy.isEndOfRecord(record)) {
 			line = this.reader.readLine();
@@ -302,18 +302,19 @@ public class FlatFileItemReader<T> extends AbstractItemCountingItemStreamItemRea
 				}
 				else {
 					// Record has no text but it might still be post processed
-					// to something (skipping preProcess since that was already done)
+					// to something (skipping preProcess since that was already
+					// done)
 					break;
 				}
-			} else {
+			}
+			else {
 				lineCount++;
-            }
+			}
 			record = recordSeparatorPolicy.preProcess(record) + line;
 		}
-		
-		return recordSeparatorPolicy.postProcess(record);
-		
-	}
 
+		return recordSeparatorPolicy.postProcess(record);
+
+	}
 
 }

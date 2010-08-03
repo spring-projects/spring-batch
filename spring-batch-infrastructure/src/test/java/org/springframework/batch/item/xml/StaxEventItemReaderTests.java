@@ -234,7 +234,7 @@ public class StaxEventItemReaderTests {
 	}
 
 	@Test
-	public void testOpenBadIOInput() {
+	public void testOpenBadIOInput() throws Exception {
 
 		source.setResource(new AbstractResource() {
 			public String getDescription() {
@@ -252,10 +252,15 @@ public class StaxEventItemReaderTests {
 
 		try {
 			source.open(executionContext);
+			fail();
 		}
 		catch (ItemStreamException ex) {
 			// expected
 		}
+		
+        // read() should then return a null
+        assertNull(source.read());
+        source.close();
 
 	}
 

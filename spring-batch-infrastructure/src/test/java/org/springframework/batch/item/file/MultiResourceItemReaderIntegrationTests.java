@@ -346,6 +346,41 @@ public class MultiResourceItemReaderIntegrationTests {
 	}
 	
 	@Test
+    public void testBadIOInput() throws Exception {
+        
+        Resource badResource = new AbstractResource() {
+            
+            public boolean exists() {
+                // Looks good ...
+                return true;
+            }
+            
+            public InputStream getInputStream() throws IOException {
+                // ... but fails during read 
+                throw new RuntimeException();
+            }
+            
+            public String getDescription() {return null;}
+        };
+
+        tested.setResources(new Resource[] { badResource, r2, r3, r4, r5 });
+        
+        tested.open(ctx);
+
+        try{
+            assertEquals("1", tested.read());
+            fail();
+        }
+        catch(ItemStreamException ex){
+            // expected
+        }
+        
+        // Now check the next read gets the next resource
+        assertEquals("4", tested.read());
+        
+    }
+	
+	@Test
 	public void testGetCurrentResourceBeforeRead() throws Exception {
 		tested.open(ctx);
 		assertNull("There is no 'current' resource before read is called", tested.getCurrentResource());
