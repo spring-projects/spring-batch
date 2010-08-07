@@ -328,6 +328,8 @@ public interface FieldSet {
 	 * 
 	 * @param index the field index.
 	 * @throws IndexOutOfBoundsException if the index is out of bounds.
+	 * @throws IllegalArgumentException if the value is not parseable
+	 * @throws NullPointerException if the value is empty
 	 */
 	Date readDate(int index);
 
@@ -337,7 +339,8 @@ public interface FieldSet {
 	 * 
 	 * @param name the field name.
 	 * @throws IllegalArgumentException if a column with given name is not
-	 * defined.
+	 * defined or if the value is not parseable
+	 * @throws NullPointerException if the value is empty
 	 */
 	Date readDate(String name);
 
@@ -348,6 +351,8 @@ public interface FieldSet {
 	 * @param index the field index.
 	 * @param defaultValue the default value to use if the field is blank
 	 * @throws IndexOutOfBoundsException if the index is out of bounds.
+	 * @throws IllegalArgumentException if the value is not parseable
+	 * @throws NullPointerException if the value is empty
 	 */
 	Date readDate(int index, Date defaultValue);
 
