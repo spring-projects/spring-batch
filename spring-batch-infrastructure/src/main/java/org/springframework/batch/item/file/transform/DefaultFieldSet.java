@@ -588,7 +588,7 @@ public class DefaultFieldSet implements FieldSet {
 	/**
 	 * Read and trim the {@link String} value at '<code>index</code>'.
 	 * 
-	 * @throws NullPointerException if the field value is <code>null</code>.
+	 * @returns null if the field value is <code>null</code>.
 	 */
 	protected String readAndTrim(int index) {
 		String value = tokens[index];
