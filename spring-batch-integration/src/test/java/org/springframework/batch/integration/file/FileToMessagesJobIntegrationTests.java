@@ -27,12 +27,9 @@ import org.springframework.batch.core.JobParametersBuilder;
 import org.springframework.batch.core.launch.JobLauncher;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.integration.channel.SubscribableChannel;
-import org.springframework.integration.core.Message;
-import org.springframework.integration.message.MessageDeliveryException;
-import org.springframework.integration.message.MessageHandler;
-import org.springframework.integration.message.MessageHandlingException;
-import org.springframework.integration.message.MessageRejectedException;
+import org.springframework.integration.Message;
+import org.springframework.integration.core.MessageHandler;
+import org.springframework.integration.core.SubscribableChannel;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
@@ -56,8 +53,7 @@ public class FileToMessagesJobIntegrationTests implements MessageHandler {
 
 	int count = 0;
 
-	public void handleMessage(Message<?> message) throws MessageRejectedException, MessageHandlingException,
-			MessageDeliveryException {
+	public void handleMessage(Message<?> message) {
 		count++;
 	}
 

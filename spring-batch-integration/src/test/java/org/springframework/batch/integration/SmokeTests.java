@@ -6,13 +6,12 @@ import static org.junit.Assert.assertTrue;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.integration.Message;
 import org.springframework.integration.annotation.MessageEndpoint;
 import org.springframework.integration.annotation.ServiceActivator;
-import org.springframework.integration.channel.PollableChannel;
-import org.springframework.integration.core.Message;
+import org.springframework.integration.core.GenericMessage;
 import org.springframework.integration.core.MessageChannel;
-import org.springframework.integration.message.GenericMessage;
+import org.springframework.integration.core.PollableChannel;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
@@ -22,14 +21,12 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 public class SmokeTests {
 
 	@Autowired
-	@Qualifier("smokein")
 	private MessageChannel smokein;
 
 	@Autowired
-	@Qualifier("smokeout")
 	private PollableChannel smokeout;
 	
-	// This has to be static because the MessageBus registers the handler
+	// This has to be static because Spring Integration registers the handler
 	// more than once (every time a test instance is created), but only one of
 	// them will get the message.
 	private volatile static int count = 0;

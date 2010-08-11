@@ -34,7 +34,10 @@ import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.item.ItemStream;
 import org.springframework.batch.item.ItemStreamException;
 import org.springframework.batch.item.ItemWriter;
-import org.springframework.integration.gateway.MessagingGateway;
+import org.springframework.integration.Message;
+import org.springframework.integration.core.GenericMessage;
+import org.springframework.integration.core.MessagingOperations;
+import org.springframework.integration.core.PollableChannel;
 import org.springframework.util.Assert;
 
 public class ChunkMessageChannelItemWriter<T> extends StepExecutionListenerSupport implements ItemWriter<T>,
@@ -48,7 +51,7 @@ public class ChunkMessageChannelItemWriter<T> extends StepExecutionListenerSuppo
 
 	private static final long DEFAULT_THROTTLE_LIMIT = 6;
 
-	private MessagingGateway messagingGateway;
+	private MessagingOperations messagingGateway;
 
 	private LocalState localState = new LocalState();
 
@@ -57,6 +60,8 @@ public class ChunkMessageChannelItemWriter<T> extends StepExecutionListenerSuppo
 	private int DEFAULT_MAX_WAIT_TIMEOUTS = 40;
 
 	private int maxWaitTimeouts = DEFAULT_MAX_WAIT_TIMEOUTS;
+
+	private PollableChannel replyChannel;
 
 	/**
 	 * The maximum number of times to wait at the end of a step for a non-null result from the remote workers. This is a
@@ -78,8 +83,12 @@ public class ChunkMessageChannelItemWriter<T> extends StepExecutionListenerSuppo
 		this.throttleLimit = throttleLimit;
 	}
 
-	public void setMessagingGateway(MessagingGateway messagingGateway) {
+	public void setMessagingOperations(MessagingOperations messagingGateway) {
 		this.messagingGateway = messagingGateway;
+	}
+
+	public void setReplyChannel(PollableChannel replyChannel) {
+		this.replyChannel = replyChannel;
 	}
 
 	public void write(List<? extends T> items) throws Exception {
@@ -94,7 +103,7 @@ public class ChunkMessageChannelItemWriter<T> extends StepExecutionListenerSuppo
 			logger.debug("Dispatching chunk: " + items);
 			ChunkRequest<T> request = new ChunkRequest<T>(items, localState.getJobId(), localState
 					.createStepContribution());
-			messagingGateway.send(request);
+			messagingGateway.send(new GenericMessage<ChunkRequest<T>>(request));
 			localState.incrementExpected();
 
 		}
@@ -192,8 +201,9 @@ public class ChunkMessageChannelItemWriter<T> extends StepExecutionListenerSuppo
 	 * and we shouldn't be)
 	 */
 	private void getNextResult() throws AsynchronousFailureException {
-		ChunkResponse payload = (ChunkResponse) messagingGateway.receive();
-		if (payload != null) {
+		Message<ChunkResponse> message = messagingGateway.receive(replyChannel);
+		if (message != null) {
+			ChunkResponse payload = message.getPayload();
 			if (logger.isDebugEnabled()) {
 				logger.debug("Found result: " + payload);
 			}

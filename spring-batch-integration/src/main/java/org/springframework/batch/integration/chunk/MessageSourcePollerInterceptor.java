@@ -3,12 +3,13 @@ package org.springframework.batch.integration.chunk;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.InitializingBean;
+import org.springframework.integration.Message;
 import org.springframework.integration.channel.ChannelInterceptor;
 import org.springframework.integration.channel.interceptor.ChannelInterceptorAdapter;
-import org.springframework.integration.core.Message;
 import org.springframework.integration.core.MessageChannel;
-import org.springframework.integration.message.MessageSource;
+import org.springframework.integration.core.MessageSource;
 import org.springframework.util.Assert;
+
 
 /**
  * A {@link ChannelInterceptor} that turns a pollable channel into a "pass-thru channel": if a client calls

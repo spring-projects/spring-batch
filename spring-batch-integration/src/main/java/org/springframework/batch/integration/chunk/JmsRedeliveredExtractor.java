@@ -18,6 +18,7 @@ package org.springframework.batch.integration.chunk;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.integration.annotation.Header;
+import org.springframework.integration.jms.JmsHeaders;
 
 /**
  * @author Dave Syer
@@ -27,7 +28,7 @@ public class JmsRedeliveredExtractor {
 	
 	private static final Log logger = LogFactory.getLog(JmsRedeliveredExtractor.class);
 	
-	public ChunkResponse extract(ChunkResponse input, @Header("springintegration_jms_redelivered") boolean redelivered) {
+	public ChunkResponse extract(ChunkResponse input, @Header(JmsHeaders.REDELIVERED) boolean redelivered) {
 		logger.debug("Extracted redelivered flag for response, value="+redelivered);
 		return new ChunkResponse(input, redelivered);
 	}
