@@ -1,10 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xmlns:beans="http://www.springframework.org/schema/beans"
-	xmlns:integration="http://www.springframework.org/schema/integration"
+	xmlns:beans="http://www.springframework.org/schema/beans" xmlns:integration="http://www.springframework.org/schema/integration"
 	xmlns:batch="http://www.springframework.org/schema/batch" xmlns:context="http://www.springframework.org/schema/context"
 	xmlns:task="http://www.springframework.org/schema/task"
-	xsi:schemaLocation="http://www.springframework.org/schema/integration http://www.springframework.org/schema/integration/spring-integration-1.0.xsd
+	xsi:schemaLocation="http://www.springframework.org/schema/integration http://www.springframework.org/schema/integration/spring-integration-2.0.xsd
 		http://www.springframework.org/schema/task http://www.springframework.org/schema/task/spring-task-3.0.xsd
 		http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.5.xsd
 		http://www.springframework.org/schema/batch http://www.springframework.org/schema/batch/spring-batch-2.1.xsd
@@ -37,19 +36,19 @@
 	<bean id="writer" class="org.springframework.batch.integration.chunk.TestItemWriter" />
 
 	<bean id="chunkWriter" class="org.springframework.batch.integration.chunk.ChunkMessageChannelItemWriter" scope="step">
-		<property name="messagingGateway" ref="messagingGateway" />
-	</bean>
-
-	<bean id="messagingGateway" class="org.springframework.integration.gateway.SimpleMessagingGateway">
-		<property name="requestChannel" ref="requests" />
+		<property name="messagingOperations" ref="messagingGateway" />
 		<property name="replyChannel" ref="replies" />
-		<property name="replyTimeout" value="1000" />
 	</bean>
 
-	<task:executor id="poolExecutor" pool-size="5-10" queue-capacity="0"/>
+	<bean id="messagingGateway" class="org.springframework.integration.core.MessagingTemplate">
+		<property name="defaultChannel" ref="requests" />
+		<property name="receiveTimeout" value="1000" />
+	</bean>
 
-	<!-- A pub-sub channel with task executor is a decent approximation to a JMS outbound adapter -->  
-	<integration:publish-subscribe-channel id="requests" task-executor="poolExecutor"/>
+	<task:executor id="poolExecutor" pool-size="5-10" queue-capacity="0" />
+
+	<!-- A pub-sub channel with task executor is a decent approximation to a JMS outbound adapter -->
+	<integration:publish-subscribe-channel id="requests" task-executor="poolExecutor" />
 	<integration:channel id="replies">
 		<integration:queue />
 	</integration:channel>

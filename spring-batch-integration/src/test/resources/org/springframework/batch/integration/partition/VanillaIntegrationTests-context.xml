@@ -43,13 +43,13 @@
 	</bean>
 
 	<bean id="partitionHandler" class="org.springframework.batch.integration.partition.MessageChannelPartitionHandler">
-		<property name="messagingGateway">
-			<bean class="org.springframework.integration.gateway.SimpleMessagingGateway">
-				<property name="requestChannel" ref="requests" />
-				<property name="replyChannel" ref="replies" />
-				<property name="replyTimeout" value="10000" />
+		<property name="messagingOperations">
+			<bean class="org.springframework.integration.core.MessagingTemplate">
+				<property name="defaultChannel" ref="requests" />
+				<property name="receiveTimeout" value="10000" />
 			</bean>
 		</property>
+		<property name="replyChannel" ref="replies"/>
 		<property name="stepName" value="step1" />
 		<property name="gridSize" value="2" />
 	</bean>

@@ -5,8 +5,8 @@
 	xmlns:aop="http://www.springframework.org/schema/aop"
 	xsi:schemaLocation="http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-3.0.xsd
 		http://www.springframework.org/schema/jms http://www.springframework.org/schema/jms/spring-jms-3.0.xsd
-		http://www.springframework.org/schema/integration http://www.springframework.org/schema/integration/spring-integration-1.0.xsd
-		http://www.springframework.org/schema/integration/jms http://www.springframework.org/schema/integration/jms/spring-integration-jms-1.0.xsd
+		http://www.springframework.org/schema/integration http://www.springframework.org/schema/integration/spring-integration-2.0.xsd
+		http://www.springframework.org/schema/integration/jms http://www.springframework.org/schema/integration/jms/spring-integration-jms-2.0.xsd
 		http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.5.xsd
 		http://www.springframework.org/schema/batch http://www.springframework.org/schema/batch/spring-batch-2.1.xsd
 		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-3.0.xsd">
@@ -42,18 +42,28 @@
 	<bean id="writer" class="org.springframework.batch.integration.chunk.TestItemWriter" />
 
 	<bean id="chunkWriter" class="org.springframework.batch.integration.chunk.ChunkMessageChannelItemWriter" scope="step">
-		<property name="messagingGateway" ref="messagingGateway" />
+		<property name="messagingOperations" ref="messagingGateway" />
+		<property name="replyChannel" ref="replies" />
 	</bean>
 
-	<bean id="messagingGateway" class="org.springframework.integration.gateway.SimpleMessagingGateway">
-		<property name="requestChannel" ref="requests" />
-		<property name="replyChannel" ref="replies" />
-		<property name="replyTimeout" value="1000" />
+	<bean id="messagingGateway" class="org.springframework.integration.core.MessagingTemplate">
+		<property name="defaultChannel" ref="requests" />
+		<property name="receiveTimeout" value="1000" />
+	</bean>
+
+	<bean class="org.springframework.beans.factory.config.CustomScopeConfigurer">
+		<property name="scopes">
+			<map>
+				<entry key="thread">
+					<bean class="org.springframework.context.support.SimpleThreadScope" />
+				</entry>
+			</map>
+		</property>
 	</bean>
 
 	<integration:channel id="requests" />
 	<!-- If we use a direct channel for requests then the replies can come in on a thread-local -->
-	<integration:thread-local-channel id="replies"/>
+	<integration:channel id="replies" scope="thread"><integration:queue/></integration:channel>
 	<integration:service-activator input-channel="requests" output-channel="replies" ref="chunkHandler" />
 
 	<bean id="chunkHandler" class="org.springframework.batch.integration.chunk.RemoteChunkHandlerFactoryBean">

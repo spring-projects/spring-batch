@@ -2,8 +2,10 @@ package org.springframework.batch.integration.chunk;
 
 import static org.junit.Assert.assertEquals;
 
+import java.io.File;
 import java.util.Collections;
 
+import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.batch.core.BatchStatus;
@@ -17,10 +19,16 @@ import org.springframework.batch.core.launch.JobLauncher;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.springframework.util.FileSystemUtils;
 
 @ContextConfiguration
 @RunWith(SpringJUnit4ClassRunner.class)
 public class RemoteChunkFaultTolerantStepJmsIntegrationTests {
+	
+	@BeforeClass
+	public static void clear() {
+		FileSystemUtils.deleteRecursively(new File("activemq-data"));
+	}
 
 	@Autowired
 	private JobLauncher jobLauncher;

@@ -9,12 +9,13 @@ import org.springframework.batch.core.StepExecution;
 import org.springframework.batch.core.partition.PartitionHandler;
 import org.springframework.batch.core.partition.StepExecutionSplitter;
 import org.springframework.batch.core.repository.JobRepository;
+import org.springframework.integration.Message;
 import org.springframework.integration.annotation.Aggregator;
 import org.springframework.integration.annotation.MessageEndpoint;
-import org.springframework.integration.core.Message;
+import org.springframework.integration.core.MessageBuilder;
 import org.springframework.integration.core.MessageChannel;
-import org.springframework.integration.gateway.MessagingGateway;
-import org.springframework.integration.message.MessageBuilder;
+import org.springframework.integration.core.MessagingOperations;
+import org.springframework.integration.core.PollableChannel;
 import org.springframework.util.Assert;
 
 /**
@@ -38,13 +39,15 @@ public class MessageChannelPartitionHandler implements PartitionHandler {
 
 	private int gridSize = 1;
 
-	private MessagingGateway messagingGateway;
+	private MessagingOperations messagingGateway;
 
 	private String stepName;
 
+	private PollableChannel replyChannel;
+
 	public void afterPropertiesSet() throws Exception {
 		Assert.notNull(stepName, "A step name must be provided for the remote workers.");
-		Assert.state(messagingGateway != null, "The MessagingGateway must be set");
+		Assert.state(messagingGateway != null, "The MessagingOperations must be set");
 	}
 
 	/**
@@ -60,10 +63,14 @@ public class MessageChannelPartitionHandler implements PartitionHandler {
 	 * The timeout for the repoy should be set sufficiently long that the remote
 	 * steps have time to complete.
 	 * 
-	 * @param messagingGateway the {@link MessagingGateway} to set
+	 * @param messagingGateway the {@link MessagingOperations} to set
 	 */
-	public void setMessagingGateway(MessagingGateway messagingGateway) {
+	public void setMessagingOperations(MessagingOperations messagingGateway) {
 		this.messagingGateway = messagingGateway;
+	}
+
+	public void setReplyChannel(PollableChannel replyChannel) {
+		this.replyChannel = replyChannel;
 	}
 
 	/**
@@ -97,18 +104,18 @@ public class MessageChannelPartitionHandler implements PartitionHandler {
 	 * @param messages the messages to be aggregated
 	 * @return the list as it was passed in
 	 */
-	@Aggregator(sendPartialResultsOnTimeout = true)
+	@Aggregator(sendPartialResultsOnExpiry = true)
 	public List<?> aggregate(List<?> messages) {
 		return messages;
 	}
 
 	/**
 	 * Sends {@link StepExecutionRequest} objects to the request channel of the
-	 * {@link MessagingGateway}, and then receives the result back as a list of
+	 * {@link MessagingOperations}, and then receives the result back as a list of
 	 * {@link StepExecution} on a reply channel. Use the
 	 * {@link #aggregate(List)} method as an aggregator of the individual remote
 	 * replies. The receive timeout needs to be set realistically in the
-	 * {@link MessagingGateway} <b>and</b> the aggregator, so that there is a
+	 * {@link MessagingOperations} <b>and</b> the aggregator, so that there is a
 	 * good chance of all work being done.
 	 * 
 	 * @see PartitionHandler#handle(StepExecutionSplitter, StepExecution)
@@ -123,8 +130,8 @@ public class MessageChannelPartitionHandler implements PartitionHandler {
 					.getJobExecutionId(), stepExecution.getId())));
 		}
 
-		@SuppressWarnings("unchecked")
-		Collection<StepExecution> result = (Collection<StepExecution>) messagingGateway.receive();
+		Message<Collection<StepExecution>> message = messagingGateway.receive(replyChannel);
+		Collection<StepExecution> result = message.getPayload();
 		return result;
 
 	}

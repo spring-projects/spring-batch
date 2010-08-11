@@ -33,11 +33,11 @@ import org.springframework.batch.item.support.ListItemReader;
 import org.springframework.batch.support.transaction.ResourcelessTransactionManager;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.integration.channel.PollableChannel;
-import org.springframework.integration.core.Message;
+import org.springframework.integration.Message;
+import org.springframework.integration.core.GenericMessage;
 import org.springframework.integration.core.MessageChannel;
-import org.springframework.integration.gateway.SimpleMessagingGateway;
-import org.springframework.integration.message.GenericMessage;
+import org.springframework.integration.core.MessagingTemplate;
+import org.springframework.integration.core.PollableChannel;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.util.StringUtils;
@@ -73,12 +73,12 @@ public class ChunkMessageItemWriterIntegrationTests {
 		factory.setItemWriter(writer);
 		factory.setCommitInterval(4);
 
-		SimpleMessagingGateway gateway = new SimpleMessagingGateway();
-		writer.setMessagingGateway(gateway);
+		MessagingTemplate gateway = new MessagingTemplate();
+		writer.setMessagingOperations(gateway);
 
-		gateway.setRequestChannel(requests);
-		gateway.setReplyChannel(replies);
-		gateway.setReplyTimeout(100);
+		gateway.setDefaultChannel(requests);
+		writer.setReplyChannel(replies);
+		gateway.setReceiveTimeout(100);
 
 		TestItemWriter.count = 0;
 
