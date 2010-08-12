@@ -6,7 +6,6 @@ import java.io.File;
 import java.util.Collections;
 
 import org.junit.BeforeClass;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.batch.core.BatchStatus;
@@ -24,7 +23,6 @@ import org.springframework.util.FileSystemUtils;
 
 @ContextConfiguration
 @RunWith(SpringJUnit4ClassRunner.class)
-@Ignore // TODO: work out why this breaks with SI 2.0
 public class RemoteChunkFaultTolerantStepJmsIntegrationTests {
 	
 	@BeforeClass
