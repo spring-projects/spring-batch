@@ -12,6 +12,7 @@ import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.integration.Message;
 import org.springframework.integration.annotation.Aggregator;
 import org.springframework.integration.annotation.MessageEndpoint;
+import org.springframework.integration.annotation.Payloads;
 import org.springframework.integration.core.MessageBuilder;
 import org.springframework.integration.core.MessageChannel;
 import org.springframework.integration.core.MessagingOperations;
@@ -105,7 +106,7 @@ public class MessageChannelPartitionHandler implements PartitionHandler {
 	 * @return the list as it was passed in
 	 */
 	@Aggregator(sendPartialResultsOnExpiry = true)
-	public List<?> aggregate(List<?> messages) {
+	public List<?> aggregate(@Payloads List<?> messages) {
 		return messages;
 	}
 

@@ -4,6 +4,7 @@ import static org.junit.Assert.assertEquals;
 
 import java.util.Collections;
 
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.batch.core.BatchStatus;
@@ -15,6 +16,8 @@ import org.springframework.batch.core.JobParametersBuilder;
 import org.springframework.batch.core.StepExecution;
 import org.springframework.batch.core.launch.JobLauncher;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.integration.Message;
+import org.springframework.integration.core.PollableChannel;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
@@ -27,6 +30,18 @@ public class RemoteChunkFaultTolerantStepIntegrationTests {
 
 	@Autowired
 	private Job job;
+	
+	@Autowired
+	private PollableChannel replies;
+	
+	@Before
+	public void drain() {
+		Message<?> message = replies.receive(100L);
+		while (message!=null) {
+			// System.err.println(message);
+			message = replies.receive(100L);
+		}
+	}
 
 	@Test
 	public void testFailedStep() throws Exception {

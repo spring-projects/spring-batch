@@ -44,6 +44,7 @@
 	<bean id="chunkWriter" class="org.springframework.batch.integration.chunk.ChunkMessageChannelItemWriter" scope="step">
 		<property name="messagingOperations" ref="messagingGateway" />
 		<property name="replyChannel" ref="replies" />
+		<property name="maxWaitTimeouts" value="10" />
 	</bean>
 
 	<bean id="messagingGateway" class="org.springframework.integration.core.MessagingTemplate">
@@ -63,7 +64,9 @@
 
 	<integration:channel id="requests" />
 	<!-- If we use a direct channel for requests then the replies can come in on a thread-local -->
-	<integration:channel id="replies" scope="thread"><integration:queue/></integration:channel>
+	<integration:channel id="replies" scope="thread">
+		<integration:queue />
+	</integration:channel>
 	<integration:service-activator input-channel="requests" output-channel="replies" ref="chunkHandler" />
 
 	<bean id="chunkHandler" class="org.springframework.batch.integration.chunk.RemoteChunkHandlerFactoryBean">
@@ -86,7 +89,13 @@
 			<bean class="org.springframework.batch.retry.support.RetryTemplate">
 				<property name="retryPolicy">
 					<bean class="org.springframework.batch.retry.policy.SimpleRetryPolicy">
-						<property name="maxAttempts" value="10" />
+						<constructor-arg value="10" />
+						<constructor-arg>
+							<map>
+								<entry key="java.lang.Exception" value="true" />
+								<entry key="java.lang.Error" value="true" />
+							</map>
+						</constructor-arg>
 					</bean>
 				</property>
 			</bean>

@@ -59,7 +59,7 @@ public class JobLaunchingMessageHandlerIntegrationTests {
 		}
 		catch (MessagingException e) {
 			String message = e.getMessage();
-			assertTrue("Wrong message: " + message, message.contains("reply channel"));
+			assertTrue("Wrong message: " + message, message.contains("replyChannel"));
 		}
 		Message<JobExecution> executionMessage = (Message<JobExecution>) responseChannel.receive(1000);
 
