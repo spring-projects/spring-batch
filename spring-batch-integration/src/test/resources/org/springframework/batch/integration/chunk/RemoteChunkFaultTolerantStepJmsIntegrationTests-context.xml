@@ -46,6 +46,7 @@
 	<bean id="chunkWriter" class="org.springframework.batch.integration.chunk.ChunkMessageChannelItemWriter" scope="step">
 		<property name="messagingOperations" ref="messagingGateway" />
 		<property name="replyChannel" ref="replies" />
+		<property name="maxWaitTimeouts" value="10" />
 	</bean>
 
 	<bean id="messagingGateway" class="org.springframework.integration.core.MessagingTemplate">
@@ -94,24 +95,24 @@
 		</integration:interceptors>
 	</integration:channel>
 
-		<jms:listener-container connection-factory="connectionFactory" transaction-manager="transactionManager"
-			acknowledge="transacted">
-			<jms:listener destination="requests" response-destination="replies" ref="chunkHandler" method="handleChunk" />
-		</jms:listener-container>
+	<jms:listener-container connection-factory="connectionFactory" transaction-manager="transactionManager"
+		acknowledge="transacted">
+		<jms:listener destination="requests" response-destination="replies" ref="chunkHandler" method="handleChunk" />
+	</jms:listener-container>
 
-		<bean id="chunkHandler" class="org.springframework.batch.integration.chunk.RemoteChunkHandlerFactoryBean">
-			<property name="chunkWriter" ref="chunkWriter" />
-			<property name="step" ref="step" />
-		</bean>
+	<bean id="chunkHandler" class="org.springframework.batch.integration.chunk.RemoteChunkHandlerFactoryBean">
+		<property name="chunkWriter" ref="chunkWriter" />
+		<property name="step" ref="step" />
+	</bean>
 
-		<bean id="transactionManager" class="org.springframework.batch.support.transaction.ResourcelessTransactionManager" />
+	<bean id="transactionManager" class="org.springframework.batch.support.transaction.ResourcelessTransactionManager" />
 
-		<bean id="jobRepository" class="org.springframework.batch.core.repository.support.MapJobRepositoryFactoryBean">
-			<property name="transactionManager" ref="transactionManager" />
-		</bean>
+	<bean id="jobRepository" class="org.springframework.batch.core.repository.support.MapJobRepositoryFactoryBean">
+		<property name="transactionManager" ref="transactionManager" />
+	</bean>
 
-		<bean id="jobLauncher" class="org.springframework.batch.core.launch.support.SimpleJobLauncher">
-			<property name="jobRepository" ref="jobRepository" />
-		</bean>
+	<bean id="jobLauncher" class="org.springframework.batch.core.launch.support.SimpleJobLauncher">
+		<property name="jobRepository" ref="jobRepository" />
+	</bean>
 
 </beans>
