@@ -39,11 +39,24 @@ public class HippyMethodInvokerTests {
 		assertEquals("2.0.foo", adapter.getMessage(2, "foo"));
 	}
 	
+	@Test
+	public void testTwoArgsOfSameTypeWithInexactMatch() throws Exception {
+		HippyMethodInvoker invoker = new HippyMethodInvoker();
+		invoker.setTargetMethod("duplicate");
+		invoker.setTargetObject(new PlainPojo());
+		invoker.setArguments(new Object[] {"2", "foo"});
+		invoker.prepare();
+		assertEquals("foo.2", invoker.invoke());
+	}
+	
 	public static class PlainPojo {
 		public String handle(double value, String input) {
 			return value+"."+input;
 		}
 		public String disorder(String input, double value) {
+			return value+"."+input;
+		}
+		public String duplicate(String input, Object value) {
 			return value+"."+input;
 		}
 		public String missing(String input) {

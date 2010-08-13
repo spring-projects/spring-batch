@@ -54,11 +54,11 @@ public class HippyMethodInvoker extends MethodInvoker {
 				for (int j = 0; j < arguments.length; j++) {
 					for (int k = 0; k < paramTypes.length; k++) {
 						// Pick the first assignable of the right type that
-						// matches this slot...
-						if (ClassUtils.isAssignableValue(paramTypes[k], arguments[j])
-								&& candidateArguments[k] == null) {
+						// matches this slot and hasn't already been filled...
+						if (ClassUtils.isAssignableValue(paramTypes[k], arguments[j]) && candidateArguments[k] == null) {
 							candidateArguments[k] = arguments[j];
 							assignedParameterCount++;
+							break;
 						}
 					}
 				}
@@ -73,9 +73,9 @@ public class HippyMethodInvoker extends MethodInvoker {
 				}
 			}
 		}
-		
-		if (transformedArguments==null) {
-			throw new IllegalArgumentException("No matching arguments found for method: "+targetMethod);
+
+		if (transformedArguments == null) {
+			throw new IllegalArgumentException("No matching arguments found for method: " + targetMethod);
 		}
 
 		if (transformedArgumentCount < transformedArguments.length) {
