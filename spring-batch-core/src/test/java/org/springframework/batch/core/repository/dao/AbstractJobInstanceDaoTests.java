@@ -15,10 +15,9 @@ import org.junit.Test;
 import org.springframework.batch.core.JobInstance;
 import org.springframework.batch.core.JobParameters;
 import org.springframework.batch.core.JobParametersBuilder;
-import org.springframework.test.context.junit4.AbstractTransactionalJUnit4SpringContextTests;
 import org.springframework.transaction.annotation.Transactional;
 
-public abstract class AbstractJobInstanceDaoTests extends AbstractTransactionalJUnit4SpringContextTests {
+public abstract class AbstractJobInstanceDaoTests {
 
 	private static final long DATE = 777;
 

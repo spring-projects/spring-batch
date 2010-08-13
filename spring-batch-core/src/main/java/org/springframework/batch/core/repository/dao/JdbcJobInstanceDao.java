@@ -132,7 +132,9 @@ public class JdbcJobInstanceDao extends AbstractJdbcBatchMetadataDao implements
 		List<String> keys = new ArrayList<String>(props.keySet());
 		Collections.sort(keys);
 		for (String key : keys) {
-			stringBuffer.append(key + "=" + props.get(key).toString() + ";");
+			JobParameter jobParameter = props.get(key);
+			String value = jobParameter.getValue()==null ? "" : jobParameter.toString();
+			stringBuffer.append(key + "=" + value + ";");
 		}
 
 		MessageDigest digest;
