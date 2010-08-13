@@ -52,7 +52,7 @@
 <setting id="org.eclipse.jdt.core.formatter.comment.indent_root_tags" value="false"/>
 <setting id="org.eclipse.jdt.core.formatter.comment.insert_new_line_before_root_tags" value="do not insert"/>
 <setting id="org.eclipse.jdt.core.formatter.comment.insert_new_line_for_parameter" value="do not insert"/>
-<setting id="org.eclipse.jdt.core.formatter.comment.line_length" value="80"/>
+<setting id="org.eclipse.jdt.core.formatter.comment.line_length" value="120"/>
 <setting id="org.eclipse.jdt.core.formatter.compact_else_if" value="true"/>
 <setting id="org.eclipse.jdt.core.formatter.continuation_indentation" value="2"/>
 <setting id="org.eclipse.jdt.core.formatter.continuation_indentation_for_array_initializer" value="2"/>
