@@ -43,6 +43,8 @@ import org.springframework.beans.propertyeditors.PropertiesEditor;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 import org.springframework.context.support.StaticApplicationContext;
+import org.springframework.core.SpringVersion;
+import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.validation.BindException;
 import org.springframework.validation.DataBinder;
 
@@ -291,13 +293,11 @@ public class BeanWrapperFieldSetMapperTests {
 		assertEquals('C', result.getVarChar());
 	}
 
-	// BeanWrapperFieldSetMapper doesn't currently support nesting with
-	// collections.
 	@Test
 	public void testNestedList() throws Exception {
 
 		TestNestedList nestedList = new TestNestedList();
-		List<Object> nestedC = new ArrayList<Object>();
+		List<TestNestedC> nestedC = new ArrayList<TestNestedC>();
 		nestedC.add(new TestNestedC());
 		nestedC.add(new TestNestedC());
 		nestedC.add(new TestNestedC());
@@ -314,9 +314,42 @@ public class BeanWrapperFieldSetMapperTests {
 
 		mapper.mapFieldSet(fieldSet);
 
-		assertEquals(1, ((TestNestedC) nestedList.getNestedC().get(0)).getValue());
-		assertEquals(2, ((TestNestedC) nestedList.getNestedC().get(1)).getValue());
-		assertEquals(3, ((TestNestedC) nestedList.getNestedC().get(2)).getValue());
+		assertEquals(1, nestedList.getNestedC().get(0).getValue());
+		assertEquals(2, nestedList.getNestedC().get(1).getValue());
+		assertEquals(3, nestedList.getNestedC().get(2).getValue());
+
+	}
+
+	@Test
+	public void testAutoPopulateNestedList() throws Exception {
+
+		if (SpringVersion.getVersion().compareTo("3") < 0) {
+			// Spring < 3.0 does not support auto grow collections
+			return;
+		}
+
+		TestNestedList nestedList = new TestNestedList();
+
+		BeanWrapperFieldSetMapper<?> mapper = new BeanWrapperFieldSetMapper<Object>() {
+			@Override
+			protected void initBinder(DataBinder binder) {
+				// Use reflection so it compiles (and fails) with Spring 2.5
+				ReflectionTestUtils.setField(binder, "autoGrowNestedPaths", true);
+			}
+		};
+		StaticApplicationContext context = new StaticApplicationContext();
+		mapper.setBeanFactory(context);
+		context.getBeanFactory().registerSingleton("bean", nestedList);
+		mapper.setPrototypeBeanName("bean");
+
+		FieldSet fieldSet = new DefaultFieldSet(new String[] { "1", "2", "3" }, new String[] { "NestedC[0].Value",
+				"NestedC[1].Value", "NestedC[2].Value" });
+
+		mapper.mapFieldSet(fieldSet);
+
+		assertEquals(1, nestedList.getNestedC().get(0).getValue());
+		assertEquals(2, nestedList.getNestedC().get(1).getValue());
+		assertEquals(3, nestedList.getNestedC().get(2).getValue());
 
 	}
 
@@ -476,13 +509,13 @@ public class BeanWrapperFieldSetMapperTests {
 
 	private static class TestNestedList {
 
-		List<Object> nestedC;
+		List<TestNestedC> nestedC = new ArrayList<TestNestedC>();
 
-		public List<Object> getNestedC() {
+		public List<TestNestedC> getNestedC() {
 			return nestedC;
 		}
 
-		public void setNestedC(List<Object> nestedC) {
+		public void setNestedC(List<TestNestedC> nestedC) {
 			this.nestedC = nestedC;
 		}
 
@@ -544,8 +577,7 @@ public class BeanWrapperFieldSetMapperTests {
 
 	}
 
-	@SuppressWarnings("unused")
-	private static class TestNestedC {
+	public static class TestNestedC {
 		private int value;
 
 		public int getValue() {
