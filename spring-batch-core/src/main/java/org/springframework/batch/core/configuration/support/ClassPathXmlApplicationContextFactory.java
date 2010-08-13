@@ -245,6 +245,11 @@ public class ClassPathXmlApplicationContextFactory implements ApplicationContext
 		protected Resource[] getConfigResources() {
 			return new Resource[] { resource };
 		}
+		
+		@Override
+		public String toString() {
+			return "ResourceXmlApplicationContext:"+getId();
+		}
 
 	}
 
