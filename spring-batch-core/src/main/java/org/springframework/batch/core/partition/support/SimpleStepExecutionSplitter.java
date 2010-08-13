@@ -16,6 +16,8 @@
 
 package org.springframework.batch.core.partition.support;
 
+import java.util.Collection;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
@@ -189,7 +191,23 @@ public class SimpleStepExecutionSplitter implements StepExecutionSplitter, Initi
 			result = partitioner.partition(splitSize);
 		}
 		else {
-			result = new SimplePartitioner().partition(splitSize);
+			/*
+			 * We need to return the same keys as the original (failed)
+			 * execution, but the execution contexts will be discarded so they
+			 * can be empty.
+			 */
+			if (partitioner instanceof PartitionNameProvider) {
+				result = new HashMap<String, ExecutionContext>();
+				Collection<String> names = ((PartitionNameProvider) partitioner).getPartitionNames(splitSize);
+				for (String name : names) {
+					result.put(name, new ExecutionContext());
+				}
+			}
+			else {
+				// If no names are provided, assume they follow the default
+				// pattern.
+				result = new SimplePartitioner().partition(splitSize);
+			}
 		}
 
 		return result;
@@ -245,9 +263,13 @@ public class SimpleStepExecutionSplitter implements StepExecutionSplitter, Initi
 			return true;
 		}
 
-		if (stepStatus == BatchStatus.STARTED || stepStatus == BatchStatus.STARTING || stepStatus == BatchStatus.STOPPING) {
-			throw new JobExecutionException("Cannot restart step from " + stepStatus + " status.  "
-					+ "The old execution may still be executing, so you may need to verify manually that this is the case.");
+		if (stepStatus == BatchStatus.STARTED || stepStatus == BatchStatus.STARTING
+				|| stepStatus == BatchStatus.STOPPING) {
+			throw new JobExecutionException(
+					"Cannot restart step from "
+							+ stepStatus
+							+ " status.  "
+							+ "The old execution may still be executing, so you may need to verify manually that this is the case.");
 		}
 
 		throw new JobExecutionException("Cannot restart step from " + stepStatus + " status.  "

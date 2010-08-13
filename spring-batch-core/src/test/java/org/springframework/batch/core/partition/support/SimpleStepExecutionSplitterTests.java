@@ -4,6 +4,8 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
 import java.util.Map;
@@ -69,6 +71,26 @@ public class SimpleStepExecutionSplitterTests {
 		assertEquals(2, split.size());
 		stepExecution = update(split, stepExecution, BatchStatus.FAILED);
 		assertEquals(2, provider.split(stepExecution, 3).size());
+	}
+
+	@Test
+	public void testRememberPartitionNames() throws Exception {
+		class CustomPartitioner implements Partitioner, PartitionNameProvider {
+			public Map<String, ExecutionContext> partition(int gridSize) {
+				return Collections.singletonMap("foo", new ExecutionContext());
+			}
+			public Collection<String> getPartitionNames(int gridSize) {
+				return Arrays.asList("foo");
+			}
+		}
+		SimpleStepExecutionSplitter provider = new SimpleStepExecutionSplitter(jobRepository, step,
+				new CustomPartitioner());
+		Set<StepExecution> split = provider.split(stepExecution, 2);
+		assertEquals(1, split.size());
+		assertEquals("step:foo", split.iterator().next().getStepName());
+		stepExecution = update(split, stepExecution, BatchStatus.FAILED);
+		split = provider.split(stepExecution, 2);
+		assertEquals("step:foo", split.iterator().next().getStepName());
 	}
 
 	@Test

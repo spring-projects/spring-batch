@@ -19,7 +19,9 @@ import static org.junit.Assert.assertEquals;
 
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Date;
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -100,6 +102,53 @@ public class PartitionStepTests {
 		// one master and two workers
 		assertEquals(3, stepExecution.getJobExecution().getStepExecutions().size());
 		assertEquals(BatchStatus.FAILED, stepExecution.getStatus());
+	}
+
+	@Test
+	public void testRestartStepExecution() throws Exception {
+		final AtomicBoolean started = new AtomicBoolean(false);
+		step.setStepExecutionSplitter(new SimpleStepExecutionSplitter(jobRepository, remote, new SimplePartitioner()));
+		step.setPartitionHandler(new PartitionHandler() {
+			public Collection<StepExecution> handle(StepExecutionSplitter stepSplitter, StepExecution stepExecution)
+					throws Exception {
+				Set<StepExecution> executions = stepSplitter.split(stepExecution, 2);
+				if (!started.get()) {
+					started.set(true);
+					for (StepExecution execution : executions) {
+						execution.setStatus(BatchStatus.FAILED);
+						execution.setExitStatus(ExitStatus.FAILED);
+						execution.getExecutionContext().putString("foo", execution.getStepName());
+					}
+				}
+				else {
+					for (StepExecution execution : executions) {
+						// On restart the execution context should have been restored
+						assertEquals(execution.getStepName(), execution.getExecutionContext().getString("foo"));
+					}
+				}
+				for (StepExecution execution : executions) {
+					jobRepository.update(execution);
+					jobRepository.updateExecutionContext(execution);
+				}
+				return executions;
+			}
+		});
+		step.afterPropertiesSet();
+		JobExecution jobExecution = jobRepository.createJobExecution("vanillaJob", new JobParameters());
+		StepExecution stepExecution = jobExecution.createStepExecution("foo");
+		jobRepository.add(stepExecution);
+		step.execute(stepExecution);
+		jobExecution.setStatus(BatchStatus.FAILED);
+		jobExecution.setEndTime(new Date());
+		jobRepository.update(jobExecution);
+		// Now restart...
+		jobExecution = jobRepository.createJobExecution("vanillaJob", new JobParameters());
+		stepExecution = jobExecution.createStepExecution("foo");
+		jobRepository.add(stepExecution);
+		step.execute(stepExecution);
+		// one master and two workers
+		assertEquals(3, stepExecution.getJobExecution().getStepExecutions().size());
+		assertEquals(BatchStatus.COMPLETED, stepExecution.getStatus());
 	}
 
 	@Test
