@@ -60,6 +60,30 @@ public class DirectPollerTests {
 	}
 
 	@Test
+	public void testTimeUnit() throws Exception {
+
+		Callable<String> callback = new Callable<String>() {
+
+			public String call() throws Exception {
+				Set<String> executions = new HashSet<String>(repository);
+				if (executions.isEmpty()) {
+					return null;
+				}
+				return executions.iterator().next();
+			}
+
+		};
+
+		sleepAndCreateStringInBackground(500L);
+
+		Future<String> task = new DirectPoller<String>(100L).poll(callback);
+
+		String value = task.get(1L, TimeUnit.SECONDS);
+		assertEquals("foo", value);
+
+	}
+
+	@Test
 	public void testWithError() throws Exception {
 
 		Callable<String> callback = new Callable<String>() {

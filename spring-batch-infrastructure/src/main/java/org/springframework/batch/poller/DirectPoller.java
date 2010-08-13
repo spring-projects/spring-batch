@@ -92,11 +92,12 @@ public class DirectPoller<S> implements Poller<S> {
 
 			Long nextExecutionTime = startTime + interval;
 			long currentTimeMillis = System.currentTimeMillis();
+			long timeoutMillis = TimeUnit.MILLISECONDS.convert(timeout, unit);
 
 			while (result == null && !cancelled) {
 
 				long delta = nextExecutionTime - startTime;
-				if (delta >= timeout && timeout > 0) {
+				if (delta >= timeoutMillis && timeoutMillis > 0) {
 					throw new TimeoutException("Timed out waiting for task to return non-null result");
 				}
 
