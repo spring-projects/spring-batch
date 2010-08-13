@@ -191,22 +191,21 @@ public class SimpleStepExecutionSplitter implements StepExecutionSplitter, Initi
 			result = partitioner.partition(splitSize);
 		}
 		else {
-			/*
-			 * We need to return the same keys as the original (failed)
-			 * execution, but the execution contexts will be discarded so they
-			 * can be empty.
-			 */
 			if (partitioner instanceof PartitionNameProvider) {
 				result = new HashMap<String, ExecutionContext>();
 				Collection<String> names = ((PartitionNameProvider) partitioner).getPartitionNames(splitSize);
 				for (String name : names) {
+					/*
+					 * We need to return the same keys as the original (failed)
+					 * execution, but the execution contexts will be discarded
+					 * so they can be empty.
+					 */
 					result.put(name, new ExecutionContext());
 				}
 			}
 			else {
-				// If no names are provided, assume they follow the default
-				// pattern.
-				result = new SimplePartitioner().partition(splitSize);
+				// If no names are provided, grab the partition again.
+				result = partitioner.partition(splitSize);
 			}
 		}
 
