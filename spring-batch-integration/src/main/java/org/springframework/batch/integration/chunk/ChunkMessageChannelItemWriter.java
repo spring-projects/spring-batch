@@ -133,13 +133,22 @@ public class ChunkMessageChannelItemWriter<T> extends StepExecutionListenerSuppo
 			return ExitStatus.FAILED.addExitDescription(e.getClass().getName() + ": " + e.getMessage());
 		}
 		finally {
+
+			if (logger.isDebugEnabled()) {
+				logger.debug("Finished waiting for results in step listener.  Still expecting: " + localState.getExpecting());
+			}
+
 			for (StepContribution contribution : getStepContributions()) {
+				if (logger.isDebugEnabled()) {
+					logger.debug("Applying:" + contribution);
+				}
 				stepExecution.apply(contribution);
 			}
 		}
 		if (timedOut) {
 			stepExecution.setStatus(BatchStatus.FAILED);
-			throw new ItemStreamException("Timed out waiting for back log at end of step");
+			return ExitStatus.FAILED.addExitDescription("Timed out waiting for " + localState.getExpecting()
+					+ " backlog at end of step");
 		}
 		return ExitStatus.COMPLETED.addExitDescription("Waited for " + expecting + " results.");
 	}
