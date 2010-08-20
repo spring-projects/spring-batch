@@ -180,7 +180,7 @@ public class RemoteChunkHandlerFactoryBean<T> implements FactoryBean<ChunkHandle
 	}
 
 	/**
-	 * Update a StepContribution with all the data from a StepContributionSource. The filter and write conuts plus the
+	 * Update a StepContribution with all the data from a StepContributionSource. The filter and write counts plus the
 	 * exit status will be updated to reflect the data in the source.
 	 * 
 	 * @param contribution the current contribution

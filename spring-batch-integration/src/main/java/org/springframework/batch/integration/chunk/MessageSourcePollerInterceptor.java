@@ -42,7 +42,7 @@ public class MessageSourcePollerInterceptor extends ChannelInterceptorAdapter im
 	}
 
 	/**
-	 * Optional MessageChannel for injecting the message receieved from the source (defaults to the channel intercepted
+	 * Optional MessageChannel for injecting the message received from the source (defaults to the channel intercepted
 	 * in {@link #preReceive(MessageChannel)}).
 	 * 
 	 * @param channel the channel to set
