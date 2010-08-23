@@ -20,7 +20,7 @@ import org.springframework.test.context.junit4.AbstractJUnit4SpringContextTests;
 @ContextConfiguration(locations = { "/job-execution-context.xml" })
 public class JobLaunchingMessageHandlerTests extends AbstractJUnit4SpringContextTests {
 	
-	JobLaunchingMessageHandler messageHandler;
+	JobLaunchRequestHandler messageHandler;
 
 	StubJobLauncher jobLauncher;
 

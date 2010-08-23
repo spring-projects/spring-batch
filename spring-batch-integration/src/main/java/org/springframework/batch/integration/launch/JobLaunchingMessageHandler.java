@@ -31,7 +31,7 @@ import org.springframework.integration.annotation.ServiceActivator;
  * @author Dave Syer
  * 
  */
-public class JobLaunchingMessageHandler {
+public class JobLaunchingMessageHandler implements JobLaunchRequestHandler {
 
 	private final JobLauncher jobLauncher;
 
