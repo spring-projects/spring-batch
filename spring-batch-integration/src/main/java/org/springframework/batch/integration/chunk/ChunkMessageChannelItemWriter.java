@@ -64,9 +64,11 @@ public class ChunkMessageChannelItemWriter<T> extends StepExecutionListenerSuppo
 	private PollableChannel replyChannel;
 
 	/**
-	 * The maximum number of times to wait at the end of a step for a non-null result from the remote workers. This is a
-	 * multiplier on the receive timeout set separately on the gateway. The ideal value is a compromise between allowing
-	 * slow workers time to finish, and responsiveness if there is a dead worker. Defaults to 40.
+	 * The maximum number of times to wait at the end of a step for a non-null
+	 * result from the remote workers. This is a multiplier on the receive
+	 * timeout set separately on the gateway. The ideal value is a compromise
+	 * between allowing slow workers time to finish, and responsiveness if there
+	 * is a dead worker. Defaults to 40.
 	 * 
 	 * @param maxWaitTimeouts the maximum number of wait timeouts
 	 */
@@ -75,8 +77,8 @@ public class ChunkMessageChannelItemWriter<T> extends StepExecutionListenerSuppo
 	}
 
 	/**
-	 * Public setter for the throttle limit. This limits the number of pending requests for chunk processing to avoid
-	 * overwhelming the receivers.
+	 * Public setter for the throttle limit. This limits the number of pending
+	 * requests for chunk processing to avoid overwhelming the receivers.
 	 * @param throttleLimit the throttle limit to set
 	 */
 	public void setThrottleLimit(long throttleLimit) {
@@ -135,7 +137,8 @@ public class ChunkMessageChannelItemWriter<T> extends StepExecutionListenerSuppo
 		finally {
 
 			if (logger.isDebugEnabled()) {
-				logger.debug("Finished waiting for results in step listener.  Still expecting: " + localState.getExpecting());
+				logger.debug("Finished waiting for results in step listener.  Still expecting: "
+						+ localState.getExpecting());
 			}
 
 			for (StepContribution contribution : getStepContributions()) {
@@ -176,7 +179,8 @@ public class ChunkMessageChannelItemWriter<T> extends StepExecutionListenerSuppo
 	}
 
 	/**
-	 * Wait until all the results that are in the pipeline come back to the reply channel.
+	 * Wait until all the results that are in the pipeline come back to the
+	 * reply channel.
 	 * 
 	 * @return true if successfully received a result, false if timed out
 	 */
@@ -184,7 +188,7 @@ public class ChunkMessageChannelItemWriter<T> extends StepExecutionListenerSuppo
 		int count = 0;
 		int maxCount = maxWaitTimeouts;
 		Throwable failure = null;
-		logger.error("Waiting for " + localState.getExpecting() + " results");
+		logger.info("Waiting for " + localState.getExpecting() + " results");
 		while (localState.getExpecting() > 0 && count++ < maxCount) {
 			try {
 				getNextResult();
@@ -202,12 +206,14 @@ public class ChunkMessageChannelItemWriter<T> extends StepExecutionListenerSuppo
 	}
 
 	/**
-	 * Get the next result if it is available (within the timeout specified in the gateway), otherwise do nothing.
+	 * Get the next result if it is available (within the timeout specified in
+	 * the gateway), otherwise do nothing.
 	 * 
-	 * @throws AsynchronousFailureException If there is a response and it contains a failed chunk response.
+	 * @throws AsynchronousFailureException If there is a response and it
+	 * contains a failed chunk response.
 	 * 
-	 * @throws IllegalStateException if the result contains the wrong job instance id (maybe we are sharing a channel
-	 * and we shouldn't be)
+	 * @throws IllegalStateException if the result contains the wrong job
+	 * instance id (maybe we are sharing a channel and we shouldn't be)
 	 */
 	private void getNextResult() throws AsynchronousFailureException {
 		Message<ChunkResponse> message = messagingGateway.receive(replyChannel);
@@ -239,8 +245,8 @@ public class ChunkMessageChannelItemWriter<T> extends StepExecutionListenerSuppo
 	}
 
 	/**
-	 * Re-throws the original throwable if it is unchecked, wraps checked exceptions into
-	 * {@link AsynchronousFailureException}.
+	 * Re-throws the original throwable if it is unchecked, wraps checked
+	 * exceptions into {@link AsynchronousFailureException}.
 	 */
 	private static AsynchronousFailureException wrapIfNecessary(Throwable throwable) {
 		if (throwable instanceof Error) {
