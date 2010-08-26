@@ -23,6 +23,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.springframework.batch.core.BatchStatus;
 import org.springframework.batch.core.ExitStatus;
@@ -98,6 +99,7 @@ public class FlowStepTests {
 	}
 
 	@Test
+	@Ignore // http://forum.springsource.org/showthread.php?t=94050
 	public void testDoExecuteAndFail() throws Exception {
 
 		FlowStep step = new FlowStep();
