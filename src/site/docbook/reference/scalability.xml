@@ -60,11 +60,14 @@
 
     <para>The result of the above configuration will be that the Step
     executes by reading, processing and writing each chunk of items
-    (each commit interval) in a separate thread of execution.  In
-    addition to any limits placed by the task executor (e.g. if it is
-    backed by a thread pool), there is a throttle limit in the tasklet
-    which defaults to 6.  You may need to increase this to ensure that
-    a thread pool is fully utililsed, e.g.</para>
+    (each commit interval) in a separate thread of execution.  Note
+    that this means there is no fixed order for the items to be
+    processed, and a chunk might contain items that are
+    non-consecutive compared to the single-threaded case. In addition
+    to any limits placed by the task executor (e.g. if it is backed by
+    a thread pool), there is a throttle limit in the tasklet
+    configuration which defaults to 6.  You may need to increase this
+    to ensure that a thread pool is fully utilised, e.g.</para>
 
     <programlisting>&lt;step id="loading"&gt; &lt;tasklet
     task-executor="taskExecutor"
@@ -87,6 +90,21 @@
     (parallelJob) in the Spring Batch Samples that show the use of a process
     indicator (see <xref linkend="process-indicator" xreflabel="" />) to keep
     track of items that have been processed in a database input table.</para>
+
+	<para>Spring Batch provides some implementations of 
+	  <classname>ItemWriter</classname> and
+	<classname>ItemReader</classname>.  Usually they say in the
+	Javadocs if they are thread safe or not, or what you have to do to
+	avoid problems in a concurrent environment.  If there is no
+	information in Javadocs, you can check the implementation to see
+	if there is any state.  If a reader is not thread safe, it may
+	still be efficient to use it in your own synchronizing delegator.
+	You can synchronize the call to <literal>read()</literal> and as
+	long as the processing and writing is the most expensive part of
+	the chunk your step may still complete much faster than in a
+	single threaded configuration.
+</para>
+
   </section>
 
   <section id="scalabilityParallelSteps">
