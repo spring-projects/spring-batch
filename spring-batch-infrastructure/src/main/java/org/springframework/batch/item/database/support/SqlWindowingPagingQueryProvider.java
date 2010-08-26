@@ -16,6 +16,8 @@
 
 package org.springframework.batch.item.database.support;
 
+import org.springframework.util.StringUtils;
+
 /**
  * Generic Paging Query Provider using standard SQL:2003 windowing functions.
  * These features are supported by DB2, Oracle, SQL Server 2005, Sybase and
@@ -35,9 +37,18 @@ public class SqlWindowingPagingQueryProvider extends AbstractSqlPagingQueryProvi
 		sql.append(") AS ROW_NUMBER");
 		sql.append(" FROM ").append(getFromClause()).append(
 				getWhereClause() == null ? "" : " WHERE " + getWhereClause());
-		sql.append(") ").append(getSubQueryAlias()).append("WHERE ROW_NUMBER <= ").append(pageSize);
+		String alias = extractTableAlias();
+		sql.append(") ").append(getSubQueryAlias()).append("WHERE " + alias + "ROW_NUMBER <= ").append(pageSize);
 
 		return sql.toString();
+	}
+
+	private String extractTableAlias() {
+		String alias = "" + getSubQueryAlias();
+		if (StringUtils.hasText(alias) && alias.toUpperCase().startsWith("AS")) {
+			alias = alias.substring(3).trim() + ".";
+		}
+		return alias;
 	}
 
 	protected Object getSubQueryAlias() {
@@ -65,7 +76,8 @@ public class SqlWindowingPagingQueryProvider extends AbstractSqlPagingQueryProvi
 			sql.append(" < ");
 		}
 		sql.append(getSortKeyPlaceHolder());
-		sql.append(") ").append(getSubQueryAlias()).append("WHERE ROW_NUMBER <= ").append(pageSize);
+		String alias = extractTableAlias();
+		sql.append(") ").append(getSubQueryAlias()).append("WHERE " + alias + "ROW_NUMBER <= ").append(pageSize);
 
 		return sql.toString();
 	}
@@ -85,7 +97,8 @@ public class SqlWindowingPagingQueryProvider extends AbstractSqlPagingQueryProvi
 		sql.append(") AS ROW_NUMBER");
 		sql.append(" FROM ").append(getFromClause()).append(
 				getWhereClause() == null ? "" : " WHERE " + getWhereClause());
-		sql.append(") ").append(getSubQueryAlias()).append("WHERE ROW_NUMBER = ").append(lastRowNum);
+		String alias = extractTableAlias();
+		sql.append(") ").append(getSubQueryAlias()).append("WHERE " + alias + "ROW_NUMBER = ").append(lastRowNum);
 
 		return sql.toString();
 	}

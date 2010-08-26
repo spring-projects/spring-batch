@@ -1,3 +1,6 @@
 target
 bin
 integration-repo
+derby-home
+derby.log
+

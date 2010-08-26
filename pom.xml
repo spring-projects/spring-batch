@@ -492,6 +492,7 @@
 						<link>http://static.springframework.org/spring-batch/apidocs/</link>
 						<link>http://static.springframework.org/spring-ws/site/apidocs/</link>
 					</links>
+					<excludePackageNames>example</excludePackageNames>
 				</configuration>
 			</plugin>
 			<plugin>

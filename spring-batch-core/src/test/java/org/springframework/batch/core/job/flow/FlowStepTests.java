@@ -97,6 +97,39 @@ public class FlowStepTests {
 
 	}
 
+	@Test
+	public void testDoExecuteAndFail() throws Exception {
+
+		FlowStep step = new FlowStep();
+		step.setJobRepository(jobRepository);
+
+		SimpleFlow flow = new SimpleFlow("job");
+		List<StateTransition> transitions = new ArrayList<StateTransition>();
+		transitions.add(StateTransition.createStateTransition(new StepState(new StubStep("step1")), "step2"));
+		StepState step2 = new StepState(new StubStep("step2", true));
+		transitions.add(StateTransition.createStateTransition(step2, ExitStatus.FAILED.getExitCode(), "end0"));
+		transitions.add(StateTransition.createStateTransition(step2, ExitStatus.COMPLETED.getExitCode(), "end1"));
+		transitions.add(StateTransition.createEndStateTransition(new EndState(FlowExecutionStatus.FAILED, "end0")));
+		transitions.add(StateTransition.createEndStateTransition(new EndState(FlowExecutionStatus.COMPLETED, "end1")));
+		flow.setStateTransitions(transitions);
+
+		step.setFlow(flow);
+		step.afterPropertiesSet();
+
+		StepExecution stepExecution = jobExecution.createStepExecution("step");
+		jobRepository.add(stepExecution);
+		step.execute(stepExecution);
+
+		stepExecution = getStepExecution(jobExecution, "step1`");
+		assertEquals(ExitStatus.COMPLETED, stepExecution.getExitStatus());
+		stepExecution = getStepExecution(jobExecution, "step2");
+		assertEquals(ExitStatus.FAILED, stepExecution.getExitStatus());
+		stepExecution = getStepExecution(jobExecution, "step");
+		assertEquals(ExitStatus.FAILED, stepExecution.getExitStatus());
+		assertEquals(3, jobExecution.getStepExecutions().size());
+
+	}
+
 	/**
 	 * Test method for {@link org.springframework.batch.core.job.flow.FlowStep#doExecute(org.springframework.batch.core.StepExecution)}.
 	 */
@@ -134,13 +167,26 @@ public class FlowStepTests {
 	 */
 	private class StubStep extends StepSupport {
 
+		private final boolean fail;
+
 		private StubStep(String name) {
+			this(name, false);
+		}
+
+		private StubStep(String name, boolean fail) {
 			super(name);
+			this.fail = fail;
 		}
 
 		public void execute(StepExecution stepExecution) throws JobInterruptedException {
-			stepExecution.setStatus(BatchStatus.COMPLETED);
-			stepExecution.setExitStatus(ExitStatus.COMPLETED);
+			BatchStatus status = BatchStatus.COMPLETED;
+			ExitStatus exitStatus = ExitStatus.COMPLETED;
+			if (fail) {
+				status = BatchStatus.FAILED;
+				exitStatus = ExitStatus.FAILED;
+			}
+			stepExecution.setStatus(status);
+			stepExecution.setExitStatus(exitStatus);
 			jobRepository.update(stepExecution);
 		}
 
