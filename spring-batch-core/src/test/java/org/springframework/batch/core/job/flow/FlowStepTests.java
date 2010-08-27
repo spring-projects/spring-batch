@@ -23,7 +23,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.springframework.batch.core.BatchStatus;
 import org.springframework.batch.core.ExitStatus;
@@ -98,8 +97,8 @@ public class FlowStepTests {
 
 	}
 
+	// BATCH-1620
 	@Test
-	@Ignore // http://forum.springsource.org/showthread.php?t=94050
 	public void testDoExecuteAndFail() throws Exception {
 
 		FlowStep step = new FlowStep();
@@ -122,7 +121,7 @@ public class FlowStepTests {
 		jobRepository.add(stepExecution);
 		step.execute(stepExecution);
 
-		stepExecution = getStepExecution(jobExecution, "step1`");
+		stepExecution = getStepExecution(jobExecution, "step1");
 		assertEquals(ExitStatus.COMPLETED, stepExecution.getExitStatus());
 		stepExecution = getStepExecution(jobExecution, "step2");
 		assertEquals(ExitStatus.FAILED, stepExecution.getExitStatus());
