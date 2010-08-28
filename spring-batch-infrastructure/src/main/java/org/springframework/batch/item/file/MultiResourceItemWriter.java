@@ -72,6 +72,10 @@ public class MultiResourceItemWriter<T> extends ExecutionContextUserSupport impl
 
 	public void write(List<? extends T> items) throws Exception {
 		if (!opened) {
+			File file = setResourceToDelegate();
+			// create only if write is called
+			file.createNewFile();
+			Assert.state(file.canWrite(), "Output resource " + file.getAbsolutePath() + " must be writable");
 			delegate.open(new ExecutionContext());
 			opened = true;
 		}
@@ -164,11 +168,10 @@ public class MultiResourceItemWriter<T> extends ExecutionContextUserSupport impl
 	/**
 	 * Create output resource (if necessary) and point the delegate to it.
 	 */
-	private void setResourceToDelegate() throws IOException {
+	private File setResourceToDelegate() throws IOException {
 		String path = resource.getFile().getAbsolutePath() + suffixCreator.getSuffix(resourceIndex);
 		File file = new File(path);
-		file.createNewFile();
-		Assert.state(file.canWrite(), "Output resource " + path + " must be writable");
 		delegate.setResource(new FileSystemResource(file));
+		return file;
 	}
 }
