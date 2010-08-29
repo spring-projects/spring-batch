@@ -246,11 +246,17 @@ catch (JobRestartException e) {
     transaction-manager="transactionManager"
     isolation-level-for-create="SERIALIZABLE"
     table-prefix="BATCH_"
+	max-varchar-length="1000"
 /&gt;</programlisting>
 
     <para>None of the configuration options listed above are required except
     the id. If they are not set, the defaults shown above will be used. They
-    are shown above for awareness purposes.</para>
+    are shown above for awareness purposes.  The <literal>max-varchar-length</literal> defaults to 2500, which is the length of the long 
+	<literal>VARCHAR</literal> 
+	columns in the <link
+    linkend="metaDataSchemaOverview">sample schema scripts</link></para> used
+	to store things like exit code descriptions.  If you don't modify the schema
+	and you don't use multi-bye characters you shouldn't need to change it.
 
     <section id="txConfigForJobRepository">
       <title>Transaction Configuration for the JobRepository</title>

@@ -40,13 +40,14 @@
     <section id="exampleDDLScripts">
       <title>Example DDL Scripts</title>
 
-      <para>The root of the Spring Batch Core JAR file contains example
+      <para>The Spring Batch Core JAR file contains example
       scripts to create the relational tables for a number of database
       platforms (which are in turn auto-detected by the job repository factory
       bean or namespace equivalent). These scripts can be used as is, or
       modified with additional indexes and constraints as desired. The file
       names are in the form <literal>schema-*.sql</literal>, where "*" is the
-      short name of the target database platform.</para>
+      short name of the target database platform.  The scripts are in
+	  the package <literal>org.springframework.batch.core</literal>.</para>
     </section>
 
     <section id="metaDataVersion">
@@ -549,6 +550,20 @@ INSERT INTO BATCH_JOB_SEQ values(0);</programlisting>
         point if run again.</para>
       </listitem>
     </itemizedlist>
+  </section>
+
+  <section id="multiByteCharacters">
+    <title>International and Multi-byte Characters</title>
+
+    <para>If you are using multi-byte character sets (e.g. Chines or Cyrillic)
+	  in your business processing, then those characters might need to be
+	  persisted in the Spring Batch schema.  Many users find that 
+	  simply changing the schema to double the length of the <literal>VARCHAR</literal> 
+	  columns is enough.  Others prefer to configure the <link
+    linkend="configuringJobRepository"><classname>JobRepository</classname></link> with <literal>max-varchar-length</literal> half the value of the <literal>VARCHAR</literal> column length is enough.  Some users have also reported that
+	they use <literal>NVARCHAR</literal> in place of <literal>VARCHAR</literal>
+	in their schema definitions.  The best result will depend on the database
+	platform and the way the database server has been configured locally.</para>
   </section>
 
   <section id="recommendationsForIndexingMetaDataTables">
