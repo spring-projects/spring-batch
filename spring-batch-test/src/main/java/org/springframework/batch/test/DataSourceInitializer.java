@@ -64,7 +64,7 @@ public class DataSourceInitializer implements InitializingBean, DisposableBean {
 
 	private boolean ignoreFailedDrop = true;
 
-	private static boolean initialized = false;
+	private boolean initialized = false;
 
 	/**
 	 * Main method as convenient entry point.
