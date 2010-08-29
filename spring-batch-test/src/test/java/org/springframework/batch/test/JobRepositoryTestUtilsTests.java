@@ -17,6 +17,8 @@ package org.springframework.batch.test;
 
 import static org.junit.Assert.assertEquals;
 
+import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import javax.sql.DataSource;
@@ -87,6 +89,21 @@ public class JobRepositoryTestUtilsTests {
 		utils.removeJobExecutions(list);
 		assertEquals(beforeJobs, SimpleJdbcTestUtils.countRowsInTable(jdbcTemplate, "BATCH_JOB_EXECUTION"));
 		assertEquals(beforeSteps, SimpleJdbcTestUtils.countRowsInTable(jdbcTemplate, "BATCH_STEP_EXECUTION"));
+	}
+
+	@Test
+	public void testRemoveJobExecutionsWithSameJobInstance() throws Exception {
+		utils = new JobRepositoryTestUtils(jobRepository, dataSource);
+		List<JobExecution> list = new ArrayList<JobExecution>();
+		JobExecution jobExecution = jobRepository.createJobExecution("job", new JobParameters());
+		jobExecution.setEndTime(new Date());
+		list.add(jobExecution);
+		jobRepository.update(jobExecution);
+		jobExecution = jobRepository.createJobExecution("job", new JobParameters());
+		list.add(jobExecution);
+		assertEquals(beforeJobs + 2, SimpleJdbcTestUtils.countRowsInTable(jdbcTemplate, "BATCH_JOB_EXECUTION"));
+		utils.removeJobExecutions(list);
+		assertEquals(beforeJobs, SimpleJdbcTestUtils.countRowsInTable(jdbcTemplate, "BATCH_JOB_EXECUTION"));
 	}
 
 	@Test

@@ -179,6 +179,8 @@ public class JobRepositoryTestUtils extends AbstractJdbcBatchMetadataDao impleme
 					jobExecution.getId());
 			jdbcTemplate.update(getQuery("delete from %PREFIX%JOB_EXECUTION where JOB_EXECUTION_ID=?"), jobExecution
 					.getId());
+		}
+		for (JobExecution jobExecution : list) {		
 			jdbcTemplate.update(getQuery("delete from %PREFIX%JOB_PARAMS where JOB_INSTANCE_ID=?"), jobExecution
 					.getJobId());
 			jdbcTemplate.update(getQuery("delete from %PREFIX%JOB_INSTANCE where JOB_INSTANCE_ID=?"), jobExecution
