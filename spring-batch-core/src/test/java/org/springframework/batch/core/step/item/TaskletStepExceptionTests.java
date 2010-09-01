@@ -255,7 +255,7 @@ public class TaskletStepExceptionTests {
 		taskletStep.execute(stepExecution);
 		assertEquals(UNKNOWN, stepExecution.getStatus());
 		Throwable e = stepExecution.getFailureExceptions().get(0);
-		assertEquals("Expected exception in step execution persistence", e.getMessage());
+		assertEquals("JobRepository failure forcing exit with unknown status", e.getMessage());
 
 	}
 

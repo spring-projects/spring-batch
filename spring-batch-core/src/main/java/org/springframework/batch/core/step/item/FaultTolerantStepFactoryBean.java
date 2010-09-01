@@ -28,6 +28,7 @@ import org.springframework.batch.classify.Classifier;
 import org.springframework.batch.classify.SubclassClassifier;
 import org.springframework.batch.core.JobInterruptedException;
 import org.springframework.batch.core.Step;
+import org.springframework.batch.core.step.FatalStepExecutionException;
 import org.springframework.batch.core.step.skip.ExceptionClassifierSkipPolicy;
 import org.springframework.batch.core.step.skip.LimitCheckingItemSkipPolicy;
 import org.springframework.batch.core.step.skip.NeverSkipItemSkipPolicy;
@@ -323,9 +324,11 @@ public class FaultTolerantStepFactoryBean<T, S> extends SimpleStepFactoryBean<T,
 	@Override
 	protected void applyConfiguration(TaskletStep step) {
 		addNonSkippableExceptionIfMissing(SkipLimitExceededException.class, NonSkippableReadException.class,
-				SkipListenerFailedException.class, SkipPolicyFailedException.class, RetryException.class, JobInterruptedException.class, Error.class);
-		addNonRetryableExceptionIfMissing(SkipLimitExceededException.class, NonSkippableReadException.class, TransactionException.class,
-				SkipListenerFailedException.class, SkipPolicyFailedException.class, RetryException.class, JobInterruptedException.class, Error.class);
+				SkipListenerFailedException.class, SkipPolicyFailedException.class, RetryException.class,
+				JobInterruptedException.class, Error.class);
+		addNonRetryableExceptionIfMissing(SkipLimitExceededException.class, NonSkippableReadException.class,
+				TransactionException.class, FatalStepExecutionException.class, SkipListenerFailedException.class,
+				SkipPolicyFailedException.class, RetryException.class, JobInterruptedException.class, Error.class);
 		super.applyConfiguration(step);
 	}
 
@@ -373,7 +376,7 @@ public class FaultTolerantStepFactoryBean<T, S> extends SimpleStepFactoryBean<T,
 			if (!skippableExceptionClasses.isEmpty()) {
 				logger.info("Skippable exceptions will be ignored because a SkipPolicy was specified explicitly");
 			}
-			if (skipLimit>0) {
+			if (skipLimit > 0) {
 				logger.info("Skip limit will be ignored because a SkipPolicy was specified explicitly");
 			}
 		}

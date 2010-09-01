@@ -15,6 +15,7 @@
  */
 package org.springframework.batch.core.step.tasklet;
 
+import java.lang.reflect.Field;
 import java.util.concurrent.Semaphore;
 
 import org.apache.commons.logging.Log;
@@ -30,6 +31,7 @@ import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.scope.context.ChunkContext;
 import org.springframework.batch.core.scope.context.StepContextRepeatCallback;
 import org.springframework.batch.core.step.AbstractStep;
+import org.springframework.batch.core.step.FatalStepExecutionException;
 import org.springframework.batch.core.step.StepInterruptionPolicy;
 import org.springframework.batch.core.step.ThreadStepInterruptionPolicy;
 import org.springframework.batch.item.ExecutionContext;
@@ -51,6 +53,7 @@ import org.springframework.transaction.support.TransactionSynchronizationAdapter
 import org.springframework.transaction.support.TransactionSynchronizationManager;
 import org.springframework.transaction.support.TransactionTemplate;
 import org.springframework.util.Assert;
+import org.springframework.util.ReflectionUtils;
 
 /**
  * Simple implementation of executing the step as a call to a {@link Tasklet},
@@ -305,7 +308,7 @@ public class TaskletStep extends AbstractStep {
 
 		private boolean rolledBack = false;
 
-		private Integer oldVersion;
+		private StepExecution oldVersion;
 
 		private boolean locked = false;
 
@@ -321,7 +324,8 @@ public class TaskletStep extends AbstractStep {
 					if (oldVersion != null) {
 						// Wah! the commit failed. We need to rescue the step
 						// execution data.
-						stepExecution.setVersion(oldVersion);
+						copy(oldVersion, stepExecution);
+						stepExecution.incrementRollbackCount();
 					}
 				}
 				if (status == TransactionSynchronization.STATUS_UNKNOWN) {
@@ -386,7 +390,8 @@ public class TaskletStep extends AbstractStep {
 
 					// In case we need to push it back to its old value
 					// after a commit fails...
-					oldVersion = stepExecution.getVersion();
+					oldVersion = new StepExecution(stepExecution.getStepName(), stepExecution.getJobExecution());
+					copy(stepExecution, oldVersion);
 
 					// Apply the contribution to the step
 					// even if unsuccessful
@@ -408,10 +413,11 @@ public class TaskletStep extends AbstractStep {
 				catch (Exception e) {
 					// If we get to here there was a problem saving the step
 					// execution and we have to fail.
-					logger.error("JobRepository failure forcing exit with unknown status", e);
+					String msg = "JobRepository failure forcing exit with unknown status";
+					logger.error(msg, e);
 					stepExecution.upgradeStatus(BatchStatus.UNKNOWN);
 					stepExecution.setTerminateOnly();
-					throw e;
+					throw new FatalStepExecutionException(msg, e);
 				}
 
 			}
@@ -419,7 +425,6 @@ public class TaskletStep extends AbstractStep {
 				logger.debug("Rollback for Error: " + e.getClass().getName() + ": " + e.getMessage());
 				rollback(stepExecution);
 				throw e;
-
 			}
 			catch (RuntimeException e) {
 				logger.debug("Rollback for RuntimeException: " + e.getClass().getName() + ": " + e.getMessage());
@@ -443,6 +448,14 @@ public class TaskletStep extends AbstractStep {
 				rolledBack = true;
 			}
 		}
+		
+		private void copy(final StepExecution source, final StepExecution target) {
+			target.setVersion(source.getVersion());
+			target.setWriteCount(source.getWriteCount());
+			target.setFilterCount(source.getFilterCount());
+			target.setRollbackCount(source.getRollbackCount());
+		}
+
 
 	}
 

@@ -21,13 +21,13 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicLong;
 
 import org.springframework.batch.core.Entity;
 import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.StepExecution;
 import org.springframework.batch.support.SerializationUtils;
+import org.springframework.batch.support.transaction.TransactionAwareProxyFactory;
 import org.springframework.dao.OptimisticLockingFailureException;
 import org.springframework.util.Assert;
 import org.springframework.util.ReflectionUtils;
@@ -37,9 +37,11 @@ import org.springframework.util.ReflectionUtils;
  */
 public class MapStepExecutionDao implements StepExecutionDao {
 
-	private Map<Long, Map<Long, StepExecution>> executionsByJobExecutionId = new ConcurrentHashMap<Long, Map<Long, StepExecution>>();
+	private Map<Long, Map<Long, StepExecution>> executionsByJobExecutionId = TransactionAwareProxyFactory
+			.createAppendOnlyTransactionalMap();
 
-	private Map<Long, StepExecution> executionsByStepExecutionId = new ConcurrentHashMap<Long, StepExecution>();
+	private Map<Long, StepExecution> executionsByStepExecutionId = TransactionAwareProxyFactory
+			.createAppendOnlyTransactionalMap();
 
 	private AtomicLong currentId = new AtomicLong();
 
@@ -51,15 +53,16 @@ public class MapStepExecutionDao implements StepExecutionDao {
 	private static StepExecution copy(StepExecution original) {
 		return (StepExecution) SerializationUtils.deserialize(SerializationUtils.serialize(original));
 	}
-	
+
 	private static void copy(final StepExecution sourceExecution, final StepExecution targetExecution) {
-		// Cheaper than full serialization is a reflective field copy, which is fine for volatile storage
+		// Cheaper than full serialization is a reflective field copy, which is
+		// fine for volatile storage
 		ReflectionUtils.doWithFields(StepExecution.class, new ReflectionUtils.FieldCallback() {
 			public void doWith(Field field) throws IllegalArgumentException, IllegalAccessException {
 				field.setAccessible(true);
 				field.set(targetExecution, field.get(sourceExecution));
 			}
-		});		
+		});
 	}
 
 	public void saveStepExecution(StepExecution stepExecution) {
@@ -70,7 +73,7 @@ public class MapStepExecutionDao implements StepExecutionDao {
 
 		Map<Long, StepExecution> executions = executionsByJobExecutionId.get(stepExecution.getJobExecutionId());
 		if (executions == null) {
-			executions = new ConcurrentHashMap<Long, StepExecution>();
+			executions = TransactionAwareProxyFactory.createAppendOnlyTransactionalMap();
 			executionsByJobExecutionId.put(stepExecution.getJobExecutionId(), executions);
 		}
 
@@ -100,8 +103,10 @@ public class MapStepExecutionDao implements StepExecutionDao {
 			}
 
 			stepExecution.incrementVersion();
-			copy(stepExecution, persistedExecution);
-			executions.put(stepExecution.getId(), persistedExecution);
+			StepExecution copy = new StepExecution(stepExecution.getStepName(), stepExecution.getJobExecution());
+			copy(stepExecution, copy);
+			executions.put(stepExecution.getId(), copy);
+			executionsByStepExecutionId.put(stepExecution.getId(), copy);
 		}
 	}
 
