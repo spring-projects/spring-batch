@@ -58,11 +58,11 @@ public class ResourcelessTransactionManager extends AbstractPlatformTransactionM
 		if (TransactionSynchronizationManager.hasResource(this)) {
 			@SuppressWarnings("unchecked")
 			Stack<Object> stack = (Stack<Object>) TransactionSynchronizationManager.getResource(this);
-			return stack.size()>1;
+			return stack.size() > 1;
 		}
 		return ((ResourcelessTransaction) transaction).isActive();
 	}
-	
+
 	protected void doSetRollbackOnly(DefaultTransactionStatus status) throws TransactionException {
 	}
 
@@ -70,12 +70,8 @@ public class ResourcelessTransactionManager extends AbstractPlatformTransactionM
 		@SuppressWarnings("unchecked")
 		Stack<Object> list = (Stack<Object>) TransactionSynchronizationManager.getResource(this);
 		Stack<Object> resources = list;
-		if (!resources.isEmpty()) {
-			resources.pop();
-		}
-		if (resources.isEmpty()) {
-			TransactionSynchronizationManager.unbindResource(this);
-		}
+		resources.clear();
+		TransactionSynchronizationManager.unbindResource(this);
 		((ResourcelessTransaction) transaction).clear();
 	}
 

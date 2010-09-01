@@ -478,7 +478,7 @@ public class FaultTolerantStepFactoryBeanRollbackTests {
 		ResourcelessTransactionManager transactionManager = new ResourcelessTransactionManager() {
 			private boolean failed = false;
 			protected void doCommit(DefaultTransactionStatus status) throws TransactionException {
-				if (writer.getWritten().isEmpty() || failed || !status.isNewTransaction()) {
+				if (writer.getWritten().isEmpty() || failed || !isExistingTransaction(status.getTransaction())) {
 					super.doCommit(status);
 					return;
 				}
