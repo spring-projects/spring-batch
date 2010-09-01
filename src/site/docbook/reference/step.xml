@@ -995,9 +995,9 @@ itemWriter.write(items);</programlisting>
     wrapped in a transaction. <classname>Tasklet</classname> implementors
     might call a stored procedure, a script, or a simple SQL update statement.
     To create a <classname>TaskletStep</classname>, the 'ref' attribute of the
-    &lt;tasket/&gt; element should reference a bean defining a
+    &lt;tasklet/&gt; element should reference a bean defining a
     <classname>Tasklet</classname> object; no &lt;chunk/&gt; element should be
-    used within the &lt;tasket/&gt;:</para>
+    used within the &lt;tasklet/&gt;:</para>
 
     <programlisting>&lt;step id="step1"&gt;
     &lt;tasklet <classname>ref="myTasklet"</classname>/&gt;

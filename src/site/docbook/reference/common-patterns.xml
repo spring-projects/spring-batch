@@ -566,7 +566,7 @@ public Trade read() throws Exception {
 
     <programlisting>&lt;job id="job1"&gt;
     &lt;step id="step1"&gt;
-        &lt;tasket&gt;
+        &lt;tasklet&gt;
             &lt;chunk reader="reader" writer="savingWriter" commit-interval="10"/&gt;
             &lt;listeners&gt;
                 <emphasis role="bold">&lt;listener ref="promotionListener"/&gt;</emphasis>
@@ -586,7 +586,7 @@ public Trade read() throws Exception {
     <para>Finally, to the saved values must be retrieved from the
     <classname>Job</classname> <classname>ExeuctionContext</classname>:</para>
 
-    <programlisting>public void RetrievingItemWriter implements ItemWriter&lt;Object&gt; {
+    <programlisting>public class RetrievingItemWriter implements ItemWriter&lt;Object&gt; {
     private Object someObject;
 
     public void write(List&lt;? extends Object&gt; items) throws Exception {
