@@ -23,10 +23,13 @@ import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.repository.support.MapJobRepositoryFactoryBean;
 import org.springframework.batch.support.transaction.ResourcelessTransactionManager;
 import org.springframework.core.task.SimpleAsyncTaskExecutor;
+import org.springframework.transaction.TransactionException;
+import org.springframework.transaction.UnexpectedRollbackException;
 import org.springframework.transaction.interceptor.RollbackRuleAttribute;
 import org.springframework.transaction.interceptor.RuleBasedTransactionAttribute;
 import org.springframework.transaction.interceptor.TransactionAttribute;
 import org.springframework.transaction.interceptor.TransactionAttributeEditor;
+import org.springframework.transaction.support.DefaultTransactionStatus;
 import org.springframework.util.StringUtils;
 
 /**
@@ -62,7 +65,8 @@ public class FaultTolerantStepFactoryBeanRollbackTests {
 		factory = new FaultTolerantStepFactoryBean<String, String>();
 
 		factory.setBeanName("stepName");
-		factory.setTransactionManager(new ResourcelessTransactionManager());
+		ResourcelessTransactionManager transactionManager = new ResourcelessTransactionManager();
+		factory.setTransactionManager(transactionManager);
 		factory.setCommitInterval(2);
 
 		reader.clear();
@@ -78,6 +82,7 @@ public class FaultTolerantStepFactoryBeanRollbackTests {
 		factory.setSkippableExceptionClasses(getExceptionMap(Exception.class));
 
 		MapJobRepositoryFactoryBean repositoryFactory = new MapJobRepositoryFactoryBean();
+		repositoryFactory.setTransactionManager(transactionManager);
 		repositoryFactory.afterPropertiesSet();
 		repository = (JobRepository) repositoryFactory.getObject();
 		factory.setJobRepository(repository);
@@ -468,6 +473,40 @@ public class FaultTolerantStepFactoryBeanRollbackTests {
 		assertEquals("[1, 2, 3, 4, 5]", processor.getProcessed().toString());
 	}
 
+	@Test
+	public void testTransactionException() throws Exception {
+		ResourcelessTransactionManager transactionManager = new ResourcelessTransactionManager() {
+			private boolean failed = false;
+			protected void doCommit(DefaultTransactionStatus status) throws TransactionException {
+				if (writer.getWritten().isEmpty() || failed || !status.isNewTransaction()) {
+					super.doCommit(status);
+					return;
+				}
+				failed = true;
+				status.setRollbackOnly();
+				super.doRollback(status);
+				throw new UnexpectedRollbackException("Planned");
+			}
+		};
+		MapJobRepositoryFactoryBean repositoryFactory = new MapJobRepositoryFactoryBean();
+		repositoryFactory.setTransactionManager(transactionManager);
+		repositoryFactory.afterPropertiesSet();
+		repository = (JobRepository) repositoryFactory.getObject();
+		factory.setJobRepository(repository);
+		factory.setTransactionManager(transactionManager);
+
+		jobExecution = repository.createJobExecution("skipJob", new JobParameters());
+		stepExecution = jobExecution.createStepExecution(factory.getName());
+		repository.add(stepExecution);
+
+		Step step = (Step) factory.getObject();
+
+		step.execute(stepExecution);
+		assertEquals(BatchStatus.FAILED, stepExecution.getStatus());
+
+		assertEquals("[]", writer.getCommitted().toString());
+	}
+
 	@SuppressWarnings("unchecked")
 	private Collection<Class<? extends Throwable>> getExceptionList(Class<? extends Throwable> arg) {
 		return Arrays.<Class<? extends Throwable>> asList(arg);
@@ -480,5 +519,5 @@ public class FaultTolerantStepFactoryBeanRollbackTests {
 		}
 		return map;
 	}
-	
+
 }

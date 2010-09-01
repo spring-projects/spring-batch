@@ -184,7 +184,6 @@ public abstract class AbstractStep implements Step, InitializingBean, BeanNameAw
 
 		// Start with a default value that will be trumped by anything
 		ExitStatus exitStatus = ExitStatus.EXECUTING;
-		Exception commitException = null;
 
 		StepSynchronizationManager.register(stepExecution);
 
@@ -234,8 +233,8 @@ public abstract class AbstractStep implements Step, InitializingBean, BeanNameAw
 				stepExecution.setStatus(BatchStatus.UNKNOWN);
 				exitStatus = exitStatus.and(ExitStatus.UNKNOWN);
 				stepExecution.addFailureException(e);
-				logger.error("Encountered an error saving batch meta data."
-						+ "This job is now in an unknown state and should not be restarted.", commitException);
+				logger.error("Encountered an error saving batch meta data. "
+						+ "This job is now in an unknown state and should not be restarted.", e);
 			}
 
 			stepExecution.setEndTime(new Date());
@@ -248,8 +247,8 @@ public abstract class AbstractStep implements Step, InitializingBean, BeanNameAw
 				stepExecution.setStatus(BatchStatus.UNKNOWN);
 				stepExecution.setExitStatus(exitStatus.and(ExitStatus.UNKNOWN));
 				stepExecution.addFailureException(e);
-				logger.error("Encountered an error saving batch meta data."
-						+ "This job is now in an unknown state and should not be restarted.", commitException);
+				logger.error("Encountered an error saving batch meta data. "
+						+ "This job is now in an unknown state and should not be restarted.", e);
 			}
 
 			try {

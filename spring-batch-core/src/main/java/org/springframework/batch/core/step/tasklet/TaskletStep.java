@@ -261,7 +261,7 @@ public class TaskletStep extends AbstractStep {
 					result = (RepeatStatus) new TransactionTemplate(transactionManager, transactionAttribute)
 							.execute(new ChunkTransactionCallback(chunkContext));
 				}
-				catch (TransactionException e) {
+				catch (UncheckedTransactionException e) {
 					// Allow checked exceptions to be thrown inside callback
 					throw (Exception) e.getCause();
 				}
@@ -430,7 +430,7 @@ public class TaskletStep extends AbstractStep {
 				logger.debug("Rollback for Exception: " + e.getClass().getName() + ": " + e.getMessage());
 				rollback(stepExecution);
 				// Allow checked exceptions
-				throw new TransactionException(e);
+				throw new UncheckedTransactionException(e);
 			}
 
 			return result;
@@ -453,9 +453,9 @@ public class TaskletStep extends AbstractStep {
 	 * @author Dave Syer
 	 * 
 	 */
-	private static class TransactionException extends RuntimeException {
+	private static class UncheckedTransactionException extends RuntimeException {
 
-		public TransactionException(Exception e) {
+		public UncheckedTransactionException(Exception e) {
 			super(e);
 		}
 
