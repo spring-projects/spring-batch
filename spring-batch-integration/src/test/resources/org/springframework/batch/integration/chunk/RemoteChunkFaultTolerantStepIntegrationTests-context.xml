@@ -105,7 +105,7 @@
 	<!-- Simulate JMS rollback and redelivery using a direct channel and a retry -->
 	<aop:config>
 		<aop:advisor advice-ref="retryAdvice"
-			pointcut="execution(* org.springframework.integration.core.MessageChannel+.send(..)) and bean(requests)" />
+			pointcut="execution(* org.springframework.integration.MessageChannel+.send(..)) and bean(requests)" />
 	</aop:config>
 
 </beans>
