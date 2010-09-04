@@ -9,7 +9,7 @@
   meets your needs before thinking about more complex implementations. Measure
   the performance of a realistic job and see if the simplest implementation
   meets your needs first: you can read and write a file of several hundred
-  megabytes in well under a minute, even with bog standard hardware.</para>
+  megabytes in well under a minute, even with standard hardware.</para>
 
   <para>When you are ready to start implementing a job with some parallel
   processing, Spring Batch offers a range of options, which are described in
@@ -239,9 +239,9 @@
     &lt;/partition&gt;
 &lt;/step&gt;</programlisting></para>
 
-    <para>Similar to the multi-threaded step, there is a setting here
-    for a throttle limit, which prevents the task executor from being
-    saturated with requests from a single step.</para>
+    <para>Similar to the multi-threaded step's throttle-limit
+    attribute, the grid-size attribute prevents the task executor from
+    being saturated with requests from a single step.</para>
 
     <para>There is a simple example which can be copied and extended in the
     unit test suite for Spring Batch Samples (see
