@@ -45,6 +45,18 @@ public class TransactionAwareMapFactoryTests extends TestCase {
 		assertTrue(map.keySet().contains("bucket"));
 	}
 
+	public void testEmpty() {
+		assertEquals(3, map.size());
+		map.put("bucket", "crap");
+		assertFalse(map.isEmpty());
+	}
+
+	public void testValues() {
+		assertEquals(3, map.size());
+		map.put("bucket", "crap");
+		assertEquals(4, map.keySet().size());
+	}
+
 	public void testRemove() {
 		assertEquals(3, map.size());
 		assertTrue(map.keySet().contains("spam"));
@@ -62,6 +74,26 @@ public class TransactionAwareMapFactoryTests extends TestCase {
 		transactionTemplate.execute(new TransactionCallback() {
 			public Object doInTransaction(TransactionStatus status) {
 				testAdd();
+				return null;
+			}
+		});
+		assertEquals(4, map.size());
+	}
+
+	public void testTransactionalEmpty() throws Exception {
+		transactionTemplate.execute(new TransactionCallback() {
+			public Object doInTransaction(TransactionStatus status) {
+				testEmpty();
+				return null;
+			}
+		});
+		assertEquals(4, map.size());
+	}
+
+	public void testTransactionalValues() throws Exception {
+		transactionTemplate.execute(new TransactionCallback() {
+			public Object doInTransaction(TransactionStatus status) {
+				testValues();
 				return null;
 			}
 		});
