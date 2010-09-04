@@ -368,7 +368,7 @@ public class TaskletStepTests {
 
 		step.execute(stepExecution);
 		Throwable e = stepExecution.getFailureExceptions().get(0);
-		assertEquals("foo", e.getMessage());
+		assertEquals("foo", e.getCause().getMessage());
 		assertEquals(BatchStatus.UNKNOWN, stepExecution.getStatus());
 	}
 

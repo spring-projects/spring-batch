@@ -168,10 +168,15 @@ public class TransactionAwareProxyFactory<T> {
 				if (appendOnly) {
 					String methodName = invocation.getMethod().getName();
 					if ((result == null && methodName.equals("get"))
-							|| (Boolean.FALSE.equals(result) && methodName.startsWith("contains"))) {
+							|| (Boolean.FALSE.equals(result) && (methodName.startsWith("contains")) || (Boolean.TRUE.equals(result) && methodName.startsWith("isEmpty")))) {
 						// In appendOnly mode the result of a get might not be
 						// in the cache...
 						return invocation.proceed();
+					}
+					if (result instanceof Collection<?>) {
+						HashSet<Object> set = new HashSet<Object>((Collection<?>) result);
+						set.addAll((Collection<?>) invocation.proceed());
+						result = set;
 					}
 				}
 

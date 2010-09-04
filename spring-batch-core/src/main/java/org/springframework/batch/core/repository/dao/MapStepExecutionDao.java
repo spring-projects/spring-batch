@@ -37,11 +37,9 @@ import org.springframework.util.ReflectionUtils;
  */
 public class MapStepExecutionDao implements StepExecutionDao {
 
-	private Map<Long, Map<Long, StepExecution>> executionsByJobExecutionId = TransactionAwareProxyFactory
-			.createAppendOnlyTransactionalMap();
+	private Map<Long, Map<Long, StepExecution>> executionsByJobExecutionId = TransactionAwareProxyFactory.createAppendOnlyTransactionalMap();
 
-	private Map<Long, StepExecution> executionsByStepExecutionId = TransactionAwareProxyFactory
-			.createAppendOnlyTransactionalMap();
+	private Map<Long, StepExecution> executionsByStepExecutionId = TransactionAwareProxyFactory.createAppendOnlyTransactionalMap();
 
 	private AtomicLong currentId = new AtomicLong();
 

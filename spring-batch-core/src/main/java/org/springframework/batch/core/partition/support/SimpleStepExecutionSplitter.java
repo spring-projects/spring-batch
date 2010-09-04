@@ -218,8 +218,7 @@ public class SimpleStepExecutionSplitter implements StepExecutionSplitter, Initi
 		String stepName = stepExecution.getStepName();
 		StepExecution lastStepExecution = jobRepository.getLastStepExecution(jobInstance, stepName);
 
-		boolean isRestart = (lastStepExecution != null && lastStepExecution.getStatus() != BatchStatus.COMPLETED) ? true
-				: false;
+		boolean isRestart = (lastStepExecution != null && lastStepExecution.getStatus() != BatchStatus.COMPLETED);
 
 		if (isRestart) {
 			stepExecution.setExecutionContext(lastStepExecution.getExecutionContext());
