@@ -366,6 +366,15 @@ public class SimpleStepFactoryBean<T, S> implements FactoryBean, BeanNameAware {
 	public void setCommitInterval(int commitInterval) {
 		this.commitInterval = commitInterval;
 	}
+	
+	/**
+	 * Accessor for commit interval if needed in sub classes.
+	 * 
+	 * @return the commit interval
+	 */
+	protected int getCommitInterval() {
+		return commitInterval;
+	}
 
 	/**
 	 * Public setter for the {@link CompletionPolicy} applying to the chunk

@@ -386,6 +386,7 @@ public class FaultTolerantStepFactoryBean<T, S> extends SimpleStepFactoryBean<T,
 		readSkipPolicy = getFatalExceptionAwareProxy(readSkipPolicy);
 		FaultTolerantChunkProvider<T> chunkProvider = new FaultTolerantChunkProvider<T>(getItemReader(),
 				getChunkOperations());
+		chunkProvider.setMaxSkipsOnRead(Math.max(getCommitInterval(), FaultTolerantChunkProvider.DEFAULT_MAX_SKIPS_ON_READ));
 		chunkProvider.setSkipPolicy(readSkipPolicy);
 		chunkProvider.setRollbackClassifier(getRollbackClassifier());
 

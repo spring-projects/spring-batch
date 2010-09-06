@@ -15,7 +15,6 @@
  */
 package org.springframework.batch.core.step.tasklet;
 
-import java.lang.reflect.Field;
 import java.util.concurrent.Semaphore;
 
 import org.apache.commons.logging.Log;
@@ -53,7 +52,6 @@ import org.springframework.transaction.support.TransactionSynchronizationAdapter
 import org.springframework.transaction.support.TransactionSynchronizationManager;
 import org.springframework.transaction.support.TransactionTemplate;
 import org.springframework.util.Assert;
-import org.springframework.util.ReflectionUtils;
 
 /**
  * Simple implementation of executing the step as a call to a {@link Tasklet},
@@ -455,7 +453,6 @@ public class TaskletStep extends AbstractStep {
 			target.setFilterCount(source.getFilterCount());
 			target.setRollbackCount(source.getRollbackCount());
 		}
-
 
 	}
 

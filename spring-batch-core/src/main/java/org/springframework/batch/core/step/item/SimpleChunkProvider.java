@@ -30,8 +30,8 @@ import org.springframework.batch.repeat.RepeatOperations;
 import org.springframework.batch.repeat.RepeatStatus;
 
 /**
- * Simple implementation of the ChunkProvider interface that does basic 
- * chunk providing from an {@link ItemReader}.
+ * Simple implementation of the ChunkProvider interface that does basic chunk
+ * providing from an {@link ItemReader}.
  * 
  * @author Dave Syer
  * @see ChunkOrientedTasklet
@@ -71,7 +71,7 @@ public class SimpleChunkProvider<I> implements ChunkProvider<I> {
 	public void registerListener(StepListener listener) {
 		this.listener.register(listener);
 	}
-	
+
 	/**
 	 * @return the listener
 	 */
@@ -103,7 +103,15 @@ public class SimpleChunkProvider<I> implements ChunkProvider<I> {
 		repeatOperations.iterate(new RepeatCallback() {
 
 			public RepeatStatus doInIteration(final RepeatContext context) throws Exception {
-				I item = read(contribution, inputs);
+				I item = null;
+				try {
+					item = read(contribution, inputs);
+				}
+				catch (SkipOverflowException e) {
+					// read() tells us about an excess of skips by throwing an
+					// exception
+					return RepeatStatus.FINISHED;
+				}
 				if (item == null) {
 					inputs.setEnd();
 					return RepeatStatus.FINISHED;
@@ -118,12 +126,25 @@ public class SimpleChunkProvider<I> implements ChunkProvider<I> {
 		return inputs;
 
 	}
-	
+
 	public void postProcess(StepContribution contribution, Chunk<I> chunk) {
 		// do nothing
 	}
 
-	protected I read(StepContribution contribution, Chunk<I> chunk) throws Exception {
+	/**
+	 * Delegates to {@link #doRead()}. Subclasses can add additional behaviour
+	 * (e.g. exception handling).
+	 * 
+	 * @param contribution the current step execution contribution
+	 * @param chunk the current chunk
+	 * @return a new item for processing
+	 * 
+	 * @throws SkipOverflowException if specifically the chunk is accumulating
+	 * too much data (e.g. skips) and it wants to force a commit.
+	 * 
+	 * @throws Exception if there is a generic issue
+	 */
+	protected I read(StepContribution contribution, Chunk<I> chunk) throws SkipOverflowException, Exception {
 		return doRead();
 	}
 
