@@ -141,52 +141,16 @@ public class TransactionAwareProxyFactory<T> {
 
 	private T createInstance() {
 
-		ProxyFactory factory = new ProxyFactory(target);
-		factory.addAdvice(new MethodInterceptor() {
+		synchronized (target) {
 
-			public Object invoke(MethodInvocation invocation) throws Throwable {
+			ProxyFactory factory = new ProxyFactory(target);
+			factory.addAdvice(new TransactionAwareInterceptor());
+			@SuppressWarnings("unchecked")
+			T instance = (T) factory.getProxy();
+			return instance;
 
-				if (!TransactionSynchronizationManager.isActualTransactionActive()) {
-					return invocation.proceed();
-				}
+		}
 
-				T cache;
-
-				if (!TransactionSynchronizationManager.hasResource(this)) {
-					cache = begin(target);
-					TransactionSynchronizationManager.bindResource(this, cache);
-					TransactionSynchronizationManager.registerSynchronization(new TargetSynchronization(this, cache));
-				}
-				else {
-					@SuppressWarnings("unchecked")
-					T retrievedCache = (T) TransactionSynchronizationManager.getResource(this);
-					cache = retrievedCache;
-				}
-
-				Object result = invocation.getMethod().invoke(cache, invocation.getArguments());
-
-				if (appendOnly) {
-					String methodName = invocation.getMethod().getName();
-					if ((result == null && methodName.equals("get"))
-							|| (Boolean.FALSE.equals(result) && (methodName.startsWith("contains")) || (Boolean.TRUE.equals(result) && methodName.startsWith("isEmpty")))) {
-						// In appendOnly mode the result of a get might not be
-						// in the cache...
-						return invocation.proceed();
-					}
-					if (result instanceof Collection<?>) {
-						HashSet<Object> set = new HashSet<Object>((Collection<?>) result);
-						set.addAll((Collection<?>) invocation.proceed());
-						result = set;
-					}
-				}
-
-				return result;
-
-			}
-		});
-		@SuppressWarnings("unchecked")
-		T instance = (T) factory.getProxy();
-		return instance;
 	}
 
 	@SuppressWarnings("unchecked")
@@ -254,6 +218,50 @@ public class TransactionAwareProxyFactory<T> {
 				}
 			}
 			TransactionSynchronizationManager.unbindResource(key);
+		}
+	}
+
+	private class TransactionAwareInterceptor implements MethodInterceptor {
+
+		public Object invoke(MethodInvocation invocation) throws Throwable {
+
+			if (!TransactionSynchronizationManager.isActualTransactionActive()) {
+				return invocation.proceed();
+			}
+
+			T cache;
+
+			if (!TransactionSynchronizationManager.hasResource(this)) {
+				cache = begin(target);
+				TransactionSynchronizationManager.bindResource(this, cache);
+				TransactionSynchronizationManager.registerSynchronization(new TargetSynchronization(this, cache));
+			}
+			else {
+				@SuppressWarnings("unchecked")
+				T retrievedCache = (T) TransactionSynchronizationManager.getResource(this);
+				cache = retrievedCache;
+			}
+
+			Object result = invocation.getMethod().invoke(cache, invocation.getArguments());
+
+			if (appendOnly) {
+				String methodName = invocation.getMethod().getName();
+				if ((result == null && methodName.equals("get"))
+						|| (Boolean.FALSE.equals(result) && (methodName.startsWith("contains")) || (Boolean.TRUE
+								.equals(result) && methodName.startsWith("isEmpty")))) {
+					// In appendOnly mode the result of a get might not be
+					// in the cache...
+					return invocation.proceed();
+				}
+				if (result instanceof Collection<?>) {
+					HashSet<Object> set = new HashSet<Object>((Collection<?>) result);
+					set.addAll((Collection<?>) invocation.proceed());
+					result = set;
+				}
+			}
+
+			return result;
+
 		}
 	}
 
