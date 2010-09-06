@@ -463,39 +463,11 @@ class StepParserStepFactoryBean<I, O> implements FactoryBean, BeanNameAware {
 	private void validateFaultTolerantSettings() {
 		validateDependency("skippable-exception-classes", skippableExceptionClasses, "skip-limit", skipLimit, true);
 		validateDependency("retryable-exception-classes", retryableExceptionClasses, "retry-limit", retryLimit, true);
-		validateAtLeastOneDependency("processor-transactional", processorTransactional,
-				"'retry-limit' or 'skip-limit'", retryLimit, skipLimit);
 		validateDependency("retry-listeners", retryListeners, "retry-limit", retryLimit, false);
 		if (isPresent(processorTransactional) && !processorTransactional && isPresent(readerTransactionalQueue)
 				&& readerTransactionalQueue) {
 			throw new IllegalArgumentException(
 					"The field 'processor-transactional' cannot be false if 'reader-transactional-queue' is true");
-		}
-	}
-
-	/**
-	 * Check if a field is present then a second (at least one taken from a
-	 * list) is also.
-	 * 
-	 * @param dependantName the name of the first field
-	 * @param dependantValue the value of the first field
-	 * @param names the names of the other fields (used to construct an
-	 * exception message)
-	 * @param values the other field values (one of which must be set if the
-	 * first field is)
-	 */
-	private void validateAtLeastOneDependency(String dependantName, Boolean dependantValue, String names,
-			Object... values) {
-		boolean oneIsPresent = false;
-		for (Object value : values) {
-			if (isPresent(value)) {
-				oneIsPresent = true;
-				break;
-			}
-		}
-		if (isPresent(dependantValue) && !oneIsPresent) {
-			throw new IllegalArgumentException("The field '" + dependantName + "' is not permitted on the step ["
-					+ this.name + "] because " + names + " is not present.");
 		}
 	}
 

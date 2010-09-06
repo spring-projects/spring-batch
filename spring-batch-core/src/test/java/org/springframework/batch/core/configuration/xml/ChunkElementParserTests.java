@@ -121,15 +121,13 @@ public class ChunkElementParserTests {
 
 	@Test
 	public void testProcessorTransactionalNotAllowedOnSimpleProcessor() throws Exception {
-		try {
-			new ClassPathXmlApplicationContext(
-					"org/springframework/batch/core/configuration/xml/ChunkElementIllegalAttributeParserTests-context.xml");
-			fail("Expected BeanCreationException");
-		}
-		catch (BeanCreationException e) {
-			String msg = e.getMessage();
-			assertTrue("Wrong message: " + msg, msg.contains("The field 'processor-transactional' is not permitted"));
-		}
+		ConfigurableApplicationContext context = new ClassPathXmlApplicationContext(
+				"org/springframework/batch/core/configuration/xml/ChunkElementIllegalAttributeParserTests-context.xml");
+		Object step = context.getBean("s1", Step.class);
+		assertNotNull("Step not parsed", step);
+		Object tasklet = ReflectionTestUtils.getField(step, "tasklet");
+		Object chunkProcessor = ReflectionTestUtils.getField(tasklet, "chunkProcessor");
+		assertTrue(chunkProcessor instanceof SimpleChunkProcessor<?, ?>);
 	}
 
 	@Test
@@ -260,7 +258,8 @@ public class ChunkElementParserTests {
 
 	private Object getPolicy(String stepName, ApplicationContext ctx, String componentName) throws Exception {
 		@SuppressWarnings("unchecked")
-		SubclassClassifier<Throwable, Object> classifier = (SubclassClassifier<Throwable, Object>) getNestedPathInStep(stepName, ctx, componentName);
+		SubclassClassifier<Throwable, Object> classifier = (SubclassClassifier<Throwable, Object>) getNestedPathInStep(
+				stepName, ctx, componentName);
 		Object policy = classifier.classify(new Exception());
 		return policy;
 	}
