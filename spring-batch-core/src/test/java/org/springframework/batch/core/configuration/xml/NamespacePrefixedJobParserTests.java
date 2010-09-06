@@ -15,22 +15,22 @@
  */
 package org.springframework.batch.core.configuration.xml;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.springframework.batch.core.*;
+import org.springframework.batch.core.BatchStatus;
+import org.springframework.batch.core.Job;
+import org.springframework.batch.core.JobExecution;
+import org.springframework.batch.core.JobParameters;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.repository.support.MapJobRepositoryFactoryBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
-
-import java.util.ArrayList;
-import java.util.List;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
 
 
 /**
@@ -62,14 +62,6 @@ public class NamespacePrefixedJobParserTests {
 		JobExecution jobExecution = jobRepository.createJobExecution(job1.getName(), new JobParameters());
 		job1.execute(jobExecution);
 		assertEquals(BatchStatus.COMPLETED, jobExecution.getStatus());
-	}
-
-	private List<String> getStepNames(JobExecution jobExecution) {
-		List<String> list = new ArrayList<String>();
-		for (StepExecution stepExecution : jobExecution.getStepExecutions()) {
-			list.add(stepExecution.getStepName());
-		}
-		return list;
 	}
 
 }
