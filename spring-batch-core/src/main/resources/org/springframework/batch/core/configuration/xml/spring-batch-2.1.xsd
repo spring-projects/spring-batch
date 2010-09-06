@@ -893,7 +893,7 @@
 			<xsd:annotation>
 				<xsd:documentation><![CDATA[
 				Whether the reader is a transactional queue. If it is then items read should not be cached 
-				in the event of a rollback since they will be returned to the queue.
+				in the event of a rollback since they will be returned to the queue. Default is false.
 				]]></xsd:documentation>
 			</xsd:annotation>
 		</xsd:attribute>
@@ -902,7 +902,7 @@
 				<xsd:documentation><![CDATA[
 				Whether the processor is transaction aware. If it is then processed items should not be
 				cached in between transactions in case of a rollback.  N.B. if reader-transactional-queue
-				is true then so should this be.
+				is true then so should this be.  Default is true.
 				]]></xsd:documentation>
 			</xsd:annotation>
 		</xsd:attribute>
