@@ -1,4 +1,4 @@
-package org.springframework.batch.core.exlore.support;
+package org.springframework.batch.core.explore.support;
 
 import static org.junit.Assert.assertEquals;
 

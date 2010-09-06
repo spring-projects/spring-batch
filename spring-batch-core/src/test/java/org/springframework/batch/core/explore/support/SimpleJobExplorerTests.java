@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.springframework.batch.core.exlore.support;
+package org.springframework.batch.core.explore.support;
 
 import static org.easymock.EasyMock.createMock;
 import static org.easymock.EasyMock.expect;
