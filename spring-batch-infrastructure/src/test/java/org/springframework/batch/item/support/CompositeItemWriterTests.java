@@ -9,8 +9,9 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import junit.framework.TestCase;
-
+import org.junit.Test;
+import org.springframework.batch.item.ExecutionContext;
+import org.springframework.batch.item.ItemStreamWriter;
 import org.springframework.batch.item.ItemWriter;
 
 /**
@@ -18,7 +19,7 @@ import org.springframework.batch.item.ItemWriter;
  * 
  * @author Robert Kasanicky
  */
-public class CompositeItemWriterTests extends TestCase {
+public class CompositeItemWriterTests {
 
 	// object under test
 	private CompositeItemWriter<Object> itemWriter = new CompositeItemWriter<Object>();
@@ -26,7 +27,7 @@ public class CompositeItemWriterTests extends TestCase {
 	/**
 	 * Regular usage scenario. All injected processors should be called.
 	 */
-
+	@Test
 	public void testProcess() throws Exception {
 
 		final int NUMBER_OF_WRITERS = 10;
@@ -51,6 +52,41 @@ public class CompositeItemWriterTests extends TestCase {
 		for (ItemWriter<? super Object> writer : writers) {
 			verify(writer);
 		}
+	}
+
+	@Test
+	public void testItemStreamCalled() throws Exception {
+		doTestItemStream(true);
+	}
+
+	@Test
+	public void testItemStreamNotCalled() throws Exception {
+		doTestItemStream(false);
+	}
+
+	private void doTestItemStream(boolean expectOpen) throws Exception {
+		@SuppressWarnings("unchecked")
+		ItemStreamWriter<? super Object> writer = createStrictMock(ItemStreamWriter.class);
+		List<Object> data = Collections.singletonList(new Object());
+		ExecutionContext executionContext = new ExecutionContext();
+		if (expectOpen) {
+			writer.open(executionContext);
+			expectLastCall().once();
+		}
+		writer.write(data);
+		expectLastCall().once();
+		replay(writer);
+
+		List<ItemWriter<? super Object>> writers = new ArrayList<ItemWriter<? super Object>>();
+		writers.add(writer);
+
+		itemWriter.setDelegates(writers);
+		if (expectOpen) {
+			itemWriter.open(executionContext);
+		}
+		itemWriter.write(data);
+
+		verify(writer);
 	}
 
 }
