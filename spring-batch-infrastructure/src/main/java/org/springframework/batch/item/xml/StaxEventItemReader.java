@@ -28,13 +28,13 @@ import javax.xml.stream.events.XMLEvent;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.springframework.batch.item.NonTransientResourceException;
 import org.springframework.batch.item.file.ResourceAwareItemReaderItemStream;
 import org.springframework.batch.item.support.AbstractItemCountingItemStreamItemReader;
 import org.springframework.batch.item.xml.stax.DefaultFragmentEventReader;
 import org.springframework.batch.item.xml.stax.FragmentEventReader;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.core.io.Resource;
-import org.springframework.dao.DataAccessResourceFailureException;
 import org.springframework.oxm.Unmarshaller;
 import org.springframework.util.Assert;
 import org.springframework.util.ClassUtils;
@@ -137,11 +137,11 @@ public class StaxEventItemReader<T> extends AbstractItemCountingItemStreamItemRe
 	 * @return <code>true</code> if next fragment was found, <code>false</code>
 	 * otherwise.
 	 * 
-	 * @throws DataAccessResourceFailureException if the cursor could not be
+	 * @throws NonTransientResourceException if the cursor could not be
 	 * moved. This will be treated as fatal and subsequent calls to read will
 	 * return null.
 	 */
-	protected boolean moveCursorToNextFragment(XMLEventReader reader) throws DataAccessResourceFailureException {
+	protected boolean moveCursorToNextFragment(XMLEventReader reader) throws NonTransientResourceException {
 		try {
 			while (true) {
 				while (reader.peek() != null && !reader.peek().isStartElement()) {
@@ -162,7 +162,7 @@ public class StaxEventItemReader<T> extends AbstractItemCountingItemStreamItemRe
 			}
 		}
 		catch (XMLStreamException e) {
-			throw new DataAccessResourceFailureException("Error while reading from event reader", e);
+			throw new NonTransientResourceException("Error while reading from event reader", e);
 		}
 	}
 
@@ -223,7 +223,7 @@ public class StaxEventItemReader<T> extends AbstractItemCountingItemStreamItemRe
 		try {
 			success = moveCursorToNextFragment(fragmentReader);
 		}
-		catch (DataAccessResourceFailureException e) {
+		catch (NonTransientResourceException e) {
 			// Prevent caller from retrying indefinitely since this is fatal
 			noInput = true;
 			throw e;

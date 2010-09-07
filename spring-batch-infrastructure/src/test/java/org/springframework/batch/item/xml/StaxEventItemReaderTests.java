@@ -19,6 +19,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.item.ItemStreamException;
+import org.springframework.batch.item.NonTransientResourceException;
 import org.springframework.core.io.AbstractResource;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.FileSystemResource;
@@ -45,7 +46,7 @@ public class StaxEventItemReaderTests {
 
 	private String mixedXml = "<fragment xmlns=\"urn:org.test.foo\"> <fragment xmlns=\"urn:org.test.bar\"> <misc1/> </fragment> <misc2/> <fragment xmlns=\"urn:org.test.bar\"> testString </fragment> </fragment>";
 
-	private String invalidXml = "<root> <fragment> <misc1/> <fragment> <misc2/> <fragment> testString </fragment> </root>";
+	private String invalidXml = "<root> </fragment> <misc1/> </root>";
 
 	private Unmarshaller unmarshaller = new MockFragmentUnmarshaller();
 
@@ -106,7 +107,7 @@ public class StaxEventItemReaderTests {
 
 	@Test
 	public void testFragmentNamespace() throws Exception {
-		
+
 		source.setResource(new ByteArrayResource(fooXml.getBytes()));
 		source.afterPropertiesSet();
 		source.open(executionContext);
@@ -120,9 +121,9 @@ public class StaxEventItemReaderTests {
 
 	@Test
 	public void testFragmentMixedNamespace() throws Exception {
-		
+
 		source.setResource(new ByteArrayResource(mixedXml.getBytes()));
-		source.setFragmentRootElementName("{urn:org.test.bar}"+FRAGMENT_ROOT_ELEMENT);
+		source.setFragmentRootElementName("{urn:org.test.bar}" + FRAGMENT_ROOT_ELEMENT);
 		source.afterPropertiesSet();
 		source.open(executionContext);
 		// see asserts in the mock unmarshaller
@@ -135,15 +136,20 @@ public class StaxEventItemReaderTests {
 
 	@Test
 	public void testFragmentInvalid() throws Exception {
-		
+
 		source.setResource(new ByteArrayResource(invalidXml.getBytes()));
 		source.setFragmentRootElementName(FRAGMENT_ROOT_ELEMENT);
 		source.afterPropertiesSet();
 		source.open(executionContext);
-		// see asserts in the mock unmarshaller
-		assertNotNull(source.read());
-		assertNotNull(source.read());
-		assertNull(source.read()); // there are only two fragments
+		// Should fail before it gets to the marshaller
+		try {
+			assertNotNull(source.read());
+			fail("Expected NonTransientResourceException");
+		}
+		catch (NonTransientResourceException e) {
+			// expected
+		}
+		assertNull(source.read()); // after an error there is no more output
 
 		source.close();
 	}
@@ -274,10 +280,10 @@ public class StaxEventItemReaderTests {
 		catch (ItemStreamException ex) {
 			// expected
 		}
-		
-        // read() should then return a null
-        assertNull(source.read());
-        source.close();
+
+		// read() should then return a null
+		assertNull(source.read());
+		source.close();
 
 	}
 
