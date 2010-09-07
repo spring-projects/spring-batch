@@ -17,7 +17,24 @@ $ mvn install
   or the goal of your choice (compile, test, etc.).  This builds the
   artifact (e.g. jar file) from the project in the current directory,
   and deploys it to you local m2 repo at
-  <<<${user.home}/.m2/repository>>>.  See below for instructions on how
+  <<<${user.home}/.m2/repository>>>.  If there are any dependency resolution 
+  problems try 
+
++---
+$ mvn install -P bootstrap
++---
+
+  which enables some additional, non-standard repositories (which
+  should not be present in ther deployed artifacts).  You should only
+  need to do this once, because then all the dependencies will be
+  installed in your local repository.  To get the source code (where
+  available) for all dependencies, you can use
+
++---
+$ mvn dependency:sources -P bootstrap
++---
+
+  See below for instructions on how
   to build the documentation and web site.
 
   By default the whole project (including subprojects) will be built

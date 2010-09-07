@@ -1,0 +1,59 @@
+Spring Batch 2.1.3 Release Notes
+
+* Bug
+
+  * {{{http://jira.springsource.org/browse/BATCH-1572}[BATCH-1572]}} - Step not failing on org.springframework.transaction.UnexpectedRollbackException
+
+  * {{{http://jira.springsource.org/browse/BATCH-1579}[BATCH-1579]}} - Problems with null job parameters and late binding
+
+  * {{{http://jira.springsource.org/browse/BATCH-1597}[BATCH-1597]}} - DirectPoller only works with timeout in milliseconds
+
+  * {{{http://jira.springsource.org/browse/BATCH-1598}[BATCH-1598]}} - JobRepositoryTestUtils delete job execution fails if there is another execution with the same job instance
+
+  * {{{http://jira.springsource.org/browse/BATCH-1600}[BATCH-1600]}} - CommandLineJobRunner cannot stop a Job execution that was restarted
+
+  * {{{http://jira.springsource.org/browse/BATCH-1601}[BATCH-1601]}} - The "initialized" field in org.springframework.batch.test.DataSourceInitializer shouldn't be static.
+
+  * {{{http://jira.springsource.org/browse/BATCH-1602}[BATCH-1602]}} - Empty string JobParameter would be re-hydrated as null by Oracle
+
+  * {{{http://jira.springsource.org/browse/BATCH-1603}[BATCH-1603]}} - MultiResourceItemReader infinite read/exception loop after a failed delegate.open() when skip policy is very lax
+
+  * {{{http://jira.springsource.org/browse/BATCH-1605}[BATCH-1605]}} - HippyMethodInvoker candidate arguments repeated
+
+  * {{{http://jira.springsource.org/browse/BATCH-1615}[BATCH-1615]}} - MultiResourceItemReader infinite read/exception loop after NonTransientDataAccessResourceException
+
+  * {{{http://jira.springsource.org/browse/BATCH-1616}[BATCH-1616]}} - A custom partitioner no longer restart the job properly upon failure
+
+  * {{{http://jira.springsource.org/browse/BATCH-1618}[BATCH-1618]}} - MultiResourceItemWriter creates an empty file if the number of item to write is a multiple of itemCountLimitPerResource
+
+  * {{{http://jira.springsource.org/browse/BATCH-1619}[BATCH-1619]}} - BadSqlGrammarException accessing Executions page with Apache Derby 10.6 datasource
+
+  * {{{http://jira.springsource.org/browse/BATCH-1620}[BATCH-1620]}} - FlowStep never fails
+
+  * {{{http://jira.springsource.org/browse/BATCH-1621}[BATCH-1621]}} - Add <step flow="..."/> attribute
+
+  * {{{http://jira.springsource.org/browse/BATCH-1623}[BATCH-1623]}} - A chunk configured with processor-transactional="true" shouldn't require a retry- or skip-limit
+
+  * {{{http://jira.springsource.org/browse/BATCH-1624}[BATCH-1624]}} - Spring Batch Website documentation - fix link to Spring Integration
+
+* Improvement
+
+  * {{{http://jira.springsource.org/browse/BATCH-836}[BATCH-836]}} - CompositeItemWriter should also implement ItemStream
+
+  * {{{http://jira.springsource.org/browse/BATCH-1531}[BATCH-1531]}} - Restart of a partitioned Step should not call Partitioner
+
+  * {{{http://jira.springsource.org/browse/BATCH-1556}[BATCH-1556]}} - JobLauncher sequence diagrams have wrong message (call) labels
+
+  * {{{http://jira.springsource.org/browse/BATCH-1604}[BATCH-1604]}} - Update docs to describe use of Unicode characters in JobRepository
+
+  * {{{http://jira.springsource.org/browse/BATCH-1608}[BATCH-1608]}} - Javadocs: declare that readDate might throw NullPointerException when value is empty
+
+  * {{{http://jira.springsource.org/browse/BATCH-1609}[BATCH-1609]}} - Javadocs: DefaultFieldSet.readAndTrim does not throw a NullPointerException as stated by the Javadoc
+
+  * {{{http://jira.springsource.org/browse/BATCH-1614}[BATCH-1614]}} - More informative log message for ClassPathXmlApplicationContextFactory.ResourceXmlApplicationContext
+
+* New Feature
+
+  * {{{http://jira.springsource.org/browse/BATCH-1495}[BATCH-1495]}} - Detect possible overrun and memory issues when skip limit is not reached but reader skips so many records that the chunk never completes
+
+  * {{{http://jira.springsource.org/browse/BATCH-1622}[BATCH-1622]}} - Support transaction propagation properly in ResourcelessTransactionManager

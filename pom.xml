@@ -45,6 +45,9 @@
 			<url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
 		</license>
 	</licenses>
+	<properties>
+		<dependency.locations.enabled>false</dependency.locations.enabled>
+	</properties>
 	<profiles>
 		<profile>
 			<id>all</id>
@@ -339,22 +342,6 @@
 				</plugin>
 			  </plugins>
 			</build>
-		</profile>
-		<profile>
-			<id>snapshots</id>
-			<pluginRepositories>
-				<pluginRepository>
-					<id>apache-snapshots</id>
-					<url>http://people.apache.org/maven-snapshot-repository</url>
-				</pluginRepository>
-			</pluginRepositories>
-			<repositories>
-				<repository>
-					<id>apache-snapshot</id>
-					<name>Apache Foundation Snapshot Repository</name>
-					<url>http://people.apache.org/maven-snapshot-repository</url>
-				</repository>
-			</repositories>
 		</profile>
 		<profile>
 			<id>manifest</id>

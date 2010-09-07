@@ -14,6 +14,7 @@
 		<spring.framework.version>2.5.6</spring.framework.version>
 		<junit.version>4.4</junit.version>
 		<bundlor.version>1.0.0.RELEASE</bundlor.version>
+		<dependency.locations.enabled>false</dependency.locations.enabled>
 	</properties>
 	<profiles>
 		<profile>
@@ -104,20 +105,36 @@
 			</build>
 		</profile>
 		<profile>
-			<id>snapshots</id>
-			<pluginRepositories>
-				<pluginRepository>
-					<id>apache-snapshots</id>
-					<url>http://people.apache.org/maven-snapshot-repository/</url>
-				</pluginRepository>
-			</pluginRepositories>
+			<id>bootstrap</id>
 			<repositories>
+				<repository>
+					<id>objectstyle</id>
+					<name>ObjectStyle.org Repository</name>
+					<url>http://objectstyle.org/maven2/</url>
+					<snapshots>
+						<enabled>false</enabled>
+					</snapshots>
+				</repository>
 				<repository>
 					<id>apache-snapshot</id>
 					<name>Apache Foundation Snapshot Repository</name>
 					<url>http://people.apache.org/maven-snapshot-repository/</url>
 				</repository>
 			</repositories>
+			<pluginRepositories>
+				<pluginRepository>
+					<id>apache-snapshots</id>
+					<url>http://people.apache.org/maven-snapshot-repository/</url>
+				</pluginRepository>
+				<pluginRepository>
+					<id>com.springsource.repository.bundles.release</id>
+					<name>SpringSource Enterprise Bundle Repository - SpringSource Bundle Releases</name>
+					<url>http://repository.springsource.com/maven/bundles/release/</url>
+					<snapshots>
+						<enabled>false</enabled>
+					</snapshots>
+				</pluginRepository>
+			</pluginRepositories>
 		</profile>
 	</profiles>
 	<build>
@@ -514,11 +531,6 @@
 			</dependency>
 			<dependency>
 				<groupId>org.springframework</groupId>
-				<artifactId>spring-expression</artifactId>
-				<version>${spring.framework.version}</version>
-			</dependency>
-			<dependency>
-				<groupId>org.springframework</groupId>
 				<artifactId>spring-jdbc</artifactId>
 				<version>${spring.framework.version}</version>
 			</dependency>
@@ -584,24 +596,4 @@
 			<url>s3://maven.springframework.org/snapshot</url>
 		</snapshotRepository>
 	</distributionManagement>
-	<repositories>
-		<repository>
-			<id>objectstyle</id>
-			<name>ObjectStyle.org Repository</name>
-			<url>http://objectstyle.org/maven2/</url>
-			<snapshots>
-				<enabled>false</enabled>
-			</snapshots>
-		</repository>
-	</repositories>
-	<pluginRepositories>
-		<pluginRepository>
-			<id>com.springsource.repository.bundles.release</id>
-			<name>SpringSource Enterprise Bundle Repository - SpringSource Bundle Releases</name>
-			<url>http://repository.springsource.com/maven/bundles/release/</url>
-			<snapshots>
-				<enabled>false</enabled>
-			</snapshots>
-		</pluginRepository>
-	</pluginRepositories>
 </project>

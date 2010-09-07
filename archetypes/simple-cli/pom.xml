@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>org.springframework.batch</groupId>
 	<artifactId>spring-batch-simple-cli</artifactId>
@@ -8,14 +9,15 @@
 	<name>Commandline</name>
 	<url>http://www.springframework.org/spring-batch/archetypes/simple-cli-archetype</url>
 	<description>This project is a minimal command line batch sample from
-	Spring Batch.  Once installed you can use "mvn exec:java" to
-	see the job run; or if you ship the lib directory you can put
-	the project jar on the classpath and run the
-	CommandLineJobRunner directly or with "java -jar".</description>
+		Spring Batch. Once installed you can use "mvn exec:java" to
+		see the job run; or if you ship the lib directory you can put
+		the project jar on the classpath and run the
+		CommandLineJobRunner directly or with "java -jar launch-context.xml job1".</description>
 	<properties>
 		<maven.test.failure.ignore>true</maven.test.failure.ignore>
 		<spring.framework.version>2.5.6</spring.framework.version>
 		<spring.batch.version>2.1.2.RELEASE</spring.batch.version>
+		<dependency.locations.enabled>false</dependency.locations.enabled>
 	</properties>
 	<profiles>
 		<profile>
@@ -37,6 +39,26 @@
 				</snapshotRepository>
 			</distributionManagement>
 		</profile>
+		<profile>
+			<id>bootstrap</id>
+			<pluginRepositories>
+				<pluginRepository>
+					<id>Codehaus</id>
+					<url>http://repository.codehaus.org/</url>
+					<snapshots>
+						<enabled>false</enabled>
+					</snapshots>
+				</pluginRepository>
+				<pluginRepository>
+					<id>com.springsource.repository.bundles.release</id>
+					<name> SpringSource Enterprise Bundle Repository - SpringSource Bundle Releases</name>
+					<url>http://repository.springsource.com/maven/bundles/release</url>
+					<snapshots>
+						<enabled>false</enabled>
+					</snapshots>
+				</pluginRepository>
+			</pluginRepositories>
+		</profile>
 	</profiles>
 	<dependencies>
 		<dependency>
@@ -50,6 +72,16 @@
 			<artifactId>spring-test</artifactId>
 			<version>${spring.framework.version}</version>
 			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-context</artifactId>
+			<version>${spring.framework.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-aop</artifactId>
+			<version>${spring.framework.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>org.springframework</groupId>
@@ -212,24 +244,6 @@
 			</plugin>
 		</plugins>
 	</build>
-	<repositories />
-	<pluginRepositories>
-		<pluginRepository>
-			<id>Codehaus</id>
-			<url>http://repository.codehaus.org/</url>
-			<snapshots>
-				<enabled>false</enabled>
-			</snapshots>
-		</pluginRepository>
-		<pluginRepository>
-			<id>com.springsource.repository.bundles.release</id>
-			<name> SpringSource Enterprise Bundle Repository - SpringSource Bundle Releases</name>
-			<url>http://repository.springsource.com/maven/bundles/release</url>
-			<snapshots>
-				<enabled>false</enabled>
-			</snapshots>
-		</pluginRepository>
-	</pluginRepositories>
 	<distributionManagement>
 		<downloadUrl>http://www.springframework.org/download</downloadUrl>
 		<site>
@@ -238,14 +252,12 @@
 		</site>
 		<repository>
 			<id>spring-release</id>
-			<name>        Spring Release Repository
-      </name>
+			<name>Spring Release Repository</name>
 			<url>file:///${user.dir}/target/staging/release</url>
 		</repository>
 		<snapshotRepository>
 			<id>spring-snapshot</id>
-			<name>        Spring Snapshot Repository
-      </name>
+			<name>Spring Snapshot Repository</name>
 			<url>file:///${user.dir}/target/staging/snapshot</url>
 		</snapshotRepository>
 	</distributionManagement>
