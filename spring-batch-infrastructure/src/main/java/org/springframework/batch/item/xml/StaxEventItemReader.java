@@ -136,8 +136,12 @@ public class StaxEventItemReader<T> extends AbstractItemCountingItemStreamItemRe
 	 * 
 	 * @return <code>true</code> if next fragment was found, <code>false</code>
 	 * otherwise.
+	 * 
+	 * @throws DataAccessResourceFailureException if the cursor could not be
+	 * moved. This will be treated as fatal and subsequent calls to read will
+	 * return null.
 	 */
-	protected boolean moveCursorToNextFragment(XMLEventReader reader) {
+	protected boolean moveCursorToNextFragment(XMLEventReader reader) throws DataAccessResourceFailureException {
 		try {
 			while (true) {
 				while (reader.peek() != null && !reader.peek().isStartElement()) {
@@ -215,7 +219,16 @@ public class StaxEventItemReader<T> extends AbstractItemCountingItemStreamItemRe
 
 		T item = null;
 
-		if (moveCursorToNextFragment(fragmentReader)) {
+		boolean success = false;
+		try {
+			success = moveCursorToNextFragment(fragmentReader);
+		}
+		catch (DataAccessResourceFailureException e) {
+			// Prevent caller from retrying indefinitely since this is fatal
+			noInput = true;
+			throw e;
+		}
+		if (success) {
 			fragmentReader.markStartFragment();
 
 			@SuppressWarnings("unchecked")

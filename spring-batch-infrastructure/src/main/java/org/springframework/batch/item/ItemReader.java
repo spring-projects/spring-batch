@@ -21,8 +21,7 @@ package org.springframework.batch.item;
  * 
  * Implementations are expected to be stateful and will be called multiple times
  * for each batch, with each call to {@link #read()} returning a different value
- * and finally returning <code>null</code> when all input data is
- * exhausted.<br/>
+ * and finally returning <code>null</code> when all input data is exhausted.<br/>
  * 
  * Implementations need *not* be thread safe and clients of a {@link ItemReader}
  * need to be aware that this is the case.<br/>
@@ -44,8 +43,16 @@ public interface ItemReader<T> {
 	 * twice from successive calls (or otherwise), if the first call was in a
 	 * transaction that rolled back.
 	 * 
-	 * @throws Exception if an underlying resource is unavailable.
+	 * @throws ParseException if there is a problem parsing the current record
+	 * (but the next one may still be valid)
+	 * @throws NonTransientResourceException if there is a fatal exception in
+	 * the underlying resource. After throwing this exception implementations
+	 * should endeavour to return null from subsequent calls to read.
+	 * @throws UnexpectedInputException if there is an uncategorised problem
+	 * with the input data. Assume potentially transient, so subsequent calls to
+	 * read might succeed.
+	 * @throws Exception if an there is a non-specific error.
 	 */
-	T read() throws Exception, UnexpectedInputException, ParseException;
+	T read() throws Exception, UnexpectedInputException, ParseException, NonTransientResourceException;
 
 }

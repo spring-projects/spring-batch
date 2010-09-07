@@ -223,7 +223,10 @@ public class FlatFileItemReader<T> extends AbstractItemCountingItemStreamItemRea
 			line = applyRecordSeparatorPolicy(line);
 		}
 		catch (IOException e) {
-			throw new FlatFileParseException("Unable to read from resource: [" + resource + "]", e, line, lineCount);
+			// Prevent IOException from recurring indefinitely
+			// if client keeps catching and re-calling
+			noInput = true;
+			throw new NonTransientFlatFileException("Unable to read from resource: [" + resource + "]", e, line, lineCount);
 		}
 		return line;
 	}

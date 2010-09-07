@@ -45,6 +45,8 @@ public class StaxEventItemReaderTests {
 
 	private String mixedXml = "<fragment xmlns=\"urn:org.test.foo\"> <fragment xmlns=\"urn:org.test.bar\"> <misc1/> </fragment> <misc2/> <fragment xmlns=\"urn:org.test.bar\"> testString </fragment> </fragment>";
 
+	private String invalidXml = "<root> <fragment> <misc1/> <fragment> <misc2/> <fragment> testString </fragment> </root>";
+
 	private Unmarshaller unmarshaller = new MockFragmentUnmarshaller();
 
 	private static final String FRAGMENT_ROOT_ELEMENT = "fragment";
@@ -121,6 +123,21 @@ public class StaxEventItemReaderTests {
 		
 		source.setResource(new ByteArrayResource(mixedXml.getBytes()));
 		source.setFragmentRootElementName("{urn:org.test.bar}"+FRAGMENT_ROOT_ELEMENT);
+		source.afterPropertiesSet();
+		source.open(executionContext);
+		// see asserts in the mock unmarshaller
+		assertNotNull(source.read());
+		assertNotNull(source.read());
+		assertNull(source.read()); // there are only two fragments
+
+		source.close();
+	}
+
+	@Test
+	public void testFragmentInvalid() throws Exception {
+		
+		source.setResource(new ByteArrayResource(invalidXml.getBytes()));
+		source.setFragmentRootElementName(FRAGMENT_ROOT_ELEMENT);
 		source.afterPropertiesSet();
 		source.open(executionContext);
 		// see asserts in the mock unmarshaller
