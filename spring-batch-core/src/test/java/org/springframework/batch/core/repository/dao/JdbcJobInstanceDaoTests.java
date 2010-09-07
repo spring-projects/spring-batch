@@ -57,6 +57,7 @@ public class JdbcJobInstanceDaoTests extends AbstractJobInstanceDaoTests {
 
 	}
 
+	@Transactional
 	@Test
 	public void testFindJobInstanceByExecution() {
 
@@ -69,6 +70,7 @@ public class JdbcJobInstanceDaoTests extends AbstractJobInstanceDaoTests {
 		assertEquals(jobInstance, returnedInstance);
 	}
 
+	@Transactional
 	@Test
 	public void testCreateJobKey() {
 
@@ -80,6 +82,7 @@ public class JdbcJobInstanceDaoTests extends AbstractJobInstanceDaoTests {
 
 	}
 
+	@Transactional
 	@Test
 	public void testCreateJobKeyWithNullParameter() {
 
@@ -94,6 +97,7 @@ public class JdbcJobInstanceDaoTests extends AbstractJobInstanceDaoTests {
 
 	}
 
+	@Transactional
 	@Test
 	public void testCreateJobKeyOrdering() {
 

@@ -24,6 +24,7 @@ import java.util.Collections;
 import java.util.List;
 
 import org.apache.commons.dbcp.BasicDataSource;
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -72,12 +73,26 @@ public class AsyncChunkOrientedStepIntegrationTests {
 
 	private RepeatTemplate chunkOperations;
 
+	private int maxActive;
+
+	private int maxIdle;
+
 	private ItemReader<String> getReader(String[] args) {
 		return new ListItemReader<String>(Arrays.asList(args));
 	}
+	
+	@After
+	public void reset() {
+		// Reset concurrency settings to something reasonable
+		dataSource.setMaxActive(maxActive);
+		dataSource.setMaxIdle(maxIdle);		
+	}
 
 	@Before
-	public void onSetUp() throws Exception {
+	public void init() throws Exception {
+		
+		maxActive = dataSource.getMaxActive();
+		maxIdle = dataSource.getMaxIdle();
 
 		// Force deadlock with batch waiting for DB pool and vice versa
 		dataSource.setMaxActive(1);
