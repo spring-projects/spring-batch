@@ -34,7 +34,7 @@ public class Entity implements Serializable {
 
 	private Long id;
 
-	private Integer version;
+	private volatile Integer version;
 
 	public Entity() {
 		super();

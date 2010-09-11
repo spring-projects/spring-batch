@@ -8,7 +8,10 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 import javax.sql.DataSource;
 
@@ -44,7 +47,7 @@ import org.springframework.util.Assert;
  */
 @ContextConfiguration(locations = "/simple-job-launcher-context.xml")
 @RunWith(SpringJUnit4ClassRunner.class)
-public class FaultTolerantStepFactoryBeanTests {
+public class FaultTolerantStepFactoryBeanRollbackIntegrationTests {
 
 	private static final int MAX_COUNT = 1000;
 
@@ -71,6 +74,7 @@ public class FaultTolerantStepFactoryBeanTests {
 	@Autowired
 	private PlatformTransactionManager transactionManager;
 
+	@SuppressWarnings("unchecked")
 	@Before
 	public void setUp() throws Exception {
 
@@ -84,12 +88,17 @@ public class FaultTolerantStepFactoryBeanTests {
 		factory.setTransactionManager(transactionManager);
 		factory.setJobRepository(repository);
 		factory.setCommitInterval(3);
+		factory.setSkipLimit(10);
 		ThreadPoolTaskExecutor taskExecutor = new ThreadPoolTaskExecutor();
 		taskExecutor.setCorePoolSize(3);
 		taskExecutor.setMaxPoolSize(6);
 		taskExecutor.setQueueCapacity(0);
 		taskExecutor.afterPropertiesSet();
 		factory.setTaskExecutor(taskExecutor);
+		
+		factory.setSkippableExceptionClasses(getExceptionMap(Exception.class));
+
+		SimpleJdbcTestUtils.deleteFromTables(new SimpleJdbcTemplate(dataSource), "ERROR_LOG");
 
 	}
 	
@@ -109,25 +118,30 @@ public class FaultTolerantStepFactoryBeanTests {
 	}
 
 	@Test
-	public void testMultithreadedSunnyDay() throws Throwable {
+	public void testMultithreadedSkipInWriter() throws Throwable {
 
-		jobExecution = repository.createJobExecution("vanillaJob", new JobParameters());
+		jobExecution = repository.createJobExecution("skipJob", new JobParameters());
 
 		for (int i = 0; i < MAX_COUNT; i++) {
 
+			if (i%100==0) {
+				logger.info("Starting step: "+i);
+			}
+
 			SimpleJdbcTemplate jdbcTemplate = new SimpleJdbcTemplate(dataSource);
-
-			reader.clear();
-			reader.setItems("1", "2", "3", "4", "5");
-			factory.setItemReader(reader);
-			writer.clear();
-			factory.setItemWriter(writer);
-			processor.clear();
-			factory.setItemProcessor(processor);
-
 			assertEquals(0, SimpleJdbcTestUtils.countRowsInTable(jdbcTemplate, "ERROR_LOG"));
 
 			try {
+
+				reader.clear();
+				reader.setItems("1", "2", "3", "4", "5");
+				factory.setItemReader(reader);
+				writer.clear();
+				factory.setItemWriter(writer);
+				processor.clear();
+				factory.setItemProcessor(processor);
+
+				writer.setFailures("1", "2", "3", "4", "5");
 
 				Step step = (Step) factory.getObject();
 
@@ -136,13 +150,12 @@ public class FaultTolerantStepFactoryBeanTests {
 				step.execute(stepExecution);
 				assertEquals(BatchStatus.COMPLETED, stepExecution.getStatus());
 
-				List<String> committed = new ArrayList<String>(writer.getCommitted());
-				Collections.sort(committed);
-				assertEquals("[1, 2, 3, 4, 5]", committed.toString());
-				List<String> processed = new ArrayList<String>(processor.getCommitted());
+				assertEquals("[]", writer.getCommitted().toString());
+				assertEquals("[]", processor.getCommitted().toString());
+				List<String> processed = new ArrayList<String>(processor.getProcessed());
 				Collections.sort(processed);
-				assertEquals("[1, 2, 3, 4, 5]", processed.toString());
-				assertEquals(0, stepExecution.getSkipCount());
+				assertEquals("[1, 1, 2, 2, 3, 3, 4, 4, 5, 5]", processed.toString());
+				assertEquals(5, stepExecution.getSkipCount());
 
 			}
 			catch (Throwable e) {
@@ -152,6 +165,14 @@ public class FaultTolerantStepFactoryBeanTests {
 
 		}
 
+	}
+
+	private Map<Class<? extends Throwable>, Boolean> getExceptionMap(Class<? extends Throwable>... args) {
+		Map<Class<? extends Throwable>, Boolean> map = new HashMap<Class<? extends Throwable>, Boolean>();
+		for (Class<? extends Throwable> arg : args) {
+			map.put(arg, true);
+		}
+		return map;
 	}
 
 	private static class SkipReaderStub implements ItemReader<String> {
@@ -185,7 +206,7 @@ public class FaultTolerantStepFactoryBeanTests {
 
 	private static class SkipWriterStub implements ItemWriter<String> {
 
-		private List<String> written = new ArrayList<String>();
+		private List<String> written = new CopyOnWriteArrayList<String>();
 
 		private Collection<String> failures = Collections.emptySet();
 
@@ -193,6 +214,10 @@ public class FaultTolerantStepFactoryBeanTests {
 
 		public SkipWriterStub(DataSource dataSource) {
 			jdbcTemplate = new SimpleJdbcTemplate(dataSource);
+		}
+
+		public void setFailures(String... failures) {
+			this.failures = Arrays.asList(failures);
 		}
 
 		public List<String> getCommitted() {
@@ -228,7 +253,7 @@ public class FaultTolerantStepFactoryBeanTests {
 
 		private final Log logger = LogFactory.getLog(getClass());
 
-		private List<String> processed = new ArrayList<String>();
+		private List<String> processed = new CopyOnWriteArrayList<String>();
 
 		private SimpleJdbcTemplate jdbcTemplate;
 
@@ -237,6 +262,13 @@ public class FaultTolerantStepFactoryBeanTests {
 		 */
 		public SkipProcessorStub(DataSource dataSource) {
 			jdbcTemplate = new SimpleJdbcTemplate(dataSource);
+		}
+		
+		/**
+		 * @return the processed
+		 */
+		public List<String> getProcessed() {
+			return processed;
 		}
 
 		public List<String> getCommitted() {

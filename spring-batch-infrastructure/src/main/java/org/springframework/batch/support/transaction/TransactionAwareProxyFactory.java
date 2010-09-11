@@ -87,29 +87,31 @@ public class TransactionAwareProxyFactory<T> {
 	 * @return an independent copy
 	 */
 	@SuppressWarnings("unchecked")
-	protected synchronized final T begin(T target) {
+	protected final T begin(T target) {
 		// Unfortunately in Java 5 this method has to synchronized
 		// (works OK without in Java 6).
-		if (target instanceof List) {
-			if (appendOnly) {
-				return (T) new ArrayList();
+		synchronized (target) {
+			if (target instanceof List) {
+				if (appendOnly) {
+					return (T) new ArrayList();
+				}
+				return (T) new ArrayList((List) target);
 			}
-			return (T) new ArrayList((List) target);
-		}
-		else if (target instanceof Set) {
-			if (appendOnly) {
-				return (T) new HashSet();
+			else if (target instanceof Set) {
+				if (appendOnly) {
+					return (T) new HashSet();
+				}
+				return (T) new HashSet((Set) target);
 			}
-			return (T) new HashSet((Set) target);
-		}
-		else if (target instanceof Map) {
-			if (appendOnly) {
-				return (T) new HashMap();
+			else if (target instanceof Map) {
+				if (appendOnly) {
+					return (T) new HashMap();
+				}
+				return (T) new HashMap((Map) target);
 			}
-			return (T) new HashMap((Map) target);
-		}
-		else {
-			throw new UnsupportedOperationException("Cannot copy target for this type: " + target.getClass());
+			else {
+				throw new UnsupportedOperationException("Cannot copy target for this type: " + target.getClass());
+			}
 		}
 	}
 
@@ -122,20 +124,22 @@ public class TransactionAwareProxyFactory<T> {
 	 * @param target the original target of the factory.
 	 */
 	@SuppressWarnings("unchecked")
-	protected synchronized void commit(T copy, T target) {
+	protected void commit(T copy, T target) {
 		// Unfortunately in Java 5 this method has to be synchronized
 		// (works OK without in Java 6).
-		if (target instanceof Collection) {
-			if (!appendOnly) {
-				((Collection) target).clear();
+		synchronized (target) {
+			if (target instanceof Collection) {
+				if (!appendOnly) {
+					((Collection) target).clear();
+				}
+				((Collection) target).addAll((Collection) copy);
 			}
-			((Collection) target).addAll((Collection) copy);
-		}
-		else {
-			if (!appendOnly) {
-				((Map) target).clear();
+			else {
+				if (!appendOnly) {
+					((Map) target).clear();
+				}
+				((Map) target).putAll((Map) copy);
 			}
-			((Map) target).putAll((Map) copy);
 		}
 	}
 

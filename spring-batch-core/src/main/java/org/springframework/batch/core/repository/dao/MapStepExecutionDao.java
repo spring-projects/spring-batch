@@ -21,13 +21,13 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicLong;
 
 import org.springframework.batch.core.Entity;
 import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.StepExecution;
 import org.springframework.batch.support.SerializationUtils;
-import org.springframework.batch.support.transaction.TransactionAwareProxyFactory;
 import org.springframework.dao.OptimisticLockingFailureException;
 import org.springframework.util.Assert;
 import org.springframework.util.ReflectionUtils;
@@ -37,9 +37,9 @@ import org.springframework.util.ReflectionUtils;
  */
 public class MapStepExecutionDao implements StepExecutionDao {
 
-	private Map<Long, Map<Long, StepExecution>> executionsByJobExecutionId = TransactionAwareProxyFactory.createAppendOnlyTransactionalMap();
+	private Map<Long, Map<Long, StepExecution>> executionsByJobExecutionId = new ConcurrentHashMap<Long, Map<Long,StepExecution>>();
 
-	private Map<Long, StepExecution> executionsByStepExecutionId = TransactionAwareProxyFactory.createAppendOnlyTransactionalMap();
+	private Map<Long, StepExecution> executionsByStepExecutionId = new ConcurrentHashMap<Long, StepExecution>();
 
 	private AtomicLong currentId = new AtomicLong();
 
@@ -71,7 +71,7 @@ public class MapStepExecutionDao implements StepExecutionDao {
 
 		Map<Long, StepExecution> executions = executionsByJobExecutionId.get(stepExecution.getJobExecutionId());
 		if (executions == null) {
-			executions = TransactionAwareProxyFactory.createAppendOnlyTransactionalMap();
+			executions = new ConcurrentHashMap<Long, StepExecution>();
 			executionsByJobExecutionId.put(stepExecution.getJobExecutionId(), executions);
 		}
 

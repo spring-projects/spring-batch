@@ -23,13 +23,10 @@ import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.repository.support.MapJobRepositoryFactoryBean;
 import org.springframework.batch.support.transaction.ResourcelessTransactionManager;
 import org.springframework.core.task.SimpleAsyncTaskExecutor;
-import org.springframework.transaction.TransactionException;
-import org.springframework.transaction.UnexpectedRollbackException;
 import org.springframework.transaction.interceptor.RollbackRuleAttribute;
 import org.springframework.transaction.interceptor.RuleBasedTransactionAttribute;
 import org.springframework.transaction.interceptor.TransactionAttribute;
 import org.springframework.transaction.interceptor.TransactionAttributeEditor;
-import org.springframework.transaction.support.DefaultTransactionStatus;
 import org.springframework.util.StringUtils;
 
 /**
@@ -471,40 +468,6 @@ public class FaultTolerantStepFactoryBeanRollbackTests {
 		assertEquals("[1, 3, 5]", writer.getCommitted().toString());
 		assertEquals("[1, 2, 1, 2, 3, 4, 5]", writer.getWritten().toString());
 		assertEquals("[1, 2, 3, 4, 5]", processor.getProcessed().toString());
-	}
-
-	@Test
-	public void testTransactionException() throws Exception {
-		ResourcelessTransactionManager transactionManager = new ResourcelessTransactionManager() {
-			private boolean failed = false;
-			protected void doCommit(DefaultTransactionStatus status) throws TransactionException {
-				if (writer.getWritten().isEmpty() || failed || !isExistingTransaction(status.getTransaction())) {
-					super.doCommit(status);
-					return;
-				}
-				failed = true;
-				status.setRollbackOnly();
-				super.doRollback(status);
-				throw new UnexpectedRollbackException("Planned");
-			}
-		};
-		MapJobRepositoryFactoryBean repositoryFactory = new MapJobRepositoryFactoryBean();
-		repositoryFactory.setTransactionManager(transactionManager);
-		repositoryFactory.afterPropertiesSet();
-		repository = (JobRepository) repositoryFactory.getObject();
-		factory.setJobRepository(repository);
-		factory.setTransactionManager(transactionManager);
-
-		jobExecution = repository.createJobExecution("skipJob", new JobParameters());
-		stepExecution = jobExecution.createStepExecution(factory.getName());
-		repository.add(stepExecution);
-
-		Step step = (Step) factory.getObject();
-
-		step.execute(stepExecution);
-		assertEquals(BatchStatus.FAILED, stepExecution.getStatus());
-
-		assertEquals("[]", writer.getCommitted().toString());
 	}
 
 	@SuppressWarnings("unchecked")
