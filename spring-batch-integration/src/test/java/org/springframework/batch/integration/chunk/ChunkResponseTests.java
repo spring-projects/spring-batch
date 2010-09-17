@@ -28,7 +28,7 @@ import org.springframework.batch.test.MetaDataInstanceFactory;
  */
 public class ChunkResponseTests {
 
-	private ChunkResponse response = new ChunkResponse(111L, MetaDataInstanceFactory.createStepExecution()
+	private ChunkResponse response = new ChunkResponse(0, 111L, MetaDataInstanceFactory.createStepExecution()
 			.createStepContribution());
 
 	@Test

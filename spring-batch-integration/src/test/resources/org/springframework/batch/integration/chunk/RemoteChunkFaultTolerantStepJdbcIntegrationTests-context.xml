@@ -54,17 +54,7 @@
 		<property name="receiveTimeout" value="1000" />
 	</bean>
 
-	<bean class="org.springframework.beans.factory.config.CustomScopeConfigurer">
-		<property name="scopes">
-			<map>
-				<entry key="thread">
-					<bean class="org.springframework.context.support.SimpleThreadScope" />
-				</entry>
-			</map>
-		</property>
-	</bean>
-
-	<int-jdbc:message-store id="messageStore" data-source="dataSource"/>
+	<int-jdbc:message-store id="messageStore" data-source="dataSource" />
 
 	<integration:channel id="requests">
 		<integration:queue message-store="messageStore" />
@@ -75,7 +65,7 @@
 	<integration:service-activator input-channel="requests" output-channel="replies" ref="chunkHandler">
 		<integration:poller>
 			<integration:interval-trigger interval="100" />
-			<integration:transactional />
+			<integration:transactional isolation="READ_COMMITTED"/>
 		</integration:poller>
 	</integration:service-activator>
 
@@ -105,6 +95,7 @@
 		ignore-failures="DROPS">
 		<jdbc:script location="${batch.drop.script}" />
 		<jdbc:script location="${batch.schema.script}" />
+		<jdbc:script location="${integration.drop.script}" />
 		<jdbc:script location="${integration.schema.script}" />
 	</jdbc:initialize-database>
 

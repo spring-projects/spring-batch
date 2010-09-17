@@ -24,8 +24,8 @@ public class ChunkProcessorChunkHandlerTests {
 			}
 		});
 		StepContribution stepContribution = MetaDataInstanceFactory.createStepExecution().createStepContribution();
-		ChunkResponse response = handler.handleChunk(new ChunkRequest<Object>(StringUtils
-				.commaDelimitedListToSet("foo,bar"), 12L, stepContribution));
+		ChunkResponse response = handler.handleChunk(new ChunkRequest<Object>(0, StringUtils
+						.commaDelimitedListToSet("foo,bar"), 12L, stepContribution));
 		assertEquals(stepContribution, response.getStepContribution());
 		assertEquals(12, response.getJobId().longValue());
 		assertTrue(response.isSuccessful());

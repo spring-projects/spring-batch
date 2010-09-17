@@ -34,6 +34,9 @@ public class RemoteChunkFaultTolerantStepJdbcIntegrationTests {
 	@Autowired
 	private PollableChannel replies;
 	
+	// @Autowired
+	// private DataSource dataSource;
+	
 	@Before
 	public void drain() {
 		Message<?> message = replies.receive(100L);
@@ -79,6 +82,7 @@ public class RemoteChunkFaultTolerantStepJdbcIntegrationTests {
 	public void testSkipsInWriter() throws Exception {
 		JobExecution jobExecution = jobLauncher.run(job, new JobParametersBuilder().addString("item.three", "fail")
 				.addLong("run.id", 1L).toJobParameters());
+		// System.err.println(new SimpleJdbcTemplate(dataSource).queryForList("SELECT * FROM INT_MESSAGE_GROUP"));
 		assertEquals(BatchStatus.COMPLETED, jobExecution.getStatus());
 		StepExecution stepExecution = jobExecution.getStepExecutions().iterator().next();
 		assertEquals(9, stepExecution.getReadCount());

@@ -195,7 +195,7 @@ public class ChunkMessageItemWriterIntegrationTests {
 	private GenericMessage<ChunkRequest> getSimpleMessage(String string, Long jobId) {
 		StepContribution stepContribution = new JobExecution(new JobInstance(0L, new JobParameters(), "job"), 1L)
 				.createStepExecution("step").createStepContribution();
-		ChunkRequest chunk = new ChunkRequest(StringUtils.commaDelimitedListToSet(string), jobId, stepContribution);
+		ChunkRequest chunk = new ChunkRequest(0, StringUtils.commaDelimitedListToSet(string), jobId, stepContribution);
 		GenericMessage<ChunkRequest> message = new GenericMessage<ChunkRequest>(chunk);
 		return message;
 	}
