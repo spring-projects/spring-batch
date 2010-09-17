@@ -21,6 +21,7 @@ import java.util.Collection;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.util.Assert;
 import org.springframework.validation.BeanPropertyBindingResult;
+import org.springframework.validation.BindException;
 import org.springframework.validation.Errors;
 
 /**
@@ -49,7 +50,7 @@ public class SpringValidator<T> implements Validator<T>, InitializingBean {
 		validator.validate(item, errors);
 
 		if (errors.hasErrors()) {
-			throw new ValidationException("Validation failed for " + item + ": " + errorsToString(errors));
+			throw new ValidationException("Validation failed for " + item + ": " + errorsToString(errors), new BindException(errors));
 		}
 	}
 

@@ -21,6 +21,7 @@ import static org.junit.Assert.fail;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.springframework.validation.BindException;
 import org.springframework.validation.Errors;
 import org.springframework.validation.Validator;
 
@@ -70,6 +71,19 @@ public class SpringValidatorTests {
 	@Test(expected = ValidationException.class)
 	public void testValidateFailure() {
 		validator.validate(MockSpringValidator.REJECT_VALUE);
+	}
+
+	/**
+	 * Typical failed validation - {@link ValidationException} is thrown
+	 */
+	@Test(expected = BindException.class)
+	public void testValidateFailureWithErrors() throws Exception {
+		try {
+			validator.validate(MockSpringValidator.REJECT_VALUE);
+		}
+		catch (ValidationException e) {
+			throw (BindException) e.getCause();
+		}
 	}
 
 	/**
