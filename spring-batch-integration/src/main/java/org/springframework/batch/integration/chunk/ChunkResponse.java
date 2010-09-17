@@ -38,24 +38,27 @@ public class ChunkResponse implements Serializable {
 	
 	private final boolean redelivered;
 
-	public ChunkResponse(Long jobId, StepContribution stepContribution) {
-		this(true, jobId, stepContribution, null);
+	private final int sequence;
+
+	public ChunkResponse(int sequence, Long jobId, StepContribution stepContribution) {
+		this(true, sequence, jobId, stepContribution, null);
 	}
 
-	public ChunkResponse(boolean status, Long jobId, StepContribution stepContribution) {
-		this(status, jobId, stepContribution, null);
+	public ChunkResponse(boolean status, int sequence, Long jobId, StepContribution stepContribution) {
+		this(status, sequence, jobId, stepContribution, null);
 	}
 
-	public ChunkResponse(boolean status, Long jobId, StepContribution stepContribution, String message) {
-		this(status, jobId, stepContribution, message, false);
+	public ChunkResponse(boolean status, int sequence, Long jobId, StepContribution stepContribution, String message) {
+		this(status, sequence, jobId, stepContribution, message, false);
 	}
 
 	public ChunkResponse(ChunkResponse input, boolean redelivered) {
-		this(input.status, input.jobId, input.stepContribution, input.message, redelivered);
+		this(input.status, input.sequence, input.jobId, input.stepContribution, input.message, redelivered);
 	}
 
-	public ChunkResponse(boolean status, Long jobId, StepContribution stepContribution, String message, boolean redelivered) {
+	public ChunkResponse(boolean status, int sequence, Long jobId, StepContribution stepContribution, String message, boolean redelivered) {
 		this.status = status;
+		this.sequence = sequence;
 		this.jobId = jobId;
 		this.stepContribution = stepContribution;
 		this.message = message;
@@ -68,6 +71,10 @@ public class ChunkResponse implements Serializable {
 
 	public Long getJobId() {
 		return jobId;
+	}
+	
+	public int getSequence() {
+		return sequence;
 	}
 
 	public boolean isSuccessful() {
@@ -87,7 +94,7 @@ public class ChunkResponse implements Serializable {
 	 */
 	@Override
 	public String toString() {
-		return getClass().getSimpleName() + ": jobId=" + jobId + ", stepContribution=" + stepContribution
+		return getClass().getSimpleName() + ": jobId=" + jobId + ", sequence=" + sequence + ", stepContribution=" + stepContribution
 				+ ", successful=" + status;
 	}
 

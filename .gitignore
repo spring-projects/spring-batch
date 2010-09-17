@@ -1,5 +1,6 @@
 bin
 lib
+derby*
 target
 .settings
 integration-repo

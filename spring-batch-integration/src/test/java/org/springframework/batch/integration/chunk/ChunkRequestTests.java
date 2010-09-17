@@ -15,7 +15,8 @@
  */
 package org.springframework.batch.integration.chunk;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 
 import java.util.Arrays;
 
@@ -29,12 +30,12 @@ import org.springframework.batch.test.MetaDataInstanceFactory;
  */
 public class ChunkRequestTests {
 
-	private ChunkRequest<String> request = new ChunkRequest<String>(Arrays.asList("foo", "bar"), 111L,
-			MetaDataInstanceFactory.createStepExecution().createStepContribution());
+	private ChunkRequest<String> request = new ChunkRequest<String>(0, Arrays.asList("foo", "bar"),
+			111L, MetaDataInstanceFactory.createStepExecution().createStepContribution());
 
 	@Test
 	public void testGetJobId() {
-		assertEquals(new Long(111L), request.getJobId());
+		assertEquals(111L, request.getJobId());
 	}
 
 	@Test
@@ -58,7 +59,7 @@ public class ChunkRequestTests {
 		ChunkRequest<String> result = (ChunkRequest<String>) SerializationUtils.deserialize(SerializationUtils
 				.serialize(request));
 		assertNotNull(result.getStepContribution());
-		assertEquals(new Long(111L), result.getJobId());
+		assertEquals(111L, result.getJobId());
 		assertEquals(2, result.getItems().size());
 	}
 

@@ -22,7 +22,8 @@ import java.util.Collection;
 import org.springframework.batch.core.StepContribution;
 
 /**
- * Encapsulation of a chunk of items to be processed remotely as part of a step execution.
+ * Encapsulation of a chunk of items to be processed remotely as part of a step
+ * execution.
  * 
  * @author Dave Syer
  * 
@@ -30,24 +31,31 @@ import org.springframework.batch.core.StepContribution;
  */
 public class ChunkRequest<T> implements Serializable {
 
-	private final Long jobId;
+	private final long jobId;
 
 	private final Collection<? extends T> items;
 
 	private final StepContribution stepContribution;
 
-	public ChunkRequest(Collection<? extends T> items, Long jobId, StepContribution stepContribution) {
+	private final int sequence;
+
+	public ChunkRequest(int sequence, Collection<? extends T> items, long jobId, StepContribution stepContribution) {
+		this.sequence = sequence;
 		this.items = items;
 		this.jobId = jobId;
 		this.stepContribution = stepContribution;
 	}
 
-	public Long getJobId() {
+	public long getJobId() {
 		return jobId;
 	}
 
 	public Collection<? extends T> getItems() {
 		return items;
+	}
+
+	public int getSequence() {
+		return sequence;
 	}
 
 	/**
@@ -62,8 +70,8 @@ public class ChunkRequest<T> implements Serializable {
 	 */
 	@Override
 	public String toString() {
-		return getClass().getSimpleName() + ": jobId=" + jobId + ", contribution=" + stepContribution + ", item count="
-				+ items.size();
+		return getClass().getSimpleName() + ": jobId=" + jobId + ", sequence=" + sequence + ", contribution="
+				+ stepContribution + ", item count=" + items.size();
 	}
 
 }

@@ -86,6 +86,7 @@ public class RetryTransactionalPollingIntegrationTests implements ApplicationCon
 		List<String> expected = Arrays.asList(StringUtils.commaDelimitedListToStringArray("a,b,fail,fail,d,e"));
 		service.setExpected(expected);
 		waitForResults(bus, expected.size(), 100); // a, b, (fail, fail, [fail]), d, e
+		// System.err.println(service.getProcessed());
 		assertEquals(6, service.getProcessed().size()); // a,b,fail,fail,d,e
 		assertEquals(1, recoverer.getRecovered().size()); // fail
 		assertEquals(expected, service.getProcessed());
