@@ -381,7 +381,7 @@ public class FaultTolerantChunkProcessor<I, O> extends SimpleChunkProcessor<I, O
 								"Retry exhausted after last attempt in recovery path, but exception is not skippable.",
 								context.getLastThrowable());
 					}
-					
+
 					inputs.setBusy(true);
 					scan(contribution, inputs, outputs, chunkMonitor);
 					return null;
@@ -389,7 +389,9 @@ public class FaultTolerantChunkProcessor<I, O> extends SimpleChunkProcessor<I, O
 
 			};
 
-			logger.debug("Attempting to write: " + inputs);
+			if (logger.isDebugEnabled()) {
+				logger.debug("Attempting to write: " + inputs);
+			}
 			batchRetryTemplate.execute(retryCallback, recoveryCallback, new DefaultRetryState(inputs,
 					rollbackClassifier));
 
@@ -494,7 +496,9 @@ public class FaultTolerantChunkProcessor<I, O> extends SimpleChunkProcessor<I, O
 	private void scan(final StepContribution contribution, final Chunk<I> inputs, final Chunk<O> outputs,
 			ChunkMonitor chunkMonitor) throws Exception {
 
-		logger.debug("Scanning for failed item on write: " + inputs);
+		if (logger.isDebugEnabled()) {
+			logger.debug("Scanning for failed item on write: " + inputs);
+		}
 		if (outputs.isEmpty()) {
 			inputs.setBusy(false);
 			return;
