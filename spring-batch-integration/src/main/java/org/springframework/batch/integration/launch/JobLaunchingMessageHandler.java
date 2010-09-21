@@ -20,13 +20,11 @@ import org.springframework.batch.core.Job;
 import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.JobExecutionException;
 import org.springframework.batch.core.JobParameters;
-import org.springframework.batch.core.UnexpectedJobExecutionException;
 import org.springframework.batch.core.launch.JobLauncher;
 import org.springframework.integration.annotation.ServiceActivator;
 
 /**
- * Message handler which uses strategies to convert a Message into a job and a
- * set of job parameters
+ * Message handler which uses strategies to convert a Message into a job and a set of job parameters
  * @author Jonas Partner
  * @author Dave Syer
  * 
@@ -44,17 +42,12 @@ public class JobLaunchingMessageHandler implements JobLaunchRequestHandler {
 	}
 
 	@ServiceActivator
-	public JobExecution launch(JobLaunchRequest request) {
+	public JobExecution launch(JobLaunchRequest request) throws JobExecutionException {
 		Job job = request.getJob();
 		JobParameters jobParameters = request.getJobParameters();
 
-		try {
-			JobExecution execution = jobLauncher.run(job, jobParameters);
-			return execution;
-		}
-		catch (JobExecutionException e) {
-			throw new UnexpectedJobExecutionException("Exception executing job: ["+request+"]", e);
-		}
+		JobExecution execution = jobLauncher.run(job, jobParameters);
+		return execution;
 	}
 
 }

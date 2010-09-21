@@ -19,8 +19,7 @@ import org.springframework.batch.core.Job;
 import org.springframework.batch.core.JobParameters;
 
 /**
- * Encapsulation of a {@link Job} and its {@link JobParameters} forming a
- * request for a job to be launched.
+ * Encapsulation of a {@link Job} and its {@link JobParameters} forming a request for a job to be launched.
  * 
  * @author Dave Syer
  * 
@@ -28,6 +27,7 @@ import org.springframework.batch.core.JobParameters;
 public class JobLaunchRequest {
 
 	private final Job job;
+
 	private final JobParameters jobParameters;
 
 	/**
@@ -52,6 +52,11 @@ public class JobLaunchRequest {
 	 */
 	public JobParameters getJobParameters() {
 		return this.jobParameters;
+	}
+
+	@Override
+	public String toString() {
+		return "JobLaunchRequest: " + job.getName() + ", parameters=" + jobParameters;
 	}
 
 }
