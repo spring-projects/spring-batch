@@ -81,7 +81,7 @@
 		</dependency>
 		<dependency>
 			<groupId>org.apache.derby</groupId>
-			<artifactId>derby</artifactId>
+			<artifactId>com.springsource.org.apache.derby</artifactId>
 			<scope>test</scope>
 		</dependency>
 		<dependency>
