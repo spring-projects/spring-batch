@@ -9,7 +9,7 @@
 	<packaging>pom</packaging>
 	<properties>
 		<maven.test.failure.ignore>true</maven.test.failure.ignore>
-		<spring.batch.version>2.1.1.RELEASE</spring.batch.version>
+		<spring.batch.version>2.1.3.RELEASE</spring.batch.version>
 		<spring.framework.version>3.0.4.RELEASE</spring.framework.version>
 		<spring.integration.version>2.0.0.BUILD-SNAPSHOT</spring.integration.version>
 	</properties>
