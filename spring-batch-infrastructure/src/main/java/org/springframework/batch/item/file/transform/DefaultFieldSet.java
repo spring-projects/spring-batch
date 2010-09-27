@@ -467,6 +467,9 @@ public class DefaultFieldSet implements FieldSet {
 		try {
 			return readBigDecimal(indexOf(name), defaultValue);
 		}
+		catch (NumberFormatException e) {
+			throw new NumberFormatException(e.getMessage() + ", name: [" + name + "]");
+		}
 		catch (IllegalArgumentException e) {
 			throw new IllegalArgumentException(e.getMessage() + ", name: [" + name + "]");
 		}
