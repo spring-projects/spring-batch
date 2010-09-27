@@ -6,6 +6,7 @@ import java.util.List;
 import org.springframework.batch.core.listener.AbstractListenerFactoryBean;
 import org.springframework.batch.core.listener.ListenerMetaData;
 import org.springframework.beans.BeanMetadataElement;
+import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.config.BeanDefinitionHolder;
 import org.springframework.beans.factory.config.RuntimeBeanReference;
 import org.springframework.beans.factory.support.AbstractBeanDefinition;
@@ -40,7 +41,7 @@ public abstract class AbstractListenerParser {
 
 	@SuppressWarnings("unchecked")
 	public void doParse(Element element, ParserContext parserContext, BeanDefinitionBuilder builder) {
-		builder.addPropertyValue("delegate", parseListenerElement(element, parserContext));
+		builder.addPropertyValue("delegate", parseListenerElement(element, parserContext, builder.getRawBeanDefinition()));
 
 		ManagedMap metaDataMap = new ManagedMap();
 		for (String metaDataPropertyName : getMethodNameAttributes()) {
@@ -53,7 +54,7 @@ public abstract class AbstractListenerParser {
 	}
 
 	@SuppressWarnings("unchecked")
-	public static BeanMetadataElement parseListenerElement(Element element, ParserContext parserContext) {
+	public static BeanMetadataElement parseListenerElement(Element element, ParserContext parserContext, BeanDefinition enclosing) {
 		String listenerRef = element.getAttribute(REF_ATTR);
 		List<Element> beanElements = DomUtils.getChildElementsByTagName(element, BEAN_ELE);
 		List<Element> refElements = DomUtils.getChildElementsByTagName(element, REF_ELE);
@@ -66,7 +67,7 @@ public abstract class AbstractListenerParser {
 		else if (beanElements.size() == 1) {
 			Element beanElement = beanElements.get(0);
 			BeanDefinitionHolder beanDefinitionHolder = parserContext.getDelegate().parseBeanDefinitionElement(
-					beanElement);
+					beanElement, enclosing);
 			parserContext.getDelegate().decorateBeanDefinitionIfRequired(beanElement, beanDefinitionHolder);
 			return beanDefinitionHolder;
 		}

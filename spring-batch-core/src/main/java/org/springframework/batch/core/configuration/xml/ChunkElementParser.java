@@ -18,6 +18,7 @@ package org.springframework.batch.core.configuration.xml;
 import java.util.List;
 
 import org.springframework.beans.MutablePropertyValues;
+import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.config.BeanDefinitionHolder;
 import org.springframework.beans.factory.config.RuntimeBeanReference;
 import org.springframework.beans.factory.config.TypedStringValue;
@@ -137,7 +138,7 @@ public class ChunkElementParser {
 		handleExceptionElement(element, parserContext, propertyValues, "retryable-exception-classes",
 				"retryableExceptionClasses");
 
-		handleRetryListenersElement(element, propertyValues, parserContext);
+		handleRetryListenersElement(element, propertyValues, parserContext, bd);
 
 		handleStreamsElement(element, propertyValues, parserContext);
 
@@ -229,7 +230,7 @@ public class ChunkElementParser {
 	}
 
 	private void handleRetryListenersElement(Element element, MutablePropertyValues propertyValues,
-			ParserContext parserContext) {
+			ParserContext parserContext, BeanDefinition enclosing) {
 		Element listenersElement = DomUtils.getChildElementByTagName(element, "retry-listeners");
 		if (listenersElement != null) {
 			CompositeComponentDefinition compositeDef = new CompositeComponentDefinition(listenersElement.getTagName(),
@@ -238,18 +239,18 @@ public class ChunkElementParser {
 			ManagedList retryListenerBeans = new ManagedList();
 			retryListenerBeans.setMergeEnabled(listenersElement.hasAttribute(MERGE_ATTR)
 					&& Boolean.valueOf(listenersElement.getAttribute(MERGE_ATTR)));
-			handleRetryListenerElements(parserContext, listenersElement, retryListenerBeans);
+			handleRetryListenerElements(parserContext, listenersElement, retryListenerBeans, enclosing);
 			propertyValues.addPropertyValue("retryListeners", retryListenerBeans);
 			parserContext.popAndRegisterContainingComponent();
 		}
 	}
 
 	@SuppressWarnings("unchecked")
-	private void handleRetryListenerElements(ParserContext parserContext, Element element, ManagedList beans) {
+	private void handleRetryListenerElements(ParserContext parserContext, Element element, ManagedList beans, BeanDefinition enclosing) {
 		List<Element> listenerElements = DomUtils.getChildElementsByTagName(element, "listener");
 		if (listenerElements != null) {
 			for (Element listenerElement : listenerElements) {
-				beans.add(AbstractListenerParser.parseListenerElement(listenerElement, parserContext));
+				beans.add(AbstractListenerParser.parseListenerElement(listenerElement, parserContext, enclosing));
 			}
 		}
 	}

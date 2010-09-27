@@ -93,7 +93,7 @@ public class TaskletParser {
 			}
 			else if (beanElements.size() == 1) {
 				Element beanElement = beanElements.get(0);
-				BeanDefinitionHolder beanDefinitionHolder = parserContext.getDelegate().parseBeanDefinitionElement(beanElement);
+				BeanDefinitionHolder beanDefinitionHolder = parserContext.getDelegate().parseBeanDefinitionElement(beanElement, bd);
 				parserContext.getDelegate().decorateBeanDefinitionIfRequired(beanElement, beanDefinitionHolder);
 				bme = beanDefinitionHolder;
 			}
