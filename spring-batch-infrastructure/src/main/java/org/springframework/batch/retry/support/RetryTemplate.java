@@ -202,7 +202,9 @@ public class RetryTemplate implements RetryOperations {
 
 		// Allow the retry policy to initialise itself...
 		RetryContext context = open(retryPolicy, state);
-		logger.debug("RetryContext retrieved: " + context);
+		if (logger.isTraceEnabled()) {
+			logger.trace("RetryContext retrieved: " + context);
+		}
 
 		// Make sure the context is available globally for clients who need
 		// it...
