@@ -306,6 +306,8 @@ public class TaskletStep extends AbstractStep {
 
 		private boolean rolledBack = false;
 
+		private boolean stepExecutionUpdated = false;
+
 		private StepExecution oldVersion;
 
 		private boolean locked = false;
@@ -319,11 +321,15 @@ public class TaskletStep extends AbstractStep {
 		public void afterCompletion(int status) {
 			try {
 				if (status != TransactionSynchronization.STATUS_COMMITTED) {
-					if (oldVersion != null) {
+					if (stepExecutionUpdated) {
 						// Wah! the commit failed. We need to rescue the step
 						// execution data.
+						logger.info("Commit failed while step execution data was already updated. "
+								+ "Reverting to old version.");
 						copy(oldVersion, stepExecution);
-						stepExecution.incrementRollbackCount();
+						if (status == TransactionSynchronization.STATUS_ROLLED_BACK) {
+							rollback(stepExecution);
+						}
 					}
 				}
 				if (status == TransactionSynchronization.STATUS_UNKNOWN) {
@@ -352,6 +358,11 @@ public class TaskletStep extends AbstractStep {
 			StepContribution contribution = stepExecution.createStepContribution();
 
 			chunkListener.beforeChunk();
+
+			// In case we need to push it back to its old value
+			// after a commit fails...
+			oldVersion = new StepExecution(stepExecution.getStepName(), stepExecution.getJobExecution());
+			copy(stepExecution, oldVersion);
 
 			try {
 
@@ -386,17 +397,14 @@ public class TaskletStep extends AbstractStep {
 						Thread.currentThread().interrupt();
 					}
 
-					// In case we need to push it back to its old value
-					// after a commit fails...
-					oldVersion = new StepExecution(stepExecution.getStepName(), stepExecution.getJobExecution());
-					copy(stepExecution, oldVersion);
-
 					// Apply the contribution to the step
 					// even if unsuccessful
 					logger.debug("Applying contribution: " + contribution);
 					stepExecution.apply(contribution);
 
 				}
+
+				stepExecutionUpdated = true;
 
 				stream.update(stepExecution.getExecutionContext());
 
@@ -446,12 +454,13 @@ public class TaskletStep extends AbstractStep {
 				rolledBack = true;
 			}
 		}
-		
+
 		private void copy(final StepExecution source, final StepExecution target) {
 			target.setVersion(source.getVersion());
 			target.setWriteCount(source.getWriteCount());
 			target.setFilterCount(source.getFilterCount());
-			target.setRollbackCount(source.getRollbackCount());
+			target.setCommitCount(source.getCommitCount());
+			target.setExecutionContext(new ExecutionContext(source.getExecutionContext()));
 		}
 
 	}

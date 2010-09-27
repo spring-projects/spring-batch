@@ -36,6 +36,7 @@ import org.springframework.batch.item.ItemStreamSupport;
 import org.springframework.batch.repeat.RepeatStatus;
 import org.springframework.batch.support.transaction.ResourcelessTransactionManager;
 import org.springframework.transaction.TransactionException;
+import org.springframework.transaction.UnexpectedRollbackException;
 import org.springframework.transaction.support.DefaultTransactionStatus;
 
 /**
@@ -210,6 +211,7 @@ public class TaskletStepExceptionTests {
 		taskletStep.setTasklet(new Tasklet() {
 
 			public RepeatStatus execute(StepContribution contribution, ChunkContext attributes) throws Exception {
+				attributes.getStepContext().getStepExecution().getExecutionContext().putString("foo", "bar");
 				return RepeatStatus.FINISHED;
 			}
 
@@ -219,6 +221,38 @@ public class TaskletStepExceptionTests {
 		assertEquals(UNKNOWN, stepExecution.getStatus());
 		Throwable e = stepExecution.getFailureExceptions().get(0);
 		assertEquals("foo", e.getMessage());
+		assertEquals(0, stepExecution.getCommitCount());
+		assertEquals(1, stepExecution.getRollbackCount()); // Failed transaction counts as rollback 
+		assertEquals(0, stepExecution.getExecutionContext().size());
+	}
+
+	@Test
+	public void testUnexpectedRollback() throws Exception {
+
+		taskletStep.setTransactionManager(new ResourcelessTransactionManager() {
+			@Override
+			protected void doCommit(DefaultTransactionStatus status) throws TransactionException {
+				super.doRollback(status);
+				throw new UnexpectedRollbackException("bar");
+			}
+		});
+
+		taskletStep.setTasklet(new Tasklet() {
+
+			public RepeatStatus execute(StepContribution contribution, ChunkContext attributes) throws Exception {
+				attributes.getStepContext().getStepExecution().getExecutionContext().putString("foo", "bar");
+				return RepeatStatus.FINISHED;
+			}
+
+		});
+
+		taskletStep.execute(stepExecution);
+		assertEquals(FAILED, stepExecution.getStatus());
+		Throwable e = stepExecution.getFailureExceptions().get(0);
+		assertEquals("bar", e.getMessage());
+		assertEquals(0, stepExecution.getCommitCount());
+		assertEquals(1, stepExecution.getRollbackCount()); // Failed transaction counts as rollback 
+		assertEquals(0, stepExecution.getExecutionContext().size());
 	}
 
 	@Test
