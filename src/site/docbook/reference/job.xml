@@ -927,6 +927,10 @@ public class JobLauncherController {
     &lt;property name="jobRegistry" ref="jobRegistry" /&gt;
     &lt;property name="jobLauncher" ref="jobLauncher" /&gt;
 &lt;/bean&gt;</programlisting>
+
+	  <note>If you set the table prefix on the job repository, don't
+	  forget to set it on the job explorer as well.</note>
+
     </section>
 
     <section id="JobParametersIncrementer">
