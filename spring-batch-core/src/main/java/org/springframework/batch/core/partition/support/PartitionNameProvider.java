@@ -25,6 +25,14 @@ import java.util.Collection;
  * interface if a partitioner extends {@link SimplePartitioner} and re-uses the
  * default partition names.
  * </p>
+ * <p>
+ * If a partitioner does implement this interface, however, on a restart the
+ * {@link Partitioner#partition(int)} method will not be called again, instead
+ * the partitions will be re-used from the last execution, and matched by name
+ * with the results of {@link PartitionNameProvider#getPartitionNames(int)}.
+ * This can be a useful performance optimisation if the partitioning process is
+ * expensive.
+ * </p>
  * 
  * @author Dave Syer
  * 

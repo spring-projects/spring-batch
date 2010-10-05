@@ -340,6 +340,17 @@
       <classname>Job</classname>), and the suffix is just a counter. There is
       a <classname>SimplePartitioner</classname> in the framework that uses
       this convention.</para>
+
+      <para>An optional interface
+      <classname>PartitioneNameProvider</classname> can be used to
+      provide the partition names separately from the partitions
+      themselves.  If a <classname>Partitioner</classname> implements
+      this interface then on a restart only the names will be queried.
+      If partitioning is expensive this can be a useful optimisation.
+      Obviously the names provided by the
+      <classname>PartitioneNameProvider</classname> must match those
+      provided by the <classname>Partitioner</classname>.</para>
+
     </section>
 
     <section id="bindingInputDataToSteps">
