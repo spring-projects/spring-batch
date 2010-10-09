@@ -79,7 +79,7 @@ public class SqlPagingQueryUtilsTests {
 	public void testGenerateRowNumSqlQueryWithNesting() {
 		AbstractSqlPagingQueryProvider qp = new TestSqlPagingQueryProvider("FOO", "BAR", "ID");
 		assertEquals(
-				"SELECT * FROM (SELECT FOO, ROWNUM as TMP_ROW_NUM FROM (SELECT FOO FROM BAR ORDER BY ID ASC)) WHERE ROWNUMBER <= 100",
+				"SELECT FOO FROM (SELECT FOO, ROWNUM as TMP_ROW_NUM FROM (SELECT FOO FROM BAR ORDER BY ID ASC)) WHERE ROWNUMBER <= 100",
 				SqlPagingQueryUtils.generateRowNumSqlQueryWithNesting(qp, "FOO", false, "ROWNUMBER <= 100"));
 	}
 

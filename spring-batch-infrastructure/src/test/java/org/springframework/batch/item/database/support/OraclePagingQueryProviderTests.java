@@ -33,14 +33,14 @@ public class OraclePagingQueryProviderTests extends AbstractSqlPagingQueryProvid
 
 	@Test @Override
 	public void testGenerateJumpToItemQuery() {
-		String sql = "SELECT * FROM (SELECT SORT_KEY, ROWNUM as TMP_ROW_NUM FROM (SELECT id AS SORT_KEY FROM foo WHERE bar = 1 ORDER BY id ASC)) WHERE TMP_ROW_NUM = 100";
+		String sql = "SELECT SORT_KEY FROM (SELECT SORT_KEY, ROWNUM as TMP_ROW_NUM FROM (SELECT id AS SORT_KEY FROM foo WHERE bar = 1 ORDER BY id ASC)) WHERE TMP_ROW_NUM = 100";
 		String s = pagingQueryProvider.generateJumpToItemQuery(145, pageSize);
 		Assert.assertEquals(sql, s);
 	}
 	
 	@Test @Override
 	public void testGenerateJumpToItemQueryForFirstPage() {
-		String sql = "SELECT * FROM (SELECT SORT_KEY, ROWNUM as TMP_ROW_NUM FROM (SELECT id AS SORT_KEY FROM foo WHERE bar = 1 ORDER BY id ASC)) WHERE TMP_ROW_NUM = 1";
+		String sql = "SELECT SORT_KEY FROM (SELECT SORT_KEY, ROWNUM as TMP_ROW_NUM FROM (SELECT id AS SORT_KEY FROM foo WHERE bar = 1 ORDER BY id ASC)) WHERE TMP_ROW_NUM = 1";
 		String s = pagingQueryProvider.generateJumpToItemQuery(45, pageSize);
 		Assert.assertEquals(sql, s);
 	}

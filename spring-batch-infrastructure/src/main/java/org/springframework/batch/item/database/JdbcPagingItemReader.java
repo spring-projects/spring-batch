@@ -188,8 +188,7 @@ public class JdbcPagingItemReader<T> extends AbstractPagingItemReader<T> impleme
 
 		PagingRowMapper rowCallback = new PagingRowMapper();
 
-		@SuppressWarnings("unchecked")
-		List query;
+		List<?> query;
 
 		if (getPage() == 0) {
 			if (logger.isDebugEnabled()) {
@@ -225,7 +224,7 @@ public class JdbcPagingItemReader<T> extends AbstractPagingItemReader<T> impleme
 		}
 		
 		@SuppressWarnings("unchecked")
-		Collection<T> result = query;
+		Collection<T> result = (Collection<T>) query;
 		results.addAll(result);
 
 	}
