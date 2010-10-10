@@ -30,6 +30,7 @@ import org.springframework.context.ApplicationListener;
 import org.springframework.context.Lifecycle;
 import org.springframework.context.event.ContextClosedEvent;
 import org.springframework.context.event.ContextRefreshedEvent;
+import org.springframework.core.Ordered;
 import org.springframework.util.Assert;
 
 /**
@@ -44,7 +45,7 @@ import org.springframework.util.Assert;
  * 
  * @since 2.1
  */
-public class AutomaticJobRegistrar implements Lifecycle, ApplicationListener, ApplicationContextAware, InitializingBean {
+public class AutomaticJobRegistrar implements Ordered, Lifecycle, ApplicationListener, ApplicationContextAware, InitializingBean {
 
 	private Collection<ApplicationContextFactory> applicationContextFactories = new ArrayList<ApplicationContextFactory>();
 
@@ -55,6 +56,8 @@ public class AutomaticJobRegistrar implements Lifecycle, ApplicationListener, Ap
 	private volatile boolean running = false;
 
 	private Object lifecycleMonitor = new Object();
+	
+	private int order = Ordered.LOWEST_PRECEDENCE;
 
 	/**
 	 * The enclosing application context, which can be used to check if
@@ -87,6 +90,19 @@ public class AutomaticJobRegistrar implements Lifecycle, ApplicationListener, Ap
 	 */
 	public void setJobLoader(JobLoader jobLoader) {
 		this.jobLoader = jobLoader;
+	}
+
+	public int getOrder() {
+		return order;
+	}
+
+	/**
+	 * The order to start up and shutdown.
+	 * @param order the order (default {@link Ordered#LOWEST_PRECEDENCE}).
+	 * @see Ordered
+	 */
+	public void setOrder(int order) {
+		this.order = order;
 	}
 
 	/**

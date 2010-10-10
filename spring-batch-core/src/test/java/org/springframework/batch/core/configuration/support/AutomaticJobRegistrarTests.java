@@ -17,6 +17,7 @@ import org.springframework.context.event.ContextClosedEvent;
 import org.springframework.context.event.ContextRefreshedEvent;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 import org.springframework.context.support.GenericApplicationContext;
+import org.springframework.core.Ordered;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;
 
@@ -37,6 +38,16 @@ public class AutomaticJobRegistrarTests {
 		DefaultJobLoader jobLoader = new DefaultJobLoader();
 		jobLoader.setJobRegistry(registry);
 		registrar.setJobLoader(jobLoader);
+	}
+
+	@Test
+	public void testOrderedImplemented() throws Exception {
+		
+		assertTrue(registrar instanceof Ordered);
+		assertEquals(Ordered.LOWEST_PRECEDENCE, registrar.getOrder());
+		registrar.setOrder(1);
+		assertEquals(1, registrar.getOrder());
+
 	}
 
 	@Test
