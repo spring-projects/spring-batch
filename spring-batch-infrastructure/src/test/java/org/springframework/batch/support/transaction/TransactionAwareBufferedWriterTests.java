@@ -174,4 +174,10 @@ public class TransactionAwareBufferedWriterTests {
 		assertEquals("", stringWriter.toString());
 	}
 
+	@Test
+	public void testCleanUpAfterRollback() throws Exception {
+		testWriteWithRollback();
+		testWriteWithCommit();
+	}
+
 }

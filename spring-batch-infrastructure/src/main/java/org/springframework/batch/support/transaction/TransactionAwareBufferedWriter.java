@@ -72,31 +72,37 @@ public class TransactionAwareBufferedWriter extends Writer {
 			TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronizationAdapter() {
 				@Override
 				public void afterCompletion(int status) {
-					if (status == STATUS_COMMITTED) {
-						complete();
+					try {
+						if (status == STATUS_COMMITTED) {
+							complete();
+						}
+					}
+					catch (IOException e) {
+						throw new FlushFailedException("Could not write to output buffer", e);
+					}
+					finally {
+						clear();
 					}
 				}
 
-				private void complete() {
+				private void complete() throws IOException {
 					StringBuffer buffer = (StringBuffer) TransactionSynchronizationManager.getResource(bufferKey);
 					if (buffer != null) {
-						try {
-							writer.write(buffer.toString());
-							writer.flush();
-							if (TransactionSynchronizationManager.hasResource(closeKey)) {
-								writer.close();
-								closeCallback.run();
-							}
+						writer.write(buffer.toString());
+						writer.flush();
+						if (TransactionSynchronizationManager.hasResource(closeKey)) {
+							writer.close();
+							closeCallback.run();
 						}
-						catch (IOException e) {
-							throw new FlushFailedException("Could not write to output buffer", e);
-						}
-						finally {
-							TransactionSynchronizationManager.unbindResource(bufferKey);
-							if (TransactionSynchronizationManager.hasResource(closeKey)) {
-								TransactionSynchronizationManager.unbindResource(closeKey);
-							}
-						}
+					}
+				}
+
+				private void clear() {
+					if (TransactionSynchronizationManager.hasResource(bufferKey)) {
+						TransactionSynchronizationManager.unbindResource(bufferKey);
+					}
+					if (TransactionSynchronizationManager.hasResource(closeKey)) {
+						TransactionSynchronizationManager.unbindResource(closeKey);
 					}
 				}
 
