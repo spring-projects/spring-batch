@@ -32,7 +32,7 @@ public class ExecutionContextTestUtilsTests {
 		Date date = new Date();
 		JobExecution jobExecution = MetaDataInstanceFactory.createJobExecution();
 		jobExecution.getExecutionContext().put("foo", date);
-		Date result = ExecutionContextTestUtils.getFromJob(jobExecution, "foo");
+		Date result = ExecutionContextTestUtils.getValueFromJob(jobExecution, "foo");
 		assertEquals(date, result);
 	}
 
@@ -42,7 +42,7 @@ public class ExecutionContextTestUtilsTests {
 		JobExecution jobExecution = MetaDataInstanceFactory.createJobExecutionWithStepExecutions(123L, Arrays.asList("foo", "bar"));
 		StepExecution stepExecution = jobExecution.createStepExecution("spam");
 		stepExecution.getExecutionContext().put("foo", date);
-		Date result = ExecutionContextTestUtils.getFromStep(jobExecution, "spam", "foo");
+		Date result = ExecutionContextTestUtils.getValueFromStepInJob(jobExecution, "spam", "foo");
 		assertEquals(date, result);
 	}
 
@@ -50,7 +50,7 @@ public class ExecutionContextTestUtilsTests {
 	public void testFromStepInJobNoSuchStep() throws Exception {
 		Date date = new Date();
 		JobExecution jobExecution = MetaDataInstanceFactory.createJobExecutionWithStepExecutions(123L, Arrays.asList("foo", "bar"));
-		Date result = ExecutionContextTestUtils.getFromStep(jobExecution, "spam", "foo");
+		Date result = ExecutionContextTestUtils.getValueFromStepInJob(jobExecution, "spam", "foo");
 		assertEquals(date, result);
 	}
 
@@ -59,7 +59,7 @@ public class ExecutionContextTestUtilsTests {
 		Date date = new Date();
 		StepExecution stepExecution = MetaDataInstanceFactory.createStepExecution();
 		stepExecution.getExecutionContext().put("foo", date);
-		Date result = ExecutionContextTestUtils.getFromStep(stepExecution, "foo");
+		Date result = ExecutionContextTestUtils.getValueFromStep(stepExecution, "foo");
 		assertEquals(date, result);
 	}
 
