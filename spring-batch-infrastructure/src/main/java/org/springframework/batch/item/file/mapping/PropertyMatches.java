@@ -138,7 +138,8 @@ final class PropertyMatches {
 		for (int i = 0; i < propertyDescriptors.length; i++) {
 			if (propertyDescriptors[i].getWriteMethod() != null) {
 				String possibleAlternative = propertyDescriptors[i].getName();
-				if (calculateStringDistance(this.propertyName, possibleAlternative) <= maxDistance) {
+				int distance = calculateStringDistance(this.propertyName, possibleAlternative);
+				if (distance <= maxDistance) {
 					candidates.add(possibleAlternative);
 				}
 			}
@@ -187,5 +188,4 @@ final class PropertyMatches {
 
 		return d[s1.length()][s2.length()];
 	}
-
 }

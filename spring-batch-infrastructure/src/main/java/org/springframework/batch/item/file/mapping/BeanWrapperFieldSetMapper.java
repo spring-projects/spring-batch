@@ -94,9 +94,9 @@ public class BeanWrapperFieldSetMapper<T> extends DefaultPropertyEditorRegistrar
 
 	private BeanFactory beanFactory;
 
-	private static Map<Class<?>, Map<String, String>> propertiesMatched = new HashMap<Class<?>, Map<String, String>>();
+	private static Map<DistanceHolder, Map<String, String>> propertiesMatched = new HashMap<DistanceHolder, Map<String, String>>();
 
-	private static int distanceLimit = 5;
+	private int distanceLimit = 5;
 
 	private boolean strict = true;
 
@@ -109,6 +109,17 @@ public class BeanWrapperFieldSetMapper<T> extends DefaultPropertyEditorRegistrar
 	 */
 	public void setBeanFactory(BeanFactory beanFactory) {
 		this.beanFactory = beanFactory;
+	}
+
+	/**
+	 * The maximum difference that can be tolerated in spelling between input
+	 * key names and bean property names. Defaults to 5, but could be set lower
+	 * if the field names match the bean names.
+	 * 
+	 * @param distanceLimit the distance limit to set
+	 */
+	public void setDistanceLimit(int distanceLimit) {
+		this.distanceLimit = distanceLimit;
 	}
 
 	/**
@@ -231,16 +242,17 @@ public class BeanWrapperFieldSetMapper<T> extends DefaultPropertyEditorRegistrar
 	 * @param properties
 	 * @return
 	 */
-	@SuppressWarnings("unchecked")
+	@SuppressWarnings({ "unchecked", "rawtypes" })
 	private Properties getBeanProperties(Object bean, Properties properties) {
 
 		Class<?> cls = bean.getClass();
 
 		// Map from field names to property names
-		Map<String, String> matches = propertiesMatched.get(cls);
+		DistanceHolder distanceKey = new DistanceHolder(cls, distanceLimit);
+		Map<String, String> matches = propertiesMatched.get(distanceKey);
 		if (matches == null) {
 			matches = new HashMap<String, String>();
-			propertiesMatched.put(cls, matches);
+			propertiesMatched.put(distanceKey, matches);
 		}
 
 		Set<String> keys = new HashSet(properties.keySet());
@@ -254,6 +266,16 @@ public class BeanWrapperFieldSetMapper<T> extends DefaultPropertyEditorRegistrar
 			String name = findPropertyName(bean, key);
 
 			if (name != null) {
+				if (matches.containsValue(name)) {
+					throw new NotWritablePropertyException(
+							cls,
+							name,
+							"Duplicate match with distance <= "
+									+ distanceLimit
+									+ " found for this property in input keys: "
+									+ keys
+									+ ". (Consider reducing the distance limit or changing the input key names to get a closer match.)");
+				}
 				matches.put(key, name);
 				switchPropertyNames(properties, key, name);
 			}
@@ -354,4 +376,46 @@ public class BeanWrapperFieldSetMapper<T> extends DefaultPropertyEditorRegistrar
 	public void setStrict(boolean strict) {
 		this.strict = strict;
 	}
+
+	private static class DistanceHolder {
+		private final Class<?> cls;
+		private final int distance;
+
+		public DistanceHolder(Class<?> cls, int distance) {
+			this.cls = cls;
+			this.distance = distance;
+			
+		}
+
+		@Override
+		public int hashCode() {
+			final int prime = 31;
+			int result = 1;
+			result = prime * result + ((cls == null) ? 0 : cls.hashCode());
+			result = prime * result + distance;
+			return result;
+		}
+
+		@Override
+		public boolean equals(Object obj) {
+			if (this == obj)
+				return true;
+			if (obj == null)
+				return false;
+			if (getClass() != obj.getClass())
+				return false;
+			DistanceHolder other = (DistanceHolder) obj;
+			if (cls == null) {
+				if (other.cls != null)
+					return false;
+			}
+			else if (!cls.equals(other.cls))
+				return false;
+			if (distance != other.distance)
+				return false;
+			return true;
+		}
+	}
+
+
 }
