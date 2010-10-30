@@ -2294,7 +2294,7 @@ itemReader.close(executionContext);</programlisting>
     select * from (
       select * from (
         select t.id, t.name, t.credit, ROWNUM ROWNUM_ from customer t order by id
-       ) where ROWNUM_ &lt;![CDATA[ &gt; ]]&gt; ( #_page# * #_pagesize# )
+       )) where ROWNUM_ &lt;![CDATA[ &gt; ]]&gt; ( #_page# * #_pagesize# )
     ) where ROWNUM &lt;![CDATA[ &lt;= ]]&gt; #_pagesize#
   &lt;/select&gt;
 </programlisting>
