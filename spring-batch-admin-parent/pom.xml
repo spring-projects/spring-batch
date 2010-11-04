@@ -618,6 +618,11 @@
 			<url>http://s3.amazonaws.com/maven.springframework.org/snapshot/</url>
 		</repository>
 		<repository>
+			<id>spring-ebr</id>
+			<name>Spring Enterprise Bundle Repository</name>
+			<url>http://s3.amazonaws.com/repository.springsource.com/maven/bundles/release/</url>
+		</repository>
+		<repository>
 			<id>objectstyle</id>
 			<name>ObjectStyle.org Repository</name>
 			<url>http://objectstyle.org/maven2</url>
