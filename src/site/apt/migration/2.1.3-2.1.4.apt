@@ -1,0 +1,55 @@
+Spring Batch 2.1.4 Release Notes
+
+* Bug
+
+  * {{{http://jira.springsource.org/browse/BATCH-1572}[BATCH-1572]}} - Step not failing on org.springframework.transaction.UnexpectedRollbackException
+
+  * {{{http://jira.springsource.org/browse/BATCH-1632}[BATCH-1632]}} - DefaultFieldSet#readBigDecimal(String, BigDecimal) and NumberFormatException
+
+  * {{{http://jira.springsource.org/browse/BATCH-1633}[BATCH-1633]}} - Dependency injection problem with step scoped anonymous inner bean
+
+  * {{{http://jira.springsource.org/browse/BATCH-1637}[BATCH-1637]}} - OraclePagingQueryProvider adds an extra column to the jump to page query
+
+  * {{{http://jira.springsource.org/browse/BATCH-1638}[BATCH-1638]}} - Possible NullPointerException when using no-rollback
+
+  * {{{http://jira.springsource.org/browse/BATCH-1639}[BATCH-1639]}} - Oracle jumpToItemQuery needs a tweak (again)
+
+  * {{{http://jira.springsource.org/browse/BATCH-1640}[BATCH-1640]}} - File writers do not behave correctly on rollback
+
+  * {{{http://jira.springsource.org/browse/BATCH-1643}[BATCH-1643]}} - Unpredictable binding in BeanWrapperFieldSetMapper because of "fuzzy" property matching
+
+  * {{{http://jira.springsource.org/browse/BATCH-1647}[BATCH-1647]}} - Inner bean with a late binding parameter in the constructor does not work
+
+  * {{{http://jira.springsource.org/browse/BATCH-1648}[BATCH-1648]}} - Paging query for IbatisPagingItemReader in reference documentation is incorrect
+
+
+
+* Defect
+
+
+  * {{{http://jira.springsource.org/browse/BATCH-1629}[BATCH-1629]}} - FaultTolerantChunkProcessor contains dangerous log statements
+
+  * {{{http://jira.springsource.org/browse/BATCH-1631}[BATCH-1631]}} - Typos on Spring Batch home page
+
+
+
+* Improvement
+
+
+  * {{{http://jira.springsource.org/browse/BATCH-1627}[BATCH-1627]}} - SpringValidator - include Binding Results with the thrown ValidationException
+
+  * {{{http://jira.springsource.org/browse/BATCH-1630}[BATCH-1630]}} - Add defensive logging conditionals in performance critical areas of the code base.
+
+  * {{{http://jira.springsource.org/browse/BATCH-1634}[BATCH-1634]}} - Documentation: custom tableprefix for JobExplorer
+
+  * {{{http://jira.springsource.org/browse/BATCH-1636}[BATCH-1636]}} - AutomaticJobRegistar should implement the Ordered interface
+
+  * {{{http://jira.springsource.org/browse/BATCH-1650}[BATCH-1650]}} - Override GroupAwareJob#toString method
+
+
+
+* New Feature
+
+
+  * {{{http://jira.springsource.org/browse/BATCH-1628}[BATCH-1628]}} - Add job parameters via properties file in CommandLineJobRunner
+
