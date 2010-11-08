@@ -19,6 +19,7 @@ import org.springframework.batch.core.Job;
 import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.JobParametersIncrementer;
 import org.springframework.batch.core.JobParametersValidator;
+import org.springframework.util.ClassUtils;
 
 /**
  * A {@link Job} that can optionally prepend a group name to another job's name,
@@ -113,6 +114,11 @@ public class GroupAwareJob implements Job {
 	@Override
 	public int hashCode() {
 		return delegate.hashCode();
+	}
+	
+	@Override
+	public String toString() {
+		return ClassUtils.getShortName(delegate.getClass()) + ": [name=" + getName() + "]";
 	}
 
 }

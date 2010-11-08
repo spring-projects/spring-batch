@@ -41,4 +41,9 @@ public class GroupAwareJobTests {
 		assertEquals("jobs.foo", result.getName());
 	}
 
+	@Test
+	public void testToString() {
+		GroupAwareJob result = new GroupAwareJob("jobs", job);
+		assertEquals("JobSupport: [name=jobs.foo]", result.toString());
+	}
 }
