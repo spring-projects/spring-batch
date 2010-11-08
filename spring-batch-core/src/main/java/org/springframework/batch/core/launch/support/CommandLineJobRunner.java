@@ -92,7 +92,8 @@ import org.springframework.util.StringUtils;
  * </p>
  * 
  * <p>
- * The arguments to this class are as follows:
+ * The arguments to this class can be provided on the command line (separated by
+ * spaces), or through stdin (separated by new line). They are as follows:
  * </p>
  * 
  * <code>
@@ -110,7 +111,8 @@ import org.springframework.util.StringUtils;
  * {@link JobParametersIncrementer} in the {@link Job}</li>
  * <li>jobIdentifier: the name of the job or the id of a job execution (for
  * -stop, -abandon or -restart).
- * <li>jobParameters: 0 to many parameters that will be used to launch a job.
+ * <li>jobParameters: 0 to many parameters that will be used to launch a job
+ * specified in the form of <code>key=value</code> pairs.
  * </ul>
  * </p>
  * 
@@ -125,7 +127,11 @@ import org.springframework.util.StringUtils;
  * {@link JobLauncher}. The job parameters passed in to the command line will be
  * converted to {@link Properties} by assuming that each individual element is
  * one parameter that is separated by an equals sign. For example,
- * "vendor.id=290232". Below is an example arguments list: "
+ * "vendor.id=290232". The resulting properties instance is converted to
+ * {@link JobParameters} using a {@link JobParametersConverter} from the
+ * application context (if there is one, or a
+ * {@link DefaultJobParametersConverter} otherwise). Below is an example
+ * arguments list: "
  * 
  * <p>
  * <code>
@@ -278,9 +284,8 @@ public class CommandLineJobRunner {
 
 			Assert.state(launcher != null, "A JobLauncher must be provided.  Please add one to the configuration.");
 			if (opts.contains("-restart") || opts.contains("-next")) {
-				Assert
-						.state(jobExplorer != null,
-								"A JobExplorer must be provided for a restart or start next operation.  Please add one to the configuration.");
+				Assert.state(jobExplorer != null,
+						"A JobExplorer must be provided for a restart or start next operation.  Please add one to the configuration.");
 			}
 
 			String jobName = jobIdentifier;
@@ -507,6 +512,15 @@ public class CommandLineJobRunner {
 
 		CommandLineJobRunner command = new CommandLineJobRunner();
 
+		List<String> newargs = new ArrayList<String>(Arrays.asList(args));
+
+		BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
+		String line = reader.readLine();
+		while (line != null) {
+			newargs.add(line);
+			line = reader.readLine();
+		}
+
 		Set<String> opts = new HashSet<String>();
 		List<String> params = new ArrayList<String>();
 
@@ -514,7 +528,7 @@ public class CommandLineJobRunner {
 		String jobPath = null;
 		String jobIdentifier = null;
 
-		for (String arg : args) {
+		for (String arg : newargs) {
 			if (arg.startsWith("-")) {
 				opts.add(arg);
 			}
@@ -539,13 +553,6 @@ public class CommandLineJobRunner {
 			logger.error(message);
 			CommandLineJobRunner.message = message;
 			command.exit(1);
-		}
-
-		BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
-		String line = reader.readLine();
-		while (line != null) {
-			params.add(line);
-			line = reader.readLine();
 		}
 
 		String[] parameters = params.toArray(new String[params.size()]);
