@@ -18,6 +18,7 @@ package org.springframework.batch.core.launch.support;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
@@ -63,23 +64,37 @@ public class CommandLineJobRunnerTests {
 
 	private String[] args = new String[] { jobPath, jobName, jobKey, scheduleDate, vendorId };
 
+	private InputStream stdin;
+
 	@Before
 	public void setUp() throws Exception {
 		JobExecution jobExecution = new JobExecution(null, new Long(1));
 		ExitStatus exitStatus = ExitStatus.COMPLETED;
 		jobExecution.setExitStatus(exitStatus);
 		StubJobLauncher.jobExecution = jobExecution;
+		stdin = System.in;
+		System.setIn(new InputStream() {
+			public int read() {
+				return -1;
+			}
+		});
+	}
+
+	@After
+	public void tearDown() throws Exception {
+		System.setIn(stdin);
+		StubJobLauncher.tearDown();
 	}
 
 	@Test
-	public void testMain() {
+	public void testMain() throws Exception {
 		CommandLineJobRunner.main(args);
 		assertTrue("Injected JobParametersConverter not used instead of default", StubJobParametersConverter.called);
 		assertEquals(0, StubSystemExiter.getStatus());
 	}
 
 	@Test
-	public void testWithJobLocator() {
+	public void testWithJobLocator() throws Exception {
 		jobPath = ClassUtils.addResourcePathToPackagePath(CommandLineJobRunnerTests.class, "launcher-with-locator.xml");
 		CommandLineJobRunner.main(new String[] { jobPath, jobName, jobKey });
 		assertTrue("Injected JobParametersConverter not used instead of default", StubJobParametersConverter.called);
@@ -94,7 +109,7 @@ public class CommandLineJobRunnerTests {
 	}
 
 	@Test
-	public void testInvalidArgs() {
+	public void testInvalidArgs() throws Exception {
 		String[] args = new String[] {};
 		CommandLineJobRunner.presetSystemExiter(new StubSystemExiter());
 		CommandLineJobRunner.main(args);
@@ -104,7 +119,7 @@ public class CommandLineJobRunnerTests {
 	}
 
 	@Test
-	public void testWrongJobName() {
+	public void testWrongJobName() throws Exception {
 		String[] args = new String[] { jobPath, "no-such-job" };
 		CommandLineJobRunner.main(args);
 		assertEquals(1, StubSystemExiter.status);
@@ -119,6 +134,23 @@ public class CommandLineJobRunnerTests {
 		CommandLineJobRunner.main(args);
 		assertEquals(0, StubSystemExiter.status);
 		assertEquals(new JobParameters(), StubJobLauncher.jobParameters);
+	}
+
+	@Test
+	public void testWithStdinParameters() throws Throwable {
+		String[] args = new String[] { jobPath, jobName };
+		System.setIn(new InputStream() {
+			char[] input = ("foo=bar\nspam=bucket").toCharArray();
+
+			int index = 0;
+
+			public int read() {
+				return index<input.length-1 ? (int) input[index++] : -1;
+			}
+		});
+		CommandLineJobRunner.main(args);
+		assertEquals(0, StubSystemExiter.status);
+		assertEquals(2, StubJobLauncher.jobParameters.getParameters().size());
 	}
 
 	@Test
@@ -263,7 +295,7 @@ public class CommandLineJobRunnerTests {
 	}
 
 	@Test
-	public void testNextWithNoParameters() {
+	public void testNextWithNoParameters() throws Exception {
 		jobPath = ClassUtils.addResourcePathToPackagePath(CommandLineJobRunnerTests.class, "launcher-with-locator.xml");
 		CommandLineJobRunner.main(new String[] { jobPath, "-next", "test-job2", jobKey });
 		assertEquals(1, StubSystemExiter.getStatus());
@@ -277,11 +309,6 @@ public class CommandLineJobRunnerTests {
 		String[] args = new String[] { jobPath, jobName };
 		CommandLineJobRunner.main(args);
 		assertTrue(StubJobLauncher.destroyed);
-	}
-
-	@After
-	public void tearDown() throws Exception {
-		StubJobLauncher.tearDown();
 	}
 
 	public static class StubSystemExiter implements SystemExiter {
@@ -329,7 +356,7 @@ public class CommandLineJobRunnerTests {
 			destroyed = false;
 		}
 	}
-	
+
 	public static class StubJobRepository extends JobRepositorySupport {
 	}
 
@@ -367,7 +394,8 @@ public class CommandLineJobRunnerTests {
 				return Arrays.asList(createJobExecution(jobInstance, BatchStatus.ABANDONED));
 			}
 			if (jobInstance.getId() == 5) {
-				return Arrays.asList(createJobExecution(jobInstance, BatchStatus.STARTED), createJobExecution(jobInstance, BatchStatus.FAILED));
+				return Arrays.asList(createJobExecution(jobInstance, BatchStatus.STARTED), createJobExecution(
+						jobInstance, BatchStatus.FAILED));
 			}
 			return Arrays.asList(createJobExecution(jobInstance, BatchStatus.COMPLETED));
 		}

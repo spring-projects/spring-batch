@@ -15,14 +15,37 @@
  */
 package org.springframework.batch.core.launch.support;
 
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Properties;
+import java.util.Set;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.springframework.batch.core.*;
+import org.springframework.batch.core.BatchStatus;
+import org.springframework.batch.core.ExitStatus;
+import org.springframework.batch.core.Job;
+import org.springframework.batch.core.JobExecution;
+import org.springframework.batch.core.JobInstance;
+import org.springframework.batch.core.JobParameter;
+import org.springframework.batch.core.JobParameters;
+import org.springframework.batch.core.JobParametersIncrementer;
 import org.springframework.batch.core.configuration.JobLocator;
 import org.springframework.batch.core.converter.DefaultJobParametersConverter;
 import org.springframework.batch.core.converter.JobParametersConverter;
 import org.springframework.batch.core.explore.JobExplorer;
-import org.springframework.batch.core.launch.*;
+import org.springframework.batch.core.launch.JobExecutionNotFailedException;
+import org.springframework.batch.core.launch.JobExecutionNotRunningException;
+import org.springframework.batch.core.launch.JobExecutionNotStoppedException;
+import org.springframework.batch.core.launch.JobLauncher;
+import org.springframework.batch.core.launch.JobParametersNotFoundException;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.beans.factory.BeanDefinitionStoreException;
 import org.springframework.beans.factory.config.AutowireCapableBeanFactory;
@@ -30,8 +53,6 @@ import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 import org.springframework.util.Assert;
 import org.springframework.util.StringUtils;
-
-import java.util.*;
 
 /**
  * <p>
@@ -482,7 +503,7 @@ public class CommandLineJobRunner {
 	 * command line.
 	 * </p>
 	 */
-	public static void main(String[] args) {
+	public static void main(String[] args) throws Exception {
 
 		CommandLineJobRunner command = new CommandLineJobRunner();
 
@@ -518,6 +539,13 @@ public class CommandLineJobRunner {
 			logger.error(message);
 			CommandLineJobRunner.message = message;
 			command.exit(1);
+		}
+
+		BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
+		String line = reader.readLine();
+		while (line != null) {
+			params.add(line);
+			line = reader.readLine();
 		}
 
 		String[] parameters = params.toArray(new String[params.size()]);
