@@ -121,6 +121,7 @@ public class BeanWrapperFieldSetMapperTests {
 		BeanWrapperFieldSetMapper<TestObject> mapper = new BeanWrapperFieldSetMapper<TestObject>();
 		StaticApplicationContext context = new StaticApplicationContext();
 		mapper.setBeanFactory(context);
+		mapper.setDistanceLimit(2);
 		context.getBeanFactory().registerSingleton("bean", new TestObject());
 		mapper.setPrototypeBeanName("bean");
 
@@ -181,6 +182,7 @@ public class BeanWrapperFieldSetMapperTests {
 		BeanWrapperFieldSetMapper<TestNestedA> mapper = new BeanWrapperFieldSetMapper<TestNestedA>();
 		StaticApplicationContext context = new StaticApplicationContext();
 		mapper.setBeanFactory(context);
+		mapper.setDistanceLimit(2);
 		context.getBeanFactory().registerSingleton("bean", testNestedA);
 		mapper.setPrototypeBeanName("bean");
 
@@ -223,6 +225,7 @@ public class BeanWrapperFieldSetMapperTests {
 		StaticApplicationContext context = new StaticApplicationContext();
 		mapper.setBeanFactory(context);
 		context.getBeanFactory().registerSingleton("bean", testNestedA);
+		mapper.setDistanceLimit(2);
 		mapper.setPrototypeBeanName("bean");
 
 		FieldSet fieldSet = new DefaultFieldSet(new String[] { "Another dummy", "2" }, new String[] {
