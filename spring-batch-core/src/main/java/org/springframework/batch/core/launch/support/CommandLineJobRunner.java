@@ -514,11 +514,16 @@ public class CommandLineJobRunner {
 
 		List<String> newargs = new ArrayList<String>(Arrays.asList(args));
 
-		BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
-		String line = reader.readLine();
-		while (line != null) {
-			newargs.add(line);
-			line = reader.readLine();
+		if (System.in.available() > 0) {
+			BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
+			String line = " ";
+			while (StringUtils.hasLength(line)) {
+				if (!line.startsWith("#") && StringUtils.hasText(line)) {
+					logger.debug("Stdin arg: "+line);
+					newargs.add(line);
+				}
+				line = reader.readLine();
+			}
 		}
 
 		Set<String> opts = new HashSet<String>();
