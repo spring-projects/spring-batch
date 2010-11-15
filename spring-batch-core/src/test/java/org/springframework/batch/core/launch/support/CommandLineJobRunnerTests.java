@@ -143,6 +143,10 @@ public class CommandLineJobRunnerTests {
 
 			int index = 0;
 
+            public int available() {
+                return input.length - index;
+            }
+
 			public int read() {
 				return index<input.length-1 ? (int) input[index++] : -1;
 			}
@@ -159,6 +163,10 @@ public class CommandLineJobRunnerTests {
 			char[] input = ("foo=bar\nspam=bucket").toCharArray();
 
 			int index = 0;
+
+            public int available() {
+                return input.length - index;
+            }
 
 			public int read() {
 				return index<input.length-1 ? (int) input[index++] : -1;
