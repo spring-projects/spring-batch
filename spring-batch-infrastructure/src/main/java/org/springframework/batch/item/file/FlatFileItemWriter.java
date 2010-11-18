@@ -18,6 +18,7 @@ package org.springframework.batch.item.file;
 
 import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.Writer;
@@ -26,6 +27,7 @@ import java.nio.channels.FileChannel;
 import java.nio.charset.UnsupportedCharsetException;
 import java.util.List;
 
+import org.apache.commons.io.IOUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.batch.item.ExecutionContext;
@@ -88,8 +90,10 @@ public class FlatFileItemWriter<T> extends ExecutionContextUserSupport implement
 	private FlatFileFooterCallback footerCallback;
 
 	private String lineSeparator = DEFAULT_LINE_SEPARATOR;
-	
+
 	private boolean transactional = DEFAULT_TRANSACTIONAL;
+
+	private boolean append = false;
 
 	public FlatFileItemWriter() {
 		setName(ClassUtils.getShortName(FlatFileItemWriter.class));
@@ -102,6 +106,9 @@ public class FlatFileItemWriter<T> extends ExecutionContextUserSupport implement
 	 */
 	public void afterPropertiesSet() throws Exception {
 		Assert.notNull(lineAggregator, "A LineAggregator must be provided.");
+		if (append) {
+			shouldDeleteIfExists = false;
+		}
 	}
 
 	/**
@@ -141,14 +148,29 @@ public class FlatFileItemWriter<T> extends ExecutionContextUserSupport implement
 
 	/**
 	 * Flag to indicate that the target file should be deleted if it already
-	 * exists, otherwise it will be appended. If headers are emitted then
-	 * appending will cause them to show up in the middle of the file. Defaults
-	 * to true (so no appending except on restart).
+	 * exists, otherwise it will be created. Defaults to true, so no appending
+	 * except on restart. If set to false and {@link #setAppendAllowed(boolean)
+	 * appendAllowed} is also false then there will be an exception when the
+	 * stream is opened to prevent existing data being potentially corrupted.
 	 * 
 	 * @param shouldDeleteIfExists the flag value to set
 	 */
 	public void setShouldDeleteIfExists(boolean shouldDeleteIfExists) {
 		this.shouldDeleteIfExists = shouldDeleteIfExists;
+	}
+
+	/**
+	 * Flag to indicate that the target file should be appended if it already
+	 * exists. If this flag is set then the flag
+	 * {@link #setShouldDeleteIfExists(boolean) shouldDeleteIfExists} is
+	 * automatically set to false, so that flag should not be set explicitly.
+	 * Defaults value is false.
+	 * 
+	 * @param append the flag value to set
+	 */
+	public void setAppendAllowed(boolean append) {
+		this.append = append;
+		this.shouldDeleteIfExists = false;
 	}
 
 	/**
@@ -292,7 +314,7 @@ public class FlatFileItemWriter<T> extends ExecutionContextUserSupport implement
 		catch (IOException ioe) {
 			throw new ItemStreamException("Failed to initialize writer", ioe);
 		}
-		if (outputState.lastMarkedByteOffsetPosition == 0) {
+		if (outputState.lastMarkedByteOffsetPosition == 0 && !outputState.appending) {
 			if (headerCallback != null) {
 				try {
 					headerCallback.writeHeader(outputState.outputBufferedWriter);
@@ -341,6 +363,7 @@ public class FlatFileItemWriter<T> extends ExecutionContextUserSupport implement
 			Assert.state(!file.exists() || file.canWrite(), "Resource is not writable: [" + resource + "]");
 			state = new OutputState();
 			state.setDeleteIfExists(shouldDeleteIfExists);
+			state.setAppendAllowed(append);
 			state.setEncoding(encoding);
 		}
 		return (OutputState) state;
@@ -375,6 +398,10 @@ public class FlatFileItemWriter<T> extends ExecutionContextUserSupport implement
 
 		boolean initialized = false;
 
+		private boolean append = false;
+
+		private boolean appending = false;
+
 		/**
 		 * Return the byte offset position of the cursor in the output file as a
 		 * long integer.
@@ -394,6 +421,13 @@ public class FlatFileItemWriter<T> extends ExecutionContextUserSupport implement
 
 			return pos;
 
+		}
+
+		/**
+		 * @param append
+		 */
+		public void setAppendAllowed(boolean append) {
+			this.append = append;
 		}
 
 		/**
@@ -492,13 +526,28 @@ public class FlatFileItemWriter<T> extends ExecutionContextUserSupport implement
 		private void initializeBufferedWriter() throws IOException {
 
 			File file = resource.getFile();
+			if (file.exists() && append) {
+				FileInputStream input = new FileInputStream(file);
+				System.err.println(IOUtils.toString(input));
+				System.err.println(input.getChannel().position());
+			}
 
-			FileUtils.setUpOutputFile(file, restarted, shouldDeleteIfExists);
+			FileUtils.setUpOutputFile(file, restarted || append, shouldDeleteIfExists);
 
 			os = new FileOutputStream(file.getAbsolutePath(), true);
 			fileChannel = os.getChannel();
 
 			outputBufferedWriter = getBufferedWriter(fileChannel, encoding);
+			outputBufferedWriter.flush();
+
+			if (append) {
+				// Bug in IO library? This doesn't work...
+				// lastMarkedByteOffsetPosition = fileChannel.position();
+				if (file.length() > 0) {
+					appending = true;
+					// Don't write the headers again
+				}
+			}
 
 			Assert.state(outputBufferedWriter != null);
 			// in case of restarting reset position to last committed point
@@ -528,7 +577,8 @@ public class FlatFileItemWriter<T> extends ExecutionContextUserSupport implement
 							closeStream();
 						}
 					});
-				} else {
+				}
+				else {
 					return new BufferedWriter(writer);
 				}
 			}

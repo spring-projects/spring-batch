@@ -120,9 +120,35 @@ public class FlatFileItemWriterTests {
 
 	@Test
 	public void testWriteWithMultipleOpen() throws Exception {
-
 		writer.open(executionContext);
 		writer.write(Collections.singletonList("test1"));
+		writer.open(executionContext);
+		writer.write(Collections.singletonList("test2"));
+		assertEquals("test1", readLine());
+		assertEquals("test2", readLine());
+	}
+
+	@Test
+	public void testWriteWithDelete() throws Exception {
+		writer.open(executionContext);
+		writer.write(Collections.singletonList("test1"));
+		writer.close();
+		assertEquals("test1", readLine());
+		reader = null;
+		writer.setShouldDeleteIfExists(true);
+		writer.open(executionContext);
+		writer.write(Collections.singletonList("test2"));
+		assertEquals("test2", readLine());
+	}
+
+	@Test
+	public void testWriteWithAppend() throws Exception {
+		writer.setAppendAllowed(true);
+		writer.open(executionContext);
+		writer.write(Collections.singletonList("test1"));
+		writer.close();
+		assertEquals("test1", readLine());
+		reader = null;
 		writer.open(executionContext);
 		writer.write(Collections.singletonList("test2"));
 		assertEquals("test1", readLine());
@@ -466,6 +492,30 @@ public class FlatFileItemWriterTests {
 		assertEquals("b", lineFromFile);
 		lineFromFile = readLine();
 		assertEquals(TEST_STRING, lineFromFile);
+	}
+
+	@Test
+	public void testWriteWithAppendAfterHeaders() throws Exception {
+		writer.setHeaderCallback(new FlatFileHeaderCallback() {
+			public void writeHeader(Writer writer) throws IOException {
+				writer.write("a\nb");
+			}
+
+		});
+		writer.setAppendAllowed(true);
+		writer.open(executionContext);
+		writer.write(Collections.singletonList("test1"));
+		writer.close();
+		assertEquals("a", readLine());
+		assertEquals("b", readLine());
+		assertEquals("test1", readLine());
+		reader = null;
+		writer.open(executionContext);
+		writer.write(Collections.singletonList("test2"));
+		assertEquals("a", readLine());
+		assertEquals("b", readLine());
+		assertEquals("test1", readLine());
+		assertEquals("test2", readLine());
 	}
 
 	@Test
