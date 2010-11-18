@@ -477,7 +477,8 @@ public class StepExecution extends Entity {
 		}
 		StepExecution other = (StepExecution) obj;
 
-		return stepName.equals(other.getStepName()) && (jobExecutionId.equals(other.getJobExecutionId()));
+		return stepName.equals(other.getStepName()) && (jobExecutionId.equals(other.getJobExecutionId()))
+				&& getId().equals(other.getId());
 	}
 
 	/**
@@ -496,8 +497,9 @@ public class StepExecution extends Entity {
 	 */
 	public int hashCode() {
 		Object jobExecutionId = getJobExecutionId();
+		Long id = getId();
 		return super.hashCode() + 31 * (stepName != null ? stepName.hashCode() : 0) + 91
-				* (jobExecutionId != null ? jobExecutionId.hashCode() : 0);
+				* (jobExecutionId != null ? jobExecutionId.hashCode() : 0) + 59 * (id != null ? id.hashCode() : 0);
 	}
 
 	public String toString() {

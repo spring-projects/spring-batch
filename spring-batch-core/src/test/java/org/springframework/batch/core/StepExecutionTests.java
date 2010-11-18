@@ -189,6 +189,14 @@ public class StepExecutionTests {
 	}
 
 	@Test
+	public void testEqualsWithSameName() throws Exception {
+		Step step = new StepSupport("stepName");
+		Entity stepExecution1 = newStepExecution(step,11L,4L);
+		Entity stepExecution2 = newStepExecution(step,11L,5L);
+		assertFalse(stepExecution1.equals(stepExecution2));
+	}
+
+	@Test
 	public void testEqualsWithSameIdentifier() throws Exception {
 		Step step = new StepSupport("stepName");
 		Entity stepExecution1 = newStepExecution(step, new Long(11));
@@ -291,9 +299,13 @@ public class StepExecutionTests {
 		assertEquals(BatchStatus.FAILED, execution.getStatus());
 	}
 
-	private StepExecution newStepExecution(Step step, Long long2) {
-		JobInstance job = new JobInstance(new Long(3), new JobParameters(), "testJob");
-		StepExecution execution = new StepExecution(step.getName(), new JobExecution(job, long2), new Long(4));
+	private StepExecution newStepExecution(Step step, Long jobExecutionId) {
+		return newStepExecution(step, jobExecutionId, 4);
+	}
+	
+	private StepExecution newStepExecution(Step step, Long jobExecutionId, long stepExecutionId) {
+		JobInstance job = new JobInstance(3L, new JobParameters(), "testJob");
+		StepExecution execution = new StepExecution(step.getName(), new JobExecution(job, jobExecutionId), stepExecutionId);
 		return execution;
 	}
 
