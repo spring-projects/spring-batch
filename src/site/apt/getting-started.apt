@@ -7,7 +7,7 @@
 
 Spring Batch Getting Started
 
-  A convenient way to get started quickly with Spring Batch is to run the samples which are packaged in the samples module.  There is also a simple command line sample (or "archetype") which has a bare bones but complete implementation of a simpel job.  The source code for the samples (and the other modules) is available either from the {{{downloads.html}.Zip assembly}} or from {{{source-repository.html}Subversion}}.
+  A convenient way to get started quickly with Spring Batch is to run the samples which are packaged in the samples module.  There is also a simple command line sample (or "archetype") which has a bare bones but complete implementation of a simpel job.  The source code for the samples (and the other modules) is available either from the {{{downloads.html}.Zip assembly}} or from {{{source-repository.html}Git}}.
 
 * Using SpringSource Tool Suite (STS)
 
@@ -73,8 +73,8 @@ $ mvn test
 
   To launch a job from the command line instead of a unit test use the <<<CommandLineJobRunner.main()>>> method (see Javadocs included in that class).
 
-* Using Maven and Subversion
+* Using Maven and Git
 
-  * Check out the Spring Batch project from Subversion (instructions are available {{{source-repository.html}here}}).
+  * Check out the Spring Batch project from Git (instructions are available {{{source-repository.html}here}}).
 
   * Run Maven from the command line in the samples directory.  There are additional building instructions and suggestions about what to do if it goes wrong {{{building.html}here}}.
