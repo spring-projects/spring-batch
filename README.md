@@ -12,6 +12,14 @@ Spring Batch is a lightweight, comprehensive batch framework designed to enable 
 * The wizard has a drop down with a list of template projects.  One of them is a "Simple Spring Batch Project".  Select it and follow the wizard.
 * A project is created with all dependencies and a simple input/output job configuration.  It can be run using a unit test, or on the command line (see instructions in the pom.xml).
 
+# Getting Help
+
+Read the main project [website](http://www.springsource.org/spring-batch) and the [User Guide](http://www.springsource.org/spring-batch/reference). Look at teh source code and the Javadocs.  For more detailed questions, use the [forum](http://forum.springsource.org/forumdisplay.php?f=41).  If you are new to Spring as well as to Spring Batch, look for information about [Spring projects](http://www.springsource.org/projects).
+
+# Contributing to Spring Batch
+
+Please help out on the [forum](http://forum.springsource.org/forumdisplay.php?f=41) by responding to questions and joining the debate.  Create [JIRA](https://jira.springsource.org/browse/BATCH) tickets and comment and vote on the ones that you are interested in.  Github is for social coding: if you want to write code, we encourage contributions through pull requests from [forks of this repository](http://help.github.com/forking/).
+
 # Getting Started Using the Samples
 
 A convenient way to get started quickly with Spring Batch is to run the samples which are packaged in the samples module.  There is also a simple command line sample (or "archetype") which has a bare bones but complete implementation of a simpel job.  The source code for the samples (and the other modules) is available either from the [Zip assembly](http://www.springsource.org/spring-batch/downloads.html) or from [Git](http://www.springsource.org/spring-batch/source-repository.html).
