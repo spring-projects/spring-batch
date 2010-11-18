@@ -8,7 +8,7 @@ Spring Batch is a lightweight, comprehensive batch framework designed to enable 
   This is the quickest way to get started.  It requires an internet connection for download, and access to a Maven repository (remote or local).
 
 * Download STS version 2.5.* (or better) from the [SpringSource website](http://www.springsource.com/products/sts).  STS is a free Eclipse bundle with many features useful for Spring developers.
-* Go to `New->Other...` and select `SpringSource Tool Suite->Template Project` from the wizard chooser.
+* Go to `File->New->Spring Template Project` from the menu bar (in the Spring perspective).
 * The wizard has a drop down with a list of template projects.  One of them is a "Simple Spring Batch Project".  Select it and follow the wizard.
 * A project is created with all dependencies and a simple input/output job configuration.  It can be run using a unit test, or on the command line (see instructions in the pom.xml).
 
