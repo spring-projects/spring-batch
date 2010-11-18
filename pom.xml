@@ -14,15 +14,15 @@
 		<module>spring-batch-core</module>
 		<module>spring-batch-test</module>
 	</modules>
-	<url>http://static.springframework.org/spring-batch</url>
+	<url>http://www.springsource.org/spring-batch</url>
 	<organization>
 		<name>SpringSource</name>
 		<url>http://www.springsource.com</url>
 	</organization>
 	<scm>
-		<url>https://fisheye.springframework.org/browse/spring-batch</url>
-		<connection>scm:svn:https://src.springframework.org/svn/spring-batch/trunk</connection>
-		<developerConnection>scm:svn:https://src.springframework.org/svn/spring-batch/trunk</developerConnection>
+		<url>http://github.com/SpringSource/spring-batch</url>
+		<connection>scm:git:git://github.com/SpringSource/spring-batch.git</connection>
+		<developerConnection>scm:git:git://github.com:SpringSource/spring-batch-admin.git</developerConnection>
 	</scm>
 	<issueManagement>
 		<system>JIRA</system>
