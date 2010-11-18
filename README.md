@@ -56,7 +56,7 @@ You can get a pretty good idea about how to set up a job by examining the unit t
 
 To launch a job from the command line instead of a unit test use the `CommandLineJobRunner.main()` method (see Javadocs included in that class).
 
-## Using Maven and Subversion
+## Using Maven and Git
 
-* Check out the Spring Batch project from Subversion (instructions are available [here](http://www.springsource.org/spring-batch/source-repository.html)).
+* Check out the Spring Batch project from Git (instructions are available [here](https://github.com/SpringSource/spring-batch)).
 * Run Maven from the command line in the samples directory.  There are additional building instructions and suggestions about what to do if it goes wrong [here](http://www.springsource.org/spring-batch/building.html).
