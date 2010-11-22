@@ -902,7 +902,8 @@
 				<xsd:documentation><![CDATA[
 				Whether the processor is transaction aware. If it is then processed items should not be
 				cached in between transactions in case of a rollback.  N.B. if reader-transactional-queue
-				is true then so should this be.  Default is true.
+				is true then so should this be.  Default is true.  If false then the processor is only called 
+				once per item per chunk, even if there are rollbacks with retries and skips.
 				]]></xsd:documentation>
 			</xsd:annotation>
 		</xsd:attribute>
