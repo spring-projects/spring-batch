@@ -18,7 +18,6 @@ package org.springframework.batch.item.file;
 
 import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.Writer;
@@ -27,7 +26,6 @@ import java.nio.channels.FileChannel;
 import java.nio.charset.UnsupportedCharsetException;
 import java.util.List;
 
-import org.apache.commons.io.IOUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.batch.item.ExecutionContext;
@@ -526,12 +524,6 @@ public class FlatFileItemWriter<T> extends ExecutionContextUserSupport implement
 		private void initializeBufferedWriter() throws IOException {
 
 			File file = resource.getFile();
-			if (file.exists() && append) {
-				FileInputStream input = new FileInputStream(file);
-				System.err.println(IOUtils.toString(input));
-				System.err.println(input.getChannel().position());
-			}
-
 			FileUtils.setUpOutputFile(file, restarted || append, shouldDeleteIfExists);
 
 			os = new FileOutputStream(file.getAbsolutePath(), true);
