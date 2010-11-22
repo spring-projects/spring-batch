@@ -322,6 +322,7 @@ public class FaultTolerantStepFactoryBean<T, S> extends SimpleStepFactoryBean<T,
 	}
 
 	@Override
+	@SuppressWarnings("unchecked")
 	protected void applyConfiguration(TaskletStep step) {
 		addNonSkippableExceptionIfMissing(SkipLimitExceededException.class, NonSkippableReadException.class,
 				SkipListenerFailedException.class, SkipPolicyFailedException.class, RetryException.class,
@@ -520,13 +521,12 @@ public class FaultTolerantStepFactoryBean<T, S> extends SimpleStepFactoryBean<T,
 		return skipPolicyWrapper;
 	}
 
-	@SuppressWarnings("unchecked")
-	private void addNonSkippableExceptionIfMissing(Class... cls) {
-		List exceptions = new ArrayList<Class<? extends Throwable>>();
-		for (Class exceptionClass : nonSkippableExceptionClasses) {
+	private void addNonSkippableExceptionIfMissing(Class<? extends Throwable>... cls) {
+		List<Class<? extends Throwable>> exceptions = new ArrayList<Class<? extends Throwable>>();
+		for (Class<? extends Throwable> exceptionClass : nonSkippableExceptionClasses) {
 			exceptions.add(exceptionClass);
 		}
-		for (Class fatal : cls) {
+		for (Class<? extends Throwable> fatal : cls) {
 			if (!exceptions.contains(fatal)) {
 				exceptions.add(fatal);
 			}
@@ -534,18 +534,17 @@ public class FaultTolerantStepFactoryBean<T, S> extends SimpleStepFactoryBean<T,
 		nonSkippableExceptionClasses = exceptions;
 	}
 
-	@SuppressWarnings("unchecked")
-	private void addNonRetryableExceptionIfMissing(Class... cls) {
-		List exceptions = new ArrayList<Class<? extends Throwable>>();
-		for (Class exceptionClass : nonRetryableExceptionClasses) {
+	private void addNonRetryableExceptionIfMissing(Class<? extends Throwable>... cls) {
+		List<Class<? extends Throwable>> exceptions = new ArrayList<Class<? extends Throwable>>();
+		for (Class<? extends Throwable> exceptionClass : nonRetryableExceptionClasses) {
 			exceptions.add(exceptionClass);
 		}
-		for (Class fatal : cls) {
+		for (Class<? extends Throwable> fatal : cls) {
 			if (!exceptions.contains(fatal)) {
 				exceptions.add(fatal);
 			}
 		}
-		nonRetryableExceptionClasses = exceptions;
+		nonRetryableExceptionClasses = (List<Class<? extends Throwable>>)exceptions;
 	}
 
 }

@@ -74,7 +74,6 @@ public class FaultTolerantStepFactoryBeanRollbackIntegrationTests {
 	@Autowired
 	private PlatformTransactionManager transactionManager;
 
-	@SuppressWarnings("unchecked")
 	@Before
 	public void setUp() throws Exception {
 
@@ -89,19 +88,11 @@ public class FaultTolerantStepFactoryBeanRollbackIntegrationTests {
 		factory.setJobRepository(repository);
 		factory.setCommitInterval(3);
 		factory.setSkipLimit(10);
-		ThreadPoolTaskExecutor taskExecutor = new ThreadPoolTaskExecutor();
-		taskExecutor.setCorePoolSize(3);
-		taskExecutor.setMaxPoolSize(6);
-		taskExecutor.setQueueCapacity(0);
-		taskExecutor.afterPropertiesSet();
-		factory.setTaskExecutor(taskExecutor);
-		
-		factory.setSkippableExceptionClasses(getExceptionMap(Exception.class));
 
 		SimpleJdbcTestUtils.deleteFromTables(new SimpleJdbcTemplate(dataSource), "ERROR_LOG");
 
 	}
-	
+
 	@Test
 	public void testUpdatesNoRollback() throws Exception {
 
@@ -120,12 +111,23 @@ public class FaultTolerantStepFactoryBeanRollbackIntegrationTests {
 	@Test
 	public void testMultithreadedSkipInWriter() throws Throwable {
 
+		ThreadPoolTaskExecutor taskExecutor = new ThreadPoolTaskExecutor();
+		taskExecutor.setCorePoolSize(3);
+		taskExecutor.setMaxPoolSize(6);
+		taskExecutor.setQueueCapacity(0);
+		taskExecutor.afterPropertiesSet();
+		factory.setTaskExecutor(taskExecutor);
+
+		@SuppressWarnings("unchecked")
+		Map<Class<? extends Throwable>, Boolean> skippable = getExceptionMap(Exception.class);
+		factory.setSkippableExceptionClasses(skippable);
+
 		jobExecution = repository.createJobExecution("skipJob", new JobParameters());
 
 		for (int i = 0; i < MAX_COUNT; i++) {
 
-			if (i%100==0) {
-				logger.info("Starting step: "+i);
+			if (i % 100 == 0) {
+				logger.info("Starting step: " + i);
 			}
 
 			SimpleJdbcTemplate jdbcTemplate = new SimpleJdbcTemplate(dataSource);
@@ -263,7 +265,7 @@ public class FaultTolerantStepFactoryBeanRollbackIntegrationTests {
 		public SkipProcessorStub(DataSource dataSource) {
 			jdbcTemplate = new SimpleJdbcTemplate(dataSource);
 		}
-		
+
 		/**
 		 * @return the processed
 		 */
@@ -287,7 +289,7 @@ public class FaultTolerantStepFactoryBeanRollbackIntegrationTests {
 
 		public String process(String item) throws Exception {
 			processed.add(item);
-			logger.debug("Processed item: "+item);
+			logger.debug("Processed item: " + item);
 			jdbcTemplate.update("INSERT INTO ERROR_LOG (MESSAGE, STEP_NAME) VALUES (?, ?)", item, "processed");
 			return item;
 		}

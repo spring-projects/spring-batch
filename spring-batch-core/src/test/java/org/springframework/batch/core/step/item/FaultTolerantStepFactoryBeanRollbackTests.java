@@ -4,8 +4,10 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -194,6 +196,47 @@ public class FaultTolerantStepFactoryBeanRollbackTests {
 		assertEquals(BatchStatus.COMPLETED, stepExecution.getStatus());
 		assertEquals(2, stepExecution.getSkipCount());
 		assertEquals(2, stepExecution.getRollbackCount());
+	}
+
+	@Test
+	public void testNoRollbackInProcessorWhenSkipExceeded() throws Throwable {
+
+		jobExecution = repository.createJobExecution("noRollbackJob", new JobParameters());
+
+		factory.setSkipLimit(0);
+
+		reader.clear();
+		reader.setItems("1", "2", "3", "4", "5");
+		factory.setItemReader(reader);
+		writer.clear();
+		factory.setItemWriter(writer);
+		processor.clear();
+		factory.setItemProcessor(processor);
+
+		@SuppressWarnings("unchecked")
+		List<Class<? extends Throwable>> exceptions = Arrays.<Class<? extends Throwable>>asList(Exception.class);
+		factory.setNoRollbackExceptionClasses(exceptions);
+		@SuppressWarnings("unchecked")
+		Map<Class<? extends Throwable>, Boolean> skippable = getExceptionMap(Exception.class);
+		factory.setSkippableExceptionClasses(skippable);
+
+		processor.setFailures("2");
+
+		Step step = (Step) factory.getObject();
+
+		stepExecution = jobExecution.createStepExecution(factory.getName());
+		repository.add(stepExecution);
+		step.execute(stepExecution);
+		assertEquals(BatchStatus.COMPLETED, stepExecution.getStatus());
+
+		assertEquals("[1, 3, 4, 5]", writer.getCommitted().toString());
+		// No rollback on 2 so processor has side effect
+		assertEquals("[1, 2, 3, 4, 5]", processor.getCommitted().toString());
+		List<String> processed = new ArrayList<String>(processor.getProcessed());
+		Collections.sort(processed);
+		assertEquals("[1, 2, 3, 4, 5]", processed.toString());
+		assertEquals(0, stepExecution.getSkipCount());
+
 	}
 
 	@Test

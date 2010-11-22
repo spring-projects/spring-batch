@@ -29,6 +29,7 @@ import org.springframework.batch.classify.Classifier;
 import org.springframework.batch.core.StepContribution;
 import org.springframework.batch.core.step.skip.LimitCheckingItemSkipPolicy;
 import org.springframework.batch.core.step.skip.NonSkippableProcessException;
+import org.springframework.batch.core.step.skip.SkipLimitExceededException;
 import org.springframework.batch.core.step.skip.SkipListenerFailedException;
 import org.springframework.batch.core.step.skip.SkipPolicy;
 import org.springframework.batch.item.ItemProcessor;
@@ -269,13 +270,19 @@ public class FaultTolerantChunkProcessor<I, O> extends SimpleChunkProcessor<I, O
 				public O recover(RetryContext context) throws Exception {
 					Throwable e = context.getLastThrowable();
 					if (shouldSkip(itemProcessSkipPolicy, e, contribution.getStepSkipCount())) {
-						contribution.incrementProcessSkipCount();
 						iterator.remove(e);
+						contribution.incrementProcessSkipCount();
 						logger.debug("Skipping after failed process", e);
 						return null;
 					}
 					else {
-						throw new RetryException("Non-skippable exception in recoverer while processing", e);
+						if (rollbackClassifier.classify(e)) {
+							// Default is to rollback unless the classifier
+							// allows us to continue
+							throw new RetryException("Non-skippable exception in recoverer while processing", e);
+						}
+						iterator.remove(e);
+						return null;
 					}
 				}
 
@@ -361,8 +368,8 @@ public class FaultTolerantChunkProcessor<I, O> extends SimpleChunkProcessor<I, O
 
 			};
 
-			batchRetryTemplate.execute(retryCallback, batchRecoveryCallback, BatchRetryTemplate.createState(
-					getInputKeys(inputs), rollbackClassifier));
+			batchRetryTemplate.execute(retryCallback, batchRecoveryCallback,
+					BatchRetryTemplate.createState(getInputKeys(inputs), rollbackClassifier));
 
 		}
 		else {
@@ -455,6 +462,9 @@ public class FaultTolerantChunkProcessor<I, O> extends SimpleChunkProcessor<I, O
 	private boolean shouldSkip(SkipPolicy policy, Throwable e, int skipCount) {
 		try {
 			return policy.shouldSkip(e, skipCount);
+		}
+		catch (SkipLimitExceededException ex) {
+			throw ex;
 		}
 		catch (RuntimeException ex) {
 			throw new SkipListenerFailedException("Fatal exception in SkipPolicy.", ex, e);
