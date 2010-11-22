@@ -49,7 +49,7 @@ public class StaxEventItemReaderCommonTests extends AbstractItemStreamItemReader
 				return foo;
 			}
 
-			@SuppressWarnings("unchecked")
+			@SuppressWarnings("rawtypes")
 			public boolean supports(Class clazz) {
 				return true;
 			}

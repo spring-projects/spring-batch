@@ -99,7 +99,7 @@ public class StepListenerFactoryBeanTests {
 		((ChunkListener) listener).afterChunk();
 		((ItemReadListener<String>) listener).beforeRead();
 		((ItemReadListener<String>) listener).afterRead(readItem);
-		((ItemReadListener) listener).onReadError(new Exception());
+		((ItemReadListener<String>) listener).onReadError(new Exception());
 		((ItemProcessListener<String, Integer>) listener).beforeProcess(readItem);
 		((ItemProcessListener<String, Integer>) listener).afterProcess(readItem, writeItem);
 		((ItemProcessListener<String, Integer>) listener).onProcessError(readItem, new Exception());

@@ -78,6 +78,7 @@ public class OrderItemReaderTests {
 		LineItem item = new LineItem();
 
 		// create mock mapper
+		@SuppressWarnings("rawtypes")
 		FieldSetMapper mapper = createMock(FieldSetMapper.class);
 		// set how mapper should respond - set return values for mapper
 		expect(mapper.mapFieldSet(headerFS)).andReturn(order);

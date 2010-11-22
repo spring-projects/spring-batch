@@ -16,7 +16,6 @@
 package org.springframework.batch.core.configuration.xml;
 
 import java.util.Map;
-import java.util.Set;
 
 import org.springframework.beans.PropertyValue;
 import org.springframework.beans.factory.config.BeanDefinition;
@@ -93,14 +92,13 @@ public class CoreNamespaceUtils {
 		}
 	}
 
-	@SuppressWarnings("unchecked")
 	private static boolean rangeArrayEditorAlreadyDefined(BeanDefinitionRegistry registry) {
 		for (String beanName : registry.getBeanDefinitionNames()) {
 			BeanDefinition bd = registry.getBeanDefinition(beanName);
 			if (CUSTOM_EDITOR_CONFIGURER_CLASS_NAME.equals(bd.getBeanClassName())) {
 				PropertyValue pv = bd.getPropertyValues().getPropertyValue("customEditors");
 				if (pv != null) {
-					for (Map.Entry entry : (Set<Map.Entry>) ((Map) pv.getValue()).entrySet()) {
+					for (Map.Entry<?, ?> entry : ((Map<?, ?>) pv.getValue()).entrySet()) {
 						if (entry.getKey() instanceof TypedStringValue) {
 							if (RANGE_ARRAY_CLASS_NAME.equals(((TypedStringValue) entry.getKey()).getValue())) {
 								return true;
@@ -172,9 +170,10 @@ public class CoreNamespaceUtils {
 	 * @return true if we find a schema declaration that matches
 	 */
 	public static boolean namespaceMatchesVersion(Element element) {
-		return matchesVersionInternal(element) && matchesVersionInternal(element.getOwnerDocument().getDocumentElement());
+		return matchesVersionInternal(element)
+				&& matchesVersionInternal(element.getOwnerDocument().getDocumentElement());
 	}
-	
+
 	private static boolean matchesVersionInternal(Element element) {
 		String schemaLocation = element.getAttributeNS("http://www.w3.org/2001/XMLSchema-instance", "schemaLocation");
 		return schemaLocation.matches("(?m).*spring-batch-2.1.xsd.*")

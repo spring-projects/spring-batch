@@ -81,7 +81,7 @@ public class StepParserTests {
 	public void testTaskletStepAttributes() throws Exception {
 		ConfigurableApplicationContext ctx = new ClassPathXmlApplicationContext(
 				"org/springframework/batch/core/configuration/xml/StepParserTaskletAttributesTests-context.xml");
-		@SuppressWarnings("unchecked")
+		@SuppressWarnings({ "unchecked", "rawtypes" })
 		Map<String, StepParserStepFactoryBean> beans = ctx.getBeansOfType(StepParserStepFactoryBean.class);
 		String factoryName = (String) beans.keySet().toArray()[0];
 		@SuppressWarnings("unchecked")

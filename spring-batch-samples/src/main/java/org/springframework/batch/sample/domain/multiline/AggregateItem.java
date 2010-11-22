@@ -28,7 +28,7 @@ import org.springframework.batch.item.ItemReaderException;
  */
 public class AggregateItem<T> {
 
-	@SuppressWarnings("unchecked")
+	@SuppressWarnings("rawtypes")
 	private static final AggregateItem FOOTER = new AggregateItem<Object>(false, true) {
 		@Override
 		public Object getItem() throws ItemReaderException {
@@ -45,7 +45,7 @@ public class AggregateItem<T> {
 		return FOOTER;
 	}
 
-	@SuppressWarnings("unchecked")
+	@SuppressWarnings("rawtypes")
 	private static final AggregateItem HEADER = new AggregateItem<Object>(true, false) {
 		@Override
 		public Object getItem() throws ItemReaderException {

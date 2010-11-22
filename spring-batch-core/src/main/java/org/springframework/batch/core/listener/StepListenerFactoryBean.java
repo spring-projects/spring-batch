@@ -41,7 +41,7 @@ public class StepListenerFactoryBean extends AbstractListenerFactoryBean {
 		return StepListener.class;
 	}
 
-	@SuppressWarnings("unchecked")
+	@SuppressWarnings("rawtypes")
 	public Class getObjectType() {
 		return StepListener.class;
 	}

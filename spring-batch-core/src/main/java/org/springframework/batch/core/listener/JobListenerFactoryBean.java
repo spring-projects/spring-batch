@@ -41,8 +41,7 @@ public class JobListenerFactoryBean extends AbstractListenerFactoryBean {
 		return JobExecutionListener.class;
 	}
 
-	@SuppressWarnings("unchecked")
-	public Class getObjectType() {
+	public Class<?> getObjectType() {
 		return JobExecutionListener.class;
 	}
 

@@ -33,7 +33,7 @@ import org.springframework.batch.item.ItemStream;
  * 
  */
 public class MulticasterBatchListener<T, S> implements StepExecutionListener, ChunkListener, ItemReadListener<T>,
-		ItemProcessListener<T, S>, ItemWriteListener<S>, SkipListener<T,S> {
+		ItemProcessListener<T, S>, ItemWriteListener<S>, SkipListener<T, S> {
 
 	private CompositeStepExecutionListener stepListener = new CompositeStepExecutionListener();
 
@@ -45,7 +45,7 @@ public class MulticasterBatchListener<T, S> implements StepExecutionListener, Ch
 
 	private CompositeItemWriteListener<S> itemWriteListener = new CompositeItemWriteListener<S>();
 
-	private CompositeSkipListener<T,S> skipListener = new CompositeSkipListener<T,S>();
+	private CompositeSkipListener<T, S> skipListener = new CompositeSkipListener<T, S>();
 
 	/**
 	 * Initialise the listener instance.
@@ -80,22 +80,22 @@ public class MulticasterBatchListener<T, S> implements StepExecutionListener, Ch
 		}
 		if (listener instanceof ItemReadListener<?>) {
 			@SuppressWarnings("unchecked")
-			ItemReadListener<T> itemReadListener = (ItemReadListener) listener;
+			ItemReadListener<T> itemReadListener = (ItemReadListener<T>) listener;
 			this.itemReadListener.register(itemReadListener);
 		}
-		if (listener instanceof ItemProcessListener<?,?>) {
+		if (listener instanceof ItemProcessListener<?, ?>) {
 			@SuppressWarnings("unchecked")
-			ItemProcessListener<T,S> itemProcessListener = (ItemProcessListener) listener;
+			ItemProcessListener<T, S> itemProcessListener = (ItemProcessListener<T, S>) listener;
 			this.itemProcessListener.register(itemProcessListener);
 		}
 		if (listener instanceof ItemWriteListener<?>) {
 			@SuppressWarnings("unchecked")
-			ItemWriteListener<S> itemWriteListener = (ItemWriteListener) listener;
+			ItemWriteListener<S> itemWriteListener = (ItemWriteListener<S>) listener;
 			this.itemWriteListener.register(itemWriteListener);
 		}
-		if (listener instanceof SkipListener<?,?>) {
+		if (listener instanceof SkipListener<?, ?>) {
 			@SuppressWarnings("unchecked")
-			SkipListener<T,S> skipListener = (SkipListener) listener;
+			SkipListener<T, S> skipListener = (SkipListener<T, S>) listener;
 			this.skipListener.register(skipListener);
 		}
 	}
@@ -294,7 +294,8 @@ public class MulticasterBatchListener<T, S> implements StepExecutionListener, Ch
 	/**
 	 * @param item
 	 * @param t
-	 * @see org.springframework.batch.core.listener.CompositeSkipListener#onSkipInProcess(Object, Throwable)
+	 * @see org.springframework.batch.core.listener.CompositeSkipListener#onSkipInProcess(Object,
+	 * Throwable)
 	 */
 	public void onSkipInProcess(T item, Throwable t) {
 		skipListener.onSkipInProcess(item, t);

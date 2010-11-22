@@ -10,7 +10,6 @@ import org.springframework.orm.ibatis.SqlMapClientFactoryBean;
 
 import com.ibatis.sqlmap.client.SqlMapClient;
 
-@SuppressWarnings("unchecked")
 @RunWith(JUnit4ClassRunner.class)
 public class IbatisPagingItemReaderCommonTests extends AbstractDatabaseItemStreamItemReaderTests {
 	
@@ -21,7 +20,7 @@ public class IbatisPagingItemReaderCommonTests extends AbstractDatabaseItemStrea
 		factory.afterPropertiesSet();
 		SqlMapClient sqlMapClient = createSqlMapClient();
 
-		IbatisPagingItemReader reader = new IbatisPagingItemReader();
+		IbatisPagingItemReader<Foo> reader = new IbatisPagingItemReader<Foo>();
 		reader.setQueryId("getPagedFoos");
 		reader.setPageSize(2);
 		reader.setSqlMapClient(sqlMapClient);
@@ -41,7 +40,7 @@ public class IbatisPagingItemReaderCommonTests extends AbstractDatabaseItemStrea
 	}
 
 	protected void pointToEmptyInput(ItemReader<Foo> tested) throws Exception {
-		IbatisPagingItemReader reader = (IbatisPagingItemReader) tested;
+		IbatisPagingItemReader<Foo> reader = (IbatisPagingItemReader<Foo>) tested;
 		reader.close();
 
 		reader.setQueryId("getNoFoos");

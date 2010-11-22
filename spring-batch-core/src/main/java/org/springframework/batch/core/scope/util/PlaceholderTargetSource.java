@@ -116,7 +116,7 @@ public class PlaceholderTargetSource extends SimpleBeanTargetSource implements I
 		beanFactory.copyConfigurationFrom(listableBeanFactory);
 
 		final TypeConverter contextTypeConverter = new TypeConverter() {
-			@SuppressWarnings("unchecked")
+			@SuppressWarnings({ "unchecked", "rawtypes" })
 			public Object convertIfNecessary(Object value, Class requiredType, MethodParameter methodParam)
 					throws TypeMismatchException {
 				Object result = null;
@@ -158,7 +158,7 @@ public class PlaceholderTargetSource extends SimpleBeanTargetSource implements I
 				return result != null ? result : typeConverter.convertIfNecessary(value, requiredType, methodParam);
 			}
 
-			@SuppressWarnings("unchecked")
+			@SuppressWarnings("rawtypes")
 			public Object convertIfNecessary(Object value, Class requiredType) throws TypeMismatchException {
 				return convertIfNecessary(value, requiredType, null);
 			}
@@ -309,7 +309,7 @@ public class PlaceholderTargetSource extends SimpleBeanTargetSource implements I
 			super(new PlaceholderStringValueResolver(typeConverter));
 		}
 
-		@SuppressWarnings("unchecked")
+		@SuppressWarnings({ "unchecked", "rawtypes" })
 		protected Object resolveValue(Object value) {
 
 			if (value instanceof TypedStringValue) {

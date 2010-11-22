@@ -68,9 +68,8 @@ public class StepWithFaultTolerantProcessTaskJobParserTests {
 	@Autowired
 	private TestWriter writer;
 
-	@SuppressWarnings("unchecked")
 	@Autowired
-	private StepParserStepFactoryBean factory;
+	private StepParserStepFactoryBean<?, ?> factory;
 
 	@Test
 	public void testStepWithTask() throws Exception {
@@ -83,10 +82,10 @@ public class StepWithFaultTolerantProcessTaskJobParserTests {
 		assertEquals("wrong retry-limit:", 3, rl);
 		Object cc = ReflectionTestUtils.getField(factory, "cacheCapacity");
 		assertEquals("wrong cache-capacity:", 100, cc);
-		assertEquals("wrong transaction-attribute:", Propagation.REQUIRED, ReflectionTestUtils.getField(factory,
-				"propagation"));
-		assertEquals("wrong transaction-attribute:", Isolation.DEFAULT, ReflectionTestUtils.getField(factory,
-				"isolation"));
+		assertEquals("wrong transaction-attribute:", Propagation.REQUIRED,
+				ReflectionTestUtils.getField(factory, "propagation"));
+		assertEquals("wrong transaction-attribute:", Isolation.DEFAULT,
+				ReflectionTestUtils.getField(factory, "isolation"));
 		assertEquals("wrong transaction-attribute:", 10, ReflectionTestUtils.getField(factory, "transactionTimeout"));
 		Object txq = ReflectionTestUtils.getField(factory, "readerTransactionalQueue");
 		assertEquals("wrong reader-transactional-queue:", true, txq);

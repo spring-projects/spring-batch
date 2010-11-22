@@ -62,9 +62,8 @@ public class StepWithBasicProcessTaskJobParserTests {
 	@Autowired
 	private TestWriter writer;
 	
-	@SuppressWarnings("unchecked")
 	@Autowired
-	private StepParserStepFactoryBean factory;
+	private StepParserStepFactoryBean<?,?> factory;
 	
 	@Test
 	public void testStepWithTask() throws Exception {

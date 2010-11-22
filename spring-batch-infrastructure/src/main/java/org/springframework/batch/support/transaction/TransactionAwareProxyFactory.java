@@ -86,7 +86,7 @@ public class TransactionAwareProxyFactory<T> {
 	 * @param target the target object (List, Set or Map)
 	 * @return an independent copy
 	 */
-	@SuppressWarnings("unchecked")
+	@SuppressWarnings({ "unchecked", "rawtypes" })
 	protected final T begin(T target) {
 		// Unfortunately in Java 5 this method has to synchronized
 		// (works OK without in Java 6).
@@ -123,7 +123,7 @@ public class TransactionAwareProxyFactory<T> {
 	 * @param copy the working copy.
 	 * @param target the original target of the factory.
 	 */
-	@SuppressWarnings("unchecked")
+	@SuppressWarnings({ "unchecked", "rawtypes" })
 	protected void commit(T copy, T target) {
 		// Unfortunately in Java 5 this method has to be synchronized
 		// (works OK without in Java 6).
@@ -157,49 +157,40 @@ public class TransactionAwareProxyFactory<T> {
 
 	}
 
-	@SuppressWarnings("unchecked")
 	public static <K, V> Map<K, V> createTransactionalMap() {
-		return (Map<K, V>) new TransactionAwareProxyFactory(new ConcurrentHashMap<K, V>()).createInstance();
+		return (Map<K, V>) new TransactionAwareProxyFactory<ConcurrentHashMap<K, V>>(new ConcurrentHashMap<K, V>()).createInstance();
 	}
 
-	@SuppressWarnings("unchecked")
 	public static <K, V> Map<K, V> createTransactionalMap(Map<K, V> map) {
-		return (Map<K, V>) new TransactionAwareProxyFactory(new ConcurrentHashMap<K, V>(map)).createInstance();
+		return (Map<K, V>) new TransactionAwareProxyFactory<ConcurrentHashMap<K, V>>(new ConcurrentHashMap<K, V>(map)).createInstance();
 	}
 
-	@SuppressWarnings("unchecked")
 	public static <K, V> Map<K, V> createAppendOnlyTransactionalMap() {
-		return (Map<K, V>) new TransactionAwareProxyFactory(new ConcurrentHashMap<K, V>(), true).createInstance();
+		return (Map<K, V>) new TransactionAwareProxyFactory<ConcurrentHashMap<K, V>>(new ConcurrentHashMap<K, V>(), true).createInstance();
 	}
 
-	@SuppressWarnings("unchecked")
 	public static <T> Set<T> createAppendOnlyTransactionalSet() {
-		return (Set<T>) new TransactionAwareProxyFactory(new CopyOnWriteArraySet<T>(), true).createInstance();
+		return (Set<T>) new TransactionAwareProxyFactory<CopyOnWriteArraySet<T>>(new CopyOnWriteArraySet<T>(), true).createInstance();
 	}
 
-	@SuppressWarnings("unchecked")
 	public static <T> Set<T> createTransactionalSet() {
-		return (Set<T>) new TransactionAwareProxyFactory(new CopyOnWriteArraySet<T>()).createInstance();
+		return (Set<T>) new TransactionAwareProxyFactory<CopyOnWriteArraySet<T>>(new CopyOnWriteArraySet<T>()).createInstance();
 	}
 
-	@SuppressWarnings("unchecked")
 	public static <T> Set<T> createTransactionalSet(Set<T> set) {
-		return (Set<T>) new TransactionAwareProxyFactory(new CopyOnWriteArraySet<T>(set)).createInstance();
+		return (Set<T>) new TransactionAwareProxyFactory<CopyOnWriteArraySet<T>>(new CopyOnWriteArraySet<T>(set)).createInstance();
 	}
 
-	@SuppressWarnings("unchecked")
 	public static <T> List<T> createAppendOnlyTransactionalList() {
-		return (List<T>) new TransactionAwareProxyFactory(new CopyOnWriteArrayList<T>(), true).createInstance();
+		return (List<T>) new TransactionAwareProxyFactory<CopyOnWriteArrayList<T>>(new CopyOnWriteArrayList<T>(), true).createInstance();
 	}
 
-	@SuppressWarnings("unchecked")
 	public static <T> List<T> createTransactionalList() {
-		return (List<T>) new TransactionAwareProxyFactory(new CopyOnWriteArrayList<T>()).createInstance();
+		return (List<T>) new TransactionAwareProxyFactory<CopyOnWriteArrayList<T>>(new CopyOnWriteArrayList<T>()).createInstance();
 	}
 
-	@SuppressWarnings("unchecked")
 	public static <T> List<T> createTransactionalList(List<T> list) {
-		return (List<T>) new TransactionAwareProxyFactory(new CopyOnWriteArrayList<T>(list)).createInstance();
+		return (List<T>) new TransactionAwareProxyFactory<CopyOnWriteArrayList<T>>(new CopyOnWriteArrayList<T>(list)).createInstance();
 	}
 
 	private class TargetSynchronization extends TransactionSynchronizationAdapter {

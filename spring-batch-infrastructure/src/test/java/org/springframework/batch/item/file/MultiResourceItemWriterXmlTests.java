@@ -59,7 +59,7 @@ public class MultiResourceItemWriterXmlTests extends AbstractMultiResourceItemWr
 			}
 		}
 
-		@SuppressWarnings("unchecked")
+		@SuppressWarnings("rawtypes")
 		public boolean supports(Class clazz) {
 			return true;
 		}

@@ -374,7 +374,7 @@ public class StaxEventItemReaderTests {
 			return events;
 		}
 
-		@SuppressWarnings("unchecked")
+		@SuppressWarnings("rawtypes")
 		public boolean supports(Class clazz) {
 			return true;
 		}

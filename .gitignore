@@ -3,4 +3,5 @@ bin
 integration-repo
 derby-home
 derby.log
+derbydb
 com.springsource.sts.config.flow.prefs

@@ -55,7 +55,6 @@ import org.springframework.util.StringUtils;
 public class ChunkElementParserTests {
 
 	@Test
-	@SuppressWarnings("unchecked")
 	public void testSimpleAttributes() throws Exception {
 		ConfigurableApplicationContext context = new ClassPathXmlApplicationContext(
 				"org/springframework/batch/core/configuration/xml/ChunkElementSimpleAttributeParserTests-context.xml");
