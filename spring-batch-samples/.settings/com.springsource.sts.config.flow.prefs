@@ -1,3 +1,4 @@
-#Mon May 17 10:38:33 BST 2010
+#Mon Nov 22 08:44:57 GMT 2010
 //com.springsource.sts.config.flow.coordinates\:http\://www.springframework.org/schema/batch\:/spring-batch-samples/src/main/resources/jobs/ioSampleJob.xml=<?xml version\="1.0" encoding\="UTF-8"?>\n<graph>\n<element type\="job">\n<structure end\="638" endstart\="632" start\="394" startend\="468"/>\n<bounds height\="118" width\="130" x\="15" y\="17"/>\n</element>\n</graph>
+//com.springsource.sts.config.flow.coordinates\:http\://www.springframework.org/schema/batch\:/spring-batch-samples/src/main/resources/jobs/partitionJdbcJob.xml=<?xml version\="1.0" encoding\="UTF-8"?>\n<graph>\n<element clazz\="JobModelElement" type\="job">\n<structure end\="818" endstart\="812" start\="557" startend\="636"/>\n<bounds height\="128" width\="147" x\="100" y\="19"/>\n</element>\n<element clazz\="StepModelElement" type\="step">\n<structure end\="1427" endstart\="1420" start\="1154" startend\="1223"/>\n<bounds height\="34" width\="65" x\="17" y\="19"/>\n</element>\n</graph>
 eclipse.preferences.version=1

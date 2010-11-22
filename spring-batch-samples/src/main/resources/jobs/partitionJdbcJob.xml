@@ -8,7 +8,7 @@
 	<job id="partitionJdbcJob" xmlns="http://www.springframework.org/schema/batch">
 		<step id="step">
 			<partition step="step1" partitioner="partitioner">
-				<handler grid-size="2" task-executor="taskExecutor"/>
+				<handler grid-size="${batch.grid.size}" task-executor="taskExecutor"/>
 			</partition>
 		</step>
 	</job>
@@ -19,7 +19,7 @@
 		<property name="column" value="ID" />
 	</bean>
 
-	<bean id="taskExecutor" class="org.springframework.core.task.SyncTaskExecutor" />
+	<bean id="taskExecutor" class="org.springframework.core.task.SimpleAsyncTaskExecutor" />
 	
 	<step id="step1" xmlns="http://www.springframework.org/schema/batch">
 		<tasklet>
@@ -34,24 +34,25 @@
 		<property name="path" value="file:./target/output/jdbc/" />
 	</bean>
 
-	<bean id="itemReader" scope="step" autowire-candidate="false" parent="itemReaderParent">
-		<property name="sql">
-			<value>
-                <![CDATA[
-                    select ID,NAME,CREDIT from CUSTOMER where ID >= ? and ID <= ?
-                ]]>
-			</value>
+	<bean id="itemReader" scope="step" autowire-candidate="false" class="org.springframework.batch.item.database.JdbcPagingItemReader">
+		<property name="dataSource" ref="dataSource" />
+		<property name="rowMapper">
+			<bean class="org.springframework.batch.sample.domain.trade.internal.CustomerCreditRowMapper" />
 		</property>
-		<property name="preparedStatementSetter">
-			<bean class="org.springframework.batch.core.resource.ListPreparedStatementSetter">
-				<property name="parameters">
-					<list>
-						<value>#{stepExecutionContext[minValue]}</value>
-						<value>#{stepExecutionContext[maxValue]}</value>
-					</list>
-				</property>
+		<property name="queryProvider">
+			<bean class="org.springframework.batch.item.database.support.SqlPagingQueryProviderFactoryBean">
+				<property name="dataSource" ref="dataSource"/>
+				<property name="fromClause" value="CUSTOMER"/>
+				<property name="selectClause" value="ID,NAME,CREDIT"/>
+				<property name="sortKey" value="ID"/>
+				<property name="whereClause" value="ID &gt;= :minId and ID &lt;= :maxId"/>
 			</bean>
-
+		</property>
+		<property name="parameterValues">
+			<map>
+				<entry key="minId" value="#{stepExecutionContext[minValue]}"/>
+				<entry key="maxId" value="#{stepExecutionContext[maxValue]}"/>
+			</map>
 		</property>
 	</bean>
 
@@ -78,7 +79,7 @@
 		</property>
 	</bean>
 
-	<bean id="inputTestReader" parent="itemReaderParent">
+	<bean id="inputTestReader" class="org.springframework.batch.item.database.JdbcCursorItemReader">
 		<property name="sql">
 			<value>
                 <![CDATA[
@@ -86,10 +87,8 @@
                 ]]>
 			</value>
 		</property>
-	</bean>
-
-	<bean id="itemReaderParent" class="org.springframework.batch.item.database.JdbcCursorItemReader" abstract="true">
 		<property name="dataSource" ref="dataSource" />
+		<property name="verifyCursorPosition" value="${batch.jdbc.verifyCursorPosition}"/>
 		<property name="rowMapper">
 			<bean class="org.springframework.batch.sample.domain.trade.internal.CustomerCreditRowMapper" />
 		</property>
