@@ -426,7 +426,7 @@
 			<dependency>
 				<groupId>org.apache.derby</groupId>
 				<artifactId>derby</artifactId>
-				<version>10.4.2.0</version>
+				<version>10.6.2.1</version>
 				<scope>test</scope>
 			</dependency>
 			<dependency>

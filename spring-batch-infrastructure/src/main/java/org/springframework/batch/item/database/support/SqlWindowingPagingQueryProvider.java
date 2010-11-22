@@ -37,6 +37,7 @@ public class SqlWindowingPagingQueryProvider extends AbstractSqlPagingQueryProvi
 		sql.append(") AS ROW_NUMBER");
 		sql.append(" FROM ").append(getFromClause()).append(
 				getWhereClause() == null ? "" : " WHERE " + getWhereClause());
+		sql.append(getAfterWhereClause());
 		String alias = extractTableAlias();
 		sql.append(") ").append(getSubQueryAlias()).append("WHERE " + alias + "ROW_NUMBER <= ").append(pageSize);
 
@@ -76,10 +77,15 @@ public class SqlWindowingPagingQueryProvider extends AbstractSqlPagingQueryProvi
 			sql.append(" < ");
 		}
 		sql.append(getSortKeyPlaceHolder());
+		sql.append(getAfterWhereClause());
 		String alias = extractTableAlias();
 		sql.append(") ").append(getSubQueryAlias()).append("WHERE " + alias + "ROW_NUMBER <= ").append(pageSize);
 
 		return sql.toString();
+	}
+
+	protected String getAfterWhereClause() {
+		return "";
 	}
 
 	@Override
@@ -97,6 +103,7 @@ public class SqlWindowingPagingQueryProvider extends AbstractSqlPagingQueryProvi
 		sql.append(") AS ROW_NUMBER");
 		sql.append(" FROM ").append(getFromClause()).append(
 				getWhereClause() == null ? "" : " WHERE " + getWhereClause());
+		sql.append(getAfterWhereClause());
 		String alias = extractTableAlias();
 		sql.append(") ").append(getSubQueryAlias()).append("WHERE " + alias + "ROW_NUMBER = ").append(lastRowNum);
 

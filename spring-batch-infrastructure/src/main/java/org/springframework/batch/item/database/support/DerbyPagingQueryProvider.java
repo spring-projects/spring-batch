@@ -31,10 +31,12 @@ import javax.sql.DataSource;
  */
 public class DerbyPagingQueryProvider extends SqlWindowingPagingQueryProvider {
 
+	private String version;
+
 	@Override
 	public void init(DataSource dataSource) throws Exception {
 		super.init(dataSource);
-		String version = JdbcUtils.extractDatabaseMetaData(dataSource, "getDatabaseProductVersion").toString();
+		version = JdbcUtils.extractDatabaseMetaData(dataSource, "getDatabaseProductVersion").toString();
 		if ("10.4.1.3".compareTo(version) > 0) {
 			throw new InvalidDataAccessResourceUsageException("Apache Derby version " + version + " is not supported by this class,  Only version 10.4.1.3 or later is supported");
 		}
@@ -48,6 +50,15 @@ public class DerbyPagingQueryProvider extends SqlWindowingPagingQueryProvider {
 	@Override
 	protected String getOverClause() {
 		return "";
+	}
+	
+	@Override
+	protected String getAfterWhereClause() {
+		if (version!=null && "10.6.1".compareTo(version) > 0) {
+			// Old behaviour retained, even though it is broken
+			return "";
+		}
+		return " " + super.getOverClause();
 	}
 
 }
