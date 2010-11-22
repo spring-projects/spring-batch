@@ -69,10 +69,8 @@ public class CompositeItemStream implements ItemStream {
 	 * @see org.springframework.batch.item.ItemStream#update(ExecutionContext)
 	 */
 	public void update(ExecutionContext executionContext) {
-		synchronized (streams) {
-			for (ItemStream itemStream : streams) {
-				itemStream.update(executionContext);
-			}
+		for (ItemStream itemStream : streams) {
+			itemStream.update(executionContext);
 		}
 	}
 
@@ -81,10 +79,8 @@ public class CompositeItemStream implements ItemStream {
 	 * @throws ItemStreamException
 	 */
 	public void close() throws ItemStreamException {
-		synchronized (streams) {
-			for (ItemStream itemStream : streams) {
-				itemStream.close();
-			}
+		for (ItemStream itemStream : streams) {
+			itemStream.close();
 		}
 	}
 
@@ -93,10 +89,8 @@ public class CompositeItemStream implements ItemStream {
 	 * @throws ItemStreamException
 	 */
 	public void open(ExecutionContext executionContext) throws ItemStreamException {
-		synchronized (streams) {
-			for (ItemStream itemStream : streams) {
-				itemStream.open(executionContext);
-			}
+		for (ItemStream itemStream : streams) {
+			itemStream.open(executionContext);
 		}
 	}
 
