@@ -95,7 +95,7 @@ public final class FileUtils {
 		}
 
 		try {
-			return file.createNewFile();
+			return file.createNewFile() && file.exists();
 		}
 		catch (IOException e) {
 			// On some filesystems you can get an exception here even though the
