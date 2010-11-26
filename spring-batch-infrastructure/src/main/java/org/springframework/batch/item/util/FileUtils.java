@@ -62,17 +62,15 @@ public final class FileUtils {
 						throw new ItemStreamException("File already exists: [" + file.getAbsolutePath() + "]");
 					}
 					if (!file.delete()) {
-						throw new IOException("Could not delete file: "+file);
+						throw new IOException("Could not delete file: " + file);
 					}
 				}
 
 				if (file.getParent() != null) {
 					new File(file.getParent()).mkdirs();
 				}
-				file.createNewFile();
-				if (!file.exists()) {
-					throw new ItemStreamException("Output file was not created: [" + file.getAbsolutePath()
-								+ "]");
+				if (!createNewFile(file)) {
+					throw new ItemStreamException("Output file was not created: [" + file.getAbsolutePath() + "]");
 				}
 			}
 		}
@@ -84,4 +82,32 @@ public final class FileUtils {
 			throw new ItemStreamException("File is not writable: [" + file.getAbsolutePath() + "]");
 		}
 	}
+
+	/**
+	 * Create a new file if it doesn't already exist.
+	 * 
+	 * @param file the file to create on the filesystem
+	 */
+	public static boolean createNewFile(File file) throws IOException {
+
+		if (file.exists()) {
+			return false;
+		}
+
+		try {
+			return file.createNewFile();
+		}
+		catch (IOException e) {
+			// On some filesystems you can get an exception here even though the
+			// files was successfully created
+			if (file.exists()) {
+				return true;
+			}
+			else {
+				throw e;
+			}
+		}
+
+	}
+
 }
