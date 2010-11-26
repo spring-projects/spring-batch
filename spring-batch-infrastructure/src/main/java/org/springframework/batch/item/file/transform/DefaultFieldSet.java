@@ -49,7 +49,9 @@ public class DefaultFieldSet implements FieldSet {
 	}
 
 	private NumberFormat numberFormat = NumberFormat.getInstance(Locale.US);
+
 	private String grouping = ",";
+
 	private String decimal = ".";
 
 	/**
@@ -60,15 +62,15 @@ public class DefaultFieldSet implements FieldSet {
 	private List<String> names;
 
 	/**
-	 * The {@link NumberFormat} to use for parsing numbers. If unset the
-	 * US locale will be used ('.' as decimal place).
+	 * The {@link NumberFormat} to use for parsing numbers. If unset the US
+	 * locale will be used ('.' as decimal place).
 	 * @param numberFormat the {@link NumberFormat} to use for number parsing
 	 */
 	public final void setNumberFormat(NumberFormat numberFormat) {
 		this.numberFormat = numberFormat;
 		if (numberFormat instanceof DecimalFormat) {
-			grouping = ""+((DecimalFormat)numberFormat).getDecimalFormatSymbols().getGroupingSeparator();
-			decimal = ""+((DecimalFormat)numberFormat).getDecimalFormatSymbols().getDecimalSeparator();
+			grouping = "" + ((DecimalFormat) numberFormat).getDecimalFormatSymbols().getGroupingSeparator();
+			decimal = "" + ((DecimalFormat) numberFormat).getDecimalFormatSymbols().getDecimalSeparator();
 		}
 	}
 
@@ -81,11 +83,24 @@ public class DefaultFieldSet implements FieldSet {
 		this.dateFormat = dateFormat;
 	}
 
+	/**
+	 * Create a FieldSet with anonymous tokens. They can only be retrieved by
+	 * column number.
+	 * @param tokens the token values
+	 * @see FieldSet#readString(int)
+	 */
 	public DefaultFieldSet(String[] tokens) {
 		this.tokens = tokens == null ? null : (String[]) tokens.clone();
 		setNumberFormat(NumberFormat.getInstance(Locale.US));
 	}
 
+	/**
+	 * Create a FieldSet with named tokens. The token values can then be
+	 * retrieved either by name or by column number.
+	 * @param tokens the token values
+	 * @param names the names of the tokens
+	 * @see FieldSet#readString(String)
+	 */
 	public DefaultFieldSet(String[] tokens, String[] names) {
 		Assert.notNull(tokens);
 		Assert.notNull(names);
@@ -438,7 +453,7 @@ public class DefaultFieldSet implements FieldSet {
 	 */
 	public BigDecimal readBigDecimal(int index, BigDecimal defaultValue) {
 		String candidate = readAndTrim(index);
-		
+
 		if (!StringUtils.hasText(candidate)) {
 			return defaultValue;
 		}
@@ -484,13 +499,17 @@ public class DefaultFieldSet implements FieldSet {
 		return parseDate(readAndTrim(index), dateFormat);
 	}
 
-	/* (non-Javadoc)
-	 * @see org.springframework.batch.item.file.transform.FieldSet#readDate(int, java.util.Date)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.springframework.batch.item.file.transform.FieldSet#readDate(int,
+	 * java.util.Date)
 	 */
 	public Date readDate(int index, Date defaultValue) {
 		try {
 			return readDate(index);
-		} catch (IllegalArgumentException e) {
+		}
+		catch (IllegalArgumentException e) {
 			return defaultValue;
 		}
 	}
@@ -511,13 +530,17 @@ public class DefaultFieldSet implements FieldSet {
 		}
 	}
 
-	/* (non-Javadoc)
-	 * @see org.springframework.batch.item.file.transform.FieldSet#readDate(int, java.util.Date)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.springframework.batch.item.file.transform.FieldSet#readDate(int,
+	 * java.util.Date)
 	 */
 	public Date readDate(String name, Date defaultValue) {
 		try {
 			return readDate(name);
-		} catch (IllegalArgumentException e) {
+		}
+		catch (IllegalArgumentException e) {
 			return defaultValue;
 		}
 	}
@@ -543,7 +566,8 @@ public class DefaultFieldSet implements FieldSet {
 	public Date readDate(int index, String pattern, Date defaultValue) {
 		try {
 			return readDate(index, pattern);
-		} catch (IllegalArgumentException e) {
+		}
+		catch (IllegalArgumentException e) {
 			return defaultValue;
 		}
 	}
@@ -573,7 +597,8 @@ public class DefaultFieldSet implements FieldSet {
 	public Date readDate(String name, String pattern, Date defaultValue) {
 		try {
 			return readDate(name, pattern);
-		} catch (IllegalArgumentException e) {
+		}
+		catch (IllegalArgumentException e) {
 			return defaultValue;
 		}
 	}

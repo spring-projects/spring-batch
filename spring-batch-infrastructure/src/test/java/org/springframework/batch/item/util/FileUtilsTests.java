@@ -141,7 +141,7 @@ public class FileUtilsTests {
 		};
 		try{
 			FileUtils.setUpOutputFile(file, false, false);
-			fail();
+			fail("Expected IOException because file doesn't exist");
 		}catch(ItemStreamException ex){
 			String message = ex.getMessage();
 			assertTrue("Wrong message: "+message, message.startsWith("Output file was not created"));
