@@ -6,18 +6,23 @@
                                  http://www.springframework.org/schema/integration
                                  http://www.springframework.org/schema/integration/spring-integration-2.0.xsd">
 	<annotation-config />
-	<channel id="requests"/>
+	<channel id="requests">
+		<queue />
+		<interceptors>
+			<beans:bean class="org.springframework.batch.integration.async.StepExecutionInterceptor" />
+		</interceptors>
+	</channel>
 	<channel id="replies">
 		<queue />
 	</channel>
 	<gateway service-interface="org.springframework.batch.item.ItemProcessor" id="processor" default-reply-timeout="1000"
 		default-request-channel="requests" default-reply-channel="replies" />
-	<service-activator input-channel="requests" output-channel="replies" ref="doubler"/>
-	<beans:bean id="doubler" class="org.springframework.batch.integration.async.AsyncItemProcessorMessagingGatewayTests$Doubler"
-		scope="step">
-		<beans:property name="factor" value="#{jobParameters['factor']}" />
-	</beans:bean>
+	<service-activator input-channel="requests" output-channel="replies" ref="doubler">
+		<poller fixed-rate="100" />
+	</service-activator>
+	<beans:bean id="doubler"
+		class="org.springframework.batch.integration.async.PollingAsyncItemProcessorMessagingGatewayTests$Doubler" />
 	<beans:bean class="org.springframework.batch.core.scope.StepScope">
-		<beans:property name="proxyTargetClass" value="true"/>
+		<beans:property name="proxyTargetClass" value="true" />
 	</beans:bean>
 </beans:beans>

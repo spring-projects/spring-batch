@@ -36,6 +36,7 @@ import org.springframework.batch.test.MetaDataInstanceFactory;
 import org.springframework.batch.test.StepScopeTestUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.task.SimpleAsyncTaskExecutor;
+import org.springframework.integration.annotation.Header;
 import org.springframework.integration.annotation.MessageEndpoint;
 import org.springframework.integration.annotation.ServiceActivator;
 import org.springframework.test.context.ContextConfiguration;
@@ -43,7 +44,7 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration
-public class AsyncItemProcessorMessagingGatewayTests {
+public class PollingAsyncItemProcessorMessagingGatewayTests {
 
 	private AsyncItemProcessor<String, String> processor = new AsyncItemProcessor<String, String>();
 
@@ -100,19 +101,16 @@ public class AsyncItemProcessorMessagingGatewayTests {
 
 	@MessageEndpoint
 	public static class Doubler {
-		private int factor = 1;
-
-		public void setFactor(int factor) {
-			this.factor = factor;
-		}
 
 		@ServiceActivator
-		public String cat(String value) {
+		public String cat(String value, @Header(value="stepExecution.jobExecution.jobInstance.jobParameters.getLong('factor')", required=false) Integer input) {
+			long factor = input==null ? 1 : input;
 			for (int i=1; i<factor; i++) {
 				value += value;
 			}
 			return value;
 		}
+
 	}
 
 }
