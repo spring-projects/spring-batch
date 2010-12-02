@@ -54,7 +54,7 @@ public class TaskExecutorPartitionHandler implements PartitionHandler, Initializ
 	private Step step;
 
 	public void afterPropertiesSet() throws Exception {
-		Assert.notNull(step, "A Step must be provided.");
+//		Assert.notNull(step, "A Step must be provided.");
 	}
 
 	/**

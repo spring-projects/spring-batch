@@ -21,6 +21,15 @@
 		<step id="s3" parent="step2"/>
 	</job>
 
+    <job id="job3">
+		<step id="j3s1"  >
+			<partition handler="handler1" partitioner="partitioner">
+                <step  parent="step2"/>
+			</partition>
+		</step>
+	</job>
+
+
 	<bean id="handler"
 		class="org.springframework.batch.core.partition.support.TaskExecutorPartitionHandler"
 		xmlns="http://www.springframework.org/schema/beans">
@@ -33,5 +42,13 @@
 
 	<beans:bean id="partitioner"
 		class="org.springframework.batch.core.partition.support.SimplePartitioner" />
+
+	<!--
+	for the inline case, demonstrates that we correctly ensure a reference to a step for both the default handler setup or a custom PartitionHandler
+	-->
+	<beans:bean id="handler1" class="org.springframework.batch.core.partition.support.TaskExecutorPartitionHandler">
+        <!-- nb: we're not configuring a step! -->
+        <beans:property name="gridSize" value="10" />
+	</beans:bean>
 
 </beans:beans>
