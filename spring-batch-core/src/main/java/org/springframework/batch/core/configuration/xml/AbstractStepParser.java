@@ -36,6 +36,7 @@ import org.w3c.dom.Element;
  *
  * @author Dave Syer
  * @author Thomas Risberg
+ * @author Josh Long
  * @see JobParser
  * @since 2.0
  */
