@@ -26,8 +26,8 @@ import java.util.List;
  * Encapsulation of a list of items to be processed and possibly a list of
  * failed items to be skipped. To mark an item as skipped clients should iterate
  * over the chunk using the {@link #iterator()} method, and if there is a
- * failure call {@link ChunkIterator#remove(Exception)} on the iterator. The
- * skipped items are then available through the chunk.
+ * failure call {@link org.springframework.batch.core.step.item.Chunk.ChunkIterator#remove()} on the iterator.
+ * The skipped items are then available through the chunk.
  * 
  * @author Dave Syer
  * @since 2.0

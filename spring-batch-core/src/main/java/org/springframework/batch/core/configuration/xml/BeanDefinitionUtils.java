@@ -32,8 +32,7 @@ public class BeanDefinitionUtils {
 	 * @return The {@link PropertyValue} for the property of the bean. Search
 	 *         parent hierarchy if necessary. Return null if none is found.
 	 */
-	public static PropertyValue getPropertyValue(String beanName, String propertyName,
-			ConfigurableListableBeanFactory beanFactory) {
+	public static PropertyValue getPropertyValue(String beanName, String propertyName, ConfigurableListableBeanFactory beanFactory) {
 		return beanFactory.getMergedBeanDefinition(beanName).getPropertyValues().getPropertyValue(propertyName);
 	}
 

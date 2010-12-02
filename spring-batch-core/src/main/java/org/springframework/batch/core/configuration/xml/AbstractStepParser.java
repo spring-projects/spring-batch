@@ -137,8 +137,7 @@ public abstract class AbstractStepParser {
 
 	}
 
-	private void parsePartition(Element stepElement, Element partitionElement, AbstractBeanDefinition bd,
-			ParserContext parserContext, boolean stepUnderspecified) {
+	private void parsePartition(Element stepElement, Element partitionElement, AbstractBeanDefinition bd, ParserContext parserContext, boolean stepUnderspecified) {
 
 		bd.setBeanClass(StepParserStepFactoryBean.class);
 		bd.setAttribute("isNamespaceStep", true);
@@ -178,8 +177,7 @@ public abstract class AbstractStepParser {
 
 	}
 
-	private void parseJob(Element stepElement, Element jobElement, AbstractBeanDefinition bd,
-			ParserContext parserContext, boolean stepUnderspecified) {
+	private void parseJob(Element stepElement, Element jobElement, AbstractBeanDefinition bd, ParserContext parserContext, boolean stepUnderspecified) {
 
 		bd.setBeanClass(StepParserStepFactoryBean.class);
 		bd.setAttribute("isNamespaceStep", true);
