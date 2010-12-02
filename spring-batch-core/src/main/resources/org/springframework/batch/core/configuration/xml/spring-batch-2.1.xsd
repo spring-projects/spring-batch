@@ -453,7 +453,7 @@
 
 	<xsd:complexType name="partitionType">
 		<xsd:all>
-			<xsd:element name="step" type="stepType" />
+			<xsd:element name="step" type="stepType" minOccurs="0" maxOccurs="1" />
 			<xsd:element name="handler" minOccurs="0" maxOccurs="1">
 				<xsd:annotation>
 					<xsd:documentation><![CDATA[

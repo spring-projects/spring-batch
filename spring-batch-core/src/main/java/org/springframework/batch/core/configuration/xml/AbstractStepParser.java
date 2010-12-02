@@ -33,11 +33,10 @@ import org.w3c.dom.Element;
  * {@link org.springframework.batch.core.Step} and goes on to (optionally) list
  * a set of transitions from that step to others with &lt;next on="pattern"
  * to="stepName"/&gt;. Used by the {@link JobParser}.
- * 
- * @see JobParser
- * 
+ *
  * @author Dave Syer
  * @author Thomas Risberg
+ * @see JobParser
  * @since 2.0
  */
 public abstract class AbstractStepParser {
@@ -60,6 +59,8 @@ public abstract class AbstractStepParser {
 
 	private static final String STEP_ATTR = "step";
 
+	private static final String STEP_ELE = STEP_ATTR;
+
 	private static final String PARTITIONER_ATTR = "partitioner";
 
 	private static final String HANDLER_ATTR = "handler";
@@ -75,10 +76,10 @@ public abstract class AbstractStepParser {
 	private static final String JOB_REPO_ATTR = "job-repository";
 
 	/**
-	 * @param stepElement The &lt;step/&gt; element
+	 * @param stepElement   The &lt;step/&gt; element
 	 * @param parserContext
 	 * @param jobFactoryRef the reference to the {@link JobParserJobFactoryBean}
-	 * from the enclosing tag. Use 'null' if unknown.
+	 *                      from the enclosing tag. Use 'null' if unknown.
 	 */
 	protected AbstractBeanDefinition parseStep(Element stepElement, ParserContext parserContext, String jobFactoryRef) {
 
@@ -100,7 +101,7 @@ public abstract class AbstractStepParser {
 		Element partitionElement = DomUtils.getChildElementByTagName(stepElement, PARTITION_ELE);
 		if (partitionElement != null) {
 			boolean stepUnderspecified = CoreNamespaceUtils.isUnderspecified(stepElement);
-			parsePartition(stepElement, partitionElement, bd, parserContext, stepUnderspecified);
+			parsePartition(stepElement, partitionElement, bd, parserContext, stepUnderspecified, jobFactoryRef);
 		}
 
 		Element jobElement = DomUtils.getChildElementByTagName(stepElement, JOB_ELE);
@@ -137,7 +138,7 @@ public abstract class AbstractStepParser {
 
 	}
 
-	private void parsePartition(Element stepElement, Element partitionElement, AbstractBeanDefinition bd, ParserContext parserContext, boolean stepUnderspecified) {
+	private void parsePartition(Element stepElement, Element partitionElement, AbstractBeanDefinition bd, ParserContext parserContext, boolean stepUnderspecified, String jobFactoryRef ) {
 
 		bd.setBeanClass(StepParserStepFactoryBean.class);
 		bd.setAttribute("isNamespaceStep", true);
@@ -145,17 +146,27 @@ public abstract class AbstractStepParser {
 		String partitionerRef = partitionElement.getAttribute(PARTITIONER_ATTR);
 		String handlerRef = partitionElement.getAttribute(HANDLER_ATTR);
 
-		if (!StringUtils.hasText(stepRef)) {
-			parserContext.getReaderContext().error("You must specify a step", partitionElement);
-			return;
-		}
 		if (!StringUtils.hasText(partitionerRef)) {
 			parserContext.getReaderContext().error("You must specify a partitioner", partitionElement);
 			return;
 		}
 
+		Element inlineStepElement = DomUtils.getChildElementByTagName(partitionElement, STEP_ELE);
+		if (inlineStepElement == null && !StringUtils.hasText(stepRef)) {
+			parserContext.getReaderContext().error("You must specify a step", partitionElement);
+			return;
+		}
+
+
 		MutablePropertyValues propertyValues = bd.getPropertyValues();
-		propertyValues.addPropertyValue("step", new RuntimeBeanReference(stepRef));
+
+		if (StringUtils.hasText(stepRef)) {
+			propertyValues.addPropertyValue("step", new RuntimeBeanReference(stepRef));
+		} else if( inlineStepElement!=null) {
+			AbstractBeanDefinition stepDefinition = parseStep(inlineStepElement, parserContext, jobFactoryRef);
+			propertyValues.addPropertyValue("step", stepDefinition );
+		}
+
 		propertyValues.addPropertyValue("partitioner", new RuntimeBeanReference(partitionerRef));
 
 		if (!StringUtils.hasText(handlerRef)) {
@@ -170,8 +181,7 @@ public abstract class AbstractStepParser {
 					propertyValues.addPropertyValue("gridSize", new TypedStringValue(gridSize));
 				}
 			}
-		}
-		else {
+		} else {
 			propertyValues.addPropertyValue("partitionHandler", new RuntimeBeanReference(handlerRef));
 		}
 
@@ -205,7 +215,7 @@ public abstract class AbstractStepParser {
 
 
 	private void parseFlow(Element stepElement, Element flowElement, AbstractBeanDefinition bd,
-			ParserContext parserContext, boolean stepUnderspecified) {
+	                       ParserContext parserContext, boolean stepUnderspecified) {
 
 		bd.setBeanClass(StepParserStepFactoryBean.class);
 		bd.setAttribute("isNamespaceStep", true);
