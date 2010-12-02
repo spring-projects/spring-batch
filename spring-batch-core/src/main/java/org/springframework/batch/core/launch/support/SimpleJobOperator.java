@@ -143,9 +143,7 @@ public class SimpleJobOperator implements JobOperator, InitializingBean {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see
-	 * org.springframework.batch.core.launch.JobOperator#getExecutions(java.
-	 * lang.Long)
+	 * @see org.springframework.batch.core.launch.JobOperator#getExecutions(java.lang.Long)
 	 */
 	public List<Long> getExecutions(long instanceId) throws NoSuchJobInstanceException {
 		JobInstance jobInstance = jobExplorer.getJobInstance(instanceId);
@@ -251,8 +249,7 @@ public class SimpleJobOperator implements JobOperator, InitializingBean {
 	 * @see
 	 * org.springframework.batch.core.launch.JobOperator#resume(java.lang.Long)
 	 */
-	public Long restart(long executionId) throws JobInstanceAlreadyCompleteException, NoSuchJobExecutionException,
-			NoSuchJobException, JobRestartException, JobParametersInvalidException {
+	public Long restart(long executionId) throws JobInstanceAlreadyCompleteException, NoSuchJobExecutionException, NoSuchJobException, JobRestartException, JobParametersInvalidException {
 
 		logger.info("Checking status of job execution with id=" + executionId);
 

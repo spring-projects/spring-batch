@@ -26,7 +26,7 @@ import java.util.TreeSet;
  * A {@link Classifier} for a parameterised object type based on a map.
  * Classifies objects according to their inheritance relation with the supplied
  * type map. If the object to be classified is one of the keys of the provided
- * map, or is a subclass of one of the keys, then the map entry vale for that
+ * map, or is a subclass of one of the keys, then the map entry value for that
  * key is returned. Otherwise returns the default value which is null by
  * default.
  * 

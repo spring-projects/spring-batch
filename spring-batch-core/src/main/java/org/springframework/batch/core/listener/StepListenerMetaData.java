@@ -79,8 +79,7 @@ public enum StepListenerMetaData implements ListenerMetaData {
 	private final Class<?>[] paramTypes;
 	private static final Map<String, StepListenerMetaData> propertyMap;
 	
-	StepListenerMetaData(String methodName, String propertyName, Class<? extends Annotation> annotation, 
-			Class<? extends StepListener> listenerInterface, Class<?>... paramTypes) {
+	StepListenerMetaData(String methodName, String propertyName, Class<? extends Annotation> annotation, Class<? extends StepListener> listenerInterface, Class<?>... paramTypes) {
 		this.methodName = methodName;
 		this.propertyName = propertyName;
 		this.annotation = annotation;

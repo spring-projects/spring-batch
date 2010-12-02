@@ -81,11 +81,9 @@ public class StepListenerFactoryBeanTests {
 	@Test
 	@SuppressWarnings("unchecked")
 	public void testStepAndChunk() throws Exception {
-
 		TestListener testListener = new TestListener();
 		factoryBean.setDelegate(testListener);
 		Map<String, String> metaDataMap = new HashMap<String, String>();
-		;
 		metaDataMap.put(AFTER_STEP.getPropertyName(), "destroy");
 		metaDataMap.put(AFTER_CHUNK.getPropertyName(), "afterChunk");
 		factoryBean.setMetaDataMap(metaDataMap);
