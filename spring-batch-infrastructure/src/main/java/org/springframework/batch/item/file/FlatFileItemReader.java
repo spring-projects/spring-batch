@@ -34,10 +34,10 @@ import org.springframework.util.ClassUtils;
 import org.springframework.util.StringUtils;
 
 /**
- * Restartable {@link ItemReader} that reads lines from input
- * {@link #setResource(Resource)}. Line is defined by the
- * {@link #setRecordSeparatorPolicy(RecordSeparatorPolicy)} and mapped to item
- * using {@link #setLineMapper(LineMapper)}.
+ * Restartable {@link ItemReader} that reads lines from input {@link #setResource(Resource)}. Line is defined by the
+ * {@link #setRecordSeparatorPolicy(RecordSeparatorPolicy)} and mapped to item using {@link #setLineMapper(LineMapper)}.
+ * If an exception is thrown during line mapping it is rethrown as {@link FlatFileParseException} adding information
+ * about the problematic line and its line number.
  * 
  * @author Robert Kasanicky
  */
@@ -79,8 +79,7 @@ public class FlatFileItemReader<T> extends AbstractItemCountingItemStreamItemRea
 
 	/**
 	 * In strict mode the reader will throw an exception on
-	 * {@link #open(org.springframework.batch.item.ExecutionContext)} if the
-	 * input resource does not exist.
+	 * {@link #open(org.springframework.batch.item.ExecutionContext)} if the input resource does not exist.
 	 * @param strict false by default
 	 */
 	public void setStrict(boolean strict) {
@@ -88,18 +87,15 @@ public class FlatFileItemReader<T> extends AbstractItemCountingItemStreamItemRea
 	}
 
 	/**
-	 * @param skippedLinesCallback will be called for each one of the initial
-	 * skipped lines before any items are read.
+	 * @param skippedLinesCallback will be called for each one of the initial skipped lines before any items are read.
 	 */
 	public void setSkippedLinesCallback(LineCallbackHandler skippedLinesCallback) {
 		this.skippedLinesCallback = skippedLinesCallback;
 	}
 
 	/**
-	 * Public setter for the number of lines to skip at the start of a file. Can
-	 * be used if the file contains a header without useful (column name)
-	 * information, and without a comment delimiter at the beginning of the
-	 * lines.
+	 * Public setter for the number of lines to skip at the start of a file. Can be used if the file contains a header
+	 * without useful (column name) information, and without a comment delimiter at the beginning of the lines.
 	 * 
 	 * @param linesToSkip the number of lines to skip
 	 */
@@ -116,21 +112,18 @@ public class FlatFileItemReader<T> extends AbstractItemCountingItemStreamItemRea
 	}
 
 	/**
-	 * Setter for the encoding for this input source. Default value is
-	 * {@link #DEFAULT_CHARSET}.
+	 * Setter for the encoding for this input source. Default value is {@link #DEFAULT_CHARSET}.
 	 * 
-	 * @param encoding a properties object which possibly contains the encoding
-	 * for this input file;
+	 * @param encoding a properties object which possibly contains the encoding for this input file;
 	 */
 	public void setEncoding(String encoding) {
 		this.encoding = encoding;
 	}
 
 	/**
-	 * Factory for the {@link BufferedReader} that will be used to extract lines
-	 * from the file. The default is fine for plain text files, but this is a
-	 * useful strategy for binary files where the standard BufferedReaader from
-	 * java.io is limiting.
+	 * Factory for the {@link BufferedReader} that will be used to extract lines from the file. The default is fine for
+	 * plain text files, but this is a useful strategy for binary files where the standard BufferedReaader from java.io
+	 * is limiting.
 	 * 
 	 * @param bufferedReaderFactory the bufferedReaderFactory to set
 	 */
@@ -139,8 +132,8 @@ public class FlatFileItemReader<T> extends AbstractItemCountingItemStreamItemRea
 	}
 
 	/**
-	 * Setter for comment prefixes. Can be used to ignore header lines as well
-	 * by using e.g. the first couple of column names as a prefix.
+	 * Setter for comment prefixes. Can be used to ignore header lines as well by using e.g. the first couple of column
+	 * names as a prefix.
 	 * 
 	 * @param comments an array of comment line prefixes.
 	 */
@@ -157,9 +150,8 @@ public class FlatFileItemReader<T> extends AbstractItemCountingItemStreamItemRea
 	}
 
 	/**
-	 * Public setter for the recordSeparatorPolicy. Used to determine where the
-	 * line endings are and do things like continue over a line ending if inside
-	 * a quoted string.
+	 * Public setter for the recordSeparatorPolicy. Used to determine where the line endings are and do things like
+	 * continue over a line ending if inside a quoted string.
 	 * 
 	 * @param recordSeparatorPolicy the recordSeparatorPolicy to set
 	 */
@@ -169,8 +161,7 @@ public class FlatFileItemReader<T> extends AbstractItemCountingItemStreamItemRea
 
 	/**
 	 * @return string corresponding to logical record according to
-	 * {@link #setRecordSeparatorPolicy(RecordSeparatorPolicy)} (might span
-	 * multiple lines in file).
+	 * {@link #setRecordSeparatorPolicy(RecordSeparatorPolicy)} (might span multiple lines in file).
 	 */
 	@Override
 	protected T doRead() throws Exception {
@@ -188,15 +179,14 @@ public class FlatFileItemReader<T> extends AbstractItemCountingItemStreamItemRea
 				return lineMapper.mapLine(line, lineCount);
 			}
 			catch (Exception ex) {
-				logger.error("Parsing error at line: " + lineCount + " in resource=" + resource.getDescription()
-						+ ", input=[" + line + "]", ex);
-				throw ex;
+				throw new FlatFileParseException("Parsing error at line: " + lineCount + " in resource=["
+						+ resource.getDescription() + "], input=[" + line + "]", ex, line, lineCount);
 			}
 		}
 	}
 
 	/**
-	 * @return next line (skip comments).
+	 * @return next line (skip comments).getCurrentResource
 	 */
 	private String readLine() {
 
@@ -226,7 +216,8 @@ public class FlatFileItemReader<T> extends AbstractItemCountingItemStreamItemRea
 			// Prevent IOException from recurring indefinitely
 			// if client keeps catching and re-calling
 			noInput = true;
-			throw new NonTransientFlatFileException("Unable to read from resource: [" + resource + "]", e, line, lineCount);
+			throw new NonTransientFlatFileException("Unable to read from resource: [" + resource + "]", e, line,
+					lineCount);
 		}
 		return line;
 	}
