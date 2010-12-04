@@ -4,13 +4,11 @@ import java.util.Map;
 
 import org.codehaus.jackson.JsonParser;
 import org.codehaus.jackson.map.MappingJsonFactory;
-import org.springframework.batch.item.file.FlatFileParseException;
 import org.springframework.batch.item.file.LineMapper;
 
 /**
- * Interpret a line as a Json object and parse it up to a Map. The line should
- * be a standard Json object, starting with "{" and ending with "}" and composed
- * of <code>name:value</code> pairs separated by commas. Whitespace is ignored,
+ * Interpret a line as a Json object and parse it up to a Map. The line should be a standard Json object, starting with
+ * "{" and ending with "}" and composed of <code>name:value</code> pairs separated by commas. Whitespace is ignored,
  * e.g.
  * 
  * <pre>
@@ -31,21 +29,16 @@ public class JsonLineMapper implements LineMapper<Map<String, Object>> {
 	private MappingJsonFactory factory = new MappingJsonFactory();
 
 	/**
-	 * Interpret the line as a Json object and create a Map from it.  
+	 * Interpret the line as a Json object and create a Map from it.
 	 * 
 	 * @see LineMapper#mapLine(String, int)
 	 */
 	public Map<String, Object> mapLine(String line, int lineNumber) throws Exception {
 		Map<String, Object> result;
-		try {
-			JsonParser parser = factory.createJsonParser(line);
-			@SuppressWarnings("unchecked")
-			Map<String, Object> token = parser.readValueAs(Map.class);
-			result = token;
-		}
-		catch (Exception e) {
-			throw new FlatFileParseException("Cannot parse line to JSON", e, line, lineNumber);
-		}
+		JsonParser parser = factory.createJsonParser(line);
+		@SuppressWarnings("unchecked")
+		Map<String, Object> token = parser.readValueAs(Map.class);
+		result = token;
 		return result;
 	}
 
