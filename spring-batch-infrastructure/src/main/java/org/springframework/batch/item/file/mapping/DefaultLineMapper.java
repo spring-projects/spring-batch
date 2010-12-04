@@ -16,7 +16,6 @@
 
 package org.springframework.batch.item.file.mapping;
 
-import org.springframework.batch.item.file.FlatFileParseException;
 import org.springframework.batch.item.file.LineMapper;
 import org.springframework.batch.item.file.transform.FieldSet;
 import org.springframework.batch.item.file.transform.LineTokenizer;
@@ -24,11 +23,9 @@ import org.springframework.beans.factory.InitializingBean;
 import org.springframework.util.Assert;
 
 /**
- * Two-phase {@link LineMapper} implementation consisting of tokenization of the
- * line into {@link FieldSet} followed by mapping to item.  By default, any exceptions
- * thrown by either delegates will be wrapped in a {@link FlatFileParseException} before
- * being rethrown.  If finer grained control of exceptions is needed, the {@link LineMapper}
- * interface should be implemented directly.
+ * Two-phase {@link LineMapper} implementation consisting of tokenization of the line into {@link FieldSet} followed by
+ * mapping to item. If finer grained control of exceptions is needed, the {@link LineMapper} interface should be
+ * implemented directly.
  * 
  * @author Robert Kasanicky
  * @author Lucas Ward
@@ -42,13 +39,7 @@ public class DefaultLineMapper<T> implements LineMapper<T>, InitializingBean {
 	private FieldSetMapper<T> fieldSetMapper;
 
 	public T mapLine(String line, int lineNumber) throws Exception {
-		try{
-			return fieldSetMapper.mapFieldSet(tokenizer.tokenize(line));
-		}
-		catch(Exception ex){
-			throw new FlatFileParseException("Parsing error at line: " + lineNumber + 
-					", input=[" + line + "]", ex, line, lineNumber); 
-		}
+		return fieldSetMapper.mapFieldSet(tokenizer.tokenize(line));
 	}
 
 	public void setLineTokenizer(LineTokenizer tokenizer) {

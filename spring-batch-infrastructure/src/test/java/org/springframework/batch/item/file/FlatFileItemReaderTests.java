@@ -193,8 +193,7 @@ public class FlatFileItemReaderTests {
 		// close input
 		reader.close();
 
-		reader
-				.setResource(getInputResource("header\nignoreme\ntestLine1\ntestLine2\ntestLine3\ntestLine4\ntestLine5\ntestLine6"));
+		reader.setResource(getInputResource("header\nignoreme\ntestLine1\ntestLine2\ntestLine3\ntestLine4\ntestLine5\ntestLine6"));
 
 		// init for restart
 		reader.open(executionContext);
@@ -302,37 +301,37 @@ public class FlatFileItemReaderTests {
 		reader.close();
 	}
 
-    @Test
-    public void testOpenBadIOInput() throws Exception {
+	@Test
+	public void testOpenBadIOInput() throws Exception {
 
-        reader.setResource(new AbstractResource() {
-            public String getDescription() {
-                return null;
-            }
+		reader.setResource(new AbstractResource() {
+			public String getDescription() {
+				return null;
+			}
 
-            public InputStream getInputStream() throws IOException {
-                throw new IOException();
-            }
+			public InputStream getInputStream() throws IOException {
+				throw new IOException();
+			}
 
-            public boolean exists() {
-                return true;
-            }
-        });
+			public boolean exists() {
+				return true;
+			}
+		});
 
-        try {
-            reader.open(executionContext);
-            fail();
-        }
-        catch (ItemStreamException ex) {
-            // expected
-        }
-        
-        // read() should then return a null
-        assertNull(reader.read());
-        reader.close();
+		try {
+			reader.open(executionContext);
+			fail();
+		}
+		catch (ItemStreamException ex) {
+			// expected
+		}
 
-    }
-	
+		// read() should then return a null
+		assertNull(reader.read());
+		reader.close();
+
+	}
+
 	@Test
 	public void testDirectoryResource() throws Exception {
 
@@ -379,6 +378,40 @@ public class FlatFileItemReaderTests {
 		reader.afterPropertiesSet();
 
 		reader.open(executionContext);
+	}
+
+	/**
+	 * Exceptions from {@link LineMapper} are wrapped as {@link FlatFileParseException} containing contextual info about
+	 * the problematic line and its line number.
+	 */
+	@Test
+	public void testMappingExceptionWrapping() throws Exception {
+		LineMapper<String> exceptionLineMapper = new LineMapper<String>() {
+
+			@Override
+			public String mapLine(String line, int lineNumber) throws Exception {
+				if (lineNumber == 2) {
+					throw new Exception("Couldn't map line 2");
+				}
+				return line;
+			}
+		};
+		reader.setLineMapper(exceptionLineMapper);
+		reader.afterPropertiesSet();
+
+		reader.open(executionContext);
+		assertNotNull(reader.read());
+
+		try {
+			reader.read();
+			fail();
+		}
+		catch (FlatFileParseException expected) {
+			assertEquals(2, expected.getLineNumber());
+			assertEquals("testLine2", expected.getInput());
+			assertEquals("Couldn't map line 2", expected.getCause().getMessage());
+			assertEquals("Parsing error at line: 2 in resource=[resource loaded from byte array], input=[testLine2]", expected.getMessage());
+		}
 	}
 
 	private Resource getInputResource(String input) {

@@ -1,12 +1,11 @@
 package org.springframework.batch.item.file.mapping;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 
 import java.util.Map;
 
+import org.codehaus.jackson.JsonParseException;
 import org.junit.Test;
-import org.springframework.batch.item.file.FlatFileParseException;
-import org.springframework.batch.item.file.mapping.JsonLineMapper;
 
 public class JsonLineMapperTests {
 	
@@ -26,7 +25,7 @@ public class JsonLineMapperTests {
 		assertEquals(2, ((Map<String, Object>) map.get("bar")).get("foo"));
 	}
 
-	@Test(expected=FlatFileParseException.class)
+	@Test(expected=JsonParseException.class)
 	public void testMappingError() throws Exception {
 		Map<String, Object> map = mapper.mapLine("{\"foo\": 1", 1);
 		assertEquals(1, map.get("foo"));
