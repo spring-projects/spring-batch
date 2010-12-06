@@ -387,8 +387,6 @@ public class FlatFileItemReaderTests {
 	@Test
 	public void testMappingExceptionWrapping() throws Exception {
 		LineMapper<String> exceptionLineMapper = new LineMapper<String>() {
-
-			@Override
 			public String mapLine(String line, int lineNumber) throws Exception {
 				if (lineNumber == 2) {
 					throw new Exception("Couldn't map line 2");
