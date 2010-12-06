@@ -4,9 +4,9 @@
 <chapter id="configureJob">
   <title>Configuring and Running a Job</title>
 
-  <para>In the <link linkend="domain">domain section</link> , the
-  overall architecture design was discussed, using the following
-  diagram as a guide:</para>
+  <para>In the <link linkend="domain">domain section</link> , the overall
+  architecture design was discussed, using the following diagram as a
+  guide:</para>
 
   <mediaobject>
     <imageobject role="html">
@@ -38,11 +38,11 @@
     required dependencies: a name, <classname>JobRepository</classname> , and
     a list of <classname>Step</classname>s.</para>
 
-    <programlisting>&lt;job id="footballJob"&gt;
-    &lt;step id="playerload"          parent="s1" next="gameLoad"/&gt;
-    &lt;step id="gameLoad"            parent="s2" next="playerSummarization"/&gt;
-    &lt;step id="playerSummarization" parent="s3"/&gt;
-&lt;/job&gt;</programlisting>
+    <programlisting><![CDATA[<job id="footballJob">
+    <step id="playerload"          parent="s1" next="gameLoad"/>
+    <step id="gameLoad"            parent="s2" next="playerSummarization"/>
+    <step id="playerSummarization" parent="s3"/>
+</job>]]></programlisting>
 
     <para>The examples here use a parent bean definition to create the steps;
     see the section on <link linkend="configureStep">step configuration</link>
@@ -50,11 +50,11 @@
     defaults to referencing a repository with an id of 'jobRepository', which
     is a sensible default. However, this can be overridden explicitly:</para>
 
-    <programlisting>&lt;job id="footballJob" <emphasis role="bold">job-repository="specialRepository"</emphasis>&gt;
-    &lt;step id="playerload"          parent="s1" next="gameLoad"/&gt;
-    &lt;step id="gameLoad"            parent="s3" next="playerSummarization"/&gt;
-    &lt;step id="playerSummarization" parent="s3"/&gt;
-&lt;/job&gt;</programlisting>
+    <programlisting><![CDATA[<job id="footballJob" ]]><emphasis role="bold">job-repository="specialRepository"</emphasis><![CDATA[>
+    <step id="playerload"          parent="s1" next="gameLoad"/>
+    <step id="gameLoad"            parent="s3" next="playerSummarization"/>
+    <step id="playerSummarization" parent="s3"/>
+</job>]]></programlisting>
 
     <para>In addition to steps a job configuration can contain other elements
     that help with parallelisation (<literal>&lt;split/&gt;</literal>),
@@ -78,16 +78,16 @@
       be run as part of a new <classname>JobInstance</classname>, then the
       restartable property may be set to 'false':</para>
 
-      <programlisting>&lt;job id="footballJob" <emphasis role="bold">restartable="false"</emphasis>&gt;
+      <programlisting><![CDATA[<job id="footballJob" ]]><emphasis role="bold">restartable="false"</emphasis><![CDATA[>
     ...
-&lt;/job&gt;</programlisting>
+</job>]]></programlisting>
 
       <para>To phrase it another way, setting restartable to false means "this
       Job does not support being started again". Restarting a Job that is not
       restartable will cause a <classname>JobRestartException</classname> to
       be thrown:</para>
 
-      <programlisting>Job job = new SimpleJob();
+      <programlisting><![CDATA[Job job = new SimpleJob();
 job.setRestartable(false);
 
 JobParameters jobParameters = new JobParameters();
@@ -101,7 +101,7 @@ try {
 }
 catch (JobRestartException e) {
     // expected
-}</programlisting>
+}]]></programlisting>
 
       <para>This snippet of JUnit code shows how attempting to create a
       <classname>JobExecution</classname> the first time for a non restartable
@@ -118,40 +118,40 @@ catch (JobRestartException e) {
       <classname>SimpleJob</classname> allows for this by calling a
       <classname>JobListener</classname> at the appropriate time:</para>
 
-      <programlisting>public interface JobExecutionListener {
+      <programlisting><![CDATA[public interface JobExecutionListener {
 
     void beforeJob(JobExecution jobExecution);
 
     void afterJob(JobExecution jobExecution);
 
-}</programlisting>
+}]]></programlisting>
 
       <para><classname>JobListener</classname>s can be added to a
       <classname>SimpleJob</classname> via the listeners element on the
       job:</para>
 
-      <programlisting>&lt;job id="footballJob"&gt;
-    &lt;step id="playerload"          parent="s1" next="gameLoad"/&gt;
-    &lt;step id="gameLoad"            parent="s2" next="playerSummarization"/&gt;
-    &lt;step id="playerSummarization" parent="s3"/&gt;
-<emphasis role="bold">    &lt;listeners&gt;
+      <programlisting><![CDATA[<job id="footballJob">
+    <step id="playerload"          parent="s1" next="gameLoad"/>
+    <step id="gameLoad"            parent="s2" next="playerSummarization"/>
+    <step id="playerSummarization" parent="s3"/>
+]]><emphasis role="bold">    &lt;listeners&gt;
         &lt;listener ref="sampleListener"/&gt;
     &lt;/listeners&gt;
-</emphasis>&lt;/job&gt;</programlisting>
+</emphasis><![CDATA[</job>]]></programlisting>
 
       <para>It should be noted that <methodname>afterJob</methodname> will be
       called regardless of the success or failure of the
       <classname>Job</classname>. If success or failure needs to be determined
       it can be obtained from the <classname>JobExecution</classname>:</para>
 
-      <programlisting>public void afterJob(JobExecution jobExecution){
+      <programlisting><![CDATA[public void afterJob(JobExecution jobExecution){
     if( jobExecution.getStatus() == BatchStatus.COMPLETED ){
         //job success
     }
     else if(jobExecution.getStatus() == BatchStatus.FAILED){
         //job failure
     }
-}</programlisting>
+}]]></programlisting>
 
       <para>The annotations corresponding to this interface are:</para>
 
@@ -184,19 +184,19 @@ catch (JobRestartException e) {
       <classname>Job</classname> with two listeners and one
       <classname>Step</classname>, "step1".</para>
 
-      <programlisting>&lt;job id="baseJob" abstract="true"&gt;
-    &lt;listeners&gt;
-        &lt;listener ref="listenerOne"/&gt;
-    &lt;listeners&gt;
-&lt;/job&gt;
+      <programlisting><![CDATA[<job id="baseJob" abstract="true">
+    <listeners>
+        <listener ref="listenerOne"/>
+    <listeners>
+</job>
 
-&lt;job id="job1" parent="baseJob3"&gt;
-    &lt;step id="step1" parent="standaloneStep"/&gt;
+<job id="job1" parent="baseJob3">
+    <step id="step1" parent="standaloneStep"/>
 
-    &lt;listeners merge="true"&gt;
-        &lt;listener ref="listenerTwo"/&gt;
-    &lt;listeners&gt;
-&lt;/job&gt;</programlisting>
+    <listeners merge="true">
+        <listener ref="listenerTwo"/>
+    <listeners>
+</job>]]></programlisting>
 
       <para>Please see the section on <link
       linkend="InheritingFromParentStep">Inheriting from a Parent Step</link>
@@ -216,10 +216,10 @@ catch (JobRestartException e) {
       of a validator is supported through the XML namespace through a child
       element of the job, e.g&gt;:</para>
 
-      <programlisting>&lt;job id="job1" parent="baseJob3"&gt;
-    &lt;step id="step1" parent="standaloneStep"/&gt;
-    &lt;validator ref="paremetersValidator"/&gt;
-&lt;/job&gt;</programlisting>
+      <programlisting><![CDATA[<job id="job1" parent="baseJob3">
+    <step id="step1" parent="standaloneStep"/>
+    <validator ref="paremetersValidator"/>
+</job>]]></programlisting>
 
       <para>The validator can be specified as a reference (as above) or as a
       nested bean definition in the beans namespace.</para>
@@ -227,12 +227,17 @@ catch (JobRestartException e) {
   </section>
 
   <section id="configuringJobRepository">
+     
+
     <title>Configuring a JobRepository</title>
 
-    <para>As described in earlier, the <link
-    linkend="jobRepository"><classname>JobRepository</classname></link> is
-    used for basic CRUD operations of the various persisted domain objects
-    within Spring Batch, such as <classname>JobExecution</classname> and
+     
+
+    <para>As described in earlier, the <link linkend="jobRepository">
+        <classname>JobRepository</classname>
+      </link> is used for basic CRUD operations of the various persisted
+    domain objects within Spring Batch, such as
+    <classname>JobExecution</classname> and
     <classname>StepExecution</classname>. It is required by many of the major
     framework features, such as the <classname>JobLauncher</classname>,
     <classname>Job</classname>, and <classname>Step</classname>. The batch
@@ -241,22 +246,26 @@ catch (JobRestartException e) {
     collaborators. However, there are still a few configuration options
     available:</para>
 
-    <programlisting>&lt;job-repository id="jobRepository"
+     
+
+    <programlisting><![CDATA[<job-repository id="jobRepository"
     data-source="dataSource"
     transaction-manager="transactionManager"
     isolation-level-for-create="SERIALIZABLE"
     table-prefix="BATCH_"
 	max-varchar-length="1000"
-/&gt;</programlisting>
+/>]]></programlisting>
+
+     
 
     <para>None of the configuration options listed above are required except
     the id. If they are not set, the defaults shown above will be used. They
-    are shown above for awareness purposes.  The <literal>max-varchar-length</literal> defaults to 2500, which is the length of the long 
-	<literal>VARCHAR</literal> 
-	columns in the <link
-    linkend="metaDataSchemaOverview">sample schema scripts</link></para> used
-	to store things like exit code descriptions.  If you don't modify the schema
-	and you don't use multi-bye characters you shouldn't need to change it.
+    are shown above for awareness purposes. The
+    <literal>max-varchar-length</literal> defaults to 2500, which is the
+    length of the long <literal>VARCHAR</literal> columns in the <link
+    linkend="metaDataSchemaOverview">sample schema scripts</link></para>
+
+     used to store things like exit code descriptions. If you don't modify the schema and you don't use multi-bye characters you shouldn't need to change it. 
 
     <section id="txConfigForJobRepository">
       <title>Transaction Configuration for the JobRepository</title>
@@ -277,30 +286,36 @@ catch (JobRestartException e) {
       that the SERIALIZED will cause problems, as long as the database
       platform supports it. However, this can be overridden:</para>
 
-      <para><programlisting>&lt;job-repository id="jobRepository"
-                <emphasis role="bold">isolation-level-for-create="REPEATABLE_READ"</emphasis> /&gt;</programlisting></para>
+      <para>
+        <programlisting><![CDATA[<job-repository id="jobRepository"
+                ]]><emphasis role="bold">isolation-level-for-create="REPEATABLE_READ"</emphasis><![CDATA[ />]]></programlisting>
+      </para>
 
       <para>If the namespace or factory beans aren't used then it is also
       essential to configure the transactional behavior of the repository
       using AOP:</para>
 
-      <para><programlisting>&lt;aop:config&gt;
-    &lt;aop:advisor 
-           pointcut="execution(* org.springframework.batch.core..*Repository+.*(..))"/&gt;
-    &lt;advice-ref="txAdvice" /&gt;
-&lt;/aop:config&gt;
+      <para>
+        <programlisting><![CDATA[<aop:config>
+    <aop:advisor 
+           pointcut="execution(* org.springframework.batch.core..*Repository+.*(..))"/>
+    <advice-ref="txAdvice" />
+</aop:config>
 
-&lt;tx:advice id="txAdvice" transaction-manager="transactionManager"&gt;
-    &lt;tx:attributes&gt;
-        &lt;tx:method name="*" /&gt;
-    &lt;/tx:attributes&gt;
-&lt;/tx:advice&gt;</programlisting></para>
+<tx:advice id="txAdvice" transaction-manager="transactionManager">
+    <tx:attributes>
+        <tx:method name="*" />
+    </tx:attributes>
+</tx:advice>]]></programlisting>
+      </para>
 
       <para>This fragment can be used as is, with almost no changes. Remember
       also to include the appropriate namespace declarations and to make sure
       spring-tx and spring-aop (or the whole of spring) are on the
       classpath.</para>
     </section>
+
+     
 
     <section id="repositoryTablePrefix">
       <title>Changing the Table Prefix</title>
@@ -314,8 +329,8 @@ catch (JobRestartException e) {
       meta data tables is needed within the same schema, then the table prefix
       will need to be changed:</para>
 
-      <programlisting>&lt;job-repository id="jobRepository"
-                <emphasis role="bold">table-prefix="SYSTEM.TEST_"</emphasis> /&gt;</programlisting>
+      <programlisting><![CDATA[<job-repository id="jobRepository"
+                ]]><emphasis role="bold">table-prefix="SYSTEM.TEST_"</emphasis><![CDATA[ />]]></programlisting>
 
       <para>Given the above changes, every query to the meta data tables will
       be prefixed with "SYSTEM.TEST_". BATCH_JOB_EXECUTION will be referred to
@@ -327,6 +342,8 @@ catch (JobRestartException e) {
       </note>
     </section>
 
+     
+
     <section id="inMemoryRepository">
       <title>In-Memory Repository</title>
 
@@ -337,10 +354,10 @@ catch (JobRestartException e) {
       this reason, Spring batch provides an in-memory Map version of the job
       repository:</para>
 
-      <programlisting>&lt;bean id="jobRepository" 
-  class="org.springframework.batch.core.repository.support.MapJobRepositoryFactoryBean"&gt;
-    &lt;property name="transactionManager" ref="transactionManager"/&gt;
-&lt;/bean&gt;</programlisting>
+      <programlisting><![CDATA[<bean id="jobRepository" 
+  class="org.springframework.batch.core.repository.support.MapJobRepositoryFactoryBean">
+    <property name="transactionManager" ref="transactionManager"/>
+</bean>]]></programlisting>
 
       <para>Note that the in-memory repository is volatile and so does not
       allow restart between JVM instances. It also cannot guarantee that two
@@ -356,6 +373,8 @@ catch (JobRestartException e) {
       <classname>ResourcelessTransactionManager</classname> useful.</para>
     </section>
 
+     
+
     <section id="nonStandardDatabaseTypesInRepository">
       <title>Non-standard Database Types in a Repository</title>
 
@@ -366,10 +385,10 @@ catch (JobRestartException e) {
       shortcut and use it to set the database type to the closest
       match:</para>
 
-      <programlisting>&lt;bean id="jobRepository" class="org...JobRepositoryFactoryBean"&gt;
-    &lt;property name="databaseType" value="db2"/&gt;
-    &lt;property name="dataSource" ref="dataSource"/&gt;
-&lt;/bean&gt;</programlisting>
+      <programlisting><![CDATA[<bean id="jobRepository" class="org...JobRepositoryFactoryBean">
+    <property name="databaseType" value="db2"/>
+    <property name="dataSource" ref="dataSource"/>
+</bean>]]></programlisting>
 
       <para>(The <classname>JobRepositoryFactoryBean</classname> tries to
       auto-detect the database type from the <classname>DataSource</classname>
@@ -384,6 +403,8 @@ catch (JobRestartException e) {
       interfaces that the <classname>SimpleJobRepository</classname> depends
       on and wire one up manually in the normal Spring way.</para>
     </section>
+
+     
   </section>
 
   <section id="configuringJobLauncher">
@@ -395,10 +416,10 @@ catch (JobRestartException e) {
     a <classname>JobRepository</classname>, in order to obtain an
     execution:</para>
 
-    <programlisting>&lt;bean id="jobLauncher"
-      class="org.springframework.batch.core.launch.support.SimpleJobLauncher"&gt;
-    &lt;property name="jobRepository" ref="jobRepository" /&gt;
-&lt;/bean&gt;</programlisting>
+    <programlisting><![CDATA[<bean id="jobLauncher"
+      class="org.springframework.batch.core.launch.support.SimpleJobLauncher">
+    <property name="jobRepository" ref="jobRepository" />
+</bean>]]></programlisting>
 
     <para>Once a <link
     linkend="jobExecution"><classname>JobExecution</classname></link> is
@@ -442,13 +463,13 @@ catch (JobRestartException e) {
     configured to allow for this scenario by configuring a
     <classname>TaskExecutor</classname>:</para>
 
-    <programlisting>&lt;bean id="jobLauncher"
-      class="org.springframework.batch.core.launch.support.SimpleJobLauncher"&gt;
-    &lt;property name="jobRepository" ref="jobRepository" /&gt;
-    &lt;property name="taskExecutor"&gt;
-        &lt;bean class="org.springframework.core.task.SimpleAsyncTaskExecutor" /&gt;
-    &lt;/property&gt;
-&lt;/bean&gt;</programlisting>
+    <programlisting><![CDATA[<bean id="jobLauncher"
+      class="org.springframework.batch.core.launch.support.SimpleJobLauncher">
+    <property name="jobRepository" ref="jobRepository" />
+    <property name="taskExecutor">
+        <bean class="org.springframework.core.task.SimpleAsyncTaskExecutor" />
+    </property>
+</bean>]]></programlisting>
 
     <para>Any implementation of the spring <classname>TaskExecutor</classname>
     interface can be used to control how jobs are asynchronously
@@ -545,27 +566,26 @@ catch (JobRestartException e) {
         name second. All arguments after these are considered to be
         JobParameters and must be in the format of 'name=value':</para>
 
-        <screen><prompt>bash$</prompt> java CommandLineJobRunner endOfDayJob.xml endOfDay schedule.date(date)=2007/05/05</screen>
+        <screen><prompt>bash$</prompt><![CDATA[ java CommandLineJobRunner endOfDayJob.xml endOfDay schedule.date(date)=2007/05/05]]></screen>
 
-        <para>In most cases you would want to use a manifest to
-        declare your main class in a jar, but for simplicity, the
-        class was used directly.  This example is using the same
-        'EndOfDay' example from the <link linkend="domain">domain
-        section</link>. The first argument is 'endOfDayJob.xml', which
-        is the Spring <classname>ApplicationContext</classname>
-        containing the
+        <para>In most cases you would want to use a manifest to declare your
+        main class in a jar, but for simplicity, the class was used directly.
+        This example is using the same 'EndOfDay' example from the <link
+        linkend="domain">domain section</link>. The first argument is
+        'endOfDayJob.xml', which is the Spring
+        <classname>ApplicationContext</classname> containing the
         <classname>Job</classname>. The second argument, 'endOfDay' represents
         the job name. The final argument, 'schedule.date(date)=2007/05/05'
         will be converted into <classname>JobParameters</classname>. An
         example of the XML configuration is below:</para>
 
-        <programlisting>&lt;job id="endOfDay"&gt;
-    &lt;step id="step1" parent="simpleStep" /&gt;
-&lt;/job&gt;
+        <programlisting><![CDATA[<job id="endOfDay">
+    <step id="step1" parent="simpleStep" />
+</job>
 
-&lt;!-- Launcher details removed for clarity --&gt;
-&lt;beans:bean id="jobLauncher"
-         class="org.springframework.batch.core.launch.support.SimpleJobLauncher" /&gt;</programlisting>
+<!-- Launcher details removed for clarity -->
+<beans:bean id="jobLauncher"
+         class="org.springframework.batch.core.launch.support.SimpleJobLauncher" />]]></programlisting>
 
         <para>This example is overly simplistic, since there are many more
         requirements to a run a batch job in Spring Batch in general, but it
@@ -603,11 +623,11 @@ catch (JobRestartException e) {
         to a number using the <classname>ExitCodeMapper</classname>
         interface:</para>
 
-        <programlisting>public interface ExitCodeMapper {
+        <programlisting><![CDATA[public interface ExitCodeMapper {
 
     public int intValue(String exitCode);
 
-}</programlisting>
+}]]></programlisting>
 
         <para>The essential contract of an
         <classname>ExitCodeMapper</classname> is that, given a string exit
@@ -666,7 +686,7 @@ catch (JobRestartException e) {
       is required when handling an <classname>HttpRequest</classname>. An
       example is below:</para>
 
-      <programlisting>@Controller
+      <programlisting><![CDATA[@Controller
 public class JobLauncherController {
 
     @Autowired
@@ -679,7 +699,7 @@ public class JobLauncherController {
     public void handle() throws Exception{
         jobLauncher.run(job, new JobParameters());
     }
-}</programlisting>
+}]]></programlisting>
     </section>
   </section>
 
@@ -736,9 +756,9 @@ public class JobLauncherController {
       query the repository for existing executions. This functionality is
       provided by the <classname>JobExplorer</classname> interface:</para>
 
-      <programlisting>public interface JobExplorer {
+      <programlisting><![CDATA[public interface JobExplorer {
 
-    List&lt;JobInstance&gt; getJobInstances(String jobName, int start, int count);
+    List<JobInstance> getJobInstances(String jobName, int start, int count);
 
     JobExecution getJobExecution(Long executionId);
 
@@ -746,10 +766,10 @@ public class JobLauncherController {
 
     JobInstance getJobInstance(Long instanceId);
 
-    List&lt;JobExecution&gt; getJobExecutions(JobInstance jobInstance);
+    List<JobExecution> getJobExecutions(JobInstance jobInstance);
 
-    Set&lt;JobExecution&gt; findRunningJobExecutions(String jobName);
-}</programlisting>
+    Set<JobExecution> findRunningJobExecutions(String jobName);
+}]]></programlisting>
 
       <para>As is evident from the method signatures above,
       <classname>JobExplorer</classname> is a read-only version of the
@@ -757,8 +777,8 @@ public class JobLauncherController {
       <classname>JobRepository</classname>, it can be easily configured via a
       factory bean:</para>
 
-      <programlisting>&lt;bean id="jobExplorer" class="org.spr...JobExplorerFactoryBean" 
-      p:dataSource-ref="dataSource" /&gt;</programlisting>
+      <programlisting><![CDATA[<bean id="jobExplorer" class="org.spr...JobExplorerFactoryBean" 
+      p:dataSource-ref="dataSource" />]]></programlisting>
 
       <para><link linkend="repositoryTablePrefix">Earlier in this
       chapter</link>, it was mentioned that the table prefix of the
@@ -767,8 +787,8 @@ public class JobLauncherController {
       <classname>JobExplorer</classname> is working with the same tables, it
       too needs the ability to set a prefix:</para>
 
-      <programlisting>&lt;bean id="jobExplorer" class="org.spr...JobExplorerFactoryBean" 
-      p:dataSource-ref="dataSource" <emphasis role="bold">p:tablePrefix="BATCH_" </emphasis>/&gt;</programlisting>
+      <programlisting><![CDATA[<bean id="jobExplorer" class="org.spr...JobExplorerFactoryBean" 
+      p:dataSource-ref="dataSource" ]]><emphasis role="bold">p:tablePrefix="BATCH_" </emphasis><![CDATA[/>]]></programlisting>
     </section>
 
     <section>
@@ -784,7 +804,7 @@ public class JobLauncherController {
       the framework and this is based on a simple map from job name to job
       instance. It is configured simply like this:</para>
 
-      <programlisting>&lt;bean id="jobRegistry" class="org.spr...MapJobRegistry" /&gt;</programlisting>
+      <programlisting><![CDATA[<bean id="jobRegistry" class="org.spr...MapJobRegistry" />]]></programlisting>
 
       <para>There are two ways to populate a JobRegistry automatically: using
       a bean post processor and using a registrar lifecycle component. These
@@ -796,9 +816,9 @@ public class JobLauncherController {
         <para>This is a bean post-processor that can register all jobs as they
         are created:</para>
 
-        <programlisting>&lt;bean id="jobRegistryBeanPostProcessor" class="org.spr...JobRegistryBeanPostProcessor"&gt;
-    &lt;property name="jobRegistry" ref="jobRegistry"/&gt;
-&lt;/bean&gt;</programlisting>
+        <programlisting><![CDATA[<bean id="jobRegistryBeanPostProcessor" class="org.spr...JobRegistryBeanPostProcessor">
+    <property name="jobRegistry" ref="jobRegistry"/>
+</bean>]]></programlisting>
 
         <para>Athough it is not strictly necessary the post-processor in the
         example has been given an id so that it can be included in child
@@ -823,18 +843,18 @@ public class JobLauncherController {
         integrate jobs contributed from separate modules of an
         application.</para>
 
-        <programlisting>&lt;bean class="org.spr...AutomaticJobRegistrar"&gt;
-   &lt;property name="applicationContextFactories"&gt;
-      &lt;bean class="org.spr...ClasspathXmlApplicationContextsFactoryBean"&gt;
-         &lt;property name="resources" value="classpath*:/config/job*.xml" /&gt;
-      &lt;/bean&gt;
-   &lt;/property&gt;
-   &lt;property name="jobLoader"&gt;
-      &lt;bean class="org.spr...DefaultJobLoader"&gt;
-         &lt;property name="jobRegistry" ref="jobRegistry" /&gt;
-      &lt;/bean&gt;
-   &lt;/property&gt;
-&lt;/bean&gt;</programlisting>
+        <programlisting><![CDATA[<bean class="org.spr...AutomaticJobRegistrar">
+   <property name="applicationContextFactories">
+      <bean class="org.spr...ClasspathXmlApplicationContextsFactoryBean">
+         <property name="resources" value="classpath*:/config/job*.xml" />
+      </bean>
+   </property>
+   <property name="jobLoader">
+      <bean class="org.spr...DefaultJobLoader">
+         <property name="jobRegistry" ref="jobRegistry" />
+      </bean>
+   </property>
+</bean>]]></programlisting>
 
         <para>The registrar has two mandatory properties, one is an array of
         <classname>ApplicationContextFactory</classname> (here created from a
@@ -875,14 +895,14 @@ public class JobLauncherController {
       provides for these types of operations via the
       <classname>JobOperator</classname> interface:</para>
 
-      <programlisting>public interface JobOperator {
+      <programlisting><![CDATA[public interface JobOperator {
 
-    List&lt;Long&gt; getExecutions(long instanceId) throws NoSuchJobInstanceException;
+    List<Long> getExecutions(long instanceId) throws NoSuchJobInstanceException;
 
-    List&lt;Long&gt; getJobInstances(String jobName, int start, int count) 
+    List<Long> getJobInstances(String jobName, int start, int count) 
           throws NoSuchJobException;
 
-    Set&lt;Long&gt; getRunningExecutions(String jobName) throws NoSuchJobException;
+    Set<Long> getRunningExecutions(String jobName) throws NoSuchJobException;
 
     String getParameters(long executionId) throws NoSuchJobExecutionException;
 
@@ -902,12 +922,12 @@ public class JobLauncherController {
 
     String getSummary(long executionId) throws NoSuchJobExecutionException;
 
-    Map&lt;Long, String&gt; getStepExecutionSummaries(long executionId) 
+    Map<Long, String> getStepExecutionSummaries(long executionId) 
           throws NoSuchJobExecutionException;
 
-    Set&lt;String&gt; getJobNames();
+    Set<String> getJobNames();
 
-}</programlisting>
+}]]></programlisting>
 
       <para>The above operations represent methods from many different
       interfaces, such as <classname>JobLauncher</classname>,
@@ -917,20 +937,20 @@ public class JobLauncherController {
       implementation of <classname>JobOperator</classname>,
       <classname>SimpleJobOperator</classname>, has many dependencies:</para>
 
-      <programlisting>&lt;bean id="jobOperator" class="org.spr...SimpleJobOperator"&gt;
-    &lt;property name="jobExplorer"&gt;
-        &lt;bean class="org.spr...JobExplorerFactoryBean"&gt;
-            &lt;property name="dataSource" ref="dataSource" /&gt;
-        &lt;/bean&gt;
-    &lt;/property&gt;
-    &lt;property name="jobRepository" ref="jobRepository" /&gt;
-    &lt;property name="jobRegistry" ref="jobRegistry" /&gt;
-    &lt;property name="jobLauncher" ref="jobLauncher" /&gt;
-&lt;/bean&gt;</programlisting>
+      <programlisting><![CDATA[<bean id="jobOperator" class="org.spr...SimpleJobOperator">
+    <property name="jobExplorer">
+        <bean class="org.spr...JobExplorerFactoryBean">
+            <property name="dataSource" ref="dataSource" />
+        </bean>
+    </property>
+    <property name="jobRepository" ref="jobRepository" />
+    <property name="jobRegistry" ref="jobRegistry" />
+    <property name="jobLauncher" ref="jobLauncher" />
+</bean>]]></programlisting>
 
-	  <note>If you set the table prefix on the job repository, don't
-	  forget to set it on the job explorer as well.</note>
-
+      <note>
+        If you set the table prefix on the job repository, don't forget to set it on the job explorer as well.
+      </note>
     </section>
 
     <section id="JobParametersIncrementer">
@@ -955,11 +975,11 @@ public class JobLauncherController {
       <classname>Job</classname> to force the <classname>Job</classname> to a
       new instance:</para>
 
-      <programlisting>public interface JobParametersIncrementer {
+      <programlisting><![CDATA[public interface JobParametersIncrementer {
 
     JobParameters getNext(JobParameters parameters);
 
-}</programlisting>
+}]]></programlisting>
 
       <para>The contract of <classname>JobParametersIncrementer</classname> is
       that, given a <link
@@ -975,7 +995,7 @@ public class JobLauncherController {
       numerical values that help to identify the <classname>Job</classname>,
       as shown below:</para>
 
-      <programlisting>public class SampleIncrementer implements JobParametersIncrementer {
+      <programlisting><![CDATA[public class SampleIncrementer implements JobParametersIncrementer {
   
     public JobParameters getNext(JobParameters parameters) { 
         if (parameters==null || parameters.isEmpty()) {
@@ -984,7 +1004,7 @@ public class JobLauncherController {
         long id = parameters.getLong("run.id",1L) + 1;
         return new JobParametersBuilder().addLong("run.id", id).toJobParameters();
     }
-}</programlisting>
+}]]></programlisting>
 
       <para>In this example, the value with a key of 'run.id' is used to
       discriminate between <classname>JobInstances</classname>. If the
@@ -995,9 +1015,9 @@ public class JobLauncherController {
       be associated with <classname>Job</classname> via the 'incrementer'
       attribute in the namespace:</para>
 
-      <programlisting>&lt;job id="footballJob" <emphasis role="bold">incrementer="sampleIncrementer"</emphasis>&gt;
+      <programlisting><![CDATA[<job id="footballJob" ]]><emphasis role="bold">incrementer="sampleIncrementer"</emphasis><![CDATA[>
     ...
-&lt;/job&gt;</programlisting>
+</job>]]></programlisting>
     </section>
 
     <section id="stoppingAJob">
@@ -1007,8 +1027,8 @@ public class JobLauncherController {
       <classname>JobOperator</classname> is gracefully stopping a
       <classname>Job:</classname></para>
 
-      <programlisting>Set&lt;Long&gt; executions = jobOperator.getRunningExecutions("sampleJob");
-jobOperator.stop(executions.iterator().next());  </programlisting>
+      <programlisting><![CDATA[Set<Long> executions = jobOperator.getRunningExecutions("sampleJob");
+jobOperator.stop(executions.iterator().next());  ]]></programlisting>
 
       <para>The shutdown is not immediate, since there is no way to force
       immediate shutdown, especially if the execution is currently in
@@ -1018,6 +1038,31 @@ jobOperator.stop(executions.iterator().next());  </programlisting>
       <classname>StepExecution</classname> to
       <classname>BatchStatus.STOPPED</classname>, save it, then do the same
       for the <classname>JobExecution</classname> before finishing.</para>
+    </section>
+
+    <section>
+      <title>Aborting a Job</title>
+
+      <para>A job execution which is <classname>FAILED</classname> can be
+      restartsed (if the Job is restartable). A job execution whose status is
+      <classname>ABORTED</classname> will not be restarted by the framework.
+      The <classname>ABORTED</classname> status is also used in step
+      executions to mark them as skippable in a restarted job execution: if a
+      job is executing and encounters a step that has been marked
+      <classname>ABORTED</classname> in the previous failed job execution, it
+      will move on to the next step (as determined by the job flow definition
+      and the step execution exit status).</para>
+
+      <para>If the process died (<literal>"kill -9"</literal> or server
+      failure) the job is, of course, not running, but the JobRepository has
+      no way of knowing because no-one told it before the process died. You
+      have to tell it manually that you know that the execution either failed
+      or should be considered aborted (change its status to
+      <classname>FAILED</classname> or <classname>ABORTED</classname>) - it's
+      a business decision and there is no way to automate it. Only change the
+      status to <classname>FAILED</classname> if it is not restartable, or if
+      you know the restart data is valid. There is a utility in Spring Batch
+      Admin <classname>JobService</classname> to abort a job execution.</para>
     </section>
   </section>
 </chapter>
