@@ -18,6 +18,7 @@ package org.springframework.batch.core.configuration.xml;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
+import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -25,75 +26,126 @@ import java.util.List;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.springframework.batch.core.BatchStatus;
-import org.springframework.batch.core.Job;
-import org.springframework.batch.core.JobExecution;
-import org.springframework.batch.core.JobParameters;
-import org.springframework.batch.core.StepExecution;
+import org.springframework.batch.core.*;
+import org.springframework.batch.core.partition.support.PartitionStep;
+import org.springframework.batch.core.partition.support.TaskExecutorPartitionHandler;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.repository.support.MapJobRepositoryFactoryBean;
+import org.springframework.batch.core.step.tasklet.TaskletStep;
+import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.ApplicationContextAware;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.springframework.util.ReflectionUtils;
 
 
 /**
  * @author Dave Syer
- *
+ * @author Josh Long
  */
 @ContextConfiguration
 @RunWith(SpringJUnit4ClassRunner.class)
-public class PartitionStepParserTests {
-	
-	@Autowired
-	@Qualifier("job1")
-	private Job job1;
+public class PartitionStepParserTests implements ApplicationContextAware {
 
-	@Autowired
-	@Qualifier("job2")
-	private Job job2;
+    @Autowired
+    @Qualifier("job1")
+    private Job job1;
 
-	@Autowired
-	private JobRepository jobRepository;
+    @Autowired
+    @Qualifier("job2")
+    private Job job2;
 
-	@Autowired
-	private MapJobRepositoryFactoryBean mapJobRepositoryFactoryBean;
-	
-	@Before
-	public void setUp() {
-		mapJobRepositoryFactoryBean.clear();
-	}
+    @Autowired
+    @Qualifier("job3")
+    private Job job3;
 
-	@Test
-	public void testDefaultHandlerStep() throws Exception {
-		assertNotNull(job1);
-		JobExecution jobExecution = jobRepository.createJobExecution(job1.getName(), new JobParameters());
-		job1.execute(jobExecution);
-		assertEquals(BatchStatus.COMPLETED, jobExecution.getStatus());
-		List<String> stepNames = getStepNames(jobExecution);
-		assertEquals(3, stepNames.size());
-		assertEquals("[s1, step1:partition0, step1:partition1]", stepNames.toString());
-	}
+    @Autowired
+    private JobRepository jobRepository;
 
-	@Test
-	public void testHandlerRefStep() throws Exception {
-		assertNotNull(job2);
-		JobExecution jobExecution = jobRepository.createJobExecution(job2.getName(), new JobParameters());
-		job2.execute(jobExecution);
-		assertEquals(BatchStatus.COMPLETED, jobExecution.getStatus());
-		List<String> stepNames = getStepNames(jobExecution);
-		assertEquals(5, stepNames.size());
-		assertEquals("[s2, s3, step1:partition0, step1:partition1, step1:partition2]", stepNames.toString());
-	}
+    @Autowired
+    private MapJobRepositoryFactoryBean mapJobRepositoryFactoryBean;
 
-	private List<String> getStepNames(JobExecution jobExecution) {
-		List<String> list = new ArrayList<String>();
-		for (StepExecution stepExecution : jobExecution.getStepExecutions()) {
-			list.add(stepExecution.getStepName());
-		}
-		Collections.sort(list);
-		return list;
-	}
+    private ApplicationContext applicationContext;
+
+    public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
+        this.applicationContext = applicationContext;
+    }
+
+    @Before
+    public void setUp() {
+        mapJobRepositoryFactoryBean.clear();
+    }
+
+    @SuppressWarnings("unchecked")
+    private <T> T accessPrivateField(Object o, String fieldName) {
+        Field field = ReflectionUtils.findField(o.getClass(), fieldName);
+        boolean previouslyAccessibleValue = field.isAccessible();
+        field.setAccessible(true);
+        T val = (T) ReflectionUtils.getField(field, o);
+        field.setAccessible(previouslyAccessibleValue);
+        return val;
+    }
+
+    /**
+     * BATCH-1659 we now support the ability define steps inline for partitioned steps.
+     * this demonstates that the execution proceeds as expected and that the partitionhandler has a reference to the inline step definition
+     */
+    @Test
+    public void testNestedPartitionStepStepReference() throws Throwable {
+        assertNotNull("the reference to the job3 configured in the XML file must not be null", job3);
+        JobExecution jobExecution = jobRepository.createJobExecution(job3.getName(), new JobParameters());
+
+        job3.execute(jobExecution);
+
+        for (StepExecution se : jobExecution.getStepExecutions()) {
+            String stepExecutionName = se.getStepName();
+            if (stepExecutionName.equalsIgnoreCase("j3s1")) { // the partitioned step
+                PartitionStep partitionStep = (PartitionStep) this.applicationContext.getBean(stepExecutionName);
+
+                // prove that the reference in the {@link TaskExecutorPartitionHandler} is the step configured inline
+                TaskExecutorPartitionHandler taskExecutorPartitionHandler = accessPrivateField(partitionStep, "partitionHandler");
+                TaskletStep taskletStep = accessPrivateField(taskExecutorPartitionHandler, "step");
+
+                assertNotNull("the taskletStep wasn't configured with a step. " +
+                        "We're trusting that the factory ensured " +
+                        "a reference was given.", taskletStep);
+            }
+        }
+        assertEquals(BatchStatus.COMPLETED, jobExecution.getStatus());
+    }
+
+    @Test
+    public void testDefaultHandlerStep() throws Exception {
+        assertNotNull(job1);
+        JobExecution jobExecution = jobRepository.createJobExecution(job1.getName(), new JobParameters());
+        job1.execute(jobExecution);
+        assertEquals(BatchStatus.COMPLETED, jobExecution.getStatus());
+        List<String> stepNames = getStepNames(jobExecution);
+        assertEquals(3, stepNames.size());
+        assertEquals("[s1, step1:partition0, step1:partition1]", stepNames.toString());
+    }
+
+    @Test
+    public void testHandlerRefStep() throws Exception {
+        assertNotNull(job2);
+        JobExecution jobExecution = jobRepository.createJobExecution(job2.getName(), new JobParameters());
+        job2.execute(jobExecution);
+        assertEquals(BatchStatus.COMPLETED, jobExecution.getStatus());
+        List<String> stepNames = getStepNames(jobExecution);
+        assertEquals(5, stepNames.size());
+        assertEquals("[s2, s3, step1:partition0, step1:partition1, step1:partition2]", stepNames.toString());
+    }
+
+    private List<String> getStepNames(JobExecution jobExecution) {
+        List<String> list = new ArrayList<String>();
+        for (StepExecution stepExecution : jobExecution.getStepExecutions()) {
+            list.add(stepExecution.getStepName());
+        }
+        Collections.sort(list);
+        return list;
+    }
 
 }

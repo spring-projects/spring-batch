@@ -74,6 +74,7 @@ import java.util.Map;
  * appropriate class for generating the {@link Step}.
  *
  * @author Dan Garrette
+ * @author Josh Long
  * @see SimpleStepFactoryBean
  * @see FaultTolerantStepFactoryBean
  * @see TaskletStep
@@ -286,6 +287,8 @@ class StepParserStepFactoryBean<I, O> implements FactoryBean, BeanNameAware {
 			handler = partitionHandler;
 		}
 
+
+        // BATCH-1659
 		if (handler instanceof TaskExecutorPartitionHandler) {
 			try {
 				TaskExecutorPartitionHandler taskExecutorPartitionHandler = (TaskExecutorPartitionHandler) handler;
