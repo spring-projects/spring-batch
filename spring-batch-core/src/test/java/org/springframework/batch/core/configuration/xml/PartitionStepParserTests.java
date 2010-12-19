@@ -90,7 +90,7 @@ public class PartitionStepParserTests implements ApplicationContextAware {
     }
 
     /**
-     * BATCH-1659 we now support the ability define steps inline for partitioned steps.
+     * BATCH-1509 we now support the ability define steps inline for partitioned steps.
      * this demonstates that the execution proceeds as expected and that the partitionhandler has a reference to the inline step definition
      */
     @Test
