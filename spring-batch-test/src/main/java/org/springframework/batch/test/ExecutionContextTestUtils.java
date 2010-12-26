@@ -34,11 +34,11 @@ import org.springframework.batch.item.ExecutionContext;
 public class ExecutionContextTestUtils {
 
 	@SuppressWarnings("unchecked")
-	static <T> T getValueFromJob(JobExecution jobExecution, String key) {
+	public static <T> T getValueFromJob(JobExecution jobExecution, String key) {
 		return (T) jobExecution.getExecutionContext().get(key);
 	}
 
-	static <T> T getValueFromStepInJob(JobExecution jobExecution, String stepName, String key) {
+	public static <T> T getValueFromStepInJob(JobExecution jobExecution, String stepName, String key) {
 		StepExecution stepExecution = null;
 		List<String> stepNames = new ArrayList<String>();
 		for (StepExecution candidate : jobExecution.getStepExecutions()) {
@@ -58,7 +58,7 @@ public class ExecutionContextTestUtils {
 	}
 
 	@SuppressWarnings("unchecked")
-	static <T> T getValueFromStep(StepExecution stepExecution, String key) {
+	public static <T> T getValueFromStep(StepExecution stepExecution, String key) {
 		return (T) stepExecution.getExecutionContext().get(key);
 	}
 
