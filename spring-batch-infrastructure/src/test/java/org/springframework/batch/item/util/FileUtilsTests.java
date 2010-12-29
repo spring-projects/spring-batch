@@ -28,11 +28,11 @@ public class FileUtilsTests {
 	 */
 	@Test
 	public void testNoRestart() throws Exception {
-		FileUtils.setUpOutputFile(file, false, false);
+		FileUtils.setUpOutputFile(file, false, false, false);
 		assertTrue(file.exists());
 
 		try {
-			FileUtils.setUpOutputFile(file, false, false);
+			FileUtils.setUpOutputFile(file, false, false, false);
 			fail();
 		}
 		catch (Exception e) {
@@ -42,7 +42,7 @@ public class FileUtilsTests {
 		file.delete();
 		Assert.state(!file.exists());
 
-		FileUtils.setUpOutputFile(file, false, true);
+		FileUtils.setUpOutputFile(file, false, false, true);
 		assertTrue(file.exists());
 
 		BufferedWriter writer = new BufferedWriter(new FileWriter(file));
@@ -51,7 +51,7 @@ public class FileUtilsTests {
 		long size = file.length();
 		Assert.state(size > 0);
 
-		FileUtils.setUpOutputFile(file, false, true);
+		FileUtils.setUpOutputFile(file, false, false, true);
 		long newSize = file.length();
 
 		assertTrue(size != newSize);
@@ -65,7 +65,7 @@ public class FileUtilsTests {
 	@Test
 	public void testRestart() throws Exception {
 		try {
-			FileUtils.setUpOutputFile(file, true, false);
+			FileUtils.setUpOutputFile(file, true, false, false);
 			fail();
 		}
 		catch (ItemStreamException e) {
@@ -73,7 +73,7 @@ public class FileUtilsTests {
 		}
 
 		try {
-			FileUtils.setUpOutputFile(file, true, true);
+			FileUtils.setUpOutputFile(file, true, false, true);
 			fail();
 		}
 		catch (ItemStreamException e) {
@@ -84,8 +84,8 @@ public class FileUtilsTests {
 		assertTrue(file.exists());
 
 		// with existing file there should be no trouble
-		FileUtils.setUpOutputFile(file, true, false);
-		FileUtils.setUpOutputFile(file, true, true);
+		FileUtils.setUpOutputFile(file, true, false, false);
+		FileUtils.setUpOutputFile(file, true, false, true);
 	}
 
 	/**
@@ -98,7 +98,7 @@ public class FileUtilsTests {
 		File dir2 = new File("testDirectory/testDirectory2");
 
 		try {
-			FileUtils.setUpOutputFile(file, false, false);
+			FileUtils.setUpOutputFile(file, false, false, false);
 			assertTrue(file.exists());
 			assertTrue(dir1.exists());
 			assertTrue(dir2.exists());
@@ -119,7 +119,7 @@ public class FileUtilsTests {
 			}
 		};
 		try{
-			FileUtils.setUpOutputFile(file, false, false);
+			FileUtils.setUpOutputFile(file, false, false, false);
 			fail();
 		}catch(ItemStreamException ex){
 			assertTrue(ex.getCause() instanceof IOException);
@@ -140,7 +140,7 @@ public class FileUtilsTests {
 			
 		};
 		try{
-			FileUtils.setUpOutputFile(file, false, false);
+			FileUtils.setUpOutputFile(file, false, false, false);
 			fail("Expected IOException because file doesn't exist");
 		}catch(ItemStreamException ex){
 			String message = ex.getMessage();
