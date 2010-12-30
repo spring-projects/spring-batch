@@ -9,6 +9,7 @@
 	<packaging>pom</packaging>
 	<properties>
 		<maven.test.failure.ignore>true</maven.test.failure.ignore>
+		<spring.batch.admin.version>${pom.version}</spring.batch.admin.version>
 		<spring.batch.version>2.1.5.RELEASE</spring.batch.version>
 		<spring.framework.version>3.0.5.RELEASE</spring.framework.version>
 		<spring.integration.version>2.0.0.RELEASE</spring.integration.version>
@@ -585,12 +586,6 @@
 				<groupId>org.springframework</groupId>
 				<artifactId>spring-webmvc</artifactId>
 				<version>${spring.framework.version}</version>
-			</dependency>
-			<dependency>
-				<groupId>org.springframework.batch</groupId>
-				<artifactId>spring-batch-integration</artifactId>
-				<version>${project.version}</version>
-				<scope>compile</scope>
 			</dependency>
 			<dependency>
 				<groupId>org.springframework.integration</groupId>
