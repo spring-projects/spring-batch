@@ -108,16 +108,6 @@
 					</snapshots>
 				</repository>
 			</repositories>
-			<pluginRepositories>
-				<pluginRepository>
-					<id>spring-ebr</id>
-					<name>Spring Maven Release Repository</name>
-					<url>http://repository.springsource.com/maven/bundles/release</url>
-					<snapshots>
-						<enabled>false</enabled>
-					</snapshots>
-				</pluginRepository>
-			</pluginRepositories>
 		</profile>
 	</profiles>
 	<build>
@@ -634,6 +624,17 @@
 			</dependency>
 		</dependencies>
 	</dependencyManagement>
+	<pluginRepositories>
+		<pluginRepository>
+			<!-- This has to be defined and visible in default profile for bundlor to work -->
+			<id>spring-ebr</id>
+			<name>Spring Maven Release Repository</name>
+			<url>http://repository.springsource.com/maven/bundles/release</url>
+			<snapshots>
+				<enabled>false</enabled>
+			</snapshots>
+		</pluginRepository>
+	</pluginRepositories>
 	<distributionManagement>
 		<site>
 			<id>static.springframework.org</id>
