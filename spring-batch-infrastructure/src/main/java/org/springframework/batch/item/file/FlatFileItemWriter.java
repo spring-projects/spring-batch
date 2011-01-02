@@ -524,7 +524,7 @@ public class FlatFileItemWriter<T> extends ExecutionContextUserSupport implement
 		private void initializeBufferedWriter() throws IOException {
 
 			File file = resource.getFile();
-			FileUtils.setUpOutputFile(file, restarted || append, shouldDeleteIfExists);
+			FileUtils.setUpOutputFile(file, restarted, append, shouldDeleteIfExists);
 
 			os = new FileOutputStream(file.getAbsolutePath(), true);
 			fileChannel = os.getChannel();
