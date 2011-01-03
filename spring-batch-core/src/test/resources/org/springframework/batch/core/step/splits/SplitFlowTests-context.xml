@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans:beans xmlns="http://www.springframework.org/schema/batch" xmlns:beans="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.springframework.org/schema/batch http://www.springframework.org/schema/batch/spring-batch-2.1.xsd
+	http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.5.xsd">
+
+
+<!--
+    <bean class="org.springframework.batch.core.launch.support.SimpleJobLauncher" p:jobRepository="jobRepository" id="jobLauncher"/>
+
+    <bean class="org.springframework.batch.core.configuration.support.MapJobRegistry" id="jobRegistry"/>
+
+    <bean class="org.springframework.batch.core.configuration.support.JobRegistryBeanPostProcessor" p:jobRegistry-ref="jobRegistry"/>
+
+    <bean class="org.springframework.batch.core.repository.support.MapJobRepositoryFactoryBean" id="jobRepository"/>
+
+    <bean class="org.springframework.batch.core.configuration.xml.DummyItemReader" id="itemReader"/>
+
+    <bean class="org.springframework.batch.core.configuration.xml.DummyItemWriter" id="itemWriter"/>
+
+    &lt;!&ndash; Define the Delta Job &ndash;&gt;
+    <batch:job id="j1">
+
+        &lt;!&ndash; prototype&ndash;&gt;
+        <batch:step id="parentStep">
+            <batch:tasklet allow-start-if-complete="true">
+                <batch:chunk reader="itemReader" writer="itemWriter" commit-interval="10"/>
+            </batch:tasklet>
+        </batch:step>
+
+
+        <batch:step id="step0" parent="parentStep" next="split1"/>
+
+        <batch:split id="split1">
+            <batch:flow>
+
+                <batch:step id="step1" parent="parentStep">
+                </batch:step>
+
+            </batch:flow>
+
+            <batch:flow>
+
+                <batch:step id="step2" parent="parentStep" > &lt;!&ndash;next="step3"&ndash;&gt;
+                </batch:step>
+
+                &lt;!&ndash;<batch:split id="step3">
+
+                    <batch:flow>
+
+                        <batch:step id="step31" parent="parentStep">
+                        </batch:step>
+
+                    </batch:flow>
+                    <batch:flow>
+
+                        <batch:step id="step32" parent="parentStep">
+                        </batch:step>
+
+                    </batch:flow>
+
+
+                </batch:split>&ndash;&gt;
+
+            </batch:flow>
+
+
+        </batch:split>
+
+    </batch:job>-->
+
+
+
+	<beans:import resource="classpath:/org/springframework/batch/core/configuration/xml/common-context.xml" />
+
+	<job id="job">
+
+        <!-- split 1 -->
+        <split id="split1" next="s4">
+			<flow>
+				<step id="f1step1" parent="step1" />
+			</flow>
+			<flow>
+				<step id="f2step1" parent="step3" next="f2split1" />
+
+
+                <split id="f2split1">
+                    <flow>
+                        <step id="f2split1s1" parent="step1"/>
+                    </flow>
+                    <flow>
+                        <step id="f2split1s2" parent="step1" />
+                    </flow>
+                </split>
+
+			</flow>
+		</split>
+		<step id="s4" parent="step4" />
+	</job>
+
+
+</beans:beans>
