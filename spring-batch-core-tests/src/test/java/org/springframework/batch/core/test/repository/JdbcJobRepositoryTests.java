@@ -31,6 +31,8 @@ import javax.sql.DataSource;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.junit.After;
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.batch.core.BatchStatus;
@@ -42,12 +44,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.simple.SimpleJdbcTemplate;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
-import org.springframework.test.context.transaction.AfterTransaction;
-import org.springframework.test.context.transaction.BeforeTransaction;
-import org.springframework.transaction.PlatformTransactionManager;
-import org.springframework.transaction.annotation.Transactional;
-import org.springframework.transaction.support.TransactionCallback;
-import org.springframework.transaction.support.TransactionTemplate;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(locations = { "/simple-job-launcher-context.xml" })
@@ -65,9 +61,6 @@ public class JdbcJobRepositoryTests {
 
 	@Autowired
 	private JobRepository repository;
-	
-	@Autowired
-	private PlatformTransactionManager transactionManager;
 
 	/** Logger */
 	private final Log logger = LogFactory.getLog(getClass());
@@ -77,7 +70,7 @@ public class JdbcJobRepositoryTests {
 		this.simpleJdbcTemplate = new SimpleJdbcTemplate(dataSource);
 	}
 
-	@BeforeTransaction
+	@Before
 	public void onSetUpInTransaction() throws Exception {
 		job = new JobSupport("test-job");
 		job.setRestartable(true);
@@ -89,7 +82,7 @@ public class JdbcJobRepositoryTests {
 		simpleJdbcTemplate.update("DELETE FROM BATCH_JOB_INSTANCE");
 	}
 
-	@AfterTransaction
+	@After
 	public void onTearDownAfterTransaction() throws Exception {
 		for (Long id : jobExecutionIds) {
 			simpleJdbcTemplate.update("DELETE FROM BATCH_JOB_EXECUTION_CONTEXT where JOB_EXECUTION_ID=?", id);
@@ -105,7 +98,6 @@ public class JdbcJobRepositoryTests {
 		}
 	}
 
-	@Transactional
 	@Test
 	public void testFindOrCreateJob() throws Exception {
 		job.setName("foo");
@@ -116,7 +108,6 @@ public class JdbcJobRepositoryTests {
 		assertNotNull(execution.getId());
 	}
 
-	@Transactional
 	@Test
 	public void testFindOrCreateJobConcurrently() throws Exception {
 
@@ -191,24 +182,14 @@ public class JdbcJobRepositoryTests {
 	private JobExecution doConcurrentStart() throws Exception {
 		new Thread(new Runnable() {
 			public void run() {
+
 				try {
-					new TransactionTemplate(transactionManager).execute(new TransactionCallback() {
-						public Object doInTransaction(org.springframework.transaction.TransactionStatus status) {
-							try {
-								JobExecution execution = repository.createJobExecution(job.getName(),
-										new JobParameters());
-								cacheJobIds(execution);
-								list.add(execution);
-								Thread.sleep(1000);
-							}
-							catch (Exception e) {
-								list.add(e);
-							}
-							return null;
-						}
-					});
+					JobExecution execution = repository.createJobExecution(job.getName(), new JobParameters());
+					cacheJobIds(execution);
+					list.add(execution);
+					Thread.sleep(1000);
 				}
-				catch (RuntimeException e) {
+				catch (Exception e) {
 					list.add(e);
 				}
 
@@ -225,7 +206,7 @@ public class JdbcJobRepositoryTests {
 		}
 
 		assertEquals("Timed out waiting for JobExecution to be created", 1, list.size());
-		assertTrue("JobExecution not created in thread", list.get(0) instanceof JobExecution);
+		assertTrue("JobExecution not created in thread: " + list.get(0), list.get(0) instanceof JobExecution);
 		return (JobExecution) list.get(0);
 	}
 
