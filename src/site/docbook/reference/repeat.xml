@@ -260,7 +260,7 @@ template.iterate(new RepeatCallback() {
 
     <programlisting>&lt;aop:config&gt;
     &lt;aop:pointcut id="transactional"
-        expression="execution(* com...*Service.processMessage(..))" /&gt;
+        expression="execution(* com..*Service.processMessage(..))" /&gt;
     &lt;aop:advisor pointcut-ref="transactional"
         advice-ref="retryAdvice" order="-1"/&gt;
 &lt;/aop:config&gt;
