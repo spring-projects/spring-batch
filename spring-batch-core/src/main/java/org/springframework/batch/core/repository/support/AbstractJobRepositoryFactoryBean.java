@@ -16,6 +16,8 @@
 
 package org.springframework.batch.core.repository.support;
 
+import org.aopalliance.intercept.MethodInterceptor;
+import org.aopalliance.intercept.MethodInvocation;
 import org.springframework.aop.framework.ProxyFactory;
 import org.springframework.aop.support.DefaultPointcutAdvisor;
 import org.springframework.aop.support.NameMatchMethodPointcut;
@@ -29,6 +31,7 @@ import org.springframework.beans.factory.FactoryBean;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.interceptor.TransactionInterceptor;
+import org.springframework.transaction.support.TransactionSynchronizationManager;
 import org.springframework.util.Assert;
 
 /**
@@ -50,6 +53,8 @@ public abstract class AbstractJobRepositoryFactoryBean implements FactoryBean, I
 	private ProxyFactory proxyFactory;
 
 	private String isolationLevelForCreate = DEFAULT_ISOLATION_LEVEL;
+
+	private boolean validateTransactionState = true;
 
 	/**
 	 * Default value for isolation level in create* method.
@@ -88,6 +93,18 @@ public abstract class AbstractJobRepositoryFactoryBean implements FactoryBean, I
 
 	public boolean isSingleton() {
 		return true;
+	}
+
+	/**
+	 * Flag to determine whether to check for an existing transaction when a
+	 * JobExecution is created. Defaults to true because it is usually a
+	 * mistake, and leads to problems with restartability and also to deadlocks
+	 * in multi-threaded steps.
+	 * 
+	 * @param validateTransactionState the flag to set
+	 */
+	public void setValidateTransactionState(boolean validateTransactionState) {
+		this.validateTransactionState = validateTransactionState;
 	}
 
 	/**
@@ -136,15 +153,27 @@ public abstract class AbstractJobRepositoryFactoryBean implements FactoryBean, I
 	private void initializeProxy() throws Exception {
 		if (proxyFactory == null) {
 			proxyFactory = new ProxyFactory();
-			TransactionInterceptor advice = new TransactionInterceptor(transactionManager, PropertiesConverter
-					.stringToProperties("create*=PROPAGATION_REQUIRES_NEW," + isolationLevelForCreate
-							+ "\ngetLastJobExecution*=PROPAGATION_REQUIRES_NEW," + isolationLevelForCreate
-							+ "\n*=PROPAGATION_REQUIRED"));
-			DefaultPointcutAdvisor advisor = new DefaultPointcutAdvisor(advice);
-			NameMatchMethodPointcut pointcut = new NameMatchMethodPointcut();
-			pointcut.addMethodName("*");
-			advisor.setPointcut(pointcut);
-			proxyFactory.addAdvisor(advisor);
+			TransactionInterceptor advice = new TransactionInterceptor(transactionManager,
+					PropertiesConverter.stringToProperties("create*=PROPAGATION_REQUIRES_NEW,"
+							+ isolationLevelForCreate + "\ngetLastJobExecution*=PROPAGATION_REQUIRES_NEW,"
+							+ isolationLevelForCreate + "\n*=PROPAGATION_REQUIRED"));
+			if (validateTransactionState) {
+				DefaultPointcutAdvisor advisor = new DefaultPointcutAdvisor(new MethodInterceptor() {
+					public Object invoke(MethodInvocation invocation) throws Throwable {
+						if (TransactionSynchronizationManager.isActualTransactionActive()) {
+							throw new IllegalStateException(
+									"Existing transaction detected in JobRepository. "
+											+ "Please fix this and try again (e.g. remove @Transactional annotations from client).");
+						}
+						return invocation.proceed();
+					}
+				});
+				NameMatchMethodPointcut pointcut = new NameMatchMethodPointcut();
+				pointcut.addMethodName("create*");
+				advisor.setPointcut(pointcut);
+				proxyFactory.addAdvisor(advisor);
+			}
+			proxyFactory.addAdvice(advice);
 			proxyFactory.setProxyTargetClass(false);
 			proxyFactory.addInterface(JobRepository.class);
 			proxyFactory.setTarget(getTarget());
