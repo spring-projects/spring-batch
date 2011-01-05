@@ -93,6 +93,7 @@
 				GAMES.player_id group by GAMES.player_id, GAMES.year_no
 			</value>
 		</property>
+		<property name="verifyCursorPosition" value="${batch.verify.cursor.position}"/>
 	</bean>
 
 	<aop:config>

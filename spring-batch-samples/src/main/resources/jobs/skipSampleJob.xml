@@ -123,6 +123,7 @@
 		<property name="rowMapper">
 			<bean class="org.springframework.batch.sample.domain.trade.internal.TradeRowMapper" />
 		</property>
+		<property name="verifyCursorPosition" value="${batch.verify.cursor.position}"/>
 	</bean>
 
 	<bean id="errorLogTasklet" class="org.springframework.batch.sample.common.ErrorLogTasklet" scope="step">
