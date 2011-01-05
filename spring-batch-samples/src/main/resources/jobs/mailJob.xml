@@ -28,6 +28,7 @@
 			</bean>
 		</property>
 		<property name="dataSource" ref="dataSource" />
+		<property name="verifyCursorPosition" value="${batch.verify.cursor.position}"/>
 	</bean>
 
 	<bean id="itemWriter" class="org.springframework.batch.item.mail.SimpleMailMessageItemWriter">
