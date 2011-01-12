@@ -33,12 +33,11 @@ import org.springframework.util.Assert;
 import org.springframework.util.ClassUtils;
 
 /**
- * Reads items from multiple resources sequentially - resource list is given by
- * {@link #setResources(Resource[])}, the actual reading is delegated to
- * {@link #setDelegate(ResourceAwareItemReaderItemStream)}.
+ * Reads items from multiple resources sequentially - resource list is given by {@link #setResources(Resource[])}, the
+ * actual reading is delegated to {@link #setDelegate(ResourceAwareItemReaderItemStream)}.
  * 
- * Input resources are ordered using {@link #setComparator(Comparator)} to make
- * sure resource ordering is preserved between job runs in restart scenario.
+ * Input resources are ordered using {@link #setComparator(Comparator)} to make sure resource ordering is preserved
+ * between job runs in restart scenario.
  * 
  * 
  * @author Robert Kasanicky
@@ -62,6 +61,17 @@ public class MultiResourceItemReader<T> implements ItemReader<T>, ItemStream {
 
 	// signals there are no resources to read -> just return null on first read
 	private boolean noInput;
+
+	private boolean strict = false;
+
+	/**
+	 * In strict mode the reader will throw an exception on
+	 * {@link #open(org.springframework.batch.item.ExecutionContext)} if there are no resources to read.
+	 * @param strict false by default
+	 */
+	public void setStrict(boolean strict) {
+		this.strict = strict;
+	}
 
 	private Comparator<Resource> comparator = new Comparator<Resource>() {
 
@@ -99,8 +109,8 @@ public class MultiResourceItemReader<T> implements ItemReader<T>, ItemStream {
 	}
 
 	/**
-	 * Use the delegate to read the next item, jump to next resource if current
-	 * one is exhausted. Items are appended to the buffer.
+	 * Use the delegate to read the next item, jump to next resource if current one is exhausted. Items are appended to
+	 * the buffer.
 	 * 
 	 * @return next item from input
 	 */
@@ -127,8 +137,7 @@ public class MultiResourceItemReader<T> implements ItemReader<T>, ItemStream {
 	}
 
 	/**
-	 * Close the {@link #setDelegate(ResourceAwareItemReaderItemStream)} reader
-	 * and reset instance variable values.
+	 * Close the {@link #setDelegate(ResourceAwareItemReaderItemStream)} reader and reset instance variable values.
 	 */
 	public void close() throws ItemStreamException {
 		delegate.close();
@@ -136,8 +145,8 @@ public class MultiResourceItemReader<T> implements ItemReader<T>, ItemStream {
 	}
 
 	/**
-	 * Figure out which resource to start with in case of restart, open the
-	 * delegate and restore delegate's position in the resource.
+	 * Figure out which resource to start with in case of restart, open the delegate and restore delegate's position in
+	 * the resource.
 	 */
 	public void open(ExecutionContext executionContext) throws ItemStreamException {
 
@@ -145,9 +154,14 @@ public class MultiResourceItemReader<T> implements ItemReader<T>, ItemStream {
 
 		noInput = false;
 		if (resources.length == 0) {
-			logger.warn("No resources to read");
-			noInput = true;
-			return;
+			if (strict) {
+				throw new IllegalStateException("No resources to read. Set strict=false if this is not an error condition.");
+			}
+			else {
+				logger.warn("No resources to read");
+				noInput = true;
+				return;
+			}
 		}
 
 		Arrays.sort(resources, comparator);
@@ -180,9 +194,8 @@ public class MultiResourceItemReader<T> implements ItemReader<T>, ItemStream {
 	}
 
 	/**
-	 * Set the boolean indicating whether or not state should be saved in the
-	 * provided {@link ExecutionContext} during the {@link ItemStream} call to
-	 * update.
+	 * Set the boolean indicating whether or not state should be saved in the provided {@link ExecutionContext} during
+	 * the {@link ItemStream} call to update.
 	 * 
 	 * @param saveState
 	 */
@@ -191,8 +204,8 @@ public class MultiResourceItemReader<T> implements ItemReader<T>, ItemStream {
 	}
 
 	/**
-	 * @param comparator used to order the injected resources, by default
-	 * compares {@link Resource#getFilename()} values.
+	 * @param comparator used to order the injected resources, by default compares {@link Resource#getFilename()}
+	 * values.
 	 */
 	public void setComparator(Comparator<Resource> comparator) {
 		this.comparator = comparator;
