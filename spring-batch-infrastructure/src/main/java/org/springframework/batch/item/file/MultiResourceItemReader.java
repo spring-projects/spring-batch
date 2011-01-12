@@ -158,7 +158,7 @@ public class MultiResourceItemReader<T> implements ItemReader<T>, ItemStream {
 				throw new IllegalStateException("No resources to read. Set strict=false if this is not an error condition.");
 			}
 			else {
-				logger.warn("No resources to read");
+				logger.warn("No resources to read. Set strict=true if this should be an error condition.");
 				noInput = true;
 				return;
 			}
