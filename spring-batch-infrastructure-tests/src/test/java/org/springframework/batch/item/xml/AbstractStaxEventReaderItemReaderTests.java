@@ -10,10 +10,8 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.batch.item.ExecutionContext;
-import org.springframework.batch.item.xml.StaxEventItemReader;
 import org.springframework.batch.item.xml.domain.Trade;
 import org.springframework.core.io.ClassPathResource;
-import org.springframework.core.io.Resource;
 import org.springframework.oxm.Unmarshaller;
 import org.springframework.util.ClassUtils;
 
@@ -21,33 +19,36 @@ public abstract class AbstractStaxEventReaderItemReaderTests {
 
 	protected StaxEventItemReader<Trade> reader = new StaxEventItemReader<Trade>();
 
-	protected Resource resource = new ClassPathResource(ClassUtils
-			.addResourcePathToPackagePath(getClass(), "input.xml"));
-
 	@Before
 	public void setUp() throws Exception {
-
-		reader.setResource(resource);
-
 		reader.setFragmentRootElementName("trade");
-
 		reader.setUnmarshaller(getUnmarshaller());
-
 		reader.afterPropertiesSet();
-
-		reader.open(new ExecutionContext());
-
 	}
 
 	@Test
 	public void testRead() throws Exception {
+		reader.setResource(new ClassPathResource(ClassUtils.addResourcePathToPackagePath(getClass(), "input.xml")));
+		reader.open(new ExecutionContext());
 		Trade result;
 		List<Trade> results = new ArrayList<Trade>();
 		while ((result = reader.read()) != null) {
 			results.add(result);
 		}
 		checkResults(results);
+	}
 
+	@Test
+	public void testReadNested() throws Exception {
+		reader.setResource(new ClassPathResource(ClassUtils
+				.addResourcePathToPackagePath(getClass(), "input-nested.xml")));
+		reader.open(new ExecutionContext());
+		Trade result;
+		List<Trade> results = new ArrayList<Trade>();
+		while ((result = reader.read()) != null) {
+			results.add(result);
+		}
+		checkResults(results);
 	}
 
 	/**
@@ -85,7 +86,4 @@ public abstract class AbstractStaxEventReaderItemReaderTests {
 		reader.close();
 	}
 
-	public void setResource(Resource resource) {
-		this.resource = resource;
-	}
 }

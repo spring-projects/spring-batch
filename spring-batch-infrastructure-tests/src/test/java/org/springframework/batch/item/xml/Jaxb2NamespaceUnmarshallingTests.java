@@ -31,17 +31,11 @@ public class Jaxb2NamespaceUnmarshallingTests {
 
 	@Before
 	public void setUp() throws Exception {
-
 		reader.setResource(resource);
-
 		reader.setFragmentRootElementName("{urn:org.springframework.batch.io.oxm.domain}trade");
-
 		reader.setUnmarshaller(getUnmarshaller());
-
 		reader.afterPropertiesSet();
-
 		reader.open(new ExecutionContext());
-
 	}
 
 	@Test
