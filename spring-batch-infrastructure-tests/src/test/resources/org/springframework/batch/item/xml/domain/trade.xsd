@@ -3,6 +3,12 @@
 	xmlns:tns="urn:org.springframework.batch.io.oxm.domain" xmlns:xs="http://www.w3.org/2001/XMLSchema"
 	elementFormDefault="qualified">
 
+  <xs:element name="records">
+  	<xs:complexType>
+  		<xs:choice minOccurs="0" maxOccurs="1"><xs:element name="trades"/></xs:choice>
+  	</xs:complexType>
+  </xs:element>
+
   <xs:element name="trades">
   	<xs:complexType>
   		<xs:choice minOccurs="0" maxOccurs="unbounded"><xs:element name="trade" type="tns:trade"/></xs:choice>
