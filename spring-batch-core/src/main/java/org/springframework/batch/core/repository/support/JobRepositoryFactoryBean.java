@@ -53,6 +53,7 @@ import org.springframework.util.StringUtils;
  * 
  * @author Ben Hale
  * @author Lucas Ward
+ * @author Dave Syer
  */
 public class JobRepositoryFactoryBean extends AbstractJobRepositoryFactoryBean implements InitializingBean {
 

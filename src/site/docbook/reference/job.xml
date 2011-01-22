@@ -190,7 +190,7 @@ catch (JobRestartException e) {
     <listeners>
 </job>
 
-<job id="job1" parent="baseJob3">
+<job id="job1" parent="baseJob">
     <step id="step1" parent="standaloneStep"/>
 
     <listeners merge="true">
