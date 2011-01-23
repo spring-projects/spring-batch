@@ -1,0 +1,5 @@
+Spring Batch 2.1.5 Release Notes
+
+* Bug
+
+  * {{{https://jira.springframework.org/browse/BATCH-1683}[BATCH-1683]}} - CommandLineJobRunner hangs waiting for input on stdin
