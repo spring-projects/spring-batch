@@ -109,6 +109,21 @@ public class JdbcJobRepositoryTests {
 	}
 
 	@Test
+	public void testFindOrCreateJobWithExecutionContext() throws Exception {
+		job.setName("foo");
+		int before = 0;
+		JobExecution execution = repository.createJobExecution(job.getName(), new JobParameters());
+		execution.getExecutionContext().put("foo", "bar");
+		repository.updateExecutionContext(execution);
+		int after = simpleJdbcTemplate.queryForInt("SELECT COUNT(*) FROM BATCH_JOB_EXECUTION_CONTEXT");
+		assertEquals(before + 1, after);
+		assertNotNull(execution.getId());
+		JobExecution last = repository.getLastJobExecution(job.getName(), new JobParameters());
+		assertEquals(execution, last);
+		assertEquals(execution.getExecutionContext(), last.getExecutionContext());
+	}
+
+	@Test
 	public void testFindOrCreateJobConcurrently() throws Exception {
 
 		job.setName("bar");

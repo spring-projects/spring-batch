@@ -37,7 +37,7 @@ import org.springframework.util.Assert;
  * JDBC DAO for {@link ExecutionContext}.
  * 
  * Stores execution context data related to both Step and Job using
- * discriminator column to distinguish between the two.
+ * a different table for each.
  * 
  * @author Lucas Ward
  * @author Robert Kasanicky
