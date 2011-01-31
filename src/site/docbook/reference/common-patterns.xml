@@ -568,10 +568,10 @@ public Trade read() throws Exception {
     &lt;step id="step1"&gt;
         &lt;tasklet&gt;
             &lt;chunk reader="reader" writer="savingWriter" commit-interval="10"/&gt;
-            &lt;listeners&gt;
-                <emphasis role="bold">&lt;listener ref="promotionListener"/&gt;</emphasis>
-            &lt;/listeners&gt;
         &lt;/tasklet&gt;
+        &lt;listeners&gt;
+            <emphasis role="bold">&lt;listener ref="promotionListener"/&gt;</emphasis>
+        &lt;/listeners&gt;
     &lt;/step&gt;
 
     &lt;step id="step2"&gt;
