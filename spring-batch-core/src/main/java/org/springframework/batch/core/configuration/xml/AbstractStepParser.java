@@ -15,6 +15,7 @@
  */
 package org.springframework.batch.core.configuration.xml;
 
+import org.springframework.batch.core.listener.StepListenerMetaData;
 import org.springframework.beans.MutablePropertyValues;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.config.RuntimeBeanReference;
@@ -76,6 +77,8 @@ public abstract class AbstractStepParser {
 
 	private static final String JOB_REPO_ATTR = "job-repository";
 
+	private static final StepListenerParser stepListenerParser = new StepListenerParser(StepListenerMetaData.stepExecutionListenerMetaData());
+
 	/**
 	 * @param stepElement   The &lt;step/&gt; element
 	 * @param parserContext
@@ -134,6 +137,8 @@ public abstract class AbstractStepParser {
 		if (description != null) {
 			bd.setDescription(description.getTextContent());
 		}
+
+		stepListenerParser.handleListenersElement(stepElement, bd, parserContext);
 
 		return bd;
 

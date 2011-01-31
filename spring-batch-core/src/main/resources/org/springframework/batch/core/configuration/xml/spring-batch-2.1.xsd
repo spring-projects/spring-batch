@@ -447,6 +447,7 @@
 				</xsd:element>
 			</xsd:choice>
 			<xsd:group ref="transitions" minOccurs="0" maxOccurs="unbounded" />
+			<xsd:element name="listeners" type="stepListenersType" minOccurs="0" maxOccurs="1" />
 		</xsd:sequence>
 		<xsd:attributeGroup ref="parentAttribute" />
 	</xsd:complexType>
@@ -805,6 +806,7 @@
 					<xsd:attributeGroup ref="mergeAttribute" />
 				</xsd:complexType>
 			</xsd:element>
+			<xsd:element name="listeners" type="stepListenersType" minOccurs="0" maxOccurs="1" />
 		</xsd:all>
 		<xsd:attribute name="commit-interval" type="xsd:string" use="optional">
 			<xsd:annotation>

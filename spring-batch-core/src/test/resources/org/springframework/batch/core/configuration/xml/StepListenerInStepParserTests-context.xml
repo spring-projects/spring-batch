@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans:beans xmlns="http://www.springframework.org/schema/batch" xmlns:beans="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.springframework.org/schema/batch http://www.springframework.org/schema/batch/spring-batch-2.1.xsd
+	http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.5.xsd">
+
+	<beans:import resource="common-context.xml" />
+
+	<job id="job">
+		<step id="s1" next="s2">
+			<tasklet ref="dummyTasklet" />
+			<listeners>
+				<listener>
+					<beans:bean class="org.springframework.batch.core.listener.StepExecutionListenerSupport" />
+				</listener>
+			</listeners>
+		</step>
+		<step id="s2" next="s3">
+			<tasklet ref="dummyTasklet" />
+			<listeners>
+				<listener>
+					<beans:bean class="org.springframework.batch.core.listener.ChunkListenerSupport" />
+				</listener>
+			</listeners>
+		</step>
+		<step id="s3" next="s4">
+			<tasklet ref="dummyTasklet">
+				<listeners>
+					<listener>
+						<beans:bean class="org.springframework.batch.core.listener.ChunkListenerSupport" />
+					</listener>
+				</listeners>
+			</tasklet>
+			<listeners>
+				<listener>
+					<beans:bean class="org.springframework.batch.core.listener.StepExecutionListenerSupport" />
+				</listener>
+			</listeners>
+		</step>
+		<step id="s4">
+			<tasklet>
+				<chunk reader="reader" writer="writer" commit-interval="2">
+					<listeners>
+						<listener>
+							<beans:bean class="org.springframework.batch.core.listener.ItemListenerSupport" />
+						</listener>
+					</listeners>
+				</chunk>
+			</tasklet>
+			<listeners>
+				<listener>
+					<beans:bean class="org.springframework.batch.core.listener.StepExecutionListenerSupport" />
+				</listener>
+			</listeners>
+		</step>
+	</job>
+
+</beans:beans>
