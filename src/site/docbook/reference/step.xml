@@ -223,10 +223,10 @@ itemWriter.write(items);</programlisting>
 &lt;step id="concreteStep3" parent="listenersParentStep"&gt;
     &lt;tasklet&gt;
         &lt;chunk reader="itemReader" writer="itemWriter" commit-interval="5"/&gt;
-        &lt;listeners merge="true"&gt;
-            &lt;listener ref="listenerTwo"/&gt;
-        &lt;listeners&gt;
     &lt;/tasklet&gt;
+    &lt;listeners merge="true"&gt;
+        &lt;listener ref="listenerTwo"/&gt;
+    &lt;listeners&gt;
 &lt;/step&gt;</programlisting>
       </section>
     </section>
@@ -663,17 +663,23 @@ itemWriter.write(items);</programlisting>
       written. This can be accomplished with one of many
       <classname>Step</classname> scoped listeners.</para>
 
-      <para>Any class that implements one of 
-	  the extensions of <classname>StepListener</classname> (but not
-      that interface itself since it is empty) 
-      can be applied to a step via the
-      listeners element:</para>
+      <para>Any class that implements one of the extensions
+	  of <classname>StepListener</classname> (but not that interface
+	  itself since it is empty) can be applied to a step via the
+	  listeners element.  The listeners element is valid inside a
+	  step, tasklet or chunk declaration.  It is recommended that you
+	  declare the listeners at the level which its function applies,
+	  or if it is multi-featured
+	  (e.g. <classname>StepExecutionListener</classname>
+	  and <classname>ItemReadListener</classname>) then declare it at
+	  the most granular level that it applies (chunk in the example
+	  given).</para>
 
       <programlisting>&lt;step id="step1"&gt;
     &lt;tasklet&gt;
         &lt;chunk reader="reader" writer="writer" commit-interval="10"/&gt;
         &lt;listeners&gt;
-            &lt;listener ref="stepListener"/&gt;
+            &lt;listener ref="chunkListener"/&gt;
         &lt;/listeners&gt;
     &lt;/tasklet&gt;
 &lt;/step&gt;</programlisting>
@@ -770,13 +776,21 @@ itemWriter.write(items);</programlisting>
             <para><classname>@AfterChunk</classname></para>
           </listitem>
         </itemizedlist>
+
+		<para>A <classname>ChunkListener</classname> can be applied
+		when there is no chunk declaration: it is
+		the <classname>TaskletStep</classname> that is responsible for
+		calling the <classname>ChunkListener</classname> so it applies
+		to a non-item-oriented tasklet as well (called before and
+		after the tasklet).</para>
+
       </section>
 
       <section id="itemReadListener">
         <title>ItemReadListener</title>
 
         <para>When discussing skip logic above, it was mentioned that it may
-        be beneficial to log out skipped records, so that they can be deal
+        be beneficial to log the skipped records, so that they can be deal
         with later. In the case of read errors, this can be done with an
         <classname>ItemReaderListener:</classname><programlisting>public interface ItemReadListener&lt;T&gt; extends StepListener {
   
