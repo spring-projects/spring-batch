@@ -17,6 +17,7 @@ package org.springframework.batch.core.configuration.xml;
 
 import java.util.List;
 
+import org.springframework.batch.core.listener.StepListenerMetaData;
 import org.springframework.beans.MutablePropertyValues;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.config.BeanDefinitionHolder;
@@ -57,6 +58,8 @@ public class ChunkElementParser {
 	private static final String ITEM_PROCESSOR_ADAPTER_CLASS = "org.springframework.batch.item.adapter.ItemProcessorAdapter";
 
 	private static final String ITEM_WRITER_ADAPTER_CLASS = "org.springframework.batch.item.adapter.ItemWriterAdapter";
+
+	private static final StepListenerParser stepListenerParser = new StepListenerParser(StepListenerMetaData.itemListenerMetaData());
 
 	/**
 	 * @param element
@@ -141,6 +144,8 @@ public class ChunkElementParser {
 		handleRetryListenersElement(element, propertyValues, parserContext, bd);
 
 		handleStreamsElement(element, propertyValues, parserContext);
+		
+		stepListenerParser.handleListenersElement(element, bd, parserContext);
 
 	}
 

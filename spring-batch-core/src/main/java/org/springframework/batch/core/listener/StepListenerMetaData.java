@@ -123,4 +123,17 @@ public enum StepListenerMetaData implements ListenerMetaData {
 	public static StepListenerMetaData fromPropertyName(String propertyName){
 		return propertyMap.get(propertyName);
 	}
+	
+	public static ListenerMetaData[] itemListenerMetaData() {
+		return new ListenerMetaData[] {BEFORE_WRITE, AFTER_WRITE, ON_WRITE_ERROR, BEFORE_PROCESS, AFTER_PROCESS, ON_PROCESS_ERROR, BEFORE_READ, AFTER_READ, ON_READ_ERROR, ON_SKIP_IN_WRITE, ON_SKIP_IN_PROCESS, ON_SKIP_IN_READ};
+	}
+
+	public static ListenerMetaData[] stepExecutionListenerMetaData() {
+		return new ListenerMetaData[] {BEFORE_STEP, AFTER_STEP};
+	}
+
+	public static ListenerMetaData[] taskletListenerMetaData() {
+		return new ListenerMetaData[] {BEFORE_CHUNK, AFTER_CHUNK};
+	}
+
 }
