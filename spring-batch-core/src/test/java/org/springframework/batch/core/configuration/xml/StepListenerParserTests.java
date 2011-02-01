@@ -27,6 +27,7 @@ import org.springframework.aop.framework.Advised;
 import org.springframework.batch.core.Step;
 import org.springframework.batch.core.StepExecutionListener;
 import org.springframework.batch.core.listener.CompositeStepExecutionListener;
+import org.springframework.batch.core.listener.ItemListenerSupport;
 import org.springframework.batch.core.listener.StepExecutionListenerSupport;
 import org.springframework.batch.core.step.tasklet.TaskletStep;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -50,6 +51,10 @@ public class StepListenerParserTests {
 	@Autowired
 	@Qualifier("s2")
 	private Step step2;
+
+	@Autowired
+	@Qualifier("s3")
+	private Step step3;
 
 	@Test
 	public void testInheritListeners() throws Exception {
@@ -96,6 +101,26 @@ public class StepListenerParserTests {
 		assertTrue(b);
 	}
 
+	@Test
+	public void testInheritListenersNoMergeFaultTolerant() throws Exception {
+
+		List<?> list = getListeners(step3);
+
+		assertEquals(2, list.size());
+		boolean a = false;
+		boolean b = false;
+		for (Object listener : list) {
+			if (listener instanceof DummyAnnotationStepExecutionListener) {
+				a = true;
+			}
+			else if (listener instanceof ItemListenerSupport) {
+				b = true;
+			}
+		}
+		assertTrue(a);
+		assertTrue(b);
+	}
+
 	@SuppressWarnings("unchecked")
 	private List<?> getListeners(Step step) throws Exception {
 		assertTrue(step instanceof TaskletStep);
@@ -110,6 +135,32 @@ public class StepListenerParserTests {
 				listener = ((Advised) listener).getTargetSource().getTarget();
 			}
 			r.add(listener);
+		}
+		compositeListener = ReflectionTestUtils.getField(step, "chunkListener");
+		composite = ReflectionTestUtils.getField(compositeListener, "listeners");
+		proxiedListeners = (List<StepExecutionListener>) ReflectionTestUtils.getField(composite, "list");
+		for (Object listener : proxiedListeners) {
+			while (listener instanceof Advised) {
+				listener = ((Advised) listener).getTargetSource().getTarget();
+			}
+			r.add(listener);
+		}
+		try {
+			compositeListener = ReflectionTestUtils.getField(
+					ReflectionTestUtils.getField(ReflectionTestUtils.getField(
+							ReflectionTestUtils.getField(step, "tasklet"), "chunkProvider"), "listener"),
+					"itemReadListener");
+			composite = ReflectionTestUtils.getField(compositeListener, "listeners");
+			proxiedListeners = (List<StepExecutionListener>) ReflectionTestUtils.getField(composite, "list");
+			for (Object listener : proxiedListeners) {
+				while (listener instanceof Advised) {
+					listener = ((Advised) listener).getTargetSource().getTarget();
+				}
+				r.add(listener);
+			}
+		}
+		catch (IllegalArgumentException e) {
+			// ignore (not a chunk oriented step)
 		}
 		return r;
 	}
