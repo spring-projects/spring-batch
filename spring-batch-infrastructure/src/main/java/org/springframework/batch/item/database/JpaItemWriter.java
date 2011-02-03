@@ -70,7 +70,7 @@ public class JpaItemWriter<T> implements ItemWriter<T>, InitializingBean {
 
 	/**
 	 * Merge all provided items that aren't already in the persistence context
-	 * and then flush and clear the entity manager.
+	 * and then flush the entity manager.
 	 * 
 	 * @see org.springframework.batch.item.ItemWriter#write(java.util.List)
 	 */
@@ -80,16 +80,12 @@ public class JpaItemWriter<T> implements ItemWriter<T>, InitializingBean {
 			throw new DataAccessResourceFailureException("Unable to obtain a transactional EntityManager");
 		}
 		doWrite(entityManager, items);
-		try {
-			entityManager.flush();
-		}
-		finally {
-			entityManager.clear();
-		}
+		entityManager.flush();
 	}
-	
+
 	/**
-	 * Do perform the actual write operation. This can be overridden in a subclass if necessary.
+	 * Do perform the actual write operation. This can be overridden in a
+	 * subclass if necessary.
 	 * 
 	 * @param entityManager the EntityManager to use for the operation
 	 * @param items the list of items to use for the write
@@ -113,7 +109,7 @@ public class JpaItemWriter<T> implements ItemWriter<T>, InitializingBean {
 				logger.debug((items.size() - mergeCount) + " entities found in persistence context.");
 			}
 		}
-		
+
 	}
 
 }
