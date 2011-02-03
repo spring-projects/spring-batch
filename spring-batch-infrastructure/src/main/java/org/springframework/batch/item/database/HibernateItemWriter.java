@@ -28,8 +28,9 @@ import org.springframework.util.Assert;
 
 /**
  * {@link ItemWriter} that uses a Hibernate session to save or update entities
- * that are not part of the current Hibernate session. It will also flush
- * and clear the session at chunk boundaries.<br/><br/>
+ * that are not part of the current Hibernate session. It will also flush and
+ * clear the session at chunk boundaries.<br/>
+ * <br/>
  * 
  * The writer is thread safe after its properties are set (normal singleton
  * behavior), so it can be used to write in multiple concurrent transactions.
@@ -71,25 +72,19 @@ public class HibernateItemWriter<T> implements ItemWriter<T>, InitializingBean {
 	}
 
 	/**
-	 * Save or update any entities not in the current hibernate session and then flush and 
-	 * clear the hibernate session.
+	 * Save or update any entities not in the current hibernate session and then
+	 * flush the hibernate session.
 	 * 
 	 * @see org.springframework.batch.item.ItemWriter#write(java.util.List)
 	 */
 	public final void write(List<? extends T> items) {
 		doWrite(hibernateTemplate, items);
-		try {
-			hibernateTemplate.flush();
-		}
-		finally {
-			// This should happen when the transaction commits anyway, but to be
-			// sure...
-			hibernateTemplate.clear();
-		}
+		hibernateTemplate.flush();
 	}
-	
+
 	/**
-	 * Do perform the actual write operation. This can be overridden in a subclass if necessary.
+	 * Do perform the actual write operation. This can be overridden in a
+	 * subclass if necessary.
 	 * 
 	 * @param hibernateTemplate the HibernateTemplate to use for the operation
 	 * @param items the list of items to use for the write
