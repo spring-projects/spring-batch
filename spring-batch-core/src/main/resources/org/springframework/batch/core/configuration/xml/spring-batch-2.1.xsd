@@ -184,8 +184,7 @@
 					<xsd:attribute name="data-source" type="xsd:string" default="dataSource">
 						<xsd:annotation>
 							<xsd:documentation source="java:javax.sql.DataSource"><![CDATA[
-							The bean name of the DataSource that is to be used. This attribute 
-							is not required, and only needs to be specified explicitly
+ref"							is not required, and only needs to be specified explicitly
 							if the bean name of the desired DataSource is not 'dataSource'.
 							]]></xsd:documentation>
 							<xsd:appinfo>
