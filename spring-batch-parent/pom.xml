@@ -8,6 +8,24 @@
 	<description>Spring Batch parent project.  Defines dependencies and common configuration for the build process.</description>
 	<url>http://static.springframework.org/spring-batch/${project.artifactId}</url>
 	<packaging>pom</packaging>
+	<scm>
+		<url>http://github.com/SpringSource/spring-batch</url>
+		<connection>scm:git:git://github.com/SpringSource/spring-batch.git</connection>
+		<developerConnection>scm:git:git://github.com/SpringSource/spring-batch.git</developerConnection>
+	</scm>
+	<licenses>
+		<license>
+			<name>Apache 2.0</name>
+			<url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+		</license>
+	</licenses>
+	<developers>
+		<developer>
+			<id>dsyer</id>
+			<name>Dave Syer</name>
+			<email>david.syer@springsource.com</email>
+		</developer>
+	</developers>
 	<properties>
 		<maven.test.failure.ignore>true</maven.test.failure.ignore>
 		<spring.framework.version>2.5.6</spring.framework.version>
@@ -39,12 +57,33 @@
 		<profile>
 			<id>central</id>
 			<distributionManagement>
-				<repository>
-					<id>spring-sourceforge</id>
-					<name>Spring Sourceforge Repository</name>
-					<url>file:///${user.dir}/sourceforge</url>
-				</repository>
+			  <snapshotRepository>
+				<id>sonatype-nexus-snapshots</id>
+				<name>Sonatype Nexus Snapshots</name>
+				<url>https://oss.sonatype.org/content/repositories/snapshots/</url>
+			  </snapshotRepository>
+			  <repository>
+				<id>sonatype-nexus-staging</id>
+				<name>Nexus Release Repository</name>
+				<url>https://oss.sonatype.org/service/local/staging/deploy/maven2/</url>
+			  </repository>
 			</distributionManagement>
+			<build>
+			  <plugins>
+					<plugin>
+					  <artifactId>maven-gpg-plugin</artifactId>
+					  <executions>
+						<execution>
+						  <id>sign-artifacts</id>
+						  <phase>verify</phase>
+						  <goals>
+							<goal>sign</goal>
+						  </goals>
+						</execution>
+					  </executions>
+					</plugin>
+			  </plugins>
+			</build>
 		</profile>
 		<profile>
 			<id>staging</id>
