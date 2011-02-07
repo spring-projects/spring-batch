@@ -86,6 +86,19 @@
 						</executions>
 					</plugin>
 					<plugin>
+					  <groupid>org.apache.maven.plugins</groupid>
+					  <artifactid>maven-gpg-plugin</artifactid>
+					  <executions>
+						<execution>
+						  <id>sign-artifacts</id>
+						  <phase>verify</phase>
+						  <goals>
+							<goal>sign</goal>
+						  </goals>
+						</execution>
+					  </executions>
+					</plugin>
+					<plugin>
 						<groupId>com.agilejava.docbkx</groupId>
 						<artifactId>docbkx-maven-plugin</artifactId>
 						<version>2.0.8</version>
