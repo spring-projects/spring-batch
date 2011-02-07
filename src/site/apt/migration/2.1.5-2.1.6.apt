@@ -1,0 +1,54 @@
+Spring Batch 2.1.6 Release Notes
+
+* Sub-task
+
+  * {{{https://jira.springframework.org/browse/BATCH-1672}[BATCH-1672]}} - When appendAllowed is true, file is not created (in the first time).
+
+  * {{{https://jira.springframework.org/browse/BATCH-1687}[BATCH-1687]}} - Fix documentation for Step Listeners
+
+  * {{{https://jira.springframework.org/browse/BATCH-1688}[BATCH-1688]}} - Add <listeners/> to <step/> and <chunk/>
+
+* Bug
+
+  * {{{https://jira.springframework.org/browse/BATCH-1635}[BATCH-1635]}} - Spring Batch and Hibernate Search do not work together
+
+  * {{{https://jira.springframework.org/browse/BATCH-1654}[BATCH-1654]}} - StepExecution.equals() should consider id as well as name and jobExecution
+
+  * {{{https://jira.springframework.org/browse/BATCH-1656}[BATCH-1656]}} - Infinite loop on no-rollback-for exception when skipLimit is reached due to exception in ItemProcessor
+
+  * {{{https://jira.springframework.org/browse/BATCH-1657}[BATCH-1657]}} - ORDER BY clause missing from paging queries for Derby
+
+  * {{{https://jira.springframework.org/browse/BATCH-1659}[BATCH-1659]}} - FileUtils setUpOutputFile fails on NAS from linux
+
+  * {{{https://jira.springframework.org/browse/BATCH-1670}[BATCH-1670]}} - Nested splits lead to invalid flow definition
+
+  * {{{https://jira.springframework.org/browse/BATCH-1671}[BATCH-1671]}} - static methods are not public in ExecutionContextTestUtils
+
+  * {{{https://jira.springframework.org/browse/BATCH-1680}[BATCH-1680]}} - Simple cli sample hangs because of wrong dependency
+
+  * {{{https://jira.springframework.org/browse/BATCH-1681}[BATCH-1681]}} - Restarting a job that generates XML output using StaxEventItemWriter with Woodstox fails
+
+* Defect
+
+  * {{{https://jira.springframework.org/browse/BATCH-1677}[BATCH-1677]}} - Error Documentation in pointcut expression declaration
+
+  * {{{https://jira.springframework.org/browse/BATCH-1678}[BATCH-1678]}} - Inheriting from a Parent Job
+
+* Improvement
+
+  * {{{https://jira.springframework.org/browse/BATCH-1661}[BATCH-1661]}} - FlatFileItemReader always logs as ERROR non data lines even though the row should be skipped
+
+  * {{{https://jira.springframework.org/browse/BATCH-1662}[BATCH-1662]}} - FieldSetFactory inconsistent parameter ordering create method
+
+  * {{{https://jira.springframework.org/browse/BATCH-1665}[BATCH-1665]}} - Provide MultiResourceItemReader property controlling whether or not it fails when there are "no resources to read"
+
+  * {{{https://jira.springframework.org/browse/BATCH-1668}[BATCH-1668]}} - Check for existing transaction when job is started (and fail if present by default)
+
+* New Feature
+
+  * {{{https://jira.springframework.org/browse/BATCH-1224}[BATCH-1224]}} - Appending functionality in FlatFileItemwriter
+
+  * {{{https://jira.springframework.org/browse/BATCH-1509}[BATCH-1509]}} - Allow a step inside a partition to be specified as an inner bean definition (as well as a reference)
+
+  * {{{https://jira.springframework.org/browse/BATCH-1514}[BATCH-1514]}} - Support for the <listeners> tag in the partition element
+
