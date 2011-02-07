@@ -42,6 +42,7 @@ public class SqlPagingQueryUtils {
 		sql.append("SELECT ").append(provider.getSelectClause());
 		sql.append(" FROM ").append(provider.getFromClause());
 		buildWhereClause(provider, remainingPageQuery, sql);
+		sql.append(" GROUP BY ").append(provider.getGroupClause());
 		sql.append(" ORDER BY ").append(provider.getSortKey());
 		buildAscendingClause(provider, sql);
 		sql.append(" " + limitClause);
@@ -65,6 +66,7 @@ public class SqlPagingQueryUtils {
 		sql.append("SELECT ").append(topClause).append(" ").append(provider.getSelectClause());
 		sql.append(" FROM ").append(provider.getFromClause());
 		buildWhereClause(provider, remainingPageQuery, sql);
+		sql.append(" GROUP BY ").append(provider.getGroupClause());
 		sql.append(" ORDER BY ").append(provider.getSortKey());
 		buildAscendingClause(provider, sql);
 
@@ -104,6 +106,7 @@ public class SqlPagingQueryUtils {
 		sql.append("SELECT * FROM (SELECT ").append(selectClause).append(", ROWNUM as TMP_ROW_NUM");
 		sql.append(" FROM ").append(provider.getFromClause());
 		buildWhereClause(provider, remainingPageQuery, sql);
+		sql.append(" GROUP BY ").append(provider.getGroupClause());
 		sql.append(" ORDER BY ").append(provider.getSortKey());
 		buildAscendingClause(provider, sql);
 		sql.append(") WHERE ").append(rowNumClause);
@@ -125,6 +128,7 @@ public class SqlPagingQueryUtils {
 				.append(", ROWNUM as TMP_ROW_NUM");
 		sql.append(" FROM (SELECT ").append(innerSelectClause).append(" FROM ").append(provider.getFromClause());
 		buildWhereClause(provider, remainingPageQuery, sql);
+		sql.append(" GROUP BY ").append(provider.getGroupClause());
 		sql.append(" ORDER BY ").append(provider.getSortKey());
 		buildAscendingClause(provider, sql);
 		sql.append(")) WHERE ").append(rowNumClause);
@@ -146,6 +150,7 @@ public class SqlPagingQueryUtils {
 		sql.append("SELECT ").append(provider.getSortKey()).append(" AS SORT_KEY");
 		sql.append(" FROM ").append(provider.getFromClause());
 		sql.append(provider.getWhereClause() == null ? "" : " WHERE " + provider.getWhereClause());
+		sql.append(" GROUP BY ").append(provider.getGroupClause());
 		sql.append(" ORDER BY ").append(provider.getSortKey());
 		buildAscendingClause(provider, sql);
 		sql.append(" " + limitClause);
@@ -166,6 +171,7 @@ public class SqlPagingQueryUtils {
 		sql.append("SELECT ").append(topClause).append(" ").append(provider.getSortKey()).append(" AS SORT_KEY");
 		sql.append(" FROM ").append(provider.getFromClause());
 		sql.append(provider.getWhereClause() == null ? "" : " WHERE " + provider.getWhereClause());
+		sql.append(" GROUP BY ").append(provider.getGroupClause());
 		sql.append(" ORDER BY ").append(provider.getSortKey());
 		buildAscendingClause(provider, sql);
 

@@ -39,9 +39,8 @@ import org.springframework.util.Assert;
 import org.springframework.util.StringUtils;
 
 /**
- * Factory bean for {@link PagingQueryProvider} interface. The database type
- * will be determined from the data source if not provided explicitly. Valid
- * types are given by the {@link DatabaseType} enum.
+ * Factory bean for {@link PagingQueryProvider} interface. The database type will be determined from the data source if
+ * not provided explicitly. Valid types are given by the {@link DatabaseType} enum.
  * 
  * @author Dave Syer
  */
@@ -57,63 +56,70 @@ public class SqlPagingQueryProviderFactoryBean implements FactoryBean {
 
 	private String selectClause;
 
+	private String groupClause;
+
 	private String sortKey;
 
 	private boolean ascending = true;
 
 	private Map<DatabaseType, AbstractSqlPagingQueryProvider> providers = new HashMap<DatabaseType, AbstractSqlPagingQueryProvider>();
 
-
 	{
 		providers.put(DB2, new Db2PagingQueryProvider());
 		providers.put(DB2ZOS, new Db2PagingQueryProvider());
-		providers.put(DERBY,new DerbyPagingQueryProvider());
-		providers.put(HSQL,new HsqlPagingQueryProvider());
-		providers.put(H2,new H2PagingQueryProvider());
-		providers.put(MYSQL,new MySqlPagingQueryProvider());
-		providers.put(ORACLE,new OraclePagingQueryProvider());
-		providers.put(POSTGRES,new PostgresPagingQueryProvider());
-		providers.put(SQLSERVER,new SqlServerPagingQueryProvider());
-		providers.put(SYBASE,new SybasePagingQueryProvider());
+		providers.put(DERBY, new DerbyPagingQueryProvider());
+		providers.put(HSQL, new HsqlPagingQueryProvider());
+		providers.put(H2, new H2PagingQueryProvider());
+		providers.put(MYSQL, new MySqlPagingQueryProvider());
+		providers.put(ORACLE, new OraclePagingQueryProvider());
+		providers.put(POSTGRES, new PostgresPagingQueryProvider());
+		providers.put(SQLSERVER, new SqlServerPagingQueryProvider());
+		providers.put(SYBASE, new SybasePagingQueryProvider());
 	}
 
 	/**
-	 * @param databaseType the databaseType to set
+	 * @param databaseType
+	 *            the databaseType to set
 	 */
 	public void setDatabaseType(String databaseType) {
 		this.databaseType = databaseType;
 	}
 
 	/**
-	 * @param dataSource the dataSource to set
+	 * @param dataSource
+	 *            the dataSource to set
 	 */
 	public void setDataSource(DataSource dataSource) {
 		this.dataSource = dataSource;
 	}
 
 	/**
-	 * @param fromClause the fromClause to set
+	 * @param fromClause
+	 *            the fromClause to set
 	 */
 	public void setFromClause(String fromClause) {
 		this.fromClause = fromClause;
 	}
 
 	/**
-	 * @param whereClause the whereClause to set
+	 * @param whereClause
+	 *            the whereClause to set
 	 */
 	public void setWhereClause(String whereClause) {
 		this.whereClause = whereClause;
 	}
 
 	/**
-	 * @param selectClause the selectClause to set
+	 * @param selectClause
+	 *            the selectClause to set
 	 */
 	public void setSelectClause(String selectClause) {
 		this.selectClause = selectClause;
 	}
 
 	/**
-	 * @param sortKey the sortKey to set
+	 * @param sortKey
+	 *            the sortKey to set
 	 */
 	public void setSortKey(String sortKey) {
 		this.sortKey = sortKey;
@@ -123,12 +129,12 @@ public class SqlPagingQueryProviderFactoryBean implements FactoryBean {
 	 * @param ascending
 	 */
 	public void setAscending(boolean ascending) {
-		this.ascending = ascending;	
+		this.ascending = ascending;
 	}
 
 	/**
-	 * Get a {@link PagingQueryProvider} instance using the provided properties
-	 * and appropriate for the given database type.
+	 * Get a {@link PagingQueryProvider} instance using the provided properties and appropriate for the given database
+	 * type.
 	 * 
 	 * @see FactoryBean#getObject()
 	 */
@@ -138,19 +144,21 @@ public class SqlPagingQueryProviderFactoryBean implements FactoryBean {
 		try {
 			type = databaseType != null ? DatabaseType.valueOf(databaseType.toUpperCase()) : DatabaseType
 					.fromMetaData(dataSource);
-		}
-		catch (MetaDataAccessException e) {
+		} catch (MetaDataAccessException e) {
 			throw new IllegalArgumentException(
 					"Could not inspect meta data for database type.  You have to supply it explicitly.", e);
 		}
 
 		AbstractSqlPagingQueryProvider provider = providers.get(type);
-		Assert.state(provider!=null, "Should not happen: missing PagingQueryProvider for DatabaseType="+type);
+		Assert.state(provider != null, "Should not happen: missing PagingQueryProvider for DatabaseType=" + type);
 
 		provider.setFromClause(fromClause);
 		provider.setWhereClause(whereClause);
 		provider.setSortKey(sortKey);
 		provider.setAscending(ascending);
+		if (StringUtils.hasText(groupClause)) {
+			provider.setGroupClause(groupClause);
+		}
 		if (StringUtils.hasText(selectClause)) {
 			provider.setSelectClause(selectClause);
 		}
@@ -172,10 +180,19 @@ public class SqlPagingQueryProviderFactoryBean implements FactoryBean {
 
 	/**
 	 * Always returns true.
+	 * 
 	 * @see FactoryBean#isSingleton()
 	 */
 	public boolean isSingleton() {
 		return true;
+	}
+
+	public void setGroupClause(String groupClause) {
+		this.groupClause = groupClause;
+	}
+
+	public String getGroupClause() {
+		return groupClause;
 	}
 
 }
