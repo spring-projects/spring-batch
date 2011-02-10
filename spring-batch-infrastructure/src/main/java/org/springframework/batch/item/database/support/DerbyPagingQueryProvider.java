@@ -54,11 +54,16 @@ public class DerbyPagingQueryProvider extends SqlWindowingPagingQueryProvider {
 	
 	@Override
 	protected String getAfterWhereClause() {
+		StringBuilder sql = new StringBuilder();
+		if (getGroupClause() != null) {
+			sql.append(" GROUP BY ").append(getGroupClause());
+		}
 		if (version!=null && "10.6.1".compareTo(version) > 0) {
 			// Old behaviour retained, even though it is broken
-			return "";
+			return sql.toString();
 		}
-		return " " + super.getOverClause();
+		sql.append(" ").append(super.getOverClause());
+		return sql.toString();
 	}
 
 }

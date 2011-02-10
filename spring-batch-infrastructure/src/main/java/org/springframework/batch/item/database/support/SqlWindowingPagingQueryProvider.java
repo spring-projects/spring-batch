@@ -19,9 +19,8 @@ package org.springframework.batch.item.database.support;
 import org.springframework.util.StringUtils;
 
 /**
- * Generic Paging Query Provider using standard SQL:2003 windowing functions.
- * These features are supported by DB2, Oracle, SQL Server 2005, Sybase and
- * Apache Derby version 10.4.1.3
+ * Generic Paging Query Provider using standard SQL:2003 windowing functions. These features are supported by DB2,
+ * Oracle, SQL Server 2005, Sybase and Apache Derby version 10.4.1.3
  * 
  * @author Thomas Risberg
  * @since 2.0
@@ -35,8 +34,8 @@ public class SqlWindowingPagingQueryProvider extends AbstractSqlPagingQueryProvi
 		sql.append("SELECT ").append(getSelectClause()).append(", ");
 		sql.append("ROW_NUMBER() OVER (").append(getOverClause());
 		sql.append(") AS ROW_NUMBER");
-		sql.append(" FROM ").append(getFromClause()).append(
-				getWhereClause() == null ? "" : " WHERE " + getWhereClause());
+		sql.append(" FROM ").append(getFromClause())
+				.append(getWhereClause() == null ? "" : " WHERE " + getWhereClause());
 		sql.append(getAfterWhereClause());
 		String alias = extractTableAlias();
 		sql.append(") ").append(getSubQueryAlias()).append("WHERE " + alias + "ROW_NUMBER <= ").append(pageSize);
@@ -72,8 +71,7 @@ public class SqlWindowingPagingQueryProvider extends AbstractSqlPagingQueryProvi
 		sql.append(getSortKey());
 		if (isAscending()) {
 			sql.append(" > ");
-		}
-		else {
+		} else {
 			sql.append(" < ");
 		}
 		sql.append(getSortKeyPlaceHolder());
@@ -85,7 +83,11 @@ public class SqlWindowingPagingQueryProvider extends AbstractSqlPagingQueryProvi
 	}
 
 	protected String getAfterWhereClause() {
-		return "";
+		if (getGroupClause() != null) {
+			return " GROUP BY " + getGroupClause();
+		} else {
+			return "";
+		}
 	}
 
 	@Override
@@ -101,8 +103,8 @@ public class SqlWindowingPagingQueryProvider extends AbstractSqlPagingQueryProvi
 		sql.append("SELECT ").append(getSortKey()).append(" AS SORT_KEY, ");
 		sql.append("ROW_NUMBER() OVER (").append(getOverClause());
 		sql.append(") AS ROW_NUMBER");
-		sql.append(" FROM ").append(getFromClause()).append(
-				getWhereClause() == null ? "" : " WHERE " + getWhereClause());
+		sql.append(" FROM ").append(getFromClause())
+				.append(getWhereClause() == null ? "" : " WHERE " + getWhereClause());
 		sql.append(getAfterWhereClause());
 		String alias = extractTableAlias();
 		sql.append(") ").append(getSubQueryAlias()).append("WHERE " + alias + "ROW_NUMBER = ").append(lastRowNum);
@@ -117,8 +119,7 @@ public class SqlWindowingPagingQueryProvider extends AbstractSqlPagingQueryProvi
 	private String getAscendingClause() {
 		if (isAscending()) {
 			return "ASC";
-		}
-		else {
+		} else {
 			return "DESC";
 		}
 	}
