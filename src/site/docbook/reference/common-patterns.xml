@@ -583,7 +583,7 @@ public Trade read() throws Exception {
     &lt;beans:property name="keys" value="someKey"/&gt;
 &lt;/beans:bean&gt;</emphasis></programlisting>
 
-    <para>Finally, to the saved values must be retrieved from the
+    <para>Finally, the saved values must be retrieved from the
     <classname>Job</classname> <classname>ExeuctionContext</classname>:</para>
 
     <programlisting>public class RetrievingItemWriter implements ItemWriter&lt;Object&gt; {
