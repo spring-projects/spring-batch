@@ -1,7 +1,25 @@
 # Spring Batch 
 
-Spring Batch is a lightweight, comprehensive batch framework designed to enable the development of robust batch applications vital for the daily operations of enterprise systems.  Spring Batch builds upon the productivity, POJO-based development approach, and general ease of use capabilities people have come to know from the Spring Framework, while making it easy for developers to access and leverage more advanced enterprise services when necessary.  
+Spring Batch is a lightweight, comprehensive batch framework designed to enable the development of robust batch applications vital for the daily operations of enterprise systems.  Spring Batch builds upon the productivity, POJO-based development approach, and general ease of use capabilities people have come to know from the Spring Framework, while making it easy for developers to access and leverage more advanced enterprise services when necessary.
 
+# Building from Source
+
+Clone the git repository using the URL on the Github home page:
+
+    $ git clone git://github.com/SpringSource/spring-batch.git
+    $ cd spring-batch
+
+## Command Line
+Use Maven 2.2.* (might work with 3.0, but we don't test it), then on the command line:
+
+    $ mvn install
+
+or, the first time (to download the stuff that isn't in the Maven Central repository):
+
+    $ mvn install -P bootstrap
+
+## SpringSource Tool Suite (STS)
+In STS (or any Eclipse distro or other IDE with Maven support), import the module directories as existing projects.  They should compile and the tests should run with no additional steps.
 
 # Getting Started Using SpringSource Tool Suite (STS)
 
