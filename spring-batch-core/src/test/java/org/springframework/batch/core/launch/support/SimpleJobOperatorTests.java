@@ -379,7 +379,7 @@ public class SimpleJobOperatorTests {
 	}
 	
 	@Test
-	public void testStop() throws Exception{
+	public void testStop() throws Exception {
 		JobInstance jobInstance = new JobInstance(123L, jobParameters, job.getName());
 		JobExecution jobExecution = new JobExecution(jobInstance, 111L);
 		jobExplorer.getJobExecution(111L);
@@ -392,5 +392,49 @@ public class SimpleJobOperatorTests {
 		verify(jobRepository);
 		assertEquals(BatchStatus.STOPPING, jobExecution.getStatus());
 	}
+
+        @Test
+        public void testAbandon() throws Exception {
+                long jobExecutionId = 222L;
+                JobInstance jobInstance = new JobInstance(456L, jobParameters, job.getName());
+                JobExecution jobExecution = new JobExecution(jobInstance, jobExecutionId);
+                jobExecution.setStatus(BatchStatus.STOPPED);
+                jobExplorer.getJobExecution(jobExecutionId);
+                expectLastCall().andReturn(jobExecution);
+                jobRepository.update(jobExecution);
+                replay(jobExplorer);
+                replay(jobRepository);
+
+                jobOperator.abandon(jobExecutionId);
+                verify(jobExplorer);
+                verify(jobRepository);
+                assertEquals(BatchStatus.ABANDONED, jobExecution.getStatus());
+        }
+
+        /*
+         * Attempting to .abandon() a jobExecution whose status is greater-than-or-equal-to
+         * the BatchStatus.STOPPED state should throw an Exception
+         */
+        @Test
+        public void testAbandonWhenJobIsAlreadyRunning() throws Exception {
+                long jobExecutionId = 222L;
+                JobInstance jobInstance = new JobInstance(789L, jobParameters, job.getName());
+                JobExecution jobExecution = new JobExecution(jobInstance, jobExecutionId);
+                jobExecution.setStatus(BatchStatus.STARTED);
+                jobExplorer.getJobExecution(jobExecutionId);
+                expectLastCall().andReturn(jobExecution);
+                replay(jobExplorer);
+                replay(jobRepository);
+
+                try {
+			jobOperator.abandon(jobExecutionId);
+			fail("Expected JobExecutionAlreadyRunningException");
+		}
+		catch (JobExecutionAlreadyRunningException e) {
+			// expected
+		}
+		verify(jobExplorer);
+                verify(jobRepository);
+        }
 
 }
