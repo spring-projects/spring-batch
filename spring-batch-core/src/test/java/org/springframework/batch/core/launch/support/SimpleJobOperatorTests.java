@@ -393,40 +393,39 @@ public class SimpleJobOperatorTests {
 		assertEquals(BatchStatus.STOPPING, jobExecution.getStatus());
 	}
 
-        @Test
-        public void testAbandon() throws Exception {
-                long jobExecutionId = 222L;
-                JobInstance jobInstance = new JobInstance(456L, jobParameters, job.getName());
-                JobExecution jobExecution = new JobExecution(jobInstance, jobExecutionId);
-                jobExecution.setStatus(BatchStatus.STOPPED);
-                jobExplorer.getJobExecution(jobExecutionId);
-                expectLastCall().andReturn(jobExecution);
-                jobRepository.update(jobExecution);
-                replay(jobExplorer);
-                replay(jobRepository);
+	@Test
+	public void testAbandon() throws Exception {
+		long jobExecutionId = 222L;
+		JobInstance jobInstance = new JobInstance(456L, jobParameters, job.getName());
+		JobExecution jobExecution = new JobExecution(jobInstance, jobExecutionId);
+		jobExecution.setStatus(BatchStatus.STOPPED);
+		jobExplorer.getJobExecution(jobExecutionId);
+		expectLastCall().andReturn(jobExecution);
+		jobRepository.update(jobExecution);
+		replay(jobExplorer);
+		replay(jobRepository);
+		jobOperator.abandon(jobExecutionId);
+		verify(jobExplorer);
+		verify(jobRepository);
+		assertEquals(BatchStatus.ABANDONED, jobExecution.getStatus());
+	}
 
-                jobOperator.abandon(jobExecutionId);
-                verify(jobExplorer);
-                verify(jobRepository);
-                assertEquals(BatchStatus.ABANDONED, jobExecution.getStatus());
-        }
+	/*
+	 * Attempting to .abandon() a jobExecution whose status is greater-than-or-equal-to
+	 * the BatchStatus.STOPPED state should throw an Exception
+	 */
+	@Test
+	public void testAbandonWhenJobIsAlreadyRunning() throws Exception {
+		long jobExecutionId = 222L;
+		JobInstance jobInstance = new JobInstance(789L, jobParameters, job.getName());
+		JobExecution jobExecution = new JobExecution(jobInstance, jobExecutionId);
+		jobExecution.setStatus(BatchStatus.STARTED);
+		jobExplorer.getJobExecution(jobExecutionId);
+		expectLastCall().andReturn(jobExecution);
+		replay(jobExplorer);
+		replay(jobRepository);
 
-        /*
-         * Attempting to .abandon() a jobExecution whose status is greater-than-or-equal-to
-         * the BatchStatus.STOPPED state should throw an Exception
-         */
-        @Test
-        public void testAbandonWhenJobIsAlreadyRunning() throws Exception {
-                long jobExecutionId = 222L;
-                JobInstance jobInstance = new JobInstance(789L, jobParameters, job.getName());
-                JobExecution jobExecution = new JobExecution(jobInstance, jobExecutionId);
-                jobExecution.setStatus(BatchStatus.STARTED);
-                jobExplorer.getJobExecution(jobExecutionId);
-                expectLastCall().andReturn(jobExecution);
-                replay(jobExplorer);
-                replay(jobRepository);
-
-                try {
+		try {
 			jobOperator.abandon(jobExecutionId);
 			fail("Expected JobExecutionAlreadyRunningException");
 		}
@@ -434,7 +433,7 @@ public class SimpleJobOperatorTests {
 			// expected
 		}
 		verify(jobExplorer);
-                verify(jobRepository);
-        }
+		verify(jobRepository);
+	}
 
 }

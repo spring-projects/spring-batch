@@ -390,17 +390,17 @@ public class SimpleJobOperator implements JobOperator, InitializingBean {
 	 */
 	@Transactional
 	public boolean abandon(long executionId) throws NoSuchJobExecutionException, JobExecutionAlreadyRunningException {
-                JobExecution jobExecution = findExecutionById(executionId);
-                if (jobExecution.getStatus().isLessThan(BatchStatus.STOPPING)) {
+		JobExecution jobExecution = findExecutionById(executionId);
+		if (jobExecution.getStatus().isLessThan(BatchStatus.STOPPING)) {
 			throw new JobExecutionAlreadyRunningException("JobExecution " + executionId + " is running "
-                                + "or complete and therefore cannot be aborted");
+				+ "or complete and therefore cannot be aborted");
 		}
 
 		logger.info("Aborting job execution: " + jobExecution);
 		jobExecution.upgradeStatus(BatchStatus.ABANDONED);
 		jobRepository.update(jobExecution);
-                return true;
-        }
+		return true;
+	}
 
 	private JobExecution findExecutionById(long executionId) throws NoSuchJobExecutionException {
 		JobExecution jobExecution = jobExplorer.getJobExecution(executionId);
