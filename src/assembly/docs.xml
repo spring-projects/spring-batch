@@ -5,6 +5,7 @@
 			<directory>src/assembly</directory>
 			<outputDirectory></outputDirectory>
 			<includes>
+				<include>README.md</include>
 				<include>license.txt</include>
 				<include>notice.txt</include>
 			</includes>
