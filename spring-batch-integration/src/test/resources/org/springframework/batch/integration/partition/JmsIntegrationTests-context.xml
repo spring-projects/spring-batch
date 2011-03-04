@@ -1,33 +1,38 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <beans xmlns="http://www.springframework.org/schema/beans" xmlns:p="http://www.springframework.org/schema/p"
 	xmlns:integration="http://www.springframework.org/schema/integration" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop.xsd
-		http://www.springframework.org/schema/integration http://www.springframework.org/schema/integration/spring-integration-1.0.xsd
+	xmlns:int-jms="http://www.springframework.org/schema/integration/jms" xmlns:task="http://www.springframework.org/schema/task"
+	xsi:schemaLocation="http://www.springframework.org/schema/batch http://www.springframework.org/schema/batch/spring-batch.xsd
+		http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop.xsd
+		http://www.springframework.org/schema/integration http://www.springframework.org/schema/integration/spring-integration-2.0.xsd
+		http://www.springframework.org/schema/task http://www.springframework.org/schema/task/spring-task-3.0.xsd
+		http://www.springframework.org/schema/integration/jms http://www.springframework.org/schema/integration/jms/spring-integration-jms-2.0.xsd
 		http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
-		http://www.springframework.org/schema/batch http://www.springframework.org/schema/batch/spring-batch.xsd
 		http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx.xsd">
 
 	<import resource="classpath:/simple-job-launcher-context.xml" />
 
+	<import resource="classpath:/jms-context.xml" />
+
+	<int-jms:outbound-gateway request-channel="requests" request-destination-name="requests"
+		reply-channel="staging" receive-timeout="30000">
+		<integration:poller fixed-rate="200" task-executor="taskExecutor" />
+	</int-jms:outbound-gateway>
+
+	<task:executor id="taskExecutor" pool-size="2" />
+
 	<channel id="requests" xmlns="http://www.springframework.org/schema/integration">
 		<queue />
 	</channel>
-	<channel id="staging" xmlns="http://www.springframework.org/schema/integration">
-		<queue />
-	</channel>
 
-	<service-activator ref="stepExecutionRequestHandler" input-channel="requests" output-channel="staging"
-		xmlns="http://www.springframework.org/schema/integration">
-		<poller>
-			<interval-trigger interval="10" />
-		</poller>
-	</service-activator>
-	<aggregator ref="partitionHandler" timeout="10000" input-channel="staging"
-		xmlns="http://www.springframework.org/schema/integration">
-		<poller>
-			<interval-trigger interval="10" />
-		</poller>
-	</aggregator>
+	<channel id="staging" xmlns="http://www.springframework.org/schema/integration" />
+
+	<int-jms:inbound-gateway request-channel="worker" request-destination-name="requests"
+		concurrent-consumers="2" />
+
+	<service-activator ref="stepExecutionRequestHandler" input-channel="worker"
+		xmlns="http://www.springframework.org/schema/integration" />
+	<aggregator ref="partitionHandler" input-channel="staging" xmlns="http://www.springframework.org/schema/integration" />
 
 	<!-- This is the "remote" worker (which in this case is local) -->
 	<bean id="stepExecutionRequestHandler" class="org.springframework.batch.integration.partition.StepExecutionRequestHandler"
