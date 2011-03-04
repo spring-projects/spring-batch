@@ -23,7 +23,7 @@
 	<bean id="brokerService" class="org.apache.activemq.broker.BrokerService" init-method="start"
 		destroy-method="stop">
 		<property name="brokerName" value="localhost" />
-		<property name="useJmx" value="false"/>
+		<property name="useJmx" value="true"/>
 		<property name="transportConnectorURIs">
 			<list>
 				<value>vm://localhost</value>
