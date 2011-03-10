@@ -6,7 +6,7 @@
 	<name>Spring Batch</name>
 	<description>Spring Batch provides tools for enterprise batch or bulk processing. It can be used to wire up jobs, and track
 	their execution, or simply as an optimization for repetitive processing in a transactional environment. Spring Batch is part of the Spring Portfolio.</description>
-	<version>2.2.0.CI-SNAPSHOT</version>
+	<version>2.2.0.CI.TENDER-SNAPSHOT</version>
 	<packaging>pom</packaging>
 	<modules>
 		<module>spring-batch-parent</module>
@@ -367,22 +367,7 @@
 			</build>
 		</profile>
 	</profiles>
-	<distributionManagement>
-		<site>
-			<id>static.springframework.org</id>
-			<url>scp://static.springframework.org/var/www/domains/springframework.org/static/htdocs/spring-batch/trunk</url>
-		</site>
-		<repository>
-			<id>spring-release</id>
-			<name>Spring Release Repository</name>
-			<url>s3://maven.springframework.org/release</url>
-		</repository>
-		<snapshotRepository>
-			<id>spring-snapshot</id>
-			<name>Spring Snapshot Repository</name>
-			<url>s3://maven.springframework.org/snapshot</url>
-		</snapshotRepository>
-	</distributionManagement>
+	
 	<build>
 		<extensions>
 			<extension>
@@ -521,19 +506,17 @@
 			<email>dhgarrette@gmail.com</email>
 		</developer>
 	</developers>
-	<pluginRepositories>
-		<pluginRepository>
-			<id>com.springsource.repository.bundles.milestone</id>
-			<name> SpringSource Enterprise Bundle Repository - SpringSource Bundle Milestones</name>
-			<url>http://repository.springsource.com/maven/bundles/milestone/</url>
-			<snapshots>
-				<enabled>false</enabled>
-			</snapshots>
-		</pluginRepository>
-		<pluginRepository>
-			<id>com.springsource.repository.bundles.snapshot</id>
-			<name>SpringSource Enterprise Bundle Repository - SpringSource Bundle Snapshots</name>
-			<url>http://repository.springsource.com/maven/bundles/snapshot/</url>
-		</pluginRepository>
-	</pluginRepositories>
+	<distributionManagement>
+		<repository>
+			<id>tender.nexus</id>
+			<name>Tender Service nexus release repository</name>
+			<url>http://192.168.1.250/nexus/content/repositories/releases/</url>
+		</repository>
+		<snapshotRepository>
+			<id>tender.nexus</id>
+			<name>Tender Service nexus snapshots repository</name>
+			<url>http://192.168.1.250/nexus/content/repositories/snapshots/</url>
+		</snapshotRepository>
+	</distributionManagement>
+	
 </project>

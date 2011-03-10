@@ -1,9 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>org.springframework.batch</groupId>
 	<artifactId>spring-batch-parent</artifactId>
-	<version>2.2.0.CI-SNAPSHOT</version>
+	<version>2.2.0.CI.TENDER-SNAPSHOT</version>
 	<name>Spring Batch Parent</name>
 	<description>Spring Batch parent project.  Defines dependencies and common configuration for the build process.</description>
 	<url>http://static.springframework.org/spring-batch/${project.artifactId}</url>
@@ -580,19 +581,16 @@
 		</dependencies>
 	</dependencyManagement>
 	<distributionManagement>
-		<site>
-			<id>static.springframework.org</id>
-			<url>scp://static.springframework.org/var/www/domains/springframework.org/static/htdocs/spring-batch/trunk</url>
-		</site>
 		<repository>
-			<id>spring-release</id>
-			<name>Spring Release Repository</name>
-			<url>s3://maven.springframework.org/release</url>
+			<id>tender.nexus</id>
+			<name>Tender Service nexus release repository</name>
+			<url>http://192.168.1.250/nexus/content/repositories/releases/</url>
 		</repository>
 		<snapshotRepository>
-			<id>spring-snapshot</id>
-			<name>Spring Snapshot Repository</name>
-			<url>s3://maven.springframework.org/snapshot</url>
+			<id>tender.nexus</id>
+			<name>Tender Service nexus snapshots repository</name>
+			<url>http://192.168.1.250/nexus/content/repositories/snapshots/</url>
 		</snapshotRepository>
 	</distributionManagement>
+
 </project>
