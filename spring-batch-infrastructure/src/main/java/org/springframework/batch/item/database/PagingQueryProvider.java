@@ -81,5 +81,7 @@ public interface PagingQueryProvider {
 	 * @return the sort key used to order the query
 	 */
 	String getSortKey();
+	
+	String getSortKeyAlias();
 
 }

@@ -37,35 +37,30 @@ import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.simple.SimpleJdbcTemplate;
 import org.springframework.util.Assert;
 import org.springframework.util.ClassUtils;
+import org.springframework.util.StringUtils;
 
 /**
  * <p>
- * {@link org.springframework.batch.item.ItemReader} for reading database
- * records using JDBC in a paging fashion.
+ * {@link org.springframework.batch.item.ItemReader} for reading database records using JDBC in a paging fashion.
  * </p>
  * 
  * <p>
- * It executes the SQL built by the {@link PagingQueryProvider} to retrieve
- * requested data. The query is executed using paged requests of a size
- * specified in {@link #setPageSize(int)}. Additional pages are requested when
- * needed as {@link #read()} method is called, returning an object corresponding
- * to current position. On restart it uses the last sort key value to locate the
- * first page to read (so it doesn't matter if the successfully processed itmes
- * have been removed or modified).
+ * It executes the SQL built by the {@link PagingQueryProvider} to retrieve requested data. The query is executed using
+ * paged requests of a size specified in {@link #setPageSize(int)}. Additional pages are requested when needed as
+ * {@link #read()} method is called, returning an object corresponding to current position. On restart it uses the last
+ * sort key value to locate the first page to read (so it doesn't matter if the successfully processed itmes have been
+ * removed or modified).
  * </p>
  * 
  * <p>
- * The performance of the paging depends on the database specific features
- * available to limit the number of returned rows. Setting a fairly large page
- * size and using a commit interval that matches the page size should provide
- * better performance.
+ * The performance of the paging depends on the database specific features available to limit the number of returned
+ * rows. Setting a fairly large page size and using a commit interval that matches the page size should provide better
+ * performance.
  * </p>
  * 
  * <p>
- * The implementation is thread-safe in between calls to
- * {@link #open(ExecutionContext)}, but remember to use
- * <code>saveState=false</code> if used in a multi-threaded client (no restart
- * available).
+ * The implementation is thread-safe in between calls to {@link #open(ExecutionContext)}, but remember to use
+ * <code>saveState=false</code> if used in a multi-threaded client (no restart available).
  * </p>
  * 
  * @author Thomas Risberg
@@ -108,12 +103,12 @@ public class JdbcPagingItemReader<T> extends AbstractPagingItemReader<T> impleme
 	}
 
 	/**
-	 * Gives the JDBC driver a hint as to the number of rows that should be
-	 * fetched from the database when more rows are needed for this
-	 * <code>ResultSet</code> object. If the fetch size specified is zero, the
-	 * JDBC driver ignores the value.
+	 * Gives the JDBC driver a hint as to the number of rows that should be fetched from the database when more rows are
+	 * needed for this <code>ResultSet</code> object. If the fetch size specified is zero, the JDBC driver ignores the
+	 * value.
 	 * 
-	 * @param fetchSize the number of rows to fetch
+	 * @param fetchSize
+	 *            the number of rows to fetch
 	 * @see ResultSet#setFetchSize(int)
 	 */
 	public void setFetchSize(int fetchSize) {
@@ -121,37 +116,34 @@ public class JdbcPagingItemReader<T> extends AbstractPagingItemReader<T> impleme
 	}
 
 	/**
-	 * A {@link PagingQueryProvider}. Supplies all the platform dependent query
-	 * generation capabilities needed by the reader.
+	 * A {@link PagingQueryProvider}. Supplies all the platform dependent query generation capabilities needed by the
+	 * reader.
 	 * 
-	 * @param queryProvider the {@link PagingQueryProvider} to use
+	 * @param queryProvider
+	 *            the {@link PagingQueryProvider} to use
 	 */
 	public void setQueryProvider(PagingQueryProvider queryProvider) {
 		this.queryProvider = queryProvider;
 	}
 
 	/**
-	 * The row mapper implementation to be used by this reader. The row mapper
-	 * is used to convert result set rows into objects, which are then returned
-	 * by the reader.
+	 * The row mapper implementation to be used by this reader. The row mapper is used to convert result set rows into
+	 * objects, which are then returned by the reader.
 	 * 
-	 * @param rowMapper a
-	 * {@link org.springframework.jdbc.core.simple.ParameterizedRowMapper}
-	 * implementation
+	 * @param rowMapper
+	 *            a {@link org.springframework.jdbc.core.simple.ParameterizedRowMapper} implementation
 	 */
 	public void setRowMapper(RowMapper rowMapper) {
 		this.rowMapper = rowMapper;
 	}
 
 	/**
-	 * The parameter values to be used for the query execution. If you use named
-	 * parameters then the key should be the name used in the query clause. If
-	 * you use "?" placeholders then the key should be the relative index that
-	 * the parameter appears in the query string built using the select, from
-	 * and where clauses specified.
+	 * The parameter values to be used for the query execution. If you use named parameters then the key should be the
+	 * name used in the query clause. If you use "?" placeholders then the key should be the relative index that the
+	 * parameter appears in the query string built using the select, from and where clauses specified.
 	 * 
-	 * @param parameterValues the values keyed by the parameter named/index used
-	 * in the query string.
+	 * @param parameterValues
+	 *            the values keyed by the parameter named/index used in the query string.
 	 */
 	public void setParameterValues(Map<String, Object> parameterValues) {
 		this.parameterValues = parameterValues;
@@ -159,6 +151,7 @@ public class JdbcPagingItemReader<T> extends AbstractPagingItemReader<T> impleme
 
 	/**
 	 * Check mandatory properties.
+	 * 
 	 * @see org.springframework.beans.factory.InitializingBean#afterPropertiesSet()
 	 */
 	public void afterPropertiesSet() throws Exception {
@@ -181,8 +174,7 @@ public class JdbcPagingItemReader<T> extends AbstractPagingItemReader<T> impleme
 
 		if (results == null) {
 			results = new CopyOnWriteArrayList<T>();
-		}
-		else {
+		} else {
 			results.clear();
 		}
 
@@ -198,31 +190,27 @@ public class JdbcPagingItemReader<T> extends AbstractPagingItemReader<T> impleme
 				if (this.queryProvider.isUsingNamedParameters()) {
 					query = simpleJdbcTemplate.getNamedParameterJdbcOperations().query(firstPageSql,
 							getParameterMap(parameterValues, null), rowCallback);
-				}
-				else {
+				} else {
 					query = simpleJdbcTemplate.getJdbcOperations().query(firstPageSql,
 							getParameterList(parameterValues, null).toArray(), rowCallback);
 				}
-			}
-			else {
+			} else {
 				query = simpleJdbcTemplate.getJdbcOperations().query(firstPageSql, rowCallback);
 			}
 
-		}
-		else {
+		} else {
 			if (logger.isDebugEnabled()) {
 				logger.debug("SQL used for reading remaining pages: [" + remainingPagesSql + "]");
 			}
 			if (this.queryProvider.isUsingNamedParameters()) {
 				query = simpleJdbcTemplate.getNamedParameterJdbcOperations().query(remainingPagesSql,
 						getParameterMap(parameterValues, startAfterValue), rowCallback);
-			}
-			else {
+			} else {
 				query = simpleJdbcTemplate.getJdbcOperations().query(remainingPagesSql,
 						getParameterList(parameterValues, startAfterValue).toArray(), rowCallback);
 			}
 		}
-		
+
 		@SuppressWarnings("unchecked")
 		Collection<T> result = (Collection<T>) query;
 		results.addAll(result);
@@ -248,8 +236,7 @@ public class JdbcPagingItemReader<T> extends AbstractPagingItemReader<T> impleme
 	@Override
 	protected void doJumpToPage(int itemIndex) {
 		/*
-		 * Normally this would be false (the startAfterValue is enough
-		 * information to restart from.
+		 * Normally this would be false (the startAfterValue is enough information to restart from.
 		 */
 		if (startAfterValue == null && getPage() > 0) {
 
@@ -268,8 +255,7 @@ public class JdbcPagingItemReader<T> extends AbstractPagingItemReader<T> impleme
 			if (this.queryProvider.isUsingNamedParameters()) {
 				startAfterValue = simpleJdbcTemplate.getNamedParameterJdbcOperations().queryForObject(jumpToItemSql,
 						getParameterMap(parameterValues, startAfterValue), startMapper);
-			}
-			else {
+			} else {
 				startAfterValue = simpleJdbcTemplate.getJdbcOperations().queryForObject(jumpToItemSql,
 						getParameterList(parameterValues, startAfterValue).toArray(), startMapper);
 			}
@@ -309,7 +295,11 @@ public class JdbcPagingItemReader<T> extends AbstractPagingItemReader<T> impleme
 
 	private class PagingRowMapper implements RowMapper {
 		public Object mapRow(ResultSet rs, int rowNum) throws SQLException {
-			startAfterValue = rs.getObject(queryProvider.getSortKey());
+			if (StringUtils.hasText(queryProvider.getSortKeyAlias())) {
+				startAfterValue = rs.getObject(queryProvider.getSortKeyAlias());
+			} else {
+				startAfterValue = rs.getObject(queryProvider.getSortKey());
+			}
 			return rowMapper.mapRow(rs, rowNum);
 		}
 	}

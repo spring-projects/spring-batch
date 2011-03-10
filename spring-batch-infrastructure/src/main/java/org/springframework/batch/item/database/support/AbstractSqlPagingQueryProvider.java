@@ -56,6 +56,8 @@ public abstract class AbstractSqlPagingQueryProvider implements PagingQueryProvi
 	private String groupClause;
 
 	private String sortKey;
+	
+	private String sortKeyAlias;
 
 	private boolean ascending = true;
 
@@ -240,5 +242,14 @@ public abstract class AbstractSqlPagingQueryProvider implements PagingQueryProvi
 	public String getGroupClause() {
 		return groupClause;
 	}
+
+	public void setSortKeyAlias(String sortKeyAlias) {
+		this.sortKeyAlias = sortKeyAlias;
+	}
+
+	public String getSortKeyAlias() {
+		return sortKeyAlias;
+	}
+
 
 }
