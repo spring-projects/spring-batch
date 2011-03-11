@@ -97,8 +97,6 @@ public class TaskletStep extends AbstractStep {
 
 	private Tasklet tasklet;
 
-	private final Semaphore semaphore = new Semaphore(1);
-
 	/**
 	 * Default constructor.
 	 */
@@ -245,6 +243,10 @@ public class TaskletStep extends AbstractStep {
 		stream.update(stepExecution.getExecutionContext());
 		getJobRepository().updateExecutionContext(stepExecution);
 
+		// Shared semaphore per step execution, so other step executions can run
+		// in parallel without needing the lock
+		final Semaphore semaphore = createSemaphore();
+
 		stepOperations.iterate(new StepContextRepeatCallback(stepExecution) {
 
 			@Override
@@ -260,7 +262,7 @@ public class TaskletStep extends AbstractStep {
 				RepeatStatus result;
 				try {
 					result = (RepeatStatus) new TransactionTemplate(transactionManager, transactionAttribute)
-							.execute(new ChunkTransactionCallback(chunkContext));
+							.execute(new ChunkTransactionCallback(chunkContext, semaphore));
 				}
 				catch (UncheckedTransactionException e) {
 					// Allow checked exceptions to be thrown inside callback
@@ -279,6 +281,16 @@ public class TaskletStep extends AbstractStep {
 
 		});
 
+	}
+
+	/**
+	 * Extension point mainly for test purposes so that the behaviour of the
+	 * lock can be manipulated to simulate various pathologies.
+	 * 
+	 * @return a semaphore for locking access to the JobRepository
+	 */
+	protected Semaphore createSemaphore() {
+		return new Semaphore(1);
 	}
 
 	protected void close(ExecutionContext ctx) throws Exception {
@@ -312,9 +324,12 @@ public class TaskletStep extends AbstractStep {
 
 		private boolean locked = false;
 
-		public ChunkTransactionCallback(ChunkContext chunkContext) {
+		private final Semaphore semaphore;
+
+		public ChunkTransactionCallback(ChunkContext chunkContext, Semaphore semaphore) {
 			this.chunkContext = chunkContext;
 			this.stepExecution = chunkContext.getStepContext().getStepExecution();
+			this.semaphore = semaphore;
 		}
 
 		@Override
