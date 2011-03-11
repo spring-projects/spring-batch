@@ -3,4 +3,6 @@ lib
 derby*
 target
 .settings
+.classpath
+.project
 integration-repo
