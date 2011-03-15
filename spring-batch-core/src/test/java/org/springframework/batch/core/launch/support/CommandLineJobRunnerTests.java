@@ -18,6 +18,7 @@ package org.springframework.batch.core.launch.support;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -134,6 +135,22 @@ public class CommandLineJobRunnerTests {
 		CommandLineJobRunner.main(args);
 		assertEquals(0, StubSystemExiter.status);
 		assertEquals(new JobParameters(), StubJobLauncher.jobParameters);
+	}
+
+	@Test
+	public void testWithInvalidStdin() throws Throwable {
+		System.setIn(new InputStream() {
+            public int available() throws IOException {
+                throw new IOException("Planned");
+            }
+
+			public int read() {
+				return -1;
+			}
+		});
+		CommandLineJobRunner.main(new String[] { jobPath, jobName });
+		assertEquals(0, StubSystemExiter.status);
+		assertEquals(0, StubJobLauncher.jobParameters.getParameters().size());
 	}
 
 	@Test
