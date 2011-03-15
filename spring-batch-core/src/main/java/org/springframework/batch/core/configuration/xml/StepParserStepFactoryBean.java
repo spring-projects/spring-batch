@@ -38,6 +38,7 @@ import org.springframework.batch.core.partition.PartitionHandler;
 import org.springframework.batch.core.partition.support.PartitionStep;
 import org.springframework.batch.core.partition.support.Partitioner;
 import org.springframework.batch.core.partition.support.SimpleStepExecutionSplitter;
+import org.springframework.batch.core.partition.support.StepExecutionAggregator;
 import org.springframework.batch.core.partition.support.TaskExecutorPartitionHandler;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.step.AbstractStep;
@@ -201,6 +202,8 @@ class StepParserStepFactoryBean<I, O> implements FactoryBean, BeanNameAware {
 	//
 	private boolean hasChunkElement = false;
 
+	private StepExecutionAggregator stepExecutionAggregator;
+
 	/**
 	 * Create a {@link Step} from the configuration provided.
 	 * 
@@ -319,7 +322,7 @@ class StepParserStepFactoryBean<I, O> implements FactoryBean, BeanNameAware {
 							+ "It should be configured with its own step reference.");
 		}
 
-		boolean allowStartIfComplete = this.allowStartIfComplete !=null ? this.allowStartIfComplete : false;
+		boolean allowStartIfComplete = this.allowStartIfComplete != null ? this.allowStartIfComplete : false;
 		String name = this.name;
 		if (step != null) {
 			try {
@@ -328,12 +331,15 @@ class StepParserStepFactoryBean<I, O> implements FactoryBean, BeanNameAware {
 			}
 			catch (Exception e) {
 				logger.info("Ignored exception from step asking for name and allowStartIfComplete flag. "
-						+ "Using default from enclosing PartitionStep ("+name+","+allowStartIfComplete+").");
+						+ "Using default from enclosing PartitionStep (" + name + "," + allowStartIfComplete + ").");
 			}
 		}
 		SimpleStepExecutionSplitter splitter = new SimpleStepExecutionSplitter(jobRepository, allowStartIfComplete,
 				name, partitioner);
 		ts.setStepExecutionSplitter(splitter);
+		if (stepExecutionAggregator != null) {
+			ts.setStepExecutionAggregator(stepExecutionAggregator);
+		}
 	}
 
 	private void configureSimple(SimpleStepFactoryBean<I, O> fb) {
@@ -643,6 +649,13 @@ class StepParserStepFactoryBean<I, O> implements FactoryBean, BeanNameAware {
 	 */
 	public void setPartitioner(Partitioner partitioner) {
 		this.partitioner = partitioner;
+	}
+	
+	/**
+	 * @param stepExecutionAggregator the stepExecutionAggregator to set
+	 */
+	public void setStepExecutionAggregator(StepExecutionAggregator stepExecutionAggregator) {
+		this.stepExecutionAggregator = stepExecutionAggregator;
 	}
 
 	/**

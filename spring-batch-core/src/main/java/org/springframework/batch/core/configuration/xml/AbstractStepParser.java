@@ -65,6 +65,8 @@ public abstract class AbstractStepParser {
 
 	private static final String PARTITIONER_ATTR = "partitioner";
 
+	private static final String AGGREGATOR_ATTR = "aggregator";
+
 	private static final String HANDLER_ATTR = "handler";
 
 	private static final String HANDLER_ELE = "handler";
@@ -150,6 +152,7 @@ public abstract class AbstractStepParser {
 		bd.setAttribute("isNamespaceStep", true);
 		String stepRef = partitionElement.getAttribute(STEP_ATTR);
 		String partitionerRef = partitionElement.getAttribute(PARTITIONER_ATTR);
+		String aggregatorRef = partitionElement.getAttribute(AGGREGATOR_ATTR);
 		String handlerRef = partitionElement.getAttribute(HANDLER_ATTR);
 
 		if (!StringUtils.hasText(partitionerRef)) {
@@ -160,6 +163,9 @@ public abstract class AbstractStepParser {
 		MutablePropertyValues propertyValues = bd.getPropertyValues();
 
 		propertyValues.addPropertyValue("partitioner", new RuntimeBeanReference(partitionerRef));
+		if (StringUtils.hasText(aggregatorRef)) {
+			propertyValues.addPropertyValue("stepExecutionAggregator", new RuntimeBeanReference(aggregatorRef));			
+		}
 
 		boolean customHandler = false;
 		if (!StringUtils.hasText(handlerRef)) {

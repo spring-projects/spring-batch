@@ -8,7 +8,7 @@
 
 	<job id="job1">
 		<step id="s1">
-			<partition step="step1" partitioner="partitioner">
+			<partition step="step1" partitioner="partitioner" aggregator="aggregator">
 				<handler task-executor="taskExecutor" grid-size="2" />
 			</partition>
 		</step>
@@ -52,6 +52,9 @@
 	<bean id="handler" class="org.springframework.batch.core.partition.support.TaskExecutorPartitionHandler" xmlns="http://www.springframework.org/schema/beans">
 		<property name="gridSize" value="3" />
 	</bean>
+
+	<beans:bean id="aggregator"
+		class="org.springframework.batch.core.configuration.xml.PartitionStepParserTests$CustomStepExecutionAggregator" />
 
 	<beans:bean id="handler5"
 		class="org.springframework.batch.core.configuration.xml.PartitionStepParserTests$CustomPartitionHandler" />

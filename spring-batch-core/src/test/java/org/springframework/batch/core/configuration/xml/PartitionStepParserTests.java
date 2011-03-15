@@ -32,6 +32,7 @@ import org.springframework.batch.core.*;
 import org.springframework.batch.core.partition.PartitionHandler;
 import org.springframework.batch.core.partition.StepExecutionSplitter;
 import org.springframework.batch.core.partition.support.PartitionStep;
+import org.springframework.batch.core.partition.support.StepExecutionAggregator;
 import org.springframework.batch.core.partition.support.TaskExecutorPartitionHandler;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.repository.support.MapJobRepositoryFactoryBean;
@@ -107,51 +108,32 @@ public class PartitionStepParserTests implements ApplicationContextAware {
 		return val;
 	}
 
+
 	@Test
-	public void testCustomHandlerRefStep() throws Exception {
-		assertNotNull(job5);
-		JobExecution jobExecution = jobRepository.createJobExecution(job5.getName(), new JobParameters());
-		job5.execute(jobExecution);
+	public void testDefaultHandlerStep() throws Exception {
+		assertNotNull(job1);
+		JobExecution jobExecution = jobRepository.createJobExecution(job1.getName(), new JobParameters());
+		job1.execute(jobExecution);
 		assertEquals(BatchStatus.COMPLETED, jobExecution.getStatus());
+		Collections.sort(savedStepNames);
+		assertEquals("[step1:partition0, step1:partition1]", savedStepNames.toString());
 		List<String> stepNames = getStepNames(jobExecution);
-		assertEquals(1, stepNames.size());
-		assertEquals("[j5s1]", stepNames.toString());
+		assertEquals(3, stepNames.size());
+		assertEquals("[s1, step1:partition0, step1:partition1]", stepNames.toString());
+		assertEquals("bar", jobExecution.getExecutionContext().get("foo"));
 	}
 
-	/**
-	 * BATCH-1509 we now support the ability define steps inline for partitioned
-	 * steps. this demonstates that the execution proceeds as expected and that
-	 * the partitionhandler has a reference to the inline step definition
-	 */
 	@Test
-	public void testNestedPartitionStep() throws Throwable {
-		assertNotNull("the reference to the job4 configured in the XML file must not be null", job4);
-		JobExecution jobExecution = jobRepository.createJobExecution(job4.getName(), new JobParameters());
-
-		job4.execute(jobExecution);
-
-		for (StepExecution se : jobExecution.getStepExecutions()) {
-			String stepExecutionName = se.getStepName();
-			if (stepExecutionName.equalsIgnoreCase("j4s1")) { // the partitioned
-																// step
-				PartitionStep partitionStep = (PartitionStep) this.applicationContext.getBean(stepExecutionName);
-
-				// prove that the reference in the {@link
-				// TaskExecutorPartitionHandler} is the step configured inline
-				TaskExecutorPartitionHandler taskExecutorPartitionHandler = accessPrivateField(partitionStep,
-						"partitionHandler");
-				TaskletStep taskletStep = accessPrivateField(taskExecutorPartitionHandler, "step");
-
-				assertNotNull("the taskletStep wasn't configured with a step. "
-						+ "We're trusting that the factory ensured " + "a reference was given.", taskletStep);
-			}
-		}
+	public void testHandlerRefStep() throws Exception {
+		assertNotNull(job2);
+		JobExecution jobExecution = jobRepository.createJobExecution(job2.getName(), new JobParameters());
+		job2.execute(jobExecution);
 		assertEquals(BatchStatus.COMPLETED, jobExecution.getStatus());
-		// Step names not saved by this one (it geosn't have that tasklet)
-		assertEquals("[]", savedStepNames.toString());
+		Collections.sort(savedStepNames);
+		assertEquals("[s3, step1:partition0, step1:partition1, step1:partition2]", savedStepNames.toString());
 		List<String> stepNames = getStepNames(jobExecution);
-		assertEquals(4, stepNames.size());
-		assertEquals("[j4s1, j4s1:partition0, j4s1:partition1, j4s1:partition2]", stepNames.toString());
+		assertEquals(5, stepNames.size());
+		assertEquals("[s2, s3, step1:partition0, step1:partition1, step1:partition2]", stepNames.toString());
 	}
 
 	/**
@@ -190,30 +172,51 @@ public class PartitionStepParserTests implements ApplicationContextAware {
 		assertEquals("[j3s1, j3s1:partition0, j3s1:partition1, j3s1:partition2]", stepNames.toString());
 	}
 
+	/**
+	 * BATCH-1509 we now support the ability define steps inline for partitioned
+	 * steps. this demonstates that the execution proceeds as expected and that
+	 * the partitionhandler has a reference to the inline step definition
+	 */
 	@Test
-	public void testDefaultHandlerStep() throws Exception {
-		assertNotNull(job1);
-		JobExecution jobExecution = jobRepository.createJobExecution(job1.getName(), new JobParameters());
-		job1.execute(jobExecution);
+	public void testNestedPartitionStep() throws Throwable {
+		assertNotNull("the reference to the job4 configured in the XML file must not be null", job4);
+		JobExecution jobExecution = jobRepository.createJobExecution(job4.getName(), new JobParameters());
+
+		job4.execute(jobExecution);
+
+		for (StepExecution se : jobExecution.getStepExecutions()) {
+			String stepExecutionName = se.getStepName();
+			if (stepExecutionName.equalsIgnoreCase("j4s1")) { // the partitioned
+																// step
+				PartitionStep partitionStep = (PartitionStep) this.applicationContext.getBean(stepExecutionName);
+
+				// prove that the reference in the {@link
+				// TaskExecutorPartitionHandler} is the step configured inline
+				TaskExecutorPartitionHandler taskExecutorPartitionHandler = accessPrivateField(partitionStep,
+						"partitionHandler");
+				TaskletStep taskletStep = accessPrivateField(taskExecutorPartitionHandler, "step");
+
+				assertNotNull("the taskletStep wasn't configured with a step. "
+						+ "We're trusting that the factory ensured " + "a reference was given.", taskletStep);
+			}
+		}
 		assertEquals(BatchStatus.COMPLETED, jobExecution.getStatus());
-		Collections.sort(savedStepNames);
-		assertEquals("[step1:partition0, step1:partition1]", savedStepNames.toString());
+		// Step names not saved by this one (it geosn't have that tasklet)
+		assertEquals("[]", savedStepNames.toString());
 		List<String> stepNames = getStepNames(jobExecution);
-		assertEquals(3, stepNames.size());
-		assertEquals("[s1, step1:partition0, step1:partition1]", stepNames.toString());
+		assertEquals(4, stepNames.size());
+		assertEquals("[j4s1, j4s1:partition0, j4s1:partition1, j4s1:partition2]", stepNames.toString());
 	}
 
 	@Test
-	public void testHandlerRefStep() throws Exception {
-		assertNotNull(job2);
-		JobExecution jobExecution = jobRepository.createJobExecution(job2.getName(), new JobParameters());
-		job2.execute(jobExecution);
+	public void testCustomHandlerRefStep() throws Exception {
+		assertNotNull(job5);
+		JobExecution jobExecution = jobRepository.createJobExecution(job5.getName(), new JobParameters());
+		job5.execute(jobExecution);
 		assertEquals(BatchStatus.COMPLETED, jobExecution.getStatus());
-		Collections.sort(savedStepNames);
-		assertEquals("[s3, step1:partition0, step1:partition1, step1:partition2]", savedStepNames.toString());
 		List<String> stepNames = getStepNames(jobExecution);
-		assertEquals(5, stepNames.size());
-		assertEquals("[s2, s3, step1:partition0, step1:partition1, step1:partition2]", stepNames.toString());
+		assertEquals(1, stepNames.size());
+		assertEquals("[j5s1]", stepNames.toString());
 	}
 
 	private List<String> getStepNames(JobExecution jobExecution) {
@@ -234,4 +237,11 @@ public class PartitionStepParserTests implements ApplicationContextAware {
 		
 	}
 
+	public static class CustomStepExecutionAggregator implements StepExecutionAggregator {
+
+		public void aggregate(StepExecution result, Collection<StepExecution> executions) {
+			result.getJobExecution().getExecutionContext().put("foo", "bar");
+		}
+		
+	}
 }
