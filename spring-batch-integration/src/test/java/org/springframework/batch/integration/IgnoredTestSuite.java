@@ -4,8 +4,8 @@ import org.junit.Ignore;
 import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
 import org.junit.runners.Suite.SuiteClasses;
-import org.springframework.batch.integration.chunk.RemoteChunkFaultTolerantStepIntegrationTests;
 import org.springframework.batch.integration.chunk.RemoteChunkFaultTolerantStepJmsIntegrationTests;
+import org.springframework.batch.integration.partition.JmsIntegrationTests;
 
 /*
  * Copyright 2009-2010 the original author or authors.
@@ -30,7 +30,7 @@ import org.springframework.batch.integration.chunk.RemoteChunkFaultTolerantStepJ
  * 
  */
 @RunWith(Suite.class)
-@SuiteClasses(value = { RemoteChunkFaultTolerantStepIntegrationTests.class,
+@SuiteClasses(value = { JmsIntegrationTests.class,
 		RemoteChunkFaultTolerantStepJmsIntegrationTests.class })
 @Ignore
 public class IgnoredTestSuite {
