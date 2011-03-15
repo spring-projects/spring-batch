@@ -157,24 +157,11 @@ public abstract class AbstractStepParser {
 			return;
 		}
 
-		Element inlineStepElement = DomUtils.getChildElementByTagName(partitionElement, STEP_ELE);
-		if (inlineStepElement == null && !StringUtils.hasText(stepRef)) {
-			parserContext.getReaderContext().error("You must specify a step", partitionElement);
-			return;
-		}
-
-
 		MutablePropertyValues propertyValues = bd.getPropertyValues();
-
-		if (StringUtils.hasText(stepRef)) {
-			propertyValues.addPropertyValue("step", new RuntimeBeanReference(stepRef));
-		} else if( inlineStepElement!=null) {
-			AbstractBeanDefinition stepDefinition = parseStep(inlineStepElement, parserContext, jobFactoryRef);
-			propertyValues.addPropertyValue("step", stepDefinition );
-		}
 
 		propertyValues.addPropertyValue("partitioner", new RuntimeBeanReference(partitionerRef));
 
+		boolean customHandler = false;
 		if (!StringUtils.hasText(handlerRef)) {
 			Element handlerElement = DomUtils.getChildElementByTagName(partitionElement, HANDLER_ELE);
 			if (handlerElement != null) {
@@ -188,7 +175,24 @@ public abstract class AbstractStepParser {
 				}
 			}
 		} else {
-			propertyValues.addPropertyValue("partitionHandler", new RuntimeBeanReference(handlerRef));
+			customHandler = true;
+			BeanDefinition partitionHandler = BeanDefinitionBuilder.genericBeanDefinition().getRawBeanDefinition();
+			partitionHandler.setParentName(handlerRef);
+			propertyValues.addPropertyValue("partitionHandler", partitionHandler);
+		}
+
+		Element inlineStepElement = DomUtils.getChildElementByTagName(partitionElement, STEP_ELE);
+		if (inlineStepElement == null && !StringUtils.hasText(stepRef) && !customHandler) {
+			parserContext.getReaderContext().error("You must specify a step", partitionElement);
+			return;
+		}
+
+		if (StringUtils.hasText(stepRef)) {
+			propertyValues.addPropertyValue("step", new RuntimeBeanReference(stepRef));
+		} else if( inlineStepElement!=null) {
+			AbstractBeanDefinition stepDefinition = parseStep(inlineStepElement, parserContext, jobFactoryRef);
+			stepDefinition.getPropertyValues().addPropertyValue("name", stepElement.getAttribute(ID_ATTR));
+			propertyValues.addPropertyValue("step", stepDefinition );
 		}
 
 	}
