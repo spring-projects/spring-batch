@@ -22,6 +22,8 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.springframework.batch.classify.BinaryExceptionClassifier;
 import org.springframework.batch.core.ChunkListener;
 import org.springframework.batch.core.Job;
@@ -59,6 +61,7 @@ import org.springframework.batch.retry.RetryPolicy;
 import org.springframework.batch.retry.backoff.BackOffPolicy;
 import org.springframework.batch.retry.policy.MapRetryContextCache;
 import org.springframework.batch.retry.policy.RetryContextCache;
+import org.springframework.beans.factory.BeanCreationException;
 import org.springframework.beans.factory.BeanNameAware;
 import org.springframework.beans.factory.FactoryBean;
 import org.springframework.core.task.SyncTaskExecutor;
@@ -84,6 +87,8 @@ import org.springframework.util.Assert;
  * @since 2.0
  */
 class StepParserStepFactoryBean<I, O> implements FactoryBean, BeanNameAware {
+
+	private static final Log logger = LogFactory.getLog(StepParserStepFactoryBean.class);
 
 	//
 	// Step Attributes
@@ -234,14 +239,10 @@ class StepParserStepFactoryBean<I, O> implements FactoryBean, BeanNameAware {
 			configureJobStep(ts);
 			return ts;
 		}
-		else if (step != null) {
+		else {
 			PartitionStep ts = new PartitionStep();
 			configurePartitionStep(ts);
 			return ts;
-		}
-		else {
-			throw new IllegalStateException("Step [" + name
-					+ "] has neither a <chunk/> element nor a 'ref' attribute referencing a Tasklet.");
 		}
 	}
 
@@ -277,7 +278,6 @@ class StepParserStepFactoryBean<I, O> implements FactoryBean, BeanNameAware {
 
 	private void configurePartitionStep(PartitionStep ts) {
 		Assert.state(partitioner != null, "A Partitioner must be provided for a partition step");
-		Assert.state(step != null, "A Step must be provided for a partition step");
 		configureAbstractStep(ts);
 
 		PartitionHandler handler;
@@ -300,17 +300,39 @@ class StepParserStepFactoryBean<I, O> implements FactoryBean, BeanNameAware {
 
 		// BATCH-1659
 		if (handler instanceof TaskExecutorPartitionHandler) {
+			// Only for a local partition handler is the step required
+			Assert.state(step != null,
+					"A Step must be provided for a partition step with a TaskExecutorPartitionHandler");
 			try {
 				TaskExecutorPartitionHandler taskExecutorPartitionHandler = (TaskExecutorPartitionHandler) handler;
 				taskExecutorPartitionHandler.setStep(step);
 				taskExecutorPartitionHandler.afterPropertiesSet();
 			}
 			catch (Exception e) {
-				throw new RuntimeException(e);
+				throw new BeanCreationException("Could not configure TaskExecutorPartitionHandler", e);
 			}
 		}
+		else {
+			// Only for a local partition handler is the step required
+			Assert.state(step == null,
+					"A Step must not be provided for a custom partition handler (unless it extends TaskExecutorPartitionHandler). "
+							+ "It should be configured with its own step reference.");
+		}
 
-		SimpleStepExecutionSplitter splitter = new SimpleStepExecutionSplitter(jobRepository, step, partitioner);
+		boolean allowStartIfComplete = this.allowStartIfComplete !=null ? this.allowStartIfComplete : false;
+		String name = this.name;
+		if (step != null) {
+			try {
+				allowStartIfComplete = step.isAllowStartIfComplete();
+				name = step.getName();
+			}
+			catch (Exception e) {
+				logger.info("Ignored exception from step asking for name and allowStartIfComplete flag. "
+						+ "Using default from enclosing PartitionStep ("+name+","+allowStartIfComplete+").");
+			}
+		}
+		SimpleStepExecutionSplitter splitter = new SimpleStepExecutionSplitter(jobRepository, allowStartIfComplete,
+				name, partitioner);
 		ts.setStepExecutionSplitter(splitter);
 	}
 
@@ -576,6 +598,13 @@ class StepParserStepFactoryBean<I, O> implements FactoryBean, BeanNameAware {
 		if (this.name == null) {
 			this.name = name;
 		}
+	}
+
+	/**
+	 * @param name the name to set
+	 */
+	public void setName(String name) {
+		this.name = name;
 	}
 
 	// =========================================================

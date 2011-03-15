@@ -71,11 +71,31 @@ public class SimpleStepExecutionSplitter implements StepExecutionSplitter, Initi
 	 * properties.
 	 * 
 	 * @param jobRepository the {@link JobRepository}
+	 * @param allowStartIfComplete flag specifying preferences on restart
+	 * @param stepName the target step name
+	 * @param partitioner a {@link Partitioner} to use for generating input
+	 * parameters
+	 */
+	public SimpleStepExecutionSplitter(JobRepository jobRepository, boolean allowStartIfComplete, String stepName, Partitioner partitioner) {
+		this.jobRepository = jobRepository;
+		this.allowStartIfComplete = allowStartIfComplete;
+		this.partitioner = partitioner;
+		this.stepName = stepName;
+	}
+
+	/**
+	 * Construct a {@link SimpleStepExecutionSplitter} from its mandatory
+	 * properties.
+	 * 
+	 * @param jobRepository the {@link JobRepository}
 	 * @param step the target step (a local version of it), used to extract the
 	 * name and allowStartIfComplete flags
 	 * @param partitioner a {@link Partitioner} to use for generating input
 	 * parameters
+	 * 
+	 * @deprecated use {@link #SimpleStepExecutionSplitter(JobRepository, boolean, String, Partitioner)} instead
 	 */
+	@Deprecated
 	public SimpleStepExecutionSplitter(JobRepository jobRepository, Step step, Partitioner partitioner) {
 		this.jobRepository = jobRepository;
 		this.allowStartIfComplete = step.isAllowStartIfComplete();
