@@ -59,7 +59,7 @@ public class SimpleJobExplorerTests extends TestCase {
 
 	private ExecutionContextDao ecDao;
 
-	private JobExecution jobExecution = new JobExecution(jobInstance, 123L);
+	private JobExecution jobExecution = new JobExecution(jobInstance, 1234L);
 
 	public void setUp() throws Exception {
 
@@ -95,13 +95,11 @@ public class SimpleJobExplorerTests extends TestCase {
 
 	@Test
 	public void testGetStepExecution() throws Exception {
-		expect(jobExecutionDao.getJobExecution(123L)).andReturn(jobExecution);
+		expect(jobExecutionDao.getJobExecution(jobExecution.getId())).andReturn(jobExecution);
 		StepExecution stepExecution = jobExecution.createStepExecution("foo");
 		expect(stepExecutionDao.getStepExecution(jobExecution, 123L))
 				.andReturn(stepExecution);
-		expect(ecDao.getExecutionContext(jobExecution)).andReturn(null);
 		expect(ecDao.getExecutionContext(stepExecution)).andReturn(null);
-		stepExecutionDao.addStepExecutions(jobExecution);
 		expectLastCall();
 		replay(jobExecutionDao, stepExecutionDao, ecDao);
 		jobExplorer.getStepExecution(jobExecution.getId(), 123L);
@@ -110,10 +108,8 @@ public class SimpleJobExplorerTests extends TestCase {
 
 	@Test
 	public void testGetStepExecutionMissing() throws Exception {
-		expect(jobExecutionDao.getJobExecution(123L)).andReturn(jobExecution);
-		stepExecutionDao.addStepExecutions(jobExecution);
+		expect(jobExecutionDao.getJobExecution(jobExecution.getId())).andReturn(jobExecution);
 		expectLastCall();
-		expect(ecDao.getExecutionContext(jobExecution)).andReturn(null);
 		expect(stepExecutionDao.getStepExecution(jobExecution, 123L))
 				.andReturn(null);
 		replay(jobExecutionDao, stepExecutionDao, ecDao);
@@ -123,7 +119,7 @@ public class SimpleJobExplorerTests extends TestCase {
 
 	@Test
 	public void testGetStepExecutionMissingJobExecution() throws Exception {
-		expect(jobExecutionDao.getJobExecution(123L)).andReturn(null);
+		expect(jobExecutionDao.getJobExecution(jobExecution.getId())).andReturn(null);
 		replay(jobExecutionDao, stepExecutionDao, ecDao);
 		assertNull(jobExplorer.getStepExecution(jobExecution.getId(), 123L));
 		verify(jobExecutionDao, stepExecutionDao, ecDao);
