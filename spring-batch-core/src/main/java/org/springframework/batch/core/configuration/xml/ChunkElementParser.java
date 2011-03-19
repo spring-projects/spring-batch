@@ -18,6 +18,7 @@ package org.springframework.batch.core.configuration.xml;
 import java.util.List;
 
 import org.springframework.batch.core.listener.StepListenerMetaData;
+import org.springframework.batch.repeat.policy.SimpleCompletionPolicy;
 import org.springframework.beans.MutablePropertyValues;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.config.BeanDefinitionHolder;
@@ -25,6 +26,7 @@ import org.springframework.beans.factory.config.RuntimeBeanReference;
 import org.springframework.beans.factory.config.TypedStringValue;
 import org.springframework.beans.factory.parsing.CompositeComponentDefinition;
 import org.springframework.beans.factory.support.AbstractBeanDefinition;
+import org.springframework.beans.factory.support.BeanDefinitionBuilder;
 import org.springframework.beans.factory.support.GenericBeanDefinition;
 import org.springframework.beans.factory.support.ManagedList;
 import org.springframework.beans.factory.support.ManagedMap;
@@ -59,7 +61,8 @@ public class ChunkElementParser {
 
 	private static final String ITEM_WRITER_ADAPTER_CLASS = "org.springframework.batch.item.adapter.ItemWriterAdapter";
 
-	private static final StepListenerParser stepListenerParser = new StepListenerParser(StepListenerMetaData.itemListenerMetaData());
+	private static final StepListenerParser stepListenerParser = new StepListenerParser(
+			StepListenerMetaData.itemListenerMetaData());
 
 	/**
 	 * @param element
@@ -80,7 +83,17 @@ public class ChunkElementParser {
 
 		String commitInterval = element.getAttribute(COMMIT_INTERVAL_ATTR);
 		if (StringUtils.hasText(commitInterval)) {
-			propertyValues.addPropertyValue("commitInterval", commitInterval);
+			if (commitInterval.startsWith("#")) {
+				// It's a late binding expression, so we need step scope...
+				BeanDefinitionBuilder completionPolicy = BeanDefinitionBuilder
+						.genericBeanDefinition(SimpleCompletionPolicy.class);
+				completionPolicy.addConstructorArgValue(commitInterval);
+				completionPolicy.setScope("step");
+				propertyValues.addPropertyValue("chunkCompletionPolicy", completionPolicy.getBeanDefinition());
+			}
+			else {
+				propertyValues.addPropertyValue("commitInterval", commitInterval);
+			}
 		}
 
 		String completionPolicyRef = element.getAttribute(CHUNK_COMPLETION_POLICY_ATTR);
@@ -144,7 +157,7 @@ public class ChunkElementParser {
 		handleRetryListenersElement(element, propertyValues, parserContext, bd);
 
 		handleStreamsElement(element, propertyValues, parserContext);
-		
+
 		stepListenerParser.handleListenersElement(element, bd, parserContext);
 
 	}
@@ -202,8 +215,8 @@ public class ChunkElementParser {
 			propertyValues.addPropertyValue(propertyName, beanDefinitionHolder);
 		}
 		else if (refElements.size() == 1) {
-			propertyValues.addPropertyValue(propertyName, parserContext.getDelegate().parsePropertySubElement(
-					refElements.get(0), null));
+			propertyValues.addPropertyValue(propertyName,
+					parserContext.getDelegate().parsePropertySubElement(refElements.get(0), null));
 		}
 
 		handleAdapterMethodAttribute(propertyName, adapterClassName, propertyValues, element);
@@ -251,7 +264,8 @@ public class ChunkElementParser {
 	}
 
 	@SuppressWarnings("unchecked")
-	private void handleRetryListenerElements(ParserContext parserContext, Element element, ManagedList beans, BeanDefinition enclosing) {
+	private void handleRetryListenerElements(ParserContext parserContext, Element element, ManagedList beans,
+			BeanDefinition enclosing) {
 		List<Element> listenerElements = DomUtils.getChildElementsByTagName(element, "listener");
 		if (listenerElements != null) {
 			for (Element listenerElement : listenerElements) {
