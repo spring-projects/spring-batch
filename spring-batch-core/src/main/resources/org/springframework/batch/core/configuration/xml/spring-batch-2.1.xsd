@@ -823,7 +823,8 @@ ref"							is not required, and only needs to be specified explicitly
 			<xsd:annotation>
 				<xsd:documentation><![CDATA[
 				The number of items that will be processed before commit is called for the transaction.  
-				Either set this or the chunk-completion-policy but not both.
+				Either set this or the chunk-completion-policy but not both.  Can be specified as an expression
+				that will be evaluated in the scope of the step (e.g. "#{jobParameters['commit.interval']}").
 				]]></xsd:documentation>
 			</xsd:annotation>
 		</xsd:attribute>
