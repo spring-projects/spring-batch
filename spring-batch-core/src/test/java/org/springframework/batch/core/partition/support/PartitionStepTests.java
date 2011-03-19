@@ -29,13 +29,11 @@ import org.springframework.batch.core.BatchStatus;
 import org.springframework.batch.core.ExitStatus;
 import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.JobParameters;
-import org.springframework.batch.core.Step;
 import org.springframework.batch.core.StepExecution;
 import org.springframework.batch.core.partition.PartitionHandler;
 import org.springframework.batch.core.partition.StepExecutionSplitter;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.repository.support.MapJobRepositoryFactoryBean;
-import org.springframework.batch.core.step.StepSupport;
 
 /**
  * @author Dave Syer
@@ -44,8 +42,6 @@ import org.springframework.batch.core.step.StepSupport;
 public class PartitionStepTests {
 
 	private PartitionStep step = new PartitionStep();
-
-	private Step remote = new StepSupport("remote");
 
 	private JobRepository jobRepository;
 
@@ -58,7 +54,7 @@ public class PartitionStepTests {
 
 	@Test
 	public void testVanillaStepExecution() throws Exception {
-		step.setStepExecutionSplitter(new SimpleStepExecutionSplitter(jobRepository, remote, new SimplePartitioner()));
+		step.setStepExecutionSplitter(new SimpleStepExecutionSplitter(jobRepository, true, step.getName(), new SimplePartitioner()));
 		step.setPartitionHandler(new PartitionHandler() {
 			public Collection<StepExecution> handle(StepExecutionSplitter stepSplitter, StepExecution stepExecution)
 					throws Exception {
@@ -82,7 +78,7 @@ public class PartitionStepTests {
 
 	@Test
 	public void testFailedStepExecution() throws Exception {
-		step.setStepExecutionSplitter(new SimpleStepExecutionSplitter(jobRepository, remote, new SimplePartitioner()));
+		step.setStepExecutionSplitter(new SimpleStepExecutionSplitter(jobRepository, true, step.getName(), new SimplePartitioner()));
 		step.setPartitionHandler(new PartitionHandler() {
 			public Collection<StepExecution> handle(StepExecutionSplitter stepSplitter, StepExecution stepExecution)
 					throws Exception {
@@ -107,7 +103,7 @@ public class PartitionStepTests {
 	@Test
 	public void testRestartStepExecution() throws Exception {
 		final AtomicBoolean started = new AtomicBoolean(false);
-		step.setStepExecutionSplitter(new SimpleStepExecutionSplitter(jobRepository, remote, new SimplePartitioner()));
+		step.setStepExecutionSplitter(new SimpleStepExecutionSplitter(jobRepository, true, step.getName(), new SimplePartitioner()));
 		step.setPartitionHandler(new PartitionHandler() {
 			public Collection<StepExecution> handle(StepExecutionSplitter stepSplitter, StepExecution stepExecution)
 					throws Exception {
@@ -153,7 +149,7 @@ public class PartitionStepTests {
 
 	@Test
 	public void testStoppedStepExecution() throws Exception {
-		step.setStepExecutionSplitter(new SimpleStepExecutionSplitter(jobRepository, remote, new SimplePartitioner()));
+		step.setStepExecutionSplitter(new SimpleStepExecutionSplitter(jobRepository, true, step.getName(), new SimplePartitioner()));
 		step.setPartitionHandler(new PartitionHandler() {
 			public Collection<StepExecution> handle(StepExecutionSplitter stepSplitter, StepExecution stepExecution)
 					throws Exception {
@@ -184,7 +180,7 @@ public class PartitionStepTests {
 				result.getExecutionContext().put("aggregated", true);
 			}
 		});
-		step.setStepExecutionSplitter(new SimpleStepExecutionSplitter(jobRepository, remote, new SimplePartitioner()));
+		step.setStepExecutionSplitter(new SimpleStepExecutionSplitter(jobRepository, true, step.getName(), new SimplePartitioner()));
 		step.setPartitionHandler(new PartitionHandler() {
 			public Collection<StepExecution> handle(StepExecutionSplitter stepSplitter, StepExecution stepExecution)
 					throws Exception {
