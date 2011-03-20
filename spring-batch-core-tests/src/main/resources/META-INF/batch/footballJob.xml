@@ -11,7 +11,7 @@
 		<step id="playerload" next="gameLoad">
 			<tasklet>
 				<chunk reader="playerFileItemReader" writer="playerWriter" 
-	                   commit-interval="#{jobParameters['commit.interval']}" />
+	                   commit-interval="#{jobParameters['commit.interval']}"/>
 			</tasklet>
 		</step>
 		<step id="gameLoad" next="playerSummarization">
