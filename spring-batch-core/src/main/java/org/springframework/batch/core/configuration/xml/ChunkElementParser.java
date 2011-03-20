@@ -18,6 +18,7 @@ package org.springframework.batch.core.configuration.xml;
 import java.util.List;
 
 import org.springframework.batch.core.listener.StepListenerMetaData;
+import org.springframework.batch.core.step.skip.LimitCheckingItemSkipPolicy;
 import org.springframework.batch.repeat.policy.SimpleCompletionPolicy;
 import org.springframework.beans.MutablePropertyValues;
 import org.springframework.beans.factory.config.BeanDefinition;
@@ -118,8 +119,26 @@ public class ChunkElementParser {
 		}
 
 		String skipLimit = element.getAttribute("skip-limit");
+		boolean hasSkipPolicy = false;
 		if (StringUtils.hasText(skipLimit)) {
-			propertyValues.addPropertyValue("skipLimit", skipLimit);
+			if (skipLimit.startsWith("#")) {
+				// It's a late binding expression, so we need step scope...
+				BeanDefinitionBuilder skipPolicy = BeanDefinitionBuilder
+						.genericBeanDefinition(LimitCheckingItemSkipPolicy.class);
+				skipPolicy.setScope("step");
+				handleExceptionElement(element, parserContext, skipPolicy.getBeanDefinition().getPropertyValues(),
+						"skippable-exception-classes", "skippableExceptionMap");
+				skipPolicy.addPropertyValue("skipLimit", skipLimit);
+				propertyValues.addPropertyValue("skipPolicy", skipPolicy.getBeanDefinition());
+				hasSkipPolicy = true;
+			}
+			else {
+				propertyValues.addPropertyValue("skipLimit", skipLimit);
+			}
+		}
+		if (!hasSkipPolicy) {
+			handleExceptionElement(element, parserContext, propertyValues, "skippable-exception-classes",
+					"skippableExceptionClasses");
 		}
 
 		handleItemHandler("skip-policy", "skipPolicy", null, false, element, parserContext, propertyValues,
@@ -147,9 +166,6 @@ public class ChunkElementParser {
 		if (StringUtils.hasText(isProcessorTransactional)) {
 			propertyValues.addPropertyValue("processorTransactional", isProcessorTransactional);
 		}
-
-		handleExceptionElement(element, parserContext, propertyValues, "skippable-exception-classes",
-				"skippableExceptionClasses");
 
 		handleExceptionElement(element, parserContext, propertyValues, "retryable-exception-classes",
 				"retryableExceptionClasses");
