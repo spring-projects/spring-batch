@@ -34,8 +34,8 @@
 			<tasklet>
 				<chunk reader="reader" writer="writer" commit-interval="5" skip-limit="5" retry-limit="3">
 					<skippable-exception-classes>
-						<include class="java.lang.NullPointerException"/>
-						<exclude class="org.springframework.dao.CannotAcquireLockException"/>
+						<include class="java.lang.IllegalArgumentException"/>
+						<exclude class="org.springframework.dao.ConcurrencyFailureException"/>
 					</skippable-exception-classes>
 					<retryable-exception-classes>
 						<include class="org.springframework.dao.DeadlockLoserDataAccessException"/>
