@@ -89,7 +89,7 @@ public class FootballJobSkipIntegrationTests {
 			logger.info("Processed: " + stepExecution);
 		}
 		// They all skip on the second execution because of a primary key violation
-		execution = jobLauncher.run(job, new JobParametersBuilder().addLong("skip.limit", 100000L)
+		execution = jobLauncher.run(job, new JobParametersBuilder().addLong("skip.limit", 100000L).addLong("retry.limit", 2L)
 				.toJobParameters());
 		assertEquals(BatchStatus.COMPLETED, execution.getStatus());
 		for (StepExecution stepExecution : execution.getStepExecutions()) {
