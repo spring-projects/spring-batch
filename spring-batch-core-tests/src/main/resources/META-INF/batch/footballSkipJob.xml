@@ -9,10 +9,13 @@
 		<step id="playerload" next="gameLoad">
 			<tasklet>
 				<chunk reader="playerFileItemReader" writer="playerWriter" commit-interval="${job.commit.interval}"
-					 skip-limit="#{jobParameters['skip.limit']}">
+					 skip-limit="#{jobParameters['skip.limit']}" retry-limit="#{jobParameters['retry.limit']}">
 					<skippable-exception-classes>
 						<include class="org.springframework.dao.DataAccessException" />
 					</skippable-exception-classes>
+					<retryable-exception-classes>
+						<include class="org.springframework.dao.DataAccessException" />
+					</retryable-exception-classes>
 				</chunk>					
 			</tasklet>
 		</step>

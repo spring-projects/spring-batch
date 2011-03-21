@@ -18,8 +18,10 @@ package org.springframework.batch.core.configuration.xml;
 import java.util.List;
 
 import org.springframework.batch.core.listener.StepListenerMetaData;
+import org.springframework.batch.core.step.item.ForceRollbackForWriteSkipException;
 import org.springframework.batch.core.step.skip.LimitCheckingItemSkipPolicy;
 import org.springframework.batch.repeat.policy.SimpleCompletionPolicy;
+import org.springframework.batch.retry.policy.SimpleRetryPolicy;
 import org.springframework.beans.MutablePropertyValues;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.config.BeanDefinitionHolder;
@@ -119,15 +121,19 @@ public class ChunkElementParser {
 		}
 
 		String skipLimit = element.getAttribute("skip-limit");
+		ManagedMap skippableExceptions = handleExceptionElement(element, parserContext, "skippable-exception-classes");
 		boolean hasSkipPolicy = false;
 		if (StringUtils.hasText(skipLimit)) {
+			if (skippableExceptions == null) {
+				parserContext.getReaderContext().error(
+						"The <chunk/> element must have skippable-exceptions if a skip-limit is specified.", element);
+			}
 			if (skipLimit.startsWith("#")) {
 				// It's a late binding expression, so we need step scope...
 				BeanDefinitionBuilder skipPolicy = BeanDefinitionBuilder
 						.genericBeanDefinition(LimitCheckingItemSkipPolicy.class);
 				skipPolicy.setScope("step");
-				handleExceptionElement(element, parserContext, skipPolicy.getBeanDefinition().getPropertyValues(),
-						"skippable-exception-classes", "skippableExceptionMap");
+				skipPolicy.addPropertyValue("skippableExceptionMap", skippableExceptions);
 				skipPolicy.addPropertyValue("skipLimit", skipLimit);
 				propertyValues.addPropertyValue("skipPolicy", skipPolicy.getBeanDefinition());
 				hasSkipPolicy = true;
@@ -137,20 +143,44 @@ public class ChunkElementParser {
 			}
 		}
 		if (!hasSkipPolicy) {
-			handleExceptionElement(element, parserContext, propertyValues, "skippable-exception-classes",
-					"skippableExceptionClasses");
+			// Even if there is no retryLimit, we can still accept exception
+			// classes for an abstract parent bean definition
+			propertyValues.addPropertyValue("skippableExceptionClasses", skippableExceptions);
 		}
 
 		handleItemHandler("skip-policy", "skipPolicy", null, false, element, parserContext, propertyValues,
 				underspecified);
 
+		String retryLimit = element.getAttribute("retry-limit");
+		ManagedMap retryableExceptions = handleExceptionElement(element, parserContext, "retryable-exception-classes");
+		boolean hasRetryPolicy = false;
+		if (StringUtils.hasText(retryLimit)) {
+			if (retryableExceptions == null) {
+				parserContext.getReaderContext().error(
+						"The <chunk/> element must have retryable-exceptions if a retry-limit is specified.", element);
+			}
+			if (retryLimit.startsWith("#")) {
+				// It's a late binding expression, so we need step scope...
+				BeanDefinitionBuilder retryPolicy = BeanDefinitionBuilder
+						.genericBeanDefinition(SimpleRetryPolicy.class);
+				retryPolicy.setScope("step");
+				retryPolicy.addPropertyValue("maxAttempts", retryLimit);
+				retryPolicy.addPropertyValue("retryableExceptions", retryableExceptions);
+				propertyValues.addPropertyValue("retryPolicy", retryPolicy.getBeanDefinition());
+				hasRetryPolicy = true;
+			}
+			else {
+				propertyValues.addPropertyValue("retryLimit", retryLimit);
+			}
+		}
+		if (!hasRetryPolicy) {
+			// Even if there is no retryLimit, we can still accept exception
+			// classes for an abstract parent bean definition
+			propertyValues.addPropertyValue("retryableExceptionClasses", retryableExceptions);
+		}
+
 		handleItemHandler("retry-policy", "retryPolicy", null, false, element, parserContext, propertyValues,
 				underspecified);
-
-		String retryLimit = element.getAttribute("retry-limit");
-		if (StringUtils.hasText(retryLimit)) {
-			propertyValues.addPropertyValue("retryLimit", retryLimit);
-		}
 
 		String cacheCapacity = element.getAttribute("cache-capacity");
 		if (StringUtils.hasText(cacheCapacity)) {
@@ -166,9 +196,6 @@ public class ChunkElementParser {
 		if (StringUtils.hasText(isProcessorTransactional)) {
 			propertyValues.addPropertyValue("processorTransactional", isProcessorTransactional);
 		}
-
-		handleExceptionElement(element, parserContext, propertyValues, "retryable-exception-classes",
-				"retryableExceptionClasses");
 
 		handleRetryListenersElement(element, propertyValues, parserContext, bd);
 
@@ -315,23 +342,24 @@ public class ChunkElementParser {
 	}
 
 	@SuppressWarnings("unchecked")
-	private void handleExceptionElement(Element element, ParserContext parserContext,
-			MutablePropertyValues propertyValues, String exceptionListName, String propertyName) {
+	private ManagedMap handleExceptionElement(Element element, ParserContext parserContext, String exceptionListName) {
 		List<Element> children = DomUtils.getChildElementsByTagName(element, exceptionListName);
 		if (children.size() == 1) {
-			Element exceptionClassesElement = children.get(0);
 			ManagedMap map = new ManagedMap();
+			Element exceptionClassesElement = children.get(0);
 			map.setMergeEnabled(exceptionClassesElement.hasAttribute(MERGE_ATTR)
 					&& Boolean.valueOf(exceptionClassesElement.getAttribute(MERGE_ATTR)));
 			addExceptionClasses("include", true, exceptionClassesElement, map, parserContext);
 			addExceptionClasses("exclude", false, exceptionClassesElement, map, parserContext);
-			propertyValues.addPropertyValue(propertyName, map);
+			map.put(ForceRollbackForWriteSkipException.class, true);
+			return map;
 		}
 		else if (children.size() > 1) {
 			parserContext.getReaderContext().error(
 					"The <" + exceptionListName + "/> element may not appear more than once in a single <"
 							+ element.getNodeName() + "/>.", element);
 		}
+		return null;
 	}
 
 	@SuppressWarnings("unchecked")
