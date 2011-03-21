@@ -7,7 +7,7 @@
 
 Spring Batch Downloads
 
-  The current GA release is <<2.1.6.RELEASE>>, the latest snapshots are <<2.1.7.CI-SNAPSHOT>>.  The version 2.0.x and 1.x branches are now in maintenance (the last release was <<2.0.4.RELEASE>>).
+  The current GA release is <<2.1.7.RELEASE>>, the latest snapshots are <<2.1.7.CI-SNAPSHOT>>.  The version 2.0.x and 1.x branches are now in maintenance (the last release was <<2.0.4.RELEASE>>).
 
 * Zip Downloads
 
@@ -37,7 +37,7 @@ Spring Batch Downloads
 <dependency>
     <groupId>org.springframework.batch</groupId>
     <artifactId>spring-batch-core</artifactId>
-    <version>2.1.6.RELEASE</version>
+    <version>2.1.7.RELEASE</version>
 </dependency>
 +---------------
 
@@ -70,7 +70,7 @@ Spring Batch Downloads
 <dependency>
     <groupId>org.springframework.batch</groupId>
     <artifactId>org.springframework.batch.core</artifactId>
-    <version>2.1.6.RELEASE</version>
+    <version>2.1.7.RELEASE</version>
 </dependency>
 +---------------
 
@@ -96,7 +96,7 @@ Spring Batch Downloads
 <dependency>
     <groupId>org.springframework.batch</groupId>
     <artifactId>spring-batch-core</artifactId>
-    <version>2.1.6.RELEASE</version>
+    <version>2.1.7.RELEASE</version>
 </dependency>
 +---------------
 
@@ -120,7 +120,7 @@ Spring Batch Downloads
 <dependency>
     <groupId>org.springframework.batch</groupId>
     <artifactId>org.springframework.batch.core</artifactId>
-    <version>2.1.6.RELEASE</version>
+    <version>2.1.7.RELEASE</version>
 </dependency>
 +---------------
 
