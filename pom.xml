@@ -46,7 +46,16 @@
 		</license>
 	</licenses>
 	<properties>
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<dependency.locations.enabled>false</dependency.locations.enabled>
+		<dist.id>spring-batch</dist.id>
+		<dist.name>Spring Batch</dist.name>
+		<dist.key>BATCH</dist.key>
+		<dist.version>${project.version}</dist.version>
+		<dist.finalName>${dist.id}-${dist.version}-no-dependencies</dist.finalName>
+		<dist.fileName>${dist.finalName}.zip</dist.fileName>
+		<dist.filePath>target/${dist.fileName}</dist.filePath>
+		<dist.bucketName>dist.springframework.org</dist.bucketName>
 	</properties>
 	<profiles>
 		<profile>
@@ -215,6 +224,20 @@
 									<goal>run</goal>
 								</goals>
 							</execution>
+							<execution>
+							  <id>upload-dist</id>
+							  <phase>deploy</phase>
+							  <goals>
+								<goal>run</goal>
+							  </goals>
+							  <configuration>
+								<tasks>
+								  <ant antfile="${basedir}/src/ant/upload-dist.xml">
+									<target name="upload-dist" />
+								  </ant>
+								</tasks>
+							  </configuration>
+							</execution>
 						</executions>
 					</plugin>
 				</plugins>
@@ -322,6 +345,9 @@
 		</profile>
 		<profile>
 			<id>staging</id>
+			<properties>
+			  <dist.staging>/${user.dir}/target/staging/dist</dist.staging>
+			</properties>
 			<distributionManagement>
 				<site>
 					<id>staging</id>
@@ -346,6 +372,9 @@
 				  </configuration>
 				</plugin>
 			  </plugins>
+			  <!-- the name of this project is 'spring-amqp-dist';
+				   make sure the zip file is just 'spring-amqp'. -->
+			  <finalName>${dist.finalName}</finalName>
 			</build>
 		</profile>
 		<profile>
@@ -405,17 +434,28 @@
 				<plugin>
 					<groupId>org.apache.maven.plugins</groupId>
 					<artifactId>maven-antrun-plugin</artifactId>
+					<version>1.4</version>
 					<dependencies>
-						<dependency>
-							<groupId>org.apache.ant</groupId>
-							<artifactId>ant</artifactId>
-							<version>1.7.0</version>
-						</dependency>
-						<dependency>
-							<groupId>org.apache.ant</groupId>
-							<artifactId>ant-apache-regexp</artifactId>
-							<version>1.7.0</version>
-						</dependency>
+					  <dependency>
+						<groupId>org.springframework.build</groupId>
+						<artifactId>org.springframework.build.aws.ant</artifactId>
+						<version>3.0.5.RELEASE</version>
+					  </dependency>
+					  <dependency>
+						<groupId>net.java.dev.jets3t</groupId>
+						<artifactId>jets3t</artifactId>
+						<version>0.7.2</version>
+					  </dependency>
+					  <dependency>
+						<groupId>org.apache.ant</groupId>
+						<artifactId>ant</artifactId>
+						<version>1.7.0</version>
+					  </dependency>
+					  <dependency>
+						<groupId>org.apache.ant</groupId>
+						<artifactId>ant-apache-regexp</artifactId>
+						<version>1.7.0</version>
+					  </dependency>
 					</dependencies>
 				</plugin>
 				<plugin>
