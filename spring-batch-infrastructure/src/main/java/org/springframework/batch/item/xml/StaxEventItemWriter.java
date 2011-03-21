@@ -31,6 +31,8 @@ import javax.xml.stream.XMLEventFactory;
 import javax.xml.stream.XMLEventWriter;
 import javax.xml.stream.XMLOutputFactory;
 import javax.xml.stream.XMLStreamException;
+import javax.xml.transform.Result;
+import javax.xml.transform.Source;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -52,7 +54,6 @@ import org.springframework.util.Assert;
 import org.springframework.util.ClassUtils;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
-import org.springframework.xml.transform.StaxResult;
 
 /**
  * An implementation of {@link ItemWriter} which uses StAX and
@@ -563,14 +564,15 @@ public class StaxEventItemWriter<T> extends ExecutionContextUserSupport implemen
 	 * @throws IOException
 	 * @throws XmlMappingException
 	 */
-	public void write(List<? extends T> items) throws XmlMappingException, IOException {
+	public void write(List<? extends T> items) throws XmlMappingException, Exception {
 
 		currentRecordCount += items.size();
 
 		for (Object object : items) {
 			Assert.state(marshaller.supports(object.getClass()),
 					"Marshaller must support the class of the marshalled object");
-			marshaller.marshal(object, new StaxResult(eventWriter));
+			Result result = StaxUtils.getResult(eventWriter);
+			marshaller.marshal(object, result );
 		}
 		try {
 			eventWriter.flush();

@@ -27,7 +27,6 @@ import org.springframework.core.io.Resource;
 import org.springframework.oxm.Unmarshaller;
 import org.springframework.oxm.XmlMappingException;
 import org.springframework.util.ClassUtils;
-import org.springframework.xml.transform.StaxSource;
 
 /**
  * Tests for {@link StaxEventItemReader}.
@@ -387,10 +386,11 @@ public class StaxEventItemReaderTests {
 		 * @return list of the events from fragment body
 		 */
 		public Object unmarshal(Source source) throws XmlMappingException, IOException {
-			StaxSource staxSource = (StaxSource) source;
-			XMLEventReader eventReader = staxSource.getXMLEventReader();
+
 			List<XMLEvent> fragmentContent;
 			try {
+				XMLEventReader eventReader = StaxUtils.getXmlEventReader( source);
+
 				// first event should be StartDocument
 				XMLEvent event1 = eventReader.nextEvent();
 				assertTrue(event1.isStartDocument());
@@ -413,7 +413,7 @@ public class StaxEventItemReaderTests {
 				assertTrue(event4.isEndDocument());
 
 			}
-			catch (XMLStreamException e) {
+			catch (Exception e) {
 				throw new RuntimeException("Error occured in FragmentDeserializer", e);
 			}
 			return fragmentContent;

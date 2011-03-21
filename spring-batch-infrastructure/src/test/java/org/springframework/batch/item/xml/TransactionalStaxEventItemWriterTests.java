@@ -30,7 +30,6 @@ import org.springframework.transaction.support.TransactionTemplate;
 import org.springframework.util.Assert;
 import org.springframework.util.ClassUtils;
 import org.springframework.util.StringUtils;
-import org.springframework.xml.transform.StaxResult;
 
 /**
  * Tests for {@link StaxEventItemWriter}.
@@ -77,7 +76,7 @@ public class TransactionalStaxEventItemWriterTests {
 				try {
 					writer.write(items);
 				}
-				catch (IOException e) {
+				catch ( Exception e) {
 					throw new RuntimeException(e);
 				}
 				return null;
@@ -115,7 +114,7 @@ public class TransactionalStaxEventItemWriterTests {
 					try {
 						writer.write(items);
 					}
-					catch (IOException e) {
+					catch (Exception e) {
 						throw new RuntimeException(e);
 					}
 					throw new RuntimeException("Planned");
@@ -133,7 +132,7 @@ public class TransactionalStaxEventItemWriterTests {
 				try {
 					writer.write(items);
 				}
-				catch (IOException e) {
+				catch (Exception e) {
 					throw new RuntimeException(e);
 				}
 				return null;
@@ -171,7 +170,7 @@ public class TransactionalStaxEventItemWriterTests {
 				try {
 					writer.write(items);
 				}
-				catch (IOException e) {
+				catch (Exception e) {
 					throw new RuntimeException(e);
 				}
 				return null;
@@ -186,7 +185,7 @@ public class TransactionalStaxEventItemWriterTests {
 					try {
 						writer.write(items);
 					}
-					catch (IOException e) {
+					catch (Exception e) {
 						throw new RuntimeException(e);
 					}
 					throw new RuntimeException("Planned");
@@ -215,13 +214,10 @@ public class TransactionalStaxEventItemWriterTests {
 	 */
 	private static class SimpleMarshaller implements Marshaller {
 		public void marshal(Object graph, Result result) throws XmlMappingException, IOException {
-			Assert.isInstanceOf(StaxResult.class, result);
-
-			StaxResult staxResult = (StaxResult) result;
 			try {
-				staxResult.getXMLEventWriter().add(XMLEventFactory.newInstance().createComment(graph.toString()));
+				StaxUtils.getXmlEventWriter(result).add(XMLEventFactory.newInstance().createComment(graph.toString()));
 			}
-			catch (XMLStreamException e) {
+			catch ( Exception e) {
 				throw new RuntimeException("Exception while writing to output file", e);
 			}
 		}

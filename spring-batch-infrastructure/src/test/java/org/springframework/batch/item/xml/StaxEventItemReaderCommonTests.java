@@ -20,7 +20,6 @@ import org.springframework.batch.item.sample.Foo;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.oxm.Unmarshaller;
 import org.springframework.oxm.XmlMappingException;
-import org.springframework.xml.transform.StaxSource;
 
 @RunWith(JUnit4ClassRunner.class)
 public class StaxEventItemReaderCommonTests extends AbstractItemStreamItemReaderTests {
@@ -33,15 +32,14 @@ public class StaxEventItemReaderCommonTests extends AbstractItemStreamItemReader
 		reader.setFragmentRootElementName("foo");
 		reader.setUnmarshaller(new Unmarshaller() {
 			public Object unmarshal(Source source) throws XmlMappingException, IOException {
-				StaxSource staxSource = (StaxSource) source;
-				XMLEventReader eventReader = staxSource.getXMLEventReader();
-				Attribute attr;
+				Attribute attr = null ;
 				try {
+					XMLEventReader eventReader = StaxUtils.getXmlEventReader( source);
 					assertTrue(eventReader.nextEvent().isStartDocument());
 					StartElement event = eventReader.nextEvent().asStartElement();
 					attr = (Attribute) event.getAttributes().next();
 				}
-				catch (XMLStreamException e) {
+				catch  (Exception e) {
 					throw new RuntimeException(e);
 				}
 				Foo foo = new Foo();
