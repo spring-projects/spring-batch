@@ -144,5 +144,3 @@ public abstract class StaxUtils {
 		return (XMLEventReader) result;
 	}
 }
-
-
