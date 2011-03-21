@@ -73,6 +73,11 @@ public class FootballJobIntegrationTests {
 		assertEquals(BatchStatus.COMPLETED, execution.getStatus());
 		for (StepExecution stepExecution : execution.getStepExecutions()) {
 			logger.info("Processed: " + stepExecution);
+			if (stepExecution.getStepName().equals("playerload")) {
+				// The effect of the retries
+				assertEquals(new Double(Math.ceil(stepExecution.getReadCount() / 10. + 1)).intValue(),
+						stepExecution.getCommitCount());
+			}
 		}
 	}
 
