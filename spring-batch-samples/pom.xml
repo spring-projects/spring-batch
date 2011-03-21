@@ -196,13 +196,6 @@
 			<scope>runtime</scope>
 		</dependency>
 		<dependency>
-			<groupId>com.oracle.jdbc</groupId>
-			<artifactId>com.springsource.oracle.jdbc</artifactId>
-			<version>10.2.0.2</version>
-			<optional>true</optional>
-			<scope>runtime</scope>
-		</dependency>
-		<dependency>
 			<groupId>postgresql</groupId>
 			<artifactId>postgresql</artifactId>
 			<version>8.3-603.jdbc3</version>
