@@ -184,8 +184,7 @@
 					<xsd:attribute name="data-source" type="xsd:string" default="dataSource">
 						<xsd:annotation>
 							<xsd:documentation source="java:javax.sql.DataSource"><![CDATA[
-							The bean name of the DataSource that is to be used. This attribute 
-							is not required, and only needs to be specified explicitly
+ref"							is not required, and only needs to be specified explicitly
 							if the bean name of the desired DataSource is not 'dataSource'.
 							]]></xsd:documentation>
 							<xsd:appinfo>
@@ -447,6 +446,7 @@
 				</xsd:element>
 			</xsd:choice>
 			<xsd:group ref="transitions" minOccurs="0" maxOccurs="unbounded" />
+			<xsd:element name="listeners" type="stepListenersType" minOccurs="0" maxOccurs="1" />
 		</xsd:sequence>
 		<xsd:attributeGroup ref="parentAttribute" />
 	</xsd:complexType>
@@ -494,6 +494,18 @@
 				<xsd:appinfo>
 					<tool:annotation kind="ref">
 						<tool:expected-type type="org.springframework.core.partition.PartitionHandler" />
+					</tool:annotation>
+				</xsd:appinfo>
+			</xsd:annotation>
+		</xsd:attribute>
+		<xsd:attribute name="aggregator">
+			<xsd:annotation>
+				<xsd:documentation><![CDATA[
+					Reference to a StepExecutionAggregator that will be used to merge the partition results back into the master StepExecution]]>
+				</xsd:documentation>
+				<xsd:appinfo>
+					<tool:annotation kind="ref">
+						<tool:expected-type type="org.springframework.core.partition.support.StepExecutionAggregator" />
 					</tool:annotation>
 				</xsd:appinfo>
 			</xsd:annotation>
@@ -805,12 +817,14 @@
 					<xsd:attributeGroup ref="mergeAttribute" />
 				</xsd:complexType>
 			</xsd:element>
+			<xsd:element name="listeners" type="stepListenersType" minOccurs="0" maxOccurs="1" />
 		</xsd:all>
 		<xsd:attribute name="commit-interval" type="xsd:string" use="optional">
 			<xsd:annotation>
 				<xsd:documentation><![CDATA[
 				The number of items that will be processed before commit is called for the transaction.  
-				Either set this or the chunk-completion-policy but not both.
+				Either set this or the chunk-completion-policy but not both.  Can be specified as an expression
+				that will be evaluated in the scope of the step (e.g. "#{jobParameters['commit.interval']}").
 				]]></xsd:documentation>
 			</xsd:annotation>
 		</xsd:attribute>

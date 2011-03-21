@@ -25,9 +25,9 @@ public abstract class AbstractJobInstanceDaoTests {
 
 	private String fooJob = "foo";
 
-	private JobParameters fooParams = new JobParametersBuilder().addString("stringKey", "stringValue").addLong(
-			"longKey", Long.MAX_VALUE).addDouble("doubleKey", Double.MAX_VALUE).addDate("dateKey", new Date(DATE))
-			.toJobParameters();
+	private JobParameters fooParams = new JobParametersBuilder().addString("stringKey", "stringValue")
+			.addLong("longKey", Long.MAX_VALUE).addDouble("doubleKey", Double.MAX_VALUE)
+			.addDate("dateKey", new Date(DATE)).toJobParameters();
 
 	protected abstract JobInstanceDao getJobInstanceDao();
 
@@ -68,7 +68,7 @@ public abstract class AbstractJobInstanceDaoTests {
 	public void testCreateAndRetrieveWithNullParameter() throws Exception {
 
 		JobParameters jobParameters = new JobParametersBuilder().addString("foo", null).toJobParameters();
-		
+
 		JobInstance fooInstance = dao.createJobInstance(fooJob, jobParameters);
 		assertNotNull(fooInstance.getId());
 		assertEquals(fooJob, fooInstance.getJobName());
@@ -144,7 +144,7 @@ public abstract class AbstractJobInstanceDaoTests {
 
 		// unrelated job instance that should be ignored by the query
 		dao.createJobInstance("anotherJob", new JobParameters());
-		
+
 		// we need two instances of the same job to check ordering
 		dao.createJobInstance(fooJob, new JobParameters());
 
@@ -154,8 +154,9 @@ public abstract class AbstractJobInstanceDaoTests {
 		assertEquals(fooJob, jobInstances.get(1).getJobName());
 		assertEquals(Integer.valueOf(0), jobInstances.get(0).getVersion());
 		assertEquals(Integer.valueOf(0), jobInstances.get(1).getVersion());
-		
-		assertTrue("Last instance should be first on the list", jobInstances.get(0).getId() > jobInstances.get(1).getId());
+
+		assertTrue("Last instance should be first on the list", jobInstances.get(0).getId() > jobInstances.get(1)
+				.getId());
 
 	}
 
@@ -170,15 +171,32 @@ public abstract class AbstractJobInstanceDaoTests {
 
 		// unrelated job instance that should be ignored by the query
 		dao.createJobInstance("anotherJob", new JobParameters());
-		
-		// we need two instances of the same job to check ordering
-		dao.createJobInstance(fooJob, new JobParameters());
 
-		List<JobInstance> jobInstances = dao.getJobInstances(fooJob, 1, 2);
-		assertEquals(1, jobInstances.size());
-		assertEquals(fooJob, jobInstances.get(0).getJobName());
-		assertEquals(Integer.valueOf(0), jobInstances.get(0).getVersion());
+		// we need multiple instances of the same job to check ordering
+		String multiInstanceJob = "multiInstanceJob";
+		String paramKey = "myID";
+		int instanceCount = 6;
+		for (int i = 1; i <= instanceCount; i++) {
+			JobParameters params = new JobParametersBuilder().addLong(paramKey, Long.valueOf(i)).toJobParameters();
+			dao.createJobInstance(multiInstanceJob, params);
+		}
 		
+
+		int startIndex = 3;
+		int queryCount = 2;
+		List<JobInstance> jobInstances = dao.getJobInstances(multiInstanceJob, startIndex, queryCount);
+
+		assertEquals(queryCount, jobInstances.size());
+
+		for (int i = 0; i < queryCount; i++) {
+			JobInstance returnedInstance = jobInstances.get(i);
+			assertEquals(multiInstanceJob, returnedInstance.getJobName());
+			assertEquals(Integer.valueOf(0), returnedInstance.getVersion());
+			
+			//checks the correct instances are returned and the order is descending
+			assertEquals(instanceCount - startIndex - i , returnedInstance.getJobParameters().getLong(paramKey));
+		}
+
 	}
 
 	/**
@@ -192,7 +210,7 @@ public abstract class AbstractJobInstanceDaoTests {
 
 		// unrelated job instance that should be ignored by the query
 		dao.createJobInstance("anotherJob", new JobParameters());
-		
+
 		// we need two instances of the same job to check ordering
 		dao.createJobInstance(fooJob, new JobParameters());
 

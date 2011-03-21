@@ -94,13 +94,10 @@ public class MapJobInstanceDao implements JobInstanceDao {
 				return Long.signum(o2.getId() - o1.getId());
 			}
 		});
-		if (start>=result.size()) {
-			start = result.size();
-		}
-		if (start + count >=result.size()) {
-			count = result.size();
-		}
-		return result.subList(start, count);
+
+		int startIndex = Math.min(start, result.size());
+		int endIndex = Math.min(start + count, result.size());
+		return result.subList(startIndex, endIndex);
 	}
 
 	public JobInstance getJobInstance(JobExecution jobExecution) {

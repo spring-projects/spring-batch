@@ -26,12 +26,12 @@ import org.junit.runner.RunWith;
 import org.springframework.aop.framework.Advised;
 import org.springframework.batch.core.Step;
 import org.springframework.batch.core.StepListener;
-import org.springframework.batch.core.listener.CompositeStepExecutionListener;
+import org.springframework.batch.core.listener.ChunkListenerSupport;
 import org.springframework.batch.core.listener.ItemListenerSupport;
 import org.springframework.batch.core.listener.StepExecutionListenerSupport;
 import org.springframework.batch.core.step.tasklet.TaskletStep;
+import org.springframework.beans.factory.BeanFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.util.ReflectionTestUtils;
@@ -42,83 +42,44 @@ import org.springframework.test.util.ReflectionTestUtils;
  */
 @ContextConfiguration
 @RunWith(SpringJUnit4ClassRunner.class)
-public class StepListenerParserTests {
-	
-	@Autowired
-	@Qualifier("s1")
-	private Step step1;
+public class StepListenerInStepParserTests {
 
 	@Autowired
-	@Qualifier("s2")
-	private Step step2;
-
-	@Autowired
-	@Qualifier("s3")
-	private Step step3;
+	private BeanFactory beanFactory;
 
 	@Test
-	public void testInheritListeners() throws Exception {
-
-		List<?> list = getListeners(step1);
-
-		assertEquals(3, list.size());
-		boolean a = false;
-		boolean b = false;
-		boolean c = false;
-		for (Object listener : list) {
-			if (listener instanceof DummyAnnotationStepExecutionListener) {
-				a = true;
-			}
-			else if (listener instanceof StepExecutionListenerSupport) {
-				b = true;
-			}
-			else if (listener instanceof CompositeStepExecutionListener) {
-				c = true;
-			}
-		}
-		assertTrue(a);
-		assertTrue(b);
-		assertTrue(c);
+	public void testListenersAtStepLevel() throws Exception {
+		Step step = (Step) beanFactory.getBean("s1");
+		List<?> list = getListeners(step);
+		assertEquals(1, list.size());
+		assertTrue(list.get(0) instanceof StepExecutionListenerSupport);
 	}
 
 	@Test
-	public void testInheritListenersNoMerge() throws Exception {
-
-		List<?> list = getListeners(step2);
-
-		assertEquals(2, list.size());
-		boolean a = false;
-		boolean b = false;
-		for (Object listener : list) {
-			if (listener instanceof DummyAnnotationStepExecutionListener) {
-				a = true;
-			}
-			else if (listener instanceof StepExecutionListenerSupport) {
-				b = true;
-			}
-		}
-		assertTrue(a);
-		assertTrue(b);
+	// TODO: BATCH-1689 (expected=BeanCreationException.class)
+	public void testListenersAtStepLevelWrongType() throws Exception {
+		Step step = (Step) beanFactory.getBean("s2");
+		List<?> list = getListeners(step);
+		assertEquals(1, list.size());
+		assertTrue(list.get(0) instanceof ChunkListenerSupport);
 	}
 
 	@Test
-	public void testInheritListenersNoMergeFaultTolerant() throws Exception {
-
-		List<?> list = getListeners(step3);
-
+	public void testListenersAtTaskletAndStepLevels() throws Exception {
+		Step step = (Step) beanFactory.getBean("s3");
+		List<?> list = getListeners(step);
 		assertEquals(2, list.size());
-		boolean a = false;
-		boolean b = false;
-		for (Object listener : list) {
-			if (listener instanceof DummyAnnotationStepExecutionListener) {
-				a = true;
-			}
-			else if (listener instanceof ItemListenerSupport) {
-				b = true;
-			}
-		}
-		assertTrue(a);
-		assertTrue(b);
+		assertTrue(list.get(0) instanceof StepExecutionListenerSupport);
+		assertTrue(list.get(1) instanceof ChunkListenerSupport);
+	}
+
+	@Test
+	public void testListenersAtChunkAndStepLevels() throws Exception {
+		Step step = (Step) beanFactory.getBean("s4");
+		List<?> list = getListeners(step);
+		assertEquals(2, list.size());
+		assertTrue(list.get(0) instanceof StepExecutionListenerSupport);
+		assertTrue(list.get(1) instanceof ItemListenerSupport);
 	}
 
 	@SuppressWarnings("unchecked")
@@ -164,5 +125,4 @@ public class StepListenerParserTests {
 		}
 		return r;
 	}
-
 }

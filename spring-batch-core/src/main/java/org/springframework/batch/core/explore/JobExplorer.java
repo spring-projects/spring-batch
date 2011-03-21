@@ -21,6 +21,7 @@ import java.util.Set;
 import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.JobInstance;
 import org.springframework.batch.core.StepExecution;
+import org.springframework.batch.item.ExecutionContext;
 
 /**
  * Entry point for browsing executions of running or historical jobs and steps.
@@ -45,7 +46,11 @@ public interface JobExplorer {
 	List<JobInstance> getJobInstances(String jobName, int start, int count);
 
 	/**
-	 * Retrieve a {@link JobExecution} by its id.
+	 * Retrieve a {@link JobExecution} by its id. The complete object graph for
+	 * this execution should be returned (unless otherwise indicated) including
+	 * the parent {@link JobInstance} and associated {@link ExecutionContext}
+	 * and {@link StepExecution} instances (also including their execution
+	 * contexts).
 	 * 
 	 * @param executionId the job execution id
 	 * @return the {@link JobExecution} with this id, or null if not found
@@ -54,11 +59,15 @@ public interface JobExplorer {
 
 	/**
 	 * Retrieve a {@link StepExecution} by its id and parent
-	 * {@link JobExecution} id.
+	 * {@link JobExecution} id. The execution context for the step should be
+	 * available in the result, and the parent job execution should have its
+	 * primitive properties, but may not contain the job instance information.
 	 * 
 	 * @param jobExecutionId the parent job execution id
 	 * @param stepExecutionId the step execution id
 	 * @return the {@link StepExecution} with this id, or null if not found
+	 * 
+	 * @see #getJobExecution(Long)
 	 */
 	StepExecution getStepExecution(Long jobExecutionId, Long stepExecutionId);
 

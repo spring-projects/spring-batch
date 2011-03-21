@@ -173,10 +173,28 @@ public class JobExecutionTests {
 	}
 
 	@Test
+	public void testStepExecutionsWithSameName() throws Exception {
+		assertEquals(0, execution.getStepExecutions().size());
+		execution.createStepExecution("step");
+		assertEquals(1, execution.getStepExecutions().size());
+		execution.createStepExecution("step");
+		assertEquals(2, execution.getStepExecutions().size());
+	}
+
+	@Test
 	public void testSetStepExecutions() throws Exception {
 		assertEquals(0, execution.getStepExecutions().size());
 		execution.addStepExecutions(Arrays.asList(new StepExecution("step", execution)));
 		assertEquals(1, execution.getStepExecutions().size());
+	}
+
+	@Test
+	public void testSetStepExecutionsWithIds() throws Exception {
+		assertEquals(0, execution.getStepExecutions().size());
+		new StepExecution("step", execution, 1L);
+		assertEquals(1, execution.getStepExecutions().size());
+		new StepExecution("step", execution, 2L);
+		assertEquals(2, execution.getStepExecutions().size());
 	}
 
 	@Test

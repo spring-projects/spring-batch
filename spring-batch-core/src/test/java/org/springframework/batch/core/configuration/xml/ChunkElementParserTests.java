@@ -66,6 +66,14 @@ public class ChunkElementParserTests {
 	}
 
 	@Test
+	public void testCommitIntervalLateBinding() throws Exception {
+		ConfigurableApplicationContext context = new ClassPathXmlApplicationContext(
+				"org/springframework/batch/core/configuration/xml/ChunkElementCommitIntervalParserTests-context.xml");
+		Step step = (Step) context.getBean("s1", Step.class);
+		assertNotNull("Step not parsed", step);
+	}
+
+	@Test
 	public void testRetryPolicyAttribute() throws Exception {
 		ConfigurableApplicationContext context = new ClassPathXmlApplicationContext(
 				"org/springframework/batch/core/configuration/xml/ChunkElementRetryPolicyParserTests-context.xml");

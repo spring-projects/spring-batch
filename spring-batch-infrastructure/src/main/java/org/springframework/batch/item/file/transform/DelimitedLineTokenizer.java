@@ -168,8 +168,9 @@ public class DelimitedLineTokenizer extends AbstractLineTokenizer {
 				endLength = 1;
 			}
 			value = value.substring(1, endLength);
+			return value;
 		}
-		return value;
+		return string;
 	}
 
 	/**

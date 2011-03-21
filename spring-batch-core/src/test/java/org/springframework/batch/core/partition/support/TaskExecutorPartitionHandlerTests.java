@@ -10,7 +10,6 @@ import java.util.Set;
 import java.util.TreeSet;
 
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.springframework.batch.core.ExitStatus;
 import org.springframework.batch.core.JobExecution;
@@ -60,12 +59,11 @@ public class TaskExecutorPartitionHandlerTests {
 		handler.afterPropertiesSet();
 	}
 
-	@Ignore //TODO update or simply remove?
 	@Test
-	public void testAfterPropertiesSet() throws Exception {
+	public void testNullStep() throws Exception {
 		handler = new TaskExecutorPartitionHandler();
 		try {
-			handler.afterPropertiesSet();
+			handler.handle(stepExecutionSplitter, stepExecution);
 			fail("Expected IllegalArgumentException");
 		}
 		catch (IllegalArgumentException e) {

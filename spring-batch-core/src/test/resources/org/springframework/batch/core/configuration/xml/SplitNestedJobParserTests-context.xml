@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans:beans xmlns="http://www.springframework.org/schema/batch" xmlns:beans="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.springframework.org/schema/batch http://www.springframework.org/schema/batch/spring-batch-2.1.xsd
+        http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.5.xsd">
+
+	<beans:import resource="classpath:/org/springframework/batch/core/configuration/xml/common-context.xml" />
+
+	<job id="job">
+		<split id="split1" next="s4">
+			<flow>
+				<!-- Missing state for [StateTransition: [state=job.split1.0.f2step1, pattern=*, next=job.split1.0.f2split1]] -->
+				<step id="f2step1" parent="step3" next="f2split1" />
+				<split id="f2split1">
+					<flow>
+						<step id="f2split1s1" parent="step1" />
+					</flow>
+					<flow>
+						<step id="f2split1s2" parent="step1" />
+					</flow>
+				</split>
+			</flow>
+			<flow>
+				<step id="f1step1" parent="step1" />
+			</flow>
+		</split>
+		<step id="s4" parent="step4" />
+	</job>
+
+</beans:beans>

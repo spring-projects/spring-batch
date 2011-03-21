@@ -27,12 +27,21 @@ import org.springframework.batch.repeat.policy.SimpleCompletionPolicy;
 import org.springframework.util.Assert;
 
 /**
+ * <p>
  * A {@link CompletionPolicy} that picks up a commit interval from
  * {@link JobParameters} by listening to the start of a step. Use anywhere that
  * a {@link CompletionPolicy} can be used (usually at the chunk level in a
  * step), and inject as a {@link StepExecutionListener} into the surrounding
  * step. N.B. only after the step has started will the completion policy be
  * usable.
+ * </p>
+ * 
+ * <p>
+ * It is easier and probably preferable to simply declare the chunk with a
+ * commit-interval that is a late-binding expression (e.g.
+ * <code>#{jobParameters['commit.interval']}</code>). That feature is available
+ * from of Spring Batch 2.1.7.
+ * </p>
  * 
  * @author Dave Syer
  * 

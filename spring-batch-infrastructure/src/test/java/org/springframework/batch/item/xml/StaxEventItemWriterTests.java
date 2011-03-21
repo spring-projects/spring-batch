@@ -106,13 +106,14 @@ public class StaxEventItemWriterTests {
 		writer = createItemWriter();
 		writer.open(executionContext);
 		writer.write(items);
+		writer.write(items);
 		writer.close();
 
 		// check the output is concatenation of 'before restart' and 'after
 		// restart' writes.
 		String outputFile = getOutputFileContent();
-		assertEquals(2, StringUtils.countOccurrencesOf(outputFile, TEST_STRING));
-		assertEquals("<root>" + TEST_STRING + TEST_STRING + "</root>", outputFile.replace(" ", ""));
+		assertEquals(3, StringUtils.countOccurrencesOf(outputFile, TEST_STRING));
+		assertEquals("<root>" + TEST_STRING + TEST_STRING + TEST_STRING + "</root>", outputFile.replace(" ", ""));
 	}
 
 	@Test
