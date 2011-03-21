@@ -38,7 +38,6 @@ import org.springframework.core.io.Resource;
 import org.springframework.oxm.Unmarshaller;
 import org.springframework.util.Assert;
 import org.springframework.util.ClassUtils;
-import org.springframework.xml.transform.StaxSource;
 
 /**
  * Item reader for reading XML input based on StAX.
@@ -52,8 +51,7 @@ import org.springframework.xml.transform.StaxSource;
  * 
  * @author Robert Kasanicky
  */
-public class StaxEventItemReader<T> extends AbstractItemCountingItemStreamItemReader<T> implements
-		ResourceAwareItemReaderItemStream<T>, InitializingBean {
+public class StaxEventItemReader<T> extends AbstractItemCountingItemStreamItemReader<T> implements ResourceAwareItemReaderItemStream<T>, InitializingBean {
 
 	private static final Log logger = LogFactory.getLog(StaxEventItemReader.class);
 
@@ -232,7 +230,7 @@ public class StaxEventItemReader<T> extends AbstractItemCountingItemStreamItemRe
 			fragmentReader.markStartFragment();
 
 			@SuppressWarnings("unchecked")
-			T mappedFragment = (T) unmarshaller.unmarshal(new StaxSource(fragmentReader));
+			T mappedFragment = (T) unmarshaller.unmarshal(StaxUtils.getSource(fragmentReader));
 
 			item = mappedFragment;
 			fragmentReader.markFragmentProcessed();
