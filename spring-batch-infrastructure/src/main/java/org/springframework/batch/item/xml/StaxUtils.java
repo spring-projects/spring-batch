@@ -16,17 +16,18 @@
 
 package org.springframework.batch.item.xml;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-import org.springframework.util.Assert;
-import org.springframework.util.ClassUtils;
+import java.lang.reflect.Constructor;
+import java.lang.reflect.Method;
 
 import javax.xml.stream.XMLEventReader;
 import javax.xml.stream.XMLEventWriter;
 import javax.xml.transform.Result;
 import javax.xml.transform.Source;
-import java.lang.reflect.Constructor;
-import java.lang.reflect.Method;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.springframework.util.Assert;
+import org.springframework.util.ClassUtils;
 
 /**
  * This class provides a little bit of indirection to avoid ugly conditional object creation. It is unfortunately
@@ -39,8 +40,6 @@ import java.lang.reflect.Method;
  *
  * @author Josh Long
  *
- * @see org.springframework.util.xml.StaxUtils
- * @see org.springframework.util.xml.StaxSource
  * @see org.springframework.xml.transform.StaxSource
  */
 public abstract class StaxUtils {
