@@ -19,16 +19,15 @@ import org.springframework.batch.item.ExecutionContext;
 import org.springframework.util.Assert;
 
 /**
- * Facilitates assigning names to objects persisting data in
- * {@link ExecutionContext} and generating keys for {@link ExecutionContext}
- * based on the name.
+ * Facilitates assigning names to objects persisting data in {@link ExecutionContext} and generating keys for
+ * {@link ExecutionContext} based on the name.
  * 
  * @author Robert Kasanicky
  */
 public class ExecutionContextUserSupport {
 
 	private String name;
-	
+
 	public ExecutionContextUserSupport() {
 		super();
 	}
@@ -39,28 +38,25 @@ public class ExecutionContextUserSupport {
 	}
 
 	/**
-	 * @return name used to uniquely identify this instance's entries in shared
-	 * context.
+	 * @return name used to uniquely identify this instance's entries in shared context.
 	 */
 	protected String getName() {
 		return this.name;
 	}
 
 	/**
-	 * @param name unique name for the item stream used to create execution
-	 * context keys.
+	 * @param name unique name used to create execution context keys.
 	 */
 	public void setName(String name) {
 		this.name = name;
 	}
 
 	/**
-	 * Prefix the argument with the name of the item stream to create a unique
-	 * key that can be safely used to identify data stored in
-	 * {@link ExecutionContext}.
+	 * Prefix the argument with {@link #getName()} to create a unique key that can be safely used to identify data
+	 * stored in {@link ExecutionContext}.
 	 */
 	public String getKey(String s) {
-		Assert.hasLength(name, "ItemStream must have a name assigned.");
+		Assert.hasText(name, "Name must be assigned for the sake of defining the execution context keys prefix.");
 		return name + "." + s;
 	}
 
