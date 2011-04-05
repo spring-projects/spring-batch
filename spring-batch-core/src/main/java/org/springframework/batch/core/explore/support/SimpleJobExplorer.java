@@ -77,6 +77,9 @@ public class SimpleJobExplorer implements JobExplorer {
 		List<JobExecution> executions = jobExecutionDao.findJobExecutions(jobInstance);
 		for (JobExecution jobExecution : executions) {
 			getJobExecutionDependencies(jobExecution);
+			for (StepExecution stepExecution : jobExecution.getStepExecutions()) {
+				getStepExecutionDependencies(stepExecution);
+			}
 		}
 		return executions;
 	}
@@ -92,6 +95,9 @@ public class SimpleJobExplorer implements JobExplorer {
 		Set<JobExecution> executions = jobExecutionDao.findRunningJobExecutions(jobName);
 		for (JobExecution jobExecution : executions) {
 			getJobExecutionDependencies(jobExecution);
+			for (StepExecution stepExecution : jobExecution.getStepExecutions()) {
+				getStepExecutionDependencies(stepExecution);
+			}
 		}
 		return executions;
 	}
