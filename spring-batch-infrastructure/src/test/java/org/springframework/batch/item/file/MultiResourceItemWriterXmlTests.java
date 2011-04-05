@@ -8,7 +8,6 @@ import java.util.Arrays;
 
 import javax.xml.stream.XMLEventFactory;
 import javax.xml.stream.XMLEventWriter;
-import javax.xml.stream.XMLStreamException;
 import javax.xml.transform.Result;
 
 import org.junit.Before;
