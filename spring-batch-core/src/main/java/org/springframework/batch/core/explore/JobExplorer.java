@@ -78,12 +78,22 @@ public interface JobExplorer {
 	JobInstance getJobInstance(Long instanceId);
 
 	/**
+	 * Retrieve job executions by their job instance. The corresponding step
+	 * executions may not be fully hydrated (e.g. their execution context may be
+	 * missing), depending on the implementation. Use
+	 * {@link #getStepExecution(Long, Long)} to hydrate them in that case.
+	 * 
 	 * @param jobInstance the {@link JobInstance} to query
 	 * @return the set of all executions for the specified {@link JobInstance}
 	 */
 	List<JobExecution> getJobExecutions(JobInstance jobInstance);
 
 	/**
+	 * Retrieve running job executions. The corresponding step executions may
+	 * not be fully hydrated (e.g. their execution context may be missing),
+	 * depending on the implementation. Use
+	 * {@link #getStepExecution(Long, Long)} to hydrate them in that case.
+	 * 
 	 * @param jobName the name of the job
 	 * @return the set of running executions for jobs with the specified name
 	 */
