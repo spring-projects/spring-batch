@@ -61,6 +61,7 @@ public abstract class StaxUtils {
 
 	private static Method staxUtilsSourceMethodOnSpring30, staxUtilsResultMethodOnSpring30;
 
+	@SuppressWarnings("rawtypes")
 	private static Constructor staxSourceClassCtorOnSpringWs15, staxResultClassCtorOnSpringWs15;
 
 	static {

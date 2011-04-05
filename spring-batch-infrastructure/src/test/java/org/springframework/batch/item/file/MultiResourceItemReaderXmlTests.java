@@ -1,6 +1,15 @@
 package org.springframework.batch.item.file;
 
+import java.io.IOException;
+import java.util.Comparator;
+
+import javax.xml.stream.XMLEventReader;
+import javax.xml.stream.events.Attribute;
+import javax.xml.stream.events.StartElement;
+import javax.xml.transform.Source;
+
 import junit.framework.Assert;
+
 import org.junit.internal.runners.JUnit4ClassRunner;
 import org.junit.runner.RunWith;
 import org.springframework.batch.item.AbstractItemStreamItemReaderTests;
@@ -13,15 +22,6 @@ import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.Resource;
 import org.springframework.oxm.Unmarshaller;
 import org.springframework.oxm.XmlMappingException;
-
-import javax.xml.stream.XMLEventReader;
-import javax.xml.stream.XMLStreamException;
-import javax.xml.stream.events.Attribute;
-import javax.xml.stream.events.StartElement;
-import javax.xml.transform.Source;
-import java.io.IOException;
-import java.util.Comparator;
-//import org.springframework.xml.transform.StaxSource;
 
 @RunWith(JUnit4ClassRunner.class)
 public class MultiResourceItemReaderXmlTests extends AbstractItemStreamItemReaderTests {
