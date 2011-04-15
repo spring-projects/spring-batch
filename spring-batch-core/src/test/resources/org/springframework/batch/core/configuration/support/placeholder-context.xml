@@ -6,17 +6,13 @@
 		http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-2.0.xsd
 		http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-2.0.xsd">
 
-	<bean class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
-		<property name="properties" value="foo=bar" />
-		<property name="order" value="1"/>
+	<bean id="test-job" class="org.springframework.batch.core.job.JobSupport">
+		<property name="name" value="${bar}" />
 	</bean>
 
-	<bean class="org.springframework.beans.factory.config.CustomEditorConfigurer">
-		<property name="customEditors">
-			<map>
-				<entry key="double[]" value="org.springframework.batch.support.IntArrayPropertyEditor"/>
-			</map>
-		</property>
+	<bean id="unique" class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+		<property name="properties" value="bar=spam" />
+		<property name="order" value="0"/>
 	</bean>
 
 </beans>

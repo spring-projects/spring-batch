@@ -238,6 +238,11 @@ public class ClassPathXmlApplicationContextFactory implements ApplicationContext
 			super.customizeBeanFactory(beanFactory);
 			if (parentBeanFactory != null) {
 				ClassPathXmlApplicationContextFactory.this.prepareBeanFactory(parentBeanFactory, beanFactory);
+				for (Class<? extends BeanFactoryPostProcessor> cls : beanFactoryPostProcessorClasses) {
+					for (String name : parent.getBeanNamesForType(cls)) {
+						beanFactory.registerSingleton(name, ((BeanFactoryPostProcessor) parent.getBean(name)));
+					}
+				}
 			}
 		}
 
@@ -245,10 +250,10 @@ public class ClassPathXmlApplicationContextFactory implements ApplicationContext
 		protected Resource[] getConfigResources() {
 			return new Resource[] { resource };
 		}
-		
+
 		@Override
 		public String toString() {
-			return "ResourceXmlApplicationContext:"+getId();
+			return "ResourceXmlApplicationContext:" + getId();
 		}
 
 	}
@@ -256,10 +261,7 @@ public class ClassPathXmlApplicationContextFactory implements ApplicationContext
 	/**
 	 * Extension point for special subclasses that want to do more complex
 	 * things with the context prior to refresh. The default implementation
-	 * copies bean factory post processors according to the values requested.
-	 * The bean factory for the context will be available if needed through
-	 * {@link ConfigurableApplicationContext#getBeanFactory()
-	 * context.getBeanFactory()}.
+	 * does nothing.
 	 * 
 	 * @param parent the parent for the new application context
 	 * @param context the new application context before it is refreshed, but
@@ -268,11 +270,6 @@ public class ClassPathXmlApplicationContextFactory implements ApplicationContext
 	 * @see ClassPathXmlApplicationContextFactory#setBeanFactoryPostProcessorClasses(Class[])
 	 */
 	protected void prepareContext(ConfigurableApplicationContext parent, ConfigurableApplicationContext context) {
-		for (Class<? extends BeanFactoryPostProcessor> cls : beanFactoryPostProcessorClasses) {
-			for (String name : parent.getBeanNamesForType(cls)) {
-				context.addBeanFactoryPostProcessor((BeanFactoryPostProcessor) parent.getBean(name));
-			}
-		}
 	}
 
 	/**

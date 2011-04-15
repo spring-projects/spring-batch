@@ -65,6 +65,17 @@ public class ClassPathXmlApplicationContextFactoryTests {
 	}
 
 	@Test
+	public void testBeanFactoryPostProcessorOrderRespected() {
+		factory.setApplicationContext(new ClassPathXmlApplicationContext(ClassUtils.addResourcePathToPackagePath(
+				getClass(), "parent-context.xml")));
+		factory.setResource(new ClassPathResource(ClassUtils.addResourcePathToPackagePath(getClass(),
+				"placeholder-context.xml")));
+		ConfigurableApplicationContext context = factory.createApplicationContext();
+		assertEquals("test-job", context.getBeanNamesForType(Job.class)[0]);
+		assertEquals("spam", ((Job) context.getBean("test-job", Job.class)).getName());
+	}
+
+	@Test
 	public void testBeanFactoryPostProcessorsNotCopied() {
 		factory.setApplicationContext(new ClassPathXmlApplicationContext(ClassUtils.addResourcePathToPackagePath(
 				getClass(), "parent-context.xml")));
