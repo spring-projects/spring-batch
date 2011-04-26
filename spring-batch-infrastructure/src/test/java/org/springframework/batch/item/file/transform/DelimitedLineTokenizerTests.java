@@ -252,4 +252,48 @@ public class DelimitedLineTokenizerTests {
 		assertEquals(4, line.getFieldCount());
 		assertEquals("", line.readString(2));
 	}
+
+	@Test
+	public void testTokenizeWithIncludedFields() {
+		tokenizer.setIncludedFields(new int[] {1,2});
+		FieldSet line = tokenizer.tokenize("\"a\",\"b\",\"c\",\"d\"");
+		assertEquals(2, line.getFieldCount());
+		assertEquals("c", line.readString(1));
+	}
+
+	@Test
+	public void testTokenizeWithIncludedFieldsAndEmptyEnd() {
+		tokenizer.setIncludedFields(new int[] {1,3});
+		FieldSet line = tokenizer.tokenize("\"a\",\"b\",\"c\",");
+		assertEquals(2, line.getFieldCount());
+		assertEquals("", line.readString(1));
+	}
+
+	@Test
+	public void testTokenizeWithIncludedFieldsAndNames() {
+		tokenizer.setIncludedFields(new int[] {1,2});
+		tokenizer.setNames(new String[] {"foo", "bar"});
+		FieldSet line = tokenizer.tokenize("\"a\",\"b\",\"c\",\"d\"");
+		assertEquals(2, line.getFieldCount());
+		assertEquals("c", line.readString("bar"));
+	}
+
+	@Test(expected=IncorrectTokenCountException.class)
+	public void testTokenizeWithIncludedFieldsAndTooFewNames() {
+		tokenizer.setIncludedFields(new int[] {1,2});
+		tokenizer.setNames(new String[] {"foo"});
+		FieldSet line = tokenizer.tokenize("\"a\",\"b\",\"c\",\"d\"");
+		assertEquals(2, line.getFieldCount());
+		assertEquals("c", line.readString("bar"));
+	}
+
+	@Test(expected=IncorrectTokenCountException.class)
+	public void testTokenizeWithIncludedFieldsAndTooManyNames() {
+		tokenizer.setIncludedFields(new int[] {1,2});
+		tokenizer.setNames(new String[] {"foo", "bar", "spam"});
+		FieldSet line = tokenizer.tokenize("\"a\",\"b\",\"c\",\"d\"");
+		assertEquals(2, line.getFieldCount());
+		assertEquals("c", line.readString("bar"));
+	}
+
 }
