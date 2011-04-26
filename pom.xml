@@ -508,8 +508,8 @@
 					<aggregate>true</aggregate>
 					<breakiterator>true</breakiterator>
 					<links>
-						<link>http://java.sun.com/j2ee/1.4/docs/api</link>
-						<link>http://java.sun.com/j2se/1.5.0/docs/api</link>
+						<link>http://download.oracle.com/javaee/5/api</link>
+						<link>http://download.oracle.com/javase/1.5.0/docs/api</link>
 						<link>http://jakarta.apache.org/commons/collections/apidocs-COLLECTIONS_3_0/</link>
 						<link>http://jakarta.apache.org/commons/dbcp/apidocs/</link>
 						<link>http://jakarta.apache.org/commons/fileupload/apidocs/</link>
@@ -524,7 +524,7 @@
 						<link>http://static.springframework.org/spring-batch/apidocs/</link>
 						<link>http://static.springframework.org/spring-ws/site/apidocs/</link>
 					</links>
-					<excludePackageNames>example</excludePackageNames>
+					<excludePackageNames>test.*:*.example:*.sample</excludePackageNames>
 				</configuration>
 			</plugin>
 			<plugin>
