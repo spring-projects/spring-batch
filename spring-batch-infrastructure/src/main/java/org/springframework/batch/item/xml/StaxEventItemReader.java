@@ -42,16 +42,16 @@ import org.springframework.util.ClassUtils;
 /**
  * Item reader for reading XML input based on StAX.
  * 
- * It extracts fragments from the input XML document which correspond to records
- * for processing. The fragments are wrapped with StartDocument and EndDocument
- * events so that the fragments can be further processed like standalone XML
+ * It extracts fragments from the input XML document which correspond to records for processing. The fragments are
+ * wrapped with StartDocument and EndDocument events so that the fragments can be further processed like standalone XML
  * documents.
  * 
  * The implementation is *not* thread-safe.
  * 
  * @author Robert Kasanicky
  */
-public class StaxEventItemReader<T> extends AbstractItemCountingItemStreamItemReader<T> implements ResourceAwareItemReaderItemStream<T>, InitializingBean {
+public class StaxEventItemReader<T> extends AbstractItemCountingItemStreamItemReader<T> implements
+		ResourceAwareItemReaderItemStream<T>, InitializingBean {
 
 	private static final Log logger = LogFactory.getLog(StaxEventItemReader.class);
 
@@ -79,8 +79,7 @@ public class StaxEventItemReader<T> extends AbstractItemCountingItemStreamItemRe
 
 	/**
 	 * In strict mode the reader will throw an exception on
-	 * {@link #open(org.springframework.batch.item.ExecutionContext)} if the
-	 * input resource does not exist.
+	 * {@link #open(org.springframework.batch.item.ExecutionContext)} if the input resource does not exist.
 	 * @param strict false by default
 	 */
 	public void setStrict(boolean strict) {
@@ -92,8 +91,7 @@ public class StaxEventItemReader<T> extends AbstractItemCountingItemStreamItemRe
 	}
 
 	/**
-	 * @param unmarshaller maps xml fragments corresponding to records to
-	 * objects
+	 * @param unmarshaller maps xml fragments corresponding to records to objects
 	 */
 	public void setUnmarshaller(Unmarshaller unmarshaller) {
 		this.unmarshaller = unmarshaller;
@@ -107,12 +105,11 @@ public class StaxEventItemReader<T> extends AbstractItemCountingItemStreamItemRe
 	}
 
 	/**
-	 * Ensure that all required dependencies for the ItemReader to run are
-	 * provided after all properties have been set.
+	 * Ensure that all required dependencies for the ItemReader to run are provided after all properties have been set.
 	 * 
 	 * @see org.springframework.beans.factory.InitializingBean#afterPropertiesSet()
-	 * @throws IllegalArgumentException if the Resource, FragmentDeserializer or
-	 * FragmentRootElementName is null, or if the root element is empty.
+	 * @throws IllegalArgumentException if the Resource, FragmentDeserializer or FragmentRootElementName is null, or if
+	 * the root element is empty.
 	 * @throws IllegalStateException if the Resource does not exist.
 	 */
 	public void afterPropertiesSet() throws Exception {
@@ -125,19 +122,15 @@ public class StaxEventItemReader<T> extends AbstractItemCountingItemStreamItemRe
 	}
 
 	/**
-	 * Responsible for moving the cursor before the StartElement of the fragment
-	 * root.
+	 * Responsible for moving the cursor before the StartElement of the fragment root.
 	 * 
-	 * This implementation simply looks for the next corresponding element, it
-	 * does not care about element nesting. You will need to override this
-	 * method to correctly handle composite fragments.
+	 * This implementation simply looks for the next corresponding element, it does not care about element nesting. You
+	 * will need to override this method to correctly handle composite fragments.
 	 * 
-	 * @return <code>true</code> if next fragment was found, <code>false</code>
-	 * otherwise.
+	 * @return <code>true</code> if next fragment was found, <code>false</code> otherwise.
 	 * 
-	 * @throws NonTransientResourceException if the cursor could not be
-	 * moved. This will be treated as fatal and subsequent calls to read will
-	 * return null.
+	 * @throws NonTransientResourceException if the cursor could not be moved. This will be treated as fatal and
+	 * subsequent calls to read will return null.
 	 */
 	protected boolean moveCursorToNextFragment(XMLEventReader reader) throws NonTransientResourceException {
 		try {
@@ -229,20 +222,22 @@ public class StaxEventItemReader<T> extends AbstractItemCountingItemStreamItemRe
 		if (success) {
 			fragmentReader.markStartFragment();
 
-			@SuppressWarnings("unchecked")
-			T mappedFragment = (T) unmarshaller.unmarshal(StaxUtils.getSource(fragmentReader));
-
-			item = mappedFragment;
-			fragmentReader.markFragmentProcessed();
+			try {
+				@SuppressWarnings("unchecked")
+				T mappedFragment = (T) unmarshaller.unmarshal(StaxUtils.getSource(fragmentReader));
+				item = mappedFragment;
+			}
+			finally {
+				fragmentReader.markFragmentProcessed();
+			}
 		}
 
 		return item;
 	}
 
 	/*
-	 * jumpToItem is overridden because reading in and attempting to bind an
-	 * entire fragment is unacceptable in a restart scenario, and may cause
-	 * exceptions to be thrown that were already skipped in previous runs.
+	 * jumpToItem is overridden because reading in and attempting to bind an entire fragment is unacceptable in a
+	 * restart scenario, and may cause exceptions to be thrown that were already skipped in previous runs.
 	 */
 	@Override
 	protected void jumpToItem(int itemIndex) throws Exception {
@@ -253,10 +248,9 @@ public class StaxEventItemReader<T> extends AbstractItemCountingItemStreamItemRe
 	}
 
 	/*
-	 * Read until the first StartElement tag that matches the provided
-	 * fragmentRootElementName. Because there may be any number of tags in
-	 * between where the reader is now and the fragment start, this is done in a
-	 * loop until the element type and name match.
+	 * Read until the first StartElement tag that matches the provided fragmentRootElementName. Because there may be any
+	 * number of tags in between where the reader is now and the fragment start, this is done in a loop until the
+	 * element type and name match.
 	 */
 	private void readToStartFragment() throws XMLStreamException {
 		while (true) {
@@ -269,10 +263,9 @@ public class StaxEventItemReader<T> extends AbstractItemCountingItemStreamItemRe
 	}
 
 	/*
-	 * Read until the first EndElement tag that matches the provided
-	 * fragmentRootElementName. Because there may be any number of tags in
-	 * between where the reader is now and the fragment end tag, this is done in
-	 * a loop until the element type and name match
+	 * Read until the first EndElement tag that matches the provided fragmentRootElementName. Because there may be any
+	 * number of tags in between where the reader is now and the fragment end tag, this is done in a loop until the
+	 * element type and name match
 	 */
 	private void readToEndFragment() throws XMLStreamException {
 		while (true) {
