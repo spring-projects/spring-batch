@@ -24,7 +24,9 @@ import org.springframework.core.io.AbstractResource;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
+import org.springframework.oxm.UncategorizedXmlMappingException;
 import org.springframework.oxm.Unmarshaller;
+import org.springframework.oxm.UnmarshallingFailureException;
 import org.springframework.oxm.XmlMappingException;
 import org.springframework.util.ClassUtils;
 
@@ -89,8 +91,8 @@ public class StaxEventItemReaderTests {
 	}
 
 	/**
-	 * Regular usage scenario. ItemReader should pass XML fragments to
-	 * unmarshaller wrapped with StartDocument and EndDocument events.
+	 * Regular usage scenario. ItemReader should pass XML fragments to unmarshaller wrapped with StartDocument and
+	 * EndDocument events.
 	 */
 	@Test
 	public void testFragmentWrapping() throws Exception {
@@ -197,8 +199,7 @@ public class StaxEventItemReaderTests {
 	}
 
 	/**
-	 * Statistics return the current record count. Calling read after end of
-	 * input does not increase the counter.
+	 * Statistics return the current record count. Calling read after end of input does not increase the counter.
 	 */
 	@Test
 	public void testExecutionContext() throws Exception {
@@ -335,6 +336,55 @@ public class StaxEventItemReaderTests {
 
 	}
 
+	/**
+	 * Make sure the reader doesn't end up in inconsistent state if there's an error during unmarshalling (BATCH-1738).
+	 * After an error during <code>read</code> the next <code>read</code> call should continue with reading the next
+	 * fragment.
+	 */
+	@Test
+	public void exceptionDuringUnmarshalling() throws Exception {
+		source.setUnmarshaller(new TroublemakerUnmarshaller());
+		source.afterPropertiesSet();
+
+		source.open(executionContext);
+		try {
+			source.read();
+			fail();
+		}
+		catch (UnmarshallingFailureException expected) {
+			assert expected.getMessage() == TroublemakerUnmarshaller.MESSAGE;
+		}
+
+		try {
+			source.read();
+			fail();
+		}
+		catch (UnmarshallingFailureException expected) {
+			assert expected.getMessage() == TroublemakerUnmarshaller.MESSAGE;
+		}
+		assertNull(source.read());
+	}
+
+	/**
+	 * Stub emulating problems during unmarshalling.
+	 */
+	private static class TroublemakerUnmarshaller implements Unmarshaller {
+
+		public static final String MESSAGE = "Unmarshallers on strike.";
+
+		@Override
+		public Object unmarshal(Source source) throws XmlMappingException, IOException {
+			throw new UnmarshallingFailureException(MESSAGE);
+		}
+
+		@SuppressWarnings("rawtypes")
+		@Override
+		public boolean supports(Class clazz) {
+			return true;
+		}
+
+	}
+
 	private StaxEventItemReader<List<XMLEvent>> createNewInputSouce() {
 		Resource resource = new ByteArrayResource(xml.getBytes());
 
@@ -349,9 +399,8 @@ public class StaxEventItemReaderTests {
 	}
 
 	/**
-	 * A simple XMLEvent unmarshaller mock - check for the start and end
-	 * document events for the fragment root & end tags + skips the fragment
-	 * contents.
+	 * A simple XMLEvent unmarshaller mock - check for the start and end document events for the fragment root & end
+	 * tags + skips the fragment contents.
 	 */
 	private static class MockFragmentUnmarshaller implements Unmarshaller {
 
@@ -379,8 +428,7 @@ public class StaxEventItemReaderTests {
 		}
 
 		/**
-		 * A simple mapFragment implementation checking the
-		 * StaxEventReaderItemReader basic read functionality.
+		 * A simple mapFragment implementation checking the StaxEventReaderItemReader basic read functionality.
 		 * 
 		 * @param source
 		 * @return list of the events from fragment body
@@ -389,7 +437,7 @@ public class StaxEventItemReaderTests {
 
 			List<XMLEvent> fragmentContent;
 			try {
-				XMLEventReader eventReader = StaxUtils.getXmlEventReader( source);
+				XMLEventReader eventReader = StaxUtils.getXmlEventReader(source);
 
 				// first event should be StartDocument
 				XMLEvent event1 = eventReader.nextEvent();
