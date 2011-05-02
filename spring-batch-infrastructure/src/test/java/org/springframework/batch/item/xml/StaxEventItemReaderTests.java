@@ -372,13 +372,11 @@ public class StaxEventItemReaderTests {
 
 		public static final String MESSAGE = "Unmarshallers on strike.";
 
-		@Override
 		public Object unmarshal(Source source) throws XmlMappingException, IOException {
 			throw new UnmarshallingFailureException(MESSAGE);
 		}
 
 		@SuppressWarnings("rawtypes")
-		@Override
 		public boolean supports(Class clazz) {
 			return true;
 		}
