@@ -28,8 +28,8 @@ import org.springframework.util.Assert;
 
 /**
  * {@link ItemWriter} that uses a Hibernate session to save or update entities
- * that are not part of the current Hibernate session. It will also flush and
- * clear the session at chunk boundaries.<br/>
+ * that are not part of the current Hibernate session. It will also flush the
+ * session at chunk boundaries.<br/>
  * <br/>
  * 
  * The writer is thread safe after its properties are set (normal singleton
