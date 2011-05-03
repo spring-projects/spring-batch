@@ -42,4 +42,15 @@ public class ParentStepFactoryBeanParserTests {
 		assertTrue("Wrong processor type", chunkProcessor instanceof FaultTolerantChunkProcessor<?,?>);
 	}
 
+	@Test
+	public void testSkippableAttributes() throws Exception {
+		ConfigurableApplicationContext context = new ClassPathXmlApplicationContext(
+				"org/springframework/batch/core/configuration/xml/ParentSkippableStepFactoryBeanParserTests-context.xml");
+		Object step = context.getBean("s1", Step.class);
+		assertNotNull("Step not parsed", step);
+		Object tasklet = ReflectionTestUtils.getField(step, "tasklet");
+		Object chunkProcessor = ReflectionTestUtils.getField(tasklet, "chunkProcessor");
+		assertTrue("Wrong processor type", chunkProcessor instanceof FaultTolerantChunkProcessor<?,?>);
+	}
+
 }
