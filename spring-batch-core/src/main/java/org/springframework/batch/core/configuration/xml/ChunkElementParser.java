@@ -124,11 +124,11 @@ public class ChunkElementParser {
 		ManagedMap skippableExceptions = handleExceptionElement(element, parserContext, "skippable-exception-classes");
 		boolean hasSkipPolicy = false;
 		if (StringUtils.hasText(skipLimit)) {
-			if (skippableExceptions == null) {
-				parserContext.getReaderContext().error(
-						"The <chunk/> element must have skippable-exceptions if a skip-limit is specified.", element);
-			}
 			if (skipLimit.startsWith("#")) {
+				if (skippableExceptions == null) {
+					parserContext.getReaderContext().error(
+							"The <chunk/> element must have skippable-exceptions if a skip-limit is specified.", element);
+				}
 				// It's a late binding expression, so we need step scope...
 				BeanDefinitionBuilder skipPolicy = BeanDefinitionBuilder
 						.genericBeanDefinition(LimitCheckingItemSkipPolicy.class);
@@ -139,6 +139,10 @@ public class ChunkElementParser {
 				hasSkipPolicy = true;
 			}
 			else {
+				if (skippableExceptions == null) {
+					skippableExceptions = new ManagedMap();
+					skippableExceptions.setMergeEnabled(true);
+				}
 				propertyValues.addPropertyValue("skipLimit", skipLimit);
 			}
 		}
@@ -155,11 +159,11 @@ public class ChunkElementParser {
 		ManagedMap retryableExceptions = handleExceptionElement(element, parserContext, "retryable-exception-classes");
 		boolean hasRetryPolicy = false;
 		if (StringUtils.hasText(retryLimit)) {
-			if (retryableExceptions == null) {
-				parserContext.getReaderContext().error(
-						"The <chunk/> element must have retryable-exceptions if a retry-limit is specified.", element);
-			}
 			if (retryLimit.startsWith("#")) {
+				if (retryableExceptions == null) {
+					parserContext.getReaderContext().error(
+							"The <chunk/> element must have retryable-exceptions if a retry-limit is specified.", element);
+				}
 				// It's a late binding expression, so we need step scope...
 				BeanDefinitionBuilder retryPolicy = BeanDefinitionBuilder
 						.genericBeanDefinition(SimpleRetryPolicy.class);
@@ -170,6 +174,10 @@ public class ChunkElementParser {
 				hasRetryPolicy = true;
 			}
 			else {
+				if (retryableExceptions == null) {
+					retryableExceptions = new ManagedMap();
+					retryableExceptions.setMergeEnabled(true);
+				}
 				propertyValues.addPropertyValue("retryLimit", retryLimit);
 			}
 		}

@@ -38,7 +38,6 @@ import org.springframework.batch.retry.listener.RetryListenerSupport;
 import org.springframework.batch.retry.policy.SimpleRetryPolicy;
 import org.springframework.beans.PropertyAccessorUtils;
 import org.springframework.beans.factory.BeanCreationException;
-import org.springframework.beans.factory.parsing.BeanDefinitionParsingException;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
@@ -91,8 +90,8 @@ public class ChunkElementParserTests {
 				"org/springframework/batch/core/configuration/xml/ChunkElementIllegalSkipAndRetryAttributeParserTests-context.xml");
 		Step step = (Step) context.getBean("s1", Step.class);
 		assertNotNull("Step not parsed", step);
-		fail("Expected BeanDefinitionParsingException");
-		} catch (BeanDefinitionParsingException e) {
+		fail("Expected BeanCreationException");
+		} catch (BeanCreationException e) {
 			// expected
 		}
 	}

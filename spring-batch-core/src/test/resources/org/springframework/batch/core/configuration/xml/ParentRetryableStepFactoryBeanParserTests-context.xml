@@ -8,9 +8,9 @@
 	<step id="stepParent" abstract="true" xmlns="http://www.springframework.org/schema/batch">
 		<tasklet>
 			<chunk>
-				<skippable-exception-classes>
+				<retryable-exception-classes>
 					<include class="java.lang.Exception" />
-				</skippable-exception-classes>
+				</retryable-exception-classes>
 			</chunk>
 		</tasklet>
 	</step>
@@ -18,7 +18,7 @@
 	<job id="job" xmlns="http://www.springframework.org/schema/batch">
 		<step id="s1" parent="stepParent">
 			<tasklet>
-				<chunk reader="reader" writer="writer" processor="processor" commit-interval="5" skip-limit="1"/>
+				<chunk reader="reader" writer="writer" processor="processor" commit-interval="5" retry-limit="1" />
 			</tasklet>
 		</step>
 	</job>
