@@ -19,9 +19,7 @@ import java.util.List;
 
 import org.springframework.batch.core.listener.StepListenerMetaData;
 import org.springframework.batch.core.step.item.ForceRollbackForWriteSkipException;
-import org.springframework.batch.core.step.skip.LimitCheckingItemSkipPolicy;
 import org.springframework.batch.repeat.policy.SimpleCompletionPolicy;
-import org.springframework.batch.retry.policy.SimpleRetryPolicy;
 import org.springframework.beans.MutablePropertyValues;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.config.BeanDefinitionHolder;
@@ -122,70 +120,32 @@ public class ChunkElementParser {
 
 		String skipLimit = element.getAttribute("skip-limit");
 		ManagedMap skippableExceptions = handleExceptionElement(element, parserContext, "skippable-exception-classes");
-		boolean hasSkipPolicy = false;
 		if (StringUtils.hasText(skipLimit)) {
-			if (skipLimit.startsWith("#")) {
-				if (skippableExceptions == null) {
-					parserContext.getReaderContext().error(
-							"The <chunk/> element must have skippable-exceptions if a skip-limit is specified.", element);
-				}
-				// It's a late binding expression, so we need step scope...
-				BeanDefinitionBuilder skipPolicy = BeanDefinitionBuilder
-						.genericBeanDefinition(LimitCheckingItemSkipPolicy.class);
-				skipPolicy.setScope("step");
-				skipPolicy.addPropertyValue("skippableExceptionMap", skippableExceptions);
-				skipPolicy.addPropertyValue("skipLimit", skipLimit);
-				propertyValues.addPropertyValue("skipPolicy", skipPolicy.getBeanDefinition());
-				hasSkipPolicy = true;
+			if (skippableExceptions == null) {
+				skippableExceptions = new ManagedMap();
+				skippableExceptions.setMergeEnabled(true);
 			}
-			else {
-				if (skippableExceptions == null) {
-					skippableExceptions = new ManagedMap();
-					skippableExceptions.setMergeEnabled(true);
-				}
-				propertyValues.addPropertyValue("skipLimit", skipLimit);
-			}
+			propertyValues.addPropertyValue("skipLimit", skipLimit);
 		}
-		if (!hasSkipPolicy) {
-			// Even if there is no retryLimit, we can still accept exception
-			// classes for an abstract parent bean definition
-			propertyValues.addPropertyValue("skippableExceptionClasses", skippableExceptions);
-		}
+		// Even if there is no retryLimit, we can still accept exception
+		// classes for an abstract parent bean definition
+		propertyValues.addPropertyValue("skippableExceptionClasses", skippableExceptions);
 
 		handleItemHandler("skip-policy", "skipPolicy", null, false, element, parserContext, propertyValues,
 				underspecified);
 
 		String retryLimit = element.getAttribute("retry-limit");
 		ManagedMap retryableExceptions = handleExceptionElement(element, parserContext, "retryable-exception-classes");
-		boolean hasRetryPolicy = false;
 		if (StringUtils.hasText(retryLimit)) {
-			if (retryLimit.startsWith("#")) {
-				if (retryableExceptions == null) {
-					parserContext.getReaderContext().error(
-							"The <chunk/> element must have retryable-exceptions if a retry-limit is specified.", element);
-				}
-				// It's a late binding expression, so we need step scope...
-				BeanDefinitionBuilder retryPolicy = BeanDefinitionBuilder
-						.genericBeanDefinition(SimpleRetryPolicy.class);
-				retryPolicy.setScope("step");
-				retryPolicy.addPropertyValue("maxAttempts", retryLimit);
-				retryPolicy.addPropertyValue("retryableExceptions", retryableExceptions);
-				propertyValues.addPropertyValue("retryPolicy", retryPolicy.getBeanDefinition());
-				hasRetryPolicy = true;
+			if (retryableExceptions == null) {
+				retryableExceptions = new ManagedMap();
+				retryableExceptions.setMergeEnabled(true);
 			}
-			else {
-				if (retryableExceptions == null) {
-					retryableExceptions = new ManagedMap();
-					retryableExceptions.setMergeEnabled(true);
-				}
-				propertyValues.addPropertyValue("retryLimit", retryLimit);
-			}
+			propertyValues.addPropertyValue("retryLimit", retryLimit);
 		}
-		if (!hasRetryPolicy) {
-			// Even if there is no retryLimit, we can still accept exception
-			// classes for an abstract parent bean definition
-			propertyValues.addPropertyValue("retryableExceptionClasses", retryableExceptions);
-		}
+		// Even if there is no retryLimit, we can still accept exception
+		// classes for an abstract parent bean definition
+		propertyValues.addPropertyValue("retryableExceptionClasses", retryableExceptions);
 
 		handleItemHandler("retry-policy", "retryPolicy", null, false, element, parserContext, propertyValues,
 				underspecified);

@@ -18,7 +18,6 @@ package org.springframework.batch.core.configuration.xml;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
-import org.junit.Ignore;
 import org.junit.Test;
 import org.springframework.batch.core.Step;
 import org.springframework.batch.core.step.item.FaultTolerantChunkProcessor;
@@ -40,7 +39,7 @@ public class ParentStepFactoryBeanParserTests {
 		assertNotNull("Step not parsed", step);
 		Object tasklet = ReflectionTestUtils.getField(step, "tasklet");
 		Object chunkProcessor = ReflectionTestUtils.getField(tasklet, "chunkProcessor");
-		assertTrue("Wrong processor type", chunkProcessor instanceof FaultTolerantChunkProcessor<?,?>);
+		assertTrue("Wrong processor type", chunkProcessor instanceof FaultTolerantChunkProcessor<?, ?>);
 	}
 
 	@Test
@@ -51,7 +50,7 @@ public class ParentStepFactoryBeanParserTests {
 		assertNotNull("Step not parsed", step);
 		Object tasklet = ReflectionTestUtils.getField(step, "tasklet");
 		Object chunkProcessor = ReflectionTestUtils.getField(tasklet, "chunkProcessor");
-		assertTrue("Wrong processor type", chunkProcessor instanceof FaultTolerantChunkProcessor<?,?>);
+		assertTrue("Wrong processor type", chunkProcessor instanceof FaultTolerantChunkProcessor<?, ?>);
 	}
 
 	@Test
@@ -62,11 +61,11 @@ public class ParentStepFactoryBeanParserTests {
 		assertNotNull("Step not parsed", step);
 		Object tasklet = ReflectionTestUtils.getField(step, "tasklet");
 		Object chunkProcessor = ReflectionTestUtils.getField(tasklet, "chunkProcessor");
-		assertTrue("Wrong processor type", chunkProcessor instanceof FaultTolerantChunkProcessor<?,?>);
+		assertTrue("Wrong processor type", chunkProcessor instanceof FaultTolerantChunkProcessor<?, ?>);
 	}
 
+	// BATCH-1396
 	@Test
-	@Ignore // Fix this BATCH-1739
 	public void testRetryableLateBindingAttributes() throws Exception {
 		ConfigurableApplicationContext context = new ClassPathXmlApplicationContext(
 				"org/springframework/batch/core/configuration/xml/ParentRetryableLateBindingStepFactoryBeanParserTests-context.xml");
@@ -74,11 +73,11 @@ public class ParentStepFactoryBeanParserTests {
 		assertNotNull("Step not parsed", step);
 		Object tasklet = ReflectionTestUtils.getField(step, "tasklet");
 		Object chunkProcessor = ReflectionTestUtils.getField(tasklet, "chunkProcessor");
-		assertTrue("Wrong processor type", chunkProcessor instanceof FaultTolerantChunkProcessor<?,?>);
+		assertTrue("Wrong processor type", chunkProcessor instanceof FaultTolerantChunkProcessor<?, ?>);
 	}
 
+	// BATCH-1396
 	@Test
-	@Ignore // Fix this BATCH-1739
 	public void testSkippableLateBindingAttributes() throws Exception {
 		ConfigurableApplicationContext context = new ClassPathXmlApplicationContext(
 				"org/springframework/batch/core/configuration/xml/ParentSkippableLateBindingStepFactoryBeanParserTests-context.xml");
@@ -86,7 +85,7 @@ public class ParentStepFactoryBeanParserTests {
 		assertNotNull("Step not parsed", step);
 		Object tasklet = ReflectionTestUtils.getField(step, "tasklet");
 		Object chunkProcessor = ReflectionTestUtils.getField(tasklet, "chunkProcessor");
-		assertTrue("Wrong processor type", chunkProcessor instanceof FaultTolerantChunkProcessor<?,?>);
+		assertTrue("Wrong processor type", chunkProcessor instanceof FaultTolerantChunkProcessor<?, ?>);
 	}
 
 }
