@@ -272,8 +272,9 @@ public class StepParserStepFactoryBeanTests {
 
 		SimplePartitioner partitioner = new SimplePartitioner();
 		fb.setPartitioner(partitioner);
-		fb.setStep(new StepSupport("foo"));
-		ProxyFactory factory = new ProxyFactory(new TaskExecutorPartitionHandler());
+		TaskExecutorPartitionHandler partitionHandler = new TaskExecutorPartitionHandler();
+		partitionHandler.setStep(new StepSupport("foo"));
+		ProxyFactory factory = new ProxyFactory(partitionHandler);
 		fb.setPartitionHandler((PartitionHandler) factory.getProxy());
 
 		Object step = fb.getObject();

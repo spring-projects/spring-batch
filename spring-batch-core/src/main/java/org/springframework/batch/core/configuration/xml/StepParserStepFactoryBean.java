@@ -284,10 +284,7 @@ class StepParserStepFactoryBean<I, O> implements FactoryBean, BeanNameAware {
 		Assert.state(partitioner != null, "A Partitioner must be provided for a partition step");
 		configureAbstractStep(ts);
 
-		PartitionHandler handler;
-
 		if (partitionHandler != null) {
-			handler = partitionHandler;
 			ts.setPartitionHandler(partitionHandler);
 		}
 		else {
@@ -299,29 +296,23 @@ class StepParserStepFactoryBean<I, O> implements FactoryBean, BeanNameAware {
 			partitionHandler.setGridSize(gridSize);
 			partitionHandler.setTaskExecutor(taskExecutor);
 			ts.setPartitionHandler(partitionHandler);
-			handler = partitionHandler;
 		}
 
-		PartitionHandler targetHandler = (PartitionHandler) extractTarget(handler, PartitionHandler.class);
 		// BATCH-1659
-		if (targetHandler instanceof TaskExecutorPartitionHandler) {
-			// Only for a local partition handler is the step required
-			Assert.state(step != null,
-					"A Step must be provided for a partition step with a TaskExecutorPartitionHandler");
-			try {
-				TaskExecutorPartitionHandler taskExecutorPartitionHandler = (TaskExecutorPartitionHandler) targetHandler;
-				taskExecutorPartitionHandler.setStep(step);
-				taskExecutorPartitionHandler.afterPropertiesSet();
+		if (partitionHandler instanceof TaskExecutorPartitionHandler) {
+			TaskExecutorPartitionHandler taskExecutorPartitionHandler = (TaskExecutorPartitionHandler) partitionHandler;
+			if (taskExecutorPartitionHandler.getStep() == null) {
+				// Only for a local partition handler is the step required
+				Assert.state(step != null,
+						"A Step must be provided for a partition step with a TaskExecutorPartitionHandler");
+				try {
+					taskExecutorPartitionHandler.setStep(step);
+					taskExecutorPartitionHandler.afterPropertiesSet();
+				}
+				catch (Exception e) {
+					throw new BeanCreationException("Could not configure TaskExecutorPartitionHandler", e);
+				}
 			}
-			catch (Exception e) {
-				throw new BeanCreationException("Could not configure TaskExecutorPartitionHandler", e);
-			}
-		}
-		else {
-			// Only for a local partition handler is the step required
-			Assert.state(step == null,
-					"A Step must not be provided for a custom partition handler (unless it extends TaskExecutorPartitionHandler). "
-							+ "It should be configured with its own step reference.");
 		}
 
 		boolean allowStartIfComplete = this.allowStartIfComplete != null ? this.allowStartIfComplete : false;
@@ -671,7 +662,7 @@ class StepParserStepFactoryBean<I, O> implements FactoryBean, BeanNameAware {
 	public void setPartitioner(Partitioner partitioner) {
 		this.partitioner = partitioner;
 	}
-	
+
 	/**
 	 * @param stepExecutionAggregator the stepExecutionAggregator to set
 	 */
