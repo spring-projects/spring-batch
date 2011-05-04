@@ -22,10 +22,13 @@ import static org.junit.Assert.assertTrue;
 import java.util.HashMap;
 
 import org.junit.Test;
+import org.springframework.aop.framework.Advised;
+import org.springframework.aop.framework.ProxyFactory;
 import org.springframework.batch.core.StepListener;
 import org.springframework.batch.core.job.flow.FlowStep;
 import org.springframework.batch.core.job.flow.support.SimpleFlow;
 import org.springframework.batch.core.listener.StepExecutionListenerSupport;
+import org.springframework.batch.core.partition.PartitionHandler;
 import org.springframework.batch.core.partition.support.PartitionStep;
 import org.springframework.batch.core.partition.support.SimplePartitioner;
 import org.springframework.batch.core.partition.support.TaskExecutorPartitionHandler;
@@ -252,6 +255,28 @@ public class StepParserStepFactoryBeanTests {
 		assertTrue(step instanceof PartitionStep);
 		Object handler = ReflectionTestUtils.getField(step, "partitionHandler");
 		assertTrue(handler instanceof TaskExecutorPartitionHandler);
+	}
+
+	@Test
+	public void testPartitionStepWithProxyHandler() throws Exception {
+		StepParserStepFactoryBean<Object, Object> fb = new StepParserStepFactoryBean<Object, Object>();
+		fb.setBeanName("step1");
+		fb.setAllowStartIfComplete(true);
+		fb.setJobRepository(new JobRepositorySupport());
+		fb.setStartLimit(5);
+		fb.setListeners(new StepListener[] { new StepExecutionListenerSupport() });
+		fb.setTaskExecutor(new SyncTaskExecutor());
+
+		SimplePartitioner partitioner = new SimplePartitioner();
+		fb.setPartitioner(partitioner);
+		fb.setStep(new StepSupport("foo"));
+		ProxyFactory factory = new ProxyFactory(new TaskExecutorPartitionHandler());
+		fb.setPartitionHandler((PartitionHandler) factory.getProxy());
+
+		Object step = fb.getObject();
+		assertTrue(step instanceof PartitionStep);
+		Object handler = ReflectionTestUtils.getField(step, "partitionHandler");
+		assertTrue(handler instanceof Advised);
 	}
 
 	@Test

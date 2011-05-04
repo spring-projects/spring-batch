@@ -30,6 +30,7 @@ import org.springframework.batch.core.Step;
 import org.springframework.batch.core.StepExecution;
 import org.springframework.batch.core.partition.PartitionHandler;
 import org.springframework.batch.core.partition.StepExecutionSplitter;
+import org.springframework.batch.core.step.StepHolder;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.core.task.SyncTaskExecutor;
 import org.springframework.core.task.TaskExecutor;
@@ -45,7 +46,7 @@ import org.springframework.util.Assert;
  * @author Dave Syer
  * @since 2.0
  */
-public class TaskExecutorPartitionHandler implements PartitionHandler, InitializingBean {
+public class TaskExecutorPartitionHandler implements PartitionHandler, StepHolder, InitializingBean {
 
 	private int gridSize = 1;
 
@@ -88,6 +89,16 @@ public class TaskExecutorPartitionHandler implements PartitionHandler, Initializ
 	 */
 	public void setStep(Step step) {
 		this.step = step;
+	}
+	
+	/**
+	 * The step instance that will be executed in parallel by this handler.
+	 * 
+	 * @return the step instance that will be used
+	 * @see StepHolder#getStep()
+	 */
+	public Step getStep() {
+		return this.step;
 	}
 
 	/**
