@@ -24,6 +24,7 @@ import java.util.Map;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.springframework.aop.framework.Advised;
 import org.springframework.batch.classify.BinaryExceptionClassifier;
 import org.springframework.batch.core.ChunkListener;
 import org.springframework.batch.core.Job;
@@ -301,13 +302,14 @@ class StepParserStepFactoryBean<I, O> implements FactoryBean, BeanNameAware {
 			handler = partitionHandler;
 		}
 
+		PartitionHandler targetHandler = (PartitionHandler) extractTarget(handler, PartitionHandler.class);
 		// BATCH-1659
-		if (handler instanceof TaskExecutorPartitionHandler) {
+		if (targetHandler instanceof TaskExecutorPartitionHandler) {
 			// Only for a local partition handler is the step required
 			Assert.state(step != null,
 					"A Step must be provided for a partition step with a TaskExecutorPartitionHandler");
 			try {
-				TaskExecutorPartitionHandler taskExecutorPartitionHandler = (TaskExecutorPartitionHandler) handler;
+				TaskExecutorPartitionHandler taskExecutorPartitionHandler = (TaskExecutorPartitionHandler) targetHandler;
 				taskExecutorPartitionHandler.setStep(step);
 				taskExecutorPartitionHandler.afterPropertiesSet();
 			}
@@ -340,6 +342,25 @@ class StepParserStepFactoryBean<I, O> implements FactoryBean, BeanNameAware {
 		if (stepExecutionAggregator != null) {
 			ts.setStepExecutionAggregator(stepExecutionAggregator);
 		}
+	}
+
+	private Object extractTarget(Object target, Class<?> type) {
+		if (target instanceof Advised) {
+			Object source;
+			try {
+				source = ((Advised) target).getTargetSource().getTarget();
+			}
+			catch (Exception e) {
+				throw new IllegalStateException("Could not extract target from proxy", e);
+			}
+			if (source instanceof Advised) {
+				source = extractTarget(source, type);
+			}
+			if (type.isAssignableFrom(source.getClass())) {
+				target = source;
+			}
+		}
+		return target;
 	}
 
 	private void configureSimple(SimpleStepFactoryBean<I, O> fb) {
