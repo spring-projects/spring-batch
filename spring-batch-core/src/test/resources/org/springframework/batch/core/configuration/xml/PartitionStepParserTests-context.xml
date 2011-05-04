@@ -16,14 +16,14 @@
 
 	<job id="job2">
 		<step id="s2" next="s3">
-			<partition step="step1" handler="handler" partitioner="partitioner" />
+			<partition handler="handler" partitioner="partitioner" />
 		</step>
 		<step id="s3" parent="step2" />
 	</job>
 
 	<job id="job3">
 		<step id="j3s1">
-			<partition handler="handler" partitioner="partitioner">
+			<partition partitioner="partitioner">
 				<step parent="step2" />
 			</partition>
 		</step>
@@ -31,7 +31,7 @@
 
 	<job id="job4">
 		<step id="j4s1">
-			<partition handler="handler" partitioner="partitioner">
+			<partition partitioner="partitioner">
 				<step>
 					<tasklet>
 						<chunk reader="reader" writer="writer" commit-interval="10" />
@@ -51,6 +51,7 @@
 		or a custom PartitionHandler -->
 	<bean id="handler" class="org.springframework.batch.core.partition.support.TaskExecutorPartitionHandler" xmlns="http://www.springframework.org/schema/beans">
 		<property name="gridSize" value="3" />
+		<property name="step" ref="step1"/>
 	</bean>
 
 	<beans:bean id="aggregator"
