@@ -59,6 +59,7 @@ import org.springframework.core.task.TaskExecutor;
 import org.springframework.transaction.TransactionException;
 import org.springframework.transaction.interceptor.DefaultTransactionAttribute;
 import org.springframework.transaction.interceptor.TransactionAttribute;
+import org.springframework.util.Assert;
 
 /**
  * Factory bean for step that provides options for configuring skip behaviour.
@@ -393,9 +394,13 @@ public class FaultTolerantStepFactoryBean<T, S> extends SimpleStepFactoryBean<T,
 	 */
 	protected SkipPolicy createSkipPolicy() {
 		SkipPolicy skipPolicy = this.skipPolicy;
-		LimitCheckingItemSkipPolicy limitCheckingItemSkipPolicy = new LimitCheckingItemSkipPolicy(skipLimit,
-				getSkippableExceptionClasses());
+		Map<Class<? extends Throwable>, Boolean> map = new HashMap<Class<? extends Throwable>, Boolean>(
+				skippableExceptionClasses);
+		map.put(ForceRollbackForWriteSkipException.class, true);
+		LimitCheckingItemSkipPolicy limitCheckingItemSkipPolicy = new LimitCheckingItemSkipPolicy(skipLimit, map);
 		if (skipPolicy == null) {
+			Assert.state(!(skippableExceptionClasses.isEmpty() && skipLimit > 0),
+					"If a skip limit is provided then skippable exceptions must also be specified");
 			skipPolicy = limitCheckingItemSkipPolicy;
 		}
 		else if (limitCheckingItemSkipPolicy != null) {
@@ -430,16 +435,6 @@ public class FaultTolerantStepFactoryBean<T, S> extends SimpleStepFactoryBean<T,
 	}
 
 	/**
-	 * @return
-	 */
-	private Map<Class<? extends Throwable>, Boolean> getSkippableExceptionClasses() {
-		Map<Class<? extends Throwable>, Boolean> map = new HashMap<Class<? extends Throwable>, Boolean>(
-				skippableExceptionClasses);
-		map.put(ForceRollbackForWriteSkipException.class, true);
-		return map;
-	}
-
-	/**
 	 * @return fully configured retry template for item processing phase.
 	 */
 	private BatchRetryTemplate configureRetry() {
@@ -453,6 +448,8 @@ public class FaultTolerantStepFactoryBean<T, S> extends SimpleStepFactoryBean<T,
 		simpleRetryPolicy = new SimpleRetryPolicy(retryLimit, map);
 
 		if (retryPolicy == null) {
+			Assert.state(!(retryableExceptionClasses.isEmpty() && retryLimit > 0),
+					"If a retry limit is provided then retryable exceptions must also be specified");
 			retryPolicy = simpleRetryPolicy;
 		}
 		else if ((!retryableExceptionClasses.isEmpty() && retryLimit > 0)) {

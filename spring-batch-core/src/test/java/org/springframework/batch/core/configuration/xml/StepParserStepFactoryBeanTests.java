@@ -20,6 +20,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
 import java.util.HashMap;
+import java.util.Map;
 
 import org.junit.Test;
 import org.springframework.aop.framework.Advised;
@@ -226,8 +227,10 @@ public class StepParserStepFactoryBeanTests {
 		fb.setSkipLimit(100);
 		fb.setThrottleLimit(10);
 		fb.setRetryListeners(new RetryListenerSupport());
-		fb.setSkippableExceptionClasses(new HashMap<Class<? extends Throwable>, Boolean>());
-		fb.setRetryableExceptionClasses(new HashMap<Class<? extends Throwable>, Boolean>());
+		@SuppressWarnings("unchecked")
+		Map<Class<? extends Throwable>, Boolean> exceptionMap = getExceptionMap(Exception.class);
+		fb.setSkippableExceptionClasses(exceptionMap);
+		fb.setRetryableExceptionClasses(exceptionMap);
 
 		Object step = fb.getObject();
 		assertTrue(step instanceof TaskletStep);
@@ -295,6 +298,14 @@ public class StepParserStepFactoryBeanTests {
 		assertTrue(step instanceof FlowStep);
 		Object handler = ReflectionTestUtils.getField(step, "flow");
 		assertTrue(handler instanceof SimpleFlow);
+	}
+
+	private Map<Class<? extends Throwable>, Boolean> getExceptionMap(Class<? extends Throwable>... args) {
+		Map<Class<? extends Throwable>, Boolean> map = new HashMap<Class<? extends Throwable>, Boolean>();
+		for (Class<? extends Throwable> arg : args) {
+			map.put(arg, true);
+		}
+		return map;
 	}
 
 }
