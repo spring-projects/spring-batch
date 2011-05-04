@@ -66,5 +66,17 @@ public abstract class AbstractSqlPagingQueryProviderTests {
 
 	@Test
 	public abstract void testGenerateJumpToItemQueryForFirstPage();
+	
+	@Test
+	public abstract void testGenerateFirstPageQueryWithGroupBy();
+
+	@Test
+	public abstract void testGenerateRemainingPagesQueryWithGroupBy();
+
+	@Test
+	public abstract void testGenerateJumpToItemQueryWithGroupBy();
+
+	@Test
+	public abstract void testGenerateJumpToItemQueryForFirstPageWithGroupBy();
 
 }

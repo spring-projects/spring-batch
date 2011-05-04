@@ -132,5 +132,38 @@ public class DerbyPagingQueryProviderTests extends AbstractSqlPagingQueryProvide
 		String s = pagingQueryProvider.generateFirstPageQuery(pageSize).toLowerCase();
 		assertTrue("Wrong query: " + s, s.contains("id desc"));
 	}
+	
+	@Test
+	@Override
+	public void testGenerateFirstPageQueryWithGroupBy() {
+		pagingQueryProvider.setGroupClause("dep");
+		String sql = "SELECT * FROM ( SELECT id, name, age, ROW_NUMBER() OVER () AS ROW_NUMBER FROM foo WHERE bar = 1 GROUP BY dep ORDER BY id ASC) AS TMP_SUB WHERE TMP_SUB.ROW_NUMBER <= 100";
+		String s = pagingQueryProvider.generateFirstPageQuery(pageSize);
+		Assert.assertEquals("", sql, s);
+	}
+
+	@Test @Override
+	public void testGenerateRemainingPagesQueryWithGroupBy() {
+		pagingQueryProvider.setGroupClause("dep");
+		String sql = "SELECT * FROM ( SELECT id, name, age, ROW_NUMBER() OVER () AS ROW_NUMBER FROM foo WHERE bar = 1 AND id > ? GROUP BY dep ORDER BY id ASC) AS TMP_SUB WHERE TMP_SUB.ROW_NUMBER <= 100";
+		String s = pagingQueryProvider.generateRemainingPagesQuery(pageSize);
+		Assert.assertEquals("", sql, s);
+	}
+
+	@Test @Override
+	public void testGenerateJumpToItemQueryWithGroupBy() {
+		pagingQueryProvider.setGroupClause("dep");
+		String sql = "SELECT SORT_KEY FROM ( SELECT id AS SORT_KEY, ROW_NUMBER() OVER () AS ROW_NUMBER FROM foo WHERE bar = 1 GROUP BY dep ORDER BY id ASC) AS TMP_SUB WHERE TMP_SUB.ROW_NUMBER = 100";
+		String s = pagingQueryProvider.generateJumpToItemQuery(145, pageSize);
+		Assert.assertEquals("", sql, s);
+	}
+
+	@Test @Override
+	public void testGenerateJumpToItemQueryForFirstPageWithGroupBy() {
+		pagingQueryProvider.setGroupClause("dep");
+		String sql = "SELECT SORT_KEY FROM ( SELECT id AS SORT_KEY, ROW_NUMBER() OVER () AS ROW_NUMBER FROM foo WHERE bar = 1 GROUP BY dep ORDER BY id ASC) AS TMP_SUB WHERE TMP_SUB.ROW_NUMBER = 1";
+		String s = pagingQueryProvider.generateJumpToItemQuery(45, pageSize);
+		Assert.assertEquals("", sql, s);
+	}
 
 }

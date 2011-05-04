@@ -55,4 +55,37 @@ public class MySqlPagingQueryProviderTests extends AbstractSqlPagingQueryProvide
 		String s = pagingQueryProvider.generateJumpToItemQuery(45, pageSize);
 		Assert.assertEquals("", sql, s);
 	}
+
+	@Override
+	public void testGenerateFirstPageQueryWithGroupBy() {
+		pagingQueryProvider.setGroupClause("dep");
+		String sql = "SELECT id, name, age FROM foo WHERE bar = 1 GROUP BY dep ORDER BY id ASC LIMIT 100";
+		String s = pagingQueryProvider.generateFirstPageQuery(pageSize);
+		Assert.assertEquals("", sql, s);
+	}
+
+	@Override
+	public void testGenerateRemainingPagesQueryWithGroupBy() {
+		pagingQueryProvider.setGroupClause("dep");
+		String sql = "SELECT id, name, age FROM foo WHERE bar = 1 AND id > ? GROUP BY dep ORDER BY id ASC LIMIT 100";
+		String s = pagingQueryProvider.generateRemainingPagesQuery(pageSize);
+		Assert.assertEquals("", sql, s);
+	}
+
+	@Override
+	public void testGenerateJumpToItemQueryWithGroupBy() {
+		pagingQueryProvider.setGroupClause("dep");
+		String sql = "SELECT id AS SORT_KEY FROM foo WHERE bar = 1 GROUP BY dep ORDER BY id ASC LIMIT 99, 1";
+		String s = pagingQueryProvider.generateJumpToItemQuery(145, pageSize);
+		Assert.assertEquals("", sql, s);
+	}
+
+	@Override
+	public void testGenerateJumpToItemQueryForFirstPageWithGroupBy() {
+		pagingQueryProvider.setGroupClause("dep");
+		String sql = "SELECT id AS SORT_KEY FROM foo WHERE bar = 1 GROUP BY dep ORDER BY id ASC LIMIT 0, 1";
+		String s = pagingQueryProvider.generateJumpToItemQuery(45, pageSize);
+		Assert.assertEquals("", sql, s);
+	}
+	
 }

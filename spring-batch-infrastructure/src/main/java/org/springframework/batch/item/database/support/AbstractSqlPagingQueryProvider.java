@@ -52,6 +52,8 @@ public abstract class AbstractSqlPagingQueryProvider implements PagingQueryProvi
 	private String fromClause;
 
 	private String whereClause;
+	
+	private String groupClause;
 
 	private String sortKey;
 
@@ -178,6 +180,9 @@ public abstract class AbstractSqlPagingQueryProvider implements PagingQueryProvi
 		if (whereClause != null) {
 			sql.append(" WHERE ").append(whereClause);
 		}
+		if (groupClause != null) {
+			sql.append(" GROUP BY ").append(groupClause);
+		}
 		List<String> namedParameters = new ArrayList<String>();
 		parameterCount = JdbcParameterUtils.countParameterPlaceholders(sql.toString(), namedParameters);
 		if (namedParameters.size() > 0) {
@@ -226,6 +231,14 @@ public abstract class AbstractSqlPagingQueryProvider implements PagingQueryProvi
 		else {
 			return temp;
 		}
+	}
+
+	public void setGroupClause(String groupClause) {
+		this.groupClause = groupClause;
+	}
+
+	public String getGroupClause() {
+		return groupClause;
 	}
 
 }
