@@ -51,6 +51,7 @@ public class HippyMethodInvoker extends MethodInvoker {
 				Class<?>[] paramTypes = candidate.getParameterTypes();
 				Object[] candidateArguments = new Object[paramTypes.length];
 				int assignedParameterCount = 0;
+				boolean assigned = paramTypes.length==0;
 				for (int j = 0; j < arguments.length; j++) {
 					for (int k = 0; k < paramTypes.length; k++) {
 						// Pick the first assignable of the right type that
@@ -58,11 +59,12 @@ public class HippyMethodInvoker extends MethodInvoker {
 						if (ClassUtils.isAssignableValue(paramTypes[k], arguments[j]) && candidateArguments[k] == null) {
 							candidateArguments[k] = arguments[j];
 							assignedParameterCount++;
+							assigned = true;
 							break;
 						}
 					}
 				}
-				if (paramTypes.length <= argCount) {
+				if (assigned && paramTypes.length <= argCount) {
 					int typeDiffWeight = getTypeDifferenceWeight(paramTypes, candidateArguments);
 					if (typeDiffWeight < minTypeDiffWeight) {
 						minTypeDiffWeight = typeDiffWeight;
