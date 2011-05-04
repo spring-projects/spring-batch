@@ -63,7 +63,6 @@ import org.springframework.batch.retry.RetryPolicy;
 import org.springframework.batch.retry.backoff.BackOffPolicy;
 import org.springframework.batch.retry.policy.MapRetryContextCache;
 import org.springframework.batch.retry.policy.RetryContextCache;
-import org.springframework.beans.factory.BeanCreationException;
 import org.springframework.beans.factory.BeanNameAware;
 import org.springframework.beans.factory.FactoryBean;
 import org.springframework.core.task.SyncTaskExecutor;
@@ -296,23 +295,6 @@ class StepParserStepFactoryBean<I, O> implements FactoryBean, BeanNameAware {
 			partitionHandler.setGridSize(gridSize);
 			partitionHandler.setTaskExecutor(taskExecutor);
 			ts.setPartitionHandler(partitionHandler);
-		}
-
-		// BATCH-1659
-		if (partitionHandler instanceof TaskExecutorPartitionHandler) {
-			TaskExecutorPartitionHandler taskExecutorPartitionHandler = (TaskExecutorPartitionHandler) partitionHandler;
-			if (taskExecutorPartitionHandler.getStep() == null) {
-				// Only for a local partition handler is the step required
-				Assert.state(step != null,
-						"A Step must be provided for a partition step with a TaskExecutorPartitionHandler");
-				try {
-					taskExecutorPartitionHandler.setStep(step);
-					taskExecutorPartitionHandler.afterPropertiesSet();
-				}
-				catch (Exception e) {
-					throw new BeanCreationException("Could not configure TaskExecutorPartitionHandler", e);
-				}
-			}
 		}
 
 		boolean allowStartIfComplete = this.allowStartIfComplete != null ? this.allowStartIfComplete : false;
