@@ -19,6 +19,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import org.junit.Before;
@@ -27,7 +28,7 @@ import org.junit.runner.RunWith;
 import org.springframework.batch.core.BatchStatus;
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.JobExecution;
-import org.springframework.batch.core.JobParameters;
+import org.springframework.batch.core.JobParametersBuilder;
 import org.springframework.batch.core.StepExecution;
 import org.springframework.batch.core.job.flow.FlowExecutionStatus;
 import org.springframework.batch.core.job.flow.JobExecutionDecider;
@@ -40,27 +41,19 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 /**
  * @author Dave Syer
- * 
+ * @author Josh Long
  */
 @ContextConfiguration
 @RunWith(SpringJUnit4ClassRunner.class)
-public class FlowStepParserTests {
+public class PartitionStepWithFlowParserTests {
 
 	@Autowired
 	@Qualifier("job1")
 	private Job job1;
 
 	@Autowired
-	@Qualifier("job2")
-	private Job job2;
-
-	@Autowired
-	@Qualifier("job3")
-	private Job job3;
-
-	@Autowired
-	@Qualifier("job4")
-	private Job job4;
+	@Qualifier("nameStoringTasklet")
+	private NameStoringTasklet nameStoringTasklet;
 
 	@Autowired
 	private JobRepository jobRepository;
@@ -68,61 +61,26 @@ public class FlowStepParserTests {
 	@Autowired
 	private MapJobRepositoryFactoryBean mapJobRepositoryFactoryBean;
 
+	private List<String> savedStepNames = new ArrayList<String>();
+
 	@Before
 	public void setUp() {
+		nameStoringTasklet.setStepNamesList(savedStepNames);
 		mapJobRepositoryFactoryBean.clear();
 	}
 
 	@Test
-	public void testFlowStep() throws Exception {
+	public void testRepeatedFlowStep() throws Exception {
 		assertNotNull(job1);
-		JobExecution jobExecution = jobRepository.createJobExecution(job1.getName(), new JobParameters());
+		JobExecution jobExecution = jobRepository.createJobExecution(job1.getName(), new JobParametersBuilder()
+				.addLong("gridSize", 1L).toJobParameters());
 		job1.execute(jobExecution);
 		assertEquals(BatchStatus.COMPLETED, jobExecution.getStatus());
+		Collections.sort(savedStepNames);
+		assertEquals("[s2, s2, s2, s2, s3, s3, s3, s3]", savedStepNames.toString());
 		List<String> stepNames = getStepNames(jobExecution);
-		assertEquals(5, stepNames.size());
-		assertEquals("[s1, job1.flow, s2, s3, s4]", stepNames.toString());
-	}
-
-	@Test
-	public void testFlowExternalStep() throws Exception {
-		assertNotNull(job2);
-		JobExecution jobExecution = jobRepository.createJobExecution(job2.getName(), new JobParameters());
-		job2.execute(jobExecution);
-		assertEquals(BatchStatus.COMPLETED, jobExecution.getStatus());
-		List<String> stepNames = getStepNames(jobExecution);
-		assertEquals(5, stepNames.size());
-		assertEquals("[job2.s1, job2.flow, s2, s3, job2.s4]", stepNames.toString());
-	}
-
-	@Test
-	public void testRepeatedFlow() throws Exception {
-		assertNotNull(job3);
-		JobExecution jobExecution = jobRepository.createJobExecution(job3.getName(), new JobParameters());
-		job3.execute(jobExecution);
-		assertEquals(BatchStatus.COMPLETED, jobExecution.getStatus());
-		List<String> stepNames = getStepNames(jobExecution);
-		assertEquals(6, stepNames.size());
-		assertEquals("[job3.flow, s2, s3, job3.flow, s2, s3]", stepNames.toString());
-	}
-
-	@Test
-	// TODO: BATCH-1745
-	public void testRestartedFlow() throws Exception {
-		assertNotNull(job4);
-		JobExecution jobExecution = jobRepository.createJobExecution(job4.getName(), new JobParameters());
-		job4.execute(jobExecution);
-		assertEquals(BatchStatus.FAILED, jobExecution.getStatus());
-		List<String> stepNames = getStepNames(jobExecution);
-		assertEquals(3, stepNames.size());
-		assertEquals("[job4.flow, s2, s3]", stepNames.toString());
-		jobExecution = jobRepository.createJobExecution(job4.getName(), new JobParameters());
-		job4.execute(jobExecution);
-		assertEquals(BatchStatus.FAILED, jobExecution.getStatus());
-		stepNames = getStepNames(jobExecution);
-		assertEquals(1, stepNames.size());
-		// The flow executes again, but all the steps were already complete
-		assertEquals("[job4.flow]", stepNames.toString());
+		assertEquals(14, stepNames.size());
+		assertEquals("[s1, s1, s1:partition0, s1:partition0, s1:partition1, s1:partition1, s2, s2, s2, s2, s3, s3, s3, s3]", stepNames.toString());
 	}
 
 	private List<String> getStepNames(JobExecution jobExecution) {
@@ -130,19 +88,20 @@ public class FlowStepParserTests {
 		for (StepExecution stepExecution : jobExecution.getStepExecutions()) {
 			list.add(stepExecution.getStepName());
 		}
+		Collections.sort(list);
 		return list;
 	}
 
 	public static class Decider implements JobExecutionDecider {
 
 		int count = 0;
-
 		public FlowExecutionStatus decide(JobExecution jobExecution, StepExecution stepExecution) {
-			if (count++ < 2) {
-				return new FlowExecutionStatus("OK");
+			if (count++<2) {
+				return new FlowExecutionStatus("OK");				
 			}
 			return new FlowExecutionStatus("END");
 		}
 
 	}
+
 }

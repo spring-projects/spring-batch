@@ -247,11 +247,11 @@ public class SimpleStepExecutionSplitter implements StepExecutionSplitter, Initi
 			stepExecution.setExecutionContext(context);
 		}
 
-		return shouldStart(allowStartIfComplete, lastStepExecution) || isRestart;
+		return shouldStart(allowStartIfComplete, stepExecution, lastStepExecution) || isRestart;
 
 	}
 
-	private boolean shouldStart(boolean allowStartIfComplete, StepExecution lastStepExecution)
+	private boolean shouldStart(boolean allowStartIfComplete, StepExecution stepExecution, StepExecution lastStepExecution)
 			throws JobExecutionException {
 
 		if (lastStepExecution == null) {
@@ -268,6 +268,10 @@ public class SimpleStepExecutionSplitter implements StepExecutionSplitter, Initi
 
 		if (stepStatus == BatchStatus.COMPLETED) {
 			if (!allowStartIfComplete) {
+				if (isSameJobExecution(stepExecution, lastStepExecution)) {
+					// it's always OK to start again in the same JobExecution
+					return true;
+				}
 				// step is complete, false should be returned, indicating that
 				// the step should not be started
 				return false;
@@ -293,6 +297,13 @@ public class SimpleStepExecutionSplitter implements StepExecutionSplitter, Initi
 		throw new JobExecutionException("Cannot restart step from " + stepStatus + " status.  "
 				+ "We believe the old execution was abandoned and therefore has been marked as un-restartable.");
 
+	}
+
+	private boolean isSameJobExecution(StepExecution stepExecution, StepExecution lastStepExecution) {
+		if (stepExecution.getJobExecutionId()==null) {
+			return lastStepExecution.getJobExecutionId()==null;
+		}
+		return stepExecution.getJobExecutionId().equals(lastStepExecution.getJobExecutionId());
 	}
 
 }
