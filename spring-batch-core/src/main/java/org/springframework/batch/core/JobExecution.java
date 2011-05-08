@@ -327,6 +327,7 @@ public class JobExecution extends Entity {
 	 */
 	public void addStepExecutions(List<StepExecution> stepExecutions) {
 		if (stepExecutions!=null) {
+			this.stepExecutions.removeAll(stepExecutions);
 			this.stepExecutions.addAll(stepExecutions);
 		}
 	}
