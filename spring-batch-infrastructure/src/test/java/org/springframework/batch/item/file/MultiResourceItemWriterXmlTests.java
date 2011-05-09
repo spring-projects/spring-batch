@@ -8,16 +8,15 @@ import java.util.Arrays;
 
 import javax.xml.stream.XMLEventFactory;
 import javax.xml.stream.XMLEventWriter;
-import javax.xml.stream.XMLStreamException;
 import javax.xml.transform.Result;
 
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.batch.item.xml.StaxEventItemWriter;
+import org.springframework.batch.item.xml.StaxUtils;
 import org.springframework.oxm.Marshaller;
 import org.springframework.oxm.XmlMappingException;
 import org.springframework.util.Assert;
-import org.springframework.xml.transform.StaxResult;
 
 /**
  * Tests for {@link MultiResourceItemWriter} delegating to
@@ -43,18 +42,17 @@ public class MultiResourceItemWriterXmlTests extends AbstractMultiResourceItemWr
 	private static class SimpleMarshaller implements Marshaller {
 		
 		public void marshal(Object graph, Result result) throws XmlMappingException, IOException {
-			Assert.isInstanceOf(StaxResult.class, result);
+			Assert.isInstanceOf(Result.class, result);
 
-			StaxResult staxResult = (StaxResult) result;
 			try {
 				XMLEventFactory factory = XMLEventFactory.newInstance();
-				XMLEventWriter writer = staxResult.getXMLEventWriter();
+				XMLEventWriter writer = StaxUtils.getXmlEventWriter(result);
 				writer.add(factory.createStartDocument("UTF-8"));
 				writer.add(factory.createStartElement("prefix", "namespace", graph.toString()));
 				writer.add(factory.createEndElement("prefix", "namespace", graph.toString()));
 				writer.add(factory.createEndDocument());
 			}
-			catch (XMLStreamException e) {
+			catch ( Exception e) {
 				throw new RuntimeException("Exception while writing to output file", e);
 			}
 		}

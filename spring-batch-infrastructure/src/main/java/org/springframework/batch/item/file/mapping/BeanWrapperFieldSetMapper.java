@@ -22,6 +22,8 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
 
 import org.springframework.batch.item.file.transform.FieldSet;
 import org.springframework.batch.support.DefaultPropertyEditorRegistrar;
@@ -94,7 +96,7 @@ public class BeanWrapperFieldSetMapper<T> extends DefaultPropertyEditorRegistrar
 
 	private BeanFactory beanFactory;
 
-	private static Map<DistanceHolder, Map<String, String>> propertiesMatched = new HashMap<DistanceHolder, Map<String, String>>();
+	private ConcurrentMap<DistanceHolder, ConcurrentMap<String, String>> propertiesMatched = new ConcurrentHashMap<DistanceHolder, ConcurrentMap<String, String>>();
 
 	private int distanceLimit = 5;
 
@@ -249,11 +251,10 @@ public class BeanWrapperFieldSetMapper<T> extends DefaultPropertyEditorRegistrar
 
 		// Map from field names to property names
 		DistanceHolder distanceKey = new DistanceHolder(cls, distanceLimit);
-		Map<String, String> matches = propertiesMatched.get(distanceKey);
-		if (matches == null) {
-			matches = new HashMap<String, String>();
-			propertiesMatched.put(distanceKey, matches);
+		if (!propertiesMatched.containsKey(distanceKey)) {
+			propertiesMatched.putIfAbsent(distanceKey, new ConcurrentHashMap<String, String>());
 		}
+		Map<String, String> matches = new HashMap<String, String>(propertiesMatched.get(distanceKey));
 
 		Set<String> keys = new HashSet(properties.keySet());
 		for (String key : keys) {
@@ -281,6 +282,9 @@ public class BeanWrapperFieldSetMapper<T> extends DefaultPropertyEditorRegistrar
 			}
 		}
 
+		if (!propertiesMatched.containsKey(distanceKey)) {
+			propertiesMatched.putIfAbsent(distanceKey, new ConcurrentHashMap<String, String>(matches));
+		}
 		return properties;
 	}
 
@@ -379,12 +383,13 @@ public class BeanWrapperFieldSetMapper<T> extends DefaultPropertyEditorRegistrar
 
 	private static class DistanceHolder {
 		private final Class<?> cls;
+
 		private final int distance;
 
 		public DistanceHolder(Class<?> cls, int distance) {
 			this.cls = cls;
 			this.distance = distance;
-			
+
 		}
 
 		@Override
@@ -416,6 +421,5 @@ public class BeanWrapperFieldSetMapper<T> extends DefaultPropertyEditorRegistrar
 			return true;
 		}
 	}
-
 
 }

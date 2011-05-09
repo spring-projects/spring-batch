@@ -21,6 +21,8 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
 
 /**
  * A {@link Classifier} for a parameterised object type based on a map.
@@ -35,7 +37,7 @@ import java.util.TreeSet;
  */
 public class SubclassClassifier<T, C> implements Classifier<T, C> {
 
-	private Map<Class<? extends T>, C> classified = new HashMap<Class<? extends T>, C>();
+	private ConcurrentMap<Class<? extends T>, C> classified = new ConcurrentHashMap<Class<? extends T>, C>();
 
 	private C defaultValue = null;
 
@@ -63,7 +65,7 @@ public class SubclassClassifier<T, C> implements Classifier<T, C> {
 	 */
 	public SubclassClassifier(Map<Class<? extends T>, C> typeMap, C defaultValue) {
 		super();
-		this.classified = new HashMap<Class<? extends T>, C>(typeMap);
+		this.classified = new ConcurrentHashMap<Class<? extends T>, C>(typeMap);
 		this.defaultValue = defaultValue;
 	}
 
@@ -85,7 +87,7 @@ public class SubclassClassifier<T, C> implements Classifier<T, C> {
 	 * @param map a map from type to class
 	 */
 	public void setTypeMap(Map<Class<? extends T>, C> map) {
-		this.classified = new HashMap<Class<? extends T>, C>(map);
+		this.classified = new ConcurrentHashMap<Class<? extends T>, C>(map);
 	}
 
 	/**

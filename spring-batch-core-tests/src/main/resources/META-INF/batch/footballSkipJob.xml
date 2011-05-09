@@ -9,11 +9,7 @@
 		<step id="playerload" next="gameLoad">
 			<tasklet>
 				<chunk reader="playerFileItemReader" writer="playerWriter" commit-interval="${job.commit.interval}"
-					skip-limit="100000">
-					<skippable-exception-classes>
-						<include class="org.springframework.dao.DataAccessException" />
-					</skippable-exception-classes>
-				</chunk>					
+					 skip-policy="skipPolicy" retry-policy="retryPolicy"/>
 			</tasklet>
 		</step>
 		<step id="gameLoad" next="playerSummarization">
@@ -27,6 +23,24 @@
 		</step>
 		<step id="playerSummarization" parent="summarizationStep" />
 	</job>
+	
+	<bean id="skipPolicy" class="org.springframework.batch.core.step.skip.LimitCheckingItemSkipPolicy" scope="step">
+		<property name="skipLimit" value="#{jobParameters['skip.limit']}" />
+		<property name="skippableExceptionMap">
+			<map key-type="java.lang.Class">
+				<entry key="org.springframework.dao.DataAccessException" value="true"/>
+			</map>
+		</property>
+	</bean>
+
+	<bean id="retryPolicy" class="org.springframework.batch.retry.policy.SimpleRetryPolicy" scope="step">
+		<property name="maxAttempts" value="#{jobParameters['retry.limit']}" />
+		<property name="retryableExceptions">
+			<map key-type="java.lang.Class">
+				<entry key="org.springframework.dao.DataAccessException" value="true"/>
+			</map>
+		</property>
+	</bean>
 
 	<step id="summarizationStep" xmlns="http://www.springframework.org/schema/batch">
 		<tasklet>

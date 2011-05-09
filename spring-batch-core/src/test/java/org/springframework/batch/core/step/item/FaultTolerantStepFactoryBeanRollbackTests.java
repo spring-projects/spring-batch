@@ -149,7 +149,7 @@ public class FaultTolerantStepFactoryBeanRollbackTests {
 		reader.setExceptionType(SkippableException.class);
 
 		// No skips by default
-		factory.setSkippableExceptionClasses(getExceptionMap());
+		factory.setSkippableExceptionClasses(getExceptionMap(RuntimeException.class));
 		// But this one is explicit in the tx-attrs so it should be skipped
 		factory.setNoRollbackExceptionClasses(getExceptionList(SkippableException.class));
 

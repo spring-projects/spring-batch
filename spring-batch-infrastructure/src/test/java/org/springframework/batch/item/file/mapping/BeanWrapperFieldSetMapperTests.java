@@ -49,7 +49,7 @@ import org.springframework.validation.BindException;
 import org.springframework.validation.DataBinder;
 
 public class BeanWrapperFieldSetMapperTests {
-
+	
 	@Test
 	public void testNameAndTypeSpecified() throws Exception {
 		BeanWrapperFieldSetMapper<TestObject> mapper = new BeanWrapperFieldSetMapper<TestObject>();

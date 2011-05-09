@@ -745,9 +745,9 @@ itemWriter.write(items);</programlisting>
 
         <para>A chunk is defined as the items processed within the scope of a
         transaction. Committing a transaction, at each commit interval,
-        commits a 'chunk'. A <classname>ChunkListener</classname> may be
+        commits a 'chunk'. A <classname>ChunkListener</classname> can be
         useful to perform logic before a chunk begins processing or after a
-        chunk has completed:</para>
+        chunk has completed successfully:</para>
 
         <programlisting>public interface ChunkListener extends StepListener {
 
@@ -760,10 +760,8 @@ itemWriter.write(items);</programlisting>
         <para>The <methodname>beforeChunk</methodname> method is called after
         the transaction is started, but before <methodname>read</methodname>
         is called on the <classname>ItemReader</classname>. Conversely,
-        <methodname>afterChunk</methodname> is called after the last call to
-        <methodname>write</methodname> on the
-        <classname>ItemWriter</classname>, but before the chunk has been
-        committed.</para>
+        <methodname>afterChunk</methodname> is called after the chunk has been
+        committed (and not at all if there is a rollback).</para>
 
         <para>The annotations corresponding to this interface are:</para>
 

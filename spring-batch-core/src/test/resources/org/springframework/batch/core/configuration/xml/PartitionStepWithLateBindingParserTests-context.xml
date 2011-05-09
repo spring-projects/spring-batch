@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans:beans xmlns="http://www.springframework.org/schema/batch" xmlns:beans="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.springframework.org/schema/batch http://www.springframework.org/schema/batch/spring-batch-2.1.xsd
+	http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.5.xsd">
+
+	<beans:import resource="common-context.xml" />
+
+	<job id="job1">
+		<step id="s1">
+			<partition partitioner="partitioner" handler="handler"/>
+		</step>
+	</job>
+
+	<bean id="handler" class="org.springframework.batch.core.partition.support.TaskExecutorPartitionHandler" scope="step"
+		xmlns="http://www.springframework.org/schema/beans">
+		<property name="gridSize" value="#{jobParameters['gridSize']}" />
+		<property name="step" ref="step1"/>
+	</bean>
+
+	<beans:bean id="partitioner" class="org.springframework.batch.core.partition.support.SimplePartitioner" />
+
+</beans:beans>

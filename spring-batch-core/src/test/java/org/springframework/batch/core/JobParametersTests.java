@@ -86,6 +86,22 @@ public class JobParametersTests {
 	}
 
 	@Test
+	public void testGetEmptyLong() {
+		parameters = new JobParameters(Collections.singletonMap("long1", new JobParameter((Long)null)));
+		assertEquals(0L, parameters.getLong("long1"));
+	}
+
+	@Test
+	public void testGetMissingLong() {
+		assertEquals(0L, parameters.getLong("missing.long1"));
+	}
+
+	@Test
+	public void testGetMissingDouble() {
+		assertEquals(0.0, parameters.getDouble("missing.double1"), 0.0001);
+	}
+
+	@Test
 	public void testIsEmptyWhenEmpty() throws Exception {
 		assertTrue(new JobParameters().isEmpty());
 	}

@@ -1,0 +1,39 @@
+Spring Batch 2.1.8 Release Notes
+
+
+* Bug
+
+  * {{{https://jira.springframework.org/browse/BATCH-1725}[BATCH-1725]}} - SubclassClassifier should use ConcurrentHashMap
+
+  * {{{https://jira.springframework.org/browse/BATCH-1727}[BATCH-1727]}} - Child contexts created by AutomaticJobRegistrar cannot easily use PropertyPlaceholderConfigurer
+
+  * {{{https://jira.springframework.org/browse/BATCH-1738}[BATCH-1738]}} - StaxEventItemReader stops reading when exception occurs during unmarshalling
+
+  * {{{https://jira.springframework.org/browse/BATCH-1739}[BATCH-1739]}} - Inheriting from parent step with skip-limit/retry-limit causes IllegalArgumentException when the inheriting bean doesn't define exception-classes.
+
+  * {{{https://jira.springframework.org/browse/BATCH-1742}[BATCH-1742]}} - HippyMethodInvoker fails when target uses method overloading and there is no exact match for arguments
+
+  * {{{https://jira.springframework.org/browse/BATCH-1743}[BATCH-1743]}} - Use step scope for PartitionHandler (so gridSize can be a job parameter) - broken in 2.1.7.
+
+  * {{{https://jira.springframework.org/browse/BATCH-1744}[BATCH-1744]}} - Revert retry-limit and skip-limit changes from BATCH-1396.
+
+* Improvement
+
+  * {{{https://jira.springframework.org/browse/BATCH-1316}[BATCH-1316]}} - JobParameters throws NullPointerException on missing key
+
+  * {{{https://jira.springframework.org/browse/BATCH-1719}[BATCH-1719]}} - The step execution context is not deserialized for getJobExecutions() and findRunningJobExecutions()
+
+  * {{{https://jira.springframework.org/browse/BATCH-1721}[BATCH-1721]}} - Replace + inside of StringBuilder.append() call in FlatFileItemWriter
+
+  * {{{https://jira.springframework.org/browse/BATCH-1722}[BATCH-1722]}} - ExecutionContextUserSupport refers to ItemStream in code and documentation
+
+  * {{{https://jira.springframework.org/browse/BATCH-1730}[BATCH-1730]}} - Flow based step cannot be repeated/ restarted within a partition
+
+* New Feature
+
+  * {{{https://jira.springframework.org/browse/BATCH-1737}[BATCH-1737]}} - DelimitedLineTokenizer. Specify which fields from a row you want to read
+
+* Pruning
+
+  * {{{https://jira.springframework.org/browse/BATCH-1741}[BATCH-1741]}} - Update javadoc for HibernateItemWriter
+

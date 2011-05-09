@@ -25,7 +25,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.aop.framework.Advised;
 import org.springframework.batch.core.Step;
-import org.springframework.batch.core.StepExecutionListener;
+import org.springframework.batch.core.StepListener;
 import org.springframework.batch.core.listener.CompositeStepExecutionListener;
 import org.springframework.batch.core.listener.ItemListenerSupport;
 import org.springframework.batch.core.listener.StepExecutionListenerSupport;
@@ -127,7 +127,7 @@ public class StepListenerParserTests {
 
 		Object compositeListener = ReflectionTestUtils.getField(step, "stepExecutionListener");
 		Object composite = ReflectionTestUtils.getField(compositeListener, "list");
-		List<StepExecutionListener> proxiedListeners = (List<StepExecutionListener>) ReflectionTestUtils.getField(
+		List<StepListener> proxiedListeners = (List<StepListener>) ReflectionTestUtils.getField(
 				composite, "list");
 		List<Object> r = new ArrayList<Object>();
 		for (Object listener : proxiedListeners) {
@@ -138,7 +138,7 @@ public class StepListenerParserTests {
 		}
 		compositeListener = ReflectionTestUtils.getField(step, "chunkListener");
 		composite = ReflectionTestUtils.getField(compositeListener, "listeners");
-		proxiedListeners = (List<StepExecutionListener>) ReflectionTestUtils.getField(composite, "list");
+		proxiedListeners = (List<StepListener>) ReflectionTestUtils.getField(composite, "list");
 		for (Object listener : proxiedListeners) {
 			while (listener instanceof Advised) {
 				listener = ((Advised) listener).getTargetSource().getTarget();
@@ -151,7 +151,7 @@ public class StepListenerParserTests {
 							ReflectionTestUtils.getField(step, "tasklet"), "chunkProvider"), "listener"),
 					"itemReadListener");
 			composite = ReflectionTestUtils.getField(compositeListener, "listeners");
-			proxiedListeners = (List<StepExecutionListener>) ReflectionTestUtils.getField(composite, "list");
+			proxiedListeners = (List<StepListener>) ReflectionTestUtils.getField(composite, "list");
 			for (Object listener : proxiedListeners) {
 				while (listener instanceof Advised) {
 					listener = ((Advised) listener).getTargetSource().getTarget();

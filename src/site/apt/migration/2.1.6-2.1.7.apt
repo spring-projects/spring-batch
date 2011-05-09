@@ -1,0 +1,36 @@
+Spring Batch 2.1.7 Release Notes
+
+* Bug
+
+
+  * {{{https://jira.springframework.org/browse/BATCH-1705}[BATCH-1705]}} - CommandLineJobRunner fails if standard input not available
+
+  * {{{https://jira.springframework.org/browse/BATCH-1707}[BATCH-1707]}} - MapJobInstanceDao.getJobInstances(String jobName, int start, int count) does not work
+
+  * {{{https://jira.springframework.org/browse/BATCH-1709}[BATCH-1709]}} - BeanWrapperFieldSetMapper race condition in cache
+
+  * {{{https://jira.springframework.org/browse/BATCH-1712}[BATCH-1712]}} - Inline step definitions clash if multiple instances share a TaskExecutorPartitionHandler
+
+  * {{{https://jira.springframework.org/browse/BATCH-1717}[BATCH-1717]}} - Failure in RetryPolicy leads to infinite loop in Step
+
+* Improvement
+
+
+  * {{{https://jira.springframework.org/browse/BATCH-1693}[BATCH-1693]}} - Add RemoteStepExecutionAggregator to update step executions from the repository during partition processing
+
+  * {{{https://jira.springframework.org/browse/BATCH-1713}[BATCH-1713]}} - The step execution context is not deserialized by default and no API to do it effectively
+
+* New Feature
+
+
+  * {{{https://jira.springframework.org/browse/BATCH-1396}[BATCH-1396]}} - Late binding of commit-interval, retry-limit, skip-limit, e.g. bound from job parameters.
+
+  * {{{https://jira.springframework.org/browse/BATCH-1696}[BATCH-1696]}} - DelimitedLineTokenizer always trims the input data
+
+  * {{{https://jira.springframework.org/browse/BATCH-1708}[BATCH-1708]}} - Inefficient (and unnecessary?) locking in TaskletStep and CompositeItemStream
+
+* Refactoring
+
+
+  * {{{https://jira.springframework.org/browse/BATCH-1532}[BATCH-1532]}} - Use Spring 3.0 OXM instead of SWS 1.5
+

@@ -17,6 +17,8 @@
 package org.springframework.batch.item.file.transform;
 
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
 
 import org.springframework.util.Assert;
@@ -43,7 +45,8 @@ public class DelimitedLineTokenizer extends AbstractLineTokenizer {
 	public static final char DELIMITER_COMMA = ',';
 
 	/**
-	 * Convenient constant for the common case of a " character used to escape delimiters or line endings.
+	 * Convenient constant for the common case of a " character used to escape
+	 * delimiters or line endings.
 	 */
 	public static final char DEFAULT_QUOTE_CHARACTER = '"';
 
@@ -54,9 +57,11 @@ public class DelimitedLineTokenizer extends AbstractLineTokenizer {
 
 	private String quoteString;
 
+	private Collection<Integer> includedFields = null;
+
 	/**
-	 * Create a new instance of the {@link DelimitedLineTokenizer} class for the common case where the delimiter is a
-	 * {@link #DELIMITER_COMMA comma}.
+	 * Create a new instance of the {@link DelimitedLineTokenizer} class for the
+	 * common case where the delimiter is a {@link #DELIMITER_COMMA comma}.
 	 * 
 	 * @see #DelimitedLineTokenizer(char)
 	 * @see #DELIMITER_COMMA
@@ -72,7 +77,7 @@ public class DelimitedLineTokenizer extends AbstractLineTokenizer {
 	 */
 	public DelimitedLineTokenizer(char delimiter) {
 		Assert.state(delimiter != DEFAULT_QUOTE_CHARACTER, "[" + DEFAULT_QUOTE_CHARACTER
-		        + "] is not allowed as delimiter for tokenizers.");
+				+ "] is not allowed as delimiter for tokenizers.");
 
 		this.delimiter = delimiter;
 		setQuoteCharacter(DEFAULT_QUOTE_CHARACTER);
@@ -88,9 +93,25 @@ public class DelimitedLineTokenizer extends AbstractLineTokenizer {
 	}
 
 	/**
-	 * Public setter for the quoteCharacter. The quote character can be used to extend a field across line endings or to
-	 * enclose a String which contains the delimiter. Inside a quoted token the quote character can be used to escape
-	 * itself, thus "a""b""c" is tokenized to a"b"c.
+	 * The fields to include in the output by position (starting at 0). By
+	 * default all fields are included, but this property can be set to pick out
+	 * only a few fields from a larger set. Note that if field names are
+	 * provided, their number must match the number of included fields.
+	 * 
+	 * @param includedFields the included fields to set
+	 */
+	public void setIncludedFields(int[] includedFields) {
+		this.includedFields = new HashSet<Integer>();
+		for (int i : includedFields) {
+			this.includedFields.add(i);
+		}
+	}
+
+	/**
+	 * Public setter for the quoteCharacter. The quote character can be used to
+	 * extend a field across line endings or to enclose a String which contains
+	 * the delimiter. Inside a quoted token the quote character can be used to
+	 * escape itself, thus "a""b""c" is tokenized to a"b"c.
 	 * 
 	 * @param quoteCharacter the quoteCharacter to set
 	 * 
@@ -102,7 +123,8 @@ public class DelimitedLineTokenizer extends AbstractLineTokenizer {
 	}
 
 	/**
-	 * Yields the tokens resulting from the splitting of the supplied <code>line</code>.
+	 * Yields the tokens resulting from the splitting of the supplied
+	 * <code>line</code>.
 	 * 
 	 * @param line the line to be tokenized
 	 * 
@@ -118,6 +140,7 @@ public class DelimitedLineTokenizer extends AbstractLineTokenizer {
 		boolean inQuoted = false;
 		int lastCut = 0;
 		int length = chars.length;
+		int fieldCount = 0;
 
 		for (int i = 0; i < length; i++) {
 
@@ -131,18 +154,23 @@ public class DelimitedLineTokenizer extends AbstractLineTokenizer {
 					endPosition--;
 				}
 
-				String value = null;
+				if (includedFields == null || includedFields.contains(fieldCount)) {
+					String value = maybeStripQuotes(new String(chars, lastCut, endPosition));
+					tokens.add(value);
+				}
 
-				value = maybeStripQuotes(new String(chars, lastCut, endPosition));
-
-				tokens.add(value);
+				fieldCount++;
 
 				if (isEnd && (isDelimiterCharacter(currentChar))) {
-					tokens.add("");
+					if (includedFields == null || includedFields.contains(fieldCount)) {
+						tokens.add("");
+					}
+					fieldCount++;
 				}
 
 				lastCut = i + 1;
-			} else if (isQuoteCharacter(currentChar)) {
+			}
+			else if (isQuoteCharacter(currentChar)) {
 				inQuoted = !inQuoted;
 			}
 
@@ -152,8 +180,9 @@ public class DelimitedLineTokenizer extends AbstractLineTokenizer {
 	}
 
 	/**
-	 * If the string is quoted strip (possibly with whitespace outside the quotes (which will be stripped), replace
-	 * escaped quotes inside the string. Quotes are escaped with double instances of the quote character.
+	 * If the string is quoted strip (possibly with whitespace outside the
+	 * quotes (which will be stripped), replace escaped quotes inside the
+	 * string. Quotes are escaped with double instances of the quote character.
 	 * 
 	 * @param string
 	 * @return the same string but stripped and unescaped if necessary
@@ -168,15 +197,17 @@ public class DelimitedLineTokenizer extends AbstractLineTokenizer {
 				endLength = 1;
 			}
 			value = value.substring(1, endLength);
+			return value;
 		}
-		return value;
+		return string;
 	}
 
 	/**
 	 * Is this string surrounded by quote characters?
 	 * 
 	 * @param value
-	 * @return true if the value starts and ends with the {@link #quoteCharacter}
+	 * @return true if the value starts and ends with the
+	 * {@link #quoteCharacter}
 	 */
 	private boolean isQuoted(String value) {
 		if (value.startsWith(quoteString) && value.endsWith(quoteString)) {
@@ -189,7 +220,8 @@ public class DelimitedLineTokenizer extends AbstractLineTokenizer {
 	 * Is the supplied character the delimiter character?
 	 * 
 	 * @param c the character to be checked
-	 * @return <code>true</code> if the supplied character is the delimiter character
+	 * @return <code>true</code> if the supplied character is the delimiter
+	 * character
 	 * @see DelimitedLineTokenizer#DelimitedLineTokenizer(char)
 	 */
 	private boolean isDelimiterCharacter(char c) {

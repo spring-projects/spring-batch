@@ -99,7 +99,7 @@
 	<aop:config>
 		<aop:aspect id="moduleLogging" ref="logAdvice">
 			<aop:after
-				pointcut="execution( * org.springframework.batch.item.ItemWriter+.write(Object)) and args(item)"
+				pointcut="execution( * org.springframework.batch.item.ItemWriter+.write(..)) and args(item)"
 				method="doStronglyTypedLogging" />
 		</aop:aspect>
 		<aop:aspect ref="eventAdvice">

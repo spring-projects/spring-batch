@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans:beans xmlns="http://www.springframework.org/schema/batch" xmlns:beans="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.springframework.org/schema/batch http://www.springframework.org/schema/batch/spring-batch-2.1.xsd
+	http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.5.xsd">
+
+	<beans:import resource="common-context.xml" />
+
+	<step id="stepParent" abstract="true" xmlns="http://www.springframework.org/schema/batch">
+		<tasklet>
+			<chunk/>
+		</tasklet>
+	</step>
+
+	<job id="job">
+		<step id="s1" parent="stepParent">
+			<tasklet>
+				<chunk reader="reader" writer="writer" processor="processor" commit-interval="1"
+					retry-policy="retryPolicy"/>
+			</tasklet>
+		</step>
+	</job>
+
+	<bean id="retryPolicy" class="org.springframework.batch.retry.policy.SimpleRetryPolicy" xmlns="http://www.springframework.org/schema/beans"
+		scope="step">
+		<property name="maxAttempts" value="#{jobParameters['retry.interval']}" />
+		<property name="retryableExceptions">
+			<map key-type="java.lang.Class">
+				<entry key="java.lang.Exception" value="true" />
+			</map>
+		</property>
+	</bean>
+
+</beans:beans>

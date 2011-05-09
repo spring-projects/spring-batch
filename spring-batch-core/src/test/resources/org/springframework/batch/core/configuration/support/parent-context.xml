@@ -8,6 +8,7 @@
 
 	<bean class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
 		<property name="properties" value="foo=bar" />
+		<property name="order" value="1"/>
 	</bean>
 
 	<bean class="org.springframework.beans.factory.config.CustomEditorConfigurer">
