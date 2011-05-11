@@ -11,11 +11,13 @@ Spring Batch Downloads
 
 * Zip Downloads
 
-  There is a ZIP artifact containing the release JARs called  <<<spring-batch-*-no-dependencies.zip>>>.  This file contains the JAR files for the release, including source code.  In addition, this release contains the Spring Batch source code including the samples.
+  There is a ZIP artifact containing the release JARs called  <<<spring-batch-*-no-dependencies.zip>>>.  This file contains the JAR files for the release, including source code and the samples.
 
   * Full releases: {{{http://static.springframework.org/downloads/nightly/release-download.php?project=BATCH}here}}.  
 
   * Milestones: {{{http://static.springframework.org/downloads/nightly/milestone-download.php?project=BATCH}here}}.
+
+Source code can also be browsed and downloaded at {{{http://github.com/SpringSource/spring-batch}Github}}.
 
 * Maven Artifacts
 
