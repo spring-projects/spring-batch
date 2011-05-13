@@ -16,18 +16,21 @@
 
 package org.springframework.batch.support;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
 import java.util.Properties;
 
+import org.junit.Test;
 import org.springframework.util.StringUtils;
-
-import junit.framework.TestCase;
 
 /**
  * Unit tests for {@link PropertiesConverter}
  * 
  * @author Robert Kasanicky
  */
-public class PropertiesConverterTests extends TestCase {
+public class PropertiesConverterTests {
 	
 	//convenience attributes for storing results of conversions
 	private Properties props = null;
@@ -36,6 +39,7 @@ public class PropertiesConverterTests extends TestCase {
 	/**
 	 * Check that Properties can be converted to String and back correctly.
 	 */
+	@Test
 	public void testTwoWayRegularConversion() {
 		
 		Properties storedProps = new Properties();
@@ -50,6 +54,7 @@ public class PropertiesConverterTests extends TestCase {
 	/**
 	 * Check that Properties can be comma delimited.
 	 */
+	@Test
 	public void testRegularConversionWithComma() {
 		
 		Properties storedProps = new Properties();
@@ -64,6 +69,7 @@ public class PropertiesConverterTests extends TestCase {
 	/**
 	 * Check that Properties can be comma delimited with extra whitespace.
 	 */
+	@Test
 	public void testRegularConversionWithCommaAndWhitespace() {
 		
 		Properties storedProps = new Properties();
@@ -78,6 +84,7 @@ public class PropertiesConverterTests extends TestCase {
 	/**
 	 * Check that Properties can be comma delimited with extra whitespace.
 	 */
+	@Test
 	public void testShortConversionWithCommas() {
 		
 		Properties storedProps = new Properties();
@@ -94,6 +101,7 @@ public class PropertiesConverterTests extends TestCase {
 	/**
 	 * Check that Properties can be newline delimited.
 	 */
+	@Test
 	public void testRegularConversionWithCommaAndNewline() {
 		
 		Properties storedProps = new Properties();
@@ -108,6 +116,7 @@ public class PropertiesConverterTests extends TestCase {
 	/**
 	 * Null String should be converted to empty Properties
 	 */
+	@Test
 	public void testStringToPropertiesNull() {
 		props = PropertiesConverter.stringToProperties(null);
 		assertNotNull(props);
@@ -117,12 +126,22 @@ public class PropertiesConverterTests extends TestCase {
 	/**
 	 * Null or empty properties should be converted to empty String
 	 */
+	@Test
 	public void testPropertiesToStringNull() {
 		string = PropertiesConverter.propertiesToString(null);
 		assertEquals("", string);
 		
 		string = PropertiesConverter.propertiesToString(new Properties());
 		assertEquals("", string);
+	}
+	
+	@Test
+	public void testEscapedColon() throws Exception {
+		Properties props = new Properties();
+		props.setProperty("test", "C:/test");
+		String str = PropertiesConverter.propertiesToString(props);
+		props = PropertiesConverter.stringToProperties(str);
+		assertEquals("C:/test", props.getProperty("test"));
 	}
 	
 }
