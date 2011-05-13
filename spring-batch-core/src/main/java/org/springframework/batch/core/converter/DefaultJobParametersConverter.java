@@ -161,6 +161,9 @@ public class DefaultJobParametersConverter implements JobParametersConverter {
 			else if (jobParameter.getType() == ParameterType.LONG) {
 				result.setProperty(key + LONG_TYPE, numberFormat.format(value));
 			}
+			else if (jobParameter.getType() == ParameterType.DOUBLE) {
+				result.setProperty(key + DOUBLE_TYPE, value.toString());
+			}
 			else {
 				result.setProperty(key, "" + value);
 			}
