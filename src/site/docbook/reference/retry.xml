@@ -231,7 +231,7 @@ Foo result = template.execute(new RetryCallback&lt;Foo&gt;() {
 // Retry on all exceptions (this is the default)
 policy.setRetryableExceptions(new Class[] {Exception.class});
 // ... but never retry IllegalStateException
-policy.setFatalExceptions(new Class[] {ILlegalStateException.class});
+policy.setFatalExceptions(new Class[] {IllegalStateException.class});
 
 // Use the policy...
 RetryTemplate template = new RetryTemplate();

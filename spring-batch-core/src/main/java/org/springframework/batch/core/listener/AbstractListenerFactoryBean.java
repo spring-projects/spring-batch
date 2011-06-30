@@ -21,8 +21,8 @@ import static org.springframework.batch.support.MethodInvokerUtils.getMethodInvo
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
-import java.util.Set;
 import java.util.Map.Entry;
+import java.util.Set;
 
 import org.springframework.aop.TargetSource;
 import org.springframework.aop.framework.Advised;
@@ -88,21 +88,54 @@ public abstract class AbstractListenerFactoryBean implements FactoryBean, Initia
 		// For every entry in the map, try and find a method by interface, name,
 		// or annotation. If the same
 		Map<String, Set<MethodInvoker>> invokerMap = new HashMap<String, Set<MethodInvoker>>();
+		boolean synthetic = false;
 		for (Entry<String, String> entry : metaDataMap.entrySet()) {
+
 			final ListenerMetaData metaData = this.getMetaDataFromPropertyName(entry.getKey());
-			Set<MethodInvoker> invokers = new NullIgnoringSet<MethodInvoker>();
-			invokers.add(getMethodInvokerByName(entry.getValue(), delegate, metaData.getParamTypes()));
-			invokers.add(getMethodInvokerForInterface(metaData.getListenerInterface(), metaData.getMethodName(),
-					delegate, metaData.getParamTypes()));
-			invokers.add(getMethodInvokerByAnnotation(metaData.getAnnotation(), delegate, metaData.getParamTypes()));
+			Set<MethodInvoker> invokers = new HashSet<MethodInvoker>();
+
+			MethodInvoker invoker;
+
+			invoker = getMethodInvokerForInterface(metaData.getListenerInterface(), metaData.getMethodName(), delegate,
+					metaData.getParamTypes());
+			if (invoker != null) {
+				invokers.add(invoker);
+			}
+			
+			invoker = getMethodInvokerByName(entry.getValue(), delegate, metaData.getParamTypes());
+			if (invoker != null) {
+				invokers.add(invoker);
+				synthetic = true;
+			}
+
+			invoker = getMethodInvokerByAnnotation(metaData.getAnnotation(), delegate, metaData.getParamTypes());
+			if (invoker != null) {
+				invokers.add(invoker);
+				synthetic = true;
+			}
+
 			if (!invokers.isEmpty()) {
 				invokerMap.put(metaData.getMethodName(), invokers);
 				listenerInterfaces.add(metaData.getListenerInterface());
 			}
+
 		}
 
 		if (listenerInterfaces.isEmpty()) {
 			listenerInterfaces.add(this.getDefaultListenerClass());
+		}
+
+		if (!synthetic) {
+			int count = 0;
+			for (Class<?> listenerInterface : listenerInterfaces) {
+				if (listenerInterface.isInstance(delegate)) {
+					count++;
+				}
+			}
+			// All listeners can be supplied by the delegate itself
+			if (count == listenerInterfaces.size()) {
+				return delegate;
+			}
 		}
 
 		boolean ordered = false;
@@ -153,23 +186,6 @@ public abstract class AbstractListenerFactoryBean implements FactoryBean, Initia
 		this.metaDataMap = metaDataMap;
 	}
 
-	/*
-	 * Extension of HashSet that ignores nulls, rather than putting them into
-	 * the set.
-	 */
-	protected static class NullIgnoringSet<E> extends HashSet<E> {
-
-		@Override
-		public boolean add(E e) {
-			if (e == null) {
-				return false;
-			}
-			else {
-				return super.add(e);
-			}
-		};
-	}
-
 	public void afterPropertiesSet() throws Exception {
 		Assert.notNull(delegate, "Delegate must not be null");
 	}
@@ -191,7 +207,8 @@ public abstract class AbstractListenerFactoryBean implements FactoryBean, Initia
 		}
 		if (target instanceof Advised) {
 			TargetSource targetSource = ((Advised) target).getTargetSource();
-			if (targetSource!=null && targetSource.getTargetClass()!=null && listenerType.isAssignableFrom(targetSource.getTargetClass())) {
+			if (targetSource != null && targetSource.getTargetClass() != null
+					&& listenerType.isAssignableFrom(targetSource.getTargetClass())) {
 				return true;
 			}
 		}

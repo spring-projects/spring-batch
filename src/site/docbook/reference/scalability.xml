@@ -66,7 +66,7 @@
     non-consecutive compared to the single-threaded case. In addition
     to any limits placed by the task executor (e.g. if it is backed by
     a thread pool), there is a throttle limit in the tasklet
-    configuration which defaults to 6.  You may need to increase this
+    configuration which defaults to 4.  You may need to increase this
     to ensure that a thread pool is fully utilised, e.g.</para>
 
     <programlisting>&lt;step id="loading"&gt; &lt;tasklet

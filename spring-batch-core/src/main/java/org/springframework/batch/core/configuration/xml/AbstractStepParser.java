@@ -15,6 +15,7 @@
  */
 package org.springframework.batch.core.configuration.xml;
 
+import org.springframework.batch.core.listener.StepListenerMetaData;
 import org.springframework.beans.MutablePropertyValues;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.config.RuntimeBeanReference;
@@ -64,6 +65,8 @@ public abstract class AbstractStepParser {
 
 	private static final String PARTITIONER_ATTR = "partitioner";
 
+	private static final String AGGREGATOR_ATTR = "aggregator";
+
 	private static final String HANDLER_ATTR = "handler";
 
 	private static final String HANDLER_ELE = "handler";
@@ -75,6 +78,8 @@ public abstract class AbstractStepParser {
 	private static final String FLOW_ELE = "flow";
 
 	private static final String JOB_REPO_ATTR = "job-repository";
+
+	private static final StepListenerParser stepListenerParser = new StepListenerParser(StepListenerMetaData.stepExecutionListenerMetaData());
 
 	/**
 	 * @param stepElement   The &lt;step/&gt; element
@@ -135,6 +140,8 @@ public abstract class AbstractStepParser {
 			bd.setDescription(description.getTextContent());
 		}
 
+		stepListenerParser.handleListenersElement(stepElement, bd, parserContext);
+
 		return bd;
 
 	}
@@ -145,6 +152,7 @@ public abstract class AbstractStepParser {
 		bd.setAttribute("isNamespaceStep", true);
 		String stepRef = partitionElement.getAttribute(STEP_ATTR);
 		String partitionerRef = partitionElement.getAttribute(PARTITIONER_ATTR);
+		String aggregatorRef = partitionElement.getAttribute(AGGREGATOR_ATTR);
 		String handlerRef = partitionElement.getAttribute(HANDLER_ATTR);
 
 		if (!StringUtils.hasText(partitionerRef)) {
@@ -152,24 +160,14 @@ public abstract class AbstractStepParser {
 			return;
 		}
 
-		Element inlineStepElement = DomUtils.getChildElementByTagName(partitionElement, STEP_ELE);
-		if (inlineStepElement == null && !StringUtils.hasText(stepRef)) {
-			parserContext.getReaderContext().error("You must specify a step", partitionElement);
-			return;
-		}
-
-
 		MutablePropertyValues propertyValues = bd.getPropertyValues();
 
-		if (StringUtils.hasText(stepRef)) {
-			propertyValues.addPropertyValue("step", new RuntimeBeanReference(stepRef));
-		} else if( inlineStepElement!=null) {
-			AbstractBeanDefinition stepDefinition = parseStep(inlineStepElement, parserContext, jobFactoryRef);
-			propertyValues.addPropertyValue("step", stepDefinition );
+		propertyValues.addPropertyValue("partitioner", new RuntimeBeanReference(partitionerRef));
+		if (StringUtils.hasText(aggregatorRef)) {
+			propertyValues.addPropertyValue("stepExecutionAggregator", new RuntimeBeanReference(aggregatorRef));			
 		}
 
-		propertyValues.addPropertyValue("partitioner", new RuntimeBeanReference(partitionerRef));
-
+		boolean customHandler = false;
 		if (!StringUtils.hasText(handlerRef)) {
 			Element handlerElement = DomUtils.getChildElementByTagName(partitionElement, HANDLER_ELE);
 			if (handlerElement != null) {
@@ -183,7 +181,24 @@ public abstract class AbstractStepParser {
 				}
 			}
 		} else {
-			propertyValues.addPropertyValue("partitionHandler", new RuntimeBeanReference(handlerRef));
+			customHandler = true;
+			BeanDefinition partitionHandler = BeanDefinitionBuilder.genericBeanDefinition().getRawBeanDefinition();
+			partitionHandler.setParentName(handlerRef);
+			propertyValues.addPropertyValue("partitionHandler", partitionHandler);
+		}
+
+		Element inlineStepElement = DomUtils.getChildElementByTagName(partitionElement, STEP_ELE);
+		if (inlineStepElement == null && !StringUtils.hasText(stepRef) && !customHandler) {
+			parserContext.getReaderContext().error("You must specify a step", partitionElement);
+			return;
+		}
+
+		if (StringUtils.hasText(stepRef)) {
+			propertyValues.addPropertyValue("step", new RuntimeBeanReference(stepRef));
+		} else if( inlineStepElement!=null) {
+			AbstractBeanDefinition stepDefinition = parseStep(inlineStepElement, parserContext, jobFactoryRef);
+			stepDefinition.getPropertyValues().addPropertyValue("name", stepElement.getAttribute(ID_ATTR));
+			propertyValues.addPropertyValue("step", stepDefinition );
 		}
 
 	}

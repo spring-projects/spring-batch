@@ -26,14 +26,14 @@ import org.springframework.beans.factory.support.BeanDefinitionBuilder;
 import org.springframework.beans.factory.support.GenericBeanDefinition;
 import org.springframework.beans.factory.support.ManagedList;
 import org.springframework.beans.factory.xml.ParserContext;
+import org.springframework.core.task.TaskExecutor;
 import org.springframework.util.StringUtils;
 import org.springframework.util.xml.DomUtils;
 import org.w3c.dom.Element;
 
 /**
  * Internal parser for the &lt;split/&gt; elements inside a job. A split element
- * references a bean definition for a
- * {@link org.springframework.batch.core.job.flow.JobExecutionDecider} and goes
+ * optionally references a bean definition for a {@link TaskExecutor} and goes
  * on to list a set of transitions to other states with &lt;next on="pattern"
  * to="stepName"/&gt;. Used by the {@link JobParser}.
  * 
@@ -48,6 +48,7 @@ public class SplitParser {
 	 * 
 	 */
 	private static final String PARENT_ATTR = "parent";
+
 	private final String jobFactoryRef;
 
 	/**
@@ -93,12 +94,13 @@ public class SplitParser {
 		@SuppressWarnings("unchecked")
 		Collection<Object> flows = new ManagedList();
 		int i = 0;
-		String prefix = idAttribute.startsWith(jobFactoryRef) ? idAttribute : jobFactoryRef+"."+idAttribute;
+		String prefix = idAttribute;
 		for (Element nextElement : flowElements) {
 			String ref = nextElement.getAttribute(PARENT_ATTR);
 			if (StringUtils.hasText(ref)) {
 				if (nextElement.getElementsByTagName("*").getLength() > 0) {
-					parserContext.getReaderContext().error("A <flow/> in a <split/> must have ref= or nested <flow/>, but not both.", nextElement);
+					parserContext.getReaderContext().error(
+							"A <flow/> in a <split/> must have ref= or nested <flow/>, but not both.", nextElement);
 				}
 				AbstractBeanDefinition flowDefinition = new GenericBeanDefinition();
 				flowDefinition.setParentName(ref);

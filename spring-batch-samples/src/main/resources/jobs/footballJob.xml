@@ -93,12 +93,13 @@
 				GAMES.player_id group by GAMES.player_id, GAMES.year_no
 			</value>
 		</property>
+		<property name="verifyCursorPosition" value="${batch.verify.cursor.position}"/>
 	</bean>
 
 	<aop:config>
 		<aop:aspect id="moduleLogging" ref="logAdvice">
 			<aop:after
-				pointcut="execution( * org.springframework.batch.item.ItemWriter+.write(Object)) and args(item)"
+				pointcut="execution( * org.springframework.batch.item.ItemWriter+.write(..)) and args(item)"
 				method="doStronglyTypedLogging" />
 		</aop:aspect>
 		<aop:aspect ref="eventAdvice">

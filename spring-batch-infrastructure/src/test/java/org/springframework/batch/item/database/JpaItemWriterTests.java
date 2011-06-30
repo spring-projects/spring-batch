@@ -79,7 +79,6 @@ public class JpaItemWriterTests {
 		em.merge("bar");
 		expectLastCall().andReturn("bar");
 		em.flush();
-		em.clear();
 		replay(em);
 		replay(emf);
 		TransactionSynchronizationManager.bindResource(emf, new EntityManagerHolder(em));

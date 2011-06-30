@@ -44,6 +44,7 @@ import org.springframework.batch.item.file.transform.LineAggregator;
 import org.springframework.batch.item.file.transform.PassThroughLineAggregator;
 import org.springframework.batch.support.transaction.ResourcelessTransactionManager;
 import org.springframework.core.io.FileSystemResource;
+import org.springframework.core.io.Resource;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.TransactionStatus;
 import org.springframework.transaction.support.TransactionCallback;
@@ -51,9 +52,8 @@ import org.springframework.transaction.support.TransactionTemplate;
 import org.springframework.util.ClassUtils;
 
 /**
- * Tests of regular usage for {@link FlatFileItemWriter} Exception cases will be
- * in separate TestCase classes with different <code>setUp</code> and
- * <code>tearDown</code> methods
+ * Tests of regular usage for {@link FlatFileItemWriter} Exception cases will be in separate TestCase classes with
+ * different <code>setUp</code> and <code>tearDown</code> methods
  * 
  * @author Robert Kasanicky
  * @author Dave Syer
@@ -76,8 +76,7 @@ public class FlatFileItemWriterTests {
 	private ExecutionContext executionContext;
 
 	/**
-	 * Create temporary output file, define mock behaviour, set dependencies and
-	 * initialize the object under test
+	 * Create temporary output file, define mock behaviour, set dependencies and initialize the object under test
 	 */
 	@Before
 	public void setUp() throws Exception {
@@ -105,9 +104,8 @@ public class FlatFileItemWriterTests {
 	}
 
 	/*
-	 * Read a line from the output file, if the reader has not been created,
-	 * recreate. This method is only necessary because running the tests in a
-	 * UNIX environment locks the file if it's open for writing.
+	 * Read a line from the output file, if the reader has not been created, recreate. This method is only necessary
+	 * because running the tests in a UNIX environment locks the file if it's open for writing.
 	 */
 	private String readLine() throws IOException {
 
@@ -153,6 +151,33 @@ public class FlatFileItemWriterTests {
 		writer.write(Collections.singletonList("test2"));
 		assertEquals("test1", readLine());
 		assertEquals("test2", readLine());
+	}
+
+	@Test
+	public void testWriteWithAppendRestartOnSecondChunk() throws Exception {
+		writer.setAppendAllowed(true);
+		writer.open(executionContext);
+		writer.write(Collections.singletonList("test1"));
+		writer.close();
+		assertEquals("test1", readLine());
+		reader = null;
+		writer.open(executionContext);
+		writer.write(Collections.singletonList(TEST_STRING));
+		writer.update(executionContext);
+		writer.write(Collections.singletonList(TEST_STRING));
+		writer.close();
+		assertEquals("test1", readLine());
+		assertEquals(TEST_STRING, readLine());
+		assertEquals(TEST_STRING, readLine());
+		assertEquals(null, readLine());
+		writer.open(executionContext);
+		writer.write(Collections.singletonList(TEST_STRING));
+		writer.close();
+		reader = null;
+		assertEquals("test1", readLine());
+		assertEquals(TEST_STRING, readLine());
+		assertEquals(TEST_STRING, readLine());
+		assertEquals(null, readLine());
 	}
 
 	@Test
@@ -293,7 +318,7 @@ public class FlatFileItemWriterTests {
 
 	private void writeStringTransactionCheck(final String expectedInTransaction) {
 		PlatformTransactionManager transactionManager = new ResourcelessTransactionManager();
-		
+
 		writer.open(executionContext);
 		new TransactionTemplate(transactionManager).execute(new TransactionCallback() {
 			public Object doInTransaction(TransactionStatus status) {
@@ -304,7 +329,7 @@ public class FlatFileItemWriterTests {
 				catch (Exception e) {
 					throw new UnexpectedInputException("Could not write data", e);
 				}
-				
+
 				return null;
 			}
 		});
@@ -325,7 +350,7 @@ public class FlatFileItemWriterTests {
 		writer.open(executionContext);
 
 		PlatformTransactionManager transactionManager = new ResourcelessTransactionManager();
-		
+
 		new TransactionTemplate(transactionManager).execute(new TransactionCallback() {
 			public Object doInTransaction(TransactionStatus status) {
 				try {
@@ -627,5 +652,27 @@ public class FlatFileItemWriterTests {
 
 		// nothing was written to output
 		assertNull(readLine());
+	}
+
+	@Test
+	/**
+	 * If append=true a new output file should still be created on the first run (not restart).
+	 */
+	public void testAppendToNotYetExistingFile() throws Exception {
+		Resource toBeCreated = new FileSystemResource("target/FlatFileItemWriterTests.out");
+		
+		outputFile = toBeCreated.getFile(); //enable easy content reading and auto-delete the file 
+		
+		assertFalse("output file does not exist yet", toBeCreated.exists());
+		writer.setResource(toBeCreated);
+		writer.setAppendAllowed(true);
+		writer.afterPropertiesSet();
+
+		writer.open(executionContext);
+		assertTrue("output file was created", toBeCreated.exists());
+
+		writer.write(Collections.singletonList("test1"));
+		writer.close();
+		assertEquals("test1", readLine());
 	}
 }

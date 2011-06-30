@@ -386,5 +386,28 @@ public class MultiResourceItemReaderIntegrationTests {
 		assertNull("There is no 'current' resource before read is called", tested.getCurrentResource());
 		
 	}
+	
+	/**
+	 * No resources to read should result in error in strict mode.
+	 */
+	@Test(expected = IllegalStateException.class)
+	public void testStrictModeEnabled() throws Exception {
+		tested.setResources(new Resource[] {});
+		tested.setStrict(true);
+		
+		tested.open(ctx);
+	}
+	
+	/**
+	 * No resources to read is OK when strict=false.
+	 */
+	@Test
+	public void testStrictModeDisabled() throws Exception {
+		tested.setResources(new Resource[] {});
+		tested.setStrict(false);
+		
+		tested.open(ctx);
+		assertTrue("empty input doesn't cause an error", true);
+	}
 
 }

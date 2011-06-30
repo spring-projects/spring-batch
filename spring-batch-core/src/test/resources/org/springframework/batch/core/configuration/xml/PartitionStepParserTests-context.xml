@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<beans:beans xmlns="http://www.springframework.org/schema/batch"
-	xmlns:beans="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+<beans:beans xmlns="http://www.springframework.org/schema/batch" xmlns:beans="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://www.springframework.org/schema/batch http://www.springframework.org/schema/batch/spring-batch-2.1.xsd
 	http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.5.xsd">
 
@@ -8,7 +8,7 @@
 
 	<job id="job1">
 		<step id="s1">
-			<partition step="step1" partitioner="partitioner">
+			<partition step="step1" partitioner="partitioner" aggregator="aggregator">
 				<handler task-executor="taskExecutor" grid-size="2" />
 			</partition>
 		</step>
@@ -16,39 +16,52 @@
 
 	<job id="job2">
 		<step id="s2" next="s3">
-			<partition step="step1" handler="handler" partitioner="partitioner"/>
+			<partition handler="handler" partitioner="partitioner" />
 		</step>
-		<step id="s3" parent="step2"/>
+		<step id="s3" parent="step2" />
 	</job>
 
-    <job id="job3">
-		<step id="j3s1"  >
-			<partition handler="handler1" partitioner="partitioner">
-                <step  parent="step2"/>
+	<job id="job3">
+		<step id="j3s1">
+			<partition partitioner="partitioner">
+				<step parent="step2" />
 			</partition>
 		</step>
 	</job>
 
+	<job id="job4">
+		<step id="j4s1">
+			<partition partitioner="partitioner">
+				<step>
+					<tasklet>
+						<chunk reader="reader" writer="writer" commit-interval="10" />
+					</tasklet>
+				</step>
+			</partition>
+		</step>
+	</job>
 
-	<bean id="handler"
-		class="org.springframework.batch.core.partition.support.TaskExecutorPartitionHandler"
-		xmlns="http://www.springframework.org/schema/beans">
+	<job id="job5">
+		<step id="j5s1">
+			<partition handler="handler5" partitioner="partitioner" />
+		</step>
+	</job>
+
+	<!-- for the inline case, demonstrates that we correctly ensure a reference to a step for both the default handler setup 
+		or a custom PartitionHandler -->
+	<bean id="handler" class="org.springframework.batch.core.partition.support.TaskExecutorPartitionHandler" xmlns="http://www.springframework.org/schema/beans">
+		<property name="gridSize" value="3" />
 		<property name="step" ref="step1"/>
-		<property name="gridSize" value="3"/>
 	</bean>
 
-	<beans:bean id="taskExecutor"
-		class="org.springframework.core.task.SyncTaskExecutor" />
+	<beans:bean id="aggregator"
+		class="org.springframework.batch.core.configuration.xml.PartitionStepParserTests$CustomStepExecutionAggregator" />
 
-	<beans:bean id="partitioner"
-		class="org.springframework.batch.core.partition.support.SimplePartitioner" />
+	<beans:bean id="handler5"
+		class="org.springframework.batch.core.configuration.xml.PartitionStepParserTests$CustomPartitionHandler" />
 
-	<!--
-	for the inline case, demonstrates that we correctly ensure a reference to a step for both the default handler setup or a custom PartitionHandler
-	-->
-	<beans:bean id="handler1" class="org.springframework.batch.core.partition.support.TaskExecutorPartitionHandler">
-        <!-- nb: we're not configuring a step! -->
-        <beans:property name="gridSize" value="10" />
-	</beans:bean>
+	<beans:bean id="taskExecutor" class="org.springframework.core.task.SyncTaskExecutor" />
+
+	<beans:bean id="partitioner" class="org.springframework.batch.core.partition.support.SimplePartitioner" />
 
 </beans:beans>

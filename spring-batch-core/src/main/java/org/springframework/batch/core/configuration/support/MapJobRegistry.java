@@ -39,10 +39,6 @@ public class MapJobRegistry implements JobRegistry {
 
 	private Map<String, JobFactory> map = new HashMap<String, JobFactory>();
 
-	/*
-	 * (non-Javadoc)
-	 * @see org.springframework.batch.container.common.configuration.JobConfigurationRegistry#registerJobConfiguration(org.springframework.batch.container.common.configuration.JobConfiguration)
-	 */
 	public void register(JobFactory jobFactory) throws DuplicateJobException {
 		Assert.notNull(jobFactory);
 		String name = jobFactory.getJobName();
@@ -56,10 +52,6 @@ public class MapJobRegistry implements JobRegistry {
 		}
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * @see org.springframework.batch.container.common.configuration.JobConfigurationRegistry#unregister(org.springframework.batch.container.common.configuration.JobConfiguration)
-	 */
 	public void unregister(String name) {
 		Assert.notNull(name, "Job configuration must have a name.");
 		synchronized (map) {
@@ -68,10 +60,6 @@ public class MapJobRegistry implements JobRegistry {
 
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * @see org.springframework.batch.container.common.configuration.JobConfigurationLocator#getJobConfiguration(java.lang.String)
-	 */
 	public Job getJob(String name) throws NoSuchJobException {
 		synchronized (map) {
 			if (!map.containsKey(name)) {
@@ -81,10 +69,6 @@ public class MapJobRegistry implements JobRegistry {
 		}
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * @see org.springframework.batch.container.common.configuration.ListableJobConfigurationRegistry#getJobConfigurations()
-	 */
 	public Collection<String> getJobNames() {
 		synchronized (map) {
 			return Collections.unmodifiableCollection(new HashSet<String>(map.keySet()));

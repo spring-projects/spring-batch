@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans:beans xmlns="http://www.springframework.org/schema/batch" xmlns:beans="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.springframework.org/schema/batch http://www.springframework.org/schema/batch/spring-batch-2.1.xsd
+	http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.5.xsd">
+
+	<beans:import resource="common-context.xml" />
+
+	<job id="job1">
+		<decision decider="decider" id="d1">
+			<next on="OK" to="s1" />
+			<end on="END" />
+		</decision>
+		<step id="s1" next="d1">
+			<partition partitioner="partitioner">
+				<handler grid-size="2" />
+				<step>
+					<flow parent="flow" />
+				</step>
+			</partition>
+		</step>
+	</job>
+
+	<flow id="flow" abstract="true">
+		<step id="s2" parent="step2" next="s3" />
+		<step id="s3" parent="step3" />
+	</flow>
+
+	<beans:bean id="partitioner" class="org.springframework.batch.core.partition.support.SimplePartitioner" />
+
+	<beans:bean id="decider" class="org.springframework.batch.core.configuration.xml.FlowStepParserTests$Decider" />
+
+</beans:beans>

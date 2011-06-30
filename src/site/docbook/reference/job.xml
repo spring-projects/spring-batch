@@ -66,7 +66,7 @@
       <title>Restartability</title>
 
       <para>One key issue when executing a batch job concerns the behavior of
-      a <classname>Job</classname> when it is restarted? The launching of a
+      a <classname>Job</classname> when it is restarted. The launching of a
       <classname>Job</classname> is considered to be a 'restart' if a
       <classname>JobExecution</classname> already exists for the particular
       <classname>JobInstance</classname>. Ideally, all jobs should be able to
@@ -190,7 +190,7 @@ catch (JobRestartException e) {
     <listeners>
 </job>
 
-<job id="job1" parent="baseJob3">
+<job id="job1" parent="baseJob">
     <step id="step1" parent="standaloneStep"/>
 
     <listeners merge="true">
@@ -214,7 +214,7 @@ catch (JobRestartException e) {
       of simple mandatory and optional parameters, and for more complex
       constraints you can implement the interface yourself. The configuration
       of a validator is supported through the XML namespace through a child
-      element of the job, e.g&gt;:</para>
+      element of the job, e.g:</para>
 
       <programlisting><![CDATA[<job id="job1" parent="baseJob3">
     <step id="step1" parent="standaloneStep"/>
@@ -265,7 +265,7 @@ catch (JobRestartException e) {
     length of the long <literal>VARCHAR</literal> columns in the <link
     linkend="metaDataSchemaOverview">sample schema scripts</link></para>
 
-     used to store things like exit code descriptions. If you don't modify the schema and you don't use multi-bye characters you shouldn't need to change it. 
+     used to store things like exit code descriptions. If you don't modify the schema and you don't use multi-byte characters you shouldn't need to change it. 
 
     <section id="txConfigForJobRepository">
       <title>Transaction Configuration for the JobRepository</title>
@@ -1044,7 +1044,7 @@ jobOperator.stop(executions.iterator().next());  ]]></programlisting>
       <title>Aborting a Job</title>
 
       <para>A job execution which is <classname>FAILED</classname> can be
-      restartsed (if the Job is restartable). A job execution whose status is
+      restarted (if the Job is restartable). A job execution whose status is
       <classname>ABORTED</classname> will not be restarted by the framework.
       The <classname>ABORTED</classname> status is also used in step
       executions to mark them as skippable in a restarted job execution: if a

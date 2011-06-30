@@ -15,29 +15,32 @@
  */
 package org.springframework.batch.core.converter;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
 import java.text.DateFormat;
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Properties;
 
-import junit.framework.TestCase;
-
+import org.junit.Test;
 import org.springframework.batch.core.JobParameters;
 import org.springframework.batch.core.JobParametersBuilder;
-import org.springframework.batch.core.converter.DefaultJobParametersConverter;
 import org.springframework.util.StringUtils;
 
 /**
  * @author Dave Syer
  * 
  */
-public class DefaultJobParametersConverterTests extends TestCase {
+public class DefaultJobParametersConverterTests {
 
 	DefaultJobParametersConverter factory = new DefaultJobParametersConverter();
 
 	DateFormat dateFormat = new SimpleDateFormat("MM/dd/yyyy");
 
+	@Test
 	public void testGetParameters() throws Exception {
 
 		String jobKey = "job.key=myKey";
@@ -54,6 +57,7 @@ public class DefaultJobParametersConverterTests extends TestCase {
 		assertEquals(date, props.getDate("schedule.date"));
 	}
 
+	@Test
 	public void testGetParametersWithDateFormat() throws Exception {
 
 		String[] args = new String[] { "schedule.date(date)=2008/23/01" };
@@ -65,19 +69,22 @@ public class DefaultJobParametersConverterTests extends TestCase {
 		assertEquals(date, props.getDate("schedule.date"));
 	}
 
+	@Test
 	public void testGetParametersWithBogusDate() throws Exception {
 
 		String[] args = new String[] { "schedule.date(date)=20080123" };
 
 		try {
 			factory.getJobParameters(StringUtils.splitArrayElementsIntoProperties(args, "="));
-		} catch (IllegalArgumentException e) {
+		}
+		catch (IllegalArgumentException e) {
 			String message = e.getMessage();
 			assertTrue("Message should contain wrong date: " + message, contains(message, "20080123"));
 			assertTrue("Message should contain format: " + message, contains(message, "yyyy/MM/dd"));
 		}
 	}
 
+	@Test
 	public void testGetParametersWithNumberFormat() throws Exception {
 
 		String[] args = new String[] { "value(long)=1,000" };
@@ -88,19 +95,22 @@ public class DefaultJobParametersConverterTests extends TestCase {
 		assertEquals(1000L, props.getLong("value"));
 	}
 
+	@Test
 	public void testGetParametersWithBogusLong() throws Exception {
 
 		String[] args = new String[] { "value(long)=foo" };
 
 		try {
 			factory.getJobParameters(StringUtils.splitArrayElementsIntoProperties(args, "="));
-		} catch (IllegalArgumentException e) {
+		}
+		catch (IllegalArgumentException e) {
 			String message = e.getMessage();
 			assertTrue("Message should contain wrong number: " + message, contains(message, "foo"));
 			assertTrue("Message should contain format: " + message, contains(message, "#"));
 		}
 	}
 
+	@Test
 	public void testGetParametersWithDoubleValueDeclaredAsLong() throws Exception {
 
 		String[] args = new String[] { "value(long)=1.03" };
@@ -108,26 +118,30 @@ public class DefaultJobParametersConverterTests extends TestCase {
 
 		try {
 			factory.getJobParameters(StringUtils.splitArrayElementsIntoProperties(args, "="));
-		} catch (IllegalArgumentException e) {
+		}
+		catch (IllegalArgumentException e) {
 			String message = e.getMessage();
 			assertTrue("Message should contain wrong number: " + message, contains(message, "1.03"));
 			assertTrue("Message should contain 'decimal': " + message, contains(message, "decimal"));
 		}
 	}
-	
+
+	@Test
 	public void testGetParametersWithBogusDouble() throws Exception {
 
 		String[] args = new String[] { "value(double)=foo" };
 
 		try {
 			factory.getJobParameters(StringUtils.splitArrayElementsIntoProperties(args, "="));
-		} catch (IllegalArgumentException e) {
+		}
+		catch (IllegalArgumentException e) {
 			String message = e.getMessage();
 			assertTrue("Message should contain wrong number: " + message, contains(message, "foo"));
 			assertTrue("Message should contain format: " + message, contains(message, "#"));
 		}
 	}
 
+	@Test
 	public void testGetParametersWithDouble() throws Exception {
 
 		String[] args = new String[] { "value(double)=1.38" };
@@ -137,6 +151,7 @@ public class DefaultJobParametersConverterTests extends TestCase {
 		assertEquals(1.38, props.getDouble("value"), Double.MIN_VALUE);
 	}
 
+	@Test
 	public void testGetParametersWithRoundDouble() throws Exception {
 
 		String[] args = new String[] { "value(double)=1.0" };
@@ -145,24 +160,40 @@ public class DefaultJobParametersConverterTests extends TestCase {
 		assertNotNull(props);
 		assertEquals(1.0, props.getDouble("value"), Double.MIN_VALUE);
 	}
+
+	@Test
+	public void testGetParametersWithVeryRoundDouble() throws Exception {
+
+		String[] args = new String[] { "value(double)=1" };
+
+		JobParameters props = factory.getJobParameters(StringUtils.splitArrayElementsIntoProperties(args, "="));
+		assertNotNull(props);
+		assertEquals(1.0, props.getDouble("value"), Double.MIN_VALUE);
+	}
+
+	@Test
 	public void testGetProperties() throws Exception {
 
 		JobParameters parameters = new JobParametersBuilder().addDate("schedule.date", dateFormat.parse("01/23/2008"))
-		        .addString("job.key", "myKey").addLong("vendor.id", new Long(33243243)).toJobParameters();
+				.addString("job.key", "myKey").addLong("vendor.id", new Long(33243243)).addDouble("double.key", 1.23)
+				.toJobParameters();
 
 		Properties props = factory.getProperties(parameters);
 		assertNotNull(props);
 		assertEquals("myKey", props.getProperty("job.key"));
 		assertEquals("33243243", props.getProperty("vendor.id(long)"));
 		assertEquals("2008/01/23", props.getProperty("schedule.date(date)"));
+		assertEquals("1.23", props.getProperty("double.key(double)"));
 	}
 
+	@Test
 	public void testEmptyArgs() {
 
 		JobParameters props = factory.getJobParameters(new Properties());
 		assertTrue(props.getParameters().isEmpty());
 	}
 
+	@Test
 	public void testNullArgs() {
 		assertEquals(new JobParameters(), factory.getJobParameters(null));
 		assertEquals(new Properties(), factory.getProperties(null));

@@ -12,7 +12,7 @@
 	<parent>
 		<groupId>org.springframework.batch</groupId>
 		<artifactId>spring-batch-parent</artifactId>
-		<version>2.1.6.CI-SNAPSHOT</version>
+		<version>2.2.0.BUILD-SNAPSHOT</version>
 		<relativePath>../spring-batch-parent</relativePath>
 	</parent>
 	<build>
@@ -141,19 +141,21 @@
 			<optional>true</optional>
 		</dependency>
 		<dependency>
-			<groupId>org.springframework.ws</groupId>
-			<artifactId>spring-oxm-tiger</artifactId>
+			<groupId>${spring.oxm.group}</groupId>
+			<artifactId>${spring.oxm.artifact}</artifactId>
 			<optional>true</optional>
 		</dependency>
-		<dependency>
+        <dependency>
 			<groupId>org.springframework</groupId>
-			<artifactId>spring-aop</artifactId>
-			<optional>true</optional>
-		</dependency>
-		<dependency>
-			<groupId>org.springframework</groupId>
-			<artifactId>spring-core</artifactId>
-		</dependency>
+            <artifactId>spring-core</artifactId>
+        </dependency>
+
+
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-aop</artifactId>
+            <optional>true</optional>
+        </dependency>
 		<dependency>
 			<groupId>org.springframework</groupId>
 			<artifactId>spring-context</artifactId>

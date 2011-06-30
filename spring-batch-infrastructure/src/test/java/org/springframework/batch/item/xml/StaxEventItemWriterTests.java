@@ -35,7 +35,6 @@ import org.springframework.transaction.support.TransactionTemplate;
 import org.springframework.util.Assert;
 import org.springframework.util.ClassUtils;
 import org.springframework.util.StringUtils;
-import org.springframework.xml.transform.StaxResult;
 
 /**
  * Tests for {@link StaxEventItemWriter}.
@@ -106,13 +105,14 @@ public class StaxEventItemWriterTests {
 		writer = createItemWriter();
 		writer.open(executionContext);
 		writer.write(items);
+		writer.write(items);
 		writer.close();
 
 		// check the output is concatenation of 'before restart' and 'after
 		// restart' writes.
 		String outputFile = getOutputFileContent();
-		assertEquals(2, StringUtils.countOccurrencesOf(outputFile, TEST_STRING));
-		assertEquals("<root>" + TEST_STRING + TEST_STRING + "</root>", outputFile.replace(" ", ""));
+		assertEquals(3, StringUtils.countOccurrencesOf(outputFile, TEST_STRING));
+		assertEquals("<root>" + TEST_STRING + TEST_STRING + TEST_STRING + "</root>", outputFile.replace(" ", ""));
 	}
 
 	@Test
@@ -404,16 +404,12 @@ public class StaxEventItemWriterTests {
 		}
 
 		public void marshal(Object graph, Result result) throws XmlMappingException, IOException {
-			Assert.isInstanceOf(StaxResult.class, result);
-
-			StaxResult staxResult = (StaxResult) result;
+ 	 	 Assert.isInstanceOf( Result.class, result);
 			try {
-				staxResult.getXMLEventWriter().add(
-						XMLEventFactory.newInstance().createStartElement(namespacePrefix, namespace, graph.toString()));
-				staxResult.getXMLEventWriter().add(
-						XMLEventFactory.newInstance().createEndElement(namespacePrefix, namespace, graph.toString()));
+				StaxUtils.getXmlEventWriter( result ).add( XMLEventFactory.newInstance().createStartElement(namespacePrefix, namespace, graph.toString()));
+				StaxUtils.getXmlEventWriter( result ).add( XMLEventFactory.newInstance().createEndElement(namespacePrefix, namespace, graph.toString()));
 			}
-			catch (XMLStreamException e) {
+			catch ( Exception e) {
 				throw new RuntimeException("Exception while writing to output file", e);
 			}
 		}

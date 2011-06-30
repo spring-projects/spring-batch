@@ -50,7 +50,7 @@ public class SimpleRetryPolicy implements RetryPolicy {
 
 	private volatile int maxAttempts;
 
-	private BinaryExceptionClassifier retryableClassifier = new BinaryExceptionClassifier(false);
+	private volatile BinaryExceptionClassifier retryableClassifier = new BinaryExceptionClassifier(false);
 
 	/**
 	 * Create a {@link SimpleRetryPolicy} with the default number of retry
@@ -75,6 +75,13 @@ public class SimpleRetryPolicy implements RetryPolicy {
 	}
 
 	/**
+	 * @param retryableExceptions
+	 */
+	public void setRetryableExceptions(Map<Class<? extends Throwable>, Boolean> retryableExceptions) {
+		this.retryableClassifier = new BinaryExceptionClassifier(retryableExceptions);
+	}
+
+	/**
 	 * Setter for retry attempts.
 	 * 
 	 * @param retryAttempts the number of attempts before a retry becomes
@@ -83,7 +90,7 @@ public class SimpleRetryPolicy implements RetryPolicy {
 	public void setMaxAttempts(int retryAttempts) {
 		this.maxAttempts = retryAttempts;
 	}
-
+	
 	/**
 	 * The maximum number of retry attempts before failure.
 	 * 

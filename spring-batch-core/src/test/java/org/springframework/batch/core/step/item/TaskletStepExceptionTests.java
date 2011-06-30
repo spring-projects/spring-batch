@@ -73,7 +73,6 @@ public class TaskletStepExceptionTests {
 
 	@Test
 	public void testApplicationException() throws Exception {
-
 		taskletStep.execute(stepExecution);
 		assertEquals(FAILED, stepExecution.getStatus());
 		assertEquals(FAILED.toString(), stepExecution.getExitStatus().getExitCode());

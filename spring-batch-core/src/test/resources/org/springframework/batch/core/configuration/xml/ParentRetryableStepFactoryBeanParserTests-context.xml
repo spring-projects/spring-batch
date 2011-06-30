@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.springframework.org/schema/batch http://www.springframework.org/schema/batch/spring-batch-2.1.xsd
+	http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.5.xsd">
+
+	<import resource="common-context.xml" />
+
+	<step id="stepParent" abstract="true" xmlns="http://www.springframework.org/schema/batch">
+		<tasklet>
+			<chunk>
+				<retryable-exception-classes>
+					<include class="java.lang.Exception" />
+				</retryable-exception-classes>
+			</chunk>
+		</tasklet>
+	</step>
+
+	<job id="job" xmlns="http://www.springframework.org/schema/batch">
+		<step id="s1" parent="stepParent">
+			<tasklet>
+				<chunk reader="reader" writer="writer" processor="processor" commit-interval="5" retry-limit="1" />
+			</tasklet>
+		</step>
+	</job>
+
+</beans>

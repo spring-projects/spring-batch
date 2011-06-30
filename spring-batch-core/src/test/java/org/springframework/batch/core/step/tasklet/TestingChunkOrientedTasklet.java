@@ -18,6 +18,7 @@ package org.springframework.batch.core.step.tasklet;
 import org.springframework.batch.core.step.item.ChunkOrientedTasklet;
 import org.springframework.batch.core.step.item.SimpleChunkProcessor;
 import org.springframework.batch.core.step.item.SimpleChunkProvider;
+import org.springframework.batch.item.ItemProcessor;
 import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.ItemWriter;
 import org.springframework.batch.item.support.PassThroughItemProcessor;
@@ -56,10 +57,19 @@ public class TestingChunkOrientedTasklet<T> extends ChunkOrientedTasklet<T> {
 	 * Creates a {@link PassThroughItemProcessor} and uses it to create an
 	 * instance of {@link Tasklet}.
 	 */
-	public TestingChunkOrientedTasklet(ItemReader<T> itemReader, ItemWriter<T> itemWriter,
+	public TestingChunkOrientedTasklet(ItemReader<T> itemReader, ItemProcessor<T, T> itemProcessor, ItemWriter<T> itemWriter,
 			RepeatOperations repeatOperations) {
 		super(new SimpleChunkProvider<T>(itemReader, repeatOperations), new SimpleChunkProcessor<T, T>(
-				new PassThroughItemProcessor<T>(), itemWriter));
+				itemProcessor, itemWriter));
+	}
+
+	/**
+	 * Creates a {@link PassThroughItemProcessor} and uses it to create an
+	 * instance of {@link Tasklet}.
+	 */
+	public TestingChunkOrientedTasklet(ItemReader<T> itemReader, ItemWriter<T> itemWriter,
+			RepeatOperations repeatOperations) {
+		this(itemReader, new PassThroughItemProcessor<T>(), itemWriter, repeatOperations);
 	}
 
 }

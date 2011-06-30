@@ -55,6 +55,9 @@ public class JobParameters implements Serializable {
 	 * @return The <code>Long</code> value
 	 */
 	public long getLong(String key){
+		if (!parameters.containsKey(key)) {
+			return 0L;
+		}
 		Object value = parameters.get(key).getValue();
 		return value==null ? 0L : ((Long)value).longValue();
 	}
@@ -113,7 +116,11 @@ public class JobParameters implements Serializable {
 	 * @return The <code>Double</code> value
 	 */
 	public double getDouble(String key){
-		return ((Double)parameters.get(key).getValue()).doubleValue();
+		if (!parameters.containsKey(key)) {
+			return 0L;
+		}
+		Double value = (Double)parameters.get(key).getValue();
+		return value==null ? 0.0 : value.doubleValue();
 	}
 	
 	/**

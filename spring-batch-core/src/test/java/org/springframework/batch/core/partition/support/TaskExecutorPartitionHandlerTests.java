@@ -60,10 +60,10 @@ public class TaskExecutorPartitionHandlerTests {
 	}
 
 	@Test
-	public void testAfterPropertiesSet() throws Exception {
+	public void testNullStep() throws Exception {
 		handler = new TaskExecutorPartitionHandler();
 		try {
-			handler.afterPropertiesSet();
+			handler.handle(stepExecutionSplitter, stepExecution);
 			fail("Expected IllegalArgumentException");
 		}
 		catch (IllegalArgumentException e) {

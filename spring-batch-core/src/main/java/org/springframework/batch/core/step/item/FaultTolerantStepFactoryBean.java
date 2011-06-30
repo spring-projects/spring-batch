@@ -29,6 +29,7 @@ import org.springframework.batch.classify.SubclassClassifier;
 import org.springframework.batch.core.JobInterruptedException;
 import org.springframework.batch.core.Step;
 import org.springframework.batch.core.step.FatalStepExecutionException;
+import org.springframework.batch.core.step.skip.CompositeSkipPolicy;
 import org.springframework.batch.core.step.skip.ExceptionClassifierSkipPolicy;
 import org.springframework.batch.core.step.skip.LimitCheckingItemSkipPolicy;
 import org.springframework.batch.core.step.skip.NeverSkipItemSkipPolicy;
@@ -47,6 +48,7 @@ import org.springframework.batch.retry.RetryException;
 import org.springframework.batch.retry.RetryListener;
 import org.springframework.batch.retry.RetryPolicy;
 import org.springframework.batch.retry.backoff.BackOffPolicy;
+import org.springframework.batch.retry.policy.CompositeRetryPolicy;
 import org.springframework.batch.retry.policy.ExceptionClassifierRetryPolicy;
 import org.springframework.batch.retry.policy.MapRetryContextCache;
 import org.springframework.batch.retry.policy.NeverRetryPolicy;
@@ -57,6 +59,7 @@ import org.springframework.core.task.TaskExecutor;
 import org.springframework.transaction.TransactionException;
 import org.springframework.transaction.interceptor.DefaultTransactionAttribute;
 import org.springframework.transaction.interceptor.TransactionAttribute;
+import org.springframework.util.Assert;
 
 /**
  * Factory bean for step that provides options for configuring skip behaviour.
@@ -373,26 +376,37 @@ public class FaultTolerantStepFactoryBean<T, S> extends SimpleStepFactoryBean<T,
 	@Override
 	protected SimpleChunkProvider<T> configureChunkProvider() {
 
-		if (skipPolicy != null) {
-			if (!skippableExceptionClasses.isEmpty()) {
-				logger.info("Skippable exceptions will be ignored because a SkipPolicy was specified explicitly");
-			}
-			if (skipLimit > 0) {
-				logger.info("Skip limit will be ignored because a SkipPolicy was specified explicitly");
-			}
-		}
-
-		SkipPolicy readSkipPolicy = skipPolicy != null ? skipPolicy : new LimitCheckingItemSkipPolicy(skipLimit,
-				getSkippableExceptionClasses());
+		SkipPolicy readSkipPolicy = createSkipPolicy();
 		readSkipPolicy = getFatalExceptionAwareProxy(readSkipPolicy);
 		FaultTolerantChunkProvider<T> chunkProvider = new FaultTolerantChunkProvider<T>(getItemReader(),
 				getChunkOperations());
-		chunkProvider.setMaxSkipsOnRead(Math.max(getCommitInterval(), FaultTolerantChunkProvider.DEFAULT_MAX_SKIPS_ON_READ));
+		chunkProvider.setMaxSkipsOnRead(Math.max(getCommitInterval(),
+				FaultTolerantChunkProvider.DEFAULT_MAX_SKIPS_ON_READ));
 		chunkProvider.setSkipPolicy(readSkipPolicy);
 		chunkProvider.setRollbackClassifier(getRollbackClassifier());
 
 		return chunkProvider;
 
+	}
+
+	/**
+	 * @return
+	 */
+	protected SkipPolicy createSkipPolicy() {
+		SkipPolicy skipPolicy = this.skipPolicy;
+		Map<Class<? extends Throwable>, Boolean> map = new HashMap<Class<? extends Throwable>, Boolean>(
+				skippableExceptionClasses);
+		map.put(ForceRollbackForWriteSkipException.class, true);
+		LimitCheckingItemSkipPolicy limitCheckingItemSkipPolicy = new LimitCheckingItemSkipPolicy(skipLimit, map);
+		if (skipPolicy == null) {
+			Assert.state(!(skippableExceptionClasses.isEmpty() && skipLimit > 0),
+					"If a skip limit is provided then skippable exceptions must also be specified");
+			skipPolicy = limitCheckingItemSkipPolicy;
+		}
+		else if (limitCheckingItemSkipPolicy != null) {
+			skipPolicy = new CompositeSkipPolicy(new SkipPolicy[] { skipPolicy, limitCheckingItemSkipPolicy });
+		}
+		return skipPolicy;
 	}
 
 	/**
@@ -408,8 +422,7 @@ public class FaultTolerantStepFactoryBean<T, S> extends SimpleStepFactoryBean<T,
 		chunkProcessor.setBuffering(!isReaderTransactionalQueue());
 		chunkProcessor.setProcessorTransactional(processorTransactional);
 
-		SkipPolicy writeSkipPolicy = skipPolicy != null ? skipPolicy : new LimitCheckingItemSkipPolicy(skipLimit,
-				getSkippableExceptionClasses());
+		SkipPolicy writeSkipPolicy = createSkipPolicy();
 		writeSkipPolicy = getFatalExceptionAwareProxy(writeSkipPolicy);
 		chunkProcessor.setWriteSkipPolicy(writeSkipPolicy);
 		chunkProcessor.setProcessSkipPolicy(writeSkipPolicy);
@@ -422,27 +435,27 @@ public class FaultTolerantStepFactoryBean<T, S> extends SimpleStepFactoryBean<T,
 	}
 
 	/**
-	 * @return
-	 */
-	private Map<Class<? extends Throwable>, Boolean> getSkippableExceptionClasses() {
-		Map<Class<? extends Throwable>, Boolean> map = new HashMap<Class<? extends Throwable>, Boolean>(
-				skippableExceptionClasses);
-		map.put(ForceRollbackForWriteSkipException.class, true);
-		return map;
-	}
-
-	/**
 	 * @return fully configured retry template for item processing phase.
 	 */
 	private BatchRetryTemplate configureRetry() {
 
+		RetryPolicy retryPolicy = this.retryPolicy;
+		SimpleRetryPolicy simpleRetryPolicy = null;
+
+		Map<Class<? extends Throwable>, Boolean> map = new HashMap<Class<? extends Throwable>, Boolean>(
+				retryableExceptionClasses);
+		map.put(ForceRollbackForWriteSkipException.class, true);
+		simpleRetryPolicy = new SimpleRetryPolicy(retryLimit, map);
+
 		if (retryPolicy == null) {
-			Map<Class<? extends Throwable>, Boolean> map = new HashMap<Class<? extends Throwable>, Boolean>(
-					retryableExceptionClasses);
-			map.put(ForceRollbackForWriteSkipException.class, true);
-			// set.addAll(noRollbackExceptionClasses); // should only be
-			// retryable on write
-			retryPolicy = new SimpleRetryPolicy(retryLimit, map);
+			Assert.state(!(retryableExceptionClasses.isEmpty() && retryLimit > 0),
+					"If a retry limit is provided then retryable exceptions must also be specified");
+			retryPolicy = simpleRetryPolicy;
+		}
+		else if ((!retryableExceptionClasses.isEmpty() && retryLimit > 0)) {
+			CompositeRetryPolicy compositeRetryPolicy = new CompositeRetryPolicy();
+			compositeRetryPolicy.setPolicies(new RetryPolicy[] { retryPolicy, simpleRetryPolicy });
+			retryPolicy = compositeRetryPolicy;
 		}
 
 		RetryPolicy retryPolicyWrapper = getFatalExceptionAwareProxy(retryPolicy);
@@ -544,7 +557,7 @@ public class FaultTolerantStepFactoryBean<T, S> extends SimpleStepFactoryBean<T,
 				exceptions.add(fatal);
 			}
 		}
-		nonRetryableExceptionClasses = (List<Class<? extends Throwable>>)exceptions;
+		nonRetryableExceptionClasses = (List<Class<? extends Throwable>>) exceptions;
 	}
 
 }

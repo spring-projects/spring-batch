@@ -3,14 +3,35 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>org.springframework.batch</groupId>
 	<artifactId>spring-batch-parent</artifactId>
-	<version>2.1.6.CI-SNAPSHOT</version>
+	<version>2.2.0.BUILD-SNAPSHOT</version>
 	<name>Spring Batch Parent</name>
 	<description>Spring Batch parent project.  Defines dependencies and common configuration for the build process.</description>
 	<url>http://static.springframework.org/spring-batch/${project.artifactId}</url>
 	<packaging>pom</packaging>
+	<scm>
+		<url>http://github.com/SpringSource/spring-batch</url>
+		<connection>scm:git:git://github.com/SpringSource/spring-batch.git</connection>
+		<developerConnection>scm:git:git://github.com/SpringSource/spring-batch.git</developerConnection>
+	</scm>
+	<licenses>
+		<license>
+			<name>Apache 2.0</name>
+			<url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+		</license>
+	</licenses>
+	<developers>
+		<developer>
+			<id>dsyer</id>
+			<name>Dave Syer</name>
+			<email>david.syer@springsource.com</email>
+		</developer>
+	</developers>
 	<properties>
 		<maven.test.failure.ignore>true</maven.test.failure.ignore>
 		<spring.framework.version>2.5.6</spring.framework.version>
+		<spring.oxm.group>org.springframework.ws</spring.oxm.group>
+		<spring.oxm.artifact>spring-oxm-tiger</spring.oxm.artifact>
+		<spring.oxm.version>1.5.8</spring.oxm.version>
 		<junit.version>4.4</junit.version>
 		<bundlor.version>1.0.0.RELEASE</bundlor.version>
 		<dependency.locations.enabled>false</dependency.locations.enabled>
@@ -33,18 +54,42 @@
 			<id>spring3</id>
 			<properties>
 				<spring.framework.version>3.0.5.RELEASE</spring.framework.version>
+				<spring.oxm.group>org.springframework</spring.oxm.group>
+				<spring.oxm.artifact>spring-oxm</spring.oxm.artifact>
+				<spring.oxm.version>3.0.5.RELEASE</spring.oxm.version>
 				<junit.version>4.8.2</junit.version>
 			</properties>
 		</profile>
 		<profile>
 			<id>central</id>
 			<distributionManagement>
+				<snapshotRepository>
+					<id>sonatype-nexus-snapshots</id>
+					<name>Sonatype Nexus Snapshots</name>
+					<url>https://oss.sonatype.org/content/repositories/snapshots/</url>
+				</snapshotRepository>
 				<repository>
-					<id>spring-sourceforge</id>
-					<name>Spring Sourceforge Repository</name>
-					<url>file:///${user.dir}/sourceforge</url>
+					<id>sonatype-nexus-staging</id>
+					<name>Nexus Release Repository</name>
+					<url>https://oss.sonatype.org/service/local/staging/deploy/maven2/</url>
 				</repository>
 			</distributionManagement>
+			<build>
+				<plugins>
+					<plugin>
+						<artifactId>maven-gpg-plugin</artifactId>
+						<executions>
+							<execution>
+								<id>sign-artifacts</id>
+								<phase>verify</phase>
+								<goals>
+									<goal>sign</goal>
+								</goals>
+							</execution>
+						</executions>
+					</plugin>
+				</plugins>
+			</build>
 		</profile>
 		<profile>
 			<id>staging</id>
@@ -560,15 +605,9 @@
 				<version>${spring.framework.version}</version>
 			</dependency>
 			<dependency>
-				<groupId>org.springframework.ws</groupId>
-				<artifactId>spring-oxm</artifactId>
-				<version>1.5.8</version>
-				<optional>true</optional>
-			</dependency>
-			<dependency>
-				<groupId>org.springframework.ws</groupId>
-				<artifactId>spring-oxm-tiger</artifactId>
-				<version>1.5.8</version>
+				<groupId>${spring.oxm.group}</groupId>
+				<artifactId>${spring.oxm.artifact}</artifactId>
+				<version>${spring.oxm.version}</version>
 				<optional>true</optional>
 			</dependency>
 			<dependency>

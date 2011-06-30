@@ -245,7 +245,11 @@ public class RetryTemplate implements RetryOperations {
 
 					doOnErrorInterceptors(retryCallback, context, e);
 
-					registerThrowable(retryPolicy, state, context, e);
+					try {
+						registerThrowable(retryPolicy, state, context, e);
+					} catch (Exception ex) {
+						throw new TerminatedRetryException("Terminated retry after error in policy", ex);
+					}
 
 					if (canRetry(retryPolicy, context) && !context.isExhaustedOnly()) {
 						try {

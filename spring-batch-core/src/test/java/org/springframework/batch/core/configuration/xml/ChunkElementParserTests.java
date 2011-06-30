@@ -29,6 +29,7 @@ import org.junit.Test;
 import org.springframework.batch.classify.SubclassClassifier;
 import org.springframework.batch.core.Step;
 import org.springframework.batch.core.step.item.SimpleChunkProcessor;
+import org.springframework.batch.core.step.skip.SkipPolicy;
 import org.springframework.batch.core.step.tasklet.TaskletStep;
 import org.springframework.batch.item.ItemStream;
 import org.springframework.batch.item.support.CompositeItemStream;
@@ -42,6 +43,7 @@ import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 import org.springframework.dao.CannotAcquireLockException;
 import org.springframework.dao.CannotSerializeTransactionException;
+import org.springframework.dao.ConcurrencyFailureException;
 import org.springframework.dao.DeadlockLoserDataAccessException;
 import org.springframework.dao.PessimisticLockingFailureException;
 import org.springframework.test.util.ReflectionTestUtils;
@@ -63,6 +65,35 @@ public class ChunkElementParserTests {
 		Object tasklet = ReflectionTestUtils.getField(step, "tasklet");
 		Object chunkProcessor = ReflectionTestUtils.getField(tasklet, "chunkProcessor");
 		assertTrue("Wrong processor type", chunkProcessor instanceof SimpleChunkProcessor);
+	}
+
+	@Test
+	public void testCommitIntervalLateBinding() throws Exception {
+		ConfigurableApplicationContext context = new ClassPathXmlApplicationContext(
+				"org/springframework/batch/core/configuration/xml/ChunkElementLateBindingParserTests-context.xml");
+		Step step = (Step) context.getBean("s1", Step.class);
+		assertNotNull("Step not parsed", step);
+	}
+
+	@Test
+	public void testSkipAndRetryAttributes() throws Exception {
+		ConfigurableApplicationContext context = new ClassPathXmlApplicationContext(
+				"org/springframework/batch/core/configuration/xml/ChunkElementSkipAndRetryAttributeParserTests-context.xml");
+		Step step = (Step) context.getBean("s1", Step.class);
+		assertNotNull("Step not parsed", step);
+	}
+
+	@Test
+	public void testIllegalSkipAndRetryAttributes() throws Exception {
+		try {
+			ConfigurableApplicationContext context = new ClassPathXmlApplicationContext(
+				"org/springframework/batch/core/configuration/xml/ChunkElementIllegalSkipAndRetryAttributeParserTests-context.xml");
+		Step step = (Step) context.getBean("s1", Step.class);
+		assertNotNull("Step not parsed", step);
+		fail("Expected BeanCreationException");
+		} catch (BeanCreationException e) {
+			// expected
+		}
 	}
 
 	@Test
@@ -90,19 +121,18 @@ public class ChunkElementParserTests {
 	public void testSkipPolicyAttribute() throws Exception {
 		ConfigurableApplicationContext context = new ClassPathXmlApplicationContext(
 				"org/springframework/batch/core/configuration/xml/ChunkElementSkipPolicyParserTests-context.xml");
-		Map<Class<? extends Throwable>, Boolean> skippable = getSkippableExceptionClasses("s1", context);
-		assertEquals(2, skippable.size());
-		containsClassified(skippable, NullPointerException.class, true);
-		containsClassified(skippable, ArithmeticException.class, true);
+		SkipPolicy policy = getSkipPolicy("s1", context);
+		assertTrue(policy.shouldSkip(new NullPointerException(), 0));
+		assertTrue(policy.shouldSkip(new ArithmeticException(), 0));
 	}
 
 	@Test
 	public void testSkipPolicyElement() throws Exception {
 		ConfigurableApplicationContext context = new ClassPathXmlApplicationContext(
 				"org/springframework/batch/core/configuration/xml/ChunkElementSkipPolicyParserTests-context.xml");
-		Map<Class<? extends Throwable>, Boolean> skippable = getSkippableExceptionClasses("s2", context);
-		assertEquals(1, skippable.size());
-		containsClassified(skippable, ArithmeticException.class, true);
+		SkipPolicy policy = getSkipPolicy("s2", context);
+		assertFalse(policy.shouldSkip(new NullPointerException(), 0));
+		assertTrue(policy.shouldSkip(new ArithmeticException(), 0));
 	}
 
 	@Test
@@ -156,6 +186,7 @@ public class ChunkElementParserTests {
 	@Test
 	public void testInheritSkippable() throws Exception {
 		Map<Class<? extends Throwable>, Boolean> skippable = getSkippableExceptionClasses("s1", getContext());
+		System.err.println(skippable);
 		assertEquals(5, skippable.size());
 		containsClassified(skippable, NullPointerException.class, true);
 		containsClassified(skippable, ArithmeticException.class, true);
@@ -167,9 +198,9 @@ public class ChunkElementParserTests {
 	public void testInheritSkippableWithNoMerge() throws Exception {
 		Map<Class<? extends Throwable>, Boolean> skippable = getSkippableExceptionClasses("s2", getContext());
 		assertEquals(3, skippable.size());
-		containsClassified(skippable, NullPointerException.class, true);
+		containsClassified(skippable, IllegalArgumentException.class, true);
 		assertFalse(skippable.containsKey(ArithmeticException.class));
-		containsClassified(skippable, CannotAcquireLockException.class, false);
+		containsClassified(skippable, ConcurrencyFailureException.class, false);
 		assertFalse(skippable.containsKey(DeadlockLoserDataAccessException.class));
 	}
 
@@ -234,6 +265,11 @@ public class ChunkElementParserTests {
 			ApplicationContext ctx) throws Exception {
 		return getNestedExceptionMap(stepName, ctx, "tasklet.chunkProvider.skipPolicy.classifier",
 				"skippableExceptionClassifier");
+	}
+
+	private SkipPolicy getSkipPolicy(String stepName,
+			ApplicationContext ctx) throws Exception {
+		return (SkipPolicy) getNestedPathInStep(stepName, ctx, "tasklet.chunkProvider.skipPolicy");
 	}
 
 	private Map<Class<? extends Throwable>, Boolean> getRetryableExceptionClasses(String stepName,
