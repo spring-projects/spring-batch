@@ -566,7 +566,25 @@
 			<email>dhgarrette@gmail.com</email>
 		</developer>
 	</developers>
+
+  <repositories>
+    <repository>
+      <id>com.springsource.repository.bundles.release</id>
+      <name>SpringSource Enterprise Bundle Repository - SpringSource Bundle Releases</name>
+      <url>http://repository.springsource.com/maven/bundles/release</url>
+    </repository>
+    <repository>
+      <id>foundrylogic.vpp</id>
+      <name>Repository used to download foundrylogic.vpp</name>
+      <url>http://objectstyle.org/maven2</url>
+    </repository>
+  </repositories>
 	<pluginRepositories>
+    <pluginRepository>
+      <id>com.springsource.repository.bundles.release</id>
+      <name>SpringSource Enterprise Bundle Repository - SpringSource Bundle Releases</name>
+      <url>http://repository.springsource.com/maven/bundles/release</url>
+    </pluginRepository>
 		<pluginRepository>
 			<id>com.springsource.repository.bundles.milestone</id>
 			<name> SpringSource Enterprise Bundle Repository - SpringSource Bundle Milestones</name>
