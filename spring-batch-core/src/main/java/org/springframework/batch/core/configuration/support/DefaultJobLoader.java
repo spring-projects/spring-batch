@@ -43,9 +43,11 @@ public class DefaultJobLoader implements JobLoader {
 
 	private JobRegistry jobRegistry;
 
-	private Map<ApplicationContextFactory, ConfigurableApplicationContext> contexts = new ConcurrentHashMap<ApplicationContextFactory, ConfigurableApplicationContext>();
+	private Map<ApplicationContextFactory, ConfigurableApplicationContext> contexts =
+            new ConcurrentHashMap<ApplicationContextFactory, ConfigurableApplicationContext>();
 
-	private Map<ConfigurableApplicationContext, Collection<String>> contextToJobNames = new ConcurrentHashMap<ConfigurableApplicationContext, Collection<String>>();
+	private Map<ConfigurableApplicationContext, Collection<String>> contextToJobNames =
+            new ConcurrentHashMap<ConfigurableApplicationContext, Collection<String>>();
 
 	/**
 	 * Default constructor useful for declarative configuration.
@@ -85,8 +87,10 @@ public class DefaultJobLoader implements JobLoader {
 		}
 		for (String jobName : jobRegistry.getJobNames()) {
 			jobRegistry.unregister(jobName);
+            onUnregisteredJob(jobName);
 		}
 		contexts.clear();
+        contextToJobNames.clear();
 	}
 
 	public Collection<Job> reload(ApplicationContextFactory factory) {
@@ -97,15 +101,17 @@ public class DefaultJobLoader implements JobLoader {
 			for (String name : contextToJobNames.get(context)) {
 				logger.debug("Unregistering job: " + name + " from context: " + context.getDisplayName());
 				jobRegistry.unregister(name);
+                onUnregisteredJob(name);
 			}
 			context.close();
+            contextToJobNames.remove(context);
 		}
 
 		try {
 			return doLoad(factory, true);
 		}
 		catch (DuplicateJobException e) {
-			throw new IllegalStateException("Found duplicte job in reload (it should have been unregistered "
+			throw new IllegalStateException("Found duplicate job in reload (it should have been unregistered "
 					+ "if it was previously registered in this loader)", e);
 		}
 	}
@@ -139,6 +145,7 @@ public class DefaultJobLoader implements JobLoader {
 			if (!autoRegistrationDetected) {
 
 				Job job = (Job) context.getBean(name);
+                beforeJobRegistration(context, job);
 				String jobName = job.getName();
 
 				// On reload try to unregister first
@@ -151,7 +158,7 @@ public class DefaultJobLoader implements JobLoader {
 				JobFactory jobFactory = new ReferenceJobFactory(job);
 				jobRegistry.register(jobFactory);
 				jobsRegistered.add(jobName);
-
+                onRegisteredJob(context, job);
 			}
 
 		}
@@ -173,5 +180,53 @@ public class DefaultJobLoader implements JobLoader {
 		return result;
 
 	}
+
+    // Callback methods
+
+     /**
+     * Invoked when a {@link Job} is about to be registered.
+     *
+     * @param context the context where the job is defined
+     * @param job the job that is about to be registered
+     */
+    protected void beforeJobRegistration(ConfigurableApplicationContext context, Job job) {
+    }
+
+    /**
+     * Invoked when a {@link Job} has been registered.
+     *
+     * @param context the context where the job is defined
+     * @param job the job that has been registered
+     */
+    protected void onRegisteredJob(ConfigurableApplicationContext context, Job job) {
+    }
+
+    /**
+     * Invoked when a {@link Job} is unregistered.
+     *
+     * @param jobName the name of the job that was unregistered
+     */
+    protected void onUnregisteredJob(String jobName) {
+    }
+
+    // Useful for unit testing purposes
+
+    /**
+     * Returns the map associating context factories to the contexts they have generated.
+     *
+     * @return a map from contract factories to Spring contexts
+     */
+    protected Map<ApplicationContextFactory, ConfigurableApplicationContext> getContexts() {
+        return contexts;
+    }
+
+    /**
+     * Returns the map associating application contexts to all the job names they contained.
+     *
+     * @return a map from Spring contexts to job names
+     */
+    protected Map<ConfigurableApplicationContext, Collection<String>> getContextToJobNames() {
+        return contextToJobNames;
+    }
 
 }
