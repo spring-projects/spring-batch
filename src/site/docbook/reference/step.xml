@@ -74,7 +74,7 @@ itemWriter.write(items);</programlisting>
     &lt;step id="step1"&gt;
         &lt;tasklet transaction-manager="transactionManager"&gt;
             &lt;chunk reader="itemReader" writer="itemWriter" commit-interval="10"/&gt;
-        &lt;tasklet&gt;
+        &lt;/tasklet&gt;
     &lt;/step&gt;
 &lt;/job&gt;</programlisting>
 
