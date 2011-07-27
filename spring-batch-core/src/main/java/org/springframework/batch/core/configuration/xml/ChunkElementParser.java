@@ -75,11 +75,11 @@ public class ChunkElementParser {
 
 		propertyValues.addPropertyValue("hasChunkElement", Boolean.TRUE);
 
-		handleItemHandler("reader", "itemReader", ITEM_READER_ADAPTER_CLASS, true, element, parserContext,
+		handleItemHandler(bd, "reader", "itemReader", ITEM_READER_ADAPTER_CLASS, true, element, parserContext,
 				propertyValues, underspecified);
-		handleItemHandler("processor", "itemProcessor", ITEM_PROCESSOR_ADAPTER_CLASS, false, element, parserContext,
+		handleItemHandler(bd, "processor", "itemProcessor", ITEM_PROCESSOR_ADAPTER_CLASS, false, element, parserContext,
 				propertyValues, underspecified);
-		handleItemHandler("writer", "itemWriter", ITEM_WRITER_ADAPTER_CLASS, true, element, parserContext,
+		handleItemHandler(bd, "writer", "itemWriter", ITEM_WRITER_ADAPTER_CLASS, true, element, parserContext,
 				propertyValues, underspecified);
 
 		String commitInterval = element.getAttribute(COMMIT_INTERVAL_ATTR);
@@ -131,7 +131,7 @@ public class ChunkElementParser {
 		// classes for an abstract parent bean definition
 		propertyValues.addPropertyValue("skippableExceptionClasses", skippableExceptions);
 
-		handleItemHandler("skip-policy", "skipPolicy", null, false, element, parserContext, propertyValues,
+		handleItemHandler(bd, "skip-policy", "skipPolicy", null, false, element, parserContext, propertyValues,
 				underspecified);
 
 		String retryLimit = element.getAttribute("retry-limit");
@@ -147,7 +147,7 @@ public class ChunkElementParser {
 		// classes for an abstract parent bean definition
 		propertyValues.addPropertyValue("retryableExceptionClasses", retryableExceptions);
 
-		handleItemHandler("retry-policy", "retryPolicy", null, false, element, parserContext, propertyValues,
+		handleItemHandler(bd, "retry-policy", "retryPolicy", null, false, element, parserContext, propertyValues,
 				underspecified);
 
 		String cacheCapacity = element.getAttribute("cache-capacity");
@@ -176,7 +176,7 @@ public class ChunkElementParser {
 	/**
 	 * Handle the ItemReader, ItemProcessor, and ItemWriter attributes/elements.
 	 */
-	private void handleItemHandler(String handlerName, String propertyName, String adapterClassName, boolean required,
+	private void handleItemHandler(AbstractBeanDefinition enclosing, String handlerName, String propertyName, String adapterClassName, boolean required,
 			Element element, ParserContext parserContext, MutablePropertyValues propertyValues, boolean underspecified) {
 		String refName = element.getAttribute(handlerName);
 		@SuppressWarnings("unchecked")
@@ -187,7 +187,7 @@ public class ChunkElementParser {
 						"The <" + element.getNodeName() + "/> element may not have both a '" + handlerName
 								+ "' attribute and a <" + handlerName + "/> element.", element);
 			}
-			handleItemHandlerElement(propertyName, adapterClassName, propertyValues, children.get(0), parserContext);
+			handleItemHandlerElement(enclosing, propertyName, adapterClassName, propertyValues, children.get(0), parserContext);
 		}
 		else if (children.size() > 1) {
 			parserContext.getReaderContext().error(
@@ -209,7 +209,7 @@ public class ChunkElementParser {
 	 * is defined within the item handler.
 	 */
 	@SuppressWarnings("unchecked")
-	private void handleItemHandlerElement(String propertyName, String adapterClassName,
+	private void handleItemHandlerElement(AbstractBeanDefinition enclosing, String propertyName, String adapterClassName,
 			MutablePropertyValues propertyValues, Element element, ParserContext parserContext) {
 		List<Element> beanElements = DomUtils.getChildElementsByTagName(element, BEAN_ELE);
 		List<Element> refElements = DomUtils.getChildElementsByTagName(element, REF_ELE);
@@ -221,8 +221,9 @@ public class ChunkElementParser {
 		else if (beanElements.size() == 1) {
 			Element beanElement = beanElements.get(0);
 			BeanDefinitionHolder beanDefinitionHolder = parserContext.getDelegate().parseBeanDefinitionElement(
-					beanElement);
+					beanElement, enclosing);
 			parserContext.getDelegate().decorateBeanDefinitionIfRequired(beanElement, beanDefinitionHolder);
+
 			propertyValues.addPropertyValue(propertyName, beanDefinitionHolder);
 		}
 		else if (refElements.size() == 1) {
