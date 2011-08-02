@@ -21,8 +21,10 @@ import static org.junit.Assert.assertTrue;
 
 import java.text.DateFormat;
 import java.text.DecimalFormat;
+import java.text.NumberFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.Locale;
 import java.util.Properties;
 
 import org.junit.Test;
@@ -152,6 +154,20 @@ public class DefaultJobParametersConverterTests {
 	}
 
 	@Test
+	public void testGetParametersWithDoubleAndLongAndNumberFormat() throws Exception {
+
+		String[] args = new String[] { "value(double)=1,23456", "long(long)=123.456" };
+		NumberFormat format = NumberFormat.getInstance(Locale.GERMAN);
+		factory.setNumberFormat(format);
+
+		JobParameters props = factory.getJobParameters(StringUtils.splitArrayElementsIntoProperties(args, "="));
+		assertNotNull(props);
+		assertEquals(1.23456, props.getDouble("value"), Double.MIN_VALUE);
+		assertEquals(123456, props.getLong("long"));
+
+	}
+
+	@Test
 	public void testGetParametersWithRoundDouble() throws Exception {
 
 		String[] args = new String[] { "value(double)=1.0" };
@@ -184,6 +200,40 @@ public class DefaultJobParametersConverterTests {
 		assertEquals("33243243", props.getProperty("vendor.id(long)"));
 		assertEquals("2008/01/23", props.getProperty("schedule.date(date)"));
 		assertEquals("1.23", props.getProperty("double.key(double)"));
+	}
+
+	@Test
+	public void testRoundTrip() throws Exception {
+
+		String[] args = new String[] { "schedule.date(date)=2008/01/23", "job.key=myKey", "vendor.id(long)=33243243",
+				"double.key(double)=1.23" };
+
+		JobParameters parameters = factory.getJobParameters(StringUtils.splitArrayElementsIntoProperties(args, "="));
+
+		Properties props = factory.getProperties(parameters);
+		assertNotNull(props);
+		assertEquals("myKey", props.getProperty("job.key"));
+		assertEquals("33243243", props.getProperty("vendor.id(long)"));
+		assertEquals("2008/01/23", props.getProperty("schedule.date(date)"));
+		assertEquals("1.23", props.getProperty("double.key(double)"));
+	}
+
+	@Test
+	public void testRoundTripWithNumberFormat() throws Exception {
+
+		String[] args = new String[] { "schedule.date(date)=2008/01/23", "job.key=myKey", "vendor.id(long)=33243243",
+				"double.key(double)=1,23" };
+		NumberFormat format = NumberFormat.getInstance(Locale.GERMAN);
+		factory.setNumberFormat(format);
+
+		JobParameters parameters = factory.getJobParameters(StringUtils.splitArrayElementsIntoProperties(args, "="));
+
+		Properties props = factory.getProperties(parameters);
+		assertNotNull(props);
+		assertEquals("myKey", props.getProperty("job.key"));
+		assertEquals("33243243", props.getProperty("vendor.id(long)"));
+		assertEquals("2008/01/23", props.getProperty("schedule.date(date)"));
+		assertEquals("1,23", props.getProperty("double.key(double)"));
 	}
 
 	@Test
