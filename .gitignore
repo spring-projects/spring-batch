@@ -2,6 +2,7 @@ bin
 lib
 derby*
 target
+*/src/META-INF
 */src/main/webapp/META-INF
 */src/main/java/META-INF
 .settings
