@@ -312,6 +312,43 @@
 			</build>
 		</profile>
 		<profile>
+			<id>build</id>
+			<activation>
+				<activeByDefault>false</activeByDefault>
+			</activation>
+			<build>
+				<plugins>
+					<plugin>
+						<!-- After the file count, we build the samples and archetypes as well -->
+						<groupId>org.apache.maven.plugins</groupId>
+						<artifactId>maven-invoker-plugin</artifactId>
+						<configuration>
+							<projectsDirectory>${basedir}</projectsDirectory>
+							<localRepositoryPath>target/local-repo</localRepositoryPath>
+							<debug>true</debug>
+							<settingsFile>${basedir}/src/it/settings.xml</settingsFile>
+							<goals>
+								<goal>clean</goal>
+								<goal>install</goal>
+							</goals>
+							<pomIncludes>
+								<pomInclude>pom.xml</pomInclude>
+							</pomIncludes>
+						</configuration>
+						<executions>
+							<execution>
+								<id>integration-test</id>
+								<phase>verify</phase>
+								<goals>
+									<goal>run</goal>
+								</goals>
+							</execution>
+						</executions>
+					</plugin>
+				</plugins>
+			</build>
+		</profile>
+		<profile>
 			<id>samples</id>
 			<modules>
 				<module>spring-batch-samples</module>

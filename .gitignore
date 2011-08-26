@@ -1,5 +1,6 @@
 target
 bin
+build.log
 integration-repo
 ivy-cache
 spring-build
