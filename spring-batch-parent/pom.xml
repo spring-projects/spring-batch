@@ -167,6 +167,14 @@
 			</repositories>
 			<pluginRepositories>
 				<pluginRepository>
+					<id>objectstyle</id>
+					<name>ObjectStyle.org Repository</name>
+					<url>http://objectstyle.org/maven2/</url>
+					<snapshots>
+						<enabled>false</enabled>
+					</snapshots>
+				</pluginRepository>
+				<pluginRepository>
 					<id>apache-snapshots</id>
 					<url>http://people.apache.org/maven-snapshot-repository/</url>
 				</pluginRepository>
