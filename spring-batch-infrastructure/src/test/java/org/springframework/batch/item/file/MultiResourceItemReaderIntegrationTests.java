@@ -131,8 +131,7 @@ public class MultiResourceItemReaderIntegrationTests {
 
 	/**
 	 * 
-	 * Read items with a couple of rollbacks, requiring to jump back to items
-	 * from previous resources.
+	 * Read items with a couple of rollbacks, requiring to jump back to items from previous resources.
 	 */
 	@Test
 	public void testRestartAcrossResourceBoundary() throws Exception {
@@ -238,7 +237,7 @@ public class MultiResourceItemReaderIntegrationTests {
 		tested.setComparator(comp);
 		tested.setResources(resources);
 		tested.open(ctx);
-		
+
 		resources = (Resource[]) ReflectionTestUtils.getField(tested, "resources");
 
 		assertSame(r3, resources[0]);
@@ -255,7 +254,7 @@ public class MultiResourceItemReaderIntegrationTests {
 		tested.open(new ExecutionContext());
 
 		assertNull(tested.read());
-		
+
 		tested.close();
 	}
 
@@ -264,15 +263,15 @@ public class MultiResourceItemReaderIntegrationTests {
 	 */
 	@Test
 	public void testNonExistentResources() throws Exception {
-		tested.setResources(new Resource[] {new FileSystemResource("no/such/file.txt")});
+		tested.setResources(new Resource[] { new FileSystemResource("no/such/file.txt") });
 		itemReader.setStrict(false);
 		tested.open(new ExecutionContext());
 
 		assertNull(tested.read());
-		
+
 		tested.close();
 	}
-	
+
 	/**
 	 * Directory resource behaves as if it was empty.
 	 */
@@ -281,112 +280,118 @@ public class MultiResourceItemReaderIntegrationTests {
 		FileSystemResource resource = new FileSystemResource("target/data");
 		resource.getFile().mkdirs();
 		assertTrue(resource.getFile().isDirectory());
-		tested.setResources(new Resource[] {resource});
+		tested.setResources(new Resource[] { resource });
 		itemReader.setStrict(false);
 		tested.open(new ExecutionContext());
 
 		assertNull(tested.read());
-		
+
 		tested.close();
 	}
-	
+
 	@Test
-	public void testMiddleResourceThrowsException() throws Exception{
-		
+	public void testMiddleResourceThrowsException() throws Exception {
+
 		Resource badResource = new AbstractResource() {
-			
+
 			public InputStream getInputStream() throws IOException {
 				throw new RuntimeException();
 			}
-			
-			public String getDescription() {return null;}
+
+			public String getDescription() {
+				return null;
+			}
 		};
 
 		tested.setResources(new Resource[] { r1, badResource, r3, r4, r5 });
-		
+
 		tested.open(ctx);
 
 		assertEquals("1", tested.read());
 		assertEquals("2", tested.read());
 		assertEquals("3", tested.read());
-		try{
+		try {
 			assertEquals("4", tested.read());
 			fail();
 		}
-		catch(ItemStreamException ex){
-			//a try/catch was used to ensure the exception was thrown when reading
-			//the 4th item, rather than on open
+		catch (ItemStreamException ex) {
+			// a try/catch was used to ensure the exception was thrown when reading
+			// the 4th item, rather than on open
 		}
 	}
-	
+
 	@Test
-	public void testFirstResourceThrowsExceptionOnRead() throws Exception{
-		
+	public void testFirstResourceThrowsExceptionOnRead() throws Exception {
+
 		Resource badResource = new AbstractResource() {
-			
+
 			public InputStream getInputStream() throws IOException {
 				throw new RuntimeException();
 			}
-			
-			public String getDescription() {return null;}
+
+			public String getDescription() {
+				return null;
+			}
 		};
 
 		tested.setResources(new Resource[] { badResource, r2, r3, r4, r5 });
-		
+
 		tested.open(ctx);
 
-		try{
+		try {
 			assertEquals("1", tested.read());
 			fail();
 		}
-		catch(ItemStreamException ex){
-			//a try/catch was used to ensure the exception was thrown when reading
-			//the 1st item, rather than on open
+		catch (ItemStreamException ex) {
+			// a try/catch was used to ensure the exception was thrown when reading
+			// the 1st item, rather than on open
 		}
 	}
-	
+
 	@Test
-    public void testBadIOInput() throws Exception {
-        
-        Resource badResource = new AbstractResource() {
-            
-            public boolean exists() {
-                // Looks good ...
-                return true;
-            }
-            
-            public InputStream getInputStream() throws IOException {
-                // ... but fails during read 
-                throw new RuntimeException();
-            }
-            
-            public String getDescription() {return null;}
-        };
+	public void testBadIOInput() throws Exception {
 
-        tested.setResources(new Resource[] { badResource, r2, r3, r4, r5 });
-        
-        tested.open(ctx);
+		Resource badResource = new AbstractResource() {
 
-        try{
-            assertEquals("1", tested.read());
-            fail();
-        }
-        catch(ItemStreamException ex){
-            // expected
-        }
-        
-        // Now check the next read gets the next resource
-        assertEquals("4", tested.read());
-        
-    }
-	
+			public boolean exists() {
+				// Looks good ...
+				return true;
+			}
+
+			public InputStream getInputStream() throws IOException {
+				// ... but fails during read
+				throw new RuntimeException();
+			}
+
+			public String getDescription() {
+				return null;
+			}
+		};
+
+		tested.setResources(new Resource[] { badResource, r2, r3, r4, r5 });
+
+		tested.open(ctx);
+
+		try {
+			assertEquals("1", tested.read());
+			fail();
+		}
+		catch (ItemStreamException ex) {
+			// expected
+		}
+
+		// Now check the next read gets the next resource
+		assertEquals("4", tested.read());
+
+	}
+
 	@Test
 	public void testGetCurrentResourceBeforeRead() throws Exception {
 		tested.open(ctx);
 		assertNull("There is no 'current' resource before read is called", tested.getCurrentResource());
-		
+
 	}
-	
+
 	/**
 	 * No resources to read should result in error in strict mode.
 	 */
@@ -394,10 +399,10 @@ public class MultiResourceItemReaderIntegrationTests {
 	public void testStrictModeEnabled() throws Exception {
 		tested.setResources(new Resource[] {});
 		tested.setStrict(true);
-		
+
 		tested.open(ctx);
 	}
-	
+
 	/**
 	 * No resources to read is OK when strict=false.
 	 */
@@ -405,9 +410,26 @@ public class MultiResourceItemReaderIntegrationTests {
 	public void testStrictModeDisabled() throws Exception {
 		tested.setResources(new Resource[] {});
 		tested.setStrict(false);
-		
+
 		tested.open(ctx);
 		assertTrue("empty input doesn't cause an error", true);
+	}
+
+	/**
+	 * E.g. when using the reader in the processing phase reading might not have been attempted at all before the job
+	 * crashed (BATCH-1798).
+	 */
+	@Test
+	public void testRestartAfterFailureWithoutRead() throws Exception {
+
+		// save reader state without calling read
+		tested.open(ctx);
+		tested.update(ctx);
+		tested.close();
+
+		// restart should work OK
+		tested.open(ctx);
+		assertEquals("1", tested.read());
 	}
 
 }
