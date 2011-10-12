@@ -5,7 +5,27 @@
 	<artifactId>spring-batch-admin-parent</artifactId>
 	<version>1.2.2.BUILD-SNAPSHOT</version>
 	<name>Spring Batch Admin Parent</name>
+	<description>A set of services (Java, JSON) and a UI (webapp) for managing and launching Spring Batch jobs.</description>
+	<url>http://www.springsource.org/spring-batch-admin</url>
 	<packaging>pom</packaging>
+	<scm>
+		<url>http://static.springframework.org/spring-batch-admin</url>
+		<connection>scm:git:git://github.com/SpringSource/spring-batch-admin.git</connection>
+		<developerConnection>scm:git:git://github.com/SpringSource/spring-batch-admin.git</developerConnection>
+	</scm>
+	<licenses>
+		<license>
+			<name>Apache 2.0</name>
+			<url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+		</license>
+	</licenses>
+	<developers>
+		<developer>
+			<id>dsyer</id>
+			<name>Dave Syer</name>
+			<email>dsyer@vmware.com</email>
+		</developer>
+	</developers>
 	<properties>
 		<maven.test.failure.ignore>true</maven.test.failure.ignore>
 		<spring.batch.version>2.1.7.RELEASE</spring.batch.version>
