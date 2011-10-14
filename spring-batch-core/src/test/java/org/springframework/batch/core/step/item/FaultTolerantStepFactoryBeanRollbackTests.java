@@ -1,8 +1,11 @@
 package org.springframework.batch.core.step.item;
 
+import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
+import static org.springframework.batch.core.BatchStatus.FAILED;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -17,12 +20,15 @@ import org.apache.commons.logging.LogFactory;
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.batch.core.BatchStatus;
+import org.springframework.batch.core.ChunkListener;
 import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.JobParameters;
 import org.springframework.batch.core.Step;
 import org.springframework.batch.core.StepExecution;
+import org.springframework.batch.core.StepListener;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.repository.support.MapJobRepositoryFactoryBean;
+import org.springframework.batch.core.step.FatalStepExecutionException;
 import org.springframework.batch.support.transaction.ResourcelessTransactionManager;
 import org.springframework.core.task.SimpleAsyncTaskExecutor;
 import org.springframework.transaction.interceptor.RollbackRuleAttribute;
@@ -90,6 +96,32 @@ public class FaultTolerantStepFactoryBeanRollbackTests {
 		stepExecution = jobExecution.createStepExecution(factory.getName());
 		repository.add(stepExecution);
 	}
+	
+	@Test
+	public void testBeforeChunkListenerException() throws Exception{
+		factory.setListeners(new StepListener []{new ExceptionThrowingChunkListener(true)});
+		Step step = (Step) factory.getObject();
+		step.execute(stepExecution);
+		assertEquals(FAILED, stepExecution.getStatus());
+		assertEquals(FAILED.toString(), stepExecution.getExitStatus().getExitCode());	
+		assertTrue(stepExecution.getCommitCount() == 0);//Make sure exception was thrown in after, not before
+		Throwable e = stepExecution.getFailureExceptions().get(0);
+		assertThat(e, instanceOf(FatalStepExecutionException.class));
+		assertThat(e.getCause(), instanceOf(IllegalArgumentException.class));
+	}
+	
+	@Test
+	public void testAfterChunkListenerException() throws Exception{
+		factory.setListeners(new StepListener []{new ExceptionThrowingChunkListener(false)});
+		Step step = (Step) factory.getObject();
+		step.execute(stepExecution);
+		assertEquals(FAILED, stepExecution.getStatus());
+		assertEquals(FAILED.toString(), stepExecution.getExitStatus().getExitCode());	
+		assertTrue(stepExecution.getCommitCount() > 0);//Make sure exception was thrown in after, not before
+		Throwable e = stepExecution.getFailureExceptions().get(0);
+		assertThat(e, instanceOf(FatalStepExecutionException.class));
+		assertThat(e.getCause(), instanceOf(IllegalArgumentException.class));
+	}		
 
 	@Test
 	public void testOverrideWithoutChangingRollbackRules() throws Exception {
@@ -524,6 +556,26 @@ public class FaultTolerantStepFactoryBeanRollbackTests {
 			map.put(arg, true);
 		}
 		return map;
+	}
+	
+	class ExceptionThrowingChunkListener implements ChunkListener{
+
+		private boolean throwBefore = true;
+
+		public ExceptionThrowingChunkListener(boolean throwBefore) {
+			this.throwBefore  = throwBefore;
+		}
+		
+		public void beforeChunk() {
+			if(throwBefore){
+				throw new IllegalArgumentException("Planned exception");
+			}
+		}
+
+		public void afterChunk() {
+			throw new IllegalArgumentException("Planned exception");
+			
+		}
 	}
 
 }
