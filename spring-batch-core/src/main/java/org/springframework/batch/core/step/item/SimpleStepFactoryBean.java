@@ -598,7 +598,8 @@ public class SimpleStepFactoryBean<T, S> implements FactoryBean, BeanNameAware {
 		step.setStepExecutionListeners(BatchListenerFactoryHelper.getListeners(listeners, StepExecutionListener.class)
 				.toArray(new StepExecutionListener[] {}));
 		
-		for(ChunkListener chunkListener: BatchListenerFactoryHelper.getListeners(listeners, ChunkListener.class)){
+		List<ChunkListener> chunkListeners = BatchListenerFactoryHelper.getListeners(listeners, ChunkListener.class);
+		for(ChunkListener chunkListener: chunkListeners){
 			registerChunkListeners(step,chunkListener);
 		}
 	}
