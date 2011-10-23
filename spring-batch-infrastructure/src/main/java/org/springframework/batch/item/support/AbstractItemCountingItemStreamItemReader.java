@@ -20,6 +20,7 @@ import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.ItemStream;
 import org.springframework.batch.item.ItemStreamException;
+import org.springframework.batch.item.ItemStreamReader;
 import org.springframework.batch.item.ParseException;
 import org.springframework.batch.item.UnexpectedInputException;
 import org.springframework.batch.item.util.ExecutionContextUserSupport;
@@ -34,7 +35,7 @@ import org.springframework.util.Assert;
  * 
  * @author Robert Kasanicky
  */
-public abstract class AbstractItemCountingItemStreamItemReader<T> implements ItemReader<T>, ItemStream {
+public abstract class AbstractItemCountingItemStreamItemReader<T> implements ItemStreamReader<T> {
 
 	private static final String READ_COUNT = "read.count";
 
