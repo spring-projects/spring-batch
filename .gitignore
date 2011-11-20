@@ -1,4 +1,7 @@
 target
+.classpath
+.project
+.settings
 bin
 build.log
 integration-repo
