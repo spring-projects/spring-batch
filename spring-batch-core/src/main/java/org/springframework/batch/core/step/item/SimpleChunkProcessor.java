@@ -151,7 +151,7 @@ public class SimpleChunkProcessor<I, O> implements ChunkProcessor<I>, Initializi
 			doAfterWrite(items);
 		}
 		catch (Exception e) {
-			listener.onWriteError(e, items);
+			doOnWriteError(e, items);
 			throw e;
 		}
 
@@ -164,6 +164,9 @@ public class SimpleChunkProcessor<I, O> implements ChunkProcessor<I>, Initializi
 	 */
 	protected final void doAfterWrite(List<O> items) {
 		listener.afterWrite(items);
+	}
+	protected final void doOnWriteError(Exception e, List<O> items) {
+		listener.onWriteError(e, items);
 	}
 
 	protected void writeItems(List<O> items) throws Exception {
