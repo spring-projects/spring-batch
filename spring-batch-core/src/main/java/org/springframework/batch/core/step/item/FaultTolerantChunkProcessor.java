@@ -529,6 +529,7 @@ public class FaultTolerantChunkProcessor<I, O> extends SimpleChunkProcessor<I, O
 			outputIterator.remove();
 		}
 		catch (Exception e) {
+			doOnWriteError(e, items);
 			if (!shouldSkip(itemWriteSkipPolicy, e, -1) && !rollbackClassifier.classify(e)) {
 				inputIterator.remove();
 				outputIterator.remove();
