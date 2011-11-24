@@ -658,7 +658,7 @@ ref"							is not required, and only needs to be specified explicitly
 				]]></xsd:documentation>
 			</xsd:annotation>
 		</xsd:attribute>
-		<xsd:attribute name="timeout" type="xsd:integer">
+		<xsd:attribute name="timeout" type="xsd:string">
 			<xsd:annotation>
 				<xsd:documentation><![CDATA[
 				The transaction timeout value (in seconds).
