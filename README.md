@@ -1,6 +1,6 @@
 # Spring Batch 
 
-Spring Batch is a lightweight, comprehensive batch framework designed to enable the development of robust batch applications vital for the daily operations of enterprise systems.  Spring Batch builds upon the productivity, POJO-based development approach, and general ease of use capabilities people have come to know from the Spring Framework, while making it easy for developers to access and leverage more advanced enterprise services when necessary.
+Spring Batch is a lightweight, comprehensive batch framework designed to enable the development of robust batch applications vital for the daily operations of enterprise systems.  Spring Batch builds upon the productivity, POJO-based development approach, and general ease of use capabilities people have come to know from the [Spring Framework](https://github.com/SpringSource/spring-framework), while making it easy for developers to access and leverage more advanced enterprise services when necessary.
 
 If you are looking for a runtime container for your Batch applications, or need a management console to view current and historic executions, take a look at [Spring Batch Admin](http://www.springsource.org/spring-batch-admin).  It is a set of services (Java, JSON, JMX) and an optional web UI that you can use to manage and monitor a Batch system.
 
