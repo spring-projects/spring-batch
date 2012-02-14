@@ -66,7 +66,7 @@ public class MapJobExplorerFactoryBean extends AbstractJobExplorerFactoryBean im
 	 * @see org.springframework.beans.factory.InitializingBean#afterPropertiesSet()
 	 */
 	public void afterPropertiesSet() throws Exception {
-		Assert.state(repositoryFactory != null, "A MapJobExplorerFactoryBean must be provided");
+		Assert.state(repositoryFactory != null, "A MapJobRepositoryFactoryBean must be provided");
 		repositoryFactory.afterPropertiesSet();
 	}
 
