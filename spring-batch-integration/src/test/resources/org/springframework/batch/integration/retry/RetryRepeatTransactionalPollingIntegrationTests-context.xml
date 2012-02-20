@@ -9,7 +9,7 @@
 		http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-2.5.xsd
 		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-2.5.xsd
 		http://www.springframework.org/schema/integration
-                                 http://www.springframework.org/schema/integration/spring-integration-1.0.xsd
+																 http://www.springframework.org/schema/integration/spring-integration.xsd
 		http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-2.5.xsd">
 
 	<integration:annotation-config />
@@ -17,16 +17,19 @@
 	<integration:channel id="requests" />
 	<integration:channel id="replies" />
 
+	<!--
+		TODO: the initial delay is a hack - it usually prevents the poller
+		from picking up data in the list before it is cleared, but one day
+		100ms will not be enough... (see INT-536)
+	-->
+	<bean id="delayedTrigger" class="org.springframework.scheduling.support.PeriodicTrigger">
+		<constructor-arg value="10"/>
+		<property name="initialDelay" value="100"/>
+	</bean>
+
 	<integration:inbound-channel-adapter
 		ref="testCase" method="input" channel="requests">
-		<integration:poller max-messages-per-poll="1">
-			<!--
-				TODO: the initial delay is a hack - it usually prevents the poller
-				from picking up data in the list before it is cleared, but one day
-				100ms will not be enough... (see INT-536)
-			-->
-			<integration:interval-trigger interval="10"
-				initial-delay="100" />
+		<integration:poller max-messages-per-poll="1" trigger="delayedTrigger">
 			<integration:advice-chain>
 				<ref bean="txAdvice" />
 				<ref bean="repeatAdvice" />

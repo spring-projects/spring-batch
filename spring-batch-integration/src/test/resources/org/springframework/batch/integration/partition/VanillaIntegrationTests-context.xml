@@ -2,7 +2,7 @@
 <beans xmlns="http://www.springframework.org/schema/beans" xmlns:p="http://www.springframework.org/schema/p"
 	xmlns:integration="http://www.springframework.org/schema/integration" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop.xsd
-		http://www.springframework.org/schema/integration http://www.springframework.org/schema/integration/spring-integration-1.0.xsd
+		http://www.springframework.org/schema/integration http://www.springframework.org/schema/integration/spring-integration.xsd
 		http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
 		http://www.springframework.org/schema/batch http://www.springframework.org/schema/batch/spring-batch.xsd
 		http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx.xsd">
@@ -18,15 +18,11 @@
 
 	<service-activator ref="stepExecutionRequestHandler" input-channel="requests" output-channel="staging"
 		xmlns="http://www.springframework.org/schema/integration">
-		<poller>
-			<interval-trigger interval="10" />
-		</poller>
+		<poller fixed-delay="10"/>
 	</service-activator>
-	<aggregator ref="partitionHandler" timeout="10000" input-channel="staging"
+	<aggregator ref="partitionHandler" send-timeout="10000" input-channel="staging"
 		xmlns="http://www.springframework.org/schema/integration">
-		<poller>
-			<interval-trigger interval="10" />
-		</poller>
+		<poller fixed-delay="10"/>
 	</aggregator>
 
 	<!-- This is the "remote" worker (which in this case is local) -->

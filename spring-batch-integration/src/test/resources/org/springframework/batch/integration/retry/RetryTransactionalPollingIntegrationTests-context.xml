@@ -4,7 +4,7 @@
 	xmlns:tx="http://www.springframework.org/schema/tx" xmlns:p="http://www.springframework.org/schema/p" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xmlns:task="http://www.springframework.org/schema/task" xmlns:util="http://www.springframework.org/schema/util"
 	xsi:schemaLocation="http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-2.5.xsd
-		http://www.springframework.org/schema/integration http://www.springframework.org/schema/integration/spring-integration-2.0.xsd
+		http://www.springframework.org/schema/integration http://www.springframework.org/schema/integration/spring-integration.xsd
 		http://www.springframework.org/schema/task http://www.springframework.org/schema/task/spring-task-3.0.xsd
 		http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.5.xsd
 		http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-3.0.xsd
@@ -16,9 +16,13 @@
 	<integration:channel id="requests" />
 	<integration:channel id="replies" />
 
+	<bean id="delayedTrigger" class="org.springframework.scheduling.support.PeriodicTrigger">
+		<constructor-arg value="10"/>
+		<property name="initialDelay" value="100"/>
+	</bean>
+
 	<integration:inbound-channel-adapter ref="testCase" method="input" channel="requests">
-		<integration:poller max-messages-per-poll="1">
-			<integration:interval-trigger interval="10" initial-delay="100" />
+		<integration:poller max-messages-per-poll="1" trigger="delayedTrigger">
 			<integration:transactional />
 		</integration:poller>
 	</integration:inbound-channel-adapter>

@@ -6,7 +6,7 @@
 	xmlns:jdbc="http://www.springframework.org/schema/jdbc"
 	xsi:schemaLocation="http://www.springframework.org/schema/jdbc http://www.springframework.org/schema/jdbc/spring-jdbc.xsd
 		http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-3.0.xsd
-		http://www.springframework.org/schema/integration http://www.springframework.org/schema/integration/spring-integration-2.0.xsd
+		http://www.springframework.org/schema/integration http://www.springframework.org/schema/integration/spring-integration.xsd
 		http://www.springframework.org/schema/integration/jms http://www.springframework.org/schema/integration/jms/spring-integration-jms-2.0.xsd
 		http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.5.xsd
 		http://www.springframework.org/schema/batch http://www.springframework.org/schema/batch/spring-batch-2.1.xsd
@@ -91,8 +91,7 @@
 		<integration:queue message-store="messageStore" />
 	</integration:channel>
 	<integration:service-activator input-channel="requests" output-channel="replies" ref="chunkHandler">
-		<integration:poller>
-			<integration:interval-trigger interval="100" />
+		<integration:poller fixed-delay="100">
 			<integration:transactional isolation="READ_COMMITTED" />
 		</integration:poller>
 	</integration:service-activator>
