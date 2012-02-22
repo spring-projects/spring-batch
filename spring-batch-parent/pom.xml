@@ -54,10 +54,10 @@
 		<profile>
 			<id>spring3</id>
 			<properties>
-				<spring.framework.version>3.0.5.RELEASE</spring.framework.version>
+				<spring.framework.version>3.0.7.RELEASE</spring.framework.version>
 				<spring.oxm.group>org.springframework</spring.oxm.group>
 				<spring.oxm.artifact>spring-oxm</spring.oxm.artifact>
-				<spring.oxm.version>3.0.5.RELEASE</spring.oxm.version>
+				<spring.oxm.version>3.0.7.RELEASE</spring.oxm.version>
 				<junit.version>4.8.2</junit.version>
 			</properties>
 		</profile>
