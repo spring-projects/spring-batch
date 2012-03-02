@@ -8,7 +8,7 @@
 
 	<step id="stepParent" abstract="true" xmlns="http://www.springframework.org/schema/batch">
 		<tasklet>
-			<chunk>
+			<chunk skip-limit="1">
 				<skippable-exception-classes>
 					<include class="java.lang.Exception" />
 				</skippable-exception-classes>
