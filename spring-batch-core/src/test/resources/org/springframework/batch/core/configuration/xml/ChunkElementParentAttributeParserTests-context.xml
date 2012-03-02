@@ -30,7 +30,7 @@
 			</tasklet>
 		</step>
 
-		<step id="s2" parent="baseStep">
+		<step id="s2" parent="baseStep" next="s3">
 			<tasklet>
 				<chunk reader="reader" writer="writer" commit-interval="5" skip-limit="5" retry-limit="3">
 					<skippable-exception-classes>
@@ -51,15 +51,51 @@
 				</chunk>
 			</tasklet>
 		</step>
+
+		<step id="s3" parent="baseStep" next="s4">
+			<tasklet>
+				<chunk reader="reader" writer="writer" commit-interval="5">
+					<streams>
+						<stream ref="stream1"/>
+					</streams>
+					<retry-listeners>
+						<listener>
+							<beans:bean class="org.springframework.batch.core.configuration.xml.DummyRetryListener"/>
+						</listener>
+					</retry-listeners>
+				</chunk>
+			</tasklet>
+		</step>
+
+		<step id="s4" parent="baseStep">
+			<tasklet>
+				<chunk reader="reader" writer="writer" commit-interval="5">
+					<retryable-exception-classes merge="true">
+						<include class="java.lang.RuntimeException"/>
+					</retryable-exception-classes>
+					<streams>
+						<stream ref="stream1"/>
+					</streams>
+					<retry-listeners>
+						<listener>
+							<beans:bean class="org.springframework.batch.core.configuration.xml.DummyRetryListener"/>
+						</listener>
+					</retry-listeners>
+				</chunk>
+			</tasklet>
+		</step>
 	</job>
 
 	<step id="baseStep" abstract="true">
 		<tasklet>
-				<chunk>
+				<chunk retry-limit="6" skip-limit="7">
 					<skippable-exception-classes>
 						<include class="java.lang.ArithmeticException"/>
 						<exclude class="org.springframework.dao.DeadlockLoserDataAccessException"/>
 					</skippable-exception-classes>
+					<retryable-exception-classes>
+						<include class="java.io.IOException"/>
+					</retryable-exception-classes>
 					<streams>
 						<stream ref="stream2"/>
 					</streams>
