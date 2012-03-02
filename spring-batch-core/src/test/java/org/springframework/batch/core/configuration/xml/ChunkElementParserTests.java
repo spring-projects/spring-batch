@@ -15,16 +15,6 @@
  */
 package org.springframework.batch.core.configuration.xml;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
-
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Map;
-
 import org.junit.Test;
 import org.springframework.batch.classify.SubclassClassifier;
 import org.springframework.batch.core.Step;
@@ -48,6 +38,17 @@ import org.springframework.dao.DeadlockLoserDataAccessException;
 import org.springframework.dao.PessimisticLockingFailureException;
 import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.util.StringUtils;
+
+import java.io.IOException;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Map;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 /**
  * @author Dan Garrette
@@ -181,6 +182,22 @@ public class ChunkElementParserTests {
 		assertEquals(3, retryable.size());
 		containsClassified(retryable, PessimisticLockingFailureException.class, true);
 		containsClassified(retryable, CannotSerializeTransactionException.class, false);
+	}
+
+	@Test
+	public void testRetryableInherited() throws Exception {
+		Map<Class<? extends Throwable>, Boolean> retryable = getRetryableExceptionClasses("s3", getContext());
+		System.err.println(retryable);
+		assertEquals(2, retryable.size());
+		containsClassified(retryable, IOException.class, true);
+	}
+
+	@Test
+	public void testRetryableInheritedMerge() throws Exception {
+		Map<Class<? extends Throwable>, Boolean> retryable = getRetryableExceptionClasses("s4", getContext());
+		System.err.println(retryable);
+		assertEquals(3, retryable.size());
+		containsClassified(retryable, IOException.class, true);
 	}
 
 	@Test
