@@ -15,6 +15,8 @@
  */
 package org.springframework.batch.core.configuration.xml;
 
+import java.util.List;
+
 import org.springframework.batch.core.listener.StepListenerMetaData;
 import org.springframework.batch.core.step.item.ForceRollbackForWriteSkipException;
 import org.springframework.batch.repeat.policy.SimpleCompletionPolicy;
@@ -33,8 +35,6 @@ import org.springframework.beans.factory.xml.ParserContext;
 import org.springframework.util.StringUtils;
 import org.springframework.util.xml.DomUtils;
 import org.w3c.dom.Element;
-
-import java.util.List;
 
 /**
  * Internal parser for the &lt;chunk/&gt; element inside a step.
@@ -127,11 +127,9 @@ public class ChunkElementParser {
 			}
 			propertyValues.addPropertyValue("skipLimit", skipLimit);
 		}
-		if (skippableExceptions != null) {
-			// Even if there is no retryLimit, we can still accept exception
-			// classes for an abstract parent bean definition
-			propertyValues.addPropertyValue("skippableExceptionClasses", skippableExceptions);
-		}
+		// Even if there is no retryLimit, we can still accept exception
+		// classes for an abstract parent bean definition
+		propertyValues.addPropertyValue("skippableExceptionClasses", skippableExceptions);
 
 		handleItemHandler(bd, "skip-policy", "skipPolicy", null, false, element, parserContext, propertyValues,
 				underspecified);
@@ -145,11 +143,9 @@ public class ChunkElementParser {
 			}
 			propertyValues.addPropertyValue("retryLimit", retryLimit);
 		}
-		if (retryableExceptions != null) {
-			// Even if there is no retryLimit, we can still accept exception
-			// classes for an abstract parent bean definition
-			propertyValues.addPropertyValue("retryableExceptionClasses", retryableExceptions);
-		}
+		// Even if there is no retryLimit, we can still accept exception
+		// classes for an abstract parent bean definition
+		propertyValues.addPropertyValue("retryableExceptionClasses", retryableExceptions);
 
 		handleItemHandler(bd, "retry-policy", "retryPolicy", null, false, element, parserContext, propertyValues,
 				underspecified);
