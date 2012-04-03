@@ -81,5 +81,5 @@ $ mvn test
 
 * Using Gradle and Git (for Groovy programmers)
 
-  * There is a Groovy project template with instructions available {{{https://github.com/robokaso/Groovy-Spring-Batch-Template}here}}
+  * There is a Groovy project template with instructions available {{{http://robokaso.github.com/Groovy-Spring-Batch-Template/}here}}
   
