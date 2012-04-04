@@ -79,7 +79,7 @@ $ mvn test
 
   * Run Maven from the command line in the samples directory.  There are additional building instructions and suggestions about what to do if it goes wrong {{{building.html}here}}.
 
-* Using Gradle and Git (for Groovy programmers)
+* Using Gradle (for Groovy programmers)
 
   * There is a Groovy project template with instructions available {{{http://robokaso.github.com/Groovy-Spring-Batch-Template/}here}}
   
