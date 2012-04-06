@@ -16,7 +16,7 @@
 package org.springframework.batch.core.job.flow;
 
 /**
- * This class is used as a holder for a BatchStatus/ExitStatus pair.
+ * Represents the status of {@link FlowExecution}.
  * 
  * @author Dan Garrette
  * @author Dave Syer
