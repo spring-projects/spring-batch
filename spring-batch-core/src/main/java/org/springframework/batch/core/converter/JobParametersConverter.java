@@ -24,7 +24,7 @@ import org.springframework.batch.core.JobParametersBuilder;
 /**
  * A factory for {@link JobParameters} instances. A job can be executed with
  * many possible runtime parameters, which identify the instance of the job.
- * This converter allows job parameters to be to and from Properties.
+ * This converter allows job parameters to be converted to and from Properties.
  * 
  * @author Dave Syer
  * 
