@@ -252,4 +252,21 @@ public class DefaultJobParametersConverterTests {
 	private boolean contains(String str, String searchStr) {
 		return str.indexOf(searchStr) != -1;
 	}
+	
+	@Test
+	public void testGetPropertiesWithNullValues() throws Exception {
+		
+		JobParameters parameters = new JobParametersBuilder().addDate("schedule.date", null)
+				.addString("job.key", null).addLong("vendor.id", null).addDouble("double.key", null)
+				.toJobParameters();
+		
+		Properties props = factory.getProperties(parameters);
+		assertNotNull(props);
+		
+		final String NOT_FOUND = "NOT FOUND";
+		assertEquals(NOT_FOUND, props.getProperty("schedule.date", NOT_FOUND));  
+		assertEquals(NOT_FOUND, props.getProperty("job.key", NOT_FOUND));  
+		assertEquals(NOT_FOUND, props.getProperty("vendor.id", NOT_FOUND));  
+		assertEquals(NOT_FOUND, props.getProperty("double.key", NOT_FOUND));  
+	}
 }

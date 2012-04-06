@@ -166,6 +166,9 @@ public class DefaultJobParametersConverter implements JobParametersConverter {
 			String key = entry.getKey();
 			JobParameter jobParameter = entry.getValue();
 			Object value = jobParameter.getValue();
+			if (value == null) {
+				continue; //skip null parameters 
+			}
 			if (jobParameter.getType() == ParameterType.DATE) {
 				result.setProperty(key + DATE_TYPE, dateFormat.format(value));
 			}
