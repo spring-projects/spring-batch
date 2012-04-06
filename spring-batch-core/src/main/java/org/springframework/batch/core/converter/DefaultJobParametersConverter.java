@@ -166,20 +166,19 @@ public class DefaultJobParametersConverter implements JobParametersConverter {
 			String key = entry.getKey();
 			JobParameter jobParameter = entry.getValue();
 			Object value = jobParameter.getValue();
-			if (value == null) {
-				continue; //skip null parameters 
-			}
-			if (jobParameter.getType() == ParameterType.DATE) {
-				result.setProperty(key + DATE_TYPE, dateFormat.format(value));
-			}
-			else if (jobParameter.getType() == ParameterType.LONG) {
-				result.setProperty(key + LONG_TYPE, longNumberFormat.format(value));
-			}
-			else if (jobParameter.getType() == ParameterType.DOUBLE) {
-				result.setProperty(key + DOUBLE_TYPE, decimalFormat((Double)value));
-			}
-			else {
-				result.setProperty(key, "" + value);
+			if (value != null) {
+				if (jobParameter.getType() == ParameterType.DATE) {
+					result.setProperty(key + DATE_TYPE, dateFormat.format(value));
+				}
+				else if (jobParameter.getType() == ParameterType.LONG) {
+					result.setProperty(key + LONG_TYPE, longNumberFormat.format(value));
+				}
+				else if (jobParameter.getType() == ParameterType.DOUBLE) {
+					result.setProperty(key + DOUBLE_TYPE, decimalFormat((Double)value));
+				}
+				else {
+					result.setProperty(key, "" + value);
+				}
 			}
 		}
 		return result;
