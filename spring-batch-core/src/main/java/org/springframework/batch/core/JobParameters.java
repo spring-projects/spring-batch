@@ -148,7 +148,7 @@ public class JobParameters implements Serializable {
 	 * @return The <code>java.util.Date</code> value
 	 */
 	public Date getDate(String key){
-		return (Date)parameters.get(key).getValue();
+		return this.getDate(key,null);
 	}
 	
 	/**
@@ -162,7 +162,7 @@ public class JobParameters implements Serializable {
 	 */
 	public Date getDate(String key, Date defaultValue){
 		if(parameters.containsKey(key)){
-			return getDate(key);
+			return (Date)parameters.get(key).getValue();
 		}
 		else{
 			return defaultValue;

@@ -191,4 +191,24 @@ public class JobParametersTests {
 
 		assertEquals(params, SerializationUtils.deserialize(serialized));
 	}
+    
+    @Test
+    public void testLongReturns0WhenKeyDoesntExit(){
+        assertEquals(0L,new JobParameters().getLong("keythatdoesntexist"));
+    }
+
+    @Test
+    public void testStringReturnsNullWhenKeyDoesntExit(){
+        assertNull(new JobParameters().getString("keythatdoesntexist"));
+    }
+
+    @Test
+    public void testDoubleReturns0WhenKeyDoesntExit(){
+        assertEquals(0.0,new JobParameters().getLong("keythatdoesntexist"), 0.0001);
+    }
+
+    @Test
+    public void testDateReturnsNullWhenKeyDoesntExit(){
+        assertNull(new JobParameters().getDate("keythatdoesntexist"));
+    }
 }
