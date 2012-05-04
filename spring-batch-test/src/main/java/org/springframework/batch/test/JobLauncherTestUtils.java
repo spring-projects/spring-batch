@@ -157,7 +157,7 @@ public class JobLauncherTestUtils {
 	 */
 	public JobParameters getUniqueJobParameters() {
 		Map<String, JobParameter> parameters = new HashMap<String, JobParameter>();
-		parameters.put("timestamp", new JobParameter(new Date().getTime()));
+		parameters.put("nanoTime", new JobParameter(System.nanoTime()));
 		return new JobParameters(parameters);
 	}
 
