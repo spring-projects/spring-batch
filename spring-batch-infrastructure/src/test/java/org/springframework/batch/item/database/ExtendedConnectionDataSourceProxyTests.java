@@ -7,7 +7,9 @@ import java.io.PrintWriter;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.SQLFeatureNotSupportedException;
 import java.sql.Statement;
+import java.util.logging.Logger;
 
 import javax.sql.DataSource;
 
@@ -329,6 +331,10 @@ public class ExtendedConnectionDataSourceProxyTests {
 				return (T) this;
 			}
 			throw new SQLException(UNWRAP_ERROR_MESSAGE);
+		}
+
+		public Logger getParentLogger() throws SQLFeatureNotSupportedException {
+			throw new SQLFeatureNotSupportedException();
 		}
 
 	}
