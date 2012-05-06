@@ -23,7 +23,6 @@ import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
 import java.sql.Connection;
 import java.sql.SQLException;
-import java.sql.SQLFeatureNotSupportedException;
 import java.util.logging.Logger;
 
 import javax.sql.DataSource;
@@ -323,8 +322,13 @@ public class ExtendedConnectionDataSourceProxy implements SmartDataSource, Initi
 		Assert.notNull(dataSource);
 	}
 
-	public Logger getParentLogger() throws SQLFeatureNotSupportedException {
-		throw new SQLFeatureNotSupportedException();
+	/**
+	 * Added due to JDK 7 compatibility, sadly a proper implementation
+	 * that would throw SqlFeatureNotSupportedException is not possible
+	 * in Java 5 (the class was added in Java 6).
+	 */
+	public Logger getParentLogger() {
+		throw new UnsupportedOperationException();
 	}
 
 }
