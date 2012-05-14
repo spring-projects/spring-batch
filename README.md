@@ -12,7 +12,7 @@ Clone the git repository using the URL on the Github home page:
     $ cd spring-batch
 
 ## Command Line
-Use Maven 2.2.* (might work with 3.0, but we don't test it), then on the command line:
+Use Maven 2.2 or 3.0, then on the command line:
 
     $ mvn install
 
@@ -27,7 +27,7 @@ In STS (or any Eclipse distro or other IDE with Maven support), import the modul
 
   This is the quickest way to get started.  It requires an internet connection for download, and access to a Maven repository (remote or local).
 
-* Download STS version 2.5.* (or better) from the [SpringSource website](http://www.springsource.com/products/sts).  STS is a free Eclipse bundle with many features useful for Spring developers.
+* Download STS version 2.5 (or better) from the [SpringSource website](http://www.springsource.com/products/sts).  STS is a free Eclipse bundle with many features useful for Spring developers.
 * Go to `File->New->Spring Template Project` from the menu bar (in the Spring perspective).
 * The wizard has a drop down with a list of template projects.  One of them is a "Simple Spring Batch Project".  Select it and follow the wizard.
 * A project is created with all dependencies and a simple input/output job configuration.  It can be run using a unit test, or on the command line (see instructions in the pom.xml).
