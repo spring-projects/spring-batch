@@ -16,7 +16,6 @@
 
 package org.springframework.batch.test;
 
-import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -66,6 +65,8 @@ import org.springframework.context.ApplicationContext;
  * @since 2.1
  */
 public class JobLauncherTestUtils {
+
+	private static final long JOB_PARAMETER_MAXIMUM = 1000000;
 
 	/** Logger */
 	protected final Log logger = LogFactory.getLog(getClass());
@@ -157,7 +158,7 @@ public class JobLauncherTestUtils {
 	 */
 	public JobParameters getUniqueJobParameters() {
 		Map<String, JobParameter> parameters = new HashMap<String, JobParameter>();
-		parameters.put("timestamp", new JobParameter(new Date().getTime()));
+		parameters.put("random", new JobParameter((long) (Math.random() * JOB_PARAMETER_MAXIMUM)));
 		return new JobParameters(parameters);
 	}
 
