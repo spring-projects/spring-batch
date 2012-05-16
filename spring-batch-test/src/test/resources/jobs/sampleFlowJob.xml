@@ -16,7 +16,8 @@
 
 	<job id="sampleFlowJob">
 		<step id="step1" parent="s1" next="step2"/>
-		<step id="step2" parent="s2"/>
+		<step id="step2" parent="s2" next="step3"/>
+		<step id="step3" parent="s3"/>
 	</job>
 
 </beans:beans>
