@@ -12,6 +12,7 @@ import org.springframework.batch.test.sample.SampleTasklet;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.jdbc.core.simple.SimpleJdbcTemplate;
+import org.springframework.test.annotation.Repeat;
 import org.springframework.test.context.ContextConfiguration;
 
 /**
@@ -71,6 +72,13 @@ public abstract class AbstractSampleJobTests {
 	public void testStep2Execution() {
 		assertEquals(BatchStatus.COMPLETED, jobLauncherTestUtils.launchStep("step2").getStatus());
 		this.verifyTasklet(2);
+	}
+
+	@Test
+	@Repeat(10)
+	public void testStep3Execution() throws Exception {
+		// logging only, may complete in < 1ms (repeat so that it's likely to for at least one of those times)
+		assertEquals(BatchStatus.COMPLETED, jobLauncherTestUtils.launchStep("step3").getStatus());
 	}
 
 	@Test
