@@ -15,11 +15,11 @@
  */
 package org.springframework.batch.core.configuration.support;
 
-import java.util.Collection;
+import java.util.concurrent.ConcurrentMap;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.configuration.DuplicateJobException;
@@ -29,50 +29,46 @@ import org.springframework.batch.core.launch.NoSuchJobException;
 import org.springframework.util.Assert;
 
 /**
- * Simple map-based implementation of {@link JobRegistry}. Access to the map is
- * synchronized, guarded by an internal lock.
+ * Simple, thread-safe, map-based implementation of {@link JobRegistry}. 
  * 
  * @author Dave Syer
+ * @author Robert Fischer
  * 
  */
 public class MapJobRegistry implements JobRegistry {
 
-	private Map<String, JobFactory> map = new HashMap<String, JobFactory>();
+	private final ConcurrentMap<String, JobFactory> map = new ConcurrentHashMap<String, JobFactory>();
 
 	public void register(JobFactory jobFactory) throws DuplicateJobException {
 		Assert.notNull(jobFactory);
 		String name = jobFactory.getJobName();
 		Assert.notNull(name, "Job configuration must have a name.");
-		synchronized (map) {
-			if (map.containsKey(name)) {
-				throw new DuplicateJobException("A job configuration with this name [" + name
-						+ "] was already registered");
-			}
-			map.put(name, jobFactory);
+		JobFactory previousValue = map.putIfAbsent(name, jobFactory);
+		if(previousValue != null) {
+			throw new DuplicateJobException("A job configuration with this name [" + name
+					+ "] was already registered");
 		}
 	}
 
 	public void unregister(String name) {
-		Assert.notNull(name, "Job configuration must have a name.");
-		synchronized (map) {
-			map.remove(name);
-		}
-
+		Assert.notNull(name, "Must be given a name to unregister");
+		map.remove(name);
 	}
 
 	public Job getJob(String name) throws NoSuchJobException {
-		synchronized (map) {
-			if (!map.containsKey(name)) {
-				throw new NoSuchJobException("No job configuration with the name [" + name + "] was registered");
-			}
-			return map.get(name).createJob();
+		JobFactory factory = map.get(name);
+		if(factory == null) {
+			throw new NoSuchJobException("No job configuration with the name [" + name + "] was registered");
+		} else {
+			return factory.createJob();
 		}
 	}
 
-	public Collection<String> getJobNames() {
-		synchronized (map) {
-			return Collections.unmodifiableCollection(new HashSet<String>(map.keySet()));
-		}
+	/**
+	* Provides an unmodifiable view of the job names.
+	*/
+	public Set<String> getJobNames() {
+		return Collections.unmodifiableSet(map.keySet());
 	}
 
 }
