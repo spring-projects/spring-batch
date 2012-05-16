@@ -33,4 +33,16 @@
 		<constructor-arg value="2" />
 	</bean>
 
+	<batch:step id="s3" parent="taskletStep">
+		<batch:tasklet ref="tasklet3">
+			<batch:listeners>
+				<batch:listener ref="tasklet3"/>
+			</batch:listeners>
+		</batch:tasklet>
+	</batch:step>
+
+	<bean id="tasklet3" class="org.springframework.batch.test.sample.LoggingTasklet">
+		<constructor-arg value="3" />
+	</bean>
+
 </beans>
