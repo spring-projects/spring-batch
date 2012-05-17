@@ -309,8 +309,21 @@ public class JdbcPagingItemReader<T> extends AbstractPagingItemReader<T> impleme
 
 	private class PagingRowMapper implements RowMapper {
 		public Object mapRow(ResultSet rs, int rowNum) throws SQLException {
-			startAfterValue = rs.getObject(queryProvider.getSortKey());
+			startAfterValue = rs.getObject(stripAlias(queryProvider.getSortKey()));
 			return rowMapper.mapRow(rs, rowNum);
+		}
+
+		private String stripAlias(String sortKey) {
+			if (sortKey != null) {
+				int separator = sortKey.indexOf('.');
+				if (separator > 0) {
+					int columnIndex = separator + 1;
+					if (columnIndex < sortKey.length()) {
+						sortKey = sortKey.substring(columnIndex);
+					}
+				}
+			}
+			return sortKey;
 		}
 	}
 
