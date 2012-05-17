@@ -138,10 +138,26 @@ public abstract class AbstractSqlPagingQueryProvider implements PagingQueryProvi
 	}
 
 	/**
-	 * 
+	 *
 	 * @return sortKey key to use to sort and limit page content
 	 */
 	public String getSortKey() {
+		return sortKey;
+	}
+
+	/**
+	 *
+	 * @return sortKey key to use to sort and limit page content (without alias)
+	 */
+	public String getSortKeyWithoutAlias() {
+		String sortKey = getSortKey();
+		int separator = sortKey.indexOf('.');
+		if (separator > 0) {
+			int columnIndex = separator + 1;
+			if (columnIndex < sortKey.length()) {
+				sortKey = sortKey.substring(columnIndex);
+			}
+		}
 		return sortKey;
 	}
 
