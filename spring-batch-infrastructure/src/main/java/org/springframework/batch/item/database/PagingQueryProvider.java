@@ -82,4 +82,11 @@ public interface PagingQueryProvider {
 	 */
 	String getSortKey();
 
+	/**
+	 * The sort key (unique single column name) without alias.
+	 *
+	 * @return the sort key used to order the query (without alias)
+	 */
+	String getSortKeyWithoutAlias();
+
 }
