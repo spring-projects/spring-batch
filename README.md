@@ -12,7 +12,7 @@ Clone the git repository using the URL on the Github home page:
     $ cd spring-batch
 
 ## Command Line
-Use Maven 2.2.* (might work with 3.0, but we don't test it), then on the command line:
+Use Maven 2.2 or 3.0, then on the command line:
 
     $ mvn install
 
