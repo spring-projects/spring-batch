@@ -54,5 +54,18 @@ public class MapExecutionContextDaoTests extends AbstractExecutionContextDaoTest
 		assertTrue(retrieved.isEmpty());
 	}
 
+	@Ignore("Under discussion for JIRA ticket BATCH-1858")
+	@Test
+	public void testNullExecutionContextUpdate() throws Exception {
+		MapExecutionContextDao tested = new MapExecutionContextDao();
+		JobExecution jobExecution = new JobExecution((long)1);
+		assertNotNull(jobExecution.getExecutionContext());
+		tested.updateExecutionContext(jobExecution);
+		assertNotNull(tested.getExecutionContext(jobExecution));
+		jobExecution.setExecutionContext(null);
+		tested.updateExecutionContext(jobExecution);
+		//assert???(mapExecutionContextDao.getExecutionContext(jobExecution) == null);
+	}
+
 }
 
