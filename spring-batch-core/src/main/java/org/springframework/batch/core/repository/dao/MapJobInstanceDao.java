@@ -21,7 +21,11 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Set;
+
 import java.util.concurrent.CopyOnWriteArraySet;
+
+import java.util.concurrent.atomic.AtomicLong;
 
 import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.JobInstance;
@@ -33,9 +37,10 @@ import org.springframework.util.Assert;
  */
 public class MapJobInstanceDao implements JobInstanceDao {
 
-	private Collection<JobInstance> jobInstances = new CopyOnWriteArraySet<JobInstance>();
+	// JDK6 Make a ConcurrentSkipListSet: tends to add on end
+	private final Set<JobInstance> jobInstances = new CopyOnWriteArraySet<JobInstance>();
 
-	private long currentId = 0;
+	private final AtomicLong currentId = new AtomicLong(0L);
 
 	public void clear() {
 		jobInstances.clear();
@@ -45,7 +50,7 @@ public class MapJobInstanceDao implements JobInstanceDao {
 
 		Assert.state(getJobInstance(jobName, jobParameters) == null, "JobInstance must not already exist");
 
-		JobInstance jobInstance = new JobInstance(currentId++, jobParameters, jobName);
+		JobInstance jobInstance = new JobInstance(currentId.getAndIncrement(), jobParameters, jobName);
 		jobInstance.incrementVersion();
 		jobInstances.add(jobInstance);
 

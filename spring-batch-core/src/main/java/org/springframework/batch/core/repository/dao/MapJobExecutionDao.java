@@ -23,7 +23,11 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
+
+import java.util.concurrent.atomic.AtomicLong;
 
 import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.JobInstance;
@@ -36,9 +40,10 @@ import org.springframework.util.Assert;
  */
 public class MapJobExecutionDao implements JobExecutionDao {
 
-	private Map<Long, JobExecution> executionsById = new ConcurrentHashMap<Long, JobExecution>();
+	// JDK6 Make this into a ConcurrentSkipListMap: adds and removes tend to be very near the front or back
+	private final ConcurrentMap<Long, JobExecution> executionsById = new ConcurrentHashMap<Long, JobExecution>();
 
-	private long currentId = 0;
+	private final AtomicLong currentId = new AtomicLong(0L);
 
 	public void clear() {
 		executionsById.clear();
@@ -51,7 +56,7 @@ public class MapJobExecutionDao implements JobExecutionDao {
 
 	public void saveJobExecution(JobExecution jobExecution) {
 		Assert.isTrue(jobExecution.getId() == null);
-		Long newId = currentId++;
+		Long newId = currentId.getAndIncrement();
 		jobExecution.setId(newId);
 		jobExecution.incrementVersion();
 		executionsById.put(newId, copy(jobExecution));
