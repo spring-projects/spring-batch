@@ -17,6 +17,7 @@ import java.util.Map;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.batch.core.BatchStatus;
@@ -58,15 +59,13 @@ public class FaultTolerantStepFactoryBeanRollbackTests {
 
 	private JobRepository repository;
 
-	public FaultTolerantStepFactoryBeanRollbackTests() throws Exception {
-		reader = new SkipReaderStub<String>();
-		processor = new SkipProcessorStub<String>();
-		writer = new SkipWriterStub<String>();
-	}
-
 	@SuppressWarnings("unchecked")
 	@Before
 	public void setUp() throws Exception {
+		reader = new SkipReaderStub<String>();
+		processor = new SkipProcessorStub<String>();
+		writer = new SkipWriterStub<String>();
+
 		factory = new FaultTolerantStepFactoryBean<String, String>();
 
 		factory.setBeanName("stepName");
@@ -95,6 +94,14 @@ public class FaultTolerantStepFactoryBeanRollbackTests {
 		jobExecution = repository.createJobExecution("skipJob", new JobParameters());
 		stepExecution = jobExecution.createStepExecution(factory.getName());
 		repository.add(stepExecution);
+	}
+
+	@After
+	public void tearDown() throws Exception {
+		reader = null;
+		processor = null;
+		writer = null;
+		factory = null;
 	}
 	
 	@Test
