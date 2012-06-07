@@ -110,7 +110,7 @@ public class SqlWindowingPagingQueryProvider extends AbstractSqlPagingQueryProvi
 	}
 
 	protected String getOverClause() {
-		return "ORDER BY " + getSortKey() + " " + getAscendingClause();
+		return "ORDER BY " + getSortKeyWithoutAlias() + " " + getAscendingClause();
 	}
 
 	protected String getOverSubstituteClauseStart() {
