@@ -63,7 +63,7 @@ public class JdbcPagingQueryIntegrationTests {
 	public void init() {
 		jdbcTemplate = new SimpleJdbcTemplate(dataSource);
 		maxId = jdbcTemplate.queryForInt("SELECT MAX(ID) from T_FOOS");
-		for (int i = maxId + 1; i <= itemCount; i++) {
+		for (int i = itemCount; i > maxId; i--) {
 			jdbcTemplate.update("INSERT into T_FOOS (ID,NAME,VALUE) values (?, ?, ?)", i, "foo" + i, i);
 		}
 		assertEquals(itemCount, SimpleJdbcTestUtils.countRowsInTable(jdbcTemplate, "T_FOOS"));
