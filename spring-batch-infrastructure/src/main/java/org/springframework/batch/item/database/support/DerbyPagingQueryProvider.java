@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *	  http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -26,7 +26,11 @@ import javax.sql.DataSource;
  * Derby implementation of a  {@link PagingQueryProvider} using standard SQL:2003 windowing functions.
  * These features are supported starting with Apache Derby version 10.4.1.3.
  *
+ * As the OVER() function does not support the ORDER BY clause a sub query is instead used to order the results
+ * before the ROW_NUM restriction is applied
+ *
  * @author Thomas Risberg
+ * @author David Thexton
  * @since 2.0
  */
 public class DerbyPagingQueryProvider extends SqlWindowingPagingQueryProvider {
@@ -43,22 +47,16 @@ public class DerbyPagingQueryProvider extends SqlWindowingPagingQueryProvider {
 	}
 	
 	@Override
-	protected Object getSubQueryAlias() {
-		return "AS TMP_SUB ";
-	}
-	
-	@Override
 	protected String getOverClause() {
 		return "";
 	}
-	
-	@Override
-	protected String getAfterWhereClause() {
-		if (version!=null && "10.6.1".compareTo(version) > 0) {
-			// Old behaviour retained, even though it is broken
-			return "";
-		}
-		return " " + super.getOverClause();
+
+	protected String getOverSubstituteClauseStart() {
+		return " FROM (SELECT " + getSelectClause();
+	}
+
+	protected String getOverSubstituteClauseEnd() {
+		return " " + super.getOverClause() + ") AS TMP_ORDERED";
 	}
 
 }
