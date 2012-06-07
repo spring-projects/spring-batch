@@ -60,7 +60,7 @@ public class JpaPagingItemReaderAsyncTests {
 	public void init() {
 		SimpleJdbcTemplate jdbcTemplate = new SimpleJdbcTemplate(dataSource);
 		maxId = jdbcTemplate.queryForInt("SELECT MAX(ID) from T_FOOS");
-		for (int i = maxId + 1; i <= ITEM_COUNT; i++) {
+		for (int i = ITEM_COUNT; i > maxId; i--) {
 			jdbcTemplate.update("INSERT into T_FOOS (ID,NAME,VALUE) values (?, ?, ?)", i, "foo" + i, i);
 		}
 		assertEquals(ITEM_COUNT, SimpleJdbcTestUtils.countRowsInTable(jdbcTemplate, "T_FOOS"));

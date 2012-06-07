@@ -70,7 +70,7 @@ public class JdbcPagingRestartIntegrationTests {
 	public void init() {
 		jdbcTemplate = new SimpleJdbcTemplate(dataSource);
 		maxId = jdbcTemplate.queryForInt("SELECT MAX(ID) from T_FOOS");
-		for (int i = maxId + 1; i <= itemCount; i++) {
+		for (int i = itemCount; i > maxId; i--) {
 			jdbcTemplate.update("INSERT into T_FOOS (ID,NAME,VALUE) values (?, ?, ?)", i, "foo" + i, i);
 		}
 		assertEquals(itemCount, SimpleJdbcTestUtils.countRowsInTable(jdbcTemplate, "T_FOOS"));
@@ -147,7 +147,7 @@ public class JdbcPagingRestartIntegrationTests {
 		factory.setDataSource(dataSource);
 		factory.setSelectClause("select ID, NAME, VALUE");
 		factory.setFromClause("from T_FOOS");
-		factory.setSortKey("ID");
+		factory.setSortKey("VALUE");
 		reader.setQueryProvider((PagingQueryProvider) factory.getObject());
 		reader.setRowMapper(new ParameterizedRowMapper<Foo>() {
 			public Foo mapRow(ResultSet rs, int i) throws SQLException {
