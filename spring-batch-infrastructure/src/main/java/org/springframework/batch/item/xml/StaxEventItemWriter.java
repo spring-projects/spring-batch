@@ -27,6 +27,7 @@ import java.nio.channels.FileChannel;
 import java.util.List;
 import java.util.Map;
 
+import javax.xml.stream.FactoryConfigurationError;
 import javax.xml.stream.XMLEventFactory;
 import javax.xml.stream.XMLEventWriter;
 import javax.xml.stream.XMLOutputFactory;
@@ -371,7 +372,7 @@ public class StaxEventItemWriter<T> extends ExecutionContextUserSupport implemen
 			throw new DataAccessResourceFailureException("Unable to write to file resource: [" + resource + "]", ioe);
 		}
 
-		XMLOutputFactory outputFactory = XMLOutputFactory.newInstance();
+		XMLOutputFactory outputFactory = createXmlOutputFactory();
 
 		if (outputFactory.isPropertySupported("com.ctc.wstx.automaticEndElements")) {
 			// If the current XMLOutputFactory implementation is supplied by
@@ -400,7 +401,7 @@ public class StaxEventItemWriter<T> extends ExecutionContextUserSupport implemen
 			else {
 				bufferedWriter = new BufferedWriter(new OutputStreamWriter(os, encoding));
 			}
-			delegateEventWriter = outputFactory.createXMLEventWriter(bufferedWriter);
+			delegateEventWriter = createXmlEventWriter(outputFactory,bufferedWriter);
 			eventWriter = new NoStartEndDocumentStreamWriter(delegateEventWriter);
 			if (!restarted) {
 				startDocument(delegateEventWriter);
@@ -417,6 +418,48 @@ public class StaxEventItemWriter<T> extends ExecutionContextUserSupport implemen
 	}
 
 	/**
+	 * Subclasses can override to customize the writer.
+	 * @param outputFactory
+	 * @param writer
+	 * @return
+	 * @throws XMLStreamException
+	 */
+	protected XMLEventWriter createXmlEventWriter(XMLOutputFactory outputFactory,Writer writer)
+			throws XMLStreamException {
+		return outputFactory.createXMLEventWriter(writer);
+	}
+
+	/**
+	 * Subclasses can override to customize the factory.
+	 * @return
+	 * @throws FactoryConfigurationError
+	 */
+	protected XMLOutputFactory createXmlOutputFactory()
+			throws FactoryConfigurationError {
+		return XMLOutputFactory.newInstance();
+	}
+	
+	/**
+	 * Subclasses can override to customize the event factory.
+	 * @return
+	 * @throws FactoryConfigurationError
+	 */
+	protected XMLEventFactory createXmlEventFactory()
+			throws FactoryConfigurationError {
+		XMLEventFactory factory = XMLEventFactory.newInstance();
+		return factory;
+	}
+	
+	/**
+	 * Subclasses can override to customize the stax result.
+	 * @return
+	 * @throws Exception
+	 */
+	protected Result createStaxResult() throws Exception {
+		return StaxUtils.getResult(eventWriter);
+	}
+
+	/**
 	 * Writes simple XML header containing:
 	 * <ul>
 	 * <li>xml declaration - defines encoding and XML version</li>
@@ -430,7 +473,7 @@ public class StaxEventItemWriter<T> extends ExecutionContextUserSupport implemen
 	 */
 	protected void startDocument(XMLEventWriter writer) throws XMLStreamException {
 
-		XMLEventFactory factory = XMLEventFactory.newInstance();
+		XMLEventFactory factory = createXmlEventFactory();
 
 		// write start document
 		writer.add(factory.createStartDocument(getEncoding(), getVersion()));
@@ -501,8 +544,7 @@ public class StaxEventItemWriter<T> extends ExecutionContextUserSupport implemen
 	 */
 	public void close() {
 
-		// harmless event to close the root tag if there were no items
-		XMLEventFactory factory = XMLEventFactory.newInstance();
+		XMLEventFactory factory = createXmlEventFactory();
 		try {
 			delegateEventWriter.add(factory.createCharacters(""));
 		}
@@ -570,7 +612,7 @@ public class StaxEventItemWriter<T> extends ExecutionContextUserSupport implemen
 		for (Object object : items) {
 			Assert.state(marshaller.supports(object.getClass()),
 					"Marshaller must support the class of the marshalled object");
-			Result result = StaxUtils.getResult(eventWriter);
+			Result result = createStaxResult();
 			marshaller.marshal(object, result );
 		}
 		try {
