@@ -168,24 +168,8 @@
 			</repositories>
 			<pluginRepositories>
 				<pluginRepository>
-					<id>objectstyle</id>
-					<name>ObjectStyle.org Repository</name>
-					<url>http://objectstyle.org/maven2/</url>
-					<snapshots>
-						<enabled>false</enabled>
-					</snapshots>
-				</pluginRepository>
-				<pluginRepository>
 					<id>apache-snapshots</id>
 					<url>http://people.apache.org/maven-snapshot-repository/</url>
-				</pluginRepository>
-				<pluginRepository>
-					<id>com.springsource.repository.bundles.release</id>
-					<name>SpringSource Enterprise Bundle Repository - SpringSource Bundle Releases</name>
-					<url>http://repository.springsource.com/maven/bundles/release/</url>
-					<snapshots>
-						<enabled>false</enabled>
-					</snapshots>
 				</pluginRepository>
 			</pluginRepositories>
 		</profile>
@@ -319,6 +303,24 @@
 			</plugin>
 		</plugins>
 	</build>
+    <pluginRepositories>
+      <pluginRepository>
+        <id>objectstyle</id>
+        <name>ObjectStyle.org Repository</name>
+        <url>http://objectstyle.org/maven2/</url>
+        <snapshots>
+          <enabled>false</enabled>
+        </snapshots>
+      </pluginRepository>
+      <pluginRepository>
+        <id>com.springsource.repository.bundles.release</id>
+        <name>SpringSource Enterprise Bundle Repository - SpringSource Bundle Releases</name>
+        <url>http://repository.springsource.com/maven/bundles/release/</url>
+        <snapshots>
+          <enabled>false</enabled>
+        </snapshots>
+      </pluginRepository>
+    </pluginRepositories>
 	<reporting>
 		<plugins>
 			<plugin>
