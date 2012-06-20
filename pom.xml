@@ -464,6 +464,11 @@
 		</extensions>
 		<pluginManagement>
 			<plugins>
+                <plugin>
+                  <groupId>org.apache.maven.plugins</groupId>
+                  <artifactId>maven-release-plugin</artifactId>
+                  <version>2.3</version>
+                </plugin>
 				<plugin>
 					<artifactId>maven-site-plugin</artifactId>
 					<version>2.0.1</version>
