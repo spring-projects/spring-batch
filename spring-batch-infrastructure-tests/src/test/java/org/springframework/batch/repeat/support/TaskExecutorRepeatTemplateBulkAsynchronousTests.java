@@ -18,6 +18,7 @@ package org.springframework.batch.repeat.support;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -35,6 +36,7 @@ import org.springframework.batch.repeat.RepeatContext;
 import org.springframework.batch.repeat.RepeatStatus;
 import org.springframework.batch.repeat.policy.SimpleCompletionPolicy;
 import org.springframework.core.task.SimpleAsyncTaskExecutor;
+import org.springframework.core.task.TaskExecutor;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 
 /**
@@ -48,7 +50,8 @@ import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
  */
 public class TaskExecutorRepeatTemplateBulkAsynchronousTests {
 
-	static Log logger = LogFactory.getLog(TaskExecutorRepeatTemplateBulkAsynchronousTests.class);
+	static Log logger = LogFactory
+			.getLog(TaskExecutorRepeatTemplateBulkAsynchronousTests.class);
 
 	private int total = 1000;
 
@@ -56,23 +59,26 @@ public class TaskExecutorRepeatTemplateBulkAsynchronousTests {
 
 	private volatile int early = Integer.MAX_VALUE;
 
+	private volatile int error = Integer.MAX_VALUE;
+
 	private TaskExecutorRepeatTemplate template;
 
 	private RepeatCallback callback;
 
 	private List<String> items;
 
-	private ThreadPoolTaskExecutor taskExecutor;
+	private ThreadPoolTaskExecutor threadPool = new ThreadPoolTaskExecutor();
 
 	@Before
 	public void setUp() {
 
 		template = new TaskExecutorRepeatTemplate();
-		taskExecutor = new ThreadPoolTaskExecutor();
-		taskExecutor.setMaxPoolSize(300);
-		taskExecutor.setCorePoolSize(10);
-		taskExecutor.setQueueCapacity(0);
-		taskExecutor.afterPropertiesSet();
+		TaskExecutor taskExecutor = new SimpleAsyncTaskExecutor();
+		threadPool.setMaxPoolSize(300);
+		threadPool.setCorePoolSize(10);
+		threadPool.setQueueCapacity(0);
+		threadPool.afterPropertiesSet();
+		taskExecutor = threadPool;
 		template.setTaskExecutor(taskExecutor);
 		template.setThrottleLimit(throttleLimit);
 
@@ -82,7 +88,8 @@ public class TaskExecutorRepeatTemplateBulkAsynchronousTests {
 
 			private volatile AtomicInteger count = new AtomicInteger(0);
 
-			public RepeatStatus doInIteration(RepeatContext context) throws Exception {
+			public RepeatStatus doInIteration(RepeatContext context)
+					throws Exception {
 				int position = count.incrementAndGet();
 				String item = position <= total ? "" + position : null;
 				items.add("" + item);
@@ -96,14 +103,24 @@ public class TaskExecutorRepeatTemplateBulkAsynchronousTests {
 				 * happens for instance if there is a failure and you want to
 				 * retry the work.)
 				 */
-				RepeatStatus result = RepeatStatus.continueIf(position != early && item != null);
+				RepeatStatus result = RepeatStatus.continueIf(position != early
+						&& item != null);
+				if (position == error) {
+					throw new RuntimeException("Planned");
+				}
 				if (!result.isContinuable()) {
-					logger.debug("Returning " + result + " for count=" + position);
+					logger.debug("Returning " + result + " for count="
+							+ position);
 				}
 				return result;
 			}
 		};
 
+	}
+
+	@After
+	public void tearDown() {
+		threadPool.destroy();
 	}
 
 	@Test
@@ -117,11 +134,6 @@ public class TaskExecutorRepeatTemplateBulkAsynchronousTests {
 		assertTrue(frequency > 1);
 		assertTrue(frequency <= throttleLimit + 1);
 
-	}
-
-	@After
-	public void tearDown() {
-		taskExecutor.destroy();
 	}
 
 	@Test
@@ -151,7 +163,8 @@ public class TaskExecutorRepeatTemplateBulkAsynchronousTests {
 		taskExecutor.setQueueCapacity(0);
 		// This is the most sensible setting, otherwise the bookkeeping in
 		// ResultHolderResultQueue gets out of whack when tasks are aborted.
-		taskExecutor.setRejectedExecutionHandler(new ThreadPoolExecutor.CallerRunsPolicy());
+		taskExecutor
+				.setRejectedExecutionHandler(new ThreadPoolExecutor.CallerRunsPolicy());
 		taskExecutor.afterPropertiesSet();
 		template.setTaskExecutor(taskExecutor);
 
@@ -162,7 +175,7 @@ public class TaskExecutorRepeatTemplateBulkAsynchronousTests {
 		// Extra tasks will be submitted before the termination is detected
 		assertEquals(total, items.size() - frequency);
 		assertTrue(frequency <= throttleLimit + 1);
-		
+
 		taskExecutor.destroy();
 
 	}
@@ -200,6 +213,22 @@ public class TaskExecutorRepeatTemplateBulkAsynchronousTests {
 		int frequency = Collections.frequency(items, "null");
 		assertEquals(10, items.size() - frequency);
 		// System.err.println("Frequency: " + frequency);
+		assertEquals(0, frequency);
+
+	}
+
+	@Test
+	public void testThrottleLimitWithError() throws Exception {
+
+		error = 50;
+
+		try {
+			template.iterate(callback);
+			fail("Expected planned exception");
+		} catch (Exception e) {
+			assertEquals("Planned", e.getMessage());
+		}
+		int frequency = Collections.frequency(items, "null");
 		assertEquals(0, frequency);
 
 	}
