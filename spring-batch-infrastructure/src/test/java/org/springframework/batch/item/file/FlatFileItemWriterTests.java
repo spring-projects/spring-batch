@@ -560,6 +560,18 @@ public class FlatFileItemWriterTests {
 	}
 
 	@Test
+	public void testDeleteOnExitReopen() throws Exception {
+		writer.setShouldDeleteIfEmpty(true);
+		writer.open(executionContext);
+		assertTrue(outputFile.exists());
+		writer.close();
+		assertFalse(outputFile.exists());
+		writer.open(executionContext);
+		writer.write(Collections.singletonList("test2"));
+		assertEquals("test2", readLine());
+	}
+
+	@Test
 	public void testWriteHeaderAfterRestartOnFirstChunk() throws Exception {
 		writer.setHeaderCallback(new FlatFileHeaderCallback() {
 
