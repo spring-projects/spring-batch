@@ -167,7 +167,7 @@ public class TaskExecutorRepeatTemplate extends RepeatTemplate {
 			 */
 			ResultHolder future;
 			try {
-				future = (ResultHolder) queue.take();
+				future = queue.take();
 			}
 			catch (InterruptedException e) {
 				Thread.currentThread().interrupt();
