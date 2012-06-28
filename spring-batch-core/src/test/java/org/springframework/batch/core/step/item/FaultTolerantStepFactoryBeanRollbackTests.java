@@ -434,6 +434,7 @@ public class FaultTolerantStepFactoryBeanRollbackTests {
 
 		assertEquals("[1, 3, 5]", writer.getWritten().toString());
 		assertEquals("[1, 3, 5]", writer.getCommitted().toString());
+		// If non-transactional, we should only process each item once
 		assertEquals("[1, 2, 3, 4, 5]", processor.getProcessed().toString());
 	}
 
