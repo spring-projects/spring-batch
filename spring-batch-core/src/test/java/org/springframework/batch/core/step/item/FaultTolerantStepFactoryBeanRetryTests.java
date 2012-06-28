@@ -131,6 +131,8 @@ public class FaultTolerantStepFactoryBeanRetryTests {
 	@Test
 	public void testProcessAllItemsWhenErrorInWriterTransformation()
 			throws Exception {
+		final int RETRY_LIMIT = 3;
+		final List<String> ITEM_LIST = Arrays.asList("1", "2", "3");
 		FaultTolerantStepFactoryBean<String, Integer> factory = new FaultTolerantStepFactoryBean<String, Integer>();
 		factory.setBeanName("step");
 
@@ -138,9 +140,6 @@ public class FaultTolerantStepFactoryBeanRetryTests {
 				new ArrayList<String>()));
 		factory.setJobRepository(repository);
 		factory.setTransactionManager(new ResourcelessTransactionManager());
-		@SuppressWarnings("unchecked")
-		Map<Class<? extends Throwable>, Boolean> exceptionMap = getExceptionMap(Exception.class);
-		factory.setRetryableExceptionClasses(exceptionMap);
 		ItemWriter<Integer> failingWriter = new ItemWriter<Integer>() {
 			public void write(List<? extends Integer> data) throws Exception {
 				int count = 0;
@@ -159,11 +158,14 @@ public class FaultTolerantStepFactoryBeanRetryTests {
 				return Integer.parseInt(item);
 			}
 		};
-		ItemReader<String> reader = new ListItemReader<String>(Arrays.asList(
-				"1", "2", "3"));
+		ItemReader<String> reader = new ListItemReader<String>(ITEM_LIST);
 		factory.setCommitInterval(3);
-		factory.setRetryLimit(3);
-		factory.setSkippableExceptionClasses(new HashMap<Class<? extends Throwable>, Boolean>());
+		factory.setRetryLimit(RETRY_LIMIT);
+		factory.setSkipLimit(1);
+		@SuppressWarnings("unchecked")
+		Map<Class<? extends Throwable>, Boolean> exceptionMap = getExceptionMap(Exception.class);
+		factory.setSkippableExceptionClasses(exceptionMap);
+		factory.setRetryableExceptionClasses(exceptionMap);
 		factory.setItemReader(reader);
 		factory.setItemProcessor(processor);
 		factory.setItemWriter(failingWriter);
@@ -173,11 +175,15 @@ public class FaultTolerantStepFactoryBeanRetryTests {
 				jobExecution);
 		repository.add(stepExecution);
 		step.execute(stepExecution);
-		System.out.println(stepExecution.getWriteCount());
-		System.out.println(processed.size());
-		System.out.println(processed);
-		System.out.println(written);
-		assertEquals((1 + 3) * 3, processed.size()); // (Initial try + retry limit)*item count
+//		System.out.println(stepExecution.getWriteCount());
+//		System.out.println(processed.size());
+//		System.out.println(processed);
+//		System.out.println(written);
+		/*
+		 * Each chunk tried up to RETRY_LIMIT, then the scan processes each item
+		 * once, identfiying the skip as it goes
+		 */
+		assertEquals((RETRY_LIMIT +1) * ITEM_LIST.size(), processed.size());
 	}
 
 	@Test
@@ -218,16 +224,14 @@ public class FaultTolerantStepFactoryBeanRetryTests {
 				jobExecution);
 		repository.add(stepExecution);
 		step.execute(stepExecution);
-		System.out.println(processed);
+		// System.out.println(processed);
 		assertEquals(ExitStatus.COMPLETED.getExitCode(), stepExecution
 				.getExitStatus().getExitCode());
 		/*
-		 * Each chunk tried up to RETRY_LIMIT, then the scan processes 1 full
-		 * chunk and fails on the scan, identfies the skip, and then
-		 * re-processes the other n-1 items
+		 * Each chunk tried up to RETRY_LIMIT, then the scan processes each item
+		 * once, identfiying the skip as it goes
 		 */
-		assertEquals(RETRY_LIMIT * ITEM_LIST.size() + ITEM_LIST.size()
-				+ ITEM_LIST.size() - 1, processed.size());
+		assertEquals((RETRY_LIMIT +1) * ITEM_LIST.size(), processed.size());
 	}
 
 	@Test
