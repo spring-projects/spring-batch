@@ -196,6 +196,8 @@ public class BatchRetryTemplate implements RetryOperations {
 
 	private final RetryTemplate regular = new RetryTemplate();
 
+	private RetryPolicy retryPolicy;
+
 	public <T> T execute(RetryCallback<T> retryCallback, Collection<RetryState> states) throws ExhaustedRetryException,
 			Exception {
 		RetryState batchState = new BatchRetryState(states);
@@ -263,8 +265,13 @@ public class BatchRetryTemplate implements RetryOperations {
 	}
 
 	public void setRetryPolicy(RetryPolicy retryPolicy) {
+		this.retryPolicy = retryPolicy;
 		delegate.setRetryPolicy(retryPolicy);
 		regular.setRetryPolicy(retryPolicy);
+	}
+	
+	public boolean canRetry(RetryContext context) {
+		return context==null ? true : retryPolicy.canRetry(context);
 	}
 
 }
