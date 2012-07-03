@@ -306,12 +306,10 @@ public abstract class AbstractJob implements Job, StepLocator, BeanNameAware,
 			}
 
 		} catch (JobInterruptedException e) {
+			logger.info("Encountered interruption executing job: "
+					+ e.getMessage());
 			if (logger.isDebugEnabled()) {
-				logger.debug("Encountered interruption executing job: "
-						+ e.getMessage(), e);
-			} else {
-				logger.info("Encountered interruption executing job: "
-						+ e.getMessage());
+				logger.debug("Full exception", e);
 			}
 			execution.setExitStatus(getDefaultExitStatusForFailure(e));
 			execution.setStatus(BatchStatus.STOPPED);
