@@ -16,10 +16,8 @@
 
 package org.springframework.batch.core.repository.dao;
 
-import java.util.concurrent.ConcurrentMap;
-import java.util.Map;
-
 import java.io.Serializable;
+import java.util.concurrent.ConcurrentMap;
 
 import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.StepExecution;
@@ -51,7 +49,6 @@ public class MapExecutionContextDao implements ExecutionContextDao {
 			this.id = id;
 		}
 
-		@Override
 		public int compareTo(ContextKey them) {
 			if(them == null) return 1;
 			final int idCompare = new Long(this.id).compareTo(new Long(them.id)); // JDK6 Make this Long.compare(x,y)
