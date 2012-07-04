@@ -18,15 +18,19 @@ package org.springframework.batch.core.configuration.xml;
 import org.springframework.batch.core.listener.StepListenerMetaData;
 import org.springframework.beans.MutablePropertyValues;
 import org.springframework.beans.factory.config.BeanDefinition;
+import org.springframework.beans.factory.config.BeanDefinitionHolder;
 import org.springframework.beans.factory.config.RuntimeBeanReference;
 import org.springframework.beans.factory.config.TypedStringValue;
 import org.springframework.beans.factory.support.AbstractBeanDefinition;
 import org.springframework.beans.factory.support.BeanDefinitionBuilder;
 import org.springframework.beans.factory.support.GenericBeanDefinition;
+import org.springframework.beans.factory.xml.BeanDefinitionParserDelegate;
 import org.springframework.beans.factory.xml.ParserContext;
 import org.springframework.util.StringUtils;
 import org.springframework.util.xml.DomUtils;
 import org.w3c.dom.Element;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
 
 /**
  * Internal parser for the &lt;step/&gt; elements inside a job. A step element
@@ -92,28 +96,58 @@ public abstract class AbstractStepParser {
 		BeanDefinitionBuilder builder = BeanDefinitionBuilder.genericBeanDefinition();
 		AbstractBeanDefinition bd = builder.getRawBeanDefinition();
 
-		Element taskletElement = DomUtils.getChildElementByTagName(stepElement, TASKLET_ELE);
-		if (taskletElement != null) {
-			boolean stepUnderspecified = CoreNamespaceUtils.isUnderspecified(stepElement);
-			new TaskletParser().parseTasklet(stepElement, taskletElement, bd, parserContext, stepUnderspecified);
-		}
+		// look at all nested elements
+		NodeList children = stepElement.getChildNodes();
+		
+		for (int i = 0; i < children.getLength(); i++) {
+			Node nd = children.item(i);
 
-		Element flowElement = DomUtils.getChildElementByTagName(stepElement, FLOW_ELE);
-		if (flowElement != null) {
-			boolean stepUnderspecified = CoreNamespaceUtils.isUnderspecified(stepElement);
-			parseFlow(stepElement, flowElement, bd, parserContext, stepUnderspecified);
-		}
+			if (nd instanceof Element) {
+				Element nestedElement = (Element) nd;
+				String name = nestedElement.getLocalName();
 
-		Element partitionElement = DomUtils.getChildElementByTagName(stepElement, PARTITION_ELE);
-		if (partitionElement != null) {
-			boolean stepUnderspecified = CoreNamespaceUtils.isUnderspecified(stepElement);
-			parsePartition(stepElement, partitionElement, bd, parserContext, stepUnderspecified, jobFactoryRef);
-		}
+				if (TASKLET_ELE.equals(name)) {
+					boolean stepUnderspecified = CoreNamespaceUtils.isUnderspecified(stepElement);
+					new TaskletParser().parseTasklet(stepElement, nestedElement, bd, parserContext, stepUnderspecified);
+				}
+				else if (FLOW_ELE.equals(name)) {
+					boolean stepUnderspecified = CoreNamespaceUtils.isUnderspecified(stepElement);
+					parseFlow(stepElement, nestedElement, bd, parserContext, stepUnderspecified);
+				}
+				else if (PARTITION_ELE.equals(name)) {
+					boolean stepUnderspecified = CoreNamespaceUtils.isUnderspecified(stepElement);
+					parsePartition(stepElement, nestedElement, bd, parserContext, stepUnderspecified, jobFactoryRef);
+				}
+				else if (JOB_ELE.equals(name)) {
+					boolean stepUnderspecified = CoreNamespaceUtils.isUnderspecified(stepElement);
+					parseJob(stepElement, nestedElement, bd, parserContext, stepUnderspecified);
+				}
+				else if ("description".equals(name)) {
+					bd.setDescription(nestedElement.getTextContent());
+				}
 
-		Element jobElement = DomUtils.getChildElementByTagName(stepElement, JOB_ELE);
-		if (jobElement != null) {
-			boolean stepUnderspecified = CoreNamespaceUtils.isUnderspecified(stepElement);
-			parseJob(stepElement, jobElement, bd, parserContext, stepUnderspecified);
+				// nested bean reference/declaration
+				else {
+					String ns = nestedElement.getNamespaceURI();
+					Object value = null;
+
+					// Spring NS
+					if ((ns == null && name.equals(BeanDefinitionParserDelegate.BEAN_ELEMENT))
+							|| ns.equals(BeanDefinitionParserDelegate.BEANS_NAMESPACE_URI)) {
+						BeanDefinitionHolder holder = parserContext.getDelegate().parseBeanDefinitionElement(nestedElement);
+						value = parserContext.getDelegate().decorateBeanDefinitionIfRequired(nestedElement, holder);
+					}
+					// Custom NS
+					else {
+						value = parserContext.getDelegate().parseCustomElement(nestedElement);
+					}
+					
+					bd.setBeanClass(StepParserStepFactoryBean.class);
+					bd.setAttribute("isNamespaceStep", true);
+
+					builder.addPropertyValue("tasklet", value);
+				}
+			}
 		}
 
 		String parentRef = stepElement.getAttribute(PARENT_ATTR);
@@ -135,15 +169,8 @@ public abstract class AbstractStepParser {
 			bd.setAttribute("jobParserJobFactoryBeanRef", jobFactoryRef);
 		}
 
-		Element description = DomUtils.getChildElementByTagName(stepElement, "description");
-		if (description != null) {
-			bd.setDescription(description.getTextContent());
-		}
-
 		stepListenerParser.handleListenersElement(stepElement, bd, parserContext);
-
 		return bd;
-
 	}
 
 	private void parsePartition(Element stepElement, Element partitionElement, AbstractBeanDefinition bd, ParserContext parserContext, boolean stepUnderspecified, String jobFactoryRef ) {
