@@ -130,6 +130,7 @@ public abstract class AbstractStepParser {
 				else {
 					String ns = nestedElement.getNamespaceURI();
 					Object value = null;
+					boolean skip = false;
 
 					// Spring NS
 					if ((ns == null && name.equals(BeanDefinitionParserDelegate.BEAN_ELEMENT))
@@ -137,15 +138,21 @@ public abstract class AbstractStepParser {
 						BeanDefinitionHolder holder = parserContext.getDelegate().parseBeanDefinitionElement(nestedElement);
 						value = parserContext.getDelegate().decorateBeanDefinitionIfRequired(nestedElement, holder);
 					}
+					// Spring Batch transitions
+					else if (ns.equals("http://www.springframework.org/schema/batch")) {
+						// don't parse
+						skip = true;
+					}
 					// Custom NS
 					else {
 						value = parserContext.getDelegate().parseCustomElement(nestedElement);
 					}
 					
-					bd.setBeanClass(StepParserStepFactoryBean.class);
-					bd.setAttribute("isNamespaceStep", true);
-
-					builder.addPropertyValue("tasklet", value);
+					if (!skip) {
+						bd.setBeanClass(StepParserStepFactoryBean.class);
+						bd.setAttribute("isNamespaceStep", true);
+						builder.addPropertyValue("tasklet", value);
+					}
 				}
 			}
 		}
