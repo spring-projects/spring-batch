@@ -47,8 +47,7 @@ import org.springframework.batch.retry.support.DefaultRetryState;
  * allows for skipping or retry of items that cause exceptions during writing.
  * 
  */
-public class FaultTolerantChunkProcessor<I, O> extends
-		SimpleChunkProcessor<I, O> {
+public class FaultTolerantChunkProcessor<I, O> extends SimpleChunkProcessor<I, O> {
 
 	private SkipPolicy itemProcessSkipPolicy = new LimitCheckingItemSkipPolicy();
 
@@ -56,8 +55,7 @@ public class FaultTolerantChunkProcessor<I, O> extends
 
 	private final BatchRetryTemplate batchRetryTemplate;
 
-	private Classifier<Throwable, Boolean> rollbackClassifier = new BinaryExceptionClassifier(
-			true);
+	private Classifier<Throwable, Boolean> rollbackClassifier = new BinaryExceptionClassifier(true);
 
 	private Log logger = LogFactory.getLog(getClass());
 
@@ -74,24 +72,21 @@ public class FaultTolerantChunkProcessor<I, O> extends
 	 * Not used in the case of the {@link #setBuffering(boolean) buffering flag}
 	 * being true (the default).
 	 * 
-	 * @param keyGenerator
-	 *            the {@link KeyGenerator} to set
+	 * @param keyGenerator the {@link KeyGenerator} to set
 	 */
 	public void setKeyGenerator(KeyGenerator keyGenerator) {
 		this.keyGenerator = keyGenerator;
 	}
 
 	/**
-	 * @param SkipPolicy
-	 *            the {@link SkipPolicy} for item processing
+	 * @param SkipPolicy the {@link SkipPolicy} for item processing
 	 */
 	public void setProcessSkipPolicy(SkipPolicy SkipPolicy) {
 		this.itemProcessSkipPolicy = SkipPolicy;
 	}
 
 	/**
-	 * @param SkipPolicy
-	 *            the {@link SkipPolicy} for item writing
+	 * @param SkipPolicy the {@link SkipPolicy} for item writing
 	 */
 	public void setWriteSkipPolicy(SkipPolicy SkipPolicy) {
 		this.itemWriteSkipPolicy = SkipPolicy;
@@ -103,8 +98,7 @@ public class FaultTolerantChunkProcessor<I, O> extends
 	 * 
 	 * @param rollbackClassifier
 	 */
-	public void setRollbackClassifier(
-			Classifier<Throwable, Boolean> rollbackClassifier) {
+	public void setRollbackClassifier(Classifier<Throwable, Boolean> rollbackClassifier) {
 		this.rollbackClassifier = rollbackClassifier;
 	}
 
@@ -132,17 +126,14 @@ public class FaultTolerantChunkProcessor<I, O> extends
 	 * true). If false then the processor is only called once per item per
 	 * chunk, even if there are rollbacks with retries and skips.
 	 * 
-	 * @param processorTransactional
-	 *            the flag value to set
+	 * @param processorTransactional the flag value to set
 	 */
 	public void setProcessorTransactional(boolean processorTransactional) {
 		this.processorTransactional = processorTransactional;
 	}
 
-	public FaultTolerantChunkProcessor(
-			ItemProcessor<? super I, ? extends O> itemProcessor,
-			ItemWriter<? super O> itemWriter,
-			BatchRetryTemplate batchRetryTemplate) {
+	public FaultTolerantChunkProcessor(ItemProcessor<? super I, ? extends O> itemProcessor,
+			ItemWriter<? super O> itemWriter, BatchRetryTemplate batchRetryTemplate) {
 		super(itemProcessor, itemWriter);
 		this.batchRetryTemplate = batchRetryTemplate;
 	}
@@ -203,22 +194,19 @@ public class FaultTolerantChunkProcessor<I, O> extends
 	}
 
 	@Override
-	protected Chunk<O> transform(final StepContribution contribution,
-			Chunk<I> inputs) throws Exception {
+	protected Chunk<O> transform(final StepContribution contribution, Chunk<I> inputs) throws Exception {
 
 		Chunk<O> outputs = new Chunk<O>();
 		@SuppressWarnings("unchecked")
 		final UserData<O> data = (UserData<O>) inputs.getUserData();
 		final Chunk<O> cache = data.getOutputs();
-		final Iterator<O> cacheIterator = cache.isEmpty() ? null
-				: new ArrayList<O>(cache.getItems()).iterator();
+		final Iterator<O> cacheIterator = cache.isEmpty() ? null : new ArrayList<O>(cache.getItems()).iterator();
 		final AtomicInteger count = new AtomicInteger(0);
 
 		// final int scanLimit = processorTransactional && data.scanning() ? 1 :
 		// 0;
 
-		for (final Chunk<I>.ChunkIterator iterator = inputs.iterator(); iterator
-				.hasNext();) {
+		for (final Chunk<I>.ChunkIterator iterator = inputs.iterator(); iterator.hasNext();) {
 
 			final I item = iterator.next();
 
@@ -228,33 +216,33 @@ public class FaultTolerantChunkProcessor<I, O> extends
 					O output = null;
 					try {
 						count.incrementAndGet();
-						O cached = (cacheIterator != null && cacheIterator
-								.hasNext()) ? cacheIterator.next() : null;
+						O cached = (cacheIterator != null && cacheIterator.hasNext()) ? cacheIterator.next() : null;
 						if (cached != null && !processorTransactional) {
 							output = cached;
-						} else {
+						}
+						else {
 							output = doProcess(item);
 							if (!processorTransactional && !data.scanning()) {
 								cache.add(output);
 							}
 						}
-					} catch (Exception e) {
+					}
+					catch (Exception e) {
 						if (rollbackClassifier.classify(e)) {
 							// Default is to rollback unless the classifier
 							// allows us to continue
 							throw e;
-						} else if (shouldSkip(itemProcessSkipPolicy, e,
-								contribution.getStepSkipCount())) {
+						}
+						else if (shouldSkip(itemProcessSkipPolicy, e, contribution.getStepSkipCount())) {
 							// If we are not re-throwing then we should check if
 							// this is skippable
 							contribution.incrementProcessSkipCount();
-							logger.debug(
-									"Skipping after failed process with no rollback",
-									e);
+							logger.debug("Skipping after failed process with no rollback", e);
 							// If not re-throwing then the listener will not be
 							// called in next chunk.
 							callProcessSkipListener(item, e);
-						} else {
+						}
+						else {
 							// If it's not skippable that's an error in
 							// configuration - it doesn't make sense to not roll
 							// back if we are also not allowed to skip
@@ -277,19 +265,17 @@ public class FaultTolerantChunkProcessor<I, O> extends
 
 				public O recover(RetryContext context) throws Exception {
 					Throwable e = context.getLastThrowable();
-					if (shouldSkip(itemProcessSkipPolicy, e,
-							contribution.getStepSkipCount())) {
+					if (shouldSkip(itemProcessSkipPolicy, e, contribution.getStepSkipCount())) {
 						iterator.remove(e);
 						contribution.incrementProcessSkipCount();
 						logger.debug("Skipping after failed process", e);
 						return null;
-					} else {
+					}
+					else {
 						if (rollbackClassifier.classify(e)) {
 							// Default is to rollback unless the classifier
 							// allows us to continue
-							throw new RetryException(
-									"Non-skippable exception in recoverer while processing",
-									e);
+							throw new RetryException("Non-skippable exception in recoverer while processing", e);
 						}
 						iterator.remove(e);
 						return null;
@@ -298,9 +284,8 @@ public class FaultTolerantChunkProcessor<I, O> extends
 
 			};
 
-			O output = batchRetryTemplate.execute(retryCallback,
-					recoveryCallback, new DefaultRetryState(getInputKey(item),
-							rollbackClassifier));
+			O output = batchRetryTemplate.execute(retryCallback, recoveryCallback, new DefaultRetryState(
+					getInputKey(item), rollbackClassifier));
 			if (output != null) {
 				outputs.add(output);
 			}
@@ -323,8 +308,8 @@ public class FaultTolerantChunkProcessor<I, O> extends
 	}
 
 	@Override
-	protected void write(final StepContribution contribution,
-			final Chunk<I> inputs, final Chunk<O> outputs) throws Exception {
+	protected void write(final StepContribution contribution, final Chunk<I> inputs, final Chunk<O> outputs)
+			throws Exception {
 
 		@SuppressWarnings("unchecked")
 		final UserData<O> data = (UserData<O>) inputs.getUserData();
@@ -339,7 +324,8 @@ public class FaultTolerantChunkProcessor<I, O> extends
 					chunkMonitor.setChunkSize(inputs.size());
 					try {
 						doWrite(outputs.getItems());
-					} catch (Exception e) {
+					}
+					catch (Exception e) {
 						if (rollbackClassifier.classify(e)) {
 							throw e;
 						}
@@ -350,11 +336,11 @@ public class FaultTolerantChunkProcessor<I, O> extends
 						 * contract.
 						 */
 						throw new ForceRollbackForWriteSkipException(
-								"Force rollback on skippable exception so that skipped item can be located.",
-								e);
+								"Force rollback on skippable exception so that skipped item can be located.", e);
 					}
 					contribution.incrementWriteCount(outputs.size());
-				} else {
+				}
+				else {
 					scan(contribution, inputs, outputs, chunkMonitor, false);
 				}
 				return null;
@@ -370,21 +356,17 @@ public class FaultTolerantChunkProcessor<I, O> extends
 
 					Throwable e = context.getLastThrowable();
 					if (outputs.size() > 1 && !rollbackClassifier.classify(e)) {
-						throw new RetryException(
-								"Invalid retry state during write caused by "
-										+ "exception that does not classify for rollback: ",
-								e);
+						throw new RetryException("Invalid retry state during write caused by "
+								+ "exception that does not classify for rollback: ", e);
 					}
 
 					Chunk<I>.ChunkIterator inputIterator = inputs.iterator();
-					for (Chunk<O>.ChunkIterator outputIterator = outputs
-							.iterator(); outputIterator.hasNext();) {
+					for (Chunk<O>.ChunkIterator outputIterator = outputs.iterator(); outputIterator.hasNext();) {
 
 						inputIterator.next();
 						outputIterator.next();
 
-						checkSkipPolicy(inputIterator, outputIterator, e,
-								contribution, true);
+						checkSkipPolicy(inputIterator, outputIterator, e, contribution, true);
 						if (!rollbackClassifier.classify(e)) {
 							throw new RetryException(
 									"Invalid retry state during recovery caused by exception that does not classify for rollback: ",
@@ -400,10 +382,10 @@ public class FaultTolerantChunkProcessor<I, O> extends
 			};
 
 			batchRetryTemplate.execute(retryCallback, batchRecoveryCallback,
-					BatchRetryTemplate.createState(getInputKeys(inputs),
-							rollbackClassifier));
+					BatchRetryTemplate.createState(getInputKeys(inputs), rollbackClassifier));
 
-		} else {
+		}
+		else {
 
 			RecoveryCallback<Object> recoveryCallback = new RecoveryCallback<Object>() {
 
@@ -414,8 +396,7 @@ public class FaultTolerantChunkProcessor<I, O> extends
 					 * do any scanning. We can just bomb out with a retry
 					 * exhausted.
 					 */
-					if (!shouldSkip(itemWriteSkipPolicy,
-							context.getLastThrowable(), -1)) {
+					if (!shouldSkip(itemWriteSkipPolicy, context.getLastThrowable(), -1)) {
 						throw new ExhaustedRetryException(
 								"Retry exhausted after last attempt in recovery path, but exception is not skippable.",
 								context.getLastThrowable());
@@ -433,13 +414,14 @@ public class FaultTolerantChunkProcessor<I, O> extends
 				logger.debug("Attempting to write: " + inputs);
 			}
 			try {
-				batchRetryTemplate.execute(retryCallback, recoveryCallback,
-						new DefaultRetryState(inputs, rollbackClassifier));
-			} catch (Exception e) {
+				batchRetryTemplate.execute(retryCallback, recoveryCallback, new DefaultRetryState(inputs,
+						rollbackClassifier));
+			}
+			catch (Exception e) {
 				RetryContext context = contextHolder.get();
 				if (!batchRetryTemplate.canRetry(context)) {
 					/*
-					 * BATCH-1761: we need advanvce warning of the scan about to
+					 * BATCH-1761: we need advance warning of the scan about to
 					 * start in the next transaction, so we can change the
 					 * processing behaviour.
 					 */
@@ -469,9 +451,9 @@ public class FaultTolerantChunkProcessor<I, O> extends
 			Throwable e = wrapper.getException();
 			try {
 				getListener().onSkipInWrite(wrapper.getItem(), e);
-			} catch (RuntimeException ex) {
-				throw new SkipListenerFailedException(
-						"Fatal exception in SkipListener.", ex, e);
+			}
+			catch (RuntimeException ex) {
+				throw new SkipListenerFailedException("Fatal exception in SkipListener.", ex, e);
 			}
 		}
 
@@ -485,17 +467,15 @@ public class FaultTolerantChunkProcessor<I, O> extends
 	 * Convenience method for calling process skip listener, so that it can be
 	 * called from multiple places.
 	 * 
-	 * @param item
-	 *            the item that is skipped
-	 * @param e
-	 *            the cause of the skip
+	 * @param item the item that is skipped
+	 * @param e the cause of the skip
 	 */
 	private void callProcessSkipListener(I item, Throwable e) {
 		try {
 			getListener().onSkipInProcess(item, e);
-		} catch (RuntimeException ex) {
-			throw new SkipListenerFailedException(
-					"Fatal exception in SkipListener.", ex, e);
+		}
+		catch (RuntimeException ex) {
+			throw new SkipListenerFailedException("Fatal exception in SkipListener.", ex, e);
 		}
 	}
 
@@ -503,21 +483,19 @@ public class FaultTolerantChunkProcessor<I, O> extends
 	 * Convenience method for calling process skip policy, so that it can be
 	 * called from multiple places.
 	 * 
-	 * @param policy
-	 *            the skip policy
-	 * @param e
-	 *            the cause of the skip
-	 * @param skipCount
-	 *            the current skip count
+	 * @param policy the skip policy
+	 * @param e the cause of the skip
+	 * @param skipCount the current skip count
 	 */
 	private boolean shouldSkip(SkipPolicy policy, Throwable e, int skipCount) {
 		try {
 			return policy.shouldSkip(e, skipCount);
-		} catch (SkipLimitExceededException ex) {
+		}
+		catch (SkipLimitExceededException ex) {
 			throw ex;
-		} catch (RuntimeException ex) {
-			throw new SkipListenerFailedException(
-					"Fatal exception in SkipPolicy.", ex, e);
+		}
+		catch (RuntimeException ex) {
+			throw new SkipListenerFailedException("Fatal exception in SkipPolicy.", ex, e);
 		}
 	}
 
@@ -539,35 +517,35 @@ public class FaultTolerantChunkProcessor<I, O> extends
 		return keys;
 	}
 
-	private void checkSkipPolicy(Chunk<I>.ChunkIterator inputIterator,
-			Chunk<O>.ChunkIterator outputIterator, Throwable e,
-			StepContribution contribution, boolean recovery) throws Exception {
+	private void checkSkipPolicy(Chunk<I>.ChunkIterator inputIterator, Chunk<O>.ChunkIterator outputIterator,
+			Throwable e, StepContribution contribution, boolean recovery) throws Exception {
 		logger.debug("Checking skip policy after failed write");
 		if (shouldSkip(itemWriteSkipPolicy, e, contribution.getStepSkipCount())) {
 			contribution.incrementWriteSkipCount();
 			inputIterator.remove();
 			outputIterator.remove(e);
 			logger.debug("Skipping after failed write", e);
-		} else {
+		}
+		else {
 			if (recovery) {
 				// Only if already recovering should we check skip policy
-				throw new RetryException(
-						"Non-skippable exception in recoverer", e);
-			} else {
+				throw new RetryException("Non-skippable exception in recoverer", e);
+			}
+			else {
 				if (e instanceof Exception) {
 					throw (Exception) e;
-				} else if (e instanceof Error) {
+				}
+				else if (e instanceof Error) {
 					throw (Error) e;
-				} else {
-					throw new RetryException(
-							"Non-skippable throwable in recoverer", e);
+				}
+				else {
+					throw new RetryException("Non-skippable throwable in recoverer", e);
 				}
 			}
 		}
 	}
 
-	private void scan(final StepContribution contribution,
-			final Chunk<I> inputs, final Chunk<O> outputs,
+	private void scan(final StepContribution contribution, final Chunk<I> inputs, final Chunk<O> outputs,
 			ChunkMonitor chunkMonitor, boolean recovery) throws Exception {
 
 		@SuppressWarnings("unchecked")
@@ -575,9 +553,9 @@ public class FaultTolerantChunkProcessor<I, O> extends
 
 		if (logger.isDebugEnabled()) {
 			if (recovery) {
-				logger.debug("Scanning for failed item on recovery from write: "
-						+ inputs);
-			} else {
+				logger.debug("Scanning for failed item on recovery from write: " + inputs);
+			}
+			else {
 				logger.debug("Scanning for failed item on write: " + inputs);
 			}
 		}
@@ -600,15 +578,15 @@ public class FaultTolerantChunkProcessor<I, O> extends
 			contribution.incrementWriteCount(1);
 			inputIterator.remove();
 			outputIterator.remove();
-		} catch (Exception e) {
+		}
+		catch (Exception e) {
 			doOnWriteError(e, items);
-			if (!shouldSkip(itemWriteSkipPolicy, e, -1)
-					&& !rollbackClassifier.classify(e)) {
+			if (!shouldSkip(itemWriteSkipPolicy, e, -1) && !rollbackClassifier.classify(e)) {
 				inputIterator.remove();
 				outputIterator.remove();
-			} else {
-				checkSkipPolicy(inputIterator, outputIterator, e, contribution,
-						recovery);
+			}
+			else {
+				checkSkipPolicy(inputIterator, outputIterator, e, contribution, recovery);
 			}
 			if (rollbackClassifier.classify(e)) {
 				throw e;

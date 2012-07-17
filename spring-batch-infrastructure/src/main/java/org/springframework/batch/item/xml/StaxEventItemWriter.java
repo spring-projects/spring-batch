@@ -421,7 +421,7 @@ public class StaxEventItemWriter<T> extends ExecutionContextUserSupport implemen
 	 * Subclasses can override to customize the writer.
 	 * @param outputFactory
 	 * @param writer
-	 * @return
+	 * @return an xml writer
 	 * @throws XMLStreamException
 	 */
 	protected XMLEventWriter createXmlEventWriter(XMLOutputFactory outputFactory,Writer writer)
@@ -431,7 +431,7 @@ public class StaxEventItemWriter<T> extends ExecutionContextUserSupport implemen
 
 	/**
 	 * Subclasses can override to customize the factory.
-	 * @return
+	 * @return a factory for the xml output
 	 * @throws FactoryConfigurationError
 	 */
 	protected XMLOutputFactory createXmlOutputFactory()
@@ -441,7 +441,7 @@ public class StaxEventItemWriter<T> extends ExecutionContextUserSupport implemen
 	
 	/**
 	 * Subclasses can override to customize the event factory.
-	 * @return
+	 * @return a factory for the xml events
 	 * @throws FactoryConfigurationError
 	 */
 	protected XMLEventFactory createXmlEventFactory()
@@ -452,7 +452,7 @@ public class StaxEventItemWriter<T> extends ExecutionContextUserSupport implemen
 	
 	/**
 	 * Subclasses can override to customize the stax result.
-	 * @return
+	 * @return a result for writing to
 	 * @throws Exception
 	 */
 	protected Result createStaxResult() throws Exception {

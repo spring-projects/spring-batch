@@ -129,15 +129,13 @@ public class FaultTolerantStepFactoryBeanRetryTests {
 	}
 
 	@Test
-	public void testProcessAllItemsWhenErrorInWriterTransformation()
+	public void testProcessAllItemsWhenErrorInWriterTransformationWhenReaderTransactional()
 			throws Exception {
 		final int RETRY_LIMIT = 3;
-		final List<String> ITEM_LIST = Arrays.asList("1", "2", "3");
+		final List<String> ITEM_LIST =  TransactionAwareProxyFactory.createTransactionalList(Arrays.asList("1", "2", "3"));
 		FaultTolerantStepFactoryBean<String, Integer> factory = new FaultTolerantStepFactoryBean<String, Integer>();
 		factory.setBeanName("step");
 
-		factory.setItemReader(new ListItemReader<String>(
-				new ArrayList<String>()));
 		factory.setJobRepository(repository);
 		factory.setTransactionManager(new ResourcelessTransactionManager());
 		ItemWriter<Integer> failingWriter = new ItemWriter<Integer>() {
@@ -158,10 +156,11 @@ public class FaultTolerantStepFactoryBeanRetryTests {
 				return Integer.parseInt(item);
 			}
 		};
-		ItemReader<String> reader = new ListItemReader<String>(ITEM_LIST);
+		ItemReader<String> reader = new ListItemReader<String>(TransactionAwareProxyFactory.createTransactionalList(ITEM_LIST));
 		factory.setCommitInterval(3);
 		factory.setRetryLimit(RETRY_LIMIT);
 		factory.setSkipLimit(1);
+		factory.setIsReaderTransactionalQueue(true);
 		@SuppressWarnings("unchecked")
 		Map<Class<? extends Throwable>, Boolean> exceptionMap = getExceptionMap(Exception.class);
 		factory.setSkippableExceptionClasses(exceptionMap);
@@ -176,6 +175,7 @@ public class FaultTolerantStepFactoryBeanRetryTests {
 		repository.add(stepExecution);
 		step.execute(stepExecution);
 //		System.out.println(stepExecution.getWriteCount());
+//		System.out.println(stepExecution.getSkipCount());
 //		System.out.println(processed.size());
 //		System.out.println(processed);
 //		System.out.println(written);
