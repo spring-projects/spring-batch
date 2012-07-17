@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans:beans xmlns="http://www.springframework.org/schema/batch" xmlns:beans="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.springframework.org/schema/batch http://www.springframework.org/schema/batch/spring-batch-2.1.xsd
+	http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.5.xsd">
+
+	<beans:import resource="common-context.xml" />
+	
+	<job id="job">
+		<step id="s1" parent="step1" next="unknown"/>
+		<step id="unknown" parent="unknownStep">
+			<next on="UNKNOWN" to="s2" />
+		</step>
+		<step id="s2" parent="step1"/>
+	</job>
+	
+	<step id="unknownStep">
+		<tasklet ref="nameStoringTasklet"/>
+		<listeners>
+			<listener><beans:bean class="org.springframework.batch.core.configuration.xml.NextAttributeUnknownJobParserTests$UnknownListener"/></listener>
+		</listeners>
+	</step>
+
+</beans:beans>
