@@ -88,7 +88,9 @@ public class SimpleChunkProvider<I> implements ChunkProvider<I> {
 		try {
 			listener.beforeRead();
 			I item = itemReader.read();
-			listener.afterRead(item);
+			if(item != null) {
+				listener.afterRead(item);
+			}
 			return item;
 		}
 		catch (Exception e) {

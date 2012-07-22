@@ -24,6 +24,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.CopyOnWriteArraySet;
 
@@ -165,8 +166,8 @@ public class TransactionAwareProxyFactory<T> {
 		return (Map<K, V>) new TransactionAwareProxyFactory<ConcurrentHashMap<K, V>>(new ConcurrentHashMap<K, V>(map)).createInstance();
 	}
 
-	public static <K, V> Map<K, V> createAppendOnlyTransactionalMap() {
-		return (Map<K, V>) new TransactionAwareProxyFactory<ConcurrentHashMap<K, V>>(new ConcurrentHashMap<K, V>(), true).createInstance();
+	public static <K, V> ConcurrentMap<K, V> createAppendOnlyTransactionalMap() {
+		return new TransactionAwareProxyFactory<ConcurrentHashMap<K, V>>(new ConcurrentHashMap<K, V>(), true).createInstance();
 	}
 
 	public static <T> Set<T> createAppendOnlyTransactionalSet() {

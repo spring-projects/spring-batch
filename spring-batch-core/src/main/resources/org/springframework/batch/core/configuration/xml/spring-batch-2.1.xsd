@@ -386,7 +386,11 @@ ref"							is not required, and only needs to be specified explicitly
 		<xsd:sequence>
 			<xsd:element name="description" type="description" minOccurs="0" />
 			<xsd:choice minOccurs="0" maxOccurs="1">
-				<xsd:element name="tasklet" type="taskletType" />
+				<xsd:choice>
+					<xsd:element name="tasklet" type="taskletType" />
+					<!-- custom namespace tasklet declaration -->
+					<xsd:any namespace="##other" minOccurs="1" maxOccurs="1" processContents="skip"/>
+				</xsd:choice>
 				<xsd:element name="partition" type="partitionType" />
 				<xsd:element name="job">
 					<xsd:complexType>

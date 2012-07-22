@@ -54,7 +54,8 @@ import org.springframework.util.ClassUtils;
  * @author Lucas Ward
  * @author Dave Syer
  */
-public abstract class AbstractJob implements Job, StepLocator, BeanNameAware, InitializingBean {
+public abstract class AbstractJob implements Job, StepLocator, BeanNameAware,
+		InitializingBean {
 
 	protected static final Log logger = LogFactory.getLog(AbstractJob.class);
 
@@ -94,9 +95,11 @@ public abstract class AbstractJob implements Job, StepLocator, BeanNameAware, In
 	 * A validator for job parameters. Defaults to a vanilla
 	 * {@link DefaultJobParametersValidator}.
 	 * 
-	 * @param jobParametersValidator a validator instance
+	 * @param jobParametersValidator
+	 *            a validator instance
 	 */
-	public void setJobParametersValidator(JobParametersValidator jobParametersValidator) {
+	public void setJobParametersValidator(
+			JobParametersValidator jobParametersValidator) {
 		this.jobParametersValidator = jobParametersValidator;
 	}
 
@@ -158,7 +161,7 @@ public abstract class AbstractJob implements Job, StepLocator, BeanNameAware, In
 	 * @return the step names
 	 */
 	public abstract Collection<String> getStepNames();
-	
+
 	public JobParametersValidator getJobParametersValidator() {
 		return jobParametersValidator;
 	}
@@ -167,7 +170,8 @@ public abstract class AbstractJob implements Job, StepLocator, BeanNameAware, In
 	 * Boolean flag to prevent categorically a job from restarting, even if it
 	 * has failed previously.
 	 * 
-	 * @param restartable the value of the flag to set (default true)
+	 * @param restartable
+	 *            the value of the flag to set (default true)
 	 */
 	public void setRestartable(boolean restartable) {
 		this.restartable = restartable;
@@ -182,10 +186,12 @@ public abstract class AbstractJob implements Job, StepLocator, BeanNameAware, In
 
 	/**
 	 * Public setter for the {@link JobParametersIncrementer}.
-	 * @param jobParametersIncrementer the {@link JobParametersIncrementer} to
-	 * set
+	 * 
+	 * @param jobParametersIncrementer
+	 *            the {@link JobParametersIncrementer} to set
 	 */
-	public void setJobParametersIncrementer(JobParametersIncrementer jobParametersIncrementer) {
+	public void setJobParametersIncrementer(
+			JobParametersIncrementer jobParametersIncrementer) {
 		this.jobParametersIncrementer = jobParametersIncrementer;
 	}
 
@@ -202,7 +208,8 @@ public abstract class AbstractJob implements Job, StepLocator, BeanNameAware, In
 	 * Public setter for injecting {@link JobExecutionListener}s. They will all
 	 * be given the listener callbacks at the appropriate point in the job.
 	 * 
-	 * @param listeners the listeners to set.
+	 * @param listeners
+	 *            the listeners to set.
 	 */
 	public void setJobExecutionListeners(JobExecutionListener[] listeners) {
 		for (int i = 0; i < listeners.length; i++) {
@@ -214,7 +221,8 @@ public abstract class AbstractJob implements Job, StepLocator, BeanNameAware, In
 	 * Register a single listener for the {@link JobExecutionListener}
 	 * callbacks.
 	 * 
-	 * @param listener a {@link JobExecutionListener}
+	 * @param listener
+	 *            a {@link JobExecutionListener}
 	 */
 	public void registerJobExecutionListener(JobExecutionListener listener) {
 		this.listener.register(listener);
@@ -231,7 +239,7 @@ public abstract class AbstractJob implements Job, StepLocator, BeanNameAware, In
 		this.jobRepository = jobRepository;
 		stepHandler = new SimpleStepHandler(jobRepository);
 	}
-	
+
 	/**
 	 * Convenience method for subclasses to access the job repository.
 	 * 
@@ -247,28 +255,32 @@ public abstract class AbstractJob implements Job, StepLocator, BeanNameAware, In
 	 * are concerned with the ordering of steps, and delegate actual step
 	 * processing to {@link #handleStep(Step, JobExecution)}.
 	 * 
-	 * @param execution the current {@link JobExecution}
+	 * @param execution
+	 *            the current {@link JobExecution}
 	 * 
-	 * @throws JobExecutionException to signal a fatal batch framework error
-	 * (not a business or validation exception)
+	 * @throws JobExecutionException
+	 *             to signal a fatal batch framework error (not a business or
+	 *             validation exception)
 	 */
-	abstract protected void doExecute(JobExecution execution) throws JobExecutionException;
+	abstract protected void doExecute(JobExecution execution)
+			throws JobExecutionException;
 
 	/**
 	 * Run the specified job, handling all listener and repository calls, and
 	 * delegating the actual processing to {@link #doExecute(JobExecution)}.
 	 * 
 	 * @see Job#execute(JobExecution)
-	 * @throws StartLimitExceededException if start limit of one of the steps
-	 * was exceeded
+	 * @throws StartLimitExceededException
+	 *             if start limit of one of the steps was exceeded
 	 */
 	public final void execute(JobExecution execution) {
 
 		logger.debug("Job execution starting: " + execution);
-		
+
 		try {
 
-			jobParametersValidator.validate(execution.getJobInstance().getJobParameters());
+			jobParametersValidator.validate(execution.getJobInstance()
+					.getJobParameters());
 
 			if (execution.getStatus() != BatchStatus.STOPPING) {
 
@@ -280,12 +292,10 @@ public abstract class AbstractJob implements Job, StepLocator, BeanNameAware, In
 				try {
 					doExecute(execution);
 					logger.debug("Job execution complete: " + execution);
-				}
-				catch (RepeatException e) {
+				} catch (RepeatException e) {
 					throw e.getCause();
 				}
-			}
-			else {
+			} else {
 
 				// The job was already stopped before we even got this far. Deal
 				// with it in the same way as any other interruption.
@@ -295,34 +305,35 @@ public abstract class AbstractJob implements Job, StepLocator, BeanNameAware, In
 
 			}
 
-		}
-		catch (JobInterruptedException e) {
-			logger.error("Encountered interruption executing job", e);
+		} catch (JobInterruptedException e) {
+			logger.info("Encountered interruption executing job: "
+					+ e.getMessage());
+			if (logger.isDebugEnabled()) {
+				logger.debug("Full exception", e);
+			}
 			execution.setExitStatus(getDefaultExitStatusForFailure(e));
 			execution.setStatus(BatchStatus.STOPPED);
 			execution.addFailureException(e);
-		}
-		catch (Throwable t) {
+		} catch (Throwable t) {
 			logger.error("Encountered fatal error executing job", t);
 			execution.setExitStatus(getDefaultExitStatusForFailure(t));
 			execution.setStatus(BatchStatus.FAILED);
 			execution.addFailureException(t);
-		}
-		finally {
+		} finally {
 
 			if (execution.getStatus().isLessThanOrEqualTo(BatchStatus.STOPPED)
 					&& execution.getStepExecutions().isEmpty()) {
 				ExitStatus exitStatus = execution.getExitStatus();
-				execution.setExitStatus(exitStatus.and(ExitStatus.NOOP
-						.addExitDescription("All steps already completed or no steps configured for this job.")));
+				execution
+						.setExitStatus(exitStatus.and(ExitStatus.NOOP
+								.addExitDescription("All steps already completed or no steps configured for this job.")));
 			}
 
 			execution.setEndTime(new Date());
 
 			try {
 				listener.afterJob(execution);
-			}
-			catch (Exception e) {
+			} catch (Exception e) {
 				logger.error("Exception encountered in afterStep callback", e);
 			}
 
@@ -339,20 +350,25 @@ public abstract class AbstractJob implements Job, StepLocator, BeanNameAware, In
 	 * to worry about populating the execution context on a restart, nor
 	 * detecting the interrupted state (in job or step execution).
 	 * 
-	 * @param step the {@link Step} to execute
-	 * @param execution the current {@link JobExecution}
+	 * @param step
+	 *            the {@link Step} to execute
+	 * @param execution
+	 *            the current {@link JobExecution}
 	 * @return the {@link StepExecution} corresponding to this step
 	 * 
-	 * @throws JobInterruptedException if the {@link JobExecution} has been
-	 * interrupted, and in particular if {@link BatchStatus#ABANDONED} or
-	 * {@link BatchStatus#STOPPING} is detected
-	 * @throws StartLimitExceededException if the start limit has been exceeded
-	 * for this step
-	 * @throws JobRestartException if the job is in an inconsistent state from
-	 * an earlier failure
+	 * @throws JobInterruptedException
+	 *             if the {@link JobExecution} has been interrupted, and in
+	 *             particular if {@link BatchStatus#ABANDONED} or
+	 *             {@link BatchStatus#STOPPING} is detected
+	 * @throws StartLimitExceededException
+	 *             if the start limit has been exceeded for this step
+	 * @throws JobRestartException
+	 *             if the job is in an inconsistent state from an earlier
+	 *             failure
 	 */
-	protected final StepExecution handleStep(Step step, JobExecution execution) throws JobInterruptedException,
-			JobRestartException, StartLimitExceededException {
+	protected final StepExecution handleStep(Step step, JobExecution execution)
+			throws JobInterruptedException, JobRestartException,
+			StartLimitExceededException {
 		return stepHandler.handleStep(step, execution);
 
 	}
@@ -360,18 +376,21 @@ public abstract class AbstractJob implements Job, StepLocator, BeanNameAware, In
 	/**
 	 * Default mapping from throwable to {@link ExitStatus}.
 	 * 
-	 * @param ex the cause of the failure
+	 * @param ex
+	 *            the cause of the failure
 	 * @return an {@link ExitStatus}
 	 */
 	private ExitStatus getDefaultExitStatusForFailure(Throwable ex) {
 		ExitStatus exitStatus;
-		if (ex instanceof JobInterruptedException || ex.getCause() instanceof JobInterruptedException) {
-			exitStatus = ExitStatus.STOPPED.addExitDescription(JobInterruptedException.class.getName());
-		}
-		else if (ex instanceof NoSuchJobException || ex.getCause() instanceof NoSuchJobException) {
-			exitStatus = new ExitStatus(ExitCodeMapper.NO_SUCH_JOB, ex.getClass().getName());
-		}
-		else {
+		if (ex instanceof JobInterruptedException
+				|| ex.getCause() instanceof JobInterruptedException) {
+			exitStatus = ExitStatus.STOPPED
+					.addExitDescription(JobInterruptedException.class.getName());
+		} else if (ex instanceof NoSuchJobException
+				|| ex.getCause() instanceof NoSuchJobException) {
+			exitStatus = new ExitStatus(ExitCodeMapper.NO_SUCH_JOB, ex
+					.getClass().getName());
+		} else {
 			exitStatus = ExitStatus.FAILED.addExitDescription(ex);
 		}
 

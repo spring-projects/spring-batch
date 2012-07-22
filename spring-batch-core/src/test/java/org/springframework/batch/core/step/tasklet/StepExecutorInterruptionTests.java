@@ -222,6 +222,8 @@ public class StepExecutorInterruptionTests {
 				}
 			}
 		};
+		processingThread.setDaemon(true);
+		processingThread.setPriority(Thread.MIN_PRIORITY);
 		return processingThread;
 	}
 
