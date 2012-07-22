@@ -269,6 +269,8 @@ public abstract class AbstractFlowParser extends AbstractSingleBeanDefinitionPar
 		if (!transitionElementExists) {
 			list.addAll(createTransition(FlowExecutionStatus.FAILED, FlowExecutionStatus.FAILED.getName(), null, null,
 					stateDef, parserContext, false));
+			list.addAll(createTransition(FlowExecutionStatus.UNKNOWN, FlowExecutionStatus.UNKNOWN.getName(), null, null,
+					stateDef, parserContext, false));
 			if (!hasNextAttribute) {
 				list.addAll(createTransition(FlowExecutionStatus.COMPLETED, null, null, null, stateDef, parserContext,
 						false));

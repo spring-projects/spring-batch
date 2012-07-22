@@ -282,9 +282,7 @@ public class BeanWrapperFieldSetMapper<T> extends DefaultPropertyEditorRegistrar
 			}
 		}
 
-		if (!propertiesMatched.containsKey(distanceKey)) {
-			propertiesMatched.putIfAbsent(distanceKey, new ConcurrentHashMap<String, String>(matches));
-		}
+		propertiesMatched.replace(distanceKey, new ConcurrentHashMap<String, String>(matches));
 		return properties;
 	}
 

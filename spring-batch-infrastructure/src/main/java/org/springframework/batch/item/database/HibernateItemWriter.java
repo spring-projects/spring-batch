@@ -29,8 +29,9 @@ import org.springframework.util.Assert;
 /**
  * {@link ItemWriter} that uses a Hibernate session to save or update entities
  * that are not part of the current Hibernate session. It will also flush the
- * session at chunk boundaries. It will also flush and clear the session at
- * chunk boundaries by default (@see ).<br/>
+ * session after writing (i.e. at chunk boundaries if used in a Spring Batch
+ * TaskletStep). It will also clear the session on write
+ * default (see {@link #setClearSession(boolean) clearSession} property).<br/>
  * <br/>
  * 
  * The writer is thread safe after its properties are set (normal singleton
@@ -42,7 +43,8 @@ import org.springframework.util.Assert;
  */
 public class HibernateItemWriter<T> implements ItemWriter<T>, InitializingBean {
 
-	protected static final Log logger = LogFactory.getLog(HibernateItemWriter.class);
+	protected static final Log logger = LogFactory
+			.getLog(HibernateItemWriter.class);
 
 	private HibernateOperations hibernateTemplate;
 
@@ -52,7 +54,8 @@ public class HibernateItemWriter<T> implements ItemWriter<T>, InitializingBean {
 	 * Flag to indicate that the session should be cleared and flushed at the
 	 * end of the write (default true).
 	 * 
-	 * @param clearSession the flag value to set
+	 * @param clearSession
+	 *            the flag value to set
 	 */
 	public void setClearSession(boolean clearSession) {
 		this.clearSession = clearSession;
@@ -61,7 +64,8 @@ public class HibernateItemWriter<T> implements ItemWriter<T>, InitializingBean {
 	/**
 	 * Public setter for the {@link HibernateOperations} property.
 	 * 
-	 * @param hibernateTemplate the hibernateTemplate to set
+	 * @param hibernateTemplate
+	 *            the hibernateTemplate to set
 	 */
 	public void setHibernateTemplate(HibernateOperations hibernateTemplate) {
 		this.hibernateTemplate = hibernateTemplate;
@@ -81,7 +85,8 @@ public class HibernateItemWriter<T> implements ItemWriter<T>, InitializingBean {
 	 * Check mandatory properties - there must be a hibernateTemplate.
 	 */
 	public void afterPropertiesSet() {
-		Assert.notNull(hibernateTemplate, "HibernateItemWriter requires a HibernateOperations");
+		Assert.notNull(hibernateTemplate,
+				"HibernateItemWriter requires a HibernateOperations");
 	}
 
 	/**
@@ -102,13 +107,17 @@ public class HibernateItemWriter<T> implements ItemWriter<T>, InitializingBean {
 	 * Do perform the actual write operation. This can be overridden in a
 	 * subclass if necessary.
 	 * 
-	 * @param hibernateTemplate the HibernateTemplate to use for the operation
-	 * @param items the list of items to use for the write
+	 * @param hibernateTemplate
+	 *            the HibernateTemplate to use for the operation
+	 * @param items
+	 *            the list of items to use for the write
 	 */
-	protected void doWrite(HibernateOperations hibernateTemplate, List<? extends T> items) {
+	protected void doWrite(HibernateOperations hibernateTemplate,
+			List<? extends T> items) {
 
 		if (logger.isDebugEnabled()) {
-			logger.debug("Writing to Hibernate with " + items.size() + " items.");
+			logger.debug("Writing to Hibernate with " + items.size()
+					+ " items.");
 		}
 
 		if (!items.isEmpty()) {
@@ -121,7 +130,8 @@ public class HibernateItemWriter<T> implements ItemWriter<T>, InitializingBean {
 			}
 			if (logger.isDebugEnabled()) {
 				logger.debug(saveOrUpdateCount + " entities saved/updated.");
-				logger.debug((items.size() - saveOrUpdateCount) + " entities found in session.");
+				logger.debug((items.size() - saveOrUpdateCount)
+						+ " entities found in session.");
 			}
 		}
 

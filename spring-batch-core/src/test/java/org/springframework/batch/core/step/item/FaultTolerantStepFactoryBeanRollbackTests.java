@@ -17,6 +17,7 @@ import java.util.Map;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.batch.core.BatchStatus;
@@ -29,7 +30,10 @@ import org.springframework.batch.core.StepListener;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.repository.support.MapJobRepositoryFactoryBean;
 import org.springframework.batch.core.step.FatalStepExecutionException;
+import org.springframework.batch.item.ItemReader;
+import org.springframework.batch.item.support.ListItemReader;
 import org.springframework.batch.support.transaction.ResourcelessTransactionManager;
+import org.springframework.batch.support.transaction.TransactionAwareProxyFactory;
 import org.springframework.core.task.SimpleAsyncTaskExecutor;
 import org.springframework.transaction.interceptor.RollbackRuleAttribute;
 import org.springframework.transaction.interceptor.RuleBasedTransactionAttribute;
@@ -58,15 +62,13 @@ public class FaultTolerantStepFactoryBeanRollbackTests {
 
 	private JobRepository repository;
 
-	public FaultTolerantStepFactoryBeanRollbackTests() throws Exception {
-		reader = new SkipReaderStub<String>();
-		processor = new SkipProcessorStub<String>();
-		writer = new SkipWriterStub<String>();
-	}
-
 	@SuppressWarnings("unchecked")
 	@Before
 	public void setUp() throws Exception {
+		reader = new SkipReaderStub<String>();
+		processor = new SkipProcessorStub<String>();
+		writer = new SkipWriterStub<String>();
+
 		factory = new FaultTolerantStepFactoryBean<String, String>();
 
 		factory.setBeanName("stepName");
@@ -95,6 +97,14 @@ public class FaultTolerantStepFactoryBeanRollbackTests {
 		jobExecution = repository.createJobExecution("skipJob", new JobParameters());
 		stepExecution = jobExecution.createStepExecution(factory.getName());
 		repository.add(stepExecution);
+	}
+
+	@After
+	public void tearDown() throws Exception {
+		reader = null;
+		processor = null;
+		writer = null;
+		factory = null;
 	}
 	
 	@Test
@@ -434,6 +444,7 @@ public class FaultTolerantStepFactoryBeanRollbackTests {
 
 		assertEquals("[1, 3, 5]", writer.getWritten().toString());
 		assertEquals("[1, 3, 5]", writer.getCommitted().toString());
+		// If non-transactional, we should only process each item once
 		assertEquals("[1, 2, 3, 4, 5]", processor.getProcessed().toString());
 	}
 
@@ -489,6 +500,25 @@ public class FaultTolerantStepFactoryBeanRollbackTests {
 		assertEquals("[1, 2, 3, 5]", writer.getCommitted().toString());
 		assertEquals("[1, 2, 3, 4, 1, 2, 3, 4, 5]", writer.getWritten().toString());
 		assertEquals("[1, 2, 3, 4, 5]", processor.getProcessed().toString());
+	}
+
+	@Test
+	public void testSkipInWriterTransactionalReader() throws Exception {
+		writer.setFailures("4");
+		ItemReader<String> reader = new ListItemReader<String>(TransactionAwareProxyFactory.createTransactionalList(Arrays.asList("1", "2", "3", "4", "5")));
+		factory.setItemReader(reader);
+		factory.setCommitInterval(30);
+		factory.setSkipLimit(10);
+		factory.setIsReaderTransactionalQueue(true);
+
+		Step step = (Step) factory.getObject();
+
+		step.execute(stepExecution);
+		assertEquals(BatchStatus.COMPLETED, stepExecution.getStatus());
+
+		assertEquals("[]", writer.getCommitted().toString());
+		assertEquals("[1, 2, 3, 4]", writer.getWritten().toString());
+		assertEquals("[1, 2, 3, 4, 5, 1, 2, 3, 4, 5]", processor.getProcessed().toString());
 	}
 
 	@Test

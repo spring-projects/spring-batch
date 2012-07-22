@@ -35,7 +35,7 @@
     the data one at a time, and creating 'chunks' that will be written out,
     within a transaction boundary. One item is read in from an
     <classname>ItemReader</classname>, handed to an
-    <classname>ItemWriter</classname>, and aggregated. Once the number of
+    <classname>ItemProcessor</classname>, and aggregated. Once the number of
     items read equals the commit interval, the entire chunk is written out via
     the ItemWriter, and then the transaction is committed.</para>
 
