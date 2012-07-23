@@ -312,7 +312,7 @@ public abstract class AbstractJob implements Job, StepLocator, BeanNameAware,
 				logger.debug("Full exception", e);
 			}
 			execution.setExitStatus(getDefaultExitStatusForFailure(e));
-			execution.setStatus(BatchStatus.STOPPED);
+			execution.setStatus(BatchStatus.max(BatchStatus.STOPPED, e.getStatus()));
 			execution.addFailureException(e);
 		} catch (Throwable t) {
 			logger.error("Encountered fatal error executing job", t);

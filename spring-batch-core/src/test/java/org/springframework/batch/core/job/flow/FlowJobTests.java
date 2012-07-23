@@ -227,8 +227,8 @@ public class FlowJobTests {
 		job.setFlow(flow);
 		job.afterPropertiesSet();
 		job.execute(jobExecution);
-		assertEquals(BatchStatus.STOPPED, jobExecution.getStatus());
-		checkRepository(BatchStatus.STOPPED, ExitStatus.STOPPED);
+		assertEquals(BatchStatus.UNKNOWN, jobExecution.getStatus());
+		checkRepository(BatchStatus.UNKNOWN, ExitStatus.STOPPED);
 		assertEquals(1, jobExecution.getAllFailureExceptions().size());
 		assertEquals(JobInterruptedException.class, jobExecution.getFailureExceptions().get(0).getClass());
 	}

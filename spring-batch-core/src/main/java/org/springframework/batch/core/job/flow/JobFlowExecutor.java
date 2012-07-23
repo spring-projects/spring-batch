@@ -64,7 +64,7 @@ public class JobFlowExecutor implements FlowExecutor {
 			return  ExitStatus.COMPLETED.getExitCode();			
 		}
 		if (stepExecution.isTerminateOnly()) {
-			throw new JobInterruptedException("Step requested termination: "+stepExecution);
+			throw new JobInterruptedException("Step requested termination: "+stepExecution, stepExecution.getStatus());
 		}
 		return stepExecution.getExitStatus().getExitCode();
 	}
