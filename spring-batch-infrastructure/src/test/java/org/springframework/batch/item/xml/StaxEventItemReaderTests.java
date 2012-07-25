@@ -47,6 +47,12 @@ public class StaxEventItemReaderTests {
 	// test xml input
 	private String xml = "<root> <fragment> <misc1/> </fragment> <misc2/> <fragment> testString </fragment> </root>";
 
+	// test xml input
+	private String emptyXml = "<root></root>";
+
+	// test xml input
+	private String missingXml = "<root><misc1/><misc2>foo</misc2></root>";
+
 	private String fooXml = "<root xmlns=\"urn:org.test.foo\"> <fragment> <misc1/> </fragment> <misc2/> <fragment> testString </fragment> </root>";
 
 	private String mixedXml = "<fragment xmlns=\"urn:org.test.foo\"> <fragment xmlns=\"urn:org.test.bar\"> <misc1/> </fragment> <misc2/> <fragment xmlns=\"urn:org.test.bar\"> testString </fragment> </fragment>";
@@ -173,6 +179,27 @@ public class StaxEventItemReaderTests {
 			assertTrue(EventHelper.startElementName(reader.peek()).equals("fragment"));
 			reader.nextEvent(); // move away from beginning of fragment
 		}
+		assertFalse(source.moveCursorToNextFragment(reader));
+	}
+
+	/**
+	 * Empty document works OK.
+	 */
+	@Test
+	public void testMoveCursorToNextFragmentOnEmpty() throws XMLStreamException, FactoryConfigurationError, IOException {
+		Resource resource = new ByteArrayResource(emptyXml.getBytes());
+		XMLEventReader reader = XMLInputFactory.newInstance().createXMLEventReader(resource.getInputStream());
+
+		assertFalse(source.moveCursorToNextFragment(reader));
+	}
+
+	/**
+	 * Document with no fragments works OK.
+	 */
+	@Test
+	public void testMoveCursorToNextFragmentOnMissing() throws XMLStreamException, FactoryConfigurationError, IOException {
+		Resource resource = new ByteArrayResource(missingXml.getBytes());
+		XMLEventReader reader = XMLInputFactory.newInstance().createXMLEventReader(resource.getInputStream());
 		assertFalse(source.moveCursorToNextFragment(reader));
 	}
 
