@@ -16,7 +16,7 @@
 	<properties>
 		<maven.test.failure.ignore>true</maven.test.failure.ignore>
 		<spring.framework.version>2.5.6</spring.framework.version>
-		<spring.batch.version>2.1.8.RELEASE</spring.batch.version>
+		<spring.batch.version>2.1.9.RELEASE</spring.batch.version>
 		<dependency.locations.enabled>false</dependency.locations.enabled>
 	</properties>
 	<profiles>
