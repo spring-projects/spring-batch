@@ -1,10 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>org.springframework.batch</groupId>
 	<artifactId>spring-batch-parent</artifactId>
-	<version>2.1.9.BUILD-SNAPSHOT</version>
+	<version>2.1.9.RELEASE</version>
 	<name>Spring Batch Parent</name>
 	<description>Spring Batch parent project.  Defines dependencies and common configuration for the build process.</description>
 	<url>http://static.springframework.org/spring-batch/${project.artifactId}</url>
@@ -13,7 +12,8 @@
 		<url>http://github.com/SpringSource/spring-batch</url>
 		<connection>scm:git:git://github.com/SpringSource/spring-batch.git</connection>
 		<developerConnection>scm:git:git://github.com/SpringSource/spring-batch.git</developerConnection>
-	</scm>
+	  <tag>2.1.9.RELEASE</tag>
+  </scm>
 	<licenses>
 		<license>
 			<name>Apache 2.0</name>
