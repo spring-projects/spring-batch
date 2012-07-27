@@ -77,6 +77,8 @@ public class FlatFileItemWriter<T> extends ExecutionContextUserSupport implement
 
 	private boolean saveState = true;
 
+	private boolean forceSync = false;
+
 	private boolean shouldDeleteIfExists = true;
 
 	private boolean shouldDeleteIfEmpty = false;
@@ -107,6 +109,19 @@ public class FlatFileItemWriter<T> extends ExecutionContextUserSupport implement
 		if (append) {
 			shouldDeleteIfExists = false;
 		}
+	}
+
+	/**
+	 * Flag to indicate that changes should be force-synced to disk on flush.
+	 * Defaults to false, which means that even with a local disk changes could
+	 * be lost if the OS crashes in between a write and a cache flush. Setting
+	 * to true may result in slower performance for usage patterns involving many
+	 * frequent writes.
+	 * 
+	 * @param forceSync the flag value to set
+	 */
+	public void setForceSync(boolean forceSync) {
+		this.forceSync = forceSync;
 	}
 
 	/**
@@ -562,7 +577,16 @@ public class FlatFileItemWriter<T> extends ExecutionContextUserSupport implement
 		 */
 		private Writer getBufferedWriter(FileChannel fileChannel, String encoding) {
 			try {
-				Writer writer = Channels.newWriter(fileChannel, encoding);
+				final FileChannel channel = fileChannel;
+				Writer writer = new BufferedWriter(Channels.newWriter(fileChannel, encoding)) {
+					@Override
+					public void flush() throws IOException {
+						super.flush();
+						if (forceSync) {
+							channel.force(false);
+						}
+					}
+				};
 				if (transactional) {
 					return new TransactionAwareBufferedWriter(writer, new Runnable() {
 						public void run() {

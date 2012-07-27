@@ -202,6 +202,17 @@ public class FlatFileItemWriterTests {
 		assertEquals(TEST_STRING, lineFromFile);
 	}
 
+	@Test
+	public void testForcedWriteString() throws Exception {
+		writer.setForceSync(true);
+		writer.open(executionContext);
+		writer.write(Collections.singletonList(TEST_STRING));
+		writer.close();
+		String lineFromFile = readLine();
+
+		assertEquals(TEST_STRING, lineFromFile);
+	}
+
 	/**
 	 * Regular usage of <code>write(String)</code> method
 	 * 

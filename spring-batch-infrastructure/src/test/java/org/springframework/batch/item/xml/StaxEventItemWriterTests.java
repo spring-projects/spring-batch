@@ -90,6 +90,16 @@ public class StaxEventItemWriterTests {
 		assertTrue("Wrong content: " + content, content.contains(TEST_STRING));
 	}
 
+	@Test
+	public void testWriteAndForceFlush() throws Exception {
+		writer.setForceSync(true);
+		writer.open(executionContext);
+		writer.write(items);
+		writer.close();
+		String content = getOutputFileContent();
+		assertTrue("Wrong content: " + content, content.contains(TEST_STRING));
+	}
+
 	/**
 	 * Restart scenario - content is appended to the output file after restart.
 	 */
