@@ -32,6 +32,7 @@
 		<spring.oxm.group>org.springframework.ws</spring.oxm.group>
 		<spring.oxm.artifact>spring-oxm-tiger</spring.oxm.artifact>
 		<spring.oxm.version>1.5.8</spring.oxm.version>
+        <spring.amqp.version>1.0.0.RELEASE</spring.amqp.version>
 		<junit.version>4.4</junit.version>
 		<bundlor.version>1.0.0.RELEASE</bundlor.version>
 		<dependency.locations.enabled>false</dependency.locations.enabled>
@@ -418,9 +419,15 @@
 			<dependency>
 				<groupId>org.easymock</groupId>
 				<artifactId>easymock</artifactId>
-				<version>2.3</version>
+				<version>2.4</version>
 				<scope>test</scope>
 			</dependency>
+            <dependency>
+                <groupId>org.easymock</groupId>
+                <artifactId>easymockclassextension</artifactId>
+                <version>2.4</version>
+                <scope>test</scope>
+            </dependency>
 			<dependency>
 				<groupId>org.apache.geronimo.specs</groupId>
 				<artifactId>geronimo-jms_1.1_spec</artifactId>
@@ -709,6 +716,16 @@
 				<version>1.1.2</version>
 				<optional>true</optional>
 			</dependency>
+            <dependency>
+                <groupId>org.springframework.amqp</groupId>
+                <artifactId>spring-amqp</artifactId>
+                <version>${spring.amqp.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.springframework.amqp</groupId>
+                <artifactId>spring-rabbit</artifactId>
+                <version>${spring.amqp.version}</version>
+            </dependency>
 		</dependencies>
 	</dependencyManagement>
 	<distributionManagement>
