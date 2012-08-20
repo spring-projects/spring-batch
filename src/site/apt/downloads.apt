@@ -7,7 +7,7 @@
 
 Spring Batch Downloads
 
-  The current GA release is <<2.1.8.RELEASE>>, the latest snapshots are <<2.2.0.BUILD-SNAPSHOT>>.  The version 2.0.x and 1.x branches are now in maintenance (the last release was <<2.0.4.RELEASE>>).
+  The current GA release is <<2.1.9.RELEASE>>, the latest snapshots are <<2.2.0.BUILD-SNAPSHOT>>.  The version 2.0.x and 1.x branches are now in maintenance (the last release was <<2.0.4.RELEASE>>).
 
 For runtime concerns and a container for running a Job as a service see the {{{http://static.springframework.org/spring-batch-admin}Spring Batch Admin}} project and the {{{http://static.springframework.org/spring-batch-admin/getting-started.html}getting started}} link there.
 
@@ -41,7 +41,7 @@ Source code can also be browsed and downloaded at {{{http://github.com/SpringSou
 <dependency>
     <groupId>org.springframework.batch</groupId>
     <artifactId>spring-batch-core</artifactId>
-    <version>2.1.8.RELEASE</version>
+    <version>2.1.9.RELEASE</version>
 </dependency>
 +---------------
 
@@ -74,7 +74,7 @@ Source code can also be browsed and downloaded at {{{http://github.com/SpringSou
 <dependency>
     <groupId>org.springframework.batch</groupId>
     <artifactId>org.springframework.batch.core</artifactId>
-    <version>2.1.8.RELEASE</version>
+    <version>2.1.9.RELEASE</version>
 </dependency>
 +---------------
 
@@ -100,7 +100,7 @@ Source code can also be browsed and downloaded at {{{http://github.com/SpringSou
 <dependency>
     <groupId>org.springframework.batch</groupId>
     <artifactId>spring-batch-core</artifactId>
-    <version>2.1.8.RELEASE</version>
+    <version>2.1.9.RELEASE</version>
 </dependency>
 +---------------
 
@@ -124,7 +124,7 @@ Source code can also be browsed and downloaded at {{{http://github.com/SpringSou
 <dependency>
     <groupId>org.springframework.batch</groupId>
     <artifactId>org.springframework.batch.core</artifactId>
-    <version>2.1.8.RELEASE</version>
+    <version>2.1.9.RELEASE</version>
 </dependency>
 +---------------
 
