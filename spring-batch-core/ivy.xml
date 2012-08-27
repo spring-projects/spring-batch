@@ -25,7 +25,7 @@
 		<dependency org="org.hsqldb" name="com.springsource.org.hsqldb" rev="1.8.0.9" conf="test->runtime,provided"/>
 		<dependency org="org.apache.commons" name="com.springsource.org.apache.commons.io" rev="1.4.0" conf="test->runtime,provided"/>
 		<dependency org="org.apache.commons" name="com.springsource.org.apache.commons.lang" rev="2.1.0" conf="compile->runtime,provided"/>
-		<dependency org="org.easymock" name="com.springsource.org.easymock" rev="2.3.0" conf="test->runtime,provided"/>
+		<dependency org="org.easymock" name="com.springsource.org.easymock" rev="2.4.0" conf="test->runtime,provided"/>
 		<dependency org="org.junit" name="com.springsource.org.junit" rev="4.4.0" conf="test->runtime,provided"/>
 		<dependency org="org.aspectj" name="com.springsource.org.aspectj.runtime" rev="1.5.4" conf="compile->runtime,provided"/>
 		<dependency org="org.aspectj" name="com.springsource.org.aspectj.weaver" rev="1.5.4" conf="compile->runtime,provided"/>
