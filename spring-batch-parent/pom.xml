@@ -28,7 +28,6 @@
 		</developer>
 	</developers>
 	<properties>
-		<maven.test.failure.ignore>true</maven.test.failure.ignore>
 		<spring.framework.version>2.5.6</spring.framework.version>
 		<spring.oxm.group>org.springframework.ws</spring.oxm.group>
 		<spring.oxm.artifact>spring-oxm-tiger</spring.oxm.artifact>
@@ -38,12 +37,6 @@
 		<dependency.locations.enabled>false</dependency.locations.enabled>
 	</properties>
 	<profiles>
-		<profile>
-			<id>strict</id>
-			<properties>
-				<maven.test.failure.ignore>false</maven.test.failure.ignore>
-			</properties>
-		</profile>
 		<profile>
 			<id>fast</id>
 			<properties>
@@ -225,7 +218,7 @@
 				</plugin>
 				<plugin>
 					<artifactId>maven-site-plugin</artifactId>
-					<version>2.0</version>
+					<version>3.1</version>
 				</plugin>
 				<plugin>
 					<artifactId>maven-jar-plugin</artifactId>
@@ -304,12 +297,11 @@
                 <plugin>
                   <groupId>org.apache.maven.plugins</groupId>
                   <artifactId>maven-site-plugin</artifactId>
-                  <version>2.2</version>
                   <dependencies>
                     <dependency>
                       <groupId>org.apache.maven.wagon</groupId>
                       <artifactId>wagon-ssh</artifactId>
-                      <version>1.0-beta-7</version>
+                      <version>2.2</version>
                     </dependency>
                   </dependencies>
                 </plugin>

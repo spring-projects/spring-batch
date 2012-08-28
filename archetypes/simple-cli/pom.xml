@@ -13,18 +13,11 @@
 		the project jar on the classpath and run the
 		CommandLineJobRunner directly or with "java -jar launch-context.xml job1".</description>
 	<properties>
-		<maven.test.failure.ignore>true</maven.test.failure.ignore>
 		<spring.framework.version>2.5.6</spring.framework.version>
 		<spring.batch.version>2.2.0.BUILD-SNAPSHOT</spring.batch.version>
 		<dependency.locations.enabled>false</dependency.locations.enabled>
 	</properties>
 	<profiles>
-		<profile>
-			<id>strict</id>
-			<properties>
-				<maven.test.failure.ignore>false</maven.test.failure.ignore>
-			</properties>
-		</profile>
 		<profile>
 			<id>staging</id>
 			<distributionManagement>
