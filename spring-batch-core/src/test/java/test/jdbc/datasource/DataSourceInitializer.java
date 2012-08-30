@@ -91,8 +91,10 @@ public class DataSourceInitializer implements InitializingBean {
 	}
 
 	private void doExecuteScript(final Resource scriptResource) {
-		if (scriptResource == null || !scriptResource.exists())
-			return;
+        if (scriptResource == null || !scriptResource.exists()) {
+            throw new IllegalArgumentException("Script resource is null or does not exist");
+        }
+
 		TransactionTemplate transactionTemplate = new TransactionTemplate(new DataSourceTransactionManager(dataSource));
 		transactionTemplate.execute(new TransactionCallback() {
 
