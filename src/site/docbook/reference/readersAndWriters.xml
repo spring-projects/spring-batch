@@ -1523,7 +1523,7 @@ assertEquals(born, values[2]);</programlisting>
           </listitem>
 
           <listitem>
-            <para><classname>FragmentDeserializer</classname> - Unmarshalling
+            <para><classname>Unmarshaller</classname> - Unmarshalling
             facility provided by Spring OXM for mapping the XML fragment to an
             object.</para>
           </listitem>
