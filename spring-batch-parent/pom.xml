@@ -32,7 +32,7 @@
 		<spring.oxm.group>org.springframework.ws</spring.oxm.group>
 		<spring.oxm.artifact>spring-oxm-tiger</spring.oxm.artifact>
 		<spring.oxm.version>1.5.8</spring.oxm.version>
-        <spring.amqp.version>1.0.0.RELEASE</spring.amqp.version>
+        	<spring.amqp.version>1.1.2.RELEASE</spring.amqp.version>
 		<junit.version>4.4</junit.version>
 		<bundlor.version>1.0.0.RELEASE</bundlor.version>
 		<dependency.locations.enabled>false</dependency.locations.enabled>
