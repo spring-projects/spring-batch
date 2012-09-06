@@ -15,4 +15,7 @@ com.springsource.sts.config.flow.prefs
 s3.properties
 .idea
 *.iml
+*.ipr
+*.iws
 .*.swp
+
