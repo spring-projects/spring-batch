@@ -43,7 +43,6 @@ import org.springframework.beans.propertyeditors.PropertiesEditor;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 import org.springframework.context.support.StaticApplicationContext;
-import org.springframework.core.SpringVersion;
 import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.validation.BindException;
 import org.springframework.validation.DataBinder;
@@ -325,12 +324,6 @@ public class BeanWrapperFieldSetMapperTests {
 
 	@Test
 	public void testAutoPopulateNestedList() throws Exception {
-
-		if (SpringVersion.getVersion().compareTo("3") < 0) {
-			// Spring < 3.0 does not support auto grow collections
-			return;
-		}
-
 		TestNestedList nestedList = new TestNestedList();
 
 		BeanWrapperFieldSetMapper<?> mapper = new BeanWrapperFieldSetMapper<Object>() {

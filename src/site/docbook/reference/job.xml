@@ -676,7 +676,7 @@ catch (JobRestartException e) {
 
       <para>The controller in this case is a Spring MVC controller. More
       information on Spring MVC can be found here: <ulink
-      url="http://static.springframework.org/spring/docs/2.5.x/reference/mvc.html">http://static.springframework.org/spring/docs/2.5.x/reference/mvc.html</ulink>.
+      url="http://static.springsource.org/spring/docs/3.1.x/spring-framework-reference/html/mvc.html">http://static.springsource.org/spring/docs/3.1.x/spring-framework-reference/html/mvc.html</ulink>.
       The controller launches a <classname>Job</classname> using a
       <classname>JobLauncher</classname> that has been configured to launch
       <link linkend="configureJobLauncher">asynchronously</link>, which

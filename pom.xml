@@ -571,7 +571,7 @@
 						<link>http://logging.apache.org/log4j/docs/api/</link>
 						<link>http://jakarta.apache.org/regexp/apidocs/</link>
 						<link>http://jakarta.apache.org/velocity/api/</link>
-						<link>http://static.springframework.org/spring/docs/2.5.x/api/</link>
+						<link>http://static.springsource.org/spring/docs/3.1.2.RELEASE/javadoc-api/</link>
 						<link>http://static.springframework.org/spring-batch/apidocs/</link>
 						<link>http://static.springframework.org/spring-ws/site/apidocs/</link>
 					</links>

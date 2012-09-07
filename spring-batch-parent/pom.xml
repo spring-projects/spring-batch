@@ -28,12 +28,12 @@
 		</developer>
 	</developers>
 	<properties>
-		<spring.framework.version>2.5.6</spring.framework.version>
-		<spring.oxm.group>org.springframework.ws</spring.oxm.group>
-		<spring.oxm.artifact>spring-oxm-tiger</spring.oxm.artifact>
-		<spring.oxm.version>1.5.8</spring.oxm.version>
-        <spring.amqp.version>1.0.0.RELEASE</spring.amqp.version>
-		<junit.version>4.4</junit.version>
+        <spring.framework.version>3.1.2.RELEASE</spring.framework.version>
+        <spring.oxm.group>org.springframework</spring.oxm.group>
+        <spring.oxm.artifact>spring-oxm</spring.oxm.artifact>
+        <spring.oxm.version>3.0.7.RELEASE</spring.oxm.version>
+        <spring.amqp.version>1.1.2.RELEASE</spring.amqp.version>
+        <junit.version>4.10</junit.version>
 		<bundlor.version>1.0.0.RELEASE</bundlor.version>
 		<dependency.locations.enabled>false</dependency.locations.enabled>
 	</properties>
@@ -43,16 +43,6 @@
 			<properties>
 				<maven.test.skip>true</maven.test.skip>
 				<maven.javadoc.skip>true</maven.javadoc.skip>
-			</properties>
-		</profile>
-		<profile>
-			<id>spring3</id>
-			<properties>
-				<spring.framework.version>3.0.7.RELEASE</spring.framework.version>
-				<spring.oxm.group>org.springframework</spring.oxm.group>
-				<spring.oxm.artifact>spring-oxm</spring.oxm.artifact>
-				<spring.oxm.version>3.0.7.RELEASE</spring.oxm.version>
-				<junit.version>4.8.2</junit.version>
 			</properties>
 		</profile>
 		<profile>
