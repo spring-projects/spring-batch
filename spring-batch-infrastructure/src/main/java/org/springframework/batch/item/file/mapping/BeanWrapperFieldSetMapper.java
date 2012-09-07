@@ -346,6 +346,8 @@ public class BeanWrapperFieldSetMapper<T> extends DefaultPropertyEditorRegistrar
 
 	private Object getPropertyValue(Object bean, String nestedName) {
 		BeanWrapperImpl wrapper = new BeanWrapperImpl(bean);
+		wrapper.setAutoGrowNestedPaths(true);
+
 		Object nestedValue = wrapper.getPropertyValue(nestedName);
 		if (nestedValue == null) {
 			try {

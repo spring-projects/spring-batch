@@ -69,7 +69,7 @@ public class DefaultJobLoaderTests {
 	private static final String JOB_XML = String
 			.format(
 					"<beans xmlns='http://www.springframework.org/schema/beans' xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance' "
-							+ "xsi:schemaLocation='http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.5.xsd'><bean class='%s$StubJob'/></beans>",
+							+ "xsi:schemaLocation='http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.1.xsd'><bean class='%s$StubJob'/></beans>",
 					DefaultJobLoaderTests.class.getName());
 
 	public static class StubJob implements Job {

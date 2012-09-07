@@ -446,8 +446,8 @@ boolean booleanValue = fs.readBoolean(2);</programlisting>
       explored more in the next sections. The resource property represents a
       Spring Core <classname>Resource</classname>. Documentation explaining
       how to create beans of this type can be found in <ulink
-      url="http://static.springframework.org/spring/docs/2.5.x/reference/resources.html"><citetitle>Spring
-      Framework, Chapter 4.Resources</citetitle></ulink>. Therefore, this
+      url="http://static.springsource.org/spring/docs/3.1.x/spring-framework-reference/html/resources.html"><citetitle>Spring
+      Framework, Chapter 5.Resources</citetitle></ulink>. Therefore, this
       guide will not go into the details of creating
       <classname>Resource</classname> objects. However, a simple example of a
       file system resource can be found below: <programlisting>Resource resource = new FileSystemResource("resources/trades.csv");</programlisting></para>
