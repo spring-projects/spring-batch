@@ -126,21 +126,21 @@ public abstract class StaxUtils {
 		return null;
 	}
 
-	public static XMLEventWriter getXmlEventWriter(Result r) throws Exception {
-		Method m = ClassUtils.getMethodIfAvailable(r.getClass(), "getXMLEventWriter", new Class[]{});
-		boolean accessible=m.isAccessible();
-		m.setAccessible(true);
-		Object result = m.invoke(r);
-		m.setAccessible(accessible);
-		return (XMLEventWriter) result;
-	}
+    public static XMLEventWriter getXmlEventWriter(Result r) throws Exception {
+        Method m = r.getClass().getDeclaredMethod("getXMLEventWriter", new Class[]{});
+        boolean accessible = m.isAccessible();
+        m.setAccessible(true);
+        Object result = m.invoke(r);
+        m.setAccessible(accessible);
+        return (XMLEventWriter) result;
+    }
 
-	public static XMLEventReader getXmlEventReader(Source s) throws Exception {
-		Method m = ClassUtils.getMethodIfAvailable(s.getClass(), "getXMLEventReader", new Class[]{});
-		boolean accessible=m.isAccessible();
-		m.setAccessible(true);
-		Object result = m.invoke(s);
-		m.setAccessible(accessible);
-		return (XMLEventReader) result;
-	}
+    public static XMLEventReader getXmlEventReader(Source s) throws Exception {
+        Method m = s.getClass().getDeclaredMethod("getXMLEventReader", new Class[]{});
+        boolean accessible = m.isAccessible();
+        m.setAccessible(true);
+        Object result = m.invoke(s);
+        m.setAccessible(accessible);
+        return (XMLEventReader) result;
+    }
 }
