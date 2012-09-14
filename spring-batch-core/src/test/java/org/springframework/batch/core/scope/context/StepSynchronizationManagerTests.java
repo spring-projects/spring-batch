@@ -86,9 +86,13 @@ public class StepSynchronizationManagerTests {
 	}
 
 	private Map<?, ?> extractStaticMap(String name) throws IllegalAccessException {
-		Field field = ReflectionUtils.findField(StepSynchronizationManager.class, name);
+		Field field = ReflectionUtils.findField(StepSynchronizationManager.class, "synchronizationManager");
 		ReflectionUtils.makeAccessible(field);
-		Map<?, ?> map = (Map<?, ?>) field.get(StepSynchronizationManager.class);
+		SynchronizationManagerSupport<?, ?> synchronizationManager =
+				(SynchronizationManagerSupport<?, ?>) field.get(StepSynchronizationManager.class);
+		field = ReflectionUtils.findField(SynchronizationManagerSupport.class, name);
+		ReflectionUtils.makeAccessible(field);
+		Map<?, ?> map = (Map<?, ?>) field.get(synchronizationManager);
 		return map;
 	}
 

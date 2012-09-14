@@ -17,53 +17,46 @@ package org.springframework.batch.core.scope;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.springframework.batch.core.scope.context.StepContext;
-import org.springframework.batch.core.scope.context.StepSynchronizationManager;
+import org.springframework.batch.core.scope.context.JobContext;
+import org.springframework.batch.core.scope.context.JobSynchronizationManager;
 import org.springframework.batch.core.scope.util.ContextFactory;
-import org.springframework.batch.core.scope.util.StepContextFactory;
+import org.springframework.batch.core.scope.util.JobContextFactory;
 import org.springframework.beans.BeanWrapper;
 import org.springframework.beans.BeanWrapperImpl;
 import org.springframework.beans.factory.ObjectFactory;
 import org.springframework.beans.factory.config.Scope;
 
 /**
- * Scope for step context. Objects in this scope use the Spring container as an
+ * Scope for job context. Objects in this scope use the Spring container as an
  * object factory, so there is only one instance of such a bean per executing
- * step. All objects in this scope are &lt;aop:scoped-proxy/&gt; (no need to
+ * job. All objects in this scope are &lt;aop:scoped-proxy/&gt; (no need to
  * decorate the bean definitions).<br/>
  * <br/>
  * 
  * In addition, support is provided for late binding of references accessible
- * from the {@link StepContext} using #{..} placeholders. Using this feature,
- * bean properties can be pulled from the step or job execution context and the
+ * from the {@link JobContext} using #{..} placeholders. Using this feature,
+ * bean properties can be pulled from the job or job execution context and the
  * job parameters. E.g.
  * 
  * <pre>
- * &lt;bean id=&quot;...&quot; class=&quot;...&quot; scope=&quot;step&quot;&gt;
- * 	&lt;property name=&quot;parent&quot; ref=&quot;#{stepExecutionContext[helper]}&quot; /&gt;
- * &lt;/bean&gt;
- * 
- * &lt;bean id=&quot;...&quot; class=&quot;...&quot; scope=&quot;step&quot;&gt;
- * 	&lt;property name=&quot;name&quot; value=&quot;#{stepExecutionContext['input.name']}&quot; /&gt;
- * &lt;/bean&gt;
- * 
- * &lt;bean id=&quot;...&quot; class=&quot;...&quot; scope=&quot;step&quot;&gt;
+ * &lt;bean id=&quot;...&quot; class=&quot;...&quot; scope=&quot;job&quot;&gt;
  * 	&lt;property name=&quot;name&quot; value=&quot;#{jobParameters[input]}&quot; /&gt;
  * &lt;/bean&gt;
  * 
- * &lt;bean id=&quot;...&quot; class=&quot;...&quot; scope=&quot;step&quot;&gt;
+ * &lt;bean id=&quot;...&quot; class=&quot;...&quot; scope=&quot;job&quot;&gt;
  * 	&lt;property name=&quot;name&quot; value=&quot;#{jobExecutionContext['input.stem']}.txt&quot; /&gt;
  * &lt;/bean&gt;
  * </pre>
  * 
- * The {@link StepContext} is referenced using standard bean property paths (as
+ * The {@link JobContext} is referenced using standard bean property paths (as
  * per {@link BeanWrapper}). The examples above all show the use of the Map
- * accessors provided as a convenience for step and job attributes.
+ * accessors provided as a convenience for job attributes.
  * 
  * @author Dave Syer
+ * @author Jimmy Praet (create JobScope based on {@link StepScope})
  * @since 2.0
  */
-public class StepScope extends ScopeSupport {
+public class JobScope extends ScopeSupport {
 
 	private Log logger = LogFactory.getLog(getClass());
 
@@ -72,24 +65,24 @@ public class StepScope extends ScopeSupport {
 	/**
 	 * Context key for clients to use for conversation identifier.
 	 */
-	public static final String ID_KEY = "STEP_IDENTIFIER";
+	public static final String ID_KEY = "JOB_IDENTIFIER";
 
 	/**
 	 * The ContextFactory.
 	 */
-	private static final ContextFactory CONTEXT_FACTORY = new StepContextFactory();
+	private static final ContextFactory CONTEXT_FACTORY = new JobContextFactory();
 
-	public StepScope() {
-		super("step", CONTEXT_FACTORY);
+	public JobScope() {
+		super("job", CONTEXT_FACTORY);
 	}
 
 	/**
 	 * If Spring 3.0 is available, this will be used to resolve expressions in
-	 * step-scoped beans. This method is part of the Scope SPI in Spring 3.0,
+	 * job-scoped beans. This method is part of the Scope SPI in Spring 3.0,
 	 * but should just be ignored by earlier versions of Spring.
 	 */
 	public Object resolveContextualObject(String key) {
-		StepContext context = getContext();
+		JobContext context = getContext();
 		// TODO: support for attributes as well maybe (setters not exposed yet
 		// so not urgent).
 		return new BeanWrapperImpl(context).getPropertyValue(key);
@@ -100,7 +93,7 @@ public class StepScope extends ScopeSupport {
 	 */
 	public Object get(String name, ObjectFactory objectFactory) {
 
-		StepContext context = getContext();
+		JobContext context = getContext();
 		Object scopedObject = context.getAttribute(name);
 
 		if (scopedObject == null) {
@@ -126,7 +119,7 @@ public class StepScope extends ScopeSupport {
 	 * @see Scope#getConversationId()
 	 */
 	public String getConversationId() {
-		StepContext context = getContext();
+		JobContext context = getContext();
 		return context.getId();
 	}
 
@@ -134,7 +127,7 @@ public class StepScope extends ScopeSupport {
 	 * @see Scope#registerDestructionCallback(String, Runnable)
 	 */
 	public void registerDestructionCallback(String name, Runnable callback) {
-		StepContext context = getContext();
+		JobContext context = getContext();
 		logger.debug(String.format("Registered destruction callback in scope=%s, name=%s", this.getName(), name));
 		context.registerDestructionCallback(name, callback);
 	}
@@ -143,22 +136,22 @@ public class StepScope extends ScopeSupport {
 	 * @see Scope#remove(String)
 	 */
 	public Object remove(String name) {
-		StepContext context = getContext();
+		JobContext context = getContext();
 		logger.debug(String.format("Removing from scope=%s, name=%s", this.getName(), name));
 		return context.removeAttribute(name);
 	}
 
 	/**
-	 * Get an attribute accessor in the form of a {@link StepContext} that can
+	 * Get an attribute accessor in the form of a {@link JobContext} that can
 	 * be used to store scoped bean instances.
 	 * 
-	 * @return the current step context which we can use as a scope storage
-	 * medium
+	 * @return the current job context which we can use as a scope storage
+	 *         medium
 	 */
-	private StepContext getContext() {
-		StepContext context = StepSynchronizationManager.getContext();
+	private JobContext getContext() {
+		JobContext context = JobSynchronizationManager.getContext();
 		if (context == null) {
-			throw new IllegalStateException("No context holder available for step scope");
+			throw new IllegalStateException("No context holder available for job scope");
 		}
 		return context;
 	}
