@@ -309,6 +309,7 @@ public class PlaceholderTargetSource extends SimpleBeanTargetSource implements I
 			super(new PlaceholderStringValueResolver(typeConverter));
 		}
 
+		@Override
 		@SuppressWarnings({ "unchecked", "rawtypes" })
 		protected Object resolveValue(Object value) {
 
@@ -367,14 +368,14 @@ public class PlaceholderTargetSource extends SimpleBeanTargetSource implements I
 			else if (value instanceof BeanDefinition) {
 
 				BeanDefinition newValue = new GenericBeanDefinition((BeanDefinition) value);
-				visitBeanDefinition((BeanDefinition) newValue);
+				visitBeanDefinition(newValue);
 				value = newValue;
 
 			}
 			else if (value instanceof BeanDefinitionHolder) {
 
 				BeanDefinition newValue = new GenericBeanDefinition(((BeanDefinitionHolder) value).getBeanDefinition());
-				visitBeanDefinition((BeanDefinition) newValue);
+				visitBeanDefinition(newValue);
 				value = newValue;
 
 			}
