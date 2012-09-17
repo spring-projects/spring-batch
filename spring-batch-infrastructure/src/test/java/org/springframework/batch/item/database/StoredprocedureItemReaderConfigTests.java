@@ -17,7 +17,7 @@ import javax.sql.DataSource;
 
 import org.hsqldb.Types;
 import org.junit.Test;
-import org.junit.internal.runners.JUnit4ClassRunner;
+import org.junit.runners.JUnit4;
 import org.junit.runner.RunWith;
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.jdbc.core.PreparedStatementSetter;
@@ -28,7 +28,7 @@ import org.springframework.transaction.TransactionStatus;
 import org.springframework.transaction.support.TransactionCallback;
 import org.springframework.transaction.support.TransactionTemplate;
 
-@RunWith(JUnit4ClassRunner.class)
+@RunWith(JUnit4.class)
 public class StoredprocedureItemReaderConfigTests {
 
 	/*

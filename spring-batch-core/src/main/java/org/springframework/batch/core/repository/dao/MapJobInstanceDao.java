@@ -17,7 +17,6 @@
 package org.springframework.batch.core.repository.dao;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;

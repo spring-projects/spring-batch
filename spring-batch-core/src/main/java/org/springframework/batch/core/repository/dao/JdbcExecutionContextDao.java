@@ -190,7 +190,7 @@ public class JdbcExecutionContextDao extends AbstractJdbcBatchMetadataDao implem
 			longContext = null;
 		}
 
-		getJdbcTemplate().getJdbcOperations().update(getQuery(sql), new PreparedStatementSetter() {
+		getJdbcTemplate().update(getQuery(sql), new PreparedStatementSetter() {
 			public void setValues(PreparedStatement ps) throws SQLException {
 				ps.setString(1, shortContext);
 				if (longContext != null) {

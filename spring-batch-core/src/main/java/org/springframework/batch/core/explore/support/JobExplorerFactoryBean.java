@@ -30,8 +30,8 @@ import org.springframework.batch.core.repository.dao.StepExecutionDao;
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.beans.factory.FactoryBean;
 import org.springframework.beans.factory.InitializingBean;
-import org.springframework.jdbc.core.simple.SimpleJdbcOperations;
-import org.springframework.jdbc.core.simple.SimpleJdbcTemplate;
+import org.springframework.jdbc.core.JdbcOperations;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.incrementer.AbstractDataFieldMaxValueIncrementer;
 import org.springframework.jdbc.support.incrementer.DataFieldMaxValueIncrementer;
 import org.springframework.jdbc.support.lob.LobHandler;
@@ -50,7 +50,7 @@ public class JobExplorerFactoryBean extends AbstractJobExplorerFactoryBean
 
 	private DataSource dataSource;
 
-	private SimpleJdbcOperations jdbcTemplate;
+	private JdbcOperations jdbcTemplate;
 
 	private String tablePrefix = AbstractJdbcBatchMetadataDao.DEFAULT_TABLE_PREFIX;
 
@@ -96,7 +96,7 @@ public class JobExplorerFactoryBean extends AbstractJobExplorerFactoryBean
 
 		Assert.notNull(dataSource, "DataSource must not be null.");
 
-		jdbcTemplate = new SimpleJdbcTemplate(dataSource);
+		jdbcTemplate = new JdbcTemplate(dataSource);
 
 	}
 

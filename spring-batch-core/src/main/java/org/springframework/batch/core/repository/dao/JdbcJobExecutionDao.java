@@ -135,7 +135,7 @@ public class JdbcJobExecutionDao extends AbstractJdbcBatchMetadataDao implements
 				jobExecution.getStartTime(), jobExecution.getEndTime(), jobExecution.getStatus().toString(),
 				jobExecution.getExitStatus().getExitCode(), jobExecution.getExitStatus().getExitDescription(),
 				jobExecution.getVersion(), jobExecution.getCreateTime(), jobExecution.getLastUpdated() };
-		getJdbcTemplate().getJdbcOperations().update(
+		getJdbcTemplate().update(
 				getQuery(SAVE_JOB_EXECUTION),
 				parameters,
 				new int[] { Types.BIGINT, Types.BIGINT, Types.TIMESTAMP, Types.TIMESTAMP, Types.VARCHAR,
@@ -197,7 +197,7 @@ public class JdbcJobExecutionDao extends AbstractJdbcBatchMetadataDao implements
 				throw new NoSuchObjectException("Invalid JobExecution, ID " + jobExecution.getId() + " not found.");
 			}
 
-			int count = getJdbcTemplate().getJdbcOperations().update(
+			int count = getJdbcTemplate().update(
 					getQuery(UPDATE_JOB_EXECUTION),
 					parameters,
 					new int[] { Types.TIMESTAMP, Types.TIMESTAMP, Types.VARCHAR, Types.VARCHAR, Types.VARCHAR,
@@ -265,8 +265,7 @@ public class JdbcJobExecutionDao extends AbstractJdbcBatchMetadataDao implements
 				result.add(mapper.mapRow(rs, 0));
 			}
 		};
-		getJdbcTemplate().getJdbcOperations()
-				.query(getQuery(GET_RUNNING_EXECUTIONS), new Object[] { jobName }, handler);
+		getJdbcTemplate().query(getQuery(GET_RUNNING_EXECUTIONS), new Object[] { jobName }, handler);
 
 		return result;
 	}

@@ -9,7 +9,7 @@ import javax.xml.stream.events.Attribute;
 import javax.xml.stream.events.StartElement;
 import javax.xml.transform.Source;
 
-import org.junit.internal.runners.JUnit4ClassRunner;
+import org.junit.runners.JUnit4;
 import org.junit.runner.RunWith;
 import org.springframework.batch.item.AbstractItemStreamItemReaderTests;
 import org.springframework.batch.item.ExecutionContext;
@@ -19,7 +19,7 @@ import org.springframework.core.io.ByteArrayResource;
 import org.springframework.oxm.Unmarshaller;
 import org.springframework.oxm.XmlMappingException;
 
-@RunWith(JUnit4ClassRunner.class)
+@RunWith(JUnit4.class)
 public class StaxEventItemReaderCommonTests extends AbstractItemStreamItemReaderTests {
 
 	private final static String FOOS = "<foos> <foo value=\"1\"/> <foo value=\"2\"/> <foo value=\"3\"/> <foo value=\"4\"/> <foo value=\"5\"/> </foos>";

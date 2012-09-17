@@ -1,6 +1,6 @@
 package org.springframework.batch.item.database;
 
-import org.junit.internal.runners.JUnit4ClassRunner;
+import org.junit.runners.JUnit4;
 import org.junit.runner.RunWith;
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.item.ItemReader;
@@ -10,7 +10,7 @@ import org.springframework.orm.ibatis.SqlMapClientFactoryBean;
 
 import com.ibatis.sqlmap.client.SqlMapClient;
 
-@RunWith(JUnit4ClassRunner.class)
+@RunWith(JUnit4.class)
 public class IbatisPagingItemReaderCommonTests extends AbstractDatabaseItemStreamItemReaderTests {
 	
 	protected ItemReader<Foo> getItemReader() throws Exception {

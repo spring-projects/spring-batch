@@ -14,7 +14,7 @@ import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
-import org.springframework.jdbc.core.simple.SimpleJdbcTemplate;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
@@ -23,7 +23,7 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 public class SampleStepTests implements ApplicationContextAware {
 
 	@Autowired
-	private SimpleJdbcTemplate jdbcTemplate;
+	private JdbcTemplate jdbcTemplate;
 
 	private StepRunner stepRunner;
 

@@ -7,7 +7,7 @@ import static org.junit.Assert.assertNull;
 import java.util.Date;
 
 import org.junit.Test;
-import org.junit.internal.runners.JUnit4ClassRunner;
+import org.junit.runners.JUnit4;
 import org.junit.runner.RunWith;
 import org.springframework.batch.core.BatchStatus;
 import org.springframework.batch.core.JobExecution;
@@ -15,7 +15,7 @@ import org.springframework.batch.core.StepExecution;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.repository.support.SimpleJobRepository;
 
-@RunWith(JUnit4ClassRunner.class)
+@RunWith(JUnit4.class)
 public class MapStepExecutionDaoTests extends AbstractStepExecutionDaoTests {
 
 	protected StepExecutionDao getStepExecutionDao() {

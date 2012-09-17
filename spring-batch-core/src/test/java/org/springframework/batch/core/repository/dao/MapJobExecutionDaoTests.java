@@ -1,29 +1,24 @@
 package org.springframework.batch.core.repository.dao;
 
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
-import java.util.concurrent.CopyOnWriteArraySet;
 import java.util.concurrent.CountDownLatch;
 
 import java.util.concurrent.atomic.AtomicReference;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.junit.internal.runners.JUnit4ClassRunner;
+import org.junit.runners.JUnit4;
 import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.JobInstance;
 import org.springframework.batch.core.JobParameters;
 
 import static org.junit.Assert.*;
 
-@RunWith(JUnit4ClassRunner.class)
+@RunWith(JUnit4.class)
 public class MapJobExecutionDaoTests extends AbstractJobExecutionDaoTests {
 
 	@Override

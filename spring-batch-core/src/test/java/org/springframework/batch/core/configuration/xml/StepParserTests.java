@@ -53,11 +53,9 @@ import org.springframework.batch.retry.RetryListener;
 import org.springframework.batch.retry.listener.RetryListenerSupport;
 import org.springframework.batch.support.transaction.ResourcelessTransactionManager;
 import org.springframework.beans.factory.parsing.BeanDefinitionParsingException;
-import org.springframework.beans.factory.xml.XmlBeanFactory;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
-import org.springframework.core.io.ClassPathResource;
 import org.springframework.dao.DeadlockLoserDataAccessException;
 import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.transaction.PlatformTransactionManager;
@@ -150,14 +148,14 @@ public class StepParserTests {
 
 	@Test(expected = BeanDefinitionParsingException.class)
 	public void testTaskletStepWithBadStepListener() throws Exception {
-		String contextLocation = "org/springframework/batch/core/configuration/xml/StepParserBadStepListenerTests-context.xml";
-		new XmlBeanFactory(new ClassPathResource(contextLocation));
+		new ClassPathXmlApplicationContext(
+				"org/springframework/batch/core/configuration/xml/StepParserBadStepListenerTests-context.xml");
 	}
 
 	@Test(expected = BeanDefinitionParsingException.class)
 	public void testTaskletStepWithBadRetryListener() throws Exception {
-		String contextLocation = "org/springframework/batch/core/configuration/xml/StepParserBadRetryListenerTests-context.xml";
-		new XmlBeanFactory(new ClassPathResource(contextLocation));
+		new ClassPathXmlApplicationContext(
+				"org/springframework/batch/core/configuration/xml/StepParserBadRetryListenerTests-context.xml");
 	}
 
 	@Test

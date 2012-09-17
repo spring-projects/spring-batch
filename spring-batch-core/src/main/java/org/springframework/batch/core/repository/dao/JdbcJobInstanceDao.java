@@ -114,7 +114,7 @@ public class JdbcJobInstanceDao extends AbstractJdbcBatchMetadataDao implements
 
 		Object[] parameters = new Object[] { jobId, jobName,
 				createJobKey(jobParameters), jobInstance.getVersion() };
-		getJdbcTemplate().getJdbcOperations().update(
+		getJdbcTemplate().update(
 				getQuery(CREATE_JOB_INSTANCE),
 				parameters,
 				new int[] { Types.BIGINT, Types.VARCHAR, Types.VARCHAR,
@@ -195,8 +195,7 @@ public class JdbcJobInstanceDao extends AbstractJdbcBatchMetadataDao implements
 			args = new Object[] { jobId, key, type, "", value, 0L, 0D };
 		}
 
-		getJdbcTemplate().getJdbcOperations().update(
-				getQuery(CREATE_JOB_PARAMETERS), args, argTypes);
+		getJdbcTemplate().update(getQuery(CREATE_JOB_PARAMETERS), args, argTypes);
 	}
 
 	/**
@@ -277,9 +276,7 @@ public class JdbcJobInstanceDao extends AbstractJdbcBatchMetadataDao implements
 				map.put(rs.getString(2), value);
 			}
 		};
-		getJdbcTemplate().getJdbcOperations().query(
-				getQuery(FIND_PARAMS_FROM_ID), new Object[] { instanceId },
-				handler);
+		getJdbcTemplate().query(getQuery(FIND_PARAMS_FROM_ID), new Object[] { instanceId }, handler);
 		return new JobParameters(map);
 	}
 
@@ -330,8 +327,7 @@ public class JdbcJobInstanceDao extends AbstractJdbcBatchMetadataDao implements
 		};
 
 		@SuppressWarnings("unchecked")
-		List<JobInstance> result = (List<JobInstance>) getJdbcTemplate()
-				.getJdbcOperations().query(getQuery(FIND_LAST_JOBS_BY_NAME),
+		List<JobInstance> result = (List<JobInstance>) getJdbcTemplate().query(getQuery(FIND_LAST_JOBS_BY_NAME),
 						new Object[] { jobName }, extractor);
 
 		return result;

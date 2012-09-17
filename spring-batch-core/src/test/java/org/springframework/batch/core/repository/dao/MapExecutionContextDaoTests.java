@@ -3,8 +3,7 @@ package org.springframework.batch.core.repository.dao;
 import static org.junit.Assert.*;
 
 import org.junit.Test;
-import org.junit.Ignore;
-import org.junit.internal.runners.JUnit4ClassRunner;
+import org.junit.runners.JUnit4;
 import org.junit.runner.RunWith;
 import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.StepExecution;
@@ -13,7 +12,7 @@ import org.springframework.batch.item.ExecutionContext;
 /**
  * Tests for {@link MapExecutionContextDao}.
  */
-@RunWith(JUnit4ClassRunner.class)
+@RunWith(JUnit4.class)
 public class MapExecutionContextDaoTests extends AbstractExecutionContextDaoTests {
 
 	@Override
