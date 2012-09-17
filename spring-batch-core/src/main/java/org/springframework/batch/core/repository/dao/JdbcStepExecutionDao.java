@@ -123,7 +123,7 @@ public class JdbcStepExecutionDao extends AbstractJdbcBatchMetadataDao implement
 				stepExecution.getExitStatus().getExitCode(), exitDescription, stepExecution.getReadSkipCount(),
 				stepExecution.getWriteSkipCount(), stepExecution.getProcessSkipCount(),
 				stepExecution.getRollbackCount(), stepExecution.getLastUpdated() };
-		getJdbcTemplate().getJdbcOperations().update(
+		getJdbcTemplate().update(
 				getQuery(SAVE_STEP_EXECUTION),
 				parameters,
 				new int[] { Types.BIGINT, Types.INTEGER, Types.VARCHAR, Types.BIGINT, Types.TIMESTAMP,
@@ -136,7 +136,6 @@ public class JdbcStepExecutionDao extends AbstractJdbcBatchMetadataDao implement
 	 * Validate StepExecution. At a minimum, JobId, StartTime, and Status cannot
 	 * be null. EndTime can be null for an unfinished job.
 	 * 
-	 * @param value
 	 * @throws IllegalArgumentException
 	 */
 	private void validateStepExecution(StepExecution stepExecution) {
@@ -169,8 +168,7 @@ public class JdbcStepExecutionDao extends AbstractJdbcBatchMetadataDao implement
 					stepExecution.getReadSkipCount(), stepExecution.getProcessSkipCount(),
 					stepExecution.getWriteSkipCount(), stepExecution.getRollbackCount(),
 					stepExecution.getLastUpdated(), stepExecution.getId(), stepExecution.getVersion() };
-			int count = getJdbcTemplate().getJdbcOperations()
-					.update(
+			int count = getJdbcTemplate().update(
 							getQuery(UPDATE_STEP_EXECUTION),
 							parameters,
 							new int[] { Types.TIMESTAMP, Types.TIMESTAMP, Types.VARCHAR, Types.INTEGER, Types.INTEGER,
@@ -194,7 +192,7 @@ public class JdbcStepExecutionDao extends AbstractJdbcBatchMetadataDao implement
 
 	/**
 	 * Truncate the exit description if the length exceeds
-	 * {@link #EXIT_MESSAGE_LENGTH}.
+	 * {@link #DEFAULT_EXIT_MESSAGE_LENGTH}.
 	 * @param description the string to truncate
 	 * @return truncated description
 	 */

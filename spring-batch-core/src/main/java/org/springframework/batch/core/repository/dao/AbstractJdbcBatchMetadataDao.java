@@ -19,7 +19,7 @@ package org.springframework.batch.core.repository.dao;
 import java.sql.Types;
 
 import org.springframework.beans.factory.InitializingBean;
-import org.springframework.jdbc.core.simple.SimpleJdbcOperations;
+import org.springframework.jdbc.core.JdbcOperations;
 import org.springframework.util.Assert;
 import org.springframework.util.StringUtils;
 
@@ -42,7 +42,7 @@ public abstract class AbstractJdbcBatchMetadataDao implements InitializingBean {
 	
 	private int clobTypeToUse = Types.CLOB;
 
-	private SimpleJdbcOperations jdbcTemplate;
+	private JdbcOperations jdbcTemplate;
 
 	protected String getQuery(String base) {
 		return StringUtils.replace(base, "%PREFIX%", tablePrefix);
@@ -63,11 +63,11 @@ public abstract class AbstractJdbcBatchMetadataDao implements InitializingBean {
 		this.tablePrefix = tablePrefix;
 	}
 
-	public void setJdbcTemplate(SimpleJdbcOperations jdbcTemplate) {
+	public void setJdbcTemplate(JdbcOperations jdbcTemplate) {
 		this.jdbcTemplate = jdbcTemplate;
 	}
 
-	protected SimpleJdbcOperations getJdbcTemplate() {
+	protected JdbcOperations getJdbcTemplate() {
 		return jdbcTemplate;
 	}
 	

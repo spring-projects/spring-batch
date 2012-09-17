@@ -31,7 +31,7 @@ import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.UncategorizedSQLException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.PreparedStatementCallback;
-import org.springframework.jdbc.core.simple.SimpleJdbcTemplate;
+import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 
 /**
  * @author Dave Syer
@@ -62,7 +62,7 @@ public class JdbcBatchItemWriterClassicTests {
 			}
 		};
 		writer.setSql("SQL");
-		writer.setSimpleJdbcTemplate(new SimpleJdbcTemplate(jdbcTemplate));
+		writer.setJdbcTemplate(new NamedParameterJdbcTemplate(jdbcTemplate));
 		writer.setItemPreparedStatementSetter(new ItemPreparedStatementSetter<String>() {
 			public void setValues(String item, PreparedStatement ps) throws SQLException {
 				list.add(item);
@@ -70,11 +70,6 @@ public class JdbcBatchItemWriterClassicTests {
 		});
 		writer.afterPropertiesSet();
 	}
-
-//	@After
-//	public void tearDown() throws Exception {
-//		RepeatSynchronizationManager.clear();
-//	}
 
 	/**
 	 * Test method for
@@ -92,9 +87,9 @@ public class JdbcBatchItemWriterClassicTests {
 		catch (IllegalArgumentException e) {
 			// expected
 			String message = e.getMessage();
-			assertTrue("Message does not contain 'SimpleJdbcTemplate'.", message.indexOf("SimpleJdbcTemplate") >= 0);
+			assertTrue("Message does not contain ' NamedParameterJdbcTemplate'.", message.indexOf("NamedParameterJdbcTemplate") >= 0);
 		}
-		writer.setSimpleJdbcTemplate(new SimpleJdbcTemplate(jdbcTemplate));
+		writer.setJdbcTemplate(new NamedParameterJdbcTemplate(jdbcTemplate));
 		try {
 			writer.afterPropertiesSet();
 			fail("Expected IllegalArgumentException");

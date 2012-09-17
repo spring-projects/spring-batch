@@ -5,9 +5,9 @@ import java.sql.SQLException;
 
 import org.springframework.batch.item.sample.Foo;
 import org.springframework.jdbc.core.RowMapper;
-import org.springframework.jdbc.core.simple.SimpleJdbcDaoSupport;
+import org.springframework.jdbc.core.support.JdbcDaoSupport;
 
-public class SingleKeyFooDao extends SimpleJdbcDaoSupport implements FooDao {
+public class SingleKeyFooDao extends JdbcDaoSupport implements FooDao {
 
 	public Foo getFoo(Object key){
 

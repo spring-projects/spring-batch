@@ -10,7 +10,7 @@ import javax.xml.transform.Source;
 
 import junit.framework.Assert;
 
-import org.junit.internal.runners.JUnit4ClassRunner;
+import org.junit.runners.JUnit4;
 import org.junit.runner.RunWith;
 import org.springframework.batch.item.AbstractItemStreamItemReaderTests;
 import org.springframework.batch.item.ExecutionContext;
@@ -23,7 +23,7 @@ import org.springframework.core.io.Resource;
 import org.springframework.oxm.Unmarshaller;
 import org.springframework.oxm.XmlMappingException;
 
-@RunWith(JUnit4ClassRunner.class)
+@RunWith(JUnit4.class)
 public class MultiResourceItemReaderXmlTests extends AbstractItemStreamItemReaderTests {
 
 	protected ItemReader<Foo> getItemReader() throws Exception {
