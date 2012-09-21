@@ -15,8 +15,7 @@
  */
 package org.springframework.batch.core.configuration.xml;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
+import java.lang.reflect.Field;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -29,11 +28,16 @@ import org.springframework.batch.core.Step;
 import org.springframework.batch.core.job.flow.FlowJob;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.repository.support.MapJobRepositoryFactoryBean;
+import org.springframework.batch.core.step.tasklet.TaskletStep;
+import org.springframework.batch.test.namespace.config.DummyNamespaceHandler;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.util.ReflectionTestUtils;
+import org.springframework.util.ReflectionUtils;
+
+import static org.junit.Assert.*;
 
 
 /**
@@ -51,6 +55,15 @@ public class TaskletParserBeanPropertiesTests {
 	@Autowired
 	@Qualifier("job2")
 	private FlowJob job2;
+
+	@Autowired
+	@Qualifier("job3")
+	private Job job3;
+
+
+	@Autowired
+	@Qualifier("job4")
+	private Job job4;
 
 	@Autowired
 	@Qualifier("tasklet")
@@ -84,6 +97,34 @@ public class TaskletParserBeanPropertiesTests {
 		Step step = job2.getStep("step2");
 		tasklet = (TestTasklet) ReflectionTestUtils.getField(step, "tasklet");
 		 assertEquals("foo", tasklet.getName());
+		assertEquals(BatchStatus.COMPLETED, jobExecution.getStatus());
+	}
+
+	@Test
+	public void testTasklet3() throws Exception {
+		assertNotNull(job3);
+		JobExecution jobExecution = jobRepository.createJobExecution(job3.getName(), new JobParameters());
+		job3.execute(jobExecution);
+		assertEquals(FlowJob.class, job3.getClass());
+		Step step = ((FlowJob) job3).getStep("step3");
+		Field field = ReflectionUtils.findField(TaskletStep.class, "tasklet");
+		ReflectionUtils.makeAccessible(field);
+		TestTasklet tasklet = (TestTasklet) ReflectionUtils.getField(field, step);
+		assertEquals("foobar", tasklet.getName());
+		assertEquals(BatchStatus.COMPLETED, jobExecution.getStatus());
+	}
+
+	@Test
+	public void testCustomNestedTasklet() throws Exception {
+		assertNotNull(job4);
+		JobExecution jobExecution = jobRepository.createJobExecution(job4.getName(), new JobParameters());
+		job4.execute(jobExecution);
+		assertEquals(FlowJob.class, job4.getClass());
+		Step step = ((FlowJob) job4).getStep("step4");
+		Field field = ReflectionUtils.findField(TaskletStep.class, "tasklet");
+		ReflectionUtils.makeAccessible(field);
+		TestTasklet tasklet = (TestTasklet) ReflectionUtils.getField(field, step);
+		assertEquals(DummyNamespaceHandler.LABEL, tasklet.getName());
 		assertEquals(BatchStatus.COMPLETED, jobExecution.getStatus());
 	}
 }

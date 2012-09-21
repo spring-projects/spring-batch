@@ -15,9 +15,9 @@
  */
 package org.springframework.batch.core.configuration.xml;
 
-import java.util.List;
-
 import org.springframework.batch.core.listener.StepListenerMetaData;
+import org.springframework.batch.core.step.item.ForceRollbackForWriteSkipException;
+import org.springframework.batch.repeat.policy.SimpleCompletionPolicy;
 import org.springframework.beans.MutablePropertyValues;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.config.BeanDefinitionHolder;
@@ -25,6 +25,7 @@ import org.springframework.beans.factory.config.RuntimeBeanReference;
 import org.springframework.beans.factory.config.TypedStringValue;
 import org.springframework.beans.factory.parsing.CompositeComponentDefinition;
 import org.springframework.beans.factory.support.AbstractBeanDefinition;
+import org.springframework.beans.factory.support.BeanDefinitionBuilder;
 import org.springframework.beans.factory.support.GenericBeanDefinition;
 import org.springframework.beans.factory.support.ManagedList;
 import org.springframework.beans.factory.support.ManagedMap;
@@ -32,6 +33,8 @@ import org.springframework.beans.factory.xml.ParserContext;
 import org.springframework.util.StringUtils;
 import org.springframework.util.xml.DomUtils;
 import org.w3c.dom.Element;
+
+import java.util.List;
 
 /**
  * Internal parser for the &lt;chunk/&gt; element inside a step.
@@ -59,7 +62,8 @@ public class ChunkElementParser {
 
 	private static final String ITEM_WRITER_ADAPTER_CLASS = "org.springframework.batch.item.adapter.ItemWriterAdapter";
 
-	private static final StepListenerParser stepListenerParser = new StepListenerParser(StepListenerMetaData.itemListenerMetaData());
+	private static final StepListenerParser stepListenerParser = new StepListenerParser(
+			StepListenerMetaData.itemListenerMetaData());
 
 	/**
 	 * @param element
@@ -71,16 +75,26 @@ public class ChunkElementParser {
 
 		propertyValues.addPropertyValue("hasChunkElement", Boolean.TRUE);
 
-		handleItemHandler("reader", "itemReader", ITEM_READER_ADAPTER_CLASS, true, element, parserContext,
+		handleItemHandler(bd, "reader", "itemReader", ITEM_READER_ADAPTER_CLASS, true, element, parserContext,
 				propertyValues, underspecified);
-		handleItemHandler("processor", "itemProcessor", ITEM_PROCESSOR_ADAPTER_CLASS, false, element, parserContext,
+		handleItemHandler(bd, "processor", "itemProcessor", ITEM_PROCESSOR_ADAPTER_CLASS, false, element, parserContext,
 				propertyValues, underspecified);
-		handleItemHandler("writer", "itemWriter", ITEM_WRITER_ADAPTER_CLASS, true, element, parserContext,
+		handleItemHandler(bd, "writer", "itemWriter", ITEM_WRITER_ADAPTER_CLASS, true, element, parserContext,
 				propertyValues, underspecified);
 
 		String commitInterval = element.getAttribute(COMMIT_INTERVAL_ATTR);
 		if (StringUtils.hasText(commitInterval)) {
-			propertyValues.addPropertyValue("commitInterval", commitInterval);
+			if (commitInterval.startsWith("#")) {
+				// It's a late binding expression, so we need step scope...
+				BeanDefinitionBuilder completionPolicy = BeanDefinitionBuilder
+						.genericBeanDefinition(SimpleCompletionPolicy.class);
+				completionPolicy.addConstructorArgValue(commitInterval);
+				completionPolicy.setScope("step");
+				propertyValues.addPropertyValue("chunkCompletionPolicy", completionPolicy.getBeanDefinition());
+			}
+			else {
+				propertyValues.addPropertyValue("commitInterval", commitInterval);
+			}
 		}
 
 		String completionPolicyRef = element.getAttribute(CHUNK_COMPLETION_POLICY_ATTR);
@@ -105,20 +119,40 @@ public class ChunkElementParser {
 		}
 
 		String skipLimit = element.getAttribute("skip-limit");
+		ManagedMap skippableExceptions = handleExceptionElement(element, parserContext, "skippable-exception-classes");
 		if (StringUtils.hasText(skipLimit)) {
+			if (skippableExceptions == null) {
+				skippableExceptions = new ManagedMap();
+				skippableExceptions.setMergeEnabled(true);
+			}
 			propertyValues.addPropertyValue("skipLimit", skipLimit);
 		}
+		if (skippableExceptions != null) {
+			// Even if there is no retryLimit, we can still accept exception
+			// classes for an abstract parent bean definition
+			propertyValues.addPropertyValue("skippableExceptionClasses", skippableExceptions);
+		}
 
-		handleItemHandler("skip-policy", "skipPolicy", null, false, element, parserContext, propertyValues,
-				underspecified);
-
-		handleItemHandler("retry-policy", "retryPolicy", null, false, element, parserContext, propertyValues,
+		handleItemHandler(bd, "skip-policy", "skipPolicy", null, false, element, parserContext, propertyValues,
 				underspecified);
 
 		String retryLimit = element.getAttribute("retry-limit");
+		ManagedMap retryableExceptions = handleExceptionElement(element, parserContext, "retryable-exception-classes");
 		if (StringUtils.hasText(retryLimit)) {
+			if (retryableExceptions == null) {
+				retryableExceptions = new ManagedMap();
+				retryableExceptions.setMergeEnabled(true);
+			}
 			propertyValues.addPropertyValue("retryLimit", retryLimit);
 		}
+		if (retryableExceptions != null) {
+			// Even if there is no retryLimit, we can still accept exception
+			// classes for an abstract parent bean definition
+			propertyValues.addPropertyValue("retryableExceptionClasses", retryableExceptions);
+		}
+
+		handleItemHandler(bd, "retry-policy", "retryPolicy", null, false, element, parserContext, propertyValues,
+				underspecified);
 
 		String cacheCapacity = element.getAttribute("cache-capacity");
 		if (StringUtils.hasText(cacheCapacity)) {
@@ -135,16 +169,10 @@ public class ChunkElementParser {
 			propertyValues.addPropertyValue("processorTransactional", isProcessorTransactional);
 		}
 
-		handleExceptionElement(element, parserContext, propertyValues, "skippable-exception-classes",
-				"skippableExceptionClasses");
-
-		handleExceptionElement(element, parserContext, propertyValues, "retryable-exception-classes",
-				"retryableExceptionClasses");
-
 		handleRetryListenersElement(element, propertyValues, parserContext, bd);
 
 		handleStreamsElement(element, propertyValues, parserContext);
-		
+
 		stepListenerParser.handleListenersElement(element, bd, parserContext);
 
 	}
@@ -152,7 +180,7 @@ public class ChunkElementParser {
 	/**
 	 * Handle the ItemReader, ItemProcessor, and ItemWriter attributes/elements.
 	 */
-	private void handleItemHandler(String handlerName, String propertyName, String adapterClassName, boolean required,
+	private void handleItemHandler(AbstractBeanDefinition enclosing, String handlerName, String propertyName, String adapterClassName, boolean required,
 			Element element, ParserContext parserContext, MutablePropertyValues propertyValues, boolean underspecified) {
 		String refName = element.getAttribute(handlerName);
 		@SuppressWarnings("unchecked")
@@ -163,7 +191,7 @@ public class ChunkElementParser {
 						"The <" + element.getNodeName() + "/> element may not have both a '" + handlerName
 								+ "' attribute and a <" + handlerName + "/> element.", element);
 			}
-			handleItemHandlerElement(propertyName, adapterClassName, propertyValues, children.get(0), parserContext);
+			handleItemHandlerElement(enclosing, propertyName, adapterClassName, propertyValues, children.get(0), parserContext);
 		}
 		else if (children.size() > 1) {
 			parserContext.getReaderContext().error(
@@ -185,7 +213,7 @@ public class ChunkElementParser {
 	 * is defined within the item handler.
 	 */
 	@SuppressWarnings("unchecked")
-	private void handleItemHandlerElement(String propertyName, String adapterClassName,
+	private void handleItemHandlerElement(AbstractBeanDefinition enclosing, String propertyName, String adapterClassName,
 			MutablePropertyValues propertyValues, Element element, ParserContext parserContext) {
 		List<Element> beanElements = DomUtils.getChildElementsByTagName(element, BEAN_ELE);
 		List<Element> refElements = DomUtils.getChildElementsByTagName(element, REF_ELE);
@@ -197,13 +225,14 @@ public class ChunkElementParser {
 		else if (beanElements.size() == 1) {
 			Element beanElement = beanElements.get(0);
 			BeanDefinitionHolder beanDefinitionHolder = parserContext.getDelegate().parseBeanDefinitionElement(
-					beanElement);
+					beanElement, enclosing);
 			parserContext.getDelegate().decorateBeanDefinitionIfRequired(beanElement, beanDefinitionHolder);
+
 			propertyValues.addPropertyValue(propertyName, beanDefinitionHolder);
 		}
 		else if (refElements.size() == 1) {
-			propertyValues.addPropertyValue(propertyName, parserContext.getDelegate().parsePropertySubElement(
-					refElements.get(0), null));
+			propertyValues.addPropertyValue(propertyName,
+					parserContext.getDelegate().parsePropertySubElement(refElements.get(0), null));
 		}
 
 		handleAdapterMethodAttribute(propertyName, adapterClassName, propertyValues, element);
@@ -251,7 +280,8 @@ public class ChunkElementParser {
 	}
 
 	@SuppressWarnings("unchecked")
-	private void handleRetryListenerElements(ParserContext parserContext, Element element, ManagedList beans, BeanDefinition enclosing) {
+	private void handleRetryListenerElements(ParserContext parserContext, Element element, ManagedList beans,
+			BeanDefinition enclosing) {
 		List<Element> listenerElements = DomUtils.getChildElementsByTagName(element, "listener");
 		if (listenerElements != null) {
 			for (Element listenerElement : listenerElements) {
@@ -285,23 +315,24 @@ public class ChunkElementParser {
 	}
 
 	@SuppressWarnings("unchecked")
-	private void handleExceptionElement(Element element, ParserContext parserContext,
-			MutablePropertyValues propertyValues, String exceptionListName, String propertyName) {
+	private ManagedMap handleExceptionElement(Element element, ParserContext parserContext, String exceptionListName) {
 		List<Element> children = DomUtils.getChildElementsByTagName(element, exceptionListName);
 		if (children.size() == 1) {
-			Element exceptionClassesElement = children.get(0);
 			ManagedMap map = new ManagedMap();
+			Element exceptionClassesElement = children.get(0);
 			map.setMergeEnabled(exceptionClassesElement.hasAttribute(MERGE_ATTR)
 					&& Boolean.valueOf(exceptionClassesElement.getAttribute(MERGE_ATTR)));
 			addExceptionClasses("include", true, exceptionClassesElement, map, parserContext);
 			addExceptionClasses("exclude", false, exceptionClassesElement, map, parserContext);
-			propertyValues.addPropertyValue(propertyName, map);
+			map.put(ForceRollbackForWriteSkipException.class, true);
+			return map;
 		}
 		else if (children.size() > 1) {
 			parserContext.getReaderContext().error(
 					"The <" + exceptionListName + "/> element may not appear more than once in a single <"
 							+ element.getNodeName() + "/>.", element);
 		}
+		return null;
 	}
 
 	@SuppressWarnings("unchecked")

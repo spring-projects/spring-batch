@@ -1,18 +1,27 @@
 package org.springframework.batch.item.database;
 
-import static org.easymock.EasyMock.*;
-import static org.junit.Assert.*;
+import static org.easymock.EasyMock.createMock;
+import static org.easymock.EasyMock.expect;
+import static org.easymock.EasyMock.replay;
+import static org.easymock.EasyMock.verify;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotSame;
+import static org.junit.Assert.assertSame;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 import java.io.PrintWriter;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.logging.Logger;
 
 import javax.sql.DataSource;
 
 import org.junit.Test;
-import org.junit.internal.runners.JUnit4ClassRunner;
+import org.junit.runners.JUnit4;
 import org.junit.runner.RunWith;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.datasource.DataSourceTransactionManager;
@@ -24,7 +33,7 @@ import org.springframework.transaction.TransactionStatus;
 import org.springframework.transaction.support.TransactionCallback;
 import org.springframework.transaction.support.TransactionTemplate;
 
-@RunWith(JUnit4ClassRunner.class)
+@RunWith(JUnit4.class)
 public class ExtendedConnectionDataSourceProxyTests {
 
 	@Test
@@ -329,6 +338,15 @@ public class ExtendedConnectionDataSourceProxyTests {
 				return (T) this;
 			}
 			throw new SQLException(UNWRAP_ERROR_MESSAGE);
+		}
+
+		/**
+		 * Added due to JDK 7 compatibility, sadly a proper implementation
+		 * that would throw SqlFeatureNotSupportedException is not possible
+		 * in Java 5 (the class was added in Java 6).
+		 */
+		public Logger getParentLogger() {
+			throw new UnsupportedOperationException();
 		}
 
 	}

@@ -21,6 +21,7 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicReference;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -202,9 +203,11 @@ public class FaultTolerantChunkProcessor<I, O> extends SimpleChunkProcessor<I, O
 		final Iterator<O> cacheIterator = cache.isEmpty() ? null : new ArrayList<O>(cache.getItems()).iterator();
 		final AtomicInteger count = new AtomicInteger(0);
 
+		// final int scanLimit = processorTransactional && data.scanning() ? 1 :
+		// 0;
+
 		for (final Chunk<I>.ChunkIterator iterator = inputs.iterator(); iterator.hasNext();) {
 
-			final int scanLimit = processorTransactional ? 1 : 0;
 			final I item = iterator.next();
 
 			RetryCallback<O> retryCallback = new RetryCallback<O>() {
@@ -214,19 +217,12 @@ public class FaultTolerantChunkProcessor<I, O> extends SimpleChunkProcessor<I, O
 					try {
 						count.incrementAndGet();
 						O cached = (cacheIterator != null && cacheIterator.hasNext()) ? cacheIterator.next() : null;
-						if (cached != null && count.get() > scanLimit) {
-							/*
-							 * If there is a cached chunk then we must be
-							 * scanning for errors in the writer, in which case
-							 * only the first one will be written, and for the
-							 * rest we need to fill in the output from the
-							 * cache.
-							 */
+						if (cached != null && !processorTransactional) {
 							output = cached;
 						}
 						else {
 							output = doProcess(item);
-							if (!processorTransactional) {
+							if (!processorTransactional && !data.scanning()) {
 								cache.add(output);
 							}
 						}
@@ -294,6 +290,17 @@ public class FaultTolerantChunkProcessor<I, O> extends SimpleChunkProcessor<I, O
 				outputs.add(output);
 			}
 
+			/*
+			 * We only want to process the first item if there is a scan for a
+			 * failed item.
+			 */
+			if (data.scanning()) {
+				while (cacheIterator != null && cacheIterator.hasNext()) {
+					outputs.add(cacheIterator.next());
+				}
+				// Only process the first item if scanning
+				break;
+			}
 		}
 
 		return outputs;
@@ -304,10 +311,16 @@ public class FaultTolerantChunkProcessor<I, O> extends SimpleChunkProcessor<I, O
 	protected void write(final StepContribution contribution, final Chunk<I> inputs, final Chunk<O> outputs)
 			throws Exception {
 
+		@SuppressWarnings("unchecked")
+		final UserData<O> data = (UserData<O>) inputs.getUserData();
+		final AtomicReference<RetryContext> contextHolder = new AtomicReference<RetryContext>();
+
 		RetryCallback<Object> retryCallback = new RetryCallback<Object>() {
 			public Object doWithRetry(RetryContext context) throws Exception {
 
-				if (!inputs.isBusy()) {
+				contextHolder.set(context);
+
+				if (!data.scanning()) {
 					chunkMonitor.setChunkSize(inputs.size());
 					try {
 						doWrite(outputs.getItems());
@@ -328,7 +341,7 @@ public class FaultTolerantChunkProcessor<I, O> extends SimpleChunkProcessor<I, O
 					contribution.incrementWriteCount(outputs.size());
 				}
 				else {
-					scan(contribution, inputs, outputs, chunkMonitor);
+					scan(contribution, inputs, outputs, chunkMonitor, false);
 				}
 				return null;
 
@@ -353,7 +366,7 @@ public class FaultTolerantChunkProcessor<I, O> extends SimpleChunkProcessor<I, O
 						inputIterator.next();
 						outputIterator.next();
 
-						checkSkipPolicy(inputIterator, outputIterator, e, contribution);
+						checkSkipPolicy(inputIterator, outputIterator, e, contribution, true);
 						if (!rollbackClassifier.classify(e)) {
 							throw new RetryException(
 									"Invalid retry state during recovery caused by exception that does not classify for rollback: ",
@@ -390,7 +403,8 @@ public class FaultTolerantChunkProcessor<I, O> extends SimpleChunkProcessor<I, O
 					}
 
 					inputs.setBusy(true);
-					scan(contribution, inputs, outputs, chunkMonitor);
+					data.scanning(true);
+					scan(contribution, inputs, outputs, chunkMonitor, true);
 					return null;
 				}
 
@@ -399,8 +413,22 @@ public class FaultTolerantChunkProcessor<I, O> extends SimpleChunkProcessor<I, O
 			if (logger.isDebugEnabled()) {
 				logger.debug("Attempting to write: " + inputs);
 			}
-			batchRetryTemplate.execute(retryCallback, recoveryCallback, new DefaultRetryState(inputs,
-					rollbackClassifier));
+			try {
+				batchRetryTemplate.execute(retryCallback, recoveryCallback, new DefaultRetryState(inputs,
+						rollbackClassifier));
+			}
+			catch (Exception e) {
+				RetryContext context = contextHolder.get();
+				if (!batchRetryTemplate.canRetry(context)) {
+					/*
+					 * BATCH-1761: we need advance warning of the scan about to
+					 * start in the next transaction, so we can change the
+					 * processing behaviour.
+					 */
+					data.scanning(true);
+				}
+				throw e;
+			}
 
 		}
 
@@ -490,7 +518,7 @@ public class FaultTolerantChunkProcessor<I, O> extends SimpleChunkProcessor<I, O
 	}
 
 	private void checkSkipPolicy(Chunk<I>.ChunkIterator inputIterator, Chunk<O>.ChunkIterator outputIterator,
-			Throwable e, StepContribution contribution) {
+			Throwable e, StepContribution contribution, boolean recovery) throws Exception {
 		logger.debug("Checking skip policy after failed write");
 		if (shouldSkip(itemWriteSkipPolicy, e, contribution.getStepSkipCount())) {
 			contribution.incrementWriteSkipCount();
@@ -499,17 +527,40 @@ public class FaultTolerantChunkProcessor<I, O> extends SimpleChunkProcessor<I, O
 			logger.debug("Skipping after failed write", e);
 		}
 		else {
-			throw new RetryException("Non-skippable exception in recoverer", e);
+			if (recovery) {
+				// Only if already recovering should we check skip policy
+				throw new RetryException("Non-skippable exception in recoverer", e);
+			}
+			else {
+				if (e instanceof Exception) {
+					throw (Exception) e;
+				}
+				else if (e instanceof Error) {
+					throw (Error) e;
+				}
+				else {
+					throw new RetryException("Non-skippable throwable in recoverer", e);
+				}
+			}
 		}
 	}
 
 	private void scan(final StepContribution contribution, final Chunk<I> inputs, final Chunk<O> outputs,
-			ChunkMonitor chunkMonitor) throws Exception {
+			ChunkMonitor chunkMonitor, boolean recovery) throws Exception {
+
+		@SuppressWarnings("unchecked")
+		final UserData<O> data = (UserData<O>) inputs.getUserData();
 
 		if (logger.isDebugEnabled()) {
-			logger.debug("Scanning for failed item on write: " + inputs);
+			if (recovery) {
+				logger.debug("Scanning for failed item on recovery from write: " + inputs);
+			}
+			else {
+				logger.debug("Scanning for failed item on write: " + inputs);
+			}
 		}
 		if (outputs.isEmpty()) {
+			data.scanning(false);
 			inputs.setBusy(false);
 			return;
 		}
@@ -529,12 +580,13 @@ public class FaultTolerantChunkProcessor<I, O> extends SimpleChunkProcessor<I, O
 			outputIterator.remove();
 		}
 		catch (Exception e) {
+			doOnWriteError(e, items);
 			if (!shouldSkip(itemWriteSkipPolicy, e, -1) && !rollbackClassifier.classify(e)) {
 				inputIterator.remove();
 				outputIterator.remove();
 			}
 			else {
-				checkSkipPolicy(inputIterator, outputIterator, e, contribution);
+				checkSkipPolicy(inputIterator, outputIterator, e, contribution, recovery);
 			}
 			if (rollbackClassifier.classify(e)) {
 				throw e;
@@ -542,6 +594,7 @@ public class FaultTolerantChunkProcessor<I, O> extends SimpleChunkProcessor<I, O
 		}
 		chunkMonitor.incrementOffset();
 		if (outputs.isEmpty()) {
+			data.scanning(false);
 			inputs.setBusy(false);
 			chunkMonitor.resetOffset();
 		}
@@ -552,6 +605,16 @@ public class FaultTolerantChunkProcessor<I, O> extends SimpleChunkProcessor<I, O
 		private Chunk<O> outputs;
 
 		private int filterCount = 0;
+
+		private boolean scanning;
+
+		public boolean scanning() {
+			return scanning;
+		}
+
+		public void scanning(boolean scanning) {
+			this.scanning = scanning;
+		}
 
 		public void incrementFilterCount() {
 			filterCount++;

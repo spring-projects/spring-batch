@@ -29,8 +29,24 @@ package org.springframework.batch.core;
  * 
  */
 public class JobInterruptedException extends JobExecutionException {
+	
+	private BatchStatus status = BatchStatus.STOPPED;
 
 	public JobInterruptedException(String msg) {
 		super(msg);
+	}
+
+	public JobInterruptedException(String msg, BatchStatus status) {
+		super(msg);
+		this.status = status;
+	}
+	
+	/**
+	 * The desired status of the surrounding execution after the interruption.
+	 * 
+	 * @return the status of the interruption (default STOPPED)
+	 */
+	public BatchStatus getStatus() {
+		return status;
 	}
 }

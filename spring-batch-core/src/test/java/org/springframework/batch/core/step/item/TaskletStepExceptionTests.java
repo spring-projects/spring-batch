@@ -38,6 +38,7 @@ import org.springframework.batch.support.transaction.ResourcelessTransactionMana
 import org.springframework.transaction.TransactionException;
 import org.springframework.transaction.UnexpectedRollbackException;
 import org.springframework.transaction.support.DefaultTransactionStatus;
+import org.springframework.transaction.support.TransactionSynchronizationManager;
 
 /**
  * Tests for the behavior of TaskletStep in a failure scenario.
@@ -73,7 +74,6 @@ public class TaskletStepExceptionTests {
 
 	@Test
 	public void testApplicationException() throws Exception {
-
 		taskletStep.execute(stepExecution);
 		assertEquals(FAILED, stepExecution.getStatus());
 		assertEquals(FAILED.toString(), stepExecution.getExitStatus().getExitCode());
@@ -222,7 +222,9 @@ public class TaskletStepExceptionTests {
 		Throwable e = stepExecution.getFailureExceptions().get(0);
 		assertEquals("foo", e.getMessage());
 		assertEquals(0, stepExecution.getCommitCount());
-		assertEquals(1, stepExecution.getRollbackCount()); // Failed transaction counts as rollback 
+		assertEquals(1, stepExecution.getRollbackCount()); // Failed transaction
+															// counts as
+															// rollback
 		assertEquals(0, stepExecution.getExecutionContext().size());
 	}
 
@@ -251,7 +253,9 @@ public class TaskletStepExceptionTests {
 		Throwable e = stepExecution.getFailureExceptions().get(0);
 		assertEquals("bar", e.getMessage());
 		assertEquals(0, stepExecution.getCommitCount());
-		assertEquals(1, stepExecution.getRollbackCount()); // Failed transaction counts as rollback 
+		assertEquals(1, stepExecution.getRollbackCount()); // Failed transaction
+															// counts as
+															// rollback
 		assertEquals(0, stepExecution.getExecutionContext().size());
 	}
 
@@ -271,6 +275,26 @@ public class TaskletStepExceptionTests {
 		assertEquals(UNKNOWN, stepExecution.getStatus());
 		Throwable e = stepExecution.getFailureExceptions().get(0);
 		assertEquals("Expected exception in step execution context persistence", e.getMessage());
+
+	}
+
+	@Test
+	public void testRepositoryErrorOnExecutionContextInTransaction() throws Exception {
+
+		taskletStep.setTasklet(new Tasklet() {
+
+			public RepeatStatus execute(StepContribution contribution, ChunkContext attributes) throws Exception {
+				return RepeatStatus.FINISHED;
+			}
+
+		});
+
+		jobRepository.setFailOnUpdateExecutionContext(true);
+		jobRepository.setFailInTransaction(true);
+		taskletStep.execute(stepExecution);
+		assertEquals(UNKNOWN, stepExecution.getStatus());
+		Throwable e = stepExecution.getFailureExceptions().get(0);
+		assertEquals("JobRepository failure forcing exit with unknown status", e.getMessage());
 
 	}
 
@@ -358,12 +382,18 @@ public class TaskletStepExceptionTests {
 
 		private int failOnUpdateExecution = -1;
 
+		private boolean failInTransaction = false;
+
 		public void setFailOnUpdateExecutionContext(boolean failOnUpdate) {
 			this.failOnUpdateContext = failOnUpdate;
 		}
 
 		public void setFailOnUpdateStepExecution(int failOnUpdate) {
 			this.failOnUpdateExecution = failOnUpdate;
+		}
+
+		public void setFailInTransaction(boolean failInTransaction) {
+			this.failInTransaction = failInTransaction;
 		}
 
 		public void add(StepExecution stepExecution) {
@@ -390,7 +420,7 @@ public class TaskletStepExceptionTests {
 		}
 
 		public void update(StepExecution stepExecution) {
-			if (updateCount==failOnUpdateExecution) {
+			if (updateCount == failOnUpdateExecution) {
 				throw new RuntimeException("Expected exception in step execution persistence");
 			}
 			updateCount++;
@@ -398,7 +428,10 @@ public class TaskletStepExceptionTests {
 
 		public void updateExecutionContext(StepExecution stepExecution) {
 			if (failOnUpdateContext) {
-				throw new RuntimeException("Expected exception in step execution context persistence");
+				if (!failInTransaction
+						|| (failInTransaction && TransactionSynchronizationManager.isActualTransactionActive())) {
+					throw new RuntimeException("Expected exception in step execution context persistence");
+				}
 			}
 		}
 

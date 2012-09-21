@@ -227,7 +227,7 @@ public class RetryTemplate implements RetryOperations {
 			/*
 			 * We allow the whole loop to be skipped if the policy or context
 			 * already forbid the first try. This is used in the case of
-			 * external retry to allow a recovery in handleRetryExhausted
+			 * stateful retry to allow a recovery in handleRetryExhausted
 			 * without the callback processing (which would throw an exception).
 			 */
 			while (canRetry(retryPolicy, context) && !context.isExhaustedOnly()) {
@@ -245,7 +245,11 @@ public class RetryTemplate implements RetryOperations {
 
 					doOnErrorInterceptors(retryCallback, context, e);
 
-					registerThrowable(retryPolicy, state, context, e);
+					try {
+						registerThrowable(retryPolicy, state, context, e);
+					} catch (Exception ex) {
+						throw new TerminatedRetryException("Terminated retry after error in policy", ex);
+					}
 
 					if (canRetry(retryPolicy, context) && !context.isExhaustedOnly()) {
 						try {

@@ -127,7 +127,7 @@ public class FaultTolerantStepFactoryBeanTests {
 		reader.setFailures("2");
 
 		// nothing is skippable
-		factory.setSkippableExceptionClasses(getExceptionMap());
+		factory.setSkippableExceptionClasses(getExceptionMap(NonExistentException.class));
 
 		Step step = (Step) factory.getObject();
 
@@ -144,7 +144,7 @@ public class FaultTolerantStepFactoryBeanTests {
 	@Test
 	public void testNonSkippableException() throws Exception {
 		// nothing is skippable
-		factory.setSkippableExceptionClasses(getExceptionMap());
+		factory.setSkippableExceptionClasses(getExceptionMap(NonExistentException.class));
 		factory.setCommitInterval(1);
 
 		// no failures on read
@@ -717,7 +717,7 @@ public class FaultTolerantStepFactoryBeanTests {
 		assertEquals(1, stepExecution.getSkipCount());
 		assertEquals(2, stepExecution.getRollbackCount());
 
-		// 1,2,3,4,3,4 - two re-processing attempts until the item is
+		// 1,2,3,4,3,4 - one scan until the item is
 		// identified and finally skipped on the second attempt
 		assertEquals("[1, 2, 3, 4, 3, 4]", processor.getProcessed().toString());
 		assertStepExecutionsAreEqual(stepExecution, repository.getLastStepExecution(jobExecution.getJobInstance(), step
@@ -1065,6 +1065,10 @@ public class FaultTolerantStepFactoryBeanTests {
 			map.put(arg, true);
 		}
 		return map;
+	}
+	
+	public static class NonExistentException extends Exception {
+		
 	}
 
 }

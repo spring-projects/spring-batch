@@ -1,6 +1,8 @@
 # Spring Batch 
 
-Spring Batch is a lightweight, comprehensive batch framework designed to enable the development of robust batch applications vital for the daily operations of enterprise systems.  Spring Batch builds upon the productivity, POJO-based development approach, and general ease of use capabilities people have come to know from the Spring Framework, while making it easy for developers to access and leverage more advanced enterprise services when necessary.
+Spring Batch is a lightweight, comprehensive batch framework designed to enable the development of robust batch applications vital for the daily operations of enterprise systems.  Spring Batch builds upon the productivity, POJO-based development approach, and general ease of use capabilities people have come to know from the [Spring Framework](https://github.com/SpringSource/spring-framework), while making it easy for developers to access and leverage more advanced enterprise services when necessary.
+
+If you are looking for a runtime container for your Batch applications, or need a management console to view current and historic executions, take a look at [Spring Batch Admin](http://www.springsource.org/spring-batch-admin).  It is a set of services (Java, JSON, JMX) and an optional web UI that you can use to manage and monitor a Batch system.
 
 # Building from Source
 
@@ -10,7 +12,7 @@ Clone the git repository using the URL on the Github home page:
     $ cd spring-batch
 
 ## Command Line
-Use Maven 2.2.* (might work with 3.0, but we don't test it), then on the command line:
+Use Maven 2.2 or 3.0, then on the command line:
 
     $ mvn install
 
@@ -39,7 +41,7 @@ Read the main project [website](http://www.springsource.org/spring-batch) and th
 Here are some ways for you to get involved in the community:
 
 * Get involved with the Spring community on the Spring Community Forums.  Please help out on the [forum](http://forum.springsource.org/forumdisplay.php?f=41) by responding to questions and joining the debate.
-* Create [JIRA](https://jira.springsource.org/browse/BATCHADM) tickets for bugs and new features and comment and vote on the ones that you are interested in.  
+* Create [JIRA](https://jira.springsource.org/browse/BATCH) tickets for bugs and new features and comment and vote on the ones that you are interested in.  
 * Github is for social coding: if you want to write code, we encourage contributions through pull requests from [forks of this repository](http://help.github.com/forking/).  If you want to contribute code this way, please reference a JIRA ticket as well covering the specific issue you are addressing.
 * Watch for upcoming articles on Spring by [subscribing](http://www.springsource.org/node/feed) to springframework.org
 

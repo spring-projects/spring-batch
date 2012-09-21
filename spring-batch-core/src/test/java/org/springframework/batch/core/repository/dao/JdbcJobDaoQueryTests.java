@@ -25,7 +25,6 @@ import org.springframework.batch.core.JobInstance;
 import org.springframework.batch.core.JobParameters;
 import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.jdbc.core.simple.SimpleJdbcTemplate;
 import org.springframework.jdbc.support.incrementer.DataFieldMaxValueIncrementer;
 
 /**
@@ -64,12 +63,12 @@ public class JdbcJobDaoQueryTests extends TestCase {
 
 	public void testTablePrefix() throws Exception {
 		jobExecutionDao.setTablePrefix("FOO_");
-		jobExecutionDao.setJdbcTemplate(new SimpleJdbcTemplate(new JdbcTemplate() {
+		jobExecutionDao.setJdbcTemplate(new JdbcTemplate() {
 			public int update(String sql, Object[] args, int[] argTypes) throws DataAccessException {
 				list.add(sql);
 				return 1;
 			}
-		}));
+		});
 		JobExecution jobExecution = new JobExecution(new JobInstance(new Long(11), new JobParameters(), "testJob"));
 
 		jobExecutionDao.saveJobExecution(jobExecution);

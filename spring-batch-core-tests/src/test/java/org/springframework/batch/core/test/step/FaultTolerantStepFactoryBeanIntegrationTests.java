@@ -52,8 +52,6 @@ public class FaultTolerantStepFactoryBeanIntegrationTests {
 
 	private FaultTolerantStepFactoryBean<String, String> factory;
 
-	private SkipReaderStub reader;
-
 	private SkipProcessorStub processor;
 
 	private SkipWriterStub writer;
@@ -74,7 +72,6 @@ public class FaultTolerantStepFactoryBeanIntegrationTests {
 	@Before
 	public void setUp() throws Exception {
 
-		reader = new SkipReaderStub();
 		writer = new SkipWriterStub(dataSource);
 		processor = new SkipProcessorStub(dataSource);
 
@@ -119,6 +116,7 @@ public class FaultTolerantStepFactoryBeanIntegrationTests {
 
 			SimpleJdbcTemplate jdbcTemplate = new SimpleJdbcTemplate(dataSource);
 
+			SkipReaderStub reader = new SkipReaderStub();
 			reader.clear();
 			reader.setItems("1", "2", "3", "4", "5");
 			factory.setItemReader(reader);

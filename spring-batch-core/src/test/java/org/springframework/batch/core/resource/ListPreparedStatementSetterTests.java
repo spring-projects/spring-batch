@@ -36,7 +36,7 @@ import org.springframework.batch.core.launch.JobLauncher;
 import org.springframework.batch.item.ItemWriter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.RowCallbackHandler;
-import org.springframework.jdbc.core.simple.SimpleJdbcTemplate;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.transaction.annotation.Transactional;
@@ -55,11 +55,11 @@ public class ListPreparedStatementSetterTests {
 
 	StepExecution stepExecution;
 
-	private SimpleJdbcTemplate simpleJdbcTemplate;
+	private JdbcTemplate jdbcTemplate;
 
 	@Autowired
 	public void setDataSource(DataSource dataSource) {
-		this.simpleJdbcTemplate = new SimpleJdbcTemplate(dataSource);
+		this.jdbcTemplate = new JdbcTemplate(dataSource);
 	}
 
 	@Autowired
@@ -86,7 +86,7 @@ public class ListPreparedStatementSetterTests {
 	public void testSetValues() {
 
 		final List<String> results = new ArrayList<String>();
-		simpleJdbcTemplate.getJdbcOperations().query("SELECT NAME from T_FOOS where ID > ? and ID < ?", pss,
+		jdbcTemplate.query("SELECT NAME from T_FOOS where ID > ? and ID < ?", pss,
 				new RowCallbackHandler() {
 					public void processRow(ResultSet rs) throws SQLException {
 						results.add(rs.getString(1));
@@ -107,12 +107,12 @@ public class ListPreparedStatementSetterTests {
 
 	@Test
 	public void testXmlConfiguration() throws Exception {
-		this.simpleJdbcTemplate.update("create table FOO (ID integer, NAME varchar(40), VALUE integer)");
+		this.jdbcTemplate.update("create table FOO (ID integer, NAME varchar(40), VALUE integer)");
 		try {
-			this.simpleJdbcTemplate.update("insert into FOO values (?,?,?)", 0, "zero", 0);
-			this.simpleJdbcTemplate.update("insert into FOO values (?,?,?)", 1, "one", 1);
-			this.simpleJdbcTemplate.update("insert into FOO values (?,?,?)", 2, "two", 2);
-			this.simpleJdbcTemplate.update("insert into FOO values (?,?,?)", 3, "three", 3);
+			this.jdbcTemplate.update("insert into FOO values (?,?,?)", 0, "zero", 0);
+			this.jdbcTemplate.update("insert into FOO values (?,?,?)", 1, "one", 1);
+			this.jdbcTemplate.update("insert into FOO values (?,?,?)", 2, "two", 2);
+			this.jdbcTemplate.update("insert into FOO values (?,?,?)", 3, "three", 3);
 
 			JobParametersBuilder builder = new JobParametersBuilder().addLong("min.id", 1L).addLong("max.id", 2L);
 			JobExecution jobExecution = this.jobLauncher.run(this.job, builder.toJobParameters());
@@ -126,7 +126,7 @@ public class ListPreparedStatementSetterTests {
 			assertEquals(new Foo(2, "two", 2), foos.get(1));
 		}
 		finally {
-			this.simpleJdbcTemplate.update("drop table FOO");
+			this.jdbcTemplate.update("drop table FOO");
 		}
 	}
 

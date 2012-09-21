@@ -22,6 +22,9 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.springframework.aop.framework.Advised;
 import org.springframework.batch.classify.BinaryExceptionClassifier;
 import org.springframework.batch.core.ChunkListener;
 import org.springframework.batch.core.Job;
@@ -36,6 +39,7 @@ import org.springframework.batch.core.partition.PartitionHandler;
 import org.springframework.batch.core.partition.support.PartitionStep;
 import org.springframework.batch.core.partition.support.Partitioner;
 import org.springframework.batch.core.partition.support.SimpleStepExecutionSplitter;
+import org.springframework.batch.core.partition.support.StepExecutionAggregator;
 import org.springframework.batch.core.partition.support.TaskExecutorPartitionHandler;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.step.AbstractStep;
@@ -84,6 +88,8 @@ import org.springframework.util.Assert;
  * @since 2.0
  */
 class StepParserStepFactoryBean<I, O> implements FactoryBean, BeanNameAware {
+
+	private static final Log logger = LogFactory.getLog(StepParserStepFactoryBean.class);
 
 	//
 	// Step Attributes
@@ -196,6 +202,8 @@ class StepParserStepFactoryBean<I, O> implements FactoryBean, BeanNameAware {
 	//
 	private boolean hasChunkElement = false;
 
+	private StepExecutionAggregator stepExecutionAggregator;
+
 	/**
 	 * Create a {@link Step} from the configuration provided.
 	 * 
@@ -234,14 +242,10 @@ class StepParserStepFactoryBean<I, O> implements FactoryBean, BeanNameAware {
 			configureJobStep(ts);
 			return ts;
 		}
-		else if (step != null) {
+		else {
 			PartitionStep ts = new PartitionStep();
 			configurePartitionStep(ts);
 			return ts;
-		}
-		else {
-			throw new IllegalStateException("Step [" + name
-					+ "] has neither a <chunk/> element nor a 'ref' attribute referencing a Tasklet.");
 		}
 	}
 
@@ -277,13 +281,9 @@ class StepParserStepFactoryBean<I, O> implements FactoryBean, BeanNameAware {
 
 	private void configurePartitionStep(PartitionStep ts) {
 		Assert.state(partitioner != null, "A Partitioner must be provided for a partition step");
-		Assert.state(step != null, "A Step must be provided for a partition step");
 		configureAbstractStep(ts);
 
-		PartitionHandler handler;
-
 		if (partitionHandler != null) {
-			handler = partitionHandler;
 			ts.setPartitionHandler(partitionHandler);
 		}
 		else {
@@ -295,23 +295,45 @@ class StepParserStepFactoryBean<I, O> implements FactoryBean, BeanNameAware {
 			partitionHandler.setGridSize(gridSize);
 			partitionHandler.setTaskExecutor(taskExecutor);
 			ts.setPartitionHandler(partitionHandler);
-			handler = partitionHandler;
 		}
 
-		// BATCH-1659
-		if (handler instanceof TaskExecutorPartitionHandler) {
+		boolean allowStartIfComplete = this.allowStartIfComplete != null ? this.allowStartIfComplete : false;
+		String name = this.name;
+		if (step != null) {
 			try {
-				TaskExecutorPartitionHandler taskExecutorPartitionHandler = (TaskExecutorPartitionHandler) handler;
-				taskExecutorPartitionHandler.setStep(step);
-				taskExecutorPartitionHandler.afterPropertiesSet();
+				allowStartIfComplete = step.isAllowStartIfComplete();
+				name = step.getName();
 			}
 			catch (Exception e) {
-				throw new RuntimeException(e);
+				logger.info("Ignored exception from step asking for name and allowStartIfComplete flag. "
+						+ "Using default from enclosing PartitionStep (" + name + "," + allowStartIfComplete + ").");
 			}
 		}
-
-		SimpleStepExecutionSplitter splitter = new SimpleStepExecutionSplitter(jobRepository, step, partitioner);
+		SimpleStepExecutionSplitter splitter = new SimpleStepExecutionSplitter(jobRepository, allowStartIfComplete,
+				name, partitioner);
 		ts.setStepExecutionSplitter(splitter);
+		if (stepExecutionAggregator != null) {
+			ts.setStepExecutionAggregator(stepExecutionAggregator);
+		}
+	}
+
+	private Object extractTarget(Object target, Class<?> type) {
+		if (target instanceof Advised) {
+			Object source;
+			try {
+				source = ((Advised) target).getTargetSource().getTarget();
+			}
+			catch (Exception e) {
+				throw new IllegalStateException("Could not extract target from proxy", e);
+			}
+			if (source instanceof Advised) {
+				source = extractTarget(source, type);
+			}
+			if (type.isAssignableFrom(source.getClass())) {
+				target = source;
+			}
+		}
+		return target;
 	}
 
 	private void configureSimple(SimpleStepFactoryBean<I, O> fb) {
@@ -578,6 +600,13 @@ class StepParserStepFactoryBean<I, O> implements FactoryBean, BeanNameAware {
 		}
 	}
 
+	/**
+	 * @param name the name to set
+	 */
+	public void setName(String name) {
+		this.name = name;
+	}
+
 	// =========================================================
 	// Flow Attributes
 	// =========================================================
@@ -614,6 +643,13 @@ class StepParserStepFactoryBean<I, O> implements FactoryBean, BeanNameAware {
 	 */
 	public void setPartitioner(Partitioner partitioner) {
 		this.partitioner = partitioner;
+	}
+
+	/**
+	 * @param stepExecutionAggregator the stepExecutionAggregator to set
+	 */
+	public void setStepExecutionAggregator(StepExecutionAggregator stepExecutionAggregator) {
+		this.stepExecutionAggregator = stepExecutionAggregator;
 	}
 
 	/**

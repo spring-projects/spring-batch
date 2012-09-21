@@ -35,7 +35,6 @@ import org.springframework.transaction.support.TransactionTemplate;
 import org.springframework.util.Assert;
 import org.springframework.util.ClassUtils;
 import org.springframework.util.StringUtils;
-import org.springframework.xml.transform.StaxResult;
 
 /**
  * Tests for {@link StaxEventItemWriter}.
@@ -84,6 +83,16 @@ public class StaxEventItemWriterTests {
 	 */
 	@Test
 	public void testWriteAndFlush() throws Exception {
+		writer.open(executionContext);
+		writer.write(items);
+		writer.close();
+		String content = getOutputFileContent();
+		assertTrue("Wrong content: " + content, content.contains(TEST_STRING));
+	}
+
+	@Test
+	public void testWriteAndForceFlush() throws Exception {
+		writer.setForceSync(true);
 		writer.open(executionContext);
 		writer.write(items);
 		writer.close();
@@ -405,16 +414,12 @@ public class StaxEventItemWriterTests {
 		}
 
 		public void marshal(Object graph, Result result) throws XmlMappingException, IOException {
-			Assert.isInstanceOf(StaxResult.class, result);
-
-			StaxResult staxResult = (StaxResult) result;
+ 	 	 Assert.isInstanceOf( Result.class, result);
 			try {
-				staxResult.getXMLEventWriter().add(
-						XMLEventFactory.newInstance().createStartElement(namespacePrefix, namespace, graph.toString()));
-				staxResult.getXMLEventWriter().add(
-						XMLEventFactory.newInstance().createEndElement(namespacePrefix, namespace, graph.toString()));
+				StaxUtils.getXmlEventWriter( result ).add( XMLEventFactory.newInstance().createStartElement(namespacePrefix, namespace, graph.toString()));
+				StaxUtils.getXmlEventWriter( result ).add( XMLEventFactory.newInstance().createEndElement(namespacePrefix, namespace, graph.toString()));
 			}
-			catch (XMLStreamException e) {
+			catch ( Exception e) {
 				throw new RuntimeException("Exception while writing to output file", e);
 			}
 		}

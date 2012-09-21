@@ -154,6 +154,33 @@ public class FlatFileItemWriterTests {
 	}
 
 	@Test
+	public void testWriteWithAppendRestartOnSecondChunk() throws Exception {
+		writer.setAppendAllowed(true);
+		writer.open(executionContext);
+		writer.write(Collections.singletonList("test1"));
+		writer.close();
+		assertEquals("test1", readLine());
+		reader = null;
+		writer.open(executionContext);
+		writer.write(Collections.singletonList(TEST_STRING));
+		writer.update(executionContext);
+		writer.write(Collections.singletonList(TEST_STRING));
+		writer.close();
+		assertEquals("test1", readLine());
+		assertEquals(TEST_STRING, readLine());
+		assertEquals(TEST_STRING, readLine());
+		assertEquals(null, readLine());
+		writer.open(executionContext);
+		writer.write(Collections.singletonList(TEST_STRING));
+		writer.close();
+		reader = null;
+		assertEquals("test1", readLine());
+		assertEquals(TEST_STRING, readLine());
+		assertEquals(TEST_STRING, readLine());
+		assertEquals(null, readLine());
+	}
+
+	@Test
 	public void testOpenTwice() {
 		// opening the writer twice should cause no issues
 		writer.open(executionContext);
@@ -167,6 +194,17 @@ public class FlatFileItemWriterTests {
 	 */
 	@Test
 	public void testWriteString() throws Exception {
+		writer.open(executionContext);
+		writer.write(Collections.singletonList(TEST_STRING));
+		writer.close();
+		String lineFromFile = readLine();
+
+		assertEquals(TEST_STRING, lineFromFile);
+	}
+
+	@Test
+	public void testForcedWriteString() throws Exception {
+		writer.setForceSync(true);
 		writer.open(executionContext);
 		writer.write(Collections.singletonList(TEST_STRING));
 		writer.close();
@@ -530,6 +568,18 @@ public class FlatFileItemWriterTests {
 		assertTrue(outputFile.exists());
 		writer.close();
 		assertFalse(outputFile.exists());
+	}
+
+	@Test
+	public void testDeleteOnExitReopen() throws Exception {
+		writer.setShouldDeleteIfEmpty(true);
+		writer.open(executionContext);
+		assertTrue(outputFile.exists());
+		writer.close();
+		assertFalse(outputFile.exists());
+		writer.open(executionContext);
+		writer.write(Collections.singletonList("test2"));
+		assertEquals("test2", readLine());
 	}
 
 	@Test

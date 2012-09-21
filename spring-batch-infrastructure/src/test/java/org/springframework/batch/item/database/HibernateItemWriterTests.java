@@ -81,6 +81,7 @@ public class HibernateItemWriterTests {
 		expectLastCall().andReturn(false);
 		ht.saveOrUpdate("bar");
 		ht.flush();
+		ht.clear();
 		replay(ht);
 		
 		List<String> items = Arrays.asList(new String[] { "foo", "bar" });

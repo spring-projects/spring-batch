@@ -86,6 +86,22 @@ public class JobParametersTests {
 	}
 
 	@Test
+	public void testGetEmptyLong() {
+		parameters = new JobParameters(Collections.singletonMap("long1", new JobParameter((Long)null)));
+		assertEquals(0L, parameters.getLong("long1"));
+	}
+
+	@Test
+	public void testGetMissingLong() {
+		assertEquals(0L, parameters.getLong("missing.long1"));
+	}
+
+	@Test
+	public void testGetMissingDouble() {
+		assertEquals(0.0, parameters.getDouble("missing.double1"), 0.0001);
+	}
+
+	@Test
 	public void testIsEmptyWhenEmpty() throws Exception {
 		assertTrue(new JobParameters().isEmpty());
 	}
@@ -175,4 +191,24 @@ public class JobParametersTests {
 
 		assertEquals(params, SerializationUtils.deserialize(serialized));
 	}
+    
+    @Test
+    public void testLongReturns0WhenKeyDoesntExit(){
+        assertEquals(0L,new JobParameters().getLong("keythatdoesntexist"));
+    }
+
+    @Test
+    public void testStringReturnsNullWhenKeyDoesntExit(){
+        assertNull(new JobParameters().getString("keythatdoesntexist"));
+    }
+
+    @Test
+    public void testDoubleReturns0WhenKeyDoesntExit(){
+        assertEquals(0.0,new JobParameters().getLong("keythatdoesntexist"), 0.0001);
+    }
+
+    @Test
+    public void testDateReturnsNullWhenKeyDoesntExit(){
+        assertNull(new JobParameters().getDate("keythatdoesntexist"));
+    }
 }

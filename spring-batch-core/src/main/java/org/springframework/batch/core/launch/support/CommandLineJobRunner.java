@@ -16,6 +16,7 @@
 package org.springframework.batch.core.launch.support;
 
 import java.io.BufferedReader;
+import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -514,15 +515,23 @@ public class CommandLineJobRunner {
 
 		List<String> newargs = new ArrayList<String>(Arrays.asList(args));
 
-		if (System.in.available() > 0) {
-			BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
-			String line = " ";
-			while (StringUtils.hasLength(line)) {
-				if (!line.startsWith("#") && StringUtils.hasText(line)) {
-					logger.debug("Stdin arg: "+line);
-					newargs.add(line);
+		try {
+			if (System.in.available() > 0) {
+				BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
+				String line = " ";
+				while (StringUtils.hasLength(line)) {
+					if (!line.startsWith("#") && StringUtils.hasText(line)) {
+						logger.debug("Stdin arg: " + line);
+						newargs.add(line);
+					}
+					line = reader.readLine();
 				}
-				line = reader.readLine();
+			}
+		}
+		catch (IOException e) {
+			logger.warn("Could not access stdin (maybe a platform limitation)");
+			if (logger.isDebugEnabled()) {
+				logger.debug("Exception details", e);
 			}
 		}
 

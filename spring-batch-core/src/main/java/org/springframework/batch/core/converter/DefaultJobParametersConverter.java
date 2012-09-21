@@ -22,14 +22,15 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Iterator;
+import java.util.Locale;
 import java.util.Map;
-import java.util.Properties;
 import java.util.Map.Entry;
+import java.util.Properties;
 
 import org.springframework.batch.core.JobParameter;
+import org.springframework.batch.core.JobParameter.ParameterType;
 import org.springframework.batch.core.JobParameters;
 import org.springframework.batch.core.JobParametersBuilder;
-import org.springframework.batch.core.JobParameter.ParameterType;
 import org.springframework.util.StringUtils;
 
 /**
@@ -46,6 +47,12 @@ import org.springframework.util.StringUtils;
  * The literal values are converted to the correct type using the default Spring
  * strategies, augmented if necessary by the custom editors provided.
  * 
+ * <br/>
+ * 
+ * If you need to be able to parse and format local-specific dates and numbers,
+ * you can inject formatters ({@link #setDateFormat(DateFormat)} and
+ * {@link #setNumberFormat(NumberFormat)}).
+ * 
  * @author Dave Syer
  * 
  */
@@ -59,9 +66,13 @@ public class DefaultJobParametersConverter implements JobParametersConverter {
 
 	private static final String DOUBLE_TYPE = "(double)";
 
+	private static NumberFormat DEFAULT_NUMBER_FORMAT = NumberFormat.getInstance(Locale.US);
+
 	private DateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd");
 
-	private NumberFormat numberFormat = new DecimalFormat("#");
+	private NumberFormat numberFormat = DEFAULT_NUMBER_FORMAT;
+
+	private final NumberFormat longNumberFormat = new DecimalFormat("#");
 
 	/**
 	 * Check for suffix on keys and use those to decide how to convert the
@@ -155,17 +166,33 @@ public class DefaultJobParametersConverter implements JobParametersConverter {
 			String key = entry.getKey();
 			JobParameter jobParameter = entry.getValue();
 			Object value = jobParameter.getValue();
-			if (jobParameter.getType() == ParameterType.DATE) {
-				result.setProperty(key + DATE_TYPE, dateFormat.format(value));
-			}
-			else if (jobParameter.getType() == ParameterType.LONG) {
-				result.setProperty(key + LONG_TYPE, numberFormat.format(value));
-			}
-			else {
-				result.setProperty(key, "" + value);
+			if (value != null) {
+				if (jobParameter.getType() == ParameterType.DATE) {
+					result.setProperty(key + DATE_TYPE, dateFormat.format(value));
+				}
+				else if (jobParameter.getType() == ParameterType.LONG) {
+					result.setProperty(key + LONG_TYPE, longNumberFormat.format(value));
+				}
+				else if (jobParameter.getType() == ParameterType.DOUBLE) {
+					result.setProperty(key + DOUBLE_TYPE, decimalFormat((Double)value));
+				}
+				else {
+					result.setProperty(key, "" + value);
+				}
 			}
 		}
 		return result;
+	}
+
+	/**
+	 * @param value a decimal value
+	 * @return a best guess at the desired format
+	 */
+	private String decimalFormat(double value) {
+		if (numberFormat != DEFAULT_NUMBER_FORMAT) {
+			return numberFormat.format(value);
+		}
+		return Double.toString(value);
 	}
 
 	/**
@@ -178,8 +205,8 @@ public class DefaultJobParametersConverter implements JobParametersConverter {
 	}
 
 	/**
-	 * Public setter for the {@link NumberFormat}. Used to parse longs, so must
-	 * not contain decimal place (e.g. use "#" or "#,###").
+	 * Public setter for the {@link NumberFormat}. Used to parse longs and
+	 * doubles, so must not contain decimal place (e.g. use "#" or "#,###").
 	 * 
 	 * @param numberFormat the {@link NumberFormat} to set
 	 */

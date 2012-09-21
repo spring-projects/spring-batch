@@ -20,7 +20,6 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
-import java.lang.reflect.Field;
 import java.util.List;
 import java.util.concurrent.Semaphore;
 
@@ -32,7 +31,10 @@ import org.springframework.batch.core.JobInterruptedException;
 import org.springframework.batch.core.JobParameters;
 import org.springframework.batch.core.StepExecution;
 import org.springframework.batch.core.job.JobSupport;
+import org.springframework.batch.core.repository.JobExecutionAlreadyRunningException;
+import org.springframework.batch.core.repository.JobInstanceAlreadyCompleteException;
 import org.springframework.batch.core.repository.JobRepository;
+import org.springframework.batch.core.repository.JobRestartException;
 import org.springframework.batch.core.repository.dao.MapExecutionContextDao;
 import org.springframework.batch.core.repository.dao.MapJobExecutionDao;
 import org.springframework.batch.core.repository.dao.MapJobInstanceDao;
@@ -43,7 +45,6 @@ import org.springframework.batch.item.ItemWriter;
 import org.springframework.batch.repeat.policy.SimpleCompletionPolicy;
 import org.springframework.batch.repeat.support.RepeatTemplate;
 import org.springframework.batch.support.transaction.ResourcelessTransactionManager;
-import org.springframework.util.ReflectionUtils;
 
 public class StepExecutorInterruptionTests {
 
@@ -56,17 +57,18 @@ public class StepExecutorInterruptionTests {
 	private StepExecution stepExecution;
 
 	private JobRepository jobRepository;
-	
-	private Field semaphore;
 
 	@Before
 	public void setUp() throws Exception {
-
 		jobRepository = new SimpleJobRepository(new MapJobInstanceDao(), new MapJobExecutionDao(),
 				new MapStepExecutionDao(), new MapExecutionContextDao());
+	}
 
+	private void configureStep(TaskletStep step) throws JobExecutionAlreadyRunningException, JobRestartException,
+			JobInstanceAlreadyCompleteException {
+
+		this.step = step;
 		JobSupport job = new JobSupport();
-		step = new TaskletStep("interruptedStep");
 		job.addStep(step);
 		job.setBeanName("testJob");
 		jobExecution = jobRepository.createJobExecution(job.getName(), new JobParameters());
@@ -77,11 +79,12 @@ public class StepExecutorInterruptionTests {
 			}
 		};
 		stepExecution = new StepExecution(step.getName(), jobExecution);
-		semaphore = ReflectionUtils.findField(step.getClass(), "semaphore");
 	}
 
 	@Test
 	public void testInterruptStep() throws Exception {
+
+		configureStep(new TaskletStep("step"));
 
 		Thread processingThread = createThread(stepExecution);
 
@@ -124,6 +127,28 @@ public class StepExecutorInterruptionTests {
 	@Test
 	public void testInterruptOnInterruptedException() throws Exception {
 
+		// This simulates the unlikely sounding, but in practice all too common
+		// in Bamboo situation where the thread is interrupted before the lock
+		// is taken.
+
+		configureStep(new TaskletStep("step") {
+			@Override
+			protected Semaphore createSemaphore() {
+				return new Semaphore(1) {
+
+					@Override
+					public void acquire() throws InterruptedException {
+						Thread.currentThread().interrupt();
+						throw new InterruptedException();
+					}
+
+					@Override
+					public void release() {
+					}
+				};
+			}
+		});
+
 		Thread processingThread = createThread(stepExecution);
 
 		step.setTasklet(new TestingChunkOrientedTasklet<Object>(new ItemReader<Object>() {
@@ -131,24 +156,6 @@ public class StepExecutorInterruptionTests {
 				return null;
 			}
 		}, itemWriter));
-
-		// This simulates the unlikely sounding, but in practice all too common
-		// in Bamboo situation where the thread is interrupted before the lock
-		// is taken.
-
-		ReflectionUtils.makeAccessible(semaphore);
-		ReflectionUtils.setField(semaphore, step, new Semaphore(1) {
-
-			@Override
-			public void acquire() throws InterruptedException {
-				Thread.currentThread().interrupt();
-				throw new InterruptedException();
-			}
-
-			@Override
-			public void release() {
-			}
-		});
 
 		processingThread.start();
 		Thread.sleep(100);
@@ -168,26 +175,30 @@ public class StepExecutorInterruptionTests {
 	@Test
 	public void testLockNotReleasedIfChunkFails() throws Exception {
 
+		configureStep(new TaskletStep("step") {
+			@Override
+			protected Semaphore createSemaphore() {
+				return new Semaphore(1) {
+					private boolean locked = false;
+
+					@Override
+					public void acquire() throws InterruptedException {
+						locked = true;
+					}
+
+					@Override
+					public void release() {
+						assertTrue("Lock released before it is acquired", locked);
+					}
+				};
+			}
+		});
+
 		step.setTasklet(new TestingChunkOrientedTasklet<Object>(new ItemReader<Object>() {
 			public Object read() throws Exception {
 				throw new RuntimeException("Planned!");
 			}
 		}, itemWriter));
-
-		ReflectionUtils.makeAccessible(semaphore);
-		ReflectionUtils.setField(semaphore, step, new Semaphore(1) {
-			private boolean locked = false;
-
-			@Override
-			public void acquire() throws InterruptedException {
-				locked = true;
-			}
-
-			@Override
-			public void release() {
-				assertTrue("Lock released before it is acquired", locked);
-			}
-		});
 
 		jobRepository.add(stepExecution);
 		step.execute(stepExecution);
@@ -211,6 +222,8 @@ public class StepExecutorInterruptionTests {
 				}
 			}
 		};
+		processingThread.setDaemon(true);
+		processingThread.setPriority(Thread.MIN_PRIORITY);
 		return processingThread;
 	}
 

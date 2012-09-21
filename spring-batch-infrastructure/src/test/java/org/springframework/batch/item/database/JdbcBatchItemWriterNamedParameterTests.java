@@ -27,7 +27,7 @@ import org.junit.Test;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.namedparam.BeanPropertySqlParameterSource;
 import org.springframework.jdbc.core.namedparam.SqlParameterSource;
-import org.springframework.jdbc.core.simple.SimpleJdbcOperations;
+import org.springframework.jdbc.core.namedparam.NamedParameterJdbcOperations;
 
 /**
  * @author Thomas Risberg
@@ -36,7 +36,7 @@ public class JdbcBatchItemWriterNamedParameterTests {
 
 	private JdbcBatchItemWriter<Foo> writer = new JdbcBatchItemWriter<Foo>();
 
-	private SimpleJdbcOperations sjt;
+    private NamedParameterJdbcOperations namedParameterJdbcOperations;
 	
 	private String sql = "update foo set bar = :bar where id = :id";
 
@@ -70,9 +70,9 @@ public class JdbcBatchItemWriterNamedParameterTests {
 
 	@Before
 	public void setUp() throws Exception {
-		sjt = createMock(SimpleJdbcOperations.class);
+        namedParameterJdbcOperations = createMock(NamedParameterJdbcOperations.class);
 		writer.setSql(sql);
-		writer.setSimpleJdbcTemplate(sjt);
+		writer.setJdbcTemplate(namedParameterJdbcOperations);
 		writer.setItemSqlParameterSourceProvider(
 				new BeanPropertyItemSqlParameterSourceProvider<Foo>());
 		writer.afterPropertiesSet();
@@ -94,9 +94,9 @@ public class JdbcBatchItemWriterNamedParameterTests {
 		catch (IllegalArgumentException e) {
 			// expected
 			String message = e.getMessage();
-			assertTrue("Message does not contain 'SimpleJdbcTemplate'.", message.indexOf("SimpleJdbcTemplate") >= 0);
+			assertTrue("Message does not contain 'NamedParameterJdbcTemplate'.", message.indexOf("NamedParameterJdbcTemplate") >= 0);
 		}
-		writer.setSimpleJdbcTemplate(sjt);
+		writer.setJdbcTemplate(namedParameterJdbcOperations);
 		try {
 			writer.afterPropertiesSet();
 			fail("Expected IllegalArgumentException");
@@ -123,20 +123,20 @@ public class JdbcBatchItemWriterNamedParameterTests {
 
 	@Test
 	public void testWriteAndFlush() throws Exception {
-		expect(sjt.batchUpdate(eq(sql), 
+		expect(namedParameterJdbcOperations.batchUpdate(eq(sql),
 				eqSqlParameterSourceArray(new SqlParameterSource[] {new BeanPropertySqlParameterSource(new Foo("bar"))})))
 				.andReturn(new int[] {1});
-		replay(sjt);
+		replay(namedParameterJdbcOperations);
 		writer.write(Collections.singletonList(new Foo("bar")));
-		verify(sjt);
+		verify(namedParameterJdbcOperations);
 	}
 
 	@Test
 	public void testWriteAndFlushWithEmptyUpdate() throws Exception {
-		expect(sjt.batchUpdate(eq(sql), 
+		expect(namedParameterJdbcOperations.batchUpdate(eq(sql),
 				eqSqlParameterSourceArray(new SqlParameterSource[] {new BeanPropertySqlParameterSource(new Foo("bar"))})))
 				.andReturn(new int[] {0});
-		replay(sjt);
+		replay(namedParameterJdbcOperations);
 		try {
 			writer.write(Collections.singletonList(new Foo("bar")));
 			fail("Expected EmptyResultDataAccessException");
@@ -146,16 +146,16 @@ public class JdbcBatchItemWriterNamedParameterTests {
 			String message = e.getMessage();
 			assertTrue("Wrong message: " + message, message.indexOf("did not update") >= 0);
 		}
-		verify(sjt);
+		verify(namedParameterJdbcOperations);
 	}
 
 	@Test
 	public void testWriteAndFlushWithFailure() throws Exception {
 		final RuntimeException ex = new RuntimeException("ERROR");
-		expect(sjt.batchUpdate(eq(sql), 
+		expect(namedParameterJdbcOperations.batchUpdate(eq(sql),
 				eqSqlParameterSourceArray(new SqlParameterSource[] {new BeanPropertySqlParameterSource(new Foo("bar"))})))
 				.andThrow(ex);
-		replay(sjt);
+		replay(namedParameterJdbcOperations);
 		try {
 			writer.write(Collections.singletonList(new Foo("bar")));
 			fail("Expected RuntimeException");
@@ -163,7 +163,7 @@ public class JdbcBatchItemWriterNamedParameterTests {
 		catch (RuntimeException e) {
 			assertEquals("ERROR", e.getMessage());
 		}
-		verify(sjt);
+		verify(namedParameterJdbcOperations);
 	}
 
 	public static SqlParameterSource[] eqSqlParameterSourceArray(SqlParameterSource[] in) {

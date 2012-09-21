@@ -1,9 +1,0 @@
-#Fri Jan 07 07:30:59 GMT 2011
-activeProfiles=spring3
-eclipse.preferences.version=1
-fullBuildGoals=process-test-resources
-includeModules=false
-resolveWorkspaceProjects=true
-resourceFilterGoals=process-resources resources\:testResources
-skipCompilerPlugin=true
-version=1

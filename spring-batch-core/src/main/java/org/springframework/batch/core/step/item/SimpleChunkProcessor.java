@@ -114,7 +114,7 @@ public class SimpleChunkProcessor<I, O> implements ChunkProcessor<I>, Initializi
 	 */
 	protected final O doProcess(I item) throws Exception {
 
-		if (itemProcessor==null) {
+		if (itemProcessor == null) {
 			@SuppressWarnings("unchecked")
 			O result = (O) item;
 			return result;
@@ -141,7 +141,7 @@ public class SimpleChunkProcessor<I, O> implements ChunkProcessor<I>, Initializi
 	 */
 	protected final void doWrite(List<O> items) throws Exception {
 
-		if (itemWriter==null) {
+		if (itemWriter == null) {
 			return;
 		}
 
@@ -151,7 +151,7 @@ public class SimpleChunkProcessor<I, O> implements ChunkProcessor<I>, Initializi
 			doAfterWrite(items);
 		}
 		catch (Exception e) {
-			listener.onWriteError(e, items);
+			doOnWriteError(e, items);
 			throw e;
 		}
 
@@ -165,9 +165,12 @@ public class SimpleChunkProcessor<I, O> implements ChunkProcessor<I>, Initializi
 	protected final void doAfterWrite(List<O> items) {
 		listener.afterWrite(items);
 	}
+	protected final void doOnWriteError(Exception e, List<O> items) {
+		listener.onWriteError(e, items);
+	}
 
 	protected void writeItems(List<O> items) throws Exception {
-		if (itemWriter!=null) {
+		if (itemWriter != null) {
 			itemWriter.write(items);
 		}
 	}
@@ -265,7 +268,17 @@ public class SimpleChunkProcessor<I, O> implements ChunkProcessor<I>, Initializi
 	 * @throws Exception if there is a problem
 	 */
 	protected void write(StepContribution contribution, Chunk<I> inputs, Chunk<O> outputs) throws Exception {
-		doWrite(outputs.getItems());
+		try {
+			doWrite(outputs.getItems());
+		}
+		catch (Exception e) {
+			/*
+			 * For a simple chunk processor (no fault tolerance) we are done
+			 * here, so prevent any more processing of these inputs.
+			 */
+			inputs.clear();
+			throw e;
+		}
 		contribution.incrementWriteCount(outputs.size());
 	}
 
@@ -273,7 +286,18 @@ public class SimpleChunkProcessor<I, O> implements ChunkProcessor<I>, Initializi
 		Chunk<O> outputs = new Chunk<O>();
 		for (Chunk<I>.ChunkIterator iterator = inputs.iterator(); iterator.hasNext();) {
 			final I item = iterator.next();
-			O output = doProcess(item);
+			O output;
+			try {
+				output = doProcess(item);
+			}
+			catch (Exception e) {
+				/*
+				 * For a simple chunk processor (no fault tolerance) we are done
+				 * here, so prevent any more processing of these inputs.
+				 */
+				inputs.clear();
+				throw e;
+			}
 			if (output != null) {
 				outputs.add(output);
 			}

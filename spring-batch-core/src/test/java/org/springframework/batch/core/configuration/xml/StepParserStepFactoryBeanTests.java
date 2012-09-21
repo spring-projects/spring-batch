@@ -20,12 +20,16 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
 import java.util.HashMap;
+import java.util.Map;
 
 import org.junit.Test;
+import org.springframework.aop.framework.Advised;
+import org.springframework.aop.framework.ProxyFactory;
 import org.springframework.batch.core.StepListener;
 import org.springframework.batch.core.job.flow.FlowStep;
 import org.springframework.batch.core.job.flow.support.SimpleFlow;
 import org.springframework.batch.core.listener.StepExecutionListenerSupport;
+import org.springframework.batch.core.partition.PartitionHandler;
 import org.springframework.batch.core.partition.support.PartitionStep;
 import org.springframework.batch.core.partition.support.SimplePartitioner;
 import org.springframework.batch.core.partition.support.TaskExecutorPartitionHandler;
@@ -223,8 +227,10 @@ public class StepParserStepFactoryBeanTests {
 		fb.setSkipLimit(100);
 		fb.setThrottleLimit(10);
 		fb.setRetryListeners(new RetryListenerSupport());
-		fb.setSkippableExceptionClasses(new HashMap<Class<? extends Throwable>, Boolean>());
-		fb.setRetryableExceptionClasses(new HashMap<Class<? extends Throwable>, Boolean>());
+		@SuppressWarnings("unchecked")
+		Map<Class<? extends Throwable>, Boolean> exceptionMap = getExceptionMap(Exception.class);
+		fb.setSkippableExceptionClasses(exceptionMap);
+		fb.setRetryableExceptionClasses(exceptionMap);
 
 		Object step = fb.getObject();
 		assertTrue(step instanceof TaskletStep);
@@ -255,6 +261,29 @@ public class StepParserStepFactoryBeanTests {
 	}
 
 	@Test
+	public void testPartitionStepWithProxyHandler() throws Exception {
+		StepParserStepFactoryBean<Object, Object> fb = new StepParserStepFactoryBean<Object, Object>();
+		fb.setBeanName("step1");
+		fb.setAllowStartIfComplete(true);
+		fb.setJobRepository(new JobRepositorySupport());
+		fb.setStartLimit(5);
+		fb.setListeners(new StepListener[] { new StepExecutionListenerSupport() });
+		fb.setTaskExecutor(new SyncTaskExecutor());
+
+		SimplePartitioner partitioner = new SimplePartitioner();
+		fb.setPartitioner(partitioner);
+		TaskExecutorPartitionHandler partitionHandler = new TaskExecutorPartitionHandler();
+		partitionHandler.setStep(new StepSupport("foo"));
+		ProxyFactory factory = new ProxyFactory(partitionHandler);
+		fb.setPartitionHandler((PartitionHandler) factory.getProxy());
+
+		Object step = fb.getObject();
+		assertTrue(step instanceof PartitionStep);
+		Object handler = ReflectionTestUtils.getField(step, "partitionHandler");
+		assertTrue(handler instanceof Advised);
+	}
+
+	@Test
 	public void testFlowStep() throws Exception {
 		StepParserStepFactoryBean<Object, Object> fb = new StepParserStepFactoryBean<Object, Object>();
 		fb.setBeanName("step1");
@@ -270,6 +299,14 @@ public class StepParserStepFactoryBeanTests {
 		assertTrue(step instanceof FlowStep);
 		Object handler = ReflectionTestUtils.getField(step, "flow");
 		assertTrue(handler instanceof SimpleFlow);
+	}
+
+	private Map<Class<? extends Throwable>, Boolean> getExceptionMap(Class<? extends Throwable>... args) {
+		Map<Class<? extends Throwable>, Boolean> map = new HashMap<Class<? extends Throwable>, Boolean>();
+		for (Class<? extends Throwable> arg : args) {
+			map.put(arg, true);
+		}
+		return map;
 	}
 
 }

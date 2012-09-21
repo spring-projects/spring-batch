@@ -40,6 +40,7 @@ import org.springframework.batch.core.repository.support.SimpleJobRepository;
 import org.springframework.batch.core.step.AbstractStep;
 import org.springframework.batch.core.step.item.FatalSkippableException;
 import org.springframework.batch.core.step.item.FatalRuntimeException;
+import org.springframework.batch.core.step.item.ForceRollbackForWriteSkipException;
 import org.springframework.batch.core.step.item.SkippableException;
 import org.springframework.batch.core.step.item.SkippableRuntimeException;
 import org.springframework.batch.core.step.tasklet.Tasklet;
@@ -52,11 +53,9 @@ import org.springframework.batch.retry.RetryListener;
 import org.springframework.batch.retry.listener.RetryListenerSupport;
 import org.springframework.batch.support.transaction.ResourcelessTransactionManager;
 import org.springframework.beans.factory.parsing.BeanDefinitionParsingException;
-import org.springframework.beans.factory.xml.XmlBeanFactory;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
-import org.springframework.core.io.ClassPathResource;
 import org.springframework.dao.DeadlockLoserDataAccessException;
 import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.transaction.PlatformTransactionManager;
@@ -149,14 +148,14 @@ public class StepParserTests {
 
 	@Test(expected = BeanDefinitionParsingException.class)
 	public void testTaskletStepWithBadStepListener() throws Exception {
-		String contextLocation = "org/springframework/batch/core/configuration/xml/StepParserBadStepListenerTests-context.xml";
-		new XmlBeanFactory(new ClassPathResource(contextLocation));
+		new ClassPathXmlApplicationContext(
+				"org/springframework/batch/core/configuration/xml/StepParserBadStepListenerTests-context.xml");
 	}
 
 	@Test(expected = BeanDefinitionParsingException.class)
 	public void testTaskletStepWithBadRetryListener() throws Exception {
-		String contextLocation = "org/springframework/batch/core/configuration/xml/StepParserBadRetryListenerTests-context.xml";
-		new XmlBeanFactory(new ClassPathResource(contextLocation));
+		new ClassPathXmlApplicationContext(
+				"org/springframework/batch/core/configuration/xml/StepParserBadRetryListenerTests-context.xml");
 	}
 
 	@Test
@@ -428,9 +427,11 @@ public class StepParserTests {
 		skippable.put(SkippableException.class, true);
 		skippable.put(FatalRuntimeException.class, false);
 		skippable.put(FatalSkippableException.class, false);
+		skippable.put(ForceRollbackForWriteSkipException.class, true);
 		Map<Class<? extends Throwable>, Boolean> retryable = new HashMap<Class<? extends Throwable>, Boolean>();
 		retryable.put(DeadlockLoserDataAccessException.class, true);
 		retryable.put(FatalSkippableException.class, true);
+		retryable.put(ForceRollbackForWriteSkipException.class, true);
 		List<Class<? extends ItemStream>> streams = Arrays.asList(CompositeItemStream.class, TestReader.class);
 		List<Class<? extends RetryListener>> retryListeners = Arrays.asList(RetryListenerSupport.class,
 				DummyRetryListener.class);
@@ -464,8 +465,10 @@ public class StepParserTests {
 		Map<Class<? extends Throwable>, Boolean> skippable = new HashMap<Class<? extends Throwable>, Boolean>();
 		skippable.put(SkippableException.class, true);
 		skippable.put(FatalSkippableException.class, false);
+		skippable.put(ForceRollbackForWriteSkipException.class, true);
 		Map<Class<? extends Throwable>, Boolean> retryable = new HashMap<Class<? extends Throwable>, Boolean>();
 		retryable.put(FatalSkippableException.class, true);
+		retryable.put(ForceRollbackForWriteSkipException.class, true);
 		List<Class<CompositeItemStream>> streams = Arrays.asList(CompositeItemStream.class);
 		List<Class<DummyRetryListener>> retryListeners = Arrays.asList(DummyRetryListener.class);
 		List<Class<CompositeStepExecutionListener>> stepListeners = Arrays.asList(CompositeStepExecutionListener.class);
@@ -495,8 +498,8 @@ public class StepParserTests {
 		StepParserStepFactoryBean<?, ?> fb = (StepParserStepFactoryBean<?, ?>) ctx
 				.getBean("&stepWithListsOverrideWithEmpty");
 
-		assertEquals(0, getExceptionMap(fb, "skippableExceptionClasses").size());
-		assertEquals(0, getExceptionMap(fb, "retryableExceptionClasses").size());
+		assertEquals(1, getExceptionMap(fb, "skippableExceptionClasses").size());
+		assertEquals(1, getExceptionMap(fb, "retryableExceptionClasses").size());
 		assertEquals(0, ((ItemStream[]) ReflectionTestUtils.getField(fb, "streams")).length);
 		assertEquals(0, ((RetryListener[]) ReflectionTestUtils.getField(fb, "retryListeners")).length);
 		assertEquals(0, ((StepListener[]) ReflectionTestUtils.getField(fb, "listeners")).length);

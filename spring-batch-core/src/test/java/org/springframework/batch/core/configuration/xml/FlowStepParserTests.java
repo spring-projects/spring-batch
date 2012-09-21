@@ -29,6 +29,8 @@ import org.springframework.batch.core.Job;
 import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.JobParameters;
 import org.springframework.batch.core.StepExecution;
+import org.springframework.batch.core.job.flow.FlowExecutionStatus;
+import org.springframework.batch.core.job.flow.JobExecutionDecider;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.repository.support.MapJobRepositoryFactoryBean;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -36,15 +38,14 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
-
 /**
  * @author Dave Syer
- *
+ * 
  */
 @ContextConfiguration
 @RunWith(SpringJUnit4ClassRunner.class)
 public class FlowStepParserTests {
-	
+
 	@Autowired
 	@Qualifier("job1")
 	private Job job1;
@@ -54,11 +55,19 @@ public class FlowStepParserTests {
 	private Job job2;
 
 	@Autowired
+	@Qualifier("job3")
+	private Job job3;
+
+	@Autowired
+	@Qualifier("job4")
+	private Job job4;
+
+	@Autowired
 	private JobRepository jobRepository;
 
 	@Autowired
 	private MapJobRepositoryFactoryBean mapJobRepositoryFactoryBean;
-	
+
 	@Before
 	public void setUp() {
 		mapJobRepositoryFactoryBean.clear();
@@ -86,6 +95,36 @@ public class FlowStepParserTests {
 		assertEquals("[job2.s1, job2.flow, s2, s3, job2.s4]", stepNames.toString());
 	}
 
+	@Test
+	public void testRepeatedFlow() throws Exception {
+		assertNotNull(job3);
+		JobExecution jobExecution = jobRepository.createJobExecution(job3.getName(), new JobParameters());
+		job3.execute(jobExecution);
+		assertEquals(BatchStatus.COMPLETED, jobExecution.getStatus());
+		List<String> stepNames = getStepNames(jobExecution);
+		assertEquals(6, stepNames.size());
+		assertEquals("[job3.flow, s2, s3, job3.flow, s2, s3]", stepNames.toString());
+	}
+
+	@Test
+	// TODO: BATCH-1745
+	public void testRestartedFlow() throws Exception {
+		assertNotNull(job4);
+		JobExecution jobExecution = jobRepository.createJobExecution(job4.getName(), new JobParameters());
+		job4.execute(jobExecution);
+		assertEquals(BatchStatus.FAILED, jobExecution.getStatus());
+		List<String> stepNames = getStepNames(jobExecution);
+		assertEquals(3, stepNames.size());
+		assertEquals("[job4.flow, s2, s3]", stepNames.toString());
+		jobExecution = jobRepository.createJobExecution(job4.getName(), new JobParameters());
+		job4.execute(jobExecution);
+		assertEquals(BatchStatus.FAILED, jobExecution.getStatus());
+		stepNames = getStepNames(jobExecution);
+		assertEquals(1, stepNames.size());
+		// The flow executes again, but all the steps were already complete
+		assertEquals("[job4.flow]", stepNames.toString());
+	}
+
 	private List<String> getStepNames(JobExecution jobExecution) {
 		List<String> list = new ArrayList<String>();
 		for (StepExecution stepExecution : jobExecution.getStepExecutions()) {
@@ -94,4 +133,16 @@ public class FlowStepParserTests {
 		return list;
 	}
 
+	public static class Decider implements JobExecutionDecider {
+
+		int count = 0;
+
+		public FlowExecutionStatus decide(JobExecution jobExecution, StepExecution stepExecution) {
+			if (count++ < 2) {
+				return new FlowExecutionStatus("OK");
+			}
+			return new FlowExecutionStatus("END");
+		}
+
+	}
 }

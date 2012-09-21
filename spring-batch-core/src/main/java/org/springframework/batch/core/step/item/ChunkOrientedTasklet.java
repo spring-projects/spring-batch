@@ -84,7 +84,7 @@ public class ChunkOrientedTasklet<I> implements Tasklet {
 		chunkContext.removeAttribute(INPUTS_KEY);
 		chunkContext.setComplete();
 
-		logger.debug("Inputs not busy, ended: "+inputs.isEnd());
+		logger.debug("Inputs not busy, ended: " + inputs.isEnd());
 		return RepeatStatus.continueIf(!inputs.isEnd());
 
 	}

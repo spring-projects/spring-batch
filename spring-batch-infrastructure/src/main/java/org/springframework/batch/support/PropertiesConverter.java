@@ -69,8 +69,8 @@ public final class PropertiesConverter {
 		}
 
 		if (!contains(stringToParse, "\n")) {
-			return StringUtils.splitArrayElementsIntoProperties(StringUtils
-					.commaDelimitedListToStringArray(stringToParse), "=");
+			stringToParse = StringUtils.arrayToDelimitedString(
+					StringUtils.commaDelimitedListToStringArray(stringToParse), "\n");
 		}
 
 		StringReader stringReader = new StringReader(stringToParse);

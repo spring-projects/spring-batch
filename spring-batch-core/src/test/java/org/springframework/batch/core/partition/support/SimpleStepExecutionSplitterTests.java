@@ -14,7 +14,9 @@ import java.util.Set;
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.batch.core.BatchStatus;
+import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.JobExecutionException;
+import org.springframework.batch.core.JobInstance;
 import org.springframework.batch.core.JobParameters;
 import org.springframework.batch.core.Step;
 import org.springframework.batch.core.StepExecution;
@@ -42,7 +44,7 @@ public class SimpleStepExecutionSplitterTests {
 
 	@Test
 	public void testSimpleStepExecutionProviderJobRepositoryStep() throws Exception {
-		SimpleStepExecutionSplitter splitter = new SimpleStepExecutionSplitter(jobRepository, step,
+		SimpleStepExecutionSplitter splitter = new SimpleStepExecutionSplitter(jobRepository, true, step.getName(),
 				new SimplePartitioner());
 		Set<StepExecution> execs = splitter.split(stepExecution, 2);
 		assertEquals(2, execs.size());
@@ -55,17 +57,18 @@ public class SimpleStepExecutionSplitterTests {
 	@Test
 	public void testSimpleStepExecutionProviderJobRepositoryStepPartitioner() throws Exception {
 		final Map<String, ExecutionContext> map = Collections.singletonMap("foo", new ExecutionContext());
-		SimpleStepExecutionSplitter splitter = new SimpleStepExecutionSplitter(jobRepository, step, new Partitioner() {
-			public Map<String, ExecutionContext> partition(int gridSize) {
-				return map;
-			}
-		});
+		SimpleStepExecutionSplitter splitter = new SimpleStepExecutionSplitter(jobRepository, true, step.getName(),
+				new Partitioner() {
+					public Map<String, ExecutionContext> partition(int gridSize) {
+						return map;
+					}
+				});
 		assertEquals(1, splitter.split(stepExecution, 2).size());
 	}
 
 	@Test
 	public void testRememberGridSize() throws Exception {
-		SimpleStepExecutionSplitter provider = new SimpleStepExecutionSplitter(jobRepository, step,
+		SimpleStepExecutionSplitter provider = new SimpleStepExecutionSplitter(jobRepository, true, step.getName(),
 				new SimplePartitioner());
 		Set<StepExecution> split = provider.split(stepExecution, 2);
 		assertEquals(2, split.size());
@@ -79,11 +82,12 @@ public class SimpleStepExecutionSplitterTests {
 			public Map<String, ExecutionContext> partition(int gridSize) {
 				return Collections.singletonMap("foo", new ExecutionContext());
 			}
+
 			public Collection<String> getPartitionNames(int gridSize) {
 				return Arrays.asList("foo");
 			}
 		}
-		SimpleStepExecutionSplitter provider = new SimpleStepExecutionSplitter(jobRepository, step,
+		SimpleStepExecutionSplitter provider = new SimpleStepExecutionSplitter(jobRepository, true, step.getName(),
 				new CustomPartitioner());
 		Set<StepExecution> split = provider.split(stepExecution, 2);
 		assertEquals(1, split.size());
@@ -95,14 +99,14 @@ public class SimpleStepExecutionSplitterTests {
 
 	@Test
 	public void testGetStepName() {
-		SimpleStepExecutionSplitter provider = new SimpleStepExecutionSplitter(jobRepository, step,
+		SimpleStepExecutionSplitter provider = new SimpleStepExecutionSplitter(jobRepository, true, step.getName(),
 				new SimplePartitioner());
 		assertEquals("step", provider.getStepName());
 	}
 
 	@Test
 	public void testUnkownStatus() throws Exception {
-		SimpleStepExecutionSplitter provider = new SimpleStepExecutionSplitter(jobRepository, step,
+		SimpleStepExecutionSplitter provider = new SimpleStepExecutionSplitter(jobRepository, true, step.getName(),
 				new SimplePartitioner());
 		Set<StepExecution> split = provider.split(stepExecution, 2);
 		assertEquals(2, split.size());
@@ -117,19 +121,30 @@ public class SimpleStepExecutionSplitterTests {
 	}
 
 	@Test
-	public void testCompleteStatus() throws Exception {
-		SimpleStepExecutionSplitter provider = new SimpleStepExecutionSplitter(jobRepository, step,
+	public void testCompleteStatusAfterFailure() throws Exception {
+		SimpleStepExecutionSplitter provider = new SimpleStepExecutionSplitter(jobRepository, false, step.getName(),
+				new SimplePartitioner());
+		Set<StepExecution> split = provider.split(stepExecution, 2);
+		assertEquals(2, split.size());
+		StepExecution nextExecution = update(split, stepExecution, BatchStatus.COMPLETED, false);
+		// If already complete in another JobExecution we don't execute again
+		assertEquals(0, provider.split(nextExecution, 2).size());
+	}
+
+	@Test
+	public void testCompleteStatusSameJobExecution() throws Exception {
+		SimpleStepExecutionSplitter provider = new SimpleStepExecutionSplitter(jobRepository, false, step.getName(),
 				new SimplePartitioner());
 		Set<StepExecution> split = provider.split(stepExecution, 2);
 		assertEquals(2, split.size());
 		stepExecution = update(split, stepExecution, BatchStatus.COMPLETED);
-		// If already complete we don't execute again
-		assertEquals(0, provider.split(stepExecution, 2).size());
+		// If already complete in the same JobExecution we should execute again
+		assertEquals(2, provider.split(stepExecution, 2).size());
 	}
 
 	@Test
 	public void testIncompleteStatus() throws Exception {
-		SimpleStepExecutionSplitter provider = new SimpleStepExecutionSplitter(jobRepository, step,
+		SimpleStepExecutionSplitter provider = new SimpleStepExecutionSplitter(jobRepository, true, step.getName(),
 				new SimplePartitioner());
 		Set<StepExecution> split = provider.split(stepExecution, 2);
 		assertEquals(2, split.size());
@@ -146,7 +161,7 @@ public class SimpleStepExecutionSplitterTests {
 
 	@Test
 	public void testAbandonedStatus() throws Exception {
-		SimpleStepExecutionSplitter provider = new SimpleStepExecutionSplitter(jobRepository, step,
+		SimpleStepExecutionSplitter provider = new SimpleStepExecutionSplitter(jobRepository, true, step.getName(),
 				new SimplePartitioner());
 		Set<StepExecution> split = provider.split(stepExecution, 2);
 		assertEquals(2, split.size());
@@ -163,6 +178,11 @@ public class SimpleStepExecutionSplitterTests {
 
 	private StepExecution update(Set<StepExecution> split, StepExecution stepExecution, BatchStatus status)
 			throws Exception {
+		return update(split, stepExecution, status, true);
+	}
+
+	private StepExecution update(Set<StepExecution> split, StepExecution stepExecution, BatchStatus status,
+			boolean sameJobExecution) throws Exception {
 
 		ExecutionContext executionContext = stepExecution.getExecutionContext();
 
@@ -176,7 +196,16 @@ public class SimpleStepExecutionSplitterTests {
 		stepExecution.setStatus(status);
 		jobRepository.update(stepExecution);
 
-		stepExecution = stepExecution.getJobExecution().createStepExecution(stepExecution.getStepName());
+		JobExecution jobExecution = stepExecution.getJobExecution();
+		if (!sameJobExecution) {
+			jobExecution.setStatus(BatchStatus.FAILED);
+			jobExecution.setEndTime(new Date());
+			jobRepository.update(jobExecution);
+			JobInstance jobInstance = jobExecution.getJobInstance();
+			jobExecution = jobRepository.createJobExecution(jobInstance.getJobName(), jobInstance.getJobParameters());
+		}
+
+		stepExecution = jobExecution.createStepExecution(stepExecution.getStepName());
 		stepExecution.setExecutionContext(executionContext);
 
 		jobRepository.add(stepExecution);

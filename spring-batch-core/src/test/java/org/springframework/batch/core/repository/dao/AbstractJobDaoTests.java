@@ -37,7 +37,7 @@ import org.springframework.batch.core.JobInstance;
 import org.springframework.batch.core.JobParameters;
 import org.springframework.batch.core.JobParametersBuilder;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.jdbc.core.simple.SimpleJdbcTemplate;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.transaction.annotation.Transactional;
 
 /**
@@ -61,11 +61,11 @@ public abstract class AbstractJobDaoTests {
 
 	protected Date jobExecutionStartTime = new Date(System.currentTimeMillis());
 
-	protected SimpleJdbcTemplate simpleJdbcTemplate;
+	protected JdbcTemplate jdbcTemplate;
 
 	@Autowired
 	public void setDataSource(DataSource dataSource) {
-		this.simpleJdbcTemplate = new SimpleJdbcTemplate(dataSource);
+		this.jdbcTemplate = new JdbcTemplate(dataSource);
 	}
 
 	/*
@@ -98,14 +98,14 @@ public abstract class AbstractJobDaoTests {
 
 	@Transactional @Test
 	public void testVersionIsNotNullForJob() throws Exception {
-		int version = simpleJdbcTemplate.queryForInt("select version from BATCH_JOB_INSTANCE where JOB_INSTANCE_ID="
+		int version = jdbcTemplate.queryForInt("select version from BATCH_JOB_INSTANCE where JOB_INSTANCE_ID="
 				+ jobInstance.getId());
 		assertEquals(0, version);
 	}
 
 	@Transactional @Test
 	public void testVersionIsNotNullForJobExecution() throws Exception {
-		int version = simpleJdbcTemplate.queryForInt("select version from BATCH_JOB_EXECUTION where JOB_EXECUTION_ID="
+		int version = jdbcTemplate.queryForInt("select version from BATCH_JOB_EXECUTION where JOB_EXECUTION_ID="
 				+ jobExecution.getId());
 		assertEquals(0, version);
 	}
@@ -221,7 +221,7 @@ public abstract class AbstractJobDaoTests {
 		// Create job.
 		jobInstance = jobInstanceDao.createJobInstance(testJob, jobParameters);
 
-		List<Map<String, Object>> jobs = simpleJdbcTemplate.queryForList(
+		List<Map<String, Object>> jobs = jdbcTemplate.queryForList(
 				"SELECT * FROM BATCH_JOB_INSTANCE where JOB_INSTANCE_ID=?",
 				jobInstance.getId());
 		assertEquals(1, jobs.size());

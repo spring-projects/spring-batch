@@ -34,7 +34,7 @@ import org.springframework.batch.item.ItemStreamException;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
-import org.springframework.jdbc.core.simple.SimpleJdbcTemplate;
+import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.util.Assert;
 import org.springframework.util.ClassUtils;
 
@@ -73,10 +73,6 @@ import org.springframework.util.ClassUtils;
  * @since 2.0
  */
 public class JdbcPagingItemReader<T> extends AbstractPagingItemReader<T> implements InitializingBean {
-
-	/**
-	 * 
-	 */
 	private static final String START_AFTER_VALUE = "start.after";
 
 	public static final int VALUE_NOT_SET = -1;
@@ -87,7 +83,7 @@ public class JdbcPagingItemReader<T> extends AbstractPagingItemReader<T> impleme
 
 	private Map<String, Object> parameterValues;
 
-	private SimpleJdbcTemplate simpleJdbcTemplate;
+	private NamedParameterJdbcTemplate namedParameterJdbcTemplate;
 
 	private RowMapper rowMapper;
 
@@ -169,7 +165,7 @@ public class JdbcPagingItemReader<T> extends AbstractPagingItemReader<T> impleme
 			jdbcTemplate.setFetchSize(fetchSize);
 		}
 		jdbcTemplate.setMaxRows(getPageSize());
-		this.simpleJdbcTemplate = new SimpleJdbcTemplate(jdbcTemplate);
+		namedParameterJdbcTemplate = new NamedParameterJdbcTemplate(jdbcTemplate);
 		Assert.notNull(queryProvider);
 		queryProvider.init(dataSource);
 		this.firstPageSql = queryProvider.generateFirstPageQuery(getPageSize());
@@ -196,16 +192,16 @@ public class JdbcPagingItemReader<T> extends AbstractPagingItemReader<T> impleme
 			}
 			if (parameterValues != null && parameterValues.size() > 0) {
 				if (this.queryProvider.isUsingNamedParameters()) {
-					query = simpleJdbcTemplate.getNamedParameterJdbcOperations().query(firstPageSql,
+					query = namedParameterJdbcTemplate.query(firstPageSql,
 							getParameterMap(parameterValues, null), rowCallback);
 				}
 				else {
-					query = simpleJdbcTemplate.getJdbcOperations().query(firstPageSql,
+					query = getJdbcTemplate().query(firstPageSql,
 							getParameterList(parameterValues, null).toArray(), rowCallback);
 				}
 			}
 			else {
-				query = simpleJdbcTemplate.getJdbcOperations().query(firstPageSql, rowCallback);
+				query = getJdbcTemplate().query(firstPageSql, rowCallback);
 			}
 
 		}
@@ -214,11 +210,11 @@ public class JdbcPagingItemReader<T> extends AbstractPagingItemReader<T> impleme
 				logger.debug("SQL used for reading remaining pages: [" + remainingPagesSql + "]");
 			}
 			if (this.queryProvider.isUsingNamedParameters()) {
-				query = simpleJdbcTemplate.getNamedParameterJdbcOperations().query(remainingPagesSql,
+				query = namedParameterJdbcTemplate.query(remainingPagesSql,
 						getParameterMap(parameterValues, startAfterValue), rowCallback);
 			}
 			else {
-				query = simpleJdbcTemplate.getJdbcOperations().query(remainingPagesSql,
+				query = getJdbcTemplate().query(remainingPagesSql,
 						getParameterList(parameterValues, startAfterValue).toArray(), rowCallback);
 			}
 		}
@@ -266,11 +262,11 @@ public class JdbcPagingItemReader<T> extends AbstractPagingItemReader<T> impleme
 				}
 			};
 			if (this.queryProvider.isUsingNamedParameters()) {
-				startAfterValue = simpleJdbcTemplate.getNamedParameterJdbcOperations().queryForObject(jumpToItemSql,
+				startAfterValue = namedParameterJdbcTemplate.queryForObject(jumpToItemSql,
 						getParameterMap(parameterValues, startAfterValue), startMapper);
 			}
 			else {
-				startAfterValue = simpleJdbcTemplate.getJdbcOperations().queryForObject(jumpToItemSql,
+				startAfterValue = getJdbcTemplate().queryForObject(jumpToItemSql,
 						getParameterList(parameterValues, startAfterValue).toArray(), startMapper);
 			}
 
@@ -309,9 +305,12 @@ public class JdbcPagingItemReader<T> extends AbstractPagingItemReader<T> impleme
 
 	private class PagingRowMapper implements RowMapper {
 		public Object mapRow(ResultSet rs, int rowNum) throws SQLException {
-			startAfterValue = rs.getObject(queryProvider.getSortKey());
+			startAfterValue = rs.getObject(queryProvider.getSortKeyWithoutAlias());
 			return rowMapper.mapRow(rs, rowNum);
 		}
 	}
 
+	private JdbcTemplate getJdbcTemplate() {
+		return (JdbcTemplate) namedParameterJdbcTemplate.getJdbcOperations();
+	}
 }

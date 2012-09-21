@@ -19,11 +19,13 @@ package org.springframework.batch.core.step.tasklet;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
-import org.junit.Before;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.junit.Test;
 import org.springframework.batch.core.BatchStatus;
 import org.springframework.batch.core.JobExecution;
@@ -32,9 +34,11 @@ import org.springframework.batch.core.StepExecution;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.step.JobRepositorySupport;
 import org.springframework.batch.item.ExecutionContext;
+import org.springframework.batch.item.ItemProcessor;
 import org.springframework.batch.item.ItemStreamSupport;
 import org.springframework.batch.item.ItemWriter;
 import org.springframework.batch.item.support.ListItemReader;
+import org.springframework.batch.item.support.PassThroughItemProcessor;
 import org.springframework.batch.repeat.policy.SimpleCompletionPolicy;
 import org.springframework.batch.repeat.support.RepeatTemplate;
 import org.springframework.batch.repeat.support.TaskExecutorRepeatTemplate;
@@ -43,6 +47,8 @@ import org.springframework.core.task.SimpleAsyncTaskExecutor;
 import org.springframework.util.StringUtils;
 
 public class AsyncTaskletStepTests {
+
+	private static Log logger = LogFactory.getLog(AsyncTaskletStepTests.class);
 
 	private List<String> processed = new CopyOnWriteArrayList<String>();
 
@@ -53,25 +59,32 @@ public class AsyncTaskletStepTests {
 	ItemWriter<String> itemWriter = new ItemWriter<String>() {
 		public void write(List<? extends String> data) throws Exception {
 			// Thread.sleep(100L);
+			logger.info("Items: " + data);
 			processed.addAll(data);
+			if (data.contains("fail")) {
+				throw new RuntimeException("Planned");
+			}
 		}
 	};
 
 	private JobRepository jobRepository;
 
-	@Before
-	public void setUp() throws Exception {
+	private List<String> items;
+
+	private int concurrencyLimit = 300;
+
+	private ItemProcessor<String, String> itemProcessor = new PassThroughItemProcessor<String>();
+
+	private void setUp() throws Exception {
 
 		step = new TaskletStep("stepName");
 
 		ResourcelessTransactionManager transactionManager = new ResourcelessTransactionManager();
 		step.setTransactionManager(transactionManager);
 
-		List<String> items = Arrays.asList(StringUtils
-				.commaDelimitedListToStringArray("1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25"));
 		RepeatTemplate chunkTemplate = new RepeatTemplate();
 		chunkTemplate.setCompletionPolicy(new SimpleCompletionPolicy(2));
-		step.setTasklet(new TestingChunkOrientedTasklet<String>(new ListItemReader<String>(items), itemWriter,
+		step.setTasklet(new TestingChunkOrientedTasklet<String>(new ListItemReader<String>(items), itemProcessor, itemWriter,
 				chunkTemplate));
 
 		jobRepository = new JobRepositorySupport();
@@ -80,7 +93,7 @@ public class AsyncTaskletStepTests {
 		TaskExecutorRepeatTemplate template = new TaskExecutorRepeatTemplate();
 		template.setThrottleLimit(throttleLimit);
 		SimpleAsyncTaskExecutor taskExecutor = new SimpleAsyncTaskExecutor();
-		taskExecutor.setConcurrencyLimit(300);
+		taskExecutor.setConcurrencyLimit(concurrencyLimit);
 		template.setTaskExecutor(taskExecutor);
 		step.setStepOperations(template);
 
@@ -101,6 +114,11 @@ public class AsyncTaskletStepTests {
 	@Test
 	public void testStepExecutionUpdates() throws Exception {
 
+		items = new ArrayList<String>(Arrays.asList(StringUtils
+				.commaDelimitedListToStringArray("1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25")));
+
+		setUp();
+
 		JobExecution jobExecution = jobRepository.createJobExecution("JOB", new JobParameters());
 		StepExecution stepExecution = jobExecution.createStepExecution(step.getName());
 
@@ -114,11 +132,86 @@ public class AsyncTaskletStepTests {
 		// System.err.println(processed);
 		// Check commit count didn't spin out of control waiting for other
 		// threads to finish...
-		assertTrue("Not enough commits: " + stepExecution.getCommitCount(), stepExecution.getCommitCount() > processed
-				.size() / 2);
-		assertTrue("Too many commits: " + stepExecution.getCommitCount(), stepExecution.getCommitCount() <= processed
-				.size()
-				/ 2 + throttleLimit + 1);
+		assertTrue("Not enough commits: " + stepExecution.getCommitCount(),
+				stepExecution.getCommitCount() > processed.size() / 2);
+		assertTrue("Too many commits: " + stepExecution.getCommitCount(),
+				stepExecution.getCommitCount() <= processed.size() / 2 + throttleLimit + 1);
+
+	}
+
+	/**
+	 * StepExecution should fail immediately on error.
+	 */
+	@Test
+	public void testStepExecutionFails() throws Exception {
+
+		throttleLimit = 1;
+		concurrencyLimit = 1;
+		items = Arrays.asList("one", "fail", "three", "four");
+		setUp();
+
+		JobExecution jobExecution = jobRepository.createJobExecution("JOB", new JobParameters());
+		StepExecution stepExecution = jobExecution.createStepExecution(step.getName());
+
+		step.execute(stepExecution);
+
+		assertEquals(BatchStatus.FAILED, stepExecution.getStatus());
+		assertEquals(2, stepExecution.getReadCount());
+		assertEquals(2, processed.size());
+
+	}
+
+	/**
+	 * StepExecution should fail immediately on error in processor.
+	 */
+	@Test
+	public void testStepExecutionFailsWithProcessor() throws Exception {
+
+		throttleLimit = 1;
+		concurrencyLimit = 1;
+		items = Arrays.asList("one", "barf", "three", "four");
+		itemProcessor = new ItemProcessor<String, String>() {
+			public String process(String item) throws Exception {
+				logger.info("Item: "+item);
+				processed.add(item);
+				if (item.equals("barf")) {
+					throw new RuntimeException("Planned processor error");
+				}
+				return item;
+			}
+		};
+		setUp();
+
+		JobExecution jobExecution = jobRepository.createJobExecution("JOB", new JobParameters());
+		StepExecution stepExecution = jobExecution.createStepExecution(step.getName());
+
+		step.execute(stepExecution);
+
+		assertEquals(BatchStatus.FAILED, stepExecution.getStatus());
+		assertEquals(2, stepExecution.getReadCount());
+		assertEquals(2, processed.size());
+
+	}
+
+	/**
+	 * StepExecution should fail immediately on error.
+	 */
+	@Test
+	public void testStepExecutionFailsOnLastItem() throws Exception {
+
+		throttleLimit = 1;
+		concurrencyLimit = 1;
+		items = Arrays.asList("one", "two", "three", "fail");
+		setUp();
+
+		JobExecution jobExecution = jobRepository.createJobExecution("JOB", new JobParameters());
+		StepExecution stepExecution = jobExecution.createStepExecution(step.getName());
+
+		step.execute(stepExecution);
+
+		assertEquals(BatchStatus.FAILED, stepExecution.getStatus());
+		assertEquals(4, stepExecution.getReadCount());
+		assertEquals(4, processed.size());
 
 	}
 

@@ -37,10 +37,9 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.jdbc.SimpleJdbcTestUtils;
 
-
 /**
  * @author Dave Syer
- *
+ * 
  */
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(locations = { "/simple-job-launcher-context.xml", "/META-INF/batch/footballJob.xml" })
@@ -48,31 +47,37 @@ public class FootballJobIntegrationTests {
 
 	/** Logger */
 	private final Log logger = LogFactory.getLog(getClass());
-	
+
 	private SimpleJdbcTemplate simpleJdbcTemplate;
 
 	@Autowired
 	private JobLauncher jobLauncher;
-	
+
 	@Autowired
 	private Job job;
-	
+
 	@Autowired
 	public void setDataSource(DataSource dataSource) {
 		this.simpleJdbcTemplate = new SimpleJdbcTemplate(dataSource);
 	}
-	
+
 	@Before
 	public void clear() {
 		SimpleJdbcTestUtils.deleteFromTables(simpleJdbcTemplate, "PLAYER_SUMMARY", "GAMES", "PLAYERS");
 	}
-	
+
 	@Test
 	public void testLaunchJob() throws Exception {
-		JobExecution execution = jobLauncher.run(job, new JobParametersBuilder().toJobParameters());
+		JobExecution execution = jobLauncher.run(job, new JobParametersBuilder().addLong("commit.interval", 10L)
+				.toJobParameters());
 		assertEquals(BatchStatus.COMPLETED, execution.getStatus());
 		for (StepExecution stepExecution : execution.getStepExecutions()) {
-			logger.info("Processed: "+stepExecution);
+			logger.info("Processed: " + stepExecution);
+			if (stepExecution.getStepName().equals("playerload")) {
+				// The effect of the retries
+				assertEquals(new Double(Math.ceil(stepExecution.getReadCount() / 10. + 1)).intValue(),
+						stepExecution.getCommitCount());
+			}
 		}
 	}
 

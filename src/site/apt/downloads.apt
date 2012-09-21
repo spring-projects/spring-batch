@@ -7,25 +7,29 @@
 
 Spring Batch Downloads
 
-  The current GA release is <<2.1.6.RELEASE>>, the latest snapshots are <<2.1.7.CI-SNAPSHOT>>.  The version 2.0.x and 1.x branches are now in maintenance (the last release was <<2.0.4.RELEASE>>).
+  The current GA release is <<2.1.9.RELEASE>>, the latest snapshots are <<2.2.0.BUILD-SNAPSHOT>>.  The version 2.0.x and 1.x branches are now in maintenance (the last release was <<2.0.4.RELEASE>>).
+
+For runtime concerns and a container for running a Job as a service see the {{{http://static.springframework.org/spring-batch-admin}Spring Batch Admin}} project and the {{{http://static.springframework.org/spring-batch-admin/getting-started.html}getting started}} link there.
 
 * Zip Downloads
 
-  There is a ZIP artifact containing the release JARs called  <<<spring-batch-*-no-dependencies.zip>>>.  This file contains the JAR files for the release, including source code.  In addition, this release contains the Spring Batch source code including the samples.
+  There is a ZIP artifact containing the release JARs called  <<<spring-batch-*-no-dependencies.zip>>>.  This file contains the JAR files for the release, including source code and the samples.
 
   * Full releases: {{{http://static.springframework.org/downloads/nightly/release-download.php?project=BATCH}here}}.  
 
   * Milestones: {{{http://static.springframework.org/downloads/nightly/milestone-download.php?project=BATCH}here}}.
 
+Source code can also be browsed and downloaded at {{{http://github.com/SpringSource/spring-batch}Github}}.
+
 * Maven Artifacts
 
-  Traditional "spring-*" artifacts are deployed on the Maven central repo.  Full releases in this format also go in our s3 repository, browseable {{{http://s3browse.com/explore/maven.springframework.org/release/org/springframework/batch}here}}:
+  Traditional "spring-*" artifacts are deployed on the Maven central repo.  Full releases in this format also go in our s3 repository, browseable {{{http://shrub.appspot.com/maven.springframework.org/release/org/springframework/batch}here}}:
 
 +---------------
 <repository>
     <id>spring-releases</id>
     <name>Spring Maven RELEASE Repository</name>
-    <url>http://s3.amazonaws.com/maven.springframework.org/release</url>
+    <url>http://maven.springframework.org/release</url>
 </repository>
 +---------------
 
@@ -37,11 +41,11 @@ Spring Batch Downloads
 <dependency>
     <groupId>org.springframework.batch</groupId>
     <artifactId>spring-batch-core</artifactId>
-    <version>2.1.6.RELEASE</version>
+    <version>2.1.9.RELEASE</version>
 </dependency>
 +---------------
 
-  All releases are also published in the SpringSource Enterprise Repository, {{{http://www.springsource.com/repository/app/}searchable here}} and {{{http://s3browse.com/explore/repository.springsource.com/maven/bundles/release}browseable here}}.  The repository is segregrated by release, milestone and snaphot releases.  For full releases use these repositories:
+  All releases are also published in the SpringSource Enterprise Repository, {{{http://www.springsource.com/repository/app/}searchable here}} and {{{http://shrub.appspot.com/repository.springsource.com/maven/bundles/release}browseable here}}.  The repository is segregrated by release, milestone and snaphot releases.  For full releases use these repositories:
 
 +---
 <repository>
@@ -70,7 +74,7 @@ Spring Batch Downloads
 <dependency>
     <groupId>org.springframework.batch</groupId>
     <artifactId>org.springframework.batch.core</artifactId>
-    <version>2.1.6.RELEASE</version>
+    <version>2.1.9.RELEASE</version>
 </dependency>
 +---------------
 
@@ -80,13 +84,13 @@ Spring Batch Downloads
 
   You can find the .ZIP downloads of the milestones {{{http://static.springframework.org/downloads/nightly/milestone-download.php?project=BATCH}here}}.
 
-  Milestones also published in the s3 repository with Maven Central format dependencies {{{http://s3browse.com/explore/maven.springframework.org/milestone/org/springframework/batch}browseable here}}.  To use them, just add the following repository to your POM (inside a \<repositories\> element at the top level):
+  Milestones also published in the s3 repository with Maven Central format dependencies {{{http://shrub.appspot.com/maven.springframework.org/milestone/org/springframework/batch}browseable here}}.  To use them, just add the following repository to your POM (inside a \<repositories\> element at the top level):
 
 +---------------
 <repository>
     <id>spring-s3</id>
     <name>Spring Maven MILESTONE Repository</name>
-    <url>http://s3.amazonaws.com/maven.springframework.org/milestone</url>
+    <url>http://maven.springframework.org/milestone</url>
 </repository>
 +---------------
 
@@ -96,11 +100,11 @@ Spring Batch Downloads
 <dependency>
     <groupId>org.springframework.batch</groupId>
     <artifactId>spring-batch-core</artifactId>
-    <version>2.1.6.RELEASE</version>
+    <version>2.1.9.RELEASE</version>
 </dependency>
 +---------------
 
-  Milestones are also deployed to the SpringSource Enterprise Repository ({{{http://s3browse.com/explore/repository.springsource.com/maven/bundles/milestone}browseable here}}), so use this repository if you want to depend on artifacts in the <<<org.springframework.*>>> style:
+  Milestones are also deployed to the SpringSource Enterprise Repository ({{{http://shrub.appspot.com/repository.springsource.com/maven/bundles/milestone}browseable here}}), so use this repository if you want to depend on artifacts in the <<<org.springframework.*>>> style:
 
 +---
 <repository>
@@ -120,7 +124,7 @@ Spring Batch Downloads
 <dependency>
     <groupId>org.springframework.batch</groupId>
     <artifactId>org.springframework.batch.core</artifactId>
-    <version>2.1.6.RELEASE</version>
+    <version>2.1.9.RELEASE</version>
 </dependency>
 +---------------
 

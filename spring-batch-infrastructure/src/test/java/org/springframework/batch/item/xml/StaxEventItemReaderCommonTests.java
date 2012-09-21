@@ -1,18 +1,16 @@
 package org.springframework.batch.item.xml;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertTrue;
 
 import java.io.IOException;
 
-import org.junit.runner.RunWith;
-import org.junit.internal.runners.JUnit4ClassRunner;
-
 import javax.xml.stream.XMLEventReader;
-import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.events.Attribute;
 import javax.xml.stream.events.StartElement;
 import javax.xml.transform.Source;
 
+import org.junit.runners.JUnit4;
+import org.junit.runner.RunWith;
 import org.springframework.batch.item.AbstractItemStreamItemReaderTests;
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.item.ItemReader;
@@ -20,9 +18,8 @@ import org.springframework.batch.item.sample.Foo;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.oxm.Unmarshaller;
 import org.springframework.oxm.XmlMappingException;
-import org.springframework.xml.transform.StaxSource;
 
-@RunWith(JUnit4ClassRunner.class)
+@RunWith(JUnit4.class)
 public class StaxEventItemReaderCommonTests extends AbstractItemStreamItemReaderTests {
 
 	private final static String FOOS = "<foos> <foo value=\"1\"/> <foo value=\"2\"/> <foo value=\"3\"/> <foo value=\"4\"/> <foo value=\"5\"/> </foos>";
@@ -33,15 +30,14 @@ public class StaxEventItemReaderCommonTests extends AbstractItemStreamItemReader
 		reader.setFragmentRootElementName("foo");
 		reader.setUnmarshaller(new Unmarshaller() {
 			public Object unmarshal(Source source) throws XmlMappingException, IOException {
-				StaxSource staxSource = (StaxSource) source;
-				XMLEventReader eventReader = staxSource.getXMLEventReader();
-				Attribute attr;
+				Attribute attr = null ;
 				try {
+					XMLEventReader eventReader = StaxUtils.getXmlEventReader( source);
 					assertTrue(eventReader.nextEvent().isStartDocument());
 					StartElement event = eventReader.nextEvent().asStartElement();
 					attr = (Attribute) event.getAttributes().next();
 				}
-				catch (XMLStreamException e) {
+				catch  (Exception e) {
 					throw new RuntimeException(e);
 				}
 				Foo foo = new Foo();

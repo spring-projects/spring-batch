@@ -1,0 +1,81 @@
+Spring Batch 2.1.9 Release Notes
+
+* Bug
+
+  * {{{https://jira.springframework.org/browse/BATCH-1751}[BATCH-1751]}} - Not possible to use property-placeholder values in batch-attributes
+
+  * {{{https://jira.springframework.org/browse/BATCH-1756}[BATCH-1756]}} - Make round-trip <<<JobParameters-Properties-JobParameters>>> work for double parameters
+
+  * {{{https://jira.springframework.org/browse/BATCH-1761}[BATCH-1761]}} - Only first item in chunk is re-processed on retry of failed write
+
+  * {{{https://jira.springframework.org/browse/BATCH-1772}[BATCH-1772]}} - missing closing xml tag in spring batch html user guide: 5.1.1. Configuring a Step
+
+  * {{{https://jira.springframework.org/browse/BATCH-1775}[BATCH-1775]}} - Inner beans of same type inside <<<<chunk/>>>> elements with scope ="step" leads to mistaken override of bean definitions
+
+  * {{{https://jira.springframework.org/browse/BATCH-1776}[BATCH-1776]}} - Batch Src Build unable to find FoundryLogic.vpp
+
+  * {{{https://jira.springframework.org/browse/BATCH-1783}[BATCH-1783]}} - Throwing exceptions inside a ChunkListener results in endless loop
+
+  * {{{https://jira.springframework.org/browse/BATCH-1798}[BATCH-1798]}} - MultiResourceItemReader fails on Restart if read() method was not called.
+
+  * {{{https://jira.springframework.org/browse/BATCH-1804}[BATCH-1804]}} - Retry does not work if additional exception occurs in the ItemWriter during scan for failure
+
+  * {{{https://jira.springframework.org/browse/BATCH-1812}[BATCH-1812]}} - ItemWriteListener does not work as expected, not called when writer runs in "recoverer"
+
+  * {{{https://jira.springframework.org/browse/BATCH-1813}[BATCH-1813]}} - BeanWrapperFieldSetMapper properties caching is broken
+
+  * {{{https://jira.springframework.org/browse/BATCH-1821}[BATCH-1821]}} - Possible mistake in current batch documentation
+
+  * {{{https://jira.springframework.org/browse/BATCH-1822}[BATCH-1822]}} - Job execution marked as STOPPED when exception occurs while committing StepExecution
+
+  * {{{https://jira.springframework.org/browse/BATCH-1826}[BATCH-1826]}} - Null pointer exception if optional parameter of type DATE is null
+
+  * {{{https://jira.springframework.org/browse/BATCH-1840}[BATCH-1840]}} - job execution continues when step is in status unknown
+
+  * {{{https://jira.springframework.org/browse/BATCH-1841}[BATCH-1841]}} - Upgrading to spring batch 2.1.8 causes error in processing xml configuration
+
+  * {{{https://jira.springframework.org/browse/BATCH-1848}[BATCH-1848]}} - JdbcPagingItemReader does not support table or column aliases due to sortKey being used in where clause, order by clause and for retrieval of result set column
+
+  * {{{https://jira.springframework.org/browse/BATCH-1852}[BATCH-1852]}} - Very quick (lt 1ms) jobs are poorly identified
+
+* Defect
+
+  * {{{https://jira.springframework.org/browse/BATCH-1753}[BATCH-1753]}} - Problems With FlatFileItemWriter: error while trying to restart an execution
+
+* Improvement
+
+  * {{{https://jira.springframework.org/browse/BATCH-1760}[BATCH-1760]}} - JobConfigurationRegistry referenced in MapJobRegistry comments
+
+  * {{{https://jira.springframework.org/browse/BATCH-1764}[BATCH-1764]}} - Correct JavaDoc for HibernateItemWriter
+
+  * {{{https://jira.springframework.org/browse/BATCH-1769}[BATCH-1769]}} - FlatFileItemReader javadocs
+
+  * {{{https://jira.springframework.org/browse/BATCH-1777}[BATCH-1777]}} - org.springframework.batch.core.converter.DefaultJobParametersConverter not safe for use with certain Locales
+
+  * {{{https://jira.springframework.org/browse/BATCH-1800}[BATCH-1800]}} - AbstractItemCountingItemStreamItemReader could implement ItemStreamReader interface instead of ItemStream and ItemReader
+
+  * {{{https://jira.springframework.org/browse/BATCH-1805}[BATCH-1805]}} - Clarify JavaDoc for JobParametersConverter
+
+  * {{{https://jira.springframework.org/browse/BATCH-1806}[BATCH-1806]}} - Javadoc for FlowExecutionStatus
+
+  * {{{https://jira.springframework.org/browse/BATCH-1815}[BATCH-1815]}} - RunIdIncrementer goes against java best practices
+
+  * {{{https://jira.springframework.org/browse/BATCH-1818}[BATCH-1818]}} - JobInterruptedException should not be logged
+
+  * {{{https://jira.springframework.org/browse/BATCH-1830}[BATCH-1830]}} - Don't log the JobInterruptedException when stopping a job
+
+  * {{{https://jira.springframework.org/browse/BATCH-1834}[BATCH-1834]}} - allow nested tasklets to be specified in the schema
+
+  * {{{https://jira.springframework.org/browse/BATCH-1861}[BATCH-1861]}} - Concurrency Support for in-memory repositories
+
+  * {{{https://jira.springframework.org/browse/BATCH-1862}[BATCH-1862]}} - Update README to reflect Maven 3.0 works
+
+  * {{{https://jira.springframework.org/browse/BATCH-1867}[BATCH-1867]}} - StaxEventItemWriter should be easier to override
+
+  * {{{https://jira.springframework.org/browse/BATCH-1874}[BATCH-1874]}} - provide a regex based line mapper
+
+  * {{{https://jira.springframework.org/browse/BATCH-1881}[BATCH-1881]}} - force sync to underlying file system in FlatFileItemWriter and StaxEventItemWriter
+
+* New Feature
+
+  * {{{https://jira.springframework.org/browse/BATCH-1758}[BATCH-1758]}} - Round trip <<<Properties-String-Properties>>> broken for short Strings in PropertiesConverter

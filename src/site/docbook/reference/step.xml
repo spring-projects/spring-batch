@@ -35,7 +35,7 @@
     the data one at a time, and creating 'chunks' that will be written out,
     within a transaction boundary. One item is read in from an
     <classname>ItemReader</classname>, handed to an
-    <classname>ItemWriter</classname>, and aggregated. Once the number of
+    <classname>ItemProcessor</classname>, and aggregated. Once the number of
     items read equals the commit interval, the entire chunk is written out via
     the ItemWriter, and then the transaction is committed.</para>
 
@@ -74,7 +74,7 @@ itemWriter.write(items);</programlisting>
     &lt;step id="step1"&gt;
         &lt;tasklet transaction-manager="transactionManager"&gt;
             &lt;chunk reader="itemReader" writer="itemWriter" commit-interval="10"/&gt;
-        &lt;tasklet&gt;
+        &lt;/tasklet&gt;
     &lt;/step&gt;
 &lt;/job&gt;</programlisting>
 
@@ -745,9 +745,9 @@ itemWriter.write(items);</programlisting>
 
         <para>A chunk is defined as the items processed within the scope of a
         transaction. Committing a transaction, at each commit interval,
-        commits a 'chunk'. A <classname>ChunkListener</classname> may be
+        commits a 'chunk'. A <classname>ChunkListener</classname> can be
         useful to perform logic before a chunk begins processing or after a
-        chunk has completed:</para>
+        chunk has completed successfully:</para>
 
         <programlisting>public interface ChunkListener extends StepListener {
 
@@ -760,10 +760,8 @@ itemWriter.write(items);</programlisting>
         <para>The <methodname>beforeChunk</methodname> method is called after
         the transaction is started, but before <methodname>read</methodname>
         is called on the <classname>ItemReader</classname>. Conversely,
-        <methodname>afterChunk</methodname> is called after the last call to
-        <methodname>write</methodname> on the
-        <classname>ItemWriter</classname>, but before the chunk has been
-        committed.</para>
+        <methodname>afterChunk</methodname> is called after the chunk has been
+        committed (and not at all if there is a rollback).</para>
 
         <para>The annotations corresponding to this interface are:</para>
 

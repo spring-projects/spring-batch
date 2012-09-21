@@ -38,8 +38,8 @@ import org.springframework.batch.core.repository.dao.AbstractJdbcBatchMetadataDa
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.simple.ParameterizedRowMapper;
-import org.springframework.jdbc.core.simple.SimpleJdbcOperations;
-import org.springframework.jdbc.core.simple.SimpleJdbcTemplate;
+import org.springframework.jdbc.core.JdbcOperations;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.util.Assert;
 
 /**
@@ -64,7 +64,7 @@ public class JobRepositoryTestUtils extends AbstractJdbcBatchMetadataDao impleme
 
 	};
 
-	private SimpleJdbcOperations jdbcTemplate;
+	private JdbcOperations jdbcTemplate;
 
 	/**
 	 * @see InitializingBean#afterPropertiesSet()
@@ -94,7 +94,7 @@ public class JobRepositoryTestUtils extends AbstractJdbcBatchMetadataDao impleme
 	}
 
 	public final void setDataSource(DataSource dataSource) {
-		jdbcTemplate = new SimpleJdbcTemplate(dataSource);
+		jdbcTemplate = new JdbcTemplate(dataSource);
 	}
 
 	/**
@@ -193,11 +193,9 @@ public class JobRepositoryTestUtils extends AbstractJdbcBatchMetadataDao impleme
 	 * {@link JobInstance} and {@link StepExecution} instances from the standard
 	 * RDBMS locations used by Spring Batch.
 	 * 
-	 * @param list a list of {@link JobExecution}
 	 * @throws DataAccessException if there is a problem
 	 */
 	public void removeJobExecutions() throws DataAccessException {
-
 		jdbcTemplate.update(getQuery("delete from %PREFIX%STEP_EXECUTION_CONTEXT"));
 		jdbcTemplate.update(getQuery("delete from %PREFIX%STEP_EXECUTION"));
 		jdbcTemplate.update(getQuery("delete from %PREFIX%JOB_EXECUTION_CONTEXT"));

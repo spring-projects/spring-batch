@@ -27,10 +27,12 @@ import java.nio.channels.FileChannel;
 import java.util.List;
 import java.util.Map;
 
+import javax.xml.stream.FactoryConfigurationError;
 import javax.xml.stream.XMLEventFactory;
 import javax.xml.stream.XMLEventWriter;
 import javax.xml.stream.XMLOutputFactory;
 import javax.xml.stream.XMLStreamException;
+import javax.xml.transform.Result;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -52,7 +54,6 @@ import org.springframework.util.Assert;
 import org.springframework.util.ClassUtils;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
-import org.springframework.xml.transform.StaxResult;
 
 /**
  * An implementation of {@link ItemWriter} which uses StAX and
@@ -138,6 +139,8 @@ public class StaxEventItemWriter<T> extends ExecutionContextUserSupport implemen
 
 	private boolean transactional = true;
 
+	private boolean forceSync;
+
 	public StaxEventItemWriter() {
 		setName(ClassUtils.getShortName(StaxEventItemWriter.class));
 	}
@@ -183,6 +186,19 @@ public class StaxEventItemWriter<T> extends ExecutionContextUserSupport implemen
 	 */
 	public void setTransactional(boolean transactional) {
 		this.transactional = transactional;
+	}
+
+	/**
+	 * Flag to indicate that changes should be force-synced to disk on flush.
+	 * Defaults to false, which means that even with a local disk changes could
+	 * be lost if the OS crashes in between a write and a cache flush. Setting
+	 * to true may result in slower performance for usage patterns involving
+	 * many frequent writes.
+	 * 
+	 * @param forceSync the flag value to set
+	 */
+	public void setForceSync(boolean forceSync) {
+		this.forceSync = forceSync;
 	}
 
 	/**
@@ -358,12 +374,14 @@ public class StaxEventItemWriter<T> extends ExecutionContextUserSupport implemen
 
 		File file;
 		FileOutputStream os = null;
+		FileChannel fileChannel = null;
 
 		try {
 			file = resource.getFile();
 			FileUtils.setUpOutputFile(file, restarted, false, overwriteOutput);
 			Assert.state(resource.exists(), "Output resource must exist");
 			os = new FileOutputStream(file, true);
+			fileChannel = os.getChannel();
 			channel = os.getChannel();
 			setPosition(position);
 		}
@@ -371,7 +389,7 @@ public class StaxEventItemWriter<T> extends ExecutionContextUserSupport implemen
 			throw new DataAccessResourceFailureException("Unable to write to file resource: [" + resource + "]", ioe);
 		}
 
-		XMLOutputFactory outputFactory = XMLOutputFactory.newInstance();
+		XMLOutputFactory outputFactory = createXmlOutputFactory();
 
 		if (outputFactory.isPropertySupported("com.ctc.wstx.automaticEndElements")) {
 			// If the current XMLOutputFactory implementation is supplied by
@@ -383,24 +401,33 @@ public class StaxEventItemWriter<T> extends ExecutionContextUserSupport implemen
 		}
 		if (outputFactory.isPropertySupported("com.ctc.wstx.outputValidateStructure")) {
 			// On restart we don't write the root element so we have to disable
-			// structural validation (see: 
+			// structural validation (see:
 			// http://jira.springframework.org/browse/BATCH-1681).
 			outputFactory.setProperty("com.ctc.wstx.outputValidateStructure", Boolean.FALSE);
 		}
 
 		try {
+			final FileChannel channel = fileChannel;
+			Writer writer = new BufferedWriter(new OutputStreamWriter(os, encoding)) {
+				@Override
+				public void flush() throws IOException {
+					super.flush();
+					if (forceSync) {
+						channel.force(false);
+					}
+				}
+			};
 			if (transactional) {
-				bufferedWriter = new TransactionAwareBufferedWriter(new OutputStreamWriter(os, encoding),
-						new Runnable() {
-							public void run() {
-								closeStream();
-							}
-						});
+				bufferedWriter = new TransactionAwareBufferedWriter(writer, new Runnable() {
+					public void run() {
+						closeStream();
+					}
+				});
 			}
 			else {
-				bufferedWriter = new BufferedWriter(new OutputStreamWriter(os, encoding));
+				bufferedWriter = writer;
 			}
-			delegateEventWriter = outputFactory.createXMLEventWriter(bufferedWriter);
+			delegateEventWriter = createXmlEventWriter(outputFactory, bufferedWriter);
 			eventWriter = new NoStartEndDocumentStreamWriter(delegateEventWriter);
 			if (!restarted) {
 				startDocument(delegateEventWriter);
@@ -417,6 +444,46 @@ public class StaxEventItemWriter<T> extends ExecutionContextUserSupport implemen
 	}
 
 	/**
+	 * Subclasses can override to customize the writer.
+	 * @param outputFactory
+	 * @param writer
+	 * @return an xml writer
+	 * @throws XMLStreamException
+	 */
+	protected XMLEventWriter createXmlEventWriter(XMLOutputFactory outputFactory, Writer writer)
+			throws XMLStreamException {
+		return outputFactory.createXMLEventWriter(writer);
+	}
+
+	/**
+	 * Subclasses can override to customize the factory.
+	 * @return a factory for the xml output
+	 * @throws FactoryConfigurationError
+	 */
+	protected XMLOutputFactory createXmlOutputFactory() throws FactoryConfigurationError {
+		return XMLOutputFactory.newInstance();
+	}
+
+	/**
+	 * Subclasses can override to customize the event factory.
+	 * @return a factory for the xml events
+	 * @throws FactoryConfigurationError
+	 */
+	protected XMLEventFactory createXmlEventFactory() throws FactoryConfigurationError {
+		XMLEventFactory factory = XMLEventFactory.newInstance();
+		return factory;
+	}
+
+	/**
+	 * Subclasses can override to customize the stax result.
+	 * @return a result for writing to
+	 * @throws Exception
+	 */
+	protected Result createStaxResult() throws Exception {
+		return StaxUtils.getResult(eventWriter);
+	}
+
+	/**
 	 * Writes simple XML header containing:
 	 * <ul>
 	 * <li>xml declaration - defines encoding and XML version</li>
@@ -430,7 +497,7 @@ public class StaxEventItemWriter<T> extends ExecutionContextUserSupport implemen
 	 */
 	protected void startDocument(XMLEventWriter writer) throws XMLStreamException {
 
-		XMLEventFactory factory = XMLEventFactory.newInstance();
+		XMLEventFactory factory = createXmlEventFactory();
 
 		// write start document
 		writer.add(factory.createStartDocument(getEncoding(), getVersion()));
@@ -501,8 +568,7 @@ public class StaxEventItemWriter<T> extends ExecutionContextUserSupport implemen
 	 */
 	public void close() {
 
-		// harmless event to close the root tag if there were no items
-		XMLEventFactory factory = XMLEventFactory.newInstance();
+		XMLEventFactory factory = createXmlEventFactory();
 		try {
 			delegateEventWriter.add(factory.createCharacters(""));
 		}
@@ -563,14 +629,15 @@ public class StaxEventItemWriter<T> extends ExecutionContextUserSupport implemen
 	 * @throws IOException
 	 * @throws XmlMappingException
 	 */
-	public void write(List<? extends T> items) throws XmlMappingException, IOException {
+	public void write(List<? extends T> items) throws XmlMappingException, Exception {
 
 		currentRecordCount += items.size();
 
 		for (Object object : items) {
 			Assert.state(marshaller.supports(object.getClass()),
 					"Marshaller must support the class of the marshalled object");
-			marshaller.marshal(object, new StaxResult(eventWriter));
+			Result result = createStaxResult();
+			marshaller.marshal(object, result);
 		}
 		try {
 			eventWriter.flush();

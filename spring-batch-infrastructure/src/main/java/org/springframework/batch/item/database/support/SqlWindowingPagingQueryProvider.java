@@ -35,25 +35,26 @@ public class SqlWindowingPagingQueryProvider extends AbstractSqlPagingQueryProvi
 		sql.append("SELECT ").append(getSelectClause()).append(", ");
 		sql.append("ROW_NUMBER() OVER (").append(getOverClause());
 		sql.append(") AS ROW_NUMBER");
+		sql.append(getOverSubstituteClauseStart());
 		sql.append(" FROM ").append(getFromClause()).append(
 				getWhereClause() == null ? "" : " WHERE " + getWhereClause());
-		sql.append(getAfterWhereClause());
-		String alias = extractTableAlias();
-		sql.append(") ").append(getSubQueryAlias()).append("WHERE " + alias + "ROW_NUMBER <= ").append(pageSize);
+		sql.append(getOverSubstituteClauseEnd());
+		sql.append(") ").append(getSubQueryAlias()).append("WHERE ").append(extractTableAlias()).append(
+				"ROW_NUMBER <= ").append(pageSize);
 
 		return sql.toString();
 	}
 
-	private String extractTableAlias() {
+	protected Object getSubQueryAlias() {
+		return "AS TMP_SUB ";
+	}
+
+	protected Object extractTableAlias() {
 		String alias = "" + getSubQueryAlias();
 		if (StringUtils.hasText(alias) && alias.toUpperCase().startsWith("AS")) {
 			alias = alias.substring(3).trim() + ".";
 		}
 		return alias;
-	}
-
-	protected Object getSubQueryAlias() {
-		return "";
 	}
 
 	@Override
@@ -63,6 +64,7 @@ public class SqlWindowingPagingQueryProvider extends AbstractSqlPagingQueryProvi
 		sql.append("SELECT ").append(getSelectClause()).append(", ");
 		sql.append("ROW_NUMBER() OVER (").append(getOverClause());
 		sql.append(") AS ROW_NUMBER");
+		sql.append(getOverSubstituteClauseStart());
 		sql.append(" FROM ").append(getFromClause());
 		sql.append(" WHERE ");
 		if (getWhereClause() != null) {
@@ -77,15 +79,11 @@ public class SqlWindowingPagingQueryProvider extends AbstractSqlPagingQueryProvi
 			sql.append(" < ");
 		}
 		sql.append(getSortKeyPlaceHolder());
-		sql.append(getAfterWhereClause());
-		String alias = extractTableAlias();
-		sql.append(") ").append(getSubQueryAlias()).append("WHERE " + alias + "ROW_NUMBER <= ").append(pageSize);
+		sql.append(getOverSubstituteClauseEnd());
+		sql.append(") ").append(getSubQueryAlias()).append("WHERE ").append(extractTableAlias()).append(
+				"ROW_NUMBER <= ").append(pageSize);
 
 		return sql.toString();
-	}
-
-	protected String getAfterWhereClause() {
-		return "";
 	}
 
 	@Override
@@ -101,17 +99,26 @@ public class SqlWindowingPagingQueryProvider extends AbstractSqlPagingQueryProvi
 		sql.append("SELECT ").append(getSortKey()).append(" AS SORT_KEY, ");
 		sql.append("ROW_NUMBER() OVER (").append(getOverClause());
 		sql.append(") AS ROW_NUMBER");
-		sql.append(" FROM ").append(getFromClause()).append(
-				getWhereClause() == null ? "" : " WHERE " + getWhereClause());
-		sql.append(getAfterWhereClause());
-		String alias = extractTableAlias();
-		sql.append(") ").append(getSubQueryAlias()).append("WHERE " + alias + "ROW_NUMBER = ").append(lastRowNum);
+		sql.append(getOverSubstituteClauseStart());
+		sql.append(" FROM ").append(getFromClause());
+		sql.append(getWhereClause() == null ? "" : " WHERE " + getWhereClause());
+		sql.append(getOverSubstituteClauseEnd());
+		sql.append(") ").append(getSubQueryAlias()).append("WHERE ").append(extractTableAlias()).append(
+				"ROW_NUMBER = ").append(lastRowNum);
 
 		return sql.toString();
 	}
 
 	protected String getOverClause() {
-		return "ORDER BY " + getSortKey() + " " + getAscendingClause();
+		return "ORDER BY " + getSortKeyWithoutAlias() + " " + getAscendingClause();
+	}
+
+	protected String getOverSubstituteClauseStart() {
+		return "";
+	}
+
+	protected String getOverSubstituteClauseEnd() {
+		return "";
 	}
 
 	private String getAscendingClause() {

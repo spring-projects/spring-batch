@@ -37,6 +37,11 @@ public class SybasePagingQueryProvider extends SqlWindowingPagingQueryProvider {
 		return SqlPagingQueryUtils.generateTopSqlQuery(this, true, buildTopClause(pageSize));
 	}
 
+	@Override
+	protected Object getSubQueryAlias() {
+		return "";
+	}
+
 	private String buildTopClause(int pageSize) {
 		return new StringBuilder().append("TOP ").append(pageSize).toString();
 	}

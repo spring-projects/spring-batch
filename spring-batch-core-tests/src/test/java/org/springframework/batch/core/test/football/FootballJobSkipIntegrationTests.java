@@ -82,16 +82,33 @@ public class FootballJobSkipIntegrationTests {
 		catch (Exception e) {
 			// Ignore (wrong platform)
 		}
-		JobExecution execution = jobLauncher.run(job, new JobParametersBuilder().addLong("run.id", 1L)
+		JobExecution execution = jobLauncher.run(job, new JobParametersBuilder().addLong("skip.limit", 0L)
 				.toJobParameters());
 		assertEquals(BatchStatus.COMPLETED, execution.getStatus());
 		for (StepExecution stepExecution : execution.getStepExecutions()) {
 			logger.info("Processed: " + stepExecution);
 		}
-		execution = jobLauncher.run(job, new JobParametersBuilder().addLong("run.id", 2L).toJobParameters());
+		// They all skip on the second execution because of a primary key
+		// violation
+		long retryLimit = 2L;
+		execution = jobLauncher.run(job,
+				new JobParametersBuilder().addLong("skip.limit", 100000L).addLong("retry.limit", retryLimit)
+						.toJobParameters());
 		assertEquals(BatchStatus.COMPLETED, execution.getStatus());
 		for (StepExecution stepExecution : execution.getStepExecutions()) {
 			logger.info("Processed: " + stepExecution);
+			if (stepExecution.getStepName().equals("playerload")) {
+				// The effect of the retries is to increase the number of
+				// rollbacks
+				int commitInterval = stepExecution.getReadCount() / (stepExecution.getCommitCount() - 1);
+				// Account for the extra empty commit if the read count is
+				// commensurate with the commit interval
+				int effectiveCommitCount = stepExecution.getReadCount() % commitInterval == 0 ? stepExecution
+						.getCommitCount() - 1 : stepExecution.getCommitCount();
+				long expectedRollbacks = Math.max(1, retryLimit) * effectiveCommitCount + stepExecution.getReadCount();
+				assertEquals(expectedRollbacks, stepExecution.getRollbackCount());
+				assertEquals(stepExecution.getReadCount(), stepExecution.getWriteSkipCount());
+			}
 		}
 
 	}

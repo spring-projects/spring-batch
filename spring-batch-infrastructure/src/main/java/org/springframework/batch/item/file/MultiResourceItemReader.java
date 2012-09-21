@@ -155,7 +155,8 @@ public class MultiResourceItemReader<T> implements ItemReader<T>, ItemStream {
 		noInput = false;
 		if (resources.length == 0) {
 			if (strict) {
-				throw new IllegalStateException("No resources to read. Set strict=false if this is not an error condition.");
+				throw new IllegalStateException(
+						"No resources to read. Set strict=false if this is not an error condition.");
 			}
 			else {
 				logger.warn("No resources to read. Set strict=true if this should be an error condition.");
@@ -168,6 +169,12 @@ public class MultiResourceItemReader<T> implements ItemReader<T>, ItemStream {
 
 		if (executionContext.containsKey(executionContextUserSupport.getKey(RESOURCE_KEY))) {
 			currentResource = executionContext.getInt(executionContextUserSupport.getKey(RESOURCE_KEY));
+
+			// context could have been saved before reading anything
+			if (currentResource == -1) {
+				currentResource = 0;
+			}
+
 			delegate.setResource(resources[currentResource]);
 			delegate.open(executionContext);
 		}

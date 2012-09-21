@@ -21,18 +21,17 @@ import static org.easymock.EasyMock.expect;
 import static org.easymock.EasyMock.expectLastCall;
 import static org.easymock.EasyMock.replay;
 import static org.easymock.EasyMock.verify;
+import static org.junit.Assert.assertNull;
 
 import java.util.Collections;
 
-import junit.framework.TestCase;
-
 import org.easymock.EasyMock;
+import org.junit.Before;
 import org.junit.Test;
 import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.JobInstance;
 import org.springframework.batch.core.JobParameters;
 import org.springframework.batch.core.StepExecution;
-import org.springframework.batch.core.explore.support.SimpleJobExplorer;
 import org.springframework.batch.core.repository.dao.ExecutionContextDao;
 import org.springframework.batch.core.repository.dao.JobExecutionDao;
 import org.springframework.batch.core.repository.dao.JobInstanceDao;
@@ -44,7 +43,7 @@ import org.springframework.batch.core.repository.dao.StepExecutionDao;
  * @author Dave Syer
  * 
  */
-public class SimpleJobExplorerTests extends TestCase {
+public class SimpleJobExplorerTests {
 
 	private SimpleJobExplorer jobExplorer;
 
@@ -59,8 +58,9 @@ public class SimpleJobExplorerTests extends TestCase {
 
 	private ExecutionContextDao ecDao;
 
-	private JobExecution jobExecution = new JobExecution(jobInstance, 123L);
+	private JobExecution jobExecution = new JobExecution(jobInstance, 1234L);
 
+	@Before
 	public void setUp() throws Exception {
 
 		jobExecutionDao = createMock(JobExecutionDao.class);
@@ -95,13 +95,11 @@ public class SimpleJobExplorerTests extends TestCase {
 
 	@Test
 	public void testGetStepExecution() throws Exception {
-		expect(jobExecutionDao.getJobExecution(123L)).andReturn(jobExecution);
+		expect(jobExecutionDao.getJobExecution(jobExecution.getId())).andReturn(jobExecution);
 		StepExecution stepExecution = jobExecution.createStepExecution("foo");
 		expect(stepExecutionDao.getStepExecution(jobExecution, 123L))
 				.andReturn(stepExecution);
-		expect(ecDao.getExecutionContext(jobExecution)).andReturn(null);
 		expect(ecDao.getExecutionContext(stepExecution)).andReturn(null);
-		stepExecutionDao.addStepExecutions(jobExecution);
 		expectLastCall();
 		replay(jobExecutionDao, stepExecutionDao, ecDao);
 		jobExplorer.getStepExecution(jobExecution.getId(), 123L);
@@ -110,10 +108,8 @@ public class SimpleJobExplorerTests extends TestCase {
 
 	@Test
 	public void testGetStepExecutionMissing() throws Exception {
-		expect(jobExecutionDao.getJobExecution(123L)).andReturn(jobExecution);
-		stepExecutionDao.addStepExecutions(jobExecution);
+		expect(jobExecutionDao.getJobExecution(jobExecution.getId())).andReturn(jobExecution);
 		expectLastCall();
-		expect(ecDao.getExecutionContext(jobExecution)).andReturn(null);
 		expect(stepExecutionDao.getStepExecution(jobExecution, 123L))
 				.andReturn(null);
 		replay(jobExecutionDao, stepExecutionDao, ecDao);
@@ -123,7 +119,7 @@ public class SimpleJobExplorerTests extends TestCase {
 
 	@Test
 	public void testGetStepExecutionMissingJobExecution() throws Exception {
-		expect(jobExecutionDao.getJobExecution(123L)).andReturn(null);
+		expect(jobExecutionDao.getJobExecution(jobExecution.getId())).andReturn(null);
 		replay(jobExecutionDao, stepExecutionDao, ecDao);
 		assertNull(jobExplorer.getStepExecution(jobExecution.getId(), 123L));
 		verify(jobExecutionDao, stepExecutionDao, ecDao);
@@ -131,28 +127,33 @@ public class SimpleJobExplorerTests extends TestCase {
 
 	@Test
 	public void testFindRunningJobExecutions() throws Exception {
+		StepExecution stepExecution = jobExecution.createStepExecution("step");
 		expect(jobExecutionDao.findRunningJobExecutions("job")).andReturn(
 				Collections.singleton(jobExecution));
 		expect(jobInstanceDao.getJobInstance(jobExecution)).andReturn(
 				jobInstance);
 		stepExecutionDao.addStepExecutions(jobExecution);
-		expectLastCall();
-		replay(jobExecutionDao, jobInstanceDao, stepExecutionDao);
+		expect(ecDao.getExecutionContext(jobExecution)).andReturn(null);
+		expect(ecDao.getExecutionContext(stepExecution)).andReturn(null);
+		replay(jobExecutionDao, jobInstanceDao, stepExecutionDao, ecDao);
 		jobExplorer.findRunningJobExecutions("job");
-		verify(jobExecutionDao, jobInstanceDao, stepExecutionDao);
+		verify(jobExecutionDao, jobInstanceDao, stepExecutionDao, ecDao);
 	}
 
 	@Test
 	public void testFindJobExecutions() throws Exception {
+		StepExecution stepExecution = jobExecution.createStepExecution("step");
 		expect(jobExecutionDao.findJobExecutions(jobInstance)).andReturn(
 				Collections.singletonList(jobExecution));
 		expect(jobInstanceDao.getJobInstance(jobExecution)).andReturn(
 				jobInstance);
 		stepExecutionDao.addStepExecutions(jobExecution);
+		expect(ecDao.getExecutionContext(jobExecution)).andReturn(null);
+		expect(ecDao.getExecutionContext(stepExecution)).andReturn(null);
 		expectLastCall();
-		replay(jobExecutionDao, jobInstanceDao, stepExecutionDao);
+		replay(jobExecutionDao, jobInstanceDao, stepExecutionDao, ecDao);
 		jobExplorer.getJobExecutions(jobInstance);
-		verify(jobExecutionDao, jobInstanceDao, stepExecutionDao);
+		verify(jobExecutionDao, jobInstanceDao, stepExecutionDao, ecDao);
 	}
 
 	@Test

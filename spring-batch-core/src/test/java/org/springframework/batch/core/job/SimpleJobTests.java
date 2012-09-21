@@ -261,6 +261,19 @@ public class SimpleJobTests {
 	}
 
 	@Test
+	public void testInterruptedAfterUnknownStatus() throws Exception {
+		step1.setStartLimit(5);
+		step2.setStartLimit(5);
+		final JobInterruptedException exception = new JobInterruptedException("Interrupt!", BatchStatus.UNKNOWN);
+		step1.setProcessException(exception);
+		job.execute(jobExecution);
+		assertEquals(1, jobExecution.getAllFailureExceptions().size());
+		assertEquals(exception, jobExecution.getStepExecutions().iterator().next().getFailureExceptions().get(0));
+		assertEquals(0, list.size());
+		checkRepository(BatchStatus.UNKNOWN, ExitStatus.STOPPED);
+	}
+
+	@Test
 	public void testFailed() throws Exception {
 		step1.setStartLimit(5);
 		step2.setStartLimit(5);
@@ -573,7 +586,7 @@ public class SimpleJobTests {
 
 			if (exception instanceof JobInterruptedException) {
 				stepExecution.setExitStatus(ExitStatus.FAILED);
-				stepExecution.setStatus(BatchStatus.FAILED);
+				stepExecution.setStatus(((JobInterruptedException) exception).getStatus());
 				stepExecution.addFailureException(exception);
 				throw (JobInterruptedException) exception;
 			}

@@ -52,7 +52,7 @@ public class TestMailSender implements MailSender {
 	}
 
 	public void send(SimpleMailMessage[] simpleMessages) throws MailException {
-		Map<SimpleMailMessage, MessagingException> failedMessages = new LinkedHashMap<SimpleMailMessage, MessagingException>();
+		Map<Object, Exception> failedMessages = new LinkedHashMap<Object, Exception>();
 		for (SimpleMailMessage simpleMessage : simpleMessages) {
 			if (subjectsToFail.contains(simpleMessage.getSubject())) {
 				failedMessages.put(simpleMessage, new MessagingException());

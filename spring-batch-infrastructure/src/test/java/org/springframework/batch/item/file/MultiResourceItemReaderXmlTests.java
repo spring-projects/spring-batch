@@ -1,30 +1,29 @@
 package org.springframework.batch.item.file;
 
-import static org.junit.Assert.assertTrue;
-
 import java.io.IOException;
 import java.util.Comparator;
 
 import javax.xml.stream.XMLEventReader;
-import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.events.Attribute;
 import javax.xml.stream.events.StartElement;
 import javax.xml.transform.Source;
 
-import org.junit.internal.runners.JUnit4ClassRunner;
+import junit.framework.Assert;
+
+import org.junit.runners.JUnit4;
 import org.junit.runner.RunWith;
 import org.springframework.batch.item.AbstractItemStreamItemReaderTests;
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.sample.Foo;
 import org.springframework.batch.item.xml.StaxEventItemReader;
+import org.springframework.batch.item.xml.StaxUtils;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.Resource;
 import org.springframework.oxm.Unmarshaller;
 import org.springframework.oxm.XmlMappingException;
-import org.springframework.xml.transform.StaxSource;
 
-@RunWith(JUnit4ClassRunner.class)
+@RunWith(JUnit4.class)
 public class MultiResourceItemReaderXmlTests extends AbstractItemStreamItemReaderTests {
 
 	protected ItemReader<Foo> getItemReader() throws Exception {
@@ -35,15 +34,16 @@ public class MultiResourceItemReaderXmlTests extends AbstractItemStreamItemReade
 		reader.setFragmentRootElementName("foo");
 		reader.setUnmarshaller(new Unmarshaller() {
 			public Object unmarshal(Source source) throws XmlMappingException, IOException {
-				StaxSource staxSource = (StaxSource) source;
-				XMLEventReader eventReader = staxSource.getXMLEventReader();
+
+
 				Attribute attr;
 				try {
-					assertTrue(eventReader.nextEvent().isStartDocument());
+					XMLEventReader eventReader = StaxUtils.getXmlEventReader(source );
+					Assert.assertTrue(eventReader.nextEvent().isStartDocument());
 					StartElement event = eventReader.nextEvent().asStartElement();
 					attr = (Attribute) event.getAttributes().next();
 				}
-				catch (XMLStreamException e) {
+				catch ( Exception e) {
 					throw new RuntimeException(e);
 				}
 				Foo foo = new Foo();

@@ -29,16 +29,15 @@ import org.springframework.beans.factory.InitializingBean;
 import org.springframework.dao.DataAccessException;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.dao.InvalidDataAccessApiUsageException;
-import org.springframework.jdbc.core.JdbcOperations;
 import org.springframework.jdbc.core.PreparedStatementCallback;
 import org.springframework.jdbc.core.namedparam.SqlParameterSource;
-import org.springframework.jdbc.core.simple.SimpleJdbcOperations;
-import org.springframework.jdbc.core.simple.SimpleJdbcTemplate;
+import org.springframework.jdbc.core.namedparam.NamedParameterJdbcOperations;
+import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.util.Assert;
 
 /**
  * <p>{@link ItemWriter} that uses the batching features from 
- * {@link SimpleJdbcTemplate} to execute a batch of statements for all items 
+ * {@link NamedParameterJdbcTemplate} to execute a batch of statements for all items
  * provided.</p>
  * 
  * The user must provide an SQL query and a special callback in the for of either 
@@ -62,7 +61,7 @@ public class JdbcBatchItemWriter<T> implements ItemWriter<T>, InitializingBean {
 
 	protected static final Log logger = LogFactory.getLog(JdbcBatchItemWriter.class);
 
-	private SimpleJdbcOperations simpleJdbcTemplate;
+	private NamedParameterJdbcOperations namedParameterJdbcTemplate;
 
 	private ItemPreparedStatementSetter<T> itemPreparedStatementSetter;
 
@@ -119,17 +118,17 @@ public class JdbcBatchItemWriter<T> implements ItemWriter<T>, InitializingBean {
 	 * @param dataSource
 	 */
 	public void setDataSource(DataSource dataSource) {
-		if (simpleJdbcTemplate == null) {
-			this.simpleJdbcTemplate = new SimpleJdbcTemplate(dataSource);
+		if (namedParameterJdbcTemplate == null) {
+			this.namedParameterJdbcTemplate = new NamedParameterJdbcTemplate(dataSource);
 		}
 	}
 
 	/**
-	 * Public setter for the {@link JdbcOperations}.
-	 * @param simpleJdbcTemplate the {@link JdbcOperations} to set
+	 * Public setter for the {@link NamedParameterJdbcOperations}.
+	 * @param namedParameterJdbcTemplate the {@link NamedParameterJdbcOperations} to set
 	 */
-	public void setSimpleJdbcTemplate(SimpleJdbcOperations simpleJdbcTemplate) {
-		this.simpleJdbcTemplate = simpleJdbcTemplate;
+	public void setJdbcTemplate(NamedParameterJdbcOperations namedParameterJdbcTemplate) {
+		this.namedParameterJdbcTemplate = namedParameterJdbcTemplate;
 	}
 
 	/**
@@ -137,7 +136,7 @@ public class JdbcBatchItemWriter<T> implements ItemWriter<T>, InitializingBean {
 	 * parameter source.
 	 */
 	public void afterPropertiesSet() {
-		Assert.notNull(simpleJdbcTemplate, "A DataSource or a SimpleJdbcTemplate is required.");
+		Assert.notNull(namedParameterJdbcTemplate, "A DataSource or a NamedParameterJdbcTemplate is required.");
 		Assert.notNull(sql, "An SQL statement is required.");
 		List<String> namedParameters = new ArrayList<String>();
 		parameterCount = JdbcParameterUtils.countParameterPlaceholders(sql, namedParameters);
@@ -174,10 +173,10 @@ public class JdbcBatchItemWriter<T> implements ItemWriter<T>, InitializingBean {
 				for (T item : items) {
 					batchArgs[i++] = itemSqlParameterSourceProvider.createSqlParameterSource(item);
 				}
-				updateCounts = simpleJdbcTemplate.batchUpdate(sql, batchArgs);
+				updateCounts = namedParameterJdbcTemplate.batchUpdate(sql, batchArgs);
 			}
 			else {
-				updateCounts = (int[]) simpleJdbcTemplate.getJdbcOperations().execute(sql, new PreparedStatementCallback() {
+				updateCounts = (int[]) namedParameterJdbcTemplate.getJdbcOperations().execute(sql, new PreparedStatementCallback() {
 					public Object doInPreparedStatement(PreparedStatement ps) throws SQLException, DataAccessException {
 						for (T item : items) {
 							itemPreparedStatementSetter.setValues(item, ps);
@@ -197,9 +196,6 @@ public class JdbcBatchItemWriter<T> implements ItemWriter<T>, InitializingBean {
 					}
 				}
 			}
-
 		}
-
 	}
-
 }
