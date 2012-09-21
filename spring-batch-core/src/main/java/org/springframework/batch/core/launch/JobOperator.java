@@ -166,6 +166,19 @@ public interface JobOperator {
 	boolean stop(long executionId) throws NoSuchJobExecutionException, JobExecutionNotRunningException;
 
 	/**
+	 * Mark the {@link JobExecution} identified by {@code executionId} as ABANDONED. If a stop signal is
+	 * ignored because the process died this is the best way to mark a job as finished with (as opposed 
+	 * to STOPPED). An abandoned job execution can be restarted, but a stopping one cannot.
+	 * 
+	 * @param executionId the id of a running {@link JobExecution}
+	 * @return the {@link JobExecution} that was aborted
+	 * @throws NoSuchJobExecutionException
+	 * @throws JobExecutionAlreadyRunningException if the job is running (it
+	 * should be stopped first)
+	 */
+	boolean abandon(long executionId) throws NoSuchJobExecutionException, JobExecutionAlreadyRunningException;
+
+	/**
 	 * Summarise the {@link JobExecution} with the supplied id, giving details
 	 * of status, start and end times etc.
 	 * 

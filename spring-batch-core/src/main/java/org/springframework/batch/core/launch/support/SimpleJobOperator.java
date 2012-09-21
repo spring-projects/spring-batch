@@ -62,7 +62,7 @@ import org.springframework.util.Assert;
  * are required:
  * 
  * <ul>
- * 	<li> {@link JobLauncher}
+ *  <li> {@link JobLauncher}
  *  <li> {@link JobExplorer}
  *  <li> {@link JobRepository}
  *  <li> {@link JobRegistry}
@@ -379,6 +379,26 @@ public class SimpleJobOperator implements JobOperator, InitializingBean {
 		jobExecution.setStatus(BatchStatus.STOPPING);
 		jobRepository.update(jobExecution);
 
+		return true;
+	}
+
+        /*
+	 * (non-Javadoc)
+	 *
+	 * @see
+	 * org.springframework.batch.core.launch.JobOperator#abandon(java.lang.Long)
+	 */
+	@Transactional
+	public boolean abandon(long executionId) throws NoSuchJobExecutionException, JobExecutionAlreadyRunningException {
+		JobExecution jobExecution = findExecutionById(executionId);
+		if (jobExecution.getStatus().isLessThan(BatchStatus.STOPPING)) {
+			throw new JobExecutionAlreadyRunningException("JobExecution " + executionId + " is running "
+				+ "or complete and therefore cannot be aborted");
+		}
+
+		logger.info("Aborting job execution: " + jobExecution);
+		jobExecution.upgradeStatus(BatchStatus.ABANDONED);
+		jobRepository.update(jobExecution);
 		return true;
 	}
 
