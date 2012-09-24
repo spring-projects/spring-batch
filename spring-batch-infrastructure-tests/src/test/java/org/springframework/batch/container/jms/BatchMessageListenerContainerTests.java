@@ -84,6 +84,7 @@ public class BatchMessageListenerContainerTests {
 		// Expect one call to consumer (chunk size is 2 but terminates on
 		// first)...
 		EasyMock.expect(consumer.receive(1000)).andReturn(message);
+		EasyMock.expect(session.getTransacted()).andReturn(false);
 
 		EasyMock.replay(consumer, session);
 
