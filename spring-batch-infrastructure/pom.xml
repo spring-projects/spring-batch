@@ -163,8 +163,8 @@
 			<optional>true</optional>
 		</dependency>
 		<dependency>
-			<groupId>${spring.oxm.group}</groupId>
-			<artifactId>${spring.oxm.artifact}</artifactId>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-oxm</artifactId>
 			<optional>true</optional>
 		</dependency>
         <dependency>

@@ -200,8 +200,8 @@
 			<artifactId>spring-aop</artifactId>
 		</dependency>
 		<dependency>
-			<groupId>${spring.oxm.group}</groupId>
-			<artifactId>${spring.oxm.artifact}</artifactId>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-oxm</artifactId>
 		</dependency>
 		<dependency>
 			<groupId>org.springframework</groupId>

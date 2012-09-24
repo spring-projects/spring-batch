@@ -7,7 +7,7 @@ import org.springframework.jdbc.core.JdbcTemplate;
 /**
  * <p>
  * Util class based off {@link org.springframework.test.jdbc.SimpleJdbcTestUtils} but for JdbcTemplate
- * rather than the deprecated {@link org.springframework.jdbc.core.simple.SimpleJdbcTemplate}.
+ * rather than the deprecated SimpleJdbcTemplate.
  *
  * This class should be removed when Batch uses Spring 3.2 - see:
  * https://jira.springsource.org/browse/SPR-9235

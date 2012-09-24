@@ -40,8 +40,8 @@ import org.springframework.util.ClassUtils;
  *
  * @author Josh Long
  *
- * @see org.springframework.xml.transform.StaxSource
  */
+@SuppressWarnings("restriction")
 public abstract class StaxUtils {
 
 	private static final Log logger = LogFactory.getLog(StaxUtils.class);
