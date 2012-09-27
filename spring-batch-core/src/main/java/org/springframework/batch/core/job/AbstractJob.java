@@ -38,6 +38,7 @@ import org.springframework.batch.core.launch.support.ExitCodeMapper;
 import org.springframework.batch.core.listener.CompositeJobExecutionListener;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.repository.JobRestartException;
+import org.springframework.batch.core.scope.context.JobSynchronizationManager;
 import org.springframework.batch.core.step.StepLocator;
 import org.springframework.batch.repeat.RepeatException;
 import org.springframework.beans.factory.BeanNameAware;
@@ -277,6 +278,8 @@ public abstract class AbstractJob implements Job, StepLocator, BeanNameAware,
 
 		logger.debug("Job execution starting: " + execution);
 
+		JobSynchronizationManager.register(execution);
+
 		try {
 
 			jobParametersValidator.validate(execution.getJobInstance()
@@ -320,24 +323,27 @@ public abstract class AbstractJob implements Job, StepLocator, BeanNameAware,
 			execution.setStatus(BatchStatus.FAILED);
 			execution.addFailureException(t);
 		} finally {
-
-			if (execution.getStatus().isLessThanOrEqualTo(BatchStatus.STOPPED)
-					&& execution.getStepExecutions().isEmpty()) {
-				ExitStatus exitStatus = execution.getExitStatus();
-				execution
-						.setExitStatus(exitStatus.and(ExitStatus.NOOP
-								.addExitDescription("All steps already completed or no steps configured for this job.")));
-			}
-
-			execution.setEndTime(new Date());
-
 			try {
-				listener.afterJob(execution);
-			} catch (Exception e) {
-				logger.error("Exception encountered in afterStep callback", e);
-			}
+				if (execution.getStatus().isLessThanOrEqualTo(BatchStatus.STOPPED)
+						&& execution.getStepExecutions().isEmpty()) {
+					ExitStatus exitStatus = execution.getExitStatus();
+					execution
+							.setExitStatus(exitStatus.and(ExitStatus.NOOP
+									.addExitDescription("All steps already completed or no steps configured for this job.")));
+				}
 
-			jobRepository.update(execution);
+				execution.setEndTime(new Date());
+
+				try {
+					listener.afterJob(execution);
+				} catch (Exception e) {
+					logger.error("Exception encountered in afterStep callback", e);
+				}
+
+				jobRepository.update(execution);
+			} finally {
+				JobSynchronizationManager.release();
+			}
 
 		}
 
@@ -402,6 +408,7 @@ public abstract class AbstractJob implements Job, StepLocator, BeanNameAware,
 		jobRepository.update(jobExecution);
 	}
 
+	@Override
 	public String toString() {
 		return ClassUtils.getShortName(getClass()) + ": [name=" + name + "]";
 	}

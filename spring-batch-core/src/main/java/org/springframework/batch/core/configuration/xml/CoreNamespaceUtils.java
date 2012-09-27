@@ -39,6 +39,10 @@ public class CoreNamespaceUtils {
 
 	private static final String STEP_SCOPE_PROCESSOR_CLASS_NAME = "org.springframework.batch.core.scope.StepScope";
 
+	private static final String JOB_SCOPE_PROCESSOR_BEAN_NAME = "org.springframework.batch.core.scope.internalJobScope";
+
+	private static final String JOB_SCOPE_PROCESSOR_CLASS_NAME = "org.springframework.batch.core.scope.JobScope";
+
 	private static final String CUSTOM_EDITOR_CONFIGURER_CLASS_NAME = "org.springframework.beans.factory.config.CustomEditorConfigurer";
 
 	private static final String RANGE_ARRAY_CLASS_NAME = "org.springframework.batch.item.file.transform.Range[]";
@@ -49,27 +53,37 @@ public class CoreNamespaceUtils {
 
 	protected static void autoregisterBeansForNamespace(ParserContext parserContext, Object source) {
 		checkForStepScope(parserContext, source);
+		checkForJobScope(parserContext, source);
 		addRangePropertyEditor(parserContext);
 		addCoreNamespacePostProcessor(parserContext);
 	}
 
 	private static void checkForStepScope(ParserContext parserContext, Object source) {
-		boolean foundStepScope = false;
+		checkForScope(parserContext, source, STEP_SCOPE_PROCESSOR_CLASS_NAME, STEP_SCOPE_PROCESSOR_BEAN_NAME);
+	}
+
+	private static void checkForJobScope(ParserContext parserContext, Object source) {
+		checkForScope(parserContext, source, JOB_SCOPE_PROCESSOR_CLASS_NAME, JOB_SCOPE_PROCESSOR_BEAN_NAME);
+	}
+
+	private static void checkForScope(ParserContext parserContext, Object source, String scopeClassName,
+			String scopeBeanName) {
+		boolean foundScope = false;
 		String[] beanNames = parserContext.getRegistry().getBeanDefinitionNames();
 		for (String beanName : beanNames) {
 			BeanDefinition bd = parserContext.getRegistry().getBeanDefinition(beanName);
-			if (STEP_SCOPE_PROCESSOR_CLASS_NAME.equals(bd.getBeanClassName())) {
-				foundStepScope = true;
+			if (scopeClassName.equals(bd.getBeanClassName())) {
+				foundScope = true;
 				break;
 			}
 		}
-		if (!foundStepScope) {
+		if (!foundScope) {
 			BeanDefinitionBuilder stepScopeBuilder = BeanDefinitionBuilder
-					.genericBeanDefinition(STEP_SCOPE_PROCESSOR_CLASS_NAME);
+					.genericBeanDefinition(scopeClassName);
 			AbstractBeanDefinition abd = stepScopeBuilder.getBeanDefinition();
 			abd.setRole(BeanDefinition.ROLE_INFRASTRUCTURE);
 			abd.setSource(source);
-			parserContext.getRegistry().registerBeanDefinition(STEP_SCOPE_PROCESSOR_BEAN_NAME, abd);
+			parserContext.getRegistry().registerBeanDefinition(scopeBeanName, abd);
 		}
 	}
 

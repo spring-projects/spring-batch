@@ -18,39 +18,43 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.batch.core.JobExecution;
-import org.springframework.batch.core.StepExecution;
 import org.springframework.util.ReflectionUtils;
 
-public class StepSynchronizationManagerTests {
+/**
+ * JobSynchronizationManagerTests.
+ * 
+ * @author Jimmy Praet
+ */
+public class JobSynchronizationManagerTests {
 
-	private StepExecution stepExecution = new StepExecution("step", new JobExecution(0L));
+	private JobExecution jobExecution = new JobExecution(0L);
 
 	@Before
 	@After
 	public void start() {
-		while (StepSynchronizationManager.getContext() != null) {
-			StepSynchronizationManager.close();
+		while (JobSynchronizationManager.getContext() != null) {
+			JobSynchronizationManager.close();
 		}
 	}
 
 	@Test
 	public void testGetContext() {
-		assertNull(StepSynchronizationManager.getContext());
-		StepSynchronizationManager.register(stepExecution);
-		assertNotNull(StepSynchronizationManager.getContext());
+		assertNull(JobSynchronizationManager.getContext());
+		JobSynchronizationManager.register(jobExecution);
+		assertNotNull(JobSynchronizationManager.getContext());
 	}
 
 	@Test
 	public void testClose() throws Exception {
 		final List<String> list = new ArrayList<String>();
-		StepContext context = StepSynchronizationManager.register(stepExecution);
+		JobContext context = JobSynchronizationManager.register(jobExecution);
 		context.registerDestructionCallback("foo", new Runnable() {
 			public void run() {
 				list.add("foo");
 			}
 		});
-		StepSynchronizationManager.close();
-		assertNull(StepSynchronizationManager.getContext());
+		JobSynchronizationManager.close();
+		assertNull(JobSynchronizationManager.getContext());
 		assertEquals(0, list.size());
 		// check for possible memory leak
 		assertEquals(0, extractStaticMap("counts").size());
@@ -58,43 +62,42 @@ public class StepSynchronizationManagerTests {
 	}
 
 	private Map<?, ?> extractStaticMap(String name) throws IllegalAccessException {
-		Field field = ReflectionUtils.findField(StepSynchronizationManager.class, "synchronizationManager");
+		Field field = ReflectionUtils.findField(JobSynchronizationManager.class, "synchronizationManager");
 		ReflectionUtils.makeAccessible(field);
 		SynchronizationManagerSupport<?, ?> synchronizationManager =
-				(SynchronizationManagerSupport<?, ?>) field.get(StepSynchronizationManager.class);
+				(SynchronizationManagerSupport<?, ?>) field.get(JobSynchronizationManager.class);
 		field = ReflectionUtils.findField(SynchronizationManagerSupport.class, name);
 		ReflectionUtils.makeAccessible(field);
 		Map<?, ?> map = (Map<?, ?>) field.get(synchronizationManager);
 		return map;
 	}
-
 	@Test
 	public void testMultithreaded() throws Exception {
-		StepContext context = StepSynchronizationManager.register(stepExecution);
+		JobContext context = JobSynchronizationManager.register(jobExecution);
 		ExecutorService executorService = Executors.newFixedThreadPool(2);
-		FutureTask<StepContext> task = new FutureTask<StepContext>(new Callable<StepContext>() {
-			public StepContext call() throws Exception {
+		FutureTask<JobContext> task = new FutureTask<JobContext>(new Callable<JobContext>() {
+			public JobContext call() throws Exception {
 				try {
-					StepSynchronizationManager.register(stepExecution);
-					StepContext context = StepSynchronizationManager.getContext();
+					JobSynchronizationManager.register(jobExecution);
+					JobContext context = JobSynchronizationManager.getContext();
 					context.setAttribute("foo", "bar");
 					return context;
 				}
 				finally {
-					StepSynchronizationManager.close();
+					JobSynchronizationManager.close();
 				}
 			}
 		});
 		executorService.execute(task);
 		executorService.awaitTermination(1, TimeUnit.SECONDS);
 		assertEquals(context.attributeNames().length, task.get().attributeNames().length);
-		StepSynchronizationManager.close();
-		assertNull(StepSynchronizationManager.getContext());
+		JobSynchronizationManager.close();
+		assertNull(JobSynchronizationManager.getContext());
 	}
 
 	@Test
 	public void testRelease() {
-		StepContext context = StepSynchronizationManager.register(stepExecution);
+		JobContext context = JobSynchronizationManager.register(jobExecution);
 		final List<String> list = new ArrayList<String>();
 		context.registerDestructionCallback("foo", new Runnable() {
 			public void run() {
@@ -102,29 +105,29 @@ public class StepSynchronizationManagerTests {
 			}
 		});
 		// On release we expect the destruction callbacks to be called
-		StepSynchronizationManager.release();
-		assertNull(StepSynchronizationManager.getContext());
+		JobSynchronizationManager.release();
+		assertNull(JobSynchronizationManager.getContext());
 		assertEquals(1, list.size());
 	}
 
 	@Test
 	public void testRegisterNull() {
-		assertNull(StepSynchronizationManager.getContext());
-		StepSynchronizationManager.register(null);
-		assertNull(StepSynchronizationManager.getContext());
+		assertNull(JobSynchronizationManager.getContext());
+		JobSynchronizationManager.register(null);
+		assertNull(JobSynchronizationManager.getContext());
 	}
 
 	@Test
 	public void testRegisterTwice() {
-		StepSynchronizationManager.register(stepExecution);
-		StepSynchronizationManager.register(stepExecution);
-		StepSynchronizationManager.close();
+		JobSynchronizationManager.register(jobExecution);
+		JobSynchronizationManager.register(jobExecution);
+		JobSynchronizationManager.close();
 		// if someone registers you have to assume they are going to close, so
 		// the last thing you want is for the close to remove another context
 		// that someone else has registered
-		assertNotNull(StepSynchronizationManager.getContext());
-		StepSynchronizationManager.close();
-		assertNull(StepSynchronizationManager.getContext());
+		assertNotNull(JobSynchronizationManager.getContext());
+		JobSynchronizationManager.close();
+		assertNull(JobSynchronizationManager.getContext());
 	}
 
 }

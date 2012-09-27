@@ -139,12 +139,12 @@ public class PlaceholderProxyFactoryBean extends ProxyConfig implements FactoryB
 	 * @param definition a target bean definition
 	 * @param registry a {@link BeanDefinitionRegistry}
 	 * @param proxyTargetClass true if we need to use CGlib to create the
-	 * proxies
-	 * @return a {@link BeanDefinitionHolder} for a
-	 * {@link PlaceholderProxyFactoryBean}
+	 *        proxies
+	 * @param contextFactory a {@link ContextFactory}
+	 * @return a {@link BeanDefinitionHolder} for a {@link PlaceholderProxyFactoryBean}
 	 */
 	public static BeanDefinitionHolder createScopedProxy(BeanDefinitionHolder definition,
-			BeanDefinitionRegistry registry, boolean proxyTargetClass) {
+			BeanDefinitionRegistry registry, boolean proxyTargetClass, ContextFactory contextFactory) {
 
 		String originalBeanName = definition.getBeanName();
 		BeanDefinition targetDefinition = definition.getBeanDefinition();
@@ -152,7 +152,7 @@ public class PlaceholderProxyFactoryBean extends ProxyConfig implements FactoryB
 		// Create a proxy definition for the original bean name,
 		// "hiding" the target bean in an internal target definition.
 		RootBeanDefinition proxyDefinition = new RootBeanDefinition(PlaceholderProxyFactoryBean.class);
-		proxyDefinition.getConstructorArgumentValues().addGenericArgumentValue(new StepContextFactory());
+		proxyDefinition.getConstructorArgumentValues().addGenericArgumentValue(contextFactory);
 		proxyDefinition.setOriginatingBeanDefinition(definition.getBeanDefinition());
 		proxyDefinition.setSource(definition.getSource());
 		proxyDefinition.setRole(BeanDefinition.ROLE_INFRASTRUCTURE);
