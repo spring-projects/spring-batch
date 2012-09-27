@@ -387,7 +387,16 @@ ref"							is not required, and only needs to be specified explicitly
 			<xsd:element name="description" type="description" minOccurs="0" />
 			<xsd:choice minOccurs="0" maxOccurs="1">
 				<xsd:choice>
-					<xsd:element name="tasklet" type="taskletType" />
+					<xsd:element name="tasklet" type="taskletType">
+						<xsd:annotation>
+							<xsd:documentation><![CDATA[
+							Declares the implementation of the Tasklet strategy indirectly
+							by configuring a chunk or directly by configuring a reference
+							to the Tasklet interface.
+							]]>
+							</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
 					<!-- custom namespace tasklet declaration -->
 					<xsd:any namespace="##other" minOccurs="1" maxOccurs="1" processContents="skip"/>
 				</xsd:choice>
@@ -542,7 +551,15 @@ ref"							is not required, and only needs to be specified explicitly
 
 	<xsd:complexType name="taskletType">
 		<xsd:all>
-			<xsd:element name="chunk" type="chunkTaskletType" minOccurs="0" maxOccurs="1" />
+			<xsd:element name="chunk" type="chunkTaskletType" minOccurs="0" maxOccurs="1">
+				<xsd:annotation>
+					<xsd:documentation><![CDATA[
+					Declares that the owning Step will preform chunk oriented processing,
+					delegates what defines a chunk and configures the chunk oriented components.
+					]]>
+					</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
 			<xsd:element name="transaction-attributes" type="transaction-attributesType" minOccurs="0" maxOccurs="1" />
 			<xsd:element name="no-rollback-exception-classes" minOccurs="0" maxOccurs="1">
 				<xsd:annotation>
