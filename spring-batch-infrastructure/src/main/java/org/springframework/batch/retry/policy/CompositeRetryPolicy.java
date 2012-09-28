@@ -29,12 +29,23 @@ import org.springframework.batch.retry.context.RetryContextSupport;
  * calls to them in order.
  * 
  * @author Dave Syer
+ * @author Michael Minella
  * 
  */
 public class CompositeRetryPolicy implements RetryPolicy {
 
 	RetryPolicy[] policies = new RetryPolicy[0];
+	private boolean optimistic = false;
 
+	/**
+	 * Setter for the optimistic flag.
+	 * 
+	 * @param optimistic
+	 */
+	public void setOptimistic(boolean optimistic) {
+		this.optimistic = optimistic;
+	}
+	
 	/**
 	 * Setter for policies.
 	 * 
@@ -46,20 +57,35 @@ public class CompositeRetryPolicy implements RetryPolicy {
 
 	/**
 	 * Delegate to the policies that were in operation when the context was
-	 * created. If any of them cannot retry then return false, oetherwise return
-	 * true.
+	 * created. By default, if any of them cannot retry then return false, otherwise return
+	 * true.  If the optimistic flag has been set to true and any of them can retry
+	 * return true, otherwise return false.
 	 * 
 	 * @see org.springframework.batch.retry.RetryPolicy#canRetry(org.springframework.batch.retry.RetryContext)
 	 */
 	public boolean canRetry(RetryContext context) {
 		RetryContext[] contexts = ((CompositeRetryContext) context).contexts;
 		RetryPolicy[] policies = ((CompositeRetryContext) context).policies;
-		for (int i = 0; i < contexts.length; i++) {
-			if (!policies[i].canRetry(contexts[i])) {
-				return false;
+		
+		boolean retryable = true;
+		
+		if(optimistic) {
+			retryable = false;
+			for (int i = 0; i < contexts.length; i++) {
+				if (policies[i].canRetry(contexts[i])) {
+					retryable = true;
+				}
 			}
 		}
-		return true;
+		else {
+			for (int i = 0; i < contexts.length; i++) {
+				if (!policies[i].canRetry(contexts[i])) {
+					retryable = false;
+				}
+			}
+		}
+		
+		return retryable;
 	}
 
 	/**
