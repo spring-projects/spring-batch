@@ -47,6 +47,7 @@
 		<dependency org="org.springframework" name="org.springframework.orm" rev="3.1.2.RELEASE" conf="optional->runtime,provided"/>
 		<dependency org="org.springframework" name="org.springframework.test" rev="3.1.2.RELEASE" conf="test->runtime,provided"/>
 		<dependency org="org.springframework" name="org.springframework.transaction" rev="3.1.2.RELEASE" conf="optional->runtime,provided"/>
+		<dependency org="org.springframework" name="org.springframework.retry" rev="1.0.2.RELEASE" conf="compile->runtime,provided"/>
 	</dependencies>
 
 </ivy-module>

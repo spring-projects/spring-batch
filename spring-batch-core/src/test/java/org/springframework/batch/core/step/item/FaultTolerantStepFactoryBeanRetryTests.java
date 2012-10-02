@@ -52,10 +52,10 @@ import org.springframework.batch.item.ItemStream;
 import org.springframework.batch.item.ItemWriter;
 import org.springframework.batch.item.support.AbstractItemCountingItemStreamItemReader;
 import org.springframework.batch.item.support.ListItemReader;
-import org.springframework.batch.retry.policy.MapRetryContextCache;
-import org.springframework.batch.retry.policy.SimpleRetryPolicy;
 import org.springframework.batch.support.transaction.ResourcelessTransactionManager;
 import org.springframework.batch.support.transaction.TransactionAwareProxyFactory;
+import org.springframework.retry.policy.MapRetryContextCache;
+import org.springframework.retry.policy.SimpleRetryPolicy;
 import org.springframework.transaction.support.TransactionSynchronizationManager;
 import org.springframework.util.StringUtils;
 

@@ -21,21 +21,21 @@ import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 
-import org.springframework.batch.classify.Classifier;
-import org.springframework.batch.retry.ExhaustedRetryException;
-import org.springframework.batch.retry.RecoveryCallback;
-import org.springframework.batch.retry.RetryCallback;
-import org.springframework.batch.retry.RetryContext;
-import org.springframework.batch.retry.RetryListener;
-import org.springframework.batch.retry.RetryOperations;
-import org.springframework.batch.retry.RetryPolicy;
-import org.springframework.batch.retry.RetryState;
-import org.springframework.batch.retry.backoff.BackOffPolicy;
-import org.springframework.batch.retry.context.RetryContextSupport;
-import org.springframework.batch.retry.policy.RetryContextCache;
-import org.springframework.batch.retry.support.DefaultRetryState;
-import org.springframework.batch.retry.support.RetrySynchronizationManager;
-import org.springframework.batch.retry.support.RetryTemplate;
+import org.springframework.classify.Classifier;
+import org.springframework.retry.ExhaustedRetryException;
+import org.springframework.retry.RecoveryCallback;
+import org.springframework.retry.RetryCallback;
+import org.springframework.retry.RetryContext;
+import org.springframework.retry.RetryListener;
+import org.springframework.retry.RetryOperations;
+import org.springframework.retry.RetryPolicy;
+import org.springframework.retry.RetryState;
+import org.springframework.retry.backoff.BackOffPolicy;
+import org.springframework.retry.context.RetryContextSupport;
+import org.springframework.retry.policy.RetryContextCache;
+import org.springframework.retry.support.DefaultRetryState;
+import org.springframework.retry.support.RetrySynchronizationManager;
+import org.springframework.retry.support.RetryTemplate;
 
 /**
  * A special purpose retry template that deals specifically with multi-valued

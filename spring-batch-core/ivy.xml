@@ -39,8 +39,10 @@
 		  <exclude org="com.oracle.oc4j" module="com.springsource.oracle.classloader"/>
 		</dependency>
 		<dependency org="org.springframework" name="org.springframework.core" rev="3.1.2.RELEASE" conf="compile->runtime,provided"/>
+		<dependency org="org.springframework" name="org.springframework.retry" rev="1.0.2.RELEASE" conf="compile->runtime,provided"/>
 		<dependency org="org.springframework" name="org.springframework.jdbc" rev="3.1.2.RELEASE" conf="optional->runtime,provided"/>
 		<dependency org="org.springframework.osgi" name="org.springframework.osgi.core" rev="1.1.2.B" conf="optional->runtime,provided"/>
+		<dependency org="org.springframework" name="org.springframework.retry" rev="1.0.2.RELEASE" conf="compile->runtime,provided"/>
 		<dependency org="org.springframework" name="org.springframework.test" rev="3.1.2.RELEASE" conf="test->runtime,provided"/>
 		<dependency org="org.springframework" name="org.springframework.transaction" rev="3.1.2.RELEASE" conf="compile->runtime,provided"/>
 		<dependency org="javax.annotation" name="com.springsource.javax.annotation" rev="1.0.0" conf="test->runtime,provided"/>

@@ -20,7 +20,7 @@ import javax.jms.JMSException;
 import javax.jms.Message;
 
 import org.springframework.batch.item.UnexpectedInputException;
-import org.springframework.batch.retry.interceptor.NewMethodArgumentsIdentifier;
+import org.springframework.retry.interceptor.NewMethodArgumentsIdentifier;
 
 /**
  * A {@link NewMethodArgumentsIdentifier} for JMS that looks for a message in
@@ -35,7 +35,7 @@ public class JmsNewMethodArgumentsIdentifier<T> implements NewMethodArgumentsIde
 	 * If any of the arguments is a message, check the JMS re-delivered flag and
 	 * return it, otherwise return false to be on the safe side.
 	 * 
-	 * @see org.springframework.batch.retry.interceptor.NewMethodArgumentsIdentifier#isNew(java.lang.Object[])
+	 * @see org.springframework.retry.interceptor.NewMethodArgumentsIdentifier#isNew(java.lang.Object[])
 	 */
 	public boolean isNew(Object[] args) {
 
