@@ -16,6 +16,7 @@
 package org.springframework.batch.core.launch.support;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -382,6 +383,22 @@ public class SimpleJobOperator implements JobOperator, InitializingBean {
 		return true;
 	}
 
+    public JobExecution abandon(long jobExecutionId) throws NoSuchJobExecutionException, JobExecutionAlreadyRunningException {
+        JobExecution jobExecution = findExecutionById(jobExecutionId);
+
+        if (jobExecution.getStatus().isLessThan(BatchStatus.STOPPING)) {
+            throw new JobExecutionAlreadyRunningException(
+                    "JobExecution is running or complete and therefore cannot be aborted");
+        }
+
+        logger.info("Aborting job execution: " + jobExecution);
+        jobExecution.upgradeStatus(BatchStatus.ABANDONED);
+        jobExecution.setEndTime(new Date());
+        jobRepository.update(jobExecution);
+
+        return jobExecution;
+    }
+
 	private JobExecution findExecutionById(long executionId) throws NoSuchJobExecutionException {
 		JobExecution jobExecution = jobExplorer.getJobExecution(executionId);
 
@@ -391,5 +408,4 @@ public class SimpleJobOperator implements JobOperator, InitializingBean {
 		return jobExecution;
 
 	}
-
 }
