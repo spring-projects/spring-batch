@@ -17,7 +17,7 @@ package org.springframework.batch.item.jms;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.springframework.batch.retry.interceptor.MethodInvocationRecoverer;
+import org.springframework.retry.interceptor.MethodInvocationRecoverer;
 import org.springframework.jms.JmsException;
 import org.springframework.jms.core.JmsOperations;
 
@@ -44,7 +44,7 @@ public class JmsMethodInvocationRecoverer<T> implements MethodInvocationRecovere
 	 * Send one message per item in the arguments list using the default destination of
 	 * the jms template. If the recovery is successful null is returned.
 	 * 
-	 * @see org.springframework.batch.retry.interceptor.MethodInvocationRecoverer#recover(Object[],
+	 * @see org.springframework.retry.interceptor.MethodInvocationRecoverer#recover(Object[],
 	 * Throwable)
 	 */
 	public T recover(Object[] items, Throwable cause) {

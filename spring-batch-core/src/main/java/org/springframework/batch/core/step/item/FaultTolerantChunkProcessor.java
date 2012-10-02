@@ -25,8 +25,8 @@ import java.util.concurrent.atomic.AtomicReference;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.springframework.batch.classify.BinaryExceptionClassifier;
-import org.springframework.batch.classify.Classifier;
+import org.springframework.classify.BinaryExceptionClassifier;
+import org.springframework.classify.Classifier;
 import org.springframework.batch.core.StepContribution;
 import org.springframework.batch.core.step.skip.LimitCheckingItemSkipPolicy;
 import org.springframework.batch.core.step.skip.NonSkippableProcessException;
@@ -35,12 +35,12 @@ import org.springframework.batch.core.step.skip.SkipListenerFailedException;
 import org.springframework.batch.core.step.skip.SkipPolicy;
 import org.springframework.batch.item.ItemProcessor;
 import org.springframework.batch.item.ItemWriter;
-import org.springframework.batch.retry.ExhaustedRetryException;
-import org.springframework.batch.retry.RecoveryCallback;
-import org.springframework.batch.retry.RetryCallback;
-import org.springframework.batch.retry.RetryContext;
-import org.springframework.batch.retry.RetryException;
-import org.springframework.batch.retry.support.DefaultRetryState;
+import org.springframework.retry.ExhaustedRetryException;
+import org.springframework.retry.RecoveryCallback;
+import org.springframework.retry.RetryCallback;
+import org.springframework.retry.RetryContext;
+import org.springframework.retry.RetryException;
+import org.springframework.retry.support.DefaultRetryState;
 
 /**
  * FaultTolerant implementation of the {@link ChunkProcessor} interface, that

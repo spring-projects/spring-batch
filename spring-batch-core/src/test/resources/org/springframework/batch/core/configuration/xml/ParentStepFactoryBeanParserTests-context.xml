@@ -7,16 +7,16 @@
 
 	<bean id="stepParent" class="org.springframework.batch.core.step.item.FaultTolerantStepFactoryBean" abstract="true">
 		<property name="backOffPolicy">
-			<bean class="org.springframework.batch.retry.backoff.FixedBackOffPolicy" />
+			<bean class="org.springframework.retry.backoff.FixedBackOffPolicy" />
 		</property>
 		<property name="retryPolicy">
-			<bean class="org.springframework.batch.retry.policy.AlwaysRetryPolicy" />
+			<bean class="org.springframework.retry.policy.AlwaysRetryPolicy" />
 		</property>
 		<property name="keyGenerator">
 			<null/>
 		</property>
 		<property name="retryContextCache">
-			<bean class="org.springframework.batch.retry.policy.MapRetryContextCache">
+			<bean class="org.springframework.retry.policy.MapRetryContextCache">
 				<property name="capacity" value="128"/>
 			</bean>
 		</property>

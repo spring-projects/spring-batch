@@ -19,7 +19,7 @@
 		</step>
 	</job>
 
-	<bean id="retryPolicy" class="org.springframework.batch.retry.policy.SimpleRetryPolicy" xmlns="http://www.springframework.org/schema/beans"
+	<bean id="retryPolicy" class="org.springframework.retry.policy.SimpleRetryPolicy" xmlns="http://www.springframework.org/schema/beans"
 		scope="step">
 		<property name="maxAttempts" value="#{jobParameters['retry.interval']}" />
 		<property name="retryableExceptions">
