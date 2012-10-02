@@ -674,6 +674,11 @@
 				<optional>true</optional>
 			</dependency>
 			<dependency>
+				<groupId>org.springframework.retry</groupId>
+				<artifactId>spring-retry</artifactId>
+				<version>1.0.2.RELEASE</version>
+			</dependency>
+			<dependency>
 				<groupId>org.springframework.amqp</groupId>
 				<artifactId>spring-amqp</artifactId>
 				<version>${spring.amqp.version}</version>

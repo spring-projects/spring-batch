@@ -15,7 +15,7 @@
 			<tasklet>
 				<chunk reader="reader" writer="writer" processor="processor" commit-interval="5">
 					<retry-policy>
-						<bean class="org.springframework.batch.retry.policy.SimpleRetryPolicy" xmlns="http://www.springframework.org/schema/beans">
+						<bean class="org.springframework.retry.policy.SimpleRetryPolicy" xmlns="http://www.springframework.org/schema/beans">
 							<property name="maxAttempts" value="2" />
 						</bean>
 					</retry-policy>
@@ -24,16 +24,16 @@
 		</step>
 	</job>
 
-	<bean id="retryPolicy" class="org.springframework.batch.retry.policy.ExceptionClassifierRetryPolicy">
+	<bean id="retryPolicy" class="org.springframework.retry.policy.ExceptionClassifierRetryPolicy">
 		<property name="policyMap">
 			<map>
 				<entry key="java.lang.NullPointerException">
-					<bean class="org.springframework.batch.retry.policy.SimpleRetryPolicy">
+					<bean class="org.springframework.retry.policy.SimpleRetryPolicy">
 						<property name="maxAttempts" value="2" />
 					</bean>
 				</entry>
 				<entry key="java.lang.ArithmeticException">
-					<bean class="org.springframework.batch.retry.policy.SimpleRetryPolicy">
+					<bean class="org.springframework.retry.policy.SimpleRetryPolicy">
 						<property name="maxAttempts" value="4" />
 					</bean>
 				</entry>

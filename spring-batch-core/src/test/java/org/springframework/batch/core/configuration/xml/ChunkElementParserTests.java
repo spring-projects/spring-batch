@@ -15,19 +15,27 @@
  */
 package org.springframework.batch.core.configuration.xml;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
+import java.io.IOException;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Map;
+
 import org.junit.Test;
-import org.springframework.batch.classify.SubclassClassifier;
 import org.springframework.batch.core.Step;
 import org.springframework.batch.core.step.item.SimpleChunkProcessor;
 import org.springframework.batch.core.step.skip.SkipPolicy;
 import org.springframework.batch.core.step.tasklet.TaskletStep;
 import org.springframework.batch.item.ItemStream;
 import org.springframework.batch.item.support.CompositeItemStream;
-import org.springframework.batch.retry.RetryListener;
-import org.springframework.batch.retry.listener.RetryListenerSupport;
-import org.springframework.batch.retry.policy.SimpleRetryPolicy;
 import org.springframework.beans.PropertyAccessorUtils;
 import org.springframework.beans.factory.BeanCreationException;
+import org.springframework.classify.SubclassClassifier;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
@@ -36,19 +44,11 @@ import org.springframework.dao.CannotSerializeTransactionException;
 import org.springframework.dao.ConcurrencyFailureException;
 import org.springframework.dao.DeadlockLoserDataAccessException;
 import org.springframework.dao.PessimisticLockingFailureException;
+import org.springframework.retry.RetryListener;
+import org.springframework.retry.listener.RetryListenerSupport;
+import org.springframework.retry.policy.SimpleRetryPolicy;
 import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.util.StringUtils;
-
-import java.io.IOException;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Map;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
 
 /**
  * @author Dan Garrette

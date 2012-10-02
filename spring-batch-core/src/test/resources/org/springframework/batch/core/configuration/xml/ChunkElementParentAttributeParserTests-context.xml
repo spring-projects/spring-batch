@@ -101,7 +101,7 @@
 					</streams>
 					<retry-listeners>
 						<listener>
-							<beans:bean class="org.springframework.batch.retry.listener.RetryListenerSupport"/>
+							<beans:bean class="org.springframework.retry.listener.RetryListenerSupport"/>
 						</listener>
 					</retry-listeners>
 				</chunk>

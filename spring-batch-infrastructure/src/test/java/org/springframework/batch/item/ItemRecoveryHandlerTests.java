@@ -16,7 +16,7 @@
 
 package org.springframework.batch.item;
 
-import org.springframework.batch.retry.interceptor.MethodInvocationRecoverer;
+import org.springframework.retry.interceptor.MethodInvocationRecoverer;
 
 import junit.framework.TestCase;
 
