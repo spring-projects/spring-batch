@@ -1,3 +1,6 @@
+/**
+ *
+ */
 package org.springframework.batch.core.repository.dao;
 
 import static org.junit.Assert.assertEquals;
@@ -5,6 +8,8 @@ import static org.junit.Assert.assertEquals;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.Date;
 import java.util.HashMap;
@@ -12,22 +17,21 @@ import java.util.Map;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.springframework.batch.core.repository.ExecutionContextSerializer;
 
 /**
- * @author Thomas Risberg
  * @author Michael Minella
+ *
  */
-public class XStreamExecutionContextStringSerializerTests {
+public class DefaultExecutionContextSerializerTests {
 
-	ExecutionContextSerializer serializer;
+	private DefaultExecutionContextSerializer serializer;
 
+	/**
+	 * @throws java.lang.Exception
+	 */
 	@Before
-	public void onSetUp() throws Exception {
-		XStreamExecutionContextStringSerializer serializerDeserializer = new XStreamExecutionContextStringSerializer();
-		(serializerDeserializer).afterPropertiesSet();
-
-		serializer = serializerDeserializer;
+	public void setUp() throws Exception {
+		serializer = new DefaultExecutionContextSerializer();
 	}
 
 	@Test
@@ -67,7 +71,6 @@ public class XStreamExecutionContextStringSerializerTests {
 	}
 
 	@Test (expected=IllegalArgumentException.class)
-	@SuppressWarnings("unchecked")
 	public void testNullSerialization() throws Exception {
 		serializer.serialize(null, null);
 	}
@@ -86,13 +89,14 @@ public class XStreamExecutionContextStringSerializerTests {
 
 		String s = out.toString();
 
-		ByteArrayInputStream in = new ByteArrayInputStream(s.getBytes());
+		InputStream in = new ByteArrayInputStream(s.getBytes());
 		Map<String, Object> m2 = (Map<String, Object>) serializer.deserialize(in);
 		return m2;
 	}
 
 	@SuppressWarnings("unused")
-	private static class ComplexObject {
+	private static class ComplexObject implements Serializable {
+		private static final long serialVersionUID = 1L;
 		private String name;
 		private BigDecimal number;
 		private ComplexObject obj;
