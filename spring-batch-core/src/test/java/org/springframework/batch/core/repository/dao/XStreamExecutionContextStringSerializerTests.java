@@ -2,6 +2,9 @@ package org.springframework.batch.core.repository.dao;
 
 import static org.junit.Assert.assertEquals;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.math.BigDecimal;
 import java.util.Date;
 import java.util.HashMap;
@@ -9,22 +12,29 @@ import java.util.Map;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.springframework.core.serializer.Deserializer;
+import org.springframework.core.serializer.Serializer;
 
 /**
  * @author Thomas Risberg
+ * @author Michael Minella
  */
 public class XStreamExecutionContextStringSerializerTests {
 
-	ExecutionContextStringSerializer serializer;
+	Serializer<Map<String, Object>> serializer;
+	Deserializer<Map<String, Object>> deserializer;
 
 	@Before
 	public void onSetUp() throws Exception {
-		serializer = new XStreamExecutionContextStringSerializer();
-		((XStreamExecutionContextStringSerializer)serializer).afterPropertiesSet();
+		XStreamExecutionContextStringSerializer serializerDeserializer = new XStreamExecutionContextStringSerializer();
+		(serializerDeserializer).afterPropertiesSet();
+
+		serializer = serializerDeserializer;
+		deserializer = serializerDeserializer;
 	}
-	
+
 	@Test
-	public void testSerializeAMap() {
+	public void testSerializeAMap() throws Exception {
 		Map<String, Object> m1 = new HashMap<String, Object>();
 		m1.put("object1", Long.valueOf(12345L));
 		m1.put("object2", "OBJECT TWO");
@@ -32,15 +42,24 @@ public class XStreamExecutionContextStringSerializerTests {
 		m1.put("object3", new Date(123456790123L));
 		m1.put("object4", new Double(1234567.1234D));
 
-		String s = serializer.serialize(m1);
-
-		Map<String, Object> m2 = serializer.deserialize(s);
+		Map<String, Object> m2 = serializationRoundTrip(m1);
 
 		compareContexts(m1, m2);
 	}
 
+	private Map<String, Object> serializationRoundTrip(Map<String, Object> m1) throws IOException {
+		ByteArrayOutputStream out = new ByteArrayOutputStream();
+		serializer.serialize(m1, out);
+
+		String s = out.toString();
+
+		ByteArrayInputStream in = new ByteArrayInputStream(s.getBytes());
+		Map<String, Object> m2 = deserializer.deserialize(in);
+		return m2;
+	}
+
 	@Test
-	public void testComplexObject() {
+	public void testComplexObject() throws Exception {
 		Map<String, Object> m1 = new HashMap<String, Object>();
 		ComplexObject o1 = new ComplexObject();
 		o1.setName("02345");
@@ -56,15 +75,14 @@ public class XStreamExecutionContextStringSerializerTests {
 		o1.setObj(o2);
 		m1.put("co", o1);
 
-		String s = serializer.serialize(m1);
-
-		Map<String, Object> m2 = serializer.deserialize(s);
+		Map<String, Object> m2 = serializationRoundTrip(m1);
 
 		compareContexts(m1, m2);
 	}
 
 	private void compareContexts(Map<String, Object> m1, Map<String, Object> m2) {
 		for (String key : m1.keySet()) {
+			System.out.println("m1 = " + m1 + " m2 = " + m2);
 			assertEquals("Bad key/value for " + key, m1.get(key), m2.get(key));
 		}
 	}
@@ -109,6 +127,7 @@ public class XStreamExecutionContextStringSerializerTests {
 		}
 
 
+		@Override
 		public boolean equals(Object o) {
 			if (this == o) return true;
 			if (o == null || getClass() != o.getClass()) return false;
@@ -123,6 +142,7 @@ public class XStreamExecutionContextStringSerializerTests {
 			return true;
 		}
 
+		@Override
 		public int hashCode() {
 			int result;
 			result = (name != null ? name.hashCode() : 0);
@@ -136,6 +156,6 @@ public class XStreamExecutionContextStringSerializerTests {
 		public String toString() {
 			return "ComplexObject [name=" + name + ", number=" + number + "]";
 		}
-		
+
 	}
 }

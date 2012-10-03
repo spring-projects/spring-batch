@@ -19,6 +19,7 @@ package org.springframework.batch.core.repository.support;
 import static org.springframework.batch.support.DatabaseType.SYBASE;
 
 import java.sql.Types;
+import java.util.Map;
 
 import javax.sql.DataSource;
 
@@ -33,11 +34,14 @@ import org.springframework.batch.core.repository.dao.JdbcStepExecutionDao;
 import org.springframework.batch.core.repository.dao.JobExecutionDao;
 import org.springframework.batch.core.repository.dao.JobInstanceDao;
 import org.springframework.batch.core.repository.dao.StepExecutionDao;
+import org.springframework.batch.core.repository.dao.XStreamExecutionContextStringSerializer;
 import org.springframework.batch.item.database.support.DataFieldMaxValueIncrementerFactory;
 import org.springframework.batch.item.database.support.DefaultDataFieldMaxValueIncrementerFactory;
 import org.springframework.batch.support.DatabaseType;
 import org.springframework.beans.factory.FactoryBean;
 import org.springframework.beans.factory.InitializingBean;
+import org.springframework.core.serializer.Deserializer;
+import org.springframework.core.serializer.Serializer;
 import org.springframework.jdbc.core.JdbcOperations;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.lob.LobHandler;
@@ -50,7 +54,7 @@ import org.springframework.util.StringUtils;
  * {@link SimpleJobRepository} using JDBC DAO implementations which persist
  * batch metadata in database. Requires the user to describe what kind of
  * database they are using.
- * 
+ *
  * @author Ben Hale
  * @author Lucas Ward
  * @author Dave Syer
@@ -73,13 +77,17 @@ public class JobRepositoryFactoryBean extends AbstractJobRepositoryFactoryBean i
 
 	private LobHandler lobHandler;
 
+	private Serializer<Map<String, Object>> serializer;
+
+	private Deserializer<Map<String, Object>> deserializer;
+
 	/**
 	 * A special handler for large objects. The default is usually fine, except
 	 * for some (usually older) versions of Oracle. The default is determined
 	 * from the data base type.
-	 * 
+	 *
 	 * @param lobHandler the {@link LobHandler} to set
-	 * 
+	 *
 	 * @see LobHandler
 	 */
 	public void setLobHandler(LobHandler lobHandler) {
@@ -95,7 +103,7 @@ public class JobRepositoryFactoryBean extends AbstractJobRepositoryFactoryBean i
 	 * multi-byte character sets this number can be smaller (by up to a factor
 	 * of 2 for 2-byte characters) than the declaration of the column length in
 	 * the DDL for the tables.
-	 * 
+	 *
 	 * @param maxVarCharLength the exitMessageLength to set
 	 */
 	public void setMaxVarCharLength(int maxVarCharLength) {
@@ -131,6 +139,7 @@ public class JobRepositoryFactoryBean extends AbstractJobRepositoryFactoryBean i
 		this.incrementerFactory = incrementerFactory;
 	}
 
+	@Override
 	public void afterPropertiesSet() throws Exception {
 
 		Assert.notNull(dataSource, "DataSource must not be null.");
@@ -203,6 +212,23 @@ public class JobRepositoryFactoryBean extends AbstractJobRepositoryFactoryBean i
 		if (lobHandler != null) {
 			dao.setLobHandler(lobHandler);
 		}
+		if(serializer != null) {
+			dao.setSerializer(serializer);
+		}
+		else {
+			Serializer<Map<String, Object>> defaultSerializer = new XStreamExecutionContextStringSerializer();
+			((XStreamExecutionContextStringSerializer) defaultSerializer).afterPropertiesSet();
+			dao.setSerializer(defaultSerializer);
+		}
+		if(deserializer != null) {
+			dao.setDeserializer(deserializer);
+		}
+		else {
+			Deserializer<Map<String, Object>> defaultDeserializer = new XStreamExecutionContextStringSerializer();
+			((XStreamExecutionContextStringSerializer) defaultDeserializer).afterPropertiesSet();
+			dao.setDeserializer(defaultDeserializer);
+		}
+
 		dao.afterPropertiesSet();
 		// Assume the same length.
 		dao.setShortContextLength(maxVarCharLength);
