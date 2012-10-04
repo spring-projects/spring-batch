@@ -14,7 +14,6 @@
 	<bean id="executionContextDao" class="org.springframework.batch.core.repository.dao.JdbcExecutionContextDao">
 		<property name="jdbcTemplate" ref="jdbcTemplate" />
 		<property name="serializer" ref="serializer"/>
-		<property name="deserializer" ref="serializer"/>
 	</bean>
 
 	<bean id="jobInstanceDao" class="org.springframework.batch.core.repository.dao.JdbcJobInstanceDao">

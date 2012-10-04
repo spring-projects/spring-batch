@@ -29,8 +29,8 @@ import java.util.Map.Entry;
 
 import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.StepExecution;
+import org.springframework.batch.core.repository.ExecutionContextSerializer;
 import org.springframework.batch.item.ExecutionContext;
-import org.springframework.core.serializer.Deserializer;
 import org.springframework.core.serializer.Serializer;
 import org.springframework.jdbc.core.PreparedStatementSetter;
 import org.springframework.jdbc.core.simple.ParameterizedRowMapper;
@@ -75,21 +75,14 @@ public class JdbcExecutionContextDao extends AbstractJdbcBatchMetadataDao implem
 
 	private LobHandler lobHandler = new DefaultLobHandler();
 
-	private Serializer<Map<String, Object>> serializer;
-
-	private Deserializer<Map<String, Object>> deserializer;
+	private ExecutionContextSerializer serializer;
 
 	/**
-	 * @param deserializer
-	 */
-	public void setDeserializer(Deserializer<Map<String, Object>> deserializer) {
-		this.deserializer = deserializer;
-	}
-
-	/**
+	 * Setter for {@link Serializer} implementation
+	 *
 	 * @param serializer
 	 */
-	public void setSerializer(Serializer<Map<String, Object>> serializer) {
+	public void setSerializer(ExecutionContextSerializer serializer) {
 		this.serializer = serializer;
 	}
 
@@ -241,6 +234,7 @@ public class JdbcExecutionContextDao extends AbstractJdbcBatchMetadataDao implem
 		return out.toString();
 	}
 
+	@SuppressWarnings("unchecked")
 	private class ExecutionContextRowMapper implements ParameterizedRowMapper<ExecutionContext> {
 		public ExecutionContext mapRow(ResultSet rs, int i) throws SQLException {
 			ExecutionContext executionContext = new ExecutionContext();
@@ -252,7 +246,7 @@ public class JdbcExecutionContextDao extends AbstractJdbcBatchMetadataDao implem
 
 			Map<String, Object> map;
 			try {
-				map = deserializer.deserialize(in);
+				map = (Map<String, Object>) serializer.deserialize(in);
 			}
 			catch (IOException ioe) {
 				throw new IllegalArgumentException("Unable to deserialize the execution context", ioe);

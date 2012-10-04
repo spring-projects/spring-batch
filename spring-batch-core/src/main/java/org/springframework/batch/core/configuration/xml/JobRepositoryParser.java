@@ -78,8 +78,6 @@ public class JobRepositoryParser extends AbstractSingleBeanDefinitionParser {
 
 		String serializer = element.getAttribute("serializer");
 
-		String deserializer = element.getAttribute("deserializer");
-
 		RuntimeBeanReference ds = new RuntimeBeanReference(dataSource);
 		builder.addPropertyValue("dataSource", ds);
 		RuntimeBeanReference tx = new RuntimeBeanReference(transactionManager);
@@ -98,10 +96,7 @@ public class JobRepositoryParser extends AbstractSingleBeanDefinitionParser {
 			builder.addPropertyValue("maxVarCharLength", maxVarCharLength);
 		}
 		if (StringUtils.hasText(serializer)) {
-			builder.addPropertyValue("serializer", serializer);
-		}
-		if (StringUtils.hasText(deserializer)) {
-			builder.addPropertyValue("deserializer", deserializer);
+			builder.addPropertyReference("serializer", serializer);
 		}
 
 		builder.setRole(BeanDefinition.ROLE_SUPPORT);

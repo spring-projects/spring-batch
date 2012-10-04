@@ -237,27 +237,14 @@ ref"							is not required, and only needs to be specified explicitly
 					</xsd:attribute>
 					<xsd:attribute name="serializer" type="xsd:string">
 						<xsd:annotation>
-							<xsd:documentation source="java:org.springframework.core.serializer.Serializer"><![CDATA[
+							<xsd:documentation><![CDATA[
 							The bean name of the Serializer that is to be used. This attribute
 							is not required.  Consideration should be given between the type of
 							serialization used and the max-varchar-length.
 							]]></xsd:documentation>
 							<xsd:appinfo>
 								<tool:annotation kind="ref">
-									<tool:expected-type type="org.springframework.core.serializer.Serializer" />
-								</tool:annotation>
-							</xsd:appinfo>
-						</xsd:annotation>
-					</xsd:attribute>
-					<xsd:attribute name="deserializer" type="xsd:string">
-						<xsd:annotation>
-							<xsd:documentation source="java:org.springframework.core.serializer.Deserializer"><![CDATA[
-							The bean name of the Deserializer that is to be used. This attribute
-							is required when the serializer is also configured.
-							]]></xsd:documentation>
-							<xsd:appinfo>
-								<tool:annotation kind="ref">
-									<tool:expected-type type="org.springframework.core.serializer.Deserializer" />
+									<tool:expected-type type="org.springframework.batch.core.repository.ExecutionContextSerializer" />
 								</tool:annotation>
 							</xsd:appinfo>
 						</xsd:annotation>

@@ -19,12 +19,12 @@ package org.springframework.batch.core.repository.support;
 import static org.springframework.batch.support.DatabaseType.SYBASE;
 
 import java.sql.Types;
-import java.util.Map;
 
 import javax.sql.DataSource;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.springframework.batch.core.repository.ExecutionContextSerializer;
 import org.springframework.batch.core.repository.dao.AbstractJdbcBatchMetadataDao;
 import org.springframework.batch.core.repository.dao.ExecutionContextDao;
 import org.springframework.batch.core.repository.dao.JdbcExecutionContextDao;
@@ -40,8 +40,6 @@ import org.springframework.batch.item.database.support.DefaultDataFieldMaxValueI
 import org.springframework.batch.support.DatabaseType;
 import org.springframework.beans.factory.FactoryBean;
 import org.springframework.beans.factory.InitializingBean;
-import org.springframework.core.serializer.Deserializer;
-import org.springframework.core.serializer.Serializer;
 import org.springframework.jdbc.core.JdbcOperations;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.lob.LobHandler;
@@ -58,6 +56,7 @@ import org.springframework.util.StringUtils;
  * @author Ben Hale
  * @author Lucas Ward
  * @author Dave Syer
+ * @author Michael Minella
  */
 public class JobRepositoryFactoryBean extends AbstractJobRepositoryFactoryBean implements InitializingBean {
 
@@ -77,9 +76,18 @@ public class JobRepositoryFactoryBean extends AbstractJobRepositoryFactoryBean i
 
 	private LobHandler lobHandler;
 
-	private Serializer<Map<String, Object>> serializer;
+	private ExecutionContextSerializer serializer;
 
-	private Deserializer<Map<String, Object>> deserializer;
+	/**
+	 * A custom implementation of the {@link ExecutionContextSerializer}.
+	 * The default, if not injected, is the {@link XStreamExecutionContextStringSerializer}.
+	 *
+	 * @param serializer
+	 * @see ExecutionContextSerializer
+	 */
+	public void setSerializer(ExecutionContextSerializer serializer) {
+		this.serializer = serializer;
+	}
 
 	/**
 	 * A special handler for large objects. The default is usually fine, except
@@ -159,6 +167,13 @@ public class JobRepositoryFactoryBean extends AbstractJobRepositoryFactoryBean i
 			lobHandler = new OracleLobHandler();
 		}
 
+		if(serializer == null) {
+			XStreamExecutionContextStringSerializer defaultSerializer = new XStreamExecutionContextStringSerializer();
+			defaultSerializer.afterPropertiesSet();
+
+			serializer = defaultSerializer;
+		}
+
 		Assert.isTrue(incrementerFactory.isSupportedIncrementerType(databaseType), "'" + databaseType
 				+ "' is an unsupported database type.  The supported database types are "
 				+ StringUtils.arrayToCommaDelimitedString(incrementerFactory.getSupportedIncrementerTypes()));
@@ -209,24 +224,13 @@ public class JobRepositoryFactoryBean extends AbstractJobRepositoryFactoryBean i
 		dao.setJdbcTemplate(jdbcTemplate);
 		dao.setTablePrefix(tablePrefix);
 		dao.setClobTypeToUse(determineClobTypeToUse(this.databaseType));
+
 		if (lobHandler != null) {
 			dao.setLobHandler(lobHandler);
 		}
+
 		if(serializer != null) {
 			dao.setSerializer(serializer);
-		}
-		else {
-			Serializer<Map<String, Object>> defaultSerializer = new XStreamExecutionContextStringSerializer();
-			((XStreamExecutionContextStringSerializer) defaultSerializer).afterPropertiesSet();
-			dao.setSerializer(defaultSerializer);
-		}
-		if(deserializer != null) {
-			dao.setDeserializer(deserializer);
-		}
-		else {
-			Deserializer<Map<String, Object>> defaultDeserializer = new XStreamExecutionContextStringSerializer();
-			((XStreamExecutionContextStringSerializer) defaultDeserializer).afterPropertiesSet();
-			dao.setDeserializer(defaultDeserializer);
 		}
 
 		dao.afterPropertiesSet();
