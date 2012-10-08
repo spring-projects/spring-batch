@@ -87,6 +87,7 @@ public class DefaultExecutionContextSerializerTests {
 		ByteArrayOutputStream out = new ByteArrayOutputStream();
 		serializer.serialize(m1, out);
 
+		out.close();
 		String s = out.toString();
 
 		InputStream in = new ByteArrayInputStream(s.getBytes());
