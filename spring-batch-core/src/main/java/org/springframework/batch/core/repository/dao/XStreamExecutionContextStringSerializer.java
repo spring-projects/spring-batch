@@ -16,37 +16,38 @@
 
 package org.springframework.batch.core.repository.dao;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.OutputStream;
+
+import org.springframework.batch.core.repository.ExecutionContextSerializer;
+import org.springframework.beans.factory.InitializingBean;
+import org.springframework.core.serializer.Deserializer;
+import org.springframework.core.serializer.Serializer;
+import org.springframework.util.Assert;
+
+import com.thoughtworks.xstream.XStream;
 import com.thoughtworks.xstream.converters.reflection.ReflectionProvider;
 import com.thoughtworks.xstream.io.HierarchicalStreamDriver;
 import com.thoughtworks.xstream.io.json.JettisonMappedXmlDriver;
-import com.thoughtworks.xstream.XStream;
-
-import java.util.Map;
-
-import org.springframework.beans.factory.InitializingBean;
 
 /**
  * Implementation that uses XStream and Jettison to provide serialization.
- * 
+ *
  * @author Thomas Risberg
+ * @author Michael Minella
  * @since 2.0
+ * @see ExecutionContextSerializer
  */
-public class XStreamExecutionContextStringSerializer implements ExecutionContextStringSerializer, InitializingBean {
+public class XStreamExecutionContextStringSerializer implements ExecutionContextSerializer, InitializingBean {
 
 	private ReflectionProvider reflectionProvider = null;
 
 	private HierarchicalStreamDriver hierarchicalStreamDriver;
 
 	private XStream xstream;
-
-	public String serialize(Map<String, Object> context) {
-		return xstream.toXML(context);
-	}
-
-	@SuppressWarnings("unchecked")
-	public Map<String, Object> deserialize(String context) {
-		return (Map<String, Object>) xstream.fromXML(context);
-	}
 
 	public void setReflectionProvider(ReflectionProvider reflectionProvider) {
 		this.reflectionProvider = reflectionProvider;
@@ -70,5 +71,40 @@ public class XStreamExecutionContextStringSerializer implements ExecutionContext
 		else {
 			xstream = new XStream(reflectionProvider, hierarchicalStreamDriver);
 		}
+	}
+
+	/**
+	 * Serializes the passed execution context to the supplied OutputStream.
+	 *
+	 * @param context
+	 * @param out
+	 * @see Serializer#serialize(Object, OutputStream)
+	 */
+	public void serialize(Object context, OutputStream out) throws IOException {
+		Assert.notNull(context);
+		Assert.notNull(out);
+
+		out.write(xstream.toXML(context).getBytes());
+	}
+
+	/**
+	 * Deserializes the supplied input stream into a new execution context.
+	 *
+	 * @param in
+	 * @return a reconstructed execution context
+	 * @see Deserializer#deserialize(InputStream)
+	 */
+	@SuppressWarnings("unchecked")
+	public Object deserialize(InputStream in) throws IOException {
+		BufferedReader br = new BufferedReader(new InputStreamReader(in));
+
+    	StringBuilder sb = new StringBuilder();
+
+    	String line;
+    	while ((line = br.readLine()) != null) {
+    		sb.append(line);
+    	}
+
+    	return xstream.fromXML(sb.toString());
 	}
 }

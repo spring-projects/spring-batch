@@ -71,9 +71,9 @@
 			<xsd:attributeGroup ref="jobRepositoryAttribute" />
 			<xsd:attribute name="incrementer" type="xsd:string" use="optional">
 				<xsd:annotation>
-					<xsd:documentation><![CDATA[ 
-						A reference to a JobParametersIncrementer bean definition.  This will be 
-						used to provide new parameters to a Job instance that is starting in a 
+					<xsd:documentation><![CDATA[
+						A reference to a JobParametersIncrementer bean definition.  This will be
+						used to provide new parameters to a Job instance that is starting in a
 						sequence.
 						]]>
 					</xsd:documentation>
@@ -174,7 +174,7 @@
 	<xsd:element name="job-repository">
 		<xsd:annotation>
 			<xsd:documentation><![CDATA[
-			Configures a JobRepository using a relational database.  This is 
+			Configures a JobRepository using a relational database.  This is
 			needed by many other components (principally Job and Step implementations).
 			]]></xsd:documentation>
 		</xsd:annotation>
@@ -197,7 +197,7 @@ ref"							is not required, and only needs to be specified explicitly
 					<xsd:attribute name="transaction-manager" type="xsd:string" default="transactionManager">
 						<xsd:annotation>
 							<xsd:documentation source="java:org.springframework.transaction.PlatformTransactionManager"><![CDATA[
-							The bean name of the TransactionManager that is to be used. This attribute 
+							The bean name of the TransactionManager that is to be used. This attribute
 							is not required, and only needs to be specified explicitly
 							if the bean name of the desired TransactionManager is not 'transactionManager'.
 							]]></xsd:documentation>
@@ -212,8 +212,8 @@ ref"							is not required, and only needs to be specified explicitly
 						<xsd:annotation>
 							<xsd:documentation><![CDATA[
 							The isolation level to use for creation of job execution entities.
-							The default is SERIALIZABLE, which prevents accidental 
-							concurrent execution of the same job (REPEATABLE_READ 
+							The default is SERIALIZABLE, which prevents accidental
+							concurrent execution of the same job (REPEATABLE_READ
 							would work as well).
 							]]></xsd:documentation>
 						</xsd:annotation>
@@ -233,6 +233,20 @@ ref"							is not required, and only needs to be specified explicitly
 							The the table prefix to use for all the batch meta-data tables.
 							Defaults to "BATCH_".
 							]]></xsd:documentation>
+						</xsd:annotation>
+					</xsd:attribute>
+					<xsd:attribute name="serializer" type="xsd:string">
+						<xsd:annotation>
+							<xsd:documentation><![CDATA[
+							The bean name of the Serializer that is to be used. This attribute
+							is not required.  Consideration should be given between the type of
+							serialization used and the max-varchar-length.
+							]]></xsd:documentation>
+							<xsd:appinfo>
+								<tool:annotation kind="ref">
+									<tool:expected-type type="org.springframework.batch.core.repository.ExecutionContextSerializer" />
+								</tool:annotation>
+							</xsd:appinfo>
 						</xsd:annotation>
 					</xsd:attribute>
 					<xsd:attribute name="lob-handler" type="xsd:string">
@@ -339,7 +353,7 @@ ref"							is not required, and only needs to be specified explicitly
 					<xsd:attribute name="parent" type="xsd:string" use="required">
 						<xsd:annotation>
 							<xsd:documentation source="java:org.springframework.batch.core.job.flow.Flow"><![CDATA[
-							The flow that will execute at this point in the job specified as a 
+							The flow that will execute at this point in the job specified as a
 							parent bean definition id.
 							]]></xsd:documentation>
 							<xsd:appinfo>
@@ -567,7 +581,7 @@ ref"							is not required, and only needs to be specified explicitly
 					List of exception classes that should not cause rollback if possible.  This list
 					is only a hint and has to be interpreted by the step to make sense in context (e.g.
 					it might not be possible to honour the hint during a write operation, so consider moving
-					code that throws these exceptions to a processor or validator).  
+					code that throws these exceptions to a processor or validator).
 					]]>
 					</xsd:documentation>
 				</xsd:annotation>
@@ -619,7 +633,7 @@ ref"							is not required, and only needs to be specified explicitly
 		<xsd:attribute name="transaction-manager" type="xsd:string">
 			<xsd:annotation>
 				<xsd:documentation source="java:org.springframework.transaction.PlatformTransactionManager"><![CDATA[
-				The bean name of the TransactionManager that is to be used. This attribute 
+				The bean name of the TransactionManager that is to be used. This attribute
 				is not required, and only needs to be specified explicitly
 				if the bean name of the desired TransactionManager is not 'transactionManager'.
 				]]></xsd:documentation>
@@ -645,8 +659,8 @@ ref"							is not required, and only needs to be specified explicitly
 		<xsd:attribute name="throttle-limit" type="xsd:string" use="optional">
 			<xsd:annotation>
 				<xsd:documentation><![CDATA[
-				This limits the number of tasks queued for concurrent 
-				processing to prevent thread pools from being overwhelmed. 
+				This limits the number of tasks queued for concurrent
+				processing to prevent thread pools from being overwhelmed.
 				Default is 4.
 				]]></xsd:documentation>
 			</xsd:annotation>
@@ -814,7 +828,7 @@ ref"							is not required, and only needs to be specified explicitly
 				<xsd:annotation>
 					<xsd:documentation><![CDATA[
 					List of exception classes that are skippable.  Exceptions (and their subclasses) that
-					are declared as included take precedence over the same value if it is also excluded.  
+					are declared as included take precedence over the same value if it is also excluded.
 					Exceptions that are already marked as no-rollback
 					are automatically skippable (but it doesn't hurt to add them again here).
 					]]>
@@ -843,7 +857,7 @@ ref"							is not required, and only needs to be specified explicitly
 		<xsd:attribute name="commit-interval" type="xsd:string" use="optional">
 			<xsd:annotation>
 				<xsd:documentation><![CDATA[
-				The number of items that will be processed before commit is called for the transaction.  
+				The number of items that will be processed before commit is called for the transaction.
 				Either set this or the chunk-completion-policy but not both.  Can be specified as an expression
 				that will be evaluated in the scope of the step (e.g. "#{jobParameters['commit.interval']}").
 				]]></xsd:documentation>
@@ -928,7 +942,7 @@ ref"							is not required, and only needs to be specified explicitly
 		<xsd:attribute name="reader-transactional-queue" type="xsd:string" use="optional">
 			<xsd:annotation>
 				<xsd:documentation><![CDATA[
-				Whether the reader is a transactional queue. If it is then items read should not be cached 
+				Whether the reader is a transactional queue. If it is then items read should not be cached
 				in the event of a rollback since they will be returned to the queue. Default is false.
 				]]></xsd:documentation>
 			</xsd:annotation>
@@ -938,7 +952,7 @@ ref"							is not required, and only needs to be specified explicitly
 				<xsd:documentation><![CDATA[
 				Whether the processor is transaction aware. If it is then processed items should not be
 				cached in between transactions in case of a rollback.  N.B. if reader-transactional-queue
-				is true then so should this be.  Default is true.  If false then the processor is only called 
+				is true then so should this be.  Default is true.  If false then the processor is only called
 				once per item per chunk, even if there are rollbacks with retries and skips.
 				]]></xsd:documentation>
 			</xsd:annotation>
@@ -1217,7 +1231,7 @@ ref"							is not required, and only needs to be specified explicitly
 		<xsd:attribute name="job-repository" type="xsd:string">
 			<xsd:annotation>
 				<xsd:documentation source="java:org.springframework.batch.core.repository.JobRepository"><![CDATA[
-				The bean name of the JobRepository that is to be used. This attribute 
+				The bean name of the JobRepository that is to be used. This attribute
 				is not required, and only needs to be specified explicitly
 				if the bean name of the desired JobRepository is not 'jobRepository'.
 				]]></xsd:documentation>
