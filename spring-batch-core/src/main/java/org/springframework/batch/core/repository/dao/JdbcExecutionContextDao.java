@@ -239,6 +239,7 @@ public class JdbcExecutionContextDao extends AbstractJdbcBatchMetadataDao implem
 
 	@SuppressWarnings("unchecked")
 	private class ExecutionContextRowMapper implements ParameterizedRowMapper<ExecutionContext> {
+
 		public ExecutionContext mapRow(ResultSet rs, int i) throws SQLException {
 			ExecutionContext executionContext = new ExecutionContext();
 			String serializedContext = rs.getString("SERIALIZED_CONTEXT");
