@@ -224,14 +224,17 @@ public class JdbcExecutionContextDao extends AbstractJdbcBatchMetadataDao implem
 		}
 
 		ByteArrayOutputStream out = new ByteArrayOutputStream();
+		String results = "";
+
 		try {
 			serializer.serialize(m, out);
+			results = new String(out.toByteArray(), "ISO-8859-1");
 		}
 		catch (IOException ioe) {
 			throw new IllegalArgumentException("Could not serialize the execution context", ioe);
 		}
 
-		return new String(out.toByteArray());
+		return results;
 	}
 
 	@SuppressWarnings("unchecked")
@@ -242,10 +245,10 @@ public class JdbcExecutionContextDao extends AbstractJdbcBatchMetadataDao implem
 			if (serializedContext == null) {
 				serializedContext = rs.getString("SHORT_CONTEXT");
 			}
-			ByteArrayInputStream in = new ByteArrayInputStream(serializedContext.getBytes());
 
 			Map<String, Object> map;
 			try {
+				ByteArrayInputStream in = new ByteArrayInputStream(serializedContext.getBytes("ISO-8859-1"));
 				map = (Map<String, Object>) serializer.deserialize(in);
 			}
 			catch (IOException ioe) {

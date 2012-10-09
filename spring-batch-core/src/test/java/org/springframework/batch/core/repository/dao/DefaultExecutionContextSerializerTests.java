@@ -86,9 +86,9 @@ public class DefaultExecutionContextSerializerTests {
 		ByteArrayOutputStream out = new ByteArrayOutputStream();
 		serializer.serialize(m1, out);
 
-		String s = new String(out.toByteArray());
+		String s = new String(out.toByteArray(), "ISO-8859-1");
 
-		InputStream in = new ByteArrayInputStream(s.getBytes());
+		InputStream in = new ByteArrayInputStream(s.getBytes("ISO-8859-1"));
 		Map<String, Object> m2 = (Map<String, Object>) serializer.deserialize(in);
 		return m2;
 	}
