@@ -231,7 +231,7 @@ public class JdbcExecutionContextDao extends AbstractJdbcBatchMetadataDao implem
 			throw new IllegalArgumentException("Could not serialize the execution context", ioe);
 		}
 
-		return out.toString();
+		return new String(out.toByteArray());
 	}
 
 	@SuppressWarnings("unchecked")
