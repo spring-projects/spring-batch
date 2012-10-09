@@ -77,7 +77,6 @@ public class DefaultExecutionContextSerializerTests {
 
 	private void compareContexts(Map<String, Object> m1, Map<String, Object> m2) {
 		for (String key : m1.keySet()) {
-			System.out.println("m1 = " + m1 + " m2 = " + m2);
 			assertEquals("Bad key/value for " + key, m1.get(key), m2.get(key));
 		}
 	}
@@ -87,8 +86,7 @@ public class DefaultExecutionContextSerializerTests {
 		ByteArrayOutputStream out = new ByteArrayOutputStream();
 		serializer.serialize(m1, out);
 
-		out.close();
-		String s = out.toString();
+		String s = new String(out.toByteArray());
 
 		InputStream in = new ByteArrayInputStream(s.getBytes());
 		Map<String, Object> m2 = (Map<String, Object>) serializer.deserialize(in);
