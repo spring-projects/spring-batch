@@ -179,7 +179,6 @@ public class JobRepositoryFactoryBean extends AbstractJobRepositoryFactoryBean i
 				+ StringUtils.arrayToCommaDelimitedString(incrementerFactory.getSupportedIncrementerTypes()));
 
 		super.afterPropertiesSet();
-
 	}
 
 	@Override
@@ -224,13 +223,10 @@ public class JobRepositoryFactoryBean extends AbstractJobRepositoryFactoryBean i
 		dao.setJdbcTemplate(jdbcTemplate);
 		dao.setTablePrefix(tablePrefix);
 		dao.setClobTypeToUse(determineClobTypeToUse(this.databaseType));
+		dao.setSerializer(serializer);
 
 		if (lobHandler != null) {
 			dao.setLobHandler(lobHandler);
-		}
-
-		if(serializer != null) {
-			dao.setSerializer(serializer);
 		}
 
 		dao.afterPropertiesSet();
