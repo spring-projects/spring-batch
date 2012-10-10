@@ -26,14 +26,19 @@ import static org.easymock.EasyMock.verify;
 
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
+import java.util.Map;
 
 import javax.sql.DataSource;
 
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.batch.core.JobParameters;
+import org.springframework.batch.core.repository.ExecutionContextSerializer;
 import org.springframework.batch.core.repository.JobRepository;
+import org.springframework.batch.core.repository.dao.DefaultExecutionContextSerializer;
+import org.springframework.batch.core.repository.dao.XStreamExecutionContextStringSerializer;
 import org.springframework.batch.item.database.support.DataFieldMaxValueIncrementerFactory;
+import org.springframework.core.serializer.Serializer;
 import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.support.incrementer.DataFieldMaxValueIncrementer;
 import org.springframework.jdbc.support.lob.DefaultLobHandler;
@@ -45,7 +50,7 @@ import org.springframework.transaction.support.DefaultTransactionDefinition;
 
 /**
  * @author Lucas Ward
- * 
+ *
  */
 public class JobRepositoryFactoryBeanTests {
 
@@ -81,26 +86,26 @@ public class JobRepositoryFactoryBeanTests {
 		expect(dataSource.getConnection()).andReturn(con);
 		expect(con.getMetaData()).andReturn(dmd);
 		expect(dmd.getDatabaseProductName()).andReturn("Oracle");
-		
+
 		expect(incrementerFactory.isSupportedIncrementerType("ORACLE")).andReturn(true);
 		expect(incrementerFactory.getSupportedIncrementerTypes()).andReturn(new String[0]);
 		expect(incrementerFactory.getIncrementer("ORACLE", tablePrefix + "JOB_SEQ")).andReturn(new StubIncrementer());
 		expect(incrementerFactory.getIncrementer("ORACLE", tablePrefix + "JOB_EXECUTION_SEQ")).andReturn(new StubIncrementer());
 		expect(incrementerFactory.getIncrementer("ORACLE", tablePrefix + "STEP_EXECUTION_SEQ")).andReturn(new StubIncrementer());
 		replay(dataSource,con,dmd, incrementerFactory);
-		
+
 		factory.afterPropertiesSet();
 		factory.getObject();
 
 		verify(incrementerFactory);
-		
+
 	}
 
 	@Test
 	public void testOracleLobHandler() throws Exception {
 
 		factory.setDatabaseType("ORACLE");
-		
+
 		incrementerFactory = createNiceMock(DataFieldMaxValueIncrementerFactory.class);
 		expect(incrementerFactory.isSupportedIncrementerType("ORACLE")).andReturn(true);
 		expect(incrementerFactory.getIncrementer("ORACLE", tablePrefix + "JOB_SEQ")).andReturn(new StubIncrementer());
@@ -112,14 +117,14 @@ public class JobRepositoryFactoryBeanTests {
 		factory.afterPropertiesSet();
 		LobHandler lobHandler = (LobHandler) ReflectionTestUtils.getField(factory, "lobHandler");
 		assertTrue(lobHandler instanceof OracleLobHandler);
-		
+
 	}
 
 	@Test
 	public void testCustomLobHandler() throws Exception {
 
 		factory.setDatabaseType("ORACLE");
-		
+
 		incrementerFactory = createNiceMock(DataFieldMaxValueIncrementerFactory.class);
 		expect(incrementerFactory.isSupportedIncrementerType("ORACLE")).andReturn(true);
 		expect(incrementerFactory.getIncrementer("ORACLE", tablePrefix + "JOB_SEQ")).andReturn(new StubIncrementer());
@@ -127,13 +132,52 @@ public class JobRepositoryFactoryBeanTests {
 		expect(incrementerFactory.getIncrementer("ORACLE", tablePrefix + "STEP_EXECUTION_SEQ")).andReturn(new StubIncrementer());
 		replay(dataSource,incrementerFactory);
 		factory.setIncrementerFactory(incrementerFactory);
-		
+
 		LobHandler lobHandler = new DefaultLobHandler();
 		factory.setLobHandler(lobHandler);
 
 		factory.afterPropertiesSet();
 		assertEquals(lobHandler, ReflectionTestUtils.getField(factory, "lobHandler"));
-		
+
+	}
+
+	@Test
+	@SuppressWarnings("unchecked")
+	public void tesDefaultSerializer() throws Exception {
+
+		factory.setDatabaseType("ORACLE");
+
+		incrementerFactory = createNiceMock(DataFieldMaxValueIncrementerFactory.class);
+		expect(incrementerFactory.isSupportedIncrementerType("ORACLE")).andReturn(true);
+		expect(incrementerFactory.getIncrementer("ORACLE", tablePrefix + "JOB_SEQ")).andReturn(new StubIncrementer());
+		expect(incrementerFactory.getIncrementer("ORACLE", tablePrefix + "JOB_EXECUTION_SEQ")).andReturn(new StubIncrementer());
+		expect(incrementerFactory.getIncrementer("ORACLE", tablePrefix + "STEP_EXECUTION_SEQ")).andReturn(new StubIncrementer());
+		replay(dataSource,incrementerFactory);
+		factory.setIncrementerFactory(incrementerFactory);
+
+		factory.afterPropertiesSet();
+		Serializer<Map<String, Object>> serializer = (Serializer<Map<String,Object>>) ReflectionTestUtils.getField(factory, "serializer");
+		assertTrue(serializer instanceof XStreamExecutionContextStringSerializer);
+	}
+
+	@Test
+	public void testCustomSerializer() throws Exception {
+
+		factory.setDatabaseType("ORACLE");
+
+		incrementerFactory = createNiceMock(DataFieldMaxValueIncrementerFactory.class);
+		expect(incrementerFactory.isSupportedIncrementerType("ORACLE")).andReturn(true);
+		expect(incrementerFactory.getIncrementer("ORACLE", tablePrefix + "JOB_SEQ")).andReturn(new StubIncrementer());
+		expect(incrementerFactory.getIncrementer("ORACLE", tablePrefix + "JOB_EXECUTION_SEQ")).andReturn(new StubIncrementer());
+		expect(incrementerFactory.getIncrementer("ORACLE", tablePrefix + "STEP_EXECUTION_SEQ")).andReturn(new StubIncrementer());
+		replay(dataSource,incrementerFactory);
+		factory.setIncrementerFactory(incrementerFactory);
+
+		ExecutionContextSerializer customSerializer = new DefaultExecutionContextSerializer();
+		factory.setSerializer(customSerializer);
+
+		factory.afterPropertiesSet();
+		assertEquals(customSerializer, ReflectionTestUtils.getField(factory, "serializer"));
 	}
 
 	@Test
@@ -161,7 +205,7 @@ public class JobRepositoryFactoryBeanTests {
 			expect(incrementerFactory.isSupportedIncrementerType("mockDb")).andReturn(true);
 			expect(incrementerFactory.getSupportedIncrementerTypes()).andReturn(new String[0]);
 			replay(incrementerFactory);
-			
+
 			factory.afterPropertiesSet();
 			fail();
 		}

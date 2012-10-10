@@ -29,13 +29,14 @@ import org.w3c.dom.Element;
 /**
  * Parser for the lt;job-repository/gt; element in the Batch namespace. Sets up
  * and returns a JobRepositoryFactoryBean.
- * 
+ *
  * @author Thomas Risberg
  * @since 2.0
- * 
+ *
  */
 public class JobRepositoryParser extends AbstractSingleBeanDefinitionParser {
 
+	@Override
 	protected String getBeanClassName(Element element) {
 		return "org.springframework.batch.core.repository.support.JobRepositoryFactoryBean";
 	}
@@ -75,6 +76,8 @@ public class JobRepositoryParser extends AbstractSingleBeanDefinitionParser {
 
 		String lobHandler = element.getAttribute("lob-handler");
 
+		String serializer = element.getAttribute("serializer");
+
 		RuntimeBeanReference ds = new RuntimeBeanReference(dataSource);
 		builder.addPropertyValue("dataSource", ds);
 		RuntimeBeanReference tx = new RuntimeBeanReference(transactionManager);
@@ -91,6 +94,9 @@ public class JobRepositoryParser extends AbstractSingleBeanDefinitionParser {
 		}
 		if (StringUtils.hasText(maxVarCharLength)) {
 			builder.addPropertyValue("maxVarCharLength", maxVarCharLength);
+		}
+		if (StringUtils.hasText(serializer)) {
+			builder.addPropertyReference("serializer", serializer);
 		}
 
 		builder.setRole(BeanDefinition.ROLE_SUPPORT);

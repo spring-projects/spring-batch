@@ -24,6 +24,7 @@ import javax.sql.DataSource;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.springframework.batch.core.repository.ExecutionContextSerializer;
 import org.springframework.batch.core.repository.dao.AbstractJdbcBatchMetadataDao;
 import org.springframework.batch.core.repository.dao.ExecutionContextDao;
 import org.springframework.batch.core.repository.dao.JdbcExecutionContextDao;
@@ -33,6 +34,7 @@ import org.springframework.batch.core.repository.dao.JdbcStepExecutionDao;
 import org.springframework.batch.core.repository.dao.JobExecutionDao;
 import org.springframework.batch.core.repository.dao.JobInstanceDao;
 import org.springframework.batch.core.repository.dao.StepExecutionDao;
+import org.springframework.batch.core.repository.dao.XStreamExecutionContextStringSerializer;
 import org.springframework.batch.item.database.support.DataFieldMaxValueIncrementerFactory;
 import org.springframework.batch.item.database.support.DefaultDataFieldMaxValueIncrementerFactory;
 import org.springframework.batch.support.DatabaseType;
@@ -50,10 +52,11 @@ import org.springframework.util.StringUtils;
  * {@link SimpleJobRepository} using JDBC DAO implementations which persist
  * batch metadata in database. Requires the user to describe what kind of
  * database they are using.
- * 
+ *
  * @author Ben Hale
  * @author Lucas Ward
  * @author Dave Syer
+ * @author Michael Minella
  */
 public class JobRepositoryFactoryBean extends AbstractJobRepositoryFactoryBean implements InitializingBean {
 
@@ -73,13 +76,26 @@ public class JobRepositoryFactoryBean extends AbstractJobRepositoryFactoryBean i
 
 	private LobHandler lobHandler;
 
+	private ExecutionContextSerializer serializer;
+
+	/**
+	 * A custom implementation of the {@link ExecutionContextSerializer}.
+	 * The default, if not injected, is the {@link XStreamExecutionContextStringSerializer}.
+	 *
+	 * @param serializer
+	 * @see ExecutionContextSerializer
+	 */
+	public void setSerializer(ExecutionContextSerializer serializer) {
+		this.serializer = serializer;
+	}
+
 	/**
 	 * A special handler for large objects. The default is usually fine, except
 	 * for some (usually older) versions of Oracle. The default is determined
 	 * from the data base type.
-	 * 
+	 *
 	 * @param lobHandler the {@link LobHandler} to set
-	 * 
+	 *
 	 * @see LobHandler
 	 */
 	public void setLobHandler(LobHandler lobHandler) {
@@ -95,7 +111,7 @@ public class JobRepositoryFactoryBean extends AbstractJobRepositoryFactoryBean i
 	 * multi-byte character sets this number can be smaller (by up to a factor
 	 * of 2 for 2-byte characters) than the declaration of the column length in
 	 * the DDL for the tables.
-	 * 
+	 *
 	 * @param maxVarCharLength the exitMessageLength to set
 	 */
 	public void setMaxVarCharLength(int maxVarCharLength) {
@@ -131,6 +147,7 @@ public class JobRepositoryFactoryBean extends AbstractJobRepositoryFactoryBean i
 		this.incrementerFactory = incrementerFactory;
 	}
 
+	@Override
 	public void afterPropertiesSet() throws Exception {
 
 		Assert.notNull(dataSource, "DataSource must not be null.");
@@ -150,12 +167,18 @@ public class JobRepositoryFactoryBean extends AbstractJobRepositoryFactoryBean i
 			lobHandler = new OracleLobHandler();
 		}
 
+		if(serializer == null) {
+			XStreamExecutionContextStringSerializer defaultSerializer = new XStreamExecutionContextStringSerializer();
+			defaultSerializer.afterPropertiesSet();
+
+			serializer = defaultSerializer;
+		}
+
 		Assert.isTrue(incrementerFactory.isSupportedIncrementerType(databaseType), "'" + databaseType
 				+ "' is an unsupported database type.  The supported database types are "
 				+ StringUtils.arrayToCommaDelimitedString(incrementerFactory.getSupportedIncrementerTypes()));
 
 		super.afterPropertiesSet();
-
 	}
 
 	@Override
@@ -200,9 +223,12 @@ public class JobRepositoryFactoryBean extends AbstractJobRepositoryFactoryBean i
 		dao.setJdbcTemplate(jdbcTemplate);
 		dao.setTablePrefix(tablePrefix);
 		dao.setClobTypeToUse(determineClobTypeToUse(this.databaseType));
+		dao.setSerializer(serializer);
+
 		if (lobHandler != null) {
 			dao.setLobHandler(lobHandler);
 		}
+
 		dao.afterPropertiesSet();
 		// Assume the same length.
 		dao.setShortContextLength(maxVarCharLength);
