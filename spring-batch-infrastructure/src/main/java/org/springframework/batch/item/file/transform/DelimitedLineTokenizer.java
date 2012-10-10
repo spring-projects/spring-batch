@@ -31,6 +31,7 @@ import org.springframework.util.StringUtils;
  *
  * @author Rob Harrop
  * @author Dave Syer
+ * @author Michael Minella
  * @deprecated As of release 2.2, replaced by {@link StringDelimitedLineTokenizer}
  */
 @Deprecated
