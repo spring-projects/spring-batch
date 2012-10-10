@@ -8,7 +8,7 @@
 	<job id="tradeJob" xmlns="http://www.springframework.org/schema/batch">
 		<step id="step1" next="step2">
 			<tasklet>
-				<chunk reader="fileItemReader" processor="validatingProcessor" writer="tradeWriter" 
+				<chunk reader="fileItemReader" processor="validatingProcessor" writer="tradeWriter"
 		               commit-interval="1">
 					<streams>
 						<stream ref="fileItemReader" />
@@ -90,7 +90,7 @@
 		<property name="lineMapper">
 			<bean class="org.springframework.batch.item.file.mapping.DefaultLineMapper">
 				<property name="lineTokenizer">
-					<bean class="org.springframework.batch.item.file.transform.DelimitedLineTokenizer">
+					<bean class="org.springframework.batch.item.file.transform.StringDelimitedLineTokenizer">
 						<property name="names" value="ISIN, Quantity, Price, Customer" />
 					</bean>
 				</property>

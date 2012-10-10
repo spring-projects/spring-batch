@@ -10,13 +10,13 @@
 	<job id="parallelJob" xmlns="http://www.springframework.org/schema/batch">
 		<step id="playerload" next="gameLoadParallel">
 			<tasklet>
-				<chunk reader="playerFileItemReader" writer="playerWriter" 
+				<chunk reader="playerFileItemReader" writer="playerWriter"
 	                   commit-interval="${job.commit.interval}" />
 			</tasklet>
 		</step>
 		<step id="gameLoadParallel" next="playerSummarization">
 			<tasklet task-executor="taskExecutor">
-				<chunk reader="gameFileItemReader" writer="gameWriter" 
+				<chunk reader="gameFileItemReader" writer="gameWriter"
 	                   commit-interval="${job.commit.interval}" />
 			</tasklet>
 		</step>
@@ -25,11 +25,11 @@
 
 	<step id="summarizationStep" xmlns="http://www.springframework.org/schema/batch">
 		<tasklet>
-			<chunk reader="playerSummarizationSource" writer="summaryWriter" 
+			<chunk reader="playerSummarizationSource" writer="summaryWriter"
                    commit-interval="${job.commit.interval}" />
 		</tasklet>
 	</step>
-	
+
 	<bean id="taskExecutor" class="org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor">
 		<property name="corePoolSize" value="10"/>
 		<property name="maxPoolSize" value="20"/>
@@ -43,21 +43,21 @@
 			</bean>
 		</property>
 	</bean>
-	
+
 	<bean id="gameWriter" class="org.springframework.batch.sample.domain.football.internal.JdbcGameDao">
 		<property name="dataSource" ref="dataSource" />
 	</bean>
-	
+
 	<bean id="summaryWriter" class="org.springframework.batch.sample.domain.football.internal.JdbcPlayerSummaryDao">
 		<property name="dataSource" ref="dataSource" />
 	</bean>
-				
+
 	<bean id="playerFileItemReader" class="org.springframework.batch.item.file.FlatFileItemReader">
 		<property name="resource" value="classpath:data/football/${player.file.name}" />
 		<property name="lineMapper">
 			<bean class="org.springframework.batch.item.file.mapping.DefaultLineMapper">
 				<property name="lineTokenizer">
-					<bean class="org.springframework.batch.item.file.transform.DelimitedLineTokenizer">
+					<bean class="org.springframework.batch.item.file.transform.StringDelimitedLineTokenizer">
 						<property name="names" value="ID,lastName,firstName,position,birthYear,debutYear" />
 					</bean>
 				</property>
@@ -74,7 +74,7 @@
 		<property name="lineMapper">
 			<bean class="org.springframework.batch.item.file.mapping.DefaultLineMapper">
 				<property name="lineTokenizer">
-					<bean class="org.springframework.batch.item.file.transform.DelimitedLineTokenizer">
+					<bean class="org.springframework.batch.item.file.transform.StringDelimitedLineTokenizer">
 						<property name="names" value="id,year,team,week,opponent,completes,attempts,passingYards,passingTd,interceptions,rushes,rushYards,receptions,receptionYards,totalTd" />
 					</bean>
 				</property>

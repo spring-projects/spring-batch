@@ -33,7 +33,7 @@
 			<bean class="org.springframework.batch.item.file.mapping.DefaultLineMapper">
 				<property name="lineTokenizer">
 					<bean
-						class="org.springframework.batch.item.file.transform.DelimitedLineTokenizer">
+						class="org.springframework.batch.item.file.transform.StringDelimitedLineTokenizer">
 						<property name="delimiter" value="," />
 					</bean>
 				</property>

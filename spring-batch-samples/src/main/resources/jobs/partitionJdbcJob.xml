@@ -20,7 +20,7 @@
 	</bean>
 
 	<bean id="taskExecutor" class="org.springframework.core.task.SimpleAsyncTaskExecutor" />
-	
+
 	<step id="step1" xmlns="http://www.springframework.org/schema/batch">
 		<tasklet>
 			<chunk writer="itemWriter" reader="itemReader" processor="itemProcessor" commit-interval="5" />
@@ -65,7 +65,7 @@
 		<property name="lineMapper">
 			<bean class="org.springframework.batch.item.file.mapping.DefaultLineMapper">
 				<property name="lineTokenizer">
-					<bean class="org.springframework.batch.item.file.transform.DelimitedLineTokenizer">
+					<bean class="org.springframework.batch.item.file.transform.StringDelimitedLineTokenizer">
 						<property name="delimiter" value="," />
 						<property name="names" value="id,name,credit" />
 					</bean>

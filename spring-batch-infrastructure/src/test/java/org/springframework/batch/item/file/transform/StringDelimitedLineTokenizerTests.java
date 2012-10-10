@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2007 the original author or authors.
+ * Copyright 2006-2012 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,11 +23,11 @@ import static org.junit.Assert.fail;
 import org.junit.Test;
 
 
-public class DelimitedLineTokenizerTests {
+public class StringDelimitedLineTokenizerTests {
 
 	private static final String TOKEN_MATCHES = "token equals the expected string";
 
-	private DelimitedLineTokenizer tokenizer = new DelimitedLineTokenizer();
+	private StringDelimitedLineTokenizer tokenizer = new StringDelimitedLineTokenizer();
 
 	@Test
 	public void testTokenizeRegularUse() {
@@ -49,7 +49,7 @@ public class DelimitedLineTokenizerTests {
 	@Test
 	public void testInvalidConstructorArgument() {
 		try {
-			new DelimitedLineTokenizer(DelimitedLineTokenizer.DEFAULT_QUOTE_CHARACTER);
+			new StringDelimitedLineTokenizer(String.valueOf(StringDelimitedLineTokenizer.DEFAULT_QUOTE_CHARACTER));
 			fail("Quote character can't be used as delimiter for delimited line tokenizer!");
 		}
 		catch (Exception e) {
@@ -124,9 +124,36 @@ public class DelimitedLineTokenizerTests {
 
 	@Test
 	public void testDelimitedLineTokenizerChar() {
-		AbstractLineTokenizer tokenizer = new DelimitedLineTokenizer(' ');
+		AbstractLineTokenizer tokenizer = new StringDelimitedLineTokenizer(" ");
 		FieldSet line = tokenizer.tokenize("a b c");
 		assertEquals(3, line.getFieldCount());
+	}
+
+	@Test
+	public void testDelimitedLineTokenizerString() {
+		AbstractLineTokenizer tokenizer = new StringDelimitedLineTokenizer(" b ");
+		FieldSet line = tokenizer.tokenize("a b c");
+		assertEquals(2, line.getFieldCount());
+		assertEquals("a", line.readString(0));
+		assertEquals("c", line.readString(1));
+	}
+
+	@Test
+	public void testDelimitedLineTokenizerNewlineToken() {
+		AbstractLineTokenizer tokenizer = new StringDelimitedLineTokenizer("\n");
+		FieldSet line = tokenizer.tokenize("a b\n c");
+		assertEquals(2, line.getFieldCount());
+		assertEquals("a b", line.readString(0));
+		assertEquals("c", line.readString(1));
+	}
+
+	@Test
+	public void testDelimitedLineTokenizerWrappedToken() {
+		AbstractLineTokenizer tokenizer = new StringDelimitedLineTokenizer("\nrap");
+		FieldSet line = tokenizer.tokenize("a b\nrap c");
+		assertEquals(2, line.getFieldCount());
+		assertEquals("a b", line.readString(0));
+		assertEquals("c", line.readString(1));
 	}
 
 	@Test

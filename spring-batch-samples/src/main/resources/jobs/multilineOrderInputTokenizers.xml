@@ -20,9 +20,9 @@
 		</property>
 	</bean>
 
-	<bean id="defaultLineTokenizer" class="org.springframework.batch.item.file.transform.DelimitedLineTokenizer"/>
+	<bean id="defaultLineTokenizer" class="org.springframework.batch.item.file.transform.StringDelimitedLineTokenizer"/>
 
-	<bean id="parentLineTokenizer" class="org.springframework.batch.item.file.transform.DelimitedLineTokenizer" abstract="true">
+	<bean id="parentLineTokenizer" class="org.springframework.batch.item.file.transform.StringDelimitedLineTokenizer" abstract="true">
 		<property name="delimiter" value=";"/>
 	</bean>
 
