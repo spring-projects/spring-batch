@@ -49,7 +49,7 @@ public class DelimitedLineTokenizerTests {
 	@Test
 	public void testInvalidConstructorArgument() {
 		try {
-			new DelimitedLineTokenizer(DelimitedLineTokenizer.DEFAULT_QUOTE_CHARACTER);
+			new DelimitedLineTokenizer(String.valueOf(DelimitedLineTokenizer.DEFAULT_QUOTE_CHARACTER));
 			fail("Quote character can't be used as delimiter for delimited line tokenizer!");
 		}
 		catch (Exception e) {
@@ -124,9 +124,36 @@ public class DelimitedLineTokenizerTests {
 
 	@Test
 	public void testDelimitedLineTokenizerChar() {
-		AbstractLineTokenizer tokenizer = new DelimitedLineTokenizer(' ');
+		AbstractLineTokenizer tokenizer = new DelimitedLineTokenizer(" ");
 		FieldSet line = tokenizer.tokenize("a b c");
 		assertEquals(3, line.getFieldCount());
+	}
+
+	@Test
+	public void testDelimitedLineTokenizerString() {
+		AbstractLineTokenizer tokenizer = new DelimitedLineTokenizer(" b ");
+		FieldSet line = tokenizer.tokenize("a b c");
+		assertEquals(2, line.getFieldCount());
+		assertEquals("a", line.readString(0));
+		assertEquals("c", line.readString(1));
+	}
+
+	@Test
+	public void testDelimitedLineTokenizerNewlineToken() {
+		AbstractLineTokenizer tokenizer = new DelimitedLineTokenizer("\n");
+		FieldSet line = tokenizer.tokenize("a b\n c");
+		assertEquals(2, line.getFieldCount());
+		assertEquals("a b", line.readString(0));
+		assertEquals("c", line.readString(1));
+	}
+
+	@Test
+	public void testDelimitedLineTokenizerWrappedToken() {
+		AbstractLineTokenizer tokenizer = new DelimitedLineTokenizer("\nrap");
+		FieldSet line = tokenizer.tokenize("a b\nrap c");
+		assertEquals(2, line.getFieldCount());
+		assertEquals("a b", line.readString(0));
+		assertEquals("c", line.readString(1));
 	}
 
 	@Test

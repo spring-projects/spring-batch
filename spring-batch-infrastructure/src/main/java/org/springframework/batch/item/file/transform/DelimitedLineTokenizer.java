@@ -32,19 +32,18 @@ import org.springframework.util.StringUtils;
  * @author Rob Harrop
  * @author Dave Syer
  * @author Michael Minella
- * @deprecated As of release 2.2, replaced by {@link StringDelimitedLineTokenizer}
  */
 @Deprecated
 public class DelimitedLineTokenizer extends AbstractLineTokenizer {
 	/**
 	 * Convenient constant for the common case of a tab delimiter.
 	 */
-	public static final char DELIMITER_TAB = '\t';
+	public static final String DELIMITER_TAB = "\t";
 
 	/**
 	 * Convenient constant for the common case of a comma delimiter.
 	 */
-	public static final char DELIMITER_COMMA = ',';
+	public static final String DELIMITER_COMMA = ",";
 
 	/**
 	 * Convenient constant for the common case of a " character used to escape
@@ -53,7 +52,7 @@ public class DelimitedLineTokenizer extends AbstractLineTokenizer {
 	public static final char DEFAULT_QUOTE_CHARACTER = '"';
 
 	// the delimiter character used when reading input.
-	private char delimiter;
+	private String delimiter;
 
 	private char quoteCharacter = DEFAULT_QUOTE_CHARACTER;
 
@@ -77,8 +76,8 @@ public class DelimitedLineTokenizer extends AbstractLineTokenizer {
 	 *
 	 * @param delimiter the desired delimiter
 	 */
-	public DelimitedLineTokenizer(char delimiter) {
-		Assert.state(delimiter != DEFAULT_QUOTE_CHARACTER, "[" + DEFAULT_QUOTE_CHARACTER
+	public DelimitedLineTokenizer(String delimiter) {
+		Assert.state(!delimiter.equals(String.valueOf(DEFAULT_QUOTE_CHARACTER)), "[" + DEFAULT_QUOTE_CHARACTER
 				+ "] is not allowed as delimiter for tokenizers.");
 
 		this.delimiter = delimiter;
@@ -90,7 +89,7 @@ public class DelimitedLineTokenizer extends AbstractLineTokenizer {
 	 *
 	 * @param delimiter
 	 */
-	public void setDelimiter(char delimiter) {
+	public void setDelimiter(String delimiter) {
 		this.delimiter = delimiter;
 	}
 
@@ -150,11 +149,16 @@ public class DelimitedLineTokenizer extends AbstractLineTokenizer {
 			char currentChar = chars[i];
 			boolean isEnd = (i == (length - 1));
 
-			if ((isDelimiterCharacter(currentChar) && !inQuoted) || isEnd) {
+			boolean isDelimiter = isDelimiter(chars, i, delimiter);
+
+			if ((isDelimiter && !inQuoted) || isEnd) {
 				int endPosition = (isEnd ? (length - lastCut) : (i - lastCut));
 
-				if (isEnd && isDelimiterCharacter(currentChar)) {
+				if (isEnd && isDelimiter) {
 					endPosition--;
+				}
+				else if (!isEnd){
+					endPosition = (endPosition - delimiter.length()) + 1;
 				}
 
 				if (includedFields == null || includedFields.contains(fieldCount)) {
@@ -164,7 +168,7 @@ public class DelimitedLineTokenizer extends AbstractLineTokenizer {
 
 				fieldCount++;
 
-				if (isEnd && (isDelimiterCharacter(currentChar))) {
+				if (isEnd && (isDelimiter)) {
 					if (includedFields == null || includedFields.contains(fieldCount)) {
 						tokens.add("");
 					}
@@ -227,8 +231,17 @@ public class DelimitedLineTokenizer extends AbstractLineTokenizer {
 	 * character
 	 * @see DelimitedLineTokenizer#DelimitedLineTokenizer(char)
 	 */
-	private boolean isDelimiterCharacter(char c) {
-		return c == this.delimiter;
+	private boolean isDelimiter(char[] chars, int i, String token) {
+		boolean result = false;
+
+		if(i >= token.length()) {
+			String end = new String(chars, (i-token.length()) + 1, token.length());
+			if(token.equals(end)) {
+				result = true;
+			}
+		}
+
+		return result;
 	}
 
 	/**

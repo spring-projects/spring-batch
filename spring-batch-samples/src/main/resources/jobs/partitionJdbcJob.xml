@@ -65,7 +65,7 @@
 		<property name="lineMapper">
 			<bean class="org.springframework.batch.item.file.mapping.DefaultLineMapper">
 				<property name="lineTokenizer">
-					<bean class="org.springframework.batch.item.file.transform.StringDelimitedLineTokenizer">
+					<bean class="org.springframework.batch.item.file.transform.DelimitedLineTokenizer">
 						<property name="delimiter" value="," />
 						<property name="names" value="id,name,credit" />
 					</bean>
