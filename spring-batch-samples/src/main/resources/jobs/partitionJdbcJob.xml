@@ -20,7 +20,7 @@
 	</bean>
 
 	<bean id="taskExecutor" class="org.springframework.core.task.SimpleAsyncTaskExecutor" />
-	
+
 	<step id="step1" xmlns="http://www.springframework.org/schema/batch">
 		<tasklet>
 			<chunk writer="itemWriter" reader="itemReader" processor="itemProcessor" commit-interval="5" />

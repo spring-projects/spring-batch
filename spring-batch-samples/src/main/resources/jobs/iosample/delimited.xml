@@ -22,7 +22,7 @@
 				</property>
 				<property name="fieldSetMapper">
 					<bean class="org.springframework.batch.item.file.mapping.BeanWrapperFieldSetMapper">
-						<property name="targetType" value="org.springframework.batch.sample.domain.trade.CustomerCredit" />	
+						<property name="targetType" value="org.springframework.batch.sample.domain.trade.CustomerCredit" />
 					</bean>
 				</property>
 			</bean>
@@ -37,7 +37,7 @@
 				<property name="delimiter" value=","/>
 				<property name="fieldExtractor">
 					<bean class="org.springframework.batch.item.file.transform.BeanWrapperFieldExtractor">
-						<property name="names" value="name,credit"/>					
+						<property name="names" value="name,credit"/>
 					</bean>
 				</property>
 			</bean>
