@@ -30,7 +30,7 @@ import org.springframework.batch.item.ItemStream;
 
 /**
  * @author Dave Syer
- * 
+ *
  */
 public class MulticasterBatchListener<T, S> implements StepExecutionListener, ChunkListener, ItemReadListener<T>,
 		ItemProcessListener<T, S>, ItemWriteListener<S>, SkipListener<T, S> {
@@ -57,7 +57,7 @@ public class MulticasterBatchListener<T, S> implements StepExecutionListener, Ch
 	/**
 	 * Register each of the objects as listeners. Once registered, calls to the
 	 * {@link MulticasterBatchListener} broadcast to the individual listeners.
-	 * 
+	 *
 	 * @param listeners listener objects of types known to the multicaster.
 	 */
 	public void setListeners(List<? extends StepListener> listeners) {
@@ -169,7 +169,7 @@ public class MulticasterBatchListener<T, S> implements StepExecutionListener, Ch
 	}
 
 	/**
-	 * 
+	 *
 	 * @see org.springframework.batch.core.listener.CompositeChunkListener#afterChunk()
 	 */
 	public void afterChunk() {
@@ -182,7 +182,7 @@ public class MulticasterBatchListener<T, S> implements StepExecutionListener, Ch
 	}
 
 	/**
-	 * 
+	 *
 	 * @see org.springframework.batch.core.listener.CompositeChunkListener#beforeChunk()
 	 */
 	public void beforeChunk() {
@@ -208,7 +208,7 @@ public class MulticasterBatchListener<T, S> implements StepExecutionListener, Ch
 	}
 
 	/**
-	 * 
+	 *
 	 * @see org.springframework.batch.core.listener.CompositeItemReadListener#beforeRead()
 	 */
 	public void beforeRead() {
@@ -229,12 +229,12 @@ public class MulticasterBatchListener<T, S> implements StepExecutionListener, Ch
 			itemReadListener.onReadError(ex);
 		}
 		catch (RuntimeException e) {
-			throw new StepListenerFailedException("Error in onReadError.", ex, e);
+			throw new StepListenerFailedException("Error in onReadError.", e, ex);
 		}
 	}
 
 	/**
-	 * 
+	 *
 	 * @see ItemWriteListener#afterWrite(List)
 	 */
 	public void afterWrite(List<? extends S> items) {
@@ -269,7 +269,7 @@ public class MulticasterBatchListener<T, S> implements StepExecutionListener, Ch
 			itemWriteListener.onWriteError(ex, items);
 		}
 		catch (RuntimeException e) {
-			throw new StepListenerFailedException("Error in onWriteError.", ex, e);
+			throw new StepListenerFailedException("Error in onWriteError.", e, ex);
 		}
 	}
 

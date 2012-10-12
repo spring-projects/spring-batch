@@ -18,7 +18,7 @@ package org.springframework.batch.core.listener;
 
 /**
  * Exception to indicate a problem in a step listener.
- * 
+ *
  * @author Dave Syer
  *
  */
@@ -37,8 +37,8 @@ public class StepListenerFailedException extends RuntimeException {
 	 * @param ex the exception that was thrown by a listener
 	 * @param e the exception that caused the skip
 	 */
-	public StepListenerFailedException(String message, Throwable ex, RuntimeException e) {
-		super(message + "\n" + e.getClass().getName() + ": " + e.getMessage(), ex);
+	public StepListenerFailedException(String message, RuntimeException ex, Throwable e) {
+		super(message + "\n" + e.getMessage() + ": " + e.getClass().getName(), ex);
 	}
 
 }
