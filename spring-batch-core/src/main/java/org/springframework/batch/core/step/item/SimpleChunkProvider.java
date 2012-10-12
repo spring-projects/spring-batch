@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2007 the original author or authors.
+ * Copyright 2006-2012 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -32,8 +32,9 @@ import org.springframework.batch.repeat.RepeatStatus;
 /**
  * Simple implementation of the ChunkProvider interface that does basic chunk
  * providing from an {@link ItemReader}.
- * 
+ *
  * @author Dave Syer
+ * @author Michael Minella
  * @see ChunkOrientedTasklet
  */
 public class SimpleChunkProvider<I> implements ChunkProvider<I> {
@@ -54,7 +55,7 @@ public class SimpleChunkProvider<I> implements ChunkProvider<I> {
 	/**
 	 * Register some {@link StepListener}s with the handler. Each will get the
 	 * callbacks in the order specified at the correct stage.
-	 * 
+	 *
 	 * @param listeners
 	 */
 	public void setListeners(List<? extends StepListener> listeners) {
@@ -65,7 +66,7 @@ public class SimpleChunkProvider<I> implements ChunkProvider<I> {
 
 	/**
 	 * Register a listener for callbacks at the appropriate stages in a process.
-	 * 
+	 *
 	 * @param listener a {@link StepListener}
 	 */
 	public void registerListener(StepListener listener) {
@@ -94,6 +95,7 @@ public class SimpleChunkProvider<I> implements ChunkProvider<I> {
 			return item;
 		}
 		catch (Exception e) {
+			logger.debug(e.getMessage() + " : " + e.getClass().getName());
 			listener.onReadError(e);
 			throw e;
 		}
@@ -136,14 +138,14 @@ public class SimpleChunkProvider<I> implements ChunkProvider<I> {
 	/**
 	 * Delegates to {@link #doRead()}. Subclasses can add additional behaviour
 	 * (e.g. exception handling).
-	 * 
+	 *
 	 * @param contribution the current step execution contribution
 	 * @param chunk the current chunk
 	 * @return a new item for processing
-	 * 
+	 *
 	 * @throws SkipOverflowException if specifically the chunk is accumulating
 	 * too much data (e.g. skips) and it wants to force a commit.
-	 * 
+	 *
 	 * @throws Exception if there is a generic issue
 	 */
 	protected I read(StepContribution contribution, Chunk<I> chunk) throws SkipOverflowException, Exception {
