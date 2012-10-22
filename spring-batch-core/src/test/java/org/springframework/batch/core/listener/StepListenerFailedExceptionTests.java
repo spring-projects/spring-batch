@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2007 the original author or authors.
+ * Copyright 2006-2012 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,6 +23,7 @@ import org.junit.Test;
 
 /**
  * @author Dave Syer
+ * @author Michael Minella
  *
  */
 public class StepListenerFailedExceptionTests {
@@ -32,11 +33,4 @@ public class StepListenerFailedExceptionTests {
 		Exception exception = new StepListenerFailedException("foo", new IllegalStateException("bar"));
 		assertEquals("foo", exception.getMessage().substring(0, 3));
 	}
-
-	@Test
-	public void testExceptionStringThrowableThrowable() throws Exception {
-		Exception exception = new StepListenerFailedException("foo", new IllegalStateException(), new RuntimeException("bar"));
-		assertEquals("foo", exception.getMessage().substring(0, 3));
-	}
-
 }

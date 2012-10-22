@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2007 the original author or authors.
+ * Copyright 2006-2012 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,8 +18,9 @@ package org.springframework.batch.core.listener;
 
 /**
  * Exception to indicate a problem in a step listener.
- * 
+ *
  * @author Dave Syer
+ * @author Michael Minella
  *
  */
 public class StepListenerFailedException extends RuntimeException {
@@ -31,14 +32,4 @@ public class StepListenerFailedException extends RuntimeException {
 	public StepListenerFailedException(String message, Throwable t) {
 		super(message, t);
 	}
-
-	/**
-	 * @param message describes the error to the user
-	 * @param ex the exception that was thrown by a listener
-	 * @param e the exception that caused the skip
-	 */
-	public StepListenerFailedException(String message, Throwable ex, RuntimeException e) {
-		super(message + "\n" + e.getClass().getName() + ": " + e.getMessage(), ex);
-	}
-
 }
