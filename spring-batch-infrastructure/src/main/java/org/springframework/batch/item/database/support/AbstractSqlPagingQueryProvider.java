@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2008 the original author or authors.
+ * Copyright 2006-2012 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -43,6 +43,7 @@ import java.util.ArrayList;
  * 
  * @author Thomas Risberg
  * @author Dave Syer
+ * @author Michael Minella
  * @since 2.0
  */
 public abstract class AbstractSqlPagingQueryProvider implements PagingQueryProvider {
@@ -54,12 +55,32 @@ public abstract class AbstractSqlPagingQueryProvider implements PagingQueryProvi
 	private String whereClause;
 
 	private String sortKey;
+	
+	private String groupClause;
 
 	private boolean ascending = true;
 
 	private int parameterCount;
 
 	private boolean usingNamedParameters;
+	
+	/**
+	 * The setter for the group by clause
+	 * 
+	 * @param SQL GROUP BY clause part of the SQL query string
+	 */
+	public void setGroupClause(String groupClause) {
+		this.groupClause = groupClause;
+	}
+	
+	/**
+	 * The getter for the group by clause
+	 * 
+	 * @return SQL GROUP BY clause part of the SQL query string
+	 */
+	public String getGroupClause() {
+		return this.groupClause;
+	}
 
 	/**
 	 * @param selectClause SELECT clause part of SQL query string
@@ -193,6 +214,9 @@ public abstract class AbstractSqlPagingQueryProvider implements PagingQueryProvi
 		sql.append(" FROM ").append(fromClause);
 		if (whereClause != null) {
 			sql.append(" WHERE ").append(whereClause);
+		}
+		if(groupClause != null) {
+			sql.append(" GROUP BY ").append(groupClause);
 		}
 		List<String> namedParameters = new ArrayList<String>();
 		parameterCount = JdbcParameterUtils.countParameterPlaceholders(sql.toString(), namedParameters);

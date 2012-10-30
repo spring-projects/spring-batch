@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2008 the original author or authors.
+ * Copyright 2006-2012 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,6 +24,7 @@ import org.springframework.util.StringUtils;
  * Apache Derby version 10.4.1.3
  * 
  * @author Thomas Risberg
+ * @author Michael Minella
  * @since 2.0
  */
 public class SqlWindowingPagingQueryProvider extends AbstractSqlPagingQueryProvider {
@@ -38,6 +39,7 @@ public class SqlWindowingPagingQueryProvider extends AbstractSqlPagingQueryProvi
 		sql.append(getOverSubstituteClauseStart());
 		sql.append(" FROM ").append(getFromClause()).append(
 				getWhereClause() == null ? "" : " WHERE " + getWhereClause());
+		sql.append(getGroupClause() == null ? "" : " GROUP BY " + getGroupClause());
 		sql.append(getOverSubstituteClauseEnd());
 		sql.append(") ").append(getSubQueryAlias()).append("WHERE ").append(extractTableAlias()).append(
 				"ROW_NUMBER <= ").append(pageSize);
@@ -79,6 +81,7 @@ public class SqlWindowingPagingQueryProvider extends AbstractSqlPagingQueryProvi
 			sql.append(" < ");
 		}
 		sql.append(getSortKeyPlaceHolder());
+		sql.append(getGroupClause() == null ? "" : " GROUP BY " + getGroupClause());
 		sql.append(getOverSubstituteClauseEnd());
 		sql.append(") ").append(getSubQueryAlias()).append("WHERE ").append(extractTableAlias()).append(
 				"ROW_NUMBER <= ").append(pageSize);
@@ -102,6 +105,7 @@ public class SqlWindowingPagingQueryProvider extends AbstractSqlPagingQueryProvi
 		sql.append(getOverSubstituteClauseStart());
 		sql.append(" FROM ").append(getFromClause());
 		sql.append(getWhereClause() == null ? "" : " WHERE " + getWhereClause());
+		sql.append(getGroupClause() == null ? "" : " GROUP BY " + getGroupClause());
 		sql.append(getOverSubstituteClauseEnd());
 		sql.append(") ").append(getSubQueryAlias()).append("WHERE ").append(extractTableAlias()).append(
 				"ROW_NUMBER = ").append(lastRowNum);
