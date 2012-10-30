@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2008 the original author or authors.
+ * Copyright 2006-2012 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,12 +16,15 @@
 
 package org.springframework.batch.item.database.support;
 
+import org.springframework.util.StringUtils;
+
 /**
  * Utility class that generates the actual SQL statements used by query
  * providers.
  * 
  * @author Thomas Risberg
  * @author Dave Syer
+ * @author Michael Minella
  * @since 2.0
  */
 public class SqlPagingQueryUtils {
@@ -42,6 +45,7 @@ public class SqlPagingQueryUtils {
 		sql.append("SELECT ").append(provider.getSelectClause());
 		sql.append(" FROM ").append(provider.getFromClause());
 		buildWhereClause(provider, remainingPageQuery, sql);
+		buildGroupByClause(provider, sql);
 		sql.append(" ORDER BY ").append(provider.getSortKeyWithoutAlias());
 		buildAscendingClause(provider, sql);
 		sql.append(" " + limitClause);
@@ -65,6 +69,7 @@ public class SqlPagingQueryUtils {
 		sql.append("SELECT ").append(topClause).append(" ").append(provider.getSelectClause());
 		sql.append(" FROM ").append(provider.getFromClause());
 		buildWhereClause(provider, remainingPageQuery, sql);
+		buildGroupByClause(provider, sql);
 		sql.append(" ORDER BY ").append(provider.getSortKeyWithoutAlias());
 		buildAscendingClause(provider, sql);
 
@@ -104,6 +109,7 @@ public class SqlPagingQueryUtils {
 		sql.append("SELECT * FROM (SELECT ").append(selectClause).append(", ROWNUM as TMP_ROW_NUM");
 		sql.append(" FROM ").append(provider.getFromClause());
 		buildWhereClause(provider, remainingPageQuery, sql);
+		buildGroupByClause(provider, sql);
 		sql.append(" ORDER BY ").append(provider.getSortKeyWithoutAlias());
 		buildAscendingClause(provider, sql);
 		sql.append(") WHERE ").append(rowNumClause);
@@ -125,6 +131,7 @@ public class SqlPagingQueryUtils {
 				.append(", ROWNUM as TMP_ROW_NUM");
 		sql.append(" FROM (SELECT ").append(innerSelectClause).append(" FROM ").append(provider.getFromClause());
 		buildWhereClause(provider, remainingPageQuery, sql);
+		buildGroupByClause(provider, sql);
 		sql.append(" ORDER BY ").append(provider.getSortKeyWithoutAlias());
 		buildAscendingClause(provider, sql);
 		sql.append(")) WHERE ").append(rowNumClause);
@@ -146,6 +153,7 @@ public class SqlPagingQueryUtils {
 		sql.append("SELECT ").append(provider.getSortKey()).append(" AS SORT_KEY");
 		sql.append(" FROM ").append(provider.getFromClause());
 		sql.append(provider.getWhereClause() == null ? "" : " WHERE " + provider.getWhereClause());
+		buildGroupByClause(provider, sql);
 		sql.append(" ORDER BY ").append(provider.getSortKeyWithoutAlias());
 		buildAscendingClause(provider, sql);
 		sql.append(" " + limitClause);
@@ -166,6 +174,7 @@ public class SqlPagingQueryUtils {
 		sql.append("SELECT ").append(topClause).append(" ").append(provider.getSortKey()).append(" AS SORT_KEY");
 		sql.append(" FROM ").append(provider.getFromClause());
 		sql.append(provider.getWhereClause() == null ? "" : " WHERE " + provider.getWhereClause());
+		buildGroupByClause(provider, sql);
 		sql.append(" ORDER BY ").append(provider.getSortKeyWithoutAlias());
 		buildAscendingClause(provider, sql);
 
@@ -200,6 +209,13 @@ public class SqlPagingQueryUtils {
 		}
 		else {
 			sql.append(provider.getWhereClause() == null ? "" : " WHERE " + provider.getWhereClause());
+		}
+	}
+	
+	private static void buildGroupByClause(AbstractSqlPagingQueryProvider provider, StringBuilder sql) {
+		if(StringUtils.hasText(provider.getGroupClause())) {
+			sql.append(" GROUP BY ");
+			sql.append(provider.getGroupClause());
 		}
 	}
 

@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2008 the original author or authors.
+ * Copyright 2006-2012 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,13 +15,14 @@
  */
 package org.springframework.batch.item.database.support;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 
 import org.junit.Assert;
 import org.junit.Test;
 
 /**
  * @author Thomas Risberg
+ * @author Michael Minella
  */
 public class SqlWindowingPagingQueryProviderTests extends AbstractSqlPagingQueryProviderTests {
 
@@ -57,4 +58,39 @@ public class SqlWindowingPagingQueryProviderTests extends AbstractSqlPagingQuery
 		Assert.assertEquals("", sql, s);
 	}
 
+	@Override
+	@Test
+	public void testGenerateFirstPageQueryWithGroupBy() {
+		pagingQueryProvider.setGroupClause("dep");
+		String sql = "SELECT * FROM ( SELECT id, name, age, ROW_NUMBER() OVER (ORDER BY id ASC) AS ROW_NUMBER FROM foo WHERE bar = 1 GROUP BY dep) AS TMP_SUB WHERE TMP_SUB.ROW_NUMBER <= 100";
+		String s = pagingQueryProvider.generateFirstPageQuery(pageSize);
+		assertEquals(sql, s);
+	}
+
+	@Override
+	@Test
+	public void testGenerateRemainingPagesQueryWithGroupBy() {
+		pagingQueryProvider.setGroupClause("dep");
+		String sql = "SELECT * FROM ( SELECT id, name, age, ROW_NUMBER() OVER (ORDER BY id ASC) AS ROW_NUMBER FROM foo WHERE bar = 1 AND id > ? GROUP BY dep) AS TMP_SUB WHERE TMP_SUB.ROW_NUMBER <= 100";
+		String s = pagingQueryProvider.generateRemainingPagesQuery(pageSize);
+		assertEquals(sql, s);
+	}
+
+	@Override
+	@Test
+	public void testGenerateJumpToItemQueryWithGroupBy() {
+		pagingQueryProvider.setGroupClause("dep");
+		String sql = "SELECT SORT_KEY FROM ( SELECT id AS SORT_KEY, ROW_NUMBER() OVER (ORDER BY id ASC) AS ROW_NUMBER FROM foo WHERE bar = 1 GROUP BY dep) AS TMP_SUB WHERE TMP_SUB.ROW_NUMBER = 100";
+		String s = pagingQueryProvider.generateJumpToItemQuery(145, pageSize);
+		assertEquals(sql, s);
+	}
+
+	@Override
+	@Test
+	public void testGenerateJumpToItemQueryForFirstPageWithGroupBy() {
+		pagingQueryProvider.setGroupClause("dep");
+		String sql = "SELECT SORT_KEY FROM ( SELECT id AS SORT_KEY, ROW_NUMBER() OVER (ORDER BY id ASC) AS ROW_NUMBER FROM foo WHERE bar = 1 GROUP BY dep) AS TMP_SUB WHERE TMP_SUB.ROW_NUMBER = 1";
+		String s = pagingQueryProvider.generateJumpToItemQuery(45, pageSize);
+		assertEquals(sql, s);
+	}
 }
