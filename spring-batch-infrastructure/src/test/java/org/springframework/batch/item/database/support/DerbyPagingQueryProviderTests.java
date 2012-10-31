@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2008 the original author or authors.
+ * Copyright 2006-2012 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,6 +19,7 @@ import static org.easymock.EasyMock.createMock;
 import static org.easymock.EasyMock.expect;
 import static org.easymock.EasyMock.replay;
 import static org.easymock.EasyMock.verify;
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
@@ -33,6 +34,7 @@ import org.springframework.dao.InvalidDataAccessResourceUsageException;
 
 /**
  * @author Thomas Risberg
+ * @author Michael Minella
  */
 public class DerbyPagingQueryProviderTests extends AbstractSqlPagingQueryProviderTests {
 
@@ -133,4 +135,39 @@ public class DerbyPagingQueryProviderTests extends AbstractSqlPagingQueryProvide
 		assertTrue("Wrong query: " + s, s.contains("id desc"));
 	}
 
+	@Override
+	@Test
+	public void testGenerateFirstPageQueryWithGroupBy() {
+		pagingQueryProvider.setGroupClause("dep");
+		String sql = "SELECT * FROM ( SELECT id, name, age, ROW_NUMBER() OVER () AS ROW_NUMBER FROM (SELECT id, name, age FROM foo WHERE bar = 1 GROUP BY dep ORDER BY id ASC) AS TMP_ORDERED) AS TMP_SUB WHERE TMP_SUB.ROW_NUMBER <= 100";
+		String s = pagingQueryProvider.generateFirstPageQuery(pageSize);
+		assertEquals(sql, s);
+	}
+
+	@Override
+	@Test
+	public void testGenerateRemainingPagesQueryWithGroupBy() {
+		pagingQueryProvider.setGroupClause("dep");
+		String sql = "SELECT * FROM ( SELECT id, name, age, ROW_NUMBER() OVER () AS ROW_NUMBER FROM (SELECT id, name, age FROM foo WHERE bar = 1 AND id > ? GROUP BY dep ORDER BY id ASC) AS TMP_ORDERED) AS TMP_SUB WHERE TMP_SUB.ROW_NUMBER <= 100";
+		String s = pagingQueryProvider.generateRemainingPagesQuery(pageSize);
+		assertEquals(sql, s);
+	}
+
+	@Override
+	@Test
+	public void testGenerateJumpToItemQueryWithGroupBy() {
+		pagingQueryProvider.setGroupClause("dep");
+		String sql = "SELECT SORT_KEY FROM ( SELECT id AS SORT_KEY, ROW_NUMBER() OVER () AS ROW_NUMBER FROM (SELECT id, name, age FROM foo WHERE bar = 1 GROUP BY dep ORDER BY id ASC) AS TMP_ORDERED) AS TMP_SUB WHERE TMP_SUB.ROW_NUMBER = 100";
+		String s = pagingQueryProvider.generateJumpToItemQuery(145, pageSize);
+		assertEquals(sql, s);
+	}
+
+	@Override
+	@Test
+	public void testGenerateJumpToItemQueryForFirstPageWithGroupBy() {
+		pagingQueryProvider.setGroupClause("dep");
+		String sql = "SELECT SORT_KEY FROM ( SELECT id AS SORT_KEY, ROW_NUMBER() OVER () AS ROW_NUMBER FROM (SELECT id, name, age FROM foo WHERE bar = 1 GROUP BY dep ORDER BY id ASC) AS TMP_ORDERED) AS TMP_SUB WHERE TMP_SUB.ROW_NUMBER = 1";
+		String s = pagingQueryProvider.generateJumpToItemQuery(45, pageSize);
+		assertEquals(sql, s);
+	}
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2008 the original author or authors.
+ * Copyright 2006-2012 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,6 +22,7 @@ import org.junit.Test;
 
 /**
  * @author Thomas Risberg
+ * @author Michael Minella
  */
 public abstract class AbstractSqlPagingQueryProviderTests {
 
@@ -66,5 +67,17 @@ public abstract class AbstractSqlPagingQueryProviderTests {
 
 	@Test
 	public abstract void testGenerateJumpToItemQueryForFirstPage();
+	
+	@Test
+	public abstract void testGenerateFirstPageQueryWithGroupBy();
+	
+	@Test
+	public abstract void testGenerateRemainingPagesQueryWithGroupBy();
+	
+	@Test
+	public abstract void testGenerateJumpToItemQueryWithGroupBy();
+	
+	@Test
+	public abstract void testGenerateJumpToItemQueryForFirstPageWithGroupBy();
 
 }

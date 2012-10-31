@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2008 the original author or authors.
+ * Copyright 2006-2012 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -44,6 +44,7 @@ import org.springframework.util.StringUtils;
  * types are given by the {@link DatabaseType} enum.
  * 
  * @author Dave Syer
+ * @author Michael Minella
  */
 public class SqlPagingQueryProviderFactoryBean implements FactoryBean {
 
@@ -56,6 +57,8 @@ public class SqlPagingQueryProviderFactoryBean implements FactoryBean {
 	private String whereClause;
 
 	private String selectClause;
+	
+	private String groupClause;
 
 	private String sortKey;
 
@@ -75,6 +78,13 @@ public class SqlPagingQueryProviderFactoryBean implements FactoryBean {
 		providers.put(POSTGRES,new PostgresPagingQueryProvider());
 		providers.put(SQLSERVER,new SqlServerPagingQueryProvider());
 		providers.put(SYBASE,new SybasePagingQueryProvider());
+	}
+	
+	/**
+	 * @param SQL GROUP BY clause part of the SQL query string
+	 */
+	public void setGroupClause(String groupClause) {
+		this.groupClause = groupClause;
 	}
 
 	/**
@@ -153,6 +163,9 @@ public class SqlPagingQueryProviderFactoryBean implements FactoryBean {
 		provider.setAscending(ascending);
 		if (StringUtils.hasText(selectClause)) {
 			provider.setSelectClause(selectClause);
+		}
+		if(StringUtils.hasText(groupClause)) {
+			provider.setGroupClause(groupClause);
 		}
 
 		provider.init(dataSource);

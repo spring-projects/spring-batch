@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2008 the original author or authors.
+ * Copyright 2006-2012 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,8 +18,12 @@ package org.springframework.batch.item.database.support;
 
 /**
  * Postgres implementation of a  {@link org.springframework.batch.item.database.PagingQueryProvider} using database specific features.
+ * 
+ * When using the groupClause, this implementation expects all select fields not used in aggregate functions to be included in the 
+ * groupClause (the provider does not add them for you).
  *
  * @author Thomas Risberg
+ * @author Michael Minella
  * @since 2.0
  */
 public class PostgresPagingQueryProvider extends AbstractSqlPagingQueryProvider {
