@@ -15,8 +15,12 @@
  */
 package org.springframework.batch.item.database.support;
 
-import org.junit.Test;
 import static org.junit.Assert.assertEquals;
+
+import java.util.LinkedHashMap;
+import java.util.Map;
+
+import org.junit.Test;
 
 /**
  * @author Thomas Risberg
@@ -38,21 +42,21 @@ public class MySqlPagingQueryProviderTests extends AbstractSqlPagingQueryProvide
 
 	@Test @Override
 	public void testGenerateRemainingPagesQuery() {
-		String sql = "SELECT id, name, age FROM foo WHERE bar = 1 AND id > ? ORDER BY id ASC LIMIT 100";
+		String sql = "SELECT id, name, age FROM foo WHERE bar = 1 AND ((id > ?)) ORDER BY id ASC LIMIT 100";
 		String s = pagingQueryProvider.generateRemainingPagesQuery(pageSize);
 		assertEquals(sql, s);
 	}
 
 	@Test @Override
 	public void testGenerateJumpToItemQuery() {
-		String sql = "SELECT id AS SORT_KEY FROM foo WHERE bar = 1 ORDER BY id ASC LIMIT 99, 1";
+		String sql = "SELECT id FROM foo WHERE bar = 1 ORDER BY id ASC LIMIT 99, 1";
 		String s = pagingQueryProvider.generateJumpToItemQuery(145, pageSize);
 		assertEquals(sql, s);
 	}
 	
 	@Test @Override
 	public void testGenerateJumpToItemQueryForFirstPage() {
-		String sql = "SELECT id AS SORT_KEY FROM foo WHERE bar = 1 ORDER BY id ASC LIMIT 0, 1";
+		String sql = "SELECT id FROM foo WHERE bar = 1 ORDER BY id ASC LIMIT 0, 1";
 		String s = pagingQueryProvider.generateJumpToItemQuery(45, pageSize);
 		assertEquals(sql, s);
 	}
@@ -70,7 +74,7 @@ public class MySqlPagingQueryProviderTests extends AbstractSqlPagingQueryProvide
 	@Test
 	public void testGenerateRemainingPagesQueryWithGroupBy() {
 		pagingQueryProvider.setGroupClause("dep");
-		String sql = "SELECT id, name, age FROM foo WHERE bar = 1 AND id > ? GROUP BY dep ORDER BY id ASC LIMIT 100";
+		String sql = "SELECT id, name, age FROM foo WHERE bar = 1 AND ((id > ?)) GROUP BY dep ORDER BY id ASC LIMIT 100";
 		String s = pagingQueryProvider.generateRemainingPagesQuery(pageSize);
 		assertEquals(sql, s);
 	}
@@ -79,7 +83,7 @@ public class MySqlPagingQueryProviderTests extends AbstractSqlPagingQueryProvide
 	@Test
 	public void testGenerateJumpToItemQueryWithGroupBy() {
 		pagingQueryProvider.setGroupClause("dep");
-		String sql = "SELECT id AS SORT_KEY FROM foo WHERE bar = 1 GROUP BY dep ORDER BY id ASC LIMIT 99, 1";
+		String sql = "SELECT id FROM foo WHERE bar = 1 GROUP BY dep ORDER BY id ASC LIMIT 99, 1";
 		String s = pagingQueryProvider.generateJumpToItemQuery(145, pageSize);
 		assertEquals(sql, s);
 	}
@@ -88,7 +92,55 @@ public class MySqlPagingQueryProviderTests extends AbstractSqlPagingQueryProvide
 	@Test
 	public void testGenerateJumpToItemQueryForFirstPageWithGroupBy() {
 		pagingQueryProvider.setGroupClause("dep");
-		String sql = "SELECT id AS SORT_KEY FROM foo WHERE bar = 1 GROUP BY dep ORDER BY id ASC LIMIT 0, 1";
+		String sql = "SELECT id FROM foo WHERE bar = 1 GROUP BY dep ORDER BY id ASC LIMIT 0, 1";
+		String s = pagingQueryProvider.generateJumpToItemQuery(45, pageSize);
+		assertEquals(sql, s);
+	}
+
+	@Override
+	@Test
+	public void testGenerateFirstPageQueryWithMultipleSortKeys() {
+		Map<String, Boolean> sortKeys = new LinkedHashMap<String, Boolean>();
+		sortKeys.put("id", true);
+		sortKeys.put("name", false);
+		pagingQueryProvider.setSortKeys(sortKeys);
+		String sql = "SELECT id, name, age FROM foo WHERE bar = 1 ORDER BY id ASC, name DESC LIMIT 100";
+		String s = pagingQueryProvider.generateFirstPageQuery(pageSize);
+		assertEquals(sql, s);
+	}
+
+	@Override
+	@Test
+	public void testGenerateRemainingPagesQueryWithMultipleSortKeys() {
+		Map<String, Boolean> sortKeys = new LinkedHashMap<String, Boolean>();
+		sortKeys.put("id", true);
+		sortKeys.put("name", false);
+		pagingQueryProvider.setSortKeys(sortKeys);
+		String sql = "SELECT id, name, age FROM foo WHERE bar = 1 AND ((id > ?) OR (id = ? AND name < ?)) ORDER BY id ASC, name DESC LIMIT 100";
+		String s = pagingQueryProvider.generateRemainingPagesQuery(pageSize);
+		assertEquals(sql, s);
+	}
+
+	@Override
+	@Test
+	public void testGenerateJumpToItemQueryWithMultipleSortKeys() {
+		Map<String, Boolean> sortKeys = new LinkedHashMap<String, Boolean>();
+		sortKeys.put("id", true);
+		sortKeys.put("name", false);
+		pagingQueryProvider.setSortKeys(sortKeys);
+		String sql = "SELECT id, name FROM foo WHERE bar = 1 ORDER BY id ASC, name DESC LIMIT 99, 1";
+		String s = pagingQueryProvider.generateJumpToItemQuery(145, pageSize);
+		assertEquals(sql, s);
+	}
+
+	@Override
+	@Test
+	public void testGenerateJumpToItemQueryForFirstPageWithMultipleSortKeys() {
+		Map<String, Boolean> sortKeys = new LinkedHashMap<String, Boolean>();
+		sortKeys.put("id", true);
+		sortKeys.put("name", false);
+		pagingQueryProvider.setSortKeys(sortKeys);
+		String sql = "SELECT id, name FROM foo WHERE bar = 1 ORDER BY id ASC, name DESC LIMIT 0, 1";
 		String s = pagingQueryProvider.generateJumpToItemQuery(45, pageSize);
 		assertEquals(sql, s);
 	}

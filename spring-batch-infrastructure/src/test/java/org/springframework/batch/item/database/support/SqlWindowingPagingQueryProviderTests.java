@@ -17,6 +17,9 @@ package org.springframework.batch.item.database.support;
 
 import static org.junit.Assert.assertEquals;
 
+import java.util.LinkedHashMap;
+import java.util.Map;
+
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -32,28 +35,28 @@ public class SqlWindowingPagingQueryProviderTests extends AbstractSqlPagingQuery
 
 	@Test @Override
 	public void testGenerateFirstPageQuery() {
-		String sql = "SELECT * FROM ( SELECT id, name, age, ROW_NUMBER() OVER (ORDER BY id ASC) AS ROW_NUMBER FROM foo WHERE bar = 1) AS TMP_SUB WHERE TMP_SUB.ROW_NUMBER <= 100";
+		String sql = "SELECT * FROM ( SELECT id, name, age, ROW_NUMBER() OVER ( ORDER BY id ASC) AS ROW_NUMBER FROM foo WHERE bar = 1) AS TMP_SUB WHERE TMP_SUB.ROW_NUMBER <= 100";
 		String s = pagingQueryProvider.generateFirstPageQuery(pageSize);
 		assertEquals("", sql, s);
 	}
 
 	@Test @Override
 	public void testGenerateRemainingPagesQuery() {
-		String sql = "SELECT * FROM ( SELECT id, name, age, ROW_NUMBER() OVER (ORDER BY id ASC) AS ROW_NUMBER FROM foo WHERE bar = 1 AND id > ?) AS TMP_SUB WHERE TMP_SUB.ROW_NUMBER <= 100";
+		String sql = "SELECT * FROM ( SELECT id, name, age, ROW_NUMBER() OVER ( ORDER BY id ASC) AS ROW_NUMBER FROM foo WHERE bar = 1 AND ((id > ?))) AS TMP_SUB WHERE TMP_SUB.ROW_NUMBER <= 100";
 		String s = pagingQueryProvider.generateRemainingPagesQuery(pageSize);
 		assertEquals("", sql, s);
 	}
 
 	@Test @Override
 	public void testGenerateJumpToItemQuery() {
-		String sql = "SELECT SORT_KEY FROM ( SELECT id AS SORT_KEY, ROW_NUMBER() OVER (ORDER BY id ASC) AS ROW_NUMBER FROM foo WHERE bar = 1) AS TMP_SUB WHERE TMP_SUB.ROW_NUMBER = 100";
+		String sql = "SELECT id FROM ( SELECT id, ROW_NUMBER() OVER ( ORDER BY id ASC) AS ROW_NUMBER FROM foo WHERE bar = 1) AS TMP_SUB WHERE TMP_SUB.ROW_NUMBER = 100";
 		String s = pagingQueryProvider.generateJumpToItemQuery(145, pageSize);
 		assertEquals("", sql, s);
 	}
 
 	@Test @Override
 	public void testGenerateJumpToItemQueryForFirstPage() {
-		String sql = "SELECT SORT_KEY FROM ( SELECT id AS SORT_KEY, ROW_NUMBER() OVER (ORDER BY id ASC) AS ROW_NUMBER FROM foo WHERE bar = 1) AS TMP_SUB WHERE TMP_SUB.ROW_NUMBER = 1";
+		String sql = "SELECT id FROM ( SELECT id, ROW_NUMBER() OVER ( ORDER BY id ASC) AS ROW_NUMBER FROM foo WHERE bar = 1) AS TMP_SUB WHERE TMP_SUB.ROW_NUMBER = 1";
 		String s = pagingQueryProvider.generateJumpToItemQuery(45, pageSize);
 		Assert.assertEquals("", sql, s);
 	}
@@ -62,7 +65,7 @@ public class SqlWindowingPagingQueryProviderTests extends AbstractSqlPagingQuery
 	@Test
 	public void testGenerateFirstPageQueryWithGroupBy() {
 		pagingQueryProvider.setGroupClause("dep");
-		String sql = "SELECT * FROM ( SELECT id, name, age, ROW_NUMBER() OVER (ORDER BY id ASC) AS ROW_NUMBER FROM foo WHERE bar = 1 GROUP BY dep) AS TMP_SUB WHERE TMP_SUB.ROW_NUMBER <= 100";
+		String sql = "SELECT * FROM ( SELECT id, name, age, ROW_NUMBER() OVER ( ORDER BY id ASC) AS ROW_NUMBER FROM foo WHERE bar = 1 GROUP BY dep) AS TMP_SUB WHERE TMP_SUB.ROW_NUMBER <= 100";
 		String s = pagingQueryProvider.generateFirstPageQuery(pageSize);
 		assertEquals(sql, s);
 	}
@@ -71,7 +74,7 @@ public class SqlWindowingPagingQueryProviderTests extends AbstractSqlPagingQuery
 	@Test
 	public void testGenerateRemainingPagesQueryWithGroupBy() {
 		pagingQueryProvider.setGroupClause("dep");
-		String sql = "SELECT * FROM ( SELECT id, name, age, ROW_NUMBER() OVER (ORDER BY id ASC) AS ROW_NUMBER FROM foo WHERE bar = 1 AND id > ? GROUP BY dep) AS TMP_SUB WHERE TMP_SUB.ROW_NUMBER <= 100";
+		String sql = "SELECT * FROM ( SELECT id, name, age, ROW_NUMBER() OVER ( ORDER BY id ASC) AS ROW_NUMBER FROM foo WHERE bar = 1 AND ((id > ?)) GROUP BY dep) AS TMP_SUB WHERE TMP_SUB.ROW_NUMBER <= 100";
 		String s = pagingQueryProvider.generateRemainingPagesQuery(pageSize);
 		assertEquals(sql, s);
 	}
@@ -80,7 +83,7 @@ public class SqlWindowingPagingQueryProviderTests extends AbstractSqlPagingQuery
 	@Test
 	public void testGenerateJumpToItemQueryWithGroupBy() {
 		pagingQueryProvider.setGroupClause("dep");
-		String sql = "SELECT SORT_KEY FROM ( SELECT id AS SORT_KEY, ROW_NUMBER() OVER (ORDER BY id ASC) AS ROW_NUMBER FROM foo WHERE bar = 1 GROUP BY dep) AS TMP_SUB WHERE TMP_SUB.ROW_NUMBER = 100";
+		String sql = "SELECT id FROM ( SELECT id, ROW_NUMBER() OVER ( ORDER BY id ASC) AS ROW_NUMBER FROM foo WHERE bar = 1 GROUP BY dep) AS TMP_SUB WHERE TMP_SUB.ROW_NUMBER = 100";
 		String s = pagingQueryProvider.generateJumpToItemQuery(145, pageSize);
 		assertEquals(sql, s);
 	}
@@ -89,8 +92,56 @@ public class SqlWindowingPagingQueryProviderTests extends AbstractSqlPagingQuery
 	@Test
 	public void testGenerateJumpToItemQueryForFirstPageWithGroupBy() {
 		pagingQueryProvider.setGroupClause("dep");
-		String sql = "SELECT SORT_KEY FROM ( SELECT id AS SORT_KEY, ROW_NUMBER() OVER (ORDER BY id ASC) AS ROW_NUMBER FROM foo WHERE bar = 1 GROUP BY dep) AS TMP_SUB WHERE TMP_SUB.ROW_NUMBER = 1";
+		String sql = "SELECT id FROM ( SELECT id, ROW_NUMBER() OVER ( ORDER BY id ASC) AS ROW_NUMBER FROM foo WHERE bar = 1 GROUP BY dep) AS TMP_SUB WHERE TMP_SUB.ROW_NUMBER = 1";
 		String s = pagingQueryProvider.generateJumpToItemQuery(45, pageSize);
 		assertEquals(sql, s);
+	}
+
+	@Override
+	@Test
+	public void testGenerateFirstPageQueryWithMultipleSortKeys() {
+		Map<String, Boolean> sortKeys = new LinkedHashMap<String, Boolean>();
+		sortKeys.put("id", true);
+		sortKeys.put("name", false);
+		pagingQueryProvider.setSortKeys(sortKeys);
+		String sql = "SELECT * FROM ( SELECT id, name, age, ROW_NUMBER() OVER ( ORDER BY id ASC, name DESC) AS ROW_NUMBER FROM foo WHERE bar = 1) AS TMP_SUB WHERE TMP_SUB.ROW_NUMBER <= 100";
+		String s = pagingQueryProvider.generateFirstPageQuery(pageSize);
+		assertEquals("", sql, s);
+	}
+
+	@Override
+	@Test
+	public void testGenerateRemainingPagesQueryWithMultipleSortKeys() {
+		Map<String, Boolean> sortKeys = new LinkedHashMap<String, Boolean>();
+		sortKeys.put("id", true);
+		sortKeys.put("name", false);
+		pagingQueryProvider.setSortKeys(sortKeys);
+		String sql = "SELECT * FROM ( SELECT id, name, age, ROW_NUMBER() OVER ( ORDER BY id ASC, name DESC) AS ROW_NUMBER FROM foo WHERE bar = 1 AND ((id > ?) OR (id = ? AND name < ?))) AS TMP_SUB WHERE TMP_SUB.ROW_NUMBER <= 100";
+		String s = pagingQueryProvider.generateRemainingPagesQuery(pageSize);
+		assertEquals("", sql, s);
+	}
+
+	@Override
+	@Test
+	public void testGenerateJumpToItemQueryWithMultipleSortKeys() {
+		Map<String, Boolean> sortKeys = new LinkedHashMap<String, Boolean>();
+		sortKeys.put("id", true);
+		sortKeys.put("name", false);
+		pagingQueryProvider.setSortKeys(sortKeys);
+		String sql = "SELECT id, name FROM ( SELECT id, name, ROW_NUMBER() OVER ( ORDER BY id ASC, name DESC) AS ROW_NUMBER FROM foo WHERE bar = 1) AS TMP_SUB WHERE TMP_SUB.ROW_NUMBER = 100";
+		String s = pagingQueryProvider.generateJumpToItemQuery(145, pageSize);
+		assertEquals("", sql, s);
+	}
+
+	@Override
+	@Test
+	public void testGenerateJumpToItemQueryForFirstPageWithMultipleSortKeys() {
+		Map<String, Boolean> sortKeys = new LinkedHashMap<String, Boolean>();
+		sortKeys.put("id", true);
+		sortKeys.put("name", false);
+		pagingQueryProvider.setSortKeys(sortKeys);
+		String sql = "SELECT id, name FROM ( SELECT id, name, ROW_NUMBER() OVER ( ORDER BY id ASC, name DESC) AS ROW_NUMBER FROM foo WHERE bar = 1) AS TMP_SUB WHERE TMP_SUB.ROW_NUMBER = 1";
+		String s = pagingQueryProvider.generateJumpToItemQuery(45, pageSize);
+		Assert.assertEquals("", sql, s);
 	}
 }
