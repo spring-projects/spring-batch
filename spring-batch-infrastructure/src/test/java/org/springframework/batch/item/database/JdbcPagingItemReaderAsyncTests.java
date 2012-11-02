@@ -7,7 +7,9 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.Callable;
 import java.util.concurrent.CompletionService;
@@ -26,12 +28,12 @@ import org.junit.runner.RunWith;
 import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.database.support.HsqlPagingQueryProvider;
 import org.springframework.batch.item.sample.Foo;
+import org.springframework.batch.support.JdbcTestUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.jdbc.core.simple.ParameterizedRowMapper;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.simple.ParameterizedRowMapper;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
-import org.springframework.batch.support.JdbcTestUtils;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(locations = "JdbcPagingItemReaderCommonTests-context.xml")
@@ -140,7 +142,9 @@ public class JdbcPagingItemReaderAsyncTests {
 		HsqlPagingQueryProvider queryProvider = new HsqlPagingQueryProvider();
 		queryProvider.setSelectClause("select ID, NAME, VALUE");
 		queryProvider.setFromClause("from T_FOOS");
-		queryProvider.setSortKey("ID");
+		Map<String, Boolean> sortKeys = new LinkedHashMap<String, Boolean>();
+		sortKeys.put("ID", true);
+		queryProvider.setSortKeys(sortKeys);
 		reader.setQueryProvider(queryProvider);
 		reader.setRowMapper(new ParameterizedRowMapper<Foo>() {
 			public Foo mapRow(ResultSet rs, int i) throws SQLException {

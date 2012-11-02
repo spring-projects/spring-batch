@@ -44,7 +44,11 @@
 				<property name="dataSource" ref="dataSource"/>
 				<property name="fromClause" value="CUSTOMER"/>
 				<property name="selectClause" value="ID,NAME,CREDIT"/>
-				<property name="sortKey" value="ID"/>
+				<property name="sortKeys">
+					<map>
+						<entry key="ID" value="true"/>
+					</map>
+				</property>
 				<property name="whereClause" value="ID &gt;= :minId and ID &lt;= :maxId"/>
 			</bean>
 		</property>

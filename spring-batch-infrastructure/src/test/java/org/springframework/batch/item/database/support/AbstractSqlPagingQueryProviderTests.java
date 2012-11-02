@@ -17,6 +17,9 @@ package org.springframework.batch.item.database.support;
 
 import static org.junit.Assert.assertTrue;
 
+import java.util.LinkedHashMap;
+import java.util.Map;
+
 import org.junit.Before;
 import org.junit.Test;
 
@@ -38,7 +41,10 @@ public abstract class AbstractSqlPagingQueryProviderTests {
 		pagingQueryProvider.setSelectClause("id, name, age");
 		pagingQueryProvider.setFromClause("foo");
 		pagingQueryProvider.setWhereClause("bar = 1");
-		pagingQueryProvider.setSortKey("id");
+		
+		Map<String, Boolean> sortKeys = new LinkedHashMap<String, Boolean>();
+		sortKeys.put("id", true);
+		pagingQueryProvider.setSortKeys(sortKeys);
 		pageSize = 100;
 
 	}
@@ -51,7 +57,7 @@ public abstract class AbstractSqlPagingQueryProviderTests {
 
 	@Test
 	public void testQueryContainsSortKeyDesc(){
-		pagingQueryProvider.setAscending(false);
+		pagingQueryProvider.getSortKeys().put("id", false);
 		String s = pagingQueryProvider.generateFirstPageQuery(pageSize).toLowerCase();
 		assertTrue("Wrong query: "+s, s.contains("id desc"));		
 	}
@@ -80,4 +86,15 @@ public abstract class AbstractSqlPagingQueryProviderTests {
 	@Test
 	public abstract void testGenerateJumpToItemQueryForFirstPageWithGroupBy();
 
+	@Test
+	public abstract void testGenerateFirstPageQueryWithMultipleSortKeys();
+
+	@Test
+	public abstract void testGenerateRemainingPagesQueryWithMultipleSortKeys();
+
+	@Test
+	public abstract void testGenerateJumpToItemQueryWithMultipleSortKeys();
+
+	@Test
+	public abstract void testGenerateJumpToItemQueryForFirstPageWithMultipleSortKeys();
 }
