@@ -190,14 +190,14 @@ public class SqlPagingQueryUtils {
 		StringBuilder builder = new StringBuilder();
 		String prefix = "";
 		
-		for (Map.Entry<String, Boolean> sortKey : provider.getSortKeys().entrySet()) {
+		for (Map.Entry<String, Order> sortKey : provider.getSortKeys().entrySet()) {
 			builder.append(prefix);
 			
 			prefix = ", ";
 			
 			builder.append(sortKey.getKey());
 			
-			if(sortKey.getValue() != null && !sortKey.getValue()) {
+			if(sortKey.getValue() != null && sortKey.getValue() == Order.DESCENDING) {
 				builder.append(" DESC");
 			}
 			else {
@@ -216,7 +216,7 @@ public class SqlPagingQueryUtils {
 	 */
 	public static void buildSortConditions(
 			AbstractSqlPagingQueryProvider provider, StringBuilder sql) {
-		List<Map.Entry<String, Boolean>> keys = new ArrayList<Map.Entry<String,Boolean>>(provider.getSortKeys().entrySet());
+		List<Map.Entry<String, Order>> keys = new ArrayList<Map.Entry<String,Order>>(provider.getSortKeys().entrySet());
 		List<String> clauses = new ArrayList<String>();
 		
 		for(int i = 0; i < keys.size(); i++) {
@@ -226,7 +226,7 @@ public class SqlPagingQueryUtils {
 			for(int j = 0; j < i; j++) {
 				clause.append(prefix);
 				prefix = " AND ";
-				Entry<String, Boolean> entry = keys.get(j);
+				Entry<String, Order> entry = keys.get(j);
 				clause.append(entry.getKey());
 				clause.append(" = ");
 				clause.append(provider.getSortKeyPlaceHolder(entry.getKey()));
@@ -237,7 +237,7 @@ public class SqlPagingQueryUtils {
 			}
 			clause.append(keys.get(i).getKey());
 			
-			if(keys.get(i).getValue() != null && !keys.get(i).getValue()) {
+			if(keys.get(i).getValue() != null && keys.get(i).getValue() == Order.DESCENDING) {
 				clause.append(" < ");
 			}
 			else {
@@ -267,7 +267,7 @@ public class SqlPagingQueryUtils {
 		
 		String prefix = "";
 		
-		for (Map.Entry<String, Boolean> sortKey : provider.getSortKeys().entrySet()) {
+		for (Map.Entry<String, Order> sortKey : provider.getSortKeys().entrySet()) {
 			select.append(prefix);
 			
 			prefix = ", ";

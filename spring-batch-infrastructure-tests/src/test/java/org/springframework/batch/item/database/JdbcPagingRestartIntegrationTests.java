@@ -25,7 +25,6 @@ import java.sql.SQLException;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.TreeMap;
 
 import javax.sql.DataSource;
 
@@ -38,6 +37,7 @@ import org.junit.runner.RunWith;
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.ItemStream;
+import org.springframework.batch.item.database.support.Order;
 import org.springframework.batch.item.database.support.SqlPagingQueryProviderFactoryBean;
 import org.springframework.batch.item.sample.Foo;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -152,8 +152,8 @@ public class JdbcPagingRestartIntegrationTests {
 		factory.setDataSource(dataSource);
 		factory.setSelectClause("select ID, NAME, VALUE");
 		factory.setFromClause("from T_FOOS");
-		Map<String, Boolean> sortKeys = new TreeMap<String, Boolean>();
-		sortKeys.put("VALUE", true);
+		Map<String, Order> sortKeys = new LinkedHashMap<String, Order>();
+		sortKeys.put("VALUE", Order.ASCENDING);
 		factory.setSortKeys(sortKeys);
 		reader.setQueryProvider((PagingQueryProvider) factory.getObject());
 		reader.setRowMapper(new ParameterizedRowMapper<Foo>() {

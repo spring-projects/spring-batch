@@ -23,6 +23,7 @@ import java.util.Map;
 
 import org.junit.runner.RunWith;
 import org.springframework.batch.item.database.support.HsqlPagingQueryProvider;
+import org.springframework.batch.item.database.support.Order;
 import org.springframework.batch.item.sample.Foo;
 import org.springframework.jdbc.core.simple.ParameterizedRowMapper;
 import org.springframework.test.context.ContextConfiguration;
@@ -45,8 +46,8 @@ public class JdbcPagingItemReaderNamedParameterTests extends AbstractPagingItemR
 		queryProvider.setSelectClause("select ID, NAME, VALUE");
 		queryProvider.setFromClause("from T_FOOS");
 		queryProvider.setWhereClause("where VALUE >= :limit");
-		Map<String, Boolean> sortKeys = new LinkedHashMap<String, Boolean>();
-		sortKeys.put("ID", true);
+		Map<String, Order> sortKeys = new LinkedHashMap<String, Order>();
+		sortKeys.put("ID", Order.ASCENDING);
 		queryProvider.setSortKeys(sortKeys);
 		reader.setParameterValues(Collections.<String, Object>singletonMap("limit", 3));
 		reader.setQueryProvider(queryProvider);

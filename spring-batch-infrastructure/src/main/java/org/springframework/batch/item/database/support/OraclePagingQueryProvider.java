@@ -54,7 +54,7 @@ public class OraclePagingQueryProvider extends AbstractSqlPagingQueryProvider {
 		StringBuilder sql = new StringBuilder();
 		String prefix = "";
 		
-		for (Map.Entry<String, Boolean> sortKey : this.getSortKeys().entrySet()) {
+		for (Map.Entry<String, Order> sortKey : this.getSortKeys().entrySet()) {
 			sql.append(prefix);
 			prefix = ", ";
 			sql.append(sortKey.getKey());

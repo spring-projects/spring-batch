@@ -46,7 +46,7 @@
 				<property name="selectClause" value="ID,NAME,CREDIT"/>
 				<property name="sortKeys">
 					<map>
-						<entry key="ID" value="true"/>
+						<entry key="ID" value="ASCENDING"/>
 					</map>
 				</property>
 				<property name="whereClause" value="ID &gt;= :minId and ID &lt;= :maxId"/>

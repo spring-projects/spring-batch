@@ -31,6 +31,7 @@ import javax.sql.DataSource;
 
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.item.ItemStreamException;
+import org.springframework.batch.item.database.support.Order;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
@@ -326,7 +327,7 @@ public class JdbcPagingItemReader<T> extends AbstractPagingItemReader<T> impleme
 	private class PagingRowMapper implements RowMapper {
 		public Object mapRow(ResultSet rs, int rowNum) throws SQLException {
 			startAfterValues = new LinkedHashMap<String, Object>();
-			for (Map.Entry<String, Boolean> sortKey : queryProvider.getSortKeys().entrySet()) {
+			for (Map.Entry<String, Order> sortKey : queryProvider.getSortKeys().entrySet()) {
 				startAfterValues.put(sortKey.getKey(), rs.getObject(sortKey.getKey()));
 			}
 			

@@ -22,6 +22,7 @@ import java.util.Map;
 
 import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.database.support.HsqlPagingQueryProvider;
+import org.springframework.batch.item.database.support.Order;
 import org.springframework.batch.item.sample.Foo;
 import org.springframework.jdbc.core.simple.ParameterizedRowMapper;
 
@@ -40,8 +41,8 @@ public class JdbcPagingItemReaderIntegrationTests extends AbstractGenericDataSou
 		HsqlPagingQueryProvider queryProvider = new HsqlPagingQueryProvider();
 		queryProvider.setSelectClause("select ID, NAME, VALUE");
 		queryProvider.setFromClause("from T_FOOS");
-		Map<String, Boolean> sortKeys = new LinkedHashMap<String, Boolean>();
-		sortKeys.put("ID", true);
+		Map<String, Order> sortKeys = new LinkedHashMap<String, Order>();
+		sortKeys.put("ID", Order.ASCENDING);
 		queryProvider.setSortKeys(sortKeys);
 		inputSource.setQueryProvider(queryProvider);
 		inputSource.setRowMapper(

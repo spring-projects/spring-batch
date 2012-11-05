@@ -36,6 +36,7 @@ import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.springframework.batch.item.database.support.Order;
 import org.springframework.batch.item.database.support.SqlPagingQueryProviderFactoryBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.simple.SimpleJdbcTemplate;
@@ -121,7 +122,7 @@ public class JdbcPagingQueryIntegrationTests {
 	private Map<String, Object> getStartAfterValues(
 			PagingQueryProvider queryProvider, List<Map<String, Object>> list) {
 		Map<String, Object> startAfterValues = new LinkedHashMap<String, Object>();
-		for (Map.Entry<String, Boolean> sortKey : queryProvider.getSortKeys().entrySet()) {
+		for (Map.Entry<String, Order> sortKey : queryProvider.getSortKeys().entrySet()) {
 			startAfterValues.put(sortKey.getKey(), list.get(pageSize - 1).get(sortKey.getKey()));
 		}
 		return startAfterValues;
@@ -154,8 +155,8 @@ public class JdbcPagingQueryIntegrationTests {
 		factory.setDataSource(dataSource);
 		factory.setSelectClause("select ID, NAME, VALUE");
 		factory.setFromClause("from T_FOOS");
-		Map<String, Boolean> sortKeys = new LinkedHashMap<String, Boolean>();
-		sortKeys.put("VALUE", true);
+		Map<String, Order> sortKeys = new LinkedHashMap<String, Order>();
+		sortKeys.put("VALUE", Order.ASCENDING);
 		factory.setSortKeys(sortKeys);
 		return (PagingQueryProvider) factory.getObject();
 

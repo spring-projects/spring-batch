@@ -17,9 +17,9 @@
 package org.springframework.batch.item.database.support;
 
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.TreeMap;
 
 import javax.sql.DataSource;
 
@@ -57,7 +57,7 @@ public abstract class AbstractSqlPagingQueryProvider implements PagingQueryProvi
 
 	private String whereClause;
 	
-	private Map<String, Boolean> sortKeys = new TreeMap<String, Boolean>();
+	private Map<String, Order> sortKeys = new LinkedHashMap<String, Order>();
 
 	private String groupClause;
 
@@ -136,7 +136,7 @@ public abstract class AbstractSqlPagingQueryProvider implements PagingQueryProvi
 	/**
 	 * @param sortKeys key to use to sort and limit page content
 	 */
-	public void setSortKeys(Map<String, Boolean> sortKeys) {
+	public void setSortKeys(Map<String, Order> sortKeys) {
 		this.sortKeys = sortKeys;
 	}
 
@@ -145,7 +145,7 @@ public abstract class AbstractSqlPagingQueryProvider implements PagingQueryProvi
 	 * 
 	 * @return sortKey key to use to sort and limit page content
 	 */
-	public Map<String, Boolean> getSortKeys() {
+	public Map<String, Order> getSortKeys() {
 		return sortKeys;
 	}
 

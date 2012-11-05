@@ -115,7 +115,7 @@ public class SqlWindowingPagingQueryProvider extends AbstractSqlPagingQueryProvi
 
 	private void buildSortKeySelect(StringBuilder sql) {
 		String prefix = "";
-		for (Map.Entry<String, Boolean> sortKey : getSortKeys().entrySet()) {
+		for (Map.Entry<String, Order> sortKey : getSortKeys().entrySet()) {
 			sql.append(prefix);
 			prefix = ", ";
 			sql.append(sortKey.getKey());

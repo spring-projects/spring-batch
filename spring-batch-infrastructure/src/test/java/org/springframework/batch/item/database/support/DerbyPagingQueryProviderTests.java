@@ -25,8 +25,6 @@ import static org.junit.Assert.fail;
 
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
-import java.util.LinkedHashMap;
-import java.util.Map;
 
 import javax.sql.DataSource;
 
@@ -132,7 +130,7 @@ public class DerbyPagingQueryProviderTests extends AbstractSqlPagingQueryProvide
 	@Test
 	@Override
 	public void testQueryContainsSortKeyDesc() {
-		pagingQueryProvider.getSortKeys().put("id", false);
+		pagingQueryProvider.getSortKeys().put("id", Order.DESCENDING);
 		String s = pagingQueryProvider.generateFirstPageQuery(pageSize).toLowerCase();
 		assertTrue("Wrong query: " + s, s.contains("id desc"));
 	}
@@ -174,50 +172,22 @@ public class DerbyPagingQueryProviderTests extends AbstractSqlPagingQueryProvide
 	}
 
 	@Override
-	@Test
-	public void testGenerateFirstPageQueryWithMultipleSortKeys() {
-		Map<String, Boolean> sortKeys = new LinkedHashMap<String, Boolean>();
-		sortKeys.put("id", true);
-		sortKeys.put("name", false);
-		pagingQueryProvider.setSortKeys(sortKeys);
-		String sql = "SELECT * FROM ( SELECT id, name, age, ROW_NUMBER() OVER () AS ROW_NUMBER FROM (SELECT id, name, age FROM foo WHERE bar = 1  ORDER BY id ASC, name DESC) AS TMP_ORDERED) AS TMP_SUB WHERE TMP_SUB.ROW_NUMBER <= 100";
-		String s = pagingQueryProvider.generateFirstPageQuery(pageSize);
-		assertEquals(sql, s);
+	public String getFirstPageSqlWithMultipleSortKeys() {
+		return "SELECT * FROM ( SELECT id, name, age, ROW_NUMBER() OVER () AS ROW_NUMBER FROM (SELECT id, name, age FROM foo WHERE bar = 1  ORDER BY name ASC, id DESC) AS TMP_ORDERED) AS TMP_SUB WHERE TMP_SUB.ROW_NUMBER <= 100";
 	}
 
 	@Override
-	@Test
-	public void testGenerateRemainingPagesQueryWithMultipleSortKeys() {
-		Map<String, Boolean> sortKeys = new LinkedHashMap<String, Boolean>();
-		sortKeys.put("id", true);
-		sortKeys.put("name", false);
-		pagingQueryProvider.setSortKeys(sortKeys);
-		String sql = "SELECT * FROM ( SELECT id, name, age, ROW_NUMBER() OVER () AS ROW_NUMBER FROM (SELECT id, name, age FROM foo WHERE bar = 1 AND ((id > ?) OR (id = ? AND name < ?))  ORDER BY id ASC, name DESC) AS TMP_ORDERED) AS TMP_SUB WHERE TMP_SUB.ROW_NUMBER <= 100";
-		String s = pagingQueryProvider.generateRemainingPagesQuery(pageSize);
-		assertEquals(sql, s);
+	public String getRemainingSqlWithMultipleSortKeys() {
+		return "SELECT * FROM ( SELECT id, name, age, ROW_NUMBER() OVER () AS ROW_NUMBER FROM (SELECT id, name, age FROM foo WHERE bar = 1 AND ((name > ?) OR (name = ? AND id < ?))  ORDER BY name ASC, id DESC) AS TMP_ORDERED) AS TMP_SUB WHERE TMP_SUB.ROW_NUMBER <= 100";
 	}
 
 	@Override
-	@Test
-	public void testGenerateJumpToItemQueryWithMultipleSortKeys() {
-		Map<String, Boolean> sortKeys = new LinkedHashMap<String, Boolean>();
-		sortKeys.put("id", true);
-		sortKeys.put("name", false);
-		pagingQueryProvider.setSortKeys(sortKeys);
-		String sql = "SELECT id, name FROM ( SELECT id, name, ROW_NUMBER() OVER () AS ROW_NUMBER FROM (SELECT id, name, age FROM foo WHERE bar = 1  ORDER BY id ASC, name DESC) AS TMP_ORDERED) AS TMP_SUB WHERE TMP_SUB.ROW_NUMBER = 100";
-		String s = pagingQueryProvider.generateJumpToItemQuery(145, pageSize);
-		assertEquals(sql, s);
+	public String getJumpToItemQueryWithMultipleSortKeys() {
+		return "SELECT name, id FROM ( SELECT name, id, ROW_NUMBER() OVER () AS ROW_NUMBER FROM (SELECT id, name, age FROM foo WHERE bar = 1  ORDER BY name ASC, id DESC) AS TMP_ORDERED) AS TMP_SUB WHERE TMP_SUB.ROW_NUMBER = 100";
 	}
 
 	@Override
-	@Test
-	public void testGenerateJumpToItemQueryForFirstPageWithMultipleSortKeys() {
-		Map<String, Boolean> sortKeys = new LinkedHashMap<String, Boolean>();
-		sortKeys.put("id", true);
-		sortKeys.put("name", false);
-		pagingQueryProvider.setSortKeys(sortKeys);
-		String sql = "SELECT id, name FROM ( SELECT id, name, ROW_NUMBER() OVER () AS ROW_NUMBER FROM (SELECT id, name, age FROM foo WHERE bar = 1  ORDER BY id ASC, name DESC) AS TMP_ORDERED) AS TMP_SUB WHERE TMP_SUB.ROW_NUMBER = 1";
-		String s = pagingQueryProvider.generateJumpToItemQuery(45, pageSize);
-		assertEquals(sql, s);
+	public String getJumpToItemQueryForFirstPageWithMultipleSortKeys() {
+		return "SELECT name, id FROM ( SELECT name, id, ROW_NUMBER() OVER () AS ROW_NUMBER FROM (SELECT id, name, age FROM foo WHERE bar = 1  ORDER BY name ASC, id DESC) AS TMP_ORDERED) AS TMP_SUB WHERE TMP_SUB.ROW_NUMBER = 1";
 	}
 }

@@ -18,7 +18,7 @@
 				<property name="dataSource" ref="dataSource" />
 				<property name="sortKeys">
 					<map>
-						<entry key="id" value="true"/>
+						<entry key="id" value="ASCENDING"/>
 					</map>
 				</property>
 				<!-- Intentionally put sort key second in the query list as a test -->

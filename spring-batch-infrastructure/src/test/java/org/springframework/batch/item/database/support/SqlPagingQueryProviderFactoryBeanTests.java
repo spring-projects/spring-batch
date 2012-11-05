@@ -43,8 +43,8 @@ public class SqlPagingQueryProviderFactoryBeanTests {
 		factory.setSelectClause("id, name, age");
 		factory.setFromClause("foo");
 		factory.setWhereClause("bar = 1");
-		Map<String, Boolean> sortKeys = new LinkedHashMap<String, Boolean>();
-		sortKeys.put("id", true);
+		Map<String, Order> sortKeys = new LinkedHashMap<String, Order>();
+		sortKeys.put("id", Order.ASCENDING);
 		factory.setSortKeys(sortKeys);
 		DataSource dataSource = DatabaseTypeTestUtils.getMockDataSource(DatabaseType.HSQL.getProductName(), "100.0.0");
 		factory.setDataSource(dataSource);

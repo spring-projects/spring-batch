@@ -34,12 +34,12 @@ import org.springframework.util.StringUtils;
  */
 public class SqlPagingQueryUtilsTests {
 	
-	private Map<String, Boolean> sortKeys;
+	private Map<String, Order> sortKeys;
 	
 	@Before
 	public void setUp() {
-		sortKeys = new LinkedHashMap<String, Boolean>();
-		sortKeys.put("ID", true);
+		sortKeys = new LinkedHashMap<String, Order>();
+		sortKeys.put("ID", Order.ASCENDING);
 	}
 
 	@Test
@@ -98,7 +98,7 @@ public class SqlPagingQueryUtilsTests {
 
 	@Test
 	public void testGenerateTopSqlQueryDescending() {
-		sortKeys.put("ID", false);
+		sortKeys.put("ID", Order.DESCENDING);
 		AbstractSqlPagingQueryProvider qp = new TestSqlPagingQueryProvider("FOO", "BAR", sortKeys);
 		assertEquals("SELECT TOP 100 FOO FROM BAR ORDER BY ID DESC", SqlPagingQueryUtils.generateTopSqlQuery(qp, false,
 				"TOP 100"));
@@ -113,7 +113,7 @@ public class SqlPagingQueryUtilsTests {
 
 	@Test
 	public void testGenerateRowNumSqlQueryDescending() {
-		sortKeys.put("ID", false);
+		sortKeys.put("ID", Order.DESCENDING);
 		AbstractSqlPagingQueryProvider qp = new TestSqlPagingQueryProvider("FOO", "BAR", sortKeys);
 		assertEquals(
 				"SELECT * FROM (SELECT FOO, ROWNUM as TMP_ROW_NUM FROM BAR ORDER BY ID DESC) WHERE ROWNUMBER <= 100",
@@ -152,7 +152,7 @@ public class SqlPagingQueryUtilsTests {
 
 	@Test
 	public void testGenerateTopJumpQueryDescending() {
-		sortKeys.put("ID", false);
+		sortKeys.put("ID", Order.DESCENDING);
 		AbstractSqlPagingQueryProvider qp = new TestSqlPagingQueryProvider("FOO", "BAR", sortKeys);
 		String query = SqlPagingQueryUtils.generateTopJumpToQuery(qp, "TOP 100, 1");
 		assertTrue("Wrong query: " + query, query.contains("ID DESC"));
@@ -164,7 +164,7 @@ public class SqlPagingQueryUtilsTests {
 
 	@Test
 	public void testGenerateLimitJumpQueryDescending() {
-		sortKeys.put("ID", false);
+		sortKeys.put("ID", Order.DESCENDING);
 		AbstractSqlPagingQueryProvider qp = new TestSqlPagingQueryProvider("FOO", "BAR", sortKeys);
 		String query = SqlPagingQueryUtils.generateLimitJumpToQuery(qp, "LIMIT 100, 1");
 		assertTrue("Wrong query: " + query, query.contains("ID DESC"));
@@ -176,7 +176,7 @@ public class SqlPagingQueryUtilsTests {
 
 	private static class TestSqlPagingQueryProvider extends AbstractSqlPagingQueryProvider {
 
-		public TestSqlPagingQueryProvider(String select, String from, Map<String, Boolean> sortKeys) {
+		public TestSqlPagingQueryProvider(String select, String from, Map<String, Order> sortKeys) {
 			setSelectClause(select);
 			setFromClause(from);
 			setSortKeys(sortKeys);

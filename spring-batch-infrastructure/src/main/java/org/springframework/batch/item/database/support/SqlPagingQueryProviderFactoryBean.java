@@ -18,8 +18,8 @@ package org.springframework.batch.item.database.support;
 import static org.springframework.batch.support.DatabaseType.DB2;
 import static org.springframework.batch.support.DatabaseType.DB2ZOS;
 import static org.springframework.batch.support.DatabaseType.DERBY;
-import static org.springframework.batch.support.DatabaseType.HSQL;
 import static org.springframework.batch.support.DatabaseType.H2;
+import static org.springframework.batch.support.DatabaseType.HSQL;
 import static org.springframework.batch.support.DatabaseType.MYSQL;
 import static org.springframework.batch.support.DatabaseType.ORACLE;
 import static org.springframework.batch.support.DatabaseType.POSTGRES;
@@ -27,6 +27,7 @@ import static org.springframework.batch.support.DatabaseType.SQLSERVER;
 import static org.springframework.batch.support.DatabaseType.SYBASE;
 
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 import javax.sql.DataSource;
@@ -46,6 +47,7 @@ import org.springframework.util.StringUtils;
  * @author Dave Syer
  * @author Michael Minella
  */
+@SuppressWarnings("rawtypes")
 public class SqlPagingQueryProviderFactoryBean implements FactoryBean {
 
 	private DataSource dataSource;
@@ -60,9 +62,7 @@ public class SqlPagingQueryProviderFactoryBean implements FactoryBean {
 	
 	private String groupClause;
 
-	private Map<String, Boolean> sortKeys;
-
-	private boolean ascending = true;
+	private Map<String, Order> sortKeys;
 
 	private Map<DatabaseType, AbstractSqlPagingQueryProvider> providers = new HashMap<DatabaseType, AbstractSqlPagingQueryProvider>();
 
@@ -125,15 +125,17 @@ public class SqlPagingQueryProviderFactoryBean implements FactoryBean {
 	/**
 	 * @param sortKey the sortKey to set
 	 */
-	public void setSortKeys(Map<String, Boolean> sortKeys) {
+	public void setSortKeys(Map<String, Order> sortKeys) {
 		this.sortKeys = sortKeys;
 	}
-
-	/**
-	 * @param ascending
-	 */
-	public void setAscending(boolean ascending) {
-		this.ascending = ascending;	
+	
+	public void setSortKey(String key) {
+		Assert.doesNotContain(key, ",", "String setter is valid for a single ASC key only");
+		
+		Map<String, Order> keys = new LinkedHashMap<String, Order>();
+		keys.put(key, Order.ASCENDING);
+		
+		this.sortKeys = keys;
 	}
 
 	/**

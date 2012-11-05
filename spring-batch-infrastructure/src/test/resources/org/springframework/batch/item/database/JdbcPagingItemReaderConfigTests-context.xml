@@ -23,8 +23,8 @@
         		<property name="fromClause" value="foo"/>
         		<property name="sortKeys">
         			<map>
-        				<entry key="id" value="true"/>
-        				<entry key="name" value="false"/>
+        				<entry key="id" value="ASCENDING"/>
+        				<entry key="name" value="DESCENDING"/>
         			</map>
         		</property>
         	</bean>

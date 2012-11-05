@@ -20,6 +20,8 @@ import java.util.Map;
 
 import javax.sql.DataSource;
 
+import org.springframework.batch.item.database.support.Order;
+
 /**
  * Interface defining the functionality to be provided for generating paging queries for use with Paging
  * Item Readers.
@@ -84,7 +86,7 @@ public interface PagingQueryProvider {
 	 *  
 	 * @return the sort keys used to order the query
 	 */
-	Map<String, Boolean> getSortKeys();
+	Map<String, Order> getSortKeys();
 	
 	/**
 	 * Returns either a String to be used as the named placeholder for a sort key value (based on the column name)

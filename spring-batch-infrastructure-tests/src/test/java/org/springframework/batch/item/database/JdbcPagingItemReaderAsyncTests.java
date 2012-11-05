@@ -41,6 +41,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.batch.item.ItemReader;
+import org.springframework.batch.item.database.support.Order;
 import org.springframework.batch.item.database.support.SqlPagingQueryProviderFactoryBean;
 import org.springframework.batch.item.sample.Foo;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -163,8 +164,8 @@ public class JdbcPagingItemReaderAsyncTests {
 		factory.setDataSource(dataSource);
 		factory.setSelectClause("select ID, NAME, VALUE");
 		factory.setFromClause("from T_FOOS");
-		Map<String, Boolean> sortKeys = new LinkedHashMap<String, Boolean>();
-		sortKeys.put("VALUE", true);
+		Map<String, Order> sortKeys = new LinkedHashMap<String, Order>();
+		sortKeys.put("VALUE", Order.ASCENDING);
 		factory.setSortKeys(sortKeys);
 		reader.setQueryProvider((PagingQueryProvider) factory.getObject());
 		reader.setRowMapper(new ParameterizedRowMapper<Foo>() {
