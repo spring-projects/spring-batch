@@ -16,6 +16,8 @@
 
 package org.springframework.batch.item.database.support;
 
+import java.util.Map;
+
 import org.springframework.util.StringUtils;
 
 /**
@@ -73,14 +75,9 @@ public class SqlWindowingPagingQueryProvider extends AbstractSqlPagingQueryProvi
 			sql.append(getWhereClause());
 			sql.append(" AND ");
 		}
-		sql.append(getSortKey());
-		if (isAscending()) {
-			sql.append(" > ");
-		}
-		else {
-			sql.append(" < ");
-		}
-		sql.append(getSortKeyPlaceHolder());
+		
+		SqlPagingQueryUtils.buildSortConditions(this, sql);
+
 		sql.append(getGroupClause() == null ? "" : " GROUP BY " + getGroupClause());
 		sql.append(getOverSubstituteClauseEnd());
 		sql.append(") ").append(getSubQueryAlias()).append("WHERE ").append(extractTableAlias()).append(
@@ -98,9 +95,12 @@ public class SqlWindowingPagingQueryProvider extends AbstractSqlPagingQueryProvi
 		}
 
 		StringBuilder sql = new StringBuilder();
-		sql.append("SELECT SORT_KEY FROM ( ");
-		sql.append("SELECT ").append(getSortKey()).append(" AS SORT_KEY, ");
-		sql.append("ROW_NUMBER() OVER (").append(getOverClause());
+		sql.append("SELECT ");
+		buildSortKeySelect(sql);
+		sql.append(" FROM ( ");
+		sql.append("SELECT ");
+		buildSortKeySelect(sql);
+		sql.append(", ROW_NUMBER() OVER (").append(getOverClause());
 		sql.append(") AS ROW_NUMBER");
 		sql.append(getOverSubstituteClauseStart());
 		sql.append(" FROM ").append(getFromClause());
@@ -113,8 +113,21 @@ public class SqlWindowingPagingQueryProvider extends AbstractSqlPagingQueryProvi
 		return sql.toString();
 	}
 
+	private void buildSortKeySelect(StringBuilder sql) {
+		String prefix = "";
+		for (Map.Entry<String, Order> sortKey : getSortKeys().entrySet()) {
+			sql.append(prefix);
+			prefix = ", ";
+			sql.append(sortKey.getKey());
+		}
+	}
+
 	protected String getOverClause() {
-		return "ORDER BY " + getSortKeyWithoutAlias() + " " + getAscendingClause();
+		StringBuilder sql = new StringBuilder();
+		
+		sql.append(" ORDER BY ").append(SqlPagingQueryUtils.buildSortClause(this));
+		
+		return sql.toString();
 	}
 
 	protected String getOverSubstituteClauseStart() {
@@ -124,14 +137,4 @@ public class SqlWindowingPagingQueryProvider extends AbstractSqlPagingQueryProvi
 	protected String getOverSubstituteClauseEnd() {
 		return "";
 	}
-
-	private String getAscendingClause() {
-		if (isAscending()) {
-			return "ASC";
-		}
-		else {
-			return "DESC";
-		}
-	}
-
 }

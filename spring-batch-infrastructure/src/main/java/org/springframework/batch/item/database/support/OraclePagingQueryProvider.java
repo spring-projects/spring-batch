@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2008 the original author or authors.
+ * Copyright 2006-2012 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,12 +16,15 @@
 
 package org.springframework.batch.item.database.support;
 
+import java.util.Map;
+
 /**
  * Oracle implementation of a
  * {@link org.springframework.batch.item.database.PagingQueryProvider} using
  * database specific features.
  * 
  * @author Thomas Risberg
+ * @author Michael Minella
  * @since 2.0
  */
 public class OraclePagingQueryProvider extends AbstractSqlPagingQueryProvider {
@@ -42,8 +45,22 @@ public class OraclePagingQueryProvider extends AbstractSqlPagingQueryProvider {
 		int page = itemIndex / pageSize;
 		int offset = (page * pageSize);
 		offset = offset == 0 ? 1 : offset;
-		return SqlPagingQueryUtils.generateRowNumSqlQueryWithNesting(this, this.getSortKey() + " AS SORT_KEY", "SORT_KEY", false, "TMP_ROW_NUM = "
+		String sortKeySelect = this.getSortKeySelect();
+		return SqlPagingQueryUtils.generateRowNumSqlQueryWithNesting(this, sortKeySelect, sortKeySelect, false, "TMP_ROW_NUM = "
 				+ offset);
+	}
+	
+	private String getSortKeySelect() {
+		StringBuilder sql = new StringBuilder();
+		String prefix = "";
+		
+		for (Map.Entry<String, Order> sortKey : this.getSortKeys().entrySet()) {
+			sql.append(prefix);
+			prefix = ", ";
+			sql.append(sortKey.getKey());
+		}
+		
+		return sql.toString();
 	}
 
 	private String buildRowNumClause(int pageSize) {
