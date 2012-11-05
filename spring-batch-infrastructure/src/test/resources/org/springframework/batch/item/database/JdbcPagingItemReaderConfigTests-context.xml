@@ -21,7 +21,12 @@
         	<bean class="org.springframework.batch.item.database.support.HsqlPagingQueryProvider">
         		<property name="selectClause" value="select id, bar"/>
         		<property name="fromClause" value="foo"/>
-        		<property name="sortKey" value="id"/>
+        		<property name="sortKeys">
+        			<map>
+        				<entry key="id" value="ASCENDING"/>
+        				<entry key="name" value="DESCENDING"/>
+        			</map>
+        		</property>
         	</bean>
         </property>
 	</bean>		

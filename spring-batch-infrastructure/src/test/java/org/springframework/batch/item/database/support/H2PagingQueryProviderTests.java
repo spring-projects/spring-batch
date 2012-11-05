@@ -15,8 +15,9 @@
  */
 package org.springframework.batch.item.database.support;
 
-import org.junit.Test;
 import static org.junit.Assert.assertEquals;
+
+import org.junit.Test;
 
 /**
  * @author Thomas Risberg
@@ -39,21 +40,21 @@ public class H2PagingQueryProviderTests extends AbstractSqlPagingQueryProviderTe
 
 	@Test @Override
 	public void testGenerateRemainingPagesQuery() {
-		String sql = "SELECT TOP 100 id, name, age FROM foo WHERE bar = 1 AND id > ? ORDER BY id ASC";
+		String sql = "SELECT TOP 100 id, name, age FROM foo WHERE bar = 1 AND ((id > ?)) ORDER BY id ASC";
 		String s = pagingQueryProvider.generateRemainingPagesQuery(pageSize);
 		assertEquals(sql, s);
 	}
 
 	@Test @Override
 	public void testGenerateJumpToItemQuery() {
-		String sql = "SELECT LIMIT 99 1 id AS SORT_KEY FROM foo WHERE bar = 1 ORDER BY id ASC";
+		String sql = "SELECT LIMIT 99 1 id FROM foo WHERE bar = 1 ORDER BY id ASC";
 		String s = pagingQueryProvider.generateJumpToItemQuery(145, pageSize);
 		assertEquals(sql, s);
 	}
 
 	@Test @Override
 	public void testGenerateJumpToItemQueryForFirstPage() {
-		String sql = "SELECT LIMIT 0 1 id AS SORT_KEY FROM foo WHERE bar = 1 ORDER BY id ASC";
+		String sql = "SELECT LIMIT 0 1 id FROM foo WHERE bar = 1 ORDER BY id ASC";
 		String s = pagingQueryProvider.generateJumpToItemQuery(45, pageSize);
 		assertEquals(sql, s);
 	}
@@ -71,7 +72,7 @@ public class H2PagingQueryProviderTests extends AbstractSqlPagingQueryProviderTe
 	@Test
 	public void testGenerateRemainingPagesQueryWithGroupBy() {
 		pagingQueryProvider.setGroupClause("dep");
-		String sql = "SELECT TOP 100 id, name, age FROM foo WHERE bar = 1 AND id > ? GROUP BY dep ORDER BY id ASC";
+		String sql = "SELECT TOP 100 id, name, age FROM foo WHERE bar = 1 AND ((id > ?)) GROUP BY dep ORDER BY id ASC";
 		String s = pagingQueryProvider.generateRemainingPagesQuery(pageSize);
 		assertEquals(sql, s);
 	}
@@ -80,7 +81,7 @@ public class H2PagingQueryProviderTests extends AbstractSqlPagingQueryProviderTe
 	@Test
 	public void testGenerateJumpToItemQueryWithGroupBy() {
 		pagingQueryProvider.setGroupClause("dep");
-		String sql = "SELECT LIMIT 99 1 id AS SORT_KEY FROM foo WHERE bar = 1 GROUP BY dep ORDER BY id ASC";
+		String sql = "SELECT LIMIT 99 1 id FROM foo WHERE bar = 1 GROUP BY dep ORDER BY id ASC";
 		String s = pagingQueryProvider.generateJumpToItemQuery(145, pageSize);
 		assertEquals(sql, s);
 	}
@@ -89,8 +90,28 @@ public class H2PagingQueryProviderTests extends AbstractSqlPagingQueryProviderTe
 	@Test
 	public void testGenerateJumpToItemQueryForFirstPageWithGroupBy() {
 		pagingQueryProvider.setGroupClause("dep");
-		String sql = "SELECT LIMIT 0 1 id AS SORT_KEY FROM foo WHERE bar = 1 GROUP BY dep ORDER BY id ASC";
+		String sql = "SELECT LIMIT 0 1 id FROM foo WHERE bar = 1 GROUP BY dep ORDER BY id ASC";
 		String s = pagingQueryProvider.generateJumpToItemQuery(45, pageSize);
 		assertEquals(sql, s);
+	}
+
+	@Override
+	public String getFirstPageSqlWithMultipleSortKeys() {
+		return "SELECT TOP 100 id, name, age FROM foo WHERE bar = 1 ORDER BY name ASC, id DESC";
+	}
+
+	@Override
+	public String getRemainingSqlWithMultipleSortKeys() {
+		return "SELECT TOP 100 id, name, age FROM foo WHERE bar = 1 AND ((name > ?) OR (name = ? AND id < ?)) ORDER BY name ASC, id DESC";
+	}
+
+	@Override
+	public String getJumpToItemQueryWithMultipleSortKeys() {
+		return "SELECT LIMIT 99 1 name, id FROM foo WHERE bar = 1 ORDER BY name ASC, id DESC";
+	}
+
+	@Override
+	public String getJumpToItemQueryForFirstPageWithMultipleSortKeys() {
+		return "SELECT LIMIT 0 1 name, id FROM foo WHERE bar = 1 ORDER BY name ASC, id DESC";
 	}
 }
