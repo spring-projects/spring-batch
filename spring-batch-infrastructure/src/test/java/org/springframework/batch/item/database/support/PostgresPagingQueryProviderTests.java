@@ -71,7 +71,7 @@ public class PostgresPagingQueryProviderTests extends AbstractSqlPagingQueryProv
 	@Test
 	public void testGenerateRemainingPagesQueryWithGroupBy() {
 		pagingQueryProvider.setGroupClause("id, dep");
-		String sql = "SELECT id, name, age FROM foo WHERE bar = 1 AND ((id > ?)) GROUP BY id, dep ORDER BY id ASC LIMIT 100";
+		String sql = "SELECT *  FROM (SELECT id, name, age FROM foo WHERE bar = 1 GROUP BY id, dep ORDER BY id ASC) AS MAIN_QRY WHERE ((id > ?)) LIMIT 100";
 		String s = pagingQueryProvider.generateRemainingPagesQuery(pageSize);
 		assertEquals(sql, s);
 	}

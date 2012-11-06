@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2008 the original author or authors.
+ * Copyright 2006-2012 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,11 +16,11 @@
 
 package org.springframework.batch.item.database.support;
 
-import org.springframework.jdbc.support.JdbcUtils;
+import javax.sql.DataSource;
+
 import org.springframework.batch.item.database.PagingQueryProvider;
 import org.springframework.dao.InvalidDataAccessResourceUsageException;
-
-import javax.sql.DataSource;
+import org.springframework.jdbc.support.JdbcUtils;
 
 /**
  * Derby implementation of a  {@link PagingQueryProvider} using standard SQL:2003 windowing functions.
@@ -31,6 +31,7 @@ import javax.sql.DataSource;
  *
  * @author Thomas Risberg
  * @author David Thexton
+ * @author Michael Minella
  * @since 2.0
  */
 public class DerbyPagingQueryProvider extends SqlWindowingPagingQueryProvider {
@@ -47,6 +48,11 @@ public class DerbyPagingQueryProvider extends SqlWindowingPagingQueryProvider {
 	}
 	
 	@Override
+	protected String getOrderedQueryAlias() {
+		return "TMP_ORDERED";
+	}
+
+	@Override
 	protected String getOverClause() {
 		return "";
 	}
@@ -56,7 +62,7 @@ public class DerbyPagingQueryProvider extends SqlWindowingPagingQueryProvider {
 	}
 
 	protected String getOverSubstituteClauseEnd() {
-		return " " + super.getOverClause() + ") AS TMP_ORDERED";
+		return " " + super.getOverClause() + ") AS " + getOrderedQueryAlias();
 	}
 
 }
