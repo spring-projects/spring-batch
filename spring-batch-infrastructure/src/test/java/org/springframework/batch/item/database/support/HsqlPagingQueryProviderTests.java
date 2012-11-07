@@ -71,7 +71,7 @@ public class HsqlPagingQueryProviderTests extends AbstractSqlPagingQueryProvider
 	@Test
 	public void testGenerateRemainingPagesQueryWithGroupBy() {
 		pagingQueryProvider.setGroupClause("dep");
-		String sql = "SELECT TOP 100 * FROM (SELECT id, name, age FROM foo WHERE bar = 1 GROUP BY dep ORDER BY id ASC) AS MAIN_QRY WHERE ((id > ?))";
+		String sql = "SELECT TOP 100 * FROM (SELECT id, name, age FROM foo WHERE bar = 1 GROUP BY dep) AS MAIN_QRY WHERE ((id > ?)) ORDER BY id ASC";
 		String s = pagingQueryProvider.generateRemainingPagesQuery(pageSize);
 		assertEquals(sql, s);
 	}

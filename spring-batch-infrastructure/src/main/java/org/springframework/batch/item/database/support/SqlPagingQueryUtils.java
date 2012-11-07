@@ -76,10 +76,10 @@ public class SqlPagingQueryUtils {
 		sql.append(" FROM ").append(provider.getFromClause());
 		sql.append(provider.getWhereClause() == null ? "" : " WHERE " + provider.getWhereClause());
 		buildGroupByClause(provider, sql);
-		sql.append(" ORDER BY ").append(buildSortClause(provider));
 		sql.append(") AS MAIN_QRY ");
 		sql.append("WHERE ");
 		buildSortConditions(provider, sql);
+		sql.append(" ORDER BY ").append(buildSortClause(provider));
 		sql.append(" " + limitClause);
 
 		return sql.toString();
@@ -125,10 +125,10 @@ public class SqlPagingQueryUtils {
 		sql.append(" FROM ").append(provider.getFromClause());
 		sql.append(provider.getWhereClause() == null ? "" : " WHERE " + provider.getWhereClause());
 		buildGroupByClause(provider, sql);
-		sql.append(" ORDER BY ").append(buildSortClause(provider));
 		sql.append(") AS MAIN_QRY ");
 		sql.append("WHERE ");
 		buildSortConditions(provider, sql);
+		sql.append(" ORDER BY ").append(buildSortClause(provider));
 
 		return sql.toString();
 	}
@@ -163,7 +163,7 @@ public class SqlPagingQueryUtils {
 	public static String generateRowNumSqlQuery(AbstractSqlPagingQueryProvider provider, String selectClause,
 			boolean remainingPageQuery, String rowNumClause) {
 		StringBuilder sql = new StringBuilder();
-		sql.append("SELECT * FROM (SELECT ").append(selectClause).append(", ROWNUM as TMP_ROW_NUM");
+		sql.append("SELECT * FROM (SELECT ").append(selectClause);
 		sql.append(" FROM ").append(provider.getFromClause());
 		sql.append(provider.getWhereClause() == null ? "" : " WHERE " + provider.getWhereClause());
 		buildGroupByClause(provider, sql);
@@ -188,7 +188,7 @@ public class SqlPagingQueryUtils {
 
 		StringBuilder sql = new StringBuilder();
 		sql.append("SELECT ").append(outerSelectClause).append(" FROM (SELECT ").append(outerSelectClause)
-				.append(", ROWNUM as TMP_ROW_NUM");
+				.append(", ").append(StringUtils.hasText(provider.getGroupClause()) ? "MIN(ROWNUM) as TMP_ROW_NUM" : "ROWNUM as TMP_ROW_NUM");
 		sql.append(" FROM (SELECT ").append(innerSelectClause).append(" FROM ").append(provider.getFromClause());
 		buildWhereClause(provider, remainingPageQuery, sql);
 		buildGroupByClause(provider, sql);

@@ -62,7 +62,7 @@ public class DerbyPagingQueryProvider extends SqlWindowingPagingQueryProvider {
 	}
 
 	protected String getOverSubstituteClauseEnd() {
-		return " " + super.getOverClause() + ") AS " + getOrderedQueryAlias();
+		return " ) AS " + getOrderedQueryAlias();
 	}
 
 }

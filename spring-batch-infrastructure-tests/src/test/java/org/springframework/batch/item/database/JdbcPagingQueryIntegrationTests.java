@@ -82,7 +82,7 @@ public class JdbcPagingQueryIntegrationTests {
 
 	@After
 	public void destroy() {
-		jdbcTemplate.update("DELETE from T_FOOS where ID>?", maxId);
+		jdbcTemplate.update("DELETE from T_FOOS");
 	}
 
 	@Test

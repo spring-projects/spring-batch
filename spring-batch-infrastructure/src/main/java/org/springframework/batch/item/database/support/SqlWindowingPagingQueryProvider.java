@@ -45,7 +45,8 @@ public class SqlWindowingPagingQueryProvider extends AbstractSqlPagingQueryProvi
 		sql.append(getOverSubstituteClauseEnd());
 		sql.append(") ").append(getSubQueryAlias()).append("WHERE ").append(extractTableAlias()).append(
 				"ROW_NUMBER <= ").append(pageSize);
-
+		sql.append(" ORDER BY ").append(SqlPagingQueryUtils.buildSortClause(this));
+		
 		return sql.toString();
 	}
 
@@ -85,6 +86,7 @@ public class SqlWindowingPagingQueryProvider extends AbstractSqlPagingQueryProvi
 				"ROW_NUMBER <= ").append(pageSize);
 		sql.append(" AND ");
 		SqlPagingQueryUtils.buildSortConditions(this, sql);
+		sql.append(" ORDER BY ").append(SqlPagingQueryUtils.buildSortClause(this));
 
 		return sql.toString();
 	}
@@ -112,6 +114,7 @@ public class SqlWindowingPagingQueryProvider extends AbstractSqlPagingQueryProvi
 		sql.append(getOverSubstituteClauseEnd());
 		sql.append(") ").append(getSubQueryAlias()).append("WHERE ").append(extractTableAlias()).append(
 				"ROW_NUMBER = ").append(lastRowNum);
+		sql.append(" ORDER BY ").append(SqlPagingQueryUtils.buildSortClause(this));
 
 		return sql.toString();
 	}

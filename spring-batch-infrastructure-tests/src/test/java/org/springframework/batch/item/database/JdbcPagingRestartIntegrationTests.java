@@ -76,6 +76,7 @@ public class JdbcPagingRestartIntegrationTests {
 		for (int i = itemCount; i > maxId; i--) {
 			jdbcTemplate.update("INSERT into T_FOOS (ID,NAME,VALUE) values (?, ?, ?)", i, "foo" + i, i);
 		}
+		
 		assertEquals(itemCount, SimpleJdbcTestUtils.countRowsInTable(jdbcTemplate, "T_FOOS"));
 	}
 
