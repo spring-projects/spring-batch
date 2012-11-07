@@ -71,7 +71,12 @@ public abstract class AbstractSqlPagingQueryProvider implements PagingQueryProvi
 	 * @param SQL GROUP BY clause part of the SQL query string
 	 */
 	public void setGroupClause(String groupClause) {
-		this.groupClause = groupClause;
+		if (StringUtils.hasText(groupClause)) {
+			this.groupClause = removeKeyWord("group by", groupClause);
+		}
+		else {
+			this.groupClause = null;
+		}
 	}
 	
 	/**

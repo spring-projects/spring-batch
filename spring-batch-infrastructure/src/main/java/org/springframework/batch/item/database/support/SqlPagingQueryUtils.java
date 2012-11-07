@@ -58,6 +58,34 @@ public class SqlPagingQueryUtils {
 	}
 
 	/**
+	 * Generate SQL query string using a LIMIT clause
+	 * 
+	 * @param provider {@link AbstractSqlPagingQueryProvider} providing the
+	 * implementation specifics
+	 * @param remainingPageQuery is this query for the ramining pages (true) as
+	 * opposed to the first page (false)
+	 * @param limitClause the implementation specific limit clause to be used
+	 * @return the generated query
+	 */
+	public static String generateLimitGroupedSqlQuery(AbstractSqlPagingQueryProvider provider, boolean remainingPageQuery,
+			String limitClause) {
+		StringBuilder sql = new StringBuilder();
+		sql.append("SELECT * ");
+		sql.append(" FROM (");
+		sql.append("SELECT ").append(provider.getSelectClause());
+		sql.append(" FROM ").append(provider.getFromClause());
+		sql.append(provider.getWhereClause() == null ? "" : " WHERE " + provider.getWhereClause());
+		buildGroupByClause(provider, sql);
+		sql.append(") AS MAIN_QRY ");
+		sql.append("WHERE ");
+		buildSortConditions(provider, sql);
+		sql.append(" ORDER BY ").append(buildSortClause(provider));
+		sql.append(" " + limitClause);
+
+		return sql.toString();
+	}
+
+	/**
 	 * Generate SQL query string using a TOP clause
 	 * 
 	 * @param provider {@link AbstractSqlPagingQueryProvider} providing the
@@ -74,6 +102,32 @@ public class SqlPagingQueryUtils {
 		sql.append(" FROM ").append(provider.getFromClause());
 		buildWhereClause(provider, remainingPageQuery, sql);
 		buildGroupByClause(provider, sql);
+		sql.append(" ORDER BY ").append(buildSortClause(provider));
+
+		return sql.toString();
+	}
+
+	/**
+	 * Generate SQL query string using a TOP clause
+	 * 
+	 * @param provider {@link AbstractSqlPagingQueryProvider} providing the
+	 * implementation specifics
+	 * @param remainingPageQuery is this query for the ramining pages (true) as
+	 * opposed to the first page (false)
+	 * @param topClause the implementation specific top clause to be used
+	 * @return the generated query
+	 */
+	public static String generateGroupedTopSqlQuery(AbstractSqlPagingQueryProvider provider, boolean remainingPageQuery,
+			String topClause) {
+		StringBuilder sql = new StringBuilder();
+		sql.append("SELECT ").append(topClause).append(" * FROM (");
+		sql.append("SELECT ").append(provider.getSelectClause());
+		sql.append(" FROM ").append(provider.getFromClause());
+		sql.append(provider.getWhereClause() == null ? "" : " WHERE " + provider.getWhereClause());
+		buildGroupByClause(provider, sql);
+		sql.append(") AS MAIN_QRY ");
+		sql.append("WHERE ");
+		buildSortConditions(provider, sql);
 		sql.append(" ORDER BY ").append(buildSortClause(provider));
 
 		return sql.toString();
@@ -109,12 +163,16 @@ public class SqlPagingQueryUtils {
 	public static String generateRowNumSqlQuery(AbstractSqlPagingQueryProvider provider, String selectClause,
 			boolean remainingPageQuery, String rowNumClause) {
 		StringBuilder sql = new StringBuilder();
-		sql.append("SELECT * FROM (SELECT ").append(selectClause).append(", ROWNUM as TMP_ROW_NUM");
+		sql.append("SELECT * FROM (SELECT ").append(selectClause);
 		sql.append(" FROM ").append(provider.getFromClause());
-		buildWhereClause(provider, remainingPageQuery, sql);
+		sql.append(provider.getWhereClause() == null ? "" : " WHERE " + provider.getWhereClause());
 		buildGroupByClause(provider, sql);
 		sql.append(" ORDER BY ").append(buildSortClause(provider));
 		sql.append(") WHERE ").append(rowNumClause);
+		if(remainingPageQuery) {
+			sql.append(" AND ");
+			buildSortConditions(provider, sql);
+		}
 
 		return sql.toString();
 
@@ -130,7 +188,7 @@ public class SqlPagingQueryUtils {
 
 		StringBuilder sql = new StringBuilder();
 		sql.append("SELECT ").append(outerSelectClause).append(" FROM (SELECT ").append(outerSelectClause)
-				.append(", ROWNUM as TMP_ROW_NUM");
+				.append(", ").append(StringUtils.hasText(provider.getGroupClause()) ? "MIN(ROWNUM) as TMP_ROW_NUM" : "ROWNUM as TMP_ROW_NUM");
 		sql.append(" FROM (SELECT ").append(innerSelectClause).append(" FROM ").append(provider.getFromClause());
 		buildWhereClause(provider, remainingPageQuery, sql);
 		buildGroupByClause(provider, sql);
