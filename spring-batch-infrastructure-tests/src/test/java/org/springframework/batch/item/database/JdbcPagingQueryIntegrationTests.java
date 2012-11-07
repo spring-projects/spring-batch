@@ -36,6 +36,7 @@ import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.springframework.batch.item.database.support.AbstractSqlPagingQueryProvider;
 import org.springframework.batch.item.database.support.Order;
 import org.springframework.batch.item.database.support.SqlPagingQueryProviderFactoryBean;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -65,20 +66,23 @@ public class JdbcPagingQueryIntegrationTests {
 	private int itemCount = 9;
 
 	private int pageSize = 2;
-
+	
 	@Before
-	public void init() {
+	public void testInit() {
 		jdbcTemplate = new SimpleJdbcTemplate(dataSource);
-		maxId = jdbcTemplate.queryForInt("SELECT MAX(ID) from T_FOOS");
-		for (int i = itemCount; i > maxId; i--) {
-			jdbcTemplate.update("INSERT into T_FOOS (ID,NAME,VALUE) values (?, ?, ?)", i, "foo" + i, i);
+		String[] names = {"Foo", "Bar", "Baz", "Foo", "Bar", "Baz", "Foo", "Bar", "Baz"};
+		String[] codes = {"A",   "B",   "A",   "B",   "B",   "B",   "A",   "B",   "A"};
+		jdbcTemplate.update("DELETE from T_FOOS");
+		for(int i = 0; i < names.length; i++) {
+			jdbcTemplate.update("INSERT into T_FOOS (ID,NAME, CODE, VALUE) values (?, ?, ?, ?)", maxId, names[i], codes[i], i);
+			maxId++;
 		}
 		assertEquals(itemCount, SimpleJdbcTestUtils.countRowsInTable(jdbcTemplate, "T_FOOS"));
 	}
 
 	@After
 	public void destroy() {
-		jdbcTemplate.update("DELETE from T_FOOS where ID>?", maxId);
+		jdbcTemplate.update("DELETE from T_FOOS");
 	}
 
 	@Test
@@ -118,12 +122,51 @@ public class JdbcPagingQueryIntegrationTests {
 
 		assertEquals(total, count);
 	}
+	
+	@Test
+	public void testQueryFromStartWithGroupBy() throws Exception {
+		AbstractSqlPagingQueryProvider queryProvider = (AbstractSqlPagingQueryProvider) getPagingQueryProvider();
+		Map<String, Order> sortKeys = new LinkedHashMap<String, Order>();
+		sortKeys.put("NAME", Order.ASCENDING);
+		sortKeys.put("CODE", Order.DESCENDING);
+		queryProvider.setSortKeys(sortKeys);
+		queryProvider.setSelectClause("select NAME, CODE, sum(VALUE)");
+		queryProvider.setGroupClause("NAME, CODE");
+
+		int pages = 3;
+		int count = 0;
+		int total = 5;
+
+		List<Map<String, Object>> list = jdbcTemplate.queryForList(queryProvider.generateFirstPageQuery(pageSize));
+		logger.debug("First page result: " + list);
+		assertEquals(pageSize, list.size());
+		count += pageSize;
+		Map<String, Object> oldValues = null;
+
+		while (count < total) {
+			Map<String, Object> startAfterValues = getStartAfterValues(
+					queryProvider, list);
+			assertNotSame(oldValues, startAfterValues);
+			list = jdbcTemplate.queryForList(queryProvider.generateRemainingPagesQuery(pageSize), getParameterList(null, startAfterValues).toArray());
+			count += list.size();
+			
+			if(list.size() < pageSize) {
+				assertEquals(1, list.size());
+			}
+			else {
+				assertEquals(pageSize, list.size());
+			}
+			oldValues = startAfterValues;
+		}
+
+		assertEquals(total, count);
+	}
 
 	private Map<String, Object> getStartAfterValues(
 			PagingQueryProvider queryProvider, List<Map<String, Object>> list) {
 		Map<String, Object> startAfterValues = new LinkedHashMap<String, Object>();
 		for (Map.Entry<String, Order> sortKey : queryProvider.getSortKeys().entrySet()) {
-			startAfterValues.put(sortKey.getKey(), list.get(pageSize - 1).get(sortKey.getKey()));
+			startAfterValues.put(sortKey.getKey(), list.get(list.size() - 1).get(sortKey.getKey()));
 		}
 		return startAfterValues;
 	}

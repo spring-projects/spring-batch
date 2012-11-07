@@ -16,6 +16,8 @@
 
 package org.springframework.batch.item.database.support;
 
+import org.springframework.util.StringUtils;
+
 /**
  * Postgres implementation of a  {@link org.springframework.batch.item.database.PagingQueryProvider} using database specific features.
  * 
@@ -35,7 +37,12 @@ public class PostgresPagingQueryProvider extends AbstractSqlPagingQueryProvider 
 
 	@Override
 	public String generateRemainingPagesQuery(int pageSize) {
-		return SqlPagingQueryUtils.generateLimitSqlQuery(this, true, buildLimitClause(pageSize));
+		if(StringUtils.hasText(getGroupClause())) {
+			return SqlPagingQueryUtils.generateLimitGroupedSqlQuery(this, true, buildLimitClause(pageSize));
+		}
+		else {
+			return SqlPagingQueryUtils.generateLimitSqlQuery(this, true, buildLimitClause(pageSize));
+		}
 	}
 
 	private String buildLimitClause(int pageSize) {

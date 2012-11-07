@@ -71,7 +71,7 @@ public class MySqlPagingQueryProviderTests extends AbstractSqlPagingQueryProvide
 	@Test
 	public void testGenerateRemainingPagesQueryWithGroupBy() {
 		pagingQueryProvider.setGroupClause("dep");
-		String sql = "SELECT id, name, age FROM foo WHERE bar = 1 AND ((id > ?)) GROUP BY dep ORDER BY id ASC LIMIT 100";
+		String sql = "SELECT *  FROM (SELECT id, name, age FROM foo WHERE bar = 1 GROUP BY dep) AS MAIN_QRY WHERE ((id > ?)) ORDER BY id ASC LIMIT 100";
 		String s = pagingQueryProvider.generateRemainingPagesQuery(pageSize);
 		assertEquals(sql, s);
 	}
