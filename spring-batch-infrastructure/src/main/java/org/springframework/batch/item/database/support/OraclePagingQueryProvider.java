@@ -32,7 +32,6 @@ public class OraclePagingQueryProvider extends AbstractSqlPagingQueryProvider {
 	@Override
 	public String generateFirstPageQuery(int pageSize) {
 		return SqlPagingQueryUtils.generateRowNumSqlQuery(this, false, buildRowNumClause(pageSize));
-
 	}
 
 	@Override

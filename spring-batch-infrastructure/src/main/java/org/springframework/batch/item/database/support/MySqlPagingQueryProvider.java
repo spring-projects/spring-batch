@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2008 the original author or authors.
+ * Copyright 2006-2012 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,11 +17,13 @@
 package org.springframework.batch.item.database.support;
 
 import org.springframework.batch.item.database.PagingQueryProvider;
+import org.springframework.util.StringUtils;
 
 /**
  * MySQL implementation of a {@link PagingQueryProvider} using database specific features.
  *
  * @author Thomas Risberg
+ * @author Michael Minella
  * @since 2.0
  */
 public class MySqlPagingQueryProvider extends AbstractSqlPagingQueryProvider {
@@ -33,7 +35,12 @@ public class MySqlPagingQueryProvider extends AbstractSqlPagingQueryProvider {
 
 	@Override
 	public String generateRemainingPagesQuery(int pageSize) {
-		return SqlPagingQueryUtils.generateLimitSqlQuery(this, true, buildLimitClause(pageSize));
+		if(StringUtils.hasText(getGroupClause())) {
+			return SqlPagingQueryUtils.generateLimitGroupedSqlQuery(this, true, buildLimitClause(pageSize));
+		}
+		else {
+			return SqlPagingQueryUtils.generateLimitSqlQuery(this, true, buildLimitClause(pageSize));
+		}
 	}
 
 	private String buildLimitClause(int pageSize) {
