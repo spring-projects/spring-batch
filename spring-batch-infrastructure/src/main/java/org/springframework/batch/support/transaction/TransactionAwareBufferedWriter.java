@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2007 the original author or authors.
+ * Copyright 2006-2012 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -28,6 +28,7 @@ import org.springframework.transaction.support.TransactionSynchronizationManager
  * underlying writer only when the transaction is committed.
  * 
  * @author Dave Syer
+ * @author Michael Minella
  * 
  */
 public class TransactionAwareBufferedWriter extends Writer {
@@ -72,16 +73,16 @@ public class TransactionAwareBufferedWriter extends Writer {
 			TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronizationAdapter() {
 				@Override
 				public void afterCompletion(int status) {
+					clear();
+				}
+				
+				@Override
+				public void afterCommit() {
 					try {
-						if (status == STATUS_COMMITTED) {
-							complete();
-						}
+						complete();
 					}
 					catch (IOException e) {
 						throw new FlushFailedException("Could not write to output buffer", e);
-					}
-					finally {
-						clear();
 					}
 				}
 

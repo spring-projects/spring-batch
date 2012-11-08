@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2007 the original author or authors.
+ * Copyright 2006-2012 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,11 +18,13 @@ package org.springframework.batch.support.transaction;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 import java.io.IOException;
 import java.io.StringWriter;
 import java.io.Writer;
 
+import org.junit.Before;
 import org.junit.Test;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.TransactionStatus;
@@ -31,22 +33,28 @@ import org.springframework.transaction.support.TransactionTemplate;
 
 /**
  * @author Dave Syer
+ * @author Michael Minella
  * 
  */
 public class TransactionAwareBufferedWriterTests {
 
 	private Writer stringWriter = new StringWriter();
 
-	private TransactionAwareBufferedWriter writer = new TransactionAwareBufferedWriter(stringWriter, new Runnable() {
-		public void run() {
-			try {
-				stringWriter.append("c");
+	private TransactionAwareBufferedWriter writer;
+	
+	@Before
+	public void init() {
+		writer = new TransactionAwareBufferedWriter(stringWriter, new Runnable() {
+			public void run() {
+				try {
+					stringWriter.append("c");
+				}
+				catch (IOException e) {
+					throw new IllegalStateException(e);
+				}
 			}
-			catch (IOException e) {
-				throw new IllegalStateException(e);
-			}
-		}
-	});
+		});
+	}
 
 	private PlatformTransactionManager transactionManager = new ResourcelessTransactionManager();
 
@@ -80,6 +88,7 @@ public class TransactionAwareBufferedWriterTests {
 	}
 
 	@Test
+	@SuppressWarnings({"unchecked", "rawtypes"})
 	public void testFlushInTransaction() throws Exception {
 		Writer mock = new Writer() {
 			@Override
@@ -117,6 +126,7 @@ public class TransactionAwareBufferedWriterTests {
 	}
 
 	@Test
+	@SuppressWarnings({"unchecked", "rawtypes"})
 	public void testWriteWithCommit() throws Exception {
 		new TransactionTemplate(transactionManager).execute(new TransactionCallback() {
 			public Object doInTransaction(TransactionStatus status) {
@@ -135,6 +145,7 @@ public class TransactionAwareBufferedWriterTests {
 	}
 
 	@Test
+	@SuppressWarnings({"unchecked", "rawtypes"})
 	public void tesBufferSizeInTransaction() throws Exception {
 		new TransactionTemplate(transactionManager).execute(new TransactionCallback() {
 			public Object doInTransaction(TransactionStatus status) {
@@ -151,6 +162,7 @@ public class TransactionAwareBufferedWriterTests {
 	}
 
 	@Test
+	@SuppressWarnings({"unchecked", "rawtypes"})
 	public void testWriteWithRollback() throws Exception {
 		try {
 			new TransactionTemplate(transactionManager).execute(new TransactionCallback() {
@@ -179,5 +191,53 @@ public class TransactionAwareBufferedWriterTests {
 		testWriteWithRollback();
 		testWriteWithCommit();
 	}
+	
+	@Test
+	@SuppressWarnings({"unchecked", "rawtypes"})
+	public void testExceptionOnFlush() throws Exception {
+		final Writer badWriter = new Writer() {
+			
+			@Override
+			public void write(char[] cbuf, int off, int len) throws IOException {
+			}
+			
+			@Override
+			public void flush() throws IOException {
+				throw new IOException("This should be bubbled");
+			}
+			
+			@Override
+			public void close() throws IOException {
+			}
+		};
+		writer = new TransactionAwareBufferedWriter(badWriter, new Runnable() {
+			public void run() {
+				try {
+					badWriter.append("c");
+				}
+				catch (IOException e) {
+					throw new IllegalStateException(e);
+				}
+			}
+		});
 
+		try {
+			new TransactionTemplate(transactionManager).execute(new TransactionCallback() {
+				public Object doInTransaction(TransactionStatus status) {
+					try {
+						writer.write("foo");
+					}
+					catch (IOException e) {
+						throw new IllegalStateException("Unexpected IOException", e);
+					}
+					assertEquals("", stringWriter.toString());
+					return null;
+				}
+			});
+			
+			fail("Exception was not thrown");
+		} catch (FlushFailedException ffe) {
+			assertEquals("Could not write to output buffer", ffe.getMessage());
+		}
+	}
 }
