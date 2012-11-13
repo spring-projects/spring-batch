@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2007 the original author or authors.
+ * Copyright 2006-2012 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -55,6 +55,7 @@ import org.springframework.util.ClassUtils;
  * @author Tomas Slanina
  * @author Robert Kasanicky
  * @author Dave Syer
+ * @author Michael Minella
  */
 public class FlatFileItemWriter<T> extends ExecutionContextUserSupport implements ResourceAwareItemWriterItemStream<T>,
 		InitializingBean {
@@ -581,24 +582,15 @@ public class FlatFileItemWriter<T> extends ExecutionContextUserSupport implement
 				Writer writer = new BufferedWriter(Channels.newWriter(fileChannel, encoding)) {
 					@Override
 					public void flush() throws IOException {
-						System.out.println("*****************************  Flush Thread:" + Thread.currentThread().getId() + "|" + Thread.currentThread().getName());
 						super.flush();
-						System.out.println("++++++++++++++++++++ super.flush called");
 						if (forceSync) {
 							channel.force(false);
-						}
-						System.out.println("~~~~~~~~~~~~~~~~~~~~~~ force complete");
-						try {
-							Thread.sleep(10*1000);
-						} catch (InterruptedException e) {
 						}
 					}
 				};
 				if (transactional) {
 					return new TransactionAwareBufferedWriter(channel, new Runnable() {
-//					return new TransactionAwareBufferedWriter(writer, new Runnable() {
 						public void run() {
-							System.out.println("============================ closing stream");
 							closeStream();
 						}
 					});

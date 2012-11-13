@@ -68,7 +68,7 @@ public abstract class AbstractSqlPagingQueryProvider implements PagingQueryProvi
 	/**
 	 * The setter for the group by clause
 	 * 
-	 * @param SQL GROUP BY clause part of the SQL query string
+	 * @param groupClause SQL GROUP BY clause part of the SQL query string
 	 */
 	public void setGroupClause(String groupClause) {
 		if (StringUtils.hasText(groupClause)) {
