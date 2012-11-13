@@ -17,6 +17,9 @@ package org.springframework.batch.support.transaction;
 
 import java.io.IOException;
 import java.io.Writer;
+import java.nio.ByteBuffer;
+import java.nio.channels.FileChannel;
+import java.util.Arrays;
 
 import org.springframework.transaction.support.TransactionSynchronizationAdapter;
 import org.springframework.transaction.support.TransactionSynchronizationManager;
@@ -41,7 +44,8 @@ public class TransactionAwareBufferedWriter extends Writer {
 
 	private final String closeKey;
 
-	private Writer writer;
+//	private Writer writer;
+	private FileChannel channel;
 
 	private final Runnable closeCallback;
 
@@ -53,9 +57,10 @@ public class TransactionAwareBufferedWriter extends Writer {
 	 * @param writer actually writes to output
 	 * @param closeCallback callback to execute on close
 	 */
-	public TransactionAwareBufferedWriter(Writer writer, Runnable closeCallback) {
+	public TransactionAwareBufferedWriter(FileChannel channel, Runnable closeCallback) {
 		super();
-		this.writer = writer;
+//		this.writer = writer;
+		this.channel = channel;
 		this.closeCallback = closeCallback;
 		this.bufferKey = BUFFER_KEY_PREFIX + "." + hashCode();
 		this.closeKey = CLOSE_KEY_PREFIX + "." + hashCode();
@@ -77,9 +82,12 @@ public class TransactionAwareBufferedWriter extends Writer {
 				}
 				
 				@Override
-				public void afterCommit() {
+				public void beforeCommit(boolean readOnly) {
 					try {
-						complete();
+						System.out.println("*****************************  TransactionSynchronization Thread:" + Thread.currentThread().getId() + "|" + Thread.currentThread().getName());
+						if(!readOnly) {
+							complete();
+						}
 					}
 					catch (IOException e) {
 						throw new FlushFailedException("Could not write to output buffer", e);
@@ -89,10 +97,18 @@ public class TransactionAwareBufferedWriter extends Writer {
 				private void complete() throws IOException {
 					StringBuffer buffer = (StringBuffer) TransactionSynchronizationManager.getResource(bufferKey);
 					if (buffer != null) {
-						writer.write(buffer.toString());
-						writer.flush();
+						String string = buffer.toString();
+						int bufferLength = string.length();
+						ByteBuffer bb = ByteBuffer.wrap(string.getBytes());
+						int bytesWritten = channel.write(bb);
+						System.out.println("$$$$$$$$$$$$$$$$$$$$$$$$$ length = " + bufferLength + " written = " + bytesWritten);
+						if(bytesWritten != bufferLength) {
+							throw new RuntimeException("Unable to write all of the crap you wanted!!!!");
+						}
+//						writer.write(buffer.toString());
+//						writer.flush();
 						if (TransactionSynchronizationManager.hasResource(closeKey)) {
-							writer.close();
+//							writer.close();
 							closeCallback.run();
 						}
 					}
@@ -148,7 +164,7 @@ public class TransactionAwareBufferedWriter extends Writer {
 			}
 			return;
 		}
-		writer.close();
+//		writer.close();
 		closeCallback.run();
 	}
 
@@ -160,7 +176,8 @@ public class TransactionAwareBufferedWriter extends Writer {
 	@Override
 	public void flush() throws IOException {
 		if (!transactionActive()) {
-			writer.flush();
+			channel.force(false);
+//			writer.flush();
 		}
 	}
 
@@ -173,13 +190,16 @@ public class TransactionAwareBufferedWriter extends Writer {
 	public void write(char[] cbuf, int off, int len) throws IOException {
 
 		if (!transactionActive()) {
-			writer.write(cbuf, off, len);
+			ByteBuffer bb = ByteBuffer.wrap(new String(Arrays.copyOfRange(cbuf, off, off + len)).getBytes());
+			int bytesWritten = channel.write(bb);
+			if(bytesWritten != len) {
+				throw new IOException("Unable to write all data.  Bytes to write: " + len + ".  Bytes written: " + bytesWritten);
+			}
+//			writer.write(cbuf, off, len);
 			return;
 		}
 
 		StringBuffer buffer = getCurrentBuffer();
 		buffer.append(cbuf, off, len);
-
 	}
-
 }

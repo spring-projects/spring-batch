@@ -15,6 +15,11 @@
  */
 package org.springframework.batch.support.transaction;
 
+import static org.easymock.EasyMock.capture;
+import static org.easymock.EasyMock.createMock;
+import static org.easymock.EasyMock.expect;
+import static org.easymock.EasyMock.replay;
+import static org.easymock.EasyMock.verify;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
@@ -23,7 +28,10 @@ import static org.junit.Assert.fail;
 import java.io.IOException;
 import java.io.StringWriter;
 import java.io.Writer;
+import java.nio.ByteBuffer;
+import java.nio.channels.FileChannel;
 
+import org.easymock.Capture;
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.transaction.PlatformTransactionManager;
@@ -39,15 +47,20 @@ import org.springframework.transaction.support.TransactionTemplate;
 public class TransactionAwareBufferedWriterTests {
 
 	private Writer stringWriter = new StringWriter();
+	
+	private FileChannel fileChannel;
 
 	private TransactionAwareBufferedWriter writer;
 	
 	@Before
 	public void init() {
-		writer = new TransactionAwareBufferedWriter(stringWriter, new Runnable() {
+		fileChannel = createMock(FileChannel.class);
+		
+		writer = new TransactionAwareBufferedWriter(fileChannel, new Runnable() {
 			public void run() {
 				try {
-					stringWriter.append("c");
+					ByteBuffer bb = ByteBuffer.wrap("c".getBytes());
+					fileChannel.write(bb);
 				}
 				catch (IOException e) {
 					throw new IllegalStateException(e);
@@ -68,23 +81,61 @@ public class TransactionAwareBufferedWriterTests {
 	 */
 	@Test
 	public void testWriteOutsideTransaction() throws Exception {
+		Capture<ByteBuffer> bb = new Capture<ByteBuffer>();
+		expect(fileChannel.write(capture(bb))).andReturn(3);
+		fileChannel.force(false);
+		replay(fileChannel);
+
 		writer.write("foo");
 		writer.flush();
 		// Not closed yet
-		assertEquals("foo", stringWriter.toString());
+		
+		String s = getStringFromByteBuffer(bb.getValue());
+		
+		verify(fileChannel);
+		assertEquals("foo", s);
+	}
+
+	private String getStringFromByteBuffer(ByteBuffer bb) {
+		byte[] bytearr = new byte[bb.remaining()];
+		bb.get(bytearr);
+		String s = new String(bytearr);
+		return s;
 	}
 
 	@Test
 	public void testBufferSizeOutsideTransaction() throws Exception {
+		Capture<ByteBuffer> bb = new Capture<ByteBuffer>();
+		expect(fileChannel.write(capture(bb))).andReturn(3);
+		replay(fileChannel);
+
 		writer.write("foo");
+		
+		verify(fileChannel);
 		assertEquals(0, writer.getBufferSize());
 	}
 
 	@Test
 	public void testCloseOutsideTransaction() throws Exception {
+		Capture<ByteBuffer> bb = new Capture<ByteBuffer>();
+		expect(fileChannel.write(capture(bb))).andReturn(3);
+		expect(fileChannel.write(capture(bb))).andReturn(1);
+		replay(fileChannel);
+
 		writer.write("foo");
 		writer.close();
-		assertEquals("fooc", stringWriter.toString());
+		
+		verify(fileChannel);
+		
+		String output = "";
+		
+		for (ByteBuffer curBuffer : bb.getValues()) {
+			output = output + getStringFromByteBuffer(curBuffer);
+			
+		}
+//		assertEquals("foo", getStringFromByteBuffer(writeBuffer.getValue()));
+//		assertEquals("c", getStringFromByteBuffer(commitBuffer.getValue()));
+		assertEquals("fooc", output);
 	}
 
 	@Test
@@ -105,7 +156,7 @@ public class TransactionAwareBufferedWriterTests {
 			public void write(char[] cbuf, int off, int len) throws IOException {
 			}
 		};
-		writer = new TransactionAwareBufferedWriter(mock, new Runnable() {
+		writer = new TransactionAwareBufferedWriter(fileChannel, new Runnable() {
 			public void run() {				
 			}
 		});
@@ -210,7 +261,7 @@ public class TransactionAwareBufferedWriterTests {
 			public void close() throws IOException {
 			}
 		};
-		writer = new TransactionAwareBufferedWriter(badWriter, new Runnable() {
+		writer = new TransactionAwareBufferedWriter(fileChannel, new Runnable() {
 			public void run() {
 				try {
 					badWriter.append("c");

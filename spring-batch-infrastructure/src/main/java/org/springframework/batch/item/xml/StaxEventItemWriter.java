@@ -418,7 +418,8 @@ public class StaxEventItemWriter<T> extends ExecutionContextUserSupport implemen
 				}
 			};
 			if (transactional) {
-				bufferedWriter = new TransactionAwareBufferedWriter(writer, new Runnable() {
+				bufferedWriter = new TransactionAwareBufferedWriter(channel, new Runnable() {
+//				bufferedWriter = new TransactionAwareBufferedWriter(writer, new Runnable() {
 					public void run() {
 						closeStream();
 					}
