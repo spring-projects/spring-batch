@@ -26,6 +26,7 @@ import javax.sql.DataSource;
 
 import org.easymock.EasyMock;
 import org.junit.Test;
+import org.springframework.batch.item.database.Order;
 import org.springframework.batch.item.database.PagingQueryProvider;
 import org.springframework.batch.support.DatabaseType;
 import org.springframework.batch.support.DatabaseTypeTestUtils;

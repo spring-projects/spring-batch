@@ -32,6 +32,7 @@ import java.util.Map;
 
 import javax.sql.DataSource;
 
+import org.springframework.batch.item.database.Order;
 import org.springframework.batch.item.database.PagingQueryProvider;
 import org.springframework.batch.support.DatabaseType;
 import org.springframework.beans.factory.FactoryBean;

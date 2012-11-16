@@ -18,6 +18,8 @@ package org.springframework.batch.item.database.support;
 
 import java.util.Map;
 
+import org.springframework.batch.item.database.Order;
+
 /**
  * Oracle implementation of a
  * {@link org.springframework.batch.item.database.PagingQueryProvider} using

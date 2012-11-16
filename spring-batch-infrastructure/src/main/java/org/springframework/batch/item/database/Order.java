@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.springframework.batch.item.database.support;
+package org.springframework.batch.item.database;
 
 /**
  * The direction of the sort in an ORDER BY clause.
