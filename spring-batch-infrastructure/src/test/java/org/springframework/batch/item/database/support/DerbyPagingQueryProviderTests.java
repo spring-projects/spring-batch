@@ -30,6 +30,7 @@ import javax.sql.DataSource;
 
 import org.junit.Assert;
 import org.junit.Test;
+import org.springframework.batch.item.database.Order;
 import org.springframework.dao.InvalidDataAccessResourceUsageException;
 
 /**

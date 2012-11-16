@@ -23,7 +23,6 @@ import java.util.Map;
 
 import org.junit.runner.RunWith;
 import org.springframework.batch.item.database.support.HsqlPagingQueryProvider;
-import org.springframework.batch.item.database.support.Order;
 import org.springframework.batch.item.sample.Foo;
 import org.springframework.jdbc.core.simple.ParameterizedRowMapper;
 import org.springframework.test.context.ContextConfiguration;
