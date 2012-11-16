@@ -22,7 +22,6 @@ import java.util.Map;
 
 import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.database.support.HsqlPagingQueryProvider;
-import org.springframework.batch.item.database.support.Order;
 import org.springframework.batch.item.sample.Foo;
 import org.springframework.jdbc.core.simple.ParameterizedRowMapper;
 

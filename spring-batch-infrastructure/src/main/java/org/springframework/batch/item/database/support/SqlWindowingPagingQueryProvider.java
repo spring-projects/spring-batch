@@ -18,6 +18,7 @@ package org.springframework.batch.item.database.support;
 
 import java.util.Map;
 
+import org.springframework.batch.item.database.Order;
 import org.springframework.util.StringUtils;
 
 /**

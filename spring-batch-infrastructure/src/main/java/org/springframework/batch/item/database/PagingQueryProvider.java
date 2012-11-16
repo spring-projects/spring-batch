@@ -20,7 +20,6 @@ import java.util.Map;
 
 import javax.sql.DataSource;
 
-import org.springframework.batch.item.database.support.Order;
 
 /**
  * Interface defining the functionality to be provided for generating paging queries for use with Paging
