@@ -47,7 +47,12 @@ public class TransactionAwareBufferedWriter extends Writer {
 	private FileChannel channel;
 
 	private final Runnable closeCallback;
-
+	
+	// default encoding for writing to output files - set to UTF-8.
+	private static final String DEFAULT_CHARSET = "UTF-8";
+	
+	private String encoding = DEFAULT_CHARSET;
+	
 	/**
 	 * Create a new instance with the underlying file channel provided, and a callback
 	 * to execute on close. The callback should clean up related resources like
@@ -62,6 +67,10 @@ public class TransactionAwareBufferedWriter extends Writer {
 		this.closeCallback = closeCallback;
 		this.bufferKey = BUFFER_KEY_PREFIX + "." + hashCode();
 		this.closeKey = CLOSE_KEY_PREFIX + "." + hashCode();
+	}
+
+	public void setEncoding(String encoding) {
+		this.encoding = encoding;
 	}
 
 	/**
@@ -95,8 +104,9 @@ public class TransactionAwareBufferedWriter extends Writer {
 					StringBuffer buffer = (StringBuffer) TransactionSynchronizationManager.getResource(bufferKey);
 					if (buffer != null) {
 						String string = buffer.toString();
-						int bufferLength = string.length();
-						ByteBuffer bb = ByteBuffer.wrap(string.getBytes());
+						byte[] bytes = string.getBytes(encoding);
+						int bufferLength = bytes.length;
+						ByteBuffer bb = ByteBuffer.wrap(bytes);
 						int bytesWritten = channel.write(bb);
 						if(bytesWritten != bufferLength) {
 							throw new IOException("All bytes to be written were not successfully written");
@@ -181,9 +191,11 @@ public class TransactionAwareBufferedWriter extends Writer {
 	public void write(char[] cbuf, int off, int len) throws IOException {
 
 		if (!transactionActive()) {
-			ByteBuffer bb = ByteBuffer.wrap(new String(Arrays.copyOfRange(cbuf, off, off + len)).getBytes());
+			byte[] bytes = new String(Arrays.copyOfRange(cbuf, off, off + len)).getBytes(encoding);
+			int length = bytes.length;
+			ByteBuffer bb = ByteBuffer.wrap(bytes);
 			int bytesWritten = channel.write(bb);
-			if(bytesWritten != len) {
+			if(bytesWritten != length) {
 				throw new IOException("Unable to write all data.  Bytes to write: " + len + ".  Bytes written: " + bytesWritten);
 			}
 			return;

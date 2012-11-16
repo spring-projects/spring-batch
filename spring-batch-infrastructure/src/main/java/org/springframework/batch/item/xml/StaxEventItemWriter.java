@@ -409,23 +409,26 @@ public class StaxEventItemWriter<T> extends ExecutionContextUserSupport implemen
 
 		try {
 			final FileChannel channel = fileChannel;
-			Writer writer = new BufferedWriter(new OutputStreamWriter(os, encoding)) {
-				@Override
-				public void flush() throws IOException {
-					super.flush();
-					if (forceSync) {
-						channel.force(false);
-					}
-				}
-			};
 			if (transactional) {
-				bufferedWriter = new TransactionAwareBufferedWriter(channel, new Runnable() {
+				TransactionAwareBufferedWriter writer = new TransactionAwareBufferedWriter(channel, new Runnable() {
 					public void run() {
 						closeStream();
 					}
 				});
+				
+				writer.setEncoding(encoding);
+				bufferedWriter = writer;
 			}
 			else {
+				Writer writer = new BufferedWriter(new OutputStreamWriter(os, encoding)) {
+					@Override
+					public void flush() throws IOException {
+						super.flush();
+						if (forceSync) {
+							channel.force(false);
+						}
+					}
+				};
 				bufferedWriter = writer;
 			}
 			delegateEventWriter = createXmlEventWriter(outputFactory, bufferedWriter);

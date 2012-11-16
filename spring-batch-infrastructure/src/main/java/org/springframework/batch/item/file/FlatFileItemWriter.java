@@ -579,23 +579,27 @@ public class FlatFileItemWriter<T> extends ExecutionContextUserSupport implement
 		private Writer getBufferedWriter(FileChannel fileChannel, String encoding) {
 			try {
 				final FileChannel channel = fileChannel;
-				Writer writer = new BufferedWriter(Channels.newWriter(fileChannel, encoding)) {
-					@Override
-					public void flush() throws IOException {
-						super.flush();
-						if (forceSync) {
-							channel.force(false);
-						}
-					}
-				};
 				if (transactional) {
-					return new TransactionAwareBufferedWriter(channel, new Runnable() {
+					TransactionAwareBufferedWriter writer = new TransactionAwareBufferedWriter(channel, new Runnable() {
 						public void run() {
 							closeStream();
 						}
 					});
+					
+					writer.setEncoding(encoding);
+					return writer;
 				}
 				else {
+					Writer writer = new BufferedWriter(Channels.newWriter(fileChannel, encoding)) {
+						@Override
+						public void flush() throws IOException {
+							super.flush();
+							if (forceSync) {
+								channel.force(false);
+							}
+						}
+					};
+
 					return new BufferedWriter(writer);
 				}
 			}
