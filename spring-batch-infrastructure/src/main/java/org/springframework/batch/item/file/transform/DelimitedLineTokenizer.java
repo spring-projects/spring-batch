@@ -64,7 +64,7 @@ public class DelimitedLineTokenizer extends AbstractLineTokenizer {
 	 * Create a new instance of the {@link DelimitedLineTokenizer} class for the
 	 * common case where the delimiter is a {@link #DELIMITER_COMMA comma}.
 	 *
-	 * @see #DelimitedLineTokenizer(char)
+	 * @see #DelimitedLineTokenizer(String)
 	 * @see #DELIMITER_COMMA
 	 */
 	public DelimitedLineTokenizer() {

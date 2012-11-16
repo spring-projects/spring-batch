@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2007 the original author or authors.
+ * Copyright 2006-2012 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -66,6 +66,7 @@ import org.springframework.util.StringUtils;
  * 
  * @author Peter Zozom
  * @author Robert Kasanicky
+ * @author Michael Minella
  * 
  */
 public class StaxEventItemWriter<T> extends ExecutionContextUserSupport implements
@@ -408,23 +409,26 @@ public class StaxEventItemWriter<T> extends ExecutionContextUserSupport implemen
 
 		try {
 			final FileChannel channel = fileChannel;
-			Writer writer = new BufferedWriter(new OutputStreamWriter(os, encoding)) {
-				@Override
-				public void flush() throws IOException {
-					super.flush();
-					if (forceSync) {
-						channel.force(false);
-					}
-				}
-			};
 			if (transactional) {
-				bufferedWriter = new TransactionAwareBufferedWriter(writer, new Runnable() {
+				TransactionAwareBufferedWriter writer = new TransactionAwareBufferedWriter(channel, new Runnable() {
 					public void run() {
 						closeStream();
 					}
 				});
+				
+				writer.setEncoding(encoding);
+				bufferedWriter = writer;
 			}
 			else {
+				Writer writer = new BufferedWriter(new OutputStreamWriter(os, encoding)) {
+					@Override
+					public void flush() throws IOException {
+						super.flush();
+						if (forceSync) {
+							channel.force(false);
+						}
+					}
+				};
 				bufferedWriter = writer;
 			}
 			delegateEventWriter = createXmlEventWriter(outputFactory, bufferedWriter);

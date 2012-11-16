@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2007 the original author or authors.
+ * Copyright 2006-2012 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,17 +17,21 @@ package org.springframework.batch.support.transaction;
 
 import java.io.IOException;
 import java.io.Writer;
+import java.nio.ByteBuffer;
+import java.nio.channels.FileChannel;
+import java.util.Arrays;
 
 import org.springframework.transaction.support.TransactionSynchronizationAdapter;
 import org.springframework.transaction.support.TransactionSynchronizationManager;
 
 /**
- * Wrapper for a {@link Writer} that delays actually writing to or closing the
+ * Wrapper for a {@link FileChannel} that delays actually writing to or closing the
  * buffer if a transaction is active. If a transaction is detected on the call
  * to {@link #write(String)} the parameter is buffered and passed on to the
  * underlying writer only when the transaction is committed.
  * 
  * @author Dave Syer
+ * @author Michael Minella
  * 
  */
 public class TransactionAwareBufferedWriter extends Writer {
@@ -40,24 +44,33 @@ public class TransactionAwareBufferedWriter extends Writer {
 
 	private final String closeKey;
 
-	private Writer writer;
+	private FileChannel channel;
 
 	private final Runnable closeCallback;
-
+	
+	// default encoding for writing to output files - set to UTF-8.
+	private static final String DEFAULT_CHARSET = "UTF-8";
+	
+	private String encoding = DEFAULT_CHARSET;
+	
 	/**
-	 * Create a new instance with the underlying writer provided, and a callback
+	 * Create a new instance with the underlying file channel provided, and a callback
 	 * to execute on close. The callback should clean up related resources like
 	 * output streams or channels.
 	 * 
-	 * @param writer actually writes to output
+	 * @param channel channel used to do the actuall file IO
 	 * @param closeCallback callback to execute on close
 	 */
-	public TransactionAwareBufferedWriter(Writer writer, Runnable closeCallback) {
+	public TransactionAwareBufferedWriter(FileChannel channel, Runnable closeCallback) {
 		super();
-		this.writer = writer;
+		this.channel = channel;
 		this.closeCallback = closeCallback;
 		this.bufferKey = BUFFER_KEY_PREFIX + "." + hashCode();
 		this.closeKey = CLOSE_KEY_PREFIX + "." + hashCode();
+	}
+
+	public void setEncoding(String encoding) {
+		this.encoding = encoding;
 	}
 
 	/**
@@ -72,26 +85,33 @@ public class TransactionAwareBufferedWriter extends Writer {
 			TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronizationAdapter() {
 				@Override
 				public void afterCompletion(int status) {
+					clear();
+				}
+				
+				@Override
+				public void beforeCommit(boolean readOnly) {
 					try {
-						if (status == STATUS_COMMITTED) {
+						if(!readOnly) {
 							complete();
 						}
 					}
 					catch (IOException e) {
 						throw new FlushFailedException("Could not write to output buffer", e);
 					}
-					finally {
-						clear();
-					}
 				}
 
 				private void complete() throws IOException {
 					StringBuffer buffer = (StringBuffer) TransactionSynchronizationManager.getResource(bufferKey);
 					if (buffer != null) {
-						writer.write(buffer.toString());
-						writer.flush();
+						String string = buffer.toString();
+						byte[] bytes = string.getBytes(encoding);
+						int bufferLength = bytes.length;
+						ByteBuffer bb = ByteBuffer.wrap(bytes);
+						int bytesWritten = channel.write(bb);
+						if(bytesWritten != bufferLength) {
+							throw new IOException("All bytes to be written were not successfully written");
+						}
 						if (TransactionSynchronizationManager.hasResource(closeKey)) {
-							writer.close();
 							closeCallback.run();
 						}
 					}
@@ -147,7 +167,6 @@ public class TransactionAwareBufferedWriter extends Writer {
 			}
 			return;
 		}
-		writer.close();
 		closeCallback.run();
 	}
 
@@ -159,7 +178,7 @@ public class TransactionAwareBufferedWriter extends Writer {
 	@Override
 	public void flush() throws IOException {
 		if (!transactionActive()) {
-			writer.flush();
+			channel.force(false);
 		}
 	}
 
@@ -172,13 +191,17 @@ public class TransactionAwareBufferedWriter extends Writer {
 	public void write(char[] cbuf, int off, int len) throws IOException {
 
 		if (!transactionActive()) {
-			writer.write(cbuf, off, len);
+			byte[] bytes = new String(Arrays.copyOfRange(cbuf, off, off + len)).getBytes(encoding);
+			int length = bytes.length;
+			ByteBuffer bb = ByteBuffer.wrap(bytes);
+			int bytesWritten = channel.write(bb);
+			if(bytesWritten != length) {
+				throw new IOException("Unable to write all data.  Bytes to write: " + len + ".  Bytes written: " + bytesWritten);
+			}
 			return;
 		}
 
 		StringBuffer buffer = getCurrentBuffer();
 		buffer.append(cbuf, off, len);
-
 	}
-
 }
