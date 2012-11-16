@@ -81,7 +81,7 @@ public class SqlPagingQueryProviderFactoryBean implements FactoryBean {
 	}
 	
 	/**
-	 * @param SQL GROUP BY clause part of the SQL query string
+	 * @param groupClause SQL GROUP BY clause part of the SQL query string
 	 */
 	public void setGroupClause(String groupClause) {
 		this.groupClause = groupClause;
@@ -123,7 +123,7 @@ public class SqlPagingQueryProviderFactoryBean implements FactoryBean {
 	}
 
 	/**
-	 * @param sortKey the sortKey to set
+	 * @param sortKeys the sortKey to set
 	 */
 	public void setSortKeys(Map<String, Order> sortKeys) {
 		this.sortKeys = sortKeys;
