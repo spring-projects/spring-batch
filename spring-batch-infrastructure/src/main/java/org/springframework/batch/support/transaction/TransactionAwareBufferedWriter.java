@@ -19,7 +19,6 @@ import java.io.IOException;
 import java.io.Writer;
 import java.nio.ByteBuffer;
 import java.nio.channels.FileChannel;
-import java.util.Arrays;
 
 import org.springframework.transaction.support.TransactionSynchronizationAdapter;
 import org.springframework.transaction.support.TransactionSynchronizationManager;
@@ -191,7 +190,9 @@ public class TransactionAwareBufferedWriter extends Writer {
 	public void write(char[] cbuf, int off, int len) throws IOException {
 
 		if (!transactionActive()) {
-			byte[] bytes = new String(Arrays.copyOfRange(cbuf, off, off + len)).getBytes(encoding);
+			char [] subArray = new char[len];
+			System.arraycopy(cbuf, off, subArray, 0, len);
+			byte[] bytes = new String(subArray).getBytes(encoding);
 			int length = bytes.length;
 			ByteBuffer bb = ByteBuffer.wrap(bytes);
 			int bytesWritten = channel.write(bb);
