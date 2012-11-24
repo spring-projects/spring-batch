@@ -15,64 +15,78 @@
  */
 package org.springframework.batch.core.configuration.support;
 
-import java.util.Collections;
-import java.util.Set;
-
-import java.util.concurrent.ConcurrentMap;
-import java.util.concurrent.ConcurrentHashMap;
-
 import org.springframework.batch.core.Job;
+import org.springframework.batch.core.Step;
 import org.springframework.batch.core.configuration.DuplicateJobException;
 import org.springframework.batch.core.configuration.JobFactory;
 import org.springframework.batch.core.configuration.JobRegistry;
+import org.springframework.batch.core.configuration.StepRegistry;
 import org.springframework.batch.core.launch.NoSuchJobException;
 import org.springframework.util.Assert;
 
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
+
 /**
- * Simple, thread-safe, map-based implementation of {@link JobRegistry}. 
- * 
+ * Simple, thread-safe, map-based implementation of {@link JobRegistry}.
+ *
  * @author Dave Syer
  * @author Robert Fischer
- * 
  */
-public class MapJobRegistry implements JobRegistry {
+public class MapJobRegistry implements JobRegistry, StepRegistry {
 
-	/**
-	* The map holding the registered job factories.
-	*/
-	// The "final" ensures that it is visible and initialized when the constructor resolves.
-	private final ConcurrentMap<String, JobFactory> map = new ConcurrentHashMap<String, JobFactory>();
+    /**
+     * The map holding the registered job factories.
+     */
+    // The "final" ensures that it is visible and initialized when the constructor resolves.
+    private final ConcurrentMap<String, JobFactory> map = new ConcurrentHashMap<String, JobFactory>();
+    private final MapStepRegistry stepRegistry = new MapStepRegistry();
 
-	public void register(JobFactory jobFactory) throws DuplicateJobException {
-		Assert.notNull(jobFactory);
-		String name = jobFactory.getJobName();
-		Assert.notNull(name, "Job configuration must have a name.");
-		JobFactory previousValue = map.putIfAbsent(name, jobFactory);
-		if(previousValue != null) {
-			throw new DuplicateJobException("A job configuration with this name [" + name
-					+ "] was already registered");
-		}
-	}
+    public void register(JobFactory jobFactory) throws DuplicateJobException {
+        Assert.notNull(jobFactory);
+        String name = jobFactory.getJobName();
+        Assert.notNull(name, "Job configuration must have a name.");
+        JobFactory previousValue = map.putIfAbsent(name, jobFactory);
+        if (previousValue != null) {
+            throw new DuplicateJobException("A job configuration with this name [" + name
+                    + "] was already registered");
+        }
+    }
 
-	public void unregister(String name) {
-		Assert.notNull(name, "Job configuration must have a name.");
-		map.remove(name);
-	}
+    public void unregister(String name) {
+        Assert.notNull(name, "Job configuration must have a name.");
+        map.remove(name);
+    }
 
-	public Job getJob(String name) throws NoSuchJobException {
-		JobFactory factory = map.get(name);
-		if(factory == null) {
-			throw new NoSuchJobException("No job configuration with the name [" + name + "] was registered");
-		} else {
-			return factory.createJob();
-		}
-	}
+    public Job getJob(String name) throws NoSuchJobException {
+        JobFactory factory = map.get(name);
+        if (factory == null) {
+            throw new NoSuchJobException("No job configuration with the name [" + name + "] was registered");
+        } else {
+            return factory.createJob();
+        }
+    }
 
-	/**
-	* Provides an unmodifiable view of the job names.
-	*/
-	public Set<String> getJobNames() {
-		return Collections.unmodifiableSet(map.keySet());
-	}
+    /**
+     * Provides an unmodifiable view of the job names.
+     */
+    public Set<String> getJobNames() {
+        return Collections.unmodifiableSet(map.keySet());
+    }
+
+    public void register(String jobName, Collection<Step> steps) {
+        stepRegistry.register(jobName, steps);
+    }
+
+    public void unregisterStepsFromJob(String jobName) {
+        stepRegistry.unregisterStepsFromJob(jobName);
+    }
+
+    public Step getStep(String jobName, String stepName) throws NoSuchJobException {
+        return stepRegistry.getStep(jobName, stepName);
+    }
 
 }
