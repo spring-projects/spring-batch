@@ -91,7 +91,7 @@ public interface PagingQueryProvider {
 	 * Returns either a String to be used as the named placeholder for a sort key value (based on the column name)
 	 * or a ? for unnamed parameters.
 	 * 
-	 * @param The sort key name
+	 * @param keyName The sort key name
 	 * @return The string to be used for a parameterized query.
 	 */
 	String getSortKeyPlaceHolder(String keyName);

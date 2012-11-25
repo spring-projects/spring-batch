@@ -124,7 +124,7 @@ public class SqlPagingQueryProviderFactoryBean implements FactoryBean {
 	}
 
 	/**
-	 * @param sortKeys the sortKey to set
+	 * @param sortKeys the sortKeys to set
 	 */
 	public void setSortKeys(Map<String, Order> sortKeys) {
 		this.sortKeys = sortKeys;
