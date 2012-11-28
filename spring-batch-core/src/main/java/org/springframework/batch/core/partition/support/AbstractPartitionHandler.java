@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2007 the original author or authors.
+ * Copyright 2006-2012 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,12 +15,12 @@
  */
 package org.springframework.batch.core.partition.support;
 
+import java.util.Collection;
+import java.util.Set;
+
 import org.springframework.batch.core.StepExecution;
 import org.springframework.batch.core.partition.PartitionHandler;
 import org.springframework.batch.core.partition.StepExecutionSplitter;
-
-import java.util.Collection;
-import java.util.Set;
 
 /**
  * Base {@link PartitionHandler} implementation providing common base
@@ -50,7 +50,9 @@ public abstract class AbstractPartitionHandler implements PartitionHandler {
     protected abstract Set<StepExecution> doHandle(StepExecution masterStepExecution,
                                                    Set<StepExecution> partitionStepExecutions) throws Exception;
 
-
+	/**
+	 * @see PartitionHandler#handle(StepExecutionSplitter, StepExecution)
+	 */
     public Collection<StepExecution> handle(final StepExecutionSplitter stepSplitter,
                                             final StepExecution masterStepExecution) throws Exception {
         final Set<StepExecution> stepExecutions = stepSplitter.split(masterStepExecution, gridSize);
