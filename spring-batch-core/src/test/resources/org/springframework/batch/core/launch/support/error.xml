@@ -8,7 +8,7 @@
 		class="org.springframework.batch.core.job.SimpleJob">
 		<property name="steps">
 			<bean id="step1"
-				class="org.springframework.batch.core.step.item.SimpleStepFactoryBean"/>
+				class="org.springframework.batch.core.step.factory.SimpleStepFactoryBean"/>
 		</property>
 	</bean>
 

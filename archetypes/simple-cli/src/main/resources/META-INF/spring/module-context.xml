@@ -5,9 +5,12 @@
 		http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.1.xsd">
 
 	<description>Example job to get you started. It provides a
-		skeleton for a typical batch application.</description>
+		skeleton for
+		a typical batch application.
+	</description>
 
-	<job id="job1" xmlns="http://www.springframework.org/schema/batch" incrementer="jobParametersIncrementer">
+	<job id="job1" xmlns="http://www.springframework.org/schema/batch"
+		incrementer="jobParametersIncrementer">
 		<step id="step1" parent="simpleStep">
 			<tasklet>
 				<chunk reader="reader" writer="writer" />
@@ -17,13 +20,12 @@
 
 	<bean id="reader" class="example.ExampleItemReader" />
 	<bean id="writer" class="example.ExampleItemWriter" />
-	
-	<!-- enables the functionality of JobOperator.startNextInstance(jobName) -->
-	<bean id="jobParametersIncrementer" class="org.springframework.batch.core.launch.support.RunIdIncrementer" />
 
-	<bean id="simpleStep"
-		class="org.springframework.batch.core.step.item.SimpleStepFactoryBean"
-		abstract="true">
+	<!-- enables the functionality of JobOperator.startNextInstance(jobName) -->
+	<bean id="jobParametersIncrementer"
+		class="org.springframework.batch.core.launch.support.RunIdIncrementer" />
+
+	<bean id="simpleStep" class="org.springframework.batch.core.step.factory.SimpleStepFactoryBean" abstract="true">
 		<property name="transactionManager" ref="transactionManager" />
 		<property name="jobRepository" ref="jobRepository" />
 		<property name="startLimit" value="100" />

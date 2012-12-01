@@ -39,8 +39,8 @@ import org.springframework.util.Assert;
 import org.springframework.util.ClassUtils;
 
 /**
- * A {@link Step} implementation that provides common behavior to subclasses,
- * including registering and calling listeners.
+ * A {@link Step} implementation that provides common behavior to subclasses, including registering and calling
+ * listeners.
  * 
  * @author Dave Syer
  * @author Ben Hale
@@ -68,7 +68,8 @@ public abstract class AbstractStep implements Step, InitializingBean, BeanNameAw
 	}
 
 	public void afterPropertiesSet() throws Exception {
-		Assert.notNull(jobRepository, "JobRepository is mandatory");
+		Assert.state(name != null, "A Step must have a name");
+		Assert.state(jobRepository != null, "JobRepository is mandatory");
 	}
 
 	public String getName() {
@@ -76,8 +77,7 @@ public abstract class AbstractStep implements Step, InitializingBean, BeanNameAw
 	}
 
 	/**
-	 * Set the name property. Always overrides the default value if this object
-	 * is a Spring bean.
+	 * Set the name property. Always overrides the default value if this object is a Spring bean.
 	 * 
 	 * @see #setBeanName(java.lang.String)
 	 */
@@ -86,11 +86,9 @@ public abstract class AbstractStep implements Step, InitializingBean, BeanNameAw
 	}
 
 	/**
-	 * Set the name property if it is not already set. Because of the order of
-	 * the callbacks in a Spring container the name property will be set first
-	 * if it is present. Care is needed with bean definition inheritance - if a
-	 * parent bean has a name, then its children need an explicit name as well,
-	 * otherwise they will not be unique.
+	 * Set the name property if it is not already set. Because of the order of the callbacks in a Spring container the
+	 * name property will be set first if it is present. Care is needed with bean definition inheritance - if a parent
+	 * bean has a name, then its children need an explicit name as well, otherwise they will not be unique.
 	 * 
 	 * @see org.springframework.beans.factory.BeanNameAware#setBeanName(java.lang.String)
 	 */
@@ -118,8 +116,8 @@ public abstract class AbstractStep implements Step, InitializingBean, BeanNameAw
 	}
 
 	/**
-	 * Public setter for flag that determines whether the step should start
-	 * again if it is already complete. Defaults to false.
+	 * Public setter for flag that determines whether the step should start again if it is already complete. Defaults to
+	 * false.
 	 * 
 	 * @param allowStartIfComplete the value of the flag to set
 	 */
@@ -137,9 +135,8 @@ public abstract class AbstractStep implements Step, InitializingBean, BeanNameAw
 	}
 
 	/**
-	 * Extension point for subclasses to execute business logic. Subclasses
-	 * should set the {@link ExitStatus} on the {@link StepExecution} before
-	 * returning.
+	 * Extension point for subclasses to execute business logic. Subclasses should set the {@link ExitStatus} on the
+	 * {@link StepExecution} before returning.
 	 * 
 	 * @param stepExecution the current step context
 	 * @throws Exception
@@ -147,9 +144,8 @@ public abstract class AbstractStep implements Step, InitializingBean, BeanNameAw
 	protected abstract void doExecute(StepExecution stepExecution) throws Exception;
 
 	/**
-	 * Extension point for subclasses to provide callbacks to their
-	 * collaborators at the beginning of a step, to open or acquire resources.
-	 * Does nothing by default.
+	 * Extension point for subclasses to provide callbacks to their collaborators at the beginning of a step, to open or
+	 * acquire resources. Does nothing by default.
 	 * 
 	 * @param ctx the {@link ExecutionContext} to use
 	 * @throws Exception
@@ -158,9 +154,8 @@ public abstract class AbstractStep implements Step, InitializingBean, BeanNameAw
 	}
 
 	/**
-	 * Extension point for subclasses to provide callbacks to their
-	 * collaborators at the end of a step (right at the end of the finally
-	 * block), to close or release resources. Does nothing by default.
+	 * Extension point for subclasses to provide callbacks to their collaborators at the end of a step (right at the end
+	 * of the finally block), to close or release resources. Does nothing by default.
 	 * 
 	 * @param ctx the {@link ExecutionContext} to use
 	 * @throws Exception
@@ -169,9 +164,8 @@ public abstract class AbstractStep implements Step, InitializingBean, BeanNameAw
 	}
 
 	/**
-	 * Template method for step execution logic - calls abstract methods for
-	 * resource initialization ({@link #open(ExecutionContext)}), execution
-	 * logic ({@link #doExecute(StepExecution)}) and resource closing (
+	 * Template method for step execution logic - calls abstract methods for resource initialization (
+	 * {@link #open(ExecutionContext)}), execution logic ({@link #doExecute(StepExecution)}) and resource closing (
 	 * {@link #close(ExecutionContext)}).
 	 */
 	public final void execute(StepExecution stepExecution) throws JobInterruptedException,
@@ -287,8 +281,7 @@ public abstract class AbstractStep implements Step, InitializingBean, BeanNameAw
 	}
 
 	/**
-	 * Register a step listener for callbacks at the appropriate stages in a
-	 * step execution.
+	 * Register a step listener for callbacks at the appropriate stages in a step execution.
 	 * 
 	 * @param listener a {@link StepExecutionListener}
 	 */
@@ -332,8 +325,8 @@ public abstract class AbstractStep implements Step, InitializingBean, BeanNameAw
 	}
 
 	/**
-	 * Default mapping from throwable to {@link ExitStatus}. Clients can modify
-	 * the exit code using a {@link StepExecutionListener}.
+	 * Default mapping from throwable to {@link ExitStatus}. Clients can modify the exit code using a
+	 * {@link StepExecutionListener}.
 	 * 
 	 * @param ex the cause of the failure
 	 * @return an {@link ExitStatus}

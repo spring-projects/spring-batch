@@ -55,8 +55,11 @@ public class FlowStep extends AbstractStep {
 	 */
 	@Override
 	public void afterPropertiesSet() throws Exception {
-		super.afterPropertiesSet();
 		Assert.state(flow != null, "A Flow must be provided");
+		if (getName()==null) {
+			setName(flow.getName());
+		}
+		super.afterPropertiesSet();
 	}
 
 	/**

@@ -16,37 +16,41 @@
 
 package org.springframework.batch.core.configuration.xml;
 
-import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.HashSet;
-import java.util.List;
+import java.util.LinkedHashSet;
 import java.util.Map;
+import java.util.Set;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-import org.springframework.aop.framework.Advised;
 import org.springframework.batch.core.ChunkListener;
+import org.springframework.batch.core.ItemProcessListener;
+import org.springframework.batch.core.ItemReadListener;
+import org.springframework.batch.core.ItemWriteListener;
 import org.springframework.batch.core.Job;
+import org.springframework.batch.core.SkipListener;
 import org.springframework.batch.core.Step;
 import org.springframework.batch.core.StepExecutionListener;
 import org.springframework.batch.core.StepListener;
 import org.springframework.batch.core.job.flow.Flow;
-import org.springframework.batch.core.job.flow.FlowStep;
 import org.springframework.batch.core.launch.JobLauncher;
-import org.springframework.batch.core.launch.support.SimpleJobLauncher;
 import org.springframework.batch.core.partition.PartitionHandler;
-import org.springframework.batch.core.partition.support.PartitionStep;
 import org.springframework.batch.core.partition.support.Partitioner;
-import org.springframework.batch.core.partition.support.SimpleStepExecutionSplitter;
 import org.springframework.batch.core.partition.support.StepExecutionAggregator;
-import org.springframework.batch.core.partition.support.TaskExecutorPartitionHandler;
 import org.springframework.batch.core.repository.JobRepository;
-import org.springframework.batch.core.step.AbstractStep;
-import org.springframework.batch.core.step.item.FaultTolerantStepFactoryBean;
+import org.springframework.batch.core.step.builder.AbstractTaskletStepBuilder;
+import org.springframework.batch.core.step.builder.FaultTolerantStepBuilder;
+import org.springframework.batch.core.step.builder.FlowStepBuilder;
+import org.springframework.batch.core.step.builder.JobStepBuilder;
+import org.springframework.batch.core.step.builder.PartitionStepBuilder;
+import org.springframework.batch.core.step.builder.SimpleStepBuilder;
+import org.springframework.batch.core.step.builder.StepBuilder;
+import org.springframework.batch.core.step.builder.StepBuilderHelper;
+import org.springframework.batch.core.step.builder.TaskletStepBuilder;
+import org.springframework.batch.core.step.factory.FaultTolerantStepFactoryBean;
+import org.springframework.batch.core.step.factory.SimpleStepFactoryBean;
 import org.springframework.batch.core.step.item.KeyGenerator;
-import org.springframework.batch.core.step.item.SimpleStepFactoryBean;
 import org.springframework.batch.core.step.job.JobParametersExtractor;
-import org.springframework.batch.core.step.job.JobStep;
 import org.springframework.batch.core.step.skip.SkipPolicy;
 import org.springframework.batch.core.step.tasklet.Tasklet;
 import org.springframework.batch.core.step.tasklet.TaskletStep;
@@ -60,7 +64,6 @@ import org.springframework.batch.repeat.support.TaskExecutorRepeatTemplate;
 import org.springframework.beans.factory.BeanNameAware;
 import org.springframework.beans.factory.FactoryBean;
 import org.springframework.classify.BinaryExceptionClassifier;
-import org.springframework.core.task.SyncTaskExecutor;
 import org.springframework.core.task.TaskExecutor;
 import org.springframework.retry.RetryListener;
 import org.springframework.retry.RetryPolicy;
@@ -74,11 +77,9 @@ import org.springframework.transaction.interceptor.DefaultTransactionAttribute;
 import org.springframework.util.Assert;
 
 /**
- * This {@link FactoryBean} is used by the batch namespace parser to create
- * {@link Step} objects. Stores all of the properties that are configurable on
- * the &lt;step/&gt; (and its inner &lt;tasklet/&gt;). Based on which properties
- * are configured, the {@link #getObject()} method will delegate to the
- * appropriate class for generating the {@link Step}.
+ * This {@link FactoryBean} is used by the batch namespace parser to create {@link Step} objects. Stores all of the
+ * properties that are configurable on the &lt;step/&gt; (and its inner &lt;tasklet/&gt;). Based on which properties are
+ * configured, the {@link #getObject()} method will delegate to the appropriate class for generating the {@link Step}.
  * 
  * @author Dan Garrette
  * @author Josh Long
@@ -88,8 +89,6 @@ import org.springframework.util.Assert;
  * @since 2.0
  */
 class StepParserStepFactoryBean<I, O> implements FactoryBean, BeanNameAware {
-
-	private static final Log logger = LogFactory.getLog(StepParserStepFactoryBean.class);
 
 	//
 	// Step Attributes
@@ -108,6 +107,8 @@ class StepParserStepFactoryBean<I, O> implements FactoryBean, BeanNameAware {
 	private Tasklet tasklet;
 
 	private PlatformTransactionManager transactionManager;
+
+	private Set<StepExecutionListener> stepExecutionListeners = new LinkedHashSet<StepExecutionListener>();
 
 	//
 	// Flow Elements
@@ -139,8 +140,6 @@ class StepParserStepFactoryBean<I, O> implements FactoryBean, BeanNameAware {
 	//
 	// Tasklet Elements
 	//
-	private StepListener[] listeners;
-
 	private Collection<Class<? extends Throwable>> noRollbackExceptionClasses;
 
 	private Integer transactionTimeout;
@@ -149,10 +148,12 @@ class StepParserStepFactoryBean<I, O> implements FactoryBean, BeanNameAware {
 
 	private Isolation isolation;
 
+	private Set<ChunkListener> chunkListeners = new LinkedHashSet<ChunkListener>();
+
 	//
 	// Chunk Attributes
 	//
-	private Integer cacheCapacity;
+	private int cacheCapacity = 0;
 
 	private CompletionPolicy chunkCompletionPolicy;
 
@@ -162,7 +163,7 @@ class StepParserStepFactoryBean<I, O> implements FactoryBean, BeanNameAware {
 
 	private Boolean processorTransactional;
 
-	private Integer retryLimit;
+	private int retryLimit = 0;
 
 	private BackOffPolicy backOffPolicy;
 
@@ -191,11 +192,19 @@ class StepParserStepFactoryBean<I, O> implements FactoryBean, BeanNameAware {
 	//
 	private RetryListener[] retryListeners;
 
-	private Map<Class<? extends Throwable>, Boolean> skippableExceptionClasses;
+	private Map<Class<? extends Throwable>, Boolean> skippableExceptionClasses = new HashMap<Class<? extends Throwable>, Boolean>();
 
-	private Map<Class<? extends Throwable>, Boolean> retryableExceptionClasses;
+	private Map<Class<? extends Throwable>, Boolean> retryableExceptionClasses = new HashMap<Class<? extends Throwable>, Boolean>();
 
 	private ItemStream[] streams;
+
+	private Set<ItemReadListener<I>> readListeners = new LinkedHashSet<ItemReadListener<I>>();
+
+	private Set<ItemWriteListener<O>> writeListeners = new LinkedHashSet<ItemWriteListener<O>>();
+
+	private Set<ItemProcessListener<I, O>> processListeners = new LinkedHashSet<ItemProcessListener<I, O>>();
+
+	private Set<SkipListener<I, O>> skipListeners = new LinkedHashSet<SkipListener<I, O>>();
 
 	//
 	// Additional
@@ -203,6 +212,8 @@ class StepParserStepFactoryBean<I, O> implements FactoryBean, BeanNameAware {
 	private boolean hasChunkElement = false;
 
 	private StepExecutionAggregator stepExecutionAggregator;
+
+	private StepListener[] listeners;
 
 	/**
 	 * Create a {@link Step} from the configuration provided.
@@ -216,36 +227,23 @@ class StepParserStepFactoryBean<I, O> implements FactoryBean, BeanNameAware {
 
 			validateFaultTolerantSettings();
 			if (isFaultTolerant()) {
-				FaultTolerantStepFactoryBean<I, O> fb = new FaultTolerantStepFactoryBean<I, O>();
-				configureSimple(fb);
-				configureFaultTolerant(fb);
-				return fb.getObject();
+				return createFaultTolerantStep();
 			}
 			else {
-				SimpleStepFactoryBean<I, O> fb = new SimpleStepFactoryBean<I, O>();
-				configureSimple(fb);
-				return fb.getObject();
+				return createSimpleStep();
 			}
 		}
 		else if (tasklet != null) {
-			TaskletStep ts = new TaskletStep();
-			configureTaskletStep(ts);
-			return ts;
+			return createTaskletStep();
 		}
 		else if (flow != null) {
-			FlowStep ts = new FlowStep();
-			configureFlowStep(ts);
-			return ts;
+			return createFlowStep();
 		}
 		else if (job != null) {
-			JobStep ts = new JobStep();
-			configureJobStep(ts);
-			return ts;
+			return createJobStep();
 		}
 		else {
-			PartitionStep ts = new PartitionStep();
-			configurePartitionStep(ts);
-			return ts;
+			return createPartitionStep();
 		}
 	}
 
@@ -255,215 +253,166 @@ class StepParserStepFactoryBean<I, O> implements FactoryBean, BeanNameAware {
 		return hasChunkElement || tasklet != null;
 	}
 
-	private void configureAbstractStep(AbstractStep ts) {
-		if (name != null) {
-			ts.setName(name);
-		}
+	private void enhanceCommonStep(StepBuilderHelper<?> builder) {
 		if (allowStartIfComplete != null) {
-			ts.setAllowStartIfComplete(allowStartIfComplete);
-		}
-		if (jobRepository != null) {
-			ts.setJobRepository(jobRepository);
+			builder.allowStartIfComplete(allowStartIfComplete);
 		}
 		if (startLimit != null) {
-			ts.setStartLimit(startLimit);
+			builder.startLimit(startLimit);
 		}
-		if (listeners != null) {
-			List<StepExecutionListener> newListeners = new ArrayList<StepExecutionListener>();
-			for (StepListener listener : listeners) {
-				if (listener instanceof StepExecutionListener) {
-					newListeners.add((StepExecutionListener) listener);
-				}
-			}
-			ts.setStepExecutionListeners(newListeners.toArray(new StepExecutionListener[0]));
+		builder.repository(jobRepository);
+		builder.transactionManager(transactionManager);
+		for (StepExecutionListener listener : stepExecutionListeners) {
+			builder.listener(listener);
 		}
 	}
 
-	private void configurePartitionStep(PartitionStep ts) {
-		Assert.state(partitioner != null, "A Partitioner must be provided for a partition step");
-		configureAbstractStep(ts);
+	private Step createPartitionStep() {
 
-		if (partitionHandler != null) {
-			ts.setPartitionHandler(partitionHandler);
+		PartitionStepBuilder builder;
+		if (partitioner != null) {
+			builder = new StepBuilder(name).partitioner(step != null ? step.getName() : name, partitioner).step(step);
 		}
 		else {
-			TaskExecutorPartitionHandler partitionHandler = new TaskExecutorPartitionHandler();
-			partitionHandler.setStep(step);
-			if (taskExecutor == null) {
-				taskExecutor = new SyncTaskExecutor();
-			}
-			partitionHandler.setGridSize(gridSize);
-			partitionHandler.setTaskExecutor(taskExecutor);
-			ts.setPartitionHandler(partitionHandler);
+			builder = new StepBuilder(name).partitioner(step);
+		}
+		enhanceCommonStep(builder);
+
+		if (partitionHandler != null) {
+			builder.partitionHandler(partitionHandler);
+		}
+		else {
+			builder.gridSize(gridSize);
+			builder.taskExecutor(taskExecutor);
 		}
 
-		boolean allowStartIfComplete = this.allowStartIfComplete != null ? this.allowStartIfComplete : false;
-		String name = this.name;
-		if (step != null) {
-			try {
-				allowStartIfComplete = step.isAllowStartIfComplete();
-				name = step.getName();
-			}
-			catch (Exception e) {
-				logger.info("Ignored exception from step asking for name and allowStartIfComplete flag. "
-						+ "Using default from enclosing PartitionStep (" + name + "," + allowStartIfComplete + ").");
-			}
-		}
-		SimpleStepExecutionSplitter splitter = new SimpleStepExecutionSplitter(jobRepository, allowStartIfComplete,
-				name, partitioner);
-		ts.setStepExecutionSplitter(splitter);
-		if (stepExecutionAggregator != null) {
-			ts.setStepExecutionAggregator(stepExecutionAggregator);
-		}
+		builder.aggregator(stepExecutionAggregator);
+
+		return builder.build();
+
 	}
 
-	private Object extractTarget(Object target, Class<?> type) {
-		if (target instanceof Advised) {
-			Object source;
-			try {
-				source = ((Advised) target).getTargetSource().getTarget();
-			}
-			catch (Exception e) {
-				throw new IllegalStateException("Could not extract target from proxy", e);
-			}
-			if (source instanceof Advised) {
-				source = extractTarget(source, type);
-			}
-			if (type.isAssignableFrom(source.getClass())) {
-				target = source;
-			}
-		}
-		return target;
-	}
+	private Step createFaultTolerantStep() {
 
-	private void configureSimple(SimpleStepFactoryBean<I, O> fb) {
-		if (name != null) {
-			fb.setBeanName(name);
-		}
-		if (allowStartIfComplete != null) {
-			fb.setAllowStartIfComplete(allowStartIfComplete);
-		}
-		if (jobRepository != null) {
-			fb.setJobRepository(jobRepository);
-		}
-		if (startLimit != null) {
-			fb.setStartLimit(startLimit);
-		}
-		if (transactionManager != null) {
-			fb.setTransactionManager(transactionManager);
-		}
-		if (listeners != null) {
-			fb.setListeners(listeners);
-		}
-		if (transactionTimeout != null) {
-			fb.setTransactionTimeout(transactionTimeout);
-		}
-		if (propagation != null) {
-			fb.setPropagation(propagation);
-		}
-		if (isolation != null) {
-			fb.setIsolation(isolation);
-		}
+		FaultTolerantStepBuilder<I, O> builder = new FaultTolerantStepBuilder<I, O>(new StepBuilder(name));
 
-		if (chunkCompletionPolicy != null) {
-			fb.setChunkCompletionPolicy(chunkCompletionPolicy);
-		}
 		if (commitInterval != null) {
-			fb.setCommitInterval(commitInterval);
+			builder.chunk(commitInterval);
 		}
-		if (taskExecutor != null) {
-			fb.setTaskExecutor(taskExecutor);
-		}
-		if (throttleLimit != null) {
-			fb.setThrottleLimit(throttleLimit);
-		}
-		if (itemReader != null) {
-			fb.setItemReader(itemReader);
-		}
-		if (itemProcessor != null) {
-			fb.setItemProcessor(itemProcessor);
-		}
-		if (itemWriter != null) {
-			fb.setItemWriter(itemWriter);
+		enhanceTaskletStepBuilder(builder);
+
+		builder.reader(itemReader);
+		builder.writer(itemWriter);
+		builder.processor(itemProcessor);
+
+		if (processorTransactional != null && !processorTransactional) {
+			builder.processorNonTransactional();
 		}
 
-		if (streams != null) {
-			fb.setStreams(streams);
+		for (SkipListener<I, O> listener : skipListeners) {
+			builder.listener(listener);
 		}
-	}
 
-	private void configureFaultTolerant(FaultTolerantStepFactoryBean<I, O> fb) {
-		if (cacheCapacity != null) {
-			fb.setCacheCapacity(cacheCapacity);
-		}
-		if (readerTransactionalQueue != null) {
-			fb.setIsReaderTransactionalQueue(readerTransactionalQueue);
-		}
-		if (processorTransactional != null) {
-			fb.setProcessorTransactional(processorTransactional);
-		}
-		if (retryLimit != null) {
-			fb.setRetryLimit(retryLimit);
-		}
-		if (skipLimit != null) {
-			fb.setSkipLimit(skipLimit);
-		}
+		registerItemListeners(builder);
+
 		if (skipPolicy != null) {
-			fb.setSkipPolicy(skipPolicy);
+			builder.skipPolicy(skipPolicy);
 		}
-		if (backOffPolicy != null) {
-			fb.setBackOffPolicy(backOffPolicy);
-		}
-		if (retryPolicy != null) {
-			fb.setRetryPolicy(retryPolicy);
-		}
-		if (retryContextCache != null) {
-			fb.setRetryContextCache(retryContextCache);
-		}
-		if (keyGenerator != null) {
-			fb.setKeyGenerator(keyGenerator);
+		else if (skipLimit!=null) {
+			builder.skipLimit(skipLimit);
+			for (Class<? extends Throwable> type : skippableExceptionClasses.keySet()) {
+				if (skippableExceptionClasses.get(type)) {
+					builder.skip(type);
+				}
+				else {
+					builder.noSkip(type);
+				}
+			}
 		}
 
 		if (retryListeners != null) {
-			fb.setRetryListeners(retryListeners);
+			for (RetryListener listener : retryListeners) {
+				builder.listener(listener);
+			}
 		}
-		if (skippableExceptionClasses != null) {
-			fb.setSkippableExceptionClasses(skippableExceptionClasses);
+
+		if (retryContextCache == null && cacheCapacity > 0) {
+			retryContextCache = new MapRetryContextCache(cacheCapacity);
 		}
-		if (retryableExceptionClasses != null) {
-			fb.setRetryableExceptionClasses(retryableExceptionClasses);
+		builder.retryContextCache(retryContextCache);
+		builder.keyGenerator(keyGenerator);
+		if (retryPolicy != null) {
+			builder.retryPolicy(retryPolicy);
 		}
+		else {
+			builder.retryLimit(retryLimit);
+			builder.backOffPolicy(backOffPolicy);
+			for (Class<? extends Throwable> type : retryableExceptionClasses.keySet()) {
+				if (retryableExceptionClasses.get(type)) {
+					builder.retry(type);
+				}
+				else {
+					builder.noRetry(type);
+				}
+			}
+		}
+
 		if (noRollbackExceptionClasses != null) {
-			fb.setNoRollbackExceptionClasses(noRollbackExceptionClasses);
+			for (Class<? extends Throwable> type : noRollbackExceptionClasses) {
+				builder.noRollback(type);
+			}
+		}
+
+		return builder.build();
+
+	}
+
+	private void registerItemListeners(SimpleStepBuilder<I, O> builder) {
+		for (ItemReadListener<I> listener : readListeners) {
+			builder.listener(listener);
+		}
+		for (ItemWriteListener<O> listener : writeListeners) {
+			builder.listener(listener);
+		}
+		for (ItemProcessListener<I, O> listener : processListeners) {
+			builder.listener(listener);
 		}
 	}
 
-	@SuppressWarnings("serial")
-	private void configureTaskletStep(TaskletStep ts) {
-		configureAbstractStep(ts);
-		if (listeners != null) {
-			List<ChunkListener> newListeners = new ArrayList<ChunkListener>();
-			for (StepListener listener : listeners) {
-				if (listener instanceof ChunkListener) {
-					newListeners.add((ChunkListener) listener);
-				}
-			}
-			ts.setChunkListeners(newListeners.toArray(new ChunkListener[0]));
+	@SuppressWarnings("unchecked")
+	private Step createSimpleStep() {
+		@SuppressWarnings("rawtypes")
+		SimpleStepBuilder builder = new SimpleStepBuilder(new StepBuilder(name));
+		if (commitInterval != null) {
+			builder.chunk(commitInterval);
 		}
-		if (tasklet != null) {
-			ts.setTasklet(tasklet);
+		enhanceTaskletStepBuilder(builder);
+		registerItemListeners(builder);
+		builder.reader(itemReader);
+		builder.writer(itemWriter);
+		builder.processor(itemProcessor);
+		builder.completionPolicy(chunkCompletionPolicy);
+		return builder.build();
+	}
+
+	private TaskletStep createTaskletStep() {
+		TaskletStepBuilder builder = new StepBuilder(name).tasklet(tasklet);
+		enhanceTaskletStepBuilder(builder);
+		return builder.build();
+	}
+
+	private void enhanceTaskletStepBuilder(AbstractTaskletStepBuilder<?> builder) {
+
+		enhanceCommonStep(builder);
+		for (ChunkListener listener : chunkListeners) {
+			builder.listener(listener);
+
 		}
-		if (taskExecutor != null) {
-			TaskExecutorRepeatTemplate repeatTemplate = new TaskExecutorRepeatTemplate();
-			repeatTemplate.setTaskExecutor(taskExecutor);
-			if (throttleLimit != null) {
-				repeatTemplate.setThrottleLimit(throttleLimit);
-			}
-			ts.setStepOperations(repeatTemplate);
+		builder.taskExecutor(taskExecutor);
+		if (throttleLimit != null) {
+			builder.throttleLimit(throttleLimit);
 		}
-		if (transactionManager != null) {
-			ts.setTransactionManager(transactionManager);
-		}
+		builder.transactionManager(transactionManager);
 		if (transactionTimeout != null || propagation != null || isolation != null
 				|| noRollbackExceptionClasses != null) {
 			DefaultTransactionAttribute attribute = new DefaultTransactionAttribute();
@@ -479,39 +428,35 @@ class StepParserStepFactoryBean<I, O> implements FactoryBean, BeanNameAware {
 			Collection<Class<? extends Throwable>> exceptions = noRollbackExceptionClasses == null ? new HashSet<Class<? extends Throwable>>()
 					: noRollbackExceptionClasses;
 			final BinaryExceptionClassifier classifier = new BinaryExceptionClassifier(exceptions, false);
-			ts.setTransactionAttribute(new DefaultTransactionAttribute(attribute) {
+			builder.transactionAttribute(new DefaultTransactionAttribute(attribute) {
 				@Override
 				public boolean rollbackOn(Throwable ex) {
 					return classifier.classify(ex);
 				}
 			});
 		}
+		if (streams != null) {
+			for (ItemStream stream : streams) {
+				builder.stream(stream);
+			}
+		}
+
 	}
 
-	@SuppressWarnings("serial")
-	private void configureFlowStep(FlowStep ts) {
-		configureAbstractStep(ts);
-		if (flow != null) {
-			ts.setFlow(flow);
-		}
+	private Step createFlowStep() {
+		FlowStepBuilder builder = new StepBuilder(name).flow(flow);
+		enhanceCommonStep(builder);
+		return builder.build();
 	}
 
-	@SuppressWarnings("serial")
-	private void configureJobStep(JobStep ts) throws Exception {
-		configureAbstractStep(ts);
-		if (job != null) {
-			ts.setJob(job);
-		}
-		if (jobParametersExtractor != null) {
-			ts.setJobParametersExtractor(jobParametersExtractor);
-		}
-		if (jobLauncher == null) {
-			SimpleJobLauncher jobLauncher = new SimpleJobLauncher();
-			jobLauncher.setJobRepository(jobRepository);
-			jobLauncher.afterPropertiesSet();
-			this.jobLauncher = jobLauncher;
-		}
-		ts.setJobLauncher(jobLauncher);
+	private Step createJobStep() throws Exception {
+
+		JobStepBuilder builder = new StepBuilder(name).job(job);
+		enhanceCommonStep(builder);
+		builder.parametersExtractor(jobParametersExtractor);
+		builder.launcher(jobLauncher);
+		return builder.build();
+
 	}
 
 	private void validateFaultTolerantSettings() {
@@ -526,14 +471,12 @@ class StepParserStepFactoryBean<I, O> implements FactoryBean, BeanNameAware {
 	}
 
 	/**
-	 * Check if a field is present then a second is also. If the
-	 * twoWayDependency flag is set then the opposite must also be true: if the
-	 * second value is present, the first must also be.
+	 * Check if a field is present then a second is also. If the twoWayDependency flag is set then the opposite must
+	 * also be true: if the second value is present, the first must also be.
 	 * 
 	 * @param dependentName the name of the first field
 	 * @param dependentValue the value of the first field
-	 * @param name the name of the other field (which should be absent if the
-	 * first is present)
+	 * @param name the name of the other field (which should be absent if the first is present)
 	 * @param value the value of the other field
 	 * @param twoWayDependency true if both depend on each other
 	 * @throws IllegalArgumentException if either condition is violated
@@ -559,6 +502,12 @@ class StepParserStepFactoryBean<I, O> implements FactoryBean, BeanNameAware {
 	private boolean isPresent(Object o) {
 		if (o instanceof Integer) {
 			return isPositive((Integer) o);
+		}
+		if (o instanceof Collection) {
+			return !((Collection<?>) o).isEmpty();
+		}
+		if (o instanceof Map) {
+			return !((Map<?, ?>) o).isEmpty();
 		}
 		return o != null;
 	}
@@ -589,8 +538,7 @@ class StepParserStepFactoryBean<I, O> implements FactoryBean, BeanNameAware {
 	// =========================================================
 
 	/**
-	 * Set the bean name property, which will become the name of the
-	 * {@link Step} when it is created.
+	 * Set the bean name property, which will become the name of the {@link Step} when it is created.
 	 * 
 	 * @see org.springframework.beans.factory.BeanNameAware#setBeanName(java.lang.String)
 	 */
@@ -678,8 +626,8 @@ class StepParserStepFactoryBean<I, O> implements FactoryBean, BeanNameAware {
 	// =========================================================
 
 	/**
-	 * Public setter for the flag to indicate that the step should be replayed
-	 * on a restart, even if successful the first time.
+	 * Public setter for the flag to indicate that the step should be replayed on a restart, even if successful the
+	 * first time.
 	 * 
 	 * @param allowStartIfComplete the shouldAllowStartIfComplete to set
 	 */
@@ -741,19 +689,47 @@ class StepParserStepFactoryBean<I, O> implements FactoryBean, BeanNameAware {
 	// =========================================================
 
 	/**
-	 * The listeners to inject into the {@link Step}. Any instance of
-	 * {@link StepListener} can be used, and will then receive callbacks at the
-	 * appropriate stage in the step.
+	 * The listeners to inject into the {@link Step}. Any instance of {@link StepListener} can be used, and will then
+	 * receive callbacks at the appropriate stage in the step.
 	 * 
 	 * @param listeners an array of listeners
 	 */
 	public void setListeners(StepListener[] listeners) {
-		this.listeners = listeners;
+		this.listeners = listeners; // useful for testing
+		for (StepListener listener : listeners) {
+			if (listener instanceof SkipListener) {
+				@SuppressWarnings("unchecked")
+				SkipListener<I, O> skipListener = (SkipListener<I, O>) listener;
+				skipListeners.add(skipListener);
+			}
+			if (listener instanceof StepExecutionListener) {
+				StepExecutionListener stepExecutionListener = (StepExecutionListener) listener;
+				stepExecutionListeners.add(stepExecutionListener);
+			}
+			if (listener instanceof ChunkListener) {
+				ChunkListener chunkListener = (ChunkListener) listener;
+				chunkListeners.add(chunkListener);
+			}
+			if (listener instanceof ItemReadListener) {
+				@SuppressWarnings("unchecked")
+				ItemReadListener<I> readListener = (ItemReadListener<I>) listener;
+				readListeners.add(readListener);
+			}
+			if (listener instanceof ItemWriteListener) {
+				@SuppressWarnings("unchecked")
+				ItemWriteListener<O> writeListener = (ItemWriteListener<O>) listener;
+				writeListeners.add(writeListener);
+			}
+			if (listener instanceof ItemProcessListener) {
+				@SuppressWarnings("unchecked")
+				ItemProcessListener<I, O> processListener = (ItemProcessListener<I, O>) listener;
+				processListeners.add(processListener);
+			}
+		}
 	}
 
 	/**
-	 * Exception classes that may not cause a rollback if encountered in the
-	 * right place.
+	 * Exception classes that may not cause a rollback if encountered in the right place.
 	 * 
 	 * @param noRollbackExceptionClasses the noRollbackExceptionClasses to set
 	 */
@@ -796,8 +772,8 @@ class StepParserStepFactoryBean<I, O> implements FactoryBean, BeanNameAware {
 	}
 
 	/**
-	 * A retry policy to apply when exceptions occur. If this is specified then
-	 * the retry limit and retryable exceptions will be ignored.
+	 * A retry policy to apply when exceptions occur. If this is specified then the retry limit and retryable exceptions
+	 * will be ignored.
 	 * 
 	 * @param retryPolicy the {@link RetryPolicy} to set
 	 */
@@ -813,9 +789,8 @@ class StepParserStepFactoryBean<I, O> implements FactoryBean, BeanNameAware {
 	}
 
 	/**
-	 * A key generator that can be used to compare items with previously
-	 * recorded items in a retry. Only used if the reader is a transactional
-	 * queue.
+	 * A key generator that can be used to compare items with previously recorded items in a retry. Only used if the
+	 * reader is a transactional queue.
 	 * 
 	 * @param keyGenerator the {@link KeyGenerator} to set
 	 */
@@ -828,28 +803,24 @@ class StepParserStepFactoryBean<I, O> implements FactoryBean, BeanNameAware {
 	// =========================================================
 
 	/**
-	 * Public setter for the capacity of the cache in the retry policy. If more
-	 * items than this fail without being skipped or recovered an exception will
-	 * be thrown. This is to guard against inadvertent infinite loops generated
+	 * Public setter for the capacity of the cache in the retry policy. If more items than this fail without being
+	 * skipped or recovered an exception will be thrown. This is to guard against inadvertent infinite loops generated
 	 * by item identity problems.<br/>
 	 * <p/>
-	 * The default value should be high enough and more for most purposes. To
-	 * breach the limit in a single-threaded step typically you have to have
-	 * this many failures in a single transaction. Defaults to the value in the
+	 * The default value should be high enough and more for most purposes. To breach the limit in a single-threaded step
+	 * typically you have to have this many failures in a single transaction. Defaults to the value in the
 	 * {@link MapRetryContextCache}.<br/>
 	 * 
-	 * @param cacheCapacity the cache capacity to set (greater than 0 else
-	 * ignored)
+	 * @param cacheCapacity the cache capacity to set (greater than 0 else ignored)
 	 */
 	public void setCacheCapacity(int cacheCapacity) {
 		this.cacheCapacity = cacheCapacity;
 	}
 
 	/**
-	 * Public setter for the {@link CompletionPolicy} applying to the chunk
-	 * level. A transaction will be committed when this policy decides to
-	 * complete. Defaults to a {@link SimpleCompletionPolicy} with chunk size
-	 * equal to the commitInterval property.
+	 * Public setter for the {@link CompletionPolicy} applying to the chunk level. A transaction will be committed when
+	 * this policy decides to complete. Defaults to a {@link SimpleCompletionPolicy} with chunk size equal to the
+	 * commitInterval property.
 	 * 
 	 * @param chunkCompletionPolicy the chunkCompletionPolicy to set
 	 */
@@ -858,8 +829,7 @@ class StepParserStepFactoryBean<I, O> implements FactoryBean, BeanNameAware {
 	}
 
 	/**
-	 * Set the commit interval. Either set this or the chunkCompletionPolicy but
-	 * not both.
+	 * Set the commit interval. Either set this or the chunkCompletionPolicy but not both.
 	 * 
 	 * @param commitInterval 1 by default
 	 */
@@ -868,9 +838,8 @@ class StepParserStepFactoryBean<I, O> implements FactoryBean, BeanNameAware {
 	}
 
 	/**
-	 * Flag to signal that the reader is transactional (usually a JMS consumer)
-	 * so that items are re-presented after a rollback. The default is false and
-	 * readers are assumed to be forward-only.
+	 * Flag to signal that the reader is transactional (usually a JMS consumer) so that items are re-presented after a
+	 * rollback. The default is false and readers are assumed to be forward-only.
 	 * 
 	 * @param isReaderTransactionalQueue the value of the flag
 	 */
@@ -879,10 +848,8 @@ class StepParserStepFactoryBean<I, O> implements FactoryBean, BeanNameAware {
 	}
 
 	/**
-	 * Flag to signal that the processor is transactional, in which case it
-	 * should be called for every item in every transaction. If false then we
-	 * can cache the processor results between transactions in the case of a
-	 * rollback.
+	 * Flag to signal that the processor is transactional, in which case it should be called for every item in every
+	 * transaction. If false then we can cache the processor results between transactions in the case of a rollback.
 	 * 
 	 * @param processorTransactional the value to set
 	 */
@@ -891,9 +858,8 @@ class StepParserStepFactoryBean<I, O> implements FactoryBean, BeanNameAware {
 	}
 
 	/**
-	 * Public setter for the retry limit. Each item can be retried up to this
-	 * limit. Note this limit includes the initial attempt to process the item,
-	 * therefore <code>retryLimit == 1</code> by default.
+	 * Public setter for the retry limit. Each item can be retried up to this limit. Note this limit includes the
+	 * initial attempt to process the item, therefore <code>retryLimit == 1</code> by default.
 	 * 
 	 * @param retryLimit the retry limit to set, must be greater or equal to 1.
 	 */
@@ -902,11 +868,9 @@ class StepParserStepFactoryBean<I, O> implements FactoryBean, BeanNameAware {
 	}
 
 	/**
-	 * Public setter for a limit that determines skip policy. If this value is
-	 * positive then an exception in chunk processing will cause the item to be
-	 * skipped and no exception propagated until the limit is reached. If it is
-	 * zero then all exceptions will be propagated from the chunk and cause the
-	 * step to abort.
+	 * Public setter for a limit that determines skip policy. If this value is positive then an exception in chunk
+	 * processing will cause the item to be skipped and no exception propagated until the limit is reached. If it is
+	 * zero then all exceptions will be propagated from the chunk and cause the step to abort.
 	 * 
 	 * @param skipLimit the value to set. Default is 0 (never skip).
 	 */
@@ -915,8 +879,7 @@ class StepParserStepFactoryBean<I, O> implements FactoryBean, BeanNameAware {
 	}
 
 	/**
-	 * Public setter for a skip policy. If this value is set then the skip limit
-	 * and skippable exceptions are ignored.
+	 * Public setter for a skip policy. If this value is set then the skip limit and skippable exceptions are ignored.
 	 * 
 	 * @param skipPolicy the {@link SkipPolicy} to set
 	 */
@@ -925,8 +888,8 @@ class StepParserStepFactoryBean<I, O> implements FactoryBean, BeanNameAware {
 	}
 
 	/**
-	 * Public setter for the {@link TaskExecutor}. If this is set, then it will
-	 * be used to execute the chunk processing inside the {@link Step}.
+	 * Public setter for the {@link TaskExecutor}. If this is set, then it will be used to execute the chunk processing
+	 * inside the {@link Step}.
 	 * 
 	 * @param taskExecutor the taskExecutor to set
 	 */
@@ -935,10 +898,8 @@ class StepParserStepFactoryBean<I, O> implements FactoryBean, BeanNameAware {
 	}
 
 	/**
-	 * Public setter for the throttle limit. This limits the number of tasks
-	 * queued for concurrent processing to prevent thread pools from being
-	 * overwhelmed. Defaults to
-	 * {@link TaskExecutorRepeatTemplate#DEFAULT_THROTTLE_LIMIT}.
+	 * Public setter for the throttle limit. This limits the number of tasks queued for concurrent processing to prevent
+	 * thread pools from being overwhelmed. Defaults to {@link TaskExecutorRepeatTemplate#DEFAULT_THROTTLE_LIMIT}.
 	 * 
 	 * @param throttleLimit the throttle limit to set.
 	 */
@@ -981,9 +942,8 @@ class StepParserStepFactoryBean<I, O> implements FactoryBean, BeanNameAware {
 	}
 
 	/**
-	 * Public setter for exception classes that when raised won't crash the job
-	 * but will result in transaction rollback and the item which handling
-	 * caused the exception will be skipped.
+	 * Public setter for exception classes that when raised won't crash the job but will result in transaction rollback
+	 * and the item which handling caused the exception will be skipped.
 	 * 
 	 * @param exceptionClasses
 	 */
@@ -1001,9 +961,8 @@ class StepParserStepFactoryBean<I, O> implements FactoryBean, BeanNameAware {
 	}
 
 	/**
-	 * The streams to inject into the {@link Step}. Any instance of
-	 * {@link ItemStream} can be used, and will then receive callbacks at the
-	 * appropriate stage in the step.
+	 * The streams to inject into the {@link Step}. Any instance of {@link ItemStream} can be used, and will then
+	 * receive callbacks at the appropriate stage in the step.
 	 * 
 	 * @param streams an array of listeners
 	 */
