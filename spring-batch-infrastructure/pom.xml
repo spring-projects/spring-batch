@@ -4,8 +4,8 @@
 	<artifactId>spring-batch-infrastructure</artifactId>
 	<packaging>jar</packaging>
 	<name>Infrastructure</name>
-	<description><![CDATA[The Spring Batch Infrastructure is a set of 
-	low-level components, interfaces and tools for batch processing 
+	<description><![CDATA[The Spring Batch Infrastructure is a set of
+	low-level components, interfaces and tools for batch processing
 	applications and optimisations.]]>
 	</description>
 	<url>http://static.springframework.org/spring-batch/${project.artifactId}</url>
@@ -213,6 +213,11 @@
 			<groupId>org.springframework</groupId>
 			<artifactId>spring-tx</artifactId>
 			<optional>true</optional>
+		</dependency>
+		<dependency>
+			 <groupId>org.springframework.data</groupId>
+			 <artifactId>spring-data-commons-core</artifactId>
+			 <optional>true</optional>
 		</dependency>
 		<dependency>
 			<groupId>org.codehaus.woodstox</groupId>
