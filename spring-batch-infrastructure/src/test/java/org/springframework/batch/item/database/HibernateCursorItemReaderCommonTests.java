@@ -1,8 +1,6 @@
 package org.springframework.batch.item.database;
 
 import org.hibernate.SessionFactory;
-import org.junit.runner.RunWith;
-import org.junit.runners.JUnit4;
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.sample.Foo;
@@ -10,7 +8,6 @@ import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;
 import org.springframework.orm.hibernate4.LocalSessionFactoryBean;
 
-@RunWith(JUnit4.class)
 public class HibernateCursorItemReaderCommonTests extends AbstractDatabaseItemStreamItemReaderTests {
 
 	@Override
