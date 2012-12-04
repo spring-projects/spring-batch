@@ -47,6 +47,7 @@ import org.springframework.batch.core.repository.dao.MapJobInstanceDao;
 import org.springframework.batch.core.repository.dao.MapStepExecutionDao;
 import org.springframework.batch.core.repository.support.SimpleJobRepository;
 import org.springframework.batch.core.step.AbstractStep;
+import org.springframework.batch.core.step.factory.SimpleStepFactoryBean;
 import org.springframework.batch.item.ItemProcessor;
 import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.ItemWriter;
@@ -272,7 +273,7 @@ public class SimpleStepFactoryBeanTests {
 		int expectedListenerCallCount = (items.length / commitInterval) + 1;
 		assertEquals(expectedListenerCallCount, chunkListener.afterCount);
 		assertEquals(expectedListenerCallCount, chunkListener.beforeCount);
-		assertTrue("Llistener order not as expected: " + writeListener.trail, writeListener.trail.startsWith("1234"));
+		assertTrue("Listener order not as expected: " + writeListener.trail, writeListener.trail.startsWith("1234"));
 	}
 
 	/**

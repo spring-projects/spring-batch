@@ -58,7 +58,7 @@
 	</bean>
 
 	<bean id="simpleStep"
-		class="org.springframework.batch.core.step.item.SimpleStepFactoryBean"
+		class="org.springframework.batch.core.step.factory.SimpleStepFactoryBean"
 		abstract="true">
 		<property name="transactionManager" ref="transactionManager" />
 		<property name="jobRepository" ref="jobRepository" />

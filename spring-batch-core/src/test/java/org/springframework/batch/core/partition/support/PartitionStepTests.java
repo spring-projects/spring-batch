@@ -50,6 +50,7 @@ public class PartitionStepTests {
 		MapJobRepositoryFactoryBean factory = new MapJobRepositoryFactoryBean();
 		jobRepository = (JobRepository) factory.getObject();
 		step.setJobRepository(jobRepository);
+		step.setName("partitioned");
 	}
 
 	@Test

@@ -13,10 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.springframework.batch.core.step.item;
-
-import java.util.Arrays;
-import java.util.List;
+package org.springframework.batch.core.step.factory;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -24,12 +21,12 @@ import org.springframework.batch.core.ChunkListener;
 import org.springframework.batch.core.ItemProcessListener;
 import org.springframework.batch.core.ItemReadListener;
 import org.springframework.batch.core.ItemWriteListener;
-import org.springframework.batch.core.SkipListener;
 import org.springframework.batch.core.Step;
 import org.springframework.batch.core.StepExecutionListener;
 import org.springframework.batch.core.StepListener;
-import org.springframework.batch.core.listener.StepListenerFactoryBean;
 import org.springframework.batch.core.repository.JobRepository;
+import org.springframework.batch.core.step.builder.SimpleStepBuilder;
+import org.springframework.batch.core.step.builder.StepBuilder;
 import org.springframework.batch.core.step.tasklet.TaskletStep;
 import org.springframework.batch.item.ItemProcessor;
 import org.springframework.batch.item.ItemReader;
@@ -40,7 +37,6 @@ import org.springframework.batch.repeat.RepeatOperations;
 import org.springframework.batch.repeat.exception.DefaultExceptionHandler;
 import org.springframework.batch.repeat.exception.ExceptionHandler;
 import org.springframework.batch.repeat.policy.SimpleCompletionPolicy;
-import org.springframework.batch.repeat.support.RepeatTemplate;
 import org.springframework.batch.repeat.support.TaskExecutorRepeatTemplate;
 import org.springframework.beans.factory.BeanNameAware;
 import org.springframework.beans.factory.FactoryBean;
@@ -50,14 +46,13 @@ import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.interceptor.DefaultTransactionAttribute;
 import org.springframework.transaction.interceptor.TransactionAttribute;
-import org.springframework.util.Assert;
 
 /**
- * Most common configuration options for simple steps should be found here. Use
- * this factory bean instead of creating a {@link Step} implementation manually.
+ * Most common configuration options for simple steps should be found here. Use this factory bean instead of creating a
+ * {@link Step} implementation manually.
  * 
- * This factory does not support configuration of fault-tolerant behavior, use
- * appropriate subclass of this factory bean to configure skip or retry.
+ * This factory does not support configuration of fault-tolerant behavior, use appropriate subclass of this factory bean
+ * to configure skip or retry.
  * 
  * @see FaultTolerantStepFactoryBean
  * 
@@ -66,8 +61,6 @@ import org.springframework.util.Assert;
  * 
  */
 public class SimpleStepFactoryBean<T, S> implements FactoryBean, BeanNameAware {
-
-	private static final int DEFAULT_COMMIT_INTERVAL = 1;
 
 	private String name;
 
@@ -123,9 +116,8 @@ public class SimpleStepFactoryBean<T, S> implements FactoryBean, BeanNameAware {
 	}
 
 	/**
-	 * Flag to signal that the reader is transactional (usually a JMS consumer)
-	 * so that items are re-presented after a rollback. The default is false and
-	 * readers are assumed to be forward-only.
+	 * Flag to signal that the reader is transactional (usually a JMS consumer) so that items are re-presented after a
+	 * rollback. The default is false and readers are assumed to be forward-only.
 	 * 
 	 * @param isReaderTransactionalQueue the value of the flag
 	 */
@@ -142,8 +134,7 @@ public class SimpleStepFactoryBean<T, S> implements FactoryBean, BeanNameAware {
 	}
 
 	/**
-	 * Set the bean name property, which will become the name of the
-	 * {@link Step} when it is created.
+	 * Set the bean name property, which will become the name of the {@link Step} when it is created.
 	 * 
 	 * @see org.springframework.beans.factory.BeanNameAware#setBeanName(java.lang.String)
 	 */
@@ -162,8 +153,7 @@ public class SimpleStepFactoryBean<T, S> implements FactoryBean, BeanNameAware {
 	/**
 	 * The timeout for an individual transaction in the step.
 	 * 
-	 * @param transactionTimeout the transaction timeout to set, defaults to
-	 * infinite
+	 * @param transactionTimeout the transaction timeout to set, defaults to infinite
 	 */
 	public void setTransactionTimeout(int transactionTimeout) {
 		this.transactionTimeout = transactionTimeout;
@@ -193,8 +183,8 @@ public class SimpleStepFactoryBean<T, S> implements FactoryBean, BeanNameAware {
 	}
 
 	/**
-	 * Public setter for the flag to indicate that the step should be replayed
-	 * on a restart, even if successful the first time.
+	 * Public setter for the flag to indicate that the step should be replayed on a restart, even if successful the
+	 * first time.
 	 * 
 	 * @param allowStartIfComplete the shouldAllowStartIfComplete to set
 	 */
@@ -224,9 +214,8 @@ public class SimpleStepFactoryBean<T, S> implements FactoryBean, BeanNameAware {
 	}
 
 	/**
-	 * The streams to inject into the {@link Step}. Any instance of
-	 * {@link ItemStream} can be used, and will then receive callbacks at the
-	 * appropriate stage in the step.
+	 * The streams to inject into the {@link Step}. Any instance of {@link ItemStream} can be used, and will then
+	 * receive callbacks at the appropriate stage in the step.
 	 * 
 	 * @param streams an array of listeners
 	 */
@@ -235,9 +224,8 @@ public class SimpleStepFactoryBean<T, S> implements FactoryBean, BeanNameAware {
 	}
 
 	/**
-	 * The listeners to inject into the {@link Step}. Any instance of
-	 * {@link StepListener} can be used, and will then receive callbacks at the
-	 * appropriate stage in the step.
+	 * The listeners to inject into the {@link Step}. Any instance of {@link StepListener} can be used, and will then
+	 * receive callbacks at the appropriate stage in the step.
 	 * 
 	 * @param listeners an array of listeners
 	 */
@@ -309,9 +297,8 @@ public class SimpleStepFactoryBean<T, S> implements FactoryBean, BeanNameAware {
 		return new DefaultTransactionAttribute(attribute) {
 
 			/**
-			 * Ignore the default behaviour and rollback on all exceptions that
-			 * bubble up to the tasklet level. The tasklet has to deal with the
-			 * rollback rules internally.
+			 * Ignore the default behaviour and rollback on all exceptions that bubble up to the tasklet level. The
+			 * tasklet has to deal with the rollback rules internally.
 			 */
 			@Override
 			public boolean rollbackOn(Throwable ex) {
@@ -328,10 +315,14 @@ public class SimpleStepFactoryBean<T, S> implements FactoryBean, BeanNameAware {
 	 * @see FactoryBean#getObject()
 	 */
 	public final Object getObject() throws Exception {
-		TaskletStep step = new TaskletStep(getName());
-		applyConfiguration(step);
-		step.afterPropertiesSet();
+		SimpleStepBuilder<T, S> builder = createBuilder(getName());
+		applyConfiguration(builder);
+		TaskletStep step = builder.build();
 		return step;
+	}
+
+	protected SimpleStepBuilder<T, S> createBuilder(String name) {
+		return new SimpleStepBuilder<T, S>(new StepBuilder(name));
 	}
 
 	public Class<TaskletStep> getObjectType() {
@@ -339,9 +330,8 @@ public class SimpleStepFactoryBean<T, S> implements FactoryBean, BeanNameAware {
 	}
 
 	/**
-	 * Returns true by default, but in most cases a {@link Step} should not be
-	 * treated as thread safe. Clients are recommended to create a new step for
-	 * each job execution.
+	 * Returns true by default, but in most cases a {@link Step} should not be treated as thread safe. Clients are
+	 * recommended to create a new step for each job execution.
 	 * 
 	 * @see org.springframework.beans.factory.FactoryBean#isSingleton()
 	 */
@@ -358,29 +348,18 @@ public class SimpleStepFactoryBean<T, S> implements FactoryBean, BeanNameAware {
 	}
 
 	/**
-	 * Set the commit interval. Either set this or the chunkCompletionPolicy but
-	 * not both.
+	 * Set the commit interval. Either set this or the chunkCompletionPolicy but not both.
 	 * 
 	 * @param commitInterval 1 by default
 	 */
 	public void setCommitInterval(int commitInterval) {
 		this.commitInterval = commitInterval;
 	}
-	
-	/**
-	 * Accessor for commit interval if needed in sub classes.
-	 * 
-	 * @return the commit interval
-	 */
-	protected int getCommitInterval() {
-		return commitInterval;
-	}
 
 	/**
-	 * Public setter for the {@link CompletionPolicy} applying to the chunk
-	 * level. A transaction will be committed when this policy decides to
-	 * complete. Defaults to a {@link SimpleCompletionPolicy} with chunk size
-	 * equal to the commitInterval property.
+	 * Public setter for the {@link CompletionPolicy} applying to the chunk level. A transaction will be committed when
+	 * this policy decides to complete. Defaults to a {@link SimpleCompletionPolicy} with chunk size equal to the
+	 * commitInterval property.
 	 * 
 	 * @param chunkCompletionPolicy the chunkCompletionPolicy to set
 	 */
@@ -389,8 +368,7 @@ public class SimpleStepFactoryBean<T, S> implements FactoryBean, BeanNameAware {
 	}
 
 	/**
-	 * Protected getter for the step operations to make them available in
-	 * subclasses.
+	 * Protected getter for the step operations to make them available in subclasses.
 	 * @return the step operations
 	 */
 	protected RepeatOperations getStepOperations() {
@@ -414,8 +392,7 @@ public class SimpleStepFactoryBean<T, S> implements FactoryBean, BeanNameAware {
 	}
 
 	/**
-	 * Protected getter for the chunk operations to make them available in
-	 * subclasses.
+	 * Protected getter for the chunk operations to make them available in subclasses.
 	 * @return the step operations
 	 */
 	protected RepeatOperations getChunkOperations() {
@@ -439,8 +416,8 @@ public class SimpleStepFactoryBean<T, S> implements FactoryBean, BeanNameAware {
 	}
 
 	/**
-	 * Public setter for the {@link TaskExecutor}. If this is set, then it will
-	 * be used to execute the chunk processing inside the {@link Step}.
+	 * Public setter for the {@link TaskExecutor}. If this is set, then it will be used to execute the chunk processing
+	 * inside the {@link Step}.
 	 * 
 	 * @param taskExecutor the taskExecutor to set
 	 */
@@ -457,202 +434,57 @@ public class SimpleStepFactoryBean<T, S> implements FactoryBean, BeanNameAware {
 	}
 
 	/**
-	 * Public setter for the throttle limit. This limits the number of tasks
-	 * queued for concurrent processing to prevent thread pools from being
-	 * overwhelmed. Defaults to
-	 * {@link TaskExecutorRepeatTemplate#DEFAULT_THROTTLE_LIMIT}.
+	 * Public setter for the throttle limit. This limits the number of tasks queued for concurrent processing to prevent
+	 * thread pools from being overwhelmed. Defaults to {@link TaskExecutorRepeatTemplate#DEFAULT_THROTTLE_LIMIT}.
 	 * @param throttleLimit the throttle limit to set.
 	 */
 	public void setThrottleLimit(int throttleLimit) {
 		this.throttleLimit = throttleLimit;
 	}
 
-	/**
-	 * @param step
-	 * 
-	 */
-	protected void applyConfiguration(TaskletStep step) {
+	protected void applyConfiguration(SimpleStepBuilder<T, S> builder) {
 
-		Assert.state(getItemReader()!=null, "ItemReader must be provided");
-		Assert.state(getItemWriter()!=null || getItemProcessor()!=null, "ItemWriter or ItemProcessor must be provided");
-		Assert.state(transactionManager!=null, "TransactionManager must be provided");
-
-		step.setTransactionManager(transactionManager);
-		step.setTransactionAttribute(getTransactionAttribute());
-		step.setJobRepository(jobRepository);
-		step.setStartLimit(startLimit);
-		step.setAllowStartIfComplete(allowStartIfComplete);
-
-		registerStreams(step, streams);
-
-		if (chunkOperations == null) {
-			RepeatTemplate repeatTemplate = new RepeatTemplate();
-			repeatTemplate.setCompletionPolicy(getChunkCompletionPolicy());
-			chunkOperations = repeatTemplate;
+		builder.reader(itemReader);
+		builder.processor(itemProcessor);
+		builder.writer(itemWriter);
+		for (StepExecutionListener listener : BatchListenerFactoryHelper.<StepExecutionListener> getListeners(
+				listeners, StepExecutionListener.class)) {
+			builder.listener(listener);
+		}
+		for (ChunkListener listener : BatchListenerFactoryHelper.<ChunkListener> getListeners(listeners,
+				ChunkListener.class)) {
+			builder.listener(listener);
+		}
+		for (ItemReadListener<T> listener : BatchListenerFactoryHelper.<ItemReadListener<T>> getListeners(listeners,
+				ItemReadListener.class)) {
+			builder.listener(listener);
+		}
+		for (ItemWriteListener<S> listener : BatchListenerFactoryHelper.<ItemWriteListener<S>> getListeners(listeners,
+				ItemWriteListener.class)) {
+			builder.listener(listener);
+		}
+		for (ItemProcessListener<T, S> listener : BatchListenerFactoryHelper.<ItemProcessListener<T, S>> getListeners(
+				listeners, ItemProcessListener.class)) {
+			builder.listener(listener);
+		}
+		builder.transactionManager(transactionManager);
+		builder.transactionAttribute(getTransactionAttribute());
+		builder.repository(jobRepository);
+		builder.startLimit(startLimit);
+		builder.allowStartIfComplete(allowStartIfComplete);
+		builder.chunk(commitInterval);
+		builder.completionPolicy(chunkCompletionPolicy);
+		builder.chunkOperations(chunkOperations);
+		builder.stepOperations(stepOperations);
+		builder.taskExecutor(taskExecutor);
+		builder.throttleLimit(throttleLimit);
+		builder.exceptionHandler(exceptionHandler);
+		if (isReaderTransactionalQueue) {
+			builder.readerIsTransactionalQueue();
+		}
+		for (ItemStream stream : streams) {
+			builder.stream(stream);
 		}
 
-		if (stepOperations == null) {
-
-			stepOperations = new RepeatTemplate();
-
-			if (taskExecutor != null) {
-				TaskExecutorRepeatTemplate repeatTemplate = new TaskExecutorRepeatTemplate();
-				repeatTemplate.setTaskExecutor(taskExecutor);
-				repeatTemplate.setThrottleLimit(throttleLimit);
-				stepOperations = repeatTemplate;
-			}
-
-			((RepeatTemplate) stepOperations).setExceptionHandler(exceptionHandler);
-
-		}
-
-		step.setStepOperations(stepOperations);
-
-		SimpleChunkProvider<T> chunkProvider = configureChunkProvider();
-
-		SimpleChunkProcessor<T, S> chunkProcessor = configureChunkProcessor();
-
-		registerItemListeners(chunkProvider, chunkProcessor);
-		registerStepListeners(step, chunkOperations);
-		registerStreams(step, itemReader, itemProcessor, itemWriter);
-
-		ChunkOrientedTasklet<T> tasklet = new ChunkOrientedTasklet<T>(chunkProvider, chunkProcessor);
-		tasklet.setBuffering(!isReaderTransactionalQueue());
-
-		step.setTasklet(tasklet);
-
 	}
-
-	/**
-	 * Register the streams with the step.
-	 * @param step the {@link TaskletStep}
-	 * @param streams the streams to register
-	 */
-	protected void registerStreams(TaskletStep step, ItemStream[] streams) {
-		step.setStreams(streams);
-	}
-
-	/**
-	 * Extension point for creating appropriate {@link ChunkProvider}. Return
-	 * value must subclass {@link SimpleChunkProvider} due to listener
-	 * registration.
-	 */
-	protected SimpleChunkProvider<T> configureChunkProvider() {
-		return new SimpleChunkProvider<T>(itemReader, chunkOperations);
-	}
-
-	/**
-	 * Extension point for creating appropriate {@link ChunkProcessor}. Return
-	 * value must subclass {@link SimpleChunkProcessor} due to listener
-	 * registration.
-	 */
-	protected SimpleChunkProcessor<T, S> configureChunkProcessor() {
-		return new SimpleChunkProcessor<T, S>(itemProcessor, itemWriter);
-	}
-
-	/**
-	 * @return a {@link CompletionPolicy} consistent with the commit interval
-	 * and injected policy (if present).
-	 */
-	private CompletionPolicy getChunkCompletionPolicy() {
-		Assert.state(!(chunkCompletionPolicy != null && commitInterval != 0),
-				"You must specify either a chunkCompletionPolicy or a commitInterval but not both.");
-		Assert.state(commitInterval >= 0, "The commitInterval must be positive or zero (for default value).");
-
-		if (chunkCompletionPolicy != null) {
-			return chunkCompletionPolicy;
-		}
-		if (commitInterval == 0) {
-			logger.info("Setting commit interval to default value (" + DEFAULT_COMMIT_INTERVAL + ")");
-			commitInterval = DEFAULT_COMMIT_INTERVAL;
-		}
-		return new SimpleCompletionPolicy(commitInterval);
-	}
-
-	private void registerStreams(TaskletStep step, ItemReader<? extends T> itemReader,
-			ItemProcessor<? super T, ? extends S> itemProcessor, ItemWriter<? super S> itemWriter) {
-		for (Object itemHandler : new Object[] { itemReader, itemWriter, itemProcessor }) {
-			if (itemHandler instanceof ItemStream) {
-				registerStreams(step, new ItemStream[] { (ItemStream) itemHandler });
-			}
-		}
-	}
-
-	/**
-	 * Register listeners with step and chunk.
-	 */
-	private void registerStepListeners(TaskletStep step, RepeatOperations chunkOperations) {
-
-		for (Object itemHandler : new Object[] { getItemReader(), itemWriter, itemProcessor }) {
-			if (StepListenerFactoryBean.isListener(itemHandler)) {
-				StepListener listener = StepListenerFactoryBean.getListener(itemHandler);
-				if (listener instanceof StepExecutionListener) {
-					step.registerStepExecutionListener((StepExecutionListener) listener);
-				}
-				if (listener instanceof ChunkListener) {
-					registerChunkListeners(step, listener);
-				}
-			}
-		}
-
-		step.setStepExecutionListeners(BatchListenerFactoryHelper.getListeners(listeners, StepExecutionListener.class)
-				.toArray(new StepExecutionListener[] {}));
-		
-		List<ChunkListener> chunkListeners = BatchListenerFactoryHelper.getListeners(listeners, ChunkListener.class);
-		for(ChunkListener chunkListener: chunkListeners){
-			registerChunkListeners(step,chunkListener);
-		}
-	}
-
-	protected void registerChunkListeners(TaskletStep step, StepListener listener) {
-		step.registerChunkListener((ChunkListener) listener);
-	}
-
-	/**
-	 * Register explicitly set ({@link #setListeners(StepListener[])}) item
-	 * listeners and auto-register reader, processor and writer if applicable
-	 */
-	private void registerItemListeners(SimpleChunkProvider<T> chunkProvider, SimpleChunkProcessor<T, S> chunkProcessor) {
-
-		StepListener[] listeners = getListeners();
-
-		// explicitly set item listeners
-		chunkProvider.setListeners(BatchListenerFactoryHelper.<ItemReadListener<T>> getListeners(listeners,
-				ItemReadListener.class));
-		chunkProvider.setListeners(BatchListenerFactoryHelper.<SkipListener<T, S>> getListeners(listeners,
-				SkipListener.class));
-
-		chunkProcessor.setListeners(BatchListenerFactoryHelper.<ItemProcessListener<T, S>> getListeners(listeners,
-				ItemProcessListener.class));
-		chunkProcessor.setListeners(BatchListenerFactoryHelper.<ItemWriteListener<S>> getListeners(listeners,
-				ItemWriteListener.class));
-		chunkProcessor.setListeners(BatchListenerFactoryHelper.<SkipListener<T, S>> getListeners(listeners,
-				SkipListener.class));
-
-		List<StepListener> listofListeners = Arrays.asList(listeners);
-		// auto-register reader, processor and writer
-		for (Object itemHandler : new Object[] { getItemReader(), getItemWriter(), getItemProcessor() }) {
-
-			if (listofListeners.contains(itemHandler)) {
-				continue;
-			}
-
-			if (StepListenerFactoryBean.isListener(itemHandler)) {
-				StepListener listener = StepListenerFactoryBean.getListener(itemHandler);
-				if (listener instanceof SkipListener<?,?>) {
-					chunkProvider.registerListener(listener);
-					chunkProcessor.registerListener(listener);
-					// already registered with both so avoid double-registering
-					continue;
-				}
-				if (listener instanceof ItemReadListener<?>) {
-					chunkProvider.registerListener(listener);
-				}
-				if (listener instanceof ItemProcessListener<?,?> || listener instanceof ItemWriteListener<?>) {
-					chunkProcessor.registerListener(listener);
-				}
-			}
-		}
-	}
-
 }

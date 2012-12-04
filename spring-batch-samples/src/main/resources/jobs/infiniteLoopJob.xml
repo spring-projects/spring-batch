@@ -27,7 +27,7 @@
 		<property name="allowStartIfComplete" value="true" />
 	</bean>
 	
-	<bean id="simpleStep" class="org.springframework.batch.core.step.item.FaultTolerantStepFactoryBean" abstract="true">
+	<bean id="simpleStep" class="org.springframework.batch.core.step.factory.FaultTolerantStepFactoryBean" abstract="true">
 		<property name="transactionManager" ref="transactionManager" />
 		<property name="jobRepository" ref="jobRepository" />
 	</bean>
