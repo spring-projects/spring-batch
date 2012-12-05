@@ -55,29 +55,39 @@ public abstract class StepBuilderHelper<B extends StepBuilderHelper<B>> {
 		this.properties = new CommonStepProperties(parent.properties);
 	}
 
-	public StepBuilderHelper<B> repository(JobRepository jobRepository) {
+	public B repository(JobRepository jobRepository) {
 		properties.jobRepository = jobRepository;
-		return this;
+		@SuppressWarnings("unchecked")
+		B result = (B) this;
+		return result;
 	}
 
-	public StepBuilderHelper<B> transactionManager(PlatformTransactionManager transactionManager) {
+	public B transactionManager(PlatformTransactionManager transactionManager) {
 		properties.transactionManager = transactionManager;
-		return this;
+		@SuppressWarnings("unchecked")
+		B result = (B) this;
+		return result;
 	}
 
-	public StepBuilderHelper<B> startLimit(int startLimit) {
+	public B startLimit(int startLimit) {
 		properties.startLimit = startLimit;
-		return this;
+		@SuppressWarnings("unchecked")
+		B result = (B) this;
+		return result;
 	}
 
-	public StepBuilderHelper<B> listener(StepExecutionListener listener) {
+	public B listener(StepExecutionListener listener) {
 		properties.addStepExecutionListener(listener);
-		return this;
+		@SuppressWarnings("unchecked")
+		B result = (B) this;
+		return result;
 	}
 
-	public StepBuilderHelper<B> allowStartIfComplete(boolean allowStartIfComplete) {
+	public B allowStartIfComplete(boolean allowStartIfComplete) {
 		properties.allowStartIfComplete = allowStartIfComplete;
-		return this;
+		@SuppressWarnings("unchecked")
+		B result = (B) this;
+		return result;
 	}
 
 	protected String getName() {
