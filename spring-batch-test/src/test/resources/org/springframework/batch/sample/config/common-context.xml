@@ -18,7 +18,7 @@
 		<property name="allowStartIfComplete" value="true" />
 	</bean>
 
-	<bean id="simpleStep" class="org.springframework.batch.core.step.item.SimpleStepFactoryBean"
+	<bean id="simpleStep" class="org.springframework.batch.core.step.factory.SimpleStepFactoryBean"
 		abstract="true">
 		<property name="transactionManager" ref="transactionManager" />
 		<property name="jobRepository" ref="jobRepository" />
@@ -26,7 +26,7 @@
 		<property name="commitInterval" value="1" />
 	</bean>
 	
-	<bean id="skipLimitStep" class="org.springframework.batch.core.step.item.FaultTolerantStepFactoryBean"
+	<bean id="skipLimitStep" class="org.springframework.batch.core.step.factory.FaultTolerantStepFactoryBean"
 		parent="simpleStep" abstract="true">
 		<property name="skipLimit" value="0" />
 	</bean>

@@ -32,7 +32,7 @@ import org.springframework.batch.item.support.CompositeItemStream;
  * @author Dave Syer
  * @since 2.0
  */
-class ChunkMonitor implements ItemStream {
+public class ChunkMonitor implements ItemStream {
 	
 	private Log logger = LogFactory.getLog(getClass());
 	

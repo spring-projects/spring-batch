@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.springframework.batch.core.step.item;
+package org.springframework.batch.core.step.factory;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -30,8 +30,7 @@ abstract class BatchListenerFactoryHelper {
 
 	public static <T> List<T> getListeners(StepListener[] listeners, Class<? super T> cls) {
 		List<T> list = new ArrayList<T>();
-		for (int i = 0; i < listeners.length; i++) {
-			StepListener stepListener = listeners[i];
+		for (StepListener stepListener : listeners) {
 			if (cls.isAssignableFrom(stepListener.getClass())) {
 				@SuppressWarnings("unchecked")
 				T listener = (T) stepListener;

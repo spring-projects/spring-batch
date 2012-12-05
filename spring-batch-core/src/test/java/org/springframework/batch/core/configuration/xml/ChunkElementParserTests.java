@@ -316,7 +316,6 @@ public class ChunkElementParserTests {
 		return policy;
 	}
 
-	@SuppressWarnings("unchecked")
 	private Object getNestedPathInStep(String stepName, ApplicationContext ctx, String path) throws Exception {
 		Map<String, Step> beans = ctx.getBeansOfType(Step.class);
 		assertTrue(beans.containsKey(stepName));
@@ -365,7 +364,6 @@ public class ChunkElementParserTests {
 		return (Collection<ItemStream>) ReflectionTestUtils.getField(compositeStream, "streams");
 	}
 
-	@SuppressWarnings("unchecked")
 	private Collection<RetryListener> getRetryListeners(String stepName, ApplicationContext ctx) throws Exception {
 		Map<String, Step> beans = ctx.getBeansOfType(Step.class);
 		assertTrue(beans.containsKey(stepName));

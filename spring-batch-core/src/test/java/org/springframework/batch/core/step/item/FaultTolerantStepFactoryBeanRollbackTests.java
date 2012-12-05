@@ -30,6 +30,7 @@ import org.springframework.batch.core.StepListener;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.repository.support.MapJobRepositoryFactoryBean;
 import org.springframework.batch.core.step.FatalStepExecutionException;
+import org.springframework.batch.core.step.factory.FaultTolerantStepFactoryBean;
 import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.support.ListItemReader;
 import org.springframework.batch.support.transaction.ResourcelessTransactionManager;
@@ -151,7 +152,6 @@ public class FaultTolerantStepFactoryBeanRollbackTests {
 		assertFalse(attr.rollbackOn(new Exception("")));
 	}
 
-	@SuppressWarnings("unchecked")
 	@Test
 	public void testNonDefaultRollbackRules() throws Exception {
 		TransactionAttributeEditor editor = new TransactionAttributeEditor();
