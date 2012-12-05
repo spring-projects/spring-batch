@@ -473,7 +473,7 @@ public class SimpleStepFactoryBean<T, S> implements FactoryBean, BeanNameAware {
 		builder.startLimit(startLimit);
 		builder.allowStartIfComplete(allowStartIfComplete);
 		builder.chunk(commitInterval);
-		builder.completionPolicy(chunkCompletionPolicy);
+		builder.chunk(chunkCompletionPolicy);
 		builder.chunkOperations(chunkOperations);
 		builder.stepOperations(stepOperations);
 		builder.taskExecutor(taskExecutor);

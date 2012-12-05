@@ -28,8 +28,12 @@ import org.springframework.batch.core.step.tasklet.TaskletStep;
 import org.springframework.transaction.PlatformTransactionManager;
 
 /**
+ * A base class and utility for other step builders providing access to common properties like job repository and
+ * transaction manager.
+ * 
  * @author Dave Syer
  * 
+ * @since 2.2
  */
 public abstract class StepBuilderHelper<B extends StepBuilderHelper<B>> {
 
@@ -42,8 +46,13 @@ public abstract class StepBuilderHelper<B extends StepBuilderHelper<B>> {
 		properties.name = name;
 	}
 
+	/**
+	 * Create a new builder initialized with any properties in the parent. The parent is copied, so it can be re-used.
+	 * 
+	 * @param parent a parent helper containing common step properties
+	 */
 	protected StepBuilderHelper(StepBuilderHelper<?> parent) {
-		this.properties = parent.properties;
+		this.properties = new CommonStepProperties(parent.properties);
 	}
 
 	public StepBuilderHelper<B> repository(JobRepository jobRepository) {
@@ -126,6 +135,17 @@ public abstract class StepBuilderHelper<B extends StepBuilderHelper<B>> {
 		private JobRepository jobRepository;
 
 		private PlatformTransactionManager transactionManager;
+
+		public CommonStepProperties() {
+		}
+
+		public CommonStepProperties(CommonStepProperties properties) {
+			this.name = properties.name;
+			this.startLimit = properties.startLimit;
+			this.allowStartIfComplete = properties.allowStartIfComplete;
+			this.jobRepository = properties.jobRepository;
+			this.transactionManager = properties.transactionManager;
+		}
 
 		public JobRepository getJobRepository() {
 			return jobRepository;

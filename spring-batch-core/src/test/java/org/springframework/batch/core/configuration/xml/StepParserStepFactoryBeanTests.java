@@ -35,6 +35,7 @@ import org.springframework.batch.core.partition.support.SimplePartitioner;
 import org.springframework.batch.core.partition.support.TaskExecutorPartitionHandler;
 import org.springframework.batch.core.step.JobRepositorySupport;
 import org.springframework.batch.core.step.StepSupport;
+import org.springframework.batch.core.step.builder.StepBuilderException;
 import org.springframework.batch.core.step.item.ChunkOrientedTasklet;
 import org.springframework.batch.core.step.tasklet.TaskletStep;
 import org.springframework.batch.item.ItemStream;
@@ -55,7 +56,7 @@ import org.springframework.transaction.annotation.Propagation;
  */
 public class StepParserStepFactoryBeanTests {
 
-	@Test(expected = IllegalStateException.class)
+	@Test(expected = StepBuilderException.class)
 	public void testNothingSet() throws Exception {
 		StepParserStepFactoryBean<Object, Object> fb = new StepParserStepFactoryBean<Object, Object>();
 		fb.getObject();
@@ -88,7 +89,7 @@ public class StepParserStepFactoryBeanTests {
 		assertTrue(stepOperations instanceof TaskExecutorRepeatTemplate);
 	}
 
-	@Test(expected = IllegalStateException.class)
+	@Test(expected = StepBuilderException.class)
 	public void testSkipLimitSet() throws Exception {
 		StepParserStepFactoryBean<Object, Object> fb = new StepParserStepFactoryBean<Object, Object>();
 		fb.setName("step");

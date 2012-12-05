@@ -391,7 +391,7 @@ class StepParserStepFactoryBean<I, O> implements FactoryBean, BeanNameAware {
 		builder.reader(itemReader);
 		builder.writer(itemWriter);
 		builder.processor(itemProcessor);
-		builder.completionPolicy(chunkCompletionPolicy);
+		builder.chunk(chunkCompletionPolicy);
 		return builder.build();
 	}
 
