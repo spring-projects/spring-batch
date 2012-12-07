@@ -77,7 +77,7 @@ public class MapJobRegistry implements JobRegistry, StepRegistry {
         return Collections.unmodifiableSet(map.keySet());
     }
 
-    public void register(String jobName, Collection<Step> steps) {
+    public void register(String jobName, Collection<Step> steps) throws DuplicateJobException {
         stepRegistry.register(jobName, steps);
     }
 
