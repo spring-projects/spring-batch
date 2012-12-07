@@ -1,6 +1,7 @@
 package org.springframework.batch.core.configuration.support;
 
 import org.springframework.batch.core.Step;
+import org.springframework.batch.core.configuration.DuplicateJobException;
 import org.springframework.batch.core.configuration.StepRegistry;
 import org.springframework.batch.core.launch.NoSuchJobException;
 import org.springframework.batch.core.step.NoSuchStepException;
@@ -23,17 +24,20 @@ public class MapStepRegistry implements StepRegistry {
 
     private final ConcurrentMap<String, Map<String, Step>> map = new ConcurrentHashMap<String, Map<String, Step>>();
 
-    public void register(String jobName, Collection<Step> steps) {
+    public void register(String jobName, Collection<Step> steps) throws DuplicateJobException {
         Assert.notNull(jobName, "The job name cannot be null.");
         Assert.notNull(steps, "The job steps cannot be null.");
 
-        unregisterStepsFromJob(jobName);
 
         final Map<String, Step> jobSteps = new HashMap<String, Step>();
         for (Step step : steps) {
             jobSteps.put(step.getName(), step);
         }
-        this.map.put(jobName, jobSteps);
+        final Object previousValue = map.putIfAbsent(jobName, jobSteps);
+        if (previousValue != null) {
+            throw new DuplicateJobException("A job configuration with this name [" + jobName
+                    + "] was already registered");
+        }
     }
 
     public void unregisterStepsFromJob(String jobName) {

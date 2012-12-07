@@ -22,8 +22,9 @@ public interface StepRegistry {
      *
      * @param jobName the give job name
      * @param steps   the job steps
+     * @throws DuplicateJobException if a job with the same job name has already been registered.
      */
-    void register(String jobName, Collection<Step> steps);
+    void register(String jobName, Collection<Step> steps) throws DuplicateJobException;
 
     /**
      * Unregisters all the steps of the given job. If the job is not registered,

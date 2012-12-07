@@ -3,6 +3,7 @@ package org.springframework.batch.core.configuration.support;
 import org.junit.Assert;
 import org.junit.Test;
 import org.springframework.batch.core.Step;
+import org.springframework.batch.core.configuration.DuplicateJobException;
 import org.springframework.batch.core.configuration.StepRegistry;
 import org.springframework.batch.core.launch.NoSuchJobException;
 import org.springframework.batch.core.step.NoSuchStepException;
@@ -12,6 +13,8 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashSet;
 
+import static junit.framework.Assert.fail;
+
 /**
  * @author Sebastien Gerard
  */
@@ -20,14 +23,14 @@ public class MapStepRegistryTests {
     private static final String EXCEPTION_NOT_THROWN_MSG = "An exception should have been thrown";
 
     @Test
-    public void registerStepEmptyCollection() {
+    public void registerStepEmptyCollection() throws DuplicateJobException {
         final StepRegistry stepRegistry = createRegistry();
 
         launchRegisterGetRegistered(stepRegistry, "myJob", getStepCollection());
     }
 
     @Test
-    public void registerStepNullJobName() {
+    public void registerStepNullJobName() throws DuplicateJobException {
         final StepRegistry stepRegistry = createRegistry();
 
         try {
@@ -38,7 +41,7 @@ public class MapStepRegistryTests {
     }
 
     @Test
-    public void registerStepNullSteps() {
+    public void registerStepNullSteps() throws DuplicateJobException {
         final StepRegistry stepRegistry = createRegistry();
 
         try {
@@ -49,7 +52,7 @@ public class MapStepRegistryTests {
     }
 
     @Test
-    public void registerStepGetStep() {
+    public void registerStepGetStep() throws DuplicateJobException {
         final StepRegistry stepRegistry = createRegistry();
 
         launchRegisterGetRegistered(stepRegistry, "myJob",
@@ -61,7 +64,7 @@ public class MapStepRegistryTests {
     }
 
     @Test
-    public void getJobNotRegistered() {
+    public void getJobNotRegistered() throws DuplicateJobException {
         final StepRegistry stepRegistry = createRegistry();
 
         final String aStepName = "myStep";
@@ -83,7 +86,7 @@ public class MapStepRegistryTests {
     }
 
     @Test
-    public void getStepNotRegistered() {
+    public void getStepNotRegistered() throws DuplicateJobException {
         final StepRegistry stepRegistry = createRegistry();
 
         final String jobName = "myJob";
@@ -98,7 +101,7 @@ public class MapStepRegistryTests {
     }
 
     @Test
-    public void registerRegisterAgainAndGet() {
+    public void registerTwice() throws DuplicateJobException {
         final StepRegistry stepRegistry = createRegistry();
 
         final String jobName = "myJob";
@@ -111,14 +114,16 @@ public class MapStepRegistryTests {
         // first registration
         launchRegisterGetRegistered(stepRegistry, jobName, stepsFirstRegistration);
 
-        // register again the job
-        launchRegisterGetRegistered(stepRegistry, jobName,
-                getStepCollection(
-                        createStep("myFourthStep"),
-                        createStep("lastOne")
-                ));
 
-        assertStepsNotRegistered(stepRegistry, jobName, stepsFirstRegistration);
+        // Second registration with same name should fail
+        try {
+            stepRegistry.register(jobName, getStepCollection(
+                    createStep("myFourthStep"),
+                    createStep("lastOne")));
+            fail("Should have failed with a "+DuplicateJobException.class.getSimpleName());
+        } catch (DuplicateJobException e) {
+            // OK
+        }
     }
 
     @Test
@@ -133,7 +138,7 @@ public class MapStepRegistryTests {
     }
 
     @Test
-    public void getStepNullStepName() throws NoSuchJobException {
+    public void getStepNullStepName() throws NoSuchJobException, DuplicateJobException {
         final StepRegistry stepRegistry = createRegistry();
 
         final String stepName = "myStep";
@@ -147,7 +152,7 @@ public class MapStepRegistryTests {
     }
 
     @Test
-    public void registerStepUnregisterJob() {
+    public void registerStepUnregisterJob() throws DuplicateJobException {
         final StepRegistry stepRegistry = createRegistry();
 
         final Collection<Step> steps = getStepCollection(
@@ -193,7 +198,8 @@ public class MapStepRegistryTests {
         return Arrays.asList(steps);
     }
 
-    protected void launchRegisterGetRegistered(StepRegistry stepRegistry, String jobName, Collection<Step> steps) {
+    protected void launchRegisterGetRegistered(StepRegistry stepRegistry, String jobName, Collection<Step> steps)
+            throws DuplicateJobException {
         stepRegistry.register(jobName, steps);
         assertStepsRegistered(stepRegistry, jobName, steps);
     }

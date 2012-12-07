@@ -181,6 +181,7 @@ public class DefaultJobLoader implements JobLoader, InitializingBean {
 				if (unregister) {
 					logger.debug("Unregistering job: " + jobName + " from context: " + context.getDisplayName());
 					jobRegistry.unregister(jobName);
+                    stepRegistry.unregisterStepsFromJob(jobName);
 				}
 
 				logger.debug("Registering job: " + jobName + " from context: " + context.getDisplayName());
