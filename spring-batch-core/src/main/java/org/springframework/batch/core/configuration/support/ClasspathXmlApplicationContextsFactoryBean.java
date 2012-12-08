@@ -51,7 +51,7 @@ public class ClasspathXmlApplicationContextsFactoryBean implements FactoryBean, 
 
 	/**
 	 * A set of resources to load using a
-	 * {@link ClassPathXmlApplicationContextFactory}. Each resource should be a
+	 * {@link GenericApplicationContextFactory}. Each resource should be a
 	 * Spring configuration file which is loaded into an application context
 	 * whose parent is the current context. In a configuration file the
 	 * resources can be given as a pattern (e.g.
@@ -116,7 +116,7 @@ public class ClasspathXmlApplicationContextsFactoryBean implements FactoryBean, 
 
 		List<ApplicationContextFactory> applicationContextFactories = new ArrayList<ApplicationContextFactory>();
 		for (Resource resource : resources) {
-			ClassPathXmlApplicationContextFactory factory = new ClassPathXmlApplicationContextFactory();
+			GenericApplicationContextFactory factory = new GenericApplicationContextFactory(resource);
 			factory.setCopyConfiguration(copyConfiguration);
 			if (beanFactoryPostProcessorClasses != null) {
 				factory.setBeanFactoryPostProcessorClasses(beanFactoryPostProcessorClasses);
@@ -124,7 +124,6 @@ public class ClasspathXmlApplicationContextsFactoryBean implements FactoryBean, 
 			if (beanPostProcessorExcludeClasses != null) {
 				factory.setBeanPostProcessorExcludeClasses(beanPostProcessorExcludeClasses);
 			}
-			factory.setResource(resource);
 			factory.setApplicationContext(applicationContext);
 			applicationContextFactories.add(factory);
 		}
