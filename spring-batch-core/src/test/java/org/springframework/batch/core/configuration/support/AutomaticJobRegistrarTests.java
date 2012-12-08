@@ -190,8 +190,7 @@ public class AutomaticJobRegistrarTests {
 	private void setUpApplicationContextFactories(Resource[] jobPaths, ApplicationContext parent) {
 		Collection<ApplicationContextFactory> applicationContextFactories = new ArrayList<ApplicationContextFactory>();
 		for (Resource resource : jobPaths) {
-			ClassPathXmlApplicationContextFactory factory = new ClassPathXmlApplicationContextFactory();
-			factory.setResource(resource);
+			GenericApplicationContextFactory factory = new GenericApplicationContextFactory(resource);
 			factory.setApplicationContext(parent);
 			applicationContextFactories.add(factory);
 		}

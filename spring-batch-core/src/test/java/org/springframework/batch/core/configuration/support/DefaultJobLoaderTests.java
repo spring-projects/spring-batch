@@ -38,8 +38,8 @@ public class DefaultJobLoaderTests {
 
 	@Test
 	public void testLoadWithExplicitName() throws Exception {
-		ClassPathXmlApplicationContextFactory factory = new ClassPathXmlApplicationContextFactory(
-				new ByteArrayResource(JOB_XML.getBytes()));
+		GenericApplicationContextFactory factory = new GenericApplicationContextFactory(new ByteArrayResource(
+				JOB_XML.getBytes()));
 		jobLoader.load(factory);
 		assertEquals(1, registry.getJobNames().size());
 		jobLoader.reload(factory);
@@ -48,8 +48,8 @@ public class DefaultJobLoaderTests {
 
 	@Test
 	public void testReload() throws Exception {
-		ClassPathXmlApplicationContextFactory factory = new ClassPathXmlApplicationContextFactory(
-				new ClassPathResource("trivial-context.xml", getClass()));
+		GenericApplicationContextFactory factory = new GenericApplicationContextFactory(new ClassPathResource(
+				"trivial-context.xml", getClass()));
 		jobLoader.load(factory);
 		assertEquals(1, registry.getJobNames().size());
 		jobLoader.reload(factory);
@@ -58,8 +58,8 @@ public class DefaultJobLoaderTests {
 
 	@Test
 	public void testReloadWithAutoRegister() throws Exception {
-		ClassPathXmlApplicationContextFactory factory = new ClassPathXmlApplicationContextFactory(
-				new ClassPathResource("trivial-context-autoregister.xml", getClass()));
+		GenericApplicationContextFactory factory = new GenericApplicationContextFactory(new ClassPathResource(
+				"trivial-context-autoregister.xml", getClass()));
 		jobLoader.load(factory);
 		assertEquals(1, registry.getJobNames().size());
 		jobLoader.reload(factory);
@@ -67,9 +67,8 @@ public class DefaultJobLoaderTests {
 	}
 
 	private static final String JOB_XML = String
-			.format(
-					"<beans xmlns='http://www.springframework.org/schema/beans' xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance' "
-							+ "xsi:schemaLocation='http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.1.xsd'><bean class='%s$StubJob'/></beans>",
+			.format("<beans xmlns='http://www.springframework.org/schema/beans' xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance' "
+					+ "xsi:schemaLocation='http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.1.xsd'><bean class='%s$StubJob'/></beans>",
 					DefaultJobLoaderTests.class.getName());
 
 	public static class StubJob implements Job {
