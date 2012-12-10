@@ -15,6 +15,15 @@
  */
 package org.springframework.batch.core.configuration.xml;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
 import org.springframework.batch.core.job.flow.FlowExecutionStatus;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.parsing.CompositeComponentDefinition;
@@ -27,8 +36,6 @@ import org.springframework.util.xml.DomUtils;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
-
-import java.util.*;
 
 /**
  * @author Dave Syer
@@ -182,14 +189,12 @@ public abstract class AbstractFlowParser extends AbstractSingleBeanDefinitionPar
 			reachableElements.add(nextAttribute);
 		}
 
-		@SuppressWarnings("unchecked")
 		List<Element> nextElements = DomUtils.getChildElementsByTagName(element, NEXT_ELE);
 		for (Element nextElement : nextElements) {
 			String toAttribute = nextElement.getAttribute(TO_ATTR);
 			reachableElements.add(toAttribute);
 		}
 
-		@SuppressWarnings("unchecked")
 		List<Element> stopElements = DomUtils.getChildElementsByTagName(element, STOP_ELE);
 		for (Element stopElement : stopElements) {
 			String restartAttribute = stopElement.getAttribute(RESTART_ATTR);
@@ -257,7 +262,6 @@ public abstract class AbstractFlowParser extends AbstractSingleBeanDefinitionPar
 		boolean transitionElementExists = false;
 		List<String> patterns = new ArrayList<String>();
 		for (String transitionName : new String[] { NEXT_ELE, STOP_ELE, END_ELE, FAIL_ELE }) {
-			@SuppressWarnings("unchecked")
 			List<Element> transitionElements = DomUtils.getChildElementsByTagName(element, transitionName);
 			for (Element transitionElement : transitionElements) {
 				verifyUniquePattern(transitionElement, patterns, element, parserContext);
