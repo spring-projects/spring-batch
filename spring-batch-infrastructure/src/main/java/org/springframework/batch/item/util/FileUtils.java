@@ -16,7 +16,11 @@
 
 package org.springframework.batch.item.util;
 
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
 
 import org.springframework.batch.item.ItemStreamException;
@@ -123,6 +127,32 @@ public final class FileUtils {
 			}
 		}
 
+	}
+
+	/**
+	 * Merges two files
+	 * 
+	 * @param source the file which needs to be copied
+	 * @param destination file to copy into
+	 */
+	public static boolean mergeFiles(File source, File destination) throws IOException {
+		try{
+			BufferedReader sourceReader = new BufferedReader(new FileReader(source));
+			BufferedWriter destWriter = new BufferedWriter(new FileWriter(destination, true));
+
+			String line = "";
+
+			while((line = sourceReader.readLine()) != null){
+				destWriter.append(line);
+				destWriter.newLine();
+			}
+			sourceReader.close();
+			destWriter.close();
+		}
+		catch(IOException e){
+			throw new ItemStreamException("Failed while merging two files");
+		}
+		return true;
 	}
 
 }
