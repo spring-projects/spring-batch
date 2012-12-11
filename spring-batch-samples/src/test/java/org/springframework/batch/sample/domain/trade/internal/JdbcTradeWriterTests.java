@@ -29,7 +29,7 @@ import org.springframework.batch.sample.domain.trade.Trade;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.jdbc.core.RowCallbackHandler;
-import org.springframework.jdbc.core.simple.SimpleJdbcTemplate;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.incrementer.AbstractDataFieldMaxValueIncrementer;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
@@ -39,13 +39,13 @@ import org.springframework.transaction.annotation.Transactional;
 @ContextConfiguration(locations = {"/data-source-context.xml"})
 public class JdbcTradeWriterTests {
 
-	private SimpleJdbcTemplate simpleJdbcTemplate;
+	private JdbcTemplate jdbcTemplate;
 
 	private JdbcTradeDao writer;
 
 	@Autowired
 	public void setDataSource(DataSource dataSource) {
-		this.simpleJdbcTemplate = new SimpleJdbcTemplate(dataSource);
+		this.jdbcTemplate = new JdbcTemplate(dataSource);
 		this.writer = new JdbcTradeDao();
 		this.writer.setDataSource(dataSource);
 
@@ -67,8 +67,8 @@ public class JdbcTradeWriterTests {
 		trade.setQuantity(5);
 		
 		writer.writeTrade(trade);
-		
-		simpleJdbcTemplate.getJdbcOperations().query("SELECT * FROM TRADE WHERE ISIN = '5647238492'", new RowCallbackHandler() {
+
+        jdbcTemplate.query("SELECT * FROM TRADE WHERE ISIN = '5647238492'", new RowCallbackHandler() {
 			public void processRow(ResultSet rs) throws SQLException {
 				assertEquals("testCustomer", rs.getString("CUSTOMER"));
 				assertEquals(new BigDecimal(Double.toString(99.69)), rs.getBigDecimal("PRICE"));

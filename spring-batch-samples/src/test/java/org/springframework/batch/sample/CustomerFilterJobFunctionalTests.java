@@ -35,7 +35,7 @@ import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.test.JobLauncherTestUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.RowCallbackHandler;
-import org.springframework.jdbc.core.simple.SimpleJdbcTemplate;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
@@ -48,7 +48,7 @@ public class CustomerFilterJobFunctionalTests {
 	private List<Customer> customers;
 	private int activeRow = 0;
 
-	private SimpleJdbcTemplate simpleJdbcTemplate;
+	private JdbcTemplate jdbcTemplate;
 	private Map<String, Double> credits = new HashMap<String, Double>();
 
 	@Autowired
@@ -56,15 +56,15 @@ public class CustomerFilterJobFunctionalTests {
 
 	@Autowired
 	public void setDataSource(DataSource dataSource) {
-		this.simpleJdbcTemplate = new SimpleJdbcTemplate(dataSource);
+		this.jdbcTemplate = new JdbcTemplate(dataSource);
 	}
 
 	@Before
 	public void onSetUp() throws Exception {
-		simpleJdbcTemplate.update("delete from TRADE");
-		simpleJdbcTemplate.update("delete from CUSTOMER where ID > 4");
-		simpleJdbcTemplate.update("update CUSTOMER set credit=100000");
-		List<Map<String, Object>> list = simpleJdbcTemplate.queryForList("select name, CREDIT from CUSTOMER");
+        jdbcTemplate.update("delete from TRADE");
+        jdbcTemplate.update("delete from CUSTOMER where ID > 4");
+        jdbcTemplate.update("update CUSTOMER set credit=100000");
+		List<Map<String, Object>> list = jdbcTemplate.queryForList("select name, CREDIT from CUSTOMER");
 		for (Map<String, Object> map : list) {
 			credits.put((String) map.get("NAME"), ((Number) map.get("CREDIT")).doubleValue());
 		}
@@ -72,8 +72,8 @@ public class CustomerFilterJobFunctionalTests {
 
 	@After
 	public void tearDown() throws Exception {
-		simpleJdbcTemplate.update("delete from TRADE");
-		simpleJdbcTemplate.update("delete from CUSTOMER where ID > 4");
+        jdbcTemplate.update("delete from TRADE");
+        jdbcTemplate.update("delete from CUSTOMER where ID > 4");
 	}
 
 	@Test
@@ -87,7 +87,7 @@ public class CustomerFilterJobFunctionalTests {
 
 		// check content of the customer table
 		activeRow = 0;
-		simpleJdbcTemplate.getJdbcOperations().query(GET_CUSTOMERS, new RowCallbackHandler() {
+        jdbcTemplate.query(GET_CUSTOMERS, new RowCallbackHandler() {
 
 			public void processRow(ResultSet rs) throws SQLException {
 				Customer customer = customers.get(activeRow++);
@@ -105,7 +105,7 @@ public class CustomerFilterJobFunctionalTests {
 
 	private Map<String, Object> getStepExecution(JobExecution jobExecution, String stepName) {
 		Long jobExecutionId = jobExecution.getId();
-		return simpleJdbcTemplate.queryForMap(
+		return jdbcTemplate.queryForMap(
 				"SELECT * from BATCH_STEP_EXECUTION where JOB_EXECUTION_ID = ? and STEP_NAME = ?", jobExecutionId,
 				stepName);
 	}

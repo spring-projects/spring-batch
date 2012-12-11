@@ -11,7 +11,7 @@ import org.springframework.batch.core.StepExecutionListener;
 import org.springframework.batch.core.scope.context.ChunkContext;
 import org.springframework.batch.core.step.tasklet.Tasklet;
 import org.springframework.batch.repeat.RepeatStatus;
-import org.springframework.jdbc.core.simple.SimpleJdbcTemplate;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.util.Assert;
 
 /**
@@ -22,7 +22,7 @@ public class ErrorLogTasklet implements Tasklet, StepExecutionListener {
 
 	protected final Log logger = LogFactory.getLog(getClass());
 
-	private SimpleJdbcTemplate simpleJdbcTemplate;
+	private JdbcTemplate jdbcTemplate;
 
 	private String jobName;
 
@@ -33,7 +33,7 @@ public class ErrorLogTasklet implements Tasklet, StepExecutionListener {
 	public RepeatStatus execute(StepContribution contribution, ChunkContext chunkContext) throws Exception {
 		Assert.notNull(this.stepName, "Step name not set.  Either this class was not registered as a listener "
 				+ "or the key 'stepName' was not found in the Job's ExecutionContext.");
-		this.simpleJdbcTemplate.update("insert into ERROR_LOG values (?, ?, '"+getSkipCount()+" records were skipped!')",
+		this.jdbcTemplate.update("insert into ERROR_LOG values (?, ?, '"+getSkipCount()+" records were skipped!')",
 				jobName, stepName);
 		return RepeatStatus.FINISHED;
 	}
@@ -54,7 +54,7 @@ public class ErrorLogTasklet implements Tasklet, StepExecutionListener {
 	}
 
 	public void setDataSource(DataSource dataSource) {
-		this.simpleJdbcTemplate = new SimpleJdbcTemplate(dataSource);
+		this.jdbcTemplate = new JdbcTemplate(dataSource);
 	}
 
 	public void beforeStep(StepExecution stepExecution) {

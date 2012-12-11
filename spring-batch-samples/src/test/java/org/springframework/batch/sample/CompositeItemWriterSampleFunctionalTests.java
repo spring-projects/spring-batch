@@ -19,7 +19,7 @@ import org.springframework.batch.sample.domain.trade.Trade;
 import org.springframework.batch.test.JobLauncherTestUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.RowCallbackHandler;
-import org.springframework.jdbc.core.simple.SimpleJdbcTemplate;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
@@ -35,21 +35,21 @@ public class CompositeItemWriterSampleFunctionalTests {
 			+ "Trade: [isin=UK21341EAH44,quantity=214,price=34.11,customer=customer4]"
 			+ "Trade: [isin=UK21341EAH45,quantity=215,price=35.11,customer=customer5]";
 
-	private SimpleJdbcTemplate simpleJdbcTemplate;
+	private JdbcTemplate jdbcTemplate;
 
 	@Autowired
 	private JobLauncherTestUtils jobLauncherTestUtils;
 
 	@Autowired
 	public void setDataSource(DataSource dataSource) {
-		this.simpleJdbcTemplate = new SimpleJdbcTemplate(dataSource);
+		this.jdbcTemplate = new JdbcTemplate(dataSource);
 	}
 
 	@Test
 	public void testJobLaunch() throws Exception {
 
-		simpleJdbcTemplate.update("DELETE from TRADE");
-		int before = simpleJdbcTemplate.queryForInt("SELECT COUNT(*) from TRADE");
+        jdbcTemplate.update("DELETE from TRADE");
+		int before = jdbcTemplate.queryForInt("SELECT COUNT(*) from TRADE");
 
 		jobLauncherTestUtils.launchJob();
 
@@ -70,12 +70,12 @@ public class CompositeItemWriterSampleFunctionalTests {
 			}
 		};
 
-		int after = simpleJdbcTemplate.queryForInt("SELECT COUNT(*) from TRADE");
+		int after = jdbcTemplate.queryForInt("SELECT COUNT(*) from TRADE");
 
 		assertEquals(before + 5, after);
-		
 
-		simpleJdbcTemplate.getJdbcOperations().query(GET_TRADES, new RowCallbackHandler() {
+
+        jdbcTemplate.query(GET_TRADES, new RowCallbackHandler() {
 			private int activeRow = 0;
 			public void processRow(ResultSet rs) throws SQLException {
 				Trade trade = trades.get(activeRow++);

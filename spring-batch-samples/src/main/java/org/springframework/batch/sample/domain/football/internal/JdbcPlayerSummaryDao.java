@@ -21,14 +21,18 @@ import java.util.List;
 import org.springframework.batch.item.ItemWriter;
 import org.springframework.batch.sample.domain.football.PlayerSummary;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
-import org.springframework.jdbc.core.simple.SimpleJdbcDaoSupport;
+import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 
-public class JdbcPlayerSummaryDao extends SimpleJdbcDaoSupport implements ItemWriter<PlayerSummary> {
+import javax.sql.DataSource;
+
+public class JdbcPlayerSummaryDao implements ItemWriter<PlayerSummary> {
 
 	private static final String INSERT_SUMMARY = "INSERT into PLAYER_SUMMARY(ID, YEAR_NO, COMPLETES, ATTEMPTS, PASSING_YARDS, PASSING_TD, "
 			+ "INTERCEPTIONS, RUSHES, RUSH_YARDS, RECEPTIONS, RECEPTIONS_YARDS, TOTAL_TD) "
 			+ "values(:id, :year, :completes, :attempts, :passingYards, :passingTd, "
 			+ ":interceptions, :rushes, :rushYards, :receptions, :receptionYards, :totalTd)";
+
+    private NamedParameterJdbcTemplate namedParameterJdbcTemplate;
 
 	public void write(List<? extends PlayerSummary> summaries) {
 
@@ -42,10 +46,11 @@ public class JdbcPlayerSummaryDao extends SimpleJdbcDaoSupport implements ItemWr
 					summary.getReceptions()).addValue("receptionYards", summary.getReceptionYards()).addValue(
 					"totalTd", summary.getTotalTd());
 
-			getSimpleJdbcTemplate().update(INSERT_SUMMARY, args);
-
+            namedParameterJdbcTemplate.update(INSERT_SUMMARY, args);
 		}
-
 	}
 
+    public void setDataSource(DataSource dataSource) {
+        this.namedParameterJdbcTemplate = new NamedParameterJdbcTemplate(dataSource);
+    }
 }

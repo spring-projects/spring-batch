@@ -29,7 +29,7 @@ import org.junit.runner.RunWith;
 import org.springframework.batch.sample.domain.football.Game;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.simple.ParameterizedRowMapper;
-import org.springframework.jdbc.core.simple.SimpleJdbcTemplate;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.transaction.annotation.Transactional;
@@ -46,11 +46,11 @@ public class JdbcGameDaoIntegrationTests {
 
 	private Game game = new Game();
 
-	private SimpleJdbcTemplate simpleJdbcTemplate;
+	private JdbcTemplate jdbcTemplate;
 
 	@Autowired
 	public void setDataSource(DataSource dataSource) {
-		this.simpleJdbcTemplate = new SimpleJdbcTemplate(dataSource);
+		this.jdbcTemplate = new JdbcTemplate(dataSource);
 		gameDao = new JdbcGameDao();
 		gameDao.setDataSource(dataSource);
 		gameDao.afterPropertiesSet();
@@ -82,7 +82,7 @@ public class JdbcGameDaoIntegrationTests {
 
 		gameDao.write(Collections.singletonList(game));
 
-		Game tempGame = simpleJdbcTemplate.queryForObject("SELECT * FROM GAMES where PLAYER_ID=? AND YEAR_NO=?",
+		Game tempGame = jdbcTemplate.queryForObject("SELECT * FROM GAMES where PLAYER_ID=? AND YEAR_NO=?",
 				new GameRowMapper(), "XXXXX00 ", game.getYear());
 		assertEquals(tempGame, game);
 	}
