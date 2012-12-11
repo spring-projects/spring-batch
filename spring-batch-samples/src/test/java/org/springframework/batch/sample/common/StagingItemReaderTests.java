@@ -14,7 +14,7 @@ import org.springframework.batch.core.JobInstance;
 import org.springframework.batch.core.JobParameters;
 import org.springframework.batch.core.StepExecution;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.jdbc.core.simple.SimpleJdbcTemplate;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.context.transaction.AfterTransaction;
@@ -30,7 +30,7 @@ import org.springframework.transaction.support.TransactionTemplate;
 @ContextConfiguration()
 public class StagingItemReaderTests {
 
-	private SimpleJdbcTemplate simpleJdbcTemplate;
+	private JdbcTemplate jdbcTemplate;
 
 	@Autowired
 	private PlatformTransactionManager transactionManager;
@@ -45,7 +45,7 @@ public class StagingItemReaderTests {
 
 	@Autowired
 	public void setDataSource(DataSource dataSource) {
-		this.simpleJdbcTemplate = new SimpleJdbcTemplate(dataSource);
+		this.jdbcTemplate = new JdbcTemplate(dataSource);
 	}
 
 	@BeforeTransaction
@@ -60,15 +60,15 @@ public class StagingItemReaderTests {
 	@AfterTransaction
 	public void onTearDownAfterTransaction() throws Exception {
 		reader.destroy();
-		simpleJdbcTemplate.update("DELETE FROM BATCH_STAGING");
+        jdbcTemplate.update("DELETE FROM BATCH_STAGING");
 	}
 
 	@Transactional
 	@Test
 	public void testReaderWithProcessorUpdatesProcessIndicator() throws Exception {
 
-		long id = simpleJdbcTemplate.queryForLong("SELECT MIN(ID) from BATCH_STAGING where JOB_ID=?", jobId);
-		String before = simpleJdbcTemplate.queryForObject("SELECT PROCESSED from BATCH_STAGING where ID=?",
+		long id = jdbcTemplate.queryForLong("SELECT MIN(ID) from BATCH_STAGING where JOB_ID=?", jobId);
+		String before = jdbcTemplate.queryForObject("SELECT PROCESSED from BATCH_STAGING where ID=?",
 				String.class, id);
 		assertEquals(StagingItemWriter.NEW, before);
 
@@ -77,10 +77,10 @@ public class StagingItemReaderTests {
 		assertEquals("FOO", item);
 		
 		StagingItemProcessor<String> updater = new StagingItemProcessor<String>();
-		updater.setJdbcTemplate(simpleJdbcTemplate);
+		updater.setJdbcTemplate(jdbcTemplate);
 		updater.process(wrapper);
 
-		String after = simpleJdbcTemplate.queryForObject("SELECT PROCESSED from BATCH_STAGING where ID=?",
+		String after = jdbcTemplate.queryForObject("SELECT PROCESSED from BATCH_STAGING where ID=?",
 				String.class, id);
 		assertEquals(StagingItemWriter.DONE, after);
 
@@ -102,8 +102,8 @@ public class StagingItemReaderTests {
 				return null;
 			}
 		});
-		long id = simpleJdbcTemplate.queryForLong("SELECT MIN(ID) from BATCH_STAGING where JOB_ID=?", jobId);
-		String before = simpleJdbcTemplate.queryForObject("SELECT PROCESSED from BATCH_STAGING where ID=?",
+		long id = jdbcTemplate.queryForLong("SELECT MIN(ID) from BATCH_STAGING where JOB_ID=?", jobId);
+		String before = jdbcTemplate.queryForObject("SELECT PROCESSED from BATCH_STAGING where ID=?",
 				String.class, id);
 		assertEquals(StagingItemWriter.DONE, before);
 	}
@@ -118,8 +118,8 @@ public class StagingItemReaderTests {
 		final Long idToUse = (Long) txTemplate.execute(new TransactionCallback() {
 			public Object doInTransaction(TransactionStatus transactionStatus) {
 
-				long id = simpleJdbcTemplate.queryForLong("SELECT MIN(ID) from BATCH_STAGING where JOB_ID=?", jobId);
-				String before = simpleJdbcTemplate.queryForObject("SELECT PROCESSED from BATCH_STAGING where ID=?",
+				long id = jdbcTemplate.queryForLong("SELECT MIN(ID) from BATCH_STAGING where JOB_ID=?", jobId);
+				String before = jdbcTemplate.queryForObject("SELECT PROCESSED from BATCH_STAGING where ID=?",
 						String.class, id);
 				assertEquals(StagingItemWriter.NEW, before);
 
@@ -132,7 +132,7 @@ public class StagingItemReaderTests {
 			}
 		});
 
-		String after = simpleJdbcTemplate.queryForObject("SELECT PROCESSED from BATCH_STAGING where ID=?",
+		String after = jdbcTemplate.queryForObject("SELECT PROCESSED from BATCH_STAGING where ID=?",
 				String.class, idToUse);
 		assertEquals(StagingItemWriter.NEW, after);
 

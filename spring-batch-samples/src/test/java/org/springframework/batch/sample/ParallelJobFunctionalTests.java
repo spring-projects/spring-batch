@@ -26,10 +26,10 @@ import org.springframework.batch.core.BatchStatus;
 import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.test.JobLauncherTestUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.jdbc.core.simple.SimpleJdbcTemplate;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
-import org.springframework.test.jdbc.SimpleJdbcTestUtils;
+import org.springframework.batch.support.JdbcTestUtils;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(locations = { "/simple-job-launcher-context.xml", "/jobs/parallelJob.xml",
@@ -39,18 +39,18 @@ public class ParallelJobFunctionalTests {
 	@Autowired
 	private JobLauncherTestUtils jobLauncherTestUtils;
 
-	private SimpleJdbcTemplate jdbcTemplate;
+	private JdbcTemplate jdbcTemplate;
 
 	@Autowired
 	public void setDataSource(DataSource dataSource) {
-		jdbcTemplate = new SimpleJdbcTemplate(dataSource);
+		jdbcTemplate = new JdbcTemplate(dataSource);
 	}
 
 	@Test
 	public void testLaunchJob() throws Exception {
-		int before = SimpleJdbcTestUtils.countRowsInTable(jdbcTemplate, "BATCH_STAGING");
+		int before = JdbcTestUtils.countRowsInTable(jdbcTemplate, "BATCH_STAGING");
 		JobExecution execution = jobLauncherTestUtils.launchJob();
-		int after = SimpleJdbcTestUtils.countRowsInTable(jdbcTemplate, "BATCH_STAGING");
+		int after = JdbcTestUtils.countRowsInTable(jdbcTemplate, "BATCH_STAGING");
 		assertEquals(BatchStatus.COMPLETED, execution.getStatus());
 		assertEquals(after - before, execution.getStepExecutions().iterator().next().getReadCount());
 	}

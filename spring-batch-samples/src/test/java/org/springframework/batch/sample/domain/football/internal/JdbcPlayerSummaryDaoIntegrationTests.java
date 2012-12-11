@@ -26,7 +26,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.batch.sample.domain.football.PlayerSummary;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.jdbc.core.simple.SimpleJdbcTemplate;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.transaction.annotation.Transactional;
@@ -43,12 +43,12 @@ public class JdbcPlayerSummaryDaoIntegrationTests {
 
 	private PlayerSummary summary;
 
-	private SimpleJdbcTemplate simpleJdbcTemplate;
+	private JdbcTemplate jdbcTemplate;
 
 	@Autowired
 	public void init(DataSource dataSource) {
 
-		this.simpleJdbcTemplate = new SimpleJdbcTemplate(dataSource);
+		this.jdbcTemplate = new JdbcTemplate(dataSource);
 		playerSummaryDao = new JdbcPlayerSummaryDao();
 		playerSummaryDao.setDataSource(dataSource);
 
@@ -71,7 +71,7 @@ public class JdbcPlayerSummaryDaoIntegrationTests {
 	@Before
 	public void onSetUpInTransaction() throws Exception {
 
-		simpleJdbcTemplate.getJdbcOperations().execute("delete from PLAYER_SUMMARY");
+        jdbcTemplate.execute("delete from PLAYER_SUMMARY");
 
 	}
 
@@ -81,7 +81,7 @@ public class JdbcPlayerSummaryDaoIntegrationTests {
 
 		playerSummaryDao.write(Collections.singletonList(summary));
 
-		PlayerSummary testSummary = simpleJdbcTemplate.queryForObject("SELECT * FROM PLAYER_SUMMARY",
+		PlayerSummary testSummary = jdbcTemplate.queryForObject("SELECT * FROM PLAYER_SUMMARY",
 				new PlayerSummaryMapper());
 
 		assertEquals(summary, testSummary);

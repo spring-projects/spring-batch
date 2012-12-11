@@ -28,7 +28,7 @@ import org.springframework.batch.core.converter.DefaultJobParametersConverter;
 import org.springframework.batch.support.PropertiesConverter;
 import org.springframework.batch.test.JobLauncherTestUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.jdbc.core.simple.SimpleJdbcTemplate;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.context.transaction.BeforeTransaction;
@@ -48,16 +48,16 @@ public class RestartFunctionalTests {
 	private JobLauncherTestUtils jobLauncherTestUtils;
 
 	// auto-injected attributes
-	private SimpleJdbcTemplate simpleJdbcTemplate;
+	private JdbcTemplate jdbcTemplate;
 
 	@Autowired
 	public void setDataSource(DataSource dataSource) {
-		this.simpleJdbcTemplate = new SimpleJdbcTemplate(dataSource);
+		this.jdbcTemplate = new JdbcTemplate(dataSource);
 	}
 
 	@BeforeTransaction
 	public void onTearDown() throws Exception {
-		simpleJdbcTemplate.update("DELETE FROM TRADE");
+        jdbcTemplate.update("DELETE FROM TRADE");
 	}
 
 	/**
@@ -72,7 +72,7 @@ public class RestartFunctionalTests {
 	@Test
 	public void testLaunchJob() throws Exception {
 
-		int before = simpleJdbcTemplate.queryForInt("SELECT COUNT(*) FROM TRADE");
+		int before = jdbcTemplate.queryForInt("SELECT COUNT(*) FROM TRADE");
 
 		JobExecution jobExecution = runJobForRestartTest();
 		assertEquals(BatchStatus.FAILED, jobExecution.getStatus());
@@ -85,14 +85,14 @@ public class RestartFunctionalTests {
 			throw new RuntimeException(ex);
 		}
 
-		int medium = simpleJdbcTemplate.queryForInt("SELECT COUNT(*) FROM TRADE");
+		int medium = jdbcTemplate.queryForInt("SELECT COUNT(*) FROM TRADE");
 		// assert based on commit interval = 2
 		assertEquals(before + 2, medium);
 
 		jobExecution = runJobForRestartTest();
 		assertEquals(BatchStatus.COMPLETED, jobExecution.getStatus());
 
-		int after = simpleJdbcTemplate.queryForInt("SELECT COUNT(*) FROM TRADE");
+		int after = jdbcTemplate.queryForInt("SELECT COUNT(*) FROM TRADE");
 
 		assertEquals(before + 5, after);
 	}

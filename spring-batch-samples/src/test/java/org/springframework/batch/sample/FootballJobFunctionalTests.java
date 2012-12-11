@@ -8,7 +8,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.batch.test.JobLauncherTestUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.jdbc.core.simple.SimpleJdbcTemplate;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
@@ -19,23 +19,23 @@ public class FootballJobFunctionalTests {
 	@Autowired
 	private JobLauncherTestUtils jobLauncherTestUtils;
 
-	private SimpleJdbcTemplate simpleJdbcTemplate;
+	private JdbcTemplate jdbcTemplate;
 
 	@Autowired
 	public void setDataSource(DataSource dataSource) {
-		this.simpleJdbcTemplate = new SimpleJdbcTemplate(dataSource);
+		this.jdbcTemplate = new JdbcTemplate(dataSource);
 	}
 
 	@Test
 	public void testLaunchJob() throws Exception {
-		
-		simpleJdbcTemplate.update("DELETE FROM PLAYERS");
-		simpleJdbcTemplate.update("DELETE FROM GAMES");
-		simpleJdbcTemplate.update("DELETE FROM PLAYER_SUMMARY");
+
+        jdbcTemplate.update("DELETE FROM PLAYERS");
+        jdbcTemplate.update("DELETE FROM GAMES");
+        jdbcTemplate.update("DELETE FROM PLAYER_SUMMARY");
 
 		jobLauncherTestUtils.launchJob();
 
-		int count = simpleJdbcTemplate.queryForInt("SELECT COUNT(*) from PLAYER_SUMMARY");
+		int count = jdbcTemplate.queryForInt("SELECT COUNT(*) from PLAYER_SUMMARY");
 		assertTrue(count > 0);
 
 	}

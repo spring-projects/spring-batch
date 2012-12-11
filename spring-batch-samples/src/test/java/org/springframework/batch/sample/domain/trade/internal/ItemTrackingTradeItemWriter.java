@@ -8,7 +8,7 @@ import javax.sql.DataSource;
 
 import org.springframework.batch.item.ItemWriter;
 import org.springframework.batch.sample.domain.trade.Trade;
-import org.springframework.jdbc.core.simple.SimpleJdbcTemplate;
+import org.springframework.jdbc.core.JdbcTemplate;
 
 public class ItemTrackingTradeItemWriter implements ItemWriter<Trade> {
 
@@ -16,10 +16,10 @@ public class ItemTrackingTradeItemWriter implements ItemWriter<Trade> {
 
 	private String writeFailureISIN;
 
-	private SimpleJdbcTemplate jdbcTemplate;
+	private JdbcTemplate jdbcTemplate;
 
 	public void setDataSource(DataSource dataSource) {
-		jdbcTemplate = new SimpleJdbcTemplate(dataSource);
+		jdbcTemplate = new JdbcTemplate(dataSource);
 	}
 
 	public void setWriteFailureISIN(String writeFailureISIN) {

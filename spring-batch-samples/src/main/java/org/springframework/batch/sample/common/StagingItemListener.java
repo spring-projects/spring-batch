@@ -22,7 +22,7 @@ import org.springframework.batch.core.listener.StepListenerSupport;
 import org.springframework.batch.item.ItemReader;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.dao.OptimisticLockingFailureException;
-import org.springframework.jdbc.core.simple.SimpleJdbcTemplate;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.util.Assert;
 
 /**
@@ -31,10 +31,10 @@ import org.springframework.util.Assert;
  */
 public class StagingItemListener extends StepListenerSupport<Long, Long> implements InitializingBean {
 
-	private SimpleJdbcTemplate jdbcTemplate;
+	private JdbcTemplate jdbcTemplate;
 
 	public void setDataSource(DataSource dataSource) {
-		jdbcTemplate = new SimpleJdbcTemplate(dataSource);
+		jdbcTemplate = new JdbcTemplate(dataSource);
 	}
 
 	public final void afterPropertiesSet() throws Exception {
