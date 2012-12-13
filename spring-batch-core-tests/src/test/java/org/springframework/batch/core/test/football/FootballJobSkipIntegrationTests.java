@@ -33,10 +33,10 @@ import org.springframework.batch.core.StepExecution;
 import org.springframework.batch.core.launch.JobLauncher;
 import org.springframework.batch.support.DatabaseType;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.jdbc.core.simple.SimpleJdbcTemplate;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
-import org.springframework.test.jdbc.SimpleJdbcTestUtils;
+import org.springframework.batch.support.JdbcTestUtils;
 
 /**
  * @author Dave Syer
@@ -49,7 +49,7 @@ public class FootballJobSkipIntegrationTests {
 	/** Logger */
 	private final Log logger = LogFactory.getLog(getClass());
 
-	private SimpleJdbcTemplate simpleJdbcTemplate;
+	private JdbcTemplate jdbcTemplate;
 
 	@Autowired
 	private JobLauncher jobLauncher;
@@ -61,13 +61,13 @@ public class FootballJobSkipIntegrationTests {
 
 	@Autowired
 	public void setDataSource(DataSource dataSource) throws Exception {
-		this.simpleJdbcTemplate = new SimpleJdbcTemplate(dataSource);
+		this.jdbcTemplate = new JdbcTemplate(dataSource);
 		databaseType = DatabaseType.fromMetaData(dataSource);
 	}
 
 	@Before
 	public void clear() {
-		SimpleJdbcTestUtils.deleteFromTables(simpleJdbcTemplate, "PLAYER_SUMMARY", "GAMES", "PLAYERS");
+		JdbcTestUtils.deleteFromTables(jdbcTemplate, "PLAYER_SUMMARY", "GAMES", "PLAYERS");
 	}
 
 	@Test
@@ -76,7 +76,7 @@ public class FootballJobSkipIntegrationTests {
 			if (databaseType == DatabaseType.POSTGRES || databaseType == DatabaseType.ORACLE) {
 				// Extra special test for these platforms (would have failed
 				// the job with UNKNOWN status in Batch 2.0):
-				simpleJdbcTemplate.update("SET CONSTRAINTS ALL DEFERRED");
+                jdbcTemplate.update("SET CONSTRAINTS ALL DEFERRED");
 			}
 		}
 		catch (Exception e) {

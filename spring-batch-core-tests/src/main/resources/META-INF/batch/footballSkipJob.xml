@@ -34,12 +34,12 @@
 	</bean>
 
 	<bean id="retryPolicy" class="org.springframework.retry.policy.SimpleRetryPolicy" scope="step">
-		<property name="maxAttempts" value="#{jobParameters['retry.limit']}" />
-		<property name="retryableExceptions">
+        <constructor-arg value="#{jobParameters['retry.limit']}"/>
+        <constructor-arg>
 			<map key-type="java.lang.Class">
 				<entry key="org.springframework.dao.DataAccessException" value="true"/>
 			</map>
-		</property>
+        </constructor-arg>
 	</bean>
 
 	<step id="summarizationStep" xmlns="http://www.springframework.org/schema/batch">
