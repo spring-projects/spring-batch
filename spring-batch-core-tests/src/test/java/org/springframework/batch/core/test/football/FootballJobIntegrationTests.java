@@ -32,10 +32,10 @@ import org.springframework.batch.core.JobParametersBuilder;
 import org.springframework.batch.core.StepExecution;
 import org.springframework.batch.core.launch.JobLauncher;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.jdbc.core.simple.SimpleJdbcTemplate;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
-import org.springframework.test.jdbc.SimpleJdbcTestUtils;
+import org.springframework.batch.support.JdbcTestUtils;
 
 /**
  * @author Dave Syer
@@ -48,7 +48,7 @@ public class FootballJobIntegrationTests {
 	/** Logger */
 	private final Log logger = LogFactory.getLog(getClass());
 
-	private SimpleJdbcTemplate simpleJdbcTemplate;
+	private JdbcTemplate jdbcTemplate;
 
 	@Autowired
 	private JobLauncher jobLauncher;
@@ -58,12 +58,12 @@ public class FootballJobIntegrationTests {
 
 	@Autowired
 	public void setDataSource(DataSource dataSource) {
-		this.simpleJdbcTemplate = new SimpleJdbcTemplate(dataSource);
+		this.jdbcTemplate = new JdbcTemplate(dataSource);
 	}
 
 	@Before
 	public void clear() {
-		SimpleJdbcTestUtils.deleteFromTables(simpleJdbcTemplate, "PLAYER_SUMMARY", "GAMES", "PLAYERS");
+		JdbcTestUtils.deleteFromTables(jdbcTemplate, "PLAYER_SUMMARY", "GAMES", "PLAYERS");
 	}
 
 	@Test

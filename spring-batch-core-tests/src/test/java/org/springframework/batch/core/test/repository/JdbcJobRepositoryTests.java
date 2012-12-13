@@ -41,7 +41,7 @@ import org.springframework.batch.core.JobParameters;
 import org.springframework.batch.core.repository.JobExecutionAlreadyRunningException;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.jdbc.core.simple.SimpleJdbcTemplate;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
@@ -57,7 +57,7 @@ public class JdbcJobRepositoryTests {
 
 	private List<Serializable> list = new ArrayList<Serializable>();
 
-	private SimpleJdbcTemplate simpleJdbcTemplate;
+	private JdbcTemplate jdbcTemplate;
 
 	@Autowired
 	private JobRepository repository;
@@ -67,32 +67,32 @@ public class JdbcJobRepositoryTests {
 
 	@Autowired
 	public void setDataSource(DataSource dataSource) {
-		this.simpleJdbcTemplate = new SimpleJdbcTemplate(dataSource);
+		this.jdbcTemplate = new JdbcTemplate(dataSource);
 	}
 
 	@Before
 	public void onSetUpInTransaction() throws Exception {
 		job = new JobSupport("test-job");
 		job.setRestartable(true);
-		simpleJdbcTemplate.update("DELETE FROM BATCH_STEP_EXECUTION_CONTEXT");
-		simpleJdbcTemplate.update("DELETE FROM BATCH_JOB_EXECUTION_CONTEXT");
-		simpleJdbcTemplate.update("DELETE FROM BATCH_STEP_EXECUTION");
-		simpleJdbcTemplate.update("DELETE FROM BATCH_JOB_EXECUTION");
-		simpleJdbcTemplate.update("DELETE FROM BATCH_JOB_PARAMS");
-		simpleJdbcTemplate.update("DELETE FROM BATCH_JOB_INSTANCE");
+        jdbcTemplate.update("DELETE FROM BATCH_STEP_EXECUTION_CONTEXT");
+        jdbcTemplate.update("DELETE FROM BATCH_JOB_EXECUTION_CONTEXT");
+        jdbcTemplate.update("DELETE FROM BATCH_STEP_EXECUTION");
+        jdbcTemplate.update("DELETE FROM BATCH_JOB_EXECUTION");
+        jdbcTemplate.update("DELETE FROM BATCH_JOB_PARAMS");
+        jdbcTemplate.update("DELETE FROM BATCH_JOB_INSTANCE");
 	}
 
 	@After
 	public void onTearDownAfterTransaction() throws Exception {
 		for (Long id : jobExecutionIds) {
-			simpleJdbcTemplate.update("DELETE FROM BATCH_JOB_EXECUTION_CONTEXT where JOB_EXECUTION_ID=?", id);
-			simpleJdbcTemplate.update("DELETE FROM BATCH_JOB_EXECUTION where JOB_EXECUTION_ID=?", id);
+            jdbcTemplate.update("DELETE FROM BATCH_JOB_EXECUTION_CONTEXT where JOB_EXECUTION_ID=?", id);
+            jdbcTemplate.update("DELETE FROM BATCH_JOB_EXECUTION where JOB_EXECUTION_ID=?", id);
 		}
 		for (Long id : jobIds) {
-			simpleJdbcTemplate.update("DELETE FROM BATCH_JOB_INSTANCE where JOB_INSTANCE_ID=?", id);
+            jdbcTemplate.update("DELETE FROM BATCH_JOB_INSTANCE where JOB_INSTANCE_ID=?", id);
 		}
 		for (Long id : jobIds) {
-			int count = simpleJdbcTemplate.queryForInt(
+			int count = jdbcTemplate.queryForInt(
 					"SELECT COUNT(*) FROM BATCH_JOB_INSTANCE where JOB_INSTANCE_ID=?", id);
 			assertEquals(0, count);
 		}
@@ -103,7 +103,7 @@ public class JdbcJobRepositoryTests {
 		job.setName("foo");
 		int before = 0;
 		JobExecution execution = repository.createJobExecution(job.getName(), new JobParameters());
-		int after = simpleJdbcTemplate.queryForInt("SELECT COUNT(*) FROM BATCH_JOB_INSTANCE");
+		int after = jdbcTemplate.queryForInt("SELECT COUNT(*) FROM BATCH_JOB_INSTANCE");
 		assertEquals(before + 1, after);
 		assertNotNull(execution.getId());
 	}
@@ -115,7 +115,7 @@ public class JdbcJobRepositoryTests {
 		JobExecution execution = repository.createJobExecution(job.getName(), new JobParameters());
 		execution.getExecutionContext().put("foo", "bar");
 		repository.updateExecutionContext(execution);
-		int after = simpleJdbcTemplate.queryForInt("SELECT COUNT(*) FROM BATCH_JOB_EXECUTION_CONTEXT");
+		int after = jdbcTemplate.queryForInt("SELECT COUNT(*) FROM BATCH_JOB_EXECUTION_CONTEXT");
 		assertEquals(before + 1, after);
 		assertNotNull(execution.getId());
 		JobExecution last = repository.getLastJobExecution(job.getName(), new JobParameters());
@@ -145,7 +145,7 @@ public class JdbcJobRepositoryTests {
 
 		assertNotNull(execution);
 
-		int after = simpleJdbcTemplate.queryForInt("SELECT COUNT(*) FROM BATCH_JOB_INSTANCE");
+		int after = jdbcTemplate.queryForInt("SELECT COUNT(*) FROM BATCH_JOB_INSTANCE");
 		assertNotNull(execution.getId());
 		assertEquals(before + 1, after);
 
@@ -166,7 +166,7 @@ public class JdbcJobRepositoryTests {
 		repository.update(execution);
 		execution.setStatus(BatchStatus.FAILED);
 
-		int before = simpleJdbcTemplate.queryForInt("SELECT COUNT(*) FROM BATCH_JOB_INSTANCE");
+		int before = jdbcTemplate.queryForInt("SELECT COUNT(*) FROM BATCH_JOB_INSTANCE");
 		assertEquals(1, before);
 
 		long t0 = System.currentTimeMillis();
@@ -179,7 +179,7 @@ public class JdbcJobRepositoryTests {
 		}
 		long t1 = System.currentTimeMillis();
 
-		int after = simpleJdbcTemplate.queryForInt("SELECT COUNT(*) FROM BATCH_JOB_INSTANCE");
+		int after = jdbcTemplate.queryForInt("SELECT COUNT(*) FROM BATCH_JOB_INSTANCE");
 		assertNotNull(execution.getId());
 		assertEquals(before, after);
 
