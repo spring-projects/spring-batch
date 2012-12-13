@@ -54,7 +54,7 @@ import org.springframework.util.StringUtils;
  * IllegalArgumentException will be thrown. This could be left to JdbcTemplate,
  * however, the exception will be fairly vague, and fails to highlight which
  * field caused the exception.
- * 
+ *
  * @author Lucas Ward
  * @author Dave Syer
  * @author Robert Kasanicky
@@ -93,7 +93,7 @@ public class JdbcJobInstanceDao extends AbstractJdbcBatchMetadataDao implements
 	 * In this jdbc implementation a job id is obtained by asking the
 	 * jobIncrementer (which is likely a sequence) for the next long value, and
 	 * then passing the Id and parameter values into an INSERT statement.
-	 * 
+	 *
 	 * @see JobInstanceDao#createJobInstance(String, JobParameters)
 	 * @throws IllegalArgumentException
 	 *             if any {@link JobParameters} fields are null.
@@ -106,6 +106,9 @@ public class JdbcJobInstanceDao extends AbstractJdbcBatchMetadataDao implements
 
 		Assert.state(getJobInstance(jobName, jobParameters) == null,
 				"JobInstance must not already exist");
+
+		// Use only identifying parameters when creating Job Instance
+		jobParameters = jobParameters.getIdentifyingJobParameters();
 
 		Long jobId = jobIncrementer.nextLongValue();
 
@@ -133,8 +136,13 @@ public class JdbcJobInstanceDao extends AbstractJdbcBatchMetadataDao implements
 		Collections.sort(keys);
 		for (String key : keys) {
 			JobParameter jobParameter = props.get(key);
-			String value = jobParameter.getValue()==null ? "" : jobParameter.toString();
-			stringBuffer.append(key + "=" + value + ";");
+
+			// should always be identifying.  Checking just for any unexpected
+			// case passing in jobParameters with non-identifying parameter.
+			if (jobParameter.isIdentifying()) {
+				String value = jobParameter.getValue()==null ? "" : jobParameter.toString();
+				stringBuffer.append(key + "=" + value + ";");
+			}
 		}
 
 		MessageDigest digest;
@@ -158,7 +166,7 @@ public class JdbcJobInstanceDao extends AbstractJdbcBatchMetadataDao implements
 	/**
 	 * Convenience method that inserts all parameters from the provided
 	 * JobParameters.
-	 * 
+	 *
 	 */
 	private void insertJobParameters(Long jobId, JobParameters jobParameters) {
 
@@ -201,16 +209,19 @@ public class JdbcJobInstanceDao extends AbstractJdbcBatchMetadataDao implements
 	/**
 	 * The job table is queried for <strong>any</strong> jobs that match the
 	 * given identifier, adding them to a list via the RowMapper callback.
-	 * 
+	 *
 	 * @see JobInstanceDao#getJobInstance(String, JobParameters)
 	 * @throws IllegalArgumentException
 	 *             if any {@link JobParameters} fields are null.
 	 */
 	public JobInstance getJobInstance(final String jobName,
-			final JobParameters jobParameters) {
+			JobParameters jobParameters) {
 
 		Assert.notNull(jobName, "Job name must not be null.");
 		Assert.notNull(jobParameters, "JobParameters must not be null.");
+
+		// Use only identifying parameters to find job instance
+		jobParameters = jobParameters.getIdentifyingJobParameters();
 
 		String jobKey = createJobKey(jobParameters);
 
@@ -237,7 +248,7 @@ public class JdbcJobInstanceDao extends AbstractJdbcBatchMetadataDao implements
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see
 	 * org.springframework.batch.core.repository.dao.JobInstanceDao#getJobInstance
 	 * (java.lang.Long)
@@ -282,7 +293,7 @@ public class JdbcJobInstanceDao extends AbstractJdbcBatchMetadataDao implements
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see
 	 * org.springframework.batch.core.repository.dao.JobInstanceDao#getJobNames
 	 * ()
@@ -299,7 +310,7 @@ public class JdbcJobInstanceDao extends AbstractJdbcBatchMetadataDao implements
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @seeorg.springframework.batch.core.repository.dao.JobInstanceDao#
 	 * getLastJobInstances(java.lang.String, int)
 	 */
@@ -335,7 +346,7 @@ public class JdbcJobInstanceDao extends AbstractJdbcBatchMetadataDao implements
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see
 	 * org.springframework.batch.core.repository.dao.JobInstanceDao#getJobInstance
 	 * (org.springframework.batch.core.JobExecution)
@@ -354,7 +365,7 @@ public class JdbcJobInstanceDao extends AbstractJdbcBatchMetadataDao implements
 	/**
 	 * Setter for {@link DataFieldMaxValueIncrementer} to be used when
 	 * generating primary keys for {@link JobInstance} instances.
-	 * 
+	 *
 	 * @param jobIncrementer
 	 *            the {@link DataFieldMaxValueIncrementer}
 	 */
@@ -369,7 +380,7 @@ public class JdbcJobInstanceDao extends AbstractJdbcBatchMetadataDao implements
 
 	/**
 	 * @author Dave Syer
-	 * 
+	 *
 	 */
 	private final class JobInstanceRowMapper implements
 			ParameterizedRowMapper<JobInstance> {

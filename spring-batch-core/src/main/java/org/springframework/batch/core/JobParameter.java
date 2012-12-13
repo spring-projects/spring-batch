@@ -22,11 +22,11 @@ import java.util.Date;
 /**
  * Domain representation of a parameter to a batch job. Only the following types
  * can be parameters: String, Long, Date, and Double.
- * 
+ *
  * @author Lucas Ward
  * @author Dave Syer
  * @since 2.0
- * 
+ *
  */
 public class JobParameter implements Serializable {
 
@@ -34,42 +34,86 @@ public class JobParameter implements Serializable {
 
 	private final ParameterType parameterType;
 
+	private final boolean identifying;
+
 	/**
 	 * Construct a new JobParameter as a String.
 	 */
 	public JobParameter(String parameter) {
-		this.parameter = parameter;
-		parameterType = ParameterType.STRING;
+		this(parameter, ParameterType.STRING, true);
 	}
 
 	/**
 	 * Construct a new JobParameter as a Long.
-	 * 
+	 *
 	 * @param parameter
 	 */
 	public JobParameter(Long parameter) {
-		this.parameter = parameter;
-		parameterType = ParameterType.LONG;
+		this(parameter, ParameterType.LONG, true);
 	}
 
 	/**
 	 * Construct a new JobParameter as a Date.
-	 * 
+	 *
 	 * @param parameter
 	 */
 	public JobParameter(Date parameter) {
-		this.parameter = parameter;
-		parameterType = ParameterType.DATE;
+		this(parameter, ParameterType.DATE, true);
 	}
 
 	/**
 	 * Construct a new JobParameter as a Double.
-	 * 
+	 *
 	 * @param parameter
 	 */
 	public JobParameter(Double parameter) {
+		this(parameter, ParameterType.DOUBLE, true);
+	}
+
+	/**
+	 * Construct a new JobParameter as a String,
+	 * with identifying flag
+	 */
+	public JobParameter(String parameter, boolean identifying) {
+		this(parameter, ParameterType.STRING, identifying);
+	}
+
+	/**
+	 * Construct a new JobParameter as a Long,
+	 * with identifying flag
+	 *
+	 * @param parameter
+	 */
+	public JobParameter(Long parameter, boolean identifying) {
+		this(parameter, ParameterType.LONG, identifying);
+	}
+
+	/**
+	 * Construct a new JobParameter as a Date,
+	 * with identifying flag
+	 *
+	 * @param parameter
+	 */
+	public JobParameter(Date parameter, boolean identifying) {
+		this(parameter, ParameterType.DATE, identifying);
+	}
+
+	/**
+	 * Construct a new JobParameter as a Double,
+	 * with identifying flag
+	 *
+	 * @param parameter
+	 */
+	public JobParameter(Double parameter, boolean identifying) {
+		this(parameter, ParameterType.DOUBLE, identifying);
+	}
+
+	protected JobParameter(Object parameter,
+							ParameterType parameterType,
+							boolean identifying) {
 		this.parameter = parameter;
-		parameterType = ParameterType.DOUBLE;
+		this.parameterType = parameterType;
+		this.identifying = identifying;
 	}
 
 	/**
@@ -92,28 +136,82 @@ public class JobParameter implements Serializable {
 		return parameterType;
 	}
 
+	public boolean isIdentifying() {
+		return identifying;
+	}
+
 	@Override
 	public boolean equals(Object obj) {
-		if (obj instanceof JobParameter == false) {
-			return false;
-		}
+
 
 		if (this == obj) {
 			return true;
 		}
+		if (obj == null) {
+			return false;
+		}
+		if (! (obj instanceof JobParameter)) {
+			return false;
+		}
 
 		JobParameter rhs = (JobParameter) obj;
-		return parameter==null ? rhs.parameter==null && parameterType==rhs.parameterType: parameter.equals(rhs.parameter);
+		if (identifying != rhs.identifying) {
+			return false;
+		}
+
+		if (parameterType != rhs.parameterType) {
+			return false;
+		}
+
+		if (parameter == null) {
+			if (rhs.parameter != null) {
+				return false;
+			}
+		} else if (!parameter.equals(rhs.parameter)) {
+			return false;
+		}
+
+		return true;
+	}
+
+	/**
+	 * Create a string presentation for JobParameter.
+	 *
+	 * Result string will be in the format of
+	 * <pre>[prefix]value</pre>
+	 *
+	 * A <code>(-)</code> prefix will be used if parameter is non-identifying.
+	 *
+	 * For String, Double and Long parameter, <code>value</code> will be the
+	 * result of <code>toString()</code> of the parameter.  For Date, <code>value</code>
+	 * will be the time in milliseconds.
+	 */
+	@Override
+	public String toString() {
+		if (parameter == null) {
+			return null;
+		}
+
+		String prefix = this.identifying? "" : "(-)";
+
+		if (parameterType == ParameterType.DATE) {
+			return prefix + ((Date) parameter).getTime();
+		} else {
+			return prefix + parameter;
+		}
 	}
 
 	@Override
-	public String toString() {
-		return parameter == null ? null : (parameterType == ParameterType.DATE ? "" + ((Date) parameter).getTime()
-				: parameter.toString());
-	}
-
 	public int hashCode() {
-		return 7 + 21 * (parameter == null ? parameterType.hashCode() : parameter.hashCode());
+		int hashCode = 7 + 21 * (parameter == null ? parameterType.hashCode() : parameter.hashCode());
+
+		// Make hashCode backward compatible by only altering hashCode for
+		// non-identifying parameters
+		if (!identifying) {
+			hashCode = hashCode * 21 + 7;
+		}
+
+		return hashCode;
 	}
 
 	/**

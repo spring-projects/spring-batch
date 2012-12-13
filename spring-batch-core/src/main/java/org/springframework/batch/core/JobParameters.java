@@ -21,6 +21,8 @@ import java.util.Date;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
+import org.springframework.batch.core.JobParameter.ParameterType;
+
 /**
  * Value object representing runtime parameters to a batch job. Because the
  * parameters have no individual meaning outside of the JobParameters they are
@@ -29,28 +31,30 @@ import java.util.Map;
  * another for equality, in order to determine if one JobParameters object
  * equals another. Furthermore, because these parameters will need to be
  * persisted, it is vital that the types added are restricted.
- * 
+ *
  * This class is immutable and therefore thread-safe.
- * 
+ *
  * @author Lucas Ward
  * @since 1.0
  */
 @SuppressWarnings("serial")
 public class JobParameters implements Serializable {
 
+	public static JobParameters EMPTY_JOB_PARAMETERS = new JobParameters();
+
 	private final Map<String,JobParameter> parameters;
-	
+
 	public JobParameters() {
 		this.parameters = new LinkedHashMap<String, JobParameter>();
 	}
-	
+
 	public JobParameters(Map<String,JobParameter> parameters) {
 		this.parameters = new LinkedHashMap<String,JobParameter>(parameters);
 	}
-	
+
 	/**
 	 * Typesafe Getter for the Long represented by the provided key.
-	 * 
+	 *
 	 * @param key The key to get a value for
 	 * @return The <code>Long</code> value
 	 */
@@ -61,14 +65,14 @@ public class JobParameters implements Serializable {
 		Object value = parameters.get(key).getValue();
 		return value==null ? 0L : ((Long)value).longValue();
 	}
-	
+
 	/**
 	 * Typesafe Getter for the Long represented by the provided key.  If the
 	 * key does not exist, the default value will be returned.
-	 * 
+	 *
 	 * @param key to return the value for
 	 * @param defaultValue to return if the value doesn't exist
-	 * @return the parameter represented by the provided key, defaultValue 
+	 * @return the parameter represented by the provided key, defaultValue
 	 * otherwise.
 	 */
 	public long getLong(String key, long defaultValue){
@@ -82,22 +86,29 @@ public class JobParameters implements Serializable {
 
 	/**
 	 * Typesafe Getter for the String represented by the provided key.
-	 * 
+	 *
 	 * @param key The key to get a value for
 	 * @return The <code>String</code> value
 	 */
 	public String getString(String key){
-		JobParameter value = parameters.get(key);
-		return value==null ? null : value.toString();
+		JobParameter param = parameters.get(key);
+		if (param==null || param.getValue() == null) {
+			return null;
+		}
+		if (param.getType() == ParameterType.DATE) {
+			return String.valueOf( ((Date) param.getValue()).getTime());
+		} else {
+			return param.getValue().toString();
+		}
 	}
-	
+
 	/**
 	 * Typesafe Getter for the String represented by the provided key.  If the
 	 * key does not exist, the default value will be returned.
-	 * 
+	 *
 	 * @param key to return the value for
 	 * @param defaultValue to return if the value doesn't exist
-	 * @return the parameter represented by the provided key, defaultValue 
+	 * @return the parameter represented by the provided key, defaultValue
 	 * otherwise.
 	 */
 	public String getString(String key, String defaultValue){
@@ -108,10 +119,10 @@ public class JobParameters implements Serializable {
 			return defaultValue;
 		}
 	}
-	
+
 	/**
 	 * Typesafe Getter for the Long represented by the provided key.
-	 * 
+	 *
 	 * @param key The key to get a value for
 	 * @return The <code>Double</code> value
 	 */
@@ -122,14 +133,14 @@ public class JobParameters implements Serializable {
 		Double value = (Double)parameters.get(key).getValue();
 		return value==null ? 0.0 : value.doubleValue();
 	}
-	
+
 	/**
 	 * Typesafe Getter for the Double represented by the provided key.  If the
 	 * key does not exist, the default value will be returned.
-	 * 
+	 *
 	 * @param key to return the value for
 	 * @param defaultValue to return if the value doesn't exist
-	 * @return the parameter represented by the provided key, defaultValue 
+	 * @return the parameter represented by the provided key, defaultValue
 	 * otherwise.
 	 */
 	public double getDouble(String key, double defaultValue){
@@ -140,24 +151,24 @@ public class JobParameters implements Serializable {
 			return defaultValue;
 		}
 	}
-	
+
 	/**
 	 * Typesafe Getter for the Date represented by the provided key.
-	 * 
+	 *
 	 * @param key The key to get a value for
 	 * @return The <code>java.util.Date</code> value
 	 */
 	public Date getDate(String key){
 		return this.getDate(key,null);
 	}
-	
+
 	/**
 	 * Typesafe Getter for the Date represented by the provided key.  If the
 	 * key does not exist, the default value will be returned.
-	 * 
+	 *
 	 * @param key to return the value for
 	 * @param defaultValue to return if the value doesn't exist
-	 * @return the parameter represented by the provided key, defaultValue 
+	 * @return the parameter represented by the provided key, defaultValue
 	 * otherwise.
 	 */
 	public Date getDate(String key, Date defaultValue){
@@ -168,42 +179,74 @@ public class JobParameters implements Serializable {
 			return defaultValue;
 		}
 	}
-	
+
 	/**
-	 * Get a map of all parameters, including string, long, and date. 
-	 * 
+	 * Get a map of all parameters, including string, long, and date.
+	 *
 	 * @return an unmodifiable map containing all parameters.
 	 */
 	public Map<String, JobParameter> getParameters(){
 		return new LinkedHashMap<String, JobParameter>(parameters);
 	}
-	
+
+	/**
+	 * Return an instance of JobParameters, which contains only identifying
+	 * parameters in current JobParameters.
+	 *
+	 * @return a instance of JobParameters contains only identifying parameters.
+	 */
+	public JobParameters getIdentifyingJobParameters() {
+
+		if (isAllParametersIdentifying()) {
+			return this;
+		} else {
+			Map<String, JobParameter> identifyingParams
+					= new LinkedHashMap<String, JobParameter>(parameters.size());
+			for (Map.Entry<String, JobParameter> entry : this.parameters.entrySet()) {
+				if (entry.getValue().isIdentifying()) {
+					identifyingParams.put(entry.getKey(), entry.getValue());
+				}
+			}
+
+			return new JobParameters(identifyingParams);
+		}
+	}
+
+	protected boolean isAllParametersIdentifying() {
+		for (Map.Entry<String, JobParameter> entry : this.parameters.entrySet()) {
+			if (! entry.getValue().isIdentifying()) {
+				return false;
+			}
+		}
+		return true;
+	}
+
 	/**
 	 * @return true if the parameters is empty, false otherwise.
 	 */
 	public boolean isEmpty(){
 		return parameters.isEmpty();
 	}
-	
+
 	@Override
 	public boolean equals(Object obj) {
 		if(obj instanceof JobParameters == false){
 			return false;
 		}
-		
+
 		if(obj == this){
 			return true;
 		}
-		
+
 		JobParameters rhs = (JobParameters)obj;
-		return this.parameters.equals(rhs.parameters); 
+		return this.parameters.equals(rhs.parameters);
 	}
-	
+
 	@Override
 	public int hashCode() {
 		return 17 + 23 * parameters.hashCode();
 	}
-	
+
 	@Override
 	public String toString() {
 		return parameters.toString();
