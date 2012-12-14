@@ -54,10 +54,10 @@ import org.springframework.util.ClassUtils;
 /**
  * Tests of regular usage for {@link FlatFileItemWriter} Exception cases will be in separate TestCase classes with
  * different <code>setUp</code> and <code>tearDown</code> methods
- * 
+ *
  * @author Robert Kasanicky
  * @author Dave Syer
- * 
+ *
  */
 public class FlatFileItemWriterTests {
 
@@ -115,6 +115,16 @@ public class FlatFileItemWriterTests {
 
 		return reader.readLine();
 	}
+	/*
+	 * Properly close the output file reader.
+	 */
+	private void closeReader() throws IOException {
+
+		if (reader != null) {
+			reader.close();
+			reader = null;
+		}
+	}
 
 	@Test
 	public void testWriteWithMultipleOpen() throws Exception {
@@ -132,7 +142,7 @@ public class FlatFileItemWriterTests {
 		writer.write(Collections.singletonList("test1"));
 		writer.close();
 		assertEquals("test1", readLine());
-		reader = null;
+		closeReader();
 		writer.setShouldDeleteIfExists(true);
 		writer.open(executionContext);
 		writer.write(Collections.singletonList("test2"));
@@ -146,7 +156,7 @@ public class FlatFileItemWriterTests {
 		writer.write(Collections.singletonList("test1"));
 		writer.close();
 		assertEquals("test1", readLine());
-		reader = null;
+		closeReader();
 		writer.open(executionContext);
 		writer.write(Collections.singletonList("test2"));
 		assertEquals("test1", readLine());
@@ -160,7 +170,7 @@ public class FlatFileItemWriterTests {
 		writer.write(Collections.singletonList("test1"));
 		writer.close();
 		assertEquals("test1", readLine());
-		reader = null;
+		closeReader();
 		writer.open(executionContext);
 		writer.write(Collections.singletonList(TEST_STRING));
 		writer.update(executionContext);
@@ -173,7 +183,7 @@ public class FlatFileItemWriterTests {
 		writer.open(executionContext);
 		writer.write(Collections.singletonList(TEST_STRING));
 		writer.close();
-		reader = null;
+		closeReader();
 		assertEquals("test1", readLine());
 		assertEquals(TEST_STRING, readLine());
 		assertEquals(TEST_STRING, readLine());
@@ -189,7 +199,7 @@ public class FlatFileItemWriterTests {
 
 	/**
 	 * Regular usage of <code>write(String)</code> method
-	 * 
+	 *
 	 * @throws Exception
 	 */
 	@Test
@@ -215,7 +225,7 @@ public class FlatFileItemWriterTests {
 
 	/**
 	 * Regular usage of <code>write(String)</code> method
-	 * 
+	 *
 	 * @throws Exception
 	 */
 	@Test
@@ -235,7 +245,7 @@ public class FlatFileItemWriterTests {
 
 	/**
 	 * Regular usage of <code>write(String)</code> method
-	 * 
+	 *
 	 * @throws Exception
 	 */
 	@Test
@@ -253,7 +263,7 @@ public class FlatFileItemWriterTests {
 
 	/**
 	 * Regular usage of <code>write(String[], LineDescriptor)</code> method
-	 * 
+	 *
 	 * @throws Exception
 	 */
 	@Test
@@ -545,7 +555,7 @@ public class FlatFileItemWriterTests {
 		assertEquals("a", readLine());
 		assertEquals("b", readLine());
 		assertEquals("test1", readLine());
-		reader = null;
+		closeReader();
 		writer.open(executionContext);
 		writer.write(Collections.singletonList("test2"));
 		assertEquals("a", readLine());
@@ -630,7 +640,7 @@ public class FlatFileItemWriterTests {
 		writer.open(executionContext);
 		writer.write(Collections.singletonList(TEST_STRING));
 		writer.close();
-		reader = null;
+		closeReader();
 		lineFromFile = readLine();
 		assertEquals("a", lineFromFile);
 		lineFromFile = readLine();
@@ -683,9 +693,9 @@ public class FlatFileItemWriterTests {
 	 */
 	public void testAppendToNotYetExistingFile() throws Exception {
 		Resource toBeCreated = new FileSystemResource("target/FlatFileItemWriterTests.out");
-		
-		outputFile = toBeCreated.getFile(); //enable easy content reading and auto-delete the file 
-		
+
+		outputFile = toBeCreated.getFile(); //enable easy content reading and auto-delete the file
+
 		assertFalse("output file does not exist yet", toBeCreated.exists());
 		writer.setResource(toBeCreated);
 		writer.setAppendAllowed(true);

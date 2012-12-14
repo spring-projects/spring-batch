@@ -28,7 +28,7 @@ import org.springframework.batch.core.StepExecution;
 
 /**
  * @author Dave Syer
- * 
+ *
  */
 public class MulticasterBatchListenerTests {
 
@@ -276,7 +276,7 @@ public class MulticasterBatchListenerTests {
 		catch (StepListenerFailedException e) {
 			// expected
 			String message = e.getCause().getMessage();
-			assertEquals("Wrong message: " + message, "foo", message);
+			assertEquals("Wrong message: " + message, "listener error", message);
 		}
 		assertEquals(1, count);
 	}
@@ -369,7 +369,7 @@ public class MulticasterBatchListenerTests {
 		catch (StepListenerFailedException e) {
 			// expected
 			String message = e.getCause().getMessage();
-			assertEquals("Wrong message: " + message, "foo", message);
+			assertEquals("Wrong message: " + message, "listener error", message);
 		}
 		assertEquals(1, count);
 	}
@@ -508,7 +508,7 @@ public class MulticasterBatchListenerTests {
 
 	/**
 	 * @author Dave Syer
-	 * 
+	 *
 	 */
 	private final class CountingStepListenerSupport extends StepListenerSupport<Integer, String> {
 		@Override
@@ -522,7 +522,7 @@ public class MulticasterBatchListenerTests {
 
 		/*
 		 * (non-Javadoc)
-		 * 
+		 *
 		 * @see
 		 * org.springframework.batch.core.listener.StepListenerSupport#afterChunk
 		 * ()
@@ -538,7 +538,7 @@ public class MulticasterBatchListenerTests {
 
 		/*
 		 * (non-Javadoc)
-		 * 
+		 *
 		 * @see
 		 * org.springframework.batch.core.listener.StepListenerSupport#afterRead
 		 * (java.lang.Object)
@@ -554,7 +554,7 @@ public class MulticasterBatchListenerTests {
 
 		/*
 		 * (non-Javadoc)
-		 * 
+		 *
 		 * @see
 		 * org.springframework.batch.core.listener.StepListenerSupport#afterStep
 		 * (org.springframework.batch.core.StepExecution)
@@ -570,7 +570,7 @@ public class MulticasterBatchListenerTests {
 
 		/*
 		 * (non-Javadoc)
-		 * 
+		 *
 		 * @see
 		 * org.springframework.batch.core.listener.StepListenerSupport#beforeChunk
 		 * ()
@@ -586,7 +586,7 @@ public class MulticasterBatchListenerTests {
 
 		/*
 		 * (non-Javadoc)
-		 * 
+		 *
 		 * @see
 		 * org.springframework.batch.core.listener.StepListenerSupport#beforeRead
 		 * ()
@@ -602,7 +602,7 @@ public class MulticasterBatchListenerTests {
 
 		/*
 		 * (non-Javadoc)
-		 * 
+		 *
 		 * @see
 		 * org.springframework.batch.core.listener.StepListenerSupport#beforeStep
 		 * (org.springframework.batch.core.StepExecution)
@@ -618,7 +618,7 @@ public class MulticasterBatchListenerTests {
 
 		/*
 		 * (non-Javadoc)
-		 * 
+		 *
 		 * @see
 		 * org.springframework.batch.core.listener.StepListenerSupport#afterWrite
 		 * (java.util.List)
@@ -634,7 +634,7 @@ public class MulticasterBatchListenerTests {
 
 		/*
 		 * (non-Javadoc)
-		 * 
+		 *
 		 * @see
 		 * org.springframework.batch.core.listener.StepListenerSupport#beforeWrite
 		 * (java.util.List)
@@ -650,7 +650,7 @@ public class MulticasterBatchListenerTests {
 
 		/*
 		 * (non-Javadoc)
-		 * 
+		 *
 		 * @see
 		 * org.springframework.batch.core.listener.StepListenerSupport#onWriteError
 		 * (java.lang.Exception, java.util.List)

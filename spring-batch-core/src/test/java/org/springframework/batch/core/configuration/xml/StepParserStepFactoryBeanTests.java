@@ -35,16 +35,17 @@ import org.springframework.batch.core.partition.support.SimplePartitioner;
 import org.springframework.batch.core.partition.support.TaskExecutorPartitionHandler;
 import org.springframework.batch.core.step.JobRepositorySupport;
 import org.springframework.batch.core.step.StepSupport;
+import org.springframework.batch.core.step.builder.StepBuilderException;
 import org.springframework.batch.core.step.item.ChunkOrientedTasklet;
 import org.springframework.batch.core.step.tasklet.TaskletStep;
 import org.springframework.batch.item.ItemStream;
 import org.springframework.batch.item.file.FlatFileItemReader;
 import org.springframework.batch.item.support.PassThroughItemProcessor;
 import org.springframework.batch.repeat.support.TaskExecutorRepeatTemplate;
-import org.springframework.batch.retry.listener.RetryListenerSupport;
 import org.springframework.batch.support.transaction.ResourcelessTransactionManager;
 import org.springframework.core.task.SimpleAsyncTaskExecutor;
 import org.springframework.core.task.SyncTaskExecutor;
+import org.springframework.retry.listener.RetryListenerSupport;
 import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Propagation;
@@ -55,7 +56,7 @@ import org.springframework.transaction.annotation.Propagation;
  */
 public class StepParserStepFactoryBeanTests {
 
-	@Test(expected = IllegalStateException.class)
+	@Test(expected = StepBuilderException.class)
 	public void testNothingSet() throws Exception {
 		StepParserStepFactoryBean<Object, Object> fb = new StepParserStepFactoryBean<Object, Object>();
 		fb.getObject();
@@ -64,6 +65,9 @@ public class StepParserStepFactoryBeanTests {
 	@Test
 	public void testOnlyTaskletSet() throws Exception {
 		StepParserStepFactoryBean<Object, Object> fb = new StepParserStepFactoryBean<Object, Object>();
+		fb.setName("step");
+		fb.setTransactionManager(new ResourcelessTransactionManager());
+		fb.setJobRepository(new JobRepositorySupport());
 		fb.setTasklet(new DummyTasklet());
 		Object step = fb.getObject();
 		assertTrue(step instanceof TaskletStep);
@@ -74,6 +78,9 @@ public class StepParserStepFactoryBeanTests {
 	@Test
 	public void testOnlyTaskletTaskExecutor() throws Exception {
 		StepParserStepFactoryBean<Object, Object> fb = new StepParserStepFactoryBean<Object, Object>();
+		fb.setName("step");
+		fb.setTransactionManager(new ResourcelessTransactionManager());
+		fb.setJobRepository(new JobRepositorySupport());
 		fb.setTasklet(new DummyTasklet());
 		fb.setTaskExecutor(new SimpleAsyncTaskExecutor());
 		Object step = fb.getObject();
@@ -82,9 +89,10 @@ public class StepParserStepFactoryBeanTests {
 		assertTrue(stepOperations instanceof TaskExecutorRepeatTemplate);
 	}
 
-	@Test(expected = IllegalStateException.class)
+	@Test(expected = StepBuilderException.class)
 	public void testSkipLimitSet() throws Exception {
 		StepParserStepFactoryBean<Object, Object> fb = new StepParserStepFactoryBean<Object, Object>();
+		fb.setName("step");
 		fb.setSkipLimit(5);
 		fb.getObject();
 	}
@@ -140,6 +148,7 @@ public class StepParserStepFactoryBeanTests {
 		fb.setItemReader(new DummyItemReader());
 		fb.setItemWriter(new DummyItemWriter());
 		fb.setStreams(new ItemStream[] { new FlatFileItemReader<Object>() });
+		fb.setHasChunkElement(true);
 
 		Object step = fb.getObject();
 		assertTrue(step instanceof TaskletStep);
@@ -147,7 +156,7 @@ public class StepParserStepFactoryBeanTests {
 		assertTrue(tasklet instanceof ChunkOrientedTasklet<?>);
 	}
 
-	@Test(expected = IllegalStateException.class)
+	@Test(expected = IllegalArgumentException.class)
 	public void testFaultTolerantStepAll() throws Exception {
 		StepParserStepFactoryBean<Object, Object> fb = new StepParserStepFactoryBean<Object, Object>();
 		fb.setBeanName("step1");
@@ -172,6 +181,7 @@ public class StepParserStepFactoryBeanTests {
 		fb.setRetryListeners(new RetryListenerSupport());
 		fb.setSkippableExceptionClasses(new HashMap<Class<? extends Throwable>, Boolean>());
 		fb.setRetryableExceptionClasses(new HashMap<Class<? extends Throwable>, Boolean>());
+		fb.setHasChunkElement(true);
 
 		Object step = fb.getObject();
 		assertTrue(step instanceof TaskletStep);

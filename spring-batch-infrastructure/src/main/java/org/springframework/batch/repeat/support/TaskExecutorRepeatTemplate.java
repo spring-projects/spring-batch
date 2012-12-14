@@ -258,7 +258,7 @@ public class TaskExecutorRepeatTemplate extends RepeatTemplate {
 				result = callback.doInIteration(context);
 
 			}
-			catch (Exception e) {
+			catch (Throwable e) {
 				error = e;
 			}
 			finally {

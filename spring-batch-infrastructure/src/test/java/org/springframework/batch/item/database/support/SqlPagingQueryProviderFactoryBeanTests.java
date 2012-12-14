@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2008 the original author or authors.
+ * Copyright 2006-2012 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,10 +19,14 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
+import java.util.LinkedHashMap;
+import java.util.Map;
+
 import javax.sql.DataSource;
 
 import org.easymock.EasyMock;
 import org.junit.Test;
+import org.springframework.batch.item.database.Order;
 import org.springframework.batch.item.database.PagingQueryProvider;
 import org.springframework.batch.support.DatabaseType;
 import org.springframework.batch.support.DatabaseTypeTestUtils;
@@ -30,6 +34,7 @@ import org.springframework.jdbc.support.MetaDataAccessException;
 
 /**
  * @author Dave Syer
+ * @author Michael Minella
  */
 public class SqlPagingQueryProviderFactoryBeanTests {
 
@@ -39,7 +44,9 @@ public class SqlPagingQueryProviderFactoryBeanTests {
 		factory.setSelectClause("id, name, age");
 		factory.setFromClause("foo");
 		factory.setWhereClause("bar = 1");
-		factory.setSortKey("id");
+		Map<String, Order> sortKeys = new LinkedHashMap<String, Order>();
+		sortKeys.put("id", Order.ASCENDING);
+		factory.setSortKeys(sortKeys);
 		DataSource dataSource = DatabaseTypeTestUtils.getMockDataSource(DatabaseType.HSQL.getProductName(), "100.0.0");
 		factory.setDataSource(dataSource);
 		EasyMock.replay(dataSource);
@@ -70,7 +77,7 @@ public class SqlPagingQueryProviderFactoryBeanTests {
 
 	@Test(expected=IllegalArgumentException.class)
 	public void testNoSortKey() throws Exception {
-		factory.setSortKey(null);
+		factory.setSortKeys(null);
 		PagingQueryProvider provider = (PagingQueryProvider) factory.getObject();
 		assertNotNull(provider);
 	}

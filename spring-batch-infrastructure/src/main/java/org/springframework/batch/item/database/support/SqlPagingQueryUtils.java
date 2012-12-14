@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2008 the original author or authors.
+ * Copyright 2006-2012 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,12 +16,21 @@
 
 package org.springframework.batch.item.database.support;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
+
+import org.springframework.batch.item.database.Order;
+import org.springframework.util.StringUtils;
+
 /**
  * Utility class that generates the actual SQL statements used by query
  * providers.
  * 
  * @author Thomas Risberg
  * @author Dave Syer
+ * @author Michael Minella
  * @since 2.0
  */
 public class SqlPagingQueryUtils {
@@ -42,8 +51,36 @@ public class SqlPagingQueryUtils {
 		sql.append("SELECT ").append(provider.getSelectClause());
 		sql.append(" FROM ").append(provider.getFromClause());
 		buildWhereClause(provider, remainingPageQuery, sql);
-		sql.append(" ORDER BY ").append(provider.getSortKeyWithoutAlias());
-		buildAscendingClause(provider, sql);
+		buildGroupByClause(provider, sql);
+		sql.append(" ORDER BY ").append(buildSortClause(provider));
+		sql.append(" " + limitClause);
+
+		return sql.toString();
+	}
+
+	/**
+	 * Generate SQL query string using a LIMIT clause
+	 * 
+	 * @param provider {@link AbstractSqlPagingQueryProvider} providing the
+	 * implementation specifics
+	 * @param remainingPageQuery is this query for the ramining pages (true) as
+	 * opposed to the first page (false)
+	 * @param limitClause the implementation specific limit clause to be used
+	 * @return the generated query
+	 */
+	public static String generateLimitGroupedSqlQuery(AbstractSqlPagingQueryProvider provider, boolean remainingPageQuery,
+			String limitClause) {
+		StringBuilder sql = new StringBuilder();
+		sql.append("SELECT * ");
+		sql.append(" FROM (");
+		sql.append("SELECT ").append(provider.getSelectClause());
+		sql.append(" FROM ").append(provider.getFromClause());
+		sql.append(provider.getWhereClause() == null ? "" : " WHERE " + provider.getWhereClause());
+		buildGroupByClause(provider, sql);
+		sql.append(") AS MAIN_QRY ");
+		sql.append("WHERE ");
+		buildSortConditions(provider, sql);
+		sql.append(" ORDER BY ").append(buildSortClause(provider));
 		sql.append(" " + limitClause);
 
 		return sql.toString();
@@ -65,8 +102,34 @@ public class SqlPagingQueryUtils {
 		sql.append("SELECT ").append(topClause).append(" ").append(provider.getSelectClause());
 		sql.append(" FROM ").append(provider.getFromClause());
 		buildWhereClause(provider, remainingPageQuery, sql);
-		sql.append(" ORDER BY ").append(provider.getSortKeyWithoutAlias());
-		buildAscendingClause(provider, sql);
+		buildGroupByClause(provider, sql);
+		sql.append(" ORDER BY ").append(buildSortClause(provider));
+
+		return sql.toString();
+	}
+
+	/**
+	 * Generate SQL query string using a TOP clause
+	 * 
+	 * @param provider {@link AbstractSqlPagingQueryProvider} providing the
+	 * implementation specifics
+	 * @param remainingPageQuery is this query for the ramining pages (true) as
+	 * opposed to the first page (false)
+	 * @param topClause the implementation specific top clause to be used
+	 * @return the generated query
+	 */
+	public static String generateGroupedTopSqlQuery(AbstractSqlPagingQueryProvider provider, boolean remainingPageQuery,
+			String topClause) {
+		StringBuilder sql = new StringBuilder();
+		sql.append("SELECT ").append(topClause).append(" * FROM (");
+		sql.append("SELECT ").append(provider.getSelectClause());
+		sql.append(" FROM ").append(provider.getFromClause());
+		sql.append(provider.getWhereClause() == null ? "" : " WHERE " + provider.getWhereClause());
+		buildGroupByClause(provider, sql);
+		sql.append(") AS MAIN_QRY ");
+		sql.append("WHERE ");
+		buildSortConditions(provider, sql);
+		sql.append(" ORDER BY ").append(buildSortClause(provider));
 
 		return sql.toString();
 	}
@@ -101,12 +164,16 @@ public class SqlPagingQueryUtils {
 	public static String generateRowNumSqlQuery(AbstractSqlPagingQueryProvider provider, String selectClause,
 			boolean remainingPageQuery, String rowNumClause) {
 		StringBuilder sql = new StringBuilder();
-		sql.append("SELECT * FROM (SELECT ").append(selectClause).append(", ROWNUM as TMP_ROW_NUM");
+		sql.append("SELECT * FROM (SELECT ").append(selectClause);
 		sql.append(" FROM ").append(provider.getFromClause());
-		buildWhereClause(provider, remainingPageQuery, sql);
-		sql.append(" ORDER BY ").append(provider.getSortKeyWithoutAlias());
-		buildAscendingClause(provider, sql);
+		sql.append(provider.getWhereClause() == null ? "" : " WHERE " + provider.getWhereClause());
+		buildGroupByClause(provider, sql);
+		sql.append(" ORDER BY ").append(buildSortClause(provider));
 		sql.append(") WHERE ").append(rowNumClause);
+		if(remainingPageQuery) {
+			sql.append(" AND ");
+			buildSortConditions(provider, sql);
+		}
 
 		return sql.toString();
 
@@ -122,11 +189,11 @@ public class SqlPagingQueryUtils {
 
 		StringBuilder sql = new StringBuilder();
 		sql.append("SELECT ").append(outerSelectClause).append(" FROM (SELECT ").append(outerSelectClause)
-				.append(", ROWNUM as TMP_ROW_NUM");
+				.append(", ").append(StringUtils.hasText(provider.getGroupClause()) ? "MIN(ROWNUM) as TMP_ROW_NUM" : "ROWNUM as TMP_ROW_NUM");
 		sql.append(" FROM (SELECT ").append(innerSelectClause).append(" FROM ").append(provider.getFromClause());
 		buildWhereClause(provider, remainingPageQuery, sql);
-		sql.append(" ORDER BY ").append(provider.getSortKeyWithoutAlias());
-		buildAscendingClause(provider, sql);
+		buildGroupByClause(provider, sql);
+		sql.append(" ORDER BY ").append(buildSortClause(provider));
 		sql.append(")) WHERE ").append(rowNumClause);
 
 		return sql.toString();
@@ -143,11 +210,11 @@ public class SqlPagingQueryUtils {
 	 */
 	public static String generateLimitJumpToQuery(AbstractSqlPagingQueryProvider provider, String limitClause) {
 		StringBuilder sql = new StringBuilder();
-		sql.append("SELECT ").append(provider.getSortKey()).append(" AS SORT_KEY");
+		sql.append("SELECT ").append(buildSortKeySelect(provider));
 		sql.append(" FROM ").append(provider.getFromClause());
 		sql.append(provider.getWhereClause() == null ? "" : " WHERE " + provider.getWhereClause());
-		sql.append(" ORDER BY ").append(provider.getSortKeyWithoutAlias());
-		buildAscendingClause(provider, sql);
+		buildGroupByClause(provider, sql);
+		sql.append(" ORDER BY ").append(buildSortClause(provider));
 		sql.append(" " + limitClause);
 
 		return sql.toString();
@@ -163,22 +230,111 @@ public class SqlPagingQueryUtils {
 	 */
 	public static String generateTopJumpToQuery(AbstractSqlPagingQueryProvider provider, String topClause) {
 		StringBuilder sql = new StringBuilder();
-		sql.append("SELECT ").append(topClause).append(" ").append(provider.getSortKey()).append(" AS SORT_KEY");
+		sql.append("SELECT ").append(topClause).append(" ").append(buildSortKeySelect(provider));
 		sql.append(" FROM ").append(provider.getFromClause());
 		sql.append(provider.getWhereClause() == null ? "" : " WHERE " + provider.getWhereClause());
-		sql.append(" ORDER BY ").append(provider.getSortKeyWithoutAlias());
-		buildAscendingClause(provider, sql);
+		buildGroupByClause(provider, sql);
+		sql.append(" ORDER BY ").append(buildSortClause(provider));
 
 		return sql.toString();
 	}
 
-	private static void buildAscendingClause(AbstractSqlPagingQueryProvider provider, StringBuilder sql) {
-		if (provider.isAscending()) {
-			sql.append(" ASC");
+	/**
+	 * Generates ORDER BY attributes based on the sort keys.
+	 * 
+	 * @param provider
+	 * @return a String that can be appended to an ORDER BY clause.
+	 */
+	public static String buildSortClause(AbstractSqlPagingQueryProvider provider) {
+		StringBuilder builder = new StringBuilder();
+		String prefix = "";
+		
+		for (Map.Entry<String, Order> sortKey : provider.getSortKeys().entrySet()) {
+			builder.append(prefix);
+			
+			prefix = ", ";
+			
+			builder.append(sortKey.getKey());
+			
+			if(sortKey.getValue() != null && sortKey.getValue() == Order.DESCENDING) {
+				builder.append(" DESC");
+			}
+			else {
+				builder.append(" ASC");
+			}
 		}
-		else {
-			sql.append(" DESC");
+		
+		return builder.toString();
+	}
+
+	/**
+	 * Appends the where conditions required to query for the subsequent pages.
+	 * 
+	 * @param provider
+	 * @param sql
+	 */
+	public static void buildSortConditions(
+			AbstractSqlPagingQueryProvider provider, StringBuilder sql) {
+		List<Map.Entry<String, Order>> keys = new ArrayList<Map.Entry<String,Order>>(provider.getSortKeys().entrySet());
+		List<String> clauses = new ArrayList<String>();
+		
+		for(int i = 0; i < keys.size(); i++) {
+			StringBuilder clause = new StringBuilder();
+			
+			String prefix = "";
+			for(int j = 0; j < i; j++) {
+				clause.append(prefix);
+				prefix = " AND ";
+				Entry<String, Order> entry = keys.get(j);
+				clause.append(entry.getKey());
+				clause.append(" = ");
+				clause.append(provider.getSortKeyPlaceHolder(entry.getKey()));
+			}
+			
+			if(clause.length() > 0) {
+				clause.append(" AND ");
+			}
+			clause.append(keys.get(i).getKey());
+			
+			if(keys.get(i).getValue() != null && keys.get(i).getValue() == Order.DESCENDING) {
+				clause.append(" < ");
+			}
+			else {
+				clause.append(" > ");
+			}
+
+			clause.append(provider.getSortKeyPlaceHolder(keys.get(i).getKey()));
+			
+			clauses.add(clause.toString());
 		}
+		
+		sql.append("(");
+		String prefix = "";
+		
+		for (String curClause : clauses) {
+			sql.append(prefix);
+			prefix = " OR ";
+			sql.append("(");
+			sql.append(curClause);
+			sql.append(")");
+		}
+		sql.append(")");
+	}
+
+	private static String buildSortKeySelect(AbstractSqlPagingQueryProvider provider) {
+		StringBuilder select = new StringBuilder();
+		
+		String prefix = "";
+		
+		for (Map.Entry<String, Order> sortKey : provider.getSortKeys().entrySet()) {
+			select.append(prefix);
+			
+			prefix = ", ";
+			
+			select.append(sortKey.getKey());
+		}
+		
+		return select.toString();
 	}
 
 	private static void buildWhereClause(AbstractSqlPagingQueryProvider provider, boolean remainingPageQuery,
@@ -189,17 +345,18 @@ public class SqlPagingQueryUtils {
 				sql.append(provider.getWhereClause());
 				sql.append(" AND ");
 			}
-			sql.append(provider.getSortKey());
-			if (provider.isAscending()) {
-				sql.append(" > ");
-			}
-			else {
-				sql.append(" < ");
-			}
-			sql.append(provider.getSortKeyPlaceHolder());
+
+			buildSortConditions(provider, sql);
 		}
 		else {
 			sql.append(provider.getWhereClause() == null ? "" : " WHERE " + provider.getWhereClause());
+		}
+	}
+	
+	private static void buildGroupByClause(AbstractSqlPagingQueryProvider provider, StringBuilder sql) {
+		if(StringUtils.hasText(provider.getGroupClause())) {
+			sql.append(" GROUP BY ");
+			sql.append(provider.getGroupClause());
 		}
 	}
 

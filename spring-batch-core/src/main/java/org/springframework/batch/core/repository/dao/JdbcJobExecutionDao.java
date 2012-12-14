@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2007 the original author or authors.
+ * Copyright 2006-2012 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -49,6 +49,7 @@ import org.springframework.util.Assert;
  * @author Lucas Ward
  * @author Dave Syer
  * @author Robert Kasanicky
+ * @author Michael Minella
  */
 public class JdbcJobExecutionDao extends AbstractJdbcBatchMetadataDao implements JobExecutionDao, InitializingBean {
 
@@ -68,7 +69,7 @@ public class JdbcJobExecutionDao extends AbstractJdbcBatchMetadataDao implements
 			+ " from %PREFIX%JOB_EXECUTION where JOB_INSTANCE_ID = ? order by JOB_EXECUTION_ID desc";
 
 	private static final String GET_LAST_EXECUTION = "SELECT JOB_EXECUTION_ID, START_TIME, END_TIME, STATUS, EXIT_CODE, EXIT_MESSAGE, CREATE_TIME, LAST_UPDATED, VERSION "
-			+ "from %PREFIX%JOB_EXECUTION E where JOB_INSTANCE_ID = ? and JOB_EXECUTION_ID = (SELECT max(JOB_EXECUTION_ID) from %PREFIX%JOB_EXECUTION E2 where E.JOB_INSTANCE_ID = E2.JOB_INSTANCE_ID)";
+			+ "from %PREFIX%JOB_EXECUTION E where JOB_INSTANCE_ID = ? and JOB_EXECUTION_ID in (SELECT max(JOB_EXECUTION_ID) from %PREFIX%JOB_EXECUTION E2 where E.JOB_INSTANCE_ID = E2.JOB_INSTANCE_ID)";
 
 	private static final String GET_EXECUTION_BY_ID = "SELECT JOB_EXECUTION_ID, START_TIME, END_TIME, STATUS, EXIT_CODE, EXIT_MESSAGE, CREATE_TIME, LAST_UPDATED, VERSION"
 			+ " from %PREFIX%JOB_EXECUTION where JOB_EXECUTION_ID = ?";
@@ -135,7 +136,7 @@ public class JdbcJobExecutionDao extends AbstractJdbcBatchMetadataDao implements
 				jobExecution.getStartTime(), jobExecution.getEndTime(), jobExecution.getStatus().toString(),
 				jobExecution.getExitStatus().getExitCode(), jobExecution.getExitStatus().getExitDescription(),
 				jobExecution.getVersion(), jobExecution.getCreateTime(), jobExecution.getLastUpdated() };
-		getJdbcTemplate().getJdbcOperations().update(
+		getJdbcTemplate().update(
 				getQuery(SAVE_JOB_EXECUTION),
 				parameters,
 				new int[] { Types.BIGINT, Types.BIGINT, Types.TIMESTAMP, Types.TIMESTAMP, Types.VARCHAR,
@@ -197,7 +198,7 @@ public class JdbcJobExecutionDao extends AbstractJdbcBatchMetadataDao implements
 				throw new NoSuchObjectException("Invalid JobExecution, ID " + jobExecution.getId() + " not found.");
 			}
 
-			int count = getJdbcTemplate().getJdbcOperations().update(
+			int count = getJdbcTemplate().update(
 					getQuery(UPDATE_JOB_EXECUTION),
 					parameters,
 					new int[] { Types.TIMESTAMP, Types.TIMESTAMP, Types.VARCHAR, Types.VARCHAR, Types.VARCHAR,
@@ -265,8 +266,7 @@ public class JdbcJobExecutionDao extends AbstractJdbcBatchMetadataDao implements
 				result.add(mapper.mapRow(rs, 0));
 			}
 		};
-		getJdbcTemplate().getJdbcOperations()
-				.query(getQuery(GET_RUNNING_EXECUTIONS), new Object[] { jobName }, handler);
+		getJdbcTemplate().query(getQuery(GET_RUNNING_EXECUTIONS), new Object[] { jobName }, handler);
 
 		return result;
 	}

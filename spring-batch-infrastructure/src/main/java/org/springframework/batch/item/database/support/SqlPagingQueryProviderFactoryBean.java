@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2008 the original author or authors.
+ * Copyright 2006-2012 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,8 +18,8 @@ package org.springframework.batch.item.database.support;
 import static org.springframework.batch.support.DatabaseType.DB2;
 import static org.springframework.batch.support.DatabaseType.DB2ZOS;
 import static org.springframework.batch.support.DatabaseType.DERBY;
-import static org.springframework.batch.support.DatabaseType.HSQL;
 import static org.springframework.batch.support.DatabaseType.H2;
+import static org.springframework.batch.support.DatabaseType.HSQL;
 import static org.springframework.batch.support.DatabaseType.MYSQL;
 import static org.springframework.batch.support.DatabaseType.ORACLE;
 import static org.springframework.batch.support.DatabaseType.POSTGRES;
@@ -27,10 +27,12 @@ import static org.springframework.batch.support.DatabaseType.SQLSERVER;
 import static org.springframework.batch.support.DatabaseType.SYBASE;
 
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 import javax.sql.DataSource;
 
+import org.springframework.batch.item.database.Order;
 import org.springframework.batch.item.database.PagingQueryProvider;
 import org.springframework.batch.support.DatabaseType;
 import org.springframework.beans.factory.FactoryBean;
@@ -44,7 +46,9 @@ import org.springframework.util.StringUtils;
  * types are given by the {@link DatabaseType} enum.
  * 
  * @author Dave Syer
+ * @author Michael Minella
  */
+@SuppressWarnings("rawtypes")
 public class SqlPagingQueryProviderFactoryBean implements FactoryBean {
 
 	private DataSource dataSource;
@@ -56,10 +60,10 @@ public class SqlPagingQueryProviderFactoryBean implements FactoryBean {
 	private String whereClause;
 
 	private String selectClause;
+	
+	private String groupClause;
 
-	private String sortKey;
-
-	private boolean ascending = true;
+	private Map<String, Order> sortKeys;
 
 	private Map<DatabaseType, AbstractSqlPagingQueryProvider> providers = new HashMap<DatabaseType, AbstractSqlPagingQueryProvider>();
 
@@ -75,6 +79,13 @@ public class SqlPagingQueryProviderFactoryBean implements FactoryBean {
 		providers.put(POSTGRES,new PostgresPagingQueryProvider());
 		providers.put(SQLSERVER,new SqlServerPagingQueryProvider());
 		providers.put(SYBASE,new SybasePagingQueryProvider());
+	}
+	
+	/**
+	 * @param groupClause SQL GROUP BY clause part of the SQL query string
+	 */
+	public void setGroupClause(String groupClause) {
+		this.groupClause = groupClause;
 	}
 
 	/**
@@ -113,17 +124,19 @@ public class SqlPagingQueryProviderFactoryBean implements FactoryBean {
 	}
 
 	/**
-	 * @param sortKey the sortKey to set
+	 * @param sortKeys the sortKeys to set
 	 */
-	public void setSortKey(String sortKey) {
-		this.sortKey = sortKey;
+	public void setSortKeys(Map<String, Order> sortKeys) {
+		this.sortKeys = sortKeys;
 	}
-
-	/**
-	 * @param ascending
-	 */
-	public void setAscending(boolean ascending) {
-		this.ascending = ascending;	
+	
+	public void setSortKey(String key) {
+		Assert.doesNotContain(key, ",", "String setter is valid for a single ASC key only");
+		
+		Map<String, Order> keys = new LinkedHashMap<String, Order>();
+		keys.put(key, Order.ASCENDING);
+		
+		this.sortKeys = keys;
 	}
 
 	/**
@@ -149,10 +162,12 @@ public class SqlPagingQueryProviderFactoryBean implements FactoryBean {
 
 		provider.setFromClause(fromClause);
 		provider.setWhereClause(whereClause);
-		provider.setSortKey(sortKey);
-		provider.setAscending(ascending);
+		provider.setSortKeys(sortKeys);
 		if (StringUtils.hasText(selectClause)) {
 			provider.setSelectClause(selectClause);
+		}
+		if(StringUtils.hasText(groupClause)) {
+			provider.setGroupClause(groupClause);
 		}
 
 		provider.init(dataSource);

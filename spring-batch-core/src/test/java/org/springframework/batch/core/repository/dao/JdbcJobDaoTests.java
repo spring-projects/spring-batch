@@ -34,7 +34,7 @@ public class JdbcJobDaoTests extends AbstractJobDaoTests {
 				.addExitDescription(LONG_STRING));
 		jobExecutionDao.updateJobExecution(jobExecution);
 
-		List<Map<String, Object>> executions = simpleJdbcTemplate.queryForList(
+		List<Map<String, Object>> executions = jdbcTemplate.queryForList(
 				"SELECT * FROM BATCH_JOB_EXECUTION where JOB_INSTANCE_ID=?",
 				jobInstance.getId());
 		assertEquals(1, executions.size());

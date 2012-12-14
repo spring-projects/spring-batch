@@ -16,6 +16,9 @@
 
 package org.springframework.batch.core.repository.dao;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -26,7 +29,9 @@ import java.util.Map.Entry;
 
 import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.StepExecution;
+import org.springframework.batch.core.repository.ExecutionContextSerializer;
 import org.springframework.batch.item.ExecutionContext;
+import org.springframework.core.serializer.Serializer;
 import org.springframework.jdbc.core.PreparedStatementSetter;
 import org.springframework.jdbc.core.simple.ParameterizedRowMapper;
 import org.springframework.jdbc.support.lob.DefaultLobHandler;
@@ -35,13 +40,14 @@ import org.springframework.util.Assert;
 
 /**
  * JDBC DAO for {@link ExecutionContext}.
- * 
+ *
  * Stores execution context data related to both Step and Job using
  * a different table for each.
- * 
+ *
  * @author Lucas Ward
  * @author Robert Kasanicky
  * @author Thomas Risberg
+ * @author Michael Minella
  */
 public class JdbcExecutionContextDao extends AbstractJdbcBatchMetadataDao implements ExecutionContextDao {
 
@@ -69,7 +75,16 @@ public class JdbcExecutionContextDao extends AbstractJdbcBatchMetadataDao implem
 
 	private LobHandler lobHandler = new DefaultLobHandler();
 
-	private ExecutionContextStringSerializer serializer;
+	private ExecutionContextSerializer serializer;
+
+	/**
+	 * Setter for {@link Serializer} implementation
+	 *
+	 * @param serializer
+	 */
+	public void setSerializer(ExecutionContextSerializer serializer) {
+		this.serializer = serializer;
+	}
 
 	/**
 	 * The maximum size that an execution context can have and still be stored
@@ -166,8 +181,6 @@ public class JdbcExecutionContextDao extends AbstractJdbcBatchMetadataDao implem
 	@Override
 	public void afterPropertiesSet() throws Exception {
 		super.afterPropertiesSet();
-		serializer = new XStreamExecutionContextStringSerializer();
-		((XStreamExecutionContextStringSerializer) serializer).afterPropertiesSet();
 	}
 
 	/**
@@ -190,7 +203,7 @@ public class JdbcExecutionContextDao extends AbstractJdbcBatchMetadataDao implem
 			longContext = null;
 		}
 
-		getJdbcTemplate().getJdbcOperations().update(getQuery(sql), new PreparedStatementSetter() {
+		getJdbcTemplate().update(getQuery(sql), new PreparedStatementSetter() {
 			public void setValues(PreparedStatement ps) throws SQLException {
 				ps.setString(1, shortContext);
 				if (longContext != null) {
@@ -209,17 +222,39 @@ public class JdbcExecutionContextDao extends AbstractJdbcBatchMetadataDao implem
 		for (Entry<String, Object> me : ctx.entrySet()) {
 			m.put(me.getKey(), me.getValue());
 		}
-		return serializer.serialize(m);
+
+		ByteArrayOutputStream out = new ByteArrayOutputStream();
+		String results = "";
+
+		try {
+			serializer.serialize(m, out);
+			results = new String(out.toByteArray(), "ISO-8859-1");
+		}
+		catch (IOException ioe) {
+			throw new IllegalArgumentException("Could not serialize the execution context", ioe);
+		}
+
+		return results;
 	}
 
+	@SuppressWarnings("unchecked")
 	private class ExecutionContextRowMapper implements ParameterizedRowMapper<ExecutionContext> {
+
 		public ExecutionContext mapRow(ResultSet rs, int i) throws SQLException {
 			ExecutionContext executionContext = new ExecutionContext();
 			String serializedContext = rs.getString("SERIALIZED_CONTEXT");
 			if (serializedContext == null) {
 				serializedContext = rs.getString("SHORT_CONTEXT");
 			}
-			Map<String, Object> map = serializer.deserialize(serializedContext);
+
+			Map<String, Object> map;
+			try {
+				ByteArrayInputStream in = new ByteArrayInputStream(serializedContext.getBytes("ISO-8859-1"));
+				map = (Map<String, Object>) serializer.deserialize(in);
+			}
+			catch (IOException ioe) {
+				throw new IllegalArgumentException("Unable to deserialize the execution context", ioe);
+			}
 			for (Map.Entry<String, Object> entry : map.entrySet()) {
 				executionContext.put(entry.getKey(), entry.getValue());
 			}

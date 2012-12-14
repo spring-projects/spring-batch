@@ -136,10 +136,8 @@ public class AsyncStepScopeIntegrationTests implements BeanFactoryAware {
 			taskExecutor.execute(task);
 		}
 
-		int i = 0;
 		for (FutureTask<String> task : tasks) {
 			assertEquals("foo", task.get());
-			i++;
 		}
 
 		// Don't close the outer scope until all tasks are finished. This should

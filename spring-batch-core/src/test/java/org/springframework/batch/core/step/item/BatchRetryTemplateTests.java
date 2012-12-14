@@ -10,13 +10,13 @@ import java.util.Collections;
 import java.util.List;
 
 import org.junit.Test;
-import org.springframework.batch.retry.ExhaustedRetryException;
-import org.springframework.batch.retry.RecoveryCallback;
-import org.springframework.batch.retry.RetryCallback;
-import org.springframework.batch.retry.RetryContext;
-import org.springframework.batch.retry.RetryState;
-import org.springframework.batch.retry.policy.SimpleRetryPolicy;
-import org.springframework.batch.retry.support.DefaultRetryState;
+import org.springframework.retry.ExhaustedRetryException;
+import org.springframework.retry.RecoveryCallback;
+import org.springframework.retry.RetryCallback;
+import org.springframework.retry.RetryContext;
+import org.springframework.retry.RetryState;
+import org.springframework.retry.policy.SimpleRetryPolicy;
+import org.springframework.retry.support.DefaultRetryState;
 
 public class BatchRetryTemplateTests {
 

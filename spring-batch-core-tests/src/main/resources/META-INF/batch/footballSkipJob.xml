@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <beans xmlns="http://www.springframework.org/schema/beans" xmlns:aop="http://www.springframework.org/schema/aop"
 	xmlns:p="http://www.springframework.org/schema/p" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-2.0.xsd
+	xsi:schemaLocation="http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-3.1.xsd
 		http://www.springframework.org/schema/batch http://www.springframework.org/schema/batch/spring-batch-2.1.xsd
-		http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd">
+		http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.1.xsd">
 
 	<job id="footballSkipJob" xmlns="http://www.springframework.org/schema/batch">
 		<step id="playerload" next="gameLoad">
@@ -23,7 +23,7 @@
 		</step>
 		<step id="playerSummarization" parent="summarizationStep" />
 	</job>
-	
+
 	<bean id="skipPolicy" class="org.springframework.batch.core.step.skip.LimitCheckingItemSkipPolicy" scope="step">
 		<property name="skipLimit" value="#{jobParameters['skip.limit']}" />
 		<property name="skippableExceptionMap">
@@ -33,13 +33,13 @@
 		</property>
 	</bean>
 
-	<bean id="retryPolicy" class="org.springframework.batch.retry.policy.SimpleRetryPolicy" scope="step">
-		<property name="maxAttempts" value="#{jobParameters['retry.limit']}" />
-		<property name="retryableExceptions">
+	<bean id="retryPolicy" class="org.springframework.retry.policy.SimpleRetryPolicy" scope="step">
+        <constructor-arg value="#{jobParameters['retry.limit']}"/>
+        <constructor-arg>
 			<map key-type="java.lang.Class">
 				<entry key="org.springframework.dao.DataAccessException" value="true"/>
 			</map>
-		</property>
+        </constructor-arg>
 	</bean>
 
 	<step id="summarizationStep" xmlns="http://www.springframework.org/schema/batch">

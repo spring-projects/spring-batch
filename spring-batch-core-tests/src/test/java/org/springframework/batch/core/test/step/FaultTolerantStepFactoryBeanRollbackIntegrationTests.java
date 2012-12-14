@@ -26,7 +26,7 @@ import org.springframework.batch.core.JobParameters;
 import org.springframework.batch.core.Step;
 import org.springframework.batch.core.StepExecution;
 import org.springframework.batch.core.repository.JobRepository;
-import org.springframework.batch.core.step.item.FaultTolerantStepFactoryBean;
+import org.springframework.batch.core.step.factory.FaultTolerantStepFactoryBean;
 import org.springframework.batch.item.ItemProcessor;
 import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.ItemWriter;
@@ -34,11 +34,11 @@ import org.springframework.batch.item.ParseException;
 import org.springframework.batch.item.UnexpectedInputException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.simple.ParameterizedRowMapper;
-import org.springframework.jdbc.core.simple.SimpleJdbcTemplate;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
-import org.springframework.test.jdbc.SimpleJdbcTestUtils;
+import org.springframework.batch.support.JdbcTestUtils;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.util.Assert;
 
@@ -86,22 +86,22 @@ public class FaultTolerantStepFactoryBeanRollbackIntegrationTests {
 		factory.setCommitInterval(3);
 		factory.setSkipLimit(10);
 
-		SimpleJdbcTestUtils.deleteFromTables(new SimpleJdbcTemplate(dataSource), "ERROR_LOG");
+		JdbcTestUtils.deleteFromTables(new JdbcTemplate(dataSource), "ERROR_LOG");
 
 	}
 
 	@Test
 	public void testUpdatesNoRollback() throws Exception {
 
-		SimpleJdbcTemplate jdbcTemplate = new SimpleJdbcTemplate(dataSource);
+        JdbcTemplate jdbcTemplate = new JdbcTemplate(dataSource);
 
 		writer.write(Arrays.asList("foo", "bar"));
 		processor.process("spam");
-		assertEquals(3, SimpleJdbcTestUtils.countRowsInTable(jdbcTemplate, "ERROR_LOG"));
+		assertEquals(3, JdbcTestUtils.countRowsInTable(jdbcTemplate, "ERROR_LOG"));
 
 		writer.clear();
 		processor.clear();
-		assertEquals(0, SimpleJdbcTestUtils.countRowsInTable(jdbcTemplate, "ERROR_LOG"));
+		assertEquals(0, JdbcTestUtils.countRowsInTable(jdbcTemplate, "ERROR_LOG"));
 
 	}
 
@@ -127,8 +127,8 @@ public class FaultTolerantStepFactoryBeanRollbackIntegrationTests {
 				logger.info("Starting step: " + i);
 			}
 
-			SimpleJdbcTemplate jdbcTemplate = new SimpleJdbcTemplate(dataSource);
-			assertEquals(0, SimpleJdbcTestUtils.countRowsInTable(jdbcTemplate, "ERROR_LOG"));
+            JdbcTemplate jdbcTemplate = new JdbcTemplate(dataSource);
+			assertEquals(0, JdbcTestUtils.countRowsInTable(jdbcTemplate, "ERROR_LOG"));
 
 			try {
 
@@ -210,10 +210,10 @@ public class FaultTolerantStepFactoryBeanRollbackIntegrationTests {
 
 		private Collection<String> failures = Collections.emptySet();
 
-		private SimpleJdbcTemplate jdbcTemplate;
+		private JdbcTemplate jdbcTemplate;
 
 		public SkipWriterStub(DataSource dataSource) {
-			jdbcTemplate = new SimpleJdbcTemplate(dataSource);
+			jdbcTemplate = new JdbcTemplate(dataSource);
 		}
 
 		public void setFailures(String... failures) {
@@ -255,13 +255,13 @@ public class FaultTolerantStepFactoryBeanRollbackIntegrationTests {
 
 		private List<String> processed = new CopyOnWriteArrayList<String>();
 
-		private SimpleJdbcTemplate jdbcTemplate;
+		private JdbcTemplate jdbcTemplate;
 
 		/**
 		 * @param dataSource
 		 */
 		public SkipProcessorStub(DataSource dataSource) {
-			jdbcTemplate = new SimpleJdbcTemplate(dataSource);
+			jdbcTemplate = new JdbcTemplate(dataSource);
 		}
 
 		/**

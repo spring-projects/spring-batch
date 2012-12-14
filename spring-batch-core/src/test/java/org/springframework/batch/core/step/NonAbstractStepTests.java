@@ -68,8 +68,7 @@ public class NonAbstractStepTests {
 	}
 
 	/**
-	 * Fills the events list when listener methods are called, prefixed with the
-	 * name of the listener.
+	 * Fills the events list when listener methods are called, prefixed with the name of the listener.
 	 */
 	private class EventTrackingListener implements StepExecutionListener {
 
@@ -85,7 +84,7 @@ public class NonAbstractStepTests {
 
 		public ExitStatus afterStep(StepExecution stepExecution) {
 			assertSame(execution, stepExecution);
-			events.add(getEvent("afterStep("+stepExecution.getExitStatus().getExitCode()+")"));
+			events.add(getEvent("afterStep(" + stepExecution.getExitStatus().getExitCode() + ")"));
 			stepExecution.getExecutionContext().putString("afterStep", "afterStep");
 			return stepExecution.getExitStatus();
 		}
@@ -104,7 +103,7 @@ public class NonAbstractStepTests {
 	private static class JobRepositoryStub extends JobRepositorySupport {
 
 		ExecutionContext saved = new ExecutionContext();
-		
+
 		static long counter = 0;
 
 		public void updateExecutionContext(StepExecution stepExecution) {
@@ -119,7 +118,6 @@ public class NonAbstractStepTests {
 				counter++;
 			}
 		}
-		
 
 	}
 
@@ -128,7 +126,7 @@ public class NonAbstractStepTests {
 		tested.setJobRepository(repository);
 		repository.add(execution);
 	}
-	
+
 	@Test
 	public void testBeanName() throws Exception {
 		AbstractStep step = new AbstractStep() {
@@ -175,10 +173,10 @@ public class NonAbstractStepTests {
 
 		assertEquals(ExitStatus.COMPLETED, execution.getExitStatus());
 
-		assertTrue("Execution context modifications made by listener should be persisted", repository.saved
-				.containsKey("beforeStep"));
-		assertTrue("Execution context modifications made by listener should be persisted", repository.saved
-				.containsKey("afterStep"));
+		assertTrue("Execution context modifications made by listener should be persisted",
+				repository.saved.containsKey("beforeStep"));
+		assertTrue("Execution context modifications made by listener should be persisted",
+				repository.saved.containsKey("afterStep"));
 	}
 
 	@Test
@@ -210,11 +208,12 @@ public class NonAbstractStepTests {
 
 		assertEquals(ExitStatus.FAILED.getExitCode(), execution.getExitStatus().getExitCode());
 		String exitDescription = execution.getExitStatus().getExitDescription();
-		assertTrue("Wrong message: "+exitDescription, exitDescription.contains("crash"));
+		assertTrue("Wrong message: " + exitDescription, exitDescription.contains("crash"));
 
-		assertTrue("Execution context modifications made by listener should be persisted", repository.saved
-				.containsKey("afterStep"));
+		assertTrue("Execution context modifications made by listener should be persisted",
+				repository.saved.containsKey("afterStep"));
 	}
+
 	/**
 	 * Exception during business processing.
 	 */
@@ -247,8 +246,8 @@ public class NonAbstractStepTests {
 
 		assertEquals("STOPPED", execution.getExitStatus().getExitCode());
 
-		assertTrue("Execution context modifications made by listener should be persisted", repository.saved
-				.containsKey("afterStep"));
+		assertTrue("Execution context modifications made by listener should be persisted",
+				repository.saved.containsKey("afterStep"));
 	}
 
 	@Test
@@ -271,8 +270,8 @@ public class NonAbstractStepTests {
 
 		assertEquals("FUNNY", execution.getExitStatus().getExitCode());
 
-		assertTrue("Execution context modifications made by listener should be persisted", repository.saved
-				.containsKey("afterStep"));
+		assertTrue("Execution context modifications made by listener should be persisted",
+				repository.saved.containsKey("afterStep"));
 	}
 
 	/**
@@ -310,16 +309,10 @@ public class NonAbstractStepTests {
 	/**
 	 * JobRepository is a required property.
 	 */
-	@Test
+	@Test(expected = IllegalStateException.class)
 	public void testAfterPropertiesSet() throws Exception {
 		tested.setJobRepository(null);
-		try {
-			tested.afterPropertiesSet();
-			fail();
-		}
-		catch (IllegalArgumentException e) {
-			// expected
-		}
+		tested.afterPropertiesSet();
 	}
 
 }

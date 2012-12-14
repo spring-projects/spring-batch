@@ -21,12 +21,7 @@ import java.util.Comparator;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.springframework.batch.item.ExecutionContext;
-import org.springframework.batch.item.ItemReader;
-import org.springframework.batch.item.ItemStream;
-import org.springframework.batch.item.ItemStreamException;
-import org.springframework.batch.item.ParseException;
-import org.springframework.batch.item.UnexpectedInputException;
+import org.springframework.batch.item.*;
 import org.springframework.batch.item.util.ExecutionContextUserSupport;
 import org.springframework.core.io.Resource;
 import org.springframework.util.Assert;
@@ -116,7 +111,7 @@ public class MultiResourceItemReader<T> implements ItemReader<T>, ItemStream {
 	 */
 	private T readNextItem() throws Exception {
 
-		T item = delegate.read();
+		T item = readFromDelegate();
 
 		while (item == null) {
 
@@ -130,13 +125,21 @@ public class MultiResourceItemReader<T> implements ItemReader<T>, ItemStream {
 			delegate.setResource(resources[currentResource]);
 			delegate.open(new ExecutionContext());
 
-			item = delegate.read();
-		}
+            item = readFromDelegate();
+        }
 
 		return item;
 	}
 
-	/**
+    private T readFromDelegate() throws Exception {
+        T item = delegate.read();
+        if(item instanceof ResourceAware){
+            ((ResourceAware) item).setResource(getCurrentResource());
+        }
+        return item;
+    }
+
+    /**
 	 * Close the {@link #setDelegate(ResourceAwareItemReaderItemStream)} reader and reset instance variable values.
 	 */
 	public void close() throws ItemStreamException {

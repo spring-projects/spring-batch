@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xmlns:util="http://www.springframework.org/schema/util"
-	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd
-	http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-2.5.xsd">
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.1.xsd
+	http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-3.1.xsd">
 
 	<bean id="dataSource" class="org.springframework.jdbc.datasource.DriverManagerDataSource">
 		<property name="driverClassName" value="org.hsqldb.jdbcDriver" />
@@ -21,7 +21,12 @@
         	<bean class="org.springframework.batch.item.database.support.HsqlPagingQueryProvider">
         		<property name="selectClause" value="select id, bar"/>
         		<property name="fromClause" value="foo"/>
-        		<property name="sortKey" value="id"/>
+        		<property name="sortKeys">
+        			<map>
+        				<entry key="id" value="ASCENDING"/>
+        				<entry key="name" value="DESCENDING"/>
+        			</map>
+        		</property>
         	</bean>
         </property>
 	</bean>		

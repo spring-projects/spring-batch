@@ -5,9 +5,9 @@
 	xmlns:p="http://www.springframework.org/schema/p"
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="
-		http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd
-		http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-2.0.xsd
-		http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-2.0.xsd">
+		http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.1.xsd
+		http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-3.1.xsd
+		http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-3.1.xsd">
 
 	<bean
 		class="org.springframework.batch.core.configuration.support.JobRegistryBeanPostProcessor">
@@ -20,7 +20,7 @@
 	<bean id="test-job"
 		class="org.springframework.batch.core.job.JobSupport">
 		<property name="steps">
-			<bean id="step1" class="org.springframework.batch.core.step.item.SimpleStepFactoryBean">
+			<bean id="step1" class="org.springframework.batch.core.step.factory.SimpleStepFactoryBean">
 				<property name="itemReader" ref="itemReader" />
 				<property name="itemWriter" ref="itemWriter" />
 				<property name="jobRepository" ref="jobRepository" />

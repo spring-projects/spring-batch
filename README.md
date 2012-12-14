@@ -34,7 +34,7 @@ In STS (or any Eclipse distro or other IDE with Maven support), import the modul
 
 # Getting Help
 
-Read the main project [website](http://www.springsource.org/spring-batch) and the [User Guide](http://www.springsource.org/spring-batch/reference). Look at the source code and the Javadocs.  For more detailed questions, use the [forum](http://forum.springsource.org/forumdisplay.php?f=41).  If you are new to Spring as well as to Spring Batch, look for information about [Spring projects](http://www.springsource.org/projects).
+Read the main project [website](http://www.springsource.org/spring-batch) and the [User Guide](http://static.springsource.org/spring-batch/reference). Look at the source code and the Javadocs.  For more detailed questions, use the [forum](http://forum.springsource.org/forumdisplay.php?f=41).  If you are new to Spring as well as to Spring Batch, look for information about [Spring projects](http://www.springsource.org/projects).
 
 # Contributing to Spring Batch
 
@@ -50,7 +50,7 @@ Before we accept a non-trivial patch or pull request we will need you to sign th
 
 # Getting Started Using the Samples
 
-A convenient way to get started quickly with Spring Batch is to run the samples which are packaged in the samples module.  There is also a simple command line sample (or "archetype") which has a bare bones but complete implementation of a simpel job.  The source code for the samples (and the other modules) is available either from the [Zip assembly](http://www.springsource.org/spring-batch/downloads.html) or from [Git](http://www.springsource.org/spring-batch/source-repository.html).
+A convenient way to get started quickly with Spring Batch is to run the samples which are packaged in the samples module.  There is also a simple command line sample (or "archetype") which has a bare bones but complete implementation of a simpel job.  The source code for the samples (and the other modules) is available either from the [Zip assembly](http://static.springsource.org/spring-batch/downloads.html) or from [Git](http://www.springsource.org/spring-batch/source-repository.html).
 
 ## Using the .Zip Distribution
 
@@ -64,7 +64,7 @@ A convenient way to get started quickly with Spring Batch is to run the samples 
   create the classpath entries you need.
 * Open Eclipse and create a workspace as for the non-Mavenized version.
 * Import the samples and archetype projects from the samples sub-directory in the directory you just unpacked.
-* The project should build cleanly without having to fix the dependencies.  If it doesn't, make sure you are online, and maybe try building on the command line first to make sure all the dependencies are downloaded.  See the [build instructions](http://www.springsource.org/spring-batch/building.html) if you run into difficulty.
+* The project should build cleanly without having to fix the dependencies.  If it doesn't, make sure you are online, and maybe try building on the command line first to make sure all the dependencies are downloaded.  See the [build instructions](http://static.springsource.org/spring-batch/building.html) if you run into difficulty.
 
 (N.B. the "archetype" is not a real Maven archetype, just a template project that can be used as a starting point for a self-contained batch job.  It is the same project that can be imported into STS using the Project Template wizard.)
 
@@ -84,7 +84,7 @@ Similar instructions would apply to other IDEs.
 * Download the "no-dependencies" package and unzip to create a directory `spring-batch-<versionId`>.
 * Open Eclipse and make a workspace in the directory you just created.
 * Import the `org.springframework.batch.samples` project from the samples directory.
-* Find all the compile scope and non-optional runtime jar files listed in the [core dependencies report](http://www.springsource.org/spring-batch/spring-batch-core/dependencies.html) and [infrastructure dependencies](http://www.springsource.org/spring-batch/spring-batch-infrastructure/dependencies.html), and import them into the project.
+* Find all the compile scope and non-optional runtime jar files listed in the [core dependencies report](http://static.springsource.org/spring-batch/spring-batch-core/dependencies.html) and [infrastructure dependencies](http://static.springsource.org/spring-batch/spring-batch-infrastructure/dependencies.html), and import them into the project.
 * Force the workspace to build (e.g. Project -> Clean...)
 * Run the unit tests in your project under src/test/java.  N.B. the FootbalJobFunctionTests takes quite a long time to run.
 
@@ -95,4 +95,4 @@ To launch a job from the command line instead of a unit test use the `CommandLin
 ## Using Maven and Git
 
 * Check out the Spring Batch project from Git (instructions are available [here](https://github.com/SpringSource/spring-batch)).
-* Run Maven from the command line in the samples directory.  There are additional building instructions and suggestions about what to do if it goes wrong [here](http://www.springsource.org/spring-batch/building.html).
+* Run Maven from the command line in the samples directory.  There are additional building instructions and suggestions about what to do if it goes wrong [here](http://static.springsource.org/spring-batch/building.html).

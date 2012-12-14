@@ -2,7 +2,7 @@ package org.springframework.batch.item.file;
 
 import java.util.Comparator;
 
-import org.junit.internal.runners.JUnit4ClassRunner;
+import org.junit.runners.JUnit4;
 import org.junit.runner.RunWith;
 import org.springframework.batch.item.AbstractItemStreamItemReaderTests;
 import org.springframework.batch.item.ExecutionContext;
@@ -11,7 +11,7 @@ import org.springframework.batch.item.sample.Foo;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.Resource;
 
-@RunWith(JUnit4ClassRunner.class)
+@RunWith(JUnit4.class)
 public class MultiResourceItemReaderFlatFileTests extends
 		AbstractItemStreamItemReaderTests {
 

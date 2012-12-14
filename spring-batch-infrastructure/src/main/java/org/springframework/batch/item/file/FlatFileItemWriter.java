@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2007 the original author or authors.
+ * Copyright 2006-2012 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,6 +21,7 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.Writer;
+import java.io.FileWriter;
 import java.nio.channels.Channels;
 import java.nio.channels.FileChannel;
 import java.nio.charset.UnsupportedCharsetException;
@@ -55,6 +56,7 @@ import org.springframework.util.ClassUtils;
  * @author Tomas Slanina
  * @author Robert Kasanicky
  * @author Dave Syer
+ * @author Michael Minella
  */
 public class FlatFileItemWriter<T> extends ExecutionContextUserSupport implements ResourceAwareItemWriterItemStream<T>,
 		InitializingBean {
@@ -86,6 +88,8 @@ public class FlatFileItemWriter<T> extends ExecutionContextUserSupport implement
 	private String encoding = OutputState.DEFAULT_CHARSET;
 
 	private FlatFileHeaderCallback headerCallback;
+
+	private FlatFilePostWriteHeaderCallback postWriteHeaderCallback;
 
 	private FlatFileFooterCallback footerCallback;
 
@@ -217,6 +221,15 @@ public class FlatFileItemWriter<T> extends ExecutionContextUserSupport implement
 	}
 
 	/**
+	 * postWriteHeaderCallback will be called after file is written to the disk.
+	 * It will store header in a separate file then merge both files.
+	 * Newline will be automatically appended after the header is written.
+	 */
+	public void setPostWriteHeaderCallback(FlatFilePostWriteHeaderCallback headerCallback) {
+		this.postWriteHeaderCallback = headerCallback;
+	}
+
+	/**
 	 * footerCallback will be called after writing the last item to file, but
 	 * before the file is closed.
 	 */
@@ -276,6 +289,7 @@ public class FlatFileItemWriter<T> extends ExecutionContextUserSupport implement
 	 * @see ItemStream#close()
 	 */
 	public void close() {
+		long totalLines = state.linesWritten;
 		if (state != null) {
 			try {
 				if (footerCallback != null && state.outputBufferedWriter != null) {
@@ -297,6 +311,25 @@ public class FlatFileItemWriter<T> extends ExecutionContextUserSupport implement
 					}
 				}
 				state = null;
+			}
+
+			try{
+				if(postWriteHeaderCallback != null){
+					Resource temporary = resource.createRelative("./.temporary");
+					File postWriteHeader = temporary.getFile();
+					postWriteHeader.delete();
+					postWriteHeader.createNewFile();
+					File original = resource.getFile();
+					Writer postWriteHeaderWriter = new BufferedWriter(new FileWriter(postWriteHeader));
+					postWriteHeaderCallback.writeHeader(postWriteHeaderWriter, original, totalLines);
+					postWriteHeaderWriter.write(System.getProperty("line.separator"));
+					postWriteHeaderWriter.close();
+					FileUtils.mergeFiles(original, postWriteHeader);
+					postWriteHeader.renameTo(original);
+				}
+			}
+			catch(IOException e){
+				throw new ItemStreamException("Failed to write Post Write Header", e);
 			}
 		}
 	}
@@ -578,23 +611,27 @@ public class FlatFileItemWriter<T> extends ExecutionContextUserSupport implement
 		private Writer getBufferedWriter(FileChannel fileChannel, String encoding) {
 			try {
 				final FileChannel channel = fileChannel;
-				Writer writer = new BufferedWriter(Channels.newWriter(fileChannel, encoding)) {
-					@Override
-					public void flush() throws IOException {
-						super.flush();
-						if (forceSync) {
-							channel.force(false);
-						}
-					}
-				};
 				if (transactional) {
-					return new TransactionAwareBufferedWriter(writer, new Runnable() {
+					TransactionAwareBufferedWriter writer = new TransactionAwareBufferedWriter(channel, new Runnable() {
 						public void run() {
 							closeStream();
 						}
 					});
+					
+					writer.setEncoding(encoding);
+					return writer;
 				}
 				else {
+					Writer writer = new BufferedWriter(Channels.newWriter(fileChannel, encoding)) {
+						@Override
+						public void flush() throws IOException {
+							super.flush();
+							if (forceSync) {
+								channel.force(false);
+							}
+						}
+					};
+
 					return new BufferedWriter(writer);
 				}
 			}

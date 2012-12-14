@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2008 the original author or authors.
+ * Copyright 2006-2012 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,13 +16,17 @@
 
 package org.springframework.batch.item.database;
 
+import java.util.Map;
+
 import javax.sql.DataSource;
+
 
 /**
  * Interface defining the functionality to be provided for generating paging queries for use with Paging
  * Item Readers.
  *
  * @author Thomas Risberg
+ * @author Michael Minella
  * @since 2.0
  */
 public interface PagingQueryProvider {
@@ -76,17 +80,19 @@ public interface PagingQueryProvider {
 	boolean isUsingNamedParameters();
 
 	/**
-	 * The sort key (unique single column name).
+	 * The sort keys.  A Map of the columns that make up the key and a Boolean indicating ascending or descending 
+	 * (ascending = true). 
 	 *  
-	 * @return the sort key used to order the query
+	 * @return the sort keys used to order the query
 	 */
-	String getSortKey();
-
+	Map<String, Order> getSortKeys();
+	
 	/**
-	 * The sort key (unique single column name) without alias.
-	 *
-	 * @return the sort key used to order the query (without alias)
+	 * Returns either a String to be used as the named placeholder for a sort key value (based on the column name)
+	 * or a ? for unnamed parameters.
+	 * 
+	 * @param keyName The sort key name
+	 * @return The string to be used for a parameterized query.
 	 */
-	String getSortKeyWithoutAlias();
-
+	String getSortKeyPlaceHolder(String keyName);
 }

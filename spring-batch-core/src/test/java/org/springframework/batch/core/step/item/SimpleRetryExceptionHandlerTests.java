@@ -24,10 +24,10 @@ import org.springframework.batch.repeat.RepeatContext;
 import org.springframework.batch.repeat.context.RepeatContextSupport;
 import org.springframework.batch.repeat.exception.SimpleLimitExceptionHandler;
 import org.springframework.batch.repeat.support.RepeatSynchronizationManager;
-import org.springframework.batch.retry.RetryContext;
-import org.springframework.batch.retry.RetryPolicy;
-import org.springframework.batch.retry.policy.AlwaysRetryPolicy;
-import org.springframework.batch.retry.policy.NeverRetryPolicy;
+import org.springframework.retry.RetryContext;
+import org.springframework.retry.RetryPolicy;
+import org.springframework.retry.policy.AlwaysRetryPolicy;
+import org.springframework.retry.policy.NeverRetryPolicy;
 
 /**
  * @author Dave Syer

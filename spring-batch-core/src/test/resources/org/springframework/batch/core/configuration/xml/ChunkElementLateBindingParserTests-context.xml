@@ -2,7 +2,7 @@
 <beans:beans xmlns="http://www.springframework.org/schema/batch" xmlns:beans="http://www.springframework.org/schema/beans"
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://www.springframework.org/schema/batch http://www.springframework.org/schema/batch/spring-batch-2.1.xsd
-	http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.5.xsd">
+	http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.1.xsd">
 
 	<beans:import resource="common-context.xml" />
 
@@ -19,7 +19,7 @@
 		</step>
 	</job>
 
-	<bean id="retryPolicy" class="org.springframework.batch.retry.policy.SimpleRetryPolicy" xmlns="http://www.springframework.org/schema/beans"
+	<bean id="retryPolicy" class="org.springframework.retry.policy.SimpleRetryPolicy" xmlns="http://www.springframework.org/schema/beans"
 		scope="step">
 		<property name="maxAttempts" value="#{jobParameters['retry.interval']}" />
 		<property name="retryableExceptions">

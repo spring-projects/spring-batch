@@ -7,7 +7,9 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.Callable;
 import java.util.concurrent.CompletionService;
@@ -26,12 +28,12 @@ import org.junit.runner.RunWith;
 import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.database.support.HsqlPagingQueryProvider;
 import org.springframework.batch.item.sample.Foo;
+import org.springframework.batch.support.JdbcTestUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.simple.ParameterizedRowMapper;
-import org.springframework.jdbc.core.simple.SimpleJdbcTemplate;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
-import org.springframework.test.jdbc.SimpleJdbcTestUtils;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(locations = "JdbcPagingItemReaderCommonTests-context.xml")
@@ -61,17 +63,17 @@ public class JdbcPagingItemReaderAsyncTests {
 
 	@Before
 	public void init() {
-		SimpleJdbcTemplate jdbcTemplate = new SimpleJdbcTemplate(dataSource);
+		JdbcTemplate jdbcTemplate = new JdbcTemplate(dataSource);
 		maxId = jdbcTemplate.queryForInt("SELECT MAX(ID) from T_FOOS");
 		for (int i = maxId + 1; i <= ITEM_COUNT; i++) {
 			jdbcTemplate.update("INSERT into T_FOOS (ID,NAME,VALUE) values (?, ?, ?)", i, "foo" + i, i);
 		}
-		assertEquals(ITEM_COUNT, SimpleJdbcTestUtils.countRowsInTable(jdbcTemplate, "T_FOOS"));
+		assertEquals(ITEM_COUNT, JdbcTestUtils.countRowsInTable(jdbcTemplate, "T_FOOS"));
 	}
 
 	@After
 	public void destroy() {
-		SimpleJdbcTemplate jdbcTemplate = new SimpleJdbcTemplate(dataSource);
+		JdbcTemplate jdbcTemplate = new JdbcTemplate(dataSource);
 		jdbcTemplate.update("DELETE from T_FOOS where ID>?", maxId);
 	}
 
@@ -140,7 +142,9 @@ public class JdbcPagingItemReaderAsyncTests {
 		HsqlPagingQueryProvider queryProvider = new HsqlPagingQueryProvider();
 		queryProvider.setSelectClause("select ID, NAME, VALUE");
 		queryProvider.setFromClause("from T_FOOS");
-		queryProvider.setSortKey("ID");
+		Map<String, Order> sortKeys = new LinkedHashMap<String, Order>();
+		sortKeys.put("ID", Order.ASCENDING);
+		queryProvider.setSortKeys(sortKeys);
 		reader.setQueryProvider(queryProvider);
 		reader.setRowMapper(new ParameterizedRowMapper<Foo>() {
 			public Foo mapRow(ResultSet rs, int i) throws SQLException {

@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2007 the original author or authors.
+ * Copyright 2006-2012 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,6 +22,7 @@ import static org.junit.Assert.assertNull;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -47,6 +48,7 @@ import org.springframework.test.jdbc.SimpleJdbcTestUtils;
 
 /**
  * @author Dave Syer
+ * @author Michael Minella
  * @since 2.1
  */
 @RunWith(SpringJUnit4ClassRunner.class)
@@ -73,6 +75,7 @@ public class JdbcPagingRestartIntegrationTests {
 		for (int i = itemCount; i > maxId; i--) {
 			jdbcTemplate.update("INSERT into T_FOOS (ID,NAME,VALUE) values (?, ?, ?)", i, "foo" + i, i);
 		}
+		
 		assertEquals(itemCount, SimpleJdbcTestUtils.countRowsInTable(jdbcTemplate, "T_FOOS"));
 	}
 
@@ -124,7 +127,9 @@ public class JdbcPagingRestartIntegrationTests {
 		logger.debug("Ids: "+ids);
 		int startAfterValue = (new Long(ids.get(count - 1).get("ID").toString())).intValue();
 		logger.debug("Start after: " + startAfterValue);
-		executionContext.putInt("JdbcPagingItemReader.start.after", startAfterValue);
+		Map<String, Object> startAfterValues = new LinkedHashMap<String, Object>();
+		startAfterValues.put("ID", startAfterValue);
+		executionContext.put("JdbcPagingItemReader.start.after", startAfterValues);
 		((ItemStream) reader).open(executionContext);
 
 		for (int i = count; i < total; i++) {
@@ -147,7 +152,9 @@ public class JdbcPagingRestartIntegrationTests {
 		factory.setDataSource(dataSource);
 		factory.setSelectClause("select ID, NAME, VALUE");
 		factory.setFromClause("from T_FOOS");
-		factory.setSortKey("VALUE");
+		Map<String, Order> sortKeys = new LinkedHashMap<String, Order>();
+		sortKeys.put("VALUE", Order.ASCENDING);
+		factory.setSortKeys(sortKeys);
 		reader.setQueryProvider((PagingQueryProvider) factory.getObject());
 		reader.setRowMapper(new ParameterizedRowMapper<Foo>() {
 			public Foo mapRow(ResultSet rs, int i) throws SQLException {

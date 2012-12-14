@@ -16,8 +16,8 @@
 
 package org.springframework.batch.core.step.item;
 
-import org.springframework.batch.classify.BinaryExceptionClassifier;
-import org.springframework.batch.classify.Classifier;
+import org.springframework.classify.BinaryExceptionClassifier;
+import org.springframework.classify.Classifier;
 import org.springframework.batch.core.StepContribution;
 import org.springframework.batch.core.step.skip.LimitCheckingItemSkipPolicy;
 import org.springframework.batch.core.step.skip.NonSkippableReadException;

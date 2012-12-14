@@ -27,6 +27,7 @@ import org.springframework.batch.core.Step;
 import org.springframework.batch.core.StepExecution;
 import org.springframework.batch.core.launch.EmptyItemWriter;
 import org.springframework.batch.core.step.JobRepositorySupport;
+import org.springframework.batch.core.step.factory.SimpleStepFactoryBean;
 import org.springframework.batch.item.support.ListItemReader;
 import org.springframework.batch.repeat.RepeatCallback;
 import org.springframework.batch.repeat.RepeatOperations;

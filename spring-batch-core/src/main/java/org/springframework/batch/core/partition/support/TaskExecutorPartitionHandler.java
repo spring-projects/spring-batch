@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2007 the original author or authors.
+ * Copyright 2006-2012 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,8 +16,6 @@
 
 package org.springframework.batch.core.partition.support;
 
-import java.util.ArrayList;
-import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.concurrent.Callable;
@@ -29,9 +27,9 @@ import org.springframework.batch.core.ExitStatus;
 import org.springframework.batch.core.Step;
 import org.springframework.batch.core.StepExecution;
 import org.springframework.batch.core.partition.PartitionHandler;
-import org.springframework.batch.core.partition.StepExecutionSplitter;
 import org.springframework.batch.core.step.StepHolder;
 import org.springframework.beans.factory.InitializingBean;
+import org.springframework.beans.factory.annotation.Required;
 import org.springframework.core.task.SyncTaskExecutor;
 import org.springframework.core.task.TaskExecutor;
 import org.springframework.core.task.TaskRejectedException;
@@ -42,32 +40,20 @@ import org.springframework.util.Assert;
  * partitioned {@link Step} locally in multiple threads. This can be an
  * effective approach for scaling batch steps that are IO intensive, like
  * directory and filesystem scanning and copying.
- * 
+ * <p/>
+ * By default, the thread pool is synchronous.
+ *
+ * @author Sebastien Gerard
  * @author Dave Syer
  * @since 2.0
  */
-public class TaskExecutorPartitionHandler implements PartitionHandler, StepHolder, InitializingBean {
-
-	private int gridSize = 1;
+public class TaskExecutorPartitionHandler extends AbstractPartitionHandler implements StepHolder, InitializingBean {
 
 	private TaskExecutor taskExecutor = new SyncTaskExecutor();
 
 	private Step step;
 
 	public void afterPropertiesSet() throws Exception {
-	}
-
-	/**
-	 * Passed to the {@link StepExecutionSplitter} in the
-	 * {@link #handle(StepExecutionSplitter, StepExecution)} method, instructing
-	 * it how many {@link StepExecution} instances are required, ideally. The
-	 * {@link StepExecutionSplitter} is allowed to ignore the grid size in the
-	 * case of a restart, since the input data partitions must be preserved.
-	 * 
-	 * @param gridSize the number of step executions that will be created
-	 */
-	public void setGridSize(int gridSize) {
-		this.gridSize = gridSize;
 	}
 
 	/**
@@ -87,6 +73,7 @@ public class TaskExecutorPartitionHandler implements PartitionHandler, StepHolde
 	 * 
 	 * @param step the {@link Step} instance to use to execute business logic
 	 */
+    @Required
 	public void setStep(Step step) {
 		this.step = step;
 	}
@@ -101,51 +88,55 @@ public class TaskExecutorPartitionHandler implements PartitionHandler, StepHolde
 		return this.step;
 	}
 
-	/**
-	 * @see PartitionHandler#handle(StepExecutionSplitter, StepExecution)
-	 */
-	public Collection<StepExecution> handle(StepExecutionSplitter stepExecutionSplitter,
-			StepExecution masterStepExecution) throws Exception {
+    @Override
+    protected Set<StepExecution> doHandle(StepExecution masterStepExecution,
+                                          Set<StepExecution> partitionStepExecutions) throws Exception {
+        Assert.notNull(step, "A Step must be provided.");
+        final Set<Future<StepExecution>> tasks = new HashSet<Future<StepExecution>>(getGridSize());
+        final Set<StepExecution> result = new HashSet<StepExecution>();
 
-		Assert.notNull(step, "A Step must be provided.");
-		
-		Set<Future<StepExecution>> tasks = new HashSet<Future<StepExecution>>(gridSize);
+        for (final StepExecution stepExecution : partitionStepExecutions) {
+            final FutureTask<StepExecution> task = createTask(step, stepExecution);
 
-		Collection<StepExecution> result = new ArrayList<StepExecution>();
+            try {
+                taskExecutor.execute(task);
+                tasks.add(task);
+            } catch (TaskRejectedException e) {
+                // couldn't execute one of the tasks
+                ExitStatus exitStatus = ExitStatus.FAILED
+                        .addExitDescription("TaskExecutor rejected the task for this step.");
+                /*
+                 * Set the status in case the caller is tracking it through the
+                 * JobExecution.
+                 */
+                stepExecution.setStatus(BatchStatus.FAILED);
+                stepExecution.setExitStatus(exitStatus);
+                result.add(stepExecution);
+            }
+        }
 
-		for (final StepExecution stepExecution : stepExecutionSplitter.split(masterStepExecution, gridSize)) {
+        for (Future<StepExecution> task : tasks) {
+            result.add(task.get());
+        }
 
-			final FutureTask<StepExecution> task = new FutureTask<StepExecution>(new Callable<StepExecution>() {
-				public StepExecution call() throws Exception {
-					step.execute(stepExecution);
-					return stepExecution;
-				}
-			});
-
-			try {
-				taskExecutor.execute(task);
-				tasks.add(task);
-			}
-			catch (TaskRejectedException e) {
-				// couldn't execute one of the tasks
-				ExitStatus exitStatus = ExitStatus.FAILED
-						.addExitDescription("TaskExecutor rejected the task for this step.");
-				/*
-				 * Set the status in case the caller is tracking it through the
-				 * JobExecution.
-				 */
-				stepExecution.setStatus(BatchStatus.FAILED);
-				stepExecution.setExitStatus(exitStatus);
-				result.add(stepExecution);
-			}
-
-		}
-
-		for (Future<StepExecution> task : tasks) {
-			result.add(task.get());
-		}
-		return result;
-
+        return result;
 	}
+
+    /**
+     * Creates the task executing the given step in the context of the given execution.
+     *
+     * @param step the step to execute
+     * @param stepExecution the given execution
+     * @return the task executing the given step
+     */
+    protected FutureTask<StepExecution> createTask(final Step step,
+                                                   final StepExecution stepExecution) {
+        return new FutureTask<StepExecution>(new Callable<StepExecution>() {
+            public StepExecution call() throws Exception {
+                step.execute(stepExecution);
+                return stepExecution;
+            }
+        });
+    }
 
 }

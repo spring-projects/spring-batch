@@ -14,21 +14,21 @@ import org.springframework.batch.core.JobInstance;
 import org.springframework.batch.core.JobParameters;
 import org.springframework.batch.core.JobParametersBuilder;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.jdbc.core.simple.SimpleJdbcTemplate;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
-import org.springframework.test.jdbc.SimpleJdbcTestUtils;
+import org.springframework.batch.support.JdbcTestUtils;
 import org.springframework.transaction.annotation.Transactional;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(locations = "sql-dao-test.xml")
 public class JdbcJobInstanceDaoTests extends AbstractJobInstanceDaoTests {
-	
-	private SimpleJdbcTemplate jdbcTemplate;
+
+	private JdbcTemplate jdbcTemplate;
 	
 	@Autowired
 	public void setDataSource(DataSource dataSource) {
-		this.jdbcTemplate = new SimpleJdbcTemplate(dataSource);
+		this.jdbcTemplate = new JdbcTemplate(dataSource);
 	}
 	
 	@Autowired
@@ -38,9 +38,9 @@ public class JdbcJobInstanceDaoTests extends AbstractJobInstanceDaoTests {
 	private JobExecutionDao jobExecutionDao;
 
 	protected JobInstanceDao getJobInstanceDao() {
-		SimpleJdbcTestUtils.deleteFromTables(jdbcTemplate, "BATCH_JOB_EXECUTION_CONTEXT",
-				"BATCH_STEP_EXECUTION_CONTEXT", "BATCH_STEP_EXECUTION",
-				"BATCH_JOB_EXECUTION", "BATCH_JOB_PARAMS", "BATCH_JOB_INSTANCE");
+		JdbcTestUtils.deleteFromTables(jdbcTemplate, "BATCH_JOB_EXECUTION_CONTEXT",
+                "BATCH_STEP_EXECUTION_CONTEXT", "BATCH_STEP_EXECUTION",
+                "BATCH_JOB_EXECUTION", "BATCH_JOB_PARAMS", "BATCH_JOB_INSTANCE");
 		return jobInstanceDao;
 	}
 

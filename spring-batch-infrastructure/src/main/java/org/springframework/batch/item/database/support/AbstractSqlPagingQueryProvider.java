@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2008 the original author or authors.
+ * Copyright 2006-2012 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,16 +16,19 @@
 
 package org.springframework.batch.item.database.support;
 
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+
 import javax.sql.DataSource;
 
-import org.springframework.util.Assert;
-import org.springframework.util.StringUtils;
 import org.springframework.batch.item.database.JdbcParameterUtils;
+import org.springframework.batch.item.database.Order;
 import org.springframework.batch.item.database.PagingQueryProvider;
 import org.springframework.dao.InvalidDataAccessApiUsageException;
-
-import java.util.List;
-import java.util.ArrayList;
+import org.springframework.util.Assert;
+import org.springframework.util.StringUtils;
 
 /**
  * Abstract SQL Paging Query Provider to serve as a base class for all provided
@@ -39,10 +42,12 @@ import java.util.ArrayList;
  * 
  * Provides properties and preparation for the mandatory "selectClause" and
  * "fromClause" as well as for the optional "whereClause". Also provides
- * property for the mandatory "sortKey".
+ * property for the mandatory "sortKeys".  <b>Note:</b> The columns that make up 
+ * the sort key must be a true key and not just a column to order by.
  * 
  * @author Thomas Risberg
  * @author Dave Syer
+ * @author Michael Minella
  * @since 2.0
  */
 public abstract class AbstractSqlPagingQueryProvider implements PagingQueryProvider {
@@ -52,14 +57,37 @@ public abstract class AbstractSqlPagingQueryProvider implements PagingQueryProvi
 	private String fromClause;
 
 	private String whereClause;
+	
+	private Map<String, Order> sortKeys = new LinkedHashMap<String, Order>();
 
-	private String sortKey;
-
-	private boolean ascending = true;
+	private String groupClause;
 
 	private int parameterCount;
 
 	private boolean usingNamedParameters;
+	
+	/**
+	 * The setter for the group by clause
+	 * 
+	 * @param groupClause SQL GROUP BY clause part of the SQL query string
+	 */
+	public void setGroupClause(String groupClause) {
+		if (StringUtils.hasText(groupClause)) {
+			this.groupClause = removeKeyWord("group by", groupClause);
+		}
+		else {
+			this.groupClause = null;
+		}
+	}
+	
+	/**
+	 * The getter for the group by clause
+	 * 
+	 * @return SQL GROUP BY clause part of the SQL query string
+	 */
+	public String getGroupClause() {
+		return this.groupClause;
+	}
 
 	/**
 	 * @param selectClause SELECT clause part of SQL query string
@@ -112,53 +140,19 @@ public abstract class AbstractSqlPagingQueryProvider implements PagingQueryProvi
 	}
 
 	/**
-	 * @param sortKey key to use to sort and limit page content
+	 * @param sortKeys key to use to sort and limit page content
 	 */
-	public void setSortKey(String sortKey) {
-		this.sortKey = sortKey;
+	public void setSortKeys(Map<String, Order> sortKeys) {
+		this.sortKeys = sortKeys;
 	}
 
 	/**
-	 * Set the flag that signals that the sort key is applied ascending (default
-	 * true).
+	 * A Map<String, Boolean> of sort columns as the key and boolean for ascending/descending (assending = true).
 	 * 
-	 * @param ascending the ascending value to set
-	 */
-	public void setAscending(boolean ascending) {
-		this.ascending = ascending;
-	}
-
-	/**
-	 * Get the flag that signals that the sort key is applied ascending.
-	 * 
-	 * @return the ascending flag
-	 */
-	public boolean isAscending() {
-		return ascending;
-	}
-
-	/**
-	 *
 	 * @return sortKey key to use to sort and limit page content
 	 */
-	public String getSortKey() {
-		return sortKey;
-	}
-
-	/**
-	 *
-	 * @return sortKey key to use to sort and limit page content (without alias)
-	 */
-	public String getSortKeyWithoutAlias() {
-		String sortKey = getSortKey();
-		int separator = sortKey.indexOf('.');
-		if (separator > 0) {
-			int columnIndex = separator + 1;
-			if (columnIndex < sortKey.length()) {
-				sortKey = sortKey.substring(columnIndex);
-			}
-		}
-		return sortKey;
+	public Map<String, Order> getSortKeys() {
+		return sortKeys;
 	}
 
 	public int getParameterCount() {
@@ -175,8 +169,8 @@ public abstract class AbstractSqlPagingQueryProvider implements PagingQueryProvi
 	 * 
 	 * @return place holder for sortKey.
 	 */
-	protected String getSortKeyPlaceHolder() {
-		return usingNamedParameters ? ":_sortKey" : "?";
+	public String getSortKeyPlaceHolder(String keyName) {
+		return usingNamedParameters ? ":_" + keyName : "?";
 	}
 
 	/**
@@ -187,12 +181,15 @@ public abstract class AbstractSqlPagingQueryProvider implements PagingQueryProvi
 		Assert.notNull(dataSource);
 		Assert.hasLength(selectClause, "selectClause must be specified");
 		Assert.hasLength(fromClause, "fromClause must be specified");
-		Assert.hasLength(sortKey, "sortKey must be specified");
+		Assert.notEmpty(sortKeys, "sortKey must be specified");
 		StringBuilder sql = new StringBuilder();
 		sql.append("SELECT ").append(selectClause);
 		sql.append(" FROM ").append(fromClause);
 		if (whereClause != null) {
 			sql.append(" WHERE ").append(whereClause);
+		}
+		if(groupClause != null) {
+			sql.append(" GROUP BY ").append(groupClause);
 		}
 		List<String> namedParameters = new ArrayList<String>();
 		parameterCount = JdbcParameterUtils.countParameterPlaceholders(sql.toString(), namedParameters);

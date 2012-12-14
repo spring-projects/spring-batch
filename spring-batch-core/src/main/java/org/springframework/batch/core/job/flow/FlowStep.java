@@ -1,14 +1,13 @@
 package org.springframework.batch.core.job.flow;
 
 import org.springframework.batch.core.JobExecutionException;
+import org.springframework.batch.core.Step;
 import org.springframework.batch.core.StepExecution;
 import org.springframework.batch.core.job.SimpleStepHandler;
 import org.springframework.batch.core.job.StepHandler;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.step.AbstractStep;
 import org.springframework.util.Assert;
-
-import com.sun.org.apache.xerces.internal.impl.xpath.XPath.Step;
 
 /**
  * A {@link Step} implementation that delegates to a {@link Flow}. Useful for
@@ -55,8 +54,11 @@ public class FlowStep extends AbstractStep {
 	 */
 	@Override
 	public void afterPropertiesSet() throws Exception {
-		super.afterPropertiesSet();
 		Assert.state(flow != null, "A Flow must be provided");
+		if (getName()==null) {
+			setName(flow.getName());
+		}
+		super.afterPropertiesSet();
 	}
 
 	/**

@@ -232,6 +232,39 @@ public class TaskExecutorRepeatTemplateBulkAsynchronousTests {
 		assertEquals(0, frequency);
 
 	}
+	
+	@Test
+	public void testErrorThrownByCallback() throws Exception {
+
+		callback = new RepeatCallback() {
+
+			private volatile AtomicInteger count = new AtomicInteger(0);
+
+			public RepeatStatus doInIteration(RepeatContext context)
+					throws Exception {
+				int position = count.incrementAndGet();
+				
+				if(position == 4) {
+					throw new OutOfMemoryError("Planned");
+				}
+				else {
+					return RepeatStatus.CONTINUABLE;
+				}
+			}
+		};
+		
+		template.setCompletionPolicy(new SimpleCompletionPolicy(10));
+
+		try {
+			template.iterate(callback);
+			fail("Expected planned exception");
+		} catch (OutOfMemoryError oome) {
+			assertEquals("Planned", oome.getMessage());
+		} catch (Exception e) {
+			e.printStackTrace();
+			fail("Wrong exception was thrown: " + e);
+		}
+	}
 
 	/**
 	 * Slightly flakey convenience method. If this doesn't do something that

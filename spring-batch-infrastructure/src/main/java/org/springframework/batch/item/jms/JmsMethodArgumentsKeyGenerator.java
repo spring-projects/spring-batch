@@ -20,7 +20,7 @@ import javax.jms.JMSException;
 import javax.jms.Message;
 
 import org.springframework.batch.item.UnexpectedInputException;
-import org.springframework.batch.retry.interceptor.MethodArgumentsKeyGenerator;
+import org.springframework.retry.interceptor.MethodArgumentsKeyGenerator;
 
 /**
  * A {@link MethodArgumentsKeyGenerator} for JMS 
@@ -34,7 +34,7 @@ public class JmsMethodArgumentsKeyGenerator implements MethodArgumentsKeyGenerat
 	 * If the message is a {@link Message} then returns the JMS message ID.
 	 * Otherwise just return the first argument.
 	 * 
-	 * @see org.springframework.batch.retry.interceptor.MethodArgumentsKeyGenerator#getKey(Object[])
+	 * @see org.springframework.retry.interceptor.MethodArgumentsKeyGenerator#getKey(Object[])
 	 * 
 	 * @throws UnexpectedInputException if the JMS id cannot be determined from
 	 * a JMS Message

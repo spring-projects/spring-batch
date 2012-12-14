@@ -20,11 +20,11 @@ import static org.easymock.EasyMock.expectLastCall;
 import static org.easymock.EasyMock.replay;
 import static org.easymock.EasyMock.verify;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
@@ -394,4 +394,29 @@ public class SimpleJobOperatorTests {
 		assertEquals(BatchStatus.STOPPING, jobExecution.getStatus());
 	}
 
+    @Test
+    public void testAbort() throws Exception {
+        JobInstance jobInstance = new JobInstance(123L, jobParameters, job.getName());
+        JobExecution jobExecution = new JobExecution(jobInstance, 111L);
+        jobExecution.setStatus(BatchStatus.STOPPING);
+        jobExplorer.getJobExecution(123L);
+        expectLastCall().andReturn(jobExecution);
+        jobRepository.update(jobExecution);
+        replay(jobExplorer);
+        jobOperator.abandon(123L);
+        assertEquals(BatchStatus.ABANDONED, jobExecution.getStatus());
+        assertNotNull(jobExecution.getEndTime());
+    }
+
+    @Test(expected = JobExecutionAlreadyRunningException.class)
+    public void testAbortNonStopping() throws Exception {
+        JobInstance jobInstance = new JobInstance(123L, jobParameters, job.getName());
+        JobExecution jobExecution = new JobExecution(jobInstance, 111L);
+        jobExecution.setStatus(BatchStatus.STARTED);
+        jobExplorer.getJobExecution(123L);
+        expectLastCall().andReturn(jobExecution);
+        jobRepository.update(jobExecution);
+        replay(jobExplorer);
+        jobOperator.abandon(123L);
+    }
 }

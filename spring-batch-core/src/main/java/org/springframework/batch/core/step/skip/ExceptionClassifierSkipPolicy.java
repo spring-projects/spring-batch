@@ -17,8 +17,8 @@ package org.springframework.batch.core.step.skip;
 
 import java.util.Map;
 
-import org.springframework.batch.classify.Classifier;
-import org.springframework.batch.classify.SubclassClassifier;
+import org.springframework.classify.Classifier;
+import org.springframework.classify.SubclassClassifier;
 
 /**
  * A {@link SkipPolicy} that depends on an exception classifier to make its

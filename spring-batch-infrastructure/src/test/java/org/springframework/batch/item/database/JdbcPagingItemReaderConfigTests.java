@@ -9,7 +9,7 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.jdbc.core.simple.SimpleJdbcTemplate;
+import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 
 import org.springframework.test.util.ReflectionTestUtils;
 
@@ -23,8 +23,9 @@ public class JdbcPagingItemReaderConfigTests {
 	@Test
 	public void testConfig() {
 		assertNotNull(jdbcPagingItemReder);
-		SimpleJdbcTemplate simpleJdbcTemplate = (SimpleJdbcTemplate) ReflectionTestUtils.getField(jdbcPagingItemReder, "simpleJdbcTemplate");
-		JdbcTemplate jdbcTemplate = (JdbcTemplate) simpleJdbcTemplate.getJdbcOperations();
+		NamedParameterJdbcTemplate namedParameterJdbcTemplate = (NamedParameterJdbcTemplate)
+                ReflectionTestUtils.getField(jdbcPagingItemReder, "namedParameterJdbcTemplate");
+        JdbcTemplate jdbcTemplate = (JdbcTemplate) namedParameterJdbcTemplate.getJdbcOperations();
 		assertEquals(1000, jdbcTemplate.getMaxRows());
 		assertEquals(100, jdbcTemplate.getFetchSize());
 	}

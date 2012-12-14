@@ -11,7 +11,7 @@ import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.test.sample.SampleTasklet;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.jdbc.core.simple.SimpleJdbcTemplate;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.annotation.Repeat;
 import org.springframework.test.context.ContextConfiguration;
 
@@ -25,7 +25,7 @@ import org.springframework.test.context.ContextConfiguration;
 @ContextConfiguration(locations = { "/simple-job-launcher-context.xml", "/job-runner-context.xml" })
 public abstract class AbstractSampleJobTests {
 
-	private SimpleJdbcTemplate jdbcTemplate;
+	private JdbcTemplate jdbcTemplate;
 
 	@Autowired
 	private JobLauncherTestUtils jobLauncherTestUtils;
@@ -35,7 +35,7 @@ public abstract class AbstractSampleJobTests {
 	private SampleTasklet tasklet2;
 
 	@Autowired
-	public void setJdbcTemplate(SimpleJdbcTemplate jdbcTemplate) {
+	public void setJdbcTemplate(JdbcTemplate jdbcTemplate) {
 		this.jdbcTemplate = jdbcTemplate;
 	}
 

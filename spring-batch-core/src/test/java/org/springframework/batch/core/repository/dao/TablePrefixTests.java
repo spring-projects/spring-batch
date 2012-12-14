@@ -31,10 +31,10 @@ import org.springframework.batch.core.scope.context.ChunkContext;
 import org.springframework.batch.core.step.tasklet.Tasklet;
 import org.springframework.batch.repeat.RepeatStatus;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.jdbc.core.simple.SimpleJdbcTemplate;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
-import org.springframework.test.jdbc.SimpleJdbcTestUtils;
+import org.springframework.batch.support.JdbcTestUtils;
 
 @ContextConfiguration
 @RunWith(SpringJUnit4ClassRunner.class)
@@ -46,18 +46,18 @@ public class TablePrefixTests {
 	@Autowired
 	private Job job;
 
-	private SimpleJdbcTemplate simpleJdbcTemplate;
+	private JdbcTemplate jdbcTemplate;
 
 	@Autowired
 	public void setDataSource(DataSource dataSource) {
-		this.simpleJdbcTemplate = new SimpleJdbcTemplate(dataSource);
+		this.jdbcTemplate = new JdbcTemplate(dataSource);
 	}
 
 	@Test
 	public void testJobLaunch() throws Exception {
 		JobExecution jobExecution = jobLauncher.run(job, new JobParameters());
 		assertEquals(BatchStatus.COMPLETED, jobExecution.getStatus());
-		assertEquals(1, SimpleJdbcTestUtils.countRowsInTable(simpleJdbcTemplate, "PREFIX_JOB_INSTANCE"));
+		assertEquals(1, JdbcTestUtils.countRowsInTable(jdbcTemplate, "PREFIX_JOB_INSTANCE"));
 	}
 
 	public static class TestTasklet implements Tasklet {

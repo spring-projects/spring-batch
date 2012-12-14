@@ -2,7 +2,7 @@
 <beans:beans xmlns="http://www.springframework.org/schema/batch" xmlns:beans="http://www.springframework.org/schema/beans"
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://www.springframework.org/schema/batch http://www.springframework.org/schema/batch/spring-batch-2.1.xsd
-	http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.5.xsd">
+	http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.1.xsd">
 
 	<beans:import resource="common-context.xml" />
 
@@ -101,7 +101,7 @@
 					</streams>
 					<retry-listeners>
 						<listener>
-							<beans:bean class="org.springframework.batch.retry.listener.RetryListenerSupport"/>
+							<beans:bean class="org.springframework.retry.listener.RetryListenerSupport"/>
 						</listener>
 					</retry-listeners>
 				</chunk>

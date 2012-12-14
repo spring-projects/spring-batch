@@ -18,6 +18,7 @@ package org.springframework.batch.core.explore.support;
 
 import javax.sql.DataSource;
 
+import org.springframework.batch.core.repository.ExecutionContextSerializer;
 import org.springframework.batch.core.repository.dao.AbstractJdbcBatchMetadataDao;
 import org.springframework.batch.core.repository.dao.ExecutionContextDao;
 import org.springframework.batch.core.repository.dao.JdbcExecutionContextDao;
@@ -27,11 +28,12 @@ import org.springframework.batch.core.repository.dao.JdbcStepExecutionDao;
 import org.springframework.batch.core.repository.dao.JobExecutionDao;
 import org.springframework.batch.core.repository.dao.JobInstanceDao;
 import org.springframework.batch.core.repository.dao.StepExecutionDao;
+import org.springframework.batch.core.repository.dao.XStreamExecutionContextStringSerializer;
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.beans.factory.FactoryBean;
 import org.springframework.beans.factory.InitializingBean;
-import org.springframework.jdbc.core.simple.SimpleJdbcOperations;
-import org.springframework.jdbc.core.simple.SimpleJdbcTemplate;
+import org.springframework.jdbc.core.JdbcOperations;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.incrementer.AbstractDataFieldMaxValueIncrementer;
 import org.springframework.jdbc.support.incrementer.DataFieldMaxValueIncrementer;
 import org.springframework.jdbc.support.lob.LobHandler;
@@ -41,7 +43,7 @@ import org.springframework.util.Assert;
  * A {@link FactoryBean} that automates the creation of a
  * {@link SimpleJobExplorer} using JDBC DAO implementations. Requires the user
  * to describe what kind of database they are using.
- * 
+ *
  * @author Dave Syer
  * @since 2.0
  */
@@ -50,7 +52,7 @@ public class JobExplorerFactoryBean extends AbstractJobExplorerFactoryBean
 
 	private DataSource dataSource;
 
-	private SimpleJdbcOperations jdbcTemplate;
+	private JdbcOperations jdbcTemplate;
 
 	private String tablePrefix = AbstractJdbcBatchMetadataDao.DEFAULT_TABLE_PREFIX;
 
@@ -63,9 +65,22 @@ public class JobExplorerFactoryBean extends AbstractJobExplorerFactoryBean
 
 	private LobHandler lobHandler;
 
+	private ExecutionContextSerializer serializer;
+
+	/**
+	 * A custom implementation of the {@link ExecutionContextSerializer}.
+	 * The default, if not injected, is the {@link XStreamExecutionContextStringSerializer}.
+	 *
+	 * @param serializer
+	 * @see ExecutionContextSerializer
+	 */
+	public void setSerializer(ExecutionContextSerializer serializer) {
+		this.serializer = serializer;
+	}
+
 	/**
 	 * Public setter for the {@link DataSource}.
-	 * 
+	 *
 	 * @param dataSource
 	 *            a {@link DataSource}
 	 */
@@ -75,7 +90,7 @@ public class JobExplorerFactoryBean extends AbstractJobExplorerFactoryBean
 
 	/**
 	 * Sets the table prefix for all the batch meta-data tables.
-	 * 
+	 *
 	 * @param tablePrefix
 	 */
 	public void setTablePrefix(String tablePrefix) {
@@ -85,7 +100,7 @@ public class JobExplorerFactoryBean extends AbstractJobExplorerFactoryBean
 	/**
 	 * The lob handler to use when saving {@link ExecutionContext} instances.
 	 * Defaults to null which works for most databases.
-	 * 
+	 *
 	 * @param lobHandler
 	 */
 	public void setLobHandler(LobHandler lobHandler) {
@@ -96,8 +111,14 @@ public class JobExplorerFactoryBean extends AbstractJobExplorerFactoryBean
 
 		Assert.notNull(dataSource, "DataSource must not be null.");
 
-		jdbcTemplate = new SimpleJdbcTemplate(dataSource);
+		jdbcTemplate = new JdbcTemplate(dataSource);
 
+		if(serializer == null) {
+			XStreamExecutionContextStringSerializer defaultSerializer = new XStreamExecutionContextStringSerializer();
+			defaultSerializer.afterPropertiesSet();
+
+			serializer = defaultSerializer;
+		}
 	}
 
 	private Object getTarget() throws Exception {
@@ -112,6 +133,7 @@ public class JobExplorerFactoryBean extends AbstractJobExplorerFactoryBean
 		dao.setJdbcTemplate(jdbcTemplate);
 		dao.setLobHandler(lobHandler);
 		dao.setTablePrefix(tablePrefix);
+		dao.setSerializer(serializer);
 		dao.afterPropertiesSet();
 		return dao;
 	}
@@ -136,6 +158,7 @@ public class JobExplorerFactoryBean extends AbstractJobExplorerFactoryBean
 		return dao;
 	}
 
+	@Override
 	protected StepExecutionDao createStepExecutionDao() throws Exception {
 		JdbcStepExecutionDao dao = new JdbcStepExecutionDao();
 		dao.setJdbcTemplate(jdbcTemplate);

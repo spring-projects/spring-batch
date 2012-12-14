@@ -1,8 +1,8 @@
 package org.springframework.batch.core.configuration.xml;
 
-import org.springframework.batch.retry.RetryCallback;
-import org.springframework.batch.retry.RetryContext;
-import org.springframework.batch.retry.RetryListener;
+import org.springframework.retry.RetryCallback;
+import org.springframework.retry.RetryContext;
+import org.springframework.retry.RetryListener;
 
 public class TestRetryListener extends AbstractTestComponent implements RetryListener {
 

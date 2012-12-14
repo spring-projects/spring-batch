@@ -22,7 +22,7 @@ import org.springframework.batch.core.Step;
 import org.springframework.batch.core.StepExecution;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.repository.support.MapJobRepositoryFactoryBean;
-import org.springframework.batch.core.step.item.FaultTolerantStepFactoryBean;
+import org.springframework.batch.core.step.factory.FaultTolerantStepFactoryBean;
 import org.springframework.batch.item.ItemProcessor;
 import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.ItemWriter;
