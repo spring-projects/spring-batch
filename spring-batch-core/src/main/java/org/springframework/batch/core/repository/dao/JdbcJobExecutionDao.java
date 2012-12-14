@@ -18,10 +18,14 @@ package org.springframework.batch.core.repository.dao;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Timestamp;
 import java.sql.Types;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
+import java.util.Map.Entry;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -29,6 +33,9 @@ import org.springframework.batch.core.BatchStatus;
 import org.springframework.batch.core.ExitStatus;
 import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.JobInstance;
+import org.springframework.batch.core.JobParameter;
+import org.springframework.batch.core.JobParameters;
+import org.springframework.batch.core.JobParameter.ParameterType;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.dao.OptimisticLockingFailureException;
@@ -45,7 +52,7 @@ import org.springframework.util.Assert;
  * IllegalArgumentException will be thrown. This could be left to JdbcTemplate,
  * however, the exception will be fairly vague, and fails to highlight which
  * field caused the exception.
- * 
+ *
  * @author Lucas Ward
  * @author Dave Syer
  * @author Robert Kasanicky
@@ -57,6 +64,10 @@ public class JdbcJobExecutionDao extends AbstractJdbcBatchMetadataDao implements
 
 	private static final String SAVE_JOB_EXECUTION = "INSERT into %PREFIX%JOB_EXECUTION(JOB_EXECUTION_ID, JOB_INSTANCE_ID, START_TIME, "
 			+ "END_TIME, STATUS, EXIT_CODE, EXIT_MESSAGE, VERSION, CREATE_TIME, LAST_UPDATED) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+
+	private static final String SAVE_JOB_EXECUTION_PARAMS = "INSERT into %PREFIX%JOB_EXECUTION_PARAMS( " +
+			" JOB_EXECUTION_ID, TYPE_CD, KEY_NAME, STRING_VAL, DATE_VAL, LONG_VAL, DOUBLE_VAL, IS_ID) " +
+			" values (?, ?, ?, ?, ?, ?, ?, ?)";
 
 	private static final String CHECK_JOB_EXECUTION_EXISTS = "SELECT COUNT(*) FROM %PREFIX%JOB_EXECUTION WHERE JOB_EXECUTION_ID = ?";
 
@@ -79,7 +90,15 @@ public class JdbcJobExecutionDao extends AbstractJdbcBatchMetadataDao implements
 
 	private static final String CURRENT_VERSION_JOB_EXECUTION = "SELECT VERSION FROM %PREFIX%JOB_EXECUTION WHERE JOB_EXECUTION_ID=?";
 
+	private static final String GET_PARAMS_BY_EXECUTION_ID
+			= "SELECT JOB_EXECUTION_ID, TYPE_CD, KEY_NAME, STRING_VAL, DATE_VAL, LONG_VAL, DOUBLE_VAL, IS_ID "
+					+ " from %PREFIX%JOB_EXECUTION_PARAMS where JOB_EXECUTION_ID = ?";
+
+	private static final String DB_YES = "1";
+	private static final String DB_NO = "0";
+
 	private int exitMessageLength = DEFAULT_EXIT_MESSAGE_LENGTH;
+
 
 	private DataFieldMaxValueIncrementer jobExecutionIncrementer;
 
@@ -95,7 +114,7 @@ public class JdbcJobExecutionDao extends AbstractJdbcBatchMetadataDao implements
 	/**
 	 * Setter for {@link DataFieldMaxValueIncrementer} to be used when
 	 * generating primary keys for {@link JobExecution} instances.
-	 * 
+	 *
 	 * @param jobExecutionIncrementer the {@link DataFieldMaxValueIncrementer}
 	 */
 	public void setJobExecutionIncrementer(DataFieldMaxValueIncrementer jobExecutionIncrementer) {
@@ -116,11 +135,11 @@ public class JdbcJobExecutionDao extends AbstractJdbcBatchMetadataDao implements
 	}
 
 	/**
-	 * 
+	 *
 	 * SQL implementation using Sequences via the Spring incrementer
 	 * abstraction. Once a new id has been obtained, the JobExecution is saved
 	 * via a SQL INSERT statement.
-	 * 
+	 *
 	 * @see JobExecutionDao#saveJobExecution(JobExecution)
 	 * @throws IllegalArgumentException if jobExecution is null, as well as any
 	 * of it's fields to be persisted.
@@ -141,12 +160,62 @@ public class JdbcJobExecutionDao extends AbstractJdbcBatchMetadataDao implements
 				parameters,
 				new int[] { Types.BIGINT, Types.BIGINT, Types.TIMESTAMP, Types.TIMESTAMP, Types.VARCHAR,
 						Types.VARCHAR, Types.VARCHAR, Types.INTEGER, Types.TIMESTAMP, Types.TIMESTAMP });
+		if (jobExecution.getJobParameters() != null) {
+			insertJobParameters(jobExecution.getId(), jobExecution.getJobParameters());
+		}
+	}
+
+	/**
+	 * Convenience method that inserts all parameters from the provided
+	 * JobParameters.
+	 *
+	 */
+	private void insertJobParameters(Long executionId, JobParameters jobParameters) {
+
+		for (Entry<String, JobParameter> entry : jobParameters.getParameters()
+				.entrySet()) {
+			JobParameter jobParameter = entry.getValue();
+			insertParameter(executionId,
+							jobParameter.getType(),
+							entry.getKey(),
+							jobParameter.getValue(),
+							jobParameter.isIdentifying());
+		}
+	}
+
+	/**
+	 * Convenience method that inserts an individual records into the
+	 * JobParameters table.
+	 */
+	private void insertParameter(Long jobId, ParameterType type, String key,
+			Object value, boolean isIdentifying) {
+
+		Object[] args = new Object[0];
+		int[] argTypes = new int[] { Types.BIGINT, Types.VARCHAR,
+				Types.VARCHAR, Types.VARCHAR, Types.TIMESTAMP, Types.BIGINT,
+				Types.DOUBLE, Types.INTEGER };
+
+		if (type == ParameterType.STRING) {
+			args = new Object[] { jobId, type, key, value, new Timestamp(0L),
+					0L, 0D, isIdentifying };
+		} else if (type == ParameterType.LONG) {
+			args = new Object[] { jobId, type, key, "", new Timestamp(0L),
+					value, new Double(0), isIdentifying };
+		} else if (type == ParameterType.DOUBLE) {
+			args = new Object[] { jobId, type, key, "", new Timestamp(0L), 0L,
+					value, isIdentifying };
+		} else if (type == ParameterType.DATE) {
+			args = new Object[] { jobId, type, key, "", value, 0L, 0D,
+					isIdentifying };
+		}
+
+		getJdbcTemplate().update(getQuery(SAVE_JOB_EXECUTION_PARAMS), args, argTypes);
 	}
 
 	/**
 	 * Validate JobExecution. At a minimum, JobId, StartTime, EndTime, and
 	 * Status cannot be null.
-	 * 
+	 *
 	 * @param jobExecution
 	 * @throws IllegalArgumentException
 	 */
@@ -163,7 +232,7 @@ public class JdbcJobExecutionDao extends AbstractJdbcBatchMetadataDao implements
 	 * is first checked to ensure all fields are not null, and that it has an
 	 * ID. The database is then queried to ensure that the ID exists, which
 	 * ensures that it is valid.
-	 * 
+	 *
 	 * @see JobExecutionDao#updateJobExecution(JobExecution)
 	 */
 	public void updateJobExecution(JobExecution jobExecution) {
@@ -236,7 +305,7 @@ public class JdbcJobExecutionDao extends AbstractJdbcBatchMetadataDao implements
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @seeorg.springframework.batch.core.repository.dao.JobExecutionDao#
 	 * getLastJobExecution(java.lang.String)
 	 */
@@ -253,7 +322,7 @@ public class JdbcJobExecutionDao extends AbstractJdbcBatchMetadataDao implements
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @seeorg.springframework.batch.core.repository.dao.JobExecutionDao#
 	 * findRunningJobExecutions(java.lang.String)
 	 */
@@ -281,14 +350,39 @@ public class JdbcJobExecutionDao extends AbstractJdbcBatchMetadataDao implements
 			jobExecution.setVersion(currentVersion);
 		}
 	}
+	private JobParameters getJobExecutionParameters(Long executionId) {
+		final Map<String, JobParameter> map = new HashMap<String, JobParameter>();
+		RowCallbackHandler handler = new RowCallbackHandler() {
+			public void processRow(ResultSet rs) throws SQLException {
+				ParameterType type = ParameterType.valueOf(rs.getString(2));
+				boolean isIdentifying = rs.getBoolean(8);
+				JobParameter value = null;
+				if (type == ParameterType.STRING) {
+					value = new JobParameter(rs.getString(4), isIdentifying);
+				} else if (type == ParameterType.LONG) {
+					value = new JobParameter(rs.getLong(6), isIdentifying);
+				} else if (type == ParameterType.DOUBLE) {
+					value = new JobParameter(rs.getDouble(7), isIdentifying);
+				} else if (type == ParameterType.DATE) {
+					value = new JobParameter(rs.getTimestamp(5), isIdentifying);
+				}
+				// No need to assert that value is not null because it's an enum
+				map.put(rs.getString(3), value);
+			}
+		};
+		getJdbcTemplate().query(getQuery(GET_PARAMS_BY_EXECUTION_ID), new Object[] { executionId }, handler);
+
+		// execution parameters may be null if DB is migrated from older version of Spring Batch
+		return map.isEmpty() ? null : new JobParameters(map);
+	}
 
 	/**
 	 * Re-usable mapper for {@link JobExecution} instances.
-	 * 
+	 *
 	 * @author Dave Syer
-	 * 
+	 *
 	 */
-	private static class JobExecutionRowMapper implements ParameterizedRowMapper<JobExecution> {
+	private class JobExecutionRowMapper implements ParameterizedRowMapper<JobExecution> {
 
 		private JobInstance jobInstance;
 
@@ -301,13 +395,15 @@ public class JdbcJobExecutionDao extends AbstractJdbcBatchMetadataDao implements
 
 		public JobExecution mapRow(ResultSet rs, int rowNum) throws SQLException {
 			Long id = rs.getLong(1);
+			JobParameters jobExecutionParams = getJobExecutionParameters(id);
+
 			JobExecution jobExecution;
 
 			if (jobInstance == null) {
 				jobExecution = new JobExecution(id);
 			}
 			else {
-				jobExecution = new JobExecution(jobInstance, id);
+				jobExecution = new JobExecution(jobInstance, jobExecutionParams, id);
 			}
 
 			jobExecution.setStartTime(rs.getTimestamp(2));
@@ -317,6 +413,7 @@ public class JdbcJobExecutionDao extends AbstractJdbcBatchMetadataDao implements
 			jobExecution.setCreateTime(rs.getTimestamp(7));
 			jobExecution.setLastUpdated(rs.getTimestamp(8));
 			jobExecution.setVersion(rs.getInt(9));
+
 			return jobExecution;
 		}
 

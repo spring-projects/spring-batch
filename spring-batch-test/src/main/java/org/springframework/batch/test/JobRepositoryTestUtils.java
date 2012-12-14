@@ -47,7 +47,7 @@ import org.springframework.util.Assert;
  * from a database. Typical usage in test case would be to create instances
  * before a transaction, save the result, and then use it to remove them after
  * the transaction.
- * 
+ *
  * @author Dave Syer
  */
 public class JobRepositoryTestUtils extends AbstractJdbcBatchMetadataDao implements InitializingBean {
@@ -83,7 +83,7 @@ public class JobRepositoryTestUtils extends AbstractJdbcBatchMetadataDao impleme
 	/**
 	 * Create a {@link JobRepositoryTestUtils} with all its mandatory
 	 * properties.
-	 * 
+	 *
 	 * @param jobRepository a {@link JobRepository} backed by a database
 	 * @param dataSource a {@link DataSource}
 	 */
@@ -115,7 +115,7 @@ public class JobRepositoryTestUtils extends AbstractJdbcBatchMetadataDao impleme
 	 * Use the {@link JobRepository} to create some {@link JobExecution}
 	 * instances each with the given job name and each having step executions
 	 * with the given step names.
-	 * 
+	 *
 	 * @param jobName the name of the job
 	 * @param stepNames the names of the step executions
 	 * @param count the required number of instances of {@link JobExecution} to
@@ -141,7 +141,7 @@ public class JobRepositoryTestUtils extends AbstractJdbcBatchMetadataDao impleme
 	/**
 	 * Use the {@link JobRepository} to create some {@link JobExecution}
 	 * instances each with a single step execution.
-	 * 
+	 *
 	 * @param count the required number of instances of {@link JobExecution} to
 	 * create
 	 * @return a collection of {@link JobExecution}
@@ -156,7 +156,7 @@ public class JobRepositoryTestUtils extends AbstractJdbcBatchMetadataDao impleme
 	 * Remove the {@link JobExecution} instances, and all associated
 	 * {@link JobInstance} and {@link StepExecution} instances from the standard
 	 * RDBMS locations used by Spring Batch.
-	 * 
+	 *
 	 * @param list a list of {@link JobExecution}
 	 * @throws DataAccessException if there is a problem
 	 */
@@ -177,10 +177,12 @@ public class JobRepositoryTestUtils extends AbstractJdbcBatchMetadataDao impleme
 			}
 			jdbcTemplate.update(getQuery("delete from %PREFIX%JOB_EXECUTION_CONTEXT where JOB_EXECUTION_ID=?"),
 					jobExecution.getId());
+			jdbcTemplate.update(getQuery("delete from %PREFIX%JOB_EXECUTION_PARAMS where JOB_EXECUTION_ID=?"),
+					jobExecution.getId());
 			jdbcTemplate.update(getQuery("delete from %PREFIX%JOB_EXECUTION where JOB_EXECUTION_ID=?"), jobExecution
 					.getId());
 		}
-		for (JobExecution jobExecution : list) {		
+		for (JobExecution jobExecution : list) {
 			jdbcTemplate.update(getQuery("delete from %PREFIX%JOB_PARAMS where JOB_INSTANCE_ID=?"), jobExecution
 					.getJobId());
 			jdbcTemplate.update(getQuery("delete from %PREFIX%JOB_INSTANCE where JOB_INSTANCE_ID=?"), jobExecution
@@ -192,7 +194,7 @@ public class JobRepositoryTestUtils extends AbstractJdbcBatchMetadataDao impleme
 	 * Remove all the {@link JobExecution} instances, and all associated
 	 * {@link JobInstance} and {@link StepExecution} instances from the standard
 	 * RDBMS locations used by Spring Batch.
-	 * 
+	 *
 	 * @throws DataAccessException if there is a problem
 	 */
 	public void removeJobExecutions() throws DataAccessException {

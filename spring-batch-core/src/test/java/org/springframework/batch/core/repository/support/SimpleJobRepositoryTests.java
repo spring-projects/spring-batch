@@ -43,9 +43,9 @@ import org.springframework.batch.core.step.StepSupport;
  * Test SimpleJobRepository. The majority of test cases are tested using
  * EasyMock, however, there were some issues with using it for the stepExecutionDao when
  * testing finding or creating steps, so an actual mock class had to be written.
- * 
+ *
  * @author Lucas Ward
- * 
+ *
  */
 public class SimpleJobRepositoryTests {
 
@@ -58,13 +58,13 @@ public class SimpleJobRepositoryTests {
 	Step stepConfiguration1;
 
 	Step stepConfiguration2;
-	
+
 	JobExecutionDao jobExecutionDao;
-	
+
 	JobInstanceDao jobInstanceDao;
 
 	StepExecutionDao stepExecutionDao;
-	
+
 	ExecutionContextDao ecDao;
 
 	JobInstance jobInstance;
@@ -74,7 +74,7 @@ public class SimpleJobRepositoryTests {
 	String databaseStep2;
 
 	List<String> steps;
-	
+
 	JobExecution jobExecution;
 
 	@Before
@@ -119,7 +119,7 @@ public class SimpleJobRepositoryTests {
 	public void testSaveOrUpdateInvalidJobExecution() {
 
 		// failure scenario - must have job ID
-		JobExecution jobExecution = new JobExecution(null, null);
+		JobExecution jobExecution = new JobExecution();
 		try {
 			jobRepository.update(jobExecution);
 			fail();
@@ -138,7 +138,7 @@ public class SimpleJobRepositoryTests {
 		replay(jobExecutionDao);
 		jobRepository.update(jobExecution);
 		verify(jobExecutionDao);
-		
+
 		assertNotNull(jobExecution.getLastUpdated());
 	}
 
@@ -156,45 +156,45 @@ public class SimpleJobRepositoryTests {
 			// expected
 		}
 	}
-	
+
 	@Test
 	public void testSaveStepExecutionSetsLastUpdated(){
-		
+
 		StepExecution stepExecution = new StepExecution("stepName", jobExecution);
-		
-		long before = System.currentTimeMillis(); 
-		
+
+		long before = System.currentTimeMillis();
+
 		jobRepository.add(stepExecution);
-		
+
 		assertNotNull(stepExecution.getLastUpdated());
-		
+
 		long lastUpdated = stepExecution.getLastUpdated().getTime();
 		assertTrue(lastUpdated > (before - 1000));
 	}
-	
+
 	@Test
 	public void testUpdateStepExecutionSetsLastUpdated(){
-		
+
 		StepExecution stepExecution = new StepExecution("stepName", jobExecution);
 		stepExecution.setId(2343L);
-		
-		long before = System.currentTimeMillis(); 
-		
+
+		long before = System.currentTimeMillis();
+
 		jobRepository.update(stepExecution);
-		
+
 		assertNotNull(stepExecution.getLastUpdated());
-		
+
 		long lastUpdated = stepExecution.getLastUpdated().getTime();
 		assertTrue(lastUpdated > (before - 1000));
 	}
-	
+
 	@Test
 	public void testInterrupted(){
-		
+
 		jobExecution.setStatus(BatchStatus.STOPPING);
 		StepExecution stepExecution = new StepExecution("stepName", jobExecution);
 		stepExecution.setId(323L);
-		
+
 		jobRepository.update(stepExecution);
 		assertTrue(stepExecution.isTerminateOnly());
 	}
@@ -214,6 +214,39 @@ public class SimpleJobRepositoryTests {
 		EasyMock.expectLastCall().andReturn(jobInstance);
 		replay(jobExecutionDao, jobInstanceDao, stepExecutionDao);
 		assertTrue(jobRepository.isJobInstanceExists("foo", new JobParameters()));
+		verify(jobExecutionDao, jobInstanceDao, stepExecutionDao);
+	}
+
+	@Test
+	public void testIsJobInstanceFalseWithNonIdParams() throws Exception {
+		JobParameters jobParams = new JobParametersBuilder()
+									.addString("str1", "val1")
+									.addString("nonIdStr2", "val2")
+									.toJobParameters();
+
+		JobParameters identifyingJobParams = jobParams.getIdentifyingJobParameters();
+
+		jobInstanceDao.getJobInstance("foo", identifyingJobParams);
+		EasyMock.expectLastCall().andReturn(null);
+		replay(jobExecutionDao, jobInstanceDao, stepExecutionDao);
+		assertFalse(jobRepository.isJobInstanceExists("foo", jobParams));
+		verify(jobExecutionDao, jobInstanceDao, stepExecutionDao);
+	}
+
+	@Test
+	public void testIsJobInstanceTrueWithNonIdParams() throws Exception {
+		JobParameters jobParams = new JobParametersBuilder()
+									.addString("str1", "val1")
+									.addString("nonIdStr2", "val2")
+									.toJobParameters();
+
+		JobParameters identifyingJobParams = jobParams.getIdentifyingJobParameters();
+
+
+		jobInstanceDao.getJobInstance("foo", identifyingJobParams);
+		EasyMock.expectLastCall().andReturn(jobInstance);
+		replay(jobExecutionDao, jobInstanceDao, stepExecutionDao);
+		assertTrue(jobRepository.isJobInstanceExists("foo", jobParams));
 		verify(jobExecutionDao, jobInstanceDao, stepExecutionDao);
 	}
 

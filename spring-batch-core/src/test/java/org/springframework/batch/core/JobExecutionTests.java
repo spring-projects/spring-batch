@@ -30,7 +30,7 @@ import org.springframework.batch.support.SerializationUtils;
 
 /**
  * @author Dave Syer
- * 
+ *
  */
 public class JobExecutionTests {
 
@@ -126,7 +126,7 @@ public class JobExecutionTests {
 	@Test
 	public void testGetJobId() {
 		assertEquals(11, execution.getJobId().longValue());
-		execution = new JobExecution(new JobInstance(new Long(23), new JobParameters(), "testJob"), null);
+		execution = new JobExecution(new JobInstance(new Long(23), new JobParameters(), "testJob"));
 		assertEquals(23, execution.getJobId().longValue());
 	}
 
@@ -136,7 +136,7 @@ public class JobExecutionTests {
 	 */
 	@Test
 	public void testGetJobIdForNullJob() {
-		execution = new JobExecution(null, null);
+		execution = new JobExecution();
 		assertEquals(null, execution.getJobId());
 	}
 
@@ -227,6 +227,7 @@ public class JobExecutionTests {
 		assertNotNull(deserialize.getFailureExceptions());
 	}
 
+	@Test
 	public void testFailureExceptions() {
 
 		RuntimeException exception = new RuntimeException();
@@ -243,5 +244,44 @@ public class JobExecutionTests {
 		assertEquals(1, execution.getFailureExceptions().size());
 		assertTrue(allExceptions.contains(exception));
 		assertTrue(allExceptions.contains(stepException1));
+	}
+
+	@Test
+	public void testGetJobParameters() {
+		JobParameters jobInstanceParams = new JobParametersBuilder()
+											.addString("str1", "jobInstance")
+											.toJobParameters();
+		JobParameters jobExecutionParams = new JobParametersBuilder()
+											.addString("str1", "jobExecution")
+											.toJobParameters();
+
+		execution = new JobExecution(new JobInstance(null, jobInstanceParams, "foo"));
+		execution.setJobParameters(jobExecutionParams);
+
+		assertEquals("job exec params", jobExecutionParams, execution.getJobParameters());
+	}
+
+
+	@Test
+	public void testGetJobParametersWithNullParameters() {
+		JobParameters jobInstanceParams = new JobParametersBuilder()
+											.addString("str1", "jobInstance")
+											.toJobParameters();
+
+		execution = new JobExecution(new JobInstance(null, jobInstanceParams, "foo"));
+		execution.setJobParameters(null);
+
+		assertEquals("job exec params", jobInstanceParams, execution.getJobParameters());
+	}
+
+
+	@Test
+	public void testGetJobParametersWithNullParametersAndNullJobInstance() {
+		execution = new JobExecution(new JobInstance(null, null, "foo"));
+		execution.setJobParameters(null);
+
+		assertEquals("job exec params",
+					JobParameters.EMPTY_JOB_PARAMETERS,
+					execution.getJobParameters());
 	}
 }

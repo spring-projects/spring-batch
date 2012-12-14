@@ -47,7 +47,7 @@ import org.springframework.core.task.TaskRejectedException;
 
 /**
  * @author Lucas Ward
- * 
+ *
  */
 public class SimpleJobLauncherTests {
 
@@ -182,7 +182,7 @@ public class SimpleJobLauncherTests {
 			}
 		});
 
-		JobExecution jobExecution = new JobExecution(null, null);
+		JobExecution jobExecution = new JobExecution();
 
 		expect(jobRepository.getLastJobExecution(job.getName(), jobParameters)).andReturn(null);
 		expect(jobRepository.createJobExecution(job.getName(), jobParameters)).andReturn(jobExecution);
@@ -259,7 +259,7 @@ public class SimpleJobLauncherTests {
 	}
 
 	private void run(ExitStatus exitStatus) throws Exception {
-		JobExecution jobExecution = new JobExecution(null, null);
+		JobExecution jobExecution = new JobExecution();
 
 		expect(jobRepository.getLastJobExecution(job.getName(), jobParameters)).andReturn(null);
 		expect(jobRepository.createJobExecution(job.getName(), jobParameters)).andReturn(jobExecution);
