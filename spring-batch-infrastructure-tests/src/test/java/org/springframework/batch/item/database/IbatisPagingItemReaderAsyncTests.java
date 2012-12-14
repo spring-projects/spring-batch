@@ -22,13 +22,13 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.batch.item.sample.Foo;
+import org.springframework.batch.support.JdbcTestUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ClassPathResource;
-import org.springframework.jdbc.core.simple.SimpleJdbcTemplate;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.orm.ibatis.SqlMapClientFactoryBean;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
-import org.springframework.test.jdbc.SimpleJdbcTestUtils;
 
 import com.ibatis.sqlmap.client.SqlMapClient;
 
@@ -55,17 +55,17 @@ public class IbatisPagingItemReaderAsyncTests {
 
 	@Before
 	public void init() {
-		SimpleJdbcTemplate jdbcTemplate = new SimpleJdbcTemplate(dataSource);
+        JdbcTemplate jdbcTemplate = new JdbcTemplate(dataSource);
 		maxId = jdbcTemplate.queryForInt("SELECT MAX(ID) from T_FOOS");
 		for (int i = ITEM_COUNT; i > maxId; i--) {
 			jdbcTemplate.update("INSERT into T_FOOS (ID,NAME,VALUE) values (?, ?, ?)", i, "foo" + i, i);
 		}
-		assertEquals(ITEM_COUNT, SimpleJdbcTestUtils.countRowsInTable(jdbcTemplate, "T_FOOS"));
+		assertEquals(ITEM_COUNT, JdbcTestUtils.countRowsInTable(jdbcTemplate, "T_FOOS"));
 	}
 
 	@After
 	public void destroy() {
-		SimpleJdbcTemplate jdbcTemplate = new SimpleJdbcTemplate(dataSource);
+        JdbcTemplate jdbcTemplate = new JdbcTemplate(dataSource);
 		jdbcTemplate.update("DELETE from T_FOOS where ID>?", maxId);
 	}
 
