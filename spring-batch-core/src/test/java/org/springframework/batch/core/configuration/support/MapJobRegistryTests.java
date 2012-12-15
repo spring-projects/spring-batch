@@ -21,8 +21,6 @@ import junit.framework.TestCase;
 
 import org.springframework.batch.core.configuration.DuplicateJobException;
 import org.springframework.batch.core.configuration.JobFactory;
-import org.springframework.batch.core.configuration.support.MapJobRegistry;
-import org.springframework.batch.core.configuration.support.ReferenceJobFactory;
 import org.springframework.batch.core.job.JobSupport;
 import org.springframework.batch.core.launch.NoSuchJobException;
 
