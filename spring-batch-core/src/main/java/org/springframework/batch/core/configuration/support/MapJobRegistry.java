@@ -16,15 +16,12 @@
 package org.springframework.batch.core.configuration.support;
 
 import org.springframework.batch.core.Job;
-import org.springframework.batch.core.Step;
 import org.springframework.batch.core.configuration.DuplicateJobException;
 import org.springframework.batch.core.configuration.JobFactory;
 import org.springframework.batch.core.configuration.JobRegistry;
-import org.springframework.batch.core.configuration.StepRegistry;
 import org.springframework.batch.core.launch.NoSuchJobException;
 import org.springframework.util.Assert;
 
-import java.util.Collection;
 import java.util.Collections;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
@@ -36,14 +33,13 @@ import java.util.concurrent.ConcurrentMap;
  * @author Dave Syer
  * @author Robert Fischer
  */
-public class MapJobRegistry implements JobRegistry, StepRegistry {
+public class MapJobRegistry implements JobRegistry {
 
     /**
      * The map holding the registered job factories.
      */
     // The "final" ensures that it is visible and initialized when the constructor resolves.
     private final ConcurrentMap<String, JobFactory> map = new ConcurrentHashMap<String, JobFactory>();
-    private final MapStepRegistry stepRegistry = new MapStepRegistry();
 
     public void register(JobFactory jobFactory) throws DuplicateJobException {
         Assert.notNull(jobFactory);
@@ -75,18 +71,6 @@ public class MapJobRegistry implements JobRegistry, StepRegistry {
      */
     public Set<String> getJobNames() {
         return Collections.unmodifiableSet(map.keySet());
-    }
-
-    public void register(String jobName, Collection<Step> steps) throws DuplicateJobException {
-        stepRegistry.register(jobName, steps);
-    }
-
-    public void unregisterStepsFromJob(String jobName) {
-        stepRegistry.unregisterStepsFromJob(jobName);
-    }
-
-    public Step getStep(String jobName, String stepName) throws NoSuchJobException {
-        return stepRegistry.getStep(jobName, stepName);
     }
 
 }

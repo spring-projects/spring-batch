@@ -68,25 +68,11 @@ public class DefaultJobLoaderTests {
     }
 
     @Test
-    public void createWithJobRegistryWhichIsAStepRegistry() {
+    public void createWithOnlyJobRegistry() {
         final DefaultJobLoader loader = new DefaultJobLoader();
         loader.setJobRegistry(jobRegistry);
 
         loader.afterPropertiesSet();
-    }
-
-    @Test
-    public void createWithSimpleJobRegistry() {
-        final DefaultJobLoader loader = new DefaultJobLoader();
-        loader.setJobRegistry(new JobRegistryMock());
-
-        try {
-            loader.afterPropertiesSet();
-            fail("Should have failed to create job loader without a step registry (" +
-                    "and the job registry could not fulfill that role)");
-        } catch (IllegalArgumentException e) {
-            // OK
-        }
     }
 
     @Test
@@ -130,6 +116,43 @@ public class DefaultJobLoaderTests {
         assertStepDoNotExist("job1", "step21", "step22");
         assertStepExist("job2", "step21", "step22", "genericStep1", "genericStep2");
         assertStepDoNotExist("job2", "step11", "step12");
+    }
+
+    @Test
+    public void testNoStepRegistryAvailable() throws DuplicateJobException {
+        final JobLoader loader = new DefaultJobLoader(jobRegistry);
+        ClassPathXmlApplicationContextFactory factory = new ClassPathXmlApplicationContextFactory(
+                new ClassPathResource("job-context-with-steps.xml", getClass()));
+        loader.load(factory);
+        // No step registry available so just registering the jobs
+        assertEquals(2, jobRegistry.getJobNames().size());
+    }
+
+    @Test
+    public void testLoadWithJobThatIsNotAStepLocator() throws DuplicateJobException {
+        ClassPathXmlApplicationContextFactory factory = new ClassPathXmlApplicationContextFactory(
+                new ByteArrayResource(BASIC_JOB_XML.getBytes()));
+        try {
+            jobLoader.load(factory);
+            fail("Should have failed with a ["+UnsupportedOperationException.class.getName()+"] as job does not" +
+                    "implement StepLocator.");
+        } catch (UnsupportedOperationException e) {
+            // Job is not a step locator, can't register steps
+        }
+
+    }
+
+    @Test
+    public void testLoadWithJobThatIsNotAStepLocatorNoStepRegistry() throws DuplicateJobException {
+        final JobLoader loader = new DefaultJobLoader(jobRegistry);
+        ClassPathXmlApplicationContextFactory factory = new ClassPathXmlApplicationContextFactory(
+                new ByteArrayResource(BASIC_JOB_XML.getBytes()));
+        try {
+            loader.load(factory);
+        } catch (UnsupportedOperationException e) {
+            fail("Should not have failed with a [" + UnsupportedOperationException.class.getName() + "] as " +
+                    "stepRegistry is not available for this JobLoader instance.");
+        }
     }
 
     @Test
@@ -182,13 +205,19 @@ public class DefaultJobLoaderTests {
         }
     }
 
+    private static final String BASIC_JOB_XML = String
+            .format(
+                    "<beans xmlns='http://www.springframework.org/schema/beans' xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance' "
+                            + "xsi:schemaLocation='http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.5.xsd'><bean class='%s$BasicStubJob'/></beans>",
+                    DefaultJobLoaderTests.class.getName());
+
     private static final String JOB_XML = String
             .format(
                     "<beans xmlns='http://www.springframework.org/schema/beans' xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance' "
                             + "xsi:schemaLocation='http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.5.xsd'><bean class='%s$StubJob'/></beans>",
                     DefaultJobLoaderTests.class.getName());
 
-    public static class StubJob implements Job, StepLocator {
+    public static class BasicStubJob implements Job {
 
         public void execute(JobExecution execution) {
         }
@@ -208,6 +237,9 @@ public class DefaultJobLoaderTests {
         public JobParametersValidator getJobParametersValidator() {
             return null;
         }
+    }
+
+    public static class StubJob extends BasicStubJob implements StepLocator {
 
         public Collection<String> getStepNames() {
             return Collections.emptyList();

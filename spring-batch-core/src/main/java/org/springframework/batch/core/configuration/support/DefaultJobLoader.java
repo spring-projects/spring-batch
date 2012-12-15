@@ -38,10 +38,12 @@ import org.springframework.util.Assert;
 
 /**
  * Default implementation of {@link JobLoader}. Uses a {@link JobRegistry} to
- * manage a population of loaded jobs and clears them up when asked.
+ * manage a population of loaded jobs and clears them up when asked. An optional
+ * {@link StepRegistry} might also be set to register the step(s) available for
+ * each registered job.
  *
  * @author Dave Syer
- *
+ * @author Stephane Nicoll
  */
 public class DefaultJobLoader implements JobLoader, InitializingBean {
 
@@ -63,14 +65,11 @@ public class DefaultJobLoader implements JobLoader, InitializingBean {
 
     /**
      * Creates a job loader with the job registry provided.
-     * <p/>
-     * If the specified {@link JobRegistry} is also a {@link StepRegistry} it
-     * is registered as the step registry to use for this instance.
      *
      * @param jobRegistry a {@link JobRegistry}
      */
     public DefaultJobLoader(JobRegistry jobRegistry) {
-        this(jobRegistry, jobRegistry instanceof StepRegistry ? (StepRegistry) jobRegistry : null);
+        this(jobRegistry, null);
     }
 
 	/**
@@ -91,9 +90,6 @@ public class DefaultJobLoader implements JobLoader, InitializingBean {
 	 */
 	public void setJobRegistry(JobRegistry jobRegistry) {
 		this.jobRegistry = jobRegistry;
-        if (stepRegistry == null && jobRegistry instanceof StepRegistry) {
-            setStepRegistry((StepRegistry) jobRegistry);
-        }
 	}
 
     /**
@@ -118,8 +114,7 @@ public class DefaultJobLoader implements JobLoader, InitializingBean {
 			}
 		}
 		for (String jobName : jobRegistry.getJobNames()) {
-			jobRegistry.unregister(jobName);
-            stepRegistry.unregisterStepsFromJob(jobName);
+            doUnregister(jobName);
 		}
 		contexts.clear();
 	}
@@ -131,8 +126,7 @@ public class DefaultJobLoader implements JobLoader, InitializingBean {
 			ConfigurableApplicationContext context = contexts.get(factory);
 			for (String name : contextToJobNames.get(context)) {
 				logger.debug("Unregistering job: " + name + " from context: " + context.getDisplayName());
-				jobRegistry.unregister(name);
-                stepRegistry.unregisterStepsFromJob(name);
+				doUnregister(name);
 			}
 			context.close();
 		}
@@ -180,16 +174,12 @@ public class DefaultJobLoader implements JobLoader, InitializingBean {
 				// On reload try to unregister first
 				if (unregister) {
 					logger.debug("Unregistering job: " + jobName + " from context: " + context.getDisplayName());
-					jobRegistry.unregister(jobName);
-                    stepRegistry.unregisterStepsFromJob(jobName);
+					doUnregister(jobName);
 				}
 
 				logger.debug("Registering job: " + jobName + " from context: " + context.getDisplayName());
-				JobFactory jobFactory = new ReferenceJobFactory(job);
-				jobRegistry.register(jobFactory);
+				doRegister(context, job);
 				jobsRegistered.add(jobName);
-                stepRegistry.register(job.getName(), getSteps(job, context));
-
 			}
 
 		}
@@ -213,20 +203,17 @@ public class DefaultJobLoader implements JobLoader, InitializingBean {
 	}
 
     /**
-     * Returns all the {@link Step} instances defined by the specified {@link Job}.
+     * Returns all the {@link Step} instances defined by the specified {@link StepLocator}.
+     * <p/>
+     * The specified <tt>jobApplicationContext</tt> is used to collect additional steps that
+     * are not exposed by the step locator
      *
-     * @param job the given job
+     * @param stepLocator the given step locator
      * @param jobApplicationContext the application context of the job
-     * @return all the {@link Step} defined in the given job
+     * @return all the {@link Step} defined by the given step locator and context
      * @see StepLocator
      */
-    private Collection<Step> getSteps(final Job job, final ApplicationContext jobApplicationContext) {
-        // TODO: that sounds like we need a stronger contract here
-        if (!(job instanceof StepLocator)) {
-            throw new UnsupportedOperationException("Cannot locate step from a Job that is not a StepLocator: job="
-					+ job.getName() + " does not implement StepLocator");
-        }
-        final StepLocator stepLocator = (StepLocator) job;
+    private Collection<Step> getSteps(final StepLocator stepLocator, final ApplicationContext jobApplicationContext) {
         final Collection<String> stepNames = stepLocator.getStepNames();
         final Collection<Step> result = new ArrayList<Step>();
         for (String stepName : stepNames) {
@@ -246,9 +233,42 @@ public class DefaultJobLoader implements JobLoader, InitializingBean {
         return result;
     }
 
+    /**
+     * Registers the specified {@link Job} defined in the specified {@link ConfigurableApplicationContext}.
+     * <p/>
+     * Makes sure to update the {@link StepRegistry} if it is available.
+     *
+     * @param context the context in which the job is defined
+     * @param job the job to register
+     * @throws DuplicateJobException if that job is already registered
+     */
+    private void doRegister(ConfigurableApplicationContext context, Job job) throws DuplicateJobException {
+        final JobFactory jobFactory = new ReferenceJobFactory(job);
+        jobRegistry.register(jobFactory);
+
+        if (stepRegistry != null) {
+            if (!(job instanceof StepLocator)) {
+                throw new UnsupportedOperationException("Cannot locate steps from a Job that is not a StepLocator: job="
+                        + job.getName() + " does not implement StepLocator");
+            }
+            stepRegistry.register(job.getName(), getSteps((StepLocator) job, context));
+        }
+    }
+
+    /**
+     * Unregisters the job identified by the specified <tt>jobName</tt>.
+     *
+     * @param jobName the name of the job to unregister
+     */
+    private void doUnregister(String jobName)  {
+        jobRegistry.unregister(jobName);
+        if (stepRegistry != null) {
+            stepRegistry.unregisterStepsFromJob(jobName);
+        }
+
+    }
+
     public void afterPropertiesSet() {
         Assert.notNull(jobRegistry, "Job registry could not be null.");
-        Assert.notNull(stepRegistry, "Step registry could not be null. Should be set if the Job registry " +
-                "implementation does not implement StepRegistry.");
     }
 }
