@@ -40,25 +40,28 @@ public class DefaultBatchConfigurer implements BatchConfigurer {
 		this.dataSource = dataSource;
 		this.transactionManager = new DataSourceTransactionManager(dataSource);
 	}
-	
+
 	protected DefaultBatchConfigurer() {}
-	
+
 	public DefaultBatchConfigurer(DataSource dataSource) {
 		setDataSource(dataSource);
 	}
-	
+
+	@Override
 	public JobRepository getJobRepository() {
 		return jobRepository;
 	}
 
+	@Override
 	public PlatformTransactionManager getTransactionManager() {
 		return transactionManager;
 	}
 
+	@Override
 	public JobLauncher getJobLauncher() {
 		return jobLauncher;
 	}
-	
+
 	@PostConstruct
 	public void initialize() throws Exception {
 		this.jobRepository = createJobRepository();

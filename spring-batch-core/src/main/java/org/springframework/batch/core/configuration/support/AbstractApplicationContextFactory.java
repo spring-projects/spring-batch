@@ -42,7 +42,7 @@ import org.springframework.util.Assert;
  * When createApplicationContext method is called, the child {@link ApplicationContext} will be returned. The child
  * context is not re-created every time it is requested, it is lazily initialized and cached. Clients should ensure that
  * it is closed when it is no longer needed. If a path is not set, the parent will always be returned.
- * 
+ *
  */
 public abstract class AbstractApplicationContextFactory implements ApplicationContextFactory, ApplicationContextAware {
 
@@ -80,7 +80,7 @@ public abstract class AbstractApplicationContextFactory implements ApplicationCo
 	/**
 	 * Flag to indicate that configuration such as bean post processors and custom editors should be copied from the
 	 * parent context. Defaults to true.
-	 * 
+	 *
 	 * @param copyConfiguration the flag value to set
 	 */
 	public void setCopyConfiguration(boolean copyConfiguration) {
@@ -90,7 +90,7 @@ public abstract class AbstractApplicationContextFactory implements ApplicationCo
 	/**
 	 * Protected access for subclasses to the flag determining whether configuration should be copied from parent
 	 * context.
-	 * 
+	 *
 	 * @return the flag value
 	 */
 	protected final boolean isCopyConfiguration() {
@@ -100,8 +100,8 @@ public abstract class AbstractApplicationContextFactory implements ApplicationCo
 	/**
 	 * Determines which bean factory post processors (like property placeholders) should be copied from the parent
 	 * context. Defaults to {@link PropertyPlaceholderConfigurer} and {@link CustomEditorConfigurer}.
-	 * 
-	 * @param copyBeanFactoryPostProcessors the flag value to set
+	 *
+	 * @param beanFactoryPostProcessorClasses array of post processor types to be copied
 	 */
 
 	public void setBeanFactoryPostProcessorClasses(
@@ -117,7 +117,7 @@ public abstract class AbstractApplicationContextFactory implements ApplicationCo
 	 * {@link BeanFactoryAware} (so any post processors that have a reference to the parent bean factory are not copied
 	 * into the child). Note that these classes do not themselves have to be {@link BeanPostProcessor} implementations
 	 * or sub-interfaces.
-	 * 
+	 *
 	 * @param beanPostProcessorExcludeClasses the classes to set
 	 */
 	public void setBeanPostProcessorExcludeClasses(Class<?>[] beanPostProcessorExcludeClasses) {
@@ -131,7 +131,7 @@ public abstract class AbstractApplicationContextFactory implements ApplicationCo
 	/**
 	 * Protected access to the list of bean factory post processor classes that should be copied over to the context
 	 * from the parent.
-	 * 
+	 *
 	 * @return the classes for post processors that were nominated for copying
 	 */
 	protected final Collection<Class<? extends BeanFactoryPostProcessor>> getBeanFactoryPostProcessorClasses() {
@@ -140,9 +140,10 @@ public abstract class AbstractApplicationContextFactory implements ApplicationCo
 
 	/**
 	 * Setter for the parent application context.
-	 * 
+	 *
 	 * @see org.springframework.context.ApplicationContextAware#setApplicationContext(org.springframework.context.ApplicationContext)
 	 */
+	@Override
 	public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
 		if (applicationContext == null) {
 			return;
@@ -153,9 +154,10 @@ public abstract class AbstractApplicationContextFactory implements ApplicationCo
 
 	/**
 	 * Creates an {@link ApplicationContext} from the provided path.
-	 * 
+	 *
 	 * @see ApplicationContextFactory#createApplicationContext()
 	 */
+	@Override
 	public ConfigurableApplicationContext createApplicationContext() {
 
 		if (resource == null) {
@@ -172,10 +174,10 @@ public abstract class AbstractApplicationContextFactory implements ApplicationCo
 	/**
 	 * Extension point for special subclasses that want to do more complex things with the context prior to refresh. The
 	 * default implementation does nothing.
-	 * 
+	 *
 	 * @param parent the parent for the new application context
 	 * @param context the new application context before it is refreshed, but after bean factory is initialized
-	 * 
+	 *
 	 * @see AbstractApplicationContextFactory#setBeanFactoryPostProcessorClasses(Class[])
 	 */
 	protected void prepareContext(ConfigurableApplicationContext parent, ConfigurableApplicationContext context) {
@@ -185,10 +187,10 @@ public abstract class AbstractApplicationContextFactory implements ApplicationCo
 	 * Extension point for special subclasses that want to do more complex things with the bean factory prior to
 	 * refresh. The default implementation copies all configuration from the parent according to the
 	 * {@link #setCopyConfiguration(boolean) flag} set.
-	 * 
+	 *
 	 * @param parent the parent bean factory for the new context (will never be null)
 	 * @param beanFactory the new bean factory before bean definitions are loaded
-	 * 
+	 *
 	 * @see AbstractApplicationContextFactory#setCopyConfiguration(boolean)
 	 * @see DefaultListableBeanFactory#copyConfigurationFrom(ConfigurableBeanFactory)
 	 */
