@@ -50,7 +50,7 @@ public class SimpleJobBuilder extends JobBuilderHelper<SimpleJobBuilder> {
 		if (builder != null) {
 			return builder.end().build();
 		}
-		SimpleJob job = new SimpleJob();
+		SimpleJob job = new SimpleJob(getName());
 		super.enhance(job);
 		job.setSteps(steps);
 		try {

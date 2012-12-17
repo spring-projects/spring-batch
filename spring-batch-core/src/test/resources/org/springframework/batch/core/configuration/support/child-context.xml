@@ -10,7 +10,7 @@
 		<property name="name" value="${foo}" />
 	</bean>
 
-	<bean id="foo" class="org.springframework.batch.core.configuration.support.ClassPathXmlApplicationContextFactoryTests$Foo">
+	<bean id="foo" class="org.springframework.batch.core.configuration.support.GenericApplicationContextFactoryTests$Foo">
 		<property name="values" value="1,4" />
 	</bean>
 
