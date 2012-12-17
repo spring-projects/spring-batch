@@ -16,8 +16,10 @@
 
 package org.springframework.batch.core.job;
 
-import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.JobExecution;
@@ -25,6 +27,8 @@ import org.springframework.batch.core.JobParametersIncrementer;
 import org.springframework.batch.core.JobParametersValidator;
 import org.springframework.batch.core.Step;
 import org.springframework.batch.core.UnexpectedJobExecutionException;
+import org.springframework.batch.core.step.NoSuchStepException;
+import org.springframework.batch.core.step.StepLocator;
 import org.springframework.beans.factory.BeanNameAware;
 import org.springframework.util.ClassUtils;
 
@@ -37,9 +41,9 @@ import org.springframework.util.ClassUtils;
  * @author Lucas Ward
  * @author Dave Syer
  */
-public class JobSupport implements BeanNameAware, Job {
+public class JobSupport implements BeanNameAware, Job, StepLocator {
 
-	private List<Step> steps = new ArrayList<Step>();
+	private Map<String, Step> steps = new HashMap<String, Step>();
 
 	private String name;
 
@@ -110,11 +114,13 @@ public class JobSupport implements BeanNameAware, Job {
 
 	public void setSteps(List<Step> steps) {
 		this.steps.clear();
-		this.steps.addAll(steps);
+        for (Step step : steps) {
+            this.steps.put(step.getName(), step);
+        }
 	}
 
 	public void addStep(Step step) {
-		this.steps.add(step);
+		this.steps.put(step.getName(), step);
 	}
 
 	/*
@@ -172,4 +178,15 @@ public class JobSupport implements BeanNameAware, Job {
 		return jobParametersValidator;
 	}
 
+    public Collection<String> getStepNames() {
+        return steps.keySet();
+    }
+
+    public Step getStep(String stepName) throws NoSuchStepException {
+        final Step step = steps.get(stepName);
+        if (step == null) {
+            throw new NoSuchStepException("Step ["+stepName+"] does not exist for job with name ["+getName()+"]");
+        }
+        return step;
+    }
 }
