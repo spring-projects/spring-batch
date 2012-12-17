@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2007 the original author or authors.
+ * Copyright 2006-2012 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,25 +16,31 @@
 
 package org.springframework.batch.sample.domain.football.internal;
 
+import javax.sql.DataSource;
+
 import org.springframework.batch.sample.domain.football.Player;
 import org.springframework.batch.sample.domain.football.PlayerDao;
-import org.springframework.jdbc.core.simple.SimpleJdbcDaoSupport;
 import org.springframework.jdbc.core.namedparam.BeanPropertySqlParameterSource;
+import org.springframework.jdbc.core.namedparam.NamedParameterJdbcOperations;
+import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 
 /**
  * @author Lucas Ward
  *
  */
-public class JdbcPlayerDao  extends SimpleJdbcDaoSupport implements PlayerDao  {
+public class JdbcPlayerDao implements PlayerDao  {
 
 	public static final String INSERT_PLAYER =
 			"INSERT into PLAYERS (player_id, last_name, first_name, pos, year_of_birth, year_drafted)" +
 			" values (:id, :lastName, :firstName, :position, :birthYear, :debutYear)";
-	
-	public void savePlayer(Player player) {
-		
-		getSimpleJdbcTemplate().update(INSERT_PLAYER,
-		new BeanPropertySqlParameterSource(player));
-		
+
+    private NamedParameterJdbcOperations namedParameterJdbcTemplate;
+
+    public void savePlayer(Player player) {
+        namedParameterJdbcTemplate.update(INSERT_PLAYER, new BeanPropertySqlParameterSource(player));
 	}
+
+    public void setDataSource(DataSource dataSource) {
+        this.namedParameterJdbcTemplate = new NamedParameterJdbcTemplate(dataSource);
+    }
 }

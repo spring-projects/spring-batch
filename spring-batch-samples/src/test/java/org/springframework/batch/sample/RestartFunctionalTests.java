@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2007 the original author or authors.
+ * Copyright 2006-2012 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -28,14 +28,15 @@ import org.springframework.batch.core.converter.DefaultJobParametersConverter;
 import org.springframework.batch.support.PropertiesConverter;
 import org.springframework.batch.test.JobLauncherTestUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.jdbc.core.simple.SimpleJdbcTemplate;
+import org.springframework.jdbc.core.JdbcOperations;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.context.transaction.BeforeTransaction;
 
 /**
  * Simple restart scenario.
- * 
+ *
  * @author Robert Kasanicky
  * @author Dave Syer
  */
@@ -48,16 +49,16 @@ public class RestartFunctionalTests {
 	private JobLauncherTestUtils jobLauncherTestUtils;
 
 	// auto-injected attributes
-	private SimpleJdbcTemplate simpleJdbcTemplate;
+	private JdbcOperations jdbcTemplate;
 
 	@Autowired
 	public void setDataSource(DataSource dataSource) {
-		this.simpleJdbcTemplate = new SimpleJdbcTemplate(dataSource);
+		this.jdbcTemplate = new JdbcTemplate(dataSource);
 	}
 
 	@BeforeTransaction
 	public void onTearDown() throws Exception {
-		simpleJdbcTemplate.update("DELETE FROM TRADE");
+        jdbcTemplate.update("DELETE FROM TRADE");
 	}
 
 	/**
@@ -66,13 +67,13 @@ public class RestartFunctionalTests {
 	 * finish successfully, because it continues execution where the previous
 	 * run stopped (module throws exception after fixed number of processed
 	 * records).
-	 * 
+	 *
 	 * @throws Exception
 	 */
 	@Test
 	public void testLaunchJob() throws Exception {
 
-		int before = simpleJdbcTemplate.queryForInt("SELECT COUNT(*) FROM TRADE");
+		int before = jdbcTemplate.queryForInt("SELECT COUNT(*) FROM TRADE");
 
 		JobExecution jobExecution = runJobForRestartTest();
 		assertEquals(BatchStatus.FAILED, jobExecution.getStatus());
@@ -85,14 +86,14 @@ public class RestartFunctionalTests {
 			throw new RuntimeException(ex);
 		}
 
-		int medium = simpleJdbcTemplate.queryForInt("SELECT COUNT(*) FROM TRADE");
+		int medium = jdbcTemplate.queryForInt("SELECT COUNT(*) FROM TRADE");
 		// assert based on commit interval = 2
 		assertEquals(before + 2, medium);
 
 		jobExecution = runJobForRestartTest();
 		assertEquals(BatchStatus.COMPLETED, jobExecution.getStatus());
 
-		int after = simpleJdbcTemplate.queryForInt("SELECT COUNT(*) FROM TRADE");
+		int after = jdbcTemplate.queryForInt("SELECT COUNT(*) FROM TRADE");
 
 		assertEquals(before + 5, after);
 	}

@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2008 the original author or authors.
+ * Copyright 2006-2012 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -27,8 +27,9 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.batch.sample.domain.trade.CustomerDebit;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.jdbc.core.JdbcOperations;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowCallbackHandler;
-import org.springframework.jdbc.core.simple.SimpleJdbcTemplate;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.transaction.annotation.Transactional;
@@ -37,21 +38,21 @@ import org.springframework.transaction.annotation.Transactional;
 @ContextConfiguration()
 public class JdbcCustomerDebitDaoTests {
 
-	private SimpleJdbcTemplate simpleJdbcTemplate;
+	private JdbcOperations jdbcTemplate;
 
 	@Autowired
 	private JdbcCustomerDebitDao writer;
 
 	@Autowired
 	public void setDataSource(DataSource dataSource) {
-		this.simpleJdbcTemplate = new SimpleJdbcTemplate(dataSource);
+		this.jdbcTemplate = new JdbcTemplate(dataSource);
 	}
 
 	@Transactional @Test
 	public void testWrite() {
 
-		//insert customer credit 
-		simpleJdbcTemplate.getJdbcOperations().execute("INSERT INTO CUSTOMER VALUES (99, 0, 'testName', 100)");
+		//insert customer credit
+        jdbcTemplate.execute("INSERT INTO CUSTOMER VALUES (99, 0, 'testName', 100)");
 
 		//create customer debit
 		CustomerDebit customerDebit = new CustomerDebit();
@@ -62,7 +63,7 @@ public class JdbcCustomerDebitDaoTests {
 		writer.write(customerDebit);
 
 		//verify customer credit
-		simpleJdbcTemplate.getJdbcOperations().query("SELECT name, credit FROM CUSTOMER WHERE name = 'testName'",
+        jdbcTemplate.query("SELECT name, credit FROM CUSTOMER WHERE name = 'testName'",
 				new RowCallbackHandler() {
 					public void processRow(ResultSet rs) throws SQLException {
 						assertEquals(95, rs.getLong("credit"));

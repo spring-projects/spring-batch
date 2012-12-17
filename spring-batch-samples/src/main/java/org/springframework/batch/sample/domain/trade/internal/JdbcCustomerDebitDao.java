@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2007 the original author or authors.
+ * Copyright 2006-2012 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,28 +21,28 @@ import javax.sql.DataSource;
 import org.springframework.batch.sample.domain.trade.CustomerDebit;
 import org.springframework.batch.sample.domain.trade.CustomerDebitDao;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.jdbc.core.simple.SimpleJdbcOperations;
-import org.springframework.jdbc.core.simple.SimpleJdbcTemplate;
+import org.springframework.jdbc.core.JdbcOperations;
+import org.springframework.jdbc.core.JdbcTemplate;
 
 
 /**
  * Reduces customer's credit by the provided amount.
- * 
+ *
  * @author Robert Kasanicky
  */
 public class JdbcCustomerDebitDao implements CustomerDebitDao {
-	
+
     private static final String UPDATE_CREDIT = "UPDATE CUSTOMER SET credit= credit-? WHERE name=?";
-    
-    private SimpleJdbcOperations simpleJdbcTemplate;
+
+    private JdbcOperations jdbcTemplate;
 
     public void write(CustomerDebit customerDebit) {
-        simpleJdbcTemplate.update(UPDATE_CREDIT, customerDebit.getDebit(), customerDebit.getName());
+        jdbcTemplate.update(UPDATE_CREDIT, customerDebit.getDebit(), customerDebit.getName());
     }
 
     @Autowired
 	public void setDataSource(DataSource dataSource) {
-        this.simpleJdbcTemplate = new SimpleJdbcTemplate(dataSource);
+        this.jdbcTemplate = new JdbcTemplate(dataSource);
     }
 
 }

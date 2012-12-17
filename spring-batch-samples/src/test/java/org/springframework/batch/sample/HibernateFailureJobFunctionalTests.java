@@ -20,9 +20,10 @@ import org.springframework.batch.sample.domain.trade.internal.HibernateCreditDao
 import org.springframework.batch.test.JobLauncherTestUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.UncategorizedSQLException;
+import org.springframework.jdbc.core.JdbcOperations;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowCallbackHandler;
 import org.springframework.jdbc.core.simple.ParameterizedRowMapper;
-import org.springframework.jdbc.core.simple.SimpleJdbcTemplate;
 import org.springframework.orm.hibernate3.HibernateJdbcException;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
@@ -34,7 +35,7 @@ import org.springframework.transaction.support.TransactionTemplate;
 /**
  * Test for HibernateJob - checks that customer credit has been updated to
  * expected value.
- * 
+ *
  * @author Dave Syer
  */
 @RunWith(SpringJUnit4ClassRunner.class)
@@ -45,17 +46,17 @@ public class HibernateFailureJobFunctionalTests {
 	@Autowired
 	private HibernateCreditDao writer;
 
-	private SimpleJdbcTemplate simpleJdbcTemplate;
+	private JdbcOperations jdbcTemplate;
 
 	private PlatformTransactionManager transactionManager;
 
 	private static final BigDecimal CREDIT_INCREASE = CustomerCreditIncreaseProcessor.FIXED_AMOUNT;
-	
+
 	private static String[] customers = { "INSERT INTO CUSTOMER (id, version, name, credit) VALUES (1, 0, 'customer1', 100000)",
 		"INSERT INTO CUSTOMER (id, version, name, credit) VALUES (2, 0, 'customer2', 100000)",
 		"INSERT INTO CUSTOMER (id, version, name, credit) VALUES (3, 0, 'customer3', 100000)",
 		"INSERT INTO CUSTOMER (id, version, name, credit) VALUES (4, 0, 'customer4', 100000)"};
-	
+
 	private static String DELETE_CUSTOMERS = "DELETE FROM CUSTOMER";
 
 	private static final String ALL_CUSTOMERS = "select * from CUSTOMER order by ID";
@@ -71,7 +72,7 @@ public class HibernateFailureJobFunctionalTests {
 
 	@Autowired
 	public void setDataSource(DataSource dataSource) {
-		this.simpleJdbcTemplate = new SimpleJdbcTemplate(dataSource);
+		this.jdbcTemplate = new JdbcTemplate(dataSource);
 	}
 
 	@Autowired
@@ -81,9 +82,9 @@ public class HibernateFailureJobFunctionalTests {
 
 	@Test
 	public void testLaunchJob() throws Exception {
-		
+
 		validatePreConditions();
-		
+
 		JobParameters params = new JobParametersBuilder().addString("key", "failureJob").toJobParameters();
 		writer.setFailOnFlush(2);
 
@@ -99,11 +100,11 @@ public class HibernateFailureJobFunctionalTests {
 			// assertEquals(1, writer.getErrors().size());
 			throw e;
 		}
-		int after = simpleJdbcTemplate.queryForInt("SELECT COUNT(*) from CUSTOMER");
+		int after = jdbcTemplate.queryForInt("SELECT COUNT(*) from CUSTOMER");
 		assertEquals(4, after);
-		
+
 		validatePostConditions();
-		
+
 	}
 
 	/**
@@ -113,8 +114,8 @@ public class HibernateFailureJobFunctionalTests {
 	protected void validatePreConditions() throws Exception {
 		ensureState();
 		creditsBeforeUpdate = (List<BigDecimal>) new TransactionTemplate(transactionManager).execute(new TransactionCallback() {
-			public Object doInTransaction(TransactionStatus status) {				
-				return simpleJdbcTemplate.query(ALL_CUSTOMERS, new ParameterizedRowMapper<BigDecimal>() {
+			public Object doInTransaction(TransactionStatus status) {
+				return jdbcTemplate.query(ALL_CUSTOMERS, new ParameterizedRowMapper<BigDecimal>() {
 					public BigDecimal mapRow(ResultSet rs, int rowNum) throws SQLException {
 						return rs.getBigDecimal(CREDIT_COLUMN);
 					}
@@ -131,16 +132,16 @@ public class HibernateFailureJobFunctionalTests {
 		new TransactionTemplate(transactionManager).execute(new TransactionCallback(){
 
 			public Object doInTransaction(TransactionStatus status) {
-				simpleJdbcTemplate.update(DELETE_CUSTOMERS);
+                jdbcTemplate.update(DELETE_CUSTOMERS);
 				for (String customer : customers) {
-					simpleJdbcTemplate.update(customer);
+                    jdbcTemplate.update(customer);
 				}
 				return null;
 			}
 			});
 
 	}
-	
+
 	/**
 	 * Credit was increased by CREDIT_INCREASE
 	 */
@@ -150,7 +151,7 @@ public class HibernateFailureJobFunctionalTests {
 
 		new TransactionTemplate(transactionManager).execute(new TransactionCallback() {
 			public Object doInTransaction(TransactionStatus status) {
-				simpleJdbcTemplate.getJdbcOperations().query(ALL_CUSTOMERS, new RowCallbackHandler() {
+                jdbcTemplate.query(ALL_CUSTOMERS, new RowCallbackHandler() {
 
 					private int i = 0;
 
@@ -161,13 +162,13 @@ public class HibernateFailureJobFunctionalTests {
 							matches.add(rs.getBigDecimal(ID_COLUMN));
 						}
 					}
-					
+
 				});
 				return null;
 			}
 		});
 
 		assertEquals((creditsBeforeUpdate.size() - 1), matches.size());
-		assertFalse(matches.contains(new BigDecimal(2)));		
+		assertFalse(matches.contains(new BigDecimal(2)));
 	}
 }

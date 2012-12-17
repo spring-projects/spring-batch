@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2007 the original author or authors.
+ * Copyright 2006-2012 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -29,7 +29,8 @@ import org.springframework.batch.core.JobInstance;
 import org.springframework.batch.core.JobParameters;
 import org.springframework.batch.core.StepExecution;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.jdbc.core.simple.SimpleJdbcTemplate;
+import org.springframework.jdbc.core.JdbcOperations;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.transaction.annotation.Transactional;
@@ -38,14 +39,14 @@ import org.springframework.transaction.annotation.Transactional;
 @ContextConfiguration
 public class StagingItemWriterTests {
 
-	private SimpleJdbcTemplate simpleJdbcTemplate;
+	private JdbcOperations jdbcTemplate;
 
 	@Autowired
 	private StagingItemWriter<String> writer;
 
 	@Autowired
 	public void setDataSource(DataSource dataSource) {
-		this.simpleJdbcTemplate = new SimpleJdbcTemplate(dataSource);
+		this.jdbcTemplate = new JdbcTemplate(dataSource);
 	}
 
 	@Before
@@ -58,9 +59,9 @@ public class StagingItemWriterTests {
 	@Transactional
 	@Test
 	public void testProcessInsertsNewItem() throws Exception {
-		int before = simpleJdbcTemplate.queryForInt("SELECT COUNT(*) from BATCH_STAGING");
+		int before = jdbcTemplate.queryForInt("SELECT COUNT(*) from BATCH_STAGING");
 		writer.write(Collections.singletonList("FOO"));
-		int after = simpleJdbcTemplate.queryForInt("SELECT COUNT(*) from BATCH_STAGING");
+		int after = jdbcTemplate.queryForInt("SELECT COUNT(*) from BATCH_STAGING");
 		assertEquals(before + 1, after);
 	}
 

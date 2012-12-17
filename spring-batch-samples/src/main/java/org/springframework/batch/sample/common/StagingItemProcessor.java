@@ -5,32 +5,32 @@ import javax.sql.DataSource;
 import org.springframework.batch.item.ItemProcessor;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.dao.OptimisticLockingFailureException;
-import org.springframework.jdbc.core.simple.SimpleJdbcOperations;
-import org.springframework.jdbc.core.simple.SimpleJdbcTemplate;
+import org.springframework.jdbc.core.JdbcOperations;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.util.Assert;
 
 /**
  * Marks the input row as 'processed'. (This change will rollback if there is
  * problem later)
- * 
+ *
  * @param <T> item type
- * 
+ *
  * @see StagingItemReader
  * @see StagingItemWriter
  * @see ProcessIndicatorItemWrapper
- * 
+ *
  * @author Robert Kasanicky
  */
 public class StagingItemProcessor<T> implements ItemProcessor<ProcessIndicatorItemWrapper<T>, T>, InitializingBean {
 
-	private SimpleJdbcOperations jdbcTemplate;
+	private JdbcOperations jdbcTemplate;
 
-	public void setJdbcTemplate(SimpleJdbcOperations jdbcTemplate) {
+	public void setJdbcTemplate(JdbcOperations jdbcTemplate) {
 		this.jdbcTemplate = jdbcTemplate;
 	}
 
 	public void setDataSource(DataSource dataSource) {
-		this.jdbcTemplate = new SimpleJdbcTemplate(dataSource);
+		this.jdbcTemplate = new JdbcTemplate(dataSource);
 	}
 
 	public void afterPropertiesSet() throws Exception {

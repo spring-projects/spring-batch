@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2007 the original author or authors.
+ * Copyright 2006-2012 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,7 +22,8 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.batch.sample.domain.trade.Trade;
 import org.springframework.batch.sample.domain.trade.TradeDao;
-import org.springframework.jdbc.core.simple.SimpleJdbcTemplate;
+import org.springframework.jdbc.core.JdbcOperations;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.incrementer.DataFieldMaxValueIncrementer;
 
 
@@ -41,7 +42,7 @@ public class JdbcTradeDao implements TradeDao {
     /**
      * handles the processing of sql query
      */
-    private SimpleJdbcTemplate simpleJdbcTemplate;
+    private JdbcOperations jdbcTemplate;
 
     /**
      * database is not expected to be setup for autoincrement
@@ -54,13 +55,13 @@ public class JdbcTradeDao implements TradeDao {
     public void writeTrade(Trade trade) {
         Long id = incrementer.nextLongValue();
         log.debug("Processing: " + trade);
-        simpleJdbcTemplate.update(INSERT_TRADE_RECORD,
+        jdbcTemplate.update(INSERT_TRADE_RECORD,
 				id, trade.getIsin(), trade.getQuantity(), trade.getPrice(),
 				trade.getCustomer());
     }
 
     public void setDataSource(DataSource dataSource) {
-        this.simpleJdbcTemplate = new SimpleJdbcTemplate(dataSource);
+        this.jdbcTemplate = new JdbcTemplate(dataSource);
     }
 
     public void setIncrementer(DataFieldMaxValueIncrementer incrementer) {

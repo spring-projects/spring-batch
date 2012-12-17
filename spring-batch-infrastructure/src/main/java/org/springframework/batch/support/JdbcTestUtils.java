@@ -2,7 +2,7 @@ package org.springframework.batch.support;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.JdbcOperations;
 
 /**
  * <p>
@@ -25,7 +25,7 @@ public final class JdbcTestUtils {
      * @param tableName table name to count rows in
      * @return the number of rows in the table
      */
-    public static int countRowsInTable(JdbcTemplate jdbcTemplate, String tableName) {
+    public static int countRowsInTable(JdbcOperations jdbcTemplate, String tableName) {
         return jdbcTemplate.queryForInt("SELECT COUNT(0) FROM " + tableName);
     }
 
@@ -35,7 +35,7 @@ public final class JdbcTestUtils {
      * @param tableNames the names of the tables from which to delete
      * @return the total number of rows deleted from all specified tables
      */
-    public static int deleteFromTables(JdbcTemplate jdbcTemplate, String... tableNames) {
+    public static int deleteFromTables(JdbcOperations jdbcTemplate, String... tableNames) {
         int totalRowCount = 0;
         for (String tableName : tableNames) {
             int rowCount = jdbcTemplate.update("DELETE FROM " + tableName);
