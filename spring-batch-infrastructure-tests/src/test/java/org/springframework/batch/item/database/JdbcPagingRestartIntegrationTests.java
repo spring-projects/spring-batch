@@ -39,12 +39,12 @@ import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.ItemStream;
 import org.springframework.batch.item.database.support.SqlPagingQueryProviderFactoryBean;
 import org.springframework.batch.item.sample.Foo;
+import org.springframework.batch.support.JdbcTestUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.simple.ParameterizedRowMapper;
-import org.springframework.jdbc.core.simple.SimpleJdbcTemplate;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
-import org.springframework.test.jdbc.SimpleJdbcTestUtils;
 
 /**
  * @author Dave Syer
@@ -62,7 +62,7 @@ public class JdbcPagingRestartIntegrationTests {
 
 	private int maxId;
 
-	private SimpleJdbcTemplate jdbcTemplate;
+	private JdbcTemplate jdbcTemplate;
 
 	private int itemCount = 9;
 
@@ -70,13 +70,13 @@ public class JdbcPagingRestartIntegrationTests {
 
 	@Before
 	public void init() {
-		jdbcTemplate = new SimpleJdbcTemplate(dataSource);
+		jdbcTemplate = new JdbcTemplate(dataSource);
 		maxId = jdbcTemplate.queryForInt("SELECT MAX(ID) from T_FOOS");
 		for (int i = itemCount; i > maxId; i--) {
 			jdbcTemplate.update("INSERT into T_FOOS (ID,NAME,VALUE) values (?, ?, ?)", i, "foo" + i, i);
 		}
 		
-		assertEquals(itemCount, SimpleJdbcTestUtils.countRowsInTable(jdbcTemplate, "T_FOOS"));
+		assertEquals(itemCount, JdbcTestUtils.countRowsInTable(jdbcTemplate, "T_FOOS"));
 	}
 
 	@After
@@ -89,7 +89,7 @@ public class JdbcPagingRestartIntegrationTests {
 
 		ItemReader<Foo> reader = getItemReader();
 
-		int total = SimpleJdbcTestUtils.countRowsInTable(jdbcTemplate, "T_FOOS");
+		int total = JdbcTestUtils.countRowsInTable(jdbcTemplate, "T_FOOS");
 
 		ExecutionContext executionContext = new ExecutionContext();
 		((ItemStream) reader).open(executionContext);
@@ -111,7 +111,7 @@ public class JdbcPagingRestartIntegrationTests {
 
 		ItemReader<Foo> reader = getItemReader();
 
-		int total = SimpleJdbcTestUtils.countRowsInTable(jdbcTemplate, "T_FOOS");
+		int total = JdbcTestUtils.countRowsInTable(jdbcTemplate, "T_FOOS");
 		int count = (total / pageSize) * pageSize;
 		int pagesToRead = Math.min(3, total/pageSize);
 		if (count >= pagesToRead*pageSize) {

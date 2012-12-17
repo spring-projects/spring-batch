@@ -38,11 +38,11 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.batch.item.database.support.AbstractSqlPagingQueryProvider;
 import org.springframework.batch.item.database.support.SqlPagingQueryProviderFactoryBean;
+import org.springframework.batch.support.JdbcTestUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.jdbc.core.simple.SimpleJdbcTemplate;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
-import org.springframework.test.jdbc.SimpleJdbcTestUtils;
 
 /**
  * @author Dave Syer
@@ -60,7 +60,7 @@ public class JdbcPagingQueryIntegrationTests {
 
 	private int maxId;
 
-	private SimpleJdbcTemplate jdbcTemplate;
+	private JdbcTemplate jdbcTemplate;
 
 	private int itemCount = 9;
 
@@ -68,7 +68,7 @@ public class JdbcPagingQueryIntegrationTests {
 	
 	@Before
 	public void testInit() {
-		jdbcTemplate = new SimpleJdbcTemplate(dataSource);
+		jdbcTemplate = new JdbcTemplate(dataSource);
 		String[] names = {"Foo", "Bar", "Baz", "Foo", "Bar", "Baz", "Foo", "Bar", "Baz"};
 		String[] codes = {"A",   "B",   "A",   "B",   "B",   "B",   "A",   "B",   "A"};
 		jdbcTemplate.update("DELETE from T_FOOS");
@@ -76,7 +76,7 @@ public class JdbcPagingQueryIntegrationTests {
 			jdbcTemplate.update("INSERT into T_FOOS (ID,NAME, CODE, VALUE) values (?, ?, ?, ?)", maxId, names[i], codes[i], i);
 			maxId++;
 		}
-		assertEquals(itemCount, SimpleJdbcTestUtils.countRowsInTable(jdbcTemplate, "T_FOOS"));
+		assertEquals(itemCount, JdbcTestUtils.countRowsInTable(jdbcTemplate, "T_FOOS"));
 	}
 
 	@After
@@ -89,7 +89,7 @@ public class JdbcPagingQueryIntegrationTests {
 
 		PagingQueryProvider queryProvider = getPagingQueryProvider();
 
-		int total = SimpleJdbcTestUtils.countRowsInTable(jdbcTemplate, "T_FOOS");
+		int total = JdbcTestUtils.countRowsInTable(jdbcTemplate, "T_FOOS");
 		assertTrue(total > pageSize);
 		int pages = total / pageSize;
 
