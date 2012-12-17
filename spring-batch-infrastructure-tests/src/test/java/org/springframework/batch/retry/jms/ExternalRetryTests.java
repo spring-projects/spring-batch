@@ -31,7 +31,7 @@ import org.junit.runner.RunWith;
 import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.ItemWriter;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.jdbc.core.simple.SimpleJdbcTemplate;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jms.core.JmsTemplate;
 import org.springframework.retry.RecoveryCallback;
 import org.springframework.retry.RetryCallback;
@@ -56,20 +56,20 @@ public class ExternalRetryTests {
 
 	private ItemReader<String> provider;
 
-	private SimpleJdbcTemplate simpleJdbcTemplate;
+	private JdbcTemplate jdbcTemplate;
 
 	@Autowired
 	private PlatformTransactionManager transactionManager;
 
 	@Autowired
 	public void setDataSource(DataSource dataSource) {
-		simpleJdbcTemplate = new SimpleJdbcTemplate(dataSource);
+		jdbcTemplate = new JdbcTemplate(dataSource);
 	}
 
 	@Before
 	public void onSetUp() throws Exception {
 		getMessages(); // drain queue
-		simpleJdbcTemplate.getJdbcOperations().execute("delete from T_BARS");
+		jdbcTemplate.execute("delete from T_BARS");
 		jmsTemplate.convertAndSend("queue", "foo");
 		provider = new ItemReader<String>() {
 			public String read() {
@@ -82,7 +82,7 @@ public class ExternalRetryTests {
 	}
 
 	private void assertInitialState() {
-		int count = simpleJdbcTemplate.queryForInt("select count(*) from T_BARS");
+		int count = jdbcTemplate.queryForInt("select count(*) from T_BARS");
 		assertEquals(0, count);
 	}
 
@@ -104,7 +104,7 @@ public class ExternalRetryTests {
 
 				for (Object text : texts) {
 
-					simpleJdbcTemplate.update("INSERT into T_BARS (id,name,foo_date) values (?,?,null)", list.size(),
+					jdbcTemplate.update("INSERT into T_BARS (id,name,foo_date) values (?,?,null)", list.size(),
 							text);
 					if (list.size() == 1) {
 						throw new RuntimeException("Rollback!");
@@ -165,7 +165,7 @@ public class ExternalRetryTests {
 		List<String> msgs = getMessages();
 
 		// The database portion committed once...
-		int count = simpleJdbcTemplate.queryForInt("select count(*) from T_BARS");
+		int count = jdbcTemplate.queryForInt("select count(*) from T_BARS");
 		assertEquals(1, count);
 
 		// ... and so did the message session.
@@ -183,7 +183,7 @@ public class ExternalRetryTests {
 		final String item = provider.read();
 		final RetryCallback<String> callback = new RetryCallback<String>() {
 			public String doWithRetry(RetryContext context) throws Exception {
-				simpleJdbcTemplate.update("INSERT into T_BARS (id,name,foo_date) values (?,?,null)", list.size(), item);
+				jdbcTemplate.update("INSERT into T_BARS (id,name,foo_date) values (?,?,null)", list.size(), item);
 				throw new RuntimeException("Rollback!");
 			}
 		};
@@ -230,7 +230,7 @@ public class ExternalRetryTests {
 		assertEquals(1, recovered.size());
 
 		// The database portion committed once...
-		int count = simpleJdbcTemplate.queryForInt("select count(*) from T_BARS");
+		int count = jdbcTemplate.queryForInt("select count(*) from T_BARS");
 		assertEquals(0, count);
 
 		// ... and so did the message session.

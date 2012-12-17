@@ -18,10 +18,10 @@ package org.springframework.batch.config;
 
 import static org.junit.Assert.*;
 
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.jdbc.core.simple.SimpleJdbcTemplate;
 import org.springframework.transaction.annotation.Transactional;
 import org.junit.runner.RunWith;
 import org.junit.AfterClass;
@@ -34,11 +34,11 @@ import javax.sql.DataSource;
 @ContextConfiguration(locations = "/org/springframework/batch/jms/jms-context.xml")
 public class DatasourceTests {
 
-	private SimpleJdbcTemplate simpleJdbcTemplate;
+	private JdbcTemplate jdbcTemplate;
 
 	@Autowired
 	public void setDataSource(DataSource dataSource) {
-		this.simpleJdbcTemplate = new SimpleJdbcTemplate(dataSource);
+		this.jdbcTemplate = new JdbcTemplate(dataSource);
 	}
 	
 	@BeforeClass
@@ -54,10 +54,10 @@ public class DatasourceTests {
 	@Transactional @Test
 	public void testTemplate() throws Exception {
 		System.err.println(System.getProperty("java.class.path"));
-		simpleJdbcTemplate.getJdbcOperations().execute("delete from T_BARS");
-		int count = simpleJdbcTemplate.queryForInt("select count(*) from T_BARS");
+		jdbcTemplate.execute("delete from T_BARS");
+		int count = jdbcTemplate.queryForInt("select count(*) from T_BARS");
 		assertEquals(0, count);
 
-		simpleJdbcTemplate.update("INSERT into T_BARS (id,name,foo_date) values (?,?,null)", 0, "foo");
+		jdbcTemplate.update("INSERT into T_BARS (id,name,foo_date) values (?,?,null)", 0, "foo");
 	}
 }

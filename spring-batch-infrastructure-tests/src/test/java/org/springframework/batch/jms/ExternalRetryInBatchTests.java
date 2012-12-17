@@ -36,7 +36,7 @@ import org.springframework.batch.repeat.policy.SimpleCompletionPolicy;
 import org.springframework.batch.repeat.support.RepeatSynchronizationManager;
 import org.springframework.batch.repeat.support.RepeatTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.jdbc.core.simple.SimpleJdbcTemplate;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jms.core.JmsTemplate;
 import org.springframework.retry.RecoveryCallback;
 import org.springframework.retry.RetryCallback;
@@ -65,20 +65,20 @@ public class ExternalRetryInBatchTests {
 
 	private ItemReader<String> provider;
 
-	private SimpleJdbcTemplate jdbcTemplate;
+	private JdbcTemplate jdbcTemplate;
 
 	@Autowired
 	private PlatformTransactionManager transactionManager;
 
 	@Autowired
 	public void setDataSource(DataSource dataSource) {
-		jdbcTemplate = new SimpleJdbcTemplate(dataSource);
+		jdbcTemplate = new JdbcTemplate(dataSource);
 	}
 
 	@Before
 	public void onSetUp() throws Exception {
 		getMessages(); // drain queue
-		jdbcTemplate.getJdbcOperations().execute("delete from T_BARS");
+		jdbcTemplate.execute("delete from T_BARS");
 		jmsTemplate.convertAndSend("queue", "foo");
 		jmsTemplate.convertAndSend("queue", "bar");
 		provider = new ItemReader<String>() {
@@ -94,7 +94,7 @@ public class ExternalRetryInBatchTests {
 	@After
 	public void onTearDown() throws Exception {
 		getMessages(); // drain queue
-		jdbcTemplate.getJdbcOperations().execute("delete from T_BARS");
+		jdbcTemplate.execute("delete from T_BARS");
 	}
 
 	private void assertInitialState() {
