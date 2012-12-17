@@ -37,12 +37,12 @@ import org.springframework.core.task.SimpleAsyncTaskExecutor;
 
 /**
  * @author Dave Syer
- * 
+ *
  */
 public class FlowJobBuilderTests {
 
 	private JobRepository jobRepository;
-	
+
 	private JobExecution execution;
 
 	private StepSupport step1 = new StepSupport("step1") {
