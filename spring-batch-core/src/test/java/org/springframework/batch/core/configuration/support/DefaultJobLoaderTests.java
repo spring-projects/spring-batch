@@ -86,20 +86,6 @@ public class DefaultJobLoaderTests {
     }
 
     @Test
-    public void createWithSimpleJobRegistry() {
-        final DefaultJobLoader loader = new DefaultJobLoader();
-        loader.setJobRegistry(new JobRegistryMock());
-
-        try {
-            loader.afterPropertiesSet();
-            fail("Should have failed to create job loader without a step registry (" +
-                    "and the job registry could not fulfill that role)");
-        } catch (IllegalArgumentException e) {
-            // OK
-        }
-    }
-
-    @Test
     public void testRegistryUpdated() throws DuplicateJobException {
     	GenericApplicationContextFactory factory = new GenericApplicationContextFactory(
                 new ClassPathResource("trivial-context.xml", getClass()));
@@ -135,7 +121,7 @@ public class DefaultJobLoaderTests {
     @Test
     public void testNoStepRegistryAvailable() throws DuplicateJobException {
         final JobLoader loader = new DefaultJobLoader(jobRegistry);
-        ClassPathXmlApplicationContextFactory factory = new ClassPathXmlApplicationContextFactory(
+        GenericApplicationContextFactory factory = new GenericApplicationContextFactory(
                 new ClassPathResource("job-context-with-steps.xml", getClass()));
         loader.load(factory);
         // No step registry available so just registering the jobs
@@ -144,7 +130,7 @@ public class DefaultJobLoaderTests {
 
     @Test
     public void testLoadWithJobThatIsNotAStepLocator() throws DuplicateJobException {
-        ClassPathXmlApplicationContextFactory factory = new ClassPathXmlApplicationContextFactory(
+    	GenericApplicationContextFactory factory = new GenericApplicationContextFactory(
                 new ByteArrayResource(BASIC_JOB_XML.getBytes()));
         try {
             jobLoader.load(factory);
@@ -159,7 +145,7 @@ public class DefaultJobLoaderTests {
     @Test
     public void testLoadWithJobThatIsNotAStepLocatorNoStepRegistry() throws DuplicateJobException {
         final JobLoader loader = new DefaultJobLoader(jobRegistry);
-        ClassPathXmlApplicationContextFactory factory = new ClassPathXmlApplicationContextFactory(
+        GenericApplicationContextFactory factory = new GenericApplicationContextFactory(
                 new ByteArrayResource(BASIC_JOB_XML.getBytes()));
         try {
             loader.load(factory);
