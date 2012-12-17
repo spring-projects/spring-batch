@@ -18,8 +18,9 @@ import org.junit.runner.RunWith;
 import org.springframework.batch.sample.domain.trade.Trade;
 import org.springframework.batch.test.JobLauncherTestUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.jdbc.core.RowCallbackHandler;
+import org.springframework.jdbc.core.JdbcOperations;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.RowCallbackHandler;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
@@ -35,7 +36,7 @@ public class CompositeItemWriterSampleFunctionalTests {
 			+ "Trade: [isin=UK21341EAH44,quantity=214,price=34.11,customer=customer4]"
 			+ "Trade: [isin=UK21341EAH45,quantity=215,price=35.11,customer=customer5]";
 
-	private JdbcTemplate jdbcTemplate;
+	private JdbcOperations jdbcTemplate;
 
 	@Autowired
 	private JobLauncherTestUtils jobLauncherTestUtils;

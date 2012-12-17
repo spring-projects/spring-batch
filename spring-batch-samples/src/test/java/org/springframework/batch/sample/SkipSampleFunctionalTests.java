@@ -24,18 +24,19 @@ import org.springframework.batch.core.repository.JobInstanceAlreadyCompleteExcep
 import org.springframework.batch.core.repository.JobRestartException;
 import org.springframework.batch.sample.common.SkipCheckingListener;
 import org.springframework.batch.sample.domain.trade.internal.TradeWriter;
+import org.springframework.batch.support.JdbcTestUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.jdbc.core.JdbcOperations;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.incrementer.DataFieldMaxValueIncrementer;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
-import org.springframework.batch.support.JdbcTestUtils;
 
 /**
  * Error is encountered during writing - transaction is rolled back and the
  * error item is skipped on second attempt to process the chunk.
- * 
+ *
  * @author Robert Kasanicky
  * @author Dan Garrette
  */
@@ -43,7 +44,7 @@ import org.springframework.batch.support.JdbcTestUtils;
 @ContextConfiguration(locations = { "/skipSample-job-launcher-context.xml" })
 public class SkipSampleFunctionalTests {
 
-	private JdbcTemplate jdbcTemplate;
+	private JdbcOperations jdbcTemplate;
 
 	@Autowired
 	private JobExplorer jobExplorer;
@@ -172,7 +173,7 @@ public class SkipSampleFunctionalTests {
 		// to output
 		// System.err.println(jdbcTemplate.queryForList("SELECT * FROM TRADE"));
 		assertEquals(5, jdbcTemplate.queryForInt("SELECT COUNT(*) from TRADE where VERSION=?", 1));
-		
+
 		// 1 record skipped in processing second step
 		assertEquals(1, SkipCheckingListener.getProcessSkips());
 
@@ -217,7 +218,7 @@ public class SkipSampleFunctionalTests {
 
 	/**
 	 * Launch the entire job, including all steps, in order.
-	 * 
+	 *
 	 * @return JobExecution, so that the test may validate the exit status
 	 */
 	public long launchJobWithIncrementer() {

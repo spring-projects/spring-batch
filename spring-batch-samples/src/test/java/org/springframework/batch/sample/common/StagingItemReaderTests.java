@@ -14,6 +14,7 @@ import org.springframework.batch.core.JobInstance;
 import org.springframework.batch.core.JobParameters;
 import org.springframework.batch.core.StepExecution;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.jdbc.core.JdbcOperations;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
@@ -30,7 +31,7 @@ import org.springframework.transaction.support.TransactionTemplate;
 @ContextConfiguration()
 public class StagingItemReaderTests {
 
-	private JdbcTemplate jdbcTemplate;
+	private JdbcOperations jdbcTemplate;
 
 	@Autowired
 	private PlatformTransactionManager transactionManager;
@@ -73,9 +74,9 @@ public class StagingItemReaderTests {
 		assertEquals(StagingItemWriter.NEW, before);
 
 		ProcessIndicatorItemWrapper<String> wrapper = reader.read();
-		String item = wrapper.getItem(); 
+		String item = wrapper.getItem();
 		assertEquals("FOO", item);
-		
+
 		StagingItemProcessor<String> updater = new StagingItemProcessor<String>();
 		updater.setJdbcTemplate(jdbcTemplate);
 		updater.process(wrapper);

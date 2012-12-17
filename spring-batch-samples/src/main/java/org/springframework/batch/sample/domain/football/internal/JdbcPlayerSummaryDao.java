@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2007 the original author or authors.
+ * Copyright 2006-2012 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,12 +18,13 @@ package org.springframework.batch.sample.domain.football.internal;
 
 import java.util.List;
 
+import javax.sql.DataSource;
+
 import org.springframework.batch.item.ItemWriter;
 import org.springframework.batch.sample.domain.football.PlayerSummary;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
+import org.springframework.jdbc.core.namedparam.NamedParameterJdbcOperations;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
-
-import javax.sql.DataSource;
 
 public class JdbcPlayerSummaryDao implements ItemWriter<PlayerSummary> {
 
@@ -32,7 +33,7 @@ public class JdbcPlayerSummaryDao implements ItemWriter<PlayerSummary> {
 			+ "values(:id, :year, :completes, :attempts, :passingYards, :passingTd, "
 			+ ":interceptions, :rushes, :rushYards, :receptions, :receptionYards, :totalTd)";
 
-    private NamedParameterJdbcTemplate namedParameterJdbcTemplate;
+    private NamedParameterJdbcOperations namedParameterJdbcTemplate;
 
 	public void write(List<? extends PlayerSummary> summaries) {
 

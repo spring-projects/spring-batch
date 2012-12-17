@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2008 the original author or authors.
+ * Copyright 2006-2012 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -27,8 +27,9 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.batch.sample.domain.football.Player;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.jdbc.core.RowCallbackHandler;
+import org.springframework.jdbc.core.JdbcOperations;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.RowCallbackHandler;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.transaction.annotation.Transactional;
@@ -40,21 +41,21 @@ import org.springframework.transaction.annotation.Transactional;
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(locations = {"/data-source-context.xml"})
 public class JdbcPlayerDaoIntegrationTests {
-	
+
 	private JdbcPlayerDao playerDao;
 
 	private Player player;
 
 	private static final String GET_PLAYER = "SELECT * from PLAYERS";
-	
-	private JdbcTemplate jdbcTemplate;
+
+	private JdbcOperations jdbcTemplate;
 
 	@Autowired
 	public void init(DataSource dataSource) {
 
 		this.jdbcTemplate = new JdbcTemplate(dataSource);
 		playerDao = new JdbcPlayerDao();
-		playerDao.setDataSource(dataSource);		
+		playerDao.setDataSource(dataSource);
 
 		player = new Player();
 		player.setId("AKFJDL00");
@@ -63,7 +64,7 @@ public class JdbcPlayerDaoIntegrationTests {
 		player.setPosition("QB");
 		player.setBirthYear(1975);
 		player.setDebutYear(1998);
-		
+
 	}
 
 
@@ -76,7 +77,7 @@ public class JdbcPlayerDaoIntegrationTests {
 
 	@Transactional @Test
 	public void testSavePlayer(){
-		
+
 		playerDao.savePlayer(player);
 
         jdbcTemplate.query(GET_PLAYER, new RowCallbackHandler(){
@@ -88,8 +89,8 @@ public class JdbcPlayerDaoIntegrationTests {
 				assertEquals(rs.getString("POS"), "QB");
 				assertEquals(rs.getInt("YEAR_OF_BIRTH"), 1975);
 				assertEquals(rs.getInt("YEAR_DRAFTED"), 1998);
-			}	
+			}
 		});
 	}
-	
+
 }

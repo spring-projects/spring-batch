@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2008 the original author or authors.
+ * Copyright 2006-2012 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -28,8 +28,9 @@ import org.junit.runner.RunWith;
 import org.springframework.batch.sample.domain.trade.Trade;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.jdbc.core.RowCallbackHandler;
+import org.springframework.jdbc.core.JdbcOperations;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.RowCallbackHandler;
 import org.springframework.jdbc.support.incrementer.AbstractDataFieldMaxValueIncrementer;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
@@ -39,7 +40,7 @@ import org.springframework.transaction.annotation.Transactional;
 @ContextConfiguration(locations = {"/data-source-context.xml"})
 public class JdbcTradeWriterTests {
 
-	private JdbcTemplate jdbcTemplate;
+	private JdbcOperations jdbcTemplate;
 
 	private JdbcTradeDao writer;
 
@@ -65,7 +66,7 @@ public class JdbcTradeWriterTests {
 		trade.setIsin("5647238492");
 		trade.setPrice(new BigDecimal(Double.toString(99.69)));
 		trade.setQuantity(5);
-		
+
 		writer.writeTrade(trade);
 
         jdbcTemplate.query("SELECT * FROM TRADE WHERE ISIN = '5647238492'", new RowCallbackHandler() {

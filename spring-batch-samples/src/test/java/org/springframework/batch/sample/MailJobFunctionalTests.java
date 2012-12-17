@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2010 the original author or authors.
+ * Copyright 2006-2012 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -32,6 +32,7 @@ import org.springframework.batch.sample.domain.mail.internal.TestMailErrorHandle
 import org.springframework.batch.sample.domain.mail.internal.TestMailSender;
 import org.springframework.batch.test.JobLauncherTestUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.jdbc.core.JdbcOperations;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.mail.MailMessage;
 import org.springframework.mail.SimpleMailMessage;
@@ -41,7 +42,7 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 /**
  * @author Dan Garrette
  * @author Dave Syer
- * 
+ *
  * @Since 2.1
  */
 @RunWith(SpringJUnit4ClassRunner.class)
@@ -66,7 +67,7 @@ public class MailJobFunctionalTests {
 
 	private static final Object[] USER8 = new Object[] { 8, "Martin Van Buren", email };
 
-	private JdbcTemplate jdbcTemplate;
+	private JdbcOperations jdbcTemplate;
 
 	@Autowired
 	private JobLauncherTestUtils jobLauncherTestUtils;

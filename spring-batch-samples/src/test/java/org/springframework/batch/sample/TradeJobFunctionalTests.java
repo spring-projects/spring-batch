@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2007 the original author or authors.
+ * Copyright 2006-2012 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -36,8 +36,9 @@ import org.junit.runner.RunWith;
 import org.springframework.batch.sample.domain.trade.Trade;
 import org.springframework.batch.test.JobLauncherTestUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.jdbc.core.RowCallbackHandler;
+import org.springframework.jdbc.core.JdbcOperations;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.RowCallbackHandler;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
@@ -48,12 +49,12 @@ public class TradeJobFunctionalTests {
 
 	private static final String GET_TRADES = "select ISIN, QUANTITY, PRICE, CUSTOMER, ID, VERSION from TRADE order by ISIN";
 	private static final String GET_CUSTOMERS = "select NAME, CREDIT from CUSTOMER order by NAME";
-	
+
 	private List<Customer> customers;
 	private List<Trade> trades;
 	private int activeRow = 0;
-	
-	private JdbcTemplate jdbcTemplate;
+
+	private JdbcOperations jdbcTemplate;
 	private Map<String, Double> credits = new HashMap<String, Double>();
 
 	@Autowired
@@ -63,7 +64,7 @@ public class TradeJobFunctionalTests {
 	public void setDataSource(DataSource dataSource) {
 		this.jdbcTemplate = new JdbcTemplate(dataSource);
 	}
-	
+
 	@Before
 	public void onSetUp() throws Exception {
         jdbcTemplate.update("delete from TRADE");
@@ -72,7 +73,7 @@ public class TradeJobFunctionalTests {
 			credits.put((String) map.get("NAME"), ((Number) map.get("CREDIT")).doubleValue());
 		}
 	}
-	
+
 	@After
 	public void tearDown() throws Exception {
         jdbcTemplate.update("delete from TRADE");
@@ -80,9 +81,9 @@ public class TradeJobFunctionalTests {
 
 	@Test
 	public void testLaunchJob() throws Exception {
-		
+
 		jobLauncherTestUtils.launchJob();
-		
+
 		customers = Arrays.asList(new Customer("customer1", (credits.get("customer1") - 98.34)),
 				new Customer("customer2", (credits.get("customer2") - 18.12 - 12.78)),
 				new Customer("customer3", (credits.get("customer3") - 109.25)),
@@ -93,48 +94,48 @@ public class TradeJobFunctionalTests {
 				new Trade("UK21341EAH47", 245, new BigDecimal("12.78"), "customer2"),
 				new Trade("UK21341EAH48", 108, new BigDecimal("109.25"), "customer3"),
 				new Trade("UK21341EAH49", 854, new BigDecimal("123.39"), "customer4"));
-			
+
 		// check content of the trade table
         jdbcTemplate.query(GET_TRADES, new RowCallbackHandler() {
 
 			public void processRow(ResultSet rs) throws SQLException {
 				Trade trade = trades.get(activeRow++);
-				
+
 				assertTrue(trade.getIsin().equals(rs.getString(1)));
 				assertTrue(trade.getQuantity() == rs.getLong(2));
 				assertTrue(trade.getPrice().equals(rs.getBigDecimal(3)));
 				assertTrue(trade.getCustomer().equals(rs.getString(4)));
 			}
 		});
-		
+
 		assertEquals(activeRow, trades.size());
-		
+
 		// check content of the customer table
 		activeRow = 0;
         jdbcTemplate.query(GET_CUSTOMERS, new RowCallbackHandler() {
 
 			public void processRow(ResultSet rs) throws SQLException {
 				Customer customer = customers.get(activeRow++);
-				
+
 				assertEquals(customer.getName(),rs.getString(1));
 				assertEquals(customer.getCredit(), rs.getDouble(2), .01);
 			}
 		});
-		
+
 		assertEquals(customers.size(), activeRow);
-		
+
 		// check content of the output file
 	}
 
 	private static class Customer {
 		private String name;
 		private double credit;
-		
+
 		public Customer(String name, double credit) {
 			this.name = name;
 			this.credit = credit;
 		}
-		
+
 		/**
 		 * @return the credit
 		 */
@@ -178,9 +179,9 @@ public class TradeJobFunctionalTests {
 				return false;
 			return true;
 		}
-		
-		
+
+
 	}
-	
-	
+
+
 }
