@@ -21,6 +21,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.springframework.batch.core.BatchStatus;
 import org.springframework.batch.core.ExitStatus;
+import org.springframework.batch.core.Job;
 import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.JobInterruptedException;
 import org.springframework.batch.core.JobParameters;
@@ -50,6 +51,16 @@ public class FlowJobBuilderTests {
 				UnexpectedJobExecutionException {
 			stepExecution.upgradeStatus(BatchStatus.COMPLETED);
 			stepExecution.setExitStatus(ExitStatus.COMPLETED);
+			jobRepository.update(stepExecution);
+		}
+	};
+
+	private StepSupport fails = new StepSupport("fails") {
+		@Override
+		public void execute(StepExecution stepExecution) throws JobInterruptedException,
+				UnexpectedJobExecutionException {
+			stepExecution.upgradeStatus(BatchStatus.FAILED);
+			stepExecution.setExitStatus(ExitStatus.FAILED);
 			jobRepository.update(stepExecution);
 		}
 	};
@@ -162,6 +173,43 @@ public class FlowJobBuilderTests {
 		builder.build().execute(execution);
 		assertEquals(BatchStatus.COMPLETED, execution.getStatus());
 		assertEquals(2, execution.getStepExecutions().size());
+	}
+
+	@Test
+	public void testBuildWithCustomEndState() throws Exception {
+		SimpleJobBuilder builder = new JobBuilder("flow").repository(jobRepository).start(step1);
+		builder.on("COMPLETED").end("FOO");
+		builder.preventRestart();
+		builder.build().execute(execution);
+		assertEquals(BatchStatus.COMPLETED, execution.getStatus());
+		assertEquals("FOO", execution.getExitStatus().getExitCode());
+		assertEquals(1, execution.getStepExecutions().size());
+	}
+
+	@Test
+	public void testBuildWithStop() throws Exception {
+		SimpleJobBuilder builder = new JobBuilder("flow").repository(jobRepository).start(step1);
+		builder.on("COMPLETED").stop();
+		builder.preventRestart();
+		builder.build().execute(execution);
+		assertEquals(BatchStatus.STOPPED, execution.getStatus());
+		assertEquals("STOPPED", execution.getExitStatus().getExitCode());
+		assertEquals(1, execution.getStepExecutions().size());
+	}
+
+	@Test
+	public void testBuildWithStopAndRestart() throws Exception {
+		SimpleJobBuilder builder = new JobBuilder("flow").repository(jobRepository).start(fails);
+		builder.on("FAILED").stopAndRestart(step2);
+		Job job = builder.build();
+		job.execute(execution);
+		assertEquals(BatchStatus.STOPPED, execution.getStatus());
+		assertEquals(1, execution.getStepExecutions().size());
+		execution = jobRepository.createJobExecution("flow", new JobParameters());
+		job.execute(execution);
+		assertEquals(BatchStatus.COMPLETED, execution.getStatus());
+		assertEquals(1, execution.getStepExecutions().size());
+		assertEquals("step2", execution.getStepExecutions().iterator().next().getStepName());
 	}
 
 }

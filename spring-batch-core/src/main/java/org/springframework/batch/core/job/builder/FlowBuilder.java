@@ -66,9 +66,13 @@ public class FlowBuilder<Q> {
 
 	private EndState completedState;
 
+	private EndState stoppedState;
+
 	private int decisionCounter = 0;
 
 	private int splitCounter = 0;
+
+	private int endCounter = 0;
 
 	private Map<Object, State> states = new HashMap<Object, State>();
 
@@ -81,6 +85,7 @@ public class FlowBuilder<Q> {
 		this.prefix = name + ".";
 		this.failedState = new EndState(FlowExecutionStatus.FAILED, prefix + "FAILED");
 		this.completedState = new EndState(FlowExecutionStatus.COMPLETED, prefix + "COMPLETED");
+		this.stoppedState = new EndState(FlowExecutionStatus.STOPPED, prefix + "STOPPED");
 	}
 
 	/**
@@ -325,10 +330,8 @@ public class FlowBuilder<Q> {
 		for (String to : copy.keySet()) {
 			if (!froms.contains(to)) {
 				currentState = copy.get(to);
-				if (currentState != completedState) {
+				if (!currentState.isEndState()) {
 					addTransition("COMPLETED", completedState);
-				}
-				if (currentState != failedState) {
 					addTransition("*", failedState);
 				}
 			}
@@ -337,12 +340,10 @@ public class FlowBuilder<Q> {
 		// Then find the states that do not have a default transition
 		for (String from : copy.keySet()) {
 			currentState = copy.get(from);
-			if (currentState != failedState) {
+			if (!currentState.isEndState()) {
 				if (!hasFail(from)) {
 					addTransition("*", failedState);
 				}
-			}
-			if (currentState != completedState) {
 				if (!hasCompleted(from)) {
 					addTransition("*", completedState);
 				}
@@ -373,12 +374,31 @@ public class FlowBuilder<Q> {
 		if (transitions.size() == 1) {
 			transitions.add(StateTransition.createEndStateTransition(failedState));
 			transitions.add(StateTransition.createEndStateTransition(completedState));
+			transitions.add(StateTransition.createEndStateTransition(stoppedState));
+		}
+		if (next.isEndState()) {
+			transitions.add(StateTransition.createEndStateTransition(next));
 		}
 		dirty = true;
 	}
 
+	private void stop(String pattern) {
+		addTransition(pattern, stoppedState);
+	}
+
+	private void stop(String pattern, State restart) {
+		EndState next = new EndState(FlowExecutionStatus.STOPPED, "STOPPED", prefix + "stop" + (endCounter++), true);
+		addTransition(pattern, next);
+		currentState = next;
+		addTransition("*", restart);
+	}
+
 	private void end(String pattern) {
 		addTransition(pattern, completedState);
+	}
+
+	private void end(String pattern, String code) {
+		addTransition(pattern, new EndState(FlowExecutionStatus.COMPLETED, code, prefix + "end" + (endCounter++)));
 	}
 
 	private void fail(String pattern) {
@@ -476,8 +496,64 @@ public class FlowBuilder<Q> {
 		 * 
 		 * @return a FlowBuilder
 		 */
+		public FlowBuilder<Q> stop() {
+			parent.stop(pattern);
+			return parent;
+		}
+
+		/**
+		 * Stop the flow and provide a flow to start with if the flow is restarted.
+		 * 
+		 * @param flow the flow to restart with
+		 * @return a FlowBuilder
+		 */
+		public FlowBuilder<Q> stopAndRestart(Flow flow) {
+			State next = parent.createState(flow);
+			parent.stop(pattern, next);
+			return parent;
+		}
+
+		/**
+		 * Stop the flow and provide a decider to start with if the flow is restarted.
+		 * 
+		 * @param restart a decider to restart with
+		 * @return a FlowBuilder
+		 */
+		public FlowBuilder<Q> stopAndRestart(JobExecutionDecider decider) {
+			State next = parent.createState(decider);
+			parent.stop(pattern, next);
+			return parent;
+		}
+
+		/**
+		 * Stop the flow and provide a step to start with if the flow is restarted.
+		 * 
+		 * @param restart the step to restart with
+		 * @return a FlowBuilder
+		 */
+		public FlowBuilder<Q> stopAndRestart(Step restart) {
+			State next = parent.createState(restart);
+			parent.stop(pattern, next);
+			return parent;
+		}
+
+		/**
+		 * Signal the successful end of the flow.
+		 * 
+		 * @return a FlowBuilder
+		 */
 		public FlowBuilder<Q> end() {
 			parent.end(pattern);
+			return parent;
+		}
+
+		/**
+		 * Signal the end of the flow with the status provided.
+		 * 
+		 * @return a FlowBuilder
+		 */
+		public FlowBuilder<Q> end(String status) {
+			parent.end(pattern, status);
 			return parent;
 		}
 
