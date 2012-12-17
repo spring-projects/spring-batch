@@ -22,7 +22,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.UncategorizedSQLException;
 import org.springframework.jdbc.core.RowCallbackHandler;
 import org.springframework.jdbc.core.simple.ParameterizedRowMapper;
-import org.springframework.jdbc.core.simple.SimpleJdbcTemplate;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.orm.hibernate3.HibernateJdbcException;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
@@ -45,7 +45,7 @@ public class HibernateFailureJobFunctionalTests {
 	@Autowired
 	private HibernateCreditDao writer;
 
-	private SimpleJdbcTemplate simpleJdbcTemplate;
+	private JdbcTemplate jdbcTemplate;
 
 	private PlatformTransactionManager transactionManager;
 
@@ -71,7 +71,7 @@ public class HibernateFailureJobFunctionalTests {
 
 	@Autowired
 	public void setDataSource(DataSource dataSource) {
-		this.simpleJdbcTemplate = new SimpleJdbcTemplate(dataSource);
+		this.jdbcTemplate = new JdbcTemplate(dataSource);
 	}
 
 	@Autowired
@@ -99,7 +99,7 @@ public class HibernateFailureJobFunctionalTests {
 			// assertEquals(1, writer.getErrors().size());
 			throw e;
 		}
-		int after = simpleJdbcTemplate.queryForInt("SELECT COUNT(*) from CUSTOMER");
+		int after = jdbcTemplate.queryForInt("SELECT COUNT(*) from CUSTOMER");
 		assertEquals(4, after);
 		
 		validatePostConditions();
@@ -114,7 +114,7 @@ public class HibernateFailureJobFunctionalTests {
 		ensureState();
 		creditsBeforeUpdate = (List<BigDecimal>) new TransactionTemplate(transactionManager).execute(new TransactionCallback() {
 			public Object doInTransaction(TransactionStatus status) {				
-				return simpleJdbcTemplate.query(ALL_CUSTOMERS, new ParameterizedRowMapper<BigDecimal>() {
+				return jdbcTemplate.query(ALL_CUSTOMERS, new ParameterizedRowMapper<BigDecimal>() {
 					public BigDecimal mapRow(ResultSet rs, int rowNum) throws SQLException {
 						return rs.getBigDecimal(CREDIT_COLUMN);
 					}
@@ -131,9 +131,9 @@ public class HibernateFailureJobFunctionalTests {
 		new TransactionTemplate(transactionManager).execute(new TransactionCallback(){
 
 			public Object doInTransaction(TransactionStatus status) {
-				simpleJdbcTemplate.update(DELETE_CUSTOMERS);
+                jdbcTemplate.update(DELETE_CUSTOMERS);
 				for (String customer : customers) {
-					simpleJdbcTemplate.update(customer);
+                    jdbcTemplate.update(customer);
 				}
 				return null;
 			}
@@ -150,7 +150,7 @@ public class HibernateFailureJobFunctionalTests {
 
 		new TransactionTemplate(transactionManager).execute(new TransactionCallback() {
 			public Object doInTransaction(TransactionStatus status) {
-				simpleJdbcTemplate.getJdbcOperations().query(ALL_CUSTOMERS, new RowCallbackHandler() {
+                jdbcTemplate.query(ALL_CUSTOMERS, new RowCallbackHandler() {
 
 					private int i = 0;
 

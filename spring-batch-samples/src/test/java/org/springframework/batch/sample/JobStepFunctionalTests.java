@@ -26,7 +26,7 @@ import org.springframework.batch.core.converter.DefaultJobParametersConverter;
 import org.springframework.batch.support.PropertiesConverter;
 import org.springframework.batch.test.JobLauncherTestUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.jdbc.core.simple.SimpleJdbcTemplate;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
@@ -43,23 +43,23 @@ public class JobStepFunctionalTests {
 	private JobLauncherTestUtils jobLauncherTestUtils;
 
 	// auto-injected attributes
-	private SimpleJdbcTemplate simpleJdbcTemplate;
+	private JdbcTemplate jdbcTemplate;
 
 	@Autowired
 	public void setDataSource(DataSource dataSource) {
-		this.simpleJdbcTemplate = new SimpleJdbcTemplate(dataSource);
+		this.jdbcTemplate = new JdbcTemplate(dataSource);
 	}
 
 	@Test
 	public void testJobLaunch() throws Exception {
 
-		simpleJdbcTemplate.update("DELETE FROM TRADE");
+        jdbcTemplate.update("DELETE FROM TRADE");
 	
 		jobLauncherTestUtils.launchJob(new DefaultJobParametersConverter()
 				.getJobParameters(PropertiesConverter
 						.stringToProperties("run.id(long)=1,parameter=true,run.date=20070122,input.file=classpath:data/fixedLengthImportJob/input/20070122.teststream.ImportTradeDataStep.txt")));
 
-		int after = simpleJdbcTemplate.queryForInt("SELECT COUNT(*) FROM TRADE");
+		int after = jdbcTemplate.queryForInt("SELECT COUNT(*) FROM TRADE");
 		assertEquals(5, after);
 
 	}

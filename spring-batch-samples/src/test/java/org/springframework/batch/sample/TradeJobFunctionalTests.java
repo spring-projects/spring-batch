@@ -37,7 +37,7 @@ import org.springframework.batch.sample.domain.trade.Trade;
 import org.springframework.batch.test.JobLauncherTestUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.RowCallbackHandler;
-import org.springframework.jdbc.core.simple.SimpleJdbcTemplate;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
@@ -53,7 +53,7 @@ public class TradeJobFunctionalTests {
 	private List<Trade> trades;
 	private int activeRow = 0;
 	
-	private SimpleJdbcTemplate simpleJdbcTemplate;
+	private JdbcTemplate jdbcTemplate;
 	private Map<String, Double> credits = new HashMap<String, Double>();
 
 	@Autowired
@@ -61,13 +61,13 @@ public class TradeJobFunctionalTests {
 
 	@Autowired
 	public void setDataSource(DataSource dataSource) {
-		this.simpleJdbcTemplate = new SimpleJdbcTemplate(dataSource);
+		this.jdbcTemplate = new JdbcTemplate(dataSource);
 	}
 	
 	@Before
 	public void onSetUp() throws Exception {
-		simpleJdbcTemplate.update("delete from TRADE");
-		List<Map<String, Object>> list = simpleJdbcTemplate.queryForList("select NAME, CREDIT from CUSTOMER");
+        jdbcTemplate.update("delete from TRADE");
+		List<Map<String, Object>> list = jdbcTemplate.queryForList("select NAME, CREDIT from CUSTOMER");
 		for (Map<String, Object> map : list) {
 			credits.put((String) map.get("NAME"), ((Number) map.get("CREDIT")).doubleValue());
 		}
@@ -75,7 +75,7 @@ public class TradeJobFunctionalTests {
 	
 	@After
 	public void tearDown() throws Exception {
-		simpleJdbcTemplate.update("delete from TRADE");
+        jdbcTemplate.update("delete from TRADE");
 	}
 
 	@Test
@@ -95,7 +95,7 @@ public class TradeJobFunctionalTests {
 				new Trade("UK21341EAH49", 854, new BigDecimal("123.39"), "customer4"));
 			
 		// check content of the trade table
-		simpleJdbcTemplate.getJdbcOperations().query(GET_TRADES, new RowCallbackHandler() {
+        jdbcTemplate.query(GET_TRADES, new RowCallbackHandler() {
 
 			public void processRow(ResultSet rs) throws SQLException {
 				Trade trade = trades.get(activeRow++);
@@ -111,7 +111,7 @@ public class TradeJobFunctionalTests {
 		
 		// check content of the customer table
 		activeRow = 0;
-		simpleJdbcTemplate.getJdbcOperations().query(GET_CUSTOMERS, new RowCallbackHandler() {
+        jdbcTemplate.query(GET_CUSTOMERS, new RowCallbackHandler() {
 
 			public void processRow(ResultSet rs) throws SQLException {
 				Customer customer = customers.get(activeRow++);
