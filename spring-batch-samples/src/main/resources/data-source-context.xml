@@ -1,21 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xmlns:util="http://www.springframework.org/schema/util"
+    xmlns:jdbc="http://www.springframework.org/schema/jdbc"
 	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.1.xsd
-	http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-3.1.xsd">
+	http://www.springframework.org/schema/jdbc http://www.springframework.org/schema/jdbc/spring-jdbc-3.1.xsd">
 
 	<!--  Initialise the database before every test case: -->
-	<bean id="dataSourceInitializer" class="test.jdbc.datasource.DataSourceInitializer">
-		<property name="dataSource" ref="dataSource"/>
-		<property name="initialize" value="${batch.data.source.init}"/>
-		<property name="initScripts">
-			<list>
-				<value>${batch.drop.script}</value>
-				<value>${batch.schema.script}</value>
-				<value>${batch.business.schema.script}</value>
-			</list>
-		</property>
-	</bean>
+    <jdbc:initialize-database data-source="dataSource">
+        <jdbc:script location="${batch.drop.script}"/>
+        <jdbc:script location="${batch.schema.script}"/>
+        <jdbc:script location="${batch.business.schema.script}"/>
+    </jdbc:initialize-database>
 
 	<bean id="dataSource" class="org.apache.commons.dbcp.BasicDataSource" destroy-method="close">
 		<property name="driverClassName" value="${batch.jdbc.driver}" />
@@ -72,5 +66,4 @@
 	</bean>
 
 	<bean id="lobHandler" class="${batch.lob.handler.class}"/>
-
 </beans>
