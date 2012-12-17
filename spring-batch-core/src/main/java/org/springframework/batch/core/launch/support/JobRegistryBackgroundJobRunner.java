@@ -27,8 +27,8 @@ import org.springframework.batch.core.Job;
 import org.springframework.batch.core.configuration.DuplicateJobException;
 import org.springframework.batch.core.configuration.JobFactory;
 import org.springframework.batch.core.configuration.JobRegistry;
-import org.springframework.batch.core.configuration.support.ClassPathXmlApplicationContextFactory;
 import org.springframework.batch.core.configuration.support.DefaultJobLoader;
+import org.springframework.batch.core.configuration.support.GenericApplicationContextFactory;
 import org.springframework.batch.core.configuration.support.JobLoader;
 import org.springframework.batch.core.launch.JobLauncher;
 import org.springframework.beans.factory.BeanFactory;
@@ -133,9 +133,8 @@ public class JobRegistryBackgroundJobRunner {
 				Resource path = resources[j];
 				logger.info("Registering Job definitions from " + Arrays.toString(resources));
 
-				ClassPathXmlApplicationContextFactory factory = new ClassPathXmlApplicationContextFactory();
+				GenericApplicationContextFactory factory = new GenericApplicationContextFactory(path);
 				factory.setApplicationContext(parentContext);
-				factory.setResource(path);
 				jobLoader.load(factory);
 			}
 

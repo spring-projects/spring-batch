@@ -34,18 +34,17 @@ import org.springframework.core.Ordered;
 import org.springframework.util.Assert;
 
 /**
- * Loads and unloads {@link Job Jobs} when the application context is created
- * and destroyed. Each resource provided is loaded as an application context
- * with the current context as its parent, and then all the jobs from the child
- * context are registered under their bean names. A {@link JobRegistry} is
- * required.
- * 
+ * Loads and unloads {@link Job Jobs} when the application context is created and destroyed. Each resource provided is
+ * loaded as an application context with the current context as its parent, and then all the jobs from the child context
+ * are registered under their bean names. A {@link JobRegistry} is required.
+ *
  * @author Lucas Ward
  * @author Dave Syer
- * 
+ *
  * @since 2.1
  */
-public class AutomaticJobRegistrar implements Ordered, Lifecycle, ApplicationListener, ApplicationContextAware, InitializingBean {
+public class AutomaticJobRegistrar implements Ordered, Lifecycle, ApplicationListener, ApplicationContextAware,
+		InitializingBean {
 
 	private Collection<ApplicationContextFactory> applicationContextFactories = new ArrayList<ApplicationContextFactory>();
 
@@ -56,26 +55,37 @@ public class AutomaticJobRegistrar implements Ordered, Lifecycle, ApplicationLis
 	private volatile boolean running = false;
 
 	private Object lifecycleMonitor = new Object();
-	
+
 	private int order = Ordered.LOWEST_PRECEDENCE;
 
 	/**
-	 * The enclosing application context, which can be used to check if
-	 * {@link ApplicationEvent events} come from the expected source.
-	 * 
-	 * @param applicationContext the enclosing application context if there is
-	 * one
+	 * The enclosing application context, which can be used to check if {@link ApplicationEvent events} come from the
+	 * expected source.
+	 *
+	 * @param applicationContext the enclosing application context if there is one
 	 * @see ApplicationContextAware#setApplicationContext(ApplicationContext)
 	 */
+	@Override
 	public void setApplicationContext(ApplicationContext applicationContext) {
 		this.applicationContext = applicationContext;
 	}
 
 	/**
 	 * Add some factories to the set that will be used to load contexts and jobs.
-	 * 
-	 * @param applicationContextFactories the {@link ApplicationContextFactory}
-	 * values to use
+	 *
+	 * @param applicationContextFactory the {@link ApplicationContextFactory} values to use
+	 */
+	public void addApplicationContextFactory(ApplicationContextFactory applicationContextFactory) {
+		if (applicationContextFactory instanceof ApplicationContextAware) {
+			((ApplicationContextAware) applicationContextFactory).setApplicationContext(applicationContext);
+		}
+		this.applicationContextFactories.add(applicationContextFactory);
+	}
+
+	/**
+	 * Add some factories to the set that will be used to load contexts and jobs.
+	 *
+	 * @param applicationContextFactories the {@link ApplicationContextFactory} values to use
 	 */
 	public void setApplicationContextFactories(ApplicationContextFactory[] applicationContextFactories) {
 		for (ApplicationContextFactory applicationContextFactory : applicationContextFactories) {
@@ -85,13 +95,14 @@ public class AutomaticJobRegistrar implements Ordered, Lifecycle, ApplicationLis
 
 	/**
 	 * The job loader that will be used to load and manage jobs.
-	 * 
+	 *
 	 * @param jobLoader the {@link JobLoader} to set
 	 */
 	public void setJobLoader(JobLoader jobLoader) {
 		this.jobLoader = jobLoader;
 	}
 
+	@Override
 	public int getOrder() {
 		return order;
 	}
@@ -106,8 +117,8 @@ public class AutomaticJobRegistrar implements Ordered, Lifecycle, ApplicationLis
 	}
 
 	/**
-	 * @throws Exception
 	 */
+	@Override
 	public void afterPropertiesSet() {
 
 		Assert.state(jobLoader != null, "A JobLoader must be provided");
@@ -115,12 +126,12 @@ public class AutomaticJobRegistrar implements Ordered, Lifecycle, ApplicationLis
 	}
 
 	/**
-	 * Creates all the application contexts required and set up job registry
-	 * entries with all the instances of {@link Job} found therein. Also closes
-	 * the contexts when the enclosing context is closed.
-	 * 
+	 * Creates all the application contexts required and set up job registry entries with all the instances of
+	 * {@link Job} found therein. Also closes the contexts when the enclosing context is closed.
+	 *
 	 * @see InitializingBean#afterPropertiesSet()
 	 */
+	@Override
 	public final void onApplicationEvent(ApplicationEvent event) {
 		// TODO: With Spring 3 a SmartLifecycle is started automatically
 		if (event.getSource() == applicationContext) {
@@ -135,9 +146,10 @@ public class AutomaticJobRegistrar implements Ordered, Lifecycle, ApplicationLis
 
 	/**
 	 * Delegates to {@link JobLoader#clear()}.
-	 * 
+	 *
 	 * @see Lifecycle#stop()
 	 */
+	@Override
 	public void stop() {
 		synchronized (this.lifecycleMonitor) {
 			jobLoader.clear();
@@ -146,11 +158,11 @@ public class AutomaticJobRegistrar implements Ordered, Lifecycle, ApplicationLis
 	}
 
 	/**
-	 * Take all the contexts from the factories provided and pass them to teh
-	 * {@link JobLoader}.
-	 * 
+	 * Take all the contexts from the factories provided and pass them to the {@link JobLoader}.
+	 *
 	 * @see Lifecycle#start()
 	 */
+	@Override
 	public void start() {
 		synchronized (this.lifecycleMonitor) {
 			if (running) {
@@ -170,10 +182,11 @@ public class AutomaticJobRegistrar implements Ordered, Lifecycle, ApplicationLis
 
 	/**
 	 * Check if this component has been started.
-	 * 
+	 *
 	 * @return true if started successfully and not stopped
 	 * @see Lifecycle#isRunning()
 	 */
+	@Override
 	public boolean isRunning() {
 		synchronized (this.lifecycleMonitor) {
 			return running;
