@@ -42,13 +42,13 @@ import org.springframework.core.task.TaskExecutor;
 /**
  * A builder for a flow of steps that can be executed as a job or as part of a job. Steps can be linked together with
  * conditional transitions that depend on the exit status of the previous step.
- * 
+ *
  * @author Dave Syer
- * 
+ *
  * @since 2.2
- * 
+ *
  * @param <Q> the type of object returned by the builder (by default a Flow)
- * 
+ *
  */
 public class FlowBuilder<Q> {
 
@@ -66,9 +66,13 @@ public class FlowBuilder<Q> {
 
 	private EndState completedState;
 
+	private EndState stoppedState;
+
 	private int decisionCounter = 0;
 
 	private int splitCounter = 0;
+
+	private int endCounter = 0;
 
 	private Map<Object, State> states = new HashMap<Object, State>();
 
@@ -81,12 +85,13 @@ public class FlowBuilder<Q> {
 		this.prefix = name + ".";
 		this.failedState = new EndState(FlowExecutionStatus.FAILED, prefix + "FAILED");
 		this.completedState = new EndState(FlowExecutionStatus.COMPLETED, prefix + "COMPLETED");
+		this.stoppedState = new EndState(FlowExecutionStatus.STOPPED, prefix + "STOPPED");
 	}
 
 	/**
 	 * Validate the current state of the builder and build a flow. Subclasses may override this to build an object of a
 	 * different type that itself depends on the flow.
-	 * 
+	 *
 	 * @return a flow
 	 */
 	public Q build() {
@@ -98,7 +103,7 @@ public class FlowBuilder<Q> {
 	/**
 	 * Transition to the next step on successful completion of the current step. All other outcomes are treated as
 	 * failures.
-	 * 
+	 *
 	 * @param step the next step
 	 * @return this to enable chaining
 	 */
@@ -109,7 +114,7 @@ public class FlowBuilder<Q> {
 
 	/**
 	 * Start a flow. If some steps are already registered, just a synonym for {@link #from(Step)}.
-	 * 
+	 *
 	 * @param step the step to start with
 	 * @return this to enable chaining
 	 */
@@ -121,7 +126,7 @@ public class FlowBuilder<Q> {
 	/**
 	 * Go back to a previously registered step and start a new path. If no steps are registered yet just a synonym for
 	 * {@link #start(Step)}.
-	 * 
+	 *
 	 * @param step the step to start from (already registered)
 	 * @return this to enable chaining
 	 */
@@ -133,8 +138,8 @@ public class FlowBuilder<Q> {
 	/**
 	 * Transition to the decider on successful completion of the current step. All other outcomes are treated as
 	 * failures.
-	 * 
-	 * @param step the next step
+	 *
+	 * @param decider the JobExecutionDecider to determine the next step to execute
 	 * @return this to enable chaining
 	 */
 	public UnterminatedFlowBuilder<Q> next(JobExecutionDecider decider) {
@@ -144,7 +149,7 @@ public class FlowBuilder<Q> {
 
 	/**
 	 * If a flow should start with a decision use this as the first state.
-	 * 
+	 *
 	 * @param decider the to start from
 	 * @return a builder to enable chaining
 	 */
@@ -155,7 +160,7 @@ public class FlowBuilder<Q> {
 
 	/**
 	 * Start again from a decision that was already registered.
-	 * 
+	 *
 	 * @param decider the decider to start from (already registered)
 	 * @return a builder to enable chaining
 	 */
@@ -166,7 +171,7 @@ public class FlowBuilder<Q> {
 
 	/**
 	 * Go next on successful completion to a subflow.
-	 * 
+	 *
 	 * @param flow the flow to go to
 	 * @return a builder to enable chaining
 	 */
@@ -177,7 +182,7 @@ public class FlowBuilder<Q> {
 
 	/**
 	 * Start again from a subflow that was already registered.
-	 * 
+	 *
 	 * @param flow the flow to start from (already registered)
 	 * @return a builder to enable chaining
 	 */
@@ -188,7 +193,7 @@ public class FlowBuilder<Q> {
 
 	/**
 	 * If a flow should start with a subflow use this as the first state.
-	 * 
+	 *
 	 * @param flow the flow to start from
 	 * @return a builder to enable chaining
 	 */
@@ -209,7 +214,7 @@ public class FlowBuilder<Q> {
 	 * Start a transition to a new state if the exit status from the previous state matches the pattern given.
 	 * Successful completion normally results in an exit status equal to (or starting with by convention) "COMPLETED".
 	 * See {@link ExitStatus} for commonly used values.
-	 * 
+	 *
 	 * @param pattern the pattern of exit status on which to take this transition
 	 * @return a builder to enable fluent chaining
 	 */
@@ -220,10 +225,8 @@ public class FlowBuilder<Q> {
 	/**
 	 * A synonym for {@link #build()} which callers might find useful. Subclasses can override build to create an object
 	 * of the desired type (e.g. a parent builder or an actual flow).
-	 * 
+	 *
 	 * @return the result of the builder
-	 * 
-	 * @param Q the type of the result
 	 */
 	public final Q end() {
 		return build();
@@ -325,10 +328,8 @@ public class FlowBuilder<Q> {
 		for (String to : copy.keySet()) {
 			if (!froms.contains(to)) {
 				currentState = copy.get(to);
-				if (currentState != completedState) {
+				if (!currentState.isEndState()) {
 					addTransition("COMPLETED", completedState);
-				}
-				if (currentState != failedState) {
 					addTransition("*", failedState);
 				}
 			}
@@ -337,12 +338,10 @@ public class FlowBuilder<Q> {
 		// Then find the states that do not have a default transition
 		for (String from : copy.keySet()) {
 			currentState = copy.get(from);
-			if (currentState != failedState) {
+			if (!currentState.isEndState()) {
 				if (!hasFail(from)) {
 					addTransition("*", failedState);
 				}
-			}
-			if (currentState != completedState) {
 				if (!hasCompleted(from)) {
 					addTransition("*", completedState);
 				}
@@ -373,12 +372,31 @@ public class FlowBuilder<Q> {
 		if (transitions.size() == 1) {
 			transitions.add(StateTransition.createEndStateTransition(failedState));
 			transitions.add(StateTransition.createEndStateTransition(completedState));
+			transitions.add(StateTransition.createEndStateTransition(stoppedState));
+		}
+		if (next.isEndState()) {
+			transitions.add(StateTransition.createEndStateTransition(next));
 		}
 		dirty = true;
 	}
 
+	private void stop(String pattern) {
+		addTransition(pattern, stoppedState);
+	}
+
+	private void stop(String pattern, State restart) {
+		EndState next = new EndState(FlowExecutionStatus.STOPPED, "STOPPED", prefix + "stop" + (endCounter++), true);
+		addTransition(pattern, next);
+		currentState = next;
+		addTransition("*", restart);
+	}
+
 	private void end(String pattern) {
 		addTransition(pattern, completedState);
+	}
+
+	private void end(String pattern, String code) {
+		addTransition(pattern, new EndState(FlowExecutionStatus.COMPLETED, code, prefix + "end" + (endCounter++)));
 	}
 
 	private void fail(String pattern) {
@@ -387,9 +405,9 @@ public class FlowBuilder<Q> {
 
 	/**
 	 * A builder for continuing a flow from a decision state.
-	 * 
+	 *
 	 * @author Dave Syer
-	 * 
+	 *
 	 * @param <Q> the result of the builder's build()
 	 */
 	public static class UnterminatedFlowBuilder<Q> {
@@ -404,9 +422,9 @@ public class FlowBuilder<Q> {
 		 * Start a transition to a new state if the exit status from the previous state matches the pattern given.
 		 * Successful completion normally results in an exit status equal to (or starting with by convention)
 		 * "COMPLETED". See {@link ExitStatus} for commonly used values.
-		 * 
+		 *
 		 * @param pattern the pattern of exit status on which to take this transition
-		 * @return
+		 * @return a TransitionBuilder
 		 */
 		public TransitionBuilder<Q> on(String pattern) {
 			return new TransitionBuilder<Q>(parent, pattern);
@@ -416,9 +434,9 @@ public class FlowBuilder<Q> {
 
 	/**
 	 * A builder for transitions within a flow.
-	 * 
+	 *
 	 * @author Dave Syer
-	 * 
+	 *
 	 * @param <Q> the result of the parent builder's build()
 	 */
 	public static class TransitionBuilder<Q> {
@@ -434,7 +452,7 @@ public class FlowBuilder<Q> {
 
 		/**
 		 * Specify the next step.
-		 * 
+		 *
 		 * @param step the next step after this transition
 		 * @return a FlowBuilder
 		 */
@@ -447,8 +465,8 @@ public class FlowBuilder<Q> {
 
 		/**
 		 * Specify the next state as a complete flow.
-		 * 
-		 * @param step the next step after this transition
+		 *
+		 * @param flow the next flow after this transition
 		 * @return a FlowBuilder
 		 */
 		public FlowBuilder<Q> to(Flow flow) {
@@ -460,8 +478,8 @@ public class FlowBuilder<Q> {
 
 		/**
 		 * Specify the next state as a decision.
-		 * 
-		 * @param step the next step after this transition
+		 *
+		 * @param decider the decider to determine the next step
 		 * @return a FlowBuilder
 		 */
 		public FlowBuilder<Q> to(JobExecutionDecider decider) {
@@ -473,7 +491,53 @@ public class FlowBuilder<Q> {
 
 		/**
 		 * Signal the successful end of the flow.
-		 * 
+		 *
+		 * @return a FlowBuilder
+		 */
+		public FlowBuilder<Q> stop() {
+			parent.stop(pattern);
+			return parent;
+		}
+
+		/**
+		 * Stop the flow and provide a flow to start with if the flow is restarted.
+		 *
+		 * @param flow the flow to restart with
+		 * @return a FlowBuilder
+		 */
+		public FlowBuilder<Q> stopAndRestart(Flow flow) {
+			State next = parent.createState(flow);
+			parent.stop(pattern, next);
+			return parent;
+		}
+
+		/**
+		 * Stop the flow and provide a decider to start with if the flow is restarted.
+		 *
+		 * @param decider a decider to restart with
+		 * @return a FlowBuilder
+		 */
+		public FlowBuilder<Q> stopAndRestart(JobExecutionDecider decider) {
+			State next = parent.createState(decider);
+			parent.stop(pattern, next);
+			return parent;
+		}
+
+		/**
+		 * Stop the flow and provide a step to start with if the flow is restarted.
+		 *
+		 * @param restart the step to restart with
+		 * @return a FlowBuilder
+		 */
+		public FlowBuilder<Q> stopAndRestart(Step restart) {
+			State next = parent.createState(restart);
+			parent.stop(pattern, next);
+			return parent;
+		}
+
+		/**
+		 * Signal the successful end of the flow.
+		 *
 		 * @return a FlowBuilder
 		 */
 		public FlowBuilder<Q> end() {
@@ -482,8 +546,18 @@ public class FlowBuilder<Q> {
 		}
 
 		/**
+		 * Signal the end of the flow with the status provided.
+		 *
+		 * @return a FlowBuilder
+		 */
+		public FlowBuilder<Q> end(String status) {
+			parent.end(pattern, status);
+			return parent;
+		}
+
+		/**
 		 * Signal the end of the flow with an error condition.
-		 * 
+		 *
 		 * @return a FlowBuilder
 		 */
 		public FlowBuilder<Q> fail() {
@@ -494,22 +568,22 @@ public class FlowBuilder<Q> {
 
 	/**
 	 * A builder for building a split state. Example (<code>builder</code> is a {@link FlowBuilder}):
-	 * 
+	 *
 	 * <pre>
 	 * Flow splitFlow = builder.start(flow1).split(new SyncTaskExecutor()).add(flow2).build();
 	 * </pre>
-	 * 
+	 *
 	 * where <code>flow1</code> and <code>flow2</code> will be executed (one after the other because of the task
 	 * executor that was added). Another example
-	 * 
+	 *
 	 * <pre>
 	 * Flow splitFlow = builder.start(step1).split(new SimpleAsyncTaskExecutor()).add(flow).build();
 	 * </pre>
-	 * 
+	 *
 	 * In this example, a flow consisting of <code>step1</code> will be executed in parallel with <code>flow</code>.
-	 * 
+	 *
 	 * @author Dave Syer
-	 * 
+	 *
 	 * @param <Q> the result of the parent builder's build()
 	 */
 	public static class SplitBuilder<Q> {
@@ -529,7 +603,7 @@ public class FlowBuilder<Q> {
 
 		/**
 		 * Add flows to the split, in addition to the current state already present in the parent builder.
-		 * 
+		 *
 		 * @param flows more flows to add to the split
 		 * @return the parent builder
 		 */
