@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+       http://www.springframework.org/schema/beans/spring-beans-3.1.xsd">
+
+    <description>
+        Declares two jobs with a set of steps. Also declares two steps that are not attached to any job
+        but could be linked to them through a partition handler configuration for instance.
+    </description>
+
+    <import resource="job-context-with-steps.xml"/>
+
+    <bean id="genericStep1" class="org.springframework.batch.core.step.StepSupport"/>
+    <bean id="genericStep2" class="org.springframework.batch.core.step.StepSupport"/>
+
+</beans>
