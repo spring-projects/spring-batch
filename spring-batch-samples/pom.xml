@@ -20,7 +20,7 @@
 			<dependency>
 				<groupId>com.vmware.sqlfire</groupId>
 				<artifactId>sqlfireclient</artifactId>
-				<version>1.0.3</version>
+				<optional>true</optional>
 			</dependency>
 		<dependency>
 			<groupId>org.springframework.batch</groupId>
