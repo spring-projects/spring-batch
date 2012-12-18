@@ -17,6 +17,11 @@
 		<environment>hsql</environment>
 	</properties>
 	<dependencies>
+			<dependency>
+				<groupId>com.vmware.sqlfire</groupId>
+				<artifactId>sqlfireclient</artifactId>
+				<optional>true</optional>
+			</dependency>
 		<dependency>
 			<groupId>org.springframework.batch</groupId>
 			<artifactId>spring-batch-core</artifactId>
@@ -238,6 +243,16 @@
 			<artifactId>mail</artifactId>
 			<version>1.4.1</version>
 		</dependency>
+		<dependency>
+            <groupId>org.springframework.amqp</groupId>
+            <artifactId>spring-amqp</artifactId>
+            <optional>true</optional>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.amqp</groupId>
+            <artifactId>spring-rabbit</artifactId>
+            <optional>true</optional>
+        </dependency>
 	</dependencies>
 	<build>
 		<plugins>
