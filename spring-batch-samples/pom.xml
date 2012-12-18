@@ -17,6 +17,11 @@
 		<environment>hsql</environment>
 	</properties>
 	<dependencies>
+			<dependency>
+				<groupId>com.vmware.sqlfire</groupId>
+				<artifactId>sqlfireclient</artifactId>
+				<version>1.0.3</version>
+			</dependency>
 		<dependency>
 			<groupId>org.springframework.batch</groupId>
 			<artifactId>spring-batch-core</artifactId>
