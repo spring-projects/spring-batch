@@ -1,0 +1,25 @@
+<assembly>
+    <id>distribution</id>
+    <formats>
+        <format>tar.gz</format>
+    </formats>
+    <includeBaseDirectory>false</includeBaseDirectory>
+    <fileSets>
+        <fileSet>
+            <directory>src/main/scripts</directory>
+            <outputDirectory>bin</outputDirectory>
+            <useDefaultExcludes>true</useDefaultExcludes>
+        </fileSet>
+        <fileSet>
+            <directory>src/main/resources/META-INF/spring/jobs/${jobName}</directory>
+            <outputDirectory>resources</outputDirectory>
+            <useDefaultExcludes>true</useDefaultExcludes>
+            <filtered>true</filtered>
+        </fileSet>
+    </fileSets>
+    <dependencySets>
+        <dependencySet>
+            <outputDirectory>lib</outputDirectory>
+        </dependencySet>
+    </dependencySets>
+</assembly>

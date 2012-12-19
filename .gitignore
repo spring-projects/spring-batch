@@ -18,4 +18,5 @@ s3.properties
 *.ipr
 *.iws
 .*.swp
+.DS_Store
 
