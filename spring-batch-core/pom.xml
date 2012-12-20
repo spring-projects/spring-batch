@@ -41,7 +41,9 @@
 			<artifactId>hsqldb</artifactId>
 		</dependency>
 		<dependency>
-			<groupId>com.h2database</groupId><artifactId>h2</artifactId><version>1.2.132</version>
+			<groupId>com.h2database</groupId>
+			<artifactId>h2</artifactId>
+			<version>1.2.132</version>
 		</dependency>
 		<dependency>
 			<groupId>commons-io</groupId>
