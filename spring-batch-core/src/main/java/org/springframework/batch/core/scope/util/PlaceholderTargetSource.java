@@ -16,6 +16,7 @@
 package org.springframework.batch.core.scope.util;
 
 import java.beans.PropertyEditor;
+import java.lang.reflect.Field;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -56,9 +57,9 @@ import org.springframework.util.StringValueResolver;
  * non-primitive values directly by making the whole bean property value into a
  * placeholder (e.g. <code>value="%{foo}"</code> where <code>foo</code> is a
  * property in the context).
- * 
+ *
  * @author Dave Syer
- * 
+ *
  */
 public class PlaceholderTargetSource extends SimpleBeanTargetSource implements InitializingBean {
 
@@ -76,7 +77,7 @@ public class PlaceholderTargetSource extends SimpleBeanTargetSource implements I
 	/**
 	 * Public setter for the context factory. Used to construct the context root
 	 * whenever placeholders are replaced in a bean definition.
-	 * 
+	 *
 	 * @param contextFactory the {@link ContextFactory}
 	 */
 	public void setContextFactory(ContextFactory contextFactory) {
@@ -85,10 +86,11 @@ public class PlaceholderTargetSource extends SimpleBeanTargetSource implements I
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see
 	 * org.springframework.beans.factory.InitializingBean#afterPropertiesSet()
 	 */
+	@Override
 	public void afterPropertiesSet() {
 		Assert.notNull(contextFactory, "The ContextFactory must be set.");
 		beanName = getTargetBeanName() + "#" + contextFactory.getContextId();
@@ -96,7 +98,7 @@ public class PlaceholderTargetSource extends SimpleBeanTargetSource implements I
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see org.springframework.aop.target.LazyInitTargetSource#getTarget()
 	 */
 	@Override
@@ -116,9 +118,16 @@ public class PlaceholderTargetSource extends SimpleBeanTargetSource implements I
 		beanFactory.copyConfigurationFrom(listableBeanFactory);
 
 		final TypeConverter contextTypeConverter = new TypeConverter() {
+			@Override
 			@SuppressWarnings({ "unchecked", "rawtypes" })
 			public Object convertIfNecessary(Object value, Class requiredType, MethodParameter methodParam)
 					throws TypeMismatchException {
+				return doConvertIfNecessary(value, requiredType,
+						methodParam);
+			}
+
+			private Object doConvertIfNecessary(Object value,
+					Class requiredType, Object param) {
 				Object result = null;
 				if (value instanceof String) {
 					String key = (String) value;
@@ -155,12 +164,30 @@ public class PlaceholderTargetSource extends SimpleBeanTargetSource implements I
 						result = value.toString();
 					}
 				}
-				return result != null ? result : typeConverter.convertIfNecessary(value, requiredType, methodParam);
+
+				if(result != null) {
+					return result;
+				}
+				else if(param instanceof Field) {
+					return typeConverter.convertIfNecessary(value, requiredType, (Field) param);
+				}
+				else {
+					return typeConverter.convertIfNecessary(value, requiredType, (MethodParameter) param);
+				}
 			}
 
+			@Override
 			@SuppressWarnings("rawtypes")
 			public Object convertIfNecessary(Object value, Class requiredType) throws TypeMismatchException {
-				return convertIfNecessary(value, requiredType, null);
+				return doConvertIfNecessary(value, requiredType, null);
+			}
+
+			@Override
+			public Object convertIfNecessary(Object value,
+					Class requiredType, Field field)
+					throws TypeMismatchException {
+				return doConvertIfNecessary(value, requiredType,
+						field);
 			}
 		};
 		beanFactory.setTypeConverter(contextTypeConverter);
@@ -220,7 +247,7 @@ public class PlaceholderTargetSource extends SimpleBeanTargetSource implements I
 		try {
 			// Give it one chance to convert - this forces the default editors
 			// to be registered
-			result = (String) typeConverter.convertIfNecessary(value, String.class);
+			result = typeConverter.convertIfNecessary(value, String.class);
 		}
 		catch (TypeMismatchException e) {
 			// ignore
@@ -287,7 +314,7 @@ public class PlaceholderTargetSource extends SimpleBeanTargetSource implements I
 	 * Determine whether the input is a whole key in the form
 	 * <code>%{...}</code>, i.e. starting with the correct prefix, ending with
 	 * the correct suffix and containing only one of each.
-	 * 
+	 *
 	 * @param value a String with placeholder patterns
 	 * @return true if the value is a key
 	 */
@@ -299,9 +326,9 @@ public class PlaceholderTargetSource extends SimpleBeanTargetSource implements I
 	/**
 	 * A {@link BeanDefinitionVisitor} that will replace embedded placeholders
 	 * with values from the provided context.
-	 * 
+	 *
 	 * @author Dave Syer
-	 * 
+	 *
 	 */
 	private final class PlaceholderBeanDefinitionVisitor extends BeanDefinitionVisitor {
 
@@ -309,6 +336,7 @@ public class PlaceholderTargetSource extends SimpleBeanTargetSource implements I
 			super(new PlaceholderStringValueResolver(typeConverter));
 		}
 
+		@Override
 		@SuppressWarnings({ "unchecked", "rawtypes" })
 		protected Object resolveValue(Object value) {
 
@@ -367,14 +395,14 @@ public class PlaceholderTargetSource extends SimpleBeanTargetSource implements I
 			else if (value instanceof BeanDefinition) {
 
 				BeanDefinition newValue = new GenericBeanDefinition((BeanDefinition) value);
-				visitBeanDefinition((BeanDefinition) newValue);
+				visitBeanDefinition(newValue);
 				value = newValue;
 
 			}
 			else if (value instanceof BeanDefinitionHolder) {
 
 				BeanDefinition newValue = new GenericBeanDefinition(((BeanDefinitionHolder) value).getBeanDefinition());
-				visitBeanDefinition((BeanDefinition) newValue);
+				visitBeanDefinition(newValue);
 				value = newValue;
 
 			}
@@ -398,6 +426,7 @@ public class PlaceholderTargetSource extends SimpleBeanTargetSource implements I
 			this.typeConverter = typeConverter;
 		}
 
+		@Override
 		public String resolveStringValue(String strVal) {
 			if (!strVal.contains(PLACEHOLDER_PREFIX)) {
 				return strVal;
@@ -407,7 +436,7 @@ public class PlaceholderTargetSource extends SimpleBeanTargetSource implements I
 
 		/**
 		 * Convenience method to replace all the placeholders in the input.
-		 * 
+		 *
 		 * @param typeConverter a {@link TypeConverter} that can be used to
 		 * convert placeholder keys to context values
 		 * @param value the value to replace placeholders in
@@ -454,7 +483,7 @@ public class PlaceholderTargetSource extends SimpleBeanTargetSource implements I
 				Class<?> requiredType, TypeConverter typeConverter) {
 			Object property = convertFromContext(key, requiredType);
 			if (property != null) {
-				result.replace(first, next + 1, (String) typeConverter.convertIfNecessary(property, String.class));
+				result.replace(first, next + 1, typeConverter.convertIfNecessary(property, String.class));
 				return true;
 			}
 			return false;
