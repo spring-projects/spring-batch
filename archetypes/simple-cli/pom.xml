@@ -13,7 +13,7 @@
 		the project jar on the classpath and run the
 		CommandLineJobRunner directly or with "java -jar launch-context.xml job1".</description>
 	<properties>
-		<spring.framework.version>3.1.2.RELEASE</spring.framework.version>
+		<spring.framework.version>3.2.0.RELEASE</spring.framework.version>
 		<spring.batch.version>2.2.0.BUILD-SNAPSHOT</spring.batch.version>
 		<dependency.locations.enabled>false</dependency.locations.enabled>
 		<junit.version>4.10</junit.version>
@@ -154,7 +154,7 @@
 						</descriptorRefs>
 					</configuration>
 				</plugin>
-				<!--This plugin's configuration is used to store Eclipse m2e settings 
+				<!--This plugin's configuration is used to store Eclipse m2e settings
 					only. It has no influence on the Maven build itself. -->
 				<plugin>
 					<groupId>org.eclipse.m2e</groupId>
