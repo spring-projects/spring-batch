@@ -11,9 +11,12 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 /**
- * Run the job to read from the "test.inbound" queue, process the messages and write them to the "test.outbound" queue:
- * mvn -q exec:java -Dexec.mainClass="org.springframework.batch.core.launch.support.CommandLineJobRunner" \
- *    -Dexec.arguments="classpath*:/META-INF/spring/jobs/amqp/amqp-example-job.xml,amqp-example-job"
+ * <p>Ensure a RabbitMQ instance is running, modifying default.amqp.properties if needed. Execute the
+ * {@link org.springframework.batch.sample.rabbitmq.amqp.AmqpMessageProducer#main(String[])} method
+ * in order for messages will be written to the "test.inbound" queue.</p>
+ *
+ * <p>Run this test and the job will read those messages, process them and write them to the "test.outbound"
+ * queue for inspection.</p>
 */
 
 @RunWith(SpringJUnit4ClassRunner.class)
