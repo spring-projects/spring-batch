@@ -22,27 +22,29 @@ import java.io.BufferedReader;
  * Policy for text file-based input sources to determine the end of a record,
  * e.g. a record might be a single line, or it might be multiple lines
  * terminated by a semicolon.
- * 
+ *
  * @author Dave Syer
- * 
+ *
  */
 public interface RecordSeparatorPolicy {
 
 	/**
-	 * Signal the end of a record based on the content of a line, being the
-	 * latest line read from an input source. The input is what you would expect
-	 * from {@link BufferedReader#readLine()} - i.e. no line separator character
-	 * at the end. But it might have line separators embedded in it.
-	 * 
-	 * @param line a String without a newline character at the end.
-	 * @return true if this line is the end of a record.
+	 * Signal the end of a record based on the content of the current record.
+	 * During the course of processing, each time this method returns false,
+	 * the next line read is appended onto it (building the record).  The input
+	 * is what you would expect from {@link BufferedReader#readLine()} - i.e.
+	 * no line separator character at the end. But it might have line separators
+	 * embedded in it.
+	 *
+	 * @param record a String without a newline character at the end.
+	 * @return true if this line is a complete record.
 	 */
-	boolean isEndOfRecord(String line);
+	boolean isEndOfRecord(String record);
 
 	/**
 	 * Give the policy a chance to post-process a complete record, e.g. remove a
 	 * suffix.
-	 * 
+	 *
 	 * @param record the complete record.
 	 * @return a modified version of the record if desired.
 	 */
@@ -53,7 +55,7 @@ public interface RecordSeparatorPolicy {
 	 * multi-line record. Can be used to remove a prefix or line-continuation
 	 * marker. If a record is a single line this callback is not used (but
 	 * {@link #postProcess(String)} will be).
-	 * 
+	 *
 	 * @param record the current record.
 	 * @return the line as it should be appended to a record.
 	 */
