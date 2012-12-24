@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<beans:beans
+        xmlns:beans="http://www.springframework.org/schema/beans"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xmlns:jdbc="http://www.springframework.org/schema/jdbc"
+        xsi:schemaLocation="
+        http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.1.xsd
+        http://www.springframework.org/schema/jdbc http://www.springframework.org/schema/jdbc/spring-jdbc-3.1.xsd">
+
+    <jdbc:initialize-database data-source="dataSource">
+        <jdbc:script location="${person.sql.location}"/>
+    </jdbc:initialize-database>
+
+    <beans:bean id="itemReader" class="org.springframework.batch.item.file.FlatFileItemReader">
+        <beans:property name="resource" value="${person.test.data.location}"/>
+        <beans:property name="lineMapper">
+            <beans:bean class="org.springframework.batch.item.file.mapping.DefaultLineMapper">
+                <beans:property name="lineTokenizer">
+                    <beans:bean class="org.springframework.batch.item.file.transform.DelimitedLineTokenizer">
+                        <beans:property name="names" value="firstName,lastName"/>
+                    </beans:bean>
+                </beans:property>
+                <beans:property name="fieldSetMapper">
+                    <beans:bean class="${package}.PersonFieldSetMapper"/>
+                </beans:property>
+            </beans:bean>
+        </beans:property>
+    </beans:bean>
+
+    <beans:bean id="itemProcessor" class="${package}.PersonItemProcessor"/>
+
+    <beans:bean id="itemWriter" class="${package}.PersonItemWriter">
+        <beans:constructor-arg ref="jdbcTemplate"/>
+        <beans:constructor-arg value="${person.insert.sql}"/>
+    </beans:bean>
+</beans:beans>
