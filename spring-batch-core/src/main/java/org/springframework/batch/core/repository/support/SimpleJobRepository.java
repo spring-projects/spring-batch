@@ -39,21 +39,21 @@ import org.springframework.batch.item.ExecutionContext;
 import org.springframework.util.Assert;
 
 /**
- * 
+ *
  * <p>
  * Implementation of {@link JobRepository} that stores JobInstances,
  * JobExecutions, and StepExecutions using the injected DAOs.
  * <p>
- * 
+ *
  * @author Lucas Ward
  * @author Dave Syer
  * @author Robert Kasanicky
- * 
+ *
  * @see JobRepository
  * @see JobInstanceDao
  * @see JobExecutionDao
  * @see StepExecutionDao
- * 
+ *
  */
 public class SimpleJobRepository implements JobRepository {
 
@@ -95,7 +95,7 @@ public class SimpleJobRepository implements JobRepository {
 
 		/*
 		 * Find all jobs matching the runtime information.
-		 * 
+		 *
 		 * If this method is transactional, and the isolation level is
 		 * REPEATABLE_READ or better, another launcher trying to start the same
 		 * job in another thread or process will block until this transaction
@@ -116,7 +116,7 @@ public class SimpleJobRepository implements JobRepository {
 					throw new JobExecutionAlreadyRunningException("A job execution for this job is already running: "
 							+ jobInstance);
 				}
-				
+
 				BatchStatus status = execution.getStatus();
 				if (status == BatchStatus.COMPLETED || status == BatchStatus.ABANDONED) {
 					throw new JobInstanceAlreadyCompleteException(
@@ -132,7 +132,7 @@ public class SimpleJobRepository implements JobRepository {
 			executionContext = new ExecutionContext();
 		}
 
-		JobExecution jobExecution = new JobExecution(jobInstance);
+		JobExecution jobExecution = new JobExecution(jobInstance, jobParameters);
 		jobExecution.setExecutionContext(executionContext);
 		jobExecution.setLastUpdated(new Date(System.currentTimeMillis()));
 
@@ -183,7 +183,7 @@ public class SimpleJobRepository implements JobRepository {
 		Assert.notNull(stepExecution.getId(), "StepExecution must already be saved (have an id assigned)");
 		ecDao.updateExecutionContext(stepExecution);
 	}
-	
+
 	public void updateExecutionContext(JobExecution jobExecution) {
 		ecDao.updateExecutionContext(jobExecution);
 	}
@@ -237,7 +237,7 @@ public class SimpleJobRepository implements JobRepository {
 	 * the provided StepExecution has been interrupted. If, after synchronizing
 	 * the status with the database, the status has been updated to STOPPING,
 	 * then the job has been interrupted.
-	 * 
+	 *
 	 * @param stepExecution
 	 */
 	private void checkForInterruption(StepExecution stepExecution) {
@@ -255,7 +255,7 @@ public class SimpleJobRepository implements JobRepository {
 			return null;
 		}
 		JobExecution jobExecution = jobExecutionDao.getLastJobExecution(jobInstance);
-	
+
 		if (jobExecution != null) {
 			jobExecution.setExecutionContext(ecDao.getExecutionContext(jobExecution));
 		}

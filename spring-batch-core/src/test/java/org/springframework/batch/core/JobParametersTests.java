@@ -1,5 +1,5 @@
 /**
- * 
+ *
  */
 package org.springframework.batch.core;
 
@@ -18,7 +18,7 @@ import org.springframework.batch.support.SerializationUtils;
 /**
  * @author Lucas Ward
  * @author Dave Syer
- * 
+ *
  */
 public class JobParametersTests {
 
@@ -62,15 +62,33 @@ public class JobParametersTests {
 	}
 
 	@Test
+	public void testGetNonIdentifyingString() {
+		parameters = new JobParameters(Collections.singletonMap("string.key1", new JobParameter((String)"value")));
+		assertEquals("value", parameters.getString("string.key1"));
+	}
+
+	@Test
 	public void testGetLong() {
 		assertEquals(1L, parameters.getLong("long.key1"));
 		assertEquals(2L, parameters.getLong("long.key2"));
 	}
 
 	@Test
+	public void testGetNonIdentifyingLong() {
+		parameters = new JobParameters(Collections.singletonMap("long.key1", new JobParameter(1L)));
+		assertEquals(1L, parameters.getLong("long.key1"));
+	}
+
+	@Test
 	public void testGetDouble() {
 		assertEquals(new Double(1.1), new Double(parameters.getDouble("double.key1")));
 		assertEquals(new Double(2.2), new Double(parameters.getDouble("double.key2")));
+	}
+
+	@Test
+	public void testGetNonIdentifyingDouble() {
+		parameters = new JobParameters(Collections.singletonMap("long.key1", new JobParameter(1.1)));
+		assertEquals(1.1, parameters.getDouble("long.key1"), 0.000000001);
 	}
 
 	@Test
@@ -83,6 +101,12 @@ public class JobParametersTests {
 	public void testGetNullDate() {
 		parameters = new JobParameters(Collections.singletonMap("date.key1", new JobParameter((Date)null)));
 		assertEquals(null, parameters.getDate("date.key1"));
+	}
+
+	@Test
+	public void testGetNonIdentifyingDate() {
+		parameters = new JobParameters(Collections.singletonMap("date.key1", new JobParameter(date1)));
+		assertEquals(date1, parameters.getDate("date.key1"));
 	}
 
 	@Test
@@ -157,7 +181,7 @@ public class JobParametersTests {
 		parameterMap.put("double.key1", new JobParameter(1.1));
 		parameterMap.put("date.key2", new JobParameter(date2));
 		parameterMap.put("date.key1", new JobParameter(date1));
-		
+
 		JobParameters testProps = new JobParameters(parameterMap);
 
 		props = testProps.getParameters();
@@ -191,7 +215,7 @@ public class JobParametersTests {
 
 		assertEquals(params, SerializationUtils.deserialize(serialized));
 	}
-    
+
     @Test
     public void testLongReturns0WhenKeyDoesntExit(){
         assertEquals(0L,new JobParameters().getLong("keythatdoesntexist"));
@@ -210,5 +234,38 @@ public class JobParametersTests {
     @Test
     public void testDateReturnsNullWhenKeyDoesntExit(){
         assertNull(new JobParameters().getDate("keythatdoesntexist"));
+    }
+
+    @Test
+    public void testGetIdentifyingJobParameters() {
+
+		Map<String, JobParameter> parameterMap = new HashMap<String, JobParameter>();
+		parameterMap.put("string.key1", new JobParameter("value1"));
+		parameterMap.put("string.nonId.key2", new JobParameter("value2", false));
+		parameterMap.put("long.key1", new JobParameter(1L));
+		parameterMap.put("long.nonId.key2", new JobParameter(2L, false));
+		parameterMap.put("double.key1", new JobParameter(1.1));
+		parameterMap.put("double.nonId.key2", new JobParameter(2.2, false));
+		parameterMap.put("date.key1", new JobParameter(date1));
+		parameterMap.put("date.nonId.key2", new JobParameter(date2, false));
+
+		JobParameters jobParameters = new JobParameters(parameterMap);
+
+		JobParameters resultParameters = jobParameters.getIdentifyingJobParameters();
+
+		assertEquals("no of elements", 4, resultParameters.getParameters().size());
+		assertEquals("value of string.key1", "value1", resultParameters.getString("string.key1"));
+		assertEquals("value of long.key1", 1L, resultParameters.getLong("long.key1"));
+		assertEquals("value of double.key1", 1.1, resultParameters.getDouble("double.key1"), 0.000000001);
+		assertEquals("value of date.key1", date1, resultParameters.getDate("date.key1"));
+    }
+
+
+    @Test
+    public void testGetIdentifyingJobParametersWithAllIdentifyingParameter() {
+    	JobParameters resultParameters = parameters.getIdentifyingJobParameters();
+
+    	assertSame("result parameters should be same instance if all parameters are identifying",
+    			parameters, resultParameters);
     }
 }

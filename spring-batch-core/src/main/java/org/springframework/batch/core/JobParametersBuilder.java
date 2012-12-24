@@ -29,7 +29,7 @@ import org.springframework.util.Assert;
  * same was a java.lang.StringBuilder (except, order is irrelevant), by adding
  * various parameter types and creating a valid {@link JobParameters} once
  * finished.
- * 
+ *
  * @author Lucas Ward
  * @since 1.0
  * @see JobParameters
@@ -56,10 +56,10 @@ public class JobParametersBuilder {
 
 	/**
 	 * Add a new String parameter for the given key.
-	 * 
+	 *
 	 * @param key - parameter accessor.
 	 * @param parameter - runtime parameter
-	 * @return a refernece to this object.
+	 * @return a reference to this object.
 	 */
 	public JobParametersBuilder addString(String key, String parameter) {
 		parameterMap.put(key, new JobParameter(parameter));
@@ -68,10 +68,10 @@ public class JobParametersBuilder {
 
 	/**
 	 * Add a new {@link Date} parameter for the given key.
-	 * 
+	 *
 	 * @param key - parameter accessor.
 	 * @param parameter - runtime parameter
-	 * @return a refernece to this object.
+	 * @return a reference to this object.
 	 */
 	public JobParametersBuilder addDate(String key, Date parameter) {
 		parameterMap.put(key, new JobParameter(parameter));
@@ -80,7 +80,7 @@ public class JobParametersBuilder {
 
 	/**
 	 * Add a new Long parameter for the given key.
-	 * 
+	 *
 	 * @param key - parameter accessor.
 	 * @param parameter - runtime parameter
 	 * @return a reference to this object.
@@ -89,10 +89,11 @@ public class JobParametersBuilder {
 		parameterMap.put(key, new JobParameter(parameter));
 		return this;
 	}
-	
+
+
 	/**
 	 * Add a new Double parameter for the given key.
-	 * 
+	 *
 	 * @param key - parameter accessor.
 	 * @param parameter - runtime parameter
 	 * @return a reference to this object.
@@ -103,9 +104,69 @@ public class JobParametersBuilder {
 	}
 
 	/**
+	 * Add a new String parameter for the given key.
+	 *
+	 * @param key - parameter accessor.
+	 * @param parameter - runtime parameter
+	 * @param isIdentifying - is parameter an identifying-parameter
+	 * @return a reference to this object.
+	 */
+	public JobParametersBuilder addString(String key,
+											String parameter,
+											boolean isIdentifying) {
+		parameterMap.put(key, new JobParameter(parameter, isIdentifying));
+		return this;
+	}
+
+	/**
+	 * Add a new {@link Date} parameter for the given key.
+	 *
+	 * @param key - parameter accessor.
+	 * @param parameter - runtime parameter
+	 * @param isIdentifying - is parameter an identifying-parameter
+	 * @return a reference to this object.
+	 */
+	public JobParametersBuilder addDate(String key,
+										Date parameter,
+										boolean isIdentifying) {
+		parameterMap.put(key, new JobParameter(parameter, isIdentifying));
+		return this;
+	}
+
+	/**
+	 * Add a new Long parameter for the given key.
+	 *
+	 * @param key - parameter accessor.
+	 * @param parameter - runtime parameter
+	 * @param isIdentifying - is parameter an identifying-parameter
+	 * @return a reference to this object.
+	 */
+	public JobParametersBuilder addLong(String key,
+										Long parameter,
+										boolean isIdentifying) {
+		parameterMap.put(key, new JobParameter(parameter, isIdentifying));
+		return this;
+	}
+
+	/**
+	 * Add a new Double parameter for the given key.
+	 *
+	 * @param key - parameter accessor.
+	 * @param parameter - runtime parameter
+	 * @param isIdentifying - is parameter an identifying-parameter
+	 * @return a reference to this object.
+	 */
+	public JobParametersBuilder addDouble(String key,
+											Double parameter,
+											boolean isIdentifying) {
+		parameterMap.put(key, new JobParameter(parameter, isIdentifying));
+		return this;
+	}
+
+	/**
 	 * Conversion method that takes the current state of this builder and
 	 * returns it as a JobruntimeParameters object.
-	 * 
+	 *
 	 * @return a valid {@link JobParameters} object.
 	 */
 	public JobParameters toJobParameters() {
@@ -114,7 +175,7 @@ public class JobParametersBuilder {
 
 	/**
 	 * Add a new {@link JobParameter} for the given key.
-	 * 
+	 *
 	 * @param key - parameter accessor
 	 * @param jobParameter - runtime parameter
 	 * @return a reference to this object.

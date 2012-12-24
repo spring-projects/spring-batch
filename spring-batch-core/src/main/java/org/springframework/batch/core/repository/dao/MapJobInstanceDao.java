@@ -49,6 +49,9 @@ public class MapJobInstanceDao implements JobInstanceDao {
 
 		Assert.state(getJobInstance(jobName, jobParameters) == null, "JobInstance must not already exist");
 
+		// Use only identifying parameters when creating Job Instance
+		jobParameters = jobParameters.getIdentifyingJobParameters();
+
 		JobInstance jobInstance = new JobInstance(currentId.getAndIncrement(), jobParameters, jobName);
 		jobInstance.incrementVersion();
 		jobInstances.add(jobInstance);
@@ -57,6 +60,9 @@ public class MapJobInstanceDao implements JobInstanceDao {
 	}
 
 	public JobInstance getJobInstance(String jobName, JobParameters jobParameters) {
+
+		// Use only identifying parameters to find job instance
+		jobParameters = jobParameters.getIdentifyingJobParameters();
 
 		for (JobInstance instance : jobInstances) {
 			if (instance.getJobName().equals(jobName) && instance.getJobParameters().equals(jobParameters)) {

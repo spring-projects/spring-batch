@@ -88,6 +88,33 @@ public abstract class AbstractJobInstanceDaoTests {
 	 */
 	@Transactional
 	@Test
+	public void testCreateAndRetrieveByNonIdParams() throws Exception {
+		JobParameters jobParams = new JobParametersBuilder()
+										.addString("str1", "val1")
+										.addString("nonIdStr2", "val2")
+										.toJobParameters();
+
+		JobParameters identifyingJobParams = jobParams.getIdentifyingJobParameters();
+
+
+
+		JobInstance fooInstance = dao.createJobInstance(fooJob, jobParams);
+		assertNotNull(fooInstance.getId());
+		assertEquals(fooJob, fooInstance.getJobName());
+		assertEquals(identifyingJobParams, fooInstance.getJobParameters());
+
+		JobInstance retrievedInstance = dao.getJobInstance(fooJob, jobParams);
+		JobParameters retrievedParams = retrievedInstance.getJobParameters();
+		assertEquals(fooInstance, retrievedInstance);
+		assertEquals(fooJob, retrievedInstance.getJobName());
+		assertEquals(identifyingJobParams, retrievedParams);
+	}
+
+	/*
+	 * Create and retrieve a job instance.
+	 */
+	@Transactional
+	@Test
 	public void testCreateAndGetById() throws Exception {
 
 		JobInstance fooInstance = dao.createJobInstance(fooJob, fooParams);
@@ -180,7 +207,7 @@ public abstract class AbstractJobInstanceDaoTests {
 			JobParameters params = new JobParametersBuilder().addLong(paramKey, Long.valueOf(i)).toJobParameters();
 			dao.createJobInstance(multiInstanceJob, params);
 		}
-		
+
 
 		int startIndex = 3;
 		int queryCount = 2;
@@ -192,7 +219,7 @@ public abstract class AbstractJobInstanceDaoTests {
 			JobInstance returnedInstance = jobInstances.get(i);
 			assertEquals(multiInstanceJob, returnedInstance.getJobName());
 			assertEquals(Integer.valueOf(0), returnedInstance.getVersion());
-			
+
 			//checks the correct instances are returned and the order is descending
 			assertEquals(instanceCount - startIndex - i , returnedInstance.getJobParameters().getLong(paramKey));
 		}

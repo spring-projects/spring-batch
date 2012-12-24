@@ -50,7 +50,7 @@ import org.springframework.transaction.PlatformTransactionManager;
 
 /**
  * @author Dave Syer
- * 
+ *
  */
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(locations = "/org/springframework/batch/core/repository/dao/sql-dao-test.xml")
@@ -80,17 +80,17 @@ public class AsyncChunkOrientedStepIntegrationTests {
 	private ItemReader<String> getReader(String[] args) {
 		return new ListItemReader<String>(Arrays.asList(args));
 	}
-	
+
 	@After
 	public void reset() {
 		// Reset concurrency settings to something reasonable
 		dataSource.setMaxActive(maxActive);
-		dataSource.setMaxIdle(maxIdle);		
+		dataSource.setMaxIdle(maxIdle);
 	}
 
 	@Before
 	public void init() throws Exception {
-		
+
 		maxActive = dataSource.getMaxActive();
 		maxIdle = dataSource.getMaxIdle();
 
@@ -133,6 +133,11 @@ public class AsyncChunkOrientedStepIntegrationTests {
 		jobRepository.add(stepExecution);
 		step.execute(stepExecution);
 		assertEquals(BatchStatus.COMPLETED, stepExecution.getStatus());
+
+		// reset datasource before retrieving the result
+		dataSource.setMaxActive(maxActive);
+		dataSource.setMaxIdle(maxIdle);
+
 		StepExecution lastStepExecution = jobRepository.getLastStepExecution(jobExecution.getJobInstance(), step
 				.getName());
 		assertEquals(lastStepExecution, stepExecution);

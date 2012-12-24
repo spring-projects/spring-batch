@@ -1,5 +1,6 @@
 package org.springframework.batch.core.repository.dao;
 
+import static org.junit.Assert.*;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
@@ -18,6 +19,7 @@ import org.springframework.batch.core.ExitStatus;
 import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.JobInstance;
 import org.springframework.batch.core.JobParameters;
+import org.springframework.batch.core.JobParametersBuilder;
 import org.springframework.batch.core.StepExecution;
 import org.springframework.dao.OptimisticLockingFailureException;
 import org.springframework.transaction.annotation.Transactional;
@@ -30,6 +32,8 @@ public abstract class AbstractJobExecutionDaoTests {
 	protected JobInstance jobInstance;
 
 	protected JobExecution execution;
+
+	protected JobParameters jobExecutionParameters;
 
 	/**
 	 * @return tested object ready for use
@@ -49,7 +53,14 @@ public abstract class AbstractJobExecutionDaoTests {
 	public void onSetUp() throws Exception {
 		dao = getJobExecutionDao();
 		jobInstance = getJobInstanceDao().createJobInstance("execTestJob", new JobParameters());
+		jobExecutionParameters = new JobParametersBuilder()
+									.addString("strParam1", "val1")
+									.addString("noId.StringParam2", "val2")
+									.toJobParameters();
 		execution = new JobExecution(jobInstance);
+		execution.setJobParameters(jobExecutionParameters);
+
+
 	}
 
 	/**
@@ -69,6 +80,23 @@ public abstract class AbstractJobExecutionDaoTests {
 		assertEquals(1, executions.size());
 		assertEquals(execution, executions.get(0));
 		assertExecutionsAreEqual(execution, executions.get(0));
+		assertEquals(jobExecutionParameters, execution.getJobParameters());
+	}
+
+	/**
+	 * Save and find a job execution.
+	 */
+	@Transactional
+	@Test
+	public void testSaveAndFindWithNullJobExecutionParameters() {
+		execution.setJobParameters(null);
+		dao.saveJobExecution(execution);
+
+		List<JobExecution> executions = dao.findJobExecutions(jobInstance);
+
+		// if result execution's parameter is null, it will return jobInstance's
+		// job parameter
+		assertSame(jobInstance.getJobParameters(), execution.getJobParameters());
 	}
 
 	/**

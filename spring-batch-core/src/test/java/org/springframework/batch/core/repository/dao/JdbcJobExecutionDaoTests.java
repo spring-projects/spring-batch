@@ -23,7 +23,7 @@ public class JdbcJobExecutionDaoTests extends AbstractJobExecutionDaoTests {
 	private JobInstanceDao jobInstanceDao;
 
 	private JdbcTemplate jdbcTemplate;
-	
+
 	@Autowired
 	public void setDataSource(DataSource dataSource) {
 		jdbcTemplate = new JdbcTemplate(dataSource);
@@ -36,7 +36,7 @@ public class JdbcJobExecutionDaoTests extends AbstractJobExecutionDaoTests {
 
 	@Override
 	protected JobExecutionDao getJobExecutionDao() {
-        JdbcTestUtils.deleteFromTables(jdbcTemplate, "BATCH_JOB_EXECUTION_CONTEXT",
+        JdbcTestUtils.deleteFromTables(jdbcTemplate, "BATCH_JOB_EXECUTION_CONTEXT","BATCH_JOB_EXECUTION_PARAMS",
                 "BATCH_STEP_EXECUTION_CONTEXT", "BATCH_STEP_EXECUTION", "BATCH_JOB_EXECUTION", "BATCH_JOB_PARAMS",
                 "BATCH_JOB_INSTANCE");
 		return jobExecutionDao;
