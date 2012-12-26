@@ -33,7 +33,7 @@ import org.springframework.batch.item.sample.Foo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;
-import org.springframework.orm.hibernate3.LocalSessionFactoryBean;
+import org.springframework.orm.hibernate4.LocalSessionFactoryBean;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.transaction.annotation.Transactional;
@@ -64,13 +64,13 @@ public class HibernateNativeQueryProviderIntegrationTests {
 
 	@Before
 	public void setUp() throws Exception {
-		
+
 		LocalSessionFactoryBean factoryBean = new LocalSessionFactoryBean();
 		factoryBean.setDataSource(dataSource);
 		factoryBean.setMappingLocations(new Resource[] { new ClassPathResource("../Foo.hbm.xml", getClass()) });
 		factoryBean.afterPropertiesSet();
 
-		sessionFactory = (SessionFactory) factoryBean.getObject();
+		sessionFactory = factoryBean.getObject();
 
 	}
 
@@ -82,7 +82,7 @@ public class HibernateNativeQueryProviderIntegrationTests {
 
 		hibernateQueryProvider.setSqlQuery(nativeQuery);
 		hibernateQueryProvider.afterPropertiesSet();
-		hibernateQueryProvider.setSession(sessionFactory.getCurrentSession());
+		hibernateQueryProvider.setSession(sessionFactory.openSession());
 
 		Query query = hibernateQueryProvider.createQuery();
 

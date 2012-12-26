@@ -18,27 +18,32 @@ package org.springframework.batch.sample.domain.trade.internal;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.hibernate.SessionFactory;
 import org.springframework.batch.repeat.RepeatContext;
 import org.springframework.batch.repeat.RepeatListener;
 import org.springframework.batch.repeat.RepeatStatus;
 import org.springframework.batch.sample.domain.trade.CustomerCredit;
 import org.springframework.batch.sample.domain.trade.CustomerCreditDao;
-import org.springframework.orm.hibernate3.support.HibernateDaoSupport;
 
 /**
  * @author Lucas Ward
  * @author Dave Syer
- * 
+ *
  */
-public class HibernateCreditDao extends HibernateDaoSupport implements
+public class HibernateCreditDao implements
 		CustomerCreditDao, RepeatListener {
 
 	private int failOnFlush = -1;
 	private List<Throwable> errors = new ArrayList<Throwable>();
+	private SessionFactory sessionFactory;
+
+	public void setSessionFactory(SessionFactory sessionFactory) {
+		this.sessionFactory = sessionFactory;
+	}
 
 	/**
 	 * Public accessor for the errors property.
-	 * 
+	 *
 	 * @return the errors - a list of Throwable instances
 	 */
 	public List<Throwable> getErrors() {
@@ -47,7 +52,7 @@ public class HibernateCreditDao extends HibernateDaoSupport implements
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see org.springframework.batch.sample.domain.trade.internal.CustomerCreditWriter#write(org.springframework.batch.sample.domain.CustomerCredit)
 	 */
 	public void writeCredit(CustomerCredit customerCredit) {
@@ -57,15 +62,15 @@ public class HibernateCreditDao extends HibernateDaoSupport implements
 			newCredit.setId(customerCredit.getId());
 			newCredit.setName(customerCredit.getName());
 			newCredit.setCredit(customerCredit.getCredit());
-			getHibernateTemplate().save(newCredit);
+			sessionFactory.getCurrentSession().save(newCredit);
 		} else {
-			getHibernateTemplate().update(customerCredit);
+			sessionFactory.getCurrentSession().update(customerCredit);
 		}
 	}
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see org.springframework.batch.io.OutputSource#write(java.lang.Object)
 	 */
 	public void write(Object output) {
@@ -74,7 +79,7 @@ public class HibernateCreditDao extends HibernateDaoSupport implements
 
 	/**
 	 * Public setter for the failOnFlush property.
-	 * 
+	 *
 	 * @param failOnFlush
 	 *            the ID of the record you want to fail on flush (for testing)
 	 */

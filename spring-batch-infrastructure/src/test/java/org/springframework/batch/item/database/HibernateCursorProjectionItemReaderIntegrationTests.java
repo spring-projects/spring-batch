@@ -14,13 +14,13 @@ import org.springframework.batch.item.ExecutionContext;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;
-import org.springframework.orm.hibernate3.LocalSessionFactoryBean;
+import org.springframework.orm.hibernate4.LocalSessionFactoryBean;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 /**
  * Tests for {@link HibernateCursorItemReader} using {@link StatelessSession}.
- * 
+ *
  * @author Robert Kasanicky
  */
 @RunWith(SpringJUnit4ClassRunner.class)
@@ -39,7 +39,7 @@ public class HibernateCursorProjectionItemReaderIntegrationTests {
 				"Foo.hbm.xml", getClass()) });
 		factoryBean.afterPropertiesSet();
 
-		SessionFactory sessionFactory = (SessionFactory) factoryBean
+		SessionFactory sessionFactory = factoryBean
 				.getObject();
 
 		reader.setQueryString(hsqlQuery);
@@ -49,7 +49,7 @@ public class HibernateCursorProjectionItemReaderIntegrationTests {
 		reader.open(new ExecutionContext());
 
 	}
-	
+
 	@Test
 	public void testMultipleItemsInProjection() throws Exception {
 		HibernateCursorItemReader<Object[]> reader = new HibernateCursorItemReader<Object[]>();

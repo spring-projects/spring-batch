@@ -6,17 +6,18 @@ import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.sample.Foo;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;
-import org.springframework.orm.hibernate3.LocalSessionFactoryBean;
+import org.springframework.orm.hibernate4.LocalSessionFactoryBean;
 
 /**
  * Tests for {@link HibernateCursorItemReader} using {@link StatelessSession}.
- * 
+ *
  * @author Robert Kasanicky
  * @author Dave Syer
  */
 public abstract class AbstractHibernateCursorItemReaderIntegrationTests extends
 		AbstractGenericDataSourceItemReaderIntegrationTests {
 
+	@Override
 	protected ItemReader<Foo> createItemReader() throws Exception {
 
 		LocalSessionFactoryBean factoryBean = new LocalSessionFactoryBean();
@@ -25,7 +26,7 @@ public abstract class AbstractHibernateCursorItemReaderIntegrationTests extends
 		customizeSessionFactory(factoryBean);
 		factoryBean.afterPropertiesSet();
 
-		SessionFactory sessionFactory = (SessionFactory) factoryBean.getObject();
+		SessionFactory sessionFactory = factoryBean.getObject();
 
 		HibernateCursorItemReader<Foo> hibernateReader = new HibernateCursorItemReader<Foo>();
 		setQuery(hibernateReader);

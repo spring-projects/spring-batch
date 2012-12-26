@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2007 the original author or authors.
+ * Copyright 2006-2013 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,33 +23,32 @@ import org.springframework.batch.item.ItemWriter;
 import org.springframework.batch.sample.domain.trade.CustomerCredit;
 import org.springframework.batch.sample.domain.trade.CustomerCreditDao;
 import org.springframework.beans.factory.InitializingBean;
-import org.springframework.orm.hibernate3.HibernateOperations;
-import org.springframework.orm.hibernate3.HibernateTemplate;
 import org.springframework.util.Assert;
 
 /**
  * Delegates writing to a custom DAO and flushes + clears hibernate session to
  * fulfill the {@link ItemWriter} contract.
- * 
+ *
  * @author Robert Kasanicky
+ * @author Michael Minella
  */
 public class HibernateAwareCustomerCreditItemWriter implements ItemWriter<CustomerCredit>, InitializingBean {
 
 	private CustomerCreditDao dao;
 
-	private HibernateOperations hibernateTemplate;
+	private SessionFactory sessionFactory;
 
 	public void write(List<? extends CustomerCredit> items) throws Exception {
 		for (CustomerCredit credit : items) {
 			dao.writeCredit(credit);
 		}
 		try {
-			hibernateTemplate.flush();
+			sessionFactory.getCurrentSession().flush();
 		}
 		finally {
 			// this should happen automatically on commit, but to be on the safe
 			// side...
-			hibernateTemplate.clear();
+			sessionFactory.getCurrentSession().clear();
 		}
 
 	}
@@ -59,11 +58,11 @@ public class HibernateAwareCustomerCreditItemWriter implements ItemWriter<Custom
 	}
 
 	public void setSessionFactory(SessionFactory sessionFactory) {
-		this.hibernateTemplate = new HibernateTemplate(sessionFactory);
+		this.sessionFactory = sessionFactory;
 	}
 
 	public void afterPropertiesSet() throws Exception {
-		Assert.notNull(hibernateTemplate, "Hibernate session factory must be set");
+		Assert.state(sessionFactory != null, "Hibernate SessionFactory is required");
 		Assert.notNull(dao, "Delegate DAO must be set");
 	}
 

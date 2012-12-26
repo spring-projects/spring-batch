@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2007 the original author or authors.
+ * Copyright 2006-2013 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,11 +19,12 @@ import java.util.List;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.hibernate.Session;
 import org.hibernate.SessionFactory;
+import org.hibernate.context.spi.CurrentSessionContext;
 import org.springframework.batch.item.ItemWriter;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.orm.hibernate3.HibernateOperations;
-import org.springframework.orm.hibernate3.HibernateTemplate;
 import org.springframework.util.Assert;
 
 /**
@@ -33,13 +34,15 @@ import org.springframework.util.Assert;
  * TaskletStep). It will also clear the session on write
  * default (see {@link #setClearSession(boolean) clearSession} property).<br/>
  * <br/>
- * 
- * The writer is thread safe after its properties are set (normal singleton
- * behavior), so it can be used to write in multiple concurrent transactions.
- * 
+ *
+ * The writer is thread safe once properties are set (normal singleton behavior)
+ * if a {@link CurrentSessionContext} that uses only one session per thread is
+ * used.
+ *
  * @author Dave Syer
  * @author Thomas Risberg
- * 
+ * @author Michael Minella
+ *
  */
 public class HibernateItemWriter<T> implements ItemWriter<T>, InitializingBean {
 
@@ -47,13 +50,14 @@ public class HibernateItemWriter<T> implements ItemWriter<T>, InitializingBean {
 			.getLog(HibernateItemWriter.class);
 
 	private HibernateOperations hibernateTemplate;
+	private SessionFactory sessionFactory;
 
 	private boolean clearSession = true;
 
 	/**
 	 * Flag to indicate that the session should be cleared and flushed at the
 	 * end of the write (default true).
-	 * 
+	 *
 	 * @param clearSession
 	 *            the flag value to set
 	 */
@@ -63,54 +67,97 @@ public class HibernateItemWriter<T> implements ItemWriter<T>, InitializingBean {
 
 	/**
 	 * Public setter for the {@link HibernateOperations} property.
-	 * 
+	 *
 	 * @param hibernateTemplate
 	 *            the hibernateTemplate to set
+	 * @deprecated As of 2.2 in favor of using Hibernate's session management APIs directly
 	 */
 	public void setHibernateTemplate(HibernateOperations hibernateTemplate) {
 		this.hibernateTemplate = hibernateTemplate;
 	}
 
 	/**
-	 * Set the Hibernate SessionFactory to be used internally. Will
-	 * automatically create a HibernateTemplate for the given SessionFactory.
-	 * 
-	 * @see #setHibernateTemplate
+	 * Set the Hibernate SessionFactory to be used internally.
+	 *
 	 */
 	public final void setSessionFactory(SessionFactory sessionFactory) {
-		this.hibernateTemplate = new HibernateTemplate(sessionFactory);
+		this.sessionFactory = sessionFactory;
 	}
 
 	/**
 	 * Check mandatory properties - there must be a hibernateTemplate.
 	 */
 	public void afterPropertiesSet() {
-		Assert.notNull(hibernateTemplate,
-				"HibernateItemWriter requires a HibernateOperations");
+		Assert.state(!(hibernateTemplate == null && sessionFactory == null),
+				"Either HibernateOperations or SessionFactory must be provided");
 	}
 
 	/**
 	 * Save or update any entities not in the current hibernate session and then
 	 * flush the hibernate session.
-	 * 
+	 *
 	 * @see org.springframework.batch.item.ItemWriter#write(java.util.List)
 	 */
 	public final void write(List<? extends T> items) {
-		doWrite(hibernateTemplate, items);
-		hibernateTemplate.flush();
-		if (clearSession) {
-			hibernateTemplate.clear();
+		if(sessionFactory == null) {
+			doWrite(hibernateTemplate, items);
+			hibernateTemplate.flush();
+			if (clearSession) {
+				hibernateTemplate.clear();
+			}
+		}
+		else {
+			doWrite(sessionFactory, items);
+			sessionFactory.getCurrentSession().flush();
+			if(clearSession) {
+				sessionFactory.getCurrentSession().clear();
+			}
 		}
 	}
 
 	/**
-	 * Do perform the actual write operation. This can be overridden in a
-	 * subclass if necessary.
-	 * 
+	 * Do perform the actual write operation using Hibernate's API.
+	 * This can be overridden in a subclass if necessary.
+	 *
 	 * @param hibernateTemplate
 	 *            the HibernateTemplate to use for the operation
 	 * @param items
 	 *            the list of items to use for the write
+	 * @deprecated As of 2.2 in favor of using Hibernate's session management APIs directly
+	 */
+	protected void doWrite(SessionFactory sessionFactory, List<? extends T> items) {
+		if (logger.isDebugEnabled()) {
+			logger.debug("Writing to Hibernate with " + items.size()
+					+ " items.");
+		}
+
+		Session currentSession = sessionFactory.getCurrentSession();
+
+		if (!items.isEmpty()) {
+			long saveOrUpdateCount = 0;
+			for (T item : items) {
+				if (!currentSession.contains(item)) {
+					currentSession.saveOrUpdate(item);
+					saveOrUpdateCount++;
+				}
+			}
+			if (logger.isDebugEnabled()) {
+				logger.debug(saveOrUpdateCount + " entities saved/updated.");
+				logger.debug((items.size() - saveOrUpdateCount)
+						+ " entities found in session.");
+			}
+		}
+	}
+
+	/**
+	 * Do perform the actual write operation using {@link HibernateOperations}.
+	 * This can be overridden in a subclass if necessary.
+	 *
+	 * @param hibernateTemplate
+	 *            the HibernateTemplate to use for the operation
+	 * @param items
+	 *            the list of items to use for the write
+	 * @deprecated As of 2.2 in favor of using Hibernate's session management APIs directly
 	 */
 	protected void doWrite(HibernateOperations hibernateTemplate,
 			List<? extends T> items) {
