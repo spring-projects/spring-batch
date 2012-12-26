@@ -158,6 +158,7 @@ public class HibernateFailureJobFunctionalTests {
 					public void processRow(ResultSet rs) throws SQLException {
 						final BigDecimal creditBeforeUpdate = creditsBeforeUpdate.get(i++);
 						final BigDecimal expectedCredit = creditBeforeUpdate.add(CREDIT_INCREASE);
+						System.out.println("expectedCredit = " + expectedCredit + " db credit = " + rs.getBigDecimal(CREDIT_COLUMN));
 						if (expectedCredit.equals(rs.getBigDecimal(CREDIT_COLUMN))) {
 							matches.add(rs.getBigDecimal(ID_COLUMN));
 						}

@@ -4,8 +4,8 @@
 	<artifactId>spring-batch-infrastructure</artifactId>
 	<packaging>jar</packaging>
 	<name>Infrastructure</name>
-	<description><![CDATA[The Spring Batch Infrastructure is a set of 
-	low-level components, interfaces and tools for batch processing 
+	<description><![CDATA[The Spring Batch Infrastructure is a set of
+	low-level components, interfaces and tools for batch processing
 	applications and optimisations.]]>
 	</description>
 	<url>http://static.springframework.org/spring-batch/${project.artifactId}</url>
@@ -108,7 +108,7 @@
 			<artifactId>derby</artifactId>
 			<scope>test</scope>
 		</dependency>
-		<dependency>
+<!-- 		<dependency>
 			<groupId>org.hibernate</groupId>
 			<artifactId>hibernate-core</artifactId>
 			<optional>true</optional>
@@ -118,7 +118,19 @@
 			<artifactId>hibernate-entitymanager</artifactId>
 			<optional>true</optional>
 		</dependency>
-		<dependency>
+ -->
+ 		<dependency>
+			<groupId>org.hibernate</groupId>
+			<artifactId>hibernate-core</artifactId>
+		     <version>4.1.9.Final</version>
+			<optional>true</optional>
+		</dependency>
+		 <dependency>
+		     <groupId>org.hibernate</groupId>
+		     <artifactId>hibernate-entitymanager</artifactId>
+		     <version>4.1.9.Final</version>
+		</dependency>
+ 		<dependency>
 			<groupId>org.hibernate</groupId>
 			<artifactId>hibernate-annotations</artifactId>
 			<optional>true</optional>

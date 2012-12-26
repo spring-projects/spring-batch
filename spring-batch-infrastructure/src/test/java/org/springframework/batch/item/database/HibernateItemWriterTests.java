@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2008 the original author or authors.
+ * Copyright 2006-2013 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,13 +15,20 @@
  */
 package org.springframework.batch.item.database;
 
-import static org.easymock.EasyMock.*;
-import static org.junit.Assert.*;
+import static org.easymock.EasyMock.createMock;
+import static org.easymock.EasyMock.expect;
+import static org.easymock.EasyMock.replay;
+import static org.easymock.EasyMock.verify;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
+import org.hibernate.Session;
+import org.hibernate.SessionFactory;
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.orm.hibernate3.HibernateOperations;
@@ -29,6 +36,7 @@ import org.springframework.orm.hibernate3.HibernateOperations;
 /**
  * @author Dave Syer
  * @author Thomas Risberg
+ * @author Michael Minella
  */
 public class HibernateItemWriterTests {
 
@@ -36,17 +44,21 @@ public class HibernateItemWriterTests {
 
 	HibernateItemWriter<Object> writer;
 
+	SessionFactory factory;
+	Session currentSession;
+
 	@Before
 	public void setUp() throws Exception {
 		writer = new HibernateItemWriter<Object>();
 		ht = createMock("ht", HibernateOperations.class);
-		writer.setHibernateTemplate(ht);
+		factory = createMock(SessionFactory.class);
+		currentSession = createMock(Session.class);
 	}
 
 	/**
 	 * Test method for
 	 * {@link org.springframework.batch.item.database.HibernateItemWriter#afterPropertiesSet()}
-	 * 
+	 *
 	 * @throws Exception
 	 */
 	@Test
@@ -56,7 +68,7 @@ public class HibernateItemWriterTests {
 			writer.afterPropertiesSet();
 			fail("Expected IllegalArgumentException");
 		}
-		catch (IllegalArgumentException e) {
+		catch (IllegalStateException e) {
 			// expected
 			assertTrue("Wrong message for exception: " + e.getMessage(), e.getMessage().indexOf("HibernateOperations") >= 0);
 		}
@@ -65,38 +77,38 @@ public class HibernateItemWriterTests {
 	/**
 	 * Test method for
 	 * {@link org.springframework.batch.item.database.HibernateItemWriter#afterPropertiesSet()}
-	 * 
+	 *
 	 * @throws Exception
 	 */
 	@Test
 	public void testAfterPropertiesSetWithDelegate() throws Exception {
+		writer.setHibernateTemplate(ht);
 		writer.afterPropertiesSet();
 	}
 
 	@Test
-	public void testWriteAndFlushSunnyDay() throws Exception {
-		ht.contains("foo");
-		expectLastCall().andReturn(true);
-		ht.contains("bar");
-		expectLastCall().andReturn(false);
+	public void testWriteAndFlushSunnyDayHibernate3() throws Exception {
+		writer.setHibernateTemplate(ht);
+		expect(ht.contains("foo")).andReturn(true);
+		expect(ht.contains("bar")).andReturn(false);
 		ht.saveOrUpdate("bar");
 		ht.flush();
 		ht.clear();
 		replay(ht);
-		
+
 		List<String> items = Arrays.asList(new String[] { "foo", "bar" });
 		writer.write(items);
-		
+
 		verify(ht);
 	}
 
 	@Test
-	public void testWriteAndFlushWithFailure() throws Exception {
+	public void testWriteAndFlushWithFailureHibernate3() throws Exception {
+		writer.setHibernateTemplate(ht);
 		final RuntimeException ex = new RuntimeException("ERROR");
-		ht.contains("foo");
-		expectLastCall().andThrow(ex);
+		expect(ht.contains("foo")).andThrow(ex);
 		replay(ht);
-		
+
 		try {
 			writer.write(Collections.singletonList("foo"));
 			fail("Expected RuntimeException");
@@ -108,4 +120,42 @@ public class HibernateItemWriterTests {
 		verify(ht);
 	}
 
+	@Test
+	public void testWriteAndFlushSunnyDayHibernate4() throws Exception {
+		writer.setSessionFactory(factory);
+		expect(factory.getCurrentSession()).andReturn(currentSession).times(3);
+		expect(currentSession.contains("foo")).andReturn(true);
+		expect(currentSession.contains("bar")).andReturn(false);
+		currentSession.saveOrUpdate("bar");
+		currentSession.flush();
+		currentSession.clear();
+
+		replay(factory, currentSession);
+
+		List<String> items = Arrays.asList(new String[] { "foo", "bar" });
+		writer.write(items);
+
+		verify(factory, currentSession);
+	}
+
+	@Test
+	public void testWriteAndFlushWithFailureHibernate4() throws Exception {
+		writer.setSessionFactory(factory);
+		final RuntimeException ex = new RuntimeException("ERROR");
+
+		expect(factory.getCurrentSession()).andReturn(currentSession);
+		expect(currentSession.contains("foo")).andThrow(ex);
+
+		replay(factory, currentSession);
+
+		try {
+			writer.write(Collections.singletonList("foo"));
+			fail("Expected RuntimeException");
+		}
+		catch (RuntimeException e) {
+			assertEquals("ERROR", e.getMessage());
+		}
+
+		verify(factory, currentSession);
+	}
 }
