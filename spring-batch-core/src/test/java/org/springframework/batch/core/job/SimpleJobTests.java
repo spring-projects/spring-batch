@@ -110,12 +110,14 @@ public class SimpleJobTests {
 
 		step1 = new StubStep("TestStep1", jobRepository);
 		step1.setCallback(new Runnable() {
+            @Override
 			public void run() {
 				list.add("default");
 			}
 		});
 		step2 = new StubStep("TestStep2", jobRepository);
 		step2.setCallback(new Runnable() {
+            @Override
 			public void run() {
 				list.add("default");
 			}
@@ -173,18 +175,22 @@ public class SimpleJobTests {
 
 		Step testStep = new Step() {
 
+            @Override
 			public void execute(StepExecution stepExecution) throws JobInterruptedException {
 				stepExecution.setExitStatus(customStatus);
 			}
 
+            @Override
 			public String getName() {
 				return "test";
 			}
 
+            @Override
 			public int getStartLimit() {
 				return 1;
 			}
 
+            @Override
 			public boolean isAllowStartIfComplete() {
 				return false;
 			}
@@ -213,10 +219,12 @@ public class SimpleJobTests {
 	@Test
 	public void testRunNormallyWithListener() throws Exception {
 		job.setJobExecutionListeners(new JobExecutionListenerSupport[] { new JobExecutionListenerSupport() {
+            @Override
 			public void beforeJob(JobExecution jobExecution) {
 				list.add("before");
 			}
 
+            @Override
 			public void afterJob(JobExecution jobExecution) {
 				list.add("after");
 			}
@@ -291,6 +299,7 @@ public class SimpleJobTests {
 	@Test
 	public void testFailedWithListener() throws Exception {
 		job.setJobExecutionListeners(new JobExecutionListenerSupport[] { new JobExecutionListenerSupport() {
+            @Override
 			public void afterJob(JobExecution jobExecution) {
 				list.add("afterJob");
 			}
@@ -478,6 +487,7 @@ public class SimpleJobTests {
 
 		step1 = new StubStep("interruptStep", jobRepository) {
 
+            @Override
 			public void execute(StepExecution stepExecution) throws JobInterruptedException,
 					UnexpectedJobExecutionException {
 				stepExecution.getJobExecution().stop();
@@ -574,6 +584,7 @@ public class SimpleJobTests {
 		 * @seeorg.springframework.batch.core.step.StepSupport#execute(org.
 		 * springframework.batch.core.StepExecution)
 		 */
+        @Override
 		public void execute(StepExecution stepExecution) throws JobInterruptedException,
 				UnexpectedJobExecutionException {
 

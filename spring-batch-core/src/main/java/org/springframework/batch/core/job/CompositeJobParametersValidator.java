@@ -41,6 +41,7 @@ public class CompositeJobParametersValidator implements JobParametersValidator, 
 	 * @param parameters some {@link JobParameters}
 	 * @throws JobParametersInvalidException if the parameters are invalid
 	 */
+    @Override
 	public void validate(JobParameters parameters)	throws JobParametersInvalidException {
 		for (JobParametersValidator validator : validators) {
 			validator.validate(parameters);
@@ -55,6 +56,7 @@ public class CompositeJobParametersValidator implements JobParametersValidator, 
 		this.validators = validators;
 	}
 
+    @Override
 	public void afterPropertiesSet() throws Exception {
 		Assert.notNull(validators, "The 'validators' may not be null");
 		Assert.notEmpty(validators, "The 'validators' may not be empty");

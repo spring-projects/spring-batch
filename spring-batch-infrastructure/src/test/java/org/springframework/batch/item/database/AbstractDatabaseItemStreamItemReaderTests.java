@@ -18,12 +18,14 @@ public abstract class AbstractDatabaseItemStreamItemReaderTests extends Abstract
 
 	protected ClassPathXmlApplicationContext ctx;
 
+    @Override
 	@Before
 	public void setUp() throws Exception {
 		initializeContext();
 		super.setUp();
 	}
 
+    @Override
 	@After
 	public void tearDown() throws Exception {
 		super.tearDown();

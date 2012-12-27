@@ -45,6 +45,7 @@ public class FlowState extends AbstractState implements FlowHolder {
 	/**
 	 * @return the flows
 	 */
+    @Override
 	public Collection<Flow> getFlows() {
 		return Collections.singleton(flow);
 	}
@@ -57,6 +58,7 @@ public class FlowState extends AbstractState implements FlowHolder {
 	/* (non-Javadoc)
 	 * @see org.springframework.batch.core.job.flow.State#isEndState()
 	 */
+    @Override
 	public boolean isEndState() {
 		return false;
 	}

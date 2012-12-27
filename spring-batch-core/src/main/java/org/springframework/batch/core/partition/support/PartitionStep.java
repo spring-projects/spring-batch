@@ -78,6 +78,7 @@ public class PartitionStep extends AbstractStep {
 	 * 
 	 * @see AbstractStep#afterPropertiesSet()
 	 */
+    @Override
 	public void afterPropertiesSet() throws Exception {
 		Assert.notNull(stepExecutionSplitter, "StepExecutionSplitter must be provided");
 		Assert.notNull(partitionHandler, "PartitionHandler must be provided");

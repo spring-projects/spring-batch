@@ -76,6 +76,7 @@ public class DataSourceInitializer implements InitializingBean, DisposableBean {
 				DataSourceInitializer.class.getSimpleName() + "-context.xml"));
 	}
 
+    @Override
 	public void destroy() {
 		if (destroyScripts==null) return;
 		for (int i = 0; i < destroyScripts.length; i++) {
@@ -94,6 +95,7 @@ public class DataSourceInitializer implements InitializingBean, DisposableBean {
 		}
 	}
 
+    @Override
 	public void afterPropertiesSet() throws Exception {
 		Assert.notNull(dataSource);
 		initialize();
@@ -118,6 +120,7 @@ public class DataSourceInitializer implements InitializingBean, DisposableBean {
 		TransactionTemplate transactionTemplate = new TransactionTemplate(new DataSourceTransactionManager(dataSource));
 		transactionTemplate.execute(new TransactionCallback() {
 
+            @Override
 			@SuppressWarnings("unchecked")
 			public Object doInTransaction(TransactionStatus status) {
 				JdbcTemplate jdbcTemplate = new JdbcTemplate(dataSource);

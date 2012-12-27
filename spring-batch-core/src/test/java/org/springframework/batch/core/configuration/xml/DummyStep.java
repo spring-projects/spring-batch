@@ -28,22 +28,27 @@ public class DummyStep implements Step, BeanNameAware {
 
 	private String name;
 
+    @Override
 	public String getName() {
 		return name;
 	}
 
+    @Override
 	public void setBeanName(String name) {
 		this.name = name;
 	}
 
+    @Override
 	public void execute(StepExecution stepExecution) throws JobInterruptedException {
 		System.out.println("EXECUTING " + getName());
 	}
 
+    @Override
 	public int getStartLimit() {
 		return 100;
 	}
 
+    @Override
 	public boolean isAllowStartIfComplete() {
 		return false;
 	}

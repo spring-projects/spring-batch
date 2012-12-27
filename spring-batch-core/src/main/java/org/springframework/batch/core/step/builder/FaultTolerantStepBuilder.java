@@ -466,6 +466,7 @@ public class FaultTolerantStepBuilder<I, O> extends SimpleStepBuilder<I, O> {
 			final Classifier<Throwable, Boolean> panic = new BinaryExceptionClassifier(types, true);
 
 			classifier = new Classifier<Throwable, Boolean>() {
+                @Override
 				public Boolean classify(Throwable classifiable) {
 					// Rollback if either the user's list or our own applies
 					return panic.classify(classifiable) || binary.classify(classifiable);
@@ -645,6 +646,7 @@ public class FaultTolerantStepBuilder<I, O> extends SimpleStepBuilder<I, O> {
 			this.chunkListener = chunkListener;
 		}
 
+        @Override
 		public void beforeChunk() {
 			try {
 				chunkListener.beforeChunk();
@@ -654,6 +656,7 @@ public class FaultTolerantStepBuilder<I, O> extends SimpleStepBuilder<I, O> {
 			}
 		}
 
+        @Override
 		public void afterChunk() {
 			try {
 				chunkListener.afterChunk();

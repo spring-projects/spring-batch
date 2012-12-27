@@ -28,6 +28,7 @@ public class RepeatInternalStateSupport implements RepeatInternalState {
 	/* (non-Javadoc)
 	 * @see org.springframework.batch.repeat.support.BatchInternalState#getThrowables()
 	 */
+    @Override
 	public Collection<Throwable> getThrowables() {
 		return throwables;
 	}

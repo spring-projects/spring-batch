@@ -41,6 +41,7 @@ public class MultiResourceItemWriterXmlTests extends AbstractMultiResourceItemWr
 	 */
 	private static class SimpleMarshaller implements Marshaller {
 		
+        @Override
 		public void marshal(Object graph, Result result) throws XmlMappingException, IOException {
 			Assert.isInstanceOf(Result.class, result);
 
@@ -57,6 +58,7 @@ public class MultiResourceItemWriterXmlTests extends AbstractMultiResourceItemWr
 			}
 		}
 
+        @Override
 		@SuppressWarnings("rawtypes")
 		public boolean supports(Class clazz) {
 			return true;

@@ -10,13 +10,16 @@ import org.springframework.retry.RetryListener;
  */
 public class DummyRetryListener implements RetryListener {
 
+    @Override
 	public <T> boolean open(RetryContext context, RetryCallback<T> callback) {
 		return false;
 	}
 
+    @Override
 	public <T> void close(RetryContext context, RetryCallback<T> callback, Throwable throwable) {
 	}
 
+    @Override
 	public <T> void onError(RetryContext context, RetryCallback<T> callback, Throwable throwable) {
 	}
 

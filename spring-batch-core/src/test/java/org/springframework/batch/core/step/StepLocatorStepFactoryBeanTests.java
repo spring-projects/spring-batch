@@ -35,18 +35,22 @@ public class StepLocatorStepFactoryBeanTests {
     
     private Step buildTestStep(final String stepName) {
         return new Step() {
+            @Override
             public String getName() {
                 return stepName;
             }
 
+            @Override
             public boolean isAllowStartIfComplete() {
                 throw new UnsupportedOperationException("Not supported yet.");
             }
 
+            @Override
             public int getStartLimit() {
                 throw new UnsupportedOperationException("Not supported yet.");
             }
 
+            @Override
             public void execute(StepExecution stepExecution) throws JobInterruptedException {
                 throw new UnsupportedOperationException("Not supported yet.");
             }

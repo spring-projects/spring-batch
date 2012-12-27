@@ -27,6 +27,7 @@ public class JobInstanceAlreadyExistsExceptionTests extends AbstractExceptionTes
 	/* (non-Javadoc)
 	 * @see org.springframework.batch.io.exception.AbstractExceptionTests#getException(java.lang.String)
 	 */
+    @Override
 	public Exception getException(String msg) throws Exception {
 		return new JobInstanceAlreadyExistsException(msg);
 	}
@@ -34,6 +35,7 @@ public class JobInstanceAlreadyExistsExceptionTests extends AbstractExceptionTes
 	/* (non-Javadoc)
 	 * @see org.springframework.batch.io.exception.AbstractExceptionTests#getException(java.lang.String, java.lang.Throwable)
 	 */
+    @Override
 	public Exception getException(String msg, Throwable t) throws Exception {
 		return new JobInstanceAlreadyExistsException(msg, t);
 	}

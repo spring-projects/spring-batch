@@ -38,6 +38,7 @@ public class BatchRetryTemplateTests {
 		BatchRetryTemplate template = new BatchRetryTemplate();
 
 		String result = template.execute(new RetryCallback<String>() {
+            @Override
 			public String doWithRetry(RetryContext context) throws Exception {
 				assertTrue("Wrong context type: " + context.getClass().getSimpleName(), context.getClass()
 						.getSimpleName().contains("Batch"));
@@ -55,6 +56,7 @@ public class BatchRetryTemplateTests {
 		BatchRetryTemplate template = new BatchRetryTemplate();
 
 		RetryCallback<String[]> retryCallback = new RetryCallback<String[]>() {
+            @Override
 			public String[] doWithRetry(RetryContext context) throws Exception {
 				assertEquals(count, context.getRetryCount());
 				if (count++ == 0) {
@@ -86,6 +88,7 @@ public class BatchRetryTemplateTests {
 				.<Class<? extends Throwable>, Boolean> singletonMap(Exception.class, true)));
 
 		RetryCallback<String[]> retryCallback = new RetryCallback<String[]>() {
+            @Override
 			public String[] doWithRetry(RetryContext context) throws Exception {
 				if (count++ < 2) {
 					throw new RecoverableException("Recoverable");
@@ -115,6 +118,7 @@ public class BatchRetryTemplateTests {
 				.<Class<? extends Throwable>, Boolean> singletonMap(Exception.class, true)));
 
 		RetryCallback<String[]> retryCallback = new RetryCallback<String[]>() {
+            @Override
 			public String[] doWithRetry(RetryContext context) throws Exception {
 				if (count++ < 1) {
 					throw new RecoverableException("Recoverable");
@@ -169,6 +173,7 @@ public class BatchRetryTemplateTests {
 				.<Class<? extends Throwable>, Boolean> singletonMap(Exception.class, true)));
 
 		RetryCallback<String[]> retryCallback = new RetryCallback<String[]>() {
+            @Override
 			public String[] doWithRetry(RetryContext context) throws Exception {
 				if (count++ < 2) {
 					throw new RecoverableException("Recoverable");
@@ -178,6 +183,7 @@ public class BatchRetryTemplateTests {
 		};
 
 		RecoveryCallback<String[]> recoveryCallback = new RecoveryCallback<String[]>() {
+            @Override
 			public String[] recover(RetryContext context) throws Exception {
 				List<String> recovered = new ArrayList<String>();
 				for (String item : outputs) {

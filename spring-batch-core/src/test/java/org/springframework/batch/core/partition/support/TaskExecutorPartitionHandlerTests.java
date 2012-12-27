@@ -34,10 +34,12 @@ public class TaskExecutorPartitionHandlerTests {
 
 	private StepExecutionSplitter stepExecutionSplitter = new StepExecutionSplitter() {
 
+        @Override
 		public String getStepName() {
 			return stepExecution.getStepName();
 		}
 
+        @Override
 		public Set<StepExecution> split(StepExecution stepExecution, int gridSize) throws JobExecutionException {
 			HashSet<StepExecution> result = new HashSet<StepExecution>();
 			for (int i = gridSize; i-- > 0;) {
@@ -92,6 +94,7 @@ public class TaskExecutorPartitionHandlerTests {
 	public void testTaskExecutorFailure() throws Exception {
 		handler.setGridSize(2);
 		handler.setTaskExecutor(new TaskExecutor() {
+            @Override
 			public void execute(Runnable task) {
 				if (count > 0) {
 					throw new TaskRejectedException("foo");

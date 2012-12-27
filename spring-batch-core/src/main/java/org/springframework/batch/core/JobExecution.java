@@ -315,6 +315,7 @@ public class JobExecution extends Entity {
 	 * 
 	 * @see org.springframework.batch.core.domain.Entity#toString()
 	 */
+    @Override
 	public String toString() {
 		return super.toString()
 				+ String.format(", startTime=%s, endTime=%s, lastUpdated=%s, status=%s, exitStatus=%s, job=[%s]",

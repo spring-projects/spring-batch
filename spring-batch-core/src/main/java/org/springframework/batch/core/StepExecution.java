@@ -469,6 +469,7 @@ public class StepExecution extends Entity {
 	 * org.springframework.batch.container.common.domain.Entity#equals(java.
 	 * lang.Object)
 	 */
+    @Override
 	public boolean equals(Object obj) {
 
 		Object jobExecutionId = getJobExecutionId();
@@ -495,6 +496,7 @@ public class StepExecution extends Entity {
 	 * 
 	 * @see org.springframework.batch.container.common.domain.Entity#hashCode()
 	 */
+    @Override
 	public int hashCode() {
 		Object jobExecutionId = getJobExecutionId();
 		Long id = getId();
@@ -502,6 +504,7 @@ public class StepExecution extends Entity {
 				* (jobExecutionId != null ? jobExecutionId.hashCode() : 0) + 59 * (id != null ? id.hashCode() : 0);
 	}
 
+    @Override
 	public String toString() {
 		return String.format(getSummary() + ", exitDescription=%s", exitStatus.getExitDescription());
 	}

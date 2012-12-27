@@ -70,6 +70,7 @@ public class MultiResourceItemWriter<T> extends ExecutionContextUserSupport impl
 		setName(ClassUtils.getShortName(MultiResourceItemWriter.class));
 	}
 
+    @Override
 	public void write(List<? extends T> items) throws Exception {
 		if (!opened) {
 			File file = setResourceToDelegate();
@@ -127,6 +128,7 @@ public class MultiResourceItemWriter<T> extends ExecutionContextUserSupport impl
 		this.saveState = saveState;
 	}
 
+    @Override
 	public void close() throws ItemStreamException {
 		resourceIndex = 1;
 		currentResourceItemCount = 0;
@@ -135,6 +137,7 @@ public class MultiResourceItemWriter<T> extends ExecutionContextUserSupport impl
 		}
 	}
 
+    @Override
 	public void open(ExecutionContext executionContext) throws ItemStreamException {
 		resourceIndex = executionContext.getInt(getKey(RESOURCE_INDEX_KEY), 1);
 		currentResourceItemCount = executionContext.getInt(getKey(CURRENT_RESOURCE_ITEM_COUNT), 0);
@@ -155,6 +158,7 @@ public class MultiResourceItemWriter<T> extends ExecutionContextUserSupport impl
 		}
 	}
 
+    @Override
 	public void update(ExecutionContext executionContext) throws ItemStreamException {
 		if (saveState) {
 			if (opened) {

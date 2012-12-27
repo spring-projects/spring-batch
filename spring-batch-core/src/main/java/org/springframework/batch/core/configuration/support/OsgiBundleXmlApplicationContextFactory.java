@@ -61,6 +61,7 @@ public class OsgiBundleXmlApplicationContextFactory implements BundleContextAwar
 	 * 
 	 * @see org.springframework.context.ApplicationContextAware#setApplicationContext(org.springframework.context.ApplicationContext)
 	 */
+    @Override
 	public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
 		parent = applicationContext;
 	}
@@ -71,6 +72,7 @@ public class OsgiBundleXmlApplicationContextFactory implements BundleContextAwar
 	 * 
 	 * @see org.springframework.osgi.context.BundleContextAware#setBundleContext(org.osgi.framework.BundleContext)
 	 */
+    @Override
 	public void setBundleContext(BundleContext context) {
 		this.bundleContext = context;
 	}
@@ -82,6 +84,7 @@ public class OsgiBundleXmlApplicationContextFactory implements BundleContextAwar
 	 * 
 	 * @see ApplicationContextFactory#createApplicationContext()
 	 */
+    @Override
 	public ConfigurableApplicationContext createApplicationContext() {
 		OsgiBundleXmlApplicationContext context = new OsgiBundleXmlApplicationContext(new String[] { path }, parent);
 		String displayName = bundleContext.getBundle().getSymbolicName() + ":" + this.displayName;

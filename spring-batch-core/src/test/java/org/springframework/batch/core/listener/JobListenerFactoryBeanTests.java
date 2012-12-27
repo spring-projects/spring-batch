@@ -125,6 +125,7 @@ public class JobListenerFactoryBeanTests {
 			public void foo(JobExecution execution) {
 			}
 
+            @Override
 			public int getOrder() {
 				return 3;
 			}
@@ -242,10 +243,12 @@ public class JobListenerFactoryBeanTests {
 
 		boolean afterJobCalled = false;
 
+        @Override
 		public void afterJob(JobExecution jobExecution) {
 			afterJobCalled = true;
 		}
 
+        @Override
 		public void beforeJob(JobExecution jobExecution) {
 			beforeJobCalled = true;
 		}

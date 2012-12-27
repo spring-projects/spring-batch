@@ -100,6 +100,7 @@ public class JdbcExecutionContextDao extends AbstractJdbcBatchMetadataDao implem
 		this.shortContextLength = shortContextLength;
 	}
 
+    @Override
 	public ExecutionContext getExecutionContext(JobExecution jobExecution) {
 		Long executionId = jobExecution.getId();
 		Assert.notNull(executionId, "ExecutionId must not be null.");
@@ -114,6 +115,7 @@ public class JdbcExecutionContextDao extends AbstractJdbcBatchMetadataDao implem
 		}
 	}
 
+    @Override
 	public ExecutionContext getExecutionContext(StepExecution stepExecution) {
 		Long executionId = stepExecution.getId();
 		Assert.notNull(executionId, "ExecutionId must not be null.");
@@ -128,6 +130,7 @@ public class JdbcExecutionContextDao extends AbstractJdbcBatchMetadataDao implem
 		}
 	}
 
+    @Override
 	public void updateExecutionContext(final JobExecution jobExecution) {
 		Long executionId = jobExecution.getId();
 		ExecutionContext executionContext = jobExecution.getExecutionContext();
@@ -139,6 +142,7 @@ public class JdbcExecutionContextDao extends AbstractJdbcBatchMetadataDao implem
 		persistSerializedContext(executionId, serializedContext, UPDATE_JOB_EXECUTION_CONTEXT);
 	}
 
+    @Override
 	public void updateExecutionContext(final StepExecution stepExecution) {
 
 		Long executionId = stepExecution.getId();
@@ -151,6 +155,7 @@ public class JdbcExecutionContextDao extends AbstractJdbcBatchMetadataDao implem
 		persistSerializedContext(executionId, serializedContext, UPDATE_STEP_EXECUTION_CONTEXT);
 	}
 
+    @Override
 	public void saveExecutionContext(JobExecution jobExecution) {
 
 		Long executionId = jobExecution.getId();
@@ -163,6 +168,7 @@ public class JdbcExecutionContextDao extends AbstractJdbcBatchMetadataDao implem
 		persistSerializedContext(executionId, serializedContext, INSERT_JOB_EXECUTION_CONTEXT);
 	}
 
+    @Override
 	public void saveExecutionContext(StepExecution stepExecution) {
 		Long executionId = stepExecution.getId();
 		ExecutionContext executionContext = stepExecution.getExecutionContext();
@@ -204,6 +210,7 @@ public class JdbcExecutionContextDao extends AbstractJdbcBatchMetadataDao implem
 		}
 
 		getJdbcTemplate().update(getQuery(sql), new PreparedStatementSetter() {
+            @Override
 			public void setValues(PreparedStatement ps) throws SQLException {
 				ps.setString(1, shortContext);
 				if (longContext != null) {
@@ -240,6 +247,7 @@ public class JdbcExecutionContextDao extends AbstractJdbcBatchMetadataDao implem
 	@SuppressWarnings("unchecked")
 	private class ExecutionContextRowMapper implements ParameterizedRowMapper<ExecutionContext> {
 
+        @Override
 		public ExecutionContext mapRow(ResultSet rs, int i) throws SQLException {
 			ExecutionContext executionContext = new ExecutionContext();
 			String serializedContext = rs.getString("SERIALIZED_CONTEXT");

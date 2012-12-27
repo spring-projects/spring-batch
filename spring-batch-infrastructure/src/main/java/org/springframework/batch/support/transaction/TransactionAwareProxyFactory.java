@@ -206,6 +206,7 @@ public class TransactionAwareProxyFactory<T> {
 			this.key = key;
 		}
 
+        @Override
 		public void afterCompletion(int status) {
 			super.afterCompletion(status);
 			if (status == TransactionSynchronization.STATUS_COMMITTED) {
@@ -219,6 +220,7 @@ public class TransactionAwareProxyFactory<T> {
 
 	private class TransactionAwareInterceptor implements MethodInterceptor {
 
+        @Override
 		public Object invoke(MethodInvocation invocation) throws Throwable {
 
 			if (!TransactionSynchronizationManager.isActualTransactionActive()) {

@@ -39,6 +39,7 @@ import org.springframework.util.Assert;
  */
 public class ColumnMapItemPreparedStatementSetter implements ItemPreparedStatementSetter<Map<String, Object>> {
 
+    @Override
 	public void setValues(Map<String, Object> item, PreparedStatement ps) throws SQLException {
 		Assert.isInstanceOf(Map.class, item, "Input to map PreparedStatement parameters must be of type Map.");
 		int counter = 1;

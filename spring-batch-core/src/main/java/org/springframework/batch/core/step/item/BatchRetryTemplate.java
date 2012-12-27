@@ -210,20 +210,24 @@ public class BatchRetryTemplate implements RetryOperations {
 		return delegate.execute(retryCallback, recoveryCallback, batchState);
 	}
 	
+    @Override
 	public final <T> T execute(RetryCallback<T> retryCallback, RecoveryCallback<T> recoveryCallback,
 			RetryState retryState) throws Exception, ExhaustedRetryException {
 		return regular.execute(retryCallback, recoveryCallback, retryState);
 	}
 
+    @Override
 	public final <T> T execute(RetryCallback<T> retryCallback, RecoveryCallback<T> recoveryCallback) throws Exception {
 		return regular.execute(retryCallback, recoveryCallback);
 	}
 
+    @Override
 	public final <T> T execute(RetryCallback<T> retryCallback, RetryState retryState) throws Exception,
 			ExhaustedRetryException {
 		return regular.execute(retryCallback, retryState);
 	}
 
+    @Override
 	public final <T> T execute(RetryCallback<T> retryCallback) throws Exception {
 		return regular.execute(retryCallback);
 	}

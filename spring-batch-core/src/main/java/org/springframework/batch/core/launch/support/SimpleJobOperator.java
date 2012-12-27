@@ -98,6 +98,7 @@ public class SimpleJobOperator implements JobOperator, InitializingBean {
 	 * 
 	 * @see org.springframework.beans.factory.InitializingBean#afterPropertiesSet()
 	 */
+    @Override
 	public void afterPropertiesSet() throws Exception {
 		Assert.notNull(jobLauncher, "JobLauncher must be provided");
 		Assert.notNull(jobRegistry, "JobLocator must be provided");
@@ -146,6 +147,7 @@ public class SimpleJobOperator implements JobOperator, InitializingBean {
 	 * 
 	 * @see org.springframework.batch.core.launch.JobOperator#getExecutions(java.lang.Long)
 	 */
+    @Override
 	public List<Long> getExecutions(long instanceId) throws NoSuchJobInstanceException {
 		JobInstance jobInstance = jobExplorer.getJobInstance(instanceId);
 		if (jobInstance == null) {
@@ -163,6 +165,7 @@ public class SimpleJobOperator implements JobOperator, InitializingBean {
 	 * 
 	 * @see org.springframework.batch.core.launch.JobOperator#getJobNames()
 	 */
+    @Override
 	public Set<String> getJobNames() {
 		return new TreeSet<String>(jobRegistry.getJobNames());
 	}
@@ -172,6 +175,7 @@ public class SimpleJobOperator implements JobOperator, InitializingBean {
 	 * 
 	 * @see JobOperator#getLastInstances(String, int, int)
 	 */
+    @Override
 	public List<Long> getJobInstances(String jobName, int start, int count) throws NoSuchJobException {
 		List<Long> list = new ArrayList<Long>();
 		for (JobInstance jobInstance : jobExplorer.getJobInstances(jobName, start, count)) {
@@ -190,6 +194,7 @@ public class SimpleJobOperator implements JobOperator, InitializingBean {
 	 * org.springframework.batch.core.launch.JobOperator#getParameters(java.
 	 * lang.Long)
 	 */
+    @Override
 	public String getParameters(long executionId) throws NoSuchJobExecutionException {
 		JobExecution jobExecution = findExecutionById(executionId);
 
@@ -204,6 +209,7 @@ public class SimpleJobOperator implements JobOperator, InitializingBean {
 	 * org.springframework.batch.core.launch.JobOperator#getRunningExecutions
 	 * (java.lang.String)
 	 */
+    @Override
 	public Set<Long> getRunningExecutions(String jobName) throws NoSuchJobException {
 		Set<Long> set = new LinkedHashSet<Long>();
 		for (JobExecution jobExecution : jobExplorer.findRunningJobExecutions(jobName)) {
@@ -222,6 +228,7 @@ public class SimpleJobOperator implements JobOperator, InitializingBean {
 	 * org.springframework.batch.core.launch.JobOperator#getStepExecutionSummaries
 	 * (java.lang.Long)
 	 */
+    @Override
 	public Map<Long, String> getStepExecutionSummaries(long executionId) throws NoSuchJobExecutionException {
 		JobExecution jobExecution = findExecutionById(executionId);
 
@@ -239,6 +246,7 @@ public class SimpleJobOperator implements JobOperator, InitializingBean {
 	 * org.springframework.batch.core.launch.JobOperator#getSummary(java.lang
 	 * .Long)
 	 */
+    @Override
 	public String getSummary(long executionId) throws NoSuchJobExecutionException {
 		JobExecution jobExecution = findExecutionById(executionId);
 		return jobExecution.toString();
@@ -250,6 +258,7 @@ public class SimpleJobOperator implements JobOperator, InitializingBean {
 	 * @see
 	 * org.springframework.batch.core.launch.JobOperator#resume(java.lang.Long)
 	 */
+    @Override
 	public Long restart(long executionId) throws JobInstanceAlreadyCompleteException, NoSuchJobExecutionException, NoSuchJobException, JobRestartException, JobParametersInvalidException {
 
 		logger.info("Checking status of job execution with id=" + executionId);
@@ -278,6 +287,7 @@ public class SimpleJobOperator implements JobOperator, InitializingBean {
 	 * org.springframework.batch.core.launch.JobOperator#start(java.lang.String,
 	 * java.lang.String)
 	 */
+    @Override
 	public Long start(String jobName, String parameters) throws NoSuchJobException, JobInstanceAlreadyExistsException, JobParametersInvalidException {
 
 		logger.info("Checking status of job with name=" + jobName);
@@ -317,6 +327,7 @@ public class SimpleJobOperator implements JobOperator, InitializingBean {
 	 * 
 	 * @see JobOperator#startNextInstance(String )
 	 */
+    @Override
 	public Long startNextInstance(String jobName) throws NoSuchJobException, JobParametersNotFoundException,
 			UnexpectedJobExecutionException, JobParametersInvalidException {
 
@@ -366,6 +377,7 @@ public class SimpleJobOperator implements JobOperator, InitializingBean {
 	 * @see
 	 * org.springframework.batch.core.launch.JobOperator#stop(java.lang.Long)
 	 */
+    @Override
 	@Transactional
 	public boolean stop(long executionId) throws NoSuchJobExecutionException, JobExecutionNotRunningException {
 
@@ -383,6 +395,7 @@ public class SimpleJobOperator implements JobOperator, InitializingBean {
 		return true;
 	}
 
+    @Override
     public JobExecution abandon(long jobExecutionId) throws NoSuchJobExecutionException, JobExecutionAlreadyRunningException {
         JobExecution jobExecution = findExecutionById(jobExecutionId);
 

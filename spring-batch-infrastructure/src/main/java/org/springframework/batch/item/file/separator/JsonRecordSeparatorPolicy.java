@@ -41,6 +41,7 @@ public class JsonRecordSeparatorPolicy extends SimpleRecordSeparatorPolicy {
 	 * 
 	 * @see RecordSeparatorPolicy#isEndOfRecord(String)
 	 */
+    @Override
 	public boolean isEndOfRecord(String line) {
 		return StringUtils.countOccurrencesOf(line, "{") == StringUtils.countOccurrencesOf(line, "}")
 				&& line.trim().endsWith("}");

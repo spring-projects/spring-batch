@@ -88,6 +88,7 @@ public class SimpleRepeatTemplateTests extends AbstractTradeBatchTests {
 
 		try {
 			template.iterate(new RepeatCallback() {
+                @Override
 				public RepeatStatus doInIteration(RepeatContext context) throws Exception {
 					count++;
 					throw new IllegalStateException("foo!");
@@ -115,17 +116,20 @@ public class SimpleRepeatTemplateTests extends AbstractTradeBatchTests {
 		final List<String> list = new ArrayList<String>();
 
 		final RepeatContext context = new RepeatContextSupport(null) {
+            @Override
 			public void close() {
 				super.close();
 				list.add("close");
 			}
 		};
 		template.setCompletionPolicy(new CompletionPolicySupport() {
+            @Override
 			public RepeatContext start(RepeatContext c) {
 				return context;
 			}
 		});
 		template.iterate(new RepeatCallback() {
+            @Override
 			public RepeatStatus doInIteration(RepeatContext context) throws Exception {
 				count++;
 				return RepeatStatus.continueIf(count < 1);
@@ -148,12 +152,14 @@ public class SimpleRepeatTemplateTests extends AbstractTradeBatchTests {
 		final List<String> list = new ArrayList<String>();
 
 		final RepeatContext context = new RepeatContextSupport(null) {
+            @Override
 			public void close() {
 				super.close();
 				list.add("close");
 			}
 		};
 		template.setCompletionPolicy(new CompletionPolicySupport() {
+            @Override
 			public RepeatContext start(RepeatContext c) {
 				return context;
 			}
@@ -161,6 +167,7 @@ public class SimpleRepeatTemplateTests extends AbstractTradeBatchTests {
 
 		try {
 			template.iterate(new RepeatCallback() {
+                @Override
 				public RepeatStatus doInIteration(RepeatContext context) throws Exception {
 					count++;
 					throw new RuntimeException("foo");
@@ -187,6 +194,7 @@ public class SimpleRepeatTemplateTests extends AbstractTradeBatchTests {
 		final List<Throwable> list = new ArrayList<Throwable>();
 
 		template.setExceptionHandler(new ExceptionHandler() {
+            @Override
 			public void handleException(RepeatContext context, Throwable throwable) throws RuntimeException {
 				list.add(throwable);
 				throw (RuntimeException) throwable;
@@ -195,6 +203,7 @@ public class SimpleRepeatTemplateTests extends AbstractTradeBatchTests {
 
 		try {
 			template.iterate(new RepeatCallback() {
+                @Override
 				public RepeatStatus doInIteration(RepeatContext context) throws Exception {
 					count++;
 					throw new RuntimeException("foo");
@@ -220,6 +229,7 @@ public class SimpleRepeatTemplateTests extends AbstractTradeBatchTests {
 
 		RepeatStatus result = template.iterate(new ItemReaderRepeatCallback<Trade>(provider, processor) {
 
+            @Override
 			public RepeatStatus doInIteration(RepeatContext context) throws Exception {
 				RepeatStatus result = super.doInIteration(context);
 				if (processor.count >= 2) {
@@ -249,6 +259,7 @@ public class SimpleRepeatTemplateTests extends AbstractTradeBatchTests {
 
 		RepeatStatus result = template.iterate(new ItemReaderRepeatCallback<Trade>(provider, processor) {
 
+            @Override
 			public RepeatStatus doInIteration(RepeatContext context) throws Exception {
 				RepeatStatus result = super.doInIteration(context);
 				if (processor.count >= 2) {
@@ -273,6 +284,7 @@ public class SimpleRepeatTemplateTests extends AbstractTradeBatchTests {
 		RepeatTemplate outer = getRepeatTemplate();
 		RepeatTemplate inner = getRepeatTemplate();
 		outer.iterate(new NestedRepeatCallback(inner, new RepeatCallback() {
+            @Override
 			public RepeatStatus doInIteration(RepeatContext context) throws Exception {
 				count++;
 				assertNotNull(context);
@@ -281,6 +293,7 @@ public class SimpleRepeatTemplateTests extends AbstractTradeBatchTests {
 				return RepeatStatus.FINISHED;
 			}
 		}) {
+            @Override
 			public RepeatStatus doInIteration(RepeatContext context) throws Exception {
 				count++;
 				assertSame(context, RepeatSynchronizationManager.getContext());
@@ -295,6 +308,7 @@ public class SimpleRepeatTemplateTests extends AbstractTradeBatchTests {
 		RepeatTemplate outer = getRepeatTemplate();
 		RepeatTemplate inner = getRepeatTemplate();
 		outer.iterate(new NestedRepeatCallback(inner, new RepeatCallback() {
+            @Override
 			public RepeatStatus doInIteration(RepeatContext context) throws Exception {
 				count++;
 				assertEquals(2, count);
@@ -302,6 +316,7 @@ public class SimpleRepeatTemplateTests extends AbstractTradeBatchTests {
 				return RepeatStatus.FINISHED;
 			}
 		}) {
+            @Override
 			public RepeatStatus doInIteration(RepeatContext context) throws Exception {
 				count++;
 				context.setCompleteOnly();
@@ -317,6 +332,7 @@ public class SimpleRepeatTemplateTests extends AbstractTradeBatchTests {
 		outer.setCompletionPolicy(new SimpleCompletionPolicy(2));
 		RepeatTemplate inner = getRepeatTemplate();
 		outer.iterate(new NestedRepeatCallback(inner, new RepeatCallback() {
+            @Override
 			public RepeatStatus doInIteration(RepeatContext context) throws Exception {
 				count++;
 				assertNotNull(context);
@@ -325,6 +341,7 @@ public class SimpleRepeatTemplateTests extends AbstractTradeBatchTests {
 				return RepeatStatus.FINISHED;
 			}
 		}) {
+            @Override
 			public RepeatStatus doInIteration(RepeatContext context) throws Exception {
 				count++;
 				assertSame(context, RepeatSynchronizationManager.getContext());
@@ -352,6 +369,7 @@ public class SimpleRepeatTemplateTests extends AbstractTradeBatchTests {
 		template.setCompletionPolicy(new SimpleCompletionPolicy(2));
 		try {
 			template.iterate(new RepeatCallback() {
+                @Override
 				public RepeatStatus doInIteration(RepeatContext context) throws Exception {
 					count++;
 					if (count < 2) {
@@ -384,6 +402,7 @@ public class SimpleRepeatTemplateTests extends AbstractTradeBatchTests {
 		try {
 			result = template.iterate(new ItemReaderRepeatCallback<Trade>(provider, processor) {
 
+                @Override
 				public RepeatStatus doInIteration(RepeatContext context) throws Exception {
 					RepeatStatus result = super.doInIteration(context);
 					if (processor.count >= 2) {
@@ -428,6 +447,7 @@ public class SimpleRepeatTemplateTests extends AbstractTradeBatchTests {
 		class ExceptionHandlerStub implements ExceptionHandler {
 			boolean called = false;
 
+            @Override
 			public void handleException(RepeatContext context, Throwable throwable) throws Throwable {
 				called = true;
 				assertSame(exception, throwable);
@@ -440,6 +460,7 @@ public class SimpleRepeatTemplateTests extends AbstractTradeBatchTests {
 		class RepeatListenerStub extends RepeatListenerSupport {
 			boolean called = false;
 
+            @Override
 			public void onError(RepeatContext context, Throwable throwable) {
 				called = true;
 				assertSame(exception, throwable);
@@ -452,6 +473,7 @@ public class SimpleRepeatTemplateTests extends AbstractTradeBatchTests {
 
 		try {
 			template.iterate(new RepeatCallback() {
+                @Override
 				public RepeatStatus doInIteration(RepeatContext context) throws Exception {
 					throw new RepeatException("typically thrown by nested repeat template", exception);
 				}

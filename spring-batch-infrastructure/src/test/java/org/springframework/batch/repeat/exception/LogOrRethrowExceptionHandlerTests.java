@@ -35,6 +35,7 @@ public class LogOrRethrowExceptionHandlerTests extends TestCase {
 
 	private RepeatContext context = null;
 
+    @Override
 	protected void setUp() throws Exception {
 		super.setUp();
 		Logger logger = Logger.getLogger(LogOrRethrowExceptionHandler.class);
@@ -67,6 +68,7 @@ public class LogOrRethrowExceptionHandlerTests extends TestCase {
 
 	public void testNotRethrownErrorLevel() throws Throwable {
 		handler.setExceptionClassifier(new ClassifierSupport<Throwable,Level>(Level.RETHROW) {
+            @Override
 			public Level classify(Throwable throwable) {
 				return Level.ERROR;
 			}
@@ -78,6 +80,7 @@ public class LogOrRethrowExceptionHandlerTests extends TestCase {
 
 	public void testNotRethrownWarnLevel() throws Throwable {
 		handler.setExceptionClassifier(new ClassifierSupport<Throwable,Level>(Level.RETHROW) {
+            @Override
 			public Level classify(Throwable throwable) {
 				return Level.WARN;
 			}
@@ -89,6 +92,7 @@ public class LogOrRethrowExceptionHandlerTests extends TestCase {
 
 	public void testNotRethrownDebugLevel() throws Throwable {
 		handler.setExceptionClassifier(new ClassifierSupport<Throwable,Level>(Level.RETHROW) {
+            @Override
 			public Level classify(Throwable throwable) {
 				return Level.DEBUG;
 			}

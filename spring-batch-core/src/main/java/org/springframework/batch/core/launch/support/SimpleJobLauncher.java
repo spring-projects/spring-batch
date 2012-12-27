@@ -83,6 +83,7 @@ public class SimpleJobLauncher implements JobLauncher, InitializingBean {
 	 * completed successfully
 	 * @throws JobParametersInvalidException
 	 */
+    @Override
 	public JobExecution run(final Job job, final JobParameters jobParameters)
 			throws JobExecutionAlreadyRunningException, JobRestartException, JobInstanceAlreadyCompleteException,
 			JobParametersInvalidException {
@@ -113,6 +114,7 @@ public class SimpleJobLauncher implements JobLauncher, InitializingBean {
 		try {
 			taskExecutor.execute(new Runnable() {
 
+                @Override
 				public void run() {
 					try {
 						logger.info("Job: [" + job + "] launched with the following parameters: [" + jobParameters
@@ -173,6 +175,7 @@ public class SimpleJobLauncher implements JobLauncher, InitializingBean {
 	 * Ensure the required dependencies of a {@link JobRepository} have been
 	 * set.
 	 */
+    @Override
 	public void afterPropertiesSet() throws Exception {
 		Assert.state(jobRepository != null, "A JobRepository has not been set.");
 		if (taskExecutor == null) {

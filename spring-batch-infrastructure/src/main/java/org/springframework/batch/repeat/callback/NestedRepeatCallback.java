@@ -55,6 +55,7 @@ public class NestedRepeatCallback implements RepeatCallback {
 	 * 
 	 * @see org.springframework.batch.repeat.RepeatCallback#doInIteration(RepeatContext)
 	 */
+    @Override
 	public RepeatStatus doInIteration(RepeatContext context) throws Exception {
 		return template.iterate(callback);
 	}

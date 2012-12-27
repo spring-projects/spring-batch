@@ -34,6 +34,7 @@ public class TransactionAwareListItemReaderTests extends TestCase {
 
 	private ListItemReader<String> reader;
 
+    @Override
 	protected void setUp() throws Exception {
 		super.setUp();
 		reader = new ListItemReader<String>(TransactionAwareProxyFactory.createTransactionalList(Arrays.asList("a", "b", "c")));
@@ -51,6 +52,7 @@ public class TransactionAwareListItemReaderTests extends TestCase {
 		final List<Object> taken = new ArrayList<Object>();
 		try {
 			new TransactionTemplate(transactionManager).execute(new TransactionCallback() {
+                @Override
 				public Object doInTransaction(TransactionStatus status) {
 					taken.add(reader.read());
 					return null;
@@ -77,6 +79,7 @@ public class TransactionAwareListItemReaderTests extends TestCase {
 		PlatformTransactionManager transactionManager = new ResourcelessTransactionManager();
 		final List<Object> taken = new ArrayList<Object>();
 		new TransactionTemplate(transactionManager).execute(new TransactionCallback() {
+            @Override
 			public Object doInTransaction(TransactionStatus status) {
 				Object next = reader.read();
 				while (next != null) {
@@ -95,6 +98,7 @@ public class TransactionAwareListItemReaderTests extends TestCase {
 		final List<Object> taken = new ArrayList<Object>();
 		try {
 			new TransactionTemplate(transactionManager).execute(new TransactionCallback() {
+                @Override
 				public Object doInTransaction(TransactionStatus status) {
 					taken.add(reader.read());
 					throw new RuntimeException("Rollback!");

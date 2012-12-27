@@ -76,6 +76,7 @@ public class JmsItemReader<T> implements ItemReader<T>, InitializingBean {
 		this.itemType = itemType;
 	}
 
+    @Override
 	@SuppressWarnings("unchecked")
 	public T read() {
 		if (itemType != null && itemType.isAssignableFrom(Message.class)) {
@@ -89,6 +90,7 @@ public class JmsItemReader<T> implements ItemReader<T>, InitializingBean {
 		return (T) result;
 	}
 
+    @Override
 	public void afterPropertiesSet() throws Exception {
 		Assert.notNull(this.jmsTemplate, "The 'jmsTemplate' is required.");
 	}

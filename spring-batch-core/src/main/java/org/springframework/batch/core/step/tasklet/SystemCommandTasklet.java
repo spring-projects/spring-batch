@@ -81,10 +81,12 @@ public class SystemCommandTasklet extends StepExecutionListenerSupport implement
 	 * Execute system command and map its exit code to {@link ExitStatus} using
 	 * {@link SystemProcessExitCodeMapper}.
 	 */
+    @Override
 	public RepeatStatus execute(StepContribution contribution, ChunkContext chunkContext) throws Exception {
 
 		FutureTask<Integer> systemCommandTask = new FutureTask<Integer>(new Callable<Integer>() {
 
+            @Override
 			public Integer call() throws Exception {
 				Process process = Runtime.getRuntime().exec(command, environmentParams, workingDirectory);
 				return process.waitFor();
@@ -144,6 +146,7 @@ public class SystemCommandTasklet extends StepExecutionListenerSupport implement
 
 	}
 
+    @Override
 	public void afterPropertiesSet() throws Exception {
 		Assert.hasLength(command, "'command' property value is required");
 		Assert.notNull(systemProcessExitCodeMapper, "SystemProcessExitCodeMapper must be set");

@@ -98,6 +98,7 @@ public class JdbcJobInstanceDao extends AbstractJdbcBatchMetadataDao implements
 	 * @throws IllegalArgumentException
 	 *             if any {@link JobParameters} fields are null.
 	 */
+    @Override
 	public JobInstance createJobInstance(String jobName,
 			JobParameters jobParameters) {
 
@@ -206,6 +207,7 @@ public class JdbcJobInstanceDao extends AbstractJdbcBatchMetadataDao implements
 	 * @throws IllegalArgumentException
 	 *             if any {@link JobParameters} fields are null.
 	 */
+    @Override
 	public JobInstance getJobInstance(final String jobName,
 			final JobParameters jobParameters) {
 
@@ -242,6 +244,7 @@ public class JdbcJobInstanceDao extends AbstractJdbcBatchMetadataDao implements
 	 * org.springframework.batch.core.repository.dao.JobInstanceDao#getJobInstance
 	 * (java.lang.Long)
 	 */
+    @Override
 	public JobInstance getJobInstance(Long instanceId) {
 
 		try {
@@ -260,6 +263,7 @@ public class JdbcJobInstanceDao extends AbstractJdbcBatchMetadataDao implements
 	private JobParameters getJobParameters(Long instanceId) {
 		final Map<String, JobParameter> map = new HashMap<String, JobParameter>();
 		RowCallbackHandler handler = new RowCallbackHandler() {
+            @Override
 			public void processRow(ResultSet rs) throws SQLException {
 				ParameterType type = ParameterType.valueOf(rs.getString(3));
 				JobParameter value = null;
@@ -287,9 +291,11 @@ public class JdbcJobInstanceDao extends AbstractJdbcBatchMetadataDao implements
 	 * org.springframework.batch.core.repository.dao.JobInstanceDao#getJobNames
 	 * ()
 	 */
+    @Override
 	public List<String> getJobNames() {
 		return getJdbcTemplate().query(getQuery(FIND_JOB_NAMES),
 				new ParameterizedRowMapper<String>() {
+                    @Override
 					public String mapRow(ResultSet rs, int rowNum)
 							throws SQLException {
 						return rs.getString(1);
@@ -303,6 +309,7 @@ public class JdbcJobInstanceDao extends AbstractJdbcBatchMetadataDao implements
 	 * @seeorg.springframework.batch.core.repository.dao.JobInstanceDao#
 	 * getLastJobInstances(java.lang.String, int)
 	 */
+    @Override
 	public List<JobInstance> getJobInstances(String jobName, final int start,
 			final int count) {
 
@@ -310,6 +317,7 @@ public class JdbcJobInstanceDao extends AbstractJdbcBatchMetadataDao implements
 
 			private List<JobInstance> list = new ArrayList<JobInstance>();
 
+            @Override
 			public Object extractData(ResultSet rs) throws SQLException,
 					DataAccessException {
 				int rowNum = 0;
@@ -340,6 +348,7 @@ public class JdbcJobInstanceDao extends AbstractJdbcBatchMetadataDao implements
 	 * org.springframework.batch.core.repository.dao.JobInstanceDao#getJobInstance
 	 * (org.springframework.batch.core.JobExecution)
 	 */
+    @Override
 	public JobInstance getJobInstance(JobExecution jobExecution) {
 
 		try {
@@ -362,6 +371,7 @@ public class JdbcJobInstanceDao extends AbstractJdbcBatchMetadataDao implements
 		this.jobIncrementer = jobIncrementer;
 	}
 
+    @Override
 	public void afterPropertiesSet() throws Exception {
 		super.afterPropertiesSet();
 		Assert.notNull(jobIncrementer);
@@ -383,6 +393,7 @@ public class JdbcJobInstanceDao extends AbstractJdbcBatchMetadataDao implements
 			this.jobParameters = jobParameters;
 		}
 
+        @Override
 		public JobInstance mapRow(ResultSet rs, int rowNum) throws SQLException {
 			Long id = rs.getLong(1);
 			if (jobParameters == null) {

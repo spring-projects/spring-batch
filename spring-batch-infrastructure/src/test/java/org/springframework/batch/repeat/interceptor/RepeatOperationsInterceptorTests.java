@@ -42,6 +42,7 @@ public class RepeatOperationsInterceptorTests extends TestCase {
 
 	private ServiceImpl target;
 
+    @Override
 	protected void setUp() throws Exception {
 		super.setUp();
 		interceptor = new RepeatOperationsInterceptor();
@@ -68,6 +69,7 @@ public class RepeatOperationsInterceptorTests extends TestCase {
 	public void testSetTemplate() throws Exception {
 		final List<Object> calls = new ArrayList<Object>();
 		interceptor.setRepeatOperations(new RepeatOperations() {
+            @Override
 			public RepeatStatus iterate(RepeatCallback callback) {
 				try {
 					Object result = callback.doInIteration(null);
@@ -87,6 +89,7 @@ public class RepeatOperationsInterceptorTests extends TestCase {
 	public void testCallbackNotExecuted() throws Exception {
 		final List<Object> calls = new ArrayList<Object>();
 		interceptor.setRepeatOperations(new RepeatOperations() {
+            @Override
 			public RepeatStatus iterate(RepeatCallback callback) {
 				calls.add(null);
 				return RepeatStatus.FINISHED;
@@ -159,6 +162,7 @@ public class RepeatOperationsInterceptorTests extends TestCase {
 		((Advised) service).addAdvice(interceptor);
 		final List<Object> list = new ArrayList<Object>();
 		((Advised) service).addAdvice(new MethodInterceptor() {
+            @Override
 			public Object invoke(MethodInvocation invocation) throws Throwable {
 				list.add("chain");
 				return invocation.proceed();
@@ -175,6 +179,7 @@ public class RepeatOperationsInterceptorTests extends TestCase {
 	public void testIllegalMethodInvocationType() throws Throwable {
 		try {
 			interceptor.invoke(new MethodInvocation() {
+                @Override
 				public Method getMethod() {
 					try {
 						return Object.class.getMethod("toString", new Class[0]);
@@ -184,18 +189,22 @@ public class RepeatOperationsInterceptorTests extends TestCase {
 					}
 				}
 
+                @Override
 				public Object[] getArguments() {
 					return null;
 				}
 
+                @Override
 				public AccessibleObject getStaticPart() {
 					return null;
 				}
 
+                @Override
 				public Object getThis() {
 					return null;
 				}
 
+                @Override
 				public Object proceed() throws Throwable {
 					return null;
 				}
@@ -235,6 +244,7 @@ public class RepeatOperationsInterceptorTests extends TestCase {
 			this.maxService = maxService;
 		}
 
+        @Override
 		public Object service() throws Exception {
 			count++;
 			if (count <= maxService) {
@@ -249,18 +259,22 @@ public class RepeatOperationsInterceptorTests extends TestCase {
 			this.complete = complete;
 		}
 
+        @Override
 		public void alternate() throws Exception {
 			count++;
 		}
 
+        @Override
 		public Object exception() throws Exception {
 			throw new RuntimeException("Duh! Stupid.");
 		}
 
+        @Override
 		public Object error() throws Exception {
 			throw new Error("Duh! Stupid error.");
 		}
 
+        @Override
 		public boolean isContinuable() throws Exception {
 			count++;
 			return !complete;

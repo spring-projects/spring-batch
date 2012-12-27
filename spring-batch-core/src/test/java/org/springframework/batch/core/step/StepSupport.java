@@ -51,6 +51,7 @@ public class StepSupport implements Step, BeanNameAware {
 		this.name = string;
 	}
 
+    @Override
 	public String getName() {
 		return this.name;
 	}
@@ -62,6 +63,7 @@ public class StepSupport implements Step, BeanNameAware {
 	 * 
 	 * @see org.springframework.beans.factory.BeanNameAware#setBeanName(java.lang.String)
 	 */
+    @Override
 	public void setBeanName(String name) {
 		if (this.name == null) {
 			this.name = name;
@@ -77,6 +79,7 @@ public class StepSupport implements Step, BeanNameAware {
 		this.name = name;
 	}
 
+    @Override
 	public int getStartLimit() {
 		return this.startLimit;
 	}
@@ -90,6 +93,7 @@ public class StepSupport implements Step, BeanNameAware {
 		this.startLimit = startLimit;
 	}
 
+    @Override
 	public boolean isAllowStartIfComplete() {
 		return this.allowStartIfComplete;
 	}
@@ -110,6 +114,7 @@ public class StepSupport implements Step, BeanNameAware {
 	 * 
 	 * @see org.springframework.batch.core.Step#execute(org.springframework.batch.core.StepExecution)
 	 */
+    @Override
 	public void execute(StepExecution stepExecution) throws JobInterruptedException, UnexpectedJobExecutionException {
 		throw new UnsupportedOperationException(
 		        "Cannot process a StepExecution.  Use a smarter subclass of StepSupport.");

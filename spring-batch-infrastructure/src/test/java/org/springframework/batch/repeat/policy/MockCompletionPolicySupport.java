@@ -20,6 +20,7 @@ import org.springframework.batch.repeat.RepeatContext;
 
 public class MockCompletionPolicySupport extends CompletionPolicySupport {
 
+    @Override
 	public boolean isComplete(RepeatContext context) {
 		return false;
 	}

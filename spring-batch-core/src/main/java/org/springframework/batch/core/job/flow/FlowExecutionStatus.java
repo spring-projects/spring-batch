@@ -107,6 +107,7 @@ public class FlowExecutionStatus implements Comparable<FlowExecutionStatus> {
 	 * @param other
 	 * @return negative, zero or positive as per the contract
 	 */
+    @Override
 	public int compareTo(FlowExecutionStatus other) {
 		Status one = Status.match(this.name);
 		Status two = Status.match(other.name);

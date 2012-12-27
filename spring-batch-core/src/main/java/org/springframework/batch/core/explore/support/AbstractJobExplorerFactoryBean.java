@@ -56,10 +56,12 @@ public abstract class AbstractJobExplorerFactoryBean implements FactoryBean {
 	 * @return JobExplorer.class
 	 * @see org.springframework.beans.factory.FactoryBean#getObjectType()
 	 */
+    @Override
 	public Class<JobExplorer> getObjectType() {
 		return JobExplorer.class;
 	}
 
+    @Override
 	public boolean isSingleton() {
 		return true;
 	}

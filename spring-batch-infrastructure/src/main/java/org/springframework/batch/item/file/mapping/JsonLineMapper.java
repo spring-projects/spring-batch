@@ -33,6 +33,7 @@ public class JsonLineMapper implements LineMapper<Map<String, Object>> {
 	 * 
 	 * @see LineMapper#mapLine(String, int)
 	 */
+    @Override
 	public Map<String, Object> mapLine(String line, int lineNumber) throws Exception {
 		Map<String, Object> result;
 		JsonParser parser = factory.createJsonParser(line);

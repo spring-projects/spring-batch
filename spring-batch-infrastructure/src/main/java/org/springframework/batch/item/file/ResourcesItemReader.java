@@ -56,6 +56,7 @@ public class ResourcesItemReader extends ExecutionContextUserSupport implements 
 	 * Increments a counter and returns the next {@link Resource} instance from
 	 * the input, or null if none remain.
 	 */
+    @Override
 	public synchronized Resource read() throws Exception {
 		int index = counter.incrementAndGet() - 1;
 		if (index >= resources.length) {
@@ -64,13 +65,16 @@ public class ResourcesItemReader extends ExecutionContextUserSupport implements 
 		return resources[index];
 	}
 
+    @Override
 	public void close() throws ItemStreamException {
 	}
 
+    @Override
 	public void open(ExecutionContext executionContext) throws ItemStreamException {
 		counter.set(executionContext.getInt(getKey("COUNT"), 0));
 	}
 
+    @Override
 	public void update(ExecutionContext executionContext) throws ItemStreamException {
 		executionContext.putInt(getKey("COUNT"), counter.get());
 	}

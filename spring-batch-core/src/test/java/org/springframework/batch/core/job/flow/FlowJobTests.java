@@ -450,6 +450,7 @@ public class FlowJobTests {
 
 		SimpleFlow flow = new SimpleFlow("job");
 		JobExecutionDecider decider = new JobExecutionDecider() {
+            @Override
 			public FlowExecutionStatus decide(JobExecution jobExecution, StepExecution stepExecution) {
 				assertNotNull(stepExecution);
 				return new FlowExecutionStatus("SWITCH");
@@ -490,6 +491,7 @@ public class FlowJobTests {
 
 		SimpleFlow flow = new SimpleFlow("job");
 		JobExecutionDecider decider = new JobExecutionDecider() {
+            @Override
 			public FlowExecutionStatus decide(JobExecution jobExecution, StepExecution stepExecution) {
 				assertNotNull(stepExecution);
 				throw new RuntimeException("Foo");
@@ -675,6 +677,7 @@ public class FlowJobTests {
 			super(name);
 		}
 
+        @Override
 		public void execute(StepExecution stepExecution) throws JobInterruptedException {
 			stepExecution.setStatus(BatchStatus.COMPLETED);
 			stepExecution.setExitStatus(ExitStatus.COMPLETED);

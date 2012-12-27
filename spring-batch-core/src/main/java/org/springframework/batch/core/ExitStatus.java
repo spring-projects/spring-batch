@@ -139,6 +139,7 @@ public class ExitStatus implements Serializable, Comparable<ExitStatus> {
 	 * @param status an {@link ExitStatus} to compare
 	 * @return 1,0,-1 according to the severity and exit code
 	 */
+    @Override
 	public int compareTo(ExitStatus status) {
 		if (severity(status) > severity(this)) {
 			return -1;
@@ -180,6 +181,7 @@ public class ExitStatus implements Serializable, Comparable<ExitStatus> {
 	 * 
 	 * @see java.lang.Object#toString()
 	 */
+    @Override
 	public String toString() {
 		return String.format("exitCode=%s;exitDescription=%s", exitCode, exitDescription);
 	}
@@ -189,6 +191,7 @@ public class ExitStatus implements Serializable, Comparable<ExitStatus> {
 	 * 
 	 * @see java.lang.Object#equals(java.lang.Object)
 	 */
+    @Override
 	public boolean equals(Object obj) {
 		if (obj == null) {
 			return false;
@@ -201,6 +204,7 @@ public class ExitStatus implements Serializable, Comparable<ExitStatus> {
 	 * 
 	 * @see java.lang.Object#hashCode()
 	 */
+    @Override
 	public int hashCode() {
 		return toString().hashCode();
 	}

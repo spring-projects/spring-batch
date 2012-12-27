@@ -35,6 +35,7 @@ public abstract class AbstractState implements State {
 		this.name = name;
 	}
 
+    @Override
 	public String getName() {
 		return name;
 	}
@@ -47,6 +48,7 @@ public abstract class AbstractState implements State {
 		return getClass().getSimpleName()+": name=["+name+"]";
 	}
 	
+    @Override
 	public abstract FlowExecutionStatus handle(FlowExecutor executor) throws Exception;
 
 }

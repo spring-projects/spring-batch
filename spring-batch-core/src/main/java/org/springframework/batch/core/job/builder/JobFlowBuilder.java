@@ -56,6 +56,7 @@ public class JobFlowBuilder extends FlowBuilder<FlowJobBuilder> {
 	 * 
 	 * @see org.springframework.batch.core.job.builder.FlowBuilder#build()
 	 */
+    @Override
 	public FlowJobBuilder build() {
 		Flow flow = flow();
 		parent.flow(flow);

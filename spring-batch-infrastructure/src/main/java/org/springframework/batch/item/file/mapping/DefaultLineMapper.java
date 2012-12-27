@@ -38,6 +38,7 @@ public class DefaultLineMapper<T> implements LineMapper<T>, InitializingBean {
 
 	private FieldSetMapper<T> fieldSetMapper;
 
+    @Override
 	public T mapLine(String line, int lineNumber) throws Exception {
 		return fieldSetMapper.mapFieldSet(tokenizer.tokenize(line));
 	}
@@ -50,6 +51,7 @@ public class DefaultLineMapper<T> implements LineMapper<T>, InitializingBean {
 		this.fieldSetMapper = fieldSetMapper;
 	}
 
+    @Override
 	public void afterPropertiesSet() {
 		Assert.notNull(tokenizer, "The LineTokenizer must be set");
 		Assert.notNull(fieldSetMapper, "The FieldSetMapper must be set");

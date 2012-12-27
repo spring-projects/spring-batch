@@ -31,6 +31,7 @@ public class SimplePlaceholderTargetSourceTests {
 
 		private ThreadLocal<String> fooHolder = new ThreadLocal<String>();
 		
+        @Override
 		public Object getContext() {
 			return this;
 		}
@@ -57,6 +58,7 @@ public class SimplePlaceholderTargetSourceTests {
 
 		private String name;
 		
+        @Override
 		public String getName() {
 			return name;
 		}

@@ -39,6 +39,7 @@ public class AmqpItemReader<T> implements ItemReader<T> {
         this.amqpTemplate = amqpTemplate;
     }
 
+    @Override
     @SuppressWarnings("unchecked")
     public T read() {
         if (itemType != null && itemType.isAssignableFrom(Message.class)) {

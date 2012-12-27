@@ -74,6 +74,7 @@ public class SimpleStepHandler implements StepHandler, InitializingBean {
 	 * 
 	 * @see InitializingBean#afterPropertiesSet()
 	 */
+    @Override
 	public void afterPropertiesSet() throws Exception {
 		Assert.state(jobRepository != null, "A JobRepository must be provided");
 	}
@@ -95,6 +96,7 @@ public class SimpleStepHandler implements StepHandler, InitializingBean {
 		this.executionContext = executionContext;
 	}
 
+    @Override
 	public StepExecution handleStep(Step step, JobExecution execution) throws JobInterruptedException,
 			JobRestartException, StartLimitExceededException {
 		if (execution.isStopping()) {

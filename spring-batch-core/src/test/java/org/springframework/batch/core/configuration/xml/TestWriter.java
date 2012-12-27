@@ -6,6 +6,7 @@ import org.springframework.batch.item.ItemWriter;
 
 public class TestWriter extends AbstractTestComponent implements ItemWriter<String> {
 
+    @Override
 	public void write(List<? extends String> items) throws Exception {
 		executed = true;
 	}

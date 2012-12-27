@@ -107,6 +107,7 @@ public class JobExplorerFactoryBean extends AbstractJobExplorerFactoryBean
 		this.lobHandler = lobHandler;
 	}
 
+    @Override
 	public void afterPropertiesSet() throws Exception {
 
 		Assert.notNull(dataSource, "DataSource must not be null.");
@@ -168,6 +169,7 @@ public class JobExplorerFactoryBean extends AbstractJobExplorerFactoryBean
 		return dao;
 	}
 
+    @Override
 	public Object getObject() throws Exception {
 		return getTarget();
 	}

@@ -15,6 +15,7 @@ import com.ibatis.sqlmap.client.SqlMapClient;
 @ContextConfiguration(locations = "/org/springframework/batch/item/database/data-source-context.xml")
 public class IbatisPagingItemReaderParameterTests extends AbstractPagingItemReaderParameterTests {
 
+    @Override
 	protected AbstractPagingItemReader<Foo> getItemReader() throws Exception {
 		SqlMapClientFactoryBean factory = new SqlMapClientFactoryBean();
 		factory.setConfigLocation(new ClassPathResource("ibatis-config.xml", getClass()));

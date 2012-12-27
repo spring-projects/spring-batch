@@ -42,6 +42,7 @@ public class PropertyExtractingDelegatingItemWriter<T> extends AbstractMethodInv
 	 * fieldsUsedAsTargetMethodArguments and passes them as arguments to the
 	 * delegate method.
 	 */
+    @Override
 	public void write(List<? extends T> items) throws Exception {
 		for (T item : items) {
 
@@ -58,6 +59,7 @@ public class PropertyExtractingDelegatingItemWriter<T> extends AbstractMethodInv
 		}
 	}
 
+    @Override
 	public void afterPropertiesSet() throws Exception {
 		super.afterPropertiesSet();
 		Assert.notEmpty(fieldsUsedAsTargetMethodArguments);

@@ -56,6 +56,7 @@ public class JobFlowExecutor implements FlowExecutor {
 		stepExecutionHolder.set(null);
 	}
 
+    @Override
 	public String executeStep(Step step) throws JobInterruptedException, JobRestartException,
 			StartLimitExceededException {
 		StepExecution stepExecution = stepHandler.handleStep(step, execution);
@@ -69,6 +70,7 @@ public class JobFlowExecutor implements FlowExecutor {
 		return stepExecution.getExitStatus().getExitCode();
 	}
 
+    @Override
 	public void abandonStepExecution() {
 		StepExecution lastStepExecution = stepExecutionHolder.get();
 		if (lastStepExecution != null && lastStepExecution.getStatus().isGreaterThan(BatchStatus.STOPPING)) {
@@ -77,24 +79,29 @@ public class JobFlowExecutor implements FlowExecutor {
 		}
 	}
 
+    @Override
 	public void updateJobExecutionStatus(FlowExecutionStatus status) {
 		execution.setStatus(findBatchStatus(status));
 		exitStatus = exitStatus.and(new ExitStatus(status.getName()));
 		execution.setExitStatus(exitStatus);
 	}
 
+    @Override
 	public JobExecution getJobExecution() {
 		return execution;
 	}
 
+    @Override
 	public StepExecution getStepExecution() {
 		return stepExecutionHolder.get();
 	}
 
+    @Override
 	public void close(FlowExecution result) {
 		stepExecutionHolder.set(null);
 	}
 
+    @Override
 	public boolean isRestart() {
 		if (getStepExecution() != null && getStepExecution().getStatus() == BatchStatus.ABANDONED) {
 			/*
@@ -107,6 +114,7 @@ public class JobFlowExecutor implements FlowExecutor {
 		return execution.getStepExecutions().isEmpty();
 	}
 
+    @Override
 	public void addExitStatus(String code) {
 		exitStatus = exitStatus.and(new ExitStatus(code));
 	}

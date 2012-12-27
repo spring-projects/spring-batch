@@ -46,6 +46,7 @@ public class DirectPoller<S> implements Poller<S> {
 	 * 
 	 * @see Poller#poll(Callable)
 	 */
+    @Override
 	public Future<S> poll(Callable<S> callable) throws Exception {
 		return new DirectPollingFuture<S>(interval, callable);
 	}
@@ -67,11 +68,13 @@ public class DirectPoller<S> implements Poller<S> {
 			this.callable = callable;
 		}
 
+        @Override
 		public boolean cancel(boolean mayInterruptIfRunning) {
 			cancelled = true;
 			return true;
 		}
 
+        @Override
 		public S get() throws InterruptedException, ExecutionException {
 			try {
 				return get(-1, TimeUnit.MILLISECONDS);
@@ -81,6 +84,7 @@ public class DirectPoller<S> implements Poller<S> {
 			}
 		}
 
+        @Override
 		public S get(long timeout, TimeUnit unit) throws InterruptedException, ExecutionException, TimeoutException {
 
 			try {
@@ -121,10 +125,12 @@ public class DirectPoller<S> implements Poller<S> {
 
 		}
 
+        @Override
 		public boolean isCancelled() {
 			return cancelled;
 		}
 
+        @Override
 		public boolean isDone() {
 			return cancelled || result != null;
 		}

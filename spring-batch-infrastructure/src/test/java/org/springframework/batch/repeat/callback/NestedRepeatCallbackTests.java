@@ -29,6 +29,7 @@ public class NestedRepeatCallbackTests extends TestCase {
 
 	public void testExecute() throws Exception {
 		NestedRepeatCallback callback = new NestedRepeatCallback(new RepeatTemplate(), new RepeatCallback() {
+            @Override
 			public RepeatStatus doInIteration(RepeatContext context) throws Exception {
 				count++;
 				return RepeatStatus.continueIf(count <= 1);

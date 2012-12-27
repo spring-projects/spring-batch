@@ -74,6 +74,7 @@ public class SimpleChunkProcessor<I, O> implements ChunkProcessor<I>, Initializi
 	 * 
 	 * @see InitializingBean#afterPropertiesSet()
 	 */
+    @Override
 	public void afterPropertiesSet() throws Exception {
 		Assert.notNull(itemWriter, "ItemWriter must be set");
 		Assert.notNull(itemProcessor, "ItemProcessor must be set");
@@ -175,6 +176,7 @@ public class SimpleChunkProcessor<I, O> implements ChunkProcessor<I>, Initializi
 		}
 	}
 
+    @Override
 	public final void process(StepContribution contribution, Chunk<I> inputs) throws Exception {
 
 		// Allow temporary state to be stored in the user data field

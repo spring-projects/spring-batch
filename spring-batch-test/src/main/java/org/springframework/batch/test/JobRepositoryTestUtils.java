@@ -58,6 +58,7 @@ public class JobRepositoryTestUtils extends AbstractJdbcBatchMetadataDao impleme
 
 		Long count = 0L;
 
+        @Override
 		public JobParameters getNext(JobParameters parameters) {
 			return new JobParameters(Collections.singletonMap("count", new JobParameter(count++)));
 		}
@@ -69,6 +70,7 @@ public class JobRepositoryTestUtils extends AbstractJdbcBatchMetadataDao impleme
 	/**
 	 * @see InitializingBean#afterPropertiesSet()
 	 */
+    @Override
 	public void afterPropertiesSet() throws Exception {
 		Assert.notNull(jobRepository, "JobRepository must be set");
 		Assert.notNull(jdbcTemplate, "DataSource must be set");
@@ -165,6 +167,7 @@ public class JobRepositoryTestUtils extends AbstractJdbcBatchMetadataDao impleme
 			List<Long> stepExecutionIds = jdbcTemplate.query(
 					getQuery("select STEP_EXECUTION_ID from %PREFIX%STEP_EXECUTION where JOB_EXECUTION_ID=?"),
 					new ParameterizedRowMapper<Long>() {
+                        @Override
 						public Long mapRow(ResultSet rs, int rowNum) throws SQLException {
 							return rs.getLong(1);
 						}

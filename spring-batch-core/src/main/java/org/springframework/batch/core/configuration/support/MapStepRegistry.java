@@ -24,6 +24,7 @@ public class MapStepRegistry implements StepRegistry {
 
     private final ConcurrentMap<String, Map<String, Step>> map = new ConcurrentHashMap<String, Map<String, Step>>();
 
+    @Override
     public void register(String jobName, Collection<Step> steps) throws DuplicateJobException {
         Assert.notNull(jobName, "The job name cannot be null.");
         Assert.notNull(steps, "The job steps cannot be null.");
@@ -40,11 +41,13 @@ public class MapStepRegistry implements StepRegistry {
         }
     }
 
+    @Override
     public void unregisterStepsFromJob(String jobName) {
         Assert.notNull(jobName, "Job configuration must have a name.");
         map.remove(jobName);
     }
 
+    @Override
     public Step getStep(String jobName, String stepName) throws NoSuchJobException {
         Assert.notNull(jobName, "The job name cannot be null.");
         Assert.notNull(stepName, "The step name cannot be null.");

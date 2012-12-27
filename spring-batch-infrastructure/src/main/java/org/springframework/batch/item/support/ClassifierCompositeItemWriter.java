@@ -49,6 +49,7 @@ public class ClassifierCompositeItemWriter<T> implements ItemWriter<T> {
 	 * Delegates to injected {@link ItemWriter} instances according to their
 	 * classification by the {@link Classifier}.
 	 */
+    @Override
 	public void write(List<? extends T> items) throws Exception {
 
 		Map<ItemWriter<? super T>, List<T>> map = new HashMap<ItemWriter<? super T>, List<T>>();

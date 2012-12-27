@@ -291,14 +291,17 @@ public class StaxEventItemReaderTests {
 	public void testOpenBadIOInput() throws Exception {
 
 		source.setResource(new AbstractResource() {
+            @Override
 			public String getDescription() {
 				return null;
 			}
 
+            @Override
 			public InputStream getInputStream() throws IOException {
 				throw new IOException();
 			}
 
+            @Override
 			public boolean exists() {
 				return true;
 			}
@@ -403,10 +406,12 @@ public class StaxEventItemReaderTests {
 
 		public static final String MESSAGE = "Unmarshallers on strike.";
 
+        @Override
 		public Object unmarshal(Source source) throws XmlMappingException, IOException {
 			throw new UnmarshallingFailureException(MESSAGE);
 		}
 
+        @Override
 		@SuppressWarnings("rawtypes")
 		public boolean supports(Class clazz) {
 			return true;
@@ -451,6 +456,7 @@ public class StaxEventItemReaderTests {
 			return events;
 		}
 
+        @Override
 		@SuppressWarnings("rawtypes")
 		public boolean supports(Class clazz) {
 			return true;
@@ -462,6 +468,7 @@ public class StaxEventItemReaderTests {
 		 * @param source
 		 * @return list of the events from fragment body
 		 */
+        @Override
 		public Object unmarshal(Source source) throws XmlMappingException, IOException {
 
 			List<XMLEvent> fragmentContent;
@@ -502,6 +509,7 @@ public class StaxEventItemReaderTests {
 
 		private boolean openCalled = false;
 
+        @Override
 		public void open(ExecutionContext executionContext) {
 			super.open(executionContext);
 			openCalled = true;
@@ -521,14 +529,17 @@ public class StaxEventItemReaderTests {
 		public NonExistentResource() {
 		}
 
+        @Override
 		public boolean exists() {
 			return false;
 		}
 
+        @Override
 		public String getDescription() {
 			return "NonExistantResource";
 		}
 
+        @Override
 		public InputStream getInputStream() throws IOException {
 			return null;
 		}

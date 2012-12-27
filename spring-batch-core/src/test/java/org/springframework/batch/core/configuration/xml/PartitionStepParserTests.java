@@ -88,6 +88,7 @@ public class PartitionStepParserTests implements ApplicationContextAware {
 
 	private List<String> savedStepNames = new ArrayList<String>();
 
+    @Override
 	public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
 		this.applicationContext = applicationContext;
 	}
@@ -229,6 +230,7 @@ public class PartitionStepParserTests implements ApplicationContextAware {
 	
 	public static class CustomPartitionHandler implements PartitionHandler {
 
+        @Override
 		public Collection<StepExecution> handle(StepExecutionSplitter stepSplitter, StepExecution stepExecution)
 				throws Exception {
 			return Arrays.asList(stepExecution);
@@ -238,6 +240,7 @@ public class PartitionStepParserTests implements ApplicationContextAware {
 
 	public static class CustomStepExecutionAggregator implements StepExecutionAggregator {
 
+        @Override
 		public void aggregate(StepExecution result, Collection<StepExecution> executions) {
 			result.getJobExecution().getExecutionContext().put("foo", "bar");
 		}

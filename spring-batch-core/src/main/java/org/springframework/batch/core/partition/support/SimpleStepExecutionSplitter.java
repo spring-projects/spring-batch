@@ -108,6 +108,7 @@ public class SimpleStepExecutionSplitter implements StepExecutionSplitter, Initi
 	 * 
 	 * @see InitializingBean#afterPropertiesSet()
 	 */
+    @Override
 	public void afterPropertiesSet() throws Exception {
 		Assert.state(jobRepository != null, "A JobRepository is required");
 		Assert.state(stepName != null, "A step name is required");
@@ -160,6 +161,7 @@ public class SimpleStepExecutionSplitter implements StepExecutionSplitter, Initi
 	/**
 	 * @see StepExecutionSplitter#getStepName()
 	 */
+    @Override
 	public String getStepName() {
 		return this.stepName;
 	}
@@ -167,6 +169,7 @@ public class SimpleStepExecutionSplitter implements StepExecutionSplitter, Initi
 	/**
 	 * @see StepExecutionSplitter#split(StepExecution, int)
 	 */
+    @Override
 	public Set<StepExecution> split(StepExecution stepExecution, int gridSize) throws JobExecutionException {
 
 		JobExecution jobExecution = stepExecution.getJobExecution();

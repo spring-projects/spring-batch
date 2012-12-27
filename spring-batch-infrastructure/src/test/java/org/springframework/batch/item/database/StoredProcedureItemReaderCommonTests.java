@@ -18,6 +18,7 @@ import org.springframework.jdbc.core.SqlParameter;
 @RunWith(JUnit4.class)
 public class StoredProcedureItemReaderCommonTests extends AbstractDatabaseItemStreamItemReaderTests {
 
+    @Override
 	protected ItemReader<Foo> getItemReader() throws Exception {
 		StoredProcedureItemReader<Foo> result = new StoredProcedureItemReader<Foo>();
 		result.setDataSource(getDataSource());
@@ -28,6 +29,7 @@ public class StoredProcedureItemReaderCommonTests extends AbstractDatabaseItemSt
 		return result;
 	}
 
+    @Override
 	protected void initializeContext() throws Exception {
 		ctx = new ClassPathXmlApplicationContext("org/springframework/batch/item/database/stored-procedure-context.xml");
 	}
@@ -43,6 +45,7 @@ public class StoredProcedureItemReaderCommonTests extends AbstractDatabaseItemSt
 		testRestart();
 	}
 
+    @Override
 	protected void pointToEmptyInput(ItemReader<Foo> tested) throws Exception {
 		StoredProcedureItemReader<Foo> reader = (StoredProcedureItemReader<Foo>) tested;
 		reader.close();
@@ -55,6 +58,7 @@ public class StoredProcedureItemReaderCommonTests extends AbstractDatabaseItemSt
 				});
 		reader.setPreparedStatementSetter(
 				new PreparedStatementSetter() {
+                    @Override
 					public void setValues(PreparedStatement ps)
 							throws SQLException {
 						ps.setInt(1, 1000);

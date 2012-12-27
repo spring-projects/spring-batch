@@ -28,6 +28,7 @@ public abstract class ItemStreamSupport implements ItemStream {
 	 * No-op.
 	 * @see org.springframework.batch.item.ItemStream#close()
 	 */
+    @Override
 	public void close() throws ItemStreamException {
 	}
 
@@ -35,6 +36,7 @@ public abstract class ItemStreamSupport implements ItemStream {
 	 * No-op.
 	 * @see org.springframework.batch.item.ItemStream#open(ExecutionContext)
 	 */
+    @Override
 	public void open(ExecutionContext executionContext) throws ItemStreamException {
 	}
 
@@ -42,6 +44,7 @@ public abstract class ItemStreamSupport implements ItemStream {
 	 * Return empty {@link ExecutionContext}.
 	 * @see org.springframework.batch.item.ItemStream#update(ExecutionContext)
 	 */
+    @Override
 	public void update(ExecutionContext executionContext) {
 	}
 

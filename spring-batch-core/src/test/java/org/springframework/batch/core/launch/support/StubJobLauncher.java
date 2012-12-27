@@ -30,6 +30,7 @@ public class StubJobLauncher implements JobLauncher {
 		return isRunning;
 	}
 
+    @Override
 	public JobExecution run(Job job, JobParameters jobParameters)
 			throws JobExecutionAlreadyRunningException {
 		lastRunCalled = RUN_JOB_IDENTIFIER;

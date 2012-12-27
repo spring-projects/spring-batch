@@ -45,6 +45,7 @@ public abstract class AbstractJpaQueryProvider implements JpaQueryProvider, Init
 	 * 
 	 * @param entityManager
 	 */
+    @Override
 	public void setEntityManager(EntityManager entityManager) {
 		this.entityManager = entityManager;
 	}

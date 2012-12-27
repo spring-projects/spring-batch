@@ -191,6 +191,7 @@ public class StepListenerFactoryBeanTests {
 			public void foo(StepExecution execution) {
 			}
 
+            @Override
 			public int getOrder() {
 				return 3;
 			}
@@ -208,6 +209,7 @@ public class StepListenerFactoryBeanTests {
 			public void foo(StepExecution execution) {
 			}
 
+            @Override
 			public void afterPropertiesSet() throws Exception {
 			}
 		};
@@ -236,6 +238,7 @@ public class StepListenerFactoryBeanTests {
 		ProxyFactory factory = new ProxyFactory();
 		factory.addInterface(DataSource.class);
 		factory.addAdvice(new MethodInterceptor() {
+            @Override
 			public Object invoke(MethodInvocation invocation) throws Throwable {
 				return null;
 			}
@@ -252,6 +255,7 @@ public class StepListenerFactoryBeanTests {
 			public void foo(StepExecution execution) {
 			}
 
+            @Override
 			public void afterPropertiesSet() throws Exception {
 			}
 		};
@@ -377,6 +381,7 @@ public class StepListenerFactoryBeanTests {
 
 		int callcount = 0;
 
+        @Override
 		@AfterStep
 		public ExitStatus afterStep(StepExecution stepExecution) {
 			Assert.notNull(stepExecution);
@@ -384,6 +389,7 @@ public class StepListenerFactoryBeanTests {
 			return null;
 		}
 
+        @Override
 		public void beforeStep(StepExecution stepExecution) {
 			callcount++;
 		}
@@ -395,12 +401,14 @@ public class StepListenerFactoryBeanTests {
 
 		int callcount = 0;
 
+        @Override
 		public ExitStatus afterStep(StepExecution stepExecution) {
 			Assert.notNull(stepExecution);
 			callcount++;
 			return null;
 		}
 
+        @Override
 		public void beforeStep(StepExecution stepExecution) {
 			callcount++;
 		}
@@ -515,14 +523,17 @@ public class StepListenerFactoryBeanTests {
 			onWriteErrorCalled = true;
 		}
 
+        @Override
 		public void onSkipInProcess(String item, Throwable t) {
 			onSkipInProcessCalled = true;
 		}
 
+        @Override
 		public void onSkipInRead(Throwable t) {
 			onSkipInReadCalled = true;
 		}
 
+        @Override
 		public void onSkipInWrite(Integer item, Throwable t) {
 			onSkipInWriteCalled = true;
 		}

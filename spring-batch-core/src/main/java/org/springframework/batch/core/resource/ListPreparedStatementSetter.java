@@ -43,6 +43,7 @@ public class ListPreparedStatementSetter implements
 
 	private List<?> parameters;
 
+    @Override
 	public void setValues(PreparedStatement ps) throws SQLException {
 		for (int i = 0; i < parameters.size(); i++) {
 			StatementCreatorUtils.setParameterValue(ps, i + 1, SqlTypeValue.TYPE_UNKNOWN, parameters.get(i));
@@ -58,6 +59,7 @@ public class ListPreparedStatementSetter implements
 		this.parameters = parameters;
 	}
 
+    @Override
 	public void afterPropertiesSet() throws Exception {
 		Assert.notNull(parameters, "Parameters must be provided");
 	}

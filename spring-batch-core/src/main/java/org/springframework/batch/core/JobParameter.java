@@ -112,6 +112,7 @@ public class JobParameter implements Serializable {
 				: parameter.toString());
 	}
 
+    @Override
 	public int hashCode() {
 		return 7 + 21 * (parameter == null ? parameterType.hashCode() : parameter.hashCode());
 	}

@@ -214,6 +214,7 @@ public class FaultTolerantStepFactoryBeanTests {
 		factory.setSkipLimit(0);
 
 		factory.setSkipPolicy(new SkipPolicy() {
+            @Override
 			public boolean shouldSkip(Throwable t, int skipCount) throws SkipLimitExceededException {
 				throw new  RuntimeException("Planned exception in SkipPolicy");
 			}
@@ -241,6 +242,7 @@ public class FaultTolerantStepFactoryBeanTests {
 		factory.setSkipLimit(0);
 
 		factory.setSkipPolicy(new SkipPolicy() {
+            @Override
 			public boolean shouldSkip(Throwable t, int skipCount) throws SkipLimitExceededException {
 				throw new  RuntimeException("Planned exception in SkipPolicy");
 			}
@@ -420,6 +422,7 @@ public class FaultTolerantStepFactoryBeanTests {
 		map.put(FatalRuntimeException.class, false);
 		factory.setSkippableExceptionClasses(map);
 		factory.setItemWriter(new ItemWriter<String>() {
+            @Override
 			public void write(List<? extends String> items) {
 				throw new FatalRuntimeException("Ouch!");
 			}
@@ -734,56 +737,71 @@ public class FaultTolerantStepFactoryBeanTests {
 		class TestItemListenerWriter implements ItemWriter<String>, ItemReadListener<String>,
 				ItemWriteListener<String>, ItemProcessListener<String, String>, SkipListener<String, String>,
 				ChunkListener {
+            @Override
 			public void write(List<? extends String> items) throws Exception {
 				if (items.contains("4")) {
 					throw new SkippableException("skippable");
 				}
 			}
 
+            @Override
 			public void afterRead(String item) {
 				listenerCalls.add(1);
 			}
 
+            @Override
 			public void beforeRead() {
 			}
 
+            @Override
 			public void onReadError(Exception ex) {
 			}
 
+            @Override
 			public void afterWrite(List<? extends String> items) {
 				listenerCalls.add(2);
 			}
 
+            @Override
 			public void beforeWrite(List<? extends String> items) {
 			}
 
+            @Override
 			public void onWriteError(Exception exception, List<? extends String> items) {
 			}
 
+            @Override
 			public void afterProcess(String item, String result) {
 				listenerCalls.add(3);
 			}
 
+            @Override
 			public void beforeProcess(String item) {
 			}
 
+            @Override
 			public void onProcessError(String item, Exception e) {
 			}
 
+            @Override
 			public void afterChunk() {
 				listenerCalls.add(4);
 			}
 
+            @Override
 			public void beforeChunk() {
 			}
 
+            @Override
 			public void onSkipInProcess(String item, Throwable t) {
 			}
 
+            @Override
 			public void onSkipInRead(Throwable t) {
 				listenerCalls.add(6);
 			}
 
+            @Override
 			public void onSkipInWrite(String item, Throwable t) {
 				listenerCalls.add(5);
 			}
@@ -809,17 +827,21 @@ public class FaultTolerantStepFactoryBeanTests {
 		writer.setFailures("4");
 
 		ItemStreamReader<String> reader = new ItemStreamReader<String>() {
+            @Override
 			public void close() throws ItemStreamException {
 				closed = true;
 			}
 
+            @Override
 			public void open(ExecutionContext executionContext) throws ItemStreamException {
 				opened = true;
 			}
 
+            @Override
 			public void update(ExecutionContext executionContext) throws ItemStreamException {
 			}
 
+            @Override
 			public String read() throws Exception, UnexpectedInputException, ParseException {
 				return null;
 			}
@@ -845,32 +867,40 @@ public class FaultTolerantStepFactoryBeanTests {
 		writer.setFailures("4");
 
 		ItemStreamReader<String> reader = new ItemStreamReader<String>() {
+            @Override
 			public void close() throws ItemStreamException {
 			}
 
+            @Override
 			public void open(ExecutionContext executionContext) throws ItemStreamException {
 			}
 
+            @Override
 			public void update(ExecutionContext executionContext) throws ItemStreamException {
 			}
 
+            @Override
 			public String read() throws Exception, UnexpectedInputException, ParseException {
 				return null;
 			}
 		};
 
 		ItemStreamReader<String> stream = new ItemStreamReader<String>() {
+            @Override
 			public void close() throws ItemStreamException {
 				closed = true;
 			}
 
+            @Override
 			public void open(ExecutionContext executionContext) throws ItemStreamException {
 				opened = true;
 			}
 
+            @Override
 			public void update(ExecutionContext executionContext) throws ItemStreamException {
 			}
 
+            @Override
 			public String read() throws Exception, UnexpectedInputException, ParseException {
 				return null;
 			}
@@ -897,17 +927,21 @@ public class FaultTolerantStepFactoryBeanTests {
 		writer.setFailures("4");
 
 		ItemStreamReader<String> reader = new ItemStreamReader<String>() {
+            @Override
 			public void close() throws ItemStreamException {
 				closed = true;
 			}
 
+            @Override
 			public void open(ExecutionContext executionContext) throws ItemStreamException {
 				opened = true;
 			}
 
+            @Override
 			public void update(ExecutionContext executionContext) throws ItemStreamException {
 			}
 
+            @Override
 			public String read() throws Exception, UnexpectedInputException, ParseException {
 				return null;
 			}
@@ -917,6 +951,7 @@ public class FaultTolerantStepFactoryBeanTests {
 		proxy.setTarget(reader);
 		proxy.setInterfaces(new Class<?>[] { ItemReader.class, ItemStream.class });
 		proxy.addAdvice(new MethodInterceptor() {
+            @Override
 			public Object invoke(MethodInvocation invocation) throws Throwable {
 				return invocation.proceed();
 			}
@@ -939,16 +974,19 @@ public class FaultTolerantStepFactoryBeanTests {
 
 		private boolean filterEncountered = false;
 
+        @Override
 		public void afterProcess(T item, S result) {
 			if (result == null) {
 				filterEncountered = true;
 			}
 		}
 
+        @Override
 		public void beforeProcess(T item) {
 
 		}
 
+        @Override
 		public void onProcessError(T item, Exception e) {
 
 		}

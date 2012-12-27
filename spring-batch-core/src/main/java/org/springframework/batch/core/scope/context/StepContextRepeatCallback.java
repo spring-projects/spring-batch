@@ -59,6 +59,7 @@ public abstract class StepContextRepeatCallback implements RepeatCallback {
 	 * 
 	 * @see RepeatCallback#doInIteration(RepeatContext)
 	 */
+    @Override
 	public RepeatStatus doInIteration(RepeatContext context) throws Exception {
 		
 		// The StepContext has to be the same for all chunks,

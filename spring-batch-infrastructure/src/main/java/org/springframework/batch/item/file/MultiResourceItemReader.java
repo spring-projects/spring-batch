@@ -73,6 +73,7 @@ public class MultiResourceItemReader<T> implements ItemReader<T>, ItemStream {
 		/**
 		 * Compares resource filenames.
 		 */
+        @Override
 		public int compare(Resource r1, Resource r2) {
 			return r1.getFilename().compareTo(r2.getFilename());
 		}
@@ -86,6 +87,7 @@ public class MultiResourceItemReader<T> implements ItemReader<T>, ItemStream {
 	/**
 	 * Reads the next item, jumping to next resource if necessary.
 	 */
+    @Override
 	public T read() throws Exception, UnexpectedInputException, ParseException {
 
 		if (noInput) {
@@ -142,6 +144,7 @@ public class MultiResourceItemReader<T> implements ItemReader<T>, ItemStream {
     /**
 	 * Close the {@link #setDelegate(ResourceAwareItemReaderItemStream)} reader and reset instance variable values.
 	 */
+    @Override
 	public void close() throws ItemStreamException {
 		delegate.close();
 		noInput = false;
@@ -151,6 +154,7 @@ public class MultiResourceItemReader<T> implements ItemReader<T>, ItemStream {
 	 * Figure out which resource to start with in case of restart, open the delegate and restore delegate's position in
 	 * the resource.
 	 */
+    @Override
 	public void open(ExecutionContext executionContext) throws ItemStreamException {
 
 		Assert.notNull(resources, "Resources must be set");
@@ -189,6 +193,7 @@ public class MultiResourceItemReader<T> implements ItemReader<T>, ItemStream {
 	/**
 	 * Store the current resource index and position in the resource.
 	 */
+    @Override
 	public void update(ExecutionContext executionContext) throws ItemStreamException {
 		if (saveState) {
 			executionContext.putInt(executionContextUserSupport.getKey(RESOURCE_KEY), currentResource);

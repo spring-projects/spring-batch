@@ -72,6 +72,7 @@ public class RemoteStepExecutionAggregator implements StepExecutionAggregator, I
 	/**
 	 * @throws Exception if the job explorer is not provided
 	 */
+    @Override
 	public void afterPropertiesSet() throws Exception {
 		Assert.state(jobExplorer != null, "A JobExplorer must be provided");
 	}
@@ -83,6 +84,7 @@ public class RemoteStepExecutionAggregator implements StepExecutionAggregator, I
 	 * 
 	 * @see StepExecutionAggregator #aggregate(StepExecution, Collection)
 	 */
+    @Override
 	public void aggregate(StepExecution result, Collection<StepExecution> executions) {
 		Assert.notNull(result, "To aggregate into a result it must be non-null.");
 		if (executions == null) {

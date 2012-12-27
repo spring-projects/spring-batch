@@ -46,6 +46,7 @@ public class DecisionState extends AbstractState {
 	/* (non-Javadoc)
 	 * @see org.springframework.batch.core.job.flow.State#isEndState()
 	 */
+    @Override
 	public boolean isEndState() {
 		return false;
 	}

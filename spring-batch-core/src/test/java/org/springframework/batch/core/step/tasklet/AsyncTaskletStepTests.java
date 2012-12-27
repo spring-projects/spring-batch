@@ -57,6 +57,7 @@ public class AsyncTaskletStepTests {
 	private int throttleLimit = 20;
 
 	ItemWriter<String> itemWriter = new ItemWriter<String>() {
+        @Override
 		public void write(List<? extends String> data) throws Exception {
 			// Thread.sleep(100L);
 			logger.info("Items: " + data);
@@ -171,6 +172,7 @@ public class AsyncTaskletStepTests {
 		concurrencyLimit = 1;
 		items = Arrays.asList("one", "barf", "three", "four");
 		itemProcessor = new ItemProcessor<String, String>() {
+            @Override
 			public String process(String item) throws Exception {
 				logger.info("Item: "+item);
 				processed.add(item);

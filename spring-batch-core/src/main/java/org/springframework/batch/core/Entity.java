@@ -124,6 +124,7 @@ public class Entity implements Serializable {
 	 * 
 	 * @see java.lang.Object#hashCode()
 	 */
+    @Override
 	public int hashCode() {
 		if (id == null) {
 			return super.hashCode();

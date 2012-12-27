@@ -47,16 +47,19 @@ public class ModularBatchConfiguration extends AbstractBatchConfiguration {
 
 	private AutomaticJobRegistrar registrar = new AutomaticJobRegistrar();
 
+    @Override
 	@Bean
 	public JobRepository jobRepository() throws Exception {
 		return getConfigurer(configurers).getJobRepository();
 	}
 
+    @Override
 	@Bean
 	public JobLauncher jobLauncher() throws Exception {
 		return getConfigurer(configurers).getJobLauncher();
 	}
 
+    @Override
 	@Bean
 	public PlatformTransactionManager transactionManager() throws Exception {
 		return getConfigurer(configurers).getTransactionManager();

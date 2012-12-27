@@ -35,6 +35,7 @@ public class RepeatContextSupportTests extends TestCase {
 		RepeatContextSupport context = new RepeatContextSupport(null);
 		context.setAttribute("foo", "FOO");
 		context.registerDestructionCallback("foo", new Runnable() {
+            @Override
 			public void run() {
 				list.add("bar");
 			}
@@ -50,6 +51,7 @@ public class RepeatContextSupportTests extends TestCase {
 	public void testDestructionCallbackMissingAttribute() throws Exception {
 		RepeatContextSupport context = new RepeatContextSupport(null);
 		context.registerDestructionCallback("foo", new Runnable() {
+            @Override
 			public void run() {
 				list.add("bar");
 			}
@@ -67,12 +69,14 @@ public class RepeatContextSupportTests extends TestCase {
 		context.setAttribute("foo", "FOO");
 		context.setAttribute("bar", "BAR");
 		context.registerDestructionCallback("bar", new Runnable() {
+            @Override
 			public void run() {
 				list.add("spam");
 				throw new RuntimeException("fail!");
 			}
 		});
 		context.registerDestructionCallback("foo", new Runnable() {
+            @Override
 			public void run() {
 				list.add("bar");
 				throw new RuntimeException("fail!");

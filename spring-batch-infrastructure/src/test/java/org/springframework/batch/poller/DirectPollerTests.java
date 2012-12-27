@@ -40,6 +40,7 @@ public class DirectPollerTests {
 
 		Callable<String> callback = new Callable<String>() {
 
+            @Override
 			public String call() throws Exception {
 				Set<String> executions = new HashSet<String>(repository);
 				if (executions.isEmpty()) {
@@ -64,6 +65,7 @@ public class DirectPollerTests {
 
 		Callable<String> callback = new Callable<String>() {
 
+            @Override
 			public String call() throws Exception {
 				Set<String> executions = new HashSet<String>(repository);
 				if (executions.isEmpty()) {
@@ -88,6 +90,7 @@ public class DirectPollerTests {
 
 		Callable<String> callback = new Callable<String>() {
 
+            @Override
 			public String call() throws Exception {
 				Set<String> executions = new HashSet<String>(repository);
 				if (executions.isEmpty()) {
@@ -115,6 +118,7 @@ public class DirectPollerTests {
 
 	private void sleepAndCreateStringInBackground(final long duration) {
 		new Thread(new Runnable() {
+            @Override
 			public void run() {
 				try {
 					Thread.sleep(duration);

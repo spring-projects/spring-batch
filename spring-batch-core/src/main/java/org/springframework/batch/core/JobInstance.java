@@ -65,6 +65,7 @@ public class JobInstance extends Entity {
 		return jobName;
 	}
 
+    @Override
 	public String toString() {
 		return super.toString() + ", JobParameters=[" + jobParameters + "]" + ", Job=[" + jobName + "]";
 	}

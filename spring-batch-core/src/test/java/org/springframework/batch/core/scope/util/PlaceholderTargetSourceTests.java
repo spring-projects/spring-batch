@@ -80,6 +80,7 @@ public class PlaceholderTargetSourceTests extends ContextFactorySupport {
 
 	private Date date = new Date(1L);
 
+    @Override
 	public Object getContext() {
 		return this;
 	}
@@ -247,10 +248,12 @@ public class PlaceholderTargetSourceTests extends ContextFactorySupport {
 			this.name = name;
 		}
 
+        @Override
 		public String getName() {
 			return name;
 		}
 
+        @Override
 		public Date getDate() {
 			return date;
 		}
@@ -263,6 +266,7 @@ public class PlaceholderTargetSourceTests extends ContextFactorySupport {
 			this.name = name;
 		}
 
+        @Override
 		public Node getParent() {
 			return parent;
 		}
@@ -275,10 +279,12 @@ public class PlaceholderTargetSourceTests extends ContextFactorySupport {
 			this.list = list;
 		}
 
+        @Override
 		public List<String> getList() {
 			return list;
 		}
 
+        @Override
 		public Map<String, Object> getMap() {
 			return map;
 		}

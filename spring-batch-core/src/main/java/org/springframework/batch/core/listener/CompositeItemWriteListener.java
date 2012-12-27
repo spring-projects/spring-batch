@@ -53,6 +53,7 @@ public class CompositeItemWriteListener<S> implements ItemWriteListener<S> {
 	 * prioritising those that implement {@link Ordered}.
 	 * @see ItemWriteListener#afterWrite(java.util.List)
 	 */
+    @Override
 	public void afterWrite(List<? extends S> items) {
 		for (Iterator<ItemWriteListener<? super S>> iterator = listeners.reverse(); iterator.hasNext();) {
 			ItemWriteListener<? super S> listener = iterator.next();
@@ -65,6 +66,7 @@ public class CompositeItemWriteListener<S> implements ItemWriteListener<S> {
 	 * that implement {@link Ordered}.
 	 * @see ItemWriteListener#beforeWrite(List)
 	 */
+    @Override
 	public void beforeWrite(List<? extends S> items) {
 		for (Iterator<ItemWriteListener<? super S>> iterator = listeners.iterator(); iterator.hasNext();) {
 			ItemWriteListener<? super S> listener = iterator.next();
@@ -77,6 +79,7 @@ public class CompositeItemWriteListener<S> implements ItemWriteListener<S> {
 	 * prioritising those that implement {@link Ordered}.
 	 * @see ItemWriteListener#onWriteError(Exception, List)
 	 */
+    @Override
 	public void onWriteError(Exception ex, List<? extends S> items) {
 		for (Iterator<ItemWriteListener<? super S>> iterator = listeners.reverse(); iterator.hasNext();) {
 			ItemWriteListener<? super S> listener = iterator.next();

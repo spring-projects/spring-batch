@@ -102,6 +102,7 @@ public class JdbcCursorItemReader<T> extends AbstractCursorItemReader<T> {
 	 * @throws IllegalArgumentException if either data source or sql properties
 	 * not set.
 	 */
+    @Override
 	public void afterPropertiesSet() throws Exception {
 		super.afterPropertiesSet();
 		Assert.notNull(sql, "The SQL query must be provided");
@@ -109,7 +110,8 @@ public class JdbcCursorItemReader<T> extends AbstractCursorItemReader<T> {
 	}
 
 
-	protected void openCursor(Connection con) {	
+    @Override
+	protected void openCursor(Connection con) {
 		try {
 			if (isUseSharedExtendedConnection()) {
 				preparedStatement = con.prepareStatement(sql, ResultSet.TYPE_FORWARD_ONLY, ResultSet.CONCUR_READ_ONLY,
@@ -133,6 +135,7 @@ public class JdbcCursorItemReader<T> extends AbstractCursorItemReader<T> {
 	}
 
 
+    @Override
 	@SuppressWarnings("unchecked")
 	protected T readCursor(ResultSet rs, int currentRow) throws SQLException {
 		return (T) rowMapper.mapRow(rs, currentRow);
@@ -141,6 +144,7 @@ public class JdbcCursorItemReader<T> extends AbstractCursorItemReader<T> {
 	/**
 	 * Close the cursor and database connection.
 	 */
+    @Override
 	protected void cleanupOnClose() throws Exception {
 		JdbcUtils.closeStatement(this.preparedStatement);
 	}

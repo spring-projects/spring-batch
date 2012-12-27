@@ -105,6 +105,7 @@ public class FlatFileItemWriter<T> extends ExecutionContextUserSupport implement
 	 * 
 	 * @see org.springframework.beans.factory.InitializingBean#afterPropertiesSet()
 	 */
+    @Override
 	public void afterPropertiesSet() throws Exception {
 		Assert.notNull(lineAggregator, "A LineAggregator must be provided.");
 		if (append) {
@@ -149,6 +150,7 @@ public class FlatFileItemWriter<T> extends ExecutionContextUserSupport implement
 	 * 
 	 * @param resource
 	 */
+    @Override
 	public void setResource(Resource resource) {
 		this.resource = resource;
 	}
@@ -246,6 +248,7 @@ public class FlatFileItemWriter<T> extends ExecutionContextUserSupport implement
 	 * @throws Exception if the transformer or file output fail,
 	 * WriterNotOpenException if the writer has not been initialized.
 	 */
+    @Override
 	public void write(List<? extends T> items) throws Exception {
 
 		if (!getOutputState().isInitialized()) {
@@ -276,6 +279,7 @@ public class FlatFileItemWriter<T> extends ExecutionContextUserSupport implement
 	/**
 	 * @see ItemStream#close()
 	 */
+    @Override
 	public void close() {
 		if (state != null) {
 			try {
@@ -308,6 +312,7 @@ public class FlatFileItemWriter<T> extends ExecutionContextUserSupport implement
 	 * 
 	 * @see ItemStream#open(ExecutionContext)
 	 */
+    @Override
 	public void open(ExecutionContext executionContext) throws ItemStreamException {
 
 		Assert.notNull(resource, "The resource must be set");
@@ -344,6 +349,7 @@ public class FlatFileItemWriter<T> extends ExecutionContextUserSupport implement
 	/**
 	 * @see ItemStream#update(ExecutionContext)
 	 */
+    @Override
 	public void update(ExecutionContext executionContext) {
 		if (state == null) {
 			throw new ItemStreamException("ItemStream not open or already closed.");
@@ -581,6 +587,7 @@ public class FlatFileItemWriter<T> extends ExecutionContextUserSupport implement
 				final FileChannel channel = fileChannel;
 				if (transactional) {
 					TransactionAwareBufferedWriter writer = new TransactionAwareBufferedWriter(channel, new Runnable() {
+                        @Override
 						public void run() {
 							closeStream();
 						}

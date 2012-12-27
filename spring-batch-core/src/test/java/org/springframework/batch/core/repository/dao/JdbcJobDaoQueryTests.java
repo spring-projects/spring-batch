@@ -41,19 +41,23 @@ public class JdbcJobDaoQueryTests extends TestCase {
 	 * (non-Javadoc)
 	 * @see junit.framework.TestCase#setUp()
 	 */
+    @Override
 	protected void setUp() throws Exception {
 
 		jobExecutionDao = new JdbcJobExecutionDao();
 		jobExecutionDao.setJobExecutionIncrementer(new DataFieldMaxValueIncrementer() {
 
+            @Override
 			public int nextIntValue() throws DataAccessException {
 				return 0;
 			}
 
+            @Override
 			public long nextLongValue() throws DataAccessException {
 				return 0;
 			}
 
+            @Override
 			public String nextStringValue() throws DataAccessException {
 				return "bar";
 			}
@@ -64,6 +68,7 @@ public class JdbcJobDaoQueryTests extends TestCase {
 	public void testTablePrefix() throws Exception {
 		jobExecutionDao.setTablePrefix("FOO_");
 		jobExecutionDao.setJdbcTemplate(new JdbcTemplate() {
+            @Override
 			public int update(String sql, Object[] args, int[] argTypes) throws DataAccessException {
 				list.add(sql);
 				return 1;

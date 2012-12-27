@@ -135,6 +135,7 @@ public class JdbcBatchItemWriter<T> implements ItemWriter<T>, InitializingBean {
 	 * Check mandatory properties - there must be a SimpleJdbcTemplate and an SQL statement plus a 
 	 * parameter source.
 	 */
+    @Override
 	public void afterPropertiesSet() {
 		Assert.notNull(namedParameterJdbcTemplate, "A DataSource or a NamedParameterJdbcTemplate is required.");
 		Assert.notNull(sql, "An SQL statement is required.");
@@ -157,6 +158,7 @@ public class JdbcBatchItemWriter<T> implements ItemWriter<T>, InitializingBean {
 	/* (non-Javadoc)
 	 * @see org.springframework.batch.item.ItemWriter#write(java.util.List)
 	 */
+    @Override
 	public void write(final List<? extends T> items) throws Exception {
 
 		if (!items.isEmpty()) {
@@ -177,6 +179,7 @@ public class JdbcBatchItemWriter<T> implements ItemWriter<T>, InitializingBean {
 			}
 			else {
 				updateCounts = (int[]) namedParameterJdbcTemplate.getJdbcOperations().execute(sql, new PreparedStatementCallback() {
+                    @Override
 					public Object doInPreparedStatement(PreparedStatement ps) throws SQLException, DataAccessException {
 						for (T item : items) {
 							itemPreparedStatementSetter.setValues(item, ps);

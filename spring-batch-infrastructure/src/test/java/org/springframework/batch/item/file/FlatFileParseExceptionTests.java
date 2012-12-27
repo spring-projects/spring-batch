@@ -21,10 +21,12 @@ import org.springframework.batch.support.AbstractExceptionTests;
 
 public class FlatFileParseExceptionTests extends AbstractExceptionTests {
 
+    @Override
 	public Exception getException(String msg) throws Exception {
 		return new FlatFileParseException(msg, "bar");
 	}
 
+    @Override
 	public Exception getException(String msg, Throwable t) throws Exception {
 		return new FlatFileParseException(msg, t, "bar", 100);
 	}

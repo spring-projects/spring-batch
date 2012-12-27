@@ -40,6 +40,7 @@ public class SplitInterruptedJobParserTests extends AbstractJobParserTests {
 
 		final JobExecution jobExecution = createJobExecution();
 		new Thread(new Runnable() {
+            @Override
 			public void run() {
 				job.execute(jobExecution);
 			}

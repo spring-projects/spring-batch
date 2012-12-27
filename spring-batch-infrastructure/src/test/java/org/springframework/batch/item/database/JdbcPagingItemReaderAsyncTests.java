@@ -106,6 +106,7 @@ public class JdbcPagingItemReaderAsyncTests {
 				.newFixedThreadPool(THREAD_COUNT));
 		for (int i = 0; i < THREAD_COUNT; i++) {
 			completionService.submit(new Callable<List<Foo>>() {
+                @Override
 				public List<Foo> call() throws Exception {
 					List<Foo> list = new ArrayList<Foo>();
 					Foo next = null;
@@ -147,6 +148,7 @@ public class JdbcPagingItemReaderAsyncTests {
 		queryProvider.setSortKeys(sortKeys);
 		reader.setQueryProvider(queryProvider);
 		reader.setRowMapper(new ParameterizedRowMapper<Foo>() {
+            @Override
 			public Foo mapRow(ResultSet rs, int i) throws SQLException {
 				Foo foo = new Foo();
 				foo.setId(rs.getInt(1));

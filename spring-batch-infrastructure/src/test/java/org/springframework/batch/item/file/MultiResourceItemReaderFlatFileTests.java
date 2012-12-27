@@ -15,6 +15,7 @@ import org.springframework.core.io.Resource;
 public class MultiResourceItemReaderFlatFileTests extends
 		AbstractItemStreamItemReaderTests {
 
+    @Override
 	protected ItemReader<Foo> getItemReader() throws Exception {
 
 		MultiResourceItemReader<Foo> multiReader = new MultiResourceItemReader<Foo>();
@@ -22,6 +23,7 @@ public class MultiResourceItemReaderFlatFileTests extends
 
 		fileReader.setLineMapper(new LineMapper<Foo>() {
 
+            @Override
 			public Foo mapLine(String line, int lineNumber) throws Exception {
 				Foo foo = new Foo();
 				foo.setValue(Integer.valueOf(line));
@@ -41,6 +43,7 @@ public class MultiResourceItemReaderFlatFileTests extends
 		multiReader.setResources(new Resource[] { r1, r2, r3, r4 });
 		multiReader.setSaveState(true);
 		multiReader.setComparator(new Comparator<Resource>() {
+            @Override
 			public int compare(Resource arg0, Resource arg1) {
 				return 0; // preserve original ordering
 			}
@@ -50,6 +53,7 @@ public class MultiResourceItemReaderFlatFileTests extends
 		return multiReader;
 	}
 
+    @Override
 	protected void pointToEmptyInput(ItemReader<Foo> tested) throws Exception {
 		MultiResourceItemReader<Foo> multiReader = (MultiResourceItemReader<Foo>) tested;
 		multiReader.close();

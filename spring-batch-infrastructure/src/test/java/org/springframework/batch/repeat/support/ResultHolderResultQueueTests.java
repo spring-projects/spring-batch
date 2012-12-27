@@ -45,14 +45,17 @@ public class ResultHolderResultQueueTests {
 			this.result = result;
 		}
 
+        @Override
 		public RepeatContext getContext() {
 			return null;
 		}
 
+        @Override
 		public Throwable getError() {
 			return error;
 		}
 
+        @Override
 		public RepeatStatus getResult() {
 			return result;
 		}

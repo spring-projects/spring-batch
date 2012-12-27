@@ -93,6 +93,7 @@ public class ChunkMonitor implements ItemStream {
 		resetOffset();
 	}
 
+    @Override
 	public void close() throws ItemStreamException {
 		holder.set(null);
 		if (streamsRegistered) {
@@ -100,6 +101,7 @@ public class ChunkMonitor implements ItemStream {
 		}
 	}
 
+    @Override
 	public void open(ExecutionContext executionContext) throws ItemStreamException {
 		if (streamsRegistered) {
 			stream.open(executionContext);
@@ -120,6 +122,7 @@ public class ChunkMonitor implements ItemStream {
 		}
 	}
 
+    @Override
 	public void update(ExecutionContext executionContext) throws ItemStreamException {
 		if (streamsRegistered) {
 			ChunkMonitorData data = getData();

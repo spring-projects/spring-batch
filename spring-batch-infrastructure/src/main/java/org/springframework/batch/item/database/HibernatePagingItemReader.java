@@ -143,6 +143,7 @@ public class HibernatePagingItemReader<T> extends AbstractPagingItemReader<T> im
 		helper.setUseStatelessSession(useStatelessSession);
 	}
 
+    @Override
 	public void afterPropertiesSet() throws Exception {
 		super.afterPropertiesSet();
 		Assert.state(fetchSize >= 0, "fetchSize must not be negative");

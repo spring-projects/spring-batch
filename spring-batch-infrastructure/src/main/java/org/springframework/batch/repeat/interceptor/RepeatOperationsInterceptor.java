@@ -61,6 +61,7 @@ public class RepeatOperationsInterceptor implements MethodInterceptor {
 	 * 
 	 * @see org.aopalliance.intercept.MethodInterceptor#invoke(org.aopalliance.intercept.MethodInvocation)
 	 */
+    @Override
 	public Object invoke(final MethodInvocation invocation) throws Throwable {
 
 		final ResultHolder result = new ResultHolder();
@@ -75,6 +76,7 @@ public class RepeatOperationsInterceptor implements MethodInterceptor {
 		try {
 			repeatOperations.iterate(new RepeatCallback() {
 
+                @Override
 				public RepeatStatus doInIteration(RepeatContext context) throws Exception {
 					try {
 

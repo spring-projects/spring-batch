@@ -46,6 +46,7 @@ public class PassThroughFieldExtractor<T> implements FieldExtractor<T> {
 	 * @param item the object to convert
 	 * @return an array of objects as close as possible to the original item
 	 */
+    @Override
 	public Object[] extract(T item) {
 
 		if (item.getClass().isArray()) {

@@ -57,10 +57,12 @@ public class DerbyPagingQueryProvider extends SqlWindowingPagingQueryProvider {
 		return "";
 	}
 
+    @Override
 	protected String getOverSubstituteClauseStart() {
 		return " FROM (SELECT " + getSelectClause();
 	}
 
+    @Override
 	protected String getOverSubstituteClauseEnd() {
 		return " ) AS " + getOrderedQueryAlias();
 	}

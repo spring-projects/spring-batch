@@ -89,6 +89,7 @@ public abstract class AbstractPagingItemReader<T> extends AbstractItemCountingIt
 	 * Check mandatory properties.
 	 * @see org.springframework.beans.factory.InitializingBean#afterPropertiesSet()
 	 */
+    @Override
 	public void afterPropertiesSet() throws Exception {
 		Assert.isTrue(pageSize > 0, "pageSize must be greater than zero");
 	}

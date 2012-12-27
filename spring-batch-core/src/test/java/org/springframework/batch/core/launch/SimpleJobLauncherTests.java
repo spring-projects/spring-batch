@@ -162,6 +162,7 @@ public class SimpleJobLauncherTests {
 	public void testTaskExecutor() throws Exception {
 		final List<String> list = new ArrayList<String>();
 		jobLauncher.setTaskExecutor(new TaskExecutor() {
+            @Override
 			public void execute(Runnable task) {
 				list.add("execute");
 				task.run();
@@ -176,6 +177,7 @@ public class SimpleJobLauncherTests {
 
 		final List<String> list = new ArrayList<String>();
 		jobLauncher.setTaskExecutor(new TaskExecutor() {
+            @Override
 			public void execute(Runnable task) {
 				list.add("execute");
 				throw new TaskRejectedException("Planned failure");
@@ -207,6 +209,7 @@ public class SimpleJobLauncherTests {
 	@Test
 	public void testRunWithException() throws Exception {
 		job = new JobSupport() {
+            @Override
 			public void execute(JobExecution execution) {
 				execution.setExitStatus(ExitStatus.FAILED);
 				throw new RuntimeException("foo");
@@ -224,6 +227,7 @@ public class SimpleJobLauncherTests {
 	@Test
 	public void testRunWithError() throws Exception {
 		job = new JobSupport() {
+            @Override
 			public void execute(JobExecution execution) {
 				execution.setExitStatus(ExitStatus.FAILED);
 				throw new Error("foo");

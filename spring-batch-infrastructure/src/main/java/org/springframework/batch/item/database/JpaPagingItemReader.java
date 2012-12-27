@@ -126,6 +126,7 @@ public class JpaPagingItemReader<T> extends AbstractPagingItemReader<T> {
 		this.parameterValues = parameterValues;
 	}
 
+    @Override
 	public void afterPropertiesSet() throws Exception {
 		super.afterPropertiesSet();
 

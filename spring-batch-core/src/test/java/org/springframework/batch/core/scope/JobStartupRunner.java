@@ -13,6 +13,7 @@ public class JobStartupRunner implements InitializingBean {
 		this.step = step;
 	}
 	
+    @Override
 	public void afterPropertiesSet() throws Exception {
 		StepExecution stepExecution = new StepExecution("step", new JobExecution(1L), 0L);
 		step.execute(stepExecution);

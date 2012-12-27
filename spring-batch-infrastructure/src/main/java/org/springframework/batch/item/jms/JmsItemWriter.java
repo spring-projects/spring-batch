@@ -65,6 +65,7 @@ public class JmsItemWriter<T> implements ItemWriter<T> {
 	 * 
 	 * @see org.springframework.batch.item.ItemWriter#write(java.util.List)
 	 */
+    @Override
 	public void write(List<? extends T> items) throws Exception {
 
 		if (logger.isDebugEnabled()) {

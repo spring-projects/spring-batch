@@ -119,6 +119,7 @@ public class EndState extends AbstractState {
 	 * 
 	 * @see org.springframework.batch.core.job.flow.State#isEndState()
 	 */
+    @Override
 	public boolean isEndState() {
 		return !status.isStop();
 	}

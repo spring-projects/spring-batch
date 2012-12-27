@@ -34,6 +34,7 @@ public class DefaultExecutionContextSerializer implements ExecutionContextSerial
 	 * @param context
 	 * @param out
 	 */
+    @Override
 	@SuppressWarnings("unchecked")
 	public void serialize(Object context, OutputStream out) throws IOException {
 		Assert.notNull(context);
@@ -48,6 +49,7 @@ public class DefaultExecutionContextSerializer implements ExecutionContextSerial
 	 * @param inputStream
 	 * @return the object serialized in the provided {@link InputStream}
 	 */
+    @Override
 	public Object deserialize(InputStream inputStream) throws IOException {
 		return deserializer.deserialize(inputStream);
 	}

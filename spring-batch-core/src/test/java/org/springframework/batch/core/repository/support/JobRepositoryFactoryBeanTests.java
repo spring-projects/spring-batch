@@ -332,14 +332,17 @@ public class JobRepositoryFactoryBeanTests {
 
 	private static class StubIncrementer implements DataFieldMaxValueIncrementer {
 
+        @Override
 		public int nextIntValue() throws DataAccessException {
 			return 0;
 		}
 
+        @Override
 		public long nextLongValue() throws DataAccessException {
 			return 0;
 		}
 
+        @Override
 		public String nextStringValue() throws DataAccessException {
 			return null;
 		}

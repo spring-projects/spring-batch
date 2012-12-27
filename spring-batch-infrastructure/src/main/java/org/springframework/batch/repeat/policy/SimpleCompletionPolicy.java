@@ -56,6 +56,7 @@ public class SimpleCompletionPolicy extends DefaultResultCompletionPolicy {
 	 * 
 	 * @see org.springframework.batch.repeat.CompletionPolicy#start(RepeatContext)
 	 */
+    @Override
 	public RepeatContext start(RepeatContext context) {
 		return new SimpleTerminationContext(context);
 	}
@@ -68,6 +69,7 @@ public class SimpleCompletionPolicy extends DefaultResultCompletionPolicy {
 	 * @throws RuntimeException (normally terminating the batch) if the result is
 	 * itself an exception.
 	 */
+    @Override
 	public boolean isComplete(RepeatContext context, RepeatStatus result) {
 		return super.isComplete(context, result) || ((SimpleTerminationContext) context).isComplete();
 	}
@@ -77,6 +79,7 @@ public class SimpleCompletionPolicy extends DefaultResultCompletionPolicy {
 	 * 
 	 * @see org.springframework.batch.repeat.CompletionPolicy#isComplete(RepeatContext)
 	 */
+    @Override
 	public boolean isComplete(RepeatContext context) {
 		return ((SimpleTerminationContext) context).isComplete();
 	}
@@ -86,6 +89,7 @@ public class SimpleCompletionPolicy extends DefaultResultCompletionPolicy {
 	 * 
 	 * @see org.springframework.batch.repeat.CompletionPolicy#update(RepeatContext)
 	 */
+    @Override
 	public void update(RepeatContext context) {
 		((SimpleTerminationContext) context).update();
 	}
@@ -108,6 +112,7 @@ public class SimpleCompletionPolicy extends DefaultResultCompletionPolicy {
 	/* (non-Javadoc)
 	 * @see java.lang.Object#toString()
 	 */
+    @Override
 	public String toString() {
 		return ClassUtils.getShortName(SimpleCompletionPolicy.class)+": chunkSize="+chunkSize;
 	}

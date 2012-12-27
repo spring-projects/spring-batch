@@ -23,6 +23,7 @@ import junit.framework.TestCase;
 public class ItemRecoveryHandlerTests extends TestCase {
 
 	MethodInvocationRecoverer<String> recoverer = new MethodInvocationRecoverer<String>() {
+        @Override
 		public String recover(Object[] data, Throwable cause) {
 			return null;
 		}

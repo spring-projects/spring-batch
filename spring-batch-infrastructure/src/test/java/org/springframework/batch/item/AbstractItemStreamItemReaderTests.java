@@ -23,6 +23,7 @@ public abstract class AbstractItemStreamItemReaderTests extends AbstractItemRead
 		return (ItemStream) tested;
 	}
 
+    @Override
 	@Before
 	public void setUp() throws Exception {
 		super.setUp();

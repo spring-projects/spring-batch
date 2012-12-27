@@ -220,6 +220,7 @@ class StepParserStepFactoryBean<I, O> implements FactoryBean, BeanNameAware {
 	 * 
 	 * @see FactoryBean#getObject()
 	 */
+    @Override
 	public final Object getObject() throws Exception {
 		if (hasChunkElement) {
 			Assert.isNull(tasklet, "Step [" + name
@@ -525,10 +526,12 @@ class StepParserStepFactoryBean<I, O> implements FactoryBean, BeanNameAware {
 		return n != null && n > 0;
 	}
 
+    @Override
 	public Class<TaskletStep> getObjectType() {
 		return TaskletStep.class;
 	}
 
+    @Override
 	public boolean isSingleton() {
 		return true;
 	}
@@ -542,6 +545,7 @@ class StepParserStepFactoryBean<I, O> implements FactoryBean, BeanNameAware {
 	 * 
 	 * @see org.springframework.beans.factory.BeanNameAware#setBeanName(java.lang.String)
 	 */
+    @Override
 	public void setBeanName(String name) {
 		if (this.name == null) {
 			this.name = name;

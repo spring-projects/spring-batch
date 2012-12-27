@@ -40,6 +40,7 @@ public class JmsMethodArgumentsKeyGenerator implements MethodArgumentsKeyGenerat
 	 * a JMS Message
 	 * @throws IllegalArgumentException if the arguments are empty
 	 */
+    @Override
 	public Object getKey(Object[] items) {
 		for (Object item : items) {
 			if (item instanceof Message) {

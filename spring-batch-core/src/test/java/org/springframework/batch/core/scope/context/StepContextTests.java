@@ -81,6 +81,7 @@ public class StepContextTests {
 	public void testDestructionCallbackSunnyDay() throws Exception {
 		context.setAttribute("foo", "FOO");
 		context.registerDestructionCallback("foo", new Runnable() {
+            @Override
 			public void run() {
 				list.add("bar");
 			}
@@ -93,6 +94,7 @@ public class StepContextTests {
 	@Test
 	public void testDestructionCallbackMissingAttribute() throws Exception {
 		context.registerDestructionCallback("foo", new Runnable() {
+            @Override
 			public void run() {
 				list.add("bar");
 			}
@@ -108,12 +110,14 @@ public class StepContextTests {
 		context.setAttribute("foo", "FOO");
 		context.setAttribute("bar", "BAR");
 		context.registerDestructionCallback("bar", new Runnable() {
+            @Override
 			public void run() {
 				list.add("spam");
 				throw new RuntimeException("fail!");
 			}
 		});
 		context.registerDestructionCallback("foo", new Runnable() {
+            @Override
 			public void run() {
 				list.add("bar");
 				throw new RuntimeException("fail!");

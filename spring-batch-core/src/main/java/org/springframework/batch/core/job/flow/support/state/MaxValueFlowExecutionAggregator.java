@@ -39,6 +39,7 @@ public class MaxValueFlowExecutionAggregator implements FlowExecutionAggregator 
 	 * 
 	 * @see FlowExecutionAggregator#aggregate(Collection)
 	 */
+    @Override
 	public FlowExecutionStatus aggregate(Collection<FlowExecution> executions) {
 		if (executions == null || executions.size() == 0) {
 			return FlowExecutionStatus.UNKNOWN;

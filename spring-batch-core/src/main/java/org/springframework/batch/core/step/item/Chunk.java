@@ -123,6 +123,7 @@ public class Chunk<W> implements Iterable<W> {
 	 * Get an unmodifiable iterator for the underlying items.
 	 * @see java.lang.Iterable#iterator()
 	 */
+    @Override
 	public ChunkIterator iterator() {
 		return new ChunkIterator(items);
 	}
@@ -213,10 +214,12 @@ public class Chunk<W> implements Iterable<W> {
 			iterator = items.iterator();
 		}
 
+        @Override
 		public boolean hasNext() {
 			return iterator.hasNext();
 		}
 
+        @Override
 		public W next() {
 			next = iterator.next();
 			return next;
@@ -227,6 +230,7 @@ public class Chunk<W> implements Iterable<W> {
 			skips.add(new SkipWrapper<W>(next, e));
 		}
 
+        @Override
 		public void remove() {
 			if (next == null) {
 				if (iterator.hasNext()) {

@@ -121,6 +121,7 @@ public class ExtendedConnectionDataSourceProxy implements SmartDataSource, Initi
 	/**
 	 * @see SmartDataSource
 	 */
+    @Override
 	public boolean shouldClose(Connection connection) {
 		boolean shouldClose = !isCloseSuppressionActive(connection);
 		if (borrowedConnection && closeSuppressedConnection.equals(connection)) {
@@ -170,12 +171,14 @@ public class ExtendedConnectionDataSourceProxy implements SmartDataSource, Initi
 		}
 	}
 
+    @Override
 	public Connection getConnection() throws SQLException {
 		synchronized (this.connectionMonitor) {
 			return initConnection(null, null);
 		}
 	}
 
+    @Override
 	public Connection getConnection(String username, String password) throws SQLException {
 		synchronized (this.connectionMonitor) {
 			return initConnection(username, password);
@@ -207,18 +210,22 @@ public class ExtendedConnectionDataSourceProxy implements SmartDataSource, Initi
 		return connection;
 	}
 
+    @Override
 	public PrintWriter getLogWriter() throws SQLException {
 		return dataSource.getLogWriter();
 	}
 
+    @Override
 	public int getLoginTimeout() throws SQLException {
 		return dataSource.getLoginTimeout();
 	}
 
+    @Override
 	public void setLogWriter(PrintWriter out) throws SQLException {
 		dataSource.setLogWriter(out);
 	}
 
+    @Override
 	public void setLoginTimeout(int seconds) throws SQLException {
 		dataSource.setLoginTimeout(seconds);
 	}
@@ -250,6 +257,7 @@ public class ExtendedConnectionDataSourceProxy implements SmartDataSource, Initi
 			this.target = target;
 		}
 
+	    @Override
 		public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
 			// Invocation on ConnectionProxy interface coming in...
 
@@ -292,6 +300,7 @@ public class ExtendedConnectionDataSourceProxy implements SmartDataSource, Initi
 	 * Performs only a 'shallow' non-recursive check of self's and delegate's
 	 * class to retain Java 5 compatibility.
 	 */
+    @Override
 	public boolean isWrapperFor(Class<?> iface) throws SQLException {
 		if (iface.isAssignableFrom(SmartDataSource.class) || iface.isAssignableFrom(dataSource.getClass())) {
 			return true;
@@ -304,6 +313,7 @@ public class ExtendedConnectionDataSourceProxy implements SmartDataSource, Initi
 	 * cast to supplied parameter class. Does *not* support recursive unwrapping
 	 * of the delegate to retain Java 5 compatibility.
 	 */
+    @Override
 	public <T> T unwrap(Class<T> iface) throws SQLException {
 		if (iface.isAssignableFrom(SmartDataSource.class)) {
 			@SuppressWarnings("unchecked")
@@ -318,6 +328,7 @@ public class ExtendedConnectionDataSourceProxy implements SmartDataSource, Initi
 		throw new SQLException("Unsupported class " + iface.getSimpleName());
 	}
 
+    @Override
 	public void afterPropertiesSet() throws Exception {
 		Assert.notNull(dataSource);
 	}

@@ -83,10 +83,12 @@ public class SimpleJobRepository implements JobRepository {
 		this.ecDao = ecDao;
 	}
 
+    @Override
 	public boolean isJobInstanceExists(String jobName, JobParameters jobParameters) {
 		return jobInstanceDao.getJobInstance(jobName, jobParameters) != null;
 	}
 
+    @Override
 	public JobExecution createJobExecution(String jobName, JobParameters jobParameters)
 			throws JobExecutionAlreadyRunningException, JobRestartException, JobInstanceAlreadyCompleteException {
 
@@ -145,6 +147,7 @@ public class SimpleJobRepository implements JobRepository {
 
 	}
 
+    @Override
 	public void update(JobExecution jobExecution) {
 
 		Assert.notNull(jobExecution, "JobExecution cannot be null.");
@@ -155,6 +158,7 @@ public class SimpleJobRepository implements JobRepository {
 		jobExecutionDao.updateJobExecution(jobExecution);
 	}
 
+    @Override
 	public void add(StepExecution stepExecution) {
 		validateStepExecution(stepExecution);
 
@@ -163,6 +167,7 @@ public class SimpleJobRepository implements JobRepository {
 		ecDao.saveExecutionContext(stepExecution);
 	}
 
+    @Override
 	public void update(StepExecution stepExecution) {
 		validateStepExecution(stepExecution);
 		Assert.notNull(stepExecution.getId(), "StepExecution must already be saved (have an id assigned)");
@@ -178,16 +183,19 @@ public class SimpleJobRepository implements JobRepository {
 		Assert.notNull(stepExecution.getJobExecutionId(), "StepExecution must belong to persisted JobExecution");
 	}
 
+    @Override
 	public void updateExecutionContext(StepExecution stepExecution) {
 		validateStepExecution(stepExecution);
 		Assert.notNull(stepExecution.getId(), "StepExecution must already be saved (have an id assigned)");
 		ecDao.updateExecutionContext(stepExecution);
 	}
 	
+    @Override
 	public void updateExecutionContext(JobExecution jobExecution) {
 		ecDao.updateExecutionContext(jobExecution);
 	}
 
+    @Override
 	public StepExecution getLastStepExecution(JobInstance jobInstance, String stepName) {
 		List<JobExecution> jobExecutions = jobExecutionDao.findJobExecutions(jobInstance);
 		List<StepExecution> stepExecutions = new ArrayList<StepExecution>(jobExecutions.size());
@@ -218,6 +226,7 @@ public class SimpleJobRepository implements JobRepository {
 	/**
 	 * @return number of executions of the step within given job instance
 	 */
+    @Override
 	public int getStepExecutionCount(JobInstance jobInstance, String stepName) {
 		int count = 0;
 		List<JobExecution> jobExecutions = jobExecutionDao.findJobExecutions(jobInstance);
@@ -249,6 +258,7 @@ public class SimpleJobRepository implements JobRepository {
 		}
 	}
 
+    @Override
 	public JobExecution getLastJobExecution(String jobName, JobParameters jobParameters) {
 		JobInstance jobInstance = jobInstanceDao.getJobInstance(jobName, jobParameters);
 		if (jobInstance == null) {

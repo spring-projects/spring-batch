@@ -40,10 +40,12 @@ public class CompositeRepeatListenerTests extends TestCase {
 	 */
 	public void testSetListeners() {
 		listener.setListeners(new RepeatListener[] { new RepeatListenerSupport() {
+            @Override
 			public void open(RepeatContext context) {
 				list.add("fail");
 			}
 		}, new RepeatListenerSupport() {
+            @Override
 			public void open(RepeatContext context) {
 				list.add("continue");
 			}
@@ -58,6 +60,7 @@ public class CompositeRepeatListenerTests extends TestCase {
 	 */
 	public void testSetListener() {
 		listener.register(new RepeatListenerSupport() {
+            @Override
 			public void before(RepeatContext context) {
 				list.add("fail");
 			}
@@ -68,6 +71,7 @@ public class CompositeRepeatListenerTests extends TestCase {
 
 	public void testClose() {
 		listener.register(new RepeatListenerSupport() {
+            @Override
 			public void close(RepeatContext context) {
 				list.add("foo");
 			}
@@ -78,6 +82,7 @@ public class CompositeRepeatListenerTests extends TestCase {
 
 	public void testOnError() {
 		listener.register(new RepeatListenerSupport() {
+            @Override
 			public void onError(RepeatContext context, Throwable e) {
 				list.add(e);
 			}

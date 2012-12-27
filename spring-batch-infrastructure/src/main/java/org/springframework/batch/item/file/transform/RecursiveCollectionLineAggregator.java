@@ -47,6 +47,7 @@ public class RecursiveCollectionLineAggregator<T> implements LineAggregator<Coll
 	 * (non-Javadoc)
 	 * @see org.springframework.batch.item.file.transform.LineAggregator#aggregate(java.lang.Object)
 	 */
+    @Override
 	public String aggregate(Collection<T> items) {
 		StringBuilder builder = new StringBuilder();
 		for (T value : items) {

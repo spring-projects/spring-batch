@@ -38,6 +38,7 @@ public class JpaNativeQueryProvider<E> extends AbstractJpaQueryProvider {
 
 	private String sqlQuery;
 
+    @Override
 	public Query createQuery() {
 		return getEntityManager().createNativeQuery(sqlQuery, entityClass);
 	}
@@ -50,6 +51,7 @@ public class JpaNativeQueryProvider<E> extends AbstractJpaQueryProvider {
 		this.entityClass = entityClazz;
 	}
 
+    @Override
 	public void afterPropertiesSet() throws Exception {
 		Assert.isTrue(StringUtils.hasText(sqlQuery), "Native SQL query cannot be empty");
 		Assert.notNull(entityClass, "Entity class cannot be NULL");

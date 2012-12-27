@@ -27,6 +27,7 @@ public class ExampleItemWriter implements ItemWriter<String> {
 	/**
 	 * @see ItemWriter#write(List)
 	 */
+    @Override
 	public void write(List<? extends String> data) throws Exception {
 		log.info(data);
 		items.addAll(data);

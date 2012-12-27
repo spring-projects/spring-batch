@@ -67,6 +67,7 @@ public class SimpleJvmExitCodeMapper implements ExitCodeMapper {
 	 * Framework
 	 * @return The exitCode of the Batch Job as known by the JVM
 	 */
+    @Override
 	public int intValue(String exitCode) {
 
 		Integer statusCode = null;

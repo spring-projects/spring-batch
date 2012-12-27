@@ -36,6 +36,7 @@ public class AbstractEventReaderWrapperTests extends TestCase {
 	AbstractEventReaderWrapper eventReaderWrapper;
 	XMLEventReader xmlEventReader;
 
+    @Override
 	protected void setUp() throws Exception {
 		super.setUp();
 

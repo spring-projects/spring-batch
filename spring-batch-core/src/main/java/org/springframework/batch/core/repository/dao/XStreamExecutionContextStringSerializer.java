@@ -57,6 +57,7 @@ public class XStreamExecutionContextStringSerializer implements ExecutionContext
 		this.hierarchicalStreamDriver = hierarchicalStreamDriver;
 	}
 
+    @Override
 	public void afterPropertiesSet() throws Exception {
 		init();
 	}
@@ -80,6 +81,7 @@ public class XStreamExecutionContextStringSerializer implements ExecutionContext
 	 * @param out
 	 * @see Serializer#serialize(Object, OutputStream)
 	 */
+    @Override
 	public void serialize(Object context, OutputStream out) throws IOException {
 		Assert.notNull(context);
 		Assert.notNull(out);
@@ -94,6 +96,7 @@ public class XStreamExecutionContextStringSerializer implements ExecutionContext
 	 * @return a reconstructed execution context
 	 * @see Deserializer#deserialize(InputStream)
 	 */
+    @Override
 	@SuppressWarnings("unchecked")
 	public Object deserialize(InputStream in) throws IOException {
 		BufferedReader br = new BufferedReader(new InputStreamReader(in));

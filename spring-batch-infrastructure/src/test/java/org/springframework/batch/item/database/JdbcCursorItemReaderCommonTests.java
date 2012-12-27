@@ -11,6 +11,7 @@ import org.springframework.batch.item.sample.Foo;
 @RunWith(JUnit4.class)
 public class JdbcCursorItemReaderCommonTests extends AbstractDatabaseItemStreamItemReaderTests {
 
+    @Override
 	protected ItemReader<Foo> getItemReader() throws Exception {
 
 		JdbcCursorItemReader<Foo> result = new JdbcCursorItemReader<Foo>();
@@ -38,6 +39,7 @@ public class JdbcCursorItemReaderCommonTests extends AbstractDatabaseItemStreamI
 		testRestart();
 	}
 
+    @Override
 	protected void pointToEmptyInput(ItemReader<Foo> tested) throws Exception {
 		JdbcCursorItemReader<Foo> reader = (JdbcCursorItemReader<Foo>) tested;
 		reader.close();

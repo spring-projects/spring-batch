@@ -29,6 +29,7 @@ public class DelimitedLineAggregatorTests {
 	private static DelimitedLineAggregator<String[]> aggregator;
 
 	private FieldExtractor<String[]> defaultFieldExtractor = new FieldExtractor<String[]>() {
+	    @Override
 		public Object[] extract(String[] item) {
 			return item;
 		}

@@ -30,6 +30,7 @@ public class CallableTaskletAdapterTests {
 	@Test
 	public void testHandle() throws Exception {
 		adapter.setCallable(new Callable<RepeatStatus>() {
+            @Override
 			public RepeatStatus call() throws Exception {
 				return RepeatStatus.FINISHED;
 			}

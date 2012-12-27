@@ -36,13 +36,16 @@ public class DummyNamespaceHandler implements NamespaceHandler {
 
 	public static String LABEL = new Random().toString();
 
+    @Override
 	public BeanDefinitionHolder decorate(Node source, BeanDefinitionHolder definition, ParserContext parserContext) {
 		return null;
 	}
 
+    @Override
 	public void init() {
 	}
 
+    @Override
 	public BeanDefinition parse(Element element, ParserContext parserContext) {
 		BeanDefinitionBuilder builder = BeanDefinitionBuilder.genericBeanDefinition(TestTasklet.class);
 		builder.addPropertyValue("name", LABEL);

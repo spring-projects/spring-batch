@@ -55,6 +55,7 @@ public class CompositeStepExecutionListener implements StepExecutionListener {
 	 * prioritising those that implement {@link Ordered}.
 	 * @see org.springframework.batch.core.StepExecutionListener#afterStep(StepExecution)
 	 */
+    @Override
 	public ExitStatus afterStep(StepExecution stepExecution) {
 		ExitStatus status = null;
 		for (Iterator<StepExecutionListener> iterator = list.reverse(); iterator.hasNext();) {
@@ -70,6 +71,7 @@ public class CompositeStepExecutionListener implements StepExecutionListener {
 	 * that implement {@link Ordered}.
 	 * @see org.springframework.batch.core.StepExecutionListener#beforeStep(StepExecution)
 	 */
+    @Override
 	public void beforeStep(StepExecution stepExecution) {
 		for (Iterator<StepExecutionListener> iterator = list.iterator(); iterator.hasNext();) {
 			StepExecutionListener listener = iterator.next();

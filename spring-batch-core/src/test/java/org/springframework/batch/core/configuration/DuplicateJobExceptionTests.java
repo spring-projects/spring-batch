@@ -28,6 +28,7 @@ public class DuplicateJobExceptionTests extends AbstractExceptionTests {
 	 * (non-Javadoc)
 	 * @see org.springframework.batch.io.exception.AbstractExceptionTests#getException(java.lang.String)
 	 */
+    @Override
 	public Exception getException(String msg) throws Exception {
 		return new DuplicateJobException(msg);
 	}
@@ -37,6 +38,7 @@ public class DuplicateJobExceptionTests extends AbstractExceptionTests {
 	 * @see org.springframework.batch.io.exception.AbstractExceptionTests#getException(java.lang.String,
 	 * java.lang.Throwable)
 	 */
+    @Override
 	public Exception getException(String msg, Throwable t) throws Exception {
 		return new DuplicateJobException(msg, t);
 	}

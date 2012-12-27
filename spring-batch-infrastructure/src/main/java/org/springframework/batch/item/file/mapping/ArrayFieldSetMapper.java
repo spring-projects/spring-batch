@@ -27,6 +27,7 @@ import org.springframework.validation.BindException;
  */
 public class ArrayFieldSetMapper implements FieldSetMapper<String[]> {
 
+    @Override
 	public String[] mapFieldSet(FieldSet fieldSet) throws BindException {
 		return fieldSet.getValues();
 	}

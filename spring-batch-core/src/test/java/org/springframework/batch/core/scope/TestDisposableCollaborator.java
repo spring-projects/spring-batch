@@ -6,6 +6,7 @@ public class TestDisposableCollaborator extends TestCollaborator implements Disp
 
 	public static volatile String message = "none";
 
+    @Override
 	public void destroy() throws Exception {
 		message = (message.equals("none") ? "" : message + ",") + getName() + ":destroyed";
 	}

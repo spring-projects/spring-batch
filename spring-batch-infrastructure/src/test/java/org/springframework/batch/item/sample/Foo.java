@@ -47,6 +47,7 @@ public class Foo {
 		this.id = id;
 	}
 	
+    @Override
 	public String toString() {
 		return "Foo[id=" +id +",name=" + name + ",value=" + value + "]";
 	}

@@ -88,6 +88,7 @@ public class JobRegistryBeanPostProcessor implements BeanPostProcessor, BeanFact
 	 * org.springframework.beans.factory.BeanFactoryAware#setBeanFactory(org
 	 * .springframework.beans.factory.BeanFactory)
 	 */
+    @Override
 	public void setBeanFactory(BeanFactory beanFactory) throws BeansException {
 		if (beanFactory instanceof DefaultListableBeanFactory) {
 			this.beanFactory = (DefaultListableBeanFactory) beanFactory;
@@ -99,6 +100,7 @@ public class JobRegistryBeanPostProcessor implements BeanPostProcessor, BeanFact
 	 * 
 	 * @see org.springframework.beans.factory.InitializingBean#afterPropertiesSet()
 	 */
+    @Override
 	public void afterPropertiesSet() throws Exception {
 		Assert.notNull(jobRegistry, "JobRegistry must not be null");
 	}
@@ -108,6 +110,7 @@ public class JobRegistryBeanPostProcessor implements BeanPostProcessor, BeanFact
 	 * post processor.
 	 * @see org.springframework.beans.factory.DisposableBean#destroy()
 	 */
+    @Override
 	public void destroy() throws Exception {
 		for (String name : jobNames) {
 			logger.debug("Unregistering job: " + name);
@@ -123,6 +126,7 @@ public class JobRegistryBeanPostProcessor implements BeanPostProcessor, BeanFact
 	 * @see org.springframework.beans.factory.config.BeanPostProcessor#postProcessAfterInitialization(java.lang.Object,
 	 * java.lang.String)
 	 */
+    @Override
 	public Object postProcessAfterInitialization(Object bean, String beanName) throws BeansException {
 		if (bean instanceof Job) {
 			Job job = (Job) bean;
@@ -165,6 +169,7 @@ public class JobRegistryBeanPostProcessor implements BeanPostProcessor, BeanFact
 	 * @see org.springframework.beans.factory.config.BeanPostProcessor#postProcessBeforeInitialization(java.lang.Object,
 	 * java.lang.String)
 	 */
+    @Override
 	public Object postProcessBeforeInitialization(Object bean, String beanName) throws BeansException {
 		return bean;
 	}

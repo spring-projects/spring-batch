@@ -49,6 +49,7 @@ public class StepExecutionSimpleCompletionPolicyTests extends TestCase {
 	 * mock step context
 	 */
 
+    @Override
 	protected void setUp() throws Exception {
 
 		JobParameters jobParameters = new JobParametersBuilder().addLong("commit.interval", 2L).toJobParameters();

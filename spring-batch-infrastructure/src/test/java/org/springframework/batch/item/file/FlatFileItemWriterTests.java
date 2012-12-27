@@ -231,6 +231,7 @@ public class FlatFileItemWriterTests {
 	@Test
 	public void testWriteWithConverter() throws Exception {
 		writer.setLineAggregator(new LineAggregator<String>() {
+            @Override
 			public String aggregate(String item) {
 				return "FOO:" + item;
 			}
@@ -251,6 +252,7 @@ public class FlatFileItemWriterTests {
 	@Test
 	public void testWriteWithConverterAndString() throws Exception {
 		writer.setLineAggregator(new LineAggregator<String>() {
+            @Override
 			public String aggregate(String item) {
 				return "FOO:" + item;
 			}
@@ -288,6 +290,7 @@ public class FlatFileItemWriterTests {
 
 		writer.setFooterCallback(new FlatFileFooterCallback() {
 
+            @Override
 			public void writeFooter(Writer writer) throws IOException {
 				writer.write("footer");
 			}
@@ -342,6 +345,7 @@ public class FlatFileItemWriterTests {
 
 		writer.open(executionContext);
 		new TransactionTemplate(transactionManager).execute(new TransactionCallback() {
+            @Override
 			public Object doInTransaction(TransactionStatus status) {
 				try {
 					writer.write(Collections.singletonList(TEST_STRING));
@@ -362,6 +366,7 @@ public class FlatFileItemWriterTests {
 
 		writer.setFooterCallback(new FlatFileFooterCallback() {
 
+            @Override
 			public void writeFooter(Writer writer) throws IOException {
 				writer.write("footer");
 			}
@@ -373,6 +378,7 @@ public class FlatFileItemWriterTests {
 		PlatformTransactionManager transactionManager = new ResourcelessTransactionManager();
 
 		new TransactionTemplate(transactionManager).execute(new TransactionCallback() {
+            @Override
 			public Object doInTransaction(TransactionStatus status) {
 				try {
 					// write some lines
@@ -395,6 +401,7 @@ public class FlatFileItemWriterTests {
 		writer.open(executionContext);
 
 		new TransactionTemplate(transactionManager).execute(new TransactionCallback() {
+            @Override
 			public Object doInTransaction(TransactionStatus status) {
 				try {
 					// write more lines
@@ -507,6 +514,7 @@ public class FlatFileItemWriterTests {
 	public void testWriteFooter() throws Exception {
 		writer.setFooterCallback(new FlatFileFooterCallback() {
 
+            @Override
 			public void writeFooter(Writer writer) throws IOException {
 				writer.write("a\nb");
 			}
@@ -524,6 +532,7 @@ public class FlatFileItemWriterTests {
 	public void testWriteHeader() throws Exception {
 		writer.setHeaderCallback(new FlatFileHeaderCallback() {
 
+            @Override
 			public void writeHeader(Writer writer) throws IOException {
 				writer.write("a\nb");
 			}
@@ -543,6 +552,7 @@ public class FlatFileItemWriterTests {
 	@Test
 	public void testWriteWithAppendAfterHeaders() throws Exception {
 		writer.setHeaderCallback(new FlatFileHeaderCallback() {
+            @Override
 			public void writeHeader(Writer writer) throws IOException {
 				writer.write("a\nb");
 			}
@@ -568,6 +578,7 @@ public class FlatFileItemWriterTests {
 	public void testWriteHeaderAndDeleteOnExit() throws Exception {
 		writer.setHeaderCallback(new FlatFileHeaderCallback() {
 
+            @Override
 			public void writeHeader(Writer writer) throws IOException {
 				writer.write("a\nb");
 			}
@@ -596,6 +607,7 @@ public class FlatFileItemWriterTests {
 	public void testWriteHeaderAfterRestartOnFirstChunk() throws Exception {
 		writer.setHeaderCallback(new FlatFileHeaderCallback() {
 
+            @Override
 			public void writeHeader(Writer writer) throws IOException {
 				writer.write("a\nb");
 			}
@@ -621,6 +633,7 @@ public class FlatFileItemWriterTests {
 	public void testWriteHeaderAfterRestartOnSecondChunk() throws Exception {
 		writer.setHeaderCallback(new FlatFileHeaderCallback() {
 
+            @Override
 			public void writeHeader(Writer writer) throws IOException {
 				writer.write("a\nb");
 			}
@@ -659,6 +672,7 @@ public class FlatFileItemWriterTests {
 
 		writer.setLineAggregator(new LineAggregator<String>() {
 
+            @Override
 			public String aggregate(String item) {
 				if (item.equals("2")) {
 					throw new RuntimeException("aggregation failed on " + item);

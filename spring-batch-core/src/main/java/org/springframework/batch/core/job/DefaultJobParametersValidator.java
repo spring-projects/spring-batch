@@ -50,6 +50,7 @@ public class DefaultJobParametersValidator implements JobParametersValidator, In
 	 * Check that there are no overlaps between required and optional keys.
 	 * @throws IllegalStateException if there is an overlap
 	 */
+    @Override
 	public void afterPropertiesSet() throws IllegalStateException {
 		for (String key : requiredKeys) {
 			Assert.state(!optionalKeys.contains(key), "Optional keys canot be required: " + key);
@@ -66,6 +67,7 @@ public class DefaultJobParametersValidator implements JobParametersValidator, In
 	 * 
 	 * @throws JobParametersInvalidException if the parameters are not valid
 	 */
+    @Override
 	public void validate(JobParameters parameters) throws JobParametersInvalidException {
 
 		if (parameters == null) {

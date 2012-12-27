@@ -32,6 +32,7 @@ public class TestReader extends AbstractTestComponent implements ItemReader<Stri
 		this.opened = opened;
 	}
 
+    @Override
 	public String read() throws Exception, UnexpectedInputException, ParseException {
 		executed = true;
 		synchronized (items) {
@@ -43,13 +44,16 @@ public class TestReader extends AbstractTestComponent implements ItemReader<Stri
 		return null;
 	}
 
+    @Override
 	public void close() throws ItemStreamException {
 	}
 
+    @Override
 	public void open(ExecutionContext executionContext) throws ItemStreamException {
 		opened = true;
 	}
 
+    @Override
 	public void update(ExecutionContext executionContext) throws ItemStreamException {
 	}
 

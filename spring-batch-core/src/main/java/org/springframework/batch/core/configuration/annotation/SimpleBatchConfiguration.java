@@ -58,21 +58,25 @@ public class SimpleBatchConfiguration extends AbstractBatchConfiguration {
 
 	private AtomicReference<PlatformTransactionManager> transactionManager = new AtomicReference<PlatformTransactionManager>();
 
+    @Override
 	@Bean
 	public JobRepository jobRepository() throws Exception {
 		return createLazyProxy(jobRepository, JobRepository.class);
 	}
 
+    @Override
 	@Bean
 	public JobLauncher jobLauncher() throws Exception {
 		return createLazyProxy(jobLauncher, JobLauncher.class);
 	}
 
+    @Override
 	@Bean
 	public JobRegistry jobRegistry() throws Exception {
 		return createLazyProxy(jobRegistry, JobRegistry.class);
 	}
 
+    @Override
 	@Bean
 	public PlatformTransactionManager transactionManager() throws Exception {
 		return createLazyProxy(transactionManager, PlatformTransactionManager.class);

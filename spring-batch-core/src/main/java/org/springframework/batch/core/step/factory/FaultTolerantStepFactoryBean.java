@@ -217,6 +217,7 @@ public class FaultTolerantStepFactoryBean<T, S> extends SimpleStepFactoryBean<T,
 		this.processorTransactional = processorTransactional;
 	}
 
+    @Override
 	protected SimpleStepBuilder<T, S> createBuilder(String name) {
 		return new FaultTolerantStepBuilder<T, S>(new StepBuilder(name));
 	}

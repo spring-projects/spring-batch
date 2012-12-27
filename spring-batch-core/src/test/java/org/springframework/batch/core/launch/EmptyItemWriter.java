@@ -39,6 +39,7 @@ public class EmptyItemWriter<T> implements ItemWriter<T>, InitializingBean {
 
 	List<Object> list;
 
+    @Override
 	public void afterPropertiesSet() throws Exception {
 		list = TransactionAwareProxyFactory.createTransactionalList();
 	}
@@ -47,6 +48,7 @@ public class EmptyItemWriter<T> implements ItemWriter<T>, InitializingBean {
 		this.failurePoint = failurePoint;
 	}
 
+    @Override
 	public void write(List<? extends T> items) {
 		for (T data : items) {
 			if (!failed && list.size() == failurePoint) {

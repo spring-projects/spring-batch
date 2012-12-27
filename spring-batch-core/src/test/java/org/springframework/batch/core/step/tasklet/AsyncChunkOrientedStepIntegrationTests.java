@@ -121,6 +121,7 @@ public class AsyncChunkOrientedStepIntegrationTests {
 
 		step.setTasklet(new TestingChunkOrientedTasklet<String>(getReader(new String[] { "a", "b", "c", "a", "b", "c",
 				"a", "b", "c", "a", "b", "c" }), new ItemWriter<String>() {
+            @Override
 			public void write(List<? extends String> data) throws Exception {
 				written.addAll(data);
 			}

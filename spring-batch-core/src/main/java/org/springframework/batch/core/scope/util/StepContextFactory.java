@@ -28,10 +28,12 @@ import org.springframework.batch.core.scope.context.StepSynchronizationManager;
  */
 public class StepContextFactory implements ContextFactory {
 
+    @Override
 	public Object getContext() {
 		return StepSynchronizationManager.getContext();
 	}
 
+    @Override
 	public String getContextId() {
 		StepContext context = StepSynchronizationManager.getContext();
 		return context!=null ? (String) context.getId() : "sysinit";

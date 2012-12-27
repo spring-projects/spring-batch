@@ -40,10 +40,12 @@ public abstract class AbstractHibernateQueryProvider implements HibernateQueryPr
     private StatelessSession statelessSession;
     private Session statefulSession;
     
+    @Override
     public void setStatelessSession(StatelessSession statelessSession) {
 		this.statelessSession = statelessSession;
 	}
 
+    @Override
 	public void setSession(Session statefulSession) {
 		this.statefulSession = statefulSession;
 	}

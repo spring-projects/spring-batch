@@ -53,6 +53,7 @@ public class SampleStepTests implements ApplicationContextAware {
 		assertEquals(2, jdbcTemplate.queryForInt("SELECT ID from TESTS where NAME = 'SampleTasklet2'"));
 	}
 
+    @Override
 	public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
 		this.context = applicationContext;
 	}

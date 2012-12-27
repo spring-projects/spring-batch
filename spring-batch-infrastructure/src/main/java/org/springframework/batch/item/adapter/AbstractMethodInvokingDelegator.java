@@ -129,6 +129,7 @@ public abstract class AbstractMethodInvokingDelegator<T> implements Initializing
 		}
 	}
 
+    @Override
 	public void afterPropertiesSet() throws Exception {
 		Assert.notNull(targetObject);
 		Assert.hasLength(targetMethod);

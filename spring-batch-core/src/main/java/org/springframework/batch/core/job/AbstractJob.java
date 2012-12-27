@@ -108,6 +108,7 @@ public abstract class AbstractJob implements Job, StepLocator, BeanNameAware,
 	 * 
 	 * @see InitializingBean#afterPropertiesSet()
 	 */
+    @Override
 	public void afterPropertiesSet() throws Exception {
 		Assert.notNull(jobRepository, "JobRepository must be set");
 	}
@@ -121,6 +122,7 @@ public abstract class AbstractJob implements Job, StepLocator, BeanNameAware,
 	 * 
 	 * @see org.springframework.beans.factory.BeanNameAware#setBeanName(java.lang.String)
 	 */
+    @Override
 	public void setBeanName(String name) {
 		if (this.name == null) {
 			this.name = name;
@@ -142,6 +144,7 @@ public abstract class AbstractJob implements Job, StepLocator, BeanNameAware,
 	 * 
 	 * @see org.springframework.batch.core.domain.IJob#getName()
 	 */
+    @Override
 	public String getName() {
 		return name;
 	}
@@ -153,6 +156,7 @@ public abstract class AbstractJob implements Job, StepLocator, BeanNameAware,
 	 * @param stepName
 	 * @return the Step
 	 */
+    @Override
 	public abstract Step getStep(String stepName);
 
 	/**
@@ -160,8 +164,10 @@ public abstract class AbstractJob implements Job, StepLocator, BeanNameAware,
 	 * 
 	 * @return the step names
 	 */
+    @Override
 	public abstract Collection<String> getStepNames();
 
+    @Override
 	public JobParametersValidator getJobParametersValidator() {
 		return jobParametersValidator;
 	}
@@ -180,6 +186,7 @@ public abstract class AbstractJob implements Job, StepLocator, BeanNameAware,
 	/**
 	 * @see Job#isRestartable()
 	 */
+    @Override
 	public boolean isRestartable() {
 		return restartable;
 	}
@@ -200,6 +207,7 @@ public abstract class AbstractJob implements Job, StepLocator, BeanNameAware,
 	 * 
 	 * @see org.springframework.batch.core.Job#getJobParametersIncrementer()
 	 */
+    @Override
 	public JobParametersIncrementer getJobParametersIncrementer() {
 		return this.jobParametersIncrementer;
 	}
@@ -273,6 +281,7 @@ public abstract class AbstractJob implements Job, StepLocator, BeanNameAware,
 	 * @throws StartLimitExceededException
 	 *             if start limit of one of the steps was exceeded
 	 */
+    @Override
 	public final void execute(JobExecution execution) {
 
 		logger.debug("Job execution starting: " + execution);
@@ -402,6 +411,7 @@ public abstract class AbstractJob implements Job, StepLocator, BeanNameAware,
 		jobRepository.update(jobExecution);
 	}
 
+    @Override
 	public String toString() {
 		return ClassUtils.getShortName(getClass()) + ": [name=" + name + "]";
 	}

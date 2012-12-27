@@ -145,6 +145,7 @@ public abstract class AbstractCursorItemReader<T> extends AbstractItemCountingIt
 	 * @throws IllegalArgumentException if either data source or sql properties
 	 * not set.
 	 */
+    @Override
 	public void afterPropertiesSet() throws Exception {
 		Assert.notNull(dataSource, "DataSource must be provided");
 	}
@@ -370,6 +371,7 @@ public abstract class AbstractCursorItemReader<T> extends AbstractItemCountingIt
 	 * Close the cursor and database connection. Make call to cleanupOnClose so sub classes can cleanup 
 	 * any resources they have allocated.
 	 */
+    @Override
 	protected void doClose() throws Exception {
 		initialized = false;
 		JdbcUtils.closeResultSet(this.rs);
@@ -432,6 +434,7 @@ public abstract class AbstractCursorItemReader<T> extends AbstractItemCountingIt
 	 * Read next row and map it to item, verify cursor position if
 	 * {@link #setVerifyCursorPosition(boolean)} is true.
 	 */
+    @Override
 	protected T doRead() throws Exception {
 		if (rs == null) {
 			throw new ReaderNotOpenException("Reader must be open before it can be read.");
@@ -466,6 +469,7 @@ public abstract class AbstractCursorItemReader<T> extends AbstractItemCountingIt
 	 * Use {@link ResultSet#absolute(int)} if possible, otherwise scroll by
 	 * calling {@link ResultSet#next()}.
 	 */
+    @Override
 	protected void jumpToItem(int itemIndex) throws Exception {
 		if (driverSupportsAbsolute) {
 			try {

@@ -69,6 +69,7 @@ public class MapJobExecutionDaoTests extends AbstractJobExecutionDaoTests {
 
 		// Implementation of the high-concurrency code
 		final Runnable codeUnderTest = new Runnable() {
+            @Override
 			public void run() {
 				try {
 					JobExecution jobExecution = new JobExecution(new JobInstance((long) -1, new JobParameters(), "mapJob"));
