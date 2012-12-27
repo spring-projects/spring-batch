@@ -67,11 +67,13 @@ public abstract class AbstractStep implements Step, InitializingBean, BeanNameAw
 		super();
 	}
 
+    @Override
 	public void afterPropertiesSet() throws Exception {
 		Assert.state(name != null, "A Step must have a name");
 		Assert.state(jobRepository != null, "JobRepository is mandatory");
 	}
 
+    @Override
 	public String getName() {
 		return this.name;
 	}
@@ -92,12 +94,14 @@ public abstract class AbstractStep implements Step, InitializingBean, BeanNameAw
 	 * 
 	 * @see org.springframework.beans.factory.BeanNameAware#setBeanName(java.lang.String)
 	 */
+    @Override
 	public void setBeanName(String name) {
 		if (this.name == null) {
 			this.name = name;
 		}
 	}
 
+    @Override
 	public int getStartLimit() {
 		return this.startLimit;
 	}
@@ -111,6 +115,7 @@ public abstract class AbstractStep implements Step, InitializingBean, BeanNameAw
 		this.startLimit = startLimit;
 	}
 
+    @Override
 	public boolean isAllowStartIfComplete() {
 		return this.allowStartIfComplete;
 	}
@@ -168,6 +173,7 @@ public abstract class AbstractStep implements Step, InitializingBean, BeanNameAw
 	 * {@link #open(ExecutionContext)}), execution logic ({@link #doExecute(StepExecution)}) and resource closing (
 	 * {@link #close(ExecutionContext)}).
 	 */
+    @Override
 	public final void execute(StepExecution stepExecution) throws JobInterruptedException,
 			UnexpectedJobExecutionException {
 
@@ -320,6 +326,7 @@ public abstract class AbstractStep implements Step, InitializingBean, BeanNameAw
 		return jobRepository;
 	}
 
+    @Override
 	public String toString() {
 		return ClassUtils.getShortName(getClass()) + ": [name=" + name + "]";
 	}

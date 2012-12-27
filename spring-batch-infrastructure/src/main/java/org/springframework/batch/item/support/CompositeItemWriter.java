@@ -45,12 +45,14 @@ public class CompositeItemWriter<T> implements ItemStreamWriter<T>, Initializing
 		this.ignoreItemStream = ignoreItemStream;
 	}
 
+    @Override
 	public void write(List<? extends T> item) throws Exception {
 		for (ItemWriter<? super T> writer : delegates) {
 			writer.write(item);
 		}
 	}
 
+    @Override
 	public void afterPropertiesSet() throws Exception {
 		Assert.notNull(delegates, "The 'delgates' may not be null");
 		Assert.notEmpty(delegates, "The 'delgates' may not be empty");
@@ -60,6 +62,7 @@ public class CompositeItemWriter<T> implements ItemStreamWriter<T>, Initializing
 		this.delegates = delegates;
 	}
 
+    @Override
 	public void close() throws ItemStreamException {
 		for (ItemWriter<? super T> writer : delegates) {
 			if (!ignoreItemStream && (writer instanceof ItemStream)) {
@@ -68,6 +71,7 @@ public class CompositeItemWriter<T> implements ItemStreamWriter<T>, Initializing
 		}
 	}
 
+    @Override
 	public void open(ExecutionContext executionContext) throws ItemStreamException {
 		for (ItemWriter<? super T> writer : delegates) {
 			if (!ignoreItemStream && (writer instanceof ItemStream)) {
@@ -76,6 +80,7 @@ public class CompositeItemWriter<T> implements ItemStreamWriter<T>, Initializing
 		}
 	}
 
+    @Override
 	public void update(ExecutionContext executionContext) throws ItemStreamException {
 		for (ItemWriter<? super T> writer : delegates) {
 			if (!ignoreItemStream && (writer instanceof ItemStream)) {

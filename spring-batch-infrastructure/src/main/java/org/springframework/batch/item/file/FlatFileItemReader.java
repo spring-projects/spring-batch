@@ -145,6 +145,7 @@ public class FlatFileItemReader<T> extends AbstractItemCountingItemStreamItemRea
 	/**
 	 * Public setter for the input resource.
 	 */
+    @Override
 	public void setResource(Resource resource) {
 		this.resource = resource;
 	}
@@ -272,6 +273,7 @@ public class FlatFileItemReader<T> extends AbstractItemCountingItemStreamItemRea
 		noInput = false;
 	}
 
+    @Override
 	public void afterPropertiesSet() throws Exception {
 		Assert.notNull(lineMapper, "LineMapper is required");
 	}

@@ -596,12 +596,14 @@ public class FaultTolerantStepFactoryBeanRollbackTests {
 			this.throwBefore  = throwBefore;
 		}
 		
+        @Override
 		public void beforeChunk() {
 			if(throwBefore){
 				throw new IllegalArgumentException("Planned exception");
 			}
 		}
 
+        @Override
 		public void afterChunk() {
 			throw new IllegalArgumentException("Planned exception");
 			

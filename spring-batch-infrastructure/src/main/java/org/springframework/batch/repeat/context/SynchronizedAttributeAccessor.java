@@ -42,6 +42,7 @@ public class SynchronizedAttributeAccessor implements AttributeAccessor {
 	 * (non-Javadoc)
 	 * @see org.springframework.core.AttributeAccessor#attributeNames()
 	 */
+    @Override
 	public String[] attributeNames() {
 		synchronized (support) {
 			return support.attributeNames();
@@ -52,6 +53,7 @@ public class SynchronizedAttributeAccessor implements AttributeAccessor {
 	 * (non-Javadoc)
 	 * @see java.lang.Object#equals(java.lang.Object)
 	 */
+    @Override
 	public boolean equals(Object other) {
 		if (this == other) {
 			return true;
@@ -75,6 +77,7 @@ public class SynchronizedAttributeAccessor implements AttributeAccessor {
 	 * (non-Javadoc)
 	 * @see org.springframework.core.AttributeAccessor#getAttribute(java.lang.String)
 	 */
+    @Override
 	public Object getAttribute(String name) {
 		synchronized (support) {
 			return support.getAttribute(name);
@@ -85,6 +88,7 @@ public class SynchronizedAttributeAccessor implements AttributeAccessor {
 	 * (non-Javadoc)
 	 * @see org.springframework.core.AttributeAccessor#hasAttribute(java.lang.String)
 	 */
+    @Override
 	public boolean hasAttribute(String name) {
 		synchronized (support) {
 			return support.hasAttribute(name);
@@ -95,6 +99,7 @@ public class SynchronizedAttributeAccessor implements AttributeAccessor {
 	 * (non-Javadoc)
 	 * @see java.lang.Object#hashCode()
 	 */
+    @Override
 	public int hashCode() {
 		return support.hashCode();
 	}
@@ -103,6 +108,7 @@ public class SynchronizedAttributeAccessor implements AttributeAccessor {
 	 * (non-Javadoc)
 	 * @see org.springframework.core.AttributeAccessor#removeAttribute(java.lang.String)
 	 */
+    @Override
 	public Object removeAttribute(String name) {
 		synchronized (support) {
 			return support.removeAttribute(name);
@@ -114,6 +120,7 @@ public class SynchronizedAttributeAccessor implements AttributeAccessor {
 	 * @see org.springframework.core.AttributeAccessor#setAttribute(java.lang.String,
 	 * java.lang.Object)
 	 */
+    @Override
 	public void setAttribute(String name, Object value) {
 		synchronized (support) {
 			support.setAttribute(name, value);
@@ -142,6 +149,7 @@ public class SynchronizedAttributeAccessor implements AttributeAccessor {
 	 * (non-Javadoc)
 	 * @see java.lang.Object#toString()
 	 */
+    @Override
 	public String toString() {
 		StringBuffer buffer = new StringBuffer("SynchronizedAttributeAccessor: [");
 		synchronized (support) {

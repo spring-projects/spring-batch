@@ -9,6 +9,7 @@ import org.springframework.jdbc.core.RowMapper;
 
 public class FooRowMapper implements RowMapper {
 
+        @Override
 		public Object mapRow(ResultSet rs, int rowNum) throws SQLException {
 
 			Foo foo = new Foo();

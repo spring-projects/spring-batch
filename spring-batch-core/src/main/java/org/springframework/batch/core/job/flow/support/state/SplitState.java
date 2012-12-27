@@ -67,6 +67,7 @@ public class SplitState extends AbstractState implements FlowHolder {
 	/**
 	 * @return the flows
 	 */
+    @Override
 	public Collection<Flow> getFlows() {
 		return flows;
 	}
@@ -87,6 +88,7 @@ public class SplitState extends AbstractState implements FlowHolder {
 		for (final Flow flow : flows) {
 
 			final FutureTask<FlowExecution> task = new FutureTask<FlowExecution>(new Callable<FlowExecution>() {
+                @Override
 				public FlowExecution call() throws Exception {
 					return flow.start(executor);
 				}
@@ -130,6 +132,7 @@ public class SplitState extends AbstractState implements FlowHolder {
 	 * 
 	 * @see org.springframework.batch.core.job.flow.State#isEndState()
 	 */
+    @Override
 	public boolean isEndState() {
 		return false;
 	}

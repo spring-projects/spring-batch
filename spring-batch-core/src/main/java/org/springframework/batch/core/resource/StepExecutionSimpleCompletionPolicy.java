@@ -71,6 +71,7 @@ public class StepExecutionSimpleCompletionPolicy extends StepExecutionListenerSu
 	 * 
 	 * @see org.springframework.batch.core.listener.StepExecutionListenerSupport#beforeStep(org.springframework.batch.core.StepExecution)
 	 */
+    @Override
 	public void beforeStep(StepExecution stepExecution) {
 		JobParameters jobParameters = stepExecution.getJobParameters();
 		Assert.state(jobParameters.getParameters().containsKey(keyName),
@@ -85,6 +86,7 @@ public class StepExecutionSimpleCompletionPolicy extends StepExecutionListenerSu
 	 * indicates completion
 	 * @see CompletionPolicy#isComplete(RepeatContext, RepeatStatus)
 	 */
+    @Override
 	public boolean isComplete(RepeatContext context, RepeatStatus result) {
 		Assert.state(delegate != null, "The delegate resource has not been initialised. "
 				+ "Remember to register this object as a StepListener.");
@@ -96,6 +98,7 @@ public class StepExecutionSimpleCompletionPolicy extends StepExecutionListenerSu
 	 * @return if the commit interval has been reached
 	 * @see org.springframework.batch.repeat.CompletionPolicy#isComplete(org.springframework.batch.repeat.RepeatContext)
 	 */
+    @Override
 	public boolean isComplete(RepeatContext context) {
 		Assert.state(delegate != null, "The delegate resource has not been initialised. "
 				+ "Remember to register this object as a StepListener.");
@@ -107,6 +110,7 @@ public class StepExecutionSimpleCompletionPolicy extends StepExecutionListenerSu
 	 * @return a new {@link RepeatContext}
 	 * @see org.springframework.batch.repeat.CompletionPolicy#start(org.springframework.batch.repeat.RepeatContext)
 	 */
+    @Override
 	public RepeatContext start(RepeatContext parent) {
 		Assert.state(delegate != null, "The delegate resource has not been initialised. "
 				+ "Remember to register this object as a StepListener.");
@@ -117,6 +121,7 @@ public class StepExecutionSimpleCompletionPolicy extends StepExecutionListenerSu
 	 * @param context
 	 * @see org.springframework.batch.repeat.CompletionPolicy#update(org.springframework.batch.repeat.RepeatContext)
 	 */
+    @Override
 	public void update(RepeatContext context) {
 		Assert.state(delegate != null, "The delegate resource has not been initialised. "
 				+ "Remember to register this object as a StepListener.");
@@ -127,6 +132,7 @@ public class StepExecutionSimpleCompletionPolicy extends StepExecutionListenerSu
 	 * Delegates to the wrapped {@link CompletionPolicy} if set, otherwise
 	 * returns the value of {@link #setKeyName(String)}.
 	 */
+    @Override
 	public String toString() {
 		return (delegate == null) ? keyName : delegate.toString();
 	}

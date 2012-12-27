@@ -24,11 +24,13 @@ public class StaxEventItemReaderCommonTests extends AbstractItemStreamItemReader
 
 	private final static String FOOS = "<foos> <foo value=\"1\"/> <foo value=\"2\"/> <foo value=\"3\"/> <foo value=\"4\"/> <foo value=\"5\"/> </foos>";
 
+    @Override
 	protected ItemReader<Foo> getItemReader() throws Exception {
 		StaxEventItemReader<Foo> reader = new StaxEventItemReader<Foo>();
 		reader.setResource(new ByteArrayResource(FOOS.getBytes()));
 		reader.setFragmentRootElementName("foo");
 		reader.setUnmarshaller(new Unmarshaller() {
+            @Override
 			public Object unmarshal(Source source) throws XmlMappingException, IOException {
 				Attribute attr = null ;
 				try {
@@ -45,6 +47,7 @@ public class StaxEventItemReaderCommonTests extends AbstractItemStreamItemReader
 				return foo;
 			}
 
+            @Override
 			@SuppressWarnings("rawtypes")
 			public boolean supports(Class clazz) {
 				return true;
@@ -57,6 +60,7 @@ public class StaxEventItemReaderCommonTests extends AbstractItemStreamItemReader
 		return reader;
 	}
 
+    @Override
 	protected void pointToEmptyInput(ItemReader<Foo> tested) throws Exception {
 		StaxEventItemReader<Foo> reader = (StaxEventItemReader<Foo>) tested;
 		reader.close();

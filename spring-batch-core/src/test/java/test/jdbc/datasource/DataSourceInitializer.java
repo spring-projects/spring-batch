@@ -73,6 +73,7 @@ public class DataSourceInitializer implements InitializingBean {
 				DataSourceInitializer.class.getSimpleName() + "-context.xml"));
 	}
 
+    @Override
 	public void afterPropertiesSet() throws Exception {
 		Assert.notNull(dataSource);
 		initialize();
@@ -98,6 +99,7 @@ public class DataSourceInitializer implements InitializingBean {
 		TransactionTemplate transactionTemplate = new TransactionTemplate(new DataSourceTransactionManager(dataSource));
 		transactionTemplate.execute(new TransactionCallback() {
 
+            @Override
 			@SuppressWarnings("unchecked")
 			public Object doInTransaction(TransactionStatus status) {
 				JdbcTemplate jdbcTemplate = new JdbcTemplate(dataSource);

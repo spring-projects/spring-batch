@@ -53,6 +53,7 @@ public class TaskExecutorPartitionHandler extends AbstractPartitionHandler imple
 
 	private Step step;
 
+    @Override
 	public void afterPropertiesSet() throws Exception {
 	}
 
@@ -84,6 +85,7 @@ public class TaskExecutorPartitionHandler extends AbstractPartitionHandler imple
 	 * @return the step instance that will be used
 	 * @see StepHolder#getStep()
 	 */
+    @Override
 	public Step getStep() {
 		return this.step;
 	}
@@ -132,6 +134,7 @@ public class TaskExecutorPartitionHandler extends AbstractPartitionHandler imple
     protected FutureTask<StepExecution> createTask(final Step step,
                                                    final StepExecution stepExecution) {
         return new FutureTask<StepExecution>(new Callable<StepExecution>() {
+            @Override
             public StepExecution call() throws Exception {
                 step.execute(stepExecution);
                 return stepExecution;

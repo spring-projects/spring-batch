@@ -29,6 +29,7 @@ public class CoreNamespaceHandler extends NamespaceHandlerSupport {
 	/**
 	 * @see NamespaceHandler#init()
 	 */
+    @Override
 	public void init() {
 		this.registerBeanDefinitionParser("job", new JobParser());
 		this.registerBeanDefinitionParser("flow", new TopLevelFlowParser());

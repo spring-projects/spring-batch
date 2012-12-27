@@ -25,6 +25,7 @@ package org.springframework.batch.core.step.skip;
  */
 public class AlwaysSkipItemSkipPolicy implements SkipPolicy {
 
+    @Override
 	public boolean shouldSkip(Throwable t, int skipCount) {
 		return true;
 	}

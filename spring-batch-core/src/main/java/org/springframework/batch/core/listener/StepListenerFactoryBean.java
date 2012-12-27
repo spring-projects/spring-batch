@@ -29,18 +29,22 @@ import org.springframework.batch.core.StepListener;
  */
 public class StepListenerFactoryBean extends AbstractListenerFactoryBean {
 
+    @Override
 	protected ListenerMetaData getMetaDataFromPropertyName(String propertyName) {
 		return StepListenerMetaData.fromPropertyName(propertyName);
 	}
 
+    @Override
 	protected ListenerMetaData[] getMetaDataValues() {
 		return StepListenerMetaData.values();
 	}
 
+    @Override
 	protected Class<?> getDefaultListenerClass() {
 		return StepListener.class;
 	}
 
+    @Override
 	@SuppressWarnings("rawtypes")
 	public Class getObjectType() {
 		return StepListener.class;

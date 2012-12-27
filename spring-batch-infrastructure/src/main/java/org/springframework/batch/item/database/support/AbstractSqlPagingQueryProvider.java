@@ -151,14 +151,17 @@ public abstract class AbstractSqlPagingQueryProvider implements PagingQueryProvi
 	 * 
 	 * @return sortKey key to use to sort and limit page content
 	 */
+    @Override
 	public Map<String, Order> getSortKeys() {
 		return sortKeys;
 	}
 
+    @Override
 	public int getParameterCount() {
 		return parameterCount;
 	}
 
+    @Override
 	public boolean isUsingNamedParameters() {
 		return usingNamedParameters;
 	}
@@ -169,6 +172,7 @@ public abstract class AbstractSqlPagingQueryProvider implements PagingQueryProvi
 	 * 
 	 * @return place holder for sortKey.
 	 */
+    @Override
 	public String getSortKeyPlaceHolder(String keyName) {
 		return usingNamedParameters ? ":_" + keyName : "?";
 	}
@@ -177,6 +181,7 @@ public abstract class AbstractSqlPagingQueryProvider implements PagingQueryProvi
 	 * Check mandatory properties.
 	 * @see org.springframework.beans.factory.InitializingBean#afterPropertiesSet()
 	 */
+    @Override
 	public void init(DataSource dataSource) throws Exception {
 		Assert.notNull(dataSource);
 		Assert.hasLength(selectClause, "selectClause must be specified");
@@ -209,6 +214,7 @@ public abstract class AbstractSqlPagingQueryProvider implements PagingQueryProvi
 	 * @param pageSize number of rows to read per page
 	 * @return query string
 	 */
+    @Override
 	public abstract String generateFirstPageQuery(int pageSize);
 
 	/**
@@ -218,6 +224,7 @@ public abstract class AbstractSqlPagingQueryProvider implements PagingQueryProvi
 	 * @param pageSize number of rows to read per page
 	 * @return query string
 	 */
+    @Override
 	public abstract String generateRemainingPagesQuery(int pageSize);
 
 	/**
@@ -228,6 +235,7 @@ public abstract class AbstractSqlPagingQueryProvider implements PagingQueryProvi
 	 * @param pageSize number of rows to read per page
 	 * @return query string
 	 */
+    @Override
 	public abstract String generateJumpToItemQuery(int itemIndex, int pageSize);
 
 	private String removeKeyWord(String keyWord, String clause) {

@@ -38,6 +38,7 @@ public class SpringValidator<T> implements Validator<T>, InitializingBean {
 	/**
 	 * @see Validator#validate(Object)
 	 */
+    @Override
 	public void validate(T item) throws ValidationException {
 
 		if (!validator.supports(item.getClass())) {
@@ -81,6 +82,7 @@ public class SpringValidator<T> implements Validator<T>, InitializingBean {
 		this.validator = validator;
 	}
 
+    @Override
 	public void afterPropertiesSet() throws Exception {
 		Assert.notNull(validator, "validator must be set");
 

@@ -51,6 +51,7 @@ public class ResultHolderResultQueue implements ResultQueue<ResultHolder> {
 		waits = new Semaphore(throttleLimit);
 	}
 
+    @Override
 	public boolean isEmpty() {
 		return results.isEmpty();
 	}
@@ -60,6 +61,7 @@ public class ResultHolderResultQueue implements ResultQueue<ResultHolder> {
 	 * 
 	 * @see org.springframework.batch.repeat.support.ResultQueue#isExpecting()
 	 */
+    @Override
 	public boolean isExpecting() {
 		// Base the decision about whether we expect more results on a
 		// counter of the number of expected results actually collected.
@@ -74,6 +76,7 @@ public class ResultHolderResultQueue implements ResultQueue<ResultHolder> {
 	 * 
 	 * @see ResultQueue#expect()
 	 */
+    @Override
 	public void expect() throws InterruptedException {
 		waits.acquire();
 		// Don't acquire the lock in a synchronized block - might deadlock
@@ -82,6 +85,7 @@ public class ResultHolderResultQueue implements ResultQueue<ResultHolder> {
 		}
 	}
 
+    @Override
 	public void put(ResultHolder holder) throws IllegalArgumentException {
 		if (!isExpecting()) {
 			throw new IllegalArgumentException("Not expecting a result.  Call expect() before put().");
@@ -115,6 +119,7 @@ public class ResultHolderResultQueue implements ResultQueue<ResultHolder> {
 	 * 
 	 * @see ResultQueue#take()
 	 */
+    @Override
 	public ResultHolder take() throws NoSuchElementException, InterruptedException {
 		if (!isExpecting()) {
 			throw new NoSuchElementException("Not expecting a result.  Call expect() before take().");
@@ -150,6 +155,7 @@ public class ResultHolderResultQueue implements ResultQueue<ResultHolder> {
 	 * 
 	 */
 	private static class ResultHolderComparator implements Comparator<ResultHolder> {
+        @Override
 		public int compare(ResultHolder h1, ResultHolder h2) {
 			RepeatStatus result1 = h1.getResult();
 			RepeatStatus result2 = h2.getResult();

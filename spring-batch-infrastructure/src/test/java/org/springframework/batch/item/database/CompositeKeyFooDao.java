@@ -38,12 +38,14 @@ public class CompositeKeyFooDao extends JdbcDaoSupport implements FooDao {
 	/* (non-Javadoc)
 	 * @see org.springframework.batch.io.sql.scratch.FooDao#getFoo(java.lang.Object)
 	 */
+    @Override
 	public Foo getFoo(Object key) {
 
 		Map<?,?> keys = (Map<?,?>)key;
 		Object[] args = keys.values().toArray();
 
 		RowMapper fooMapper = new RowMapper(){
+            @Override
 			public Object mapRow(ResultSet rs, int rowNum) throws SQLException {
 				Foo foo = new Foo();
 				foo.setId(rs.getInt(1));

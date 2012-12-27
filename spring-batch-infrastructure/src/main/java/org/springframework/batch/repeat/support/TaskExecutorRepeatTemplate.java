@@ -95,6 +95,7 @@ public class TaskExecutorRepeatTemplate extends RepeatTemplate {
 	 * method so there is no need to synchronize access.
 	 * 
 	 */
+    @Override
 	protected RepeatStatus getNextResult(RepeatContext context, RepeatCallback callback, RepeatInternalState state)
 			throws Throwable {
 
@@ -153,6 +154,7 @@ public class TaskExecutorRepeatTemplate extends RepeatTemplate {
 	 * 
 	 * @see org.springframework.batch.repeat.support.RepeatTemplate#waitForResults(org.springframework.batch.repeat.support.RepeatInternalState)
 	 */
+    @Override
 	protected boolean waitForResults(RepeatInternalState state) {
 
 		ResultQueue<ResultHolder> queue = ((ResultQueueInternalState) state).getResultQueue();
@@ -191,6 +193,7 @@ public class TaskExecutorRepeatTemplate extends RepeatTemplate {
 		return result;
 	}
 
+    @Override
 	protected RepeatInternalState createInternalState(RepeatContext context) {
 		// Queue of pending results:
 		return new ResultQueueInternalState(throttleLimit);
@@ -243,6 +246,7 @@ public class TaskExecutorRepeatTemplate extends RepeatTemplate {
 		 * 
 		 * @see java.lang.Runnable#run()
 		 */
+        @Override
 		public void run() {
 			boolean clearContext = false;
 			try {
@@ -276,6 +280,7 @@ public class TaskExecutorRepeatTemplate extends RepeatTemplate {
 		 * Get the result - never blocks because the queue manages waiting for
 		 * the task to finish.
 		 */
+        @Override
 		public RepeatStatus getResult() {
 			return result;
 		}
@@ -284,6 +289,7 @@ public class TaskExecutorRepeatTemplate extends RepeatTemplate {
 		 * Get the error - never blocks because the queue manages waiting for
 		 * the task to finish.
 		 */
+        @Override
 		public Throwable getError() {
 			return error;
 		}
@@ -291,6 +297,7 @@ public class TaskExecutorRepeatTemplate extends RepeatTemplate {
 		/**
 		 * Getter for the context.
 		 */
+        @Override
 		public RepeatContext getContext() {
 			return this.context;
 		}

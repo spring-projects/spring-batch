@@ -165,6 +165,7 @@ public final class StateTransition implements Comparable<StateTransition> {
 	 * fo? > foo.
 	 * @see Comparable#compareTo(Object)
 	 */
+    @Override
 	public int compareTo(StateTransition other) {
 		String value = other.pattern;
 		if (pattern.equals(value)) {

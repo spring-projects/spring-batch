@@ -49,6 +49,7 @@ public class MapExecutionContextDao implements ExecutionContextDao {
 			this.id = id;
 		}
 
+        @Override
 		public int compareTo(ContextKey them) {
 			if(them == null) return 1;
 			final int idCompare = new Long(this.id).compareTo(new Long(them.id)); // JDK6 Make this Long.compare(x,y)
@@ -93,10 +94,12 @@ public class MapExecutionContextDao implements ExecutionContextDao {
 		return (ExecutionContext) SerializationUtils.deserialize(SerializationUtils.serialize(original));
 	}
 
+    @Override
 	public ExecutionContext getExecutionContext(StepExecution stepExecution) {
 		return copy(contexts.get(ContextKey.step(stepExecution.getId())));
 	}
 
+    @Override
 	public void updateExecutionContext(StepExecution stepExecution) {
 		ExecutionContext executionContext = stepExecution.getExecutionContext();
 		if (executionContext != null) {
@@ -104,10 +107,12 @@ public class MapExecutionContextDao implements ExecutionContextDao {
 		}
 	}
 
+    @Override
 	public ExecutionContext getExecutionContext(JobExecution jobExecution) {
 		return copy(contexts.get(ContextKey.job(jobExecution.getId())));
 	}
 
+    @Override
 	public void updateExecutionContext(JobExecution jobExecution) {
 		ExecutionContext executionContext = jobExecution.getExecutionContext();
 		if (executionContext != null) {
@@ -115,10 +120,12 @@ public class MapExecutionContextDao implements ExecutionContextDao {
 		}
 	}
 
+    @Override
 	public void saveExecutionContext(JobExecution jobExecution) {
 		updateExecutionContext(jobExecution);
 	}
 
+    @Override
 	public void saveExecutionContext(StepExecution stepExecution) {
 		updateExecutionContext(stepExecution);
 	}

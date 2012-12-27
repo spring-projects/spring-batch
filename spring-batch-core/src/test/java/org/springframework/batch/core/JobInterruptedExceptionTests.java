@@ -25,6 +25,7 @@ public class JobInterruptedExceptionTests extends AbstractExceptionTests {
 	/* (non-Javadoc)
 	 * @see org.springframework.batch.io.exception.AbstractExceptionTests#getException(java.lang.String)
 	 */
+    @Override
 	public Exception getException(String msg) throws Exception {
 		return new JobInterruptedException(msg);
 	}
@@ -32,6 +33,7 @@ public class JobInterruptedExceptionTests extends AbstractExceptionTests {
 	/* (non-Javadoc)
 	 * @see org.springframework.batch.io.exception.AbstractExceptionTests#getException(java.lang.String, java.lang.Throwable)
 	 */
+    @Override
 	public Exception getException(String msg, Throwable t) throws Exception {
 		return new RuntimeException(msg, t);
 	}

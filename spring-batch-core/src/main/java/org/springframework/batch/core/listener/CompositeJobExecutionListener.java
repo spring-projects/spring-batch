@@ -53,6 +53,7 @@ public class CompositeJobExecutionListener implements JobExecutionListener {
 	 * prioritising those that implement {@link Ordered}.
 	 * @see org.springframework.batch.core.JobExecutionListener#afterJob(org.springframework.batch.core.JobExecution)
 	 */
+    @Override
 	public void afterJob(JobExecution jobExecution) {
 		for (Iterator<JobExecutionListener> iterator = listeners.reverse(); iterator.hasNext();) {
 			JobExecutionListener listener = iterator.next();
@@ -65,6 +66,7 @@ public class CompositeJobExecutionListener implements JobExecutionListener {
 	 * that implement {@link Ordered}.
 	 * @see org.springframework.batch.core.JobExecutionListener#beforeJob(org.springframework.batch.core.JobExecution)
 	 */
+    @Override
 	public void beforeJob(JobExecution jobExecution) {
 		for (Iterator<JobExecutionListener> iterator = listeners.iterator(); iterator.hasNext();) {
 			JobExecutionListener listener = iterator.next();

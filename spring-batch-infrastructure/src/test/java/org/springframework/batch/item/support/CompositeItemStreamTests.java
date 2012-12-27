@@ -38,6 +38,7 @@ public class CompositeItemStreamTests extends TestCase {
 
 	public void testRegisterAndOpen() {
 		ItemStreamSupport stream = new ItemStreamSupport() {
+            @Override
 			public void open(ExecutionContext executionContext) throws ItemStreamException {
 				list.add("bar");
 			}
@@ -49,6 +50,7 @@ public class CompositeItemStreamTests extends TestCase {
 
 	public void testRegisterTwice() {
 		ItemStreamSupport stream = new ItemStreamSupport() {
+            @Override
 			public void open(ExecutionContext executionContext) throws ItemStreamException {
 				list.add("bar");
 			}
@@ -61,6 +63,7 @@ public class CompositeItemStreamTests extends TestCase {
 
 	public void testMark() {
 		manager.register(new ItemStreamSupport() {
+            @Override
 			public void update(ExecutionContext executionContext) {
 				list.add("bar");
 			}
@@ -71,6 +74,7 @@ public class CompositeItemStreamTests extends TestCase {
 
 	public void testClose() {
 		manager.register(new ItemStreamSupport() {
+            @Override
 			public void close() throws ItemStreamException {
 				list.add("bar");
 			}
@@ -81,6 +85,7 @@ public class CompositeItemStreamTests extends TestCase {
 
 	public void testCloseDoesNotUnregister() {
 		manager.setStreams(new ItemStream[] { new ItemStreamSupport() {
+            @Override
 			public void open(ExecutionContext executionContext) throws ItemStreamException {
 				list.add("bar");
 			}

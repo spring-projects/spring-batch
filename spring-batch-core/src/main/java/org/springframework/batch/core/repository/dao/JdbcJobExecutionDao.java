@@ -102,11 +102,13 @@ public class JdbcJobExecutionDao extends AbstractJdbcBatchMetadataDao implements
 		this.jobExecutionIncrementer = jobExecutionIncrementer;
 	}
 
+    @Override
 	public void afterPropertiesSet() throws Exception {
 		super.afterPropertiesSet();
 		Assert.notNull(jobExecutionIncrementer, "The jobExecutionIncrementer must not be null.");
 	}
 
+    @Override
 	public List<JobExecution> findJobExecutions(final JobInstance job) {
 
 		Assert.notNull(job, "Job cannot be null.");
@@ -125,6 +127,7 @@ public class JdbcJobExecutionDao extends AbstractJdbcBatchMetadataDao implements
 	 * @throws IllegalArgumentException if jobExecution is null, as well as any
 	 * of it's fields to be persisted.
 	 */
+    @Override
 	public void saveJobExecution(JobExecution jobExecution) {
 
 		validateJobExecution(jobExecution);
@@ -166,6 +169,7 @@ public class JdbcJobExecutionDao extends AbstractJdbcBatchMetadataDao implements
 	 * 
 	 * @see JobExecutionDao#updateJobExecution(JobExecution)
 	 */
+    @Override
 	public void updateJobExecution(JobExecution jobExecution) {
 
 		validateJobExecution(jobExecution);
@@ -217,6 +221,7 @@ public class JdbcJobExecutionDao extends AbstractJdbcBatchMetadataDao implements
 		}
 	}
 
+    @Override
 	public JobExecution getLastJobExecution(JobInstance jobInstance) {
 
 		Long id = jobInstance.getId();
@@ -240,6 +245,7 @@ public class JdbcJobExecutionDao extends AbstractJdbcBatchMetadataDao implements
 	 * @seeorg.springframework.batch.core.repository.dao.JobExecutionDao#
 	 * getLastJobExecution(java.lang.String)
 	 */
+    @Override
 	public JobExecution getJobExecution(Long executionId) {
 		try {
 			JobExecution jobExecution = getJdbcTemplate().queryForObject(getQuery(GET_EXECUTION_BY_ID),
@@ -257,10 +263,12 @@ public class JdbcJobExecutionDao extends AbstractJdbcBatchMetadataDao implements
 	 * @seeorg.springframework.batch.core.repository.dao.JobExecutionDao#
 	 * findRunningJobExecutions(java.lang.String)
 	 */
+    @Override
 	public Set<JobExecution> findRunningJobExecutions(String jobName) {
 
 		final Set<JobExecution> result = new HashSet<JobExecution>();
 		RowCallbackHandler handler = new RowCallbackHandler() {
+            @Override
 			public void processRow(ResultSet rs) throws SQLException {
 				JobExecutionRowMapper mapper = new JobExecutionRowMapper();
 				result.add(mapper.mapRow(rs, 0));
@@ -271,6 +279,7 @@ public class JdbcJobExecutionDao extends AbstractJdbcBatchMetadataDao implements
 		return result;
 	}
 
+    @Override
 	public void synchronizeStatus(JobExecution jobExecution) {
 		int currentVersion = getJdbcTemplate().queryForInt(getQuery(CURRENT_VERSION_JOB_EXECUTION),
 				jobExecution.getId());
@@ -299,6 +308,7 @@ public class JdbcJobExecutionDao extends AbstractJdbcBatchMetadataDao implements
 			this.jobInstance = jobInstance;
 		}
 
+        @Override
 		public JobExecution mapRow(ResultSet rs, int rowNum) throws SQLException {
 			Long id = rs.getLong(1);
 			JobExecution jobExecution;

@@ -29,6 +29,7 @@ import org.springframework.batch.repeat.RepeatStatus;
  */
 public class FailingTasklet extends NameStoringTasklet {
 
+    @Override
 	public RepeatStatus execute(StepContribution contribution, ChunkContext chunkContext) throws Exception {
 		super.execute(contribution, chunkContext);
 		throw new RuntimeException();

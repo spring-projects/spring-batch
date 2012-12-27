@@ -48,15 +48,18 @@ public class FlatFileItemReaderTests {
 			// 1 record = 2 lines
 			boolean pair = true;
 
+            @Override
 			public boolean isEndOfRecord(String line) {
 				pair = !pair;
 				return pair;
 			}
 
+            @Override
 			public String postProcess(String record) {
 				return record;
 			}
 
+            @Override
 			public String preProcess(String record) {
 				return record;
 			}
@@ -83,15 +86,18 @@ public class FlatFileItemReaderTests {
 			// 1 record = 2 lines
 			boolean pair = true;
 
+            @Override
 			public boolean isEndOfRecord(String line) {
 				pair = !pair;
 				return pair;
 			}
 
+            @Override
 			public String postProcess(String record) {
 				return record;
 			}
 
+            @Override
 			public String preProcess(String record) {
 				return record;
 			}
@@ -119,14 +125,17 @@ public class FlatFileItemReaderTests {
 
 		reader.setRecordSeparatorPolicy(new RecordSeparatorPolicy() {
 
+            @Override
 			public boolean isEndOfRecord(String line) {
 				return StringUtils.hasText(line);
 			}
 
+            @Override
 			public String postProcess(String record) {
 				return StringUtils.hasText(record) ? record : null;
 			}
 
+            @Override
 			public String preProcess(String record) {
 				return record;
 			}
@@ -150,6 +159,7 @@ public class FlatFileItemReaderTests {
 			// 1 record = 2 lines
 			boolean pair = true;
 
+            @Override
 			public boolean isEndOfRecord(String line) {
 				if (StringUtils.hasText(line)) {
 					pair = !pair;
@@ -157,10 +167,12 @@ public class FlatFileItemReaderTests {
 				return pair;
 			}
 
+            @Override
 			public String postProcess(String record) {
 				return StringUtils.hasText(record) ? record : null;
 			}
 
+            @Override
 			public String preProcess(String record) {
 				return record;
 			}
@@ -305,14 +317,17 @@ public class FlatFileItemReaderTests {
 	public void testOpenBadIOInput() throws Exception {
 
 		reader.setResource(new AbstractResource() {
+            @Override
 			public String getDescription() {
 				return null;
 			}
 
+            @Override
 			public InputStream getInputStream() throws IOException {
 				throw new IOException();
 			}
 
+            @Override
 			public boolean exists() {
 				return true;
 			}
@@ -387,6 +402,7 @@ public class FlatFileItemReaderTests {
 	@Test
 	public void testMappingExceptionWrapping() throws Exception {
 		LineMapper<String> exceptionLineMapper = new LineMapper<String>() {
+            @Override
 			public String mapLine(String line, int lineNumber) throws Exception {
 				if (lineNumber == 2) {
 					throw new Exception("Couldn't map line 2");
@@ -421,14 +437,17 @@ public class FlatFileItemReaderTests {
 		public NonExistentResource() {
 		}
 
+        @Override
 		public boolean exists() {
 			return false;
 		}
 
+        @Override
 		public String getDescription() {
 			return "NonExistentResource";
 		}
 
+        @Override
 		public InputStream getInputStream() throws IOException {
 			return null;
 		}

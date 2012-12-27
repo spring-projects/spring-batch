@@ -75,6 +75,7 @@ public class SimpleFlow implements Flow, InitializingBean {
 	 * 
 	 * @see Flow#getName()
 	 */
+    @Override
 	public String getName() {
 		return name;
 	}
@@ -92,6 +93,7 @@ public class SimpleFlow implements Flow, InitializingBean {
 	/**
 	 * {@inheritDoc}
 	 */
+    @Override
 	public State getState(String stateName) {
 		return stateMap.get(stateName);
 	}
@@ -99,6 +101,7 @@ public class SimpleFlow implements Flow, InitializingBean {
 	/**
 	 * {@inheritDoc}
 	 */
+    @Override
 	public Collection<State> getStates() {
 		return new HashSet<State>(stateMap.values());
 	}
@@ -108,6 +111,7 @@ public class SimpleFlow implements Flow, InitializingBean {
 	 * 
 	 * @see InitializingBean#afterPropertiesSet()
 	 */
+    @Override
 	public void afterPropertiesSet() throws Exception {
 		initializeTransitions();
 	}
@@ -115,6 +119,7 @@ public class SimpleFlow implements Flow, InitializingBean {
 	/**
 	 * @see Flow#start(FlowExecutor)
 	 */
+    @Override
 	public FlowExecution start(FlowExecutor executor) throws FlowExecutionException {
 		if (startState == null) {
 			initializeTransitions();
@@ -127,6 +132,7 @@ public class SimpleFlow implements Flow, InitializingBean {
 	/**
 	 * @see Flow#resume(String, FlowExecutor)
 	 */
+    @Override
 	public FlowExecution resume(String stateName, FlowExecutor executor) throws FlowExecutionException {
 
 		FlowExecutionStatus status = FlowExecutionStatus.UNKNOWN;

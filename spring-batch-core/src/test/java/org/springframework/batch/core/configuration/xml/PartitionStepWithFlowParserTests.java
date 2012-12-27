@@ -95,6 +95,7 @@ public class PartitionStepWithFlowParserTests {
 	public static class Decider implements JobExecutionDecider {
 
 		int count = 0;
+        @Override
 		public FlowExecutionStatus decide(JobExecution jobExecution, StepExecution stepExecution) {
 			if (count++<2) {
 				return new FlowExecutionStatus("OK");				

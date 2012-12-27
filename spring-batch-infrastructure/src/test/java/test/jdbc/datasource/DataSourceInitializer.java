@@ -80,12 +80,14 @@ public class DataSourceInitializer implements InitializingBean, DisposableBean {
 	 * @throws Throwable
 	 * @see java.lang.Object#finalize()
 	 */
+    @Override
 	protected void finalize() throws Throwable {
 		logger.debug("finalize called for " + dataSource);
 		super.finalize();
 		initialized = false;
 	}
 
+    @Override
 	public void destroy() {
 		logger.info("destroy called for " + dataSource);
 		doDestroy();
@@ -109,6 +111,7 @@ public class DataSourceInitializer implements InitializingBean, DisposableBean {
 		}
 	}
 
+    @Override
 	public void afterPropertiesSet() throws Exception {
 		Assert.notNull(dataSource);
 		initialize();
@@ -135,6 +138,7 @@ public class DataSourceInitializer implements InitializingBean, DisposableBean {
 		TransactionTemplate transactionTemplate = new TransactionTemplate(new DataSourceTransactionManager(dataSource));
 		transactionTemplate.execute(new TransactionCallback() {
 
+            @Override
 			@SuppressWarnings("unchecked")
 			public Object doInTransaction(TransactionStatus status) {
 				String[] scripts;

@@ -87,10 +87,12 @@ public abstract class AbstractJobRepositoryFactoryBean implements FactoryBean, I
 	 * @return JobRepository.class
 	 * @see org.springframework.beans.factory.FactoryBean#getObjectType()
 	 */
+    @Override
 	public Class<JobRepository> getObjectType() {
 		return JobRepository.class;
 	}
 
+    @Override
 	public boolean isSingleton() {
 		return true;
 	}
@@ -159,6 +161,7 @@ public abstract class AbstractJobRepositoryFactoryBean implements FactoryBean, I
 							+ isolationLevelForCreate + "\n*=PROPAGATION_REQUIRED"));
 			if (validateTransactionState) {
 				DefaultPointcutAdvisor advisor = new DefaultPointcutAdvisor(new MethodInterceptor() {
+                    @Override
 					public Object invoke(MethodInvocation invocation) throws Throwable {
 						if (TransactionSynchronizationManager.isActualTransactionActive()) {
 							throw new IllegalStateException(
@@ -180,6 +183,7 @@ public abstract class AbstractJobRepositoryFactoryBean implements FactoryBean, I
 		}
 	}
 
+    @Override
 	public void afterPropertiesSet() throws Exception {
 		Assert.notNull(transactionManager, "TransactionManager must not be null.");
 
@@ -191,6 +195,7 @@ public abstract class AbstractJobRepositoryFactoryBean implements FactoryBean, I
 				createExecutionContextDao());
 	}
 
+    @Override
 	public Object getObject() throws Exception {
 		if (proxyFactory == null) {
 			afterPropertiesSet();

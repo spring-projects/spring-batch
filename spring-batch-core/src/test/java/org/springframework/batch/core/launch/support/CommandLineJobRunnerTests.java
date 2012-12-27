@@ -75,6 +75,7 @@ public class CommandLineJobRunnerTests {
 		StubJobLauncher.jobExecution = jobExecution;
 		stdin = System.in;
 		System.setIn(new InputStream() {
+            @Override
 			public int read() {
 				return -1;
 			}
@@ -140,10 +141,12 @@ public class CommandLineJobRunnerTests {
 	@Test
 	public void testWithInvalidStdin() throws Throwable {
 		System.setIn(new InputStream() {
+            @Override
             public int available() throws IOException {
                 throw new IOException("Planned");
             }
 
+            @Override
 			public int read() {
 				return -1;
 			}
@@ -160,10 +163,12 @@ public class CommandLineJobRunnerTests {
 
 			int index = 0;
 
+            @Override
             public int available() {
                 return input.length - index;
             }
 
+            @Override
 			public int read() {
 				return index<input.length-1 ? (int) input[index++] : -1;
 			}
@@ -181,10 +186,12 @@ public class CommandLineJobRunnerTests {
 
 			int index = 0;
 
+            @Override
             public int available() {
                 return input.length - index;
             }
 
+            @Override
 			public int read() {
 				return index<input.length-1 ? (int) input[index++] : -1;
 			}
@@ -356,6 +363,7 @@ public class CommandLineJobRunnerTests {
 
 		private static int status;
 
+        @Override
 		public void exit(int status) {
 			StubSystemExiter.status = status;
 		}
@@ -375,6 +383,7 @@ public class CommandLineJobRunnerTests {
 
 		private static boolean destroyed = false;
 
+        @Override
 		public JobExecution run(Job job, JobParameters jobParameters) throws JobExecutionAlreadyRunningException {
 
 			StubJobLauncher.jobParameters = jobParameters;
@@ -407,10 +416,12 @@ public class CommandLineJobRunnerTests {
 
 		static JobExecution jobExecution;
 
+        @Override
 		public Set<JobExecution> findRunningJobExecutions(String jobName) {
 			throw new UnsupportedOperationException();
 		}
 
+        @Override
 		public JobExecution getJobExecution(Long executionId) {
 			if (jobExecution != null) {
 				return jobExecution;
@@ -418,6 +429,7 @@ public class CommandLineJobRunnerTests {
 			throw new UnsupportedOperationException();
 		}
 
+        @Override
 		public List<JobExecution> getJobExecutions(JobInstance jobInstance) {
 			if (jobInstance.getId() == 0) {
 				return Arrays.asList(createJobExecution(jobInstance, BatchStatus.FAILED));
@@ -451,10 +463,12 @@ public class CommandLineJobRunnerTests {
 			return jobExecution;
 		}
 
+        @Override
 		public JobInstance getJobInstance(Long instanceId) {
 			throw new UnsupportedOperationException();
 		}
 
+        @Override
 		public List<JobInstance> getJobInstances(String jobName, int start, int count) {
 			if (jobInstances == null) {
 				return new ArrayList<JobInstance>();
@@ -464,10 +478,12 @@ public class CommandLineJobRunnerTests {
 			return result;
 		}
 
+        @Override
 		public StepExecution getStepExecution(Long jobExecutionId, Long stepExecutionId) {
 			throw new UnsupportedOperationException();
 		}
 
+        @Override
 		public List<String> getJobNames() {
 			throw new UnsupportedOperationException();
 		}
@@ -480,11 +496,13 @@ public class CommandLineJobRunnerTests {
 
 		static boolean called = false;
 
+        @Override
 		public JobParameters getJobParameters(Properties properties) {
 			called = true;
 			return delegate.getJobParameters(properties);
 		}
 
+        @Override
 		public Properties getProperties(JobParameters params) {
 			throw new UnsupportedOperationException();
 		}

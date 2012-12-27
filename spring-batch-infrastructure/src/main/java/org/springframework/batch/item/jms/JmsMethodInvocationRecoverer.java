@@ -47,6 +47,7 @@ public class JmsMethodInvocationRecoverer<T> implements MethodInvocationRecovere
 	 * @see org.springframework.retry.interceptor.MethodInvocationRecoverer#recover(Object[],
 	 * Throwable)
 	 */
+    @Override
 	public T recover(Object[] items, Throwable cause) {
 		try {
 			for (Object item : items) {

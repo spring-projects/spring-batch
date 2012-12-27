@@ -74,6 +74,7 @@ public class SimpleRetryExceptionHandler extends RetryListenerSupport implements
 	 * @see ExceptionHandler#handleException(org.springframework.batch.repeat.RepeatContext,
 	 * java.lang.Throwable)
 	 */
+    @Override
 	public void handleException(RepeatContext context, Throwable throwable) throws Throwable {
 		// Only bother to check the delegate exception handler if we know that
 		// retry is exhausted
@@ -93,6 +94,7 @@ public class SimpleRetryExceptionHandler extends RetryListenerSupport implements
 	 * @see org.springframework.batch.retry.RetryListener#close(org.springframework.batch.retry.RetryContext,
 	 * org.springframework.batch.retry.RetryCallback, java.lang.Throwable)
 	 */
+    @Override
 	public <T> void close(RetryContext context, RetryCallback<T> callback, Throwable throwable) {
 		if (!retryPolicy.canRetry(context)) {
 			logger.debug("Marking retry as exhausted: "+context);

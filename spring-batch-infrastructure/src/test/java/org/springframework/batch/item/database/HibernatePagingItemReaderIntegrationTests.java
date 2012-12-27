@@ -17,6 +17,7 @@ import org.springframework.orm.hibernate3.LocalSessionFactoryBean;
 public class HibernatePagingItemReaderIntegrationTests extends
 		AbstractGenericDataSourceItemReaderIntegrationTests {
 
+    @Override
 	protected ItemReader<Foo> createItemReader() throws Exception {
 
 		LocalSessionFactoryBean factoryBean = new LocalSessionFactoryBean();

@@ -46,6 +46,7 @@ public class RepeatOperationsStepFactoryBeanTests extends TestCase {
 
 	private JobExecution jobExecution = new JobExecution(new JobInstance(0L, new JobParameters(), "job"));
 
+    @Override
 	protected void setUp() throws Exception {
 		factory.setBeanName("RepeatOperationsStep");
 		factory.setItemReader(new ListItemReader<String>(new ArrayList<String>()));
@@ -71,6 +72,7 @@ public class RepeatOperationsStepFactoryBeanTests extends TestCase {
 
 		factory.setStepOperations(new RepeatOperations() {
 
+            @Override
 			public RepeatStatus iterate(RepeatCallback callback) {
 				list = new ArrayList<String>();
 				list.add("foo");

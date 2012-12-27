@@ -57,6 +57,7 @@ public class PartitionStepTests {
 	public void testVanillaStepExecution() throws Exception {
 		step.setStepExecutionSplitter(new SimpleStepExecutionSplitter(jobRepository, true, step.getName(), new SimplePartitioner()));
 		step.setPartitionHandler(new PartitionHandler() {
+            @Override
 			public Collection<StepExecution> handle(StepExecutionSplitter stepSplitter, StepExecution stepExecution)
 					throws Exception {
 				Set<StepExecution> executions = stepSplitter.split(stepExecution, 2);
@@ -81,6 +82,7 @@ public class PartitionStepTests {
 	public void testFailedStepExecution() throws Exception {
 		step.setStepExecutionSplitter(new SimpleStepExecutionSplitter(jobRepository, true, step.getName(), new SimplePartitioner()));
 		step.setPartitionHandler(new PartitionHandler() {
+            @Override
 			public Collection<StepExecution> handle(StepExecutionSplitter stepSplitter, StepExecution stepExecution)
 					throws Exception {
 				Set<StepExecution> executions = stepSplitter.split(stepExecution, 2);
@@ -106,6 +108,7 @@ public class PartitionStepTests {
 		final AtomicBoolean started = new AtomicBoolean(false);
 		step.setStepExecutionSplitter(new SimpleStepExecutionSplitter(jobRepository, true, step.getName(), new SimplePartitioner()));
 		step.setPartitionHandler(new PartitionHandler() {
+            @Override
 			public Collection<StepExecution> handle(StepExecutionSplitter stepSplitter, StepExecution stepExecution)
 					throws Exception {
 				Set<StepExecution> executions = stepSplitter.split(stepExecution, 2);
@@ -152,6 +155,7 @@ public class PartitionStepTests {
 	public void testStoppedStepExecution() throws Exception {
 		step.setStepExecutionSplitter(new SimpleStepExecutionSplitter(jobRepository, true, step.getName(), new SimplePartitioner()));
 		step.setPartitionHandler(new PartitionHandler() {
+            @Override
 			public Collection<StepExecution> handle(StepExecutionSplitter stepSplitter, StepExecution stepExecution)
 					throws Exception {
 				Set<StepExecution> executions = stepSplitter.split(stepExecution, 2);
@@ -183,6 +187,7 @@ public class PartitionStepTests {
 		});
 		step.setStepExecutionSplitter(new SimpleStepExecutionSplitter(jobRepository, true, step.getName(), new SimplePartitioner()));
 		step.setPartitionHandler(new PartitionHandler() {
+            @Override
 			public Collection<StepExecution> handle(StepExecutionSplitter stepSplitter, StepExecution stepExecution)
 					throws Exception {
 				return Arrays.asList(stepExecution);

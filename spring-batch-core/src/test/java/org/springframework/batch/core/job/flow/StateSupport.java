@@ -46,6 +46,7 @@ public class StateSupport extends AbstractState {
 		return this.status;
 	}
 	
+    @Override
 	public boolean isEndState() {
 		return false;
 	}

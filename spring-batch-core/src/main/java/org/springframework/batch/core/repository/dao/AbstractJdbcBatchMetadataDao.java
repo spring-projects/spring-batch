@@ -79,6 +79,7 @@ public abstract class AbstractJdbcBatchMetadataDao implements InitializingBean {
 		this.clobTypeToUse = clobTypeToUse;
 	}
 
+    @Override
 	public void afterPropertiesSet() throws Exception {
 		Assert.notNull(jdbcTemplate);
 	}

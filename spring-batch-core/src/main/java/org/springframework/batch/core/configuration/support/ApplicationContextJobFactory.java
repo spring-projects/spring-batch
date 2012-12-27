@@ -48,6 +48,7 @@ public class ApplicationContextJobFactory implements JobFactory {
 	 * 
 	 * @see org.springframework.batch.core.configuration.JobFactory#createJob()
 	 */
+    @Override
 	public final Job createJob() {
 		return job;
 	}
@@ -57,6 +58,7 @@ public class ApplicationContextJobFactory implements JobFactory {
 	 * 
 	 * @see JobFactory#getJobName()
 	 */
+    @Override
 	public String getJobName() {
 		return job.getName();
 	}

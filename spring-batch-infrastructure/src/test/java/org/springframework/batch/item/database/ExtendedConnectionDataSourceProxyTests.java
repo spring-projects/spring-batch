@@ -198,6 +198,7 @@ public class ExtendedConnectionDataSourceProxyTests {
 		Connection connection = DataSourceUtils.getConnection(csds);
 		csds.startCloseSuppression(connection);
 		tt.execute(new TransactionCallback() {
+            @Override
 			public Object doInTransaction(TransactionStatus status) {
 				template.queryForList("select baz from bar");
 				template.queryForList("select foo from bar");
@@ -205,9 +206,11 @@ public class ExtendedConnectionDataSourceProxyTests {
 			}
 		});
 		tt.execute(new TransactionCallback() {
+            @Override
 			public Object doInTransaction(TransactionStatus status) {
 				template.queryForList("select ham from foo");
 				tt2.execute(new TransactionCallback() {
+                    @Override
 					public Object doInTransaction(TransactionStatus status) {
 						template.queryForList("select 1 from eggs");
 						return null;
@@ -218,6 +221,7 @@ public class ExtendedConnectionDataSourceProxyTests {
 			}
 		});
 		tt.execute(new TransactionCallback() {
+            @Override
 			public Object doInTransaction(TransactionStatus status) {
 				template.queryForList("select spam from ham");
 				return null;
@@ -301,30 +305,37 @@ public class ExtendedConnectionDataSourceProxyTests {
 
 		private static final String UNWRAP_ERROR_MESSAGE = "supplied type is not implemented by this class";
 
+        @Override
 		public Connection getConnection() throws SQLException {
 			throw new UnsupportedOperationException();
 		}
 
+        @Override
 		public Connection getConnection(String username, String password) throws SQLException {
 			throw new UnsupportedOperationException();
 		}
 
+        @Override
 		public PrintWriter getLogWriter() throws SQLException {
 			throw new UnsupportedOperationException();
 		}
 
+        @Override
 		public int getLoginTimeout() throws SQLException {
 			throw new UnsupportedOperationException();
 		}
 
+        @Override
 		public void setLogWriter(PrintWriter out) throws SQLException {
 			throw new UnsupportedOperationException();
 		}
 
+        @Override
 		public void setLoginTimeout(int seconds) throws SQLException {
 			throw new UnsupportedOperationException();
 		}
 
+        @Override
 		public boolean isWrapperFor(Class<?> iface) throws SQLException {
 			if (iface.equals(Supported.class) || (iface.equals(DataSource.class))) {
 				return true;
@@ -332,6 +343,7 @@ public class ExtendedConnectionDataSourceProxyTests {
 			return false;
 		}
 
+        @Override
 		@SuppressWarnings("unchecked")
 		public <T> T unwrap(Class<T> iface) throws SQLException {
 			if (iface.equals(Supported.class) || iface.equals(DataSource.class)) {

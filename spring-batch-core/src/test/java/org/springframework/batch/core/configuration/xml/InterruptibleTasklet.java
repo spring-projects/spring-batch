@@ -31,6 +31,7 @@ public class InterruptibleTasklet extends NameStoringTasklet {
 	
 	private volatile boolean started = false;
 
+    @Override
 	public RepeatStatus execute(StepContribution contribution, ChunkContext chunkContext) throws Exception {
 		if (!started) {
 			super.execute(contribution, chunkContext);

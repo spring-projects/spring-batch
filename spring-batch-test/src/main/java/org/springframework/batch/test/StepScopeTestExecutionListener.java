@@ -74,6 +74,7 @@ public class StepScopeTestExecutionListener implements TestExecutionListener {
 	 * @throws Exception if there is a problem
 	 * @see TestExecutionListener#prepareTestInstance(TestContext)
 	 */
+    @Override
 	public void prepareTestInstance(TestContext testContext) throws Exception {
 		StepExecution stepExecution = getStepExecution(testContext);
 		if (stepExecution != null) {
@@ -86,6 +87,7 @@ public class StepScopeTestExecutionListener implements TestExecutionListener {
 	 * @throws Exception if there is a problem
 	 * @see TestExecutionListener#beforeTestMethod(TestContext)
 	 */
+    @Override
 	public void beforeTestMethod(org.springframework.test.context.TestContext testContext) throws Exception {
 		if (testContext.hasAttribute(STEP_EXECUTION)) {
 			StepExecution stepExecution = (StepExecution) testContext.getAttribute(STEP_EXECUTION);
@@ -99,6 +101,7 @@ public class StepScopeTestExecutionListener implements TestExecutionListener {
 	 * @throws Exception if there is a problem
 	 * @see TestExecutionListener#afterTestMethod(TestContext)
 	 */
+    @Override
 	public void afterTestMethod(TestContext testContext) throws Exception {
 		if (testContext.hasAttribute(STEP_EXECUTION)) {
 			StepSynchronizationManager.close();
@@ -108,12 +111,14 @@ public class StepScopeTestExecutionListener implements TestExecutionListener {
 	/*
 	 * Support for Spring 3.0 (empty).
 	 */
+    @Override
 	public void afterTestClass(TestContext testContext) throws Exception {
 	}
 
 	/*
 	 * Support for Spring 3.0 (empty).
 	 */
+    @Override
 	public void beforeTestClass(TestContext testContext) throws Exception {
 	}
 	
@@ -168,6 +173,7 @@ public class StepScopeTestExecutionListener implements TestExecutionListener {
 			return result == null ? null : result.getName();
 		}
 
+        @Override
 		public void doWith(Method method) throws IllegalArgumentException, IllegalAccessException {
 			Class<?> type = method.getReturnType();
 			if (preferredType.isAssignableFrom(type)) {

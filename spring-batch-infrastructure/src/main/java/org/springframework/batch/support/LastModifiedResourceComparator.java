@@ -38,6 +38,7 @@ public class LastModifiedResourceComparator implements Comparator<Resource> {
 	 * 
 	 * @see Comparator#compare(Object, Object)
 	 */
+    @Override
 	public int compare(Resource r1, Resource r2) {
 		Assert.isTrue(r1.exists(), "Resource does not exist: " + r1);
 		Assert.isTrue(r2.exists(), "Resource does not exist: " + r2);

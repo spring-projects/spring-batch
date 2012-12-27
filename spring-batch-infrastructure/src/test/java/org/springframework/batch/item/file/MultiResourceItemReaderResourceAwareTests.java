@@ -52,6 +52,7 @@ public class MultiResourceItemReaderResourceAwareTests {
 
 		tested.setDelegate(itemReader);
 		tested.setComparator(new Comparator<Resource>() {
+            @Override
 			public int compare(Resource o1, Resource o2) {
 				return 0; // do not change ordering
 			}
@@ -87,6 +88,7 @@ public class MultiResourceItemReaderResourceAwareTests {
     }
 
     static final class FooLineMapper implements LineMapper<Foo> {
+        @Override
         public Foo mapLine(String line, int lineNumber) throws Exception {
             return new Foo(line);
         }
@@ -101,6 +103,7 @@ public class MultiResourceItemReaderResourceAwareTests {
             this.value = value;
         }
 
+        @Override
         public void setResource(Resource resource) {
             this.resource = resource;
         }

@@ -27,6 +27,7 @@ public class ApplicationContextJobFactoryTests {
 	}
 
 	private static class StubApplicationContextFactory implements ApplicationContextFactory {
+        @Override
 		public ConfigurableApplicationContext createApplicationContext() {
 			StaticApplicationContext context = new StaticApplicationContext();
 			context.registerSingleton("job", JobSupport.class);
@@ -36,6 +37,7 @@ public class ApplicationContextJobFactoryTests {
 	}
 
 	private static class PostProcessingApplicationContextFactory implements ApplicationContextFactory {
+        @Override
 		public ConfigurableApplicationContext createApplicationContext() {
 			StaticApplicationContext context = new StaticApplicationContext();
 			context.registerSingleton("job", JobSupport.class);
@@ -48,6 +50,7 @@ public class ApplicationContextJobFactoryTests {
 
 	private static class TestBeanPostProcessor implements BeanPostProcessor {
 
+        @Override
 		public Object postProcessAfterInitialization(Object bean, String beanName) throws BeansException {
 			if (bean instanceof JobSupport) {
 				((JobSupport) bean).setName("bar");
@@ -55,6 +58,7 @@ public class ApplicationContextJobFactoryTests {
 			return bean;
 		}
 
+        @Override
 		public Object postProcessBeforeInitialization(Object bean, String beanName) throws BeansException {
 			return bean;
 		}

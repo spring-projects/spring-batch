@@ -47,6 +47,7 @@ public class CallableTaskletAdapter implements Tasklet, InitializingBean {
 	 * 
 	 * @see org.springframework.beans.factory.InitializingBean#afterPropertiesSet()
 	 */
+    @Override
 	public void afterPropertiesSet() throws Exception {
 		Assert.notNull(callable);
 	}
@@ -56,6 +57,7 @@ public class CallableTaskletAdapter implements Tasklet, InitializingBean {
 	 * the {@link StepContribution} and the attributes.
 	 * @see Tasklet#execute(StepContribution, ChunkContext)
 	 */
+    @Override
 	public RepeatStatus execute(StepContribution contribution, ChunkContext chunkContext) throws Exception {
 		return callable.call();
 	}

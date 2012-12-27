@@ -58,6 +58,7 @@ public class SkipReaderStub<T> extends AbstractExceptionThrowingItemHandlerStub<
 		read.clear();
 	}
 
+    @Override
 	public T read() throws Exception, UnexpectedInputException, ParseException {
 		counter++;
 		if (counter >= items.length) {

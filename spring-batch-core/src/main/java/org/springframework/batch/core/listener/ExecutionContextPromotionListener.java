@@ -46,6 +46,7 @@ public class ExecutionContextPromotionListener extends StepExecutionListenerSupp
 
 	private boolean strict = false;
 
+    @Override
 	public ExitStatus afterStep(StepExecution stepExecution) {
 		ExecutionContext stepContext = stepExecution.getExecutionContext();
 		ExecutionContext jobContext = stepExecution.getJobExecution().getExecutionContext();
@@ -69,6 +70,7 @@ public class ExecutionContextPromotionListener extends StepExecutionListenerSupp
 		return null;
 	}
 
+    @Override
 	public void afterPropertiesSet() throws Exception {
 		Assert.notNull(this.keys, "The 'keys' property must be provided");
 		Assert.notEmpty(this.keys, "The 'keys' property must not be empty");

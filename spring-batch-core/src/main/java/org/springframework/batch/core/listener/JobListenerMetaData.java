@@ -56,22 +56,27 @@ public enum JobListenerMetaData implements ListenerMetaData {
 		}
 	}
 
+    @Override
 	public String getMethodName() {
 		return methodName;
 	}
 
+    @Override
 	public Class<? extends Annotation> getAnnotation() {
 		return annotation;
 	}
 
+    @Override
 	public Class<?> getListenerInterface() {
 		return JobExecutionListener.class;
 	}
 	
+    @Override
 	public String getPropertyName() {
 		return propertyName;
 	}
 	
+    @Override
 	public Class<?>[] getParamTypes() {
 		return new Class<?>[]{ JobExecution.class };
 	}

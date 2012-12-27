@@ -101,11 +101,13 @@ public class SimpleChunkProvider<I> implements ChunkProvider<I> {
 		}
 	}
 
+    @Override
 	public Chunk<I> provide(final StepContribution contribution) throws Exception {
 
 		final Chunk<I> inputs = new Chunk<I>();
 		repeatOperations.iterate(new RepeatCallback() {
 
+            @Override
 			public RepeatStatus doInIteration(final RepeatContext context) throws Exception {
 				I item = null;
 				try {
@@ -131,6 +133,7 @@ public class SimpleChunkProvider<I> implements ChunkProvider<I> {
 
 	}
 
+    @Override
 	public void postProcess(StepContribution contribution, Chunk<I> chunk) {
 		// do nothing
 	}

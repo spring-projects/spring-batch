@@ -23,6 +23,7 @@ public class ColumnMapExecutionContextRowMapperTests extends TestCase {
 	
 	private PreparedStatement ps;
 		
+    @Override
 	protected void setUp() throws Exception {
 		super.setUp();
 	

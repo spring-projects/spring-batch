@@ -35,6 +35,7 @@ public class ConfigurableSystemProcessExitCodeMapper implements SystemProcessExi
 	
 	private Map<Object, ExitStatus> mappings;
 
+    @Override
 	public ExitStatus getExitStatus(int exitCode) {
 		ExitStatus exitStatus = mappings.get(exitCode);
 		if (exitStatus != null) {

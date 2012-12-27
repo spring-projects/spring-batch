@@ -67,6 +67,7 @@ public class GroupAwareJob implements Job {
 		this.delegate = delegate;
 	}
 
+    @Override
 	public void execute(JobExecution execution) {
 		delegate.execute(execution);
 	}
@@ -77,18 +78,22 @@ public class GroupAwareJob implements Job {
 	 * 
 	 * @see org.springframework.batch.core.Job#getName()
 	 */
+    @Override
 	public String getName() {
 		return groupName==null ? delegate.getName() : groupName + SEPARATOR + delegate.getName();
 	}
 
+    @Override
 	public boolean isRestartable() {
 		return delegate.isRestartable();
 	}
 
+    @Override
 	public JobParametersIncrementer getJobParametersIncrementer() {
 		return delegate.getJobParametersIncrementer();
 	}
 
+    @Override
 	public JobParametersValidator getJobParametersValidator() {
 		return delegate.getJobParametersValidator();
 	}

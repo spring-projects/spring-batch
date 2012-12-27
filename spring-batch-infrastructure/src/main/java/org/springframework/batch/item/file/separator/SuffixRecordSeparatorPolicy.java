@@ -61,6 +61,7 @@ public class SuffixRecordSeparatorPolicy extends DefaultRecordSeparatorPolicy {
 	 * 
 	 * @see org.springframework.batch.item.file.separator.RecordSeparatorPolicy#isEndOfRecord(java.lang.String)
 	 */
+    @Override
 	public boolean isEndOfRecord(String line) {
 		if (line == null) {
 			return true;
@@ -74,6 +75,7 @@ public class SuffixRecordSeparatorPolicy extends DefaultRecordSeparatorPolicy {
 	 * 
 	 * @see org.springframework.batch.item.file.separator.SimpleRecordSeparatorPolicy#postProcess(java.lang.String)
 	 */
+    @Override
 	public String postProcess(String record) {
 		if (record==null) {
 			return null;

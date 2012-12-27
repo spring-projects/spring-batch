@@ -48,6 +48,7 @@ public class SkipWriterStub<T> extends AbstractExceptionThrowingItemHandlerStub<
 		committed.clear();
 	}
 
+    @Override
 	public void write(List<? extends T> items) throws Exception {
 		logger.debug("Writing: " + items);
 		for (T item : items) {

@@ -27,6 +27,7 @@ import org.springframework.batch.item.ExecutionContext;
  */
 public class MinMaxPartitioner extends SimplePartitioner {
 
+    @Override
 	public Map<String, ExecutionContext> partition(int gridSize) {
 		Map<String, ExecutionContext> partition = super.partition(gridSize);
 		int total = 8; // The number of items in the ExampleItemReader

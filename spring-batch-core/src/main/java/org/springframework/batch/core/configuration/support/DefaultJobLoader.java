@@ -107,6 +107,7 @@ public class DefaultJobLoader implements JobLoader, InitializingBean {
 	 *
 	 * @see JobLoader#clear()
 	 */
+    @Override
 	public void clear() {
 		for (ConfigurableApplicationContext context : contexts.values()) {
 			if (context.isActive()) {
@@ -119,6 +120,7 @@ public class DefaultJobLoader implements JobLoader, InitializingBean {
 		contexts.clear();
 	}
 
+    @Override
 	public Collection<Job> reload(ApplicationContextFactory factory) {
 
 		// If the same factory is loaded twice the context can be closed
@@ -140,6 +142,7 @@ public class DefaultJobLoader implements JobLoader, InitializingBean {
 		}
 	}
 
+    @Override
 	public Collection<Job> load(ApplicationContextFactory factory) throws DuplicateJobException {
 		return doLoad(factory, false);
 	}
@@ -268,6 +271,7 @@ public class DefaultJobLoader implements JobLoader, InitializingBean {
 
     }
 
+    @Override
     public void afterPropertiesSet() {
         Assert.notNull(jobRegistry, "Job registry could not be null.");
     }

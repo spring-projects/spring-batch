@@ -202,6 +202,7 @@ public class JobRegistryBackgroundJobRunner {
 		logger.info("Starting job registry in parent context from XML at: [" + args[0] + "]");
 
 		new Thread(new Runnable() {
+            @Override
 			public void run() {
 				try {
 					launcher.run();

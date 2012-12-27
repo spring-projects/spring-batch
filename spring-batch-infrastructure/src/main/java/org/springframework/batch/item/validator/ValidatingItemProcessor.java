@@ -72,6 +72,7 @@ public class ValidatingItemProcessor<T> implements ItemProcessor<T, T>, Initiali
 	 * @return the input item
 	 * @throws ValidationException if validation fails
 	 */
+    @Override
 	public T process(T item) throws ValidationException {
 		try {
 			validator.validate(item);
@@ -87,6 +88,7 @@ public class ValidatingItemProcessor<T> implements ItemProcessor<T, T>, Initiali
 		return item;
 	}
 
+    @Override
 	public void afterPropertiesSet() throws Exception {
 		Assert.notNull(validator, "Validator must not be null.");
 	}

@@ -63,6 +63,7 @@ public class StepState extends AbstractState implements StepHolder {
 	/**
 	 * @return the step
 	 */
+    @Override
 	public Step getStep() {
 		return step;
 	}
@@ -70,6 +71,7 @@ public class StepState extends AbstractState implements StepHolder {
 	/* (non-Javadoc)
 	 * @see org.springframework.batch.core.job.flow.State#isEndState()
 	 */
+    @Override
 	public boolean isEndState() {
 		return false;
 	}

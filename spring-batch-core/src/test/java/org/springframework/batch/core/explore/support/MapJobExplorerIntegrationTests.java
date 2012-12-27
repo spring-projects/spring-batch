@@ -57,6 +57,7 @@ public class MapJobExplorerIntegrationTests {
 		SimpleJob job = new SimpleJob("job");
 		TaskletStep step = new TaskletStep("step");
 		step.setTasklet(new Tasklet() {
+            @Override
 			public RepeatStatus execute(StepContribution contribution, ChunkContext chunkContext) throws Exception {
 				while (block) {
 					Thread.sleep(100L);

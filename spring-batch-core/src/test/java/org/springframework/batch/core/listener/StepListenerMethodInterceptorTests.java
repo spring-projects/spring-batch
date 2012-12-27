@@ -103,22 +103,27 @@ public class StepListenerMethodInterceptorTests {
 			this.args = args;
 		}
 		
+        @Override
 		public Method getMethod() {
 			return method;
 		}
 
+        @Override
 		public Object[] getArguments() {
 			return null;
 		}
 
+        @Override
 		public AccessibleObject getStaticPart() {
 			return null;
 		}
 
+        @Override
 		public Object getThis() {
 			return null;
 		}
 
+        @Override
 		public Object proceed() throws Throwable {
 			return null;
 		}

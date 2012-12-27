@@ -53,10 +53,12 @@ public class StepListenerParser extends AbstractListenerParser {
 		this.listenerMetaData = listenerMetaData;
 	}
 
+    @Override
 	protected Class<? extends AbstractListenerFactoryBean> getBeanClass() {
 		return StepListenerFactoryBean.class;
 	}
 
+    @Override
 	protected ListenerMetaData[] getMetaDataValues() {
 		return listenerMetaData;
 	}

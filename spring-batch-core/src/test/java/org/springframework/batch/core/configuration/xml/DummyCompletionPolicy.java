@@ -10,18 +10,22 @@ import org.springframework.batch.repeat.RepeatStatus;
  */
 public class DummyCompletionPolicy implements CompletionPolicy {
 
+    @Override
 	public boolean isComplete(RepeatContext context, RepeatStatus result) {
 		return false;
 	}
 
+    @Override
 	public boolean isComplete(RepeatContext context) {
 		return false;
 	}
 
+    @Override
 	public RepeatContext start(RepeatContext parent) {
 		return null;
 	}
 
+    @Override
 	public void update(RepeatContext context) {
 	}
 

@@ -36,6 +36,7 @@ public class StepLocatorStepFactoryBean implements FactoryBean<Step> {
 	 * 
 	 * @see FactoryBean#getObject()
 	 */
+    @Override
 	public Step getObject() throws Exception {
 		return stepLocator.getStep(stepName);
 	}
@@ -45,6 +46,7 @@ public class StepLocatorStepFactoryBean implements FactoryBean<Step> {
 	 * 
 	 * @see FactoryBean#getObjectType()
 	 */
+    @Override
 	public Class<? extends Step> getObjectType() {
 		return Step.class;
 	}
@@ -54,6 +56,7 @@ public class StepLocatorStepFactoryBean implements FactoryBean<Step> {
 	 * 
 	 * @see FactoryBean#isSingleton()
 	 */
+    @Override
 	public boolean isSingleton() {
 		return true;
 	}

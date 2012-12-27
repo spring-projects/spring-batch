@@ -33,16 +33,20 @@ public class DummyPlatformTransactionManager implements PlatformTransactionManag
 		return name;
 	}
 
+    @Override
 	public void setBeanName(String name) {
 		this.name = name;
 	}
 
+    @Override
 	public void commit(TransactionStatus status) throws TransactionException {
 	}
 
+    @Override
 	public void rollback(TransactionStatus status) throws TransactionException {
 	}
 
+    @Override
 	public TransactionStatus getTransaction(TransactionDefinition definition) throws TransactionException {
 		return null;
 	}

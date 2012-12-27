@@ -43,6 +43,7 @@ public class ScheduledJobParametersFactory implements JobParametersConverter {
 	 * 
 	 * @see org.springframework.batch.core.runtime.JobParametersFactory#getJobParameters(java.util.Properties)
 	 */
+    @Override
 	public JobParameters getJobParameters(Properties props) {
 
 		if (props == null || props.isEmpty()) {
@@ -73,6 +74,7 @@ public class ScheduledJobParametersFactory implements JobParametersConverter {
 	 * 
 	 * @see org.springframework.batch.core.converter.JobParametersConverter#getProperties(org.springframework.batch.core.JobParameters)
 	 */
+    @Override
 	public Properties getProperties(JobParameters params) {
 
 		if (params == null || params.isEmpty()) {

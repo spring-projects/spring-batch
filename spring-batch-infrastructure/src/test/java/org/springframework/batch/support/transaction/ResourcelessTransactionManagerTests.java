@@ -38,8 +38,10 @@ public class ResourcelessTransactionManagerTests {
 	@Test
 	public void testCommit() throws Exception {
 		new TransactionTemplate(transactionManager).execute(new TransactionCallback() {
+            @Override
 			public Object doInTransaction(TransactionStatus status) {
 				TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronizationAdapter() {
+                    @Override
 					public void afterCompletion(int status) {
 						super.afterCompletion(status);
 						txStatus = status;
@@ -56,8 +58,10 @@ public class ResourcelessTransactionManagerTests {
 		testCommit();
 		txStatus = -1;
 		new TransactionTemplate(transactionManager).execute(new TransactionCallback() {
+            @Override
 			public Object doInTransaction(TransactionStatus status) {
 				TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronizationAdapter() {
+                    @Override
 					public void afterCompletion(int status) {
 						super.afterCompletion(status);
 						txStatus = status;
@@ -73,8 +77,10 @@ public class ResourcelessTransactionManagerTests {
 	public void testCommitNested() throws Exception {
 		final TransactionTemplate transactionTemplate = new TransactionTemplate(transactionManager);
 		transactionTemplate.execute(new TransactionCallback() {
+            @Override
 			public Object doInTransaction(TransactionStatus status) {
 				TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronizationAdapter() {
+                    @Override
 					public void afterCompletion(int status) {
 						super.afterCompletion(status);
 						txStatus = status;
@@ -82,6 +88,7 @@ public class ResourcelessTransactionManagerTests {
 					}
 				});
 				transactionTemplate.execute(new TransactionCallback() {
+                    @Override
 					public Object doInTransaction(TransactionStatus status) {
 						assertEquals(0, count);
 						count++;
@@ -103,8 +110,10 @@ public class ResourcelessTransactionManagerTests {
 		txStatus = -1;
 		final TransactionTemplate transactionTemplate = new TransactionTemplate(transactionManager);
 		transactionTemplate.execute(new TransactionCallback() {
+            @Override
 			public Object doInTransaction(TransactionStatus status) {
 				TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronizationAdapter() {
+                    @Override
 					public void afterCompletion(int status) {
 						super.afterCompletion(status);
 						txStatus = status;
@@ -112,6 +121,7 @@ public class ResourcelessTransactionManagerTests {
 					}
 				});
 				transactionTemplate.execute(new TransactionCallback() {
+                    @Override
 					public Object doInTransaction(TransactionStatus status) {
 						assertEquals(0, count);
 						count++;
@@ -130,8 +140,10 @@ public class ResourcelessTransactionManagerTests {
 	public void testRollback() throws Exception {
 		try {
 			new TransactionTemplate(transactionManager).execute(new TransactionCallback() {
+                @Override
 				public Object doInTransaction(TransactionStatus status) {
 					TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronizationAdapter() {
+                        @Override
 						public void afterCompletion(int status) {
 							super.afterCompletion(status);
 							txStatus = status;
@@ -153,8 +165,10 @@ public class ResourcelessTransactionManagerTests {
 		final TransactionTemplate transactionTemplate = new TransactionTemplate(transactionManager);
 		try {
 			transactionTemplate.execute(new TransactionCallback() {
+                @Override
 				public Object doInTransaction(TransactionStatus status) {
 					TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronizationAdapter() {
+                        @Override
 						public void afterCompletion(int status) {
 							super.afterCompletion(status);
 							txStatus = status;
@@ -162,6 +176,7 @@ public class ResourcelessTransactionManagerTests {
 						}
 					});
 					transactionTemplate.execute(new TransactionCallback() {
+                        @Override
 						public Object doInTransaction(TransactionStatus status) {
 							assertEquals(0, count);
 							count++;
@@ -186,8 +201,10 @@ public class ResourcelessTransactionManagerTests {
 		final TransactionTemplate transactionTemplate = new TransactionTemplate(transactionManager);
 		try {
 			transactionTemplate.execute(new TransactionCallback() {
+                @Override
 				public Object doInTransaction(TransactionStatus status) {
 					TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronizationAdapter() {
+                        @Override
 						public void afterCompletion(int status) {
 							super.afterCompletion(status);
 							txStatus = status;
@@ -195,6 +212,7 @@ public class ResourcelessTransactionManagerTests {
 						}
 					});
 					transactionTemplate.execute(new TransactionCallback() {
+                        @Override
 						public Object doInTransaction(TransactionStatus status) {
 							assertEquals(0, count);
 							count++;

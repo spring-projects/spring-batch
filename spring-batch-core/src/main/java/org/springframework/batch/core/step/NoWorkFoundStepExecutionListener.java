@@ -27,6 +27,7 @@ import org.springframework.batch.core.listener.StepExecutionListenerSupport;
  */
 public class NoWorkFoundStepExecutionListener extends StepExecutionListenerSupport {
 
+    @Override
 	public ExitStatus afterStep(StepExecution stepExecution) {
 		if (stepExecution.getReadCount() == 0) {
 			return ExitStatus.FAILED;

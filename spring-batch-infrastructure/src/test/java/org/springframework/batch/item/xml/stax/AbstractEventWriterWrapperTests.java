@@ -42,6 +42,7 @@ public class AbstractEventWriterWrapperTests extends TestCase {
 
 	XMLEventWriter xmlEventWriter;
 
+    @Override
 	protected void setUp() throws Exception {
 		super.setUp();
 

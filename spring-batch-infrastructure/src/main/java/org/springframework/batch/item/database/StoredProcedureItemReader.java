@@ -142,13 +142,15 @@ public class StoredProcedureItemReader<T> extends AbstractCursorItemReader<T> {
 	 * @throws IllegalArgumentException if either data source or sql properties
 	 * not set.
 	 */
+    @Override
 	public void afterPropertiesSet() throws Exception {
 		super.afterPropertiesSet();
 		Assert.notNull(procedureName, "The name of the stored procedure must be provided");
 		Assert.notNull(rowMapper, "RowMapper must be provided");
 	}
 
-	protected void openCursor(Connection con) {	
+    @Override
+	protected void openCursor(Connection con) {
 
 		Assert.state(procedureName != null, "Procedure Name must not be null.");
 		Assert.state(refCursorPosition >= 0, 
@@ -223,6 +225,7 @@ public class StoredProcedureItemReader<T> extends AbstractCursorItemReader<T> {
 
 	}
 
+    @Override
 	@SuppressWarnings("unchecked")
 	protected T readCursor(ResultSet rs, int currentRow) throws SQLException {
 		return (T) rowMapper.mapRow(rs, currentRow);
@@ -231,6 +234,7 @@ public class StoredProcedureItemReader<T> extends AbstractCursorItemReader<T> {
 	/**
 	 * Close the cursor and database connection.
 	 */
+    @Override
 	protected void cleanupOnClose() throws Exception {
 		JdbcUtils.closeStatement(this.callableStatement);
 	}

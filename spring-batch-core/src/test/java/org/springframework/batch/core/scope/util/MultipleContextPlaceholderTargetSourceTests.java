@@ -210,6 +210,7 @@ public class MultipleContextPlaceholderTargetSourceTests {
 
 		private Object root;
 
+	    @Override
 		public Object getContext() {
 			return root;
 		}

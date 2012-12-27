@@ -145,6 +145,7 @@ public class SqlPagingQueryProviderFactoryBean implements FactoryBean {
 	 * 
 	 * @see FactoryBean#getObject()
 	 */
+    @Override
 	public Object getObject() throws Exception {
 
 		DatabaseType type;
@@ -181,6 +182,7 @@ public class SqlPagingQueryProviderFactoryBean implements FactoryBean {
 	 * 
 	 * @see FactoryBean#getObjectType()
 	 */
+    @Override
 	public Class<PagingQueryProvider> getObjectType() {
 		return PagingQueryProvider.class;
 	}
@@ -189,6 +191,7 @@ public class SqlPagingQueryProviderFactoryBean implements FactoryBean {
 	 * Always returns true.
 	 * @see FactoryBean#isSingleton()
 	 */
+    @Override
 	public boolean isSingleton() {
 		return true;
 	}

@@ -75,6 +75,7 @@ public class StepExecutorInterruptionTests {
 		step.setJobRepository(jobRepository);
 		step.setTransactionManager(new ResourcelessTransactionManager());
 		itemWriter = new ItemWriter<Object>() {
+            @Override
 			public void write(List<? extends Object> item) throws Exception {
 			}
 		};
@@ -92,6 +93,7 @@ public class StepExecutorInterruptionTests {
 		// N.B, If we don't set the completion policy it might run forever
 		template.setCompletionPolicy(new SimpleCompletionPolicy(2));
 		step.setTasklet(new TestingChunkOrientedTasklet<Object>(new ItemReader<Object>() {
+            @Override
 			public Object read() throws Exception {
 				// do something non-trivial (and not Thread.sleep())
 				double foo = 1;
@@ -152,6 +154,7 @@ public class StepExecutorInterruptionTests {
 		Thread processingThread = createThread(stepExecution);
 
 		step.setTasklet(new TestingChunkOrientedTasklet<Object>(new ItemReader<Object>() {
+            @Override
 			public Object read() throws Exception {
 				return null;
 			}
@@ -195,6 +198,7 @@ public class StepExecutorInterruptionTests {
 		});
 
 		step.setTasklet(new TestingChunkOrientedTasklet<Object>(new ItemReader<Object>() {
+            @Override
 			public Object read() throws Exception {
 				throw new RuntimeException("Planned!");
 			}
@@ -212,6 +216,7 @@ public class StepExecutorInterruptionTests {
 	 */
 	private Thread createThread(final StepExecution stepExecution) {
 		Thread processingThread = new Thread() {
+            @Override
 			public void run() {
 				try {
 					jobRepository.add(stepExecution);

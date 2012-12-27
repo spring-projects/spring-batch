@@ -138,6 +138,7 @@ public class SimpleStepFactoryBean<T, S> implements FactoryBean, BeanNameAware {
 	 * 
 	 * @see org.springframework.beans.factory.BeanNameAware#setBeanName(java.lang.String)
 	 */
+    @Override
 	public void setBeanName(String name) {
 		this.name = name;
 	}
@@ -314,6 +315,7 @@ public class SimpleStepFactoryBean<T, S> implements FactoryBean, BeanNameAware {
 	 * 
 	 * @see FactoryBean#getObject()
 	 */
+    @Override
 	public final Object getObject() throws Exception {
 		SimpleStepBuilder<T, S> builder = createBuilder(getName());
 		applyConfiguration(builder);
@@ -325,6 +327,7 @@ public class SimpleStepFactoryBean<T, S> implements FactoryBean, BeanNameAware {
 		return new SimpleStepBuilder<T, S>(new StepBuilder(name));
 	}
 
+    @Override
 	public Class<TaskletStep> getObjectType() {
 		return TaskletStep.class;
 	}
@@ -335,6 +338,7 @@ public class SimpleStepFactoryBean<T, S> implements FactoryBean, BeanNameAware {
 	 * 
 	 * @see org.springframework.beans.factory.FactoryBean#isSingleton()
 	 */
+    @Override
 	public boolean isSingleton() {
 		return this.singleton;
 	}

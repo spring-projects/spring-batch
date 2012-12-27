@@ -40,10 +40,12 @@ public class CompositeJobExecutionListenerTests extends TestCase {
 	 */
 	public void testSetListeners() {
 		listener.setListeners(Arrays.asList(new JobExecutionListenerSupport() {
+            @Override
 			public void afterJob(JobExecution jobExecution) {
 				list.add("fail");
 			}
 		}, new JobExecutionListenerSupport() {
+            @Override
 			public void afterJob(JobExecution jobExecution) {
 				list.add("continue");
 			}
@@ -59,6 +61,7 @@ public class CompositeJobExecutionListenerTests extends TestCase {
 	 */
 	public void testSetListener() {
 		listener.register(new JobExecutionListenerSupport() {
+            @Override
 			public void afterJob(JobExecution jobExecution) {
 				list.add("fail");
 			}
@@ -74,6 +77,7 @@ public class CompositeJobExecutionListenerTests extends TestCase {
 	 */
 	public void testOpen() {
 		listener.register(new JobExecutionListenerSupport() {
+            @Override
 			public void beforeJob(JobExecution stepExecution) {
 				list.add("foo");
 			}

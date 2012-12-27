@@ -90,6 +90,7 @@ public class TaskletStepExceptionTests {
 	@Test
 	public void testInterruptedWithCustomStatus() throws Exception {
 		taskletStep.setTasklet(new Tasklet() {
+            @Override
 			public RepeatStatus execute(StepContribution contribution, ChunkContext chunkContext) throws Exception {
 				contribution.setExitStatus(new ExitStatus("FUNNY"));
 				throw new JobInterruptedException("Planned");
@@ -144,6 +145,7 @@ public class TaskletStepExceptionTests {
 		} });
 		taskletStep.setTasklet(new Tasklet() {
 
+            @Override
 			public RepeatStatus execute(StepContribution contribution, ChunkContext attributes) throws Exception {
 				return RepeatStatus.FINISHED;
 			}
@@ -210,6 +212,7 @@ public class TaskletStepExceptionTests {
 
 		taskletStep.setTasklet(new Tasklet() {
 
+            @Override
 			public RepeatStatus execute(StepContribution contribution, ChunkContext attributes) throws Exception {
 				attributes.getStepContext().getStepExecution().getExecutionContext().putString("foo", "bar");
 				return RepeatStatus.FINISHED;
@@ -241,6 +244,7 @@ public class TaskletStepExceptionTests {
 
 		taskletStep.setTasklet(new Tasklet() {
 
+            @Override
 			public RepeatStatus execute(StepContribution contribution, ChunkContext attributes) throws Exception {
 				attributes.getStepContext().getStepExecution().getExecutionContext().putString("foo", "bar");
 				return RepeatStatus.FINISHED;
@@ -264,6 +268,7 @@ public class TaskletStepExceptionTests {
 
 		taskletStep.setTasklet(new Tasklet() {
 
+            @Override
 			public RepeatStatus execute(StepContribution contribution, ChunkContext attributes) throws Exception {
 				return RepeatStatus.FINISHED;
 			}
@@ -283,6 +288,7 @@ public class TaskletStepExceptionTests {
 
 		taskletStep.setTasklet(new Tasklet() {
 
+            @Override
 			public RepeatStatus execute(StepContribution contribution, ChunkContext attributes) throws Exception {
 				return RepeatStatus.FINISHED;
 			}
@@ -303,6 +309,7 @@ public class TaskletStepExceptionTests {
 
 		taskletStep.setTasklet(new Tasklet() {
 
+            @Override
 			public RepeatStatus execute(StepContribution contribution, ChunkContext attributes) throws Exception {
 				return RepeatStatus.FINISHED;
 			}
@@ -322,6 +329,7 @@ public class TaskletStepExceptionTests {
 
 		taskletStep.setTasklet(new Tasklet() {
 
+            @Override
 			public RepeatStatus execute(StepContribution contribution, ChunkContext attributes) throws Exception {
 				throw new RuntimeException("Tasklet exception");
 			}
@@ -361,6 +369,7 @@ public class TaskletStepExceptionTests {
 
 	private static class ExceptionTasklet implements Tasklet {
 
+        @Override
 		public RepeatStatus execute(StepContribution contribution, ChunkContext chunkContext) throws Exception {
 			throw taskletException;
 		}
@@ -396,29 +405,36 @@ public class TaskletStepExceptionTests {
 			this.failInTransaction = failInTransaction;
 		}
 
+        @Override
 		public void add(StepExecution stepExecution) {
 		}
 
+        @Override
 		public JobExecution createJobExecution(String jobName, JobParameters jobParameters)
 				throws JobExecutionAlreadyRunningException, JobRestartException, JobInstanceAlreadyCompleteException {
 			return null;
 		}
 
+        @Override
 		public StepExecution getLastStepExecution(JobInstance jobInstance, String stepName) {
 			return null;
 		}
 
+        @Override
 		public int getStepExecutionCount(JobInstance jobInstance, String stepName) {
 			return 0;
 		}
 
+        @Override
 		public boolean isJobInstanceExists(String jobName, JobParameters jobParameters) {
 			return false;
 		}
 
+        @Override
 		public void update(JobExecution jobExecution) {
 		}
 
+        @Override
 		public void update(StepExecution stepExecution) {
 			if (updateCount == failOnUpdateExecution) {
 				throw new RuntimeException("Expected exception in step execution persistence");
@@ -426,6 +442,7 @@ public class TaskletStepExceptionTests {
 			updateCount++;
 		}
 
+        @Override
 		public void updateExecutionContext(StepExecution stepExecution) {
 			if (failOnUpdateContext) {
 				if (!failInTransaction
@@ -439,10 +456,12 @@ public class TaskletStepExceptionTests {
 			return updateCount;
 		}
 
+        @Override
 		public JobExecution getLastJobExecution(String jobName, JobParameters jobParameters) {
 			return null;
 		}
 
+        @Override
 		public void updateExecutionContext(JobExecution jobExecution) {
 		}
 	}

@@ -40,10 +40,12 @@ public class JobFactoryRegistrationListenerTests {
 	public void testBind() throws Exception {
 		listener.setJobRegistry(registry);
 		listener.bind(new JobFactory() {
+            @Override
 			public Job createJob() {
 				return null;
 			}
 
+            @Override
 			public String getJobName() {
 				return "foo";
 			}
@@ -60,10 +62,12 @@ public class JobFactoryRegistrationListenerTests {
 	public void testUnbind() throws Exception {
 		testBind();
 		listener.unbind(new JobFactory() {
+            @Override
 			public Job createJob() {
 				return null;
 			}
 
+            @Override
 			public String getJobName() {
 				return "foo";
 			}

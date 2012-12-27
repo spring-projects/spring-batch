@@ -74,6 +74,7 @@ public class StopJobParserTests extends AbstractJobParserTests {
 	}
 
 	public static class TestDecider implements JobExecutionDecider {
+        @Override
 		public FlowExecutionStatus decide(JobExecution jobExecution, StepExecution stepExecution) {
 			return new FlowExecutionStatus("FOO");
 		}

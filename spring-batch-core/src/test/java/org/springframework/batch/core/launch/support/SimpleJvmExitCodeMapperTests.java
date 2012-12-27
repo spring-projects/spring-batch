@@ -30,6 +30,7 @@ public class SimpleJvmExitCodeMapperTests extends TestCase {
 	private SimpleJvmExitCodeMapper ecm;
 	private SimpleJvmExitCodeMapper ecm2;
 	
+    @Override
 	protected void setUp() throws Exception {
 		ecm = new SimpleJvmExitCodeMapper();
 		Map<String, Integer> ecmMap = new HashMap<String, Integer>();
@@ -45,6 +46,7 @@ public class SimpleJvmExitCodeMapperTests extends TestCase {
 		ecm2.setMapping(ecm2Map);
 	}
 
+    @Override
 	protected void tearDown() throws Exception {
 		super.tearDown();
 	}

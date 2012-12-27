@@ -50,11 +50,13 @@ public class PatternMatchingCompositeLineMapperTests {
 	public void testKeyFound() throws Exception {
 		Map<String, LineTokenizer> tokenizers = new HashMap<String, LineTokenizer>();
 		tokenizers.put("foo*", new LineTokenizer() {
+            @Override
 			public FieldSet tokenize(String line) {
 				return new DefaultFieldSet(new String[] { "a", "b" });
 			}
 		});
 		tokenizers.put("bar*", new LineTokenizer() {
+            @Override
 			public FieldSet tokenize(String line) {
 				return new DefaultFieldSet(new String[] { "c", "d" });
 			}
@@ -63,11 +65,13 @@ public class PatternMatchingCompositeLineMapperTests {
 
 		Map<String, FieldSetMapper<Name>> fieldSetMappers = new HashMap<String, FieldSetMapper<Name>>();
 		fieldSetMappers.put("foo*", new FieldSetMapper<Name>() {
+            @Override
 			public Name mapFieldSet(FieldSet fs) {
 				return new Name(fs.readString(0), fs.readString(1), 0);
 			}
 		});
 		fieldSetMappers.put("bar*", new FieldSetMapper<Name>() {
+            @Override
 			public Name mapFieldSet(FieldSet fs) {
 				return new Name(fs.readString(1), fs.readString(0), 0);
 			}
@@ -82,11 +86,13 @@ public class PatternMatchingCompositeLineMapperTests {
 	public void testMapperKeyNotFound() throws Exception {
 		Map<String, LineTokenizer> tokenizers = new HashMap<String, LineTokenizer>();
 		tokenizers.put("foo*", new LineTokenizer() {
+            @Override
 			public FieldSet tokenize(String line) {
 				return new DefaultFieldSet(new String[] { "a", "b" });
 			}
 		});
 		tokenizers.put("bar*", new LineTokenizer() {
+            @Override
 			public FieldSet tokenize(String line) {
 				return new DefaultFieldSet(new String[] { "c", "d" });
 			}
@@ -95,6 +101,7 @@ public class PatternMatchingCompositeLineMapperTests {
 
 		Map<String, FieldSetMapper<Name>> fieldSetMappers = new HashMap<String, FieldSetMapper<Name>>();
 		fieldSetMappers.put("foo*", new FieldSetMapper<Name>() {
+            @Override
 			public Name mapFieldSet(FieldSet fs) {
 				return new Name(fs.readString(0), fs.readString(1), 0);
 			}

@@ -9,9 +9,11 @@ import org.springframework.jdbc.core.support.JdbcDaoSupport;
 
 public class SingleKeyFooDao extends JdbcDaoSupport implements FooDao {
 
+    @Override
 	public Foo getFoo(Object key){
 
 		RowMapper fooMapper = new RowMapper(){
+            @Override
 			public Object mapRow(ResultSet rs, int rowNum) throws SQLException {
 				Foo foo = new Foo();
 				foo.setId(rs.getInt(1));

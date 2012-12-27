@@ -212,6 +212,7 @@ public class FaultTolerantChunkProcessor<I, O> extends SimpleChunkProcessor<I, O
 
 			RetryCallback<O> retryCallback = new RetryCallback<O>() {
 
+                @Override
 				public O doWithRetry(RetryContext context) throws Exception {
 					O output = null;
 					try {
@@ -263,6 +264,7 @@ public class FaultTolerantChunkProcessor<I, O> extends SimpleChunkProcessor<I, O
 
 			RecoveryCallback<O> recoveryCallback = new RecoveryCallback<O>() {
 
+                @Override
 				public O recover(RetryContext context) throws Exception {
 					Throwable e = context.getLastThrowable();
 					if (shouldSkip(itemProcessSkipPolicy, e, contribution.getStepSkipCount())) {
@@ -316,6 +318,7 @@ public class FaultTolerantChunkProcessor<I, O> extends SimpleChunkProcessor<I, O
 		final AtomicReference<RetryContext> contextHolder = new AtomicReference<RetryContext>();
 
 		RetryCallback<Object> retryCallback = new RetryCallback<Object>() {
+            @Override
 			public Object doWithRetry(RetryContext context) throws Exception {
 
 				contextHolder.set(context);
@@ -352,6 +355,7 @@ public class FaultTolerantChunkProcessor<I, O> extends SimpleChunkProcessor<I, O
 
 			RecoveryCallback<Object> batchRecoveryCallback = new RecoveryCallback<Object>() {
 
+                @Override
 				public Object recover(RetryContext context) throws Exception {
 
 					Throwable e = context.getLastThrowable();
@@ -389,6 +393,7 @@ public class FaultTolerantChunkProcessor<I, O> extends SimpleChunkProcessor<I, O
 
 			RecoveryCallback<Object> recoveryCallback = new RecoveryCallback<Object>() {
 
+                @Override
 				public Object recover(RetryContext context) throws Exception {
 
 					/*

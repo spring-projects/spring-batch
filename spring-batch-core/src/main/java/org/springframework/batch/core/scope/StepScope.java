@@ -91,6 +91,7 @@ public class StepScope implements Scope, BeanFactoryPostProcessor, Ordered {
 		this.order = order;
 	}
 
+    @Override
 	public int getOrder() {
 		return order;
 	}
@@ -124,6 +125,7 @@ public class StepScope implements Scope, BeanFactoryPostProcessor, Ordered {
 	 * step-scoped beans. This method is part of the Scope SPI in Spring 3.0,
 	 * but should just be ignored by earlier versions of Spring.
 	 */
+    @Override
 	public Object resolveContextualObject(String key) {
 		StepContext context = getContext();
 		// TODO: support for attributes as well maybe (setters not exposed yet
@@ -134,6 +136,7 @@ public class StepScope implements Scope, BeanFactoryPostProcessor, Ordered {
 	/**
 	 * @see Scope#get(String, ObjectFactory)
 	 */
+    @Override
 	public Object get(String name, ObjectFactory objectFactory) {
 
 		StepContext context = getContext();
@@ -161,6 +164,7 @@ public class StepScope implements Scope, BeanFactoryPostProcessor, Ordered {
 	/**
 	 * @see Scope#getConversationId()
 	 */
+    @Override
 	public String getConversationId() {
 		StepContext context = getContext();
 		return context.getId();
@@ -169,6 +173,7 @@ public class StepScope implements Scope, BeanFactoryPostProcessor, Ordered {
 	/**
 	 * @see Scope#registerDestructionCallback(String, Runnable)
 	 */
+    @Override
 	public void registerDestructionCallback(String name, Runnable callback) {
 		StepContext context = getContext();
 		logger.debug(String.format("Registered destruction callback in scope=%s, name=%s", this.name, name));
@@ -178,6 +183,7 @@ public class StepScope implements Scope, BeanFactoryPostProcessor, Ordered {
 	/**
 	 * @see Scope#remove(String)
 	 */
+    @Override
 	public Object remove(String name) {
 		StepContext context = getContext();
 		logger.debug(String.format("Removing from scope=%s, name=%s", this.name, name));
@@ -207,6 +213,7 @@ public class StepScope implements Scope, BeanFactoryPostProcessor, Ordered {
 	 * @param beanFactory the BeanFactory to register with
 	 * @throws BeansException if there is a problem.
 	 */
+    @Override
 	public void postProcessBeanFactory(ConfigurableListableBeanFactory beanFactory) throws BeansException {
 
 		beanFactory.registerScope(name, this);
@@ -307,6 +314,7 @@ public class StepScope implements Scope, BeanFactoryPostProcessor, Ordered {
 
 		public Scopifier(BeanDefinitionRegistry registry, String scope, boolean proxyTargetClass, boolean scoped) {
 			super(new StringValueResolver() {
+                @Override
 				public String resolveStringValue(String value) {
 					return value;
 				}
@@ -374,6 +382,7 @@ public class StepScope implements Scope, BeanFactoryPostProcessor, Ordered {
 
 		private ExpressionHider(String scope, final boolean scoped) {
 			super(new StringValueResolver() {
+                @Override
 				public String resolveStringValue(String value) {
 					if (scoped && value.contains(PLACEHOLDER_PREFIX) && value.contains(PLACEHOLDER_SUFFIX)) {
 						value = value.replace(PLACEHOLDER_PREFIX, REPLACEMENT_PREFIX);

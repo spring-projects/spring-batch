@@ -38,6 +38,7 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 @ContextConfiguration(locations = "/org/springframework/batch/item/database/JdbcPagingItemReaderParameterTests-context.xml")
 public class JdbcPagingItemReaderClassicParameterTests extends AbstractPagingItemReaderParameterTests {
 
+    @Override
 	protected AbstractPagingItemReader<Foo> getItemReader() throws Exception {
 
 		JdbcPagingItemReader<Foo> reader = new JdbcPagingItemReader<Foo>();
@@ -53,6 +54,7 @@ public class JdbcPagingItemReaderClassicParameterTests extends AbstractPagingIte
 		reader.setQueryProvider(queryProvider);
 		reader.setRowMapper(
 				new ParameterizedRowMapper<Foo>() {
+                    @Override
 					public Foo mapRow(ResultSet rs, int i) throws SQLException {
 						Foo foo = new Foo();
 						foo.setId(rs.getInt(1));

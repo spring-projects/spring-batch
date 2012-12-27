@@ -66,6 +66,7 @@ public class SingleItemPeekableItemReader<T> implements ItemStreamReader<T>, Pee
 	 * 
 	 * @see ItemReader#read()
 	 */
+    @Override
 	public T read() throws Exception, UnexpectedInputException, ParseException {
 		if (next != null) {
 			T item = next;
@@ -85,6 +86,7 @@ public class SingleItemPeekableItemReader<T> implements ItemStreamReader<T>, Pee
 	 * 
 	 * @see PeekableItemReader#peek()
 	 */
+    @Override
 	public T peek() throws Exception, UnexpectedInputException, ParseException {
 		if (next == null) {
 			updateDelegate(executionContext);
@@ -100,6 +102,7 @@ public class SingleItemPeekableItemReader<T> implements ItemStreamReader<T>, Pee
 	 * @throws ItemStreamException if there is a problem
 	 * @see ItemStream#close()
 	 */
+    @Override
 	public void close() throws ItemStreamException {
 		next = null;
 		if (delegate instanceof ItemStream) {
@@ -116,6 +119,7 @@ public class SingleItemPeekableItemReader<T> implements ItemStreamReader<T>, Pee
 	 * @throws ItemStreamException if there is a problem
 	 * @see ItemStream#open(ExecutionContext)
 	 */
+    @Override
 	public void open(ExecutionContext executionContext) throws ItemStreamException {
 		next = null;
 		if (delegate instanceof ItemStream) {
@@ -133,6 +137,7 @@ public class SingleItemPeekableItemReader<T> implements ItemStreamReader<T>, Pee
 	 * @throws ItemStreamException if there is a problem
 	 * @see ItemStream#update(ExecutionContext)
 	 */
+    @Override
 	public void update(ExecutionContext executionContext) throws ItemStreamException {
 		if (next != null) {
 			// Get the last state from the delegate instead of using

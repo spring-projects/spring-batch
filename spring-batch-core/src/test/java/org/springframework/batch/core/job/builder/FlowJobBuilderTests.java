@@ -143,6 +143,7 @@ public class FlowJobBuilderTests {
 	public void testBuildDecision() throws Exception {
 		JobExecutionDecider decider = new JobExecutionDecider() {
 			private int count = 0;
+            @Override
 			public FlowExecutionStatus decide(JobExecution jobExecution, StepExecution stepExecution) {
 				count++;
 				return count<2 ? new FlowExecutionStatus("ONGOING") : FlowExecutionStatus.COMPLETED;

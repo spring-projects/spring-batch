@@ -27,6 +27,7 @@ import org.springframework.batch.core.ExitStatus;
  * @author Robert Kasanicky
  */
 public class SimpleSystemProcessExitCodeMapper implements SystemProcessExitCodeMapper {
+    @Override
 	public ExitStatus getExitStatus(int exitCode) {
 		if (exitCode == 0) {
 			return ExitStatus.COMPLETED;

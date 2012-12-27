@@ -43,6 +43,7 @@ public class DefaultStepExecutionAggregator implements StepExecutionAggregator {
 	 * </ul>
 	 * @see StepExecutionAggregator #aggregate(StepExecution, Collection)
 	 */
+    @Override
 	public void aggregate(StepExecution result, Collection<StepExecution> executions) {
 		Assert.notNull(result, "To aggregate into a result it must be non-null.");
 		if (executions == null) {

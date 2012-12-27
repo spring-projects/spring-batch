@@ -44,6 +44,7 @@ public class HibernateNativeQueryProvider<E> extends AbstractHibernateQueryProvi
 	 * stateless if both are available).
 	 * </p>
 	 */
+    @Override
 	public SQLQuery createQuery() {
 
 		if (isStatelessSession()) {

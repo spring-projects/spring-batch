@@ -31,6 +31,7 @@ public class SimpleRecordSeparatorPolicy implements RecordSeparatorPolicy {
 	 * 
 	 * @see org.springframework.batch.item.file.separator.RecordSeparatorPolicy#isEndOfRecord(java.lang.String)
 	 */
+    @Override
 	public boolean isEndOfRecord(String line) {
 		return true;
 	}
@@ -39,6 +40,7 @@ public class SimpleRecordSeparatorPolicy implements RecordSeparatorPolicy {
 	 * Pass the record through. Do nothing.
 	 * @see org.springframework.batch.item.file.separator.RecordSeparatorPolicy#postProcess(java.lang.String)
 	 */
+    @Override
 	public String postProcess(String record) {
 		return record;
 	}
@@ -47,6 +49,7 @@ public class SimpleRecordSeparatorPolicy implements RecordSeparatorPolicy {
 	 * Pass the line through.  Do nothing.
 	 * @see org.springframework.batch.item.file.separator.RecordSeparatorPolicy#preProcess(java.lang.String)
 	 */
+    @Override
 	public String preProcess(String line) {
 		return line;
 	}

@@ -61,10 +61,12 @@ public class SimpleFlowFactoryBean implements FactoryBean, InitializingBean {
 	 * 
 	 * @throws Exception
 	 */
+    @Override
 	public void afterPropertiesSet() throws Exception {
 		Assert.hasText(name, "The flow must have a name");
 	}
 
+    @Override
 	public Object getObject() throws Exception {
 
 		SimpleFlow flow = new SimpleFlow(name);
@@ -109,10 +111,12 @@ public class SimpleFlowFactoryBean implements FactoryBean, InitializingBean {
 		return new DelegateState(stateName, state);
 	}
 
+    @Override
 	public Class<?> getObjectType() {
 		return SimpleFlow.class;
 	}
 
+    @Override
 	public boolean isSingleton() {
 		return true;
 	}
@@ -132,6 +136,7 @@ public class SimpleFlowFactoryBean implements FactoryBean, InitializingBean {
 			this.state = state;
 		}
 
+        @Override
 		public boolean isEndState() {
 			return state.isEndState();
 		}
@@ -141,6 +146,7 @@ public class SimpleFlowFactoryBean implements FactoryBean, InitializingBean {
 			return state.handle(executor);
 		}
 
+        @Override
 		public Collection<Flow> getFlows() {
 			return (state instanceof FlowHolder) ? ((FlowHolder)state).getFlows() : Collections.<Flow>emptyList();
 		}

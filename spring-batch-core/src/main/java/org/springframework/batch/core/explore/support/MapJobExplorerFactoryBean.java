@@ -65,6 +65,7 @@ public class MapJobExplorerFactoryBean extends AbstractJobExplorerFactoryBean im
 	 * @throws Exception
 	 * @see org.springframework.beans.factory.InitializingBean#afterPropertiesSet()
 	 */
+    @Override
 	public void afterPropertiesSet() throws Exception {
 		Assert.state(repositoryFactory != null, "A MapJobRepositoryFactoryBean must be provided");
 		repositoryFactory.afterPropertiesSet();
@@ -90,6 +91,7 @@ public class MapJobExplorerFactoryBean extends AbstractJobExplorerFactoryBean im
 		return repositoryFactory.getExecutionContextDao();
 	}
 
+    @Override
 	public Object getObject() throws Exception {
 		return new SimpleJobExplorer(createJobInstanceDao(), createJobExecutionDao(), createStepExecutionDao(),
 				createExecutionContextDao());

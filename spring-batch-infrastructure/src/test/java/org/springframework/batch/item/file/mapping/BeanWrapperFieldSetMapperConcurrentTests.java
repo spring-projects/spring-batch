@@ -45,6 +45,7 @@ public class BeanWrapperFieldSetMapperConcurrentTests {
 		Collection<Future<Boolean>> results = new ArrayList<Future<Boolean>>();
 		for (int i = 0; i < 10; i++) {
 			Future<Boolean> result = executorService.submit(new Callable<Boolean>() {
+                @Override
 				public Boolean call() throws Exception {
 					for (int i = 0; i < 10; i++) {
 						GreenBean bean = mapper.mapFieldSet(lineTokenizer.tokenize("blue,green"));

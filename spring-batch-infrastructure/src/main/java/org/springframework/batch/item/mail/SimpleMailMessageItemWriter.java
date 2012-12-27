@@ -86,6 +86,7 @@ public class SimpleMailMessageItemWriter implements ItemWriter<SimpleMailMessage
 	 * 
 	 * @see InitializingBean#afterPropertiesSet()
 	 */
+    @Override
 	public void afterPropertiesSet() throws IllegalStateException {
 		Assert.state(mailSender != null, "A MailSender must be provided.");
 	}
@@ -94,6 +95,7 @@ public class SimpleMailMessageItemWriter implements ItemWriter<SimpleMailMessage
 	 * @param items the items to send
 	 * @see ItemWriter#write(List)
 	 */
+    @Override
 	public void write(List<? extends SimpleMailMessage> items) throws MailException {
 		try {
 			mailSender.send(items.toArray(new SimpleMailMessage[items.size()]));

@@ -55,6 +55,7 @@ class JobParserJobFactoryBean implements SmartFactoryBean {
 		this.name = name;
 	}
 
+    @Override
 	public final Object getObject() throws Exception {
 		Assert.isTrue(StringUtils.hasText(name), "The job must have an id.");
 		FlowJob flowJob = new FlowJob(name);
@@ -115,18 +116,22 @@ class JobParserJobFactoryBean implements SmartFactoryBean {
 		this.flow = flow;
 	}
 
+    @Override
 	public Class<FlowJob> getObjectType() {
 		return FlowJob.class;
 	}
 
+    @Override
 	public boolean isSingleton() {
 		return true;
 	}
 	
+    @Override
 	public boolean isEagerInit() {
 		return true;
 	}
 	
+    @Override
 	public boolean isPrototype() {
 		return false;
 	}

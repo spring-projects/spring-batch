@@ -90,6 +90,7 @@ public class LogOrRethrowExceptionHandler implements ExceptionHandler {
 	 * 
 	 * @see ExceptionHandler#handleException(RepeatContext, Throwable)
 	 */
+    @Override
 	public void handleException(RepeatContext context, Throwable throwable) throws Throwable {
 
 		Level key = exceptionClassifier.classify(throwable);

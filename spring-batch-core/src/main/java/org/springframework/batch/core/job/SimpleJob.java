@@ -72,6 +72,7 @@ public class SimpleJob extends AbstractJob {
 	 * 
 	 * @return the step names for this job
 	 */
+    @Override
 	public Collection<String> getStepNames() {
 		List<String> names = new ArrayList<String>();
 		for (Step step : steps) {
@@ -95,6 +96,7 @@ public class SimpleJob extends AbstractJob {
 	 * @see
 	 * org.springframework.batch.core.job.AbstractJob#getStep(java.lang.String)
 	 */
+    @Override
 	public Step getStep(String stepName) {
 		for (Step step : this.steps) {
 			if (step.getName().equals(stepName)) {
@@ -113,6 +115,7 @@ public class SimpleJob extends AbstractJob {
 	 * 
 	 * @see AbstractJob#handleStep(Step, JobExecution)
 	 */
+    @Override
 	protected void doExecute(JobExecution execution) throws JobInterruptedException, JobRestartException,
 			StartLimitExceededException {
 

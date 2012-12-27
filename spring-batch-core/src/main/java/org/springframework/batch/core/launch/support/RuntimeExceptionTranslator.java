@@ -27,6 +27,7 @@ public class RuntimeExceptionTranslator implements MethodInterceptor {
 	/* (non-Javadoc)
 	 * @see org.aopalliance.intercept.MethodInterceptor#invoke(org.aopalliance.intercept.MethodInvocation)
 	 */
+    @Override
 	public Object invoke(MethodInvocation invocation) throws Throwable {
 		try {
 			return invocation.proceed();

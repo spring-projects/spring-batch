@@ -35,6 +35,7 @@ public class CompositeSkipPolicy implements SkipPolicy {
 		this.skipPolicies = skipPolicies;
 	}
 
+    @Override
 	public boolean shouldSkip(Throwable t, int skipCount) throws SkipLimitExceededException {
 		for (SkipPolicy policy : skipPolicies) {
 			if (policy.shouldSkip(t, skipCount)) {

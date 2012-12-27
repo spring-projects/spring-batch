@@ -92,9 +92,11 @@ public class ChunkOrientedStepIntegrationTests {
 
 		step.setTasklet(new TestingChunkOrientedTasklet<String>(getReader(new String[] { "a", "b", "c" }),
 				new ItemWriter<String>() {
+                    @Override
 					public void write(List<? extends String> data) throws Exception {
 						TransactionSynchronizationManager
 								.registerSynchronization(new TransactionSynchronizationAdapter() {
+                                    @Override
 									public void beforeCommit(boolean readOnly) {
 										throw new RuntimeException("Simulate commit failure");
 									}

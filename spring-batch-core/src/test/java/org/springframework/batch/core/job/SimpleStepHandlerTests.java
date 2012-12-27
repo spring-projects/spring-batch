@@ -77,6 +77,7 @@ public class SimpleStepHandlerTests {
 			super(name);
 		}
 
+        @Override
 		public void execute(StepExecution stepExecution) throws JobInterruptedException {
 			stepExecution.setStatus(BatchStatus.COMPLETED);
 			stepExecution.setExitStatus(ExitStatus.COMPLETED);

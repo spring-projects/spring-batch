@@ -62,6 +62,7 @@ public class OrderedCompositeTests {
 	public void testAddOrdered() {
 		list.setItems(Arrays.asList((Object) "1"));
 		list.add(new Ordered() {
+            @Override
 			public int getOrder() {
 				return 0;
 			}
@@ -75,11 +76,13 @@ public class OrderedCompositeTests {
 	public void testAddMultipleOrdered() {
 		list.setItems(Arrays.asList((Object) "1"));
 		list.add(new Ordered() {
+            @Override
 			public int getOrder() {
 				return 1;
 			}
 		});
 		list.add(new Ordered() {
+            @Override
 			public int getOrder() {
 				return 0;
 			}
@@ -94,11 +97,13 @@ public class OrderedCompositeTests {
 	public void testAddDuplicateOrdered() {
 		list.setItems(Arrays.asList((Object) "1"));
 		list.add(new Ordered() {
+            @Override
 			public int getOrder() {
 				return 1;
 			}
 		});
 		list.add(new Ordered() {
+            @Override
 			public int getOrder() {
 				return 1;
 			}
@@ -112,6 +117,7 @@ public class OrderedCompositeTests {
 	@Test
 	public void testAddAnnotationOrdered() {
 		list.add(new Ordered() {
+            @Override
 			public int getOrder() {
 				return 1;
 			}

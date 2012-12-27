@@ -72,6 +72,7 @@ public class HibernateCursorItemReader<T> extends AbstractItemCountingItemStream
 
 	private Map<String, Object> parameterValues;
 
+    @Override
 	public void afterPropertiesSet() throws Exception {
 		Assert.state(fetchSize >= 0, "fetchSize must not be negative");
 		helper.afterPropertiesSet();
@@ -150,6 +151,7 @@ public class HibernateCursorItemReader<T> extends AbstractItemCountingItemStream
 		helper.setUseStatelessSession(useStatelessSession);
 	}
 
+    @Override
 	protected T doRead() throws Exception {
 		if (cursor.next()) {
 			Object[] data = cursor.get();
@@ -178,6 +180,7 @@ public class HibernateCursorItemReader<T> extends AbstractItemCountingItemStream
 	/**
 	 * Open hibernate session and create a forward-only cursor for the query.
 	 */
+    @Override
 	protected void doOpen() throws Exception {
 		Assert.state(!initialized, "Cannot open an already opened ItemReader, call close first");
 		cursor = helper.getForwardOnlyCursor(fetchSize, parameterValues);
@@ -215,6 +218,7 @@ public class HibernateCursorItemReader<T> extends AbstractItemCountingItemStream
 	/**
 	 * Close the cursor and hibernate session.
 	 */
+    @Override
 	protected void doClose() throws Exception {
 
 		initialized = false;

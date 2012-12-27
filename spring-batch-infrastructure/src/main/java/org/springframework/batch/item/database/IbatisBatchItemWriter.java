@@ -102,6 +102,7 @@ public class IbatisBatchItemWriter<T> implements ItemWriter<T>, InitializingBean
 	/**
 	 * Check mandatory properties - there must be an SqlMapClient and a statementId.
 	 */
+    @Override
 	public void afterPropertiesSet() {
 		Assert.notNull(sqlMapClientTemplate, "A SqlMapClient or a SqlMapClientTemplate is required.");
 		Assert.notNull(statementId, "A statementId is required.");
@@ -110,6 +111,7 @@ public class IbatisBatchItemWriter<T> implements ItemWriter<T>, InitializingBean
 	/* (non-Javadoc)
 	 * @see org.springframework.batch.item.ItemWriter#write(java.util.List)
 	 */
+    @Override
 	public void write(final List<? extends T> items) {
 
 		if (!items.isEmpty()) {
@@ -121,6 +123,7 @@ public class IbatisBatchItemWriter<T> implements ItemWriter<T>, InitializingBean
 			@SuppressWarnings("unchecked")
 			List<BatchResult> results = (List<BatchResult>) sqlMapClientTemplate.execute(
 					new SqlMapClientCallback() {
+                        @Override
 						public Object doInSqlMapClient(SqlMapExecutor executor)
 								throws SQLException {
 							executor.startBatch();

@@ -86,6 +86,7 @@ public class StaxEventItemReader<T> extends AbstractItemCountingItemStreamItemRe
 		this.strict = strict;
 	}
 
+    @Override
 	public void setResource(Resource resource) {
 		this.resource = resource;
 	}
@@ -112,6 +113,7 @@ public class StaxEventItemReader<T> extends AbstractItemCountingItemStreamItemRe
 	 * the root element is empty.
 	 * @throws IllegalStateException if the Resource does not exist.
 	 */
+    @Override
 	public void afterPropertiesSet() throws Exception {
 		Assert.notNull(unmarshaller, "The Unmarshaller must not be null.");
 		Assert.hasLength(fragmentRootElementName, "The FragmentRootElementName must not be null");
@@ -157,6 +159,7 @@ public class StaxEventItemReader<T> extends AbstractItemCountingItemStreamItemRe
 		}
 	}
 
+    @Override
 	protected void doClose() throws Exception {
 		try {
 			if (fragmentReader != null) {
@@ -173,6 +176,7 @@ public class StaxEventItemReader<T> extends AbstractItemCountingItemStreamItemRe
 
 	}
 
+    @Override
 	protected void doOpen() throws Exception {
 		Assert.notNull(resource, "The Resource must not be null.");
 
@@ -202,6 +206,7 @@ public class StaxEventItemReader<T> extends AbstractItemCountingItemStreamItemRe
 	/**
 	 * Move to next fragment and map it to item.
 	 */
+    @Override
 	protected T doRead() throws Exception {
 
 		if (noInput) {

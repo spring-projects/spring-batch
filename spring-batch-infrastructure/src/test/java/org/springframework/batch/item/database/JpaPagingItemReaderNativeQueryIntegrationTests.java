@@ -22,6 +22,7 @@ public class JpaPagingItemReaderNativeQueryIntegrationTests extends AbstractPagi
     @Autowired
     private EntityManagerFactory entityManagerFactory;
 
+    @Override
     protected AbstractPagingItemReader<Foo> getItemReader() throws Exception {
 
         String sqlQuery = "select * from T_FOOS where value >= :limit";

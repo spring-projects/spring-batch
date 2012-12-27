@@ -83,6 +83,7 @@ public class SimpleJobOperatorTests {
 			@Override
 			public JobParametersIncrementer getJobParametersIncrementer() {
 				return new JobParametersIncrementer() {
+                    @Override
 					public JobParameters getNext(JobParameters parameters) {
 						return jobParameters;
 					}
@@ -93,6 +94,7 @@ public class SimpleJobOperatorTests {
 		jobOperator = new SimpleJobOperator();
 
 		jobOperator.setJobRegistry(new MapJobRegistry() {
+            @Override
 			public Job getJob(String name) throws NoSuchJobException {
 				if (name.equals("foo")) {
 					return job;
@@ -107,6 +109,7 @@ public class SimpleJobOperatorTests {
 		});
 
 		jobOperator.setJobLauncher(new JobLauncher() {
+            @Override
 			public JobExecution run(Job job, JobParameters jobParameters) throws JobExecutionAlreadyRunningException,
 					JobRestartException, JobInstanceAlreadyCompleteException {
 				return new JobExecution(new JobInstance(123L, jobParameters, job.getName()), 999L);

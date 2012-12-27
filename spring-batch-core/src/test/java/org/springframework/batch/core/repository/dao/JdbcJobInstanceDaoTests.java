@@ -37,6 +37,7 @@ public class JdbcJobInstanceDaoTests extends AbstractJobInstanceDaoTests {
 	@Autowired
 	private JobExecutionDao jobExecutionDao;
 
+    @Override
 	protected JobInstanceDao getJobInstanceDao() {
 		JdbcTestUtils.deleteFromTables(jdbcTemplate, "BATCH_JOB_EXECUTION_CONTEXT",
                 "BATCH_STEP_EXECUTION_CONTEXT", "BATCH_STEP_EXECUTION",

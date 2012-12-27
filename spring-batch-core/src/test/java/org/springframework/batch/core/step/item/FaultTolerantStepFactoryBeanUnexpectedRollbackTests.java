@@ -49,6 +49,7 @@ public class FaultTolerantStepFactoryBeanUnexpectedRollbackTests {
 
 		DataSourceTransactionManager transactionManager = new DataSourceTransactionManager(dataSource) {
 			private boolean failed = false;
+            @Override
 			protected void doCommit(DefaultTransactionStatus status) throws TransactionException {
 				if (writer.getWritten().isEmpty() || failed || !isExistingTransaction(status.getTransaction())) {
 					super.doCommit(status);

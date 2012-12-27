@@ -94,6 +94,7 @@ public class HibernateItemReaderHelper<T> implements InitializingBean {
 		this.sessionFactory = sessionFactory;
 	}
 
+    @Override
 	public void afterPropertiesSet() throws Exception {
 
 		Assert.state(sessionFactory != null, "A SessionFactory must be provided");

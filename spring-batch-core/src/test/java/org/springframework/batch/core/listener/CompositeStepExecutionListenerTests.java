@@ -41,11 +41,13 @@ public class CompositeStepExecutionListenerTests extends TestCase {
 	 */
 	public void testSetListeners() {
 		listener.setListeners(new StepExecutionListener[] { new StepExecutionListenerSupport() {
+            @Override
 			public ExitStatus afterStep(StepExecution stepExecution) {
 				list.add("fail");
 				return ExitStatus.FAILED;
 			}
 		}, new StepExecutionListenerSupport() {
+            @Override
 			public ExitStatus afterStep(StepExecution stepExecution) {
 				list.add("continue");
 				return ExitStatus.EXECUTING;
@@ -62,6 +64,7 @@ public class CompositeStepExecutionListenerTests extends TestCase {
 	 */
 	public void testSetListener() {
 		listener.register(new StepExecutionListenerSupport() {
+            @Override
 			public ExitStatus afterStep(StepExecution stepExecution) {
 				list.add("fail");
 				return ExitStatus.FAILED;
@@ -78,6 +81,7 @@ public class CompositeStepExecutionListenerTests extends TestCase {
 	 */
 	public void testOpen() {
 		listener.register(new StepExecutionListenerSupport() {
+            @Override
 			public void beforeStep(StepExecution stepExecution) {
 				list.add("foo");
 			}

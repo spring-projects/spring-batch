@@ -88,6 +88,7 @@ public class ListPreparedStatementSetterTests {
 		final List<String> results = new ArrayList<String>();
 		jdbcTemplate.query("SELECT NAME from T_FOOS where ID > ? and ID < ?", pss,
 				new RowCallbackHandler() {
+                    @Override
 					public void processRow(ResultSet rs) throws SQLException {
 						results.add(rs.getString(1));
 					}
@@ -133,6 +134,7 @@ public class ListPreparedStatementSetterTests {
 	public static class FooStoringItemWriter implements ItemWriter<Foo> {
 		private List<Foo> foos = new ArrayList<Foo>();
 
+        @Override
 		public void write(List<? extends Foo> items) throws Exception {
 			foos.addAll(items);
 		}

@@ -126,6 +126,7 @@ public class ConcurrentTransactionAwareProxyTests {
 	public void testTransactionalContains() throws Exception {
 		final Map<Long, Map<String, String>> map = TransactionAwareProxyFactory.createAppendOnlyTransactionalMap();
 		boolean result = (Boolean) new TransactionTemplate(transactionManager).execute(new TransactionCallback() {
+            @Override
 			public Object doInTransaction(TransactionStatus status) {
 				return map.containsKey("foo");
 			}
@@ -139,6 +140,7 @@ public class ConcurrentTransactionAwareProxyTests {
 
 			final int count = i;
 			completionService.submit(new Callable<List<String>>() {
+                @Override
 				public List<String> call() throws Exception {
 					List<String> list = new ArrayList<String>();
 					for (int i = 0; i < innerMax; i++) {
@@ -166,6 +168,7 @@ public class ConcurrentTransactionAwareProxyTests {
 		for (int i = 0; i < outerMax; i++) {
 
 			completionService.submit(new Callable<List<String>>() {
+                @Override
 				public List<String> call() throws Exception {
 					List<String> result = new ArrayList<String>();
 					for (int i = 0; i < innerMax; i++) {
@@ -205,6 +208,7 @@ public class ConcurrentTransactionAwareProxyTests {
 				final long id = j * 1000 + 123L + i;
 
 				completionService.submit(new Callable<List<String>>() {
+                    @Override
 					public List<String> call() throws Exception {
 						List<String> list = new ArrayList<String>();
 						for (int i = 0; i < innerMax; i++) {
@@ -227,6 +231,7 @@ public class ConcurrentTransactionAwareProxyTests {
 	private String saveInSetAndAssert(final Set<String> set, final String value) {
 
 		new TransactionTemplate(transactionManager).execute(new TransactionCallback() {
+            @Override
 			public Object doInTransaction(TransactionStatus status) {
 				set.add(value);
 				return null;
@@ -242,6 +247,7 @@ public class ConcurrentTransactionAwareProxyTests {
 	private String saveInListAndAssert(final List<String> list, final String value) {
 
 		new TransactionTemplate(transactionManager).execute(new TransactionCallback() {
+            @Override
 			public Object doInTransaction(TransactionStatus status) {
 				list.add(value);
 				return null;
@@ -258,6 +264,7 @@ public class ConcurrentTransactionAwareProxyTests {
 			final String value) {
 
 		new TransactionTemplate(transactionManager).execute(new TransactionCallback() {
+            @Override
 			public Object doInTransaction(TransactionStatus status) {
 				if (!map.containsKey(id)) {
 					map.put(id, new HashMap<String, String>());

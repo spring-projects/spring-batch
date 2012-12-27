@@ -183,14 +183,17 @@ public class SqlPagingQueryUtilsTests {
 			setSortKeys(sortKeys);
 		}
 
+        @Override
 		public String generateFirstPageQuery(int pageSize) {
 			return null;
 		}
 
+        @Override
 		public String generateRemainingPagesQuery(int pageSize) {
 			return null;
 		}
 
+        @Override
 		public String generateJumpToItemQuery(int itemIndex, int pageSize) {
 			return null;
 		}

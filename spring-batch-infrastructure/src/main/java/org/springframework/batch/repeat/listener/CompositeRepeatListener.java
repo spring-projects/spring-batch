@@ -54,6 +54,7 @@ public class CompositeRepeatListener implements RepeatListener {
 	/* (non-Javadoc)
 	 * @see org.springframework.batch.repeat.RepeatListener#after(org.springframework.batch.repeat.RepeatContext, org.springframework.batch.repeat.ExitStatus)
 	 */
+    @Override
 	public void after(RepeatContext context, RepeatStatus result) {
 		for (RepeatListener listener : listeners) {
 			listener.after(context, result);
@@ -63,6 +64,7 @@ public class CompositeRepeatListener implements RepeatListener {
 	/* (non-Javadoc)
 	 * @see org.springframework.batch.repeat.RepeatListener#before(org.springframework.batch.repeat.RepeatContext)
 	 */
+    @Override
 	public void before(RepeatContext context) {
 		for (RepeatListener listener : listeners) {
 			listener.before(context);
@@ -72,6 +74,7 @@ public class CompositeRepeatListener implements RepeatListener {
 	/* (non-Javadoc)
 	 * @see org.springframework.batch.repeat.RepeatListener#close(org.springframework.batch.repeat.RepeatContext)
 	 */
+    @Override
 	public void close(RepeatContext context) {
 		for (RepeatListener listener : listeners) {
 			listener.close(context);
@@ -81,6 +84,7 @@ public class CompositeRepeatListener implements RepeatListener {
 	/* (non-Javadoc)
 	 * @see org.springframework.batch.repeat.RepeatListener#onError(org.springframework.batch.repeat.RepeatContext, java.lang.Throwable)
 	 */
+    @Override
 	public void onError(RepeatContext context, Throwable e) {
 		for (RepeatListener listener : listeners) {
 			listener.onError(context, e);
@@ -90,6 +94,7 @@ public class CompositeRepeatListener implements RepeatListener {
 	/* (non-Javadoc)
 	 * @see org.springframework.batch.repeat.RepeatListener#open(org.springframework.batch.repeat.RepeatContext)
 	 */
+    @Override
 	public void open(RepeatContext context) {
 		for (RepeatListener listener : listeners) {
 			listener.open(context);

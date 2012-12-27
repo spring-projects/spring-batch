@@ -23,6 +23,7 @@ public class PlaceholderTargetSourceErrorTests extends ContextFactorySupport {
 
 	private Date date = new Date(1L);
 
+    @Override
 	public Object getContext() {
 		return this;
 	}
@@ -159,6 +160,7 @@ public class PlaceholderTargetSourceErrorTests extends ContextFactorySupport {
 		public Foo() {
 		}
 
+        @Override
 		public long getValue() {
 			return value;
 		}
@@ -171,10 +173,12 @@ public class PlaceholderTargetSourceErrorTests extends ContextFactorySupport {
 			this.name = name;
 		}
 
+        @Override
 		public String getName() {
 			return name;
 		}
 
+        @Override
 		public Date getDate() {
 			return date;
 		}
@@ -187,6 +191,7 @@ public class PlaceholderTargetSourceErrorTests extends ContextFactorySupport {
 			this.name = name;
 		}
 
+        @Override
 		public Node getParent() {
 			return parent;
 		}

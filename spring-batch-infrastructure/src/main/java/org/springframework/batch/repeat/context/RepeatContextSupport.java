@@ -53,6 +53,7 @@ public class RepeatContextSupport extends SynchronizedAttributeAccessor implemen
 	 * 
 	 * @see org.springframework.batch.repeat.RepeatContext#isCompleteOnly()
 	 */
+    @Override
 	public boolean isCompleteOnly() {
 		return completeOnly;
 	}
@@ -62,6 +63,7 @@ public class RepeatContextSupport extends SynchronizedAttributeAccessor implemen
 	 * 
 	 * @see org.springframework.batch.repeat.RepeatContext#setCompleteOnly()
 	 */
+    @Override
 	public void setCompleteOnly() {
 		completeOnly = true;
 	}
@@ -71,6 +73,7 @@ public class RepeatContextSupport extends SynchronizedAttributeAccessor implemen
 	 * 
 	 * @see org.springframework.batch.repeat.RepeatContext#isTerminateOnly()
 	 */
+    @Override
 	public boolean isTerminateOnly() {
 		return terminateOnly;
 	}
@@ -80,6 +83,7 @@ public class RepeatContextSupport extends SynchronizedAttributeAccessor implemen
 	 * 
 	 * @see org.springframework.batch.repeat.RepeatContext#setTerminateOnly()
 	 */
+    @Override
 	public void setTerminateOnly() {
 		terminateOnly = true;
 		setCompleteOnly();
@@ -90,6 +94,7 @@ public class RepeatContextSupport extends SynchronizedAttributeAccessor implemen
 	 * 
 	 * @see org.springframework.batch.repeat.RepeatContext#getParent()
 	 */
+    @Override
 	public RepeatContext getParent() {
 		return parent;
 	}
@@ -106,6 +111,7 @@ public class RepeatContextSupport extends SynchronizedAttributeAccessor implemen
 	 * 
 	 * @see org.springframework.batch.repeat.RepeatContext#getStartedCount()
 	 */
+    @Override
 	public synchronized int getStartedCount() {
 		return count;
 	}
@@ -117,6 +123,7 @@ public class RepeatContextSupport extends SynchronizedAttributeAccessor implemen
 	 * org.springframework.batch.repeat.RepeatContext#registerDestructionCallback
 	 * (java.lang.String, java.lang.Runnable)
 	 */
+    @Override
 	public void registerDestructionCallback(String name, Runnable callback) {
 		synchronized (callbacks) {
 			Set<Runnable> set = callbacks.get(name);
@@ -133,6 +140,7 @@ public class RepeatContextSupport extends SynchronizedAttributeAccessor implemen
 	 * 
 	 * @see org.springframework.batch.repeat.RepeatContext#close()
 	 */
+    @Override
 	public void close() {
 
 		List<RuntimeException> errors = new ArrayList<RuntimeException>();

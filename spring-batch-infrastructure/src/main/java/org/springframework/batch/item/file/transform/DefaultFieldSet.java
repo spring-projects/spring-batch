@@ -118,6 +118,7 @@ public class DefaultFieldSet implements FieldSet {
 	 * 
 	 * @see org.springframework.batch.item.file.mapping.IFieldSet#getNames()
 	 */
+    @Override
 	public String[] getNames() {
 		if (names == null) {
 			throw new IllegalStateException("Field names are not known");
@@ -130,6 +131,7 @@ public class DefaultFieldSet implements FieldSet {
 	 * 
 	 * @see org.springframework.batch.item.file.mapping.FieldSet#hasNames()
 	 */
+    @Override
 	public boolean hasNames() {
 		return names != null;
 	}
@@ -139,6 +141,7 @@ public class DefaultFieldSet implements FieldSet {
 	 * 
 	 * @see org.springframework.batch.item.file.mapping.IFieldSet#getValues()
 	 */
+    @Override
 	public String[] getValues() {
 		return tokens.clone();
 	}
@@ -149,6 +152,7 @@ public class DefaultFieldSet implements FieldSet {
 	 * @see
 	 * org.springframework.batch.item.file.mapping.IFieldSet#readString(int)
 	 */
+    @Override
 	public String readString(int index) {
 		return readAndTrim(index);
 	}
@@ -160,6 +164,7 @@ public class DefaultFieldSet implements FieldSet {
 	 * org.springframework.batch.item.file.mapping.IFieldSet#readString(java
 	 * .lang.String)
 	 */
+    @Override
 	public String readString(String name) {
 		return readString(indexOf(name));
 	}
@@ -170,6 +175,7 @@ public class DefaultFieldSet implements FieldSet {
 	 * @see
 	 * org.springframework.batch.item.file.mapping.IFieldSet#readRawString(int)
 	 */
+    @Override
 	public String readRawString(int index) {
 		return tokens[index];
 	}
@@ -181,6 +187,7 @@ public class DefaultFieldSet implements FieldSet {
 	 * org.springframework.batch.item.file.mapping.IFieldSet#readRawString(java
 	 * .lang.String)
 	 */
+    @Override
 	public String readRawString(String name) {
 		return readRawString(indexOf(name));
 	}
@@ -191,6 +198,7 @@ public class DefaultFieldSet implements FieldSet {
 	 * @see
 	 * org.springframework.batch.item.file.mapping.IFieldSet#readBoolean(int)
 	 */
+    @Override
 	public boolean readBoolean(int index) {
 		return readBoolean(index, "true");
 	}
@@ -202,6 +210,7 @@ public class DefaultFieldSet implements FieldSet {
 	 * org.springframework.batch.item.file.mapping.IFieldSet#readBoolean(java
 	 * .lang.String)
 	 */
+    @Override
 	public boolean readBoolean(String name) {
 		return readBoolean(indexOf(name));
 	}
@@ -213,6 +222,7 @@ public class DefaultFieldSet implements FieldSet {
 	 * org.springframework.batch.item.file.mapping.IFieldSet#readBoolean(int,
 	 * java.lang.String)
 	 */
+    @Override
 	public boolean readBoolean(int index, String trueValue) {
 		Assert.notNull(trueValue, "'trueValue' cannot be null.");
 
@@ -228,6 +238,7 @@ public class DefaultFieldSet implements FieldSet {
 	 * org.springframework.batch.item.file.mapping.IFieldSet#readBoolean(java
 	 * .lang.String, java.lang.String)
 	 */
+    @Override
 	public boolean readBoolean(String name, String trueValue) {
 		return readBoolean(indexOf(name), trueValue);
 	}
@@ -237,6 +248,7 @@ public class DefaultFieldSet implements FieldSet {
 	 * 
 	 * @see org.springframework.batch.item.file.mapping.IFieldSet#readChar(int)
 	 */
+    @Override
 	public char readChar(int index) {
 		String value = readAndTrim(index);
 
@@ -252,6 +264,7 @@ public class DefaultFieldSet implements FieldSet {
 	 * org.springframework.batch.item.file.mapping.IFieldSet#readChar(java.lang
 	 * .String)
 	 */
+    @Override
 	public char readChar(String name) {
 		return readChar(indexOf(name));
 	}
@@ -261,6 +274,7 @@ public class DefaultFieldSet implements FieldSet {
 	 * 
 	 * @see org.springframework.batch.item.file.mapping.IFieldSet#readByte(int)
 	 */
+    @Override
 	public byte readByte(int index) {
 		return Byte.parseByte(readAndTrim(index));
 	}
@@ -272,6 +286,7 @@ public class DefaultFieldSet implements FieldSet {
 	 * org.springframework.batch.item.file.mapping.IFieldSet#readByte(java.lang
 	 * .String)
 	 */
+    @Override
 	public byte readByte(String name) {
 		return readByte(indexOf(name));
 	}
@@ -281,6 +296,7 @@ public class DefaultFieldSet implements FieldSet {
 	 * 
 	 * @see org.springframework.batch.item.file.mapping.IFieldSet#readShort(int)
 	 */
+    @Override
 	public short readShort(int index) {
 		return Short.parseShort(readAndTrim(index));
 	}
@@ -292,6 +308,7 @@ public class DefaultFieldSet implements FieldSet {
 	 * org.springframework.batch.item.file.mapping.IFieldSet#readShort(java.
 	 * lang.String)
 	 */
+    @Override
 	public short readShort(String name) {
 		return readShort(indexOf(name));
 	}
@@ -301,6 +318,7 @@ public class DefaultFieldSet implements FieldSet {
 	 * 
 	 * @see org.springframework.batch.item.file.mapping.IFieldSet#readInt(int)
 	 */
+    @Override
 	public int readInt(int index) {
 		return parseNumber(readAndTrim(index)).intValue();
 	}
@@ -312,6 +330,7 @@ public class DefaultFieldSet implements FieldSet {
 	 * org.springframework.batch.item.file.mapping.IFieldSet#readInt(java.lang
 	 * .String)
 	 */
+    @Override
 	public int readInt(String name) {
 		return readInt(indexOf(name));
 	}
@@ -322,6 +341,7 @@ public class DefaultFieldSet implements FieldSet {
 	 * @see org.springframework.batch.item.file.mapping.IFieldSet#readInt(int,
 	 * int)
 	 */
+    @Override
 	public int readInt(int index, int defaultValue) {
 		String value = readAndTrim(index);
 
@@ -335,6 +355,7 @@ public class DefaultFieldSet implements FieldSet {
 	 * org.springframework.batch.item.file.mapping.IFieldSet#readInt(java.lang
 	 * .String, int)
 	 */
+    @Override
 	public int readInt(String name, int defaultValue) {
 		return readInt(indexOf(name), defaultValue);
 	}
@@ -344,6 +365,7 @@ public class DefaultFieldSet implements FieldSet {
 	 * 
 	 * @see org.springframework.batch.item.file.mapping.IFieldSet#readLong(int)
 	 */
+    @Override
 	public long readLong(int index) {
 		return parseNumber(readAndTrim(index)).longValue();
 	}
@@ -355,6 +377,7 @@ public class DefaultFieldSet implements FieldSet {
 	 * org.springframework.batch.item.file.mapping.IFieldSet#readLong(java.lang
 	 * .String)
 	 */
+    @Override
 	public long readLong(String name) {
 		return readLong(indexOf(name));
 	}
@@ -365,6 +388,7 @@ public class DefaultFieldSet implements FieldSet {
 	 * @see org.springframework.batch.item.file.mapping.IFieldSet#readLong(int,
 	 * long)
 	 */
+    @Override
 	public long readLong(int index, long defaultValue) {
 		String value = readAndTrim(index);
 
@@ -378,6 +402,7 @@ public class DefaultFieldSet implements FieldSet {
 	 * org.springframework.batch.item.file.mapping.IFieldSet#readLong(java.lang
 	 * .String, long)
 	 */
+    @Override
 	public long readLong(String name, long defaultValue) {
 		return readLong(indexOf(name), defaultValue);
 	}
@@ -387,6 +412,7 @@ public class DefaultFieldSet implements FieldSet {
 	 * 
 	 * @see org.springframework.batch.item.file.mapping.IFieldSet#readFloat(int)
 	 */
+    @Override
 	public float readFloat(int index) {
 		return parseNumber(readAndTrim(index)).floatValue();
 	}
@@ -398,6 +424,7 @@ public class DefaultFieldSet implements FieldSet {
 	 * org.springframework.batch.item.file.mapping.IFieldSet#readFloat(java.
 	 * lang.String)
 	 */
+    @Override
 	public float readFloat(String name) {
 		return readFloat(indexOf(name));
 	}
@@ -408,6 +435,7 @@ public class DefaultFieldSet implements FieldSet {
 	 * @see
 	 * org.springframework.batch.item.file.mapping.IFieldSet#readDouble(int)
 	 */
+    @Override
 	public double readDouble(int index) {
 		return (Double) parseNumber(readAndTrim(index)).doubleValue();
 	}
@@ -419,6 +447,7 @@ public class DefaultFieldSet implements FieldSet {
 	 * org.springframework.batch.item.file.mapping.IFieldSet#readDouble(java
 	 * .lang.String)
 	 */
+    @Override
 	public double readDouble(String name) {
 		return readDouble(indexOf(name));
 	}
@@ -429,6 +458,7 @@ public class DefaultFieldSet implements FieldSet {
 	 * @see
 	 * org.springframework.batch.item.file.mapping.IFieldSet#readBigDecimal(int)
 	 */
+    @Override
 	public BigDecimal readBigDecimal(int index) {
 		return readBigDecimal(index, null);
 	}
@@ -440,6 +470,7 @@ public class DefaultFieldSet implements FieldSet {
 	 * org.springframework.batch.item.file.mapping.IFieldSet#readBigDecimal(
 	 * java.lang.String)
 	 */
+    @Override
 	public BigDecimal readBigDecimal(String name) {
 		return readBigDecimal(name, null);
 	}
@@ -451,6 +482,7 @@ public class DefaultFieldSet implements FieldSet {
 	 * org.springframework.batch.item.file.mapping.IFieldSet#readBigDecimal(int,
 	 * java.math.BigDecimal)
 	 */
+    @Override
 	public BigDecimal readBigDecimal(int index, BigDecimal defaultValue) {
 		String candidate = readAndTrim(index);
 
@@ -478,6 +510,7 @@ public class DefaultFieldSet implements FieldSet {
 	 * org.springframework.batch.item.file.mapping.IFieldSet#readBigDecimal(
 	 * java.lang.String, java.math.BigDecimal)
 	 */
+    @Override
 	public BigDecimal readBigDecimal(String name, BigDecimal defaultValue) {
 		try {
 			return readBigDecimal(indexOf(name), defaultValue);
@@ -495,6 +528,7 @@ public class DefaultFieldSet implements FieldSet {
 	 * 
 	 * @see org.springframework.batch.item.file.mapping.IFieldSet#readDate(int)
 	 */
+    @Override
 	public Date readDate(int index) {
 		return parseDate(readAndTrim(index), dateFormat);
 	}
@@ -505,6 +539,7 @@ public class DefaultFieldSet implements FieldSet {
 	 * @see org.springframework.batch.item.file.transform.FieldSet#readDate(int,
 	 * java.util.Date)
 	 */
+    @Override
 	public Date readDate(int index, Date defaultValue) {
 		try {
 			return readDate(index);
@@ -521,6 +556,7 @@ public class DefaultFieldSet implements FieldSet {
 	 * org.springframework.batch.item.file.mapping.IFieldSet#readDate(java.lang
 	 * .String)
 	 */
+    @Override
 	public Date readDate(String name) {
 		try {
 			return readDate(indexOf(name));
@@ -536,6 +572,7 @@ public class DefaultFieldSet implements FieldSet {
 	 * @see org.springframework.batch.item.file.transform.FieldSet#readDate(int,
 	 * java.util.Date)
 	 */
+    @Override
 	public Date readDate(String name, Date defaultValue) {
 		try {
 			return readDate(name);
@@ -551,6 +588,7 @@ public class DefaultFieldSet implements FieldSet {
 	 * @see org.springframework.batch.item.file.mapping.IFieldSet#readDate(int,
 	 * java.lang.String)
 	 */
+    @Override
 	public Date readDate(int index, String pattern) {
 		SimpleDateFormat sdf = new SimpleDateFormat(pattern);
 		sdf.setLenient(false);
@@ -563,6 +601,7 @@ public class DefaultFieldSet implements FieldSet {
 	 * @see org.springframework.batch.item.file.mapping.IFieldSet#readDate(int,
 	 * java.lang.String)
 	 */
+    @Override
 	public Date readDate(int index, String pattern, Date defaultValue) {
 		try {
 			return readDate(index, pattern);
@@ -579,6 +618,7 @@ public class DefaultFieldSet implements FieldSet {
 	 * org.springframework.batch.item.file.mapping.IFieldSet#readDate(java.lang
 	 * .String, java.lang.String)
 	 */
+    @Override
 	public Date readDate(String name, String pattern) {
 		try {
 			return readDate(indexOf(name), pattern);
@@ -594,6 +634,7 @@ public class DefaultFieldSet implements FieldSet {
 	 * @see org.springframework.batch.item.file.mapping.IFieldSet#readDate(int,
 	 * java.lang.String)
 	 */
+    @Override
 	public Date readDate(String name, String pattern, Date defaultValue) {
 		try {
 			return readDate(name, pattern);
@@ -609,6 +650,7 @@ public class DefaultFieldSet implements FieldSet {
 	 * @see
 	 * org.springframework.batch.item.file.mapping.IFieldSet#getFieldCount()
 	 */
+    @Override
 	public int getFieldCount() {
 		return tokens.length;
 	}
@@ -647,6 +689,7 @@ public class DefaultFieldSet implements FieldSet {
 		throw new IllegalArgumentException("Cannot access column [" + name + "] from " + names);
 	}
 
+    @Override
 	public String toString() {
 		if (names != null) {
 			return getProperties().toString();
@@ -658,6 +701,7 @@ public class DefaultFieldSet implements FieldSet {
 	/**
 	 * @see java.lang.Object#equals(java.lang.Object)
 	 */
+    @Override
 	public boolean equals(Object object) {
 		if (object instanceof DefaultFieldSet) {
 			DefaultFieldSet fs = (DefaultFieldSet) object;
@@ -673,6 +717,7 @@ public class DefaultFieldSet implements FieldSet {
 		return false;
 	}
 
+    @Override
 	public int hashCode() {
 		// this algorithm was taken from java 1.5 jdk Arrays.hashCode(Object[])
 		if (tokens == null) {
@@ -694,6 +739,7 @@ public class DefaultFieldSet implements FieldSet {
 	 * @see
 	 * org.springframework.batch.item.file.mapping.IFieldSet#getProperties()
 	 */
+    @Override
 	public Properties getProperties() {
 		if (names == null) {
 			throw new IllegalStateException("Cannot create properties without meta data");

@@ -59,6 +59,7 @@ public class ChunkedRepeatTests extends AbstractTradeBatchTests {
 
 		RepeatStatus result = repeatTemplate.iterate(new NestedRepeatCallback(chunkTemplate, callback) {
 
+            @Override
 			public RepeatStatus doInIteration(RepeatContext context) throws Exception {
 				count++; // for test assertion
 				return super.doInIteration(context);
@@ -95,6 +96,7 @@ public class ChunkedRepeatTests extends AbstractTradeBatchTests {
 
 		RepeatStatus result = repeatTemplate.iterate(new NestedRepeatCallback(chunkTemplate, callback) {
 
+            @Override
 			public RepeatStatus doInIteration(RepeatContext context) throws Exception {
 				count++; // for test assertion
 				return super.doInIteration(context);
@@ -157,6 +159,7 @@ public class ChunkedRepeatTests extends AbstractTradeBatchTests {
 			ItemReader<Trade> truncated = new ItemReader<Trade>() {
 				int count = 0;
 
+                @Override
 				public Trade read() throws Exception {
 					if (count++ < 2)
 						return provider.read();
@@ -166,6 +169,7 @@ public class ChunkedRepeatTests extends AbstractTradeBatchTests {
 			chunker.reset();
 			template.iterate(new ItemReaderRepeatCallback<Trade>(truncated, processor) {
 
+                @Override
 				public RepeatStatus doInIteration(RepeatContext context) throws Exception {
 					RepeatStatus result = super.doInIteration(context);
 					if (!result.isContinuable() && chunker.first()) {

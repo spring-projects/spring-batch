@@ -34,6 +34,7 @@ public class JvmSystemExiter implements SystemExiter {
 	 * 
 	 * @see org.springframework.batch.core.launch.support.SystemExiter#exit(int)
 	 */
+    @Override
 	public void exit(int status) {
 		System.exit(status);
 	}

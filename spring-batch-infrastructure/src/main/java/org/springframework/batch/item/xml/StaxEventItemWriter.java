@@ -151,6 +151,7 @@ public class StaxEventItemWriter<T> extends ExecutionContextUserSupport implemen
 	 * 
 	 * @param resource the output file
 	 */
+    @Override
 	public void setResource(Resource resource) {
 		this.resource = resource;
 	}
@@ -322,6 +323,7 @@ public class StaxEventItemWriter<T> extends ExecutionContextUserSupport implemen
 	 * @throws Exception
 	 * @see org.springframework.beans.factory.InitializingBean#afterPropertiesSet()
 	 */
+    @Override
 	public void afterPropertiesSet() throws Exception {
 		Assert.notNull(marshaller);
 		if (rootTagName.contains("{")) {
@@ -339,6 +341,7 @@ public class StaxEventItemWriter<T> extends ExecutionContextUserSupport implemen
 	 * 
 	 * @see org.springframework.batch.item.ItemStream#open(ExecutionContext)
 	 */
+    @Override
 	public void open(ExecutionContext executionContext) {
 
 		Assert.notNull(resource, "The resource must be set");
@@ -411,6 +414,7 @@ public class StaxEventItemWriter<T> extends ExecutionContextUserSupport implemen
 			final FileChannel channel = fileChannel;
 			if (transactional) {
 				TransactionAwareBufferedWriter writer = new TransactionAwareBufferedWriter(channel, new Runnable() {
+                    @Override
 					public void run() {
 						closeStream();
 					}
@@ -570,6 +574,7 @@ public class StaxEventItemWriter<T> extends ExecutionContextUserSupport implemen
 	 * 
 	 * @see org.springframework.batch.item.ItemStream#close()
 	 */
+    @Override
 	public void close() {
 
 		XMLEventFactory factory = createXmlEventFactory();
@@ -633,6 +638,7 @@ public class StaxEventItemWriter<T> extends ExecutionContextUserSupport implemen
 	 * @throws IOException
 	 * @throws XmlMappingException
 	 */
+    @Override
 	public void write(List<? extends T> items) throws XmlMappingException, Exception {
 
 		currentRecordCount += items.size();
@@ -657,6 +663,7 @@ public class StaxEventItemWriter<T> extends ExecutionContextUserSupport implemen
 	 * 
 	 * @see org.springframework.batch.item.ItemStream#update(ExecutionContext)
 	 */
+    @Override
 	public void update(ExecutionContext executionContext) {
 
 		if (saveState) {

@@ -45,6 +45,7 @@ public class JdbcPagingItemReaderCommonTests extends AbstractItemStreamItemReade
 	@Autowired
 	private DataSource dataSource;
 
+    @Override
 	protected ItemReader<Foo> getItemReader() throws Exception {
 
 		JdbcPagingItemReader<Foo> reader = new JdbcPagingItemReader<Foo>();
@@ -58,6 +59,7 @@ public class JdbcPagingItemReaderCommonTests extends AbstractItemStreamItemReade
 		reader.setQueryProvider(queryProvider);
 		reader.setRowMapper(
 				new ParameterizedRowMapper<Foo>() {
+                    @Override
 					public Foo mapRow(ResultSet rs, int i) throws SQLException {
 						Foo foo = new Foo();
 						foo.setId(rs.getInt(1));
@@ -74,6 +76,7 @@ public class JdbcPagingItemReaderCommonTests extends AbstractItemStreamItemReade
 		return reader;
 	}
 
+    @Override
 	protected void pointToEmptyInput(ItemReader<Foo> tested) throws Exception {
 		JdbcPagingItemReader<Foo> reader = (JdbcPagingItemReader<Foo>) tested;
 		reader.close();

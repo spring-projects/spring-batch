@@ -35,10 +35,12 @@ public class NameStoringTasklet extends StepExecutionListenerSupport implements 
 	private String stepName = null;
 	private List<String> stepNamesList = null;
 
+    @Override
 	public void beforeStep(StepExecution stepExecution) {
 		stepName = stepExecution.getStepName();
 	}
 
+    @Override
 	public RepeatStatus execute(StepContribution contribution, ChunkContext chunkContext) throws Exception {
 		if (stepNamesList != null) {
 			stepNamesList.add(stepName);

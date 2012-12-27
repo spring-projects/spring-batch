@@ -37,6 +37,7 @@ public class ScheduledJobParametersFactoryTests extends TestCase {
 
 	DateFormat dateFormat = new SimpleDateFormat("MM/dd/yyyy");
 
+    @Override
 	protected void setUp() throws Exception {
 		super.setUp();
 

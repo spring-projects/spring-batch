@@ -32,6 +32,7 @@ public class BeanPropertyItemSqlParameterSourceProvider<T> implements ItemSqlPar
 	 * the provided item.
 	 * @param item the item to use for parameter values
 	 */
+    @Override
 	public SqlParameterSource createSqlParameterSource(T item) {
 		return new BeanPropertySqlParameterSource(item);
 	}

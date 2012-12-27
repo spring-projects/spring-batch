@@ -18,10 +18,12 @@ import org.springframework.batch.core.repository.support.SimpleJobRepository;
 @RunWith(JUnit4.class)
 public class MapStepExecutionDaoTests extends AbstractStepExecutionDaoTests {
 
+    @Override
 	protected StepExecutionDao getStepExecutionDao() {
 		return new MapStepExecutionDao();
 	}
 
+    @Override
 	protected JobRepository getJobRepository() {
 		return new SimpleJobRepository(new MapJobInstanceDao(), new MapJobExecutionDao(), new MapStepExecutionDao(),
 				new MapExecutionContextDao());

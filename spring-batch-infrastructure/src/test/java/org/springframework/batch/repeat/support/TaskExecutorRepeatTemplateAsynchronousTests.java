@@ -64,6 +64,7 @@ public class TaskExecutorRepeatTemplateAsynchronousTests extends AbstractTradeBa
 		template.setTaskExecutor(taskExecutor);
 		try {
 			template.iterate(new RepeatCallback() {
+                @Override
 				public RepeatStatus doInIteration(RepeatContext context) throws Exception {
 					count++;
 					throw new IllegalStateException("foo!");
@@ -90,11 +91,13 @@ public class TaskExecutorRepeatTemplateAsynchronousTests extends AbstractTradeBa
 		template.setTaskExecutor(taskExecutor);
 
 		template.setExceptionHandler(new ExceptionHandler() {
+            @Override
 			public void handleException(RepeatContext context, Throwable throwable) throws Throwable {
 				count++;
 			}
 		});
 		template.iterate(new RepeatCallback() {
+            @Override
 			public RepeatStatus doInIteration(RepeatContext context) throws Exception {
 				throw new IllegalStateException("foo!");
 			}
@@ -112,6 +115,7 @@ public class TaskExecutorRepeatTemplateAsynchronousTests extends AbstractTradeBa
 		RepeatTemplate inner = new RepeatTemplate();
 
 		outer.iterate(new NestedRepeatCallback(inner, new RepeatCallback() {
+            @Override
 			public RepeatStatus doInIteration(RepeatContext context) throws Exception {
 				count++;
 				assertNotNull(context);
@@ -120,6 +124,7 @@ public class TaskExecutorRepeatTemplateAsynchronousTests extends AbstractTradeBa
 				return RepeatStatus.FINISHED;
 			}
 		}) {
+            @Override
 			public RepeatStatus doInIteration(RepeatContext context) throws Exception {
 				count++;
 				assertNotNull(context);
@@ -147,6 +152,7 @@ public class TaskExecutorRepeatTemplateAsynchronousTests extends AbstractTradeBa
 		final Set<String> threadNames = new HashSet<String>();
 
 		final RepeatCallback callback = new RepeatCallback() {
+            @Override
 			public RepeatStatus doInIteration(RepeatContext context) throws Exception {
 				assertNotSame(threadName, Thread.currentThread().getName());
 				threadNames.add(Thread.currentThread().getName());
@@ -182,6 +188,7 @@ public class TaskExecutorRepeatTemplateAsynchronousTests extends AbstractTradeBa
 		final List<String> items = new ArrayList<String>();
 
 		final RepeatCallback callback = new RepeatCallback() {
+            @Override
 			public RepeatStatus doInIteration(RepeatContext context) throws Exception {
 				assertNotSame(threadName, Thread.currentThread().getName());
 				Trade item = provider.read();
@@ -230,6 +237,7 @@ public class TaskExecutorRepeatTemplateAsynchronousTests extends AbstractTradeBa
 		final Set<String> threadNames = new HashSet<String>();
 
 		final RepeatCallback stepCallback = new ItemReaderRepeatCallback<Trade>(provider, processor) {
+            @Override
 			public RepeatStatus doInIteration(RepeatContext context) throws Exception {
 				assertNotSame(threadName, Thread.currentThread().getName());
 				threadNames.add(Thread.currentThread().getName());
@@ -242,6 +250,7 @@ public class TaskExecutorRepeatTemplateAsynchronousTests extends AbstractTradeBa
 			}
 		};
 		RepeatCallback jobCallback = new RepeatCallback() {
+            @Override
 			public RepeatStatus doInIteration(RepeatContext context) throws Exception {
 				stepTemplate.iterate(stepCallback);
 				return RepeatStatus.FINISHED;

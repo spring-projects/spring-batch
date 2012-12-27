@@ -61,6 +61,7 @@ public class RangeArrayPropertyEditor extends PropertyEditorSupport {
 		this.forceDisjointRanges = forceDisjointRanges;
 	}
 
+    @Override
 	public void setAsText(String text) throws IllegalArgumentException {
 		
 		//split text into ranges
@@ -93,6 +94,7 @@ public class RangeArrayPropertyEditor extends PropertyEditorSupport {
 		setValue(ranges);
 	}
 	
+    @Override
 	public String getAsText() {
 		Range[] ranges = (Range[])getValue();
 		
@@ -117,6 +119,7 @@ public class RangeArrayPropertyEditor extends PropertyEditorSupport {
 		
 		//sort array of Ranges
 		Arrays.sort(c, new Comparator<Integer>() {
+                @Override
 				public int compare(Integer r1, Integer r2) {
 					return ranges[r1].getMin()-ranges[r2].getMin();
 				}								

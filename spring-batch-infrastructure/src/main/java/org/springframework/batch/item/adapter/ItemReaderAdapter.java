@@ -29,6 +29,7 @@ public class ItemReaderAdapter<T> extends AbstractMethodInvokingDelegator<T> imp
 	/**
 	 * @return return value of the target method.
 	 */
+    @Override
 	public T read() throws Exception {
 		return invokeDelegateMethod();
 	}

@@ -53,6 +53,7 @@ public abstract class AbstractPartitionHandler implements PartitionHandler {
 	/**
 	 * @see PartitionHandler#handle(StepExecutionSplitter, StepExecution)
 	 */
+    @Override
     public Collection<StepExecution> handle(final StepExecutionSplitter stepSplitter,
                                             final StepExecution masterStepExecution) throws Exception {
         final Set<StepExecution> stepExecutions = stepSplitter.split(masterStepExecution, gridSize);

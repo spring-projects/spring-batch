@@ -133,6 +133,7 @@ public class FaultTolerantStepFactoryBeanNonBufferingTests {
 			this.failures = failures;
 		}
 
+        @Override
 		public void write(List<? extends String> items) throws Exception {
 			logger.debug("Writing: " + items);
 			for (String item : items) {

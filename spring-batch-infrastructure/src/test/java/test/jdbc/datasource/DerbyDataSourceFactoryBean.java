@@ -19,6 +19,7 @@ public class DerbyDataSourceFactoryBean extends AbstractFactoryBean {
 		this.dataDirectory = dataDirectory;
 	}
 
+    @Override
 	protected Object createInstance() throws Exception {
 		File directory = new File(dataDirectory);
 		System.setProperty("derby.system.home", directory.getCanonicalPath());
@@ -34,6 +35,7 @@ public class DerbyDataSourceFactoryBean extends AbstractFactoryBean {
 		return ds;
 	}
 
+    @Override
 	public Class<DataSource> getObjectType() {
 		return DataSource.class;
 	}

@@ -53,6 +53,7 @@ public class DefaultMailErrorHandler implements MailErrorHandler {
 	 * @throws MailException a translation of the Exception
 	 * @see MailErrorHandler#handle(MailMessage, Exception)
 	 */
+    @Override
 	public void handle(MailMessage message, Exception exception) throws MailException {
 		String msg = message.toString();
 		throw new MailSendException("Mail server send failed: "

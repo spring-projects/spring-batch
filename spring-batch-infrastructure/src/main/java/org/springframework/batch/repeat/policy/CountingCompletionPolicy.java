@@ -92,6 +92,7 @@ public abstract class CountingCompletionPolicy extends DefaultResultCompletionPo
 	 * (non-Javadoc)
 	 * @see org.springframework.batch.repeat.policy.CompletionPolicySupport#isComplete(org.springframework.batch.repeat.BatchContext)
 	 */
+    @Override
 	final public boolean isComplete(RepeatContext context) {
 		int count = ((CountingBatchContext) context).getCounter().getCount();
 		return count >= maxCount;
@@ -101,6 +102,7 @@ public abstract class CountingCompletionPolicy extends DefaultResultCompletionPo
 	 * (non-Javadoc)
 	 * @see org.springframework.batch.repeat.policy.CompletionPolicySupport#start(org.springframework.batch.repeat.BatchContext)
 	 */
+    @Override
 	public RepeatContext start(RepeatContext parent) {
 		return new CountingBatchContext(parent);
 	}
@@ -109,6 +111,7 @@ public abstract class CountingCompletionPolicy extends DefaultResultCompletionPo
 	 * (non-Javadoc)
 	 * @see org.springframework.batch.repeat.policy.CompletionPolicySupport#update(org.springframework.batch.repeat.BatchContext)
 	 */
+    @Override
 	final public void update(RepeatContext context) {
 		super.update(context);
 		int delta = doUpdate(context);

@@ -42,6 +42,7 @@ public class MethodInvokingTaskletAdapter extends AbstractMethodInvokingDelegato
 	 * 
 	 * @see Tasklet#execute(StepContribution, ChunkContext)
 	 */
+    @Override
 	public RepeatStatus execute(StepContribution contribution, ChunkContext chunkContext) throws Exception {
 		contribution.setExitStatus(mapResult(invokeDelegateMethod()));
 		return RepeatStatus.FINISHED;

@@ -90,6 +90,7 @@ public class FaultTolerantStepFactoryBeanRetryTests {
 	JobExecution jobExecution;
 
 	private ItemWriter<String> writer = new ItemWriter<String>() {
+        @Override
 		public void write(List<? extends String> data) throws Exception {
 			processed.addAll(data);
 		}
@@ -140,6 +141,7 @@ public class FaultTolerantStepFactoryBeanRetryTests {
 		factory.setJobRepository(repository);
 		factory.setTransactionManager(new ResourcelessTransactionManager());
 		ItemWriter<Integer> failingWriter = new ItemWriter<Integer>() {
+            @Override
 			public void write(List<? extends Integer> data) throws Exception {
 				int count = 0;
 				for (Integer item : data) {
@@ -152,6 +154,7 @@ public class FaultTolerantStepFactoryBeanRetryTests {
 		};
 
 		ItemProcessor<String, Integer> processor = new ItemProcessor<String, Integer>() {
+            @Override
 			public Integer process(String item) throws Exception {
 				processed.add(item);
 				return Integer.parseInt(item);
@@ -192,6 +195,7 @@ public class FaultTolerantStepFactoryBeanRetryTests {
 		final int RETRY_LIMIT = 3;
 		final List<String> ITEM_LIST = Arrays.asList("a", "b", "c");
 		ItemWriter<String> failingWriter = new ItemWriter<String>() {
+            @Override
 			public void write(List<? extends String> data) throws Exception {
 				int count = 0;
 				for (String item : data) {
@@ -204,6 +208,7 @@ public class FaultTolerantStepFactoryBeanRetryTests {
 		};
 
 		ItemProcessor<String, String> processor = new ItemProcessor<String, String>() {
+            @Override
 			public String process(String item) throws Exception {
 				processed.add(item);
 				return item;
@@ -239,6 +244,7 @@ public class FaultTolerantStepFactoryBeanRetryTests {
 	public void testNoItemsReprocessedWhenErrorInWriterAndProcessorNotTransactional()
 			throws Exception {
 		ItemWriter<String> failingWriter = new ItemWriter<String>() {
+            @Override
 			public void write(List<? extends String> data) throws Exception {
 				int count = 0;
 				for (String item : data) {
@@ -251,6 +257,7 @@ public class FaultTolerantStepFactoryBeanRetryTests {
 		};
 
 		ItemProcessor<String, String> processor = new ItemProcessor<String, String>() {
+            @Override
 			public String process(String item) throws Exception {
 				processed.add(item);
 				return item;
@@ -291,6 +298,7 @@ public class FaultTolerantStepFactoryBeanRetryTests {
 	public void testSuccessfulRetryWithReadFailure() throws Exception {
 		ItemReader<String> provider = new ListItemReader<String>(Arrays.asList(
 				"a", "b", "c")) {
+            @Override
 			public String read() {
 				String item = super.read();
 				provided.add(item);
@@ -355,6 +363,7 @@ public class FaultTolerantStepFactoryBeanRetryTests {
 		factory.setItemReader(reader);
 		factory.setStreams(new ItemStream[] { reader });
 		factory.setItemWriter(new ItemWriter<String>() {
+            @Override
 			public void write(List<? extends String> items) throws Exception {
 				if (fail && items.contains("e")) {
 					throw new RuntimeException("Planned failure");
@@ -393,6 +402,7 @@ public class FaultTolerantStepFactoryBeanRetryTests {
 		factory.setSkipLimit(2);
 		ItemReader<String> provider = new ListItemReader<String>(Arrays.asList(
 				"a", "b", "c", "d", "e", "f")) {
+            @Override
 			public String read() {
 				String item = super.read();
 				count++;
@@ -423,6 +433,7 @@ public class FaultTolerantStepFactoryBeanRetryTests {
 	public void testSkipAndRetryWithWriteFailure() throws Exception {
 
 		factory.setListeners(new StepListener[] { new SkipListenerSupport<String, String>() {
+            @Override
 			public void onSkipInWrite(String item, Throwable t) {
 				recovered.add(item);
 				assertTrue(TransactionSynchronizationManager
@@ -432,6 +443,7 @@ public class FaultTolerantStepFactoryBeanRetryTests {
 		factory.setSkipLimit(2);
 		ItemReader<String> provider = new ListItemReader<String>(Arrays.asList(
 				"a", "b", "c", "d", "e", "f")) {
+            @Override
 			public String read() {
 				String item = super.read();
 				logger.debug("Read Called! Item: [" + item + "]");
@@ -442,6 +454,7 @@ public class FaultTolerantStepFactoryBeanRetryTests {
 		};
 
 		ItemWriter<String> itemWriter = new ItemWriter<String>() {
+            @Override
 			public void write(List<? extends String> item) throws Exception {
 				logger.debug("Write Called! Item: [" + item + "]");
 				processed.addAll(item);
@@ -484,6 +497,7 @@ public class FaultTolerantStepFactoryBeanRetryTests {
 
 		factory.setCommitInterval(3);
 		factory.setListeners(new StepListener[] { new SkipListenerSupport<String, String>() {
+            @Override
 			public void onSkipInWrite(String item, Throwable t) {
 				recovered.add(item);
 				assertTrue(TransactionSynchronizationManager
@@ -493,6 +507,7 @@ public class FaultTolerantStepFactoryBeanRetryTests {
 		factory.setSkipLimit(2);
 		ItemReader<String> provider = new ListItemReader<String>(Arrays.asList(
 				"a", "b", "c", "d", "e", "f")) {
+            @Override
 			public String read() {
 				String item = super.read();
 				logger.debug("Read Called! Item: [" + item + "]");
@@ -503,6 +518,7 @@ public class FaultTolerantStepFactoryBeanRetryTests {
 		};
 
 		ItemWriter<String> itemWriter = new ItemWriter<String>() {
+            @Override
 			public void write(List<? extends String> item) throws Exception {
 				logger.debug("Write Called! Item: [" + item + "]");
 				processed.addAll(item);
@@ -549,6 +565,7 @@ public class FaultTolerantStepFactoryBeanRetryTests {
 		factory.setSkipLimit(0);
 		ItemReader<String> provider = new ListItemReader<String>(
 				Arrays.asList("b")) {
+            @Override
 			public String read() {
 				String item = super.read();
 				provided.add(item);
@@ -557,6 +574,7 @@ public class FaultTolerantStepFactoryBeanRetryTests {
 			}
 		};
 		ItemWriter<String> itemWriter = new ItemWriter<String>() {
+            @Override
 			public void write(List<? extends String> item) throws Exception {
 				processed.addAll(item);
 				written.addAll(item);
@@ -602,6 +620,7 @@ public class FaultTolerantStepFactoryBeanRetryTests {
 		factory.setSkipLimit(1);
 		ItemReader<String> provider = new ListItemReader<String>(
 				Arrays.asList("b")) {
+            @Override
 			public String read() {
 				String item = super.read();
 				provided.add(item);
@@ -610,6 +629,7 @@ public class FaultTolerantStepFactoryBeanRetryTests {
 			}
 		};
 		ItemWriter<String> itemWriter = new ItemWriter<String>() {
+            @Override
 			public void write(List<? extends String> item) throws Exception {
 				processed.addAll(item);
 				written.addAll(item);
@@ -653,6 +673,7 @@ public class FaultTolerantStepFactoryBeanRetryTests {
 		factory.setSkipLimit(0);
 		ItemReader<String> provider = new ListItemReader<String>(
 				Arrays.asList("b")) {
+            @Override
 			public String read() {
 				String item = super.read();
 				provided.add(item);
@@ -661,6 +682,7 @@ public class FaultTolerantStepFactoryBeanRetryTests {
 			}
 		};
 		ItemWriter<String> itemWriter = new ItemWriter<String>() {
+            @Override
 			public void write(List<? extends String> item) throws Exception {
 				processed.addAll(item);
 				written.addAll(item);
@@ -701,6 +723,7 @@ public class FaultTolerantStepFactoryBeanRetryTests {
 		// set the cache limit stupidly low
 		factory.setRetryContextCache(new MapRetryContextCache(0));
 		ItemReader<String> provider = new ItemReader<String>() {
+            @Override
 			public String read() {
 				String item = "" + count;
 				provided.add(item);
@@ -713,6 +736,7 @@ public class FaultTolerantStepFactoryBeanRetryTests {
 			}
 		};
 		ItemWriter<String> itemWriter = new ItemWriter<String>() {
+            @Override
 			public void write(List<? extends String> item) throws Exception {
 				processed.addAll(item);
 				logger.debug("Write Called! Item: [" + item + "]");

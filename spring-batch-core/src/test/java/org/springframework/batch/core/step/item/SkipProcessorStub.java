@@ -55,6 +55,7 @@ public class SkipProcessorStub<T> extends AbstractExceptionThrowingItemHandlerSt
 		filter = false;
 	}
 
+    @Override
 	public T process(T item) throws Exception {
 		processed.add(item);
 		committed.add(item);

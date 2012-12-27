@@ -44,6 +44,7 @@ public class RethrowOnThresholdExceptionHandler implements ExceptionHandler {
 	protected final Log logger = LogFactory.getLog(RethrowOnThresholdExceptionHandler.class);
 
 	private Classifier<? super Throwable, IntegerHolder> exceptionClassifier = new Classifier<Throwable, IntegerHolder>() {
+        @Override
 		public RethrowOnThresholdExceptionHandler.IntegerHolder classify(Throwable classifiable) {
 			return ZERO;
 		}
@@ -92,6 +93,7 @@ public class RethrowOnThresholdExceptionHandler implements ExceptionHandler {
 	 * @throws Throwable
 	 * @see ExceptionHandler#handleException(RepeatContext, Throwable)
 	 */
+    @Override
 	public void handleException(RepeatContext context, Throwable throwable) throws Throwable {
 
 		IntegerHolder key = exceptionClassifier.classify(throwable);

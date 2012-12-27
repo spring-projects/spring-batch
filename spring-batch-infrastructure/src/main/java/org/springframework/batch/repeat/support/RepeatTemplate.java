@@ -132,6 +132,7 @@ public class RepeatTemplate implements RepeatOperations {
 	 * 
 	 * @see org.springframework.batch.repeat.RepeatOperations#iterate(org.springframework.batch.repeat.RepeatCallback)
 	 */
+    @Override
 	public RepeatStatus iterate(RepeatCallback callback) {
 
 		RepeatContext outer = RepeatSynchronizationManager.getContext();

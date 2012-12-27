@@ -51,6 +51,7 @@ public class JdbcBatchItemWriterClassicTests {
 	public void setUp() throws Exception {
 		ps = createMock(PreparedStatement.class);
 		jdbcTemplate = new JdbcTemplate() {
+            @Override
 			public Object execute(String sql, PreparedStatementCallback action) throws DataAccessException {
 				list.add(sql);
 				try {
@@ -64,6 +65,7 @@ public class JdbcBatchItemWriterClassicTests {
 		writer.setSql("SQL");
 		writer.setJdbcTemplate(new NamedParameterJdbcTemplate(jdbcTemplate));
 		writer.setItemPreparedStatementSetter(new ItemPreparedStatementSetter<String>() {
+            @Override
 			public void setValues(String item, PreparedStatement ps) throws SQLException {
 				list.add(item);
 			}
@@ -111,6 +113,7 @@ public class JdbcBatchItemWriterClassicTests {
 		}
 		writer.setItemPreparedStatementSetter(
 				new ItemPreparedStatementSetter<String>() {
+                    @Override
 					public void setValues(String item, PreparedStatement ps)
 							throws SQLException {
 					}
@@ -153,6 +156,7 @@ public class JdbcBatchItemWriterClassicTests {
 	public void testWriteAndFlushWithFailure() throws Exception {
 		final RuntimeException ex = new RuntimeException("bar");
 		writer.setItemPreparedStatementSetter(new ItemPreparedStatementSetter<String>() {
+            @Override
 			public void setValues(String item, PreparedStatement ps) throws SQLException {
 				list.add(item);
 				throw ex;
@@ -171,6 +175,7 @@ public class JdbcBatchItemWriterClassicTests {
 		}
 		assertEquals(2, list.size());
 		writer.setItemPreparedStatementSetter(new ItemPreparedStatementSetter<String>() {
+            @Override
 			public void setValues(String item, PreparedStatement ps) throws SQLException {
 				list.add(item);
 			}

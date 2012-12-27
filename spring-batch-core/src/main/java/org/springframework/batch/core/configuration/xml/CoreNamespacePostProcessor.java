@@ -49,6 +49,7 @@ public class CoreNamespacePostProcessor implements BeanPostProcessor, BeanFactor
 
 	private ApplicationContext applicationContext;
 
+    @Override
 	public void postProcessBeanFactory(ConfigurableListableBeanFactory beanFactory) throws BeansException {
 		for (String beanName : beanFactory.getBeanDefinitionNames()) {
 			injectJobRepositoryIntoSteps(beanName, beanFactory);
@@ -101,6 +102,7 @@ public class CoreNamespacePostProcessor implements BeanPostProcessor, BeanFactor
 		}
 	}
 
+    @Override
 	public Object postProcessBeforeInitialization(Object bean, String beanName) throws BeansException {
 		return injectDefaults(bean);
 	}
@@ -140,10 +142,12 @@ public class CoreNamespacePostProcessor implements BeanPostProcessor, BeanFactor
 		return bean;
 	}
 
+    @Override
 	public Object postProcessAfterInitialization(Object bean, String beanName) throws BeansException {
 		return bean;
 	}
 
+    @Override
 	public void setApplicationContext(ApplicationContext applicationContext) {
 		this.applicationContext = applicationContext;
 	}

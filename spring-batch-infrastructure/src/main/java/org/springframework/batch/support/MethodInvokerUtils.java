@@ -117,6 +117,7 @@ public class MethodInvokerUtils {
 				.getTargetClass() : target.getClass();
 		if (mi != null) {
 			ReflectionUtils.doWithMethods(targetClass, new ReflectionUtils.MethodCallback() {
+                @Override
 				public void doWith(Method method) throws IllegalArgumentException, IllegalAccessException {
 					Annotation annotation = AnnotationUtils.findAnnotation(method, annotationType);
 					if (annotation != null) {
@@ -163,6 +164,7 @@ public class MethodInvokerUtils {
 		}
 		final AtomicReference<Method> annotatedMethod = new AtomicReference<Method>();
 		ReflectionUtils.doWithMethods(targetClass, new ReflectionUtils.MethodCallback() {
+            @Override
 			public void doWith(Method method) throws IllegalArgumentException, IllegalAccessException {
 				Annotation annotation = AnnotationUtils.findAnnotation(method, annotationType);
 				if (annotation != null) {
@@ -192,6 +194,7 @@ public class MethodInvokerUtils {
 	public static <C, T> MethodInvoker getMethodInvokerForSingleArgument(Object target) {
 		final AtomicReference<Method> methodHolder = new AtomicReference<Method>();
 		ReflectionUtils.doWithMethods(target.getClass(), new ReflectionUtils.MethodCallback() {
+            @Override
 			public void doWith(Method method) throws IllegalArgumentException, IllegalAccessException {
 				if (method.getParameterTypes() == null || method.getParameterTypes().length != 1) {
 					return;

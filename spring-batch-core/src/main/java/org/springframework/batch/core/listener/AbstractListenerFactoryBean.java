@@ -68,6 +68,7 @@ public abstract class AbstractListenerFactoryBean implements FactoryBean, Initia
 
 	private Map<String, String> metaDataMap;
 
+    @Override
 	public Object getObject() {
 
 		if (metaDataMap == null) {
@@ -174,6 +175,7 @@ public abstract class AbstractListenerFactoryBean implements FactoryBean, Initia
 		}
 	}
 
+    @Override
 	public boolean isSingleton() {
 		return true;
 	}
@@ -186,6 +188,7 @@ public abstract class AbstractListenerFactoryBean implements FactoryBean, Initia
 		this.metaDataMap = metaDataMap;
 	}
 
+    @Override
 	public void afterPropertiesSet() throws Exception {
 		Assert.notNull(delegate, "Delegate must not be null");
 	}

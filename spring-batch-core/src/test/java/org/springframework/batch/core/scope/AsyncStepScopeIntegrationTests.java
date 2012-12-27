@@ -45,6 +45,7 @@ public class AsyncStepScopeIntegrationTests implements BeanFactoryAware {
 
 	private int beanCount;
 
+    @Override
 	public void setBeanFactory(BeanFactory beanFactory) throws BeansException {
 		this.beanFactory = (ListableBeanFactory) beanFactory;
 	}
@@ -80,6 +81,7 @@ public class AsyncStepScopeIntegrationTests implements BeanFactoryAware {
 			final String value = "foo" + i;
 			final Long id = 123L + i;
 			FutureTask<String> task = new FutureTask<String>(new Callable<String>() {
+                @Override
 				public String call() throws Exception {
 					StepExecution stepExecution = new StepExecution(value, new JobExecution(0L), id);
 					ExecutionContext executionContext = stepExecution.getExecutionContext();
@@ -119,6 +121,7 @@ public class AsyncStepScopeIntegrationTests implements BeanFactoryAware {
 		for (int i = 0; i < 12; i++) {
 			final String value = "foo" + i;
 			FutureTask<String> task = new FutureTask<String>(new Callable<String>() {
+                @Override
 				public String call() throws Exception {
 					ExecutionContext executionContext = stepExecution.getExecutionContext();
 					executionContext.put("foo", value);

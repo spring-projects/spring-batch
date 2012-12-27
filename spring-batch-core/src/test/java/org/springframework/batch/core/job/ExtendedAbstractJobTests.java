@@ -158,6 +158,7 @@ public class ExtendedAbstractJobTests {
 				setName("StubStep");
 			}
 
+            @Override
 			public void execute(StepExecution stepExecution) throws JobInterruptedException {
 				stepExecution.getJobExecution().getExecutionContext().put(key, value);
 			}
