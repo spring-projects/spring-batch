@@ -30,7 +30,7 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import com.ibatis.sqlmap.client.SqlMapClient;
-import org.springframework.batch.support.JdbcTestUtils;
+import org.springframework.test.jdbc.JdbcTestUtils;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(locations = "JdbcPagingItemReaderCommonTests-context.xml")
