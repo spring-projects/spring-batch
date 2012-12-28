@@ -24,7 +24,7 @@ import org.springframework.batch.core.repository.JobInstanceAlreadyCompleteExcep
 import org.springframework.batch.core.repository.JobRestartException;
 import org.springframework.batch.sample.common.SkipCheckingListener;
 import org.springframework.batch.sample.domain.trade.internal.TradeWriter;
-import org.springframework.batch.support.JdbcTestUtils;
+import org.springframework.test.jdbc.JdbcTestUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.jdbc.core.JdbcOperations;
@@ -167,7 +167,7 @@ public class SkipSampleFunctionalTests {
 	private void validateLaunchWithSkips(JobExecution jobExecution) {
 		// Step1: 9 input records, 1 skipped in read, 1 skipped in write =>
 		// 7 written to output
-		assertEquals(7, JdbcTestUtils.countRowsInTable(jdbcTemplate, "TRADE"));
+		assertEquals(7, JdbcTestUtils.countRowsInTable((JdbcTemplate) jdbcTemplate, "TRADE"));
 
 		// Step2: 7 input records, 1 skipped on process, 1 on write => 5 written
 		// to output
@@ -178,7 +178,7 @@ public class SkipSampleFunctionalTests {
 		assertEquals(1, SkipCheckingListener.getProcessSkips());
 
 		// Both steps contained skips
-		assertEquals(2, JdbcTestUtils.countRowsInTable(jdbcTemplate, "ERROR_LOG"));
+		assertEquals(2, JdbcTestUtils.countRowsInTable((JdbcTemplate) jdbcTemplate, "ERROR_LOG"));
 
 		assertEquals("2 records were skipped!", jdbcTemplate.queryForObject(
 				"SELECT MESSAGE from ERROR_LOG where JOB_NAME = ? and STEP_NAME = ?", String.class, "skipJob", "step1"));
@@ -197,13 +197,13 @@ public class SkipSampleFunctionalTests {
 	private void validateLaunchWithoutSkips(JobExecution jobExecution) {
 
 		// Step1: 5 input records => 5 written to output
-		assertEquals(5, JdbcTestUtils.countRowsInTable(jdbcTemplate, "TRADE"));
+		assertEquals(5, JdbcTestUtils.countRowsInTable((JdbcTemplate) jdbcTemplate, "TRADE"));
 
 		// Step2: 5 input records => 5 written to output
 		assertEquals(5, jdbcTemplate.queryForInt("SELECT COUNT(*) from TRADE where VERSION=?", 1));
 
 		// Neither step contained skips
-		assertEquals(0, JdbcTestUtils.countRowsInTable(jdbcTemplate, "ERROR_LOG"));
+		assertEquals(0, JdbcTestUtils.countRowsInTable((JdbcTemplate) jdbcTemplate, "ERROR_LOG"));
 
 		assertEquals(new BigDecimal("270.75"), jobExecution.getExecutionContext().get(TradeWriter.TOTAL_AMOUNT_KEY));
 
