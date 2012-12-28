@@ -29,6 +29,7 @@ import org.springframework.batch.core.StepExecution;
 import org.springframework.batch.core.StepListener;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.repository.support.MapJobRepositoryFactoryBean;
+import org.springframework.batch.core.scope.context.ChunkContext;
 import org.springframework.batch.core.step.FatalStepExecutionException;
 import org.springframework.batch.core.step.factory.FaultTolerantStepFactoryBean;
 import org.springframework.batch.item.ItemReader;
@@ -608,6 +609,9 @@ public class FaultTolerantStepFactoryBeanRollbackTests {
 			throw new IllegalArgumentException("Planned exception");
 
 		}
-	}
 
+		@Override
+		public void afterFailedChunk(ChunkContext context) {
+		}
+	}
 }

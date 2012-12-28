@@ -351,12 +351,14 @@ public class TaskletStep extends AbstractStep {
 							rollback(stepExecution);
 						}
 					}
+					chunkListener.afterFailedChunk(chunkContext);
 				}
 				if (status == TransactionSynchronization.STATUS_UNKNOWN) {
 					logger.error("Rolling back with transaction in unknown state");
 					rollback(stepExecution);
 					stepExecution.upgradeStatus(BatchStatus.UNKNOWN);
 					stepExecution.setTerminateOnly();
+					chunkListener.afterFailedChunk(chunkContext);
 				}
 			}
 			finally {
@@ -396,6 +398,7 @@ public class TaskletStep extends AbstractStep {
 					}
 					catch (Exception e) {
 						if (transactionAttribute.rollbackOn(e)) {
+							chunkContext.setAttribute("sb_rollback_exception", e);
 							throw e;
 						}
 					}

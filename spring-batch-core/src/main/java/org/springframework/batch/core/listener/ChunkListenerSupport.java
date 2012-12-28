@@ -16,6 +16,7 @@
 package org.springframework.batch.core.listener;
 
 import org.springframework.batch.core.ChunkListener;
+import org.springframework.batch.core.scope.context.ChunkContext;
 
 /**
  * Basic support implementation of {@link ChunkListener}
@@ -37,6 +38,14 @@ public class ChunkListenerSupport implements ChunkListener {
 	 */
 	@Override
 	public void beforeChunk() {
+	}
+
+
+	@Override
+	/* (non-Javadoc)
+	 * @see org.springframework.batch.core.domain.ChunkListener#afterFailedChunk(ChunkContext)
+	 */
+	public void afterFailedChunk(ChunkContext context) {
 	}
 
 }

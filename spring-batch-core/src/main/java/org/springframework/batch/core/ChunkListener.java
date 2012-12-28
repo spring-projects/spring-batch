@@ -15,11 +15,13 @@
  */
 package org.springframework.batch.core;
 
+import org.springframework.batch.core.scope.context.ChunkContext;
+
 /**
  * Listener interface for the lifecycle of a chunk.  A chunk
- * can be through of as a collection of items that will be 
+ * can be through of as a collection of items that will be
  * committed together.
- * 
+ *
  * @author Lucas Ward
  *
  */
@@ -29,9 +31,11 @@ public interface ChunkListener extends StepListener {
 	 * Callback before the chunk is executed, but inside the transaction.
 	 */
 	void beforeChunk();
-	
+
 	/**
 	 * Callback after the chunk is executed, outside the transaction.
 	 */
 	void afterChunk();
+
+	void afterFailedChunk(ChunkContext context);
 }

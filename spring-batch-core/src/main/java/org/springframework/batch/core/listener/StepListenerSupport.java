@@ -26,6 +26,7 @@ import org.springframework.batch.core.SkipListener;
 import org.springframework.batch.core.StepExecution;
 import org.springframework.batch.core.StepExecutionListener;
 import org.springframework.batch.core.StepListener;
+import org.springframework.batch.core.scope.context.ChunkContext;
 
 /**
  * Basic no-op implementations of all {@link StepListener} interfaces.
@@ -147,6 +148,10 @@ ItemReadListener<T>, ItemProcessListener<T,S>, ItemWriteListener<S>, SkipListene
 	 */
 	@Override
 	public void onSkipInWrite(S item, Throwable t) {
+	}
+
+	@Override
+	public void afterFailedChunk(ChunkContext context) {
 	}
 
 }

@@ -46,6 +46,7 @@ import org.springframework.batch.core.repository.dao.MapJobExecutionDao;
 import org.springframework.batch.core.repository.dao.MapJobInstanceDao;
 import org.springframework.batch.core.repository.dao.MapStepExecutionDao;
 import org.springframework.batch.core.repository.support.SimpleJobRepository;
+import org.springframework.batch.core.scope.context.ChunkContext;
 import org.springframework.batch.core.step.AbstractStep;
 import org.springframework.batch.core.step.factory.SimpleStepFactoryBean;
 import org.springframework.batch.item.ItemProcessor;
@@ -259,6 +260,11 @@ public class SimpleStepFactoryBeanTests {
 				writeListener.trail = writeListener.trail + "1";
 				beforeCount++;
 			}
+
+			@Override
+			public void afterFailedChunk(ChunkContext context) {
+
+			}
 		}
 		AssertingWriteListener writeListener = new AssertingWriteListener();
 		CountingChunkListener chunkListener = new CountingChunkListener(writeListener);
@@ -390,6 +396,10 @@ public class SimpleStepFactoryBeanTests {
 
 			@Override
 			public void beforeChunk() {
+			}
+
+			@Override
+			public void afterFailedChunk(ChunkContext context) {
 			}
 
 		}
