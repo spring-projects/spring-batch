@@ -46,6 +46,7 @@ import org.springframework.batch.core.repository.dao.MapJobExecutionDao;
 import org.springframework.batch.core.repository.dao.MapJobInstanceDao;
 import org.springframework.batch.core.repository.dao.MapStepExecutionDao;
 import org.springframework.batch.core.repository.support.SimpleJobRepository;
+import org.springframework.batch.core.scope.context.ChunkContext;
 import org.springframework.batch.core.step.AbstractStep;
 import org.springframework.batch.core.step.factory.SimpleStepFactoryBean;
 import org.springframework.batch.item.ItemProcessor;
@@ -217,7 +218,7 @@ public class SimpleStepFactoryBeanTests {
 
 	@Test
 	public void testChunkListeners() throws Exception {
-		String[] items = new String[] { "1", "2", "3", "4", "5", "6", "7" };
+		String[] items = new String[] { "1", "2", "3", "4", "5", "6", "7", "error" };
 		int commitInterval = 3;
 
 		SimpleStepFactoryBean<String, String> factory = getStepFactory(items);
@@ -227,6 +228,10 @@ public class SimpleStepFactoryBeanTests {
 
 			@Override
 			public void beforeWrite(List<? extends Object> items) {
+				if(items.contains("error")) {
+					throw new RuntimeException("rollback the last chunk");
+				}
+
 				trail = trail + "2";
 			}
 
@@ -240,6 +245,8 @@ public class SimpleStepFactoryBeanTests {
 			int beforeCount = 0;
 
 			int afterCount = 0;
+
+			int failedCount = 0;
 
 			private AssertingWriteListener writeListener;
 
@@ -259,6 +266,12 @@ public class SimpleStepFactoryBeanTests {
 				writeListener.trail = writeListener.trail + "1";
 				beforeCount++;
 			}
+
+			@Override
+			public void afterChunkError(ChunkContext context) {
+				writeListener.trail = writeListener.trail + "5";
+				failedCount++;
+			}
 		}
 		AssertingWriteListener writeListener = new AssertingWriteListener();
 		CountingChunkListener chunkListener = new CountingChunkListener(writeListener);
@@ -272,13 +285,15 @@ public class SimpleStepFactoryBeanTests {
 		JobExecution jobExecution = repository.createJobExecution(job.getName(), new JobParameters());
 		job.execute(jobExecution);
 
-		assertEquals(BatchStatus.COMPLETED, jobExecution.getStatus());
+		assertEquals(BatchStatus.FAILED, jobExecution.getStatus());
 		assertNull(reader.read());
-		assertEquals(items.length, written.size());
+		assertEquals(6, written.size());
 
 		int expectedListenerCallCount = (items.length / commitInterval) + 1;
-		assertEquals(expectedListenerCallCount, chunkListener.afterCount);
+		assertEquals(expectedListenerCallCount - 1, chunkListener.afterCount);
 		assertEquals(expectedListenerCallCount, chunkListener.beforeCount);
+		assertEquals(1, chunkListener.failedCount);
+		assertEquals("1234123415", writeListener.trail);
 		assertTrue("Listener order not as expected: " + writeListener.trail, writeListener.trail.startsWith("1234"));
 	}
 
@@ -390,6 +405,10 @@ public class SimpleStepFactoryBeanTests {
 
 			@Override
 			public void beforeChunk() {
+			}
+
+			@Override
+			public void afterChunkError(ChunkContext context) {
 			}
 
 		}

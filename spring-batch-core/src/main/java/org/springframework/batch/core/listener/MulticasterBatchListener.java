@@ -26,6 +26,7 @@ import org.springframework.batch.core.SkipListener;
 import org.springframework.batch.core.StepExecution;
 import org.springframework.batch.core.StepExecutionListener;
 import org.springframework.batch.core.StepListener;
+import org.springframework.batch.core.scope.context.ChunkContext;
 import org.springframework.batch.item.ItemStream;
 
 /**
@@ -317,4 +318,13 @@ ItemProcessListener<T, S>, ItemWriteListener<S>, SkipListener<T, S> {
 		skipListener.onSkipInProcess(item, t);
 	}
 
+	@Override
+	public void afterChunkError(ChunkContext context) {
+		try {
+			chunkListener.afterChunkError(context);
+		}
+		catch (RuntimeException e) {
+			throw new StepListenerFailedException("Error in afterFailedChunk.", e);
+		}
+	}
 }
