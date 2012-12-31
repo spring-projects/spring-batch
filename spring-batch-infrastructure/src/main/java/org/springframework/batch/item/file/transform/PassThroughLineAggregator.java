@@ -28,6 +28,7 @@ public class PassThroughLineAggregator<T> implements LineAggregator<T> {
 	 * 
 	 * @see org.springframework.batch.item.file.transform.LineAggregator#aggregate(java.lang.Object)
 	 */
+    @Override
 	public String aggregate(T item) {
 		return item.toString();
 	}

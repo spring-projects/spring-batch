@@ -36,38 +36,47 @@ abstract class AbstractEventWriterWrapper implements XMLEventWriter {
 		this.wrappedEventWriter = wrappedEventWriter;
 	}
 
+    @Override
 	public void add(XMLEvent event) throws XMLStreamException {
 		wrappedEventWriter.add(event);
 	}
 
+    @Override
 	public void add(XMLEventReader reader) throws XMLStreamException {
 		wrappedEventWriter.add(reader);
 	}
 
+    @Override
 	public void close() throws XMLStreamException {
 		wrappedEventWriter.close();
 	}
 
+    @Override
 	public void flush() throws XMLStreamException {
 		wrappedEventWriter.flush();
 	}
 
+    @Override
 	public NamespaceContext getNamespaceContext() {
 		return wrappedEventWriter.getNamespaceContext();
 	}
 
+    @Override
 	public String getPrefix(String uri) throws XMLStreamException {
 		return wrappedEventWriter.getPrefix(uri);
 	}
 
+    @Override
 	public void setDefaultNamespace(String uri) throws XMLStreamException {
 		wrappedEventWriter.setDefaultNamespace(uri);
 	}
 
+    @Override
 	public void setNamespaceContext(NamespaceContext context) throws XMLStreamException {
 		wrappedEventWriter.setNamespaceContext(context);
 	}
 
+    @Override
 	public void setPrefix(String prefix, String uri) throws XMLStreamException {
 		wrappedEventWriter.setPrefix(prefix, uri);
 	}

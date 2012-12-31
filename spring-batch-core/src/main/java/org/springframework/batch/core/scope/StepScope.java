@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2007 the original author or authors.
+ * Copyright 2006-2013 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -44,34 +44,34 @@ import org.springframework.util.StringValueResolver;
  * step. All objects in this scope are &lt;aop:scoped-proxy/&gt; (no need to
  * decorate the bean definitions).<br/>
  * <br/>
- * 
+ *
  * In addition, support is provided for late binding of references accessible
  * from the {@link StepContext} using #{..} placeholders. Using this feature,
  * bean properties can be pulled from the step or job execution context and the
  * job parameters. E.g.
- * 
+ *
  * <pre>
  * &lt;bean id=&quot;...&quot; class=&quot;...&quot; scope=&quot;step&quot;&gt;
  * 	&lt;property name=&quot;parent&quot; ref=&quot;#{stepExecutionContext[helper]}&quot; /&gt;
  * &lt;/bean&gt;
- * 
+ *
  * &lt;bean id=&quot;...&quot; class=&quot;...&quot; scope=&quot;step&quot;&gt;
  * 	&lt;property name=&quot;name&quot; value=&quot;#{stepExecutionContext['input.name']}&quot; /&gt;
  * &lt;/bean&gt;
- * 
+ *
  * &lt;bean id=&quot;...&quot; class=&quot;...&quot; scope=&quot;step&quot;&gt;
  * 	&lt;property name=&quot;name&quot; value=&quot;#{jobParameters[input]}&quot; /&gt;
  * &lt;/bean&gt;
- * 
+ *
  * &lt;bean id=&quot;...&quot; class=&quot;...&quot; scope=&quot;step&quot;&gt;
  * 	&lt;property name=&quot;name&quot; value=&quot;#{jobExecutionContext['input.stem']}.txt&quot; /&gt;
  * &lt;/bean&gt;
  * </pre>
- * 
+ *
  * The {@link StepContext} is referenced using standard bean property paths (as
  * per {@link BeanWrapper}). The examples above all show the use of the Map
  * accessors provided as a convenience for step and job attributes.
- * 
+ *
  * @author Dave Syer
  * @since 2.0
  */
@@ -91,6 +91,7 @@ public class StepScope implements Scope, BeanFactoryPostProcessor, Ordered {
 		this.order = order;
 	}
 
+	@Override
 	public int getOrder() {
 		return order;
 	}
@@ -111,7 +112,7 @@ public class StepScope implements Scope, BeanFactoryPostProcessor, Ordered {
 	/**
 	 * Flag to indicate that proxies should use dynamic subclassing. This allows
 	 * classes with no interface to be proxied. Defaults to false.
-	 * 
+	 *
 	 * @param proxyTargetClass set to true to have proxies created using dynamic
 	 * subclasses
 	 */
@@ -124,6 +125,7 @@ public class StepScope implements Scope, BeanFactoryPostProcessor, Ordered {
 	 * step-scoped beans. This method is part of the Scope SPI in Spring 3.0,
 	 * but should just be ignored by earlier versions of Spring.
 	 */
+	@Override
 	public Object resolveContextualObject(String key) {
 		StepContext context = getContext();
 		// TODO: support for attributes as well maybe (setters not exposed yet
@@ -134,6 +136,8 @@ public class StepScope implements Scope, BeanFactoryPostProcessor, Ordered {
 	/**
 	 * @see Scope#get(String, ObjectFactory)
 	 */
+	@SuppressWarnings("rawtypes")
+	@Override
 	public Object get(String name, ObjectFactory objectFactory) {
 
 		StepContext context = getContext();
@@ -161,6 +165,7 @@ public class StepScope implements Scope, BeanFactoryPostProcessor, Ordered {
 	/**
 	 * @see Scope#getConversationId()
 	 */
+	@Override
 	public String getConversationId() {
 		StepContext context = getContext();
 		return context.getId();
@@ -169,6 +174,7 @@ public class StepScope implements Scope, BeanFactoryPostProcessor, Ordered {
 	/**
 	 * @see Scope#registerDestructionCallback(String, Runnable)
 	 */
+	@Override
 	public void registerDestructionCallback(String name, Runnable callback) {
 		StepContext context = getContext();
 		logger.debug(String.format("Registered destruction callback in scope=%s, name=%s", this.name, name));
@@ -178,6 +184,7 @@ public class StepScope implements Scope, BeanFactoryPostProcessor, Ordered {
 	/**
 	 * @see Scope#remove(String)
 	 */
+	@Override
 	public Object remove(String name) {
 		StepContext context = getContext();
 		logger.debug(String.format("Removing from scope=%s, name=%s", this.name, name));
@@ -187,7 +194,7 @@ public class StepScope implements Scope, BeanFactoryPostProcessor, Ordered {
 	/**
 	 * Get an attribute accessor in the form of a {@link StepContext} that can
 	 * be used to store scoped bean instances.
-	 * 
+	 *
 	 * @return the current step context which we can use as a scope storage
 	 * medium
 	 */
@@ -201,12 +208,13 @@ public class StepScope implements Scope, BeanFactoryPostProcessor, Ordered {
 
 	/**
 	 * Register this scope with the enclosing BeanFactory.
-	 * 
+	 *
 	 * @see BeanFactoryPostProcessor#postProcessBeanFactory(ConfigurableListableBeanFactory)
-	 * 
+	 *
 	 * @param beanFactory the BeanFactory to register with
 	 * @throws BeansException if there is a problem.
 	 */
+	@Override
 	public void postProcessBeanFactory(ConfigurableListableBeanFactory beanFactory) throws BeansException {
 
 		beanFactory.registerScope(name, this);
@@ -244,7 +252,7 @@ public class StepScope implements Scope, BeanFactoryPostProcessor, Ordered {
 	/**
 	 * Public setter for the name property. This can then be used as a bean
 	 * definition attribute, e.g. scope="step". Defaults to "step".
-	 * 
+	 *
 	 * @param name the name to set for this scope.
 	 */
 	public void setName(String name) {
@@ -257,7 +265,7 @@ public class StepScope implements Scope, BeanFactoryPostProcessor, Ordered {
 	 * &lt;aop-auto-proxy/&gt; to a step scoped bean. Also if Spring EL is not
 	 * available will enable a weak version of late binding as described in the
 	 * class-level docs.
-	 * 
+	 *
 	 * @param beanName the bean name to replace
 	 * @param definition the bean definition to replace
 	 * @param registry the enclosing {@link BeanDefinitionRegistry}
@@ -291,9 +299,9 @@ public class StepScope implements Scope, BeanFactoryPostProcessor, Ordered {
 	/**
 	 * Helper class to scan a bean definition hierarchy and force the use of
 	 * auto-proxy for step scoped beans.
-	 * 
+	 *
 	 * @author Dave Syer
-	 * 
+	 *
 	 */
 	private static class Scopifier extends BeanDefinitionVisitor {
 
@@ -307,6 +315,7 @@ public class StepScope implements Scope, BeanFactoryPostProcessor, Ordered {
 
 		public Scopifier(BeanDefinitionRegistry registry, String scope, boolean proxyTargetClass, boolean scoped) {
 			super(new StringValueResolver() {
+				@Override
 				public String resolveStringValue(String value) {
 					return value;
 				}
@@ -356,9 +365,9 @@ public class StepScope implements Scope, BeanFactoryPostProcessor, Ordered {
 	/**
 	 * Helper class to scan a bean definition hierarchy and hide placeholders
 	 * from Spring EL.
-	 * 
+	 *
 	 * @author Dave Syer
-	 * 
+	 *
 	 */
 	private static class ExpressionHider extends BeanDefinitionVisitor {
 
@@ -374,6 +383,7 @@ public class StepScope implements Scope, BeanFactoryPostProcessor, Ordered {
 
 		private ExpressionHider(String scope, final boolean scoped) {
 			super(new StringValueResolver() {
+				@Override
 				public String resolveStringValue(String value) {
 					if (scoped && value.contains(PLACEHOLDER_PREFIX) && value.contains(PLACEHOLDER_SUFFIX)) {
 						value = value.replace(PLACEHOLDER_PREFIX, REPLACEMENT_PREFIX);
@@ -400,7 +410,7 @@ public class StepScope implements Scope, BeanFactoryPostProcessor, Ordered {
 				boolean scopeChange = !scope.equals(otherScope);
 				if (scopeChange) {
 					new ExpressionHider(otherScope == null ? scope : otherScope, !scoped)
-							.visitBeanDefinition(definition);
+					.visitBeanDefinition(definition);
 					// Exit here so that nested inner bean definitions are not
 					// analysed by both visitors
 					return value;

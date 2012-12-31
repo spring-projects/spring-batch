@@ -70,6 +70,7 @@ public class ThrottleLimitResultQueueTests {
 	public void testThrottleLimit() throws Exception {
 		queue.expect();
 		new Thread(new Runnable() {
+            @Override
 			public void run() {
 				try {
 					Thread.sleep(100L);

@@ -7,15 +7,18 @@ public class RangeArrayPropertyEditorTests extends TestCase {
 	private Range[] ranges;
 	private RangeArrayPropertyEditor pe;
 
+    @Override
 	public void setUp() {
 
 		ranges = null;
 
 		pe = new RangeArrayPropertyEditor() {
+            @Override
 			public void setValue(Object value) {
 				ranges = (Range[]) value;
 			}
 
+            @Override
 			public Object getValue() {
 				return ranges;
 			}

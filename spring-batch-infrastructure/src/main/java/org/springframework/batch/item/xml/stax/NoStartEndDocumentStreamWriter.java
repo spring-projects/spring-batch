@@ -33,6 +33,7 @@ public class NoStartEndDocumentStreamWriter extends AbstractEventWriterWrapper {
 		super(wrappedEventWriter);
 	}
 
+    @Override
 	public void add(XMLEvent event) throws XMLStreamException {
 		if ((!event.isStartDocument()) && (!event.isEndDocument())) {
 			wrappedEventWriter.add(event);

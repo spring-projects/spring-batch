@@ -43,6 +43,7 @@ public class PatternMatcher<S> {
 		// Sort keys to start with the most specific
 		sorted = new ArrayList<String>(map.keySet());
 		Collections.sort(sorted, new Comparator<String>() {
+            @Override
 			public int compare(String o1, String o2) {
 				String s1 = o1; // .replace('?', '{');
 				String s2 = o2; // .replace('*', '}');

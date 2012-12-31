@@ -43,6 +43,7 @@ public class AmqpItemWriter<T> implements ItemWriter<T> {
         this.amqpTemplate = amqpTemplate;
     }
 
+    @Override
     public void write(final List<? extends T> items) throws Exception {
         if (log.isDebugEnabled()) {
             log.debug("Writing to AMQP with " + items.size() + " items.");

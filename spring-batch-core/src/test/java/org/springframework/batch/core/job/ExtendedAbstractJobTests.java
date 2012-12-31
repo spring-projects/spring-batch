@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2007 the original author or authors.
+ * Copyright 2006-2013 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -41,13 +41,13 @@ import org.springframework.batch.core.step.StepSupport;
 
 /**
  * @author Dave Syer
- * 
+ *
  */
 public class ExtendedAbstractJobTests {
 
 	private AbstractJob job;
 	private JobRepository jobRepository;
-	
+
 	@Before
 	public void setUp() throws Exception {
 		MapJobRepositoryFactoryBean factory = new MapJobRepositoryFactoryBean();
@@ -118,7 +118,7 @@ public class ExtendedAbstractJobTests {
 			assertTrue(e.getMessage().contains("JobRepository"));
 		}
 	}
-	
+
 	@Test
 	public void testValidatorWithNotNullParameters() throws Exception {
 		JobExecution execution = jobRepository.createJobExecution("job", new JobParameters());
@@ -147,7 +147,7 @@ public class ExtendedAbstractJobTests {
 	 */
 	@Test
 	public void testHandleStep() throws Exception {
-		
+
 		class StubStep extends StepSupport {
 
 			static final String value = "message for next steps";
@@ -158,11 +158,12 @@ public class ExtendedAbstractJobTests {
 				setName("StubStep");
 			}
 
+			@Override
 			public void execute(StepExecution stepExecution) throws JobInterruptedException {
 				stepExecution.getJobExecution().getExecutionContext().put(key, value);
 			}
 		}
-		
+
 		MapJobRepositoryFactoryBean factory = new MapJobRepositoryFactoryBean();
 		factory.afterPropertiesSet();
 		JobRepository repository = (JobRepository) factory.getObject();
@@ -185,12 +186,12 @@ public class ExtendedAbstractJobTests {
 
 	/**
 	 * @author Dave Syer
-	 * 
+	 *
 	 */
 	private static class StubJob extends AbstractJob {
 		/**
 		 * @param name
-		 * @param jobRepository 
+		 * @param jobRepository
 		 */
 		private StubJob(String name, JobRepository jobRepository) {
 			super(name);
@@ -217,7 +218,7 @@ public class ExtendedAbstractJobTests {
 		public Step getStep(String stepName) {
 			return null;
 		}
-		
+
 		@Override
 		public Collection<String> getStepNames() {
 			return Collections.<String> emptySet();

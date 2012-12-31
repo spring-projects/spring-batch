@@ -45,6 +45,7 @@ public class PatternMatchingCompositeLineTokenizer implements LineTokenizer, Ini
 	 * org.springframework.batch.item.file.transform.LineTokenizer#tokenize(
 	 * java.lang.String)
 	 */
+    @Override
 	public FieldSet tokenize(String line) {
 		return tokenizers.match(line).tokenize(line);
 	}
@@ -55,6 +56,7 @@ public class PatternMatchingCompositeLineTokenizer implements LineTokenizer, Ini
 	 * @see
 	 * org.springframework.beans.factory.InitializingBean#afterPropertiesSet()
 	 */
+    @Override
 	public void afterPropertiesSet() throws Exception {
 		Assert.isTrue(this.tokenizers != null, "The 'tokenizers' property must be non-empty");
 	}

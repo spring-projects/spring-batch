@@ -111,11 +111,13 @@ public class SpringValidatorTests {
 
 		public static final TestBean REJECT_MULTI_VALUE = new TestBean("foo", "bar");
 
+        @Override
 		@SuppressWarnings({ "rawtypes", "unchecked" })
 		public boolean supports(Class clazz) {
 			return clazz.isAssignableFrom(TestBean.class);
 		}
 
+        @Override
 		public void validate(Object value, Errors errors) {
 			if (value.equals(ACCEPT_VALUE)) {
 				return; // return without adding errors
@@ -157,6 +159,7 @@ public class SpringValidatorTests {
 			this.bar = bar;
 		}
 
+        @Override
 		public String toString() {
 			return "TestBeanToString";
 		}

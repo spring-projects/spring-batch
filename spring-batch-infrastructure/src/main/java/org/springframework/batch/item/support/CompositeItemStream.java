@@ -68,6 +68,7 @@ public class CompositeItemStream implements ItemStream {
 	 * 
 	 * @see org.springframework.batch.item.ItemStream#update(ExecutionContext)
 	 */
+    @Override
 	public void update(ExecutionContext executionContext) {
 		for (ItemStream itemStream : streams) {
 			itemStream.update(executionContext);
@@ -78,6 +79,7 @@ public class CompositeItemStream implements ItemStream {
 	 * Broadcast the call to close.
 	 * @throws ItemStreamException
 	 */
+    @Override
 	public void close() throws ItemStreamException {
 		for (ItemStream itemStream : streams) {
 			itemStream.close();
@@ -88,6 +90,7 @@ public class CompositeItemStream implements ItemStream {
 	 * Broadcast the call to open.
 	 * @throws ItemStreamException
 	 */
+    @Override
 	public void open(ExecutionContext executionContext) throws ItemStreamException {
 		for (ItemStream itemStream : streams) {
 			itemStream.open(executionContext);

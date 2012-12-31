@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2007 the original author or authors.
+ * Copyright 2006-2013 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -27,13 +27,14 @@ import org.springframework.beans.factory.FactoryBean;
  * A {@link FactoryBean} that automates the creation of a
  * {@link SimpleJobExplorer}. Declares abstract methods for providing DAO
  * object implementations.
- * 
+ *
  * @see JobExplorerFactoryBean
  * @see MapJobExplorerFactoryBean
- * 
+ *
  * @author Dave Syer
  * @since 2.0
  */
+@SuppressWarnings("rawtypes")
 public abstract class AbstractJobExplorerFactoryBean implements FactoryBean {
 
 	/**
@@ -45,21 +46,23 @@ public abstract class AbstractJobExplorerFactoryBean implements FactoryBean {
 	 * @return fully configured {@link JobExecutionDao} implementation.
 	 */
 	protected abstract JobExecutionDao createJobExecutionDao() throws Exception;
-	
+
 	protected abstract StepExecutionDao createStepExecutionDao() throws Exception;
 
 	protected abstract ExecutionContextDao createExecutionContextDao() throws Exception;
 
 	/**
 	 * The type of object to be returned from {@link #getObject()}.
-	 * 
+	 *
 	 * @return JobExplorer.class
 	 * @see org.springframework.beans.factory.FactoryBean#getObjectType()
 	 */
+	@Override
 	public Class<JobExplorer> getObjectType() {
 		return JobExplorer.class;
 	}
 
+	@Override
 	public boolean isSingleton() {
 		return true;
 	}

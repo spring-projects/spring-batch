@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2007 the original author or authors.
+ * Copyright 2006-2013 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -31,7 +31,7 @@ import org.springframework.retry.policy.NeverRetryPolicy;
 
 /**
  * @author Dave Syer
- * 
+ *
  */
 public class SimpleRetryExceptionHandlerTests extends TestCase {
 
@@ -39,18 +39,20 @@ public class SimpleRetryExceptionHandlerTests extends TestCase {
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see junit.framework.TestCase#setUp()
 	 */
+	@Override
 	protected void setUp() throws Exception {
 		RepeatSynchronizationManager.register(context);
 	}
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see junit.framework.TestCase#tearDown()
 	 */
+	@Override
 	protected void tearDown() throws Exception {
 		RepeatSynchronizationManager.clear();
 	}

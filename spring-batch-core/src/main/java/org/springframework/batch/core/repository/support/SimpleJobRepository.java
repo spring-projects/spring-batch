@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2007 the original author or authors.
+ * Copyright 2006-2013 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -39,21 +39,21 @@ import org.springframework.batch.item.ExecutionContext;
 import org.springframework.util.Assert;
 
 /**
- * 
+ *
  * <p>
  * Implementation of {@link JobRepository} that stores JobInstances,
  * JobExecutions, and StepExecutions using the injected DAOs.
  * <p>
- * 
+ *
  * @author Lucas Ward
  * @author Dave Syer
  * @author Robert Kasanicky
- * 
+ *
  * @see JobRepository
  * @see JobInstanceDao
  * @see JobExecutionDao
  * @see StepExecutionDao
- * 
+ *
  */
 public class SimpleJobRepository implements JobRepository {
 
@@ -83,10 +83,12 @@ public class SimpleJobRepository implements JobRepository {
 		this.ecDao = ecDao;
 	}
 
+	@Override
 	public boolean isJobInstanceExists(String jobName, JobParameters jobParameters) {
 		return jobInstanceDao.getJobInstance(jobName, jobParameters) != null;
 	}
 
+	@Override
 	public JobExecution createJobExecution(String jobName, JobParameters jobParameters)
 			throws JobExecutionAlreadyRunningException, JobRestartException, JobInstanceAlreadyCompleteException {
 
@@ -95,7 +97,7 @@ public class SimpleJobRepository implements JobRepository {
 
 		/*
 		 * Find all jobs matching the runtime information.
-		 * 
+		 *
 		 * If this method is transactional, and the isolation level is
 		 * REPEATABLE_READ or better, another launcher trying to start the same
 		 * job in another thread or process will block until this transaction
@@ -116,12 +118,12 @@ public class SimpleJobRepository implements JobRepository {
 					throw new JobExecutionAlreadyRunningException("A job execution for this job is already running: "
 							+ jobInstance);
 				}
-				
+
 				BatchStatus status = execution.getStatus();
 				if (status == BatchStatus.COMPLETED || status == BatchStatus.ABANDONED) {
 					throw new JobInstanceAlreadyCompleteException(
 							"A job instance already exists and is complete for parameters=" + jobParameters
-									+ ".  If you want to run this job again, change the parameters.");
+							+ ".  If you want to run this job again, change the parameters.");
 				}
 			}
 			executionContext = ecDao.getExecutionContext(jobExecutionDao.getLastJobExecution(jobInstance));
@@ -145,6 +147,7 @@ public class SimpleJobRepository implements JobRepository {
 
 	}
 
+	@Override
 	public void update(JobExecution jobExecution) {
 
 		Assert.notNull(jobExecution, "JobExecution cannot be null.");
@@ -155,6 +158,7 @@ public class SimpleJobRepository implements JobRepository {
 		jobExecutionDao.updateJobExecution(jobExecution);
 	}
 
+	@Override
 	public void add(StepExecution stepExecution) {
 		validateStepExecution(stepExecution);
 
@@ -163,6 +167,7 @@ public class SimpleJobRepository implements JobRepository {
 		ecDao.saveExecutionContext(stepExecution);
 	}
 
+	@Override
 	public void update(StepExecution stepExecution) {
 		validateStepExecution(stepExecution);
 		Assert.notNull(stepExecution.getId(), "StepExecution must already be saved (have an id assigned)");
@@ -178,16 +183,19 @@ public class SimpleJobRepository implements JobRepository {
 		Assert.notNull(stepExecution.getJobExecutionId(), "StepExecution must belong to persisted JobExecution");
 	}
 
+	@Override
 	public void updateExecutionContext(StepExecution stepExecution) {
 		validateStepExecution(stepExecution);
 		Assert.notNull(stepExecution.getId(), "StepExecution must already be saved (have an id assigned)");
 		ecDao.updateExecutionContext(stepExecution);
 	}
-	
+
+	@Override
 	public void updateExecutionContext(JobExecution jobExecution) {
 		ecDao.updateExecutionContext(jobExecution);
 	}
 
+	@Override
 	public StepExecution getLastStepExecution(JobInstance jobInstance, String stepName) {
 		List<JobExecution> jobExecutions = jobExecutionDao.findJobExecutions(jobInstance);
 		List<StepExecution> stepExecutions = new ArrayList<StepExecution>(jobExecutions.size());
@@ -218,6 +226,7 @@ public class SimpleJobRepository implements JobRepository {
 	/**
 	 * @return number of executions of the step within given job instance
 	 */
+	@Override
 	public int getStepExecutionCount(JobInstance jobInstance, String stepName) {
 		int count = 0;
 		List<JobExecution> jobExecutions = jobExecutionDao.findJobExecutions(jobInstance);
@@ -237,7 +246,7 @@ public class SimpleJobRepository implements JobRepository {
 	 * the provided StepExecution has been interrupted. If, after synchronizing
 	 * the status with the database, the status has been updated to STOPPING,
 	 * then the job has been interrupted.
-	 * 
+	 *
 	 * @param stepExecution
 	 */
 	private void checkForInterruption(StepExecution stepExecution) {
@@ -249,13 +258,14 @@ public class SimpleJobRepository implements JobRepository {
 		}
 	}
 
+	@Override
 	public JobExecution getLastJobExecution(String jobName, JobParameters jobParameters) {
 		JobInstance jobInstance = jobInstanceDao.getJobInstance(jobName, jobParameters);
 		if (jobInstance == null) {
 			return null;
 		}
 		JobExecution jobExecution = jobExecutionDao.getLastJobExecution(jobInstance);
-	
+
 		if (jobExecution != null) {
 			jobExecution.setExecutionContext(ecDao.getExecutionContext(jobExecution));
 		}

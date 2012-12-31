@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2007 the original author or authors.
+ * Copyright 2006-2013 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,7 +24,7 @@ import org.springframework.core.Ordered;
 /**
  * @author Lucas Ward
  * @author Dave Syer
- * 
+ *
  */
 public class CompositeItemWriteListener<S> implements ItemWriteListener<S> {
 
@@ -32,7 +32,7 @@ public class CompositeItemWriteListener<S> implements ItemWriteListener<S> {
 
 	/**
 	 * Public setter for the listeners.
-	 * 
+	 *
 	 * @param itemWriteListeners
 	 */
 	public void setListeners(List<? extends ItemWriteListener<? super S>> itemWriteListeners) {
@@ -41,7 +41,7 @@ public class CompositeItemWriteListener<S> implements ItemWriteListener<S> {
 
 	/**
 	 * Register additional listener.
-	 * 
+	 *
 	 * @param itemWriteListener
 	 */
 	public void register(ItemWriteListener<? super S> itemWriteListener) {
@@ -53,6 +53,7 @@ public class CompositeItemWriteListener<S> implements ItemWriteListener<S> {
 	 * prioritising those that implement {@link Ordered}.
 	 * @see ItemWriteListener#afterWrite(java.util.List)
 	 */
+	@Override
 	public void afterWrite(List<? extends S> items) {
 		for (Iterator<ItemWriteListener<? super S>> iterator = listeners.reverse(); iterator.hasNext();) {
 			ItemWriteListener<? super S> listener = iterator.next();
@@ -65,6 +66,7 @@ public class CompositeItemWriteListener<S> implements ItemWriteListener<S> {
 	 * that implement {@link Ordered}.
 	 * @see ItemWriteListener#beforeWrite(List)
 	 */
+	@Override
 	public void beforeWrite(List<? extends S> items) {
 		for (Iterator<ItemWriteListener<? super S>> iterator = listeners.iterator(); iterator.hasNext();) {
 			ItemWriteListener<? super S> listener = iterator.next();
@@ -77,6 +79,7 @@ public class CompositeItemWriteListener<S> implements ItemWriteListener<S> {
 	 * prioritising those that implement {@link Ordered}.
 	 * @see ItemWriteListener#onWriteError(Exception, List)
 	 */
+	@Override
 	public void onWriteError(Exception ex, List<? extends S> items) {
 		for (Iterator<ItemWriteListener<? super S>> iterator = listeners.reverse(); iterator.hasNext();) {
 			ItemWriteListener<? super S> listener = iterator.next();

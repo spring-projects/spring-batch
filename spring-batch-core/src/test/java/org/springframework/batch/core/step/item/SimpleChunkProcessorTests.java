@@ -20,6 +20,7 @@ public class SimpleChunkProcessorTests {
 
 	private SimpleChunkProcessor<String, String> processor = new SimpleChunkProcessor<String, String>(
 			new ItemProcessor<String, String>() {
+				@Override
 				public String process(String item) throws Exception {
 					if (item.equals("err")) {
 						return null;
@@ -27,6 +28,7 @@ public class SimpleChunkProcessorTests {
 					return item;
 				}
 			}, new ItemWriter<String>() {
+				@Override
 				public void write(List<? extends String> items) throws Exception {
 					if (items.contains("fail")) {
 						throw new RuntimeException("Planned failure!");

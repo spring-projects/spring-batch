@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2008 the original author or authors.
+ * Copyright 2002-2013 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -39,7 +39,7 @@ import org.springframework.util.Assert;
  * {@link FactoryBean} implementation that builds a listener based on the
  * various lifecycle methods or annotations that are provided. There are three
  * possible ways of having a method called as part of a listener lifecycle:
- * 
+ *
  * <ul>
  * <li>Interface implementation: By implementing any of the subclasses of a
  * listener interface, methods on said interface will be called
@@ -47,7 +47,7 @@ import org.springframework.util.Assert;
  * <li>String name of the method to be called, which is tied to a
  * {@link ListenerMetaData} value in the metaDataMap.
  * </ul>
- * 
+ *
  * It should be noted that methods obtained by name or annotation that don't
  * match the listener method signatures to which they belong will cause errors.
  * However, it is acceptable to have no parameters at all. If the same method is
@@ -56,18 +56,20 @@ import org.springframework.util.Assert;
  * has multiple methods tied to a particular listener, each method will be
  * called. Also note that the same annotations cannot be applied to two separate
  * methods in a single class.
- * 
+ *
  * @author Lucas Ward
  * @author Dan Garrette
  * @since 2.0
  * @see ListenerMetaData
  */
+@SuppressWarnings("rawtypes")
 public abstract class AbstractListenerFactoryBean implements FactoryBean, InitializingBean {
 
 	private Object delegate;
 
 	private Map<String, String> metaDataMap;
 
+	@Override
 	public Object getObject() {
 
 		if (metaDataMap == null) {
@@ -101,7 +103,7 @@ public abstract class AbstractListenerFactoryBean implements FactoryBean, Initia
 			if (invoker != null) {
 				invokers.add(invoker);
 			}
-			
+
 			invoker = getMethodInvokerByName(entry.getValue(), delegate, metaData.getParamTypes());
 			if (invoker != null) {
 				invokers.add(invoker);
@@ -174,6 +176,7 @@ public abstract class AbstractListenerFactoryBean implements FactoryBean, Initia
 		}
 	}
 
+	@Override
 	public boolean isSingleton() {
 		return true;
 	}
@@ -186,6 +189,7 @@ public abstract class AbstractListenerFactoryBean implements FactoryBean, Initia
 		this.metaDataMap = metaDataMap;
 	}
 
+	@Override
 	public void afterPropertiesSet() throws Exception {
 		Assert.notNull(delegate, "Delegate must not be null");
 	}
@@ -193,7 +197,7 @@ public abstract class AbstractListenerFactoryBean implements FactoryBean, Initia
 	/**
 	 * Convenience method to check whether the given object is or can be made
 	 * into a listener.
-	 * 
+	 *
 	 * @param target the object to check
 	 * @return true if the delegate is an instance of any of the listener
 	 * interface, or contains the marker annotations

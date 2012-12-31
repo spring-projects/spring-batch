@@ -36,7 +36,7 @@ import org.springframework.transaction.support.DefaultTransactionStatus;
 public class FaultTolerantStepFactoryBeanUnexpectedRollbackTests {
 
 	protected final Log logger = LogFactory.getLog(getClass());
-	
+
 	@Autowired
 	private DataSource dataSource;
 
@@ -47,8 +47,10 @@ public class FaultTolerantStepFactoryBeanUnexpectedRollbackTests {
 		FaultTolerantStepFactoryBean<String, String> factory = new FaultTolerantStepFactoryBean<String, String>();
 		factory.setItemWriter(writer);
 
+		@SuppressWarnings("serial")
 		DataSourceTransactionManager transactionManager = new DataSourceTransactionManager(dataSource) {
 			private boolean failed = false;
+			@Override
 			protected void doCommit(DefaultTransactionStatus status) throws TransactionException {
 				if (writer.getWritten().isEmpty() || failed || !isExistingTransaction(status.getTransaction())) {
 					super.doCommit(status);

@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2009 the original author or authors.
+ * Copyright 2006-2013 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -33,7 +33,7 @@ import org.springframework.transaction.PlatformTransactionManager;
 /**
  * Post-process jobs and steps defined using the batch namespace to inject
  * dependencies.
- * 
+ *
  * @author Dan Garrette
  * @since 2.0.1
  */
@@ -49,6 +49,7 @@ public class CoreNamespacePostProcessor implements BeanPostProcessor, BeanFactor
 
 	private ApplicationContext applicationContext;
 
+	@Override
 	public void postProcessBeanFactory(ConfigurableListableBeanFactory beanFactory) throws BeansException {
 		for (String beanName : beanFactory.getBeanDefinitionNames()) {
 			injectJobRepositoryIntoSteps(beanName, beanFactory);
@@ -59,7 +60,7 @@ public class CoreNamespacePostProcessor implements BeanPostProcessor, BeanFactor
 	/**
 	 * Automatically inject job-repository from a job into its steps. Only
 	 * inject if the step is an AbstractStep or StepParserStepFactoryBean.
-	 * 
+	 *
 	 * @param beanName
 	 * @param beanFactory
 	 */
@@ -88,7 +89,7 @@ public class CoreNamespacePostProcessor implements BeanPostProcessor, BeanFactor
 	 * If any of the beans in the parent hierarchy is a &lt;step/&gt; with a
 	 * &lt;tasklet/&gt;, then the bean class must be
 	 * {@link StepParserStepFactoryBean}.
-	 * 
+	 *
 	 * @param beanName
 	 * @param beanFactory
 	 */
@@ -101,6 +102,7 @@ public class CoreNamespacePostProcessor implements BeanPostProcessor, BeanFactor
 		}
 	}
 
+	@Override
 	public Object postProcessBeforeInitialization(Object bean, String beanName) throws BeansException {
 		return injectDefaults(bean);
 	}
@@ -113,7 +115,7 @@ public class CoreNamespacePostProcessor implements BeanPostProcessor, BeanFactor
 	 * <li>Inject "transactionManager" into any
 	 * {@link StepParserStepFactoryBean} without a transactionManager.
 	 * </ul>
-	 * 
+	 *
 	 * @param bean
 	 * @return
 	 */
@@ -140,10 +142,12 @@ public class CoreNamespacePostProcessor implements BeanPostProcessor, BeanFactor
 		return bean;
 	}
 
+	@Override
 	public Object postProcessAfterInitialization(Object bean, String beanName) throws BeansException {
 		return bean;
 	}
 
+	@Override
 	public void setApplicationContext(ApplicationContext applicationContext) {
 		this.applicationContext = applicationContext;
 	}

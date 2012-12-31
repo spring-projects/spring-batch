@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2007 the original author or authors.
+ * Copyright 2006-2013 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,12 +24,13 @@ import org.junit.Test;
 import org.springframework.batch.repeat.RepeatStatus;
 
 public class CallableTaskletAdapterTests {
-	
+
 	private CallableTaskletAdapter adapter = new CallableTaskletAdapter();
 
 	@Test
 	public void testHandle() throws Exception {
 		adapter.setCallable(new Callable<RepeatStatus>() {
+			@Override
 			public RepeatStatus call() throws Exception {
 				return RepeatStatus.FINISHED;
 			}
@@ -47,5 +48,5 @@ public class CallableTaskletAdapterTests {
 			// expected
 		}
 	}
-	
+
 }

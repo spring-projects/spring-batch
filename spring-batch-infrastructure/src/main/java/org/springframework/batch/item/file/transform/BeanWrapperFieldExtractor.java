@@ -48,6 +48,7 @@ public class BeanWrapperFieldExtractor<T> implements FieldExtractor<T>, Initiali
 	/**
 	 * @see org.springframework.batch.item.file.transform.FieldExtractor#extract(java.lang.Object)
 	 */
+    @Override
 	public Object[] extract(T item) {
 		List<Object> values = new ArrayList<Object>();
 
@@ -58,6 +59,7 @@ public class BeanWrapperFieldExtractor<T> implements FieldExtractor<T>, Initiali
 		return values.toArray();
 	}
 
+    @Override
 	public void afterPropertiesSet() {
 		Assert.notNull(names, "The 'names' property must be set.");
 	}

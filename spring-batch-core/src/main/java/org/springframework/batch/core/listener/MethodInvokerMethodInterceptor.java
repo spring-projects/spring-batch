@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2008 the original author or authors.
+ * Copyright 2002-2013 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -32,7 +32,7 @@ import org.springframework.batch.support.MethodInvoker;
  * that isn't void is
  * {@link StepExecutionListener#afterStep(org.springframework.batch.core.StepExecution)}
  * , which returns ExitStatus.
- * 
+ *
  * @author Lucas Ward
  * @since 2.0
  * @see MethodInvoker
@@ -51,6 +51,7 @@ public class MethodInvokerMethodInterceptor implements MethodInterceptor {
 		this.invokerMap = invokerMap;
 	}
 
+	@Override
 	public Object invoke(MethodInvocation invocation) throws Throwable {
 
 		String methodName = invocation.getMethod().getName();
@@ -91,7 +92,7 @@ public class MethodInvokerMethodInterceptor implements MethodInterceptor {
 		MethodInvokerMethodInterceptor other = (MethodInvokerMethodInterceptor) obj;
 		return invokerMap.equals(other.invokerMap);
 	}
-	
+
 	/**
 	 * {@inheritDoc}
 	 */

@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2012 the original author or authors.
+ * Copyright 2006-2013 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -33,7 +33,7 @@ import org.springframework.batch.item.ItemStream;
  * @author Michael Minella
  */
 public class MulticasterBatchListener<T, S> implements StepExecutionListener, ChunkListener, ItemReadListener<T>,
-		ItemProcessListener<T, S>, ItemWriteListener<S>, SkipListener<T, S> {
+ItemProcessListener<T, S>, ItemWriteListener<S>, SkipListener<T, S> {
 
 	private CompositeStepExecutionListener stepListener = new CompositeStepExecutionListener();
 
@@ -106,6 +106,7 @@ public class MulticasterBatchListener<T, S> implements StepExecutionListener, Ch
 	 * @see org.springframework.batch.core.listener.CompositeItemProcessListener#afterProcess(java.lang.Object,
 	 * java.lang.Object)
 	 */
+	@Override
 	public void afterProcess(T item, S result) {
 		try {
 			itemProcessListener.afterProcess(item, result);
@@ -119,6 +120,7 @@ public class MulticasterBatchListener<T, S> implements StepExecutionListener, Ch
 	 * @param item
 	 * @see org.springframework.batch.core.listener.CompositeItemProcessListener#beforeProcess(java.lang.Object)
 	 */
+	@Override
 	public void beforeProcess(T item) {
 		try {
 			itemProcessListener.beforeProcess(item);
@@ -134,6 +136,7 @@ public class MulticasterBatchListener<T, S> implements StepExecutionListener, Ch
 	 * @see org.springframework.batch.core.listener.CompositeItemProcessListener#onProcessError(java.lang.Object,
 	 * java.lang.Exception)
 	 */
+	@Override
 	public void onProcessError(T item, Exception ex) {
 		try {
 			itemProcessListener.onProcessError(item, ex);
@@ -146,6 +149,7 @@ public class MulticasterBatchListener<T, S> implements StepExecutionListener, Ch
 	/**
 	 * @see org.springframework.batch.core.listener.CompositeStepExecutionListener#afterStep(StepExecution)
 	 */
+	@Override
 	public ExitStatus afterStep(StepExecution stepExecution) {
 		try {
 			return stepListener.afterStep(stepExecution);
@@ -159,6 +163,7 @@ public class MulticasterBatchListener<T, S> implements StepExecutionListener, Ch
 	 * @param stepExecution
 	 * @see org.springframework.batch.core.listener.CompositeStepExecutionListener#beforeStep(org.springframework.batch.core.StepExecution)
 	 */
+	@Override
 	public void beforeStep(StepExecution stepExecution) {
 		try {
 			stepListener.beforeStep(stepExecution);
@@ -172,6 +177,7 @@ public class MulticasterBatchListener<T, S> implements StepExecutionListener, Ch
 	 *
 	 * @see org.springframework.batch.core.listener.CompositeChunkListener#afterChunk()
 	 */
+	@Override
 	public void afterChunk() {
 		try {
 			chunkListener.afterChunk();
@@ -185,6 +191,7 @@ public class MulticasterBatchListener<T, S> implements StepExecutionListener, Ch
 	 *
 	 * @see org.springframework.batch.core.listener.CompositeChunkListener#beforeChunk()
 	 */
+	@Override
 	public void beforeChunk() {
 		try {
 			chunkListener.beforeChunk();
@@ -198,6 +205,7 @@ public class MulticasterBatchListener<T, S> implements StepExecutionListener, Ch
 	 * @param item
 	 * @see org.springframework.batch.core.listener.CompositeItemReadListener#afterRead(java.lang.Object)
 	 */
+	@Override
 	public void afterRead(T item) {
 		try {
 			itemReadListener.afterRead(item);
@@ -211,6 +219,7 @@ public class MulticasterBatchListener<T, S> implements StepExecutionListener, Ch
 	 *
 	 * @see org.springframework.batch.core.listener.CompositeItemReadListener#beforeRead()
 	 */
+	@Override
 	public void beforeRead() {
 		try {
 			itemReadListener.beforeRead();
@@ -224,6 +233,7 @@ public class MulticasterBatchListener<T, S> implements StepExecutionListener, Ch
 	 * @param ex
 	 * @see org.springframework.batch.core.listener.CompositeItemReadListener#onReadError(java.lang.Exception)
 	 */
+	@Override
 	public void onReadError(Exception ex) {
 		try {
 			itemReadListener.onReadError(ex);
@@ -237,6 +247,7 @@ public class MulticasterBatchListener<T, S> implements StepExecutionListener, Ch
 	 *
 	 * @see ItemWriteListener#afterWrite(List)
 	 */
+	@Override
 	public void afterWrite(List<? extends S> items) {
 		try {
 			itemWriteListener.afterWrite(items);
@@ -250,6 +261,7 @@ public class MulticasterBatchListener<T, S> implements StepExecutionListener, Ch
 	 * @param items
 	 * @see ItemWriteListener#beforeWrite(List)
 	 */
+	@Override
 	public void beforeWrite(List<? extends S> items) {
 		try {
 			itemWriteListener.beforeWrite(items);
@@ -264,6 +276,7 @@ public class MulticasterBatchListener<T, S> implements StepExecutionListener, Ch
 	 * @param items
 	 * @see ItemWriteListener#onWriteError(Exception, List)
 	 */
+	@Override
 	public void onWriteError(Exception ex, List<? extends S> items) {
 		try {
 			itemWriteListener.onWriteError(ex, items);
@@ -277,6 +290,7 @@ public class MulticasterBatchListener<T, S> implements StepExecutionListener, Ch
 	 * @param t
 	 * @see org.springframework.batch.core.listener.CompositeSkipListener#onSkipInRead(java.lang.Throwable)
 	 */
+	@Override
 	public void onSkipInRead(Throwable t) {
 		skipListener.onSkipInRead(t);
 	}
@@ -287,6 +301,7 @@ public class MulticasterBatchListener<T, S> implements StepExecutionListener, Ch
 	 * @see org.springframework.batch.core.listener.CompositeSkipListener#onSkipInWrite(java.lang.Object,
 	 * java.lang.Throwable)
 	 */
+	@Override
 	public void onSkipInWrite(S item, Throwable t) {
 		skipListener.onSkipInWrite(item, t);
 	}
@@ -297,6 +312,7 @@ public class MulticasterBatchListener<T, S> implements StepExecutionListener, Ch
 	 * @see org.springframework.batch.core.listener.CompositeSkipListener#onSkipInProcess(Object,
 	 * Throwable)
 	 */
+	@Override
 	public void onSkipInProcess(T item, Throwable t) {
 		skipListener.onSkipInProcess(item, t);
 	}

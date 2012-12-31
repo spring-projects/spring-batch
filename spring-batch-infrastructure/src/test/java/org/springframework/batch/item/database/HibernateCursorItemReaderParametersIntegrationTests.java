@@ -13,6 +13,7 @@ import org.hibernate.StatelessSession;
 public class HibernateCursorItemReaderParametersIntegrationTests extends
 		AbstractHibernateCursorItemReaderIntegrationTests {
 
+    @Override
 	protected void setQuery(HibernateCursorItemReader<?> reader) {
 		reader.setQueryString("from Foo where name like :name");
 		reader.setParameterValues(Collections.singletonMap("name", (Object) "bar%"));

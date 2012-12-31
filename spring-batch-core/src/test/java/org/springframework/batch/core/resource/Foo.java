@@ -5,19 +5,19 @@ package org.springframework.batch.core.resource;
  * Simple domain object for testing purposes.
  */
 public class Foo {
-	
+
 	private int id;
 	private String name;
 	private int value;
-	
+
 	public Foo(){}
-	
+
 	public Foo(int id, String name, int value) {
 		this.id = id;
 		this.name = name;
 		this.value = value;
 	}
-	
+
 	public String getName() {
 		return name;
 	}
@@ -36,7 +36,8 @@ public class Foo {
 	public void setId(int id) {
 		this.id = id;
 	}
-	
+
+	@Override
 	public String toString() {
 		return "Foo[id=" +id +",name=" + name + ",value=" + value + "]";
 	}
@@ -53,24 +54,31 @@ public class Foo {
 
 	@Override
 	public boolean equals(Object obj) {
-		if (this == obj)
+		if (this == obj) {
 			return true;
-		if (obj == null)
-			return false;
-		if (getClass() != obj.getClass())
-			return false;
-		Foo other = (Foo) obj;
-		if (id != other.id)
-			return false;
-		if (name == null) {
-			if (other.name != null)
-				return false;
 		}
-		else if (!name.equals(other.name))
+		if (obj == null) {
 			return false;
-		if (value != other.value)
+		}
+		if (getClass() != obj.getClass()) {
 			return false;
+		}
+		Foo other = (Foo) obj;
+		if (id != other.id) {
+			return false;
+		}
+		if (name == null) {
+			if (other.name != null) {
+				return false;
+			}
+		}
+		else if (!name.equals(other.name)) {
+			return false;
+		}
+		if (value != other.value) {
+			return false;
+		}
 		return true;
 	}
-	
+
 }

@@ -48,6 +48,7 @@ public class ThrottleLimitResultQueue<T> implements ResultQueue<T> {
 		waits = new Semaphore(throttleLimit);
 	}
 
+    @Override
 	public boolean isEmpty() {
 		return results.isEmpty();
 	}
@@ -57,6 +58,7 @@ public class ThrottleLimitResultQueue<T> implements ResultQueue<T> {
 	 * 
 	 * @see org.springframework.batch.repeat.support.ResultQueue#isExpecting()
 	 */
+    @Override
 	public boolean isExpecting() {
 		// Base the decision about whether we expect more results on a
 		// counter of the number of expected results actually collected.
@@ -71,6 +73,7 @@ public class ThrottleLimitResultQueue<T> implements ResultQueue<T> {
 	 * 
 	 * @see ResultQueue#expect()
 	 */
+    @Override
 	public void expect() throws InterruptedException {
 		synchronized (lock) {
 			waits.acquire();
@@ -78,6 +81,7 @@ public class ThrottleLimitResultQueue<T> implements ResultQueue<T> {
 		}
 	}
 
+    @Override
 	public void put(T holder) throws IllegalArgumentException {
 		if (!isExpecting()) {
 			throw new IllegalArgumentException("Not expecting a result.  Call expect() before put().");
@@ -89,6 +93,7 @@ public class ThrottleLimitResultQueue<T> implements ResultQueue<T> {
 		waits.release();
 	}
 
+    @Override
 	public T take() throws NoSuchElementException, InterruptedException {
 		if (!isExpecting()) {
 			throw new NoSuchElementException("Not expecting a result.  Call expect() before take().");

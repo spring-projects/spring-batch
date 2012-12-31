@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2008 the original author or authors.
+ * Copyright 2002-2013 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,7 +20,7 @@ import org.springframework.batch.core.JobExecutionListener;
 /**
  * This {@link AbstractListenerFactoryBean} implementation is used to create a
  * {@link JobExecutionListener}.
- * 
+ *
  * @author Lucas Ward
  * @author Dan Garrette
  * @since 2.0
@@ -29,18 +29,22 @@ import org.springframework.batch.core.JobExecutionListener;
  */
 public class JobListenerFactoryBean extends AbstractListenerFactoryBean {
 
+	@Override
 	protected ListenerMetaData getMetaDataFromPropertyName(String propertyName) {
 		return JobListenerMetaData.fromPropertyName(propertyName);
 	}
 
+	@Override
 	protected ListenerMetaData[] getMetaDataValues() {
 		return JobListenerMetaData.values();
 	}
 
+	@Override
 	protected Class<?> getDefaultListenerClass() {
 		return JobExecutionListener.class;
 	}
 
+	@Override
 	public Class<?> getObjectType() {
 		return JobExecutionListener.class;
 	}
@@ -48,7 +52,7 @@ public class JobListenerFactoryBean extends AbstractListenerFactoryBean {
 	/**
 	 * Convenience method to wrap any object and expose the appropriate
 	 * {@link JobExecutionListener} interfaces.
-	 * 
+	 *
 	 * @param delegate a delegate object
 	 * @return a JobListener instance constructed from the delegate
 	 */
@@ -61,7 +65,7 @@ public class JobListenerFactoryBean extends AbstractListenerFactoryBean {
 	/**
 	 * Convenience method to check whether the given object is or can be made
 	 * into a {@link JobExecutionListener}.
-	 * 
+	 *
 	 * @param delegate the object to check
 	 * @return true if the delegate is an instance of
 	 *         {@link JobExecutionListener}, or contains the marker annotations

@@ -114,6 +114,7 @@ public class HippyMethodInvokerTests {
 
 	public static class TestMethodAdapter extends AbstractMethodInvokingDelegator<String> implements Service {
 
+	    @Override
 		public String getMessage(double value, String input) {
 			try {
 				return invokeDelegateMethodWithArguments(new Object[] { value, input });

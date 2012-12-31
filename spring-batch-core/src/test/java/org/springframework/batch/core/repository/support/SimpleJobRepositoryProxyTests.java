@@ -20,7 +20,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 /**
  * Repository tests using JDBC DAOs (rather than mocks).
- * 
+ *
  * @author Robert Kasanicky
  */
 @RunWith(SpringJUnit4ClassRunner.class)
@@ -58,6 +58,7 @@ public class SimpleJobRepositoryProxyTests {
 
 		private boolean invoked;
 
+		@Override
 		public Object invoke(MethodInvocation invocation) throws Throwable {
 			invoked = true;
 			return invocation.proceed();

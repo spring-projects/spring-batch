@@ -59,10 +59,11 @@ public class SimpleStepExecutionSplitterTests {
 		final Map<String, ExecutionContext> map = Collections.singletonMap("foo", new ExecutionContext());
 		SimpleStepExecutionSplitter splitter = new SimpleStepExecutionSplitter(jobRepository, true, step.getName(),
 				new Partitioner() {
-					public Map<String, ExecutionContext> partition(int gridSize) {
-						return map;
-					}
-				});
+			@Override
+			public Map<String, ExecutionContext> partition(int gridSize) {
+				return map;
+			}
+		});
 		assertEquals(1, splitter.split(stepExecution, 2).size());
 	}
 
@@ -79,10 +80,12 @@ public class SimpleStepExecutionSplitterTests {
 	@Test
 	public void testRememberPartitionNames() throws Exception {
 		class CustomPartitioner implements Partitioner, PartitionNameProvider {
+			@Override
 			public Map<String, ExecutionContext> partition(int gridSize) {
 				return Collections.singletonMap("foo", new ExecutionContext());
 			}
 
+			@Override
 			public Collection<String> getPartitionNames(int gridSize) {
 				return Arrays.asList("foo");
 			}

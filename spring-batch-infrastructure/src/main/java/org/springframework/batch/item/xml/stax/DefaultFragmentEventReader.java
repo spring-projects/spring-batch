@@ -77,11 +77,13 @@ public class DefaultFragmentEventReader extends AbstractEventReaderWrapper imple
 		endDocumentEvent = XMLEventFactory.newInstance().createEndDocument();
 	}
 
+    @Override
 	public void markStartFragment() {
 		startFragmentFollows = true;
 		fragmentRootName = null;
 	}
 
+    @Override
 	public boolean hasNext() {
 		try {
 			if (peek() != null) {
@@ -94,6 +96,7 @@ public class DefaultFragmentEventReader extends AbstractEventReaderWrapper imple
 		return false;
 	}
 
+    @Override
 	public Object next() {
 		try {
 			return nextEvent();
@@ -103,6 +106,7 @@ public class DefaultFragmentEventReader extends AbstractEventReaderWrapper imple
 		}
 	}
 
+    @Override
 	public XMLEvent nextEvent() throws XMLStreamException {
 		if (fakeDocumentEnd) {
 			throw new NoSuchElementException();
@@ -161,6 +165,7 @@ public class DefaultFragmentEventReader extends AbstractEventReaderWrapper imple
 		return event;
 	}
 
+    @Override
 	public XMLEvent peek() throws XMLStreamException {
 		if (fakeDocumentEnd) {
 			return null;
@@ -172,6 +177,7 @@ public class DefaultFragmentEventReader extends AbstractEventReaderWrapper imple
 	 * Finishes reading the fragment in case the fragment was processed without
 	 * being read until the end.
 	 */
+    @Override
 	public void markFragmentProcessed() {
 		if (insideFragment|| startFragmentFollows) {
 			try {
@@ -186,6 +192,7 @@ public class DefaultFragmentEventReader extends AbstractEventReaderWrapper imple
 		fakeDocumentEnd = false;
 	}
 
+    @Override
 	public void reset() {
 		insideFragment = false;
 		startFragmentFollows = false;

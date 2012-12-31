@@ -81,6 +81,7 @@ public class SimpleMethodInvoker implements MethodInvoker {
 	 * org.springframework.batch.core.configuration.util.MethodInvoker#invokeMethod
 	 * (java.lang.Object[])
 	 */
+    @Override
 	public Object invokeMethod(Object... args) {
 
 		Class<?>[] parameterTypes = method.getParameterTypes();

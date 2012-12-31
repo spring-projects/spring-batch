@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2009 the original author or authors.
+ * Copyright 2006-2013 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -29,7 +29,7 @@ import org.springframework.batch.core.scope.context.ChunkContext;
 
 /**
  * @author Dave Syer
- * 
+ *
  */
 public class ChunkOrientedTaskletTests {
 
@@ -38,14 +38,17 @@ public class ChunkOrientedTaskletTests {
 	@Test
 	public void testHandle() throws Exception {
 		ChunkOrientedTasklet<String> handler = new ChunkOrientedTasklet<String>(new ChunkProvider<String>() {
+			@Override
 			public Chunk<String> provide(StepContribution contribution) throws Exception {
 				contribution.incrementReadCount();
 				Chunk<String> chunk = new Chunk<String>();
 				chunk.add("foo");
 				return chunk;
 			}
+			@Override
 			public void postProcess(StepContribution contribution, Chunk<String> chunk) {};
 		}, new ChunkProcessor<String>() {
+			@Override
 			public void process(StepContribution contribution, Chunk<String> chunk) {
 				contribution.incrementWriteCount(1);
 			}
@@ -61,11 +64,14 @@ public class ChunkOrientedTaskletTests {
 	@Test
 	public void testFail() throws Exception {
 		ChunkOrientedTasklet<String> handler = new ChunkOrientedTasklet<String>(new ChunkProvider<String>() {
+			@Override
 			public Chunk<String> provide(StepContribution contribution) throws Exception {
 				throw new RuntimeException("Foo!");
 			}
+			@Override
 			public void postProcess(StepContribution contribution, Chunk<String> chunk) {};
 		}, new ChunkProcessor<String>() {
+			@Override
 			public void process(StepContribution contribution, Chunk<String> chunk) {
 				fail("Not expecting to get this far");
 			}
@@ -85,6 +91,7 @@ public class ChunkOrientedTaskletTests {
 	@Test
 	public void testExitCode() throws Exception {
 		ChunkOrientedTasklet<String> handler = new ChunkOrientedTasklet<String>(new ChunkProvider<String>() {
+			@Override
 			public Chunk<String> provide(StepContribution contribution) throws Exception {
 				contribution.incrementReadCount();
 				Chunk<String> chunk = new Chunk<String>();
@@ -92,8 +99,10 @@ public class ChunkOrientedTaskletTests {
 				chunk.setEnd();
 				return chunk;
 			}
+			@Override
 			public void postProcess(StepContribution contribution, Chunk<String> chunk) {};
 		}, new ChunkProcessor<String>() {
+			@Override
 			public void process(StepContribution contribution, Chunk<String> chunk) {
 				contribution.incrementWriteCount(1);
 			}

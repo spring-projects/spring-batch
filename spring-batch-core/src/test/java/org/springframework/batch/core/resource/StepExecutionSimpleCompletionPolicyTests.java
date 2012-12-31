@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2007 the original author or authors.
+ * Copyright 2006-2013 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -31,7 +31,7 @@ import org.springframework.batch.repeat.RepeatContext;
 
 /**
  * Unit tests for {@link StepExecutionSimpleCompletionPolicy}
- * 
+ *
  * @author Dave Syer
  */
 public class StepExecutionSimpleCompletionPolicyTests extends TestCase {
@@ -49,6 +49,7 @@ public class StepExecutionSimpleCompletionPolicyTests extends TestCase {
 	 * mock step context
 	 */
 
+	@Override
 	protected void setUp() throws Exception {
 
 		JobParameters jobParameters = new JobParametersBuilder().addLong("commit.interval", 2L).toJobParameters();
@@ -59,7 +60,7 @@ public class StepExecutionSimpleCompletionPolicyTests extends TestCase {
 		policy.beforeStep(stepExecution);
 
 	}
-	
+
 	public void testToString() throws Exception {
 		String msg = policy.toString();
 		assertTrue("String does not contain chunk size", msg.indexOf("chunkSize=2")>=0);

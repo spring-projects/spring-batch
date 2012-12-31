@@ -44,6 +44,7 @@ public class JobExecutionNotificationPublisher implements ApplicationListener, N
 	 * 
 	 * @see org.springframework.jmx.export.notification.NotificationPublisherAware#setNotificationPublisher(org.springframework.jmx.export.notification.NotificationPublisher)
 	 */
+    @Override
 	public void setNotificationPublisher(NotificationPublisher notificationPublisher) {
 		this.notificationPublisher = notificationPublisher;
 	}
@@ -55,6 +56,7 @@ public class JobExecutionNotificationPublisher implements ApplicationListener, N
 	 * 
 	 * @see ApplicationListener#onApplicationEvent(ApplicationEvent) 
 	 */
+    @Override
 	public void onApplicationEvent(ApplicationEvent applicationEvent) {
 		if (applicationEvent instanceof SimpleMessageApplicationEvent) {
 			String message = applicationEvent.toString();

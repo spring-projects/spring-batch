@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2007 the original author or authors.
+ * Copyright 2006-2013 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -27,13 +27,13 @@ import org.springframework.util.Assert;
 /**
  * Delegates processing to a custom method - extracts property values from item
  * object and uses them as arguments for the delegate method.
- * 
+ *
  * @see ItemWriterAdapter
- * 
+ *
  * @author Robert Kasanicky
  */
 public class PropertyExtractingDelegatingItemWriter<T> extends AbstractMethodInvokingDelegator<T> implements
-		ItemWriter<T> {
+ItemWriter<T> {
 
 	private String[] fieldsUsedAsTargetMethodArguments;
 
@@ -42,6 +42,7 @@ public class PropertyExtractingDelegatingItemWriter<T> extends AbstractMethodInv
 	 * fieldsUsedAsTargetMethodArguments and passes them as arguments to the
 	 * delegate method.
 	 */
+	@Override
 	public void write(List<? extends T> items) throws Exception {
 		for (T item : items) {
 
@@ -58,6 +59,7 @@ public class PropertyExtractingDelegatingItemWriter<T> extends AbstractMethodInv
 		}
 	}
 
+	@Override
 	public void afterPropertiesSet() throws Exception {
 		super.afterPropertiesSet();
 		Assert.notEmpty(fieldsUsedAsTargetMethodArguments);

@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2007 the original author or authors.
+ * Copyright 2006-2013 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,7 +26,7 @@ import org.springframework.batch.core.job.flow.FlowHolder;
 
 /**
  * State that delegates to a Flow
- * 
+ *
  * @author Dave Syer
  * @since 2.0
  */
@@ -41,10 +41,11 @@ public class FlowState extends AbstractState implements FlowHolder {
 		super(name);
 		this.flow = flow;
 	}
-	
+
 	/**
 	 * @return the flows
 	 */
+	@Override
 	public Collection<Flow> getFlows() {
 		return Collections.singleton(flow);
 	}
@@ -53,10 +54,11 @@ public class FlowState extends AbstractState implements FlowHolder {
 	public FlowExecutionStatus handle(FlowExecutor executor) throws Exception {
 		return flow.start(executor).getStatus();
 	}
-	
+
 	/* (non-Javadoc)
 	 * @see org.springframework.batch.core.job.flow.State#isEndState()
 	 */
+	@Override
 	public boolean isEndState() {
 		return false;
 	}

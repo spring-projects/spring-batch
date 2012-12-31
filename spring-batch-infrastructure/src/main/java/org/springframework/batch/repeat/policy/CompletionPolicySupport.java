@@ -36,6 +36,7 @@ public class CompletionPolicySupport implements CompletionPolicy {
 	 * @see org.springframework.batch.repeat.CompletionPolicy#isComplete(org.springframework.batch.repeat.RepeatContext,
 	 * RepeatStatus)
 	 */
+    @Override
 	public boolean isComplete(RepeatContext context, RepeatStatus result) {
 		if (result != null && !result.isContinuable()) {
 			return true;
@@ -50,6 +51,7 @@ public class CompletionPolicySupport implements CompletionPolicy {
 	 * 
 	 * @see org.springframework.batch.repeat.CompletionPolicy#isComplete(org.springframework.batch.repeat.RepeatContext)
 	 */
+    @Override
 	public boolean isComplete(RepeatContext context) {
 		return true;
 	}
@@ -59,6 +61,7 @@ public class CompletionPolicySupport implements CompletionPolicy {
 	 * 
 	 * @see org.springframework.batch.repeat.CompletionPolicy#start(RepeatContext)
 	 */
+    @Override
 	public RepeatContext start(RepeatContext context) {
 		return new RepeatContextSupport(context);
 	}
@@ -68,6 +71,7 @@ public class CompletionPolicySupport implements CompletionPolicy {
 	 * 
 	 * @see org.springframework.batch.repeat.CompletionPolicy#update(org.springframework.batch.repeat.RepeatContext)
 	 */
+    @Override
 	public void update(RepeatContext context) {
 		if (context instanceof RepeatContextSupport) {
 			((RepeatContextSupport) context).increment();

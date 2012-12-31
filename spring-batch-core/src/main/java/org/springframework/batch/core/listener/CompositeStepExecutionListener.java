@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2007 the original author or authors.
+ * Copyright 2006-2013 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,7 +26,7 @@ import org.springframework.core.Ordered;
 /**
  * @author Lucas Ward
  * @author Dave Syer
- * 
+ *
  */
 public class CompositeStepExecutionListener implements StepExecutionListener {
 
@@ -34,7 +34,7 @@ public class CompositeStepExecutionListener implements StepExecutionListener {
 
 	/**
 	 * Public setter for the listeners.
-	 * 
+	 *
 	 * @param listeners
 	 */
 	public void setListeners(StepExecutionListener[] listeners) {
@@ -43,7 +43,7 @@ public class CompositeStepExecutionListener implements StepExecutionListener {
 
 	/**
 	 * Register additional listener.
-	 * 
+	 *
 	 * @param stepExecutionListener
 	 */
 	public void register(StepExecutionListener stepExecutionListener) {
@@ -52,9 +52,10 @@ public class CompositeStepExecutionListener implements StepExecutionListener {
 
 	/**
 	 * Call the registered listeners in reverse order, respecting and
-	 * prioritising those that implement {@link Ordered}.
+	 * prioritizing those that implement {@link Ordered}.
 	 * @see org.springframework.batch.core.StepExecutionListener#afterStep(StepExecution)
 	 */
+	@Override
 	public ExitStatus afterStep(StepExecution stepExecution) {
 		ExitStatus status = null;
 		for (Iterator<StepExecutionListener> iterator = list.reverse(); iterator.hasNext();) {
@@ -66,10 +67,11 @@ public class CompositeStepExecutionListener implements StepExecutionListener {
 	}
 
 	/**
-	 * Call the registered listeners in order, respecting and prioritising those
+	 * Call the registered listeners in order, respecting and prioritizing those
 	 * that implement {@link Ordered}.
 	 * @see org.springframework.batch.core.StepExecutionListener#beforeStep(StepExecution)
 	 */
+	@Override
 	public void beforeStep(StepExecution stepExecution) {
 		for (Iterator<StepExecutionListener> iterator = list.iterator(); iterator.hasNext();) {
 			StepExecutionListener listener = iterator.next();

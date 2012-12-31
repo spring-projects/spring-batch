@@ -40,6 +40,7 @@ public class CompositeExceptionHandler implements ExceptionHandler {
 	 * 
 	 * @see ExceptionHandler#handleException(RepeatContext, Throwable)
 	 */
+    @Override
 	public void handleException(RepeatContext context, Throwable throwable) throws Throwable {
 		for (int i = 0; i < handlers.length; i++) {
 			ExceptionHandler handler = handlers[i];

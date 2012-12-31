@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2007 the original author or authors.
+ * Copyright 2006-2012 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,10 +23,10 @@ import org.springframework.batch.core.StepExecution;
 
 /**
  * Policy that checks the current thread to see if it has been interrupted.
- * 
+ *
  * @author Lucas Ward
  * @author Dave Syer
- * 
+ *
  */
 public class ThreadStepInterruptionPolicy implements StepInterruptionPolicy {
 
@@ -36,6 +36,7 @@ public class ThreadStepInterruptionPolicy implements StepInterruptionPolicy {
 	 * Returns if the current job lifecycle has been interrupted by checking if
 	 * the current thread is interrupted.
 	 */
+	@Override
 	public void checkInterrupted(StepExecution stepExecution) throws JobInterruptedException {
 
 		if (isInterrupted(stepExecution)) {

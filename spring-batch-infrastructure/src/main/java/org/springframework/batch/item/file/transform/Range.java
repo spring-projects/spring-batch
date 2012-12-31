@@ -55,6 +55,7 @@ public class Range {
 		return max != UPPER_BORDER_NOT_DEFINED;
 	}
 	
+    @Override
 	public String toString() {
 		return hasMaxValue() ? min + "-" + max : String.valueOf(min);
 	}

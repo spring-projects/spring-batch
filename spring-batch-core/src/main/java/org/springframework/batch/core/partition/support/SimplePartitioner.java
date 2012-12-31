@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2007 the original author or authors.
+ * Copyright 2006-2013 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,7 +26,7 @@ import org.springframework.batch.item.ExecutionContext;
  * of empty {@link ExecutionContext} instances, and labels them as
  * <code>{partition0, partition1, ..., partitionN}</code>, where <code>N</code> is the grid
  * size.
- * 
+ *
  * @author Dave Syer
  * @since 2.0
  */
@@ -34,6 +34,7 @@ public class SimplePartitioner implements Partitioner {
 
 	private static final String PARTITION_KEY = "partition";
 
+	@Override
 	public Map<String, ExecutionContext> partition(int gridSize) {
 		Map<String, ExecutionContext> map = new HashMap<String, ExecutionContext>(gridSize);
 		for (int i = 0; i < gridSize; i++) {

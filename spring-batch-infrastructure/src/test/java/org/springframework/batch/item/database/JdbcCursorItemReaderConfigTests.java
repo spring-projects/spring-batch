@@ -49,6 +49,7 @@ public class JdbcCursorItemReaderConfigTests {
 		final ExecutionContext ec = new ExecutionContext();
 		tt.execute(
 				new TransactionCallback() {
+                    @Override
 					public Object doInTransaction(TransactionStatus status) {
 						reader.open(ec);
 						reader.close();
@@ -81,6 +82,7 @@ public class JdbcCursorItemReaderConfigTests {
 		final ExecutionContext ec = new ExecutionContext();
 		tt.execute(
 				new TransactionCallback() {
+                    @Override
 					public Object doInTransaction(TransactionStatus status) {
 						reader.open(ec);
 						reader.close();

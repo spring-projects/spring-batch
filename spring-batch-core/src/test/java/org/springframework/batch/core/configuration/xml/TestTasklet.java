@@ -8,17 +8,18 @@ import org.springframework.batch.repeat.RepeatStatus;
 public class TestTasklet extends AbstractTestComponent implements Tasklet {
 
 	private String name;
-	
+
+	@Override
 	public RepeatStatus execute(StepContribution contribution,
 			ChunkContext chunkContext) throws Exception {
 		executed = true;
-		return RepeatStatus.FINISHED;  
-	}  
+		return RepeatStatus.FINISHED;
+	}
 
 	public String getName() {
 		return name;
 	}
-	
+
 	public void setName(String name) {
 		this.name = name;
 	}

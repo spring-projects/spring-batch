@@ -59,6 +59,7 @@ public class StoredprocedureItemReaderConfigTests {
 		final ExecutionContext ec = new ExecutionContext();
 		tt.execute(
 				new TransactionCallback() {
+                    @Override
 					public Object doInTransaction(TransactionStatus status) {
 						reader.open(ec);
 						reader.close();
@@ -95,6 +96,7 @@ public class StoredprocedureItemReaderConfigTests {
 		final ExecutionContext ec = new ExecutionContext();
 		tt.execute(
 				new TransactionCallback() {
+                    @Override
 					public Object doInTransaction(TransactionStatus status) {
 						reader.open(ec);
 						reader.close();
@@ -133,6 +135,7 @@ public class StoredprocedureItemReaderConfigTests {
 				new SqlParameter("bar", Types.OTHER)});
 		reader.setPreparedStatementSetter(
 				new PreparedStatementSetter() {
+                    @Override
 					public void setValues(PreparedStatement ps)
 							throws SQLException {
 					}
@@ -141,6 +144,7 @@ public class StoredprocedureItemReaderConfigTests {
 		final ExecutionContext ec = new ExecutionContext();
 		tt.execute(
 				new TransactionCallback() {
+                    @Override
 					public Object doInTransaction(TransactionStatus status) {
 						reader.open(ec);
 						reader.close();

@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2007 the original author or authors.
+ * Copyright 2006-2013 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,12 +22,13 @@ import java.util.Date;
 /**
  * Domain representation of a parameter to a batch job. Only the following types
  * can be parameters: String, Long, Date, and Double.
- * 
+ *
  * @author Lucas Ward
  * @author Dave Syer
  * @since 2.0
- * 
+ *
  */
+@SuppressWarnings("serial")
 public class JobParameter implements Serializable {
 
 	private final Object parameter;
@@ -44,7 +45,7 @@ public class JobParameter implements Serializable {
 
 	/**
 	 * Construct a new JobParameter as a Long.
-	 * 
+	 *
 	 * @param parameter
 	 */
 	public JobParameter(Long parameter) {
@@ -54,7 +55,7 @@ public class JobParameter implements Serializable {
 
 	/**
 	 * Construct a new JobParameter as a Date.
-	 * 
+	 *
 	 * @param parameter
 	 */
 	public JobParameter(Date parameter) {
@@ -64,7 +65,7 @@ public class JobParameter implements Serializable {
 
 	/**
 	 * Construct a new JobParameter as a Double.
-	 * 
+	 *
 	 * @param parameter
 	 */
 	public JobParameter(Double parameter) {
@@ -112,6 +113,7 @@ public class JobParameter implements Serializable {
 				: parameter.toString());
 	}
 
+	@Override
 	public int hashCode() {
 		return 7 + 21 * (parameter == null ? parameterType.hashCode() : parameter.hashCode());
 	}

@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2007 the original author or authors.
+ * Copyright 2006-2013 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -38,14 +38,15 @@ import org.springframework.util.Assert;
  * A {@link FactoryBean} that automates the creation of a
  * {@link SimpleJobRepository}. Declares abstract methods for providing DAO
  * object implementations.
- * 
+ *
  * @see JobRepositoryFactoryBean
  * @see MapJobRepositoryFactoryBean
- * 
+ *
  * @author Ben Hale
  * @author Lucas Ward
  * @author Robert Kasanicky
  */
+@SuppressWarnings("rawtypes")
 public abstract class AbstractJobRepositoryFactoryBean implements FactoryBean, InitializingBean {
 
 	private PlatformTransactionManager transactionManager;
@@ -83,14 +84,16 @@ public abstract class AbstractJobRepositoryFactoryBean implements FactoryBean, I
 
 	/**
 	 * The type of object to be returned from {@link #getObject()}.
-	 * 
+	 *
 	 * @return JobRepository.class
 	 * @see org.springframework.beans.factory.FactoryBean#getObjectType()
 	 */
+	@Override
 	public Class<JobRepository> getObjectType() {
 		return JobRepository.class;
 	}
 
+	@Override
 	public boolean isSingleton() {
 		return true;
 	}
@@ -100,7 +103,7 @@ public abstract class AbstractJobRepositoryFactoryBean implements FactoryBean, I
 	 * JobExecution is created. Defaults to true because it is usually a
 	 * mistake, and leads to problems with restartability and also to deadlocks
 	 * in multi-threaded steps.
-	 * 
+	 *
 	 * @param validateTransactionState the flag to set
 	 */
 	public void setValidateTransactionState(boolean validateTransactionState) {
@@ -112,9 +115,9 @@ public abstract class AbstractJobRepositoryFactoryBean implements FactoryBean, I
 	 * job execution entities are initially created. The default is
 	 * ISOLATION_SERIALIZABLE, which prevents accidental concurrent execution of
 	 * the same job (ISOLATION_REPEATABLE_READ would work as well).
-	 * 
+	 *
 	 * @param isolationLevelForCreate the isolation level name to set
-	 * 
+	 *
 	 * @see SimpleJobRepository#createJobExecution(String,
 	 * org.springframework.batch.core.JobParameters)
 	 */
@@ -133,7 +136,7 @@ public abstract class AbstractJobRepositoryFactoryBean implements FactoryBean, I
 	/**
 	 * The transaction manager used in this factory. Useful to inject into steps
 	 * and jobs, to ensure that they are using the same instance.
-	 * 
+	 *
 	 * @return the transactionManager
 	 */
 	public PlatformTransactionManager getTransactionManager() {
@@ -159,6 +162,7 @@ public abstract class AbstractJobRepositoryFactoryBean implements FactoryBean, I
 							+ isolationLevelForCreate + "\n*=PROPAGATION_REQUIRED"));
 			if (validateTransactionState) {
 				DefaultPointcutAdvisor advisor = new DefaultPointcutAdvisor(new MethodInterceptor() {
+					@Override
 					public Object invoke(MethodInvocation invocation) throws Throwable {
 						if (TransactionSynchronizationManager.isActualTransactionActive()) {
 							throw new IllegalStateException(
@@ -180,6 +184,7 @@ public abstract class AbstractJobRepositoryFactoryBean implements FactoryBean, I
 		}
 	}
 
+	@Override
 	public void afterPropertiesSet() throws Exception {
 		Assert.notNull(transactionManager, "TransactionManager must not be null.");
 
@@ -191,6 +196,7 @@ public abstract class AbstractJobRepositoryFactoryBean implements FactoryBean, I
 				createExecutionContextDao());
 	}
 
+	@Override
 	public Object getObject() throws Exception {
 		if (proxyFactory == null) {
 			afterPropertiesSet();

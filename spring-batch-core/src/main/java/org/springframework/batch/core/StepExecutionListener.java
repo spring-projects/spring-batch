@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2008 the original author or authors.
+ * Copyright 2006-2013 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,17 +18,17 @@ package org.springframework.batch.core;
 
 /**
  * Listener interface for the lifecycle of a {@link Step}.
- * 
+ *
  * @author Lucas Ward
  * @author Dave Syer
- * 
+ *
  */
 public interface StepExecutionListener extends StepListener {
 
 	/**
 	 * Initialize the state of the listener with the {@link StepExecution} from
 	 * the current scope.
-	 * 
+	 *
 	 * @param stepExecution
 	 */
 	void beforeStep(StepExecution stepExecution);
@@ -37,11 +37,11 @@ public interface StepExecutionListener extends StepListener {
 	 * Give a listener a chance to modify the exit status from a step. The value
 	 * returned will be combined with the normal exit status using
 	 * {@link ExitStatus#and(ExitStatus)}.
-	 * 
+	 *
 	 * Called after execution of step's processing logic (both successful or
 	 * failed). Throwing exception in this method has no effect, it will only be
 	 * logged.
-	 * 
+	 *
 	 * @return an {@link ExitStatus} to combine with the normal value. Return
 	 * null to leave the old value unchanged.
 	 */

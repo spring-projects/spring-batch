@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2009 the original author or authors.
+ * Copyright 2006-2013 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,9 +26,9 @@ import org.springframework.batch.repeat.RepeatStatus;
 /**
  * A {@link Tasklet} implementing variations on read-process-write item
  * handling.
- * 
+ *
  * @author Dave Syer
- * 
+ *
  * @param <I> input item type
  */
 public class ChunkOrientedTasklet<I> implements Tasklet {
@@ -53,13 +53,14 @@ public class ChunkOrientedTasklet<I> implements Tasklet {
 	 * true, which is appropriate for forward-only, non-transactional item
 	 * readers. Main (or only) use case for setting this flag to false is a
 	 * transactional JMS item reader.
-	 * 
+	 *
 	 * @param buffering
 	 */
 	public void setBuffering(boolean buffering) {
 		this.buffering = buffering;
 	}
 
+	@Override
 	public RepeatStatus execute(StepContribution contribution, ChunkContext chunkContext) throws Exception {
 
 		@SuppressWarnings("unchecked")

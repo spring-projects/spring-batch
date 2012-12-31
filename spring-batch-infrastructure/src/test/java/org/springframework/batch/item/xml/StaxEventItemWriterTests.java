@@ -51,6 +51,7 @@ public class StaxEventItemWriterTests {
 
 	// test item for writing to output
 	private Object item = new Object() {
+        @Override
 		public String toString() {
 			return ClassUtils.getShortName(StaxEventItemWriter.class) + "-testString";
 		}
@@ -132,6 +133,7 @@ public class StaxEventItemWriterTests {
 		PlatformTransactionManager transactionManager = new ResourcelessTransactionManager();
 
 		new TransactionTemplate(transactionManager).execute(new TransactionCallback() {
+            @Override
 			public Object doInTransaction(TransactionStatus status) {
 				try {
 					// write item
@@ -151,6 +153,7 @@ public class StaxEventItemWriterTests {
 		writer = createItemWriter();
 		writer.open(executionContext);
 		new TransactionTemplate(transactionManager).execute(new TransactionCallback() {
+            @Override
 			public Object doInTransaction(TransactionStatus status) {
 				try {
 					writer.write(items);
@@ -180,6 +183,7 @@ public class StaxEventItemWriterTests {
 		writer.open(executionContext);
 		try {
 			new TransactionTemplate(transactionManager).execute(new TransactionCallback() {
+                @Override
 				public Object doInTransaction(TransactionStatus status) {
 					try {
 						writer.write(items);
@@ -202,6 +206,7 @@ public class StaxEventItemWriterTests {
 		// create new writer from saved restart data and continue writing
 		writer = createItemWriter();
 		new TransactionTemplate(transactionManager).execute(new TransactionCallback() {
+            @Override
 			public Object doInTransaction(TransactionStatus status) {
 				writer.open(executionContext);
 				try {
@@ -234,6 +239,7 @@ public class StaxEventItemWriterTests {
 
 		writer.setHeaderCallback(new StaxWriterCallback() {
 
+            @Override
 			public void write(XMLEventWriter writer) throws IOException {
 				XMLEventFactory factory = XMLEventFactory.newInstance();
 				try {
@@ -279,6 +285,7 @@ public class StaxEventItemWriterTests {
 	public void testOpenAndClose() throws Exception {
 		writer.setHeaderCallback(new StaxWriterCallback() {
 
+            @Override
 			public void write(XMLEventWriter writer) throws IOException {
 				XMLEventFactory factory = XMLEventFactory.newInstance();
 				try {
@@ -294,6 +301,7 @@ public class StaxEventItemWriterTests {
 		});
 		writer.setFooterCallback(new StaxWriterCallback() {
 
+            @Override
 			public void write(XMLEventWriter writer) throws IOException {
 				XMLEventFactory factory = XMLEventFactory.newInstance();
 				try {
@@ -413,6 +421,7 @@ public class StaxEventItemWriterTests {
 			this.namespacePrefix = namespacePrefix;
 		}
 
+        @Override
 		public void marshal(Object graph, Result result) throws XmlMappingException, IOException {
  	 	 Assert.isInstanceOf( Result.class, result);
 			try {
@@ -424,6 +433,7 @@ public class StaxEventItemWriterTests {
 			}
 		}
 
+        @Override
 		@SuppressWarnings("rawtypes")
 		public boolean supports(Class clazz) {
 			return true;

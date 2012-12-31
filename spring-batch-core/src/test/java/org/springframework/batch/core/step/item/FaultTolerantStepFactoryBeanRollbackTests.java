@@ -107,32 +107,32 @@ public class FaultTolerantStepFactoryBeanRollbackTests {
 		writer = null;
 		factory = null;
 	}
-	
+
 	@Test
 	public void testBeforeChunkListenerException() throws Exception{
 		factory.setListeners(new StepListener []{new ExceptionThrowingChunkListener(true)});
 		Step step = (Step) factory.getObject();
 		step.execute(stepExecution);
 		assertEquals(FAILED, stepExecution.getStatus());
-		assertEquals(FAILED.toString(), stepExecution.getExitStatus().getExitCode());	
+		assertEquals(FAILED.toString(), stepExecution.getExitStatus().getExitCode());
 		assertTrue(stepExecution.getCommitCount() == 0);//Make sure exception was thrown in after, not before
 		Throwable e = stepExecution.getFailureExceptions().get(0);
 		assertThat(e, instanceOf(FatalStepExecutionException.class));
 		assertThat(e.getCause(), instanceOf(IllegalArgumentException.class));
 	}
-	
+
 	@Test
 	public void testAfterChunkListenerException() throws Exception{
 		factory.setListeners(new StepListener []{new ExceptionThrowingChunkListener(false)});
 		Step step = (Step) factory.getObject();
 		step.execute(stepExecution);
 		assertEquals(FAILED, stepExecution.getStatus());
-		assertEquals(FAILED.toString(), stepExecution.getExitStatus().getExitCode());	
+		assertEquals(FAILED.toString(), stepExecution.getExitStatus().getExitCode());
 		assertTrue(stepExecution.getCommitCount() > 0);//Make sure exception was thrown in after, not before
 		Throwable e = stepExecution.getFailureExceptions().get(0);
 		assertThat(e, instanceOf(FatalStepExecutionException.class));
 		assertThat(e.getCause(), instanceOf(IllegalArgumentException.class));
-	}		
+	}
 
 	@Test
 	public void testOverrideWithoutChangingRollbackRules() throws Exception {
@@ -587,7 +587,7 @@ public class FaultTolerantStepFactoryBeanRollbackTests {
 		}
 		return map;
 	}
-	
+
 	class ExceptionThrowingChunkListener implements ChunkListener{
 
 		private boolean throwBefore = true;
@@ -595,16 +595,18 @@ public class FaultTolerantStepFactoryBeanRollbackTests {
 		public ExceptionThrowingChunkListener(boolean throwBefore) {
 			this.throwBefore  = throwBefore;
 		}
-		
+
+		@Override
 		public void beforeChunk() {
 			if(throwBefore){
 				throw new IllegalArgumentException("Planned exception");
 			}
 		}
 
+		@Override
 		public void afterChunk() {
 			throw new IllegalArgumentException("Planned exception");
-			
+
 		}
 	}
 

@@ -109,6 +109,7 @@ public class BeanWrapperFieldSetMapper<T> extends DefaultPropertyEditorRegistrar
 	 * org.springframework.beans.factory.BeanFactoryAware#setBeanFactory(org
 	 * .springframework.beans.factory.BeanFactory)
 	 */
+    @Override
 	public void setBeanFactory(BeanFactory beanFactory) {
 		this.beanFactory = beanFactory;
 	}
@@ -161,6 +162,7 @@ public class BeanWrapperFieldSetMapper<T> extends DefaultPropertyEditorRegistrar
 	 * 
 	 * @see org.springframework.beans.factory.InitializingBean#afterPropertiesSet()
 	 */
+    @Override
 	public void afterPropertiesSet() throws Exception {
 		Assert.state(name != null || type != null, "Either name or type must be provided.");
 		Assert.state(name == null || type == null, "Both name and type cannot be specified together.");
@@ -178,6 +180,7 @@ public class BeanWrapperFieldSetMapper<T> extends DefaultPropertyEditorRegistrar
 	 * field that cannot be mapped to a bean property.
 	 * @see org.springframework.batch.item.file.mapping.FieldSetMapper#mapFieldSet(FieldSet)
 	 */
+    @Override
 	public T mapFieldSet(FieldSet fs) throws BindException {
 		T copy = getBean();
 		DataBinder binder = createBinder(copy);

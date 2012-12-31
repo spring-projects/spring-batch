@@ -19,6 +19,7 @@ public class SimpleMessageApplicationEvent extends ApplicationEvent {
 	/* (non-Javadoc)
 	 * @see java.util.EventObject#toString()
 	 */
+    @Override
 	public String toString() {
 		return "message=["+message+"], " + super.toString();
 	}

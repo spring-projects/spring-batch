@@ -21,7 +21,7 @@ import org.springframework.batch.core.job.flow.JobExecutionDecider;
 
 /**
  * @author Dave Syer
- * 
+ *
  */
 public class JobFlowBuilder extends FlowBuilder<FlowJobBuilder> {
 
@@ -53,9 +53,10 @@ public class JobFlowBuilder extends FlowBuilder<FlowJobBuilder> {
 	/**
 	 * Build a flow and inject it into the parent builder. The parent builder is then returned so it can be enhanced
 	 * before building an actual job.  Normally called explicitly via {@link #end()}.
-	 * 
+	 *
 	 * @see org.springframework.batch.core.job.builder.FlowBuilder#build()
 	 */
+	@Override
 	public FlowJobBuilder build() {
 		Flow flow = flow();
 		parent.flow(flow);

@@ -13,6 +13,7 @@ import org.junit.runners.JUnit4;
 @RunWith(JUnit4.class)
 public class HibernateCursorItemReaderCommonTests extends AbstractDatabaseItemStreamItemReaderTests {
 
+    @Override
 	protected ItemReader<Foo> getItemReader() throws Exception {
 		
 		SessionFactory sessionFactory = createSessionFactory();
@@ -40,6 +41,7 @@ public class HibernateCursorItemReaderCommonTests extends AbstractDatabaseItemSt
 
 	}
 
+    @Override
 	protected void pointToEmptyInput(ItemReader<Foo> tested) throws Exception {
 		HibernateCursorItemReader<Foo> reader = (HibernateCursorItemReader<Foo>) tested;
 		reader.close();

@@ -40,6 +40,7 @@ public class StepScopeClassIntegrationTests implements BeanFactoryAware {
 
 	private int beanCount;
 
+	@Override
 	public void setBeanFactory(BeanFactory beanFactory) throws BeansException {
 		this.beanFactory = (ListableBeanFactory) beanFactory;
 	}

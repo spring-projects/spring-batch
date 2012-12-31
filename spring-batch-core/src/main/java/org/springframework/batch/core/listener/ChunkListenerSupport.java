@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2008 the original author or authors.
+ * Copyright 2006-2013 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,7 +19,7 @@ import org.springframework.batch.core.ChunkListener;
 
 /**
  * Basic support implementation of {@link ChunkListener}
- * 
+ *
  * @author Lucas Ward
  *
  */
@@ -28,12 +28,14 @@ public class ChunkListenerSupport implements ChunkListener {
 	/* (non-Javadoc)
 	 * @see org.springframework.batch.core.domain.ChunkListener#afterChunk()
 	 */
+	@Override
 	public void afterChunk() {
 	}
 
 	/* (non-Javadoc)
 	 * @see org.springframework.batch.core.domain.ChunkListener#beforeChunk()
 	 */
+	@Override
 	public void beforeChunk() {
 	}
 

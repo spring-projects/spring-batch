@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2007 the original author or authors.
+ * Copyright 2006-2013 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -33,13 +33,13 @@ import org.springframework.util.Assert;
  * TaskletStep). It will also clear the session on write
  * default (see {@link #setClearSession(boolean) clearSession} property).<br/>
  * <br/>
- * 
+ *
  * The writer is thread safe after its properties are set (normal singleton
  * behavior), so it can be used to write in multiple concurrent transactions.
- * 
+ *
  * @author Dave Syer
  * @author Thomas Risberg
- * 
+ *
  */
 public class HibernateItemWriter<T> implements ItemWriter<T>, InitializingBean {
 
@@ -53,7 +53,7 @@ public class HibernateItemWriter<T> implements ItemWriter<T>, InitializingBean {
 	/**
 	 * Flag to indicate that the session should be cleared and flushed at the
 	 * end of the write (default true).
-	 * 
+	 *
 	 * @param clearSession
 	 *            the flag value to set
 	 */
@@ -63,7 +63,7 @@ public class HibernateItemWriter<T> implements ItemWriter<T>, InitializingBean {
 
 	/**
 	 * Public setter for the {@link HibernateOperations} property.
-	 * 
+	 *
 	 * @param hibernateTemplate
 	 *            the hibernateTemplate to set
 	 */
@@ -74,7 +74,7 @@ public class HibernateItemWriter<T> implements ItemWriter<T>, InitializingBean {
 	/**
 	 * Set the Hibernate SessionFactory to be used internally. Will
 	 * automatically create a HibernateTemplate for the given SessionFactory.
-	 * 
+	 *
 	 * @see #setHibernateTemplate
 	 */
 	public final void setSessionFactory(SessionFactory sessionFactory) {
@@ -84,6 +84,7 @@ public class HibernateItemWriter<T> implements ItemWriter<T>, InitializingBean {
 	/**
 	 * Check mandatory properties - there must be a hibernateTemplate.
 	 */
+	@Override
 	public void afterPropertiesSet() {
 		Assert.notNull(hibernateTemplate,
 				"HibernateItemWriter requires a HibernateOperations");
@@ -92,9 +93,10 @@ public class HibernateItemWriter<T> implements ItemWriter<T>, InitializingBean {
 	/**
 	 * Save or update any entities not in the current hibernate session and then
 	 * flush the hibernate session.
-	 * 
+	 *
 	 * @see org.springframework.batch.item.ItemWriter#write(java.util.List)
 	 */
+	@Override
 	public final void write(List<? extends T> items) {
 		doWrite(hibernateTemplate, items);
 		hibernateTemplate.flush();
@@ -106,7 +108,7 @@ public class HibernateItemWriter<T> implements ItemWriter<T>, InitializingBean {
 	/**
 	 * Do perform the actual write operation. This can be overridden in a
 	 * subclass if necessary.
-	 * 
+	 *
 	 * @param hibernateTemplate
 	 *            the HibernateTemplate to use for the operation
 	 * @param items

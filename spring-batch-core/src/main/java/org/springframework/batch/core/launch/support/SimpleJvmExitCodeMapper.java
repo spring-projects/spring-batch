@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2007 the original author or authors.
+ * Copyright 2006-2013 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -27,7 +27,7 @@ import org.springframework.batch.core.ExitStatus;
  * An implementation of {@link ExitCodeMapper} that can be configured through a
  * map from batch exit codes (String) to integer results. Some default entries
  * are set up to recognise common cases.  Any that are injected are added to these.
- * 
+ *
  * @author Stijn Maller
  * @author Lucas Ward
  * @author Dave Syer
@@ -67,6 +67,7 @@ public class SimpleJvmExitCodeMapper implements ExitCodeMapper {
 	 * Framework
 	 * @return The exitCode of the Batch Job as known by the JVM
 	 */
+	@Override
 	public int intValue(String exitCode) {
 
 		Integer statusCode = null;

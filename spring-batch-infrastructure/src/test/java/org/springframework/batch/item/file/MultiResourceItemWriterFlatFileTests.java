@@ -35,6 +35,7 @@ public class MultiResourceItemWriterFlatFileTests extends AbstractMultiResourceI
 			this.list = list;
 		}
 
+        @Override
 		public Object doInTransaction(TransactionStatus status) {
 			try {
 				tested.write(list);
@@ -98,6 +99,7 @@ public class MultiResourceItemWriterFlatFileTests extends AbstractMultiResourceI
 	public void testMultiResourceWriteScenarioWithFooter() throws Exception {
 
 		delegate.setFooterCallback(new FlatFileFooterCallback() {
+            @Override
 			public void writeFooter(Writer writer) throws IOException {
 				writer.write("f");
 			}
@@ -124,6 +126,7 @@ public class MultiResourceItemWriterFlatFileTests extends AbstractMultiResourceI
 	public void testTransactionalMultiResourceWriteScenarioWithFooter() throws Exception {
 
 		delegate.setFooterCallback(new FlatFileFooterCallback() {
+            @Override
 			public void writeFooter(Writer writer) throws IOException {
 				writer.write("f");
 			}
@@ -181,6 +184,7 @@ public class MultiResourceItemWriterFlatFileTests extends AbstractMultiResourceI
 	public void testRestartWithFooter() throws Exception {
 
 		delegate.setFooterCallback(new FlatFileFooterCallback() {
+            @Override
 			public void writeFooter(Writer writer) throws IOException {
 				writer.write("f");
 			}
@@ -215,6 +219,7 @@ public class MultiResourceItemWriterFlatFileTests extends AbstractMultiResourceI
 	public void testTransactionalRestartWithFooter() throws Exception {
 
 		delegate.setFooterCallback(new FlatFileFooterCallback() {
+            @Override
 			public void writeFooter(Writer writer) throws IOException {
 				writer.write("f");
 			}

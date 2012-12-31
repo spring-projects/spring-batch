@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2011 the original author or authors.
+ * Copyright 2006-2013 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,7 +22,7 @@ package org.springframework.batch.core.step.skip;
 public class CompositeSkipPolicy implements SkipPolicy {
 
 	private SkipPolicy[] skipPolicies;
-	
+
 	public CompositeSkipPolicy() {
 		this(new SkipPolicy[0]);
 	}
@@ -30,11 +30,12 @@ public class CompositeSkipPolicy implements SkipPolicy {
 	public CompositeSkipPolicy(SkipPolicy[] skipPolicies) {
 		this.skipPolicies = skipPolicies;
 	}
-	
+
 	public void setSkipPolicies(SkipPolicy[] skipPolicies) {
 		this.skipPolicies = skipPolicies;
 	}
 
+	@Override
 	public boolean shouldSkip(Throwable t, int skipCount) throws SkipLimitExceededException {
 		for (SkipPolicy policy : skipPolicies) {
 			if (policy.shouldSkip(t, skipCount)) {

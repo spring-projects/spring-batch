@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2008 the original author or authors.
+ * Copyright 2002-2013 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -63,7 +63,7 @@ import org.springframework.util.Assert;
 
 /**
  * @author Lucas Ward
- * 
+ *
  */
 public class StepListenerFactoryBeanTests {
 
@@ -186,11 +186,11 @@ public class StepListenerFactoryBeanTests {
 	@Test
 	public void testAnnotationsWithOrdered() throws Exception {
 		Object delegate = new Ordered() {
-			@SuppressWarnings("unused")
 			@BeforeStep
 			public void foo(StepExecution execution) {
 			}
 
+			@Override
 			public int getOrder() {
 				return 3;
 			}
@@ -203,11 +203,11 @@ public class StepListenerFactoryBeanTests {
 	@Test
 	public void testProxiedAnnotationsFactoryMethod() throws Exception {
 		Object delegate = new InitializingBean() {
-			@SuppressWarnings("unused")
 			@BeforeStep
 			public void foo(StepExecution execution) {
 			}
 
+			@Override
 			public void afterPropertiesSet() throws Exception {
 			}
 		};
@@ -224,7 +224,6 @@ public class StepListenerFactoryBeanTests {
 	@Test
 	public void testAnnotationsIsListener() throws Exception {
 		assertTrue(StepListenerFactoryBean.isListener(new Object() {
-			@SuppressWarnings("unused")
 			@BeforeStep
 			public void foo(StepExecution execution) {
 			}
@@ -236,6 +235,7 @@ public class StepListenerFactoryBeanTests {
 		ProxyFactory factory = new ProxyFactory();
 		factory.addInterface(DataSource.class);
 		factory.addAdvice(new MethodInterceptor() {
+			@Override
 			public Object invoke(MethodInvocation invocation) throws Throwable {
 				return null;
 			}
@@ -247,11 +247,11 @@ public class StepListenerFactoryBeanTests {
 	@Test
 	public void testProxiedAnnotationsIsListener() throws Exception {
 		Object delegate = new InitializingBean() {
-			@SuppressWarnings("unused")
 			@BeforeStep
 			public void foo(StepExecution execution) {
 			}
 
+			@Override
 			public void afterPropertiesSet() throws Exception {
 			}
 		};
@@ -276,7 +276,6 @@ public class StepListenerFactoryBeanTests {
 	@Test
 	public void testEmptySignatureAnnotation() {
 		AbstractTestComponent delegate = new AbstractTestComponent() {
-			@SuppressWarnings("unused")
 			@AfterWrite
 			public void aMethod() {
 				executed = true;
@@ -292,7 +291,6 @@ public class StepListenerFactoryBeanTests {
 	@Test
 	public void testRightSignatureAnnotation() {
 		AbstractTestComponent delegate = new AbstractTestComponent() {
-			@SuppressWarnings("unused")
 			@AfterWrite
 			public void aMethod(List<String> items) {
 				executed = true;
@@ -310,7 +308,6 @@ public class StepListenerFactoryBeanTests {
 	@Test(expected = IllegalArgumentException.class)
 	public void testWrongSignatureAnnotation() {
 		AbstractTestComponent delegate = new AbstractTestComponent() {
-			@SuppressWarnings("unused")
 			@AfterWrite
 			public void aMethod(Integer item) {
 				executed = true;
@@ -377,6 +374,7 @@ public class StepListenerFactoryBeanTests {
 
 		int callcount = 0;
 
+		@Override
 		@AfterStep
 		public ExitStatus afterStep(StepExecution stepExecution) {
 			Assert.notNull(stepExecution);
@@ -384,6 +382,7 @@ public class StepListenerFactoryBeanTests {
 			return null;
 		}
 
+		@Override
 		public void beforeStep(StepExecution stepExecution) {
 			callcount++;
 		}
@@ -395,12 +394,14 @@ public class StepListenerFactoryBeanTests {
 
 		int callcount = 0;
 
+		@Override
 		public ExitStatus afterStep(StepExecution stepExecution) {
 			Assert.notNull(stepExecution);
 			callcount++;
 			return null;
 		}
 
+		@Override
 		public void beforeStep(StepExecution stepExecution) {
 			callcount++;
 		}
@@ -515,14 +516,17 @@ public class StepListenerFactoryBeanTests {
 			onWriteErrorCalled = true;
 		}
 
+		@Override
 		public void onSkipInProcess(String item, Throwable t) {
 			onSkipInProcessCalled = true;
 		}
 
+		@Override
 		public void onSkipInRead(Throwable t) {
 			onSkipInReadCalled = true;
 		}
 
+		@Override
 		public void onSkipInWrite(Integer item, Throwable t) {
 			onSkipInWriteCalled = true;
 		}

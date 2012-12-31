@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2007 the original author or authors.
+ * Copyright 2006-2013 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,7 +22,7 @@ import org.springframework.batch.core.job.flow.JobExecutionDecider;
 
 /**
  * State that requires a decider to make the status decision.
- * 
+ *
  * @author Dave Syer
  * @since 2.0
  */
@@ -42,10 +42,11 @@ public class DecisionState extends AbstractState {
 	public FlowExecutionStatus handle(FlowExecutor executor) throws Exception {
 		return decider.decide(executor.getJobExecution(), executor.getStepExecution());
 	}
-	
+
 	/* (non-Javadoc)
 	 * @see org.springframework.batch.core.job.flow.State#isEndState()
 	 */
+	@Override
 	public boolean isEndState() {
 		return false;
 	}

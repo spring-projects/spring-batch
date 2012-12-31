@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2007 the original author or authors.
+ * Copyright 2006-2013 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,16 +19,17 @@ import org.springframework.beans.factory.xml.NamespaceHandler;
 import org.springframework.beans.factory.xml.NamespaceHandlerSupport;
 
 /**
- * 
+ *
  *
  * @author Dave Syer
- * 
+ *
  */
 public class CoreNamespaceHandler extends NamespaceHandlerSupport {
 
 	/**
 	 * @see NamespaceHandler#init()
 	 */
+	@Override
 	public void init() {
 		this.registerBeanDefinitionParser("job", new JobParser());
 		this.registerBeanDefinitionParser("flow", new TopLevelFlowParser());

@@ -41,6 +41,7 @@ public class ExampleItemReader implements ItemReader<String>, ItemStream {
 	/**
 	 * Reads next record from input
 	 */
+	@Override
 	public String read() throws Exception {
 		if (index >= input.length || index >= max) {
 			return null;
@@ -61,13 +62,16 @@ public class ExampleItemReader implements ItemReader<String>, ItemStream {
 		return input[index++];
 	}
 
+	@Override
 	public void close() throws ItemStreamException {
 	}
 
+	@Override
 	public void open(ExecutionContext executionContext) throws ItemStreamException {
 		index = (int) executionContext.getLong("POSITION", min);
 	}
 
+	@Override
 	public void update(ExecutionContext executionContext) throws ItemStreamException {
 		executionContext.putLong("POSITION", index);
 	}

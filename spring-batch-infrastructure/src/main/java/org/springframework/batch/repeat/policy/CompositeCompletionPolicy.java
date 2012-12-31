@@ -51,6 +51,7 @@ public class CompositeCompletionPolicy implements CompletionPolicy {
 	 * @see org.springframework.batch.repeat.CompletionPolicy#isComplete(org.springframework.batch.repeat.RepeatContext,
 	 * RepeatStatus)
 	 */
+    @Override
 	public boolean isComplete(RepeatContext context, RepeatStatus result) {
 		RepeatContext[] contexts = ((CompositeBatchContext) context).contexts;
 		CompletionPolicy[] policies = ((CompositeBatchContext) context).policies;
@@ -67,6 +68,7 @@ public class CompositeCompletionPolicy implements CompletionPolicy {
 	 * 
 	 * @see org.springframework.batch.repeat.CompletionPolicy#isComplete(org.springframework.batch.repeat.RepeatContext)
 	 */
+    @Override
 	public boolean isComplete(RepeatContext context) {
 		RepeatContext[] contexts = ((CompositeBatchContext) context).contexts;
 		CompletionPolicy[] policies = ((CompositeBatchContext) context).policies;
@@ -83,6 +85,7 @@ public class CompositeCompletionPolicy implements CompletionPolicy {
 	 * 
 	 * @see org.springframework.batch.repeat.CompletionPolicy#start(RepeatContext)
 	 */
+    @Override
 	public RepeatContext start(RepeatContext context) {
 		List<RepeatContext> list = new ArrayList<RepeatContext>();
 		for (int i = 0; i < policies.length; i++) {
@@ -97,6 +100,7 @@ public class CompositeCompletionPolicy implements CompletionPolicy {
 	 * 
 	 * @see org.springframework.batch.repeat.CompletionPolicy#update(org.springframework.batch.repeat.RepeatContext)
 	 */
+    @Override
 	public void update(RepeatContext context) {
 		RepeatContext[] contexts = ((CompositeBatchContext) context).contexts;
 		CompletionPolicy[] policies = ((CompositeBatchContext) context).policies;

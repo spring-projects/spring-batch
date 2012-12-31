@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2007 the original author or authors.
+ * Copyright 2006-2013 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,7 +21,7 @@ import org.springframework.batch.item.ItemReader;
 /**
  * Invokes a custom method on a delegate plain old Java object which itself
  * provides an item.
- * 
+ *
  * @author Robert Kasanicky
  */
 public class ItemReaderAdapter<T> extends AbstractMethodInvokingDelegator<T> implements ItemReader<T> {
@@ -29,6 +29,7 @@ public class ItemReaderAdapter<T> extends AbstractMethodInvokingDelegator<T> imp
 	/**
 	 * @return return value of the target method.
 	 */
+	@Override
 	public T read() throws Exception {
 		return invokeDelegateMethod();
 	}

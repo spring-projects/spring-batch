@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2007 the original author or authors.
+ * Copyright 2006-2013 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,9 +23,9 @@ import org.springframework.context.ConfigurableApplicationContext;
 /**
  * A {@link JobFactory} that creates its own {@link ApplicationContext} and
  * pulls a bean out when asked to create a {@link Job}.
- * 
+ *
  * @author Dave Syer
- * 
+ *
  */
 public class ApplicationContextJobFactory implements JobFactory {
 
@@ -39,24 +39,26 @@ public class ApplicationContextJobFactory implements JobFactory {
 	 */
 	public ApplicationContextJobFactory(String jobName, ApplicationContextFactory applicationContextFactory) {
 		ConfigurableApplicationContext context = applicationContextFactory.createApplicationContext();
-		this.job = (Job) context.getBean(jobName, Job.class);
+		this.job = context.getBean(jobName, Job.class);
 	}
 
 	/**
 	 * Create an {@link ApplicationContext} from the factory provided and pull
 	 * out a bean with the name given during initialization.
-	 * 
+	 *
 	 * @see org.springframework.batch.core.configuration.JobFactory#createJob()
 	 */
+	@Override
 	public final Job createJob() {
 		return job;
 	}
-	
+
 	/**
 	 * Just return the name of instance passed in on initialization.
-	 * 
+	 *
 	 * @see JobFactory#getJobName()
 	 */
+	@Override
 	public String getJobName() {
 		return job.getName();
 	}

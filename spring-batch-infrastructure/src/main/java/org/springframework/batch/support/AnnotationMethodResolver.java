@@ -64,6 +64,7 @@ public class AnnotationMethodResolver implements MethodResolver {
 	 * @throws IllegalArgumentException if more than one Method has the
 	 * specified annotation
 	 */
+    @Override
 	public Method findMethod(Object candidate) {
 		Assert.notNull(candidate, "candidate object must not be null");
 		Class<?> targetClass = AopUtils.getTargetClass(candidate);
@@ -85,10 +86,12 @@ public class AnnotationMethodResolver implements MethodResolver {
 	 * @throws IllegalArgumentException if more than one Method has the
 	 * specified annotation
 	 */
+    @Override
 	public Method findMethod(final Class<?> clazz) {
 		Assert.notNull(clazz, "class must not be null");
 		final AtomicReference<Method> annotatedMethod = new AtomicReference<Method>();
 		ReflectionUtils.doWithMethods(clazz, new ReflectionUtils.MethodCallback() {
+            @Override
 			public void doWith(Method method) throws IllegalArgumentException, IllegalAccessException {
 				Annotation annotation = AnnotationUtils.findAnnotation(method, annotationType);
 				if (annotation != null) {

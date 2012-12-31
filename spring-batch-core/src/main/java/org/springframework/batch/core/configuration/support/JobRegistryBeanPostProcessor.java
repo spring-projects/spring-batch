@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2007 the original author or authors.
+ * Copyright 2006-2013 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -40,12 +40,12 @@ import org.springframework.util.Assert;
  * {@link JobRegistry}. Include a bean of this type along with your job
  * configuration, and use the same {@link JobRegistry} as a {@link JobLocator}
  * when you need to locate a {@link Job} to launch.
- * 
+ *
  * @author Dave Syer
- * 
+ *
  */
 public class JobRegistryBeanPostProcessor implements BeanPostProcessor, BeanFactoryAware, InitializingBean,
-		DisposableBean {
+DisposableBean {
 
 	private static Log logger = LogFactory.getLog(JobRegistryBeanPostProcessor.class);
 
@@ -65,7 +65,7 @@ public class JobRegistryBeanPostProcessor implements BeanPostProcessor, BeanFact
 	 * contributing to the same {@link JobRegistry}: child contexts can then
 	 * define an instance with a unique group name to avoid clashes between job
 	 * names.
-	 * 
+	 *
 	 * @param groupName the groupName to set
 	 */
 	public void setGroupName(String groupName) {
@@ -74,7 +74,7 @@ public class JobRegistryBeanPostProcessor implements BeanPostProcessor, BeanFact
 
 	/**
 	 * Injection setter for {@link JobRegistry}.
-	 * 
+	 *
 	 * @param jobRegistry the jobConfigurationRegistry to set
 	 */
 	public void setJobRegistry(JobRegistry jobRegistry) {
@@ -83,11 +83,12 @@ public class JobRegistryBeanPostProcessor implements BeanPostProcessor, BeanFact
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see
 	 * org.springframework.beans.factory.BeanFactoryAware#setBeanFactory(org
 	 * .springframework.beans.factory.BeanFactory)
 	 */
+	@Override
 	public void setBeanFactory(BeanFactory beanFactory) throws BeansException {
 		if (beanFactory instanceof DefaultListableBeanFactory) {
 			this.beanFactory = (DefaultListableBeanFactory) beanFactory;
@@ -96,9 +97,10 @@ public class JobRegistryBeanPostProcessor implements BeanPostProcessor, BeanFact
 
 	/**
 	 * Make sure the registry is set before use.
-	 * 
+	 *
 	 * @see org.springframework.beans.factory.InitializingBean#afterPropertiesSet()
 	 */
+	@Override
 	public void afterPropertiesSet() throws Exception {
 		Assert.notNull(jobRegistry, "JobRegistry must not be null");
 	}
@@ -108,6 +110,7 @@ public class JobRegistryBeanPostProcessor implements BeanPostProcessor, BeanFact
 	 * post processor.
 	 * @see org.springframework.beans.factory.DisposableBean#destroy()
 	 */
+	@Override
 	public void destroy() throws Exception {
 		for (String name : jobNames) {
 			logger.debug("Unregistering job: " + name);
@@ -119,10 +122,11 @@ public class JobRegistryBeanPostProcessor implements BeanPostProcessor, BeanFact
 	/**
 	 * If the bean is an instance of {@link Job} then register it.
 	 * @throws FatalBeanException if there is a {@link DuplicateJobException}.
-	 * 
+	 *
 	 * @see org.springframework.beans.factory.config.BeanPostProcessor#postProcessAfterInitialization(java.lang.Object,
 	 * java.lang.String)
 	 */
+	@Override
 	public Object postProcessAfterInitialization(Object bean, String beanName) throws BeansException {
 		if (bean instanceof Job) {
 			Job job = (Job) bean;
@@ -150,7 +154,7 @@ public class JobRegistryBeanPostProcessor implements BeanPostProcessor, BeanFact
 	 * Determine a group name for the job to be registered. Default
 	 * implementation just returns the {@link #setGroupName(String) groupName}
 	 * configured. Provides an extension point for specialised subclasses.
-	 * 
+	 *
 	 * @param beanDefinition the bean definition for the job
 	 * @param job the job
 	 * @return a group name for the job (or null if not needed)
@@ -161,10 +165,11 @@ public class JobRegistryBeanPostProcessor implements BeanPostProcessor, BeanFact
 
 	/**
 	 * Do nothing.
-	 * 
+	 *
 	 * @see org.springframework.beans.factory.config.BeanPostProcessor#postProcessBeforeInitialization(java.lang.Object,
 	 * java.lang.String)
 	 */
+	@Override
 	public Object postProcessBeforeInitialization(Object bean, String beanName) throws BeansException {
 		return bean;
 	}

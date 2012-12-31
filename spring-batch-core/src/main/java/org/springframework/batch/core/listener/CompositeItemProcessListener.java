@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2007 the original author or authors.
+ * Copyright 2006-2013 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,7 +23,7 @@ import org.springframework.core.Ordered;
 
 /**
  * @author Dave Syer
- * 
+ *
  */
 public class CompositeItemProcessListener<T, S> implements ItemProcessListener<T, S> {
 
@@ -31,7 +31,7 @@ public class CompositeItemProcessListener<T, S> implements ItemProcessListener<T
 
 	/**
 	 * Public setter for the listeners.
-	 * 
+	 *
 	 * @param itemReadListeners
 	 */
 	public void setListeners(List<? extends ItemProcessListener<? super T, ? super S>> itemReadListeners) {
@@ -40,7 +40,7 @@ public class CompositeItemProcessListener<T, S> implements ItemProcessListener<T
 
 	/**
 	 * Register additional listener.
-	 * 
+	 *
 	 * @param itemReaderListener
 	 */
 	public void register(ItemProcessListener<? super T, ? super S> itemReaderListener) {
@@ -53,6 +53,7 @@ public class CompositeItemProcessListener<T, S> implements ItemProcessListener<T
 	 * @see org.springframework.batch.core.ItemProcessListener#afterProcess(java.lang.Object,
 	 * java.lang.Object)
 	 */
+	@Override
 	public void afterProcess(T item, S result) {
 		for (Iterator<ItemProcessListener<? super T, ? super S>> iterator = listeners.reverse(); iterator.hasNext();) {
 			ItemProcessListener<? super T, ? super S> listener = iterator.next();
@@ -65,6 +66,7 @@ public class CompositeItemProcessListener<T, S> implements ItemProcessListener<T
 	 * that implement {@link Ordered}.
 	 * @see org.springframework.batch.core.ItemProcessListener#beforeProcess(java.lang.Object)
 	 */
+	@Override
 	public void beforeProcess(T item) {
 		for (Iterator<ItemProcessListener<? super T, ? super S>> iterator = listeners.iterator(); iterator.hasNext();) {
 			ItemProcessListener<? super T, ? super S> listener = iterator.next();
@@ -78,6 +80,7 @@ public class CompositeItemProcessListener<T, S> implements ItemProcessListener<T
 	 * @see org.springframework.batch.core.ItemProcessListener#onProcessError(java.lang.Object,
 	 * java.lang.Exception)
 	 */
+	@Override
 	public void onProcessError(T item, Exception e) {
 		for (Iterator<ItemProcessListener<? super T, ? super S>> iterator = listeners.reverse(); iterator.hasNext();) {
 			ItemProcessListener<? super T, ? super S> listener = iterator.next();

@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2007 the original author or authors.
+ * Copyright 2006-2013 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,7 +24,7 @@ import org.springframework.core.Ordered;
 /**
  * @author Lucas Ward
  * @author Dave Syer
- * 
+ *
  */
 public class CompositeItemReadListener<T> implements ItemReadListener<T> {
 
@@ -32,7 +32,7 @@ public class CompositeItemReadListener<T> implements ItemReadListener<T> {
 
 	/**
 	 * Public setter for the listeners.
-	 * 
+	 *
 	 * @param itemReadListeners
 	 */
 	public void setListeners(List<? extends ItemReadListener<? super T>> itemReadListeners) {
@@ -41,7 +41,7 @@ public class CompositeItemReadListener<T> implements ItemReadListener<T> {
 
 	/**
 	 * Register additional listener.
-	 * 
+	 *
 	 * @param itemReaderListener
 	 */
 	public void register(ItemReadListener<? super T> itemReaderListener) {
@@ -53,6 +53,7 @@ public class CompositeItemReadListener<T> implements ItemReadListener<T> {
 	 * prioritising those that implement {@link Ordered}.
 	 * @see org.springframework.batch.core.ItemReadListener#afterRead(java.lang.Object)
 	 */
+	@Override
 	public void afterRead(T item) {
 		for (Iterator<ItemReadListener<? super T>> iterator = listeners.reverse(); iterator.hasNext();) {
 			ItemReadListener<? super T> listener = iterator.next();
@@ -65,6 +66,7 @@ public class CompositeItemReadListener<T> implements ItemReadListener<T> {
 	 * that implement {@link Ordered}.
 	 * @see org.springframework.batch.core.ItemReadListener#beforeRead()
 	 */
+	@Override
 	public void beforeRead() {
 		for (Iterator<ItemReadListener<? super T>> iterator = listeners.iterator(); iterator.hasNext();) {
 			ItemReadListener<? super T> listener = iterator.next();
@@ -77,6 +79,7 @@ public class CompositeItemReadListener<T> implements ItemReadListener<T> {
 	 * prioritising those that implement {@link Ordered}.
 	 * @see org.springframework.batch.core.ItemReadListener#onReadError(java.lang.Exception)
 	 */
+	@Override
 	public void onReadError(Exception ex) {
 		for (Iterator<ItemReadListener<? super T>> iterator = listeners.iterator(); iterator.hasNext();) {
 			ItemReadListener<? super T> listener = iterator.next();

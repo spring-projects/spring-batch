@@ -22,6 +22,7 @@ public class NoStartEndDocumentWriterTests extends TestCase {
 
 	private XMLEventFactory eventFactory = XMLEventFactory.newInstance();
 
+    @Override
 	protected void setUp() throws Exception {
 		wrappedWriter = createStrictMock(XMLEventWriter.class);
 		writer = new NoStartEndDocumentStreamWriter(wrappedWriter);

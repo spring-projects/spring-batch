@@ -12,25 +12,26 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 @ContextConfiguration
 @RunWith(SpringJUnit4ClassRunner.class)
 public class SimplePlaceholderTargetSourceTests {
-	
+
 	@Autowired
 	@Qualifier("simple")
 	private Node simple;
-	
+
 	@Autowired
 	private SimpleContextFactory contextFactory;
-	
+
 	@Test
 	public void testGetSimple() {
 		contextFactory.set("bar");
 		assertEquals("bar", simple.getName());
 		contextFactory.clear();
 	}
-	
+
 	public static class SimpleContextFactory extends ContextFactorySupport {
 
 		private ThreadLocal<String> fooHolder = new ThreadLocal<String>();
-		
+
+		@Override
 		public Object getContext() {
 			return this;
 		}
@@ -46,17 +47,18 @@ public class SimplePlaceholderTargetSourceTests {
 		public String getFoo() {
 			return fooHolder.get();
 		}
-		
+
 	}
 
 	public static interface Node {
 		String getName();
 	}
-	
+
 	public static class Foo implements Node {
 
 		private String name;
-		
+
+		@Override
 		public String getName() {
 			return name;
 		}
@@ -64,7 +66,7 @@ public class SimplePlaceholderTargetSourceTests {
 		public void setName(String name) {
 			this.name = name;
 		}
-		
+
 	}
 
 }

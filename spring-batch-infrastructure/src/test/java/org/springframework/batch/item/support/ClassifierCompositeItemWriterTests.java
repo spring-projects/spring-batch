@@ -41,11 +41,13 @@ public class ClassifierCompositeItemWriterTests {
 	public void testWrite() throws Exception {
 		Map<String, ItemWriter<? super String>> map = new HashMap<String, ItemWriter<? super String>>();
 		ItemWriter<String> fooWriter = new ItemWriter<String>() {
+            @Override
 			public void write(List<? extends String> items) throws Exception {
 				foos.addAll(items);
 			}
 		};
 		ItemWriter<String> defaultWriter = new ItemWriter<String>() {
+            @Override
 			public void write(List<? extends String> items) throws Exception {
 				defaults.addAll(items);
 			}

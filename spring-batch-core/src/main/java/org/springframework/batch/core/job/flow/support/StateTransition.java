@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2007 the original author or authors.
+ * Copyright 2006-2013 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,7 +26,7 @@ import org.springframework.util.StringUtils;
  * another. The originating State name and the next {@link State} to execute are
  * linked by a pattern for the {@link ExitStatus#getExitCode() exit code} of an
  * execution of the originating State.
- * 
+ *
  * @author Dave Syer
  * @since 2.0
  */
@@ -42,7 +42,7 @@ public final class StateTransition implements Comparable<StateTransition> {
 	 * Create a new end state {@link StateTransition} specification. This
 	 * transition explicitly goes unconditionally to an end state (i.e. no more
 	 * executions).
-	 * 
+	 *
 	 * @param state the {@link State} used to generate the outcome for this
 	 * transition
 	 */
@@ -54,7 +54,7 @@ public final class StateTransition implements Comparable<StateTransition> {
 	 * Create a new end state {@link StateTransition} specification. This
 	 * transition explicitly goes to an end state (i.e. no more processing) if
 	 * the outcome matches the pattern.
-	 * 
+	 *
 	 * @param state the {@link State} used to generate the outcome for this
 	 * transition
 	 * @param pattern the pattern to match in the exit status of the
@@ -67,11 +67,11 @@ public final class StateTransition implements Comparable<StateTransition> {
 	/**
 	 * Convenience method to switch the origin and destination of a transition,
 	 * creating a new instance.
-	 * 
+	 *
 	 * @param stateTransition an existing state transition
 	 * @param state the new state for the origin
 	 * @param next the new name for the destination
-	 * 
+	 *
 	 * @return a {@link StateTransition}
 	 */
 	public static StateTransition switchOriginAndDestination(StateTransition stateTransition, State state, String next) {
@@ -81,7 +81,7 @@ public final class StateTransition implements Comparable<StateTransition> {
 	/**
 	 * Create a new state {@link StateTransition} specification with a wildcard
 	 * pattern that matches all outcomes.
-	 * 
+	 *
 	 * @param state the {@link State} used to generate the outcome for this
 	 * transition
 	 * @param next the name of the next {@link State} to execute
@@ -93,7 +93,7 @@ public final class StateTransition implements Comparable<StateTransition> {
 	/**
 	 * Create a new {@link StateTransition} specification from one {@link State}
 	 * to another (by name).
-	 * 
+	 *
 	 * @param state the {@link State} used to generate the outcome for this
 	 * transition
 	 * @param pattern the pattern to match in the exit status of the
@@ -141,7 +141,7 @@ public final class StateTransition implements Comparable<StateTransition> {
 	/**
 	 * Check if the provided status matches the pattern, signalling that the
 	 * next State should be executed.
-	 * 
+	 *
 	 * @param status the status to compare
 	 * @return true if the pattern matches this status
 	 */
@@ -151,7 +151,7 @@ public final class StateTransition implements Comparable<StateTransition> {
 
 	/**
 	 * Check for a special next State signalling the end of a job.
-	 * 
+	 *
 	 * @return true if this transition goes nowhere (there is no next)
 	 */
 	public boolean isEnd() {
@@ -165,6 +165,7 @@ public final class StateTransition implements Comparable<StateTransition> {
 	 * fo? > foo.
 	 * @see Comparable#compareTo(Object)
 	 */
+	@Override
 	public int compareTo(StateTransition other) {
 		String value = other.pattern;
 		if (pattern.equals(value)) {
@@ -191,7 +192,7 @@ public final class StateTransition implements Comparable<StateTransition> {
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see java.lang.Object#toString()
 	 */
 	@Override

@@ -13,6 +13,7 @@ import com.ibatis.sqlmap.client.SqlMapClient;
 @RunWith(JUnit4.class)
 public class IbatisPagingItemReaderCommonTests extends AbstractDatabaseItemStreamItemReaderTests {
 	
+    @Override
 	protected ItemReader<Foo> getItemReader() throws Exception {
 		SqlMapClientFactoryBean factory = new SqlMapClientFactoryBean();
 		factory.setConfigLocation(new ClassPathResource("ibatis-config.xml", getClass()));
@@ -39,6 +40,7 @@ public class IbatisPagingItemReaderCommonTests extends AbstractDatabaseItemStrea
 		return (SqlMapClient) factory.getObject();
 	}
 
+    @Override
 	protected void pointToEmptyInput(ItemReader<Foo> tested) throws Exception {
 		IbatisPagingItemReader<Foo> reader = (IbatisPagingItemReader<Foo>) tested;
 		reader.close();

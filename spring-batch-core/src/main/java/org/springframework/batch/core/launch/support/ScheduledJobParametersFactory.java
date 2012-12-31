@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2008 the original author or authors.
+ * Copyright 2006-2013 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,8 +20,8 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Map;
-import java.util.Properties;
 import java.util.Map.Entry;
+import java.util.Properties;
 
 import org.springframework.batch.core.JobParameter;
 import org.springframework.batch.core.JobParameters;
@@ -30,7 +30,7 @@ import org.springframework.batch.core.converter.JobParametersConverter;
 
 /**
  * @author Lucas Ward
- * 
+ *
  */
 public class ScheduledJobParametersFactory implements JobParametersConverter {
 
@@ -40,9 +40,10 @@ public class ScheduledJobParametersFactory implements JobParametersConverter {
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see org.springframework.batch.core.runtime.JobParametersFactory#getJobParameters(java.util.Properties)
 	 */
+	@Override
 	public JobParameters getJobParameters(Properties props) {
 
 		if (props == null || props.isEmpty()) {
@@ -70,9 +71,10 @@ public class ScheduledJobParametersFactory implements JobParametersConverter {
 
 	/**
 	 * Convert schedule date to Date, and assume all other parameters can be represented by their default string value.
-	 * 
+	 *
 	 * @see org.springframework.batch.core.converter.JobParametersConverter#getProperties(org.springframework.batch.core.JobParameters)
 	 */
+	@Override
 	public Properties getProperties(JobParameters params) {
 
 		if (params == null || params.isEmpty()) {
@@ -95,7 +97,7 @@ public class ScheduledJobParametersFactory implements JobParametersConverter {
 
 	/**
 	 * Public setter for injecting a date format.
-	 * 
+	 *
 	 * @param dateFormat a {@link DateFormat}, defaults to "yyyy/MM/dd"
 	 */
 	public void setDateFormat(DateFormat dateFormat) {

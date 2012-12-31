@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2007 the original author or authors.
+ * Copyright 2006-2013 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,14 +20,14 @@ import org.springframework.batch.core.job.flow.support.state.AbstractState;
 
 /**
  * Base class for {@link State} implementations in test cases.
- * 
+ *
  * @author Dave Syer
  *
  */
 public class StateSupport extends AbstractState {
 
 	private FlowExecutionStatus status;
-	
+
 	public StateSupport(String name) {
 		this(name, FlowExecutionStatus.COMPLETED);
 	}
@@ -45,7 +45,8 @@ public class StateSupport extends AbstractState {
 		}
 		return this.status;
 	}
-	
+
+	@Override
 	public boolean isEndState() {
 		return false;
 	}

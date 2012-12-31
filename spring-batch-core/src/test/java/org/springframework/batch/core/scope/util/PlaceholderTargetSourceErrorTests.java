@@ -23,6 +23,7 @@ public class PlaceholderTargetSourceErrorTests extends ContextFactorySupport {
 
 	private Date date = new Date(1L);
 
+	@Override
 	public Object getContext() {
 		return this;
 	}
@@ -57,7 +58,7 @@ public class PlaceholderTargetSourceErrorTests extends ContextFactorySupport {
 
 	private PlaceholderTargetSource createValue(String name, String value) throws Exception {
 		String input = IOUtils.toString(new ClassPathResource(getClass().getSimpleName() + "-context.xml", getClass())
-				.getInputStream());
+		.getInputStream());
 		input = input.replace("<!-- INSERT -->", String.format("<property name=\"%s\" value=\"%s\" />", name, value));
 		Resource resource = new ByteArrayResource(input.getBytes());
 		GenericApplicationContext context = new GenericApplicationContext();
@@ -107,8 +108,8 @@ public class PlaceholderTargetSourceErrorTests extends ContextFactorySupport {
 
 	@Test
 	public void testPartialReplaceIntegerToString() throws Exception {
-			Node target = (Node) createValue("name", "foo-%{integer}").getTarget();
-			assertEquals("foo-4321", target.getName());
+		Node target = (Node) createValue("name", "foo-%{integer}").getTarget();
+		assertEquals("foo-4321", target.getName());
 	}
 
 	@Test
@@ -159,6 +160,7 @@ public class PlaceholderTargetSourceErrorTests extends ContextFactorySupport {
 		public Foo() {
 		}
 
+		@Override
 		public long getValue() {
 			return value;
 		}
@@ -171,10 +173,12 @@ public class PlaceholderTargetSourceErrorTests extends ContextFactorySupport {
 			this.name = name;
 		}
 
+		@Override
 		public String getName() {
 			return name;
 		}
 
+		@Override
 		public Date getDate() {
 			return date;
 		}
@@ -187,6 +191,7 @@ public class PlaceholderTargetSourceErrorTests extends ContextFactorySupport {
 			this.name = name;
 		}
 
+		@Override
 		public Node getParent() {
 			return parent;
 		}

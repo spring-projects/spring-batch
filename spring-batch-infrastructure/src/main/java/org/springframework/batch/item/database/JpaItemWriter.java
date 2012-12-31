@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2008 the original author or authors.
+ * Copyright 2006-2013 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -33,18 +33,18 @@ import org.springframework.util.Assert;
  * {@link org.springframework.batch.item.ItemWriter} that is using a JPA
  * EntityManagerFactory to merge any Entities that aren't part of the
  * persistence context.
- * 
+ *
  * It is required that {@link #write(List)} is called inside a transaction.<br/>
- * 
+ *
  * The reader must be configured with an
  * {@link javax.persistence.EntityManagerFactory} that is capable of
  * participating in Spring managed transactions.
- * 
+ *
  * The writer is thread safe after its properties are set (normal singleton
  * behaviour), so it can be used to write in multiple concurrent transactions.
- * 
+ *
  * @author Thomas Risberg
- * 
+ *
  */
 public class JpaItemWriter<T> implements ItemWriter<T>, InitializingBean {
 
@@ -54,7 +54,7 @@ public class JpaItemWriter<T> implements ItemWriter<T>, InitializingBean {
 
 	/**
 	 * Set the EntityManager to be used internally.
-	 * 
+	 *
 	 * @param entityManagerFactory the entityManagerFactory to set
 	 */
 	public void setEntityManagerFactory(EntityManagerFactory entityManagerFactory) {
@@ -64,6 +64,7 @@ public class JpaItemWriter<T> implements ItemWriter<T>, InitializingBean {
 	/**
 	 * Check mandatory properties - there must be an entityManagerFactory.
 	 */
+	@Override
 	public void afterPropertiesSet() throws Exception {
 		Assert.notNull(entityManagerFactory, "An EntityManagerFactory is required");
 	}
@@ -71,9 +72,10 @@ public class JpaItemWriter<T> implements ItemWriter<T>, InitializingBean {
 	/**
 	 * Merge all provided items that aren't already in the persistence context
 	 * and then flush the entity manager.
-	 * 
+	 *
 	 * @see org.springframework.batch.item.ItemWriter#write(java.util.List)
 	 */
+	@Override
 	public final void write(List<? extends T> items) {
 		EntityManager entityManager = EntityManagerFactoryUtils.getTransactionalEntityManager(entityManagerFactory);
 		if (entityManager == null) {
@@ -86,7 +88,7 @@ public class JpaItemWriter<T> implements ItemWriter<T>, InitializingBean {
 	/**
 	 * Do perform the actual write operation. This can be overridden in a
 	 * subclass if necessary.
-	 * 
+	 *
 	 * @param entityManager the EntityManager to use for the operation
 	 * @param items the list of items to use for the write
 	 */

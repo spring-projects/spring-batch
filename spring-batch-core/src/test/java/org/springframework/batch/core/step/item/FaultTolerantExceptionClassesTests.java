@@ -51,6 +51,7 @@ public class FaultTolerantExceptionClassesTests implements ApplicationContextAwa
 
 	private ApplicationContext applicationContext;
 
+	@Override
 	public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
 		this.applicationContext = applicationContext;
 	}
@@ -291,9 +292,9 @@ public class FaultTolerantExceptionClassesTests implements ApplicationContextAwa
 		writer.setExceptionType(FatalRuntimeException.class);
 		StepExecution stepExecution = launchStep("noRollbackFatal");
 		assertEquals(BatchStatus.COMPLETED, stepExecution.getStatus());
-		// BATCH-1331: 
+		// BATCH-1331:
 		assertEquals("[1, 2, 3, 1, 2, 3, 4]", writer.getWritten().toString());
-		// BATCH-1331: 
+		// BATCH-1331:
 		assertEquals("[1, 2, 3, 4]", writer.getCommitted().toString());
 	}
 

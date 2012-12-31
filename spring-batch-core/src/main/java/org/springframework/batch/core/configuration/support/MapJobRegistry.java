@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2007 the original author or authors.
+ * Copyright 2006-2013 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,17 +15,17 @@
  */
 package org.springframework.batch.core.configuration.support;
 
+import java.util.Collections;
+import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
+
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.configuration.DuplicateJobException;
 import org.springframework.batch.core.configuration.JobFactory;
 import org.springframework.batch.core.configuration.JobRegistry;
 import org.springframework.batch.core.launch.NoSuchJobException;
 import org.springframework.util.Assert;
-
-import java.util.Collections;
-import java.util.Set;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ConcurrentMap;
 
 /**
  * Simple, thread-safe, map-based implementation of {@link JobRegistry}.
@@ -35,42 +35,46 @@ import java.util.concurrent.ConcurrentMap;
  */
 public class MapJobRegistry implements JobRegistry {
 
-    /**
-     * The map holding the registered job factories.
-     */
-    // The "final" ensures that it is visible and initialized when the constructor resolves.
-    private final ConcurrentMap<String, JobFactory> map = new ConcurrentHashMap<String, JobFactory>();
+	/**
+	 * The map holding the registered job factories.
+	 */
+	// The "final" ensures that it is visible and initialized when the constructor resolves.
+	private final ConcurrentMap<String, JobFactory> map = new ConcurrentHashMap<String, JobFactory>();
 
-    public void register(JobFactory jobFactory) throws DuplicateJobException {
-        Assert.notNull(jobFactory);
-        String name = jobFactory.getJobName();
-        Assert.notNull(name, "Job configuration must have a name.");
-        JobFactory previousValue = map.putIfAbsent(name, jobFactory);
-        if (previousValue != null) {
-            throw new DuplicateJobException("A job configuration with this name [" + name
-                    + "] was already registered");
-        }
-    }
+	@Override
+	public void register(JobFactory jobFactory) throws DuplicateJobException {
+		Assert.notNull(jobFactory);
+		String name = jobFactory.getJobName();
+		Assert.notNull(name, "Job configuration must have a name.");
+		JobFactory previousValue = map.putIfAbsent(name, jobFactory);
+		if (previousValue != null) {
+			throw new DuplicateJobException("A job configuration with this name [" + name
+					+ "] was already registered");
+		}
+	}
 
-    public void unregister(String name) {
-        Assert.notNull(name, "Job configuration must have a name.");
-        map.remove(name);
-    }
+	@Override
+	public void unregister(String name) {
+		Assert.notNull(name, "Job configuration must have a name.");
+		map.remove(name);
+	}
 
-    public Job getJob(String name) throws NoSuchJobException {
-        JobFactory factory = map.get(name);
-        if (factory == null) {
-            throw new NoSuchJobException("No job configuration with the name [" + name + "] was registered");
-        } else {
-            return factory.createJob();
-        }
-    }
+	@Override
+	public Job getJob(String name) throws NoSuchJobException {
+		JobFactory factory = map.get(name);
+		if (factory == null) {
+			throw new NoSuchJobException("No job configuration with the name [" + name + "] was registered");
+		} else {
+			return factory.createJob();
+		}
+	}
 
-    /**
-     * Provides an unmodifiable view of the job names.
-     */
-    public Set<String> getJobNames() {
-        return Collections.unmodifiableSet(map.keySet());
-    }
+	/**
+	 * Provides an unmodifiable view of the job names.
+	 */
+	@Override
+	public Set<String> getJobNames() {
+		return Collections.unmodifiableSet(map.keySet());
+	}
 
 }

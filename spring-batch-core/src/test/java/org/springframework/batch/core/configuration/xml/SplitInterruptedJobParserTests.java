@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2007 the original author or authors.
+ * Copyright 2006-2013 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -40,11 +40,12 @@ public class SplitInterruptedJobParserTests extends AbstractJobParserTests {
 
 		final JobExecution jobExecution = createJobExecution();
 		new Thread(new Runnable() {
+			@Override
 			public void run() {
 				job.execute(jobExecution);
 			}
 		}).start();
-		
+
 		Thread.sleep(100L);
 		jobExecution.setStatus(BatchStatus.STOPPING);
 		Thread.sleep(200L);
@@ -53,7 +54,7 @@ public class SplitInterruptedJobParserTests extends AbstractJobParserTests {
 			Thread.sleep(200L);
 		}
 		assertTrue("Timed out waiting for job to stop: "+jobExecution, count<10);
-		
+
 		assertEquals(BatchStatus.STOPPED, jobExecution.getStatus());
 		assertEquals(ExitStatus.STOPPED.getExitCode(), jobExecution.getExitStatus().getExitCode());
 

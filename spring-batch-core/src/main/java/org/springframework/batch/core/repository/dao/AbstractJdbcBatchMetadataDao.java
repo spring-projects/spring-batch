@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2007 the original author or authors.
+ * Copyright 2006-2013 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,7 +26,7 @@ import org.springframework.util.StringUtils;
 /**
  * Encapsulates common functionality needed by JDBC batch metadata DAOs -
  * provides jdbcTemplate for subclasses and handles table prefixes.
- * 
+ *
  * @author Robert Kasanicky
  */
 public abstract class AbstractJdbcBatchMetadataDao implements InitializingBean {
@@ -35,11 +35,11 @@ public abstract class AbstractJdbcBatchMetadataDao implements InitializingBean {
 	 * Default value for the table prefix property.
 	 */
 	public static final String DEFAULT_TABLE_PREFIX = "BATCH_";
-	
+
 	public static final int DEFAULT_EXIT_MESSAGE_LENGTH = 2500;
 
 	private String tablePrefix = DEFAULT_TABLE_PREFIX;
-	
+
 	private int clobTypeToUse = Types.CLOB;
 
 	private JdbcOperations jdbcTemplate;
@@ -47,7 +47,7 @@ public abstract class AbstractJdbcBatchMetadataDao implements InitializingBean {
 	protected String getQuery(String base) {
 		return StringUtils.replace(base, "%PREFIX%", tablePrefix);
 	}
-	
+
 	protected String getTablePrefix() {
 		return tablePrefix;
 	}
@@ -56,7 +56,7 @@ public abstract class AbstractJdbcBatchMetadataDao implements InitializingBean {
 	 * Public setter for the table prefix property. This will be prefixed to all
 	 * the table names before queries are executed. Defaults to
 	 * {@link #DEFAULT_TABLE_PREFIX}.
-	 * 
+	 *
 	 * @param tablePrefix the tablePrefix to set
 	 */
 	public void setTablePrefix(String tablePrefix) {
@@ -70,7 +70,7 @@ public abstract class AbstractJdbcBatchMetadataDao implements InitializingBean {
 	protected JdbcOperations getJdbcTemplate() {
 		return jdbcTemplate;
 	}
-	
+
 	public int getClobTypeToUse() {
 		return clobTypeToUse;
 	}
@@ -79,6 +79,7 @@ public abstract class AbstractJdbcBatchMetadataDao implements InitializingBean {
 		this.clobTypeToUse = clobTypeToUse;
 	}
 
+	@Override
 	public void afterPropertiesSet() throws Exception {
 		Assert.notNull(jdbcTemplate);
 	}

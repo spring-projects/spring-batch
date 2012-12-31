@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2007 the original author or authors.
+ * Copyright 2006-2013 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,7 +24,7 @@ import org.springframework.core.Ordered;
 
 /**
  * @author Dave Syer
- * 
+ *
  */
 public class CompositeJobExecutionListener implements JobExecutionListener {
 
@@ -32,7 +32,7 @@ public class CompositeJobExecutionListener implements JobExecutionListener {
 
 	/**
 	 * Public setter for the listeners.
-	 * 
+	 *
 	 * @param listeners
 	 */
 	public void setListeners(List<? extends JobExecutionListener> listeners) {
@@ -41,7 +41,7 @@ public class CompositeJobExecutionListener implements JobExecutionListener {
 
 	/**
 	 * Register additional listener.
-	 * 
+	 *
 	 * @param jobExecutionListener
 	 */
 	public void register(JobExecutionListener jobExecutionListener) {
@@ -53,6 +53,7 @@ public class CompositeJobExecutionListener implements JobExecutionListener {
 	 * prioritising those that implement {@link Ordered}.
 	 * @see org.springframework.batch.core.JobExecutionListener#afterJob(org.springframework.batch.core.JobExecution)
 	 */
+	@Override
 	public void afterJob(JobExecution jobExecution) {
 		for (Iterator<JobExecutionListener> iterator = listeners.reverse(); iterator.hasNext();) {
 			JobExecutionListener listener = iterator.next();
@@ -65,6 +66,7 @@ public class CompositeJobExecutionListener implements JobExecutionListener {
 	 * that implement {@link Ordered}.
 	 * @see org.springframework.batch.core.JobExecutionListener#beforeJob(org.springframework.batch.core.JobExecution)
 	 */
+	@Override
 	public void beforeJob(JobExecution jobExecution) {
 		for (Iterator<JobExecutionListener> iterator = listeners.iterator(); iterator.hasNext();) {
 			JobExecutionListener listener = iterator.next();

@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2008 the original author or authors.
+ * Copyright 2002-2013 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,7 +20,7 @@ import org.springframework.batch.core.StepListener;
 /**
  * This {@link AbstractListenerFactoryBean} implementation is used to create a
  * {@link StepListener}.
- * 
+ *
  * @author Lucas Ward
  * @author Dan Garrette
  * @since 2.0
@@ -29,18 +29,22 @@ import org.springframework.batch.core.StepListener;
  */
 public class StepListenerFactoryBean extends AbstractListenerFactoryBean {
 
+	@Override
 	protected ListenerMetaData getMetaDataFromPropertyName(String propertyName) {
 		return StepListenerMetaData.fromPropertyName(propertyName);
 	}
 
+	@Override
 	protected ListenerMetaData[] getMetaDataValues() {
 		return StepListenerMetaData.values();
 	}
 
+	@Override
 	protected Class<?> getDefaultListenerClass() {
 		return StepListener.class;
 	}
 
+	@Override
 	@SuppressWarnings("rawtypes")
 	public Class getObjectType() {
 		return StepListener.class;
@@ -49,7 +53,7 @@ public class StepListenerFactoryBean extends AbstractListenerFactoryBean {
 	/**
 	 * Convenience method to wrap any object and expose the appropriate
 	 * {@link StepListener} interfaces.
-	 * 
+	 *
 	 * @param delegate a delegate object
 	 * @return a StepListener instance constructed from the delegate
 	 */
@@ -62,7 +66,7 @@ public class StepListenerFactoryBean extends AbstractListenerFactoryBean {
 	/**
 	 * Convenience method to check whether the given object is or can be made
 	 * into a {@link StepListener}.
-	 * 
+	 *
 	 * @param delegate the object to check
 	 * @return true if the delegate is an instance of any of the
 	 *         {@link StepListener} interfaces, or contains the marker

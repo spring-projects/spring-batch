@@ -178,6 +178,7 @@ public class JdbcBatchItemWriterNamedParameterTests {
 	        this.expected = expected;
 	    }
 
+        @Override
 	    public boolean matches(Object actual) {
 	        if (!(actual instanceof SqlParameterSource[])) {
 	            return false;
@@ -194,6 +195,7 @@ public class JdbcBatchItemWriterNamedParameterTests {
 	        return true;
 	    }
 
+        @Override
 	    public void appendTo(StringBuffer buffer) {
 	        buffer.append("eqSqlParameterSourceArray(");
 	        buffer.append(expected.getClass().getName());

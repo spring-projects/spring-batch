@@ -24,6 +24,7 @@ package org.springframework.batch.item.file;
  */
 public class SimpleResourceSuffixCreator implements ResourceSuffixCreator {
 
+    @Override
 	public String getSuffix(int index) {
 		return "." + index;
 	}

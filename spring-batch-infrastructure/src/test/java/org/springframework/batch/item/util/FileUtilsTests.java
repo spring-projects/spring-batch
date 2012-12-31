@@ -114,6 +114,7 @@ public class FileUtilsTests {
 	public void testBadFile(){
 
 		File file = new File("new file"){
+            @Override
 			public boolean createNewFile() throws IOException {
 				throw new IOException();
 			}

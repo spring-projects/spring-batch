@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2007 the original author or authors.
+ * Copyright 2006-2013 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -29,7 +29,7 @@ import org.springframework.jdbc.support.incrementer.DataFieldMaxValueIncrementer
 
 /**
  * @author Dave Syer
- * 
+ *
  */
 public class JdbcJobDaoQueryTests extends TestCase {
 
@@ -41,19 +41,23 @@ public class JdbcJobDaoQueryTests extends TestCase {
 	 * (non-Javadoc)
 	 * @see junit.framework.TestCase#setUp()
 	 */
+	@Override
 	protected void setUp() throws Exception {
 
 		jobExecutionDao = new JdbcJobExecutionDao();
 		jobExecutionDao.setJobExecutionIncrementer(new DataFieldMaxValueIncrementer() {
 
+			@Override
 			public int nextIntValue() throws DataAccessException {
 				return 0;
 			}
 
+			@Override
 			public long nextLongValue() throws DataAccessException {
 				return 0;
 			}
 
+			@Override
 			public String nextStringValue() throws DataAccessException {
 				return "bar";
 			}
@@ -64,6 +68,7 @@ public class JdbcJobDaoQueryTests extends TestCase {
 	public void testTablePrefix() throws Exception {
 		jobExecutionDao.setTablePrefix("FOO_");
 		jobExecutionDao.setJdbcTemplate(new JdbcTemplate() {
+			@Override
 			public int update(String sql, Object[] args, int[] argTypes) throws DataAccessException {
 				list.add(sql);
 				return 1;

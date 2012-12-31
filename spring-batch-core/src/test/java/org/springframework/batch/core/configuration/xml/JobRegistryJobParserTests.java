@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2007 the original author or authors.
+ * Copyright 2006-2013 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -36,16 +36,17 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 @ContextConfiguration
 @RunWith(SpringJUnit4ClassRunner.class)
 public class JobRegistryJobParserTests implements ApplicationContextAware {
-	
+
 	@Autowired
 	private ListableJobLocator jobRegistry;
 
 	private ApplicationContext applicationContext;
-	
+
+	@Override
 	public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
 		this.applicationContext = applicationContext;
 	}
-	
+
 	@Test
 	public void testOneStep() throws Exception {
 		assertEquals(2, applicationContext.getBeanNamesForType(Job.class).length);

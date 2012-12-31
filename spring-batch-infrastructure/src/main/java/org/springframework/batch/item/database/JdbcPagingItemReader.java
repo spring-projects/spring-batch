@@ -266,6 +266,7 @@ public class JdbcPagingItemReader<T> extends AbstractPagingItemReader<T> impleme
 			}
 
 			RowMapper startMapper = new RowMapper() {
+                @Override
 				public Object mapRow(ResultSet rs, int i) throws SQLException {
 					return rs.getObject(1);
 				}
@@ -324,6 +325,7 @@ public class JdbcPagingItemReader<T> extends AbstractPagingItemReader<T> impleme
 
 	@SuppressWarnings("rawtypes")
 	private class PagingRowMapper implements RowMapper {
+        @Override
 		public Object mapRow(ResultSet rs, int rowNum) throws SQLException {
 			startAfterValues = new LinkedHashMap<String, Object>();
 			for (Map.Entry<String, Order> sortKey : queryProvider.getSortKeys().entrySet()) {

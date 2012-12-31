@@ -37,6 +37,7 @@ public class CompositeItemProcessor<I, O> implements ItemProcessor<I, O>, Initia
 
 	private List<ItemProcessor<Object, Object>> delegates;
 
+    @Override
 	@SuppressWarnings("unchecked")
 	public O process(I item) throws Exception {
 		Object result = item;
@@ -50,6 +51,7 @@ public class CompositeItemProcessor<I, O> implements ItemProcessor<I, O>, Initia
 		return (O) result;
 	}
 
+    @Override
 	public void afterPropertiesSet() throws Exception {
 		Assert.notNull(delegates, "The 'delgates' may not be null");
 		Assert.notEmpty(delegates, "The 'delgates' may not be empty");

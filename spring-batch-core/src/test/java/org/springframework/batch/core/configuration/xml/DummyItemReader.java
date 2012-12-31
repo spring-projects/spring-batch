@@ -10,6 +10,7 @@ import org.springframework.batch.item.UnexpectedInputException;
  */
 public class DummyItemReader implements ItemReader<Object> {
 
+	@Override
 	public Object read() throws Exception, UnexpectedInputException, ParseException {
 		return null;
 	}

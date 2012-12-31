@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2007 the original author or authors.
+ * Copyright 2006-2013 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,10 +22,8 @@ import java.util.Comparator;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
-
 import java.util.concurrent.atomic.AtomicLong;
 
 import org.springframework.batch.core.JobExecution;
@@ -53,6 +51,7 @@ public class MapJobExecutionDao implements JobExecutionDao {
 		return copy;
 	}
 
+	@Override
 	public void saveJobExecution(JobExecution jobExecution) {
 		Assert.isTrue(jobExecution.getId() == null);
 		Long newId = currentId.getAndIncrement();
@@ -61,6 +60,7 @@ public class MapJobExecutionDao implements JobExecutionDao {
 		executionsById.put(newId, copy(jobExecution));
 	}
 
+	@Override
 	public List<JobExecution> findJobExecutions(JobInstance jobInstance) {
 		List<JobExecution> executions = new ArrayList<JobExecution>();
 		for (JobExecution exec : executionsById.values()) {
@@ -70,6 +70,7 @@ public class MapJobExecutionDao implements JobExecutionDao {
 		}
 		Collections.sort(executions, new Comparator<JobExecution>() {
 
+			@Override
 			public int compare(JobExecution e1, JobExecution e2) {
 				long result = (e1.getId() - e2.getId());
 				if (result > 0) {
@@ -86,6 +87,7 @@ public class MapJobExecutionDao implements JobExecutionDao {
 		return executions;
 	}
 
+	@Override
 	public void updateJobExecution(JobExecution jobExecution) {
 		Long id = jobExecution.getId();
 		Assert.notNull(id, "JobExecution is expected to have an id (should be saved already)");
@@ -103,6 +105,7 @@ public class MapJobExecutionDao implements JobExecutionDao {
 		}
 	}
 
+	@Override
 	public JobExecution getLastJobExecution(JobInstance jobInstance) {
 		JobExecution lastExec = null;
 		for (JobExecution exec : executionsById.values()) {
@@ -121,10 +124,11 @@ public class MapJobExecutionDao implements JobExecutionDao {
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @seeorg.springframework.batch.core.repository.dao.JobExecutionDao#
 	 * findRunningJobExecutions(java.lang.String)
 	 */
+	@Override
 	public Set<JobExecution> findRunningJobExecutions(String jobName) {
 		Set<JobExecution> result = new HashSet<JobExecution>();
 		for (JobExecution exec : executionsById.values()) {
@@ -138,15 +142,17 @@ public class MapJobExecutionDao implements JobExecutionDao {
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see
 	 * org.springframework.batch.core.repository.dao.JobExecutionDao#getJobExecution
 	 * (java.lang.Long)
 	 */
+	@Override
 	public JobExecution getJobExecution(Long executionId) {
 		return copy(executionsById.get(executionId));
 	}
 
+	@Override
 	public void synchronizeStatus(JobExecution jobExecution) {
 		JobExecution saved = getJobExecution(jobExecution.getId());
 		if (saved.getVersion().intValue() != jobExecution.getVersion().intValue()) {

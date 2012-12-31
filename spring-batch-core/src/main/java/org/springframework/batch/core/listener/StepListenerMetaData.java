@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2008 the original author or authors.
+ * Copyright 2002-2013 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -48,7 +48,7 @@ import org.springframework.batch.core.annotation.OnWriteError;
 /**
  * Enumeration for {@link StepListener} meta data, which ties together the names
  * of methods, their interfaces, annotation, and expected arguments.
- * 
+ *
  * @author Lucas Ward
  * @since 2.0
  * @see StepListenerFactoryBean
@@ -71,14 +71,14 @@ public enum StepListenerMetaData implements ListenerMetaData {
 	ON_SKIP_IN_READ("onSkipInRead", "on-skip-in-read-method", OnSkipInRead.class, SkipListener.class, Throwable.class),
 	ON_SKIP_IN_PROCESS("onSkipInProcess", "on-skip-in-process-method", OnSkipInProcess.class, SkipListener.class, Object.class, Throwable.class),
 	ON_SKIP_IN_WRITE("onSkipInWrite", "on-skip-in-write-method", OnSkipInWrite.class, SkipListener.class, Object.class, Throwable.class);
-	
+
 	private final String methodName;
 	private final String propertyName;
 	private final Class<? extends Annotation> annotation;
 	private final Class<? extends StepListener> listenerInterface;
 	private final Class<?>[] paramTypes;
 	private static final Map<String, StepListenerMetaData> propertyMap;
-	
+
 	StepListenerMetaData(String methodName, String propertyName, Class<? extends Annotation> annotation, Class<? extends StepListener> listenerInterface, Class<?>... paramTypes) {
 		this.methodName = methodName;
 		this.propertyName = propertyName;
@@ -86,7 +86,7 @@ public enum StepListenerMetaData implements ListenerMetaData {
 		this.listenerInterface = listenerInterface;
 		this.paramTypes = paramTypes;
 	}
-	
+
 	static{
 		propertyMap = new HashMap<String, StepListenerMetaData>();
 		for(StepListenerMetaData metaData : values()){
@@ -94,36 +94,41 @@ public enum StepListenerMetaData implements ListenerMetaData {
 		}
 	}
 
+	@Override
 	public String getMethodName() {
 		return methodName;
 	}
 
+	@Override
 	public Class<? extends Annotation> getAnnotation() {
 		return annotation;
 	}
 
+	@Override
 	public Class<?> getListenerInterface() {
 		return listenerInterface;
 	}
 
+	@Override
 	public Class<?>[] getParamTypes() {
 		return paramTypes;
 	}
-	
+
+	@Override
 	public String getPropertyName() {
 		return propertyName;
 	}
-	
+
 	/**
 	 * Return the relevant meta data for the provided property name.
-	 * 
+	 *
 	 * @param propertyName
 	 * @return meta data with supplied property name, null if none exists.
 	 */
 	public static StepListenerMetaData fromPropertyName(String propertyName){
 		return propertyMap.get(propertyName);
 	}
-	
+
 	public static ListenerMetaData[] itemListenerMetaData() {
 		return new ListenerMetaData[] {BEFORE_WRITE, AFTER_WRITE, ON_WRITE_ERROR, BEFORE_PROCESS, AFTER_PROCESS, ON_PROCESS_ERROR, BEFORE_READ, AFTER_READ, ON_READ_ERROR, ON_SKIP_IN_WRITE, ON_SKIP_IN_PROCESS, ON_SKIP_IN_READ};
 	}

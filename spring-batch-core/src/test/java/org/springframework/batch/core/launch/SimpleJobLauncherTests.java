@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2007 the original author or authors.
+ * Copyright 2006-2013 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -47,7 +47,7 @@ import org.springframework.core.task.TaskRejectedException;
 
 /**
  * @author Lucas Ward
- * 
+ *
  */
 public class SimpleJobLauncherTests {
 
@@ -162,6 +162,7 @@ public class SimpleJobLauncherTests {
 	public void testTaskExecutor() throws Exception {
 		final List<String> list = new ArrayList<String>();
 		jobLauncher.setTaskExecutor(new TaskExecutor() {
+			@Override
 			public void execute(Runnable task) {
 				list.add("execute");
 				task.run();
@@ -176,6 +177,7 @@ public class SimpleJobLauncherTests {
 
 		final List<String> list = new ArrayList<String>();
 		jobLauncher.setTaskExecutor(new TaskExecutor() {
+			@Override
 			public void execute(Runnable task) {
 				list.add("execute");
 				throw new TaskRejectedException("Planned failure");
@@ -207,6 +209,7 @@ public class SimpleJobLauncherTests {
 	@Test
 	public void testRunWithException() throws Exception {
 		job = new JobSupport() {
+			@Override
 			public void execute(JobExecution execution) {
 				execution.setExitStatus(ExitStatus.FAILED);
 				throw new RuntimeException("foo");
@@ -224,6 +227,7 @@ public class SimpleJobLauncherTests {
 	@Test
 	public void testRunWithError() throws Exception {
 		job = new JobSupport() {
+			@Override
 			public void execute(JobExecution execution) {
 				execution.setExitStatus(ExitStatus.FAILED);
 				throw new Error("foo");

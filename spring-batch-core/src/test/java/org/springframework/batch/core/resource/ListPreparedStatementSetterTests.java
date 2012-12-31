@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2008 the original author or authors.
+ * Copyright 2006-2013 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -35,20 +35,20 @@ import org.springframework.batch.core.job.AbstractJob;
 import org.springframework.batch.core.launch.JobLauncher;
 import org.springframework.batch.item.ItemWriter;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.jdbc.core.RowCallbackHandler;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.RowCallbackHandler;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.transaction.annotation.Transactional;
 
 /**
  * @author Lucas Ward
- * 
+ *
  */
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(locations = {
 		"/org/springframework/batch/core/resource/ListPreparedStatementSetterTests-context.xml",
-		"/org/springframework/batch/core/repository/dao/data-source-context.xml" })
+"/org/springframework/batch/core/repository/dao/data-source-context.xml" })
 public class ListPreparedStatementSetterTests {
 
 	ListPreparedStatementSetter pss;
@@ -88,10 +88,11 @@ public class ListPreparedStatementSetterTests {
 		final List<String> results = new ArrayList<String>();
 		jdbcTemplate.query("SELECT NAME from T_FOOS where ID > ? and ID < ?", pss,
 				new RowCallbackHandler() {
-					public void processRow(ResultSet rs) throws SQLException {
-						results.add(rs.getString(1));
-					}
-				});
+			@Override
+			public void processRow(ResultSet rs) throws SQLException {
+				results.add(rs.getString(1));
+			}
+		});
 
 		assertEquals(2, results.size());
 		assertEquals("bar2", results.get(0));
@@ -133,6 +134,7 @@ public class ListPreparedStatementSetterTests {
 	public static class FooStoringItemWriter implements ItemWriter<Foo> {
 		private List<Foo> foos = new ArrayList<Foo>();
 
+		@Override
 		public void write(List<? extends Foo> items) throws Exception {
 			foos.addAll(items);
 		}

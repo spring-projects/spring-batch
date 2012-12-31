@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2007 the original author or authors.
+ * Copyright 2006-2013 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -28,36 +28,44 @@ import org.springframework.batch.core.repository.JobRestartException;
 
 /**
  * @author Dave Syer
- * 
+ *
  */
 public class JobFlowExecutorSupport implements FlowExecutor {
 
+	@Override
 	public String executeStep(Step step) throws JobInterruptedException, JobRestartException,
-			StartLimitExceededException {
+	StartLimitExceededException {
 		return ExitStatus.COMPLETED.getExitCode();
 	}
 
+	@Override
 	public JobExecution getJobExecution() {
 		return null;
 	}
 
+	@Override
 	public StepExecution getStepExecution() {
 		return null;
 	}
 
+	@Override
 	public void close(FlowExecution result) {
 	}
 
+	@Override
 	public void abandonStepExecution() {
 	}
-	
-	public void updateJobExecutionStatus(FlowExecutionStatus status) {		
+
+	@Override
+	public void updateJobExecutionStatus(FlowExecutionStatus status) {
 	}
-	
+
+	@Override
 	public boolean isRestart() {
 		return false;
 	}
-	
+
+	@Override
 	public void addExitStatus(String code) {
 	}
 

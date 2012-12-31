@@ -22,6 +22,7 @@ public class DerbyShutdownBean implements DisposableBean {
 		this.dataSource = dataSource;
 	}
 
+    @Override
 	public void destroy() throws Exception {
 		logger.info("Attempting Derby database shut down on: " + dataSource);
 		if (!isShutdown && dataSource != null

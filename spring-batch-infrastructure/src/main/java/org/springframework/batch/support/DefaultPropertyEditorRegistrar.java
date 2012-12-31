@@ -45,6 +45,7 @@ public class DefaultPropertyEditorRegistrar implements PropertyEditorRegistrar {
 	 * 
 	 * @see org.springframework.beans.PropertyEditorRegistrar#registerCustomEditors(org.springframework.beans.PropertyEditorRegistry)
 	 */
+    @Override
 	public void registerCustomEditors(PropertyEditorRegistry registry) {
 		if (this.customEditors != null) {
 			for (Entry<Class<?>, PropertyEditor> entry : customEditors.entrySet()) {

@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2009 the original author or authors.
+ * Copyright 2006-2013 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,7 +21,6 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
-
 import org.springframework.jdbc.core.PreparedStatementSetter;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.support.JdbcUtils;
@@ -31,26 +30,27 @@ import org.springframework.util.ClassUtils;
 /**
  * <p>
  * Simple item reader implementation that opens a JDBC cursor and continually retrieves the
- * next row in the ResultSet. 
+ * next row in the ResultSet.
  * </p>
- * 
+ *
  * <p>
- * The statement used to open the cursor is created with the 'READ_ONLY' option since a non read-only 
- * cursor may unnecessarily lock tables or rows. It is also opened with 'TYPE_FORWARD_ONLY' option. 
- * By default the cursor will be opened using a separate connection which means that it will not participate 
+ * The statement used to open the cursor is created with the 'READ_ONLY' option since a non read-only
+ * cursor may unnecessarily lock tables or rows. It is also opened with 'TYPE_FORWARD_ONLY' option.
+ * By default the cursor will be opened using a separate connection which means that it will not participate
  * in any transactions created as part of the step processing.
  * </p>
- *  
+ *
  * <p>
  * Each call to {@link #read()} will call the provided RowMapper, passing in the
- * ResultSet. 
+ * ResultSet.
  * </p>
- * 
+ *
  * @author Lucas Ward
  * @author Peter Zozom
  * @author Robert Kasanicky
  * @author Thomas Risberg
  */
+@SuppressWarnings("rawtypes")
 public class JdbcCursorItemReader<T> extends AbstractCursorItemReader<T> {
 
 	PreparedStatement preparedStatement;
@@ -68,7 +68,7 @@ public class JdbcCursorItemReader<T> extends AbstractCursorItemReader<T> {
 
 	/**
 	 * Set the RowMapper to be used for all calls to read().
-	 * 
+	 *
 	 * @param rowMapper
 	 */
 	public void setRowMapper(RowMapper rowMapper) {
@@ -79,7 +79,7 @@ public class JdbcCursorItemReader<T> extends AbstractCursorItemReader<T> {
 	 * Set the SQL statement to be used when creating the cursor. This statement
 	 * should be a complete and valid SQL statement, as it will be run directly
 	 * without any modification.
-	 * 
+	 *
 	 * @param sql
 	 */
 	public void setSql(String sql) {
@@ -89,7 +89,7 @@ public class JdbcCursorItemReader<T> extends AbstractCursorItemReader<T> {
 	/**
 	 * Set the PreparedStatementSetter to use if any parameter values that need
 	 * to be set in the supplied query.
-	 * 
+	 *
 	 * @param preparedStatementSetter
 	 */
 	public void setPreparedStatementSetter(PreparedStatementSetter preparedStatementSetter) {
@@ -98,10 +98,11 @@ public class JdbcCursorItemReader<T> extends AbstractCursorItemReader<T> {
 
 	/**
 	 * Assert that mandatory properties are set.
-	 * 
+	 *
 	 * @throws IllegalArgumentException if either data source or sql properties
 	 * not set.
 	 */
+	@Override
 	public void afterPropertiesSet() throws Exception {
 		super.afterPropertiesSet();
 		Assert.notNull(sql, "The SQL query must be provided");
@@ -109,7 +110,8 @@ public class JdbcCursorItemReader<T> extends AbstractCursorItemReader<T> {
 	}
 
 
-	protected void openCursor(Connection con) {	
+	@Override
+	protected void openCursor(Connection con) {
 		try {
 			if (isUseSharedExtendedConnection()) {
 				preparedStatement = con.prepareStatement(sql, ResultSet.TYPE_FORWARD_ONLY, ResultSet.CONCUR_READ_ONLY,
@@ -129,18 +131,20 @@ public class JdbcCursorItemReader<T> extends AbstractCursorItemReader<T> {
 			close();
 			throw getExceptionTranslator().translate("Executing query", getSql(), se);
 		}
-	
+
 	}
 
 
+	@Override
 	@SuppressWarnings("unchecked")
 	protected T readCursor(ResultSet rs, int currentRow) throws SQLException {
 		return (T) rowMapper.mapRow(rs, currentRow);
 	}
-	
+
 	/**
 	 * Close the cursor and database connection.
 	 */
+	@Override
 	protected void cleanupOnClose() throws Exception {
 		JdbcUtils.closeStatement(this.preparedStatement);
 	}

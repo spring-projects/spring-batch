@@ -33,6 +33,7 @@ import org.springframework.jdbc.core.simple.ParameterizedRowMapper;
  */
 public class JdbcPagingItemReaderOrderIntegrationTests extends AbstractGenericDataSourceItemReaderIntegrationTests {
 
+    @Override
 	protected ItemReader<Foo> createItemReader() throws Exception {
 
 		JdbcPagingItemReader<Foo> inputSource = new JdbcPagingItemReader<Foo>();
@@ -47,6 +48,7 @@ public class JdbcPagingItemReaderOrderIntegrationTests extends AbstractGenericDa
 		inputSource.setQueryProvider(queryProvider);
 		inputSource.setRowMapper(
 				new ParameterizedRowMapper<Foo>() {
+                    @Override
 					public Foo mapRow(ResultSet rs, int i) throws SQLException {
 						Foo foo = new Foo();
 						foo.setId(rs.getInt(1));

@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2007 the original author or authors.
+ * Copyright 2006-2013 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -32,10 +32,11 @@ import org.springframework.batch.item.ExecutionContext;
 
 /**
  * Batch domain object representing the execution of a job.
- * 
+ *
  * @author Lucas Ward
- * 
+ *
  */
+@SuppressWarnings("serial")
 public class JobExecution extends Entity {
 
 	private JobInstance jobInstance;
@@ -61,7 +62,7 @@ public class JobExecution extends Entity {
 	/**
 	 * Because a JobExecution isn't valid unless the job is set, this
 	 * constructor is the only valid one from a modelling point of view.
-	 * 
+	 *
 	 * @param job the job of which this execution is a part
 	 */
 	public JobExecution(JobInstance job, Long id) {
@@ -71,7 +72,7 @@ public class JobExecution extends Entity {
 
 	/**
 	 * Constructor for transient (unsaved) instances.
-	 * 
+	 *
 	 * @param job the enclosing {@link JobInstance}
 	 */
 	public JobExecution(JobInstance job) {
@@ -108,7 +109,7 @@ public class JobExecution extends Entity {
 
 	/**
 	 * Set the value of the status field.
-	 * 
+	 *
 	 * @param status the status to set
 	 */
 	public void setStatus(BatchStatus status) {
@@ -119,7 +120,7 @@ public class JobExecution extends Entity {
 	 * Upgrade the status field if the provided value is greater than the
 	 * existing one. Clients using this method to set the status can be sure
 	 * that they don't overwrite a failed status with an successful one.
-	 * 
+	 *
 	 * @param status the new status value
 	 */
 	public void upgradeStatus(BatchStatus status) {
@@ -129,7 +130,7 @@ public class JobExecution extends Entity {
 	/**
 	 * Convenience getter for for the id of the enclosing job. Useful for DAO
 	 * implementations.
-	 * 
+	 *
 	 * @return the id of the enclosing job
 	 */
 	public Long getJobId() {
@@ -162,7 +163,7 @@ public class JobExecution extends Entity {
 
 	/**
 	 * Accessor for the step executions.
-	 * 
+	 *
 	 * @return the step executions that were registered
 	 */
 	public Collection<StepExecution> getStepExecutions() {
@@ -201,7 +202,7 @@ public class JobExecution extends Entity {
 	/**
 	 * Signal the {@link JobExecution} to stop. Iterates through the associated
 	 * {@link StepExecution}s, calling {@link StepExecution#setTerminateOnly()}.
-	 * 
+	 *
 	 */
 	public void stop() {
 		for (StepExecution stepExecution : stepExecutions) {
@@ -212,7 +213,7 @@ public class JobExecution extends Entity {
 
 	/**
 	 * Sets the {@link ExecutionContext} for this execution
-	 * 
+	 *
 	 * @param executionContext the context
 	 */
 	public void setExecutionContext(ExecutionContext executionContext) {
@@ -222,7 +223,7 @@ public class JobExecution extends Entity {
 	/**
 	 * Returns the {@link ExecutionContext} for this execution. The content is
 	 * expected to be persisted after each step completion (successful or not).
-	 * 
+	 *
 	 * @return the context
 	 */
 	public ExecutionContext getExecutionContext() {
@@ -255,7 +256,7 @@ public class JobExecution extends Entity {
 	/**
 	 * Get the date representing the last time this JobExecution was updated in
 	 * the JobRepository.
-	 * 
+	 *
 	 * @return Date representing the last time this JobExecution was updated.
 	 */
 	public Date getLastUpdated() {
@@ -264,7 +265,7 @@ public class JobExecution extends Entity {
 
 	/**
 	 * Set the last time this JobExecution was updated.
-	 * 
+	 *
 	 * @param lastUpdated
 	 */
 	public void setLastUpdated(Date lastUpdated) {
@@ -277,7 +278,7 @@ public class JobExecution extends Entity {
 
 	/**
 	 * Add the provided throwable to the failure exception list.
-	 * 
+	 *
 	 * @param t
 	 */
 	public synchronized void addFailureException(Throwable t) {
@@ -287,7 +288,7 @@ public class JobExecution extends Entity {
 	/**
 	 * Return all failure causing exceptions for this JobExecution, including
 	 * step executions.
-	 * 
+	 *
 	 * @return List<Throwable> containing all exceptions causing failure for
 	 * this JobExecution.
 	 */
@@ -312,9 +313,10 @@ public class JobExecution extends Entity {
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see org.springframework.batch.core.domain.Entity#toString()
 	 */
+	@Override
 	public String toString() {
 		return super.toString()
 				+ String.format(", startTime=%s, endTime=%s, lastUpdated=%s, status=%s, exitStatus=%s, job=[%s]",

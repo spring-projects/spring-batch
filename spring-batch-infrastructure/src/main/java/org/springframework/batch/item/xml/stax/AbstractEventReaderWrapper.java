@@ -34,39 +34,48 @@ abstract class AbstractEventReaderWrapper implements XMLEventReader {
 		this.wrappedEventReader = wrappedEventReader;
 	}
 	
+    @Override
 	public void close() throws XMLStreamException {
 		wrappedEventReader.close();
 		
 	}
 
+    @Override
 	public String getElementText() throws XMLStreamException {
 		return wrappedEventReader.getElementText();
 	}
 
+    @Override
 	public Object getProperty(String name) throws IllegalArgumentException {
 		return wrappedEventReader.getProperty(name);
 	}
 
+    @Override
 	public boolean hasNext() {
 		return wrappedEventReader.hasNext();
 	}
 
+    @Override
 	public XMLEvent nextEvent() throws XMLStreamException {
 		return wrappedEventReader.nextEvent();
 	}
 
+    @Override
 	public XMLEvent nextTag() throws XMLStreamException {
 		return wrappedEventReader.nextTag();
 	}
 
+    @Override
 	public XMLEvent peek() throws XMLStreamException {
 		return wrappedEventReader.peek();
 	}
 
+    @Override
 	public Object next() {
 		return wrappedEventReader.next();
 	}
 
+    @Override
 	public void remove() {
 		wrappedEventReader.remove();
 	}

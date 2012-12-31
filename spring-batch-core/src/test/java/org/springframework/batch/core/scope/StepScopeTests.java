@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2007 the original author or authors.
+ * Copyright 2006-2013 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -38,8 +38,9 @@ import org.springframework.context.support.StaticApplicationContext;
 
 /**
  * @author Dave Syer
- * 
+ *
  */
+@SuppressWarnings("rawtypes")
 public class StepScopeTests {
 
 	private StepScope scope = new StepScope();
@@ -64,6 +65,7 @@ public class StepScopeTests {
 		StepSynchronizationManager.close();
 		try {
 			scope.get("foo", new ObjectFactory() {
+				@Override
 				public Object getObject() throws BeansException {
 					return foo;
 				}
@@ -80,6 +82,7 @@ public class StepScopeTests {
 	public void testGetWithNothingAlreadyThere() {
 		final String foo = "bar";
 		Object value = scope.get("foo", new ObjectFactory() {
+			@Override
 			public Object getObject() throws BeansException {
 				return foo;
 			}
@@ -92,6 +95,7 @@ public class StepScopeTests {
 	public void testGetWithSomethingAlreadyThere() {
 		context.setAttribute("foo", "bar");
 		Object value = scope.get("foo", new ObjectFactory() {
+			@Override
 			public Object getObject() throws BeansException {
 				return null;
 			}
@@ -105,6 +109,7 @@ public class StepScopeTests {
 		context.setAttribute("foo", "bar");
 		StepContext context = StepSynchronizationManager.register(new StepExecution("bar", new JobExecution(0L)));
 		Object value = scope.get("foo", new ObjectFactory() {
+			@Override
 			public Object getObject() throws BeansException {
 				return "spam";
 			}
@@ -133,6 +138,7 @@ public class StepScopeTests {
 		final List<String> list = new ArrayList<String>();
 		context.setAttribute("foo", "bar");
 		scope.registerDestructionCallback("foo", new Runnable() {
+			@Override
 			public void run() {
 				list.add("foo");
 			}
@@ -149,11 +155,13 @@ public class StepScopeTests {
 		final List<String> list = new ArrayList<String>();
 		context.setAttribute("foo", "bar");
 		scope.registerDestructionCallback("foo", new Runnable() {
+			@Override
 			public void run() {
 				list.add("foo");
 			}
 		});
 		scope.registerDestructionCallback("foo", new Runnable() {
+			@Override
 			public void run() {
 				list.add("bar");
 			}
@@ -179,6 +187,7 @@ public class StepScopeTests {
 		assertEquals(11, scope.getOrder());
 	}
 
+	@SuppressWarnings("resource")
 	@Test
 	public void testName() throws Exception {
 		scope.setName("foo");

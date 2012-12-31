@@ -34,6 +34,7 @@ public class RecursiveCollectionItemTransformerTests extends TestCase {
 
 	public void testSetDelegateAndPassInString() throws Exception {
 		aggregator.setDelegate(new LineAggregator<String>() {
+            @Override
 			public String aggregate(String item) {
 				return "bar";
 			}

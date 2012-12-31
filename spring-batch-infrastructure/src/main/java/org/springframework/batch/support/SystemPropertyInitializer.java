@@ -61,6 +61,7 @@ public class SystemPropertyInitializer implements InitializingBean {
 	 * 
 	 * @see InitializingBean#afterPropertiesSet()
 	 */
+    @Override
 	public void afterPropertiesSet() throws Exception {
 		Assert.state(defaultValue != null || System.getProperty(keyName) != null,
 				"Either a default value must be specified or the value should already be set for System property: "

@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2007 the original author or authors.
+ * Copyright 2006-2013 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -28,14 +28,14 @@ import org.springframework.batch.item.support.CompositeItemStream;
  * an input chunk. Only works with single threaded steps because it has to use a
  * {@link ThreadLocal} to manage the state and co-ordinate between the caller
  * and the wrapped {@link ItemStream}.
- * 
+ *
  * @author Dave Syer
  * @since 2.0
  */
 public class ChunkMonitor implements ItemStream {
-	
+
 	private Log logger = LogFactory.getLog(getClass());
-	
+
 	private boolean streamsRegistered = false;
 
 	public static class ChunkMonitorData {
@@ -93,6 +93,7 @@ public class ChunkMonitor implements ItemStream {
 		resetOffset();
 	}
 
+	@Override
 	public void close() throws ItemStreamException {
 		holder.set(null);
 		if (streamsRegistered) {
@@ -100,6 +101,7 @@ public class ChunkMonitor implements ItemStream {
 		}
 	}
 
+	@Override
 	public void open(ExecutionContext executionContext) throws ItemStreamException {
 		if (streamsRegistered) {
 			stream.open(executionContext);
@@ -120,6 +122,7 @@ public class ChunkMonitor implements ItemStream {
 		}
 	}
 
+	@Override
 	public void update(ExecutionContext executionContext) throws ItemStreamException {
 		if (streamsRegistered) {
 			ChunkMonitorData data = getData();

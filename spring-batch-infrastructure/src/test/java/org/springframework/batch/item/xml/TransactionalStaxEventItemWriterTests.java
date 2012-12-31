@@ -47,6 +47,7 @@ public class TransactionalStaxEventItemWriterTests {
 
 	// test item for writing to output
 	private Object item = new Object() {
+        @Override
 		public String toString() {
 			return ClassUtils.getShortName(StaxEventItemWriter.class) + "-testString";
 		}
@@ -71,6 +72,7 @@ public class TransactionalStaxEventItemWriterTests {
 	public void testWriteAndFlush() throws Exception {
 		writer.open(executionContext);
 		new TransactionTemplate(transactionManager).execute(new TransactionCallback() {
+            @Override
 			public Object doInTransaction(TransactionStatus status) {
 				try {
 					writer.write(items);
@@ -93,6 +95,7 @@ public class TransactionalStaxEventItemWriterTests {
 	public void testWriteWithHeaderAfterRollback() throws Exception {
 		writer.setHeaderCallback(new StaxWriterCallback(){
 
+            @Override
 			public void write(XMLEventWriter writer) throws IOException {
 				XMLEventFactory factory = XMLEventFactory.newInstance();
 				try {
@@ -109,6 +112,7 @@ public class TransactionalStaxEventItemWriterTests {
 		writer.open(executionContext);
 		try {
 			new TransactionTemplate(transactionManager).execute(new TransactionCallback() {
+                @Override
 				public Object doInTransaction(TransactionStatus status) {
 					try {
 						writer.write(items);
@@ -127,6 +131,7 @@ public class TransactionalStaxEventItemWriterTests {
 		writer.close();
 		writer.open(executionContext);
 		new TransactionTemplate(transactionManager).execute(new TransactionCallback() {
+            @Override
 			public Object doInTransaction(TransactionStatus status) {
 				try {
 					writer.write(items);
@@ -150,6 +155,7 @@ public class TransactionalStaxEventItemWriterTests {
 	public void testWriteWithHeaderAfterFlushAndRollback() throws Exception {
 		writer.setHeaderCallback(new StaxWriterCallback(){
 
+            @Override
 			public void write(XMLEventWriter writer) throws IOException {
 				XMLEventFactory factory = XMLEventFactory.newInstance();
 				try {
@@ -165,6 +171,7 @@ public class TransactionalStaxEventItemWriterTests {
 		});
 		writer.open(executionContext);
 		new TransactionTemplate(transactionManager).execute(new TransactionCallback() {
+            @Override
 			public Object doInTransaction(TransactionStatus status) {
 				try {
 					writer.write(items);
@@ -180,6 +187,7 @@ public class TransactionalStaxEventItemWriterTests {
 		writer.open(executionContext);
 		try {
 			new TransactionTemplate(transactionManager).execute(new TransactionCallback() {
+                @Override
 				public Object doInTransaction(TransactionStatus status) {
 					try {
 						writer.write(items);
@@ -212,6 +220,7 @@ public class TransactionalStaxEventItemWriterTests {
 	 * Writes object's toString representation as XML comment.
 	 */
 	private static class SimpleMarshaller implements Marshaller {
+        @Override
 		public void marshal(Object graph, Result result) throws XmlMappingException, IOException {
 			try {
 				StaxUtils.getXmlEventWriter(result).add(XMLEventFactory.newInstance().createComment(graph.toString()));
@@ -221,6 +230,7 @@ public class TransactionalStaxEventItemWriterTests {
 			}
 		}
 
+        @Override
 		@SuppressWarnings("rawtypes")
 		public boolean supports(Class clazz) {
 			return true;

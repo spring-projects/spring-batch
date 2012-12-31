@@ -21,11 +21,12 @@ import org.springframework.util.StopWatch;
 @ContextConfiguration
 @RunWith(SpringJUnit4ClassRunner.class)
 public class StepScopePerformanceTests implements ApplicationContextAware {
-	
+
 	private Log logger = LogFactory.getLog(getClass());
 
 	private ApplicationContext applicationContext;
 
+	@Override
 	public void setApplicationContext(ApplicationContext applicationContext)
 			throws BeansException {
 		this.applicationContext = applicationContext;

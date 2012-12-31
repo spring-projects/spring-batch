@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2007 the original author or authors.
+ * Copyright 2006-2013 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -45,7 +45,7 @@ import org.springframework.util.Assert;
  * jobs registered, e.g. a JMX MBean wrapper for a {@link JobLauncher}, or a
  * Quartz trigger.
  * </p>
- * 
+ *
  * <p>
  * With any launch of a batch job within Spring Batch, a Spring context
  * containing the {@link Job} has to be created. Using this launcher, the jobs
@@ -56,9 +56,9 @@ import org.springframework.util.Assert;
  * {@link JobRegistry}. Therefore, if autowiring fails to set it then an
  * exception will be thrown.
  * </p>
- * 
+ *
  * @author Dave Syer
- * 
+ *
  */
 public class JobRegistryBackgroundJobRunner {
 
@@ -93,16 +93,16 @@ public class JobRegistryBackgroundJobRunner {
 
 	/**
 	 * A loader for the jobs that are going to be registered.
-	 * 
+	 *
 	 * @param jobLoader the {@link JobLoader} to set
 	 */
 	public void setJobLoader(JobLoader jobLoader) {
 		this.jobLoader = jobLoader;
 	}
-	
+
 	/**
 	 * A job registry that can be used to create a job loader (if none is provided).
-	 * 
+	 *
 	 * @param jobRegistry the {@link JobRegistry} to set
 	 */
 	public void setJobRegistry(JobRegistry jobRegistry) {
@@ -155,7 +155,7 @@ public class JobRegistryBackgroundJobRunner {
 		String[] names = parentContext.getBeanNamesForType(JobLoader.class);
 		if (names.length == 0) {
 			if (parentContext.containsBean("jobLoader")) {
-				jobLoader = (JobLoader) parentContext.getBean("jobLoader", JobLoader.class);
+				jobLoader = parentContext.getBean("jobLoader", JobLoader.class);
 				return;
 			}
 			if (jobRegistry != null) {
@@ -164,7 +164,7 @@ public class JobRegistryBackgroundJobRunner {
 			}
 		}
 
-		jobLoader = (JobLoader) parentContext.getBean(names[0], JobLoader.class);
+		jobLoader = parentContext.getBean(names[0], JobLoader.class);
 		return;
 
 	}
@@ -175,20 +175,20 @@ public class JobRegistryBackgroundJobRunner {
 	 * {@link JobRegistry} and the child contexts are expected to contain
 	 * {@link Job} definitions, each of which will be registered wit the
 	 * registry.
-	 * 
+	 *
 	 * Example usage:
-	 * 
+	 *
 	 * <pre>
 	 * $ java -classpath ... JobRegistryBackgroundJobRunner job-registry-context.xml job1.xml job2.xml ...
 	 * </pre>
-	 * 
+	 *
 	 * The child contexts are created only when needed though the
 	 * {@link JobFactory} interface (but the XML is validated on startup by
 	 * using it to create a {@link BeanFactory} which is then discarded).
-	 * 
+	 *
 	 * The parent context is created in a separate thread, and the program will
 	 * pause for input in an infinite loop until the user hits any key.
-	 * 
+	 *
 	 * @param args the context locations to use (first one is for parent)
 	 * @throws Exception if anything goes wrong with the context creation
 	 */
@@ -202,6 +202,7 @@ public class JobRegistryBackgroundJobRunner {
 		logger.info("Starting job registry in parent context from XML at: [" + args[0] + "]");
 
 		new Thread(new Runnable() {
+			@Override
 			public void run() {
 				try {
 					launcher.run();
@@ -240,7 +241,7 @@ public class JobRegistryBackgroundJobRunner {
 
 		synchronized (JobRegistryBackgroundJobRunner.class) {
 			System.out
-					.println("Started application.  Interrupt (CTRL-C) or call JobRegistryBackgroundJobRunner.stop() to exit.");
+			.println("Started application.  Interrupt (CTRL-C) or call JobRegistryBackgroundJobRunner.stop() to exit.");
 			JobRegistryBackgroundJobRunner.class.wait();
 		}
 		launcher.destroy();

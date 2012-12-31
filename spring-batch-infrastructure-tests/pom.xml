@@ -16,33 +16,6 @@
 	</properties>
 	<profiles>
 		<profile>
-			<id>tiger</id>
-			<activation>
-				<jdk>1.5</jdk>
-			</activation>
-			<dependencies>
-				<dependency>
-					<groupId>javax.xml.bind</groupId>
-					<artifactId>jaxb-api</artifactId>
-					<scope>provided</scope>
-					<optional>true</optional>
-					<version>2.1</version>
-					<exclusions>
-						<exclusion>
-							<groupId>javax.xml.stream</groupId>
-							<artifactId>stax-api</artifactId>
-						</exclusion>
-					</exclusions>
-				</dependency>
-				<dependency>
-					<groupId>com.sun.xml.bind</groupId>
-					<artifactId>jaxb-impl</artifactId>
-					<version>2.1.5</version>
-					<scope>provided</scope>
-				</dependency>
-			</dependencies>
-		</profile>
-		<profile>
 			<id>default</id>
 			<activation>
 				<activeByDefault>true</activeByDefault>

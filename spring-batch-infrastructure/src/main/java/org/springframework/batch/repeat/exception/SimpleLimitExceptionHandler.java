@@ -52,6 +52,7 @@ public class SimpleLimitExceptionHandler implements ExceptionHandler, Initializi
 	 * 
 	 * @see org.springframework.beans.factory.InitializingBean#afterPropertiesSet()
 	 */
+    @Override
 	public void afterPropertiesSet() throws Exception {
 		if (limit <= 0) {
 			return;
@@ -108,6 +109,7 @@ public class SimpleLimitExceptionHandler implements ExceptionHandler, Initializi
 	 * @see org.springframework.batch.repeat.exception.ExceptionHandler#handleException(org.springframework.batch.repeat.RepeatContext,
 	 * Throwable)
 	 */
+    @Override
 	public void handleException(RepeatContext context, Throwable throwable) throws Throwable {
 		delegate.handleException(context, throwable);
 	}

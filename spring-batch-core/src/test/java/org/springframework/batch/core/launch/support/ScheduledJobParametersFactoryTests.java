@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2008 the original author or authors.
+ * Copyright 2006-2013 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,12 +24,11 @@ import junit.framework.TestCase;
 
 import org.springframework.batch.core.JobParameters;
 import org.springframework.batch.core.JobParametersBuilder;
-import org.springframework.batch.core.launch.support.ScheduledJobParametersFactory;
 import org.springframework.util.StringUtils;
 
 /**
  * @author Lucas Ward
- * 
+ *
  */
 public class ScheduledJobParametersFactoryTests extends TestCase {
 
@@ -37,6 +36,7 @@ public class ScheduledJobParametersFactoryTests extends TestCase {
 
 	DateFormat dateFormat = new SimpleDateFormat("MM/dd/yyyy");
 
+	@Override
 	protected void setUp() throws Exception {
 		super.setUp();
 
@@ -62,7 +62,7 @@ public class ScheduledJobParametersFactoryTests extends TestCase {
 	public void testGetProperties() throws Exception {
 
 		JobParameters parameters = new JobParametersBuilder().addDate("schedule.date", dateFormat.parse("01/23/2008"))
-		        .addString("job.key", "myKey").addString("vendor.id", "33243243").toJobParameters();
+				.addString("job.key", "myKey").addString("vendor.id", "33243243").toJobParameters();
 
 		Properties props = factory.getProperties(parameters);
 		assertNotNull(props);

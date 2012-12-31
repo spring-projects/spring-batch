@@ -26,6 +26,7 @@ import org.junit.Test;
  */
 public class TaskExecutorRepeatTemplateTests extends SimpleRepeatTemplateTests {
 
+    @Override
 	public RepeatTemplate getRepeatTemplate() {
 		return new TaskExecutorRepeatTemplate();
 	}

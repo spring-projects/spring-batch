@@ -99,6 +99,7 @@ public class JpaPagingItemReaderAsyncTests {
 				.newFixedThreadPool(THREAD_COUNT));
 		for (int i = 0; i < THREAD_COUNT; i++) {
 			completionService.submit(new Callable<List<Foo>>() {
+                @Override
 				public List<Foo> call() throws Exception {
 					List<Foo> list = new ArrayList<Foo>();
 					Foo next = null;

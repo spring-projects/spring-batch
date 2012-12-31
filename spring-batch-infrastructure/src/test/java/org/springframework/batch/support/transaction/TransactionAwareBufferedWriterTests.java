@@ -52,6 +52,7 @@ public class TransactionAwareBufferedWriterTests {
 		fileChannel = createMock(FileChannel.class);
 		
 		writer = new TransactionAwareBufferedWriter(fileChannel, new Runnable() {
+            @Override
 			public void run() {
 				try {
 					ByteBuffer bb = ByteBuffer.wrap("c".getBytes());
@@ -125,6 +126,7 @@ public class TransactionAwareBufferedWriterTests {
 		replay(fileChannel);
 
 		new TransactionTemplate(transactionManager).execute(new TransactionCallback() {
+            @Override
 			public Object doInTransaction(TransactionStatus status) {
 				try {
 					writer.write("foo");
@@ -149,6 +151,7 @@ public class TransactionAwareBufferedWriterTests {
 		replay(fileChannel);
 		
 		new TransactionTemplate(transactionManager).execute(new TransactionCallback() {
+            @Override
 			public Object doInTransaction(TransactionStatus status) {
 				try {
 					writer.write("foo");
@@ -173,6 +176,7 @@ public class TransactionAwareBufferedWriterTests {
 		replay(fileChannel);
 
 		new TransactionTemplate(transactionManager).execute(new TransactionCallback() {
+            @Override
 			public Object doInTransaction(TransactionStatus status) {
 				try {
 					writer.write("foo");
@@ -194,6 +198,7 @@ public class TransactionAwareBufferedWriterTests {
 	public void testWriteWithRollback() throws Exception {
 		try {
 			new TransactionTemplate(transactionManager).execute(new TransactionCallback() {
+                @Override
 				public Object doInTransaction(TransactionStatus status) {
 					try {
 						writer.write("foo");
@@ -224,12 +229,14 @@ public class TransactionAwareBufferedWriterTests {
 	@SuppressWarnings({"unchecked", "rawtypes"})
 	public void testExceptionOnFlush() throws Exception {
 		writer = new TransactionAwareBufferedWriter(fileChannel, new Runnable() {
+            @Override
 			public void run() {
 			}
 		});
 
 		try {
 			new TransactionTemplate(transactionManager).execute(new TransactionCallback() {
+                @Override
 				public Object doInTransaction(TransactionStatus status) {
 					try {
 						writer.write("foo");

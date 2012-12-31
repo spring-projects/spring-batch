@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2007 the original author or authors.
+ * Copyright 2006-2013 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -73,7 +73,7 @@ public class PartitionStepWithFlowParserTests {
 	public void testRepeatedFlowStep() throws Exception {
 		assertNotNull(job1);
 		JobExecution jobExecution = jobRepository.createJobExecution(job1.getName(), new JobParametersBuilder()
-				.addLong("gridSize", 1L).toJobParameters());
+		.addLong("gridSize", 1L).toJobParameters());
 		job1.execute(jobExecution);
 		assertEquals(BatchStatus.COMPLETED, jobExecution.getStatus());
 		Collections.sort(savedStepNames);
@@ -95,9 +95,10 @@ public class PartitionStepWithFlowParserTests {
 	public static class Decider implements JobExecutionDecider {
 
 		int count = 0;
+		@Override
 		public FlowExecutionStatus decide(JobExecution jobExecution, StepExecution stepExecution) {
 			if (count++<2) {
-				return new FlowExecutionStatus("OK");				
+				return new FlowExecutionStatus("OK");
 			}
 			return new FlowExecutionStatus("END");
 		}

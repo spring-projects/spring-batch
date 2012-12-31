@@ -15,10 +15,12 @@ import org.springframework.transaction.annotation.Transactional;
 @ContextConfiguration(locations = "sql-dao-test.xml")
 public class JdbcStepExecutionDaoTests extends AbstractStepExecutionDaoTests {
 
+	@Override
 	protected StepExecutionDao getStepExecutionDao() {
 		return (StepExecutionDao) applicationContext.getBean("stepExecutionDao");
 	}
 
+	@Override
 	protected JobRepository getJobRepository() {
 		deleteFromTables("BATCH_JOB_EXECUTION_CONTEXT", "BATCH_STEP_EXECUTION_CONTEXT", "BATCH_STEP_EXECUTION", "BATCH_JOB_EXECUTION",
 				"BATCH_JOB_PARAMS", "BATCH_JOB_INSTANCE");
@@ -30,15 +32,15 @@ public class JdbcStepExecutionDaoTests extends AbstractStepExecutionDaoTests {
 	 */
 	@Transactional @Test
 	public void testTruncateExitDescription() {
-		
+
 		StringBuffer sb = new StringBuffer();
 		for (int i = 0; i < 100; i++) {
 			sb.append("too long exit description");
 		}
 		String longDescription = sb.toString();
-		
+
 		ExitStatus exitStatus = ExitStatus.FAILED.addExitDescription(longDescription);
-		
+
 		stepExecution.setExitStatus(exitStatus);
 
 		((JdbcStepExecutionDao) dao).setExitMessageLength(250);
@@ -56,5 +58,5 @@ public class JdbcStepExecutionDaoTests extends AbstractStepExecutionDaoTests {
 		assertTrue("Exit description should be truncated", retrievedAfterUpdate.getExitStatus().getExitDescription()
 				.length() < stepExecution.getExitStatus().getExitDescription().length());
 	}
-	
+
 }

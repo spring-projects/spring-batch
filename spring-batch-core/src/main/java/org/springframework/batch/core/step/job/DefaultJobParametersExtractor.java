@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2010 the original author or authors.
+ * Copyright 2006-2013 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -32,9 +32,9 @@ import org.springframework.batch.item.ExecutionContext;
  * Simple implementation of {@link JobParametersExtractor} which pulls
  * parameters with named keys out of the step execution context and the job
  * parameters of the surrounding job.
- * 
+ *
  * @author Dave Syer
- * 
+ *
  */
 public class DefaultJobParametersExtractor implements JobParametersExtractor {
 
@@ -52,7 +52,7 @@ public class DefaultJobParametersExtractor implements JobParametersExtractor {
 	 * values of the respective type and assigned to job parameters accordingly
 	 * (there will be an error if they are not of the right type). Without a
 	 * special suffix in that form a parameter is assumed to be of type String.
-	 * 
+	 *
 	 * @param keys the keys to set
 	 */
 	public void setKeys(String[] keys) {
@@ -60,8 +60,9 @@ public class DefaultJobParametersExtractor implements JobParametersExtractor {
 	}
 
 	/**
-	 * @see JobParametersExtractor#getJobParameters(StepExecution)
+	 * @see JobParametersExtractor#getJobParameters(Job, StepExecution)
 	 */
+	@Override
 	public JobParameters getJobParameters(Job job, StepExecution stepExecution) {
 		JobParametersBuilder builder = new JobParametersBuilder();
 		Map<String, JobParameter> jobParameters = stepExecution.getJobParameters().getParameters();

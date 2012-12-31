@@ -17,6 +17,7 @@ import org.springframework.orm.hibernate3.LocalSessionFactoryBean;
 public abstract class AbstractHibernateCursorItemReaderIntegrationTests extends
 		AbstractGenericDataSourceItemReaderIntegrationTests {
 
+    @Override
 	protected ItemReader<Foo> createItemReader() throws Exception {
 
 		LocalSessionFactoryBean factoryBean = new LocalSessionFactoryBean();

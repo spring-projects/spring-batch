@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2008 the original author or authors.
+ * Copyright 2006-2013 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -57,6 +57,7 @@ public class XStreamExecutionContextStringSerializer implements ExecutionContext
 		this.hierarchicalStreamDriver = hierarchicalStreamDriver;
 	}
 
+	@Override
 	public void afterPropertiesSet() throws Exception {
 		init();
 	}
@@ -80,6 +81,7 @@ public class XStreamExecutionContextStringSerializer implements ExecutionContext
 	 * @param out
 	 * @see Serializer#serialize(Object, OutputStream)
 	 */
+	@Override
 	public void serialize(Object context, OutputStream out) throws IOException {
 		Assert.notNull(context);
 		Assert.notNull(out);
@@ -94,7 +96,7 @@ public class XStreamExecutionContextStringSerializer implements ExecutionContext
 	 * @return a reconstructed execution context
 	 * @see Deserializer#deserialize(InputStream)
 	 */
-	@SuppressWarnings("unchecked")
+	@Override
 	public Object deserialize(InputStream in) throws IOException {
 		BufferedReader br = new BufferedReader(new InputStreamReader(in));
 

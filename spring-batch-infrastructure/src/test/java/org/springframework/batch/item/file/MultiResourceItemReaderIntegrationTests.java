@@ -53,6 +53,7 @@ public class MultiResourceItemReaderIntegrationTests {
 
 		tested.setDelegate(itemReader);
 		tested.setComparator(new Comparator<Resource>() {
+            @Override
 			public int compare(Resource o1, Resource o2) {
 				return 0; // do not change ordering
 			}
@@ -226,6 +227,7 @@ public class MultiResourceItemReaderIntegrationTests {
 			/**
 			 * Reversed ordering by filename.
 			 */
+            @Override
 			public int compare(Resource o1, Resource o2) {
 				Resource r1 = (Resource) o1;
 				Resource r2 = (Resource) o2;
@@ -294,10 +296,12 @@ public class MultiResourceItemReaderIntegrationTests {
 
 		Resource badResource = new AbstractResource() {
 
+            @Override
 			public InputStream getInputStream() throws IOException {
 				throw new RuntimeException();
 			}
 
+            @Override
 			public String getDescription() {
 				return null;
 			}
@@ -325,10 +329,12 @@ public class MultiResourceItemReaderIntegrationTests {
 
 		Resource badResource = new AbstractResource() {
 
+            @Override
 			public InputStream getInputStream() throws IOException {
 				throw new RuntimeException();
 			}
 
+            @Override
 			public String getDescription() {
 				return null;
 			}
@@ -353,16 +359,19 @@ public class MultiResourceItemReaderIntegrationTests {
 
 		Resource badResource = new AbstractResource() {
 
+            @Override
 			public boolean exists() {
 				// Looks good ...
 				return true;
 			}
 
+            @Override
 			public InputStream getInputStream() throws IOException {
 				// ... but fails during read
 				throw new RuntimeException();
 			}
 
+            @Override
 			public String getDescription() {
 				return null;
 			}

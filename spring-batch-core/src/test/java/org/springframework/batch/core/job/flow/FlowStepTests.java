@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2009 the original author or authors.
+ * Copyright 2006-2013 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -43,7 +43,7 @@ import org.springframework.batch.core.step.StepSupport;
  *
  */
 public class FlowStepTests {
-	
+
 	private JobRepository jobRepository;
 	private JobExecution jobExecution;
 
@@ -164,7 +164,7 @@ public class FlowStepTests {
 
 	/**
 	 * @author Dave Syer
-	 * 
+	 *
 	 */
 	private class StubStep extends StepSupport {
 
@@ -179,6 +179,7 @@ public class FlowStepTests {
 			this.fail = fail;
 		}
 
+		@Override
 		public void execute(StepExecution stepExecution) throws JobInterruptedException {
 			BatchStatus status = BatchStatus.COMPLETED;
 			ExitStatus exitStatus = ExitStatus.COMPLETED;

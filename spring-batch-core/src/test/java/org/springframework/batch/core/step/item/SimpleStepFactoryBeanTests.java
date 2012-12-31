@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2007 the original author or authors.
+ * Copyright 2006-2013 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -70,6 +70,7 @@ public class SimpleStepFactoryBeanTests {
 	private List<String> written = new ArrayList<String>();
 
 	private ItemWriter<String> writer = new ItemWriter<String>() {
+		@Override
 		public void write(List<? extends String> data) throws Exception {
 			written.addAll(data);
 		}
@@ -134,6 +135,7 @@ public class SimpleStepFactoryBeanTests {
 		SimpleStepFactoryBean<String, String> factory = getStepFactory(new String[] { "foo", "bar", "spam" });
 
 		factory.setItemWriter(new ItemWriter<String>() {
+			@Override
 			public void write(List<? extends String> data) throws Exception {
 				throw new RuntimeException("Error!");
 			}
@@ -171,6 +173,7 @@ public class SimpleStepFactoryBeanTests {
 		SimpleStepFactoryBean<String, String> factory = getStepFactory(new String[] { "foo", "bar", "spam" });
 		factory.setBeanName("exceptionStep");
 		factory.setItemWriter(new ItemWriter<String>() {
+			@Override
 			public void write(List<? extends String> data) throws Exception {
 				throw new RuntimeException("Foo");
 			}
@@ -195,6 +198,7 @@ public class SimpleStepFactoryBeanTests {
 		factory.setItemWriter(new ItemWriter<String>() {
 			int count = 0;
 
+			@Override
 			public void write(List<? extends String> data) throws Exception {
 				if (count++ == 0) {
 					throw new RuntimeException("Foo");
@@ -244,11 +248,13 @@ public class SimpleStepFactoryBeanTests {
 				this.writeListener = writeListener;
 			}
 
+			@Override
 			public void afterChunk() {
 				writeListener.trail = writeListener.trail + "4";
 				afterCount++;
 			}
 
+			@Override
 			public void beforeChunk() {
 				writeListener.trail = writeListener.trail + "1";
 				beforeCount++;
@@ -328,48 +334,61 @@ public class SimpleStepFactoryBeanTests {
 		final List<String> listenerCalls = new ArrayList<String>();
 
 		class TestItemListenerWriter implements ItemWriter<String>, ItemProcessor<String, String>,
-				ItemReadListener<String>, ItemWriteListener<String>, ItemProcessListener<String, String>, ChunkListener {
+		ItemReadListener<String>, ItemWriteListener<String>, ItemProcessListener<String, String>, ChunkListener {
+			@Override
 			public void write(List<? extends String> items) throws Exception {
 			}
 
+			@Override
 			public String process(String item) throws Exception {
 				return item;
 			}
 
+			@Override
 			public void afterRead(String item) {
 				listenerCalls.add("read");
 			}
 
+			@Override
 			public void beforeRead() {
 			}
 
+			@Override
 			public void onReadError(Exception ex) {
 			}
 
+			@Override
 			public void afterWrite(List<? extends String> items) {
 				listenerCalls.add("write");
 			}
 
+			@Override
 			public void beforeWrite(List<? extends String> items) {
 			}
 
+			@Override
 			public void onWriteError(Exception exception, List<? extends String> items) {
 			}
 
+			@Override
 			public void afterProcess(String item, String result) {
 				listenerCalls.add("process");
 			}
 
+			@Override
 			public void beforeProcess(String item) {
 			}
 
+			@Override
 			public void onProcessError(String item, Exception e) {
 			}
 
+			@Override
 			public void afterChunk() {
 				listenerCalls.add("chunk");
 			}
 
+			@Override
 			public void beforeChunk() {
 			}
 
@@ -401,16 +420,20 @@ public class SimpleStepFactoryBeanTests {
 		final List<String> listenerCalls = new ArrayList<String>();
 
 		class TestItemListenerWriter implements ItemWriter<String>, ItemWriteListener<String> {
+			@Override
 			public void write(List<? extends String> items) throws Exception {
 			}
 
+			@Override
 			public void afterWrite(List<? extends String> items) {
 				listenerCalls.add("write");
 			}
 
+			@Override
 			public void beforeWrite(List<? extends String> items) {
 			}
 
+			@Override
 			public void onWriteError(Exception exception, List<? extends String> items) {
 			}
 
@@ -439,6 +462,7 @@ public class SimpleStepFactoryBeanTests {
 		SimpleStepFactoryBean<String, String> factory = getStepFactory(new String[] { "foo", "bar", "spam" });
 		factory.setItemWriter(null);
 		factory.setItemProcessor(new ItemProcessor<String, String>() {
+			@Override
 			public String process(String item) throws Exception {
 				written.add(item);
 				return null;

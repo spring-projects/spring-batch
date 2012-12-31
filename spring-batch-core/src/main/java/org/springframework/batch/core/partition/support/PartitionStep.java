@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2007 the original author or authors.
+ * Copyright 2006-2013 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -31,7 +31,7 @@ import org.springframework.util.Assert;
 /**
  * Implementation of {@link Step} which partitions the execution and spreads the
  * load using a {@link PartitionHandler}.
- * 
+ *
  * @author Dave Syer
  * @since 2.0
  */
@@ -46,7 +46,7 @@ public class PartitionStep extends AbstractStep {
 	/**
 	 * A {@link PartitionHandler} which can send out step executions for remote
 	 * processing and bring back the results.
-	 * 
+	 *
 	 * @param partitionHandler the {@link PartitionHandler} to set
 	 */
 	public void setPartitionHandler(PartitionHandler partitionHandler) {
@@ -57,7 +57,7 @@ public class PartitionStep extends AbstractStep {
 	 * A {@link StepExecutionAggregator} that can aggregate step executions when
 	 * they come back from the handler. Defaults to a
 	 * {@link DefaultStepExecutionAggregator}.
-	 * 
+	 *
 	 * @param stepExecutionAggregator the {@link StepExecutionAggregator} to set
 	 */
 	public void setStepExecutionAggregator(StepExecutionAggregator stepExecutionAggregator) {
@@ -75,9 +75,10 @@ public class PartitionStep extends AbstractStep {
 	/**
 	 * Assert that mandatory properties are set (stepExecutionSplitter,
 	 * partitionHandler) and delegate top superclass.
-	 * 
+	 *
 	 * @see AbstractStep#afterPropertiesSet()
 	 */
+	@Override
 	public void afterPropertiesSet() throws Exception {
 		Assert.notNull(stepExecutionSplitter, "StepExecutionSplitter must be provided");
 		Assert.notNull(partitionHandler, "PartitionHandler must be provided");
@@ -92,9 +93,9 @@ public class PartitionStep extends AbstractStep {
 	 * individual step executions and their input parameters (through
 	 * {@link ExecutionContext}) for the partition elements are provided by the
 	 * {@link StepExecutionSplitter}.
-	 * 
+	 *
 	 * @param stepExecution the master step execution for the partition
-	 * 
+	 *
 	 * @see Step#execute(StepExecution)
 	 */
 	@Override

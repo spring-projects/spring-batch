@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2007 the original author or authors.
+ * Copyright 2006-2013 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,7 +15,7 @@
  */
 package org.springframework.batch.core.configuration.support;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 
 import org.junit.Test;
 import org.springframework.batch.core.Job;
@@ -23,7 +23,7 @@ import org.springframework.batch.core.configuration.JobFactory;
 
 /**
  * @author Dave Syer
- * 
+ *
  */
 public class JobFactoryRegistrationListenerTests {
 
@@ -40,10 +40,12 @@ public class JobFactoryRegistrationListenerTests {
 	public void testBind() throws Exception {
 		listener.setJobRegistry(registry);
 		listener.bind(new JobFactory() {
+			@Override
 			public Job createJob() {
 				return null;
 			}
 
+			@Override
 			public String getJobName() {
 				return "foo";
 			}
@@ -54,16 +56,18 @@ public class JobFactoryRegistrationListenerTests {
 	/**
 	 * Test method for
 	 * {@link org.springframework.batch.core.configuration.support.JobFactoryRegistrationListener#unbind(org.springframework.batch.core.configuration.JobFactory, java.util.Map)}.
-	 * @throws Exception 
+	 * @throws Exception
 	 */
 	@Test
 	public void testUnbind() throws Exception {
 		testBind();
 		listener.unbind(new JobFactory() {
+			@Override
 			public Job createJob() {
 				return null;
 			}
 
+			@Override
 			public String getJobName() {
 				return "foo";
 			}

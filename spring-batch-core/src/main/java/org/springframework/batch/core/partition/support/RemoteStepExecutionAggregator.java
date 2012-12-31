@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2007 the original author or authors.
+ * Copyright 2006-2013 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -28,7 +28,7 @@ import org.springframework.util.Assert;
  * Convenience class for aggregating a set of {@link StepExecution} instances
  * when the input comes from remote steps, so the data need to be refreshed from
  * the repository.
- * 
+ *
  * @author Dave Syer
  * @since 2.1
  */
@@ -47,7 +47,7 @@ public class RemoteStepExecutionAggregator implements StepExecutionAggregator, I
 	/**
 	 * Create a new instance with a job explorer that can be used to refresh the
 	 * data when aggregating.
-	 * 
+	 *
 	 * @param jobExplorer the {@link JobExplorer} to use
 	 */
 	public RemoteStepExecutionAggregator(JobExplorer jobExplorer) {
@@ -72,6 +72,7 @@ public class RemoteStepExecutionAggregator implements StepExecutionAggregator, I
 	/**
 	 * @throws Exception if the job explorer is not provided
 	 */
+	@Override
 	public void afterPropertiesSet() throws Exception {
 		Assert.state(jobExplorer != null, "A JobExplorer must be provided");
 	}
@@ -80,9 +81,10 @@ public class RemoteStepExecutionAggregator implements StepExecutionAggregator, I
 	 * Aggregates the input executions into the result {@link StepExecution}
 	 * delegating to the delegate aggregator once the input has been refreshed
 	 * from the {@link JobExplorer}.
-	 * 
+	 *
 	 * @see StepExecutionAggregator #aggregate(StepExecution, Collection)
 	 */
+	@Override
 	public void aggregate(StepExecution result, Collection<StepExecution> executions) {
 		Assert.notNull(result, "To aggregate into a result it must be non-null.");
 		if (executions == null) {

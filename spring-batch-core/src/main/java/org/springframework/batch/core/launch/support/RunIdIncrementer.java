@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2007 the original author or authors.
+ * Copyright 2006-2013 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,12 +25,12 @@ import org.springframework.batch.core.JobParametersIncrementer;
 public class RunIdIncrementer implements JobParametersIncrementer {
 
 	private static String RUN_ID_KEY = "run.id";
-	
+
 	private String key = RUN_ID_KEY;
-	
+
 	/**
 	 * The name of the run id in the job parameters.  Defaults to "run.id".
-	 * 
+	 *
 	 * @param key the key to set
 	 */
 	public void setKey(String key) {
@@ -40,10 +40,11 @@ public class RunIdIncrementer implements JobParametersIncrementer {
 	/**
 	 * Increment the run.id parameter (starting with 1).
 	 */
+	@Override
 	public JobParameters getNext(JobParameters parameters) {
-		
+
 		JobParameters params = (parameters == null) ? new JobParameters() : parameters;
-			
+
 		long id = params.getLong(key, 0L) + 1;
 		return new JobParametersBuilder(params).addLong(key, id).toJobParameters();
 	}

@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2007 the original author or authors.
+ * Copyright 2006-2013 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,11 +25,12 @@ import org.springframework.util.ClassUtils;
  * from another should subclass from Entity. More information on this pattern
  * and the difference between Entities and Value Objects can be found in Domain
  * Driven Design by Eric Evans.
- * 
+ *
  * @author Lucas Ward
  * @author Dave Syer
- * 
+ *
  */
+@SuppressWarnings("serial")
 public class Entity implements Serializable {
 
 	private Long id;
@@ -42,7 +43,7 @@ public class Entity implements Serializable {
 
 	public Entity(Long id) {
 		super();
-		
+
 		//Commented out because StepExecutions are still created in a disconnected
 		//manner.  The Repository should create them, then this can be uncommented.
 		//Assert.notNull(id, "Entity id must not be null.");
@@ -63,7 +64,7 @@ public class Entity implements Serializable {
 	public Integer getVersion() {
 		return version;
 	}
-	
+
 	/**
 	 * Public setter for the version needed only by repository methods.
 	 * @param version the version to set
@@ -91,7 +92,7 @@ public class Entity implements Serializable {
 	/**
 	 * Attempt to establish identity based on id if both exist. If either id
 	 * does not exist use Object.equals().
-	 * 
+	 *
 	 * @see java.lang.Object#equals(java.lang.Object)
 	 */
 	@Override
@@ -121,9 +122,10 @@ public class Entity implements Serializable {
 	 * {@link Entity} after it is saved. Spring Batch does not store any of its
 	 * entities in Sets as a matter of course, so internally this is consistent.
 	 * Clients should not be exposed to unsaved entities.
-	 * 
+	 *
 	 * @see java.lang.Object#hashCode()
 	 */
+	@Override
 	public int hashCode() {
 		if (id == null) {
 			return super.hashCode();

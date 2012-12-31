@@ -20,6 +20,7 @@ import org.springframework.batch.item.sample.Foo;
  */
 public class HibernateCursorItemReaderStatefulIntegrationTests extends AbstractHibernateCursorItemReaderIntegrationTests {
 
+    @Override
 	protected boolean isUseStatelessSession() {
 		return false;
 	}

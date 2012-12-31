@@ -20,6 +20,7 @@ import org.springframework.batch.support.AbstractExceptionTests;
 
 public class ItemStreamExceptionTests extends AbstractExceptionTests {
 
+    @Override
 	public Exception getException(String msg) throws Exception {
 		return new ItemStreamException(msg);
 	}
@@ -28,6 +29,7 @@ public class ItemStreamExceptionTests extends AbstractExceptionTests {
 		return new ItemStreamException(t);
 	}
 
+    @Override
 	public Exception getException(String msg, Throwable t) throws Exception {
 		return new ItemStreamException(msg, t);
 	}

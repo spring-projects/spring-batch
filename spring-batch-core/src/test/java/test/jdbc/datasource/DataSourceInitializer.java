@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2007 the original author or authors.
+ * Copyright 2006-2013 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -41,15 +41,15 @@ import org.springframework.util.StringUtils;
 /**
  * Wrapper for a {@link DataSource} that can run scripts on start up and shut
  * down.  Us as a bean definition <br/><br/>
- * 
+ *
  * Run this class to initialize a database in a running server process.
  * Make sure the server is running first by launching the "hsql-server" from the
  * <code>hsql.server</code> project. Then you can right click in Eclipse and
  * Run As -&gt; Java Application. Do the same any time you want to wipe the
  * database and start again.
- * 
+ *
  * @author Dave Syer
- * 
+ *
  */
 public class DataSourceInitializer implements InitializingBean {
 
@@ -65,14 +65,16 @@ public class DataSourceInitializer implements InitializingBean {
 
 	/**
 	 * Main method as convenient entry point.
-	 * 
+	 *
 	 * @param args
 	 */
+	@SuppressWarnings("resource")
 	public static void main(String... args) {
 		new ClassPathXmlApplicationContext(ClassUtils.addResourcePathToPackagePath(DataSourceInitializer.class,
 				DataSourceInitializer.class.getSimpleName() + "-context.xml"));
 	}
 
+	@Override
 	public void afterPropertiesSet() throws Exception {
 		Assert.notNull(dataSource);
 		initialize();
@@ -90,15 +92,16 @@ public class DataSourceInitializer implements InitializingBean {
 		}
 	}
 
+	@SuppressWarnings({ "unchecked", "rawtypes" })
 	private void doExecuteScript(final Resource scriptResource) {
-        if (scriptResource == null || !scriptResource.exists()) {
-            throw new IllegalArgumentException("Script resource is null or does not exist");
-        }
+		if (scriptResource == null || !scriptResource.exists()) {
+			throw new IllegalArgumentException("Script resource is null or does not exist");
+		}
 
 		TransactionTemplate transactionTemplate = new TransactionTemplate(new DataSourceTransactionManager(dataSource));
 		transactionTemplate.execute(new TransactionCallback() {
 
-			@SuppressWarnings("unchecked")
+			@Override
 			public Object doInTransaction(TransactionStatus status) {
 				JdbcTemplate jdbcTemplate = new JdbcTemplate(dataSource);
 				String[] scripts;

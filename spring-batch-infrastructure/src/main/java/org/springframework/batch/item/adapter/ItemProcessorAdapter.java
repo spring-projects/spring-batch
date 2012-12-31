@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2007 the original author or authors.
+ * Copyright 2006-2013 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,16 +21,17 @@ import org.springframework.batch.item.ItemProcessor;
 /**
  * Invokes a custom method on a delegate plain old Java object which itself
  * processes an item.
- * 
+ *
  * @author Dave Syer
  */
 public class ItemProcessorAdapter<I,O> extends AbstractMethodInvokingDelegator<O> implements ItemProcessor<I,O> {
 
 	/**
 	 * Invoke the delegate method and return the result.
-	 * 
+	 *
 	 * @see ItemProcessor#process(Object)
 	 */
+	@Override
 	public O process(I item) throws Exception {
 		return invokeDelegateMethodWithArgument(item);
 	}

@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2010 the original author or authors.
+ * Copyright 2006-2013 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -33,9 +33,9 @@ import org.springframework.util.StringUtils;
 /**
  * Internal shared state helper for hibernate readers managing sessions and
  * queries.
- * 
+ *
  * @author Dave Syer
- * 
+ *
  */
 public class HibernateItemReaderHelper<T> implements InitializingBean {
 
@@ -76,7 +76,7 @@ public class HibernateItemReaderHelper<T> implements InitializingBean {
 
 	/**
 	 * Can be set only in uninitialized state.
-	 * 
+	 *
 	 * @param useStatelessSession <code>true</code> to use
 	 * {@link StatelessSession} <code>false</code> to use standard hibernate
 	 * {@link Session}
@@ -94,6 +94,7 @@ public class HibernateItemReaderHelper<T> implements InitializingBean {
 		this.sessionFactory = sessionFactory;
 	}
 
+	@Override
 	public void afterPropertiesSet() throws Exception {
 
 		Assert.state(sessionFactory != null, "A SessionFactory must be provided");
@@ -112,10 +113,10 @@ public class HibernateItemReaderHelper<T> implements InitializingBean {
 
 	/**
 	 * Get a cursor over all of the results, with the forward-only flag set.
-	 * 
+	 *
 	 * @param fetchSize the fetch size to use retrieving the results
 	 * @param parameterValues the parameter values to use (or null if none).
-	 * 
+	 *
 	 * @return a forward-only {@link ScrollableResults}
 	 */
 	public ScrollableResults getForwardOnlyCursor(int fetchSize, Map<String, Object> parameterValues) {
@@ -171,7 +172,7 @@ public class HibernateItemReaderHelper<T> implements InitializingBean {
 
 	/**
 	 * Scroll through the results up to the item specified.
-	 * 
+	 *
 	 * @param cursor the results to scroll over
 	 */
 	public void jumpToItem(ScrollableResults cursor, int itemIndex, int flushInterval) {
@@ -200,7 +201,7 @@ public class HibernateItemReaderHelper<T> implements InitializingBean {
 	/**
 	 * Read a page of data, clearing the existing session (if necessary) first,
 	 * and creating a new session before executing the query.
-	 * 
+	 *
 	 * @param page the page to read (starting at 0)
 	 * @param pageSize the size of the page or maximum number of items to read
 	 * @param fetchSize the fetch size to use

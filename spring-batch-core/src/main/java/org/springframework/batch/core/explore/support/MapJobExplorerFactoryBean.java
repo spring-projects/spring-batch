@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2007 the original author or authors.
+ * Copyright 2006-2013 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -28,7 +28,7 @@ import org.springframework.util.Assert;
 /**
  * A {@link FactoryBean} that automates the creation of a
  * {@link SimpleJobExplorer} using in-memory DAO implementations.
- * 
+ *
  * @author Dave Syer
  * @since 2.0
  */
@@ -54,7 +54,7 @@ public class MapJobExplorerFactoryBean extends AbstractJobExplorerFactoryBean im
 
 	/**
 	 * The repository factory that can be used to create daos for the explorer.
-	 * 
+	 *
 	 * @param repositoryFactory a {@link MapJobExplorerFactoryBean}
 	 */
 	public void setRepositoryFactory(MapJobRepositoryFactoryBean repositoryFactory) {
@@ -65,6 +65,7 @@ public class MapJobExplorerFactoryBean extends AbstractJobExplorerFactoryBean im
 	 * @throws Exception
 	 * @see org.springframework.beans.factory.InitializingBean#afterPropertiesSet()
 	 */
+	@Override
 	public void afterPropertiesSet() throws Exception {
 		Assert.state(repositoryFactory != null, "A MapJobRepositoryFactoryBean must be provided");
 		repositoryFactory.afterPropertiesSet();
@@ -90,6 +91,7 @@ public class MapJobExplorerFactoryBean extends AbstractJobExplorerFactoryBean im
 		return repositoryFactory.getExecutionContextDao();
 	}
 
+	@Override
 	public Object getObject() throws Exception {
 		return new SimpleJobExplorer(createJobInstanceDao(), createJobExecutionDao(), createStepExecutionDao(),
 				createExecutionContextDao());

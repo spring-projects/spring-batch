@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2007 the original author or authors.
+ * Copyright 2006-2013 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -27,10 +27,11 @@ import org.springframework.batch.support.transaction.TransactionAwareProxyFactor
 
 /**
  * In-memory implementation of {@link ExecutionContextDao} backed by maps.
- * 
+ *
  * @author Robert Kasanicky
  * @author Dave Syer
  */
+@SuppressWarnings("serial")
 public class MapExecutionContextDao implements ExecutionContextDao {
 
 	private final ConcurrentMap<ContextKey, ExecutionContext> contexts = TransactionAwareProxyFactory
@@ -44,29 +45,44 @@ public class MapExecutionContextDao implements ExecutionContextDao {
 		private final long id;
 
 		private ContextKey(Type type, long id) {
-			if(type == null) throw new IllegalStateException("Need a non-null type for a context");
+			if(type == null) {
+				throw new IllegalStateException("Need a non-null type for a context");
+			}
 			this.type = type;
 			this.id = id;
 		}
 
+		@Override
 		public int compareTo(ContextKey them) {
-			if(them == null) return 1;
+			if(them == null) {
+				return 1;
+			}
 			final int idCompare = new Long(this.id).compareTo(new Long(them.id)); // JDK6 Make this Long.compare(x,y)
-			if(idCompare != 0) return idCompare;
+			if(idCompare != 0) {
+				return idCompare;
+			}
 			final int typeCompare = this.type.compareTo(them.type);
-			if(typeCompare != 0) return typeCompare;
+			if(typeCompare != 0) {
+				return typeCompare;
+			}
 			return 0;
 		}
 
 		@Override
 		public boolean equals(Object them) {
-			if(them == null) return false;
-			if(them instanceof ContextKey) return this.equals((ContextKey)them);
+			if(them == null) {
+				return false;
+			}
+			if(them instanceof ContextKey) {
+				return this.equals((ContextKey)them);
+			}
 			return false;
 		}
 
 		public boolean equals(ContextKey them) {
-			if(them == null) return false;
+			if(them == null) {
+				return false;
+			}
 			return this.id == them.id && this.type.equals(them.type);
 		}
 
@@ -74,9 +90,9 @@ public class MapExecutionContextDao implements ExecutionContextDao {
 		public int hashCode() {
 			int value = (int)(id^(id>>>32));
 			switch(type) {
-				case STEP: return value;
-				case JOB: return ~value;
-				default: throw new IllegalStateException("Unknown type encountered in switch: " + type);
+			case STEP: return value;
+			case JOB: return ~value;
+			default: throw new IllegalStateException("Unknown type encountered in switch: " + type);
 			}
 		}
 
@@ -85,7 +101,7 @@ public class MapExecutionContextDao implements ExecutionContextDao {
 		public static ContextKey job(long id) { return new ContextKey(Type.JOB, id); }
 	}
 
-	public void clear() {	
+	public void clear() {
 		contexts.clear();
 	}
 
@@ -93,10 +109,12 @@ public class MapExecutionContextDao implements ExecutionContextDao {
 		return (ExecutionContext) SerializationUtils.deserialize(SerializationUtils.serialize(original));
 	}
 
+	@Override
 	public ExecutionContext getExecutionContext(StepExecution stepExecution) {
 		return copy(contexts.get(ContextKey.step(stepExecution.getId())));
 	}
 
+	@Override
 	public void updateExecutionContext(StepExecution stepExecution) {
 		ExecutionContext executionContext = stepExecution.getExecutionContext();
 		if (executionContext != null) {
@@ -104,10 +122,12 @@ public class MapExecutionContextDao implements ExecutionContextDao {
 		}
 	}
 
+	@Override
 	public ExecutionContext getExecutionContext(JobExecution jobExecution) {
 		return copy(contexts.get(ContextKey.job(jobExecution.getId())));
 	}
 
+	@Override
 	public void updateExecutionContext(JobExecution jobExecution) {
 		ExecutionContext executionContext = jobExecution.getExecutionContext();
 		if (executionContext != null) {
@@ -115,10 +135,12 @@ public class MapExecutionContextDao implements ExecutionContextDao {
 		}
 	}
 
+	@Override
 	public void saveExecutionContext(JobExecution jobExecution) {
 		updateExecutionContext(jobExecution);
 	}
 
+	@Override
 	public void saveExecutionContext(StepExecution stepExecution) {
 		updateExecutionContext(stepExecution);
 	}

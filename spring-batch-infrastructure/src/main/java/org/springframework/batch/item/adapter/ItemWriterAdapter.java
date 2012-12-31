@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2007 the original author or authors.
+ * Copyright 2006-2013 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,20 +22,21 @@ import org.springframework.batch.item.ItemWriter;
 
 
 /**
- * Delegates item processing to a custom method - 
+ * Delegates item processing to a custom method -
  * passes the item as an argument for the delegate method.
- * 
+ *
  * @see PropertyExtractingDelegatingItemWriter
- * 
+ *
  * @author Robert Kasanicky
  */
 public class ItemWriterAdapter<T> extends AbstractMethodInvokingDelegator<T> implements ItemWriter<T> {
-	
-    public void write(List<? extends T> items) throws Exception {
-    	for (T item : items) {
-    		invokeDelegateMethodWithArgument(item);			
+
+	@Override
+	public void write(List<? extends T> items) throws Exception {
+		for (T item : items) {
+			invokeDelegateMethodWithArgument(item);
 		}
-    }
-	
+	}
+
 }
 

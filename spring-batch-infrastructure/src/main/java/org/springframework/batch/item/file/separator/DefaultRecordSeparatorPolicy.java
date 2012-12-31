@@ -85,6 +85,7 @@ public class DefaultRecordSeparatorPolicy extends SimpleRecordSeparatorPolicy {
 	 * 
 	 * @see org.springframework.batch.item.file.separator.RecordSeparatorPolicy#isEndOfRecord(java.lang.String)
 	 */
+    @Override
 	public boolean isEndOfRecord(String line) {
 		return !isQuoteUnterminated(line) && !isContinued(line);
 	}
@@ -96,6 +97,7 @@ public class DefaultRecordSeparatorPolicy extends SimpleRecordSeparatorPolicy {
 	 * 
 	 * @see org.springframework.batch.item.file.separator.SimpleRecordSeparatorPolicy#preProcess(java.lang.String)
 	 */
+    @Override
 	public String preProcess(String line) {
 		if (isQuoteUnterminated(line)) {
 			return line + "\n";

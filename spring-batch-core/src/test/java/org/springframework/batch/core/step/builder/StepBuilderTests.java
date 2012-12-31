@@ -29,7 +29,7 @@ import org.springframework.transaction.PlatformTransactionManager;
 
 /**
  * @author Dave Syer
- * 
+ *
  */
 public class StepBuilderTests {
 
@@ -42,6 +42,7 @@ public class StepBuilderTests {
 		PlatformTransactionManager transactionManager = new ResourcelessTransactionManager();
 		TaskletStepBuilder builder = new StepBuilder("step").repository(jobRepository)
 				.transactionManager(transactionManager).tasklet(new Tasklet() {
+					@Override
 					public RepeatStatus execute(StepContribution contribution, ChunkContext chunkContext)
 							throws Exception {
 						return null;

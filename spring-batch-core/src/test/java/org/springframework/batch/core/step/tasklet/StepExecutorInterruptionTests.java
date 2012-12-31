@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2007 the original author or authors.
+ * Copyright 2006-2013 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -65,7 +65,7 @@ public class StepExecutorInterruptionTests {
 	}
 
 	private void configureStep(TaskletStep step) throws JobExecutionAlreadyRunningException, JobRestartException,
-			JobInstanceAlreadyCompleteException {
+	JobInstanceAlreadyCompleteException {
 
 		this.step = step;
 		JobSupport job = new JobSupport();
@@ -75,6 +75,7 @@ public class StepExecutorInterruptionTests {
 		step.setJobRepository(jobRepository);
 		step.setTransactionManager(new ResourcelessTransactionManager());
 		itemWriter = new ItemWriter<Object>() {
+			@Override
 			public void write(List<? extends Object> item) throws Exception {
 			}
 		};
@@ -92,6 +93,7 @@ public class StepExecutorInterruptionTests {
 		// N.B, If we don't set the completion policy it might run forever
 		template.setCompletionPolicy(new SimpleCompletionPolicy(2));
 		step.setTasklet(new TestingChunkOrientedTasklet<Object>(new ItemReader<Object>() {
+			@Override
 			public Object read() throws Exception {
 				// do something non-trivial (and not Thread.sleep())
 				double foo = 1;
@@ -132,6 +134,7 @@ public class StepExecutorInterruptionTests {
 		// is taken.
 
 		configureStep(new TaskletStep("step") {
+			@SuppressWarnings("serial")
 			@Override
 			protected Semaphore createSemaphore() {
 				return new Semaphore(1) {
@@ -152,6 +155,7 @@ public class StepExecutorInterruptionTests {
 		Thread processingThread = createThread(stepExecution);
 
 		step.setTasklet(new TestingChunkOrientedTasklet<Object>(new ItemReader<Object>() {
+			@Override
 			public Object read() throws Exception {
 				return null;
 			}
@@ -176,6 +180,7 @@ public class StepExecutorInterruptionTests {
 	public void testLockNotReleasedIfChunkFails() throws Exception {
 
 		configureStep(new TaskletStep("step") {
+			@SuppressWarnings("serial")
 			@Override
 			protected Semaphore createSemaphore() {
 				return new Semaphore(1) {
@@ -195,6 +200,7 @@ public class StepExecutorInterruptionTests {
 		});
 
 		step.setTasklet(new TestingChunkOrientedTasklet<Object>(new ItemReader<Object>() {
+			@Override
 			public Object read() throws Exception {
 				throw new RuntimeException("Planned!");
 			}
@@ -212,6 +218,7 @@ public class StepExecutorInterruptionTests {
 	 */
 	private Thread createThread(final StepExecution stepExecution) {
 		Thread processingThread = new Thread() {
+			@Override
 			public void run() {
 				try {
 					jobRepository.add(stepExecution);

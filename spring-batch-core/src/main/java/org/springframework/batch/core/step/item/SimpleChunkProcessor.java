@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2007 the original author or authors.
+ * Copyright 2006-2013 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -30,7 +30,7 @@ import org.springframework.util.Assert;
  * Simple implementation of the {@link ChunkProcessor} interface that handles
  * basic item writing and processing. Any exceptions encountered will be
  * rethrown.
- * 
+ *
  * @see ChunkOrientedTasklet
  */
 public class SimpleChunkProcessor<I, O> implements ChunkProcessor<I>, InitializingBean {
@@ -71,9 +71,10 @@ public class SimpleChunkProcessor<I, O> implements ChunkProcessor<I>, Initializi
 
 	/**
 	 * Check mandatory properties.
-	 * 
+	 *
 	 * @see InitializingBean#afterPropertiesSet()
 	 */
+	@Override
 	public void afterPropertiesSet() throws Exception {
 		Assert.notNull(itemWriter, "ItemWriter must be set");
 		Assert.notNull(itemProcessor, "ItemProcessor must be set");
@@ -82,7 +83,7 @@ public class SimpleChunkProcessor<I, O> implements ChunkProcessor<I>, Initializi
 	/**
 	 * Register some {@link StepListener}s with the handler. Each will get the
 	 * callbacks in the order specified at the correct stage.
-	 * 
+	 *
 	 * @param listeners
 	 */
 	public void setListeners(List<? extends StepListener> listeners) {
@@ -93,7 +94,7 @@ public class SimpleChunkProcessor<I, O> implements ChunkProcessor<I>, Initializi
 
 	/**
 	 * Register a listener for callbacks at the appropriate stages in a process.
-	 * 
+	 *
 	 * @param listener a {@link StepListener}
 	 */
 	public void registerListener(StepListener listener) {
@@ -135,7 +136,7 @@ public class SimpleChunkProcessor<I, O> implements ChunkProcessor<I>, Initializi
 
 	/**
 	 * Surrounds the actual write call with listener callbacks.
-	 * 
+	 *
 	 * @param items
 	 * @throws Exception
 	 */
@@ -159,7 +160,7 @@ public class SimpleChunkProcessor<I, O> implements ChunkProcessor<I>, Initializi
 
 	/**
 	 * Call the listener's after write method.
-	 * 
+	 *
 	 * @param items
 	 */
 	protected final void doAfterWrite(List<O> items) {
@@ -175,6 +176,7 @@ public class SimpleChunkProcessor<I, O> implements ChunkProcessor<I>, Initializi
 		}
 	}
 
+	@Override
 	public final void process(StepContribution contribution, Chunk<I> inputs) throws Exception {
 
 		// Allow temporary state to be stored in the user data field
@@ -206,7 +208,7 @@ public class SimpleChunkProcessor<I, O> implements ChunkProcessor<I>, Initializi
 	 * {@link #isComplete(Chunk)}, {@link #getFilterCount(Chunk, Chunk)} and
 	 * {@link #getAdjustedOutputs(Chunk, Chunk)} might also need to be, to
 	 * ensure that the user data is handled consistently.
-	 * 
+	 *
 	 * @param inputs the inputs for the process
 	 */
 	protected void initializeUserData(Chunk<I> inputs) {
@@ -216,12 +218,12 @@ public class SimpleChunkProcessor<I, O> implements ChunkProcessor<I>, Initializi
 	/**
 	 * Extension point for subclasses to calculate the filter count. Defaults to
 	 * the difference between input size and output size.
-	 * 
+	 *
 	 * @param inputs the inputs after transformation
 	 * @param outputs the outputs after transformation
-	 * 
+	 *
 	 * @return the difference in sizes
-	 * 
+	 *
 	 * @see #initializeUserData(Chunk)
 	 */
 	protected int getFilterCount(Chunk<I> inputs, Chunk<O> outputs) {
@@ -231,10 +233,10 @@ public class SimpleChunkProcessor<I, O> implements ChunkProcessor<I>, Initializi
 	/**
 	 * Extension point for subclasses that want to store additional data in the
 	 * inputs. Default just checks if inputs are empty.
-	 * 
+	 *
 	 * @param inputs the input chunk
 	 * @return true if it is empty
-	 * 
+	 *
 	 * @see #initializeUserData(Chunk)
 	 */
 	protected boolean isComplete(Chunk<I> inputs) {
@@ -245,11 +247,11 @@ public class SimpleChunkProcessor<I, O> implements ChunkProcessor<I>, Initializi
 	 * Extension point for subclasses that want to adjust the outputs based on
 	 * additional saved data in the inputs. Default implementation just returns
 	 * the outputs unchanged.
-	 * 
+	 *
 	 * @param inputs the inputs for the transformation
 	 * @param outputs the result of the transformation
 	 * @return the outputs unchanged
-	 * 
+	 *
 	 * @see #initializeUserData(Chunk)
 	 */
 	protected Chunk<O> getAdjustedOutputs(Chunk<I> inputs, Chunk<O> outputs) {
@@ -261,7 +263,7 @@ public class SimpleChunkProcessor<I, O> implements ChunkProcessor<I>, Initializi
 	 * increments the write count in the contribution. Subclasses can handle
 	 * more complicated scenarios, e.g.with fault tolerance. If output items are
 	 * skipped they should be removed from the inputs as well.
-	 * 
+	 *
 	 * @param contribution the current step contribution
 	 * @param inputs the inputs that gave rise to the ouputs
 	 * @param outputs the outputs to write

@@ -22,6 +22,7 @@ import org.springframework.util.StringUtils;
 
 public class IntArrayPropertyEditor extends PropertyEditorSupport {
 
+    @Override
 	public void setAsText(String text) throws IllegalArgumentException {
 		String[] strs = StringUtils.commaDelimitedListToStringArray(text);
 		int[] value = new int[strs.length];

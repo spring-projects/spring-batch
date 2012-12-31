@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2009 the original author or authors.
+ * Copyright 2006-2013 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -30,9 +30,9 @@ import org.springframework.batch.core.repository.JobRestartException;
 /**
  * Implementation of {@link FlowExecutor} for use in components that need to
  * execute a flow related to a {@link JobExecution}.
- * 
+ *
  * @author Dave Syer
- * 
+ *
  */
 public class JobFlowExecutor implements FlowExecutor {
 
@@ -56,12 +56,13 @@ public class JobFlowExecutor implements FlowExecutor {
 		stepExecutionHolder.set(null);
 	}
 
+	@Override
 	public String executeStep(Step step) throws JobInterruptedException, JobRestartException,
-			StartLimitExceededException {
+	StartLimitExceededException {
 		StepExecution stepExecution = stepHandler.handleStep(step, execution);
 		stepExecutionHolder.set(stepExecution);
 		if (stepExecution == null) {
-			return  ExitStatus.COMPLETED.getExitCode();			
+			return  ExitStatus.COMPLETED.getExitCode();
 		}
 		if (stepExecution.isTerminateOnly()) {
 			throw new JobInterruptedException("Step requested termination: "+stepExecution, stepExecution.getStatus());
@@ -69,6 +70,7 @@ public class JobFlowExecutor implements FlowExecutor {
 		return stepExecution.getExitStatus().getExitCode();
 	}
 
+	@Override
 	public void abandonStepExecution() {
 		StepExecution lastStepExecution = stepExecutionHolder.get();
 		if (lastStepExecution != null && lastStepExecution.getStatus().isGreaterThan(BatchStatus.STOPPING)) {
@@ -77,24 +79,29 @@ public class JobFlowExecutor implements FlowExecutor {
 		}
 	}
 
+	@Override
 	public void updateJobExecutionStatus(FlowExecutionStatus status) {
 		execution.setStatus(findBatchStatus(status));
 		exitStatus = exitStatus.and(new ExitStatus(status.getName()));
 		execution.setExitStatus(exitStatus);
 	}
 
+	@Override
 	public JobExecution getJobExecution() {
 		return execution;
 	}
 
+	@Override
 	public StepExecution getStepExecution() {
 		return stepExecutionHolder.get();
 	}
 
+	@Override
 	public void close(FlowExecution result) {
 		stepExecutionHolder.set(null);
 	}
 
+	@Override
 	public boolean isRestart() {
 		if (getStepExecution() != null && getStepExecution().getStatus() == BatchStatus.ABANDONED) {
 			/*
@@ -107,6 +114,7 @@ public class JobFlowExecutor implements FlowExecutor {
 		return execution.getStepExecutions().isEmpty();
 	}
 
+	@Override
 	public void addExitStatus(String code) {
 		exitStatus = exitStatus.and(new ExitStatus(code));
 	}

@@ -28,7 +28,7 @@ import org.springframework.batch.repeat.exception.ExceptionHandler;
 public class CompositeExceptionHandlerTests extends TestCase {
 
 	private CompositeExceptionHandler handler = new CompositeExceptionHandler();
-	
+
 	public void testNewHandler() throws Throwable {
 		try {
 			handler.handleException(null, new RuntimeException());
@@ -37,16 +37,18 @@ public class CompositeExceptionHandlerTests extends TestCase {
 			fail("Unexpected RuntimeException");
 		}
 	}
-	
+
 	public void testDelegation() throws Throwable {
 		final List<String> list = new ArrayList<String>();
 		handler.setHandlers(new ExceptionHandler[] {
 			new ExceptionHandler() {
+                @Override
 				public void handleException(RepeatContext context, Throwable throwable) throws RuntimeException {
 					list.add("1");
 				}
 			},
 			new ExceptionHandler() {
+                @Override
 				public void handleException(RepeatContext context, Throwable throwable) throws RuntimeException {
 					list.add("2");
 				}

@@ -24,6 +24,7 @@ import org.junit.Test;
 public class ItemReaderTests {
 
 	ItemReader<String> provider = new ItemReader<String>() {
+	    @Override
 		public String read() {
 			return "foo";
 		}

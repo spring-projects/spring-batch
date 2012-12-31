@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2007 the original author or authors.
+ * Copyright 2006-2013 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,10 +20,11 @@ import java.io.Serializable;
 /**
  * Represents a contribution to a {@link StepExecution}, buffering changes until
  * they can be applied at a chunk boundary.
- * 
+ *
  * @author Dave Syer
- * 
+ *
  */
+@SuppressWarnings("serial")
 public class StepContribution implements Serializable {
 
 	private volatile int readCount = 0;
@@ -51,7 +52,7 @@ public class StepContribution implements Serializable {
 
 	/**
 	 * Set the {@link ExitStatus} for this contribution.
-	 * 
+	 *
 	 * @param status
 	 */
 	public void setExitStatus(ExitStatus status) {
@@ -60,7 +61,7 @@ public class StepContribution implements Serializable {
 
 	/**
 	 * Public getter for the status.
-	 * 
+	 *
 	 * @return the {@link ExitStatus} for this contribution
 	 */
 	public ExitStatus getExitStatus() {
@@ -90,7 +91,7 @@ public class StepContribution implements Serializable {
 
 	/**
 	 * Public access to the read counter.
-	 * 
+	 *
 	 * @return the item counter.
 	 */
 	public int getReadCount() {
@@ -99,7 +100,7 @@ public class StepContribution implements Serializable {
 
 	/**
 	 * Public access to the write counter.
-	 * 
+	 *
 	 * @return the item counter.
 	 */
 	public int getWriteCount() {
@@ -153,7 +154,7 @@ public class StepContribution implements Serializable {
 	}
 
 	/**
-	 * 
+	 *
 	 */
 	public void incrementProcessSkipCount() {
 		processSkipCount++;
@@ -183,9 +184,10 @@ public class StepContribution implements Serializable {
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see java.lang.Object#toString()
 	 */
+	@Override
 	public String toString() {
 		return "[StepContribution: read=" + readCount + ", written=" + writeCount + ", filtered=" + filterCount
 				+ ", readSkips=" + readSkipCount + ", writeSkips=" + writeSkipCount + ", processSkips="

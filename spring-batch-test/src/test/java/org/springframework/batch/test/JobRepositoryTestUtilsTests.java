@@ -134,6 +134,7 @@ public class JobRepositoryTestUtilsTests {
 	public void testCreateJobExecutionsWithIncrementer() throws Exception {
 		utils = new JobRepositoryTestUtils(jobRepository, dataSource);
 		utils.setJobParametersIncrementer(new JobParametersIncrementer() {
+            @Override
 			public JobParameters getNext(JobParameters parameters) {
 				return new JobParametersBuilder().addString("foo","bar").toJobParameters();
 			}

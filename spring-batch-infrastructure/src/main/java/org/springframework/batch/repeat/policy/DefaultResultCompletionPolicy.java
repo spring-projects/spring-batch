@@ -37,6 +37,7 @@ public class DefaultResultCompletionPolicy extends CompletionPolicySupport {
 	 * @see org.springframework.batch.repeat.CompletionPolicy#isComplete(org.springframework.batch.repeat.RepeatContext,
 	 *      RepeatStatus)
 	 */
+    @Override
 	public boolean isComplete(RepeatContext context, RepeatStatus result) {
 		return (result == null || !result.isContinuable());
 	}
@@ -46,6 +47,7 @@ public class DefaultResultCompletionPolicy extends CompletionPolicySupport {
 	 * 
 	 * @see org.springframework.batch.repeat.CompletionPolicy#isComplete(org.springframework.batch.repeat.RepeatContext)
 	 */
+    @Override
 	public boolean isComplete(RepeatContext context) {
 		return false;
 	}

@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2007 the original author or authors.
+ * Copyright 2006-2013 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -49,7 +49,7 @@ import org.springframework.batch.core.step.StepSupport;
 
 /**
  * @author Dave Syer
- * 
+ *
  */
 public class FlowJobTests {
 
@@ -361,7 +361,7 @@ public class FlowJobTests {
 		List<StateTransition> transitions = new ArrayList<StateTransition>();
 		transitions.add(StateTransition.createStateTransition(new StepState(new StubStep("step1")), "end"));
 		transitions
-				.add(StateTransition.createStateTransition(new EndState(FlowExecutionStatus.FAILED, "end"), "step2"));
+		.add(StateTransition.createStateTransition(new EndState(FlowExecutionStatus.FAILED, "end"), "step2"));
 		transitions.add(StateTransition.createStateTransition(new StepState(new StubStep("step2")), ExitStatus.FAILED
 				.getExitCode(), "end0"));
 		transitions.add(StateTransition.createStateTransition(new StepState(new StubStep("step2")),
@@ -450,6 +450,7 @@ public class FlowJobTests {
 
 		SimpleFlow flow = new SimpleFlow("job");
 		JobExecutionDecider decider = new JobExecutionDecider() {
+			@Override
 			public FlowExecutionStatus decide(JobExecution jobExecution, StepExecution stepExecution) {
 				assertNotNull(stepExecution);
 				return new FlowExecutionStatus("SWITCH");
@@ -490,6 +491,7 @@ public class FlowJobTests {
 
 		SimpleFlow flow = new SimpleFlow("job");
 		JobExecutionDecider decider = new JobExecutionDecider() {
+			@Override
 			public FlowExecutionStatus decide(JobExecution jobExecution, StepExecution stepExecution) {
 				assertNotNull(stepExecution);
 				throw new RuntimeException("Foo");
@@ -667,7 +669,7 @@ public class FlowJobTests {
 	/**
 	/**
 	 * @author Dave Syer
-	 * 
+	 *
 	 */
 	private class StubStep extends StepSupport {
 
@@ -675,6 +677,7 @@ public class FlowJobTests {
 			super(name);
 		}
 
+		@Override
 		public void execute(StepExecution stepExecution) throws JobInterruptedException {
 			stepExecution.setStatus(BatchStatus.COMPLETED);
 			stepExecution.setExitStatus(ExitStatus.COMPLETED);

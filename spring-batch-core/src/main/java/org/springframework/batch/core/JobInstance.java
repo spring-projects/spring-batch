@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2007 the original author or authors.
+ * Copyright 2006-2013 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,20 +23,21 @@ import org.springframework.util.Assert;
  * identity is given by the pair {@link Job} and {@link JobParameters}.
  * JobInstance can be restarted multiple times in case of execution failure and
  * it's lifecycle ends with first successful execution.
- * 
+ *
  * Trying to execute an existing JobIntance that has already completed
  * successfully will result in error. Error will be raised also for an attempt
  * to restart a failed JobInstance if the Job is not restartable.
- * 
+ *
  * @see Job
  * @see JobParameters
  * @see JobExecution
- * 
+ *
  * @author Lucas Ward
  * @author Dave Syer
  * @author Robert Kasanicky
- * 
+ *
  */
+@SuppressWarnings("unchecked")
 public class JobInstance extends Entity {
 
 	private final JobParameters jobParameters;
@@ -65,6 +66,7 @@ public class JobInstance extends Entity {
 		return jobName;
 	}
 
+	@Override
 	public String toString() {
 		return super.toString() + ", JobParameters=[" + jobParameters + "]" + ", Job=[" + jobName + "]";
 	}

@@ -47,6 +47,7 @@ public class CompositeCompletionPolicyTests extends TestCase {
 		CompositeCompletionPolicy policy = new CompositeCompletionPolicy();
 		policy.setPolicies(new CompletionPolicy[] { new MockCompletionPolicySupport(),
 				new MockCompletionPolicySupport() {
+                    @Override
 					public boolean isComplete(RepeatContext context) {
 						return true;
 					}
@@ -59,6 +60,7 @@ public class CompositeCompletionPolicyTests extends TestCase {
 		CompositeCompletionPolicy policy = new CompositeCompletionPolicy();
 		policy.setPolicies(new CompletionPolicy[] { new MockCompletionPolicySupport(),
 				new MockCompletionPolicySupport() {
+                    @Override
 					public boolean isComplete(RepeatContext context, RepeatStatus result) {
 						return true;
 					}
