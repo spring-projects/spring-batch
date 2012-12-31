@@ -36,7 +36,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
-import org.springframework.batch.support.JdbcTestUtils;
+import org.springframework.test.jdbc.JdbcTestUtils;
 
 /**
  * @author Dave Syer
