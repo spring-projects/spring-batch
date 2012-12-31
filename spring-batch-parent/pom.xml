@@ -27,6 +27,11 @@
 			<name>Dave Syer</name>
 			<email>david.syer@springsource.com</email>
 		</developer>
+		<developer>
+			<id>mminella</id>
+			<name>Michael Minella</name>
+			<email>mminella@vmware.com</email>
+		</developer>
 	</developers>
 	<properties>
 		<spring.framework.version>3.2.0.RELEASE</spring.framework.version>
@@ -422,7 +427,7 @@
 			<dependency>
 				<groupId>org.hibernate</groupId>
 				<artifactId>hibernate-core</artifactId>
-				<version>3.3.2.GA</version>
+				<version>4.1.9.Final</version>
 				<optional>true</optional>
 				<exclusions>
 					<exclusion>
@@ -446,7 +451,7 @@
 			<dependency>
 				<groupId>org.hibernate</groupId>
 				<artifactId>hibernate-entitymanager</artifactId>
-				<version>3.3.2.GA</version>
+				<version>4.1.9.Final</version>
 				<optional>true</optional>
 				<exclusions>
 					<exclusion>

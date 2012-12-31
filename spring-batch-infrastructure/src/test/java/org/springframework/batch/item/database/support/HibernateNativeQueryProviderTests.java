@@ -22,8 +22,8 @@ import static org.easymock.EasyMock.replay;
 import static org.easymock.EasyMock.verify;
 
 import org.hibernate.SQLQuery;
+import org.hibernate.Session;
 import org.hibernate.StatelessSession;
-import org.hibernate.classic.Session;
 import org.junit.Test;
 import org.springframework.batch.item.database.orm.HibernateNativeQueryProvider;
 import org.springframework.util.Assert;
@@ -78,7 +78,7 @@ public class HibernateNativeQueryProviderTests {
 
 		verify(session, query);
 	}
-	
+
 	private static class Foo {
 	}
 
