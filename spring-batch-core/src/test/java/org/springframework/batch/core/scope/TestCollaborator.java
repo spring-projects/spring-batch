@@ -4,15 +4,16 @@ import java.io.Serializable;
 import java.util.List;
 
 
+@SuppressWarnings("serial")
 public class TestCollaborator implements Collaborator, Serializable {
 
 	private String name;
-	
+
 	private Collaborator parent;
-	
+
 	private List<String> list;
 
-    @Override
+	@Override
 	public List<String> getList() {
 		return list;
 	}
@@ -21,7 +22,7 @@ public class TestCollaborator implements Collaborator, Serializable {
 		this.list = list;
 	}
 
-    @Override
+	@Override
 	public Collaborator getParent() {
 		return parent;
 	}
@@ -30,7 +31,7 @@ public class TestCollaborator implements Collaborator, Serializable {
 		this.parent = parent;
 	}
 
-    @Override
+	@Override
 	public String getName() {
 		return name;
 	}

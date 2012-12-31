@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 the original author or authors.
+ * Copyright 2012-2013 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -30,34 +30,34 @@ import org.springframework.util.Assert;
  * @author Chris Schaefer
  */
 public class AmqpItemReader<T> implements ItemReader<T> {
-    private final AmqpTemplate amqpTemplate;
-    private Class<? extends T> itemType;
+	private final AmqpTemplate amqpTemplate;
+	private Class<? extends T> itemType;
 
-    public AmqpItemReader(final AmqpTemplate amqpTemplate) {
-        Assert.notNull(amqpTemplate, "AmpqTemplate must not be null");
+	public AmqpItemReader(final AmqpTemplate amqpTemplate) {
+		Assert.notNull(amqpTemplate, "AmpqTemplate must not be null");
 
-        this.amqpTemplate = amqpTemplate;
-    }
+		this.amqpTemplate = amqpTemplate;
+	}
 
-    @Override
-    @SuppressWarnings("unchecked")
-    public T read() {
-        if (itemType != null && itemType.isAssignableFrom(Message.class)) {
-            return (T) amqpTemplate.receive();
-        }
+	@Override
+	@SuppressWarnings("unchecked")
+	public T read() {
+		if (itemType != null && itemType.isAssignableFrom(Message.class)) {
+			return (T) amqpTemplate.receive();
+		}
 
-        Object result = amqpTemplate.receiveAndConvert();
+		Object result = amqpTemplate.receiveAndConvert();
 
-        if (itemType != null && result != null) {
-            Assert.state(itemType.isAssignableFrom(result.getClass()),
-                    "Received message payload of wrong type: expected [" + itemType + "]");
-        }
+		if (itemType != null && result != null) {
+			Assert.state(itemType.isAssignableFrom(result.getClass()),
+					"Received message payload of wrong type: expected [" + itemType + "]");
+		}
 
-        return (T) result;
-    }
+		return (T) result;
+	}
 
-    public void setItemType(Class<? extends T> itemType) {
-        Assert.notNull(itemType, "Item type cannot be null");
-        this.itemType = itemType;
-    }
+	public void setItemType(Class<? extends T> itemType) {
+		Assert.notNull(itemType, "Item type cannot be null");
+		this.itemType = itemType;
+	}
 }

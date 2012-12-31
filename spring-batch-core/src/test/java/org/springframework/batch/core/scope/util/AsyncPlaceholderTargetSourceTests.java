@@ -47,7 +47,7 @@ public class AsyncPlaceholderTargetSourceTests implements BeanFactoryAware {
 
 	private int beanCount;
 
-    @Override
+	@Override
 	public void setBeanFactory(BeanFactory beanFactory) throws BeansException {
 		this.beanFactory = (ListableBeanFactory) beanFactory;
 	}
@@ -80,7 +80,7 @@ public class AsyncPlaceholderTargetSourceTests implements BeanFactoryAware {
 		for (int i = 0; i < 12; i++) {
 			final String value = "foo" + i;
 			FutureTask<String> task = new FutureTask<String>(new Callable<String>() {
-                @Override
+				@Override
 				public String call() throws Exception {
 					attributes.set(Collections.singletonMap("foo", value));
 					try {
@@ -107,7 +107,7 @@ public class AsyncPlaceholderTargetSourceTests implements BeanFactoryAware {
 
 		private Object root;
 
-        @Override
+		@Override
 		public Object getContext() {
 			return root;
 		}
@@ -132,7 +132,7 @@ public class AsyncPlaceholderTargetSourceTests implements BeanFactoryAware {
 
 		private Log logger = LogFactory.getLog(getClass());
 
-        @Override
+		@Override
 		public String getName() {
 			return name;
 		}

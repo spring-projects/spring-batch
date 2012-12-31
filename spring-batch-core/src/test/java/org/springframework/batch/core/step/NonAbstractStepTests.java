@@ -4,7 +4,6 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -51,7 +50,7 @@ public class NonAbstractStepTests {
 			setBeanName("eventTrackingStep");
 		}
 
-        @Override
+		@Override
 		protected void open(ExecutionContext ctx) throws Exception {
 			events.add("open");
 		}
@@ -63,7 +62,7 @@ public class NonAbstractStepTests {
 			context.setExitStatus(ExitStatus.COMPLETED);
 		}
 
-        @Override
+		@Override
 		protected void close(ExecutionContext ctx) throws Exception {
 			events.add("close");
 		}
@@ -84,7 +83,7 @@ public class NonAbstractStepTests {
 			return name + "#" + event;
 		}
 
-        @Override
+		@Override
 		public ExitStatus afterStep(StepExecution stepExecution) {
 			assertSame(execution, stepExecution);
 			events.add(getEvent("afterStep(" + stepExecution.getExitStatus().getExitCode() + ")"));
@@ -92,7 +91,7 @@ public class NonAbstractStepTests {
 			return stepExecution.getExitStatus();
 		}
 
-        @Override
+		@Override
 		public void beforeStep(StepExecution stepExecution) {
 			assertSame(execution, stepExecution);
 			events.add(getEvent("beforeStep"));
@@ -110,7 +109,7 @@ public class NonAbstractStepTests {
 
 		static long counter = 0;
 
-        @Override
+		@Override
 		public void updateExecutionContext(StepExecution stepExecution) {
 			Assert.state(stepExecution.getId() != null, "StepExecution must already be saved");
 			saved = stepExecution.getExecutionContext();
@@ -291,7 +290,7 @@ public class NonAbstractStepTests {
 			}
 		};
 		repository = new JobRepositoryStub() {
-            @Override
+			@Override
 			public void updateExecutionContext(StepExecution stepExecution) {
 				throw new RuntimeException("Bad context!");
 			}

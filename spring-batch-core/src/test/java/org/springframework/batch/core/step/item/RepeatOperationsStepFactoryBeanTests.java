@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2007 the original author or authors.
+ * Copyright 2006-2013 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -36,7 +36,7 @@ import org.springframework.batch.support.transaction.ResourcelessTransactionMana
 
 /**
  * @author Dave Syer
- * 
+ *
  */
 public class RepeatOperationsStepFactoryBeanTests extends TestCase {
 
@@ -46,7 +46,7 @@ public class RepeatOperationsStepFactoryBeanTests extends TestCase {
 
 	private JobExecution jobExecution = new JobExecution(new JobInstance(0L, new JobParameters(), "job"));
 
-    @Override
+	@Override
 	protected void setUp() throws Exception {
 		factory.setBeanName("RepeatOperationsStep");
 		factory.setItemReader(new ListItemReader<String>(new ArrayList<String>()));
@@ -72,7 +72,7 @@ public class RepeatOperationsStepFactoryBeanTests extends TestCase {
 
 		factory.setStepOperations(new RepeatOperations() {
 
-            @Override
+			@Override
 			public RepeatStatus iterate(RepeatCallback callback) {
 				list = new ArrayList<String>();
 				list.add("foo");

@@ -6,7 +6,7 @@ import org.springframework.batch.core.JobParametersIncrementer;
 
 public class TestJobParametersIncrementer implements JobParametersIncrementer {
 
-    @Override
+	@Override
 	public JobParameters getNext(JobParameters parameters) {
 		return  new JobParametersBuilder().addString("foo", "spam").toJobParameters();
 	}

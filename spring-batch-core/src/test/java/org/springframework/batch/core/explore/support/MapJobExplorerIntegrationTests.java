@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2007 the original author or authors.
+ * Copyright 2006-2013 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,7 +24,6 @@ import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.JobParametersBuilder;
 import org.springframework.batch.core.StepContribution;
 import org.springframework.batch.core.explore.JobExplorer;
-import org.springframework.batch.core.explore.support.MapJobExplorerFactoryBean;
 import org.springframework.batch.core.job.SimpleJob;
 import org.springframework.batch.core.launch.support.SimpleJobLauncher;
 import org.springframework.batch.core.repository.JobRepository;
@@ -37,7 +36,7 @@ import org.springframework.core.task.SimpleAsyncTaskExecutor;
 
 /**
  * @author Dave Syer
- * 
+ *
  */
 public class MapJobExplorerIntegrationTests {
 
@@ -57,7 +56,7 @@ public class MapJobExplorerIntegrationTests {
 		SimpleJob job = new SimpleJob("job");
 		TaskletStep step = new TaskletStep("step");
 		step.setTasklet(new Tasklet() {
-            @Override
+			@Override
 			public RepeatStatus execute(StepContribution contribution, ChunkContext chunkContext) throws Exception {
 				while (block) {
 					Thread.sleep(100L);

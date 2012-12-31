@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2007 the original author or authors.
+ * Copyright 2006-2013 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -50,16 +50,17 @@ import org.springframework.transaction.interceptor.TransactionAttribute;
 /**
  * Most common configuration options for simple steps should be found here. Use this factory bean instead of creating a
  * {@link Step} implementation manually.
- * 
+ *
  * This factory does not support configuration of fault-tolerant behavior, use appropriate subclass of this factory bean
  * to configure skip or retry.
- * 
+ *
  * @see FaultTolerantStepFactoryBean
- * 
+ *
  * @author Dave Syer
  * @author Robert Kasanicky
- * 
+ *
  */
+@SuppressWarnings("rawtypes")
 public class SimpleStepFactoryBean<T, S> implements FactoryBean, BeanNameAware {
 
 	private String name;
@@ -118,7 +119,7 @@ public class SimpleStepFactoryBean<T, S> implements FactoryBean, BeanNameAware {
 	/**
 	 * Flag to signal that the reader is transactional (usually a JMS consumer) so that items are re-presented after a
 	 * rollback. The default is false and readers are assumed to be forward-only.
-	 * 
+	 *
 	 * @param isReaderTransactionalQueue the value of the flag
 	 */
 	public void setIsReaderTransactionalQueue(boolean isReaderTransactionalQueue) {
@@ -135,10 +136,10 @@ public class SimpleStepFactoryBean<T, S> implements FactoryBean, BeanNameAware {
 
 	/**
 	 * Set the bean name property, which will become the name of the {@link Step} when it is created.
-	 * 
+	 *
 	 * @see org.springframework.beans.factory.BeanNameAware#setBeanName(java.lang.String)
 	 */
-    @Override
+	@Override
 	public void setBeanName(String name) {
 		this.name = name;
 	}
@@ -153,7 +154,7 @@ public class SimpleStepFactoryBean<T, S> implements FactoryBean, BeanNameAware {
 
 	/**
 	 * The timeout for an individual transaction in the step.
-	 * 
+	 *
 	 * @param transactionTimeout the transaction timeout to set, defaults to infinite
 	 */
 	public void setTransactionTimeout(int transactionTimeout) {
@@ -176,7 +177,7 @@ public class SimpleStepFactoryBean<T, S> implements FactoryBean, BeanNameAware {
 
 	/**
 	 * Public setter for the start limit for the step.
-	 * 
+	 *
 	 * @param startLimit the startLimit to set
 	 */
 	public void setStartLimit(int startLimit) {
@@ -186,7 +187,7 @@ public class SimpleStepFactoryBean<T, S> implements FactoryBean, BeanNameAware {
 	/**
 	 * Public setter for the flag to indicate that the step should be replayed on a restart, even if successful the
 	 * first time.
-	 * 
+	 *
 	 * @param allowStartIfComplete the shouldAllowStartIfComplete to set
 	 */
 	public void setAllowStartIfComplete(boolean allowStartIfComplete) {
@@ -217,7 +218,7 @@ public class SimpleStepFactoryBean<T, S> implements FactoryBean, BeanNameAware {
 	/**
 	 * The streams to inject into the {@link Step}. Any instance of {@link ItemStream} can be used, and will then
 	 * receive callbacks at the appropriate stage in the step.
-	 * 
+	 *
 	 * @param streams an array of listeners
 	 */
 	public void setStreams(ItemStream[] streams) {
@@ -227,7 +228,7 @@ public class SimpleStepFactoryBean<T, S> implements FactoryBean, BeanNameAware {
 	/**
 	 * The listeners to inject into the {@link Step}. Any instance of {@link StepListener} can be used, and will then
 	 * receive callbacks at the appropriate stage in the step.
-	 * 
+	 *
 	 * @param listeners an array of listeners
 	 */
 	public void setListeners(StepListener[] listeners) {
@@ -268,7 +269,7 @@ public class SimpleStepFactoryBean<T, S> implements FactoryBean, BeanNameAware {
 
 	/**
 	 * Public setter for {@link JobRepository}.
-	 * 
+	 *
 	 * @param jobRepository is a mandatory dependence (no default).
 	 */
 	public void setJobRepository(JobRepository jobRepository) {
@@ -277,7 +278,7 @@ public class SimpleStepFactoryBean<T, S> implements FactoryBean, BeanNameAware {
 
 	/**
 	 * Public setter for the {@link PlatformTransactionManager}.
-	 * 
+	 *
 	 * @param transactionManager the transaction manager to set
 	 */
 	public void setTransactionManager(PlatformTransactionManager transactionManager) {
@@ -312,10 +313,10 @@ public class SimpleStepFactoryBean<T, S> implements FactoryBean, BeanNameAware {
 
 	/**
 	 * Create a {@link Step} from the configuration provided.
-	 * 
+	 *
 	 * @see FactoryBean#getObject()
 	 */
-    @Override
+	@Override
 	public final Object getObject() throws Exception {
 		SimpleStepBuilder<T, S> builder = createBuilder(getName());
 		applyConfiguration(builder);
@@ -327,7 +328,7 @@ public class SimpleStepFactoryBean<T, S> implements FactoryBean, BeanNameAware {
 		return new SimpleStepBuilder<T, S>(new StepBuilder(name));
 	}
 
-    @Override
+	@Override
 	public Class<TaskletStep> getObjectType() {
 		return TaskletStep.class;
 	}
@@ -335,10 +336,10 @@ public class SimpleStepFactoryBean<T, S> implements FactoryBean, BeanNameAware {
 	/**
 	 * Returns true by default, but in most cases a {@link Step} should not be treated as thread safe. Clients are
 	 * recommended to create a new step for each job execution.
-	 * 
+	 *
 	 * @see org.springframework.beans.factory.FactoryBean#isSingleton()
 	 */
-    @Override
+	@Override
 	public boolean isSingleton() {
 		return this.singleton;
 	}
@@ -353,7 +354,7 @@ public class SimpleStepFactoryBean<T, S> implements FactoryBean, BeanNameAware {
 
 	/**
 	 * Set the commit interval. Either set this or the chunkCompletionPolicy but not both.
-	 * 
+	 *
 	 * @param commitInterval 1 by default
 	 */
 	public void setCommitInterval(int commitInterval) {
@@ -364,7 +365,7 @@ public class SimpleStepFactoryBean<T, S> implements FactoryBean, BeanNameAware {
 	 * Public setter for the {@link CompletionPolicy} applying to the chunk level. A transaction will be committed when
 	 * this policy decides to complete. Defaults to a {@link SimpleCompletionPolicy} with chunk size equal to the
 	 * commitInterval property.
-	 * 
+	 *
 	 * @param chunkCompletionPolicy the chunkCompletionPolicy to set
 	 */
 	public void setChunkCompletionPolicy(CompletionPolicy chunkCompletionPolicy) {
@@ -422,7 +423,7 @@ public class SimpleStepFactoryBean<T, S> implements FactoryBean, BeanNameAware {
 	/**
 	 * Public setter for the {@link TaskExecutor}. If this is set, then it will be used to execute the chunk processing
 	 * inside the {@link Step}.
-	 * 
+	 *
 	 * @param taskExecutor the taskExecutor to set
 	 */
 	public void setTaskExecutor(TaskExecutor taskExecutor) {

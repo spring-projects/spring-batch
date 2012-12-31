@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2007 the original author or authors.
+ * Copyright 2006-2013 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -64,7 +64,7 @@ import org.springframework.batch.item.ExecutionContext;
 /**
  * Tests for DefaultJobLifecycle. MapJobDao and MapStepExecutionDao are used
  * instead of a mock repository to test that status is being stored correctly.
- * 
+ *
  * @author Lucas Ward
  */
 public class SimpleJobTests {
@@ -110,14 +110,14 @@ public class SimpleJobTests {
 
 		step1 = new StubStep("TestStep1", jobRepository);
 		step1.setCallback(new Runnable() {
-            @Override
+			@Override
 			public void run() {
 				list.add("default");
 			}
 		});
 		step2 = new StubStep("TestStep2", jobRepository);
 		step2.setCallback(new Runnable() {
-            @Override
+			@Override
 			public void run() {
 				list.add("default");
 			}
@@ -175,22 +175,22 @@ public class SimpleJobTests {
 
 		Step testStep = new Step() {
 
-            @Override
+			@Override
 			public void execute(StepExecution stepExecution) throws JobInterruptedException {
 				stepExecution.setExitStatus(customStatus);
 			}
 
-            @Override
+			@Override
 			public String getName() {
 				return "test";
 			}
 
-            @Override
+			@Override
 			public int getStartLimit() {
 				return 1;
 			}
 
-            @Override
+			@Override
 			public boolean isAllowStartIfComplete() {
 				return false;
 			}
@@ -219,12 +219,12 @@ public class SimpleJobTests {
 	@Test
 	public void testRunNormallyWithListener() throws Exception {
 		job.setJobExecutionListeners(new JobExecutionListenerSupport[] { new JobExecutionListenerSupport() {
-            @Override
+			@Override
 			public void beforeJob(JobExecution jobExecution) {
 				list.add("before");
 			}
 
-            @Override
+			@Override
 			public void afterJob(JobExecution jobExecution) {
 				list.add("after");
 			}
@@ -299,7 +299,7 @@ public class SimpleJobTests {
 	@Test
 	public void testFailedWithListener() throws Exception {
 		job.setJobExecutionListeners(new JobExecutionListenerSupport[] { new JobExecutionListenerSupport() {
-            @Override
+			@Override
 			public void afterJob(JobExecution jobExecution) {
 				list.add("afterJob");
 			}
@@ -487,9 +487,9 @@ public class SimpleJobTests {
 
 		step1 = new StubStep("interruptStep", jobRepository) {
 
-            @Override
+			@Override
 			public void execute(StepExecution stepExecution) throws JobInterruptedException,
-					UnexpectedJobExecutionException {
+			UnexpectedJobExecutionException {
 				stepExecution.getJobExecution().stop();
 				super.execute(stepExecution);
 			}
@@ -580,13 +580,13 @@ public class SimpleJobTests {
 
 		/*
 		 * (non-Javadoc)
-		 * 
+		 *
 		 * @seeorg.springframework.batch.core.step.StepSupport#execute(org.
 		 * springframework.batch.core.StepExecution)
 		 */
-        @Override
+		@Override
 		public void execute(StepExecution stepExecution) throws JobInterruptedException,
-				UnexpectedJobExecutionException {
+		UnexpectedJobExecutionException {
 
 			passedInJobContext = new ExecutionContext(stepExecution.getJobExecution().getExecutionContext());
 			passedInStepContext = new ExecutionContext(stepExecution.getExecutionContext());

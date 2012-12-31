@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2008 the original author or authors.
+ * Copyright 2006-2013 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -44,18 +44,18 @@ import org.springframework.util.Assert;
  * be taken to ensure any users of this class understand fully whether or not
  * the implementation of TaskExecutor used will start tasks synchronously or
  * asynchronously. The default setting uses a synchronous task executor.
- * 
+ *
  * There is only one required dependency of this Launcher, a
  * {@link JobRepository}. The JobRepository is used to obtain a valid
  * JobExecution. The Repository must be used because the provided {@link Job}
  * could be a restart of an existing {@link JobInstance}, and only the
  * Repository can reliably recreate it.
- * 
+ *
  * @author Lucas Ward
  * @Author Dave Syer
- * 
+ *
  * @since 1.0
- * 
+ *
  * @see JobRepository
  * @see TaskExecutor
  */
@@ -71,7 +71,7 @@ public class SimpleJobLauncher implements JobLauncher, InitializingBean {
 	 * Run the provided job with the given {@link JobParameters}. The
 	 * {@link JobParameters} will be used to determine if this is an execution
 	 * of an existing job instance, or if a new one should be created.
-	 * 
+	 *
 	 * @param job the job to be run.
 	 * @param jobParameters the {@link JobParameters} for this particular
 	 * execution.
@@ -83,7 +83,7 @@ public class SimpleJobLauncher implements JobLauncher, InitializingBean {
 	 * completed successfully
 	 * @throws JobParametersInvalidException
 	 */
-    @Override
+	@Override
 	public JobExecution run(final Job job, final JobParameters jobParameters)
 			throws JobExecutionAlreadyRunningException, JobRestartException, JobInstanceAlreadyCompleteException,
 			JobParametersInvalidException {
@@ -114,7 +114,7 @@ public class SimpleJobLauncher implements JobLauncher, InitializingBean {
 		try {
 			taskExecutor.execute(new Runnable() {
 
-                @Override
+				@Override
 				public void run() {
 					try {
 						logger.info("Job: [" + job + "] launched with the following parameters: [" + jobParameters
@@ -155,7 +155,7 @@ public class SimpleJobLauncher implements JobLauncher, InitializingBean {
 
 	/**
 	 * Set the JobRepsitory.
-	 * 
+	 *
 	 * @param jobRepository
 	 */
 	public void setJobRepository(JobRepository jobRepository) {
@@ -164,7 +164,7 @@ public class SimpleJobLauncher implements JobLauncher, InitializingBean {
 
 	/**
 	 * Set the TaskExecutor. (Optional)
-	 * 
+	 *
 	 * @param taskExecutor
 	 */
 	public void setTaskExecutor(TaskExecutor taskExecutor) {
@@ -175,7 +175,7 @@ public class SimpleJobLauncher implements JobLauncher, InitializingBean {
 	 * Ensure the required dependencies of a {@link JobRepository} have been
 	 * set.
 	 */
-    @Override
+	@Override
 	public void afterPropertiesSet() throws Exception {
 		Assert.state(jobRepository != null, "A JobRepository has not been set.");
 		if (taskExecutor == null) {

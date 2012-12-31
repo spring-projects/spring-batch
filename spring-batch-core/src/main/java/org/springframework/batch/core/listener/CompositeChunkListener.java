@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2007 the original author or authors.
+ * Copyright 2006-2013 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,7 +23,7 @@ import org.springframework.core.Ordered;
 
 /**
  * @author Lucas Ward
- * 
+ *
  */
 public class CompositeChunkListener implements ChunkListener {
 
@@ -31,7 +31,7 @@ public class CompositeChunkListener implements ChunkListener {
 
 	/**
 	 * Public setter for the listeners.
-	 * 
+	 *
 	 * @param listeners
 	 */
 	public void setListeners(List<? extends ChunkListener> listeners) {
@@ -40,7 +40,7 @@ public class CompositeChunkListener implements ChunkListener {
 
 	/**
 	 * Register additional listener.
-	 * 
+	 *
 	 * @param chunkListener
 	 */
 	public void register(ChunkListener chunkListener) {
@@ -50,10 +50,10 @@ public class CompositeChunkListener implements ChunkListener {
 	/**
 	 * Call the registered listeners in order, respecting and prioritising those
 	 * that implement {@link Ordered}.
-	 * 
+	 *
 	 * @see org.springframework.batch.core.ChunkListener#afterChunk()
 	 */
-    @Override
+	@Override
 	public void afterChunk() {
 		for (Iterator<ChunkListener> iterator = listeners.iterator(); iterator.hasNext();) {
 			ChunkListener listener = iterator.next();
@@ -63,10 +63,10 @@ public class CompositeChunkListener implements ChunkListener {
 
 	/**
 	 * Call the registered listeners in reverse order.
-	 * 
+	 *
 	 * @see org.springframework.batch.core.ChunkListener#beforeChunk()
 	 */
-    @Override
+	@Override
 	public void beforeChunk() {
 		for (Iterator<ChunkListener> iterator = listeners.reverse(); iterator.hasNext();) {
 			ChunkListener listener = iterator.next();

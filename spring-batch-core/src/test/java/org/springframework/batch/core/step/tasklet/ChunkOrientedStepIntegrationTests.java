@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2007 the original author or authors.
+ * Copyright 2006-2013 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -48,7 +48,7 @@ import org.springframework.transaction.support.TransactionSynchronizationManager
 
 /**
  * @author Dave Syer
- * 
+ *
  */
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(locations = "/org/springframework/batch/core/repository/dao/sql-dao-test.xml")
@@ -87,22 +87,23 @@ public class ChunkOrientedStepIntegrationTests {
 
 	}
 
+	@SuppressWarnings("serial")
 	@Test
 	public void testStatusForCommitFailedException() throws Exception {
 
 		step.setTasklet(new TestingChunkOrientedTasklet<String>(getReader(new String[] { "a", "b", "c" }),
 				new ItemWriter<String>() {
-                    @Override
-					public void write(List<? extends String> data) throws Exception {
-						TransactionSynchronizationManager
-								.registerSynchronization(new TransactionSynchronizationAdapter() {
-                                    @Override
-									public void beforeCommit(boolean readOnly) {
-										throw new RuntimeException("Simulate commit failure");
-									}
-								});
+			@Override
+			public void write(List<? extends String> data) throws Exception {
+				TransactionSynchronizationManager
+				.registerSynchronization(new TransactionSynchronizationAdapter() {
+					@Override
+					public void beforeCommit(boolean readOnly) {
+						throw new RuntimeException("Simulate commit failure");
 					}
-				}, chunkOperations));
+				});
+			}
+		}, chunkOperations));
 
 		JobExecution jobExecution = jobRepository.createJobExecution(job.getName(), new JobParameters(Collections
 				.singletonMap("run.id", new JobParameter(getClass().getName() + ".1"))));

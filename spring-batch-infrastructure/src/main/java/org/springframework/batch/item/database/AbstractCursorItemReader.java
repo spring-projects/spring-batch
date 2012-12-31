@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2009 the original author or authors.
+ * Copyright 2006-2013 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -45,27 +45,27 @@ import org.springframework.util.Assert;
 
 /**
  * <p>
- * Abstract base class for any simple item reader that opens a database cursor and continually retrieves 
- * the next row in the ResultSet. 
+ * Abstract base class for any simple item reader that opens a database cursor and continually retrieves
+ * the next row in the ResultSet.
  * </p>
- * 
+ *
  * <p>
  * By default the cursor will be opened using a separate connection. The ResultSet for the cursor
- * is held open regardless of commits or roll backs in a surrounding transaction. Clients of this 
+ * is held open regardless of commits or roll backs in a surrounding transaction. Clients of this
  * reader are responsible for buffering the items in the case that they need to be re-presented on a
  * rollback. This buffering is handled by the step implementations provided and is only a concern for
  * anyone writing their own step implementations.
  * </p>
- * 
+ *
  * <p>
- * There is an option ({@link #setUseSharedExtendedConnection(boolean)} that will share the connection 
- * used for the cursor with the rest of the step processing. If you set this flag to <code>true</code> 
- * then you must wrap the DataSource in a {@link ExtendedConnectionDataSourceProxy} to prevent the 
- * connection from being closed and released after each commit performed as part of the step processing. 
- * You must also use a JDBC driver supporting JDBC 3.0 or later since the cursor will be opened with the 
- * additional option of 'HOLD_CUSORS_OVER_COMMIT' enabled. 
+ * There is an option ({@link #setUseSharedExtendedConnection(boolean)} that will share the connection
+ * used for the cursor with the rest of the step processing. If you set this flag to <code>true</code>
+ * then you must wrap the DataSource in a {@link ExtendedConnectionDataSourceProxy} to prevent the
+ * connection from being closed and released after each commit performed as part of the step processing.
+ * You must also use a JDBC driver supporting JDBC 3.0 or later since the cursor will be opened with the
+ * additional option of 'HOLD_CUSORS_OVER_COMMIT' enabled.
  * </p>
- * 
+ *
  * <p>
  * Each call to {@link #read()} will attempt to map the row at the current position in the
  * ResultSet. There is currently no wrapping of the ResultSet to suppress calls
@@ -76,7 +76,7 @@ import org.springframework.util.Assert;
  * restartability. This ensures that each call to {@link #read()} returns the
  * ResultSet at the correct row, regardless of rollbacks or restarts.
  * </p>
- * 
+ *
  * <p>
  * {@link ExecutionContext}: The current row is returned as restart data, and
  * when restored from that same data, the cursor is opened and the current row
@@ -84,56 +84,56 @@ import org.springframework.util.Assert;
  * {@link #setDriverSupportsAbsolute(boolean)} for improving restart
  * performance.
  * </p>
- * 
+ *
  * <p>
  * Calling close on this {@link ItemStream} will cause all resources it is
  * currently using to be freed. (Connection, ResultSet, etc). It is then illegal
  * to call {@link #read()} again until it has been re-opened.
  * </p>
- * 
+ *
  * <p>
  * Known limitation: when used with Derby
  * {@link #setVerifyCursorPosition(boolean)} needs to be <code>false</code>
  * because {@link ResultSet#getRow()} call used for cursor position verification
  * is not available for 'TYPE_FORWARD_ONLY' result sets.
  * </p>
- * 
+ *
  * @author Lucas Ward
  * @author Peter Zozom
  * @author Robert Kasanicky
  * @author Thomas Risberg
  */
 public abstract class AbstractCursorItemReader<T> extends AbstractItemCountingItemStreamItemReader<T>
-		implements InitializingBean {
+implements InitializingBean {
 
 	/** Logger available to subclasses */
 	protected final Log log = LogFactory.getLog(getClass());
 
 	public static final int VALUE_NOT_SET = -1;
 	private Connection con;
-	
+
 	protected ResultSet rs;
-	
+
 	private DataSource dataSource;
-	
+
 	private int fetchSize = VALUE_NOT_SET;
-	
+
 	private int maxRows = VALUE_NOT_SET;
-	
+
 	private int queryTimeout = VALUE_NOT_SET;
-	
+
 	private boolean ignoreWarnings = true;
-	
+
 	private boolean verifyCursorPosition = true;
-	
+
 	private SQLExceptionTranslator exceptionTranslator;
-	
+
 	private boolean initialized = false;
-	
+
 	private boolean driverSupportsAbsolute = false;
-	
+
 	private boolean useSharedExtendedConnection = false;
-	
+
 
 	public AbstractCursorItemReader() {
 		super();
@@ -141,18 +141,18 @@ public abstract class AbstractCursorItemReader<T> extends AbstractItemCountingIt
 
 	/**
 	 * Assert that mandatory properties are set.
-	 * 
+	 *
 	 * @throws IllegalArgumentException if either data source or sql properties
 	 * not set.
 	 */
-    @Override
+	@Override
 	public void afterPropertiesSet() throws Exception {
 		Assert.notNull(dataSource, "DataSource must be provided");
 	}
 
 	/**
 	 * Public setter for the data source for injection purposes.
-	 * 
+	 *
 	 * @param dataSource
 	 */
 	public void setDataSource(DataSource dataSource) {
@@ -161,7 +161,7 @@ public abstract class AbstractCursorItemReader<T> extends AbstractItemCountingIt
 
 	/**
 	 * Public getter for the data source.
-	 * 
+	 *
 	 * @return the dataSource
 	 */
 	public DataSource getDataSource() {
@@ -173,7 +173,7 @@ public abstract class AbstractCursorItemReader<T> extends AbstractItemCountingIt
 	 * CallableStatement), applying statement settings such as fetch size, max
 	 * rows, and query timeout. @param stmt the JDBC Statement to prepare
 	 * @throws SQLException
-	 * 
+	 *
 	 * @see #setFetchSize
 	 * @see #setMaxRows
 	 * @see #setQueryTimeout
@@ -193,7 +193,7 @@ public abstract class AbstractCursorItemReader<T> extends AbstractItemCountingIt
 
 	/**
 	 * Return the exception translator for this instance.
-	 * 
+	 *
 	 * Creates a default SQLErrorCodeSQLExceptionTranslator for the specified
 	 * DataSource if none is set.
 	 */
@@ -214,31 +214,31 @@ public abstract class AbstractCursorItemReader<T> extends AbstractItemCountingIt
 	/**
 	 * Throw a SQLWarningException if we're not ignoring warnings, else log the
 	 * warnings (at debug level).
-	 * 
+	 *
 	 * @param statement the current statement to obtain the warnings from, if there are any.
 	 * @throws SQLException
-	 * 
+	 *
 	 * @see org.springframework.jdbc.SQLWarningException
 	 */
 	protected void handleWarnings(Statement statement) throws SQLWarningException,
-			SQLException {
-				if (ignoreWarnings) {
-					if (log.isDebugEnabled()) {
-						SQLWarning warningToLog = statement.getWarnings();
-						while (warningToLog != null) {
-							log.debug("SQLWarning ignored: SQL state '" + warningToLog.getSQLState() + "', error code '"
-									+ warningToLog.getErrorCode() + "', message [" + warningToLog.getMessage() + "]");
-							warningToLog = warningToLog.getNextWarning();
-						}
-					}
-				}
-				else {
-					SQLWarning warnings = statement.getWarnings();
-					if (warnings != null) {
-						throw new SQLWarningException("Warning not ignored", warnings);
-					}
+	SQLException {
+		if (ignoreWarnings) {
+			if (log.isDebugEnabled()) {
+				SQLWarning warningToLog = statement.getWarnings();
+				while (warningToLog != null) {
+					log.debug("SQLWarning ignored: SQL state '" + warningToLog.getSQLState() + "', error code '"
+							+ warningToLog.getErrorCode() + "', message [" + warningToLog.getMessage() + "]");
+					warningToLog = warningToLog.getNextWarning();
 				}
 			}
+		}
+		else {
+			SQLWarning warnings = statement.getWarnings();
+			if (warnings != null) {
+				throw new SQLWarningException("Warning not ignored", warnings);
+			}
+		}
+	}
 
 	/**
 	 * Moves the cursor in the ResultSet to the position specified by the row
@@ -262,7 +262,7 @@ public abstract class AbstractCursorItemReader<T> extends AbstractItemCountingIt
 	 * fetched from the database when more rows are needed for this
 	 * <code>ResultSet</code> object. If the fetch size specified is zero, the
 	 * JDBC driver ignores the value.
-	 * 
+	 *
 	 * @param fetchSize the number of rows to fetch
 	 * @see ResultSet#setFetchSize(int)
 	 */
@@ -273,7 +273,7 @@ public abstract class AbstractCursorItemReader<T> extends AbstractItemCountingIt
 	/**
 	 * Sets the limit for the maximum number of rows that any
 	 * <code>ResultSet</code> object can contain to the given number.
-	 * 
+	 *
 	 * @param maxRows the new max rows limit; zero means there is no limit
 	 * @see Statement#setMaxRows(int)
 	 */
@@ -285,7 +285,7 @@ public abstract class AbstractCursorItemReader<T> extends AbstractItemCountingIt
 	 * Sets the number of seconds the driver will wait for a
 	 * <code>Statement</code> object to execute to the given number of seconds.
 	 * If the limit is exceeded, an <code>SQLException</code> is thrown.
-	 * 
+	 *
 	 * @param queryTimeout seconds the new query timeout limit in seconds; zero
 	 * means there is no limit
 	 * @see Statement#setQueryTimeout(int)
@@ -297,7 +297,7 @@ public abstract class AbstractCursorItemReader<T> extends AbstractItemCountingIt
 	/**
 	 * Set whether SQLWarnings should be ignored (only logged) or exception
 	 * should be thrown.
-	 * 
+	 *
 	 * @param ignoreWarnings if TRUE, warnings are ignored
 	 */
 	public void setIgnoreWarnings(boolean ignoreWarnings) {
@@ -307,7 +307,7 @@ public abstract class AbstractCursorItemReader<T> extends AbstractItemCountingIt
 	/**
 	 * Allow verification of cursor position after current row is processed by
 	 * RowMapper or RowCallbackHandler. Default value is TRUE.
-	 * 
+	 *
 	 * @param verifyCursorPosition if true, cursor position is verified
 	 */
 	public void setVerifyCursorPosition(boolean verifyCursorPosition) {
@@ -320,9 +320,9 @@ public abstract class AbstractCursorItemReader<T> extends AbstractItemCountingIt
 	 * <code>true</code> for JDBC drivers that supports ResultSet.absolute() as
 	 * it may improve performance, especially if a step fails while working with
 	 * a large data set.
-	 * 
+	 *
 	 * @see ResultSet#absolute(int)
-	 * 
+	 *
 	 * @param driverSupportsAbsolute <code>false</code> by default
 	 */
 	public void setDriverSupportsAbsolute(boolean driverSupportsAbsolute) {
@@ -331,16 +331,16 @@ public abstract class AbstractCursorItemReader<T> extends AbstractItemCountingIt
 
 	/**
 	 * Indicate whether the connection used for the cursor should be used by all other processing
-	 * thus sharing the same transaction. If this is set to false, which is the default, then the 
+	 * thus sharing the same transaction. If this is set to false, which is the default, then the
 	 * cursor will be opened using in its connection and will not participate in any transactions
-	 * started for the rest of the step processing. If you set this flag to true then you must 
+	 * started for the rest of the step processing. If you set this flag to true then you must
 	 * wrap the DataSource in a {@link ExtendedConnectionDataSourceProxy} to prevent the
 	 * connection from being closed and released after each commit.
-	 * 
-	 * When you set this option to <code>true</code> then the statement used to open the cursor 
-	 * will be created with both 'READ_ONLY' and 'HOLD_CUSORS_OVER_COMMIT' options. This allows 
-	 * holding the cursor open over transaction start and commits performed in the step processing. 
-	 * To use this feature you need a database that supports this and a JDBC driver supporting 
+	 *
+	 * When you set this option to <code>true</code> then the statement used to open the cursor
+	 * will be created with both 'READ_ONLY' and 'HOLD_CUSORS_OVER_COMMIT' options. This allows
+	 * holding the cursor open over transaction start and commits performed in the step processing.
+	 * To use this feature you need a database that supports this and a JDBC driver supporting
 	 * JDBC 3.0 or later.
 	 *
 	 * @param useSharedExtendedConnection <code>false</code> by default
@@ -354,7 +354,7 @@ public abstract class AbstractCursorItemReader<T> extends AbstractItemCountingIt
 	}
 
 	public abstract String getSql();
-	
+
 	/**
 	 * Check the result set is in synch with the currentRow attribute. This is
 	 * important to ensure that the user hasn't modified the current row.
@@ -368,10 +368,10 @@ public abstract class AbstractCursorItemReader<T> extends AbstractItemCountingIt
 	}
 
 	/**
-	 * Close the cursor and database connection. Make call to cleanupOnClose so sub classes can cleanup 
+	 * Close the cursor and database connection. Make call to cleanupOnClose so sub classes can cleanup
 	 * any resources they have allocated.
 	 */
-    @Override
+	@Override
 	protected void doClose() throws Exception {
 		initialized = false;
 		JdbcUtils.closeResultSet(this.rs);
@@ -387,7 +387,7 @@ public abstract class AbstractCursorItemReader<T> extends AbstractItemCountingIt
 			JdbcUtils.closeConnection(this.con);
 		}
 	}
-	
+
 	protected abstract void cleanupOnClose()  throws Exception;
 
 	/**
@@ -402,12 +402,12 @@ public abstract class AbstractCursorItemReader<T> extends AbstractItemCountingIt
 		initializeConnection();
 		openCursor(con);
 		initialized = true;
-	
+
 	}
 
 	protected void initializeConnection() {
 		Assert.state(getDataSource() != null, "DataSource must not be null.");
-		
+
 		try {
 			if (useSharedExtendedConnection) {
 				if (!(getDataSource() instanceof ExtendedConnectionDataSourceProxy)) {
@@ -427,19 +427,19 @@ public abstract class AbstractCursorItemReader<T> extends AbstractItemCountingIt
 			throw getExceptionTranslator().translate("Executing query", getSql(), se);
 		}
 	}
-	
+
 	protected abstract void openCursor(Connection con);
-	
+
 	/**
 	 * Read next row and map it to item, verify cursor position if
 	 * {@link #setVerifyCursorPosition(boolean)} is true.
 	 */
-    @Override
+	@Override
 	protected T doRead() throws Exception {
 		if (rs == null) {
 			throw new ReaderNotOpenException("Reader must be open before it can be read.");
 		}
-	
+
 		try {
 			if (!rs.next()) {
 				return null;
@@ -453,11 +453,11 @@ public abstract class AbstractCursorItemReader<T> extends AbstractItemCountingIt
 			throw getExceptionTranslator().translate("Attempt to process next row failed", getSql(), se);
 		}
 	}
-	
+
 	/**
-	 * Read the cursor and map to the type of object this reader should return. This method must be 
+	 * Read the cursor and map to the type of object this reader should return. This method must be
 	 * overriden by subclasses.
-	 *  
+	 *
 	 * @param rs The current result set
 	 * @param currentRow Current position of the result set
 	 * @return the mapped object at the cursor position
@@ -469,7 +469,7 @@ public abstract class AbstractCursorItemReader<T> extends AbstractItemCountingIt
 	 * Use {@link ResultSet#absolute(int)} if possible, otherwise scroll by
 	 * calling {@link ResultSet#next()}.
 	 */
-    @Override
+	@Override
 	protected void jumpToItem(int itemIndex) throws Exception {
 		if (driverSupportsAbsolute) {
 			try {
@@ -480,7 +480,7 @@ public abstract class AbstractCursorItemReader<T> extends AbstractItemCountingIt
 				// traversing ResultSet
 				log.warn("The JDBC driver does not appear to support ResultSet.absolute(). Consider"
 						+ " reverting to the default behavior setting the driverSupportsAbsolute to false", e);
-	
+
 				moveCursorToRow(itemIndex);
 			}
 		}

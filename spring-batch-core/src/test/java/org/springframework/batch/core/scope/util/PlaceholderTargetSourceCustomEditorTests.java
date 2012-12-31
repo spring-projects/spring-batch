@@ -22,7 +22,7 @@ public class PlaceholderTargetSourceCustomEditorTests extends ContextFactorySupp
 
 	private Date date = new Date(1L);
 
-    @Override
+	@Override
 	public Object getContext() {
 		return this;
 	}
@@ -49,7 +49,7 @@ public class PlaceholderTargetSourceCustomEditorTests extends ContextFactorySupp
 		public Foo() {
 		}
 
-        @Override
+		@Override
 		public String getName() {
 			return name;
 		}

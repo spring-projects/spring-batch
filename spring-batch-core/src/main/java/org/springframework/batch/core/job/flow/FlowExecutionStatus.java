@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2007 the original author or authors.
+ * Copyright 2006-2013 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,7 +17,7 @@ package org.springframework.batch.core.job.flow;
 
 /**
  * Represents the status of {@link FlowExecution}.
- * 
+ *
  * @author Dan Garrette
  * @author Dave Syer
  * @since 2.0
@@ -101,13 +101,13 @@ public class FlowExecutionStatus implements Comparable<FlowExecutionStatus> {
 	/**
 	 * Create an ordering on {@link FlowExecutionStatus} instances by comparing
 	 * their statuses.
-	 * 
+	 *
 	 * @see Comparable#compareTo(Object)
-	 * 
+	 *
 	 * @param other
 	 * @return negative, zero or positive as per the contract
 	 */
-    @Override
+	@Override
 	public int compareTo(FlowExecutionStatus other) {
 		Status one = Status.match(this.name);
 		Status two = Status.match(other.name);
@@ -120,7 +120,7 @@ public class FlowExecutionStatus implements Comparable<FlowExecutionStatus> {
 
 	/**
 	 * Check the equality of the statuses.
-	 * 
+	 *
 	 * @see java.lang.Object#equals(java.lang.Object)
 	 */
 	@Override

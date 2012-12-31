@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2009 the original author or authors.
+ * Copyright 2006-2013 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -50,12 +50,12 @@ import org.springframework.util.ClassUtils;
  * such as a {@link JobRepository}, {@link JobExecutionListener}s, and various
  * configuration parameters are set here. Therefore, common error handling and
  * listener calling activities are abstracted away from implementations.
- * 
+ *
  * @author Lucas Ward
  * @author Dave Syer
  */
 public abstract class AbstractJob implements Job, StepLocator, BeanNameAware,
-		InitializingBean {
+InitializingBean {
 
 	protected static final Log logger = LogFactory.getLog(AbstractJob.class);
 
@@ -83,7 +83,7 @@ public abstract class AbstractJob implements Job, StepLocator, BeanNameAware,
 	/**
 	 * Convenience constructor to immediately add name (which is mandatory but
 	 * not final).
-	 * 
+	 *
 	 * @param name
 	 */
 	public AbstractJob(String name) {
@@ -94,7 +94,7 @@ public abstract class AbstractJob implements Job, StepLocator, BeanNameAware,
 	/**
 	 * A validator for job parameters. Defaults to a vanilla
 	 * {@link DefaultJobParametersValidator}.
-	 * 
+	 *
 	 * @param jobParametersValidator
 	 *            a validator instance
 	 */
@@ -105,10 +105,10 @@ public abstract class AbstractJob implements Job, StepLocator, BeanNameAware,
 
 	/**
 	 * Assert mandatory properties: {@link JobRepository}.
-	 * 
+	 *
 	 * @see InitializingBean#afterPropertiesSet()
 	 */
-    @Override
+	@Override
 	public void afterPropertiesSet() throws Exception {
 		Assert.notNull(jobRepository, "JobRepository must be set");
 	}
@@ -119,10 +119,10 @@ public abstract class AbstractJob implements Job, StepLocator, BeanNameAware,
 	 * if it is present. Care is needed with bean definition inheritance - if a
 	 * parent bean has a name, then its children need an explicit name as well,
 	 * otherwise they will not be unique.
-	 * 
+	 *
 	 * @see org.springframework.beans.factory.BeanNameAware#setBeanName(java.lang.String)
 	 */
-    @Override
+	@Override
 	public void setBeanName(String name) {
 		if (this.name == null) {
 			this.name = name;
@@ -132,7 +132,7 @@ public abstract class AbstractJob implements Job, StepLocator, BeanNameAware,
 	/**
 	 * Set the name property. Always overrides the default value if this object
 	 * is a Spring bean.
-	 * 
+	 *
 	 * @see #setBeanName(java.lang.String)
 	 */
 	public void setName(String name) {
@@ -141,10 +141,10 @@ public abstract class AbstractJob implements Job, StepLocator, BeanNameAware,
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see org.springframework.batch.core.domain.IJob#getName()
 	 */
-    @Override
+	@Override
 	public String getName() {
 		return name;
 	}
@@ -152,22 +152,22 @@ public abstract class AbstractJob implements Job, StepLocator, BeanNameAware,
 	/**
 	 * Retrieve the step with the given name. If there is no Step with the given
 	 * name, then return null.
-	 * 
+	 *
 	 * @param stepName
 	 * @return the Step
 	 */
-    @Override
+	@Override
 	public abstract Step getStep(String stepName);
 
 	/**
 	 * Retrieve the step names.
-	 * 
+	 *
 	 * @return the step names
 	 */
-    @Override
+	@Override
 	public abstract Collection<String> getStepNames();
 
-    @Override
+	@Override
 	public JobParametersValidator getJobParametersValidator() {
 		return jobParametersValidator;
 	}
@@ -175,7 +175,7 @@ public abstract class AbstractJob implements Job, StepLocator, BeanNameAware,
 	/**
 	 * Boolean flag to prevent categorically a job from restarting, even if it
 	 * has failed previously.
-	 * 
+	 *
 	 * @param restartable
 	 *            the value of the flag to set (default true)
 	 */
@@ -186,14 +186,14 @@ public abstract class AbstractJob implements Job, StepLocator, BeanNameAware,
 	/**
 	 * @see Job#isRestartable()
 	 */
-    @Override
+	@Override
 	public boolean isRestartable() {
 		return restartable;
 	}
 
 	/**
 	 * Public setter for the {@link JobParametersIncrementer}.
-	 * 
+	 *
 	 * @param jobParametersIncrementer
 	 *            the {@link JobParametersIncrementer} to set
 	 */
@@ -204,10 +204,10 @@ public abstract class AbstractJob implements Job, StepLocator, BeanNameAware,
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see org.springframework.batch.core.Job#getJobParametersIncrementer()
 	 */
-    @Override
+	@Override
 	public JobParametersIncrementer getJobParametersIncrementer() {
 		return this.jobParametersIncrementer;
 	}
@@ -215,7 +215,7 @@ public abstract class AbstractJob implements Job, StepLocator, BeanNameAware,
 	/**
 	 * Public setter for injecting {@link JobExecutionListener}s. They will all
 	 * be given the listener callbacks at the appropriate point in the job.
-	 * 
+	 *
 	 * @param listeners
 	 *            the listeners to set.
 	 */
@@ -228,7 +228,7 @@ public abstract class AbstractJob implements Job, StepLocator, BeanNameAware,
 	/**
 	 * Register a single listener for the {@link JobExecutionListener}
 	 * callbacks.
-	 * 
+	 *
 	 * @param listener
 	 *            a {@link JobExecutionListener}
 	 */
@@ -240,7 +240,7 @@ public abstract class AbstractJob implements Job, StepLocator, BeanNameAware,
 	 * Public setter for the {@link JobRepository} that is needed to manage the
 	 * state of the batch meta domain (jobs, steps, executions) during the life
 	 * of a job.
-	 * 
+	 *
 	 * @param jobRepository
 	 */
 	public void setJobRepository(JobRepository jobRepository) {
@@ -250,7 +250,7 @@ public abstract class AbstractJob implements Job, StepLocator, BeanNameAware,
 
 	/**
 	 * Convenience method for subclasses to access the job repository.
-	 * 
+	 *
 	 * @return the jobRepository
 	 */
 	protected JobRepository getJobRepository() {
@@ -262,10 +262,10 @@ public abstract class AbstractJob implements Job, StepLocator, BeanNameAware,
 	 * logic and ignore listeners and repository calls. Implementations usually
 	 * are concerned with the ordering of steps, and delegate actual step
 	 * processing to {@link #handleStep(Step, JobExecution)}.
-	 * 
+	 *
 	 * @param execution
 	 *            the current {@link JobExecution}
-	 * 
+	 *
 	 * @throws JobExecutionException
 	 *             to signal a fatal batch framework error (not a business or
 	 *             validation exception)
@@ -276,12 +276,12 @@ public abstract class AbstractJob implements Job, StepLocator, BeanNameAware,
 	/**
 	 * Run the specified job, handling all listener and repository calls, and
 	 * delegating the actual processing to {@link #doExecute(JobExecution)}.
-	 * 
+	 *
 	 * @see Job#execute(JobExecution)
 	 * @throws StartLimitExceededException
 	 *             if start limit of one of the steps was exceeded
 	 */
-    @Override
+	@Override
 	public final void execute(JobExecution execution) {
 
 		logger.debug("Job execution starting: " + execution);
@@ -334,8 +334,8 @@ public abstract class AbstractJob implements Job, StepLocator, BeanNameAware,
 					&& execution.getStepExecutions().isEmpty()) {
 				ExitStatus exitStatus = execution.getExitStatus();
 				execution
-						.setExitStatus(exitStatus.and(ExitStatus.NOOP
-								.addExitDescription("All steps already completed or no steps configured for this job.")));
+				.setExitStatus(exitStatus.and(ExitStatus.NOOP
+						.addExitDescription("All steps already completed or no steps configured for this job.")));
 			}
 
 			execution.setEndTime(new Date());
@@ -358,13 +358,13 @@ public abstract class AbstractJob implements Job, StepLocator, BeanNameAware,
 	 * method do not need access to the {@link JobRepository}, nor do they need
 	 * to worry about populating the execution context on a restart, nor
 	 * detecting the interrupted state (in job or step execution).
-	 * 
+	 *
 	 * @param step
 	 *            the {@link Step} to execute
 	 * @param execution
 	 *            the current {@link JobExecution}
 	 * @return the {@link StepExecution} corresponding to this step
-	 * 
+	 *
 	 * @throws JobInterruptedException
 	 *             if the {@link JobExecution} has been interrupted, and in
 	 *             particular if {@link BatchStatus#ABANDONED} or
@@ -384,7 +384,7 @@ public abstract class AbstractJob implements Job, StepLocator, BeanNameAware,
 
 	/**
 	 * Default mapping from throwable to {@link ExitStatus}.
-	 * 
+	 *
 	 * @param ex
 	 *            the cause of the failure
 	 * @return an {@link ExitStatus}
@@ -411,7 +411,7 @@ public abstract class AbstractJob implements Job, StepLocator, BeanNameAware,
 		jobRepository.update(jobExecution);
 	}
 
-    @Override
+	@Override
 	public String toString() {
 		return ClassUtils.getShortName(getClass()) + ": [name=" + name + "]";
 	}

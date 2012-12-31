@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2007 the original author or authors.
+ * Copyright 2006-2013 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -39,7 +39,7 @@ public class EmptyItemWriter<T> implements ItemWriter<T>, InitializingBean {
 
 	List<Object> list;
 
-    @Override
+	@Override
 	public void afterPropertiesSet() throws Exception {
 		list = TransactionAwareProxyFactory.createTransactionalList();
 	}
@@ -48,7 +48,7 @@ public class EmptyItemWriter<T> implements ItemWriter<T>, InitializingBean {
 		this.failurePoint = failurePoint;
 	}
 
-    @Override
+	@Override
 	public void write(List<? extends T> items) {
 		for (T data : items) {
 			if (!failed && list.size() == failurePoint) {

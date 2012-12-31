@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2008 the original author or authors.
+ * Copyright 2006-2013 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -34,18 +34,18 @@ import com.ibatis.sqlmap.engine.execution.BatchException;
 import com.ibatis.sqlmap.engine.execution.BatchResult;
 
 /**
- * {@link ItemWriter} that uses the batching features from 
- * {@link SqlMapClientTemplate} to execute a batch of statements for all items 
+ * {@link ItemWriter} that uses the batching features from
+ * {@link SqlMapClientTemplate} to execute a batch of statements for all items
  * provided.<br/>
- * 
+ *
  * The user must provide an iBATIS statement id that points to the SQL statement defined
  * in the iBATIS SqlMap configuration.<br/>
- * 
+ *
  * It is expected that {@link #write(List)} is called inside a transaction.<br/>
- * 
+ *
  * The writer is thread safe after its properties are set (normal singleton
  * behavior), so it can be used to write in multiple concurrent transactions.
- * 
+ *
  * @author Thomas Risberg
  * @since 2.0
  */
@@ -62,7 +62,7 @@ public class IbatisBatchItemWriter<T> implements ItemWriter<T>, InitializingBean
 	/**
 	 * Public setter for the flag that determines whether an assertion is made
 	 * that all items cause at least one row to be updated.
-	 * 
+	 *
 	 * @param assertUpdates the flag to set. Defaults to true;
 	 */
 	public void setAssertUpdates(boolean assertUpdates) {
@@ -71,7 +71,7 @@ public class IbatisBatchItemWriter<T> implements ItemWriter<T>, InitializingBean
 
 	/**
 	 * Public setter for {@link SqlMapClient} for injection purposes.
-	 * 
+	 *
 	 * @param sqlMapClient the SqlMapClient
 	 */
 	public void setSqlMapClient(SqlMapClient sqlMapClient) {
@@ -82,7 +82,7 @@ public class IbatisBatchItemWriter<T> implements ItemWriter<T>, InitializingBean
 
 	/**
 	 * Public setter for the {@link SqlMapClientTemplate}.
-	 * 
+	 *
 	 * @param sqlMapClientTemplate the SqlMapClientTemplate
 	 */
 	public void setSqlMapClientTemplate(SqlMapClientTemplate sqlMapClientTemplate) {
@@ -90,9 +90,9 @@ public class IbatisBatchItemWriter<T> implements ItemWriter<T>, InitializingBean
 	}
 
 	/**
-	 * Public setter for the statement id identifying the statement in the SqlMap 
+	 * Public setter for the statement id identifying the statement in the SqlMap
 	 * configuration file.
-	 * 
+	 *
 	 * @param statementId the id for the statement
 	 */
 	public void setStatementId(String statementId) {
@@ -102,16 +102,16 @@ public class IbatisBatchItemWriter<T> implements ItemWriter<T>, InitializingBean
 	/**
 	 * Check mandatory properties - there must be an SqlMapClient and a statementId.
 	 */
-    @Override
+	@Override
 	public void afterPropertiesSet() {
 		Assert.notNull(sqlMapClientTemplate, "A SqlMapClient or a SqlMapClientTemplate is required.");
 		Assert.notNull(statementId, "A statementId is required.");
 	}
-	
+
 	/* (non-Javadoc)
 	 * @see org.springframework.batch.item.ItemWriter#write(java.util.List)
 	 */
-    @Override
+	@Override
 	public void write(final List<? extends T> items) {
 
 		if (!items.isEmpty()) {
@@ -119,11 +119,11 @@ public class IbatisBatchItemWriter<T> implements ItemWriter<T>, InitializingBean
 			if (logger.isDebugEnabled()) {
 				logger.debug("Executing batch with " + items.size() + " items.");
 			}
-			
+
 			@SuppressWarnings("unchecked")
 			List<BatchResult> results = (List<BatchResult>) sqlMapClientTemplate.execute(
 					new SqlMapClientCallback() {
-                        @Override
+						@Override
 						public Object doInSqlMapClient(SqlMapExecutor executor)
 								throws SQLException {
 							executor.startBatch();
@@ -137,14 +137,14 @@ public class IbatisBatchItemWriter<T> implements ItemWriter<T>, InitializingBean
 							}
 						}
 					});
-			
+
 			if (assertUpdates) {
 				if (results.size() != 1) {
 					throw new InvalidDataAccessResourceUsageException("Batch execution returned invalid results. " +
 							"Expected 1 but number of BatchResult objects returned was " + results.size());
 				}
-				
-				int[] updateCounts = results.get(0).getUpdateCounts();  
+
+				int[] updateCounts = results.get(0).getUpdateCounts();
 
 				for (int i = 0; i < updateCounts.length; i++) {
 					int value = updateCounts[i];

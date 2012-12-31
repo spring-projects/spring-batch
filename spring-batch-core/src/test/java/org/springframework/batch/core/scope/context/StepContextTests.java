@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2007 the original author or authors.
+ * Copyright 2006-2013 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -30,12 +30,11 @@ import org.springframework.batch.core.JobInstance;
 import org.springframework.batch.core.JobParameters;
 import org.springframework.batch.core.JobParametersBuilder;
 import org.springframework.batch.core.StepExecution;
-import org.springframework.batch.core.scope.context.StepContext;
 import org.springframework.batch.item.ExecutionContext;
 
 /**
  * @author Dave Syer
- * 
+ *
  */
 public class StepContextTests {
 
@@ -81,7 +80,7 @@ public class StepContextTests {
 	public void testDestructionCallbackSunnyDay() throws Exception {
 		context.setAttribute("foo", "FOO");
 		context.registerDestructionCallback("foo", new Runnable() {
-            @Override
+			@Override
 			public void run() {
 				list.add("bar");
 			}
@@ -94,7 +93,7 @@ public class StepContextTests {
 	@Test
 	public void testDestructionCallbackMissingAttribute() throws Exception {
 		context.registerDestructionCallback("foo", new Runnable() {
-            @Override
+			@Override
 			public void run() {
 				list.add("bar");
 			}
@@ -110,14 +109,14 @@ public class StepContextTests {
 		context.setAttribute("foo", "FOO");
 		context.setAttribute("bar", "BAR");
 		context.registerDestructionCallback("bar", new Runnable() {
-            @Override
+			@Override
 			public void run() {
 				list.add("spam");
 				throw new RuntimeException("fail!");
 			}
 		});
 		context.registerDestructionCallback("foo", new Runnable() {
-            @Override
+			@Override
 			public void run() {
 				list.add("bar");
 				throw new RuntimeException("fail!");

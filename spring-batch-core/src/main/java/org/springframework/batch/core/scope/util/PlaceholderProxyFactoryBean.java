@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2007 the original author or authors.
+ * Copyright 2006-2013 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -41,10 +41,11 @@ import org.springframework.util.ClassUtils;
  * Factory bean for proxies that can replace placeholders in their target. Just
  * a specialisation of {@link ScopedProxyFactoryBean}, with a different target
  * source type.
- * 
+ *
  * @author Dave Syer
- * 
+ *
  */
+@SuppressWarnings({ "serial", "rawtypes" })
 public class PlaceholderProxyFactoryBean extends ProxyConfig implements FactoryBean, BeanFactoryAware {
 
 	/** The TargetSource that manages scoping */
@@ -74,7 +75,7 @@ public class PlaceholderProxyFactoryBean extends ProxyConfig implements FactoryB
 		this.scopedTargetSource.setTargetBeanName(targetBeanName);
 	}
 
-    @Override
+	@Override
 	public void setBeanFactory(BeanFactory beanFactory) {
 		if (!(beanFactory instanceof ConfigurableBeanFactory)) {
 			throw new IllegalStateException("Not running in a ConfigurableBeanFactory: " + beanFactory);
@@ -105,13 +106,13 @@ public class PlaceholderProxyFactoryBean extends ProxyConfig implements FactoryB
 		// proxy itself is not subject to auto-proxying! Only its target bean
 		// is.
 		pf.addInterface(AopInfrastructureBean.class);
-		
+
 		this.scopedTargetSource.afterPropertiesSet();
 
 		this.proxy = pf.getProxy(cbf.getBeanClassLoader());
 	}
 
-    @Override
+	@Override
 	public Object getObject() {
 		if (this.proxy == null) {
 			throw new FactoryBeanNotInitializedException();
@@ -119,7 +120,7 @@ public class PlaceholderProxyFactoryBean extends ProxyConfig implements FactoryB
 		return this.proxy;
 	}
 
-    @Override
+	@Override
 	public Class<?> getObjectType() {
 		if (this.proxy != null) {
 			return this.proxy.getClass();
@@ -130,7 +131,7 @@ public class PlaceholderProxyFactoryBean extends ProxyConfig implements FactoryB
 		return null;
 	}
 
-    @Override
+	@Override
 	public boolean isSingleton() {
 		return true;
 	}
@@ -139,7 +140,7 @@ public class PlaceholderProxyFactoryBean extends ProxyConfig implements FactoryB
 	 * Convenience method to create a {@link BeanDefinition} for a target
 	 * wrapped in a placeholder tarrget source, able to defer binding of
 	 * placeholders until the bean is used.
-	 * 
+	 *
 	 * @param definition a target bean definition
 	 * @param registry a {@link BeanDefinitionRegistry}
 	 * @param proxyTargetClass true if we need to use CGlib to create the

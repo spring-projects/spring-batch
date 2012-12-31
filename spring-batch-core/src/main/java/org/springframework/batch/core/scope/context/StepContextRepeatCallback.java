@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2007 the original author or authors.
+ * Copyright 2006-2013 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -30,14 +30,14 @@ import org.springframework.util.ObjectUtils;
 /**
  * Convenient base class for clients who need to do something in a repeat
  * callback inside a {@link Step}.
- * 
+ *
  * @author Dave Syer
- * 
+ *
  */
 public abstract class StepContextRepeatCallback implements RepeatCallback {
 
 	private final Queue<ChunkContext> attributeQueue = new LinkedBlockingQueue<ChunkContext>();
-	
+
 	private final StepExecution stepExecution;
 
 	private final Log logger = LogFactory.getLog(StepContextRepeatCallback.class);
@@ -56,12 +56,12 @@ public abstract class StepContextRepeatCallback implements RepeatCallback {
 	 * if the callback is executed in a pooled thread. Handles the registration
 	 * and de-registration of the step context, so clients should not duplicate
 	 * those calls.
-	 * 
+	 *
 	 * @see RepeatCallback#doInIteration(RepeatContext)
 	 */
-    @Override
+	@Override
 	public RepeatStatus doInIteration(RepeatContext context) throws Exception {
-		
+
 		// The StepContext has to be the same for all chunks,
 		// otherwise step-scoped beans will be re-initialised for each chunk.
 		StepContext stepContext = StepSynchronizationManager.register(stepExecution);
@@ -95,7 +95,7 @@ public abstract class StepContextRepeatCallback implements RepeatCallback {
 	 * that they are finished with a context by removing all the attributes they
 	 * have added. If a worker does not remove them another thread might see
 	 * stale state.
-	 * 
+	 *
 	 * @param context the current {@link RepeatContext}
 	 * @param chunkContext the chunk context in which to carry out the work
 	 * @return the repeat status from the execution

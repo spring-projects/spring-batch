@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2007 the original author or authors.
+ * Copyright 2006-2013 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,12 +24,13 @@ import org.springframework.util.StringUtils;
 /**
  * Value object used to carry information about the status of a
  * job or step execution.
- * 
+ *
  * ExitStatus is immutable and therefore thread-safe.
- * 
+ *
  * @author Dave Syer
- * 
+ *
  */
+@SuppressWarnings("serial")
 public class ExitStatus implements Serializable, Comparable<ExitStatus> {
 
 	/**
@@ -85,7 +86,7 @@ public class ExitStatus implements Serializable, Comparable<ExitStatus> {
 
 	/**
 	 * Getter for the exit code (defaults to blank).
-	 * 
+	 *
 	 * @return the exit code.
 	 */
 	public String getExitCode() {
@@ -106,7 +107,7 @@ public class ExitStatus implements Serializable, Comparable<ExitStatus> {
 	 * case of equal severity, the exit code is replaced if the new value is
 	 * alphabetically greater.<br/>
 	 * <br/>
-	 * 
+	 *
 	 * Severity is defined by the exit code:
 	 * <ul>
 	 * <li>Codes beginning with EXECUTING have severity 1</li>
@@ -117,9 +118,9 @@ public class ExitStatus implements Serializable, Comparable<ExitStatus> {
 	 * <li>Codes beginning with UNKNOWN have severity 6</li>
 	 * </ul>
 	 * Others have severity 7, so custom exit codes always win.<br/>
-	 * 
+	 *
 	 * If the input is null just return this.
-	 * 
+	 *
 	 * @param status an {@link ExitStatus} to combine with this one.
 	 * @return a new {@link ExitStatus} combining the current value and the
 	 * argument provided.
@@ -134,12 +135,12 @@ public class ExitStatus implements Serializable, Comparable<ExitStatus> {
 		}
 		return result;
 	}
-	
+
 	/**
 	 * @param status an {@link ExitStatus} to compare
 	 * @return 1,0,-1 according to the severity and exit code
 	 */
-    @Override
+	@Override
 	public int compareTo(ExitStatus status) {
 		if (severity(status) > severity(this)) {
 			return -1;
@@ -178,20 +179,20 @@ public class ExitStatus implements Serializable, Comparable<ExitStatus> {
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see java.lang.Object#toString()
 	 */
-    @Override
+	@Override
 	public String toString() {
 		return String.format("exitCode=%s;exitDescription=%s", exitCode, exitDescription);
 	}
 
 	/**
 	 * Compare the fields one by one.
-	 * 
+	 *
 	 * @see java.lang.Object#equals(java.lang.Object)
 	 */
-    @Override
+	@Override
 	public boolean equals(Object obj) {
 		if (obj == null) {
 			return false;
@@ -201,10 +202,10 @@ public class ExitStatus implements Serializable, Comparable<ExitStatus> {
 
 	/**
 	 * Compatible with the equals implementation.
-	 * 
+	 *
 	 * @see java.lang.Object#hashCode()
 	 */
-    @Override
+	@Override
 	public int hashCode() {
 		return toString().hashCode();
 	}
@@ -212,7 +213,7 @@ public class ExitStatus implements Serializable, Comparable<ExitStatus> {
 	/**
 	 * Add an exit code to an existing {@link ExitStatus}. If there is already a
 	 * code present tit will be replaced.
-	 * 
+	 *
 	 * @param code the code to add
 	 * @return a new {@link ExitStatus} with the same properties but a new exit
 	 * code.
@@ -223,7 +224,7 @@ public class ExitStatus implements Serializable, Comparable<ExitStatus> {
 
 	/**
 	 * Check if this status represents a running process.
-	 * 
+	 *
 	 * @return true if the exit code is "RUNNING" or "UNKNOWN"
 	 */
 	public boolean isRunning() {
@@ -234,7 +235,7 @@ public class ExitStatus implements Serializable, Comparable<ExitStatus> {
 	 * Add an exit description to an existing {@link ExitStatus}. If there is
 	 * already a description present the two will be concatenated with a
 	 * semicolon.
-	 * 
+	 *
 	 * @param description the description to add
 	 * @return a new {@link ExitStatus} with the same properties but a new exit
 	 * description
@@ -257,7 +258,7 @@ public class ExitStatus implements Serializable, Comparable<ExitStatus> {
 	/**
 	 * Extract the stack trace from the throwable provided and append it to
 	 * the exist description.
-	 * 
+	 *
 	 * @param throwable
 	 * @return a new ExitStatus with the stack trace appended
 	 */

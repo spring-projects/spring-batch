@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2007 the original author or authors.
+ * Copyright 2006-2013 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -28,7 +28,7 @@ import java.util.List;
  * over the chunk using the {@link #iterator()} method, and if there is a
  * failure call {@link org.springframework.batch.core.step.item.Chunk.ChunkIterator#remove()} on the iterator.
  * The skipped items are then available through the chunk.
- * 
+ *
  * @author Dave Syer
  * @since 2.0
  */
@@ -105,7 +105,7 @@ public class Chunk<W> implements Iterable<W> {
 	/**
 	 * Register an anonymous skip. To skip an individual item, use
 	 * {@link ChunkIterator#remove()}.
-	 * 
+	 *
 	 * @param e the exception that caused the skip
 	 */
 	public void skip(Exception e) {
@@ -123,7 +123,7 @@ public class Chunk<W> implements Iterable<W> {
 	 * Get an unmodifiable iterator for the underlying items.
 	 * @see java.lang.Iterable#iterator()
 	 */
-    @Override
+	@Override
 	public ChunkIterator iterator() {
 		return new ChunkIterator(items);
 	}
@@ -137,7 +137,7 @@ public class Chunk<W> implements Iterable<W> {
 
 	/**
 	 * Flag to indicate if the source data is exhausted.
-	 * 
+	 *
 	 * @return true if there is no more data to process
 	 */
 	public boolean isEnd() {
@@ -155,7 +155,7 @@ public class Chunk<W> implements Iterable<W> {
 	/**
 	 * Query the chunk to see if anyone has registered an interest in keeping a
 	 * reference to it.
-	 * 
+	 *
 	 * @return the busy flag
 	 */
 	public boolean isBusy() {
@@ -165,7 +165,7 @@ public class Chunk<W> implements Iterable<W> {
 	/**
 	 * Register an interest in the chunk to prevent it from being cleaned up
 	 * before the flag is reset to false.
-	 * 
+	 *
 	 * @param busy the flag to set
 	 */
 	public void setBusy(boolean busy) {
@@ -189,7 +189,7 @@ public class Chunk<W> implements Iterable<W> {
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see java.lang.Object#toString()
 	 */
 	@Override
@@ -198,11 +198,11 @@ public class Chunk<W> implements Iterable<W> {
 	}
 
 	/**
-	 * Special iterator for a chunk providing the {@link #remove(Exception)}
+	 * Special iterator for a chunk providing the {@link #remove(Throwable)}
 	 * method for dynamically removing an item and adding it to the skips.
-	 * 
+	 *
 	 * @author Dave Syer
-	 * 
+	 *
 	 */
 	public class ChunkIterator implements Iterator<W> {
 
@@ -214,12 +214,12 @@ public class Chunk<W> implements Iterable<W> {
 			iterator = items.iterator();
 		}
 
-        @Override
+		@Override
 		public boolean hasNext() {
 			return iterator.hasNext();
 		}
 
-        @Override
+		@Override
 		public W next() {
 			next = iterator.next();
 			return next;
@@ -230,7 +230,7 @@ public class Chunk<W> implements Iterable<W> {
 			skips.add(new SkipWrapper<W>(next, e));
 		}
 
-        @Override
+		@Override
 		public void remove() {
 			if (next == null) {
 				if (iterator.hasNext()) {

@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2009 the original author or authors.
+ * Copyright 2006-2013 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -34,9 +34,9 @@ import org.springframework.util.Assert;
 /**
  * Implementation of {@link StepHandler} that manages repository and restart
  * concerns.
- * 
+ *
  * @author Dave Syer
- * 
+ *
  */
 public class SimpleStepHandler implements StepHandler, InitializingBean {
 
@@ -71,10 +71,10 @@ public class SimpleStepHandler implements StepHandler, InitializingBean {
 
 	/**
 	 * Check mandatory properties (jobRepository).
-	 * 
+	 *
 	 * @see InitializingBean#afterPropertiesSet()
 	 */
-    @Override
+	@Override
 	public void afterPropertiesSet() throws Exception {
 		Assert.state(jobRepository != null, "A JobRepository must be provided");
 	}
@@ -89,16 +89,16 @@ public class SimpleStepHandler implements StepHandler, InitializingBean {
 	/**
 	 * A context containing values to be added to the step execution before it
 	 * is handled.
-	 * 
+	 *
 	 * @param executionContext the execution context to set
 	 */
 	public void setExecutionContext(ExecutionContext executionContext) {
 		this.executionContext = executionContext;
 	}
 
-    @Override
+	@Override
 	public StepExecution handleStep(Step step, JobExecution execution) throws JobInterruptedException,
-			JobRestartException, StartLimitExceededException {
+	JobRestartException, StartLimitExceededException {
 		if (execution.isStopping()) {
 			throw new JobInterruptedException("JobExecution interrupted.");
 		}
@@ -178,7 +178,7 @@ public class SimpleStepHandler implements StepHandler, InitializingBean {
 	 * @param lastStepExecution the last step execution
 	 * @param jobInstance
 	 * @param step
-	 * 
+	 *
 	 * @throws StartLimitExceededException if the start limit has been exceeded
 	 * for this step
 	 * @throws JobRestartException if the job is in an inconsistent state from

@@ -1,3 +1,18 @@
+/*
+ * Copyright 2012-2013 the original author or authors.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package org.springframework.batch.core.job;
 
 import java.util.Arrays;
@@ -13,9 +28,9 @@ import org.springframework.util.Assert;
 
 /**
  * Default implementation of {@link JobParametersValidator}.
- * 
+ *
  * @author Dave Syer
- * 
+ *
  */
 public class DefaultJobParametersValidator implements JobParametersValidator, InitializingBean {
 
@@ -33,10 +48,10 @@ public class DefaultJobParametersValidator implements JobParametersValidator, In
 	/**
 	 * Create a new validator with the required and optional job parameter keys
 	 * provided.
-	 * 
+	 *
 	 * @see DefaultJobParametersValidator#setOptionalKeys(String[])
 	 * @see DefaultJobParametersValidator#setRequiredKeys(String[])
-	 * 
+	 *
 	 * @param requiredKeys the required keys
 	 * @param optionalKeys the optional keys
 	 */
@@ -50,7 +65,7 @@ public class DefaultJobParametersValidator implements JobParametersValidator, In
 	 * Check that there are no overlaps between required and optional keys.
 	 * @throws IllegalStateException if there is an overlap
 	 */
-    @Override
+	@Override
 	public void afterPropertiesSet() throws IllegalStateException {
 		for (String key : requiredKeys) {
 			Assert.state(!optionalKeys.contains(key), "Optional keys canot be required: " + key);
@@ -62,12 +77,12 @@ public class DefaultJobParametersValidator implements JobParametersValidator, In
 	 * are explicitly specified then all keys must be in that list, or in the
 	 * required list. Otherwise all keys that are specified as required must be
 	 * present.
-	 * 
+	 *
 	 * @see JobParametersValidator#validate(JobParameters)
-	 * 
+	 *
 	 * @throws JobParametersInvalidException if the parameters are not valid
 	 */
-    @Override
+	@Override
 	public void validate(JobParameters parameters) throws JobParametersInvalidException {
 
 		if (parameters == null) {
@@ -109,9 +124,9 @@ public class DefaultJobParametersValidator implements JobParametersValidator, In
 	 * The keys that are required in the parameters. The default is empty,
 	 * meaning that all parameters are optional, unless optional keys are
 	 * explicitly specified.
-	 * 
+	 *
 	 * @param requiredKeys the required key values
-	 * 
+	 *
 	 * @see #setOptionalKeys(String[])
 	 */
 	public final void setRequiredKeys(String[] requiredKeys) {
@@ -123,9 +138,9 @@ public class DefaultJobParametersValidator implements JobParametersValidator, In
 	 * optional, then to be valid all other keys must be explicitly required.
 	 * The default is empty, meaning that all parameters that are not required
 	 * are optional.
-	 * 
+	 *
 	 * @param optionalKeys the optional key values
-	 * 
+	 *
 	 * @see #setRequiredKeys(String[])
 	 */
 	public final void setOptionalKeys(String[] optionalKeys) {

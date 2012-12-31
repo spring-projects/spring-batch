@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2008 the original author or authors.
+ * Copyright 2002-2013 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -27,7 +27,7 @@ import org.springframework.batch.core.annotation.BeforeJob;
 /**
  * Enumeration for {@link JobExecutionListener} meta data, which ties together the names
  * of methods, their interfaces, annotation, and expected arguments.
- * 
+ *
  * @author Lucas Ward
  * @since 2.0
  * @see JobListenerFactoryBean
@@ -36,19 +36,19 @@ public enum JobListenerMetaData implements ListenerMetaData {
 
 	BEFORE_JOB("beforeJob", "before-job-method", BeforeJob.class),
 	AFTER_JOB("afterJob", "after-job-method", AfterJob.class);
-	
-	
+
+
 	private final String methodName;
 	private final String propertyName;
 	private final Class<? extends Annotation> annotation;
 	private static final Map<String, JobListenerMetaData> propertyMap;
-	
+
 	JobListenerMetaData(String methodName, String propertyName, Class<? extends Annotation> annotation) {
 		this.methodName = methodName;
 		this.propertyName = propertyName;
 		this.annotation = annotation;
 	}
-	
+
 	static{
 		propertyMap = new HashMap<String, JobListenerMetaData>();
 		for(JobListenerMetaData metaData : values()){
@@ -56,34 +56,34 @@ public enum JobListenerMetaData implements ListenerMetaData {
 		}
 	}
 
-    @Override
+	@Override
 	public String getMethodName() {
 		return methodName;
 	}
 
-    @Override
+	@Override
 	public Class<? extends Annotation> getAnnotation() {
 		return annotation;
 	}
 
-    @Override
+	@Override
 	public Class<?> getListenerInterface() {
 		return JobExecutionListener.class;
 	}
-	
-    @Override
+
+	@Override
 	public String getPropertyName() {
 		return propertyName;
 	}
-	
-    @Override
+
+	@Override
 	public Class<?>[] getParamTypes() {
 		return new Class<?>[]{ JobExecution.class };
 	}
 
 	/**
 	 * Return the relevant meta data for the provided property name.
-	 * 
+	 *
 	 * @param propertyName
 	 * @return meta data with supplied property name, null if none exists.
 	 */

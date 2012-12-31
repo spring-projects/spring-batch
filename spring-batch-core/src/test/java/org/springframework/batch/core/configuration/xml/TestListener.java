@@ -7,7 +7,7 @@ import org.springframework.batch.core.annotation.AfterRead;
 
 public class TestListener extends AbstractTestComponent implements StepExecutionListener {
 
-    @Override
+	@Override
 	public ExitStatus afterStep(StepExecution stepExecution) {
 		return null;
 	}
@@ -17,14 +17,14 @@ public class TestListener extends AbstractTestComponent implements StepExecution
 		return stepExecution.getExitStatus();
 	}
 
-    @Override
+	@Override
 	public void beforeStep(StepExecution stepExecution) {
 		executed = true;
 	}
-	
+
 	@AfterRead
 	public void logItem(){
-		
+
 	}
 
 }

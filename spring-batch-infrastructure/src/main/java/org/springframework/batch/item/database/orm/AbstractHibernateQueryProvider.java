@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2008 the original author or authors.
+ * Copyright 2006-2013 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,44 +21,44 @@ import org.hibernate.Session;
 import org.hibernate.StatelessSession;
 
 /**
- * <p>Abstract Hibernate Query Provider to serve as a base class for all 
+ * <p>Abstract Hibernate Query Provider to serve as a base class for all
  * Hibernate {@link Query} providers.</p>
- * 
- * <p>The implementing provider can be configured to use either 
- * {@link StatelessSession} sufficient for simple mappings without the need 
- * to cascade to associated objects or standard Hibernate {@link Session} 
+ *
+ * <p>The implementing provider can be configured to use either
+ * {@link StatelessSession} sufficient for simple mappings without the need
+ * to cascade to associated objects or standard Hibernate {@link Session}
  * for more advanced mappings or when caching is desired.</p>
- * 
+ *
  * @author Anatoly Polinsky
  * @author Dave Syer
- * 
+ *
  * @since 2.1
  *
  */
 public abstract class AbstractHibernateQueryProvider implements HibernateQueryProvider {
-    
-    private StatelessSession statelessSession;
-    private Session statefulSession;
-    
-    @Override
-    public void setStatelessSession(StatelessSession statelessSession) {
+
+	private StatelessSession statelessSession;
+	private Session statefulSession;
+
+	@Override
+	public void setStatelessSession(StatelessSession statelessSession) {
 		this.statelessSession = statelessSession;
 	}
 
-    @Override
+	@Override
 	public void setSession(Session statefulSession) {
 		this.statefulSession = statefulSession;
 	}
 
 	public boolean isStatelessSession() {
-        return this.statefulSession==null && this.statelessSession!=null;
-    }
-
-	protected StatelessSession getStatelessSession() {
-	    return statelessSession;
+		return this.statefulSession==null && this.statelessSession!=null;
 	}
 
-    protected Session getStatefulSession() {
-        return statefulSession;
-    }	
+	protected StatelessSession getStatelessSession() {
+		return statelessSession;
+	}
+
+	protected Session getStatefulSession() {
+		return statefulSession;
+	}
 }

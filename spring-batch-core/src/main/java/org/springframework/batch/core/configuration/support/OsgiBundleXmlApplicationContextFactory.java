@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2007 the original author or authors.
+ * Copyright 2006-2013 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -27,12 +27,12 @@ import org.springframework.osgi.context.support.OsgiBundleXmlApplicationContext;
 /**
  * {@link ApplicationContextFactory} that can be used to load a context from an
  * XML location in a bundle.
- * 
+ *
  * @author Dave Syer
- * 
+ *
  */
 public class OsgiBundleXmlApplicationContextFactory implements BundleContextAware, ApplicationContextFactory,
-		ApplicationContextAware {
+ApplicationContextAware {
 
 	private BundleContext bundleContext;
 
@@ -58,10 +58,10 @@ public class OsgiBundleXmlApplicationContextFactory implements BundleContextAwar
 
 	/**
 	 * Setter for the parent application context.
-	 * 
+	 *
 	 * @see org.springframework.context.ApplicationContextAware#setApplicationContext(org.springframework.context.ApplicationContext)
 	 */
-    @Override
+	@Override
 	public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
 		parent = applicationContext;
 	}
@@ -69,10 +69,10 @@ public class OsgiBundleXmlApplicationContextFactory implements BundleContextAwar
 	/**
 	 * Stash the {@link BundleContext} for creating a job application context
 	 * later.
-	 * 
+	 *
 	 * @see org.springframework.osgi.context.BundleContextAware#setBundleContext(org.osgi.framework.BundleContext)
 	 */
-    @Override
+	@Override
 	public void setBundleContext(BundleContext context) {
 		this.bundleContext = context;
 	}
@@ -81,10 +81,10 @@ public class OsgiBundleXmlApplicationContextFactory implements BundleContextAwar
 	 * Create an application context from the provided path, using the current
 	 * OSGi {@link BundleContext} and the enclosing Spring
 	 * {@link ApplicationContext} as a parent context.
-	 * 
+	 *
 	 * @see ApplicationContextFactory#createApplicationContext()
 	 */
-    @Override
+	@Override
 	public ConfigurableApplicationContext createApplicationContext() {
 		OsgiBundleXmlApplicationContext context = new OsgiBundleXmlApplicationContext(new String[] { path }, parent);
 		String displayName = bundleContext.getBundle().getSymbolicName() + ":" + this.displayName;
@@ -108,10 +108,12 @@ public class OsgiBundleXmlApplicationContextFactory implements BundleContextAwar
 
 	@Override
 	public boolean equals(Object obj) {
-		if (this == obj)
+		if (this == obj) {
 			return true;
-		if (obj == null)
+		}
+		if (obj == null) {
 			return false;
+		}
 		return toString().equals(obj.toString());
 	}
 

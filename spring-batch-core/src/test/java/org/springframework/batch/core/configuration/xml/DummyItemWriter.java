@@ -10,7 +10,7 @@ import org.springframework.batch.item.ItemWriter;
  */
 public class DummyItemWriter implements ItemWriter<Object> {
 
-    @Override
+	@Override
 	public void write(List<? extends Object> items) throws Exception {
 	}
 

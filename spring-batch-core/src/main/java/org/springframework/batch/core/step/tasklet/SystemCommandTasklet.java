@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2007 the original author or authors.
+ * Copyright 2006-2013 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -36,23 +36,23 @@ import org.springframework.util.Assert;
 
 /**
  * {@link Tasklet} that executes a system command.
- * 
+ *
  * The system command is executed asynchronously using injected
  * {@link #setTaskExecutor(TaskExecutor)} - timeout value is required to be set,
  * so that the batch job does not hang forever if the external process hangs.
- * 
+ *
  * Tasklet periodically checks for termination status (i.e.
  * {@link #setCommand(String)} finished its execution or
  * {@link #setTimeout(long)} expired or job was interrupted). The check interval
  * is given by {@link #setTerminationCheckInterval(long)}.
- * 
+ *
  * When job interrupt is detected tasklet's execution is terminated immediately
  * by throwing {@link JobInterruptedException}.
- * 
+ *
  * {@link #setInterruptOnCancel(boolean)} specifies whether the tasklet should
  * attempt to interrupt the thread that executes the system command if it is
  * still running when tasklet exits (abnormally).
- * 
+ *
  * @author Robert Kasanicky
  */
 public class SystemCommandTasklet extends StepExecutionListenerSupport implements Tasklet, InitializingBean {
@@ -81,12 +81,12 @@ public class SystemCommandTasklet extends StepExecutionListenerSupport implement
 	 * Execute system command and map its exit code to {@link ExitStatus} using
 	 * {@link SystemProcessExitCodeMapper}.
 	 */
-    @Override
+	@Override
 	public RepeatStatus execute(StepContribution contribution, ChunkContext chunkContext) throws Exception {
 
 		FutureTask<Integer> systemCommandTask = new FutureTask<Integer>(new Callable<Integer>() {
 
-            @Override
+			@Override
 			public Integer call() throws Exception {
 				Process process = Runtime.getRuntime().exec(command, environmentParams, workingDirectory);
 				return process.waitFor();
@@ -146,7 +146,7 @@ public class SystemCommandTasklet extends StepExecutionListenerSupport implement
 
 	}
 
-    @Override
+	@Override
 	public void afterPropertiesSet() throws Exception {
 		Assert.hasLength(command, "'command' property value is required");
 		Assert.notNull(systemProcessExitCodeMapper, "SystemProcessExitCodeMapper must be set");
@@ -175,7 +175,7 @@ public class SystemCommandTasklet extends StepExecutionListenerSupport implement
 	/**
 	 * The time interval how often the tasklet will check for termination
 	 * status.
-	 * 
+	 *
 	 * @param checkInterval time interval in milliseconds (1 second by default).
 	 */
 	public void setTerminationCheckInterval(long checkInterval) {

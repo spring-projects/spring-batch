@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2008 the original author or authors.
+ * Copyright 2006-2013 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -29,21 +29,21 @@ import org.springframework.util.Assert;
 /**
  * Implementation of the {@link PreparedStatementSetter} interface that accepts
  * a list of values to be set on a PreparedStatement.  This is usually used in
- * conjunction with the {@link JdbcCursorItemReader} to allow for the replacement 
+ * conjunction with the {@link JdbcCursorItemReader} to allow for the replacement
  * of bind variables when generating the cursor.  The order of the list will be
  * used to determine the ordering of setting variables.  For example, the first
  * item in the list will be the first bind variable set.  (i.e. it will
  * correspond to the first '?' in the SQL statement)
- * 
+ *
  * @author Lucas Ward
- * 
+ *
  */
 public class ListPreparedStatementSetter implements
-		PreparedStatementSetter, InitializingBean {
+PreparedStatementSetter, InitializingBean {
 
 	private List<?> parameters;
 
-    @Override
+	@Override
 	public void setValues(PreparedStatement ps) throws SQLException {
 		for (int i = 0; i < parameters.size(); i++) {
 			StatementCreatorUtils.setParameterValue(ps, i + 1, SqlTypeValue.TYPE_UNKNOWN, parameters.get(i));
@@ -59,7 +59,7 @@ public class ListPreparedStatementSetter implements
 		this.parameters = parameters;
 	}
 
-    @Override
+	@Override
 	public void afterPropertiesSet() throws Exception {
 		Assert.notNull(parameters, "Parameters must be provided");
 	}

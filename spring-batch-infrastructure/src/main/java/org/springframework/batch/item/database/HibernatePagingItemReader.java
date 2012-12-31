@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2007 the original author or authors.
+ * Copyright 2006-2013 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -37,7 +37,7 @@ import org.springframework.util.ClassUtils;
  * query can be used by {@link #setQueryName(String)}, or a query provider
  * strategy can be supplied via
  * {@link #setQueryProvider(HibernateQueryProvider)}.
- * 
+ *
  * <p>
  * The reader can be configured to use either {@link StatelessSession}
  * sufficient for simple mappings without the need to cascade to associated
@@ -46,16 +46,16 @@ import org.springframework.util.ClassUtils;
  * the {@link #update(ExecutionContext)} method without being flushed (no data
  * modifications are expected).
  * </p>
- * 
+ *
  * <p>
  * The implementation is thread-safe in between calls to
  * {@link #open(ExecutionContext)}, but remember to use
  * <code>saveState=false</code> if used in a multi-threaded client (no restart
  * available).
  * </p>
- * 
+ *
  * @author Dave Syer
- * 
+ *
  * @since 2.1
  */
 public class HibernatePagingItemReader<T> extends AbstractPagingItemReader<T> implements ItemStream, InitializingBean {
@@ -72,7 +72,7 @@ public class HibernatePagingItemReader<T> extends AbstractPagingItemReader<T> im
 
 	/**
 	 * The parameter values to apply to a query (map of name:value).
-	 * 
+	 *
 	 * @param parameterValues the parameter values to set
 	 */
 	public void setParameterValues(Map<String, Object> parameterValues) {
@@ -84,7 +84,7 @@ public class HibernatePagingItemReader<T> extends AbstractPagingItemReader<T> im
 	 * {@link #setQueryString(String) query string} or the {
 	 * {@link #setQueryProvider(HibernateQueryProvider) query provider} should
 	 * be set.
-	 * 
+	 *
 	 * @param queryName name of a hibernate named query
 	 */
 	public void setQueryName(String queryName) {
@@ -94,7 +94,7 @@ public class HibernatePagingItemReader<T> extends AbstractPagingItemReader<T> im
 	/**
 	 * Fetch size used internally by Hibernate to limit amount of data fetched
 	 * from database per round trip.
-	 * 
+	 *
 	 * @param fetchSize the fetch size to pass down to Hibernate
 	 */
 	public void setFetchSize(int fetchSize) {
@@ -105,7 +105,7 @@ public class HibernatePagingItemReader<T> extends AbstractPagingItemReader<T> im
 	 * A query provider. Either this or the {{@link #setQueryString(String)
 	 * query string} or the {{@link #setQueryName(String) query name} should be
 	 * set.
-	 * 
+	 *
 	 * @param queryProvider Hibernate query provider
 	 */
 	public void setQueryProvider(HibernateQueryProvider queryProvider) {
@@ -116,7 +116,7 @@ public class HibernatePagingItemReader<T> extends AbstractPagingItemReader<T> im
 	 * A query string in HQL. Either this or the {
 	 * {@link #setQueryProvider(HibernateQueryProvider) query provider} or the {
 	 * {@link #setQueryName(String) query name} should be set.
-	 * 
+	 *
 	 * @param queryString HQL query string
 	 */
 	public void setQueryString(String queryString) {
@@ -125,7 +125,7 @@ public class HibernatePagingItemReader<T> extends AbstractPagingItemReader<T> im
 
 	/**
 	 * The Hibernate SessionFactory to use the create a session.
-	 * 
+	 *
 	 * @param sessionFactory the {@link SessionFactory} to set
 	 */
 	public void setSessionFactory(SessionFactory sessionFactory) {
@@ -134,7 +134,7 @@ public class HibernatePagingItemReader<T> extends AbstractPagingItemReader<T> im
 
 	/**
 	 * Can be set only in uninitialized state.
-	 * 
+	 *
 	 * @param useStatelessSession <code>true</code> to use
 	 * {@link StatelessSession} <code>false</code> to use standard hibernate
 	 * {@link Session}
@@ -143,7 +143,7 @@ public class HibernatePagingItemReader<T> extends AbstractPagingItemReader<T> im
 		helper.setUseStatelessSession(useStatelessSession);
 	}
 
-    @Override
+	@Override
 	public void afterPropertiesSet() throws Exception {
 		super.afterPropertiesSet();
 		Assert.state(fetchSize >= 0, "fetchSize must not be negative");

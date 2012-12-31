@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2009 the original author or authors.
+ * Copyright 2006-2013 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -33,20 +33,20 @@ public class DummyPlatformTransactionManager implements PlatformTransactionManag
 		return name;
 	}
 
-    @Override
+	@Override
 	public void setBeanName(String name) {
 		this.name = name;
 	}
 
-    @Override
+	@Override
 	public void commit(TransactionStatus status) throws TransactionException {
 	}
 
-    @Override
+	@Override
 	public void rollback(TransactionStatus status) throws TransactionException {
 	}
 
-    @Override
+	@Override
 	public TransactionStatus getTransaction(TransactionDefinition definition) throws TransactionException {
 		return null;
 	}

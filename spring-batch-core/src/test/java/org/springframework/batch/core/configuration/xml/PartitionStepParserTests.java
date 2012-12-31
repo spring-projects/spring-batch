@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2007 the original author or authors.
+ * Copyright 2006-2013 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -28,7 +28,11 @@ import java.util.List;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.springframework.batch.core.*;
+import org.springframework.batch.core.BatchStatus;
+import org.springframework.batch.core.Job;
+import org.springframework.batch.core.JobExecution;
+import org.springframework.batch.core.JobParameters;
+import org.springframework.batch.core.StepExecution;
 import org.springframework.batch.core.partition.PartitionHandler;
 import org.springframework.batch.core.partition.StepExecutionSplitter;
 import org.springframework.batch.core.partition.support.PartitionStep;
@@ -88,7 +92,7 @@ public class PartitionStepParserTests implements ApplicationContextAware {
 
 	private List<String> savedStepNames = new ArrayList<String>();
 
-    @Override
+	@Override
 	public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
 		this.applicationContext = applicationContext;
 	}
@@ -152,7 +156,7 @@ public class PartitionStepParserTests implements ApplicationContextAware {
 		for (StepExecution se : jobExecution.getStepExecutions()) {
 			String stepExecutionName = se.getStepName();
 			// the partitioned step
-			if (stepExecutionName.equalsIgnoreCase("j3s1")) { 
+			if (stepExecutionName.equalsIgnoreCase("j3s1")) {
 				PartitionStep partitionStep = (PartitionStep) this.applicationContext.getBean(stepExecutionName);
 				// prove that the reference in the {@link
 				// TaskExecutorPartitionHandler} is the step configured inline
@@ -187,7 +191,7 @@ public class PartitionStepParserTests implements ApplicationContextAware {
 		for (StepExecution se : jobExecution.getStepExecutions()) {
 			String stepExecutionName = se.getStepName();
 			if (stepExecutionName.equalsIgnoreCase("j4s1")) { // the partitioned
-																// step
+				// step
 				PartitionStep partitionStep = (PartitionStep) this.applicationContext.getBean(stepExecutionName);
 
 				// prove that the reference in the {@link
@@ -227,23 +231,23 @@ public class PartitionStepParserTests implements ApplicationContextAware {
 		Collections.sort(list);
 		return list;
 	}
-	
+
 	public static class CustomPartitionHandler implements PartitionHandler {
 
-        @Override
+		@Override
 		public Collection<StepExecution> handle(StepExecutionSplitter stepSplitter, StepExecution stepExecution)
 				throws Exception {
 			return Arrays.asList(stepExecution);
 		}
-		
+
 	}
 
 	public static class CustomStepExecutionAggregator implements StepExecutionAggregator {
 
-        @Override
+		@Override
 		public void aggregate(StepExecution result, Collection<StepExecution> executions) {
 			result.getJobExecution().getExecutionContext().put("foo", "bar");
 		}
-		
+
 	}
 }

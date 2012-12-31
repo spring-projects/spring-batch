@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2007 the original author or authors.
+ * Copyright 2006-2013 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -35,20 +35,18 @@ import org.springframework.retry.policy.MapRetryContextCache;
 import org.springframework.retry.policy.RetryContextCache;
 
 /**
- * Factory bean for step that provides options for configuring skip behaviour. User can set {@link #setSkipLimit(int)}
- * to set how many exceptions of {@link #setSkippableExceptionClasses(Collection)} types are tolerated.
- * {@link #setFatalExceptionClasses(Collection)} will cause immediate termination of job - they are treated as higher
- * priority than {@link #setSkippableExceptionClasses(Collection)}, so the two lists don't need to be exclusive.
- * 
+ * Factory bean for step that provides options for configuring skip behavior. User can set {@link #setSkipLimit(int)}
+ * to set how many exceptions of {@link #setSkippableExceptionClasses(Map)} types are tolerated.
+ *
  * Skippable exceptions on write will by default cause transaction rollback - to avoid rollback for specific exception
  * class include it in the transaction attribute as "no rollback for".
- * 
+ *
  * @see SimpleStepFactoryBean
- * 
+ *
  * @author Dave Syer
  * @author Robert Kasanicky
  * @author Morten Andersen-Gott
- * 
+ *
  */
 public class FaultTolerantStepFactoryBean<T, S> extends SimpleStepFactoryBean<T, S> {
 
@@ -81,7 +79,7 @@ public class FaultTolerantStepFactoryBean<T, S> extends SimpleStepFactoryBean<T,
 	/**
 	 * The {@link KeyGenerator} to use to identify failed items across rollback. Not used in the case of the
 	 * {@link #setIsReaderTransactionalQueue(boolean) transactional queue flag} being false (the default).
-	 * 
+	 *
 	 * @param keyGenerator the {@link KeyGenerator} to set
 	 */
 	public void setKeyGenerator(KeyGenerator keyGenerator) {
@@ -91,7 +89,7 @@ public class FaultTolerantStepFactoryBean<T, S> extends SimpleStepFactoryBean<T,
 	/**
 	 * Setter for the retry policy. If this is specified the other retry properties are ignored (retryLimit,
 	 * backOffPolicy, retryableExceptionClasses).
-	 * 
+	 *
 	 * @param retryPolicy a stateless {@link RetryPolicy}
 	 */
 	public void setRetryPolicy(RetryPolicy retryPolicy) {
@@ -101,7 +99,7 @@ public class FaultTolerantStepFactoryBean<T, S> extends SimpleStepFactoryBean<T,
 	/**
 	 * Public setter for the retry limit. Each item can be retried up to this limit. Note this limit includes the
 	 * initial attempt to process the item, therefore <code>retryLimit == 1</code> by default.
-	 * 
+	 *
 	 * @param retryLimit the retry limit to set, must be greater or equal to 1.
 	 */
 	public void setRetryLimit(int retryLimit) {
@@ -112,13 +110,13 @@ public class FaultTolerantStepFactoryBean<T, S> extends SimpleStepFactoryBean<T,
 	 * Public setter for the capacity of the cache in the retry policy. If more items than this fail without being
 	 * skipped or recovered an exception will be thrown. This is to guard against inadvertent infinite loops generated
 	 * by item identity problems.<br/>
-	 * 
+	 *
 	 * The default value should be high enough and more for most purposes. To breach the limit in a single-threaded step
 	 * typically you have to have this many failures in a single transaction. Defaults to the value in the
 	 * {@link MapRetryContextCache}.<br/>
-	 * 
+	 *
 	 * This property is ignored if the {@link #setRetryContextCache(RetryContextCache)} is set directly.
-	 * 
+	 *
 	 * @param cacheCapacity the cache capacity to set (greater than 0 else ignored)
 	 */
 	public void setCacheCapacity(int cacheCapacity) {
@@ -128,7 +126,7 @@ public class FaultTolerantStepFactoryBean<T, S> extends SimpleStepFactoryBean<T,
 	/**
 	 * Override the default retry context cache for retry of chunk processing. If this property is set then
 	 * {@link #setCacheCapacity(int)} is ignored.
-	 * 
+	 *
 	 * @param retryContextCache the {@link RetryContextCache} to set
 	 */
 	public void setRetryContextCache(RetryContextCache retryContextCache) {
@@ -137,7 +135,7 @@ public class FaultTolerantStepFactoryBean<T, S> extends SimpleStepFactoryBean<T,
 
 	/**
 	 * Public setter for the retryable exceptions classifier map (from throwable class to boolean, true is retryable).
-	 * 
+	 *
 	 * @param retryableExceptionClasses the retryableExceptionClasses to set
 	 */
 	public void setRetryableExceptionClasses(Map<Class<? extends Throwable>, Boolean> retryableExceptionClasses) {
@@ -146,7 +144,7 @@ public class FaultTolerantStepFactoryBean<T, S> extends SimpleStepFactoryBean<T,
 
 	/**
 	 * Public setter for the {@link BackOffPolicy}.
-	 * 
+	 *
 	 * @param backOffPolicy the {@link BackOffPolicy} to set
 	 */
 	public void setBackOffPolicy(BackOffPolicy backOffPolicy) {
@@ -155,7 +153,7 @@ public class FaultTolerantStepFactoryBean<T, S> extends SimpleStepFactoryBean<T,
 
 	/**
 	 * Public setter for the {@link RetryListener}s.
-	 * 
+	 *
 	 * @param retryListeners the {@link RetryListener}s to set
 	 */
 	public void setRetryListeners(RetryListener... retryListeners) {
@@ -166,7 +164,7 @@ public class FaultTolerantStepFactoryBean<T, S> extends SimpleStepFactoryBean<T,
 	 * A limit that determines skip policy. If this value is positive then an exception in chunk processing will cause
 	 * the item to be skipped and no exception propagated until the limit is reached. If it is zero then all exceptions
 	 * will be propagated from the chunk and cause the step to abort.
-	 * 
+	 *
 	 * @param skipLimit the value to set. Default is 0 (never skip).
 	 */
 	public void setSkipLimit(int skipLimit) {
@@ -177,7 +175,7 @@ public class FaultTolerantStepFactoryBean<T, S> extends SimpleStepFactoryBean<T,
 	 * A {@link SkipPolicy} that determines the outcome of an exception when processing an item. Overrides the
 	 * {@link #setSkipLimit(int) skipLimit}. The {@link #setSkippableExceptionClasses(Map) skippableExceptionClasses}
 	 * are also ignored if this is set.
-	 * 
+	 *
 	 * @param skipPolicy the {@link SkipPolicy} to set
 	 */
 	public void setSkipPolicy(SkipPolicy skipPolicy) {
@@ -190,7 +188,7 @@ public class FaultTolerantStepFactoryBean<T, S> extends SimpleStepFactoryBean<T,
 	 * Remember to set the {@link #setSkipLimit(int) skip limit} as well.
 	 * <p/>
 	 * Defaults to all no exception.
-	 * 
+	 *
 	 * @param exceptionClasses defaults to <code>Exception</code>
 	 */
 	public void setSkippableExceptionClasses(Map<Class<? extends Throwable>, Boolean> exceptionClasses) {
@@ -203,7 +201,7 @@ public class FaultTolerantStepFactoryBean<T, S> extends SimpleStepFactoryBean<T,
 	 * then the step will not fail as long as the skip limit is not breached.
 	 * <p/>
 	 * Defaults is empty.
-	 * 
+	 *
 	 * @param noRollbackExceptionClasses the exception classes to set
 	 */
 	public void setNoRollbackExceptionClasses(Collection<Class<? extends Throwable>> noRollbackExceptionClasses) {
@@ -217,7 +215,7 @@ public class FaultTolerantStepFactoryBean<T, S> extends SimpleStepFactoryBean<T,
 		this.processorTransactional = processorTransactional;
 	}
 
-    @Override
+	@Override
 	protected SimpleStepBuilder<T, S> createBuilder(String name) {
 		return new FaultTolerantStepBuilder<T, S>(new StepBuilder(name));
 	}

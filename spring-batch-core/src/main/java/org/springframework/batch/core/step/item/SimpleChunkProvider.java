@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2012 the original author or authors.
+ * Copyright 2006-2013 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -101,13 +101,13 @@ public class SimpleChunkProvider<I> implements ChunkProvider<I> {
 		}
 	}
 
-    @Override
+	@Override
 	public Chunk<I> provide(final StepContribution contribution) throws Exception {
 
 		final Chunk<I> inputs = new Chunk<I>();
 		repeatOperations.iterate(new RepeatCallback() {
 
-            @Override
+			@Override
 			public RepeatStatus doInIteration(final RepeatContext context) throws Exception {
 				I item = null;
 				try {
@@ -133,7 +133,7 @@ public class SimpleChunkProvider<I> implements ChunkProvider<I> {
 
 	}
 
-    @Override
+	@Override
 	public void postProcess(StepContribution contribution, Chunk<I> chunk) {
 		// do nothing
 	}

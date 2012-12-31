@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2008 the original author or authors.
+ * Copyright 2006-2013 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,14 +16,14 @@
 
 package org.springframework.batch.item.database;
 
-import org.springframework.util.ClassUtils;
-import org.springframework.util.Assert;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.concurrent.CopyOnWriteArrayList;
+
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.orm.ibatis.SqlMapClientTemplate;
-
-import java.util.Map;
-import java.util.HashMap;
-import java.util.concurrent.CopyOnWriteArrayList;
+import org.springframework.util.Assert;
+import org.springframework.util.ClassUtils;
 
 import com.ibatis.sqlmap.client.SqlMapClient;
 
@@ -32,7 +32,7 @@ import com.ibatis.sqlmap.client.SqlMapClient;
  * {@link org.springframework.batch.item.ItemReader} for reading database
  * records using iBATIS in a paging fashion.
  * </p>
- * 
+ *
  * <p>
  * It executes the query specified as the {@link #setQueryId(String)} to
  * retrieve requested data. The query is executed using paged requests of a size
@@ -53,20 +53,20 @@ import com.ibatis.sqlmap.client.SqlMapClient;
  * infinite loop in the reader because it keeps asking for the next page and
  * gets the same result set over and over.
  * </p>
- * 
+ *
  * <p>
  * The performance of the paging depends on the iBATIS implementation.
  * Setting a fairly large page size and using a commit interval that matches the
  * page size should provide better performance.
  * </p>
- * 
+ *
  * <p>
  * The implementation is thread-safe in between calls to
  * {@link #open(ExecutionContext)}, but remember to use
  * <code>saveState=false</code> if used in a multi-threaded client (no restart
  * available).
  * </p>
- * 
+ *
  * @author Thomas Risberg
  * @author Dave Syer
  * @since 2.0
@@ -95,7 +95,7 @@ public class IbatisPagingItemReader<T> extends AbstractPagingItemReader<T> {
 
 	/**
 	 * The parameter values to be used for the query execution.
-	 * 
+	 *
 	 * @param parameterValues the values keyed by the parameter named used in
 	 * the query string.
 	 */
@@ -107,7 +107,7 @@ public class IbatisPagingItemReader<T> extends AbstractPagingItemReader<T> {
 	 * Check mandatory properties.
 	 * @see org.springframework.beans.factory.InitializingBean#afterPropertiesSet()
 	 */
-    @Override
+	@Override
 	public void afterPropertiesSet() throws Exception {
 		super.afterPropertiesSet();
 		Assert.notNull(sqlMapClient);

@@ -24,7 +24,7 @@ public class TestStep implements Step {
 		context = null;
 	}
 
-    @Override
+	@Override
 	public void execute(StepExecution stepExecution) throws JobInterruptedException {
 		context = StepSynchronizationManager.getContext();
 		setContextFromCollaborator();
@@ -43,17 +43,17 @@ public class TestStep implements Step {
 		}
 	}
 
-    @Override
+	@Override
 	public String getName() {
 		return "foo";
 	}
 
-    @Override
+	@Override
 	public int getStartLimit() {
 		return Integer.MAX_VALUE;
 	}
 
-    @Override
+	@Override
 	public boolean isAllowStartIfComplete() {
 		return false;
 	}

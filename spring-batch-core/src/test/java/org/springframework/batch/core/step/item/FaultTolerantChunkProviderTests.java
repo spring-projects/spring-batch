@@ -38,7 +38,7 @@ public class FaultTolerantChunkProviderTests {
 	@Test
 	public void testProvideWithOverflow() throws Exception {
 		provider = new FaultTolerantChunkProvider<String>(new ItemReader<String>() {
-            @Override
+			@Override
 			public String read() throws Exception, UnexpectedInputException, ParseException {
 				throw new RuntimeException("Planned");
 			}

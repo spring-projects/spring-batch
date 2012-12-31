@@ -1,5 +1,5 @@
 /*
- * Copyright 2011 the original author or authors.
+ * Copyright 2011-2013 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,29 +25,29 @@ import org.springframework.util.Assert;
 
 /**
  * Composite {@link JobParametersValidator} that passes the job parameters through a sequence of
- * injected <code>JobParametersValidator</code>s 
- * 
+ * injected <code>JobParametersValidator</code>s
+ *
  * @author Morten Andersen-Gott
  *
  */
 public class CompositeJobParametersValidator implements JobParametersValidator, InitializingBean {
 
 	private List<JobParametersValidator> validators;
-	
+
 	/**
 	 * Validates the JobParameters according to the injected JobParameterValidators
 	 * Validation stops and exception is thrown on first validation error
-	 * 
+	 *
 	 * @param parameters some {@link JobParameters}
 	 * @throws JobParametersInvalidException if the parameters are invalid
 	 */
-    @Override
+	@Override
 	public void validate(JobParameters parameters)	throws JobParametersInvalidException {
 		for (JobParametersValidator validator : validators) {
 			validator.validate(parameters);
 		}
 	}
-	
+
 	/**
 	 * Public setter for the validators
 	 * @param validators
@@ -56,12 +56,12 @@ public class CompositeJobParametersValidator implements JobParametersValidator, 
 		this.validators = validators;
 	}
 
-    @Override
+	@Override
 	public void afterPropertiesSet() throws Exception {
 		Assert.notNull(validators, "The 'validators' may not be null");
 		Assert.notEmpty(validators, "The 'validators' may not be empty");
 	}
-	
-	
+
+
 
 }

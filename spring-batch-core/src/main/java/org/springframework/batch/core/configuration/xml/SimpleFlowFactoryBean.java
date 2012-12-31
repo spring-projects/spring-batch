@@ -1,3 +1,18 @@
+/*
+ * Copyright 2012-2013 the original author or authors.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package org.springframework.batch.core.configuration.xml;
 
 import java.util.ArrayList;
@@ -23,10 +38,11 @@ import org.springframework.util.Assert;
  * replaces the states in the input with proxies that have a unique name formed
  * from the flow name and the original state name (unless the name is already in
  * that form, in which case it is not modified).
- * 
+ *
  * @author Dave Syer
- * 
+ *
  */
+@SuppressWarnings("rawtypes")
 public class SimpleFlowFactoryBean implements FactoryBean, InitializingBean {
 
 	private String name;
@@ -37,7 +53,7 @@ public class SimpleFlowFactoryBean implements FactoryBean, InitializingBean {
 
 	/**
 	 * The name of the flow that is created by this factory.
-	 * 
+	 *
 	 * @param name the value of the name
 	 */
 	public void setName(String name) {
@@ -47,10 +63,10 @@ public class SimpleFlowFactoryBean implements FactoryBean, InitializingBean {
 
 	/**
 	 * The raw state transitions for the flow. They will be transformed into
-	 * proxies that have the same behaviour but unique names prefixed with the
+	 * proxies that have the same behavior but unique names prefixed with the
 	 * flow name.
-	 * 
-	 * @param name the value of the name
+	 *
+	 * @param stateTransitions the list of transitions
 	 */
 	public void setStateTransitions(List<StateTransition> stateTransitions) {
 		this.stateTransitions = stateTransitions;
@@ -58,15 +74,15 @@ public class SimpleFlowFactoryBean implements FactoryBean, InitializingBean {
 
 	/**
 	 * Check mandatory properties (name).
-	 * 
+	 *
 	 * @throws Exception
 	 */
-    @Override
+	@Override
 	public void afterPropertiesSet() throws Exception {
 		Assert.hasText(name, "The flow must have a name");
 	}
 
-    @Override
+	@Override
 	public Object getObject() throws Exception {
 
 		SimpleFlow flow = new SimpleFlow(name);
@@ -95,7 +111,7 @@ public class SimpleFlowFactoryBean implements FactoryBean, InitializingBean {
 	 * Convenience method to get a state that proxies the input but with a
 	 * different name, appropriate to this flow. If the state is a StepState
 	 * then the step name is also changed.
-	 * 
+	 *
 	 * @param state
 	 * @return
 	 */
@@ -111,22 +127,22 @@ public class SimpleFlowFactoryBean implements FactoryBean, InitializingBean {
 		return new DelegateState(stateName, state);
 	}
 
-    @Override
+	@Override
 	public Class<?> getObjectType() {
 		return SimpleFlow.class;
 	}
 
-    @Override
+	@Override
 	public boolean isSingleton() {
 		return true;
 	}
 
 	/**
 	 * A State that proxies a delegate and changes its name but leaves its
-	 * behaviour unchanged.
-	 * 
+	 * behavior unchanged.
+	 *
 	 * @author Dave Syer
-	 * 
+	 *
 	 */
 	private static class DelegateState extends AbstractState implements FlowHolder {
 		private final State state;
@@ -136,7 +152,7 @@ public class SimpleFlowFactoryBean implements FactoryBean, InitializingBean {
 			this.state = state;
 		}
 
-        @Override
+		@Override
 		public boolean isEndState() {
 			return state.isEndState();
 		}
@@ -146,11 +162,11 @@ public class SimpleFlowFactoryBean implements FactoryBean, InitializingBean {
 			return state.handle(executor);
 		}
 
-        @Override
+		@Override
 		public Collection<Flow> getFlows() {
 			return (state instanceof FlowHolder) ? ((FlowHolder)state).getFlows() : Collections.<Flow>emptyList();
 		}
-		
+
 	}
 
 }

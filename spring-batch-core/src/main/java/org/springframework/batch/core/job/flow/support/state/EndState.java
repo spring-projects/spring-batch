@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2007 the original author or authors.
+ * Copyright 2006-2013 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,7 +25,7 @@ import org.springframework.batch.core.job.flow.State;
 /**
  * {@link State} implementation for ending a job if it is in progress and
  * continuing if just starting.
- * 
+ *
  * @author Dave Syer
  * @since 2.0
  */
@@ -58,7 +58,7 @@ public class EndState extends AbstractState {
 	 * @param name The name of the state
 	 * @param abandon flag to indicate that previous step execution can be
 	 * marked as abandoned (if there is one)
-	 * 
+	 *
 	 */
 	public EndState(FlowExecutionStatus status, String code, String name, boolean abandon) {
 		super(name);
@@ -69,7 +69,7 @@ public class EndState extends AbstractState {
 
 	/**
 	 * Return the {@link FlowExecutionStatus} stored.
-	 * 
+	 *
 	 * @see State#handle(FlowExecutor)
 	 */
 	@Override
@@ -116,17 +116,17 @@ public class EndState extends AbstractState {
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see org.springframework.batch.core.job.flow.State#isEndState()
 	 */
-    @Override
+	@Override
 	public boolean isEndState() {
 		return !status.isStop();
 	}
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see java.lang.Object#toString()
 	 */
 	@Override

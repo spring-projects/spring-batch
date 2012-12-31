@@ -1,5 +1,5 @@
 /**
- * 
+ *
  */
 package org.springframework.batch.core.step.item;
 
@@ -42,10 +42,10 @@ import org.springframework.transaction.support.TransactionSynchronizationManager
 
 /**
  * Tests for the behavior of TaskletStep in a failure scenario.
- * 
+ *
  * @author Lucas Ward
  * @author Dave Syer
- * 
+ *
  */
 public class TaskletStepExceptionTests {
 
@@ -90,7 +90,7 @@ public class TaskletStepExceptionTests {
 	@Test
 	public void testInterruptedWithCustomStatus() throws Exception {
 		taskletStep.setTasklet(new Tasklet() {
-            @Override
+			@Override
 			public RepeatStatus execute(StepContribution contribution, ChunkContext chunkContext) throws Exception {
 				contribution.setExitStatus(new ExitStatus("FUNNY"));
 				throw new JobInterruptedException("Planned");
@@ -145,7 +145,7 @@ public class TaskletStepExceptionTests {
 		} });
 		taskletStep.setTasklet(new Tasklet() {
 
-            @Override
+			@Override
 			public RepeatStatus execute(StepContribution contribution, ChunkContext attributes) throws Exception {
 				return RepeatStatus.FINISHED;
 			}
@@ -195,6 +195,7 @@ public class TaskletStepExceptionTests {
 		assertEquals(2, jobRepository.getUpdateCount());
 	}
 
+	@SuppressWarnings("serial")
 	@Test
 	public void testCommitError() throws Exception {
 
@@ -212,7 +213,7 @@ public class TaskletStepExceptionTests {
 
 		taskletStep.setTasklet(new Tasklet() {
 
-            @Override
+			@Override
 			public RepeatStatus execute(StepContribution contribution, ChunkContext attributes) throws Exception {
 				attributes.getStepContext().getStepExecution().getExecutionContext().putString("foo", "bar");
 				return RepeatStatus.FINISHED;
@@ -226,11 +227,12 @@ public class TaskletStepExceptionTests {
 		assertEquals("foo", e.getMessage());
 		assertEquals(0, stepExecution.getCommitCount());
 		assertEquals(1, stepExecution.getRollbackCount()); // Failed transaction
-															// counts as
-															// rollback
+		// counts as
+		// rollback
 		assertEquals(0, stepExecution.getExecutionContext().size());
 	}
 
+	@SuppressWarnings("serial")
 	@Test
 	public void testUnexpectedRollback() throws Exception {
 
@@ -244,7 +246,7 @@ public class TaskletStepExceptionTests {
 
 		taskletStep.setTasklet(new Tasklet() {
 
-            @Override
+			@Override
 			public RepeatStatus execute(StepContribution contribution, ChunkContext attributes) throws Exception {
 				attributes.getStepContext().getStepExecution().getExecutionContext().putString("foo", "bar");
 				return RepeatStatus.FINISHED;
@@ -258,8 +260,8 @@ public class TaskletStepExceptionTests {
 		assertEquals("bar", e.getMessage());
 		assertEquals(0, stepExecution.getCommitCount());
 		assertEquals(1, stepExecution.getRollbackCount()); // Failed transaction
-															// counts as
-															// rollback
+		// counts as
+		// rollback
 		assertEquals(0, stepExecution.getExecutionContext().size());
 	}
 
@@ -268,7 +270,7 @@ public class TaskletStepExceptionTests {
 
 		taskletStep.setTasklet(new Tasklet() {
 
-            @Override
+			@Override
 			public RepeatStatus execute(StepContribution contribution, ChunkContext attributes) throws Exception {
 				return RepeatStatus.FINISHED;
 			}
@@ -288,7 +290,7 @@ public class TaskletStepExceptionTests {
 
 		taskletStep.setTasklet(new Tasklet() {
 
-            @Override
+			@Override
 			public RepeatStatus execute(StepContribution contribution, ChunkContext attributes) throws Exception {
 				return RepeatStatus.FINISHED;
 			}
@@ -309,7 +311,7 @@ public class TaskletStepExceptionTests {
 
 		taskletStep.setTasklet(new Tasklet() {
 
-            @Override
+			@Override
 			public RepeatStatus execute(StepContribution contribution, ChunkContext attributes) throws Exception {
 				return RepeatStatus.FINISHED;
 			}
@@ -329,7 +331,7 @@ public class TaskletStepExceptionTests {
 
 		taskletStep.setTasklet(new Tasklet() {
 
-            @Override
+			@Override
 			public RepeatStatus execute(StepContribution contribution, ChunkContext attributes) throws Exception {
 				throw new RuntimeException("Tasklet exception");
 			}
@@ -369,7 +371,7 @@ public class TaskletStepExceptionTests {
 
 	private static class ExceptionTasklet implements Tasklet {
 
-        @Override
+		@Override
 		public RepeatStatus execute(StepContribution contribution, ChunkContext chunkContext) throws Exception {
 			throw taskletException;
 		}
@@ -405,36 +407,36 @@ public class TaskletStepExceptionTests {
 			this.failInTransaction = failInTransaction;
 		}
 
-        @Override
+		@Override
 		public void add(StepExecution stepExecution) {
 		}
 
-        @Override
+		@Override
 		public JobExecution createJobExecution(String jobName, JobParameters jobParameters)
 				throws JobExecutionAlreadyRunningException, JobRestartException, JobInstanceAlreadyCompleteException {
 			return null;
 		}
 
-        @Override
+		@Override
 		public StepExecution getLastStepExecution(JobInstance jobInstance, String stepName) {
 			return null;
 		}
 
-        @Override
+		@Override
 		public int getStepExecutionCount(JobInstance jobInstance, String stepName) {
 			return 0;
 		}
 
-        @Override
+		@Override
 		public boolean isJobInstanceExists(String jobName, JobParameters jobParameters) {
 			return false;
 		}
 
-        @Override
+		@Override
 		public void update(JobExecution jobExecution) {
 		}
 
-        @Override
+		@Override
 		public void update(StepExecution stepExecution) {
 			if (updateCount == failOnUpdateExecution) {
 				throw new RuntimeException("Expected exception in step execution persistence");
@@ -442,7 +444,7 @@ public class TaskletStepExceptionTests {
 			updateCount++;
 		}
 
-        @Override
+		@Override
 		public void updateExecutionContext(StepExecution stepExecution) {
 			if (failOnUpdateContext) {
 				if (!failInTransaction
@@ -456,12 +458,12 @@ public class TaskletStepExceptionTests {
 			return updateCount;
 		}
 
-        @Override
+		@Override
 		public JobExecution getLastJobExecution(String jobName, JobParameters jobParameters) {
 			return null;
 		}
 
-        @Override
+		@Override
 		public void updateExecutionContext(JobExecution jobExecution) {
 		}
 	}

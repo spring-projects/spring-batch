@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2007 the original author or authors.
+ * Copyright 2006-2013 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -35,16 +35,16 @@ import org.springframework.util.Assert;
  * step. N.B. only after the step has started will the completion policy be
  * usable.
  * </p>
- * 
+ *
  * <p>
  * It is easier and probably preferable to simply declare the chunk with a
  * commit-interval that is a late-binding expression (e.g.
  * <code>#{jobParameters['commit.interval']}</code>). That feature is available
  * from of Spring Batch 2.1.7.
  * </p>
- * 
+ *
  * @author Dave Syer
- * 
+ *
  * @see CompletionPolicy
  */
 public class StepExecutionSimpleCompletionPolicy extends StepExecutionListenerSupport implements CompletionPolicy {
@@ -68,10 +68,10 @@ public class StepExecutionSimpleCompletionPolicy extends StepExecutionListenerSu
 	 * the {@link JobParameters}. If there is a Long parameter with the given
 	 * key name, the intValue of this parameter is used. If not an exception
 	 * will be thrown.
-	 * 
+	 *
 	 * @see org.springframework.batch.core.listener.StepExecutionListenerSupport#beforeStep(org.springframework.batch.core.StepExecution)
 	 */
-    @Override
+	@Override
 	public void beforeStep(StepExecution stepExecution) {
 		JobParameters jobParameters = stepExecution.getJobParameters();
 		Assert.state(jobParameters.getParameters().containsKey(keyName),
@@ -86,7 +86,7 @@ public class StepExecutionSimpleCompletionPolicy extends StepExecutionListenerSu
 	 * indicates completion
 	 * @see CompletionPolicy#isComplete(RepeatContext, RepeatStatus)
 	 */
-    @Override
+	@Override
 	public boolean isComplete(RepeatContext context, RepeatStatus result) {
 		Assert.state(delegate != null, "The delegate resource has not been initialised. "
 				+ "Remember to register this object as a StepListener.");
@@ -98,7 +98,7 @@ public class StepExecutionSimpleCompletionPolicy extends StepExecutionListenerSu
 	 * @return if the commit interval has been reached
 	 * @see org.springframework.batch.repeat.CompletionPolicy#isComplete(org.springframework.batch.repeat.RepeatContext)
 	 */
-    @Override
+	@Override
 	public boolean isComplete(RepeatContext context) {
 		Assert.state(delegate != null, "The delegate resource has not been initialised. "
 				+ "Remember to register this object as a StepListener.");
@@ -110,7 +110,7 @@ public class StepExecutionSimpleCompletionPolicy extends StepExecutionListenerSu
 	 * @return a new {@link RepeatContext}
 	 * @see org.springframework.batch.repeat.CompletionPolicy#start(org.springframework.batch.repeat.RepeatContext)
 	 */
-    @Override
+	@Override
 	public RepeatContext start(RepeatContext parent) {
 		Assert.state(delegate != null, "The delegate resource has not been initialised. "
 				+ "Remember to register this object as a StepListener.");
@@ -121,7 +121,7 @@ public class StepExecutionSimpleCompletionPolicy extends StepExecutionListenerSu
 	 * @param context
 	 * @see org.springframework.batch.repeat.CompletionPolicy#update(org.springframework.batch.repeat.RepeatContext)
 	 */
-    @Override
+	@Override
 	public void update(RepeatContext context) {
 		Assert.state(delegate != null, "The delegate resource has not been initialised. "
 				+ "Remember to register this object as a StepListener.");
@@ -132,7 +132,7 @@ public class StepExecutionSimpleCompletionPolicy extends StepExecutionListenerSu
 	 * Delegates to the wrapped {@link CompletionPolicy} if set, otherwise
 	 * returns the value of {@link #setKeyName(String)}.
 	 */
-    @Override
+	@Override
 	public String toString() {
 		return (delegate == null) ? keyName : delegate.toString();
 	}

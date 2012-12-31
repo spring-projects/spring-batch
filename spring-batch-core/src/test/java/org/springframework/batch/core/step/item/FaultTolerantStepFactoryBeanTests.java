@@ -105,7 +105,7 @@ public class FaultTolerantStepFactoryBeanTests {
 		factory.setSkipLimit(2);
 
 		factory
-				.setSkippableExceptionClasses(getExceptionMap(SkippableException.class, SkippableRuntimeException.class));
+		.setSkippableExceptionClasses(getExceptionMap(SkippableException.class, SkippableRuntimeException.class));
 
 		MapJobRepositoryFactoryBean repositoryFactory = new MapJobRepositoryFactoryBean();
 		repositoryFactory.afterPropertiesSet();
@@ -119,7 +119,7 @@ public class FaultTolerantStepFactoryBeanTests {
 
 	/**
 	 * Non-skippable (and non-fatal) exception causes failure immediately.
-	 * 
+	 *
 	 * @throws Exception
 	 */
 	@SuppressWarnings("unchecked")
@@ -214,7 +214,7 @@ public class FaultTolerantStepFactoryBeanTests {
 		factory.setSkipLimit(0);
 
 		factory.setSkipPolicy(new SkipPolicy() {
-            @Override
+			@Override
 			public boolean shouldSkip(Throwable t, int skipCount) throws SkipLimitExceededException {
 				throw new  RuntimeException("Planned exception in SkipPolicy");
 			}
@@ -225,7 +225,7 @@ public class FaultTolerantStepFactoryBeanTests {
 		Step step = (Step) factory.getObject();
 
 		step.execute(stepExecution);
-		
+
 		assertEquals(BatchStatus.FAILED, stepExecution.getStatus());
 		assertEquals(0, stepExecution.getReadSkipCount());
 		assertEquals(1, stepExecution.getReadCount());
@@ -242,7 +242,7 @@ public class FaultTolerantStepFactoryBeanTests {
 		factory.setSkipLimit(0);
 
 		factory.setSkipPolicy(new SkipPolicy() {
-            @Override
+			@Override
 			public boolean shouldSkip(Throwable t, int skipCount) throws SkipLimitExceededException {
 				throw new  RuntimeException("Planned exception in SkipPolicy");
 			}
@@ -253,7 +253,7 @@ public class FaultTolerantStepFactoryBeanTests {
 		Step step = (Step) factory.getObject();
 
 		step.execute(stepExecution);
-		
+
 		assertEquals(BatchStatus.FAILED, stepExecution.getStatus());
 		assertEquals(0, stepExecution.getWriteSkipCount());
 		assertEquals(2, stepExecution.getReadCount());
@@ -422,7 +422,7 @@ public class FaultTolerantStepFactoryBeanTests {
 		map.put(FatalRuntimeException.class, false);
 		factory.setSkippableExceptionClasses(map);
 		factory.setItemWriter(new ItemWriter<String>() {
-            @Override
+			@Override
 			public void write(List<? extends String> items) {
 				throw new FatalRuntimeException("Ouch!");
 			}
@@ -735,73 +735,73 @@ public class FaultTolerantStepFactoryBeanTests {
 		final List<Integer> listenerCalls = new ArrayList<Integer>();
 
 		class TestItemListenerWriter implements ItemWriter<String>, ItemReadListener<String>,
-				ItemWriteListener<String>, ItemProcessListener<String, String>, SkipListener<String, String>,
-				ChunkListener {
-            @Override
+		ItemWriteListener<String>, ItemProcessListener<String, String>, SkipListener<String, String>,
+		ChunkListener {
+			@Override
 			public void write(List<? extends String> items) throws Exception {
 				if (items.contains("4")) {
 					throw new SkippableException("skippable");
 				}
 			}
 
-            @Override
+			@Override
 			public void afterRead(String item) {
 				listenerCalls.add(1);
 			}
 
-            @Override
+			@Override
 			public void beforeRead() {
 			}
 
-            @Override
+			@Override
 			public void onReadError(Exception ex) {
 			}
 
-            @Override
+			@Override
 			public void afterWrite(List<? extends String> items) {
 				listenerCalls.add(2);
 			}
 
-            @Override
+			@Override
 			public void beforeWrite(List<? extends String> items) {
 			}
 
-            @Override
+			@Override
 			public void onWriteError(Exception exception, List<? extends String> items) {
 			}
 
-            @Override
+			@Override
 			public void afterProcess(String item, String result) {
 				listenerCalls.add(3);
 			}
 
-            @Override
+			@Override
 			public void beforeProcess(String item) {
 			}
 
-            @Override
+			@Override
 			public void onProcessError(String item, Exception e) {
 			}
 
-            @Override
+			@Override
 			public void afterChunk() {
 				listenerCalls.add(4);
 			}
 
-            @Override
+			@Override
 			public void beforeChunk() {
 			}
 
-            @Override
+			@Override
 			public void onSkipInProcess(String item, Throwable t) {
 			}
 
-            @Override
+			@Override
 			public void onSkipInRead(Throwable t) {
 				listenerCalls.add(6);
 			}
 
-            @Override
+			@Override
 			public void onSkipInWrite(String item, Throwable t) {
 				listenerCalls.add(5);
 			}
@@ -827,21 +827,21 @@ public class FaultTolerantStepFactoryBeanTests {
 		writer.setFailures("4");
 
 		ItemStreamReader<String> reader = new ItemStreamReader<String>() {
-            @Override
+			@Override
 			public void close() throws ItemStreamException {
 				closed = true;
 			}
 
-            @Override
+			@Override
 			public void open(ExecutionContext executionContext) throws ItemStreamException {
 				opened = true;
 			}
 
-            @Override
+			@Override
 			public void update(ExecutionContext executionContext) throws ItemStreamException {
 			}
 
-            @Override
+			@Override
 			public String read() throws Exception, UnexpectedInputException, ParseException {
 				return null;
 			}
@@ -867,40 +867,40 @@ public class FaultTolerantStepFactoryBeanTests {
 		writer.setFailures("4");
 
 		ItemStreamReader<String> reader = new ItemStreamReader<String>() {
-            @Override
+			@Override
 			public void close() throws ItemStreamException {
 			}
 
-            @Override
+			@Override
 			public void open(ExecutionContext executionContext) throws ItemStreamException {
 			}
 
-            @Override
+			@Override
 			public void update(ExecutionContext executionContext) throws ItemStreamException {
 			}
 
-            @Override
+			@Override
 			public String read() throws Exception, UnexpectedInputException, ParseException {
 				return null;
 			}
 		};
 
 		ItemStreamReader<String> stream = new ItemStreamReader<String>() {
-            @Override
+			@Override
 			public void close() throws ItemStreamException {
 				closed = true;
 			}
 
-            @Override
+			@Override
 			public void open(ExecutionContext executionContext) throws ItemStreamException {
 				opened = true;
 			}
 
-            @Override
+			@Override
 			public void update(ExecutionContext executionContext) throws ItemStreamException {
 			}
 
-            @Override
+			@Override
 			public String read() throws Exception, UnexpectedInputException, ParseException {
 				return null;
 			}
@@ -927,21 +927,21 @@ public class FaultTolerantStepFactoryBeanTests {
 		writer.setFailures("4");
 
 		ItemStreamReader<String> reader = new ItemStreamReader<String>() {
-            @Override
+			@Override
 			public void close() throws ItemStreamException {
 				closed = true;
 			}
 
-            @Override
+			@Override
 			public void open(ExecutionContext executionContext) throws ItemStreamException {
 				opened = true;
 			}
 
-            @Override
+			@Override
 			public void update(ExecutionContext executionContext) throws ItemStreamException {
 			}
 
-            @Override
+			@Override
 			public String read() throws Exception, UnexpectedInputException, ParseException {
 				return null;
 			}
@@ -951,7 +951,7 @@ public class FaultTolerantStepFactoryBeanTests {
 		proxy.setTarget(reader);
 		proxy.setInterfaces(new Class<?>[] { ItemReader.class, ItemStream.class });
 		proxy.addAdvice(new MethodInterceptor() {
-            @Override
+			@Override
 			public Object invoke(MethodInvocation invocation) throws Throwable {
 				return invocation.proceed();
 			}
@@ -974,19 +974,19 @@ public class FaultTolerantStepFactoryBeanTests {
 
 		private boolean filterEncountered = false;
 
-        @Override
+		@Override
 		public void afterProcess(T item, S result) {
 			if (result == null) {
 				filterEncountered = true;
 			}
 		}
 
-        @Override
+		@Override
 		public void beforeProcess(T item) {
 
 		}
 
-        @Override
+		@Override
 		public void onProcessError(T item, Exception e) {
 
 		}
@@ -1017,7 +1017,7 @@ public class FaultTolerantStepFactoryBeanTests {
 
 	/**
 	 * condition: skippable < fatal; exception is unclassified
-	 * 
+	 *
 	 * expected: false; default classification
 	 */
 	@Test
@@ -1027,7 +1027,7 @@ public class FaultTolerantStepFactoryBeanTests {
 
 	/**
 	 * condition: skippable < fatal; exception is skippable
-	 * 
+	 *
 	 * expected: true
 	 */
 	@Test
@@ -1037,7 +1037,7 @@ public class FaultTolerantStepFactoryBeanTests {
 
 	/**
 	 * condition: skippable < fatal; exception is fatal
-	 * 
+	 *
 	 * expected: false
 	 */
 	@Test
@@ -1047,7 +1047,7 @@ public class FaultTolerantStepFactoryBeanTests {
 
 	/**
 	 * condition: fatal < skippable; exception is unclassified
-	 * 
+	 *
 	 * expected: false; default classification
 	 */
 	@Test
@@ -1057,7 +1057,7 @@ public class FaultTolerantStepFactoryBeanTests {
 
 	/**
 	 * condition: fatal < skippable; exception is skippable
-	 * 
+	 *
 	 * expected: true
 	 */
 	@Test
@@ -1067,7 +1067,7 @@ public class FaultTolerantStepFactoryBeanTests {
 
 	/**
 	 * condition: fatal < skippable; exception is fatal
-	 * 
+	 *
 	 * expected: false
 	 */
 	@Test
@@ -1091,6 +1091,7 @@ public class FaultTolerantStepFactoryBeanTests {
 		return getSkipPolicy(factory);
 	}
 
+	@SuppressWarnings("rawtypes")
 	private SkipPolicy getSkipPolicy(FactoryBean factory) throws Exception {
 		Object step = factory.getObject();
 		Object tasklet = ReflectionTestUtils.getField(step, "tasklet");
@@ -1105,9 +1106,10 @@ public class FaultTolerantStepFactoryBeanTests {
 		}
 		return map;
 	}
-	
+
+	@SuppressWarnings("serial")
 	public static class NonExistentException extends Exception {
-		
+
 	}
 
 }

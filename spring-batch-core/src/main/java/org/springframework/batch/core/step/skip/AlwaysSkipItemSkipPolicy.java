@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2008 the original author or authors.
+ * Copyright 2006-2013 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,13 +19,13 @@ package org.springframework.batch.core.step.skip;
 /**
  * Implementation of the {@link SkipPolicy} interface that
  * will always return that an item should be skipped.
- * 
+ *
  * @author Ben Hale
  * @author Lucas Ward
  */
 public class AlwaysSkipItemSkipPolicy implements SkipPolicy {
 
-    @Override
+	@Override
 	public boolean shouldSkip(Throwable t, int skipCount) {
 		return true;
 	}

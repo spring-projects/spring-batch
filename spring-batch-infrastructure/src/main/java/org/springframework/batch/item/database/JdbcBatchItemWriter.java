@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2008 the original author or authors.
+ * Copyright 2006-2013 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -30,29 +30,29 @@ import org.springframework.dao.DataAccessException;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.dao.InvalidDataAccessApiUsageException;
 import org.springframework.jdbc.core.PreparedStatementCallback;
-import org.springframework.jdbc.core.namedparam.SqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcOperations;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
+import org.springframework.jdbc.core.namedparam.SqlParameterSource;
 import org.springframework.util.Assert;
 
 /**
- * <p>{@link ItemWriter} that uses the batching features from 
+ * <p>{@link ItemWriter} that uses the batching features from
  * {@link NamedParameterJdbcTemplate} to execute a batch of statements for all items
  * provided.</p>
- * 
- * The user must provide an SQL query and a special callback in the for of either 
+ *
+ * The user must provide an SQL query and a special callback in the for of either
  * {@link ItemPreparedStatementSetter}, or a {@link ItemSqlParameterSourceProvider}.
- * You can use either named parameters or the traditional '?' placeholders. If you use the 
- * named parameter support then you should provide a {@link ItemSqlParameterSourceProvider}, 
+ * You can use either named parameters or the traditional '?' placeholders. If you use the
+ * named parameter support then you should provide a {@link ItemSqlParameterSourceProvider},
  * otherwise you should provide a  {@link ItemPreparedStatementSetter}.
- * This callback would be responsible for mapping the item to the parameters needed to 
+ * This callback would be responsible for mapping the item to the parameters needed to
  * execute the SQL statement.<br/>
- * 
+ *
  * It is expected that {@link #write(List)} is called inside a transaction.<br/>
- * 
+ *
  * The writer is thread safe after its properties are set (normal singleton
  * behavior), so it can be used to write in multiple concurrent transactions.
- * 
+ *
  * @author Dave Syer
  * @author Thomas Risberg
  * @since 2.0
@@ -114,7 +114,7 @@ public class JdbcBatchItemWriter<T> implements ItemWriter<T>, InitializingBean {
 
 	/**
 	 * Public setter for the data source for injection purposes.
-	 * 
+	 *
 	 * @param dataSource
 	 */
 	public void setDataSource(DataSource dataSource) {
@@ -132,10 +132,10 @@ public class JdbcBatchItemWriter<T> implements ItemWriter<T>, InitializingBean {
 	}
 
 	/**
-	 * Check mandatory properties - there must be a SimpleJdbcTemplate and an SQL statement plus a 
+	 * Check mandatory properties - there must be a SimpleJdbcTemplate and an SQL statement plus a
 	 * parameter source.
 	 */
-    @Override
+	@Override
 	public void afterPropertiesSet() {
 		Assert.notNull(namedParameterJdbcTemplate, "A DataSource or a NamedParameterJdbcTemplate is required.");
 		Assert.notNull(sql, "An SQL statement is required.");
@@ -154,11 +154,11 @@ public class JdbcBatchItemWriter<T> implements ItemWriter<T>, InitializingBean {
 			Assert.notNull(itemPreparedStatementSetter, "Using SQL statement with '?' placeholders requires an ItemPreparedStatementSetter");
 		}
 	}
-	
+
 	/* (non-Javadoc)
 	 * @see org.springframework.batch.item.ItemWriter#write(java.util.List)
 	 */
-    @Override
+	@Override
 	public void write(final List<? extends T> items) throws Exception {
 
 		if (!items.isEmpty()) {
@@ -168,7 +168,7 @@ public class JdbcBatchItemWriter<T> implements ItemWriter<T>, InitializingBean {
 			}
 
 			int[] updateCounts = null;
-			
+
 			if (usingNamedParameters) {
 				SqlParameterSource[] batchArgs = new SqlParameterSource[items.size()];
 				int i = 0;
@@ -179,7 +179,7 @@ public class JdbcBatchItemWriter<T> implements ItemWriter<T>, InitializingBean {
 			}
 			else {
 				updateCounts = (int[]) namedParameterJdbcTemplate.getJdbcOperations().execute(sql, new PreparedStatementCallback() {
-                    @Override
+					@Override
 					public Object doInPreparedStatement(PreparedStatement ps) throws SQLException, DataAccessException {
 						for (T item : items) {
 							itemPreparedStatementSetter.setValues(item, ps);

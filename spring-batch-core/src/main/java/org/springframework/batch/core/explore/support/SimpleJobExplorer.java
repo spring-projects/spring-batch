@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2007 the original author or authors.
+ * Copyright 2006-2013 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -30,10 +30,10 @@ import org.springframework.batch.core.repository.dao.StepExecutionDao;
 
 /**
  * Implementation of {@link JobExplorer} using the injected DAOs.
- * 
+ *
  * @author Dave Syer
  * @author Lucas Ward
- * 
+ *
  * @see JobExplorer
  * @see JobInstanceDao
  * @see JobExecutionDao
@@ -68,12 +68,12 @@ public class SimpleJobExplorer implements JobExplorer {
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see
 	 * org.springframework.batch.core.explore.JobExplorer#findJobExecutions(
 	 * org.springframework.batch.core.JobInstance)
 	 */
-    @Override
+	@Override
 	public List<JobExecution> getJobExecutions(JobInstance jobInstance) {
 		List<JobExecution> executions = jobExecutionDao.findJobExecutions(jobInstance);
 		for (JobExecution jobExecution : executions) {
@@ -87,12 +87,12 @@ public class SimpleJobExplorer implements JobExplorer {
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see
 	 * org.springframework.batch.core.explore.JobExplorer#findRunningJobExecutions
 	 * (java.lang.String)
 	 */
-    @Override
+	@Override
 	public Set<JobExecution> findRunningJobExecutions(String jobName) {
 		Set<JobExecution> executions = jobExecutionDao.findRunningJobExecutions(jobName);
 		for (JobExecution jobExecution : executions) {
@@ -106,12 +106,12 @@ public class SimpleJobExplorer implements JobExplorer {
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see
 	 * org.springframework.batch.core.explore.JobExplorer#getJobExecution(java
 	 * .lang.Long)
 	 */
-    @Override
+	@Override
 	public JobExecution getJobExecution(Long executionId) {
 		if (executionId == null) {
 			return null;
@@ -129,12 +129,12 @@ public class SimpleJobExplorer implements JobExplorer {
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see
 	 * org.springframework.batch.core.explore.JobExplorer#getStepExecution(java
 	 * .lang.Long)
 	 */
-    @Override
+	@Override
 	public StepExecution getStepExecution(Long jobExecutionId, Long executionId) {
 		JobExecution jobExecution = jobExecutionDao.getJobExecution(jobExecutionId);
 		if (jobExecution == null) {
@@ -147,34 +147,34 @@ public class SimpleJobExplorer implements JobExplorer {
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see
 	 * org.springframework.batch.core.explore.JobExplorer#getJobInstance(java
 	 * .lang.Long)
 	 */
-    @Override
+	@Override
 	public JobInstance getJobInstance(Long instanceId) {
 		return jobInstanceDao.getJobInstance(instanceId);
 	}
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see
 	 * org.springframework.batch.core.explore.JobExplorer#getLastJobInstances
 	 * (java.lang.String, int)
 	 */
-    @Override
+	@Override
 	public List<JobInstance> getJobInstances(String jobName, int start, int count) {
 		return jobInstanceDao.getJobInstances(jobName, start, count);
 	}
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see org.springframework.batch.core.explore.JobExplorer#getJobNames()
 	 */
-    @Override
+	@Override
 	public List<String> getJobNames() {
 		return jobInstanceDao.getJobNames();
 	}

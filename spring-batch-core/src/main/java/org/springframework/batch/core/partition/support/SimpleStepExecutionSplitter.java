@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2007 the original author or authors.
+ * Copyright 2006-2013 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,8 +20,8 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
-import java.util.Set;
 import java.util.Map.Entry;
+import java.util.Set;
 
 import org.springframework.batch.core.BatchStatus;
 import org.springframework.batch.core.JobExecution;
@@ -44,7 +44,7 @@ import org.springframework.util.Assert;
  * base (name of the target step) plus a suffix taken from the
  * {@link Partitioner} identifiers, separated by a colon, e.g.
  * <code>{step1:partition0, step1:partition1, ...}</code>.
- * 
+ *
  * @author Dave Syer
  * @since 2.0
  */
@@ -69,7 +69,7 @@ public class SimpleStepExecutionSplitter implements StepExecutionSplitter, Initi
 	/**
 	 * Construct a {@link SimpleStepExecutionSplitter} from its mandatory
 	 * properties.
-	 * 
+	 *
 	 * @param jobRepository the {@link JobRepository}
 	 * @param allowStartIfComplete flag specifying preferences on restart
 	 * @param stepName the target step name
@@ -86,13 +86,13 @@ public class SimpleStepExecutionSplitter implements StepExecutionSplitter, Initi
 	/**
 	 * Construct a {@link SimpleStepExecutionSplitter} from its mandatory
 	 * properties.
-	 * 
+	 *
 	 * @param jobRepository the {@link JobRepository}
 	 * @param step the target step (a local version of it), used to extract the
 	 * name and allowStartIfComplete flags
 	 * @param partitioner a {@link Partitioner} to use for generating input
 	 * parameters
-	 * 
+	 *
 	 * @deprecated use {@link #SimpleStepExecutionSplitter(JobRepository, boolean, String, Partitioner)} instead
 	 */
 	@Deprecated
@@ -105,10 +105,10 @@ public class SimpleStepExecutionSplitter implements StepExecutionSplitter, Initi
 
 	/**
 	 * Check mandatory properties (step name, job repository and partitioner).
-	 * 
+	 *
 	 * @see InitializingBean#afterPropertiesSet()
 	 */
-    @Override
+	@Override
 	public void afterPropertiesSet() throws Exception {
 		Assert.state(jobRepository != null, "A JobRepository is required");
 		Assert.state(stepName != null, "A step name is required");
@@ -119,9 +119,9 @@ public class SimpleStepExecutionSplitter implements StepExecutionSplitter, Initi
 	 * Flag to indicate that the partition target step is allowed to start if an
 	 * execution is complete. Defaults to the same value as the underlying step.
 	 * Set this manually to override the underlying step properties.
-	 * 
+	 *
 	 * @see Step#isAllowStartIfComplete()
-	 * 
+	 *
 	 * @param allowStartIfComplete the value to set
 	 */
 	public void setAllowStartIfComplete(boolean allowStartIfComplete) {
@@ -131,7 +131,7 @@ public class SimpleStepExecutionSplitter implements StepExecutionSplitter, Initi
 	/**
 	 * The job repository that will be used to manage the persistence of the
 	 * delegate step executions.
-	 * 
+	 *
 	 * @param jobRepository the JobRepository to set
 	 */
 	public void setJobRepository(JobRepository jobRepository) {
@@ -141,7 +141,7 @@ public class SimpleStepExecutionSplitter implements StepExecutionSplitter, Initi
 	/**
 	 * The {@link Partitioner} that will be used to generate step execution meta
 	 * data for the target step.
-	 * 
+	 *
 	 * @param partitioner the partitioner to set
 	 */
 	public void setPartitioner(Partitioner partitioner) {
@@ -151,7 +151,7 @@ public class SimpleStepExecutionSplitter implements StepExecutionSplitter, Initi
 	/**
 	 * The name of the target step that will be executed across the partitions.
 	 * Mandatory with no default.
-	 * 
+	 *
 	 * @param stepName the step name to set
 	 */
 	public void setStepName(String stepName) {
@@ -161,7 +161,7 @@ public class SimpleStepExecutionSplitter implements StepExecutionSplitter, Initi
 	/**
 	 * @see StepExecutionSplitter#getStepName()
 	 */
-    @Override
+	@Override
 	public String getStepName() {
 		return this.stepName;
 	}
@@ -169,7 +169,7 @@ public class SimpleStepExecutionSplitter implements StepExecutionSplitter, Initi
 	/**
 	 * @see StepExecutionSplitter#split(StepExecution, int)
 	 */
-    @Override
+	@Override
 	public Set<StepExecution> split(StepExecution stepExecution, int gridSize) throws JobExecutionException {
 
 		JobExecution jobExecution = stepExecution.getJobExecution();

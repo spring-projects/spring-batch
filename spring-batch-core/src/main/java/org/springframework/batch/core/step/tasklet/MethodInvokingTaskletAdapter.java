@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2007 the original author or authors.
+ * Copyright 2006-2013 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -27,11 +27,11 @@ import org.springframework.batch.repeat.RepeatStatus;
  * an {@link ExitStatus}. The POJO method is usually going to have no arguments,
  * but a static argument or array of arguments can be used by setting the
  * arguments property.
- * 
+ *
  * @see AbstractMethodInvokingDelegator
- * 
+ *
  * @author Dave Syer
- * 
+ *
  */
 public class MethodInvokingTaskletAdapter extends AbstractMethodInvokingDelegator<Object> implements Tasklet {
 
@@ -39,10 +39,10 @@ public class MethodInvokingTaskletAdapter extends AbstractMethodInvokingDelegato
 	 * Delegate execution to the target object and translate the return value to
 	 * an {@link ExitStatus} by invoking a method in the delegate POJO. Ignores
 	 * the {@link StepContribution} and the attributes.
-	 * 
+	 *
 	 * @see Tasklet#execute(StepContribution, ChunkContext)
 	 */
-    @Override
+	@Override
 	public RepeatStatus execute(StepContribution contribution, ChunkContext chunkContext) throws Exception {
 		contribution.setExitStatus(mapResult(invokeDelegateMethod()));
 		return RepeatStatus.FINISHED;
@@ -51,7 +51,7 @@ public class MethodInvokingTaskletAdapter extends AbstractMethodInvokingDelegato
 	/**
 	 * If the result is an {@link ExitStatus} already just return that,
 	 * otherwise return {@link ExitStatus#COMPLETED}.
-	 * 
+	 *
 	 * @param result the value returned by the delegate method
 	 * @return an {@link ExitStatus} consistent with the result
 	 */

@@ -21,15 +21,15 @@ public class StepListenerMethodInterceptorTests {
 
 	MethodInvokerMethodInterceptor interceptor;
 	TestClass testClass;
-	
+
 	@Before
 	public void setUp(){
 		testClass = new TestClass();
 	}
-	
+
 	@Test
 	public void testNormalCase() throws Throwable{
-		
+
 		Map<String, Set<MethodInvoker>> invokerMap = new HashMap<String, Set<MethodInvoker>>();
 		for(Method method : TestClass.class.getMethods()){
 			invokerMap.put(method.getName(), asSet( new SimpleMethodInvoker(testClass, method)));
@@ -40,10 +40,10 @@ public class StepListenerMethodInterceptorTests {
 		interceptor.invoke(new StubMethodInvocation(TestClass.class.getMethod("method2")));
 		assertEquals(1, testClass.method2Count);
 	}
-	
+
 	@Test
 	public void testMultipleInvokersPerName() throws Throwable{
-		
+
 		Map<String, Set<MethodInvoker>> invokerMap = new HashMap<String, Set<MethodInvoker>>();
 		Set<MethodInvoker> invokers = asSet(MethodInvokerUtils.getMethodInvokerByName(testClass, "method1", false));
 		invokers.add(MethodInvokerUtils.getMethodInvokerByName(testClass, "method2", false));
@@ -54,7 +54,7 @@ public class StepListenerMethodInterceptorTests {
 		interceptor.invoke(new StubMethodInvocation(TestClass.class.getMethod("method2")));
 		assertEquals(1, testClass.method2Count);
 	}
-	
+
 	@Test
 	public void testExitStatusReturn() throws Throwable{
 		Map<String, Set<MethodInvoker>> invokerMap = new HashMap<String, Set<MethodInvoker>>();
@@ -64,69 +64,69 @@ public class StepListenerMethodInterceptorTests {
 		interceptor = new MethodInvokerMethodInterceptor(invokerMap);
 		assertEquals(ExitStatus.COMPLETED, interceptor.invoke(new StubMethodInvocation(TestClass.class.getMethod("method3"))));
 	}
-	
+
 	public Set<MethodInvoker> asSet(MethodInvoker methodInvoker){
 		Set<MethodInvoker> invokerSet = new HashSet<MethodInvoker>();
 		invokerSet.add(methodInvoker);
 		return invokerSet;
 	}
-	
+
 	@SuppressWarnings("unused")
 	private class TestClass{
-		
+
 		int method1Count = 0;
 		int method2Count = 0;
 		int method3Count = 0;
-		
+
 		public void method1(){
 			method1Count++;
 		}
-		
+
 		public void method2(){
 			method2Count++;
 		}
-		
+
 		public ExitStatus method3(){
 			method3Count++;
 			return ExitStatus.COMPLETED;
 		}
 	}
-	
+
 	@SuppressWarnings("unused")
 	private class StubMethodInvocation implements MethodInvocation{
 
 		Method method;
 		Object[] args;
-		
+
 		public StubMethodInvocation(Method method, Object... args) {
 			this.method = method;
 			this.args = args;
 		}
-		
-        @Override
+
+		@Override
 		public Method getMethod() {
 			return method;
 		}
 
-        @Override
+		@Override
 		public Object[] getArguments() {
 			return null;
 		}
 
-        @Override
+		@Override
 		public AccessibleObject getStaticPart() {
 			return null;
 		}
 
-        @Override
+		@Override
 		public Object getThis() {
 			return null;
 		}
 
-        @Override
+		@Override
 		public Object proceed() throws Throwable {
 			return null;
 		}
-		
+
 	}
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2008 the original author or authors.
+ * Copyright 2002-2013 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -38,19 +38,19 @@ import org.springframework.util.Assert;
  * Implementation of {@link SmartDataSource} that is capable of keeping a single
  * JDBC Connection which is NOT closed after each use even if
  * {@link Connection#close()} is called.
- * 
+ *
  * The connection can be kept open over multiple transactions when used together
  * with any of Spring's
  * {@link org.springframework.transaction.PlatformTransactionManager}
  * implementations.
- * 
+ *
  * <p>
  * Loosely based on the SingleConnectionDataSource implementation in Spring
  * Core. Intended to be used with the {@link JdbcCursorItemReader} to provide a
  * connection that remains open across transaction boundaries, It remains open
  * for the life of the cursor, and can be shared with the main transaction of
  * the rest of the step processing.
- * 
+ *
  * <p>
  * Once close suppression has been turned on for a connection, it will be
  * returned for the first {@link #getConnection()} call. Any subsequent calls to
@@ -64,16 +64,16 @@ import org.springframework.util.Assert;
  * {@link Connection} to be the main {@link Connection} for an extended data
  * access process. The close suppression is turned off by calling
  * {@link #stopCloseSuppression(Connection)}.
- * 
+ *
  * <p>
  * This class is not multi-threading capable.
- * 
+ *
  * <p>
  * The connection returned will be a close-suppressing proxy instead of the
  * physical {@link Connection}. Be aware that you will not be able to cast this
  * to a native <code>OracleConnection</code> or the like anymore; you need to
  * use a {@link org.springframework.jdbc.support.nativejdbc.NativeJdbcExtractor}.
- * 
+ *
  * @author Thomas Risberg
  * @see #getConnection()
  * @see java.sql.Connection#close()
@@ -111,7 +111,7 @@ public class ExtendedConnectionDataSourceProxy implements SmartDataSource, Initi
 
 	/**
 	 * Setter for the {&link DataSource} that is to be wrapped.
-	 * 
+	 *
 	 * @param dataSource the DataSource
 	 */
 	public void setDataSource(DataSource dataSource) {
@@ -121,7 +121,7 @@ public class ExtendedConnectionDataSourceProxy implements SmartDataSource, Initi
 	/**
 	 * @see SmartDataSource
 	 */
-    @Override
+	@Override
 	public boolean shouldClose(Connection connection) {
 		boolean shouldClose = !isCloseSuppressionActive(connection);
 		if (borrowedConnection && closeSuppressedConnection.equals(connection)) {
@@ -133,7 +133,7 @@ public class ExtendedConnectionDataSourceProxy implements SmartDataSource, Initi
 	/**
 	 * Return the status of close suppression being activated for a given
 	 * {@link Connection}
-	 * 
+	 *
 	 * @param connection the {@link Connection} that the close suppression
 	 * status is requested for
 	 * @return true or false
@@ -146,7 +146,7 @@ public class ExtendedConnectionDataSourceProxy implements SmartDataSource, Initi
 	}
 
 	/**
-	 * 
+	 *
 	 * @param connection the {@link Connection} that close suppression is
 	 * requested for
 	 */
@@ -160,7 +160,7 @@ public class ExtendedConnectionDataSourceProxy implements SmartDataSource, Initi
 	}
 
 	/**
-	 * 
+	 *
 	 * @param connection the {@link Connection} that close suppression should be
 	 * turned off for
 	 */
@@ -171,14 +171,14 @@ public class ExtendedConnectionDataSourceProxy implements SmartDataSource, Initi
 		}
 	}
 
-    @Override
+	@Override
 	public Connection getConnection() throws SQLException {
 		synchronized (this.connectionMonitor) {
 			return initConnection(null, null);
 		}
 	}
 
-    @Override
+	@Override
 	public Connection getConnection(String username, String password) throws SQLException {
 		synchronized (this.connectionMonitor) {
 			return initConnection(username, password);
@@ -210,22 +210,22 @@ public class ExtendedConnectionDataSourceProxy implements SmartDataSource, Initi
 		return connection;
 	}
 
-    @Override
+	@Override
 	public PrintWriter getLogWriter() throws SQLException {
 		return dataSource.getLogWriter();
 	}
 
-    @Override
+	@Override
 	public int getLoginTimeout() throws SQLException {
 		return dataSource.getLoginTimeout();
 	}
 
-    @Override
+	@Override
 	public void setLogWriter(PrintWriter out) throws SQLException {
 		dataSource.setLogWriter(out);
 	}
 
-    @Override
+	@Override
 	public void setLoginTimeout(int seconds) throws SQLException {
 		dataSource.setLoginTimeout(seconds);
 	}
@@ -257,7 +257,7 @@ public class ExtendedConnectionDataSourceProxy implements SmartDataSource, Initi
 			this.target = target;
 		}
 
-	    @Override
+		@Override
 		public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
 			// Invocation on ConnectionProxy interface coming in...
 
@@ -300,7 +300,7 @@ public class ExtendedConnectionDataSourceProxy implements SmartDataSource, Initi
 	 * Performs only a 'shallow' non-recursive check of self's and delegate's
 	 * class to retain Java 5 compatibility.
 	 */
-    @Override
+	@Override
 	public boolean isWrapperFor(Class<?> iface) throws SQLException {
 		if (iface.isAssignableFrom(SmartDataSource.class) || iface.isAssignableFrom(dataSource.getClass())) {
 			return true;
@@ -313,7 +313,7 @@ public class ExtendedConnectionDataSourceProxy implements SmartDataSource, Initi
 	 * cast to supplied parameter class. Does *not* support recursive unwrapping
 	 * of the delegate to retain Java 5 compatibility.
 	 */
-    @Override
+	@Override
 	public <T> T unwrap(Class<T> iface) throws SQLException {
 		if (iface.isAssignableFrom(SmartDataSource.class)) {
 			@SuppressWarnings("unchecked")
@@ -328,7 +328,7 @@ public class ExtendedConnectionDataSourceProxy implements SmartDataSource, Initi
 		throw new SQLException("Unsupported class " + iface.getSimpleName());
 	}
 
-    @Override
+	@Override
 	public void afterPropertiesSet() throws Exception {
 		Assert.notNull(dataSource);
 	}

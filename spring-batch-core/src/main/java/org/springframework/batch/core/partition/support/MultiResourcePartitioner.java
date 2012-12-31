@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2007 the original author or authors.
+ * Copyright 2006-2013 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -30,7 +30,7 @@ import org.springframework.util.Assert;
  * {@link ExecutionContext} per resource, and labels them as
  * <code>{partition0, partition1, ..., partitionN}</code>. The grid size is
  * ignored.
- * 
+ *
  * @author Dave Syer
  * @since 2.0
  */
@@ -65,10 +65,10 @@ public class MultiResourcePartitioner implements Partitioner {
 	/**
 	 * Assign the filename of each of the injected resources to an
 	 * {@link ExecutionContext}.
-	 * 
+	 *
 	 * @see Partitioner#partition(int)
 	 */
-    @Override
+	@Override
 	public Map<String, ExecutionContext> partition(int gridSize) {
 		Map<String, ExecutionContext> map = new HashMap<String, ExecutionContext>(gridSize);
 		int i = 0;

@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2009 the original author or authors.
+ * Copyright 2006-2013 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -27,17 +27,17 @@ import org.springframework.batch.item.ExecutionContext;
  */
 public class MinMaxPartitioner extends SimplePartitioner {
 
-    @Override
+	@Override
 	public Map<String, ExecutionContext> partition(int gridSize) {
 		Map<String, ExecutionContext> partition = super.partition(gridSize);
 		int total = 8; // The number of items in the ExampleItemReader
 		int range = total/gridSize;
 		int i = 0;
 		for (ExecutionContext context : partition.values()) {
-			 int min = (i++)*range;
-			 int max = Math.min(total, (min+1)*range);
-			 context.putInt("min", min);
-			 context.putInt("max", max);
+			int min = (i++)*range;
+			int max = Math.min(total, (min+1)*range);
+			context.putInt("min", min);
+			context.putInt("max", max);
 		}
 		return partition;
 	}

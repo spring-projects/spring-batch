@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2012 the original author or authors.
+ * Copyright 2006-2013 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -38,14 +38,14 @@ import org.springframework.jdbc.support.incrementer.DataFieldMaxValueIncrementer
 import org.springframework.util.Assert;
 
 /**
- * Jdbc implementation of {@link JobExecutionDao}. Uses sequences (via Spring's
+ * JDBC implementation of {@link JobExecutionDao}. Uses sequences (via Spring's
  * {@link DataFieldMaxValueIncrementer} abstraction) to create all primary keys
  * before inserting a new row. Objects are checked to ensure all mandatory
  * fields to be stored are not null. If any are found to be null, an
  * IllegalArgumentException will be thrown. This could be left to JdbcTemplate,
  * however, the exception will be fairly vague, and fails to highlight which
  * field caused the exception.
- * 
+ *
  * @author Lucas Ward
  * @author Dave Syer
  * @author Robert Kasanicky
@@ -95,20 +95,20 @@ public class JdbcJobExecutionDao extends AbstractJdbcBatchMetadataDao implements
 	/**
 	 * Setter for {@link DataFieldMaxValueIncrementer} to be used when
 	 * generating primary keys for {@link JobExecution} instances.
-	 * 
+	 *
 	 * @param jobExecutionIncrementer the {@link DataFieldMaxValueIncrementer}
 	 */
 	public void setJobExecutionIncrementer(DataFieldMaxValueIncrementer jobExecutionIncrementer) {
 		this.jobExecutionIncrementer = jobExecutionIncrementer;
 	}
 
-    @Override
+	@Override
 	public void afterPropertiesSet() throws Exception {
 		super.afterPropertiesSet();
 		Assert.notNull(jobExecutionIncrementer, "The jobExecutionIncrementer must not be null.");
 	}
 
-    @Override
+	@Override
 	public List<JobExecution> findJobExecutions(final JobInstance job) {
 
 		Assert.notNull(job, "Job cannot be null.");
@@ -118,16 +118,16 @@ public class JdbcJobExecutionDao extends AbstractJdbcBatchMetadataDao implements
 	}
 
 	/**
-	 * 
+	 *
 	 * SQL implementation using Sequences via the Spring incrementer
 	 * abstraction. Once a new id has been obtained, the JobExecution is saved
 	 * via a SQL INSERT statement.
-	 * 
+	 *
 	 * @see JobExecutionDao#saveJobExecution(JobExecution)
 	 * @throws IllegalArgumentException if jobExecution is null, as well as any
 	 * of it's fields to be persisted.
 	 */
-    @Override
+	@Override
 	public void saveJobExecution(JobExecution jobExecution) {
 
 		validateJobExecution(jobExecution);
@@ -143,13 +143,13 @@ public class JdbcJobExecutionDao extends AbstractJdbcBatchMetadataDao implements
 				getQuery(SAVE_JOB_EXECUTION),
 				parameters,
 				new int[] { Types.BIGINT, Types.BIGINT, Types.TIMESTAMP, Types.TIMESTAMP, Types.VARCHAR,
-						Types.VARCHAR, Types.VARCHAR, Types.INTEGER, Types.TIMESTAMP, Types.TIMESTAMP });
+					Types.VARCHAR, Types.VARCHAR, Types.INTEGER, Types.TIMESTAMP, Types.TIMESTAMP });
 	}
 
 	/**
 	 * Validate JobExecution. At a minimum, JobId, StartTime, EndTime, and
 	 * Status cannot be null.
-	 * 
+	 *
 	 * @param jobExecution
 	 * @throws IllegalArgumentException
 	 */
@@ -166,10 +166,10 @@ public class JdbcJobExecutionDao extends AbstractJdbcBatchMetadataDao implements
 	 * is first checked to ensure all fields are not null, and that it has an
 	 * ID. The database is then queried to ensure that the ID exists, which
 	 * ensures that it is valid.
-	 * 
+	 *
 	 * @see JobExecutionDao#updateJobExecution(JobExecution)
 	 */
-    @Override
+	@Override
 	public void updateJobExecution(JobExecution jobExecution) {
 
 		validateJobExecution(jobExecution);
@@ -206,7 +206,7 @@ public class JdbcJobExecutionDao extends AbstractJdbcBatchMetadataDao implements
 					getQuery(UPDATE_JOB_EXECUTION),
 					parameters,
 					new int[] { Types.TIMESTAMP, Types.TIMESTAMP, Types.VARCHAR, Types.VARCHAR, Types.VARCHAR,
-							Types.INTEGER, Types.TIMESTAMP, Types.TIMESTAMP, Types.BIGINT, Types.INTEGER });
+						Types.INTEGER, Types.TIMESTAMP, Types.TIMESTAMP, Types.BIGINT, Types.INTEGER });
 
 			// Avoid concurrent modifications...
 			if (count == 0) {
@@ -221,7 +221,7 @@ public class JdbcJobExecutionDao extends AbstractJdbcBatchMetadataDao implements
 		}
 	}
 
-    @Override
+	@Override
 	public JobExecution getLastJobExecution(JobInstance jobInstance) {
 
 		Long id = jobInstance.getId();
@@ -241,11 +241,11 @@ public class JdbcJobExecutionDao extends AbstractJdbcBatchMetadataDao implements
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @seeorg.springframework.batch.core.repository.dao.JobExecutionDao#
 	 * getLastJobExecution(java.lang.String)
 	 */
-    @Override
+	@Override
 	public JobExecution getJobExecution(Long executionId) {
 		try {
 			JobExecution jobExecution = getJdbcTemplate().queryForObject(getQuery(GET_EXECUTION_BY_ID),
@@ -259,16 +259,16 @@ public class JdbcJobExecutionDao extends AbstractJdbcBatchMetadataDao implements
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @seeorg.springframework.batch.core.repository.dao.JobExecutionDao#
 	 * findRunningJobExecutions(java.lang.String)
 	 */
-    @Override
+	@Override
 	public Set<JobExecution> findRunningJobExecutions(String jobName) {
 
 		final Set<JobExecution> result = new HashSet<JobExecution>();
 		RowCallbackHandler handler = new RowCallbackHandler() {
-            @Override
+			@Override
 			public void processRow(ResultSet rs) throws SQLException {
 				JobExecutionRowMapper mapper = new JobExecutionRowMapper();
 				result.add(mapper.mapRow(rs, 0));
@@ -279,7 +279,7 @@ public class JdbcJobExecutionDao extends AbstractJdbcBatchMetadataDao implements
 		return result;
 	}
 
-    @Override
+	@Override
 	public void synchronizeStatus(JobExecution jobExecution) {
 		int currentVersion = getJdbcTemplate().queryForInt(getQuery(CURRENT_VERSION_JOB_EXECUTION),
 				jobExecution.getId());
@@ -293,9 +293,9 @@ public class JdbcJobExecutionDao extends AbstractJdbcBatchMetadataDao implements
 
 	/**
 	 * Re-usable mapper for {@link JobExecution} instances.
-	 * 
+	 *
 	 * @author Dave Syer
-	 * 
+	 *
 	 */
 	private static class JobExecutionRowMapper implements ParameterizedRowMapper<JobExecution> {
 
@@ -308,7 +308,7 @@ public class JdbcJobExecutionDao extends AbstractJdbcBatchMetadataDao implements
 			this.jobInstance = jobInstance;
 		}
 
-        @Override
+		@Override
 		public JobExecution mapRow(ResultSet rs, int rowNum) throws SQLException {
 			Long id = rs.getLong(1);
 			JobExecution jobExecution;

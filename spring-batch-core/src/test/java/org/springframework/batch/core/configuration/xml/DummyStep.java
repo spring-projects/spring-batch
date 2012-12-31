@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2009 the original author or authors.
+ * Copyright 2006-2013 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -28,27 +28,27 @@ public class DummyStep implements Step, BeanNameAware {
 
 	private String name;
 
-    @Override
+	@Override
 	public String getName() {
 		return name;
 	}
 
-    @Override
+	@Override
 	public void setBeanName(String name) {
 		this.name = name;
 	}
 
-    @Override
+	@Override
 	public void execute(StepExecution stepExecution) throws JobInterruptedException {
 		System.out.println("EXECUTING " + getName());
 	}
 
-    @Override
+	@Override
 	public int getStartLimit() {
 		return 100;
 	}
 
-    @Override
+	@Override
 	public boolean isAllowStartIfComplete() {
 		return false;
 	}

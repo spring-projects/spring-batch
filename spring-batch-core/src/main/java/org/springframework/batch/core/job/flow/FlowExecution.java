@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2007 the original author or authors.
+ * Copyright 2006-2013 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -51,13 +51,13 @@ public class FlowExecution implements Comparable<FlowExecution> {
 	/**
 	 * Create an ordering on {@link FlowExecution} instances by comparing their
 	 * statuses.
-	 * 
+	 *
 	 * @see Comparable#compareTo(Object)
-	 * 
+	 *
 	 * @param other
 	 * @return negative, zero or positive as per the contract
 	 */
-    @Override
+	@Override
 	public int compareTo(FlowExecution other) {
 		return this.status.compareTo(other.getStatus());
 	}

@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2007 the original author or authors.
+ * Copyright 2006-2013 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -51,9 +51,9 @@ import org.springframework.retry.support.RetryTemplate;
  * normal), but there may still be entries in the cache for the original failed
  * items. This might mean that an item that did not cause a failure is never
  * retried because other items in the same batch fail fatally first.
- * 
+ *
  * @author Dave Syer
- * 
+ *
  */
 public class BatchRetryTemplate implements RetryOperations {
 
@@ -68,6 +68,7 @@ public class BatchRetryTemplate implements RetryOperations {
 
 	}
 
+	@SuppressWarnings("serial")
 	private static class BatchRetryContext extends RetryContextSupport {
 
 		private final Collection<RetryContext> contexts;
@@ -199,7 +200,7 @@ public class BatchRetryTemplate implements RetryOperations {
 	private RetryPolicy retryPolicy;
 
 	public <T> T execute(RetryCallback<T> retryCallback, Collection<RetryState> states) throws ExhaustedRetryException,
-			Exception {
+	Exception {
 		RetryState batchState = new BatchRetryState(states);
 		return delegate.execute(retryCallback, batchState);
 	}
@@ -209,25 +210,25 @@ public class BatchRetryTemplate implements RetryOperations {
 		RetryState batchState = new BatchRetryState(states);
 		return delegate.execute(retryCallback, recoveryCallback, batchState);
 	}
-	
-    @Override
+
+	@Override
 	public final <T> T execute(RetryCallback<T> retryCallback, RecoveryCallback<T> recoveryCallback,
 			RetryState retryState) throws Exception, ExhaustedRetryException {
 		return regular.execute(retryCallback, recoveryCallback, retryState);
 	}
 
-    @Override
+	@Override
 	public final <T> T execute(RetryCallback<T> retryCallback, RecoveryCallback<T> recoveryCallback) throws Exception {
 		return regular.execute(retryCallback, recoveryCallback);
 	}
 
-    @Override
+	@Override
 	public final <T> T execute(RetryCallback<T> retryCallback, RetryState retryState) throws Exception,
-			ExhaustedRetryException {
+	ExhaustedRetryException {
 		return regular.execute(retryCallback, retryState);
 	}
 
-    @Override
+	@Override
 	public final <T> T execute(RetryCallback<T> retryCallback) throws Exception {
 		return regular.execute(retryCallback);
 	}
@@ -273,7 +274,7 @@ public class BatchRetryTemplate implements RetryOperations {
 		delegate.setRetryPolicy(retryPolicy);
 		regular.setRetryPolicy(retryPolicy);
 	}
-	
+
 	public boolean canRetry(RetryContext context) {
 		return context==null ? true : retryPolicy.canRetry(context);
 	}

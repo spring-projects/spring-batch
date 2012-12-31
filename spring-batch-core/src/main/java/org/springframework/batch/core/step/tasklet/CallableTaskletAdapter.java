@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2007 the original author or authors.
+ * Copyright 2006-2013 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,9 +26,9 @@ import org.springframework.util.Assert;
 /**
  * Adapts a {@link Callable}&lt;{@link RepeatStatus}&gt; to the {@link Tasklet}
  * interface.
- * 
+ *
  * @author Dave Syer
- * 
+ *
  */
 public class CallableTaskletAdapter implements Tasklet, InitializingBean {
 
@@ -44,10 +44,10 @@ public class CallableTaskletAdapter implements Tasklet, InitializingBean {
 
 	/**
 	 * Assert that the callable is set.
-	 * 
+	 *
 	 * @see org.springframework.beans.factory.InitializingBean#afterPropertiesSet()
 	 */
-    @Override
+	@Override
 	public void afterPropertiesSet() throws Exception {
 		Assert.notNull(callable);
 	}
@@ -57,7 +57,7 @@ public class CallableTaskletAdapter implements Tasklet, InitializingBean {
 	 * the {@link StepContribution} and the attributes.
 	 * @see Tasklet#execute(StepContribution, ChunkContext)
 	 */
-    @Override
+	@Override
 	public RepeatStatus execute(StepContribution contribution, ChunkContext chunkContext) throws Exception {
 		return callable.call();
 	}

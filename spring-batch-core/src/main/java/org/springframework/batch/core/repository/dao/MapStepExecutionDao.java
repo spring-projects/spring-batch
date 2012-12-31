@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2007 the original author or authors.
+ * Copyright 2006-2013 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -56,7 +56,7 @@ public class MapStepExecutionDao implements StepExecutionDao {
 		// Cheaper than full serialization is a reflective field copy, which is
 		// fine for volatile storage
 		ReflectionUtils.doWithFields(StepExecution.class, new ReflectionUtils.FieldCallback() {
-            @Override
+			@Override
 			public void doWith(Field field) throws IllegalArgumentException, IllegalAccessException {
 				field.setAccessible(true);
 				field.set(targetExecution, field.get(sourceExecution));
@@ -64,7 +64,7 @@ public class MapStepExecutionDao implements StepExecutionDao {
 		});
 	}
 
-    @Override
+	@Override
 	public void saveStepExecution(StepExecution stepExecution) {
 
 		Assert.isTrue(stepExecution.getId() == null);
@@ -85,7 +85,7 @@ public class MapStepExecutionDao implements StepExecutionDao {
 
 	}
 
-    @Override
+	@Override
 	public void updateStepExecution(StepExecution stepExecution) {
 
 		Assert.notNull(stepExecution.getJobExecutionId());
@@ -111,12 +111,12 @@ public class MapStepExecutionDao implements StepExecutionDao {
 		}
 	}
 
-    @Override
+	@Override
 	public StepExecution getStepExecution(JobExecution jobExecution, Long stepExecutionId) {
 		return executionsByStepExecutionId.get(stepExecutionId);
 	}
 
-    @Override
+	@Override
 	public void addStepExecutions(JobExecution jobExecution) {
 		Map<Long, StepExecution> executions = executionsByJobExecutionId.get(jobExecution.getId());
 		if (executions == null || executions.isEmpty()) {
@@ -125,7 +125,7 @@ public class MapStepExecutionDao implements StepExecutionDao {
 		List<StepExecution> result = new ArrayList<StepExecution>(executions.values());
 		Collections.sort(result, new Comparator<Entity>() {
 
-            @Override
+			@Override
 			public int compare(Entity o1, Entity o2) {
 				return Long.signum(o2.getId() - o1.getId());
 			}

@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2007 the original author or authors.
+ * Copyright 2006-2013 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,8 +25,6 @@ import java.util.concurrent.atomic.AtomicReference;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.springframework.classify.BinaryExceptionClassifier;
-import org.springframework.classify.Classifier;
 import org.springframework.batch.core.StepContribution;
 import org.springframework.batch.core.step.skip.LimitCheckingItemSkipPolicy;
 import org.springframework.batch.core.step.skip.NonSkippableProcessException;
@@ -35,6 +33,8 @@ import org.springframework.batch.core.step.skip.SkipListenerFailedException;
 import org.springframework.batch.core.step.skip.SkipPolicy;
 import org.springframework.batch.item.ItemProcessor;
 import org.springframework.batch.item.ItemWriter;
+import org.springframework.classify.BinaryExceptionClassifier;
+import org.springframework.classify.Classifier;
 import org.springframework.retry.ExhaustedRetryException;
 import org.springframework.retry.RecoveryCallback;
 import org.springframework.retry.RetryCallback;
@@ -45,7 +45,7 @@ import org.springframework.retry.support.DefaultRetryState;
 /**
  * FaultTolerant implementation of the {@link ChunkProcessor} interface, that
  * allows for skipping or retry of items that cause exceptions during writing.
- * 
+ *
  */
 public class FaultTolerantChunkProcessor<I, O> extends SimpleChunkProcessor<I, O> {
 
@@ -71,7 +71,7 @@ public class FaultTolerantChunkProcessor<I, O> extends SimpleChunkProcessor<I, O
 	 * The {@link KeyGenerator} to use to identify failed items across rollback.
 	 * Not used in the case of the {@link #setBuffering(boolean) buffering flag}
 	 * being true (the default).
-	 * 
+	 *
 	 * @param keyGenerator the {@link KeyGenerator} to set
 	 */
 	public void setKeyGenerator(KeyGenerator keyGenerator) {
@@ -95,7 +95,7 @@ public class FaultTolerantChunkProcessor<I, O> extends SimpleChunkProcessor<I, O
 	/**
 	 * A classifier that can distinguish between exceptions that cause rollback
 	 * (return true) or not (return false).
-	 * 
+	 *
 	 * @param rollbackClassifier
 	 */
 	public void setRollbackClassifier(Classifier<Throwable, Boolean> rollbackClassifier) {
@@ -114,7 +114,7 @@ public class FaultTolerantChunkProcessor<I, O> extends SimpleChunkProcessor<I, O
 	 * always come back as a chunk after a rollback. Otherwise things are more
 	 * complicated because after a rollback the new chunk might or might not
 	 * contain items from the previous failed chunk.
-	 * 
+	 *
 	 * @param buffering
 	 */
 	public void setBuffering(boolean buffering) {
@@ -125,7 +125,7 @@ public class FaultTolerantChunkProcessor<I, O> extends SimpleChunkProcessor<I, O
 	 * Flag to say that the {@link ItemProcessor} is transactional (defaults to
 	 * true). If false then the processor is only called once per item per
 	 * chunk, even if there are rollbacks with retries and skips.
-	 * 
+	 *
 	 * @param processorTransactional the flag value to set
 	 */
 	public void setProcessorTransactional(boolean processorTransactional) {
@@ -212,7 +212,7 @@ public class FaultTolerantChunkProcessor<I, O> extends SimpleChunkProcessor<I, O
 
 			RetryCallback<O> retryCallback = new RetryCallback<O>() {
 
-                @Override
+				@Override
 				public O doWithRetry(RetryContext context) throws Exception {
 					O output = null;
 					try {
@@ -264,7 +264,7 @@ public class FaultTolerantChunkProcessor<I, O> extends SimpleChunkProcessor<I, O
 
 			RecoveryCallback<O> recoveryCallback = new RecoveryCallback<O>() {
 
-                @Override
+				@Override
 				public O recover(RetryContext context) throws Exception {
 					Throwable e = context.getLastThrowable();
 					if (shouldSkip(itemProcessSkipPolicy, e, contribution.getStepSkipCount())) {
@@ -318,7 +318,7 @@ public class FaultTolerantChunkProcessor<I, O> extends SimpleChunkProcessor<I, O
 		final AtomicReference<RetryContext> contextHolder = new AtomicReference<RetryContext>();
 
 		RetryCallback<Object> retryCallback = new RetryCallback<Object>() {
-            @Override
+			@Override
 			public Object doWithRetry(RetryContext context) throws Exception {
 
 				contextHolder.set(context);
@@ -355,7 +355,7 @@ public class FaultTolerantChunkProcessor<I, O> extends SimpleChunkProcessor<I, O
 
 			RecoveryCallback<Object> batchRecoveryCallback = new RecoveryCallback<Object>() {
 
-                @Override
+				@Override
 				public Object recover(RetryContext context) throws Exception {
 
 					Throwable e = context.getLastThrowable();
@@ -393,7 +393,7 @@ public class FaultTolerantChunkProcessor<I, O> extends SimpleChunkProcessor<I, O
 
 			RecoveryCallback<Object> recoveryCallback = new RecoveryCallback<Object>() {
 
-                @Override
+				@Override
 				public Object recover(RetryContext context) throws Exception {
 
 					/*
@@ -471,7 +471,7 @@ public class FaultTolerantChunkProcessor<I, O> extends SimpleChunkProcessor<I, O
 	/**
 	 * Convenience method for calling process skip listener, so that it can be
 	 * called from multiple places.
-	 * 
+	 *
 	 * @param item the item that is skipped
 	 * @param e the cause of the skip
 	 */
@@ -487,7 +487,7 @@ public class FaultTolerantChunkProcessor<I, O> extends SimpleChunkProcessor<I, O
 	/**
 	 * Convenience method for calling process skip policy, so that it can be
 	 * called from multiple places.
-	 * 
+	 *
 	 * @param policy the skip policy
 	 * @param e the cause of the skip
 	 * @param skipCount the current skip count

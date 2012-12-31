@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2007 the original author or authors.
+ * Copyright 2006-2013 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -29,10 +29,10 @@ import org.springframework.util.ClassUtils;
  * identical functionality but named <code>financeDepartment.overnightJob</code>
  * . The use of a "." separator for elements is deliberate, since it is a "safe"
  * character in a <a href="http://www.w3.org/Addressing/URL">URL</a>.
- * 
- * 
+ *
+ *
  * @author Dave Syer
- * 
+ *
  */
 public class GroupAwareJob implements Job {
 
@@ -48,7 +48,7 @@ public class GroupAwareJob implements Job {
 
 	/**
 	 * Create a new {@link Job} with the delegate and no group name.
-	 * 
+	 *
 	 * @param delegate a delegate for the features of a regular Job
 	 */
 	public GroupAwareJob(Job delegate) {
@@ -57,7 +57,7 @@ public class GroupAwareJob implements Job {
 
 	/**
 	 * Create a new {@link Job} with the given group name and delegate.
-	 * 
+	 *
 	 * @param groupName the group name to prepend
 	 * @param delegate a delegate for the features of a regular Job
 	 */
@@ -67,40 +67,40 @@ public class GroupAwareJob implements Job {
 		this.delegate = delegate;
 	}
 
-    @Override
+	@Override
 	public void execute(JobExecution execution) {
 		delegate.execute(execution);
 	}
-	
+
 	/**
 	 * Concatenates the group name and the delegate job name (joining with a
 	 * ".").
-	 * 
+	 *
 	 * @see org.springframework.batch.core.Job#getName()
 	 */
-    @Override
+	@Override
 	public String getName() {
 		return groupName==null ? delegate.getName() : groupName + SEPARATOR + delegate.getName();
 	}
 
-    @Override
+	@Override
 	public boolean isRestartable() {
 		return delegate.isRestartable();
 	}
 
-    @Override
+	@Override
 	public JobParametersIncrementer getJobParametersIncrementer() {
 		return delegate.getJobParametersIncrementer();
 	}
 
-    @Override
+	@Override
 	public JobParametersValidator getJobParametersValidator() {
 		return delegate.getJobParametersValidator();
 	}
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see java.lang.Object#equals(java.lang.Object)
 	 */
 	@Override
@@ -113,14 +113,14 @@ public class GroupAwareJob implements Job {
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see java.lang.Object#hashCode()
 	 */
 	@Override
 	public int hashCode() {
 		return delegate.hashCode();
 	}
-	
+
 	@Override
 	public String toString() {
 		return ClassUtils.getShortName(delegate.getClass()) + ": [name=" + getName() + "]";

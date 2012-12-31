@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2007 the original author or authors.
+ * Copyright 2006-2013 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,11 +19,11 @@ import java.io.FileNotFoundException;
 import java.util.Collections;
 import java.util.Map;
 
-import org.springframework.classify.BinaryExceptionClassifier;
-import org.springframework.classify.Classifier;
 import org.springframework.batch.core.Step;
 import org.springframework.batch.core.StepExecution;
 import org.springframework.batch.item.file.FlatFileParseException;
+import org.springframework.classify.BinaryExceptionClassifier;
+import org.springframework.classify.Classifier;
 
 /**
  * <p>
@@ -35,7 +35,7 @@ import org.springframework.batch.item.file.FlatFileParseException;
  * however, if the vast majority of records are causing exceptions, the file is
  * likely bad.
  * </p>
- * 
+ *
  * <p>
  * Furthermore, it is also likely that you only want to skip certain exceptions.
  * {@link FlatFileParseException} is a good example of an exception you will
@@ -43,7 +43,7 @@ import org.springframework.batch.item.file.FlatFileParseException;
  * immediate termination of the {@link Step}. A {@link Classifier} is used to
  * determine whether a particular exception is skippable or not.
  * </p>
- * 
+ *
  * @author Ben Hale
  * @author Lucas Ward
  * @author Robert Kasanicky
@@ -87,7 +87,7 @@ public class LimitCheckingItemSkipPolicy implements SkipPolicy {
 	/**
 	 * The absolute number of skips (of skippable exceptions) that can be
 	 * tolerated before a failure.
-	 * 
+	 *
 	 * @param skipLimit the skip limit to set
 	 */
 	public void setSkipLimit(int skipLimit) {
@@ -97,7 +97,7 @@ public class LimitCheckingItemSkipPolicy implements SkipPolicy {
 	/**
 	 * The classifier that will be used to decide on skippability. If an
 	 * exception classifies as "true" then it is skippable, and otherwise not.
-	 * 
+	 *
 	 * @param skippableExceptionClassifier the skippableExceptionClassifier to
 	 * set
 	 */
@@ -108,7 +108,7 @@ public class LimitCheckingItemSkipPolicy implements SkipPolicy {
 	/**
 	 * Set up the classifier through a convenient map from throwable class to
 	 * boolean (true if skippable).
-	 * 
+	 *
 	 * @param skippableExceptions the skippable exceptions to set
 	 */
 	public void setSkippableExceptionMap(Map<Class<? extends Throwable>, Boolean> skippableExceptions) {
@@ -123,7 +123,7 @@ public class LimitCheckingItemSkipPolicy implements SkipPolicy {
 	 * skipCount is greater than the skipLimit, then a
 	 * {@link SkipLimitExceededException} will be thrown.
 	 */
-    @Override
+	@Override
 	public boolean shouldSkip(Throwable t, int skipCount) {
 		if (skippableExceptionClassifier.classify(t)) {
 			if (skipCount < skipLimit) {

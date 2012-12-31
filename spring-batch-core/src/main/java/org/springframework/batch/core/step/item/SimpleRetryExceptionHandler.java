@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2007 the original author or authors.
+ * Copyright 2006-2013 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,12 +17,12 @@ package org.springframework.batch.core.step.item;
 
 import java.util.Collection;
 
-import org.apache.commons.logging.LogFactory;
 import org.apache.commons.logging.Log;
-import org.springframework.classify.BinaryExceptionClassifier;
+import org.apache.commons.logging.LogFactory;
 import org.springframework.batch.repeat.RepeatContext;
 import org.springframework.batch.repeat.exception.ExceptionHandler;
 import org.springframework.batch.repeat.support.RepeatSynchronizationManager;
+import org.springframework.classify.BinaryExceptionClassifier;
 import org.springframework.retry.RetryCallback;
 import org.springframework.retry.RetryContext;
 import org.springframework.retry.RetryPolicy;
@@ -32,9 +32,9 @@ import org.springframework.retry.listener.RetryListenerSupport;
  * An {@link ExceptionHandler} that is aware of the retry context so that it can
  * distinguish between a fatal exception and one that can be retried. Delegates
  * the actual exception handling to another {@link ExceptionHandler}.
- * 
+ *
  * @author Dave Syer
- * 
+ *
  */
 public class SimpleRetryExceptionHandler extends RetryListenerSupport implements ExceptionHandler {
 
@@ -42,7 +42,7 @@ public class SimpleRetryExceptionHandler extends RetryListenerSupport implements
 	 * Attribute key, whose existence signals an exhausted retry.
 	 */
 	private static final String EXHAUSTED = SimpleRetryExceptionHandler.class.getName() + ".RETRY_EXHAUSTED";
-	
+
 	private static final Log logger = LogFactory.getLog(SimpleRetryExceptionHandler.class);
 
 	final private RetryPolicy retryPolicy;
@@ -53,7 +53,7 @@ public class SimpleRetryExceptionHandler extends RetryListenerSupport implements
 
 	/**
 	 * Create an exception handler from its mandatory properties.
-	 * 
+	 *
 	 * @param retryPolicy the retry policy that will be under effect when an
 	 * exception is encountered
 	 * @param exceptionHandler the delegate to use if an exception actually
@@ -70,11 +70,11 @@ public class SimpleRetryExceptionHandler extends RetryListenerSupport implements
 	 * Check if the exception is going to be retried, and veto the handling if
 	 * it is. If retry is exhausted or the exception is on the fatal list, then
 	 * handle using the delegate.
-	 * 
+	 *
 	 * @see ExceptionHandler#handleException(org.springframework.batch.repeat.RepeatContext,
 	 * java.lang.Throwable)
 	 */
-    @Override
+	@Override
 	public void handleException(RepeatContext context, Throwable throwable) throws Throwable {
 		// Only bother to check the delegate exception handler if we know that
 		// retry is exhausted
@@ -90,11 +90,11 @@ public class SimpleRetryExceptionHandler extends RetryListenerSupport implements
 	/**
 	 * If retry is exhausted set up some state in the context that can be used
 	 * to signal that the exception should be handled.
-	 * 
-	 * @see org.springframework.batch.retry.RetryListener#close(org.springframework.batch.retry.RetryContext,
-	 * org.springframework.batch.retry.RetryCallback, java.lang.Throwable)
+	 *
+	 * @see org.springframework.retry.RetryListener#close(org.springframework.retry.RetryContext,
+	 * org.springframework.retry.RetryCallback, java.lang.Throwable)
 	 */
-    @Override
+	@Override
 	public <T> void close(RetryContext context, RetryCallback<T> callback, Throwable throwable) {
 		if (!retryPolicy.canRetry(context)) {
 			logger.debug("Marking retry as exhausted: "+context);

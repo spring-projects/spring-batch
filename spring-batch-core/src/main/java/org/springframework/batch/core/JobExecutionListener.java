@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2008 the original author or authors.
+ * Copyright 2006-2013 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,15 +20,15 @@ package org.springframework.batch.core;
  * Implementations can be stateful if they are careful to either ensure thread
  * safety, or to use one instance of a listener per job, assuming that job
  * instances themselves are not used by more than one thread.
- * 
+ *
  * @author Dave Syer
- * 
+ *
  */
 public interface JobExecutionListener {
 
 	/**
 	 * Callback before a job executes.
-	 * 
+	 *
 	 * @param jobExecution the current {@link JobExecution}
 	 */
 	void beforeJob(JobExecution jobExecution);
@@ -37,7 +37,7 @@ public interface JobExecutionListener {
 	 * Callback after completion of a job. Called after both both successful and
 	 * failed executions. To perform logic on a particular status, use
 	 * "if (jobExecution.getStatus() == BatchStatus.X)".
-	 * 
+	 *
 	 * @param jobExecution the current {@link JobExecution}
 	 */
 	void afterJob(JobExecution jobExecution);

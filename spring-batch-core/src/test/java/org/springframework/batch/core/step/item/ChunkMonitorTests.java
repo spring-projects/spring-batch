@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2007 the original author or authors.
+ * Copyright 2006-2013 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -29,12 +29,12 @@ import org.springframework.batch.item.UnexpectedInputException;
 
 /**
  * @author Dave Syer
- * 
+ *
  */
 public class ChunkMonitorTests {
 
 	/**
-	 * 
+	 *
 	 */
 	private static final int CHUNK_SIZE = 5;
 
@@ -47,7 +47,7 @@ public class ChunkMonitorTests {
 	@Before
 	public void setUp() {
 		monitor.setItemReader(new ItemReader<String>() {
-            @Override
+			@Override
 			public String read() throws Exception, UnexpectedInputException, ParseException {
 				return "" + (count++);
 			}
@@ -110,7 +110,7 @@ public class ChunkMonitorTests {
 	@Test(expected = ItemStreamException.class)
 	public void testOpenWithErrorInReader() {
 		monitor.setItemReader(new ItemReader<String>() {
-            @Override
+			@Override
 			public String read() throws Exception, UnexpectedInputException, ParseException {
 				throw new IllegalStateException("Expected");
 			}
@@ -140,7 +140,7 @@ public class ChunkMonitorTests {
 	public void testUpdateWithNoStream() throws Exception {
 		monitor = new ChunkMonitor();
 		monitor.setItemReader(new ItemReader<String>() {
-            @Override
+			@Override
 			public String read() throws Exception, UnexpectedInputException, ParseException {
 				return "" + (count++);
 			}
@@ -149,6 +149,6 @@ public class ChunkMonitorTests {
 		monitor.incrementOffset();
 		ExecutionContext executionContext = new ExecutionContext();
 		monitor.update(executionContext);
-		assertEquals(0, executionContext.size());		
+		assertEquals(0, executionContext.size());
 	}
 }

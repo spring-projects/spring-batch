@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2007 the original author or authors.
+ * Copyright 2006-2013 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -30,12 +30,12 @@ import org.springframework.util.MethodInvoker;
  * Superclass for delegating classes which dynamically call a custom method of
  * injected object. Provides convenient API for dynamic method invocation
  * shielding subclasses from low-level details and exception handling.
- * 
+ *
  * {@link Exception}s thrown by a successfully invoked delegate method are
  * re-thrown without wrapping. In case the delegate method throws a
  * {@link Throwable} that doesn't subclass {@link Exception} it will be wrapped
  * by {@link InvocationTargetThrowableWrapper}.
- * 
+ *
  * @author Robert Kasanicky
  */
 public abstract class AbstractMethodInvokingDelegator<T> implements InitializingBean {
@@ -129,7 +129,7 @@ public abstract class AbstractMethodInvokingDelegator<T> implements Initializing
 		}
 	}
 
-    @Override
+	@Override
 	public void afterPropertiesSet() throws Exception {
 		Assert.notNull(targetObject);
 		Assert.hasLength(targetMethod);
@@ -171,8 +171,9 @@ public abstract class AbstractMethodInvokingDelegator<T> implements Initializing
 							argumentsMatchParameters = false;
 						}
 					}
-					if (argumentsMatchParameters)
+					if (argumentsMatchParameters) {
 						return true;
+					}
 				}
 			}
 		}
@@ -201,7 +202,7 @@ public abstract class AbstractMethodInvokingDelegator<T> implements Initializing
 	 * {@link #setTargetMethod(String)}. These will be used only when the
 	 * subclass tries to invoke the target method without providing explicit
 	 * argument values.
-	 * 
+	 *
 	 * If arguments are set to not-null value {@link #afterPropertiesSet()} will
 	 * check the values are compatible with target method's signature. In case
 	 * arguments are null (not set) method signature will not be checked and it
@@ -214,7 +215,7 @@ public abstract class AbstractMethodInvokingDelegator<T> implements Initializing
 	/**
 	 * Used to wrap a {@link Throwable} (not an {@link Exception}) thrown by a
 	 * reflectively-invoked delegate.
-	 * 
+	 *
 	 * @author Robert Kasanicky
 	 */
 	public static class InvocationTargetThrowableWrapper extends RuntimeException {

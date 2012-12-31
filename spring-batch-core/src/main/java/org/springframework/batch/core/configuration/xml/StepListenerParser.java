@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2009 the original author or authors.
+ * Copyright 2006-2013 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -32,13 +32,13 @@ import org.w3c.dom.Element;
 /**
  * Parser for a step listener element. Builds a {@link StepListenerFactoryBean}
  * using attributes from the configuration.
- * 
+ *
  * @author Dan Garrette
  * @since 2.0
  * @see AbstractListenerParser
  */
 public class StepListenerParser extends AbstractListenerParser {
-	
+
 	private static final String LISTENERS_ELE = "listeners";
 
 	private static final String MERGE_ATTR = "merge";
@@ -53,17 +53,17 @@ public class StepListenerParser extends AbstractListenerParser {
 		this.listenerMetaData = listenerMetaData;
 	}
 
-    @Override
+	@Override
 	protected Class<? extends AbstractListenerFactoryBean> getBeanClass() {
 		return StepListenerFactoryBean.class;
 	}
 
-    @Override
+	@Override
 	protected ListenerMetaData[] getMetaDataValues() {
 		return listenerMetaData;
 	}
 
-	@SuppressWarnings("unchecked")
+	@SuppressWarnings({"unchecked", "rawtypes"})
 	public void handleListenersElement(Element stepElement, BeanDefinition beanDefinition,
 			ParserContext parserContext) {
 		MutablePropertyValues propertyValues = beanDefinition.getPropertyValues();

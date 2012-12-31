@@ -48,7 +48,7 @@ public class FlowJobBuilderTests {
 	private StepSupport step1 = new StepSupport("step1") {
 		@Override
 		public void execute(StepExecution stepExecution) throws JobInterruptedException,
-				UnexpectedJobExecutionException {
+		UnexpectedJobExecutionException {
 			stepExecution.upgradeStatus(BatchStatus.COMPLETED);
 			stepExecution.setExitStatus(ExitStatus.COMPLETED);
 			jobRepository.update(stepExecution);
@@ -58,7 +58,7 @@ public class FlowJobBuilderTests {
 	private StepSupport fails = new StepSupport("fails") {
 		@Override
 		public void execute(StepExecution stepExecution) throws JobInterruptedException,
-				UnexpectedJobExecutionException {
+		UnexpectedJobExecutionException {
 			stepExecution.upgradeStatus(BatchStatus.FAILED);
 			stepExecution.setExitStatus(ExitStatus.FAILED);
 			jobRepository.update(stepExecution);
@@ -68,7 +68,7 @@ public class FlowJobBuilderTests {
 	private StepSupport step2 = new StepSupport("step2") {
 		@Override
 		public void execute(StepExecution stepExecution) throws JobInterruptedException,
-				UnexpectedJobExecutionException {
+		UnexpectedJobExecutionException {
 			stepExecution.upgradeStatus(BatchStatus.COMPLETED);
 			stepExecution.setExitStatus(ExitStatus.COMPLETED);
 			jobRepository.update(stepExecution);
@@ -78,7 +78,7 @@ public class FlowJobBuilderTests {
 	private StepSupport step3 = new StepSupport("step3") {
 		@Override
 		public void execute(StepExecution stepExecution) throws JobInterruptedException,
-				UnexpectedJobExecutionException {
+		UnexpectedJobExecutionException {
 			stepExecution.upgradeStatus(BatchStatus.COMPLETED);
 			stepExecution.setExitStatus(ExitStatus.COMPLETED);
 			jobRepository.update(stepExecution);
@@ -143,7 +143,7 @@ public class FlowJobBuilderTests {
 	public void testBuildDecision() throws Exception {
 		JobExecutionDecider decider = new JobExecutionDecider() {
 			private int count = 0;
-            @Override
+			@Override
 			public FlowExecutionStatus decide(JobExecution jobExecution, StepExecution stepExecution) {
 				count++;
 				return count<2 ? new FlowExecutionStatus("ONGOING") : FlowExecutionStatus.COMPLETED;

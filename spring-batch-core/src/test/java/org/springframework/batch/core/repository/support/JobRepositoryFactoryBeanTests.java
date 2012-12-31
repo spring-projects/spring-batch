@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2008 the original author or authors.
+ * Copyright 2006-2013 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -332,17 +332,17 @@ public class JobRepositoryFactoryBeanTests {
 
 	private static class StubIncrementer implements DataFieldMaxValueIncrementer {
 
-        @Override
+		@Override
 		public int nextIntValue() throws DataAccessException {
 			return 0;
 		}
 
-        @Override
+		@Override
 		public long nextLongValue() throws DataAccessException {
 			return 0;
 		}
 
-        @Override
+		@Override
 		public String nextStringValue() throws DataAccessException {
 			return null;
 		}

@@ -6,7 +6,7 @@ import org.junit.runners.JUnit4;
 @RunWith(JUnit4.class)
 public class MapJobInstanceDaoTests extends AbstractJobInstanceDaoTests {
 
-    @Override
+	@Override
 	protected JobInstanceDao getJobInstanceDao() {
 		return new MapJobInstanceDao();
 	}

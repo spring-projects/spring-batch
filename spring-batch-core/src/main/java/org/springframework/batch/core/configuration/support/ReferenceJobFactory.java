@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2007 the original author or authors.
+ * Copyright 2006-2013 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,9 +21,9 @@ import org.springframework.batch.core.configuration.JobFactory;
 /**
  * A {@link JobFactory} that just keeps a reference to a {@link Job}. It never
  * modifies its {@link Job}.
- * 
+ *
  * @author Dave Syer
- * 
+ *
  */
 public class ReferenceJobFactory implements JobFactory {
 
@@ -38,20 +38,20 @@ public class ReferenceJobFactory implements JobFactory {
 
 	/**
 	 * Just return the instance passed in on initialization.
-	 * 
+	 *
 	 * @see JobFactory#createJob()
 	 */
-    @Override
+	@Override
 	public final Job createJob() {
 		return job;
 	}
-	
+
 	/**
 	 * Just return the name of instance passed in on initialization.
-	 * 
+	 *
 	 * @see JobFactory#getJobName()
 	 */
-    @Override
+	@Override
 	public String getJobName() {
 		return job.getName();
 	}

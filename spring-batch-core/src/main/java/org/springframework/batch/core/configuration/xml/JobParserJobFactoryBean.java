@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2009 the original author or authors.
+ * Copyright 2006-2013 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -30,7 +30,7 @@ import org.springframework.util.StringUtils;
  * This {@link FactoryBean} is used by the batch namespace parser to create
  * {@link FlowJob} objects. It stores all of the properties that are
  * configurable on the &lt;job/&gt;.
- * 
+ *
  * @author Dan Garrette
  * @author Dave Syer
  * @since 2.0.1
@@ -55,7 +55,7 @@ class JobParserJobFactoryBean implements SmartFactoryBean {
 		this.name = name;
 	}
 
-    @Override
+	@Override
 	public final Object getObject() throws Exception {
 		Assert.isTrue(StringUtils.hasText(name), "The job must have an id.");
 		FlowJob flowJob = new FlowJob(name);
@@ -95,7 +95,7 @@ class JobParserJobFactoryBean implements SmartFactoryBean {
 	public void setJobRepository(JobRepository jobRepository) {
 		this.jobRepository = jobRepository;
 	}
-	
+
 	public void setJobParametersValidator(JobParametersValidator jobParametersValidator) {
 		this.jobParametersValidator = jobParametersValidator;
 	}
@@ -116,22 +116,22 @@ class JobParserJobFactoryBean implements SmartFactoryBean {
 		this.flow = flow;
 	}
 
-    @Override
+	@Override
 	public Class<FlowJob> getObjectType() {
 		return FlowJob.class;
 	}
 
-    @Override
+	@Override
 	public boolean isSingleton() {
 		return true;
 	}
-	
-    @Override
+
+	@Override
 	public boolean isEagerInit() {
 		return true;
 	}
-	
-    @Override
+
+	@Override
 	public boolean isPrototype() {
 		return false;
 	}

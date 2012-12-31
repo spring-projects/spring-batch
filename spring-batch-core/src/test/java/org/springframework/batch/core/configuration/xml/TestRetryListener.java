@@ -6,17 +6,17 @@ import org.springframework.retry.RetryListener;
 
 public class TestRetryListener extends AbstractTestComponent implements RetryListener {
 
-    @Override
+	@Override
 	public <T> void close(RetryContext context, RetryCallback<T> callback,
 			Throwable throwable) {
 	}
 
-    @Override
+	@Override
 	public <T> void onError(RetryContext context, RetryCallback<T> callback,
 			Throwable throwable) {
 	}
 
-    @Override
+	@Override
 	public <T> boolean open(RetryContext context, RetryCallback<T> callback) {
 		executed = true;
 		return true;

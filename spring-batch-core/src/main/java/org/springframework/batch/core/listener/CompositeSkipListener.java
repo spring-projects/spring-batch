@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2007 the original author or authors.
+ * Copyright 2006-2013 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,7 +23,7 @@ import org.springframework.core.Ordered;
 
 /**
  * @author Dave Syer
- * 
+ *
  */
 public class CompositeSkipListener<T,S> implements SkipListener<T,S> {
 
@@ -31,7 +31,7 @@ public class CompositeSkipListener<T,S> implements SkipListener<T,S> {
 
 	/**
 	 * Public setter for the listeners.
-	 * 
+	 *
 	 * @param listeners
 	 */
 	public void setListeners(List<? extends SkipListener<? super T,? super S>> listeners) {
@@ -40,7 +40,7 @@ public class CompositeSkipListener<T,S> implements SkipListener<T,S> {
 
 	/**
 	 * Register additional listener.
-	 * 
+	 *
 	 * @param listener
 	 */
 	public void register(SkipListener<? super T,? super S> listener) {
@@ -52,7 +52,7 @@ public class CompositeSkipListener<T,S> implements SkipListener<T,S> {
 	 * that implement {@link Ordered}.
 	 * @see org.springframework.batch.core.SkipListener#onSkipInRead(java.lang.Throwable)
 	 */
-    @Override
+	@Override
 	public void onSkipInRead(Throwable t) {
 		for (Iterator<SkipListener<? super T,? super S>> iterator = listeners.iterator(); iterator.hasNext();) {
 			SkipListener<? super T,? super S> listener = iterator.next();
@@ -66,7 +66,7 @@ public class CompositeSkipListener<T,S> implements SkipListener<T,S> {
 	 * @see org.springframework.batch.core.SkipListener#onSkipInWrite(java.lang.Object,
 	 * java.lang.Throwable)
 	 */
-    @Override
+	@Override
 	public void onSkipInWrite(S item, Throwable t) {
 		for (Iterator<SkipListener<? super T,? super S>> iterator = listeners.iterator(); iterator.hasNext();) {
 			SkipListener<? super T,? super S> listener = iterator.next();
@@ -80,7 +80,7 @@ public class CompositeSkipListener<T,S> implements SkipListener<T,S> {
 	 * @see org.springframework.batch.core.SkipListener#onSkipInWrite(java.lang.Object,
 	 * java.lang.Throwable)
 	 */
-    @Override
+	@Override
 	public void onSkipInProcess(T item, Throwable t) {
 		for (Iterator<SkipListener<? super T,? super S>> iterator = listeners.iterator(); iterator.hasNext();) {
 			SkipListener<? super T,? super S> listener = iterator.next();

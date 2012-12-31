@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2010 the original author or authors.
+ * Copyright 2006-2013 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,9 +23,9 @@ import org.springframework.classify.SubclassClassifier;
 /**
  * A {@link SkipPolicy} that depends on an exception classifier to make its
  * decision, and then delegates to the classifier result.
- * 
+ *
  * @author Dave Syer
- * 
+ *
  * @see SubclassClassifier
  */
 public class ExceptionClassifierSkipPolicy implements SkipPolicy {
@@ -34,7 +34,7 @@ public class ExceptionClassifierSkipPolicy implements SkipPolicy {
 
 	/**
 	 * The classifier that will be used to choose a delegate policy.
-	 * 
+	 *
 	 * @param classifier the classifier to use to choose a delegate policy
 	 */
 	public void setExceptionClassifier(SubclassClassifier<Throwable, SkipPolicy> classifier) {
@@ -46,7 +46,7 @@ public class ExceptionClassifierSkipPolicy implements SkipPolicy {
 	 * set it once, e.g. in configuration, and then don't change it during a
 	 * running application. Either this property or the exception classifier
 	 * directly should be set, but not both.
-	 * 
+	 *
 	 * @param policyMap a map of String to {@link SkipPolicy} that will be used
 	 * to create a {@link Classifier} to locate a policy.
 	 */
@@ -59,13 +59,13 @@ public class ExceptionClassifierSkipPolicy implements SkipPolicy {
 	/**
 	 * Consult the classifier and find a delegate policy, and then use that to
 	 * determine the outcome.
-	 * 
+	 *
 	 * @param t the throwable to consider
 	 * @param skipCount the current skip count
 	 * @return true if the exception can be skipped
 	 * @throws SkipLimitExceededException if a limit is exceeded
 	 */
-    @Override
+	@Override
 	public boolean shouldSkip(Throwable t, int skipCount) throws SkipLimitExceededException {
 		return classifier.classify(t).shouldSkip(t, skipCount);
 	}

@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2007 the original author or authors.
+ * Copyright 2006-2013 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -34,7 +34,7 @@ import org.springframework.batch.core.repository.JobRestartException;
  * {@link JobExecution}. Sequentially executes a job by iterating through its
  * list of steps.  Any {@link Step} that fails will fail the job.  The job is
  * considered complete when all steps have been executed.
- * 
+ *
  * @author Lucas Ward
  * @author Dave Syer
  */
@@ -59,7 +59,7 @@ public class SimpleJob extends AbstractJob {
 	/**
 	 * Public setter for the steps in this job. Overrides any calls to
 	 * {@link #addStep(Step)}.
-	 * 
+	 *
 	 * @param steps the steps to execute
 	 */
 	public void setSteps(List<Step> steps) {
@@ -69,10 +69,10 @@ public class SimpleJob extends AbstractJob {
 
 	/**
 	 * Convenience method for clients to inspect the steps for this job.
-	 * 
+	 *
 	 * @return the step names for this job
 	 */
-    @Override
+	@Override
 	public Collection<String> getStepNames() {
 		List<String> names = new ArrayList<String>();
 		for (Step step : steps) {
@@ -83,7 +83,7 @@ public class SimpleJob extends AbstractJob {
 
 	/**
 	 * Convenience method for adding a single step to the job.
-	 * 
+	 *
 	 * @param step a {@link Step} to add
 	 */
 	public void addStep(Step step) {
@@ -92,11 +92,11 @@ public class SimpleJob extends AbstractJob {
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see
 	 * org.springframework.batch.core.job.AbstractJob#getStep(java.lang.String)
 	 */
-    @Override
+	@Override
 	public Step getStep(String stepName) {
 		for (Step step : this.steps) {
 			if (step.getName().equals(stepName)) {
@@ -110,14 +110,14 @@ public class SimpleJob extends AbstractJob {
 	 * Handler of steps sequentially as provided, checking each one for success
 	 * before moving to the next. Returns the last {@link StepExecution}
 	 * successfully processed if it exists, and null if none were processed.
-	 * 
+	 *
 	 * @param execution the current {@link JobExecution}
-	 * 
+	 *
 	 * @see AbstractJob#handleStep(Step, JobExecution)
 	 */
-    @Override
+	@Override
 	protected void doExecute(JobExecution execution) throws JobInterruptedException, JobRestartException,
-			StartLimitExceededException {
+	StartLimitExceededException {
 
 		StepExecution stepExecution = null;
 		for (Step step : steps) {

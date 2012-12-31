@@ -1,12 +1,13 @@
 package org.springframework.batch.core.repository.dao;
 
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.fail;
+
 import java.util.Collections;
 import java.util.Date;
 import java.util.SortedSet;
 import java.util.TreeSet;
-
 import java.util.concurrent.CountDownLatch;
-
 import java.util.concurrent.atomic.AtomicReference;
 
 import org.junit.Test;
@@ -16,8 +17,6 @@ import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.JobInstance;
 import org.springframework.batch.core.JobParameters;
 
-import static org.junit.Assert.*;
-
 @RunWith(JUnit4.class)
 public class MapJobExecutionDaoTests extends AbstractJobExecutionDaoTests {
 
@@ -25,7 +24,7 @@ public class MapJobExecutionDaoTests extends AbstractJobExecutionDaoTests {
 	protected JobExecutionDao getJobExecutionDao() {
 		return new MapJobExecutionDao();
 	}
-	
+
 	@Override
 	protected JobInstanceDao getJobInstanceDao() {
 		return new MapJobInstanceDao();
@@ -38,23 +37,23 @@ public class MapJobExecutionDaoTests extends AbstractJobExecutionDaoTests {
 	public void testPersistentCopy() {
 		JobExecutionDao tested = new MapJobExecutionDao();
 		JobExecution jobExecution = new JobExecution(new JobInstance((long) 1, new JobParameters(), "mapJob"));
-		
+
 		assertNull(jobExecution.getStartTime());
 		tested.saveJobExecution(jobExecution);
 		jobExecution.setStartTime(new Date());
-		
+
 		JobExecution retrieved = tested.getJobExecution(jobExecution.getId());
 		assertNull(retrieved.getStartTime());
-		
+
 		tested.updateJobExecution(jobExecution);
 		jobExecution.setEndTime(new Date());
 		assertNull(retrieved.getEndTime());
-		
+
 	}
 
 	/**
-	* Verify that the ids are properly generated even under heavy concurrent load
-	*/
+	 * Verify that the ids are properly generated even under heavy concurrent load
+	 */
 	@Test
 	public void testConcurrentSaveJobExecution() throws Exception {
 		final int iterations = 100;
@@ -69,7 +68,7 @@ public class MapJobExecutionDaoTests extends AbstractJobExecutionDaoTests {
 
 		// Implementation of the high-concurrency code
 		final Runnable codeUnderTest = new Runnable() {
-            @Override
+			@Override
 			public void run() {
 				try {
 					JobExecution jobExecution = new JobExecution(new JobInstance((long) -1, new JobParameters(), "mapJob"));
@@ -98,11 +97,13 @@ public class MapJobExecutionDaoTests extends AbstractJobExecutionDaoTests {
 		for(Thread t : threads) { t.join(); }
 
 		// Ensure no general exceptions arose
-		if(exception.get() != null) throw new RuntimeException("Excepion occurred under high concurrency usage", exception.get());
+		if(exception.get() != null) {
+			throw new RuntimeException("Excepion occurred under high concurrency usage", exception.get());
+		}
 
 		// Validate the ids: we'd expect one of these three things to fail
 		if(ids.size() < iterations) {
-			fail("Duplicate id generated during high concurrency usage");	
+			fail("Duplicate id generated during high concurrency usage");
 		}
 		if(ids.first() < 0) {
 			fail("Generated an id less than zero during high concurrency usage: " + ids.first());

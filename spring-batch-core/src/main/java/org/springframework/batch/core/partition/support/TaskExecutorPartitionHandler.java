@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2012 the original author or authors.
+ * Copyright 2006-2013 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -71,17 +71,17 @@ public class TaskExecutorPartitionHandler extends AbstractPartitionHandler imple
 	 * {@link StepExecution}. This is a regular Spring Batch step, with all the
 	 * business logic required to complete an execution based on the input
 	 * parameters in its {@link StepExecution} context.
-	 * 
+	 *
 	 * @param step the {@link Step} instance to use to execute business logic
 	 */
     @Required
 	public void setStep(Step step) {
 		this.step = step;
 	}
-	
+
 	/**
 	 * The step instance that will be executed in parallel by this handler.
-	 * 
+	 *
 	 * @return the step instance that will be used
 	 * @see StepHolder#getStep()
 	 */

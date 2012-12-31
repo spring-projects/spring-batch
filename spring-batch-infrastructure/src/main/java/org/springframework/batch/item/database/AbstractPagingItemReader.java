@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2008 the original author or authors.
+ * Copyright 2006-2013 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -27,20 +27,20 @@ import org.springframework.util.ClassUtils;
 /**
  * Abstract {@link org.springframework.batch.item.ItemReader} for to extend when
  * reading database records in a paging fashion.
- * 
+ *
  * <p>
  * Implementations should execute queries using paged requests of a size
  * specified in {@link #setPageSize(int)}. Additional pages are requested when
  * needed as {@link #read()} method is called, returning an object corresponding
  * to current position.
  * </p>
- * 
+ *
  * @author Thomas Risberg
  * @author Dave Syer
  * @since 2.0
  */
 public abstract class AbstractPagingItemReader<T> extends AbstractItemCountingItemStreamItemReader<T> implements
-		InitializingBean {
+InitializingBean {
 
 	protected Log logger = LogFactory.getLog(getClass());
 
@@ -78,7 +78,7 @@ public abstract class AbstractPagingItemReader<T> extends AbstractItemCountingIt
 
 	/**
 	 * The number of rows to retrieve at a time.
-	 * 
+	 *
 	 * @param pageSize the number of rows to fetch per page
 	 */
 	public void setPageSize(int pageSize) {
@@ -89,7 +89,7 @@ public abstract class AbstractPagingItemReader<T> extends AbstractItemCountingIt
 	 * Check mandatory properties.
 	 * @see org.springframework.beans.factory.InitializingBean#afterPropertiesSet()
 	 */
-    @Override
+	@Override
 	public void afterPropertiesSet() throws Exception {
 		Assert.isTrue(pageSize > 0, "pageSize must be greater than zero");
 	}

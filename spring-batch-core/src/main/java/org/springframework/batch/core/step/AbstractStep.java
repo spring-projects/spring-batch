@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2007 the original author or authors.
+ * Copyright 2006-2013 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -41,7 +41,7 @@ import org.springframework.util.ClassUtils;
 /**
  * A {@link Step} implementation that provides common behavior to subclasses, including registering and calling
  * listeners.
- * 
+ *
  * @author Dave Syer
  * @author Ben Hale
  * @author Robert Kasanicky
@@ -67,20 +67,20 @@ public abstract class AbstractStep implements Step, InitializingBean, BeanNameAw
 		super();
 	}
 
-    @Override
+	@Override
 	public void afterPropertiesSet() throws Exception {
 		Assert.state(name != null, "A Step must have a name");
 		Assert.state(jobRepository != null, "JobRepository is mandatory");
 	}
 
-    @Override
+	@Override
 	public String getName() {
 		return this.name;
 	}
 
 	/**
 	 * Set the name property. Always overrides the default value if this object is a Spring bean.
-	 * 
+	 *
 	 * @see #setBeanName(java.lang.String)
 	 */
 	public void setName(String name) {
@@ -91,31 +91,31 @@ public abstract class AbstractStep implements Step, InitializingBean, BeanNameAw
 	 * Set the name property if it is not already set. Because of the order of the callbacks in a Spring container the
 	 * name property will be set first if it is present. Care is needed with bean definition inheritance - if a parent
 	 * bean has a name, then its children need an explicit name as well, otherwise they will not be unique.
-	 * 
+	 *
 	 * @see org.springframework.beans.factory.BeanNameAware#setBeanName(java.lang.String)
 	 */
-    @Override
+	@Override
 	public void setBeanName(String name) {
 		if (this.name == null) {
 			this.name = name;
 		}
 	}
 
-    @Override
+	@Override
 	public int getStartLimit() {
 		return this.startLimit;
 	}
 
 	/**
 	 * Public setter for the startLimit.
-	 * 
+	 *
 	 * @param startLimit the startLimit to set
 	 */
 	public void setStartLimit(int startLimit) {
 		this.startLimit = startLimit;
 	}
 
-    @Override
+	@Override
 	public boolean isAllowStartIfComplete() {
 		return this.allowStartIfComplete;
 	}
@@ -123,7 +123,7 @@ public abstract class AbstractStep implements Step, InitializingBean, BeanNameAw
 	/**
 	 * Public setter for flag that determines whether the step should start again if it is already complete. Defaults to
 	 * false.
-	 * 
+	 *
 	 * @param allowStartIfComplete the value of the flag to set
 	 */
 	public void setAllowStartIfComplete(boolean allowStartIfComplete) {
@@ -132,7 +132,7 @@ public abstract class AbstractStep implements Step, InitializingBean, BeanNameAw
 
 	/**
 	 * Convenient constructor for setting only the name property.
-	 * 
+	 *
 	 * @param name
 	 */
 	public AbstractStep(String name) {
@@ -142,7 +142,7 @@ public abstract class AbstractStep implements Step, InitializingBean, BeanNameAw
 	/**
 	 * Extension point for subclasses to execute business logic. Subclasses should set the {@link ExitStatus} on the
 	 * {@link StepExecution} before returning.
-	 * 
+	 *
 	 * @param stepExecution the current step context
 	 * @throws Exception
 	 */
@@ -151,7 +151,7 @@ public abstract class AbstractStep implements Step, InitializingBean, BeanNameAw
 	/**
 	 * Extension point for subclasses to provide callbacks to their collaborators at the beginning of a step, to open or
 	 * acquire resources. Does nothing by default.
-	 * 
+	 *
 	 * @param ctx the {@link ExecutionContext} to use
 	 * @throws Exception
 	 */
@@ -161,7 +161,7 @@ public abstract class AbstractStep implements Step, InitializingBean, BeanNameAw
 	/**
 	 * Extension point for subclasses to provide callbacks to their collaborators at the end of a step (right at the end
 	 * of the finally block), to close or release resources. Does nothing by default.
-	 * 
+	 *
 	 * @param ctx the {@link ExecutionContext} to use
 	 * @throws Exception
 	 */
@@ -173,9 +173,9 @@ public abstract class AbstractStep implements Step, InitializingBean, BeanNameAw
 	 * {@link #open(ExecutionContext)}), execution logic ({@link #doExecute(StepExecution)}) and resource closing (
 	 * {@link #close(ExecutionContext)}).
 	 */
-    @Override
+	@Override
 	public final void execute(StepExecution stepExecution) throws JobInterruptedException,
-			UnexpectedJobExecutionException {
+	UnexpectedJobExecutionException {
 
 		logger.debug("Executing: id=" + stepExecution.getId());
 		stepExecution.setStartTime(new Date());
@@ -288,7 +288,7 @@ public abstract class AbstractStep implements Step, InitializingBean, BeanNameAw
 
 	/**
 	 * Register a step listener for callbacks at the appropriate stages in a step execution.
-	 * 
+	 *
 	 * @param listener a {@link StepExecutionListener}
 	 */
 	public void registerStepExecutionListener(StepExecutionListener listener) {
@@ -297,7 +297,7 @@ public abstract class AbstractStep implements Step, InitializingBean, BeanNameAw
 
 	/**
 	 * Register each of the objects as listeners.
-	 * 
+	 *
 	 * @param listeners an array of listener objects of known types.
 	 */
 	public void setStepExecutionListeners(StepExecutionListener[] listeners) {
@@ -315,7 +315,7 @@ public abstract class AbstractStep implements Step, InitializingBean, BeanNameAw
 
 	/**
 	 * Public setter for {@link JobRepository}.
-	 * 
+	 *
 	 * @param jobRepository is a mandatory dependence (no default).
 	 */
 	public void setJobRepository(JobRepository jobRepository) {
@@ -326,7 +326,7 @@ public abstract class AbstractStep implements Step, InitializingBean, BeanNameAw
 		return jobRepository;
 	}
 
-    @Override
+	@Override
 	public String toString() {
 		return ClassUtils.getShortName(getClass()) + ": [name=" + name + "]";
 	}
@@ -334,7 +334,7 @@ public abstract class AbstractStep implements Step, InitializingBean, BeanNameAw
 	/**
 	 * Default mapping from throwable to {@link ExitStatus}. Clients can modify the exit code using a
 	 * {@link StepExecutionListener}.
-	 * 
+	 *
 	 * @param ex the cause of the failure
 	 * @return an {@link ExitStatus}
 	 */

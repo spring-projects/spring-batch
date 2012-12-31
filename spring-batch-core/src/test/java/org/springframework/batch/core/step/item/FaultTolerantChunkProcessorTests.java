@@ -47,7 +47,7 @@ public class FaultTolerantChunkProcessorTests {
 		processor = new FaultTolerantChunkProcessor<String, String>(
 				new PassThroughItemProcessor<String>(),
 				new ItemWriter<String>() {
-                    @Override
+					@Override
 					public void write(List<? extends String> items)
 							throws Exception {
 						if (items.contains("fail")) {
@@ -69,7 +69,7 @@ public class FaultTolerantChunkProcessorTests {
 	@Test
 	public void testTransform() throws Exception {
 		processor.setItemProcessor(new ItemProcessor<String, String>() {
-            @Override
+			@Override
 			public String process(String item) throws Exception {
 				return item.equals("1") ? null : item;
 			}
@@ -84,7 +84,7 @@ public class FaultTolerantChunkProcessorTests {
 	public void testFilterCountOnSkip() throws Exception {
 		processor.setProcessSkipPolicy(new AlwaysSkipItemSkipPolicy());
 		processor.setItemProcessor(new ItemProcessor<String, String>() {
-            @Override
+			@Override
 			public String process(String item) throws Exception {
 				if (item.equals("1")) {
 					throw new RuntimeException("Skippable");
@@ -110,14 +110,14 @@ public class FaultTolerantChunkProcessorTests {
 
 	/**
 	 * An Error can be retried or skipped but by default it is just propagated
-	 * 
+	 *
 	 * @throws Exception
 	 */
 	@Test
 	public void testWriteSkipOnError() throws Exception {
 		processor.setWriteSkipPolicy(new AlwaysSkipItemSkipPolicy());
 		processor.setItemWriter(new ItemWriter<String>() {
-            @Override
+			@Override
 			public void write(List<? extends String> items) throws Exception {
 				if (items.contains("fail")) {
 					assertFalse("Expected Error!", true);
@@ -139,7 +139,7 @@ public class FaultTolerantChunkProcessorTests {
 	public void testWriteSkipOnException() throws Exception {
 		processor.setWriteSkipPolicy(new AlwaysSkipItemSkipPolicy());
 		processor.setItemWriter(new ItemWriter<String>() {
-            @Override
+			@Override
 			public void write(List<? extends String> items) throws Exception {
 				if (items.contains("fail")) {
 					throw new RuntimeException("Expected Exception!");
@@ -170,7 +170,7 @@ public class FaultTolerantChunkProcessorTests {
 	public void testWriteSkipOnExceptionWithTrivialChunk() throws Exception {
 		processor.setWriteSkipPolicy(new AlwaysSkipItemSkipPolicy());
 		processor.setItemWriter(new ItemWriter<String>() {
-            @Override
+			@Override
 			public void write(List<? extends String> items) throws Exception {
 				if (items.contains("fail")) {
 					throw new RuntimeException("Expected Exception!");
@@ -201,19 +201,20 @@ public class FaultTolerantChunkProcessorTests {
 	@Test
 	public void testTransformWithExceptionAndNoRollback() throws Exception {
 		processor.setItemProcessor(new ItemProcessor<String, String>() {
-            @Override
+			@Override
 			public String process(String item) throws Exception {
-				if (item.equals("1"))
+				if (item.equals("1")) {
 					throw new DataIntegrityViolationException("Planned");
+				}
 				return item;
 			}
 		});
 		processor.setProcessSkipPolicy(new AlwaysSkipItemSkipPolicy());
 		processor
-				.setRollbackClassifier(new BinaryExceptionClassifier(
-						Collections
-								.<Class<? extends Throwable>> singleton(DataIntegrityViolationException.class),
-						false));
+		.setRollbackClassifier(new BinaryExceptionClassifier(
+				Collections
+				.<Class<? extends Throwable>> singleton(DataIntegrityViolationException.class),
+				false));
 		Chunk<String> inputs = new Chunk<String>(Arrays.asList("1", "2"));
 		processor.process(contribution, inputs);
 		assertEquals(1, list.size());
@@ -252,7 +253,7 @@ public class FaultTolerantChunkProcessorTests {
 		processor = new FaultTolerantChunkProcessor<String, String>(
 				new PassThroughItemProcessor<String>(),
 				new ItemWriter<String>() {
-                    @Override
+					@Override
 					public void write(List<? extends String> items)
 							throws Exception {
 						// Fail if there is more than one item
@@ -306,7 +307,7 @@ public class FaultTolerantChunkProcessorTests {
 		processor = new FaultTolerantChunkProcessor<String, String>(
 				new PassThroughItemProcessor<String>(),
 				new ItemWriter<String>() {
-                    @Override
+					@Override
 					public void write(List<? extends String> items)
 							throws Exception {
 						// Always fail in writer
@@ -337,7 +338,7 @@ public class FaultTolerantChunkProcessorTests {
 		batchRetryTemplate.setRetryPolicy(retryPolicy);
 		processor.setWriteSkipPolicy(new AlwaysSkipItemSkipPolicy());
 		processor.setItemWriter(new ItemWriter<String>() {
-            @Override
+			@Override
 			public void write(List<? extends String> items) throws Exception {
 				if (items.contains("fail")) {
 					throw new IllegalArgumentException("Expected Exception!");
@@ -382,7 +383,7 @@ public class FaultTolerantChunkProcessorTests {
 		batchRetryTemplate.setRetryPolicy(retryPolicy);
 		processor.setWriteSkipPolicy(new AlwaysSkipItemSkipPolicy());
 		processor.setItemWriter(new ItemWriter<String>() {
-            @Override
+			@Override
 			public void write(List<? extends String> items) throws Exception {
 				if (items.contains("fail")) {
 					throw new IllegalArgumentException("Expected Exception!");
@@ -437,7 +438,7 @@ public class FaultTolerantChunkProcessorTests {
 				Collections.<Class<? extends Throwable>, Boolean> singletonMap(
 						IllegalArgumentException.class, true)));
 		processor.setItemWriter(new ItemWriter<String>() {
-            @Override
+			@Override
 			public void write(List<? extends String> items) throws Exception {
 				if (items.contains("fail")) {
 					throw new IllegalArgumentException("Expected Exception!");

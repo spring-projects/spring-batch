@@ -37,7 +37,7 @@ import org.springframework.transaction.PlatformTransactionManager;
  * only initialize when a method is called. This is to prevent (as much as possible) configuration cycles from
  * developing when these components are needed in a configuration resource that itself provides a
  * {@link BatchConfigurer}.
- * 
+ *
  * @author Dave Syer
  * @since 2.2
  * @see EnableBatchProcessing
@@ -47,7 +47,7 @@ public class SimpleBatchConfiguration extends AbstractBatchConfiguration {
 
 	@Autowired
 	private ApplicationContext context;
-	
+
 	private boolean initialized = false;
 
 	private AtomicReference<JobRepository> jobRepository = new AtomicReference<JobRepository>();
@@ -58,25 +58,25 @@ public class SimpleBatchConfiguration extends AbstractBatchConfiguration {
 
 	private AtomicReference<PlatformTransactionManager> transactionManager = new AtomicReference<PlatformTransactionManager>();
 
-    @Override
+	@Override
 	@Bean
 	public JobRepository jobRepository() throws Exception {
 		return createLazyProxy(jobRepository, JobRepository.class);
 	}
 
-    @Override
+	@Override
 	@Bean
 	public JobLauncher jobLauncher() throws Exception {
 		return createLazyProxy(jobLauncher, JobLauncher.class);
 	}
 
-    @Override
+	@Override
 	@Bean
 	public JobRegistry jobRegistry() throws Exception {
 		return createLazyProxy(jobRegistry, JobRegistry.class);
 	}
 
-    @Override
+	@Override
 	@Bean
 	public PlatformTransactionManager transactionManager() throws Exception {
 		return createLazyProxy(transactionManager, PlatformTransactionManager.class);
@@ -95,7 +95,7 @@ public class SimpleBatchConfiguration extends AbstractBatchConfiguration {
 	/**
 	 * Sets up the basic components by extracting them from the {@link BatchConfigurer configurer}, defaulting to some
 	 * sensible values as long as a unique DataSource is available.
-	 * 
+	 *
 	 * @throws Exception if there is a problem in the configurer
 	 */
 	protected void initialize() throws Exception {

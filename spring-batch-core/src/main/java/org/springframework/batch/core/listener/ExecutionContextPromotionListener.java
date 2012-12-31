@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2007 the original author or authors.
+ * Copyright 2006-2013 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -29,12 +29,12 @@ import org.springframework.util.Assert;
  * {@link ExecutionContext} to the {@link Job} {@link ExecutionContext} at the
  * end of a step. A list of keys should be provided that correspond to the items
  * in the {@link Step} {@link ExecutionContext} that should be promoted.
- * 
+ *
  * Additionally, an optional list of statuses can be set to indicate for which
  * exit status codes the promotion should occur. These statuses will be checked
  * using the {@link PatternMatcher}, so wildcards are allowed. By default,
  * promotion will only occur for steps with an exit code of "COMPLETED".
- * 
+ *
  * @author Dan Garrette
  * @since 2.0
  */
@@ -46,7 +46,7 @@ public class ExecutionContextPromotionListener extends StepExecutionListenerSupp
 
 	private boolean strict = false;
 
-    @Override
+	@Override
 	public ExitStatus afterStep(StepExecution stepExecution) {
 		ExecutionContext stepContext = stepExecution.getExecutionContext();
 		ExecutionContext jobContext = stepExecution.getJobExecution().getExecutionContext();
@@ -60,7 +60,7 @@ public class ExecutionContextPromotionListener extends StepExecutionListenerSupp
 						if (strict) {
 							throw new IllegalArgumentException("The key [" + key
 									+ "] was not found in the Step's ExecutionContext.");
-						}						
+						}
 					}
 				}
 				break;
@@ -70,7 +70,7 @@ public class ExecutionContextPromotionListener extends StepExecutionListenerSupp
 		return null;
 	}
 
-    @Override
+	@Override
 	public void afterPropertiesSet() throws Exception {
 		Assert.notNull(this.keys, "The 'keys' property must be provided");
 		Assert.notEmpty(this.keys, "The 'keys' property must not be empty");
@@ -98,7 +98,7 @@ public class ExecutionContextPromotionListener extends StepExecutionListenerSupp
 	/**
 	 * If set to TRUE, the listener will throw an exception if any 'key' is not
 	 * found in the Step {@link ExecutionContext}. FALSE by default.
-	 * 
+	 *
 	 * @param strict
 	 */
 	public void setStrict(boolean strict) {

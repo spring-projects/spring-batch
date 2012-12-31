@@ -223,7 +223,7 @@ public class SystemCommandTaskletIntegrationTests {
 	 */
 	private static class TestExitCodeMapper implements SystemProcessExitCodeMapper {
 
-        @Override
+		@Override
 		public ExitStatus getExitStatus(int exitCode) {
 			if (exitCode == 0) {
 				return ExitStatus.COMPLETED;

@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2007 the original author or authors.
+ * Copyright 2006-2013 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,9 +21,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Set;
-
 import java.util.concurrent.CopyOnWriteArraySet;
-
 import java.util.concurrent.atomic.AtomicLong;
 
 import org.springframework.batch.core.JobExecution;
@@ -45,7 +43,7 @@ public class MapJobInstanceDao implements JobInstanceDao {
 		jobInstances.clear();
 	}
 
-    @Override
+	@Override
 	public JobInstance createJobInstance(String jobName, JobParameters jobParameters) {
 
 		Assert.state(getJobInstance(jobName, jobParameters) == null, "JobInstance must not already exist");
@@ -57,7 +55,7 @@ public class MapJobInstanceDao implements JobInstanceDao {
 		return jobInstance;
 	}
 
-    @Override
+	@Override
 	public JobInstance getJobInstance(String jobName, JobParameters jobParameters) {
 
 		for (JobInstance instance : jobInstances) {
@@ -69,7 +67,7 @@ public class MapJobInstanceDao implements JobInstanceDao {
 
 	}
 
-    @Override
+	@Override
 	public JobInstance getJobInstance(Long instanceId) {
 		for (JobInstance instance : jobInstances) {
 			if (instance.getId().equals(instanceId)) {
@@ -79,7 +77,7 @@ public class MapJobInstanceDao implements JobInstanceDao {
 		return null;
 	}
 
-    @Override
+	@Override
 	public List<String> getJobNames() {
 		List<String> result = new ArrayList<String>();
 		for (JobInstance instance : jobInstances) {
@@ -89,7 +87,7 @@ public class MapJobInstanceDao implements JobInstanceDao {
 		return result;
 	}
 
-    @Override
+	@Override
 	public List<JobInstance> getJobInstances(String jobName, int start, int count) {
 		List<JobInstance> result = new ArrayList<JobInstance>();
 		for (JobInstance instance : jobInstances) {
@@ -99,7 +97,7 @@ public class MapJobInstanceDao implements JobInstanceDao {
 		}
 		Collections.sort(result, new Comparator<JobInstance>() {
 			// sort by ID descending
-            @Override
+			@Override
 			public int compare(JobInstance o1, JobInstance o2) {
 				return Long.signum(o2.getId() - o1.getId());
 			}
@@ -110,7 +108,7 @@ public class MapJobInstanceDao implements JobInstanceDao {
 		return result.subList(startIndex, endIndex);
 	}
 
-    @Override
+	@Override
 	public JobInstance getJobInstance(JobExecution jobExecution) {
 		return jobExecution.getJobInstance();
 	}

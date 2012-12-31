@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2008 the original author or authors.
+ * Copyright 2006-2013 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,10 +26,10 @@ import org.springframework.beans.factory.InitializingBean;
  * Abstract JPA Query Provider to serve as a base class for all JPA
  * {@link Query} providers.
  * </p>
- * 
+ *
  * @author Anatoly Polinsky
  * @author Dave Syer
- * 
+ *
  * @since 2.1
  */
 public abstract class AbstractJpaQueryProvider implements JpaQueryProvider, InitializingBean {
@@ -42,10 +42,10 @@ public abstract class AbstractJpaQueryProvider implements JpaQueryProvider, Init
 	 * {@link HibernateQueryProvider}. This is currently needed to allow
 	 * {@link HibernateQueryProvider} to participate in a user's managed transaction.
 	 * </p>
-	 * 
+	 *
 	 * @param entityManager
 	 */
-    @Override
+	@Override
 	public void setEntityManager(EntityManager entityManager) {
 		this.entityManager = entityManager;
 	}
@@ -54,7 +54,7 @@ public abstract class AbstractJpaQueryProvider implements JpaQueryProvider, Init
 	 * <p>
 	 * Getter for {@link EntityManager}
 	 * </p>
-	 * 
+	 *
 	 * @return entityManager the injected {@link EntityManager}
 	 */
 	protected EntityManager getEntityManager() {

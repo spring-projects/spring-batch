@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2008 the original author or authors.
+ * Copyright 2002-2013 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -36,7 +36,7 @@ import org.springframework.core.Ordered;
 
 /**
  * @author Lucas Ward
- * 
+ *
  */
 public class JobListenerFactoryBeanTests {
 
@@ -105,7 +105,6 @@ public class JobListenerFactoryBeanTests {
 	@Test
 	public void testAnnotationsIsListener() throws Exception {
 		assertTrue(JobListenerFactoryBean.isListener(new Object() {
-			@SuppressWarnings("unused")
 			@BeforeJob
 			public void foo(JobExecution execution) {
 			}
@@ -120,12 +119,11 @@ public class JobListenerFactoryBeanTests {
 	@Test
 	public void testAnnotationsWithOrdered() throws Exception {
 		Object delegate = new Ordered() {
-			@SuppressWarnings("unused")
 			@BeforeJob
 			public void foo(JobExecution execution) {
 			}
 
-            @Override
+			@Override
 			public int getOrder() {
 				return 3;
 			}
@@ -146,7 +144,6 @@ public class JobListenerFactoryBeanTests {
 	@Test
 	public void testEmptySignatureAnnotation() {
 		AbstractTestComponent delegate = new AbstractTestComponent() {
-			@SuppressWarnings("unused")
 			@AfterJob
 			public void aMethod() {
 				executed = true;
@@ -161,7 +158,6 @@ public class JobListenerFactoryBeanTests {
 	@Test
 	public void testRightSignatureAnnotation() {
 		AbstractTestComponent delegate = new AbstractTestComponent() {
-			@SuppressWarnings("unused")
 			@AfterJob
 			public void aMethod(JobExecution jobExecution) {
 				executed = true;
@@ -177,7 +173,6 @@ public class JobListenerFactoryBeanTests {
 	@Test(expected = IllegalArgumentException.class)
 	public void testWrongSignatureAnnotation() {
 		AbstractTestComponent delegate = new AbstractTestComponent() {
-			@SuppressWarnings("unused")
 			@AfterJob
 			public void aMethod(Integer item) {
 				executed = true;
@@ -243,19 +238,18 @@ public class JobListenerFactoryBeanTests {
 
 		boolean afterJobCalled = false;
 
-        @Override
+		@Override
 		public void afterJob(JobExecution jobExecution) {
 			afterJobCalled = true;
 		}
 
-        @Override
+		@Override
 		public void beforeJob(JobExecution jobExecution) {
 			beforeJobCalled = true;
 		}
 
 	}
 
-	@SuppressWarnings("unused")
 	private class AnnotatedTestClass {
 
 		boolean beforeJobCalled = false;

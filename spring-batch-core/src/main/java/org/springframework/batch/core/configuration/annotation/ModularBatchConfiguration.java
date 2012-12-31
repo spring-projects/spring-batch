@@ -31,7 +31,7 @@ import org.springframework.transaction.PlatformTransactionManager;
 /**
  * Base {@code Configuration} class providing common structure for enabling and using Spring Batch. Customization is
  * available by implementing the {@link BatchConfigurer} interface.
- * 
+ *
  * @author Dave Syer
  * @since 2.2
  * @see EnableBatchProcessing
@@ -47,19 +47,19 @@ public class ModularBatchConfiguration extends AbstractBatchConfiguration {
 
 	private AutomaticJobRegistrar registrar = new AutomaticJobRegistrar();
 
-    @Override
+	@Override
 	@Bean
 	public JobRepository jobRepository() throws Exception {
 		return getConfigurer(configurers).getJobRepository();
 	}
 
-    @Override
+	@Override
 	@Bean
 	public JobLauncher jobLauncher() throws Exception {
 		return getConfigurer(configurers).getJobLauncher();
 	}
 
-    @Override
+	@Override
 	@Bean
 	public PlatformTransactionManager transactionManager() throws Exception {
 		return getConfigurer(configurers).getTransactionManager();

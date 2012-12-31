@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2007 the original author or authors.
+ * Copyright 2006-2013 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -43,7 +43,7 @@ import org.springframework.beans.factory.InitializingBean;
  * particular order). The start state name can be specified explicitly (and must
  * exist in the set of transitions), or computed from the existing transitions,
  * if unambiguous.
- * 
+ *
  * @author Dave Syer
  * @since 2.0
  */
@@ -63,7 +63,7 @@ public class SimpleFlow implements Flow, InitializingBean {
 
 	/**
 	 * Create a flow with the given name.
-	 * 
+	 *
 	 * @param name the name of the flow
 	 */
 	public SimpleFlow(String name) {
@@ -72,17 +72,17 @@ public class SimpleFlow implements Flow, InitializingBean {
 
 	/**
 	 * Get the name for this flow.
-	 * 
+	 *
 	 * @see Flow#getName()
 	 */
-    @Override
+	@Override
 	public String getName() {
 		return name;
 	}
 
 	/**
 	 * Public setter for the stateTransitions.
-	 * 
+	 *
 	 * @param stateTransitions the stateTransitions to set
 	 */
 	public void setStateTransitions(List<StateTransition> stateTransitions) {
@@ -93,25 +93,25 @@ public class SimpleFlow implements Flow, InitializingBean {
 	/**
 	 * {@inheritDoc}
 	 */
-    @Override
+	@Override
 	public State getState(String stateName) {
 		return stateMap.get(stateName);
 	}
-	
+
 	/**
 	 * {@inheritDoc}
 	 */
-    @Override
+	@Override
 	public Collection<State> getStates() {
 		return new HashSet<State>(stateMap.values());
 	}
 
 	/**
 	 * Locate start state and pre-populate data structures needed for execution.
-	 * 
+	 *
 	 * @see InitializingBean#afterPropertiesSet()
 	 */
-    @Override
+	@Override
 	public void afterPropertiesSet() throws Exception {
 		initializeTransitions();
 	}
@@ -119,7 +119,7 @@ public class SimpleFlow implements Flow, InitializingBean {
 	/**
 	 * @see Flow#start(FlowExecutor)
 	 */
-    @Override
+	@Override
 	public FlowExecution start(FlowExecutor executor) throws FlowExecutionException {
 		if (startState == null) {
 			initializeTransitions();
@@ -132,7 +132,7 @@ public class SimpleFlow implements Flow, InitializingBean {
 	/**
 	 * @see Flow#resume(String, FlowExecutor)
 	 */
-    @Override
+	@Override
 	public FlowExecution resume(String stateName, FlowExecutor executor) throws FlowExecutionException {
 
 		FlowExecutionStatus status = FlowExecutionStatus.UNKNOWN;
@@ -158,7 +158,7 @@ public class SimpleFlow implements Flow, InitializingBean {
 				throw new FlowExecutionException(String.format("Ended flow=%s at state=%s with exception", name,
 						stateName), e);
 			}
-			
+
 			logger.debug("Completed state="+stateName+" with status="+status);
 
 			state = nextState(stateName, status);

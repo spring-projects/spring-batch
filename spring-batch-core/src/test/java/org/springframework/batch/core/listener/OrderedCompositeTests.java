@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2007 the original author or authors.
+ * Copyright 2006-2013 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -27,7 +27,7 @@ import org.springframework.core.annotation.Order;
 
 /**
  * @author Dave Syer
- * 
+ *
  */
 public class OrderedCompositeTests {
 
@@ -62,7 +62,7 @@ public class OrderedCompositeTests {
 	public void testAddOrdered() {
 		list.setItems(Arrays.asList((Object) "1"));
 		list.add(new Ordered() {
-            @Override
+			@Override
 			public int getOrder() {
 				return 0;
 			}
@@ -76,13 +76,13 @@ public class OrderedCompositeTests {
 	public void testAddMultipleOrdered() {
 		list.setItems(Arrays.asList((Object) "1"));
 		list.add(new Ordered() {
-            @Override
+			@Override
 			public int getOrder() {
 				return 1;
 			}
 		});
 		list.add(new Ordered() {
-            @Override
+			@Override
 			public int getOrder() {
 				return 0;
 			}
@@ -97,13 +97,13 @@ public class OrderedCompositeTests {
 	public void testAddDuplicateOrdered() {
 		list.setItems(Arrays.asList((Object) "1"));
 		list.add(new Ordered() {
-            @Override
+			@Override
 			public int getOrder() {
 				return 1;
 			}
 		});
 		list.add(new Ordered() {
-            @Override
+			@Override
 			public int getOrder() {
 				return 1;
 			}
@@ -117,7 +117,7 @@ public class OrderedCompositeTests {
 	@Test
 	public void testAddAnnotationOrdered() {
 		list.add(new Ordered() {
-            @Override
+			@Override
 			public int getOrder() {
 				return 1;
 			}

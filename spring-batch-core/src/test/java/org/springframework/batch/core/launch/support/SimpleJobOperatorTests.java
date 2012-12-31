@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2007 the original author or authors.
+ * Copyright 2006-2013 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -58,7 +58,7 @@ import org.springframework.batch.support.PropertiesConverter;
 
 /**
  * @author Dave Syer
- * 
+ *
  */
 public class SimpleJobOperatorTests {
 
@@ -67,14 +67,14 @@ public class SimpleJobOperatorTests {
 	protected Job job;
 
 	private JobExplorer jobExplorer;
-	
+
 	private JobRepository jobRepository;
 
 	private JobParameters jobParameters;
 
 	/**
 	 * @throws Exception
-	 * 
+	 *
 	 */
 	@Before
 	public void setUp() throws Exception {
@@ -83,7 +83,7 @@ public class SimpleJobOperatorTests {
 			@Override
 			public JobParametersIncrementer getJobParametersIncrementer() {
 				return new JobParametersIncrementer() {
-                    @Override
+					@Override
 					public JobParameters getNext(JobParameters parameters) {
 						return jobParameters;
 					}
@@ -94,7 +94,7 @@ public class SimpleJobOperatorTests {
 		jobOperator = new SimpleJobOperator();
 
 		jobOperator.setJobRegistry(new MapJobRegistry() {
-            @Override
+			@Override
 			public Job getJob(String name) throws NoSuchJobException {
 				if (name.equals("foo")) {
 					return job;
@@ -102,6 +102,7 @@ public class SimpleJobOperatorTests {
 				throw new NoSuchJobException("foo");
 			}
 
+			@SuppressWarnings({ "unchecked", "rawtypes" })
 			@Override
 			public Set<String> getJobNames() {
 				return new HashSet(Arrays.asList(new String[] { "foo", "bar" }));
@@ -109,9 +110,9 @@ public class SimpleJobOperatorTests {
 		});
 
 		jobOperator.setJobLauncher(new JobLauncher() {
-            @Override
+			@Override
 			public JobExecution run(Job job, JobParameters jobParameters) throws JobExecutionAlreadyRunningException,
-					JobRestartException, JobInstanceAlreadyCompleteException {
+			JobRestartException, JobInstanceAlreadyCompleteException {
 				return new JobExecution(new JobInstance(123L, jobParameters, job.getName()), 999L);
 			}
 		});
@@ -119,7 +120,7 @@ public class SimpleJobOperatorTests {
 		jobExplorer = EasyMock.createNiceMock(JobExplorer.class);
 
 		jobOperator.setJobExplorer(jobExplorer);
-		
+
 		jobRepository = createMock(JobRepository.class);
 		jobOperator.setJobRepository(jobRepository);
 
@@ -201,7 +202,7 @@ public class SimpleJobOperatorTests {
 		jobParameters = new JobParameters();
 		jobExplorer.getJobExecution(111L);
 		EasyMock.expectLastCall()
-				.andReturn(new JobExecution(new JobInstance(123L, jobParameters, job.getName()), 111L));
+		.andReturn(new JobExecution(new JobInstance(123L, jobParameters, job.getName()), 111L));
 		EasyMock.replay(jobExplorer);
 		Long value = jobOperator.restart(111L);
 		assertEquals(999, value.longValue());
@@ -297,7 +298,7 @@ public class SimpleJobOperatorTests {
 		final JobParameters jobParameters = new JobParameters();
 		jobExplorer.getJobExecution(111L);
 		EasyMock.expectLastCall()
-				.andReturn(new JobExecution(new JobInstance(123L, jobParameters, job.getName()), 111L));
+		.andReturn(new JobExecution(new JobInstance(123L, jobParameters, job.getName()), 111L));
 		EasyMock.replay(jobExplorer);
 		String value = jobOperator.getParameters(111L);
 		assertEquals("a=b", value);
@@ -381,7 +382,7 @@ public class SimpleJobOperatorTests {
 		}
 		EasyMock.verify(jobExplorer);
 	}
-	
+
 	@Test
 	public void testStop() throws Exception{
 		JobInstance jobInstance = new JobInstance(123L, jobParameters, job.getName());
@@ -397,29 +398,29 @@ public class SimpleJobOperatorTests {
 		assertEquals(BatchStatus.STOPPING, jobExecution.getStatus());
 	}
 
-    @Test
-    public void testAbort() throws Exception {
-        JobInstance jobInstance = new JobInstance(123L, jobParameters, job.getName());
-        JobExecution jobExecution = new JobExecution(jobInstance, 111L);
-        jobExecution.setStatus(BatchStatus.STOPPING);
-        jobExplorer.getJobExecution(123L);
-        expectLastCall().andReturn(jobExecution);
-        jobRepository.update(jobExecution);
-        replay(jobExplorer);
-        jobOperator.abandon(123L);
-        assertEquals(BatchStatus.ABANDONED, jobExecution.getStatus());
-        assertNotNull(jobExecution.getEndTime());
-    }
+	@Test
+	public void testAbort() throws Exception {
+		JobInstance jobInstance = new JobInstance(123L, jobParameters, job.getName());
+		JobExecution jobExecution = new JobExecution(jobInstance, 111L);
+		jobExecution.setStatus(BatchStatus.STOPPING);
+		jobExplorer.getJobExecution(123L);
+		expectLastCall().andReturn(jobExecution);
+		jobRepository.update(jobExecution);
+		replay(jobExplorer);
+		jobOperator.abandon(123L);
+		assertEquals(BatchStatus.ABANDONED, jobExecution.getStatus());
+		assertNotNull(jobExecution.getEndTime());
+	}
 
-    @Test(expected = JobExecutionAlreadyRunningException.class)
-    public void testAbortNonStopping() throws Exception {
-        JobInstance jobInstance = new JobInstance(123L, jobParameters, job.getName());
-        JobExecution jobExecution = new JobExecution(jobInstance, 111L);
-        jobExecution.setStatus(BatchStatus.STARTED);
-        jobExplorer.getJobExecution(123L);
-        expectLastCall().andReturn(jobExecution);
-        jobRepository.update(jobExecution);
-        replay(jobExplorer);
-        jobOperator.abandon(123L);
-    }
+	@Test(expected = JobExecutionAlreadyRunningException.class)
+	public void testAbortNonStopping() throws Exception {
+		JobInstance jobInstance = new JobInstance(123L, jobParameters, job.getName());
+		JobExecution jobExecution = new JobExecution(jobInstance, 111L);
+		jobExecution.setStatus(BatchStatus.STARTED);
+		jobExplorer.getJobExecution(123L);
+		expectLastCall().andReturn(jobExecution);
+		jobRepository.update(jobExecution);
+		replay(jobExplorer);
+		jobOperator.abandon(123L);
+	}
 }

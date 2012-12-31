@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2007 the original author or authors.
+ * Copyright 2006-2013 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -60,17 +60,18 @@ import org.springframework.util.Assert;
  * loop is controlled by the step operations (
  * {@link #setStepOperations(RepeatOperations)}).<br/>
  * <br/>
- * 
+ *
  * Clients can use interceptors in the step operations to intercept or listen to
  * the iteration on a step-wide basis, for instance to get a callback when the
  * step is complete. Those that want callbacks at the level of an individual
  * tasks, can specify interceptors for the chunk operations.
- * 
+ *
  * @author Dave Syer
  * @author Lucas Ward
  * @author Ben Hale
  * @author Robert Kasanicky
  */
+@SuppressWarnings("serial")
 public class TaskletStep extends AbstractStep {
 
 	private static final Log logger = LogFactory.getLog(TaskletStep.class);
@@ -113,7 +114,7 @@ public class TaskletStep extends AbstractStep {
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see
 	 * org.springframework.batch.core.step.AbstractStep#afterPropertiesSet()
 	 */
@@ -125,7 +126,7 @@ public class TaskletStep extends AbstractStep {
 
 	/**
 	 * Public setter for the {@link PlatformTransactionManager}.
-	 * 
+	 *
 	 * @param transactionManager the transaction manager to set
 	 */
 	public void setTransactionManager(PlatformTransactionManager transactionManager) {
@@ -134,7 +135,7 @@ public class TaskletStep extends AbstractStep {
 
 	/**
 	 * Public setter for the {@link TransactionAttribute}.
-	 * 
+	 *
 	 * @param transactionAttribute the {@link TransactionAttribute} to set
 	 */
 	public void setTransactionAttribute(TransactionAttribute transactionAttribute) {
@@ -143,7 +144,7 @@ public class TaskletStep extends AbstractStep {
 
 	/**
 	 * Public setter for the {@link Tasklet}.
-	 * 
+	 *
 	 * @param tasklet the {@link Tasklet} to set
 	 */
 	public void setTasklet(Tasklet tasklet) {
@@ -156,7 +157,7 @@ public class TaskletStep extends AbstractStep {
 	/**
 	 * Register a chunk listener for callbacks at the appropriate stages in a
 	 * step execution.
-	 * 
+	 *
 	 * @param listener a {@link ChunkListener}
 	 */
 	public void registerChunkListener(ChunkListener listener) {
@@ -165,7 +166,7 @@ public class TaskletStep extends AbstractStep {
 
 	/**
 	 * Register each of the objects as listeners.
-	 * 
+	 *
 	 * @param listeners an array of listener objects of known types.
 	 */
 	public void setChunkListeners(ChunkListener[] listeners) {
@@ -182,7 +183,7 @@ public class TaskletStep extends AbstractStep {
 	 * so if you implement {@link ItemWriter} using delegation to another object
 	 * which itself is a {@link ItemStream}, you need to register the delegate
 	 * here.
-	 * 
+	 *
 	 * @param streams an array of {@link ItemStream} objects.
 	 */
 	public void setStreams(ItemStream[] streams) {
@@ -194,7 +195,7 @@ public class TaskletStep extends AbstractStep {
 	/**
 	 * Register a single {@link ItemStream} for callbacks to the stream
 	 * interface.
-	 * 
+	 *
 	 * @param stream
 	 */
 	public void registerStream(ItemStream stream) {
@@ -205,7 +206,7 @@ public class TaskletStep extends AbstractStep {
 	 * The {@link RepeatOperations} to use for the outer loop of the batch
 	 * processing. Should be set up by the caller through a factory. Defaults to
 	 * a plain {@link RepeatTemplate}.
-	 * 
+	 *
 	 * @param stepOperations a {@link RepeatOperations} instance.
 	 */
 	public void setStepOperations(RepeatOperations stepOperations) {
@@ -216,7 +217,7 @@ public class TaskletStep extends AbstractStep {
 	 * Setter for the {@link StepInterruptionPolicy}. The policy is used to
 	 * check whether an external request has been made to interrupt the job
 	 * execution.
-	 * 
+	 *
 	 * @param interruptionPolicy a {@link StepInterruptionPolicy}
 	 */
 	public void setInterruptionPolicy(StepInterruptionPolicy interruptionPolicy) {
@@ -231,13 +232,14 @@ public class TaskletStep extends AbstractStep {
 	 * used to store the result. Various reporting information are also added to
 	 * the current context governing the step execution, which would normally be
 	 * available to the caller through the step's {@link ExecutionContext}.<br/>
-	 * 
+	 *
 	 * @throws JobInterruptedException if the step or a chunk is interrupted
 	 * @throws RuntimeException if there is an exception during a chunk
 	 * execution
-	 * 
+	 *
 	 */
 	@Override
+	@SuppressWarnings("unchecked")
 	protected void doExecute(StepExecution stepExecution) throws Exception {
 
 		stream.update(stepExecution.getExecutionContext());
@@ -262,7 +264,7 @@ public class TaskletStep extends AbstractStep {
 				RepeatStatus result;
 				try {
 					result = (RepeatStatus) new TransactionTemplate(transactionManager, transactionAttribute)
-							.execute(new ChunkTransactionCallback(chunkContext, semaphore));
+					.execute(new ChunkTransactionCallback(chunkContext, semaphore));
 				}
 				catch (UncheckedTransactionException e) {
 					// Allow checked exceptions to be thrown inside callback
@@ -286,19 +288,19 @@ public class TaskletStep extends AbstractStep {
 	/**
 	 * Extension point mainly for test purposes so that the behaviour of the
 	 * lock can be manipulated to simulate various pathologies.
-	 * 
+	 *
 	 * @return a semaphore for locking access to the JobRepository
 	 */
 	protected Semaphore createSemaphore() {
 		return new Semaphore(1);
 	}
 
-    @Override
+	@Override
 	protected void close(ExecutionContext ctx) throws Exception {
 		stream.close();
 	}
 
-    @Override
+	@Override
 	protected void open(ExecutionContext ctx) throws Exception {
 		stream.open(ctx);
 	}
@@ -308,10 +310,11 @@ public class TaskletStep extends AbstractStep {
 	 * failures in the transaction commit and rollback, only panicking if the
 	 * transaction status is unknown (i.e. if a commit failure leads to a clean
 	 * rollback then we assume the state is consistent).
-	 * 
+	 *
 	 * @author Dave Syer
-	 * 
+	 *
 	 */
+	@SuppressWarnings("rawtypes")
 	private class ChunkTransactionCallback extends TransactionSynchronizationAdapter implements TransactionCallback {
 
 		private final StepExecution stepExecution;
@@ -366,7 +369,7 @@ public class TaskletStep extends AbstractStep {
 			}
 		}
 
-        @Override
+		@Override
 		public Object doInTransaction(TransactionStatus status) {
 
 			TransactionSynchronizationManager.registerSynchronization(this);
@@ -486,9 +489,9 @@ public class TaskletStep extends AbstractStep {
 	/**
 	 * Convenience wrapper for a checked exception so that it can cause a
 	 * rollback and be extracted afterwards.
-	 * 
+	 *
 	 * @author Dave Syer
-	 * 
+	 *
 	 */
 	private static class UncheckedTransactionException extends RuntimeException {
 
