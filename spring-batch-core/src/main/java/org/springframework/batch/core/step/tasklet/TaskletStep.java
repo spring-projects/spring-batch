@@ -70,6 +70,7 @@ import org.springframework.util.Assert;
  * @author Lucas Ward
  * @author Ben Hale
  * @author Robert Kasanicky
+ * @author Michael Minella
  */
 @SuppressWarnings("serial")
 public class TaskletStep extends AbstractStep {
@@ -358,7 +359,6 @@ public class TaskletStep extends AbstractStep {
 					rollback(stepExecution);
 					stepExecution.upgradeStatus(BatchStatus.UNKNOWN);
 					stepExecution.setTerminateOnly();
-					chunkListener.afterFailedChunk(chunkContext);
 				}
 			}
 			finally {
@@ -398,11 +398,10 @@ public class TaskletStep extends AbstractStep {
 					}
 					catch (Exception e) {
 						if (transactionAttribute.rollbackOn(e)) {
-							chunkContext.setAttribute("sb_rollback_exception", e);
+							chunkContext.setAttribute(ChunkListener.ROLLBACK_EXCEPTION_KEY, e);
 							throw e;
 						}
 					}
-
 				}
 				finally {
 

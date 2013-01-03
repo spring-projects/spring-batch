@@ -111,7 +111,7 @@ public class FaultTolerantStepFactoryBeanRollbackTests {
 
 	@Test
 	public void testBeforeChunkListenerException() throws Exception{
-		factory.setListeners(new StepListener []{new ExceptionThrowingChunkListener(true)});
+		factory.setListeners(new StepListener []{new ExceptionThrowingChunkListener(1)});
 		Step step = (Step) factory.getObject();
 		step.execute(stepExecution);
 		assertEquals(FAILED, stepExecution.getStatus());
@@ -124,7 +124,7 @@ public class FaultTolerantStepFactoryBeanRollbackTests {
 
 	@Test
 	public void testAfterChunkListenerException() throws Exception{
-		factory.setListeners(new StepListener []{new ExceptionThrowingChunkListener(false)});
+		factory.setListeners(new StepListener []{new ExceptionThrowingChunkListener(2)});
 		Step step = (Step) factory.getObject();
 		step.execute(stepExecution);
 		assertEquals(FAILED, stepExecution.getStatus());
@@ -591,27 +591,31 @@ public class FaultTolerantStepFactoryBeanRollbackTests {
 
 	class ExceptionThrowingChunkListener implements ChunkListener{
 
-		private boolean throwBefore = true;
+		private int phase = -1;
 
-		public ExceptionThrowingChunkListener(boolean throwBefore) {
-			this.throwBefore  = throwBefore;
+		public ExceptionThrowingChunkListener(int throwPhase) {
+			this.phase  = throwPhase;
 		}
 
 		@Override
 		public void beforeChunk() {
-			if(throwBefore){
+			if(phase == 1){
 				throw new IllegalArgumentException("Planned exception");
 			}
 		}
 
 		@Override
 		public void afterChunk() {
-			throw new IllegalArgumentException("Planned exception");
-
+			if(phase == 2) {
+				throw new IllegalArgumentException("Planned exception");
+			}
 		}
 
 		@Override
 		public void afterFailedChunk(ChunkContext context) {
+			if(phase == 3) {
+				throw new IllegalArgumentException("Planned exception");
+			}
 		}
 	}
 }
