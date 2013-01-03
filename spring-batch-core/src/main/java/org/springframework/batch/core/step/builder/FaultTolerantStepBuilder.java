@@ -29,6 +29,7 @@ import org.springframework.batch.core.JobInterruptedException;
 import org.springframework.batch.core.SkipListener;
 import org.springframework.batch.core.StepListener;
 import org.springframework.batch.core.listener.StepListenerFactoryBean;
+import org.springframework.batch.core.scope.context.ChunkContext;
 import org.springframework.batch.core.step.FatalStepExecutionException;
 import org.springframework.batch.core.step.item.BatchRetryTemplate;
 import org.springframework.batch.core.step.item.ChunkMonitor;
@@ -667,6 +668,14 @@ public class FaultTolerantStepBuilder<I, O> extends SimpleStepBuilder<I, O> {
 			}
 		}
 
+		@Override
+		public void afterFailedChunk(ChunkContext context) {
+			try {
+				chunkListener.afterFailedChunk(context);
+			}
+			catch (Throwable t) {
+				throw new FatalStepExecutionException("ChunkListener threw exception, rethrowing as fatal", t);
+			}
+		}
 	}
-
 }
