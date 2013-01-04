@@ -1069,6 +1069,7 @@ ref"							is not required, and only needs to be specified explicitly
 				<xsd:attribute name="after-step-method" type="xsd:string" />
 				<xsd:attribute name="before-chunk-method" type="xsd:string" />
 				<xsd:attribute name="after-chunk-method" type="xsd:string" />
+				<xsd:attribute name="after-chunk-error-method" type="xsd:string" />
 				<xsd:attribute name="before-read-method" type="xsd:string" />
 				<xsd:attribute name="after-read-method" type="xsd:string" />
 				<xsd:attribute name="on-read-error-method" type="xsd:string" />

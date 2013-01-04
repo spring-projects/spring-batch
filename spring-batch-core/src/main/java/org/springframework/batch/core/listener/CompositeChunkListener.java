@@ -19,6 +19,7 @@ import java.util.Iterator;
 import java.util.List;
 
 import org.springframework.batch.core.ChunkListener;
+import org.springframework.batch.core.scope.context.ChunkContext;
 import org.springframework.core.Ordered;
 
 /**
@@ -71,6 +72,14 @@ public class CompositeChunkListener implements ChunkListener {
 		for (Iterator<ChunkListener> iterator = listeners.reverse(); iterator.hasNext();) {
 			ChunkListener listener = iterator.next();
 			listener.beforeChunk();
+		}
+	}
+
+	@Override
+	public void afterChunkError(ChunkContext context) {
+		for (Iterator<ChunkListener> iterator = listeners.iterator(); iterator.hasNext();) {
+			ChunkListener listener = iterator.next();
+			listener.afterChunkError(context);
 		}
 	}
 }
