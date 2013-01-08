@@ -21,6 +21,7 @@ import java.util.List;
 import junit.framework.TestCase;
 
 import org.springframework.batch.core.ExitStatus;
+import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.StepExecution;
 import org.springframework.batch.core.StepExecutionListener;
 
@@ -40,9 +41,12 @@ public class CompositeStepExecutionListenerTests extends TestCase {
 	 * .
 	 */
 	public void testSetListeners() {
+		JobExecution jobExecution = new JobExecution(1l);
+		StepExecution stepExecution = new StepExecution("s1", jobExecution);
 		listener.setListeners(new StepExecutionListener[] { new StepExecutionListenerSupport() {
 			@Override
 			public ExitStatus afterStep(StepExecution stepExecution) {
+				assertEquals(ExitStatus.STOPPED, stepExecution.getExitStatus());
 				list.add("fail");
 				return ExitStatus.FAILED;
 			}
@@ -50,10 +54,10 @@ public class CompositeStepExecutionListenerTests extends TestCase {
 			@Override
 			public ExitStatus afterStep(StepExecution stepExecution) {
 				list.add("continue");
-				return ExitStatus.EXECUTING;
+				return ExitStatus.STOPPED;
 			}
 		} });
-		assertEquals(ExitStatus.FAILED, listener.afterStep(null));
+		assertEquals(ExitStatus.FAILED, listener.afterStep(stepExecution));
 		assertEquals(2, list.size());
 	}
 
@@ -63,6 +67,8 @@ public class CompositeStepExecutionListenerTests extends TestCase {
 	 * .
 	 */
 	public void testSetListener() {
+		JobExecution jobExecution = new JobExecution(1l);
+		StepExecution stepExecution = new StepExecution("s1", jobExecution);
 		listener.register(new StepExecutionListenerSupport() {
 			@Override
 			public ExitStatus afterStep(StepExecution stepExecution) {
@@ -70,7 +76,7 @@ public class CompositeStepExecutionListenerTests extends TestCase {
 				return ExitStatus.FAILED;
 			}
 		});
-		assertEquals(ExitStatus.FAILED, listener.afterStep(null));
+		assertEquals(ExitStatus.FAILED, listener.afterStep(stepExecution));
 		assertEquals(1, list.size());
 	}
 

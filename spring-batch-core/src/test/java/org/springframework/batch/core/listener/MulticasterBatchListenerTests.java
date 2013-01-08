@@ -24,6 +24,7 @@ import java.util.List;
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.batch.core.ExitStatus;
+import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.StepExecution;
 import org.springframework.batch.core.scope.context.ChunkContext;
 
@@ -46,6 +47,8 @@ public class MulticasterBatchListenerTests {
 
 	@Test
 	public void testSetListeners() {
+		JobExecution jobExecution = new JobExecution(1l);
+		StepExecution stepExecution = new StepExecution("s1", jobExecution);
 		multicast.setListeners(Arrays.asList(new StepListenerSupport<Integer, String>() {
 			@Override
 			public ExitStatus afterStep(StepExecution stepExecution) {
@@ -53,7 +56,7 @@ public class MulticasterBatchListenerTests {
 				return super.afterStep(stepExecution);
 			}
 		}));
-		multicast.afterStep(null);
+		multicast.afterStep(stepExecution);
 		// setListeners is cumulative (should be OK if used for DI)
 		assertEquals(2, count);
 	}
@@ -65,6 +68,8 @@ public class MulticasterBatchListenerTests {
 	 */
 	@Test
 	public void testRegister() {
+		JobExecution jobExecution = new JobExecution(1l);
+		StepExecution stepExecution = new StepExecution("s1", jobExecution);
 		multicast.register(new StepListenerSupport<Integer, String>() {
 			@Override
 			public ExitStatus afterStep(StepExecution stepExecution) {
@@ -72,7 +77,7 @@ public class MulticasterBatchListenerTests {
 				return super.afterStep(stepExecution);
 			}
 		});
-		multicast.afterStep(null);
+		multicast.afterStep(stepExecution);
 		assertEquals(2, count);
 	}
 
