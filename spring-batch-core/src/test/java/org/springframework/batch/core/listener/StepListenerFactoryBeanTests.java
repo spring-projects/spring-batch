@@ -18,7 +18,6 @@ package org.springframework.batch.core.listener;
 import static junit.framework.Assert.assertTrue;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
-import static org.springframework.batch.core.listener.StepListenerMetaData.AFTER_CHUNK;
 import static org.springframework.batch.core.listener.StepListenerMetaData.AFTER_STEP;
 import static org.springframework.batch.core.listener.StepListenerMetaData.AFTER_WRITE;
 
@@ -44,6 +43,8 @@ import org.springframework.batch.core.SkipListener;
 import org.springframework.batch.core.StepExecution;
 import org.springframework.batch.core.StepExecutionListener;
 import org.springframework.batch.core.StepListener;
+import org.springframework.batch.core.annotation.AfterChunk;
+import org.springframework.batch.core.annotation.AfterChunkError;
 import org.springframework.batch.core.annotation.AfterProcess;
 import org.springframework.batch.core.annotation.AfterRead;
 import org.springframework.batch.core.annotation.AfterStep;
@@ -57,6 +58,7 @@ import org.springframework.batch.core.annotation.OnProcessError;
 import org.springframework.batch.core.annotation.OnReadError;
 import org.springframework.batch.core.annotation.OnWriteError;
 import org.springframework.batch.core.configuration.xml.AbstractTestComponent;
+import org.springframework.batch.core.scope.context.ChunkContext;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.core.Ordered;
 import org.springframework.util.Assert;
@@ -83,10 +85,10 @@ public class StepListenerFactoryBeanTests {
 	public void testStepAndChunk() throws Exception {
 		TestListener testListener = new TestListener();
 		factoryBean.setDelegate(testListener);
-		Map<String, String> metaDataMap = new HashMap<String, String>();
-		metaDataMap.put(AFTER_STEP.getPropertyName(), "destroy");
-		metaDataMap.put(AFTER_CHUNK.getPropertyName(), "afterChunk");
-		factoryBean.setMetaDataMap(metaDataMap);
+		//		Map<String, String> metaDataMap = new HashMap<String, String>();
+		//		metaDataMap.put(AFTER_STEP.getPropertyName(), "destroy");
+		//		metaDataMap.put(AFTER_CHUNK.getPropertyName(), "afterChunk");
+		//		factoryBean.setMetaDataMap(metaDataMap);
 		String readItem = "item";
 		Integer writeItem = 2;
 		List<Integer> writeItems = Arrays.asList(writeItem);
@@ -95,6 +97,7 @@ public class StepListenerFactoryBeanTests {
 		((StepExecutionListener) listener).afterStep(stepExecution);
 		((ChunkListener) listener).beforeChunk();
 		((ChunkListener) listener).afterChunk();
+		((ChunkListener) listener).afterChunkError(new ChunkContext(null));
 		((ItemReadListener<String>) listener).beforeRead();
 		((ItemReadListener<String>) listener).afterRead(readItem);
 		((ItemReadListener<String>) listener).onReadError(new Exception());
@@ -110,6 +113,7 @@ public class StepListenerFactoryBeanTests {
 		assertTrue(testListener.beforeStepCalled);
 		assertTrue(testListener.beforeChunkCalled);
 		assertTrue(testListener.afterChunkCalled);
+		assertTrue(testListener.afterChunkErrorCalled);
 		assertTrue(testListener.beforeReadCalled);
 		assertTrue(testListener.afterReadCalled);
 		assertTrue(testListener.onReadErrorCalled);
@@ -132,7 +136,6 @@ public class StepListenerFactoryBeanTests {
 		ThreeStepExecutionListener delegate = new ThreeStepExecutionListener();
 		factoryBean.setDelegate(delegate);
 		Map<String, String> metaDataMap = new HashMap<String, String>();
-		;
 		metaDataMap.put(AFTER_STEP.getPropertyName(), "destroy");
 		factoryBean.setMetaDataMap(metaDataMap);
 		StepListener listener = (StepListener) factoryBean.getObject();
@@ -428,6 +431,8 @@ public class StepListenerFactoryBeanTests {
 
 		boolean afterChunkCalled = false;
 
+		boolean afterChunkErrorCalled = false;
+
 		boolean beforeReadCalled = false;
 
 		boolean afterReadCalled = false;
@@ -457,6 +462,7 @@ public class StepListenerFactoryBeanTests {
 			beforeStepCalled = true;
 		}
 
+		@AfterStep
 		public void destroy() {
 			afterStepCalled = true;
 		}
@@ -466,8 +472,14 @@ public class StepListenerFactoryBeanTests {
 			beforeChunkCalled = true;
 		}
 
+		@AfterChunk
 		public void afterChunk() {
 			afterChunkCalled = true;
+		}
+
+		@AfterChunkError
+		public void afterChunkError(ChunkContext context) {
+			afterChunkErrorCalled = true;
 		}
 
 		@BeforeRead
