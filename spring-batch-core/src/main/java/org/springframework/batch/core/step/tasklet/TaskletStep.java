@@ -272,7 +272,7 @@ public class TaskletStep extends AbstractStep {
 					throw (Exception) e.getCause();
 				}
 
-				chunkListener.afterChunk();
+				chunkListener.afterChunk(chunkContext);
 
 				// Check for interruption after transaction as well, so that
 				// the interrupted exception is correctly propagated up to
@@ -380,7 +380,7 @@ public class TaskletStep extends AbstractStep {
 
 			StepContribution contribution = stepExecution.createStepContribution();
 
-			chunkListener.beforeChunk();
+			chunkListener.beforeChunk(chunkContext);
 
 			// In case we need to push it back to its old value
 			// after a commit fails...

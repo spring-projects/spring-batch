@@ -785,12 +785,12 @@ public class FaultTolerantStepFactoryBeanTests {
 			}
 
 			@Override
-			public void afterChunk() {
+			public void afterChunk(ChunkContext context) {
 				listenerCalls.add(4);
 			}
 
 			@Override
-			public void beforeChunk() {
+			public void beforeChunk(ChunkContext context) {
 			}
 
 			@Override

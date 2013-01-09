@@ -59,8 +59,8 @@ public enum StepListenerMetaData implements ListenerMetaData {
 
 	BEFORE_STEP("beforeStep", "before-step-method", BeforeStep.class, StepExecutionListener.class, StepExecution.class),
 	AFTER_STEP("afterStep", "after-step-method", AfterStep.class, StepExecutionListener.class, StepExecution.class),
-	BEFORE_CHUNK("beforeChunk", "before-chunk-method", BeforeChunk.class, ChunkListener.class),
-	AFTER_CHUNK("afterChunk", "after-chunk-method", AfterChunk.class, ChunkListener.class),
+	BEFORE_CHUNK("beforeChunk", "before-chunk-method", BeforeChunk.class, ChunkListener.class, ChunkContext.class),
+	AFTER_CHUNK("afterChunk", "after-chunk-method", AfterChunk.class, ChunkListener.class, ChunkContext.class),
 	AFTER_CHUNK_ERROR("afterChunkError", "after-chunk-error-method", AfterChunkError.class, ChunkListener.class, ChunkContext.class),
 	BEFORE_READ("beforeRead", "before-read-method", BeforeRead.class, ItemReadListener.class),
 	AFTER_READ("afterRead", "after-read-method", AfterRead.class, ItemReadListener.class, Object.class),

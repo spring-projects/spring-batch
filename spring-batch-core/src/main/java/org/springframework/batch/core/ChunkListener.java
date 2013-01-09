@@ -32,13 +32,17 @@ public interface ChunkListener extends StepListener {
 
 	/**
 	 * Callback before the chunk is executed, but inside the transaction.
+	 *
+	 * @param context The current {@link ChunkContext}
 	 */
-	void beforeChunk();
+	void beforeChunk(ChunkContext context);
 
 	/**
 	 * Callback after the chunk is executed, outside the transaction.
+	 *
+	 * @param context The current {@link ChunkContext}
 	 */
-	void afterChunk();
+	void afterChunk(ChunkContext context);
 
 	/**
 	 * Callback after a chunk has been marked for rollback.  It is invoked

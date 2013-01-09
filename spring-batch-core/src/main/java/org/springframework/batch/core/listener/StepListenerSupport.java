@@ -53,17 +53,17 @@ ItemReadListener<T>, ItemProcessListener<T,S>, ItemWriteListener<S>, SkipListene
 	}
 
 	/* (non-Javadoc)
-	 * @see org.springframework.batch.core.domain.ChunkListener#afterChunk()
+	 * @see org.springframework.batch.core.domain.ChunkListener#afterChunk(ChunkContext context)
 	 */
 	@Override
-	public void afterChunk() {
+	public void afterChunk(ChunkContext context) {
 	}
 
 	/* (non-Javadoc)
-	 * @see org.springframework.batch.core.domain.ChunkListener#beforeChunk()
+	 * @see org.springframework.batch.core.domain.ChunkListener#beforeChunk(ChunkContext context)
 	 */
 	@Override
-	public void beforeChunk() {
+	public void beforeChunk(ChunkContext context) {
 	}
 
 	/* (non-Javadoc)

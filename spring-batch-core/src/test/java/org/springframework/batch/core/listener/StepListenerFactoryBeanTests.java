@@ -95,8 +95,8 @@ public class StepListenerFactoryBeanTests {
 		StepListener listener = (StepListener) factoryBean.getObject();
 		((StepExecutionListener) listener).beforeStep(stepExecution);
 		((StepExecutionListener) listener).afterStep(stepExecution);
-		((ChunkListener) listener).beforeChunk();
-		((ChunkListener) listener).afterChunk();
+		((ChunkListener) listener).beforeChunk(null);
+		((ChunkListener) listener).afterChunk(null);
 		((ChunkListener) listener).afterChunkError(new ChunkContext(null));
 		((ItemReadListener<String>) listener).beforeRead();
 		((ItemReadListener<String>) listener).afterRead(readItem);
