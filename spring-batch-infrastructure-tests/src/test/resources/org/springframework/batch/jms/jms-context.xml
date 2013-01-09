@@ -38,14 +38,14 @@
 		<!-- We aren't adding a listener here (want to do it in unit test)
 		so need to set autoStartup=false -->
 		<property name="autoStartup" value="false" />
-		<!-- We need the transaction manager, but only because we can't 
-		intercept the MessageListenerContainer in the right place 
-		(it tries to open a JMS session before receiveAndExecute() 
+		<!-- We need the transaction manager, but only because we can't
+		intercept the MessageListenerContainer in the right place
+		(it tries to open a JMS session before receiveAndExecute()
 		so the JMS session commits after every item, not after every chunk) -->
 		<property name="transactionManager" ref="transactionManager" />
 		<property name="connectionFactory" ref="txAwareConnectionFactory" />
 		<property name="destinationName" value="queue" />
-		<!-- This is important... it forces the container to acknowledge message receipt, 
+		<!-- This is important... it forces the container to acknowledge message receipt,
 			and avoid duplicate messages in the sunny day case -->
 		<property name="sessionTransacted" value="true" />
 		<property name="adviceChain">
