@@ -25,6 +25,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.springframework.batch.core.ExitStatus;
 import org.springframework.batch.core.StepExecution;
+import org.springframework.batch.core.scope.context.ChunkContext;
 
 /**
  * @author Dave Syer
@@ -128,25 +129,25 @@ public class MulticasterBatchListenerTests {
 
 	/**
 	 * Test method for
-	 * {@link org.springframework.batch.core.listener.MulticasterBatchListener#afterChunk()}
+	 * {@link org.springframework.batch.core.listener.MulticasterBatchListener#afterChunk(ChunkContext context)}
 	 * .
 	 */
 	@Test
 	public void testAfterChunk() {
-		multicast.afterChunk();
+		multicast.afterChunk(null);
 		assertEquals(1, count);
 	}
 
 	/**
 	 * Test method for
-	 * {@link org.springframework.batch.core.listener.MulticasterBatchListener#afterChunk()}
+	 * {@link org.springframework.batch.core.listener.MulticasterBatchListener#afterChunk(ChunkContext context)}
 	 * .
 	 */
 	@Test
 	public void testAfterChunkFails() {
 		error = true;
 		try {
-			multicast.afterChunk();
+			multicast.afterChunk(null);
 			fail("Expected StepListenerFailedException");
 		}
 		catch (StepListenerFailedException e) {
@@ -159,25 +160,25 @@ public class MulticasterBatchListenerTests {
 
 	/**
 	 * Test method for
-	 * {@link org.springframework.batch.core.listener.MulticasterBatchListener#beforeChunk()}
+	 * {@link org.springframework.batch.core.listener.MulticasterBatchListener#beforeChunk(ChunkContext context)}
 	 * .
 	 */
 	@Test
 	public void testBeforeChunk() {
-		multicast.beforeChunk();
+		multicast.beforeChunk(null);
 		assertEquals(1, count);
 	}
 
 	/**
 	 * Test method for
-	 * {@link org.springframework.batch.core.listener.MulticasterBatchListener#beforeChunk()}
+	 * {@link org.springframework.batch.core.listener.MulticasterBatchListener#beforeChunk(ChunkContext context)}
 	 * .
 	 */
 	@Test
 	public void testBeforeChunkFails() {
 		error = true;
 		try {
-			multicast.beforeChunk();
+			multicast.beforeChunk(null);
 			fail("Expected StepListenerFailedException");
 		}
 		catch (StepListenerFailedException e) {
@@ -528,12 +529,12 @@ public class MulticasterBatchListenerTests {
 		 * ()
 		 */
 		@Override
-		public void afterChunk() {
+		public void afterChunk(ChunkContext context) {
 			count++;
 			if (error) {
 				throw new RuntimeException("listener error");
 			}
-			super.afterChunk();
+			super.afterChunk(context);
 		}
 
 		/*
@@ -576,12 +577,12 @@ public class MulticasterBatchListenerTests {
 		 * ()
 		 */
 		@Override
-		public void beforeChunk() {
+		public void beforeChunk(ChunkContext context) {
 			count++;
 			if (error) {
 				throw new RuntimeException("listener error");
 			}
-			super.beforeChunk();
+			super.beforeChunk(context);
 		}
 
 		/*

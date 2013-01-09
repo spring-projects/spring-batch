@@ -33,9 +33,11 @@ public class CompositeChunkListenerTests {
 
 	ChunkListener listener;
 	CompositeChunkListener compositeListener;
+	ChunkContext chunkContext;
 
 	@Before
 	public void setUp() throws Exception {
+		chunkContext = new ChunkContext(null);
 		listener = createMock(ChunkListener.class);
 		compositeListener = new CompositeChunkListener();
 		compositeListener.register(listener);
@@ -43,19 +45,18 @@ public class CompositeChunkListenerTests {
 
 	@Test
 	public void testBeforeChunk(){
-
-		listener.beforeChunk();
+		listener.beforeChunk(chunkContext);
 		replay(listener);
-		compositeListener.beforeChunk();
+		compositeListener.beforeChunk(chunkContext);
 		verify(listener);
 	}
 
 	@Test
 	public void testAfterChunk(){
 
-		listener.afterChunk();
+		listener.afterChunk(chunkContext);
 		replay(listener);
-		compositeListener.afterChunk();
+		compositeListener.afterChunk(chunkContext);
 		verify(listener);
 	}
 

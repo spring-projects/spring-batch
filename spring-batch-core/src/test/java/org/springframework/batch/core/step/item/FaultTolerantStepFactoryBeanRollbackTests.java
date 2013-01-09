@@ -598,14 +598,14 @@ public class FaultTolerantStepFactoryBeanRollbackTests {
 		}
 
 		@Override
-		public void beforeChunk() {
+		public void beforeChunk(ChunkContext context) {
 			if(phase == 1){
 				throw new IllegalArgumentException("Planned exception");
 			}
 		}
 
 		@Override
-		public void afterChunk() {
+		public void afterChunk(ChunkContext context) {
 			if(phase == 2) {
 				throw new IllegalArgumentException("Planned exception");
 			}

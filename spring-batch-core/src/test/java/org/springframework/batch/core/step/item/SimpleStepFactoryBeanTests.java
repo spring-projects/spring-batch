@@ -256,13 +256,13 @@ public class SimpleStepFactoryBeanTests {
 			}
 
 			@Override
-			public void afterChunk() {
+			public void afterChunk(ChunkContext context) {
 				writeListener.trail = writeListener.trail + "4";
 				afterCount++;
 			}
 
 			@Override
-			public void beforeChunk() {
+			public void beforeChunk(ChunkContext context) {
 				writeListener.trail = writeListener.trail + "1";
 				beforeCount++;
 			}
@@ -399,12 +399,12 @@ public class SimpleStepFactoryBeanTests {
 			}
 
 			@Override
-			public void afterChunk() {
+			public void afterChunk(ChunkContext context) {
 				listenerCalls.add("chunk");
 			}
 
 			@Override
-			public void beforeChunk() {
+			public void beforeChunk(ChunkContext context) {
 			}
 
 			@Override

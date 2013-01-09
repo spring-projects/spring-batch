@@ -649,9 +649,9 @@ public class FaultTolerantStepBuilder<I, O> extends SimpleStepBuilder<I, O> {
 		}
 
 		@Override
-		public void beforeChunk() {
+		public void beforeChunk(ChunkContext context) {
 			try {
-				chunkListener.beforeChunk();
+				chunkListener.beforeChunk(context);
 			}
 			catch (Throwable t) {
 				throw new FatalStepExecutionException("ChunkListener threw exception, rethrowing as fatal", t);
@@ -659,9 +659,9 @@ public class FaultTolerantStepBuilder<I, O> extends SimpleStepBuilder<I, O> {
 		}
 
 		@Override
-		public void afterChunk() {
+		public void afterChunk(ChunkContext context) {
 			try {
-				chunkListener.afterChunk();
+				chunkListener.afterChunk(context);
 			}
 			catch (Throwable t) {
 				throw new FatalStepExecutionException("ChunkListener threw exception, rethrowing as fatal", t);
