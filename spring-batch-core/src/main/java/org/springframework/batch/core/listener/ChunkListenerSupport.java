@@ -22,6 +22,7 @@ import org.springframework.batch.core.scope.context.ChunkContext;
  * Basic support implementation of {@link ChunkListener}
  *
  * @author Lucas Ward
+ * @author Michael Minella
  *
  */
 public class ChunkListenerSupport implements ChunkListener {
@@ -30,14 +31,14 @@ public class ChunkListenerSupport implements ChunkListener {
 	 * @see org.springframework.batch.core.domain.ChunkListener#afterChunk()
 	 */
 	@Override
-	public void afterChunk() {
+	public void afterChunk(ChunkContext context) {
 	}
 
 	/* (non-Javadoc)
 	 * @see org.springframework.batch.core.domain.ChunkListener#beforeChunk()
 	 */
 	@Override
-	public void beforeChunk() {
+	public void beforeChunk(ChunkContext context) {
 	}
 
 

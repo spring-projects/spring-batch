@@ -31,7 +31,7 @@ import org.springframework.batch.core.scope.context.ChunkContext;
  *
  * @author Michael Minella
  * @since 2.2
- * @see ChunkListener#afterChunkError(ChunkContext)
+ * @see ChunkListener#afterChunkError(ChunkContext context)
  */
 @Retention(RetentionPolicy.RUNTIME)
 @Target({ElementType.METHOD})

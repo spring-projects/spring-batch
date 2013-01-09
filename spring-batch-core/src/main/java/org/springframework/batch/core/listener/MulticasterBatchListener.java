@@ -176,12 +176,12 @@ ItemProcessListener<T, S>, ItemWriteListener<S>, SkipListener<T, S> {
 
 	/**
 	 *
-	 * @see org.springframework.batch.core.listener.CompositeChunkListener#afterChunk()
+	 * @see org.springframework.batch.core.listener.CompositeChunkListener#afterChunk(ChunkContext context)
 	 */
 	@Override
-	public void afterChunk() {
+	public void afterChunk(ChunkContext context) {
 		try {
-			chunkListener.afterChunk();
+			chunkListener.afterChunk(context);
 		}
 		catch (RuntimeException e) {
 			throw new StepListenerFailedException("Error in afterChunk.", e);
@@ -190,12 +190,12 @@ ItemProcessListener<T, S>, ItemWriteListener<S>, SkipListener<T, S> {
 
 	/**
 	 *
-	 * @see org.springframework.batch.core.listener.CompositeChunkListener#beforeChunk()
+	 * @see org.springframework.batch.core.listener.CompositeChunkListener#beforeChunk(ChunkContext context)
 	 */
 	@Override
-	public void beforeChunk() {
+	public void beforeChunk(ChunkContext context) {
 		try {
-			chunkListener.beforeChunk();
+			chunkListener.beforeChunk(context);
 		}
 		catch (RuntimeException e) {
 			throw new StepListenerFailedException("Error in beforeChunk.", e);

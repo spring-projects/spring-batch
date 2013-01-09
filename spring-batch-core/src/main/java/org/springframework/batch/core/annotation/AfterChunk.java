@@ -21,15 +21,16 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 import org.springframework.batch.core.ChunkListener;
+import org.springframework.batch.core.scope.context.ChunkContext;
 
 /**
  * Marks a method to be called after a chunk is executed.<br>
  * <br/>
- * Expected signature: void afterChunk()
- * 
+ * Expected signature: void afterChunk(ChunkContext context)
+ *
  * @author Lucas Ward
  * @since 2.0
- * @see ChunkListener#afterChunk()
+ * @see ChunkListener#afterChunk(ChunkContext context)
  */
 @Retention(RetentionPolicy.RUNTIME)
 @Target({ElementType.METHOD})

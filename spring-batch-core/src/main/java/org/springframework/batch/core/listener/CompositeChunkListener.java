@@ -49,29 +49,29 @@ public class CompositeChunkListener implements ChunkListener {
 	}
 
 	/**
-	 * Call the registered listeners in order, respecting and prioritising those
+	 * Call the registered listeners in order, respecting and prioritizing those
 	 * that implement {@link Ordered}.
 	 *
-	 * @see org.springframework.batch.core.ChunkListener#afterChunk()
+	 * @see org.springframework.batch.core.ChunkListener#afterChunk(ChunkContext context)
 	 */
 	@Override
-	public void afterChunk() {
+	public void afterChunk(ChunkContext context) {
 		for (Iterator<ChunkListener> iterator = listeners.iterator(); iterator.hasNext();) {
 			ChunkListener listener = iterator.next();
-			listener.afterChunk();
+			listener.afterChunk(context);
 		}
 	}
 
 	/**
 	 * Call the registered listeners in reverse order.
 	 *
-	 * @see org.springframework.batch.core.ChunkListener#beforeChunk()
+	 * @see org.springframework.batch.core.ChunkListener#beforeChunk(ChunkContext context)
 	 */
 	@Override
-	public void beforeChunk() {
+	public void beforeChunk(ChunkContext context) {
 		for (Iterator<ChunkListener> iterator = listeners.reverse(); iterator.hasNext();) {
 			ChunkListener listener = iterator.next();
-			listener.beforeChunk();
+			listener.beforeChunk(context);
 		}
 	}
 
