@@ -130,8 +130,6 @@ public class HibernateItemWriter<T> implements ItemWriter<T>, InitializingBean {
 	 * Do perform the actual write operation using Hibernate's API.
 	 * This can be overridden in a subclass if necessary.
 	 *
-	 * @param hibernateTemplate
-	 *            the HibernateTemplate to use for the operation
 	 * @param items
 	 *            the list of items to use for the write
 	 * @deprecated As of 2.2 in favor of using Hibernate's session management APIs directly

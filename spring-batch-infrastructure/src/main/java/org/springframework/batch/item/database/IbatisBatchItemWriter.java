@@ -35,7 +35,7 @@ import com.ibatis.sqlmap.engine.execution.BatchResult;
 
 /**
  * {@link ItemWriter} that uses the batching features from
- * {@link SqlMapClientTemplate} to execute a batch of statements for all items
+ * SqlMapClientTemplate to execute a batch of statements for all items
  * provided.<br/>
  *
  * The user must provide an iBATIS statement id that points to the SQL statement defined
@@ -81,7 +81,7 @@ public class IbatisBatchItemWriter<T> implements ItemWriter<T>, InitializingBean
 	}
 
 	/**
-	 * Public setter for the {@link SqlMapClientTemplate}.
+	 * Public setter for the SqlMapClientTemplate.
 	 *
 	 * @param sqlMapClientTemplate the SqlMapClientTemplate
 	 */
