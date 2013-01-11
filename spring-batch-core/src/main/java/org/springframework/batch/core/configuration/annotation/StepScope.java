@@ -13,7 +13,7 @@ import org.springframework.context.annotation.ScopedProxyMode;
  * explicitly on every bean definition. Use this on any &#64;Bean that needs to inject &#64;Values from the step
  * context, and any bean that needs to share a lifecycle with a step execution (e.g. an ItemStream). E.g.
  * </p>
- * 
+ *
  * <pre class="code">
  * &#064;Bean
  * &#064;StepScope
@@ -22,13 +22,13 @@ import org.springframework.context.annotation.ScopedProxyMode;
  * 	return new SimpleCallable(value);
  * }
  * </pre>
- * 
- * <p>Marking a &#64;Bean as &#64;StepScope is quivalent to marking it as <code>&#64;Scope(value="step", proxyMode=INTERFACES)</code></p>
- * 
+ *
+ * <p>Marking a &#64;Bean as &#64;StepScope is equivalent to marking it as <code>&#64;Scope(value="step", proxyMode=INTERFACES)</code></p>
+ *
  * @author Dave Syer
- * 
+ *
  * @Since 2.2
- * 
+ *
  */
 @Scope(value = "step")
 @Retention(RetentionPolicy.RUNTIME)
@@ -37,9 +37,9 @@ public @interface StepScope {
 
 	/**
 	 * Set the proxy mode to use (defaults to INTERFACES).
-	 * 
+	 *
 	 * @see Scope#proxyMode()
-	 * 
+	 *
 	 * @return the proxy mode to use
 	 */
 	ScopedProxyMode proxyMode() default ScopedProxyMode.INTERFACES;

@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2011 the original author or authors.
+ * Copyright 2006-2013 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -38,7 +38,7 @@ import org.springframework.context.support.ClassPathXmlApplicationContext;
 
 /**
  * @author Dave Syer
- * 
+ *
  */
 public class StepScopeConfigurationTests {
 
@@ -107,7 +107,6 @@ public class StepScopeConfigurationTests {
 		System.arraycopy(config, 0, configs, 1, config.length);
 		configs[0] = DataSourceConfiguration.class;
 		AnnotationConfigApplicationContext context = new AnnotationConfigApplicationContext();
-		// context.setScopeMetadataResolver(new AnnotationScopeMetadataResolver(ScopedProxyMode.TARGET_CLASS));
 		context.register(configs);
 		context.refresh();
 		this.context = context;
@@ -126,7 +125,7 @@ public class StepScopeConfigurationTests {
 			context.close();
 		}
 	}
-	
+
 	public static class SimpleCallable implements Callable<String> {
 		private final String value;
 
@@ -142,7 +141,7 @@ public class StepScopeConfigurationTests {
 
 	public static class SimpleHolder {
 		private final String value;
-		
+
 		protected SimpleHolder() {
 			value = "<WRONG>";
 		}
