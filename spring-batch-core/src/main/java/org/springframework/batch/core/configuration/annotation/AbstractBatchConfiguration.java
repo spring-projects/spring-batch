@@ -37,8 +37,7 @@ import org.springframework.util.Assert;
 
 /**
  * Base {@code Configuration} class providing common structure for enabling and using Spring Batch. Customization is
- * available by implementing the {@link BatchConfigurer} interface.
- * {@link BatchConfigurer}.
+ * available by implementing the {@link BatchConfigurer} interface. {@link BatchConfigurer}.
  * 
  * @author Dave Syer
  * @since 2.2
@@ -47,9 +46,6 @@ import org.springframework.util.Assert;
 @Configuration
 @Import(StepScopeConfiguration.class)
 public abstract class AbstractBatchConfiguration implements ImportAware {
-
-	@Autowired
-	private StepScope stepScope;
 
 	@Autowired
 	private ApplicationContext context;
@@ -89,13 +85,10 @@ public abstract class AbstractBatchConfiguration implements ImportAware {
 				EnableBatchProcessing.class.getName(), false));
 		Assert.notNull(enabled,
 				"@EnableBatchProcessing is not present on importing class " + importMetadata.getClassName());
-		if (enabled.getBoolean("proxyTargetClass")) {
-			stepScope.setProxyTargetClass(true);
-		}
 	}
 
 	protected BatchConfigurer getConfigurer(Collection<BatchConfigurer> configurers) throws Exception {
-		if (this.configurer!=null) {
+		if (this.configurer != null) {
 			return this.configurer;
 		}
 		if (configurers == null || configurers.isEmpty()) {
@@ -134,6 +127,7 @@ class StepScopeConfiguration {
 
 	@Bean
 	public StepScope stepScope() {
+		stepScope.setAutoProxy(false);
 		return stepScope;
 	}
 

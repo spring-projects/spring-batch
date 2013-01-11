@@ -21,15 +21,7 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
-import javax.sql.DataSource;
-
-import org.springframework.batch.core.configuration.support.ApplicationContextFactory;
-import org.springframework.batch.core.configuration.support.AutomaticJobRegistrar;
-import org.springframework.batch.core.launch.JobLauncher;
-import org.springframework.batch.core.repository.JobRepository;
-import org.springframework.batch.core.scope.StepScope;
 import org.springframework.context.annotation.Import;
-import org.springframework.transaction.PlatformTransactionManager;
 
 /**
  * <p>
@@ -161,12 +153,6 @@ import org.springframework.transaction.PlatformTransactionManager;
 @Documented
 @Import(BatchConfigurationSelector.class)
 public @interface EnableBatchProcessing {
-
-	/**
-	 * Indicate whether beans in <code>scope="step"</code> should use subclass-based (CGLIB) proxies are to be created
-	 * as opposed to standard Java interface-based proxies. The default is {@code false}.
-	 */
-	boolean proxyTargetClass() default false;
 
 	/**
 	 * Indicate whether the configuration is going to be modularized into multiple application contexts. If true then
