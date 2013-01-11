@@ -80,6 +80,8 @@ public class StepScope implements Scope, BeanFactoryPostProcessor, Ordered {
 
 	private int order = Ordered.LOWEST_PRECEDENCE;
 
+	private boolean autoProxy = true;
+
 	private final Object mutex = new Object();
 
 	/**
@@ -113,6 +115,16 @@ public class StepScope implements Scope, BeanFactoryPostProcessor, Ordered {
 	 */
 	public void setProxyTargetClass(boolean proxyTargetClass) {
 		this.proxyTargetClass = proxyTargetClass;
+	}
+
+	/**
+	 * Flag to indicate that bean definitions need not be auto proxied. This gives control back to the declarer of the
+	 * bean definition (e.g. in an &#64;Configuration class).
+	 *
+	 * @param autoProxy the flag value to set (default true)
+	 */
+	public void setAutoProxy(boolean autoProxy) {
+		this.autoProxy = autoProxy;
 	}
 
 	/**
@@ -211,6 +223,10 @@ public class StepScope implements Scope, BeanFactoryPostProcessor, Ordered {
 	public void postProcessBeanFactory(ConfigurableListableBeanFactory beanFactory) throws BeansException {
 
 		beanFactory.registerScope(name, this);
+
+		if(!autoProxy) {
+			return;
+		}
 
 		Assert.state(beanFactory instanceof BeanDefinitionRegistry,
 				"BeanFactory was not a BeanDefinitionRegistry, so StepScope cannot be used.");
