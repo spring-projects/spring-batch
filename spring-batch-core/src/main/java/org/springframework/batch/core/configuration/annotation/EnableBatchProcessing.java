@@ -21,13 +21,11 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
-import javax.sql.DataSource;
-
+import org.springframework.batch.core.configuration.JobRegistry;
 import org.springframework.batch.core.configuration.support.ApplicationContextFactory;
 import org.springframework.batch.core.configuration.support.AutomaticJobRegistrar;
 import org.springframework.batch.core.launch.JobLauncher;
 import org.springframework.batch.core.repository.JobRepository;
-import org.springframework.batch.core.scope.StepScope;
 import org.springframework.context.annotation.Import;
 import org.springframework.transaction.PlatformTransactionManager;
 
@@ -35,61 +33,61 @@ import org.springframework.transaction.PlatformTransactionManager;
  * <p>
  * Enable Spring Batch features and provide a base configuration for setting up batch jobs in an &#064;Configuration
  * class, roughly equivalent to using the {@code <batch:*>} XML namespace.
- * 
+ *
  * <pre class="code">
  * &#064;Configuration
  * &#064;EnableBatchProcessing
  * &#064;Import(DataSourceCnfiguration.class)
  * public class AppConfig {
- * 
+ *
  * 	&#064;Autowired
  * 	private JobBuilderFactory jobs;
- * 
+ *
  * 	&#064;Bean
  * 	public Job job() {
  * 		return jobs.get(&quot;myJob&quot;).start(step1()).next(step2()).build();
  * 	}
- * 
+ *
  * 	&#064;Bean
  *    protected Step step1() {
  *       ...
  *    }
- * 
+ *
  * 	&#064;Bean
  *    protected Step step2() {
  *     ...
  *    }
  * }
  * </pre>
- * 
+ *
  * The user has to provide a {@link DataSource} as a bean in the context, or else implement {@link BatchConfigurer} in
  * the configuration class itself, e.g.
- * 
+ *
  * <pre class="code">
  * &#064;Configuration
  * &#064;EnableBatchProcessing
  * public class AppConfig extends DefaultBatchConfigurer {
- * 
+ *
  *    &#064;Bean
  *    public Job job() {
  *       ...
  *    }
- * 
+ *
  *    &#064;Override
  *    protected JobRepository createJobRepository() {
  *       ...
  *    }
- *  
+ *
  *  ...
- *  
+ *
  * }
  * </pre>
- * 
+ *
  * Note that only one of your configuration classes needs to have the <code>&#064;EnableBatchProcessing</code>
  * annotation. Once you have an <code>&#064;EnableBatchProcessing</code> class in your configuration you will have an
  * instance of {@link StepScope} so your beans inside steps can have <code>&#064;Scope("step")</code>. You will also be
  * able to <code>&#064;Autowired</code> some useful stuff into your context:
- * 
+ *
  * <ul>
  * <li>a {@link JobRepository} (bean name "jobRepository")</li>
  * <li>a {@link JobLauncher} (bean name "jobLauncher")</li>
@@ -100,43 +98,43 @@ import org.springframework.transaction.PlatformTransactionManager;
  * <li>a {@link StepBuilderFactory} (bean name "stepBuilders") as a convenience to prevent you from having to inject the
  * job repository and transaction manager into every step</li>
  * </ul>
- * 
+ *
  * If the configuration is specified as <code>modular=true</code> then the context will also contain an
  * {@link AutomaticJobRegistrar}. The job registrar is useful for modularizing your configuration if there are multiple
  * jobs. It works by creating separate child application contexts containing job configurations and registering those
  * jobs. The jobs can then create steps and other dependent components without needing to worry about bean definition
  * name clashes. Beans of type {@link ApplicationContextFactory} will be registered automatically with the job
  * registrar. Example:
- * 
+ *
  * <pre class="code">
  * &#064;Configuration
  * &#064;EnableBatchProcessing(modular=true)
  * public class AppConfig {
- * 
+ *
  *    &#064;Bean
  *    public ApplicationContextFactory someJobs() {
  *       return new GenericApplicationContextFactory(SomeJobConfiguration.class);
  *    }
- * 
+ *
  *    &#064;Bean
  *    public ApplicationContextFactory moreJobs() {
  *       return new GenericApplicationContextFactory(MoreJobConfiguration.class);
  *    }
- *  
+ *
  *  ...
- *  
+ *
  * }
  * </pre>
- * 
+ *
  * Note that a modular parent context in general should <em>not</em> itself contain &#64;Bean definitions for job,
  * especially if a {@link BatchConfigurer} is provided, because cyclic configuration dependencies are otherwise likely
  * to develop.
- * 
+ *
  * </p>
- * 
+ *
  * <p>
  * For reference, the first example above can be compared to the following Spring XML configuration:
- * 
+ *
  * <pre class="code">
  * {@code
  * <batch>
@@ -152,21 +150,15 @@ import org.springframework.transaction.PlatformTransactionManager;
  * </batch>
  * }
  * </pre>
- * 
+ *
  * @author Dave Syer
- * 
+ *
  */
 @Target(ElementType.TYPE)
 @Retention(RetentionPolicy.RUNTIME)
 @Documented
 @Import(BatchConfigurationSelector.class)
 public @interface EnableBatchProcessing {
-
-	/**
-	 * Indicate whether beans in <code>scope="step"</code> should use subclass-based (CGLIB) proxies are to be created
-	 * as opposed to standard Java interface-based proxies. The default is {@code false}.
-	 */
-	boolean proxyTargetClass() default false;
 
 	/**
 	 * Indicate whether the configuration is going to be modularized into multiple application contexts. If true then
