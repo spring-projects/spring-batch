@@ -56,7 +56,7 @@ public class StepScopeTests {
 
 	@After
 	public void tearDown() throws Exception {
-		StepSynchronizationManager.close();
+		StepSynchronizationManager.release();
 	}
 
 	@Test

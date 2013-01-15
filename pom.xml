@@ -625,7 +625,7 @@
 		<pluginRepository>
 			<id>com.springsource.repository.bundles.milestone</id>
 			<name> SpringSource Enterprise Bundle Repository - SpringSource Bundle Milestones</name>
-			<url>http://repository.springsource.com/maven/bundles/milestone/</url>
+			<url>http://repository.springsource.com/maven/bundles/milestone</url>
 			<snapshots>
 				<enabled>false</enabled>
 			</snapshots>
@@ -633,7 +633,23 @@
 		<pluginRepository>
 			<id>com.springsource.repository.bundles.snapshot</id>
 			<name>SpringSource Enterprise Bundle Repository - SpringSource Bundle Snapshots</name>
-			<url>http://repository.springsource.com/maven/bundles/snapshot/</url>
+			<url>http://repository.springsource.com/maven/bundles/snapshot</url>
+		</pluginRepository>
+		<pluginRepository>
+			<id>com.springsource.repository.bundles.release</id>
+			<name>SpringSource Enterprise Bundle Repository - SpringSource Bundle Releases</name>
+			<url>http://repository.springsource.com/maven/bundles/release</url>
+			<snapshots>
+				<enabled>false</enabled>
+			</snapshots>
+		</pluginRepository>
+		<pluginRepository>
+			<id>com.springsource.repository.bundles.release</id>
+			<name>SpringSource Enterprise Bundle Repository - SpringSource Bundle Releases</name>
+			<url>http://repository.springsource.com/maven/bundles/release/</url>
+			<snapshots>
+				<enabled>false</enabled>
+			</snapshots>
 		</pluginRepository>
 	</pluginRepositories>
 </project>
