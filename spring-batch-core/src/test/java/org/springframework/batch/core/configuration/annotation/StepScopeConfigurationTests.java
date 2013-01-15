@@ -114,6 +114,7 @@ public class StepScopeConfigurationTests {
 
 	@Before
 	public void setup() {
+		StepSynchronizationManager.release();
 		stepExecution = new StepExecution("STEP", null);
 		StepSynchronizationManager.register(stepExecution);
 	}
