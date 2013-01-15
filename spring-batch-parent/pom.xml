@@ -141,9 +141,9 @@
 			<id>bootstrap</id>
 			<repositories>
 				<repository>
-   					<id>gemstone</id>
-   					<name>Release bundles for SQLFire and GemFire</name>
-  					 <url>http://dist.gemstone.com.s3.amazonaws.com/maven/release</url>
+					<id>gemstone</id>
+					<name>Release bundles for SQLFire and GemFire</name>
+					<url>http://dist.gemstone.com.s3.amazonaws.com/maven/release</url>
 				</repository>
 				<repository>
 					<id>objectstyle</id>
@@ -473,6 +473,10 @@
 					<exclusion>
 						<groupId>org.hibernate</groupId>
 						<artifactId>hibernate</artifactId>
+					</exclusion>
+					<exclusion>
+						<groupId>commons-logging</groupId>
+						<artifactId>commons-logging</artifactId>
 					</exclusion>
 				</exclusions>
 			</dependency>
