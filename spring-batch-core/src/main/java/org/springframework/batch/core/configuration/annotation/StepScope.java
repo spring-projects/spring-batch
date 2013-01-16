@@ -30,18 +30,9 @@ import org.springframework.context.annotation.ScopedProxyMode;
  * @Since 2.2
  *
  */
-@Scope(value = "step")
+@Scope(value = "step", proxyMode = ScopedProxyMode.INTERFACES)
 @Retention(RetentionPolicy.RUNTIME)
 @Documented
 public @interface StepScope {
-
-	/**
-	 * Set the proxy mode to use (defaults to INTERFACES).
-	 *
-	 * @see Scope#proxyMode()
-	 *
-	 * @return the proxy mode to use
-	 */
-	ScopedProxyMode proxyMode() default ScopedProxyMode.INTERFACES;
 
 }

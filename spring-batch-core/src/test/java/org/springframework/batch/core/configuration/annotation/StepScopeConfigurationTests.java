@@ -33,6 +33,7 @@ import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Scope;
 import org.springframework.context.annotation.ScopedProxyMode;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
@@ -53,6 +54,7 @@ public class StepScopeConfigurationTests {
 	public void testXmlStepScopeWithProxyTargetClass() throws Exception {
 		context = new ClassPathXmlApplicationContext(
 				"org/springframework/batch/core/configuration/annotation/StepScopeConfigurationTestsProxyTargetClass-context.xml");
+		StepSynchronizationManager.register(stepExecution);
 		SimpleHolder value = context.getBean(SimpleHolder.class);
 		assertEquals("STEP", value.call());
 	}
@@ -61,6 +63,7 @@ public class StepScopeConfigurationTests {
 	public void testXmlStepScopeWithInterface() throws Exception {
 		context = new ClassPathXmlApplicationContext(
 				"org/springframework/batch/core/configuration/annotation/StepScopeConfigurationTestsInterface-context.xml");
+		StepSynchronizationManager.register(stepExecution);
 		@SuppressWarnings("unchecked")
 		Callable<String> value = context.getBean(Callable.class);
 		assertEquals("STEP", value.call());
@@ -70,6 +73,13 @@ public class StepScopeConfigurationTests {
 	public void testStepScopeWithProxyTargetClass() throws Exception {
 		init(StepScopeConfigurationRequiringProxyTargetClass.class);
 		SimpleHolder value = context.getBean(SimpleHolder.class);
+		assertEquals("STEP", value.call());
+	}
+
+	@Test
+	public void testStepScopeWithProxyTargetClassInjected() throws Exception {
+		init(StepScopeConfigurationInjectingProxy.class);
+		SimpleHolder value = context.getBean(Wrapper.class).getValue();
 		assertEquals("STEP", value.call());
 	}
 
@@ -110,13 +120,13 @@ public class StepScopeConfigurationTests {
 		context.register(configs);
 		context.refresh();
 		this.context = context;
+		StepSynchronizationManager.register(stepExecution);
 	}
 
 	@Before
 	public void setup() {
 		StepSynchronizationManager.release();
 		stepExecution = new StepExecution("STEP", null);
-		StepSynchronizationManager.register(stepExecution);
 	}
 
 	@After
@@ -155,13 +165,45 @@ public class StepScopeConfigurationTests {
 			return value;
 		}
 	}
+	
+	public static class Wrapper {
+
+		private SimpleHolder value;
+
+		public Wrapper(SimpleHolder value) {
+			this.value = value;
+		}
+		
+		public SimpleHolder getValue() {
+			return value;
+		}
+		
+	}
+
+	@Configuration
+	@EnableBatchProcessing
+	public static class StepScopeConfigurationInjectingProxy {
+		
+		@Bean
+		public Wrapper wrapper(SimpleHolder value) {
+			return new Wrapper(value);
+		}
+
+		@Bean
+		@Scope(value="step", proxyMode = ScopedProxyMode.TARGET_CLASS)
+		protected SimpleHolder value(@Value("#{stepExecution.stepName}")
+		final String value) {
+			return new SimpleHolder(value);
+		}
+
+	}
 
 	@Configuration
 	@EnableBatchProcessing
 	public static class StepScopeConfigurationRequiringProxyTargetClass {
 
 		@Bean
-		@StepScope(proxyMode = ScopedProxyMode.TARGET_CLASS)
+		@Scope(value="step", proxyMode = ScopedProxyMode.TARGET_CLASS)
 		protected SimpleHolder value(@Value("#{stepExecution.stepName}")
 		final String value) {
 			return new SimpleHolder(value);
