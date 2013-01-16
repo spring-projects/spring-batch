@@ -1,35 +1,22 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<beans xmlns="http://www.springframework.org/schema/beans"
-	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://www.springframework.org/schema/batch http://www.springframework.org/schema/batch/spring-batch-2.1.xsd
-		http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.1.xsd">
+<beans:beans
+        xmlns:beans="http://www.springframework.org/schema/beans"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xmlns:batch="http://www.springframework.org/schema/batch"
+        xsi:schemaLocation="
+          http://www.springframework.org/schema/batch http://www.springframework.org/schema/batch/spring-batch-2.1.xsd
+          http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.2.xsd">
 
-	<description>Example job to get you started. It provides a
-		skeleton for
-		a typical batch application.
-	</description>
+    <beans:description>Example job providing a skeleton for a typical batch application.</beans:description>
 
-	<job id="job1" xmlns="http://www.springframework.org/schema/batch"
-		incrementer="jobParametersIncrementer">
-		<step id="step1" parent="simpleStep">
-			<tasklet>
-				<chunk reader="reader" writer="writer" />
-			</tasklet>
-		</step>
-	</job>
-
-	<bean id="reader" class="example.ExampleItemReader" />
-	<bean id="writer" class="example.ExampleItemWriter" />
-
-	<!-- enables the functionality of JobOperator.startNextInstance(jobName) -->
-	<bean id="jobParametersIncrementer"
-		class="org.springframework.batch.core.launch.support.RunIdIncrementer" />
-
-	<bean id="simpleStep" class="org.springframework.batch.core.step.factory.SimpleStepFactoryBean" abstract="true">
-		<property name="transactionManager" ref="transactionManager" />
-		<property name="jobRepository" ref="jobRepository" />
-		<property name="startLimit" value="100" />
-		<property name="commitInterval" value="1" />
-	</bean>
-
-</beans>
+    <batch:job id="personJob" incrementer="jobParametersIncrementer">
+        <batch:step id="step1">
+            <batch:tasklet>
+                <batch:chunk reader="itemReader" processor="itemProcessor" writer="itemWriter"
+                             commit-interval="${step1.commit.interval}"/>
+            </batch:tasklet>
+            <batch:fail on="FAILED"/>
+            <batch:end on="*"/>
+        </batch:step>
+    </batch:job>
+</beans:beans>
