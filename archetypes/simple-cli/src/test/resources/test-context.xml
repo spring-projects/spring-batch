@@ -1,13 +1,38 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xmlns:context="http://www.springframework.org/schema/context"
-	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.1.xsd
-		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-3.1.xsd">
+<beans:beans
+        xmlns:beans="http://www.springframework.org/schema/beans"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xmlns:jdbc="http://www.springframework.org/schema/jdbc"
+        xmlns:p="http://www.springframework.org/schema/p"
+        xmlns:context="http://www.springframework.org/schema/context"
+        xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.1.xsd
+          http://www.springframework.org/schema/jdbc http://www.springframework.org/schema/jdbc/spring-jdbc-3.1.xsd
+          http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-3.1.xsd">
 
-	<import resource="classpath*:/launch-context.xml"/>
-	
-	<context:annotation-config/>
-	
-	<bean class="org.springframework.batch.test.JobLauncherTestUtils"/>
+    <beans:import resource="classpath:launch-context.xml"/>
 
-</beans>
+    <context:annotation-config/>
+
+    <jdbc:initialize-database data-source="dataSource">
+        <jdbc:script location="${batch.drop.script}"/>
+        <jdbc:script location="${person.sql.location}"/>
+        <jdbc:script location="${batch.schema.script}"/>
+    </jdbc:initialize-database>
+
+    <beans:bean class="org.springframework.batch.test.JobLauncherTestUtils"/>
+
+    <beans:bean id="jobOperator"
+                class="org.springframework.batch.core.launch.support.SimpleJobOperator"
+                p:jobLauncher-ref="jobLauncher" p:jobExplorer-ref="jobExplorer"
+                p:jobRepository-ref="jobRepository" p:jobRegistry-ref="jobRegistry"/>
+
+    <beans:bean id="jobExplorer"
+                class="org.springframework.batch.core.explore.support.JobExplorerFactoryBean"
+                p:dataSource-ref="dataSource"/>
+
+    <beans:bean id="jobRegistry"
+                class="org.springframework.batch.core.configuration.support.MapJobRegistry"/>
+
+    <beans:bean class="org.springframework.batch.core.configuration.support.JobRegistryBeanPostProcessor"
+                p:jobRegistry-ref="jobRegistry"/>
+</beans:beans>
