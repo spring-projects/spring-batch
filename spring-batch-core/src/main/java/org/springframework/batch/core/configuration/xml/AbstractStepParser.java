@@ -52,6 +52,8 @@ public abstract class AbstractStepParser {
 	private static final String PARENT_ATTR = "parent";
 
 	private static final String REF_ATTR = "ref";
+	
+	private static final String ALLOW_START_ATTR = "allow-start-if-complete";
 
 	private static final String TASKLET_ELE = "tasklet";
 
@@ -176,6 +178,13 @@ public abstract class AbstractStepParser {
 			bd.setAttribute("jobParserJobFactoryBeanRef", jobFactoryRef);
 		}
 
+		//add the allow parser here
+		String isAllowStart = stepElement.getAttribute(ALLOW_START_ATTR);
+		if (StringUtils.hasText(isAllowStart)) {
+			//set the value as a property
+			bd.getPropertyValues().add("allowStartIfComplete", Boolean.valueOf(isAllowStart));
+		}
+		
 		stepListenerParser.handleListenersElement(stepElement, bd, parserContext);
 		return bd;
 	}
