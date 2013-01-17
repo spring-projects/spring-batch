@@ -179,11 +179,14 @@ public abstract class AbstractStepParser {
 		}
 
 		//add the allow parser here
-//		String isAllowStart = stepElement.getAttribute(ALLOW_START_ATTR);
-//		if (StringUtils.hasText(isAllowStart)) {
-//			//set the value as a property
-//			bd.getPropertyValues().add("allowStartIfComplete", Boolean.valueOf(isAllowStart));
-//		}
+		String isAllowStart = stepElement.getAttribute(ALLOW_START_ATTR);
+		if (StringUtils.hasText(isAllowStart)) {
+			//check if the value is already set from an inner element
+			if (!bd.getPropertyValues().contains("allowStartIfComplete")) {
+				//set the value as a property
+				bd.getPropertyValues().add("allowStartIfComplete", Boolean.valueOf(isAllowStart));
+			}//end if
+		}
 		
 		stepListenerParser.handleListenersElement(stepElement, bd, parserContext);
 		return bd;
