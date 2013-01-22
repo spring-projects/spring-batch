@@ -286,6 +286,7 @@ ref"							is not required, and only needs to be specified explicitly
 						<xsd:extension base="stepType">
 							<xsd:attribute name="id" type="xsd:ID" use="required" />
 							<xsd:attributeGroup ref="nextAttribute" />
+							<xsd:attributeGroup ref="allowStartIfCompleteAttribute" />
 						</xsd:extension>
 					</xsd:complexContent>
 				</xsd:complexType>
@@ -623,13 +624,6 @@ ref"							is not required, and only needs to be specified explicitly
 				]]></xsd:documentation>
 			</xsd:annotation>
 		</xsd:attribute>
-		<xsd:attribute name="allow-start-if-complete" type="xsd:string" use="optional">
-			<xsd:annotation>
-				<xsd:documentation><![CDATA[
-				Set to true to allow a step to be started even if it is already complete.
-				]]></xsd:documentation>
-			</xsd:annotation>
-		</xsd:attribute>
 		<xsd:attribute name="transaction-manager" type="xsd:string">
 			<xsd:annotation>
 				<xsd:documentation source="java:org.springframework.transaction.PlatformTransactionManager"><![CDATA[
@@ -665,6 +659,7 @@ ref"							is not required, and only needs to be specified explicitly
 				]]></xsd:documentation>
 			</xsd:annotation>
 		</xsd:attribute>
+		<xsd:attributeGroup ref="allowStartIfCompleteAttribute"/>
 	</xsd:complexType>
 
 	<xsd:complexType name="transaction-attributesType">
@@ -983,6 +978,16 @@ ref"							is not required, and only needs to be specified explicitly
 				</xsd:documentation>
 			</xsd:annotation>
 		</xsd:attribute>
+	</xsd:attributeGroup>
+
+	<xsd:attributeGroup name="allowStartIfCompleteAttribute">
+		<xsd:attribute name="allow-start-if-complete" type="xsd:string" use="optional">
+			<xsd:annotation>
+				<xsd:documentation><![CDATA[
+				Set to true to allow a step to be started even if it is already complete.
+				]]></xsd:documentation>
+			</xsd:annotation>
+		</xsd:attribute>	
 	</xsd:attributeGroup>
 
 	<xsd:attributeGroup name="exceptionClassAttribute">
