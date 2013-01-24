@@ -14,29 +14,29 @@ Use Cases for Spring Batch
   in this project, and use cases are a useful resource to make sure
   they are all agreed on scope and certain implementation details.
 
-    * {{{simple.html}Simple Batch Repeat}}
+    * {{{./simple.html}Simple Batch Repeat}}
 
-    * {{{retry.html}Automatic Retry After Failure}}
+    * {{{./retry.html}Automatic Retry After Failure}}
 
-    * {{{chunks.html}Commit Batch Process Periodically}}: chunk
+    * {{{./chunks.html}Commit Batch Process Periodically}}: chunk
     processing.
 
-    * {{{async.html}Asynchronous Chunk Processing}}: parallel
+    * {{{./async.html}Asynchronous Chunk Processing}}: parallel
     processing within a chunk.
-    
-    * {{{file-to-file.html}Copy File to File in a Batch}}
 
-    * {{{parallel.html}Massively Parallel Batch Processing}}.  Spring
+    * {{{./file-to-file.html}Copy File to File in a Batch}}
+
+    * {{{./parallel.html}Massively Parallel Batch Processing}}.  Spring
     Batch 1.0 does not contain any implementations of this use case,
     but it is quite feasible to implement them using the framework as
     a starting point.  1.1 has some prototype code under the Integration
     module.
 
-    * {{{restart.html}Manual Restart After Failure}}
+    * {{{./restart.html}Manual Restart After Failure}}
 
-    * {{{steps.html}Sequential Processing of Dependent Steps}}
+    * {{{./steps.html}Sequential Processing of Dependent Steps}}
 
-    * {{{partial.html}Partial Processing}}: skip records (e.g. on rollback).
+    * {{{./partial.html}Partial Processing}}: skip records (e.g. on rollback).
 
     * Whole-Batch Transaction - transactional support for the whole
     batch, not just chunks.  Quite a common requirement, but not
@@ -45,16 +45,16 @@ Use Cases for Spring Batch
     copy it in one big batch (e.g. using native database tools) or
     chunk it (e.g. if it is now in a form for which chunk failure is
     easier to deal with).
-    
-    * {{{scheduled.html}Scheduled Processing}}: Batch Jobs controlled
+
+    * {{{./scheduled.html}Scheduled Processing}}: Batch Jobs controlled
     by scheduler (e.g. start, stop, suspend, kill).  Spring Batch does
     not intend to implement the scheduler concerns, but needs
     to provide enough information that a scheduler can act
     appropriately.
-    
+
     * Non-Sequential Processing of Steps (Conditional Branching)
 
-    * {{{pause.html}Pause and Resume Job Execution}}
+    * {{{./pause.html}Pause and Resume Job Execution}}
 
 
 * Actors

@@ -7,7 +7,7 @@
 
 Spring Batch Features and Roadmap
 
-  See also {{{migration/2.0-highlights.html}details of main themes of 2.0}}.
+  See also {{{./migration/2.0-highlights.html}details of main themes of 2.0}}.
 
 * 2.0 Features
 
@@ -18,7 +18,7 @@ Spring Batch Features and Roadmap
   * RepeatOperations: an abstraction for grouping repeated
   operations together and moving the iteration logic into the
   framework.
- 
+
   * RetryOperations: an abstraction for automatic retry.
 
   * ItemReader abstraction and implementations for flat files, xml
@@ -26,7 +26,7 @@ Spring Batch Features and Roadmap
 
   * Flat files are supported with fixed length and delimited records
   (input and ouput).
-  
+
   * Xml is supported through Spring OXM mapping between objects and Xml
   elements (input and ouput).  Large files are streamed, not read as a whole.
 

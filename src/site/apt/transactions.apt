@@ -16,14 +16,14 @@ Batch Processing and Transactions
 
 +---
 1   |  REPEAT(until=exhausted) {
-    |  
+    |
 2   |    TX {
 3   |      REPEAT(size=5) {
-3.1 |        input; 
+3.1 |        input;
 3.2 |        output;
     |      }
     |    }
-    |  
+    |
     |  }
 +---
 
@@ -44,7 +44,7 @@ Batch Processing and Transactions
 
 +---
 0   |  TX {
-1   |    input; 
+1   |    input;
 1.1 |    output;
 2   |    RETRY {
 2.1 |      remote access;
@@ -62,12 +62,12 @@ Batch Processing and Transactions
 * {Typical} Repeat-Retry Pattern
 
   The most typical batch processing pattern is to add a retry to the
-  inner block of the chunk in the {{{#Simple Batching}simple}} example.
+  inner block of the chunk in the {{{Simple Batching}simple}} example.
   Consider this:
 
 +---
 1   |  REPEAT(until=exhausted, exception=not critical) {
-    |  
+    |
 2   |    TX {
 3   |      REPEAT(size=5) {
     |
@@ -86,7 +86,7 @@ Batch Processing and Transactions
 +---
 
   The inner RETRY(4) block is marked as "stateful" - see the
-  {{{#Typical}typical}} use case for a description of a stateful
+  {{{Typical}typical}} use case for a description of a stateful
   retry.  This means that if the the retry PROCESS(5) block fails, the
   behaviour of the RETRY(4) is as follows.
 
@@ -115,7 +115,7 @@ Batch Processing and Transactions
   type), the retry policy might be able to determine that the
   RECOVER(6) path can be taken on the last attempt after PROCESS(5)
   has just failed, instead of waiting for the item to be re-presented.
-  This is not the default behaviour because it requires detailed
+  This is not the default behavior because it requires detailed
   knowledge of what has happened inside the PROCESS(5) block, which is
   not usually available - e.g. if the output included write
   access before the failure, then the exception should be rethrown to
@@ -136,7 +136,7 @@ Batch Processing and Transactions
   implementation of the input(4.1).  Thus the output(5.1) might fail
   again, on a new item, or on the old one.  The client of the batch
   should not assume that each RETRY(4) attempt is going to process the
-  same items as the last on ethat failed.  E.g. if the termination
+  same items as the last one that failed.  E.g. if the termination
   policy for REPEAT(1) is to fail after 10 attempts, it will fail
   after 10 consecutive attempts, but not necessarily at the same item.
   This is consistent with the overall retry strategy: it is the inner
@@ -145,14 +145,14 @@ Batch Processing and Transactions
 
 * Asynchronous Chunk Processing
 
-  The inner batches or chunks in the {{{#Typical}typical}} example
+  The inner batches or chunks in the {{{Typical}typical}} example
   above can be executed concurrently by configuring the outer batch to
   use an <<<AsyncTaskExecutor>>>.  The outer batch waits for all the
   chunks to complete before completing.
 
 +---
 1   |  REPEAT(until=exhausted, concurrent, exception=not critical) {
-    |  
+    |
 2   |    TX {
 3   |      REPEAT(size=5) {
     |
@@ -166,20 +166,20 @@ Batch Processing and Transactions
     |
     |      }
     |    }
-    |  
+    |
     |  }
 +---
 
 * Asynchronous Item Processing
 
-  The individual items in chunks in the {{{#Typical}typical}} 
+  The individual items in chunks in the {{{Typical}typical}}
   can also in principle be processed concurrently.  In this case the
   transaction boundary has to move to the level of the individual
   item, so that each transaction is on a single thread:
 
 +---
 1   |  REPEAT(until=exhausted, exception=not critical) {
-    |  
+    |
 2   |    REPEAT(size=5, concurrent) {
     |
 3   |      TX {
@@ -193,7 +193,7 @@ Batch Processing and Transactions
     |      }
     |
     |    }
-    |  
+    |
     |  }
 +---
 
@@ -213,15 +213,15 @@ Interactions Between Batching and Transaction Propagation
 
 +---
 1   |  TX {
-    |  
-1.1 |    input; 
+    |
+1.1 |    input;
 2.2 |    database access;
 2   |    RETRY {
 3   |      TX {
 3.1 |        database access;
     |      }
     |    }
-    |  
+    |
     |  }
 +---
 
@@ -234,9 +234,9 @@ Interactions Between Batching and Transaction Propagation
 
 +---
 1   |  TX {
-    |  
+    |
 2   |    REPEAT(size=5) {
-2.1 |      input; 
+2.1 |      input;
 2.2 |      database access;
 3   |      RETRY {
 4   |        TX {
@@ -244,7 +244,7 @@ Interactions Between Batching and Transaction Propagation
     |        }
     |      }
     |    }
-    |  
+    |
     |  }
 +---
 
@@ -280,7 +280,7 @@ Interactions Between Batching and Transaction Propagation
 
 +---
 0   |  SESSION {
-1   |    input; 
+1   |    input;
 2   |    RETRY {
 3   |      TX {
 3.1 |        database access;
@@ -303,7 +303,7 @@ Interactions Between Batching and Transaction Propagation
 * Stateless Retry Cannot Recover
 
   The distinction between a stateless and a stateful retry in the
-  {{{#Typical}typical}} example above is important.  It is actually
+  {{{Typical}typical}} example above is important.  It is actually
   ultimately a transactional constraint that forces the distinction,
   and this constraint also makes it obvious why the distinction
   exists.
@@ -311,17 +311,17 @@ Interactions Between Batching and Transaction Propagation
   We start with the observation that there is no way to skip an item
   that failed and successfully commit the rest of the chunk unless we
   wrap the item processing in a transaction.  So we simplify the
-  {{{#Typical}typical}} batch execution plan to look like this:
+  {{{Typical}typical}} batch execution plan to look like this:
 
 +---
 0   |  REPEAT(until=exhausted) {
-    |  
+    |
 1   |    TX {
 2   |      REPEAT(size=5) {
     |
 3   |        RETRY(stateless) {
 4   |          TX {
-4.1 |            input; 
+4.1 |            input;
 4.2 |            database access;
     |          }
 5   |        } RECOVER {
@@ -330,7 +330,7 @@ Interactions Between Batching and Transaction Propagation
     |
     |      }
     |    }
-    |  
+    |
     |  }
 +---
 
@@ -349,6 +349,6 @@ Interactions Between Batching and Transaction Propagation
   not to support recovery with stateless retries in current versions of
   Spring Batch.  The same effect can always be achieved (at the
   expense of repeating more processing) using the
-  {{{#Typical}typical}} pattern above.
+  {{{Typical}typical}} pattern above.
 
 

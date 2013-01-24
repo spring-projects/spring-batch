@@ -27,7 +27,7 @@ Use Case: Simple Batch Repeat
 
     * Is stateless - this is not a framework restriction in principle,
     but simplifies the implementation for now.  See in the
-    {{{#store}Implementation}} section below for some notes on
+    {{{store}Implementation}} section below for some notes on
     stateful synchronisation;
 
     * Should be implementable as a POJO if desired.
@@ -208,7 +208,7 @@ public class RepeatTemplate implements RepeatOperations {
 
         // set up the batch
         interceptors.open();
-        
+
         while (running) {
 
             // allow interceptor to pre-process and veto continuation
@@ -255,7 +255,7 @@ public class RepeatTemplate implements RepeatOperations {
 
         // set up the batch session
         RepeatContext context = completionPolicy.start();
-        
+
         while (!completionPolicy.isComplete(context)) {
 
             // callback gets the context as an argument

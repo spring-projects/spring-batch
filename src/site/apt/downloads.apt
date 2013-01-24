@@ -15,7 +15,7 @@ For runtime concerns and a container for running a Job as a service see the {{{h
 
   There is a ZIP artifact containing the release JARs called  <<<spring-batch-*-no-dependencies.zip>>>.  This file contains the JAR files for the release, including source code and the samples.
 
-  * Full releases: {{{http://static.springframework.org/downloads/nightly/release-download.php?project=BATCH}here}}.  
+  * Full releases: {{{http://static.springframework.org/downloads/nightly/release-download.php?project=BATCH}here}}.
 
   * Milestones: {{{http://static.springframework.org/downloads/nightly/milestone-download.php?project=BATCH}here}}.
 
@@ -80,7 +80,7 @@ Source code can also be browsed and downloaded at {{{http://github.com/SpringSou
 
 * Milestone Builds
 
-  These builds are provided for evaluation and community feedback.  Spring Batch builds have a release identifier ending in "MX" where X is the milestone number, or "RCX" for a release candidate (older builds have "mX" and "rcX").  
+  These builds are provided for evaluation and community feedback.  Spring Batch builds have a release identifier ending in "MX" where X is the milestone number, or "RCX" for a release candidate (older builds have "mX" and "rcX").
 
   You can find the .ZIP downloads of the milestones {{{http://static.springframework.org/downloads/nightly/milestone-download.php?project=BATCH}here}}.
 
@@ -130,4 +130,4 @@ Source code can also be browsed and downloaded at {{{http://github.com/SpringSou
 
 Snapshot Builds
 
-  Nightly snapshots are available through the same process with slightly different URLs.  See {{{snapshots.html}here}} for details.
+  Nightly snapshots are available through the same process with slightly different URLs.  See {{{./snapshots.html}here}} for details.

@@ -17,8 +17,8 @@ $ mvn install
   or the goal of your choice (compile, test, etc.).  This builds the
   artifact (e.g. jar file) from the project in the current directory,
   and deploys it to you local m2 repo at
-  <<<${user.home}/.m2/repository>>>.  If there are any dependency resolution 
-  problems try 
+  <<<${user.home}/.m2/repository>>>.  If there are any dependency resolution
+  problems try
 
 +---
 $ mvn install -P bootstrap
@@ -48,7 +48,7 @@ $ mvn -N install
 
 * Skipping Tests
 
-  The profile <<fast>> skips all the tests, so 
+  The profile <<fast>> skips all the tests, so
 
 +---
 mvn -o install -P fast
@@ -59,7 +59,7 @@ mvn -o install -P fast
 
 * Running Individual Tests
 
-  The standard way to do this with Maven is -Dtest= with the class name (not fully qualified), e.g. 
+  The standard way to do this with Maven is -Dtest= with the class name (not fully qualified), e.g.
 
 +---
 $ mvn test -Dtest=FootballJobFunctionalTests
@@ -121,12 +121,12 @@ $ mvn -P snapshots dependency:tree
 +---
 
   in your <<<~/.subversion>>> (or <<<c:\Documents and Settings\<uid>\Application Data\Subversion/config>>>).  If anyone forgets to do that then the property can be recursively set using Tortoise (type in the property key and value and use the recursive checkbox).
- 
+
 * Documentation
 
   With the exception of reference docs, please put content in the
   project that it is most closely associated with.  Here is a
-  {{{sitemap.html}site map}} to help you decide.
+  {{{./sitemap.html}site map}} to help you decide.
 
 ** Quotidian Web Content
 
@@ -270,7 +270,7 @@ in a browser (it's the ALT content)...
 +---
 mvn site:run
 +---
- 
+
   and go to http://localhost:8080.
 
   In a project with unit tests, you can skip the tests and go straight
@@ -282,7 +282,7 @@ mvn -o site:run -P fast
 
   If you are offline, or want to speed things up a bit, the "-o" stops
   Maven from trying to resolve dependencies on the internet.
-  
+
   Use -N to build only the current project, not subprojects,  So this
   is pretty useful at the top level:
 
@@ -295,7 +295,7 @@ mvn -N -o site:run -P fast
   xml file with a chapter in it.  There is no link to these pages on
   the site because the real docbook generated output is much nicer,
   but this is still pretty useful for debugging and dynamic
-  editing. 
+  editing.
 
   Note that the formatting is a bit limited compared to the whole
   docbook stylesheet - Maven uses Doxia to squish all of docbook into
@@ -310,7 +310,7 @@ mvn -N -o site:run -P fast
 * Building and deploying the web site
 
   There is a bug in the m2 reactor (MNG-740) which means that we have
-  to install the parent pom to the local repo first. 
+  to install the parent pom to the local repo first.
 
   So do it this way:
 
@@ -339,7 +339,7 @@ Problems?
   your local Spring Batch repo
   <<<${user.home}/.m2/repository/org/springframework/batch>>>.  If
   necessary, delete a project or directory and update from SVN again.
-  
+
   Try
 
 +---

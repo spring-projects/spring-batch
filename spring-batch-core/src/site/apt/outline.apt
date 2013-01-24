@@ -1,20 +1,20 @@
 			------------------------------------------
 			 The Spring Batch - Reference Documentation
 			 ----------------------------------------
-			 Wayne Lund, Waseem Malik, Lucas Ward, Scott Wintermute, 
+			 Wayne Lund, Waseem Malik, Lucas Ward, Scott Wintermute,
 			 Kerry O'Brien, Tomi Vanek
 			 -------------------------------------------
 			 May 2007
 
 Preface
 
-*1.    {{{introduction.html}Spring Container Batch Processing}}
+*1.    {{{./introduction.html}Spring Container Batch Processing}}
 
     *1.1.    Overview
 
     *1.2   Usage Scenarios
 
-*2.    {{{overview.html}Architecture Overview}}
+*2.    {{{./overview.html}Architecture Overview}}
 
 	**2.1.    Introduction to Architecture Layers
 
@@ -25,11 +25,11 @@ Preface
 	**2.4 Container Support Layer
 
     **2.5 The Container Core Layer
-      
+
     **2.6 Using the Spring-batch infrastructure
-    
+
     	*2.6.1 Infrastructure Provided I/O Support
-    	
+
     	*2.6.2 Infrastucture Provided Base Services
 
     *2.7.    Batch Execution Container Configurations
@@ -40,7 +40,7 @@ Preface
 
 	*2.7.3     Batch Execution Container Hosted in J2EE Container - managed environment
 
-		
+
 *3.    Core Batch Services
 
     *3.1.    Launching Batch Jobs
@@ -119,6 +119,6 @@ Preface
 
 *7.   [INCUB:Batch XML Schema]
 
-*8.    {{{glossary.html}Glossary}}
+*8.    {{{./glossary.html}Glossary}}
 
 

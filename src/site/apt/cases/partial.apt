@@ -44,7 +44,7 @@ Partial Processing
   The vanilla flow proceeds as follows:
 
     [[1]] Batch processing begins as per normal (see for example
-    {{{chunks.apt}chunk processing use case}}).
+    {{{./chunks.apt}chunk processing use case}}).
 
     [[1]] A record is processed.  This step repeats until...
 
@@ -68,7 +68,7 @@ Partial Processing
 ** Abort Batch Early
 
   The batch cannot skip all records.  After each failure the decision
-  about whether to coninue has to be made: 
+  about whether to coninue has to be made:
 
     [[1]] When a record is processed successfully, Container logs the
     event in a form that can be used later to identify successful
@@ -94,8 +94,8 @@ Partial Processing
 
   * The decision to abort is based on exception classification.  Each
   time an item is processed, the framework needs to catch exceptions
-  and classify them as 
-  
+  and classify them as
+
     * fatal: signals an abort - rethrow.
 
     * transient: nominally fatal, but the operation is retryable.
@@ -103,7 +103,7 @@ Partial Processing
     * non-fatal: signals a skip.
 
   The transient failure is really just a sub-type of fatal case.  It
-  is treated differently by the {{{retry.html}retry framework}} but
+  is treated differently by the {{{./retry.html}retry framework}} but
   not necessarily by the vanilla batch.
 
   * Actually we can't decide what action to take simply on the
@@ -136,7 +136,7 @@ public void iterate(RepeatCallback callback) {
   the whole <<<iterate()>>> was transactional we need to rethrow
 
   * If the processing is asynchronous, the template has to execute in
-  a separate thread (see {{{async.html}asynchronous example}}).  In
+  a separate thread (see {{{./async.html}asynchronous example}}).  In
   this case the whole thread (i.e. the <<<iterate()>>>) has to be
   transactional.  Whoever is counting failed items needs to be
   poooling information from multiple threads.
