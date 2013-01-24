@@ -4,21 +4,21 @@
 	xmlns:p="http://www.springframework.org/schema/p" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="
 		http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
-		http://www.springframework.org/schema/batch http://www.springframework.org/schema/batch/spring-batch-2.1.xsd
+		http://www.springframework.org/schema/batch http://www.springframework.org/schema/batch/spring-batch-2.2.xsd
 		http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop.xsd
 		http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx.xsd">
 
 	<description>
 	<![CDATA[Sample showing usage of CompositeItemWriter.
-		Note that when two writers of the same class are used simultaneously 
-		they need to be distinguished using the 'name' property 
+		Note that when two writers of the same class are used simultaneously
+		they need to be distinguished using the 'name' property
 		(see the two FlatFileItemWriters used in this example).]]>
 	</description>
 
 	<job id="compositeItemWriterJob" xmlns="http://www.springframework.org/schema/batch" >
 		<step id="step1">
 			<tasklet>
-				<chunk reader="fileItemReader" processor="processor" writer="compositeWriter" 
+				<chunk reader="fileItemReader" processor="processor" writer="compositeWriter"
 		               commit-interval="1">
 					<streams>
 						<stream ref="fileItemReader"/>
@@ -103,7 +103,7 @@
 			<bean class="org.springframework.batch.item.file.transform.PassThroughLineAggregator" />
 		</property>
 	</bean>
-	
+
 	<bean id="fieldSetMapper" class="org.springframework.batch.sample.domain.trade.internal.TradeFieldSetMapper" />
 
 </beans>

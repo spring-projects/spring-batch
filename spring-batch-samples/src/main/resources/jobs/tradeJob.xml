@@ -3,15 +3,15 @@
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xmlns:p="http://www.springframework.org/schema/p"
 	xmlns:batch="http://www.springframework.org/schema/batch"
-	xsi:schemaLocation="http://www.springframework.org/schema/batch http://www.springframework.org/schema/batch/spring-batch-2.1.xsd
+	xsi:schemaLocation="http://www.springframework.org/schema/batch http://www.springframework.org/schema/batch/spring-batch-2.2.xsd
 		http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
-		
+
 	<batch:job-repository />
 
 	<job id="tradeJob" xmlns="http://www.springframework.org/schema/batch">
 		<step id="step1" next="step2">
 			<tasklet>
-				<chunk reader="fileItemReader" processor="validatingProcessor" writer="tradeWriter" 
+				<chunk reader="fileItemReader" processor="validatingProcessor" writer="tradeWriter"
 		               commit-interval="1">
 					<streams>
 						<stream ref="fileItemReader" />

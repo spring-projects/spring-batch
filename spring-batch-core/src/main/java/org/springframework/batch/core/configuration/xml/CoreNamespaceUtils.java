@@ -30,7 +30,7 @@ import org.w3c.dom.Element;
 
 /**
  * Utility methods used in parsing of the batch core namespace
- * 
+ *
  * @author Thomas Risberg
  */
 public class CoreNamespaceUtils {
@@ -75,7 +75,7 @@ public class CoreNamespaceUtils {
 
 	/**
 	 * Register a RangePropertyEditor if one does not already exist.
-	 * 
+	 *
 	 * @param parserContext
 	 */
 	@SuppressWarnings("unchecked")
@@ -142,7 +142,7 @@ public class CoreNamespaceUtils {
 	/**
 	 * Should this element be treated as incomplete? If it has a parent or is
 	 * abstract, then it may not have all properties.
-	 * 
+	 *
 	 * @param element
 	 * @return TRUE if the element is abstract or has a parent
 	 */
@@ -165,7 +165,7 @@ public class CoreNamespaceUtils {
 	 * compatible with the new parser, so it is an error to explicitly define
 	 * 2.0. It might be an error to declare spring-batch.xsd as an alias, but
 	 * you are only going to find that out when one of the sub parses breaks.)
-	 * 
+	 *
 	 * @param element the element that is to be parsed next
 	 * @return true if we find a schema declaration that matches
 	 */
@@ -176,7 +176,7 @@ public class CoreNamespaceUtils {
 
 	private static boolean matchesVersionInternal(Element element) {
 		String schemaLocation = element.getAttributeNS("http://www.w3.org/2001/XMLSchema-instance", "schemaLocation");
-		return schemaLocation.matches("(?m).*spring-batch-2.1.xsd.*")
+		return schemaLocation.matches("(?m).*spring-batch-2.2.xsd.*")
 				|| schemaLocation.matches("(?m).*spring-batch.xsd.*")
 				|| !schemaLocation.matches("(?m).*spring-batch.*");
 	}

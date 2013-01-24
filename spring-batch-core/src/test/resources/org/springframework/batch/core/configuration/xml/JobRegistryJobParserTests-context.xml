@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <beans xmlns:batch="http://www.springframework.org/schema/batch"
 	xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://www.springframework.org/schema/batch http://www.springframework.org/schema/batch/spring-batch-2.1.xsd
+	xsi:schemaLocation="http://www.springframework.org/schema/batch http://www.springframework.org/schema/batch/spring-batch-2.2.xsd
 	http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.1.xsd">
 
 	<bean id="transactionManager"
@@ -31,7 +31,7 @@
 	<batch:job id="job2">
 		<batch:step id="j2.s1" parent="step1" />
 	</batch:job>
-	
+
 	<batch:job id="job1" parent="job">
 		<batch:step id="j1.s1" parent="step1" />
 	</batch:job>

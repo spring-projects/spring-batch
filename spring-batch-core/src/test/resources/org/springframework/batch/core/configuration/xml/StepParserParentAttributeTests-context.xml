@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <beans:beans xmlns="http://www.springframework.org/schema/batch" xmlns:beans="http://www.springframework.org/schema/beans"
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://www.springframework.org/schema/batch http://www.springframework.org/schema/batch/spring-batch-2.1.xsd
+	xsi:schemaLocation="http://www.springframework.org/schema/batch http://www.springframework.org/schema/batch/spring-batch-2.2.xsd
 	http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.1.xsd">
 
 	<beans:import resource="common-context.xml" />
@@ -42,7 +42,7 @@
 		<step id="s13" parent="dummyStepWithTaskletOnParent" next="s14"/>
 		<step id="s14" parent="standaloneStepWithTaskletAndDummyParent"/>
 	</job>
-	
+
 	<step id="standalone2" parent="baseStep">
 		<tasklet>
 			<chunk reader="reader" writer="writer" commit-interval="5"/>
@@ -91,10 +91,10 @@
 			</listeners>
 		</tasklet>
 	</step>
-	
+
 	<beans:bean id="dummyStep" class="org.springframework.batch.core.configuration.xml.DummyStep"/>
-	
-	<beans:bean id="dummyStepWithTaskletOnParent" parent="standaloneStepWithTasklet" 
+
+	<beans:bean id="dummyStepWithTaskletOnParent" parent="standaloneStepWithTasklet"
 	            class="org.springframework.batch.core.configuration.xml.DummyTasklet"/>
 
 	<step id="standaloneStepWithTasklet">
@@ -116,7 +116,7 @@
 		<step id="injectedRepoStepWithParent" parent="defaultRepoStandaloneStep" next="injectedOverrideRepoStep"><tasklet ref="dummyTasklet"/></step>
 		<step id="injectedOverrideRepoStep" parent="specifiedRepoStandaloneStep"><tasklet ref="dummyTasklet"/></step>
 	</job>
-	
+
 	<job id="jobWithRepoOnParent" parent="baseJobWithRepo">
 		<step id="injectedRepoFromParentStep" next="injectedRepoFromParentStepWithParent"><tasklet ref="dummyTasklet"/></step>
 		<step id="injectedRepoFromParentStepWithParent" parent="defaultRepoStandaloneStep" next="injectedOverrideRepoFromParentStep"><tasklet ref="dummyTasklet"/></step>
@@ -126,13 +126,13 @@
 	<step id="defaultRepoStandaloneStep">
 		<tasklet ref="dummyTasklet"/>
 	</step>
-	
+
 	<step id="specifiedRepoStandaloneStep" job-repository="dummyJobRepository2">
 		<tasklet transaction-manager="dummyTxMgr" ref="dummyTasklet"/>
 	</step>
 
 	<job id="baseJobWithRepo" job-repository="dummyJobRepository2" abstract="true"/>
-	
+
 	<beans:bean id="dummyJobRepository" class="org.springframework.batch.core.configuration.xml.DummyJobRepository"/>
 	<beans:bean id="dummyJobRepository2" class="org.springframework.batch.core.configuration.xml.DummyJobRepository"/>
 
@@ -145,8 +145,8 @@
 
 	<beans:bean id="dummyTxMgr" class="org.springframework.batch.core.configuration.xml.DummyPlatformTransactionManager"/>
 	<beans:bean id="dummyTxMgr2" class="org.springframework.batch.core.configuration.xml.DummyPlatformTransactionManager"/>
-	
-	
+
+
 	<step id="baseStepWithLists" abstract="true">
 		<tasklet>
 			<chunk>
@@ -176,7 +176,7 @@
 			</no-rollback-exception-classes>
 		</tasklet>
 	</step>
-	
+
 	<step id="stepWithListsMerge" parent="baseStepWithLists">
 		<tasklet>
 			<chunk reader="reader" writer="writer" commit-interval="10">
@@ -206,7 +206,7 @@
 			</no-rollback-exception-classes>
 		</tasklet>
 	</step>
-	
+
 	<step id="stepWithListsNoMerge" parent="baseStepWithLists">
 		<tasklet>
 			<chunk reader="reader" writer="writer" commit-interval="10">
@@ -236,7 +236,7 @@
 			</no-rollback-exception-classes>
 		</tasklet>
 	</step>
-	
+
 	<step id="stepWithListsOverrideWithEmpty" parent="baseStepWithLists">
 		<tasklet>
 			<chunk reader="reader" writer="writer" commit-interval="10">
@@ -249,7 +249,7 @@
 			<no-rollback-exception-classes/>
 		</tasklet>
 	</step>
-	
+
 	<beans:bean id="stream1" class="org.springframework.batch.core.configuration.xml.TestReader"/>
 	<beans:bean id="stream2" class="org.springframework.batch.item.support.CompositeItemStream"/>
 
