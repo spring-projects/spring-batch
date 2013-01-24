@@ -63,7 +63,7 @@ Use Case: Commit Batch Process Periodically
     creates <<<FileChannel>>> for it.
 
     [[1]] Client reads a line from the file, and converts it to a
-    database statement, then runs it.  
+    database statement, then runs it.
 
     [[1]] Container increments counter.
 
@@ -93,7 +93,7 @@ Use Case: Commit Batch Process Periodically
   If there is an error in the input data in the middle of a chunk
   (could be manifested as database exception, e.g. uniqueness
   exception, or nullable exception):
-  
+
     [[1]] Container rolls back current transaction.
 
     [[1]] Container terminates batch and notifies client of precise
@@ -117,7 +117,7 @@ Use Case: Commit Batch Process Periodically
 * Implementation
 
   * The concept of a batch iterator seems relevant here (see also the
-  {{{simple.html}simple}} use case).  The iterator could be more than
+  {{{./simple.html}simple}} use case).  The iterator could be more than
   just a loop that might terminate early: here it could also manage
   the file cursor on the input source.  In this design there is a
   <<<ItemReader>>> interface that can take care of termination and
@@ -161,7 +161,7 @@ Use Case: Commit Batch Process Periodically
   is to retain this separation in a batch operation.  The batch
   framework itself might provide some of these synchronizations.
 
-  * The {{{simple.html}Simple Batch Repeat}} is actually a pretty good
+  * The {{{./simple.html}Simple Batch Repeat}} is actually a pretty good
   model for the chunk processing in this use case.  This observation
   leads to another: that a batch of chunks is a nested (or composed)
   batch - the outer termination policy is dependent only on the data

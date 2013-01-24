@@ -26,7 +26,7 @@ Use Case: Sequential Processing of Dependent Steps
 
 * Preconditions
 
-  * A non-trivial sequence is defined: 
+  * A non-trivial sequence is defined:
 
     * more than one step:
 
@@ -67,7 +67,7 @@ Use Case: Sequential Processing of Dependent Steps
     [[1]] Client instructs Framework to store internal state needed by
     further steps (e.g. cached reference data).
 
-    [[1]] Framework logs successful completion of step, and stores 
+    [[1]] Framework logs successful completion of step, and stores
 
     [[1]] Repeat for next and subsequent steps.  Internal state is
     passed from one state to the next.
@@ -123,10 +123,10 @@ Use Case: Sequential Processing of Dependent Steps
   introduction of a batch context concept.  And the need for
   initialising restarts leads to the context being serializable,
   either natively or by some pluggable strategy (this is covered in
-  the {{{restart.html}Restart after Failure}} use case).
+  the {{{./restart.html}Restart after Failure}} use case).
 
-  Unfortunately, the need for {{{parallel.html}parallel processing}}
-  and automatic {{{restart.html}restart}} also makes it practically
+  Unfortunately, the need for {{{./parallel.html}parallel processing}}
+  and automatic {{{./restart.html}restart}} also makes it practically
   impossible for steps to handle the context at the level of a single
   thread of execution, where the client needs to implement business
   logic.  If a step is executing in parallel, then each node needs to
@@ -147,7 +147,7 @@ Use Case: Sequential Processing of Dependent Steps
   object as an argument):
 
 +---
-batchTemplate.iterate(new RepeatCallback[] { 
+batchTemplate.iterate(new RepeatCallback[] {
 
     new RepeatCallback() {
         public boolean doInIteration(RepeatContext context) {

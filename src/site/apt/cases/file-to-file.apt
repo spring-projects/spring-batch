@@ -41,7 +41,7 @@ Use Case: Copy File to File
 
 * Description
 
-  Very similar to the use case {{{chunks.html}Copy File to
+  Very similar to the use case {{{./chunks.html}Copy File to
   Database}}, but involving transactional access to an output source
   which is a file.  Also we are introducing the idea of an aggregate
   function for the output.
@@ -60,7 +60,7 @@ Use Case: Copy File to File
 * Variations
 
   * Chunk failure variations proceed as in the use case
-  {{{chunks.html}Copy File to Database}}.  In the case of a
+  {{{./chunks.html}Copy File to Database}}.  In the case of a
   restart after fatal failure, the intermediate output file need does
   not need to be reset or re-created.
 

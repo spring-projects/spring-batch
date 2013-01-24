@@ -43,7 +43,7 @@ Use Case: Asynchronous Chunk Processing
 
 * Description
 
-  The vanilla case proceeds as for normal {{{chunks.html}chunk
+  The vanilla case proceeds as for normal {{{./chunks.html}chunk
   processing}}, but:
 
     [[1]] Within a chunk, Container processes records in parallel.

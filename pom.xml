@@ -620,6 +620,11 @@
 			<name>Dan Garrette</name>
 			<email>dhgarrette@gmail.com</email>
 		</developer>
+		<developer>
+			<id>mminella</id>
+			<name>Michael Minella</name>
+			<email>mminella@vmware.com</email>
+		</developer>
 	</developers>
 	<pluginRepositories>
 		<pluginRepository>
@@ -639,22 +644,6 @@
 			<id>com.springsource.repository.bundles.release</id>
 			<name>SpringSource Enterprise Bundle Repository - SpringSource Bundle Releases</name>
 			<url>http://repository.springsource.com/maven/bundles/release</url>
-			<snapshots>
-				<enabled>false</enabled>
-			</snapshots>
-		</pluginRepository>
-		<pluginRepository>
-			<id>com.springsource.repository.bundles.release</id>
-			<name>SpringSource Enterprise Bundle Repository - SpringSource Bundle Releases</name>
-			<url>http://repository.springsource.com/maven/bundles/release/</url>
-			<snapshots>
-				<enabled>false</enabled>
-			</snapshots>
-		</pluginRepository>
-		<pluginRepository>
-			<id>com.springsource.repository.bundles.release</id>
-			<name>SpringSource Enterprise Bundle Repository - SpringSource Bundle Releases</name>
-			<url>http://repository.springsource.com/maven/bundles/release/</url>
 			<snapshots>
 				<enabled>false</enabled>
 			</snapshots>

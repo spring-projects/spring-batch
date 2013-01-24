@@ -102,7 +102,7 @@ Use Case: Automatic Retry
     should not be retried (they will always fail the same way).
 
 ** Early Termination
- 
+
   Normally client code is unaware of the Framework, but occasionally
   emergency measures might be taken inside client code where all
   further retry attempts are vetoed for the current block.
@@ -122,7 +122,7 @@ Use Case: Automatic Retry
     * A back-off delay is used at the <beginning> of the retry
     before any other transactional resources are enlisted.
 
-* Implementation
+* {Implementation}
 
   * The vanilla case and most of the variations can be achieved with a
   simple template approach:
@@ -134,7 +134,7 @@ Object result = retryTemplate.execute(new RetryCallback() {
     public Object doWithRetry(RetryContext context) throws Throwable {
         // do some processing
         return result;
-    }    
+    }
 });
 +---
 
@@ -173,13 +173,13 @@ Object result = retryTemplate.execute(new RetryCallback() {
   where the current item being processed is a message.  This can be
   generalised to more generic data types, as long as the item can be
   rejected transactionally to signal that we require it to be
-  re-delivered to this or another consumer.  
+  re-delivered to this or another consumer.
 
   Consider this pattern, which is very typical:
 
 +---
 1   |  SESSION {
-2   |    receive; 
+2   |    receive;
 3   |    RETRY {
     |      remote access;
     |    }
@@ -192,7 +192,7 @@ Object result = retryTemplate.execute(new RetryCallback() {
 +---
 0   |  RETRY {                   // Do not do this!
 1   |    SESSION {
-2   |      receive; 
+2   |      receive;
 3   |      RETRY {
     |        remote access;
     |      }
@@ -231,7 +231,7 @@ Object result = retryTemplate.execute(new RetryCallback() {
 
   Decisions (3.1) and (5.1) require knowledge of the history of
   processing the current message.  Note that the action on failure is
-  the opposite to the vanilla case {{{#retry}above}} - if the retry
+  the opposite to the vanilla case {{{Implementation}above}} - if the retry
   limit is not reached then we rethrow the exception.
 
   If the retry limit is not reached then the rethrow(5.3) causes the
