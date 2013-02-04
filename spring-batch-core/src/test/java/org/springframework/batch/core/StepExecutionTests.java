@@ -34,17 +34,17 @@ import org.springframework.batch.support.SerializationUtils;
 
 /**
  * @author Dave Syer
- * 
+ *
  */
 public class StepExecutionTests {
 
 	private StepExecution execution = newStepExecution(new StepSupport("stepName"), new Long(23));
 
 	private StepExecution blankExecution = newStepExecution(new StepSupport("blank"), null);
-	
+
 	private ExecutionContext foobarEc = new ExecutionContext();
-	
-	
+
+
 
 	@Before
 	public void setUp() throws Exception {
@@ -58,7 +58,7 @@ public class StepExecutionTests {
 
 	@Test
 	public void testStepExecutionWithNullId() {
-		assertNull(new StepExecution("stepName", new JobExecution(new JobInstance(null,null,"foo"))).getId());
+		assertNull(new StepExecution("stepName", new JobExecution(new JobInstance(null,"foo"), null)).getId());
 	}
 
 	/**
@@ -161,7 +161,7 @@ public class StepExecutionTests {
 	@Test
 	public void testNullNameIsIllegal() throws Exception {
 		try {
-			new StepExecution(null, new JobExecution(new JobInstance(null, null, "job")));
+			new StepExecution(null, new JobExecution(new JobInstance(null, "job"), null));
 			fail();
 		}
 		catch (IllegalArgumentException e) {
@@ -262,25 +262,25 @@ public class StepExecutionTests {
 		execution.setExecutionContext(foobarEc);
 		assertTrue(set.contains(execution));
 	}
-	
+
 	@Test
 	public void testSerialization() throws Exception {
-		
+
 		ExitStatus status = ExitStatus.NOOP;
 		execution.setExitStatus(status);
 		execution.setExecutionContext(foobarEc);
-		
+
 		byte[] serialized = SerializationUtils.serialize(execution);
 		StepExecution deserialized = (StepExecution) SerializationUtils.deserialize(serialized);
-		
+
 		assertEquals(execution, deserialized);
 		assertEquals(status, deserialized.getExitStatus());
 		assertNotNull(deserialized.getFailureExceptions());
 	}
-	
+
 	@Test
 	public void testAddException() throws Exception{
-		
+
 		RuntimeException exception = new RuntimeException();
 		assertEquals(0, execution.getFailureExceptions().size());
 		execution.addFailureException(exception);
@@ -302,10 +302,10 @@ public class StepExecutionTests {
 	private StepExecution newStepExecution(Step step, Long jobExecutionId) {
 		return newStepExecution(step, jobExecutionId, 4);
 	}
-	
+
 	private StepExecution newStepExecution(Step step, Long jobExecutionId, long stepExecutionId) {
-		JobInstance job = new JobInstance(3L, new JobParameters(), "testJob");
-		StepExecution execution = new StepExecution(step.getName(), new JobExecution(job, jobExecutionId), stepExecutionId);
+		JobInstance job = new JobInstance(3L, "testJob");
+		StepExecution execution = new StepExecution(step.getName(), new JobExecution(job, jobExecutionId, new JobParameters()), stepExecutionId);
 		return execution;
 	}
 

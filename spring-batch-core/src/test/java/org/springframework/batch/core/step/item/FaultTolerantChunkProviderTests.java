@@ -24,7 +24,7 @@ public class FaultTolerantChunkProviderTests {
 	private FaultTolerantChunkProvider<String> provider;
 
 	private StepContribution contribution = new StepContribution(new StepExecution("foo", new JobExecution(
-			new JobInstance(123L, new JobParameters(), "job"))));
+			new JobInstance(123L, "job"), new JobParameters())));
 
 	@Test
 	public void testProvide() throws Exception {

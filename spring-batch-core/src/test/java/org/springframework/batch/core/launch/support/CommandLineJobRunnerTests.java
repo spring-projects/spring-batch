@@ -69,7 +69,7 @@ public class CommandLineJobRunnerTests {
 
 	@Before
 	public void setUp() throws Exception {
-		JobExecution jobExecution = new JobExecution(null, new Long(1));
+		JobExecution jobExecution = new JobExecution(null, new Long(1), null);
 		ExitStatus exitStatus = ExitStatus.COMPLETED;
 		jobExecution.setExitStatus(exitStatus);
 		StubJobLauncher.jobExecution = jobExecution;
@@ -213,8 +213,7 @@ public class CommandLineJobRunnerTests {
 	@Test
 	public void testStop() throws Throwable {
 		String[] args = new String[] { jobPath, "-stop", jobName };
-		JobParameters jobParameters = new JobParametersBuilder().addString("foo", "bar").toJobParameters();
-		StubJobExplorer.jobInstances = Arrays.asList(new JobInstance(3L, jobParameters, jobName));
+		StubJobExplorer.jobInstances = Arrays.asList(new JobInstance(3L, jobName));
 		CommandLineJobRunner.main(args);
 		assertEquals(0, StubSystemExiter.status);
 	}
@@ -222,8 +221,7 @@ public class CommandLineJobRunnerTests {
 	@Test
 	public void testStopFailed() throws Throwable {
 		String[] args = new String[] { jobPath, "-stop", jobName };
-		JobParameters jobParameters = new JobParametersBuilder().addString("foo", "bar").toJobParameters();
-		StubJobExplorer.jobInstances = Arrays.asList(new JobInstance(0L, jobParameters, jobName));
+		StubJobExplorer.jobInstances = Arrays.asList(new JobInstance(0L, jobName));
 		CommandLineJobRunner.main(args);
 		assertEquals(1, StubSystemExiter.status);
 	}
@@ -231,8 +229,7 @@ public class CommandLineJobRunnerTests {
 	@Test
 	public void testStopFailedAndRestarted() throws Throwable {
 		String[] args = new String[] { jobPath, "-stop", jobName };
-		JobParameters jobParameters = new JobParametersBuilder().addString("foo", "bar").toJobParameters();
-		StubJobExplorer.jobInstances = Arrays.asList(new JobInstance(5L, jobParameters, jobName));
+		StubJobExplorer.jobInstances = Arrays.asList(new JobInstance(5L, jobName));
 		CommandLineJobRunner.main(args);
 		assertEquals(0, StubSystemExiter.status);
 	}
@@ -240,8 +237,7 @@ public class CommandLineJobRunnerTests {
 	@Test
 	public void testStopRestarted() throws Throwable {
 		String[] args = new String[] { jobPath, "-stop", jobName };
-		JobParameters jobParameters = new JobParametersBuilder().addString("foo", "bar").toJobParameters();
-		JobInstance jobInstance = new JobInstance(3L, jobParameters, jobName);
+		JobInstance jobInstance = new JobInstance(3L, jobName);
 		StubJobExplorer.jobInstances = Arrays.asList(jobInstance);
 		CommandLineJobRunner.main(args);
 		assertEquals(0, StubSystemExiter.status);
@@ -250,8 +246,7 @@ public class CommandLineJobRunnerTests {
 	@Test
 	public void testAbandon() throws Throwable {
 		String[] args = new String[] { jobPath, "-abandon", jobName };
-		JobParameters jobParameters = new JobParametersBuilder().addString("foo", "bar").toJobParameters();
-		StubJobExplorer.jobInstances = Arrays.asList(new JobInstance(2L, jobParameters, jobName));
+		StubJobExplorer.jobInstances = Arrays.asList(new JobInstance(2L, jobName));
 		CommandLineJobRunner.main(args);
 		assertEquals(0, StubSystemExiter.status);
 	}
@@ -259,8 +254,7 @@ public class CommandLineJobRunnerTests {
 	@Test
 	public void testAbandonRunning() throws Throwable {
 		String[] args = new String[] { jobPath, "-abandon", jobName };
-		JobParameters jobParameters = new JobParametersBuilder().addString("foo", "bar").toJobParameters();
-		StubJobExplorer.jobInstances = Arrays.asList(new JobInstance(3L, jobParameters, jobName));
+		StubJobExplorer.jobInstances = Arrays.asList(new JobInstance(3L, jobName));
 		CommandLineJobRunner.main(args);
 		assertEquals(1, StubSystemExiter.status);
 	}
@@ -268,8 +262,7 @@ public class CommandLineJobRunnerTests {
 	@Test
 	public void testAbandonAbandoned() throws Throwable {
 		String[] args = new String[] { jobPath, "-abandon", jobName };
-		JobParameters jobParameters = new JobParametersBuilder().addString("foo", "bar").toJobParameters();
-		StubJobExplorer.jobInstances = Arrays.asList(new JobInstance(4L, jobParameters, jobName));
+		StubJobExplorer.jobInstances = Arrays.asList(new JobInstance(4L, jobName));
 		CommandLineJobRunner.main(args);
 		assertEquals(1, StubSystemExiter.status);
 	}
@@ -278,17 +271,20 @@ public class CommandLineJobRunnerTests {
 	public void testRestart() throws Throwable {
 		String[] args = new String[] { jobPath, "-restart", jobName };
 		JobParameters jobParameters = new JobParametersBuilder().addString("foo", "bar").toJobParameters();
-		StubJobExplorer.jobInstances = Arrays.asList(new JobInstance(0L, jobParameters, jobName));
+		JobInstance jobInstance = new JobInstance(0L, jobName);
+		StubJobExplorer.jobInstances = Arrays.asList(jobInstance);
+		StubJobExplorer.jobParameters = jobParameters;
 		CommandLineJobRunner.main(args);
 		assertEquals(0, StubSystemExiter.status);
 		assertEquals(jobParameters, StubJobLauncher.jobParameters);
+		StubJobExplorer.jobParameters = new JobParameters();
 	}
 
 	@Test
 	public void testRestartExecution() throws Throwable {
 		String[] args = new String[] { jobPath, "-restart", "11" };
 		JobParameters jobParameters = new JobParametersBuilder().addString("foo", "bar").toJobParameters();
-		JobExecution jobExecution = new JobExecution(new JobInstance(0L, jobParameters, jobName), 11L);
+		JobExecution jobExecution = new JobExecution(new JobInstance(0L, jobName), 11L, jobParameters);
 		jobExecution.setStatus(BatchStatus.FAILED);
 		StubJobExplorer.jobExecution = jobExecution;
 		CommandLineJobRunner.main(args);
@@ -300,7 +296,7 @@ public class CommandLineJobRunnerTests {
 	public void testRestartExecutionNotFailed() throws Throwable {
 		String[] args = new String[] { jobPath, "-restart", "11" };
 		JobParameters jobParameters = new JobParametersBuilder().addString("foo", "bar").toJobParameters();
-		JobExecution jobExecution = new JobExecution(new JobInstance(0L, jobParameters, jobName), 11L);
+		JobExecution jobExecution = new JobExecution(new JobInstance(0L, jobName), 11L, jobParameters);
 		jobExecution.setStatus(BatchStatus.COMPLETED);
 		StubJobExplorer.jobExecution = jobExecution;
 		CommandLineJobRunner.main(args);
@@ -311,8 +307,7 @@ public class CommandLineJobRunnerTests {
 	@Test
 	public void testRestartNotFailed() throws Throwable {
 		String[] args = new String[] { jobPath, "-restart", jobName };
-		JobParameters jobParameters = new JobParametersBuilder().addString("foo", "bar").toJobParameters();
-		StubJobExplorer.jobInstances = Arrays.asList(new JobInstance(123L, jobParameters, jobName));
+		StubJobExplorer.jobInstances = Arrays.asList(new JobInstance(123L, jobName));
 		CommandLineJobRunner.main(args);
 		assertEquals(1, StubSystemExiter.status);
 		String errorMessage = CommandLineJobRunner.getErrorMessage();
@@ -325,7 +320,7 @@ public class CommandLineJobRunnerTests {
 		String[] args = new String[] { jobPath, "-next", jobName, "bar=foo" };
 		JobParameters jobParameters = new JobParametersBuilder().addString("foo", "bar").addString("bar", "foo")
 				.toJobParameters();
-		StubJobExplorer.jobInstances = Arrays.asList(new JobInstance(2L, jobParameters, jobName));
+		StubJobExplorer.jobInstances = Arrays.asList(new JobInstance(2L, jobName));
 		CommandLineJobRunner.main(args);
 		assertEquals(0, StubSystemExiter.status);
 		jobParameters = new JobParametersBuilder().addString("foo", "spam").addString("bar", "foo").toJobParameters();
@@ -416,6 +411,8 @@ public class CommandLineJobRunnerTests {
 
 		static JobExecution jobExecution;
 
+		static JobParameters jobParameters = new JobParameters();
+
 		@Override
 		public Set<JobExecution> findRunningJobExecutions(String jobName) {
 			throw new UnsupportedOperationException();
@@ -454,7 +451,7 @@ public class CommandLineJobRunnerTests {
 		}
 
 		private JobExecution createJobExecution(JobInstance jobInstance, BatchStatus status) {
-			JobExecution jobExecution = new JobExecution(jobInstance, 1L);
+			JobExecution jobExecution = new JobExecution(jobInstance, 1L, jobParameters);
 			jobExecution.setStatus(status);
 			jobExecution.setStartTime(new Date());
 			if (status != BatchStatus.STARTED) {

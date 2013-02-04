@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2008 the original author or authors.
+ * Copyright 2006-2013 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -74,22 +74,22 @@ public class JdbcJobRepositoryTests {
 	public void onSetUpInTransaction() throws Exception {
 		job = new JobSupport("test-job");
 		job.setRestartable(true);
-        jdbcTemplate.update("DELETE FROM BATCH_STEP_EXECUTION_CONTEXT");
-        jdbcTemplate.update("DELETE FROM BATCH_JOB_EXECUTION_CONTEXT");
-        jdbcTemplate.update("DELETE FROM BATCH_STEP_EXECUTION");
-        jdbcTemplate.update("DELETE FROM BATCH_JOB_EXECUTION");
-        jdbcTemplate.update("DELETE FROM BATCH_JOB_PARAMS");
-        jdbcTemplate.update("DELETE FROM BATCH_JOB_INSTANCE");
+		jdbcTemplate.update("DELETE FROM BATCH_STEP_EXECUTION_CONTEXT");
+		jdbcTemplate.update("DELETE FROM BATCH_JOB_EXECUTION_CONTEXT");
+		jdbcTemplate.update("DELETE FROM BATCH_STEP_EXECUTION");
+		jdbcTemplate.update("DELETE FROM BATCH_JOB_EXECUTION_PARAMS");
+		jdbcTemplate.update("DELETE FROM BATCH_JOB_EXECUTION");
+		jdbcTemplate.update("DELETE FROM BATCH_JOB_INSTANCE");
 	}
 
 	@After
 	public void onTearDownAfterTransaction() throws Exception {
 		for (Long id : jobExecutionIds) {
-            jdbcTemplate.update("DELETE FROM BATCH_JOB_EXECUTION_CONTEXT where JOB_EXECUTION_ID=?", id);
-            jdbcTemplate.update("DELETE FROM BATCH_JOB_EXECUTION where JOB_EXECUTION_ID=?", id);
+			jdbcTemplate.update("DELETE FROM BATCH_JOB_EXECUTION_CONTEXT where JOB_EXECUTION_ID=?", id);
+			jdbcTemplate.update("DELETE FROM BATCH_JOB_EXECUTION where JOB_EXECUTION_ID=?", id);
 		}
 		for (Long id : jobIds) {
-            jdbcTemplate.update("DELETE FROM BATCH_JOB_INSTANCE where JOB_INSTANCE_ID=?", id);
+			jdbcTemplate.update("DELETE FROM BATCH_JOB_INSTANCE where JOB_INSTANCE_ID=?", id);
 		}
 		for (Long id : jobIds) {
 			int count = jdbcTemplate.queryForInt(
@@ -188,8 +188,9 @@ public class JdbcJobRepositoryTests {
 	}
 
 	private void cacheJobIds(JobExecution execution) {
-		if (execution == null)
+		if (execution == null) {
 			return;
+		}
 		jobExecutionIds.add(execution.getId());
 		jobIds.add(execution.getJobId());
 	}

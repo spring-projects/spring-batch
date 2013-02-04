@@ -46,18 +46,10 @@ public abstract class AbstractJobInstanceDaoTests {
 		JobInstance fooInstance = dao.createJobInstance(fooJob, fooParams);
 		assertNotNull(fooInstance.getId());
 		assertEquals(fooJob, fooInstance.getJobName());
-		assertEquals(fooParams, fooInstance.getJobParameters());
 
 		JobInstance retrievedInstance = dao.getJobInstance(fooJob, fooParams);
-		JobParameters retrievedParams = retrievedInstance.getJobParameters();
 		assertEquals(fooInstance, retrievedInstance);
 		assertEquals(fooJob, retrievedInstance.getJobName());
-		assertEquals(fooParams, retrievedParams);
-
-		assertEquals(Long.MAX_VALUE, retrievedParams.getLong("longKey"));
-		assertEquals(Double.MAX_VALUE, retrievedParams.getDouble("doubleKey"), 0.001);
-		assertEquals("stringValue", retrievedParams.getString("stringKey"));
-		assertEquals(new Date(DATE), retrievedParams.getDate("dateKey"));
 	}
 
 	/*
@@ -72,15 +64,10 @@ public abstract class AbstractJobInstanceDaoTests {
 		JobInstance fooInstance = dao.createJobInstance(fooJob, jobParameters);
 		assertNotNull(fooInstance.getId());
 		assertEquals(fooJob, fooInstance.getJobName());
-		assertEquals(jobParameters, fooInstance.getJobParameters());
 
 		JobInstance retrievedInstance = dao.getJobInstance(fooJob, jobParameters);
-		JobParameters retrievedParams = retrievedInstance.getJobParameters();
 		assertEquals(fooInstance, retrievedInstance);
 		assertEquals(fooJob, retrievedInstance.getJobName());
-		assertEquals(jobParameters, retrievedParams);
-
-		assertEquals(null, retrievedParams.getString("foo"));
 	}
 
 	/*
@@ -93,18 +80,10 @@ public abstract class AbstractJobInstanceDaoTests {
 		JobInstance fooInstance = dao.createJobInstance(fooJob, fooParams);
 		assertNotNull(fooInstance.getId());
 		assertEquals(fooJob, fooInstance.getJobName());
-		assertEquals(fooParams, fooInstance.getJobParameters());
 
 		JobInstance retrievedInstance = dao.getJobInstance(fooInstance.getId());
-		JobParameters retrievedParams = retrievedInstance.getJobParameters();
 		assertEquals(fooInstance, retrievedInstance);
 		assertEquals(fooJob, retrievedInstance.getJobName());
-		assertEquals(fooParams, retrievedParams);
-
-		assertEquals(Long.MAX_VALUE, retrievedParams.getLong("longKey"));
-		assertEquals(Double.MAX_VALUE, retrievedParams.getDouble("doubleKey"), 0.001);
-		assertEquals("stringValue", retrievedParams.getString("stringKey"));
-		assertEquals(new Date(DATE), retrievedParams.getDate("dateKey"));
 	}
 
 	/*
@@ -180,7 +159,7 @@ public abstract class AbstractJobInstanceDaoTests {
 			JobParameters params = new JobParametersBuilder().addLong(paramKey, Long.valueOf(i)).toJobParameters();
 			dao.createJobInstance(multiInstanceJob, params);
 		}
-		
+
 
 		int startIndex = 3;
 		int queryCount = 2;
@@ -192,9 +171,9 @@ public abstract class AbstractJobInstanceDaoTests {
 			JobInstance returnedInstance = jobInstances.get(i);
 			assertEquals(multiInstanceJob, returnedInstance.getJobName());
 			assertEquals(Integer.valueOf(0), returnedInstance.getVersion());
-			
+
 			//checks the correct instances are returned and the order is descending
-			assertEquals(instanceCount - startIndex - i , returnedInstance.getJobParameters().getLong(paramKey));
+			//			assertEquals(instanceCount - startIndex - i , returnedInstance.getJobParameters().getLong(paramKey));
 		}
 
 	}
@@ -241,7 +220,7 @@ public abstract class AbstractJobInstanceDaoTests {
 	@Test
 	public void testCreationAddsVersion() {
 
-		JobInstance jobInstance = new JobInstance((long) 1, new JobParameters(), "testVersionAndId");
+		JobInstance jobInstance = new JobInstance((long) 1, "testVersionAndId");
 
 		assertNull(jobInstance.getVersion());
 

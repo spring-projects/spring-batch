@@ -20,7 +20,7 @@ import org.springframework.transaction.annotation.Transactional;
 public abstract class AbstractExecutionContextDaoTests extends AbstractTransactionalJUnit4SpringContextTests {
 
 	private JobInstanceDao jobInstanceDao;
-	
+
 	private JobExecutionDao jobExecutionDao;
 
 	private StepExecutionDao stepExecutionDao;
@@ -39,7 +39,7 @@ public abstract class AbstractExecutionContextDaoTests extends AbstractTransacti
 		contextDao = getExecutionContextDao();
 
 		JobInstance ji = jobInstanceDao.createJobInstance("testJob", new JobParameters());
-		jobExecution = new JobExecution(ji);
+		jobExecution = new JobExecution(ji, new JobParameters());
 		jobExecutionDao.saveJobExecution(jobExecution);
 		stepExecution = new StepExecution("stepName", jobExecution);
 		stepExecutionDao.saveStepExecution(stepExecution);

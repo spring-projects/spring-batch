@@ -39,7 +39,7 @@ public class NonAbstractStepTests {
 	final List<String> events = new ArrayList<String>();
 
 	final StepExecution execution = new StepExecution(tested.getName(), new JobExecution(new JobInstance(1L,
-			new JobParameters(), "jobName")));
+			"jobName"), new JobParameters()));
 
 	/**
 	 * Fills the events list when abstract methods are called.

@@ -44,7 +44,7 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 @ContextConfiguration
 @RunWith(SpringJUnit4ClassRunner.class)
 public class JobStepParserTests {
-	
+
 	@Autowired
 	@Qualifier("job1")
 	private Job job1;
@@ -58,7 +58,7 @@ public class JobStepParserTests {
 
 	@Autowired
 	private MapJobRepositoryFactoryBean mapJobRepositoryFactoryBean;
-	
+
 	@Before
 	public void setUp() {
 		mapJobRepositoryFactoryBean.clear();

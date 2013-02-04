@@ -113,7 +113,6 @@ public class AsyncChunkOrientedStepIntegrationTests {
 		repeatTemplate.setTaskExecutor(new SimpleAsyncTaskExecutor());
 		step.setStepOperations(repeatTemplate);
 		step.setTransactionManager(transactionManager);
-
 	}
 
 	@Test
@@ -134,11 +133,10 @@ public class AsyncChunkOrientedStepIntegrationTests {
 		jobRepository.add(stepExecution);
 		step.execute(stepExecution);
 		assertEquals(BatchStatus.COMPLETED, stepExecution.getStatus());
+		dataSource.setMaxActive(2);
 		StepExecution lastStepExecution = jobRepository.getLastStepExecution(jobExecution.getJobInstance(), step
 				.getName());
 		assertEquals(lastStepExecution, stepExecution);
 		assertFalse(lastStepExecution == stepExecution);
-
 	}
-
 }

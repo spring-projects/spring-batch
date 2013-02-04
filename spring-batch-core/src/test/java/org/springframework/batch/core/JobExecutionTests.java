@@ -30,16 +30,16 @@ import org.springframework.batch.support.SerializationUtils;
 
 /**
  * @author Dave Syer
- * 
+ *
  */
 public class JobExecutionTests {
 
-	private JobExecution execution = new JobExecution(new JobInstance(new Long(11), new JobParameters(), "foo"),
-			new Long(12));
+	private JobExecution execution = new JobExecution(new JobInstance(new Long(11), "foo"),
+			new Long(12), new JobParameters());
 
 	@Test
 	public void testJobExecution() {
-		assertNull(new JobExecution(new JobInstance(null, null, "foo")).getId());
+		assertNull(new JobExecution(new JobInstance(null, "foo"), null).getId());
 	}
 
 	/**
@@ -126,7 +126,7 @@ public class JobExecutionTests {
 	@Test
 	public void testGetJobId() {
 		assertEquals(11, execution.getJobId().longValue());
-		execution = new JobExecution(new JobInstance(new Long(23), new JobParameters(), "testJob"), null);
+		execution = new JobExecution(new JobInstance(new Long(23), "testJob"), null, new JobParameters());
 		assertEquals(23, execution.getJobId().longValue());
 	}
 
@@ -136,7 +136,7 @@ public class JobExecutionTests {
 	 */
 	@Test
 	public void testGetJobIdForNullJob() {
-		execution = new JobExecution(null, null);
+		execution = new JobExecution((JobInstance) null, (JobParameters) null);
 		assertEquals(null, execution.getJobId());
 	}
 
@@ -213,7 +213,7 @@ public class JobExecutionTests {
 
 	@Test
 	public void testToStringWithNullJob() throws Exception {
-		execution = new JobExecution(new JobInstance(null, null, "foo"));
+		execution = new JobExecution(new JobInstance(null, "foo"), null);
 		assertTrue("JobExecution string does not contain id", execution.toString().indexOf("id=") >= 0);
 		assertTrue("JobExecution string does not contain job: " + execution, execution.toString().indexOf("job=") >= 0);
 	}

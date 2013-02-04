@@ -134,7 +134,7 @@ public class SimpleJobRepository implements JobRepository {
 			executionContext = new ExecutionContext();
 		}
 
-		JobExecution jobExecution = new JobExecution(jobInstance);
+		JobExecution jobExecution = new JobExecution(jobInstance, jobParameters);
 		jobExecution.setExecutionContext(executionContext);
 		jobExecution.setLastUpdated(new Date(System.currentTimeMillis()));
 
@@ -199,6 +199,7 @@ public class SimpleJobRepository implements JobRepository {
 	public StepExecution getLastStepExecution(JobInstance jobInstance, String stepName) {
 		List<JobExecution> jobExecutions = jobExecutionDao.findJobExecutions(jobInstance);
 		List<StepExecution> stepExecutions = new ArrayList<StepExecution>(jobExecutions.size());
+
 		for (JobExecution jobExecution : jobExecutions) {
 			stepExecutionDao.addStepExecutions(jobExecution);
 			for (StepExecution stepExecution : jobExecution.getStepExecutions()) {
@@ -207,6 +208,7 @@ public class SimpleJobRepository implements JobRepository {
 				}
 			}
 		}
+
 		StepExecution latest = null;
 		for (StepExecution stepExecution : stepExecutions) {
 			if (latest == null) {
@@ -216,10 +218,12 @@ public class SimpleJobRepository implements JobRepository {
 				latest = stepExecution;
 			}
 		}
+
 		if (latest != null) {
 			ExecutionContext executionContext = ecDao.getExecutionContext(latest);
 			latest.setExecutionContext(executionContext);
 		}
+
 		return latest;
 	}
 

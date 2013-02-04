@@ -15,7 +15,7 @@
  */
 package org.springframework.batch.core.step.job;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -33,7 +33,7 @@ import org.springframework.batch.support.PropertiesConverter;
  *
  */
 public class DefaultJobParametersExtractorJobParametersTests {
-	
+
 	private DefaultJobParametersExtractor extractor = new DefaultJobParametersExtractor();
 
 	@Test
@@ -43,7 +43,7 @@ public class DefaultJobParametersExtractorJobParametersTests {
 		JobParameters jobParameters = extractor.getJobParameters(null, stepExecution);
 		assertEquals("{foo=bar}", jobParameters.toString());
 	}
-	
+
 	@Test
 	public void testGetAllJobParameters() throws Exception {
 		StepExecution stepExecution = getStepExecution("foo=bar,spam=bucket");
@@ -51,7 +51,7 @@ public class DefaultJobParametersExtractorJobParametersTests {
 		JobParameters jobParameters = extractor.getJobParameters(null, stepExecution);
 		assertEquals("{spam=bucket, foo=bar}", jobParameters.toString());
 	}
-	
+
 	@Test
 	public void testGetNamedLongStringParameters() throws Exception {
 		StepExecution stepExecution = getStepExecution("foo=bar");
@@ -100,7 +100,7 @@ public class DefaultJobParametersExtractorJobParametersTests {
 	 */
 	private StepExecution getStepExecution(String parameters) {
 		JobParameters jobParameters = new DefaultJobParametersConverter().getJobParameters(PropertiesConverter.stringToProperties(parameters));
-		return new StepExecution("step", new JobExecution(new JobInstance(1L, jobParameters, "job")));
+		return new StepExecution("step", new JobExecution(new JobInstance(1L, "job"), jobParameters));
 	}
 
 }

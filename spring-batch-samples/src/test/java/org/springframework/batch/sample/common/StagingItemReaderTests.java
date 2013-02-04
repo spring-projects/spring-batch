@@ -52,7 +52,7 @@ public class StagingItemReaderTests {
 	@BeforeTransaction
 	public void onSetUpBeforeTransaction() throws Exception {
 		StepExecution stepExecution = new StepExecution("stepName", new JobExecution(new JobInstance(jobId,
-				new JobParameters(), "testJob")));
+				"testJob"), new JobParameters()));
 		writer.beforeStep(stepExecution);
 		writer.write(Arrays.asList(new String[] { "FOO", "BAR", "SPAM", "BUCKET" }));
 		reader.beforeStep(stepExecution);
@@ -61,7 +61,7 @@ public class StagingItemReaderTests {
 	@AfterTransaction
 	public void onTearDownAfterTransaction() throws Exception {
 		reader.destroy();
-        jdbcTemplate.update("DELETE FROM BATCH_STAGING");
+		jdbcTemplate.update("DELETE FROM BATCH_STAGING");
 	}
 
 	@Transactional

@@ -10,9 +10,9 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.JobExecution;
-import org.springframework.batch.core.JobInstance;
+import org.springframework.batch.core.JobParameters;
 import org.springframework.batch.core.JobParametersBuilder;
-import org.springframework.batch.core.repository.dao.JdbcJobInstanceDao;
+import org.springframework.batch.core.repository.dao.JdbcJobExecutionDao;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.context.ContextConfiguration;
@@ -34,37 +34,40 @@ public class JobLauncherIntegrationTests {
 	public void setDataSource(DataSource dataSource) {
 		jdbcTemplate = new JdbcTemplate(dataSource);
 	}
-	
+
 	@Test
 	public void testLaunchAndRelaunch() throws Exception {
-		
+
 		int before = jdbcTemplate.queryForInt("select count(*) from BATCH_JOB_INSTANCE");
-		
+
 		JobExecution jobExecution = launch(true,0);
-		launch(false, jobExecution.getJobId());
-		launch(false, jobExecution.getJobId());
+		launch(false, jobExecution.getId());
+		launch(false, jobExecution.getId());
 
 		int after = jdbcTemplate.queryForInt("select count(*) from BATCH_JOB_INSTANCE");
 		assertEquals(before+1, after);
 
 	}
 
-	private JobExecution launch(boolean start, long jobInstanceID) throws Exception {
+	private JobExecution launch(boolean start, long jobExecutionId) throws Exception {
 
 		if (start) {
 
 			Calendar c = Calendar.getInstance();
 			JobParametersBuilder builder = new JobParametersBuilder();
 			builder.addDate("TIMESTAMP", c.getTime());
-			return jobLauncher.run(job, builder.toJobParameters());
+			JobParameters jobParameters = builder.toJobParameters();
+
+			return jobLauncher.run(job, jobParameters);
 
 		} else {
 
-			JdbcJobInstanceDao dao = new JdbcJobInstanceDao();
+			JdbcJobExecutionDao dao = new JdbcJobExecutionDao();
 			dao.setJdbcTemplate(jdbcTemplate);
-			JobInstance instance = dao.getJobInstance(jobInstanceID);
-			if (instance != null) {
-				return jobLauncher.run(job, instance.getJobParameters());
+			JobExecution execution = dao.getJobExecution(jobExecutionId);
+
+			if (execution != null) {
+				return jobLauncher.run(job, execution.getJobParameters());
 			}
 
 			return null;

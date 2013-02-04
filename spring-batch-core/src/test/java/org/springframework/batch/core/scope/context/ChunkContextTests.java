@@ -30,13 +30,13 @@ import org.springframework.batch.core.JobParameters;
 
 /**
  * @author Dave Syer
- * 
+ *
  */
 public class ChunkContextTests {
 
 	private ChunkContext context = new ChunkContext(new StepContext(new JobExecution(new JobInstance(0L,
-			new JobParameters(Collections.singletonMap("foo", new JobParameter("bar"))), "job"), 1L)
-			.createStepExecution("foo")));
+			"job"), 1L, new JobParameters(Collections.singletonMap("foo", new JobParameter("bar"))))
+	.createStepExecution("foo")));
 
 	@Test
 	public void testGetStepContext() {
@@ -49,7 +49,7 @@ public class ChunkContextTests {
 	public void testIsComplete() {
 		assertFalse(context.isComplete());
 		context.setComplete();
-		assertTrue(context.isComplete());		
+		assertTrue(context.isComplete());
 	}
 
 	@Test

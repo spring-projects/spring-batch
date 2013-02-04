@@ -32,8 +32,8 @@ public class JobRepositorySupport implements JobRepository {
 	 */
 	@Override
 	public JobExecution createJobExecution(String jobName, JobParameters jobParameters) {
-		JobInstance jobInstance = new JobInstance(0L, jobParameters, jobName);
-		return new JobExecution(jobInstance, 11L);
+		JobInstance jobInstance = new JobInstance(0L, jobName);
+		return new JobExecution(jobInstance, 11L, jobParameters);
 	}
 
 	/* (non-Javadoc)

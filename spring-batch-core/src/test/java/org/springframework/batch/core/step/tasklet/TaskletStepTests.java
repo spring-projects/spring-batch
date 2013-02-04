@@ -85,6 +85,8 @@ public class TaskletStepTests {
 
 	private JobInstance jobInstance;
 
+	private JobParameters jobParameters;
+
 	private ResourcelessTransactionManager transactionManager;
 
 	@SuppressWarnings("serial")
@@ -125,7 +127,8 @@ public class TaskletStepTests {
 		step.setStepOperations(template);
 
 		job = new JobSupport("FOO");
-		jobInstance = new JobInstance(0L, new JobParameters(), job.getName());
+		jobInstance = new JobInstance(0L, job.getName());
+		jobParameters = new JobParameters();
 
 		step.setTransactionManager(transactionManager);
 
@@ -133,7 +136,7 @@ public class TaskletStepTests {
 
 	@Test
 	public void testStepExecutor() throws Exception {
-		JobExecution jobExecutionContext = new JobExecution(jobInstance);
+		JobExecution jobExecutionContext = new JobExecution(jobInstance, jobParameters);
 		StepExecution stepExecution = new StepExecution(step.getName(), jobExecutionContext);
 		step.execute(stepExecution);
 		assertEquals(1, processed.size());
@@ -143,7 +146,7 @@ public class TaskletStepTests {
 
 	@Test
 	public void testCommitCount_Even() throws Exception {
-		JobExecution jobExecutionContext = new JobExecution(jobInstance);
+		JobExecution jobExecutionContext = new JobExecution(jobInstance, jobParameters);
 		step = getStep(new String[] { "foo", "bar", "spam", "eggs" }, 2);
 		step.setTransactionManager(transactionManager);
 		StepExecution stepExecution = new StepExecution(step.getName(), jobExecutionContext);
@@ -156,7 +159,7 @@ public class TaskletStepTests {
 
 	@Test
 	public void testCommitCount_Uneven() throws Exception {
-		JobExecution jobExecutionContext = new JobExecution(jobInstance);
+		JobExecution jobExecutionContext = new JobExecution(jobInstance, jobParameters);
 		step = getStep(new String[] { "foo", "bar", "spam" }, 2);
 		step.setTransactionManager(transactionManager);
 		StepExecution stepExecution = new StepExecution(step.getName(), jobExecutionContext);
@@ -169,7 +172,7 @@ public class TaskletStepTests {
 
 	@Test
 	public void testEmptyReader() throws Exception {
-		JobExecution jobExecutionContext = new JobExecution(jobInstance);
+		JobExecution jobExecutionContext = new JobExecution(jobInstance, jobParameters);
 		StepExecution stepExecution = new StepExecution(step.getName(), jobExecutionContext);
 		step = getStep(new String[0]);
 		step.setTasklet(new TestingChunkOrientedTasklet<String>(getReader(new String[0]), itemWriter,
@@ -190,7 +193,7 @@ public class TaskletStepTests {
 	@Test
 	public void testStepExecutionUpdates() throws Exception {
 
-		JobExecution jobExecution = new JobExecution(jobInstance);
+		JobExecution jobExecution = new JobExecution(jobInstance, jobParameters);
 		StepExecution stepExecution = new StepExecution(step.getName(), jobExecution);
 
 		step.setStepOperations(new RepeatTemplate());
@@ -211,7 +214,7 @@ public class TaskletStepTests {
 	@Test
 	public void testStepExecutionUpdateFailure() throws Exception {
 
-		JobExecution jobExecution = new JobExecution(jobInstance);
+		JobExecution jobExecution = new JobExecution(jobInstance, jobParameters);
 		StepExecution stepExecution = new StepExecution(step.getName(), jobExecution);
 
 		JobRepository repository = new JobRepositoryFailedUpdateStub();
@@ -230,7 +233,7 @@ public class TaskletStepTests {
 				new MapStepExecutionDao(), new MapExecutionContextDao());
 		step.setJobRepository(repository);
 
-		JobExecution jobExecution = repository.createJobExecution(job.getName(), jobInstance.getJobParameters());
+		JobExecution jobExecution = repository.createJobExecution(job.getName(), jobParameters);
 		StepExecution stepExecution = new StepExecution(step.getName(), jobExecution);
 		repository.add(stepExecution);
 		step.execute(stepExecution);
@@ -250,7 +253,7 @@ public class TaskletStepTests {
 		};
 
 		step.setTasklet(new TestingChunkOrientedTasklet<String>(itemReader, itemWriter));
-		JobExecution jobExecutionContext = new JobExecution(jobInstance);
+		JobExecution jobExecutionContext = new JobExecution(jobInstance, jobParameters);
 		StepExecution stepExecution = new StepExecution(step.getName(), jobExecutionContext);
 
 		try {
@@ -276,7 +279,7 @@ public class TaskletStepTests {
 		};
 
 		step.setTasklet(new TestingChunkOrientedTasklet<String>(itemReader, itemWriter));
-		JobExecution jobExecutionContext = new JobExecution(jobInstance);
+		JobExecution jobExecutionContext = new JobExecution(jobInstance, jobParameters);
 		StepExecution stepExecution = new StepExecution(step.getName(), jobExecutionContext);
 
 		try {
@@ -308,7 +311,7 @@ public class TaskletStepTests {
 				return ExitStatus.FAILED.addExitDescription("FOO");
 			}
 		});
-		JobExecution jobExecutionContext = new JobExecution(jobInstance);
+		JobExecution jobExecutionContext = new JobExecution(jobInstance, jobParameters);
 		StepExecution stepExecution = new StepExecution(step.getName(), jobExecutionContext);
 
 		try {
@@ -331,7 +334,7 @@ public class TaskletStepTests {
 		MockRestartableItemReader tasklet = new MockRestartableItemReader();
 		step.setTasklet(new TestingChunkOrientedTasklet<String>(tasklet, itemWriter));
 		step.registerStream(tasklet);
-		JobExecution jobExecutionContext = new JobExecution(jobInstance);
+		JobExecution jobExecutionContext = new JobExecution(jobInstance, jobParameters);
 		StepExecution stepExecution = new StepExecution(step.getName(), jobExecutionContext);
 
 		step.execute(stepExecution);
@@ -342,7 +345,7 @@ public class TaskletStepTests {
 
 	@Test
 	public void testSuccessfulExecutionWithExecutionContext() throws Exception {
-		final JobExecution jobExecution = new JobExecution(jobInstance);
+		final JobExecution jobExecution = new JobExecution(jobInstance, jobParameters);
 		final StepExecution stepExecution = new StepExecution(step.getName(), jobExecution);
 		step.setJobRepository(new JobRepositorySupport() {
 			@Override
@@ -359,7 +362,7 @@ public class TaskletStepTests {
 
 	@Test
 	public void testSuccessfulExecutionWithFailureOnSaveOfExecutionContext() throws Exception {
-		final JobExecution jobExecution = new JobExecution(jobInstance);
+		final JobExecution jobExecution = new JobExecution(jobInstance, jobParameters);
 		final StepExecution stepExecution = new StepExecution(step.getName(), jobExecution);
 		step.setJobRepository(new JobRepositorySupport() {
 			private int counter = 0;
@@ -389,7 +392,7 @@ public class TaskletStepTests {
 	public void testNoSaveExecutionAttributesRestartableJob() {
 		MockRestartableItemReader tasklet = new MockRestartableItemReader();
 		step.setTasklet(new TestingChunkOrientedTasklet<String>(tasklet, itemWriter));
-		JobExecution jobExecutionContext = new JobExecution(jobInstance);
+		JobExecution jobExecutionContext = new JobExecution(jobInstance, jobParameters);
 		StepExecution stepExecution = new StepExecution(step.getName(), jobExecutionContext);
 
 		try {
@@ -415,7 +418,7 @@ public class TaskletStepTests {
 				return "foo";
 			}
 		}, itemWriter));
-		JobExecution jobExecution = new JobExecution(jobInstance);
+		JobExecution jobExecution = new JobExecution(jobInstance, jobParameters);
 		StepExecution stepExecution = new StepExecution(step.getName(), jobExecution);
 
 		step.execute(stepExecution);
@@ -436,7 +439,7 @@ public class TaskletStepTests {
 		};
 		step.setTasklet(new TestingChunkOrientedTasklet<String>(reader, itemWriter));
 		step.registerStream(reader);
-		JobExecution jobExecution = new JobExecution(jobInstance);
+		JobExecution jobExecution = new JobExecution(jobInstance, jobParameters);
 		StepExecution stepExecution = new StepExecution(step.getName(), jobExecution);
 
 		assertEquals(false, stepExecution.getExecutionContext().containsKey("foo"));
@@ -456,7 +459,7 @@ public class TaskletStepTests {
 				executionContext.putString("foo", "bar");
 			}
 		} });
-		JobExecution jobExecution = new JobExecution(jobInstance);
+		JobExecution jobExecution = new JobExecution(jobInstance, jobParameters);
 		StepExecution stepExecution = new StepExecution(step.getName(), jobExecution);
 
 		assertEquals(false, stepExecution.getExecutionContext().containsKey("foo"));
@@ -480,7 +483,7 @@ public class TaskletStepTests {
 				return null;
 			}
 		});
-		JobExecution jobExecution = new JobExecution(jobInstance);
+		JobExecution jobExecution = new JobExecution(jobInstance, jobParameters);
 		StepExecution stepExecution = new StepExecution(step.getName(), jobExecution);
 		step.execute(stepExecution);
 		assertEquals(2, list.size());
@@ -501,7 +504,7 @@ public class TaskletStepTests {
 		};
 		step.setStreams(new ItemStream[] { reader });
 		step.registerStepExecutionListener(reader);
-		StepExecution stepExecution = new StepExecution(step.getName(), new JobExecution(jobInstance));
+		StepExecution stepExecution = new StepExecution(step.getName(), new JobExecution(jobInstance, jobParameters));
 		step.execute(stepExecution);
 		assertEquals(1, list.size());
 	}
@@ -523,7 +526,7 @@ public class TaskletStepTests {
 		stepTemplate.setCompletionPolicy(new SimpleCompletionPolicy(5));
 		step.setStepOperations(stepTemplate);
 
-		JobExecution jobExecution = new JobExecution(jobInstance);
+		JobExecution jobExecution = new JobExecution(jobInstance, jobParameters);
 		StepExecution stepExecution = new StepExecution(step.getName(), jobExecution);
 		step.execute(stepExecution);
 		assertEquals(1, list.size());
@@ -547,7 +550,7 @@ public class TaskletStepTests {
 				throw new RuntimeException("FOO");
 			}
 		}, itemWriter));
-		JobExecution jobExecution = new JobExecution(jobInstance);
+		JobExecution jobExecution = new JobExecution(jobInstance, jobParameters);
 		StepExecution stepExecution = new StepExecution(step.getName(), jobExecution);
 		step.execute(stepExecution);
 		assertEquals("FOO", stepExecution.getFailureExceptions().get(0).getMessage());
@@ -569,7 +572,7 @@ public class TaskletStepTests {
 		};
 		step.setTasklet(new TestingChunkOrientedTasklet<String>(reader, itemWriter));
 		step.setStreams(new ItemStream[] { reader });
-		JobExecution jobExecution = new JobExecution(jobInstance);
+		JobExecution jobExecution = new JobExecution(jobInstance, jobParameters);
 		StepExecution stepExecution = new StepExecution(step.getName(), jobExecution);
 
 		assertEquals(false, stepExecution.getExecutionContext().containsKey("foo"));
@@ -606,7 +609,7 @@ public class TaskletStepTests {
 
 		step.setTasklet(new TestingChunkOrientedTasklet<String>(itemReader, itemWriter));
 
-		JobExecution jobExecutionContext = new JobExecution(jobInstance);
+		JobExecution jobExecutionContext = new JobExecution(jobInstance, jobParameters);
 		StepExecution stepExecution = new StepExecution(step.getName(), jobExecutionContext);
 
 		stepExecution.setExecutionContext(foobarEc);
@@ -630,7 +633,7 @@ public class TaskletStepTests {
 		};
 		step.setTasklet(new TestingChunkOrientedTasklet<String>(itemReader, itemWriter));
 
-		JobExecution jobExecutionContext = new JobExecution(jobInstance);
+		JobExecution jobExecutionContext = new JobExecution(jobInstance, jobParameters);
 		StepExecution stepExecution = new StepExecution(step.getName(), jobExecutionContext);
 
 		stepExecution.setExecutionContext(foobarEc);
@@ -654,7 +657,7 @@ public class TaskletStepTests {
 		};
 		step.setTasklet(new TestingChunkOrientedTasklet<String>(itemReader, itemWriter));
 
-		JobExecution jobExecutionContext = new JobExecution(jobInstance);
+		JobExecution jobExecutionContext = new JobExecution(jobInstance, jobParameters);
 		StepExecution stepExecution = new StepExecution(step.getName(), jobExecutionContext);
 
 		stepExecution.setExecutionContext(foobarEc);
@@ -686,7 +689,7 @@ public class TaskletStepTests {
 			}
 		});
 
-		JobExecution jobExecutionContext = new JobExecution(jobInstance);
+		JobExecution jobExecutionContext = new JobExecution(jobInstance, jobParameters);
 		StepExecution stepExecution = new StepExecution(step.getName(), jobExecutionContext);
 
 		stepExecution.setExecutionContext(foobarEc);
@@ -716,7 +719,7 @@ public class TaskletStepTests {
 			}
 		});
 
-		JobExecution jobExecutionContext = new JobExecution(jobInstance);
+		JobExecution jobExecutionContext = new JobExecution(jobInstance, jobParameters);
 		StepExecution stepExecution = new StepExecution(step.getName(), jobExecutionContext);
 
 		stepExecution.setExecutionContext(foobarEc);
@@ -740,7 +743,7 @@ public class TaskletStepTests {
 			}
 		} });
 
-		JobExecution jobExecutionContext = new JobExecution(jobInstance);
+		JobExecution jobExecutionContext = new JobExecution(jobInstance, jobParameters);
 		StepExecution stepExecution = new StepExecution(step.getName(), jobExecutionContext);
 
 		step.execute(stepExecution);
@@ -768,7 +771,7 @@ public class TaskletStepTests {
 		step.setTasklet(new TestingChunkOrientedTasklet<String>(itemReader, itemWriter));
 		step.registerStream(itemReader);
 
-		JobExecution jobExecutionContext = new JobExecution(jobInstance);
+		JobExecution jobExecutionContext = new JobExecution(jobInstance, jobParameters);
 		StepExecution stepExecution = new StepExecution(step.getName(), jobExecutionContext);
 
 		stepExecution.setExecutionContext(foobarEc);
@@ -801,7 +804,7 @@ public class TaskletStepTests {
 		step.setTasklet(new TestingChunkOrientedTasklet<String>(reader, itemWriter));
 		step.registerStream(reader);
 
-		StepExecution stepExecution = new StepExecution(step.getName(), new JobExecution(jobInstance));
+		StepExecution stepExecution = new StepExecution(step.getName(), new JobExecution(jobInstance, jobParameters));
 
 		step.execute(stepExecution);
 		assertEquals(BatchStatus.FAILED, stepExecution.getStatus());
@@ -820,7 +823,7 @@ public class TaskletStepTests {
 		template.setCompletionPolicy(new DefaultResultCompletionPolicy());
 		step.setStepOperations(template);
 
-		JobExecution jobExecutionContext = new JobExecution(jobInstance);
+		JobExecution jobExecutionContext = new JobExecution(jobInstance, jobParameters);
 		StepExecution stepExecution = new StepExecution(step.getName(), jobExecutionContext);
 
 		step.execute(stepExecution);
@@ -842,7 +845,7 @@ public class TaskletStepTests {
 			}
 		};
 		step.setStepExecutionListeners(new StepExecutionListener[] { listener });
-		StepExecution stepExecution = new StepExecution(step.getName(), new JobExecution(jobInstance));
+		StepExecution stepExecution = new StepExecution(step.getName(), new JobExecution(jobInstance, jobParameters));
 
 		step.execute(stepExecution);
 		assertEquals(BatchStatus.COMPLETED, stepExecution.getStatus());
@@ -859,7 +862,7 @@ public class TaskletStepTests {
 			}
 		});
 
-		JobExecution jobExecutionContext = new JobExecution(jobInstance);
+		JobExecution jobExecutionContext = new JobExecution(jobInstance, jobParameters);
 		StepExecution stepExecution = new StepExecution(step.getName(), jobExecutionContext);
 
 		@SuppressWarnings("serial")
@@ -883,7 +886,7 @@ public class TaskletStepTests {
 				return null;
 			}
 		});
-		JobExecution jobExecutionContext = new JobExecution(jobInstance);
+		JobExecution jobExecutionContext = new JobExecution(jobInstance, jobParameters);
 		StepExecution stepExecution = new StepExecution(step.getName(), jobExecutionContext);
 		step.execute(stepExecution);
 		assertEquals(BatchStatus.COMPLETED, stepExecution.getStatus());

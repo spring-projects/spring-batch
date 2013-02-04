@@ -354,6 +354,7 @@ public class TaskletStep extends AbstractStep {
 					}
 					chunkListener.afterChunkError(chunkContext);
 				}
+
 				if (status == TransactionSynchronization.STATUS_UNKNOWN) {
 					logger.error("Rolling back with transaction in unknown state");
 					rollback(stepExecution);
@@ -367,13 +368,13 @@ public class TaskletStep extends AbstractStep {
 				if (locked) {
 					semaphore.release();
 				}
+
 				locked = false;
 			}
 		}
 
 		@Override
 		public Object doInTransaction(TransactionStatus status) {
-
 			TransactionSynchronizationManager.registerSynchronization(this);
 
 			RepeatStatus result = RepeatStatus.CONTINUABLE;
@@ -448,7 +449,6 @@ public class TaskletStep extends AbstractStep {
 					stepExecution.setTerminateOnly();
 					throw new FatalStepExecutionException(msg, e);
 				}
-
 			}
 			catch (Error e) {
 				logger.debug("Rollback for Error: " + e.getClass().getName() + ": " + e.getMessage());

@@ -205,7 +205,7 @@ public class SimpleStepExecutionSplitterTests {
 			jobExecution.setEndTime(new Date());
 			jobRepository.update(jobExecution);
 			JobInstance jobInstance = jobExecution.getJobInstance();
-			jobExecution = jobRepository.createJobExecution(jobInstance.getJobName(), jobInstance.getJobParameters());
+			jobExecution = jobRepository.createJobExecution(jobInstance.getJobName(), jobExecution.getJobParameters());
 		}
 
 		stepExecution = jobExecution.createStepExecution(stepExecution.getStepName());

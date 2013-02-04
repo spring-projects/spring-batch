@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2010 the original author or authors.
+ * Copyright 2006-2013 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -34,14 +34,14 @@ import org.springframework.batch.support.SerializationUtils;
 
 /**
  * @author Dave Syer
- * 
+ * @author Michael Minella
  */
 public class StepExecutionSerializationUtilsTests {
 
 	@Test
 	public void testCycle() throws Exception {
 		StepExecution stepExecution = new StepExecution("step", new JobExecution(new JobInstance(123L,
-				new JobParameters(), "job"), 321L), 11L);
+				"job"), 321L, new JobParameters()), 11L);
 		stepExecution.getExecutionContext().put("foo.bar.spam", 123);
 		StepExecution result = getCopy(stepExecution);
 		assertEquals(stepExecution, result);
@@ -49,7 +49,7 @@ public class StepExecutionSerializationUtilsTests {
 
 	@Test
 	public void testMultipleCycles() throws Throwable {
-	
+
 		int count = 0;
 		int repeats = 100;
 		int threads = 10;
@@ -58,7 +58,7 @@ public class StepExecutionSerializationUtilsTests {
 		CompletionService<StepExecution> completionService = new ExecutorCompletionService<StepExecution>(executor);
 
 		for (int i = 0; i < repeats; i++) {
-			final JobExecution jobExecution = new JobExecution(new JobInstance(123L, new JobParameters(), "job"), 321L);
+			final JobExecution jobExecution = new JobExecution(new JobInstance(123L, "job"), 321L, new JobParameters());
 			for (int j = 0; j < threads; j++) {
 				completionService.submit(new Callable<StepExecution>() {
 					public StepExecution call() throws Exception {

@@ -27,7 +27,7 @@ import org.springframework.batch.support.PropertiesConverter;
 
 /**
  * @author Dave Syer
- * 
+ *
  */
 public class MetaDataInstanceFactoryTests {
 
@@ -45,25 +45,6 @@ public class MetaDataInstanceFactoryTests {
 	private String stepName = "step";
 
 	private Long stepExecutionId = 11L;
-
-	/**
-	 * Test method for
-	 * {@link MetaDataInstanceFactory#createJobInstance(String, Long, String)} .
-	 */
-	@Test
-	public void testCreateJobInstanceStringLongString() {
-		assertNotNull(MetaDataInstanceFactory.createJobInstance(jobName, instanceId, jobParametersString));
-	}
-
-	/**
-	 * Test method for
-	 * {@link MetaDataInstanceFactory#createJobInstance(String, Long, JobParameters)}
-	 * .
-	 */
-	@Test
-	public void testCreateJobInstanceStringLongJobParameters() {
-		assertNotNull(MetaDataInstanceFactory.createJobInstance(jobName, instanceId, jobParameters));
-	}
 
 	/**
 	 * Test method for
