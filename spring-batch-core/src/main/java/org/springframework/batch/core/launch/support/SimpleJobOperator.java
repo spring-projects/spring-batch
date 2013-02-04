@@ -199,7 +199,7 @@ public class SimpleJobOperator implements JobOperator, InitializingBean {
 		JobExecution jobExecution = findExecutionById(executionId);
 
 		return PropertiesConverter.propertiesToString(jobParametersConverter.getProperties(jobExecution
-				.getJobInstance().getJobParameters()));
+				.getJobParameters()));
 	}
 
 	/*
@@ -267,7 +267,7 @@ public class SimpleJobOperator implements JobOperator, InitializingBean {
 
 		String jobName = jobExecution.getJobInstance().getJobName();
 		Job job = jobRegistry.getJob(jobName);
-		JobParameters parameters = jobExecution.getJobInstance().getJobParameters();
+		JobParameters parameters = jobExecution.getJobParameters();
 
 		logger.info(String.format("Attempting to resume job with name=%s and parameters=%s", jobName, parameters));
 		try {
@@ -349,7 +349,8 @@ public class SimpleJobOperator implements JobOperator, InitializingBean {
 			}
 		}
 		else {
-			parameters = incrementer.getNext(lastInstances.get(0).getJobParameters());
+			List<JobExecution> lastExecutions = jobExplorer.getJobExecutions(lastInstances.get(0));
+			parameters = incrementer.getNext(lastExecutions.get(0).getJobParameters());
 		}
 
 		logger.info(String.format("Attempting to launch job with name=%s and parameters=%s", jobName, parameters));

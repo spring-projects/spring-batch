@@ -1,25 +1,43 @@
 /**
- * 
+ *
  */
 package org.springframework.batch.core;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 
 import java.util.Date;
 import java.util.Iterator;
 import java.util.Map;
 
-import junit.framework.TestCase;
+import org.junit.Test;
 
 /**
  * @author Lucas Ward
  *
  */
-public class JobParametersBuilderTests extends TestCase {
+public class JobParametersBuilderTests {
 
 	JobParametersBuilder parametersBuilder = new JobParametersBuilder();
-	
+
 	Date date = new Date(System.currentTimeMillis());
-	
-	public void testToJobRuntimeParamters(){	
+
+	@Test
+	public void testNonIdentifyingParameters() {
+		parametersBuilder.addDate("SCHEDULE_DATE", date, false);
+		parametersBuilder.addLong("LONG", new Long(1), false);
+		parametersBuilder.addString("STRING", "string value", false);
+		JobParameters parameters = parametersBuilder.toJobParameters();
+		assertEquals(date, parameters.getDate("SCHEDULE_DATE"));
+		assertEquals(1L, parameters.getLong("LONG"));
+		assertEquals("string value", parameters.getString("STRING"));
+		assertFalse(parameters.getParameters().get("SCHEDULE_DATE").isIdentifying());
+		assertFalse(parameters.getParameters().get("LONG").isIdentifying());
+		assertFalse(parameters.getParameters().get("STRING").isIdentifying());
+	}
+
+	@Test
+	public void testToJobRuntimeParamters(){
 		parametersBuilder.addDate("SCHEDULE_DATE", date);
 		parametersBuilder.addLong("LONG", new Long(1));
 		parametersBuilder.addString("STRING", "string value");
@@ -29,7 +47,8 @@ public class JobParametersBuilderTests extends TestCase {
 		assertEquals("string value", parameters.getString("STRING"));
 	}
 
-	public void testNullRuntimeParamters(){	
+	@Test
+	public void testNullRuntimeParamters(){
 		parametersBuilder.addDate("SCHEDULE_DATE", null);
 		parametersBuilder.addLong("LONG", null);
 		parametersBuilder.addString("STRING", null);
@@ -39,14 +58,16 @@ public class JobParametersBuilderTests extends TestCase {
 		assertEquals(null, parameters.getString("STRING"));
 	}
 
-	public void testCopy(){	
+	@Test
+	public void testCopy(){
 		parametersBuilder.addString("STRING", "string value");
 		parametersBuilder = new JobParametersBuilder(parametersBuilder.toJobParameters());
 		Iterator<String> parameters = parametersBuilder.toJobParameters().getParameters().keySet().iterator();
 		assertEquals("STRING", parameters.next());
 	}
 
-	public void testOrderedTypes(){	
+	@Test
+	public void testOrderedTypes(){
 		parametersBuilder.addDate("SCHEDULE_DATE", date);
 		parametersBuilder.addLong("LONG", new Long(1));
 		parametersBuilder.addString("STRING", "string value");
@@ -56,7 +77,8 @@ public class JobParametersBuilderTests extends TestCase {
 		assertEquals("STRING", parameters.next());
 	}
 
-	public void testOrderedStrings(){	
+	@Test
+	public void testOrderedStrings(){
 		parametersBuilder.addString("foo", "value foo");
 		parametersBuilder.addString("bar", "value bar");
 		parametersBuilder.addString("spam", "value spam");
@@ -65,7 +87,8 @@ public class JobParametersBuilderTests extends TestCase {
 		assertEquals("bar", parameters.next());
 		assertEquals("spam", parameters.next());
 	}
-	
+
+	@Test
 	public void testAddJobParameter(){
 		JobParameter jobParameter = new JobParameter("bar");
 		parametersBuilder.addParameter("foo", jobParameter);

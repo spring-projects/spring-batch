@@ -28,7 +28,7 @@ import org.springframework.batch.core.StepExecution;
 
 /**
  * @author Dave Syer
- * 
+ *
  */
 public class JobParameterExecutionContextCopyListenerTests {
 
@@ -39,7 +39,7 @@ public class JobParameterExecutionContextCopyListenerTests {
 	@Before
 	public void createExecution() {
 		JobParameters jobParameters = new JobParametersBuilder().addString("foo", "bar").toJobParameters();
-		stepExecution = new StepExecution("foo", new JobExecution(new JobInstance(123L, jobParameters, "job")));
+		stepExecution = new StepExecution("foo", new JobExecution(new JobInstance(123L, "job"), jobParameters));
 	}
 
 	@Test

@@ -1,9 +1,12 @@
 /**
- * 
+ *
  */
 package org.springframework.batch.core;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 
 import java.util.Collections;
 import java.util.Date;
@@ -18,7 +21,7 @@ import org.springframework.batch.support.SerializationUtils;
 /**
  * @author Lucas Ward
  * @author Dave Syer
- * 
+ *
  */
 public class JobParametersTests {
 
@@ -36,14 +39,14 @@ public class JobParametersTests {
 	private JobParameters getNewParameters() {
 
 		Map<String, JobParameter> parameterMap = new HashMap<String, JobParameter>();
-		parameterMap.put("string.key1", new JobParameter("value1"));
-		parameterMap.put("string.key2", new JobParameter("value2"));
-		parameterMap.put("long.key1", new JobParameter(1L));
-		parameterMap.put("long.key2", new JobParameter(2L));
-		parameterMap.put("double.key1", new JobParameter(1.1));
-		parameterMap.put("double.key2", new JobParameter(2.2));
-		parameterMap.put("date.key1", new JobParameter(date1));
-		parameterMap.put("date.key2", new JobParameter(date2));
+		parameterMap.put("string.key1", new JobParameter("value1", true));
+		parameterMap.put("string.key2", new JobParameter("value2", true));
+		parameterMap.put("long.key1", new JobParameter(1L, true));
+		parameterMap.put("long.key2", new JobParameter(2L, true));
+		parameterMap.put("double.key1", new JobParameter(1.1, true));
+		parameterMap.put("double.key2", new JobParameter(2.2, true));
+		parameterMap.put("date.key1", new JobParameter(date1, true));
+		parameterMap.put("date.key2", new JobParameter(date2, true));
 
 		return new JobParameters(parameterMap);
 	}
@@ -57,7 +60,7 @@ public class JobParametersTests {
 
 	@Test
 	public void testGetNullString() {
-		parameters = new JobParameters(Collections.singletonMap("string.key1", new JobParameter((String)null)));
+		parameters = new JobParameters(Collections.singletonMap("string.key1", new JobParameter((String) null, true)));
 		assertEquals(null, parameters.getDate("string.key1"));
 	}
 
@@ -81,13 +84,13 @@ public class JobParametersTests {
 
 	@Test
 	public void testGetNullDate() {
-		parameters = new JobParameters(Collections.singletonMap("date.key1", new JobParameter((Date)null)));
+		parameters = new JobParameters(Collections.singletonMap("date.key1", new JobParameter((Date)null, true)));
 		assertEquals(null, parameters.getDate("date.key1"));
 	}
 
 	@Test
 	public void testGetEmptyLong() {
-		parameters = new JobParameters(Collections.singletonMap("long1", new JobParameter((Long)null)));
+		parameters = new JobParameters(Collections.singletonMap("long1", new JobParameter((Long)null, true)));
 		assertEquals(0L, parameters.getLong("long1"));
 	}
 
@@ -149,15 +152,15 @@ public class JobParametersTests {
 		String string1 = stringBuilder.toString();
 
 		Map<String, JobParameter> parameterMap = new HashMap<String, JobParameter>();
-		parameterMap.put("string.key2", new JobParameter("value2"));
-		parameterMap.put("string.key1", new JobParameter("value1"));
-		parameterMap.put("long.key2", new JobParameter(2L));
-		parameterMap.put("long.key1", new JobParameter(1L));
-		parameterMap.put("double.key2", new JobParameter(2.2));
-		parameterMap.put("double.key1", new JobParameter(1.1));
-		parameterMap.put("date.key2", new JobParameter(date2));
-		parameterMap.put("date.key1", new JobParameter(date1));
-		
+		parameterMap.put("string.key2", new JobParameter("value2", true));
+		parameterMap.put("string.key1", new JobParameter("value1", true));
+		parameterMap.put("long.key2", new JobParameter(2L, true));
+		parameterMap.put("long.key1", new JobParameter(1L, true));
+		parameterMap.put("double.key2", new JobParameter(2.2, true));
+		parameterMap.put("double.key1", new JobParameter(1.1, true));
+		parameterMap.put("date.key2", new JobParameter(date2, true));
+		parameterMap.put("date.key1", new JobParameter(date1, true));
+
 		JobParameters testProps = new JobParameters(parameterMap);
 
 		props = testProps.getParameters();
@@ -187,28 +190,28 @@ public class JobParametersTests {
 		JobParameters params = getNewParameters();
 
 		byte[] serialized =
-		SerializationUtils.serialize(params);
+				SerializationUtils.serialize(params);
 
 		assertEquals(params, SerializationUtils.deserialize(serialized));
 	}
-    
-    @Test
-    public void testLongReturns0WhenKeyDoesntExit(){
-        assertEquals(0L,new JobParameters().getLong("keythatdoesntexist"));
-    }
 
-    @Test
-    public void testStringReturnsNullWhenKeyDoesntExit(){
-        assertNull(new JobParameters().getString("keythatdoesntexist"));
-    }
+	@Test
+	public void testLongReturns0WhenKeyDoesntExit(){
+		assertEquals(0L,new JobParameters().getLong("keythatdoesntexist"));
+	}
 
-    @Test
-    public void testDoubleReturns0WhenKeyDoesntExit(){
-        assertEquals(0.0,new JobParameters().getLong("keythatdoesntexist"), 0.0001);
-    }
+	@Test
+	public void testStringReturnsNullWhenKeyDoesntExit(){
+		assertNull(new JobParameters().getString("keythatdoesntexist"));
+	}
 
-    @Test
-    public void testDateReturnsNullWhenKeyDoesntExit(){
-        assertNull(new JobParameters().getDate("keythatdoesntexist"));
-    }
+	@Test
+	public void testDoubleReturns0WhenKeyDoesntExit(){
+		assertEquals(0.0,new JobParameters().getLong("keythatdoesntexist"), 0.0001);
+	}
+
+	@Test
+	public void testDateReturnsNullWhenKeyDoesntExit(){
+		assertNull(new JobParameters().getDate("keythatdoesntexist"));
+	}
 }

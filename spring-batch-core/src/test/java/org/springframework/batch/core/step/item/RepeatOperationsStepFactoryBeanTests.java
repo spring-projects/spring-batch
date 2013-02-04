@@ -44,7 +44,7 @@ public class RepeatOperationsStepFactoryBeanTests extends TestCase {
 
 	private List<String> list;
 
-	private JobExecution jobExecution = new JobExecution(new JobInstance(0L, new JobParameters(), "job"));
+	private JobExecution jobExecution = new JobExecution(new JobInstance(0L, "job"), new JobParameters());
 
 	@Override
 	protected void setUp() throws Exception {

@@ -178,11 +178,6 @@ public class FaultTolerantStepFactoryBeanRetryTests {
 				jobExecution);
 		repository.add(stepExecution);
 		step.execute(stepExecution);
-		//		System.out.println(stepExecution.getWriteCount());
-		//		System.out.println(stepExecution.getSkipCount());
-		//		System.out.println(processed.size());
-		//		System.out.println(processed);
-		//		System.out.println(written);
 		/*
 		 * Each chunk tried up to RETRY_LIMIT, then the scan processes each item
 		 * once, identfiying the skip as it goes
@@ -230,7 +225,6 @@ public class FaultTolerantStepFactoryBeanRetryTests {
 				jobExecution);
 		repository.add(stepExecution);
 		step.execute(stepExecution);
-		// System.out.println(processed);
 		assertEquals(ExitStatus.COMPLETED.getExitCode(), stepExecution
 				.getExitStatus().getExitCode());
 		/*
@@ -278,10 +272,6 @@ public class FaultTolerantStepFactoryBeanRetryTests {
 				jobExecution);
 		repository.add(stepExecution);
 		step.execute(stepExecution);
-		// System.out.println(stepExecution.getWriteCount());
-		// System.out.println(processed.size());
-		// System.out.println(processed);
-		// System.out.println(written);
 		assertEquals(3, processed.size()); // Initial try only, then cached
 	}
 

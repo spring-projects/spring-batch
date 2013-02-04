@@ -39,9 +39,9 @@ import org.springframework.batch.core.repository.dao.StepExecutionDao;
 
 /**
  * Test {@link SimpleJobExplorer}.
- * 
+ *
  * @author Dave Syer
- * 
+ *
  */
 public class SimpleJobExplorerTests {
 
@@ -53,12 +53,11 @@ public class SimpleJobExplorerTests {
 
 	private StepExecutionDao stepExecutionDao;
 
-	private JobInstance jobInstance = new JobInstance(111L,
-			new JobParameters(), "job");
+	private JobInstance jobInstance = new JobInstance(111L, "job");
 
 	private ExecutionContextDao ecDao;
 
-	private JobExecution jobExecution = new JobExecution(jobInstance, 1234L);
+	private JobExecution jobExecution = new JobExecution(jobInstance, 1234L, new JobParameters());
 
 	@Before
 	public void setUp() throws Exception {
@@ -98,7 +97,7 @@ public class SimpleJobExplorerTests {
 		expect(jobExecutionDao.getJobExecution(jobExecution.getId())).andReturn(jobExecution);
 		StepExecution stepExecution = jobExecution.createStepExecution("foo");
 		expect(stepExecutionDao.getStepExecution(jobExecution, 123L))
-				.andReturn(stepExecution);
+		.andReturn(stepExecution);
 		expect(ecDao.getExecutionContext(stepExecution)).andReturn(null);
 		expectLastCall();
 		replay(jobExecutionDao, stepExecutionDao, ecDao);
@@ -111,7 +110,7 @@ public class SimpleJobExplorerTests {
 		expect(jobExecutionDao.getJobExecution(jobExecution.getId())).andReturn(jobExecution);
 		expectLastCall();
 		expect(stepExecutionDao.getStepExecution(jobExecution, 123L))
-				.andReturn(null);
+		.andReturn(null);
 		replay(jobExecutionDao, stepExecutionDao, ecDao);
 		assertNull(jobExplorer.getStepExecution(jobExecution.getId(), 123L));
 		verify(jobExecutionDao, stepExecutionDao, ecDao);

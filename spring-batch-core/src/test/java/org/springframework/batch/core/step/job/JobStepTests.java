@@ -35,7 +35,7 @@ import org.springframework.batch.item.ExecutionContext;
 
 /**
  * @author Dave Syer
- * 
+ *
  */
 public class JobStepTests {
 
@@ -143,7 +143,7 @@ public class JobStepTests {
 		step.setJob(new JobSupport("child") {
 			@Override
 			public void execute(JobExecution execution) throws UnexpectedJobExecutionException {
-				assertEquals(1, execution.getJobInstance().getJobParameters().getParameters().size());
+				assertEquals(1, execution.getJobParameters().getParameters().size());
 				execution.setStatus(BatchStatus.FAILED);
 				execution.setEndTime(new Date());
 				jobRepository.update(execution);
@@ -160,11 +160,11 @@ public class JobStepTests {
 		JobExecution jobExecution = stepExecution.getJobExecution();
 		jobExecution.setEndTime(new Date());
 		jobRepository.update(jobExecution);
-		
+
 		jobExecution = jobRepository.createJobExecution("job", new JobParameters());
 		stepExecution = jobExecution.createStepExecution("step");
 		// In a restart the surrounding Job would set up the context like this...
-		stepExecution.setExecutionContext(executionContext); 
+		stepExecution.setExecutionContext(executionContext);
 		jobRepository.add(stepExecution);
 		step.execute(stepExecution);
 		assertEquals("FOO", stepExecution.getFailureExceptions().get(0).getMessage());

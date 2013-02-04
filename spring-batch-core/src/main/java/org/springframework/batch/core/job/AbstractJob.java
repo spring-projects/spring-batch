@@ -288,8 +288,7 @@ InitializingBean {
 
 		try {
 
-			jobParametersValidator.validate(execution.getJobInstance()
-					.getJobParameters());
+			jobParametersValidator.validate(execution.getJobParameters());
 
 			if (execution.getStatus() != BatchStatus.STOPPING) {
 

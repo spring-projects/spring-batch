@@ -21,10 +21,13 @@ import java.util.Date;
 
 /**
  * Domain representation of a parameter to a batch job. Only the following types
- * can be parameters: String, Long, Date, and Double.
+ * can be parameters: String, Long, Date, and Double.  The identifying flag is
+ * used to indicate if the parameter is to be used as part of the identification of
+ * a job instance.
  *
  * @author Lucas Ward
  * @author Dave Syer
+ * @author Michael Minella
  * @since 2.0
  *
  */
@@ -35,12 +38,58 @@ public class JobParameter implements Serializable {
 
 	private final ParameterType parameterType;
 
+	private final boolean identifying;
+
+	/**
+	 * Construct a new JobParameter as a String.
+	 */
+	public JobParameter(String parameter, boolean identifying) {
+		this.parameter = parameter;
+		parameterType = ParameterType.STRING;
+		this.identifying = identifying;
+	}
+
+	/**
+	 * Construct a new JobParameter as a Long.
+	 *
+	 * @param parameter
+	 */
+	public JobParameter(Long parameter, boolean identifying) {
+		this.parameter = parameter;
+		parameterType = ParameterType.LONG;
+		this.identifying = identifying;
+	}
+
+	/**
+	 * Construct a new JobParameter as a Date.
+	 *
+	 * @param parameter
+	 */
+	public JobParameter(Date parameter, boolean identifying) {
+		this.parameter = parameter;
+		parameterType = ParameterType.DATE;
+		this.identifying = identifying;
+	}
+
+	/**
+	 * Construct a new JobParameter as a Double.
+	 *
+	 * @param parameter
+	 */
+	public JobParameter(Double parameter, boolean identifying) {
+		this.parameter = parameter;
+		parameterType = ParameterType.DOUBLE;
+		this.identifying = identifying;
+	}
+
+
 	/**
 	 * Construct a new JobParameter as a String.
 	 */
 	public JobParameter(String parameter) {
 		this.parameter = parameter;
 		parameterType = ParameterType.STRING;
+		this.identifying = true;
 	}
 
 	/**
@@ -51,6 +100,7 @@ public class JobParameter implements Serializable {
 	public JobParameter(Long parameter) {
 		this.parameter = parameter;
 		parameterType = ParameterType.LONG;
+		this.identifying = true;
 	}
 
 	/**
@@ -61,6 +111,7 @@ public class JobParameter implements Serializable {
 	public JobParameter(Date parameter) {
 		this.parameter = parameter;
 		parameterType = ParameterType.DATE;
+		this.identifying = true;
 	}
 
 	/**
@@ -71,6 +122,11 @@ public class JobParameter implements Serializable {
 	public JobParameter(Double parameter) {
 		this.parameter = parameter;
 		parameterType = ParameterType.DOUBLE;
+		this.identifying = true;
+	}
+
+	public boolean isIdentifying() {
+		return identifying;
 	}
 
 	/**

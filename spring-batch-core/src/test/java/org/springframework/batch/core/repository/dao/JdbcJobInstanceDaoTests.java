@@ -12,7 +12,6 @@ import org.junit.runner.RunWith;
 import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.JobInstance;
 import org.springframework.batch.core.JobParameters;
-import org.springframework.batch.core.JobParametersBuilder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.context.ContextConfiguration;
@@ -41,76 +40,22 @@ public class JdbcJobInstanceDaoTests extends AbstractJobInstanceDaoTests {
 	protected JobInstanceDao getJobInstanceDao() {
 		JdbcTestUtils.deleteFromTables(jdbcTemplate, "BATCH_JOB_EXECUTION_CONTEXT",
 				"BATCH_STEP_EXECUTION_CONTEXT", "BATCH_STEP_EXECUTION",
-				"BATCH_JOB_EXECUTION", "BATCH_JOB_PARAMS", "BATCH_JOB_INSTANCE");
+				"BATCH_JOB_EXECUTION", "BATCH_JOB_EXECUTION_PARAMS", "BATCH_JOB_INSTANCE");
 		return jobInstanceDao;
-	}
-
-	@Transactional
-	@Test
-	public void testNullStringParameter() throws Exception {
-
-		JobInstance jobInstance = dao.createJobInstance("testInstance",
-				new JobParametersBuilder().addString("foo", null).toJobParameters());
-
-		JobInstance retrievedInstance = dao.getJobInstance(jobInstance.getId());
-		JobParameters retrievedParams = retrievedInstance.getJobParameters();
-		assertEquals(null, retrievedParams.getString("foo"));
-
 	}
 
 	@Transactional
 	@Test
 	public void testFindJobInstanceByExecution() {
 
+		JobParameters jobParameters = new JobParameters();
 		JobInstance jobInstance = dao.createJobInstance("testInstance",
-				new JobParameters());
-		JobExecution jobExecution = new JobExecution(jobInstance, 2L);
+				jobParameters);
+		JobExecution jobExecution = new JobExecution(jobInstance, 2L, jobParameters);
 		jobExecutionDao.saveJobExecution(jobExecution);
 
 		JobInstance returnedInstance = dao.getJobInstance(jobExecution);
 		assertEquals(jobInstance, returnedInstance);
-	}
-
-	@Transactional
-	@Test
-	public void testCreateJobKey() {
-
-		JdbcJobInstanceDao jdbcDao = (JdbcJobInstanceDao) dao;
-		JobParameters jobParameters = new JobParametersBuilder().addString(
-				"foo", "bar").addString("bar", "foo").toJobParameters();
-		String key = jdbcDao.createJobKey(jobParameters);
-		assertEquals(32, key.length());
-
-	}
-
-	@Transactional
-	@Test
-	public void testCreateJobKeyWithNullParameter() {
-
-		JdbcJobInstanceDao jdbcDao = (JdbcJobInstanceDao) dao;
-		JobParameters jobParameters1 = new JobParametersBuilder().addString(
-				"foo", "bar").addString("bar", null).toJobParameters();
-		JobParameters jobParameters2 = new JobParametersBuilder().addString(
-				"foo", "bar").addString("bar", "").toJobParameters();
-		String key1 = jdbcDao.createJobKey(jobParameters1);
-		String key2 = jdbcDao.createJobKey(jobParameters2);
-		assertEquals(key1, key2);
-
-	}
-
-	@Transactional
-	@Test
-	public void testCreateJobKeyOrdering() {
-
-		JdbcJobInstanceDao jdbcDao = (JdbcJobInstanceDao) dao;
-		JobParameters jobParameters1 = new JobParametersBuilder().addString(
-				"foo", "bar").addString("bar", "foo").toJobParameters();
-		String key1 = jdbcDao.createJobKey(jobParameters1);
-		JobParameters jobParameters2 = new JobParametersBuilder().addString(
-				"bar", "foo").addString("foo", "bar").toJobParameters();
-		String key2 = jdbcDao.createJobKey(jobParameters2);
-		assertEquals(key1, key2);
-
 	}
 
 	@Test

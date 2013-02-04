@@ -54,6 +54,7 @@ import org.springframework.util.StringUtils;
  * {@link #setNumberFormat(NumberFormat)}).
  *
  * @author Dave Syer
+ * @author Michael Minella
  *
  */
 public class DefaultJobParametersConverter implements JobParametersConverter {
@@ -65,6 +66,10 @@ public class DefaultJobParametersConverter implements JobParametersConverter {
 	public static final String LONG_TYPE = "(long)";
 
 	private static final String DOUBLE_TYPE = "(double)";
+
+	private static final String NON_IDENTIFYING_FLAG = "-";
+
+	private static final String IDENTIFYING_FLAG = "+";
 
 	private static NumberFormat DEFAULT_NUMBER_FORMAT = NumberFormat.getInstance(Locale.US);
 
@@ -96,6 +101,14 @@ public class DefaultJobParametersConverter implements JobParametersConverter {
 			Entry<Object, Object> entry = it.next();
 			String key = (String) entry.getKey();
 			String value = (String) entry.getValue();
+
+			boolean identifying = isIdentifyingKey(key);
+			if(!identifying) {
+				key = key.replaceFirst(NON_IDENTIFYING_FLAG, "");
+			} else if(identifying && key.startsWith(IDENTIFYING_FLAG)) {
+				key = key.replaceFirst("\\" + IDENTIFYING_FLAG, "");
+			}
+
 			if (key.endsWith(DATE_TYPE)) {
 				Date date;
 				try {
@@ -106,7 +119,7 @@ public class DefaultJobParametersConverter implements JobParametersConverter {
 							+ ((SimpleDateFormat) dateFormat).toPattern() : "";
 							throw new IllegalArgumentException("Date format is invalid: [" + value + "]" + suffix);
 				}
-				propertiesBuilder.addDate(StringUtils.replace(key, DATE_TYPE, ""), date);
+				propertiesBuilder.addDate(StringUtils.replace(key, DATE_TYPE, ""), date, identifying);
 			}
 			else if (key.endsWith(LONG_TYPE)) {
 				Long result;
@@ -117,21 +130,31 @@ public class DefaultJobParametersConverter implements JobParametersConverter {
 					throw new IllegalArgumentException("Number format is invalid for long value: [" + value
 							+ "], use a format with no decimal places");
 				}
-				propertiesBuilder.addLong(StringUtils.replace(key, LONG_TYPE, ""), result);
+				propertiesBuilder.addLong(StringUtils.replace(key, LONG_TYPE, ""), result, identifying);
 			}
 			else if (key.endsWith(DOUBLE_TYPE)) {
 				Double result = parseNumber(value).doubleValue();
-				propertiesBuilder.addDouble(StringUtils.replace(key, DOUBLE_TYPE, ""), result);
+				propertiesBuilder.addDouble(StringUtils.replace(key, DOUBLE_TYPE, ""), result, identifying);
 			}
 			else if (StringUtils.endsWithIgnoreCase(key, STRING_TYPE)) {
-				propertiesBuilder.addString(StringUtils.replace(key, STRING_TYPE, ""), value);
+				propertiesBuilder.addString(StringUtils.replace(key, STRING_TYPE, ""), value, identifying);
 			}
 			else {
-				propertiesBuilder.addString(key, value);
+				propertiesBuilder.addString(key, value, identifying);
 			}
 		}
 
 		return propertiesBuilder.toJobParameters();
+	}
+
+	private boolean isIdentifyingKey(String key) {
+		boolean identifying = true;
+
+		if(key.startsWith(NON_IDENTIFYING_FLAG)) {
+			identifying = false;
+		}
+
+		return identifying;
 	}
 
 	/**

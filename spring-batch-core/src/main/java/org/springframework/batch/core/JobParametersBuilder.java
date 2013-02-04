@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2007 the original author or authors.
+ * Copyright 2006-2013 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -28,9 +28,13 @@ import org.springframework.util.Assert;
  * to ensure typesafety. Once created, it can be used in the
  * same was a java.lang.StringBuilder (except, order is irrelevant), by adding
  * various parameter types and creating a valid {@link JobParameters} once
- * finished.
- * 
+ * finished.<br/>
+ * <br/>
+ * Using the identifying flag indicates if the parameter will be used
+ * in the identification of a JobInstance.  That flag defaults to true.
+ *
  * @author Lucas Ward
+ * @author Michael Minella
  * @since 1.0
  * @see JobParameters
  * @see JobParameter
@@ -55,57 +59,109 @@ public class JobParametersBuilder {
 	}
 
 	/**
-	 * Add a new String parameter for the given key.
-	 * 
+	 * Add a new identifying String parameter for the given key.
+	 *
 	 * @param key - parameter accessor.
 	 * @param parameter - runtime parameter
-	 * @return a refernece to this object.
+	 * @return a reference to this object.
 	 */
 	public JobParametersBuilder addString(String key, String parameter) {
-		parameterMap.put(key, new JobParameter(parameter));
+		parameterMap.put(key, new JobParameter(parameter, true));
+		return this;
+	}
+
+	/**
+	 * Add a new String parameter for the given key.
+	 *
+	 * @param key - parameter accessor.
+	 * @param parameter - runtime parameter
+	 * @param identifying - indicates if the parameter is used as part of identifying a job instance
+	 * @return a reference to this object.
+	 */
+	public JobParametersBuilder addString(String key, String parameter, boolean identifying) {
+		parameterMap.put(key, new JobParameter(parameter, identifying));
+		return this;
+	}
+
+	/**
+	 * Add a new identifying {@link Date} parameter for the given key.
+	 *
+	 * @param key - parameter accessor.
+	 * @param parameter - runtime parameter
+	 * @return a reference to this object.
+	 */
+	public JobParametersBuilder addDate(String key, Date parameter) {
+		parameterMap.put(key, new JobParameter(parameter, true));
 		return this;
 	}
 
 	/**
 	 * Add a new {@link Date} parameter for the given key.
-	 * 
+	 *
 	 * @param key - parameter accessor.
 	 * @param parameter - runtime parameter
-	 * @return a refernece to this object.
+	 * @param identifying - indicates if the parameter is used as part of identifying a job instance
+	 * @return a reference to this object.
 	 */
-	public JobParametersBuilder addDate(String key, Date parameter) {
-		parameterMap.put(key, new JobParameter(parameter));
+	public JobParametersBuilder addDate(String key, Date parameter, boolean identifying) {
+		parameterMap.put(key, new JobParameter(parameter, identifying));
 		return this;
 	}
 
 	/**
-	 * Add a new Long parameter for the given key.
-	 * 
+	 * Add a new identifying Long parameter for the given key.
+	 *
 	 * @param key - parameter accessor.
 	 * @param parameter - runtime parameter
 	 * @return a reference to this object.
 	 */
 	public JobParametersBuilder addLong(String key, Long parameter) {
-		parameterMap.put(key, new JobParameter(parameter));
+		parameterMap.put(key, new JobParameter(parameter, true));
 		return this;
 	}
-	
+
 	/**
-	 * Add a new Double parameter for the given key.
-	 * 
+	 * Add a new Long parameter for the given key.
+	 *
+	 * @param key - parameter accessor.
+	 * @param parameter - runtime parameter
+	 * @param identifying - indicates if the parameter is used as part of identifying a job instance
+	 * @return a reference to this object.
+	 */
+	public JobParametersBuilder addLong(String key, Long parameter, boolean identifying) {
+		parameterMap.put(key, new JobParameter(parameter, identifying));
+		return this;
+	}
+
+	/**
+	 * Add a new identifying Double parameter for the given key.
+	 *
 	 * @param key - parameter accessor.
 	 * @param parameter - runtime parameter
 	 * @return a reference to this object.
 	 */
 	public JobParametersBuilder addDouble(String key, Double parameter) {
-		parameterMap.put(key, new JobParameter(parameter));
+		parameterMap.put(key, new JobParameter(parameter, true));
+		return this;
+	}
+
+	/**
+	 * Add a new Double parameter for the given key.
+	 *
+	 * @param key - parameter accessor.
+	 * @param parameter - runtime parameter
+	 * @param identifying - indicates if the parameter is used as part of identifying a job instance
+	 * @return a reference to this object.
+	 */
+	public JobParametersBuilder addDouble(String key, Double parameter, boolean identifying) {
+		parameterMap.put(key, new JobParameter(parameter, identifying));
 		return this;
 	}
 
 	/**
 	 * Conversion method that takes the current state of this builder and
 	 * returns it as a JobruntimeParameters object.
-	 * 
+	 *
 	 * @return a valid {@link JobParameters} object.
 	 */
 	public JobParameters toJobParameters() {
@@ -114,7 +170,7 @@ public class JobParametersBuilder {
 
 	/**
 	 * Add a new {@link JobParameter} for the given key.
-	 * 
+	 *
 	 * @param key - parameter accessor
 	 * @param jobParameter - runtime parameter
 	 * @return a reference to this object.

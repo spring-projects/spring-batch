@@ -31,7 +31,7 @@ public class SystemCommandTaskletIntegrationTests {
 	private SystemCommandTasklet tasklet = new SystemCommandTasklet();
 
 	private StepExecution stepExecution = new StepExecution("systemCommandStep", new JobExecution(new JobInstance(1L,
-			new JobParameters(), "systemCommandJob")));
+			"systemCommandJob"), new JobParameters()));
 
 	@Before
 	public void setUp() throws Exception {

@@ -74,7 +74,7 @@ public class JdbcJobDaoQueryTests extends TestCase {
 				return 1;
 			}
 		});
-		JobExecution jobExecution = new JobExecution(new JobInstance(new Long(11), new JobParameters(), "testJob"));
+		JobExecution jobExecution = new JobExecution(new JobInstance(new Long(11), "testJob"), new JobParameters());
 
 		jobExecutionDao.saveJobExecution(jobExecution);
 		assertEquals(1, list.size());
