@@ -51,12 +51,13 @@ public class StepScopeTests {
 
 	@Before
 	public void setUp() throws Exception {
+		StepSynchronizationManager.release();
 		context = StepSynchronizationManager.register(stepExecution);
 	}
 
 	@After
 	public void tearDown() throws Exception {
-		StepSynchronizationManager.release();
+		StepSynchronizationManager.close();
 	}
 
 	@Test
