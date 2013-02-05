@@ -25,19 +25,18 @@ import org.springframework.batch.core.JobInstance;
 import org.springframework.batch.core.JobParameters;
 import org.springframework.batch.core.StepContribution;
 import org.springframework.batch.core.StepExecution;
-import org.springframework.batch.core.step.tasklet.MethodInvokingTaskletAdapter;
 
 /**
  * @author Dave Syer
  *
  */
 public class StepHandlerAdapterTests {
-	
+
 	private MethodInvokingTaskletAdapter tasklet = new MethodInvokingTaskletAdapter();
 	private Object result = null;
-	
+
 	private StepExecution stepExecution = new StepExecution("systemCommandStep", new JobExecution(new JobInstance(1L,
-			new JobParameters(), "systemCommandJob")));
+			"systemCommandJob"), new JobParameters()));
 
 	public ExitStatus execute() {
 		return ExitStatus.NOOP;

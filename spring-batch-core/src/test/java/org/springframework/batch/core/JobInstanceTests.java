@@ -21,18 +21,18 @@ import org.springframework.batch.support.SerializationUtils;
 
 /**
  * @author dsyer
- * 
+ *
  */
 public class JobInstanceTests extends TestCase {
 
-	private JobInstance instance = new JobInstance(new Long(11), new JobParameters(), "job");
+	private JobInstance instance = new JobInstance(new Long(11), "job");
 
 	/**
 	 * Test method for
 	 * {@link org.springframework.batch.core.JobInstance#getJobName()}.
 	 */
 	public void testGetName() {
-		instance = new JobInstance(new Long(1), new JobParameters(), "foo");
+		instance = new JobInstance(new Long(1), "foo");
 		assertEquals("foo", instance.getJobName());
 	}
 
@@ -42,24 +42,21 @@ public class JobInstanceTests extends TestCase {
 
 	public void testCreateWithNulls() {
 		try {
-			new JobInstance(null, null, null);
+			new JobInstance(null, null);
 			fail("job instance can't exist without job specified");
 		}
 		catch (IllegalArgumentException e) {
 			// expected
 		}
-		instance = new JobInstance(null, null, "testJob");
+		instance = new JobInstance(null, "testJob");
 		assertEquals("testJob", instance.getJobName());
-		assertEquals(0, instance.getJobParameters().getParameters().size());
 	}
 
 	public void testSerialization() {
-		instance = new JobInstance(new Long(1), new JobParametersBuilder().addDouble("doubleKey", Double.valueOf(5.1))
-				.toJobParameters(), "jobName");
-		
-		byte[] serialized = SerializationUtils.serialize(instance);
-		
-		assertEquals(instance, SerializationUtils.deserialize(serialized));
+		instance = new JobInstance(new Long(1), "jobName");
 
+		byte[] serialized = SerializationUtils.serialize(instance);
+
+		assertEquals(instance, SerializationUtils.deserialize(serialized));
 	}
 }

@@ -36,7 +36,7 @@ public class MapJobExecutionDaoTests extends AbstractJobExecutionDaoTests {
 	@Test
 	public void testPersistentCopy() {
 		JobExecutionDao tested = new MapJobExecutionDao();
-		JobExecution jobExecution = new JobExecution(new JobInstance((long) 1, new JobParameters(), "mapJob"));
+		JobExecution jobExecution = new JobExecution(new JobInstance((long) 1, "mapJob"), new JobParameters());
 
 		assertNull(jobExecution.getStartTime());
 		tested.saveJobExecution(jobExecution);
@@ -71,7 +71,7 @@ public class MapJobExecutionDaoTests extends AbstractJobExecutionDaoTests {
 			@Override
 			public void run() {
 				try {
-					JobExecution jobExecution = new JobExecution(new JobInstance((long) -1, new JobParameters(), "mapJob"));
+					JobExecution jobExecution = new JobExecution(new JobInstance((long) -1, "mapJob"), new JobParameters());
 					latch.await();
 					tested.saveJobExecution(jobExecution);
 					ids.add(jobExecution.getId());

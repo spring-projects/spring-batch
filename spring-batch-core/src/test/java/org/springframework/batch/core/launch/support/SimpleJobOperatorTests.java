@@ -16,6 +16,7 @@
 package org.springframework.batch.core.launch.support;
 
 import static org.easymock.EasyMock.createMock;
+import static org.easymock.EasyMock.expect;
 import static org.easymock.EasyMock.expectLastCall;
 import static org.easymock.EasyMock.replay;
 import static org.easymock.EasyMock.verify;
@@ -113,7 +114,7 @@ public class SimpleJobOperatorTests {
 			@Override
 			public JobExecution run(Job job, JobParameters jobParameters) throws JobExecutionAlreadyRunningException,
 			JobRestartException, JobInstanceAlreadyCompleteException {
-				return new JobExecution(new JobInstance(123L, jobParameters, job.getName()), 999L);
+				return new JobExecution(new JobInstance(123L, job.getName()), 999L, jobParameters);
 			}
 		});
 
@@ -161,9 +162,9 @@ public class SimpleJobOperatorTests {
 	 */
 	@Test
 	public void testStartNextInstanceSunnyDay() throws Exception {
-		final JobParameters jobParameters = new JobParameters();
-		jobExplorer.getJobInstances("foo", 0, 1);
-		EasyMock.expectLastCall().andReturn(Collections.singletonList(new JobInstance(321L, jobParameters, "foo")));
+		JobInstance jobInstance = new JobInstance(321L, "foo");
+		expect(jobExplorer.getJobInstances("foo", 0, 1)).andReturn(Collections.singletonList(jobInstance));
+		expect(jobExplorer.getJobExecutions(jobInstance)).andReturn(Collections.singletonList(new JobExecution(jobInstance, new JobParameters())));
 		EasyMock.replay(jobExplorer);
 		Long value = jobOperator.startNextInstance("foo");
 		assertEquals(999, value.longValue());
@@ -202,7 +203,7 @@ public class SimpleJobOperatorTests {
 		jobParameters = new JobParameters();
 		jobExplorer.getJobExecution(111L);
 		EasyMock.expectLastCall()
-		.andReturn(new JobExecution(new JobInstance(123L, jobParameters, job.getName()), 111L));
+		.andReturn(new JobExecution(new JobInstance(123L, job.getName()), 111L, jobParameters));
 		EasyMock.replay(jobExplorer);
 		Long value = jobOperator.restart(111L);
 		assertEquals(999, value.longValue());
@@ -213,7 +214,7 @@ public class SimpleJobOperatorTests {
 	public void testGetSummarySunnyDay() throws Exception {
 		jobParameters = new JobParameters();
 		jobExplorer.getJobExecution(111L);
-		JobExecution jobExecution = new JobExecution(new JobInstance(123L, jobParameters, job.getName()), 111L);
+		JobExecution jobExecution = new JobExecution(new JobInstance(123L, job.getName()), 111L, jobParameters);
 		EasyMock.expectLastCall().andReturn(jobExecution);
 		EasyMock.replay(jobExplorer);
 		String value = jobOperator.getSummary(111L);
@@ -240,7 +241,7 @@ public class SimpleJobOperatorTests {
 	public void testGetStepExecutionSummariesSunnyDay() throws Exception {
 		jobParameters = new JobParameters();
 		jobExplorer.getJobExecution(111L);
-		JobExecution jobExecution = new JobExecution(new JobInstance(123L, jobParameters, job.getName()), 111L);
+		JobExecution jobExecution = new JobExecution(new JobInstance(123L, job.getName()), 111L, jobParameters);
 		jobExecution.createStepExecution("step1");
 		jobExecution.createStepExecution("step2");
 		jobExecution.getStepExecutions().iterator().next().setId(21L);
@@ -270,7 +271,7 @@ public class SimpleJobOperatorTests {
 	public void testFindRunningExecutionsSunnyDay() throws Exception {
 		jobParameters = new JobParameters();
 		jobExplorer.findRunningJobExecutions("foo");
-		JobExecution jobExecution = new JobExecution(new JobInstance(123L, jobParameters, job.getName()), 111L);
+		JobExecution jobExecution = new JobExecution(new JobInstance(123L, job.getName()), 111L, jobParameters);
 		EasyMock.expectLastCall().andReturn(Collections.singleton(jobExecution));
 		EasyMock.replay(jobExplorer);
 		Set<Long> value = jobOperator.getRunningExecutions("foo");
@@ -298,7 +299,7 @@ public class SimpleJobOperatorTests {
 		final JobParameters jobParameters = new JobParameters();
 		jobExplorer.getJobExecution(111L);
 		EasyMock.expectLastCall()
-		.andReturn(new JobExecution(new JobInstance(123L, jobParameters, job.getName()), 111L));
+		.andReturn(new JobExecution(new JobInstance(123L, job.getName()), 111L, jobParameters));
 		EasyMock.replay(jobExplorer);
 		String value = jobOperator.getParameters(111L);
 		assertEquals("a=b", value);
@@ -321,9 +322,8 @@ public class SimpleJobOperatorTests {
 
 	@Test
 	public void testGetLastInstancesSunnyDay() throws Exception {
-		jobParameters = new JobParameters();
 		jobExplorer.getJobInstances("foo", 0, 2);
-		JobInstance jobInstance = new JobInstance(123L, jobParameters, job.getName());
+		JobInstance jobInstance = new JobInstance(123L, job.getName());
 		EasyMock.expectLastCall().andReturn(Collections.singletonList(jobInstance));
 		EasyMock.replay(jobExplorer);
 		List<Long> value = jobOperator.getJobInstances("foo", 0, 2);
@@ -356,10 +356,10 @@ public class SimpleJobOperatorTests {
 
 	@Test
 	public void testGetExecutionsSunnyDay() throws Exception {
-		JobInstance jobInstance = new JobInstance(123L, jobParameters, job.getName());
+		JobInstance jobInstance = new JobInstance(123L, job.getName());
 		jobExplorer.getJobInstance(123L);
 		EasyMock.expectLastCall().andReturn(jobInstance);
-		JobExecution jobExecution = new JobExecution(jobInstance, 111L);
+		JobExecution jobExecution = new JobExecution(jobInstance, 111L, jobParameters);
 		jobExplorer.getJobExecutions(jobInstance);
 		EasyMock.expectLastCall().andReturn(Collections.singletonList(jobExecution));
 		EasyMock.replay(jobExplorer);
@@ -385,8 +385,8 @@ public class SimpleJobOperatorTests {
 
 	@Test
 	public void testStop() throws Exception{
-		JobInstance jobInstance = new JobInstance(123L, jobParameters, job.getName());
-		JobExecution jobExecution = new JobExecution(jobInstance, 111L);
+		JobInstance jobInstance = new JobInstance(123L, job.getName());
+		JobExecution jobExecution = new JobExecution(jobInstance, 111L, jobParameters);
 		jobExplorer.getJobExecution(111L);
 		expectLastCall().andReturn(jobExecution);
 		jobRepository.update(jobExecution);
@@ -400,8 +400,8 @@ public class SimpleJobOperatorTests {
 
 	@Test
 	public void testAbort() throws Exception {
-		JobInstance jobInstance = new JobInstance(123L, jobParameters, job.getName());
-		JobExecution jobExecution = new JobExecution(jobInstance, 111L);
+		JobInstance jobInstance = new JobInstance(123L, job.getName());
+		JobExecution jobExecution = new JobExecution(jobInstance, 111L, jobParameters);
 		jobExecution.setStatus(BatchStatus.STOPPING);
 		jobExplorer.getJobExecution(123L);
 		expectLastCall().andReturn(jobExecution);
@@ -414,8 +414,8 @@ public class SimpleJobOperatorTests {
 
 	@Test(expected = JobExecutionAlreadyRunningException.class)
 	public void testAbortNonStopping() throws Exception {
-		JobInstance jobInstance = new JobInstance(123L, jobParameters, job.getName());
-		JobExecution jobExecution = new JobExecution(jobInstance, 111L);
+		JobInstance jobInstance = new JobInstance(123L, job.getName());
+		JobExecution jobExecution = new JobExecution(jobInstance, 111L, jobParameters);
 		jobExecution.setStatus(BatchStatus.STARTED);
 		jobExplorer.getJobExecution(123L);
 		expectLastCall().andReturn(jobExecution);

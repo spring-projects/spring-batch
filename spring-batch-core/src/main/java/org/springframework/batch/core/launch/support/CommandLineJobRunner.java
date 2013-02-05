@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2008 the original author or authors.
+ * Copyright 2006-2013 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -67,7 +67,7 @@ import org.springframework.util.StringUtils;
  * restarted. However, a code of 10 might mean that something critical has
  * happened and the issue should be escalated.
  * </p>
- * 
+ *
  * <p>
  * With any launch of a batch job within Spring Batch, a Spring context
  * containing the {@link Job} and some execution context has to be created. This
@@ -82,7 +82,7 @@ import org.springframework.util.StringUtils;
  * exception is thrown by this class, it will be mapped to an integer and
  * returned.
  * </p>
- * 
+ *
  * <p>
  * Notice a property is available to set the {@link SystemExiter}. This class is
  * used to exit from the main method, rather than calling System.exit()
@@ -91,16 +91,16 @@ import org.springframework.util.StringUtils;
  * possible to do, however it is a complex solution, much more so than
  * strategizing the exiter.
  * </p>
- * 
+ *
  * <p>
  * The arguments to this class can be provided on the command line (separated by
  * spaces), or through stdin (separated by new line). They are as follows:
  * </p>
- * 
+ *
  * <code>
  * jobPath <options> jobIdentifier (jobParameters)*
  * </code>
- * 
+ *
  * <p>
  * The command line options are as follows
  * <ul>
@@ -116,13 +116,13 @@ import org.springframework.util.StringUtils;
  * specified in the form of <code>key=value</code> pairs.
  * </ul>
  * </p>
- * 
+ *
  * <p>
  * If the <code>-next</code> option is used the parameters on the command line
  * (if any) are appended to those retrieved from the incrementer, overriding any
  * with the same key.
  * </p>
- * 
+ *
  * <p>
  * The combined application context must contain only one instance of
  * {@link JobLauncher}. The job parameters passed in to the command line will be
@@ -133,14 +133,14 @@ import org.springframework.util.StringUtils;
  * application context (if there is one, or a
  * {@link DefaultJobParametersConverter} otherwise). Below is an example
  * arguments list: "
- * 
+ *
  * <p>
  * <code>
- * java org.springframework.batch.core.launch.support.CommandLineJobRunner testJob.xml 
- * testJob schedule.date=2008/01/24 vendor.id=3902483920 
+ * java org.springframework.batch.core.launch.support.CommandLineJobRunner testJob.xml
+ * testJob schedule.date=2008/01/24 vendor.id=3902483920
  * <code>
  * </p>
- * 
+ *
  * <p>
  * Once arguments have been successfully parsed, autowiring will be used to set
  * various dependencies. The {@JobLauncher} for example, will be
@@ -152,7 +152,7 @@ import org.springframework.util.StringUtils;
  * it will be used, if not the beanFactory will be asked, using the
  * jobIdentifier as the bean id.
  * </p>
- * 
+ *
  * @author Dave Syer
  * @author Lucas Ward
  * @since 1.0
@@ -178,9 +178,11 @@ public class CommandLineJobRunner {
 
 	private JobRepository jobRepository;
 
+	private final static List<String> VALID_OPTS = Arrays.asList(new String [] {"-restart", "-next", "-stop", "-abandon"});
+
 	/**
 	 * Injection setter for the {@link JobLauncher}.
-	 * 
+	 *
 	 * @param launcher the launcher to set
 	 */
 	public void setLauncher(JobLauncher launcher) {
@@ -196,7 +198,7 @@ public class CommandLineJobRunner {
 
 	/**
 	 * Injection setter for {@link JobExplorer}.
-	 * 
+	 *
 	 * @param jobExplorer the {@link JobExplorer} to set
 	 */
 	public void setJobExplorer(JobExplorer jobExplorer) {
@@ -205,7 +207,7 @@ public class CommandLineJobRunner {
 
 	/**
 	 * Injection setter for the {@link ExitCodeMapper}.
-	 * 
+	 *
 	 * @param exitCodeMapper the exitCodeMapper to set
 	 */
 	public void setExitCodeMapper(ExitCodeMapper exitCodeMapper) {
@@ -216,8 +218,8 @@ public class CommandLineJobRunner {
 	 * Static setter for the {@link SystemExiter} so it can be adjusted before
 	 * dependency injection. Typically overridden by
 	 * {@link #setSystemExiter(SystemExiter)}.
-	 * 
-	 * @param systemExitor
+	 *
+	 * @param systemExiter
 	 */
 	public static void presetSystemExiter(SystemExiter systemExiter) {
 		CommandLineJobRunner.systemExiter = systemExiter;
@@ -227,7 +229,7 @@ public class CommandLineJobRunner {
 	 * Retrieve the error message set by an instance of
 	 * {@link CommandLineJobRunner} as it exits. Empty if the last job launched
 	 * was successful.
-	 * 
+	 *
 	 * @return the error message
 	 */
 	public static String getErrorMessage() {
@@ -236,8 +238,8 @@ public class CommandLineJobRunner {
 
 	/**
 	 * Injection setter for the {@link SystemExiter}.
-	 * 
-	 * @param systemExitor
+	 *
+	 * @param systemExiter
 	 */
 	public void setSystemExiter(SystemExiter systemExiter) {
 		CommandLineJobRunner.systemExiter = systemExiter;
@@ -245,7 +247,7 @@ public class CommandLineJobRunner {
 
 	/**
 	 * Injection setter for {@link JobParametersConverter}.
-	 * 
+	 *
 	 * @param jobParametersConverter
 	 */
 	public void setJobParametersConverter(JobParametersConverter jobParametersConverter) {
@@ -254,7 +256,7 @@ public class CommandLineJobRunner {
 
 	/**
 	 * Delegate to the exiter to (possibly) exit the VM gracefully.
-	 * 
+	 *
 	 * @param status
 	 */
 	public void exit(int status) {
@@ -295,7 +297,7 @@ public class CommandLineJobRunner {
 					.splitArrayElementsIntoProperties(parameters, "="));
 			Assert.isTrue(parameters == null || parameters.length == 0 || !jobParameters.isEmpty(),
 					"Invalid JobParameters " + Arrays.asList(parameters)
-							+ ". If parameters are provided they should be in the form name=value (no whitespace).");
+					+ ". If parameters are provided they should be in the form name=value (no whitespace).");
 
 			if (opts.contains("-stop")) {
 				List<JobExecution> jobExecutions = getRunningJobExecutions(jobIdentifier);
@@ -327,7 +329,7 @@ public class CommandLineJobRunner {
 					throw new JobExecutionNotFailedException("No failed or stopped execution found for job="
 							+ jobIdentifier);
 				}
-				jobParameters = jobExecution.getJobInstance().getJobParameters();
+				jobParameters = jobExecution.getJobParameters();
 				jobName = jobExecution.getJobInstance().getJobName();
 			}
 
@@ -476,7 +478,8 @@ public class CommandLineJobRunner {
 			}
 		}
 		else {
-			jobParameters = incrementer.getNext(lastInstances.get(0).getJobParameters());
+			List<JobExecution> lastExecutions = jobExplorer.getJobExecutions(lastInstances.get(0));
+			jobParameters = incrementer.getNext(lastExecutions.get(0).getJobParameters());
 		}
 		return jobParameters;
 	}
@@ -490,7 +493,7 @@ public class CommandLineJobRunner {
 	 * Spring context).<br/>
 	 * Parameters can be provided in the form key=value, and will be converted
 	 * using the injected {@link JobParametersConverter}.
-	 * 
+	 *
 	 * @param args <p>
 	 * <ul>
 	 * <li>-restart: (optional) if the job has failed or stopped and the most
@@ -543,7 +546,7 @@ public class CommandLineJobRunner {
 		String jobIdentifier = null;
 
 		for (String arg : newargs) {
-			if (arg.startsWith("-")) {
+			if (VALID_OPTS.contains(arg)) {
 				opts.add(arg);
 			}
 			else {

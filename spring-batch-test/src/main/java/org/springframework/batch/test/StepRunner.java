@@ -45,7 +45,7 @@ import org.springframework.batch.item.ExecutionContext;
  * Utility class for executing steps outside of a {@link Job}. This is useful in
  * end to end testing in order to allow for the testing of a step individually
  * without running every Step in a job.
- * 
+ *
  * <ul>
  * <li><b>launchStep(Step step)</b>: Launch the step with new parameters each
  * time. (The current system time will be used)
@@ -53,12 +53,12 @@ import org.springframework.batch.item.ExecutionContext;
  * specified step with the provided JobParameters. This may be useful if your
  * step requires a certain parameter during runtime.
  * </ul>
- * 
+ *
  * It should be noted that any checked exceptions encountered while running the
  * Step will wrapped with RuntimeException. Any checked exception thrown will be
  * due to a framework error, not the logic of the step, and thus requiring a
  * throws declaration in clients of this class is unnecessary.
- * 
+ *
  * @author Dan Garrette
  * @author Lucas Ward
  * @since 2.0
@@ -82,8 +82,8 @@ public class StepRunner {
 	 * Launch just the specified step as its own job. A unique set of
 	 * JobParameters will automatically be generated. An IllegalStateException
 	 * is thrown if there is no Step with the given name.
-	 * 
-	 * @param stepName The name of the step to launch
+	 *
+	 * @param step The step to launch
 	 * @return JobExecution
 	 */
 	public JobExecution launchStep(Step step) {
@@ -94,8 +94,8 @@ public class StepRunner {
 	 * Launch just the specified step as its own job. A unique set of
 	 * JobParameters will automatically be generated. An IllegalStateException
 	 * is thrown if there is no Step with the given name.
-	 * 
-	 * @param stepName The name of the step to launch
+	 *
+	 * @param step The step to launch
 	 * @param jobExecutionContext An ExecutionContext whose values will be
 	 * loaded into the Job ExecutionContext prior to launching the step.
 	 * @return JobExecution
@@ -107,8 +107,8 @@ public class StepRunner {
 	/**
 	 * Launch just the specified step as its own job. An IllegalStateException
 	 * is thrown if there is no Step with the given name.
-	 * 
-	 * @param stepName The name of the step to launch
+	 *
+	 * @param step The step to launch
 	 * @param jobParameters The JobParameters to use during the launch
 	 * @return JobExecution
 	 */
@@ -119,8 +119,8 @@ public class StepRunner {
 	/**
 	 * Launch just the specified step as its own job. An IllegalStateException
 	 * is thrown if there is no Step with the given name.
-	 * 
-	 * @param stepName The name of the step to launch
+	 *
+	 * @param step The step to launch
 	 * @param jobParameters The JobParameters to use during the launch
 	 * @param jobExecutionContext An ExecutionContext whose values will be
 	 * loaded into the Job ExecutionContext prior to launching the step.
@@ -143,7 +143,7 @@ public class StepRunner {
 		//
 		if (jobExecutionContext != null && !jobExecutionContext.isEmpty()) {
 			job.setJobExecutionListeners(new JobExecutionListener[] { new JobExecutionListenerSupport() {
-                @Override
+				@Override
 				public void beforeJob(JobExecution jobExecution) {
 					ExecutionContext jobContext = jobExecution.getExecutionContext();
 					for (Map.Entry<String, Object> entry : jobExecutionContext.entrySet()) {
@@ -161,7 +161,7 @@ public class StepRunner {
 
 	/**
 	 * Launch the given job
-	 * 
+	 *
 	 * @param job
 	 * @param jobParameters
 	 */

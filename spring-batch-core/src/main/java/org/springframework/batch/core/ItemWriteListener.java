@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2008 the original author or authors.
+ * Copyright 2006-2013 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,30 +17,31 @@ package org.springframework.batch.core;
 
 import java.util.List;
 
+import org.springframework.batch.core.scope.context.ChunkContext;
 import org.springframework.batch.item.ItemWriter;
 
 /**
  * Listener interface for the writing of items.  Implementations
  * of this interface will be notified before, after, and in case
  * of any exception thrown while writing a list of items.
- * 
+ *
  * @author Lucas Ward
- * 
+ *
  */
 public interface ItemWriteListener<S> extends StepListener {
 
 	/**
 	 * Called before {@link ItemWriter#write(java.util.List)}
-	 * 
+	 *
 	 * @param items to be written
 	 */
 	void beforeWrite(List<? extends S> items);
 
 	/**
-	 * Called after {@link ItemWriter#write(java.util.List)} This will be 
-	 * called before any transaction is committed, and before 
-	 * {@link ChunkListener#afterChunk()}
-	 * 
+	 * Called after {@link ItemWriter#write(java.util.List)} This will be
+	 * called before any transaction is committed, and before
+	 * {@link ChunkListener#afterChunk(ChunkContext)}
+	 *
 	 * @param items written items
 	 */
 	void afterWrite(List<? extends S> items);
@@ -50,7 +51,7 @@ public interface ItemWriteListener<S> extends StepListener {
 	 * transaction, but the transaction will normally be rolled back. There is
 	 * no way to identify from this callback which of the items (if any) caused
 	 * the error.
-	 * 
+	 *
 	 * @param exception thrown from {@link ItemWriter}
 	 * @param items attempted to be written.
 	 */

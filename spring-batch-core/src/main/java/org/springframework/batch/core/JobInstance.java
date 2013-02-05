@@ -19,8 +19,7 @@ package org.springframework.batch.core;
 import org.springframework.util.Assert;
 
 /**
- * Batch domain object representing a uniquely identifiable job run - it's
- * identity is given by the pair {@link Job} and {@link JobParameters}.
+ * Batch domain object representing a uniquely identifiable job run.
  * JobInstance can be restarted multiple times in case of execution failure and
  * it's lifecycle ends with first successful execution.
  *
@@ -35,28 +34,18 @@ import org.springframework.util.Assert;
  * @author Lucas Ward
  * @author Dave Syer
  * @author Robert Kasanicky
+ * @author Michael Minella
  *
  */
-@SuppressWarnings("unchecked")
+@SuppressWarnings("serial")
 public class JobInstance extends Entity {
-
-	private final JobParameters jobParameters;
 
 	private final String jobName;
 
-	public JobInstance(Long id, JobParameters jobParameters, String jobName) {
+	public JobInstance(Long id, String jobName) {
 		super(id);
 		Assert.hasLength(jobName);
-		// Assert.hasLength(job.getName());
-		this.jobParameters = jobParameters == null ? new JobParameters() : jobParameters;
 		this.jobName = jobName;
-	}
-
-	/**
-	 * @return {@link JobParameters}
-	 */
-	public JobParameters getJobParameters() {
-		return jobParameters;
 	}
 
 	/**
@@ -68,7 +57,7 @@ public class JobInstance extends Entity {
 
 	@Override
 	public String toString() {
-		return super.toString() + ", JobParameters=[" + jobParameters + "]" + ", Job=[" + jobName + "]";
+		return super.toString() + ", Job=[" + jobName + "]";
 	}
 
 }

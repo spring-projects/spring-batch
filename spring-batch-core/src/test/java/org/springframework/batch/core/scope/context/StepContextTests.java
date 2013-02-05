@@ -40,7 +40,7 @@ public class StepContextTests {
 
 	private List<String> list = new ArrayList<String>();
 
-	private StepExecution stepExecution = new StepExecution("step", new JobExecution(new JobInstance(2L, null, "job"), 0L), 1L);
+	private StepExecution stepExecution = new StepExecution("step", new JobExecution(new JobInstance(2L, "job"), 0L, null), 1L);
 
 	private StepContext context = new StepContext(stepExecution);
 
@@ -169,8 +169,9 @@ public class StepContextTests {
 	@Test
 	public void testJobParameters() throws Exception {
 		JobParameters jobParameters = new JobParametersBuilder().addString("foo", "bar").toJobParameters();
-		JobInstance jobInstance = new JobInstance(0L, jobParameters, "foo");
-		stepExecution.getJobExecution().setJobInstance(jobInstance);
+		JobInstance instance = stepExecution.getJobExecution().getJobInstance();
+		stepExecution = new StepExecution("step", new JobExecution(instance, jobParameters));
+		context = new StepContext(stepExecution);
 		assertEquals("bar", context.getJobParameters().get("foo"));
 	}
 

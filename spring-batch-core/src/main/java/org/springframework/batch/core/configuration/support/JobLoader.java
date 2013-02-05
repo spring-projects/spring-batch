@@ -1,5 +1,5 @@
 /*
- * Copyright 2009-2010 the original author or authors.
+ * Copyright 2009-2013 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,17 +22,17 @@ import org.springframework.batch.core.configuration.DuplicateJobException;
 
 /**
  * @author Dave Syer
- * 
+ *
  * @since 2.1
  */
 public interface JobLoader {
 
 	/**
 	 * Load an application context and register all the jobs.
-	 * 
+	 *
 	 * @param factory a factory for an application context (containing jobs)
 	 * @return a collection of the jobs created
-	 * 
+	 *
 	 * @throws DuplicateJobException if a job with the same name was already
 	 * registered
 	 */
@@ -43,12 +43,9 @@ public interface JobLoader {
 	 * unregistered them if already registered. Implementations should also take
 	 * care to close and clean up the application context previously created if
 	 * possible (either from this factory or from one with the same jobs).
-	 * 
+	 *
 	 * @param factory a factory for an application context (containing jobs)
 	 * @return a collection of the jobs created
-	 * 
-	 * @throws DuplicateJobException if a job with the same name was already
-	 * registered
 	 */
 	Collection<Job> reload(ApplicationContextFactory factory);
 

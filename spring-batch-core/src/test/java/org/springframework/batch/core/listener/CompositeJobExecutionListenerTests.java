@@ -82,7 +82,7 @@ public class CompositeJobExecutionListenerTests extends TestCase {
 				list.add("foo");
 			}
 		});
-		listener.beforeJob(new JobExecution(new JobInstance(new Long(11L), null, "testOpenJob")));
+		listener.beforeJob(new JobExecution(new JobInstance(new Long(11L), "testOpenJob"), null));
 		assertEquals(1, list.size());
 	}
 

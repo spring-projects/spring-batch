@@ -52,7 +52,7 @@ public class StagingItemWriterTests {
 	@Before
 	public void onSetUpBeforeTransaction() throws Exception {
 		StepExecution stepExecution = new StepExecution("stepName", new JobExecution(new JobInstance(12L,
-				new JobParameters(), "testJob")));
+				"testJob"), new JobParameters()));
 		writer.beforeStep(stepExecution);
 	}
 

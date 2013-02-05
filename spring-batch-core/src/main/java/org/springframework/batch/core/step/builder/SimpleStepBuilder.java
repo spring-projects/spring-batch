@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2011 the original author or authors.
+ * Copyright 2006-2013 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -45,11 +45,11 @@ import org.springframework.util.Assert;
  * Step builder for simple item processing (chunk oriented) steps. Items are read and cached in chunks, and then
  * processed (transformed) and written (optionally either the processor or the writer can be omitted) all in the same
  * transaction.
- * 
+ *
  * @see FaultTolerantStepBuilder for a step that handles retry and skip of failed items
- * 
+ *
  * @author Dave Syer
- * 
+ *
  * @since 2.2
  */
 public class SimpleStepBuilder<I, O> extends AbstractTaskletStepBuilder<SimpleStepBuilder<I, O>> {
@@ -74,16 +74,16 @@ public class SimpleStepBuilder<I, O> extends AbstractTaskletStepBuilder<SimpleSt
 
 	/**
 	 * Create a new builder initialized with any properties in the parent. The parent is copied, so it can be re-used.
-	 * 
+	 *
 	 * @param parent a parent helper containing common step properties
 	 */
 	public SimpleStepBuilder(StepBuilderHelper<?> parent) {
 		super(parent);
 	}
-	
+
 	/**
 	 * Create a new builder initialized with any properties in the parent. The parent is copied, so it can be re-used.
-	 * 
+	 *
 	 * @param parent a parent helper containing common step properties
 	 */
 	protected SimpleStepBuilder(SimpleStepBuilder<I, O> parent) {
@@ -97,7 +97,7 @@ public class SimpleStepBuilder<I, O> extends AbstractTaskletStepBuilder<SimpleSt
 		this.itemListeners = parent.itemListeners;
 		this.readerTransactionalQueue = parent.readerTransactionalQueue;
 	}
-	
+
 	public FaultTolerantStepBuilder<I, O> faultTolerant() {
 		FaultTolerantStepBuilder<I, O> builder = new FaultTolerantStepBuilder<I, O>(this);
 		return builder;
@@ -105,7 +105,7 @@ public class SimpleStepBuilder<I, O> extends AbstractTaskletStepBuilder<SimpleSt
 
 	/**
 	 * Build a step with the reader, writer, processor as provided.
-	 * 
+	 *
 	 * @see org.springframework.batch.core.step.builder.AbstractTaskletStepBuilder#build()
 	 */
 	@Override
@@ -130,9 +130,9 @@ public class SimpleStepBuilder<I, O> extends AbstractTaskletStepBuilder<SimpleSt
 
 	/**
 	 * Sets the chunk size or commit interval for this step. This is the maximum number of items that will be read
-	 * before processing starts in a single transaction. Not compatible with {@link #completionPolicy(CompletionPolicy)}
+	 * before processing starts in a single transaction. Not compatible with {@link #completionPolicy}
 	 * .
-	 * 
+	 *
 	 * @param chunkSize the chunk size (a.k.a commit interval)
 	 * @return this for fluent chaining
 	 */
@@ -146,7 +146,7 @@ public class SimpleStepBuilder<I, O> extends AbstractTaskletStepBuilder<SimpleSt
 	/**
 	 * Sets a completion policy for the chunk processing. Items are read until this policy determines that a chunk is
 	 * complete, giving more control than with just the {@link #chunk(int) chunk size} (or commit interval).
-	 * 
+	 *
 	 * @param completionPolicy a completion policy for the chunk
 	 * @return this for fluent chaining
 	 */
@@ -160,7 +160,7 @@ public class SimpleStepBuilder<I, O> extends AbstractTaskletStepBuilder<SimpleSt
 	/**
 	 * An item reader that provides a stream of items. Will be automatically registered as a {@link #stream(ItemStream)}
 	 * or listener if it implements the corresponding interface. By default assumed to be non-transactional.
-	 * 
+	 *
 	 * @see #readerTransactionalQueue
 	 * @param reader an item reader
 	 * @return this for fluent chaining
@@ -173,7 +173,7 @@ public class SimpleStepBuilder<I, O> extends AbstractTaskletStepBuilder<SimpleSt
 	/**
 	 * An item writer that writes a chunk of items. Will be automatically registered as a {@link #stream(ItemStream)} or
 	 * listener if it implements the corresponding interface.
-	 * 
+	 *
 	 * @param writer an item writer
 	 * @return this for fluent chaining
 	 */
@@ -185,7 +185,7 @@ public class SimpleStepBuilder<I, O> extends AbstractTaskletStepBuilder<SimpleSt
 	/**
 	 * An item processor that processes or transforms a stream of items. Will be automatically registered as a
 	 * {@link #stream(ItemStream)} or listener if it implements the corresponding interface.
-	 * 
+	 *
 	 * @param processor an item processor
 	 * @return this for fluent chaining
 	 */
@@ -198,7 +198,7 @@ public class SimpleStepBuilder<I, O> extends AbstractTaskletStepBuilder<SimpleSt
 	 * Sets a flag to say that the reader is transactional (usually a queue), which is to say that failed items might be
 	 * rolled back and re-presented in a subsequent transaction. Default is false, meaning that the items are read
 	 * outside a transaction and possibly cached.
-	 * 
+	 *
 	 * @return this for fluent chaining
 	 */
 	public SimpleStepBuilder<I, O> readerIsTransactionalQueue() {
@@ -208,7 +208,7 @@ public class SimpleStepBuilder<I, O> extends AbstractTaskletStepBuilder<SimpleSt
 
 	/**
 	 * Register an item reader listener.
-	 * 
+	 *
 	 * @param listener the listener to register
 	 * @return this for fluent chaining
 	 */
@@ -219,7 +219,7 @@ public class SimpleStepBuilder<I, O> extends AbstractTaskletStepBuilder<SimpleSt
 
 	/**
 	 * Register an item writer listener.
-	 * 
+	 *
 	 * @param listener the listener to register
 	 * @return this for fluent chaining
 	 */
@@ -230,7 +230,7 @@ public class SimpleStepBuilder<I, O> extends AbstractTaskletStepBuilder<SimpleSt
 
 	/**
 	 * Register an item processor listener.
-	 * 
+	 *
 	 * @param listener the listener to register
 	 * @return this for fluent chaining
 	 */
@@ -242,7 +242,7 @@ public class SimpleStepBuilder<I, O> extends AbstractTaskletStepBuilder<SimpleSt
 	/**
 	 * Instead of a {@link #chunk(int) chunk size} or {@link #chunk(CompletionPolicy) completion policy} you can provide
 	 * a complete repeat operations instance that handles the iteration over the item reader.
-	 * 
+	 *
 	 * @param repeatTemplate a cmplete repeat template for the chunk
 	 * @return this for fluent chaining
 	 */
@@ -318,7 +318,7 @@ public class SimpleStepBuilder<I, O> extends AbstractTaskletStepBuilder<SimpleSt
 					listener((ChunkListener) listener);
 				}
 				if (listener instanceof ItemReadListener<?> || listener instanceof ItemProcessListener<?, ?>
-						|| listener instanceof ItemWriteListener<?>) {
+				|| listener instanceof ItemWriteListener<?>) {
 					itemListeners.add(listener);
 				}
 			}

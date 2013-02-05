@@ -20,12 +20,14 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
-import java.util.Set;
-import java.util.concurrent.CopyOnWriteArraySet;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicLong;
 
+import org.springframework.batch.core.DefaultJobKeyGenerator;
 import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.JobInstance;
+import org.springframework.batch.core.JobKeyGenerator;
 import org.springframework.batch.core.JobParameters;
 import org.springframework.util.Assert;
 
@@ -35,7 +37,10 @@ import org.springframework.util.Assert;
 public class MapJobInstanceDao implements JobInstanceDao {
 
 	// JDK6 Make a ConcurrentSkipListSet: tends to add on end
-	private final Set<JobInstance> jobInstances = new CopyOnWriteArraySet<JobInstance>();
+	private final Map<String, JobInstance> jobInstances = new ConcurrentHashMap<String, JobInstance>();
+	//	private final Set<JobInstance> jobInstances = new CopyOnWriteArraySet<JobInstance>();
+
+	private JobKeyGenerator<JobParameters> jobKeyGenerator = new DefaultJobKeyGenerator();
 
 	private final AtomicLong currentId = new AtomicLong(0L);
 
@@ -48,28 +53,22 @@ public class MapJobInstanceDao implements JobInstanceDao {
 
 		Assert.state(getJobInstance(jobName, jobParameters) == null, "JobInstance must not already exist");
 
-		JobInstance jobInstance = new JobInstance(currentId.getAndIncrement(), jobParameters, jobName);
+		JobInstance jobInstance = new JobInstance(currentId.getAndIncrement(), jobName);
 		jobInstance.incrementVersion();
-		jobInstances.add(jobInstance);
+		jobInstances.put(jobName + jobKeyGenerator.generateKey(jobParameters), jobInstance);
 
 		return jobInstance;
 	}
 
 	@Override
 	public JobInstance getJobInstance(String jobName, JobParameters jobParameters) {
-
-		for (JobInstance instance : jobInstances) {
-			if (instance.getJobName().equals(jobName) && instance.getJobParameters().equals(jobParameters)) {
-				return instance;
-			}
-		}
-		return null;
-
+		return jobInstances.get(jobName + jobKeyGenerator.generateKey(jobParameters));
 	}
 
 	@Override
 	public JobInstance getJobInstance(Long instanceId) {
-		for (JobInstance instance : jobInstances) {
+		for (Map.Entry<String, JobInstance> instanceEntry : jobInstances.entrySet()) {
+			JobInstance instance = instanceEntry.getValue();
 			if (instance.getId().equals(instanceId)) {
 				return instance;
 			}
@@ -80,8 +79,8 @@ public class MapJobInstanceDao implements JobInstanceDao {
 	@Override
 	public List<String> getJobNames() {
 		List<String> result = new ArrayList<String>();
-		for (JobInstance instance : jobInstances) {
-			result.add(instance.getJobName());
+		for (Map.Entry<String, JobInstance> instanceEntry : jobInstances.entrySet()) {
+			result.add(instanceEntry.getValue().getJobName());
 		}
 		Collections.sort(result);
 		return result;
@@ -90,7 +89,8 @@ public class MapJobInstanceDao implements JobInstanceDao {
 	@Override
 	public List<JobInstance> getJobInstances(String jobName, int start, int count) {
 		List<JobInstance> result = new ArrayList<JobInstance>();
-		for (JobInstance instance : jobInstances) {
+		for (Map.Entry<String, JobInstance> instanceEntry : jobInstances.entrySet()) {
+			JobInstance instance = instanceEntry.getValue();
 			if (instance.getJobName().equals(jobName)) {
 				result.add(instance);
 			}

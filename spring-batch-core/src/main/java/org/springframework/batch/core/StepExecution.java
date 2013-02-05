@@ -385,10 +385,10 @@ public class StepExecution extends Entity {
 	 * that is null
 	 */
 	public JobParameters getJobParameters() {
-		if (jobExecution == null || jobExecution.getJobInstance() == null) {
+		if (jobExecution == null) {
 			return new JobParameters();
 		}
-		return jobExecution.getJobInstance().getJobParameters();
+		return jobExecution.getJobParameters();
 	}
 
 	/**

@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2008 the original author or authors.
+ * Copyright 2006-2013 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,6 +16,7 @@
 package org.springframework.batch.core.converter;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
@@ -34,13 +35,74 @@ import org.springframework.util.StringUtils;
 
 /**
  * @author Dave Syer
- * 
+ * @author Michael Minella
+ *
  */
 public class DefaultJobParametersConverterTests {
 
 	DefaultJobParametersConverter factory = new DefaultJobParametersConverter();
 
 	DateFormat dateFormat = new SimpleDateFormat("MM/dd/yyyy");
+
+	@Test
+	public void testGetParametersIdentifyingWithIdentifyingKey() throws Exception {
+		String jobKey = "+job.key=myKey";
+		String scheduleDate = "+schedule.date(date)=2008/01/23";
+		String vendorId = "+vendor.id(long)=33243243";
+
+		String[] args = new String[] { jobKey, scheduleDate, vendorId };
+
+		JobParameters props = factory.getJobParameters(StringUtils.splitArrayElementsIntoProperties(args, "="));
+		assertNotNull(props);
+		assertTrue(props.getParameters().get("job.key").isIdentifying());
+		assertTrue(props.getParameters().get("schedule.date").isIdentifying());
+		assertTrue(props.getParameters().get("vendor.id").isIdentifying());
+	}
+
+	@Test
+	public void testGetParametersIdentifyingByDefault() throws Exception {
+		String jobKey = "job.key=myKey";
+		String scheduleDate = "schedule.date(date)=2008/01/23";
+		String vendorId = "vendor.id(long)=33243243";
+
+		String[] args = new String[] { jobKey, scheduleDate, vendorId };
+
+		JobParameters props = factory.getJobParameters(StringUtils.splitArrayElementsIntoProperties(args, "="));
+		assertNotNull(props);
+		assertTrue(props.getParameters().get("job.key").isIdentifying());
+		assertTrue(props.getParameters().get("schedule.date").isIdentifying());
+		assertTrue(props.getParameters().get("vendor.id").isIdentifying());
+	}
+
+	@Test
+	public void testGetParametersNonIdentifying() throws Exception {
+		String jobKey = "-job.key=myKey";
+		String scheduleDate = "-schedule.date(date)=2008/01/23";
+		String vendorId = "-vendor.id(long)=33243243";
+
+		String[] args = new String[] { jobKey, scheduleDate, vendorId };
+
+		JobParameters props = factory.getJobParameters(StringUtils.splitArrayElementsIntoProperties(args, "="));
+		assertNotNull(props);
+		assertFalse(props.getParameters().get("job.key").isIdentifying());
+		assertFalse(props.getParameters().get("schedule.date").isIdentifying());
+		assertFalse(props.getParameters().get("vendor.id").isIdentifying());
+	}
+
+	@Test
+	public void testGetParametersMixed() throws Exception {
+		String jobKey = "+job.key=myKey";
+		String scheduleDate = "schedule.date(date)=2008/01/23";
+		String vendorId = "-vendor.id(long)=33243243";
+
+		String[] args = new String[] { jobKey, scheduleDate, vendorId };
+
+		JobParameters props = factory.getJobParameters(StringUtils.splitArrayElementsIntoProperties(args, "="));
+		assertNotNull(props);
+		assertTrue(props.getParameters().get("job.key").isIdentifying());
+		assertTrue(props.getParameters().get("schedule.date").isIdentifying());
+		assertFalse(props.getParameters().get("vendor.id").isIdentifying());
+	}
 
 	@Test
 	public void testGetParameters() throws Exception {
@@ -206,7 +268,7 @@ public class DefaultJobParametersConverterTests {
 	public void testRoundTrip() throws Exception {
 
 		String[] args = new String[] { "schedule.date(date)=2008/01/23", "job.key=myKey", "vendor.id(long)=33243243",
-				"double.key(double)=1.23" };
+		"double.key(double)=1.23" };
 
 		JobParameters parameters = factory.getJobParameters(StringUtils.splitArrayElementsIntoProperties(args, "="));
 
@@ -222,7 +284,7 @@ public class DefaultJobParametersConverterTests {
 	public void testRoundTripWithNumberFormat() throws Exception {
 
 		String[] args = new String[] { "schedule.date(date)=2008/01/23", "job.key=myKey", "vendor.id(long)=33243243",
-				"double.key(double)=1,23" };
+		"double.key(double)=1,23" };
 		NumberFormat format = NumberFormat.getInstance(Locale.GERMAN);
 		factory.setNumberFormat(format);
 
@@ -252,21 +314,21 @@ public class DefaultJobParametersConverterTests {
 	private boolean contains(String str, String searchStr) {
 		return str.indexOf(searchStr) != -1;
 	}
-	
+
 	@Test
 	public void testGetPropertiesWithNullValues() throws Exception {
-		
+
 		JobParameters parameters = new JobParametersBuilder().addDate("schedule.date", null)
 				.addString("job.key", null).addLong("vendor.id", null).addDouble("double.key", null)
 				.toJobParameters();
-		
+
 		Properties props = factory.getProperties(parameters);
 		assertNotNull(props);
-		
+
 		final String NOT_FOUND = "NOT FOUND";
-		assertEquals(NOT_FOUND, props.getProperty("schedule.date", NOT_FOUND));  
-		assertEquals(NOT_FOUND, props.getProperty("job.key", NOT_FOUND));  
-		assertEquals(NOT_FOUND, props.getProperty("vendor.id", NOT_FOUND));  
-		assertEquals(NOT_FOUND, props.getProperty("double.key", NOT_FOUND));  
+		assertEquals(NOT_FOUND, props.getProperty("schedule.date", NOT_FOUND));
+		assertEquals(NOT_FOUND, props.getProperty("job.key", NOT_FOUND));
+		assertEquals(NOT_FOUND, props.getProperty("vendor.id", NOT_FOUND));
+		assertEquals(NOT_FOUND, props.getProperty("double.key", NOT_FOUND));
 	}
 }

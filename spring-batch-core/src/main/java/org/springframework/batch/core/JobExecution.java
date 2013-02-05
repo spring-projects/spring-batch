@@ -34,10 +34,13 @@ import org.springframework.batch.item.ExecutionContext;
  * Batch domain object representing the execution of a job.
  *
  * @author Lucas Ward
+ * @author Michael Minella
  *
  */
 @SuppressWarnings("serial")
 public class JobExecution extends Entity {
+
+	private final JobParameters jobParameters;
 
 	private JobInstance jobInstance;
 
@@ -61,13 +64,14 @@ public class JobExecution extends Entity {
 
 	/**
 	 * Because a JobExecution isn't valid unless the job is set, this
-	 * constructor is the only valid one from a modelling point of view.
+	 * constructor is the only valid one from a modeling point of view.
 	 *
 	 * @param job the job of which this execution is a part
 	 */
-	public JobExecution(JobInstance job, Long id) {
+	public JobExecution(JobInstance job, Long id, JobParameters jobParameters) {
 		super(id);
 		this.jobInstance = job;
+		this.jobParameters = jobParameters == null ? new JobParameters() : jobParameters;
 	}
 
 	/**
@@ -75,12 +79,20 @@ public class JobExecution extends Entity {
 	 *
 	 * @param job the enclosing {@link JobInstance}
 	 */
-	public JobExecution(JobInstance job) {
-		this(job, null);
+	public JobExecution(JobInstance job, JobParameters jobParameters) {
+		this(job, null, jobParameters);
+	}
+
+	public JobExecution(Long id, JobParameters jobParameters) {
+		this(null, id, jobParameters);
 	}
 
 	public JobExecution(Long id) {
-		super(id);
+		this(null, id, null);
+	}
+
+	public JobParameters getJobParameters() {
+		return this.jobParameters;
 	}
 
 	public Date getEndTime() {
@@ -319,8 +331,8 @@ public class JobExecution extends Entity {
 	@Override
 	public String toString() {
 		return super.toString()
-				+ String.format(", startTime=%s, endTime=%s, lastUpdated=%s, status=%s, exitStatus=%s, job=[%s]",
-						startTime, endTime, lastUpdated, status, exitStatus, jobInstance);
+				+ String.format(", startTime=%s, endTime=%s, lastUpdated=%s, status=%s, exitStatus=%s, job=[%s], jobParameters=[%s]",
+						startTime, endTime, lastUpdated, status, exitStatus, jobInstance, jobParameters);
 	}
 
 	/**

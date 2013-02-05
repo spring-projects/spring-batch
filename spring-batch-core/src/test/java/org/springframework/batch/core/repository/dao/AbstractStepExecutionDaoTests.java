@@ -40,7 +40,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 /**
  * Tests for {@link StepExecutionDao} implementations.
- * 
+ *
  * @see #getStepExecutionDao()
  */
 public abstract class AbstractStepExecutionDaoTests extends AbstractTransactionalJUnit4SpringContextTests {
@@ -139,7 +139,7 @@ public abstract class AbstractStepExecutionDaoTests extends AbstractTransactiona
 	@Transactional
 	@Test
 	public void testGetForNotExistingJobExecution() {
-		assertNull(dao.getStepExecution(new JobExecution(jobInstance, (long) 777), 11L));
+		assertNull(dao.getStepExecution(new JobExecution(jobInstance, (long) 777, new JobParameters()), 11L));
 	}
 
 	/**

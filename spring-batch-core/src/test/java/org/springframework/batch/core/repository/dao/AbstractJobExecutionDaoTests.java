@@ -31,6 +31,8 @@ public abstract class AbstractJobExecutionDaoTests {
 
 	protected JobExecution execution;
 
+	protected JobParameters jobParameters;
+
 	/**
 	 * @return tested object ready for use
 	 */
@@ -48,8 +50,9 @@ public abstract class AbstractJobExecutionDaoTests {
 	@Before
 	public void onSetUp() throws Exception {
 		dao = getJobExecutionDao();
-		jobInstance = getJobInstanceDao().createJobInstance("execTestJob", new JobParameters());
-		execution = new JobExecution(jobInstance);
+		jobParameters = new JobParameters();
+		jobInstance = getJobInstanceDao().createJobInstance("execTestJob", jobParameters);
+		execution = new JobExecution(jobInstance, new JobParameters());
 	}
 
 	/**
@@ -81,7 +84,7 @@ public abstract class AbstractJobExecutionDaoTests {
 		List<JobExecution> execs = new ArrayList<JobExecution>();
 
 		for (int i = 0; i < 10; i++) {
-			JobExecution exec = new JobExecution(jobInstance);
+			JobExecution exec = new JobExecution(jobInstance, jobParameters);
 			exec.setCreateTime(new Date(i));
 			execs.add(exec);
 			dao.saveJobExecution(exec);
@@ -146,10 +149,10 @@ public abstract class AbstractJobExecutionDaoTests {
 	@Transactional
 	@Test
 	public void testGetLastExecution() {
-		JobExecution exec1 = new JobExecution(jobInstance);
+		JobExecution exec1 = new JobExecution(jobInstance, jobParameters);
 		exec1.setCreateTime(new Date(0));
 
-		JobExecution exec2 = new JobExecution(jobInstance);
+		JobExecution exec2 = new JobExecution(jobInstance, jobParameters);
 		exec2.setCreateTime(new Date(1));
 
 		dao.saveJobExecution(exec1);
@@ -176,13 +179,13 @@ public abstract class AbstractJobExecutionDaoTests {
 	@Test
 	public void testFindRunningExecutions() {
 
-		JobExecution exec = new JobExecution(jobInstance);
+		JobExecution exec = new JobExecution(jobInstance, jobParameters);
 		exec.setCreateTime(new Date(0));
 		exec.setEndTime(new Date(1L));
 		exec.setLastUpdated(new Date(5L));
 		dao.saveJobExecution(exec);
 
-		exec = new JobExecution(jobInstance);
+		exec = new JobExecution(jobInstance, jobParameters);
 		exec.setLastUpdated(new Date(5L));
 		exec.createStepExecution("step");
 		dao.saveJobExecution(exec);
@@ -219,7 +222,7 @@ public abstract class AbstractJobExecutionDaoTests {
 	@Transactional
 	@Test
 	public void testGetExecution() {
-		JobExecution exec = new JobExecution(jobInstance);
+		JobExecution exec = new JobExecution(jobInstance, jobParameters);
 		exec.setCreateTime(new Date(0));
 		exec.createStepExecution("step");
 
@@ -254,10 +257,10 @@ public abstract class AbstractJobExecutionDaoTests {
 	@Test
 	public void testConcurrentModificationException() {
 
-		JobExecution exec1 = new JobExecution(jobInstance);
+		JobExecution exec1 = new JobExecution(jobInstance, jobParameters);
 		dao.saveJobExecution(exec1);
 
-		JobExecution exec2 = new JobExecution(jobInstance);
+		JobExecution exec2 = new JobExecution(jobInstance, jobParameters);
 		exec2.setId(exec1.getId());
 
 		exec2.incrementVersion();
@@ -284,11 +287,11 @@ public abstract class AbstractJobExecutionDaoTests {
 	@Test
 	public void testSynchronizeStatusUpgrade() {
 
-		JobExecution exec1 = new JobExecution(jobInstance);
+		JobExecution exec1 = new JobExecution(jobInstance, jobParameters);
 		exec1.setStatus(BatchStatus.STOPPING);
 		dao.saveJobExecution(exec1);
 
-		JobExecution exec2 = new JobExecution(jobInstance);
+		JobExecution exec2 = new JobExecution(jobInstance, jobParameters);
 		Assert.state(exec1.getId() != null);
 		exec2.setId(exec1.getId());
 
@@ -311,11 +314,11 @@ public abstract class AbstractJobExecutionDaoTests {
 	@Test
 	public void testSynchronizeStatusDowngrade() {
 
-		JobExecution exec1 = new JobExecution(jobInstance);
+		JobExecution exec1 = new JobExecution(jobInstance, jobParameters);
 		exec1.setStatus(BatchStatus.STARTED);
 		dao.saveJobExecution(exec1);
 
-		JobExecution exec2 = new JobExecution(jobInstance);
+		JobExecution exec2 = new JobExecution(jobInstance, jobParameters);
 		Assert.state(exec1.getId() != null);
 		exec2.setId(exec1.getId());
 

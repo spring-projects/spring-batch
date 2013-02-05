@@ -18,9 +18,13 @@ package org.springframework.batch.core.repository.dao;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Timestamp;
 import java.sql.Types;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 
 import org.apache.commons.logging.Log;
@@ -29,6 +33,9 @@ import org.springframework.batch.core.BatchStatus;
 import org.springframework.batch.core.ExitStatus;
 import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.JobInstance;
+import org.springframework.batch.core.JobParameter;
+import org.springframework.batch.core.JobParameter.ParameterType;
+import org.springframework.batch.core.JobParameters;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.dao.OptimisticLockingFailureException;
@@ -78,6 +85,12 @@ public class JdbcJobExecutionDao extends AbstractJdbcBatchMetadataDao implements
 			+ "E.JOB_INSTANCE_ID from %PREFIX%JOB_EXECUTION E, %PREFIX%JOB_INSTANCE I where E.JOB_INSTANCE_ID=I.JOB_INSTANCE_ID and I.JOB_NAME=? and E.END_TIME is NULL order by E.JOB_EXECUTION_ID desc";
 
 	private static final String CURRENT_VERSION_JOB_EXECUTION = "SELECT VERSION FROM %PREFIX%JOB_EXECUTION WHERE JOB_EXECUTION_ID=?";
+
+	private static final String FIND_PARAMS_FROM_ID = "SELECT JOB_EXECUTION_ID, KEY_NAME, TYPE_CD, "
+			+ "STRING_VAL, DATE_VAL, LONG_VAL, DOUBLE_VAL, IDENTIFYING from %PREFIX%JOB_EXECUTION_PARAMS where JOB_EXECUTION_ID = ?";
+
+	private static final String CREATE_JOB_PARAMETERS = "INSERT into %PREFIX%JOB_EXECUTION_PARAMS(JOB_EXECUTION_ID, KEY_NAME, TYPE_CD, "
+			+ "STRING_VAL, DATE_VAL, LONG_VAL, DOUBLE_VAL, IDENTIFYING) values (?, ?, ?, ?, ?, ?, ?, ?)";
 
 	private int exitMessageLength = DEFAULT_EXIT_MESSAGE_LENGTH;
 
@@ -144,6 +157,8 @@ public class JdbcJobExecutionDao extends AbstractJdbcBatchMetadataDao implements
 				parameters,
 				new int[] { Types.BIGINT, Types.BIGINT, Types.TIMESTAMP, Types.TIMESTAMP, Types.VARCHAR,
 					Types.VARCHAR, Types.VARCHAR, Types.INTEGER, Types.TIMESTAMP, Types.TIMESTAMP });
+
+		insertJobParameters(jobExecution.getId(), jobExecution.getJobParameters());
 	}
 
 	/**
@@ -292,14 +307,93 @@ public class JdbcJobExecutionDao extends AbstractJdbcBatchMetadataDao implements
 	}
 
 	/**
+	 * Convenience method that inserts all parameters from the provided
+	 * JobParameters.
+	 *
+	 */
+	private void insertJobParameters(Long executionId, JobParameters jobParameters) {
+
+		for (Entry<String, JobParameter> entry : jobParameters.getParameters()
+				.entrySet()) {
+			JobParameter jobParameter = entry.getValue();
+			insertParameter(executionId, jobParameter.getType(), entry.getKey(),
+					jobParameter.getValue(), jobParameter.isIdentifying());
+		}
+	}
+
+	/**
+	 * Convenience method that inserts an individual records into the
+	 * JobParameters table.
+	 */
+	private void insertParameter(Long executionId, ParameterType type, String key,
+			Object value, boolean identifying) {
+
+		Object[] args = new Object[0];
+		int[] argTypes = new int[] { Types.BIGINT, Types.VARCHAR,
+				Types.VARCHAR, Types.VARCHAR, Types.TIMESTAMP, Types.BIGINT,
+				Types.DOUBLE, Types.CHAR };
+
+		String identifyingFlag = identifying? "Y":"N";
+
+		if (type == ParameterType.STRING) {
+			args = new Object[] { executionId, key, type, value, new Timestamp(0L),
+					0L, 0D, identifyingFlag};
+		} else if (type == ParameterType.LONG) {
+			args = new Object[] { executionId, key, type, "", new Timestamp(0L),
+					value, new Double(0), identifyingFlag};
+		} else if (type == ParameterType.DOUBLE) {
+			args = new Object[] { executionId, key, type, "", new Timestamp(0L), 0L,
+					value, identifyingFlag};
+		} else if (type == ParameterType.DATE) {
+			args = new Object[] { executionId, key, type, "", value, 0L, 0D, identifyingFlag};
+		}
+
+		getJdbcTemplate().update(getQuery(CREATE_JOB_PARAMETERS), args, argTypes);
+	}
+
+	/**
+	 * @param executionId
+	 * @return
+	 */
+	private JobParameters getJobParameters(Long executionId) {
+		final Map<String, JobParameter> map = new HashMap<String, JobParameter>();
+		RowCallbackHandler handler = new RowCallbackHandler() {
+			@Override
+			public void processRow(ResultSet rs) throws SQLException {
+				ParameterType type = ParameterType.valueOf(rs.getString(3));
+				JobParameter value = null;
+
+				if (type == ParameterType.STRING) {
+					value = new JobParameter(rs.getString(4), rs.getString(8).equalsIgnoreCase("Y"));
+				} else if (type == ParameterType.LONG) {
+					value = new JobParameter(rs.getLong(6), rs.getString(8).equalsIgnoreCase("Y"));
+				} else if (type == ParameterType.DOUBLE) {
+					value = new JobParameter(rs.getDouble(7), rs.getString(8).equalsIgnoreCase("Y"));
+				} else if (type == ParameterType.DATE) {
+					value = new JobParameter(rs.getTimestamp(5), rs.getString(8).equalsIgnoreCase("Y"));
+				}
+
+				// No need to assert that value is not null because it's an enum
+				map.put(rs.getString(2), value);
+			}
+		};
+
+		getJdbcTemplate().query(getQuery(FIND_PARAMS_FROM_ID), new Object[] { executionId }, handler);
+
+		return new JobParameters(map);
+	}
+
+	/**
 	 * Re-usable mapper for {@link JobExecution} instances.
 	 *
 	 * @author Dave Syer
 	 *
 	 */
-	private static class JobExecutionRowMapper implements ParameterizedRowMapper<JobExecution> {
+	private final class JobExecutionRowMapper implements ParameterizedRowMapper<JobExecution> {
 
 		private JobInstance jobInstance;
+
+		private JobParameters jobParameters;
 
 		public JobExecutionRowMapper() {
 		}
@@ -312,12 +406,15 @@ public class JdbcJobExecutionDao extends AbstractJdbcBatchMetadataDao implements
 		public JobExecution mapRow(ResultSet rs, int rowNum) throws SQLException {
 			Long id = rs.getLong(1);
 			JobExecution jobExecution;
+			if (jobParameters == null) {
+				jobParameters = getJobParameters(id);
+			}
 
 			if (jobInstance == null) {
-				jobExecution = new JobExecution(id);
+				jobExecution = new JobExecution(id, jobParameters);
 			}
 			else {
-				jobExecution = new JobExecution(jobInstance, id);
+				jobExecution = new JobExecution(jobInstance, id, jobParameters);
 			}
 
 			jobExecution.setStartTime(rs.getTimestamp(2));

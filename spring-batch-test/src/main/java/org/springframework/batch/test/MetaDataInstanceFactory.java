@@ -28,9 +28,9 @@ import org.springframework.batch.support.PropertiesConverter;
 /**
  * Convenience methods for creating test instances of {@link JobExecution},
  * {@link JobInstance} and {@link StepExecution}.
- * 
+ *
  * @author Dave Syer
- * 
+ *
  */
 public class MetaDataInstanceFactory {
 
@@ -61,54 +61,28 @@ public class MetaDataInstanceFactory {
 
 	/**
 	 * Create a {@link JobInstance} with the parameters provided.
-	 * 
-	 * @param jobName the name of the job
-	 * @param instanceId the Id of the {@link JobInstance}
-	 * @param jobParameters comma or new line separated name=value pairs
-	 * @return a {@link JobInstance}
-	 */
-	public static JobInstance createJobInstance(String jobName, Long instanceId, String jobParameters) {
-		JobParameters params = new DefaultJobParametersConverter().getJobParameters(PropertiesConverter
-				.stringToProperties(jobParameters));
-		return createJobInstance(jobName, instanceId, params);
-	}
-
-	/**
-	 * Create a {@link JobInstance} with the parameters provided.
-	 * 
-	 * @param jobName the name of the job
-	 * @param instanceId the Id of the {@link JobInstance}
-	 * @param jobParameters an instance of {@link JobParameters}
-	 * @return a {@link JobInstance}
-	 */
-	public static JobInstance createJobInstance(String jobName, Long instanceId, JobParameters jobParameters) {
-		return new JobInstance(instanceId, jobParameters, jobName);
-	}
-
-	/**
-	 * Create a {@link JobInstance} with the parameters provided.
-	 * 
+	 *
 	 * @param jobName the name of the job
 	 * @param instanceId the Id of the {@link JobInstance}
 	 * @return a {@link JobInstance} with empty {@link JobParameters}
 	 */
 	public static JobInstance createJobInstance(String jobName, Long instanceId) {
-		return new JobInstance(instanceId, new JobParameters(), jobName);
+		return new JobInstance(instanceId, jobName);
 	}
 
 	/**
 	 * Create a {@link JobInstance} with default parameters.
-	 * 
+	 *
 	 * @return a {@link JobInstance} with name=DEFAULT_JOB_NAME,
 	 * id=DEFAULT_JOB_INSTANCE_ID and empty parameters
 	 */
 	public static JobInstance createJobInstance() {
-		return new JobInstance(DEFAULT_JOB_INSTANCE_ID, new JobParameters(), DEFAULT_JOB_NAME);
+		return new JobInstance(DEFAULT_JOB_INSTANCE_ID, DEFAULT_JOB_NAME);
 	}
 
 	/**
 	 * Create a {@link JobExecution} with default parameters.
-	 * 
+	 *
 	 * @return a {@link JobExecution} with id=DEFAULT_JOB_EXECUTION_ID
 	 */
 	public static JobExecution createJobExecution() {
@@ -117,7 +91,7 @@ public class MetaDataInstanceFactory {
 
 	/**
 	 * Create a {@link JobExecution} with the parameters provided.
-	 * 
+	 *
 	 * @param executionId the id for the {@link JobExecution}
 	 * @return a {@link JobExecution} with valid {@link JobInstance}
 	 */
@@ -127,7 +101,7 @@ public class MetaDataInstanceFactory {
 
 	/**
 	 * Create a {@link JobExecution} with the parameters provided.
-	 * 
+	 *
 	 * @param jobName the name of the job
 	 * @param instanceId the id for the {@link JobInstance}
 	 * @param executionId the id for the {@link JobExecution}
@@ -139,7 +113,7 @@ public class MetaDataInstanceFactory {
 
 	/**
 	 * Create a {@link JobExecution} with the parameters provided.
-	 * 
+	 *
 	 * @param jobName the name of the job
 	 * @param instanceId the Id of the {@link JobInstance}
 	 * @param executionId the id for the {@link JobExecution}
@@ -155,7 +129,7 @@ public class MetaDataInstanceFactory {
 
 	/**
 	 * Create a {@link JobExecution} with the parameters provided.
-	 * 
+	 *
 	 * @param jobName the name of the job
 	 * @param instanceId the Id of the {@link JobInstance}
 	 * @param executionId the id for the {@link JobExecution}
@@ -164,12 +138,12 @@ public class MetaDataInstanceFactory {
 	 */
 	public static JobExecution createJobExecution(String jobName, Long instanceId, Long executionId,
 			JobParameters jobParameters) {
-		return new JobExecution(createJobInstance(jobName, instanceId, jobParameters), executionId);
+		return new JobExecution(createJobInstance(jobName, instanceId), executionId, jobParameters);
 	}
 
 	/**
 	 * Create a {@link StepExecution} with default parameters.
-	 * 
+	 *
 	 * @return a {@link StepExecution} with stepName="step" and
 	 * id=DEFAULT_STEP_EXECUTION_ID
 	 */
@@ -179,7 +153,7 @@ public class MetaDataInstanceFactory {
 
 	/**
 	 * Create a {@link StepExecution} with the parameters provided.
-	 * 
+	 *
 	 * @param stepName the stepName for the {@link StepExecution}
 	 * @param executionId the id for the {@link StepExecution}
 	 * @return a {@link StepExecution} with a {@link JobExecution} having
@@ -191,7 +165,7 @@ public class MetaDataInstanceFactory {
 
 	/**
 	 * Create a {@link StepExecution} with the parameters provided.
-	 * 
+	 *
 	 * @param stepName the stepName for the {@link StepExecution}
 	 * @param executionId the id for the {@link StepExecution}
 	 * @return a {@link StepExecution} with the given {@link JobExecution}
@@ -205,7 +179,7 @@ public class MetaDataInstanceFactory {
 	/**
 	 * Create a {@link JobExecution} with the parameters provided with attached
 	 * step executions.
-	 * 
+	 *
 	 * @param executionId the {@link JobExecution} id
 	 * @param stepNames the names of the step executions
 	 * @return a {@link JobExecution} with step executions as specified, each
@@ -225,10 +199,10 @@ public class MetaDataInstanceFactory {
 	 * Create a {@link StepExecution} and all its parent entities with default
 	 * values, but using the {@link ExecutionContext} and {@link JobParameters}
 	 * provided.
-	 * 
+	 *
 	 * @param jobParameters come {@link JobParameters}
 	 * @param executionContext some {@link ExecutionContext}
-	 * 
+	 *
 	 * @return a {@link StepExecution} with the execution context provided
 	 */
 	public static StepExecution createStepExecution(JobParameters jobParameters, ExecutionContext executionContext) {
@@ -240,7 +214,7 @@ public class MetaDataInstanceFactory {
 	/**
 	 * Create a {@link StepExecution} and all its parent entities with default
 	 * values, but using the {@link JobParameters} provided.
-	 * 
+	 *
 	 * @param jobParameters some {@link JobParameters}
 	 * @return a {@link StepExecution} with the job parameters provided
 	 */
@@ -253,7 +227,7 @@ public class MetaDataInstanceFactory {
 	/**
 	 * Create a {@link StepExecution} and all its parent entities with default
 	 * values, but using the {@link ExecutionContext} provided.
-	 * 
+	 *
 	 * @param executionContext some {@link ExecutionContext}
 	 * @return a {@link StepExecution} with the execution context provided
 	 */

@@ -39,7 +39,7 @@ import org.springframework.test.jdbc.JdbcTestUtils;
 
 /**
  * @author Dave Syer
- * 
+ *
  */
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(locations = "/simple-job-launcher-context.xml")
@@ -65,7 +65,7 @@ public class JobRepositoryTestUtilsTests {
 		beforeJobs = JdbcTestUtils.countRowsInTable(jdbcTemplate, "BATCH_JOB_EXECUTION");
 		beforeSteps = JdbcTestUtils.countRowsInTable(jdbcTemplate, "BATCH_STEP_EXECUTION");
 	}
-	
+
 	@Test(expected=IllegalArgumentException.class)
 	public void testMandatoryProperties() throws Exception {
 		utils = new JobRepositoryTestUtils();
@@ -134,14 +134,14 @@ public class JobRepositoryTestUtilsTests {
 	public void testCreateJobExecutionsWithIncrementer() throws Exception {
 		utils = new JobRepositoryTestUtils(jobRepository, dataSource);
 		utils.setJobParametersIncrementer(new JobParametersIncrementer() {
-            @Override
+			@Override
 			public JobParameters getNext(JobParameters parameters) {
 				return new JobParametersBuilder().addString("foo","bar").toJobParameters();
 			}
 		});
 		List<JobExecution> list = utils.createJobExecutions(1);
 		assertEquals(1, list.size());
-		assertEquals("bar", list.get(0).getJobInstance().getJobParameters().getString("foo"));
+		assertEquals("bar", list.get(0).getJobParameters().getString("foo"));
 		utils.removeJobExecutions(list);
 		assertEquals(beforeJobs, JdbcTestUtils.countRowsInTable(jdbcTemplate, "BATCH_JOB_EXECUTION"));
 	}

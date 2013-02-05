@@ -16,8 +16,13 @@
 
 package org.springframework.batch.core.repository.support;
 
-import static org.easymock.EasyMock.*;
-import static org.junit.Assert.*;
+import static org.easymock.EasyMock.createMock;
+import static org.easymock.EasyMock.replay;
+import static org.easymock.EasyMock.verify;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -43,9 +48,9 @@ import org.springframework.batch.core.step.StepSupport;
  * Test SimpleJobRepository. The majority of test cases are tested using
  * EasyMock, however, there were some issues with using it for the stepExecutionDao when
  * testing finding or creating steps, so an actual mock class had to be written.
- * 
+ *
  * @author Lucas Ward
- * 
+ *
  */
 public class SimpleJobRepositoryTests {
 
@@ -58,13 +63,13 @@ public class SimpleJobRepositoryTests {
 	Step stepConfiguration1;
 
 	Step stepConfiguration2;
-	
+
 	JobExecutionDao jobExecutionDao;
-	
+
 	JobInstanceDao jobInstanceDao;
 
 	StepExecutionDao stepExecutionDao;
-	
+
 	ExecutionContextDao ecDao;
 
 	JobInstance jobInstance;
@@ -74,7 +79,7 @@ public class SimpleJobRepositoryTests {
 	String databaseStep2;
 
 	List<String> steps;
-	
+
 	JobExecution jobExecution;
 
 	@Before
@@ -103,7 +108,7 @@ public class SimpleJobRepositoryTests {
 
 		job.setSteps(stepConfigurations);
 
-		jobInstance = new JobInstance(1L, jobParameters, job.getName());
+		jobInstance = new JobInstance(1L, job.getName());
 
 		databaseStep1 = "dbStep1";
 		databaseStep2 = "dbStep2";
@@ -112,14 +117,14 @@ public class SimpleJobRepositoryTests {
 		steps.add(databaseStep1);
 		steps.add(databaseStep2);
 
-		jobExecution = new JobExecution(new JobInstance(1L, jobParameters, job.getName()), 1L);
+		jobExecution = new JobExecution(new JobInstance(1L, job.getName()), 1L, jobParameters);
 	}
 
 	@Test
 	public void testSaveOrUpdateInvalidJobExecution() {
 
 		// failure scenario - must have job ID
-		JobExecution jobExecution = new JobExecution(null, null);
+		JobExecution jobExecution = new JobExecution((JobInstance) null, (JobParameters) null);
 		try {
 			jobRepository.update(jobExecution);
 			fail();
@@ -132,13 +137,13 @@ public class SimpleJobRepositoryTests {
 	@Test
 	public void testUpdateValidJobExecution() throws Exception {
 
-		JobExecution jobExecution = new JobExecution(new JobInstance(1L, jobParameters, job.getName()), 1L);
+		JobExecution jobExecution = new JobExecution(new JobInstance(1L, job.getName()), 1L, jobParameters);
 		// new execution - call update on job dao
 		jobExecutionDao.updateJobExecution(jobExecution);
 		replay(jobExecutionDao);
 		jobRepository.update(jobExecution);
 		verify(jobExecutionDao);
-		
+
 		assertNotNull(jobExecution.getLastUpdated());
 	}
 
@@ -156,45 +161,45 @@ public class SimpleJobRepositoryTests {
 			// expected
 		}
 	}
-	
+
 	@Test
 	public void testSaveStepExecutionSetsLastUpdated(){
-		
+
 		StepExecution stepExecution = new StepExecution("stepName", jobExecution);
-		
-		long before = System.currentTimeMillis(); 
-		
+
+		long before = System.currentTimeMillis();
+
 		jobRepository.add(stepExecution);
-		
+
 		assertNotNull(stepExecution.getLastUpdated());
-		
+
 		long lastUpdated = stepExecution.getLastUpdated().getTime();
 		assertTrue(lastUpdated > (before - 1000));
 	}
-	
+
 	@Test
 	public void testUpdateStepExecutionSetsLastUpdated(){
-		
+
 		StepExecution stepExecution = new StepExecution("stepName", jobExecution);
 		stepExecution.setId(2343L);
-		
-		long before = System.currentTimeMillis(); 
-		
+
+		long before = System.currentTimeMillis();
+
 		jobRepository.update(stepExecution);
-		
+
 		assertNotNull(stepExecution.getLastUpdated());
-		
+
 		long lastUpdated = stepExecution.getLastUpdated().getTime();
 		assertTrue(lastUpdated > (before - 1000));
 	}
-	
+
 	@Test
 	public void testInterrupted(){
-		
+
 		jobExecution.setStatus(BatchStatus.STOPPING);
 		StepExecution stepExecution = new StepExecution("stepName", jobExecution);
 		stepExecution.setId(323L);
-		
+
 		jobRepository.update(stepExecution);
 		assertTrue(stepExecution.isTerminateOnly());
 	}

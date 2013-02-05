@@ -14,6 +14,7 @@ import org.springframework.batch.core.job.JobSupport;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.annotation.DirtiesContext;
+import org.springframework.test.annotation.DirtiesContext.ClassMode;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.transaction.annotation.Transactional;
@@ -25,6 +26,7 @@ import org.springframework.transaction.annotation.Transactional;
  */
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration
+@DirtiesContext(classMode=ClassMode.AFTER_EACH_TEST_METHOD)
 public class SimpleJobRepositoryProxyTests {
 
 	@Autowired
@@ -37,7 +39,6 @@ public class SimpleJobRepositoryProxyTests {
 
 	@Transactional
 	@Test(expected=IllegalStateException.class)
-	@DirtiesContext
 	public void testCreateAndFindWithExistingTransaction() throws Exception {
 		assertFalse(advice.invoked);
 		JobExecution jobExecution = jobRepository.createJobExecution(job.getName(), new JobParameters());
@@ -46,7 +47,6 @@ public class SimpleJobRepositoryProxyTests {
 	}
 
 	@Test
-	@DirtiesContext
 	public void testCreateAndFindNoTransaction() throws Exception {
 		assertFalse(advice.invoked);
 		JobExecution jobExecution = jobRepository.createJobExecution(job.getName(), new JobParameters());
