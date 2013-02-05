@@ -22,15 +22,16 @@ public class JdbcStepExecutionDaoTests extends AbstractStepExecutionDaoTests {
 
 	@Override
 	protected JobRepository getJobRepository() {
-		deleteFromTables("BATCH_JOB_EXECUTION_CONTEXT", "BATCH_STEP_EXECUTION_CONTEXT", "BATCH_STEP_EXECUTION", "BATCH_JOB_EXECUTION",
-				"BATCH_JOB_EXECUTION_PARAMS", "BATCH_JOB_INSTANCE");
+		deleteFromTables("BATCH_JOB_EXECUTION_CONTEXT", "BATCH_STEP_EXECUTION_CONTEXT", "BATCH_STEP_EXECUTION",
+				"BATCH_JOB_EXECUTION_PARAMS", "BATCH_JOB_EXECUTION", "BATCH_JOB_INSTANCE");
 		return (JobRepository) applicationContext.getBean("jobRepository");
 	}
 
 	/**
 	 * Long exit descriptions are truncated on both save and update.
 	 */
-	@Transactional @Test
+	@Transactional
+	@Test
 	public void testTruncateExitDescription() {
 
 		StringBuffer sb = new StringBuffer();

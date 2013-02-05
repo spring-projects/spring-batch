@@ -47,10 +47,13 @@ import org.springframework.core.task.SimpleAsyncTaskExecutor;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.transaction.PlatformTransactionManager;
+import org.springframework.transaction.TransactionStatus;
+import org.springframework.transaction.support.TransactionCallback;
+import org.springframework.transaction.support.TransactionTemplate;
 
 /**
  * @author Dave Syer
- *
+ * 
  */
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(locations = "/org/springframework/batch/core/repository/dao/sql-dao-test.xml")
@@ -126,16 +129,21 @@ public class AsyncChunkOrientedStepIntegrationTests {
 			}
 		}, chunkOperations));
 
-		JobExecution jobExecution = jobRepository.createJobExecution(job.getName(), new JobParameters(Collections
-				.singletonMap("run.id", new JobParameter(getClass().getName() + ".1"))));
+		final JobExecution jobExecution = jobRepository.createJobExecution(job.getName(),
+				new JobParameters(Collections.singletonMap("run.id", new JobParameter(getClass().getName() + ".1"))));
 		StepExecution stepExecution = new StepExecution(step.getName(), jobExecution);
 
 		jobRepository.add(stepExecution);
 		step.execute(stepExecution);
 		assertEquals(BatchStatus.COMPLETED, stepExecution.getStatus());
-		dataSource.setMaxActive(2);
-		StepExecution lastStepExecution = jobRepository.getLastStepExecution(jobExecution.getJobInstance(), step
-				.getName());
+		// Need a transaction so one connection is enough to get job execution and its parameters
+		StepExecution lastStepExecution = new TransactionTemplate(transactionManager)
+				.execute(new TransactionCallback<StepExecution>() {
+					@Override
+					public StepExecution doInTransaction(TransactionStatus status) {
+						return jobRepository.getLastStepExecution(jobExecution.getJobInstance(), step.getName());
+					}
+				});
 		assertEquals(lastStepExecution, stepExecution);
 		assertFalse(lastStepExecution == stepExecution);
 	}
