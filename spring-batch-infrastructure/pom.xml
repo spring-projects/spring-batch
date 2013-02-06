@@ -44,8 +44,8 @@
 			<artifactId>easymock</artifactId>
 		</dependency>
         <dependency>
-            <groupId>org.easymock</groupId>
-            <artifactId>easymockclassextension</artifactId>
+            <groupId>org.mockito</groupId>
+            <artifactId>mockito-core</artifactId>
         </dependency>
 		<dependency>
 			<groupId>org.aspectj</groupId>
