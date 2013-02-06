@@ -186,11 +186,11 @@ multiResource          |x |  |  |  |  |  |  |x |  |  |  |x |
   one place, since it contains a static constant value (<<<QUERY>>>)
   which is used to configure the query for the writer.
 
-* Amqp Job Sample ({AmqpJobFunctionalTest})
+* Amqp Job Sample ({AmqpJobFunctionalTests})
 
   This sample shows the use of Spring Batch to write to an <<<AmqpItemWriter>>>.
   The AmqpItemReader and Writer were contributed by Chris Schaeffer and
-  a blog entry can be found at http://blog.dtzq.com/2012/08/spring-batch-amqp-itemreader-itemwriter.html.
+  a blog entry can be found at {{http://blog.dtzq.com/2012/08/spring-batch-amqp-itemreader-itemwriter.html}}.
   It is modeled after the JmsItemReader / Writer implementations, which
   are popular models for remote chunking. It leverages the AmqpTemplate.
 
