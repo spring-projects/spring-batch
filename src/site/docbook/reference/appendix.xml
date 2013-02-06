@@ -103,6 +103,13 @@
             received through the injected JmsOperations receive()
             method</entry>
           </row>
+          <row>
+            <entry align="left">AmqpItemReader</entry>
+
+            <entry align="left">Given a Spring AmqpTemplate it provides
+            synchronous receive methods. The receiveAndConvert() method 
+            lets you receive POJO objects. </entry>
+          </row>
 
           <row>
             <entry align="left">JpaPagingItemReader</entry>
@@ -217,6 +224,14 @@
             convert each item to XML and then writes it to an XML file using
             StAX.</entry>
           </row>
+          <row>
+            <entry align="left">AmqpItemWriter</entry>
+	    
+            <entry align="left">Given a Spring AmqpTemplate it provides
+            for synchronous send method. The convertAndSend(Object)
+             method lets you send POJO objects. </entry>
+          </row>
+
         </tbody>
       </tgroup>
     </table>
