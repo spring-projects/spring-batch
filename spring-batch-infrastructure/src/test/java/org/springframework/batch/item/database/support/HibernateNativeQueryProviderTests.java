@@ -16,10 +16,8 @@
 
 package org.springframework.batch.item.database.support;
 
-import static org.easymock.EasyMock.createMock;
-import static org.easymock.EasyMock.expect;
-import static org.easymock.EasyMock.replay;
-import static org.easymock.EasyMock.verify;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 import org.hibernate.SQLQuery;
 import org.hibernate.Session;
@@ -31,6 +29,7 @@ import org.springframework.util.Assert;
 /**
  * @author Anatoly Polinsky
  * @author Dave Syer
+ * @author Will Schipp
  */
 public class HibernateNativeQueryProviderTests {
 
@@ -46,18 +45,15 @@ public class HibernateNativeQueryProviderTests {
 		String sqlQuery = "select * from T_FOOS";
 		hibernateQueryProvider.setSqlQuery(sqlQuery);
 
-		StatelessSession session = createMock(StatelessSession.class);
-		SQLQuery query = createMock(SQLQuery.class);
+		StatelessSession session = mock(StatelessSession.class);
+		SQLQuery query = mock(SQLQuery.class);
 
-		expect(session.createSQLQuery(sqlQuery)).andReturn(query);
-		expect(query.addEntity(Foo.class)).andReturn(query);
-
-		replay(session, query);
+		when(session.createSQLQuery(sqlQuery)).thenReturn(query);
+		when(query.addEntity(Foo.class)).thenReturn(query);
 
 		hibernateQueryProvider.setStatelessSession(session);
 		Assert.notNull(hibernateQueryProvider.createQuery());
 
-		verify(session, query);
 	}
 
 	@Test
@@ -65,18 +61,15 @@ public class HibernateNativeQueryProviderTests {
 		String sqlQuery = "select * from T_FOOS";
 		hibernateQueryProvider.setSqlQuery(sqlQuery);
 
-		Session session = createMock(Session.class);
-		SQLQuery query = createMock(SQLQuery.class);
+		Session session = mock(Session.class);
+		SQLQuery query = mock(SQLQuery.class);
 
-		expect(session.createSQLQuery(sqlQuery)).andReturn(query);
-		expect(query.addEntity(Foo.class)).andReturn(query);
-
-		replay(session, query);
+		when(session.createSQLQuery(sqlQuery)).thenReturn(query);
+		when(query.addEntity(Foo.class)).thenReturn(query);
 
 		hibernateQueryProvider.setSession(session);
 		Assert.notNull(hibernateQueryProvider.createQuery());
 
-		verify(session, query);
 	}
 
 	private static class Foo {

@@ -1,9 +1,7 @@
 package org.springframework.batch.item.database;
 
-import static org.easymock.EasyMock.createMock;
-import static org.easymock.EasyMock.expect;
-import static org.easymock.EasyMock.replay;
-import static org.easymock.EasyMock.verify;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotSame;
@@ -38,21 +36,18 @@ public class ExtendedConnectionDataSourceProxyTests {
 
 	@Test
 	public void testOperationWithDataSourceUtils() throws SQLException {
-		Connection con = createMock(Connection.class);
-		DataSource ds = createMock(DataSource.class);
+		Connection con = mock(Connection.class);
+		DataSource ds = mock(DataSource.class);
 
-		expect(ds.getConnection()).andReturn(con); // con1
+		when(ds.getConnection()).thenReturn(con); // con1
 		con.close();
-		expect(ds.getConnection()).andReturn(con); // con2
+		when(ds.getConnection()).thenReturn(con); // con2
 		con.close();
 
-		expect(ds.getConnection()).andReturn(con); // con3
+		when(ds.getConnection()).thenReturn(con); // con3
 		con.close(); // con3
-		expect(ds.getConnection()).andReturn(con); // con4
+		when(ds.getConnection()).thenReturn(con); // con4
 		con.close(); // con4
-
-		replay(ds);
-		replay(con);
 
 		final ExtendedConnectionDataSourceProxy csds = new ExtendedConnectionDataSourceProxy(ds);
 
@@ -83,23 +78,19 @@ public class ExtendedConnectionDataSourceProxyTests {
 		assertTrue("should be able to close connection", csds.shouldClose(con4));
 		con4.close();
 
-		verify(ds);
-		verify(con);
 
 	}
 
 	@Test
 	public void testOperationWithDirectCloseCall() throws SQLException {
-		Connection con = createMock(Connection.class);
-		DataSource ds = createMock(DataSource.class);
+		Connection con = mock(Connection.class);
+		DataSource ds = mock(DataSource.class);
 
-		expect(ds.getConnection()).andReturn(con); // con1
+		when(ds.getConnection()).thenReturn(con); // con1
 		con.close();
-		expect(ds.getConnection()).andReturn(con); // con2
+		when(ds.getConnection()).thenReturn(con); // con2
 		con.close();
 
-		replay(ds);
-		replay(con);
 
 		final ExtendedConnectionDataSourceProxy csds = new ExtendedConnectionDataSourceProxy(ds);
 
@@ -120,72 +111,66 @@ public class ExtendedConnectionDataSourceProxyTests {
 		assertTrue("should be able to close connection", csds.shouldClose(con2));
 		con2.close();
 
-		verify(ds);
-		verify(con);
 
 	}
 
 	@Test
 	public void testSupressOfCloseWithJdbcTemplate() throws Exception {
 
-		Connection con = createMock(Connection.class);
-		DataSource ds = createMock(DataSource.class);
-		Statement stmt = createMock(Statement.class);
-		ResultSet rs = createMock(ResultSet.class);
+		Connection con = mock(Connection.class);
+		DataSource ds = mock(DataSource.class);
+		Statement stmt = mock(Statement.class);
+		ResultSet rs = mock(ResultSet.class);
 
 		// open and start suppressing close
-		expect(ds.getConnection()).andReturn(con);
+		when(ds.getConnection()).thenReturn(con);
 
 		// transaction 1
-		expect(con.getAutoCommit()).andReturn(false);
-		expect(con.createStatement()).andReturn(stmt);
-		expect(stmt.executeQuery("select baz from bar")).andReturn(rs);
-		expect(rs.next()).andReturn(false);
-		expect(con.createStatement()).andReturn(stmt);
-		expect(stmt.executeQuery("select foo from bar")).andReturn(rs);
-		expect(rs.next()).andReturn(false);
+		when(con.getAutoCommit()).thenReturn(false);
+		when(con.createStatement()).thenReturn(stmt);
+		when(stmt.executeQuery("select baz from bar")).thenReturn(rs);
+		when(rs.next()).thenReturn(false);
+		when(con.createStatement()).thenReturn(stmt);
+		when(stmt.executeQuery("select foo from bar")).thenReturn(rs);
+		when(rs.next()).thenReturn(false);
 		con.commit();
 
 		// transaction 2
-		expect(con.getAutoCommit()).andReturn(false);
-		expect(con.createStatement()).andReturn(stmt);
-		expect(stmt.executeQuery("select ham from foo")).andReturn(rs);
-		expect(rs.next()).andReturn(false);
+		when(con.getAutoCommit()).thenReturn(false);
+		when(con.createStatement()).thenReturn(stmt);
+		when(stmt.executeQuery("select ham from foo")).thenReturn(rs);
+		when(rs.next()).thenReturn(false);
 		// REQUIRES_NEW transaction
-		expect(ds.getConnection()).andReturn(con);
-		expect(con.getAutoCommit()).andReturn(false);
-		expect(con.createStatement()).andReturn(stmt);
-		expect(stmt.executeQuery("select 1 from eggs")).andReturn(rs);
-		expect(rs.next()).andReturn(false);
+		when(ds.getConnection()).thenReturn(con);
+		when(con.getAutoCommit()).thenReturn(false);
+		when(con.createStatement()).thenReturn(stmt);
+		when(stmt.executeQuery("select 1 from eggs")).thenReturn(rs);
+		when(rs.next()).thenReturn(false);
 		con.commit();
 		con.close();
 		// resume transaction 2
-		expect(con.createStatement()).andReturn(stmt);
-		expect(stmt.executeQuery("select more, ham from foo")).andReturn(rs);
-		expect(rs.next()).andReturn(false);
+		when(con.createStatement()).thenReturn(stmt);
+		when(stmt.executeQuery("select more, ham from foo")).thenReturn(rs);
+		when(rs.next()).thenReturn(false);
 		con.commit();
 
 		// transaction 3
-		expect(con.getAutoCommit()).andReturn(false);
-		expect(con.createStatement()).andReturn(stmt);
-		expect(stmt.executeQuery("select spam from ham")).andReturn(rs);
-		expect(rs.next()).andReturn(false);
+		when(con.getAutoCommit()).thenReturn(false);
+		when(con.createStatement()).thenReturn(stmt);
+		when(stmt.executeQuery("select spam from ham")).thenReturn(rs);
+		when(rs.next()).thenReturn(false);
 		con.commit();
 
 		// stop suppressing close and close
 		con.close();
 
 		// standalone query
-		expect(ds.getConnection()).andReturn(con);
-		expect(con.createStatement()).andReturn(stmt);
-		expect(stmt.executeQuery("select egg from bar")).andReturn(rs);
-		expect(rs.next()).andReturn(false);
+		when(ds.getConnection()).thenReturn(con);
+		when(con.createStatement()).thenReturn(stmt);
+		when(stmt.executeQuery("select egg from bar")).thenReturn(rs);
+		when(rs.next()).thenReturn(false);
 		con.close();
 
-		replay(rs);
-		replay(stmt);
-		replay(con);
-		replay(ds);
 
 		final ExtendedConnectionDataSourceProxy csds = new ExtendedConnectionDataSourceProxy();
 		csds.setDataSource(ds);
@@ -231,10 +216,6 @@ public class ExtendedConnectionDataSourceProxyTests {
 		DataSourceUtils.releaseConnection(connection, csds);
 		template.queryForList("select egg from bar");
 
-		verify(rs);
-		verify(stmt);
-		verify(con);
-		verify(ds);
 	}
 
 	@Test(expected = IllegalArgumentException.class)

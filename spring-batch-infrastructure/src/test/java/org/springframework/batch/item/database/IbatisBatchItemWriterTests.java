@@ -16,7 +16,8 @@
 package org.springframework.batch.item.database;
 
 import static org.junit.Assert.*;
-import static org.easymock.EasyMock.*;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 import java.util.Collections;
 import java.util.List;
@@ -34,6 +35,7 @@ import com.ibatis.sqlmap.engine.execution.BatchResult;
 
 /**
  * @author Thomas Risberg
+ * @author Will Schipp
  */
 public class IbatisBatchItemWriterTests {
 
@@ -94,8 +96,8 @@ public class IbatisBatchItemWriterTests {
 
 	@Before
 	public void setUp() throws Exception {
-		smc = createMock(SqlMapClient.class);
-		ds = createNiceMock(DataSource.class);
+		smc = mock(SqlMapClient.class);
+		ds = mock(DataSource.class);
 		smct = new SqlMapClientTemplate(ds, smc);
 		writer.setStatementId(statementId);
 		writer.setSqlMapClientTemplate(smct);
@@ -136,37 +138,31 @@ public class IbatisBatchItemWriterTests {
 
 	@Test
 	public void testWriteAndFlush() throws Exception {
-		SqlMapSession sms = createMock(SqlMapSession.class); 
-		expect(smc.openSession()).andReturn(sms);
+		SqlMapSession sms = mock(SqlMapSession.class); 
+		when(smc.openSession()).thenReturn(sms);
 		sms.close();
-		expect(sms.getCurrentConnection()).andReturn(null);
+		when(sms.getCurrentConnection()).thenReturn(null);
 		sms.setUserConnection(null);
 		sms.startBatch();
-		expect(sms.update("updateFoo", new Foo("bar"))).andReturn(-2);
+		when(sms.update("updateFoo", new Foo("bar"))).thenReturn(-2);
 		List<BatchResult> results = Collections.singletonList(new BatchResult("updateFoo", "update foo"));
 		results.get(0).setUpdateCounts(new int[] {1});
-		expect(sms.executeBatchDetailed()).andReturn(results);
-		replay(sms);
-		replay(smc);
+		when(sms.executeBatchDetailed()).thenReturn(results);
 		writer.write(Collections.singletonList(new Foo("bar")));
-		verify(sms);
-		verify(smc);
 	}
 
 	@Test
 	public void testWriteAndFlushWithEmptyUpdate() throws Exception {
-		SqlMapSession sms = createMock(SqlMapSession.class); 
-		expect(smc.openSession()).andReturn(sms);
+		SqlMapSession sms = mock(SqlMapSession.class); 
+		when(smc.openSession()).thenReturn(sms);
 		sms.close();
-		expect(sms.getCurrentConnection()).andReturn(null);
+		when(sms.getCurrentConnection()).thenReturn(null);
 		sms.setUserConnection(null);
 		sms.startBatch();
-		expect(sms.update("updateFoo", new Foo("bar"))).andReturn(1);
+		when(sms.update("updateFoo", new Foo("bar"))).thenReturn(1);
 		List<BatchResult> results = Collections.singletonList(new BatchResult("updateFoo", "update foo"));
 		results.get(0).setUpdateCounts(new int[] {0});
-		expect(sms.executeBatchDetailed()).andReturn(results);
-		replay(sms);
-		replay(smc);
+		when(sms.executeBatchDetailed()).thenReturn(results);
 		try {
 			writer.write(Collections.singletonList(new Foo("bar")));
 			fail("Expected EmptyResultDataAccessException");
@@ -176,22 +172,18 @@ public class IbatisBatchItemWriterTests {
 			String message = e.getMessage();
 			assertTrue("Wrong message: " + message, message.indexOf("did not update") >= 0);
 		}
-		verify(sms);
-		verify(smc);
 	}
 
 	@Test
 	public void testWriteAndFlushWithFailure() throws Exception {
 		final RuntimeException ex = new RuntimeException("ERROR");
-		SqlMapSession sms = createMock(SqlMapSession.class); 
-		expect(smc.openSession()).andReturn(sms);
+		SqlMapSession sms = mock(SqlMapSession.class); 
+		when(smc.openSession()).thenReturn(sms);
 		sms.close();
-		expect(sms.getCurrentConnection()).andReturn(null);
+		when(sms.getCurrentConnection()).thenReturn(null);
 		sms.setUserConnection(null);
 		sms.startBatch();
-		expect(sms.update("updateFoo", new Foo("bar"))).andThrow(ex);
-		replay(sms);
-		replay(smc);
+		when(sms.update("updateFoo", new Foo("bar"))).thenThrow(ex);
 		try {
 			writer.write(Collections.singletonList(new Foo("bar")));
 			fail("Expected RuntimeException");
@@ -199,8 +191,6 @@ public class IbatisBatchItemWriterTests {
 		catch (RuntimeException e) {
 			assertEquals("ERROR", e.getMessage());
 		}
-		verify(sms);
-		verify(smc);
 	}
 
 }

@@ -15,9 +15,7 @@
  */
 package org.springframework.batch.core.listener;
 
-import static org.easymock.EasyMock.createMock;
-import static org.easymock.EasyMock.replay;
-import static org.easymock.EasyMock.verify;
+import static org.mockito.Mockito.mock;
 
 import java.util.ArrayList;
 
@@ -27,6 +25,7 @@ import org.springframework.batch.core.ItemReadListener;
 
 /**
  * @author Lucas Ward
+ * @author Will Schipp
  *
  */
 public class CompositeItemReadListenerTests {
@@ -37,7 +36,7 @@ public class CompositeItemReadListenerTests {
 	@SuppressWarnings("unchecked")
 	@Before
 	public void setUp() throws Exception {
-		listener = createMock(ItemReadListener.class);
+		listener = mock(ItemReadListener.class);
 		compositeListener = new CompositeItemReadListener<Object>();
 		compositeListener.register(listener);
 	}
@@ -46,18 +45,14 @@ public class CompositeItemReadListenerTests {
 	public void testBeforeRead(){
 		
 		listener.beforeRead();
-		replay(listener);
 		compositeListener.beforeRead();
-		verify(listener);
 	}
 	
 	@Test
 	public void testAfterRead(){
 		Object item = new Object();
 		listener.afterRead(item);
-		replay(listener);
 		compositeListener.afterRead(item);
-		verify(listener);
 	}
 	
 	@Test
@@ -65,9 +60,7 @@ public class CompositeItemReadListenerTests {
 		
 		Exception ex = new Exception();
 		listener.onReadError(ex);
-		replay(listener);
 		compositeListener.onReadError(ex);
-		verify(listener);
 	}
 
 	@Test
@@ -78,9 +71,7 @@ public class CompositeItemReadListenerTests {
 			}
 		});
 		listener.beforeRead();
-		replay(listener);
 		compositeListener.beforeRead();
-		verify(listener);
 	}
 	
 }

@@ -1,8 +1,7 @@
 package org.springframework.batch.item.xml;
 
-import static org.easymock.EasyMock.createMock;
-import static org.easymock.EasyMock.expect;
-import static org.easymock.EasyMock.replay;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
@@ -329,10 +328,9 @@ public class StaxEventItemWriterTests {
 
 	@Test
 	public void testNonExistantResource() throws Exception {
-		Resource doesntExist = createMock(Resource.class);
-		expect(doesntExist.getFile()).andReturn(File.createTempFile("arbitrary", null));
-		expect(doesntExist.exists()).andReturn(false);
-		replay(doesntExist);
+		Resource doesntExist = mock(Resource.class);
+		when(doesntExist.getFile()).thenReturn(File.createTempFile("arbitrary", null));
+		when(doesntExist.exists()).thenReturn(false);
 
 		writer.setResource(doesntExist);
 

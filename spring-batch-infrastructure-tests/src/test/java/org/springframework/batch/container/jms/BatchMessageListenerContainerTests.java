@@ -16,6 +16,9 @@
 
 package org.springframework.batch.container.jms;
 
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
+
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
@@ -54,20 +57,17 @@ public class BatchMessageListenerContainerTests {
 			}
 		});
 
-		Session session = EasyMock.createNiceMock(Session.class);
-		MessageConsumer consumer = EasyMock.createMock(MessageConsumer.class);
-		Message message = EasyMock.createMock(Message.class);
+		Session session = mock(Session.class);
+		MessageConsumer consumer = mock(MessageConsumer.class);
+		Message message = mock(Message.class);
 
 		// Expect two calls to consumer (chunk size)...
-		EasyMock.expect(session.getTransacted()).andReturn(true).anyTimes();
-		EasyMock.expect(consumer.receive(1000)).andReturn(message).times(2);
-
-		EasyMock.replay(consumer, session);
+		when(session.getTransacted()).thenReturn(true);
+		when(session.getTransacted()).thenReturn(true);
+		when(consumer.receive(1000)).thenReturn(message);
 
 		boolean received = doExecute(session, consumer);
 		assertTrue("Message not received", received);
-
-		EasyMock.verify(consumer);
 
 	}
 
@@ -77,21 +77,17 @@ public class BatchMessageListenerContainerTests {
 		template.setCompletionPolicy(new SimpleCompletionPolicy(2));
 		container = getContainer(template);
 
-		Session session = EasyMock.createMock(Session.class);
-		MessageConsumer consumer = EasyMock.createMock(MessageConsumer.class);
+		Session session = mock(Session.class);
+		MessageConsumer consumer = mock(MessageConsumer.class);
 		Message message = null;
 
 		// Expect one call to consumer (chunk size is 2 but terminates on
 		// first)...
-		EasyMock.expect(consumer.receive(1000)).andReturn(message);
-		EasyMock.expect(session.getTransacted()).andReturn(false);
-
-		EasyMock.replay(consumer, session);
+		when(consumer.receive(1000)).thenReturn(message);
+		when(session.getTransacted()).thenReturn(false);
 
 		boolean received = doExecute(session, consumer);
 		assertFalse("Message not received", received);
-
-		EasyMock.verify(consumer, session);
 
 	}
 
@@ -137,7 +133,7 @@ public class BatchMessageListenerContainerTests {
 	}
 
 	private BatchMessageListenerContainer getContainer(RepeatTemplate template) {
-		ConnectionFactory connectionFactory = EasyMock.createMock(ConnectionFactory.class);
+		ConnectionFactory connectionFactory = mock(ConnectionFactory.class);
 		// Yuck: we need to turn these method in base class to no-ops because the invoker is a private class
 		// we can't create for test purposes...
 		BatchMessageListenerContainer container = new BatchMessageListenerContainer() {
@@ -167,27 +163,23 @@ public class BatchMessageListenerContainerTests {
 			}
 		});
 
-		Session session = EasyMock.createMock(Session.class);
-		MessageConsumer consumer = EasyMock.createMock(MessageConsumer.class);
-		Message message = EasyMock.createMock(Message.class);
+		Session session = mock(Session.class);
+		MessageConsumer consumer = mock(MessageConsumer.class);
+		Message message = mock(Message.class);
 
 		if (expectGetTransactionCount>0) {
-			EasyMock.expect(session.getTransacted()).andReturn(true).times(expectGetTransactionCount);
+			when(session.getTransacted()).thenReturn(true);
 		}
 
 		// Expect only one call to consumer (chunk size is 2, but first one
 		// rolls back terminating batch)...
-		EasyMock.expect(consumer.receive(1000)).andReturn(message).anyTimes();
+		when(consumer.receive(1000)).thenReturn(message);
 		if (expectRollback) {
 			session.rollback();
-			EasyMock.expectLastCall();
 		}
-
-		EasyMock.replay(session, consumer, message);
 
 		boolean received = doExecute(session, consumer);
 
-		EasyMock.verify(session, consumer, message);
 		return received;
 	}
 

@@ -16,7 +16,9 @@
 
 package org.springframework.batch.item.amqp;
 
-import org.easymock.classextension.EasyMock;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
+
 import org.junit.Test;
 import org.springframework.amqp.core.AmqpTemplate;
 import org.springframework.amqp.core.Message;
@@ -31,6 +33,7 @@ import static org.junit.Assert.fail;
  * </p>
  *
  * @author Chris Schaefer
+ * @author Will Schipp
  */
 public class AmqpItemReaderTests {
     @Test(expected = IllegalArgumentException.class)
@@ -40,51 +43,44 @@ public class AmqpItemReaderTests {
 
     @Test
     public void testNoItemType() {
-        final AmqpTemplate amqpTemplate = EasyMock.createMock(AmqpTemplate.class);
-        EasyMock.expect(amqpTemplate.receiveAndConvert()).andReturn("foo");
-        EasyMock.replay(amqpTemplate);
+        final AmqpTemplate amqpTemplate = mock(AmqpTemplate.class);
+        when(amqpTemplate.receiveAndConvert()).thenReturn("foo");
 
         final AmqpItemReader<String> amqpItemReader = new AmqpItemReader<String>(amqpTemplate);
         assertEquals("foo", amqpItemReader.read());
-        EasyMock.verify(amqpTemplate);
     }
 
     @Test
     public void testNonMessageItemType() {
-        final AmqpTemplate amqpTemplate = EasyMock.createMock(AmqpTemplate.class);
-        EasyMock.expect(amqpTemplate.receiveAndConvert()).andReturn("foo");
-        EasyMock.replay(amqpTemplate);
+        final AmqpTemplate amqpTemplate = mock(AmqpTemplate.class);
+        when(amqpTemplate.receiveAndConvert()).thenReturn("foo");
 
         final AmqpItemReader<String> amqpItemReader = new AmqpItemReader<String>(amqpTemplate);
         amqpItemReader.setItemType(String.class);
 
         assertEquals("foo", amqpItemReader.read());
 
-        EasyMock.verify(amqpTemplate);
     }
 
     @Test
     public void testMessageItemType() {
-        final AmqpTemplate amqpTemplate = EasyMock.createMock(AmqpTemplate.class);
-        final Message message = EasyMock.createMock(Message.class);
+        final AmqpTemplate amqpTemplate = mock(AmqpTemplate.class);
+        final Message message = mock(Message.class);
 
-        EasyMock.expect(amqpTemplate.receive()).andReturn(message);
-        EasyMock.replay(amqpTemplate, message);
+        when(amqpTemplate.receive()).thenReturn(message);
 
         final AmqpItemReader<Message> amqpItemReader = new AmqpItemReader<Message>(amqpTemplate);
         amqpItemReader.setItemType(Message.class);
 
         assertEquals(message, amqpItemReader.read());
 
-        EasyMock.verify(amqpTemplate);
     }
 
     @Test
     public void testTypeMismatch() {
-        final AmqpTemplate amqpTemplate = EasyMock.createMock(AmqpTemplate.class);
+        final AmqpTemplate amqpTemplate = mock(AmqpTemplate.class);
 
-        EasyMock.expect(amqpTemplate.receiveAndConvert()).andReturn("foo");
-        EasyMock.replay(amqpTemplate);
+        when(amqpTemplate.receiveAndConvert()).thenReturn("foo");
 
         final AmqpItemReader<Integer> amqpItemReader = new AmqpItemReader<Integer>(amqpTemplate);
         amqpItemReader.setItemType(Integer.class);
@@ -96,12 +92,11 @@ public class AmqpItemReaderTests {
             assertTrue(e.getMessage().contains("wrong type"));
         }
 
-        EasyMock.verify(amqpTemplate);
     }
 
     @Test(expected = IllegalArgumentException.class)
     public void testNullItemType() {
-        final AmqpTemplate amqpTemplate = EasyMock.createMock(AmqpTemplate.class);
+        final AmqpTemplate amqpTemplate = mock(AmqpTemplate.class);
 
         final AmqpItemReader<String> amqpItemReader = new AmqpItemReader<String>(amqpTemplate);
         amqpItemReader.setItemType(null);

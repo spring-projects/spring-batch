@@ -16,12 +16,8 @@
 
 package org.springframework.batch.core.launch;
 
-import static org.easymock.EasyMock.createMock;
-import static org.easymock.EasyMock.expect;
-import static org.easymock.EasyMock.expectLastCall;
-import static org.easymock.EasyMock.replay;
-import static org.easymock.EasyMock.reset;
-import static org.easymock.EasyMock.verify;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
@@ -47,6 +43,7 @@ import org.springframework.core.task.TaskRejectedException;
 
 /**
  * @author Lucas Ward
+ * @author Will Schipp
  *
  */
 public class SimpleJobLauncherTests {
@@ -69,7 +66,7 @@ public class SimpleJobLauncherTests {
 	public void setUp() throws Exception {
 
 		jobLauncher = new SimpleJobLauncher();
-		jobRepository = createMock(JobRepository.class);
+		jobRepository = mock(JobRepository.class);
 		jobLauncher.setJobRepository(jobRepository);
 
 	}
@@ -85,16 +82,10 @@ public class SimpleJobLauncherTests {
 		job.setJobParametersValidator(new DefaultJobParametersValidator(new String[] { "missing-and-required" },
 				new String[0]));
 
-		expect(jobRepository.getLastJobExecution(job.getName(), jobParameters)).andReturn(null);
-		replay(jobRepository);
+		when(jobRepository.getLastJobExecution(job.getName(), jobParameters)).thenReturn(null);
 
 		jobLauncher.afterPropertiesSet();
-		try {
-			jobLauncher.run(job, jobParameters);
-		}
-		finally {
-			verify(jobRepository);
-		}
+		jobLauncher.run(job, jobParameters);
 
 	}
 
@@ -114,14 +105,11 @@ public class SimpleJobLauncherTests {
 		};
 
 		testRun();
-		reset(jobRepository);
-		expect(jobRepository.getLastJobExecution(job.getName(), jobParameters)).andReturn(
+		when(jobRepository.getLastJobExecution(job.getName(), jobParameters)).thenReturn(
 				new JobExecution(new JobInstance(1L, job.getName()), jobParameters));
-		expect(jobRepository.createJobExecution(job.getName(), jobParameters)).andReturn(
+		when(jobRepository.createJobExecution(job.getName(), jobParameters)).thenReturn(
 				new JobExecution(new JobInstance(1L, job.getName()), jobParameters));
-		replay(jobRepository);
 		jobLauncher.run(job, jobParameters);
-		verify(jobRepository);
 	}
 
 	/*
@@ -145,17 +133,14 @@ public class SimpleJobLauncherTests {
 
 		testRun();
 		try {
-			reset(jobRepository);
-			expect(jobRepository.getLastJobExecution(job.getName(), jobParameters)).andReturn(
+			when(jobRepository.getLastJobExecution(job.getName(), jobParameters)).thenReturn(
 					new JobExecution(new JobInstance(1L, job.getName()), jobParameters));
-			replay(jobRepository);
 			jobLauncher.run(job, jobParameters);
 			fail("Expected JobRestartException");
 		}
 		catch (JobRestartException e) {
 			// expected
 		}
-		verify(jobRepository);
 	}
 
 	@Test
@@ -186,11 +171,9 @@ public class SimpleJobLauncherTests {
 
 		JobExecution jobExecution = new JobExecution((JobInstance) null, (JobParameters) null);
 
-		expect(jobRepository.getLastJobExecution(job.getName(), jobParameters)).andReturn(null);
-		expect(jobRepository.createJobExecution(job.getName(), jobParameters)).andReturn(jobExecution);
+		when(jobRepository.getLastJobExecution(job.getName(), jobParameters)).thenReturn(null);
+		when(jobRepository.createJobExecution(job.getName(), jobParameters)).thenReturn(jobExecution);
 		jobRepository.update(jobExecution);
-		expectLastCall();
-		replay(jobRepository);
 
 		jobLauncher.afterPropertiesSet();
 		try {
@@ -199,7 +182,6 @@ public class SimpleJobLauncherTests {
 		finally {
 			assertEquals(BatchStatus.FAILED, jobExecution.getStatus());
 			assertEquals(ExitStatus.FAILED.getExitCode(), jobExecution.getExitStatus().getExitCode());
-			verify(jobRepository);
 		}
 
 		assertEquals(1, list.size());
@@ -265,9 +247,8 @@ public class SimpleJobLauncherTests {
 	private void run(ExitStatus exitStatus) throws Exception {
 		JobExecution jobExecution = new JobExecution((JobInstance) null, (JobParameters) null);
 
-		expect(jobRepository.getLastJobExecution(job.getName(), jobParameters)).andReturn(null);
-		expect(jobRepository.createJobExecution(job.getName(), jobParameters)).andReturn(jobExecution);
-		replay(jobRepository);
+		when(jobRepository.getLastJobExecution(job.getName(), jobParameters)).thenReturn(null);
+		when(jobRepository.createJobExecution(job.getName(), jobParameters)).thenReturn(jobExecution);
 
 		jobLauncher.afterPropertiesSet();
 		try {
@@ -275,7 +256,6 @@ public class SimpleJobLauncherTests {
 		}
 		finally {
 			assertEquals(exitStatus, jobExecution.getExitStatus());
-			verify(jobRepository);
 		}
 	}
 

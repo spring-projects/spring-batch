@@ -16,10 +16,13 @@
 
 package org.springframework.batch.item.database;
 
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
+
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 
-import org.easymock.EasyMock;
+
 import org.hibernate.SessionFactory;
 import org.hibernate.StatelessSession;
 import org.junit.Test;
@@ -28,37 +31,34 @@ import org.springframework.test.util.ReflectionTestUtils;
 
 /**
  * @author Dave Syer
+ * @author Will Schipp
  *
  */
 public class HibernateItemReaderHelperTests {
 	
 	private HibernateItemReaderHelper<String> helper = new HibernateItemReaderHelper<String>();
 	
-	private SessionFactory sessionFactory = EasyMock.createMock(SessionFactory.class);
+	private SessionFactory sessionFactory = mock(SessionFactory.class);
 	
 	@Test
 	public void testOneSessionForAllPages() throws Exception {
 
-		StatelessSession session = EasyMock.createNiceMock(StatelessSession.class);
-		EasyMock.expect(sessionFactory.openStatelessSession()).andReturn(session);
-		EasyMock.replay(sessionFactory, session);
+		StatelessSession session = mock(StatelessSession.class);
+		when(sessionFactory.openStatelessSession()).thenReturn(session);
 		
 		helper.setSessionFactory(sessionFactory);
 
 		helper.createQuery();
 		// Multiple calls to createQuery only creates one session
 		helper.createQuery();
-		
-		EasyMock.verify(sessionFactory, session);
 
 	}
 
 	@Test
 	public void testSessionReset() throws Exception {
 
-		StatelessSession session = EasyMock.createNiceMock(StatelessSession.class);
-		EasyMock.expect(sessionFactory.openStatelessSession()).andReturn(session);
-		EasyMock.replay(sessionFactory, session);
+		StatelessSession session = mock(StatelessSession.class);
+		when(sessionFactory.openStatelessSession()).thenReturn(session);
 		
 		helper.setSessionFactory(sessionFactory);
 
@@ -67,8 +67,6 @@ public class HibernateItemReaderHelperTests {
 
 		helper.close();		
 		assertNull(ReflectionTestUtils.getField(helper, "statelessSession"));
-		
-		EasyMock.verify(sessionFactory, session);
 
 	}
 
