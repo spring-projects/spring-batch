@@ -1,9 +1,7 @@
 package org.springframework.batch.item.support;
 
-import static org.easymock.EasyMock.createStrictMock;
-import static org.easymock.EasyMock.expectLastCall;
-import static org.easymock.EasyMock.replay;
-import static org.easymock.EasyMock.verify;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -18,6 +16,7 @@ import org.springframework.batch.item.ItemWriter;
  * Tests for {@link CompositeItemWriter}
  * 
  * @author Robert Kasanicky
+ * @author Will Schipp
  */
 public class CompositeItemWriterTests {
 
@@ -37,11 +36,9 @@ public class CompositeItemWriterTests {
 
 		for (int i = 0; i < NUMBER_OF_WRITERS; i++) {
 			@SuppressWarnings("unchecked")
-			ItemWriter<? super Object> writer = createStrictMock(ItemWriter.class);
+			ItemWriter<? super Object> writer = mock(ItemWriter.class);
 
 			writer.write(data);
-			expectLastCall().once();
-			replay(writer);
 
 			writers.add(writer);
 		}
@@ -49,9 +46,7 @@ public class CompositeItemWriterTests {
 		itemWriter.setDelegates(writers);
 		itemWriter.write(data);
 
-		for (ItemWriter<? super Object> writer : writers) {
-			verify(writer);
-		}
+
 	}
 
 	@Test
@@ -66,16 +61,13 @@ public class CompositeItemWriterTests {
 
 	private void doTestItemStream(boolean expectOpen) throws Exception {
 		@SuppressWarnings("unchecked")
-		ItemStreamWriter<? super Object> writer = createStrictMock(ItemStreamWriter.class);
+		ItemStreamWriter<? super Object> writer = mock(ItemStreamWriter.class);
 		List<Object> data = Collections.singletonList(new Object());
 		ExecutionContext executionContext = new ExecutionContext();
 		if (expectOpen) {
 			writer.open(executionContext);
-			expectLastCall().once();
 		}
 		writer.write(data);
-		expectLastCall().once();
-		replay(writer);
 
 		List<ItemWriter<? super Object>> writers = new ArrayList<ItemWriter<? super Object>>();
 		writers.add(writer);
@@ -85,8 +77,6 @@ public class CompositeItemWriterTests {
 			itemWriter.open(executionContext);
 		}
 		itemWriter.write(data);
-
-		verify(writer);
 	}
 
 }

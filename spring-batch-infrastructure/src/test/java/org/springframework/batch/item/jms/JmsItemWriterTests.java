@@ -16,9 +16,10 @@
 
 package org.springframework.batch.item.jms;
 
+import static org.mockito.Mockito.mock;
+
 import java.util.Arrays;
 
-import org.easymock.EasyMock;
 import org.junit.Test;
 import org.springframework.jms.core.JmsOperations;
 import org.springframework.jms.core.JmsTemplate;
@@ -29,16 +30,12 @@ public class JmsItemWriterTests {
 
 	@Test
 	public void testNoItemTypeSunnyDay() throws Exception {
-		JmsOperations jmsTemplate = EasyMock.createMock(JmsOperations.class);
+		JmsOperations jmsTemplate = mock(JmsOperations.class);
 		jmsTemplate.convertAndSend("foo");
-		EasyMock.expectLastCall();
 		jmsTemplate.convertAndSend("bar");
-		EasyMock.expectLastCall();
-		EasyMock.replay(jmsTemplate);
 
 		itemWriter.setJmsTemplate(jmsTemplate);
 		itemWriter.write(Arrays.asList("foo", "bar"));
-		EasyMock.verify(jmsTemplate);
 	}
 	
 	@Test(expected=IllegalArgumentException.class)

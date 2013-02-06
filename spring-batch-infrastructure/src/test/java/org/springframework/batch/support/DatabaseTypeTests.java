@@ -1,7 +1,5 @@
 package org.springframework.batch.support;
 
-import static org.easymock.EasyMock.replay;
-import static org.easymock.EasyMock.verify;
 import static org.junit.Assert.assertEquals;
 import static org.springframework.batch.support.DatabaseType.DB2;
 import static org.springframework.batch.support.DatabaseType.DB2ZOS;
@@ -22,6 +20,7 @@ import org.springframework.jdbc.support.MetaDataAccessException;
 /**
  * 
  * @author Lucas Ward
+ * @author Will Schipp
  * 
  */
 public class DatabaseTypeTests {
@@ -48,81 +47,61 @@ public class DatabaseTypeTests {
 	@Test
 	public void testFromMetaDataForDerby() throws Exception {
 		DataSource ds = DatabaseTypeTestUtils.getMockDataSource("Apache Derby");
-		replay(ds);
 		assertEquals(DERBY, DatabaseType.fromMetaData(ds));
-		verify(ds);
 	}
 
 	@Test
 	public void testFromMetaDataForDB2() throws Exception {
 		DataSource ds = DatabaseTypeTestUtils.getMockDataSource("DB2/Linux");
-		replay(ds);
 		assertEquals(DB2, DatabaseType.fromMetaData(ds));
-		verify(ds);
 	}
 
 	@Test
 	public void testFromMetaDataForDB2ZOS() throws Exception {
 		DataSource ds = DatabaseTypeTestUtils.getMockDataSource("DB2", "DSN08015");
-		replay(ds);
 		assertEquals(DB2ZOS, DatabaseType.fromMetaData(ds));
-		verify(ds);
 	}
 
 	@Test
 	public void testFromMetaDataForHsql() throws Exception {
 		DataSource ds = DatabaseTypeTestUtils.getMockDataSource("HSQL Database Engine");
-		replay(ds);
 		assertEquals(HSQL, DatabaseType.fromMetaData(ds));
-		verify(ds);
 	}
 
 	@Test
 	public void testFromMetaDataForSqlServer() throws Exception {
 		DataSource ds = DatabaseTypeTestUtils.getMockDataSource("Microsoft SQL Server");
-		replay(ds);
 		assertEquals(SQLSERVER, DatabaseType.fromMetaData(ds));
-		verify(ds);
 	}
 
 	@Test
 	public void testFromMetaDataForMySql() throws Exception {
 		DataSource ds = DatabaseTypeTestUtils.getMockDataSource("MySQL");
-		replay(ds);
 		assertEquals(MYSQL, DatabaseType.fromMetaData(ds));
-		verify(ds);
 	}
 
 	@Test
 	public void testFromMetaDataForOracle() throws Exception {
 		DataSource ds = DatabaseTypeTestUtils.getMockDataSource("Oracle");
-		replay(ds);
 		assertEquals(ORACLE, DatabaseType.fromMetaData(ds));
-		verify(ds);
 	}
 
 	@Test
 	public void testFromMetaDataForPostgres() throws Exception {
 		DataSource ds = DatabaseTypeTestUtils.getMockDataSource("PostgreSQL");
-		replay(ds);
 		assertEquals(POSTGRES, DatabaseType.fromMetaData(ds));
-		verify(ds);
 	}
 
 	@Test
 	public void testFromMetaDataForSybase() throws Exception {
 		DataSource ds = DatabaseTypeTestUtils.getMockDataSource("Adaptive Server Enterprise");
-		replay(ds);
 		assertEquals(SYBASE, DatabaseType.fromMetaData(ds));
-		verify(ds);
 	}
 
 	@Test(expected=MetaDataAccessException.class)
 	public void testBadMetaData() throws Exception {
 		DataSource ds = DatabaseTypeTestUtils.getMockDataSource(new MetaDataAccessException("Bad!"));
-		replay(ds);
 		assertEquals(SYBASE, DatabaseType.fromMetaData(ds));
-		verify(ds);
 	}
 
 }

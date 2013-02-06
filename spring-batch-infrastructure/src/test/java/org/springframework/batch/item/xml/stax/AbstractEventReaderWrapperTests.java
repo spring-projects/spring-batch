@@ -15,11 +15,8 @@
  */
 package org.springframework.batch.item.xml.stax;
 
-import static org.easymock.EasyMock.createMock;
-import static org.easymock.EasyMock.expect;
-import static org.easymock.EasyMock.expectLastCall;
-import static org.easymock.EasyMock.replay;
-import static org.easymock.EasyMock.verify;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 import javax.xml.stream.XMLEventReader;
 import javax.xml.stream.XMLStreamException;
@@ -29,7 +26,7 @@ import junit.framework.TestCase;
 
 /**
  * @author Lucas Ward
- * 
+ * @author Will Schipp
  */
 public class AbstractEventReaderWrapperTests extends TestCase {
 
@@ -40,87 +37,67 @@ public class AbstractEventReaderWrapperTests extends TestCase {
 	protected void setUp() throws Exception {
 		super.setUp();
 
-		xmlEventReader = createMock(XMLEventReader.class);
+		xmlEventReader = mock(XMLEventReader.class);
 		eventReaderWrapper = new StubEventReader(xmlEventReader);
 	}
 
 	public void testClose() throws XMLStreamException {
 		xmlEventReader.close();
-		expectLastCall().once();
-		replay(xmlEventReader);
 		eventReaderWrapper.close();
-		verify(xmlEventReader);
 	}
 
 	public void testGetElementText() throws XMLStreamException {
 
 		String text = "text";
-		expect(xmlEventReader.getElementText()).andReturn(text);
-		replay(xmlEventReader);
+		when(xmlEventReader.getElementText()).thenReturn(text);
 		assertEquals(eventReaderWrapper.getElementText(), text);
-		verify(xmlEventReader);
 	}
 
 	public void testGetProperty() throws IllegalArgumentException {
 
 		String text = "text";
-		expect(xmlEventReader.getProperty("name")).andReturn(text);
-		replay(xmlEventReader);
+		when(xmlEventReader.getProperty("name")).thenReturn(text);
 		assertEquals(eventReaderWrapper.getProperty("name"), text);
-		verify(xmlEventReader);
 	}
 
 	public void testHasNext() {
 
-		expect(xmlEventReader.hasNext()).andReturn(true);
-		replay(xmlEventReader);
+		when(xmlEventReader.hasNext()).thenReturn(true);
 		assertTrue(eventReaderWrapper.hasNext());
-		verify(xmlEventReader);
 	}
 
 	public void testNext() {
 
 		String text = "text";
-		expect(xmlEventReader.next()).andReturn(text);
-		replay(xmlEventReader);
+		when(xmlEventReader.next()).thenReturn(text);
 		assertEquals(eventReaderWrapper.next(), text);
-		verify(xmlEventReader);
 	}
 
 	public void testNextEvent() throws XMLStreamException {
 
-		XMLEvent event = createMock(XMLEvent.class);
-		expect(xmlEventReader.nextEvent()).andReturn(event);
-		replay(xmlEventReader);
+		XMLEvent event = mock(XMLEvent.class);
+		when(xmlEventReader.nextEvent()).thenReturn(event);
 		assertEquals(eventReaderWrapper.nextEvent(), event);
-		verify(xmlEventReader);
 	}
 
 	public void testNextTag() throws XMLStreamException {
 
-		XMLEvent event = createMock(XMLEvent.class);
-		expect(xmlEventReader.nextTag()).andReturn(event);
-		replay(xmlEventReader);
+		XMLEvent event = mock(XMLEvent.class);
+		when(xmlEventReader.nextTag()).thenReturn(event);
 		assertEquals(eventReaderWrapper.nextTag(), event);
-		verify(xmlEventReader);
 	}
 
 	public void testPeek() throws XMLStreamException {
 
-		XMLEvent event = createMock(XMLEvent.class);
-		expect(xmlEventReader.peek()).andReturn(event);
-		replay(xmlEventReader);
+		XMLEvent event = mock(XMLEvent.class);
+		when(xmlEventReader.peek()).thenReturn(event);
 		assertEquals(eventReaderWrapper.peek(), event);
-		verify(xmlEventReader);
 	}
 
 	public void testRemove() {
 
 		xmlEventReader.remove();
-		expectLastCall().once();
-		replay(xmlEventReader);
 		eventReaderWrapper.remove();
-		verify(xmlEventReader);
 	}
 
 	private static class StubEventReader extends AbstractEventReaderWrapper {

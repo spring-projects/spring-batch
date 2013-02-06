@@ -15,10 +15,8 @@
  */
 package org.springframework.batch.item.database;
 
-import static org.easymock.EasyMock.createMock;
-import static org.easymock.EasyMock.expect;
-import static org.easymock.EasyMock.replay;
-import static org.easymock.EasyMock.verify;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
@@ -37,6 +35,7 @@ import org.springframework.orm.hibernate3.HibernateOperations;
  * @author Dave Syer
  * @author Thomas Risberg
  * @author Michael Minella
+ * @author Will Schipp
  */
 public class HibernateItemWriterTests {
 
@@ -50,9 +49,9 @@ public class HibernateItemWriterTests {
 	@Before
 	public void setUp() throws Exception {
 		writer = new HibernateItemWriter<Object>();
-		ht = createMock("ht", HibernateOperations.class);
-		factory = createMock(SessionFactory.class);
-		currentSession = createMock(Session.class);
+		ht = mock(HibernateOperations.class,"ht");
+		factory = mock(SessionFactory.class);
+		currentSession = mock(Session.class);
 	}
 
 	/**
@@ -89,25 +88,22 @@ public class HibernateItemWriterTests {
 	@Test
 	public void testWriteAndFlushSunnyDayHibernate3() throws Exception {
 		writer.setHibernateTemplate(ht);
-		expect(ht.contains("foo")).andReturn(true);
-		expect(ht.contains("bar")).andReturn(false);
+		when(ht.contains("foo")).thenReturn(true);
+		when(ht.contains("bar")).thenReturn(false);
 		ht.saveOrUpdate("bar");
 		ht.flush();
 		ht.clear();
-		replay(ht);
 
 		List<String> items = Arrays.asList(new String[] { "foo", "bar" });
 		writer.write(items);
 
-		verify(ht);
 	}
 
 	@Test
 	public void testWriteAndFlushWithFailureHibernate3() throws Exception {
 		writer.setHibernateTemplate(ht);
 		final RuntimeException ex = new RuntimeException("ERROR");
-		expect(ht.contains("foo")).andThrow(ex);
-		replay(ht);
+		when(ht.contains("foo")).thenThrow(ex);
 
 		try {
 			writer.write(Collections.singletonList("foo"));
@@ -117,25 +113,20 @@ public class HibernateItemWriterTests {
 			assertEquals("ERROR", e.getMessage());
 		}
 
-		verify(ht);
 	}
 
 	@Test
 	public void testWriteAndFlushSunnyDayHibernate4() throws Exception {
 		writer.setSessionFactory(factory);
-		expect(factory.getCurrentSession()).andReturn(currentSession).times(3);
-		expect(currentSession.contains("foo")).andReturn(true);
-		expect(currentSession.contains("bar")).andReturn(false);
+		when(factory.getCurrentSession()).thenReturn(currentSession);
+		when(currentSession.contains("foo")).thenReturn(true);
+		when(currentSession.contains("bar")).thenReturn(false);
 		currentSession.saveOrUpdate("bar");
 		currentSession.flush();
 		currentSession.clear();
 
-		replay(factory, currentSession);
-
 		List<String> items = Arrays.asList(new String[] { "foo", "bar" });
 		writer.write(items);
-
-		verify(factory, currentSession);
 	}
 
 	@Test
@@ -143,10 +134,8 @@ public class HibernateItemWriterTests {
 		writer.setSessionFactory(factory);
 		final RuntimeException ex = new RuntimeException("ERROR");
 
-		expect(factory.getCurrentSession()).andReturn(currentSession);
-		expect(currentSession.contains("foo")).andThrow(ex);
-
-		replay(factory, currentSession);
+		when(factory.getCurrentSession()).thenReturn(currentSession);
+		when(currentSession.contains("foo")).thenThrow(ex);
 
 		try {
 			writer.write(Collections.singletonList("foo"));
@@ -155,7 +144,5 @@ public class HibernateItemWriterTests {
 		catch (RuntimeException e) {
 			assertEquals("ERROR", e.getMessage());
 		}
-
-		verify(factory, currentSession);
 	}
 }

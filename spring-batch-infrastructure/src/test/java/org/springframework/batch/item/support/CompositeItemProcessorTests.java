@@ -1,9 +1,7 @@
 package org.springframework.batch.item.support;
 
-import static org.easymock.EasyMock.createMock;
-import static org.easymock.EasyMock.expect;
-import static org.easymock.EasyMock.replay;
-import static org.easymock.EasyMock.verify;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 import static org.junit.Assert.assertSame;
 import static org.junit.Assert.fail;
 
@@ -19,6 +17,7 @@ import org.springframework.batch.item.support.CompositeItemProcessor;
  * Tests for {@link CompositeItemProcessor}.
  * 
  * @author Robert Kasanicky
+ * @author Will Schipp
  */
 public class CompositeItemProcessorTests {
 
@@ -30,8 +29,8 @@ public class CompositeItemProcessorTests {
 	@SuppressWarnings("unchecked")
 	@Before
 	public void setUp() throws Exception {
-		processor1 = createMock(ItemProcessor.class);
-		processor2 = createMock(ItemProcessor.class);
+		processor1 = mock(ItemProcessor.class);
+		processor2 = mock(ItemProcessor.class);
 		
 		composite.setDelegates(new ArrayList<ItemProcessor<Object,Object>>() {{ 
 			add(processor1); add(processor2); 
@@ -50,17 +49,12 @@ public class CompositeItemProcessorTests {
 		Object itemAfterFirstTransfromation = new Object();
 		Object itemAfterSecondTransformation = new Object();
 
-		expect(processor1.process(item)).andReturn(itemAfterFirstTransfromation);
+		when(processor1.process(item)).thenReturn(itemAfterFirstTransfromation);
 		
-		expect(processor2.process(itemAfterFirstTransfromation)).andReturn(itemAfterSecondTransformation);
-		
-		replay(processor1);
-		replay(processor2);
-		
+		when(processor2.process(itemAfterFirstTransfromation)).thenReturn(itemAfterSecondTransformation);
+				
 		assertSame(itemAfterSecondTransformation, composite.process(item));
 
-		verify(processor1);
-		verify(processor2);
 	}
 	
 	/**
@@ -96,9 +90,7 @@ public class CompositeItemProcessorTests {
 	public void testFilteredItemInFirstProcessor() throws Exception{
 		
 		Object item = new Object();
-		expect(processor1.process(item)).andReturn(null);
-		replay(processor1, processor2);
+		when(processor1.process(item)).thenReturn(null);
 		Assert.assertEquals(null,composite.process(item));
-		verify(processor1,processor2);
 	}
 }

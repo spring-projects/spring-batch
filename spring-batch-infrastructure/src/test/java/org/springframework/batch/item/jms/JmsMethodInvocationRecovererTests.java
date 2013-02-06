@@ -15,12 +15,14 @@
  */
 package org.springframework.batch.item.jms;
 
-import org.easymock.EasyMock;
+import static org.mockito.Mockito.mock;
+
 import org.junit.Test;
 import org.springframework.jms.core.JmsOperations;
 
 /**
  * @author Dave Syer
+ * @author Will Schipp
  * 
  */
 public class JmsMethodInvocationRecovererTests {
@@ -29,14 +31,12 @@ public class JmsMethodInvocationRecovererTests {
 
 	@Test
 	public void testRecoverWithNoDestination() throws Exception {
-		JmsOperations jmsTemplate = EasyMock.createMock(JmsOperations.class);
+		JmsOperations jmsTemplate = mock(JmsOperations.class);
 		jmsTemplate.convertAndSend("foo");
-		EasyMock.replay(jmsTemplate);
 
 		itemReader.setJmsTemplate(jmsTemplate);
 		itemReader.recover(new Object[] { "foo" }, null);
 
-		EasyMock.verify(jmsTemplate);
 	}
 
 }

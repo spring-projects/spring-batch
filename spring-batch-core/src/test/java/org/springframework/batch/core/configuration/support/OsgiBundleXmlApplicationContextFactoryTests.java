@@ -15,11 +15,8 @@
  */
 package org.springframework.batch.core.configuration.support;
 
-import static org.easymock.EasyMock.createMock;
-import static org.easymock.EasyMock.createNiceMock;
-import static org.easymock.EasyMock.expect;
-import static org.easymock.EasyMock.replay;
-import static org.easymock.EasyMock.verify;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 import static org.junit.Assert.assertEquals;
 
 import org.junit.Test;
@@ -29,6 +26,7 @@ import org.springframework.util.ClassUtils;
 
 /**
  * @author Dave Syer
+ * @author Will Schipp
  *
  */
 public class OsgiBundleXmlApplicationContextFactoryTests {
@@ -42,13 +40,11 @@ public class OsgiBundleXmlApplicationContextFactoryTests {
 	public void testSetDisplayName() {
 		factory.setDisplayName("foo");
 		factory.setPath("classpath:"+ClassUtils.addResourcePathToPackagePath(getClass(), "trivial-context.xml"));
-		BundleContext bundleContext = createMock(BundleContext.class);
-		Bundle bundle = createNiceMock(Bundle.class);
-		expect(bundleContext.getBundle()).andReturn(bundle).anyTimes();
-		replay(bundleContext, bundle);
+		BundleContext bundleContext = mock(BundleContext.class);
+		Bundle bundle = mock(Bundle.class);
+		when(bundleContext.getBundle()).thenReturn(bundle);
 		factory.setBundleContext(bundleContext);
 		// factory.createApplicationContext();
-		verify(bundleContext, bundle);
 	}
 
 	@Test

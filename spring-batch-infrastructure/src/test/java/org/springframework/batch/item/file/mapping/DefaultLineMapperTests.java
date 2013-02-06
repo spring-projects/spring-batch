@@ -1,9 +1,7 @@
 package org.springframework.batch.item.file.mapping;
 
-import static org.easymock.EasyMock.createStrictMock;
-import static org.easymock.EasyMock.expect;
-import static org.easymock.EasyMock.replay;
-import static org.easymock.EasyMock.verify;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 import static org.junit.Assert.assertSame;
 
 import org.junit.Test;
@@ -38,21 +36,17 @@ public class DefaultLineMapperTests {
 		final FieldSet fs = new DefaultFieldSet(new String[]{"token1", "token2"});
 		final String item = "ITEM";
 		
-		LineTokenizer tokenizer = createStrictMock(LineTokenizer.class);
-		expect(tokenizer.tokenize(line)).andReturn(fs);
-		replay(tokenizer);
+		LineTokenizer tokenizer = mock(LineTokenizer.class);
+		when(tokenizer.tokenize(line)).thenReturn(fs);
 		
 		@SuppressWarnings("unchecked")
-		FieldSetMapper<String> fsMapper = createStrictMock(FieldSetMapper.class);
-		expect(fsMapper.mapFieldSet(fs)).andReturn(item);
-		replay(fsMapper);
+		FieldSetMapper<String> fsMapper = mock(FieldSetMapper.class);
+		when(fsMapper.mapFieldSet(fs)).thenReturn(item);
 		
 		tested.setLineTokenizer(tokenizer);
 		tested.setFieldSetMapper(fsMapper);
 		
 		assertSame(item, tested.mapLine(line, 1));
-		verify(tokenizer);
-		verify(fsMapper);
 		
 	}
 	

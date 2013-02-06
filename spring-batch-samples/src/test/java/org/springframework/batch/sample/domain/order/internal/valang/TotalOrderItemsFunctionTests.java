@@ -1,8 +1,7 @@
 package org.springframework.batch.sample.domain.order.internal.valang;
 
-import static org.easymock.EasyMock.createMock;
-import static org.easymock.EasyMock.expect;
-import static org.easymock.EasyMock.replay;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
@@ -23,11 +22,11 @@ public class TotalOrderItemsFunctionTests {
 	@Before
 	public void setUp() {
 		//create mock for first argument - set count to 3
-		Function argument1 = createMock(Function.class);
-		expect(argument1.getResult(null)).andReturn(3);
-		replay(argument1);
+		Function argument1 = mock(Function.class);
+		when(argument1.getResult(null)).thenReturn(3);
+
 		
-		argument2 = createMock(Function.class);
+		argument2 = mock(Function.class);
 
 		//create function
 		function = new TotalOrderItemsFunction(new Function[] {argument1, argument2}, 0, 0);
@@ -37,8 +36,7 @@ public class TotalOrderItemsFunctionTests {
 	@Test
 	public void testFunctionWithNonListValue() {
 		
-		expect(argument2.getResult(null)).andReturn(this);
-		replay(argument2);
+		when(argument2.getResult(null)).thenReturn(this);
 		
 		//call tested method - exception is expected because non list value
 		try {
@@ -59,8 +57,7 @@ public class TotalOrderItemsFunctionTests {
 		List<LineItem> list = new ArrayList<LineItem>();
 		list.add(item);
 		
-		expect(argument2.getResult(null)).andReturn(list);
-		replay(argument2);
+		when(argument2.getResult(null)).thenReturn(list);
 
 		//vefify result
 		assertTrue((Boolean) function.doGetResult(null));
@@ -76,8 +73,7 @@ public class TotalOrderItemsFunctionTests {
 		List<LineItem> list = new ArrayList<LineItem>();
 		list.add(item);
 		
-		expect(argument2.getResult(null)).andReturn(list);
-		replay(argument2);
+		when(argument2.getResult(null)).thenReturn(list);
 
 		//vefify result
 		assertFalse((Boolean) function.doGetResult(null));

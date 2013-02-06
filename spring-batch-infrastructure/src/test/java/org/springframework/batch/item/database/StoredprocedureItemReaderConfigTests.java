@@ -1,10 +1,7 @@
 package org.springframework.batch.item.database;
 
-import static org.easymock.EasyMock.createMock;
-import static org.easymock.EasyMock.createNiceMock;
-import static org.easymock.EasyMock.expect;
-import static org.easymock.EasyMock.replay;
-import static org.easymock.EasyMock.verify;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 import java.sql.CallableStatement;
 import java.sql.Connection;
@@ -36,20 +33,19 @@ public class StoredprocedureItemReaderConfigTests {
 	 */
 	@Test
 	public void testUsesCurrentTransaction() throws Exception {
-		DataSource ds = createMock(DataSource.class);
-		DatabaseMetaData dmd = createNiceMock(DatabaseMetaData.class);
-		expect(dmd.getDatabaseProductName()).andReturn("Oracle").times(2);
-		Connection con = createMock(Connection.class);
-		expect(con.getMetaData()).andReturn(dmd);
-		expect(con.getMetaData()).andReturn(dmd);
-		expect(con.getAutoCommit()).andReturn(false);
-		CallableStatement cs = createNiceMock(CallableStatement.class);
-		expect(con.prepareCall("{call foo_bar()}", ResultSet.TYPE_FORWARD_ONLY, ResultSet.CONCUR_READ_ONLY,
-				ResultSet.HOLD_CURSORS_OVER_COMMIT)).andReturn(cs);
-		expect(ds.getConnection()).andReturn(con);
-		expect(ds.getConnection()).andReturn(con);
+		DataSource ds = mock(DataSource.class);
+		DatabaseMetaData dmd = mock(DatabaseMetaData.class);
+		when(dmd.getDatabaseProductName()).thenReturn("Oracle");
+		Connection con = mock(Connection.class);
+		when(con.getMetaData()).thenReturn(dmd);
+		when(con.getMetaData()).thenReturn(dmd);
+		when(con.getAutoCommit()).thenReturn(false);
+		CallableStatement cs = mock(CallableStatement.class);
+		when(con.prepareCall("{call foo_bar()}", ResultSet.TYPE_FORWARD_ONLY, ResultSet.CONCUR_READ_ONLY,
+				ResultSet.HOLD_CURSORS_OVER_COMMIT)).thenReturn(cs);
+		when(ds.getConnection()).thenReturn(con);
+		when(ds.getConnection()).thenReturn(con);
 		con.commit();
-		replay(con,dmd, ds, cs);
 		PlatformTransactionManager tm = new DataSourceTransactionManager(ds);
 		TransactionTemplate tt = new TransactionTemplate(tm);
 		final StoredProcedureItemReader<String> reader = new StoredProcedureItemReader<String>();
@@ -66,7 +62,6 @@ public class StoredprocedureItemReaderConfigTests {
 						return null;
 					}
 				});
-		verify(ds);
 	}
 	
 	/*
@@ -75,19 +70,18 @@ public class StoredprocedureItemReaderConfigTests {
 	@Test
 	public void testUsesItsOwnTransaction() throws Exception {
 		
-		DataSource ds = createMock(DataSource.class);
-		DatabaseMetaData dmd = createNiceMock(DatabaseMetaData.class);
-		expect(dmd.getDatabaseProductName()).andReturn("Oracle").times(2);
-		Connection con = createMock(Connection.class);
-		expect(con.getMetaData()).andReturn(dmd);
-		expect(con.getMetaData()).andReturn(dmd);
-		expect(con.getAutoCommit()).andReturn(false);
-		CallableStatement cs = createNiceMock(CallableStatement.class);
-		expect(con.prepareCall("{call foo_bar()}", ResultSet.TYPE_FORWARD_ONLY, ResultSet.CONCUR_READ_ONLY)).andReturn(cs);
-		expect(ds.getConnection()).andReturn(con);
-		expect(ds.getConnection()).andReturn(con);
+		DataSource ds = mock(DataSource.class);
+		DatabaseMetaData dmd = mock(DatabaseMetaData.class);
+		when(dmd.getDatabaseProductName()).thenReturn("Oracle");
+		Connection con = mock(Connection.class);
+		when(con.getMetaData()).thenReturn(dmd);
+		when(con.getMetaData()).thenReturn(dmd);
+		when(con.getAutoCommit()).thenReturn(false);
+		CallableStatement cs = mock(CallableStatement.class);
+		when(con.prepareCall("{call foo_bar()}", ResultSet.TYPE_FORWARD_ONLY, ResultSet.CONCUR_READ_ONLY)).thenReturn(cs);
+		when(ds.getConnection()).thenReturn(con);
+		when(ds.getConnection()).thenReturn(con);
 		con.commit();
-		replay(con,dmd, ds, cs);
 		PlatformTransactionManager tm = new DataSourceTransactionManager(ds);
 		TransactionTemplate tt = new TransactionTemplate(tm);
 		final StoredProcedureItemReader<String> reader = new StoredProcedureItemReader<String>();
@@ -103,7 +97,6 @@ public class StoredprocedureItemReaderConfigTests {
 						return null;
 					}
 				});
-		verify(ds);
 	}
 
 	/*
@@ -112,19 +105,18 @@ public class StoredprocedureItemReaderConfigTests {
 	@Test
 	public void testHandlesRefCursorPosition() throws Exception {
 		
-		DataSource ds = createMock(DataSource.class);
-		DatabaseMetaData dmd = createNiceMock(DatabaseMetaData.class);
-		expect(dmd.getDatabaseProductName()).andReturn("Oracle").times(2);
-		Connection con = createMock(Connection.class);
-		expect(con.getMetaData()).andReturn(dmd);
-		expect(con.getMetaData()).andReturn(dmd);
-		expect(con.getAutoCommit()).andReturn(false);
-		CallableStatement cs = createNiceMock(CallableStatement.class);
-		expect(con.prepareCall("{call foo_bar(?, ?)}", ResultSet.TYPE_FORWARD_ONLY, ResultSet.CONCUR_READ_ONLY)).andReturn(cs);
-		expect(ds.getConnection()).andReturn(con);
-		expect(ds.getConnection()).andReturn(con);
+		DataSource ds = mock(DataSource.class);
+		DatabaseMetaData dmd = mock(DatabaseMetaData.class);
+		when(dmd.getDatabaseProductName()).thenReturn("Oracle");
+		Connection con = mock(Connection.class);
+		when(con.getMetaData()).thenReturn(dmd);
+		when(con.getMetaData()).thenReturn(dmd);
+		when(con.getAutoCommit()).thenReturn(false);
+		CallableStatement cs = mock(CallableStatement.class);
+		when(con.prepareCall("{call foo_bar(?, ?)}", ResultSet.TYPE_FORWARD_ONLY, ResultSet.CONCUR_READ_ONLY)).thenReturn(cs);
+		when(ds.getConnection()).thenReturn(con);
+		when(ds.getConnection()).thenReturn(con);
 		con.commit();
-		replay(con,dmd, ds, cs);
 		PlatformTransactionManager tm = new DataSourceTransactionManager(ds);
 		TransactionTemplate tt = new TransactionTemplate(tm);
 		final StoredProcedureItemReader<String> reader = new StoredProcedureItemReader<String>();
@@ -151,6 +143,5 @@ public class StoredprocedureItemReaderConfigTests {
 						return null;
 					}
 				});
-		verify(ds);
 	}
 }

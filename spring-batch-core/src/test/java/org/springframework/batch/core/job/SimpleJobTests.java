@@ -16,9 +16,8 @@
 
 package org.springframework.batch.core.job;
 
-import static org.easymock.EasyMock.createMock;
-import static org.easymock.EasyMock.replay;
-import static org.easymock.EasyMock.verify;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
@@ -66,6 +65,7 @@ import org.springframework.batch.item.ExecutionContext;
  * instead of a mock repository to test that status is being stored correctly.
  *
  * @author Lucas Ward
+ * @author Will Schipp
  */
 public class SimpleJobTests {
 
@@ -437,17 +437,15 @@ public class SimpleJobTests {
 	public void testInterruptWithListener() throws Exception {
 		step1.setProcessException(new JobInterruptedException("job interrupted!"));
 
-		JobExecutionListener listener = createMock(JobExecutionListener.class);
+		JobExecutionListener listener = mock(JobExecutionListener.class);
 		listener.beforeJob(jobExecution);
 		listener.afterJob(jobExecution);
-		replay(listener);
 
 		job.setJobExecutionListeners(new JobExecutionListener[] { listener });
 
 		job.execute(jobExecution);
 		assertEquals(BatchStatus.STOPPED, jobExecution.getStatus());
 
-		verify(listener);
 	}
 
 	/**

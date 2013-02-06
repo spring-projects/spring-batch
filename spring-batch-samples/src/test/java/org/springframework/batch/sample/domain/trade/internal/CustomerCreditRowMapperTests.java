@@ -1,6 +1,6 @@
 package org.springframework.batch.sample.domain.trade.internal;
 
-import static org.easymock.EasyMock.*;
+import static org.mockito.Mockito.when;
 
 import java.math.BigDecimal;
 import java.sql.ResultSet;
@@ -32,9 +32,9 @@ public class CustomerCreditRowMapperTests extends AbstractRowMapperTests {
 	}
 
 	protected void setUpResultSetMock(ResultSet rs) throws SQLException {
-		expect(rs.getInt(CustomerCreditRowMapper.ID_COLUMN)).andReturn(ID);
-		expect(rs.getString(CustomerCreditRowMapper.NAME_COLUMN)).andReturn(CUSTOMER);
-		expect(rs.getBigDecimal(CustomerCreditRowMapper.CREDIT_COLUMN)).andReturn(CREDIT);
+		when(rs.getInt(CustomerCreditRowMapper.ID_COLUMN)).thenReturn(ID);
+		when(rs.getString(CustomerCreditRowMapper.NAME_COLUMN)).thenReturn(CUSTOMER);
+		when(rs.getBigDecimal(CustomerCreditRowMapper.CREDIT_COLUMN)).thenReturn(CREDIT);
 	}
 
 }

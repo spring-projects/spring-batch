@@ -16,13 +16,11 @@
 
 package org.springframework.batch.item.database;
 
-import static org.easymock.EasyMock.createMock;
-import static org.easymock.EasyMock.expectLastCall;
-import static org.easymock.EasyMock.replay;
-import static org.easymock.EasyMock.verify;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 import java.util.Arrays;
 import java.util.List;
@@ -37,6 +35,7 @@ import org.springframework.transaction.support.TransactionSynchronizationManager
 
 /**
  * @author Thomas Risberg
+ * @author Will Schipp
  * 
  */
 public class JpaItemWriterTests {
@@ -51,7 +50,7 @@ public class JpaItemWriterTests {
 			TransactionSynchronizationManager.clearSynchronization();
 		}
 		writer = new JpaItemWriter<Object>();
-		emf = createMock("emf", EntityManagerFactory.class);
+		emf = mock(EntityManagerFactory.class,"emf");
 		writer.setEntityManagerFactory(emf);
 	}
 
@@ -71,38 +70,28 @@ public class JpaItemWriterTests {
 
 	@Test
 	public void testWriteAndFlushSunnyDay() throws Exception {
-		EntityManager em = createMock("em", EntityManager.class);
+		EntityManager em = mock(EntityManager.class,"em");
 		em.contains("foo");
-		expectLastCall().andReturn(true);
 		em.contains("bar");
-		expectLastCall().andReturn(false);
 		em.merge("bar");
-		expectLastCall().andReturn("bar");
 		em.flush();
-		replay(em);
-		replay(emf);
 		TransactionSynchronizationManager.bindResource(emf, new EntityManagerHolder(em));
 
 		List<String> items = Arrays.asList(new String[] { "foo", "bar" });
 
 		writer.write(items);
 
-		verify(em);
 		TransactionSynchronizationManager.unbindResource(emf);
 	}
 
 	@Test
 	public void testWriteAndFlushWithFailure() throws Exception {
 		final RuntimeException ex = new RuntimeException("ERROR");
-		EntityManager em = createMock("em", EntityManager.class);
+		EntityManager em = mock(EntityManager.class,"em");
 		em.contains("foo");
-		expectLastCall().andReturn(true);
 		em.contains("bar");
-		expectLastCall().andReturn(false);
 		em.merge("bar");
-		expectLastCall().andThrow(ex);
-		replay(em);
-		replay(emf);
+		when(em).thenThrow(ex);
 		TransactionSynchronizationManager.bindResource(emf, new EntityManagerHolder(em));
 		List<String> items = Arrays.asList(new String[] { "foo", "bar" });
 
@@ -114,7 +103,6 @@ public class JpaItemWriterTests {
 			assertEquals("ERROR", e.getMessage());
 		}
 
-		verify(em);
 		TransactionSynchronizationManager.unbindResource(emf);
 	}
 
