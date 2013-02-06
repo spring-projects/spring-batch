@@ -16,15 +16,17 @@
 package org.springframework.batch.item.jms;
 
 import static org.junit.Assert.assertEquals;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 import javax.jms.Message;
 
-import org.easymock.EasyMock;
 import org.junit.Test;
 
 
 /**
  * @author Dave Syer
+ * @author Will Schipp
  *
  */
 public class JmsMethodArgumentsKeyGeneratorTests {
@@ -33,15 +35,13 @@ public class JmsMethodArgumentsKeyGeneratorTests {
 
 	@Test
 	public void testGetKeyFromMessage() throws Exception {
-		Message message = EasyMock.createMock(Message.class);
-		EasyMock.expect(message.getJMSMessageID()).andReturn("foo");
-		EasyMock.replay(message);
+		Message message = mock(Message.class);
+		when(message.getJMSMessageID()).thenReturn("foo");
 
 		JmsItemReader<Message> itemReader = new JmsItemReader<Message>();
 		itemReader.setItemType(Message.class);
 		assertEquals("foo", methodArgumentsKeyGenerator.getKey(new Object[]{message}));
 
-		EasyMock.verify(message);
 	}
 
 	@Test

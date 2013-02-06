@@ -15,11 +15,12 @@
  */
 package org.springframework.batch.sample.domain.trade.internal;
 
+import static org.mockito.Mockito.mock;
+
 import java.math.BigDecimal;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 
-import org.easymock.EasyMock;
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.batch.sample.domain.trade.CustomerCredit;
@@ -38,7 +39,7 @@ public class CustomerCreditUpdatePreparedStatementSetterTests {
 
 	@Before
 	public void setUp() throws Exception {
-		ps = EasyMock.createMock(PreparedStatement.class);
+		ps = mock(PreparedStatement.class);
 		credit = new CustomerCredit();
 		credit.setId(13);
 		credit.setCredit(new BigDecimal(12000));
@@ -51,12 +52,8 @@ public class CustomerCreditUpdatePreparedStatementSetterTests {
 	@Test
 	public void testSetValues() throws SQLException {
 		ps.setBigDecimal(1, credit.getCredit().add(CustomerCreditUpdatePreparedStatementSetter.FIXED_AMOUNT));
-		EasyMock.expectLastCall();
 		ps.setLong(2, credit.getId());
-		EasyMock.expectLastCall();
-		EasyMock.replay(ps);
 		setter.setValues(credit, ps);
-		EasyMock.verify(ps);
 	}
 
 }

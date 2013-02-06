@@ -1,7 +1,6 @@
 package org.springframework.batch.sample.support;
 
-import static org.easymock.EasyMock.createMock;
-import static org.easymock.EasyMock.replay;
+import static org.mockito.Mockito.mock;
 import static org.junit.Assert.assertEquals;
 
 import java.sql.ResultSet;
@@ -21,7 +20,7 @@ public abstract class AbstractRowMapperTests {
 	private static final int IGNORED_ROW_NUMBER = 0;
 
 	// mock result set
-	private ResultSet rs = createMock(ResultSet.class);
+	private ResultSet rs = mock(ResultSet.class);
 
 	/**
 	 * @return Expected result of mapping the mock <code>ResultSet</code> by the
@@ -45,7 +44,6 @@ public abstract class AbstractRowMapperTests {
 	@Test
 	public void testRegularUse() throws SQLException {
 		setUpResultSetMock(rs);
-		replay(rs);
 
 		assertEquals(expectedDomainObject(), rowMapper().mapRow(rs, IGNORED_ROW_NUMBER));
 	}

@@ -15,10 +15,8 @@
  */
 package org.springframework.batch.item.database.support;
 
-import static org.easymock.EasyMock.createMock;
-import static org.easymock.EasyMock.expect;
-import static org.easymock.EasyMock.replay;
-import static org.easymock.EasyMock.verify;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
@@ -36,6 +34,7 @@ import org.springframework.dao.InvalidDataAccessResourceUsageException;
 /**
  * @author Thomas Risberg
  * @author Michael Minella
+ * @author Will Schipp
  */
 public class DerbyPagingQueryProviderTests extends AbstractSqlPagingQueryProviderTests {
 
@@ -45,32 +44,23 @@ public class DerbyPagingQueryProviderTests extends AbstractSqlPagingQueryProvide
 	
 	@Test
 	public void testInit() throws Exception {
-		DataSource ds = createMock(DataSource.class);
-		Connection con = createMock(Connection.class);
-		DatabaseMetaData dmd = createMock(DatabaseMetaData.class);
-		expect(dmd.getDatabaseProductVersion()).andReturn("10.4.1.3");
-		expect(con.getMetaData()).andReturn(dmd);
-		expect(ds.getConnection()).andReturn(con);
-		replay(dmd);
-		replay(con);
-		replay(ds);
+		DataSource ds = mock(DataSource.class);
+		Connection con = mock(Connection.class);
+		DatabaseMetaData dmd = mock(DatabaseMetaData.class);
+		when(dmd.getDatabaseProductVersion()).thenReturn("10.4.1.3");
+		when(con.getMetaData()).thenReturn(dmd);
+		when(ds.getConnection()).thenReturn(con);
 		pagingQueryProvider.init(ds);
-		verify(ds);
-		verify(con);
-		verify(dmd);
 	}
 
 	@Test
 	public void testInitWithUnsupportedVErsion() throws Exception {
-		DataSource ds = createMock(DataSource.class);
-		Connection con = createMock(Connection.class);
-		DatabaseMetaData dmd = createMock(DatabaseMetaData.class);
-		expect(dmd.getDatabaseProductVersion()).andReturn("10.2.9.9");
-		expect(con.getMetaData()).andReturn(dmd);
-		expect(ds.getConnection()).andReturn(con);
-		replay(dmd);
-		replay(con);
-		replay(ds);
+		DataSource ds = mock(DataSource.class);
+		Connection con = mock(Connection.class);
+		DatabaseMetaData dmd = mock(DatabaseMetaData.class);
+		when(dmd.getDatabaseProductVersion()).thenReturn("10.2.9.9");
+		when(con.getMetaData()).thenReturn(dmd);
+		when(ds.getConnection()).thenReturn(con);
 		try {
 			pagingQueryProvider.init(ds);
 			fail();
@@ -78,9 +68,6 @@ public class DerbyPagingQueryProviderTests extends AbstractSqlPagingQueryProvide
 		catch (InvalidDataAccessResourceUsageException e) {
 			// expected
 		}
-		verify(ds);
-		verify(con);
-		verify(dmd);
 	}
 
 	@Test

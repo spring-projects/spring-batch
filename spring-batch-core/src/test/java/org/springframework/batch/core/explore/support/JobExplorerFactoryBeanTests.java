@@ -17,7 +17,7 @@ package org.springframework.batch.core.explore.support;
 
 import static junit.framework.Assert.assertTrue;
 import static junit.framework.Assert.fail;
-import static org.easymock.EasyMock.createMock;
+import static org.mockito.Mockito.mock;
 import static org.junit.Assert.assertNotNull;
 
 import javax.sql.DataSource;
@@ -29,6 +29,7 @@ import org.springframework.batch.core.explore.support.JobExplorerFactoryBean;
 
 /**
  * @author Dave Syer
+ * @author Will Schipp
  * 
  */
 public class JobExplorerFactoryBeanTests {
@@ -43,7 +44,7 @@ public class JobExplorerFactoryBeanTests {
 	public void setUp() throws Exception {
 
 		factory = new JobExplorerFactoryBean();
-		dataSource = createMock(DataSource.class);
+		dataSource = mock(DataSource.class);
 		factory.setDataSource(dataSource);
 		factory.setTablePrefix(tablePrefix);
 

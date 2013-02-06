@@ -15,11 +15,8 @@
  */
 package org.springframework.batch.item.xml.stax;
 
-import static org.easymock.EasyMock.createMock;
-import static org.easymock.EasyMock.expect;
-import static org.easymock.EasyMock.expectLastCall;
-import static org.easymock.EasyMock.replay;
-import static org.easymock.EasyMock.verify;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 import javax.xml.namespace.NamespaceContext;
 import javax.xml.stream.XMLEventReader;
@@ -29,11 +26,9 @@ import javax.xml.stream.events.XMLEvent;
 
 import junit.framework.TestCase;
 
-import org.easymock.EasyMock;
-
-
 /**
  * @author Lucas Ward
+ * @author Will Schipp
  * 
  */
 public class AbstractEventWriterWrapperTests extends TestCase {
@@ -46,80 +41,58 @@ public class AbstractEventWriterWrapperTests extends TestCase {
 	protected void setUp() throws Exception {
 		super.setUp();
 
-		xmlEventWriter = createMock(XMLEventWriter.class);
+		xmlEventWriter = mock(XMLEventWriter.class);
 		eventWriterWrapper = new StubEventWriter(xmlEventWriter);
 	}
 
 	public void testAdd() throws XMLStreamException {
 
-		XMLEvent event =  EasyMock.createMock(XMLEvent.class);
+		XMLEvent event =  mock(XMLEvent.class);
 		xmlEventWriter.add(event);
-		expectLastCall();
-		replay(xmlEventWriter);
 		eventWriterWrapper.add(event);
-		verify(xmlEventWriter);
 
 	}
 
 	public void testAddReader() throws XMLStreamException {
 
-		XMLEventReader reader = createMock(XMLEventReader.class);
+		XMLEventReader reader = mock(XMLEventReader.class);
 		xmlEventWriter.add(reader);
-		expectLastCall().once();
-		replay(xmlEventWriter);
 		eventWriterWrapper.add(reader);
-		verify(xmlEventWriter);
 	}
 
 	public void testClose() throws XMLStreamException {
 		xmlEventWriter.close();
-		expectLastCall().once();
-		replay(xmlEventWriter);
 		eventWriterWrapper.close();
-		verify(xmlEventWriter);
 	}
 
 	public void testFlush() throws XMLStreamException {
 		xmlEventWriter.flush();
-		expectLastCall().once();
-		replay(xmlEventWriter);
 		eventWriterWrapper.flush();
-		verify(xmlEventWriter);
 	}
 
 	public void testGetNamespaceContext() {
-		NamespaceContext context = EasyMock.createMock(NamespaceContext.class);
-		expect(xmlEventWriter.getNamespaceContext()).andReturn(context);
-		replay(xmlEventWriter);
+		NamespaceContext context = mock(NamespaceContext.class);
+		when(xmlEventWriter.getNamespaceContext()).thenReturn(context);
 		assertEquals(eventWriterWrapper.getNamespaceContext(), context);
-		verify(xmlEventWriter);
 	}
 
 	public void testGetPrefix() throws XMLStreamException {
 		String uri = "uri";
-		expect(xmlEventWriter.getPrefix(uri)).andReturn(uri);
-		replay(xmlEventWriter);
+		when(xmlEventWriter.getPrefix(uri)).thenReturn(uri);
 		assertEquals(eventWriterWrapper.getPrefix(uri), uri);
-		verify(xmlEventWriter);
 	}
 
 	public void testSetDefaultNamespace() throws XMLStreamException {
 		String uri = "uri";
 		xmlEventWriter.setDefaultNamespace(uri);
-		expectLastCall().once();
-		replay(xmlEventWriter);
 		eventWriterWrapper.setDefaultNamespace(uri);
-		verify(xmlEventWriter);
 	}
 
 	public void testSetNamespaceContext() throws XMLStreamException {
 
-		NamespaceContext context = EasyMock.createMock(NamespaceContext.class);
+		NamespaceContext context = mock(NamespaceContext.class);
 		xmlEventWriter.setNamespaceContext(context);
-		expectLastCall().once();
-		replay(xmlEventWriter);
 		eventWriterWrapper.setNamespaceContext(context);
-		verify(xmlEventWriter);
 	}
 
 	public void testSetPrefix() throws XMLStreamException {
@@ -127,10 +100,7 @@ public class AbstractEventWriterWrapperTests extends TestCase {
 		String uri = "uri";
 		String prefix = "prefix";
 		xmlEventWriter.setPrefix(prefix, uri);
-		expectLastCall().once();
-		replay(xmlEventWriter);
 		eventWriterWrapper.setPrefix(prefix, uri);
-		verify(xmlEventWriter);
 	}
 
 	private static class StubEventWriter extends AbstractEventWriterWrapper {

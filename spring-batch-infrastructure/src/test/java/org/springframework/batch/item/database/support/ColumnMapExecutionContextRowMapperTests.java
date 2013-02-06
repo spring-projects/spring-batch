@@ -3,7 +3,8 @@
  */
 package org.springframework.batch.item.database.support;
 
-import static org.easymock.EasyMock.*;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 import java.sql.PreparedStatement;
 import java.util.HashMap;
@@ -14,6 +15,7 @@ import junit.framework.TestCase;
 
 /**
  * @author Lucas Ward
+ * @author Will Schipp
  */
 public class ColumnMapExecutionContextRowMapperTests extends TestCase {
 
@@ -27,7 +29,7 @@ public class ColumnMapExecutionContextRowMapperTests extends TestCase {
 	protected void setUp() throws Exception {
 		super.setUp();
 	
-		ps = createMock(PreparedStatement.class);
+		ps = mock(PreparedStatement.class);
 		mapper = new ColumnMapItemPreparedStatementSetter();
 		
 		key = new LinkedHashMap<String, Object>(2);
@@ -37,18 +39,14 @@ public class ColumnMapExecutionContextRowMapperTests extends TestCase {
 	
 	public void testCreateExecutionContextFromEmptyKeys() throws Exception {
 		
-		replay(ps);
 		mapper.setValues(new HashMap<String, Object>(), ps);
-		verify(ps);
 	}
 	
 	public void testCreateSetter() throws Exception {
 		
 		ps.setObject(1, Integer.valueOf(1));
 		ps.setObject(2, Integer.valueOf(2));
-		replay(ps);
 		mapper.setValues(key, ps);	
-		verify(ps);
 	}
 	
 }

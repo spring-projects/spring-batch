@@ -6,12 +6,13 @@ import javax.xml.stream.events.XMLEvent;
 
 import junit.framework.TestCase;
 
-import static org.easymock.EasyMock.*;
+import static org.mockito.Mockito.mock;
 
 /**
  * Tests for {@link NoStartEndDocumentStreamWriter}
  * 
  * @author Robert Kasanicky
+ * @author Will Schipp
  */
 public class NoStartEndDocumentWriterTests extends TestCase {
 
@@ -24,7 +25,7 @@ public class NoStartEndDocumentWriterTests extends TestCase {
 
     @Override
 	protected void setUp() throws Exception {
-		wrappedWriter = createStrictMock(XMLEventWriter.class);
+		wrappedWriter = mock(XMLEventWriter.class);
 		writer = new NoStartEndDocumentStreamWriter(wrappedWriter);
 	}
 
@@ -37,13 +38,10 @@ public class NoStartEndDocumentWriterTests extends TestCase {
 
 		// mock expects only a single event
 		wrappedWriter.add(event);
-		expectLastCall().once();
-		replay(wrappedWriter);
 
 		writer.add(eventFactory.createStartDocument());
 		writer.add(event);
 		writer.add(eventFactory.createEndDocument());
 
-		verify(wrappedWriter);
 	}
 }

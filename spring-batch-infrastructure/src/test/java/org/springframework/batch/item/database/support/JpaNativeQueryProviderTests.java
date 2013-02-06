@@ -16,10 +16,8 @@
 
 package org.springframework.batch.item.database.support;
 
-import static org.easymock.EasyMock.createMock;
-import static org.easymock.EasyMock.expect;
-import static org.easymock.EasyMock.replay;
-import static org.easymock.EasyMock.verify;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 import javax.persistence.EntityManager;
 import javax.persistence.Query;
@@ -32,6 +30,7 @@ import org.springframework.util.Assert;
 /**
  * @author Anatoly Polinsky
  * @author Dave Syer
+ * @author Will Schipp
  */
 public class JpaNativeQueryProviderTests {
 
@@ -48,16 +47,12 @@ public class JpaNativeQueryProviderTests {
 		String sqlQuery = "select * from T_FOOS where value >= :limit";
 		jpaQueryProvider.setSqlQuery(sqlQuery);
 
-		EntityManager entityManager = createMock(EntityManager.class);
-		Query query = createMock(Query.class);
+		EntityManager entityManager = mock(EntityManager.class);
+		Query query = mock(Query.class);
 
-		expect(entityManager.createNativeQuery(sqlQuery, Foo.class)).andReturn(query);
-
-		replay(entityManager);
+		when(entityManager.createNativeQuery(sqlQuery, Foo.class)).thenReturn(query);
 
 		jpaQueryProvider.setEntityManager(entityManager);
 		Assert.notNull(jpaQueryProvider.createQuery());
-
-		verify(entityManager);
 	}
 }

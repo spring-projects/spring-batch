@@ -1,10 +1,7 @@
 package org.springframework.batch.item.database;
 
-import static org.easymock.EasyMock.createMock;
-import static org.easymock.EasyMock.createNiceMock;
-import static org.easymock.EasyMock.expect;
-import static org.easymock.EasyMock.replay;
-import static org.easymock.EasyMock.verify;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -30,16 +27,15 @@ public class JdbcCursorItemReaderConfigTests {
 	 */
 	@Test
 	public void testUsesCurrentTransaction() throws Exception {
-		DataSource ds = createMock(DataSource.class);
-		Connection con = createMock(Connection.class);
-		expect(con.getAutoCommit()).andReturn(false);
-		PreparedStatement ps = createNiceMock(PreparedStatement.class);
-		expect(con.prepareStatement("select foo from bar", ResultSet.TYPE_FORWARD_ONLY, ResultSet.CONCUR_READ_ONLY,
-				ResultSet.HOLD_CURSORS_OVER_COMMIT)).andReturn(ps);
-		expect(ds.getConnection()).andReturn(con);
-		expect(ds.getConnection()).andReturn(con);
+		DataSource ds = mock(DataSource.class);
+		Connection con = mock(Connection.class);
+		when(con.getAutoCommit()).thenReturn(false);
+		PreparedStatement ps = mock(PreparedStatement.class);
+		when(con.prepareStatement("select foo from bar", ResultSet.TYPE_FORWARD_ONLY, ResultSet.CONCUR_READ_ONLY,
+				ResultSet.HOLD_CURSORS_OVER_COMMIT)).thenReturn(ps);
+		when(ds.getConnection()).thenReturn(con);
+		when(ds.getConnection()).thenReturn(con);
 		con.commit();
-		replay(con, ds, ps);
 		PlatformTransactionManager tm = new DataSourceTransactionManager(ds);
 		TransactionTemplate tt = new TransactionTemplate(tm);
 		final JdbcCursorItemReader<String> reader = new JdbcCursorItemReader<String>();
@@ -56,7 +52,6 @@ public class JdbcCursorItemReaderConfigTests {
 						return null;
 					}
 				});
-		verify(ds);
 	}
 	
 	/*
@@ -65,15 +60,14 @@ public class JdbcCursorItemReaderConfigTests {
 	@Test
 	public void testUsesItsOwnTransaction() throws Exception {
 		
-		DataSource ds = createMock(DataSource.class);
-		Connection con = createMock(Connection.class);
-		expect(con.getAutoCommit()).andReturn(false);
-		PreparedStatement ps = createNiceMock(PreparedStatement.class);
-		expect(con.prepareStatement("select foo from bar", ResultSet.TYPE_FORWARD_ONLY, ResultSet.CONCUR_READ_ONLY)).andReturn(ps);
-		expect(ds.getConnection()).andReturn(con);
-		expect(ds.getConnection()).andReturn(con);
+		DataSource ds = mock(DataSource.class);
+		Connection con = mock(Connection.class);
+		when(con.getAutoCommit()).thenReturn(false);
+		PreparedStatement ps = mock(PreparedStatement.class);
+		when(con.prepareStatement("select foo from bar", ResultSet.TYPE_FORWARD_ONLY, ResultSet.CONCUR_READ_ONLY)).thenReturn(ps);
+		when(ds.getConnection()).thenReturn(con);
+		when(ds.getConnection()).thenReturn(con);
 		con.commit();
-		replay(con, ds, ps);
 		PlatformTransactionManager tm = new DataSourceTransactionManager(ds);
 		TransactionTemplate tt = new TransactionTemplate(tm);
 		final JdbcCursorItemReader<String> reader = new JdbcCursorItemReader<String>();
@@ -89,7 +83,6 @@ public class JdbcCursorItemReaderConfigTests {
 						return null;
 					}
 				});
-		verify(ds);
 	}
 
 }
