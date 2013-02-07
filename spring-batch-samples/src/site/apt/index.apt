@@ -43,6 +43,7 @@ Source code can also be browsed and downloaded at {{{http://github.com/SpringSou
     * How do I process the data and write to the output source? How
     and what business logic is being applied to the processing of a
     record?
+{{adhocLoop}}                |  |  |  |  |x |  |  |  |  |  |  |  |  |
 
     * How do I recover from an exception while operating on the output
     source? There are numerous recovery strategies that can be applied
@@ -59,6 +60,8 @@ Source code can also be browsed and downloaded at {{{http://github.com/SpringSou
 |<<Job / Feature>> | <<skip>> | <<retry>> | <<restart>> | <<automatic mapping>> | <<asynch launch>> | <<validation>> | <<delegation>> | <<write behind>> | <<non- sequential>> | <<asynch process>> | <<filtering>> | <<flat file>> | <<multi-step>> |
 *----+----+----+----+----+----+----+----+----+----+----+----+
 {{adhocLoop}}                |  |  |  |  |x |  |  |  |  |  |  |  |  |
+*----+----+----+----+----+----+----+----+----+----+----+----+
+{{AmqpJobFunctionalTests}}                |  |  |  |  |  |  |  |  |  |x |  |  |  |
 *----+----+----+----+----+----+----+----+----+----+----+----+
 {{beanWrapperMapperSample}}  |  |  |  |x |  |  |  |  |  |  |  |  |  |
 *----+----+----+----+----+----+----+----+----+----+----+----+
@@ -101,29 +104,29 @@ Source code can also be browsed and downloaded at {{{http://github.com/SpringSou
 
   The <<<ioSampleJob>>> ({ioSample}) has a number of special instances that show different IO features using the same job configuration but with different readers and writers:
 
-*----+----+----+----+----+----+----+----+----+----+----+----++----+----+----+----+----+----+----+----+----+----+----+----+
-|<<Job / Feature>> | <<delimited input>> | <<fixed-length input>> | <<xml input>> | <<db paging input>> | <<db cursor input>> | <<delimited output>> | <<fixed-length output>> | <<xml output>> | <<db output>> | <<multiple files>> | <<multi-line>> | multi-record |
-*----+----+----+----+----+----+----+----+----+----+----+----++----+----+----+----+----+----+----+----+----+----+----+----+
-delimited              |x |  |  |  |  |  |  |x |  |  |  |  |  |  |
-*----+----+----+----+----+----+----+----+----+----+----+----++----+----+----+----+----+----+----+----+----+----+----+----+
-{{fixedLength}}        |  |x |  |  |  |  |  |  |x |  |  |  |  |  |
-*----+----+----+----+----+----+----+----+----+----+----+----++----+----+----+----+----+----+----+----+----+----+----+----+
-{{ibatis}}             |  |  |  |  |x |  |  |  |  |  |x |  |  |  |
-*----+----+----+----+----+----+----+----+----+----+----+----++----+----+----+----+----+----+----+----+----+----+----+----+
-hibernate              |  |  |  |  |x |  |  |  |  |  |x |  |  |  |
-*----+----+----+----+----+----+----+----+----+----+----+----++----+----+----+----+----+----+----+----+----+----+----+----+
-{{jdbcCursor}}         |  |  |  |  |x |  |  |  |  |  |x |  |  |  |
-*----+----+----+----+----+----+----+----+----+----+----+----++----+----+----+----+----+----+----+----+----+----+----+----+
-jpa                    |  |  |  |x |  |  |  |  |  |  |x |  |  |  |
-*----+----+----+----+----+----+----+----+----+----+----+----++----+----+----+----+----+----+----+----+----+----+----+----+
-multiLine              |x |  |  |  |  |  |  |x |  |  |  |  |x |  |
-*----+----+----+----+----+----+----+----+----+----+----+----++----+----+----+----+----+----+----+----+----+----+----+----+
-multiRecordtype        |  |x |  |  |  |  |  |  |x |  |  |  |  |x |
-*----+----+----+----+----+----+----+----+----+----+----+----++----+----+----+----+----+----+----+----+----+----+----+----+
-multiResource          |x |  |  |  |  |  |  |x |  |  |  |x |  |  |
-*----+----+----+----+----+----+----+----+----+----+----+----++----+----+----+----+----+----+----+----+----+----+----+----+
-{{xml}}                |  |  |x |  |  |  |  |  |  |x |  |  |  |  |
-*----+----+----+----+----+----+----+----+----+----+----+----++----+----+----+----+----+----+----+----+----+----+----+----+
+*----+----+----+----+----+----+----+----+----+----+----+----++
+|<<Job / Feature>> | <<delimited input>> | <<fixed-length input>> | <<xml input>> | <<db paging input>> | <<db cursor input>> | <<delimited output>> | <<fixed-length output>> | <<xml output>> | <<db output>> | <<multiple files>> | <<multi-line>> | <<multi-record>> |
+*----+----+----+----+----+----+----+----+----+----+----+----++
+delimited              |x |  |  |  |  |  |  |x |  |  |  |  | 
+*----+----+----+----+----+----+----+----+----+----+----+----++
+{{fixedLength}}        |  |x |  |  |  |  |  |  |x |  |  |  | 
+*----+----+----+----+----+----+----+----+----+----+----+----++
+{{ibatis}}             |  |  |  |  |x |  |  |  |  |  |x |  | 
+*----+----+----+----+----+----+----+----+----+----+----+----++
+hibernate              |  |  |  |  |x |  |  |  |  |  |x |  | 
+*----+----+----+----+----+----+----+----+----+----+----+----++
+{{jdbcCursor}}         |  |  |  |  |x |  |  |  |  |  |x |  | 
+*----+----+----+----+----+----+----+----+----+----+----+----++
+jpa                    |  |  |  |x |  |  |  |  |  |  |x |  |
+*----+----+----+----+----+----+----+----+----+----+----+----++
+multiLine              |x |  |  |  |  |  |  |x |  |  |x |  |
+*----+----+----+----+----+----+----+----+----+----+----+----++
+multiRecordtype        |  |x |  |  |  |  |  |  |x |  |  |x | 
+*----+----+----+----+----+----+----+----+----+----+----+----++
+multiResource          |x |  |  |  |  |  |  |x |  |  |  |x | 
+*----+----+----+----+----+----+----+----+----+----+----+----++
+{{xml}}                |  |  |x |  |  |  |  |  |  |x |  |  |
+*----+----+----+----+----+----+----+----+----+----+----+----++
 
 
 * Common Sample Source Structures
@@ -183,6 +186,19 @@ multiResource          |x |  |  |  |  |  |  |x |  |  |  |x |  |  |
   one place, since it contains a static constant value (<<<QUERY>>>)
   which is used to configure the query for the writer.
 
+* Amqp Job Sample ({AmqpJobFunctionalTests})
+
+  This sample shows the use of Spring Batch to write to an <<<AmqpItemWriter>>>.
+  The AmqpItemReader and Writer were contributed by Chris Schaeffer and
+  a blog entry can be found at {{http://blog.dtzq.com/2012/08/spring-batch-amqp-itemreader-itemwriter.html}}.
+  It is modeled after the JmsItemReader / Writer implementations, which
+  are popular models for remote chunking. It leverages the AmqpTemplate.
+
+  This example requires the env to have a copy of rabbitmq installed
+  and running.  The standard dashboard can be used to see the traffic
+  from the <<<MessageProducer>>> to the AmqpItemWriter.  Make sure you
+  launch the <<<MessageProducer>>> before launching the test. 
+ 
 * BeanWrapperMapper Sample ({beanWrapperMapperSample})
 
   This sample shows the use of automatic mapping from fields in a file
@@ -200,6 +216,7 @@ multiResource          |x |  |  |  |  |  |  |x |  |  |  |x |  |  |
   the mapper will accept the values happily.  Underscores instead of
   camel-casing (e.g. <<<CREDIT_CARD>>> instead of <<<creditCard>>>)
   also work.
+
 
 * Composite ItemWriter Sample ({compositeItemWriterSample})
 

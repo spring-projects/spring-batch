@@ -494,7 +494,7 @@ itemWriter.write(items);</programlisting>
       refines the list of skippable exception classes to be all
       <classname>Exception</classname>s <emphasis>except</emphasis>
       <classname>FileNotFoundException</classname>. Any excluded exception
-      calsses will be fatal if encountered (i.e. not skipped).</para>
+      classes will be fatal if encountered (i.e. not skipped).</para>
 
       <para>For any exception encountered, the skippability will be determined
       by the nearest superclass in the class hierarchy. Any unclassifed
