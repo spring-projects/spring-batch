@@ -189,7 +189,7 @@ multiResource          |x |  |  |  |  |  |  |x |  |  |  |x |
 * Amqp Job Sample ({AmqpJobFunctionalTests})
 
   This sample shows the use of Spring Batch to write to an <<<AmqpItemWriter>>>.
-  The AmqpItemReader and Writer were contributed by Chris Schaeffer and
+  The AmqpItemReader and Writer were contributed by Chris Schaefer and
   a blog entry can be found at {{http://blog.dtzq.com/2012/08/spring-batch-amqp-itemreader-itemwriter.html}}.
   It is modeled after the JmsItemReader / Writer implementations, which
   are popular models for remote chunking. It leverages the AmqpTemplate.
