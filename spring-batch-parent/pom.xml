@@ -371,18 +371,18 @@
 				<version>${junit.version}</version>
 				<scope>test</scope>
 			</dependency>
-			<dependency>
-				<groupId>org.easymock</groupId>
-				<artifactId>easymock</artifactId>
-				<version>3.1</version>
-				<scope>test</scope>
-			</dependency>
-			<dependency>
-				<groupId>org.easymock</groupId>
-				<artifactId>easymockclassextension</artifactId>
-				<version>3.1</version>
-				<scope>test</scope>
-			</dependency>
+<!-- 			<dependency> -->
+<!-- 				<groupId>org.easymock</groupId> -->
+<!-- 				<artifactId>easymock</artifactId> -->
+<!-- 				<version>3.1</version> -->
+<!-- 				<scope>test</scope> -->
+<!-- 			</dependency> -->
+<!-- 			<dependency> -->
+<!-- 				<groupId>org.easymock</groupId> -->
+<!-- 				<artifactId>easymockclassextension</artifactId> -->
+<!-- 				<version>3.1</version> -->
+<!-- 				<scope>test</scope> -->
+<!-- 			</dependency> -->
 			<dependency>
 				<groupId>org.apache.geronimo.specs</groupId>
 				<artifactId>geronimo-jms_1.1_spec</artifactId>

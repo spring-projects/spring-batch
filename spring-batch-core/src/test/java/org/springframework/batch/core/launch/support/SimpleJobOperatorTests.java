@@ -171,7 +171,6 @@ public class SimpleJobOperatorTests {
 	public void testStartNewInstanceSunnyDay() throws Exception {
 		jobParameters = new JobParameters();
 		jobRepository.isJobInstanceExists("foo", jobParameters);
-//		EasyMock.expectLastCall().andReturn(false);
 		Long value = jobOperator.start("foo", "a=b");
 		assertEquals(999, value.longValue());
 	}
@@ -213,7 +212,6 @@ public class SimpleJobOperatorTests {
 	public void testGetSummaryNoSuchExecution() throws Exception {
 		jobParameters = new JobParameters();
 		jobExplorer.getJobExecution(111L);
-//		EasyMock.expectLastCall().andReturn(null);
 		try {
 			jobOperator.getSummary(111L);
 			fail("Expected NoSuchJobExecutionException");
@@ -239,7 +237,6 @@ public class SimpleJobOperatorTests {
 	public void testGetStepExecutionSummariesNoSuchExecution() throws Exception {
 		jobParameters = new JobParameters();
 		jobExplorer.getJobExecution(111L);
-//		EasyMock.expectLastCall().andReturn(null);
 		try {
 			jobOperator.getStepExecutionSummaries(111L);
 			fail("Expected NoSuchJobExecutionException");
@@ -280,7 +277,6 @@ public class SimpleJobOperatorTests {
 	@Test
 	public void testGetJobParametersNoSuchExecution() throws Exception {
 		jobExplorer.getJobExecution(111L);
-//		EasyMock.expectLastCall().andReturn(null);
 		try {
 			jobOperator.getParameters(111L);
 			fail("Expected NoSuchJobExecutionException");
@@ -303,7 +299,6 @@ public class SimpleJobOperatorTests {
 	public void testGetLastInstancesNoSuchJob() throws Exception {
 		jobParameters = new JobParameters();
 		jobExplorer.getJobInstances("no-such-job", 0, 2);
-//		EasyMock.expectLastCall().andReturn(Collections.emptyList());
 		try {
 			jobOperator.getJobInstances("no-such-job", 0, 2);
 			fail("Expected NoSuchJobException");
@@ -325,10 +320,8 @@ public class SimpleJobOperatorTests {
 		JobInstance jobInstance = new JobInstance(123L, job.getName());
 		when(jobExplorer.getJobInstance(123L)).thenReturn(jobInstance);
 		
-//		EasyMock.expectLastCall().andReturn(jobInstance);
 		JobExecution jobExecution = new JobExecution(jobInstance, 111L, jobParameters);
 		when(jobExplorer.getJobExecutions(jobInstance)).thenReturn(Collections.singletonList(jobExecution));
-//		EasyMock.expectLastCall().andReturn(Collections.singletonList(jobExecution));
 		List<Long> value = jobOperator.getExecutions(123L);
 		assertEquals(111L, value.iterator().next().longValue());
 	}
@@ -336,7 +329,6 @@ public class SimpleJobOperatorTests {
 	@Test
 	public void testGetExecutionsNoSuchInstance() throws Exception {
 		jobExplorer.getJobInstance(123L);
-//		EasyMock.expectLastCall().andReturn(null);
 		try {
 			jobOperator.getExecutions(123L);
 			fail("Expected NoSuchJobInstanceException");

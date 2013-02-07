@@ -39,14 +39,14 @@
 			<groupId>junit</groupId>
 			<artifactId>junit</artifactId>
 		</dependency>
-		<dependency>
-			<groupId>org.easymock</groupId>
-			<artifactId>easymock</artifactId>
-		</dependency>
-        <dependency>
-            <groupId>org.easymock</groupId>
-            <artifactId>easymockclassextension</artifactId>
-        </dependency>
+<!-- 		<dependency> -->
+<!-- 			<groupId>org.easymock</groupId> -->
+<!-- 			<artifactId>easymock</artifactId> -->
+<!-- 		</dependency> -->
+<!--         <dependency> -->
+<!--             <groupId>org.easymock</groupId> -->
+<!--             <artifactId>easymockclassextension</artifactId> -->
+<!--         </dependency> -->
 		<dependency>
 			<groupId>org.aspectj</groupId>
 			<artifactId>aspectjrt</artifactId>
