@@ -1045,11 +1045,11 @@ jobOperator.stop(executions.iterator().next());  ]]></programlisting>
 
       <para>A job execution which is <classname>FAILED</classname> can be
       restarted (if the Job is restartable). A job execution whose status is
-      <classname>ABORTED</classname> will not be restarted by the framework.
-      The <classname>ABORTED</classname> status is also used in step
+      <classname>ABANDONED</classname> will not be restarted by the framework.
+      The <classname>ABANDONED</classname> status is also used in step
       executions to mark them as skippable in a restarted job execution: if a
       job is executing and encounters a step that has been marked
-      <classname>ABORTED</classname> in the previous failed job execution, it
+      <classname>ABANDONED</classname> in the previous failed job execution, it
       will move on to the next step (as determined by the job flow definition
       and the step execution exit status).</para>
 
@@ -1058,7 +1058,7 @@ jobOperator.stop(executions.iterator().next());  ]]></programlisting>
       no way of knowing because no-one told it before the process died. You
       have to tell it manually that you know that the execution either failed
       or should be considered aborted (change its status to
-      <classname>FAILED</classname> or <classname>ABORTED</classname>) - it's
+      <classname>FAILED</classname> or <classname>ABANDONED</classname>) - it's
       a business decision and there is no way to automate it. Only change the
       status to <classname>FAILED</classname> if it is not restartable, or if
       you know the restart data is valid. There is a utility in Spring Batch
