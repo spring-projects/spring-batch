@@ -13,14 +13,13 @@ import java.io.PrintWriter;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.SQLFeatureNotSupportedException;
 import java.sql.Statement;
 import java.util.logging.Logger;
 
 import javax.sql.DataSource;
 
 import org.junit.Test;
-import org.junit.runners.JUnit4;
-import org.junit.runner.RunWith;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.datasource.DataSourceTransactionManager;
 import org.springframework.jdbc.datasource.DataSourceUtils;
@@ -31,7 +30,6 @@ import org.springframework.transaction.TransactionStatus;
 import org.springframework.transaction.support.TransactionCallback;
 import org.springframework.transaction.support.TransactionTemplate;
 
-@RunWith(JUnit4.class)
 public class ExtendedConnectionDataSourceProxyTests {
 
 	@Test
@@ -115,6 +113,7 @@ public class ExtendedConnectionDataSourceProxyTests {
 	}
 
 	@Test
+	@SuppressWarnings({"unchecked", "rawtypes"})
 	public void testSupressOfCloseWithJdbcTemplate() throws Exception {
 
 		Connection con = mock(Connection.class);
@@ -183,7 +182,7 @@ public class ExtendedConnectionDataSourceProxyTests {
 		Connection connection = DataSourceUtils.getConnection(csds);
 		csds.startCloseSuppression(connection);
 		tt.execute(new TransactionCallback() {
-            @Override
+			@Override
 			public Object doInTransaction(TransactionStatus status) {
 				template.queryForList("select baz from bar");
 				template.queryForList("select foo from bar");
@@ -191,11 +190,11 @@ public class ExtendedConnectionDataSourceProxyTests {
 			}
 		});
 		tt.execute(new TransactionCallback() {
-            @Override
+			@Override
 			public Object doInTransaction(TransactionStatus status) {
 				template.queryForList("select ham from foo");
 				tt2.execute(new TransactionCallback() {
-                    @Override
+					@Override
 					public Object doInTransaction(TransactionStatus status) {
 						template.queryForList("select 1 from eggs");
 						return null;
@@ -206,7 +205,7 @@ public class ExtendedConnectionDataSourceProxyTests {
 			}
 		});
 		tt.execute(new TransactionCallback() {
-            @Override
+			@Override
 			public Object doInTransaction(TransactionStatus status) {
 				template.queryForList("select spam from ham");
 				return null;
@@ -237,8 +236,8 @@ public class ExtendedConnectionDataSourceProxyTests {
 			fail();
 		}
 		catch (SQLException expected) {
-//			this would be the correct behavior in a Java6-only recursive implementation
-//			assertEquals(DataSourceStub.UNWRAP_ERROR_MESSAGE, expected.getMessage());
+			//			this would be the correct behavior in a Java6-only recursive implementation
+			//			assertEquals(DataSourceStub.UNWRAP_ERROR_MESSAGE, expected.getMessage());
 			assertEquals("Unsupported class " + Unsupported.class.getSimpleName(), expected.getMessage());
 		}
 	}
@@ -260,7 +259,7 @@ public class ExtendedConnectionDataSourceProxyTests {
 
 		assertTrue(tested.isWrapperFor(DataSource.class));
 		assertEquals(tested, tested.unwrap(DataSource.class));
-		
+
 		assertTrue(tested.isWrapperFor(SmartDataSource.class));
 		assertEquals(tested, tested.unwrap(SmartDataSource.class));
 	}
@@ -286,37 +285,37 @@ public class ExtendedConnectionDataSourceProxyTests {
 
 		private static final String UNWRAP_ERROR_MESSAGE = "supplied type is not implemented by this class";
 
-        @Override
+		@Override
 		public Connection getConnection() throws SQLException {
 			throw new UnsupportedOperationException();
 		}
 
-        @Override
+		@Override
 		public Connection getConnection(String username, String password) throws SQLException {
 			throw new UnsupportedOperationException();
 		}
 
-        @Override
+		@Override
 		public PrintWriter getLogWriter() throws SQLException {
 			throw new UnsupportedOperationException();
 		}
 
-        @Override
+		@Override
 		public int getLoginTimeout() throws SQLException {
 			throw new UnsupportedOperationException();
 		}
 
-        @Override
+		@Override
 		public void setLogWriter(PrintWriter out) throws SQLException {
 			throw new UnsupportedOperationException();
 		}
 
-        @Override
+		@Override
 		public void setLoginTimeout(int seconds) throws SQLException {
 			throw new UnsupportedOperationException();
 		}
 
-        @Override
+		@Override
 		public boolean isWrapperFor(Class<?> iface) throws SQLException {
 			if (iface.equals(Supported.class) || (iface.equals(DataSource.class))) {
 				return true;
@@ -324,7 +323,7 @@ public class ExtendedConnectionDataSourceProxyTests {
 			return false;
 		}
 
-        @Override
+		@Override
 		@SuppressWarnings("unchecked")
 		public <T> T unwrap(Class<T> iface) throws SQLException {
 			if (iface.equals(Supported.class) || iface.equals(DataSource.class)) {
@@ -334,13 +333,10 @@ public class ExtendedConnectionDataSourceProxyTests {
 		}
 
 		/**
-		 * Added due to JDK 7 compatibility, sadly a proper implementation
-		 * that would throw SqlFeatureNotSupportedException is not possible
-		 * in Java 5 (the class was added in Java 6).
+		 * Added due to JDK 7.
 		 */
-		public Logger getParentLogger() {
-			throw new UnsupportedOperationException();
+		public Logger getParentLogger() throws SQLFeatureNotSupportedException {
+			throw new SQLFeatureNotSupportedException();
 		}
-
 	}
 }
