@@ -35,7 +35,6 @@ import javax.jms.MessageListener;
 import javax.jms.Session;
 
 import org.aopalliance.aop.Advice;
-import org.easymock.EasyMock;
 import org.junit.Test;
 import org.springframework.batch.repeat.interceptor.RepeatOperationsInterceptor;
 import org.springframework.batch.repeat.policy.SimpleCompletionPolicy;
