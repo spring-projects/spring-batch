@@ -26,7 +26,7 @@ import org.springframework.batch.core.repository.JobRestartException;
  * @author Will Schipp
  *
  */
-public class SimpleJobLauncherTest {
+public class SimpleJobLauncherTests {
 
 	private SimpleJobLauncher jobLauncher;
 	
