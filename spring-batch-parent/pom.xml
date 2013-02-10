@@ -371,18 +371,18 @@
 				<version>${junit.version}</version>
 				<scope>test</scope>
 			</dependency>
-			<dependency>
-				<groupId>org.easymock</groupId>
-				<artifactId>easymock</artifactId>
-				<version>3.1</version>
-				<scope>test</scope>
-			</dependency>
-			<dependency>
-				<groupId>org.easymock</groupId>
-				<artifactId>easymockclassextension</artifactId>
-				<version>3.1</version>
-				<scope>test</scope>
-			</dependency>
+<!-- 			<dependency> -->
+<!-- 				<groupId>org.easymock</groupId> -->
+<!-- 				<artifactId>easymock</artifactId> -->
+<!-- 				<version>3.1</version> -->
+<!-- 				<scope>test</scope> -->
+<!-- 			</dependency> -->
+<!-- 			<dependency> -->
+<!-- 				<groupId>org.easymock</groupId> -->
+<!-- 				<artifactId>easymockclassextension</artifactId> -->
+<!-- 				<version>3.1</version> -->
+<!-- 				<scope>test</scope> -->
+<!-- 			</dependency> -->
 			<dependency>
 				<groupId>org.apache.geronimo.specs</groupId>
 				<artifactId>geronimo-jms_1.1_spec</artifactId>
@@ -690,6 +690,12 @@
 				<artifactId>spring-rabbit</artifactId>
 				<version>${spring.amqp.version}</version>
 			</dependency>
+			<dependency>
+				<groupId>org.mockito</groupId>
+				<artifactId>mockito-all</artifactId>
+				<version>1.9.5</version>
+				<scope>test</scope>
+			</dependency>			
 		</dependencies>
 	</dependencyManagement>
 	<distributionManagement>

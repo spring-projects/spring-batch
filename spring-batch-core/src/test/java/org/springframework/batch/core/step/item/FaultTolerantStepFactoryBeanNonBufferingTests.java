@@ -1,9 +1,7 @@
 package org.springframework.batch.core.step.item;
 
-import static org.easymock.EasyMock.createStrictMock;
-import static org.easymock.EasyMock.expectLastCall;
-import static org.easymock.EasyMock.replay;
-import static org.easymock.EasyMock.verify;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 
@@ -76,12 +74,9 @@ public class FaultTolerantStepFactoryBeanNonBufferingTests {
 	@Test
 	public void testSkip() throws Exception {
 		@SuppressWarnings("unchecked")
-		SkipListener<Integer, String> skipListener = createStrictMock(SkipListener.class);
+		SkipListener<Integer, String> skipListener = mock(SkipListener.class);
 		skipListener.onSkipInWrite("3", exception);
-		expectLastCall().once();
 		skipListener.onSkipInWrite("4", exception);
-		expectLastCall().once();
-		replay(skipListener);
 
 		factory.setListeners(new SkipListener[] { skipListener });
 		Step step = (Step) factory.getObject();
@@ -107,7 +102,6 @@ public class FaultTolerantStepFactoryBeanNonBufferingTests {
 		// 5 items + 1 rollbacks reading 2 items each time
 		assertEquals(7, stepExecution.getReadCount());
 
-		verify(skipListener);
 	}
 
 	/**

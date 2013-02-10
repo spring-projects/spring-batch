@@ -15,9 +15,7 @@
  */
 package org.springframework.batch.core.listener;
 
-import static org.easymock.EasyMock.createMock;
-import static org.easymock.EasyMock.replay;
-import static org.easymock.EasyMock.verify;
+import static org.mockito.Mockito.mock;
 
 import java.util.Collections;
 
@@ -27,6 +25,7 @@ import org.springframework.batch.core.ItemProcessListener;
 
 /**
  * @author Dave Syer
+ * @author Will Schipp
  * 
  */
 public class CompositeItemProcessListenerTests {
@@ -38,7 +37,7 @@ public class CompositeItemProcessListenerTests {
 	@SuppressWarnings("unchecked")
 	@Before
 	public void setUp() throws Exception {
-		listener = createMock(ItemProcessListener.class);
+		listener = mock(ItemProcessListener.class);
 		compositeListener = new CompositeItemProcessListener<Object, Object>();
 		compositeListener.register(listener);
 	}
@@ -47,9 +46,7 @@ public class CompositeItemProcessListenerTests {
 	public void testBeforeRProcess() {
 		Object item = new Object();
 		listener.beforeProcess(item);
-		replay(listener);
 		compositeListener.beforeProcess(item);
-		verify(listener);
 	}
 
 	@Test
@@ -57,9 +54,7 @@ public class CompositeItemProcessListenerTests {
 		Object item = new Object();
 		Object result = new Object();
 		listener.afterProcess(item, result);
-		replay(listener);
 		compositeListener.afterProcess(item, result);
-		verify(listener);
 	}
 
 	@Test
@@ -67,9 +62,7 @@ public class CompositeItemProcessListenerTests {
 		Object item = new Object();
 		Exception ex = new Exception();
 		listener.onProcessError(item, ex);
-		replay(listener);
 		compositeListener.onProcessError(item, ex);
-		verify(listener);
 	}
 
 	@Test
@@ -77,9 +70,7 @@ public class CompositeItemProcessListenerTests {
 		compositeListener.setListeners(Collections
 				.<ItemProcessListener<? super Object, ? super Object>> singletonList(listener));
 		listener.beforeProcess(null);
-		replay(listener);
 		compositeListener.beforeProcess(null);
-		verify(listener);
 	}
 
 }

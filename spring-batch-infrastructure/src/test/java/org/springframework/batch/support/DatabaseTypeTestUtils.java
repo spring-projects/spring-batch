@@ -15,9 +15,8 @@
  */
 package org.springframework.batch.support;
 
-import static org.easymock.EasyMock.createNiceMock;
-import static org.easymock.EasyMock.expect;
-import static org.easymock.EasyMock.replay;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
@@ -28,6 +27,7 @@ import org.apache.commons.dbcp.BasicDataSource;
 
 /**
  * @author Dave Syer
+ * @author Will Schipp
  *
  */
 public class DatabaseTypeTestUtils {
@@ -54,22 +54,21 @@ public class DatabaseTypeTestUtils {
 	}
 
 	public static DataSource getMockDataSource(String databaseProductName, String databaseVersion) throws Exception {
-		DatabaseMetaData dmd = createNiceMock(DatabaseMetaData.class);
-		DataSource ds = createNiceMock(DataSource.class);
-		Connection con = createNiceMock(Connection.class);
-		expect(ds.getConnection()).andReturn(con).anyTimes();
-		expect(con.getMetaData()).andReturn(dmd).anyTimes();
-		expect(dmd.getDatabaseProductName()).andReturn(databaseProductName).anyTimes();
+		DatabaseMetaData dmd = mock(DatabaseMetaData.class);
+		DataSource ds = mock(DataSource.class);
+		Connection con = mock(Connection.class);
+		when(ds.getConnection()).thenReturn(con);
+		when(con.getMetaData()).thenReturn(dmd);
+		when(dmd.getDatabaseProductName()).thenReturn(databaseProductName);
 		if (databaseVersion!=null) {
-			expect(dmd.getDatabaseProductVersion()).andReturn(databaseVersion).anyTimes();
+			when(dmd.getDatabaseProductVersion()).thenReturn(databaseVersion);
 		}
-		replay(dmd, con);
 		return ds;
 	}
 
 	public static DataSource getMockDataSource(Exception e) throws Exception {
-		DataSource ds = createNiceMock(DataSource.class);
-		expect(ds.getConnection()).andReturn(null).anyTimes();
+		DataSource ds = mock(DataSource.class);
+		when(ds.getConnection()).thenReturn(null);
 		return ds;
 	}
 

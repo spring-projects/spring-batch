@@ -19,12 +19,14 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
+
 import java.util.LinkedHashMap;
 import java.util.Map;
 
 import javax.sql.DataSource;
 
-import org.easymock.EasyMock;
 import org.junit.Test;
 import org.springframework.batch.item.database.Order;
 import org.springframework.batch.item.database.PagingQueryProvider;
@@ -49,7 +51,6 @@ public class SqlPagingQueryProviderFactoryBeanTests {
 		factory.setSortKeys(sortKeys);
 		DataSource dataSource = DatabaseTypeTestUtils.getMockDataSource(DatabaseType.HSQL.getProductName(), "100.0.0");
 		factory.setDataSource(dataSource);
-		EasyMock.replay(dataSource);
 	}
 
 	@Test

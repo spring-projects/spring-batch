@@ -16,7 +16,8 @@
 package org.springframework.batch.item.database;
 
 import static org.junit.Assert.*;
-import static org.easymock.EasyMock.*;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
@@ -36,6 +37,7 @@ import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 /**
  * @author Dave Syer
  * @author Thomas Risberg
+ * @author Will Schipp
  */
 public class JdbcBatchItemWriterClassicTests {
 
@@ -49,7 +51,7 @@ public class JdbcBatchItemWriterClassicTests {
 
 	@Before
 	public void setUp() throws Exception {
-		ps = createMock(PreparedStatement.class);
+		ps = mock(PreparedStatement.class);
 		jdbcTemplate = new JdbcTemplate() {
             @Override
 			public Object execute(String sql, PreparedStatementCallback action) throws DataAccessException {
@@ -125,9 +127,7 @@ public class JdbcBatchItemWriterClassicTests {
 	@Test
 	public void testWriteAndFlush() throws Exception {
 		ps.addBatch();
-		expectLastCall();
-		expect(ps.executeBatch()).andReturn(new int[] { 123 });
-		replay(ps);
+		when(ps.executeBatch()).thenReturn(new int[] { 123 });
 		writer.write(Collections.singletonList("bar"));
 		assertEquals(2, list.size());
 		assertTrue(list.contains("SQL"));
@@ -136,9 +136,7 @@ public class JdbcBatchItemWriterClassicTests {
 	@Test
 	public void testWriteAndFlushWithEmptyUpdate() throws Exception {
 		ps.addBatch();
-		expectLastCall();
-		expect(ps.executeBatch()).andReturn(new int[] { 0 });
-		replay(ps);
+		when(ps.executeBatch()).thenReturn(new int[] { 0 });
 		try {
 			writer.write(Collections.singletonList("bar"));
 			fail("Expected EmptyResultDataAccessException");
@@ -163,9 +161,7 @@ public class JdbcBatchItemWriterClassicTests {
 			}
 		});
 		ps.addBatch();
-		expectLastCall().times(1);
-		expect(ps.executeBatch()).andReturn(new int[] { 123 });
-		replay(ps);
+		when(ps.executeBatch()).thenReturn(new int[] { 123 });
 		try {
 			writer.write(Collections.singletonList("foo"));
 			fail("Expected RuntimeException");
@@ -181,7 +177,6 @@ public class JdbcBatchItemWriterClassicTests {
 			}
 		});
 		writer.write(Collections.singletonList("foo"));
-		verify(ps);
 		assertEquals(4, list.size());
 		assertTrue(list.contains("SQL"));
 		assertTrue(list.contains("foo"));

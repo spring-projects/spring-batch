@@ -16,6 +16,9 @@
 package org.springframework.batch.item.mail;
 
 import static org.junit.Assert.assertEquals;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
+import static org.mockito.AdditionalMatchers.aryEq;
 
 import java.util.Arrays;
 import java.util.Collections;
@@ -23,7 +26,6 @@ import java.util.concurrent.atomic.AtomicReference;
 
 import javax.mail.MessagingException;
 
-import org.easymock.EasyMock;
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.mail.MailException;
@@ -34,6 +36,7 @@ import org.springframework.mail.SimpleMailMessage;
 
 /**
  * @author Dave Syer
+ * @author Will Schipp
  * 
  * @since 2.1
  * 
@@ -42,7 +45,7 @@ public class SimpleMailMessageItemWriterTests {
 
 	private SimpleMailMessageItemWriter writer = new SimpleMailMessageItemWriter();
 
-	private MailSender mailSender = EasyMock.createMock(MailSender.class);
+	private MailSender mailSender = mock(MailSender.class);
 
 	@Before
 	public void setUp() {
@@ -56,13 +59,10 @@ public class SimpleMailMessageItemWriterTests {
 		SimpleMailMessage bar = new SimpleMailMessage();
 		SimpleMailMessage[] items = new SimpleMailMessage[] { foo, bar };
 
-		mailSender.send(EasyMock.aryEq(items));
-		EasyMock.expectLastCall();
-		EasyMock.replay(mailSender);
+		mailSender.send(aryEq(items));
 
 		writer.write(Arrays.asList(items));
 
-		EasyMock.verify(mailSender);
 
 	}
 
@@ -73,14 +73,10 @@ public class SimpleMailMessageItemWriterTests {
 		SimpleMailMessage bar = new SimpleMailMessage();
 		SimpleMailMessage[] items = new SimpleMailMessage[] { foo, bar };
 
-		mailSender.send(EasyMock.aryEq(items));
-		EasyMock.expectLastCall().andThrow(
-				new MailSendException(Collections.singletonMap((Object)foo, (Exception)new MessagingException("FOO"))));
-		EasyMock.replay(mailSender);
+		mailSender.send(aryEq(items));
+		when(mailSender).thenThrow(new MailSendException(Collections.singletonMap((Object)foo, (Exception)new MessagingException("FOO"))));
 
 		writer.write(Arrays.asList(items));
-
-		EasyMock.verify(mailSender);
 
 	}
 
@@ -99,16 +95,13 @@ public class SimpleMailMessageItemWriterTests {
 		SimpleMailMessage bar = new SimpleMailMessage();
 		SimpleMailMessage[] items = new SimpleMailMessage[] { foo, bar };
 
-		mailSender.send(EasyMock.aryEq(items));
-		EasyMock.expectLastCall().andThrow(
-				new MailSendException(Collections.singletonMap((Object)foo, (Exception)new MessagingException("FOO"))));
-		EasyMock.replay(mailSender);
+		mailSender.send(aryEq(items));
+		when(mailSender).thenThrow(new MailSendException(Collections.singletonMap((Object)foo, (Exception)new MessagingException("FOO"))));
 
 		writer.write(Arrays.asList(items));
 
 		assertEquals("FOO", content.get());
 
-		EasyMock.verify(mailSender);
 
 	}
 

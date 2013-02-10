@@ -16,18 +16,15 @@
 
 package org.springframework.batch.core.repository.support;
 
-import static org.easymock.EasyMock.createMock;
-import static org.easymock.EasyMock.replay;
-import static org.easymock.EasyMock.verify;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
+import static org.junit.Assert.*;
+
 
 import java.util.ArrayList;
 import java.util.List;
 
-import org.easymock.EasyMock;
+
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.batch.core.BatchStatus;
@@ -50,7 +47,8 @@ import org.springframework.batch.core.step.StepSupport;
  * testing finding or creating steps, so an actual mock class had to be written.
  *
  * @author Lucas Ward
- *
+ * @author Will Schipp
+ * 
  */
 public class SimpleJobRepositoryTests {
 
@@ -85,10 +83,10 @@ public class SimpleJobRepositoryTests {
 	@Before
 	public void setUp() throws Exception {
 
-		jobExecutionDao = createMock(JobExecutionDao.class);
-		jobInstanceDao = createMock(JobInstanceDao.class);
-		stepExecutionDao = createMock(StepExecutionDao.class);
-		ecDao = createMock(ExecutionContextDao.class);
+		jobExecutionDao = mock(JobExecutionDao.class);
+		jobInstanceDao = mock(JobInstanceDao.class);
+		stepExecutionDao = mock(StepExecutionDao.class);
+		ecDao = mock(ExecutionContextDao.class);
 
 		jobRepository = new SimpleJobRepository(jobInstanceDao, jobExecutionDao, stepExecutionDao, ecDao);
 
@@ -140,10 +138,7 @@ public class SimpleJobRepositoryTests {
 		JobExecution jobExecution = new JobExecution(new JobInstance(1L, job.getName()), 1L, jobParameters);
 		// new execution - call update on job dao
 		jobExecutionDao.updateJobExecution(jobExecution);
-		replay(jobExecutionDao);
 		jobRepository.update(jobExecution);
-		verify(jobExecutionDao);
-
 		assertNotNull(jobExecution.getLastUpdated());
 	}
 
@@ -207,19 +202,14 @@ public class SimpleJobRepositoryTests {
 	@Test
 	public void testIsJobInstanceFalse() throws Exception {
 		jobInstanceDao.getJobInstance("foo", new JobParameters());
-		EasyMock.expectLastCall().andReturn(null);
-		replay(jobExecutionDao, jobInstanceDao, stepExecutionDao);
 		assertFalse(jobRepository.isJobInstanceExists("foo", new JobParameters()));
-		verify(jobExecutionDao, jobInstanceDao, stepExecutionDao);
 	}
 
 	@Test
 	public void testIsJobInstanceTrue() throws Exception {
+		when(jobInstanceDao.getJobInstance("foo", new JobParameters())).thenReturn(jobInstance);
 		jobInstanceDao.getJobInstance("foo", new JobParameters());
-		EasyMock.expectLastCall().andReturn(jobInstance);
-		replay(jobExecutionDao, jobInstanceDao, stepExecutionDao);
 		assertTrue(jobRepository.isJobInstanceExists("foo", new JobParameters()));
-		verify(jobExecutionDao, jobInstanceDao, stepExecutionDao);
 	}
 
 }
