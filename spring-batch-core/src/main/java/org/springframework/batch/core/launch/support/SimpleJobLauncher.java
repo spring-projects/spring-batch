@@ -24,6 +24,7 @@ import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.JobInstance;
 import org.springframework.batch.core.JobParameters;
 import org.springframework.batch.core.JobParametersInvalidException;
+import org.springframework.batch.core.StepExecution;
 import org.springframework.batch.core.launch.JobLauncher;
 import org.springframework.batch.core.repository.JobExecutionAlreadyRunningException;
 import org.springframework.batch.core.repository.JobInstanceAlreadyCompleteException;
@@ -53,6 +54,7 @@ import org.springframework.util.Assert;
  *
  * @author Lucas Ward
  * @Author Dave Syer
+ * @author Will Schipp
  *
  * @since 1.0
  *
@@ -97,12 +99,22 @@ public class SimpleJobLauncher implements JobLauncher, InitializingBean {
 			if (!job.isRestartable()) {
 				throw new JobRestartException("JobInstance already exists and is not restartable");
 			}
+			/*
+			 * validate here if it has stepExecutions that are UNKNOWN
+			 * retrieve the previous execution and check
+			 */
+			for (StepExecution execution : lastExecution.getStepExecutions()) {
+				if (execution.getStatus() == BatchStatus.UNKNOWN) {
+					//throw
+					throw new JobRestartException("Step [" + execution.getStepName() + "] is of status UNKNOWN"); 
+				}//end if
+			}//end for			
 		}
 
 		// Check the validity of the parameters before doing creating anything
 		// in the repository...
 		job.getJobParametersValidator().validate(jobParameters);
-
+		
 		/*
 		 * There is a very small probability that a non-restartable job can be
 		 * restarted, but only if another process or thread manages to launch
