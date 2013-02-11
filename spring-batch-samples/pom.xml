@@ -193,9 +193,8 @@
 		<dependency>
 			<groupId>postgresql</groupId>
 			<artifactId>postgresql</artifactId>
-			<version>8.3-603.jdbc3</version>
+			<version>9.1-901.jdbc4</version>
 			<optional>true</optional>
-			<scope>runtime</scope>
 		</dependency>
 		<dependency>
 			<groupId>org.springframework</groupId>
