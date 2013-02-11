@@ -16,11 +16,11 @@
 
 package org.springframework.batch.core.launch;
 
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -274,8 +274,8 @@ public class SimpleJobLauncherTests {
 	 * Test to support BATCH-1770 -> throw in parent thread JobRestartException when 
 	 * a stepExecution is UNKNOWN
 	 */
-	@Test
-	public void testRunStepStatusUNKNOWN() {
+	@Test(expected=JobRestartException.class)
+	public void testRunStepStatusUnknown() throws Exception {
 		//try and restart a job where the step execution is UNKNOWN 
 		//setup
 		String jobName = "test_job";
@@ -298,18 +298,7 @@ public class SimpleJobLauncherTests {
 		jobLauncher.setJobRepository(jobRepository);
 		
 		//run
-		try {
-			jobLauncher.run(job, parameters);
-		} catch (JobExecutionAlreadyRunningException e) {
-			fail(e.toString());
-		} catch (JobRestartException e) {
-			//expect exception
-			assertTrue(e.getMessage().contains("is of status UNKNOWN"));
-		} catch (JobInstanceAlreadyCompleteException e) {
-			fail(e.toString());
-		} catch (JobParametersInvalidException e) {
-			fail(e.toString());
-		}
+		jobLauncher.run(job, parameters);
 
 	}	
 }
