@@ -32,6 +32,7 @@ import org.springframework.batch.core.repository.JobRestartException;
  * execute a flow related to a {@link JobExecution}.
  *
  * @author Dave Syer
+ * @author Michael Minella
  *
  */
 public class JobFlowExecutor implements FlowExecutor {
@@ -59,15 +60,28 @@ public class JobFlowExecutor implements FlowExecutor {
 	@Override
 	public String executeStep(Step step) throws JobInterruptedException, JobRestartException,
 	StartLimitExceededException {
+		boolean isRerun = isStepRestart(step);
 		StepExecution stepExecution = stepHandler.handleStep(step, execution);
 		stepExecutionHolder.set(stepExecution);
+
 		if (stepExecution == null) {
 			return  ExitStatus.COMPLETED.getExitCode();
 		}
 		if (stepExecution.isTerminateOnly()) {
 			throw new JobInterruptedException("Step requested termination: "+stepExecution, stepExecution.getStatus());
 		}
+
+		if(isRerun) {
+			stepExecution.getExecutionContext().put("batch.restart", true);
+		}
+
 		return stepExecution.getExitStatus().getExitCode();
+	}
+
+	private boolean isStepRestart(Step step) {
+		int count = jobRepository.getStepExecutionCount(execution.getJobInstance(), step.getName());
+
+		return count > 0;
 	}
 
 	@Override

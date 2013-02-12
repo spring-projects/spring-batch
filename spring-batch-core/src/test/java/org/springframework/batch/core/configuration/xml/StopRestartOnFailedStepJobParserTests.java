@@ -54,7 +54,7 @@ public class StopRestartOnFailedStepJobParserTests extends AbstractJobParserTest
 	}
 
 	private void launchAndAssert(String stepNames) throws JobInstanceAlreadyCompleteException, JobRestartException,
-			JobExecutionAlreadyRunningException {
+	JobExecutionAlreadyRunningException {
 		JobExecution jobExecution = createJobExecution();
 		job.execute(jobExecution);
 		assertEquals(stepNames, stepNamesList.toString());
