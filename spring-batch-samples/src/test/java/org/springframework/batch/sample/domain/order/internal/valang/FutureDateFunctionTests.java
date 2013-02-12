@@ -1,8 +1,7 @@
 package org.springframework.batch.sample.domain.order.internal.valang;
 
-import static org.easymock.EasyMock.createMock;
-import static org.easymock.EasyMock.expect;
-import static org.easymock.EasyMock.replay;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
@@ -20,7 +19,7 @@ public class FutureDateFunctionTests {
 	
 	@Before
 	public void setUp() {
-		argument = createMock(Function.class);
+		argument = mock(Function.class);
 
 		//create function
 		function = new FutureDateFunction(new Function[] {argument}, 0, 0);
@@ -31,8 +30,7 @@ public class FutureDateFunctionTests {
 	public void testFunctionWithNonDateValue() {
 		
 		//set-up mock argument - set return value to non Date value
-		expect(argument.getResult(null)).andReturn(this);
-		replay(argument);
+		when(argument.getResult(null)).thenReturn(this);
 				
 		//call tested method - exception is expected because non date value
 		try {
@@ -48,8 +46,7 @@ public class FutureDateFunctionTests {
 	public void testFunctionWithFutureDate() throws Exception {
 
 		//set-up mock argument - set return value to future Date
-		expect(argument.getResult(null)).andReturn(new Date(Long.MAX_VALUE));
-		replay(argument);
+		when(argument.getResult(null)).thenReturn(new Date(Long.MAX_VALUE));
 
 		//vefify result - should be true because of future date
 		assertTrue((Boolean) function.doGetResult(null));
@@ -60,8 +57,7 @@ public class FutureDateFunctionTests {
 	public void testFunctionWithPastDate() throws Exception {
 
 		//set-up mock argument - set return value to future Date
-		expect(argument.getResult(null)).andReturn(new Date(0));
-		replay(argument);
+		when(argument.getResult(null)).thenReturn(new Date(0));
 
 		//vefify result - should be false because of past date
 		assertFalse((Boolean) function.doGetResult(null));

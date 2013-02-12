@@ -15,22 +15,28 @@
  */
 package org.springframework.batch.item.database;
 
-import static org.junit.Assert.*;
-import static org.easymock.EasyMock.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+import static org.mockito.Matchers.argThat;
+import static org.mockito.Matchers.eq;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 import java.util.Collections;
 
-import org.easymock.EasyMock;
-import org.easymock.IArgumentMatcher;
+import org.hamcrest.BaseMatcher;
+import org.hamcrest.Description;
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.namedparam.BeanPropertySqlParameterSource;
-import org.springframework.jdbc.core.namedparam.SqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcOperations;
+import org.springframework.jdbc.core.namedparam.SqlParameterSource;
 
 /**
  * @author Thomas Risberg
+ * @author Will Schipp
  */
 public class JdbcBatchItemWriterNamedParameterTests {
 
@@ -70,7 +76,7 @@ public class JdbcBatchItemWriterNamedParameterTests {
 
 	@Before
 	public void setUp() throws Exception {
-        namedParameterJdbcOperations = createMock(NamedParameterJdbcOperations.class);
+        namedParameterJdbcOperations = mock(NamedParameterJdbcOperations.class);
 		writer.setSql(sql);
 		writer.setJdbcTemplate(namedParameterJdbcOperations);
 		writer.setItemSqlParameterSourceProvider(
@@ -123,20 +129,17 @@ public class JdbcBatchItemWriterNamedParameterTests {
 
 	@Test
 	public void testWriteAndFlush() throws Exception {
-		expect(namedParameterJdbcOperations.batchUpdate(eq(sql),
+		when(namedParameterJdbcOperations.batchUpdate(eq(sql),
 				eqSqlParameterSourceArray(new SqlParameterSource[] {new BeanPropertySqlParameterSource(new Foo("bar"))})))
-				.andReturn(new int[] {1});
-		replay(namedParameterJdbcOperations);
+				.thenReturn(new int[] {1});
 		writer.write(Collections.singletonList(new Foo("bar")));
-		verify(namedParameterJdbcOperations);
 	}
 
 	@Test
 	public void testWriteAndFlushWithEmptyUpdate() throws Exception {
-		expect(namedParameterJdbcOperations.batchUpdate(eq(sql),
+		when(namedParameterJdbcOperations.batchUpdate(eq(sql),
 				eqSqlParameterSourceArray(new SqlParameterSource[] {new BeanPropertySqlParameterSource(new Foo("bar"))})))
-				.andReturn(new int[] {0});
-		replay(namedParameterJdbcOperations);
+				.thenReturn(new int[] {0});
 		try {
 			writer.write(Collections.singletonList(new Foo("bar")));
 			fail("Expected EmptyResultDataAccessException");
@@ -146,16 +149,14 @@ public class JdbcBatchItemWriterNamedParameterTests {
 			String message = e.getMessage();
 			assertTrue("Wrong message: " + message, message.indexOf("did not update") >= 0);
 		}
-		verify(namedParameterJdbcOperations);
 	}
 
 	@Test
 	public void testWriteAndFlushWithFailure() throws Exception {
 		final RuntimeException ex = new RuntimeException("ERROR");
-		expect(namedParameterJdbcOperations.batchUpdate(eq(sql),
+		when(namedParameterJdbcOperations.batchUpdate(eq(sql),
 				eqSqlParameterSourceArray(new SqlParameterSource[] {new BeanPropertySqlParameterSource(new Foo("bar"))})))
-				.andThrow(ex);
-		replay(namedParameterJdbcOperations);
+				.thenThrow(ex);
 		try {
 			writer.write(Collections.singletonList(new Foo("bar")));
 			fail("Expected RuntimeException");
@@ -163,15 +164,14 @@ public class JdbcBatchItemWriterNamedParameterTests {
 		catch (RuntimeException e) {
 			assertEquals("ERROR", e.getMessage());
 		}
-		verify(namedParameterJdbcOperations);
 	}
 
 	public static SqlParameterSource[] eqSqlParameterSourceArray(SqlParameterSource[] in) {
-	    EasyMock.reportMatcher(new SqlParameterSourceArrayEquals(in));
+		argThat(new SqlParameterSourceArrayEquals(in));
 	    return null;
 	}
 
-	public static class SqlParameterSourceArrayEquals implements IArgumentMatcher {
+	public static class SqlParameterSourceArrayEquals extends BaseMatcher<SqlParameterSource[]> {
 	    private SqlParameterSource[] expected;
 
 	    public SqlParameterSourceArrayEquals(SqlParameterSource[] expected) {
@@ -195,14 +195,15 @@ public class JdbcBatchItemWriterNamedParameterTests {
 	        return true;
 	    }
 
-        @Override
-	    public void appendTo(StringBuffer buffer) {
-	        buffer.append("eqSqlParameterSourceArray(");
-	        buffer.append(expected.getClass().getName());
-	        buffer.append(" with length \"");
-	        buffer.append(expected.length);
-	        buffer.append("\")");
 
-	    }
-	}
+		@Override
+		public void describeTo(Description description) {
+	        description.appendText("eqSqlParameterSourceArray(");
+			description.appendText(expected.getClass().getName());
+			description.appendText(" with length \"");
+			description.appendValue(expected.length);
+			description.appendText("\")");			
+		}
+	}	
+
 }

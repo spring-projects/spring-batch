@@ -16,7 +16,8 @@
 
 package org.springframework.batch.item.amqp;
 
-import org.easymock.EasyMock;
+import static org.mockito.Mockito.mock;
+
 import org.junit.Test;
 import org.springframework.amqp.core.AmqpTemplate;
 
@@ -28,6 +29,7 @@ import java.util.Arrays;
  * </p>
  *
  * @author Chris Schaefer
+ * @author Will Schipp
  */
 public class AmqpItemWriterTests {
     @Test(expected = IllegalArgumentException.class)
@@ -37,20 +39,14 @@ public class AmqpItemWriterTests {
 
     @Test
     public void voidTestWrite() throws Exception {
-        AmqpTemplate amqpTemplate = EasyMock.createMock(AmqpTemplate.class);
+        AmqpTemplate amqpTemplate = mock(AmqpTemplate.class);
 
         amqpTemplate.convertAndSend("foo");
-        EasyMock.expectLastCall();
 
         amqpTemplate.convertAndSend("bar");
-        EasyMock.expectLastCall();
-
-        EasyMock.replay(amqpTemplate);
 
         AmqpItemWriter<String> amqpItemWriter = new AmqpItemWriter<String>(amqpTemplate);
         amqpItemWriter.write(Arrays.asList("foo", "bar"));
-
-        EasyMock.verify(amqpTemplate);
 
     }
 }

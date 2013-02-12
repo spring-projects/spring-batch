@@ -15,9 +15,7 @@
  */
 package org.springframework.batch.core.job;
 
-import static org.easymock.EasyMock.createMock;
-import static org.easymock.EasyMock.replay;
-import static org.easymock.EasyMock.verify;
+import static org.mockito.Mockito.mock;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -52,23 +50,19 @@ public class CompositeJobParametersValidatorTests {
 	
 	@Test
 	public void testDelegateIsInvoked() throws JobParametersInvalidException{
-		JobParametersValidator validator = createMock(JobParametersValidator.class);
+		JobParametersValidator validator = mock(JobParametersValidator.class);
 		validator.validate(parameters);
 		compositeJobParametersValidator.setValidators(Arrays.asList(validator));
-		replay(validator);
 		compositeJobParametersValidator.validate(parameters);
-		verify(validator);
 	}
 	
 	@Test
 	public void testDelegatesAreInvoked() throws JobParametersInvalidException{
-		JobParametersValidator validator = createMock(JobParametersValidator.class);
+		JobParametersValidator validator = mock(JobParametersValidator.class);
 		validator.validate(parameters);
 		validator.validate(parameters);
 		compositeJobParametersValidator.setValidators(Arrays.asList(validator, validator));
-		replay(validator);
 		compositeJobParametersValidator.validate(parameters);
-		verify(validator);
 	}
 	
 }

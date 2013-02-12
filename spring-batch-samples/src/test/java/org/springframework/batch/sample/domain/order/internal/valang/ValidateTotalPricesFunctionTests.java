@@ -1,8 +1,7 @@
 package org.springframework.batch.sample.domain.order.internal.valang;
 
-import static org.easymock.EasyMock.createMock;
-import static org.easymock.EasyMock.expect;
-import static org.easymock.EasyMock.replay;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
@@ -24,7 +23,7 @@ public class ValidateTotalPricesFunctionTests {
 	@Before
 	public void setUp() {
 
-		argument = createMock(Function.class);
+		argument = mock(Function.class);
 
 		//create function
 		function = new ValidateTotalPricesFunction(new Function[] {argument}, 0, 0);
@@ -49,8 +48,7 @@ public class ValidateTotalPricesFunctionTests {
 		items.add(item);
 		
 		//set return value for mock argument
-		expect(argument.getResult(null)).andReturn(items).times(2);
-		replay(argument);
+		when(argument.getResult(null)).thenReturn(items);
 
 		//verify result - should be true - all total prices are correct
 		assertTrue((Boolean) function.doGetResult(null));
@@ -82,8 +80,7 @@ public class ValidateTotalPricesFunctionTests {
 		items.add(item);
 		
 		//set return value for mock argument
-		expect(argument.getResult(null)).andReturn(items).times(2);
-		replay(argument);
+		when(argument.getResult(null)).thenReturn(items);
 
 		//verify result - should be true - all total prices are correct
 		assertEquals(true, function.doGetResult(null));
@@ -116,8 +113,7 @@ public class ValidateTotalPricesFunctionTests {
 		items.add(item);
 		
 		//set return value for mock argument
-		expect(argument.getResult(null)).andReturn(items).times(2);
-		replay(argument);
+		when(argument.getResult(null)).thenReturn(items);
 
 		//verify result - should be true - all total prices are correct
 		assertEquals(true, function.doGetResult(null));		

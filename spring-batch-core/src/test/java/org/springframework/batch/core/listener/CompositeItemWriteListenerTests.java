@@ -15,9 +15,7 @@
  */
 package org.springframework.batch.core.listener;
 
-import static org.easymock.EasyMock.createMock;
-import static org.easymock.EasyMock.replay;
-import static org.easymock.EasyMock.verify;
+import static org.mockito.Mockito.mock;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -29,6 +27,7 @@ import org.springframework.batch.core.ItemWriteListener;
 
 /**
  * @author Lucas Ward
+ * @author Will Schipp
  * 
  */
 public class CompositeItemWriteListenerTests {
@@ -40,7 +39,7 @@ public class CompositeItemWriteListenerTests {
 	@SuppressWarnings("unchecked")
 	@Before
 	public void setUp() throws Exception {
-		listener = createMock(ItemWriteListener.class);
+		listener = mock(ItemWriteListener.class);
 		compositeListener = new CompositeItemWriteListener<Object>();
 		compositeListener.register(listener);
 	}
@@ -49,18 +48,14 @@ public class CompositeItemWriteListenerTests {
 	public void testBeforeWrite() {
 		List<Object> item = Collections.singletonList(new Object());
 		listener.beforeWrite(item);
-		replay(listener);
 		compositeListener.beforeWrite(item);
-		verify(listener);
 	}
 
 	@Test
 	public void testAfterWrite() {
 		List<Object> item = Collections.singletonList(new Object());
 		listener.afterWrite(item);
-		replay(listener);
 		compositeListener.afterWrite(item);
-		verify(listener);
 	}
 
 	@Test
@@ -68,9 +63,7 @@ public class CompositeItemWriteListenerTests {
 		List<Object> item = Collections.singletonList(new Object());
 		Exception ex = new Exception();
 		listener.onWriteError(ex, item);
-		replay(listener);
 		compositeListener.onWriteError(ex, item);
-		verify(listener);
 	}
 
 	@Test
@@ -82,9 +75,7 @@ public class CompositeItemWriteListenerTests {
 		});
 		List<Object> item = Collections.singletonList(new Object());
 		listener.beforeWrite(item);
-		replay(listener);
 		compositeListener.beforeWrite(item);
-		verify(listener);
 	}
 
 }

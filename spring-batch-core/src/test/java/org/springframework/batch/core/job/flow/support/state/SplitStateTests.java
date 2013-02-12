@@ -16,12 +16,13 @@
 package org.springframework.batch.core.job.flow.support.state;
 
 import static org.junit.Assert.assertEquals;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 
-import org.easymock.EasyMock;
 import org.junit.Test;
 import org.springframework.batch.core.job.flow.Flow;
 import org.springframework.batch.core.job.flow.FlowExecution;
@@ -32,6 +33,7 @@ import org.springframework.core.task.SimpleAsyncTaskExecutor;
 
 /**
  * @author Dave Syer
+ * @author Will Schipp
  *
  */
 public class SplitStateTests {
@@ -42,41 +44,34 @@ public class SplitStateTests {
 	public void testBasicHandling() throws Exception {
 
 		Collection<Flow> flows  = new ArrayList<Flow>();
-		Flow flow1 = EasyMock.createMock(Flow.class);
-		Flow flow2 = EasyMock.createMock(Flow.class);
+		Flow flow1 = mock(Flow.class);
+		Flow flow2 = mock(Flow.class);
 		flows.add(flow1);
 		flows.add(flow2);
 
 		SplitState state = new SplitState(flows, "foo");
 
-		EasyMock.expect(flow1.start(executor)).andReturn(new FlowExecution("step1", FlowExecutionStatus.COMPLETED));
-		EasyMock.expect(flow2.start(executor)).andReturn(new FlowExecution("step1", FlowExecutionStatus.COMPLETED));
-		EasyMock.replay(flow1, flow2);
+		when(flow1.start(executor)).thenReturn(new FlowExecution("step1", FlowExecutionStatus.COMPLETED));
+		when(flow2.start(executor)).thenReturn(new FlowExecution("step1", FlowExecutionStatus.COMPLETED));
 
 		FlowExecutionStatus result = state.handle(executor);
 		assertEquals(FlowExecutionStatus.COMPLETED, result);
-
-		EasyMock.verify(flow1, flow2);
 
 	}
 
 	@Test
 	public void testConcurrentHandling() throws Exception {
 
-		Flow flow1 = EasyMock.createMock(Flow.class);
-		Flow flow2 = EasyMock.createMock(Flow.class);
+		Flow flow1 = mock(Flow.class);
+		Flow flow2 = mock(Flow.class);
 
 		SplitState state = new SplitState(Arrays.asList(flow1, flow2), "foo");
 		state.setTaskExecutor(new SimpleAsyncTaskExecutor());
 
-		EasyMock.expect(flow1.start(executor)).andReturn(new FlowExecution("step1", FlowExecutionStatus.COMPLETED));
-		EasyMock.expect(flow2.start(executor)).andReturn(new FlowExecution("step1", FlowExecutionStatus.COMPLETED));
-		EasyMock.replay(flow1, flow2);
-
+		when(flow1.start(executor)).thenReturn(new FlowExecution("step1", FlowExecutionStatus.COMPLETED));
+		when(flow2.start(executor)).thenReturn(new FlowExecution("step1", FlowExecutionStatus.COMPLETED));
 		FlowExecutionStatus result = state.handle(executor);
 		assertEquals(FlowExecutionStatus.COMPLETED, result);
-
-		EasyMock.verify(flow1, flow2);
 
 	}
 

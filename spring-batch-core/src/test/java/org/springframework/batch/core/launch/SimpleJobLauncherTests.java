@@ -16,30 +16,33 @@
 
 package org.springframework.batch.core.launch;
 
-import static org.easymock.EasyMock.createMock;
-import static org.easymock.EasyMock.expect;
-import static org.easymock.EasyMock.expectLastCall;
-import static org.easymock.EasyMock.replay;
-import static org.easymock.EasyMock.reset;
-import static org.easymock.EasyMock.verify;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.batch.core.BatchStatus;
 import org.springframework.batch.core.ExitStatus;
+import org.springframework.batch.core.Job;
 import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.JobInstance;
 import org.springframework.batch.core.JobParameters;
+import org.springframework.batch.core.JobParametersBuilder;
 import org.springframework.batch.core.JobParametersInvalidException;
+import org.springframework.batch.core.JobParametersValidator;
+import org.springframework.batch.core.StepExecution;
 import org.springframework.batch.core.job.DefaultJobParametersValidator;
 import org.springframework.batch.core.job.JobSupport;
 import org.springframework.batch.core.launch.support.SimpleJobLauncher;
+import org.springframework.batch.core.repository.JobExecutionAlreadyRunningException;
+import org.springframework.batch.core.repository.JobInstanceAlreadyCompleteException;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.repository.JobRestartException;
 import org.springframework.core.task.TaskExecutor;
@@ -47,6 +50,7 @@ import org.springframework.core.task.TaskRejectedException;
 
 /**
  * @author Lucas Ward
+ * @author Will Schipp
  *
  */
 public class SimpleJobLauncherTests {
@@ -69,7 +73,7 @@ public class SimpleJobLauncherTests {
 	public void setUp() throws Exception {
 
 		jobLauncher = new SimpleJobLauncher();
-		jobRepository = createMock(JobRepository.class);
+		jobRepository = mock(JobRepository.class);
 		jobLauncher.setJobRepository(jobRepository);
 
 	}
@@ -85,16 +89,10 @@ public class SimpleJobLauncherTests {
 		job.setJobParametersValidator(new DefaultJobParametersValidator(new String[] { "missing-and-required" },
 				new String[0]));
 
-		expect(jobRepository.getLastJobExecution(job.getName(), jobParameters)).andReturn(null);
-		replay(jobRepository);
+		when(jobRepository.getLastJobExecution(job.getName(), jobParameters)).thenReturn(null);
 
 		jobLauncher.afterPropertiesSet();
-		try {
-			jobLauncher.run(job, jobParameters);
-		}
-		finally {
-			verify(jobRepository);
-		}
+		jobLauncher.run(job, jobParameters);
 
 	}
 
@@ -114,14 +112,11 @@ public class SimpleJobLauncherTests {
 		};
 
 		testRun();
-		reset(jobRepository);
-		expect(jobRepository.getLastJobExecution(job.getName(), jobParameters)).andReturn(
+		when(jobRepository.getLastJobExecution(job.getName(), jobParameters)).thenReturn(
 				new JobExecution(new JobInstance(1L, job.getName()), jobParameters));
-		expect(jobRepository.createJobExecution(job.getName(), jobParameters)).andReturn(
+		when(jobRepository.createJobExecution(job.getName(), jobParameters)).thenReturn(
 				new JobExecution(new JobInstance(1L, job.getName()), jobParameters));
-		replay(jobRepository);
 		jobLauncher.run(job, jobParameters);
-		verify(jobRepository);
 	}
 
 	/*
@@ -145,17 +140,14 @@ public class SimpleJobLauncherTests {
 
 		testRun();
 		try {
-			reset(jobRepository);
-			expect(jobRepository.getLastJobExecution(job.getName(), jobParameters)).andReturn(
+			when(jobRepository.getLastJobExecution(job.getName(), jobParameters)).thenReturn(
 					new JobExecution(new JobInstance(1L, job.getName()), jobParameters));
-			replay(jobRepository);
 			jobLauncher.run(job, jobParameters);
 			fail("Expected JobRestartException");
 		}
 		catch (JobRestartException e) {
 			// expected
 		}
-		verify(jobRepository);
 	}
 
 	@Test
@@ -186,11 +178,9 @@ public class SimpleJobLauncherTests {
 
 		JobExecution jobExecution = new JobExecution((JobInstance) null, (JobParameters) null);
 
-		expect(jobRepository.getLastJobExecution(job.getName(), jobParameters)).andReturn(null);
-		expect(jobRepository.createJobExecution(job.getName(), jobParameters)).andReturn(jobExecution);
+		when(jobRepository.getLastJobExecution(job.getName(), jobParameters)).thenReturn(null);
+		when(jobRepository.createJobExecution(job.getName(), jobParameters)).thenReturn(jobExecution);
 		jobRepository.update(jobExecution);
-		expectLastCall();
-		replay(jobRepository);
 
 		jobLauncher.afterPropertiesSet();
 		try {
@@ -199,7 +189,6 @@ public class SimpleJobLauncherTests {
 		finally {
 			assertEquals(BatchStatus.FAILED, jobExecution.getStatus());
 			assertEquals(ExitStatus.FAILED.getExitCode(), jobExecution.getExitStatus().getExitCode());
-			verify(jobRepository);
 		}
 
 		assertEquals(1, list.size());
@@ -265,9 +254,8 @@ public class SimpleJobLauncherTests {
 	private void run(ExitStatus exitStatus) throws Exception {
 		JobExecution jobExecution = new JobExecution((JobInstance) null, (JobParameters) null);
 
-		expect(jobRepository.getLastJobExecution(job.getName(), jobParameters)).andReturn(null);
-		expect(jobRepository.createJobExecution(job.getName(), jobParameters)).andReturn(jobExecution);
-		replay(jobRepository);
+		when(jobRepository.getLastJobExecution(job.getName(), jobParameters)).thenReturn(null);
+		when(jobRepository.createJobExecution(job.getName(), jobParameters)).thenReturn(jobExecution);
 
 		jobLauncher.afterPropertiesSet();
 		try {
@@ -275,11 +263,42 @@ public class SimpleJobLauncherTests {
 		}
 		finally {
 			assertEquals(exitStatus, jobExecution.getExitStatus());
-			verify(jobRepository);
 		}
 	}
 
 	private boolean contains(String str, String searchStr) {
 		return str.indexOf(searchStr) != -1;
 	}
+	
+	/**
+	 * Test to support BATCH-1770 -> throw in parent thread JobRestartException when 
+	 * a stepExecution is UNKNOWN
+	 */
+	@Test(expected=JobRestartException.class)
+	public void testRunStepStatusUnknown() throws Exception {
+		//try and restart a job where the step execution is UNKNOWN 
+		//setup
+		String jobName = "test_job";
+		JobRepository jobRepository = mock(JobRepository.class);
+		JobParameters parameters = new JobParametersBuilder().addLong("runtime", System.currentTimeMillis()).toJobParameters();
+		JobExecution jobExecution = mock(JobExecution.class);
+		Job job = mock(Job.class);
+		JobParametersValidator validator = mock(JobParametersValidator.class);
+		StepExecution stepExecution = mock(StepExecution.class);
+		
+		when(job.getName()).thenReturn(jobName);
+		when(job.isRestartable()).thenReturn(true);		
+		when(job.getJobParametersValidator()).thenReturn(validator);
+		when(jobRepository.getLastJobExecution(jobName, parameters)).thenReturn(jobExecution);
+		when(stepExecution.getStatus()).thenReturn(BatchStatus.UNKNOWN);
+		when(jobExecution.getStepExecutions()).thenReturn(Arrays.asList(stepExecution));
+		
+		//setup launcher
+		jobLauncher = new SimpleJobLauncher();
+		jobLauncher.setJobRepository(jobRepository);
+		
+		//run
+		jobLauncher.run(job, parameters);
+
+	}	
 }

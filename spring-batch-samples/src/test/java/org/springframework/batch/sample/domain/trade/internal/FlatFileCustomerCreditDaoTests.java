@@ -15,9 +15,7 @@
  */
 package org.springframework.batch.sample.domain.trade.internal;
 
-import static org.easymock.EasyMock.createMock;
-import static org.easymock.EasyMock.replay;
-import static org.easymock.EasyMock.verify;
+import static org.mockito.Mockito.mock;
 
 import java.math.BigDecimal;
 import java.util.Collections;
@@ -38,7 +36,7 @@ public class FlatFileCustomerCreditDaoTests {
 	public void setUp() throws Exception {
 
 		//create mock for OutputSource
-		output = createMock(ResourceLifecycleItemWriter.class);
+		output = mock(ResourceLifecycleItemWriter.class);
 
 		//create new writer
 		writer = new FlatFileCustomerCreditDao();
@@ -50,13 +48,10 @@ public class FlatFileCustomerCreditDaoTests {
 		ExecutionContext executionContext = new ExecutionContext();
 		//set-up outputSource mock
 		output.open(executionContext);
-		replay(output);
 
 		//call tested method
 		writer.open(executionContext);
 		
-		//verify method calls
-		verify(output);
 	}
 	
 	@Test
@@ -64,13 +59,10 @@ public class FlatFileCustomerCreditDaoTests {
 		
 		//set-up outputSource mock
 		output.close();
-		replay(output);
 
 		//call tested method
 		writer.close();
-		
-		//verify method calls
-		verify(output);
+
 	}
 	
 	@Test
@@ -87,13 +79,9 @@ public class FlatFileCustomerCreditDaoTests {
 		//set-up OutputSource mock
 		output.write(Collections.singletonList("testName;1"));
 		output.open(new ExecutionContext());
-		replay(output);
 
 		//call tested method
 		writer.writeCredit(credit);
-		
-		//verify method calls
-		verify(output);
 	}
 	
 	private interface ResourceLifecycleItemWriter extends ItemWriter<String>, ItemStream{

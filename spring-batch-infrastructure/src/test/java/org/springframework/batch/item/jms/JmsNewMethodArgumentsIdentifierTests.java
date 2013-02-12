@@ -16,15 +16,17 @@
 package org.springframework.batch.item.jms;
 
 import static org.junit.Assert.assertEquals;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 import javax.jms.Message;
 
-import org.easymock.EasyMock;
 import org.junit.Test;
 
 
 /**
  * @author Dave Syer
+ * @author Will Schipp
  *
  */
 public class JmsNewMethodArgumentsIdentifierTests {
@@ -33,12 +35,10 @@ public class JmsNewMethodArgumentsIdentifierTests {
 
 	@Test
 	public void testIsNewForMessage() throws Exception {
-		Message message = EasyMock.createMock(Message.class);
-		EasyMock.expect(message.getJMSRedelivered()).andReturn(true);
-		EasyMock.replay(message);
+		Message message = mock(Message.class);
+		when(message.getJMSRedelivered()).thenReturn(true);
 		assertEquals(false, newMethodArgumentsIdentifier.isNew(new Object[]{message}));
 		
-		EasyMock.verify(message);
 	}
 
 	@Test

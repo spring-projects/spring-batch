@@ -1,6 +1,7 @@
 package org.springframework.batch.sample.domain.trade.internal;
 
-import static org.easymock.EasyMock.*;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 import java.math.BigDecimal;
 import java.util.Collections;
@@ -19,7 +20,7 @@ public class CustomerCreditUpdateProcessorTests {
 	@Before
 	public void setUp() {
 		//create mock writer
-		dao = createMock(CustomerCreditDao.class);
+		dao = mock(CustomerCreditDao.class);
 		//create processor, set writer and credit filter
 		writer = new CustomerCreditUpdateWriter();
 		writer.setDao(dao);
@@ -30,7 +31,6 @@ public class CustomerCreditUpdateProcessorTests {
 	public void testProcess() throws Exception {
 		
 		//set-up mock writer - no writer's method should be called 
-		replay(dao);
 		
 		//create credit and set it to same value as credit filter
 		CustomerCredit credit = new CustomerCredit();
@@ -39,20 +39,15 @@ public class CustomerCreditUpdateProcessorTests {
 		writer.write(Collections.singletonList(credit));
 		//verify method calls - no method should be called 
 		//because credit is not greater then credit filter
-		verify(dao);
 		
 		//change credit to be greater than credit filter
 		credit.setCredit(new BigDecimal(CREDIT_FILTER + 1));
 		//reset and set-up writer - write method is expected to be called
-		reset(dao);
 		dao.writeCredit(credit);
-		replay(dao);
 		
 		//call tested method
 		writer.write(Collections.singletonList(credit));
 		
-		//verify method calls
-		verify(dao);
 	}
 	
 }

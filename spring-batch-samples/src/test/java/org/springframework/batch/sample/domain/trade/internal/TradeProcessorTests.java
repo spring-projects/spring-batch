@@ -1,8 +1,6 @@
 package org.springframework.batch.sample.domain.trade.internal;
 
-import static org.easymock.EasyMock.createMock;
-import static org.easymock.EasyMock.replay;
-import static org.easymock.EasyMock.verify;
+import static org.mockito.Mockito.mock;
 
 import java.util.Collections;
 
@@ -20,7 +18,7 @@ public class TradeProcessorTests {
 	public void setUp() {
 		
 		//create mock writer
-		writer = createMock(TradeDao.class);
+		writer = mock(TradeDao.class);
 		
 		//create processor
 		processor = new TradeWriter();
@@ -33,13 +31,9 @@ public class TradeProcessorTests {
 		Trade trade = new Trade();
 		//set-up mock writer
 		writer.writeTrade(trade);
-		replay(writer);
 		
 		//call tested method
 		processor.write(Collections.singletonList(trade));
-		
-		//verify method calls
-		verify(writer);
 	}
 	
 }

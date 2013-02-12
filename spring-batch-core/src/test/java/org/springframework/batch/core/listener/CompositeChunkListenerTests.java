@@ -15,9 +15,7 @@
  */
 package org.springframework.batch.core.listener;
 
-import static org.easymock.EasyMock.createMock;
-import static org.easymock.EasyMock.replay;
-import static org.easymock.EasyMock.verify;
+import static org.mockito.Mockito.mock;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -27,6 +25,7 @@ import org.springframework.batch.core.scope.context.ChunkContext;
 /**
  * @author Lucas Ward
  * @author Michael Minella
+ * @author Will Schipp
  *
  */
 public class CompositeChunkListenerTests {
@@ -38,7 +37,7 @@ public class CompositeChunkListenerTests {
 	@Before
 	public void setUp() throws Exception {
 		chunkContext = new ChunkContext(null);
-		listener = createMock(ChunkListener.class);
+		listener = mock(ChunkListener.class);
 		compositeListener = new CompositeChunkListener();
 		compositeListener.register(listener);
 	}
@@ -46,26 +45,20 @@ public class CompositeChunkListenerTests {
 	@Test
 	public void testBeforeChunk(){
 		listener.beforeChunk(chunkContext);
-		replay(listener);
 		compositeListener.beforeChunk(chunkContext);
-		verify(listener);
 	}
 
 	@Test
 	public void testAfterChunk(){
 
 		listener.afterChunk(chunkContext);
-		replay(listener);
 		compositeListener.afterChunk(chunkContext);
-		verify(listener);
 	}
 
 	@Test
 	public void testAfterChunkFailed(){
 		ChunkContext context = new ChunkContext(null);
 		listener.afterChunkError(context);
-		replay(listener);
 		compositeListener.afterChunkError(context);
-		verify(listener);
 	}
 }

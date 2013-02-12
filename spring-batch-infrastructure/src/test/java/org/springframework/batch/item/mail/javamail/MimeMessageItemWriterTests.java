@@ -16,6 +16,9 @@
 package org.springframework.batch.item.mail.javamail;
 
 import static org.junit.Assert.assertEquals;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
+import static org.mockito.AdditionalMatchers.aryEq;
 
 import java.util.Arrays;
 import java.util.Collections;
@@ -26,7 +29,6 @@ import javax.mail.MessagingException;
 import javax.mail.Session;
 import javax.mail.internet.MimeMessage;
 
-import org.easymock.EasyMock;
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.batch.item.mail.MailErrorHandler;
@@ -37,6 +39,7 @@ import org.springframework.mail.javamail.JavaMailSender;
 
 /**
  * @author Dave Syer
+ * @author Will Schipp
  * 
  * @since 2.1
  * 
@@ -45,7 +48,7 @@ public class MimeMessageItemWriterTests {
 
 	private MimeMessageItemWriter writer = new MimeMessageItemWriter();
 
-	private JavaMailSender mailSender = EasyMock.createMock(JavaMailSender.class);
+	private JavaMailSender mailSender = mock(JavaMailSender.class);
 	
 	private Session session = Session.getDefaultInstance(new Properties());
 
@@ -61,13 +64,10 @@ public class MimeMessageItemWriterTests {
 		MimeMessage bar = new MimeMessage(session);
 		MimeMessage[] items = new MimeMessage[] { foo, bar };
 
-		mailSender.send(EasyMock.aryEq(items));
-		EasyMock.expectLastCall();
-		EasyMock.replay(mailSender);
+		mailSender.send(aryEq(items));
 
 		writer.write(Arrays.asList(items));
 
-		EasyMock.verify(mailSender);
 
 	}
 
@@ -78,14 +78,11 @@ public class MimeMessageItemWriterTests {
 		MimeMessage bar = new MimeMessage(session);
 		MimeMessage[] items = new MimeMessage[] { foo, bar };
 
-		mailSender.send(EasyMock.aryEq(items));
-		EasyMock.expectLastCall().andThrow(
-				new MailSendException(Collections.singletonMap((Object)foo, (Exception)new MessagingException("FOO"))));
-		EasyMock.replay(mailSender);
+		mailSender.send(aryEq(items));
+		when(mailSender).thenThrow(new MailSendException(Collections.singletonMap((Object)foo, (Exception)new MessagingException("FOO"))));
 
 		writer.write(Arrays.asList(items));
 
-		EasyMock.verify(mailSender);
 
 	}
 
@@ -104,16 +101,13 @@ public class MimeMessageItemWriterTests {
 		MimeMessage bar = new MimeMessage(session);
 		MimeMessage[] items = new MimeMessage[] { foo, bar };
 
-		mailSender.send(EasyMock.aryEq(items));
-		EasyMock.expectLastCall().andThrow(
-				new MailSendException(Collections.singletonMap((Object)foo, (Exception) new MessagingException("FOO"))));
-		EasyMock.replay(mailSender);
+		mailSender.send(aryEq(items));
+		when(mailSender).thenThrow(new MailSendException(Collections.singletonMap((Object)foo, (Exception)new MessagingException("FOO"))));
 
 		writer.write(Arrays.asList(items));
 
 		assertEquals("FOO", content.get());
 
-		EasyMock.verify(mailSender);
 
 	}
 
