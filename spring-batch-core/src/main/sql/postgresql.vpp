@@ -1,3 +1,5 @@
+#macro (alter $name $table $constraint) ALTER TABLE ${name} DROP CONSTRAINT IF EXISTS ${constraint};
+#end
 #macro (sequence $name $value)CREATE SEQUENCE ${name} MAXVALUE 9223372036854775807 NO CYCLE;
 #end
 #macro (notnull $name $type)ALTER COLUMN ${name} SET NOT NULL#end
