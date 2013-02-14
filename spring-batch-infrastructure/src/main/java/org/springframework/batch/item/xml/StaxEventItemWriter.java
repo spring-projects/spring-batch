@@ -41,7 +41,7 @@ import org.springframework.batch.item.ItemStreamException;
 import org.springframework.batch.item.ItemWriter;
 import org.springframework.batch.item.WriteFailedException;
 import org.springframework.batch.item.file.ResourceAwareItemWriterItemStream;
-import org.springframework.batch.item.util.ExecutionContextUserSupport;
+import org.springframework.batch.item.support.AbstractItemStreamWriter;
 import org.springframework.batch.item.util.FileUtils;
 import org.springframework.batch.item.xml.stax.NoStartEndDocumentStreamWriter;
 import org.springframework.batch.support.transaction.TransactionAwareBufferedWriter;
@@ -69,7 +69,7 @@ import org.springframework.util.StringUtils;
  * @author Michael Minella
  * 
  */
-public class StaxEventItemWriter<T> extends ExecutionContextUserSupport implements
+public class StaxEventItemWriter<T> extends AbstractItemStreamWriter<T> implements
 		ResourceAwareItemWriterItemStream<T>, InitializingBean {
 
 	private static final Log log = LogFactory.getLog(StaxEventItemWriter.class);
@@ -143,7 +143,7 @@ public class StaxEventItemWriter<T> extends ExecutionContextUserSupport implemen
 	private boolean forceSync;
 
 	public StaxEventItemWriter() {
-		setName(ClassUtils.getShortName(StaxEventItemWriter.class));
+		this.setExecutionContextName(ClassUtils.getShortName(StaxEventItemWriter.class));
 	}
 
 	/**
@@ -351,8 +351,8 @@ public class StaxEventItemWriter<T> extends ExecutionContextUserSupport implemen
 
 		// if restart data is provided, restart from provided offset
 		// otherwise start from beginning
-		if (executionContext.containsKey(getKey(RESTART_DATA_NAME))) {
-			startAtPosition = executionContext.getLong(getKey(RESTART_DATA_NAME));
+		if (executionContext.containsKey(this.getExecutionContextKey(RESTART_DATA_NAME))) {
+			startAtPosition = executionContext.getLong(this.getExecutionContextKey(RESTART_DATA_NAME));
 			restarted = true;
 		}
 
@@ -668,8 +668,8 @@ public class StaxEventItemWriter<T> extends ExecutionContextUserSupport implemen
 
 		if (saveState) {
 			Assert.notNull(executionContext, "ExecutionContext must not be null");
-			executionContext.putLong(getKey(RESTART_DATA_NAME), getPosition());
-			executionContext.putLong(getKey(WRITE_STATISTICS_NAME), currentRecordCount);
+			executionContext.putLong(this.getExecutionContextKey(RESTART_DATA_NAME), getPosition());
+			executionContext.putLong(this.getExecutionContextKey(WRITE_STATISTICS_NAME), currentRecordCount);
 		}
 	}
 

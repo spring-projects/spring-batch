@@ -24,7 +24,7 @@ import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.item.ItemStream;
 import org.springframework.batch.item.ItemStreamException;
 import org.springframework.batch.item.ItemWriter;
-import org.springframework.batch.item.util.ExecutionContextUserSupport;
+import org.springframework.batch.item.support.AbstractItemStreamWriter;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
 import org.springframework.util.Assert;
@@ -44,7 +44,7 @@ import org.springframework.util.ClassUtils;
  * 
  * @author Robert Kasanicky
  */
-public class MultiResourceItemWriter<T> extends ExecutionContextUserSupport implements ItemWriter<T>, ItemStream {
+public class MultiResourceItemWriter<T> extends AbstractItemStreamWriter<T> {
 
 	final static private String RESOURCE_INDEX_KEY = "resource.index";
 
@@ -67,7 +67,7 @@ public class MultiResourceItemWriter<T> extends ExecutionContextUserSupport impl
 	private boolean opened = false;
 
 	public MultiResourceItemWriter() {
-		setName(ClassUtils.getShortName(MultiResourceItemWriter.class));
+		this.setExecutionContextName(ClassUtils.getShortName(MultiResourceItemWriter.class));
 	}
 
     @Override
@@ -139,8 +139,8 @@ public class MultiResourceItemWriter<T> extends ExecutionContextUserSupport impl
 
     @Override
 	public void open(ExecutionContext executionContext) throws ItemStreamException {
-		resourceIndex = executionContext.getInt(getKey(RESOURCE_INDEX_KEY), 1);
-		currentResourceItemCount = executionContext.getInt(getKey(CURRENT_RESOURCE_ITEM_COUNT), 0);
+		resourceIndex = executionContext.getInt(this.getExecutionContextKey(RESOURCE_INDEX_KEY), 1);
+		currentResourceItemCount = executionContext.getInt(this.getExecutionContextKey(CURRENT_RESOURCE_ITEM_COUNT), 0);
 
 		try {
 			setResourceToDelegate();
@@ -149,7 +149,7 @@ public class MultiResourceItemWriter<T> extends ExecutionContextUserSupport impl
 			throw new ItemStreamException("Couldn't assign resource", e);
 		}
 
-		if (executionContext.containsKey(getKey(CURRENT_RESOURCE_ITEM_COUNT))) {
+		if (executionContext.containsKey(this.getExecutionContextKey(CURRENT_RESOURCE_ITEM_COUNT))) {
 			// It's a restart
 			delegate.open(executionContext);
 		}
@@ -164,8 +164,8 @@ public class MultiResourceItemWriter<T> extends ExecutionContextUserSupport impl
 			if (opened) {
 				delegate.update(executionContext);
 			}
-			executionContext.putInt(getKey(CURRENT_RESOURCE_ITEM_COUNT), currentResourceItemCount);
-			executionContext.putInt(getKey(RESOURCE_INDEX_KEY), resourceIndex);
+			executionContext.putInt(this.getExecutionContextKey(CURRENT_RESOURCE_ITEM_COUNT), currentResourceItemCount);
+			executionContext.putInt(this.getExecutionContextKey(RESOURCE_INDEX_KEY), resourceIndex);
 		}
 	}
 

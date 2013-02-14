@@ -22,7 +22,7 @@ import java.util.Comparator;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.batch.item.*;
-import org.springframework.batch.item.util.ExecutionContextUserSupport;
+import org.springframework.batch.item.support.AbstractItemStreamReader;
 import org.springframework.core.io.Resource;
 import org.springframework.util.Assert;
 import org.springframework.util.ClassUtils;
@@ -38,13 +38,11 @@ import org.springframework.util.ClassUtils;
  * @author Robert Kasanicky
  * @author Lucas Ward
  */
-public class MultiResourceItemReader<T> implements ItemReader<T>, ItemStream {
+public class MultiResourceItemReader<T> extends AbstractItemStreamReader<T> {
 
 	private static final Log logger = LogFactory.getLog(MultiResourceItemReader.class);
 
 	private static final String RESOURCE_KEY = "resourceIndex";
-
-	private final ExecutionContextUserSupport executionContextUserSupport = new ExecutionContextUserSupport();
 
 	private ResourceAwareItemReaderItemStream<? extends T> delegate;
 
@@ -81,7 +79,7 @@ public class MultiResourceItemReader<T> implements ItemReader<T>, ItemStream {
 	};
 
 	public MultiResourceItemReader() {
-		executionContextUserSupport.setName(ClassUtils.getShortName(MultiResourceItemReader.class));
+		this.setExecutionContextName(ClassUtils.getShortName(MultiResourceItemReader.class));
 	}
 
 	/**
@@ -174,8 +172,8 @@ public class MultiResourceItemReader<T> implements ItemReader<T>, ItemStream {
 
 		Arrays.sort(resources, comparator);
 
-		if (executionContext.containsKey(executionContextUserSupport.getKey(RESOURCE_KEY))) {
-			currentResource = executionContext.getInt(executionContextUserSupport.getKey(RESOURCE_KEY));
+		if (executionContext.containsKey(this.getExecutionContextKey(RESOURCE_KEY))) {
+			currentResource = executionContext.getInt(this.getExecutionContextKey(RESOURCE_KEY));
 
 			// context could have been saved before reading anything
 			if (currentResource == -1) {
@@ -196,7 +194,7 @@ public class MultiResourceItemReader<T> implements ItemReader<T>, ItemStream {
     @Override
 	public void update(ExecutionContext executionContext) throws ItemStreamException {
 		if (saveState) {
-			executionContext.putInt(executionContextUserSupport.getKey(RESOURCE_KEY), currentResource);
+			executionContext.putInt(this.getExecutionContextKey(RESOURCE_KEY), currentResource);
 			delegate.update(executionContext);
 		}
 	}

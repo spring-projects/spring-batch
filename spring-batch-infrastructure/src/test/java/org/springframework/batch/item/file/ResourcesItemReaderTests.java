@@ -34,7 +34,7 @@ public class ResourcesItemReaderTests {
 	@Test
 	public void testReadAfterOpen() throws Exception {
 		ExecutionContext executionContext = new ExecutionContext();
-		executionContext.putInt(reader.getKey("COUNT"), 1);
+		executionContext.putInt(reader.getExecutionContextKey("COUNT"), 1);
 		reader.open(executionContext);
 		assertNotNull(reader.read());
 		assertNull(reader.read());
@@ -46,7 +46,7 @@ public class ResourcesItemReaderTests {
 		assertNotNull(reader.read());
 
 		reader.update(executionContext);
-		assertEquals(1, executionContext.getInt(reader.getKey("COUNT")));
+		assertEquals(1, executionContext.getInt(reader.getExecutionContextKey("COUNT")));
 	}
 
 }
