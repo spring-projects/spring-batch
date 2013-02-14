@@ -23,7 +23,6 @@ import junit.framework.TestCase;
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.item.ItemStream;
 import org.springframework.batch.item.ItemStreamException;
-import org.springframework.batch.item.ItemStreamSupport;
 import org.springframework.batch.item.support.CompositeItemStream;
 
 /**
@@ -37,7 +36,7 @@ public class CompositeItemStreamTests extends TestCase {
 	private List<String> list = new ArrayList<String>();
 
 	public void testRegisterAndOpen() {
-		ItemStreamSupport stream = new ItemStreamSupport() {
+		AbstractItemStream stream = new AbstractItemStream() {
             @Override
 			public void open(ExecutionContext executionContext) throws ItemStreamException {
 				list.add("bar");
@@ -49,7 +48,7 @@ public class CompositeItemStreamTests extends TestCase {
 	}
 
 	public void testRegisterTwice() {
-		ItemStreamSupport stream = new ItemStreamSupport() {
+		AbstractItemStream stream = new AbstractItemStream() {
             @Override
 			public void open(ExecutionContext executionContext) throws ItemStreamException {
 				list.add("bar");
@@ -62,7 +61,7 @@ public class CompositeItemStreamTests extends TestCase {
 	}
 
 	public void testMark() {
-		manager.register(new ItemStreamSupport() {
+		manager.register(new AbstractItemStream() {
             @Override
 			public void update(ExecutionContext executionContext) {
 				list.add("bar");
@@ -73,7 +72,7 @@ public class CompositeItemStreamTests extends TestCase {
 	}
 
 	public void testClose() {
-		manager.register(new ItemStreamSupport() {
+		manager.register(new AbstractItemStream() {
             @Override
 			public void close() throws ItemStreamException {
 				list.add("bar");
@@ -84,7 +83,7 @@ public class CompositeItemStreamTests extends TestCase {
 	}
 
 	public void testCloseDoesNotUnregister() {
-		manager.setStreams(new ItemStream[] { new ItemStreamSupport() {
+		manager.setStreams(new ItemStream[] { new AbstractItemStream() {
             @Override
 			public void open(ExecutionContext executionContext) throws ItemStreamException {
 				list.add("bar");
