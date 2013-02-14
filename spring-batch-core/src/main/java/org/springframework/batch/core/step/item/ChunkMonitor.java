@@ -21,6 +21,7 @@ import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.ItemStream;
 import org.springframework.batch.item.ItemStreamException;
+import org.springframework.batch.item.support.AbstractItemStream;
 import org.springframework.batch.item.support.CompositeItemStream;
 
 /**
@@ -32,7 +33,7 @@ import org.springframework.batch.item.support.CompositeItemStream;
  * @author Dave Syer
  * @since 2.0
  */
-public class ChunkMonitor implements ItemStream {
+public class ChunkMonitor extends AbstractItemStream {
 
 	private Log logger = LogFactory.getLog(getClass());
 
@@ -57,6 +58,10 @@ public class ChunkMonitor implements ItemStream {
 
 	private ItemReader<?> reader;
 
+        public ChunkMonitor() {
+                this.setExecutionContextName(getClass().getName());
+        }
+        
 	/**
 	 * @param stream the stream to set
 	 */
@@ -105,7 +110,7 @@ public class ChunkMonitor implements ItemStream {
 	public void open(ExecutionContext executionContext) throws ItemStreamException {
 		if (streamsRegistered) {
 			stream.open(executionContext);
-			ChunkMonitorData data = new ChunkMonitorData(executionContext.getInt(OFFSET, 0), 0);
+			ChunkMonitorData data = new ChunkMonitorData(executionContext.getInt(this.getExecutionContextKey(OFFSET), 0), 0);
 			holder.set(data);
 			if (reader == null) {
 				logger.warn("No ItemReader set (must be concurrent step), so ignoring offset data.");
@@ -132,7 +137,7 @@ public class ChunkMonitor implements ItemStream {
 				stream.update(executionContext);
 			}
 			else {
-				executionContext.putInt(OFFSET, data.offset);
+				executionContext.putInt(this.getExecutionContextKey(OFFSET), data.offset);
 			}
 		}
 	}

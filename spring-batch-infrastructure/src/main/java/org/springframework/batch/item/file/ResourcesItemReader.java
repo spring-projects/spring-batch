@@ -7,7 +7,7 @@ import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.ItemStreamException;
 import org.springframework.batch.item.ItemStreamReader;
-import org.springframework.batch.item.util.ExecutionContextUserSupport;
+import org.springframework.batch.item.support.AbstractItemStreamReader;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.support.ResourceArrayPropertyEditor;
 
@@ -30,17 +30,17 @@ import org.springframework.core.io.support.ResourceArrayPropertyEditor;
  * 
  * @since 2.1
  */
-public class ResourcesItemReader extends ExecutionContextUserSupport implements ItemStreamReader<Resource> {
+public class ResourcesItemReader extends AbstractItemStreamReader<Resource> {
 
 	private Resource[] resources = new Resource[0];
 
 	private AtomicInteger counter = new AtomicInteger(0);
 
-	{
+        public ResourcesItemReader() {
 		/*
 		 * Initialize the name for the key in the execution context.
 		 */
-		setName(getClass().getName());
+		this.setExecutionContextName(getClass().getName());
 	}
 
 	/**
@@ -71,12 +71,12 @@ public class ResourcesItemReader extends ExecutionContextUserSupport implements 
 
     @Override
 	public void open(ExecutionContext executionContext) throws ItemStreamException {
-		counter.set(executionContext.getInt(getKey("COUNT"), 0));
+		counter.set(executionContext.getInt(this.getExecutionContextKey("COUNT"), 0));
 	}
 
     @Override
 	public void update(ExecutionContext executionContext) throws ItemStreamException {
-		executionContext.putInt(getKey("COUNT"), counter.get());
+		executionContext.putInt(this.getExecutionContextKey("COUNT"), counter.get());
 	}
 
 }

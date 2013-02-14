@@ -6,11 +6,12 @@ import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.ItemStream;
 import org.springframework.batch.item.ItemStreamException;
+import org.springframework.batch.item.support.AbstractItemStreamReader;
 
 /**
  * {@link ItemReader} with hard-coded input data.
  */
-public class ExampleItemReader implements ItemReader<String>, ItemStream {
+public class ExampleItemReader extends AbstractItemStreamReader<String> {
 
 	private Log logger = LogFactory.getLog(getClass());
 
@@ -24,6 +25,10 @@ public class ExampleItemReader implements ItemReader<String>, ItemStream {
 
 	public static volatile boolean fail = false;
 
+        public ExampleItemReader() {
+                this.setExecutionContextName(getClass().getName());
+        }
+        
 	/**
 	 * @param min the min to set
 	 */
@@ -63,17 +68,13 @@ public class ExampleItemReader implements ItemReader<String>, ItemStream {
 	}
 
 	@Override
-	public void close() throws ItemStreamException {
-	}
-
-	@Override
 	public void open(ExecutionContext executionContext) throws ItemStreamException {
-		index = (int) executionContext.getLong("POSITION", min);
+		index = (int) executionContext.getLong(this.getExecutionContextKey("POSITION"), min);
 	}
 
 	@Override
 	public void update(ExecutionContext executionContext) throws ItemStreamException {
-		executionContext.putLong("POSITION", index);
+		executionContext.putLong(this.getExecutionContextKey("POSITION"), index);
 	}
 
 }

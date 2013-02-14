@@ -32,7 +32,7 @@ import org.springframework.batch.core.step.tasklet.TaskletStep;
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.item.ItemStream;
 import org.springframework.batch.item.ItemStreamException;
-import org.springframework.batch.item.ItemStreamSupport;
+import org.springframework.batch.item.support.AbstractItemStream;
 import org.springframework.batch.repeat.RepeatStatus;
 import org.springframework.batch.support.transaction.ResourcelessTransactionManager;
 import org.springframework.transaction.TransactionException;
@@ -104,7 +104,7 @@ public class TaskletStepExceptionTests {
 	@Test
 	public void testOpenFailure() throws Exception {
 		final RuntimeException exception = new RuntimeException();
-		taskletStep.setStreams(new ItemStream[] { new ItemStreamSupport() {
+		taskletStep.setStreams(new ItemStream[] { new AbstractItemStream() {
 			@Override
 			public void open(ExecutionContext executionContext) throws ItemStreamException {
 				throw exception;
@@ -181,7 +181,7 @@ public class TaskletStepExceptionTests {
 	public void testCloseError() throws Exception {
 
 		final RuntimeException exception = new RuntimeException();
-		taskletStep.setStreams(new ItemStream[] { new ItemStreamSupport() {
+		taskletStep.setStreams(new ItemStream[] { new AbstractItemStream() {
 			@Override
 			public void close() throws ItemStreamException {
 				throw exception;

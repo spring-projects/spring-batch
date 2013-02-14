@@ -35,7 +35,7 @@ import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.step.JobRepositorySupport;
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.item.ItemProcessor;
-import org.springframework.batch.item.ItemStreamSupport;
+import org.springframework.batch.item.support.AbstractItemStream;
 import org.springframework.batch.item.ItemWriter;
 import org.springframework.batch.item.support.ListItemReader;
 import org.springframework.batch.item.support.PassThroughItemProcessor;
@@ -98,7 +98,7 @@ public class AsyncTaskletStepTests {
 		template.setTaskExecutor(taskExecutor);
 		step.setStepOperations(template);
 
-		step.registerStream(new ItemStreamSupport() {
+		step.registerStream(new AbstractItemStream() {
 			private int count = 0;
 
 			@Override

@@ -53,8 +53,9 @@ import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.ItemStream;
 import org.springframework.batch.item.ItemStreamException;
-import org.springframework.batch.item.ItemStreamSupport;
+import org.springframework.batch.item.support.AbstractItemStream;
 import org.springframework.batch.item.ItemWriter;
+import org.springframework.batch.item.support.AbstractItemStreamReader;
 import org.springframework.batch.item.support.ListItemReader;
 import org.springframework.batch.repeat.RepeatStatus;
 import org.springframework.batch.repeat.policy.DefaultResultCompletionPolicy;
@@ -453,7 +454,7 @@ public class TaskletStepTests {
 
 	@Test
 	public void testDirectlyInjectedItemStream() throws Exception {
-		step.setStreams(new ItemStream[] { new ItemStreamSupport() {
+		step.setStreams(new ItemStream[] { new AbstractItemStream() {
 			@Override
 			public void update(ExecutionContext executionContext) {
 				executionContext.putString("foo", "bar");
@@ -736,7 +737,7 @@ public class TaskletStepTests {
 	public void testStatusForFinalUpdateFailedException() throws Exception {
 
 		step.setJobRepository(new JobRepositorySupport());
-		step.setStreams(new ItemStream[] { new ItemStreamSupport() {
+		step.setStreams(new ItemStream[] { new AbstractItemStream() {
 			@Override
 			public void close() throws ItemStreamException {
 				throw new RuntimeException("Bar");
@@ -919,8 +920,8 @@ public class TaskletStepTests {
 		}
 	}
 
-	private class MockRestartableItemReader extends ItemStreamSupport implements ItemReader<String>,
-	StepExecutionListener {
+	private class MockRestartableItemReader extends AbstractItemStreamReader<String> 
+                implements StepExecutionListener {
 
 		private boolean getExecutionAttributesCalled = false;
 

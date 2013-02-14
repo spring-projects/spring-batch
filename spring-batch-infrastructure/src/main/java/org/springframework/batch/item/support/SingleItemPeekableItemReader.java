@@ -42,7 +42,7 @@ import org.springframework.batch.item.UnexpectedInputException;
  * @author Dave Syer
  * 
  */
-public class SingleItemPeekableItemReader<T> implements ItemStreamReader<T>, PeekableItemReader<T> {
+public class SingleItemPeekableItemReader<T> extends AbstractItemStreamReader<T> implements PeekableItemReader<T> {
 
 	private ItemReader<T> delegate;
 

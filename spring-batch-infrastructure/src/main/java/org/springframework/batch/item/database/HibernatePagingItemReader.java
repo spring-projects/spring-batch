@@ -58,7 +58,7 @@ import org.springframework.util.ClassUtils;
  *
  * @since 2.1
  */
-public class HibernatePagingItemReader<T> extends AbstractPagingItemReader<T> implements ItemStream, InitializingBean {
+public class HibernatePagingItemReader<T> extends AbstractPagingItemReader<T> implements InitializingBean {
 
 	private HibernateItemReaderHelper<T> helper = new HibernateItemReaderHelper<T>();
 

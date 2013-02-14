@@ -23,7 +23,7 @@ import org.junit.Test;
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.ItemStreamException;
-import org.springframework.batch.item.ItemStreamSupport;
+import org.springframework.batch.item.support.AbstractItemStream;
 import org.springframework.batch.item.ParseException;
 import org.springframework.batch.item.UnexpectedInputException;
 
@@ -52,7 +52,7 @@ public class ChunkMonitorTests {
 				return "" + (count++);
 			}
 		});
-		monitor.registerItemStream(new ItemStreamSupport() {
+		monitor.registerItemStream(new AbstractItemStream() {
 			@Override
 			public void close() throws ItemStreamException {
 				closed = true;

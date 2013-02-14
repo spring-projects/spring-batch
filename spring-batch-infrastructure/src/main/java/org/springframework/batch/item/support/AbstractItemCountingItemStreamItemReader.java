@@ -19,10 +19,8 @@ package org.springframework.batch.item.support;
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.ItemStreamException;
-import org.springframework.batch.item.ItemStreamReader;
 import org.springframework.batch.item.ParseException;
 import org.springframework.batch.item.UnexpectedInputException;
-import org.springframework.batch.item.util.ExecutionContextUserSupport;
 import org.springframework.util.Assert;
 
 /**
@@ -34,7 +32,7 @@ import org.springframework.util.Assert;
  * 
  * @author Robert Kasanicky
  */
-public abstract class AbstractItemCountingItemStreamItemReader<T> implements ItemStreamReader<T> {
+public abstract class AbstractItemCountingItemStreamItemReader<T> extends AbstractItemStreamReader<T> {
 
 	private static final String READ_COUNT = "read.count";
 
@@ -43,8 +41,6 @@ public abstract class AbstractItemCountingItemStreamItemReader<T> implements Ite
 	private int currentItemCount = 0;
 
 	private int maxItemCount = Integer.MAX_VALUE;
-
-	private ExecutionContextUserSupport ecSupport = new ExecutionContextUserSupport();
 
 	private boolean saveState = true;
 
@@ -143,12 +139,12 @@ public abstract class AbstractItemCountingItemStreamItemReader<T> implements Ite
 			return;
 		}
 
-		if (executionContext.containsKey(ecSupport.getKey(READ_COUNT_MAX))) {
-			maxItemCount = executionContext.getInt(ecSupport.getKey(READ_COUNT_MAX));
+		if (executionContext.containsKey(this.getExecutionContextKey(READ_COUNT_MAX))) {
+			maxItemCount = executionContext.getInt(this.getExecutionContextKey(READ_COUNT_MAX));
 		}
 
-		if (executionContext.containsKey(ecSupport.getKey(READ_COUNT))) {
-			int itemCount = executionContext.getInt(ecSupport.getKey(READ_COUNT));
+		if (executionContext.containsKey(this.getExecutionContextKey(READ_COUNT))) {
+			int itemCount = executionContext.getInt(this.getExecutionContextKey(READ_COUNT));
 
 			if (itemCount < maxItemCount) {
 				try {
@@ -168,16 +164,12 @@ public abstract class AbstractItemCountingItemStreamItemReader<T> implements Ite
 	public void update(ExecutionContext executionContext) throws ItemStreamException {
 		if (saveState) {
 			Assert.notNull(executionContext, "ExecutionContext must not be null");
-			executionContext.putInt(ecSupport.getKey(READ_COUNT), currentItemCount);
+			executionContext.putInt(this.getExecutionContextKey(READ_COUNT), currentItemCount);
 			if (maxItemCount < Integer.MAX_VALUE) {
-				executionContext.putInt(ecSupport.getKey(READ_COUNT_MAX), maxItemCount);
+				executionContext.putInt(this.getExecutionContextKey(READ_COUNT_MAX), maxItemCount);
 			}
 		}
 
-	}
-
-	protected ExecutionContextUserSupport getExecutionContextUserSupport() {
-		return ecSupport;
 	}
 
 	/**
@@ -188,7 +180,7 @@ public abstract class AbstractItemCountingItemStreamItemReader<T> implements Ite
 	 * @param name the name for the component
 	 */
 	public void setName(String name) {
-		ecSupport.setName(name);
+		this.setExecutionContextName(name);
 	}
 
 	/**

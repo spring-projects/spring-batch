@@ -21,7 +21,6 @@ import java.util.List;
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.item.ItemStream;
 import org.springframework.batch.item.ItemStreamException;
-import org.springframework.batch.item.ItemStreamWriter;
 import org.springframework.batch.item.ItemWriter;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.util.Assert;
@@ -35,7 +34,7 @@ import org.springframework.util.Assert;
  * @author Robert Kasanicky
  * @author Dave Syer
  */
-public class CompositeItemWriter<T> implements ItemStreamWriter<T>, InitializingBean {
+public class CompositeItemWriter<T> extends AbstractItemStreamWriter<T> implements InitializingBean {
 
 	private List<ItemWriter<? super T>> delegates;
 

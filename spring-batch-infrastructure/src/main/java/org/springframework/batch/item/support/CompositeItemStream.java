@@ -29,7 +29,7 @@ import org.springframework.batch.item.ItemStreamException;
  * @author Dave Syer
  * 
  */
-public class CompositeItemStream implements ItemStream {
+public class CompositeItemStream extends AbstractItemStream {
 
 	private List<ItemStream> streams = new ArrayList<ItemStream>();
 

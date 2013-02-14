@@ -55,8 +55,7 @@ import org.springframework.util.ClassUtils;
  * @author Robert Kasanicky
  * @author Dave Syer
  */
-public class HibernateCursorItemReader<T> extends AbstractItemCountingItemStreamItemReader<T> implements ItemStream,
-InitializingBean {
+public class HibernateCursorItemReader<T> extends AbstractItemCountingItemStreamItemReader<T> implements InitializingBean {
 
 	private HibernateItemReaderHelper<T> helper = new HibernateItemReaderHelper<T>();
 

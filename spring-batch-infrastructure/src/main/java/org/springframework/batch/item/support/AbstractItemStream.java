@@ -13,7 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.springframework.batch.item;
+package org.springframework.batch.item.support;
+
+import org.springframework.batch.item.ExecutionContext;
+import org.springframework.batch.item.ItemStream;
+import org.springframework.batch.item.ItemStreamException;
+import org.springframework.batch.item.util.ExecutionContextUserSupport;
 
 
 /**
@@ -22,8 +27,10 @@ package org.springframework.batch.item;
  * @author Dave Syer
  *
  */
-public abstract class ItemStreamSupport implements ItemStream {
+public abstract class AbstractItemStream implements ItemStream {
 
+        private final ExecutionContextUserSupport executionContextUserSupport = new ExecutionContextUserSupport();
+    
 	/**
 	 * No-op.
 	 * @see org.springframework.batch.item.ItemStream#close()
@@ -48,4 +55,16 @@ public abstract class ItemStreamSupport implements ItemStream {
 	public void update(ExecutionContext executionContext) {
 	}
 
+        private ExecutionContextUserSupport getExecutionContextUserSupport() {
+            return executionContextUserSupport; 
+        }
+        
+        protected void setExecutionContextName(String name) {
+            this.getExecutionContextUserSupport().setName(name);
+        }
+        
+        public String getExecutionContextKey(String key) {
+            return this.getExecutionContextUserSupport().getKey(key);
+        }
+    
 }
