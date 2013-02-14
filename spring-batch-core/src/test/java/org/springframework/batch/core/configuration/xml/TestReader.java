@@ -3,15 +3,13 @@ package org.springframework.batch.core.configuration.xml;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-
 import org.springframework.batch.item.ExecutionContext;
-import org.springframework.batch.item.ItemReader;
-import org.springframework.batch.item.ItemStream;
 import org.springframework.batch.item.ItemStreamException;
+import org.springframework.batch.item.ItemStreamReader;
 import org.springframework.batch.item.ParseException;
 import org.springframework.batch.item.UnexpectedInputException;
 
-public class TestReader extends AbstractTestComponent implements ItemReader<String>, ItemStream {
+public class TestReader extends AbstractTestComponent implements ItemStreamReader<String> {
 
 	private boolean opened = false;
 

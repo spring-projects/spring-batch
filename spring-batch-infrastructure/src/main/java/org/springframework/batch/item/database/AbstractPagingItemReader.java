@@ -25,7 +25,7 @@ import org.springframework.util.Assert;
 import org.springframework.util.ClassUtils;
 
 /**
- * Abstract {@link org.springframework.batch.item.ItemReader} for to extend when
+ * Abstract {@link org.springframework.batch.item.ItemStreamReader} for to extend when
  * reading database records in a paging fashion.
  *
  * <p>
@@ -39,8 +39,8 @@ import org.springframework.util.ClassUtils;
  * @author Dave Syer
  * @since 2.0
  */
-public abstract class AbstractPagingItemReader<T> extends AbstractItemCountingItemStreamItemReader<T> implements
-InitializingBean {
+public abstract class AbstractPagingItemReader<T> extends AbstractItemCountingItemStreamItemReader<T> 
+        implements InitializingBean {
 
 	protected Log logger = LogFactory.getLog(getClass());
 
