@@ -3,14 +3,13 @@ package org.springframework.batch.core.partition;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.batch.item.ExecutionContext;
-import org.springframework.batch.item.ItemReader;
-import org.springframework.batch.item.ItemStream;
 import org.springframework.batch.item.ItemStreamException;
+import org.springframework.batch.item.ItemStreamReader;
 
 /**
- * {@link ItemReader} with hard-coded input data.
+ * {@link ItemStreamReader} with hard-coded input data.
  */
-public class ExampleItemReader implements ItemReader<String>, ItemStream {
+public class ExampleItemReader implements ItemStreamReader<String> {
 
 	private Log logger = LogFactory.getLog(getClass());
 
