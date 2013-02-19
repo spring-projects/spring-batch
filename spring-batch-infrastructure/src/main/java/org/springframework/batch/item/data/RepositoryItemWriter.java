@@ -84,6 +84,7 @@ public class RepositoryItemWriter implements ItemWriter, InitializingBean {
 	 *
 	 * @see org.springframework.batch.item.ItemWriter#write(java.util.List)
 	 */
+	@Override
 	public void write(List items) throws Exception {
 		if(!CollectionUtils.isEmpty(items)) {
 			doWrite(items);
@@ -112,8 +113,9 @@ public class RepositoryItemWriter implements ItemWriter, InitializingBean {
 	/**
 	 * Check mandatory properties - there must be a repository.
 	 */
+	@Override
 	public void afterPropertiesSet() throws Exception {
-		Assert.state(repository != null, "A CRUDRepository is required");
+		Assert.state(repository != null, "A CrudRepository implementation is required");
 	}
 
 
