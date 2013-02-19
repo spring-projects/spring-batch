@@ -231,6 +231,15 @@
 			<scope>runtime</scope>
 		</dependency>
 		<dependency>
+			 <groupId>org.springframework.data</groupId>
+			 <artifactId>spring-data-commons-core</artifactId>
+			 <optional>true</optional>
+		</dependency>
+  		<dependency>
+			<groupId>org.springframework.data</groupId>
+			<artifactId>spring-data-jpa</artifactId>
+		</dependency>
+		<dependency>
 			<groupId>javax.mail</groupId>
 			<artifactId>mail</artifactId>
 			<version>1.4.1</version>
