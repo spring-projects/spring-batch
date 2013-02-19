@@ -21,7 +21,12 @@ import java.util.Comparator;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.springframework.batch.item.*;
+import org.springframework.batch.item.ExecutionContext;
+import org.springframework.batch.item.ItemStreamException;
+import org.springframework.batch.item.ItemStreamReader;
+import org.springframework.batch.item.ParseException;
+import org.springframework.batch.item.ResourceAware;
+import org.springframework.batch.item.UnexpectedInputException;
 import org.springframework.batch.item.util.ExecutionContextUserSupport;
 import org.springframework.core.io.Resource;
 import org.springframework.util.Assert;
@@ -38,7 +43,7 @@ import org.springframework.util.ClassUtils;
  * @author Robert Kasanicky
  * @author Lucas Ward
  */
-public class MultiResourceItemReader<T> implements ItemReader<T>, ItemStream {
+public class MultiResourceItemReader<T> implements ItemStreamReader<T> {
 
 	private static final Log logger = LogFactory.getLog(MultiResourceItemReader.class);
 

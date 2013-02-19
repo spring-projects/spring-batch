@@ -22,8 +22,7 @@ import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.StatelessSession;
 import org.springframework.batch.item.ExecutionContext;
-import org.springframework.batch.item.ItemReader;
-import org.springframework.batch.item.ItemStream;
+import org.springframework.batch.item.ItemStreamReader;
 import org.springframework.batch.item.ItemStreamException;
 import org.springframework.batch.item.database.orm.HibernateQueryProvider;
 import org.springframework.batch.item.support.AbstractItemCountingItemStreamItemReader;
@@ -32,7 +31,7 @@ import org.springframework.util.Assert;
 import org.springframework.util.ClassUtils;
 
 /**
- * {@link ItemReader} for reading database records built on top of Hibernate. It
+ * {@link ItemStreamReader} for reading database records built on top of Hibernate. It
  * executes the HQL query when initialized iterates over the result set as
  * {@link #read()} method is called, returning an object corresponding to
  * current row. The query can be set directly using
@@ -55,8 +54,8 @@ import org.springframework.util.ClassUtils;
  * @author Robert Kasanicky
  * @author Dave Syer
  */
-public class HibernateCursorItemReader<T> extends AbstractItemCountingItemStreamItemReader<T> implements ItemStream,
-InitializingBean {
+public class HibernateCursorItemReader<T> extends AbstractItemCountingItemStreamItemReader<T> 
+        implements InitializingBean {
 
 	private HibernateItemReaderHelper<T> helper = new HibernateItemReaderHelper<T>();
 

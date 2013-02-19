@@ -55,6 +55,7 @@ import org.springframework.batch.item.ItemStream;
 import org.springframework.batch.item.ItemStreamException;
 import org.springframework.batch.item.ItemStreamSupport;
 import org.springframework.batch.item.ItemWriter;
+import org.springframework.batch.item.support.AbstractItemStreamItemReader;
 import org.springframework.batch.item.support.ListItemReader;
 import org.springframework.batch.repeat.RepeatStatus;
 import org.springframework.batch.repeat.policy.DefaultResultCompletionPolicy;
@@ -919,8 +920,7 @@ public class TaskletStepTests {
 		}
 	}
 
-	private class MockRestartableItemReader extends ItemStreamSupport implements ItemReader<String>,
-	StepExecutionListener {
+	private class MockRestartableItemReader extends AbstractItemStreamItemReader<String> implements StepExecutionListener {
 
 		private boolean getExecutionAttributesCalled = false;
 

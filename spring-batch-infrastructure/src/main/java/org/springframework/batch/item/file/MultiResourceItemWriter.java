@@ -19,11 +19,9 @@ package org.springframework.batch.item.file;
 import java.io.File;
 import java.io.IOException;
 import java.util.List;
-
 import org.springframework.batch.item.ExecutionContext;
-import org.springframework.batch.item.ItemStream;
 import org.springframework.batch.item.ItemStreamException;
-import org.springframework.batch.item.ItemWriter;
+import org.springframework.batch.item.ItemStreamWriter;
 import org.springframework.batch.item.util.ExecutionContextUserSupport;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
@@ -44,7 +42,7 @@ import org.springframework.util.ClassUtils;
  * 
  * @author Robert Kasanicky
  */
-public class MultiResourceItemWriter<T> extends ExecutionContextUserSupport implements ItemWriter<T>, ItemStream {
+public class MultiResourceItemWriter<T> extends ExecutionContextUserSupport implements ItemStreamWriter<T> {
 
 	final static private String RESOURCE_INDEX_KEY = "resource.index";
 
