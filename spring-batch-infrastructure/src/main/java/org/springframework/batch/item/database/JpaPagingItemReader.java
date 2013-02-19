@@ -79,6 +79,7 @@ import org.springframework.util.ClassUtils;
  *
  * @author Thomas Risberg
  * @author Dave Syer
+ * @author Will Schipp
  * @since 2.0
  */
 public class JpaPagingItemReader<T> extends AbstractPagingItemReader<T> {
@@ -94,6 +95,8 @@ public class JpaPagingItemReader<T> extends AbstractPagingItemReader<T> {
 	private JpaQueryProvider queryProvider;
 
 	private Map<String, Object> parameterValues;
+	
+	private boolean transacted = true;//default value
 
 	public JpaPagingItemReader() {
 		setName(ClassUtils.getShortName(JpaPagingItemReader.class));
@@ -124,6 +127,18 @@ public class JpaPagingItemReader<T> extends AbstractPagingItemReader<T> {
 	 */
 	public void setParameterValues(Map<String, Object> parameterValues) {
 		this.parameterValues = parameterValues;
+	}
+
+	/**
+	 * By default (true) the EntityTransaction will be started and committed around the read.  
+	 * Can be overridden (false) in cases where the JPA implementation doesn't support a 
+	 * particular transaction.  (e.g. Hibernate with a JTA transaction).  NOTE: may cause 
+	 * problems in guaranteeing the object consistency in the EntityManagerFactory.
+	 * 
+	 * @param transacted
+	 */
+	public void setTransacted(boolean transacted) {
+		this.transacted = transacted;
 	}
 
 	@Override
@@ -174,11 +189,15 @@ public class JpaPagingItemReader<T> extends AbstractPagingItemReader<T> {
 	@SuppressWarnings("unchecked")
 	protected void doReadPage() {
 
-		EntityTransaction tx = entityManager.getTransaction();
-		tx.begin();
+		EntityTransaction tx = null;
+		
+		if (transacted) {
+			tx = entityManager.getTransaction();
+			tx.begin();
 
-		entityManager.flush();
-		entityManager.clear();
+			entityManager.flush();
+			entityManager.clear();
+		}//end if
 
 		Query query = createQuery().setFirstResult(getPage() * getPageSize()).setMaxResults(getPageSize());
 
@@ -196,7 +215,9 @@ public class JpaPagingItemReader<T> extends AbstractPagingItemReader<T> {
 		}
 		results.addAll(query.getResultList());
 
-		tx.commit();
+		if (transacted) {
+			tx.commit();
+		}//end if
 	}
 
 	@Override
