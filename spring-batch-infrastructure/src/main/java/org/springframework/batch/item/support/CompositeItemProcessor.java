@@ -16,6 +16,7 @@
 
 package org.springframework.batch.item.support;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.batch.item.ItemProcessor;
@@ -35,30 +36,37 @@ import org.springframework.util.Assert;
  */
 public class CompositeItemProcessor<I, O> implements ItemProcessor<I, O>, InitializingBean {
 
-	private List<ItemProcessor<Object, Object>> delegates;
+	private final List<ItemProcessor<Object, Object>> delegates = new ArrayList<ItemProcessor<Object, Object>>();
 
     @Override
 	@SuppressWarnings("unchecked")
 	public O process(I item) throws Exception {
 		Object result = item;
-
-		for (ItemProcessor<Object, Object> delegate : delegates) {
-			if (result == null) {
-				return null;
-			}
-			result = delegate.process(result);
-		}
+                
+                synchronized (delegates) {
+                    for (ItemProcessor<Object, Object> delegate : delegates) {
+                            if (result == null) {
+                                    return null;
+                            }
+                            result = delegate.process(result);
+                    }
+                }
 		return (O) result;
 	}
 
     @Override
 	public void afterPropertiesSet() throws Exception {
-		Assert.notNull(delegates, "The 'delgates' may not be null");
-		Assert.notEmpty(delegates, "The 'delgates' may not be empty");
+                synchronized (delegates) {
+                    Assert.notNull(delegates, "The 'delgates' may not be null");
+                    Assert.notEmpty(delegates, "The 'delgates' may not be empty");
+                }
 	}
 
 	public void setDelegates(List<ItemProcessor<Object, Object>> delegates) {
-		this.delegates = delegates;
+                synchronized (delegates) {
+                    this.delegates.clear();
+                    this.delegates.addAll(delegates);
+                }
 	}
 
 }
