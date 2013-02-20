@@ -27,11 +27,12 @@ import org.springframework.batch.item.ItemStreamException;
  * Simple {@link ItemStream} that delegates to a list of other streams.
  * 
  * @author Dave Syer
+ * @author Dean de Bree
  * 
  */
 public class CompositeItemStream implements ItemStream {
 
-	private List<ItemStream> streams = new ArrayList<ItemStream>();
+	private final List<ItemStream> streams = new ArrayList<ItemStream>();
 
 	/**
 	 * Public setter for the listeners.
@@ -39,7 +40,10 @@ public class CompositeItemStream implements ItemStream {
 	 * @param listeners
 	 */
 	public void setStreams(ItemStream[] listeners) {
-		this.streams = Arrays.asList(listeners);
+                synchronized (streams) {
+                    streams.clear();
+                    streams.addAll(Arrays.asList(listeners));
+                }
 	}
 
 	/**
@@ -49,17 +53,10 @@ public class CompositeItemStream implements ItemStream {
 	 */
 	public void register(ItemStream stream) {
 		synchronized (streams) {
-			if (!streams.contains(stream)) {
+			if ( ! streams.contains(stream)) {
 				streams.add(stream);
 			}
 		}
-	}
-
-	/**
-	 * 
-	 */
-	public CompositeItemStream() {
-		super();
 	}
 
 	/**
@@ -70,9 +67,11 @@ public class CompositeItemStream implements ItemStream {
 	 */
     @Override
 	public void update(ExecutionContext executionContext) {
-		for (ItemStream itemStream : streams) {
-			itemStream.update(executionContext);
-		}
+                synchronized (streams) {
+                    for (ItemStream itemStream : streams) {
+                            itemStream.update(executionContext);
+                    }
+                }
 	}
 
 	/**
@@ -81,9 +80,11 @@ public class CompositeItemStream implements ItemStream {
 	 */
     @Override
 	public void close() throws ItemStreamException {
-		for (ItemStream itemStream : streams) {
-			itemStream.close();
-		}
+                synchronized (streams) {
+                    for (ItemStream itemStream : streams) {
+                            itemStream.close();
+                    }
+                }
 	}
 
 	/**
@@ -92,9 +93,11 @@ public class CompositeItemStream implements ItemStream {
 	 */
     @Override
 	public void open(ExecutionContext executionContext) throws ItemStreamException {
-		for (ItemStream itemStream : streams) {
-			itemStream.open(executionContext);
-		}
+                synchronized (streams) {
+                    for (ItemStream itemStream : streams) {
+                            itemStream.open(executionContext);
+                    }
+                }
 	}
 
 }

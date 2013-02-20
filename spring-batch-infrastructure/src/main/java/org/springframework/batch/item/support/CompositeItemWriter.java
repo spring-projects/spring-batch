@@ -16,6 +16,7 @@
 
 package org.springframework.batch.item.support;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.batch.item.ExecutionContext;
@@ -37,7 +38,7 @@ import org.springframework.util.Assert;
  */
 public class CompositeItemWriter<T> implements ItemStreamWriter<T>, InitializingBean {
 
-	private List<ItemWriter<? super T>> delegates;
+	private final List<ItemWriter<? super T>> delegates = new ArrayList<ItemWriter<? super T>>();
 
 	private boolean ignoreItemStream = false;
 
@@ -47,46 +48,58 @@ public class CompositeItemWriter<T> implements ItemStreamWriter<T>, Initializing
 
     @Override
 	public void write(List<? extends T> item) throws Exception {
-		for (ItemWriter<? super T> writer : delegates) {
-			writer.write(item);
-		}
+                synchronized (delegates) {
+                    for (ItemWriter<? super T> writer : delegates) {
+                            writer.write(item);
+                    }
+                }
 	}
 
     @Override
 	public void afterPropertiesSet() throws Exception {
-		Assert.notNull(delegates, "The 'delgates' may not be null");
-		Assert.notEmpty(delegates, "The 'delgates' may not be empty");
+                synchronized (delegates) {
+                    Assert.notEmpty(delegates, "The 'delgates' may not be empty");
+                }
 	}
 
 	public void setDelegates(List<ItemWriter<? super T>> delegates) {
-		this.delegates = delegates;
+                synchronized (delegates) {
+                    delegates.clear();
+                    delegates.addAll(delegates);
+                }
 	}
 
     @Override
 	public void close() throws ItemStreamException {
-		for (ItemWriter<? super T> writer : delegates) {
-			if (!ignoreItemStream && (writer instanceof ItemStream)) {
-				((ItemStream) writer).close();
-			}
-		}
+                synchronized (delegates) {
+                    for (ItemWriter<? super T> writer : delegates) {
+                            if (!ignoreItemStream && (writer instanceof ItemStream)) {
+                                    ((ItemStream) writer).close();
+                            }
+                    }
+                }
 	}
 
     @Override
 	public void open(ExecutionContext executionContext) throws ItemStreamException {
-		for (ItemWriter<? super T> writer : delegates) {
-			if (!ignoreItemStream && (writer instanceof ItemStream)) {
-				((ItemStream) writer).open(executionContext);
-			}
-		}
+                synchronized (delegates) {
+                    for (ItemWriter<? super T> writer : delegates) {
+                            if (!ignoreItemStream && (writer instanceof ItemStream)) {
+                                    ((ItemStream) writer).open(executionContext);
+                            }
+                    }
+                }
 	}
 
     @Override
 	public void update(ExecutionContext executionContext) throws ItemStreamException {
-		for (ItemWriter<? super T> writer : delegates) {
-			if (!ignoreItemStream && (writer instanceof ItemStream)) {
-				((ItemStream) writer).update(executionContext);
-			}
-		}
+                synchronized (delegates) {
+                    for (ItemWriter<? super T> writer : delegates) {
+                            if (!ignoreItemStream && (writer instanceof ItemStream)) {
+                                    ((ItemStream) writer).update(executionContext);
+                            }
+                    }
+                }
 	}
 
 }
