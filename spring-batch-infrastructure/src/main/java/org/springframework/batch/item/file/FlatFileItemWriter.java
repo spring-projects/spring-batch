@@ -31,6 +31,7 @@ import org.apache.commons.logging.LogFactory;
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.item.ItemStream;
 import org.springframework.batch.item.ItemStreamException;
+import org.springframework.batch.item.SaveStateItemStream;
 import org.springframework.batch.item.WriteFailedException;
 import org.springframework.batch.item.WriterNotOpenException;
 import org.springframework.batch.item.file.transform.LineAggregator;
@@ -58,7 +59,7 @@ import org.springframework.util.ClassUtils;
  * @author Michael Minella
  */
 public class FlatFileItemWriter<T> extends ExecutionContextUserSupport implements ResourceAwareItemWriterItemStream<T>,
-		InitializingBean {
+		SaveStateItemStream, InitializingBean {
 
 	private static final boolean DEFAULT_TRANSACTIONAL = true;
 
@@ -199,17 +200,15 @@ public class FlatFileItemWriter<T> extends ExecutionContextUserSupport implement
 		this.shouldDeleteIfEmpty = shouldDeleteIfEmpty;
 	}
 
-	/**
-	 * Set the flag indicating whether or not state should be saved in the
-	 * provided {@link ExecutionContext} during the {@link ItemStream} call to
-	 * update. Setting this to false means that it will always start at the
-	 * beginning on a restart.
-	 * 
-	 * @param saveState
-	 */
+    @Override
 	public void setSaveState(boolean saveState) {
 		this.saveState = saveState;
 	}
+
+    @Override
+        public boolean isSaveState() {
+            return this.saveState;
+        }
 
 	/**
 	 * headerCallback will be called before writing the first item to file.
@@ -357,7 +356,7 @@ public class FlatFileItemWriter<T> extends ExecutionContextUserSupport implement
 
 		Assert.notNull(executionContext, "ExecutionContext must not be null");
 
-		if (saveState) {
+		if (isSaveState()) {
 
 			try {
 				executionContext.putLong(getKey(RESTART_DATA_NAME), state.position());
