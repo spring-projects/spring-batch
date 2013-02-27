@@ -429,12 +429,13 @@ public class TaskletStepTests {
 	public void testStreamManager() throws Exception {
 		MockRestartableItemReader reader = new MockRestartableItemReader() {
 			@Override
-			public String read() throws Exception {
+			public String read() {
 				return "foo";
 			}
 
 			@Override
 			public void update(ExecutionContext executionContext) {
+                                super.update(executionContext);
 				executionContext.putString("foo", "bar");
 			}
 		};
@@ -457,6 +458,7 @@ public class TaskletStepTests {
 		step.setStreams(new ItemStream[] { new ItemStreamSupport() {
 			@Override
 			public void update(ExecutionContext executionContext) {
+                                super.update(executionContext);
 				executionContext.putString("foo", "bar");
 			}
 		} });
@@ -500,6 +502,7 @@ public class TaskletStepTests {
 
 			@Override
 			public void open(ExecutionContext executionContext) throws ItemStreamException {
+                                super.open(executionContext);
 				assertEquals(1, list.size());
 			}
 		};
@@ -547,7 +550,7 @@ public class TaskletStepTests {
 		});
 		step.setTasklet(new TestingChunkOrientedTasklet<String>(new MockRestartableItemReader() {
 			@Override
-			public String read() throws Exception {
+			public String read() throws RuntimeException {
 				throw new RuntimeException("FOO");
 			}
 		}, itemWriter));
@@ -562,12 +565,13 @@ public class TaskletStepTests {
 	public void testDirectlyInjectedStreamWhichIsAlsoReader() throws Exception {
 		MockRestartableItemReader reader = new MockRestartableItemReader() {
 			@Override
-			public String read() throws Exception {
+			public String read() {
 				return "foo";
 			}
 
 			@Override
 			public void update(ExecutionContext executionContext) {
+                                super.update(executionContext);
 				executionContext.putString("foo", "bar");
 			}
 		};
@@ -740,6 +744,7 @@ public class TaskletStepTests {
 		step.setStreams(new ItemStream[] { new ItemStreamSupport() {
 			@Override
 			public void close() throws ItemStreamException {
+                                super.close();
 				throw new RuntimeException("Bar");
 			}
 		} });
@@ -797,7 +802,7 @@ public class TaskletStepTests {
 	public void testRestartAfterFailureInFirstChunk() throws Exception {
 		MockRestartableItemReader reader = new MockRestartableItemReader() {
 			@Override
-			public String read() throws Exception {
+			public String read() throws RuntimeException {
 				// fail on the very first item
 				throw new RuntimeException("CRASH!");
 			}
@@ -927,12 +932,13 @@ public class TaskletStepTests {
 		private boolean restoreFromCalled = false;
 
 		@Override
-		public String read() throws Exception {
+		public String read() {
 			return "item";
 		}
 
 		@Override
 		public void update(ExecutionContext executionContext) {
+                        super.update(executionContext);
 			getExecutionAttributesCalled = true;
 			executionContext.putString("spam", "bucket");
 		}

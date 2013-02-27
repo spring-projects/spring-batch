@@ -86,12 +86,12 @@ public class MultiResourceItemWriterFlatFileTests extends AbstractMultiResourceI
 		super.setUp(delegate);
 
 		tested.update(executionContext);
-		assertEquals(0, executionContext.getInt(tested.getKey("resource.item.count")));
-		assertEquals(1, executionContext.getInt(tested.getKey("resource.index")));
+		assertEquals(0, executionContext.getInt(tested.getExecutionContextKey("resource.item.count")));
+		assertEquals(1, executionContext.getInt(tested.getExecutionContextKey("resource.index")));
 		tested.write(Arrays.asList("1", "2", "3"));
 		tested.update(executionContext);
-		assertEquals(0, executionContext.getInt(tested.getKey("resource.item.count")));
-		assertEquals(2, executionContext.getInt(tested.getKey("resource.index")));
+		assertEquals(0, executionContext.getInt(tested.getExecutionContextKey("resource.item.count")));
+		assertEquals(2, executionContext.getInt(tested.getExecutionContextKey("resource.index")));
 
 	}
 

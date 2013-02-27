@@ -17,6 +17,7 @@
 package org.springframework.batch.item.support;
 
 import org.springframework.batch.item.ItemReader;
+import org.springframework.batch.item.ItemStreamReader;
 import org.springframework.batch.item.ItemStreamSupport;
 
 
@@ -25,6 +26,6 @@ import org.springframework.batch.item.ItemStreamSupport;
  * @author Dave Syer
  *
  */
-public abstract class AbstractItemStreamItemReader<T> extends ItemStreamSupport implements ItemReader<T> {
+public abstract class AbstractItemStreamItemReader<T> extends ItemStreamSupport implements ItemStreamReader<T> {
 
 }
