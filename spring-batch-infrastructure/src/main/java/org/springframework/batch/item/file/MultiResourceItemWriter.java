@@ -21,8 +21,7 @@ import java.io.IOException;
 import java.util.List;
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.item.ItemStreamException;
-import org.springframework.batch.item.ItemStreamWriter;
-import org.springframework.batch.item.util.ExecutionContextUserSupport;
+import org.springframework.batch.item.support.AbstractItemStreamItemWriter;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
 import org.springframework.util.Assert;
@@ -42,7 +41,7 @@ import org.springframework.util.ClassUtils;
  * 
  * @author Robert Kasanicky
  */
-public class MultiResourceItemWriter<T> extends ExecutionContextUserSupport implements ItemStreamWriter<T> {
+public class MultiResourceItemWriter<T> extends AbstractItemStreamItemWriter<T> {
 
 	final static private String RESOURCE_INDEX_KEY = "resource.index";
 
@@ -65,7 +64,7 @@ public class MultiResourceItemWriter<T> extends ExecutionContextUserSupport impl
 	private boolean opened = false;
 
 	public MultiResourceItemWriter() {
-		setName(ClassUtils.getShortName(MultiResourceItemWriter.class));
+		this.setExecutionContextName(ClassUtils.getShortName(MultiResourceItemWriter.class));
 	}
 
     @Override
@@ -128,6 +127,7 @@ public class MultiResourceItemWriter<T> extends ExecutionContextUserSupport impl
 
     @Override
 	public void close() throws ItemStreamException {
+                super.close();
 		resourceIndex = 1;
 		currentResourceItemCount = 0;
 		if (opened) {
@@ -137,8 +137,9 @@ public class MultiResourceItemWriter<T> extends ExecutionContextUserSupport impl
 
     @Override
 	public void open(ExecutionContext executionContext) throws ItemStreamException {
-		resourceIndex = executionContext.getInt(getKey(RESOURCE_INDEX_KEY), 1);
-		currentResourceItemCount = executionContext.getInt(getKey(CURRENT_RESOURCE_ITEM_COUNT), 0);
+                super.open(executionContext);
+		resourceIndex = executionContext.getInt(getExecutionContextKey(RESOURCE_INDEX_KEY), 1);
+		currentResourceItemCount = executionContext.getInt(getExecutionContextKey(CURRENT_RESOURCE_ITEM_COUNT), 0);
 
 		try {
 			setResourceToDelegate();
@@ -147,7 +148,7 @@ public class MultiResourceItemWriter<T> extends ExecutionContextUserSupport impl
 			throw new ItemStreamException("Couldn't assign resource", e);
 		}
 
-		if (executionContext.containsKey(getKey(CURRENT_RESOURCE_ITEM_COUNT))) {
+		if (executionContext.containsKey(getExecutionContextKey(CURRENT_RESOURCE_ITEM_COUNT))) {
 			// It's a restart
 			delegate.open(executionContext);
 		}
@@ -158,12 +159,13 @@ public class MultiResourceItemWriter<T> extends ExecutionContextUserSupport impl
 
     @Override
 	public void update(ExecutionContext executionContext) throws ItemStreamException {
+                super.update(executionContext);
 		if (saveState) {
 			if (opened) {
 				delegate.update(executionContext);
 			}
-			executionContext.putInt(getKey(CURRENT_RESOURCE_ITEM_COUNT), currentResourceItemCount);
-			executionContext.putInt(getKey(RESOURCE_INDEX_KEY), resourceIndex);
+			executionContext.putInt(getExecutionContextKey(CURRENT_RESOURCE_ITEM_COUNT), currentResourceItemCount);
+			executionContext.putInt(getExecutionContextKey(RESOURCE_INDEX_KEY), resourceIndex);
 		}
 	}
 
