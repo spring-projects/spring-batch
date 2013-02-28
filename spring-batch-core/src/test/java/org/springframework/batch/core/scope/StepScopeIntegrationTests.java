@@ -78,7 +78,6 @@ public class StepScopeIntegrationTests {
 		String parent = (String) TestStep.getContext().getAttribute("parent");
 		assertNotNull(parent);
 		assertEquals("bar", parent);
-		System.out.println(TestStep.getContext().getAttribute("parent.class"));
 		assertTrue("Scoped proxy not created", ((String) TestStep.getContext().getAttribute("parent.class"))
 				.startsWith("class $Proxy"));
 	}
