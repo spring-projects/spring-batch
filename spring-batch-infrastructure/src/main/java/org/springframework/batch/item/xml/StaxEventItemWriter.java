@@ -39,6 +39,7 @@ import org.apache.commons.logging.LogFactory;
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.item.ItemStreamException;
 import org.springframework.batch.item.ItemWriter;
+import org.springframework.batch.item.SaveStateItemStream;
 import org.springframework.batch.item.WriteFailedException;
 import org.springframework.batch.item.file.ResourceAwareItemWriterItemStream;
 import org.springframework.batch.item.util.ExecutionContextUserSupport;
@@ -70,7 +71,7 @@ import org.springframework.util.StringUtils;
  * 
  */
 public class StaxEventItemWriter<T> extends ExecutionContextUserSupport implements
-		ResourceAwareItemWriterItemStream<T>, InitializingBean {
+		ResourceAwareItemWriterItemStream<T>, InitializingBean, SaveStateItemStream {
 
 	private static final Log log = LogFactory.getLog(StaxEventItemWriter.class);
 
@@ -315,9 +316,15 @@ public class StaxEventItemWriter<T> extends ExecutionContextUserSupport implemen
 		this.overwriteOutput = overwriteOutput;
 	}
 
+    @Override
 	public void setSaveState(boolean saveState) {
 		this.saveState = saveState;
 	}
+
+    @Override
+        public boolean isSaveState() {
+                return this.saveState;
+        }
 
 	/**
 	 * @throws Exception
@@ -666,7 +673,7 @@ public class StaxEventItemWriter<T> extends ExecutionContextUserSupport implemen
     @Override
 	public void update(ExecutionContext executionContext) {
 
-		if (saveState) {
+		if (isSaveState()) {
 			Assert.notNull(executionContext, "ExecutionContext must not be null");
 			executionContext.putLong(getKey(RESTART_DATA_NAME), getPosition());
 			executionContext.putLong(getKey(WRITE_STATISTICS_NAME), currentRecordCount);

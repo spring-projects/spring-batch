@@ -21,6 +21,7 @@ import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.ItemStreamException;
 import org.springframework.batch.item.ItemStreamReader;
 import org.springframework.batch.item.ParseException;
+import org.springframework.batch.item.SaveStateItemStream;
 import org.springframework.batch.item.UnexpectedInputException;
 import org.springframework.batch.item.util.ExecutionContextUserSupport;
 import org.springframework.util.Assert;
@@ -34,7 +35,7 @@ import org.springframework.util.Assert;
  * 
  * @author Robert Kasanicky
  */
-public abstract class AbstractItemCountingItemStreamItemReader<T> implements ItemStreamReader<T> {
+public abstract class AbstractItemCountingItemStreamItemReader<T> implements ItemStreamReader<T>, SaveStateItemStream {
 
 	private static final String READ_COUNT = "read.count";
 
@@ -166,7 +167,7 @@ public abstract class AbstractItemCountingItemStreamItemReader<T> implements Ite
 
     @Override
 	public void update(ExecutionContext executionContext) throws ItemStreamException {
-		if (saveState) {
+		if (isSaveState()) {
 			Assert.notNull(executionContext, "ExecutionContext must not be null");
 			executionContext.putInt(ecSupport.getKey(READ_COUNT), currentItemCount);
 			if (maxItemCount < Integer.MAX_VALUE) {
@@ -191,23 +192,12 @@ public abstract class AbstractItemCountingItemStreamItemReader<T> implements Ite
 		ecSupport.setName(name);
 	}
 
-	/**
-	 * Set the flag that determines whether to save internal data for
-	 * {@link ExecutionContext}. Only switch this to false if you don't want to
-	 * save any state from this stream, and you don't need it to be restartable.
-	 * Always set it to false if the reader is being used in a concurrent
-	 * environment.
-	 * 
-	 * @param saveState flag value (default true).
-	 */
+    @Override
 	public void setSaveState(boolean saveState) {
 		this.saveState = saveState;
 	}
 
-	/**
-	 * The flag that determines whether to save internal state for restarts.
-	 * @return true if the flag was set
-	 */
+    @Override
 	public boolean isSaveState() {
 		return saveState;
 	}

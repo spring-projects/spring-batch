@@ -26,6 +26,7 @@ import org.springframework.batch.item.ItemStreamException;
 import org.springframework.batch.item.ItemStreamReader;
 import org.springframework.batch.item.ParseException;
 import org.springframework.batch.item.ResourceAware;
+import org.springframework.batch.item.SaveStateItemStream;
 import org.springframework.batch.item.UnexpectedInputException;
 import org.springframework.batch.item.util.ExecutionContextUserSupport;
 import org.springframework.core.io.Resource;
@@ -43,7 +44,7 @@ import org.springframework.util.ClassUtils;
  * @author Robert Kasanicky
  * @author Lucas Ward
  */
-public class MultiResourceItemReader<T> implements ItemStreamReader<T> {
+public class MultiResourceItemReader<T> implements ItemStreamReader<T>, SaveStateItemStream {
 
 	private static final Log logger = LogFactory.getLog(MultiResourceItemReader.class);
 
@@ -200,7 +201,7 @@ public class MultiResourceItemReader<T> implements ItemStreamReader<T> {
 	 */
     @Override
 	public void update(ExecutionContext executionContext) throws ItemStreamException {
-		if (saveState) {
+		if (isSaveState()) {
 			executionContext.putInt(executionContextUserSupport.getKey(RESOURCE_KEY), currentResource);
 			delegate.update(executionContext);
 		}
@@ -212,16 +213,16 @@ public class MultiResourceItemReader<T> implements ItemStreamReader<T> {
 	public void setDelegate(ResourceAwareItemReaderItemStream<? extends T> delegate) {
 		this.delegate = delegate;
 	}
-
-	/**
-	 * Set the boolean indicating whether or not state should be saved in the provided {@link ExecutionContext} during
-	 * the {@link ItemStream} call to update.
-	 * 
-	 * @param saveState
-	 */
+        
+    @Override
 	public void setSaveState(boolean saveState) {
 		this.saveState = saveState;
 	}
+
+    @Override
+        public boolean isSaveState() {
+                return this.saveState;
+        }
 
 	/**
 	 * @param comparator used to order the injected resources, by default compares {@link Resource#getFilename()}

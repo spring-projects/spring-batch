@@ -22,6 +22,7 @@ import java.util.List;
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.item.ItemStreamException;
 import org.springframework.batch.item.ItemStreamWriter;
+import org.springframework.batch.item.SaveStateItemStream;
 import org.springframework.batch.item.util.ExecutionContextUserSupport;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
@@ -42,7 +43,7 @@ import org.springframework.util.ClassUtils;
  * 
  * @author Robert Kasanicky
  */
-public class MultiResourceItemWriter<T> extends ExecutionContextUserSupport implements ItemStreamWriter<T> {
+public class MultiResourceItemWriter<T> extends ExecutionContextUserSupport implements ItemStreamWriter<T>, SaveStateItemStream {
 
 	final static private String RESOURCE_INDEX_KEY = "resource.index";
 
@@ -122,9 +123,15 @@ public class MultiResourceItemWriter<T> extends ExecutionContextUserSupport impl
 		this.resource = resource;
 	}
 
+    @Override
 	public void setSaveState(boolean saveState) {
 		this.saveState = saveState;
 	}
+
+    @Override
+        public boolean isSaveState() {
+                return this.saveState;
+        }
 
     @Override
 	public void close() throws ItemStreamException {
@@ -158,7 +165,7 @@ public class MultiResourceItemWriter<T> extends ExecutionContextUserSupport impl
 
     @Override
 	public void update(ExecutionContext executionContext) throws ItemStreamException {
-		if (saveState) {
+		if (isSaveState()) {
 			if (opened) {
 				delegate.update(executionContext);
 			}
