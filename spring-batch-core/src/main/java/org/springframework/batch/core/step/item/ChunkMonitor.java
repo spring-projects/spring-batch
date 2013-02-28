@@ -60,7 +60,7 @@ public class ChunkMonitor extends ItemStreamSupport {
 	private ItemReader<?> reader;
 
         public ChunkMonitor() {
-                this.setExecutionContextName(ClassUtils.getShortName(this.getClass()));
+                this.setExecutionContextName(ChunkMonitor.class.getName());
         }
         
 	/**
