@@ -23,6 +23,8 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 @RunWith(SpringJUnit4ClassRunner.class)
 public class StepScopeIntegrationTests {
 
+	private static final String PROXY_TO_STRING_REGEX = "class .*\\$Proxy\\d+";
+
 	@Autowired
 	@Qualifier("vanilla")
 	private Step vanilla;
@@ -65,7 +67,7 @@ public class StepScopeIntegrationTests {
 		assertNotNull(collaborator);
 		assertEquals("bar", collaborator);
 		assertTrue("Scoped proxy not created", ((String) TestStep.getContext().getAttribute("collaborator.class"))
-				.startsWith("class $Proxy"));
+				.matches(PROXY_TO_STRING_REGEX));
 	}
 
 	@Test
@@ -79,7 +81,7 @@ public class StepScopeIntegrationTests {
 		assertNotNull(parent);
 		assertEquals("bar", parent);
 		assertTrue("Scoped proxy not created", ((String) TestStep.getContext().getAttribute("parent.class"))
-				.startsWith("class $Proxy"));
+				.matches(PROXY_TO_STRING_REGEX));
 	}
 
 	@Test
