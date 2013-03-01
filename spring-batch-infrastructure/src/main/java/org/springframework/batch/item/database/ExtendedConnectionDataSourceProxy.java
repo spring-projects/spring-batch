@@ -23,6 +23,7 @@ import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
 import java.sql.Connection;
 import java.sql.SQLException;
+import java.sql.SQLFeatureNotSupportedException;
 import java.util.logging.Logger;
 
 import javax.sql.DataSource;
@@ -33,6 +34,7 @@ import org.springframework.jdbc.datasource.DataSourceUtils;
 import org.springframework.jdbc.datasource.SmartDataSource;
 import org.springframework.transaction.support.TransactionSynchronizationManager;
 import org.springframework.util.Assert;
+import org.springframework.util.MethodInvoker;
 
 /**
  * Implementation of {@link SmartDataSource} that is capable of keeping a single
@@ -334,12 +336,24 @@ public class ExtendedConnectionDataSourceProxy implements SmartDataSource, Initi
 	}
 
 	/**
-	 * Added due to JDK 7 compatibility, sadly a proper implementation
-	 * that would throw SqlFeatureNotSupportedException is not possible
-	 * in Java 5 (the class was added in Java 6).
+	 * Added due to JDK 7 compatibility.
 	 */
-	public Logger getParentLogger() {
-		throw new UnsupportedOperationException();
-	}
+	public Logger getParentLogger() throws SQLFeatureNotSupportedException{
+		MethodInvoker invoker = new MethodInvoker();
+		invoker.setTargetObject(dataSource);
+		invoker.setTargetMethod("getParentLogger");
 
+		try {
+			invoker.prepare();
+			return (Logger) invoker.invoke();
+		} catch (ClassNotFoundException cnfe) {
+			throw new SQLFeatureNotSupportedException(cnfe);
+		} catch (NoSuchMethodException nsme) {
+			throw new SQLFeatureNotSupportedException(nsme);
+		} catch (IllegalAccessException iae) {
+			throw new SQLFeatureNotSupportedException(iae);
+		} catch (InvocationTargetException ite) {
+			throw new SQLFeatureNotSupportedException(ite);
+		}
+	}
 }
