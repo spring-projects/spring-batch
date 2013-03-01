@@ -437,6 +437,7 @@ public class StaxEventItemWriter<T> extends ExecutionContextUserSupport implemen
 			}
 			delegateEventWriter = createXmlEventWriter(outputFactory, bufferedWriter);
 			eventWriter = new NoStartEndDocumentStreamWriter(delegateEventWriter);
+			initNamespaceContext(delegateEventWriter);
 			if (!restarted) {
 				startDocument(delegateEventWriter);
 			}
@@ -489,6 +490,39 @@ public class StaxEventItemWriter<T> extends ExecutionContextUserSupport implemen
 	 */
 	protected Result createStaxResult() throws Exception {
 		return StaxUtils.getResult(eventWriter);
+	}
+	
+	/**
+	 * Inits the namespace context of the XMLEventWriter:
+	 * <ul>
+	 * <li>rootTagNamespacePrefix for rootTagName</li>
+	 * <li>any other xmlns namespace prefix declarations in the root element attributes</li>
+	 * </ul>
+	 * 
+	 * @param writer XML event writer
+	 * @throws XMLStreamException
+	 */
+	protected void initNamespaceContext(XMLEventWriter writer) throws XMLStreamException {
+		if (StringUtils.hasText(getRootTagNamespace())) {
+			if(StringUtils.hasText(getRootTagNamespacePrefix())) {
+				writer.setPrefix(getRootTagNamespacePrefix(), getRootTagNamespace());	
+			} else {
+				writer.setDefaultNamespace(getRootTagNamespace());
+			}
+		}
+		if (!CollectionUtils.isEmpty(getRootElementAttributes())) {
+			for (Map.Entry<String, String> entry : getRootElementAttributes().entrySet()) {
+				String key = entry.getKey();
+				if (key.startsWith("xmlns")) {
+					String prefix = "";
+					if (key.contains(":")) {
+						prefix = key.substring(key.indexOf(":") + 1);
+					}
+					System.err.println("registering prefix: " +prefix + "=" + entry.getValue());
+					writer.setPrefix(prefix, entry.getValue());
+				}
+			}
+		}			
 	}
 
 	/**
