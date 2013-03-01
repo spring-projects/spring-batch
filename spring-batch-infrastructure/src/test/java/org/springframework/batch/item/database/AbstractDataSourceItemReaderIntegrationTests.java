@@ -254,6 +254,16 @@ public abstract class AbstractDataSourceItemReaderIntegrationTests {
 		assertEquals(4, foo4.getValue());
 		assertEquals(5, foo5.getValue());
 	}
+	
+
+	//set transaction to false and make sure the tests work
+	@Test
+	public void testTransacted() throws Exception {
+		if (reader instanceof JpaPagingItemReader) {
+			((JpaPagingItemReader)reader).setTransacted(false);
+			this.testNormalProcessing();
+		}//end if
+	}
 
 	protected ItemStream getAsItemStream(ItemReader<Foo> source) {
 		return (ItemStream) source;
