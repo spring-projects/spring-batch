@@ -83,6 +83,7 @@ import org.springframework.util.Assert;
  *
  * @author Dan Garrette
  * @author Josh Long
+ * @author Will Schipp
  * @see SimpleStepFactoryBean
  * @see FaultTolerantStepFactoryBean
  * @see TaskletStep
@@ -95,7 +96,7 @@ class StepParserStepFactoryBean<I, O> implements FactoryBean, BeanNameAware {
 	// Step Attributes
 	//
 	private String name;
-
+ 
 	//
 	// Tasklet Attributes
 	//
@@ -268,6 +269,7 @@ class StepParserStepFactoryBean<I, O> implements FactoryBean, BeanNameAware {
 			builder.listener(listener);
 		}
 	}
+	
 
 	private Step createPartitionStep() {
 
@@ -278,7 +280,11 @@ class StepParserStepFactoryBean<I, O> implements FactoryBean, BeanNameAware {
 		else {
 			builder = new StepBuilder(name).partitioner(step);
 		}
-		enhanceCommonStep(builder);
+		
+		//BATCH-1720 - removed commonStep configuration to support remoteStep
+//		enhanceCommonStep(builder);
+		//added the repository directly as it is a mandatory requirement
+		builder.repository(jobRepository);
 
 		if (partitionHandler != null) {
 			builder.partitionHandler(partitionHandler);
