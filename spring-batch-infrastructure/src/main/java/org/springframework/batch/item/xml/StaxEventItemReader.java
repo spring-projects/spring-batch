@@ -17,6 +17,7 @@
 package org.springframework.batch.item.xml;
 
 import java.io.InputStream;
+import java.util.NoSuchElementException;
 
 import javax.xml.namespace.QName;
 import javax.xml.stream.XMLEventReader;
@@ -247,8 +248,18 @@ public class StaxEventItemReader<T> extends AbstractItemCountingItemStreamItemRe
 	@Override
 	protected void jumpToItem(int itemIndex) throws Exception {
 		for (int i = 0; i < itemIndex; i++) {
-			readToStartFragment();
-			readToEndFragment();
+			try {
+				readToStartFragment();
+				readToEndFragment();
+			} catch (NoSuchElementException e) {
+				if (itemIndex == (i + 1)) {
+					// we can presume a NoSuchElementException on the last item means the EOF was reached on the last run
+					return;
+				} else {
+					// if NoSuchElementException occurs on an item other than the last one, this indicates a problem
+					throw e;
+				}
+			}
 		}
 	}
 
