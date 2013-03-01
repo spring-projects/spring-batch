@@ -141,6 +141,8 @@ public class StaxEventItemWriter<T> extends ExecutionContextUserSupport implemen
 	private boolean transactional = true;
 
 	private boolean forceSync;
+	
+	private boolean shouldDeleteIfEmpty = false;
 
 	public StaxEventItemWriter() {
 		setName(ClassUtils.getShortName(StaxEventItemWriter.class));
@@ -202,6 +204,16 @@ public class StaxEventItemWriter<T> extends ExecutionContextUserSupport implemen
 	public void setForceSync(boolean forceSync) {
 		this.forceSync = forceSync;
 	}
+	
+	/**
+	 * Flag to indicate that the target file should be deleted if no items have
+	 * been written (other than header and footer) on close. Defaults to false.
+	 * 
+	 * @param shouldDeleteIfEmpty the flag value to set
+	 */
+	public void setShouldDeleteIfEmpty(boolean shouldDeleteIfEmpty) {
+		this.shouldDeleteIfEmpty = shouldDeleteIfEmpty;
+	}	
 
 	/**
 	 * Get used encoding.
@@ -353,7 +365,8 @@ public class StaxEventItemWriter<T> extends ExecutionContextUserSupport implemen
 		// otherwise start from beginning
 		if (executionContext.containsKey(getKey(RESTART_DATA_NAME))) {
 			startAtPosition = executionContext.getLong(getKey(RESTART_DATA_NAME));
-			restarted = true;
+			currentRecordCount = executionContext.getLong(getKey(WRITE_STATISTICS_NAME));
+			restarted = true;			
 		}
 
 		open(startAtPosition, restarted);
@@ -619,6 +632,14 @@ public class StaxEventItemWriter<T> extends ExecutionContextUserSupport implemen
 					}
 				}
 			}
+			if (currentRecordCount == 0 && shouldDeleteIfEmpty) {
+				try {
+					resource.getFile().delete();
+				}
+				catch (IOException e) {
+					throw new ItemStreamException("Failed to delete empty file on close", e);
+				}
+			}			
 		}
 	}
 
