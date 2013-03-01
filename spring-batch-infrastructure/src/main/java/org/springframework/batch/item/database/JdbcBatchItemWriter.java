@@ -19,6 +19,7 @@ import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import javax.sql.DataSource;
 
@@ -55,6 +56,7 @@ import org.springframework.util.Assert;
  *
  * @author Dave Syer
  * @author Thomas Risberg
+ * @author Michael Minella
  * @since 2.0
  */
 public class JdbcBatchItemWriter<T> implements ItemWriter<T>, InitializingBean {
@@ -106,7 +108,8 @@ public class JdbcBatchItemWriter<T> implements ItemWriter<T>, InitializingBean {
 	/**
 	 * Public setter for the {@link ItemSqlParameterSourceProvider}.
 	 * @param itemSqlParameterSourceProvider the {@link ItemSqlParameterSourceProvider} to
-	 * set. This is required when using named parameters for the SQL statement.
+	 * set. This is required when using named parameters for the SQL statement and the type
+	 * to be written does not implement {@link Map}.
 	 */
 	public void setItemSqlParameterSourceProvider(ItemSqlParameterSourceProvider<T> itemSqlParameterSourceProvider) {
 		this.itemSqlParameterSourceProvider = itemSqlParameterSourceProvider;
@@ -147,10 +150,7 @@ public class JdbcBatchItemWriter<T> implements ItemWriter<T>, InitializingBean {
 			}
 			usingNamedParameters = true;
 		}
-		if (usingNamedParameters) {
-			Assert.notNull(itemSqlParameterSourceProvider, "Using SQL statement with named parameters requires an ItemSqlParameterSourceProvider");
-		}
-		else {
+		if (!usingNamedParameters) {
 			Assert.notNull(itemPreparedStatementSetter, "Using SQL statement with '?' placeholders requires an ItemPreparedStatementSetter");
 		}
 	}
@@ -159,6 +159,7 @@ public class JdbcBatchItemWriter<T> implements ItemWriter<T>, InitializingBean {
 	 * @see org.springframework.batch.item.ItemWriter#write(java.util.List)
 	 */
 	@Override
+	@SuppressWarnings({"unchecked", "rawtypes"})
 	public void write(final List<? extends T> items) throws Exception {
 
 		if (!items.isEmpty()) {
@@ -170,12 +171,16 @@ public class JdbcBatchItemWriter<T> implements ItemWriter<T>, InitializingBean {
 			int[] updateCounts = null;
 
 			if (usingNamedParameters) {
-				SqlParameterSource[] batchArgs = new SqlParameterSource[items.size()];
-				int i = 0;
-				for (T item : items) {
-					batchArgs[i++] = itemSqlParameterSourceProvider.createSqlParameterSource(item);
+				if(items.get(0) instanceof Map) {
+					updateCounts = namedParameterJdbcTemplate.batchUpdate(sql, items.toArray(new Map[0]));
+				} else {
+					SqlParameterSource[] batchArgs = new SqlParameterSource[items.size()];
+					int i = 0;
+					for (T item : items) {
+						batchArgs[i++] = itemSqlParameterSourceProvider.createSqlParameterSource(item);
+					}
+					updateCounts = namedParameterJdbcTemplate.batchUpdate(sql, batchArgs);
 				}
-				updateCounts = namedParameterJdbcTemplate.batchUpdate(sql, batchArgs);
 			}
 			else {
 				updateCounts = (int[]) namedParameterJdbcTemplate.getJdbcOperations().execute(sql, new PreparedStatementCallback() {
