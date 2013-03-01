@@ -24,11 +24,14 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.hamcrest.BaseMatcher;
 import org.hamcrest.Description;
 import org.junit.Before;
 import org.junit.Test;
+import org.mockito.ArgumentCaptor;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.namedparam.BeanPropertySqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcOperations;
@@ -37,13 +40,15 @@ import org.springframework.jdbc.core.namedparam.SqlParameterSource;
 /**
  * @author Thomas Risberg
  * @author Will Schipp
+ * @author Michael Minella
  */
+@SuppressWarnings({"rawtypes", "serial", "unchecked"})
 public class JdbcBatchItemWriterNamedParameterTests {
 
-	private JdbcBatchItemWriter<Foo> writer = new JdbcBatchItemWriter<Foo>();
+	private JdbcBatchItemWriter writer = new JdbcBatchItemWriter<Foo>();
 
-    private NamedParameterJdbcOperations namedParameterJdbcOperations;
-	
+	private NamedParameterJdbcOperations namedParameterJdbcOperations;
+
 	private String sql = "update foo set bar = :bar where id = :id";
 
 	@SuppressWarnings("unused")
@@ -55,7 +60,7 @@ public class JdbcBatchItemWriterNamedParameterTests {
 			this.id = 1L;
 			this.bar = bar;
 		}
-		
+
 		public Long getId() {
 			return id;
 		}
@@ -71,12 +76,12 @@ public class JdbcBatchItemWriterNamedParameterTests {
 		public void setBar(String bar) {
 			this.bar = bar;
 		}
-		
+
 	}
 
 	@Before
 	public void setUp() throws Exception {
-        namedParameterJdbcOperations = mock(NamedParameterJdbcOperations.class);
+		namedParameterJdbcOperations = mock(NamedParameterJdbcOperations.class);
 		writer.setSql(sql);
 		writer.setJdbcTemplate(namedParameterJdbcOperations);
 		writer.setItemSqlParameterSourceProvider(
@@ -113,22 +118,27 @@ public class JdbcBatchItemWriterNamedParameterTests {
 			assertTrue("Message does not contain 'sql'.", message.indexOf("sql") >= 0);
 		}
 		writer.setSql("select * from foo where id = :id");
-		try {
-			writer.afterPropertiesSet();
-			fail("Expected IllegalArgumentException");
-		}
-		catch (IllegalArgumentException e) {
-			// expected
-			String message = e.getMessage();
-			assertTrue("Message does not contain 'ItemSqlParameterSourceProvider'.", message.indexOf("ItemSqlParameterSourceProvider") >= 0);
-		}
-		writer.setItemSqlParameterSourceProvider(
-				new BeanPropertyItemSqlParameterSourceProvider<Foo>());
+
 		writer.afterPropertiesSet();
 	}
 
 	@Test
 	public void testWriteAndFlush() throws Exception {
+		writer.setItemSqlParameterSourceProvider(null);
+		ArgumentCaptor<Map []> captor = ArgumentCaptor.forClass(Map[].class);
+
+		when(namedParameterJdbcOperations.batchUpdate(eq(sql),
+				captor.capture()))
+				.thenReturn(new int[] {1});
+		writer.write(Collections.singletonList(new HashMap<String, Object>() {{put("foo", "bar");}}));
+
+		assertEquals(1, captor.getValue().length);
+		Map<String, Object> results = captor.getValue()[0];
+		assertEquals("bar", results.get("foo"));
+	}
+
+	@Test
+	public void testWriteAndFlushMap() throws Exception {
 		when(namedParameterJdbcOperations.batchUpdate(eq(sql),
 				eqSqlParameterSourceArray(new SqlParameterSource[] {new BeanPropertySqlParameterSource(new Foo("bar"))})))
 				.thenReturn(new int[] {1});
@@ -168,42 +178,42 @@ public class JdbcBatchItemWriterNamedParameterTests {
 
 	public static SqlParameterSource[] eqSqlParameterSourceArray(SqlParameterSource[] in) {
 		argThat(new SqlParameterSourceArrayEquals(in));
-	    return null;
+		return null;
 	}
 
 	public static class SqlParameterSourceArrayEquals extends BaseMatcher<SqlParameterSource[]> {
-	    private SqlParameterSource[] expected;
+		private SqlParameterSource[] expected;
 
-	    public SqlParameterSourceArrayEquals(SqlParameterSource[] expected) {
-	        this.expected = expected;
-	    }
+		public SqlParameterSourceArrayEquals(SqlParameterSource[] expected) {
+			this.expected = expected;
+		}
 
-        @Override
-	    public boolean matches(Object actual) {
-	        if (!(actual instanceof SqlParameterSource[])) {
-	            return false;
-	        }
-	        SqlParameterSource[] actualArray = (SqlParameterSource[])actual;
-	        if (expected.length != actualArray.length) {
-	        	return false;
-	        }
-	        for (int i = 0; i < expected.length; i++) {
-	        	if (!expected[i].getClass().equals(actualArray[i].getClass())) {
-		        	return false;
-	        	}
-	        }
-	        return true;
-	    }
+		@Override
+		public boolean matches(Object actual) {
+			if (!(actual instanceof SqlParameterSource[])) {
+				return false;
+			}
+			SqlParameterSource[] actualArray = (SqlParameterSource[])actual;
+			if (expected.length != actualArray.length) {
+				return false;
+			}
+			for (int i = 0; i < expected.length; i++) {
+				if (!expected[i].getClass().equals(actualArray[i].getClass())) {
+					return false;
+				}
+			}
+			return true;
+		}
 
 
 		@Override
 		public void describeTo(Description description) {
-	        description.appendText("eqSqlParameterSourceArray(");
+			description.appendText("eqSqlParameterSourceArray(");
 			description.appendText(expected.getClass().getName());
 			description.appendText(" with length \"");
 			description.appendValue(expected.length);
-			description.appendText("\")");			
+			description.appendText("\")");
 		}
-	}	
+	}
 
 }
