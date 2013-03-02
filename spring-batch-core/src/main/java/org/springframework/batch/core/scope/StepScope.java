@@ -144,7 +144,6 @@ public class StepScope implements Scope, BeanFactoryPostProcessor, Ordered {
 	@SuppressWarnings("rawtypes")
 	@Override
 	public Object get(String name, ObjectFactory objectFactory) {
-
 		StepContext context = getContext();
 		Object scopedObject = context.getAttribute(name);
 
@@ -239,7 +238,8 @@ public class StepScope implements Scope, BeanFactoryPostProcessor, Ordered {
 			boolean scoped = name.equals(definition.getScope());
 			Scopifier scopifier = new Scopifier(registry, name, proxyTargetClass, scoped);
 			scopifier.visitBeanDefinition(definition);
-			if (scoped) {
+
+			if (scoped && !definition.isAbstract()) {
 				createScopedProxy(beanName, definition, registry, proxyTargetClass);
 			}
 		}

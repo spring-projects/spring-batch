@@ -70,6 +70,15 @@ public class StepScopeConfigurationTests {
 	}
 
 	@Test
+	public void testXmlStepScopeWithInheritence() throws Exception {
+		context = new ClassPathXmlApplicationContext(
+				"org/springframework/batch/core/configuration/annotation/StepScopeConfigurationTestsInheritence-context.xml");
+		StepSynchronizationManager.register(stepExecution);
+		SimpleHolder value = (SimpleHolder) context.getBean("child");
+		assertEquals("STEP", value.call());
+	}
+
+	@Test
 	public void testStepScopeWithProxyTargetClass() throws Exception {
 		init(StepScopeConfigurationRequiringProxyTargetClass.class);
 		SimpleHolder value = context.getBean(SimpleHolder.class);
@@ -165,7 +174,7 @@ public class StepScopeConfigurationTests {
 			return value;
 		}
 	}
-	
+
 	public static class Wrapper {
 
 		private SimpleHolder value;
@@ -173,17 +182,17 @@ public class StepScopeConfigurationTests {
 		public Wrapper(SimpleHolder value) {
 			this.value = value;
 		}
-		
+
 		public SimpleHolder getValue() {
 			return value;
 		}
-		
+
 	}
 
 	@Configuration
 	@EnableBatchProcessing
 	public static class StepScopeConfigurationInjectingProxy {
-		
+
 		@Bean
 		public Wrapper wrapper(SimpleHolder value) {
 			return new Wrapper(value);
