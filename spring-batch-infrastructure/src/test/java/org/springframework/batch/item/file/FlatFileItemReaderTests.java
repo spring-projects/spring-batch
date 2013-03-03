@@ -12,6 +12,7 @@ import java.io.InputStream;
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.batch.item.ExecutionContext;
+import org.springframework.batch.item.ItemCountAware;
 import org.springframework.batch.item.ItemStreamException;
 import org.springframework.batch.item.file.mapping.PassThroughLineMapper;
 import org.springframework.batch.item.file.separator.RecordSeparatorPolicy;
@@ -31,6 +32,8 @@ public class FlatFileItemReaderTests {
 	private String TEST_STRING = "FlatFileInputTemplate-TestData";
 
 	private FlatFileItemReader<String> reader = new FlatFileItemReader<String>();
+	
+	private FlatFileItemReader<Item> itemReader = new FlatFileItemReader<Item>();
 
 	private ExecutionContext executionContext = new ExecutionContext();
 
@@ -39,6 +42,9 @@ public class FlatFileItemReaderTests {
 
 		reader.setResource(getInputResource("testLine1\ntestLine2\ntestLine3\ntestLine4\ntestLine5\ntestLine6"));
 		reader.setLineMapper(new PassThroughLineMapper());
+
+		itemReader.setResource(getInputResource("testLine1\ntestLine2\ntestLine3\ntestLine4\ntestLine5\ntestLine6"));
+		itemReader.setLineMapper(new ItemLineMapper());
 	}
 
 	@Test
@@ -427,6 +433,66 @@ public class FlatFileItemReaderTests {
 			assertEquals("Parsing error at line: 2 in resource=[resource loaded from byte array], input=[testLine2]", expected.getMessage());
 		}
 	}
+	
+	@Test
+	public void testItemCountAware() throws Exception {
+		itemReader.open(executionContext);
+		Item item1 = itemReader.read();
+		assertEquals("testLine1", item1.getValue());
+		assertEquals(1, item1.getItemCount());
+		Item item2 = itemReader.read();
+		assertEquals("testLine2", item2.getValue());
+		assertEquals(2, item2.getItemCount());
+		itemReader.update(executionContext);
+		itemReader.close();
+		
+		itemReader.open(executionContext);
+		Item item3 = itemReader.read();
+		assertEquals("testLine3", item3.getValue());
+		assertEquals(3, item3.getItemCount());
+	}
+	
+	@Test
+	public void testItemCountAwareMultiLine() throws Exception {
+		itemReader.setRecordSeparatorPolicy(new RecordSeparatorPolicy() {
+
+			// 1 record = 2 lines
+			boolean pair = true;
+
+            @Override
+			public boolean isEndOfRecord(String line) {
+				if (StringUtils.hasText(line)) {
+					pair = !pair;
+				}
+				return pair;
+			}
+
+            @Override
+			public String postProcess(String record) {
+				return StringUtils.hasText(record) ? record : null;
+			}
+
+            @Override
+			public String preProcess(String record) {
+				return record;
+			}
+		});		
+		
+		itemReader.open(executionContext);
+		Item item1 = itemReader.read();
+		assertEquals("testLine1testLine2", item1.getValue());
+		assertEquals(1, item1.getItemCount());
+		Item item2 = itemReader.read();
+		assertEquals("testLine3testLine4", item2.getValue());
+		assertEquals(2, item2.getItemCount());
+		itemReader.update(executionContext);
+		itemReader.close();
+		
+		itemReader.open(executionContext);
+		Item item3 = itemReader.read();
+		assertEquals("testLine5testLine6", item3.getValue());
+		assertEquals(3, item3.getItemCount());
+	}	
 
 	private Resource getInputResource(String input) {
 		return new ByteArrayResource(input.getBytes());
@@ -451,5 +517,43 @@ public class FlatFileItemReaderTests {
 		public InputStream getInputStream() throws IOException {
 			return null;
 		}
+	}
+	
+	private static class Item implements ItemCountAware {
+		
+		private String value;
+		
+		private int itemCount;
+		
+		public Item(String value) {
+			this.value = value;
+		}
+		
+		public void setValue(String value) {
+			this.value = value;
+		}
+		
+		public String getValue() {
+			return value;
+		}
+		
+		@Override
+		public void setItemCount(int count) {
+			this.itemCount = count;
+		}
+		
+		public int getItemCount() {
+			return itemCount;
+		}
+		
+	}
+	
+	private static final class ItemLineMapper implements LineMapper<Item>  {
+
+		@Override
+		public Item mapLine(String line, int lineNumber) throws Exception {
+			return new Item(line);
+		}
+		
 	}
 }

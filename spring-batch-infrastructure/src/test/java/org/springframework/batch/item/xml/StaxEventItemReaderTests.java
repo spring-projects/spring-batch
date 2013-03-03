@@ -23,6 +23,7 @@ import javax.xml.transform.Source;
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.batch.item.ExecutionContext;
+import org.springframework.batch.item.ItemCountAware;
 import org.springframework.batch.item.ItemStreamException;
 import org.springframework.batch.item.NonTransientResourceException;
 import org.springframework.core.io.AbstractResource;
@@ -115,6 +116,35 @@ public class StaxEventItemReaderTests {
 
 		source.close();
 	}
+	
+	@Test
+	public void testItemCountAwareFragment() throws Exception {
+		StaxEventItemReader<ItemCountAwareFragment> source = createNewItemCountAwareInputSouce();
+		source.afterPropertiesSet();
+		source.open(executionContext);
+		assertEquals(1, source.read().getItemCount());
+		assertEquals(2, source.read().getItemCount());
+		assertNull(source.read()); // there are only two fragments
+
+		source.close();
+	}	
+	
+	@Test
+	public void testItemCountAwareFragmentRestart() throws Exception {
+		StaxEventItemReader<ItemCountAwareFragment> source = createNewItemCountAwareInputSouce();
+		source.afterPropertiesSet();
+		source.open(executionContext);
+		assertEquals(1, source.read().getItemCount());
+		source.update(executionContext);
+		source.close();
+		source = createNewItemCountAwareInputSouce();
+		source.afterPropertiesSet();
+		source.open(executionContext);
+		assertEquals(2, source.read().getItemCount());
+		assertNull(source.read()); // there are only two fragments
+
+		source.close();
+	}	
 
 	@Test
 	public void testFragmentNamespace() throws Exception {
@@ -431,6 +461,19 @@ public class StaxEventItemReaderTests {
 
 		return newSource;
 	}
+	
+	private StaxEventItemReader<ItemCountAwareFragment> createNewItemCountAwareInputSouce() {
+		Resource resource = new ByteArrayResource(xml.getBytes());
+
+		StaxEventItemReader<ItemCountAwareFragment> newSource = new StaxEventItemReader<ItemCountAwareFragment>();
+		newSource.setResource(resource);
+
+		newSource.setFragmentRootElementName(FRAGMENT_ROOT_ELEMENT);
+		newSource.setUnmarshaller(new ItemCountAwareMockFragmentUnmarshaller());
+		newSource.setSaveState(true);
+
+		return newSource;
+	}	
 
 	/**
 	 * A simple XMLEvent unmarshaller mock - check for the start and end document events for the fragment root & end
@@ -503,6 +546,40 @@ public class StaxEventItemReaderTests {
 			return fragmentContent;
 		}
 
+	}
+	
+	private static class ItemCountAwareMockFragmentUnmarshaller extends MockFragmentUnmarshaller {
+		@Override
+		public Object unmarshal(Source source) throws XmlMappingException,
+				IOException {
+			List<XMLEvent> fragment = (List<XMLEvent>) super.unmarshal(source);
+			if(fragment != null) {
+				return new ItemCountAwareFragment(fragment);
+			} else {
+				return null;
+			}
+		}
+	}
+	
+	private static class ItemCountAwareFragment implements ItemCountAware {
+		
+		private List<XMLEvent> fragment;
+		
+		private int itemCount;			
+		
+		public ItemCountAwareFragment(List<XMLEvent> fragment) {
+			this.fragment = fragment;
+		}
+		
+		@Override
+		public void setItemCount(int count) {
+			this.itemCount = count;
+		}
+		
+		public int getItemCount() {
+			return itemCount;
+		}
+		
 	}
 
 	private static class MockStaxEventItemReader extends StaxEventItemReader<List<XMLEvent>> {
