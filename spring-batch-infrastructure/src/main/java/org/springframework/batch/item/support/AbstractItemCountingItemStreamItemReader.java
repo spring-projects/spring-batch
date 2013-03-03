@@ -17,6 +17,7 @@
 package org.springframework.batch.item.support;
 
 import org.springframework.batch.item.ExecutionContext;
+import org.springframework.batch.item.ItemCountAware;
 import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.ItemStreamException;
 import org.springframework.batch.item.ParseException;
@@ -79,7 +80,11 @@ public abstract class AbstractItemCountingItemStreamItemReader<T> extends Abstra
 			return null;
 		}
 		currentItemCount++;
-		return doRead();
+		T item = doRead();
+		if(item instanceof ItemCountAware) {
+			((ItemCountAware) item).setItemCount(currentItemCount);			
+		} 
+		return item;
 	}
 
 	protected int getCurrentItemCount() {
