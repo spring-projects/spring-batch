@@ -43,16 +43,16 @@ public class TestReader extends AbstractTestComponent implements ItemStreamReade
 	}
 
 	@Override
-	public void close() throws ItemStreamException {
+	public void close() {
 	}
 
 	@Override
-	public void open(ExecutionContext executionContext) throws ItemStreamException {
+	public void open(ExecutionContext executionContext) {
 		opened = true;
 	}
 
 	@Override
-	public void update(ExecutionContext executionContext) throws ItemStreamException {
+	public void update(ExecutionContext executionContext) {
 	}
 
 }

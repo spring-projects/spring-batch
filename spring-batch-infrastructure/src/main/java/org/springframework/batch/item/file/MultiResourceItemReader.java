@@ -23,11 +23,10 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.item.ItemStreamException;
-import org.springframework.batch.item.ItemStreamReader;
 import org.springframework.batch.item.ParseException;
 import org.springframework.batch.item.ResourceAware;
 import org.springframework.batch.item.UnexpectedInputException;
-import org.springframework.batch.item.util.ExecutionContextUserSupport;
+import org.springframework.batch.item.support.AbstractItemStreamItemReader;
 import org.springframework.core.io.Resource;
 import org.springframework.util.Assert;
 import org.springframework.util.ClassUtils;
@@ -43,13 +42,11 @@ import org.springframework.util.ClassUtils;
  * @author Robert Kasanicky
  * @author Lucas Ward
  */
-public class MultiResourceItemReader<T> implements ItemStreamReader<T> {
+public class MultiResourceItemReader<T> extends AbstractItemStreamItemReader<T> {
 
 	private static final Log logger = LogFactory.getLog(MultiResourceItemReader.class);
 
 	private static final String RESOURCE_KEY = "resourceIndex";
-
-	private final ExecutionContextUserSupport executionContextUserSupport = new ExecutionContextUserSupport();
 
 	private ResourceAwareItemReaderItemStream<? extends T> delegate;
 
@@ -86,7 +83,7 @@ public class MultiResourceItemReader<T> implements ItemStreamReader<T> {
 	};
 
 	public MultiResourceItemReader() {
-		executionContextUserSupport.setName(ClassUtils.getShortName(MultiResourceItemReader.class));
+                this.setExecutionContextName(ClassUtils.getShortName(MultiResourceItemReader.class));
 	}
 
 	/**
@@ -151,6 +148,7 @@ public class MultiResourceItemReader<T> implements ItemStreamReader<T> {
 	 */
     @Override
 	public void close() throws ItemStreamException {
+                super.close();
 		delegate.close();
 		noInput = false;
 	}
@@ -161,7 +159,7 @@ public class MultiResourceItemReader<T> implements ItemStreamReader<T> {
 	 */
     @Override
 	public void open(ExecutionContext executionContext) throws ItemStreamException {
-
+                super.open(executionContext);
 		Assert.notNull(resources, "Resources must be set");
 
 		noInput = false;
@@ -179,8 +177,8 @@ public class MultiResourceItemReader<T> implements ItemStreamReader<T> {
 
 		Arrays.sort(resources, comparator);
 
-		if (executionContext.containsKey(executionContextUserSupport.getKey(RESOURCE_KEY))) {
-			currentResource = executionContext.getInt(executionContextUserSupport.getKey(RESOURCE_KEY));
+		if (executionContext.containsKey(getExecutionContextKey(RESOURCE_KEY))) {
+			currentResource = executionContext.getInt(getExecutionContextKey(RESOURCE_KEY));
 
 			// context could have been saved before reading anything
 			if (currentResource == -1) {
@@ -200,8 +198,9 @@ public class MultiResourceItemReader<T> implements ItemStreamReader<T> {
 	 */
     @Override
 	public void update(ExecutionContext executionContext) throws ItemStreamException {
+                super.update(executionContext);
 		if (saveState) {
-			executionContext.putInt(executionContextUserSupport.getKey(RESOURCE_KEY), currentResource);
+			executionContext.putInt(getExecutionContextKey(RESOURCE_KEY), currentResource);
 			delegate.update(executionContext);
 		}
 	}

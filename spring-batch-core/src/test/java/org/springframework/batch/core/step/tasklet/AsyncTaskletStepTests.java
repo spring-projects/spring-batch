@@ -103,6 +103,7 @@ public class AsyncTaskletStepTests {
 
 			@Override
 			public void update(ExecutionContext executionContext) {
+                                super.update(executionContext);
 				executionContext.putInt("counter", count++);
 			}
 		});

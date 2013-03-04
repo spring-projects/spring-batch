@@ -49,6 +49,7 @@ import org.springframework.batch.item.ParseException;
 import org.springframework.batch.item.UnexpectedInputException;
 import org.springframework.batch.item.WriteFailedException;
 import org.springframework.batch.item.WriterNotOpenException;
+import org.springframework.batch.item.support.AbstractItemStreamItemReader;
 import org.springframework.batch.support.transaction.ResourcelessTransactionManager;
 import org.springframework.beans.factory.FactoryBean;
 import org.springframework.scheduling.concurrent.ConcurrentTaskExecutor;
@@ -830,23 +831,21 @@ public class FaultTolerantStepFactoryBeanTests {
 	public void testItemStreamOpenedEvenWithTaskExecutor() throws Exception {
 		writer.setFailures("4");
 
-		ItemStreamReader<String> reader = new ItemStreamReader<String>() {
+		ItemStreamReader<String> reader = new AbstractItemStreamItemReader<String>() {
 			@Override
-			public void close() throws ItemStreamException {
+			public void close() {
+                                super.close();
 				closed = true;
 			}
 
 			@Override
-			public void open(ExecutionContext executionContext) throws ItemStreamException {
+			public void open(ExecutionContext executionContext) {
+                                super.open(executionContext);
 				opened = true;
 			}
 
 			@Override
-			public void update(ExecutionContext executionContext) throws ItemStreamException {
-			}
-
-			@Override
-			public String read() throws Exception, UnexpectedInputException, ParseException {
+			public String read() {
 				return null;
 			}
 		};
@@ -870,42 +869,29 @@ public class FaultTolerantStepFactoryBeanTests {
 	public void testNestedItemStreamOpened() throws Exception {
 		writer.setFailures("4");
 
-		ItemStreamReader<String> reader = new ItemStreamReader<String>() {
-			@Override
-			public void close() throws ItemStreamException {
-			}
+		ItemStreamReader<String> reader = new AbstractItemStreamItemReader<String>() {
 
 			@Override
-			public void open(ExecutionContext executionContext) throws ItemStreamException {
-			}
-
-			@Override
-			public void update(ExecutionContext executionContext) throws ItemStreamException {
-			}
-
-			@Override
-			public String read() throws Exception, UnexpectedInputException, ParseException {
+			public String read() {
 				return null;
 			}
 		};
 
-		ItemStreamReader<String> stream = new ItemStreamReader<String>() {
+		ItemStreamReader<String> stream = new AbstractItemStreamItemReader<String>() {
 			@Override
-			public void close() throws ItemStreamException {
+			public void close() {
+                                super.close();
 				closed = true;
 			}
 
 			@Override
-			public void open(ExecutionContext executionContext) throws ItemStreamException {
+			public void open(ExecutionContext executionContext) {
+                                super.open(executionContext);
 				opened = true;
 			}
 
 			@Override
-			public void update(ExecutionContext executionContext) throws ItemStreamException {
-			}
-
-			@Override
-			public String read() throws Exception, UnexpectedInputException, ParseException {
+			public String read() {
 				return null;
 			}
 		};
@@ -930,23 +916,21 @@ public class FaultTolerantStepFactoryBeanTests {
 	public void testProxiedItemStreamOpened() throws Exception {
 		writer.setFailures("4");
 
-		ItemStreamReader<String> reader = new ItemStreamReader<String>() {
+		ItemStreamReader<String> reader = new AbstractItemStreamItemReader<String>() {
 			@Override
-			public void close() throws ItemStreamException {
+			public void close() {
+                                super.close();
 				closed = true;
 			}
 
 			@Override
-			public void open(ExecutionContext executionContext) throws ItemStreamException {
+			public void open(ExecutionContext executionContext) {
+                                super.open(executionContext);
 				opened = true;
 			}
 
 			@Override
-			public void update(ExecutionContext executionContext) throws ItemStreamException {
-			}
-
-			@Override
-			public String read() throws Exception, UnexpectedInputException, ParseException {
+			public String read() {
 				return null;
 			}
 		};

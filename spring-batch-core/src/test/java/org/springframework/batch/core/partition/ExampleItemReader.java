@@ -5,11 +5,13 @@ import org.apache.commons.logging.LogFactory;
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.item.ItemStreamException;
 import org.springframework.batch.item.ItemStreamReader;
+import org.springframework.batch.item.support.AbstractItemStreamItemReader;
+import org.springframework.util.ClassUtils;
 
 /**
  * {@link ItemStreamReader} with hard-coded input data.
  */
-public class ExampleItemReader implements ItemStreamReader<String> {
+public class ExampleItemReader extends AbstractItemStreamItemReader<String> {
 
 	private Log logger = LogFactory.getLog(getClass());
 
@@ -23,6 +25,10 @@ public class ExampleItemReader implements ItemStreamReader<String> {
 
 	public static volatile boolean fail = false;
 
+        public ExampleItemReader() {
+                this.setExecutionContextName(ClassUtils.getShortName(this.getClass()));
+        }
+        
 	/**
 	 * @param min the min to set
 	 */
@@ -62,17 +68,15 @@ public class ExampleItemReader implements ItemStreamReader<String> {
 	}
 
 	@Override
-	public void close() throws ItemStreamException {
-	}
-
-	@Override
 	public void open(ExecutionContext executionContext) throws ItemStreamException {
-		index = (int) executionContext.getLong("POSITION", min);
+                super.open(executionContext);
+		index = (int) executionContext.getLong(getExecutionContextKey("POSITION"), min);
 	}
 
 	@Override
 	public void update(ExecutionContext executionContext) throws ItemStreamException {
-		executionContext.putLong("POSITION", index);
+                super.update(executionContext);
+		executionContext.putLong(getExecutionContextKey("POSITION"), index);
 	}
 
 }
