@@ -63,6 +63,8 @@ public class TransactionAwareBufferedWriterTests {
 				}
 			}
 		});
+		
+		writer.setEncoding("UTF-8");
 	}
 
 	private PlatformTransactionManager transactionManager = new ResourcelessTransactionManager();
@@ -100,7 +102,7 @@ public class TransactionAwareBufferedWriterTests {
 		
 		assertEquals(0, writer.getBufferSize());
 	}
-
+	
 	@Ignore //TODO - need to fix capture test
 	@Test
 	public void testCloseOutsideTransaction() throws Exception {
@@ -183,6 +185,30 @@ public class TransactionAwareBufferedWriterTests {
 		
 		assertEquals(0, writer.getBufferSize());
 	}
+	
+	@Test
+	@SuppressWarnings({"unchecked", "rawtypes"})
+	// BATCH-1959
+	public void testBufferSizeInTransactionWithMultiByteCharacter() throws Exception {
+		ArgumentCaptor<ByteBuffer> bb = ArgumentCaptor.forClass(ByteBuffer.class);
+		when(fileChannel.write(bb.capture())).thenReturn(5);
+
+		new TransactionTemplate(transactionManager).execute(new TransactionCallback() {
+            @Override
+			public Object doInTransaction(TransactionStatus status) {
+				try {
+					writer.write("fóó");
+				}
+				catch (IOException e) {
+					throw new IllegalStateException("Unexpected IOException", e);
+				}
+				assertEquals(5, writer.getBufferSize());
+				return null;
+			}
+		});
+		
+		assertEquals(0, writer.getBufferSize());
+	}	
 
 	@Test
 	@SuppressWarnings({"unchecked", "rawtypes"})
