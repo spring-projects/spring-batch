@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2012 the original author or authors.
+ * Copyright 2006-2013 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -70,7 +70,7 @@ import org.springframework.util.StringUtils;
  * 
  */
 public class StaxEventItemWriter<T> extends AbstractItemStreamItemWriter<T> implements
-		ResourceAwareItemWriterItemStream<T>, InitializingBean {
+ResourceAwareItemWriterItemStream<T>, InitializingBean {
 
 	private static final Log log = LogFactory.getLog(StaxEventItemWriter.class);
 
@@ -151,7 +151,7 @@ public class StaxEventItemWriter<T> extends AbstractItemStreamItemWriter<T> impl
 	 * 
 	 * @param resource the output file
 	 */
-    @Override
+	@Override
 	public void setResource(Resource resource) {
 		this.resource = resource;
 	}
@@ -323,7 +323,7 @@ public class StaxEventItemWriter<T> extends AbstractItemStreamItemWriter<T> impl
 	 * @throws Exception
 	 * @see org.springframework.beans.factory.InitializingBean#afterPropertiesSet()
 	 */
-    @Override
+	@Override
 	public void afterPropertiesSet() throws Exception {
 		Assert.notNull(marshaller);
 		if (rootTagName.contains("{")) {
@@ -341,10 +341,10 @@ public class StaxEventItemWriter<T> extends AbstractItemStreamItemWriter<T> impl
 	 * 
 	 * @see org.springframework.batch.item.ItemStream#open(ExecutionContext)
 	 */
-    @Override
+	@Override
 	public void open(ExecutionContext executionContext) {
-                super.open(executionContext);
-        
+		super.open(executionContext);
+
 		Assert.notNull(resource, "The resource must be set");
 
 		long startAtPosition = 0;
@@ -375,6 +375,7 @@ public class StaxEventItemWriter<T> extends AbstractItemStreamItemWriter<T> impl
 	/**
 	 * Helper method for opening output source at given file position
 	 */
+	@SuppressWarnings("resource")
 	private void open(long position, boolean restarted) {
 
 		File file;
@@ -415,12 +416,12 @@ public class StaxEventItemWriter<T> extends AbstractItemStreamItemWriter<T> impl
 			final FileChannel channel = fileChannel;
 			if (transactional) {
 				TransactionAwareBufferedWriter writer = new TransactionAwareBufferedWriter(channel, new Runnable() {
-                    @Override
+					@Override
 					public void run() {
 						closeStream();
 					}
 				});
-				
+
 				writer.setEncoding(encoding);
 				bufferedWriter = writer;
 			}
@@ -492,7 +493,7 @@ public class StaxEventItemWriter<T> extends AbstractItemStreamItemWriter<T> impl
 	protected Result createStaxResult() throws Exception {
 		return StaxUtils.getResult(eventWriter);
 	}
-	
+
 	/**
 	 * Inits the namespace context of the XMLEventWriter:
 	 * <ul>
@@ -506,7 +507,7 @@ public class StaxEventItemWriter<T> extends AbstractItemStreamItemWriter<T> impl
 	protected void initNamespaceContext(XMLEventWriter writer) throws XMLStreamException {
 		if (StringUtils.hasText(getRootTagNamespace())) {
 			if(StringUtils.hasText(getRootTagNamespacePrefix())) {
-				writer.setPrefix(getRootTagNamespacePrefix(), getRootTagNamespace());	
+				writer.setPrefix(getRootTagNamespacePrefix(), getRootTagNamespace());
 			} else {
 				writer.setDefaultNamespace(getRootTagNamespace());
 			}
@@ -519,11 +520,11 @@ public class StaxEventItemWriter<T> extends AbstractItemStreamItemWriter<T> impl
 					if (key.contains(":")) {
 						prefix = key.substring(key.indexOf(":") + 1);
 					}
-					System.err.println("registering prefix: " +prefix + "=" + entry.getValue());
+					log.debug("registering prefix: " +prefix + "=" + entry.getValue());
 					writer.setPrefix(prefix, entry.getValue());
 				}
 			}
-		}			
+		}
 	}
 
 	/**
@@ -609,10 +610,10 @@ public class StaxEventItemWriter<T> extends AbstractItemStreamItemWriter<T> impl
 	 * 
 	 * @see org.springframework.batch.item.ItemStream#close()
 	 */
-    @Override
+	@Override
 	public void close() {
-                super.close();
-        
+		super.close();
+
 		XMLEventFactory factory = createXmlEventFactory();
 		try {
 			delegateEventWriter.add(factory.createCharacters(""));
@@ -674,7 +675,7 @@ public class StaxEventItemWriter<T> extends AbstractItemStreamItemWriter<T> impl
 	 * @throws IOException
 	 * @throws XmlMappingException
 	 */
-    @Override
+	@Override
 	public void write(List<? extends T> items) throws XmlMappingException, Exception {
 
 		currentRecordCount += items.size();
@@ -699,9 +700,9 @@ public class StaxEventItemWriter<T> extends AbstractItemStreamItemWriter<T> impl
 	 * 
 	 * @see org.springframework.batch.item.ItemStream#update(ExecutionContext)
 	 */
-    @Override
+	@Override
 	public void update(ExecutionContext executionContext) {
-                super.update(executionContext);
+		super.update(executionContext);
 		if (saveState) {
 			Assert.notNull(executionContext, "ExecutionContext must not be null");
 			executionContext.putLong(getExecutionContextKey(RESTART_DATA_NAME), getPosition());

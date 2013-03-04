@@ -1,11 +1,11 @@
 package org.springframework.batch.item.xml;
 
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 import java.io.File;
 import java.io.IOException;
@@ -52,16 +52,16 @@ public class StaxEventItemWriterTests {
 
 	// test item for writing to output
 	private Object item = new Object() {
-        @Override
+		@Override
 		public String toString() {
 			return ClassUtils.getShortName(StaxEventItemWriter.class) + "-testString";
 		}
 	};
-	
+
 	private JAXBItem jaxbItem = new JAXBItem();
 
 	private List<? extends Object> items = Collections.singletonList(item);
-	
+
 	private List<? extends Object> jaxbItems = Collections.singletonList(jaxbItem);
 
 	private static final String TEST_STRING = "<" + ClassUtils.getShortName(StaxEventItemWriter.class)
@@ -74,7 +74,7 @@ public class StaxEventItemWriterTests {
 			+ "-testString/>";
 
 	private SimpleMarshaller marshaller;
-	
+
 	private Jaxb2Marshaller jaxbMarshaller;
 
 	@Before
@@ -136,13 +136,14 @@ public class StaxEventItemWriterTests {
 	}
 
 	@Test
+	@SuppressWarnings({"unchecked", "rawtypes"})
 	public void testTransactionalRestart() throws Exception {
 		writer.open(executionContext);
 
 		PlatformTransactionManager transactionManager = new ResourcelessTransactionManager();
 
 		new TransactionTemplate(transactionManager).execute(new TransactionCallback() {
-            @Override
+			@Override
 			public Object doInTransaction(TransactionStatus status) {
 				try {
 					// write item
@@ -162,7 +163,7 @@ public class StaxEventItemWriterTests {
 		writer = createItemWriter();
 		writer.open(executionContext);
 		new TransactionTemplate(transactionManager).execute(new TransactionCallback() {
-            @Override
+			@Override
 			public Object doInTransaction(TransactionStatus status) {
 				try {
 					writer.write(items);
@@ -185,6 +186,7 @@ public class StaxEventItemWriterTests {
 	}
 
 	@Test
+	@SuppressWarnings({"unchecked", "rawtypes"})
 	public void testTransactionalRestartFailOnFirstWrite() throws Exception {
 
 		PlatformTransactionManager transactionManager = new ResourcelessTransactionManager();
@@ -192,7 +194,7 @@ public class StaxEventItemWriterTests {
 		writer.open(executionContext);
 		try {
 			new TransactionTemplate(transactionManager).execute(new TransactionCallback() {
-                @Override
+				@Override
 				public Object doInTransaction(TransactionStatus status) {
 					try {
 						writer.write(items);
@@ -214,7 +216,7 @@ public class StaxEventItemWriterTests {
 		// create new writer from saved restart data and continue writing
 		writer = createItemWriter();
 		new TransactionTemplate(transactionManager).execute(new TransactionCallback() {
-            @Override
+			@Override
 			public Object doInTransaction(TransactionStatus status) {
 				writer.open(executionContext);
 				try {
@@ -246,7 +248,7 @@ public class StaxEventItemWriterTests {
 
 		writer.setHeaderCallback(new StaxWriterCallback() {
 
-            @Override
+			@Override
 			public void write(XMLEventWriter writer) throws IOException {
 				XMLEventFactory factory = XMLEventFactory.newInstance();
 				try {
@@ -292,7 +294,7 @@ public class StaxEventItemWriterTests {
 	public void testOpenAndClose() throws Exception {
 		writer.setHeaderCallback(new StaxWriterCallback() {
 
-            @Override
+			@Override
 			public void write(XMLEventWriter writer) throws IOException {
 				XMLEventFactory factory = XMLEventFactory.newInstance();
 				try {
@@ -308,7 +310,7 @@ public class StaxEventItemWriterTests {
 		});
 		writer.setFooterCallback(new StaxWriterCallback() {
 
-            @Override
+			@Override
 			public void write(XMLEventWriter writer) throws IOException {
 				XMLEventFactory factory = XMLEventFactory.newInstance();
 				try {
@@ -409,7 +411,7 @@ public class StaxEventItemWriterTests {
 		assertTrue("Wrong content: " + content, content.contains(("</ns:root>")));
 		assertTrue("Wrong content: " + content, content.contains(("<ns:root")));
 	}
-	
+
 	/**
 	 * Namespace prefixes are properly initialized on restart.
 	 */
@@ -422,7 +424,7 @@ public class StaxEventItemWriterTests {
 		writer.write(jaxbItems);
 		writer.update(executionContext);
 		writer.close();
-		
+
 		writer = createItemWriter();
 		writer.setMarshaller(jaxbMarshaller);
 		writer.setRootTagName("{http://www.springframework.org/test}root");
@@ -431,12 +433,12 @@ public class StaxEventItemWriterTests {
 		writer.write(jaxbItems);
 		writer.update(executionContext);
 		writer.close();
-		
+
 		String content = getOutputFileContent();
-		assertEquals("Wrong content: " + content, 
+		assertEquals("Wrong content: " + content,
 				"<root xmlns=\"http://www.springframework.org/test\"><item/><item/></root>", content);
 	}
-	
+
 	/**
 	 * Namespace prefixes are properly initialized on restart.
 	 */
@@ -449,7 +451,7 @@ public class StaxEventItemWriterTests {
 		writer.write(jaxbItems);
 		writer.update(executionContext);
 		writer.close();
-		
+
 		writer = createItemWriter();
 		writer.setMarshaller(jaxbMarshaller);
 		writer.setRootTagName("{http://www.springframework.org/test}ns:root");
@@ -458,12 +460,12 @@ public class StaxEventItemWriterTests {
 		writer.write(jaxbItems);
 		writer.update(executionContext);
 		writer.close();
-		
+
 		String content = getOutputFileContent();
-		assertEquals("Wrong content: " + content, 
+		assertEquals("Wrong content: " + content,
 				"<ns:root xmlns:ns=\"http://www.springframework.org/test\"><ns:item/><ns:item/></ns:root>", content);
-	}	
-	
+	}
+
 	/**
 	 * Namespace prefixes are properly initialized on restart.
 	 */
@@ -477,7 +479,7 @@ public class StaxEventItemWriterTests {
 		writer.write(jaxbItems);
 		writer.update(executionContext);
 		writer.close();
-		
+
 		writer = createItemWriter();
 		writer.setMarshaller(jaxbMarshaller);
 		writer.setRootTagName("{urn:org.test.foo}foo:root");
@@ -487,11 +489,11 @@ public class StaxEventItemWriterTests {
 		writer.write(jaxbItems);
 		writer.update(executionContext);
 		writer.close();
-		
+
 		String content = getOutputFileContent();
-		assertEquals("Wrong content: " + content, 
+		assertEquals("Wrong content: " + content,
 				"<foo:root xmlns:foo=\"urn:org.test.foo\" xmlns:ns=\"http://www.springframework.org/test\"><ns:item/><ns:item/></foo:root>", content);
-	}		
+	}
 
 	/**
 	 * Writes object's toString representation as XML comment.
@@ -510,9 +512,9 @@ public class StaxEventItemWriterTests {
 			this.namespacePrefix = namespacePrefix;
 		}
 
-        @Override
+		@Override
 		public void marshal(Object graph, Result result) throws XmlMappingException, IOException {
- 	 	 Assert.isInstanceOf( Result.class, result);
+			Assert.isInstanceOf( Result.class, result);
 			try {
 				StaxUtils.getXmlEventWriter( result ).add( XMLEventFactory.newInstance().createStartElement(namespacePrefix, namespace, graph.toString()));
 				StaxUtils.getXmlEventWriter( result ).add( XMLEventFactory.newInstance().createEndElement(namespacePrefix, namespace, graph.toString()));
@@ -522,7 +524,7 @@ public class StaxEventItemWriterTests {
 			}
 		}
 
-        @Override
+		@Override
 		@SuppressWarnings("rawtypes")
 		public boolean supports(Class clazz) {
 			return true;
@@ -558,7 +560,7 @@ public class StaxEventItemWriterTests {
 
 		return source;
 	}
-	
+
 	@XmlRootElement(name="item", namespace="http://www.springframework.org/test")
 	private static class JAXBItem {
 	}
