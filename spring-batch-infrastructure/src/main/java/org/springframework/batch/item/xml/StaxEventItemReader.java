@@ -17,6 +17,7 @@
 package org.springframework.batch.item.xml;
 
 import java.io.InputStream;
+import java.util.NoSuchElementException;
 
 import javax.xml.namespace.QName;
 import javax.xml.stream.XMLEventReader;
@@ -51,7 +52,7 @@ import org.springframework.util.ClassUtils;
  * @author Robert Kasanicky
  */
 public class StaxEventItemReader<T> extends AbstractItemCountingItemStreamItemReader<T> implements
-		ResourceAwareItemReaderItemStream<T>, InitializingBean {
+ResourceAwareItemReaderItemStream<T>, InitializingBean {
 
 	private static final Log logger = LogFactory.getLog(StaxEventItemReader.class);
 
@@ -86,7 +87,7 @@ public class StaxEventItemReader<T> extends AbstractItemCountingItemStreamItemRe
 		this.strict = strict;
 	}
 
-    @Override
+	@Override
 	public void setResource(Resource resource) {
 		this.resource = resource;
 	}
@@ -113,7 +114,7 @@ public class StaxEventItemReader<T> extends AbstractItemCountingItemStreamItemRe
 	 * the root element is empty.
 	 * @throws IllegalStateException if the Resource does not exist.
 	 */
-    @Override
+	@Override
 	public void afterPropertiesSet() throws Exception {
 		Assert.notNull(unmarshaller, "The Unmarshaller must not be null.");
 		Assert.hasLength(fragmentRootElementName, "The FragmentRootElementName must not be null");
@@ -159,7 +160,7 @@ public class StaxEventItemReader<T> extends AbstractItemCountingItemStreamItemRe
 		}
 	}
 
-    @Override
+	@Override
 	protected void doClose() throws Exception {
 		try {
 			if (fragmentReader != null) {
@@ -176,7 +177,7 @@ public class StaxEventItemReader<T> extends AbstractItemCountingItemStreamItemRe
 
 	}
 
-    @Override
+	@Override
 	protected void doOpen() throws Exception {
 		Assert.notNull(resource, "The Resource must not be null.");
 
@@ -206,7 +207,7 @@ public class StaxEventItemReader<T> extends AbstractItemCountingItemStreamItemRe
 	/**
 	 * Move to next fragment and map it to item.
 	 */
-    @Override
+	@Override
 	protected T doRead() throws Exception {
 
 		if (noInput) {
@@ -247,8 +248,18 @@ public class StaxEventItemReader<T> extends AbstractItemCountingItemStreamItemRe
 	@Override
 	protected void jumpToItem(int itemIndex) throws Exception {
 		for (int i = 0; i < itemIndex; i++) {
-			readToStartFragment();
-			readToEndFragment();
+			try {
+				readToStartFragment();
+				readToEndFragment();
+			} catch (NoSuchElementException e) {
+				if (itemIndex == (i + 1)) {
+					// we can presume a NoSuchElementException on the last item means the EOF was reached on the last run
+					return;
+				} else {
+					// if NoSuchElementException occurs on an item other than the last one, this indicates a problem
+					throw e;
+				}
+			}
 		}
 	}
 

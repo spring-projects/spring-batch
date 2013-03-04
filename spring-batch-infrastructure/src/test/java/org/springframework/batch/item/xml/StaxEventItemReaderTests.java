@@ -223,6 +223,26 @@ public class StaxEventItemReaderTests {
 
 	}
 
+	/**
+	 * Test restart at end of file.
+	 */
+	@Test
+	public void testRestartAtEndOfFile() throws Exception {
+
+		source.open(executionContext);
+		assertNotNull(source.read());
+		assertNotNull(source.read());
+		assertNull(source.read());
+		source.update(executionContext);
+		source.close();
+		
+		assertEquals(3, executionContext.getInt(ClassUtils.getShortName(StaxEventItemReader.class) + ".read.count"));
+		
+		source = createNewInputSouce();
+		source.open(executionContext);
+		assertNull(source.read());
+	}
+	
 	@Test
 	public void testRestoreWorksFromClosedStream() throws Exception {
 		source.close();
