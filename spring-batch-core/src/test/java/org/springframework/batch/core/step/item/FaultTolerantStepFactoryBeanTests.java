@@ -831,16 +831,16 @@ public class FaultTolerantStepFactoryBeanTests {
 	public void testItemStreamOpenedEvenWithTaskExecutor() throws Exception {
 		writer.setFailures("4");
 
-		ItemStreamReader<String> reader = new AbstractItemStreamItemReader<String>() {
+		ItemReader<String> reader = new AbstractItemStreamItemReader<String>() {
 			@Override
 			public void close() {
-                                super.close();
+				super.close();
 				closed = true;
 			}
 
 			@Override
 			public void open(ExecutionContext executionContext) {
-                                super.open(executionContext);
+				super.open(executionContext);
 				opened = true;
 			}
 
@@ -869,29 +869,42 @@ public class FaultTolerantStepFactoryBeanTests {
 	public void testNestedItemStreamOpened() throws Exception {
 		writer.setFailures("4");
 
-		ItemStreamReader<String> reader = new AbstractItemStreamItemReader<String>() {
+		ItemStreamReader<String> reader = new ItemStreamReader<String>() {
+			@Override
+			public void close() throws ItemStreamException {
+			}
 
 			@Override
-			public String read() {
+			public void open(ExecutionContext executionContext) throws ItemStreamException {
+			}
+
+			@Override
+			public void update(ExecutionContext executionContext) throws ItemStreamException {
+			}
+
+			@Override
+			public String read() throws Exception, UnexpectedInputException, ParseException {
 				return null;
 			}
 		};
 
-		ItemStreamReader<String> stream = new AbstractItemStreamItemReader<String>() {
+		ItemStreamReader<String> stream = new ItemStreamReader<String>() {
 			@Override
-			public void close() {
-                                super.close();
+			public void close() throws ItemStreamException {
 				closed = true;
 			}
 
 			@Override
-			public void open(ExecutionContext executionContext) {
-                                super.open(executionContext);
+			public void open(ExecutionContext executionContext) throws ItemStreamException {
 				opened = true;
 			}
 
 			@Override
-			public String read() {
+			public void update(ExecutionContext executionContext) throws ItemStreamException {
+			}
+
+			@Override
+			public String read() throws Exception, UnexpectedInputException, ParseException {
 				return null;
 			}
 		};
@@ -916,21 +929,23 @@ public class FaultTolerantStepFactoryBeanTests {
 	public void testProxiedItemStreamOpened() throws Exception {
 		writer.setFailures("4");
 
-		ItemStreamReader<String> reader = new AbstractItemStreamItemReader<String>() {
+		ItemStreamReader<String> reader = new ItemStreamReader<String>() {
 			@Override
-			public void close() {
-                                super.close();
+			public void close() throws ItemStreamException {
 				closed = true;
 			}
 
 			@Override
-			public void open(ExecutionContext executionContext) {
-                                super.open(executionContext);
+			public void open(ExecutionContext executionContext) throws ItemStreamException {
 				opened = true;
 			}
 
 			@Override
-			public String read() {
+			public void update(ExecutionContext executionContext) throws ItemStreamException {
+			}
+
+			@Override
+			public String read() throws Exception, UnexpectedInputException, ParseException {
 				return null;
 			}
 		};

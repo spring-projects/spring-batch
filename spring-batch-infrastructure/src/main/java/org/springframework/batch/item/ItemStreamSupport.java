@@ -26,13 +26,13 @@ import org.springframework.batch.item.util.ExecutionContextUserSupport;
  */
 public abstract class ItemStreamSupport implements ItemStream {
 
-        private final ExecutionContextUserSupport executionContextUserSupport = new ExecutionContextUserSupport();
-    
+	private final ExecutionContextUserSupport executionContextUserSupport = new ExecutionContextUserSupport();
+
 	/**
 	 * No-op.
 	 * @see org.springframework.batch.item.ItemStream#close()
 	 */
-    @Override
+	@Override
 	public void close() {
 	}
 
@@ -40,7 +40,7 @@ public abstract class ItemStreamSupport implements ItemStream {
 	 * No-op.
 	 * @see org.springframework.batch.item.ItemStream#open(ExecutionContext)
 	 */
-    @Override
+	@Override
 	public void open(ExecutionContext executionContext) {
 	}
 
@@ -48,20 +48,16 @@ public abstract class ItemStreamSupport implements ItemStream {
 	 * Return empty {@link ExecutionContext}.
 	 * @see org.springframework.batch.item.ItemStream#update(ExecutionContext)
 	 */
-    @Override
+	@Override
 	public void update(ExecutionContext executionContext) {
 	}
-    
-        private ExecutionContextUserSupport getExecutionContextUserSupport() {
-            return executionContextUserSupport; 
-        }
 
-        protected void setExecutionContextName(String name) {
-            this.getExecutionContextUserSupport().setName(name);
-        }
+	protected void setExecutionContextName(String name) {
+		executionContextUserSupport.setName(name);
+	}
 
-        public String getExecutionContextKey(String key) {
-            return this.getExecutionContextUserSupport().getKey(key);
-        }
+	public String getExecutionContextKey(String key) {
+		return executionContextUserSupport.getKey(key);
+	}
 
 }

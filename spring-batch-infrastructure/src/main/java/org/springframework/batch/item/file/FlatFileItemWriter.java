@@ -58,7 +58,7 @@ import org.springframework.util.ClassUtils;
  * @author Michael Minella
  */
 public class FlatFileItemWriter<T> extends AbstractItemStreamItemWriter<T> implements ResourceAwareItemWriterItemStream<T>,
-		InitializingBean {
+InitializingBean {
 
 	private static final boolean DEFAULT_TRANSACTIONAL = true;
 
@@ -97,7 +97,7 @@ public class FlatFileItemWriter<T> extends AbstractItemStreamItemWriter<T> imple
 	private boolean append = false;
 
 	public FlatFileItemWriter() {
-                this.setExecutionContextName(ClassUtils.getShortName(FlatFileItemWriter.class));
+		this.setExecutionContextName(ClassUtils.getShortName(FlatFileItemWriter.class));
 	}
 
 	/**
@@ -105,7 +105,7 @@ public class FlatFileItemWriter<T> extends AbstractItemStreamItemWriter<T> imple
 	 * 
 	 * @see org.springframework.beans.factory.InitializingBean#afterPropertiesSet()
 	 */
-    @Override
+	@Override
 	public void afterPropertiesSet() throws Exception {
 		Assert.notNull(lineAggregator, "A LineAggregator must be provided.");
 		if (append) {
@@ -150,7 +150,7 @@ public class FlatFileItemWriter<T> extends AbstractItemStreamItemWriter<T> imple
 	 * 
 	 * @param resource
 	 */
-    @Override
+	@Override
 	public void setResource(Resource resource) {
 		this.resource = resource;
 	}
@@ -248,7 +248,7 @@ public class FlatFileItemWriter<T> extends AbstractItemStreamItemWriter<T> imple
 	 * @throws Exception if the transformer or file output fail,
 	 * WriterNotOpenException if the writer has not been initialized.
 	 */
-    @Override
+	@Override
 	public void write(List<? extends T> items) throws Exception {
 
 		if (!getOutputState().isInitialized()) {
@@ -279,9 +279,9 @@ public class FlatFileItemWriter<T> extends AbstractItemStreamItemWriter<T> imple
 	/**
 	 * @see ItemStream#close()
 	 */
-    @Override
+	@Override
 	public void close() {
-                super.close();
+		super.close();
 		if (state != null) {
 			try {
 				if (footerCallback != null && state.outputBufferedWriter != null) {
@@ -313,10 +313,10 @@ public class FlatFileItemWriter<T> extends AbstractItemStreamItemWriter<T> imple
 	 * 
 	 * @see ItemStream#open(ExecutionContext)
 	 */
-    @Override
+	@Override
 	public void open(ExecutionContext executionContext) throws ItemStreamException {
-                super.open(executionContext);
-        
+		super.open(executionContext);
+
 		Assert.notNull(resource, "The resource must be set");
 
 		if (!getOutputState().isInitialized()) {
@@ -351,9 +351,9 @@ public class FlatFileItemWriter<T> extends AbstractItemStreamItemWriter<T> imple
 	/**
 	 * @see ItemStream#update(ExecutionContext)
 	 */
-    @Override
+	@Override
 	public void update(ExecutionContext executionContext) {
-                super.update(executionContext);
+		super.update(executionContext);
 		if (state == null) {
 			throw new ItemStreamException("ItemStream not open or already closed.");
 		}
@@ -389,10 +389,10 @@ public class FlatFileItemWriter<T> extends AbstractItemStreamItemWriter<T> imple
 			state.setAppendAllowed(append);
 			state.setEncoding(encoding);
 		}
-		return (OutputState) state;
+		return state;
 	}
-        
-        /**
+
+	/**
 	 * The name of the component which will be used as a stem for keys in the
 	 * {@link ExecutionContext}. Subclasses should provide a default value, e.g.
 	 * the short form of the class name.
@@ -400,7 +400,7 @@ public class FlatFileItemWriter<T> extends AbstractItemStreamItemWriter<T> imple
 	 * @param name the name for the component
 	 */
 	public void setName(String name) {
-                this.setExecutionContextName(name);
+		this.setExecutionContextName(name);
 	}
 
 	/**
@@ -601,12 +601,12 @@ public class FlatFileItemWriter<T> extends AbstractItemStreamItemWriter<T> imple
 				final FileChannel channel = fileChannel;
 				if (transactional) {
 					TransactionAwareBufferedWriter writer = new TransactionAwareBufferedWriter(channel, new Runnable() {
-                        @Override
+						@Override
 						public void run() {
 							closeStream();
 						}
 					});
-					
+
 					writer.setEncoding(encoding);
 					return writer;
 				}

@@ -22,6 +22,7 @@ import java.util.Comparator;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.batch.item.ExecutionContext;
+import org.springframework.batch.item.ItemStream;
 import org.springframework.batch.item.ItemStreamException;
 import org.springframework.batch.item.ParseException;
 import org.springframework.batch.item.ResourceAware;
@@ -75,7 +76,7 @@ public class MultiResourceItemReader<T> extends AbstractItemStreamItemReader<T> 
 		/**
 		 * Compares resource filenames.
 		 */
-        @Override
+		@Override
 		public int compare(Resource r1, Resource r2) {
 			return r1.getFilename().compareTo(r2.getFilename());
 		}
@@ -83,13 +84,13 @@ public class MultiResourceItemReader<T> extends AbstractItemStreamItemReader<T> 
 	};
 
 	public MultiResourceItemReader() {
-                this.setExecutionContextName(ClassUtils.getShortName(MultiResourceItemReader.class));
+		this.setExecutionContextName(ClassUtils.getShortName(MultiResourceItemReader.class));
 	}
 
 	/**
 	 * Reads the next item, jumping to next resource if necessary.
 	 */
-    @Override
+	@Override
 	public T read() throws Exception, UnexpectedInputException, ParseException {
 
 		if (noInput) {
@@ -129,26 +130,26 @@ public class MultiResourceItemReader<T> extends AbstractItemStreamItemReader<T> 
 			delegate.setResource(resources[currentResource]);
 			delegate.open(new ExecutionContext());
 
-            item = readFromDelegate();
-        }
+			item = readFromDelegate();
+		}
 
 		return item;
 	}
 
-    private T readFromDelegate() throws Exception {
-        T item = delegate.read();
-        if(item instanceof ResourceAware){
-            ((ResourceAware) item).setResource(getCurrentResource());
-        }
-        return item;
-    }
+	private T readFromDelegate() throws Exception {
+		T item = delegate.read();
+		if(item instanceof ResourceAware){
+			((ResourceAware) item).setResource(getCurrentResource());
+		}
+		return item;
+	}
 
-    /**
+	/**
 	 * Close the {@link #setDelegate(ResourceAwareItemReaderItemStream)} reader and reset instance variable values.
 	 */
-    @Override
+	@Override
 	public void close() throws ItemStreamException {
-                super.close();
+		super.close();
 		delegate.close();
 		noInput = false;
 	}
@@ -157,9 +158,9 @@ public class MultiResourceItemReader<T> extends AbstractItemStreamItemReader<T> 
 	 * Figure out which resource to start with in case of restart, open the delegate and restore delegate's position in
 	 * the resource.
 	 */
-    @Override
+	@Override
 	public void open(ExecutionContext executionContext) throws ItemStreamException {
-                super.open(executionContext);
+		super.open(executionContext);
 		Assert.notNull(resources, "Resources must be set");
 
 		noInput = false;
@@ -196,9 +197,9 @@ public class MultiResourceItemReader<T> extends AbstractItemStreamItemReader<T> 
 	/**
 	 * Store the current resource index and position in the resource.
 	 */
-    @Override
+	@Override
 	public void update(ExecutionContext executionContext) throws ItemStreamException {
-                super.update(executionContext);
+		super.update(executionContext);
 		if (saveState) {
 			executionContext.putInt(getExecutionContextKey(RESOURCE_KEY), currentResource);
 			delegate.update(executionContext);

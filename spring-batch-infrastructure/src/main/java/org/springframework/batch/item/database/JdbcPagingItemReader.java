@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2012 the original author or authors.
+ * Copyright 2006-2013 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -222,7 +222,7 @@ public class JdbcPagingItemReader<T> extends AbstractPagingItemReader<T> impleme
 						getParameterList(parameterValues, startAfterValues).toArray(), rowCallback);
 			}
 		}
-		
+
 		Collection<T> result = (Collection<T>) query;
 		results.addAll(result);
 	}
@@ -240,12 +240,12 @@ public class JdbcPagingItemReader<T> extends AbstractPagingItemReader<T> impleme
 	public void open(ExecutionContext executionContext) {
 		if (isSaveState()) {
 			startAfterValues = (Map<String, Object>) executionContext.get(getExecutionContextKey(START_AFTER_VALUE));
-			
+
 			if(startAfterValues == null) {
 				startAfterValues = new LinkedHashMap<String, Object>();
 			}
 		}
-		
+
 		super.open(executionContext);
 	}
 
@@ -266,7 +266,7 @@ public class JdbcPagingItemReader<T> extends AbstractPagingItemReader<T> impleme
 			}
 
 			RowMapper startMapper = new RowMapper() {
-                @Override
+				@Override
 				public Object mapRow(ResultSet rs, int i) throws SQLException {
 					return rs.getObject(1);
 				}
@@ -316,7 +316,7 @@ public class JdbcPagingItemReader<T> extends AbstractPagingItemReader<T> impleme
 				parameterList.add(keys.get(i).getValue());
 			}
 		}
-		
+
 		if (logger.isDebugEnabled()) {
 			logger.debug("Using parameterList:" + parameterList);
 		}
@@ -325,13 +325,13 @@ public class JdbcPagingItemReader<T> extends AbstractPagingItemReader<T> impleme
 
 	@SuppressWarnings("rawtypes")
 	private class PagingRowMapper implements RowMapper {
-        @Override
+		@Override
 		public Object mapRow(ResultSet rs, int rowNum) throws SQLException {
 			startAfterValues = new LinkedHashMap<String, Object>();
 			for (Map.Entry<String, Order> sortKey : queryProvider.getSortKeys().entrySet()) {
 				startAfterValues.put(sortKey.getKey(), rs.getObject(sortKey.getKey()));
 			}
-			
+
 			return rowMapper.mapRow(rs, rowNum);
 		}
 	}
