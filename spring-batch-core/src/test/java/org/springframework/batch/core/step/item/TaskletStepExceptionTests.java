@@ -184,6 +184,7 @@ public class TaskletStepExceptionTests {
 		taskletStep.setStreams(new ItemStream[] { new ItemStreamSupport() {
 			@Override
 			public void close() throws ItemStreamException {
+                                super.close();
 				throw exception;
 			}
 		} });

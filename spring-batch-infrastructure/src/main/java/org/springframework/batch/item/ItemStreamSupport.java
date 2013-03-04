@@ -15,37 +15,49 @@
  */
 package org.springframework.batch.item;
 
+import org.springframework.batch.item.util.ExecutionContextUserSupport;
 
 /**
  * Empty method implementation of {@link ItemStream}.
  *
  * @author Dave Syer
+ * @author Dean de Bree
  *
  */
 public abstract class ItemStreamSupport implements ItemStream {
+
+	private final ExecutionContextUserSupport executionContextUserSupport = new ExecutionContextUserSupport();
 
 	/**
 	 * No-op.
 	 * @see org.springframework.batch.item.ItemStream#close()
 	 */
-    @Override
-	public void close() throws ItemStreamException {
+	@Override
+	public void close() {
 	}
 
 	/**
 	 * No-op.
 	 * @see org.springframework.batch.item.ItemStream#open(ExecutionContext)
 	 */
-    @Override
-	public void open(ExecutionContext executionContext) throws ItemStreamException {
+	@Override
+	public void open(ExecutionContext executionContext) {
 	}
 
 	/**
 	 * Return empty {@link ExecutionContext}.
 	 * @see org.springframework.batch.item.ItemStream#update(ExecutionContext)
 	 */
-    @Override
+	@Override
 	public void update(ExecutionContext executionContext) {
+	}
+
+	protected void setExecutionContextName(String name) {
+		executionContextUserSupport.setName(name);
+	}
+
+	public String getExecutionContextKey(String key) {
+		return executionContextUserSupport.getKey(key);
 	}
 
 }

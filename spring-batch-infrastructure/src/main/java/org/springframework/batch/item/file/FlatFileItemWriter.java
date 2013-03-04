@@ -34,7 +34,7 @@ import org.springframework.batch.item.ItemStreamException;
 import org.springframework.batch.item.WriteFailedException;
 import org.springframework.batch.item.WriterNotOpenException;
 import org.springframework.batch.item.file.transform.LineAggregator;
-import org.springframework.batch.item.util.ExecutionContextUserSupport;
+import org.springframework.batch.item.support.AbstractItemStreamItemWriter;
 import org.springframework.batch.item.util.FileUtils;
 import org.springframework.batch.support.transaction.TransactionAwareBufferedWriter;
 import org.springframework.beans.factory.InitializingBean;
@@ -57,8 +57,8 @@ import org.springframework.util.ClassUtils;
  * @author Dave Syer
  * @author Michael Minella
  */
-public class FlatFileItemWriter<T> extends ExecutionContextUserSupport implements ResourceAwareItemWriterItemStream<T>,
-		InitializingBean {
+public class FlatFileItemWriter<T> extends AbstractItemStreamItemWriter<T> implements ResourceAwareItemWriterItemStream<T>,
+InitializingBean {
 
 	private static final boolean DEFAULT_TRANSACTIONAL = true;
 
@@ -97,7 +97,7 @@ public class FlatFileItemWriter<T> extends ExecutionContextUserSupport implement
 	private boolean append = false;
 
 	public FlatFileItemWriter() {
-		setName(ClassUtils.getShortName(FlatFileItemWriter.class));
+		this.setExecutionContextName(ClassUtils.getShortName(FlatFileItemWriter.class));
 	}
 
 	/**
@@ -105,7 +105,7 @@ public class FlatFileItemWriter<T> extends ExecutionContextUserSupport implement
 	 * 
 	 * @see org.springframework.beans.factory.InitializingBean#afterPropertiesSet()
 	 */
-    @Override
+	@Override
 	public void afterPropertiesSet() throws Exception {
 		Assert.notNull(lineAggregator, "A LineAggregator must be provided.");
 		if (append) {
@@ -150,7 +150,7 @@ public class FlatFileItemWriter<T> extends ExecutionContextUserSupport implement
 	 * 
 	 * @param resource
 	 */
-    @Override
+	@Override
 	public void setResource(Resource resource) {
 		this.resource = resource;
 	}
@@ -248,7 +248,7 @@ public class FlatFileItemWriter<T> extends ExecutionContextUserSupport implement
 	 * @throws Exception if the transformer or file output fail,
 	 * WriterNotOpenException if the writer has not been initialized.
 	 */
-    @Override
+	@Override
 	public void write(List<? extends T> items) throws Exception {
 
 		if (!getOutputState().isInitialized()) {
@@ -279,8 +279,9 @@ public class FlatFileItemWriter<T> extends ExecutionContextUserSupport implement
 	/**
 	 * @see ItemStream#close()
 	 */
-    @Override
+	@Override
 	public void close() {
+		super.close();
 		if (state != null) {
 			try {
 				if (footerCallback != null && state.outputBufferedWriter != null) {
@@ -312,8 +313,9 @@ public class FlatFileItemWriter<T> extends ExecutionContextUserSupport implement
 	 * 
 	 * @see ItemStream#open(ExecutionContext)
 	 */
-    @Override
+	@Override
 	public void open(ExecutionContext executionContext) throws ItemStreamException {
+		super.open(executionContext);
 
 		Assert.notNull(resource, "The resource must be set");
 
@@ -324,7 +326,7 @@ public class FlatFileItemWriter<T> extends ExecutionContextUserSupport implement
 
 	private void doOpen(ExecutionContext executionContext) throws ItemStreamException {
 		OutputState outputState = getOutputState();
-		if (executionContext.containsKey(getKey(RESTART_DATA_NAME))) {
+		if (executionContext.containsKey(getExecutionContextKey(RESTART_DATA_NAME))) {
 			outputState.restoreFrom(executionContext);
 		}
 		try {
@@ -349,8 +351,9 @@ public class FlatFileItemWriter<T> extends ExecutionContextUserSupport implement
 	/**
 	 * @see ItemStream#update(ExecutionContext)
 	 */
-    @Override
+	@Override
 	public void update(ExecutionContext executionContext) {
+		super.update(executionContext);
 		if (state == null) {
 			throw new ItemStreamException("ItemStream not open or already closed.");
 		}
@@ -360,13 +363,13 @@ public class FlatFileItemWriter<T> extends ExecutionContextUserSupport implement
 		if (saveState) {
 
 			try {
-				executionContext.putLong(getKey(RESTART_DATA_NAME), state.position());
+				executionContext.putLong(getExecutionContextKey(RESTART_DATA_NAME), state.position());
 			}
 			catch (IOException e) {
 				throw new ItemStreamException("ItemStream does not return current position properly", e);
 			}
 
-			executionContext.putLong(getKey(WRITTEN_STATISTICS_NAME), state.linesWritten);
+			executionContext.putLong(getExecutionContextKey(WRITTEN_STATISTICS_NAME), state.linesWritten);
 		}
 	}
 
@@ -386,7 +389,18 @@ public class FlatFileItemWriter<T> extends ExecutionContextUserSupport implement
 			state.setAppendAllowed(append);
 			state.setEncoding(encoding);
 		}
-		return (OutputState) state;
+		return state;
+	}
+
+	/**
+	 * The name of the component which will be used as a stem for keys in the
+	 * {@link ExecutionContext}. Subclasses should provide a default value, e.g.
+	 * the short form of the class name.
+	 * 
+	 * @param name the name for the component
+	 */
+	public void setName(String name) {
+		this.setExecutionContextName(name);
 	}
 
 	/**
@@ -454,7 +468,7 @@ public class FlatFileItemWriter<T> extends ExecutionContextUserSupport implement
 		 * @param executionContext
 		 */
 		public void restoreFrom(ExecutionContext executionContext) {
-			lastMarkedByteOffsetPosition = executionContext.getLong(getKey(RESTART_DATA_NAME));
+			lastMarkedByteOffsetPosition = executionContext.getLong(getExecutionContextKey(RESTART_DATA_NAME));
 			restarted = true;
 		}
 
@@ -587,12 +601,12 @@ public class FlatFileItemWriter<T> extends ExecutionContextUserSupport implement
 				final FileChannel channel = fileChannel;
 				if (transactional) {
 					TransactionAwareBufferedWriter writer = new TransactionAwareBufferedWriter(channel, new Runnable() {
-                        @Override
+						@Override
 						public void run() {
 							closeStream();
 						}
 					});
-					
+
 					writer.setEncoding(encoding);
 					return writer;
 				}

@@ -41,7 +41,7 @@ import org.springframework.batch.item.ItemStreamException;
 import org.springframework.batch.item.ItemWriter;
 import org.springframework.batch.item.WriteFailedException;
 import org.springframework.batch.item.file.ResourceAwareItemWriterItemStream;
-import org.springframework.batch.item.util.ExecutionContextUserSupport;
+import org.springframework.batch.item.support.AbstractItemStreamItemWriter;
 import org.springframework.batch.item.util.FileUtils;
 import org.springframework.batch.item.xml.stax.NoStartEndDocumentStreamWriter;
 import org.springframework.batch.support.transaction.TransactionAwareBufferedWriter;
@@ -69,7 +69,7 @@ import org.springframework.util.StringUtils;
  * @author Michael Minella
  * 
  */
-public class StaxEventItemWriter<T> extends ExecutionContextUserSupport implements
+public class StaxEventItemWriter<T> extends AbstractItemStreamItemWriter<T> implements
 		ResourceAwareItemWriterItemStream<T>, InitializingBean {
 
 	private static final Log log = LogFactory.getLog(StaxEventItemWriter.class);
@@ -143,7 +143,7 @@ public class StaxEventItemWriter<T> extends ExecutionContextUserSupport implemen
 	private boolean forceSync;
 
 	public StaxEventItemWriter() {
-		setName(ClassUtils.getShortName(StaxEventItemWriter.class));
+		setExecutionContextName(ClassUtils.getShortName(StaxEventItemWriter.class));
 	}
 
 	/**
@@ -343,7 +343,8 @@ public class StaxEventItemWriter<T> extends ExecutionContextUserSupport implemen
 	 */
     @Override
 	public void open(ExecutionContext executionContext) {
-
+                super.open(executionContext);
+        
 		Assert.notNull(resource, "The resource must be set");
 
 		long startAtPosition = 0;
@@ -351,8 +352,8 @@ public class StaxEventItemWriter<T> extends ExecutionContextUserSupport implemen
 
 		// if restart data is provided, restart from provided offset
 		// otherwise start from beginning
-		if (executionContext.containsKey(getKey(RESTART_DATA_NAME))) {
-			startAtPosition = executionContext.getLong(getKey(RESTART_DATA_NAME));
+		if (executionContext.containsKey(getExecutionContextKey(RESTART_DATA_NAME))) {
+			startAtPosition = executionContext.getLong(getExecutionContextKey(RESTART_DATA_NAME));
 			restarted = true;
 		}
 
@@ -576,7 +577,8 @@ public class StaxEventItemWriter<T> extends ExecutionContextUserSupport implemen
 	 */
     @Override
 	public void close() {
-
+                super.close();
+        
 		XMLEventFactory factory = createXmlEventFactory();
 		try {
 			delegateEventWriter.add(factory.createCharacters(""));
@@ -665,11 +667,11 @@ public class StaxEventItemWriter<T> extends ExecutionContextUserSupport implemen
 	 */
     @Override
 	public void update(ExecutionContext executionContext) {
-
+                super.update(executionContext);
 		if (saveState) {
 			Assert.notNull(executionContext, "ExecutionContext must not be null");
-			executionContext.putLong(getKey(RESTART_DATA_NAME), getPosition());
-			executionContext.putLong(getKey(WRITE_STATISTICS_NAME), currentRecordCount);
+			executionContext.putLong(getExecutionContextKey(RESTART_DATA_NAME), getPosition());
+			executionContext.putLong(getExecutionContextKey(WRITE_STATISTICS_NAME), currentRecordCount);
 		}
 	}
 

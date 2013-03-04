@@ -22,12 +22,12 @@ import java.util.Comparator;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.batch.item.ExecutionContext;
+import org.springframework.batch.item.ItemStream;
 import org.springframework.batch.item.ItemStreamException;
-import org.springframework.batch.item.ItemStreamReader;
 import org.springframework.batch.item.ParseException;
 import org.springframework.batch.item.ResourceAware;
 import org.springframework.batch.item.UnexpectedInputException;
-import org.springframework.batch.item.util.ExecutionContextUserSupport;
+import org.springframework.batch.item.support.AbstractItemStreamItemReader;
 import org.springframework.core.io.Resource;
 import org.springframework.util.Assert;
 import org.springframework.util.ClassUtils;
@@ -43,13 +43,11 @@ import org.springframework.util.ClassUtils;
  * @author Robert Kasanicky
  * @author Lucas Ward
  */
-public class MultiResourceItemReader<T> implements ItemStreamReader<T> {
+public class MultiResourceItemReader<T> extends AbstractItemStreamItemReader<T> {
 
 	private static final Log logger = LogFactory.getLog(MultiResourceItemReader.class);
 
 	private static final String RESOURCE_KEY = "resourceIndex";
-
-	private final ExecutionContextUserSupport executionContextUserSupport = new ExecutionContextUserSupport();
 
 	private ResourceAwareItemReaderItemStream<? extends T> delegate;
 
@@ -78,7 +76,7 @@ public class MultiResourceItemReader<T> implements ItemStreamReader<T> {
 		/**
 		 * Compares resource filenames.
 		 */
-        @Override
+		@Override
 		public int compare(Resource r1, Resource r2) {
 			return r1.getFilename().compareTo(r2.getFilename());
 		}
@@ -86,13 +84,13 @@ public class MultiResourceItemReader<T> implements ItemStreamReader<T> {
 	};
 
 	public MultiResourceItemReader() {
-		executionContextUserSupport.setName(ClassUtils.getShortName(MultiResourceItemReader.class));
+		this.setExecutionContextName(ClassUtils.getShortName(MultiResourceItemReader.class));
 	}
 
 	/**
 	 * Reads the next item, jumping to next resource if necessary.
 	 */
-    @Override
+	@Override
 	public T read() throws Exception, UnexpectedInputException, ParseException {
 
 		if (noInput) {
@@ -132,25 +130,26 @@ public class MultiResourceItemReader<T> implements ItemStreamReader<T> {
 			delegate.setResource(resources[currentResource]);
 			delegate.open(new ExecutionContext());
 
-            item = readFromDelegate();
-        }
+			item = readFromDelegate();
+		}
 
 		return item;
 	}
 
-    private T readFromDelegate() throws Exception {
-        T item = delegate.read();
-        if(item instanceof ResourceAware){
-            ((ResourceAware) item).setResource(getCurrentResource());
-        }
-        return item;
-    }
+	private T readFromDelegate() throws Exception {
+		T item = delegate.read();
+		if(item instanceof ResourceAware){
+			((ResourceAware) item).setResource(getCurrentResource());
+		}
+		return item;
+	}
 
-    /**
+	/**
 	 * Close the {@link #setDelegate(ResourceAwareItemReaderItemStream)} reader and reset instance variable values.
 	 */
-    @Override
+	@Override
 	public void close() throws ItemStreamException {
+		super.close();
 		delegate.close();
 		noInput = false;
 	}
@@ -159,9 +158,9 @@ public class MultiResourceItemReader<T> implements ItemStreamReader<T> {
 	 * Figure out which resource to start with in case of restart, open the delegate and restore delegate's position in
 	 * the resource.
 	 */
-    @Override
+	@Override
 	public void open(ExecutionContext executionContext) throws ItemStreamException {
-
+		super.open(executionContext);
 		Assert.notNull(resources, "Resources must be set");
 
 		noInput = false;
@@ -179,8 +178,8 @@ public class MultiResourceItemReader<T> implements ItemStreamReader<T> {
 
 		Arrays.sort(resources, comparator);
 
-		if (executionContext.containsKey(executionContextUserSupport.getKey(RESOURCE_KEY))) {
-			currentResource = executionContext.getInt(executionContextUserSupport.getKey(RESOURCE_KEY));
+		if (executionContext.containsKey(getExecutionContextKey(RESOURCE_KEY))) {
+			currentResource = executionContext.getInt(getExecutionContextKey(RESOURCE_KEY));
 
 			// context could have been saved before reading anything
 			if (currentResource == -1) {
@@ -198,10 +197,11 @@ public class MultiResourceItemReader<T> implements ItemStreamReader<T> {
 	/**
 	 * Store the current resource index and position in the resource.
 	 */
-    @Override
+	@Override
 	public void update(ExecutionContext executionContext) throws ItemStreamException {
+		super.update(executionContext);
 		if (saveState) {
-			executionContext.putInt(executionContextUserSupport.getKey(RESOURCE_KEY), currentResource);
+			executionContext.putInt(getExecutionContextKey(RESOURCE_KEY), currentResource);
 			delegate.update(executionContext);
 		}
 	}

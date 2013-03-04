@@ -54,7 +54,8 @@ public class ChunkMonitorTests {
 		});
 		monitor.registerItemStream(new ItemStreamSupport() {
 			@Override
-			public void close() throws ItemStreamException {
+			public void close() {
+                                super.close();
 				closed = true;
 			}
 		});
