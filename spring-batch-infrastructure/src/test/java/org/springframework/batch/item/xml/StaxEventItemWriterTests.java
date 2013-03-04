@@ -57,10 +57,14 @@ public class StaxEventItemWriterTests {
 			return ClassUtils.getShortName(StaxEventItemWriter.class) + "-testString";
 		}
 	};
+	
+	private JAXBItem jaxbItem = new JAXBItem();
 
 	private JAXBItem jaxbItem = new JAXBItem();
 
 	private List<? extends Object> items = Collections.singletonList(item);
+	
+	private List<? extends Object> jaxbItems = Collections.singletonList(jaxbItem);
 
 	private List<? extends Object> jaxbItems = Collections.singletonList(jaxbItem);
 
@@ -74,6 +78,8 @@ public class StaxEventItemWriterTests {
 			+ "-testString/>";
 
 	private SimpleMarshaller marshaller;
+	
+	private Jaxb2Marshaller jaxbMarshaller;
 
 	private Jaxb2Marshaller jaxbMarshaller;
 
@@ -411,6 +417,89 @@ public class StaxEventItemWriterTests {
 		assertTrue("Wrong content: " + content, content.contains(("</ns:root>")));
 		assertTrue("Wrong content: " + content, content.contains(("<ns:root")));
 	}
+	
+	/**
+	 * Namespace prefixes are properly initialized on restart.
+	 */
+	@Test
+	public void testRootTagWithNamespaceRestart() throws Exception {
+		writer.setMarshaller(jaxbMarshaller);
+		writer.setRootTagName("{http://www.springframework.org/test}root");
+		writer.afterPropertiesSet();
+		writer.open(executionContext);
+		writer.write(jaxbItems);
+		writer.update(executionContext);
+		writer.close();
+		
+		writer = createItemWriter();
+		writer.setMarshaller(jaxbMarshaller);
+		writer.setRootTagName("{http://www.springframework.org/test}root");
+		writer.afterPropertiesSet();
+		writer.open(executionContext);
+		writer.write(jaxbItems);
+		writer.update(executionContext);
+		writer.close();
+		
+		String content = getOutputFileContent();
+		assertEquals("Wrong content: " + content, 
+				"<root xmlns=\"http://www.springframework.org/test\"><item/><item/></root>", content);
+	}
+	
+	/**
+	 * Namespace prefixes are properly initialized on restart.
+	 */
+	@Test
+	public void testRootTagWithNamespaceAndPrefixRestart() throws Exception {
+		writer.setMarshaller(jaxbMarshaller);
+		writer.setRootTagName("{http://www.springframework.org/test}ns:root");
+		writer.afterPropertiesSet();
+		writer.open(executionContext);
+		writer.write(jaxbItems);
+		writer.update(executionContext);
+		writer.close();
+		
+		writer = createItemWriter();
+		writer.setMarshaller(jaxbMarshaller);
+		writer.setRootTagName("{http://www.springframework.org/test}ns:root");
+		writer.afterPropertiesSet();
+		writer.open(executionContext);
+		writer.write(jaxbItems);
+		writer.update(executionContext);
+		writer.close();
+		
+		String content = getOutputFileContent();
+		assertEquals("Wrong content: " + content, 
+				"<ns:root xmlns:ns=\"http://www.springframework.org/test\"><ns:item/><ns:item/></ns:root>", content);
+	}	
+	
+	/**
+	 * Namespace prefixes are properly initialized on restart.
+	 */
+	@Test
+	public void testRootTagWithAdditionalNamespaceRestart() throws Exception {
+		writer.setMarshaller(jaxbMarshaller);
+		writer.setRootTagName("{urn:org.test.foo}foo:root");
+		writer.setRootElementAttributes(Collections.singletonMap("xmlns:ns", "http://www.springframework.org/test"));
+		writer.afterPropertiesSet();
+		writer.open(executionContext);
+		writer.write(jaxbItems);
+		writer.update(executionContext);
+		writer.close();
+		
+		writer = createItemWriter();
+		writer.setMarshaller(jaxbMarshaller);
+		writer.setRootTagName("{urn:org.test.foo}foo:root");
+		writer.setRootElementAttributes(Collections.singletonMap("xmlns:ns", "http://www.springframework.org/test"));
+		writer.afterPropertiesSet();
+		writer.open(executionContext);
+		writer.write(jaxbItems);
+		writer.update(executionContext);
+		writer.close();
+		
+		String content = getOutputFileContent();
+		assertEquals("Wrong content: " + content, 
+				"<foo:root xmlns:foo=\"urn:org.test.foo\" xmlns:ns=\"http://www.springframework.org/test\"><ns:item/><ns:item/></foo:root>", content);
+	}		
 
 	/**
 	 * Namespace prefixes are properly initialized on restart.
@@ -559,6 +648,10 @@ public class StaxEventItemWriterTests {
 		source.afterPropertiesSet();
 
 		return source;
+	}
+	
+	@XmlRootElement(name="item", namespace="http://www.springframework.org/test")
+	private static class JAXBItem {
 	}
 
 	@XmlRootElement(name="item", namespace="http://www.springframework.org/test")
