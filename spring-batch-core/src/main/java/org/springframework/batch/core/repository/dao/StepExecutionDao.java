@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2007 the original author or authors.
+ * Copyright 2006-2013 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,6 +16,7 @@
 
 package org.springframework.batch.core.repository.dao;
 
+import java.util.Collection;
 
 import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.StepExecution;
@@ -34,6 +35,17 @@ public interface StepExecutionDao {
 	void saveStepExecution(StepExecution stepExecution);
 
 	/**
+	 * Save the given collection of StepExecution as a batch.
+	 * 
+	 * Preconditions: StepExecution Id must be null.
+	 * 
+	 * Postconditions: StepExecution Id will be set to a unique Long.
+	 * 
+	 * @param stepExecutions
+	 */
+	void saveStepExecutions(Collection<StepExecution> stepExecutions);
+
+	/**
 	 * Update the given StepExecution
 	 * 
 	 * Preconditions: Id must not be null.
@@ -50,7 +62,7 @@ public interface StepExecutionDao {
 	 * @return a {@link StepExecution}
 	 */
 	StepExecution getStepExecution(JobExecution jobExecution, Long stepExecutionId);
-	
+
 	/**
 	 * Retrieve all the {@link StepExecution} for the parent {@link JobExecution}.
 	 * 

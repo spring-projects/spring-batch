@@ -16,6 +16,8 @@
 
 package org.springframework.batch.core.repository;
 
+import java.util.Collection;
+
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.JobInstance;
@@ -39,6 +41,7 @@ import org.springframework.transaction.annotation.Isolation;
  * @author Lucas Ward
  * @author Dave Syer
  * @author Robert Kasanicky
+ * @author David Turanski
  */
 public interface JobRepository {
 
@@ -114,6 +117,17 @@ public interface JobRepository {
 	 * @param stepExecution
 	 */
 	void add(StepExecution stepExecution);
+
+	/**
+	 * Save a collection of {@link StepExecution}s and each {@link ExecutionContext}. The 
+	 * StepExecution ID will be assigned - it is not permitted that an ID be assigned before calling
+	 * this method. Instead, it should be left blank, to be assigned by {@link JobRepository}.
+	 * 
+	 * Preconditions: {@link StepExecution} must have a valid {@link Step}.
+	 * 
+	 * @param stepExecution
+	 */
+	void addAll(Collection<StepExecution> stepExecutions);
 
 	/**
 	 * Update the {@link StepExecution} (but not its {@link ExecutionContext}).
