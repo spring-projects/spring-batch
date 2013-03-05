@@ -17,6 +17,7 @@
 package org.springframework.batch.core.repository.support;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 
@@ -48,6 +49,7 @@ import org.springframework.util.Assert;
  * @author Lucas Ward
  * @author Dave Syer
  * @author Robert Kasanicky
+ * @author David Turanski
  *
  * @see JobRepository
  * @see JobInstanceDao
@@ -123,12 +125,11 @@ public class SimpleJobRepository implements JobRepository {
 				if (status == BatchStatus.COMPLETED || status == BatchStatus.ABANDONED) {
 					throw new JobInstanceAlreadyCompleteException(
 							"A job instance already exists and is complete for parameters=" + jobParameters
-							+ ".  If you want to run this job again, change the parameters.");
+									+ ".  If you want to run this job again, change the parameters.");
 				}
 			}
 			executionContext = ecDao.getExecutionContext(jobExecutionDao.getLastJobExecution(jobInstance));
-		}
-		else {
+		} else {
 			// no job found, create one
 			jobInstance = jobInstanceDao.createJobInstance(jobName, jobParameters);
 			executionContext = new ExecutionContext();
@@ -165,6 +166,17 @@ public class SimpleJobRepository implements JobRepository {
 		stepExecution.setLastUpdated(new Date(System.currentTimeMillis()));
 		stepExecutionDao.saveStepExecution(stepExecution);
 		ecDao.saveExecutionContext(stepExecution);
+	}
+
+	@Override
+	public void addAll(Collection<StepExecution> stepExecutions) {
+		Assert.notNull(stepExecutions, "Attempt to save a null collection of step executions");
+		for (StepExecution stepExecution : stepExecutions) {
+			validateStepExecution(stepExecution);
+			stepExecution.setLastUpdated(new Date(System.currentTimeMillis()));
+		}
+		stepExecutionDao.saveStepExecutions(stepExecutions);
+		ecDao.saveExecutionContexts(stepExecutions);
 	}
 
 	@Override
@@ -276,6 +288,4 @@ public class SimpleJobRepository implements JobRepository {
 		return jobExecution;
 
 	}
-
-
 }

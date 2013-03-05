@@ -11,6 +11,8 @@ import static org.springframework.batch.core.BatchStatus.FAILED;
 import static org.springframework.batch.core.BatchStatus.STOPPED;
 import static org.springframework.batch.core.BatchStatus.UNKNOWN;
 
+import java.util.Collection;
+
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.batch.core.ExitStatus;
@@ -45,6 +47,7 @@ import org.springframework.transaction.support.TransactionSynchronizationManager
  *
  * @author Lucas Ward
  * @author Dave Syer
+ * @author David Turanski
  *
  */
 public class TaskletStepExceptionTests {
@@ -466,6 +469,10 @@ public class TaskletStepExceptionTests {
 
 		@Override
 		public void updateExecutionContext(JobExecution jobExecution) {
+		}
+
+		@Override
+		public void addAll(Collection<StepExecution> stepExecutions) {
 		}
 	}
 
