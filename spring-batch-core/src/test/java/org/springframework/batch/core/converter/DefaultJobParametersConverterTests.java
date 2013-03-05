@@ -116,7 +116,7 @@ public class DefaultJobParametersConverterTests {
 		JobParameters props = factory.getJobParameters(StringUtils.splitArrayElementsIntoProperties(args, "="));
 		assertNotNull(props);
 		assertEquals("myKey", props.getString("job.key"));
-		assertEquals(33243243L, props.getLong("vendor.id"));
+		assertEquals(33243243L, props.getLong("vendor.id").longValue());
 		Date date = dateFormat.parse("01/23/2008");
 		assertEquals(date, props.getDate("schedule.date"));
 	}
@@ -156,7 +156,7 @@ public class DefaultJobParametersConverterTests {
 		factory.setNumberFormat(new DecimalFormat("#,###"));
 		JobParameters props = factory.getJobParameters(StringUtils.splitArrayElementsIntoProperties(args, "="));
 		assertNotNull(props);
-		assertEquals(1000L, props.getLong("value"));
+		assertEquals(1000L, props.getLong("value").longValue());
 	}
 
 	@Test
@@ -225,7 +225,7 @@ public class DefaultJobParametersConverterTests {
 		JobParameters props = factory.getJobParameters(StringUtils.splitArrayElementsIntoProperties(args, "="));
 		assertNotNull(props);
 		assertEquals(1.23456, props.getDouble("value"), Double.MIN_VALUE);
-		assertEquals(123456, props.getLong("long"));
+		assertEquals(123456, props.getLong("long").longValue());
 
 	}
 

@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2007 the original author or authors.
+ * Copyright 2006-2013 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -33,45 +33,46 @@ import java.util.Map;
  * This class is immutable and therefore thread-safe.
  * 
  * @author Lucas Ward
+ * @author Michael Minella
  * @since 1.0
  */
 @SuppressWarnings("serial")
 public class JobParameters implements Serializable {
 
 	private final Map<String,JobParameter> parameters;
-	
+
 	public JobParameters() {
 		this.parameters = new LinkedHashMap<String, JobParameter>();
 	}
-	
+
 	public JobParameters(Map<String,JobParameter> parameters) {
 		this.parameters = new LinkedHashMap<String,JobParameter>(parameters);
 	}
-	
+
 	/**
 	 * Typesafe Getter for the Long represented by the provided key.
 	 * 
 	 * @param key The key to get a value for
 	 * @return The <code>Long</code> value
 	 */
-	public long getLong(String key){
+	public Long getLong(String key){
 		if (!parameters.containsKey(key)) {
 			return 0L;
 		}
 		Object value = parameters.get(key).getValue();
 		return value==null ? 0L : ((Long)value).longValue();
 	}
-	
+
 	/**
 	 * Typesafe Getter for the Long represented by the provided key.  If the
 	 * key does not exist, the default value will be returned.
 	 * 
 	 * @param key to return the value for
 	 * @param defaultValue to return if the value doesn't exist
-	 * @return the parameter represented by the provided key, defaultValue 
+	 * @return the parameter represented by the provided key, defaultValue
 	 * otherwise.
 	 */
-	public long getLong(String key, long defaultValue){
+	public Long getLong(String key, long defaultValue){
 		if(parameters.containsKey(key)){
 			return getLong(key);
 		}
@@ -90,14 +91,14 @@ public class JobParameters implements Serializable {
 		JobParameter value = parameters.get(key);
 		return value==null ? null : value.toString();
 	}
-	
+
 	/**
 	 * Typesafe Getter for the String represented by the provided key.  If the
 	 * key does not exist, the default value will be returned.
 	 * 
 	 * @param key to return the value for
 	 * @param defaultValue to return if the value doesn't exist
-	 * @return the parameter represented by the provided key, defaultValue 
+	 * @return the parameter represented by the provided key, defaultValue
 	 * otherwise.
 	 */
 	public String getString(String key, String defaultValue){
@@ -108,31 +109,31 @@ public class JobParameters implements Serializable {
 			return defaultValue;
 		}
 	}
-	
+
 	/**
 	 * Typesafe Getter for the Long represented by the provided key.
 	 * 
 	 * @param key The key to get a value for
 	 * @return The <code>Double</code> value
 	 */
-	public double getDouble(String key){
+	public Double getDouble(String key){
 		if (!parameters.containsKey(key)) {
-			return 0L;
+			return 0.0;
 		}
 		Double value = (Double)parameters.get(key).getValue();
 		return value==null ? 0.0 : value.doubleValue();
 	}
-	
+
 	/**
 	 * Typesafe Getter for the Double represented by the provided key.  If the
 	 * key does not exist, the default value will be returned.
 	 * 
 	 * @param key to return the value for
 	 * @param defaultValue to return if the value doesn't exist
-	 * @return the parameter represented by the provided key, defaultValue 
+	 * @return the parameter represented by the provided key, defaultValue
 	 * otherwise.
 	 */
-	public double getDouble(String key, double defaultValue){
+	public Double getDouble(String key, double defaultValue){
 		if(parameters.containsKey(key)){
 			return getDouble(key);
 		}
@@ -140,7 +141,7 @@ public class JobParameters implements Serializable {
 			return defaultValue;
 		}
 	}
-	
+
 	/**
 	 * Typesafe Getter for the Date represented by the provided key.
 	 * 
@@ -150,14 +151,14 @@ public class JobParameters implements Serializable {
 	public Date getDate(String key){
 		return this.getDate(key,null);
 	}
-	
+
 	/**
 	 * Typesafe Getter for the Date represented by the provided key.  If the
 	 * key does not exist, the default value will be returned.
 	 * 
 	 * @param key to return the value for
 	 * @param defaultValue to return if the value doesn't exist
-	 * @return the parameter represented by the provided key, defaultValue 
+	 * @return the parameter represented by the provided key, defaultValue
 	 * otherwise.
 	 */
 	public Date getDate(String key, Date defaultValue){
@@ -168,42 +169,42 @@ public class JobParameters implements Serializable {
 			return defaultValue;
 		}
 	}
-	
+
 	/**
-	 * Get a map of all parameters, including string, long, and date. 
+	 * Get a map of all parameters, including string, long, and date.
 	 * 
 	 * @return an unmodifiable map containing all parameters.
 	 */
 	public Map<String, JobParameter> getParameters(){
 		return new LinkedHashMap<String, JobParameter>(parameters);
 	}
-	
+
 	/**
 	 * @return true if the parameters is empty, false otherwise.
 	 */
 	public boolean isEmpty(){
 		return parameters.isEmpty();
 	}
-	
+
 	@Override
 	public boolean equals(Object obj) {
 		if(obj instanceof JobParameters == false){
 			return false;
 		}
-		
+
 		if(obj == this){
 			return true;
 		}
-		
+
 		JobParameters rhs = (JobParameters)obj;
-		return this.parameters.equals(rhs.parameters); 
+		return this.parameters.equals(rhs.parameters);
 	}
-	
+
 	@Override
 	public int hashCode() {
 		return 17 + 23 * parameters.hashCode();
 	}
-	
+
 	@Override
 	public String toString() {
 		return parameters.toString();
