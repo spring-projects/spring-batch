@@ -602,6 +602,19 @@ public class FlatFileItemWriterTests {
 		writer.write(Collections.singletonList("test2"));
 		assertEquals("test2", readLine());
 	}
+	
+	@Test
+	public void testDeleteOnExitNoRecordsWrittenAfterRestart() throws Exception {
+		writer.setShouldDeleteIfEmpty(true);
+		writer.open(executionContext);
+		writer.write(Collections.singletonList("test2"));
+		writer.update(executionContext);
+		writer.close();
+		assertTrue(outputFile.exists());
+		writer.open(executionContext);
+		writer.close();
+		assertTrue(outputFile.exists());
+	}
 
 	@Test
 	public void testWriteHeaderAfterRestartOnFirstChunk() throws Exception {
