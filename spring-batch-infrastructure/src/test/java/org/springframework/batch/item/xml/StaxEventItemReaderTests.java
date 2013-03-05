@@ -116,7 +116,7 @@ public class StaxEventItemReaderTests {
 
 		source.close();
 	}
-	
+
 	@Test
 	public void testItemCountAwareFragment() throws Exception {
 		StaxEventItemReader<ItemCountAwareFragment> source = createNewItemCountAwareInputSouce();
@@ -127,8 +127,8 @@ public class StaxEventItemReaderTests {
 		assertNull(source.read()); // there are only two fragments
 
 		source.close();
-	}	
-	
+	}
+
 	@Test
 	public void testItemCountAwareFragmentRestart() throws Exception {
 		StaxEventItemReader<ItemCountAwareFragment> source = createNewItemCountAwareInputSouce();
@@ -144,7 +144,7 @@ public class StaxEventItemReaderTests {
 		assertNull(source.read()); // there are only two fragments
 
 		source.close();
-	}	
+	}
 
 	@Test
 	public void testFragmentNamespace() throws Exception {
@@ -265,14 +265,14 @@ public class StaxEventItemReaderTests {
 		assertNull(source.read());
 		source.update(executionContext);
 		source.close();
-		
+
 		assertEquals(3, executionContext.getInt(ClassUtils.getShortName(StaxEventItemReader.class) + ".read.count"));
-		
+
 		source = createNewInputSouce();
 		source.open(executionContext);
 		assertNull(source.read());
 	}
-	
+
 	@Test
 	public void testRestoreWorksFromClosedStream() throws Exception {
 		source.close();
@@ -341,17 +341,17 @@ public class StaxEventItemReaderTests {
 	public void testOpenBadIOInput() throws Exception {
 
 		source.setResource(new AbstractResource() {
-            @Override
+			@Override
 			public String getDescription() {
 				return null;
 			}
 
-            @Override
+			@Override
 			public InputStream getInputStream() throws IOException {
 				throw new IOException();
 			}
 
-            @Override
+			@Override
 			public boolean exists() {
 				return true;
 			}
@@ -456,12 +456,12 @@ public class StaxEventItemReaderTests {
 
 		public static final String MESSAGE = "Unmarshallers on strike.";
 
-        @Override
+		@Override
 		public Object unmarshal(Source source) throws XmlMappingException, IOException {
 			throw new UnmarshallingFailureException(MESSAGE);
 		}
 
-        @Override
+		@Override
 		@SuppressWarnings("rawtypes")
 		public boolean supports(Class clazz) {
 			return true;
@@ -481,7 +481,7 @@ public class StaxEventItemReaderTests {
 
 		return newSource;
 	}
-	
+
 	private StaxEventItemReader<ItemCountAwareFragment> createNewItemCountAwareInputSouce() {
 		Resource resource = new ByteArrayResource(xml.getBytes());
 
@@ -493,7 +493,7 @@ public class StaxEventItemReaderTests {
 		newSource.setSaveState(true);
 
 		return newSource;
-	}	
+	}
 
 	/**
 	 * A simple XMLEvent unmarshaller mock - check for the start and end document events for the fragment root & end
@@ -519,7 +519,7 @@ public class StaxEventItemReaderTests {
 			return events;
 		}
 
-        @Override
+		@Override
 		@SuppressWarnings("rawtypes")
 		public boolean supports(Class clazz) {
 			return true;
@@ -531,7 +531,7 @@ public class StaxEventItemReaderTests {
 		 * @param source
 		 * @return list of the events from fragment body
 		 */
-        @Override
+		@Override
 		public Object unmarshal(Source source) throws XmlMappingException, IOException {
 
 			List<XMLEvent> fragmentContent;
@@ -567,11 +567,12 @@ public class StaxEventItemReaderTests {
 		}
 
 	}
-	
+
+	@SuppressWarnings("unchecked")
 	private static class ItemCountAwareMockFragmentUnmarshaller extends MockFragmentUnmarshaller {
 		@Override
 		public Object unmarshal(Source source) throws XmlMappingException,
-				IOException {
+		IOException {
 			List<XMLEvent> fragment = (List<XMLEvent>) super.unmarshal(source);
 			if(fragment != null) {
 				return new ItemCountAwareFragment(fragment);
@@ -580,33 +581,30 @@ public class StaxEventItemReaderTests {
 			}
 		}
 	}
-	
+
 	private static class ItemCountAwareFragment implements ItemCountAware {
-		
-		private List<XMLEvent> fragment;
-		
-		private int itemCount;			
-		
+
+		private int itemCount;
+
 		public ItemCountAwareFragment(List<XMLEvent> fragment) {
-			this.fragment = fragment;
 		}
-		
+
 		@Override
 		public void setItemCount(int count) {
 			this.itemCount = count;
 		}
-		
+
 		public int getItemCount() {
 			return itemCount;
 		}
-		
+
 	}
 
 	private static class MockStaxEventItemReader extends StaxEventItemReader<List<XMLEvent>> {
 
 		private boolean openCalled = false;
 
-        @Override
+		@Override
 		public void open(ExecutionContext executionContext) {
 			super.open(executionContext);
 			openCalled = true;
@@ -626,17 +624,17 @@ public class StaxEventItemReaderTests {
 		public NonExistentResource() {
 		}
 
-        @Override
+		@Override
 		public boolean exists() {
 			return false;
 		}
 
-        @Override
+		@Override
 		public String getDescription() {
 			return "NonExistantResource";
 		}
 
-        @Override
+		@Override
 		public InputStream getInputStream() throws IOException {
 			return null;
 		}

@@ -32,7 +32,7 @@ public class FlatFileItemReaderTests {
 	private String TEST_STRING = "FlatFileInputTemplate-TestData";
 
 	private FlatFileItemReader<String> reader = new FlatFileItemReader<String>();
-	
+
 	private FlatFileItemReader<Item> itemReader = new FlatFileItemReader<Item>();
 
 	private ExecutionContext executionContext = new ExecutionContext();
@@ -54,18 +54,18 @@ public class FlatFileItemReaderTests {
 			// 1 record = 2 lines
 			boolean pair = true;
 
-            @Override
+			@Override
 			public boolean isEndOfRecord(String line) {
 				pair = !pair;
 				return pair;
 			}
 
-            @Override
+			@Override
 			public String postProcess(String record) {
 				return record;
 			}
 
-            @Override
+			@Override
 			public String preProcess(String record) {
 				return record;
 			}
@@ -92,18 +92,18 @@ public class FlatFileItemReaderTests {
 			// 1 record = 2 lines
 			boolean pair = true;
 
-            @Override
+			@Override
 			public boolean isEndOfRecord(String line) {
 				pair = !pair;
 				return pair;
 			}
 
-            @Override
+			@Override
 			public String postProcess(String record) {
 				return record;
 			}
 
-            @Override
+			@Override
 			public String preProcess(String record) {
 				return record;
 			}
@@ -131,17 +131,17 @@ public class FlatFileItemReaderTests {
 
 		reader.setRecordSeparatorPolicy(new RecordSeparatorPolicy() {
 
-            @Override
+			@Override
 			public boolean isEndOfRecord(String line) {
 				return StringUtils.hasText(line);
 			}
 
-            @Override
+			@Override
 			public String postProcess(String record) {
 				return StringUtils.hasText(record) ? record : null;
 			}
 
-            @Override
+			@Override
 			public String preProcess(String record) {
 				return record;
 			}
@@ -165,7 +165,7 @@ public class FlatFileItemReaderTests {
 			// 1 record = 2 lines
 			boolean pair = true;
 
-            @Override
+			@Override
 			public boolean isEndOfRecord(String line) {
 				if (StringUtils.hasText(line)) {
 					pair = !pair;
@@ -173,12 +173,12 @@ public class FlatFileItemReaderTests {
 				return pair;
 			}
 
-            @Override
+			@Override
 			public String postProcess(String record) {
 				return StringUtils.hasText(record) ? record : null;
 			}
 
-            @Override
+			@Override
 			public String preProcess(String record) {
 				return record;
 			}
@@ -323,17 +323,17 @@ public class FlatFileItemReaderTests {
 	public void testOpenBadIOInput() throws Exception {
 
 		reader.setResource(new AbstractResource() {
-            @Override
+			@Override
 			public String getDescription() {
 				return null;
 			}
 
-            @Override
+			@Override
 			public InputStream getInputStream() throws IOException {
 				throw new IOException();
 			}
 
-            @Override
+			@Override
 			public boolean exists() {
 				return true;
 			}
@@ -408,7 +408,7 @@ public class FlatFileItemReaderTests {
 	@Test
 	public void testMappingExceptionWrapping() throws Exception {
 		LineMapper<String> exceptionLineMapper = new LineMapper<String>() {
-            @Override
+			@Override
 			public String mapLine(String line, int lineNumber) throws Exception {
 				if (lineNumber == 2) {
 					throw new Exception("Couldn't map line 2");
@@ -433,7 +433,7 @@ public class FlatFileItemReaderTests {
 			assertEquals("Parsing error at line: 2 in resource=[resource loaded from byte array], input=[testLine2]", expected.getMessage());
 		}
 	}
-	
+
 	@Test
 	public void testItemCountAware() throws Exception {
 		itemReader.open(executionContext);
@@ -445,13 +445,13 @@ public class FlatFileItemReaderTests {
 		assertEquals(2, item2.getItemCount());
 		itemReader.update(executionContext);
 		itemReader.close();
-		
+
 		itemReader.open(executionContext);
 		Item item3 = itemReader.read();
 		assertEquals("testLine3", item3.getValue());
 		assertEquals(3, item3.getItemCount());
 	}
-	
+
 	@Test
 	public void testItemCountAwareMultiLine() throws Exception {
 		itemReader.setRecordSeparatorPolicy(new RecordSeparatorPolicy() {
@@ -459,7 +459,7 @@ public class FlatFileItemReaderTests {
 			// 1 record = 2 lines
 			boolean pair = true;
 
-            @Override
+			@Override
 			public boolean isEndOfRecord(String line) {
 				if (StringUtils.hasText(line)) {
 					pair = !pair;
@@ -467,17 +467,17 @@ public class FlatFileItemReaderTests {
 				return pair;
 			}
 
-            @Override
+			@Override
 			public String postProcess(String record) {
 				return StringUtils.hasText(record) ? record : null;
 			}
 
-            @Override
+			@Override
 			public String preProcess(String record) {
 				return record;
 			}
-		});		
-		
+		});
+
 		itemReader.open(executionContext);
 		Item item1 = itemReader.read();
 		assertEquals("testLine1testLine2", item1.getValue());
@@ -487,12 +487,12 @@ public class FlatFileItemReaderTests {
 		assertEquals(2, item2.getItemCount());
 		itemReader.update(executionContext);
 		itemReader.close();
-		
+
 		itemReader.open(executionContext);
 		Item item3 = itemReader.read();
 		assertEquals("testLine5testLine6", item3.getValue());
 		assertEquals(3, item3.getItemCount());
-	}	
+	}
 
 	private Resource getInputResource(String input) {
 		return new ByteArrayResource(input.getBytes());
@@ -503,57 +503,58 @@ public class FlatFileItemReaderTests {
 		public NonExistentResource() {
 		}
 
-        @Override
+		@Override
 		public boolean exists() {
 			return false;
 		}
 
-        @Override
+		@Override
 		public String getDescription() {
 			return "NonExistentResource";
 		}
 
-        @Override
+		@Override
 		public InputStream getInputStream() throws IOException {
 			return null;
 		}
 	}
-	
+
 	private static class Item implements ItemCountAware {
-		
+
 		private String value;
-		
+
 		private int itemCount;
-		
+
 		public Item(String value) {
 			this.value = value;
 		}
-		
+
+		@SuppressWarnings("unused")
 		public void setValue(String value) {
 			this.value = value;
 		}
-		
+
 		public String getValue() {
 			return value;
 		}
-		
+
 		@Override
 		public void setItemCount(int count) {
 			this.itemCount = count;
 		}
-		
+
 		public int getItemCount() {
 			return itemCount;
 		}
-		
+
 	}
-	
+
 	private static final class ItemLineMapper implements LineMapper<Item>  {
 
 		@Override
 		public Item mapLine(String line, int lineNumber) throws Exception {
 			return new Item(line);
 		}
-		
+
 	}
 }
