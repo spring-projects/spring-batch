@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2007 the original author or authors.
+ * Copyright 2006-2013 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,6 +17,7 @@
 package org.springframework.batch.item.support;
 
 import org.springframework.batch.item.ExecutionContext;
+import org.springframework.batch.item.ItemCountAware;
 import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.ItemStreamException;
 import org.springframework.batch.item.ParseException;
@@ -73,13 +74,17 @@ public abstract class AbstractItemCountingItemStreamItemReader<T> extends Abstra
 		}
 	}
 
-    @Override
+	@Override
 	public final T read() throws Exception, UnexpectedInputException, ParseException {
 		if (currentItemCount >= maxItemCount) {
 			return null;
 		}
 		currentItemCount++;
-		return doRead();
+		T item = doRead();
+		if(item instanceof ItemCountAware) {
+			((ItemCountAware) item).setItemCount(currentItemCount);
+		}
+		return item;
 	}
 
 	protected int getCurrentItemCount() {
@@ -115,9 +120,9 @@ public abstract class AbstractItemCountingItemStreamItemReader<T> extends Abstra
 		this.maxItemCount = count;
 	}
 
-    @Override
+	@Override
 	public void close() throws ItemStreamException {
-                super.close();
+		super.close();
 		currentItemCount = 0;
 		try {
 			doClose();
@@ -127,9 +132,9 @@ public abstract class AbstractItemCountingItemStreamItemReader<T> extends Abstra
 		}
 	}
 
-    @Override
+	@Override
 	public void open(ExecutionContext executionContext) throws ItemStreamException {
-                super.open(executionContext);
+		super.open(executionContext);
 		try {
 			doOpen();
 		}
@@ -161,9 +166,9 @@ public abstract class AbstractItemCountingItemStreamItemReader<T> extends Abstra
 
 	}
 
-    @Override
+	@Override
 	public void update(ExecutionContext executionContext) throws ItemStreamException {
-                super.update(executionContext);
+		super.update(executionContext);
 		if (saveState) {
 			Assert.notNull(executionContext, "ExecutionContext must not be null");
 			executionContext.putInt(getExecutionContextKey(READ_COUNT), currentItemCount);
@@ -182,7 +187,7 @@ public abstract class AbstractItemCountingItemStreamItemReader<T> extends Abstra
 	 * @param name the name for the component
 	 */
 	public void setName(String name) {
-                this.setExecutionContextName(name);
+		this.setExecutionContextName(name);
 	}
 
 	/**
