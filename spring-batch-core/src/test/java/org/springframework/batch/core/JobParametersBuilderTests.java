@@ -1,6 +1,3 @@
-/**
- *
- */
 package org.springframework.batch.core;
 
 import static org.junit.Assert.assertEquals;
@@ -14,6 +11,7 @@ import org.junit.Test;
 
 /**
  * @author Lucas Ward
+ * @author Michael Minella
  *
  */
 public class JobParametersBuilderTests {
@@ -29,7 +27,7 @@ public class JobParametersBuilderTests {
 		parametersBuilder.addString("STRING", "string value", false);
 		JobParameters parameters = parametersBuilder.toJobParameters();
 		assertEquals(date, parameters.getDate("SCHEDULE_DATE"));
-		assertEquals(1L, parameters.getLong("LONG"));
+		assertEquals(1L, parameters.getLong("LONG").longValue());
 		assertEquals("string value", parameters.getString("STRING"));
 		assertFalse(parameters.getParameters().get("SCHEDULE_DATE").isIdentifying());
 		assertFalse(parameters.getParameters().get("LONG").isIdentifying());
@@ -43,7 +41,7 @@ public class JobParametersBuilderTests {
 		parametersBuilder.addString("STRING", "string value");
 		JobParameters parameters = parametersBuilder.toJobParameters();
 		assertEquals(date, parameters.getDate("SCHEDULE_DATE"));
-		assertEquals(1L, parameters.getLong("LONG"));
+		assertEquals(1L, parameters.getLong("LONG").longValue());
 		assertEquals("string value", parameters.getString("STRING"));
 	}
 
@@ -54,7 +52,7 @@ public class JobParametersBuilderTests {
 		parametersBuilder.addString("STRING", null);
 		JobParameters parameters = parametersBuilder.toJobParameters();
 		assertEquals(null, parameters.getDate("SCHEDULE_DATE"));
-		assertEquals(0L, parameters.getLong("LONG"));
+		assertEquals(0L, parameters.getLong("LONG").longValue());
 		assertEquals(null, parameters.getString("STRING"));
 	}
 
