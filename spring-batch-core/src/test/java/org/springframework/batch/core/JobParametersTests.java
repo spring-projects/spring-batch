@@ -1,6 +1,3 @@
-/**
- *
- */
 package org.springframework.batch.core;
 
 import static org.junit.Assert.assertEquals;
@@ -21,6 +18,7 @@ import org.springframework.batch.support.SerializationUtils;
 /**
  * @author Lucas Ward
  * @author Dave Syer
+ * @author Michael Minella
  *
  */
 public class JobParametersTests {
@@ -66,8 +64,8 @@ public class JobParametersTests {
 
 	@Test
 	public void testGetLong() {
-		assertEquals(1L, parameters.getLong("long.key1"));
-		assertEquals(2L, parameters.getLong("long.key2"));
+		assertEquals(1L, parameters.getLong("long.key1").longValue());
+		assertEquals(2L, parameters.getLong("long.key2").longValue());
 	}
 
 	@Test
@@ -91,12 +89,12 @@ public class JobParametersTests {
 	@Test
 	public void testGetEmptyLong() {
 		parameters = new JobParameters(Collections.singletonMap("long1", new JobParameter((Long)null, true)));
-		assertEquals(0L, parameters.getLong("long1"));
+		assertEquals(0L, parameters.getLong("long1").longValue());
 	}
 
 	@Test
 	public void testGetMissingLong() {
-		assertEquals(0L, parameters.getLong("missing.long1"));
+		assertEquals(0L, parameters.getLong("missing.long1").longValue());
 	}
 
 	@Test
@@ -197,7 +195,7 @@ public class JobParametersTests {
 
 	@Test
 	public void testLongReturns0WhenKeyDoesntExit(){
-		assertEquals(0L,new JobParameters().getLong("keythatdoesntexist"));
+		assertEquals(0L,new JobParameters().getLong("keythatdoesntexist").longValue());
 	}
 
 	@Test
