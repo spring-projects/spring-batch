@@ -18,12 +18,11 @@ package org.springframework.batch.core.repository.support;
 
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.verify;
 import static org.junit.Assert.*;
-
 
 import java.util.ArrayList;
 import java.util.List;
-
 
 import org.junit.Before;
 import org.junit.Test;
@@ -126,8 +125,7 @@ public class SimpleJobRepositoryTests {
 		try {
 			jobRepository.update(jobExecution);
 			fail();
-		}
-		catch (Exception ex) {
+		} catch (Exception ex) {
 			// expected
 		}
 	}
@@ -151,14 +149,13 @@ public class SimpleJobRepositoryTests {
 		try {
 			jobRepository.add(stepExecution);
 			fail();
-		}
-		catch (Exception ex) {
+		} catch (Exception ex) {
 			// expected
 		}
 	}
 
 	@Test
-	public void testSaveStepExecutionSetsLastUpdated(){
+	public void testSaveStepExecutionSetsLastUpdated() {
 
 		StepExecution stepExecution = new StepExecution("stepName", jobExecution);
 
@@ -173,7 +170,25 @@ public class SimpleJobRepositoryTests {
 	}
 
 	@Test
-	public void testUpdateStepExecutionSetsLastUpdated(){
+	public void testSaveStepExecutions() {
+		List<StepExecution> stepExecutions = new ArrayList<StepExecution>();
+		for (int i = 0; i < 3; i++) {
+			StepExecution stepExecution = new StepExecution("stepName" + i, jobExecution);
+			stepExecutions.add(stepExecution);
+		}
+
+		jobRepository.addAll(stepExecutions);
+		verify(stepExecutionDao).saveStepExecutions(stepExecutions);
+		verify(ecDao).saveExecutionContexts(stepExecutions);
+	}
+
+	@Test(expected = IllegalArgumentException.class)
+	public void testSaveNullStepExecutions() {
+		jobRepository.addAll(null);
+	}
+
+	@Test
+	public void testUpdateStepExecutionSetsLastUpdated() {
 
 		StepExecution stepExecution = new StepExecution("stepName", jobExecution);
 		stepExecution.setId(2343L);
@@ -189,7 +204,7 @@ public class SimpleJobRepositoryTests {
 	}
 
 	@Test
-	public void testInterrupted(){
+	public void testInterrupted() {
 
 		jobExecution.setStatus(BatchStatus.STOPPING);
 		StepExecution stepExecution = new StepExecution("stepName", jobExecution);

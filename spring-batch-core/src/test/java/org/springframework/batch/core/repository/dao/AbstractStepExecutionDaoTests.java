@@ -21,8 +21,10 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.fail;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
+import java.util.List;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -117,6 +119,53 @@ public abstract class AbstractStepExecutionDaoTests extends AbstractTransactiona
 
 	@Transactional
 	@Test
+	public void testSaveAndGetExecutions() {
+
+		List<StepExecution> stepExecutions = new ArrayList<StepExecution>();
+		for (int i = 0; i < 3; i++) {
+			StepExecution se = new StepExecution("step" + i, jobExecution);
+			se.setStatus(BatchStatus.STARTED);
+			se.setReadSkipCount(i);
+			se.setProcessSkipCount(i);
+			se.setWriteSkipCount(i);
+			se.setProcessSkipCount(i);
+			se.setRollbackCount(i);
+			se.setLastUpdated(new Date(System.currentTimeMillis()));
+			se.setReadCount(i);
+			se.setFilterCount(i);
+			se.setWriteCount(i);
+			stepExecutions.add(se);
+		}
+
+		dao.saveStepExecutions(stepExecutions);
+
+		for (int i = 0; i < 3; i++) {
+
+			StepExecution retrieved = dao.getStepExecution(jobExecution, stepExecutions.get(i).getId());
+
+			assertStepExecutionsAreEqual(stepExecutions.get(i), retrieved);
+			assertNotNull(retrieved.getVersion());
+			assertNotNull(retrieved.getJobExecution());
+			assertNotNull(retrieved.getJobExecution().getId());
+			assertNotNull(retrieved.getJobExecution().getJobId());
+			assertNotNull(retrieved.getJobExecution().getJobInstance());
+		}
+	}
+
+	@Transactional
+	@Test(expected = IllegalArgumentException.class)
+	public void testSaveNullCollectionThrowsException() {
+		dao.saveStepExecutions(null);
+	}
+
+	@Transactional
+	@Test
+	public void testSaveEmptyCollection() {
+		dao.saveStepExecutions(new ArrayList<StepExecution>());
+	}
+
+	@Transactional
+	@Test
 	public void testSaveAndGetNonExistentExecution() {
 		assertNull(dao.getStepExecution(jobExecution, 45677L));
 	}
@@ -152,8 +201,7 @@ public abstract class AbstractStepExecutionDaoTests extends AbstractTransactiona
 		try {
 			dao.saveStepExecution(stepExecution);
 			fail();
-		}
-		catch (IllegalArgumentException e) {
+		} catch (IllegalArgumentException e) {
 			// expected
 		}
 	}
@@ -168,8 +216,7 @@ public abstract class AbstractStepExecutionDaoTests extends AbstractTransactiona
 		try {
 			dao.saveStepExecution(stepExecution);
 			fail();
-		}
-		catch (IllegalArgumentException e) {
+		} catch (IllegalArgumentException e) {
 			// expected
 		}
 	}
@@ -221,8 +268,7 @@ public abstract class AbstractStepExecutionDaoTests extends AbstractTransactiona
 		try {
 			dao.updateStepExecution(exec2);
 			fail();
-		}
-		catch (OptimisticLockingFailureException e) {
+		} catch (OptimisticLockingFailureException e) {
 			// expected
 		}
 

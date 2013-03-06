@@ -42,13 +42,15 @@ public class MapExecutionContextDao implements ExecutionContextDao {
 
 	private static final class ContextKey implements Comparable<ContextKey>, Serializable {
 
-		private static enum Type { STEP, JOB; }
+		private static enum Type {
+			STEP, JOB;
+		}
 
 		private final Type type;
 		private final long id;
 
 		private ContextKey(Type type, long id) {
-			if(type == null) {
+			if (type == null) {
 				throw new IllegalStateException("Need a non-null type for a context");
 			}
 			this.type = type;
@@ -57,15 +59,15 @@ public class MapExecutionContextDao implements ExecutionContextDao {
 
 		@Override
 		public int compareTo(ContextKey them) {
-			if(them == null) {
+			if (them == null) {
 				return 1;
 			}
 			final int idCompare = new Long(this.id).compareTo(new Long(them.id)); // JDK6 Make this Long.compare(x,y)
-			if(idCompare != 0) {
+			if (idCompare != 0) {
 				return idCompare;
 			}
 			final int typeCompare = this.type.compareTo(them.type);
-			if(typeCompare != 0) {
+			if (typeCompare != 0) {
 				return typeCompare;
 			}
 			return 0;
@@ -73,17 +75,17 @@ public class MapExecutionContextDao implements ExecutionContextDao {
 
 		@Override
 		public boolean equals(Object them) {
-			if(them == null) {
+			if (them == null) {
 				return false;
 			}
-			if(them instanceof ContextKey) {
-				return this.equals((ContextKey)them);
+			if (them instanceof ContextKey) {
+				return this.equals((ContextKey) them);
 			}
 			return false;
 		}
 
 		public boolean equals(ContextKey them) {
-			if(them == null) {
+			if (them == null) {
 				return false;
 			}
 			return this.id == them.id && this.type.equals(them.type);
@@ -91,17 +93,24 @@ public class MapExecutionContextDao implements ExecutionContextDao {
 
 		@Override
 		public int hashCode() {
-			int value = (int)(id^(id>>>32));
-			switch(type) {
-			case STEP: return value;
-			case JOB: return ~value;
-			default: throw new IllegalStateException("Unknown type encountered in switch: " + type);
+			int value = (int) (id ^ (id >>> 32));
+			switch (type) {
+			case STEP:
+				return value;
+			case JOB:
+				return ~value;
+			default:
+				throw new IllegalStateException("Unknown type encountered in switch: " + type);
 			}
 		}
 
-		public static ContextKey step(long id) { return new ContextKey(Type.STEP, id); }
+		public static ContextKey step(long id) {
+			return new ContextKey(Type.STEP, id);
+		}
 
-		public static ContextKey job(long id) { return new ContextKey(Type.JOB, id); }
+		public static ContextKey job(long id) {
+			return new ContextKey(Type.JOB, id);
+		}
 	}
 
 	public void clear() {
@@ -148,12 +157,12 @@ public class MapExecutionContextDao implements ExecutionContextDao {
 		updateExecutionContext(stepExecution);
 	}
 
-	 
 	@Override
 	public void saveExecutionContexts(Collection<StepExecution> stepExecutions) {
-		Assert.notNull(stepExecutions,"Attempt to save a nulk collection of step executions");
-		for (StepExecution stepExecution: stepExecutions) {
+		Assert.notNull(stepExecutions, "Attempt to save a null collection of step executions");
+		for (StepExecution stepExecution : stepExecutions) {
 			saveExecutionContext(stepExecution);
+			saveExecutionContext(stepExecution.getJobExecution());
 		}
 	}
 
