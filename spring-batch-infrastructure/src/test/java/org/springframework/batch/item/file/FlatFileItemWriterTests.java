@@ -25,8 +25,9 @@ import static org.junit.Assert.fail;
 
 import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileReader;
+import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.io.Writer;
 import java.nio.charset.UnsupportedCharsetException;
 import java.util.ArrayList;
@@ -88,6 +89,7 @@ public class FlatFileItemWriterTests {
 		writer.setLineAggregator(new PassThroughLineAggregator<String>());
 		writer.afterPropertiesSet();
 		writer.setSaveState(true);
+		writer.setEncoding("UTF-8");
 		executionContext = new ExecutionContext();
 	}
 
@@ -110,7 +112,7 @@ public class FlatFileItemWriterTests {
 	private String readLine() throws IOException {
 
 		if (reader == null) {
-			reader = new BufferedReader(new FileReader(outputFile));
+			reader = new BufferedReader(new InputStreamReader(new FileInputStream(outputFile), "UTF-8"));
 		}
 
 		return reader.readLine();
@@ -125,7 +127,7 @@ public class FlatFileItemWriterTests {
 			reader = null;
 		}
 	}
-
+	
 	@Test
 	public void testWriteWithMultipleOpen() throws Exception {
 		writer.open(executionContext);
@@ -429,6 +431,76 @@ public class FlatFileItemWriterTests {
 		assertEquals(3, executionContext.getLong(ClassUtils.getShortName(FlatFileItemWriter.class) + ".written"));
 
 	}
+	
+	@Test
+	// BATCH-1959
+	public void testTransactionalRestartWithMultiByteCharacter() throws Exception {
+
+		writer.setFooterCallback(new FlatFileFooterCallback() {
+
+            @Override
+			public void writeFooter(Writer writer) throws IOException {
+				writer.write("footer");
+			}
+
+		});
+
+		writer.open(executionContext);
+
+		PlatformTransactionManager transactionManager = new ResourcelessTransactionManager();
+
+		new TransactionTemplate(transactionManager).execute(new TransactionCallback() {
+            @Override
+			public Object doInTransaction(TransactionStatus status) {
+				try {
+					// write some lines
+					writer.write(Arrays.asList(new String[] { "téstLine1", "téstLine2", "téstLine3" }));
+					// write more lines
+					writer.write(Arrays.asList(new String[] { "téstLine4", "téstLine5" }));
+				}
+				catch (Exception e) {
+					throw new UnexpectedInputException("Could not write data", e);
+				}
+				// get restart data
+				writer.update(executionContext);
+				return null;
+			}
+		});
+		// close template
+		writer.close();
+
+		// init with correct data
+		writer.open(executionContext);
+
+		new TransactionTemplate(transactionManager).execute(new TransactionCallback() {
+            @Override
+			public Object doInTransaction(TransactionStatus status) {
+				try {
+					// write more lines
+					writer.write(Arrays.asList(new String[] { "téstLine6", "téstLine7", "téstLine8" }));
+				}
+				catch (Exception e) {
+					throw new UnexpectedInputException("Could not write data", e);
+				}
+				// get restart data
+				writer.update(executionContext);
+				return null;
+			}
+		});
+		// close template
+		writer.close();
+
+		// verify what was written to the file
+		for (int i = 1; i <= 8; i++) {
+			assertEquals("téstLine" + i, readLine());
+		}
+
+		assertEquals("footer", readLine());
+
+		// 3 lines were written to the file after restart
+		assertEquals(3, executionContext.getLong(ClassUtils.getShortName(FlatFileItemWriter.class) + ".written"));
+
+	}	
 
 	@Test
 	public void testOpenWithNonWritableFile() throws Exception {

@@ -16,10 +16,12 @@
 package org.springframework.batch.support.transaction;
 
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.io.Writer;
 import java.nio.ByteBuffer;
 import java.nio.channels.FileChannel;
 
+import org.springframework.batch.item.WriteFailedException;
 import org.springframework.transaction.support.TransactionSynchronizationAdapter;
 import org.springframework.transaction.support.TransactionSynchronizationManager;
 
@@ -137,13 +139,17 @@ public class TransactionAwareBufferedWriter extends Writer {
 	 * Convenience method for clients to determine if there is any unflushed
 	 * data.
 	 * 
-	 * @return the current size of unflushed buffered data
+	 * @return the current size (in bytes) of unflushed buffered data
 	 */
 	public long getBufferSize() {
 		if (!transactionActive()) {
 			return 0L;
 		}
-		return getCurrentBuffer().length();
+		try {			
+			return getCurrentBuffer().toString().getBytes(encoding).length;
+		} catch (UnsupportedEncodingException e) {
+			throw new WriteFailedException("Could not determine buffer size because of unsupported encoding: " + encoding, e);
+		}
 	}
 
 	/**
