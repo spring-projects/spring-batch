@@ -25,6 +25,7 @@ import org.springframework.batch.core.JobInterruptedException;
 import org.springframework.batch.core.StartLimitExceededException;
 import org.springframework.batch.core.Step;
 import org.springframework.batch.core.StepExecution;
+import org.springframework.batch.core.partition.support.PartitionStep;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.repository.JobRestartException;
 import org.springframework.batch.item.ExecutionContext;
@@ -36,6 +37,7 @@ import org.springframework.util.Assert;
  * concerns.
  *
  * @author Dave Syer
+ * @author Will Schipp
  *
  */
 public class SimpleStepHandler implements StepHandler, InitializingBean {
@@ -201,6 +203,16 @@ public class SimpleStepHandler implements StepHandler, InitializingBean {
 					+ "so it may be dangerous to proceed. Manual intervention is probably necessary.");
 		}
 
+		//test for a remote step
+		if (step instanceof PartitionStep) {
+			if (stepStatus == BatchStatus.ABANDONED) {
+				// step is complete, false should be returned, indicating that the
+				// step should not be started
+				logger.info("Step already complete or not restartable, so no action to execute: " + lastStepExecution);
+				return false;
+			}//end if
+		}//end if
+		
 		if ((stepStatus == BatchStatus.COMPLETED && step.isAllowStartIfComplete() == false)
 				|| stepStatus == BatchStatus.ABANDONED) {
 			// step is complete, false should be returned, indicating that the
