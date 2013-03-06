@@ -17,6 +17,7 @@ package org.springframework.batch.core.repository.dao;
 
 import java.lang.reflect.Field;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
@@ -136,5 +137,13 @@ public class MapStepExecutionDao implements StepExecutionDao {
 			copy.add(copy(exec));
 		}
 		jobExecution.addStepExecutions(copy);
+	}
+
+	@Override
+	public void saveStepExecutions(Collection<StepExecution> stepExecutions) {
+		Assert.notNull(stepExecutions,"Attempt to save an null collect of step executions");
+		for (StepExecution stepExecution: stepExecutions) {
+			saveStepExecution(stepExecution);
+		}
 	}
 }

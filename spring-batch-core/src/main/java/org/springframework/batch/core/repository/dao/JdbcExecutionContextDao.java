@@ -22,7 +22,9 @@ import java.io.IOException;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.Collection;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -32,6 +34,7 @@ import org.springframework.batch.core.StepExecution;
 import org.springframework.batch.core.repository.ExecutionContextSerializer;
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.core.serializer.Serializer;
+import org.springframework.jdbc.core.BatchPreparedStatementSetter;
 import org.springframework.jdbc.core.PreparedStatementSetter;
 import org.springframework.jdbc.core.simple.ParameterizedRowMapper;
 import org.springframework.jdbc.support.lob.DefaultLobHandler;
@@ -48,6 +51,7 @@ import org.springframework.util.Assert;
  * @author Robert Kasanicky
  * @author Thomas Risberg
  * @author Michael Minella
+ * @author David Turanski
  */
 public class JdbcExecutionContextDao extends AbstractJdbcBatchMetadataDao implements ExecutionContextDao {
 
@@ -180,6 +184,20 @@ public class JdbcExecutionContextDao extends AbstractJdbcBatchMetadataDao implem
 		persistSerializedContext(executionId, serializedContext, INSERT_STEP_EXECUTION_CONTEXT);
 	}
 
+	@Override
+	public void saveExecutionContexts(Collection<StepExecution> stepExecutions) {
+		Assert.notNull(stepExecutions, "Attempt to save an null collection of step executions");
+		Map<Long, String> serializedContexts = new HashMap<Long, String>(stepExecutions.size());
+		for (StepExecution stepExecution : stepExecutions) {
+			Long executionId = stepExecution.getId();
+			ExecutionContext executionContext = stepExecution.getExecutionContext();
+			Assert.notNull(executionId, "ExecutionId must not be null.");
+			Assert.notNull(executionContext, "The ExecutionContext must not be null.");
+			serializedContexts.put(executionId, serializeContext(executionContext));
+		}
+		persistSerializedContexts(serializedContexts, INSERT_STEP_EXECUTION_CONTEXT);
+	}
+
 	public void setLobHandler(LobHandler lobHandler) {
 		this.lobHandler = lobHandler;
 	}
@@ -220,6 +238,49 @@ public class JdbcExecutionContextDao extends AbstractJdbcBatchMetadataDao implem
 					ps.setNull(2, getClobTypeToUse());
 				}
 				ps.setLong(3, executionId);
+			}
+		});
+	}
+
+	/**
+	 * @param executionId
+	 * @param serializedContext
+	 * @param sql with parameters (shortContext, longContext, executionId)
+	 */
+	private void persistSerializedContexts(final Map<Long, String> serializedContexts, String sql) {
+
+		final Iterator<Long> executionIdIterator = serializedContexts.keySet().iterator();
+
+		getJdbcTemplate().batchUpdate(getQuery(sql), new BatchPreparedStatementSetter() {
+			@Override
+			public void setValues(PreparedStatement ps, int i) throws SQLException {
+				Long executionId = executionIdIterator.next();
+				String serializedContext = serializedContexts.get(executionId);
+				String shortContext;
+				String longContext;
+				if (serializedContext.length() > shortContextLength) {
+					// Overestimate length of ellipsis to be on the safe side with
+					// 2-byte chars
+					shortContext = serializedContext.substring(0, shortContextLength - 8) + " ...";
+					longContext = serializedContext;
+				}
+				else {
+					shortContext = serializedContext;
+					longContext = null;
+				}
+				ps.setString(1, shortContext);
+				if (longContext != null) {
+					lobHandler.getLobCreator().setClobAsString(ps, 2, longContext);
+				}
+				else {
+					ps.setNull(2, getClobTypeToUse());
+				}
+				ps.setLong(3, executionId);
+			}
+
+			@Override
+			public int getBatchSize() {
+				return serializedContexts.size();
 			}
 		});
 	}

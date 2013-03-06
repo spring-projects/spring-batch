@@ -1,6 +1,3 @@
-/**
- *
- */
 package org.springframework.batch.core.step.item;
 
 import static org.junit.Assert.assertEquals;
@@ -10,6 +7,8 @@ import static org.springframework.batch.core.BatchStatus.COMPLETED;
 import static org.springframework.batch.core.BatchStatus.FAILED;
 import static org.springframework.batch.core.BatchStatus.STOPPED;
 import static org.springframework.batch.core.BatchStatus.UNKNOWN;
+
+import java.util.Collection;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -45,6 +44,7 @@ import org.springframework.transaction.support.TransactionSynchronizationManager
  *
  * @author Lucas Ward
  * @author Dave Syer
+ * @author David Turanski
  *
  */
 public class TaskletStepExceptionTests {
@@ -184,7 +184,7 @@ public class TaskletStepExceptionTests {
 		taskletStep.setStreams(new ItemStream[] { new ItemStreamSupport() {
 			@Override
 			public void close() throws ItemStreamException {
-                                super.close();
+				super.close();
 				throw exception;
 			}
 		} });
@@ -466,6 +466,10 @@ public class TaskletStepExceptionTests {
 
 		@Override
 		public void updateExecutionContext(JobExecution jobExecution) {
+		}
+
+		@Override
+		public void addAll(Collection<StepExecution> stepExecutions) {
 		}
 	}
 

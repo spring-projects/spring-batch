@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2007 the original author or authors.
+ * Copyright 2006-2013 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,6 +16,8 @@
 
 package org.springframework.batch.core.repository.dao;
 
+import java.util.Collection;
+
 import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.StepExecution;
 import org.springframework.batch.item.ExecutionContext;
@@ -24,6 +26,7 @@ import org.springframework.batch.item.ExecutionContext;
  * DAO interface for persisting and retrieving {@link ExecutionContext}s.
  * 
  * @author Robert Kasanicky
+ * @author David Turanski
  */
 public interface ExecutionContextDao {
 
@@ -52,6 +55,13 @@ public interface ExecutionContextDao {
 	 * @param stepExecution
 	 */
 	void saveExecutionContext(final StepExecution stepExecution);
+
+	/**
+	 * Persist the execution context associated with each stepExecution in a given collection,
+	 * persistent entry for the context should not exist yet.
+	 * @param stepExecution
+	 */
+	void saveExecutionContexts(final Collection<StepExecution> stepExecutions);
 
 	/**
 	 * Persist the updates of execution context associated with the given

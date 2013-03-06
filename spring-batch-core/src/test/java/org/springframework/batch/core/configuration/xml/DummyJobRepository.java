@@ -15,6 +15,8 @@
  */
 package org.springframework.batch.core.configuration.xml;
 
+import java.util.Collection;
+
 import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.JobInstance;
 import org.springframework.batch.core.JobParameters;
@@ -27,6 +29,7 @@ import org.springframework.beans.factory.BeanNameAware;
 
 /**
  * @author Dan Garrette
+ * @author David Turanski
  * @since 2.0.1
  */
 public class DummyJobRepository implements JobRepository, BeanNameAware {
@@ -86,6 +89,10 @@ public class DummyJobRepository implements JobRepository, BeanNameAware {
 
 	@Override
 	public void updateExecutionContext(JobExecution jobExecution) {
+	}
+
+	@Override
+	public void addAll(Collection<StepExecution> stepExecutions) {
 	}
 
 }
