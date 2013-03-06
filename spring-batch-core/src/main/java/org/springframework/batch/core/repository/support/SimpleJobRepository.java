@@ -125,11 +125,12 @@ public class SimpleJobRepository implements JobRepository {
 				if (status == BatchStatus.COMPLETED || status == BatchStatus.ABANDONED) {
 					throw new JobInstanceAlreadyCompleteException(
 							"A job instance already exists and is complete for parameters=" + jobParameters
-									+ ".  If you want to run this job again, change the parameters.");
+							+ ".  If you want to run this job again, change the parameters.");
 				}
 			}
 			executionContext = ecDao.getExecutionContext(jobExecutionDao.getLastJobExecution(jobInstance));
-		} else {
+		}
+		else {
 			// no job found, create one
 			jobInstance = jobInstanceDao.createJobInstance(jobName, jobParameters);
 			executionContext = new ExecutionContext();

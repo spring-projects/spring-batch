@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2007 the original author or authors.
+ * Copyright 2006-2013 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -119,7 +119,7 @@ public interface JobRepository {
 	void add(StepExecution stepExecution);
 
 	/**
-	 * Save a collection of {@link StepExecution}s and each {@link ExecutionContext}. The 
+	 * Save a collection of {@link StepExecution}s and each {@link ExecutionContext}. The
 	 * StepExecution ID will be assigned - it is not permitted that an ID be assigned before calling
 	 * this method. Instead, it should be left blank, to be assigned by {@link JobRepository}.
 	 * 

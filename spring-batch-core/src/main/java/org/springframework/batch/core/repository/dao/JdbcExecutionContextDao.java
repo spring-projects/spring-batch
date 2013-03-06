@@ -113,7 +113,8 @@ public class JdbcExecutionContextDao extends AbstractJdbcBatchMetadataDao implem
 				new ExecutionContextRowMapper(), executionId);
 		if (results.size() > 0) {
 			return results.get(0);
-		} else {
+		}
+		else {
 			return new ExecutionContext();
 		}
 	}
@@ -127,7 +128,8 @@ public class JdbcExecutionContextDao extends AbstractJdbcBatchMetadataDao implem
 				new ExecutionContextRowMapper(), executionId);
 		if (results.size() > 0) {
 			return results.get(0);
-		} else {
+		}
+		else {
 			return new ExecutionContext();
 		}
 	}
@@ -219,7 +221,8 @@ public class JdbcExecutionContextDao extends AbstractJdbcBatchMetadataDao implem
 			// 2-byte chars
 			shortContext = serializedContext.substring(0, shortContextLength - 8) + " ...";
 			longContext = serializedContext;
-		} else {
+		}
+		else {
 			shortContext = serializedContext;
 			longContext = null;
 		}
@@ -230,7 +233,8 @@ public class JdbcExecutionContextDao extends AbstractJdbcBatchMetadataDao implem
 				ps.setString(1, shortContext);
 				if (longContext != null) {
 					lobHandler.getLobCreator().setClobAsString(ps, 2, longContext);
-				} else {
+				}
+				else {
 					ps.setNull(2, getClobTypeToUse());
 				}
 				ps.setLong(3, executionId);
@@ -259,14 +263,16 @@ public class JdbcExecutionContextDao extends AbstractJdbcBatchMetadataDao implem
 					// 2-byte chars
 					shortContext = serializedContext.substring(0, shortContextLength - 8) + " ...";
 					longContext = serializedContext;
-				} else {
+				}
+				else {
 					shortContext = serializedContext;
 					longContext = null;
 				}
 				ps.setString(1, shortContext);
 				if (longContext != null) {
 					lobHandler.getLobCreator().setClobAsString(ps, 2, longContext);
-				} else {
+				}
+				else {
 					ps.setNull(2, getClobTypeToUse());
 				}
 				ps.setLong(3, executionId);
@@ -292,7 +298,8 @@ public class JdbcExecutionContextDao extends AbstractJdbcBatchMetadataDao implem
 		try {
 			serializer.serialize(m, out);
 			results = new String(out.toByteArray(), "ISO-8859-1");
-		} catch (IOException ioe) {
+		}
+		catch (IOException ioe) {
 			throw new IllegalArgumentException("Could not serialize the execution context", ioe);
 		}
 
@@ -314,7 +321,8 @@ public class JdbcExecutionContextDao extends AbstractJdbcBatchMetadataDao implem
 			try {
 				ByteArrayInputStream in = new ByteArrayInputStream(serializedContext.getBytes("ISO-8859-1"));
 				map = (Map<String, Object>) serializer.deserialize(in);
-			} catch (IOException ioe) {
+			}
+			catch (IOException ioe) {
 				throw new IllegalArgumentException("Unable to deserialize the execution context", ioe);
 			}
 			for (Map.Entry<String, Object> entry : map.entrySet()) {

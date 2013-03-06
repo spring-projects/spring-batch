@@ -1,6 +1,3 @@
-/**
- *
- */
 package org.springframework.batch.core.step.item;
 
 import static org.junit.Assert.assertEquals;
@@ -187,7 +184,7 @@ public class TaskletStepExceptionTests {
 		taskletStep.setStreams(new ItemStream[] { new ItemStreamSupport() {
 			@Override
 			public void close() throws ItemStreamException {
-                                super.close();
+				super.close();
 				throw exception;
 			}
 		} });

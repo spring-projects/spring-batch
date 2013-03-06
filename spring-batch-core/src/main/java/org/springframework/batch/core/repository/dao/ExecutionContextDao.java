@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2007 the original author or authors.
+ * Copyright 2006-2013 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -55,7 +55,7 @@ public interface ExecutionContextDao {
 	 * @param stepExecution
 	 */
 	void saveExecutionContext(final StepExecution stepExecution);
-	
+
 	/**
 	 * Persist the execution context associated with each stepExecution in a given collection,
 	 * persistent entry for the context should not exist yet.
