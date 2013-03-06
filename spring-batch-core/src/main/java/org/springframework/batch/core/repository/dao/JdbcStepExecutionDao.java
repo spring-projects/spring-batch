@@ -16,9 +16,15 @@
 
 package org.springframework.batch.core.repository.dao;
 
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Timestamp;
 import java.sql.Types;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Iterator;
 import java.util.List;
 
 import org.apache.commons.logging.Log;
@@ -29,6 +35,7 @@ import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.StepExecution;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.dao.OptimisticLockingFailureException;
+import org.springframework.jdbc.core.BatchPreparedStatementSetter;
 import org.springframework.jdbc.core.simple.ParameterizedRowMapper;
 import org.springframework.jdbc.support.incrementer.DataFieldMaxValueIncrementer;
 import org.springframework.util.Assert;
@@ -49,6 +56,7 @@ import org.springframework.util.Assert;
  * @author Lucas Ward
  * @author Dave Syer
  * @author Robert Kasanicky
+ * @author David Turanski
  *
  * @see StepExecutionDao
  */
@@ -106,32 +114,88 @@ public class JdbcStepExecutionDao extends AbstractJdbcBatchMetadataDao implement
 	 */
 	@Override
 	public void saveStepExecution(StepExecution stepExecution) {
+		List<Object[]> parameters = buildStepExecutionParameters(stepExecution);
+		Object[] parameterValues = (Object[])parameters.get(0);
 
+		//Template expects an int array fails with Integer
+		int[] parameterTypes = new int[parameters.get(1).length];
+		for (int i = 0; i < parameterTypes.length; i++) {
+			parameterTypes[i] = (Integer)parameters.get(1)[i];
+		}
+
+		getJdbcTemplate().update(getQuery(SAVE_STEP_EXECUTION), parameterValues, parameterTypes);
+	}
+
+	/**
+	 * Batch insert StepExecutions
+	 * @see StepExecutionDao#saveStepExecutions(Collection)
+	 */
+	@Override
+	public void saveStepExecutions(final Collection<StepExecution> stepExecutions) {
+		Assert.notNull(stepExecutions, "Attempt to save a null collection of step executions");
+		final Iterator<StepExecution> iterator = stepExecutions.iterator();
+		getJdbcTemplate().batchUpdate(getQuery(SAVE_STEP_EXECUTION), new BatchPreparedStatementSetter() {
+
+			@Override
+			public int getBatchSize() {
+				return stepExecutions.size();
+			}
+
+			@Override
+			public void setValues(PreparedStatement ps, int i) throws SQLException {
+				StepExecution stepExecution = iterator.next();
+				List<Object[]> parameters = buildStepExecutionParameters(stepExecution);
+				Object[] parameterValues = (Object[]) parameters.get(0);
+				Integer[] parameterTypes = (Integer[]) parameters.get(1);
+				for (int indx = 0; indx < parameterValues.length; indx++) {
+					switch (parameterTypes[indx]) {
+					case Types.INTEGER:
+						ps.setInt(indx + 1, (Integer) parameterValues[indx]);
+						break;
+					case Types.VARCHAR:
+						ps.setString(indx + 1, (String) parameterValues[indx]);
+						break;
+					case Types.TIMESTAMP:
+						if (parameterValues[indx] !=null) {
+							ps.setTimestamp(indx + 1, new Timestamp(((java.util.Date) parameterValues[indx]).getTime()));
+						}
+						break;
+					case Types.BIGINT:
+						ps.setLong(indx + 1, (Long) parameterValues[indx]);
+						break;
+					default:
+						throw new IllegalArgumentException(
+								"unsupported SQL parameter type for step execution field index " + i);
+					}
+				}
+			}
+		});
+	}
+
+	private List<Object[]> buildStepExecutionParameters(StepExecution stepExecution) {
 		Assert.isNull(stepExecution.getId(),
 				"to-be-saved (not updated) StepExecution can't already have an id assigned");
 		Assert.isNull(stepExecution.getVersion(),
 				"to-be-saved (not updated) StepExecution can't already have a version assigned");
-
 		validateStepExecution(stepExecution);
-
-		String exitDescription = truncateExitDescription(stepExecution.getExitStatus().getExitDescription());
-
 		stepExecution.setId(stepExecutionIncrementer.nextLongValue());
-		stepExecution.incrementVersion(); // should be 0 now
-		Object[] parameters = new Object[] { stepExecution.getId(), stepExecution.getVersion(),
+		stepExecution.incrementVersion(); //Should be 0
+		List<Object[]> parameters = new ArrayList<Object[]>();
+		String exitDescription = truncateExitDescription(stepExecution.getExitStatus().getExitDescription());
+		Object[] parameterValues = new Object[] { stepExecution.getId(), stepExecution.getVersion(),
 				stepExecution.getStepName(), stepExecution.getJobExecutionId(), stepExecution.getStartTime(),
 				stepExecution.getEndTime(), stepExecution.getStatus().toString(), stepExecution.getCommitCount(),
 				stepExecution.getReadCount(), stepExecution.getFilterCount(), stepExecution.getWriteCount(),
 				stepExecution.getExitStatus().getExitCode(), exitDescription, stepExecution.getReadSkipCount(),
 				stepExecution.getWriteSkipCount(), stepExecution.getProcessSkipCount(),
 				stepExecution.getRollbackCount(), stepExecution.getLastUpdated() };
-		getJdbcTemplate().update(
-				getQuery(SAVE_STEP_EXECUTION),
-				parameters,
-				new int[] { Types.BIGINT, Types.INTEGER, Types.VARCHAR, Types.BIGINT, Types.TIMESTAMP,
-					Types.TIMESTAMP, Types.VARCHAR, Types.INTEGER, Types.INTEGER, Types.INTEGER, Types.INTEGER,
-					Types.VARCHAR, Types.VARCHAR, Types.INTEGER, Types.INTEGER, Types.INTEGER, Types.INTEGER,
-					Types.TIMESTAMP });
+		Integer[] parameterTypes = new Integer[] { Types.BIGINT, Types.INTEGER, Types.VARCHAR, Types.BIGINT,
+				Types.TIMESTAMP, Types.TIMESTAMP, Types.VARCHAR, Types.INTEGER, Types.INTEGER, Types.INTEGER,
+				Types.INTEGER, Types.VARCHAR, Types.VARCHAR, Types.INTEGER, Types.INTEGER, Types.INTEGER,
+				Types.INTEGER, Types.TIMESTAMP };
+		parameters.add(0, Arrays.copyOf(parameterValues,parameterValues.length));
+		parameters.add(1, Arrays.copyOf(parameterTypes,parameterTypes.length));
+		return parameters;
 	}
 
 	/**
@@ -171,13 +235,13 @@ public class JdbcStepExecutionDao extends AbstractJdbcBatchMetadataDao implement
 					stepExecution.getReadSkipCount(), stepExecution.getProcessSkipCount(),
 					stepExecution.getWriteSkipCount(), stepExecution.getRollbackCount(),
 					stepExecution.getLastUpdated(), stepExecution.getId(), stepExecution.getVersion() };
-			int count = getJdbcTemplate().update(
-					getQuery(UPDATE_STEP_EXECUTION),
-					parameters,
-					new int[] { Types.TIMESTAMP, Types.TIMESTAMP, Types.VARCHAR, Types.INTEGER, Types.INTEGER,
-						Types.INTEGER, Types.INTEGER, Types.VARCHAR, Types.VARCHAR, Types.INTEGER,
-						Types.INTEGER, Types.INTEGER, Types.INTEGER, Types.INTEGER, Types.TIMESTAMP,
-						Types.BIGINT, Types.INTEGER });
+			int count = getJdbcTemplate()
+					.update(getQuery(UPDATE_STEP_EXECUTION),
+							parameters,
+							new int[] { Types.TIMESTAMP, Types.TIMESTAMP, Types.VARCHAR, Types.INTEGER, Types.INTEGER,
+									Types.INTEGER, Types.INTEGER, Types.VARCHAR, Types.VARCHAR, Types.INTEGER,
+									Types.INTEGER, Types.INTEGER, Types.INTEGER, Types.INTEGER, Types.TIMESTAMP,
+									Types.BIGINT, Types.INTEGER });
 
 			// Avoid concurrent modifications...
 			if (count == 0) {
@@ -203,8 +267,7 @@ public class JdbcStepExecutionDao extends AbstractJdbcBatchMetadataDao implement
 		if (description != null && description.length() > exitMessageLength) {
 			logger.debug("Truncating long message before update of StepExecution, original message is: " + description);
 			return description.substring(0, exitMessageLength);
-		}
-		else {
+		} else {
 			return description;
 		}
 	}
@@ -218,8 +281,7 @@ public class JdbcStepExecutionDao extends AbstractJdbcBatchMetadataDao implement
 				"There can be at most one step execution with given name for single job execution");
 		if (executions.isEmpty()) {
 			return null;
-		}
-		else {
+		} else {
 			return executions.get(0);
 		}
 	}
