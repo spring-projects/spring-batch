@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:aop="http://www.springframework.org/schema/aop"
+	xmlns:p="http://www.springframework.org/schema/p"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-3.1.xsd
+		http://www.springframework.org/schema/batch http://www.springframework.org/schema/batch/spring-batch-2.2.xsd
+		http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.1.xsd">
+
+	<job id="chunkTimeoutJob" xmlns="http://www.springframework.org/schema/batch">
+		<step id="chunk-step">
+			<tasklet>
+				<chunk reader="dummyReader" processor="sleepingProcessor" writer="loggingWriter"
+	                   commit-interval="5" />
+		        <transaction-attributes timeout="1"/>	            
+			</tasklet>
+		</step>
+	</job>
+
+	<job id="taskletTimeoutJob" xmlns="http://www.springframework.org/schema/batch">
+		<step id="tasklet-step">
+			<tasklet ref="sleepingTasklet">
+		        <transaction-attributes timeout="1"/>	            
+			</tasklet>
+		</step>
+	</job>
+	
+	<bean id="dummyReader" class="org.springframework.batch.item.support.ListItemReader">
+		<constructor-arg>
+			<list>
+				<value>1</value>
+				<value>2</value>
+				<value>3</value>
+				<value>4</value>
+				<value>5</value>
+				<value>6</value>
+				<value>7</value>
+				<value>8</value>
+				<value>9</value>
+				<value>10</value>
+			</list>
+		</constructor-arg>
+	</bean>
+	
+	<bean id="sleepingProcessor" class="org.springframework.batch.core.test.timeout.SleepingItemProcessor">
+		<property name="millisToSleep" value="500" />
+	</bean>
+	
+	<bean id="loggingWriter" class="org.springframework.batch.core.test.timeout.LoggingItemWriter" />
+	
+	<bean id="sleepingTasklet" class="org.springframework.batch.core.test.timeout.SleepingTasklet">
+		<property name="millisToSleep" value="2000" />
+	</bean>
+
+</beans>
