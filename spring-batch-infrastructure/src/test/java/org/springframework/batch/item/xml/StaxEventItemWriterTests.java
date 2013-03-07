@@ -437,6 +437,24 @@ public class StaxEventItemWriterTests {
 		writer.close();
 		String content = getOutputFileContent();
 		assertTrue("Wrong content: " + content, content.contains(TEST_STRING));
+	}
+	
+	/**
+	 * Test that the writer can restart if the previous execution deleted empty file.
+	 */
+	@Test
+	public void testDeleteIfEmptyRestart() throws Exception {
+		writer.setShouldDeleteIfEmpty(true);
+		writer.open(executionContext);
+		writer.update(executionContext);
+		writer.close();
+		assertFalse(resource.getFile().exists());
+		writer = createItemWriter();
+		writer.setShouldDeleteIfEmpty(true);
+		writer.open(executionContext);
+		writer.close();
+		String content = getOutputFileContent();
+		assertTrue("Wrong content: " + content, content.contains(TEST_STRING));
 	}	
 	
 
