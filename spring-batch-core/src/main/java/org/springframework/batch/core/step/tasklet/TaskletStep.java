@@ -452,10 +452,8 @@ public class TaskletStep extends AbstractStep {
 				catch (Exception e) {
 					// If we get to here there was a problem saving the step
 					// execution and we have to fail.
-					String msg = "JobRepository failure forcing exit with unknown status";
+					String msg = "JobRepository failure forcing rollback";
 					logger.error(msg, e);
-					stepExecution.upgradeStatus(BatchStatus.UNKNOWN);
-					stepExecution.setTerminateOnly();
 					throw new FatalStepExecutionException(msg, e);
 				}
 			}
