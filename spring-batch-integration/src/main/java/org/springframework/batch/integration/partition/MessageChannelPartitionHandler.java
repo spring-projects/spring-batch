@@ -32,6 +32,7 @@ import org.springframework.util.Assert;
  * Spring Batch {@link JobRepository} so that the shared state across those restarts can be managed centrally.
  * 
  * @author Dave Syer
+ * @author Will Schipp
  * 
  */
 @MessageEndpoint
@@ -44,6 +45,11 @@ public class MessageChannelPartitionHandler implements PartitionHandler {
 	private MessagingOperations messagingGateway;
 
 	private String stepName;
+	
+	/**
+	 * pollable channel for the replies
+	 */
+	private PollableChannel replyChannel;
 
 	public void afterPropertiesSet() throws Exception {
 		Assert.notNull(stepName, "A step name must be provided for the remote workers.");
@@ -95,6 +101,10 @@ public class MessageChannelPartitionHandler implements PartitionHandler {
 		return messages;
 	}
 
+	public void setReplyChannel(PollableChannel replyChannel) {
+		this.replyChannel = replyChannel;
+	}
+
 	/**
 	 * Sends {@link StepExecutionRequest} objects to the request channel of the {@link MessagingOperations}, and then
 	 * receives the result back as a list of {@link StepExecution} on a reply channel. Use the {@link #aggregate(List)}
@@ -108,7 +118,10 @@ public class MessageChannelPartitionHandler implements PartitionHandler {
 
 		Set<StepExecution> split = stepExecutionSplitter.split(masterStepExecution, gridSize);
 		int count = 0;
-		PollableChannel replyChannel = new QueueChannel();
+		
+		if (replyChannel == null) {
+			replyChannel = new QueueChannel();
+		}//end if 
 		
 		for (StepExecution stepExecution : split) {
 			Message<StepExecutionRequest> request = createMessage(count++, split.size(), new StepExecutionRequest(
