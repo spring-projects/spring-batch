@@ -17,6 +17,7 @@
 package org.springframework.batch.core.repository.dao;
 
 import java.io.Serializable;
+import java.util.Collection;
 import java.util.concurrent.ConcurrentMap;
 
 import org.springframework.batch.core.JobExecution;
@@ -24,12 +25,14 @@ import org.springframework.batch.core.StepExecution;
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.support.SerializationUtils;
 import org.springframework.batch.support.transaction.TransactionAwareProxyFactory;
+import org.springframework.util.Assert;
 
 /**
  * In-memory implementation of {@link ExecutionContextDao} backed by maps.
  *
  * @author Robert Kasanicky
  * @author Dave Syer
+ * @author David Turanski
  */
 @SuppressWarnings("serial")
 public class MapExecutionContextDao implements ExecutionContextDao {
@@ -143,6 +146,15 @@ public class MapExecutionContextDao implements ExecutionContextDao {
 	@Override
 	public void saveExecutionContext(StepExecution stepExecution) {
 		updateExecutionContext(stepExecution);
+	}
+
+	 
+	@Override
+	public void saveExecutionContexts(Collection<StepExecution> stepExecutions) {
+		Assert.notNull(stepExecutions,"Attempt to save a nulk collection of step executions");
+		for (StepExecution stepExecution: stepExecutions) {
+			saveExecutionContext(stepExecution);
+		}
 	}
 
 }

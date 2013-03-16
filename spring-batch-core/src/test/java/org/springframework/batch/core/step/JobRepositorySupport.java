@@ -15,6 +15,8 @@
  */
 package org.springframework.batch.core.step;
 
+import java.util.Collection;
+
 import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.JobInstance;
 import org.springframework.batch.core.JobParameters;
@@ -23,6 +25,7 @@ import org.springframework.batch.core.repository.JobRepository;
 
 /**
  * @author Dave Syer
+ * @author David Turanski
  *
  */
 public class JobRepositorySupport implements JobRepository {
@@ -94,6 +97,10 @@ public class JobRepositorySupport implements JobRepository {
 
 	@Override
 	public void updateExecutionContext(JobExecution jobExecution) {
+	}
+
+	@Override
+	public void addAll(Collection<StepExecution> stepExecutions) {
 	}
 
 }

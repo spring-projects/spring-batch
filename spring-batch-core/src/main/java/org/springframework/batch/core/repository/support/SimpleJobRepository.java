@@ -17,6 +17,7 @@
 package org.springframework.batch.core.repository.support;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 
@@ -48,6 +49,7 @@ import org.springframework.util.Assert;
  * @author Lucas Ward
  * @author Dave Syer
  * @author Robert Kasanicky
+ * @author David Turanski
  *
  * @see JobRepository
  * @see JobInstanceDao
@@ -168,6 +170,17 @@ public class SimpleJobRepository implements JobRepository {
 	}
 
 	@Override
+	public void addAll(Collection<StepExecution> stepExecutions) {
+		Assert.notNull(stepExecutions, "Attempt to save a null collection of step executions");
+		for (StepExecution stepExecution : stepExecutions) {
+			validateStepExecution(stepExecution);
+			stepExecution.setLastUpdated(new Date(System.currentTimeMillis()));
+		}
+		stepExecutionDao.saveStepExecutions(stepExecutions);
+		ecDao.saveExecutionContexts(stepExecutions);
+	}
+
+	@Override
 	public void update(StepExecution stepExecution) {
 		validateStepExecution(stepExecution);
 		Assert.notNull(stepExecution.getId(), "StepExecution must already be saved (have an id assigned)");
@@ -276,6 +289,4 @@ public class SimpleJobRepository implements JobRepository {
 		return jobExecution;
 
 	}
-
-
 }
