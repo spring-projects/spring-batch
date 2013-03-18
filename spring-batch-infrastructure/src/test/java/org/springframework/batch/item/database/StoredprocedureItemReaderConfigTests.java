@@ -12,7 +12,7 @@ import java.sql.SQLException;
 
 import javax.sql.DataSource;
 
-import org.hsqldb.Types;
+import org.hsqldb.types.Types;
 import org.junit.Test;
 import org.junit.runners.JUnit4;
 import org.junit.runner.RunWith;

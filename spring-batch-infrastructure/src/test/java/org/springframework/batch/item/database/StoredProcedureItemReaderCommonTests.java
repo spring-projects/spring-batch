@@ -3,7 +3,7 @@ package org.springframework.batch.item.database;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 
-import org.hsqldb.Types;
+import org.hsqldb.types.Types;
 import org.junit.Test;
 import org.junit.runners.JUnit4;
 import org.junit.runner.RunWith;
@@ -53,7 +53,7 @@ public class StoredProcedureItemReaderCommonTests extends AbstractDatabaseItemSt
 		reader.setProcedureName("read_some_foos");
 		reader.setParameters(
 				new SqlParameter[] {
-					new SqlParameter("from_id", Types.NUMERIC),	
+					new SqlParameter("from_id", Types.NUMERIC),
 					new SqlParameter("to_id", Types.NUMERIC)	
 				});
 		reader.setPreparedStatementSetter(
