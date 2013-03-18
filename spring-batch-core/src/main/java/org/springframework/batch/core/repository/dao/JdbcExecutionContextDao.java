@@ -248,42 +248,41 @@ public class JdbcExecutionContextDao extends AbstractJdbcBatchMetadataDao implem
 	 * @param sql with parameters (shortContext, longContext, executionId)
 	 */
 	private void persistSerializedContexts(final Map<Long, String> serializedContexts, String sql) {
+        if (!serializedContexts.isEmpty()) {
+            final Iterator<Long> executionIdIterator = serializedContexts.keySet().iterator();
 
-		final Iterator<Long> executionIdIterator = serializedContexts.keySet().iterator();
+            getJdbcTemplate().batchUpdate(getQuery(sql), new BatchPreparedStatementSetter() {
+                @Override
+                public void setValues(PreparedStatement ps, int i) throws SQLException {
+                    Long executionId = executionIdIterator.next();
+                    String serializedContext = serializedContexts.get(executionId);
+                    String shortContext;
+                    String longContext;
+                    if (serializedContext.length() > shortContextLength) {
+                        // Overestimate length of ellipsis to be on the safe side with
+                        // 2-byte chars
+                        shortContext = serializedContext.substring(0, shortContextLength - 8) + " ...";
+                        longContext = serializedContext;
+                    } else {
+                        shortContext = serializedContext;
+                        longContext = null;
+                    }
+                    ps.setString(1, shortContext);
+                    if (longContext != null) {
+                        lobHandler.getLobCreator().setClobAsString(ps, 2, longContext);
+                    } else {
+                        ps.setNull(2, getClobTypeToUse());
+                    }
+                    ps.setLong(3, executionId);
+                }
 
-		getJdbcTemplate().batchUpdate(getQuery(sql), new BatchPreparedStatementSetter() {
-			@Override
-			public void setValues(PreparedStatement ps, int i) throws SQLException {
-				Long executionId = executionIdIterator.next();
-				String serializedContext = serializedContexts.get(executionId);
-				String shortContext;
-				String longContext;
-				if (serializedContext.length() > shortContextLength) {
-					// Overestimate length of ellipsis to be on the safe side with
-					// 2-byte chars
-					shortContext = serializedContext.substring(0, shortContextLength - 8) + " ...";
-					longContext = serializedContext;
-				}
-				else {
-					shortContext = serializedContext;
-					longContext = null;
-				}
-				ps.setString(1, shortContext);
-				if (longContext != null) {
-					lobHandler.getLobCreator().setClobAsString(ps, 2, longContext);
-				}
-				else {
-					ps.setNull(2, getClobTypeToUse());
-				}
-				ps.setLong(3, executionId);
-			}
-
-			@Override
-			public int getBatchSize() {
-				return serializedContexts.size();
-			}
-		});
-	}
+                @Override
+                public int getBatchSize() {
+                    return serializedContexts.size();
+                }
+            });
+        }
+    }
 
 	@SuppressWarnings("unchecked")
 	private String serializeContext(ExecutionContext ctx) {
