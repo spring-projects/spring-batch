@@ -110,13 +110,22 @@ public class FlatFileItemWriterTests {
 	 * because running the tests in a UNIX environment locks the file if it's open for writing.
 	 */
 	private String readLine() throws IOException {
+		return readLine("UTF-8");
+	}
+	
+	/*
+	 * Read a line from the output file, if the reader has not been created, recreate. This method is only necessary
+	 * because running the tests in a UNIX environment locks the file if it's open for writing.
+	 */
+	private String readLine(String encoding) throws IOException {
 
 		if (reader == null) {
-			reader = new BufferedReader(new InputStreamReader(new FileInputStream(outputFile), "UTF-8"));
+			reader = new BufferedReader(new InputStreamReader(new FileInputStream(outputFile), encoding));
 		}
 
 		return reader.readLine();
-	}
+	}	
+	
 	/*
 	 * Properly close the output file reader.
 	 */
@@ -434,8 +443,18 @@ public class FlatFileItemWriterTests {
 	
 	@Test
 	// BATCH-1959
-	public void testTransactionalRestartWithMultiByteCharacter() throws Exception {
+	public void testTransactionalRestartWithMultiByteCharacterUTF8() throws Exception {
+		testTransactionalRestartWithMultiByteCharacter("UTF-8");
+	}
 
+	@Test
+	// BATCH-1959
+	public void testTransactionalRestartWithMultiByteCharacterUTF16BE() throws Exception {
+		testTransactionalRestartWithMultiByteCharacter("UTF-16BE");
+	}
+
+	private void testTransactionalRestartWithMultiByteCharacter(String encoding) throws Exception {
+		writer.setEncoding(encoding);
 		writer.setFooterCallback(new FlatFileFooterCallback() {
 
             @Override
@@ -492,15 +511,14 @@ public class FlatFileItemWriterTests {
 
 		// verify what was written to the file
 		for (int i = 1; i <= 8; i++) {
-			assertEquals("téstLine" + i, readLine());
+			assertEquals("téstLine" + i, readLine(encoding));
 		}
 
-		assertEquals("footer", readLine());
+		assertEquals("footer", readLine(encoding));
 
 		// 3 lines were written to the file after restart
-		assertEquals(3, executionContext.getLong(ClassUtils.getShortName(FlatFileItemWriter.class) + ".written"));
-
-	}	
+		assertEquals(3, executionContext.getLong(ClassUtils.getShortName(FlatFileItemWriter.class) + ".written"));		
+	}
 
 	@Test
 	public void testOpenWithNonWritableFile() throws Exception {
