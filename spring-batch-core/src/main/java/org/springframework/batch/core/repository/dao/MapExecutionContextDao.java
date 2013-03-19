@@ -148,12 +148,13 @@ public class MapExecutionContextDao implements ExecutionContextDao {
 		updateExecutionContext(stepExecution);
 	}
 
-	 
+
 	@Override
 	public void saveExecutionContexts(Collection<StepExecution> stepExecutions) {
 		Assert.notNull(stepExecutions,"Attempt to save a nulk collection of step executions");
 		for (StepExecution stepExecution: stepExecutions) {
 			saveExecutionContext(stepExecution);
+			saveExecutionContext(stepExecution.getJobExecution());
 		}
 	}
 

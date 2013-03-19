@@ -16,14 +16,16 @@
 
 package org.springframework.batch.core.repository.support;
 
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import static org.junit.Assert.*;
-
 
 import java.util.ArrayList;
 import java.util.List;
-
 
 import org.junit.Before;
 import org.junit.Test;
@@ -170,6 +172,24 @@ public class SimpleJobRepositoryTests {
 
 		long lastUpdated = stepExecution.getLastUpdated().getTime();
 		assertTrue(lastUpdated > (before - 1000));
+	}
+
+	@Test
+	public void testSaveStepExecutions() {
+		List<StepExecution> stepExecutions = new ArrayList<StepExecution>();
+		for (int i = 0; i < 3; i++) {
+			StepExecution stepExecution = new StepExecution("stepName" + i, jobExecution);
+			stepExecutions.add(stepExecution);
+		}
+
+		jobRepository.addAll(stepExecutions);
+		verify(stepExecutionDao).saveStepExecutions(stepExecutions);
+		verify(ecDao).saveExecutionContexts(stepExecutions);
+	}
+
+	@Test(expected = IllegalArgumentException.class)
+	public void testSaveNullStepExecutions() {
+		jobRepository.addAll(null);
 	}
 
 	@Test
