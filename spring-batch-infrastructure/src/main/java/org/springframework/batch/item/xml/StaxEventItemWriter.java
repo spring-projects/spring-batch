@@ -366,7 +366,14 @@ public class StaxEventItemWriter<T> extends ExecutionContextUserSupport implemen
 		if (executionContext.containsKey(getKey(RESTART_DATA_NAME))) {
 			startAtPosition = executionContext.getLong(getKey(RESTART_DATA_NAME));
 			currentRecordCount = executionContext.getLong(getKey(WRITE_STATISTICS_NAME));
-			restarted = true;			
+			restarted = true;
+			if (shouldDeleteIfEmpty && currentRecordCount == 0) {
+				// previous execution deleted the output file because no items were written
+				restarted = false;
+				startAtPosition = 0;
+			} else {
+				restarted = true;
+			}			
 		}
 
 		open(startAtPosition, restarted);

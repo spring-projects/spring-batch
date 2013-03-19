@@ -433,7 +433,7 @@ public class StaxEventItemWriterTests {
 	 * Test that the writer can restart if the previous execution deleted empty file.
 	 */
 	@Test
-	public void testDeleteIfEmptyRestart() throws Exception {
+	public void testDeleteIfEmptyRestartAfterDelete() throws Exception {
 		writer.setShouldDeleteIfEmpty(true);
 		writer.open(executionContext);
 		writer.update(executionContext);
@@ -442,10 +442,62 @@ public class StaxEventItemWriterTests {
 		writer = createItemWriter();
 		writer.setShouldDeleteIfEmpty(true);
 		writer.open(executionContext);
+		writer.write(items);
+		writer.update(executionContext);		
 		writer.close();
 		String content = getOutputFileContent();
 		assertTrue("Wrong content: " + content, content.contains(TEST_STRING));
 	}	
+	
+	/**
+	 * Resource is not deleted when items have been written and shouldDeleteIfEmpty flag is set (restart after delete).
+	 */
+	@Test
+	public void testDeleteIfEmptyNoRecordsWrittenHeaderAndFooterRestartAfterDelete() throws Exception {
+		writer.setShouldDeleteIfEmpty(true);
+		writer.setHeaderCallback(new StaxWriterCallback() {
+
+            @Override
+			public void write(XMLEventWriter writer) throws IOException {
+				XMLEventFactory factory = XMLEventFactory.newInstance();
+				try {
+					writer.add(factory.createStartElement("", "", "header"));
+					writer.add(factory.createEndElement("", "", "header"));
+				}
+				catch (XMLStreamException e) {
+					throw new RuntimeException(e);
+				}
+
+			}
+
+		});
+		writer.setFooterCallback(new StaxWriterCallback() {
+
+            @Override
+			public void write(XMLEventWriter writer) throws IOException {
+				XMLEventFactory factory = XMLEventFactory.newInstance();
+				try {
+					writer.add(factory.createStartElement("", "", "footer"));
+					writer.add(factory.createEndElement("", "", "footer"));
+				}
+				catch (XMLStreamException e) {
+					throw new RuntimeException(e);
+				}
+
+			}
+
+		});		
+		writer.open(executionContext);
+		writer.update(executionContext);
+		writer.close();
+		assertFalse("file should be deleted" + resource, resource.getFile().exists());
+		writer.open(executionContext);
+		writer.write(items);
+		writer.update(executionContext);		
+		writer.close();
+		String content = getOutputFileContent();
+		assertTrue("Wrong content: " + content, content.contains(TEST_STRING));		
+	}		
 	
 
 	/**

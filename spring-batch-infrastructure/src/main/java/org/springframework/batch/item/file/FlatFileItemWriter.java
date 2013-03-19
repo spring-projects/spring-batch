@@ -455,7 +455,14 @@ public class FlatFileItemWriter<T> extends ExecutionContextUserSupport implement
 		 */
 		public void restoreFrom(ExecutionContext executionContext) {
 			lastMarkedByteOffsetPosition = executionContext.getLong(getKey(RESTART_DATA_NAME));
-			restarted = true;
+			linesWritten = executionContext.getLong(getKey(WRITTEN_STATISTICS_NAME));
+			if (shouldDeleteIfEmpty && linesWritten == 0) {
+				// previous execution deleted the output file because no items were written
+				restarted = false;
+				lastMarkedByteOffsetPosition = 0;
+			} else {
+				restarted = true;
+			}
 		}
 
 		/**
@@ -571,7 +578,6 @@ public class FlatFileItemWriter<T> extends ExecutionContextUserSupport implement
 			}
 
 			initialized = true;
-			linesWritten = 0;
 		}
 
 		public boolean isInitialized() {
