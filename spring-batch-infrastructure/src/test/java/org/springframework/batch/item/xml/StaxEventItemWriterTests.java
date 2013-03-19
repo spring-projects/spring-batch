@@ -60,12 +60,25 @@ public class StaxEventItemWriterTests {
 
 	private JAXBItem jaxbItem = new JAXBItem();
 
+	// test item for writing to output with multi byte character
+	private Object itemMultiByte = new Object() {
+		@Override
+		public String toString() {
+			return ClassUtils.getShortName(StaxEventItemWriter.class) + "-téstStrïng";
+		}
+	};
+
 	private List<? extends Object> items = Collections.singletonList(item);
+
+	private List<? extends Object> itemsMultiByte = Collections.singletonList(itemMultiByte);
 
 	private List<? extends Object> jaxbItems = Collections.singletonList(jaxbItem);
 
 	private static final String TEST_STRING = "<" + ClassUtils.getShortName(StaxEventItemWriter.class)
 			+ "-testString/>";
+
+	private static final String TEST_STRING_MULTI_BYTE = "<" + ClassUtils.getShortName(StaxEventItemWriter.class)
+			+ "-téstStrïng/>";
 
 	private static final String NS_TEST_STRING = "<ns:" + ClassUtils.getShortName(StaxEventItemWriter.class)
 			+ "-testString/>";
@@ -183,6 +196,68 @@ public class StaxEventItemWriterTests {
 		String outputFile = getOutputFileContent();
 		assertEquals(2, StringUtils.countOccurrencesOf(outputFile, TEST_STRING));
 		assertTrue(outputFile.contains("<root>" + TEST_STRING + TEST_STRING + "</root>"));
+	}
+
+	@Test
+	// BATCH-1959
+	public void testTransactionalRestartWithMultiByteCharacterUTF8() throws Exception {
+		testTransactionalRestartWithMultiByteCharacter("UTF-8");
+	}
+
+	@Test
+	// BATCH-1959
+	public void testTransactionalRestartWithMultiByteCharacterUTF16BE() throws Exception {
+		testTransactionalRestartWithMultiByteCharacter("UTF-16BE");
+	}
+
+	private void testTransactionalRestartWithMultiByteCharacter(String encoding) throws Exception {
+		writer.setEncoding(encoding);
+		writer.open(executionContext);
+
+		PlatformTransactionManager transactionManager = new ResourcelessTransactionManager();
+
+		new TransactionTemplate(transactionManager).execute(new TransactionCallback() {
+			@Override
+			public Object doInTransaction(TransactionStatus status) {
+				try {
+					// write item
+					writer.write(itemsMultiByte);
+				}
+				catch (Exception e) {
+					throw new UnexpectedInputException("Could not write data", e);
+				}
+				// get restart data
+				writer.update(executionContext);
+				return null;
+			}
+		});
+		writer.close();
+
+		// create new writer from saved restart data and continue writing
+		writer = createItemWriter();
+		writer.setEncoding(encoding);
+		writer.open(executionContext);
+		new TransactionTemplate(transactionManager).execute(new TransactionCallback() {
+			@Override
+			public Object doInTransaction(TransactionStatus status) {
+				try {
+					writer.write(itemsMultiByte);
+				}
+				catch (Exception e) {
+					throw new UnexpectedInputException("Could not write data", e);
+				}
+				// get restart data
+				writer.update(executionContext);
+				return null;
+			}
+		});
+		writer.close();
+
+		// check the output is concatenation of 'before restart' and 'after
+		// restart' writes.
+		String outputFile = getOutputFileContent(encoding);
+		assertEquals(2, StringUtils.countOccurrencesOf(outputFile, TEST_STRING_MULTI_BYTE));
+		assertTrue(outputFile.contains("<root>" + TEST_STRING_MULTI_BYTE + TEST_STRING_MULTI_BYTE + "</root>"));
 	}
 
 	@Test
@@ -692,10 +767,20 @@ public class StaxEventItemWriterTests {
 	 * @return output file content as String
 	 */
 	private String getOutputFileContent() throws IOException {
-		String value = FileUtils.readFileToString(resource.getFile(), null);
-		value = value.replace("<?xml version='1.0' encoding='UTF-8'?>", "");
+		return getOutputFileContent("UTF-8");
+	}
+
+
+	/**
+	 * @param encoding the encoding
+	 * @return output file content as String
+	 */
+	private String getOutputFileContent(String encoding) throws IOException {
+		String value = FileUtils.readFileToString(resource.getFile(), encoding);
+		value = value.replace("<?xml version='1.0' encoding='" + encoding + "'?>", "");
 		return value;
 	}
+
 
 	/**
 	 * @return new instance of fully configured writer
