@@ -368,6 +368,13 @@ ResourceAwareItemWriterItemStream<T>, InitializingBean {
 			startAtPosition = executionContext.getLong(getExecutionContextKey(RESTART_DATA_NAME));
 			currentRecordCount = executionContext.getLong(getExecutionContextKey(WRITE_STATISTICS_NAME));
 			restarted = true;
+			if (shouldDeleteIfEmpty && currentRecordCount == 0) {
+				// previous execution deleted the output file because no items were written
+				restarted = false;
+				startAtPosition = 0;
+			} else {
+				restarted = true;
+			}
 		}
 
 		open(startAtPosition, restarted);
