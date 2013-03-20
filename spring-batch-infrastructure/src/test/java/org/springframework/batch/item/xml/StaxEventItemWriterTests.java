@@ -352,7 +352,7 @@ public class StaxEventItemWriterTests {
 			assertEquals("Output resource must exist", e.getMessage());
 		}
 	}
-	
+
 	/**
 	 * Resource is not deleted when items have been written and shouldDeleteIfEmpty flag is set.
 	 */
@@ -364,10 +364,10 @@ public class StaxEventItemWriterTests {
 		writer.close();
 		String content = getOutputFileContent();
 		assertTrue("Wrong content: " + content, content.contains(TEST_STRING));
-	}	
+	}
 
 	/**
-	 * Resource is not deleted when items have been written and shouldDeleteIfEmpty flag is set.
+	 * Resource is deleted when no items have been written and shouldDeleteIfEmpty flag is set.
 	 */
 	@Test
 	public void testDeleteIfEmptyNoRecordsWritten() throws Exception {
@@ -376,16 +376,16 @@ public class StaxEventItemWriterTests {
 		writer.close();
 		assertFalse("file should be deleted" + resource, resource.getFile().exists());
 	}
-	
+
 	/**
-	 * Resource is not deleted when items have been written and shouldDeleteIfEmpty flag is set.
+	 * Resource is deleted when items have not been written and shouldDeleteIfEmpty flag is set.
 	 */
 	@Test
 	public void testDeleteIfEmptyNoRecordsWrittenHeaderAndFooter() throws Exception {
 		writer.setShouldDeleteIfEmpty(true);
 		writer.setHeaderCallback(new StaxWriterCallback() {
 
-            @Override
+			@Override
 			public void write(XMLEventWriter writer) throws IOException {
 				XMLEventFactory factory = XMLEventFactory.newInstance();
 				try {
@@ -401,7 +401,7 @@ public class StaxEventItemWriterTests {
 		});
 		writer.setFooterCallback(new StaxWriterCallback() {
 
-            @Override
+			@Override
 			public void write(XMLEventWriter writer) throws IOException {
 				XMLEventFactory factory = XMLEventFactory.newInstance();
 				try {
@@ -414,12 +414,12 @@ public class StaxEventItemWriterTests {
 
 			}
 
-		});		
+		});
 		writer.open(executionContext);
 		writer.close();
 		assertFalse("file should be deleted" + resource, resource.getFile().exists());
-	}	
-	
+	}
+
 	/**
 	 * Resource is not deleted when items have been written and shouldDeleteIfEmpty flag is set.
 	 */
@@ -430,7 +430,7 @@ public class StaxEventItemWriterTests {
 		writer.write(items);
 		writer.update(executionContext);
 		writer.close();
-		
+
 		writer = createItemWriter();
 		writer.setShouldDeleteIfEmpty(true);
 		writer.open(executionContext);
@@ -438,7 +438,7 @@ public class StaxEventItemWriterTests {
 		String content = getOutputFileContent();
 		assertTrue("Wrong content: " + content, content.contains(TEST_STRING));
 	}
-	
+
 	/**
 	 * Test that the writer can restart if the previous execution deleted empty file.
 	 */
@@ -453,12 +453,12 @@ public class StaxEventItemWriterTests {
 		writer.setShouldDeleteIfEmpty(true);
 		writer.open(executionContext);
 		writer.write(items);
-		writer.update(executionContext);		
+		writer.update(executionContext);
 		writer.close();
 		String content = getOutputFileContent();
 		assertTrue("Wrong content: " + content, content.contains(TEST_STRING));
-	}	
-	
+	}
+
 	/**
 	 * Resource is not deleted when items have been written and shouldDeleteIfEmpty flag is set (restart after delete).
 	 */
@@ -467,7 +467,7 @@ public class StaxEventItemWriterTests {
 		writer.setShouldDeleteIfEmpty(true);
 		writer.setHeaderCallback(new StaxWriterCallback() {
 
-            @Override
+			@Override
 			public void write(XMLEventWriter writer) throws IOException {
 				XMLEventFactory factory = XMLEventFactory.newInstance();
 				try {
@@ -483,7 +483,7 @@ public class StaxEventItemWriterTests {
 		});
 		writer.setFooterCallback(new StaxWriterCallback() {
 
-            @Override
+			@Override
 			public void write(XMLEventWriter writer) throws IOException {
 				XMLEventFactory factory = XMLEventFactory.newInstance();
 				try {
@@ -496,19 +496,19 @@ public class StaxEventItemWriterTests {
 
 			}
 
-		});		
+		});
 		writer.open(executionContext);
 		writer.update(executionContext);
 		writer.close();
 		assertFalse("file should be deleted" + resource, resource.getFile().exists());
 		writer.open(executionContext);
 		writer.write(items);
-		writer.update(executionContext);		
+		writer.update(executionContext);
 		writer.close();
 		String content = getOutputFileContent();
-		assertTrue("Wrong content: " + content, content.contains(TEST_STRING));		
-	}		
-	
+		assertTrue("Wrong content: " + content, content.contains(TEST_STRING));
+	}
+
 
 	/**
 	 * Item is written to the output file with namespace.
