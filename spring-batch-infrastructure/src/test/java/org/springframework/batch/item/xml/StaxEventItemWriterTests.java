@@ -354,6 +354,163 @@ public class StaxEventItemWriterTests {
 	}
 
 	/**
+	 * Resource is not deleted when items have been written and shouldDeleteIfEmpty flag is set.
+	 */
+	@Test
+	public void testDeleteIfEmptyRecordsWritten() throws Exception {
+		writer.setShouldDeleteIfEmpty(true);
+		writer.open(executionContext);
+		writer.write(items);
+		writer.close();
+		String content = getOutputFileContent();
+		assertTrue("Wrong content: " + content, content.contains(TEST_STRING));
+	}
+
+	/**
+	 * Resource is deleted when no items have been written and shouldDeleteIfEmpty flag is set.
+	 */
+	@Test
+	public void testDeleteIfEmptyNoRecordsWritten() throws Exception {
+		writer.setShouldDeleteIfEmpty(true);
+		writer.open(executionContext);
+		writer.close();
+		assertFalse("file should be deleted" + resource, resource.getFile().exists());
+	}
+
+	/**
+	 * Resource is deleted when items have not been written and shouldDeleteIfEmpty flag is set.
+	 */
+	@Test
+	public void testDeleteIfEmptyNoRecordsWrittenHeaderAndFooter() throws Exception {
+		writer.setShouldDeleteIfEmpty(true);
+		writer.setHeaderCallback(new StaxWriterCallback() {
+
+			@Override
+			public void write(XMLEventWriter writer) throws IOException {
+				XMLEventFactory factory = XMLEventFactory.newInstance();
+				try {
+					writer.add(factory.createStartElement("", "", "header"));
+					writer.add(factory.createEndElement("", "", "header"));
+				}
+				catch (XMLStreamException e) {
+					throw new RuntimeException(e);
+				}
+
+			}
+
+		});
+		writer.setFooterCallback(new StaxWriterCallback() {
+
+			@Override
+			public void write(XMLEventWriter writer) throws IOException {
+				XMLEventFactory factory = XMLEventFactory.newInstance();
+				try {
+					writer.add(factory.createStartElement("", "", "footer"));
+					writer.add(factory.createEndElement("", "", "footer"));
+				}
+				catch (XMLStreamException e) {
+					throw new RuntimeException(e);
+				}
+
+			}
+
+		});
+		writer.open(executionContext);
+		writer.close();
+		assertFalse("file should be deleted" + resource, resource.getFile().exists());
+	}
+
+	/**
+	 * Resource is not deleted when items have been written and shouldDeleteIfEmpty flag is set.
+	 */
+	@Test
+	public void testDeleteIfEmptyRecordsWrittenRestart() throws Exception {
+		writer.setShouldDeleteIfEmpty(true);
+		writer.open(executionContext);
+		writer.write(items);
+		writer.update(executionContext);
+		writer.close();
+
+		writer = createItemWriter();
+		writer.setShouldDeleteIfEmpty(true);
+		writer.open(executionContext);
+		writer.close();
+		String content = getOutputFileContent();
+		assertTrue("Wrong content: " + content, content.contains(TEST_STRING));
+	}
+
+	/**
+	 * Test that the writer can restart if the previous execution deleted empty file.
+	 */
+	@Test
+	public void testDeleteIfEmptyRestartAfterDelete() throws Exception {
+		writer.setShouldDeleteIfEmpty(true);
+		writer.open(executionContext);
+		writer.update(executionContext);
+		writer.close();
+		assertFalse(resource.getFile().exists());
+		writer = createItemWriter();
+		writer.setShouldDeleteIfEmpty(true);
+		writer.open(executionContext);
+		writer.write(items);
+		writer.update(executionContext);
+		writer.close();
+		String content = getOutputFileContent();
+		assertTrue("Wrong content: " + content, content.contains(TEST_STRING));
+	}
+
+	/**
+	 * Resource is not deleted when items have been written and shouldDeleteIfEmpty flag is set (restart after delete).
+	 */
+	@Test
+	public void testDeleteIfEmptyNoRecordsWrittenHeaderAndFooterRestartAfterDelete() throws Exception {
+		writer.setShouldDeleteIfEmpty(true);
+		writer.setHeaderCallback(new StaxWriterCallback() {
+
+			@Override
+			public void write(XMLEventWriter writer) throws IOException {
+				XMLEventFactory factory = XMLEventFactory.newInstance();
+				try {
+					writer.add(factory.createStartElement("", "", "header"));
+					writer.add(factory.createEndElement("", "", "header"));
+				}
+				catch (XMLStreamException e) {
+					throw new RuntimeException(e);
+				}
+
+			}
+
+		});
+		writer.setFooterCallback(new StaxWriterCallback() {
+
+			@Override
+			public void write(XMLEventWriter writer) throws IOException {
+				XMLEventFactory factory = XMLEventFactory.newInstance();
+				try {
+					writer.add(factory.createStartElement("", "", "footer"));
+					writer.add(factory.createEndElement("", "", "footer"));
+				}
+				catch (XMLStreamException e) {
+					throw new RuntimeException(e);
+				}
+
+			}
+
+		});
+		writer.open(executionContext);
+		writer.update(executionContext);
+		writer.close();
+		assertFalse("file should be deleted" + resource, resource.getFile().exists());
+		writer.open(executionContext);
+		writer.write(items);
+		writer.update(executionContext);
+		writer.close();
+		String content = getOutputFileContent();
+		assertTrue("Wrong content: " + content, content.contains(TEST_STRING));
+	}
+
+
+	/**
 	 * Item is written to the output file with namespace.
 	 */
 	@Test

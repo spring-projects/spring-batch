@@ -142,6 +142,8 @@ ResourceAwareItemWriterItemStream<T>, InitializingBean {
 
 	private boolean forceSync;
 
+	private boolean shouldDeleteIfEmpty = false;
+
 	public StaxEventItemWriter() {
 		setExecutionContextName(ClassUtils.getShortName(StaxEventItemWriter.class));
 	}
@@ -201,6 +203,16 @@ ResourceAwareItemWriterItemStream<T>, InitializingBean {
 	 */
 	public void setForceSync(boolean forceSync) {
 		this.forceSync = forceSync;
+	}
+
+	/**
+	 * Flag to indicate that the target file should be deleted if no items have
+	 * been written (other than header and footer) on close. Defaults to false.
+	 * 
+	 * @param shouldDeleteIfEmpty the flag value to set
+	 */
+	public void setShouldDeleteIfEmpty(boolean shouldDeleteIfEmpty) {
+		this.shouldDeleteIfEmpty = shouldDeleteIfEmpty;
 	}
 
 	/**
@@ -354,7 +366,15 @@ ResourceAwareItemWriterItemStream<T>, InitializingBean {
 		// otherwise start from beginning
 		if (executionContext.containsKey(getExecutionContextKey(RESTART_DATA_NAME))) {
 			startAtPosition = executionContext.getLong(getExecutionContextKey(RESTART_DATA_NAME));
+			currentRecordCount = executionContext.getLong(getExecutionContextKey(WRITE_STATISTICS_NAME));
 			restarted = true;
+			if (shouldDeleteIfEmpty && currentRecordCount == 0) {
+				// previous execution deleted the output file because no items were written
+				restarted = false;
+				startAtPosition = 0;
+			} else {
+				restarted = true;
+			}
 		}
 
 		open(startAtPosition, restarted);
@@ -654,6 +674,14 @@ ResourceAwareItemWriterItemStream<T>, InitializingBean {
 					if (!transactional) {
 						closeStream();
 					}
+				}
+			}
+			if (currentRecordCount == 0 && shouldDeleteIfEmpty) {
+				try {
+					resource.getFile().delete();
+				}
+				catch (IOException e) {
+					throw new ItemStreamException("Failed to delete empty file on close", e);
 				}
 			}
 		}

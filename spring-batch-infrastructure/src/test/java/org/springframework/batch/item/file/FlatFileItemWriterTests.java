@@ -323,8 +323,8 @@ public class FlatFileItemWriterTests {
 
 		assertEquals("footer", readLine());
 
-		// 3 lines were written to the file after restart
-		assertEquals(3, executionContext.getLong(ClassUtils.getShortName(FlatFileItemWriter.class) + ".written"));
+		// 8 lines were written to the file in total
+		assertEquals(8, executionContext.getLong(ClassUtils.getShortName(FlatFileItemWriter.class) + ".written"));
 
 	}
 
@@ -425,8 +425,8 @@ public class FlatFileItemWriterTests {
 
 		assertEquals("footer", readLine());
 
-		// 3 lines were written to the file after restart
-		assertEquals(3, executionContext.getLong(ClassUtils.getShortName(FlatFileItemWriter.class) + ".written"));
+		// 8 lines were written to the file in total
+		assertEquals(8, executionContext.getLong(ClassUtils.getShortName(FlatFileItemWriter.class) + ".written"));
 
 	}
 
@@ -595,12 +595,50 @@ public class FlatFileItemWriterTests {
 	public void testDeleteOnExitReopen() throws Exception {
 		writer.setShouldDeleteIfEmpty(true);
 		writer.open(executionContext);
+		writer.update(executionContext);
 		assertTrue(outputFile.exists());
 		writer.close();
 		assertFalse(outputFile.exists());
 		writer.open(executionContext);
 		writer.write(Collections.singletonList("test2"));
 		assertEquals("test2", readLine());
+	}
+	
+	@Test
+	public void testWriteHeaderAndDeleteOnExitReopen() throws Exception {
+		writer.setHeaderCallback(new FlatFileHeaderCallback() {
+
+            @Override
+			public void writeHeader(Writer writer) throws IOException {
+				writer.write("a\nb");
+			}
+
+		});
+		writer.setShouldDeleteIfEmpty(true);
+		writer.open(executionContext);
+		writer.update(executionContext);
+		assertTrue(outputFile.exists());
+		writer.close();
+		assertFalse(outputFile.exists());
+
+		writer.open(executionContext);
+		writer.write(Collections.singletonList("test2"));
+		assertEquals("a", readLine());
+		assertEquals("b", readLine());
+		assertEquals("test2", readLine());
+	}	
+	
+	@Test
+	public void testDeleteOnExitNoRecordsWrittenAfterRestart() throws Exception {
+		writer.setShouldDeleteIfEmpty(true);
+		writer.open(executionContext);
+		writer.write(Collections.singletonList("test2"));
+		writer.update(executionContext);
+		writer.close();
+		assertTrue(outputFile.exists());
+		writer.open(executionContext);
+		writer.close();
+		assertTrue(outputFile.exists());
 	}
 
 	@Test

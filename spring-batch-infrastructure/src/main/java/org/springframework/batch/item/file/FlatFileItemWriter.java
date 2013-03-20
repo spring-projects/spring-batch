@@ -469,7 +469,14 @@ InitializingBean {
 		 */
 		public void restoreFrom(ExecutionContext executionContext) {
 			lastMarkedByteOffsetPosition = executionContext.getLong(getExecutionContextKey(RESTART_DATA_NAME));
-			restarted = true;
+			linesWritten = executionContext.getLong(getExecutionContextKey(WRITTEN_STATISTICS_NAME));
+			if (shouldDeleteIfEmpty && linesWritten == 0) {
+				// previous execution deleted the output file because no items were written
+				restarted = false;
+				lastMarkedByteOffsetPosition = 0;
+			} else {
+				restarted = true;
+			}
 		}
 
 		/**
@@ -585,7 +592,6 @@ InitializingBean {
 			}
 
 			initialized = true;
-			linesWritten = 0;
 		}
 
 		public boolean isInitialized() {
