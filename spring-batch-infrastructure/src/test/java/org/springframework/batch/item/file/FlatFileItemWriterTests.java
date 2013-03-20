@@ -516,8 +516,8 @@ public class FlatFileItemWriterTests {
 
 		assertEquals("footer", readLine(encoding));
 
-		// 3 lines were written to the file after restart
-		assertEquals(3, executionContext.getLong(ClassUtils.getShortName(FlatFileItemWriter.class) + ".written"));		
+		// 8 lines were written to the file in total
+		assertEquals(8, executionContext.getLong(ClassUtils.getShortName(FlatFileItemWriter.class) + ".written"));		
 	}
 
 	@Test
