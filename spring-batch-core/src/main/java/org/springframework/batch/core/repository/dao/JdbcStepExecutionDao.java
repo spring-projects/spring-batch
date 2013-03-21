@@ -133,44 +133,49 @@ public class JdbcStepExecutionDao extends AbstractJdbcBatchMetadataDao implement
 	@Override
 	public void saveStepExecutions(final Collection<StepExecution> stepExecutions) {
 		Assert.notNull(stepExecutions, "Attempt to save a null collection of step executions");
-		final Iterator<StepExecution> iterator = stepExecutions.iterator();
-		getJdbcTemplate().batchUpdate(getQuery(SAVE_STEP_EXECUTION), new BatchPreparedStatementSetter() {
 
-			@Override
-			public int getBatchSize() {
-				return stepExecutions.size();
-			}
+        if (!stepExecutions.isEmpty()) {
+            final Iterator<StepExecution> iterator = stepExecutions.iterator();
+            getJdbcTemplate().batchUpdate(getQuery(SAVE_STEP_EXECUTION), new BatchPreparedStatementSetter() {
 
-			@Override
-			public void setValues(PreparedStatement ps, int i) throws SQLException {
-				StepExecution stepExecution = iterator.next();
-				List<Object[]> parameters = buildStepExecutionParameters(stepExecution);
-				Object[] parameterValues = (Object[]) parameters.get(0);
-				Integer[] parameterTypes = (Integer[]) parameters.get(1);
-				for (int indx = 0; indx < parameterValues.length; indx++) {
-					switch (parameterTypes[indx]) {
-					case Types.INTEGER:
-						ps.setInt(indx + 1, (Integer) parameterValues[indx]);
-						break;
-					case Types.VARCHAR:
-						ps.setString(indx + 1, (String) parameterValues[indx]);
-						break;
-					case Types.TIMESTAMP:
-						if (parameterValues[indx] !=null) {
-							ps.setTimestamp(indx + 1, new Timestamp(((java.util.Date) parameterValues[indx]).getTime()));
-						}
-						break;
-					case Types.BIGINT:
-						ps.setLong(indx + 1, (Long) parameterValues[indx]);
-						break;
-					default:
-						throw new IllegalArgumentException(
-								"unsupported SQL parameter type for step execution field index " + i);
-					}
-				}
-			}
-		});
-	}
+                @Override
+                public int getBatchSize() {
+                    return stepExecutions.size();
+                }
+
+                @Override
+                public void setValues(PreparedStatement ps, int i) throws SQLException {
+                    StepExecution stepExecution = iterator.next();
+                    List<Object[]> parameters = buildStepExecutionParameters(stepExecution);
+                    Object[] parameterValues = (Object[]) parameters.get(0);
+                    Integer[] parameterTypes = (Integer[]) parameters.get(1);
+                    for (int indx = 0; indx < parameterValues.length; indx++) {
+                        switch (parameterTypes[indx]) {
+                            case Types.INTEGER:
+                                ps.setInt(indx + 1, (Integer) parameterValues[indx]);
+                                break;
+                            case Types.VARCHAR:
+                                ps.setString(indx + 1, (String) parameterValues[indx]);
+                                break;
+                            case Types.TIMESTAMP:
+                                if (parameterValues[indx] != null) {
+                                    ps.setTimestamp(indx + 1, new Timestamp(((java.util.Date) parameterValues[indx]).getTime()));
+                                } else {
+                                    ps.setNull(indx + 1, Types.TIMESTAMP);
+                                }
+                                break;
+                            case Types.BIGINT:
+                                ps.setLong(indx + 1, (Long) parameterValues[indx]);
+                                break;
+                            default:
+                                throw new IllegalArgumentException(
+                                        "unsupported SQL parameter type for step execution field index " + i);
+                        }
+                    }
+                }
+            });
+        }
+    }
 
 	private List<Object[]> buildStepExecutionParameters(StepExecution stepExecution) {
 		Assert.isNull(stepExecution.getId(),
