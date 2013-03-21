@@ -25,8 +25,9 @@ import static org.junit.Assert.fail;
 
 import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileReader;
+import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.io.Writer;
 import java.nio.charset.UnsupportedCharsetException;
 import java.util.ArrayList;
@@ -88,6 +89,7 @@ public class FlatFileItemWriterTests {
 		writer.setLineAggregator(new PassThroughLineAggregator<String>());
 		writer.afterPropertiesSet();
 		writer.setSaveState(true);
+		writer.setEncoding("UTF-8");
 		executionContext = new ExecutionContext();
 	}
 
@@ -108,13 +110,22 @@ public class FlatFileItemWriterTests {
 	 * because running the tests in a UNIX environment locks the file if it's open for writing.
 	 */
 	private String readLine() throws IOException {
+		return readLine("UTF-8");
+	}
+
+	/*
+	 * Read a line from the output file, if the reader has not been created, recreate. This method is only necessary
+	 * because running the tests in a UNIX environment locks the file if it's open for writing.
+	 */
+	private String readLine(String encoding) throws IOException {
 
 		if (reader == null) {
-			reader = new BufferedReader(new FileReader(outputFile));
+			reader = new BufferedReader(new InputStreamReader(new FileInputStream(outputFile), encoding));
 		}
 
 		return reader.readLine();
 	}
+
 	/*
 	 * Properly close the output file reader.
 	 */
@@ -231,7 +242,7 @@ public class FlatFileItemWriterTests {
 	@Test
 	public void testWriteWithConverter() throws Exception {
 		writer.setLineAggregator(new LineAggregator<String>() {
-            @Override
+			@Override
 			public String aggregate(String item) {
 				return "FOO:" + item;
 			}
@@ -252,7 +263,7 @@ public class FlatFileItemWriterTests {
 	@Test
 	public void testWriteWithConverterAndString() throws Exception {
 		writer.setLineAggregator(new LineAggregator<String>() {
-            @Override
+			@Override
 			public String aggregate(String item) {
 				return "FOO:" + item;
 			}
@@ -290,7 +301,7 @@ public class FlatFileItemWriterTests {
 
 		writer.setFooterCallback(new FlatFileFooterCallback() {
 
-            @Override
+			@Override
 			public void writeFooter(Writer writer) throws IOException {
 				writer.write("footer");
 			}
@@ -345,7 +356,7 @@ public class FlatFileItemWriterTests {
 
 		writer.open(executionContext);
 		new TransactionTemplate(transactionManager).execute(new TransactionCallback() {
-            @Override
+			@Override
 			public Object doInTransaction(TransactionStatus status) {
 				try {
 					writer.write(Collections.singletonList(TEST_STRING));
@@ -366,7 +377,7 @@ public class FlatFileItemWriterTests {
 
 		writer.setFooterCallback(new FlatFileFooterCallback() {
 
-            @Override
+			@Override
 			public void writeFooter(Writer writer) throws IOException {
 				writer.write("footer");
 			}
@@ -378,7 +389,7 @@ public class FlatFileItemWriterTests {
 		PlatformTransactionManager transactionManager = new ResourcelessTransactionManager();
 
 		new TransactionTemplate(transactionManager).execute(new TransactionCallback() {
-            @Override
+			@Override
 			public Object doInTransaction(TransactionStatus status) {
 				try {
 					// write some lines
@@ -401,7 +412,7 @@ public class FlatFileItemWriterTests {
 		writer.open(executionContext);
 
 		new TransactionTemplate(transactionManager).execute(new TransactionCallback() {
-            @Override
+			@Override
 			public Object doInTransaction(TransactionStatus status) {
 				try {
 					// write more lines
@@ -428,6 +439,85 @@ public class FlatFileItemWriterTests {
 		// 8 lines were written to the file in total
 		assertEquals(8, executionContext.getLong(ClassUtils.getShortName(FlatFileItemWriter.class) + ".written"));
 
+	}
+
+	@Test
+	// BATCH-1959
+	public void testTransactionalRestartWithMultiByteCharacterUTF8() throws Exception {
+		testTransactionalRestartWithMultiByteCharacter("UTF-8");
+	}
+
+	@Test
+	// BATCH-1959
+	public void testTransactionalRestartWithMultiByteCharacterUTF16BE() throws Exception {
+		testTransactionalRestartWithMultiByteCharacter("UTF-16BE");
+	}
+
+	private void testTransactionalRestartWithMultiByteCharacter(String encoding) throws Exception {
+		writer.setEncoding(encoding);
+		writer.setFooterCallback(new FlatFileFooterCallback() {
+
+			@Override
+			public void writeFooter(Writer writer) throws IOException {
+				writer.write("footer");
+			}
+
+		});
+
+		writer.open(executionContext);
+
+		PlatformTransactionManager transactionManager = new ResourcelessTransactionManager();
+
+		new TransactionTemplate(transactionManager).execute(new TransactionCallback() {
+			@Override
+			public Object doInTransaction(TransactionStatus status) {
+				try {
+					// write some lines
+					writer.write(Arrays.asList(new String[] { "téstLine1", "téstLine2", "téstLine3" }));
+					// write more lines
+					writer.write(Arrays.asList(new String[] { "téstLine4", "téstLine5" }));
+				}
+				catch (Exception e) {
+					throw new UnexpectedInputException("Could not write data", e);
+				}
+				// get restart data
+				writer.update(executionContext);
+				return null;
+			}
+		});
+		// close template
+		writer.close();
+
+		// init with correct data
+		writer.open(executionContext);
+
+		new TransactionTemplate(transactionManager).execute(new TransactionCallback() {
+			@Override
+			public Object doInTransaction(TransactionStatus status) {
+				try {
+					// write more lines
+					writer.write(Arrays.asList(new String[] { "téstLine6", "téstLine7", "téstLine8" }));
+				}
+				catch (Exception e) {
+					throw new UnexpectedInputException("Could not write data", e);
+				}
+				// get restart data
+				writer.update(executionContext);
+				return null;
+			}
+		});
+		// close template
+		writer.close();
+
+		// verify what was written to the file
+		for (int i = 1; i <= 8; i++) {
+			assertEquals("téstLine" + i, readLine(encoding));
+		}
+
+		assertEquals("footer", readLine(encoding));
+
+		// 8 lines were written to the file in total
+		assertEquals(8, executionContext.getLong(ClassUtils.getShortName(FlatFileItemWriter.class) + ".written"));
 	}
 
 	@Test
@@ -514,7 +604,7 @@ public class FlatFileItemWriterTests {
 	public void testWriteFooter() throws Exception {
 		writer.setFooterCallback(new FlatFileFooterCallback() {
 
-            @Override
+			@Override
 			public void writeFooter(Writer writer) throws IOException {
 				writer.write("a\nb");
 			}
@@ -532,7 +622,7 @@ public class FlatFileItemWriterTests {
 	public void testWriteHeader() throws Exception {
 		writer.setHeaderCallback(new FlatFileHeaderCallback() {
 
-            @Override
+			@Override
 			public void writeHeader(Writer writer) throws IOException {
 				writer.write("a\nb");
 			}
@@ -552,7 +642,7 @@ public class FlatFileItemWriterTests {
 	@Test
 	public void testWriteWithAppendAfterHeaders() throws Exception {
 		writer.setHeaderCallback(new FlatFileHeaderCallback() {
-            @Override
+			@Override
 			public void writeHeader(Writer writer) throws IOException {
 				writer.write("a\nb");
 			}
@@ -578,7 +668,7 @@ public class FlatFileItemWriterTests {
 	public void testWriteHeaderAndDeleteOnExit() throws Exception {
 		writer.setHeaderCallback(new FlatFileHeaderCallback() {
 
-            @Override
+			@Override
 			public void writeHeader(Writer writer) throws IOException {
 				writer.write("a\nb");
 			}
@@ -603,12 +693,12 @@ public class FlatFileItemWriterTests {
 		writer.write(Collections.singletonList("test2"));
 		assertEquals("test2", readLine());
 	}
-	
+
 	@Test
 	public void testWriteHeaderAndDeleteOnExitReopen() throws Exception {
 		writer.setHeaderCallback(new FlatFileHeaderCallback() {
 
-            @Override
+			@Override
 			public void writeHeader(Writer writer) throws IOException {
 				writer.write("a\nb");
 			}
@@ -626,8 +716,8 @@ public class FlatFileItemWriterTests {
 		assertEquals("a", readLine());
 		assertEquals("b", readLine());
 		assertEquals("test2", readLine());
-	}	
-	
+	}
+
 	@Test
 	public void testDeleteOnExitNoRecordsWrittenAfterRestart() throws Exception {
 		writer.setShouldDeleteIfEmpty(true);
@@ -645,7 +735,7 @@ public class FlatFileItemWriterTests {
 	public void testWriteHeaderAfterRestartOnFirstChunk() throws Exception {
 		writer.setHeaderCallback(new FlatFileHeaderCallback() {
 
-            @Override
+			@Override
 			public void writeHeader(Writer writer) throws IOException {
 				writer.write("a\nb");
 			}
@@ -671,7 +761,7 @@ public class FlatFileItemWriterTests {
 	public void testWriteHeaderAfterRestartOnSecondChunk() throws Exception {
 		writer.setHeaderCallback(new FlatFileHeaderCallback() {
 
-            @Override
+			@Override
 			public void writeHeader(Writer writer) throws IOException {
 				writer.write("a\nb");
 			}
@@ -710,7 +800,7 @@ public class FlatFileItemWriterTests {
 
 		writer.setLineAggregator(new LineAggregator<String>() {
 
-            @Override
+			@Override
 			public String aggregate(String item) {
 				if (item.equals("2")) {
 					throw new RuntimeException("aggregation failed on " + item);
