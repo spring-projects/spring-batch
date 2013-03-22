@@ -1,7 +1,7 @@
 
---insert script that 'copies' existing batch_job_params to batch_job_execution_params
---sets new params to identifying ones
---verified on h2, 
+-- insert script that 'copies' existing batch_job_params to batch_job_execution_params
+-- sets new params to identifying ones
+-- verified on h2, 
 
 INSERT INTO BATCH_JOB_EXECUTION_PARAMS 
 	( JOB_EXECUTION_ID , TYPE_CD, KEY_NAME, STRING_VAL, DATE_VAL, LONG_VAL, DOUBLE_VAL, IDENTIFYING )

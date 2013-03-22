@@ -1,12 +1,12 @@
 
---create the requisite table
+-- create the requisite table
 
 CREATE TABLE BATCH_JOB_EXECUTION_PARAMS  (
 	JOB_EXECUTION_ID BIGINT NOT NULL ,
 	TYPE_CD VARCHAR(6) NOT NULL ,
 	KEY_NAME VARCHAR(100) NOT NULL ,
 	STRING_VAL VARCHAR(250) ,
-	DATE_VAL TIMESTAMP DEFAULT NULL ,
+	DATE_VAL DATETIME DEFAULT NULL ,
 	LONG_VAL BIGINT ,
 	DOUBLE_VAL DOUBLE PRECISION ,
 	IDENTIFYING CHAR(1) NOT NULL ,
@@ -14,9 +14,9 @@ CREATE TABLE BATCH_JOB_EXECUTION_PARAMS  (
 	references BATCH_JOB_EXECUTION(JOB_EXECUTION_ID)
 ) ;
 
---insert script that 'copies' existing batch_job_params to batch_job_execution_params
---sets new params to identifying ones
---verified on h2, 
+-- insert script that 'copies' existing batch_job_params to batch_job_execution_params
+-- sets new params to identifying ones
+-- verified on h2, 
 
 INSERT INTO BATCH_JOB_EXECUTION_PARAMS 
 	( JOB_EXECUTION_ID , TYPE_CD, KEY_NAME, STRING_VAL, DATE_VAL, LONG_VAL, DOUBLE_VAL, IDENTIFYING )
