@@ -35,13 +35,6 @@ import org.springframework.util.Assert;
  * default (see {@link #setClearSession(boolean) clearSession} property).<br/>
  * <br/>
  *
-<<<<<<< HEAD
- * The writer is thread safe after its properties are set (normal singleton
- * behavior), so it can be used to write in multiple concurrent transactions.
- *
- * @author Dave Syer
- * @author Thomas Risberg
-=======
  * The writer is thread safe once properties are set (normal singleton behavior)
  * if a {@link CurrentSessionContext} that uses only one session per thread is
  * used.
@@ -49,7 +42,6 @@ import org.springframework.util.Assert;
  * @author Dave Syer
  * @author Thomas Risberg
  * @author Michael Minella
->>>>>>> BATCH-1904: Updated to support Hibernate 4
  *
  */
 public class HibernateItemWriter<T> implements ItemWriter<T>, InitializingBean {
@@ -159,13 +151,8 @@ public class HibernateItemWriter<T> implements ItemWriter<T>, InitializingBean {
 	}
 
 	/**
-<<<<<<< HEAD
-	 * Do perform the actual write operation. This can be overridden in a
-	 * subclass if necessary.
-=======
 	 * Do perform the actual write operation using {@link HibernateOperations}.
 	 * This can be overridden in a subclass if necessary.
->>>>>>> BATCH-1904: Updated to support Hibernate 4
 	 *
 	 * @param hibernateTemplate
 	 *            the HibernateTemplate to use for the operation
