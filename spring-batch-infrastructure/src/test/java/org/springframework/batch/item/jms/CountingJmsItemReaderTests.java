@@ -19,6 +19,8 @@ package org.springframework.batch.item.jms;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 import java.util.Date;
 
@@ -40,51 +42,41 @@ public class CountingJmsItemReaderTests {
 
 	@Test
 	public void testNoItemTypeSunnyDay() {
-		JmsOperations jmsTemplate = EasyMock.createMock(JmsOperations.class);
-		EasyMock.expect(jmsTemplate.receiveAndConvert()).andReturn("foo");
-		EasyMock.expect(jmsTemplate.receiveAndConvert()).andReturn(null);
-		EasyMock.replay(jmsTemplate);
+		JmsOperations jmsTemplate = mock(JmsOperations.class);
+		when(jmsTemplate.receiveAndConvert()).thenReturn("foo");
 
-		CountingJmsItemReader<String> itemReader = new CountingJmsItemReader<String>();
 		itemReader.setJmsTemplate(jmsTemplate);
 		assertEquals("foo", itemReader.read());
-		assertEquals(null, itemReader.read());
-		EasyMock.verify(jmsTemplate);
 	}
 
 	@Test
 	public void testSetItemTypeSunnyDay() {
-		JmsOperations jmsTemplate = EasyMock.createMock(JmsOperations.class);
-		EasyMock.expect(jmsTemplate.receiveAndConvert()).andReturn("foo");
-		EasyMock.replay(jmsTemplate);
+		JmsOperations jmsTemplate = mock(JmsOperations.class);
+		when(jmsTemplate.receiveAndConvert()).thenReturn("foo");
 
 		itemReader.setJmsTemplate(jmsTemplate);
 		itemReader.setItemType(String.class);
 		assertEquals("foo", itemReader.read());
-		EasyMock.verify(jmsTemplate);
 	}
 
 	@Test
 	public void testSetItemSubclassTypeSunnyDay() {
-		JmsOperations jmsTemplate = EasyMock.createMock(JmsOperations.class);
+		JmsOperations jmsTemplate = mock(JmsOperations.class);
 
 		Date date = new java.sql.Date(0L);
-		EasyMock.expect(jmsTemplate.receiveAndConvert()).andReturn(date);
-		EasyMock.replay(jmsTemplate);
+		when(jmsTemplate.receiveAndConvert()).thenReturn(date);
 
 		JmsItemReader<Date> itemReader = new JmsItemReader<Date>();
 		itemReader.setJmsTemplate(jmsTemplate);
 		itemReader.setItemType(Date.class);
 		assertEquals(date, itemReader.read());
 
-		EasyMock.verify(jmsTemplate);
 	}
 
 	@Test
 	public void testSetItemTypeMismatch() {
-		JmsOperations jmsTemplate = EasyMock.createMock(JmsOperations.class);
-		EasyMock.expect(jmsTemplate.receiveAndConvert()).andReturn("foo");
-		EasyMock.replay(jmsTemplate);
+		JmsOperations jmsTemplate = mock(JmsOperations.class);
+		when(jmsTemplate.receiveAndConvert()).thenReturn("foo");
 
 		JmsItemReader<Date> itemReader = new JmsItemReader<Date>();
 		itemReader.setJmsTemplate(jmsTemplate);
@@ -96,21 +88,18 @@ public class CountingJmsItemReaderTests {
 			// expected
 			assertTrue(e.getMessage().indexOf("wrong type") >= 0);
 		}
-		EasyMock.verify(jmsTemplate);
 	}
 
 	@Test
 	public void testNextMessageSunnyDay() {
-		JmsOperations jmsTemplate = EasyMock.createMock(JmsOperations.class);
-		Message message = EasyMock.createMock(Message.class);
-		EasyMock.expect(jmsTemplate.receive()).andReturn(message);
-		EasyMock.replay(jmsTemplate, message);
+		JmsOperations jmsTemplate = mock(JmsOperations.class);
+		Message message = mock(Message.class);
+		when(jmsTemplate.receive()).thenReturn(message);
 
 		JmsItemReader<Message> itemReader = new JmsItemReader<Message>();
 		itemReader.setJmsTemplate(jmsTemplate);
 		itemReader.setItemType(Message.class);
 		assertEquals(message, itemReader.read());
-		EasyMock.verify(jmsTemplate);
 	}
 
 	@Test(expected = IllegalArgumentException.class)
@@ -126,5 +115,4 @@ public class CountingJmsItemReaderTests {
 		jmsTemplate.setDefaultDestinationName("foo");
 		itemReader.setJmsTemplate(jmsTemplate);
 	}
-
 }
