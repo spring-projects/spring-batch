@@ -10,7 +10,7 @@ import org.springframework.batch.item.ItemStreamException;
 import org.springframework.util.Assert;
 
 /**
- * 
+ * This is a thread safe reader that counts a specific number of requests that are read.
  * @author George Foster
  * 
  * @param <T>
@@ -85,7 +85,13 @@ public class CountingJmsItemReader<T> extends JmsItemReader<T> implements ItemSt
 
 	public void setMaxItemCount(final long maxItemCount) {
 		Assert.isTrue(maxItemCount > 0, "maxItemCount should be greater than 0");
-		this.maxItemCount = maxItemCount;
+		writeLock.lock();
+		try {
+			this.maxItemCount = maxItemCount;
+		}
+		finally {
+			writeLock.unlock();
+		}
 	}
 
 }
