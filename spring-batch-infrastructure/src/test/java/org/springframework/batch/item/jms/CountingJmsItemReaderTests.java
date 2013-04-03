@@ -34,11 +34,11 @@ import org.springframework.jms.core.JmsTemplate;
  * 
  * @author George Foster
  * 
- *         TODO rewrite more complete unit tests
+ * TODO rewrite more complete unit tests
  */
 public class CountingJmsItemReaderTests {
 
-	JmsItemReader<String> itemReader = new JmsItemReader<String>();
+	CountingJmsItemReader<String> itemReader = new CountingJmsItemReader<String>();
 
 	@Test
 	public void testNoItemTypeSunnyDay() {
@@ -47,6 +47,18 @@ public class CountingJmsItemReaderTests {
 
 		itemReader.setJmsTemplate(jmsTemplate);
 		assertEquals("foo", itemReader.read());
+	}
+
+	@Test
+	public void testSetMaxItemsSunnyDay() {
+		JmsOperations jmsTemplate = mock(JmsOperations.class);
+		when(jmsTemplate.receiveAndConvert()).thenReturn("foo");
+
+		itemReader.setJmsTemplate(jmsTemplate);
+		itemReader.setItemType(String.class);
+		itemReader.setMaxItemCount(1);
+		assertEquals("foo", itemReader.read());
+		assertEquals(null, itemReader.read());
 	}
 
 	@Test
@@ -84,7 +96,8 @@ public class CountingJmsItemReaderTests {
 		try {
 			itemReader.read();
 			fail("Expected IllegalStateException");
-		} catch (IllegalStateException e) {
+		}
+		catch (IllegalStateException e) {
 			// expected
 			assertTrue(e.getMessage().indexOf("wrong type") >= 0);
 		}
@@ -114,5 +127,10 @@ public class CountingJmsItemReaderTests {
 		JmsTemplate jmsTemplate = new JmsTemplate();
 		jmsTemplate.setDefaultDestinationName("foo");
 		itemReader.setJmsTemplate(jmsTemplate);
+	}
+
+	@Test(expected = IllegalArgumentException.class)
+	public void testSetMaxItemsWithIllegalArguement() {
+		itemReader.setMaxItemCount(0);
 	}
 }
