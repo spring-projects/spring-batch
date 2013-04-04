@@ -20,6 +20,10 @@ Spring Batch 2.2.0.M1 Release Notes
 
   * {{{https://jira.springframework.org/browse/BATCH-1950}[BATCH-1950]}} - Fix bootstrap process
 
+  * {{{https://jira.springframework.org/browse/BATCH-1884}[BATCH-1884]}} - JobLauncherIntegrationTests failing
+
+  * {{{https://jira.springframework.org/browse/BATCH-1890}[BATCH-1890]}} - Fix broken JDK5 build after Spring 3.1.2
+
 * Improvement
 
   * {{{https://jira.springframework.org/browse/BATCH-1667}[BATCH-1667]}} - StepExecutionListener ExitStatus not persisted and not accessible for other listeners
@@ -31,6 +35,16 @@ Spring Batch 2.2.0.M1 Release Notes
   * {{{https://jira.springframework.org/browse/BATCH-1889}[BATCH-1889]}} - SqlFire support
 
   * {{{https://jira.springframework.org/browse/BATCH-1904}[BATCH-1904]}} - Upgrade support of Hibernate to Hibernate 4
+
+  * {{{https://jira.springframework.org/browse/BATCH-1887}[BATCH-1887]}} - Cleanup maven warnings
+
+  * {{{https://jira.springframework.org/browse/BATCH-1891}[BATCH-1891]}} - Migrate usage of deprecated classes
+
+  * {{{https://jira.springframework.org/browse/BATCH-1928}[BATCH-1928]}} - Convert deprecated classes from the org.springframework.jdbc.core.simple package in samples
+
+  * {{{https://jira.springframework.org/browse/BATCH-1929}[BATCH-1929]}} - Convert deprecated classes from the org.springframework.jdbc.core.simple package in core-tests
+
+  * {{{https://jira.springframework.org/browse/BATCH-1931}[BATCH-1931]}} - Convert deprecated classes from the org.springframework.jdbc.core.simple package in infrastructure-tests
 
 * New Feature
 
@@ -50,11 +64,17 @@ Spring Batch 2.2.0.M1 Release Notes
 
   * {{{https://jira.springframework.org/browse/BATCH-1935}[BATCH-1935]}} - Add quick start maven archetype
 
+  * {{{https://jira.springframework.org/browse/BATCH-1685}[BATCH-1685]}} - Upgrade minimum support level for Spring to 3.1.2
+
+  * {{{https://jira.springframework.org/browse/BATCH-1882}[BATCH-1882]}} - AMQP ItemReader and ItemWriter
+
 * Task
 
   * {{{https://jira.springframework.org/browse/BATCH-1938}[BATCH-1938]}} - Update to support Spring 3.2.0.RELEASE
 
   * {{{https://jira.springframework.org/browse/BATCH-1943}[BATCH-1943]}} - Add ChunkContext to existing ChunkListener methods
+
+  * {{{https://jira.springframework.org/browse/BATCH-1883}[BATCH-1883]}} - Bump spring-amqp Version to 1.1.2
 
 * Refactoring
 
@@ -63,3 +83,6 @@ Spring Batch 2.2.0.M1 Release Notes
   * {{{https://jira.springframework.org/browse/BATCH-1940}[BATCH-1940]}} - Replace org.springframework.batch.support.JdbcTestUtils with org.springframework.test.jdbc.JdbcTestUtils
 
   * {{{https://jira.springframework.org/browse/BATCH-1949}[BATCH-1949]}} - Remove explicit checks for Spring 3 in StepScope
+
+  * {{{https://jira.springframework.org/browse/BATCH-1919}[BATCH-1919]}} - Switch to using <jdbc:/> namespace in samples
+ 
