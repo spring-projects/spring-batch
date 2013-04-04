@@ -227,7 +227,9 @@ Foo result = template.execute(new RetryCallback&lt;Foo&gt;() {
     this list overrides the retryable list so that it can be used to give
     finer control over the retry behavior:</para>
 
-    <programlisting>SimpleRetryPolicy policy = new SimpleRetryPolicy(5);
+    <programlisting>SimpleRetryPolicy policy = new SimpleRetryPolicy();
+// Set the max retry attempts
+policy.setMaxAttempts(5);
 // Retry on all exceptions (this is the default)
 policy.setRetryableExceptions(new Class[] {Exception.class});
 // ... but never retry IllegalStateException
