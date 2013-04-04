@@ -72,8 +72,9 @@
     batch job. A <classname>Job</classname> is an entity that encapsulates an
     entire batch process. As is common with other Spring projects, a
     <classname>Job</classname> will be wired together via an XML configuration
-    file. This file may be referred to as the "job configuration". However,
-    <classname>Job</classname> is just the top of an overall hierarchy:</para>
+    file or Java based configuration. This configuration may be referred to as 
+    the "job configuration". However, <classname>Job</classname> is just the 
+    top of an overall hierarchy:</para>
 
     <mediaobject>
       <imageobject role="html">
@@ -137,7 +138,7 @@
       executions (<classname>JobExecution</classname> is discussed in more
       detail below) and only one <classname>JobInstance</classname>
       corresponding to a particular <classname>Job</classname> and
-      <classname>JobParameters</classname> can be running at a given
+      identifying <classname>JobParameter</classname>s can be running at a given
       time.</para>
 
       <para>The definition of a <classname>JobInstance</classname> has
@@ -188,11 +189,17 @@
       one that was started with a job parameter of 01-01-2008 and another that
       was started with a parameter of 01-02-2008. Thus, the contract can be
       defined as: <classname>JobInstance</classname> =
-      <classname>Job</classname> + <classname>JobParameters</classname>. This
+      <classname>Job</classname> + identifying <classname>JobParameters</classname>. This
       allows a developer to effectively control how a
       <classname>JobInstance</classname> is defined, since they control what
       parameters are passed in.</para>
     </section>
+	<note>
+		<para>Not all job parameters are required to contribute to the identification
+		of a <classname>JobInstance</classname>.  By default they do, however the framework
+		allows the submission of a <classname>Job</classname> with parameters that do
+		not contribute to the identity of a <classname>JobInstance</classname> as well.</para>
+	</note>
 
     <section id="domainJobExecution">
       <title id="jobExecution">JobExecution</title>
@@ -205,7 +212,7 @@
       successfully. Using the EndOfDay <classname>Job</classname> described
       above as an example, consider a <classname>JobInstance</classname> for
       01-01-2008 that failed the first time it was run. If it is run again
-      with the same job parameters as the first run (01-01-2008), a new
+      with the same identifying job parameters as the first run (01-01-2008), a new
       <classname>JobExecution</classname> will be created. However, there will
       still be only one <classname>JobInstance</classname>.</para>
 
@@ -324,18 +331,20 @@
       </table>
 
       <table>
-        <title>BATCH_JOB_PARAMS</title>
+        <title>BATCH_JOB_EXECUTION_PARAMS</title>
 
         <tgroup cols="4">
           <tbody>
             <row>
-              <entry>JOB_INST_ID</entry>
+              <entry>JOB_EXECUTION_ID</entry>
 
               <entry>TYPE_CD</entry>
 
               <entry>KEY_NAME</entry>
 
               <entry>DATE_VAL</entry>
+
+              <entry>IDENTIFYING</entry>
             </row>
 
             <row>
@@ -346,6 +355,8 @@
               <entry>schedule.Date</entry>
 
               <entry>2008-01-01</entry>
+
+              <entry>TRUE</entry>
             </row>
           </tbody>
         </tgroup>
@@ -436,18 +447,20 @@
       </table>
 
       <table>
-        <title>BATCH_JOB_PARAMS</title>
+        <title>BATCH_JOB_EXECUTION_PARAMS</title>
 
         <tgroup cols="4">
           <tbody>
             <row>
-              <entry>JOB_INST_ID</entry>
+              <entry>JOB_EXECUTION_ID</entry>
 
               <entry>TYPE_CD</entry>
 
               <entry>KEY_NAME</entry>
 
               <entry>DATE_VAL</entry>
+
+              <entry>IDENTIFYING</entry>
             </row>
 
             <row>
@@ -458,6 +471,8 @@
               <entry>schedule.Date</entry>
 
               <entry>2008-01-01 00:00:00</entry>
+
+              <entry>TRUE</entry>
             </row>
 
             <row>
@@ -467,7 +482,21 @@
 
               <entry>schedule.Date</entry>
 
+              <entry>2008-01-01 00:00:00</entry>
+
+              <entry>TRUE</entry>
+            </row>
+
+            <row>
+              <entry>3</entry>
+
+              <entry>DATE</entry>
+
+              <entry>schedule.Date</entry>
+
               <entry>2008-01-02 00:00:00</entry>
+
+              <entry>TRUE</entry>
             </row>
           </tbody>
         </tgroup>
@@ -1017,9 +1046,9 @@ ExecutionContext ecJob = jobExecution.getExecutionContext();
      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
      xsi:schemaLocation="
            http://www.springframework.org/schema/beans 
-           http://www.springframework.org/schema/beans/spring-beans-3.1.xsd
+           http://www.springframework.org/schema/beans/spring-beans.xsd
            <emphasis role="bold">http://www.springframework.org/schema/batch 
-           http://www.springframework.org/schema/batch/spring-batch-2.0.xsd</emphasis>"&gt;
+           http://www.springframework.org/schema/batch/spring-batch-2.2.xsd</emphasis>"&gt;
 
     &lt;job id="ioSampleJob"&gt;
         &lt;step id="step1"&gt;

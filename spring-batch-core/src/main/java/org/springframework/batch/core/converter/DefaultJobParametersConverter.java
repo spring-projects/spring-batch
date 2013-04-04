@@ -27,6 +27,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Properties;
 
+import org.springframework.batch.core.JobInstance;
 import org.springframework.batch.core.JobParameter;
 import org.springframework.batch.core.JobParameter.ParameterType;
 import org.springframework.batch.core.JobParameters;
@@ -35,7 +36,9 @@ import org.springframework.util.StringUtils;
 
 /**
  * Converter for {@link JobParameters} instances using a simple naming
- * convention for property keys. Key names ending with "(&lt;type&gt;)" where
+ * convention for property keys. Key names that are prefixed with a - are
+ * considered non-identifying and will not contribute to the identity of a
+ * {@link JobInstance}.  Key names ending with "(&lt;type&gt;)" where
  * type is one of string, date, long are converted to the corresponding type.
  * The default type is string. E.g.
  *
@@ -48,7 +51,7 @@ import org.springframework.util.StringUtils;
  * strategies, augmented if necessary by the custom editors provided.
  *
  * <br/>
- *
+ * 
  * If you need to be able to parse and format local-specific dates and numbers,
  * you can inject formatters ({@link #setDateFormat(DateFormat)} and
  * {@link #setNumberFormat(NumberFormat)}).
