@@ -53,7 +53,10 @@
 
     <programlisting>RetryTemplate template = new RetryTemplate();
 
-template.setRetryPolicy(new TimeoutRetryPolicy(30000L));
+TimeoutRetryPolicy policy = new TimeoutRetryPolicy();
+policy.setTimeout(30000L);
+
+template.setRetryPolicy(policy);
 
 Foo result = template.execute(new RetryCallback&lt;Foo&gt;() {
 
