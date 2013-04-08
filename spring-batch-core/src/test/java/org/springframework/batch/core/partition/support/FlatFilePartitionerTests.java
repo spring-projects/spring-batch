@@ -94,7 +94,7 @@ public class FlatFilePartitionerTests {
 	}
 
 	private void assertPartition(long startAt, long lines, Map<String, ExecutionContext> partition, String suffix) {
-		ExecutionContext ex = partition.get(FlatFilePartitioner.PARTITION_PREFIX + suffix);
+		ExecutionContext ex = partition.get(FlatFilePartitioner.DEFAULT_PARTITION_PREFIX + suffix);
 		assertEquals(startAt, ex.get(FlatFilePartitioner.DEFAULT_START_AT_KEY));
 		assertEquals(lines, ex.get(FlatFilePartitioner.DEFAULT_ITEMS_COUNT_KEY));
 		assertEquals("file:"+TMP_PATH, ex.get(FlatFilePartitioner.DEFAULT_RESOURCE_KEY));
@@ -168,7 +168,7 @@ public class FlatFilePartitionerTests {
 		long prevStartAt = 0;
 		long prevItems = 0;
 		for( int i=0; i<gridSize; i++) {
-			ExecutionContext ex = partition.get(String.format("%s%02d", FlatFilePartitioner.PARTITION_PREFIX, i));
+			ExecutionContext ex = partition.get(String.format("%s%02d", FlatFilePartitioner.DEFAULT_PARTITION_PREFIX, i));
 			long items = (Long) ex.get(FlatFilePartitioner.DEFAULT_ITEMS_COUNT_KEY);
 			long startAt = (Long) ex.get(FlatFilePartitioner.DEFAULT_START_AT_KEY);
 			itemsTotal += items;

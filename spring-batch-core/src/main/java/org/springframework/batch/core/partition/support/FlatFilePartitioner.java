@@ -24,7 +24,6 @@ import java.util.Map;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.batch.core.partition.support.Partitioner;
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.core.io.Resource;
 import org.springframework.util.Assert;
@@ -65,7 +64,17 @@ public class FlatFilePartitioner implements Partitioner {
     /**
      * The common partition prefix name to use.
      */
-    public static final String PARTITION_PREFIX = "partition-";
+    public static final String DEFAULT_PARTITION_PREFIX = "partition-";
+    
+    /**
+     * Default buffer size to use when reading the file through during partitioning
+     */
+    public static final int DEFAULT_BUFFER_SIZE = 4096;
+    
+    /**
+     * Default character that breaks input byte stream into lines
+     */
+    public static final char DEFAULT_LINE_SEPARATOR_CHAR = '\n';
 
     private final Logger logger = LoggerFactory.getLogger(FlatFilePartitioner.class);
 
@@ -74,6 +83,9 @@ public class FlatFilePartitioner implements Partitioner {
     private String startAtKeyName = DEFAULT_START_AT_KEY;
     private String itemsCountKeyName = DEFAULT_ITEMS_COUNT_KEY;
     private String resourceKeyName = DEFAULT_RESOURCE_KEY;
+    private String partitionPrefix = DEFAULT_PARTITION_PREFIX;
+    private int bufferSize = DEFAULT_BUFFER_SIZE;
+    private char lineSeparatorCharacter = DEFAULT_LINE_SEPARATOR_CHAR;
     
 	/**
 	 * The name of the key for the byte offset in each {@link ExecutionContext}.
@@ -102,6 +114,29 @@ public class FlatFilePartitioner implements Partitioner {
 		this.resourceKeyName = keyName;
 	}
 
+	/**
+	 * The prefix used to prepend each generated partition name 
+	 * @param prefix
+	 */
+	public void setPartitionPrefix(String prefix) {
+		this.partitionPrefix = prefix;
+	}
+	
+	/**
+     * The buffer size to use when reading the file through during partitioning
+	 * @param bufferSize
+	 */
+	public void setBufferSize(int bufferSize) {
+		this.bufferSize = bufferSize;
+	}
+
+	/**
+     * Sets the character that breaks input byte stream into lines
+	 */
+	public void setLineSeparatorCharacter(char lineSeparatorChar) {
+		this.lineSeparatorCharacter = lineSeparatorChar;
+	}
+	
     /**
      * Creates a set of {@link ExecutionContext} according to the provided
      * <tt>gridSize</tt> if there are enough elements.
@@ -147,11 +182,10 @@ public class FlatFilePartitioner implements Partitioner {
 	                    "grid(s) (" + partitionCursor.getBytesPerPartition() + " each)");
 	        }
 
-            final int BUFFER_SIZE = 4096;
             final InputStream in = resource.getInputStream();
         	try {
 	            final InputStream is = new BufferedInputStream(in);
-				byte[] c = new byte[BUFFER_SIZE];
+				byte[] c = new byte[bufferSize];
 				ByteStreamCursor byteCursor = new ByteStreamCursor(); 
 	            int readChars;
 	            while ((readChars = is.read(c)) != -1) {
@@ -194,7 +228,7 @@ public class FlatFilePartitioner implements Partitioner {
      * Increments indexes on a new character read. 
      * Detects the new line character and updates counters.
      */
-    private static class ByteStreamCursor {
+    private class ByteStreamCursor {
         private long totalLineCount = 0;
         private long lineCount = 0;
         private byte lastSeenChar = 0;
@@ -205,7 +239,7 @@ public class FlatFilePartitioner implements Partitioner {
 			this.lastSeenChar = lastSeenChar;
 			this.currentByteInd++;
             // New line is \n on Unix and \r\n on Windows                
-            if (lastSeenChar == '\n') {
+            if (lastSeenChar == lineSeparatorCharacter) {
             	startNewLine();
                 return true;
             }
@@ -235,8 +269,8 @@ public class FlatFilePartitioner implements Partitioner {
 		}
 		
 		public boolean lastLineUnterminated() {
-			return (totalLineCount > 0 && lastSeenChar != '\n') || 						// <-- last line is not empty but is not terminated by '\n'
-	            (totalLineCount == 0 && lastSeenChar != '\n' && currentByteInd > 0);	// <-- the first line is the last line and it's not terminated by '\n'
+			return (totalLineCount > 0 && lastSeenChar != lineSeparatorCharacter) || 						// <-- last line is not empty but is not terminated by '\n'
+	            (totalLineCount == 0 && lastSeenChar != lineSeparatorCharacter && currentByteInd > 0);	// <-- the first line is the last line and it's not terminated by '\n'
 		}
 		
 		public boolean outstandingData() {
@@ -291,7 +325,7 @@ public class FlatFilePartitioner implements Partitioner {
 		
 		private String getPartitionName(int gridSize, int partitionIndex) {
 			final String partitionNumberFormat = "%0" + String.valueOf(gridSize).length() + "d";
-			return PARTITION_PREFIX + String.format(partitionNumberFormat, partitionIndex);
+			return partitionPrefix + String.format(partitionNumberFormat, partitionIndex);
 		}
     }
     
@@ -361,13 +395,13 @@ public class FlatFilePartitioner implements Partitioner {
             	contentExists = true;
             	lastChar = c[i];
                 // We're dealing with the char here, it's \n on Unix and \r\n on Windows                
-                if (c[i] == '\n')
+                if (c[i] == DEFAULT_LINE_SEPARATOR_CHAR)
                     ++count;
             }
         }
         // Last line
-        if ( (count > 0 && lastChar != '\n') || 						// <-- last line is not empty but is not terminated by '\n'
-        	(count == 0 && lastChar != '\n' && contentExists) ) {		// <-- the first line is the last line and it's not terminated by '\n'
+        if ( (count > 0 && lastChar != DEFAULT_LINE_SEPARATOR_CHAR) || 						// <-- last line is not empty but is not terminated by '\n'
+        	(count == 0 && lastChar != DEFAULT_LINE_SEPARATOR_CHAR && contentExists) ) {		// <-- the first line is the last line and it's not terminated by '\n'
             count++;
         }
         return count;
