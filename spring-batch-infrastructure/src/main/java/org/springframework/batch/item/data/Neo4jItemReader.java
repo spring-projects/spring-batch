@@ -201,7 +201,6 @@ InitializingBean {
 		query.append(" LIMIT " + pageSize);
 
 		String resultingQuery = query.toString();
-		System.out.println("resulting query = " + resultingQuery);
 
 		if (logger.isDebugEnabled()) {
 			logger.debug(resultingQuery);

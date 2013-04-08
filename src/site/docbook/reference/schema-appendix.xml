@@ -12,7 +12,7 @@
     <classname>JobInstance</classname>, <classname>JobExecution</classname>,
     <classname>JobParameters</classname>, and
     <classname>StepExecution</classname> map to BATCH_JOB_INSTANCE,
-    BATCH_JOB_EXECUTION, BATCH_JOB_PARAMS, and BATCH_STEP_EXECUTION,
+    BATCH_JOB_EXECUTION, BATCH_JOB_EXECUTION_PARAMS, and BATCH_STEP_EXECUTION,
     respectively. <classname>ExecutionContext</classname> maps to both
     BATCH_JOB_EXECUTION_CONTEXT and BATCH_STEP_EXECUTION_CONTEXT. The
     <classname>JobRepository</classname> is responsible for saving and storing
@@ -84,7 +84,7 @@ CREATE SEQUENCE BATCH_JOB_EXECUTION_SEQ;
 CREATE SEQUENCE BATCH_JOB_SEQ;</programlisting>
 
       <para>Many database vendors don't support sequences. In these cases,
-      work-arounds are used, such as the following for mySQL:</para>
+      work-arounds are used, such as the following for MySQL:</para>
 
       <programlisting>CREATE TABLE BATCH_STEP_EXECUTION_SEQ (ID BIGINT NOT NULL) type=MYISAM;
 INSERT INTO BATCH_STEP_EXECUTION_SEQ values(0);
@@ -147,36 +147,37 @@ INSERT INTO BATCH_JOB_SEQ values(0);</programlisting>
   </section>
 
   <section id="metaDataBatchJobParams">
-    <title>BATCH_JOB_PARAMS</title>
+    <title>BATCH_JOB_EXECUTION_PARAMS</title>
 
-    <para>The BATCH_JOB_PARAMS table holds all information relevant to the
+    <para>The BATCH_JOB_EXECUTION_PARAMS table holds all information relevant to the
     <classname>JobParameters</classname> object. It contains 0 or more
-    key/value pairs that together uniquely identify a
-    <classname>JobInstance</classname> and serve as a record of the parameters
-    a job was run with. It should be noted that the table has been
+    key/value pairs passed to a <classname>Job</classname> and serve as a record of the parameters
+    a job was run with. For each parameter that contributes to the generation of a job's identity, 
+    the IDENTIFYING flag is set to true.  It should be noted that the table has been
     denormalized. Rather than creating a separate table for each type, there
     is one table with a column indicating the type:</para>
 
-    <programlisting>CREATE TABLE BATCH_JOB_PARAMS  (
-  JOB_INSTANCE_ID BIGINT NOT NULL ,
-  TYPE_CD VARCHAR(6) NOT NULL ,
-  KEY_NAME VARCHAR(100) NOT NULL , 
-  STRING_VAL VARCHAR(250) , 
-  DATE_VAL TIMESTAMP DEFAULT NULL,
-  LONG_VAL BIGINT ,
-  DOUBLE_VAL DOUBLE PRECISION,
-  constraint JOB_INSTANCE_PARAMS_FK foreign key (JOB_INSTANCE_ID)
-  references BATCH_JOB_INSTANCE(JOB_INSTANCE_ID)
+    <programlisting>CREATE TABLE BATCH_JOB_EXECUTION_PARAMS  (
+	JOB_EXECUTION_ID BIGINT NOT NULL ,
+	TYPE_CD VARCHAR(6) NOT NULL ,
+	KEY_NAME VARCHAR(100) NOT NULL ,
+	STRING_VAL VARCHAR(250) ,
+	DATE_VAL DATETIME DEFAULT NULL ,
+	LONG_VAL BIGINT ,
+	DOUBLE_VAL DOUBLE PRECISION ,
+	IDENTIFYING CHAR(1) NOT NULL ,
+	constraint JOB_EXEC_PARAMS_FK foreign key (JOB_EXECUTION_ID)
+	references BATCH_JOB_EXECUTION(JOB_EXECUTION_ID)
 );</programlisting>
 
     <para>Below are descriptions for each column:</para>
 
     <itemizedlist>
       <listitem>
-        <para>JOB_INSTANCE_ID: Foreign Key from the BATCH_JOB_INSTANCE table
-        that indicates the job instance the parameter entry belongs to. It
+        <para>JOB_EXECUTION_ID: Foreign Key from the BATCH_JOB_EXECUTION table
+        that indicates the job execution the parameter entry belongs to. It
         should be noted that multiple rows (i.e key/value pairs) may exist for
-        each instance.</para>
+        each execution.</para>
       </listitem>
 
       <listitem>
@@ -203,6 +204,10 @@ INSERT INTO BATCH_JOB_SEQ values(0);</programlisting>
 
       <listitem>
         <para>DOUBLE_VAL: Parameter value, if the type is double.</para>
+      </listitem>
+
+      <listitem>
+        <para>IDENTIFYING: Flag indicating if the parameter contributed to the identity of the related <classname>JobInstance</classname>.</para>
       </listitem>
     </itemizedlist>
 
