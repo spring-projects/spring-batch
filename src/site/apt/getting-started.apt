@@ -83,3 +83,8 @@ $ mvn test
 
   * There is a Groovy project template with instructions available {{{http://robokaso.github.com/Groovy-Spring-Batch-Template/}here}}
 
+* Migrating to 2.2.x
+
+  As part of the update to support non-identifying job parameters ({{{https://jira.springsource.org/browse/BATCH-1412}BATCH-1412}}), the database schema for the job repository was updated.  To migrate your existing job repository to the new one, you'll need to execute the appropriate migration script for your platform.  This script will create the new BATCH_JOB_EXECUTION_PARAMS table and migrate the parameters from the old table to the new table.  The script can be found in the <<<org.springframework.batch.core.migration>>> package.  
+
+

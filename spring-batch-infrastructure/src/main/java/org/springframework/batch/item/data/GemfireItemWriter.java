@@ -12,19 +12,21 @@
  */
 package org.springframework.batch.item.data;
 
+import org.springframework.batch.item.ItemWriter;
 import org.springframework.batch.item.KeyValueItemWriter;
+import org.springframework.data.gemfire.GemfireOperations;
 import org.springframework.data.gemfire.GemfireTemplate;
 import org.springframework.util.Assert;
 
 /**
- * An {@ link ItemWriter} that stores items in GemFire
+ * An {@link ItemWriter} that stores items in GemFire
  * 
  * @author David Turanski
  * @since 2.2
  *
  */
 public class GemfireItemWriter<K,V> extends KeyValueItemWriter<K,V> {
-	private GemfireTemplate gemfireTemplate;
+	private GemfireOperations gemfireTemplate;
 	/**
 	 * @param gemfireTemplate the {@link GemfireTemplate} to set
 	 */
