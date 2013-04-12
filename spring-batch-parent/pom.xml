@@ -744,6 +744,11 @@
 				<version>1.0.3.RELEASE</version>
 				<optional>true</optional>
 			</dependency>
+		  	<dependency>
+		  		<groupId>com.gemstone.gemfire</groupId>
+		  		<artifactId>gemfire</artifactId>
+		  		<version>7.0.1</version>
+		  	</dependency>			
 		</dependencies>
 	</dependencyManagement>
 	<distributionManagement>
