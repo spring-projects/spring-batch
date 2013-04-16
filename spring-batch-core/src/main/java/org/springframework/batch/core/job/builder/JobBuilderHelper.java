@@ -181,6 +181,9 @@ public abstract class JobBuilderHelper<B extends JobBuilderHelper<B>> {
 			this.name = properties.name;
 			this.restartable = properties.restartable;
 			this.jobRepository = properties.jobRepository;
+			this.jobExecutionListeners = properties.jobExecutionListeners;
+			this.jobParametersIncrementer = properties.jobParametersIncrementer;
+			this.jobParametersValidator = properties.jobParametersValidator;
 		}
 
 		public JobParametersIncrementer getJobParametersIncrementer() {
