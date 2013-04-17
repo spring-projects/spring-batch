@@ -153,7 +153,7 @@ public class DefaultJobParametersConverterTests {
 
 		String[] args = new String[] { "value(long)=1,000" };
 
-		factory.setNumberFormat(new DecimalFormat("#,###"));
+		factory.setNumberFormat(new DecimalFormat("#,###", DecimalFormatSymbols.getInstance(Locale.ENGLISH)));
 		JobParameters props = factory.getJobParameters(StringUtils.splitArrayElementsIntoProperties(args, "="));
 		assertNotNull(props);
 		assertEquals(1000L, props.getLong("value").longValue());
