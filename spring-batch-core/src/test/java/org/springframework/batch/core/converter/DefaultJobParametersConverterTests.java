@@ -22,6 +22,7 @@ import static org.junit.Assert.assertTrue;
 
 import java.text.DateFormat;
 import java.text.DecimalFormat;
+import java.text.DecimalFormatSymbols;
 import java.text.NumberFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -153,7 +154,7 @@ public class DefaultJobParametersConverterTests {
 
 		String[] args = new String[] { "value(long)=1,000" };
 
-		factory.setNumberFormat(new DecimalFormat("#,###"));
+		factory.setNumberFormat(new DecimalFormat("#,###", DecimalFormatSymbols.getInstance(Locale.ENGLISH)));
 		JobParameters props = factory.getJobParameters(StringUtils.splitArrayElementsIntoProperties(args, "="));
 		assertNotNull(props);
 		assertEquals(1000L, props.getLong("value").longValue());
@@ -178,7 +179,7 @@ public class DefaultJobParametersConverterTests {
 	public void testGetParametersWithDoubleValueDeclaredAsLong() throws Exception {
 
 		String[] args = new String[] { "value(long)=1.03" };
-		factory.setNumberFormat(new DecimalFormat("#.#"));
+		factory.setNumberFormat(new DecimalFormat("#.#", DecimalFormatSymbols.getInstance(Locale.ENGLISH)));
 
 		try {
 			factory.getJobParameters(StringUtils.splitArrayElementsIntoProperties(args, "="));
