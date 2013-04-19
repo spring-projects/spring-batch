@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2007 the original author or authors.
+ * Copyright 2006-2013 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -54,6 +54,7 @@ public class PollingAsyncItemProcessorMessagingGatewayTests {
 	public MethodRule rule = new MethodRule() {
 		public Statement apply(final Statement base, FrameworkMethod method, Object target) {
 			return new Statement() {
+				@Override
 				public void evaluate() throws Throwable {
 					StepScopeTestUtils.doInStepScope(stepExecution, new Callable<Void>() {
 						public Void call() throws Exception {
@@ -103,7 +104,7 @@ public class PollingAsyncItemProcessorMessagingGatewayTests {
 	public static class Doubler {
 
 		@ServiceActivator
-		public String cat(String value, @Header(value="stepExecution.jobExecution.jobInstance.jobParameters.getLong('factor')", required=false) Integer input) {
+		public String cat(String value, @Header(value="stepExecution.jobExecution.jobParameters.getLong('factor')", required=false) Integer input) {
 			long factor = input==null ? 1 : input;
 			for (int i=1; i<factor; i++) {
 				value += value;

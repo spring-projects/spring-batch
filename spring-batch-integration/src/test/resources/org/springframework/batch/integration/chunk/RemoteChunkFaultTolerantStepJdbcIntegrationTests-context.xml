@@ -5,13 +5,13 @@
 	xmlns:aop="http://www.springframework.org/schema/aop" xmlns:int-jdbc="http://www.springframework.org/schema/integration/jdbc"
 	xmlns:jdbc="http://www.springframework.org/schema/jdbc"
 	xsi:schemaLocation="http://www.springframework.org/schema/jdbc http://www.springframework.org/schema/jdbc/spring-jdbc.xsd
-		http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-3.0.xsd
+		http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop.xsd
 		http://www.springframework.org/schema/integration http://www.springframework.org/schema/integration/spring-integration.xsd
-		http://www.springframework.org/schema/integration/jms http://www.springframework.org/schema/integration/jms/spring-integration-jms-2.0.xsd
-		http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.5.xsd
-		http://www.springframework.org/schema/batch http://www.springframework.org/schema/batch/spring-batch-2.1.xsd
+		http://www.springframework.org/schema/integration/jms http://www.springframework.org/schema/integration/jms/spring-integration-jms.xsd
+		http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/batch http://www.springframework.org/schema/batch/spring-batch-2.2.xsd
 		http://www.springframework.org/schema/integration/jdbc http://www.springframework.org/schema/integration/jdbc/spring-integration-jdbc.xsd
-		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-3.0.xsd">
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd">
 
 	<job id="job" xmlns="http://www.springframework.org/schema/batch">
 		<step id="step">
@@ -57,11 +57,11 @@
 		<property name="receiveTimeout" value="1000" />
 	</bean>
 
-	<bean id="retryAdvice" class="org.springframework.batch.retry.interceptor.RetryOperationsInterceptor">
+	<bean id="retryAdvice" class="org.springframework.retry.interceptor.RetryOperationsInterceptor">
 		<property name="retryOperations">
-			<bean class="org.springframework.batch.retry.support.RetryTemplate">
+			<bean class="org.springframework.retry.support.RetryTemplate">
 				<property name="retryPolicy">
-					<bean class="org.springframework.batch.retry.policy.SimpleRetryPolicy">
+					<bean class="org.springframework.retry.policy.SimpleRetryPolicy">
 						<constructor-arg value="10" />
 						<constructor-arg>
 							<map key-type="java.lang.Class" value-type="java.lang.Boolean">

@@ -5,11 +5,11 @@ import java.util.List;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.springframework.batch.retry.interceptor.MethodInvocationRecoverer;
+import org.springframework.retry.interceptor.MethodInvocationRecoverer;
 
 /**
  * @author Dave Syer
- * 
+ *
  */
 public final class SimpleRecoverer implements MethodInvocationRecoverer<String> {
 
