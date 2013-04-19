@@ -18,6 +18,7 @@ import org.springframework.batch.core.launch.JobLauncher;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.integration.Message;
 import org.springframework.integration.core.PollableChannel;
+import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
@@ -30,23 +31,20 @@ public class RemoteChunkFaultTolerantStepJdbcIntegrationTests {
 
 	@Autowired
 	private Job job;
-	
+
 	@Autowired
 	private PollableChannel replies;
-	
-	// @Autowired
-	// private DataSource dataSource;
-	
+
 	@Before
 	public void drain() {
 		Message<?> message = replies.receive(100L);
 		while (message!=null) {
-			// System.err.println(message);
 			message = replies.receive(100L);
 		}
 	}
 
 	@Test
+	@DirtiesContext
 	public void testFailedStep() throws Exception {
 		JobExecution jobExecution = jobLauncher.run(job, new JobParameters(Collections.singletonMap("item.three",
 				new JobParameter("unsupported"))));
@@ -58,6 +56,7 @@ public class RemoteChunkFaultTolerantStepJdbcIntegrationTests {
 	}
 
 	@Test
+	@DirtiesContext
 	public void testFailedStepOnError() throws Exception {
 		JobExecution jobExecution = jobLauncher.run(job, new JobParameters(Collections.singletonMap("item.three",
 				new JobParameter("error"))));
@@ -69,6 +68,7 @@ public class RemoteChunkFaultTolerantStepJdbcIntegrationTests {
 	}
 
 	@Test
+	@DirtiesContext
 	public void testSunnyDayFaultTolerant() throws Exception {
 		JobExecution jobExecution = jobLauncher.run(job, new JobParameters(Collections.singletonMap("item.three",
 				new JobParameter("3"))));
@@ -79,6 +79,7 @@ public class RemoteChunkFaultTolerantStepJdbcIntegrationTests {
 	}
 
 	@Test
+	@DirtiesContext
 	public void testSkipsInWriter() throws Exception {
 		JobExecution jobExecution = jobLauncher.run(job, new JobParametersBuilder().addString("item.three", "fail")
 				.addLong("run.id", 1L).toJobParameters());

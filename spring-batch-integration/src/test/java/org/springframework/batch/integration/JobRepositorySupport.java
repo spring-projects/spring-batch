@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2007 the original author or authors.
+ * Copyright 2006-2013 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,6 +14,8 @@
  * limitations under the License.
  */
 package org.springframework.batch.integration;
+
+import java.util.Collection;
 
 import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.JobInstance;
@@ -35,7 +37,7 @@ public class JobRepositorySupport implements JobRepository {
 	 */
 	public JobExecution createJobExecution(String jobName, JobParameters jobParameters)
 			throws JobExecutionAlreadyRunningException, JobRestartException, JobInstanceAlreadyCompleteException {
-		return new JobExecution(new JobInstance(0L, jobParameters, jobName));
+		return new JobExecution(new JobInstance(0L, jobName), jobParameters);
 	}
 
 	/* (non-Javadoc)
@@ -69,7 +71,7 @@ public class JobRepositorySupport implements JobRepository {
 	 */
 	public void updateExecutionContext(StepExecution stepExecution) {
 	}
-	
+
 	public void updateExecutionContext(JobExecution jobExecution) {
 	}
 
@@ -90,5 +92,11 @@ public class JobRepositorySupport implements JobRepository {
 		return null;
 	}
 
-
+	public void addAll(Collection<StepExecution> stepExecutions) {
+		if(stepExecutions != null) {
+			for (StepExecution stepExecution : stepExecutions) {
+				add(stepExecution);
+			}
+		}
+	}
 }

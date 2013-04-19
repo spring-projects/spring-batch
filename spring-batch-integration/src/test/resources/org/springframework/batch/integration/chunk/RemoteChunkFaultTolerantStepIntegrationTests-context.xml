@@ -3,13 +3,13 @@
 	xmlns:beans="http://www.springframework.org/schema/beans" xmlns:integration="http://www.springframework.org/schema/integration"
 	xmlns:batch="http://www.springframework.org/schema/batch" xmlns:context="http://www.springframework.org/schema/context"
 	xmlns:aop="http://www.springframework.org/schema/aop"
-	xsi:schemaLocation="http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-3.0.xsd
-		http://www.springframework.org/schema/jms http://www.springframework.org/schema/jms/spring-jms-3.0.xsd
+	xsi:schemaLocation="http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop.xsd
+		http://www.springframework.org/schema/jms http://www.springframework.org/schema/jms/spring-jms.xsd
 		http://www.springframework.org/schema/integration http://www.springframework.org/schema/integration/spring-integration.xsd
-		http://www.springframework.org/schema/integration/jms http://www.springframework.org/schema/integration/jms/spring-integration-jms-2.0.xsd
-		http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.5.xsd
-		http://www.springframework.org/schema/batch http://www.springframework.org/schema/batch/spring-batch-2.1.xsd
-		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-3.0.xsd">
+		http://www.springframework.org/schema/integration/jms http://www.springframework.org/schema/integration/jms/spring-integration-jms.xsd
+		http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/batch http://www.springframework.org/schema/batch/spring-batch-2.2.xsd
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd">
 
 	<job id="job" xmlns="http://www.springframework.org/schema/batch">
 		<step id="step">
@@ -84,11 +84,11 @@
 		<property name="jobRepository" ref="jobRepository" />
 	</bean>
 
-	<bean id="retryAdvice" class="org.springframework.batch.retry.interceptor.RetryOperationsInterceptor">
+	<bean id="retryAdvice" class="org.springframework.retry.interceptor.RetryOperationsInterceptor">
 		<property name="retryOperations">
-			<bean class="org.springframework.batch.retry.support.RetryTemplate">
+			<bean class="org.springframework.retry.support.RetryTemplate">
 				<property name="retryPolicy">
-					<bean class="org.springframework.batch.retry.policy.SimpleRetryPolicy">
+					<bean class="org.springframework.retry.policy.SimpleRetryPolicy">
 						<constructor-arg value="10" />
 						<constructor-arg>
 							<map>
