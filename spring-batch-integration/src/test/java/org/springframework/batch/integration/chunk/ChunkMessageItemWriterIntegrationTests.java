@@ -27,7 +27,7 @@ import org.springframework.batch.core.repository.dao.MapJobExecutionDao;
 import org.springframework.batch.core.repository.dao.MapJobInstanceDao;
 import org.springframework.batch.core.repository.dao.MapStepExecutionDao;
 import org.springframework.batch.core.repository.support.SimpleJobRepository;
-import org.springframework.batch.core.step.item.SimpleStepFactoryBean;
+import org.springframework.batch.core.step.factory.SimpleStepFactoryBean;
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.item.support.ListItemReader;
 import org.springframework.batch.support.transaction.ResourcelessTransactionManager;
@@ -167,7 +167,7 @@ public class ChunkMessageItemWriterIntegrationTests {
 		// Set up context with two messages (chunks) in the backlog
 		stepExecution.getExecutionContext().putInt(ChunkMessageChannelItemWriter.EXPECTED, 3);
 		stepExecution.getExecutionContext().putInt(ChunkMessageChannelItemWriter.ACTUAL, 2);
-		
+
 		// Speed up the eventual failure
 		writer.setMaxWaitTimeouts(2);
 
@@ -191,10 +191,10 @@ public class ChunkMessageItemWriterIntegrationTests {
 	 * @param string
 	 * @return
 	 */
-	@SuppressWarnings("unchecked")
+	@SuppressWarnings({"unchecked", "rawtypes"})
 	private GenericMessage<ChunkRequest> getSimpleMessage(String string, Long jobId) {
-		StepContribution stepContribution = new JobExecution(new JobInstance(0L, new JobParameters(), "job"), 1L)
-				.createStepExecution("step").createStepContribution();
+		StepContribution stepContribution = new JobExecution(new JobInstance(0L, "job"), new JobParameters())
+		.createStepExecution("step").createStepContribution();
 		ChunkRequest chunk = new ChunkRequest(0, StringUtils.commaDelimitedListToSet(string), jobId, stepContribution);
 		GenericMessage<ChunkRequest> message = new GenericMessage<ChunkRequest>(chunk);
 		return message;
@@ -240,7 +240,7 @@ public class ChunkMessageItemWriterIntegrationTests {
 		// Set up expectation of three messages (chunks) in the backlog
 		stepExecution.getExecutionContext().putInt(ChunkMessageChannelItemWriter.EXPECTED, 6);
 		stepExecution.getExecutionContext().putInt(ChunkMessageChannelItemWriter.ACTUAL, 3);
-		
+
 		writer.setMaxWaitTimeouts(2);
 
 		/*
@@ -262,7 +262,7 @@ public class ChunkMessageItemWriterIntegrationTests {
 	/**
 	 * This one is flakey - we try to force it to wait until after the step to
 	 * finish processing just by waiting for long enough.
-	 * 
+	 *
 	 * @throws Exception
 	 */
 	@Test
@@ -308,7 +308,7 @@ public class ChunkMessageItemWriterIntegrationTests {
 	}
 
 	private StepExecution getStepExecution(Step step) throws JobExecutionAlreadyRunningException, JobRestartException,
-			JobInstanceAlreadyCompleteException {
+	JobInstanceAlreadyCompleteException {
 		SimpleJob job = new SimpleJob();
 		job.setName("job");
 		JobExecution jobExecution = jobRepository.createJobExecution(job.getName(), new JobParametersBuilder().addLong(

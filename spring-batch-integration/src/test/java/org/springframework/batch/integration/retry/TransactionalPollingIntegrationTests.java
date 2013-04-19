@@ -86,11 +86,16 @@ public class TransactionalPollingIntegrationTests implements ApplicationContextA
 	@Test
 	@DirtiesContext
 	public void testSunnyDay() throws Exception {
-		list = TransactionAwareProxyFactory.createTransactionalList(Arrays.asList(StringUtils
-				.commaDelimitedListToStringArray("a,b,c,d,e,f,g,h,j,k")));
-		expected = Arrays.asList(StringUtils.commaDelimitedListToStringArray("a,b,c,d"));
-		waitForResults(bus, 4, 60);
-		assertEquals(expected, processed);
+		try {
+			list = TransactionAwareProxyFactory.createTransactionalList(Arrays.asList(StringUtils
+					.commaDelimitedListToStringArray("a,b,c,d,e,f,g,h,j,k")));
+			expected = Arrays.asList(StringUtils.commaDelimitedListToStringArray("a,b,c,d"));
+			waitForResults(bus, 4, 60);
+			assertEquals(expected, processed);
+		} catch (Throwable t) {
+			System.out.println(t.getMessage());
+			t.printStackTrace();
+		}
 	}
 
 	@Test
