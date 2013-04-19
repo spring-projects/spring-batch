@@ -130,41 +130,6 @@
 				</plugins>
 			</build>
 		</profile>
-		<profile>
-			<!-- Enable this profile to get a first build from a fresh checkout -->
-			<id>bootstrap</id>
-			<repositories>
-				<repository>
-					<id>spring-milestones</id>
-					<name>Spring Maven Milestone Repository</name>
-					<url>http://maven.springframework.org/milestone/</url>
-					<snapshots>
-						<enabled>false</enabled>
-					</snapshots>
-				</repository>
-				<repository>
-					<id>spring-snapshots</id>
-					<name>Spring Maven Snapshot Repository</name>
-					<url>http://maven.springframework.org/snapshot/</url>
-				</repository>
-				<repository>
-					<id>spring-ebr</id>
-					<name>Spring Enterprise Bundle Repository</name>
-					<url>http://repository.springsource.com/maven/bundles/release/</url>
-					<snapshots>
-						<enabled>false</enabled>
-					</snapshots>
-				</repository>
-				<repository>
-					<id>objectstyle</id>
-					<name>ObjectStyle.org Repository</name>
-					<url>http://objectstyle.org/maven2</url>
-					<snapshots>
-						<enabled>false</enabled>
-					</snapshots>
-				</repository>
-			</repositories>
-		</profile>
 	</profiles>
 	<build>
 		<pluginManagement>
@@ -746,4 +711,35 @@
 			<url>s3://maven.springframework.org/snapshot</url>
 		</snapshotRepository>
 	</distributionManagement>
+	<repositories>
+		<repository>
+			<id>spring-milestones</id>
+			<name>Spring Maven Milestone Repository</name>
+			<url>http://maven.springframework.org/milestone/</url>
+			<snapshots>
+				<enabled>false</enabled>
+			</snapshots>
+		</repository>
+		<repository>
+			<id>spring-snapshots</id>
+			<name>Spring Maven Snapshot Repository</name>
+			<url>http://maven.springframework.org/snapshot/</url>
+		</repository>
+		<repository>
+			<id>spring-ebr</id>
+			<name>Spring Enterprise Bundle Repository</name>
+			<url>http://repository.springsource.com/maven/bundles/release/</url>
+			<snapshots>
+				<enabled>false</enabled>
+			</snapshots>
+		</repository>
+		<repository>
+			<id>objectstyle</id>
+			<name>ObjectStyle.org Repository</name>
+			<url>http://objectstyle.org/maven2</url>
+			<snapshots>
+				<enabled>false</enabled>
+			</snapshots>
+		</repository>
+	</repositories>
 </project>
