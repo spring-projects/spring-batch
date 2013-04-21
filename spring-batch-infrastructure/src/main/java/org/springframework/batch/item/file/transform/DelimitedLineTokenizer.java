@@ -144,7 +144,6 @@ public class DelimitedLineTokenizer extends AbstractLineTokenizer {
 		int fieldCount = 0;
 
 		for (int i = 0; i < length; i++) {
-
 			char currentChar = chars[i];
 			boolean isEnd = (i == (length - 1));
 
@@ -154,7 +153,7 @@ public class DelimitedLineTokenizer extends AbstractLineTokenizer {
 				int endPosition = (isEnd ? (length - lastCut) : (i - lastCut));
 
 				if (isEnd && isDelimiter) {
-					endPosition--;
+					endPosition = endPosition - delimiter.length();
 				}
 				else if (!isEnd){
 					endPosition = (endPosition - delimiter.length()) + 1;
@@ -233,7 +232,7 @@ public class DelimitedLineTokenizer extends AbstractLineTokenizer {
 	private boolean isDelimiter(char[] chars, int i, String token) {
 		boolean result = false;
 
-		if(i >= token.length()) {
+		if(i >= token.length() - 1) {
 			String end = new String(chars, (i-token.length()) + 1, token.length());
 			if(token.equals(end)) {
 				result = true;
