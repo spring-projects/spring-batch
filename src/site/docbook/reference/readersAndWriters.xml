@@ -134,7 +134,7 @@
 }</programlisting>
 
     <para>The class above contains another <classname>ItemWriter</classname>
-    to which it delgates after having provided some business logic. This
+    to which it delegates after having provided some business logic. This
     pattern could easily be used for an <classname>ItemReader</classname> as
     well, perhaps to obtain more reference data based upon the input that was
     provided by the main <classname>ItemReader</classname>. It is also useful
