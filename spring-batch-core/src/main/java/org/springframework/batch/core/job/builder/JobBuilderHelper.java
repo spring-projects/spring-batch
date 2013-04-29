@@ -40,10 +40,10 @@ public abstract class JobBuilderHelper<B extends JobBuilderHelper<B>> {
 
 	protected final Log logger = LogFactory.getLog(getClass());
 
-	private final CommonStepProperties properties;
+	private final CommonJobProperties properties;
 
 	public JobBuilderHelper(String name) {
-		this.properties = new CommonStepProperties();
+		this.properties = new CommonJobProperties();
 		properties.name = name;
 	}
 
@@ -53,7 +53,7 @@ public abstract class JobBuilderHelper<B extends JobBuilderHelper<B>> {
 	 * @param parent a parent helper containing common step properties
 	 */
 	protected JobBuilderHelper(JobBuilderHelper<?> parent) {
-		this.properties = new CommonStepProperties(parent.properties);
+		this.properties = new CommonJobProperties(parent.properties);
 	}
 
 	/**
@@ -162,7 +162,7 @@ public abstract class JobBuilderHelper<B extends JobBuilderHelper<B>> {
 
 	}
 
-	public static class CommonStepProperties {
+	public static class CommonJobProperties {
 
 		private Set<JobExecutionListener> jobExecutionListeners = new LinkedHashSet<JobExecutionListener>();
 
@@ -174,13 +174,16 @@ public abstract class JobBuilderHelper<B extends JobBuilderHelper<B>> {
 
 		private JobParametersValidator jobParametersValidator;
 
-		public CommonStepProperties() {
+		public CommonJobProperties() {
 		}
 
-		public CommonStepProperties(CommonStepProperties properties) {
+		public CommonJobProperties(CommonJobProperties properties) {
 			this.name = properties.name;
 			this.restartable = properties.restartable;
 			this.jobRepository = properties.jobRepository;
+			this.jobExecutionListeners = new LinkedHashSet<JobExecutionListener>(properties.jobExecutionListeners);
+			this.jobParametersIncrementer = properties.jobParametersIncrementer;
+			this.jobParametersValidator = properties.jobParametersValidator;
 		}
 
 		public JobParametersIncrementer getJobParametersIncrementer() {
