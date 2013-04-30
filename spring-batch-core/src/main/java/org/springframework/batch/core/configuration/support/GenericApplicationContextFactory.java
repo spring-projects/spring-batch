@@ -58,10 +58,10 @@ public class GenericApplicationContextFactory extends AbstractApplicationContext
 			return new ResourceXmlApplicationContext(parent, (Resource) resource);
 		}
 		if (resource instanceof Class<?>) {
-			return new ResourceAnnotationApplicationContext(parent, (Class<?>) resource);
+			return new ResourceAnnotationApplicationContext(parent, resource);
 		}
 		if (resource instanceof String) {
-			return new ResourceAnnotationApplicationContext(parent, (String) resource);
+			return new ResourceAnnotationApplicationContext(parent, resource);
 		}
 		throw new IllegalArgumentException("No application context could be created for resource type: "
 				+ resource.getClass());
@@ -99,7 +99,7 @@ public class GenericApplicationContextFactory extends AbstractApplicationContext
 				GenericApplicationContextFactory.this.prepareBeanFactory(parentBeanFactory, beanFactory);
 				for (Class<? extends BeanFactoryPostProcessor> cls : getBeanFactoryPostProcessorClasses()) {
 					for (String name : parent.getBeanNamesForType(cls)) {
-						beanFactory.registerSingleton(name, ((BeanFactoryPostProcessor) parent.getBean(name)));
+						beanFactory.registerSingleton(name, (parent.getBean(name)));
 					}
 				}
 			}

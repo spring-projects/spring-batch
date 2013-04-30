@@ -35,6 +35,7 @@ import org.springframework.beans.factory.support.DefaultListableBeanFactory;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 import org.springframework.context.ConfigurableApplicationContext;
+import org.springframework.context.support.PropertySourcesPlaceholderConfigurer;
 import org.springframework.util.Assert;
 
 /**
@@ -67,6 +68,7 @@ public abstract class AbstractApplicationContextFactory implements ApplicationCo
 		this.resource = resource;
 		beanFactoryPostProcessorClasses = new ArrayList<Class<? extends BeanFactoryPostProcessor>>();
 		beanFactoryPostProcessorClasses.add(PropertyPlaceholderConfigurer.class);
+		beanFactoryPostProcessorClasses.add(PropertySourcesPlaceholderConfigurer.class);
 		beanFactoryPostProcessorClasses.add(CustomEditorConfigurer.class);
 		beanPostProcessorExcludeClasses = new ArrayList<Class<?>>();
 		/*
@@ -200,14 +202,14 @@ public abstract class AbstractApplicationContextFactory implements ApplicationCo
 			beanFactory.copyConfigurationFrom(parent);
 			List<BeanPostProcessor> beanPostProcessors = beanFactory instanceof AbstractBeanFactory ? ((AbstractBeanFactory) beanFactory)
 					.getBeanPostProcessors() : new ArrayList<BeanPostProcessor>();
-			for (BeanPostProcessor beanPostProcessor : new ArrayList<BeanPostProcessor>(beanPostProcessors)) {
-				for (Class<?> cls : beanPostProcessorExcludeClasses) {
-					if (cls.isAssignableFrom(beanPostProcessor.getClass())) {
-						logger.debug("Removing bean post processor: " + beanPostProcessor + " of type " + cls);
-						beanPostProcessors.remove(beanPostProcessor);
+					for (BeanPostProcessor beanPostProcessor : new ArrayList<BeanPostProcessor>(beanPostProcessors)) {
+						for (Class<?> cls : beanPostProcessorExcludeClasses) {
+							if (cls.isAssignableFrom(beanPostProcessor.getClass())) {
+								logger.debug("Removing bean post processor: " + beanPostProcessor + " of type " + cls);
+								beanPostProcessors.remove(beanPostProcessor);
+							}
+						}
 					}
-				}
-			}
 		}
 	}
 
@@ -223,10 +225,12 @@ public abstract class AbstractApplicationContextFactory implements ApplicationCo
 
 	@Override
 	public boolean equals(Object obj) {
-		if (this == obj)
+		if (this == obj) {
 			return true;
-		if (obj == null)
+		}
+		if (obj == null) {
 			return false;
+		}
 		return toString().equals(obj.toString());
 	}
 
