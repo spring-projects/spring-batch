@@ -58,8 +58,8 @@ public class GenericApplicationContextFactoryTests {
 				getClass(), "parent-context.xml")));
 		ConfigurableApplicationContext context = factory.createApplicationContext();
 		assertEquals("test-job", context.getBeanNamesForType(Job.class)[0]);
-		assertEquals("bar", ((Job) context.getBean("test-job", Job.class)).getName());
-		assertEquals(4, ((Foo) context.getBean("foo", Foo.class)).values[1], 0.01);
+		assertEquals("bar", context.getBean("test-job", Job.class).getName());
+		assertEquals(4, context.getBean("foo", Foo.class).values[1], 0.01);
 	}
 
 	@Test
@@ -70,7 +70,20 @@ public class GenericApplicationContextFactoryTests {
 				getClass(), "parent-context.xml")));
 		ConfigurableApplicationContext context = factory.createApplicationContext();
 		assertEquals("test-job", context.getBeanNamesForType(Job.class)[0]);
-		assertEquals("spam", ((Job) context.getBean("test-job", Job.class)).getName());
+		assertEquals("spam", context.getBean("test-job", Job.class).getName());
+	}
+
+	@Test
+	public void testBeanFactoryProfileRespected() {
+		GenericApplicationContextFactory factory = new GenericApplicationContextFactory(
+				new ClassPathResource(ClassUtils.addResourcePathToPackagePath(getClass(), "profiles.xml")));
+		ClassPathXmlApplicationContext parentContext = new ClassPathXmlApplicationContext(ClassUtils.addResourcePathToPackagePath(
+				getClass(), "parent-context.xml"));
+		parentContext.getEnvironment().setActiveProfiles("preferred");
+		factory.setApplicationContext(parentContext);
+		ConfigurableApplicationContext context = factory.createApplicationContext();
+		assertEquals("test-job", context.getBeanNamesForType(Job.class)[0]);
+		assertEquals("spam", context.getBean("test-job", Job.class).getName());
 	}
 
 	@Test
@@ -84,8 +97,8 @@ public class GenericApplicationContextFactoryTests {
 		factory.setBeanFactoryPostProcessorClasses(classes);
 		ConfigurableApplicationContext context = factory.createApplicationContext();
 		assertEquals("test-job", context.getBeanNamesForType(Job.class)[0]);
-		assertEquals("${foo}", ((Job) context.getBean("test-job", Job.class)).getName());
-		assertEquals(4, ((Foo) context.getBean("foo", Foo.class)).values[1], 0.01);
+		assertEquals("${foo}", context.getBean("test-job", Job.class).getName());
+		assertEquals(4, context.getBean("foo", Foo.class).values[1], 0.01);
 	}
 
 	@Test
@@ -97,10 +110,10 @@ public class GenericApplicationContextFactoryTests {
 		factory.setCopyConfiguration(false);
 		ConfigurableApplicationContext context = factory.createApplicationContext();
 		assertEquals("test-job", context.getBeanNamesForType(Job.class)[0]);
-		assertEquals("bar", ((Job) context.getBean("test-job", Job.class)).getName());
+		assertEquals("bar", context.getBean("test-job", Job.class).getName());
 		// The CustomEditorConfigurer is a BeanFactoryPostProcessor so the
 		// editor gets copied anyway!
-		assertEquals(4, ((Foo) context.getBean("foo", Foo.class)).values[1], 0.01);
+		assertEquals(4, context.getBean("foo", Foo.class).values[1], 0.01);
 	}
 
 	@Test
