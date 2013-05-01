@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2007 the original author or authors.
+ * Copyright 2006-2013 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -27,7 +27,8 @@ import org.springframework.integration.annotation.ServiceActivator;
  * Message handler which uses strategies to convert a Message into a job and a set of job parameters
  * @author Jonas Partner
  * @author Dave Syer
- * 
+ * @author Gunnar Hillert
+ *
  */
 public class JobLaunchingMessageHandler implements JobLaunchRequestHandler {
 
@@ -46,8 +47,7 @@ public class JobLaunchingMessageHandler implements JobLaunchRequestHandler {
 		Job job = request.getJob();
 		JobParameters jobParameters = request.getJobParameters();
 
-		JobExecution execution = jobLauncher.run(job, jobParameters);
-		return execution;
+		return jobLauncher.run(job, jobParameters);
 	}
 
 }
