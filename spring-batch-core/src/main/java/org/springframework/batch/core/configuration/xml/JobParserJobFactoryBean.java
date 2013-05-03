@@ -35,7 +35,7 @@ import org.springframework.util.StringUtils;
  * @author Dave Syer
  * @since 2.0.1
  */
-class JobParserJobFactoryBean implements SmartFactoryBean {
+public class JobParserJobFactoryBean implements SmartFactoryBean {
 
 	private String name;
 

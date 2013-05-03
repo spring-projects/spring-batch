@@ -59,7 +59,9 @@ import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.ItemStream;
 import org.springframework.batch.item.ItemWriter;
 import org.springframework.batch.repeat.CompletionPolicy;
+import org.springframework.batch.repeat.policy.CompositeCompletionPolicy;
 import org.springframework.batch.repeat.policy.SimpleCompletionPolicy;
+import org.springframework.batch.repeat.policy.TimeoutTerminationPolicy;
 import org.springframework.batch.repeat.support.TaskExecutorRepeatTemplate;
 import org.springframework.beans.factory.BeanNameAware;
 import org.springframework.beans.factory.FactoryBean;
@@ -89,7 +91,7 @@ import org.springframework.util.Assert;
  * @since 2.0
  */
 @SuppressWarnings("rawtypes")
-class StepParserStepFactoryBean<I, O> implements FactoryBean, BeanNameAware {
+public class StepParserStepFactoryBean<I, O> implements FactoryBean, BeanNameAware {
 
 	//
 	// Step Attributes
@@ -188,6 +190,8 @@ class StepParserStepFactoryBean<I, O> implements FactoryBean, BeanNameAware {
 
 	private ItemWriter<? super O> itemWriter;
 
+	private Integer timeout;
+
 	//
 	// Chunk Elements
 	//
@@ -228,6 +232,7 @@ class StepParserStepFactoryBean<I, O> implements FactoryBean, BeanNameAware {
 					+ "] has both a <chunk/> element and a 'ref' attribute  referencing a Tasklet.");
 
 			validateFaultTolerantSettings();
+
 			if (isFaultTolerant()) {
 				return createFaultTolerantStep();
 			}
@@ -384,15 +389,26 @@ class StepParserStepFactoryBean<I, O> implements FactoryBean, BeanNameAware {
 	@SuppressWarnings("unchecked")
 	private Step createSimpleStep() {
 		SimpleStepBuilder builder = new SimpleStepBuilder(new StepBuilder(name));
-		if (commitInterval != null) {
+
+		if(timeout != null && commitInterval != null) {
+			CompositeCompletionPolicy completionPolicy = new CompositeCompletionPolicy();
+			CompletionPolicy [] policies = new CompletionPolicy[2];
+			policies[0] = new SimpleCompletionPolicy(commitInterval);
+			policies[1] = new TimeoutTerminationPolicy(timeout);
+			completionPolicy.setPolicies(policies);
+			builder.chunk(completionPolicy);
+		} else if(timeout != null) {
+			builder.chunk(new TimeoutTerminationPolicy(timeout * 1000));
+		} else if(commitInterval != null) {
 			builder.chunk(commitInterval);
 		}
+
+		builder.chunk(chunkCompletionPolicy);
 		enhanceTaskletStepBuilder(builder);
 		registerItemListeners(builder);
 		builder.reader(itemReader);
 		builder.writer(itemWriter);
 		builder.processor(itemProcessor);
-		builder.chunk(chunkCompletionPolicy);
 		return builder.build();
 	}
 
@@ -973,6 +989,10 @@ class StepParserStepFactoryBean<I, O> implements FactoryBean, BeanNameAware {
 	 */
 	public void setStreams(ItemStream[] streams) {
 		this.streams = streams;
+	}
+
+	public void setTimeout(Integer timeout) {
+		this.timeout = timeout;
 	}
 
 	// =========================================================

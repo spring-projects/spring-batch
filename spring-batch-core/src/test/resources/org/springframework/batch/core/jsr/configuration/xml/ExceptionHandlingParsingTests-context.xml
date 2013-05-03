@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<job id="job1" xmlns="http://xmlns.jcp.org/xml/ns/javaee"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/javaee http://xmlns.jcp.org/xml/ns/javaee/jobXML_1_0.xsd" 
+	version="1.0">
+	<step id="step1" next="step2">
+		<chunk item-count="5" skip-limit="2">
+			<reader ref="generatingItemReader1"/>
+			<processor ref="problemProcessor"/>
+			<writer ref="sysoutItemWriter"/>
+			<skippable-exception-classes>
+				<include class="java.lang.Exception"/>
+				<exclude class="java.lang.RuntimeException"/>
+			</skippable-exception-classes>
+		</chunk>
+	</step>
+ 	<step id="step2" next="step3">
+		<chunk item-count="5" retry-limit="2">
+			<reader ref="generatingItemReader2"/>
+			<processor ref="problemProcessor"/>
+			<writer ref="sysoutItemWriter"/>
+			<retryable-exception-classes>
+				<include class="java.lang.Exception"/>
+				<exclude class="java.lang.RuntimeException"/>
+			</retryable-exception-classes>
+		</chunk>
+	</step>
+	<step id="step3">
+		<chunk item-count="5">
+			<reader ref="generatingItemReader3"/>
+			<processor ref="problemProcessor"/>
+			<writer ref="sysoutItemWriter"/>
+			<no-rollback-exception-classes>
+				<include class="java.lang.Exception"/>
+			</no-rollback-exception-classes>
+		</chunk>
+	</step>
+</job>
