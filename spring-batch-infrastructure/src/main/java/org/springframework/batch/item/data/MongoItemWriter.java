@@ -46,15 +46,14 @@ import org.springframework.util.StringUtils;
  */
 public class MongoItemWriter<T> implements ItemWriter<T>, InitializingBean {
 
-	private static final String BUFFER_KEY_PREFIX = MongoItemWriter.class.getName() + ".BUFFER_KEY";
 	private MongoOperations template;
-	private final String bufferKey;
+	private final Object bufferKey;
 	private String collection;
 	private boolean delete = false;
 
 	public MongoItemWriter() {
 		super();
-		this.bufferKey = BUFFER_KEY_PREFIX + "." + hashCode();
+		this.bufferKey = new Object();
 	}
 
 	/**

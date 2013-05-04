@@ -37,13 +37,9 @@ import org.springframework.transaction.support.TransactionSynchronizationManager
  */
 public class TransactionAwareBufferedWriter extends Writer {
 
-	private static final String BUFFER_KEY_PREFIX = TransactionAwareBufferedWriter.class.getName() + ".BUFFER_KEY";
+	private final Object bufferKey;
 
-	private static final String CLOSE_KEY_PREFIX = TransactionAwareBufferedWriter.class.getName() + ".CLOSE_KEY";
-
-	private final String bufferKey;
-
-	private final String closeKey;
+	private final Object closeKey;
 
 	private FileChannel channel;
 
@@ -66,8 +62,8 @@ public class TransactionAwareBufferedWriter extends Writer {
 		super();
 		this.channel = channel;
 		this.closeCallback = closeCallback;
-		this.bufferKey = BUFFER_KEY_PREFIX + "." + hashCode();
-		this.closeKey = CLOSE_KEY_PREFIX + "." + hashCode();
+		this.bufferKey = new Object();
+		this.closeKey = new Object();
 	}
 
 	public void setEncoding(String encoding) {

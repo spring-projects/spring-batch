@@ -20,15 +20,20 @@ import static org.junit.Assert.fail;
 import static org.mockito.Matchers.anyObject;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.any;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.channels.FileChannel;
 
+import javax.validation.constraints.AssertTrue;
+
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
+import org.mockito.invocation.InvocationOnMock;
+import org.mockito.stubbing.Answer;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.TransactionStatus;
 import org.springframework.transaction.support.TransactionCallback;
@@ -295,6 +300,53 @@ public class TransactionAwareBufferedWriterTests {
 		} catch (FlushFailedException ffe) {
 			assertEquals("Could not write to output buffer", ffe.getMessage());
 		}
+	}
+	
+	// BATCH-2018
+	@Test
+	@SuppressWarnings({"unchecked", "rawtypes"})
+	public void testResourceKeyCollision() throws Exception {
+		final int limit = 5000;
+		final TransactionAwareBufferedWriter[] writers = new TransactionAwareBufferedWriter[limit];
+		final String[] results = new String[limit];
+		for(int i = 0; i< limit; i++) {
+			final int index = i;
+			FileChannel fileChannel = mock(FileChannel.class);
+			when(fileChannel.write(any(ByteBuffer.class))).thenAnswer(new Answer<Integer>() {
+				@Override
+				public Integer answer(InvocationOnMock invocation)
+						throws Throwable {
+					ByteBuffer buffer = (ByteBuffer) invocation.getArguments()[0];
+					String val = new String(buffer.array(), "UTF-8");
+					if(results[index] == null) {
+						results[index] = val;
+					} else {
+						results[index] += val;
+					}
+					return buffer.limit();
+				}
+			});
+			writers[i] = new TransactionAwareBufferedWriter(fileChannel, null);
+		}
+		
+		new TransactionTemplate(transactionManager).execute(new TransactionCallback() {
+            @Override
+			public Object doInTransaction(TransactionStatus status) {
+				try {
+					for(int i=0; i< limit; i++) {
+						writers[i].write(String.valueOf(i));
+					}
+				}
+				catch (IOException e) {
+					throw new IllegalStateException("Unexpected IOException", e);
+				}
+				return null;
+			}
+		});		
+		
+		for(int i=0; i< limit; i++) {
+			assertEquals(String.valueOf(i), results[i]);
+		}				
 	}
 
 	private String getStringFromByteBuffer(ByteBuffer bb) {
