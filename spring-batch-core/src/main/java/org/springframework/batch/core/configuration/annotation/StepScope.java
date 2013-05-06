@@ -30,7 +30,7 @@ import org.springframework.context.annotation.ScopedProxyMode;
  * @Since 2.2
  *
  */
-@Scope(value = "step", proxyMode = ScopedProxyMode.INTERFACES)
+@Scope(value = "step", proxyMode = ScopedProxyMode.TARGET_CLASS)
 @Retention(RetentionPolicy.RUNTIME)
 @Documented
 public @interface StepScope {
