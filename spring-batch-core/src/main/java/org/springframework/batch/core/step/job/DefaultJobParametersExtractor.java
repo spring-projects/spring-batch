@@ -34,6 +34,7 @@ import org.springframework.batch.item.ExecutionContext;
  * parameters of the surrounding job.
  *
  * @author Dave Syer
+ * @author Will Schipp
  *
  */
 public class DefaultJobParametersExtractor implements JobParametersExtractor {
@@ -130,4 +131,13 @@ public class DefaultJobParametersExtractor implements JobParametersExtractor {
 		return builder.toJobParameters();
 	}
 
+	/**
+	 * setter to support switching off all parent parameters
+	 * @param useAllParentParameters
+	 */
+	public void setUseAllParentParameters(boolean useAllParentParameters) {
+		this.useAllParentParameters = useAllParentParameters;
+	}
+
+	
 }
