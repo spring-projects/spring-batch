@@ -15,10 +15,11 @@
  */
 package org.springframework.batch.integration.launch;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -89,6 +90,7 @@ public class JobLaunchingGatewayIntegrationTests {
 				new JobParameters()));
 		try {
 			requestChannel.send(trigger);
+			fail();
 		}
 		catch (MessagingException e) {
 			String message = e.getMessage();
@@ -127,6 +129,7 @@ public class JobLaunchingGatewayIntegrationTests {
 
 		try {
 			requestChannel.send(stringMessage);
+			fail();
 		}
 		catch (MessageHandlingException e) {
 			String message = e.getCause().getMessage();

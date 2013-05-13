@@ -39,7 +39,7 @@ public class JobLaunchingGateway extends AbstractReplyProducingMessageHandler {
 	/**
 	 * Constructor taking a {@link JobLauncher} as parameter.
 	 *
-	 * @param storedProcExecutor Must not be null.
+	 * @param jobLauncher Must not be null.
 	 *
 	 */
 	public JobLaunchingGateway(JobLauncher jobLauncher) {
