@@ -6,6 +6,7 @@
 	xsi:schemaLocation="http://www.springframework.org/schema/batch-integration http://www.springframework.org/schema/batch-integration/spring-batch-integration.xsd
 		http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
 		http://www.springframework.org/schema/integration http://www.springframework.org/schema/integration/spring-integration.xsd">
+		
 	<import resource="classpath:simple-job-launcher-context.xml" />
 	<integration:annotation-config/>
 	<integration:channel id="requests" />
