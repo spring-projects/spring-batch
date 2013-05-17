@@ -10,6 +10,7 @@ import static org.springframework.batch.support.DatabaseType.ORACLE;
 import static org.springframework.batch.support.DatabaseType.POSTGRES;
 import static org.springframework.batch.support.DatabaseType.SQLSERVER;
 import static org.springframework.batch.support.DatabaseType.SYBASE;
+import static org.springframework.batch.support.DatabaseType.TIMESTEN;
 import static org.springframework.batch.support.DatabaseType.fromProductName;
 
 import javax.sql.DataSource;
@@ -34,6 +35,7 @@ public class DatabaseTypeTests {
 		assertEquals(SQLSERVER, fromProductName("Microsoft SQL Server"));
 		assertEquals(MYSQL, fromProductName("MySQL"));
 		assertEquals(ORACLE, fromProductName("Oracle"));
+		assertEquals(TIMESTEN, fromProductName("TimesTen"));
 		assertEquals(POSTGRES, fromProductName("PostgreSQL"));
 		assertEquals(SYBASE, fromProductName("Sybase"));
 	}
@@ -84,6 +86,12 @@ public class DatabaseTypeTests {
 	public void testFromMetaDataForOracle() throws Exception {
 		DataSource ds = DatabaseTypeTestUtils.getMockDataSource("Oracle");
 		assertEquals(ORACLE, DatabaseType.fromMetaData(ds));
+	}
+	
+	@Test
+	public void testFromMetaDataForTimesTen() throws Exception {
+		DataSource ds = DatabaseTypeTestUtils.getMockDataSource("TimesTen");
+		assertEquals(TIMESTEN, DatabaseType.fromMetaData(ds));
 	}
 
 	@Test
