@@ -24,6 +24,7 @@ import java.util.Map;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.batch.core.partition.support.Partitioner;
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.core.io.Resource;
 import org.springframework.util.Assert;
@@ -55,7 +56,12 @@ public class FlatFilePartitioner implements Partitioner {
      * The {@link ExecutionContext} key name for number of items/lines to read in the partition.
      */
     public static final String DEFAULT_ITEMS_COUNT_KEY = "itemsCount";
-
+    
+    /**
+     * The {@link ExecutionContext} key name for number of previous partition's items/lines readed
+     */
+    public static final String DEFAULT_PREVIOUS_ITEMS_COUNT_KEY = "previousItemsCount";
+    
     /**
      * The {@link ExecutionContext} key name for the file resource which has been used for partitioning.
      */
@@ -82,6 +88,7 @@ public class FlatFilePartitioner implements Partitioner {
 
     private String startAtKeyName = DEFAULT_START_AT_KEY;
     private String itemsCountKeyName = DEFAULT_ITEMS_COUNT_KEY;
+    private String previousItemsCountKeyName = DEFAULT_PREVIOUS_ITEMS_COUNT_KEY;
     private String resourceKeyName = DEFAULT_RESOURCE_KEY;
     private String partitionPrefix = DEFAULT_PARTITION_PREFIX;
     private int bufferSize = DEFAULT_BUFFER_SIZE;
@@ -103,6 +110,15 @@ public class FlatFilePartitioner implements Partitioner {
 	 */
 	public void setItemsCountKeyName(String keyName) {
 		this.itemsCountKeyName = keyName;
+	}
+
+	/**
+	 * The name of the key for the line offset in each {@link ExecutionContext}.
+	 * Defaults to "previousItemsCount".
+	 * @param keyName the value of the key
+	 */
+	public void setPreviousItemsCountKeyName(String keyName) {
+		this.previousItemsCountKeyName = keyName;
 	}
 
 	/**
@@ -173,7 +189,7 @@ public class FlatFilePartitioner implements Partitioner {
 	        if (partitionCursor.getBytesPerPartition() == 0) {
 	        	long lines = countItems(resource);
 	            logger.info("Not enough data (" + lines + ") for the requested gridSize [" + gridSize + "]");
-	            partitionCursor.createPartition( 0, lines, result );
+	            partitionCursor.createPartition( 0, lines, 0, result );
 	            return result;
 	        }
 
@@ -188,15 +204,15 @@ public class FlatFilePartitioner implements Partitioner {
 				byte[] c = new byte[bufferSize];
 				ByteStreamCursor byteCursor = new ByteStreamCursor(); 
 	            int readChars;
+	            
+	            long previousItemsCount = 0l;
+	            
 	            while ((readChars = is.read(c)) != -1) {
 	                for (int i = 0; i < readChars; ++i) {
-	                	
 	                	if( byteCursor.lastSeenCharIsNewline( c[i] ) ) {
 		                	if( byteCursor.getCurrentByteInd() > partitionCursor.getPartitionBorder() ) {
-		                		
-		                		partitionCursor.createPartition( byteCursor.getStartAt(), 
-		    	            			byteCursor.getLineCount(), result );
-		    	            	
+		                		partitionCursor.createPartition( byteCursor.getStartAt(), byteCursor.getLineCount(), previousItemsCount, result );
+		                		previousItemsCount = previousItemsCount + byteCursor.getLineCount();
 		    	            	byteCursor.startNewPartition();
 		                	}
 	                    }
@@ -206,8 +222,7 @@ public class FlatFilePartitioner implements Partitioner {
 	            	byteCursor.startNewLine();
 	            }
 	            if( byteCursor.outstandingData() ) {
-	            	partitionCursor.createPartition( byteCursor.getStartAt(), 
-	            			byteCursor.getLineCount(), result );
+	            	partitionCursor.createPartition( byteCursor.getStartAt(), byteCursor.getLineCount(), previousItemsCount, result );
 	            }
 		        return result;
         	}
@@ -216,8 +231,7 @@ public class FlatFilePartitioner implements Partitioner {
         	}
         }
         catch (IOException e) {
-            throw new IllegalStateException("Unexpected IO exception while partitioning ["
-                    + resource.getDescription() + "]", e);
+            throw new IllegalStateException("Unexpected IO exception while partitioning [" + resource.getDescription() + "]", e);
         }
     }
     
@@ -315,11 +329,10 @@ public class FlatFilePartitioner implements Partitioner {
 			this.partitionBorder += bytesPerPartition + (remainderCounter-- > 0 ? 1 : 0);
 		}
 		
-		public void createPartition(long startAt, long lineCount, 
-				final Map<String, ExecutionContext> result) {
+		public void createPartition(long startAt, long lineCount, long previousItemsCount, final Map<String, ExecutionContext> result) {
 
 			final String partitionName = getPartitionName(gridSize, partitionIndex++);
-			result.put(partitionName, createExecutionContext(partitionName, startAt, lineCount));
+			result.put(partitionName, createExecutionContext(partitionName, startAt, lineCount, previousItemsCount));
 			toNextPartitionBorder();
 		}
 		
@@ -336,10 +349,11 @@ public class FlatFilePartitioner implements Partitioner {
      * @param itemsCount the number of items to read
      * @return the execution context (output)
      */
-    protected ExecutionContext createExecutionContext(String partitionName, long startAt, long itemsCount) {
+    protected ExecutionContext createExecutionContext(String partitionName, long startAt, long itemsCount, long previousItemsCount) {
         final ExecutionContext executionContext = new ExecutionContext();
         executionContext.putLong(startAtKeyName, startAt);
         executionContext.putLong(itemsCountKeyName, itemsCount);
+        executionContext.putLong(previousItemsCountKeyName, previousItemsCount);
 		try {
 			executionContext.putString(resourceKeyName, "file:" + resource.getFile().getPath());
 		} catch (IOException e) {
