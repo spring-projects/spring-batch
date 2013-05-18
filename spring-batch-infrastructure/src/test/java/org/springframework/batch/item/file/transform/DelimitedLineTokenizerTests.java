@@ -139,6 +139,26 @@ public class DelimitedLineTokenizerTests {
 	}
 
 	@Test
+	public void testDelimitedLineTokenizerStringBeginningOfLine() {
+		AbstractLineTokenizer tokenizer = new DelimitedLineTokenizer(" | ");
+		FieldSet line = tokenizer.tokenize(" | a | b");
+		assertEquals(3, line.getFieldCount());
+		assertEquals("", line.readString(0));
+		assertEquals("a", line.readString(1));
+		assertEquals("b", line.readString(2));
+	}
+
+	@Test
+	public void testDelimitedLineTokenizerStringEndOfLine() {
+		AbstractLineTokenizer tokenizer = new DelimitedLineTokenizer(" | ");
+		FieldSet line = tokenizer.tokenize("a | b | ");
+		assertEquals(3, line.getFieldCount());
+		assertEquals("a", line.readString(0));
+		assertEquals("b", line.readString(1));
+		assertEquals("", line.readString(2));
+	}
+
+	@Test
 	public void testDelimitedLineTokenizerNewlineToken() {
 		AbstractLineTokenizer tokenizer = new DelimitedLineTokenizer("\n");
 		FieldSet line = tokenizer.tokenize("a b\n c");

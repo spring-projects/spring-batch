@@ -155,6 +155,7 @@ public abstract class StepBuilderHelper<B extends StepBuilderHelper<B>> {
 			this.allowStartIfComplete = properties.allowStartIfComplete;
 			this.jobRepository = properties.jobRepository;
 			this.transactionManager = properties.transactionManager;
+			this.stepExecutionListeners = new ArrayList<StepExecutionListener>(properties.stepExecutionListeners);
 		}
 
 		public JobRepository getJobRepository() {

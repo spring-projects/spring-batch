@@ -16,19 +16,19 @@ import org.springframework.batch.item.SpELItemKeyMapper;
 import org.springframework.util.Assert;
 
 /**
- * A convenient {@link GemfireItemWriter} implementation that uses a {@ link SpELItemKeyMapper}
+ * A convenient {@link GemfireItemWriter} implementation that uses a {@link SpELItemKeyMapper}
  * 
  * @author David Turanski
  * @since 2.2
  */
-public class SpELMappingGemfireItemWriter<K,V> extends GemfireItemWriter<K, V>{
+public class SpELMappingGemfireItemWriter<K, V> extends GemfireItemWriter<K, V> {
 	/**
 	 * A constructor that accepts a SpEL expression used to derive the key
 	 * @param keyExpression
 	 */
 	SpELMappingGemfireItemWriter(String keyExpression) {
 		super();
-		Assert.hasText(keyExpression,"a valid keyExpression is required.");
+		Assert.hasText(keyExpression, "a valid keyExpression is required.");
 		setItemKeyMapper(new SpELItemKeyMapper<K, V>(keyExpression));
 	}
 }

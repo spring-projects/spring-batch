@@ -103,8 +103,18 @@ public class StepScopeConfigurationTests {
 	}
 
 	@Test
-	public void testStepScopeWithInterface() throws Exception {
-		init(StepScopeConfigurationWithInterface.class);
+	public void testIntentionallyBlowupWithForcedInterface() throws Exception {
+		init(StepScopeConfigurationForcingInterfaceProxy.class);
+		StepSynchronizationManager.release();
+		expected.expect(BeanCreationException.class);
+		expected.expectMessage("step scope");
+		SimpleHolder value = context.getBean(SimpleHolder.class);
+		assertEquals("STEP", value.call());
+	}
+
+	@Test
+	public void testStepScopeWithDefaults() throws Exception {
+		init(StepScopeConfigurationWithDefaults.class);
 		@SuppressWarnings("unchecked")
 		Callable<String> value = context.getBean(Callable.class);
 		assertEquals("STEP", value.call());
@@ -112,7 +122,7 @@ public class StepScopeConfigurationTests {
 
 	@Test
 	public void testIntentionallyBlowUpOnMissingContextWithInterface() throws Exception {
-		init(StepScopeConfigurationWithInterface.class);
+		init(StepScopeConfigurationWithDefaults.class);
 		StepSynchronizationManager.release();
 		expected.expect(BeanCreationException.class);
 		expected.expectMessage("step scope");
@@ -222,13 +232,26 @@ public class StepScopeConfigurationTests {
 
 	@Configuration
 	@EnableBatchProcessing
-	public static class StepScopeConfigurationWithInterface {
+	public static class StepScopeConfigurationWithDefaults {
 
 		@Bean
 		@StepScope
 		protected Callable<String> value(@Value("#{stepExecution.stepName}")
 		final String value) {
 			return new SimpleCallable(value);
+		}
+
+	}
+
+	@Configuration
+	@EnableBatchProcessing
+	public static class StepScopeConfigurationForcingInterfaceProxy {
+
+		@Bean
+		@Scope(value="step", proxyMode = ScopedProxyMode.INTERFACES)
+		protected SimpleHolder value(@Value("#{stepExecution.stepName}")
+		final String value) {
+			return new SimpleHolder(value);
 		}
 
 	}
