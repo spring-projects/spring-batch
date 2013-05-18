@@ -93,10 +93,11 @@ public class FlatFilePartitionerTests {
 		partitioner.setResource(resource);
 	}
 
-	private void assertPartition(long startAt, long lines, Map<String, ExecutionContext> partition, String suffix) {
+	private void assertPartition(long startAt, long lines, long prevLines, Map<String, ExecutionContext> partition, String suffix) {
 		ExecutionContext ex = partition.get(FlatFilePartitioner.DEFAULT_PARTITION_PREFIX + suffix);
 		assertEquals(startAt, ex.get(FlatFilePartitioner.DEFAULT_START_AT_KEY));
 		assertEquals(lines, ex.get(FlatFilePartitioner.DEFAULT_ITEMS_COUNT_KEY));
+		assertEquals(prevLines, ex.get(FlatFilePartitioner.DEFAULT_PREVIOUS_ITEMS_COUNT_KEY));
 		assertEquals("file:"+TMP_PATH, ex.get(FlatFilePartitioner.DEFAULT_RESOURCE_KEY));
 	}
 
@@ -108,7 +109,7 @@ public class FlatFilePartitionerTests {
 		Map<String, ExecutionContext> partition = partitioner.partition(1);
 		assertEquals(1, partition.size());
 		
-		assertPartition(0L, testLines, partition, "0");
+		assertPartition(0L, testLines, 0, partition, "0");
 	}
 	
 	@Test
@@ -119,8 +120,8 @@ public class FlatFilePartitionerTests {
 		Map<String, ExecutionContext> partition = partitioner.partition(2);
 		assertEquals(2, partition.size());
 
-		assertPartition(0L, testLines/2+1, partition, "0");
-		assertPartition((testLines/2+1)*11, testLines/2-1, partition, "1");
+		assertPartition(0L, testLines/2+1, 0, partition, "0");
+		assertPartition((testLines/2+1)*11, testLines/2-1, testLines/2+1, partition, "1");
 	}
 	
 	@Test
@@ -130,11 +131,11 @@ public class FlatFilePartitionerTests {
 		Map<String, ExecutionContext> partition = partitioner.partition(20);
 		assertEquals(5, partition.size());
 
-		assertPartition(0L, 1L, partition, "00");
-		assertPartition(11L, 1L, partition, "01");
-		assertPartition(22L, 1L, partition, "02");
-		assertPartition(33L, 1L, partition, "03");
-		assertPartition(44L, 1L, partition, "04");
+		assertPartition(0L, 1L, 0L, partition, "00");
+		assertPartition(11L, 1L, 1L, partition, "01");
+		assertPartition(22L, 1L, 2L, partition, "02");
+		assertPartition(33L, 1L, 3L, partition, "03");
+		assertPartition(44L, 1L, 4L, partition, "04");
 	}
 	
 	@Test
@@ -150,7 +151,7 @@ public class FlatFilePartitionerTests {
 		Map<String, ExecutionContext> partition = partitioner.partition(10);
 		assertEquals(1, partition.size());
 
-		assertPartition(0L, 1L, partition, "00");
+		assertPartition(0L, 1L, 0L, partition, "00");
 	}
 
 	@Test

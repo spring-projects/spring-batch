@@ -189,7 +189,7 @@ public class FlatFilePartitioner implements Partitioner {
 	        if (partitionCursor.getBytesPerPartition() == 0) {
 	        	long lines = countItems(resource);
 	            logger.info("Not enough data (" + lines + ") for the requested gridSize [" + gridSize + "]");
-	            partitionCursor.createPartition( 0, lines, 0, result );
+	            partitionCursor.createPartition( 0, lines, result );
 	            return result;
 	        }
 
@@ -205,14 +205,11 @@ public class FlatFilePartitioner implements Partitioner {
 				ByteStreamCursor byteCursor = new ByteStreamCursor(); 
 	            int readChars;
 	            
-	            long previousItemsCount = 0l;
-	            
 	            while ((readChars = is.read(c)) != -1) {
 	                for (int i = 0; i < readChars; ++i) {
 	                	if( byteCursor.lastSeenCharIsNewline( c[i] ) ) {
 		                	if( byteCursor.getCurrentByteInd() > partitionCursor.getPartitionBorder() ) {
-		                		partitionCursor.createPartition( byteCursor.getStartAt(), byteCursor.getLineCount(), previousItemsCount, result );
-		                		previousItemsCount = previousItemsCount + byteCursor.getLineCount();
+		                		partitionCursor.createPartition( byteCursor.getStartAt(), byteCursor.getLineCount(), result );
 		    	            	byteCursor.startNewPartition();
 		                	}
 	                    }
@@ -222,7 +219,7 @@ public class FlatFilePartitioner implements Partitioner {
 	            	byteCursor.startNewLine();
 	            }
 	            if( byteCursor.outstandingData() ) {
-	            	partitionCursor.createPartition( byteCursor.getStartAt(), byteCursor.getLineCount(), previousItemsCount, result );
+	            	partitionCursor.createPartition( byteCursor.getStartAt(), byteCursor.getLineCount(), result );
 	            }
 		        return result;
         	}
@@ -306,6 +303,7 @@ public class FlatFilePartitioner implements Partitioner {
         private long remainderCounter;
         private long partitionBorder;
         private int partitionIndex;
+        private long previousItemsCount;
 
     	PartitionBorderCursor(int gridSize, long sizeInBytes) {
     		this.gridSize = gridSize;
@@ -314,6 +312,7 @@ public class FlatFilePartitioner implements Partitioner {
             this.remainderCounter = this.bytesRemainder;
             this.partitionBorder = 0;
             this.partitionIndex = 0;
+            this.previousItemsCount = 0;
 			toNextPartitionBorder();
     	}
 
@@ -329,10 +328,11 @@ public class FlatFilePartitioner implements Partitioner {
 			this.partitionBorder += bytesPerPartition + (remainderCounter-- > 0 ? 1 : 0);
 		}
 		
-		public void createPartition(long startAt, long lineCount, long previousItemsCount, final Map<String, ExecutionContext> result) {
+		public void createPartition(long startAt, long lineCount, final Map<String, ExecutionContext> result) {
 
 			final String partitionName = getPartitionName(gridSize, partitionIndex++);
 			result.put(partitionName, createExecutionContext(partitionName, startAt, lineCount, previousItemsCount));
+			previousItemsCount += lineCount;
 			toNextPartitionBorder();
 		}
 		
