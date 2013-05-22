@@ -53,8 +53,8 @@ public class CompositeItemProcessor<I, O> implements ItemProcessor<I, O>, Initia
 
     @Override
 	public void afterPropertiesSet() throws Exception {
-		Assert.notNull(delegates, "The 'delgates' may not be null");
-		Assert.notEmpty(delegates, "The 'delgates' may not be empty");
+		Assert.notNull(delegates, "The 'delegates' may not be null");
+		Assert.notEmpty(delegates, "The 'delegates' may not be empty");
 	}
 
 	public void setDelegates(List<ItemProcessor<Object, Object>> delegates) {

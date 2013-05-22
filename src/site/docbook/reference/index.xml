@@ -5,7 +5,7 @@
 	<bookinfo>
 		<title>Spring Batch - Reference Documentation</title>
 
-		<releaseinfo>Spring Batch 2.2.0.M1</releaseinfo>
+		<releaseinfo>Spring Batch 2.2.0.RC1</releaseinfo>
 
 		<authorgroup>
 			<author>
@@ -41,6 +41,11 @@
 				<firstname>Michael</firstname>
 				<surname>Minella</surname>
 			</author>
+
+            <author>
+                <firstname>Chris</firstname>
+                <surname>Schaefer</surname>
+            </author>
 
 		</authorgroup>
 

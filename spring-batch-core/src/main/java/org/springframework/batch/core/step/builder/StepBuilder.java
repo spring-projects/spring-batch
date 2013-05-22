@@ -24,16 +24,16 @@ import org.springframework.batch.repeat.CompletionPolicy;
 
 /**
  * Convenient entry point for building all kinds of steps. Use this as a factory for fluent builders of any step.
- *
+ * 
  * @author Dave Syer
- *
+ * 
  * @since 2.2
  */
 public class StepBuilder extends StepBuilderHelper<StepBuilder> {
 
 	/**
 	 * Initialize a step builder for a step with the given name.
-	 *
+	 * 
 	 * @param name the name of the step
 	 */
 	public StepBuilder(String name) {
@@ -42,7 +42,7 @@ public class StepBuilder extends StepBuilderHelper<StepBuilder> {
 
 	/**
 	 * Build a step with a custom tasklet, not necessarily item processing.
-	 *
+	 * 
 	 * @param tasklet a tasklet
 	 * @return a {@link TaskletStepBuilder}
 	 */
@@ -52,10 +52,18 @@ public class StepBuilder extends StepBuilderHelper<StepBuilder> {
 
 	/**
 	 * Build a step that processes items in chunks with the size provided. To extend the step to being fault tolerant,
-	 * call the {@link SimpleStepBuilder#faultTolerant()} method on the builder.
-	 *
+	 * call the {@link SimpleStepBuilder#faultTolerant()} method on the builder. In most cases you will want to
+	 * parameterize your call to this method, to preserve the type safety of your readers and writers, e.g.
+	 * 
+	 * <pre>
+	 * new StepBuilder(&quot;step1&quot;).&lt;Order, Ledger&gt; chunk(100).reader(new OrderReader()).writer(new LedgerWriter())
+	 * // ... etc.
+	 * </pre>
+	 * 
 	 * @param chunkSize the chunk size (commit interval)
 	 * @return a {@link SimpleStepBuilder}
+	 * @param I the type of item to be processed as input
+	 * @param O the type of item to be output
 	 */
 	public <I, O> SimpleStepBuilder<I, O> chunk(int chunkSize) {
 		return new SimpleStepBuilder<I, O>(this).chunk(chunkSize);
@@ -63,10 +71,18 @@ public class StepBuilder extends StepBuilderHelper<StepBuilder> {
 
 	/**
 	 * Build a step that processes items in chunks with the completion policy provided. To extend the step to being
-	 * fault tolerant, call the {@link SimpleStepBuilder#faultTolerant()} method on the builder.
-	 *
+	 * fault tolerant, call the {@link SimpleStepBuilder#faultTolerant()} method on the builder. In most cases you will
+	 * want to parameterize your call to this method, to preserve the type safety of your readers and writers, e.g.
+	 * 
+	 * <pre>
+	 * new StepBuilder(&quot;step1&quot;).&lt;Order, Ledger&gt; chunk(100).reader(new OrderReader()).writer(new LedgerWriter())
+	 * // ... etc.
+	 * </pre>
+	 * 
 	 * @param completionPolicy the completion policy to use to control chunk processing
 	 * @return a {@link SimpleStepBuilder}
+	 * @param I the type of item to be processed as input
+	 * @param O the type of item to be output *
 	 */
 	public <I, O> SimpleStepBuilder<I, O> chunk(CompletionPolicy completionPolicy) {
 		return new SimpleStepBuilder<I, O>(this).chunk(completionPolicy);
@@ -74,7 +90,7 @@ public class StepBuilder extends StepBuilderHelper<StepBuilder> {
 
 	/**
 	 * Create a partition step builder for a remote (or local) step.
-	 *
+	 * 
 	 * @param stepName the name of the remote or delegate step
 	 * @param partitioner a partitioner to be used to construct new step executions
 	 * @return a {@link PartitionStepBuilder}
@@ -85,7 +101,7 @@ public class StepBuilder extends StepBuilderHelper<StepBuilder> {
 
 	/**
 	 * Create a partition step builder for a remote (or local) step.
-	 *
+	 * 
 	 * @param step the step to execute in parallel
 	 * @return a PartitionStepBuilder
 	 */
@@ -95,7 +111,7 @@ public class StepBuilder extends StepBuilderHelper<StepBuilder> {
 
 	/**
 	 * Create a new step builder that will execute a job.
-	 *
+	 * 
 	 * @param job a job to execute
 	 * @return a {@link JobStepBuilder}
 	 */
@@ -105,7 +121,7 @@ public class StepBuilder extends StepBuilderHelper<StepBuilder> {
 
 	/**
 	 * Create a new step builder that will execute a flow.
-	 *
+	 * 
 	 * @param flow a flow to execute
 	 * @return a {@link FlowStepBuilder}
 	 */

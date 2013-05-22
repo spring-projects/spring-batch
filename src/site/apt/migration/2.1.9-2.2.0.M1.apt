@@ -2,6 +2,8 @@ Spring Batch 2.2.0.M1 Release Notes
 
 * Bug
 
+  * {{{https://jira.springframework.org/browse/BATCH-1697}[BATCH-1697]}} - TaskletStep not marked as FAILED when FlatFileItemWriter fails to append footer
+
   * {{{https://jira.springframework.org/browse/BATCH-1745}[BATCH-1745]}} - XSD inconsistency: allow-start-if-complete is not allowed on non-tasklet step
 
   * {{{https://jira.springframework.org/browse/BATCH-1773}[BATCH-1773]}} - Step-scoped annotation based listener is not called
@@ -10,13 +12,21 @@ Spring Batch 2.2.0.M1 Release Notes
 
   * {{{https://jira.springframework.org/browse/BATCH-1780}[BATCH-1780]}} - Code exception is masked by a batch exception
 
+  * {{{https://jira.springframework.org/browse/BATCH-1795}[BATCH-1795]}} - ExponentialBackOffPolicy and BackOffContext
+
   * {{{https://jira.springframework.org/browse/BATCH-1799}[BATCH-1799]}} - Exception in flush of file output ItemWriters does not abort a step/job
+
+  * {{{https://jira.springframework.org/browse/BATCH-1884}[BATCH-1884]}} - JobLauncherIntegrationTests failing
+
+  * {{{https://jira.springframework.org/browse/BATCH-1890}[BATCH-1890]}} - Fix broken JDK5 build after Spring 3.1.2
 
   * {{{https://jira.springframework.org/browse/BATCH-1903}[BATCH-1903]}} - SQL compatibility breakage with HSQL
 
   * {{{https://jira.springframework.org/browse/BATCH-1916}[BATCH-1916]}} - RecordSeparatorPolicy#isEndOfRecord wrong javadoc?
 
   * {{{https://jira.springframework.org/browse/BATCH-1920}[BATCH-1920]}} - Add sample for new AMQPItemReader & Writer
+
+  * {{{https://jira.springframework.org/browse/BATCH-1948}[BATCH-1948]}} - StepScope doesn't work properly with proxyTargetClass=true in @Bean definitions
 
   * {{{https://jira.springframework.org/browse/BATCH-1950}[BATCH-1950]}} - Fix bootstrap process
 
@@ -26,17 +36,33 @@ Spring Batch 2.2.0.M1 Release Notes
 
   * {{{https://jira.springframework.org/browse/BATCH-1691}[BATCH-1691]}} - Allow to define groupBy for SqlPaginingQueryProviderFactoryBean
 
+  * {{{https://jira.springframework.org/browse/BATCH-1718}[BATCH-1718]}} - CompositeRetryPolicy by default is pessimistic
+
   * {{{https://jira.springframework.org/browse/BATCH-1854}[BATCH-1854]}} - Create marker interface to be used by MultiResourceItemReader to inject the resource an item was read from.
+
+  * {{{https://jira.springframework.org/browse/BATCH-1887}[BATCH-1887]}} - Cleanup maven warnings
 
   * {{{https://jira.springframework.org/browse/BATCH-1889}[BATCH-1889]}} - SqlFire support
 
+  * {{{https://jira.springframework.org/browse/BATCH-1891}[BATCH-1891]}} - Migrate usage of deprecated classes
+
   * {{{https://jira.springframework.org/browse/BATCH-1904}[BATCH-1904]}} - Upgrade support of Hibernate to Hibernate 4
+
+  * {{{https://jira.springframework.org/browse/BATCH-1928}[BATCH-1928]}} - Convert deprecated classes from the org.springframework.jdbc.core.simple package in samples
+
+  * {{{https://jira.springframework.org/browse/BATCH-1929}[BATCH-1929]}} - Convert deprecated classes from the org.springframework.jdbc.core.simple package in core-tests
+
+  * {{{https://jira.springframework.org/browse/BATCH-1931}[BATCH-1931]}} - Convert deprecated classes from the org.springframework.jdbc.core.simple package in infrastructure-tests
 
 * New Feature
 
   * {{{https://jira.springframework.org/browse/BATCH-1666}[BATCH-1666]}} - Add abort(long executionId) convenience method to JobOperator
 
+  * {{{https://jira.springframework.org/browse/BATCH-1667}[BATCH-1667]}} - StepExecutionListener ExitStatus not persisted and not accessible for other listeners
+
   * {{{https://jira.springframework.org/browse/BATCH-1684}[BATCH-1684]}} - Allow serializer to be injected into JobRepository (ExecutionContextDao)
+
+  * {{{https://jira.springframework.org/browse/BATCH-1685}[BATCH-1685]}} - Upgrade minimum support level for Spring to 3.1.2
 
   * {{{https://jira.springframework.org/browse/BATCH-1694}[BATCH-1694]}} - Add StepLocatorStepFactoryBean
 
@@ -46,11 +72,19 @@ Spring Batch 2.2.0.M1 Release Notes
 
   * {{{https://jira.springframework.org/browse/BATCH-1869}[BATCH-1869]}} - Need a line tokenizer to parse the line based on string (multi character) delimiter than a single character delimiter
 
+  * {{{https://jira.springframework.org/browse/BATCH-1882}[BATCH-1882]}} - AMQP ItemReader and ItemWriter
+
   * {{{https://jira.springframework.org/browse/BATCH-1911}[BATCH-1911]}} - Provide a Step registry to be able to locate a step by its name on (namely) remote nodes
+
+  * {{{https://jira.springframework.org/browse/BATCH-1912}[BATCH-1912]}} - Provide a base PartitionHandler so that other implementations can benefit from a shared base implementation
+
+  * {{{https://jira.springframework.org/browse/BATCH-1918}[BATCH-1918]}} - @Configuration support for batch (e.g. @EnableBatchProcessing)
 
   * {{{https://jira.springframework.org/browse/BATCH-1935}[BATCH-1935]}} - Add quick start maven archetype
 
 * Task
+
+  * {{{https://jira.springframework.org/browse/BATCH-1883}[BATCH-1883]}} - Bump spring-amqp Version to 1.1.2
 
   * {{{https://jira.springframework.org/browse/BATCH-1938}[BATCH-1938]}} - Update to support Spring 3.2.0.RELEASE
 
@@ -58,8 +92,15 @@ Spring Batch 2.2.0.M1 Release Notes
 
 * Refactoring
 
+  * {{{https://jira.springframework.org/browse/BATCH-1895}[BATCH-1895]}} - Remove batch retry and depend on spring-retry.
+
+  * {{{https://jira.springframework.org/browse/BATCH-1897}[BATCH-1897]}} - Remove ant files from batch.
+
   * {{{https://jira.springframework.org/browse/BATCH-1915}[BATCH-1915]}} - Change minimum compiler level to 1.6 and use @Override everywhere
+
+  * {{{https://jira.springframework.org/browse/BATCH-1919}[BATCH-1919]}} - Switch to using <jdbc:/> namespace in samples
 
   * {{{https://jira.springframework.org/browse/BATCH-1940}[BATCH-1940]}} - Replace org.springframework.batch.support.JdbcTestUtils with org.springframework.test.jdbc.JdbcTestUtils
 
   * {{{https://jira.springframework.org/browse/BATCH-1949}[BATCH-1949]}} - Remove explicit checks for Spring 3 in StepScope
+ 
