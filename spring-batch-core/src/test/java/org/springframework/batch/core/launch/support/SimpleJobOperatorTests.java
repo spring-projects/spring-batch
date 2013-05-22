@@ -15,15 +15,16 @@
  */
 package org.springframework.batch.core.launch.support;
 
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
-
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
+import static org.mockito.Matchers.anyString;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
@@ -36,12 +37,17 @@ import org.junit.Test;
 import org.springframework.batch.core.BatchStatus;
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.JobExecution;
+import org.springframework.batch.core.JobExecutionException;
 import org.springframework.batch.core.JobInstance;
 import org.springframework.batch.core.JobParameters;
 import org.springframework.batch.core.JobParametersIncrementer;
+import org.springframework.batch.core.Step;
+import org.springframework.batch.core.StepContribution;
+import org.springframework.batch.core.configuration.JobRegistry;
 import org.springframework.batch.core.configuration.support.MapJobRegistry;
 import org.springframework.batch.core.converter.DefaultJobParametersConverter;
 import org.springframework.batch.core.explore.JobExplorer;
+import org.springframework.batch.core.job.AbstractJob;
 import org.springframework.batch.core.job.JobSupport;
 import org.springframework.batch.core.launch.JobInstanceAlreadyExistsException;
 import org.springframework.batch.core.launch.JobLauncher;
@@ -52,6 +58,10 @@ import org.springframework.batch.core.repository.JobExecutionAlreadyRunningExcep
 import org.springframework.batch.core.repository.JobInstanceAlreadyCompleteException;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.repository.JobRestartException;
+import org.springframework.batch.core.scope.context.ChunkContext;
+import org.springframework.batch.core.step.tasklet.StoppableTasklet;
+import org.springframework.batch.core.step.tasklet.TaskletStep;
+import org.springframework.batch.repeat.RepeatStatus;
 import org.springframework.batch.support.PropertiesConverter;
 
 /**
@@ -350,6 +360,32 @@ public class SimpleJobOperatorTests {
 	}
 
 	@Test
+	public void testStopTasklet() throws Exception {
+		JobInstance jobInstance = new JobInstance(123L, job.getName());
+		JobExecution jobExecution = new JobExecution(jobInstance, 111L, jobParameters);
+		MockStoppableTasklet tasklet = new MockStoppableTasklet();
+		TaskletStep taskletStep = new TaskletStep();
+		taskletStep.setTasklet(tasklet);
+		MockJob job = new MockJob();
+		job.taskletStep = taskletStep;
+		
+		JobRegistry jobRegistry = mock(JobRegistry.class);
+		TaskletStep step = mock(TaskletStep.class);
+		
+		when(step.getTasklet()).thenReturn(tasklet);
+		when(step.getName()).thenReturn("test_job.step1");
+		when(jobRegistry.getJob(anyString())).thenReturn(job);
+		when(jobExplorer.getJobExecution(111L)).thenReturn(jobExecution);
+		
+		jobOperator.setJobRegistry(jobRegistry);
+		jobExplorer.getJobExecution(111L);
+		jobRepository.update(jobExecution);
+		jobOperator.stop(111L);
+		assertEquals(BatchStatus.STOPPING, jobExecution.getStatus());	
+		assertTrue(tasklet.stopped);
+	}
+	
+	@Test
 	public void testAbort() throws Exception {
 		JobInstance jobInstance = new JobInstance(123L, job.getName());
 		JobExecution jobExecution = new JobExecution(jobInstance, 111L, jobParameters);
@@ -369,5 +405,43 @@ public class SimpleJobOperatorTests {
 		when(jobExplorer.getJobExecution(123L)).thenReturn(jobExecution);
 		jobRepository.update(jobExecution);
 		jobOperator.abandon(123L);
+	}
+	
+	class MockJob extends AbstractJob {
+
+		private TaskletStep taskletStep;
+		
+		@Override
+		public Step getStep(String stepName) {
+			return taskletStep;
+		}
+
+		@Override
+		public Collection<String> getStepNames() {
+			return Arrays.asList("test_job.step1");
+		}
+
+		@Override
+		protected void doExecute(JobExecution execution) throws JobExecutionException {
+			
+		}
+		
+	}
+	
+	class MockStoppableTasklet implements StoppableTasklet {
+
+		boolean stopped = Boolean.FALSE;
+		
+		@Override
+		public RepeatStatus execute(StepContribution contribution,
+				ChunkContext chunkContext) throws Exception {
+			return null;
+		}
+
+		@Override
+		public void stop() {
+			stopped = Boolean.TRUE;
+		}
+		
 	}
 }

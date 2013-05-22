@@ -31,9 +31,10 @@ import org.springframework.batch.repeat.RepeatStatus;
  * @see AbstractMethodInvokingDelegator
  *
  * @author Dave Syer
+ * @author Will Schipp
  *
  */
-public class MethodInvokingTaskletAdapter extends AbstractMethodInvokingDelegator<Object> implements Tasklet {
+public class MethodInvokingTaskletAdapter extends AbstractMethodInvokingDelegator<Object> implements StoppableTasklet {
 
 	/**
 	 * Delegate execution to the target object and translate the return value to
@@ -61,5 +62,8 @@ public class MethodInvokingTaskletAdapter extends AbstractMethodInvokingDelegato
 		}
 		return ExitStatus.COMPLETED;
 	}
+
+	@Override
+	public void stop() { }
 
 }

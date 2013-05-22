@@ -30,7 +30,7 @@ import org.springframework.util.Assert;
  * @author Dave Syer
  *
  */
-public class CallableTaskletAdapter implements Tasklet, InitializingBean {
+public class CallableTaskletAdapter implements StoppableTasklet, InitializingBean {
 
 	private Callable<RepeatStatus> callable;
 
@@ -61,5 +61,8 @@ public class CallableTaskletAdapter implements Tasklet, InitializingBean {
 	public RepeatStatus execute(StepContribution contribution, ChunkContext chunkContext) throws Exception {
 		return callable.call();
 	}
+
+	@Override
+	public void stop() { }
 
 }

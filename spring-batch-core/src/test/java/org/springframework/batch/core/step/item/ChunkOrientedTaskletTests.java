@@ -26,6 +26,7 @@ import org.springframework.batch.core.JobParameters;
 import org.springframework.batch.core.StepContribution;
 import org.springframework.batch.core.StepExecution;
 import org.springframework.batch.core.scope.context.ChunkContext;
+import org.springframework.batch.repeat.RepeatStatus;
 
 /**
  * @author Dave Syer
@@ -114,5 +115,44 @@ public class ChunkOrientedTaskletTests {
 		// The tasklet does not change the exit code
 		assertEquals(expected, contribution.getExitStatus());
 	}
+	
+	@Test
+	public void testStopped() throws Exception {
+		ChunkOrientedTasklet<String> handler = new ChunkOrientedTasklet<String>(new MockChunkProvider(), new ChunkProcessor<String>() {
+			@Override
+			public void process(StepContribution contribution, Chunk<String> chunk) {
+				contribution.incrementWriteCount(1);
+			}
+		});
+		StepContribution contribution = new StepContribution(new StepExecution("foo", new JobExecution(new JobInstance(
+				123L, "job"), new JobParameters())));
+		ExitStatus expected = ExitStatus.STOPPED;
+		while (handler.execute(contribution, context).equals(RepeatStatus.CONTINUABLE)) {
+			handler.stop();//call a stop after the first one
+		}//end while
+		// The tasklet does not change the exit code
+		assertEquals(expected, contribution.getExitStatus());		
+	}
 
+	class MockChunkProvider implements ChunkProvider<String>{
+
+		int max = 3;
+		int counter = 0;
+		
+		@Override
+		public Chunk<String> provide(StepContribution contribution) throws Exception {
+			while (counter < max) {
+				counter++;
+				Chunk<String> chunk = new Chunk<String>();
+				chunk.add("foo");
+				System.out.println("here's the chunk " + chunk);
+				return chunk;//send it
+			}
+			return null;
+		}
+
+		@Override
+		public void postProcess(StepContribution contribution,Chunk<String> chunk) { }
+		
+	}
 }

@@ -16,6 +16,7 @@
 package org.springframework.batch.core.launch.support;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Date;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
@@ -33,6 +34,7 @@ import org.springframework.batch.core.JobInstance;
 import org.springframework.batch.core.JobParameters;
 import org.springframework.batch.core.JobParametersIncrementer;
 import org.springframework.batch.core.JobParametersInvalidException;
+import org.springframework.batch.core.Step;
 import org.springframework.batch.core.StepExecution;
 import org.springframework.batch.core.UnexpectedJobExecutionException;
 import org.springframework.batch.core.configuration.JobRegistry;
@@ -40,6 +42,7 @@ import org.springframework.batch.core.configuration.ListableJobLocator;
 import org.springframework.batch.core.converter.DefaultJobParametersConverter;
 import org.springframework.batch.core.converter.JobParametersConverter;
 import org.springframework.batch.core.explore.JobExplorer;
+import org.springframework.batch.core.job.AbstractJob;
 import org.springframework.batch.core.launch.JobExecutionNotRunningException;
 import org.springframework.batch.core.launch.JobInstanceAlreadyExistsException;
 import org.springframework.batch.core.launch.JobLauncher;
@@ -52,6 +55,9 @@ import org.springframework.batch.core.repository.JobExecutionAlreadyRunningExcep
 import org.springframework.batch.core.repository.JobInstanceAlreadyCompleteException;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.repository.JobRestartException;
+import org.springframework.batch.core.step.tasklet.StoppableTasklet;
+import org.springframework.batch.core.step.tasklet.Tasklet;
+import org.springframework.batch.core.step.tasklet.TaskletStep;
 import org.springframework.batch.support.PropertiesConverter;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.transaction.annotation.Transactional;
@@ -71,6 +77,7 @@ import org.springframework.util.Assert;
  *
  * @author Dave Syer
  * @author Lucas Ward
+ * @author Will Schipp
  * @since 2.0
  */
 public class SimpleJobOperator implements JobOperator, InitializingBean {
@@ -392,6 +399,32 @@ public class SimpleJobOperator implements JobOperator, InitializingBean {
 		}
 		jobExecution.setStatus(BatchStatus.STOPPING);
 		jobRepository.update(jobExecution);
+		//implementation to support Tasklet.stop()
+		//TODO manage this is an 'scoped' proxy test
+		//find the job object
+		Job job;
+		try {
+			job = jobRegistry.getJob(jobExecution.getJobInstance().getJobName());
+			//get the steps for the job
+			if (job instanceof AbstractJob) {
+				//retrieve the steps
+				Collection<String> stepNames = ((AbstractJob)job).getStepNames();
+				//go through the step names are retrieve each step
+				for (String stepName : stepNames) {
+					Step step = ((AbstractJob)job).getStep(stepName);
+					//determine type
+					if (step instanceof TaskletStep) {
+						//invoke stop --> reflection?
+						Tasklet tasklet = ((TaskletStep) step).getTasklet();
+						if (tasklet instanceof StoppableTasklet) {
+							((StoppableTasklet)tasklet).stop();
+						}//end if
+					}//end if
+				}//end for
+			}//end if
+		} catch (NoSuchJobException e) {
+			logger.error("Couldn't find Job for the execution:" + jobExecution.getJobInstance().getJobName());
+		}
 
 		return true;
 	}
