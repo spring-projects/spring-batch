@@ -71,6 +71,7 @@ import org.springframework.util.Assert;
  * @author Ben Hale
  * @author Robert Kasanicky
  * @author Michael Minella
+ * @author Will Schipp
  */
 @SuppressWarnings("serial")
 public class TaskletStep extends AbstractStep {
@@ -304,6 +305,14 @@ public class TaskletStep extends AbstractStep {
 	@Override
 	protected void open(ExecutionContext ctx) throws Exception {
 		stream.open(ctx);
+	}
+
+	/**
+	 * retrieve the tasklet - helper method for JobOperator
+	 * @return the {@link Tasklet} instance being executed within this step
+	 */
+	public Tasklet getTasklet() {
+		return tasklet;
 	}
 
 	/**
