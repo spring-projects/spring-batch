@@ -16,7 +16,6 @@
 package org.springframework.batch.core.launch.support;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Date;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
@@ -400,30 +399,26 @@ public class SimpleJobOperator implements JobOperator, InitializingBean {
 		jobExecution.setStatus(BatchStatus.STOPPING);
 		jobRepository.update(jobExecution);
 		//implementation to support Tasklet.stop()
-		//TODO manage this is an 'scoped' proxy test
-		//find the job object
-		Job job;
 		try {
-			job = jobRegistry.getJob(jobExecution.getJobInstance().getJobName());
-			//get the steps for the job
-			if (job instanceof AbstractJob) {
-				//retrieve the steps
-				Collection<String> stepNames = ((AbstractJob)job).getStepNames();
-				//go through the step names are retrieve each step
-				for (String stepName : stepNames) {
-					Step step = ((AbstractJob)job).getStep(stepName);
-					//determine type
-					if (step instanceof TaskletStep) {
-						//invoke stop --> reflection?
-						Tasklet tasklet = ((TaskletStep) step).getTasklet();
-						if (tasklet instanceof StoppableTasklet) {
-							((StoppableTasklet)tasklet).stop();
+			Job job = jobRegistry.getJob(jobExecution.getJobInstance().getJobName());
+			if (job instanceof AbstractJob) {//can only process as AbstractJob is the only way to get the step object
+				//get the current stepExecution
+				for (StepExecution stepExecution : jobExecution.getStepExecutions()) {
+					if (stepExecution.getStatus().isRunning()) {
+						//have the step execution that's running -> need to 'stop' it
+						Step step = ((AbstractJob)job).getStep(stepExecution.getStepName());
+						if (step instanceof TaskletStep) {
+							Tasklet tasklet = ((TaskletStep)step).getTasklet();
+							if (tasklet instanceof StoppableTasklet) {
+								((StoppableTasklet)tasklet).stop();
+							}//end if
 						}//end if
 					}//end if
-				}//end for
+				}//end for				
 			}//end if
-		} catch (NoSuchJobException e) {
-			logger.error("Couldn't find Job for the execution:" + jobExecution.getJobInstance().getJobName());
+		}
+		catch (NoSuchJobException e) {
+			//TODO - handle by converting
 		}
 
 		return true;
