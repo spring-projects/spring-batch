@@ -82,6 +82,8 @@ public class FlatFilePartitioner implements Partitioner {
      */
     public static final char DEFAULT_LINE_SEPARATOR_CHAR = '\n';
 
+    public static final int DEFAULT_LINES_TO_SKIP = 0;
+
     private final Logger logger = LoggerFactory.getLogger(FlatFilePartitioner.class);
 
     private Resource resource;
@@ -93,7 +95,17 @@ public class FlatFilePartitioner implements Partitioner {
     private String partitionPrefix = DEFAULT_PARTITION_PREFIX;
     private int bufferSize = DEFAULT_BUFFER_SIZE;
     private char lineSeparatorCharacter = DEFAULT_LINE_SEPARATOR_CHAR;
+	private int linesToSkip = DEFAULT_LINES_TO_SKIP;
     
+	/**
+	 * Public setter for the number of lines to skip at the start of a file. Can be used if the file contains a header
+	 * without useful (column name) information, and without a comment delimiter at the beginning of the lines.
+	 * 
+	 * @param linesToSkip the number of lines to skip
+	 */
+	public void setLinesToSkip(int linesToSkip) {
+		this.linesToSkip = linesToSkip;
+	}
 	/**
 	 * The name of the key for the byte offset in each {@link ExecutionContext}.
 	 * Defaults to "startAt".
@@ -153,6 +165,21 @@ public class FlatFilePartitioner implements Partitioner {
 		this.lineSeparatorCharacter = lineSeparatorChar;
 	}
 	
+	public static class LinesCount {
+		private long bytesToSkip;
+		private long linesCount;
+		public LinesCount(long bytesToSkip, long linesCount) {
+			this.bytesToSkip = bytesToSkip;
+			this.linesCount = linesCount;
+		}
+		public long getBytesToSkip() {
+			return bytesToSkip;
+		}
+		public long getLinesCount() {
+			return linesCount;
+		}
+	}
+	
     /**
      * Creates a set of {@link ExecutionContext} according to the provided
      * <tt>gridSize</tt> if there are enough elements.
@@ -187,9 +214,9 @@ public class FlatFilePartitioner implements Partitioner {
 		        
 	        // Check the case that the set is to small for the number of request partition(s)
 	        if (partitionCursor.getBytesPerPartition() == 0) {
-	        	long lines = countItems(resource);
-	            logger.info("Not enough data (" + lines + ") for the requested gridSize [" + gridSize + "]");
-	            partitionCursor.createPartition( 0, lines, result );
+	        	LinesCount linesCount = countItems(resource);
+	            logger.info("Not enough data (" + linesCount.getLinesCount() + ") for the requested gridSize [" + gridSize + "]");
+	            partitionCursor.createPartition( linesCount, result );
 	            return result;
 	        }
 
@@ -209,7 +236,7 @@ public class FlatFilePartitioner implements Partitioner {
 	                for (int i = 0; i < readChars; ++i) {
 	                	if( byteCursor.lastSeenCharIsNewline( c[i] ) ) {
 		                	if( byteCursor.getCurrentByteInd() > partitionCursor.getPartitionBorder() ) {
-		                		partitionCursor.createPartition( byteCursor.getStartAt(), byteCursor.getLineCount(), result );
+		                		partitionCursor.createPartition( byteCursor.getLinesCount(), result );
 		    	            	byteCursor.startNewPartition();
 		                	}
 	                    }
@@ -219,7 +246,7 @@ public class FlatFilePartitioner implements Partitioner {
 	            	byteCursor.startNewLine();
 	            }
 	            if( byteCursor.outstandingData() ) {
-	            	partitionCursor.createPartition( byteCursor.getStartAt(), byteCursor.getLineCount(), result );
+	            	partitionCursor.createPartition( byteCursor.getLinesCount(), result );
 	            }
 		        return result;
         	}
@@ -242,6 +269,8 @@ public class FlatFilePartitioner implements Partitioner {
     private class ByteStreamCursor {
         private long totalLineCount = 0;
         private long lineCount = 0;
+        private long skipLineCount = linesToSkip;
+        private long skipBytesCount = 0;
         private byte lastSeenChar = 0;
         private long currentByteInd = 0L;
         private long startAt = 0;
@@ -249,6 +278,9 @@ public class FlatFilePartitioner implements Partitioner {
 		public boolean lastSeenCharIsNewline(byte lastSeenChar) {
 			this.lastSeenChar = lastSeenChar;
 			this.currentByteInd++;
+			if(skipLineCount > 0) {
+				skipBytesCount++;
+			}
             // New line is \n on Unix and \r\n on Windows                
             if (lastSeenChar == lineSeparatorCharacter) {
             	startNewLine();
@@ -258,7 +290,12 @@ public class FlatFilePartitioner implements Partitioner {
 		}
 		
 		public void startNewLine() {
-            lineCount++;
+			if(skipLineCount > 0) {
+				skipLineCount--;
+			}
+			else {
+				lineCount++;
+			}
             totalLineCount++;
 		}
 
@@ -267,12 +304,8 @@ public class FlatFilePartitioner implements Partitioner {
             lineCount = 0;
 		}
 
-		public long getLineCount() {
-			return lineCount;
-		}
-
-		public long getStartAt() {
-			return startAt;
+		public LinesCount getLinesCount() {
+			return new LinesCount(startAt > skipBytesCount ? startAt : skipBytesCount, lineCount);
 		}
 
 		public long getCurrentByteInd() {
@@ -328,11 +361,11 @@ public class FlatFilePartitioner implements Partitioner {
 			this.partitionBorder += bytesPerPartition + (remainderCounter-- > 0 ? 1 : 0);
 		}
 		
-		public void createPartition(long startAt, long lineCount, final Map<String, ExecutionContext> result) {
+		public void createPartition(LinesCount linesCount, final Map<String, ExecutionContext> result) {
 
 			final String partitionName = getPartitionName(gridSize, partitionIndex++);
-			result.put(partitionName, createExecutionContext(partitionName, startAt, lineCount, previousItemsCount));
-			previousItemsCount += lineCount;
+			result.put(partitionName, createExecutionContext(partitionName, linesCount.getBytesToSkip(), linesCount.getLinesCount(), previousItemsCount));
+			previousItemsCount += linesCount.getLinesCount();
 			toNextPartitionBorder();
 		}
 		
@@ -371,11 +404,11 @@ public class FlatFilePartitioner implements Partitioner {
      * @param resource the resource
      * @return the number of items contained in the resource
      */
-    protected long countItems(Resource resource) {
+    protected LinesCount countItems(Resource resource) {
         try {
             final InputStream in = resource.getInputStream();
             try {
-                return countLines(in);
+                return countLinesAfterSkip(in);
             } finally {
                 in.close();
             }
@@ -383,6 +416,46 @@ public class FlatFilePartitioner implements Partitioner {
             throw new IllegalStateException("Unexpected IO exception while counting items for ["
                     + resource.getDescription() + "]", e);
         }
+    }
+    
+    private LinesCount countLinesAfterSkip(InputStream in) throws IOException {
+        final InputStream is = new BufferedInputStream(in);
+        byte[] c = new byte[bufferSize];
+        long count = 0;
+        int readChars;
+        byte lastChar = 0;
+        boolean contentExists = false;
+        long lineSkipCount = linesToSkip;
+        long bytesToSkip = 0;
+        while ((readChars = is.read(c)) != -1) {
+            for (int i = 0; i < readChars; ++i) {
+            	contentExists = true;
+            	lastChar = c[i];
+            	if( lineSkipCount > 0) {
+            		bytesToSkip++;
+            	}
+                // We're dealing with the char here, it's \n on Unix and \r\n on Windows                
+                if (c[i] == DEFAULT_LINE_SEPARATOR_CHAR) {
+                	if( lineSkipCount > 0 ) {
+                		lineSkipCount--;
+                	}
+                	else {
+                		count++;
+                	}
+                }
+            }
+        }
+        // Last line
+        if ( (count > 0 && lastChar != DEFAULT_LINE_SEPARATOR_CHAR) || 						// <-- last line is not empty but is not terminated by '\n'
+        	(count == 0 && lastChar != DEFAULT_LINE_SEPARATOR_CHAR && contentExists) ) {		// <-- the first line is the last line and it's not terminated by '\n'
+        	if( lineSkipCount > 0 ) {
+        		lineSkipCount--;
+        	}
+        	else {
+        		count++;
+        	}
+        }
+        return new LinesCount(bytesToSkip, count);
     }
 
     /**
@@ -399,7 +472,7 @@ public class FlatFilePartitioner implements Partitioner {
      */    
     public static long countLines(InputStream in) throws IOException {
         final InputStream is = new BufferedInputStream(in);
-        byte[] c = new byte[4096];
+        byte[] c = new byte[DEFAULT_BUFFER_SIZE];
         long count = 0;
         int readChars;
         byte lastChar = 0;
