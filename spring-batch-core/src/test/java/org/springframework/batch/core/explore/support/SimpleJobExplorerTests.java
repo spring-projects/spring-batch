@@ -18,6 +18,8 @@ package org.springframework.batch.core.explore.support;
 
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.verify;
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 
 import java.util.Collections;
@@ -88,11 +90,17 @@ public class SimpleJobExplorerTests {
 	@Test
 	public void testGetStepExecution() throws Exception {
 		when(jobExecutionDao.getJobExecution(jobExecution.getId())).thenReturn(jobExecution);
+		when(jobInstanceDao.getJobInstance(jobExecution)).thenReturn(jobInstance);
 		StepExecution stepExecution = jobExecution.createStepExecution("foo");
 		when(stepExecutionDao.getStepExecution(jobExecution, 123L))
 				.thenReturn(stepExecution);
 		when(ecDao.getExecutionContext(stepExecution)).thenReturn(null);
-		jobExplorer.getStepExecution(jobExecution.getId(), 123L);
+		stepExecution = jobExplorer.getStepExecution(jobExecution.getId(), 123L);
+		
+		assertEquals(jobInstance, 
+			stepExecution.getJobExecution().getJobInstance());
+		
+		verify(jobInstanceDao).getJobInstance(jobExecution);
 	}
 
 	@Test
