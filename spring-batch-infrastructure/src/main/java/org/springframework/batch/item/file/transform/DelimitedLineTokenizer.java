@@ -142,14 +142,16 @@ public class DelimitedLineTokenizer extends AbstractLineTokenizer {
 		int lastCut = 0;
 		int length = chars.length;
 		int fieldCount = 0;
+		int endIndexLastDelimiter = -1;
 
 		for (int i = 0; i < length; i++) {
 			char currentChar = chars[i];
 			boolean isEnd = (i == (length - 1));
 
-			boolean isDelimiter = isDelimiter(chars, i, delimiter);
+			boolean isDelimiter = isDelimiter(chars, i, delimiter, endIndexLastDelimiter);
 
 			if ((isDelimiter && !inQuoted) || isEnd) {
+				endIndexLastDelimiter = i;
 				int endPosition = (isEnd ? (length - lastCut) : (i - lastCut));
 
 				if (isEnd && isDelimiter) {
@@ -229,13 +231,15 @@ public class DelimitedLineTokenizer extends AbstractLineTokenizer {
 	 * character
 	 * @see DelimitedLineTokenizer#DelimitedLineTokenizer(char)
 	 */
-	private boolean isDelimiter(char[] chars, int i, String token) {
+	private boolean isDelimiter(char[] chars, int i, String token, int endIndexLastDelimiter) {
 		boolean result = false;
 
-		if(i >= token.length() - 1) {
-			String end = new String(chars, (i-token.length()) + 1, token.length());
-			if(token.equals(end)) {
-				result = true;
+		if(i-endIndexLastDelimiter >= delimiter.length()) {
+			if(i >= token.length() - 1) {
+				String end = new String(chars, (i-token.length()) + 1, token.length());
+				if(token.equals(end)) {
+					result = true;
+				}
 			}
 		}
 
