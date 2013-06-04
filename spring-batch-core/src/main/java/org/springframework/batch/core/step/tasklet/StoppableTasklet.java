@@ -2,9 +2,7 @@ package org.springframework.batch.core.step.tasklet;
 
 /**
  * 
- * JSR-352 compatible tasklet that provides the 'stop' function.
- * The Spring Batch Tasklet is analogous to 'batchlet' in the JSR
- * terminology
+ * Stoppable tasklet
  * 
  * @author Will Schipp
  *

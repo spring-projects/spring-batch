@@ -41,7 +41,6 @@ import org.springframework.batch.core.configuration.ListableJobLocator;
 import org.springframework.batch.core.converter.DefaultJobParametersConverter;
 import org.springframework.batch.core.converter.JobParametersConverter;
 import org.springframework.batch.core.explore.JobExplorer;
-import org.springframework.batch.core.job.AbstractJob;
 import org.springframework.batch.core.launch.JobExecutionNotRunningException;
 import org.springframework.batch.core.launch.JobInstanceAlreadyExistsException;
 import org.springframework.batch.core.launch.JobLauncher;
@@ -54,6 +53,8 @@ import org.springframework.batch.core.repository.JobExecutionAlreadyRunningExcep
 import org.springframework.batch.core.repository.JobInstanceAlreadyCompleteException;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.repository.JobRestartException;
+import org.springframework.batch.core.step.NoSuchStepException;
+import org.springframework.batch.core.step.StepLocator;
 import org.springframework.batch.core.step.tasklet.StoppableTasklet;
 import org.springframework.batch.core.step.tasklet.Tasklet;
 import org.springframework.batch.core.step.tasklet.TaskletStep;
@@ -401,24 +402,29 @@ public class SimpleJobOperator implements JobOperator, InitializingBean {
 		//implementation to support Tasklet.stop()
 		try {
 			Job job = jobRegistry.getJob(jobExecution.getJobInstance().getJobName());
-			if (job instanceof AbstractJob) {//can only process as AbstractJob is the only way to get the step object
+			if (job instanceof StepLocator) {//can only process as StepLocator is the only way to get the step object
 				//get the current stepExecution
 				for (StepExecution stepExecution : jobExecution.getStepExecutions()) {
 					if (stepExecution.getStatus().isRunning()) {
-						//have the step execution that's running -> need to 'stop' it
-						Step step = ((AbstractJob)job).getStep(stepExecution.getStepName());
-						if (step instanceof TaskletStep) {
-							Tasklet tasklet = ((TaskletStep)step).getTasklet();
-							if (tasklet instanceof StoppableTasklet) {
-								((StoppableTasklet)tasklet).stop();
+						try {
+							//have the step execution that's running -> need to 'stop' it
+							Step step = ((StepLocator)job).getStep(stepExecution.getStepName());
+							if (step instanceof TaskletStep) {
+								Tasklet tasklet = ((TaskletStep)step).getTasklet();
+								if (tasklet instanceof StoppableTasklet) {
+									((StoppableTasklet)tasklet).stop();
+								}//end if
 							}//end if
-						}//end if
+						}
+						catch (NoSuchStepException e) {
+							logger.warn("Step not found",e);
+						}
 					}//end if
 				}//end for				
 			}//end if
 		}
 		catch (NoSuchJobException e) {
-			//TODO - handle by converting
+			logger.warn("Cannot find Job object",e);
 		}
 
 		return true;

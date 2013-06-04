@@ -18,10 +18,8 @@ package org.springframework.batch.core.step.item;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.springframework.batch.core.ExitStatus;
 import org.springframework.batch.core.StepContribution;
 import org.springframework.batch.core.scope.context.ChunkContext;
-import org.springframework.batch.core.step.tasklet.StoppableTasklet;
 import org.springframework.batch.core.step.tasklet.Tasklet;
 import org.springframework.batch.repeat.RepeatStatus;
 
@@ -30,11 +28,10 @@ import org.springframework.batch.repeat.RepeatStatus;
  * handling.
  *
  * @author Dave Syer
- * @author Will Schipp
  *
  * @param <I> input item type
  */
-public class ChunkOrientedTasklet<I> implements StoppableTasklet {
+public class ChunkOrientedTasklet<I> implements Tasklet {
 
 	private static final String INPUTS_KEY = "INPUTS";
 
@@ -43,11 +40,6 @@ public class ChunkOrientedTasklet<I> implements StoppableTasklet {
 	private final ChunkProvider<I> chunkProvider;
 
 	private boolean buffering = true;
-	
-	/**
-	 * support for stoppable tasklet
-	 */
-	private boolean stopped = false;
 
 	private static Log logger = LogFactory.getLog(ChunkOrientedTasklet.class);
 
@@ -71,13 +63,6 @@ public class ChunkOrientedTasklet<I> implements StoppableTasklet {
 	@Override
 	public RepeatStatus execute(StepContribution contribution, ChunkContext chunkContext) throws Exception {
 
-		//check for stopped at the beginning of a chunk
-		if (stopped) {
-			stopped = false;//reset
-			contribution.setExitStatus(ExitStatus.STOPPED);
-			return RepeatStatus.FINISHED;
-		}//end if
-		
 		@SuppressWarnings("unchecked")
 		Chunk<I> inputs = (Chunk<I>) chunkContext.getAttribute(INPUTS_KEY);
 		if (inputs == null) {
@@ -105,9 +90,4 @@ public class ChunkOrientedTasklet<I> implements StoppableTasklet {
 
 	}
 
-	@Override
-	public void stop() {
-		stopped = true;
-	}
-	
 }

@@ -363,7 +363,7 @@ public class SimpleJobOperatorTests {
 	public void testStopTasklet() throws Exception {
 		JobInstance jobInstance = new JobInstance(123L, job.getName());
 		JobExecution jobExecution = new JobExecution(jobInstance, 111L, jobParameters);
-		MockStoppableTasklet tasklet = new MockStoppableTasklet();
+		StoppableTasklet tasklet = mock(StoppableTasklet.class);
 		TaskletStep taskletStep = new TaskletStep();
 		taskletStep.setTasklet(tasklet);
 		MockJob job = new MockJob();
@@ -382,7 +382,6 @@ public class SimpleJobOperatorTests {
 		jobRepository.update(jobExecution);
 		jobOperator.stop(111L);
 		assertEquals(BatchStatus.STOPPING, jobExecution.getStatus());	
-		assertTrue(tasklet.stopped);
 	}
 	
 	@Test
@@ -428,20 +427,4 @@ public class SimpleJobOperatorTests {
 		
 	}
 	
-	class MockStoppableTasklet implements StoppableTasklet {
-
-		boolean stopped = Boolean.FALSE;
-		
-		@Override
-		public RepeatStatus execute(StepContribution contribution,
-				ChunkContext chunkContext) throws Exception {
-			return null;
-		}
-
-		@Override
-		public void stop() {
-			stopped = Boolean.TRUE;
-		}
-		
-	}
 }
