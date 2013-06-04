@@ -1,7 +1,7 @@
                                     ---------
                                     Downloads
                                     ---------
-                                    Dave Syer, Ben Hale
+                                    Dave Syer, Ben Hale, Michael Minella
                                     ------
                                     December 2007, February 2009, July 2009
 
@@ -23,13 +23,13 @@ Source code can also be browsed and downloaded at {{{http://github.com/SpringSou
 
 * Maven Artifacts
 
-  Traditional "spring-*" artifacts are deployed on the Maven central repo.  Full releases in this format also go in our s3 repository, browseable {{{http://shrub.appspot.com/maven.springframework.org/release/org/springframework/batch}here}}:
+  Traditional "spring-*" artifacts are deployed on the Maven central repo.  Full releases in this format also go in our s3 repository, browseable {{{http://shrub.appspot.com/maven.springframework.org/release/org/springframework/batch/}here}}:
 
 +---------------
 <repository>
     <id>spring-releases</id>
     <name>Spring Maven RELEASE Repository</name>
-    <url>http://maven.springframework.org/release</url>
+    <url>http://repo.springsource.org/release</url>
 </repository>
 +---------------
 
@@ -104,7 +104,7 @@ Source code can also be browsed and downloaded at {{{http://github.com/SpringSou
 </dependency>
 +---------------
 
-  Milestones are also deployed to the SpringSource Enterprise Repository ({{{http://shrub.appspot.com/repository.springsource.com/maven/bundles/milestone}browseable here}}), so use this repository if you want to depend on artifacts in the <<<org.springframework.*>>> style:
+  Milestones are also deployed to the SpringSource Enterprise Repository ({{{http://shrub.appspot.com/repository.springsource.com/maven/bundles/milestone/}browseable here}}), so use this repository if you want to depend on artifacts in the <<<org.springframework.*>>> style:
 
 +---
 <repository>
