@@ -1,7 +1,7 @@
                                     ------
                                     Spring Batch Migration Guides
                                     ------
-                                    Dave Syer
+                                    Dave Syer, Michael Minella
                                     ------
                                     September 2009
 
@@ -12,6 +12,8 @@
   You can also browse the upcoming releases and look at the {{{http://opensource.atlassian.com/projects/spring/browse/BATCH?report=com.atlassian.jira.plugin.system.project:roadmap-panel}Road Map}} query.
 
   Links:
+
+    * {{{./2.2.0.RC2-2.2.0.html}2.2.0.RC2-2.2.0}}
 
     * {{{./2.2.0.RC1-2.2.0.RC2.html}2.2.0.RC1-2.2.0.RC2}}
 
