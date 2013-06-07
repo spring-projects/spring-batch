@@ -103,7 +103,9 @@ public class SystemCommandTaskletIntegrationTests {
 	 */
 	@Test
 	public void testExecuteTimeout() throws Exception {
-		String command = "sleep 3";
+		String command = System.getProperty("os.name").toLowerCase().indexOf("win")>0 ? 
+			"ping 1.1.1.1 -n 1 -w 3000" : 
+			"sleep 3";
 		tasklet.setCommand(command);
 		tasklet.setTimeout(10);
 		tasklet.afterPropertiesSet();
@@ -123,7 +125,9 @@ public class SystemCommandTaskletIntegrationTests {
 	 */
 	@Test
 	public void testInterruption() throws Exception {
-		String command = "sleep 5";
+		String command = System.getProperty("os.name").toLowerCase().indexOf("win")>0 ? 
+			"ping 1.1.1.1 -n 1 -w 5000" : 
+			"sleep 5";
 		tasklet.setCommand(command);
 		tasklet.setTerminationCheckInterval(10);
 		tasklet.afterPropertiesSet();
