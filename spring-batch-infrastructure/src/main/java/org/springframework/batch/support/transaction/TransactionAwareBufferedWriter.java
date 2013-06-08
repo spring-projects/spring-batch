@@ -37,37 +37,33 @@ import org.springframework.transaction.support.TransactionSynchronizationManager
  */
 public class TransactionAwareBufferedWriter extends Writer {
 
-	private static final String BUFFER_KEY_PREFIX = TransactionAwareBufferedWriter.class.getName() + ".BUFFER_KEY";
+	private final Object bufferKey;
 
-	private static final String CLOSE_KEY_PREFIX = TransactionAwareBufferedWriter.class.getName() + ".CLOSE_KEY";
-
-	private final String bufferKey;
-
-	private final String closeKey;
+	private final Object closeKey;
 
 	private FileChannel channel;
 
 	private final Runnable closeCallback;
-	
+
 	// default encoding for writing to output files - set to UTF-8.
 	private static final String DEFAULT_CHARSET = "UTF-8";
-	
+
 	private String encoding = DEFAULT_CHARSET;
-	
+
 	/**
 	 * Create a new instance with the underlying file channel provided, and a callback
 	 * to execute on close. The callback should clean up related resources like
 	 * output streams or channels.
 	 * 
-	 * @param channel channel used to do the actuall file IO
+	 * @param channel channel used to do the actual file IO
 	 * @param closeCallback callback to execute on close
 	 */
 	public TransactionAwareBufferedWriter(FileChannel channel, Runnable closeCallback) {
 		super();
 		this.channel = channel;
 		this.closeCallback = closeCallback;
-		this.bufferKey = BUFFER_KEY_PREFIX + "." + hashCode();
-		this.closeKey = CLOSE_KEY_PREFIX + "." + hashCode();
+		this.bufferKey = new Object();
+		this.closeKey = new Object();
 	}
 
 	public void setEncoding(String encoding) {
@@ -88,7 +84,7 @@ public class TransactionAwareBufferedWriter extends Writer {
 				public void afterCompletion(int status) {
 					clear();
 				}
-				
+
 				@Override
 				public void beforeCommit(boolean readOnly) {
 					try {
@@ -145,7 +141,7 @@ public class TransactionAwareBufferedWriter extends Writer {
 		if (!transactionActive()) {
 			return 0L;
 		}
-		try {			
+		try {
 			return getCurrentBuffer().toString().getBytes(encoding).length;
 		} catch (UnsupportedEncodingException e) {
 			throw new WriteFailedException("Could not determine buffer size because of unsupported encoding: " + encoding, e);
