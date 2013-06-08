@@ -77,7 +77,6 @@
 			<groupId>org.springframework.batch</groupId>
 			<artifactId>spring-batch-test</artifactId>
 			<version>${project.version}</version>
-			<scope>test</scope>
 		</dependency>
 		<dependency>
 			<groupId>commons-dbcp</groupId>
@@ -118,15 +117,15 @@
 <!-- 			<artifactId>easymock</artifactId> -->
 <!-- 		</dependency> -->
 		<dependency>
+			<groupId>org.slf4j</groupId>
+			<artifactId>slf4j-log4j12</artifactId>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
 			<groupId>log4j</groupId>
 			<artifactId>log4j</artifactId>
 			<scope>test</scope>
 		</dependency>
-		<dependency>
-			<groupId>org.slf4j</groupId>
-			<artifactId>slf4j-log4j12</artifactId>
-			<scope>test</scope>
-		</dependency>		
 		<dependency>
 			<groupId>org.springframework</groupId>
 			<artifactId>spring-jdbc</artifactId>
@@ -172,9 +171,6 @@
 					<artifactId>maven-surefire-plugin</artifactId>
 					<configuration>
 						<junitArtifactName>junit:junit</junitArtifactName>
-						<additionalClasspathElements>
-							<additionalClasspathElement>src/test/java</additionalClasspathElement>
-						</additionalClasspathElements>
 					</configuration>
 				</plugin>
 			</plugins>
