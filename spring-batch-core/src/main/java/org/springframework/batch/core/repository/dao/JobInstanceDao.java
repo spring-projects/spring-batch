@@ -27,6 +27,7 @@ import org.springframework.batch.core.JobParameters;
  * 
  * @author Lucas Ward
  * @author Robert Kasanicky
+ * @author Will Schipp
  * 
  */
 public interface JobInstanceDao {
@@ -49,6 +50,9 @@ public interface JobInstanceDao {
 	/**
 	 * Find the job instance that matches the given name and parameters. If no
 	 * matching job instances are found, then returns null.
+	 * 
+	 * If using the JdbcJobInstance, you can provide the jobName with a wildcard
+	 * (e.g. *Job) to return 'like' job names.  (e.g. *Job will return 'someJob' and 'otherJob')
 	 * 
 	 * @param jobName the name of the job
 	 * @param jobParameters the parameters with which the job was executed
