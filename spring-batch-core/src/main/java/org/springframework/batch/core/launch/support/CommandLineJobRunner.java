@@ -47,10 +47,13 @@ import org.springframework.batch.core.launch.JobExecutionNotRunningException;
 import org.springframework.batch.core.launch.JobExecutionNotStoppedException;
 import org.springframework.batch.core.launch.JobLauncher;
 import org.springframework.batch.core.launch.JobParametersNotFoundException;
+import org.springframework.batch.core.launch.NoSuchJobException;
 import org.springframework.batch.core.repository.JobRepository;
+import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.BeanDefinitionStoreException;
 import org.springframework.beans.factory.config.AutowireCapableBeanFactory;
 import org.springframework.context.ConfigurableApplicationContext;
+import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 import org.springframework.util.Assert;
 import org.springframework.util.StringUtils;
@@ -281,7 +284,12 @@ public class CommandLineJobRunner {
 		ConfigurableApplicationContext context = null;
 
 		try {
-			context = new ClassPathXmlApplicationContext(jobPath);
+			try {
+				context = new ClassPathXmlApplicationContext(jobPath);
+			} catch (BeansException e) {
+				logger.info("No XML-based context named " + jobPath + ". Trying class-based configuration.");
+				context = new AnnotationConfigApplicationContext(Class.forName(jobPath));
+			}
 			context.getAutowireCapableBeanFactory().autowireBeanProperties(this,
 					AutowireCapableBeanFactory.AUTOWIRE_BY_TYPE, false);
 
@@ -292,7 +300,7 @@ public class CommandLineJobRunner {
 			}
 
 			String jobName = jobIdentifier;
-
+			
 			JobParameters jobParameters = jobParametersConverter.getJobParameters(StringUtils
 					.splitArrayElementsIntoProperties(parameters, "="));
 			Assert.isTrue(parameters == null || parameters.length == 0 || !jobParameters.isEmpty(),
@@ -333,11 +341,14 @@ public class CommandLineJobRunner {
 				jobName = jobExecution.getJobInstance().getJobName();
 			}
 
-			Job job;
+			Job job = null;
 			if (jobLocator != null) {
-				job = jobLocator.getJob(jobName);
+				try {
+					job = jobLocator.getJob(jobName);
+				} catch (NoSuchJobException e) {
+				}
 			}
-			else {
+			if (job == null) {
 				job = (Job) context.getBean(jobName);
 			}
 
@@ -566,7 +577,7 @@ public class CommandLineJobRunner {
 		}
 
 		if (jobPath == null || jobIdentifier == null) {
-			String message = "At least 2 arguments are required: JobPath and jobIdentifier.";
+			String message = "At least 2 arguments are required: JobPath/JobClass and jobIdentifier.";
 			logger.error(message);
 			CommandLineJobRunner.message = message;
 			command.exit(1);

@@ -19,4 +19,4 @@ s3.properties
 *.iws
 .*.swp
 .DS_Store
-
+.springBeans
