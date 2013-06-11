@@ -75,7 +75,9 @@ JobInstanceDao, InitializingBean {
 
 	private static final String FIND_JOB_NAMES = "SELECT distinct JOB_NAME from %PREFIX%JOB_INSTANCE order by JOB_NAME";
 	
-	private static final String FIND_LAST_JOBS_BY_NAME = "SELECT JOB_INSTANCE_ID, JOB_NAME from %PREFIX%JOB_INSTANCE where JOB_NAME like ? order by JOB_INSTANCE_ID desc";
+	private static final String FIND_LAST_JOBS_BY_NAME = "SELECT JOB_INSTANCE_ID, JOB_NAME from %PREFIX%JOB_INSTANCE where JOB_NAME = ? order by JOB_INSTANCE_ID desc";
+	
+	private static final String FIND_LAST_JOBS_LIKE_NAME = "SELECT JOB_INSTANCE_ID, JOB_NAME from %PREFIX%JOB_INSTANCE where JOB_NAME like ? order by JOB_INSTANCE_ID desc";
 
 	private DataFieldMaxValueIncrementer jobIncrementer;
 
@@ -222,12 +224,6 @@ JobInstanceDao, InitializingBean {
 			}
 
 		};
-
-		//check if the name contains a wildcard
-		if (jobName.contains(STAR_WILDCARD)) {
-			//swap for sql wildcard
-			jobName = jobName.replaceAll("\\" + STAR_WILDCARD, SQL_WILDCARD);
-		}//end if
 		
 		@SuppressWarnings("unchecked")
 		List<JobInstance> result = (List<JobInstance>) getJdbcTemplate().query(getQuery(FIND_LAST_JOBS_BY_NAME),
@@ -272,6 +268,44 @@ JobInstanceDao, InitializingBean {
 		Assert.notNull(jobIncrementer);
 	}
 
+
+	@Override
+	public List<JobInstance> getJobInstancesByName(String jobName, final int start,
+			final int count) {
+		ResultSetExtractor extractor = new ResultSetExtractor() {
+
+			private List<JobInstance> list = new ArrayList<JobInstance>();
+
+			@Override
+			public Object extractData(ResultSet rs) throws SQLException,
+			DataAccessException {
+				int rowNum = 0;
+				while (rowNum < start && rs.next()) {
+					rowNum++;
+				}
+				while (rowNum < start + count && rs.next()) {
+					ParameterizedRowMapper<JobInstance> rowMapper = new JobInstanceRowMapper();
+					list.add(rowMapper.mapRow(rs, rowNum));
+					rowNum++;
+				}
+				return list;
+			}
+
+		};
+
+		//check if the name contains a wildcard
+		if (jobName.contains(STAR_WILDCARD)) {
+			//swap for sql wildcard
+			jobName = jobName.replaceAll("\\" + STAR_WILDCARD, SQL_WILDCARD);
+		}//end if
+		
+		@SuppressWarnings("unchecked")
+		List<JobInstance> result = (List<JobInstance>) getJdbcTemplate().query(getQuery(FIND_LAST_JOBS_LIKE_NAME),
+				new Object[] { jobName }, extractor);
+
+		return result;
+	}	
+	
 	/**
 	 * @author Dave Syer
 	 *
@@ -290,4 +324,5 @@ JobInstanceDao, InitializingBean {
 			return jobInstance;
 		}
 	}
+
 }

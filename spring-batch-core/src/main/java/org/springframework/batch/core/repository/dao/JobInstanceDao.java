@@ -88,6 +88,18 @@ public interface JobInstanceDao {
 	 * @return the job instances with this name or empty if none
 	 */
 	List<JobInstance> getJobInstances(String jobName, int start, int count);
+	
+	/**
+	 * Fetch the last job instances with the provided name, sorted backwards by
+	 * primary key. using a 'like' criteria
+	 * 
+	 *  
+	 * @param jobName
+	 * @param start
+	 * @param count
+	 * @return
+	 */
+	List<JobInstance> getJobInstancesByName(String jobName,int start, int count);
 
 	/**
 	 * Retrieve the names of all job instances sorted alphabetically - i.e. jobs

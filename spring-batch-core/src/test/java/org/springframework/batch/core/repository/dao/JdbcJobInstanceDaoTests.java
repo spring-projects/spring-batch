@@ -1,6 +1,7 @@
 package org.springframework.batch.core.repository.dao;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
 import java.math.BigInteger;
@@ -79,11 +80,10 @@ public class JdbcJobInstanceDaoTests extends AbstractJobInstanceDaoTests {
 		//look up a job using a wildcard (* substituted to %)
 		// unrelated job instance that should be ignored by the query
 		dao.createJobInstance("anotherJob", new JobParameters());
-
 		// we need two instances of the same job to check ordering
 		dao.createJobInstance("someJob", new JobParameters());
 		//now look for them
-		List<JobInstance> jobInstances = dao.getJobInstances("*Job", 0, 2);
+		List<JobInstance> jobInstances = dao.getJobInstancesByName("*Job", 0, 2);
 		assertEquals(2, jobInstances.size());
 		for (JobInstance instance : jobInstances) {
 			assertTrue(instance.getJobName().contains("Job"));
