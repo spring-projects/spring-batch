@@ -70,6 +70,24 @@ public class StepBuilder extends StepBuilderHelper<StepBuilder> {
 	}
 
 	/**
+	 * Build a step that processes items in chunks with the size provided. To extend the step to being fault tolerant,
+	 * call the {@link SimpleStepBuilder#faultTolerant()} method on the builder. In most cases you will want to
+	 * parameterize your call to this method, to preserve the type safety of your readers and writers, e.g.
+	 * 
+	 * <pre>
+	 * new StepBuilder(&quot;step1&quot;).chunk(100, Order.class, Ledger.class).reader(new OrderReader()).writer(new LedgerWriter())
+	 * // ... etc.
+	 * </pre>
+	 * 
+	 * @param chunkSize the chunk size (commit interval)
+	 * @return a {@link SimpleStepBuilder}
+	 * @param clazz1 the type of item to be processed as input
+	 * @param clazz2 the type of item to be output
+	 */
+	public <I, O> SimpleStepBuilder<I, O> chunk(int chunkSize, Class<I> clazz1, Class<O> clazz2) {
+		return chunk(chunkSize);
+	}	
+	/**
 	 * Build a step that processes items in chunks with the completion policy provided. To extend the step to being
 	 * fault tolerant, call the {@link SimpleStepBuilder#faultTolerant()} method on the builder. In most cases you will
 	 * want to parameterize your call to this method, to preserve the type safety of your readers and writers, e.g.
@@ -88,6 +106,24 @@ public class StepBuilder extends StepBuilderHelper<StepBuilder> {
 		return new SimpleStepBuilder<I, O>(this).chunk(completionPolicy);
 	}
 
+	/**
+	 * Build a step that processes items in chunks with the completion policy provided. To extend the step to being
+	 * fault tolerant, call the {@link SimpleStepBuilder#faultTolerant()} method on the builder. In most cases you will
+	 * want to parameterize your call to this method, to preserve the type safety of your readers and writers, e.g.
+	 * 
+	 * <pre>
+	 * new StepBuilder(&quot;step1&quot;).chunk(100, Order.class, Ledge.class).reader(new OrderReader()).writer(new LedgerWriter())
+	 * // ... etc.
+	 * </pre>
+	 * 
+	 * @param completionPolicy the completion policy to use to control chunk processing
+	 * @return a {@link SimpleStepBuilder}
+	 * @param clazz1 the type of item to be processed as input
+	 * @param clazz2 the type of item to be output *
+	 */
+	public <I, O> SimpleStepBuilder<I, O> chunk(CompletionPolicy completionPolicy, Class<I> clazz1, Class<O> clazz2) {
+		return chunk(completionPolicy);
+	}	
 	/**
 	 * Create a partition step builder for a remote (or local) step.
 	 * 

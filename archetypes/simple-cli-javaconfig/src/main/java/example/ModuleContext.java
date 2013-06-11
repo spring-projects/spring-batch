@@ -27,7 +27,7 @@ public class ModuleContext {
 	public Step step1(StepBuilderFactory stepBuilderFactory, ItemReader<Person> reader,
 			ItemWriter<Person> writer, ItemProcessor<Person, Person> processor) {
 		return stepBuilderFactory.get("step1")
-				.<Person, Person> chunk(10)
+				.chunk(10, Person.class, Person.class)
 				.reader(reader)
 				.processor(processor)
 				.writer(writer)
