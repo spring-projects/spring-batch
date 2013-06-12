@@ -270,7 +270,7 @@ JobInstanceDao, InitializingBean {
 
 
 	@Override
-	public List<JobInstance> getJobInstancesByName(String jobName, final int start,
+	public List<JobInstance> findJobInstancesByName(String jobName, final int start,
 			final int count) {
 		ResultSetExtractor extractor = new ResultSetExtractor() {
 

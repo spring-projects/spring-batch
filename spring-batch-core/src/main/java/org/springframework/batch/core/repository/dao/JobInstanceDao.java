@@ -99,7 +99,7 @@ public interface JobInstanceDao {
 	 * @param count
 	 * @return
 	 */
-	List<JobInstance> getJobInstancesByName(String jobName,int start, int count);
+	List<JobInstance> findJobInstancesByName(String jobName,int start, int count);
 
 	/**
 	 * Retrieve the names of all job instances sorted alphabetically - i.e. jobs

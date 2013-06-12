@@ -83,7 +83,7 @@ public class JdbcJobInstanceDaoTests extends AbstractJobInstanceDaoTests {
 		// we need two instances of the same job to check ordering
 		dao.createJobInstance("someJob", new JobParameters());
 		//now look for them
-		List<JobInstance> jobInstances = dao.getJobInstancesByName("*Job", 0, 2);
+		List<JobInstance> jobInstances = dao.findJobInstancesByName("*Job", 0, 2);
 		assertEquals(2, jobInstances.size());
 		for (JobInstance instance : jobInstances) {
 			assertTrue(instance.getJobName().contains("Job"));

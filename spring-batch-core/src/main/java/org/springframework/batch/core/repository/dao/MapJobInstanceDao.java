@@ -114,7 +114,7 @@ public class MapJobInstanceDao implements JobInstanceDao {
 	}
 
 	@Override
-	public List<JobInstance> getJobInstancesByName(String jobName, int start, int count) {
+	public List<JobInstance> findJobInstancesByName(String jobName, int start, int count) {
 		//no 'wildcard' implementation for map
 		return getJobInstances(jobName,start,count);
 	}
