@@ -15,14 +15,14 @@
  */
 package org.springframework.batch.core.configuration.xml;
 
+import java.util.List;
+
 import org.springframework.batch.core.listener.StepListenerMetaData;
-import org.springframework.batch.core.step.item.ForceRollbackForWriteSkipException;
 import org.springframework.batch.repeat.policy.SimpleCompletionPolicy;
 import org.springframework.beans.MutablePropertyValues;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.config.BeanDefinitionHolder;
 import org.springframework.beans.factory.config.RuntimeBeanReference;
-import org.springframework.beans.factory.config.TypedStringValue;
 import org.springframework.beans.factory.parsing.CompositeComponentDefinition;
 import org.springframework.beans.factory.support.AbstractBeanDefinition;
 import org.springframework.beans.factory.support.BeanDefinitionBuilder;
@@ -30,11 +30,10 @@ import org.springframework.beans.factory.support.GenericBeanDefinition;
 import org.springframework.beans.factory.support.ManagedList;
 import org.springframework.beans.factory.support.ManagedMap;
 import org.springframework.beans.factory.xml.ParserContext;
+import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 import org.springframework.util.xml.DomUtils;
 import org.w3c.dom.Element;
-
-import java.util.List;
 
 /**
  * Internal parser for the &lt;chunk/&gt; element inside a step.
@@ -108,18 +107,18 @@ public class ChunkElementParser {
 			if (propertyValues.contains("commitInterval")) {
 				parserContext.getReaderContext().error(
 						"The <" + element.getNodeName() + "/> element must contain either '" + COMMIT_INTERVAL_ATTR
-								+ "' " + "or '" + CHUNK_COMPLETION_POLICY_ATTR + "', but not both.", element);
+						+ "' " + "or '" + CHUNK_COMPLETION_POLICY_ATTR + "', but not both.", element);
 			}
 			else {
 				parserContext.getReaderContext().error(
 						"The <" + element.getNodeName() + "/> element must contain either '" + COMMIT_INTERVAL_ATTR
-								+ "' " + "or '" + CHUNK_COMPLETION_POLICY_ATTR + "'.", element);
+						+ "' " + "or '" + CHUNK_COMPLETION_POLICY_ATTR + "'.", element);
 
 			}
 		}
 
 		String skipLimit = element.getAttribute("skip-limit");
-		ManagedMap skippableExceptions = handleExceptionElement(element, parserContext, "skippable-exception-classes");
+		ManagedMap skippableExceptions = new ExceptionElementParser().parse(element, parserContext, "skippable-exception-classes");
 		if (StringUtils.hasText(skipLimit)) {
 			if (skippableExceptions == null) {
 				skippableExceptions = new ManagedMap();
@@ -128,6 +127,12 @@ public class ChunkElementParser {
 			propertyValues.addPropertyValue("skipLimit", skipLimit);
 		}
 		if (skippableExceptions != null) {
+			List<Element> exceptionClassElements = DomUtils.getChildElementsByTagName(element, "skippable-exception-classes");
+
+			if(!CollectionUtils.isEmpty(exceptionClassElements)) {
+				skippableExceptions.setMergeEnabled(exceptionClassElements.get(0).hasAttribute(MERGE_ATTR)
+						&& Boolean.valueOf(exceptionClassElements.get(0).getAttribute(MERGE_ATTR)));
+			}
 			// Even if there is no retryLimit, we can still accept exception
 			// classes for an abstract parent bean definition
 			propertyValues.addPropertyValue("skippableExceptionClasses", skippableExceptions);
@@ -137,7 +142,7 @@ public class ChunkElementParser {
 				underspecified);
 
 		String retryLimit = element.getAttribute("retry-limit");
-		ManagedMap retryableExceptions = handleExceptionElement(element, parserContext, "retryable-exception-classes");
+		ManagedMap retryableExceptions = new ExceptionElementParser().parse(element, parserContext, "retryable-exception-classes");
 		if (StringUtils.hasText(retryLimit)) {
 			if (retryableExceptions == null) {
 				retryableExceptions = new ManagedMap();
@@ -146,6 +151,12 @@ public class ChunkElementParser {
 			propertyValues.addPropertyValue("retryLimit", retryLimit);
 		}
 		if (retryableExceptions != null) {
+			List<Element> exceptionClassElements = DomUtils.getChildElementsByTagName(element, "retryable-exception-classes");
+
+			if(!CollectionUtils.isEmpty(exceptionClassElements)) {
+				retryableExceptions.setMergeEnabled(exceptionClassElements.get(0).hasAttribute(MERGE_ATTR)
+						&& Boolean.valueOf(exceptionClassElements.get(0).getAttribute(MERGE_ATTR)));
+			}
 			// Even if there is no retryLimit, we can still accept exception
 			// classes for an abstract parent bean definition
 			propertyValues.addPropertyValue("retryableExceptionClasses", retryableExceptions);
@@ -189,7 +200,7 @@ public class ChunkElementParser {
 			if (StringUtils.hasText(refName)) {
 				parserContext.getReaderContext().error(
 						"The <" + element.getNodeName() + "/> element may not have both a '" + handlerName
-								+ "' attribute and a <" + handlerName + "/> element.", element);
+						+ "' attribute and a <" + handlerName + "/> element.", element);
 			}
 			handleItemHandlerElement(enclosing, propertyName, adapterClassName, propertyValues, children.get(0), parserContext);
 		}
@@ -204,7 +215,7 @@ public class ChunkElementParser {
 		else if (required && !underspecified) {
 			parserContext.getReaderContext().error(
 					"The <" + element.getNodeName() + "/> element has neither a '" + handlerName
-							+ "' attribute nor a <" + handlerName + "/> element.", element);
+					+ "' attribute nor a <" + handlerName + "/> element.", element);
 		}
 	}
 
@@ -220,7 +231,7 @@ public class ChunkElementParser {
 		if (beanElements.size() + refElements.size() != 1) {
 			parserContext.getReaderContext().error(
 					"The <" + element.getNodeName() + "/> must have exactly one of either a <" + BEAN_ELE
-							+ "/> element or a <" + REF_ELE + "/> element.", element);
+					+ "/> element or a <" + REF_ELE + "/> element.", element);
 		}
 		else if (beanElements.size() == 1) {
 			Element beanElement = beanElements.get(0);
@@ -313,35 +324,35 @@ public class ChunkElementParser {
 			propertyValues.addPropertyValue("streams", streamBeans);
 		}
 	}
-
-	@SuppressWarnings("unchecked")
-	private ManagedMap handleExceptionElement(Element element, ParserContext parserContext, String exceptionListName) {
-		List<Element> children = DomUtils.getChildElementsByTagName(element, exceptionListName);
-		if (children.size() == 1) {
-			ManagedMap map = new ManagedMap();
-			Element exceptionClassesElement = children.get(0);
-			map.setMergeEnabled(exceptionClassesElement.hasAttribute(MERGE_ATTR)
-					&& Boolean.valueOf(exceptionClassesElement.getAttribute(MERGE_ATTR)));
-			addExceptionClasses("include", true, exceptionClassesElement, map, parserContext);
-			addExceptionClasses("exclude", false, exceptionClassesElement, map, parserContext);
-			map.put(ForceRollbackForWriteSkipException.class, true);
-			return map;
-		}
-		else if (children.size() > 1) {
-			parserContext.getReaderContext().error(
-					"The <" + exceptionListName + "/> element may not appear more than once in a single <"
-							+ element.getNodeName() + "/>.", element);
-		}
-		return null;
-	}
-
-	@SuppressWarnings("unchecked")
-	private void addExceptionClasses(String elementName, boolean include, Element exceptionClassesElement,
-			ManagedMap map, ParserContext parserContext) {
-		for (Element child : (List<Element>) DomUtils.getChildElementsByTagName(exceptionClassesElement, elementName)) {
-			String className = child.getAttribute("class");
-			map.put(new TypedStringValue(className, Class.class), include);
-		}
-	}
-
+	//
+	//	@SuppressWarnings("unchecked")
+	//	private ManagedMap handleExceptionElement(Element element, ParserContext parserContext, String exceptionListName) {
+	//		List<Element> children = DomUtils.getChildElementsByTagName(element, exceptionListName);
+	//		if (children.size() == 1) {
+	//			ManagedMap map = new ManagedMap();
+	//			Element exceptionClassesElement = children.get(0);
+	//			map.setMergeEnabled(exceptionClassesElement.hasAttribute(MERGE_ATTR)
+	//					&& Boolean.valueOf(exceptionClassesElement.getAttribute(MERGE_ATTR)));
+	//			addExceptionClasses("include", true, exceptionClassesElement, map, parserContext);
+	//			addExceptionClasses("exclude", false, exceptionClassesElement, map, parserContext);
+	//			map.put(ForceRollbackForWriteSkipException.class, true);
+	//			return map;
+	//		}
+	//		else if (children.size() > 1) {
+	//			parserContext.getReaderContext().error(
+	//					"The <" + exceptionListName + "/> element may not appear more than once in a single <"
+	//							+ element.getNodeName() + "/>.", element);
+	//		}
+	//		return null;
+	//	}
+	//
+	//	@SuppressWarnings("unchecked")
+	//	private void addExceptionClasses(String elementName, boolean include, Element exceptionClassesElement,
+	//			ManagedMap map, ParserContext parserContext) {
+	//		for (Element child : (List<Element>) DomUtils.getChildElementsByTagName(exceptionClassesElement, elementName)) {
+	//			String className = child.getAttribute("class");
+	//			map.put(new TypedStringValue(className, Class.class), include);
+	//		}
+	//	}
+	//
 }
