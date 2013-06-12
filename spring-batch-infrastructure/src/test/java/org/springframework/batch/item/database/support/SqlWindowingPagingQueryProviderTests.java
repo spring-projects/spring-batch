@@ -17,8 +17,12 @@ package org.springframework.batch.item.database.support;
 
 import static org.junit.Assert.assertEquals;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import org.junit.Assert;
 import org.junit.Test;
+import org.springframework.batch.item.database.Order;
 
 /**
  * @author Thomas Risberg
@@ -94,6 +98,20 @@ public class SqlWindowingPagingQueryProviderTests extends AbstractSqlPagingQuery
 	public void testGenerateJumpToItemQueryForFirstPageWithGroupBy() {
 		pagingQueryProvider.setGroupClause("dep");
 		String sql = "SELECT id FROM ( SELECT id, ROW_NUMBER() OVER ( ORDER BY id ASC) AS ROW_NUMBER FROM foo WHERE bar = 1 GROUP BY dep) AS TMP_SUB WHERE TMP_SUB.ROW_NUMBER = 1 ORDER BY id ASC";
+		String s = pagingQueryProvider.generateJumpToItemQuery(45, pageSize);
+		assertEquals(sql, s);
+	}
+	
+	@Test
+	public void testGenerateJumpToItemQueryForTableQualifierReplacement() {
+		pagingQueryProvider.setFromClause("foo_e E, foo_i I");
+		pagingQueryProvider.setWhereClause("E.id=I.id");
+		
+		Map<String, Order> sortKeys = new HashMap<String, Order>();
+		sortKeys.put("E.id", Order.DESCENDING);		
+		pagingQueryProvider.setSortKeys(sortKeys);
+		
+		String sql="SELECT TMP_SUB.id FROM ( SELECT E.id, ROW_NUMBER() OVER ( ORDER BY E.id DESC) AS ROW_NUMBER FROM foo_e E, foo_i I WHERE E.id=I.id) AS TMP_SUB WHERE TMP_SUB.ROW_NUMBER = 1 ORDER BY TMP_SUB.id DESC";
 		String s = pagingQueryProvider.generateJumpToItemQuery(45, pageSize);
 		assertEquals(sql, s);
 	}
