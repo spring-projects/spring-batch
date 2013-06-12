@@ -102,7 +102,7 @@ public class SqlWindowingPagingQueryProvider extends AbstractSqlPagingQueryProvi
 
 		StringBuilder sql = new StringBuilder();
 		sql.append("SELECT ");
-		buildSortKeySelect(sql);
+		buildSortKeySelect(sql, getSortKeysReplaced(extractTableAlias()));
 		sql.append(" FROM ( ");
 		sql.append("SELECT ");
 		buildSortKeySelect(sql);
@@ -115,14 +115,30 @@ public class SqlWindowingPagingQueryProvider extends AbstractSqlPagingQueryProvi
 		sql.append(getOverSubstituteClauseEnd());
 		sql.append(") ").append(getSubQueryAlias()).append("WHERE ").append(extractTableAlias()).append(
 				"ROW_NUMBER = ").append(lastRowNum);
-		sql.append(" ORDER BY ").append(SqlPagingQueryUtils.buildSortClause(this));
+		sql.append(" ORDER BY ").append(SqlPagingQueryUtils.buildSortClause(getSortKeysReplaced(extractTableAlias())));
 
 		return sql.toString();
 	}
 
-	private void buildSortKeySelect(StringBuilder sql) {
-		String prefix = "";
+	private Map<String, Order> getSortKeysReplaced(Object qualifierReplacement) {
+		String newQualifier = "" + qualifierReplacement;
+		Map<String, Order> sortKeys = new HashMap<String, Order>();
 		for (Map.Entry<String, Order> sortKey : getSortKeys().entrySet()) {
+			sortKeys.put(sortKey.getKey().replaceFirst("^.*\\.", newQualifier), sortKey.getValue());
+		}
+		return sortKeys;
+	}
+	
+	private void buildSortKeySelect(StringBuilder sql) {
+		buildSortKeySelect(sql, null);
+	}
+	
+	private void buildSortKeySelect(StringBuilder sql, Map<String, Order> sortKeys) {
+		String prefix = "";
+		if (sortKeys == null) {
+			sortKeys = getSortKeys();
+		}
+		for (Map.Entry<String, Order> sortKey : sortKeys.entrySet()) {
 			sql.append(prefix);
 			prefix = ", ";
 			sql.append(sortKey.getKey());
