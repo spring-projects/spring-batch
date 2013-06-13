@@ -3,6 +3,7 @@ package org.springframework.batch.item.support;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.junit.Assert.assertSame;
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
 
 import java.util.ArrayList;
@@ -55,6 +56,27 @@ public class CompositeItemProcessorTests {
 				
 		assertSame(itemAfterSecondTransformation, composite.process(item));
 
+	}
+	
+	/**
+	 * Test that the CompositeItemProcessor can work with generic types for the ItemProcessor delegates.
+	 */
+	@Test
+	public void testItemProcessorGenerics() throws Exception {
+		CompositeItemProcessor<String, String> composite = new CompositeItemProcessor<String, String>();
+		final ItemProcessor<String, String> processor1 = mock(ItemProcessor.class);
+		final ItemProcessor<String, String> processor2 = mock(ItemProcessor.class);
+		composite.setDelegates(new ArrayList<ItemProcessor<String,String>>() {{ 
+			add(processor1); add(processor2); 
+		}});
+		composite.afterPropertiesSet();
+
+		when(processor1.process("input")).thenReturn("intermediate");
+		
+		when(processor2.process("intermediate")).thenReturn("output");
+				
+		assertEquals("output", composite.process("input"));
+		
 	}
 	
 	/**
