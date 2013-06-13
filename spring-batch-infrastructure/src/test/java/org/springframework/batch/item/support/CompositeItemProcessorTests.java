@@ -1,9 +1,10 @@
 package org.springframework.batch.item.support;
 
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertSame;
 import static org.junit.Assert.fail;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 import java.util.ArrayList;
 
@@ -11,7 +12,6 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.batch.item.ItemProcessor;
-import org.springframework.batch.item.support.CompositeItemProcessor;
 
 /**
  * Tests for {@link CompositeItemProcessor}.
@@ -22,23 +22,23 @@ import org.springframework.batch.item.support.CompositeItemProcessor;
 public class CompositeItemProcessorTests {
 
 	private CompositeItemProcessor<Object, Object> composite = new CompositeItemProcessor<Object, Object>();
-	
+
 	private ItemProcessor<Object, Object> processor1;
 	private ItemProcessor<Object, Object> processor2;
-	
-	@SuppressWarnings("unchecked")
+
+	@SuppressWarnings({ "unchecked", "serial" })
 	@Before
 	public void setUp() throws Exception {
 		processor1 = mock(ItemProcessor.class);
 		processor2 = mock(ItemProcessor.class);
-		
-		composite.setDelegates(new ArrayList<ItemProcessor<Object,Object>>() {{ 
-			add(processor1); add(processor2); 
+
+		composite.setDelegates(new ArrayList<ItemProcessor<Object,Object>>() {{
+			add(processor1); add(processor2);
 		}});
-		
+
 		composite.afterPropertiesSet();
 	}
-	
+
 	/**
 	 * Regular usage scenario - item is passed through the processing chain,
 	 * return value of the of the last transformation is returned by the composite.
@@ -50,20 +50,42 @@ public class CompositeItemProcessorTests {
 		Object itemAfterSecondTransformation = new Object();
 
 		when(processor1.process(item)).thenReturn(itemAfterFirstTransfromation);
-		
+
 		when(processor2.process(itemAfterFirstTransfromation)).thenReturn(itemAfterSecondTransformation);
-				
+
 		assertSame(itemAfterSecondTransformation, composite.process(item));
 
 	}
-	
+
 	/**
-	 * The list of transformers must not be null or empty and 
+	 * Test that the CompositeItemProcessor can work with generic types for the ItemProcessor delegates.
+	 */
+	@Test
+	@SuppressWarnings({"unchecked", "serial"})
+	public void testItemProcessorGenerics() throws Exception {
+		CompositeItemProcessor<String, String> composite = new CompositeItemProcessor<String, String>();
+		final ItemProcessor<String, Integer> processor1 = mock(ItemProcessor.class);
+		final ItemProcessor<Integer, String> processor2 = mock(ItemProcessor.class);
+		composite.setDelegates(new ArrayList<ItemProcessor<?,?>>() {{
+			add(processor1); add(processor2);
+		}});
+		composite.afterPropertiesSet();
+
+		when(processor1.process("input")).thenReturn(5);
+
+		when(processor2.process(5)).thenReturn("output");
+
+		assertEquals("output", composite.process("input"));
+
+	}
+
+	/**
+	 * The list of transformers must not be null or empty and
 	 * can contain only instances of {@link ItemProcessor}.
 	 */
 	@Test
 	public void testAfterPropertiesSet() throws Exception {
-		
+
 		// value not set
 		composite.setDelegates(null);
 		try {
@@ -73,7 +95,7 @@ public class CompositeItemProcessorTests {
 		catch (IllegalArgumentException e) {
 			// expected
 		}
-		
+
 		// empty list
 		composite.setDelegates(new ArrayList<ItemProcessor<Object,Object>>());
 		try {
@@ -83,12 +105,12 @@ public class CompositeItemProcessorTests {
 		catch (IllegalArgumentException e) {
 			// expected
 		}
-		
+
 	}
-	
+
 	@Test
 	public void testFilteredItemInFirstProcessor() throws Exception{
-		
+
 		Object item = new Object();
 		when(processor1.process(item)).thenReturn(null);
 		Assert.assertEquals(null,composite.process(item));
