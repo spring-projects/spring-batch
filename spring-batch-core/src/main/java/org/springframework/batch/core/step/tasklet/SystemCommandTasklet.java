@@ -117,6 +117,7 @@ public class SystemCommandTasklet extends StepExecutionListenerSupport implement
 			}
 			else if (stopped) {
 				stopped = false;//reset
+				//invoke cancel
 				systemCommandTask.cancel(interruptOnCancel);
 				contribution.setExitStatus(ExitStatus.STOPPED);
 				return RepeatStatus.FINISHED;

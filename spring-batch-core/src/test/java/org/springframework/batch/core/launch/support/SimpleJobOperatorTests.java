@@ -20,6 +20,7 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 import static org.mockito.Matchers.anyString;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -385,6 +386,42 @@ public class SimpleJobOperatorTests {
 	}
 	
 	@Test
+	public void testStopTaskletException() throws Exception {
+		JobInstance jobInstance = new JobInstance(123L, job.getName());
+		JobExecution jobExecution = new JobExecution(jobInstance, 111L, jobParameters);
+		StoppableTasklet tasklet = new StoppableTasklet() {
+
+			@Override
+			public RepeatStatus execute(StepContribution contribution,
+					ChunkContext chunkContext) throws Exception {
+				return null;
+			}
+
+			@Override
+			public void stop() {
+				throw new IllegalStateException();
+			}};
+		TaskletStep taskletStep = new TaskletStep();
+		taskletStep.setTasklet(tasklet);
+		MockJob job = new MockJob();
+		job.taskletStep = taskletStep;
+		
+		JobRegistry jobRegistry = mock(JobRegistry.class);
+		TaskletStep step = mock(TaskletStep.class);
+		
+		when(step.getTasklet()).thenReturn(tasklet);
+		when(step.getName()).thenReturn("test_job.step1");
+		when(jobRegistry.getJob(anyString())).thenReturn(job);
+		when(jobExplorer.getJobExecution(111L)).thenReturn(jobExecution);
+		
+		jobOperator.setJobRegistry(jobRegistry);
+		jobExplorer.getJobExecution(111L);
+		jobRepository.update(jobExecution);
+		jobOperator.stop(111L);
+		assertEquals(BatchStatus.STOPPING, jobExecution.getStatus());		
+	}
+	
+	@Test
 	public void testAbort() throws Exception {
 		JobInstance jobInstance = new JobInstance(123L, job.getName());
 		JobExecution jobExecution = new JobExecution(jobInstance, 111L, jobParameters);
@@ -405,6 +442,7 @@ public class SimpleJobOperatorTests {
 		jobRepository.update(jobExecution);
 		jobOperator.abandon(123L);
 	}
+	
 	
 	class MockJob extends AbstractJob {
 
