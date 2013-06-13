@@ -27,5 +27,6 @@ public class JsrNamespaceHandler extends NamespaceHandlerSupport {
 	@Override
 	public void init() {
 		this.registerBeanDefinitionParser("job", new JobParser());
+		this.registerBeanDefinitionParser("batch-artifacts", new BatchParser());
 	}
 }
