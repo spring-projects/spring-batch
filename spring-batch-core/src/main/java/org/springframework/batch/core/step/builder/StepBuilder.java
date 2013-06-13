@@ -62,8 +62,8 @@ public class StepBuilder extends StepBuilderHelper<StepBuilder> {
 	 * 
 	 * @param chunkSize the chunk size (commit interval)
 	 * @return a {@link SimpleStepBuilder}
-	 * @param I the type of item to be processed as input
-	 * @param O the type of item to be output
+	 * @param <I> the type of item to be processed as input
+	 * @param <O> the type of item to be output
 	 */
 	public <I, O> SimpleStepBuilder<I, O> chunk(int chunkSize) {
 		return new SimpleStepBuilder<I, O>(this).chunk(chunkSize);
@@ -81,8 +81,8 @@ public class StepBuilder extends StepBuilderHelper<StepBuilder> {
 	 * 
 	 * @param completionPolicy the completion policy to use to control chunk processing
 	 * @return a {@link SimpleStepBuilder}
-	 * @param I the type of item to be processed as input
-	 * @param O the type of item to be output *
+	 * @param <I> the type of item to be processed as input
+	 * @param <O> the type of item to be output *
 	 */
 	public <I, O> SimpleStepBuilder<I, O> chunk(CompletionPolicy completionPolicy) {
 		return new SimpleStepBuilder<I, O>(this).chunk(completionPolicy);
