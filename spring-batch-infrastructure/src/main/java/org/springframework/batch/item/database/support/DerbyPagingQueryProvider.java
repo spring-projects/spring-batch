@@ -35,16 +35,32 @@ import org.springframework.jdbc.support.JdbcUtils;
  * @since 2.0
  */
 public class DerbyPagingQueryProvider extends SqlWindowingPagingQueryProvider {
-
-	private String version;
+	
+	private static final String MINIMAL_DERBY_VERSION = "10.4.1.3";
 
 	@Override
 	public void init(DataSource dataSource) throws Exception {
 		super.init(dataSource);
-		version = JdbcUtils.extractDatabaseMetaData(dataSource, "getDatabaseProductVersion").toString();
-		if ("10.4.1.3".compareTo(version) > 0) {
-			throw new InvalidDataAccessResourceUsageException("Apache Derby version " + version + " is not supported by this class,  Only version 10.4.1.3 or later is supported");
+		String version = JdbcUtils.extractDatabaseMetaData(dataSource, "getDatabaseProductVersion").toString();
+		if (!isDerbyVersionSupported(version)) {
+			throw new InvalidDataAccessResourceUsageException("Apache Derby version " + version + " is not supported by this class,  Only version " + MINIMAL_DERBY_VERSION + " or later is supported");
 		}
+	}
+	
+	// derby version numbering is M.m.f.p [ {alpha|beta} ] see http://db.apache.org/derby/papers/versionupgrade.html#Basic+Numbering+Scheme
+	private boolean isDerbyVersionSupported(String version) {
+		String[] minimalVersionParts = MINIMAL_DERBY_VERSION.split("\\.");
+		String[] versionParts = version.split("[\\. ]");
+		for (int i = 0; i < minimalVersionParts.length; i++) {
+			int minimalVersionPart = Integer.valueOf(minimalVersionParts[i]);
+			int versionPart = Integer.valueOf(versionParts[i]);
+			if (versionPart < minimalVersionPart) {
+				return false;
+			} else if (versionPart > minimalVersionPart) {
+				return true;
+			}
+		}
+		return true; 
 	}
 	
 	@Override
