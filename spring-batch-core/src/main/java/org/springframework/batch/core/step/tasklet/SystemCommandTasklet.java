@@ -54,8 +54,9 @@ import org.springframework.util.Assert;
  * still running when tasklet exits (abnormally).
  *
  * @author Robert Kasanicky
+ * @author Will Schipp
  */
-public class SystemCommandTasklet extends StepExecutionListenerSupport implements Tasklet, InitializingBean {
+public class SystemCommandTasklet extends StepExecutionListenerSupport implements StoppableTasklet, InitializingBean {
 
 	protected static final Log logger = LogFactory.getLog(SystemCommandTasklet.class);
 
@@ -77,6 +78,8 @@ public class SystemCommandTasklet extends StepExecutionListenerSupport implement
 
 	private boolean interruptOnCancel = false;
 
+	private boolean stopped = false;
+	
 	/**
 	 * Execute system command and map its exit code to {@link ExitStatus} using
 	 * {@link SystemProcessExitCodeMapper}.
@@ -99,7 +102,7 @@ public class SystemCommandTasklet extends StepExecutionListenerSupport implement
 		taskExecutor.execute(systemCommandTask);
 
 		while (true) {
-			Thread.sleep(checkInterval);
+			Thread.sleep(checkInterval);//moved to the end of the logic			
 			if (systemCommandTask.isDone()) {
 				contribution.setExitStatus(systemProcessExitCodeMapper.getExitStatus(systemCommandTask.get()));
 				return RepeatStatus.FINISHED;
@@ -112,6 +115,14 @@ public class SystemCommandTasklet extends StepExecutionListenerSupport implement
 				systemCommandTask.cancel(interruptOnCancel);
 				throw new JobInterruptedException("Job interrupted while executing system command '" + command + "'");
 			}
+			else if (stopped) {
+				stopped = false;//reset
+				//invoke cancel
+				systemCommandTask.cancel(interruptOnCancel);
+				contribution.setExitStatus(ExitStatus.STOPPED);
+				return RepeatStatus.FINISHED;
+			}
+
 		}
 
 	}
@@ -206,6 +217,11 @@ public class SystemCommandTasklet extends StepExecutionListenerSupport implement
 	 */
 	public void setInterruptOnCancel(boolean interruptOnCancel) {
 		this.interruptOnCancel = interruptOnCancel;
+	}
+
+	@Override
+	public void stop() {
+		stopped = true;
 	}
 
 }

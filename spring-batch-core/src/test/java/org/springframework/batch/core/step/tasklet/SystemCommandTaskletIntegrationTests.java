@@ -220,6 +220,24 @@ public class SystemCommandTaskletIntegrationTests {
 		// no error expected now
 		tasklet.setWorkingDirectory(directory.getCanonicalPath());
 	}
+	
+	/*
+	 * test stopping a tasklet
+	 */
+	@Test
+	public void testStopped() throws Exception {
+		String command = "sleep 5";
+		tasklet.setCommand(command);
+		tasklet.setTerminationCheckInterval(10);
+		tasklet.afterPropertiesSet();
+
+		StepContribution contribution = stepExecution.createStepContribution();
+		//send stop
+		tasklet.stop();		
+		tasklet.execute(contribution, null);
+
+		assertEquals(contribution.getExitStatus().getExitCode(),ExitStatus.STOPPED.getExitCode());
+	}
 
 	/**
 	 * Exit code mapper containing mapping logic expected by the tests. 0 means
