@@ -15,7 +15,6 @@
  */
 package org.springframework.batch.core.jsr.configuration.xml;
 
-import org.springframework.batch.core.configuration.xml.StepParserStepFactoryBean;
 import org.springframework.batch.core.step.tasklet.Tasklet;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.config.RuntimeBeanReference;
@@ -40,8 +39,8 @@ public class BatchletParser extends AbstractSingleBeanDefinitionParser {
 	public void parseBatchlet(Element stepElement, Element taskletElement, AbstractBeanDefinition bd,
 			ParserContext parserContext) {
 
-		bd.setBeanClass(StepParserStepFactoryBean.class);
-		bd.setAttribute("isNamespaceStep", true);
+		bd.setBeanClass(StepFactoryBean.class);
+		bd.setAttribute("isNamespaceStep", false);
 
 		String taskletRef = taskletElement.getAttribute(REF);
 

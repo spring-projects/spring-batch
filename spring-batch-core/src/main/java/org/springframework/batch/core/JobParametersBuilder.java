@@ -19,6 +19,7 @@ package org.springframework.batch.core;
 import java.util.Date;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.Properties;
 
 import org.springframework.util.Assert;
 
@@ -56,6 +57,22 @@ public class JobParametersBuilder {
 	 */
 	public JobParametersBuilder(JobParameters jobParameters) {
 		this.parameterMap = new LinkedHashMap<String, JobParameter>(jobParameters.getParameters());
+	}
+
+	/**
+	 * Constructor to add conversion capabilities to support JSR-352.  Per the spec, it is expected that all
+	 * keys and values in the provided {@link Properties} instance are Strings
+	 *
+	 * @param properties the job parameters to be used
+	 */
+	public JobParametersBuilder(Properties properties) {
+		this.parameterMap = new LinkedHashMap<String, JobParameter>();
+
+		if(properties != null) {
+			for (Map.Entry<Object, Object> curProperty : properties.entrySet()) {
+				this.parameterMap.put((String) curProperty.getKey(), new JobParameter((String) curProperty.getValue(), false));
+			}
+		}
 	}
 
 	/**

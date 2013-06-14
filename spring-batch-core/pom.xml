@@ -24,6 +24,11 @@
 		    <version>1.0-b29</version>
 		</dependency>
 		<dependency>
+		    <groupId>com.ibm.jbatch</groupId>
+		    <artifactId>com.ibm.jbatch-tck-spi</artifactId>
+		    <version>1.0</version>
+		</dependency>
+		<dependency>
 			<groupId>org.hsqldb</groupId>
 			<artifactId>hsqldb</artifactId>
 		</dependency>
@@ -204,7 +209,7 @@
 									<fileset dir="${basedir}/src/main/sql" includes="schema*.sql.vpp" />
 									<mapper type="glob" from="*.sql.vpp" to="*-sqlf.sql" />
 								</vppcopy>
-								
+
 								<vppcopy todir="${basedir}/target/generated-resources" overwrite="true">
 									<config>
 										<context>
