@@ -30,6 +30,7 @@ import org.springframework.util.Assert;
  * @see Job
  * @see JobParameters
  * @see JobExecution
+ * @see javax.batch.runtime.JobInstance
  *
  * @author Lucas Ward
  * @author Dave Syer
@@ -38,7 +39,7 @@ import org.springframework.util.Assert;
  *
  */
 @SuppressWarnings("serial")
-public class JobInstance extends Entity {
+public class JobInstance extends Entity implements javax.batch.runtime.JobInstance{
 
 	private final String jobName;
 
@@ -51,6 +52,7 @@ public class JobInstance extends Entity {
 	/**
 	 * @return the job name. (Equivalent to getJob().getName())
 	 */
+	@Override
 	public String getJobName() {
 		return jobName;
 	}
@@ -60,4 +62,8 @@ public class JobInstance extends Entity {
 		return super.toString() + ", Job=[" + jobName + "]";
 	}
 
+	@Override
+	public long getInstanceId() {
+		return super.getId();
+	}
 }

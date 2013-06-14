@@ -3,6 +3,8 @@ package org.springframework.batch.core.jsr.configuration.xml;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
+import javax.batch.api.Batchlet;
+
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.batch.core.BatchStatus;
@@ -16,7 +18,7 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
-@ContextConfiguration({"SimpleJobParsingTests-context.xml", "jsr-base-context.xml"})
+@ContextConfiguration
 @RunWith(SpringJUnit4ClassRunner.class)
 public class SimpleJobParsingTests {
 
@@ -38,6 +40,9 @@ public class SimpleJobParsingTests {
 	@Autowired
 	public JobLauncher jobLauncher;
 
+	@Autowired
+	public Batchlet batchlet;
+
 	@Test
 	public void test() throws Exception {
 		assertNotNull(job);
@@ -48,6 +53,7 @@ public class SimpleJobParsingTests {
 		assertEquals("step2", step2.getName());
 		assertNotNull(step3);
 		assertEquals("step3", step3.getName());
+		assertNotNull(batchlet);
 
 		JobExecution execution = jobLauncher.run(job, new JobParameters());
 		assertEquals(BatchStatus.COMPLETED, execution.getStatus());
