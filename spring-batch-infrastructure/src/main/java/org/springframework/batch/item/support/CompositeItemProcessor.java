@@ -35,21 +35,31 @@ import org.springframework.util.Assert;
  */
 public class CompositeItemProcessor<I, O> implements ItemProcessor<I, O>, InitializingBean {
 
-	private List<ItemProcessor<Object, Object>> delegates;
+	private List<? extends ItemProcessor<?, ?>> delegates;
 
     @Override
 	@SuppressWarnings("unchecked")
 	public O process(I item) throws Exception {
 		Object result = item;
 
-		for (ItemProcessor<Object, Object> delegate : delegates) {
+		for (ItemProcessor<?, ?> delegate : delegates) {
 			if (result == null) {
 				return null;
 			}
-			result = delegate.process(result);
+
+			result = processItem(delegate, result);
 		}
 		return (O) result;
 	}
+    
+    /* 
+     * Helper method to work around wildcard capture compiler error: see http://docs.oracle.com/javase/tutorial/java/generics/capture.html
+     * The method process(capture#1-of ?) in the type ItemProcessor<capture#1-of ?,capture#2-of ?> is not applicable for the arguments (Object)
+     */
+    @SuppressWarnings("unchecked")
+	private <T> Object processItem(ItemProcessor<T, ?> processor, Object input) throws Exception {
+    	return processor.process((T) input);
+    }
 
     @Override
 	public void afterPropertiesSet() throws Exception {
@@ -57,8 +67,8 @@ public class CompositeItemProcessor<I, O> implements ItemProcessor<I, O>, Initia
 		Assert.notEmpty(delegates, "The 'delegates' may not be empty");
 	}
 
-	public void setDelegates(List<ItemProcessor<Object, Object>> delegates) {
+	public void setDelegates(List<? extends ItemProcessor<?, ?>> delegates) {
 		this.delegates = delegates;
-	}
+	}	
 
 }
