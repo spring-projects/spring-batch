@@ -33,7 +33,7 @@
 	</developers>
 	<properties>
 		<maven.test.failure.ignore>false</maven.test.failure.ignore>
-		<spring.batch.version>2.2.0.RC1</spring.batch.version>
+		<spring.batch.version>2.2.0.RELEASE</spring.batch.version>
 		<spring.framework.version>3.2.1.RELEASE</spring.framework.version>
 		<spring.integration.version>2.2.3.RELEASE</spring.integration.version>
 		<spring.retry.version>1.0.2.RELEASE</spring.retry.version>
