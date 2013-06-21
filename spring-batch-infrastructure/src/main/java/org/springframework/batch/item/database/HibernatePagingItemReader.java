@@ -23,7 +23,6 @@ import org.hibernate.SessionFactory;
 import org.hibernate.StatelessSession;
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.item.ItemReader;
-import org.springframework.batch.item.ItemStream;
 import org.springframework.batch.item.database.orm.HibernateQueryProvider;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.util.Assert;
@@ -58,8 +57,8 @@ import org.springframework.util.ClassUtils;
  *
  * @since 2.1
  */
-public class HibernatePagingItemReader<T> extends AbstractPagingItemReader<T> 
-                implements InitializingBean {
+public class HibernatePagingItemReader<T> extends AbstractPagingItemReader<T>
+implements InitializingBean {
 
 	private HibernateItemReaderHelper<T> helper = new HibernateItemReaderHelper<T>();
 
@@ -152,8 +151,8 @@ public class HibernatePagingItemReader<T> extends AbstractPagingItemReader<T>
 	}
 
 	@Override
-	protected void doOpen() throws Exception {
-		super.doOpen();
+	protected void doOpen(ExecutionContext context) throws Exception {
+		super.doOpen(context);
 	}
 
 	@Override

@@ -22,8 +22,8 @@ import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.StatelessSession;
 import org.springframework.batch.item.ExecutionContext;
-import org.springframework.batch.item.ItemStreamReader;
 import org.springframework.batch.item.ItemStreamException;
+import org.springframework.batch.item.ItemStreamReader;
 import org.springframework.batch.item.database.orm.HibernateQueryProvider;
 import org.springframework.batch.item.support.AbstractItemCountingItemStreamItemReader;
 import org.springframework.beans.factory.InitializingBean;
@@ -54,8 +54,8 @@ import org.springframework.util.ClassUtils;
  * @author Robert Kasanicky
  * @author Dave Syer
  */
-public class HibernateCursorItemReader<T> extends AbstractItemCountingItemStreamItemReader<T> 
-        implements InitializingBean {
+public class HibernateCursorItemReader<T> extends AbstractItemCountingItemStreamItemReader<T>
+implements InitializingBean {
 
 	private HibernateItemReaderHelper<T> helper = new HibernateItemReaderHelper<T>();
 
@@ -180,7 +180,7 @@ public class HibernateCursorItemReader<T> extends AbstractItemCountingItemStream
 	 * Open hibernate session and create a forward-only cursor for the query.
 	 */
 	@Override
-	protected void doOpen() throws Exception {
+	protected void doOpen(ExecutionContext context) throws Exception {
 		Assert.state(!initialized, "Cannot open an already opened ItemReader, call close first");
 		cursor = helper.getForwardOnlyCursor(fetchSize, parameterValues);
 		initialized = true;
@@ -193,8 +193,7 @@ public class HibernateCursorItemReader<T> extends AbstractItemCountingItemStream
 	 * @throws ItemStreamException if there is a problem
 	 */
 	@Override
-	public void update(ExecutionContext executionContext) throws ItemStreamException {
-		super.update(executionContext);
+	public void doUpdate(ExecutionContext executionContext) throws ItemStreamException {
 		helper.clear();
 	}
 

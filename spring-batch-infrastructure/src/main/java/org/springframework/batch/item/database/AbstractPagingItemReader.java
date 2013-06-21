@@ -19,6 +19,7 @@ import java.util.List;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.item.support.AbstractItemCountingItemStreamItemReader;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.util.Assert;
@@ -39,8 +40,8 @@ import org.springframework.util.ClassUtils;
  * @author Dave Syer
  * @since 2.0
  */
-public abstract class AbstractPagingItemReader<T> extends AbstractItemCountingItemStreamItemReader<T> 
-        implements InitializingBean {
+public abstract class AbstractPagingItemReader<T> extends AbstractItemCountingItemStreamItemReader<T>
+implements InitializingBean {
 
 	protected Log logger = LogFactory.getLog(getClass());
 
@@ -128,12 +129,15 @@ public abstract class AbstractPagingItemReader<T> extends AbstractItemCountingIt
 	abstract protected void doReadPage();
 
 	@Override
-	protected void doOpen() throws Exception {
+	protected void doOpen(ExecutionContext context) throws Exception {
 
 		Assert.state(!initialized, "Cannot open an already opened ItemReader, call close first");
 		initialized = true;
 
 	}
+
+	@Override
+	protected void doUpdate(ExecutionContext context){}
 
 	@Override
 	protected void doClose() throws Exception {

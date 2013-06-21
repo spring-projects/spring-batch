@@ -228,8 +228,7 @@ public class JdbcPagingItemReader<T> extends AbstractPagingItemReader<T> impleme
 	}
 
 	@Override
-	public void update(ExecutionContext executionContext) throws ItemStreamException {
-		super.update(executionContext);
+	public void doUpdate(ExecutionContext executionContext) throws ItemStreamException {
 		if (isSaveState() && startAfterValues != null) {
 			executionContext.put(getExecutionContextKey(START_AFTER_VALUE), startAfterValues);
 		}
@@ -237,7 +236,8 @@ public class JdbcPagingItemReader<T> extends AbstractPagingItemReader<T> impleme
 
 	@Override
 	@SuppressWarnings("unchecked")
-	public void open(ExecutionContext executionContext) {
+	public void doOpen(ExecutionContext executionContext) throws Exception {
+		super.doOpen(executionContext);
 		if (isSaveState()) {
 			startAfterValues = (Map<String, Object>) executionContext.get(getExecutionContextKey(START_AFTER_VALUE));
 
@@ -245,8 +245,6 @@ public class JdbcPagingItemReader<T> extends AbstractPagingItemReader<T> impleme
 				startAfterValues = new LinkedHashMap<String, Object>();
 			}
 		}
-
-		super.open(executionContext);
 	}
 
 	@Override

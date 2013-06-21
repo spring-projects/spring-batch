@@ -22,6 +22,7 @@ import java.nio.charset.Charset;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.ReaderNotOpenException;
 import org.springframework.batch.item.file.separator.RecordSeparatorPolicy;
@@ -42,7 +43,7 @@ import org.springframework.util.StringUtils;
  * @author Robert Kasanicky
  */
 public class FlatFileItemReader<T> extends AbstractItemCountingItemStreamItemReader<T> implements
-		ResourceAwareItemReaderItemStream<T>, InitializingBean {
+ResourceAwareItemReaderItemStream<T>, InitializingBean {
 
 	private static final Log logger = LogFactory.getLog(FlatFileItemReader.class);
 
@@ -145,7 +146,7 @@ public class FlatFileItemReader<T> extends AbstractItemCountingItemStreamItemRea
 	/**
 	 * Public setter for the input resource.
 	 */
-    @Override
+	@Override
 	public void setResource(Resource resource) {
 		this.resource = resource;
 	}
@@ -241,7 +242,7 @@ public class FlatFileItemReader<T> extends AbstractItemCountingItemStreamItemRea
 	}
 
 	@Override
-	protected void doOpen() throws Exception {
+	protected void doOpen(ExecutionContext context) throws Exception {
 		Assert.notNull(resource, "Input resource must be set");
 		Assert.notNull(recordSeparatorPolicy, "RecordSeparatorPolicy must be set");
 
@@ -273,7 +274,7 @@ public class FlatFileItemReader<T> extends AbstractItemCountingItemStreamItemRea
 		noInput = false;
 	}
 
-    @Override
+	@Override
 	public void afterPropertiesSet() throws Exception {
 		Assert.notNull(lineMapper, "LineMapper is required");
 	}
@@ -313,4 +314,7 @@ public class FlatFileItemReader<T> extends AbstractItemCountingItemStreamItemRea
 
 	}
 
+	@Override
+	protected void doUpdate(ExecutionContext context) throws Exception {
+	}
 }

@@ -605,8 +605,8 @@ public class StaxEventItemReaderTests {
 		private boolean openCalled = false;
 
 		@Override
-		public void open(ExecutionContext executionContext) {
-			super.open(executionContext);
+		public void doOpen(ExecutionContext executionContext) throws Exception {
+			super.doOpen(executionContext);
 			openCalled = true;
 		}
 

@@ -28,9 +28,9 @@ import org.springframework.batch.item.ExecutionContext;
  *
  */
 public class SingleItemPeekableItemReaderTests {
-	
+
 	private SingleItemPeekableItemReader<String> reader = new SingleItemPeekableItemReader<String>();
-	
+
 	/**
 	 * Test method for {@link org.springframework.batch.item.support.SingleItemPeekableItemReader#read()}.
 	 */
@@ -66,7 +66,7 @@ public class SingleItemPeekableItemReaderTests {
 		reader.update(executionContext);
 		reader.close();
 		reader.open(executionContext);
-		assertEquals("b", reader.read());		
+		assertEquals("b", reader.read());
 	}
 
 	/**
@@ -81,7 +81,7 @@ public class SingleItemPeekableItemReaderTests {
 		reader.update(executionContext);
 		reader.close();
 		reader.open(executionContext);
-		assertEquals("b", reader.read());		
+		assertEquals("b", reader.read());
 	}
 
 	@Test
@@ -93,20 +93,20 @@ public class SingleItemPeekableItemReaderTests {
 		reader.update(executionContext);
 		reader.close();
 		reader.open(executionContext);
-		assertEquals("b", reader.read());		
+		assertEquals("b", reader.read());
 		assertEquals("c", reader.peek());
 		reader.update(executionContext);
 		reader.close();
 		reader.open(executionContext);
-		assertEquals("c", reader.read());		
+		assertEquals("c", reader.read());
 	}
 
 	public static class CountingListItemReader<T> extends AbstractItemCountingItemStreamItemReader<T> {
-		
+
 		private final List<T> list;
-		
+
 		private int counter = 0;
-		
+
 		public CountingListItemReader(List<T> list) {
 			this.list = list;
 			setName("foo");
@@ -118,7 +118,7 @@ public class SingleItemPeekableItemReaderTests {
 		}
 
 		@Override
-		protected void doOpen() throws Exception {
+		protected void doOpen(ExecutionContext context) throws Exception {
 			counter = 0;
 		}
 
@@ -129,7 +129,9 @@ public class SingleItemPeekableItemReaderTests {
 			}
 			return list.get(counter++);
 		}
-		
-	}
 
+		@Override
+		protected void doUpdate(ExecutionContext context) throws Exception {
+		}
+	}
 }

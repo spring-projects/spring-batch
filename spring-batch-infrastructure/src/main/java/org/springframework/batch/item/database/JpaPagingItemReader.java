@@ -96,7 +96,7 @@ public class JpaPagingItemReader<T> extends AbstractPagingItemReader<T> {
 	private JpaQueryProvider queryProvider;
 
 	private Map<String, Object> parameterValues;
-	
+
 	private boolean transacted = true;//default value
 
 	public JpaPagingItemReader() {
@@ -129,18 +129,18 @@ public class JpaPagingItemReader<T> extends AbstractPagingItemReader<T> {
 	public void setParameterValues(Map<String, Object> parameterValues) {
 		this.parameterValues = parameterValues;
 	}
-	
+
 	/**
-	 * By default (true) the EntityTransaction will be started and committed around the read.  
-	 * Can be overridden (false) in cases where the JPA implementation doesn't support a 
-	 * particular transaction.  (e.g. Hibernate with a JTA transaction).  NOTE: may cause 
+	 * By default (true) the EntityTransaction will be started and committed around the read.
+	 * Can be overridden (false) in cases where the JPA implementation doesn't support a
+	 * particular transaction.  (e.g. Hibernate with a JTA transaction).  NOTE: may cause
 	 * problems in guaranteeing the object consistency in the EntityManagerFactory.
 	 * 
 	 * @param transacted
 	 */
 	public void setTransacted(boolean transacted) {
 		this.transacted = transacted;
-	}	
+	}
 
 	@Override
 	public void afterPropertiesSet() throws Exception {
@@ -171,8 +171,8 @@ public class JpaPagingItemReader<T> extends AbstractPagingItemReader<T> {
 	}
 
 	@Override
-	protected void doOpen() throws Exception {
-		super.doOpen();
+	protected void doOpen(ExecutionContext context) throws Exception {
+		super.doOpen(context);
 
 		entityManager = entityManagerFactory.createEntityManager(jpaPropertyMap);
 		if (entityManager == null) {
@@ -191,11 +191,11 @@ public class JpaPagingItemReader<T> extends AbstractPagingItemReader<T> {
 	protected void doReadPage() {
 
 		EntityTransaction tx = null;
-		
+
 		if (transacted) {
 			tx = entityManager.getTransaction();
 			tx.begin();
-			
+
 			entityManager.flush();
 			entityManager.clear();
 		}//end if
@@ -214,7 +214,7 @@ public class JpaPagingItemReader<T> extends AbstractPagingItemReader<T> {
 		else {
 			results.clear();
 		}
-		
+
 		if (!transacted) {
 			List<T> queryResult = query.getResultList();
 			for (T entity : queryResult) {

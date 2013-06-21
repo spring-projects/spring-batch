@@ -29,6 +29,7 @@ import javax.xml.stream.events.XMLEvent;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.item.NonTransientResourceException;
 import org.springframework.batch.item.file.ResourceAwareItemReaderItemStream;
 import org.springframework.batch.item.support.AbstractItemCountingItemStreamItemReader;
@@ -178,7 +179,7 @@ ResourceAwareItemReaderItemStream<T>, InitializingBean {
 	}
 
 	@Override
-	protected void doOpen() throws Exception {
+	protected void doOpen(ExecutionContext context) throws Exception {
 		Assert.notNull(resource, "The Resource must not be null.");
 
 		noInput = true;
@@ -291,5 +292,9 @@ ResourceAwareItemReaderItemStream<T>, InitializingBean {
 				return;
 			}
 		}
+	}
+
+	@Override
+	protected void doUpdate(ExecutionContext context) throws Exception {
 	}
 }

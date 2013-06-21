@@ -34,7 +34,7 @@ import org.springframework.batch.item.ExecutionContext;
 public class ItemCountingItemStreamItemReaderTests {
 
 	private ItemCountingItemStreamItemReader reader = new ItemCountingItemStreamItemReader();
-	
+
 	@Before
 	public void setUp() {
 		reader.setName("foo");
@@ -89,6 +89,7 @@ public class ItemCountingItemStreamItemReaderTests {
 		reader.update(context);
 		assertEquals(1, context.size());
 		assertEquals(1, context.getInt("foo.read.count"));
+		assertEquals(1, reader.updateCalled);
 	}
 
 	@Test
@@ -98,6 +99,7 @@ public class ItemCountingItemStreamItemReaderTests {
 		ExecutionContext context = new ExecutionContext();
 		reader.update(context);
 		assertEquals(1, context.getInt("bar.read.count"));
+		assertEquals(1, reader.updateCalled);
 	}
 
 	@Test
@@ -106,6 +108,7 @@ public class ItemCountingItemStreamItemReaderTests {
 		ExecutionContext context = new ExecutionContext();
 		reader.update(context);
 		assertEquals(1, context.size());
+		assertEquals(1, reader.updateCalled);
 	}
 
 	@Test
@@ -124,6 +127,7 @@ public class ItemCountingItemStreamItemReaderTests {
 		reader.open(context);
 		reader.update(context);
 		assertEquals(2, context.size());
+		assertEquals(1, reader.updateCalled);
 	}
 
 	private static class ItemCountingItemStreamItemReader extends AbstractItemCountingItemStreamItemReader<String> {
@@ -131,6 +135,8 @@ public class ItemCountingItemStreamItemReaderTests {
 		private boolean closeCalled = false;
 
 		private boolean openCalled = false;
+
+		private int updateCalled = 0;
 
 		private Iterator<String> items = Arrays.asList("a", "b", "c").iterator();
 
@@ -140,7 +146,7 @@ public class ItemCountingItemStreamItemReaderTests {
 		}
 
 		@Override
-		protected void doOpen() throws Exception {
+		protected void doOpen(ExecutionContext context) throws Exception {
 			openCalled = true;
 		}
 
@@ -152,6 +158,10 @@ public class ItemCountingItemStreamItemReaderTests {
 			return items.next();
 		}
 
+		@Override
+		protected void doUpdate(ExecutionContext context) throws Exception {
+			updateCalled++;
+		}
 	}
 
 }
