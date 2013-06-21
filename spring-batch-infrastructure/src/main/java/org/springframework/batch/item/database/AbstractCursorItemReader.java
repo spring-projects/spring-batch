@@ -394,7 +394,7 @@ implements InitializingBean {
 	 * Execute the statement to open the cursor.
 	 */
 	@Override
-	protected final void doOpen() throws Exception {
+	protected final void doOpen(ExecutionContext context) throws Exception {
 
 		Assert.state(!initialized, "Stream is already initialized.  Close before re-opening.");
 		Assert.isNull(rs, "ResultSet still open!  Close before re-opening.");
@@ -404,6 +404,9 @@ implements InitializingBean {
 		initialized = true;
 
 	}
+
+	@Override
+	protected void doUpdate(ExecutionContext context){}
 
 	protected void initializeConnection() {
 		Assert.state(getDataSource() != null, "DataSource must not be null.");

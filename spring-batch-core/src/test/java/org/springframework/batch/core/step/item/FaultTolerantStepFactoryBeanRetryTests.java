@@ -337,7 +337,7 @@ public class FaultTolerantStepFactoryBeanRetryTests {
 			}
 
 			@Override
-			protected void doOpen() throws Exception {
+			protected void doOpen(ExecutionContext context) throws Exception {
 				reader = new ListItemReader<String>(Arrays.asList("a", "b",
 						"c", "d", "e", "f"));
 			}
@@ -345,6 +345,10 @@ public class FaultTolerantStepFactoryBeanRetryTests {
 			@Override
 			protected String doRead() throws Exception {
 				return reader.read();
+			}
+
+			@Override
+			protected void doUpdate(ExecutionContext context) throws Exception {
 			}
 
 		};

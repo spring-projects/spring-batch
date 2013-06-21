@@ -56,12 +56,17 @@ public abstract class AbstractItemCountingItemStreamItemReader<T> extends Abstra
 	/**
 	 * Open resources necessary to start reading input.
 	 */
-	protected abstract void doOpen() throws Exception;
+	protected abstract void doOpen(ExecutionContext context) throws Exception;
 
 	/**
 	 * Close the resources opened in {@link #doOpen()}.
 	 */
 	protected abstract void doClose() throws Exception;
+
+	/**
+	 * Update the {@link ExecutionContext} with the current state.
+	 */
+	protected abstract void doUpdate(ExecutionContext context) throws Exception;
 
 	/**
 	 * Move to the given item index. Subclasses should override this method if
@@ -121,7 +126,7 @@ public abstract class AbstractItemCountingItemStreamItemReader<T> extends Abstra
 	}
 
 	@Override
-	public void close() throws ItemStreamException {
+	public final void close() throws ItemStreamException {
 		super.close();
 		currentItemCount = 0;
 		try {
@@ -133,10 +138,10 @@ public abstract class AbstractItemCountingItemStreamItemReader<T> extends Abstra
 	}
 
 	@Override
-	public void open(ExecutionContext executionContext) throws ItemStreamException {
+	public final void open(ExecutionContext executionContext) throws ItemStreamException {
 		super.open(executionContext);
 		try {
-			doOpen();
+			doOpen(executionContext);
 		}
 		catch (Exception e) {
 			throw new ItemStreamException("Failed to initialize the reader", e);
@@ -167,8 +172,15 @@ public abstract class AbstractItemCountingItemStreamItemReader<T> extends Abstra
 	}
 
 	@Override
-	public void update(ExecutionContext executionContext) throws ItemStreamException {
+	public final void update(ExecutionContext executionContext) throws ItemStreamException {
 		super.update(executionContext);
+		try {
+			doUpdate(executionContext);
+		}
+		catch (Exception e) {
+			throw new ItemStreamException("Failed to update executionContext", e);
+		}
+
 		if (saveState) {
 			Assert.notNull(executionContext, "ExecutionContext must not be null");
 			executionContext.putInt(getExecutionContextKey(READ_COUNT), currentItemCount);

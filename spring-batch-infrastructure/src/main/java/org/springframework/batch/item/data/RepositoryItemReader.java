@@ -210,7 +210,7 @@ public class RepositoryItemReader<T> extends AbstractItemCountingItemStreamItemR
 	}
 
 	@Override
-	protected void doOpen() throws Exception {
+	protected void doOpen(ExecutionContext context) throws Exception {
 	}
 
 	@Override
@@ -259,5 +259,9 @@ public class RepositoryItemReader<T> extends AbstractItemCountingItemStreamItemR
 		invoker.setTargetObject(targetObject);
 		invoker.setTargetMethod(targetMethod);
 		return invoker;
+	}
+
+	@Override
+	protected void doUpdate(ExecutionContext context) throws Exception {
 	}
 }

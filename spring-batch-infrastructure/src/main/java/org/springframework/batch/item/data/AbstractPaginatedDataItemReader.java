@@ -2,6 +2,7 @@ package org.springframework.batch.item.data;
 
 import java.util.Iterator;
 
+import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.ItemStreamReader;
 import org.springframework.batch.item.support.AbstractItemCountingItemStreamItemReader;
@@ -75,8 +76,11 @@ AbstractItemCountingItemStreamItemReader<T> {
 	protected abstract Iterator<T> doPageRead();
 
 	@Override
-	protected void doOpen() throws Exception {
+	protected void doOpen(ExecutionContext context) throws Exception {
 	}
+
+	@Override
+	protected void doUpdate(ExecutionContext context) {}
 
 	@Override
 	protected void doClose() throws Exception {
