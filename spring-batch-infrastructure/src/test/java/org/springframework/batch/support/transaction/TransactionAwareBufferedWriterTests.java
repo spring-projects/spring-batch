@@ -19,6 +19,9 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
 import static org.mockito.Matchers.anyObject;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.io.IOException;
@@ -26,14 +29,14 @@ import java.nio.ByteBuffer;
 import java.nio.channels.FileChannel;
 
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
+import org.mockito.invocation.InvocationOnMock;
+import org.mockito.stubbing.Answer;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.TransactionStatus;
 import org.springframework.transaction.support.TransactionCallback;
 import org.springframework.transaction.support.TransactionTemplate;
-//import org.easymock.Capture;
 
 /**
  * @author Dave Syer
@@ -46,13 +49,13 @@ public class TransactionAwareBufferedWriterTests {
 	private FileChannel fileChannel;
 
 	private TransactionAwareBufferedWriter writer;
-	
+
 	@Before
 	public void init() {
 		fileChannel = mock(FileChannel.class);
-		
+
 		writer = new TransactionAwareBufferedWriter(fileChannel, new Runnable() {
-            @Override
+			@Override
 			public void run() {
 				try {
 					ByteBuffer bb = ByteBuffer.wrap("c".getBytes());
@@ -63,7 +66,7 @@ public class TransactionAwareBufferedWriterTests {
 				}
 			}
 		});
-		
+
 		writer.setEncoding("UTF-8");
 	}
 
@@ -77,45 +80,63 @@ public class TransactionAwareBufferedWriterTests {
 	 */
 	@Test
 	public void testWriteOutsideTransaction() throws Exception {
-//		Capture<ByteBuffer> bb = new Capture<ByteBuffer>();
 		ArgumentCaptor<ByteBuffer> bb = ArgumentCaptor.forClass(ByteBuffer.class);
-//		when(fileChannel.write(capture(bb))).thenReturn(3);
 		when(fileChannel.write(bb.capture())).thenReturn(3);
-		fileChannel.force(false);
 
 		writer.write("foo");
 		writer.flush();
 		// Not closed yet
-		
+
 		String s = getStringFromByteBuffer(bb.getValue());
-		
+
 		assertEquals("foo", s);
+
+		verify(fileChannel, never()).force(false);
 	}
 
 	@Test
-	public void testBufferSizeOutsideTransaction() throws Exception {
-//		Capture<ByteBuffer> bb = new Capture<ByteBuffer>();
+	public void testWriteOutsideTransactionForceSync() throws Exception {
+		writer.setForceSync(true);
 		ArgumentCaptor<ByteBuffer> bb = ArgumentCaptor.forClass(ByteBuffer.class);
 		when(fileChannel.write(bb.capture())).thenReturn(3);
 
 		writer.write("foo");
-		
+		writer.flush();
+		// Not closed yet
+
+		String s = getStringFromByteBuffer(bb.getValue());
+
+		assertEquals("foo", s);
+
+		verify(fileChannel, times(1)).force(false);
+	}
+
+	@Test
+	public void testBufferSizeOutsideTransaction() throws Exception {
+		ArgumentCaptor<ByteBuffer> bb = ArgumentCaptor.forClass(ByteBuffer.class);
+		when(fileChannel.write(bb.capture())).thenReturn(3);
+
+		writer.write("foo");
+
 		assertEquals(0, writer.getBufferSize());
 	}
-	
-	@Ignore //TODO - need to fix capture test
+
 	@Test
 	public void testCloseOutsideTransaction() throws Exception {
-		ArgumentCaptor<ByteBuffer> writeBuffer = ArgumentCaptor.forClass(ByteBuffer.class);
-		ArgumentCaptor<ByteBuffer> commitBuffer = ArgumentCaptor.forClass(ByteBuffer.class);
-		when(fileChannel.write(writeBuffer.capture())).thenReturn(4);
-		when(fileChannel.write(commitBuffer.capture())).thenReturn(1);
+		ArgumentCaptor<ByteBuffer> byteBufferCaptor = ArgumentCaptor.forClass(ByteBuffer.class);
+
+		when(fileChannel.write(byteBufferCaptor.capture())).thenAnswer(new Answer<Integer>() {
+			@Override
+			public Integer answer(InvocationOnMock invocation) throws Throwable {
+				return ((ByteBuffer) invocation.getArguments()[0]).remaining();
+			}
+		});
 
 		writer.write("foo");
 		writer.close();
-		
-		assertEquals("foo", getStringFromByteBuffer(writeBuffer.getValue()));
-		assertEquals("c", getStringFromByteBuffer(commitBuffer.getValue()));
+
+		assertEquals("foo", getStringFromByteBuffer(byteBufferCaptor.getAllValues().get(0)));
+		assertEquals("c", getStringFromByteBuffer(byteBufferCaptor.getAllValues().get(1)));
 	}
 
 	@Test
@@ -124,7 +145,7 @@ public class TransactionAwareBufferedWriterTests {
 		when(fileChannel.write((ByteBuffer)anyObject())).thenReturn(3);
 
 		new TransactionTemplate(transactionManager).execute(new TransactionCallback() {
-            @Override
+			@Override
 			public Object doInTransaction(TransactionStatus status) {
 				try {
 					writer.write("foo");
@@ -137,7 +158,32 @@ public class TransactionAwareBufferedWriterTests {
 				return null;
 			}
 		});
-		
+
+		verify(fileChannel, never()).force(false);
+	}
+
+	@Test
+	@SuppressWarnings({"unchecked", "rawtypes"})
+	public void testFlushInTransactionForceSync() throws Exception {
+		writer.setForceSync(true);
+		when(fileChannel.write((ByteBuffer)anyObject())).thenReturn(3);
+
+		new TransactionTemplate(transactionManager).execute(new TransactionCallback() {
+			@Override
+			public Object doInTransaction(TransactionStatus status) {
+				try {
+					writer.write("foo");
+					writer.flush();
+				}
+				catch (IOException e) {
+					throw new IllegalStateException("Unexpected IOException", e);
+				}
+				assertEquals(3, writer.getBufferSize());
+				return null;
+			}
+		});
+
+		verify(fileChannel, times(1)).force(false);
 	}
 
 	@Test
@@ -145,9 +191,9 @@ public class TransactionAwareBufferedWriterTests {
 	public void testWriteWithCommit() throws Exception {
 		ArgumentCaptor<ByteBuffer> bb = ArgumentCaptor.forClass(ByteBuffer.class);
 		when(fileChannel.write(bb.capture())).thenReturn(3);
-		
+
 		new TransactionTemplate(transactionManager).execute(new TransactionCallback() {
-            @Override
+			@Override
 			public Object doInTransaction(TransactionStatus status) {
 				try {
 					writer.write("foo");
@@ -159,7 +205,7 @@ public class TransactionAwareBufferedWriterTests {
 				return null;
 			}
 		});
-		
+
 		assertEquals(0, writer.getBufferSize());
 	}
 
@@ -170,7 +216,7 @@ public class TransactionAwareBufferedWriterTests {
 		when(fileChannel.write(bb.capture())).thenReturn(3);
 
 		new TransactionTemplate(transactionManager).execute(new TransactionCallback() {
-            @Override
+			@Override
 			public Object doInTransaction(TransactionStatus status) {
 				try {
 					writer.write("foo");
@@ -182,10 +228,10 @@ public class TransactionAwareBufferedWriterTests {
 				return null;
 			}
 		});
-		
+
 		assertEquals(0, writer.getBufferSize());
 	}
-	
+
 	@Test
 	@SuppressWarnings({"unchecked", "rawtypes"})
 	// BATCH-1959
@@ -194,7 +240,7 @@ public class TransactionAwareBufferedWriterTests {
 		when(fileChannel.write(bb.capture())).thenReturn(5);
 
 		new TransactionTemplate(transactionManager).execute(new TransactionCallback() {
-            @Override
+			@Override
 			public Object doInTransaction(TransactionStatus status) {
 				try {
 					writer.write("fóó");
@@ -206,21 +252,21 @@ public class TransactionAwareBufferedWriterTests {
 				return null;
 			}
 		});
-		
+
 		assertEquals(0, writer.getBufferSize());
-	}	
+	}
 
 	@Test
 	@SuppressWarnings({"unchecked", "rawtypes"})
 	// BATCH-1959
 	public void testBufferSizeInTransactionWithMultiByteCharacterUTF16BE() throws Exception {
 		writer.setEncoding("UTF-16BE");
-		
+
 		ArgumentCaptor<ByteBuffer> bb = ArgumentCaptor.forClass(ByteBuffer.class);
 		when(fileChannel.write(bb.capture())).thenReturn(6);
 
 		new TransactionTemplate(transactionManager).execute(new TransactionCallback() {
-            @Override
+			@Override
 			public Object doInTransaction(TransactionStatus status) {
 				try {
 					writer.write("fóó");
@@ -232,16 +278,16 @@ public class TransactionAwareBufferedWriterTests {
 				return null;
 			}
 		});
-		
+
 		assertEquals(0, writer.getBufferSize());
-	}	
+	}
 
 	@Test
 	@SuppressWarnings({"unchecked", "rawtypes"})
 	public void testWriteWithRollback() throws Exception {
 		try {
 			new TransactionTemplate(transactionManager).execute(new TransactionCallback() {
-                @Override
+				@Override
 				public Object doInTransaction(TransactionStatus status) {
 					try {
 						writer.write("foo");
@@ -267,19 +313,19 @@ public class TransactionAwareBufferedWriterTests {
 		testWriteWithRollback();
 		testWriteWithCommit();
 	}
-	
+
 	@Test
 	@SuppressWarnings({"unchecked", "rawtypes"})
 	public void testExceptionOnFlush() throws Exception {
 		writer = new TransactionAwareBufferedWriter(fileChannel, new Runnable() {
-            @Override
+			@Override
 			public void run() {
 			}
 		});
 
 		try {
 			new TransactionTemplate(transactionManager).execute(new TransactionCallback() {
-                @Override
+				@Override
 				public Object doInTransaction(TransactionStatus status) {
 					try {
 						writer.write("foo");
@@ -290,7 +336,7 @@ public class TransactionAwareBufferedWriterTests {
 					return null;
 				}
 			});
-			
+
 			fail("Exception was not thrown");
 		} catch (FlushFailedException ffe) {
 			assertEquals("Could not write to output buffer", ffe.getMessage());
