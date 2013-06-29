@@ -614,6 +614,7 @@ InitializingBean {
 					});
 
 					writer.setEncoding(encoding);
+					writer.setForceSync(forceSync);
 					return writer;
 				}
 				else {
@@ -627,7 +628,7 @@ InitializingBean {
 						}
 					};
 
-					return new BufferedWriter(writer);
+					return writer;
 				}
 			}
 			catch (UnsupportedCharsetException ucse) {
