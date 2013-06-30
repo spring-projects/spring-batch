@@ -658,7 +658,7 @@ ResourceAwareItemWriterItemStream<T>, InitializingBean {
 		finally {
 
 			try {
-				eventWriter.close();
+				delegateEventWriter.close();
 			}
 			catch (XMLStreamException e) {
 				log.error("Unable to close file resource: [" + resource + "] " + e);
