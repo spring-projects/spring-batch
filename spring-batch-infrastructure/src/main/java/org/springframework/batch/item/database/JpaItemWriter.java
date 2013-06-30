@@ -76,7 +76,7 @@ public class JpaItemWriter<T> implements ItemWriter<T>, InitializingBean {
 	 * @see org.springframework.batch.item.ItemWriter#write(java.util.List)
 	 */
 	@Override
-	public final void write(List<? extends T> items) {
+	public void write(List<? extends T> items) {
 		EntityManager entityManager = EntityManagerFactoryUtils.getTransactionalEntityManager(entityManagerFactory);
 		if (entityManager == null) {
 			throw new DataAccessResourceFailureException("Unable to obtain a transactional EntityManager");
