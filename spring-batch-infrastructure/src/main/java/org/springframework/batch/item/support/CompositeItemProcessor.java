@@ -28,7 +28,7 @@ import org.springframework.util.Assert;
  * transformation is the entry value of the next).<br/>
  * <br/>
  * 
- * Note the user is responsible for injecting a chain of {@link ItemProcessor} s
+ * Note the user is responsible for injecting a chain of {@link ItemProcessor}s
  * that conforms to declared input and output types.
  * 
  * @author Robert Kasanicky
