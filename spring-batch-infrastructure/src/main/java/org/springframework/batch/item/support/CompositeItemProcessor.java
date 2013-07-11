@@ -28,7 +28,7 @@ import org.springframework.util.Assert;
  * transformation is the entry value of the next).<br/>
  * <br/>
  * 
- * Note the user is responsible for injecting a chain of {@link ItemProcessor} s
+ * Note the user is responsible for injecting a chain of {@link ItemProcessor}s
  * that conforms to declared input and output types.
  * 
  * @author Robert Kasanicky
@@ -37,7 +37,7 @@ public class CompositeItemProcessor<I, O> implements ItemProcessor<I, O>, Initia
 
 	private List<ItemProcessor<Object, Object>> delegates;
 
-    @Override
+	@Override
 	@SuppressWarnings("unchecked")
 	public O process(I item) throws Exception {
 		Object result = item;
@@ -51,7 +51,7 @@ public class CompositeItemProcessor<I, O> implements ItemProcessor<I, O>, Initia
 		return (O) result;
 	}
 
-    @Override
+	@Override
 	public void afterPropertiesSet() throws Exception {
 		Assert.notNull(delegates, "The 'delegates' may not be null");
 		Assert.notEmpty(delegates, "The 'delegates' may not be empty");
