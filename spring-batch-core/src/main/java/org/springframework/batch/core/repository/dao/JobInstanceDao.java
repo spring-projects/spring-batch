@@ -27,6 +27,7 @@ import org.springframework.batch.core.JobParameters;
  * 
  * @author Lucas Ward
  * @author Robert Kasanicky
+ * @author Will Schipp
  * 
  */
 public interface JobInstanceDao {
@@ -49,6 +50,9 @@ public interface JobInstanceDao {
 	/**
 	 * Find the job instance that matches the given name and parameters. If no
 	 * matching job instances are found, then returns null.
+	 * 
+	 * If using the JdbcJobInstance, you can provide the jobName with a wildcard
+	 * (e.g. *Job) to return 'like' job names.  (e.g. *Job will return 'someJob' and 'otherJob')
 	 * 
 	 * @param jobName the name of the job
 	 * @param jobParameters the parameters with which the job was executed
@@ -84,6 +88,18 @@ public interface JobInstanceDao {
 	 * @return the job instances with this name or empty if none
 	 */
 	List<JobInstance> getJobInstances(String jobName, int start, int count);
+	
+	/**
+	 * Fetch the last job instances with the provided name, sorted backwards by
+	 * primary key. using a 'like' criteria
+	 * 
+	 *  
+	 * @param jobName
+	 * @param start
+	 * @param count
+	 * @return
+	 */
+	List<JobInstance> findJobInstancesByName(String jobName,int start, int count);
 
 	/**
 	 * Retrieve the names of all job instances sorted alphabetically - i.e. jobs

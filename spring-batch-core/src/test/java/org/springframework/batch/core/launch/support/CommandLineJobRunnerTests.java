@@ -485,6 +485,13 @@ public class CommandLineJobRunnerTests {
 			throw new UnsupportedOperationException();
 		}
 
+		@Override
+		public List<JobInstance> getJobInstancesByJobName(String jobName,
+				int start, int count) {
+			//return the job instances
+			return this.getJobInstances(jobName, start, count);
+		}
+
 	}
 
 	public static class StubJobParametersConverter implements JobParametersConverter {

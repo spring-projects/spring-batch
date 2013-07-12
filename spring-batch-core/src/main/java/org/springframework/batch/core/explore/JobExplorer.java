@@ -29,7 +29,7 @@ import org.springframework.batch.item.ExecutionContext;
  * volatile fields that would have been present when the execution was active.
  * 
  * @author Dave Syer
- * 
+ * @author Will Schipp
  * @since 2.0
  */
 public interface JobExplorer {
@@ -44,6 +44,17 @@ public interface JobExplorer {
 	 * @return the {@link JobInstance} values up to a maximum of count values
 	 */
 	List<JobInstance> getJobInstances(String jobName, int start, int count);
+	
+	/**
+	 * Fetch {@link JobInstance} values in descending order of creation (and
+	 * therefore usually of first execution) with a 'like'/wildcard criteria.
+	 *  
+	 * @param jobName
+	 * @param start
+	 * @param count
+	 * @return
+	 */
+	List<JobInstance> getJobInstancesByJobName(String jobName, int start, int count);
 
 	/**
 	 * Retrieve a {@link JobExecution} by its id. The complete object graph for
