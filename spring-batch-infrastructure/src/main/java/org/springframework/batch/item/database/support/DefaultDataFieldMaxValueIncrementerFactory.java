@@ -25,6 +25,7 @@ import static org.springframework.batch.support.DatabaseType.ORACLE;
 import static org.springframework.batch.support.DatabaseType.POSTGRES;
 import static org.springframework.batch.support.DatabaseType.SQLSERVER;
 import static org.springframework.batch.support.DatabaseType.SYBASE;
+import static org.springframework.batch.support.DatabaseType.TIMESTEN;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -95,7 +96,7 @@ public class DefaultDataFieldMaxValueIncrementerFactory implements DataFieldMaxV
 		else if (databaseType == MYSQL) {
 			return new MySQLMaxValueIncrementer(dataSource, incrementerName, incrementerColumnName);
 		}
-		else if (databaseType == ORACLE) {
+		else if (databaseType == ORACLE || databaseType == TIMESTEN) {
 			return new OracleSequenceMaxValueIncrementer(dataSource, incrementerName);
 		}
 		else if (databaseType == POSTGRES) {

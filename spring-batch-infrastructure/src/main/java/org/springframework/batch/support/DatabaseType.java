@@ -43,7 +43,9 @@ public enum DatabaseType {
 	MYSQL("MySQL"),
 	ORACLE("Oracle"),
 	POSTGRES("PostgreSQL"),
-	SYBASE("Sybase"), H2("H2");
+	SYBASE("Sybase"), 
+	TIMESTEN("TimesTen"),
+	H2("H2");
 	
 	private static final Map<String, DatabaseType> nameMap;
 	

@@ -24,7 +24,7 @@ import static org.springframework.batch.support.DatabaseType.MYSQL;
 import static org.springframework.batch.support.DatabaseType.ORACLE;
 import static org.springframework.batch.support.DatabaseType.POSTGRES;
 import static org.springframework.batch.support.DatabaseType.SQLSERVER;
-import static org.springframework.batch.support.DatabaseType.SYBASE;
+import static org.springframework.batch.support.DatabaseType.*;
 
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -76,6 +76,7 @@ public class SqlPagingQueryProviderFactoryBean implements FactoryBean {
 		providers.put(H2,new H2PagingQueryProvider());
 		providers.put(MYSQL,new MySqlPagingQueryProvider());
 		providers.put(ORACLE,new OraclePagingQueryProvider());
+		providers.put(TIMESTEN,new OraclePagingQueryProvider());
 		providers.put(POSTGRES,new PostgresPagingQueryProvider());
 		providers.put(SQLSERVER,new SqlServerPagingQueryProvider());
 		providers.put(SYBASE,new SybasePagingQueryProvider());
