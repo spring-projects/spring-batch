@@ -50,7 +50,7 @@ import org.springframework.util.ClassUtils;
  * specified in {@link #setPageSize(int)}. Additional pages are requested when
  * needed as {@link #read()} method is called, returning an object corresponding
  * to current position. On restart it uses the last sort key value to locate the
- * first page to read (so it doesn't matter if the successfully processed itmes
+ * first page to read (so it doesn't matter if the successfully processed items
  * have been removed or modified).
  * </p>
  * 
@@ -94,6 +94,8 @@ public class JdbcPagingItemReader<T> extends AbstractPagingItemReader<T> impleme
 	private String remainingPagesSql;
 
 	private Map<String, Object> startAfterValues;
+	
+	private Map<String, Object> previousStartAfterValues;
 
 	private int fetchSize = VALUE_NOT_SET;
 
@@ -210,6 +212,7 @@ public class JdbcPagingItemReader<T> extends AbstractPagingItemReader<T> impleme
 
 		}
 		else {
+			previousStartAfterValues = startAfterValues;
 			if (logger.isDebugEnabled()) {
 				logger.debug("SQL used for reading remaining pages: [" + remainingPagesSql + "]");
 			}
@@ -230,9 +233,19 @@ public class JdbcPagingItemReader<T> extends AbstractPagingItemReader<T> impleme
 	@Override
 	public void update(ExecutionContext executionContext) throws ItemStreamException {
 		super.update(executionContext);
-		if (isSaveState() && startAfterValues != null) {
-			executionContext.put(getExecutionContextKey(START_AFTER_VALUE), startAfterValues);
+		if (isSaveState()) {
+			if (isAtEndOfPage() && startAfterValues != null) {
+				// restart on next page
+				executionContext.put(getExecutionContextKey(START_AFTER_VALUE), startAfterValues);	
+			} else if (previousStartAfterValues != null) {
+				// restart on current page
+				executionContext.put(getExecutionContextKey(START_AFTER_VALUE), previousStartAfterValues);
+			}
 		}
+	}
+	
+	private boolean isAtEndOfPage() {
+		return getCurrentItemCount() % getPageSize() == 0;
 	}
 
 	@Override
