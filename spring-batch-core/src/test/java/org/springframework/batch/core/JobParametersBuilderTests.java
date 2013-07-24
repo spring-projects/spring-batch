@@ -6,6 +6,7 @@ import static org.junit.Assert.assertFalse;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.Properties;
 
 import org.junit.Test;
 
@@ -19,6 +20,30 @@ public class JobParametersBuilderTests {
 	JobParametersBuilder parametersBuilder = new JobParametersBuilder();
 
 	Date date = new Date(System.currentTimeMillis());
+
+	@Test
+	public void testFromProperties() {
+		Properties props = new Properties();
+		props.put("SCHEDULE_DATE", date.toString());
+		props.put("LONG", "1");
+		props.put("STRING", "string value");
+
+		JobParametersBuilder builder = new JobParametersBuilder(props);
+		JobParameters parameters = builder.toJobParameters();
+		assertEquals(date.toString(), parameters.getString("SCHEDULE_DATE"));
+		assertEquals("1", parameters.getString("LONG").toString());
+		assertEquals("string value", parameters.getString("STRING"));
+		assertFalse(parameters.getParameters().get("SCHEDULE_DATE").isIdentifying());
+		assertFalse(parameters.getParameters().get("LONG").isIdentifying());
+		assertFalse(parameters.getParameters().get("STRING").isIdentifying());
+	}
+
+	@Test
+	public void testFromNullProperties() {
+		JobParametersBuilder builder = new JobParametersBuilder((Properties) null);
+		JobParameters parameters = builder.toJobParameters();
+		assertEquals(0, parameters.getParameters().size());
+	}
 
 	@Test
 	public void testNonIdentifyingParameters() {

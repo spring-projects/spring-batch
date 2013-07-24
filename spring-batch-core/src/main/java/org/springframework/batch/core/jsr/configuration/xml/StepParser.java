@@ -17,7 +17,6 @@ package org.springframework.batch.core.jsr.configuration.xml;
 
 import java.util.Collection;
 
-import org.springframework.batch.core.configuration.xml.StepParserStepFactoryBean;
 import org.springframework.batch.core.job.flow.support.state.StepState;
 import org.springframework.batch.core.listener.StepListenerFactoryBean;
 import org.springframework.beans.factory.config.BeanDefinition;
@@ -32,8 +31,7 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 /**
- * Parser for the &lt;step /&gt; element defined by JSR-352.  Current state parses it
- * into existing Spring Batch artifacts.
+ * Parser for the &lt;step /&gt; element defined by JSR-352.
  * 
  * @author Michael Minella
  * @since 3.0
@@ -46,15 +44,10 @@ public class StepParser extends AbstractSingleBeanDefinitionParser {
 	private static final String START_LIMIT_ATTRIBUTE = "start-limit";
 	private static final String SPLIT_ID_ATTRIBUTE = "id";
 
-	@Override
-	@SuppressWarnings("rawtypes")
-	protected Class<StepParserStepFactoryBean> getBeanClass(Element element) {
-		return StepParserStepFactoryBean.class;
-	}
-
 	protected Collection<BeanDefinition>  parse(Element element, ParserContext parserContext, BeanDefinitionBuilder builder) {
 		BeanDefinitionBuilder defBuilder = BeanDefinitionBuilder.genericBeanDefinition();
 		AbstractBeanDefinition bd = defBuilder.getRawBeanDefinition();
+		bd.setBeanClass(StepFactoryBean.class);
 
 		BeanDefinitionBuilder stateBuilder = BeanDefinitionBuilder.genericBeanDefinition(StepState.class);
 

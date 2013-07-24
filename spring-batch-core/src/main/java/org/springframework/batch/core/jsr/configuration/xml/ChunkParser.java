@@ -18,7 +18,6 @@ package org.springframework.batch.core.jsr.configuration.xml;
 import java.util.List;
 
 import org.springframework.batch.core.configuration.xml.ExceptionElementParser;
-import org.springframework.batch.core.configuration.xml.StepParserStepFactoryBean;
 import org.springframework.batch.core.step.item.ChunkOrientedTasklet;
 import org.springframework.batch.item.ItemProcessor;
 import org.springframework.batch.item.ItemReader;
@@ -67,7 +66,8 @@ public class ChunkParser {
 
 	public void parse(Element element, AbstractBeanDefinition bd, ParserContext parserContext) {
 		MutablePropertyValues propertyValues = bd.getPropertyValues();
-		bd.setBeanClass(StepParserStepFactoryBean.class);
+		bd.setBeanClass(StepFactoryBean.class);
+		bd.setAttribute("isNamespaceStep", false);
 
 		propertyValues.addPropertyValue("hasChunkElement", Boolean.TRUE);
 
