@@ -7,6 +7,11 @@
   <section id="retryTemplate">
     <title>RetryTemplate</title>
 
+	<note>
+		<para>The retry functionality was pulled out of Spring Batch as of 2.2.0.
+		It is now part of a new library, Spring Retry.</para>
+	</note>
+
     <para>To make processing more robust and less prone to failure, sometimes
     it helps to automatically retry a failed operation in case it might
     succeed on a subsequent attempt. Errors that are susceptible to this kind
@@ -22,13 +27,13 @@
 
     &lt;T&gt; T execute(RetryCallback&lt;T&gt; retryCallback) throws Exception;
 
-    &lt;T&gt; T execute(RetryCallback&lt;T&gt; retryCallback, RecoveryCallback&lt;T&gt; recoveryCallback) 
+    &lt;T&gt; T execute(RetryCallback&lt;T&gt; retryCallback, RecoveryCallback&lt;T&gt; recoveryCallback)
         throws Exception;
 
-    &lt;T&gt; T execute(RetryCallback&lt;T&gt; retryCallback, RetryState retryState) 
+    &lt;T&gt; T execute(RetryCallback&lt;T&gt; retryCallback, RetryState retryState)
         throws Exception, ExhaustedRetryException;
 
-    &lt;T&gt; T execute(RetryCallback&lt;T&gt; retryCallback, RecoveryCallback&lt;T&gt; recoveryCallback, 
+    &lt;T&gt; T execute(RetryCallback&lt;T&gt; retryCallback, RecoveryCallback&lt;T&gt; recoveryCallback,
         RetryState retryState) throws Exception;
 
 }</programlisting>The basic callback is a simple interface that allows you to
@@ -276,7 +281,7 @@ template.execute(new RetryCallback&lt;Foo&gt;() {
 
     BackOffContext start(RetryContext context);
 
-    void backOff(BackOffContext backOffContext) 
+    void backOff(BackOffContext backOffContext)
         throws BackOffInterruptedException;
 
 }</programlisting>A <classname>BackoffPolicy</classname> is free to implement

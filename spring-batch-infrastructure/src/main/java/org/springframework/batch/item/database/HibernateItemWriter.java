@@ -81,7 +81,7 @@ public class HibernateItemWriter<T> implements ItemWriter<T>, InitializingBean {
 	 *
 	 * @param sessionFactory session factory to be used by the writer
 	 */
-	public final void setSessionFactory(SessionFactory sessionFactory) {
+	public void setSessionFactory(SessionFactory sessionFactory) {
 		this.sessionFactory = sessionFactory;
 	}
 
@@ -101,7 +101,7 @@ public class HibernateItemWriter<T> implements ItemWriter<T>, InitializingBean {
 	 * @see org.springframework.batch.item.ItemWriter#write(java.util.List)
 	 */
 	@Override
-	public final void write(List<? extends T> items) {
+	public void write(List<? extends T> items) {
 		if(sessionFactory == null) {
 			doWrite(hibernateTemplate, items);
 			hibernateTemplate.flush();

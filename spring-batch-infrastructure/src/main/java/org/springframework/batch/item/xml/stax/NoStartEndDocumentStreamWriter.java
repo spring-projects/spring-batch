@@ -39,4 +39,10 @@ public class NoStartEndDocumentStreamWriter extends AbstractEventWriterWrapper {
 			wrappedEventWriter.add(event);
 		}
 	}
+    
+    // prevents OXM Marshallers from closing the XMLEventWriter
+    @Override
+    public void close() throws XMLStreamException {
+    	flush();
+    }
 }
