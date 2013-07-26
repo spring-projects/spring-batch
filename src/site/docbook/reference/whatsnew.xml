@@ -2,427 +2,129 @@
 <!DOCTYPE chapter PUBLIC "-//OASIS//DTD DocBook XML V4.4//EN"
 "http://www.oasis-open.org/docbook/xml/4.4/docbookx.dtd">
 <chapter id="whatsNew">
-  <title>What's New in Spring Batch 2.0</title>
+  <title>What's New in Spring Batch 2.2</title>
 
-  <para>The Spring Batch 2.0 release has six major themes:</para>
+  <para>The Spring Batch 2.2 release has six major themes:</para>
 
   <itemizedlist>
     <listitem>
-      <para>Java 5</para>
+      <para>Spring Data Integration</para>
     </listitem>
 
     <listitem>
-      <para>Non Sequential Step Execution</para>
+      <para>Java Configuration</para>
     </listitem>
 
     <listitem>
-      <para>Chunk oriented processing</para>
+      <para>Spring Retry</para>
     </listitem>
 
     <listitem>
-      <para>Meta Data enhancements</para>
-    </listitem>
-
-    <listitem>
-      <para>Scalability</para>
-    </listitem>
-
-    <listitem>
-      <para>Configuration</para>
+      <para>Job Parameters</para>
     </listitem>
   </itemizedlist>
 
-  <section id="whatsNewJava5">
-    <title id="s.2.1.6">Java 5</title>
+  <section id="whatsNewSpringData">
+    <title id="s.2.1.6">Spring Data Integration</title>
 
-    <para>The 1.x releases of Spring Batch were all based on Java 1.4. This
-    prevented the framework from using many enhancements provided in Java 5
-    such as generics, parameterized types, etc. The entire framework has been
-    updated to utilize these features. As a result, <emphasis role="bold">Java
-    1.4 is no longer supported.</emphasis> Most of the interfaces developers
-    work with have been updated to support generic types. As an example, the
-    <classname>ItemReader</classname> interface from 1.1 is below:</para>
+    <para>Since the 2.0 release of Spring Batch, the Spring Data project has brought
+    support for the NoSQL movement to Spring.  The 2.2 release of Spring Batch has added
+    support for MongoDB, Neo4j and Gemfire natively through the Spring Data abstractions.</para>
 
-    <programlisting>public interface ItemReader {
-
-    Object read() throws Exception;
-
-    void mark() throws MarkFailedException;
- 
-    void reset() throws ResetFailedException;
-}</programlisting>
-
-    <para>As you can see, the <methodname>read</methodname> method returns an
-    <classname>Object</classname>. The 2.0 version is below:</para>
-
-    <programlisting>public interface ItemReader&lt;T&gt; {
-
-    T read() throws Exception, UnexpectedInputException, ParseException;
-
-}</programlisting>
-
-    <para>As you can see, <classname>ItemReader</classname> now supports the
-    generic type, <classname>T</classname>, which is returned from read. You
-    may also notice that <methodname>mark</methodname> and
-    <methodname>reset</methodname> have been removed. This is due to step
-    processing strategy changes, which are discussed below. Many other
-    interfaces have been similarly updated.</para>
+    <para>This release has also added support for writing to any custom Spring Data Repository a
+    user may write.  The <classname>RepositoryItemReader</classname> and
+    <classname>RepositoryItemWriter</classname> each wrap a repository implementation (
+    <classname>PagingAndSortingRepository</classname> and <classname>CrudRepository</classname>
+    respectively) to retrieve data from and persist data to.</para>
   </section>
 
-  <section id="whatsNewChunkOrientedProcessing">
-    <title>Chunk Oriented Processing</title>
+  <section id="whatsNewJavaConfiguration">
+    <title>Java Configuration</title>
 
-    <para>Previously, the default processing strategy provided by Spring Batch
-    was item-oriented processing:</para>
+    <para>Until 2.2.0 the only option for configuring a job was via XML (either through the batch DSL or
+    by hand).  However, in 2.2.0, Java based configuration has been added as a way to define Spring Batch
+    Jobs.  To support this new configuration option, an annotation and builder classes have been added.  What
+    was previously defined as this:</para>
 
-    <mediaobject>
-      <imageobject role="html">
-        <imagedata align="center"
-                   fileref="images/item-oriented-processing.png" scale="80"
-                   width="" />
-      </imageobject>
+    <programlisting>&lt;batch&gt;
+    &lt;job-repository/&gt;
 
-      <imageobject role="fo">
-        <imagedata align="center"
-                   fileref="images/item-oriented-processing.png" scale="60" />
-      </imageobject>
-    </mediaobject>
+    &lt;job id="myJob"&gt;
+        &lt;step id="step1".../&gt;
+        &lt;step id="step2".../&gt;
+    &lt;/job&gt;
 
-    <para>In item-oriented processing, the <classname>ItemReader</classname>
-    returns one <classname>Object</classname> (the 'item') which is then
-    handed to the <classname>ItemWriter</classname>, periodically committing
-    when the number of items hits the commit interval. For example, if the
-    commit interval is 5, <classname>ItemReader</classname> and
-    <classname>ItemWriter</classname> will each be called 5 times. This is
-    illustrated in a simplified code example below:</para>
+    &lt;beans:bean id="transactionManager".../&gt;
 
-    <programlisting>for(int i = 0; i &lt; commitInterval; i++){
-    Object item = itemReader.read();
-    itemWriter.write(item);
+    &lt;beans:bean id="jobLauncher" class="org.springframework.batch.core.launch.support.SimpleJobLauncher"&gt;
+        &lt;beans:property name="jobRepository" ref="jobRepository"/&gt;
+    &lt;/beans:bean&gt;
+&lt;/batch&gt;
+    </programlisting>
+
+    <para>Can now be configured using the <classname>@EnableBatchProcessing</classname> annotation and the
+    provided <classname>JobBuilderFactory</classname> and <classname>StepBuilderFactory</classname> as show below:</para>
+
+    <programlisting> &#064;Configuration
+ &#064;EnableBatchProcessing
+ &#064;Import(DataSourceCnfiguration.class)
+ public class AppConfig {
+
+     &#064;Autowired
+      private JobBuilderFactory jobs;
+
+     &#064;Bean
+     public Job job() {
+          return jobs.get(&quot;myJob&quot;).start(step1()).next(step2()).build();
+     }
+
+     &#064;Bean
+     protected Step step1() {
+          ...
+     }
+
+     &#064;Bean
+     protected Step step2() {
+          ...
+     }
 }</programlisting>
 
-    <para>Both the <classname>ItemReader</classname> and
-    <classname>ItemWriter</classname> interfaces were completely geared toward
-    this approach:</para>
-
-    <programlisting>public interface ItemReader {
-
-    Object read() throws Exception;
-
-    void mark() throws MarkFailedException;
- 
-    void reset() throws ResetFailedException;
-}</programlisting>
-
-    <programlisting>public interface ItemWriter {
-
-    void write(Object item) throws Exception;
-
-    void flush() throws FlushFailedException;
-
-    void clear() throws ClearFailedException;
-}</programlisting>
-
-    <para>Because the 'scope' of the processing was one item, supporting
-    rollback scenarios required additional methods, which is what
-    <methodname>mark</methodname>, <methodname>reset</methodname>,
-    <methodname>flush</methodname>, and <methodname>clear</methodname>
-    provided. If, after successfully reading and writing 2 items, the third
-    has an error while writing, the transaction would need to be rolled back.
-    In this case, the <methodname>clear</methodname> method on the writer
-    would be called, indicating that it should <methodname>clear</methodname>
-    its buffer, and <methodname>reset</methodname> would be called on the
-    <classname>ItemReader</classname>, indicating that it should return back
-    to the last position it was at when <methodname>mark</methodname> was
-    called. (Both <methodname>mark</methodname> and
-    <methodname>flush</methodname> are called on commit)</para>
-
-    <para>In 2.0, this strategy has been changed to a chunk-oriented
-    approach:</para>
-
-    <mediaobject>
-      <imageobject role="html">
-        <imagedata align="center"
-                   fileref="images/simplified-chunk-oriented-processing.png"
-                   scale="80" width="" />
-      </imageobject>
-
-      <imageobject role="fo">
-        <imagedata align="center"
-                   fileref="images/simplified-chunk-oriented-processing.png"
-                   scale="60" />
-      </imageobject>
-    </mediaobject>
-
-    <para>Using the same example from above, if the commit interval is five,
-    read will be called 5 times, and write once. The items read will be
-    aggregated into a list, that will ultimately be written out, as the
-    simplified example below illustrates:</para>
-
-    <programlisting>List items = new Arraylist();
-for(int i = 0; i &lt; commitInterval; i++){
-    items.add(itemReader.read());
-}
-itemWriter.write(items);</programlisting>
-
-    <para>This approach not only allows for much simpler processing and
-    scalability approaches, it also makes the
-    <classname>ItemReader</classname> and <classname>ItemWriter</classname>
-    interfaces much cleaner:</para>
-
-    <programlisting>public interface ItemReader&lt;T&gt; {
-
-    T read() throws Exception, UnexpectedInputException, ParseException;
-
-}</programlisting>
-
-    <programlisting>public interface ItemWriter&lt;T&gt; {
-
-    void write(List&lt;? extends T&gt; items) throws Exception;
-
-}</programlisting>
-
-    <para>As you can see, the interfaces no longer contain the
-    <methodname>mark</methodname>, <methodname>reset</methodname>,
-    <methodname>flush</methodname>, and <methodname>clear</methodname>
-    methods. This makes the creation of readers and writers much more
-    straightforward for developers. In the case of
-    <classname>ItemReader</classname>, the interface is now forward-only. The
-    framework will buffer read items for developers in the case of rollback
-    (though there are exceptions if the underlying resource is transactional
-    see: <xref linkend="transactionalReaders" />).
-    <classname>ItemWriter</classname> is also simplified, since it gets the
-    entire 'chunk' of items at once, rather than one at a time, it can decide
-    to flush any resources (such as a file or hibernate session) before
-    returning control to the <classname>Step</classname>. More detailed
-    information on chunk-oriented processing can be found in <xref
-    linkend="chunkOrientedProcessing" />. Reader and writer implementation
-    information can be found in <xref linkend="readersAndWriters" />.</para>
-
-    <section id="whatsNewItemProcessor">
-      <title>ItemProcessor</title>
-
-      <para>Previously, <classname>Step</classname>s had only two
-      dependencies, <classname>ItemReader</classname> and
-      <classname>ItemWriter</classname>:</para>
-
-      <mediaobject>
-        <imageobject role="html">
-          <imagedata align="center" fileref="images/1-1-step.png" scale="60" />
-        </imageobject>
-
-        <imageobject role="fo">
-          <imagedata align="center" fileref="images/1-1-step.png" scale="50" />
-        </imageobject>
-      </mediaobject>
-
-      <para>The basic configuration above is fairly robust. However, there are
-      many cases where the item needs to be transformed before writing. In 1.x
-      this can be achieved using the composite pattern:</para>
-
-      <mediaobject>
-        <imageobject role="html">
-          <imagedata align="center" fileref="images/composite-transformer.png"
-                     scale="95" />
-        </imageobject>
-
-        <imageobject role="fo">
-          <imagedata align="center" fileref="images/composite-transformer.png"
-                     scale="55" />
-        </imageobject>
-      </mediaobject>
-
-      <para>This approach works. However, it requires an extra layer between
-      either the reader or the writer and the <classname>Step</classname>.
-      Furthermore, the <classname>ItemWriter</classname> would need to be
-      registered separately as an <classname>ItemStream</classname> with the
-      <classname>Step</classname>. For this reason, the
-      <classname>ItemTransfomer</classname> was renamed to
-      <classname>ItemProcessor</classname> and moved up to the same level as
-      <classname>ItemReader</classname> and
-      <classname>ItemWriter</classname>:</para>
-
-      <mediaobject>
-        <imageobject role="html">
-          <imagedata align="center" fileref="images/step.png" scale="60" />
-        </imageobject>
-
-        <imageobject role="fo">
-          <imagedata align="center" fileref="images/step.png" scale="50" />
-        </imageobject>
-      </mediaobject>
-    </section>
+    <para>The <classname>@EnableBatchProcessing</classname> annotation makes a number
+    of common dependencies available for autowiring by default.  This list includes a
+    <classname>JobRepsitory</classname>, <classname>JobLauncher</classname>,
+    <classname>JobRegistry</classname>, <classname>PlatformTransactionManager</classname>,
+    <classname>JobBuilderFactory</classname>, and a <classname>StepBuilderFactory</classname>.
+    More information on how to configure Jobs and Steps with the new
+    Java config can be found in <xref linkend="javaConfig" /></para>
   </section>
 
-  <section id="whatsNewConfiguration">
-    <title>Configuration Enhancements</title>
+    <section id="whatsNewSpringRetry">
+      <title>Spring Retry</title>
 
-    <para>Until 2.0, the only option for configuring batch jobs has been
-    normal spring bean configuration. However, in 2.0 there is a new namespace
-    for configuration. For example, in 1.1, configuring a job looked like the
-    following:</para>
-
-    <programlisting>&lt;bean id="footballJob"
-      class="org.springframework.batch.core.job.SimpleJob"&gt;
-    &lt;property name="steps"&gt;
-        &lt;list&gt;
-            &lt;!-- Step bean details ommitted for clarity --&gt;
-            &lt;bean id="playerload"/&gt;
-            &lt;bean id="gameLoad"/&gt;
-            &lt;bean id="playerSummarization"/&gt;
-        &lt;/list&gt;
-    &lt;/property&gt;
-    &lt;property name="jobRepository" ref="jobRepository" /&gt;
-&lt;/bean&gt;</programlisting>
-
-    <para>In 2.0, the equivalent would be:</para>
-
-    <programlisting>&lt;job id="footballJob"&gt;
-    &lt;!-- Step bean details ommitted for clarity --&gt;
-    &lt;step id="playerload" next="gameLoad"/&gt;
-    &lt;step id="gameLoad" next="playerSummarization"/&gt;
-    &lt;step id="playerSummarization"/&gt;
-&lt;/job&gt;</programlisting>
-
-    <para>More information on how to configure Jobs and Steps with the new
-    namespace can be found in <xref linkend="configureJob" />, and <xref
-    linkend="configureStep" />.</para>
+      <para>The ability to retry an operation via the <classname>RetryTemplate</classname>
+      has always been a feature of Spring Batch.  That ability has been identified as a
+      useful feature for other frameworks (Spring Integration for example).  With the 2.2.0
+      release, the retry logic has been extracted from Spring Batch into it's own library
+      called Spring Retry.  With this change, there are two main impacts.  The first is
+      that the majority of the <literal>org.springframework.batch.retry</literal> package
+      has been moved into this new library.  With that move, the package name has also
+      dropped the batch to become <literal>org.springframework.retry</literal>.</para>
   </section>
 
-  <section id="whatsNewMetaDataAccess">
-    <title>Meta Data Access Improvements</title>
+  <section id="whatsNewJobParameters">
+    <title>Job Parameters</title>
 
-    <para>The <classname>JobRepository</classname> interface represents basic
-    CRUD operations with <classname>Job</classname> meta-data. However, it may
-    also be useful to query the meta-data. For that reason, the
-    <classname>JobExplorer</classname> and <classname>JobOperator</classname>
-    interfaces have been created:</para>
+    <para>Prior to the 2.2.0 release of Spring Batch, all parameters pass to a job execution
+    were used as part of the identity of the job.  This limited the ability to change job
+    parameters during a rerun of a job.  To accommodate this use case, 2.2.0 introduced the
+    idea of non-identifying job parameters.</para>
 
-    <mediaobject>
-      <imageobject role="html">
-        <imagedata align="center" fileref="images/job-repository-advanced.png"
-                   scale="115" />
-      </imageobject>
-
-      <imageobject role="fo">
-        <imagedata align="center" fileref="images/job-repository-advanced.png"
-                   scale="60" />
-      </imageobject>
-    </mediaobject>
-
-    <para>More information on the new meta data features can be found in <xref
-    linkend="advancedMetaData" />. It is also worth noting that Jobs can now
-    be stopped via the database, removing the requirement to maintain a handle
-    to the <classname>JobExecution</classname> on the JVM the job was launched
-    in.</para>
+    <para>By default, job parameters in 2.2.0 are still identifying.  However, Spring Batch
+    now allows a user to specify a parameter not be used in the identity of a job instance.
+    In order to support this change, the domain model for batch changed.  Before 2.2.0, job
+    parameters were associated with a <classname>JobInstance</classname>.  2.2.0 and beyond,
+    they are associated with a <classname>JobExecution</classname>.  This also required the
+    underlying database schema for the job repository to change.</para>
   </section>
 
-  <section id="whatsNewNonSequential">
-    <title>Non Sequential Step Execution</title>
-
-    <para>2.0 has also seen improvements in how steps can be configured.
-    Rather than requiring that they solely be sequential:</para>
-
-    <mediaobject>
-      <imageobject role="html">
-        <imagedata align="center" fileref="images/sequential-flow.png"
-                   scale="20" />
-      </imageobject>
-
-      <imageobject role="fo">
-        <imagedata align="center" fileref="images/sequential-flow.png"
-                   scale="45" />
-      </imageobject>
-    </mediaobject>
-
-    <para>They may now be conditional:</para>
-
-    <mediaobject>
-      <imageobject role="html">
-        <imagedata align="center" fileref="images/conditional-flow.png"
-                   scale="50" />
-      </imageobject>
-
-      <imageobject role="fo">
-        <imagedata align="center" fileref="images/conditional-flow.png"
-                   scale="45" />
-      </imageobject>
-    </mediaobject>
-
-    <para>This new 'conditional flow' support is made easy to configure via
-    the new namespace:</para>
-
-    <programlisting>&lt;job id="job"&gt;
-    &lt;step id="stepA"&gt;
-        &lt;next on="FAILED" to="stepB" /&gt;
-        &lt;next on="*" to="stepC" /&gt;
-    &lt;/step&gt;
-    &lt;step id="stepB" next="stepC" /&gt;
-    &lt;step id="stepC" /&gt;
-&lt;/job&gt;</programlisting>
-
-    <para>More details on how to configure non sequential steps can be found
-    in <xref linkend="controllingStepFlow" />.</para>
-  </section>
-
-  <section id="whatsNewScalability">
-    <title>Scalability</title>
-
-    <para>Spring Batch 1.x was always intended as a single VM, possibly
-    multi-threaded model, but many features were built into it that support
-    parallel execution in multiple processes. Many projects have successfully
-    implemented a scalable solution relying on the quality of service features
-    of Spring Batch to ensure that processing only happens in the correct
-    sequence. In 2.0 those features have been exposed more explicitly. There
-    are two approaches to scalability: remote chunking, and
-    partitioning.</para>
-
-    <section id="whatsNewRemoteChunking">
-      <title>Remote Chunking</title>
-
-      <para>Remote chunking is a technique for dividing up the work of a step
-      without any explicit knowledge of the structure of the data. Any input
-      source can be split up dynamically by reading it in a single process (as
-      per normal in 1.x) and sending the items as a chunk to a remote worker
-      process. The remote process implements a listener pattern, responding to
-      the request, processing the data and sending an asynchronous reply. The
-      transport for the request and reply has to be durable with guaranteed
-      delivery and a single consumer, and those features are readily available
-      with any JMS implementation. But Spring Batch is building the remote
-      chunking feature on top of Spring Integration, therefore it is agnostic
-      to the actual implementation of the message middleware. More details can
-      be found in <xref linkend="remoteChunking" /></para>
-    </section>
-
-    <section id="whatsNewPartitioning">
-      <title>Partitioning</title>
-
-      <para>Partitioning is an alternative approach which in contrast depends
-      on having some knowledge of the structure of the input data, like a
-      range of primary keys, or the name of a file to process. The advantage
-      of this model is that the processors of each element in a partition can
-      act as if they are a single step in a normal Spring Batch job. They
-      don't have to implement any special or new patterns, which makes them
-      easy to configure and test. Partitioning in principle is more scalable
-      than remote chunking because there is no serialization bottleneck
-      arising from reading all the input data in one place.</para>
-
-      <para>In Spring Batch 2.0 partitioning is supported by two interfaces:
-      <classname>PartitionHandler</classname> and
-      <classname>StepExecutionSplitter</classname>. The
-      <classname>PartitionHandler</classname> is the one that knows about the
-      execution fabric - it has to transmit requests to remote steps and
-      collect the results using whatever grid or remoting technology is
-      available. <classname>PartitionHandler</classname> is an SPI, and Spring
-      Batch provides one implementation out of the box for local execution
-      through a <classname>TaskExecutor</classname>. This will be useful
-      immediately when parallel processing of heavily IO bound tasks is
-      required, since in those cases remote execution only complicates the
-      deployment and doesn't necessarily help much with the performance. Other
-      implementations will be specific to the execution fabric. (e.g. one of
-      the grid providers such as IBM, Oracle, Terracotta, Appistry etc.),
-      Spring Batch makes no preference for any of grid provider over another.
-      More details can be found in <xref linkend="partitioning" /></para>
-    </section>
-  </section>
 </chapter>
