@@ -226,12 +226,101 @@ catch (JobRestartException e) {
     </section>
   </section>
 
+  <section id="javaConfig">
+  	<title>Java Config</title>
+
+  	<para>Spring 3 brought the ability to configure applications via java instead
+  	of XML.  As of Spring Batch 2.2.0, batch jobs can be configured using the same
+  	java config.  There are two components for the java based configuration:
+  	the <classname>@EnableBatchConfiguration</classname> annotation and two builders.</para>
+
+  	<para>The <classname>@EnableBatchProcessing</classname> works similarly to the other
+  	<classname>@Enable*</classname> annotations in the Spring family.  In this case,
+  	<classname>@EnableBatchProcessing</classname> provides a base configuration for
+  	building batch jobs.  Within this base configuration, an instance of
+  	<classname>StepScope</classname> is createded in addition to a number of beans made
+  	available to be autowired:
+  	</para>
+
+  	<itemizedlist>
+        <listitem>
+            <para><classname>JobRepository</classname> - bean name "jobRepository"</para>
+        </listitem>
+        <listitem>
+            <para><classname>JobLauncher</classname> - bean name "jobLauncher"</para>
+        </listitem>
+        <listitem>
+            <para><classname>JobRegistry</classname> - bean name "jobRegistry"</para>
+        </listitem>
+        <listitem>
+            <para><classname>PlatformTransactionManager</classname> - bean name "transactionManager"</para>
+        </listitem>
+        <listitem>
+            <para><classname>JobBuilderFactory</classname> - bean name "jobBuilders"</para>
+        </listitem>
+        <listitem>
+            <para><classname>StepBuilderFactory</classname> - bean name "stepBuilders"</para>
+        </listitem>
+    </itemizedlist>
+
+    <para>The core interface for this configuration is the <classname>BatchConfigurer</classname>.
+    The default implementation provides the beans mentioned above and requires a
+    <classname>DataSource</classname> as a bean within the context to be provided.  This data
+    source will be used by the <classname>JobRepository</classname>.
+    </para>
+
+    <note>
+    	<para>Only one configuration class needs to have the
+    	<classname>@EnableBatchProcessing</classname> annotation.  Once you have a class
+    	annotated with it, you will have all of the above available.</para>
+    </note>
+
+	<para>With the base configuration in place, a user can use the provided builder factories
+	to configure a job.  Below is an example of a two step job configured via the
+	<classname>JobBuilderFactory</classname> and the <classname>StepBuilderFactory</classname>.</para>
+
+    <programlisting>&#064;Configuration
+&#064;EnableBatchProcessing
+&#064;Import(DataSourceCnfiguration.class)
+public class AppConfig {
+
+    &#064;Autowired
+    private JobBuilderFactory jobs;
+
+    &#064;Autowired
+    private StepBuilderFactory steps;
+
+    &#064;Bean
+    public Job job() {
+        return jobs.get(&quot;myJob&quot;).start(step1()).next(step2()).build();
+    }
+
+    &#064;Bean
+    protected Step step1(ItemReader&lt;Person&gt; reader, ItemProcessor&lt;Person, Person&gt; processor, ItemWriter&lt;Person&gt; writer) {
+        return steps.get("step1")
+            .&lt;Person, Person&gt; chunk(10)
+            .reader(reader)
+            .processor(processor)
+            .writer(writer)
+            .build();
+    }
+
+    &#064;Bean
+    protected Step step2(Tasklet tasklet) {
+        return steps.get("step2")
+            .tasklet(tasklet)
+            .build();
+    }
+}</programlisting>
+
+  </section>
+
   <section id="configuringJobRepository">
-     
+
 
     <title>Configuring a JobRepository</title>
 
-     
+
 
     <para>As described in earlier, the <link linkend="jobRepository">
         <classname>JobRepository</classname>
@@ -246,7 +335,7 @@ catch (JobRestartException e) {
     collaborators. However, there are still a few configuration options
     available:</para>
 
-     
+
 
     <programlisting><![CDATA[<job-repository id="jobRepository"
     data-source="dataSource"
@@ -256,7 +345,7 @@ catch (JobRestartException e) {
 	max-varchar-length="1000"
 />]]></programlisting>
 
-     
+
 
     <para>None of the configuration options listed above are required except
     the id. If they are not set, the defaults shown above will be used. They
@@ -265,7 +354,7 @@ catch (JobRestartException e) {
     length of the long <literal>VARCHAR</literal> columns in the <link
     linkend="metaDataSchemaOverview">sample schema scripts</link></para>
 
-     used to store things like exit code descriptions. If you don't modify the schema and you don't use multi-byte characters you shouldn't need to change it. 
+     used to store things like exit code descriptions. If you don't modify the schema and you don't use multi-byte characters you shouldn't need to change it.
 
     <section id="txConfigForJobRepository">
       <title>Transaction Configuration for the JobRepository</title>
@@ -297,7 +386,7 @@ catch (JobRestartException e) {
 
       <para>
         <programlisting><![CDATA[<aop:config>
-    <aop:advisor 
+    <aop:advisor
            pointcut="execution(* org.springframework.batch.core..*Repository+.*(..))"/>
     <advice-ref="txAdvice" />
 </aop:config>
@@ -315,7 +404,7 @@ catch (JobRestartException e) {
       classpath.</para>
     </section>
 
-     
+
 
     <section id="repositoryTablePrefix">
       <title>Changing the Table Prefix</title>
@@ -342,7 +431,7 @@ catch (JobRestartException e) {
       </note>
     </section>
 
-     
+
 
     <section id="inMemoryRepository">
       <title>In-Memory Repository</title>
@@ -354,7 +443,7 @@ catch (JobRestartException e) {
       this reason, Spring batch provides an in-memory Map version of the job
       repository:</para>
 
-      <programlisting><![CDATA[<bean id="jobRepository" 
+      <programlisting><![CDATA[<bean id="jobRepository"
   class="org.springframework.batch.core.repository.support.MapJobRepositoryFactoryBean">
     <property name="transactionManager" ref="transactionManager"/>
 </bean>]]></programlisting>
@@ -373,7 +462,7 @@ catch (JobRestartException e) {
       <classname>ResourcelessTransactionManager</classname> useful.</para>
     </section>
 
-     
+
 
     <section id="nonStandardDatabaseTypesInRepository">
       <title>Non-standard Database Types in a Repository</title>
@@ -404,7 +493,7 @@ catch (JobRestartException e) {
       on and wire one up manually in the normal Spring way.</para>
     </section>
 
-     
+
   </section>
 
   <section id="configuringJobLauncher">
@@ -777,7 +866,7 @@ public class JobLauncherController {
       <classname>JobRepository</classname>, it can be easily configured via a
       factory bean:</para>
 
-      <programlisting><![CDATA[<bean id="jobExplorer" class="org.spr...JobExplorerFactoryBean" 
+      <programlisting><![CDATA[<bean id="jobExplorer" class="org.spr...JobExplorerFactoryBean"
       p:dataSource-ref="dataSource" />]]></programlisting>
 
       <para><link linkend="repositoryTablePrefix">Earlier in this
@@ -787,7 +876,7 @@ public class JobLauncherController {
       <classname>JobExplorer</classname> is working with the same tables, it
       too needs the ability to set a prefix:</para>
 
-      <programlisting><![CDATA[<bean id="jobExplorer" class="org.spr...JobExplorerFactoryBean" 
+      <programlisting><![CDATA[<bean id="jobExplorer" class="org.spr...JobExplorerFactoryBean"
       p:dataSource-ref="dataSource" ]]><emphasis role="bold">p:tablePrefix="BATCH_" </emphasis><![CDATA[/>]]></programlisting>
     </section>
 
@@ -899,30 +988,30 @@ public class JobLauncherController {
 
     List<Long> getExecutions(long instanceId) throws NoSuchJobInstanceException;
 
-    List<Long> getJobInstances(String jobName, int start, int count) 
+    List<Long> getJobInstances(String jobName, int start, int count)
           throws NoSuchJobException;
 
     Set<Long> getRunningExecutions(String jobName) throws NoSuchJobException;
 
     String getParameters(long executionId) throws NoSuchJobExecutionException;
 
-    Long start(String jobName, String parameters) 
+    Long start(String jobName, String parameters)
           throws NoSuchJobException, JobInstanceAlreadyExistsException;
 
-    Long restart(long executionId) 
+    Long restart(long executionId)
           throws JobInstanceAlreadyCompleteException, NoSuchJobExecutionException,
                   NoSuchJobException, JobRestartException;
 
-    Long startNextInstance(String jobName) 
-          throws NoSuchJobException, JobParametersNotFoundException, JobRestartException, 
+    Long startNextInstance(String jobName)
+          throws NoSuchJobException, JobParametersNotFoundException, JobRestartException,
                  JobExecutionAlreadyRunningException, JobInstanceAlreadyCompleteException;
 
-    boolean stop(long executionId) 
+    boolean stop(long executionId)
           throws NoSuchJobExecutionException, JobExecutionNotRunningException;
 
     String getSummary(long executionId) throws NoSuchJobExecutionException;
 
-    Map<Long, String> getStepExecutionSummaries(long executionId) 
+    Map<Long, String> getStepExecutionSummaries(long executionId)
           throws NoSuchJobExecutionException;
 
     Set<String> getJobNames();
@@ -996,8 +1085,8 @@ public class JobLauncherController {
       as shown below:</para>
 
       <programlisting><![CDATA[public class SampleIncrementer implements JobParametersIncrementer {
-  
-    public JobParameters getNext(JobParameters parameters) { 
+
+    public JobParameters getNext(JobParameters parameters) {
         if (parameters==null || parameters.isEmpty()) {
             return new JobParametersBuilder().addLong("run.id", 1L).toJobParameters();
         }

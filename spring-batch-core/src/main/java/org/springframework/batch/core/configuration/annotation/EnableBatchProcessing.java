@@ -37,7 +37,7 @@ import org.springframework.transaction.PlatformTransactionManager;
  * <pre class="code">
  * &#064;Configuration
  * &#064;EnableBatchProcessing
- * &#064;Import(DataSourceCnfiguration.class)
+ * &#064;Import(DataSourceConfiguration.class)
  * public class AppConfig {
  *
  * 	&#064;Autowired
