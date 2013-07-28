@@ -191,4 +191,19 @@ public class SimpleJobExplorer implements JobExplorer {
 		}
 	}
 
+    protected JobInstanceDao getJobInstanceDao() {
+        return jobInstanceDao;
+    }
+
+    protected JobExecutionDao getJobExecutionDao() {
+        return jobExecutionDao;
+    }
+
+    protected StepExecutionDao getStepExecutionDao() {
+        return stepExecutionDao;
+    }
+
+    protected ExecutionContextDao getEcDao() {
+        return ecDao;
+    }
 }
