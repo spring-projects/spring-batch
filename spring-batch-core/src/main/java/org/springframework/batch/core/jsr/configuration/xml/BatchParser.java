@@ -64,6 +64,8 @@ public class BatchParser extends AbstractBeanDefinitionParser {
 				AbstractBeanDefinition beanDefintion = BeanDefinitionBuilder.genericBeanDefinition(curElement.getAttribute("class"))
 						.getBeanDefinition();
 
+				beanDefintion.setScope("step");
+
 				String beanName = curElement.getAttribute("id");
 
 				if(!registry.containsBeanDefinition(beanName)) {

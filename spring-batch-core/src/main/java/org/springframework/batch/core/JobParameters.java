@@ -20,6 +20,7 @@ import java.io.Serializable;
 import java.util.Date;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.Properties;
 
 /**
  * Value object representing runtime parameters to a batch job. Because the
@@ -208,5 +209,17 @@ public class JobParameters implements Serializable {
 	@Override
 	public String toString() {
 		return parameters.toString();
+	}
+
+	public Properties toProperties() {
+		Properties props = new Properties();
+
+		for (Map.Entry<String, JobParameter> param : parameters.entrySet()) {
+			if(param.getValue() != null) {
+				props.put(param.getKey(), param.getValue().toString());
+			}
+		}
+
+		return props;
 	}
 }

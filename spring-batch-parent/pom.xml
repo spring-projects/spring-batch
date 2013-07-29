@@ -3,7 +3,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>org.springframework.batch</groupId>
 	<artifactId>spring-batch-parent</artifactId>
-	<version>3.0.0.BUILD-SNAPSHOT</version>
+	<version>2.2.2.BUILD-SNAPSHOT</version>
 	<name>Spring Batch Parent</name>
 	<description>Spring Batch parent project.  Defines dependencies and common configuration for the build process.</description>
 	<url>http://static.springframework.org/spring-batch/${project.artifactId}</url>
@@ -598,6 +598,13 @@
 				<version>2.5</version>
 				<scope>provided</scope>
 				<optional>true</optional>
+			</dependency>
+			<dependency>
+			    <groupId>javax.batch</groupId>
+			    <artifactId>javax.batch-api</artifactId>
+			    <version>1.0</version>
+			    <scope>provided</scope>
+			    <optional>true</optional>
 			</dependency>
 			<dependency>
 				<groupId>stax</groupId>

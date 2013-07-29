@@ -23,7 +23,7 @@ import org.springframework.context.annotation.ScopedProxyMode;
  * }
  * </pre>
  *
- * <p>Marking a &#64;Bean as &#64;StepScope is equivalent to marking it as <code>&#64;Scope(value="step", proxyMode=INTERFACES)</code></p>
+ * <p>Marking a &#64;Bean as &#64;StepScope is equivalent to marking it as <code>&#64;Scope(value="step", proxyMode=TARGET_CLASS)</code></p>
  *
  * @author Dave Syer
  *

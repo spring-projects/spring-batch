@@ -112,6 +112,40 @@ public abstract class AbstractDataSourceItemReaderIntegrationTests {
 	}
 
 	/*
+	 * Restart scenario - read records, save restart data, create new input
+	 * source and restore from restart data - the new input source should
+	 * continue where the old one finished.
+	 */
+	@Transactional @Test
+	public void testRestartOnSecondPage() throws Exception {
+
+		getAsItemStream(reader).open(executionContext);
+		
+		Foo foo1 = reader.read();
+		assertEquals(1, foo1.getValue());
+		Foo foo2 = reader.read();
+		assertEquals(2, foo2.getValue());
+		Foo foo3 = reader.read();
+		assertEquals(3, foo3.getValue());
+		Foo foo4 = reader.read();
+		assertEquals(4, foo4.getValue());
+
+		getAsItemStream(reader).update(executionContext);
+	
+		getAsItemStream(reader).close();
+
+		// create new input source
+		reader = createItemReader();
+
+		getAsItemStream(reader).open(executionContext);
+
+		Foo foo5 = reader.read();
+		assertEquals(5, foo5.getValue());
+
+		assertNull(reader.read());
+	}
+
+	/*
 	 * Reading from an input source and then trying to restore causes an error.
 	 */
 	@Transactional @Test
