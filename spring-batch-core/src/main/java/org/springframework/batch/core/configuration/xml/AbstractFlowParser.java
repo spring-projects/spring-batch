@@ -211,7 +211,7 @@ public abstract class AbstractFlowParser extends AbstractSingleBeanDefinitionPar
 	 * @param reachableElementMap
 	 * @param accumulator a collection of reachable element names
 	 */
-	private void findAllReachableElements(String startElement, Map<String, Set<String>> reachableElementMap,
+	protected void findAllReachableElements(String startElement, Map<String, Set<String>> reachableElementMap,
 			Set<String> accumulator) {
 		Set<String> reachableIds = reachableElementMap.get(startElement);
 		accumulator.add(startElement);
@@ -233,7 +233,7 @@ public abstract class AbstractFlowParser extends AbstractSingleBeanDefinitionPar
 	 * {@link org.springframework.batch.core.job.flow.support.StateTransition}
 	 * references
 	 */
-	protected static Collection<BeanDefinition> getNextElements(ParserContext parserContext, BeanDefinition stateDef,
+	public static Collection<BeanDefinition> getNextElements(ParserContext parserContext, BeanDefinition stateDef,
 			Element element) {
 		return getNextElements(parserContext, null, stateDef, element);
 	}
@@ -248,7 +248,7 @@ public abstract class AbstractFlowParser extends AbstractSingleBeanDefinitionPar
 	 * {@link org.springframework.batch.core.job.flow.support.StateTransition}
 	 * references
 	 */
-	protected static Collection<BeanDefinition> getNextElements(ParserContext parserContext, String stepId,
+	public static Collection<BeanDefinition> getNextElements(ParserContext parserContext, String stepId,
 			BeanDefinition stateDef, Element element) {
 
 		Collection<BeanDefinition> list = new ArrayList<BeanDefinition>();
@@ -283,7 +283,7 @@ public abstract class AbstractFlowParser extends AbstractSingleBeanDefinitionPar
 		else if (hasNextAttribute) {
 			parserContext.getReaderContext().error(
 					"The <" + element.getNodeName() + "/> may not contain a '" + NEXT_ATTR
-							+ "' attribute and a transition element", element);
+					+ "' attribute and a transition element", element);
 		}
 
 		return list;
@@ -390,7 +390,7 @@ public abstract class AbstractFlowParser extends AbstractSingleBeanDefinitionPar
 	 * @return the BatchStatus corresponding to the transition name
 	 */
 	private static FlowExecutionStatus getBatchStatusFromEndTransitionName(String elementName) {
-        elementName = stripNamespace(elementName);
+		elementName = stripNamespace(elementName);
 		if (STOP_ELE.equals(elementName)) {
 			return FlowExecutionStatus.STOPPED;
 		}
@@ -405,17 +405,17 @@ public abstract class AbstractFlowParser extends AbstractSingleBeanDefinitionPar
 		}
 	}
 
-    /**
-     * Strip the namespace from the element name if it exists.
-     */
-    private static String stripNamespace(String elementName){
-        if(elementName.startsWith("batch:")){
-            return elementName.substring(6);
-        }
-        else{
-            return elementName;
-        }
-    }
+	/**
+	 * Strip the namespace from the element name if it exists.
+	 */
+	private static String stripNamespace(String elementName){
+		if(elementName.startsWith("batch:")){
+			return elementName.substring(6);
+		}
+		else{
+			return elementName;
+		}
+	}
 
 	/**
 	 * @param parserContext the parser context

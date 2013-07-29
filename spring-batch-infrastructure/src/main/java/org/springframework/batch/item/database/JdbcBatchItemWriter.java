@@ -42,7 +42,7 @@ import org.springframework.util.Assert;
  * provided.</p>
  *
  * The user must provide an SQL query and a special callback in the for of either
- * {@link ItemPreparedStatementSetter}, or a {@link ItemSqlParameterSourceProvider}.
+ * {@link ItemPreparedStatementSetter} or {@link ItemSqlParameterSourceProvider}.
  * You can use either named parameters or the traditional '?' placeholders. If you use the
  * named parameter support then you should provide a {@link ItemSqlParameterSourceProvider},
  * otherwise you should provide a  {@link ItemPreparedStatementSetter}.

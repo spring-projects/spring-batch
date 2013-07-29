@@ -10,6 +10,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Properties;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -211,5 +212,19 @@ public class JobParametersTests {
 	@Test
 	public void testDateReturnsNullWhenKeyDoesntExit(){
 		assertNull(new JobParameters().getDate("keythatdoesntexist"));
+	}
+
+	@Test
+	public void testToProperties() {
+		Properties results = parameters.toProperties();
+
+		assertEquals(results.get("string.key1"), "value1");
+		assertEquals(results.get("string.key2"), "value2");
+		assertEquals(results.get("long.key1"), "1");
+		assertEquals(results.get("long.key2"), "2");
+		assertEquals(results.get("double.key1"), "1.1");
+		assertEquals(results.get("double.key2"), "2.2");
+		assertEquals(results.get("date.key1"), String.valueOf(date1.getTime()));
+		assertEquals(results.get("date.key2"), String.valueOf(date2.getTime()));
 	}
 }

@@ -7,6 +7,9 @@ import javax.xml.stream.events.XMLEvent;
 import junit.framework.TestCase;
 
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.times;
 
 /**
  * Tests for {@link NoStartEndDocumentStreamWriter}
@@ -43,5 +46,15 @@ public class NoStartEndDocumentWriterTests extends TestCase {
 		writer.add(event);
 		writer.add(eventFactory.createEndDocument());
 
+	}
+	
+	/**
+	 * Close is not delegated to the wrapped writer. Instead, the wrapped writer is flushed.
+	 */
+	public void testClose() throws Exception {
+		writer.close();
+		
+		verify(wrappedWriter, times(1)).flush();
+		verify(wrappedWriter, never()).close();
 	}
 }

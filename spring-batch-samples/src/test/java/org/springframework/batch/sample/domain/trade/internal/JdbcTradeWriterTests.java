@@ -26,6 +26,7 @@ import javax.sql.DataSource;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.batch.sample.domain.trade.Trade;
+import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.jdbc.core.JdbcOperations;
@@ -38,11 +39,13 @@ import org.springframework.transaction.annotation.Transactional;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(locations = {"/data-source-context.xml"})
-public class JdbcTradeWriterTests {
+public class JdbcTradeWriterTests implements InitializingBean {
 
 	private JdbcOperations jdbcTemplate;
 
 	private JdbcTradeDao writer;
+
+	private AbstractDataFieldMaxValueIncrementer incrementer;
 
 	@Autowired
 	public void setDataSource(DataSource dataSource) {
@@ -55,7 +58,7 @@ public class JdbcTradeWriterTests {
 	@Autowired
 	public void setIncrementer(@Qualifier("incrementerParent") AbstractDataFieldMaxValueIncrementer incrementer) {
 		incrementer.setIncrementerName("TRADE_SEQ");
-		this.writer.setIncrementer(incrementer);
+		this.incrementer = incrementer;
 	}
 
 	@Transactional @Test
@@ -69,12 +72,18 @@ public class JdbcTradeWriterTests {
 
 		writer.writeTrade(trade);
 
-        jdbcTemplate.query("SELECT * FROM TRADE WHERE ISIN = '5647238492'", new RowCallbackHandler() {
+		jdbcTemplate.query("SELECT * FROM TRADE WHERE ISIN = '5647238492'", new RowCallbackHandler() {
+			@Override
 			public void processRow(ResultSet rs) throws SQLException {
 				assertEquals("testCustomer", rs.getString("CUSTOMER"));
 				assertEquals(new BigDecimal(Double.toString(99.69)), rs.getBigDecimal("PRICE"));
 				assertEquals(5,rs.getLong("QUANTITY"));
 			}
 		});
+	}
+
+	@Override
+	public void afterPropertiesSet() throws Exception {
+		this.writer.setIncrementer(incrementer);
 	}
 }

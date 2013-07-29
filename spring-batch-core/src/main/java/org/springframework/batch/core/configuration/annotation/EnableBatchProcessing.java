@@ -21,6 +21,8 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
+import javax.sql.DataSource;
+
 import org.springframework.batch.core.configuration.JobRegistry;
 import org.springframework.batch.core.configuration.support.ApplicationContextFactory;
 import org.springframework.batch.core.configuration.support.AutomaticJobRegistrar;
@@ -37,7 +39,7 @@ import org.springframework.transaction.PlatformTransactionManager;
  * <pre class="code">
  * &#064;Configuration
  * &#064;EnableBatchProcessing
- * &#064;Import(DataSourceCnfiguration.class)
+ * &#064;Import(DataSourceConfiguration.class)
  * public class AppConfig {
  *
  * 	&#064;Autowired

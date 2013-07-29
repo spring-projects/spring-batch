@@ -16,8 +16,6 @@
 
 package org.springframework.batch.core.step.item;
 
-import org.springframework.classify.BinaryExceptionClassifier;
-import org.springframework.classify.Classifier;
 import org.springframework.batch.core.StepContribution;
 import org.springframework.batch.core.step.skip.LimitCheckingItemSkipPolicy;
 import org.springframework.batch.core.step.skip.NonSkippableReadException;
@@ -27,6 +25,8 @@ import org.springframework.batch.core.step.skip.SkipPolicy;
 import org.springframework.batch.core.step.skip.SkipPolicyFailedException;
 import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.repeat.RepeatOperations;
+import org.springframework.classify.BinaryExceptionClassifier;
+import org.springframework.classify.Classifier;
 
 /**
  * FaultTolerant implementation of the {@link ChunkProcessor} interface, that
@@ -53,7 +53,7 @@ public class FaultTolerantChunkProvider<I> extends SimpleChunkProvider<I> {
 	public FaultTolerantChunkProvider(ItemReader<? extends I> itemReader, RepeatOperations repeatOperations) {
 		super(itemReader, repeatOperations);
 	}
-	
+
 	/**
 	 * @param maxSkipsOnRead the maximum number of skips on read
 	 */
@@ -89,6 +89,7 @@ public class FaultTolerantChunkProvider<I> extends SimpleChunkProvider<I> {
 			catch (Exception e) {
 
 				if (shouldSkip(skipPolicy, e, contribution.getStepSkipCount())) {
+
 					// increment skip count and try again
 					contribution.incrementReadSkipCount();
 					chunk.skip(e);

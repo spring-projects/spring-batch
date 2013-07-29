@@ -15,7 +15,12 @@
  */
 package org.springframework.batch.core.listener;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+
 import org.springframework.batch.core.StepListener;
+import org.springframework.batch.core.jsr.JsrStepListenerMetaData;
 
 /**
  * This {@link AbstractListenerFactoryBean} implementation is used to create a
@@ -31,12 +36,22 @@ public class StepListenerFactoryBean extends AbstractListenerFactoryBean {
 
 	@Override
 	protected ListenerMetaData getMetaDataFromPropertyName(String propertyName) {
-		return StepListenerMetaData.fromPropertyName(propertyName);
+		ListenerMetaData metaData = StepListenerMetaData.fromPropertyName(propertyName);
+
+		if(metaData == null) {
+			metaData = JsrStepListenerMetaData.fromPropertyName(propertyName);
+		}
+
+		return metaData;
 	}
 
 	@Override
 	protected ListenerMetaData[] getMetaDataValues() {
-		return StepListenerMetaData.values();
+		List<ListenerMetaData> values = new ArrayList<ListenerMetaData>();
+		Collections.addAll(values, StepListenerMetaData.values());
+		Collections.addAll(values, JsrStepListenerMetaData.values());
+
+		return values.toArray(new ListenerMetaData[0]);
 	}
 
 	@Override

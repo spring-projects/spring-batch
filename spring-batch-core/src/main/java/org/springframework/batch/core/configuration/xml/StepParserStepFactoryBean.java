@@ -33,6 +33,11 @@ import org.springframework.batch.core.Step;
 import org.springframework.batch.core.StepExecutionListener;
 import org.springframework.batch.core.StepListener;
 import org.springframework.batch.core.job.flow.Flow;
+import org.springframework.batch.core.jsr.ChunkListenerAdapter;
+import org.springframework.batch.core.jsr.ItemProcessListenerAdapter;
+import org.springframework.batch.core.jsr.ItemReadListenerAdapter;
+import org.springframework.batch.core.jsr.ItemWriteListenerAdapter;
+import org.springframework.batch.core.jsr.StepListenerAdapter;
 import org.springframework.batch.core.launch.JobLauncher;
 import org.springframework.batch.core.partition.PartitionHandler;
 import org.springframework.batch.core.partition.support.Partitioner;
@@ -59,7 +64,9 @@ import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.ItemStream;
 import org.springframework.batch.item.ItemWriter;
 import org.springframework.batch.repeat.CompletionPolicy;
+import org.springframework.batch.repeat.policy.CompositeCompletionPolicy;
 import org.springframework.batch.repeat.policy.SimpleCompletionPolicy;
+import org.springframework.batch.repeat.policy.TimeoutTerminationPolicy;
 import org.springframework.batch.repeat.support.TaskExecutorRepeatTemplate;
 import org.springframework.beans.factory.BeanNameAware;
 import org.springframework.beans.factory.FactoryBean;
@@ -83,13 +90,14 @@ import org.springframework.util.Assert;
  *
  * @author Dan Garrette
  * @author Josh Long
+ * @author Michael Minella
  * @see SimpleStepFactoryBean
  * @see FaultTolerantStepFactoryBean
  * @see TaskletStep
  * @since 2.0
  */
 @SuppressWarnings("rawtypes")
-class StepParserStepFactoryBean<I, O> implements FactoryBean, BeanNameAware {
+public class StepParserStepFactoryBean<I, O> implements FactoryBean, BeanNameAware {
 
 	//
 	// Step Attributes
@@ -109,7 +117,7 @@ class StepParserStepFactoryBean<I, O> implements FactoryBean, BeanNameAware {
 
 	private PlatformTransactionManager transactionManager;
 
-	private Set<StepExecutionListener> stepExecutionListeners = new LinkedHashSet<StepExecutionListener>();
+	private Set<Object> stepExecutionListeners = new LinkedHashSet<Object>();
 
 	//
 	// Flow Elements
@@ -188,6 +196,8 @@ class StepParserStepFactoryBean<I, O> implements FactoryBean, BeanNameAware {
 
 	private ItemWriter<? super O> itemWriter;
 
+	private Integer timeout;
+
 	//
 	// Chunk Elements
 	//
@@ -214,8 +224,6 @@ class StepParserStepFactoryBean<I, O> implements FactoryBean, BeanNameAware {
 
 	private StepExecutionAggregator stepExecutionAggregator;
 
-	private StepListener[] listeners;
-
 	/**
 	 * Create a {@link Step} from the configuration provided.
 	 *
@@ -228,6 +236,7 @@ class StepParserStepFactoryBean<I, O> implements FactoryBean, BeanNameAware {
 					+ "] has both a <chunk/> element and a 'ref' attribute  referencing a Tasklet.");
 
 			validateFaultTolerantSettings();
+
 			if (isFaultTolerant()) {
 				return createFaultTolerantStep();
 			}
@@ -264,8 +273,12 @@ class StepParserStepFactoryBean<I, O> implements FactoryBean, BeanNameAware {
 		}
 		builder.repository(jobRepository);
 		builder.transactionManager(transactionManager);
-		for (StepExecutionListener listener : stepExecutionListeners) {
-			builder.listener(listener);
+		for (Object listener : stepExecutionListeners) {
+			if(listener instanceof StepExecutionListener) {
+				builder.listener((StepExecutionListener) listener);
+			} else if(listener instanceof StepListener) {
+				builder.listener(new StepListenerAdapter((javax.batch.api.listener.StepListener) listener));
+			}
 		}
 	}
 
@@ -384,15 +397,26 @@ class StepParserStepFactoryBean<I, O> implements FactoryBean, BeanNameAware {
 	@SuppressWarnings("unchecked")
 	private Step createSimpleStep() {
 		SimpleStepBuilder builder = new SimpleStepBuilder(new StepBuilder(name));
-		if (commitInterval != null) {
+
+		if(timeout != null && commitInterval != null) {
+			CompositeCompletionPolicy completionPolicy = new CompositeCompletionPolicy();
+			CompletionPolicy [] policies = new CompletionPolicy[2];
+			policies[0] = new SimpleCompletionPolicy(commitInterval);
+			policies[1] = new TimeoutTerminationPolicy(timeout * 1000);
+			completionPolicy.setPolicies(policies);
+			builder.chunk(completionPolicy);
+		} else if(timeout != null) {
+			builder.chunk(new TimeoutTerminationPolicy(timeout * 1000));
+		} else if(commitInterval != null) {
 			builder.chunk(commitInterval);
 		}
+
+		builder.chunk(chunkCompletionPolicy);
 		enhanceTaskletStepBuilder(builder);
 		registerItemListeners(builder);
 		builder.reader(itemReader);
 		builder.writer(itemWriter);
 		builder.processor(itemProcessor);
-		builder.chunk(chunkCompletionPolicy);
 		return builder.build();
 	}
 
@@ -699,11 +723,11 @@ class StepParserStepFactoryBean<I, O> implements FactoryBean, BeanNameAware {
 	 *
 	 * @param listeners an array of listeners
 	 */
-	public void setListeners(StepListener[] listeners) {
-		this.listeners = listeners; // useful for testing
-		for (StepListener listener : listeners) {
+	@SuppressWarnings("unchecked")
+	public void setListeners(Object[] listeners) {
+		//		this.listeners = listeners; // useful for testing
+		for (Object listener : listeners) {
 			if (listener instanceof SkipListener) {
-				@SuppressWarnings("unchecked")
 				SkipListener<I, O> skipListener = (SkipListener<I, O>) listener;
 				skipListeners.add(skipListener);
 			}
@@ -711,24 +735,41 @@ class StepParserStepFactoryBean<I, O> implements FactoryBean, BeanNameAware {
 				StepExecutionListener stepExecutionListener = (StepExecutionListener) listener;
 				stepExecutionListeners.add(stepExecutionListener);
 			}
+			if(listener instanceof javax.batch.api.listener.StepListener) {
+				StepExecutionListener stepExecutionListener = new StepListenerAdapter((javax.batch.api.listener.StepListener) listener);
+				stepExecutionListeners.add(stepExecutionListener);
+			}
 			if (listener instanceof ChunkListener) {
 				ChunkListener chunkListener = (ChunkListener) listener;
 				chunkListeners.add(chunkListener);
 			}
+			if(listener instanceof javax.batch.api.chunk.listener.ChunkListener) {
+				ChunkListener chunkListener = new ChunkListenerAdapter((javax.batch.api.chunk.listener.ChunkListener) listener);
+				chunkListeners.add(chunkListener);
+			}
 			if (listener instanceof ItemReadListener) {
-				@SuppressWarnings("unchecked")
 				ItemReadListener<I> readListener = (ItemReadListener<I>) listener;
 				readListeners.add(readListener);
 			}
+			if(listener instanceof javax.batch.api.chunk.listener.ItemReadListener) {
+				ItemReadListener itemListener = new ItemReadListenerAdapter((javax.batch.api.chunk.listener.ItemReadListener) listener);
+				readListeners.add(itemListener);
+			}
 			if (listener instanceof ItemWriteListener) {
-				@SuppressWarnings("unchecked")
 				ItemWriteListener<O> writeListener = (ItemWriteListener<O>) listener;
 				writeListeners.add(writeListener);
 			}
+			if(listener instanceof javax.batch.api.chunk.listener.ItemWriteListener) {
+				ItemWriteListener itemListener = new ItemWriteListenerAdapter((javax.batch.api.chunk.listener.ItemWriteListener) listener);
+				writeListeners.add(itemListener);
+			}
 			if (listener instanceof ItemProcessListener) {
-				@SuppressWarnings("unchecked")
 				ItemProcessListener<I, O> processListener = (ItemProcessListener<I, O>) listener;
 				processListeners.add(processListener);
+			}
+			if(listener instanceof javax.batch.api.chunk.listener.ItemProcessListener) {
+				ItemProcessListener itemListener = new ItemProcessListenerAdapter((javax.batch.api.chunk.listener.ItemProcessListener) listener);
+				processListeners.add(itemListener);
 			}
 		}
 	}
@@ -973,6 +1014,10 @@ class StepParserStepFactoryBean<I, O> implements FactoryBean, BeanNameAware {
 	 */
 	public void setStreams(ItemStream[] streams) {
 		this.streams = streams;
+	}
+
+	public void setTimeout(Integer timeout) {
+		this.timeout = timeout;
 	}
 
 	// =========================================================

@@ -92,7 +92,6 @@ public class InlineItemHandlerParserTests {
 		Map<String,ItemReader> readers = context.getBeansOfType(ItemReader.class);
 		// Should be 2 each (proxy and target) for the two readers in the steps defined
 		assertEquals(4, readers.size());
-		// System.err.println(readers);
 	}
 
 }

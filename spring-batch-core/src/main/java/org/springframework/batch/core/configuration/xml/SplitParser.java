@@ -84,14 +84,13 @@ public class SplitParser {
 			stateBuilder.addPropertyValue("taskExecutor", taskExecutorRef);
 		}
 
-		@SuppressWarnings("unchecked")
 		List<Element> flowElements = DomUtils.getChildElementsByTagName(element, "flow");
 
 		if (flowElements.size() < 2) {
 			parserContext.getReaderContext().error("A <split/> must contain at least two 'flow' elements.", element);
 		}
 
-		@SuppressWarnings("unchecked")
+		@SuppressWarnings({"rawtypes", "unchecked"})
 		Collection<Object> flows = new ManagedList();
 		int i = 0;
 		String prefix = idAttribute;

@@ -140,6 +140,7 @@ public class SimpleJobExplorer implements JobExplorer {
 		if (jobExecution == null) {
 			return null;
 		}
+		getJobExecutionDependencies(jobExecution);
 		StepExecution stepExecution = stepExecutionDao.getStepExecution(jobExecution, executionId);
 		getStepExecutionDependencies(stepExecution);
 		return stepExecution;

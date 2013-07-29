@@ -429,10 +429,8 @@ public class FaultTolerantStepBuilder<I, O> extends SimpleStepBuilder<I, O> {
 	 * Register explicitly set item listeners and auto-register reader, processor and writer if applicable
 	 */
 	private void registerSkipListeners() {
-
 		// auto-register reader, processor and writer
 		for (Object itemHandler : new Object[] { getReader(), getWriter(), getProcessor() }) {
-
 			if (StepListenerFactoryBean.isListener(itemHandler)) {
 				StepListener listener = StepListenerFactoryBean.getListener(itemHandler);
 				if (listener instanceof SkipListener<?, ?>) {

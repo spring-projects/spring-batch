@@ -9,11 +9,12 @@
   <parent>
     <groupId>org.springframework.batch</groupId>
     <artifactId>spring-batch-parent</artifactId>
-    <version>3.0.0.BUILD-SNAPSHOT</version>
+    <version>2.2.2.BUILD-SNAPSHOT</version>
     <relativePath>../spring-batch-parent</relativePath>
   </parent>
   <modules>
     <module>simple-cli</module>
+    <module>simple-cli-javaconfig</module>
   </modules>
   <build>
     <pluginManagement>
