@@ -22,7 +22,7 @@ import org.springframework.util.Assert;
 
 /**
  * Wrapper class for {@link javax.batch.api.chunk.listener.ItemProcessListener}
- * 
+ *
  * @author Michael Minella
  *
  * @param <T> input type
@@ -64,7 +64,7 @@ public class ItemProcessListenerAdapter<T,S> implements ItemProcessListener<T, S
 		try {
 			delegate.onProcessError(item, e);
 		} catch (Exception e1) {
-			throw new BatchRuntimeException(e);
+			throw new BatchRuntimeException(e1);
 		}
 	}
 }

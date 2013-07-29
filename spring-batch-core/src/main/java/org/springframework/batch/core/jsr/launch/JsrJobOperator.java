@@ -21,6 +21,7 @@ import java.util.List;
 import java.util.Properties;
 import java.util.Set;
 
+import javax.batch.operations.BatchRuntimeException;
 import javax.batch.operations.JobExecutionAlreadyCompleteException;
 import javax.batch.operations.JobExecutionIsRunningException;
 import javax.batch.operations.JobExecutionNotMostRecentException;
@@ -62,29 +63,29 @@ import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseBuilder;
 /**
  * The entrance for executing batch jobs as defined by JSR-352.  This class provides
  * a base {@link ApplicationContext} that is the equivalent to the following:
- * 
+ *
  * <pre class="code">
  * 	&#064;Configuration
  * 	&#064;EnableBatchProcessing
  * 	public static class BaseConfiguration extends DefaultBatchConfigurer {
- * 
+ *
  * 		&#064;Bean
  * 		JobLauncher jobLauncher() { ... }
- * 
+ *
  * 		&#064;Bean
  * 		org.springframework.batch.core.launch.JobOperator batchJobOperator(JobExplorer jobExplorer,
  * 																		   JobLauncher jobLauncher,
  * 																		   JobRepository jobRepository,
  * 																		   JobRegistry jobRegistry)  { ... }
- * 
+ *
  * 		&#064;Bean
  * 		JobExplorerFactoryBean jobExplorer(final DataSource dataSource)  { ... }
- * 
+ *
  * 		&#064;Bean
  * 		DataSource dataSource()  { ... }
  * 	}
  * </pre>
- * 
+ *
  * @author Michael Minella
  * @since 3.0
  * @see EnableBatchProcessing
@@ -105,6 +106,7 @@ public class JsrJobOperator implements JobOperator {
 			((SimpleJobLauncher) jobLauncher).afterPropertiesSet();
 			((SimpleJobOperator) batchJobOperator).afterPropertiesSet();
 		} catch (Exception e) {
+			throw new BatchRuntimeException("Unable to bootstrap JobOperator", e);
 		}
 	}
 
@@ -220,6 +222,7 @@ public class JsrJobOperator implements JobOperator {
 	}
 
 	@Override
+	@SuppressWarnings("resource")
 	public long start(String jobName, Properties params) throws JobStartException,
 	JobSecurityException {
 		GenericXmlApplicationContext batchContext = new GenericXmlApplicationContext();

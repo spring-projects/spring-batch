@@ -31,18 +31,16 @@ import org.springframework.batch.core.listener.ListenerMetaData;
  * @since 3.0
  */
 public enum JsrJobListenerMetaData implements ListenerMetaData {
-	BEFORE_JOB("beforeJob", "jsr-before-job", null),
-	AFTER_JOB("afterJob", "jsr-after-job", null);
+	BEFORE_JOB("beforeJob", "jsr-before-job"),
+	AFTER_JOB("afterJob", "jsr-after-job");
 
 	private final String methodName;
 	private final String propertyName;
-	private final Class<? extends Annotation> annotation;
 	private static final Map<String, JsrJobListenerMetaData> propertyMap;
 
-	JsrJobListenerMetaData(String methodName, String propertyName, Class<? extends Annotation> annotation) {
+	JsrJobListenerMetaData(String methodName, String propertyName) {
 		this.methodName = methodName;
 		this.propertyName = propertyName;
-		this.annotation = annotation;
 	}
 
 	static{
@@ -59,7 +57,7 @@ public enum JsrJobListenerMetaData implements ListenerMetaData {
 
 	@Override
 	public Class<? extends Annotation> getAnnotation() {
-		return annotation;
+		return null;
 	}
 
 	@Override

@@ -402,7 +402,7 @@ public class StepParserStepFactoryBean<I, O> implements FactoryBean, BeanNameAwa
 			CompositeCompletionPolicy completionPolicy = new CompositeCompletionPolicy();
 			CompletionPolicy [] policies = new CompletionPolicy[2];
 			policies[0] = new SimpleCompletionPolicy(commitInterval);
-			policies[1] = new TimeoutTerminationPolicy(timeout);
+			policies[1] = new TimeoutTerminationPolicy(timeout * 1000);
 			completionPolicy.setPolicies(policies);
 			builder.chunk(completionPolicy);
 		} else if(timeout != null) {

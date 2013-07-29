@@ -3,6 +3,7 @@ package org.springframework.batch.core.jsr;
 import javax.batch.api.chunk.listener.SkipProcessListener;
 import javax.batch.api.chunk.listener.SkipReadListener;
 import javax.batch.api.chunk.listener.SkipWriteListener;
+import javax.batch.operations.BatchRuntimeException;
 
 import org.springframework.batch.core.SkipListener;
 
@@ -24,14 +25,14 @@ public class SkipListenerAdapter<T, S> implements SkipListener<T, S> {
 			try {
 				skipReadDelegate.onSkipReadItem((Exception) t);
 			} catch (Exception e) {
-				//TODO: Do something here
+				throw new BatchRuntimeException(e);
 			}
 		}
 	}
 
 	@Override
 	public void onSkipInWrite(S item, Throwable t) {
-		//TODO: Awating information on the JSR's method
+		//TODO: This will take more than just wrapping...
 	}
 
 	@Override
@@ -40,7 +41,7 @@ public class SkipListenerAdapter<T, S> implements SkipListener<T, S> {
 			try {
 				skipProcessDelegate.onSkipProcessItem(item, (Exception) t);
 			} catch (Exception e) {
-				//TODO: Do something here
+				throw new BatchRuntimeException(e);
 			}
 		}
 	}

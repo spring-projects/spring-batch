@@ -67,7 +67,7 @@ public class ChunkListenerAdapter implements ChunkListener {
 				throw new BatchRuntimeException(e);
 			}
 		} else {
-			throw new BatchRuntimeException("Unable to retrieve causing exception");
+			throw new BatchRuntimeException("Unable to retrieve causing exception due to null ChunkContext");
 		}
 	}
 }
