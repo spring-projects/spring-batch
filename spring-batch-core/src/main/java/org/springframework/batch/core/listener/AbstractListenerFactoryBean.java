@@ -71,7 +71,6 @@ public abstract class AbstractListenerFactoryBean implements FactoryBean, Initia
 
 	@Override
 	public Object getObject() {
-
 		if (metaDataMap == null) {
 			metaDataMap = new HashMap<String, String>();
 		}
@@ -92,12 +91,10 @@ public abstract class AbstractListenerFactoryBean implements FactoryBean, Initia
 		Map<String, Set<MethodInvoker>> invokerMap = new HashMap<String, Set<MethodInvoker>>();
 		boolean synthetic = false;
 		for (Entry<String, String> entry : metaDataMap.entrySet()) {
-
 			final ListenerMetaData metaData = this.getMetaDataFromPropertyName(entry.getKey());
 			Set<MethodInvoker> invokers = new HashSet<MethodInvoker>();
 
 			MethodInvoker invoker;
-
 			invoker = getMethodInvokerForInterface(metaData.getListenerInterface(), metaData.getMethodName(), delegate,
 					metaData.getParamTypes());
 			if (invoker != null) {
@@ -110,10 +107,12 @@ public abstract class AbstractListenerFactoryBean implements FactoryBean, Initia
 				synthetic = true;
 			}
 
-			invoker = getMethodInvokerByAnnotation(metaData.getAnnotation(), delegate, metaData.getParamTypes());
-			if (invoker != null) {
-				invokers.add(invoker);
-				synthetic = true;
+			if(metaData.getAnnotation() != null) {
+				invoker = getMethodInvokerByAnnotation(metaData.getAnnotation(), delegate, metaData.getParamTypes());
+				if (invoker != null) {
+					invokers.add(invoker);
+					synthetic = true;
+				}
 			}
 
 			if (!invokers.isEmpty()) {

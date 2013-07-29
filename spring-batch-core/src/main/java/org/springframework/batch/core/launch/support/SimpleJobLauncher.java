@@ -25,12 +25,18 @@ import org.springframework.batch.core.JobInstance;
 import org.springframework.batch.core.JobParameters;
 import org.springframework.batch.core.JobParametersInvalidException;
 import org.springframework.batch.core.StepExecution;
+import org.springframework.batch.core.jsr.JobContext;
 import org.springframework.batch.core.launch.JobLauncher;
 import org.springframework.batch.core.repository.JobExecutionAlreadyRunningException;
 import org.springframework.batch.core.repository.JobInstanceAlreadyCompleteException;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.repository.JobRestartException;
+import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.InitializingBean;
+import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.ApplicationContextAware;
+import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.core.task.SyncTaskExecutor;
 import org.springframework.core.task.TaskExecutor;
 import org.springframework.core.task.TaskRejectedException;
@@ -55,19 +61,22 @@ import org.springframework.util.Assert;
  * @author Lucas Ward
  * @Author Dave Syer
  * @author Will Schipp
+ * @author Michael Minella
  *
  * @since 1.0
  *
  * @see JobRepository
  * @see TaskExecutor
  */
-public class SimpleJobLauncher implements JobLauncher, InitializingBean {
+public class SimpleJobLauncher implements JobLauncher, InitializingBean, ApplicationContextAware {
 
 	protected static final Log logger = LogFactory.getLog(SimpleJobLauncher.class);
 
 	private JobRepository jobRepository;
 
 	private TaskExecutor taskExecutor;
+
+	private ApplicationContext context;
 
 	/**
 	 * Run the provided job with the given {@link JobParameters}. The
@@ -106,15 +115,15 @@ public class SimpleJobLauncher implements JobLauncher, InitializingBean {
 			for (StepExecution execution : lastExecution.getStepExecutions()) {
 				if (execution.getStatus() == BatchStatus.UNKNOWN) {
 					//throw
-					throw new JobRestartException("Step [" + execution.getStepName() + "] is of status UNKNOWN"); 
+					throw new JobRestartException("Step [" + execution.getStepName() + "] is of status UNKNOWN");
 				}//end if
-			}//end for			
+			}//end for
 		}
 
 		// Check the validity of the parameters before doing creating anything
 		// in the repository...
 		job.getJobParametersValidator().validate(jobParameters);
-		
+
 		/*
 		 * There is a very small probability that a non-restartable job can be
 		 * restarted, but only if another process or thread manages to launch
@@ -122,6 +131,11 @@ public class SimpleJobLauncher implements JobLauncher, InitializingBean {
 		 * assertion and the next method returning successfully.
 		 */
 		jobExecution = jobRepository.createJobExecution(job.getName(), jobParameters);
+
+		if(context != null && context instanceof ConfigurableApplicationContext) {
+			ConfigurableListableBeanFactory factory = ((ConfigurableApplicationContext)context).getBeanFactory();
+			factory.registerSingleton(job.getName() + "_" + jobExecution.getId() + "_jobContext", new JobContext(jobExecution));
+		}
 
 		try {
 			taskExecutor.execute(new Runnable() {
@@ -196,4 +210,9 @@ public class SimpleJobLauncher implements JobLauncher, InitializingBean {
 		}
 	}
 
+	@Override
+	public void setApplicationContext(ApplicationContext context)
+			throws BeansException {
+		this.context = context;
+	}
 }

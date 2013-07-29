@@ -21,6 +21,7 @@ package org.springframework.batch.core;
  * 
  * @author Lucas Ward
  * @author Dave Syer
+ * @author Michael Minella
  */
 public enum BatchStatus {
 
@@ -76,8 +77,9 @@ public enum BatchStatus {
 			return max(this, other);
 		}
 		// Both less than or equal to STARTED
-		if (this == COMPLETED || other == COMPLETED)
+		if (this == COMPLETED || other == COMPLETED) {
 			return COMPLETED;
+		}
 		return max(this, other);
 	}
 
@@ -103,6 +105,29 @@ public enum BatchStatus {
 	 */
 	public boolean isLessThanOrEqualTo(BatchStatus other) {
 		return this.compareTo(other) <= 0;
+	}
+
+	/**
+	 * Converts the current status to the JSR-352 equivalent
+	 * 
+	 * @return JSR-352 equivalent to the current status
+	 */
+	public javax.batch.runtime.BatchStatus getBatchStatus() {
+		if(this == ABANDONED) {
+			return javax.batch.runtime.BatchStatus.ABANDONED;
+		} else if(this == COMPLETED) {
+			return javax.batch.runtime.BatchStatus.COMPLETED;
+		} else if(this == STARTED) {
+			return javax.batch.runtime.BatchStatus.STARTED;
+		} else if(this == STARTING) {
+			return javax.batch.runtime.BatchStatus.STARTING;
+		} else if(this == STOPPED) {
+			return javax.batch.runtime.BatchStatus.STOPPED;
+		} else if(this == STOPPING) {
+			return javax.batch.runtime.BatchStatus.STOPPING;
+		} else {
+			return javax.batch.runtime.BatchStatus.FAILED;
+		}
 	}
 
 	/**

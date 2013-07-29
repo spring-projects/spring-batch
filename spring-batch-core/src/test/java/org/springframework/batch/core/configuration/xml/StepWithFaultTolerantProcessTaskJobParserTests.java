@@ -19,13 +19,15 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
+import java.util.Set;
+
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.batch.core.BatchStatus;
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.JobParameters;
-import org.springframework.batch.core.StepListener;
+import org.springframework.batch.core.StepExecutionListener;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.item.ItemStream;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -40,7 +42,7 @@ import org.springframework.transaction.annotation.Propagation;
 
 /**
  * @author Thomas Risberg
- * 
+ *
  */
 @ContextConfiguration
 @RunWith(SpringJUnit4ClassRunner.class)
@@ -71,6 +73,7 @@ public class StepWithFaultTolerantProcessTaskJobParserTests {
 	@Autowired
 	private StepParserStepFactoryBean<?, ?> factory;
 
+	@SuppressWarnings("unchecked")
 	@Test
 	public void testStepWithTask() throws Exception {
 		assertNotNull(job);
@@ -91,8 +94,8 @@ public class StepWithFaultTolerantProcessTaskJobParserTests {
 		assertEquals("wrong reader-transactional-queue:", true, txq);
 		Object te = ReflectionTestUtils.getField(factory, "taskExecutor");
 		assertEquals("wrong task-executor:", ConcurrentTaskExecutor.class, te.getClass());
-		Object listeners = ReflectionTestUtils.getField(factory, "listeners");
-		assertEquals("wrong number of listeners:", 2, ((StepListener[]) listeners).length);
+		Object listeners = ReflectionTestUtils.getField(factory, "stepExecutionListeners");
+		assertEquals("wrong number of listeners:", 2, ((Set<StepExecutionListener>) listeners).size());
 		Object retryListeners = ReflectionTestUtils.getField(factory, "retryListeners");
 		assertEquals("wrong number of retry-listeners:", 2, ((RetryListener[]) retryListeners).length);
 		Object streams = ReflectionTestUtils.getField(factory, "streams");
