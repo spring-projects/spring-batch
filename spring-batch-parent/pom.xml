@@ -3,7 +3,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>org.springframework.batch</groupId>
 	<artifactId>spring-batch-parent</artifactId>
-	<version>2.2.2.BUILD-SNAPSHOT</version>
+	<version>3.0.0.BUILD-SNAPSHOT</version>
 	<name>Spring Batch Parent</name>
 	<description>Spring Batch parent project.  Defines dependencies and common configuration for the build process.</description>
 	<url>http://static.springframework.org/spring-batch/${project.artifactId}</url>
@@ -33,7 +33,7 @@
 		</developer>
 	</developers>
 	<properties>
-		<spring.framework.version>3.2.3.RELEASE</spring.framework.version>
+		<spring.framework.version>3.2.0.RELEASE</spring.framework.version>
 		<spring.amqp.version>1.1.2.RELEASE</spring.amqp.version>
 		<junit.version>4.10</junit.version>
 		<bundlor.version>1.0.0.RELEASE</bundlor.version>
