@@ -15,13 +15,12 @@
  */
 package org.springframework.batch.core.launch.support;
 
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
-
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 import java.util.Arrays;
 import java.util.Collections;
@@ -112,7 +111,7 @@ public class SimpleJobOperatorTests {
 			@Override
 			public JobExecution run(Job job, JobParameters jobParameters) throws JobExecutionAlreadyRunningException,
 			JobRestartException, JobInstanceAlreadyCompleteException {
-				return new JobExecution(new JobInstance(123L, job.getName()), 999L, jobParameters);
+				return new JobExecution(new JobInstance(123L, job.getName()), 999L, jobParameters, null);
 			}
 		});
 
@@ -192,7 +191,7 @@ public class SimpleJobOperatorTests {
 	@Test
 	public void testResumeSunnyDay() throws Exception {
 		jobParameters = new JobParameters();
-		when(jobExplorer.getJobExecution(111l)).thenReturn(new JobExecution(new JobInstance(123L, job.getName()), 111L, jobParameters));
+		when(jobExplorer.getJobExecution(111l)).thenReturn(new JobExecution(new JobInstance(123L, job.getName()), 111L, jobParameters, null));
 		jobExplorer.getJobExecution(111L);
 		Long value = jobOperator.restart(111L);
 		assertEquals(999, value.longValue());
@@ -201,7 +200,7 @@ public class SimpleJobOperatorTests {
 	@Test
 	public void testGetSummarySunnyDay() throws Exception {
 		jobParameters = new JobParameters();
-		JobExecution jobExecution = new JobExecution(new JobInstance(123L, job.getName()), 111L, jobParameters);
+		JobExecution jobExecution = new JobExecution(new JobInstance(123L, job.getName()), 111L, jobParameters, null);
 		when(jobExplorer.getJobExecution(111L)).thenReturn(jobExecution);
 		jobExplorer.getJobExecution(111L);
 		String value = jobOperator.getSummary(111L);
@@ -224,7 +223,7 @@ public class SimpleJobOperatorTests {
 	public void testGetStepExecutionSummariesSunnyDay() throws Exception {
 		jobParameters = new JobParameters();
 
-		JobExecution jobExecution = new JobExecution(new JobInstance(123L, job.getName()), 111L, jobParameters);
+		JobExecution jobExecution = new JobExecution(new JobInstance(123L, job.getName()), 111L, jobParameters, null);
 		jobExecution.createStepExecution("step1");
 		jobExecution.createStepExecution("step2");
 		jobExecution.getStepExecutions().iterator().next().setId(21L);
@@ -248,7 +247,7 @@ public class SimpleJobOperatorTests {
 	@Test
 	public void testFindRunningExecutionsSunnyDay() throws Exception {
 		jobParameters = new JobParameters();
-		JobExecution jobExecution = new JobExecution(new JobInstance(123L, job.getName()), 111L, jobParameters);
+		JobExecution jobExecution = new JobExecution(new JobInstance(123L, job.getName()), 111L, jobParameters, null);
 		when(jobExplorer.findRunningJobExecutions("foo")).thenReturn(Collections.singleton(jobExecution));
 		Set<Long> value = jobOperator.getRunningExecutions("foo");
 		assertEquals(111L, value.iterator().next().longValue());
@@ -269,7 +268,7 @@ public class SimpleJobOperatorTests {
 	@Test
 	public void testGetJobParametersSunnyDay() throws Exception {
 		final JobParameters jobParameters = new JobParameters();
-		when(jobExplorer.getJobExecution(111L)).thenReturn(new JobExecution(new JobInstance(123L, job.getName()), 111L, jobParameters));
+		when(jobExplorer.getJobExecution(111L)).thenReturn(new JobExecution(new JobInstance(123L, job.getName()), 111L, jobParameters, null));
 		String value = jobOperator.getParameters(111L);
 		assertEquals("a=b", value);
 	}
@@ -319,8 +318,8 @@ public class SimpleJobOperatorTests {
 	public void testGetExecutionsSunnyDay() throws Exception {
 		JobInstance jobInstance = new JobInstance(123L, job.getName());
 		when(jobExplorer.getJobInstance(123L)).thenReturn(jobInstance);
-		
-		JobExecution jobExecution = new JobExecution(jobInstance, 111L, jobParameters);
+
+		JobExecution jobExecution = new JobExecution(jobInstance, 111L, jobParameters, null);
 		when(jobExplorer.getJobExecutions(jobInstance)).thenReturn(Collections.singletonList(jobExecution));
 		List<Long> value = jobOperator.getExecutions(123L);
 		assertEquals(111L, value.iterator().next().longValue());
@@ -341,7 +340,7 @@ public class SimpleJobOperatorTests {
 	@Test
 	public void testStop() throws Exception{
 		JobInstance jobInstance = new JobInstance(123L, job.getName());
-		JobExecution jobExecution = new JobExecution(jobInstance, 111L, jobParameters);
+		JobExecution jobExecution = new JobExecution(jobInstance, 111L, jobParameters, null);
 		when(jobExplorer.getJobExecution(111L)).thenReturn(jobExecution);
 		jobExplorer.getJobExecution(111L);
 		jobRepository.update(jobExecution);
@@ -352,7 +351,7 @@ public class SimpleJobOperatorTests {
 	@Test
 	public void testAbort() throws Exception {
 		JobInstance jobInstance = new JobInstance(123L, job.getName());
-		JobExecution jobExecution = new JobExecution(jobInstance, 111L, jobParameters);
+		JobExecution jobExecution = new JobExecution(jobInstance, 111L, jobParameters, null);
 		jobExecution.setStatus(BatchStatus.STOPPING);
 		when(jobExplorer.getJobExecution(123L)).thenReturn(jobExecution);
 		jobRepository.update(jobExecution);
@@ -364,7 +363,7 @@ public class SimpleJobOperatorTests {
 	@Test(expected = JobExecutionAlreadyRunningException.class)
 	public void testAbortNonStopping() throws Exception {
 		JobInstance jobInstance = new JobInstance(123L, job.getName());
-		JobExecution jobExecution = new JobExecution(jobInstance, 111L, jobParameters);
+		JobExecution jobExecution = new JobExecution(jobInstance, 111L, jobParameters, null);
 		jobExecution.setStatus(BatchStatus.STARTED);
 		when(jobExplorer.getJobExecution(123L)).thenReturn(jobExecution);
 		jobRepository.update(jobExecution);

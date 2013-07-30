@@ -34,12 +34,12 @@ public class JobExecutionTests {
 		execution.setStatus(BatchStatus.FAILED);
 		execution.setVersion(21);
 
-		adapter = new JobExecution(execution);
+		adapter = new JobExecution(execution, new ParametersConverterSupport());
 	}
 
 	@Test(expected=IllegalArgumentException.class)
 	public void testCreateWithNull() {
-		adapter = new JobExecution(null);
+		adapter = new JobExecution(null, new ParametersConverterSupport());
 	}
 
 	@Test

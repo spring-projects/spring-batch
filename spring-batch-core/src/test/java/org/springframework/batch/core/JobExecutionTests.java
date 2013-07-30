@@ -35,7 +35,7 @@ import org.springframework.batch.support.SerializationUtils;
 public class JobExecutionTests {
 
 	private JobExecution execution = new JobExecution(new JobInstance(new Long(11), "foo"),
-			new Long(12), new JobParameters());
+			new Long(12), new JobParameters(), null);
 
 	@Test
 	public void testJobExecution() {
@@ -51,6 +51,12 @@ public class JobExecutionTests {
 		assertNull(execution.getEndTime());
 		execution.setEndTime(new Date(100L));
 		assertEquals(100L, execution.getEndTime().getTime());
+	}
+
+	@Test
+	public void testGetJobConfigurationName() {
+		execution = new JobExecution(new JobInstance(null, "foo"), null, "/META-INF/batch-jobs/someJob.xml");
+		assertEquals("/META-INF/batch-jobs/someJob.xml", execution.getJobConfigurationName());
 	}
 
 	/**
@@ -126,7 +132,7 @@ public class JobExecutionTests {
 	@Test
 	public void testGetJobId() {
 		assertEquals(11, execution.getJobId().longValue());
-		execution = new JobExecution(new JobInstance(new Long(23), "testJob"), null, new JobParameters());
+		execution = new JobExecution(new JobInstance(new Long(23), "testJob"), null, new JobParameters(), null);
 		assertEquals(23, execution.getJobId().longValue());
 	}
 

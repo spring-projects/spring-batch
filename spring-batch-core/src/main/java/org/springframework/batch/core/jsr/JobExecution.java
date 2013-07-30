@@ -32,57 +32,87 @@ import org.springframework.util.Assert;
 public class JobExecution implements javax.batch.runtime.JobExecution {
 
 	private org.springframework.batch.core.JobExecution execution;
+	private ParametersConverter parametersConverter;
 
 	/**
 	 * @param execution for all information to be delegated from
 	 */
-	public JobExecution(org.springframework.batch.core.JobExecution execution) {
+	public JobExecution(org.springframework.batch.core.JobExecution execution, ParametersConverter parametersConverter) {
 		Assert.notNull(execution, "A JobExecution is required");
 		this.execution = execution;
+
+		this.parametersConverter = parametersConverter;
 	}
 
+	/* (non-Javadoc)
+	 * @see javax.batch.runtime.JobExecution#getExecutionId()
+	 */
 	@Override
 	public long getExecutionId() {
 		return this.execution.getId();
 	}
 
+	/* (non-Javadoc)
+	 * @see javax.batch.runtime.JobExecution#getJobName()
+	 */
 	@Override
 	public String getJobName() {
 		return this.execution.getJobInstance().getJobName();
 	}
 
+	/* (non-Javadoc)
+	 * @see javax.batch.runtime.JobExecution#getBatchStatus()
+	 */
 	@Override
 	public BatchStatus getBatchStatus() {
 		return this.execution.getStatus().getBatchStatus();
 	}
 
+	/* (non-Javadoc)
+	 * @see javax.batch.runtime.JobExecution#getStartTime()
+	 */
 	@Override
 	public Date getStartTime() {
 		return this.execution.getStartTime();
 	}
 
+	/* (non-Javadoc)
+	 * @see javax.batch.runtime.JobExecution#getEndTime()
+	 */
 	@Override
 	public Date getEndTime() {
 		return this.execution.getEndTime();
 	}
 
+	/* (non-Javadoc)
+	 * @see javax.batch.runtime.JobExecution#getExitStatus()
+	 */
 	@Override
 	public String getExitStatus() {
 		return this.execution.getExitStatus().getExitCode();
 	}
 
+	/* (non-Javadoc)
+	 * @see javax.batch.runtime.JobExecution#getCreateTime()
+	 */
 	@Override
 	public Date getCreateTime() {
 		return this.execution.getCreateTime();
 	}
 
+	/* (non-Javadoc)
+	 * @see javax.batch.runtime.JobExecution#getLastUpdatedTime()
+	 */
 	@Override
 	public Date getLastUpdatedTime() {
 		return this.execution.getLastUpdated();
 	}
 
+	/* (non-Javadoc)
+	 * @see javax.batch.runtime.JobExecution#getJobParameters()
+	 */
 	@Override
 	public Properties getJobParameters() {
-		return this.execution.getJobParameters().toProperties();
+		return parametersConverter.convert(this.execution.getJobParameters());
 	}
 }

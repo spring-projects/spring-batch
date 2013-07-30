@@ -24,17 +24,19 @@ public class JobContextTests {
 	private JobExecution execution;
 	@Mock
 	private JobInstance instance;
+	@Mock
+	private ParametersConverter converter;
 
 	@Before
 	public void setUp() throws Exception {
 		MockitoAnnotations.initMocks(this);
-		context = new JobContext(execution);
+		context = new JobContext(execution, converter);
 		when(execution.getJobInstance()).thenReturn(instance);
 	}
 
 	@Test(expected=IllegalArgumentException.class)
 	public void testCreateWithNull() {
-		context = new JobContext(null);
+		context = new JobContext(null, null);
 	}
 
 	@Test
@@ -69,8 +71,11 @@ public class JobContextTests {
 		JobParameters params = new JobParametersBuilder()
 		.addString("key1", "value1")
 		.toJobParameters();
+		Properties results = new Properties();
+		results.put("key1", "value1");
 
 		when(execution.getJobParameters()).thenReturn(params);
+		when(converter.convert(params)).thenReturn(results);
 
 		Properties props = context.getProperties();
 

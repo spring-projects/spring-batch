@@ -84,7 +84,6 @@ public abstract class AbstractJobDaoTests {
 
 	@Before
 	public void onSetUpInTransaction() throws Exception {
-
 		// Create job.
 		jobInstance = jobInstanceDao.createJobInstance(jobName, jobParameters);
 
@@ -119,7 +118,6 @@ public abstract class AbstractJobDaoTests {
 
 	@Transactional @Test
 	public void testFindJob() {
-
 		JobInstance instance = jobInstanceDao.getJobInstance(jobName, jobParameters);
 		assertNotNull(instance);
 		assertTrue(jobInstance.equals(instance));
@@ -187,7 +185,7 @@ public abstract class AbstractJobDaoTests {
 	public void testUpdateInvalidJobExecution() {
 
 		// id is invalid
-		JobExecution execution = new JobExecution(jobInstance, (long) 29432, jobParameters);
+		JobExecution execution = new JobExecution(jobInstance, (long) 29432, jobParameters, null);
 		execution.incrementVersion();
 		try {
 			jobExecutionDao.updateJobExecution(execution);

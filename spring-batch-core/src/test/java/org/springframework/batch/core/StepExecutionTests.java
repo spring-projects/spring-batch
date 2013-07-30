@@ -305,7 +305,7 @@ public class StepExecutionTests {
 
 	private StepExecution newStepExecution(Step step, Long jobExecutionId, long stepExecutionId) {
 		JobInstance job = new JobInstance(3L, "testJob");
-		StepExecution execution = new StepExecution(step.getName(), new JobExecution(job, jobExecutionId, new JobParameters()), stepExecutionId);
+		StepExecution execution = new StepExecution(step.getName(), new JobExecution(job, jobExecutionId, new JobParameters(), null), stepExecutionId);
 		return execution;
 	}
 
