@@ -62,16 +62,27 @@ public class JobExecution extends Entity {
 
 	private transient volatile List<Throwable> failureExceptions = new CopyOnWriteArrayList<Throwable>();
 
+	private final String jobConfigurationName;
+
 	/**
 	 * Because a JobExecution isn't valid unless the job is set, this
 	 * constructor is the only valid one from a modeling point of view.
 	 *
 	 * @param job the job of which this execution is a part
 	 */
-	public JobExecution(JobInstance job, Long id, JobParameters jobParameters) {
+	public JobExecution(JobInstance job, Long id, JobParameters jobParameters, String jobConfigurationName) {
 		super(id);
 		this.jobInstance = job;
 		this.jobParameters = jobParameters == null ? new JobParameters() : jobParameters;
+		this.jobConfigurationName = jobConfigurationName;
+	}
+
+	public JobExecution(JobInstance job, JobParameters jobParameters, String jobConfigurationName) {
+		this(job, null, jobParameters, jobConfigurationName);
+	}
+
+	public JobExecution(Long id, JobParameters jobParameters, String jobConfigurationName) {
+		this(null, id, jobParameters, jobConfigurationName);
 	}
 
 	/**
@@ -80,15 +91,15 @@ public class JobExecution extends Entity {
 	 * @param job the enclosing {@link JobInstance}
 	 */
 	public JobExecution(JobInstance job, JobParameters jobParameters) {
-		this(job, null, jobParameters);
+		this(job, null, jobParameters, null);
 	}
 
 	public JobExecution(Long id, JobParameters jobParameters) {
-		this(null, id, jobParameters);
+		this(null, id, jobParameters, null);
 	}
 
 	public JobExecution(Long id) {
-		this(null, id, null);
+		this(null, id, null, null);
 	}
 
 	public JobParameters getJobParameters() {
@@ -254,6 +265,10 @@ public class JobExecution extends Entity {
 	 */
 	public void setCreateTime(Date createTime) {
 		this.createTime = createTime;
+	}
+
+	public String getJobConfigurationName() {
+		return this.jobConfigurationName;
 	}
 
 	/**

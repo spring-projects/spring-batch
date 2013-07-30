@@ -27,6 +27,7 @@ import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.JobInstance;
 import org.springframework.batch.core.JobKeyGenerator;
 import org.springframework.batch.core.JobParameters;
+import org.springframework.batch.core.launch.NoSuchJobException;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.dao.DataAccessException;
 import org.springframework.dao.EmptyResultDataAccessException;
@@ -60,6 +61,8 @@ JobInstanceDao, InitializingBean {
 
 	private static final String FIND_JOBS_WITH_KEY = FIND_JOBS_WITH_NAME
 			+ " and JOB_KEY = ?";
+
+	private static final String COUNT_JOBS_WITH_NAME = "SELECT COUNT(*) from %PREFIX%JOB_INSTANCE where JOB_NAME = ?";
 
 	private static final String FIND_JOBS_WITH_EMPTY_KEY = "SELECT JOB_INSTANCE_ID, JOB_NAME from %PREFIX%JOB_INSTANCE where JOB_NAME = ? and (JOB_KEY = ? OR JOB_KEY is NULL)";
 
@@ -241,6 +244,21 @@ JobInstanceDao, InitializingBean {
 					new JobInstanceRowMapper(), jobExecution.getId());
 		} catch (EmptyResultDataAccessException e) {
 			return null;
+		}
+	}
+
+	/* (non-Javadoc)
+	 * @see org.springframework.batch.core.repository.dao.JobInstanceDao#getJobInstanceCount(java.lang.String)
+	 */
+	@Override
+	public int getJobInstanceCount(String jobName) throws NoSuchJobException {
+
+		try {
+			return getJdbcTemplate().queryForInt(
+					getQuery(COUNT_JOBS_WITH_NAME),
+					jobName);
+		} catch (EmptyResultDataAccessException e) {
+			throw new NoSuchJobException("No job instances were found for job name " + jobName);
 		}
 	}
 

@@ -23,6 +23,7 @@ import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.JobInstance;
 import org.springframework.batch.core.StepExecution;
 import org.springframework.batch.core.explore.JobExplorer;
+import org.springframework.batch.core.launch.NoSuchJobException;
 import org.springframework.batch.core.repository.dao.ExecutionContextDao;
 import org.springframework.batch.core.repository.dao.JobExecutionDao;
 import org.springframework.batch.core.repository.dao.JobInstanceDao;
@@ -33,6 +34,7 @@ import org.springframework.batch.core.repository.dao.StepExecutionDao;
  *
  * @author Dave Syer
  * @author Lucas Ward
+ * @author Michael Minella
  *
  * @see JobExplorer
  * @see JobInstanceDao
@@ -180,6 +182,14 @@ public class SimpleJobExplorer implements JobExplorer {
 		return jobInstanceDao.getJobNames();
 	}
 
+	/* (non-Javadoc)
+	 * @see org.springframework.batch.core.explore.JobExplorer#getJobInstanceCount(java.lang.String)
+	 */
+	@Override
+	public int getJobInstanceCount(String jobName) throws NoSuchJobException {
+		return jobInstanceDao.getJobInstanceCount(jobName);
+	}
+
 	/*
 	 * Find all dependencies for a JobExecution, including JobInstance (which
 	 * requires JobParameters) plus StepExecutions
@@ -198,5 +208,4 @@ public class SimpleJobExplorer implements JobExplorer {
 			stepExecution.setExecutionContext(ecDao.getExecutionContext(stepExecution));
 		}
 	}
-
 }

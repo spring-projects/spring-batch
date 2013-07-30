@@ -471,6 +471,18 @@ public class TaskletStepExceptionTests {
 		@Override
 		public void addAll(Collection<StepExecution> stepExecutions) {
 		}
+
+		@Override
+		public JobInstance createJobInstance(String jobName,
+				JobParameters jobParameters) {
+			return null;
+		}
+
+		@Override
+		public JobExecution createJobExecution(JobInstance jobInstance,
+				JobParameters jobParameters, String jobConfigurationLocation) {
+			return null;
+		}
 	}
 
 }

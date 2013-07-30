@@ -178,7 +178,8 @@ public class SimpleJobOperator implements JobOperator, InitializingBean {
 	@Override
 	public List<Long> getJobInstances(String jobName, int start, int count) throws NoSuchJobException {
 		List<Long> list = new ArrayList<Long>();
-		for (JobInstance jobInstance : jobExplorer.getJobInstances(jobName, start, count)) {
+		List<JobInstance> jobInstances = jobExplorer.getJobInstances(jobName, start, count);
+		for (JobInstance jobInstance : jobInstances) {
 			list.add(jobInstance.getId());
 		}
 		if (list.isEmpty() && !jobRegistry.getJobNames().contains(jobName)) {

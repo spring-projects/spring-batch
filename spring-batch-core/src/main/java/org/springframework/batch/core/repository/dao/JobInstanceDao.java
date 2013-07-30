@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2007 the original author or authors.
+ * Copyright 2006-2013 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,25 +21,27 @@ import java.util.List;
 import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.JobInstance;
 import org.springframework.batch.core.JobParameters;
+import org.springframework.batch.core.launch.NoSuchJobException;
 
 /**
  * Data Access Object for job instances.
- * 
+ *
  * @author Lucas Ward
  * @author Robert Kasanicky
- * 
+ * @author Michael Minella
+ *
  */
 public interface JobInstanceDao {
 
 	/**
 	 * Create a JobInstance with given name and parameters.
-	 * 
+	 *
 	 * PreConditions: JobInstance for given name and parameters must not already
 	 * exist
-	 * 
+	 *
 	 * PostConditions: A valid job instance will be returned which has been
 	 * persisted and contains an unique Id.
-	 * 
+	 *
 	 * @param jobName
 	 * @param jobParameters
 	 * @return JobInstance
@@ -49,7 +51,7 @@ public interface JobInstanceDao {
 	/**
 	 * Find the job instance that matches the given name and parameters. If no
 	 * matching job instances are found, then returns null.
-	 * 
+	 *
 	 * @param jobName the name of the job
 	 * @param jobParameters the parameters with which the job was executed
 	 * @return {@link JobInstance} object matching the job name and
@@ -59,7 +61,7 @@ public interface JobInstanceDao {
 
 	/**
 	 * Fetch the job instance with the provided identifier.
-	 * 
+	 *
 	 * @param instanceId the job identifier
 	 * @return the job instance with this identifier or null if it doesn't exist
 	 */
@@ -67,17 +69,17 @@ public interface JobInstanceDao {
 
 	/**
 	 * Fetch the JobInstance for the provided JobExecution.
-	 * 
+	 *
 	 * @param jobExecution the JobExecution
 	 * @return the JobInstance for the provided execution or null if it doesn't exist.
 	 */
 	JobInstance getJobInstance(JobExecution jobExecution);
-	
+
 	/**
 	 * Fetch the last job instances with the provided name, sorted backwards by
 	 * primary key.
-	 * 
-	 * 
+	 *
+	 *
 	 * @param jobName the job name
 	 * @param start the start index of the instances to return
 	 * @param count the maximum number of objects to return
@@ -91,5 +93,17 @@ public interface JobInstanceDao {
 	 * @return the names of all job instances
 	 */
 	List<String> getJobNames();
+
+
+	/**
+	 * Query the repository for the number of unique {@link JobInstance}s
+	 * associated with the supplied job name.
+	 *
+	 * @param jobName the name of the job to query for
+	 * @return the number of {@link JobInstance}s that exist within the
+	 * associated job repository
+	 * @throws NoSuchJobException
+	 */
+	int getJobInstanceCount(String jobName) throws NoSuchJobException;
 
 }

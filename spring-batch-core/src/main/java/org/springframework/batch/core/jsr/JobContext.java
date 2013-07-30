@@ -35,56 +35,86 @@ public class JobContext implements javax.batch.runtime.context.JobContext {
 
 	private JobExecution jobExecution;
 	private Object transientUserData;
+	private ParametersConverter jobParametersConverter;
 
 	/**
 	 * @param jobExecution for the related job
 	 */
-	public JobContext(JobExecution jobExecution) {
+	public JobContext(JobExecution jobExecution, ParametersConverter jobParametersConverter) {
 		Assert.notNull(jobExecution, "A JobExecution is required");
+		Assert.notNull(jobParametersConverter, "A ParametersConverter is required");
 
 		this.jobExecution = jobExecution;
+		this.jobParametersConverter = jobParametersConverter;
 	}
 
+	/* (non-Javadoc)
+	 * @see javax.batch.runtime.context.JobContext#getJobName()
+	 */
 	@Override
 	public String getJobName() {
 		return jobExecution.getJobInstance().getJobName();
 	}
 
+	/* (non-Javadoc)
+	 * @see javax.batch.runtime.context.JobContext#getTransientUserData()
+	 */
 	@Override
 	public Object getTransientUserData() {
 		return transientUserData;
 	}
 
+	/* (non-Javadoc)
+	 * @see javax.batch.runtime.context.JobContext#setTransientUserData(java.lang.Object)
+	 */
 	@Override
 	public void setTransientUserData(Object data) {
 		transientUserData = data;
 	}
 
+	/* (non-Javadoc)
+	 * @see javax.batch.runtime.context.JobContext#getInstanceId()
+	 */
 	@Override
 	public long getInstanceId() {
 		return jobExecution.getJobInstance().getId();
 	}
 
+	/* (non-Javadoc)
+	 * @see javax.batch.runtime.context.JobContext#getExecutionId()
+	 */
 	@Override
 	public long getExecutionId() {
 		return jobExecution.getId();
 	}
 
+	/* (non-Javadoc)
+	 * @see javax.batch.runtime.context.JobContext#getProperties()
+	 */
 	@Override
 	public Properties getProperties() {
-		return jobExecution.getJobParameters().toProperties();
+		return jobParametersConverter.convert(this.jobExecution.getJobParameters());
 	}
 
+	/* (non-Javadoc)
+	 * @see javax.batch.runtime.context.JobContext#getBatchStatus()
+	 */
 	@Override
 	public BatchStatus getBatchStatus() {
 		return jobExecution.getStatus().getBatchStatus();
 	}
 
+	/* (non-Javadoc)
+	 * @see javax.batch.runtime.context.JobContext#getExitStatus()
+	 */
 	@Override
 	public String getExitStatus() {
 		return jobExecution.getExitStatus().getExitCode();
 	}
 
+	/* (non-Javadoc)
+	 * @see javax.batch.runtime.context.JobContext#setExitStatus(java.lang.String)
+	 */
 	@Override
 	public void setExitStatus(String status) {
 		jobExecution.setExitStatus(new ExitStatus(status));

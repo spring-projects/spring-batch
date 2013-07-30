@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2007 the original author or authors.
+ * Copyright 2006-2013 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,15 +21,17 @@ import java.util.Set;
 import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.JobInstance;
 import org.springframework.batch.core.StepExecution;
+import org.springframework.batch.core.launch.NoSuchJobException;
 import org.springframework.batch.item.ExecutionContext;
 
 /**
  * Entry point for browsing executions of running or historical jobs and steps.
  * Since the data may be re-hydrated from persistent storage, it may not contain
  * volatile fields that would have been present when the execution was active.
- * 
+ *
  * @author Dave Syer
- * 
+ * @author Michael Minella
+ *
  * @since 2.0
  */
 public interface JobExplorer {
@@ -37,7 +39,7 @@ public interface JobExplorer {
 	/**
 	 * Fetch {@link JobInstance} values in descending order of creation (and
 	 * therefore usually of first execution).
-	 * 
+	 *
 	 * @param jobName the name of the job to query
 	 * @param start the start index of the instances to return
 	 * @param count the maximum number of instances to return
@@ -51,7 +53,7 @@ public interface JobExplorer {
 	 * the parent {@link JobInstance} and associated {@link ExecutionContext}
 	 * and {@link StepExecution} instances (also including their execution
 	 * contexts).
-	 * 
+	 *
 	 * @param executionId the job execution id
 	 * @return the {@link JobExecution} with this id, or null if not found
 	 */
@@ -62,11 +64,11 @@ public interface JobExplorer {
 	 * {@link JobExecution} id. The execution context for the step should be
 	 * available in the result, and the parent job execution should have its
 	 * primitive properties, but may not contain the job instance information.
-	 * 
+	 *
 	 * @param jobExecutionId the parent job execution id
 	 * @param stepExecutionId the step execution id
 	 * @return the {@link StepExecution} with this id, or null if not found
-	 * 
+	 *
 	 * @see #getJobExecution(Long)
 	 */
 	StepExecution getStepExecution(Long jobExecutionId, Long stepExecutionId);
@@ -82,7 +84,7 @@ public interface JobExplorer {
 	 * executions may not be fully hydrated (e.g. their execution context may be
 	 * missing), depending on the implementation. Use
 	 * {@link #getStepExecution(Long, Long)} to hydrate them in that case.
-	 * 
+	 *
 	 * @param jobInstance the {@link JobInstance} to query
 	 * @return the set of all executions for the specified {@link JobInstance}
 	 */
@@ -93,7 +95,7 @@ public interface JobExplorer {
 	 * not be fully hydrated (e.g. their execution context may be missing),
 	 * depending on the implementation. Use
 	 * {@link #getStepExecution(Long, Long)} to hydrate them in that case.
-	 * 
+	 *
 	 * @param jobName the name of the job
 	 * @return the set of running executions for jobs with the specified name
 	 */
@@ -102,9 +104,20 @@ public interface JobExplorer {
 	/**
 	 * Query the repository for all unique {@link JobInstance} names (sorted
 	 * alphabetically).
-	 * 
+	 *
 	 * @return the set of job names that have been executed
 	 */
 	List<String> getJobNames();
+
+	/**
+	 * Query the repository for the number of unique {@link JobInstance}s
+	 * associated with the supplied job name.
+	 *
+	 * @param jobName the name of the job to query for
+	 * @return the number of {@link JobInstance}s that exist within the
+	 * associated job repository
+	 * @throws NoSuchJobException
+	 */
+	int getJobInstanceCount(String jobName) throws NoSuchJobException;
 
 }

@@ -50,7 +50,7 @@ import org.springframework.batch.core.step.StepSupport;
  *
  * @author Lucas Ward
  * @author Will Schipp
- * 
+ *
  */
 public class SimpleJobRepositoryTests {
 
@@ -117,7 +117,7 @@ public class SimpleJobRepositoryTests {
 		steps.add(databaseStep1);
 		steps.add(databaseStep2);
 
-		jobExecution = new JobExecution(new JobInstance(1L, job.getName()), 1L, jobParameters);
+		jobExecution = new JobExecution(new JobInstance(1L, job.getName()), 1L, jobParameters, null);
 	}
 
 	@Test
@@ -137,7 +137,7 @@ public class SimpleJobRepositoryTests {
 	@Test
 	public void testUpdateValidJobExecution() throws Exception {
 
-		JobExecution jobExecution = new JobExecution(new JobInstance(1L, job.getName()), 1L, jobParameters);
+		JobExecution jobExecution = new JobExecution(new JobInstance(1L, job.getName()), 1L, jobParameters, null);
 		// new execution - call update on job dao
 		jobExecutionDao.updateJobExecution(jobExecution);
 		jobRepository.update(jobExecution);

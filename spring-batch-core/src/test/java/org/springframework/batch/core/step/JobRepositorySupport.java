@@ -36,7 +36,7 @@ public class JobRepositorySupport implements JobRepository {
 	@Override
 	public JobExecution createJobExecution(String jobName, JobParameters jobParameters) {
 		JobInstance jobInstance = new JobInstance(0L, jobName);
-		return new JobExecution(jobInstance, 11L, jobParameters);
+		return new JobExecution(jobInstance, 11L, jobParameters, null);
 	}
 
 	/* (non-Javadoc)
@@ -103,4 +103,15 @@ public class JobRepositorySupport implements JobRepository {
 	public void addAll(Collection<StepExecution> stepExecutions) {
 	}
 
+	@Override
+	public JobInstance createJobInstance(String jobName,
+			JobParameters jobParameters) {
+		return null;
+	}
+
+	@Override
+	public JobExecution createJobExecution(JobInstance jobInstance,
+			JobParameters jobParameters, String jobConfigurationLocation) {
+		return null;
+	}
 }
