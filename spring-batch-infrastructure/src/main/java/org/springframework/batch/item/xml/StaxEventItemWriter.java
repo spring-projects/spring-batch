@@ -395,7 +395,6 @@ ResourceAwareItemWriterItemStream<T>, InitializingBean {
 	/**
 	 * Helper method for opening output source at given file position
 	 */
-	@SuppressWarnings("resource")
 	private void open(long position, boolean restarted) {
 
 		File file;
@@ -443,25 +442,20 @@ ResourceAwareItemWriterItemStream<T>, InitializingBean {
 				});
 
 				writer.setEncoding(encoding);
+				writer.setForceSync(forceSync);
 				bufferedWriter = writer;
 			}
 			else {
-				Writer writer = new BufferedWriter(new OutputStreamWriter(os, encoding)) {
-					@Override
-					public void flush() throws IOException {
-						super.flush();
-						if (forceSync) {
-							channel.force(false);
-						}
-					}
-				};
-				bufferedWriter = writer;
+				bufferedWriter =  new BufferedWriter(new OutputStreamWriter(os, encoding));
 			}
 			delegateEventWriter = createXmlEventWriter(outputFactory, bufferedWriter);
 			eventWriter = new NoStartEndDocumentStreamWriter(delegateEventWriter);
 			initNamespaceContext(delegateEventWriter);
 			if (!restarted) {
 				startDocument(delegateEventWriter);
+				if (forceSync) {
+					channel.force(false);
+				}
 			}
 		}
 		catch (XMLStreamException xse) {
@@ -470,8 +464,10 @@ ResourceAwareItemWriterItemStream<T>, InitializingBean {
 		catch (UnsupportedEncodingException e) {
 			throw new DataAccessResourceFailureException("Unable to write to file resource: [" + resource
 					+ "] with encoding=[" + encoding + "]", e);
+		} 
+		catch (IOException e) {
+			throw new DataAccessResourceFailureException("Unable to write to file resource: [" + resource + "]", e);
 		}
-
 	}
 
 	/**
@@ -658,7 +654,7 @@ ResourceAwareItemWriterItemStream<T>, InitializingBean {
 		finally {
 
 			try {
-				eventWriter.close();
+				delegateEventWriter.close();
 			}
 			catch (XMLStreamException e) {
 				log.error("Unable to close file resource: [" + resource + "] " + e);
@@ -716,8 +712,14 @@ ResourceAwareItemWriterItemStream<T>, InitializingBean {
 		}
 		try {
 			eventWriter.flush();
+			if (forceSync) {
+				channel.force(false);
+			}			
 		}
 		catch (XMLStreamException e) {
+			throw new WriteFailedException("Failed to flush the events", e);
+		} 
+		catch (IOException e) {
 			throw new WriteFailedException("Failed to flush the events", e);
 		}
 

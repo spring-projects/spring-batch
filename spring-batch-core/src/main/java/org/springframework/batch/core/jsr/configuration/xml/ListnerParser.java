@@ -66,7 +66,6 @@ public class ListnerParser {
 	}
 
 	private ManagedList<AbstractBeanDefinition> parseListeners(Element element, ParserContext parserContext) {
-
 		List<Element> listenersElements = DomUtils.getChildElementsByTagName(element, LISTENERS_ELEMENT);
 
 		ManagedList<AbstractBeanDefinition> listeners = new ManagedList<AbstractBeanDefinition>();

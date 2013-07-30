@@ -25,13 +25,13 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Set;
 
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.springframework.aop.framework.Advised;
 import org.springframework.batch.core.Step;
 import org.springframework.batch.core.StepExecutionListener;
-import org.springframework.batch.core.StepListener;
 import org.springframework.batch.core.job.AbstractJob;
 import org.springframework.batch.core.listener.CompositeStepExecutionListener;
 import org.springframework.batch.core.listener.StepExecutionListenerSupport;
@@ -446,7 +446,7 @@ public class StepParserTests {
 		Map<Class<? extends Throwable>, Boolean> retryableFound = getExceptionMap(fb, "retryableExceptionClasses");
 		ItemStream[] streamsFound = (ItemStream[]) ReflectionTestUtils.getField(fb, "streams");
 		RetryListener[] retryListenersFound = (RetryListener[]) ReflectionTestUtils.getField(fb, "retryListeners");
-		StepListener[] stepListenersFound = (StepListener[]) ReflectionTestUtils.getField(fb, "listeners");
+		Set<StepExecutionListener> stepListenersFound = (Set<StepExecutionListener>) ReflectionTestUtils.getField(fb, "stepExecutionListeners");
 		Collection<Class<? extends Throwable>> noRollbackFound = getExceptionList(fb, "noRollbackExceptionClasses");
 
 		assertSameMaps(skippable, skippableFound);
@@ -480,7 +480,7 @@ public class StepParserTests {
 		Map<Class<? extends Throwable>, Boolean> retryableFound = getExceptionMap(fb, "retryableExceptionClasses");
 		ItemStream[] streamsFound = (ItemStream[]) ReflectionTestUtils.getField(fb, "streams");
 		RetryListener[] retryListenersFound = (RetryListener[]) ReflectionTestUtils.getField(fb, "retryListeners");
-		StepListener[] stepListenersFound = (StepListener[]) ReflectionTestUtils.getField(fb, "listeners");
+		Set<StepExecutionListener> stepListenersFound = (Set<StepExecutionListener>) ReflectionTestUtils.getField(fb, "stepExecutionListeners");
 		Collection<Class<? extends Throwable>> noRollbackFound = getExceptionList(fb, "noRollbackExceptionClasses");
 
 		assertSameMaps(skippable, skippableFound);
@@ -491,6 +491,7 @@ public class StepParserTests {
 		assertSameCollections(noRollback, noRollbackFound);
 	}
 
+	@SuppressWarnings("unchecked")
 	@Test
 	public void testStepWithListsOverrideWithEmpty() throws Exception {
 		ApplicationContext ctx = stepParserParentAttributeTestsCtx;
@@ -502,7 +503,7 @@ public class StepParserTests {
 		assertEquals(1, getExceptionMap(fb, "retryableExceptionClasses").size());
 		assertEquals(0, ((ItemStream[]) ReflectionTestUtils.getField(fb, "streams")).length);
 		assertEquals(0, ((RetryListener[]) ReflectionTestUtils.getField(fb, "retryListeners")).length);
-		assertEquals(0, ((StepListener[]) ReflectionTestUtils.getField(fb, "listeners")).length);
+		assertEquals(0, ((Set<StepExecutionListener>) ReflectionTestUtils.getField(fb, "stepExecutionListeners")).size());
 		assertEquals(0, getExceptionList(fb, "noRollbackExceptionClasses").size());
 	}
 

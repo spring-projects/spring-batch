@@ -15,15 +15,17 @@
  */
 package org.springframework.batch.core;
 
-import junit.framework.TestCase;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
 
+import org.junit.Test;
 import org.springframework.batch.support.SerializationUtils;
 
 /**
  * @author dsyer
  *
  */
-public class JobInstanceTests extends TestCase {
+public class JobInstanceTests {
 
 	private JobInstance instance = new JobInstance(new Long(11), "job");
 
@@ -31,15 +33,18 @@ public class JobInstanceTests extends TestCase {
 	 * Test method for
 	 * {@link org.springframework.batch.core.JobInstance#getJobName()}.
 	 */
+	@Test
 	public void testGetName() {
 		instance = new JobInstance(new Long(1), "foo");
 		assertEquals("foo", instance.getJobName());
 	}
 
+	@Test
 	public void testGetJob() {
 		assertEquals("job", instance.getJobName());
 	}
 
+	@Test
 	public void testCreateWithNulls() {
 		try {
 			new JobInstance(null, null);
@@ -52,11 +57,17 @@ public class JobInstanceTests extends TestCase {
 		assertEquals("testJob", instance.getJobName());
 	}
 
+	@Test
 	public void testSerialization() {
 		instance = new JobInstance(new Long(1), "jobName");
 
 		byte[] serialized = SerializationUtils.serialize(instance);
 
 		assertEquals(instance, SerializationUtils.deserialize(serialized));
+	}
+
+	@Test
+	public void testGetInstanceId() {
+		assertEquals(11, instance.getInstanceId());
 	}
 }

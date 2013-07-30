@@ -8,7 +8,7 @@
 	<parent>
 		<groupId>org.springframework.batch</groupId>
 		<artifactId>spring-batch-parent</artifactId>
-		<version>3.0.0.BUILD-SNAPSHOT</version>
+		<version>2.2.2.BUILD-SNAPSHOT</version>
 		<relativePath>../spring-batch-parent</relativePath>
 	</parent>
 	<profiles>
@@ -151,11 +151,6 @@
 			<groupId>cglib</groupId>
 			<artifactId>cglib-nodep</artifactId>
 			<optional>true</optional>
-		</dependency>
-		<dependency>
-		    <groupId>com.ibm.jbatch</groupId>
-		    <artifactId>com.ibm.jbatch-tck-spi</artifactId>
-		    <version>1.0-b28</version>
 		</dependency>
 	</dependencies>
 	<build>

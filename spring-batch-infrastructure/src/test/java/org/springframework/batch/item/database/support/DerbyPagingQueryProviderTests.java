@@ -54,7 +54,18 @@ public class DerbyPagingQueryProviderTests extends AbstractSqlPagingQueryProvide
 	}
 
 	@Test
-	public void testInitWithUnsupportedVErsion() throws Exception {
+	public void testInitWithRecentVersion() throws Exception {
+		DataSource ds = mock(DataSource.class);
+		Connection con = mock(Connection.class);
+		DatabaseMetaData dmd = mock(DatabaseMetaData.class);
+		when(dmd.getDatabaseProductVersion()).thenReturn("10.10.1.1");
+		when(con.getMetaData()).thenReturn(dmd);
+		when(ds.getConnection()).thenReturn(con);
+		pagingQueryProvider.init(ds);
+	}
+
+	@Test
+	public void testInitWithUnsupportedVersion() throws Exception {
 		DataSource ds = mock(DataSource.class);
 		Connection con = mock(Connection.class);
 		DatabaseMetaData dmd = mock(DatabaseMetaData.class);

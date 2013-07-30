@@ -726,6 +726,32 @@ public class StaxEventItemWriterTests {
 		assertEquals("Wrong content: " + content,
 				"<foo:root xmlns:foo=\"urn:org.test.foo\" xmlns:ns=\"http://www.springframework.org/test\"><ns:item/><ns:item/></foo:root>", content);
 	}
+	
+	/**
+	 * Test with OXM Marshaller that closes the XMLEventWriter. 
+	 */
+	// BATCH-2054
+	@Test
+	public void testMarshallingClosingEventWriter() throws Exception {
+		writer.setMarshaller(new SimpleMarshaller() {
+			@Override
+			public void marshal(Object graph, Result result) throws XmlMappingException, IOException {
+				super.marshal(graph, result);
+				try {
+					StaxUtils.getXmlEventWriter(result).close();
+				} catch (Exception e) {
+					throw new RuntimeException("Exception while writing to output file", e);
+				}
+			}
+
+		});
+		writer.afterPropertiesSet();
+
+		writer.open(executionContext);
+
+		writer.write(items);
+		writer.write(items);
+	}	
 
 	/**
 	 * Writes object's toString representation as XML comment.

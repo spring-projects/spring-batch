@@ -16,8 +16,6 @@
 package org.springframework.batch.core.jsr.configuration.xml;
 
 import org.springframework.batch.core.configuration.xml.CoreNamespaceUtils;
-import org.springframework.batch.core.configuration.xml.JobParserJobFactoryBean;
-import org.springframework.batch.core.listener.JobListenerFactoryBean;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.support.BeanDefinitionBuilder;
 import org.springframework.beans.factory.xml.AbstractSingleBeanDefinitionParser;
@@ -38,8 +36,8 @@ public class JobParser extends AbstractSingleBeanDefinitionParser {
 	private static final String ID_ATTRIBUTE = "id";
 
 	@Override
-	protected Class<JobParserJobFactoryBean> getBeanClass(Element element) {
-		return JobParserJobFactoryBean.class;
+	protected Class<JobFactoryBean> getBeanClass(Element element) {
+		return JobFactoryBean.class;
 	}
 
 	@Override
