@@ -352,7 +352,7 @@ public class JsrJobOperator implements JobOperator {
 
 		if(executions != null) {
 			for (org.springframework.batch.core.StepExecution stepExecution : executions) {
-				batchExecutions.add(new org.springframework.batch.core.jsr.StepExecution(stepExecution));
+				batchExecutions.add(new org.springframework.batch.core.jsr.StepExecution(jobExplorer.getStepExecution(executionId, stepExecution.getId())));
 			}
 		}
 

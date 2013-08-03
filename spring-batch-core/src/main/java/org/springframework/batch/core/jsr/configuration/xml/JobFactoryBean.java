@@ -18,10 +18,17 @@ package org.springframework.batch.core.jsr.configuration.xml;
 import javax.batch.api.listener.JobListener;
 
 import org.springframework.batch.core.JobExecutionListener;
-import org.springframework.batch.core.configuration.xml.JobParserJobFactoryBean;
+import org.springframework.batch.core.JobParametersIncrementer;
+import org.springframework.batch.core.JobParametersValidator;
+import org.springframework.batch.core.job.flow.Flow;
 import org.springframework.batch.core.job.flow.FlowJob;
 import org.springframework.batch.core.jsr.JobListenerAdapter;
+import org.springframework.batch.core.jsr.job.flow.JsrFlowJob;
+import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.beans.factory.FactoryBean;
+import org.springframework.beans.factory.SmartFactoryBean;
+import org.springframework.util.Assert;
+import org.springframework.util.StringUtils;
 
 /**
  * This {@link FactoryBean} is used by the JSR-352 namespace parser to create
@@ -31,10 +38,101 @@ import org.springframework.beans.factory.FactoryBean;
  * @author Michael Minella
  * @since 3.0
  */
-public class JobFactoryBean extends JobParserJobFactoryBean {
+public class JobFactoryBean implements SmartFactoryBean<FlowJob> {
+
+	private String name;
+
+	private Boolean restartable;
+
+	private JobRepository jobRepository;
+
+	private JobParametersValidator jobParametersValidator;
+
+	private JobExecutionListener[] jobExecutionListeners;
+
+	private JobParametersIncrementer jobParametersIncrementer;
+
+	private Flow flow;
 
 	public JobFactoryBean(String name) {
-		super(name);
+		this.name = name;
+	}
+
+	@Override
+	public final FlowJob getObject() throws Exception {
+		Assert.isTrue(StringUtils.hasText(name), "The job must have an id.");
+		FlowJob flowJob = new JsrFlowJob(name);
+
+		if (restartable != null) {
+			flowJob.setRestartable(restartable);
+		}
+
+		if (jobRepository != null) {
+			flowJob.setJobRepository(jobRepository);
+		}
+
+		if (jobParametersValidator != null) {
+			flowJob.setJobParametersValidator(jobParametersValidator);
+		}
+
+		if (jobExecutionListeners != null) {
+			flowJob.setJobExecutionListeners(jobExecutionListeners);
+		}
+
+		if (jobParametersIncrementer != null) {
+			flowJob.setJobParametersIncrementer(jobParametersIncrementer);
+		}
+
+		if (flow != null) {
+			flowJob.setFlow(flow);
+		}
+
+		flowJob.afterPropertiesSet();
+		return flowJob;
+	}
+
+	public void setRestartable(Boolean restartable) {
+		this.restartable = restartable;
+	}
+
+	public void setJobRepository(JobRepository jobRepository) {
+		this.jobRepository = jobRepository;
+	}
+
+	public void setJobParametersValidator(JobParametersValidator jobParametersValidator) {
+		this.jobParametersValidator = jobParametersValidator;
+	}
+
+	public JobRepository getJobRepository() {
+		return this.jobRepository;
+	}
+
+	public void setJobParametersIncrementer(JobParametersIncrementer jobParametersIncrementer) {
+		this.jobParametersIncrementer = jobParametersIncrementer;
+	}
+
+	public void setFlow(Flow flow) {
+		this.flow = flow;
+	}
+
+	@Override
+	public Class<FlowJob> getObjectType() {
+		return FlowJob.class;
+	}
+
+	@Override
+	public boolean isSingleton() {
+		return true;
+	}
+
+	@Override
+	public boolean isEagerInit() {
+		return true;
+	}
+
+	@Override
+	public boolean isPrototype() {
+		return false;
 	}
 
 	/**
@@ -56,7 +154,7 @@ public class JobFactoryBean extends JobParserJobFactoryBean {
 				}
 			}
 
-			super.setJobExecutionListeners(listeners);
+			this.jobExecutionListeners = listeners;
 		}
 	}
 }

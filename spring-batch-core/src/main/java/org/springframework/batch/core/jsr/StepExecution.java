@@ -25,6 +25,9 @@ import org.springframework.batch.core.ExitStatus;
 import org.springframework.util.Assert;
 
 /**
+ * Implementation of the StepExecution as defined in JSR-352.  This implementation
+ * wraps a {@link org.springframework.batch.core.StepExecution} as it's source of
+ * data.
  *
  * @author Michael Minella
  * @since 3.0
@@ -33,37 +36,59 @@ public class StepExecution implements javax.batch.runtime.StepExecution{
 
 	private final org.springframework.batch.core.StepExecution stepExecution;
 
+	/**
+	 * @param stepExecution The {@link org.springframework.batch.core.StepExecution} used
+	 * as the basis for the data.
+	 */
 	public StepExecution(org.springframework.batch.core.StepExecution stepExecution) {
 		Assert.notNull(stepExecution, "A StepExecution is required");
 
 		this.stepExecution = stepExecution;
 	}
 
+	/* (non-Javadoc)
+	 * @see javax.batch.runtime.StepExecution#getStepExecutionId()
+	 */
 	@Override
 	public long getStepExecutionId() {
 		return stepExecution.getId();
 	}
 
+	/* (non-Javadoc)
+	 * @see javax.batch.runtime.StepExecution#getStepName()
+	 */
 	@Override
 	public String getStepName() {
 		return stepExecution.getStepName();
 	}
 
+	/* (non-Javadoc)
+	 * @see javax.batch.runtime.StepExecution#getBatchStatus()
+	 */
 	@Override
 	public BatchStatus getBatchStatus() {
 		return stepExecution.getStatus().getBatchStatus();
 	}
 
+	/* (non-Javadoc)
+	 * @see javax.batch.runtime.StepExecution#getStartTime()
+	 */
 	@Override
 	public Date getStartTime() {
 		return stepExecution.getStartTime();
 	}
 
+	/* (non-Javadoc)
+	 * @see javax.batch.runtime.StepExecution#getEndTime()
+	 */
 	@Override
 	public Date getEndTime() {
 		return stepExecution.getEndTime();
 	}
 
+	/* (non-Javadoc)
+	 * @see javax.batch.runtime.StepExecution#getExitStatus()
+	 */
 	@Override
 	public String getExitStatus() {
 		ExitStatus status = stepExecution.getExitStatus();
@@ -75,12 +100,17 @@ public class StepExecution implements javax.batch.runtime.StepExecution{
 		}
 	}
 
-	//TODO: Implement this
+	/* (non-Javadoc)
+	 * @see javax.batch.runtime.StepExecution#getPersistentUserData()
+	 */
 	@Override
 	public Serializable getPersistentUserData() {
-		return null;
+		return (Serializable) stepExecution.getExecutionContext().get("batch_jsr_persistentUserData");
 	}
 
+	/* (non-Javadoc)
+	 * @see javax.batch.runtime.StepExecution#getMetrics()
+	 */
 	@Override
 	public Metric[] getMetrics() {
 		Metric[] metrics = new Metric[8];

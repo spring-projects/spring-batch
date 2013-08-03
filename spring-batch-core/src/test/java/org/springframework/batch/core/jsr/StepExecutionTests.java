@@ -39,6 +39,7 @@ public class StepExecutionTests {
 		stepExecution.setWriteSkipCount(8);
 		stepExecution.setStartTime(new Date(0));
 		stepExecution.setEndTime(new Date(10000000));
+		stepExecution.getExecutionContext().put("batch_jsr_persistentUserData", "persisted data");
 
 		jsrStepExecution = new org.springframework.batch.core.jsr.StepExecution(stepExecution);
 	}
@@ -63,6 +64,7 @@ public class StepExecutionTests {
 		assertEquals(new Date(0), jsrStepExecution.getStartTime());
 		assertEquals(new Date(10000000), jsrStepExecution.getEndTime());
 		assertEquals("customExitStatus", jsrStepExecution.getExitStatus());
+		assertEquals("persisted data", jsrStepExecution.getPersistentUserData());
 
 		Metric[] metrics = jsrStepExecution.getMetrics();
 

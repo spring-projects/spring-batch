@@ -273,11 +273,13 @@ public class JsrJobOperatorTests {
 	public void testGetStepExecutionsRoseyScenario() {
 		JobExecution jobExecution = new JobExecution(5l);
 		List<StepExecution> stepExecutions = new ArrayList<StepExecution>();
-		stepExecutions.add(new StepExecution("step1", jobExecution));
-		stepExecutions.add(new StepExecution("step2", jobExecution));
+		stepExecutions.add(new StepExecution("step1", jobExecution, 1l));
+		stepExecutions.add(new StepExecution("step2", jobExecution, 2l));
 		jobExecution.addStepExecutions(stepExecutions);
 
 		when(jobExplorer.getJobExecution(5l)).thenReturn(jobExecution);
+		when(jobExplorer.getStepExecution(5l, 1l)).thenReturn(new StepExecution("step1", jobExecution, 1l));
+		when(jobExplorer.getStepExecution(5l, 2l)).thenReturn(new StepExecution("step2", jobExecution, 2l));
 
 		List<javax.batch.runtime.StepExecution> results = jsrJobOperator.getStepExecutions(5l);
 
