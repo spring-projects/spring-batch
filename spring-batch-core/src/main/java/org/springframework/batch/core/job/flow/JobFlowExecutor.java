@@ -41,7 +41,7 @@ public class JobFlowExecutor implements FlowExecutor {
 
 	private final JobExecution execution;
 
-	private ExitStatus exitStatus = ExitStatus.EXECUTING;
+	protected ExitStatus exitStatus = ExitStatus.EXECUTING;
 
 	private final StepHandler stepHandler;
 
@@ -137,7 +137,7 @@ public class JobFlowExecutor implements FlowExecutor {
 	 * @param status
 	 * @return
 	 */
-	private BatchStatus findBatchStatus(FlowExecutionStatus status) {
+	protected BatchStatus findBatchStatus(FlowExecutionStatus status) {
 		for (BatchStatus batchStatus : BatchStatus.values()) {
 			if (status.getName().startsWith(batchStatus.toString())) {
 				return batchStatus;
