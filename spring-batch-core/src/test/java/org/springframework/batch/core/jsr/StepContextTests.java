@@ -14,6 +14,7 @@ import org.springframework.batch.core.ExitStatus;
 import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.JobParametersBuilder;
 import org.springframework.batch.core.StepExecution;
+import org.springframework.batch.core.converter.JobParametersConverterSupport;
 
 public class StepContextTests {
 
@@ -37,7 +38,7 @@ public class StepContextTests {
 		stepExecution.setWriteCount(7);
 		stepExecution.setWriteSkipCount(8);
 
-		stepContext = new StepContext(stepExecution, new ParametersConverterSupport());
+		stepContext = new StepContext(stepExecution, new JobParametersConverterSupport());
 		stepContext.setTransientUserData("This is my transient data");
 	}
 

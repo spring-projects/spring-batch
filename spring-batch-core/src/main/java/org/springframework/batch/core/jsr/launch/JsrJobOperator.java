@@ -42,9 +42,9 @@ import org.springframework.batch.core.BatchStatus;
 import org.springframework.batch.core.ExitStatus;
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.JobParameters;
+import org.springframework.batch.core.converter.JobParametersConverter;
 import org.springframework.batch.core.explore.JobExplorer;
 import org.springframework.batch.core.jsr.JobContext;
-import org.springframework.batch.core.jsr.ParametersConverter;
 import org.springframework.batch.core.repository.JobExecutionAlreadyRunningException;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.beans.factory.access.BeanFactoryLocator;
@@ -122,7 +122,7 @@ public class JsrJobOperator implements JobOperator {
 	private JobExplorer jobExplorer;
 	private JobRepository jobRepository;
 	private TaskExecutor taskExecutor;
-	private ParametersConverter jobParametersConverter;
+	private JobParametersConverter jobParametersConverter;
 	private static ApplicationContext baseContext;
 
 	/**
@@ -152,7 +152,7 @@ public class JsrJobOperator implements JobOperator {
 	 * @param jobRepository an instance of Spring Batch's {@link JobOperator}
 	 * @param jobOperator an instance of Spring Batch's {@link org.springframework.batch.core.launch.JobOperator}
 	 */
-	public JsrJobOperator(JobExplorer jobExplorer, JobRepository jobRepository, org.springframework.batch.core.launch.JobOperator jobOperator, ParametersConverter jobParametersConverter) {
+	public JsrJobOperator(JobExplorer jobExplorer, JobRepository jobRepository, org.springframework.batch.core.launch.JobOperator jobOperator, JobParametersConverter jobParametersConverter) {
 		Assert.notNull(jobExplorer, "A JobExplorer is required");
 		Assert.notNull(jobRepository, "A JobRepository is required");
 		Assert.notNull(jobOperator, "A JobOperator is required");
@@ -190,7 +190,7 @@ public class JsrJobOperator implements JobOperator {
 	 * @param converter A {@link Converter} implementation used to convert {@link Properties} to
 	 * {@link JobParameters}
 	 */
-	public void setJobParametersConverter(ParametersConverter converter) {
+	public void setJobParametersConverter(JobParametersConverter converter) {
 		Assert.notNull(converter, "A Converter is required");
 
 		this.jobParametersConverter = converter;
@@ -314,7 +314,7 @@ public class JsrJobOperator implements JobOperator {
 			throw new NoSuchJobExecutionException("Unable to find the JobExecution for id " + executionId);
 		}
 
-		return jobParametersConverter.convert(execution.getJobParameters());
+		return jobParametersConverter.getProperties(execution.getJobParameters());
 	}
 
 	/* (non-Javadoc)
@@ -419,7 +419,7 @@ public class JsrJobOperator implements JobOperator {
 		final org.springframework.batch.core.JobExecution jobExecution;
 
 		try {
-			JobParameters jobParameters = jobParametersConverter.convert(params);
+			JobParameters jobParameters = jobParametersConverter.getJobParameters(params);
 			jobExecution = jobRepository.createJobExecution(previousJobExecution.getJobInstance(), jobParameters, previousJobExecution.getJobConfigurationName());
 		} catch (Exception e) {
 			throw new JobRestartException(e);
@@ -496,7 +496,7 @@ public class JsrJobOperator implements JobOperator {
 		final org.springframework.batch.core.JobExecution jobExecution;
 
 		try {
-			JobParameters jobParameters = jobParametersConverter.convert(params);
+			JobParameters jobParameters = jobParametersConverter.getJobParameters(params);
 			org.springframework.batch.core.JobInstance jobInstance = jobRepository.createJobInstance(job.getName(), jobParameters);
 			jobExecution = jobRepository.createJobExecution(jobInstance, jobParameters, jobConfigurationLocation);
 		} catch (Exception e) {

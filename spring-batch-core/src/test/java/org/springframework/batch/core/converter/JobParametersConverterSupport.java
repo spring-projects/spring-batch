@@ -1,4 +1,4 @@
-package org.springframework.batch.core.jsr;
+package org.springframework.batch.core.converter;
 
 import java.util.Map;
 import java.util.Properties;
@@ -7,16 +7,15 @@ import org.springframework.batch.core.JobParameter;
 import org.springframework.batch.core.JobParameters;
 import org.springframework.batch.core.JobParametersBuilder;
 
-public class ParametersConverterSupport implements ParametersConverter {
+public class JobParametersConverterSupport implements JobParametersConverter {
 
 	@Override
-	public JobParameters convert(Properties parameters) {
+	public JobParameters getJobParameters(Properties properties) {
 		JobParametersBuilder builder = new JobParametersBuilder();
 
-		if(parameters != null) {
-			for (Map.Entry<Object, Object> curParameter : parameters.entrySet()) {
+		if(properties != null) {
+			for (Map.Entry<Object, Object> curParameter : properties.entrySet()) {
 				if(curParameter.getValue() != null) {
-
 					builder.addString(curParameter.getKey().toString(), curParameter.getValue().toString(), false);
 				}
 			}
@@ -25,12 +24,15 @@ public class ParametersConverterSupport implements ParametersConverter {
 		return builder.toJobParameters();
 	}
 
+	/* (non-Javadoc)
+	 * @see org.springframework.batch.core.converter.JobParametersConverter#getProperties(org.springframework.batch.core.JobParameters)
+	 */
 	@Override
-	public Properties convert(JobParameters parameters) {
+	public Properties getProperties(JobParameters params) {
 		Properties properties = new Properties();
 
-		if(properties != null) {
-			for(Map.Entry<String, JobParameter> curParameter: parameters.getParameters().entrySet()) {
+		if(params != null) {
+			for(Map.Entry<String, JobParameter> curParameter: params.getParameters().entrySet()) {
 				properties.setProperty(curParameter.getKey(), curParameter.getValue().getValue().toString());
 			}
 		}
