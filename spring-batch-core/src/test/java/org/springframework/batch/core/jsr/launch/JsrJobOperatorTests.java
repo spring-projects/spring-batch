@@ -29,10 +29,10 @@ import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.JobInstance;
 import org.springframework.batch.core.JobParametersBuilder;
 import org.springframework.batch.core.StepExecution;
+import org.springframework.batch.core.converter.JobParametersConverter;
+import org.springframework.batch.core.converter.JobParametersConverterSupport;
 import org.springframework.batch.core.explore.JobExplorer;
 import org.springframework.batch.core.explore.support.SimpleJobExplorer;
-import org.springframework.batch.core.jsr.ParametersConverter;
-import org.springframework.batch.core.jsr.ParametersConverterSupport;
 import org.springframework.batch.core.launch.support.SimpleJobOperator;
 import org.springframework.batch.core.repository.JobExecutionAlreadyRunningException;
 import org.springframework.batch.core.repository.JobRepository;
@@ -47,12 +47,12 @@ public class JsrJobOperatorTests {
 	private JobExplorer jobExplorer;
 	@Mock
 	private JobRepository jobRepository;
-	private ParametersConverter parameterConverter;
+	private JobParametersConverter parameterConverter;
 
 	@Before
 	public void setup() {
 		MockitoAnnotations.initMocks(this);
-		parameterConverter = new ParametersConverterSupport();
+		parameterConverter = new JobParametersConverterSupport();
 		jsrJobOperator = new JsrJobOperator(jobExplorer, jobRepository, jobOperator, parameterConverter);
 	}
 

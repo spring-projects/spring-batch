@@ -23,15 +23,16 @@ import javax.batch.runtime.Metric;
 
 import org.springframework.batch.core.ExitStatus;
 import org.springframework.batch.core.StepExecution;
+import org.springframework.batch.core.converter.JobParametersConverter;
 import org.springframework.util.Assert;
 
 public class StepContext implements javax.batch.runtime.context.StepContext {
 
 	private StepExecution stepExecution;
 	private Object transientUserData;
-	private ParametersConverter jobParametersConveter;
+	private JobParametersConverter jobParametersConveter;
 
-	public StepContext(StepExecution stepExecution, ParametersConverter jobParametersConveter) {
+	public StepContext(StepExecution stepExecution, JobParametersConverter jobParametersConveter) {
 		Assert.notNull(stepExecution, "A StepExecution is required");
 		Assert.notNull(jobParametersConveter, "A ParametersConverter is required");
 
@@ -61,7 +62,7 @@ public class StepContext implements javax.batch.runtime.context.StepContext {
 
 	@Override
 	public Properties getProperties() {
-		return jobParametersConveter.convert(this.stepExecution.getJobParameters());
+		return jobParametersConveter.getProperties(this.stepExecution.getJobParameters());
 	}
 
 	@Override

@@ -20,6 +20,7 @@ import java.util.Properties;
 
 import javax.batch.runtime.BatchStatus;
 
+import org.springframework.batch.core.converter.JobParametersConverter;
 import org.springframework.util.Assert;
 
 /**
@@ -32,12 +33,12 @@ import org.springframework.util.Assert;
 public class JobExecution implements javax.batch.runtime.JobExecution {
 
 	private org.springframework.batch.core.JobExecution execution;
-	private ParametersConverter parametersConverter;
+	private JobParametersConverter parametersConverter;
 
 	/**
 	 * @param execution for all information to be delegated from
 	 */
-	public JobExecution(org.springframework.batch.core.JobExecution execution, ParametersConverter parametersConverter) {
+	public JobExecution(org.springframework.batch.core.JobExecution execution, JobParametersConverter parametersConverter) {
 		Assert.notNull(execution, "A JobExecution is required");
 		this.execution = execution;
 
@@ -113,6 +114,6 @@ public class JobExecution implements javax.batch.runtime.JobExecution {
 	 */
 	@Override
 	public Properties getJobParameters() {
-		return parametersConverter.convert(this.execution.getJobParameters());
+		return parametersConverter.getProperties(this.execution.getJobParameters());
 	}
 }

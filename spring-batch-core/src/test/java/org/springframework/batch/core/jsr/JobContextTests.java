@@ -16,6 +16,7 @@ import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.JobInstance;
 import org.springframework.batch.core.JobParameters;
 import org.springframework.batch.core.JobParametersBuilder;
+import org.springframework.batch.core.converter.JobParametersConverter;
 
 public class JobContextTests {
 
@@ -25,7 +26,7 @@ public class JobContextTests {
 	@Mock
 	private JobInstance instance;
 	@Mock
-	private ParametersConverter converter;
+	private JobParametersConverter converter;
 
 	@Before
 	public void setUp() throws Exception {
@@ -75,7 +76,7 @@ public class JobContextTests {
 		results.put("key1", "value1");
 
 		when(execution.getJobParameters()).thenReturn(params);
-		when(converter.convert(params)).thenReturn(results);
+		when(converter.getProperties(params)).thenReturn(results);
 
 		Properties props = context.getProperties();
 

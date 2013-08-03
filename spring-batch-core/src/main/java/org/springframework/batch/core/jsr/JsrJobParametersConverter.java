@@ -23,6 +23,7 @@ import javax.sql.DataSource;
 import org.springframework.batch.core.JobParameter;
 import org.springframework.batch.core.JobParameters;
 import org.springframework.batch.core.JobParametersBuilder;
+import org.springframework.batch.core.converter.JobParametersConverter;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.repository.dao.AbstractJdbcBatchMetadataDao;
 import org.springframework.batch.item.database.support.DataFieldMaxValueIncrementerFactory;
@@ -44,7 +45,7 @@ import org.springframework.util.Assert;
  * @author Michael Minella
  * @since 3.0
  */
-public class JsrJobParametersConverter implements ParametersConverter, InitializingBean {
+public class JsrJobParametersConverter implements JobParametersConverter, InitializingBean {
 
 	public static final String JOB_RUN_ID = "jsr_batch_run_id";
 	public DataFieldMaxValueIncrementer incremeter;
@@ -78,15 +79,15 @@ public class JsrJobParametersConverter implements ParametersConverter, Initializ
 	}
 
 	/* (non-Javadoc)
-	 * @see org.springframework.batch.core.jsr.ParametersConverter#convert(java.util.Properties)
+	 * @see org.springframework.batch.core.converter.JobParametersConverter#getJobParameters(java.util.Properties)
 	 */
 	@Override
-	public JobParameters convert(Properties parameters) {
+	public JobParameters getJobParameters(Properties properties) {
 		JobParametersBuilder builder = new JobParametersBuilder();
 		boolean runIdFound = false;
 
-		if(parameters != null) {
-			for (Map.Entry<Object, Object> curParameter : parameters.entrySet()) {
+		if(properties != null) {
+			for (Map.Entry<Object, Object> curParameter : properties.entrySet()) {
 				if(curParameter.getValue() != null) {
 					if(curParameter.getKey().equals(JOB_RUN_ID)) {
 						runIdFound = true;
@@ -106,15 +107,15 @@ public class JsrJobParametersConverter implements ParametersConverter, Initializ
 	}
 
 	/* (non-Javadoc)
-	 * @see org.springframework.batch.core.jsr.ParametersConverter#convert(org.springframework.batch.core.JobParameters)
+	 * @see org.springframework.batch.core.converter.JobParametersConverter#getProperties(org.springframework.batch.core.JobParameters)
 	 */
 	@Override
-	public Properties convert(JobParameters parameters) {
+	public Properties getProperties(JobParameters params) {
 		Properties properties = new Properties();
 		boolean runIdFound = false;
 
-		if(parameters != null) {
-			for(Map.Entry<String, JobParameter> curParameter: parameters.getParameters().entrySet()) {
+		if(params != null) {
+			for(Map.Entry<String, JobParameter> curParameter: params.getParameters().entrySet()) {
 				if(curParameter.getKey().equals(JOB_RUN_ID)) {
 					runIdFound = true;
 				}
