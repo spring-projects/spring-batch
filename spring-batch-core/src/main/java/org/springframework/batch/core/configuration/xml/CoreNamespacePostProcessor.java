@@ -15,6 +15,7 @@
  */
 package org.springframework.batch.core.configuration.xml;
 
+import org.springframework.batch.core.jsr.configuration.xml.JobFactoryBean;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.step.AbstractStep;
 import org.springframework.beans.BeansException;
@@ -122,6 +123,12 @@ public class CoreNamespacePostProcessor implements BeanPostProcessor, BeanFactor
 	private Object injectDefaults(Object bean) {
 		if (bean instanceof JobParserJobFactoryBean) {
 			JobParserJobFactoryBean fb = (JobParserJobFactoryBean) bean;
+			JobRepository jobRepository = fb.getJobRepository();
+			if (jobRepository == null) {
+				fb.setJobRepository((JobRepository) applicationContext.getBean(DEFAULT_JOB_REPOSITORY_NAME));
+			}
+		} else if(bean instanceof JobFactoryBean) {
+			JobFactoryBean fb = (JobFactoryBean) bean;
 			JobRepository jobRepository = fb.getJobRepository();
 			if (jobRepository == null) {
 				fb.setJobRepository((JobRepository) applicationContext.getBean(DEFAULT_JOB_REPOSITORY_NAME));
