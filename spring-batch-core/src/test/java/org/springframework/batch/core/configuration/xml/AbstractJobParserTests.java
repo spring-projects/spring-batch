@@ -22,7 +22,7 @@ import java.util.ArrayList;
 import org.junit.Before;
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.JobExecution;
-import org.springframework.batch.core.JobParameters;
+import org.springframework.batch.core.JobParametersBuilder;
 import org.springframework.batch.core.StepExecution;
 import org.springframework.batch.core.repository.JobExecutionAlreadyRunningException;
 import org.springframework.batch.core.repository.JobInstanceAlreadyCompleteException;
@@ -42,7 +42,7 @@ public abstract class AbstractJobParserTests {
 
 	@Autowired
 	private JobRepository jobRepository;
-	
+
 	@Autowired
 	private MapJobRepositoryFactoryBean mapJobRepositoryFactoryBean;
 
@@ -59,8 +59,8 @@ public abstract class AbstractJobParserTests {
 	 * @return JobExecution
 	 */
 	protected JobExecution createJobExecution() throws JobInstanceAlreadyCompleteException, JobRestartException,
-			JobExecutionAlreadyRunningException {
-		return jobRepository.createJobExecution(job.getName(), new JobParameters());
+	JobExecutionAlreadyRunningException {
+		return jobRepository.createJobExecution(job.getName(), new JobParametersBuilder().addLong("key1", 1l).toJobParameters());
 	}
 
 	/**

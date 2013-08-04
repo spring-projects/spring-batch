@@ -42,6 +42,7 @@ import org.springframework.batch.core.converter.DefaultJobParametersConverter;
 import org.springframework.batch.core.converter.JobParametersConverter;
 import org.springframework.batch.core.explore.JobExplorer;
 import org.springframework.batch.core.launch.JobLauncher;
+import org.springframework.batch.core.launch.NoSuchJobException;
 import org.springframework.batch.core.repository.JobExecutionAlreadyRunningException;
 import org.springframework.batch.core.step.JobRepositorySupport;
 import org.springframework.util.ClassUtils;
@@ -69,7 +70,7 @@ public class CommandLineJobRunnerTests {
 
 	@Before
 	public void setUp() throws Exception {
-		JobExecution jobExecution = new JobExecution(null, new Long(1), null);
+		JobExecution jobExecution = new JobExecution(null, new Long(1), null, null);
 		ExitStatus exitStatus = ExitStatus.COMPLETED;
 		jobExecution.setExitStatus(exitStatus);
 		StubJobLauncher.jobExecution = jobExecution;
@@ -284,7 +285,7 @@ public class CommandLineJobRunnerTests {
 	public void testRestartExecution() throws Throwable {
 		String[] args = new String[] { jobPath, "-restart", "11" };
 		JobParameters jobParameters = new JobParametersBuilder().addString("foo", "bar").toJobParameters();
-		JobExecution jobExecution = new JobExecution(new JobInstance(0L, jobName), 11L, jobParameters);
+		JobExecution jobExecution = new JobExecution(new JobInstance(0L, jobName), 11L, jobParameters, null);
 		jobExecution.setStatus(BatchStatus.FAILED);
 		StubJobExplorer.jobExecution = jobExecution;
 		CommandLineJobRunner.main(args);
@@ -296,7 +297,7 @@ public class CommandLineJobRunnerTests {
 	public void testRestartExecutionNotFailed() throws Throwable {
 		String[] args = new String[] { jobPath, "-restart", "11" };
 		JobParameters jobParameters = new JobParametersBuilder().addString("foo", "bar").toJobParameters();
-		JobExecution jobExecution = new JobExecution(new JobInstance(0L, jobName), 11L, jobParameters);
+		JobExecution jobExecution = new JobExecution(new JobInstance(0L, jobName), 11L, jobParameters, null);
 		jobExecution.setStatus(BatchStatus.COMPLETED);
 		StubJobExplorer.jobExecution = jobExecution;
 		CommandLineJobRunner.main(args);
@@ -451,7 +452,7 @@ public class CommandLineJobRunnerTests {
 		}
 
 		private JobExecution createJobExecution(JobInstance jobInstance, BatchStatus status) {
-			JobExecution jobExecution = new JobExecution(jobInstance, 1L, jobParameters);
+			JobExecution jobExecution = new JobExecution(jobInstance, 1L, jobParameters, null);
 			jobExecution.setStatus(status);
 			jobExecution.setStartTime(new Date());
 			if (status != BatchStatus.STARTED) {
@@ -483,6 +484,24 @@ public class CommandLineJobRunnerTests {
 		@Override
 		public List<String> getJobNames() {
 			throw new UnsupportedOperationException();
+		}
+
+		@Override
+		public int getJobInstanceCount(String jobName)
+				throws NoSuchJobException {
+			int count = 0;
+
+			for (JobInstance jobInstance : jobInstances) {
+				if(jobInstance.getJobName().equals(jobName)) {
+					count++;
+				}
+			}
+
+			if(count == 0) {
+				throw new NoSuchJobException("Unable to find job instances for " + jobName);
+			} else {
+				return count;
+			}
 		}
 
 	}

@@ -29,6 +29,7 @@ import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.JobInstance;
 import org.springframework.batch.core.JobKeyGenerator;
 import org.springframework.batch.core.JobParameters;
+import org.springframework.batch.core.launch.NoSuchJobException;
 import org.springframework.util.Assert;
 
 /**
@@ -38,7 +39,6 @@ public class MapJobInstanceDao implements JobInstanceDao {
 
 	// JDK6 Make a ConcurrentSkipListSet: tends to add on end
 	private final Map<String, JobInstance> jobInstances = new ConcurrentHashMap<String, JobInstance>();
-	//	private final Set<JobInstance> jobInstances = new CopyOnWriteArraySet<JobInstance>();
 
 	private JobKeyGenerator<JobParameters> jobKeyGenerator = new DefaultJobKeyGenerator();
 
@@ -55,14 +55,14 @@ public class MapJobInstanceDao implements JobInstanceDao {
 
 		JobInstance jobInstance = new JobInstance(currentId.getAndIncrement(), jobName);
 		jobInstance.incrementVersion();
-		jobInstances.put(jobName + jobKeyGenerator.generateKey(jobParameters), jobInstance);
+		jobInstances.put(jobName + "|" + jobKeyGenerator.generateKey(jobParameters), jobInstance);
 
 		return jobInstance;
 	}
 
 	@Override
 	public JobInstance getJobInstance(String jobName, JobParameters jobParameters) {
-		return jobInstances.get(jobName + jobKeyGenerator.generateKey(jobParameters));
+		return jobInstances.get(jobName + "|" + jobKeyGenerator.generateKey(jobParameters));
 	}
 
 	@Override
@@ -113,4 +113,23 @@ public class MapJobInstanceDao implements JobInstanceDao {
 		return jobExecution.getJobInstance();
 	}
 
+	@Override
+	public int getJobInstanceCount(String jobName) throws NoSuchJobException {
+		int count = 0;
+
+		for (Map.Entry<String, JobInstance> instanceEntry : jobInstances.entrySet()) {
+			String key = instanceEntry.getKey();
+			String curJobName = key.substring(0, key.lastIndexOf("|"));
+
+			if(curJobName.equals(jobName)) {
+				count++;
+			}
+		}
+
+		if(count == 0) {
+			throw new NoSuchJobException("No job instances for job name " + jobName + " were found");
+		} else {
+			return count;
+		}
+	}
 }

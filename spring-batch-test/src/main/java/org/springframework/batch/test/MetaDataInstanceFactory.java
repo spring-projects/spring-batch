@@ -138,7 +138,7 @@ public class MetaDataInstanceFactory {
 	 */
 	public static JobExecution createJobExecution(String jobName, Long instanceId, Long executionId,
 			JobParameters jobParameters) {
-		return new JobExecution(createJobInstance(jobName, instanceId), executionId, jobParameters);
+		return new JobExecution(createJobInstance(jobName, instanceId), executionId, jobParameters, null);
 	}
 
 	/**

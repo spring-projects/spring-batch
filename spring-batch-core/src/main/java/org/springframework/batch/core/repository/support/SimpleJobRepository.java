@@ -122,7 +122,7 @@ public class SimpleJobRepository implements JobRepository {
 				}
 
 				BatchStatus status = execution.getStatus();
-				if (status == BatchStatus.COMPLETED || status == BatchStatus.ABANDONED) {
+				if (execution.getJobParameters().getParameters().size() > 0 && (status == BatchStatus.COMPLETED || status == BatchStatus.ABANDONED)) {
 					throw new JobInstanceAlreadyCompleteException(
 							"A job instance already exists and is complete for parameters=" + jobParameters
 							+ ".  If you want to run this job again, change the parameters.");
@@ -136,7 +136,7 @@ public class SimpleJobRepository implements JobRepository {
 			executionContext = new ExecutionContext();
 		}
 
-		JobExecution jobExecution = new JobExecution(jobInstance, jobParameters);
+		JobExecution jobExecution = new JobExecution(jobInstance, jobParameters, null);
 		jobExecution.setExecutionContext(executionContext);
 		jobExecution.setLastUpdated(new Date(System.currentTimeMillis()));
 
@@ -258,7 +258,7 @@ public class SimpleJobRepository implements JobRepository {
 		return count;
 	}
 
-	/*
+	/**
 	 * Check to determine whether or not the JobExecution that is the parent of
 	 * the provided StepExecution has been interrupted. If, after synchronizing
 	 * the status with the database, the status has been updated to STOPPING,
@@ -288,5 +288,35 @@ public class SimpleJobRepository implements JobRepository {
 		}
 		return jobExecution;
 
+	}
+
+	@Override
+	public JobInstance createJobInstance(String jobName, JobParameters jobParameters) {
+		Assert.notNull(jobName, "A job name is required to create a JobInstance");
+		Assert.notNull(jobParameters, "Job parameters are required to create a JobInstance");
+
+		JobInstance jobInstance = jobInstanceDao.createJobInstance(jobName, jobParameters);
+
+		return jobInstance;
+	}
+
+	@Override
+	public JobExecution createJobExecution(JobInstance jobInstance,
+			JobParameters jobParameters, String jobConfigurationLocation) {
+
+		Assert.notNull(jobInstance, "A JobInstance is required to associate the JobExecution with");
+		Assert.notNull(jobParameters, "A JobParameters object is required to create a JobExecution");
+
+		JobExecution jobExecution = new JobExecution(jobInstance, jobParameters, jobConfigurationLocation);
+		ExecutionContext executionContext = new ExecutionContext();
+		jobExecution.setExecutionContext(executionContext);
+		jobExecution.setLastUpdated(new Date(System.currentTimeMillis()));
+
+		// Save the JobExecution so that it picks up an ID (useful for clients
+		// monitoring asynchronous executions):
+		jobExecutionDao.saveJobExecution(jobExecution);
+		ecDao.saveExecutionContext(jobExecution);
+
+		return jobExecution;
 	}
 }

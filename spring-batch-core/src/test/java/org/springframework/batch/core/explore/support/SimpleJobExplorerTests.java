@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2007 the original author or authors.
+ * Copyright 2006-2013 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,11 +16,11 @@
 
 package org.springframework.batch.core.explore.support;
 
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
-import static org.mockito.Mockito.verify;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 import java.util.Collections;
 
@@ -30,6 +30,7 @@ import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.JobInstance;
 import org.springframework.batch.core.JobParameters;
 import org.springframework.batch.core.StepExecution;
+import org.springframework.batch.core.launch.NoSuchJobException;
 import org.springframework.batch.core.repository.dao.ExecutionContextDao;
 import org.springframework.batch.core.repository.dao.JobExecutionDao;
 import org.springframework.batch.core.repository.dao.JobInstanceDao;
@@ -40,7 +41,7 @@ import org.springframework.batch.core.repository.dao.StepExecutionDao;
  *
  * @author Dave Syer
  * @author Will Schipp
- * 
+ * @author Michael Minella
  *
  */
 public class SimpleJobExplorerTests {
@@ -57,7 +58,7 @@ public class SimpleJobExplorerTests {
 
 	private ExecutionContextDao ecDao;
 
-	private JobExecution jobExecution = new JobExecution(jobInstance, 1234L, new JobParameters());
+	private JobExecution jobExecution = new JobExecution(jobInstance, 1234L, new JobParameters(), null);
 
 	@Before
 	public void setUp() throws Exception {
@@ -93,13 +94,13 @@ public class SimpleJobExplorerTests {
 		when(jobInstanceDao.getJobInstance(jobExecution)).thenReturn(jobInstance);
 		StepExecution stepExecution = jobExecution.createStepExecution("foo");
 		when(stepExecutionDao.getStepExecution(jobExecution, 123L))
-				.thenReturn(stepExecution);
+		.thenReturn(stepExecution);
 		when(ecDao.getExecutionContext(stepExecution)).thenReturn(null);
 		stepExecution = jobExplorer.getStepExecution(jobExecution.getId(), 123L);
-		
-		assertEquals(jobInstance, 
-			stepExecution.getJobExecution().getJobInstance());
-		
+
+		assertEquals(jobInstance,
+				stepExecution.getJobExecution().getJobInstance());
+
 		verify(jobInstanceDao).getJobInstance(jobExecution);
 	}
 
@@ -107,7 +108,7 @@ public class SimpleJobExplorerTests {
 	public void testGetStepExecutionMissing() throws Exception {
 		when(jobExecutionDao.getJobExecution(jobExecution.getId())).thenReturn(jobExecution);
 		when(stepExecutionDao.getStepExecution(jobExecution, 123L))
-				.thenReturn(null);
+		.thenReturn(null);
 		assertNull(jobExplorer.getStepExecution(jobExecution.getId(), 123L));
 	}
 
@@ -161,4 +162,17 @@ public class SimpleJobExplorerTests {
 		jobExplorer.getJobNames();
 	}
 
+	@Test
+	public void testGetJobInstanceCount() throws Exception {
+		when(jobInstanceDao.getJobInstanceCount("myJob")).thenReturn(4);
+
+		assertEquals(4, jobExplorer.getJobInstanceCount("myJob"));
+	}
+
+	@Test(expected=NoSuchJobException.class)
+	public void testGetJobInstanceCountException() throws Exception {
+		when(jobInstanceDao.getJobInstanceCount("throwException")).thenThrow(new NoSuchJobException("expected"));
+
+		jobExplorer.getJobInstanceCount("throwException");
+	}
 }
