@@ -72,6 +72,7 @@ public class StepContext implements javax.batch.runtime.context.StepContext {
 
 	@Override
 	public void setPersistentUserData(Serializable data) {
+		stepExecution.getExecutionContext().put("batch_jsr_persistentUserData", data);
 	}
 
 	@Override

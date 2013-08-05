@@ -33,13 +33,13 @@ import org.springframework.batch.core.step.StepLocator;
  * steps, rather than requiring sequential execution. In general, this job
  * implementation was designed to be used behind a parser, allowing for a
  * namespace to abstract away details.
- * 
+ *
  * @author Dave Syer
  * @since 2.0
  */
 public class FlowJob extends AbstractJob {
 
-	private Flow flow;
+	protected Flow flow;
 
 	private Map<String, Step> stepMap = new ConcurrentHashMap<String, Step>();
 
@@ -61,7 +61,7 @@ public class FlowJob extends AbstractJob {
 
 	/**
 	 * Public setter for the flow.
-	 * 
+	 *
 	 * @param flow the flow to set
 	 */
 	public void setFlow(Flow flow) {
