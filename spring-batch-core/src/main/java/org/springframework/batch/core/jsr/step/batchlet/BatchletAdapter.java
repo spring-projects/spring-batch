@@ -16,17 +16,22 @@
 package org.springframework.batch.core.jsr.step.batchlet;
 
 import javax.batch.api.Batchlet;
+import javax.batch.operations.BatchRuntimeException;
 
 import org.springframework.batch.core.ExitStatus;
 import org.springframework.batch.core.StepContribution;
 import org.springframework.batch.core.scope.context.ChunkContext;
-import org.springframework.batch.core.step.tasklet.Tasklet;
+import org.springframework.batch.core.step.tasklet.StoppableTasklet;
 import org.springframework.batch.repeat.RepeatStatus;
 import org.springframework.util.Assert;
 import org.springframework.util.StringUtils;
 
-//TODO: This needs to implement StoppableTasklet
-public class BatchletAdapter implements Tasklet {
+/**
+ *
+ * @author Michael Minella
+ * @since 3.0
+ */
+public class BatchletAdapter implements StoppableTasklet {
 
 	private Batchlet batchlet;
 
@@ -47,9 +52,12 @@ public class BatchletAdapter implements Tasklet {
 		return RepeatStatus.FINISHED;
 	}
 
-	//TODO: Once the stoppable tasklet is implemented...this will be good to go
-	//	@Override
-	//	public void stop() {
-	//		batchlet.stop();
-	//	}
+	@Override
+	public void stop() {
+		try {
+			batchlet.stop();
+		} catch (Exception e) {
+			throw new BatchRuntimeException(e);
+		}
+	}
 }

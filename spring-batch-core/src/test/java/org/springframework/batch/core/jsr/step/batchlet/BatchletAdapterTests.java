@@ -1,10 +1,12 @@
 package org.springframework.batch.core.jsr.step.batchlet;
 
 import static org.junit.Assert.assertEquals;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import javax.batch.api.Batchlet;
+import javax.batch.operations.BatchRuntimeException;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -49,5 +51,17 @@ public class BatchletAdapterTests {
 
 		verify(delegate).process();
 		verify(contribution).setExitStatus(new ExitStatus("my exit status"));
+	}
+
+	@Test
+	public void testStop() throws Exception{
+		adapter.stop();
+		verify(delegate).stop();
+	}
+
+	@Test(expected=BatchRuntimeException.class)
+	public void testStopException() throws Exception{
+		doThrow(new Exception("expected")).when(delegate).stop();
+		adapter.stop();
 	}
 }
