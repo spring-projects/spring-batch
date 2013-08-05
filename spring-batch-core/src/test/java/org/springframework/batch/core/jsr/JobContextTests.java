@@ -1,3 +1,18 @@
+/*
+ * Copyright 2013 the original author or authors.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package org.springframework.batch.core.jsr;
 
 import static org.junit.Assert.assertEquals;
@@ -16,7 +31,6 @@ import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.JobInstance;
 import org.springframework.batch.core.JobParameters;
 import org.springframework.batch.core.JobParametersBuilder;
-import org.springframework.batch.core.converter.JobParametersConverter;
 
 public class JobContextTests {
 
@@ -25,13 +39,15 @@ public class JobContextTests {
 	private JobExecution execution;
 	@Mock
 	private JobInstance instance;
-	@Mock
-	private JobParametersConverter converter;
 
 	@Before
 	public void setUp() throws Exception {
 		MockitoAnnotations.initMocks(this);
-		context = new JobContext(execution, converter);
+
+        Properties properties = new Properties();
+        properties.put("jobLevelProperty1", "jobLevelValue1");
+
+		context = new JobContext(execution, properties);
 		when(execution.getJobInstance()).thenReturn(instance);
 	}
 
@@ -68,19 +84,19 @@ public class JobContextTests {
 	}
 
 	@Test
-	public void testGetProperties() {
+	public void testJobParameters() {
 		JobParameters params = new JobParametersBuilder()
 		.addString("key1", "value1")
 		.toJobParameters();
-		Properties results = new Properties();
-		results.put("key1", "value1");
 
 		when(execution.getJobParameters()).thenReturn(params);
-		when(converter.getProperties(params)).thenReturn(results);
 
-		Properties props = context.getProperties();
+        assertEquals("value1", execution.getJobParameters().getString("key1"));
+	}
 
-		assertEquals("value1", props.get("key1"));
+	@Test
+	public void testJobProperties() {
+	    assertEquals("jobLevelValue1", context.getProperties().get("jobLevelProperty1"));
 	}
 
 	@Test

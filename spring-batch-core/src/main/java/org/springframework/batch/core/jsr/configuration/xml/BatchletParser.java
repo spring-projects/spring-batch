@@ -30,25 +30,25 @@ import org.w3c.dom.Element;
  * attribute is expected to point to an implementation of Tasklet).
  * 
  * @author Michael Minella
+ * @author Chris Schaefer
  * @since 3.0
  */
 public class BatchletParser extends AbstractSingleBeanDefinitionParser {
-
 	private static final String REF = "ref";
 
-	public void parseBatchlet(Element stepElement, Element taskletElement, AbstractBeanDefinition bd,
-			ParserContext parserContext) {
-
+	public void parseBatchlet(Element batchletElement, AbstractBeanDefinition bd, ParserContext parserContext) {
 		bd.setBeanClass(StepFactoryBean.class);
 		bd.setAttribute("isNamespaceStep", false);
 
-		String taskletRef = taskletElement.getAttribute(REF);
+		String taskletRef = batchletElement.getAttribute(REF);
 
 		if (StringUtils.hasText(taskletRef)) {
 			bd.getPropertyValues().addPropertyValue("tasklet", new RuntimeBeanReference(taskletRef));
 		}
 
 		bd.setRole(BeanDefinition.ROLE_SUPPORT);
-		bd.setSource(parserContext.extractSource(taskletElement));
+		bd.setSource(parserContext.extractSource(batchletElement));
+
+		new PropertyParser(taskletRef, parserContext).parseProperties(batchletElement);
 	}
 }

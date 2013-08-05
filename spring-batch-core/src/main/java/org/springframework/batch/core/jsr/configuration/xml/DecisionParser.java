@@ -29,6 +29,7 @@ import org.w3c.dom.Element;
  * parses a decision element and assumes that it refers to a {@link JobExecutionDecider}
  * 
  * @author Michael Minella
+ * @author Chris Schaefer
  * @since 3.0
  */
 public class DecisionParser {
@@ -37,7 +38,6 @@ public class DecisionParser {
 	private static final String REF_ATTRIBUTE = "ref";
 
 	public Collection<BeanDefinition> parse(Element element, ParserContext parserContext) {
-
 		String refAttribute = element.getAttribute(REF_ATTRIBUTE);
 		String idAttribute = element.getAttribute(ID_ATTRIBUTE);
 
@@ -45,6 +45,9 @@ public class DecisionParser {
 				BeanDefinitionBuilder.genericBeanDefinition("org.springframework.batch.core.job.flow.support.state.DecisionState");
 		stateBuilder.addConstructorArgValue(new RuntimeBeanReference(refAttribute));
 		stateBuilder.addConstructorArgValue(idAttribute);
+
+		new PropertyParser(refAttribute, parserContext).parseProperties(element);
+
 		return FlowParser.getNextElements(parserContext, stateBuilder.getBeanDefinition(), element);
 	}
 }
