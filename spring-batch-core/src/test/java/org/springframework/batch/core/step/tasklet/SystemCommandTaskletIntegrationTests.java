@@ -221,6 +221,26 @@ public class SystemCommandTaskletIntegrationTests {
 		tasklet.setWorkingDirectory(directory.getCanonicalPath());
 	}
 
+	/*
+	 * test stopping a tasklet
+	 */
+	@Test
+	public void testStopped() throws Exception {
+		String command = System.getProperty("os.name").toLowerCase().indexOf("win") >= 0 ?
+				"ping 1.1.1.1 -n 1 -w 5000" :
+					"sleep 5";
+		tasklet.setCommand(command);
+		tasklet.setTerminationCheckInterval(10);
+		tasklet.afterPropertiesSet();
+
+		StepContribution contribution = stepExecution.createStepContribution();
+		//send stop
+		tasklet.stop();
+		tasklet.execute(contribution, null);
+
+		assertEquals(contribution.getExitStatus().getExitCode(),ExitStatus.STOPPED.getExitCode());
+	}
+
 	/**
 	 * Exit code mapper containing mapping logic expected by the tests. 0 means
 	 * finished successfully, other value means failure.
