@@ -17,9 +17,11 @@ package org.springframework.batch.core.jsr.configuration.xml;
 
 import org.springframework.batch.core.configuration.xml.CoreNamespaceUtils;
 import org.springframework.beans.factory.config.BeanDefinition;
+import org.springframework.beans.factory.support.AbstractBeanDefinition;
 import org.springframework.beans.factory.support.BeanDefinitionBuilder;
 import org.springframework.beans.factory.xml.AbstractSingleBeanDefinitionParser;
 import org.springframework.beans.factory.xml.ParserContext;
+import org.springframework.context.annotation.AnnotationConfigUtils;
 import org.springframework.util.StringUtils;
 import org.w3c.dom.Element;
 
@@ -28,14 +30,17 @@ import org.w3c.dom.Element;
  * the standard Spring Batch artifacts.
  * 
  * @author Michael Minella
+ * @author Chris Schaefer
  * @since 3.0
  */
 public class JobParser extends AbstractSingleBeanDefinitionParser {
+    private static final String ID_ATTRIBUTE = "id";
+    private static final String RESTARTABLE_ATTRIBUTE = "restartable";
+    private static final String BATCH_PROPERTY_POST_PROCESSOR_CLASS_NAME = "org.springframework.batch.core.jsr.configuration.support.BatchPropertyBeanPostProcessor";
+    private static final String BATCH_PROPERTY_POST_PROCESSOR_BEAN_NAME = "batchPropertyPostProcessor";
+    private static final String JSR_AUTOWIRED_ANNOTATION_BEAN_POST_PROCESSOR_CLASS_NAME = "org.springframework.batch.core.jsr.configuration.support.JsrAutowiredAnnotationBeanPostProcessor";
 
-	private static final String RESTARTABLE_ATTRIBUTE = "restartable";
-	private static final String ID_ATTRIBUTE = "id";
-
-	@Override
+    @Override
 	protected Class<JobFactoryBean> getBeanClass(Element element) {
 		return JobFactoryBean.class;
 	}
@@ -43,6 +48,7 @@ public class JobParser extends AbstractSingleBeanDefinitionParser {
 	@Override
 	protected void doParse(Element element, ParserContext parserContext, BeanDefinitionBuilder builder) {
 		CoreNamespaceUtils.autoregisterBeansForNamespace(parserContext, parserContext.extractSource(element));
+		autoregisterJsrBeansForNamespace(parserContext);
 
 		String jobName = element.getAttribute(ID_ATTRIBUTE);
 		builder.addConstructorArgValue(jobName);
@@ -56,5 +62,34 @@ public class JobParser extends AbstractSingleBeanDefinitionParser {
 		builder.addPropertyValue("flow", flowDef);
 
 		new ListnerParser(JobListenerFactoryBean.class, "jobExecutionListeners").parseListeners(element, parserContext, builder);
+		new PropertyParser("job-" + jobName, parserContext).parseProperties(element);
 	}
+
+	private void autoregisterJsrBeansForNamespace(ParserContext parserContext) {
+        autoRegisterBatchPostProcessor(parserContext);
+        autoRegisterJsrAutowiredAnnotationBeanPostProcessor(parserContext);
+	}
+
+    private void autoRegisterBatchPostProcessor(ParserContext parserContext) {
+        BeanDefinitionBuilder batchPropertyBeanPostProcessor =
+                BeanDefinitionBuilder.genericBeanDefinition(BATCH_PROPERTY_POST_PROCESSOR_CLASS_NAME);
+
+        AbstractBeanDefinition batchPropertyBeanPostProcessorDefinition = batchPropertyBeanPostProcessor.getBeanDefinition();
+        batchPropertyBeanPostProcessorDefinition.setRole(BeanDefinition.ROLE_INFRASTRUCTURE);
+
+        parserContext.getRegistry().registerBeanDefinition(BATCH_PROPERTY_POST_PROCESSOR_BEAN_NAME, batchPropertyBeanPostProcessorDefinition);
+    }
+
+    private void autoRegisterJsrAutowiredAnnotationBeanPostProcessor(ParserContext parserContext) {
+        BeanDefinitionBuilder jsrAutowiredAnnotationBeanPostProcessor =
+                BeanDefinitionBuilder.genericBeanDefinition(JSR_AUTOWIRED_ANNOTATION_BEAN_POST_PROCESSOR_CLASS_NAME);
+
+        AbstractBeanDefinition jsrAutowiredAnnotationBeanPostProcessorDefinition =
+                jsrAutowiredAnnotationBeanPostProcessor.getBeanDefinition();
+
+        jsrAutowiredAnnotationBeanPostProcessorDefinition.setRole(BeanDefinition.ROLE_INFRASTRUCTURE);
+
+        parserContext.getRegistry().registerBeanDefinition(AnnotationConfigUtils.AUTOWIRED_ANNOTATION_PROCESSOR_BEAN_NAME,
+                jsrAutowiredAnnotationBeanPostProcessorDefinition);
+    }
 }

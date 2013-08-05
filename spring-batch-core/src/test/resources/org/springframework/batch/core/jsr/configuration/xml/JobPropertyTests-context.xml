@@ -1,0 +1,125 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:c="http://www.springframework.org/schema/c"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+						http://xmlns.jcp.org/xml/ns/javaee http://xmlns.jcp.org/xml/ns/javaee/jobXML_1_0.xsd">
+
+    <!-- Not implemented (partition relatated): JSR 8.2.6.2, 8.2.6.3.1, 8.2.6.4.1, 8.2.6.5.1, 8.2.6.6.1 -->
+
+	<job id="job1" xmlns="http://xmlns.jcp.org/xml/ns/javaee" version="1.0">
+	    <!-- JSR Section 8.1.3 -->
+        <properties>
+            <property name="jobPropertyName1" value="jobPropertyValue1"/>
+            <property name="jobPropertyName2" value="jobPropertyValue2"/>
+        </properties>
+
+		<step id="step1">
+		    <!-- JSR Section 8.2.3 -->
+		    <properties>
+                <property name="step1PropertyName1" value="step1PropertyValue1"/>
+                <property name="step1PropertyName2" value="step1PropertyValue2"/>
+		    </properties>
+            <chunk checkpoint-policy="custom">
+				<reader ref="testReader">
+				    <!-- JSR Section 8.2.1.1.1 -->
+                    <properties>
+                        <property name="readerPropertyName1" value="readerPropertyValue1"/>
+                        <property name="readerPropertyName2" value="readerPropertyValue2"/>
+                        <property name="annotationNamedReaderPropertyName" value="annotationNamedReaderPropertyValue"/>
+                        <property name="nonexistentReaderPropertyName" value="nonexistentReaderPropertyValue"/>
+                    </properties>
+				</reader>
+				<processor ref="testProcessor">
+				    <!-- JSR Section 8.2.1.2.1 -->
+                    <properties>
+                        <property name="processorPropertyName1" value="processorPropertyValue1"/>
+                        <property name="processorPropertyName2" value="processorPropertyValue2"/>
+                        <property name="annotationNamedProcessorPropertyName" value="annotationNamedProcessorPropertyValue"/>
+                        <property name="nonexistentProcessorPropertyName" value="nonexistentProcessorPropertyValue"/>
+                    </properties>
+                </processor>
+				<writer ref="testWriter">
+				    <!-- JSR Section 8.2.1.3.1 -->
+                    <properties>
+                        <property name="writerPropertyName1" value="writerPropertyValue1"/>
+                        <property name="writerPropertyName2" value="writerPropertyValue2"/>
+                        <property name="annotationNamedWriterPropertyName" value="annotationNamedWriterPropertyValue"/>
+                        <property name="nonexistentWriterPropertyName" value="nonexistentWriterPropertyValue"/>
+                    </properties>
+				</writer>
+				<checkpoint-algorithm ref="testCheckpointAlgorithm">
+				    <!-- JSR Section 8.2.1.5.1 -->
+                    <properties>
+                        <property name="algorithmPropertyName1" value="algorithmPropertyValue1"/>
+                        <property name="algorithmPropertyName2" value="algorithmPropertyValue2"/>
+                        <property name="annotationNamedAlgorithmPropertyName" value="annotationNamedAlgorithmPropertyValue"/>
+                        <property name="nonexistentAlgorithmPropertyName" value="nonexistentAlgorithmPropertyValue"/>
+                    </properties>
+				</checkpoint-algorithm>
+			</chunk>
+			<next on="*" to="stepDecider"/>
+		</step>
+		<decision id="stepDecider" ref="testDecider">
+            <properties>
+                <property name="deciderPropertyName1" value="deciderPropertyValue1"/>
+                <property name="deciderPropertyName2" value="deciderPropertyValue2"/>
+                <property name="annotationNamedDeciderPropertyName" value="annotationNamedDeciderPropertyValue"/>
+                <property name="nonexistentDeciderPropertyName" value="nonexistentDeciderPropertyValue"/>
+            </properties>
+            <next on="*" to="step2"/>
+		</decision>
+		<step id="step2">
+            <!-- JSR Section 8.2.3 -->
+            <properties>
+                <property name="step2PropertyName1" value="step2PropertyValue1"/>
+                <property name="step2PropertyName2" value="step2PropertyValue2"/>
+            </properties>
+            <!-- JSR Section 8.2.4.1 -->
+            <listeners>
+                <listener ref="testStepListener">
+                    <properties>
+                        <property name="stepListenerPropertyName1" value="stepListenerPropertyValue1"/>
+                        <property name="stepListenerPropertyName2" value="stepListenerPropertyValue2"/>
+                        <property name="annotationNamedStepListenerPropertyName" value="annotationNamedStepListenerPropertyValue"/>
+                        <property name="nonexistentStepListenerPropertyName" value="nonexistentStepListenerPropertyValue"/>
+                    </properties>
+                </listener>
+            </listeners>
+            <batchlet ref="testBatchlet">
+                <!-- JSR Section 8.2.2.2 -->
+                <properties>
+                    <property name="batchletPropertyName1" value="batchletPropertyValue1"/>
+                    <property name="batchletPropertyName2" value="batchletPropertyValue2"/>
+                    <property name="annotationNamedBatchletPropertyName" value="annotationNamedBatchletPropertyValue"/>
+                    <property name="nonexistentBatchletPropertyName" value="nonexistentBatchletPropertyValue"/>
+                </properties>
+            </batchlet>
+		</step>
+	</job>
+
+	<bean id="transactionManager" class="org.springframework.batch.support.transaction.ResourcelessTransactionManager"/>
+
+	<bean id="jobLauncher" class="org.springframework.batch.core.launch.support.SimpleJobLauncher">
+		<property name="jobRepository" ref="jobRepository"/>
+	</bean>
+
+	<bean id="jobRepository" class="org.springframework.batch.core.repository.support.MapJobRepositoryFactoryBean"/>
+
+    <bean id="testReader" class="org.springframework.batch.core.jsr.configuration.xml.JobPropertyTests.TestItemReader"/>
+
+    <bean id="testProcessor" class="org.springframework.batch.core.jsr.configuration.xml.JobPropertyTests.TestItemProcessor"/>
+
+    <bean id="testWriter" class="org.springframework.batch.core.jsr.configuration.xml.JobPropertyTests.TestItemWriter"/>
+
+    <bean id="testCheckpointAlgorithm" class="org.springframework.batch.core.jsr.configuration.xml.JobPropertyTests.TestCheckpointAlgorithm"/>
+
+    <bean id="testBatchlet" class="org.springframework.batch.core.jsr.configuration.xml.JobPropertyTests.TestBatchlet"/>
+
+    <bean id="testStepListener" class="org.springframework.batch.core.jsr.configuration.xml.JobPropertyTests.TestStepListener"/>
+
+    <bean id="testDecider" class="org.springframework.batch.core.jsr.configuration.xml.JobPropertyTests.TestDecider"/>
+
+    <bean id="injectTestObj" class="org.springframework.batch.core.jsr.configuration.xml.JobPropertyTests.InjectTestObj"
+        c:name="Chris"/>
+</beans>

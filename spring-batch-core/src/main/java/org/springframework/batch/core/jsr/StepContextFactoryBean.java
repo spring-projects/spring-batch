@@ -15,49 +15,39 @@
  */
 package org.springframework.batch.core.jsr;
 
-import javax.sql.DataSource;
+import java.util.Properties;
 
-import org.springframework.batch.core.converter.JobParametersConverter;
+import org.springframework.batch.core.jsr.configuration.support.BatchPropertyContext;
 import org.springframework.batch.core.scope.context.StepSynchronizationManager;
 import org.springframework.beans.factory.FactoryBean;
-import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.util.Assert;
 
 /**
  * {@link FactoryBean} implementation used to create {@link javax.batch.runtime.context.StepContext}
  * instances within the step scope.
  *
  * @author Michael Minella
+ * @author Chris Schaefer
  * @since 3.0
  */
-public class StepContextFactoryBean implements FactoryBean<StepContext>, InitializingBean {
-
+public class StepContextFactoryBean implements FactoryBean<StepContext> {
 	@Autowired
-	public DataSource dataSource;
-	private JobParametersConverter jobParametersConveter;
+	private BatchPropertyContext batchPropertyContext;
 
-	/* (non-Javadoc)
-	 * @see org.springframework.beans.factory.InitializingBean#afterPropertiesSet()
-	 */
-	@Override
-	public void afterPropertiesSet() throws Exception {
-		Assert.notNull(dataSource, "A DataSource is required");
-
-		jobParametersConveter = new JsrJobParametersConverter(dataSource);
-	}
-
-	/* (non-Javadoc)
-	 * @see org.springframework.beans.factory.FactoryBean#getObject()
-	 */
+    /* (non-Javadoc)
+     * @see org.springframework.beans.factory.FactoryBean#getObject()
+     */
 	@Override
 	public StepContext getObject() throws Exception {
-		return new StepContext(StepSynchronizationManager.getContext().getStepExecution(), jobParametersConveter);
+		org.springframework.batch.core.StepExecution stepExecution = StepSynchronizationManager.getContext().getStepExecution();
+		Properties properties = batchPropertyContext.getBatchProperties(stepExecution.getStepName());
+
+		return new StepContext(stepExecution, properties);
 	}
 
-	/* (non-Javadoc)
-	 * @see org.springframework.beans.factory.FactoryBean#getObjectType()
-	 */
+    /* (non-Javadoc)
+     * @see org.springframework.beans.factory.FactoryBean#getObjectType()
+     */
 	@Override
 	public Class<?> getObjectType() {
 		return StepContext.class;

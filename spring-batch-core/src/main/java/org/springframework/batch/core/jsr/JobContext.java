@@ -21,7 +21,6 @@ import javax.batch.runtime.BatchStatus;
 
 import org.springframework.batch.core.ExitStatus;
 import org.springframework.batch.core.JobExecution;
-import org.springframework.batch.core.converter.JobParametersConverter;
 import org.springframework.util.Assert;
 
 /**
@@ -30,23 +29,23 @@ import org.springframework.util.Assert;
  * obtain the related contextual information.
  *
  * @author Michael Minella
+ * @author Chris Schaefer
  * @since 3.0
  */
 public class JobContext implements javax.batch.runtime.context.JobContext {
 
-	private JobExecution jobExecution;
 	private Object transientUserData;
-	private JobParametersConverter jobParametersConverter;
+    private Properties properties;
+    private JobExecution jobExecution;
 
-	/**
+    /**
 	 * @param jobExecution for the related job
 	 */
-	public JobContext(JobExecution jobExecution, JobParametersConverter jobParametersConverter) {
+	public JobContext(JobExecution jobExecution, Properties properties) {
 		Assert.notNull(jobExecution, "A JobExecution is required");
-		Assert.notNull(jobParametersConverter, "A ParametersConverter is required");
 
-		this.jobExecution = jobExecution;
-		this.jobParametersConverter = jobParametersConverter;
+        this.properties = properties;
+        this.jobExecution = jobExecution;
 	}
 
 	/* (non-Javadoc)
@@ -94,7 +93,7 @@ public class JobContext implements javax.batch.runtime.context.JobContext {
 	 */
 	@Override
 	public Properties getProperties() {
-		return jobParametersConverter.getProperties(this.jobExecution.getJobParameters());
+		return properties != null ? properties : new Properties();
 	}
 
 	/* (non-Javadoc)
