@@ -18,6 +18,7 @@ package org.springframework.batch.core.jsr.configuration.xml;
 import java.util.Collection;
 
 import org.springframework.batch.core.job.flow.support.state.StepState;
+import org.springframework.batch.core.jsr.StepContextFactoryBean;
 import org.springframework.batch.core.listener.StepListenerFactoryBean;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.parsing.BeanComponentDefinition;
@@ -32,7 +33,7 @@ import org.w3c.dom.NodeList;
 
 /**
  * Parser for the &lt;step /&gt; element defined by JSR-352.
- * 
+ *
  * @author Michael Minella
  * @since 3.0
  */
@@ -85,6 +86,13 @@ public class StepParser extends AbstractSingleBeanDefinitionParser {
 				}
 			}
 		}
+
+		AbstractBeanDefinition stepContextBeanDefinition = BeanDefinitionBuilder.genericBeanDefinition(StepContextFactoryBean.class)
+				.getBeanDefinition();
+
+		stepContextBeanDefinition.setScope("step");
+
+		parserContext.getRegistry().registerBeanDefinition(stepName + "stepContext", stepContextBeanDefinition);
 
 		return FlowParser.getNextElements(parserContext, stepName, stateBuilder.getBeanDefinition(), element);
 	}

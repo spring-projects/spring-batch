@@ -1,6 +1,8 @@
 package org.springframework.batch.core.jsr;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
 import java.util.Properties;
@@ -15,11 +17,13 @@ import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.JobParametersBuilder;
 import org.springframework.batch.core.StepExecution;
 import org.springframework.batch.core.converter.JobParametersConverterSupport;
+import org.springframework.batch.item.ExecutionContext;
 
 public class StepContextTests {
 
 	private StepExecution stepExecution;
 	private StepContext stepContext;
+	private ExecutionContext executionContext;
 
 	@Before
 	public void setUp() throws Exception {
@@ -37,6 +41,8 @@ public class StepContextTests {
 		stepExecution.setRollbackCount(6);
 		stepExecution.setWriteCount(7);
 		stepExecution.setWriteSkipCount(8);
+		executionContext = new ExecutionContext();
+		stepExecution.setExecutionContext(executionContext);
 
 		stepContext = new StepContext(stepExecution, new JobParametersConverterSupport());
 		stepContext.setTransientUserData("This is my transient data");
@@ -91,5 +97,39 @@ public class StepContextTests {
 	public void testSetExitStatus() {
 		stepContext.setExitStatus("new Exit Status");
 		assertEquals("new Exit Status", stepExecution.getExitStatus().getExitCode());
+	}
+
+	@Test
+	public void testPersistentUserData() {
+		String data = "saved data";
+		stepContext.setPersistentUserData(data);
+		assertEquals(data, stepContext.getPersistentUserData());
+		assertEquals(data, executionContext.get("batch_jsr_persistentUserData"));
+	}
+
+	@Test
+	public void testGetExceptionEmpty() {
+		assertNull(stepContext.getException());
+	}
+
+	@Test
+	public void testGetExceptionException() {
+		stepExecution.addFailureException(new Exception("expected"));
+		assertEquals("expected", stepContext.getException().getMessage());
+	}
+
+	@Test
+	public void testGetExceptionThrowable() {
+		stepExecution.addFailureException(new Throwable("expected"));
+		assertTrue(stepContext.getException().getMessage().endsWith("expected"));
+	}
+
+	@Test
+	public void testGetExceptionMultiple() {
+		stepExecution.addFailureException(new Exception("not me"));
+		stepExecution.addFailureException(new Exception("not me either"));
+		stepExecution.addFailureException(new Exception("me"));
+
+		assertEquals("me", stepContext.getException().getMessage());
 	}
 }

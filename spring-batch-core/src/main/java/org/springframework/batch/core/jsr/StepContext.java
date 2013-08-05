@@ -16,6 +16,7 @@
 package org.springframework.batch.core.jsr;
 
 import java.io.Serializable;
+import java.util.List;
 import java.util.Properties;
 
 import javax.batch.runtime.BatchStatus;
@@ -26,6 +27,14 @@ import org.springframework.batch.core.StepExecution;
 import org.springframework.batch.core.converter.JobParametersConverter;
 import org.springframework.util.Assert;
 
+/**
+ * Wrapper class to provide the {@link javax.batch.runtime.context.StepContext} functionality
+ * as specified in JSR-352.  Wrapper delegates to the underlying {@link StepExecution} to
+ * obtain the related contextual information.
+ *
+ * @author Michael Minella
+ * @since 3.0
+ */
 public class StepContext implements javax.batch.runtime.context.StepContext {
 
 	private StepExecution stepExecution;
@@ -40,60 +49,116 @@ public class StepContext implements javax.batch.runtime.context.StepContext {
 		this.jobParametersConveter = jobParametersConveter;
 	}
 
+	/* (non-Javadoc)
+	 * @see javax.batch.runtime.context.StepContext#getStepName()
+	 */
 	@Override
 	public String getStepName() {
 		return stepExecution.getStepName();
 	}
 
+	/* (non-Javadoc)
+	 * @see javax.batch.runtime.context.StepContext#getTransientUserData()
+	 */
 	@Override
 	public Object getTransientUserData() {
 		return transientUserData;
 	}
 
+	/* (non-Javadoc)
+	 * @see javax.batch.runtime.context.StepContext#setTransientUserData(java.lang.Object)
+	 */
 	@Override
 	public void setTransientUserData(Object data) {
 		this.transientUserData = data;
 	}
 
+	/* (non-Javadoc)
+	 * @see javax.batch.runtime.context.StepContext#getStepExecutionId()
+	 */
 	@Override
 	public long getStepExecutionId() {
 		return stepExecution.getId();
 	}
 
+	/* (non-Javadoc)
+	 * @see javax.batch.runtime.context.StepContext#getProperties()
+	 */
 	@Override
 	public Properties getProperties() {
+		//TODO: Fix this...this should be properties, not parameters.  Waiting on BATCH-2001
 		return jobParametersConveter.getProperties(this.stepExecution.getJobParameters());
 	}
 
+	/* (non-Javadoc)
+	 * @see javax.batch.runtime.context.StepContext#getPersistentUserData()
+	 */
 	@Override
 	public Serializable getPersistentUserData() {
-		return null;
+		return (Serializable) stepExecution.getExecutionContext().get("batch_jsr_persistentUserData");
 	}
 
+	/* (non-Javadoc)
+	 * @see javax.batch.runtime.context.StepContext#setPersistentUserData(java.io.Serializable)
+	 */
 	@Override
 	public void setPersistentUserData(Serializable data) {
+		stepExecution.getExecutionContext().put("batch_jsr_persistentUserData", data);
 	}
 
+	/* (non-Javadoc)
+	 * @see javax.batch.runtime.context.StepContext#getBatchStatus()
+	 */
 	@Override
 	public BatchStatus getBatchStatus() {
 		return stepExecution.getStatus().getBatchStatus();
 	}
 
+	/* (non-Javadoc)
+	 * @see javax.batch.runtime.context.StepContext#getExitStatus()
+	 */
 	@Override
 	public String getExitStatus() {
 		return stepExecution.getExitStatus().getExitCode();
 	}
 
+	/* (non-Javadoc)
+	 * @see javax.batch.runtime.context.StepContext#setExitStatus(java.lang.String)
+	 */
 	@Override
 	public void setExitStatus(String status) {
 		stepExecution.setExitStatus(new ExitStatus(status));
 	}
 
+	/**
+	 * To support both JSR-352's requirement to return the most recent exception
+	 * and Spring Batch's support for {@link Throwable}, this implementation will
+	 * return the most recent exception in the underlying {@link StepExecution}'s
+	 * failure exceptions list.  If the exception there extends {@link Throwable}
+	 * instead of {@link Exception}, it will be wrapped in an {@link Exception} and
+	 * then returned.
+	 *
+	 * @see javax.batch.runtime.context.StepContext#getException()
+	 */
 	@Override
 	public Exception getException() {
-		return null;
+		List<Throwable> failureExceptions = stepExecution.getFailureExceptions();
+		if(failureExceptions == null || failureExceptions.isEmpty()) {
+			return null;
+		} else {
+			Throwable t = failureExceptions.get(failureExceptions.size() - 1);
+
+			if(t instanceof Exception) {
+				return (Exception) t;
+			} else {
+				return new Exception(t);
+			}
+		}
 	}
 
+	/* (non-Javadoc)
+	 * @see javax.batch.runtime.context.StepContext#getMetrics()
+	 */
 	@Override
 	public Metric[] getMetrics() {
 		Metric[] metrics = new Metric[8];
