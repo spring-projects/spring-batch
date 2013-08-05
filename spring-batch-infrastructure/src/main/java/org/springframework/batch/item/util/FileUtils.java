@@ -74,6 +74,9 @@ public final class FileUtils {
 				}
 				else {
 					if (!file.exists()) {
+						if (file.getParent() != null) {
+							new File(file.getParent()).mkdirs();
+						}
 						if (!createNewFile(file)) {
 							throw new ItemStreamException("Output file was not created: [" + file.getAbsolutePath()
 									+ "]");
