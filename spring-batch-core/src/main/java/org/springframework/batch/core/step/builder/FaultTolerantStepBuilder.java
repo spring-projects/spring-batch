@@ -35,6 +35,8 @@ import org.springframework.batch.core.step.FatalStepExecutionException;
 import org.springframework.batch.core.step.item.BatchRetryTemplate;
 import org.springframework.batch.core.step.item.ChunkMonitor;
 import org.springframework.batch.core.step.item.ChunkOrientedTasklet;
+import org.springframework.batch.core.step.item.ChunkProcessor;
+import org.springframework.batch.core.step.item.ChunkProvider;
 import org.springframework.batch.core.step.item.FaultTolerantChunkProcessor;
 import org.springframework.batch.core.step.item.FaultTolerantChunkProvider;
 import org.springframework.batch.core.step.item.ForceRollbackForWriteSkipException;
@@ -166,8 +168,8 @@ public class FaultTolerantStepBuilder<I, O> extends SimpleStepBuilder<I, O> {
 		Assert.state(getProcessor() != null || getWriter() != null, "ItemWriter or ItemProcessor must be provided");
 		addSpecialExceptions();
 		registerSkipListeners();
-		FaultTolerantChunkProvider<I> chunkProvider = createChunkProvider();
-		FaultTolerantChunkProcessor<I, O> chunkProcessor = createChunkProcessor();
+		ChunkProvider<I> chunkProvider = createChunkProvider();
+		ChunkProcessor<I> chunkProcessor = createChunkProcessor();
 		ChunkOrientedTasklet<I> tasklet = new ChunkOrientedTasklet<I>(chunkProvider, chunkProcessor);
 		tasklet.setBuffering(!isReaderTransactionalQueue());
 		return tasklet;
@@ -382,7 +384,7 @@ public class FaultTolerantStepBuilder<I, O> extends SimpleStepBuilder<I, O> {
 		return this;
 	}
 
-	private FaultTolerantChunkProvider<I> createChunkProvider() {
+	protected ChunkProvider<I> createChunkProvider() {
 
 		SkipPolicy readSkipPolicy = createSkipPolicy();
 		readSkipPolicy = getFatalExceptionAwareProxy(readSkipPolicy);
@@ -399,7 +401,7 @@ public class FaultTolerantStepBuilder<I, O> extends SimpleStepBuilder<I, O> {
 
 	}
 
-	private FaultTolerantChunkProcessor<I, O> createChunkProcessor() {
+	protected ChunkProcessor<I> createChunkProcessor() {
 
 		BatchRetryTemplate batchRetryTemplate = createRetryOperations();
 
@@ -435,7 +437,7 @@ public class FaultTolerantStepBuilder<I, O> extends SimpleStepBuilder<I, O> {
 				SkipPolicyFailedException.class, RetryException.class, JobInterruptedException.class, Error.class);
 	}
 
-	private void detectStreamInReader() {
+	protected void detectStreamInReader() {
 		if (streamIsReader) {
 			if (!concurrent()) {
 				chunkMonitor.setItemReader(getReader());
@@ -470,7 +472,7 @@ public class FaultTolerantStepBuilder<I, O> extends SimpleStepBuilder<I, O> {
 	 *
 	 * @return an exception classifier: maps to true if an exception should cause rollback
 	 */
-	private Classifier<Throwable, Boolean> getRollbackClassifier() {
+	protected Classifier<Throwable, Boolean> getRollbackClassifier() {
 
 		Classifier<Throwable, Boolean> classifier = new BinaryExceptionClassifier(noRollbackExceptionClasses, false);
 
@@ -534,7 +536,7 @@ public class FaultTolerantStepBuilder<I, O> extends SimpleStepBuilder<I, O> {
 	/**
 	 * @return fully configured retry template for item processing phase.
 	 */
-	private BatchRetryTemplate createRetryOperations() {
+	protected BatchRetryTemplate createRetryOperations() {
 
 		RetryPolicy retryPolicy = this.retryPolicy;
 		SimpleRetryPolicy simpleRetryPolicy = null;
@@ -582,6 +584,10 @@ public class FaultTolerantStepBuilder<I, O> extends SimpleStepBuilder<I, O> {
 
 	}
 
+	protected ChunkMonitor getChunkMonitor() {
+		return this.chunkMonitor;
+	}
+
 	/**
 	 * Wrap the provided {@link #setRetryPolicy(RetryPolicy)} so that it never retries explicitly non-retryable
 	 * exceptions.
@@ -610,7 +616,7 @@ public class FaultTolerantStepBuilder<I, O> extends SimpleStepBuilder<I, O> {
 	 * @param skipPolicy an existing skip policy
 	 * @return a skip policy that will not skip fatal exceptions
 	 */
-	private SkipPolicy getFatalExceptionAwareProxy(SkipPolicy skipPolicy) {
+	protected SkipPolicy getFatalExceptionAwareProxy(SkipPolicy skipPolicy) {
 
 		NeverSkipItemSkipPolicy neverSkipPolicy = new NeverSkipItemSkipPolicy();
 		Map<Class<? extends Throwable>, SkipPolicy> map = new HashMap<Class<? extends Throwable>, SkipPolicy>();

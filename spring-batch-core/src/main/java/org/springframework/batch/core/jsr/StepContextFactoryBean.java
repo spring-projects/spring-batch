@@ -34,9 +34,9 @@ public class StepContextFactoryBean implements FactoryBean<StepContext> {
 	@Autowired
 	private BatchPropertyContext batchPropertyContext;
 
-    /* (non-Javadoc)
-     * @see org.springframework.beans.factory.FactoryBean#getObject()
-     */
+	/* (non-Javadoc)
+	 * @see org.springframework.beans.factory.FactoryBean#getObject()
+	 */
 	@Override
 	public StepContext getObject() throws Exception {
 		org.springframework.batch.core.StepExecution stepExecution = StepSynchronizationManager.getContext().getStepExecution();
@@ -45,9 +45,9 @@ public class StepContextFactoryBean implements FactoryBean<StepContext> {
 		return new StepContext(stepExecution, properties);
 	}
 
-    /* (non-Javadoc)
-     * @see org.springframework.beans.factory.FactoryBean#getObjectType()
-     */
+	/* (non-Javadoc)
+	 * @see org.springframework.beans.factory.FactoryBean#getObjectType()
+	 */
 	@Override
 	public Class<?> getObjectType() {
 		return StepContext.class;

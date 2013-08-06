@@ -311,7 +311,7 @@ public class SimpleStepBuilder<I, O> extends AbstractTaskletStepBuilder<SimpleSt
 	/**
 	 * @return a {@link CompletionPolicy} consistent with the chunk size and injected policy (if present).
 	 */
-	private CompletionPolicy getChunkCompletionPolicy() {
+	protected CompletionPolicy getChunkCompletionPolicy() {
 		Assert.state(!(completionPolicy != null && chunkSize > 0),
 				"You must specify either a chunkCompletionPolicy or a commitInterval but not both.");
 		Assert.state(chunkSize >= 0, "The commitInterval must be positive or zero (for default value).");

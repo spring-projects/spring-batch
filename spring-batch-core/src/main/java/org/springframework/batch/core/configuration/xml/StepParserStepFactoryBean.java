@@ -309,7 +309,7 @@ public class StepParserStepFactoryBean<I, O> implements FactoryBean, BeanNameAwa
 
 	private Step createFaultTolerantStep() {
 
-		FaultTolerantStepBuilder<I, O> builder = new FaultTolerantStepBuilder<I, O>(new StepBuilder(name));
+		FaultTolerantStepBuilder<I, O> builder = getFaultTolerantStepBuilder(this.name);
 
 		if (commitInterval != null) {
 			builder.chunk(commitInterval);
@@ -382,6 +382,10 @@ public class StepParserStepFactoryBean<I, O> implements FactoryBean, BeanNameAwa
 
 	}
 
+	protected FaultTolerantStepBuilder<I, O> getFaultTolerantStepBuilder(String stepName) {
+		return new FaultTolerantStepBuilder<I, O>(new StepBuilder(stepName));
+	}
+
 	private void registerItemListeners(SimpleStepBuilder<I, O> builder) {
 		for (ItemReadListener<I> listener : readListeners) {
 			builder.listener(listener);
@@ -396,7 +400,7 @@ public class StepParserStepFactoryBean<I, O> implements FactoryBean, BeanNameAwa
 
 	@SuppressWarnings("unchecked")
 	private Step createSimpleStep() {
-		SimpleStepBuilder builder = new SimpleStepBuilder(new StepBuilder(name));
+		SimpleStepBuilder builder = getSimpleStepBuilder(this.name);
 
 		if(timeout != null && commitInterval != null) {
 			CompositeCompletionPolicy completionPolicy = new CompositeCompletionPolicy();
@@ -418,6 +422,11 @@ public class StepParserStepFactoryBean<I, O> implements FactoryBean, BeanNameAwa
 		builder.writer(itemWriter);
 		builder.processor(itemProcessor);
 		return builder.build();
+	}
+
+	@SuppressWarnings("unchecked")
+	protected SimpleStepBuilder getSimpleStepBuilder(String stepName) {
+		return new SimpleStepBuilder(new StepBuilder(stepName));
 	}
 
 	private TaskletStep createTaskletStep() {

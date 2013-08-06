@@ -17,12 +17,7 @@ package org.springframework.batch.core.jsr.configuration.xml;
 
 import java.util.Collection;
 
-import org.w3c.dom.Element;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
-
 import org.springframework.batch.core.job.flow.support.state.StepState;
-import org.springframework.batch.core.jsr.StepContextFactoryBean;
 import org.springframework.batch.core.listener.StepListenerFactoryBean;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.parsing.BeanComponentDefinition;
@@ -31,10 +26,13 @@ import org.springframework.beans.factory.support.BeanDefinitionBuilder;
 import org.springframework.beans.factory.xml.AbstractSingleBeanDefinitionParser;
 import org.springframework.beans.factory.xml.ParserContext;
 import org.springframework.util.StringUtils;
+import org.w3c.dom.Element;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
 
 /**
  * Parser for the &lt;step /&gt; element defined by JSR-352.
- * 
+ *
  * @author Michael Minella
  * @author Glenn Renfro
  * @author Chris Schaefer
@@ -90,13 +88,6 @@ public class StepParser extends AbstractSingleBeanDefinitionParser {
 				}
 			}
 		}
-
-		AbstractBeanDefinition stepContextBeanDefinition = BeanDefinitionBuilder.genericBeanDefinition(StepContextFactoryBean.class)
-				.getBeanDefinition();
-
-		stepContextBeanDefinition.setScope("step");
-
-		parserContext.getRegistry().registerBeanDefinition(stepName + "stepContext", stepContextBeanDefinition);
 
 		return FlowParser.getNextElements(parserContext, stepName, stateBuilder.getBeanDefinition(), element);
 	}
