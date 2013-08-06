@@ -17,6 +17,10 @@ package org.springframework.batch.core.jsr.configuration.xml;
 
 import java.util.Collection;
 
+import org.w3c.dom.Element;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+
 import org.springframework.batch.core.job.flow.support.state.StepState;
 import org.springframework.batch.core.jsr.StepContextFactoryBean;
 import org.springframework.batch.core.listener.StepListenerFactoryBean;
@@ -27,14 +31,12 @@ import org.springframework.beans.factory.support.BeanDefinitionBuilder;
 import org.springframework.beans.factory.xml.AbstractSingleBeanDefinitionParser;
 import org.springframework.beans.factory.xml.ParserContext;
 import org.springframework.util.StringUtils;
-import org.w3c.dom.Element;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
 
 /**
  * Parser for the &lt;step /&gt; element defined by JSR-352.
- *
+ * 
  * @author Michael Minella
+ * @author Glenn Renfro
  * @since 3.0
  */
 public class StepParser extends AbstractSingleBeanDefinitionParser {
@@ -59,12 +61,13 @@ public class StepParser extends AbstractSingleBeanDefinitionParser {
 
 		String startLimit = element.getAttribute(START_LIMIT_ATTRIBUTE);
 		if(StringUtils.hasText(startLimit)) {
-			builder.addPropertyValue("startLimit", startLimit);
+			bd.getPropertyValues().addPropertyValue("startLimit", startLimit);
 		}
 
 		String allowStartIfComplete = element.getAttribute(ALLOW_START_IF_COMPLETE_ATTRIBUTE);
 		if(StringUtils.hasText(allowStartIfComplete)) {
-			builder.addPropertyValue("allowStartIfComplete", allowStartIfComplete);
+			bd.getPropertyValues().addPropertyValue("allowStartIfComplete",
+					allowStartIfComplete);
 		}
 
 		new ListnerParser(StepListenerFactoryBean.class, "listeners").parseListeners(element, parserContext, bd);
