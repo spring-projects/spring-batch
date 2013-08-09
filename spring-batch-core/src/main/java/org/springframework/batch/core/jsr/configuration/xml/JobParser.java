@@ -16,6 +16,7 @@
 package org.springframework.batch.core.jsr.configuration.xml;
 
 import org.springframework.batch.core.configuration.xml.CoreNamespaceUtils;
+import org.springframework.batch.core.jsr.StepContextFactoryBean;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.support.AbstractBeanDefinition;
 import org.springframework.beans.factory.support.BeanDefinitionBuilder;
@@ -28,7 +29,7 @@ import org.w3c.dom.Element;
 /**
  * Parses a &lt;job /&gt; tag as defined in JSR-352.  Current state parses into
  * the standard Spring Batch artifacts.
- * 
+ *
  * @author Michael Minella
  * @author Chris Schaefer
  * @since 3.0
@@ -60,6 +61,13 @@ public class JobParser extends AbstractSingleBeanDefinitionParser {
 
 		BeanDefinition flowDef = new FlowParser(jobName).parse(element, parserContext);
 		builder.addPropertyValue("flow", flowDef);
+
+		AbstractBeanDefinition stepContextBeanDefinition = BeanDefinitionBuilder.genericBeanDefinition(StepContextFactoryBean.class)
+				.getBeanDefinition();
+
+		stepContextBeanDefinition.setScope("step");
+
+		parserContext.getRegistry().registerBeanDefinition("stepContextFactory", stepContextBeanDefinition);
 
 		new ListnerParser(JobListenerFactoryBean.class, "jobExecutionListeners").parseListeners(element, parserContext, builder);
 		new PropertyParser("job-" + jobName, parserContext).parseProperties(element);
