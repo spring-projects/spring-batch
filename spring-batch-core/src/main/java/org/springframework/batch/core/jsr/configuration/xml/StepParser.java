@@ -37,17 +37,17 @@ import org.springframework.util.StringUtils;
  * 
  * @author Michael Minella
  * @author Glenn Renfro
+ * @author Chris Schaefer
  * @since 3.0
  */
 public class StepParser extends AbstractSingleBeanDefinitionParser {
-
 	private static final String CHUNK_ELEMENT = "chunk";
 	private static final String BATCHLET_ELEMENT = "batchlet";
 	private static final String ALLOW_START_IF_COMPLETE_ATTRIBUTE = "allow-start-if-complete";
 	private static final String START_LIMIT_ATTRIBUTE = "start-limit";
 	private static final String SPLIT_ID_ATTRIBUTE = "id";
 
-	protected Collection<BeanDefinition>  parse(Element element, ParserContext parserContext, BeanDefinitionBuilder builder) {
+	protected Collection<BeanDefinition> parse(Element element, ParserContext parserContext, BeanDefinitionBuilder builder) {
 		BeanDefinitionBuilder defBuilder = BeanDefinitionBuilder.genericBeanDefinition();
 		AbstractBeanDefinition bd = defBuilder.getRawBeanDefinition();
 		bd.setBeanClass(StepFactoryBean.class);
@@ -71,6 +71,7 @@ public class StepParser extends AbstractSingleBeanDefinitionParser {
 		}
 
 		new ListnerParser(StepListenerFactoryBean.class, "listeners").parseListeners(element, parserContext, bd);
+		new PropertyParser(stepName, parserContext).parseProperties(element);
 
 		// look at all nested elements
 		NodeList children = element.getChildNodes();
@@ -83,7 +84,7 @@ public class StepParser extends AbstractSingleBeanDefinitionParser {
 				String name = nestedElement.getLocalName();
 
 				if(name.equalsIgnoreCase(BATCHLET_ELEMENT)) {
-					new BatchletParser().parseBatchlet(element, nestedElement, bd, parserContext);
+					new BatchletParser().parseBatchlet(nestedElement, bd, parserContext);
 				} else if(name.equals(CHUNK_ELEMENT)) {
 					new ChunkParser().parse(nestedElement, bd, parserContext);
 				}

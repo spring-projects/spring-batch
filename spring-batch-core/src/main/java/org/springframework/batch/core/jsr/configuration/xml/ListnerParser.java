@@ -35,7 +35,6 @@ import org.w3c.dom.Element;
  * @since 3.0
  */
 public class ListnerParser {
-
 	private static final String REF_ATTRIBUTE = "ref";
 	private static final String LISTENER_ELEMENT = "listener";
 	private static final String LISTENERS_ELEMENT = "listeners";
@@ -43,11 +42,11 @@ public class ListnerParser {
 	private Class listenerType;
 	private String propertyKey;
 
-	@SuppressWarnings("rawtypes")
+    @SuppressWarnings("rawtypes")
 	public ListnerParser(Class listenerType, String propertyKey) {
-		this.listenerType = listenerType;
 		this.propertyKey = propertyKey;
-	}
+        this.listenerType = listenerType;
+    }
 
 	public void parseListeners(Element element, ParserContext parserContext, AbstractBeanDefinition bd) {
 		ManagedList<AbstractBeanDefinition> listeners = parseListeners(element, parserContext);
@@ -78,9 +77,14 @@ public class ListnerParser {
 			listeners.setMergeEnabled(false);
 			List<Element> listenerElements = DomUtils.getChildElementsByTagName(listenersElement, LISTENER_ELEMENT);
 			for (Element listenerElement : listenerElements) {
+                String beanName = listenerElement.getAttribute(REF_ATTRIBUTE);
+
 				BeanDefinitionBuilder bd = BeanDefinitionBuilder.genericBeanDefinition(listenerType);
-				bd.addPropertyValue("delegate", new RuntimeBeanReference(listenerElement.getAttribute(REF_ATTRIBUTE)));
+				bd.addPropertyValue("delegate", new RuntimeBeanReference(beanName));
+
 				listeners.add(bd.getBeanDefinition());
+
+                new PropertyParser(beanName, parserContext).parseProperties(listenerElement);
 			}
 			parserContext.popAndRegisterContainingComponent();
 		}

@@ -45,16 +45,14 @@ import org.springframework.batch.core.JobParameters;
 import org.springframework.batch.core.converter.JobParametersConverter;
 import org.springframework.batch.core.explore.JobExplorer;
 import org.springframework.batch.core.jsr.JobContext;
+import org.springframework.batch.core.jsr.configuration.support.BatchPropertyContext;
 import org.springframework.batch.core.repository.JobExecutionAlreadyRunningException;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.beans.factory.access.BeanFactoryLocator;
 import org.springframework.beans.factory.access.BeanFactoryReference;
-import org.springframework.beans.factory.annotation.AutowiredAnnotationBeanPostProcessor;
 import org.springframework.beans.factory.config.AutowireCapableBeanFactory;
 import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
-import org.springframework.beans.factory.support.GenericBeanDefinition;
 import org.springframework.context.ApplicationContext;
-import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.access.ContextSingletonBeanFactoryLocator;
 import org.springframework.context.support.GenericXmlApplicationContext;
 import org.springframework.core.convert.converter.Converter;
@@ -114,9 +112,11 @@ import org.springframework.util.Assert;
  * how job instances are identified differently.
  *
  * @author Michael Minella
+ * @author Chris Schaefer
  * @since 3.0
  */
 public class JsrJobOperator implements JobOperator {
+    private static final String BATCH_PROPERTY_CONTEXT_BEAN_NAME = "batchPropertyContext";
 
 	private org.springframework.batch.core.launch.JobOperator batchJobOperator;
 	private JobExplorer jobExplorer;
@@ -406,10 +406,8 @@ public class JsrJobOperator implements JobOperator {
 		}
 
 		batchContext.setParent(baseContext);
-		GenericBeanDefinition bd = new GenericBeanDefinition();
-		bd.setBeanClass(AutowiredAnnotationBeanPostProcessor.class);
-		batchContext.registerBeanDefinition("postProcessor", bd);
 		batchContext.refresh();
+
 		final Job job = batchContext.getBean(Job.class);
 
 		if(!job.isRestartable()) {
@@ -426,8 +424,12 @@ public class JsrJobOperator implements JobOperator {
 		}
 
 		try {
-			ConfigurableListableBeanFactory factory = ((ConfigurableApplicationContext)batchContext).getBeanFactory();
-			factory.registerSingleton(job.getName() + "_" + jobExecution.getId() + "_jobContext", new JobContext(jobExecution, jobParametersConverter));
+			ConfigurableListableBeanFactory factory = batchContext.getBeanFactory();
+
+			BatchPropertyContext batchPropertyContext = factory.getBean(BATCH_PROPERTY_CONTEXT_BEAN_NAME, BatchPropertyContext.class);
+			Properties properties = batchPropertyContext.getBatchProperties("job-" + job.getName());
+
+			factory.registerSingleton(job.getName() + "_" + jobExecution.getId() + "_jobContext", new JobContext(jobExecution, properties));
 
 			taskExecutor.execute(new Runnable() {
 
@@ -485,9 +487,6 @@ public class JsrJobOperator implements JobOperator {
 		}
 
 		batchContext.setParent(baseContext);
-		GenericBeanDefinition bd = new GenericBeanDefinition();
-		bd.setBeanClass(AutowiredAnnotationBeanPostProcessor.class);
-		batchContext.registerBeanDefinition("postProcessor", bd);
 		batchContext.refresh();
 		final Job job = batchContext.getBean(Job.class);
 
@@ -504,8 +503,12 @@ public class JsrJobOperator implements JobOperator {
 		}
 
 		try {
-			ConfigurableListableBeanFactory factory = ((ConfigurableApplicationContext)batchContext).getBeanFactory();
-			factory.registerSingleton(job.getName() + "_" + jobExecution.getId() + "_jobContext", new JobContext(jobExecution, jobParametersConverter));
+			ConfigurableListableBeanFactory factory = batchContext.getBeanFactory();
+
+			BatchPropertyContext batchPropertyContext = factory.getBean(BATCH_PROPERTY_CONTEXT_BEAN_NAME, BatchPropertyContext.class);
+			Properties properties = batchPropertyContext.getBatchProperties("job-" + job.getName());
+
+			factory.registerSingleton(job.getName() + "_" + jobExecution.getId() + "_jobContext", new JobContext(jobExecution, properties));
 
 			taskExecutor.execute(new Runnable() {
 

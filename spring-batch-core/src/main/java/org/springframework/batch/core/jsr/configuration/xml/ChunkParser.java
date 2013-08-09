@@ -41,11 +41,11 @@ import org.w3c.dom.NodeList;
  * {@link ItemProcessor}, and {@link ItemWriter}).
  * 
  * @author Michael Minella
+ * @author Chris Schaefer
  * @since 3.0
  *
  */
 public class ChunkParser {
-
 	private static final String TIME_LIMIT_ATTRIBUTE = "time-limit";
 	private static final String ITEM_COUNT_ATTRIBUTE = "item-count";
 	private static final String CHECKPOINT_ALGORITHM_ELEMENT = "checkpoint-algorithm";
@@ -77,8 +77,7 @@ public class ChunkParser {
 				parseSimpleAttribute(element, propertyValues, ITEM_COUNT_ATTRIBUTE, "commitInterval");
 				parseSimpleAttribute(element, propertyValues, TIME_LIMIT_ATTRIBUTE, "timeout");
 			} else if(checkpointPolicy.equals(CUSTOM_CHECKPOINT_POLICY)) {
-				parseCustomCheckpointAlgorithm(element, parserContext,
-						propertyValues);
+				parseCustomCheckpointAlgorithm(element, parserContext, propertyValues);
 			}
 		}
 
@@ -102,26 +101,31 @@ public class ChunkParser {
 	}
 
 	@SuppressWarnings({"unchecked", "rawtypes"})
-	private void parseChildElement(Element element,
-			ParserContext parserContext, MutablePropertyValues propertyValues,
-			Node nd) {
+	private void parseChildElement(Element element, ParserContext parserContext,
+	        MutablePropertyValues propertyValues, Node nd) {
 		if (nd instanceof Element) {
 			Element nestedElement = (Element) nd;
 			String name = nestedElement.getLocalName();
-
 			String artifactName = nestedElement.getAttribute(REF_ATTRIBUTE);
+
 			if(name.equals(READER_ELEMENT)) {
 				if (StringUtils.hasText(artifactName)) {
 					propertyValues.addPropertyValue("itemReader", new RuntimeBeanReference(artifactName));
 				}
+
+                new PropertyParser(artifactName, parserContext).parseProperties(nestedElement);
 			} else if(name.equals(PROCESSOR_ELEMENT)) {
 				if (StringUtils.hasText(artifactName)) {
 					propertyValues.addPropertyValue("itemProcessor", new RuntimeBeanReference(artifactName));
 				}
+
+                new PropertyParser(artifactName, parserContext).parseProperties(nestedElement);
 			} else if(name.equals(WRITER_ELEMENT)) {
 				if (StringUtils.hasText(artifactName)) {
 					propertyValues.addPropertyValue("itemWriter", new RuntimeBeanReference(artifactName));
 				}
+
+                new PropertyParser(artifactName, parserContext).parseProperties(nestedElement);
 			} else if(name.equals(SKIPPABLE_EXCEPTION_CLASSES_ELEMENT)) {
 				ManagedMap exceptionClasses = new ExceptionElementParser().parse(element, parserContext, SKIPPABLE_EXCEPTION_CLASSES_ELEMENT);
 				if(exceptionClasses != null) {
@@ -146,8 +150,7 @@ public class ChunkParser {
 		}
 	}
 
-	private void parseCustomCheckpointAlgorithm(Element element,
-			ParserContext parserContext, MutablePropertyValues propertyValues) {
+	private void parseCustomCheckpointAlgorithm(Element element, ParserContext parserContext, MutablePropertyValues propertyValues) {
 		List<Element> elements = DomUtils.getChildElementsByTagName(element, CHECKPOINT_ALGORITHM_ELEMENT);
 
 		if(elements.size() == 1) {
@@ -157,6 +160,8 @@ public class ChunkParser {
 			if(StringUtils.hasText(name)) {
 				propertyValues.addPropertyValue("chunkCompletionPolicy", new RuntimeBeanReference(name));
 			}
+
+            new PropertyParser(name, parserContext).parseProperties(checkpointAlgorithmElement);
 		} else if(elements.size() > 1){
 			parserContext.getReaderContext().error(
 					"The <checkpoint-algorithm/> element may not appear more than once in a single <"
