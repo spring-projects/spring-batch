@@ -20,6 +20,7 @@ import java.util.Set;
 
 import org.springframework.batch.core.ChunkListener;
 import org.springframework.batch.core.Step;
+import org.springframework.batch.core.StepExecutionListener;
 import org.springframework.batch.core.step.tasklet.Tasklet;
 import org.springframework.batch.core.step.tasklet.TaskletStep;
 import org.springframework.batch.item.ItemStream;
@@ -45,7 +46,7 @@ import org.springframework.transaction.interceptor.TransactionAttribute;
 public abstract class AbstractTaskletStepBuilder<B extends AbstractTaskletStepBuilder<B>> extends
 		StepBuilderHelper<AbstractTaskletStepBuilder<B>> {
 
-	private Set<ChunkListener> listeners = new LinkedHashSet<ChunkListener>();
+	protected Set<ChunkListener> chunkListeners = new LinkedHashSet<ChunkListener>();
 
 	private RepeatOperations stepOperations;
 
@@ -72,12 +73,14 @@ public abstract class AbstractTaskletStepBuilder<B extends AbstractTaskletStepBu
 	 * @return a tasklet step fully configured and read to execute
 	 */
 	public TaskletStep build() {
+		
+		registerStepListenerAsChunkListener();
 
 		TaskletStep step = new TaskletStep(getName());
 
 		super.enhance(step);
 
-		step.setChunkListeners(listeners.toArray(new ChunkListener[0]));
+		step.setChunkListeners(chunkListeners.toArray(new ChunkListener[0]));
 
 		if (transactionAttribute != null) {
 			step.setTransactionAttribute(transactionAttribute);
@@ -113,6 +116,14 @@ public abstract class AbstractTaskletStepBuilder<B extends AbstractTaskletStepBu
 
 	}
 
+	private void registerStepListenerAsChunkListener() {
+		for (StepExecutionListener stepExecutionListener: properties.getStepExecutionListeners()){
+			if (stepExecutionListener instanceof ChunkListener){
+				listener((ChunkListener)stepExecutionListener);
+			}
+		}
+	}
+
 	/**
 	 * Register a chunk listener.
 	 * 
@@ -120,7 +131,7 @@ public abstract class AbstractTaskletStepBuilder<B extends AbstractTaskletStepBu
 	 * @return this for fluent chaining
 	 */
 	public AbstractTaskletStepBuilder<B> listener(ChunkListener listener) {
-		listeners.add(listener);
+		chunkListeners.add(listener);
 		return this;
 	}
 
