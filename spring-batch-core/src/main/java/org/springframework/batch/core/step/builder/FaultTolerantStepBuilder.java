@@ -27,6 +27,7 @@ import java.util.Set;
 import org.springframework.batch.core.ChunkListener;
 import org.springframework.batch.core.JobInterruptedException;
 import org.springframework.batch.core.SkipListener;
+import org.springframework.batch.core.StepExecutionListener;
 import org.springframework.batch.core.StepListener;
 import org.springframework.batch.core.listener.StepListenerFactoryBean;
 import org.springframework.batch.core.scope.context.ChunkContext;
@@ -49,6 +50,7 @@ import org.springframework.batch.core.step.skip.SkipListenerFailedException;
 import org.springframework.batch.core.step.skip.SkipPolicy;
 import org.springframework.batch.core.step.skip.SkipPolicyFailedException;
 import org.springframework.batch.core.step.tasklet.Tasklet;
+import org.springframework.batch.core.step.tasklet.TaskletStep;
 import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.ItemStream;
 import org.springframework.batch.repeat.RepeatOperations;
@@ -131,6 +133,26 @@ public class FaultTolerantStepBuilder<I, O> extends SimpleStepBuilder<I, O> {
 	 */
 	protected FaultTolerantStepBuilder(SimpleStepBuilder<I, O> parent) {
 		super(parent);
+	}
+
+	@Override
+	public TaskletStep build() {
+		registerStepListenerAsSkipListener();
+		return super.build();
+	}
+
+	@SuppressWarnings("unchecked")
+	private void registerStepListenerAsSkipListener() {
+		for (StepExecutionListener stepExecutionListener: properties.getStepExecutionListeners()){
+			if (stepExecutionListener instanceof SkipListener){
+				listener((SkipListener<I,O>)stepExecutionListener);
+			}
+		}
+		for (ChunkListener chunkListener: this.chunkListeners){
+			if (chunkListener instanceof SkipListener){
+				listener((SkipListener<I,O>)chunkListener);
+			}
+		}
 	}
 
 	/**
