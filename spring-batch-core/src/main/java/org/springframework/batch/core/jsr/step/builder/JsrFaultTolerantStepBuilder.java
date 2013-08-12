@@ -63,8 +63,7 @@ public class JsrFaultTolerantStepBuilder<I, O> extends FaultTolerantStepBuilder<
 	@Override
 	@SuppressWarnings({"unchecked", "rawtypes"})
 	protected ChunkProcessor<I> createChunkProcessor() {
-		SkipPolicy skipPolicy = createSkipPolicy();
-		skipPolicy = getFatalExceptionAwareProxy(skipPolicy);
+		SkipPolicy skipPolicy = getFatalExceptionAwareProxy(createSkipPolicy());
 		JsrFaultTolerantChunkProcessor chunkProcessor = new JsrFaultTolerantChunkProcessor(getReader(), getProcessor(),
 				getWriter(), createChunkOperations(), createRetryOperations());
 		chunkProcessor.setSkipPolicy(skipPolicy);

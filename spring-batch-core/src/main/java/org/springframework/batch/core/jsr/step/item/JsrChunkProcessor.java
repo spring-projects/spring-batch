@@ -101,7 +101,7 @@ public class JsrChunkProcessor<I,O> implements ChunkProcessor<I> {
 
 				O processedItem = transform(contribution, item);
 
-				if(item != null && processedItem == null) {
+				if(processedItem == null) {
 					filterCount.incrementAndGet();
 				} else {
 					output.add(processedItem);
