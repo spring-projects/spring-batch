@@ -24,6 +24,8 @@ import java.util.List;
 
 import javax.batch.api.BatchProperty;
 import javax.batch.api.Batchlet;
+import javax.batch.api.Decider;
+import javax.batch.api.chunk.CheckpointAlgorithm;
 import javax.batch.api.chunk.ItemProcessor;
 import javax.batch.api.chunk.ItemReader;
 import javax.batch.api.chunk.ItemWriter;
@@ -37,13 +39,7 @@ import org.springframework.batch.core.ExitStatus;
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.JobParameters;
-import org.springframework.batch.core.StepExecution;
-import org.springframework.batch.core.job.flow.FlowExecutionStatus;
-import org.springframework.batch.core.job.flow.JobExecutionDecider;
 import org.springframework.batch.core.launch.JobLauncher;
-import org.springframework.batch.repeat.CompletionPolicy;
-import org.springframework.batch.repeat.RepeatContext;
-import org.springframework.batch.repeat.RepeatStatus;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.test.context.ContextConfiguration;
@@ -335,31 +331,12 @@ public class JobPropertyTests {
 		}
 	}
 
-	public static final class TestCheckpointAlgorithm implements CompletionPolicy {
+	public static final class TestCheckpointAlgorithm implements CheckpointAlgorithm {
 		@Inject @BatchProperty String algorithmPropertyName1;
 		@Inject @BatchProperty String algorithmPropertyName2;
 		@Inject @BatchProperty(name = "annotationNamedAlgorithmPropertyName") String annotationNamedProperty;
 		@Inject @BatchProperty String notDefinedProperty;
 		@Inject @BatchProperty(name = "notDefinedAnnotationNamedProperty") String notDefinedAnnotationNamedProperty;
-
-		@Override
-		public boolean isComplete(RepeatContext context, RepeatStatus result) {
-			return true;
-		}
-
-		@Override
-		public boolean isComplete(RepeatContext context) {
-			return true;
-		}
-
-		@Override
-		public RepeatContext start(RepeatContext parent) {
-			return parent;
-		}
-
-		@Override
-		public void update(RepeatContext context) {
-		}
 
 		String getAlgorithmPropertyName1() {
 			return algorithmPropertyName1;
@@ -380,20 +357,32 @@ public class JobPropertyTests {
 		String getNotDefinedAnnotationNamedProperty() {
 			return notDefinedAnnotationNamedProperty;
 		}
+
+		@Override
+		public int checkpointTimeout() throws Exception {
+			return 0;
+		}
+
+		@Override
+		public void beginCheckpoint() throws Exception {
+		}
+
+		@Override
+		public boolean isReadyToCheckpoint() throws Exception {
+			return true;
+		}
+
+		@Override
+		public void endCheckpoint() throws Exception {
+		}
 	}
 
-	public static class TestDecider implements JobExecutionDecider {
+	public static class TestDecider implements Decider {
 		@Inject @BatchProperty String deciderPropertyName1;
 		@Inject @BatchProperty String deciderPropertyName2;
 		@Inject @BatchProperty(name = "annotationNamedDeciderPropertyName") String annotationNamedProperty;
 		@Inject @BatchProperty String notDefinedProperty;
 		@Inject @BatchProperty(name = "notDefinedAnnotationNamedProperty") String notDefinedAnnotationNamedProperty;
-
-		@Override
-		public FlowExecutionStatus decide(JobExecution jobExecution,
-				StepExecution stepExecution) {
-			return new FlowExecutionStatus("step2");
-		}
 
 		String getDeciderPropertyName1() {
 			return deciderPropertyName1;
@@ -413,6 +402,12 @@ public class JobPropertyTests {
 
 		String getNotDefinedAnnotationNamedProperty() {
 			return notDefinedAnnotationNamedProperty;
+		}
+
+		@Override
+		public String decide(javax.batch.runtime.StepExecution[] executions)
+				throws Exception {
+			return "step2";
 		}
 	}
 

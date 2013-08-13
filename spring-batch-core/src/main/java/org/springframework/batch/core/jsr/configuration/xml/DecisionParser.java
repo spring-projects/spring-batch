@@ -19,7 +19,6 @@ import java.util.Collection;
 
 import org.springframework.batch.core.job.flow.JobExecutionDecider;
 import org.springframework.beans.factory.config.BeanDefinition;
-import org.springframework.beans.factory.config.RuntimeBeanReference;
 import org.springframework.beans.factory.support.BeanDefinitionBuilder;
 import org.springframework.beans.factory.xml.ParserContext;
 import org.w3c.dom.Element;
@@ -27,7 +26,7 @@ import org.w3c.dom.Element;
 /**
  * Parser for the &lt;decision /&gt; element as specified in JSR-352.  The current state
  * parses a decision element and assumes that it refers to a {@link JobExecutionDecider}
- * 
+ *
  * @author Michael Minella
  * @author Chris Schaefer
  * @since 3.0
@@ -42,9 +41,9 @@ public class DecisionParser {
 		String idAttribute = element.getAttribute(ID_ATTRIBUTE);
 
 		BeanDefinitionBuilder stateBuilder =
-				BeanDefinitionBuilder.genericBeanDefinition("org.springframework.batch.core.job.flow.support.state.DecisionState");
-		stateBuilder.addConstructorArgValue(new RuntimeBeanReference(refAttribute));
-		stateBuilder.addConstructorArgValue(idAttribute);
+				BeanDefinitionBuilder.genericBeanDefinition("org.springframework.batch.core.jsr.configuration.xml.DecisionStateFactoryBean");
+		stateBuilder.addPropertyReference("decider", refAttribute);
+		stateBuilder.addPropertyValue("name", idAttribute);
 
 		new PropertyParser(refAttribute, parserContext).parseProperties(element);
 

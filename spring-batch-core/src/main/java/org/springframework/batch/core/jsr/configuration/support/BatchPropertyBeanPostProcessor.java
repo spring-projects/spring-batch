@@ -21,20 +21,34 @@ import java.lang.reflect.Modifier;
 import java.util.HashSet;
 import java.util.Properties;
 import java.util.Set;
+
 import javax.batch.api.BatchProperty;
 import javax.batch.api.Batchlet;
+import javax.batch.api.Decider;
+import javax.batch.api.chunk.CheckpointAlgorithm;
 import javax.batch.api.chunk.ItemProcessor;
 import javax.batch.api.chunk.ItemReader;
 import javax.batch.api.chunk.ItemWriter;
+import javax.batch.api.chunk.listener.ChunkListener;
 import javax.batch.api.chunk.listener.ItemProcessListener;
 import javax.batch.api.chunk.listener.ItemReadListener;
 import javax.batch.api.chunk.listener.ItemWriteListener;
+import javax.batch.api.chunk.listener.RetryProcessListener;
+import javax.batch.api.chunk.listener.RetryReadListener;
+import javax.batch.api.chunk.listener.RetryWriteListener;
+import javax.batch.api.chunk.listener.SkipProcessListener;
+import javax.batch.api.chunk.listener.SkipReadListener;
+import javax.batch.api.chunk.listener.SkipWriteListener;
+import javax.batch.api.listener.JobListener;
+import javax.batch.api.listener.StepListener;
+import javax.batch.api.partition.PartitionAnalyzer;
+import javax.batch.api.partition.PartitionCollector;
+import javax.batch.api.partition.PartitionMapper;
+import javax.batch.api.partition.PartitionPlan;
+import javax.batch.api.partition.PartitionReducer;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.springframework.batch.core.Job;
-import org.springframework.batch.core.Step;
-import org.springframework.batch.core.job.flow.JobExecutionDecider;
-import org.springframework.batch.repeat.CompletionPolicy;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.BeanPostProcessor;
@@ -47,114 +61,129 @@ import org.springframework.util.ReflectionUtils;
  * </p>
  *
  * @author Chris Schaefer
+ * @author Michael Minella
  * @since 3.0
  */
 public class BatchPropertyBeanPostProcessor implements BeanPostProcessor {
-    @Autowired
-    private BatchPropertyContext batchPropertyContext;
-    private Log logger = LogFactory.getLog(getClass());
-    private Set<Class<? extends Annotation>> requiredAnnotations = new HashSet<Class<? extends Annotation>>();
+	@Autowired
+	private BatchPropertyContext batchPropertyContext;
+	private Log logger = LogFactory.getLog(getClass());
+	private Set<Class<? extends Annotation>> requiredAnnotations = new HashSet<Class<? extends Annotation>>();
 
-    public BatchPropertyBeanPostProcessor() {
-        setRequiredAnnotations();
-    }
+	public BatchPropertyBeanPostProcessor() {
+		setRequiredAnnotations();
+	}
 
-    @Override
-    public Object postProcessBeforeInitialization(final Object bean, String beanName) throws BeansException {
-        if (!isBatchArtifact(bean)) {
-            return bean;
-        }
+	@Override
+	public Object postProcessBeforeInitialization(final Object bean, String beanName) throws BeansException {
+		if (!isBatchArtifact(bean)) {
+			return bean;
+		}
 
-        final Properties artifactProperties = batchPropertyContext.getBatchProperties(beanName);
+		final Properties artifactProperties = batchPropertyContext.getBatchProperties(beanName);
 
-        if (artifactProperties.isEmpty()) {
-            return bean;
-        }
+		if (artifactProperties.isEmpty()) {
+			return bean;
+		}
 
-        injectBatchProperties(bean, artifactProperties);
+		injectBatchProperties(bean, artifactProperties);
 
-        return bean;
-    }
+		return bean;
+	}
 
-    private void setRequiredAnnotations() {
-        ClassLoader cl = BatchPropertyBeanPostProcessor.class.getClassLoader();
+	@SuppressWarnings("unchecked")
+	private void setRequiredAnnotations() {
+		ClassLoader cl = BatchPropertyBeanPostProcessor.class.getClassLoader();
 
-        try {
-            this.requiredAnnotations.add((Class<? extends Annotation>) cl.loadClass("javax.inject.Inject"));
-        } catch (ClassNotFoundException ex) {
-            logger.warn("javax.inject.Inject not found - @BatchProperty marked fields will not be processed.");
-        }
+		try {
+			this.requiredAnnotations.add((Class<? extends Annotation>) cl.loadClass("javax.inject.Inject"));
+		} catch (ClassNotFoundException ex) {
+			logger.warn("javax.inject.Inject not found - @BatchProperty marked fields will not be processed.");
+		}
 
-        this.requiredAnnotations.add(BatchProperty.class);
-    }
+		this.requiredAnnotations.add(BatchProperty.class);
+	}
 
-    private boolean isBatchArtifact(Object bean) {
-        return (bean instanceof ItemReader) ||
-                (bean instanceof ItemProcessor) ||
-                (bean instanceof ItemWriter) ||
-                (bean instanceof CompletionPolicy) ||
-                (bean instanceof Batchlet) ||
-                (bean instanceof ItemReadListener) ||
-                (bean instanceof ItemProcessListener) ||
-                (bean instanceof ItemWriteListener) ||
-                (bean instanceof JobExecutionDecider) ||
-                (bean instanceof Step) ||
-                (bean instanceof Job);
-    }
+	private boolean isBatchArtifact(Object bean) {
+		return (bean instanceof ItemReader) ||
+				(bean instanceof ItemProcessor) ||
+				(bean instanceof ItemWriter) ||
+				(bean instanceof CheckpointAlgorithm) ||
+				(bean instanceof Batchlet) ||
+				(bean instanceof ItemReadListener) ||
+				(bean instanceof ItemProcessListener) ||
+				(bean instanceof ItemWriteListener) ||
+				(bean instanceof JobListener) ||
+				(bean instanceof StepListener) ||
+				(bean instanceof ChunkListener) ||
+				(bean instanceof SkipReadListener) ||
+				(bean instanceof SkipProcessListener) ||
+				(bean instanceof SkipWriteListener) ||
+				(bean instanceof RetryReadListener) ||
+				(bean instanceof RetryProcessListener) ||
+				(bean instanceof RetryWriteListener) ||
+				(bean instanceof PartitionMapper) ||
+				(bean instanceof PartitionReducer) ||
+				(bean instanceof PartitionCollector) ||
+				(bean instanceof PartitionAnalyzer) ||
+				(bean instanceof PartitionPlan) ||
+				(bean instanceof Decider);
+	}
 
-    private void injectBatchProperties(final Object bean, final Properties artifactProperties) {
-        ReflectionUtils.doWithFields(bean.getClass(), new ReflectionUtils.FieldCallback() {
-            public void doWith(Field field) throws IllegalArgumentException, IllegalAccessException {
-                if (isValidFieldModifier(field) && isAnnotated(field)) {
-                    boolean isAccessible = field.isAccessible();
-                    field.setAccessible(true);
+	private void injectBatchProperties(final Object bean, final Properties artifactProperties) {
+		ReflectionUtils.doWithFields(bean.getClass(), new ReflectionUtils.FieldCallback() {
+			@Override
+			public void doWith(Field field) throws IllegalArgumentException, IllegalAccessException {
+				if (isValidFieldModifier(field) && isAnnotated(field)) {
+					boolean isAccessible = field.isAccessible();
+					field.setAccessible(true);
 
-                    String batchProperty = getBatchPropertyFieldValue(field, artifactProperties);
+					String batchProperty = getBatchPropertyFieldValue(field, artifactProperties);
 
-                    if (batchProperty != null) {
-                        field.set(bean, batchProperty);
-                    }
+					if (batchProperty != null) {
+						field.set(bean, batchProperty);
+					}
 
-                    field.setAccessible(isAccessible);
-                }
-            }
-        });
-    }
+					field.setAccessible(isAccessible);
+				}
+			}
+		});
+	}
 
-    private String getBatchPropertyFieldValue(Field field, Properties batchArtifactProperties) {
-        BatchProperty batchProperty = field.getAnnotation(BatchProperty.class);
+	private String getBatchPropertyFieldValue(Field field, Properties batchArtifactProperties) {
+		BatchProperty batchProperty = field.getAnnotation(BatchProperty.class);
 
-        if (!"".equals(batchProperty.name())) {
-            return getBatchProperty(batchProperty.name(), batchArtifactProperties);
-        }
+		if (!"".equals(batchProperty.name())) {
+			return getBatchProperty(batchProperty.name(), batchArtifactProperties);
+		}
 
-        return getBatchProperty(field.getName(), batchArtifactProperties);
-    }
+		return getBatchProperty(field.getName(), batchArtifactProperties);
+	}
 
-    private String getBatchProperty(String propertyKey, Properties batchArtifactProperties) {
-        if (batchArtifactProperties.containsKey(propertyKey)) {
-            return (String) batchArtifactProperties.get(propertyKey);
-        }
+	private String getBatchProperty(String propertyKey, Properties batchArtifactProperties) {
+		if (batchArtifactProperties.containsKey(propertyKey)) {
+			return (String) batchArtifactProperties.get(propertyKey);
+		}
 
-        return null;
-    }
+		return null;
+	}
 
-    private boolean isAnnotated(Field field) {
-        for (Class<? extends Annotation> annotation : requiredAnnotations) {
-            if(!field.isAnnotationPresent(annotation)) {
-                return false;
-            }
-        }
+	private boolean isAnnotated(Field field) {
+		for (Class<? extends Annotation> annotation : requiredAnnotations) {
+			if(!field.isAnnotationPresent(annotation)) {
+				return false;
+			}
+		}
 
-        return true;
-    }
+		return true;
+	}
 
-    private boolean isValidFieldModifier(Field field) {
-        return !Modifier.isStatic(field.getModifiers()) && !Modifier.isFinal(field.getModifiers());
-    }
+	private boolean isValidFieldModifier(Field field) {
+		return !Modifier.isStatic(field.getModifiers()) && !Modifier.isFinal(field.getModifiers());
+	}
 
-    @Override
-    public Object postProcessAfterInitialization(Object bean, String beanName) throws BeansException {
-        return bean;
-    }
+	@Override
+	public Object postProcessAfterInitialization(Object bean, String beanName) throws BeansException {
+		return bean;
+	}
 }
