@@ -27,6 +27,7 @@ import java.util.concurrent.ConcurrentHashMap;
  * </p>
  *
  * @author Chris Schaefer
+ * @author Michael Minella
  * @since 3.0
  */
 public class BatchPropertyContext {
@@ -40,25 +41,25 @@ public class BatchPropertyContext {
 	 *
 	 * @param batchPropertyContextEntries the {@link BatchPropertyContextEntry} objects to add
 	 */
-    public void setBatchContextEntries(List<BatchPropertyContextEntry> batchPropertyContextEntries) {
-        for (BatchPropertyContextEntry batchPropertyContextEntry : batchPropertyContextEntries) {
-            setBatchContextEntry(batchPropertyContextEntry);
-        }
-    }
+	public void setBatchContextEntries(List<BatchPropertyContextEntry> batchPropertyContextEntries) {
+		for (BatchPropertyContextEntry batchPropertyContextEntry : batchPropertyContextEntries) {
+			setBatchContextEntry(batchPropertyContextEntry);
+		}
+	}
 
-    private void setBatchContextEntry(BatchPropertyContextEntry batchPropertyContextEntry) {
-        String beanName = batchPropertyContextEntry.getBeanName();
-        Properties properties = batchPropertyContextEntry.getProperties();
+	private void setBatchContextEntry(BatchPropertyContextEntry batchPropertyContextEntry) {
+		String beanName = batchPropertyContextEntry.getBeanName();
+		Properties properties = batchPropertyContextEntry.getProperties();
 
-        if (batchProperties.containsKey(beanName)) {
-            Properties existingProperties = batchProperties.get(beanName);
-            existingProperties.putAll(properties);
+		if (batchProperties.containsKey(beanName)) {
+			Properties existingProperties = batchProperties.get(beanName);
+			existingProperties.putAll(properties);
 
-            batchProperties.put(beanName, existingProperties);
-        } else {
-            batchProperties.put(beanName, properties);
-        }
-    }
+			batchProperties.put(beanName, existingProperties);
+		} else {
+			batchProperties.put(beanName, properties);
+		}
+	}
 
 	/**
 	 * <p>
@@ -69,25 +70,33 @@ public class BatchPropertyContext {
 	 * @param beanName the bean name representing the batch artifact to obtain properties for
 	 * @return the {@link Properties} for the provided batch artifact
 	 */
-    public Properties getBatchProperties(String beanName) {
-        Properties properties = new Properties();
+	public Properties getBatchProperties(String beanName) {
+		Properties properties = new Properties();
 
-        if (batchProperties.containsKey(beanName)) {
-            properties.putAll(batchProperties.get(beanName));
-        }
+		if (batchProperties.containsKey(beanName)) {
+			properties.putAll(batchProperties.get(beanName));
+		} else {
+			if(beanName.startsWith("scopedTarget")) {
+				beanName = beanName.substring(13);
+			}
 
-        for (String jobLevelProperty : batchProperties.keySet()) {
-            if (jobLevelProperty.startsWith("job-")) {
-                if (batchProperties.containsKey(jobLevelProperty)) {
-                    properties.putAll(batchProperties.get(jobLevelProperty));
-                }
+			if(batchProperties.containsKey(beanName)) {
+				properties.putAll(batchProperties.get(beanName));
+			}
+		}
 
-                break;
-            }
-        }
+		for (String jobLevelProperty : batchProperties.keySet()) {
+			if (jobLevelProperty.startsWith("job-")) {
+				if (batchProperties.containsKey(jobLevelProperty)) {
+					properties.putAll(batchProperties.get(jobLevelProperty));
+				}
 
-        return properties;
-    }
+				break;
+			}
+		}
+
+		return properties;
+	}
 
 	/**
 	 * <p>

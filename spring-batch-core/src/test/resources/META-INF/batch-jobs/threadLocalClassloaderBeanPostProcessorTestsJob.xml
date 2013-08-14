@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<job id="threadLocalClassloaderBeanPostProcessorTestsJob" xmlns="http://xmlns.jcp.org/xml/ns/javaee" version="1.0">
+	<step id="step1" >
+		<batchlet ref="org.springframework.batch.core.jsr.configuration.xml.ThreadLocalClassloaderBeanPostProcessorTestsBatchlet">
+			<properties>
+				<property name="jobParam1" value="someParameter"/>
+			</properties>
+		</batchlet>
+	</step>
+</job>
