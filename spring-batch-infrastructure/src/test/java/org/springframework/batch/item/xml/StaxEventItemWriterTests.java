@@ -767,6 +767,153 @@ public class StaxEventItemWriterTests {
 	}	
 
 	/**
+	 * Test opening and closing corresponding tags in header- and footer callback.
+	 */
+	@Test
+	public void testOpenAndCloseTagsInCallbacks() throws Exception {
+		initWriterForSimpleCallbackTests();
+		writer.open(executionContext);
+		writer.write(items);
+		writer.close();
+		String content = getOutputFileContent();
+
+		assertEquals("Wrong content: " + content,
+				"<ns:testroot xmlns:ns=\"http://www.springframework.org/test\"><ns:group><StaxEventItemWriter-testString/></ns:group></ns:testroot>", content);
+	}
+	
+	/**
+	 * Test opening and closing corresponding tags in header- and footer callback (restart).
+	 */
+	@Test
+	public void testOpenAndCloseTagsInCallbacksRestart() throws Exception {
+		initWriterForSimpleCallbackTests();
+		writer.open(executionContext);
+		writer.write(items);
+		writer.update(executionContext);
+		
+		initWriterForSimpleCallbackTests();
+		
+		writer.open(executionContext);
+		writer.write(items);
+		writer.close();
+		String content = getOutputFileContent();
+
+		assertEquals("Wrong content: " + content,
+				"<ns:testroot xmlns:ns=\"http://www.springframework.org/test\">" +
+				"<ns:group><StaxEventItemWriter-testString/><StaxEventItemWriter-testString/></group></ns:testroot>", content);
+	}
+
+	/**
+	 * Test opening and closing corresponding tags in complex header- and footer callback (restart).
+	 */
+	@Test
+	public void testOpenAndCloseTagsInComplexCallbacksRestart() throws Exception {
+		initWriterForComplexCallbackTests();
+		writer.open(executionContext);
+		writer.write(items);
+		writer.update(executionContext);
+		
+		initWriterForComplexCallbackTests();
+		
+		writer.open(executionContext);
+		writer.write(items);
+		writer.close();
+		String content = getOutputFileContent();
+
+		assertEquals("Wrong content: " + content,
+				"<ns:testroot xmlns:ns=\"http://www.springframework.org/test\">" +
+				"<preHeader>PRE-HEADER</preHeader><ns:group><subGroup><postHeader>POST-HEADER</postHeader>" +
+				"<StaxEventItemWriter-testString/><StaxEventItemWriter-testString/>" +
+				"<preFooter>PRE-FOOTER</preFooter></subGroup></group><postFooter>POST-FOOTER</postFooter>" +
+				"</ns:testroot>", content);
+	}
+	
+	private void initWriterForSimpleCallbackTests() throws Exception {
+		writer = createItemWriter();
+		writer.setHeaderCallback(new StaxWriterCallback() {
+
+			@Override
+			public void write(XMLEventWriter writer) throws IOException {
+				XMLEventFactory factory = XMLEventFactory.newInstance();
+				try {
+					writer.add(factory.createStartElement("ns", "http://www.springframework.org/test", "group"));
+				}
+				catch (XMLStreamException e) {
+					throw new RuntimeException(e);
+				}
+			}
+
+		});
+		writer.setFooterCallback(new StaxWriterCallback() {
+
+			@Override
+			public void write(XMLEventWriter writer) throws IOException {
+				XMLEventFactory factory = XMLEventFactory.newInstance();
+				try {
+					writer.add(factory.createEndElement("ns", "http://www.springframework.org/test", "group"));
+				}
+				catch (XMLStreamException e) {
+					throw new RuntimeException(e);
+				}
+
+			}
+
+		});
+		writer.setRootTagName("{http://www.springframework.org/test}ns:testroot");
+		writer.afterPropertiesSet();
+	}
+
+	// more complex callbacks, writing element before and after the multiple corresponding header- and footer elements
+	private void initWriterForComplexCallbackTests() throws Exception {
+		writer = createItemWriter();
+		writer.setHeaderCallback(new StaxWriterCallback() {
+
+			@Override
+			public void write(XMLEventWriter writer) throws IOException {
+				XMLEventFactory factory = XMLEventFactory.newInstance();
+				try {
+					writer.add(factory.createStartElement("", "", "preHeader"));
+					writer.add(factory.createCharacters("PRE-HEADER"));
+					writer.add(factory.createEndElement("", "", "preHeader"));
+					writer.add(factory.createStartElement("ns", "http://www.springframework.org/test", "group"));
+					writer.add(factory.createStartElement("", "", "subGroup"));
+					writer.add(factory.createStartElement("", "", "postHeader"));
+					writer.add(factory.createCharacters("POST-HEADER"));
+					writer.add(factory.createEndElement("", "", "postHeader"));
+				}
+				catch (XMLStreamException e) {
+					throw new RuntimeException(e);
+				}
+			}
+
+		});
+		writer.setFooterCallback(new StaxWriterCallback() {
+
+			@Override
+			public void write(XMLEventWriter writer) throws IOException {
+				XMLEventFactory factory = XMLEventFactory.newInstance();
+				try {
+					writer.add(factory.createStartElement("", "", "preFooter"));
+					writer.add(factory.createCharacters("PRE-FOOTER"));
+					writer.add(factory.createEndElement("", "", "preFooter"));
+					writer.add(factory.createEndElement("", "", "subGroup"));
+					writer.add(factory.createEndElement("ns", "http://www.springframework.org/test", "group"));
+					writer.add(factory.createStartElement("", "", "postFooter"));
+					writer.add(factory.createCharacters("POST-FOOTER"));
+					writer.add(factory.createEndElement("", "", "postFooter"));
+				}
+				catch (XMLStreamException e) {
+					throw new RuntimeException(e);
+				}
+
+			}
+
+		});
+		writer.setRootTagName("{http://www.springframework.org/test}ns:testroot");
+		writer.afterPropertiesSet();
+	}
+
+	/**
 	 * Writes object's toString representation as XML comment.
 	 */
 	private static class SimpleMarshaller implements Marshaller {
