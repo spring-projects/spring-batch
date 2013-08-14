@@ -17,6 +17,8 @@
 package org.springframework.batch.item.xml;
 
 import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.NoSuchElementException;
 
 import javax.xml.namespace.QName;
@@ -39,6 +41,7 @@ import org.springframework.core.io.Resource;
 import org.springframework.oxm.Unmarshaller;
 import org.springframework.util.Assert;
 import org.springframework.util.ClassUtils;
+import org.springframework.util.StringUtils;
 
 /**
  * Item reader for reading XML input based on StAX.
@@ -66,13 +69,11 @@ ResourceAwareItemReaderItemStream<T>, InitializingBean {
 
 	private InputStream inputStream;
 
-	private String fragmentRootElementName;
+	private List<QName> fragmentRootElementNames;
 
 	private boolean noInput;
 
 	private boolean strict = true;
-
-	private String fragmentRootElementNameSpace;
 
 	public StaxEventItemReader() {
 		setName(ClassUtils.getShortName(StaxEventItemReader.class));
@@ -103,7 +104,17 @@ ResourceAwareItemReaderItemStream<T>, InitializingBean {
 	 * @param fragmentRootElementName name of the root element of the fragment
 	 */
 	public void setFragmentRootElementName(String fragmentRootElementName) {
-		this.fragmentRootElementName = fragmentRootElementName;
+		setFragmentRootElementNames(new String[] {fragmentRootElementName});
+	}
+
+	/**
+	 * @param fragmentRootElementNames list of the names of the root element of the fragment
+	 */
+	public void setFragmentRootElementNames(String[] fragmentRootElementNames) {
+		this.fragmentRootElementNames = new ArrayList<QName>();
+		for (String fragmentRootElementName : fragmentRootElementNames) {
+			this.fragmentRootElementNames.add(parseFragmentRootElementName(fragmentRootElementName));
+		}
 	}
 
 	/**
@@ -117,11 +128,11 @@ ResourceAwareItemReaderItemStream<T>, InitializingBean {
 	@Override
 	public void afterPropertiesSet() throws Exception {
 		Assert.notNull(unmarshaller, "The Unmarshaller must not be null.");
-		Assert.hasLength(fragmentRootElementName, "The FragmentRootElementName must not be null");
-		if (fragmentRootElementName.contains("{")) {
-			fragmentRootElementNameSpace = fragmentRootElementName.replaceAll("\\{(.*)\\}.*", "$1");
-			fragmentRootElementName = fragmentRootElementName.replaceAll("\\{.*\\}(.*)", "$1");
-		}
+		Assert.notNull(fragmentRootElementNames, "The FragmentRootElementNames must not be null");
+		Assert.notNull(fragmentRootElementNames, "The FragmentRootElementNames must not be empty");
+		for (QName fragmentRootElementName : fragmentRootElementNames) {
+			Assert.hasText(fragmentRootElementName.getLocalPart(), "The FragmentRootElementNames must contain empty elements");
+		}		
 	}
 
 	/**
@@ -145,11 +156,8 @@ ResourceAwareItemReaderItemStream<T>, InitializingBean {
 					return false;
 				}
 				QName startElementName = ((StartElement) reader.peek()).getName();
-				if (startElementName.getLocalPart().equals(fragmentRootElementName)) {
-					if (fragmentRootElementNameSpace == null
-							|| startElementName.getNamespaceURI().equals(fragmentRootElementNameSpace)) {
-						return true;
-					}
+				if (isFragmentRootElementName(startElementName)) {
+					return true;
 				}
 				reader.nextEvent();
 
@@ -264,7 +272,7 @@ ResourceAwareItemReaderItemStream<T>, InitializingBean {
 	}
 
 	/*
-	 * Read until the first StartElement tag that matches the provided fragmentRootElementName. Because there may be any
+	 * Read until the first StartElement tag that matches any of the provided fragmentRootElementNames. Because there may be any
 	 * number of tags in between where the reader is now and the fragment start, this is done in a loop until the
 	 * element type and name match.
 	 */
@@ -272,14 +280,14 @@ ResourceAwareItemReaderItemStream<T>, InitializingBean {
 		while (true) {
 			XMLEvent nextEvent = eventReader.nextEvent();
 			if (nextEvent.isStartElement()
-					&& ((StartElement) nextEvent).getName().getLocalPart().equals(fragmentRootElementName)) {
+					&& isFragmentRootElementName(((StartElement) nextEvent).getName())) {
 				return;
 			}
 		}
 	}
 
 	/*
-	 * Read until the first EndElement tag that matches the provided fragmentRootElementName. Because there may be any
+	 * Read until the first EndElement tag that matches any of the provided fragmentRootElementNames. Because there may be any
 	 * number of tags in between where the reader is now and the fragment end tag, this is done in a loop until the
 	 * element type and name match
 	 */
@@ -287,9 +295,32 @@ ResourceAwareItemReaderItemStream<T>, InitializingBean {
 		while (true) {
 			XMLEvent nextEvent = eventReader.nextEvent();
 			if (nextEvent.isEndElement()
-					&& ((EndElement) nextEvent).getName().getLocalPart().equals(fragmentRootElementName)) {
+					&& isFragmentRootElementName(((EndElement) nextEvent).getName())) {
 				return;
 			}
 		}
 	}
+	
+	private boolean isFragmentRootElementName(QName name) {
+		for (QName fragmentRootElementName : fragmentRootElementNames) {
+			if (fragmentRootElementName.getLocalPart().equals(name.getLocalPart())) {
+				if (!StringUtils.hasText(fragmentRootElementName.getNamespaceURI())
+						|| fragmentRootElementName.getNamespaceURI().equals(name.getNamespaceURI())) {					
+					return true;
+				}
+			}
+		}
+		return false;
+	}	
+	
+	private QName parseFragmentRootElementName(String fragmentRootElementName) {
+		String name = fragmentRootElementName;
+		String nameSpace = null;
+		if (fragmentRootElementName.contains("{")) {
+			nameSpace = fragmentRootElementName.replaceAll("\\{(.*)\\}.*", "$1");
+			name = fragmentRootElementName.replaceAll("\\{.*\\}(.*)", "$1");
+		}
+		return new QName(nameSpace, name, "");
+	}
+	
 }

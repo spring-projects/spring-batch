@@ -10,6 +10,7 @@ import static org.junit.Assert.fail;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import javax.xml.stream.FactoryConfigurationError;
@@ -49,6 +50,9 @@ public class StaxEventItemReaderTests {
 	private String xml = "<root> <fragment> <misc1/> </fragment> <misc2/> <fragment> testString </fragment> </root>";
 
 	// test xml input
+	private String xmlMultiFragment = "<root> <fragmentA> <misc1/> </fragmentA> <misc2/> <fragmentB> testString </fragmentB> <fragmentA xmlns=\"urn:org.test.bar\"> testString </fragmentA></root>";
+
+	// test xml input
 	private String emptyXml = "<root></root>";
 
 	// test xml input
@@ -63,6 +67,8 @@ public class StaxEventItemReaderTests {
 	private Unmarshaller unmarshaller = new MockFragmentUnmarshaller();
 
 	private static final String FRAGMENT_ROOT_ELEMENT = "fragment";
+	
+	private static final String[] MULTI_FRAGMENT_ROOT_ELEMENTS = {"fragmentA", "fragmentB"};
 
 	private ExecutionContext executionContext;
 
@@ -194,7 +200,66 @@ public class StaxEventItemReaderTests {
 
 		source.close();
 	}
+	
+	@Test
+	public void testMultiFragment() throws Exception {
 
+		source.setResource(new ByteArrayResource(xmlMultiFragment.getBytes()));
+		source.setFragmentRootElementNames(MULTI_FRAGMENT_ROOT_ELEMENTS);
+		source.afterPropertiesSet();
+		source.open(executionContext);
+		// see asserts in the mock unmarshaller
+		assertNotNull(source.read());
+		assertNotNull(source.read());
+		assertNotNull(source.read());
+		assertNull(source.read()); // there are only three fragments
+
+		source.close();
+	}	
+
+	@Test
+	public void testMultiFragmentNameSpace() throws Exception {
+
+		source.setResource(new ByteArrayResource(xmlMultiFragment.getBytes()));
+		source.setFragmentRootElementNames(new String[] {"{urn:org.test.bar}fragmentA", "fragmentB"});
+		source.afterPropertiesSet();
+		source.open(executionContext);
+		// see asserts in the mock unmarshaller
+		assertNotNull(source.read());
+		assertNotNull(source.read());
+		assertNull(source.read()); // there are only two fragments (one has wrong namespace)
+
+		source.close();
+	}	
+
+	@Test
+	public void testMultiFragmentRestart() throws Exception {
+
+		source.setResource(new ByteArrayResource(xmlMultiFragment.getBytes()));
+		source.setFragmentRootElementNames(MULTI_FRAGMENT_ROOT_ELEMENTS);
+		source.afterPropertiesSet();
+		source.open(executionContext);
+		// see asserts in the mock unmarshaller
+		assertNotNull(source.read());
+		assertNotNull(source.read());
+		
+		source.update(executionContext);		
+		assertEquals(2, executionContext.getInt(ClassUtils.getShortName(StaxEventItemReader.class) + ".read.count"));
+		
+		source.close();
+		
+		source = createNewInputSouce();
+		source.setResource(new ByteArrayResource(xmlMultiFragment.getBytes()));
+		source.setFragmentRootElementNames(MULTI_FRAGMENT_ROOT_ELEMENTS);
+		source.afterPropertiesSet();
+		source.open(executionContext);
+		
+		assertNotNull(source.read());
+		assertNull(source.read()); // there are only three fragments
+
+		source.close();
+	}	
+	
 	/**
 	 * Cursor is moved before beginning of next fragment.
 	 */
@@ -510,7 +575,7 @@ public class StaxEventItemReaderTests {
 			do {
 				eventInsideFragment = eventReader.peek();
 				if (eventInsideFragment instanceof EndElement
-						&& ((EndElement) eventInsideFragment).getName().getLocalPart().equals(FRAGMENT_ROOT_ELEMENT)) {
+						&& isFragmentRootElement(((EndElement) eventInsideFragment).getName().getLocalPart())) {
 					break;
 				}
 				events.add(eventReader.nextEvent());
@@ -545,7 +610,7 @@ public class StaxEventItemReaderTests {
 				// second should be StartElement of the fragment
 				XMLEvent event2 = eventReader.nextEvent();
 				assertTrue(event2.isStartElement());
-				assertTrue(EventHelper.startElementName(event2).equals(FRAGMENT_ROOT_ELEMENT));
+				assertTrue(isFragmentRootElement(EventHelper.startElementName(event2)));
 
 				// jump before the end of fragment
 				fragmentContent = readRecordsInsideFragment(eventReader);
@@ -553,7 +618,7 @@ public class StaxEventItemReaderTests {
 				// end of fragment
 				XMLEvent event3 = eventReader.nextEvent();
 				assertTrue(event3.isEndElement());
-				assertTrue(EventHelper.endElementName(event3).equals(FRAGMENT_ROOT_ELEMENT));
+				assertTrue(isFragmentRootElement(EventHelper.endElementName(event3)));
 
 				// EndDocument should follow the end of fragment
 				XMLEvent event4 = eventReader.nextEvent();
@@ -564,6 +629,10 @@ public class StaxEventItemReaderTests {
 				throw new RuntimeException("Error occured in FragmentDeserializer", e);
 			}
 			return fragmentContent;
+		}
+		
+		private boolean isFragmentRootElement(String name) {
+			return FRAGMENT_ROOT_ELEMENT.equals(name) || Arrays.asList(MULTI_FRAGMENT_ROOT_ELEMENTS).contains(name);
 		}
 
 	}
