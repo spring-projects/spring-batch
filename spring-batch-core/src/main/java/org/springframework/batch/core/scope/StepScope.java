@@ -75,6 +75,8 @@ import org.springframework.util.StringValueResolver;
  * @since 2.0
  */
 public class StepScope implements Scope, BeanFactoryPostProcessor, Ordered {
+	
+	private static final String TARGET_NAME_PREFIX = "scopedTarget.";
 
 	private Log logger = LogFactory.getLog(getClass());
 
@@ -232,15 +234,17 @@ public class StepScope implements Scope, BeanFactoryPostProcessor, Ordered {
 		BeanDefinitionRegistry registry = (BeanDefinitionRegistry) beanFactory;
 
 		for (String beanName : beanFactory.getBeanDefinitionNames()) {
-			BeanDefinition definition = beanFactory.getBeanDefinition(beanName);
-			// Replace this or any of its inner beans with scoped proxy if it
-			// has this scope
-			boolean scoped = name.equals(definition.getScope());
-			Scopifier scopifier = new Scopifier(registry, name, proxyTargetClass, scoped);
-			scopifier.visitBeanDefinition(definition);
+			if (!beanName.startsWith(TARGET_NAME_PREFIX)) {
+				BeanDefinition definition = beanFactory.getBeanDefinition(beanName);			
+				// Replace this or any of its inner beans with scoped proxy if it
+				// has this scope
+				boolean scoped = name.equals(definition.getScope());
+				Scopifier scopifier = new Scopifier(registry, name, proxyTargetClass, scoped);
+				scopifier.visitBeanDefinition(definition);
 
-			if (scoped && !definition.isAbstract()) {
-				createScopedProxy(beanName, definition, registry, proxyTargetClass);
+				if (scoped && !definition.isAbstract()) {
+					createScopedProxy(beanName, definition, registry, proxyTargetClass);
+				}
 			}
 		}
 
