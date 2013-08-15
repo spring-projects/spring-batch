@@ -197,6 +197,13 @@ public class JsrJobOperatorTests {
 		jsrJobOperator.getJobInstanceCount("myJob");
 	}
 
+	@Test(expected=NoSuchJobException.class)
+	public void testGetJobInstanceCountZeroInstancesReturned() throws Exception {
+		when(jobExplorer.getJobInstanceCount("myJob")).thenReturn(0);
+
+		jsrJobOperator.getJobInstanceCount("myJob");
+	}
+
 	@Test
 	public void testGetJobInstancesRoseyScenario() {
 		List<JobInstance> instances = new ArrayList<JobInstance>();
@@ -313,8 +320,15 @@ public class JsrJobOperatorTests {
 	}
 
 	@Test
-	public void testStartMultipleTimesSameParameters() {
+	public void testStartMultipleTimesSameParameters() throws Exception {
 		jsrJobOperator = BatchRuntime.getJobOperator();
+
+		int jobInstanceCountBefore = 0;
+
+		try {
+			jobInstanceCountBefore = jsrJobOperator.getJobInstanceCount("myJob3");
+		} catch (NoSuchJobException ignore) {
+		}
 
 		long run1 = jsrJobOperator.start("jsrJobOperatorTestJob", null);
 		long run2 = jsrJobOperator.start("jsrJobOperatorTestJob", null);
@@ -324,7 +338,9 @@ public class JsrJobOperatorTests {
 		assertEquals(BatchStatus.COMPLETED, jsrJobOperator.getJobExecution(run2).getBatchStatus());
 		assertEquals(BatchStatus.COMPLETED, jsrJobOperator.getJobExecution(run3).getBatchStatus());
 
-		assertTrue(3 >= jsrJobOperator.getJobInstanceCount("jsrJobOperatorTestJob"));
+		int jobInstanceCountAfter = jsrJobOperator.getJobInstanceCount("myJob3");
+
+		assertTrue((jobInstanceCountAfter - jobInstanceCountBefore) == 3);
 	}
 
 	@Test

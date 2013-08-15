@@ -116,7 +116,7 @@ import org.springframework.util.Assert;
  * @since 3.0
  */
 public class JsrJobOperator implements JobOperator {
-    private static final String BATCH_PROPERTY_CONTEXT_BEAN_NAME = "batchPropertyContext";
+	private static final String BATCH_PROPERTY_CONTEXT_BEAN_NAME = "batchPropertyContext";
 
 	private org.springframework.batch.core.launch.JobOperator batchJobOperator;
 	private JobExplorer jobExplorer;
@@ -273,7 +273,13 @@ public class JsrJobOperator implements JobOperator {
 	public int getJobInstanceCount(String jobName) throws NoSuchJobException,
 	JobSecurityException {
 		try {
-			return jobExplorer.getJobInstanceCount(jobName);
+			int count = jobExplorer.getJobInstanceCount(jobName);
+
+			if(count <= 0) {
+				throw new NoSuchJobException("No job instances were found for job name " + jobName);
+			} else {
+				return count;
+			}
 		} catch (org.springframework.batch.core.launch.NoSuchJobException e) {
 			throw new NoSuchJobException("No job instances were found for job name " + jobName);
 		}
