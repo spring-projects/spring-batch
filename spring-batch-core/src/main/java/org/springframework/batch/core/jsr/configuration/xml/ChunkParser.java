@@ -39,7 +39,7 @@ import org.w3c.dom.NodeList;
  * Parser for the &lt;chunk /&gt; element as specified in JSR-352.  The current state
  * parses a chunk element into it's related batch artifacts ({@link ChunkOrientedTasklet}, {@link ItemReader},
  * {@link ItemProcessor}, and {@link ItemWriter}).
- * 
+ *
  * @author Michael Minella
  * @author Chris Schaefer
  * @since 3.0
@@ -79,6 +79,9 @@ public class ChunkParser {
 			} else if(checkpointPolicy.equals(CUSTOM_CHECKPOINT_POLICY)) {
 				parseCustomCheckpointAlgorithm(element, parserContext, propertyValues);
 			}
+		} else {
+			parseSimpleAttribute(element, propertyValues, ITEM_COUNT_ATTRIBUTE, "commitInterval");
+			parseSimpleAttribute(element, propertyValues, TIME_LIMIT_ATTRIBUTE, "timeout");
 		}
 
 		parseSimpleAttribute(element, propertyValues, SKIP_LIMIT_ATTRIBUTE, "skipLimit");
@@ -102,7 +105,7 @@ public class ChunkParser {
 
 	@SuppressWarnings({"unchecked", "rawtypes"})
 	private void parseChildElement(Element element, ParserContext parserContext,
-	        MutablePropertyValues propertyValues, Node nd) {
+			MutablePropertyValues propertyValues, Node nd) {
 		if (nd instanceof Element) {
 			Element nestedElement = (Element) nd;
 			String name = nestedElement.getLocalName();
@@ -113,19 +116,19 @@ public class ChunkParser {
 					propertyValues.addPropertyValue("itemReader", new RuntimeBeanReference(artifactName));
 				}
 
-                new PropertyParser(artifactName, parserContext).parseProperties(nestedElement);
+				new PropertyParser(artifactName, parserContext).parseProperties(nestedElement);
 			} else if(name.equals(PROCESSOR_ELEMENT)) {
 				if (StringUtils.hasText(artifactName)) {
 					propertyValues.addPropertyValue("itemProcessor", new RuntimeBeanReference(artifactName));
 				}
 
-                new PropertyParser(artifactName, parserContext).parseProperties(nestedElement);
+				new PropertyParser(artifactName, parserContext).parseProperties(nestedElement);
 			} else if(name.equals(WRITER_ELEMENT)) {
 				if (StringUtils.hasText(artifactName)) {
 					propertyValues.addPropertyValue("itemWriter", new RuntimeBeanReference(artifactName));
 				}
 
-                new PropertyParser(artifactName, parserContext).parseProperties(nestedElement);
+				new PropertyParser(artifactName, parserContext).parseProperties(nestedElement);
 			} else if(name.equals(SKIPPABLE_EXCEPTION_CLASSES_ELEMENT)) {
 				ManagedMap exceptionClasses = new ExceptionElementParser().parse(element, parserContext, SKIPPABLE_EXCEPTION_CLASSES_ELEMENT);
 				if(exceptionClasses != null) {
@@ -161,7 +164,7 @@ public class ChunkParser {
 				propertyValues.addPropertyValue("chunkCompletionPolicy", new RuntimeBeanReference(name));
 			}
 
-            new PropertyParser(name, parserContext).parseProperties(checkpointAlgorithmElement);
+			new PropertyParser(name, parserContext).parseProperties(checkpointAlgorithmElement);
 		} else if(elements.size() > 1){
 			parserContext.getReaderContext().error(
 					"The <checkpoint-algorithm/> element may not appear more than once in a single <"
