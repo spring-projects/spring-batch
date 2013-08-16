@@ -395,6 +395,14 @@ public class JsrJobOperator implements JobOperator {
 			throw new JobExecutionAlreadyCompleteException("The requested job has already completed");
 		}
 
+		List<org.springframework.batch.core.JobExecution> previousExecutions = jobExplorer.getJobExecutions(previousJobExecution.getJobInstance());
+
+		for (org.springframework.batch.core.JobExecution jobExecution : previousExecutions) {
+			if(jobExecution.getCreateTime().compareTo(previousJobExecution.getCreateTime()) > 0) {
+				throw new JobExecutionNotMostRecentException("The requested JobExecution to restart was not the most recently run");
+			}
+		}
+
 		String jobName = previousJobExecution.getJobInstance().getJobName();
 
 		GenericXmlApplicationContext batchContext = new GenericXmlApplicationContext();
