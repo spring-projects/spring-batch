@@ -40,7 +40,7 @@ public class StepContextFactoryBean implements FactoryBean<StepContext> {
 	@Override
 	public StepContext getObject() throws Exception {
 		org.springframework.batch.core.StepExecution stepExecution = StepSynchronizationManager.getContext().getStepExecution();
-		Properties properties = batchPropertyContext.getBatchProperties(stepExecution.getStepName());
+		Properties properties = batchPropertyContext.getStepLevelProperties(stepExecution.getStepName());
 
 		return new StepContext(stepExecution, properties);
 	}

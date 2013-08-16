@@ -491,8 +491,8 @@ public class JobPropertyTests {
 			org.springframework.util.Assert.isNull(stepContext.getProperties().get("step1PropertyName2"));
 			org.springframework.util.Assert.isTrue(stepContext.getProperties().get("step2PropertyName1").equals("step2PropertyValue1"));
 			org.springframework.util.Assert.isTrue(stepContext.getProperties().get("step2PropertyName2").equals("step2PropertyValue2"));
-			org.springframework.util.Assert.isTrue(stepContext.getProperties().get("jobPropertyName1").equals("jobPropertyValue1"));
-			org.springframework.util.Assert.isTrue(stepContext.getProperties().get("jobPropertyName2").equals("jobPropertyValue2"));
+			org.springframework.util.Assert.isTrue(stepContext.getProperties().get("jobPropertyName1") == null);
+			org.springframework.util.Assert.isTrue(stepContext.getProperties().get("jobPropertyName2") == null);
 
 			return null;
 		}

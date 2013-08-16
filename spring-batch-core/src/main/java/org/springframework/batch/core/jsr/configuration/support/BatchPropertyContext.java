@@ -61,6 +61,24 @@ public class BatchPropertyContext {
 		}
 	}
 
+	public Properties getStepLevelProperties(String beanName) {
+		Properties properties = new Properties();
+
+		if (batchProperties.containsKey(beanName)) {
+			properties.putAll(batchProperties.get(beanName));
+		} else {
+			if(beanName.startsWith("scopedTarget")) {
+				beanName = beanName.substring(13);
+			}
+
+			if(batchProperties.containsKey(beanName)) {
+				properties.putAll(batchProperties.get(beanName));
+			}
+		}
+
+		return properties;
+	}
+
 	/**
 	 * <p>
 	 * Obtains the batch {@link Properties} for the provided bean name / batch artifact. The returned
