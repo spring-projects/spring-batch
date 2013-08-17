@@ -12,14 +12,8 @@
 					http://www.springframework.org/schema/jdbc/spring-jdbc-3.2.xsd
                     http://www.springframework.org/schema/context
                     http://www.springframework.org/schema/context/spring-context-3.2.xsd">
-<!--
-	<context:annotation-config/>
 
-    first, define your individual @Configuration classes as beans
-    <bean class="org.springframework.batch.core.jsr.launch.JsrJobOperator.BaseConfiguration"/>
- -->
-
- 	<bean id="baseContext" class="org.springframework.context.support.ClassPathXmlApplicationContext">
+ 	<bean id="baseContext" class="org.springframework.context.support.GenericXmlApplicationContext">
  		<constructor-arg>
  			<list>
  				<value>baseContext.xml</value>
