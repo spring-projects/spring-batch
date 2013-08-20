@@ -31,11 +31,13 @@ import java.util.concurrent.ConcurrentHashMap;
  * @since 3.0
  */
 public class BatchPropertyContext {
+	private static final String JOB_ARTIFACT_PROPERTY_PREFIX = "job-";
+
 	private ConcurrentHashMap<String, Properties> batchProperties = new ConcurrentHashMap<String, Properties>();
 
 	/**
 	 * <p>
-	 * Adds each of the provided {@link BatchPropertyContext} objects to the existing propery
+	 * Adds each of the provided {@link BatchPropertyContext} objects to the existing property
 	 * context.
 	 * </p>
 	 *
@@ -61,19 +63,21 @@ public class BatchPropertyContext {
 		}
 	}
 
+	/**
+	 * <p>
+	 * Obtains all properties for the specific batch artifact / bean name without any job level
+	 * properties.
+	 * </p>
+	 *
+	 * @param beanName the batch artifact / bean name to obtain {@link Properties} for
+	 * @return the step level {@link Properties}
+	 */
 	public Properties getStepLevelProperties(String beanName) {
 		Properties properties = new Properties();
+		String originalBeanName = getOriginalBeanName(beanName);
 
-		if (batchProperties.containsKey(beanName)) {
-			properties.putAll(batchProperties.get(beanName));
-		} else {
-			if(beanName.startsWith("scopedTarget")) {
-				beanName = beanName.substring(13);
-			}
-
-			if(batchProperties.containsKey(beanName)) {
-				properties.putAll(batchProperties.get(beanName));
-			}
+		if (batchProperties.containsKey(originalBeanName)) {
+			properties.putAll(batchProperties.get(originalBeanName));
 		}
 
 		return properties;
@@ -82,7 +86,8 @@ public class BatchPropertyContext {
 	/**
 	 * <p>
 	 * Obtains the batch {@link Properties} for the provided bean name / batch artifact. The returned
-	 * {@link Properties} will also contain any job level properties that have been set.
+	 * {@link Properties} will also contain any job level properties that have been set. Job level
+	 * properties will not override existing lower level artifact properties.
 	 * </p>
 	 *
 	 * @param beanName the bean name representing the batch artifact to obtain properties for
@@ -90,30 +95,51 @@ public class BatchPropertyContext {
 	 */
 	public Properties getBatchProperties(String beanName) {
 		Properties properties = new Properties();
+		String originalBeanName = getOriginalBeanName(beanName);
 
-		if (batchProperties.containsKey(beanName)) {
-			properties.putAll(batchProperties.get(beanName));
-		} else {
-			if(beanName.startsWith("scopedTarget")) {
-				beanName = beanName.substring(13);
-			}
-
-			if(batchProperties.containsKey(beanName)) {
-				properties.putAll(batchProperties.get(beanName));
-			}
+		if (batchProperties.containsKey(originalBeanName)) {
+			properties.putAll(batchProperties.get(originalBeanName));
 		}
 
-		for (String jobLevelProperty : batchProperties.keySet()) {
-			if (jobLevelProperty.startsWith("job-")) {
-				if (batchProperties.containsKey(jobLevelProperty)) {
-					properties.putAll(batchProperties.get(jobLevelProperty));
-				}
+		Properties jobLevelProperties = getJobProperties();
 
-				break;
+		for (String jobLevelProperty : jobLevelProperties.stringPropertyNames()) {
+			if (!properties.containsKey(jobLevelProperty)) {
+				properties.put(jobLevelProperty, jobLevelProperties.getProperty(jobLevelProperty));
 			}
 		}
 
 		return properties;
+	}
+
+	/**
+	 * <p>
+	 * Obtains all {@link Properties} that reside at the Job level configuration.
+	 * </p>
+	 *
+	 * @return the job level {@link Properties}
+	 */
+	public Properties getJobProperties() {
+		Properties jobProperties = new Properties();
+
+		for (String jobLevelProperty : batchProperties.keySet()) {
+			if (jobLevelProperty.startsWith(JOB_ARTIFACT_PROPERTY_PREFIX)) {
+				if (batchProperties.containsKey(jobLevelProperty)) {
+					jobProperties.putAll(batchProperties.get(jobLevelProperty));
+					break;
+				}
+			}
+		}
+
+		return jobProperties;
+	}
+
+	protected String getOriginalBeanName(String beanName) {
+		if (beanName.startsWith("scopedTarget")) {
+			return beanName.substring(13);
+		}
+
+		return beanName;
 	}
 
 	/**

@@ -41,7 +41,6 @@ import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.JobParameters;
 import org.springframework.batch.core.launch.JobLauncher;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.ApplicationContext;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
@@ -81,9 +80,6 @@ public class JobPropertyTests {
 
 	@Autowired
 	private TestBatchlet testBatchlet;
-
-	@Autowired
-	private ApplicationContext applicationContext;
 
 	@Test
 	public void testJobLevelPropertiesInItemReader() throws Exception {

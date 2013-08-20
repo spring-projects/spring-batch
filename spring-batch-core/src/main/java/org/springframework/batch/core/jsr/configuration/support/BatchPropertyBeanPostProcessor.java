@@ -49,9 +49,16 @@ import javax.batch.api.partition.PartitionReducer;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.springframework.batch.core.scope.StepScope;
 import org.springframework.beans.BeansException;
+import org.springframework.beans.factory.BeanFactory;
+import org.springframework.beans.factory.BeanFactoryAware;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.config.BeanExpressionContext;
+import org.springframework.beans.factory.config.BeanExpressionResolver;
 import org.springframework.beans.factory.config.BeanPostProcessor;
+import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
+import org.springframework.context.expression.StandardBeanExpressionResolver;
 import org.springframework.util.ReflectionUtils;
 
 /**
@@ -64,10 +71,12 @@ import org.springframework.util.ReflectionUtils;
  * @author Michael Minella
  * @since 3.0
  */
-public class BatchPropertyBeanPostProcessor implements BeanPostProcessor {
-	@Autowired
+public class BatchPropertyBeanPostProcessor implements BeanPostProcessor, BeanFactoryAware {
 	private BatchPropertyContext batchPropertyContext;
 	private Log logger = LogFactory.getLog(getClass());
+	private ConfigurableListableBeanFactory beanFactory;
+	private BeanExpressionContext beanExpressionContext;
+	private BeanExpressionResolver expressionResolver = new StandardBeanExpressionResolver();
 	private Set<Class<? extends Annotation>> requiredAnnotations = new HashSet<Class<? extends Annotation>>();
 
 	public BatchPropertyBeanPostProcessor() {
@@ -96,12 +105,12 @@ public class BatchPropertyBeanPostProcessor implements BeanPostProcessor {
 		ClassLoader cl = BatchPropertyBeanPostProcessor.class.getClassLoader();
 
 		try {
-			this.requiredAnnotations.add((Class<? extends Annotation>) cl.loadClass("javax.inject.Inject"));
+			requiredAnnotations.add((Class<? extends Annotation>) cl.loadClass("javax.inject.Inject"));
 		} catch (ClassNotFoundException ex) {
 			logger.warn("javax.inject.Inject not found - @BatchProperty marked fields will not be processed.");
 		}
 
-		this.requiredAnnotations.add(BatchProperty.class);
+		requiredAnnotations.add(BatchProperty.class);
 	}
 
 	private boolean isBatchArtifact(Object bean) {
@@ -162,7 +171,9 @@ public class BatchPropertyBeanPostProcessor implements BeanPostProcessor {
 
 	private String getBatchProperty(String propertyKey, Properties batchArtifactProperties) {
 		if (batchArtifactProperties.containsKey(propertyKey)) {
-			return (String) batchArtifactProperties.get(propertyKey);
+			String propertyValue = (String) batchArtifactProperties.get(propertyKey);
+
+			return (String) expressionResolver.evaluate(propertyValue, beanExpressionContext);
 		}
 
 		return null;
@@ -170,7 +181,7 @@ public class BatchPropertyBeanPostProcessor implements BeanPostProcessor {
 
 	private boolean isAnnotated(Field field) {
 		for (Class<? extends Annotation> annotation : requiredAnnotations) {
-			if(!field.isAnnotationPresent(annotation)) {
+			if (!field.isAnnotationPresent(annotation)) {
 				return false;
 			}
 		}
@@ -185,5 +196,21 @@ public class BatchPropertyBeanPostProcessor implements BeanPostProcessor {
 	@Override
 	public Object postProcessAfterInitialization(Object bean, String beanName) throws BeansException {
 		return bean;
+	}
+
+	@Override
+	public void setBeanFactory(BeanFactory beanFactory) throws BeansException {
+		if (!(beanFactory instanceof ConfigurableListableBeanFactory)) {
+			throw new IllegalArgumentException(
+					"BatchPropertyBeanPostProcessor requires a ConfigurableListableBeanFactory");
+		}
+
+		this.beanFactory = (ConfigurableListableBeanFactory) beanFactory;
+		this.beanExpressionContext = new BeanExpressionContext(this.beanFactory, this.beanFactory.getBean(StepScope.class));
+	}
+
+	@Autowired
+	public void setBatchPropertyContext(BatchPropertyContext batchPropertyContext) {
+		this.batchPropertyContext = batchPropertyContext;
 	}
 }

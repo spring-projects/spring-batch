@@ -502,6 +502,7 @@ public class JsrJobOperator implements JobOperator {
 
 		batchContext.setParent(baseContext);
 		batchContext.refresh();
+
 		final Job job = batchContext.getBean(Job.class);
 
 		Assert.notNull(jobName, "The job name must not be null.");
