@@ -35,7 +35,7 @@ import org.w3c.dom.NodeList;
 /**
  * Parses flows as defined in JSR-352.  The current state parses a flow
  * as it is within a regular Spring Batch job/flow.
- * 
+ *
  * @author Michael Minella
  * @since 3.0
  */
@@ -47,7 +47,8 @@ public class FlowParser extends AbstractFlowParser {
 	private StepParser stepParser = new StepParser();
 	private String flowName;
 
-	public FlowParser(String flowName) {
+	public FlowParser(String flowName, String jobFactoryRef) {
+		super.setJobFactoryRef(jobFactoryRef);
 		this.flowName = flowName;
 	}
 
@@ -75,9 +76,9 @@ public class FlowParser extends AbstractFlowParser {
 				if (nodeName.equals(STEP_ELEMENT)) {
 					stateTransitions.addAll(stepParser.parse(child, parserContext, builder));
 				} else if(nodeName.equals(SPLIT_ELEMENT)) {
-					stateTransitions.addAll(new SplitParser().parse(child, parserContext));
+					stateTransitions.addAll(new SplitParser(flowName).parse(child, parserContext));
 				} else if(nodeName.equals(DECISION_ELEMENT)) {
-					stateTransitions.addAll(new DecisionParser().parse(child, parserContext));
+					stateTransitions.addAll(new DecisionParser().parse(child, parserContext, flowName));
 				}
 			}
 		}

@@ -17,39 +17,36 @@ package org.springframework.batch.core.jsr.configuration.xml;
 
 import javax.batch.api.Decider;
 
+import org.springframework.batch.core.Step;
 import org.springframework.batch.core.job.flow.JobExecutionDecider;
-import org.springframework.batch.core.job.flow.State;
-import org.springframework.batch.core.job.flow.support.state.DecisionState;
-import org.springframework.batch.core.jsr.DecisionAdapter;
+import org.springframework.batch.core.jsr.step.DecisionStep;
+import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.beans.factory.FactoryBean;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.util.Assert;
 
 /**
- * {@link FactoryBean} for creating a {@link DecisionState}.  If the underlying
- * decider is a {@link Decider}, it will be wrapped in a {@link DecisionAdapter}.
+ * {@link FactoryBean} for creating a {@link DecisionStep}.
  *
  * @author Michael Minella
  * @since 3.0
  */
-public class DecisionStateFactoryBean implements FactoryBean<State>, InitializingBean {
+public class DecisionStepFactoryBean implements FactoryBean<Step>, InitializingBean {
 
 	private Decider jsrDecider;
-	private JobExecutionDecider decider;
 	private String name;
+	private JobRepository jobRepository;
+
+	public void setJobRepository(JobRepository jobRepository) {
+		this.jobRepository = jobRepository;
+	}
 
 	/**
 	 * @param decider either a {@link Decider} or a {@link JobExecutionDecider}
 	 * @throws IllegalArgumentException if the type passed in is not a valid type
 	 */
-	public void setDecider(Object decider) {
-		if(decider instanceof JobExecutionDecider) {
-			this.decider = (JobExecutionDecider) decider;
-		} else if(decider instanceof Decider) {
-			this.jsrDecider = (Decider) decider;
-		} else {
-			throw new IllegalArgumentException("Invalid type for a decider");
-		}
+	public void setDecider(Decider decider) {
+		this.jsrDecider = decider;
 	}
 
 	/**
@@ -65,17 +62,13 @@ public class DecisionStateFactoryBean implements FactoryBean<State>, Initializin
 	 * @see org.springframework.beans.factory.FactoryBean#getObject()
 	 */
 	@Override
-	public State getObject() throws Exception {
-		JobExecutionDecider wrappedDecider = null;
+	public Step getObject() throws Exception {
 
-		if(decider != null) {
-			wrappedDecider = decider;
-		} else if(jsrDecider != null) {
-			wrappedDecider = new DecisionAdapter(jsrDecider);
-		}
-		State state = new DecisionState(wrappedDecider, name);
+		DecisionStep decisionStep = new DecisionStep(jsrDecider);
+		decisionStep.setName(name);
+		decisionStep.setJobRepository(jobRepository);
 
-		return state;
+		return decisionStep;
 	}
 
 	/* (non-Javadoc)
@@ -83,7 +76,7 @@ public class DecisionStateFactoryBean implements FactoryBean<State>, Initializin
 	 */
 	@Override
 	public Class<?> getObjectType() {
-		return JobExecutionDecider.class;
+		return DecisionStep.class;
 	}
 
 	/* (non-Javadoc)
@@ -96,7 +89,7 @@ public class DecisionStateFactoryBean implements FactoryBean<State>, Initializin
 
 	@Override
 	public void afterPropertiesSet() throws Exception {
-		Assert.isTrue(!(decider == null && jsrDecider == null), "A decider implementation is required");
+		Assert.isTrue(!(jsrDecider == null), "A decider implementation is required");
 		Assert.notNull(name, "A name is required for a decision state");
 	}
 }

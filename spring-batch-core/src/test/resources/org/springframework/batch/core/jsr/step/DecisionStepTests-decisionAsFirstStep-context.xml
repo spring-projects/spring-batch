@@ -5,15 +5,11 @@
 						http://xmlns.jcp.org/xml/ns/javaee http://xmlns.jcp.org/xml/ns/javaee/jobXML_1_0.xsd
 						http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util.xsd">
 	<job id="job1" xmlns="http://xmlns.jcp.org/xml/ns/javaee" version="1.0">
-		<step id="step1" next="decider">
-			<batchlet ref="step1Ref" />
-		</step>
-		<decision ref="jsrDecider" id="decider">
-			<next on="next" to="step2" />
-			<end on="*" />
+		<decision ref="nextDecider" id="decision1">
+			<next on="*" to="step2"/>
 		</decision>
 		<step id="step2">
-			<batchlet ref="step1Ref" />
+			<batchlet ref="doSomethingBatchlet"/>
 		</step>
 	</job>
 
@@ -25,7 +21,8 @@
 
 	<bean id="jobRepository" class="org.springframework.batch.core.repository.support.MapJobRepositoryFactoryBean"/>
 
-	<bean id="jsrDecider" class="org.springframework.batch.core.jsr.configuration.xml.DecisionParsingTests.JsrDecider"/>
+	<bean id="nextDecider" class="org.springframework.batch.core.jsr.step.DecisionStepTests.NextDecider"/>
 
-	<bean id="step1Ref" class="org.springframework.batch.core.step.tasklet.TaskletSupport"/>
+	<bean id="doSomethingBatchlet" class="org.springframework.batch.core.jsr.step.batchlet.BatchletSupport"/>
+
 </beans>
