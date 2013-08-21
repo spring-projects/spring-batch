@@ -27,11 +27,17 @@ import org.w3c.dom.Element;
 
 /**
  * Parses a &lt;split /&gt; element as defined in JSR-352.
- * 
+ *
  * @author Michael Minella
  * @since 3.0
  */
 public class SplitParser {
+
+	private String jobFactoryRef;
+
+	public SplitParser(String jobFactoryRef) {
+		this.jobFactoryRef = jobFactoryRef;
+	}
 
 	public Collection<BeanDefinition> parse(Element element, ParserContext parserContext) {
 
@@ -48,15 +54,14 @@ public class SplitParser {
 
 		Collection<Object> flows = new ManagedList<Object>();
 		int i = 0;
-		String prefix = idAttribute;
 		for (Element nextElement : flowElements) {
-			FlowParser flowParser = new FlowParser(prefix + "." + i);
+			FlowParser flowParser = new FlowParser(idAttribute + "." + i, jobFactoryRef);
 			flows.add(flowParser.parse(nextElement, parserContext));
 			i++;
 		}
 
 		stateBuilder.addConstructorArgValue(flows);
-		stateBuilder.addConstructorArgValue(prefix);
+		stateBuilder.addConstructorArgValue(idAttribute);
 
 		return FlowParser.getNextElements(parserContext, null, stateBuilder.getBeanDefinition(), element);
 	}

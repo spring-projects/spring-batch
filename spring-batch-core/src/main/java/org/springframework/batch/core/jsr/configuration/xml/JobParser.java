@@ -55,7 +55,7 @@ public class JobParser extends AbstractSingleBeanDefinitionParser {
 			builder.addPropertyValue("restartable", restartableAttribute);
 		}
 
-		BeanDefinition flowDef = new FlowParser(jobName).parse(element, parserContext);
+		BeanDefinition flowDef = new FlowParser(jobName, jobName).parse(element, parserContext);
 		builder.addPropertyValue("flow", flowDef);
 
 		AbstractBeanDefinition stepContextBeanDefinition = BeanDefinitionBuilder.genericBeanDefinition(StepContextFactoryBean.class)

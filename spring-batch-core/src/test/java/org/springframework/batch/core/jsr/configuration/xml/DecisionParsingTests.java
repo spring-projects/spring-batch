@@ -17,16 +17,14 @@ package org.springframework.batch.core.jsr.configuration.xml;
 
 import static org.junit.Assert.assertEquals;
 
-import org.junit.Ignore;
+import javax.batch.api.Decider;
+
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.batch.core.BatchStatus;
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.JobParameters;
-import org.springframework.batch.core.StepExecution;
-import org.springframework.batch.core.job.flow.FlowExecutionStatus;
-import org.springframework.batch.core.job.flow.JobExecutionDecider;
 import org.springframework.batch.core.launch.JobLauncher;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
@@ -43,19 +41,18 @@ public class DecisionParsingTests {
 	public JobLauncher jobLauncher;
 
 	@Test
-	@Ignore
 	public void test() throws Exception {
 		JobExecution execution = jobLauncher.run(job, new JobParameters());
 		assertEquals(BatchStatus.COMPLETED, execution.getStatus());
-		assertEquals(2, execution.getStepExecutions().size());
+		assertEquals(3, execution.getStepExecutions().size());
 	}
 
-	public static class TestDecider implements JobExecutionDecider {
+	public static class JsrDecider implements Decider {
 
 		@Override
-		public FlowExecutionStatus decide(JobExecution jobExecution,
-				StepExecution stepExecution) {
-			return new FlowExecutionStatus("step2");
+		public String decide(javax.batch.runtime.StepExecution[] executions)
+				throws Exception {
+			return "next";
 		}
 	}
 }

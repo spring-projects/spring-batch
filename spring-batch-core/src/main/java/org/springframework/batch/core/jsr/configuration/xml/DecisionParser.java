@@ -18,9 +18,14 @@ package org.springframework.batch.core.jsr.configuration.xml;
 import java.util.Collection;
 
 import org.springframework.batch.core.job.flow.JobExecutionDecider;
+import org.springframework.batch.core.job.flow.support.state.StepState;
 import org.springframework.beans.factory.config.BeanDefinition;
+import org.springframework.beans.factory.config.RuntimeBeanReference;
+import org.springframework.beans.factory.parsing.BeanComponentDefinition;
+import org.springframework.beans.factory.support.AbstractBeanDefinition;
 import org.springframework.beans.factory.support.BeanDefinitionBuilder;
 import org.springframework.beans.factory.xml.ParserContext;
+import org.springframework.util.StringUtils;
 import org.w3c.dom.Element;
 
 /**
@@ -36,14 +41,25 @@ public class DecisionParser {
 	private static final String ID_ATTRIBUTE = "id";
 	private static final String REF_ATTRIBUTE = "ref";
 
-	public Collection<BeanDefinition> parse(Element element, ParserContext parserContext) {
-		String refAttribute = element.getAttribute(REF_ATTRIBUTE);
+	public Collection<BeanDefinition> parse(Element element, ParserContext parserContext, String jobFactoryRef) {
+		BeanDefinitionBuilder factoryBuilder = BeanDefinitionBuilder.genericBeanDefinition();
+		AbstractBeanDefinition factoryDefinition = factoryBuilder.getRawBeanDefinition();
+		factoryDefinition.setBeanClass(DecisionStepFactoryBean.class);
+
+		BeanDefinitionBuilder stateBuilder = BeanDefinitionBuilder.genericBeanDefinition(StepState.class);
+
 		String idAttribute = element.getAttribute(ID_ATTRIBUTE);
 
-		BeanDefinitionBuilder stateBuilder =
-				BeanDefinitionBuilder.genericBeanDefinition("org.springframework.batch.core.jsr.configuration.xml.DecisionStateFactoryBean");
-		stateBuilder.addPropertyReference("decider", refAttribute);
-		stateBuilder.addPropertyValue("name", idAttribute);
+		parserContext.registerBeanComponent(new BeanComponentDefinition(factoryDefinition, idAttribute));
+		stateBuilder.addConstructorArgReference(idAttribute);
+
+		String refAttribute = element.getAttribute(REF_ATTRIBUTE);
+		factoryDefinition.getPropertyValues().add("decider", new RuntimeBeanReference(refAttribute));
+		factoryDefinition.getPropertyValues().add("name", idAttribute);
+
+		if(StringUtils.hasText(jobFactoryRef)) {
+			factoryDefinition.setAttribute("jobParserJobFactoryBeanRef", jobFactoryRef);
+		}
 
 		new PropertyParser(refAttribute, parserContext).parseProperties(element);
 
