@@ -18,7 +18,6 @@ package org.springframework.batch.core.jsr.configuration.xml;
 import javax.batch.api.Decider;
 
 import org.springframework.batch.core.Step;
-import org.springframework.batch.core.job.flow.JobExecutionDecider;
 import org.springframework.batch.core.jsr.step.DecisionStep;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.beans.factory.FactoryBean;
@@ -37,12 +36,15 @@ public class DecisionStepFactoryBean implements FactoryBean<Step>, InitializingB
 	private String name;
 	private JobRepository jobRepository;
 
+	/**
+	 * @param jobRepository All steps need to be able to reference a {@link JobRepository}
+	 */
 	public void setJobRepository(JobRepository jobRepository) {
 		this.jobRepository = jobRepository;
 	}
 
 	/**
-	 * @param decider either a {@link Decider} or a {@link JobExecutionDecider}
+	 * @param decider a {@link Decider}
 	 * @throws IllegalArgumentException if the type passed in is not a valid type
 	 */
 	public void setDecider(Decider decider) {
@@ -89,7 +91,7 @@ public class DecisionStepFactoryBean implements FactoryBean<Step>, InitializingB
 
 	@Override
 	public void afterPropertiesSet() throws Exception {
-		Assert.isTrue(!(jsrDecider == null), "A decider implementation is required");
+		Assert.isTrue(jsrDecider != null, "A decider implementation is required");
 		Assert.notNull(name, "A name is required for a decision state");
 	}
 }

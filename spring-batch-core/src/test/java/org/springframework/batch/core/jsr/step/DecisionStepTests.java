@@ -8,7 +8,6 @@ import java.util.List;
 import javax.batch.api.Decider;
 import javax.batch.runtime.StepExecution;
 
-import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.springframework.batch.core.BatchStatus;
@@ -21,10 +20,6 @@ import org.springframework.context.support.GenericXmlApplicationContext;
 
 @SuppressWarnings("resource")
 public class DecisionStepTests {
-
-	@Before
-	public void setUp() throws Exception {
-	}
 
 	@Test
 	public void testDecisionAsFirstStepOfJob() throws Exception {

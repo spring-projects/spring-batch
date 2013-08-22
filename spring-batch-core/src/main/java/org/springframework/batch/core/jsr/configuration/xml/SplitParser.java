@@ -54,15 +54,14 @@ public class SplitParser {
 
 		Collection<Object> flows = new ManagedList<Object>();
 		int i = 0;
-		String prefix = idAttribute;
 		for (Element nextElement : flowElements) {
-			FlowParser flowParser = new FlowParser(prefix + "." + i, jobFactoryRef);
+			FlowParser flowParser = new FlowParser(idAttribute + "." + i, jobFactoryRef);
 			flows.add(flowParser.parse(nextElement, parserContext));
 			i++;
 		}
 
 		stateBuilder.addConstructorArgValue(flows);
-		stateBuilder.addConstructorArgValue(prefix);
+		stateBuilder.addConstructorArgValue(idAttribute);
 
 		return FlowParser.getNextElements(parserContext, null, stateBuilder.getBeanDefinition(), element);
 	}
