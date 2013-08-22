@@ -106,20 +106,20 @@
 
 	<bean id="jobRepository" class="org.springframework.batch.core.repository.support.MapJobRepositoryFactoryBean"/>
 
-    <bean id="testReader" class="org.springframework.batch.core.jsr.configuration.xml.JobPropertyTests.TestItemReader"/>
+    <bean id="testReader" class="org.springframework.batch.core.jsr.configuration.xml.JobPropertyTests$TestItemReader"/>
 
-    <bean id="testProcessor" class="org.springframework.batch.core.jsr.configuration.xml.JobPropertyTests.TestItemProcessor"/>
+    <bean id="testProcessor" class="org.springframework.batch.core.jsr.configuration.xml.JobPropertyTests$TestItemProcessor"/>
 
-    <bean id="testWriter" class="org.springframework.batch.core.jsr.configuration.xml.JobPropertyTests.TestItemWriter"/>
+    <bean id="testWriter" class="org.springframework.batch.core.jsr.configuration.xml.JobPropertyTests$TestItemWriter"/>
 
-    <bean id="testCheckpointAlgorithm" class="org.springframework.batch.core.jsr.configuration.xml.JobPropertyTests.TestCheckpointAlgorithm"/>
+    <bean id="testCheckpointAlgorithm" class="org.springframework.batch.core.jsr.configuration.xml.JobPropertyTests$TestCheckpointAlgorithm"/>
 
-    <bean id="testBatchlet" class="org.springframework.batch.core.jsr.configuration.xml.JobPropertyTests.TestBatchlet"/>
+    <bean id="testBatchlet" class="org.springframework.batch.core.jsr.configuration.xml.JobPropertyTests$TestBatchlet"/>
 
-    <bean id="testStepListener" class="org.springframework.batch.core.jsr.configuration.xml.JobPropertyTests.TestStepListener"/>
+    <bean id="testStepListener" class="org.springframework.batch.core.jsr.configuration.xml.JobPropertyTests$TestStepListener"/>
 
-    <bean id="testDecider" class="org.springframework.batch.core.jsr.configuration.xml.JobPropertyTests.TestDecider"/>
+    <bean id="testDecider" class="org.springframework.batch.core.jsr.configuration.xml.JobPropertyTests$TestDecider"/>
 
-    <bean id="injectTestObj" class="org.springframework.batch.core.jsr.configuration.xml.JobPropertyTests.InjectTestObj"
+    <bean id="injectTestObj" class="org.springframework.batch.core.jsr.configuration.xml.JobPropertyTests$InjectTestObj"
         c:name="Chris"/>
 </beans>
