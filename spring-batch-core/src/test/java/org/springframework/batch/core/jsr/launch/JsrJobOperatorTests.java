@@ -2,6 +2,7 @@ package org.springframework.batch.core.jsr.launch;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 import static org.mockito.Mockito.verify;
@@ -33,6 +34,7 @@ import org.springframework.batch.core.converter.JobParametersConverter;
 import org.springframework.batch.core.converter.JobParametersConverterSupport;
 import org.springframework.batch.core.explore.JobExplorer;
 import org.springframework.batch.core.explore.support.SimpleJobExplorer;
+import org.springframework.batch.core.jsr.JsrJobParametersConverter;
 import org.springframework.batch.core.launch.support.SimpleJobOperator;
 import org.springframework.batch.core.repository.JobExecutionAlreadyRunningException;
 import org.springframework.batch.core.repository.JobRepository;
@@ -252,13 +254,14 @@ public class JsrJobOperatorTests {
 
 	@Test
 	public void testGetParametersRoseyScenario() {
-		JobExecution jobExecution = new JobExecution(5l, new JobParametersBuilder().addString("key1", "value1").toJobParameters());
+		JobExecution jobExecution = new JobExecution(5l, new JobParametersBuilder().addString("key1", "value1").addLong(JsrJobParametersConverter.JOB_RUN_ID, 5l).toJobParameters());
 
 		when(jobExplorer.getJobExecution(5l)).thenReturn(jobExecution);
 
 		Properties params = jsrJobOperator.getParameters(5l);
 
 		assertEquals("value1", params.get("key1"));
+		assertNull(params.get(JsrJobParametersConverter.JOB_RUN_ID));
 	}
 
 	@Test(expected=NoSuchJobExecutionException.class)

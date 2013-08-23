@@ -45,6 +45,7 @@ import org.springframework.batch.core.JobParameters;
 import org.springframework.batch.core.converter.JobParametersConverter;
 import org.springframework.batch.core.explore.JobExplorer;
 import org.springframework.batch.core.jsr.JobContext;
+import org.springframework.batch.core.jsr.JsrJobParametersConverter;
 import org.springframework.batch.core.jsr.configuration.support.BatchPropertyContext;
 import org.springframework.batch.core.repository.JobExecutionAlreadyRunningException;
 import org.springframework.batch.core.repository.JobRepository;
@@ -320,7 +321,10 @@ public class JsrJobOperator implements JobOperator {
 			throw new NoSuchJobExecutionException("Unable to find the JobExecution for id " + executionId);
 		}
 
-		return jobParametersConverter.getProperties(execution.getJobParameters());
+		Properties properties = jobParametersConverter.getProperties(execution.getJobParameters());
+		properties.remove(JsrJobParametersConverter.JOB_RUN_ID);
+
+		return properties;
 	}
 
 	/* (non-Javadoc)

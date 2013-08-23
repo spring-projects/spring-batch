@@ -114,6 +114,8 @@ public class JobExecution implements javax.batch.runtime.JobExecution {
 	 */
 	@Override
 	public Properties getJobParameters() {
-		return parametersConverter.getProperties(this.execution.getJobParameters());
+		Properties properties = parametersConverter.getProperties(this.execution.getJobParameters());
+		properties.remove(JsrJobParametersConverter.JOB_RUN_ID);
+		return properties;
 	}
 }

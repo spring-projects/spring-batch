@@ -1,6 +1,7 @@
 package org.springframework.batch.core.jsr;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
 
 import java.util.Date;
 import java.util.Properties;
@@ -57,5 +58,6 @@ public class JobExecutionTests {
 		Properties props = adapter.getJobParameters();
 
 		assertEquals("value1", props.get("key1"));
+		assertNull(props.get(JsrJobParametersConverter.JOB_RUN_ID));
 	}
 }
