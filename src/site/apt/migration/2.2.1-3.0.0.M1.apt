@@ -1,0 +1,60 @@
+Spring Batch 3.0.0.M1 Release Notes
+
+* New Feature
+
+  * {{{http://jira.springsource.org/browse/BATCH-1997}[BATCH-1997]}} - Implement JSR TCK SPI
+
+  * {{{http://jira.springsource.org/browse/BATCH-1999}[BATCH-1999]}} - JSR-352 Parsing
+
+  * {{{http://jira.springsource.org/browse/BATCH-2000}[BATCH-2000]}} - Parser batch.xml
+
+  * {{{http://jira.springsource.org/browse/BATCH-2007}[BATCH-2007]}} - Adapt JSR JobOperator to Spring Batch JobOperator
+
+  * {{{http://jira.springsource.org/browse/BATCH-2009}[BATCH-2009]}} - Implement Tasklet.stop()
+
+  * {{{http://jira.springsource.org/browse/BATCH-2037}[BATCH-2037]}} - Retry Reads
+
+  * {{{http://jira.springsource.org/browse/BATCH-2062}[BATCH-2062]}} - Implement the JSR's CheckpointAlgorithm interface
+
+  * {{{http://jira.springsource.org/browse/BATCH-2071}[BATCH-2071]}} - Add Thread Context Class Loading for batch artifacts (JSR-352 section 10.5)
+
+  * {{{http://jira.springsource.org/browse/BATCH-2072}[BATCH-2072]}} - Implement JSR's Decider interface
+
+  * {{{http://jira.springsource.org/browse/BATCH-2077}[BATCH-2077]}} - Java Config: Register listeners just once
+
+* Bug
+
+  * {{{http://jira.springsource.org/browse/BATCH-2018}[BATCH-2018]}} - TransactionAwareBufferedWriter uses hashcode as TransactionSynchronizationManager key
+
+  * {{{http://jira.springsource.org/browse/BATCH-2034}[BATCH-2034]}} - 'Job cannot be null' exception when starting FlowStep remotely with org.springframework.batch.integration.partition.StepExecutionRequestHandler
+
+  * {{{http://jira.springsource.org/browse/BATCH-2035}[BATCH-2035]}} - Create parallel to simple-cli for pure Java configuration
+
+  * {{{http://jira.springsource.org/browse/BATCH-2067}[BATCH-2067]}} - Fix context management
+
+  * {{{http://jira.springsource.org/browse/BATCH-2073}[BATCH-2073]}} - allow-start-if-complete in JSR based job definition is not parsed correctly
+
+* Improvement
+
+  * {{{http://jira.springsource.org/browse/BATCH-1343}[BATCH-1343]}} - Change JobLauncher.run() to "throws JobExecutionException"
+
+  * {{{http://jira.springsource.org/browse/BATCH-1664}[BATCH-1664]}} - MultiResourceItemReader.getCurrentResource() shouldn't be public
+
+  * {{{http://jira.springsource.org/browse/BATCH-1811}[BATCH-1811]}} - Javadoc for JdbcBatchItemWriter
+
+  * {{{http://jira.springsource.org/browse/BATCH-2043}[BATCH-2043]}} - Update DefaultJobParametersConvereterTests to specify English locale
+
+  * {{{http://jira.springsource.org/browse/BATCH-2044}[BATCH-2044]}} - Update SystemCommandTaskletIntegrationTests.java to use ping on windows instead of sleep
+
+* Task
+
+  * {{{http://jira.springsource.org/browse/BATCH-2004}[BATCH-2004]}} - Create wrapper/adapter classes for JSR interfaces
+
+  * {{{http://jira.springsource.org/browse/BATCH-2006}[BATCH-2006]}} - Create context implementations
+
+  * {{{http://jira.springsource.org/browse/BATCH-2008}[BATCH-2008]}} - Implement JSR's JobExecution, JobInstance and StepExecution interfaces
+
+
+
+
+
