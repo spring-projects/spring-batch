@@ -9,23 +9,29 @@
 			<chunk checkpoint-policy="item" item-count="3">
 				<reader ref="generatingItemReader1" />
 				<processor ref="countingItemProcessor" />
-				<writer ref="sysoutItemWriter" />
+				<writer ref="countingItemWriter" />
 			</chunk>
 		</step>
-		<step id="step2" next="step3">
+ 		<step id="step2" next="step3">
 			<chunk checkpoint-policy="custom">
-				<reader ref="generatingItemReader1" />
+				<reader ref="generatingItemReader2" />
 				<processor ref="countingItemProcessor" />
-				<writer ref="sysoutItemWriter" />
+				<writer ref="countingItemWriter" />
 				<checkpoint-algorithm ref="testCompletionPolicy" />
 			</chunk>
 		</step>
-		<step id="step3">
+		<step id="step3" next="step4">
 			<chunk checkpoint-policy="item" item-count="3" time-limit="1">
-				<reader ref="generatingItemReader1" />
+				<reader ref="generatingItemReader3" />
 				<processor ref="countingItemProcessor" />
-				<writer ref="sysoutItemWriter" />
-				<checkpoint-algorithm ref="testCompletionPolicy" />
+				<writer ref="countingItemWriter" />
+			</chunk>
+		</step>
+		<step id="step4">
+			<chunk checkpoint-policy="item">
+				<reader ref="generatingItemReader4" />
+				<processor ref="countingItemProcessor" />
+				<writer ref="countingItemWriter" />
 			</chunk>
 		</step>
 	</job>
@@ -43,6 +49,9 @@
 			<list>
 				<value>One</value>
 				<value>Two</value>
+				<value>Three</value>
+				<value>Four</value>
+				<value>Five</value>
 			</list>
 		</constructor-arg>
 	</bean>
@@ -50,8 +59,11 @@
 	<bean id="generatingItemReader2" class="org.springframework.batch.item.support.ListItemReader">
 		<constructor-arg>
 			<list>
+				<value>One</value>
+				<value>Two</value>
 				<value>Three</value>
 				<value>Four</value>
+				<value>Five</value>
 			</list>
 		</constructor-arg>
 	</bean>
@@ -59,20 +71,37 @@
 	<bean id="generatingItemReader3" class="org.springframework.batch.item.support.ListItemReader">
 		<constructor-arg>
 			<list>
+				<value>One</value>
+				<value>Two</value>
+			</list>
+		</constructor-arg>
+	</bean>
+
+	<bean id="generatingItemReader4" class="org.springframework.batch.item.support.ListItemReader">
+		<constructor-arg>
+			<list>
+				<value>One</value>
+				<value>Two</value>
+				<value>Three</value>
+				<value>Four</value>
 				<value>Five</value>
 				<value>Six</value>
+				<value>Seven</value>
+				<value>Eight</value>
+				<value>Nine</value>
+				<value>Ten</value>
+				<value>Eleven</value>
+				<value>Twelve</value>
+				<value>Thirteen</value>
+				<value>Fourteen</value>
+				<value>Fifteen</value>
 			</list>
 		</constructor-arg>
 	</bean>
 
 	<bean id="countingItemProcessor" class="org.springframework.batch.core.jsr.configuration.xml.CountingItemProcessor"/>
 
-	<bean id="sysoutItemWriter" class="org.springframework.batch.item.adapter.ItemWriterAdapter">
-		<property name="targetObject">
-			<util:constant static-field="java.lang.System.out"/>
-		</property>
-		<property name="targetMethod" value="println"/>
-	</bean>
+	<bean id="countingItemWriter" class="org.springframework.batch.core.jsr.configuration.xml.SimpleItemBasedJobParsingTests$CountingItemWriter"/>
 
-	<bean id="testCompletionPolicy" class="org.springframework.batch.core.jsr.configuration.xml.SimpleItemBasedJobParsingTests.CountingCompletionPolicy"/>
+	<bean id="testCompletionPolicy" class="org.springframework.batch.core.jsr.configuration.xml.SimpleItemBasedJobParsingTests$CountingCompletionPolicy"/>
 </beans>

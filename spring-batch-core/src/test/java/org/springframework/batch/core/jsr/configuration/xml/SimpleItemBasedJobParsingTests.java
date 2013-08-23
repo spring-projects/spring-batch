@@ -16,7 +16,12 @@
 package org.springframework.batch.core.jsr.configuration.xml;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
+
+import java.io.Serializable;
+import java.util.List;
+
+import javax.batch.api.chunk.CheckpointAlgorithm;
+import javax.batch.api.chunk.ItemWriter;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -26,9 +31,6 @@ import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.JobParameters;
 import org.springframework.batch.core.Step;
 import org.springframework.batch.core.launch.JobLauncher;
-import org.springframework.batch.repeat.CompletionPolicy;
-import org.springframework.batch.repeat.RepeatContext;
-import org.springframework.batch.repeat.RepeatStatus;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
@@ -50,45 +52,71 @@ public class SimpleItemBasedJobParsingTests {
 	public CountingCompletionPolicy policy;
 
 	@Autowired
+	public CountingItemWriter writer;
+
+	@Autowired
 	public JobLauncher jobLauncher;
 
 	@Test
 	public void test() throws Exception {
-		assertNotNull(job);
-		assertEquals("job1", job.getName());
-		assertNotNull(step1);
-		assertEquals("step1", step1.getName());
-
 		JobExecution execution = jobLauncher.run(job, new JobParameters());
 		assertEquals(BatchStatus.COMPLETED, execution.getStatus());
-		assertEquals(3, execution.getStepExecutions().size());
-		assertEquals(2, processor.count);
-		assertEquals(3, policy.counter);
+		assertEquals(4, execution.getStepExecutions().size());
+		assertEquals(27, processor.count);
+		assertEquals(2, policy.checkpointCount);
+		assertEquals(8, writer.writeCount);
+		assertEquals(27, writer.itemCount);
 	}
 
-	public static class CountingCompletionPolicy implements CompletionPolicy {
+	public static class CountingItemWriter implements ItemWriter {
 
-		protected int counter;
+		protected int writeCount = 0;
+		protected int itemCount = 0;
 
 		@Override
-		public boolean isComplete(RepeatContext context, RepeatStatus result) {
-			return counter == 3;
+		public void open(Serializable checkpoint) throws Exception {
 		}
 
 		@Override
-		public boolean isComplete(RepeatContext context) {
-			return counter == 3;
+		public void close() throws Exception {
 		}
 
 		@Override
-		public RepeatContext start(RepeatContext parent) {
-			counter = 0;
-			return parent;
+		public void writeItems(List<Object> items) throws Exception {
+			System.err.println("Items to be written: " + items);
+			writeCount++;
+			itemCount += items.size();
 		}
 
 		@Override
-		public void update(RepeatContext context) {
-			counter++;
+		public Serializable checkpointInfo() throws Exception {
+			return null;
+		}
+	}
+
+	public static class CountingCompletionPolicy implements CheckpointAlgorithm {
+
+		protected int itemCount = 0;
+		protected int checkpointCount = 0;
+
+		@Override
+		public int checkpointTimeout() throws Exception {
+			return 0;
+		}
+
+		@Override
+		public void beginCheckpoint() throws Exception {
+		}
+
+		@Override
+		public boolean isReadyToCheckpoint() throws Exception {
+			itemCount++;
+			return itemCount % 3 == 0;
+		}
+
+		@Override
+		public void endCheckpoint() throws Exception {
+			checkpointCount++;
 		}
 	}
 }

@@ -74,13 +74,25 @@ public class ChunkParser {
 		String checkpointPolicy = element.getAttribute(CHECKPOINT_POLICY_ATTRIBUTE);
 		if(StringUtils.hasText(checkpointPolicy)) {
 			if(checkpointPolicy.equals(ITEM_CHECKPOINT_POLICY)) {
-				parseSimpleAttribute(element, propertyValues, ITEM_COUNT_ATTRIBUTE, "commitInterval");
+				String itemCount = element.getAttribute(ITEM_COUNT_ATTRIBUTE);
+				if (StringUtils.hasText(itemCount)) {
+					propertyValues.addPropertyValue("commitInterval", itemCount);
+				} else {
+					propertyValues.addPropertyValue("commitInterval", "10");
+				}
+
 				parseSimpleAttribute(element, propertyValues, TIME_LIMIT_ATTRIBUTE, "timeout");
 			} else if(checkpointPolicy.equals(CUSTOM_CHECKPOINT_POLICY)) {
 				parseCustomCheckpointAlgorithm(element, parserContext, propertyValues);
 			}
 		} else {
-			parseSimpleAttribute(element, propertyValues, ITEM_COUNT_ATTRIBUTE, "commitInterval");
+			String itemCount = element.getAttribute(ITEM_COUNT_ATTRIBUTE);
+			if (StringUtils.hasText(itemCount)) {
+				propertyValues.addPropertyValue("commitInterval", itemCount);
+			} else {
+				propertyValues.addPropertyValue("commitInterval", "10");
+			}
+
 			parseSimpleAttribute(element, propertyValues, TIME_LIMIT_ATTRIBUTE, "timeout");
 		}
 
@@ -97,9 +109,9 @@ public class ChunkParser {
 
 	private void parseSimpleAttribute(Element element,
 			MutablePropertyValues propertyValues, String attributeName, String propertyName) {
-		String skipLimit = element.getAttribute(attributeName);
-		if (StringUtils.hasText(skipLimit)) {
-			propertyValues.addPropertyValue(propertyName, skipLimit);
+		String propertyValue = element.getAttribute(attributeName);
+		if (StringUtils.hasText(propertyValue)) {
+			propertyValues.addPropertyValue(propertyName, propertyValue);
 		}
 	}
 
