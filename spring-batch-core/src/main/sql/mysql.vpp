@@ -1,4 +1,4 @@
-#macro (sequence $name $value)CREATE TABLE ${name} (ID BIGINT NOT NULL) ENGINE=MYISAM;
+#macro (sequence $name $value)CREATE TABLE ${name} (ID BIGINT NOT NULL) ENGINE=InnoDB;
 INSERT INTO ${name} values(0);
 #end
 #macro (notnull $name $type)MODIFY COLUMN ${name} ${type} NOT NULL#end
