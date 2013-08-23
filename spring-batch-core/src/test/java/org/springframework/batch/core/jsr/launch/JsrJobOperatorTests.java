@@ -9,6 +9,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Properties;
@@ -24,6 +25,7 @@ import javax.batch.runtime.BatchStatus;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.springframework.batch.core.JobExecution;
@@ -36,7 +38,6 @@ import org.springframework.batch.core.explore.JobExplorer;
 import org.springframework.batch.core.explore.support.SimpleJobExplorer;
 import org.springframework.batch.core.jsr.JsrJobParametersConverter;
 import org.springframework.batch.core.launch.support.SimpleJobOperator;
-import org.springframework.batch.core.repository.JobExecutionAlreadyRunningException;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.step.JobRepositorySupport;
 
@@ -95,21 +96,27 @@ public class JsrJobOperatorTests {
 
 	@Test
 	public void testAbandonRoseyScenario() throws Exception {
+		JobExecution jobExecution = new JobExecution(5l);
+		jobExecution.setEndTime(new Date());
+		when(jobExplorer.getJobExecution(5l)).thenReturn(jobExecution);
+
 		jsrJobOperator.abandon(5l);
 
-		verify(jobOperator).abandon(5l);
+		ArgumentCaptor<JobExecution> executionCaptor = ArgumentCaptor.forClass(JobExecution.class);
+		verify(jobRepository).update(executionCaptor.capture());
+		assertEquals(org.springframework.batch.core.BatchStatus.ABANDONED, executionCaptor.getValue().getStatus());
+
 	}
 
 	@Test(expected=NoSuchJobExecutionException.class)
 	public void testAbandonNoSuchJob() throws Exception {
-		when(jobOperator.abandon(5l)).thenThrow(new org.springframework.batch.core.launch.NoSuchJobExecutionException("expected"));
-
 		jsrJobOperator.abandon(5l);
 	}
 
 	@Test(expected=JobExecutionIsRunningException.class)
 	public void testAbandonJobRunning() throws Exception {
-		when(jobOperator.abandon(5l)).thenThrow(new JobExecutionAlreadyRunningException("expected"));
+		JobExecution jobExecution = new JobExecution(5l);
+		when(jobExplorer.getJobExecution(5l)).thenReturn(jobExecution);
 
 		jsrJobOperator.abandon(5l);
 	}

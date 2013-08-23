@@ -47,7 +47,6 @@ import org.springframework.batch.core.explore.JobExplorer;
 import org.springframework.batch.core.jsr.JobContext;
 import org.springframework.batch.core.jsr.JsrJobParametersConverter;
 import org.springframework.batch.core.jsr.configuration.support.BatchPropertyContext;
-import org.springframework.batch.core.repository.JobExecutionAlreadyRunningException;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.beans.factory.access.BeanFactoryLocator;
 import org.springframework.beans.factory.access.BeanFactoryReference;
@@ -203,13 +202,18 @@ public class JsrJobOperator implements JobOperator {
 	@Override
 	public void abandon(long jobExecutionId) throws NoSuchJobExecutionException,
 	JobExecutionIsRunningException, JobSecurityException {
-		try {
-			batchJobOperator.abandon(jobExecutionId);
-		} catch (org.springframework.batch.core.launch.NoSuchJobExecutionException e) {
-			throw new NoSuchJobExecutionException(e);
-		} catch (JobExecutionAlreadyRunningException e) {
-			throw new JobExecutionIsRunningException(e);
+		org.springframework.batch.core.JobExecution jobExecution = jobExplorer.getJobExecution(jobExecutionId);
+
+		if(jobExecution == null) {
+			throw new NoSuchJobExecutionException("Unable to retrieve JobExecution for id " + jobExecutionId);
 		}
+
+		if(jobExecution.isRunning()) {
+			throw new JobExecutionIsRunningException("Unable to abandon a job that is currently running");
+		}
+
+		jobExecution.upgradeStatus(BatchStatus.ABANDONED);
+		jobRepository.update(jobExecution);
 	}
 
 	/* (non-Javadoc)
