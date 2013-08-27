@@ -21,6 +21,7 @@ import java.util.Properties;
 import org.junit.Before;
 import org.junit.Test;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 /**
@@ -37,20 +38,20 @@ public class BatchPropertyContextTests {
 	public void setUp() {
 		BatchPropertyContext batchPropertyContext = new BatchPropertyContext();
 
-		Properties bean1Properties = new Properties();
-		bean1Properties.setProperty("readerName", "bean1readerName");
-		bean1Properties.setProperty("readerWriter", "bean1writerName");
-		entries.add(batchPropertyContext.new BatchPropertyContextEntry("bean1", bean1Properties));
+		Properties step1Properties = new Properties();
+		step1Properties.setProperty("step1PropertyName1", "step1PropertyValue1");
+		step1Properties.setProperty("step1PropertyName2", "step1PropertyValue2");
+		entries.add(batchPropertyContext.new BatchPropertyContextEntry("job1.step1", step1Properties));
 
-		Properties bean2Properties = new Properties();
-		bean2Properties.setProperty("readerName", "bean2readerName");
-		bean2Properties.setProperty("readerWriter", "bean2writerName");
-		entries.add(batchPropertyContext.new BatchPropertyContextEntry("bean2", bean2Properties));
+		Properties step2Properties = new Properties();
+		step2Properties.setProperty("step2PropertyName1", "step2PropertyValue1");
+		step2Properties.setProperty("step2PropertyName2", "step2PropertyValue2");
+		entries.add(batchPropertyContext.new BatchPropertyContextEntry("job1.step2", step2Properties));
 
 		Properties jobProperties = new Properties();
 		jobProperties.setProperty("jobProperty1", "jobProperty1value");
 		jobProperties.setProperty("jobProperty2", "jobProperty2value");
-		entries.add(batchPropertyContext.new BatchPropertyContextEntry("job-testJob", jobProperties));
+		entries.add(batchPropertyContext.new BatchPropertyContextEntry("job1.job-job1", jobProperties));
 	}
 
 	@Test
@@ -58,21 +59,21 @@ public class BatchPropertyContextTests {
 		BatchPropertyContext batchPropertyContext = new BatchPropertyContext();
 		batchPropertyContext.setBatchContextEntries(entries);
 
-		Properties bean1 = batchPropertyContext.getBatchProperties("bean1");
-		assertEquals(4, bean1.size());
-		assertEquals("bean1readerName", bean1.getProperty("readerName"));
-		assertEquals("bean1writerName", bean1.getProperty("readerWriter"));
-		assertEquals("jobProperty1value", bean1.getProperty("jobProperty1"));
-		assertEquals("jobProperty2value", bean1.getProperty("jobProperty2"));
+		Properties step1BatchProperties = batchPropertyContext.getBatchProperties("job1.step1");
+		assertEquals(4, step1BatchProperties.size());
+		assertEquals("step1PropertyValue1", step1BatchProperties.getProperty("step1PropertyName1"));
+		assertEquals("step1PropertyValue2", step1BatchProperties.getProperty("step1PropertyName2"));
+		assertEquals("jobProperty1value", step1BatchProperties.getProperty("jobProperty1"));
+		assertEquals("jobProperty2value", step1BatchProperties.getProperty("jobProperty2"));
 
-		Properties bean2 = batchPropertyContext.getBatchProperties("bean2");
-		assertEquals(4, bean2.size());
-		assertEquals("bean2readerName", bean2.getProperty("readerName"));
-		assertEquals("bean2writerName", bean2.getProperty("readerWriter"));
-		assertEquals("jobProperty1value", bean2.getProperty("jobProperty1"));
-		assertEquals("jobProperty2value", bean2.getProperty("jobProperty2"));
+		Properties step2BatchProperties = batchPropertyContext.getBatchProperties("job1.step2");
+		assertEquals(4, step2BatchProperties.size());
+		assertEquals("step2PropertyValue1", step2BatchProperties.getProperty("step2PropertyName1"));
+		assertEquals("step2PropertyValue2", step2BatchProperties.getProperty("step2PropertyName2"));
+		assertEquals("jobProperty1value", step2BatchProperties.getProperty("jobProperty1"));
+		assertEquals("jobProperty2value", step2BatchProperties.getProperty("jobProperty2"));
 
-		Properties jobProperties = batchPropertyContext.getBatchProperties("job-testJob");
+		Properties jobProperties = batchPropertyContext.getBatchProperties("job1.job-job1");
 		assertEquals(2, jobProperties.size());
 		assertEquals("jobProperty1value", jobProperties.getProperty("jobProperty1"));
 		assertEquals("jobProperty2value", jobProperties.getProperty("jobProperty2"));
@@ -82,17 +83,17 @@ public class BatchPropertyContextTests {
 	public void testAddBatchContextEntriesToExistingArtifact() {
 		BatchPropertyContext batchPropertyContext = new BatchPropertyContext();
 
-		Properties bean2Properties = new Properties();
-		bean2Properties.setProperty("processorName", "bean2processorName");
-		entries.add(batchPropertyContext.new BatchPropertyContextEntry("bean2", bean2Properties));
+		Properties step1properties = new Properties();
+		step1properties.setProperty("newStep1PropertyName", "newStep1PropertyValue");
+		entries.add(batchPropertyContext.new BatchPropertyContextEntry("job1.step1", step1properties));
 
 		batchPropertyContext.setBatchContextEntries(entries);
 
-		Properties bean2 = batchPropertyContext.getBatchProperties("bean2");
+		Properties bean2 = batchPropertyContext.getBatchProperties("job1.step1");
 		assertEquals(5, bean2.size());
-		assertEquals("bean2readerName", bean2.getProperty("readerName"));
-		assertEquals("bean2writerName", bean2.getProperty("readerWriter"));
-		assertEquals("bean2processorName", bean2.getProperty("processorName"));
+		assertEquals("step1PropertyValue1", bean2.getProperty("step1PropertyName1"));
+		assertEquals("step1PropertyValue2", bean2.getProperty("step1PropertyName2"));
+		assertEquals("newStep1PropertyValue", bean2.getProperty("newStep1PropertyName"));
 		assertEquals("jobProperty1value", bean2.getProperty("jobProperty1"));
 		assertEquals("jobProperty2value", bean2.getProperty("jobProperty2"));
 	}
@@ -102,78 +103,15 @@ public class BatchPropertyContextTests {
 		BatchPropertyContext batchPropertyContext = new BatchPropertyContext();
 		batchPropertyContext.setBatchContextEntries(entries);
 
-		Properties bean1 = batchPropertyContext.getStepLevelProperties("bean1");
+		Properties bean1 = batchPropertyContext.getStepLevelProperties("job1.step1");
 		assertEquals(2, bean1.size());
-		assertEquals("bean1readerName", bean1.getProperty("readerName"));
-		assertEquals("bean1writerName", bean1.getProperty("readerWriter"));
+		assertEquals("step1PropertyValue1", bean1.getProperty("step1PropertyName1"));
+		assertEquals("step1PropertyValue2", bean1.getProperty("step1PropertyName2"));
 
-		Properties bean2 = batchPropertyContext.getStepLevelProperties("bean2");
+		Properties bean2 = batchPropertyContext.getStepLevelProperties("job1.step2");
 		assertEquals(2, bean2.size());
-		assertEquals("bean2readerName", bean2.getProperty("readerName"));
-		assertEquals("bean2writerName", bean2.getProperty("readerWriter"));
-	}
-
-	@Test
-	public void testGetScopedStepLevelProperties() {
-		BatchPropertyContext batchPropertyContext = new BatchPropertyContext();
-
-		Properties scopedBeanProperties = new Properties();
-		scopedBeanProperties.setProperty("scopedBeanName", "scopedBeanValue");
-		entries.add(batchPropertyContext.new BatchPropertyContextEntry("scopedBean", scopedBeanProperties));
-
-		batchPropertyContext.setBatchContextEntries(entries);
-
-		Properties bean1 = batchPropertyContext.getStepLevelProperties("bean1");
-		assertEquals(2, bean1.size());
-		assertEquals("bean1readerName", bean1.getProperty("readerName"));
-		assertEquals("bean1writerName", bean1.getProperty("readerWriter"));
-
-		Properties bean2 = batchPropertyContext.getStepLevelProperties("bean2");
-		assertEquals(2, bean2.size());
-		assertEquals("bean2readerName", bean2.getProperty("readerName"));
-		assertEquals("bean2writerName", bean2.getProperty("readerWriter"));
-
-		Properties scopedBean = batchPropertyContext.getStepLevelProperties("scopedTarget.scopedBean");
-		assertEquals(1, scopedBean.size());
-		assertEquals("scopedBeanValue", scopedBean.getProperty("scopedBeanName"));
-	}
-
-	@Test
-	public void testGetScopedBatchProperties() {
-		BatchPropertyContext batchPropertyContext = new BatchPropertyContext();
-
-		Properties scopedBeanProperties = new Properties();
-		scopedBeanProperties.setProperty("scopedBeanName", "scopedBeanValue");
-		entries.add(batchPropertyContext.new BatchPropertyContextEntry("scopedBean", scopedBeanProperties));
-
-		batchPropertyContext.setBatchContextEntries(entries);
-
-		Properties bean1 = batchPropertyContext.getBatchProperties("bean1");
-		assertEquals(4, bean1.size());
-		assertEquals("bean1readerName", bean1.getProperty("readerName"));
-		assertEquals("bean1writerName", bean1.getProperty("readerWriter"));
-		assertEquals("jobProperty1value", bean1.getProperty("jobProperty1"));
-		assertEquals("jobProperty2value", bean1.getProperty("jobProperty2"));
-
-		Properties bean2 = batchPropertyContext.getBatchProperties("bean2");
-		assertEquals(4, bean2.size());
-		assertEquals("bean2readerName", bean2.getProperty("readerName"));
-		assertEquals("bean2writerName", bean2.getProperty("readerWriter"));
-		assertEquals("jobProperty1value", bean2.getProperty("jobProperty1"));
-		assertEquals("jobProperty2value", bean2.getProperty("jobProperty2"));
-
-		Properties scopedBean = batchPropertyContext.getBatchProperties("scopedTarget.scopedBean");
-		assertEquals(3, scopedBean.size());
-		assertEquals("scopedBeanValue", scopedBean.getProperty("scopedBeanName"));
-		assertEquals("jobProperty1value", scopedBean.getProperty("jobProperty1"));
-		assertEquals("jobProperty2value", scopedBean.getProperty("jobProperty2"));
-	}
-
-	@Test
-	public void testGetOriginalBeanName() {
-		BatchPropertyContext batchPropertyContext = new BatchPropertyContext();
-		String originalName = batchPropertyContext.getOriginalBeanName("scopedTarget.myBean");
-		assertTrue(originalName.equals("myBean"));
+		assertEquals("step2PropertyValue1", bean2.getProperty("step2PropertyName1"));
+		assertEquals("step2PropertyValue2", bean2.getProperty("step2PropertyName2"));
 	}
 
 	@Test
@@ -185,7 +123,6 @@ public class BatchPropertyContextTests {
 		assertEquals(2, jobProperties.size());
 		assertEquals("jobProperty1value", jobProperties.getProperty("jobProperty1"));
 		assertEquals("jobProperty2value", jobProperties.getProperty("jobProperty2"));
-
 	}
 
 	@Test
@@ -193,22 +130,52 @@ public class BatchPropertyContextTests {
 		BatchPropertyContext batchPropertyContext = new BatchPropertyContext();
 
 		Properties jobProperties = new Properties();
-		jobProperties.setProperty("readerName", "testJobreaderName");
-		entries.add(batchPropertyContext.new BatchPropertyContextEntry("job-testJob", jobProperties));
+		jobProperties.setProperty("step1PropertyName1", "step1PropertyOverride");
+		entries.add(batchPropertyContext.new BatchPropertyContextEntry("job1.job-job1", jobProperties));
 
 		batchPropertyContext.setBatchContextEntries(entries);
 
-		Properties bean1 = batchPropertyContext.getBatchProperties("bean1");
+		Properties bean1 = batchPropertyContext.getBatchProperties("job1.step1");
 		assertEquals(4, bean1.size());
-		assertEquals("bean1readerName", bean1.getProperty("readerName"));
-		assertEquals("bean1writerName", bean1.getProperty("readerWriter"));
+		assertEquals("step1PropertyValue1", bean1.getProperty("step1PropertyName1"));
+		assertEquals("step1PropertyValue2", bean1.getProperty("step1PropertyName2"));
 		assertEquals("jobProperty1value", bean1.getProperty("jobProperty1"));
 		assertEquals("jobProperty2value", bean1.getProperty("jobProperty2"));
 
-		Properties testJobBean = batchPropertyContext.getBatchProperties("job-testJob");
+		Properties testJobBean = batchPropertyContext.getBatchProperties("job1.job-job1");
 		assertEquals(3, testJobBean.size());
-		assertEquals("testJobreaderName", testJobBean.getProperty("readerName"));
+		assertEquals("step1PropertyOverride", testJobBean.getProperty("step1PropertyName1"));
 		assertEquals("jobProperty1value", testJobBean.getProperty("jobProperty1"));
 		assertEquals("jobProperty2value", testJobBean.getProperty("jobProperty2"));
+	}
+
+	@Test
+	public void testJobLevelPropertiesWithPath() {
+		List<BatchPropertyContext.BatchPropertyContextEntry> entries = new ArrayList<BatchPropertyContext.BatchPropertyContextEntry>();
+
+		BatchPropertyContext batchPropertyContext = new BatchPropertyContext();
+
+		Properties jobProperties = new Properties();
+		jobProperties.setProperty("readerName", "testJobreaderName");
+
+		entries.add(batchPropertyContext.new BatchPropertyContextEntry("job1.job-job1.itemReader", jobProperties));
+
+		batchPropertyContext.setBatchContextEntries(entries);
+
+		Properties props = batchPropertyContext.getJobProperties();
+		assertEquals(1, props.size());
+		assertEquals("testJobreaderName", props.getProperty("readerName"));
+	}
+
+	@Test
+	public void testJobLevelComponentPath() {
+		BatchPropertyContext batchPropertyContext = new BatchPropertyContext();
+		assertTrue(batchPropertyContext.isJobLevelComponentPath("myJob.job-myJob"));
+		assertTrue(batchPropertyContext.isJobLevelComponentPath("myJob.job-myJob.myReader"));
+		assertTrue(batchPropertyContext.isJobLevelComponentPath("myJob.job-myJob.myReader.something"));
+		assertFalse(batchPropertyContext.isJobLevelComponentPath("myJob"));
+		assertFalse(batchPropertyContext.isJobLevelComponentPath("job-myJob"));
+		assertFalse(batchPropertyContext.isJobLevelComponentPath(null));
+		assertFalse(batchPropertyContext.isJobLevelComponentPath("myJob."));
 	}
 }

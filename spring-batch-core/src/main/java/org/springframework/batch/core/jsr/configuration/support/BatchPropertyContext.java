@@ -18,6 +18,7 @@ package org.springframework.batch.core.jsr.configuration.support;
 import java.util.List;
 import java.util.Properties;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.regex.Pattern;
 
 /**
  * <p>
@@ -32,6 +33,7 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 public class BatchPropertyContext {
 	private static final String JOB_ARTIFACT_PROPERTY_PREFIX = "job-";
+	private static final Pattern JOB_PATH_DELIMITER_PATTERN = Pattern.compile("\\.");
 
 	private ConcurrentHashMap<String, Properties> batchProperties = new ConcurrentHashMap<String, Properties>();
 
@@ -74,10 +76,9 @@ public class BatchPropertyContext {
 	 */
 	public Properties getStepLevelProperties(String beanName) {
 		Properties properties = new Properties();
-		String originalBeanName = getOriginalBeanName(beanName);
 
-		if (batchProperties.containsKey(originalBeanName)) {
-			properties.putAll(batchProperties.get(originalBeanName));
+		if (batchProperties.containsKey(beanName)) {
+			properties.putAll(batchProperties.get(beanName));
 		}
 
 		return properties;
@@ -95,10 +96,9 @@ public class BatchPropertyContext {
 	 */
 	public Properties getBatchProperties(String beanName) {
 		Properties properties = new Properties();
-		String originalBeanName = getOriginalBeanName(beanName);
 
-		if (batchProperties.containsKey(originalBeanName)) {
-			properties.putAll(batchProperties.get(originalBeanName));
+		if (batchProperties.containsKey(beanName)) {
+			properties.putAll(batchProperties.get(beanName));
 		}
 
 		Properties jobLevelProperties = getJobProperties();
@@ -123,7 +123,7 @@ public class BatchPropertyContext {
 		Properties jobProperties = new Properties();
 
 		for (String jobLevelProperty : batchProperties.keySet()) {
-			if (jobLevelProperty.startsWith(JOB_ARTIFACT_PROPERTY_PREFIX)) {
+			if(isJobLevelComponentPath(jobLevelProperty)) {
 				if (batchProperties.containsKey(jobLevelProperty)) {
 					jobProperties.putAll(batchProperties.get(jobLevelProperty));
 					break;
@@ -134,12 +134,24 @@ public class BatchPropertyContext {
 		return jobProperties;
 	}
 
-	protected String getOriginalBeanName(String beanName) {
-		if (beanName.startsWith("scopedTarget")) {
-			return beanName.substring(13);
+	// for now we assume properties are using a path format, currently: jobName.componentName.artifactName
+	// componentName can be the step name, job name prefixed by job- etc
+	protected boolean isJobLevelComponentPath(String jobLevelProperty) {
+		if(jobLevelProperty == null || "".equals(jobLevelProperty)) {
+			return false;
 		}
 
-		return beanName;
+		String[] path = JOB_PATH_DELIMITER_PATTERN.split(jobLevelProperty);
+
+		if (path.length >= 2) {
+			String componentPath = path[1];
+
+			if (componentPath != null && componentPath.startsWith(JOB_ARTIFACT_PROPERTY_PREFIX)) {
+				return true;
+			}
+		}
+
+		return false;
 	}
 
 	/**

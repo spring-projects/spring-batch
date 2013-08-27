@@ -48,6 +48,14 @@ public class JobParser extends AbstractSingleBeanDefinitionParser {
 		JsrNamespaceUtils.autoregisterJsrBeansForNamespace(parserContext);
 
 		String jobName = element.getAttribute(ID_ATTRIBUTE);
+
+		if(PropertyParser.hasPath()) {
+			PropertyParser.clearPath();
+			throw new IllegalArgumentException("Job parsing started for job name: " + jobName + " and property parser path already populated.");
+		}
+
+		PropertyParser.pushPath(jobName);
+
 		builder.addConstructorArgValue(jobName);
 
 		String restartableAttribute = element.getAttribute(RESTARTABLE_ATTRIBUTE);
@@ -66,6 +74,9 @@ public class JobParser extends AbstractSingleBeanDefinitionParser {
 		parserContext.getRegistry().registerBeanDefinition("stepContextFactory", stepContextBeanDefinition);
 
 		new ListnerParser(JobListenerFactoryBean.class, "jobExecutionListeners").parseListeners(element, parserContext, builder);
+
 		new PropertyParser(PropertyParser.JOB_ARTIFACT_PROPERTY_PREFIX + jobName, parserContext).parseProperties(element);
+
+		PropertyParser.popPath();
 	}
 }

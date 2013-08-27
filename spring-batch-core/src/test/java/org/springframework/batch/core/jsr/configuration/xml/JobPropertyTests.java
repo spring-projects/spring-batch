@@ -15,10 +15,6 @@
  */
 package org.springframework.batch.core.jsr.configuration.xml;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-
 import java.io.Serializable;
 import java.util.List;
 
@@ -29,9 +25,8 @@ import javax.batch.api.chunk.CheckpointAlgorithm;
 import javax.batch.api.chunk.ItemProcessor;
 import javax.batch.api.chunk.ItemReader;
 import javax.batch.api.chunk.ItemWriter;
+import javax.batch.api.listener.StepListener;
 import javax.inject.Inject;
-
-import junit.framework.Assert;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -43,10 +38,11 @@ import org.springframework.batch.core.launch.JobLauncher;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import static org.junit.Assert.assertEquals;
 
 /**
  * <p>
- * Test cases for parsing various &lt;properties /&gt; elements defined by JSR-352.
+ * Configuration test for parsing various &lt;properties /&gt; elements defined by JSR-352.
  * </p>
  *
  * @author Chris Schaefer
@@ -55,116 +51,15 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 @RunWith(SpringJUnit4ClassRunner.class)
 public class JobPropertyTests {
 	@Autowired
-	private TestItemReader testItemReader;
-
-	@Autowired
 	private Job job;
 
 	@Autowired
 	private JobLauncher jobLauncher;
 
-	@Autowired
-	private TestItemProcessor testItemProcessor;
-
-	@Autowired
-	private TestItemWriter testItemWriter;
-
-	@Autowired
-	private TestCheckpointAlgorithm testCheckpointAlgorithm;
-
-	@Autowired
-	private TestDecider testDecider;
-
-	@Autowired
-	private TestStepListener testStepListener;
-
-	@Autowired
-	private TestBatchlet testBatchlet;
-
 	@Test
-	public void testJobLevelPropertiesInItemReader() throws Exception {
-		assertEquals("jobPropertyValue1", testItemReader.getJobPropertyName1());
-		assertEquals("jobPropertyValue2", testItemReader.getJobPropertyName2());
-	}
-
-	@Test
-	public void testStepContextProperties() throws Exception {
+	public void testJobPropertyConfiguration() throws Exception {
 		JobExecution jobExecution = jobLauncher.run(job, new JobParameters());
 		assertEquals(ExitStatus.COMPLETED, jobExecution.getExitStatus());
-	}
-
-	@Test
-	public void testItemReaderProperties() throws Exception {
-		assertEquals("readerPropertyValue1", testItemReader.getReaderPropertyName1());
-		assertEquals("readerPropertyValue2", testItemReader.getReaderPropertyName2());
-		assertEquals("annotationNamedReaderPropertyValue", testItemReader.getAnnotationNamedProperty());
-		assertNull(testItemReader.getNotDefinedProperty());
-		assertNull(testItemReader.getNotDefinedAnnotationNamedProperty());
-	}
-
-	@Test
-	public void testItemProcessorProperties() throws Exception {
-		Assert.assertEquals("processorPropertyValue1", testItemProcessor.getProcessorPropertyName1());
-		Assert.assertEquals("processorPropertyValue2", testItemProcessor.getProcessorPropertyName2());
-		assertEquals("annotationNamedProcessorPropertyValue", testItemProcessor.getAnnotationNamedProperty());
-		assertNull(testItemProcessor.getNotDefinedProperty());
-		assertNull(testItemProcessor.getNotDefinedAnnotationNamedProperty());
-	}
-
-	@Test
-	public void testItemWriterProperties() throws Exception {
-		Assert.assertEquals("writerPropertyValue1", testItemWriter.getWriterPropertyName1());
-		Assert.assertEquals("writerPropertyValue2", testItemWriter.getWriterPropertyName2());
-		assertEquals("annotationNamedWriterPropertyValue", testItemWriter.getAnnotationNamedProperty());
-		assertNull(testItemWriter.getNotDefinedProperty());
-		assertNull(testItemWriter.getNotDefinedAnnotationNamedProperty());
-	}
-
-	@Test
-	public void testCheckpointAlgorithmProperties() throws Exception {
-		Assert.assertEquals("algorithmPropertyValue1", testCheckpointAlgorithm.getAlgorithmPropertyName1());
-		Assert.assertEquals("algorithmPropertyValue2", testCheckpointAlgorithm.getAlgorithmPropertyName2());
-		assertEquals("annotationNamedAlgorithmPropertyValue", testCheckpointAlgorithm.getAnnotationNamedProperty());
-		assertNull(testCheckpointAlgorithm.getNotDefinedProperty());
-		assertNull(testCheckpointAlgorithm.getNotDefinedAnnotationNamedProperty());
-	}
-
-	@Test
-	public void testDeciderProperties() throws Exception {
-		Assert.assertEquals("deciderPropertyValue1", testDecider.getDeciderPropertyName1());
-		Assert.assertEquals("deciderPropertyValue2", testDecider.getDeciderPropertyName2());
-		assertEquals("annotationNamedDeciderPropertyValue", testDecider.getAnnotationNamedProperty());
-		assertNull(testDecider.getNotDefinedProperty());
-		assertNull(testDecider.getNotDefinedAnnotationNamedProperty());
-	}
-
-	@Test
-	public void testStepListenerProperties() throws Exception {
-		Assert.assertEquals("stepListenerPropertyValue1", testStepListener.getStepListenerPropertyName1());
-		Assert.assertEquals("stepListenerPropertyValue2", testStepListener.getStepListenerPropertyName2());
-		assertEquals("annotationNamedStepListenerPropertyValue", testStepListener.getAnnotationNamedProperty());
-		assertNull(testStepListener.getNotDefinedProperty());
-		assertNull(testStepListener.getNotDefinedAnnotationNamedProperty());
-	}
-
-	@Test
-	public void testBatchletProperties() throws Exception {
-		Assert.assertEquals("batchletPropertyValue1", testBatchlet.getBatchletPropertyName1());
-		Assert.assertEquals("batchletPropertyValue2", testBatchlet.getBatchletPropertyName2());
-		assertEquals("annotationNamedBatchletPropertyValue", testBatchlet.getAnnotationNamedProperty());
-		assertNull(testBatchlet.getNotDefinedProperty());
-		assertNull(testBatchlet.getNotDefinedAnnotationNamedProperty());
-	}
-
-	@Test
-	public void testFieldWithInjectAnnotationOnlyInjects() throws Exception {
-		assertNotNull(testItemReader.getInjectAnnotatedOnlyField());
-		assertEquals("Chris", testItemReader.getInjectAnnotatedOnlyField().getName());
-	}
-
-	@Test
-	public void testFieldWithBatchPropertyAnnotationOnlyNoInjection() throws Exception {
-		assertNull(testItemReader.getBatchAnnotatedOnlyField());
 	}
 
 	public static final class TestItemReader implements ItemReader {
@@ -172,6 +67,7 @@ public class JobPropertyTests {
 
 		@Inject @BatchProperty String readerPropertyName1;
 		@Inject @BatchProperty String readerPropertyName2;
+		@Inject @BatchProperty String readerPropertyName3;
 		@Inject @BatchProperty(name = "annotationNamedReaderPropertyName") String annotationNamedProperty;
 		@Inject @BatchProperty String notDefinedProperty;
 		@Inject @BatchProperty(name = "notDefinedAnnotationNamedProperty") String notDefinedAnnotationNamedProperty;
@@ -188,8 +84,19 @@ public class JobPropertyTests {
 			org.springframework.util.Assert.isNull(stepContext.getProperties().get("step2PropertyName2"));
 			org.springframework.util.Assert.isTrue(stepContext.getProperties().get("step1PropertyName1").equals("step1PropertyValue1"));
 			org.springframework.util.Assert.isTrue(stepContext.getProperties().get("step1PropertyName2").equals("step1PropertyValue2"));
-			org.springframework.util.Assert.isTrue(stepContext.getProperties().get("jobPropertyName1").equals("jobPropertyValue1"));
-			org.springframework.util.Assert.isTrue(stepContext.getProperties().get("jobPropertyName2").equals("jobPropertyValue2"));
+			org.springframework.util.Assert.isTrue(stepContext.getProperties().get("jobPropertyName1") == null);
+			org.springframework.util.Assert.isTrue(stepContext.getProperties().get("jobPropertyName2") == null);
+			org.springframework.util.Assert.isTrue("jobPropertyValue1".equals(jobPropertyName1));
+			org.springframework.util.Assert.isTrue("jobPropertyValue2".equals(jobPropertyName2));
+			org.springframework.util.Assert.isTrue("readerPropertyValue1".equals(readerPropertyName1));
+			org.springframework.util.Assert.isTrue("readerPropertyValue2".equals(readerPropertyName2));
+			org.springframework.util.Assert.isTrue("annotationNamedReaderPropertyValue".equals(annotationNamedProperty));
+			org.springframework.util.Assert.isNull(notDefinedProperty);
+			org.springframework.util.Assert.isNull(notDefinedAnnotationNamedProperty);
+			org.springframework.util.Assert.isNull(batchAnnotatedOnlyField);
+			org.springframework.util.Assert.notNull(injectAnnotatedOnlyField);
+			org.springframework.util.Assert.isTrue("Chris".equals(injectAnnotatedOnlyField.getName()));
+			org.springframework.util.Assert.isNull(readerPropertyName3);
 		}
 
 		@Override
@@ -210,42 +117,6 @@ public class JobPropertyTests {
 		public Serializable checkpointInfo() throws Exception {
 			return null;
 		}
-
-		String getReaderPropertyName1() {
-			return readerPropertyName1;
-		}
-
-		String getReaderPropertyName2() {
-			return readerPropertyName2;
-		}
-
-		String getAnnotationNamedProperty() {
-			return annotationNamedProperty;
-		}
-
-		String getNotDefinedProperty() {
-			return notDefinedProperty;
-		}
-
-		String getNotDefinedAnnotationNamedProperty() {
-			return notDefinedAnnotationNamedProperty;
-		}
-
-		String getJobPropertyName1() {
-			return jobPropertyName1;
-		}
-
-		String getJobPropertyName2() {
-			return jobPropertyName2;
-		}
-
-		InjectTestObj getInjectAnnotatedOnlyField() {
-			return injectAnnotatedOnlyField;
-		}
-
-		String getBatchAnnotatedOnlyField() {
-			return batchAnnotatedOnlyField;
-		}
 	}
 
 	public static final class TestItemProcessor implements ItemProcessor {
@@ -257,27 +128,13 @@ public class JobPropertyTests {
 
 		@Override
 		public Object processItem(Object o) throws Exception {
+			org.springframework.util.Assert.isTrue("processorPropertyValue1".equals(processorPropertyName1));
+			org.springframework.util.Assert.isTrue("processorPropertyValue2".equals(processorPropertyName2));
+			org.springframework.util.Assert.isTrue("annotationNamedProcessorPropertyValue".equals(annotationNamedProperty));
+			org.springframework.util.Assert.isNull(notDefinedProperty);
+			org.springframework.util.Assert.isNull(notDefinedAnnotationNamedProperty);
+
 			return o;
-		}
-
-		String getProcessorPropertyName1() {
-			return processorPropertyName1;
-		}
-
-		String getProcessorPropertyName2() {
-			return processorPropertyName2;
-		}
-
-		String getAnnotationNamedProperty() {
-			return annotationNamedProperty;
-		}
-
-		String getNotDefinedProperty() {
-			return notDefinedProperty;
-		}
-
-		String getNotDefinedAnnotationNamedProperty() {
-			return notDefinedAnnotationNamedProperty;
 		}
 	}
 
@@ -290,6 +147,11 @@ public class JobPropertyTests {
 
 		@Override
 		public void open(Serializable serializable) throws Exception {
+			org.springframework.util.Assert.isTrue("writerPropertyValue1".equals(writerPropertyName1));
+			org.springframework.util.Assert.isTrue("writerPropertyValue2".equals(writerPropertyName2));
+			org.springframework.util.Assert.isTrue("annotationNamedWriterPropertyValue".equals(annotationNamedProperty));
+			org.springframework.util.Assert.isNull(notDefinedProperty);
+			org.springframework.util.Assert.isNull(notDefinedAnnotationNamedProperty);
 		}
 
 		@Override
@@ -305,26 +167,6 @@ public class JobPropertyTests {
 		public Serializable checkpointInfo() throws Exception {
 			return null;
 		}
-
-		String getWriterPropertyName1() {
-			return writerPropertyName1;
-		}
-
-		String getWriterPropertyName2() {
-			return writerPropertyName2;
-		}
-
-		String getAnnotationNamedProperty() {
-			return annotationNamedProperty;
-		}
-
-		String getNotDefinedProperty() {
-			return notDefinedProperty;
-		}
-
-		String getNotDefinedAnnotationNamedProperty() {
-			return notDefinedAnnotationNamedProperty;
-		}
 	}
 
 	public static final class TestCheckpointAlgorithm implements CheckpointAlgorithm {
@@ -334,26 +176,6 @@ public class JobPropertyTests {
 		@Inject @BatchProperty String notDefinedProperty;
 		@Inject @BatchProperty(name = "notDefinedAnnotationNamedProperty") String notDefinedAnnotationNamedProperty;
 
-		String getAlgorithmPropertyName1() {
-			return algorithmPropertyName1;
-		}
-
-		String getAlgorithmPropertyName2() {
-			return algorithmPropertyName2;
-		}
-
-		String getAnnotationNamedProperty() {
-			return annotationNamedProperty;
-		}
-
-		String getNotDefinedProperty() {
-			return notDefinedProperty;
-		}
-
-		String getNotDefinedAnnotationNamedProperty() {
-			return notDefinedAnnotationNamedProperty;
-		}
-
 		@Override
 		public int checkpointTimeout() throws Exception {
 			return 0;
@@ -361,6 +183,11 @@ public class JobPropertyTests {
 
 		@Override
 		public void beginCheckpoint() throws Exception {
+			org.springframework.util.Assert.isTrue("algorithmPropertyValue1".equals(algorithmPropertyName1));
+			org.springframework.util.Assert.isTrue("algorithmPropertyValue2".equals(algorithmPropertyName2));
+			org.springframework.util.Assert.isTrue("annotationNamedAlgorithmPropertyValue".equals(annotationNamedProperty));
+			org.springframework.util.Assert.isNull(notDefinedProperty);
+			org.springframework.util.Assert.isNull(notDefinedAnnotationNamedProperty);
 		}
 
 		@Override
@@ -380,35 +207,19 @@ public class JobPropertyTests {
 		@Inject @BatchProperty String notDefinedProperty;
 		@Inject @BatchProperty(name = "notDefinedAnnotationNamedProperty") String notDefinedAnnotationNamedProperty;
 
-		String getDeciderPropertyName1() {
-			return deciderPropertyName1;
-		}
-
-		String getDeciderPropertyName2() {
-			return deciderPropertyName2;
-		}
-
-		String getAnnotationNamedProperty() {
-			return annotationNamedProperty;
-		}
-
-		String getNotDefinedProperty() {
-			return notDefinedProperty;
-		}
-
-		String getNotDefinedAnnotationNamedProperty() {
-			return notDefinedAnnotationNamedProperty;
-		}
-
 		@Override
-		public String decide(javax.batch.runtime.StepExecution[] executions)
-				throws Exception {
+		public String decide(javax.batch.runtime.StepExecution[] executions) throws Exception {
+			org.springframework.util.Assert.isTrue("deciderPropertyValue1".equals(deciderPropertyName1));
+			org.springframework.util.Assert.isTrue("deciderPropertyValue2".equals(deciderPropertyName2));
+			org.springframework.util.Assert.isTrue("annotationNamedDeciderPropertyValue".equals(annotationNamedProperty));
+			org.springframework.util.Assert.isNull(notDefinedProperty);
+			org.springframework.util.Assert.isNull(notDefinedAnnotationNamedProperty);
+
 			return "step2";
 		}
 	}
 
-	public static class TestStepListener implements javax.batch.api.chunk.listener.ItemReadListener,
-	javax.batch.api.chunk.listener.ItemProcessListener, javax.batch.api.chunk.listener.ItemWriteListener {
+	public static class TestStepListener implements StepListener {
 		@Inject @BatchProperty String stepListenerPropertyName1;
 		@Inject @BatchProperty String stepListenerPropertyName2;
 		@Inject @BatchProperty(name = "annotationNamedStepListenerPropertyName") String annotationNamedProperty;
@@ -416,59 +227,16 @@ public class JobPropertyTests {
 		@Inject @BatchProperty(name = "notDefinedAnnotationNamedProperty") String notDefinedAnnotationNamedProperty;
 
 		@Override
-		public void beforeProcess(Object o) throws Exception {
+		public void beforeStep() throws Exception {
+			org.springframework.util.Assert.isTrue("stepListenerPropertyValue1".equals(stepListenerPropertyName1));
+			org.springframework.util.Assert.isTrue("stepListenerPropertyValue2".equals(stepListenerPropertyName2));
+			org.springframework.util.Assert.isTrue("annotationNamedStepListenerPropertyValue".equals(annotationNamedProperty));
+			org.springframework.util.Assert.isNull(notDefinedProperty);
+			org.springframework.util.Assert.isNull(notDefinedAnnotationNamedProperty);
 		}
 
 		@Override
-		public void afterProcess(Object o, Object o2) throws Exception {
-		}
-
-		@Override
-		public void onProcessError(Object o, Exception e) throws Exception {
-		}
-
-		@Override
-		public void beforeRead() throws Exception {
-		}
-
-		@Override
-		public void afterRead(Object o) throws Exception {
-		}
-
-		@Override
-		public void onReadError(Exception e) throws Exception {
-		}
-
-		@Override
-		public void beforeWrite(List<Object> objects) throws Exception {
-		}
-
-		@Override
-		public void afterWrite(List<Object> objects) throws Exception {
-		}
-
-		@Override
-		public void onWriteError(List<Object> objects, Exception e) throws Exception {
-		}
-
-		String getStepListenerPropertyName1() {
-			return stepListenerPropertyName1;
-		}
-
-		String getStepListenerPropertyName2() {
-			return stepListenerPropertyName2;
-		}
-
-		String getAnnotationNamedProperty() {
-			return annotationNamedProperty;
-		}
-
-		String getNotDefinedProperty() {
-			return notDefinedProperty;
-		}
-
-		String getNotDefinedAnnotationNamedProperty() {
-			return notDefinedAnnotationNamedProperty;
+		public void afterStep() throws Exception {
 		}
 	}
 
@@ -490,31 +258,17 @@ public class JobPropertyTests {
 			org.springframework.util.Assert.isTrue(stepContext.getProperties().get("jobPropertyName1") == null);
 			org.springframework.util.Assert.isTrue(stepContext.getProperties().get("jobPropertyName2") == null);
 
+			org.springframework.util.Assert.isTrue("batchletPropertyValue1".equals(batchletPropertyName1));
+			org.springframework.util.Assert.isTrue("batchletPropertyValue2".equals(batchletPropertyName2));
+			org.springframework.util.Assert.isTrue("annotationNamedBatchletPropertyValue".equals(annotationNamedProperty));
+			org.springframework.util.Assert.isNull(notDefinedProperty);
+			org.springframework.util.Assert.isNull(notDefinedAnnotationNamedProperty);
+
 			return null;
 		}
 
 		@Override
 		public void stop() throws Exception {
-		}
-
-		String getBatchletPropertyName1() {
-			return batchletPropertyName1;
-		}
-
-		String getBatchletPropertyName2() {
-			return batchletPropertyName2;
-		}
-
-		String getAnnotationNamedProperty() {
-			return annotationNamedProperty;
-		}
-
-		String getNotDefinedProperty() {
-			return notDefinedProperty;
-		}
-
-		String getNotDefinedAnnotationNamedProperty() {
-			return notDefinedAnnotationNamedProperty;
 		}
 	}
 
