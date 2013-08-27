@@ -15,7 +15,10 @@
  */
 package org.springframework.batch.core.jsr.configuration.xml;
 
+import java.util.Deque;
 import java.util.HashMap;
+import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
@@ -48,6 +51,7 @@ public class PropertyParser {
 	private static final String BATCH_CONTEXT_ENTRIES_PROPERTY_NAME = "batchContextEntries";
 	private static final String BATCH_PROPERTY_CONTEXT_BEAN_CLASS_NAME = "org.springframework.batch.core.jsr.configuration.support.BatchPropertyContext";
 	private static final String BATCH_PROPERTY_CONTEXT_BEAN_NAME = "batchPropertyContext";
+	private static final Deque<String> PATH = new LinkedList<String>();
 
 	private String beanName;
 	private ParserContext parserContext;
@@ -58,6 +62,26 @@ public class PropertyParser {
 
 		registerBatchPropertyContext();
 		registerJobProperties();
+	}
+
+	public PropertyParser(ParserContext parserContext) {
+		this("", parserContext);
+	}
+
+	public static void pushPath(String pathElement) {
+		PATH.push(pathElement);
+	}
+
+	public static void popPath() {
+		PATH.pop();
+	}
+
+	public static boolean hasPath() {
+		return !PATH.isEmpty();
+	}
+
+	public static void clearPath() {
+		PATH.clear();
 	}
 
 	/**
@@ -94,7 +118,7 @@ public class PropertyParser {
 
 		BatchPropertyContext batchPropertyContext = new BatchPropertyContext();
 		BatchPropertyContext.BatchPropertyContextEntry batchPropertyContextEntry =
-			batchPropertyContext.new BatchPropertyContextEntry(beanName, properties);
+			batchPropertyContext.new BatchPropertyContextEntry(getContextEntryKey(), properties);
 
 		ManagedList<BatchPropertyContext.BatchPropertyContextEntry> managedList = new ManagedList<BatchPropertyContext.BatchPropertyContextEntry>();
 		managedList.setMergeEnabled(true);
@@ -137,5 +161,24 @@ public class PropertyParser {
 			BeanDefinition jobPropertiesBeanDefinition = parserContext.getRegistry().getBeanDefinition(JOB_PROPERTIES_BEAN_NAME);
 			jobPropertiesBeanDefinition.getConstructorArgumentValues().addGenericArgumentValue(jobProperties);
 		}
+	}
+
+	private String getPath() {
+		StringBuilder pathBuilder = new StringBuilder();
+		Iterator pathIterator = PATH.descendingIterator();
+
+		if (pathIterator.hasNext()) {
+			pathBuilder.append(pathIterator.next());
+
+			while (pathIterator.hasNext()) {
+				pathBuilder.append(".").append(pathIterator.next());
+			}
+		}
+
+		return pathBuilder.toString();
+	}
+
+	private String getContextEntryKey() {
+		return "".equals(beanName) ? getPath() : getPath() + "." + beanName;
 	}
 }

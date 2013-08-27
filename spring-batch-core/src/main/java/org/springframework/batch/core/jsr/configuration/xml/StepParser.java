@@ -54,6 +54,9 @@ public class StepParser extends AbstractSingleBeanDefinitionParser {
 
 		String stepName = element.getAttribute(SPLIT_ID_ATTRIBUTE);
 		builder.addPropertyValue("name", stepName);
+
+		PropertyParser.pushPath(stepName);
+
 		parserContext.registerBeanComponent(new BeanComponentDefinition(bd, stepName));
 		stateBuilder.addConstructorArgReference(stepName);
 
@@ -69,7 +72,7 @@ public class StepParser extends AbstractSingleBeanDefinitionParser {
 		}
 
 		new ListnerParser(StepListenerFactoryBean.class, "listeners").parseListeners(element, parserContext, bd);
-		new PropertyParser(stepName, parserContext).parseProperties(element);
+		new PropertyParser(parserContext).parseProperties(element);
 
 		// look at all nested elements
 		NodeList children = element.getChildNodes();
@@ -89,6 +92,10 @@ public class StepParser extends AbstractSingleBeanDefinitionParser {
 			}
 		}
 
-		return FlowParser.getNextElements(parserContext, stepName, stateBuilder.getBeanDefinition(), element);
+		Collection<BeanDefinition> nextElements = FlowParser.getNextElements(parserContext, stepName, stateBuilder.getBeanDefinition(), element);
+
+		PropertyParser.popPath();
+
+		return nextElements;
 	}
 }

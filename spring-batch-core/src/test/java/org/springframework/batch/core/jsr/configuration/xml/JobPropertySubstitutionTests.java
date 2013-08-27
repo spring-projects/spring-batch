@@ -53,24 +53,8 @@ public class JobPropertySubstitutionTests {
 	@Autowired
 	private JobLauncher jobLauncher;
 
-	@Autowired
-	private TestItemWriter testItemWriter;
-
-	@Autowired
-	private TestItemReader testItemReader;
-
 	@Test
-	public void testSystemPropertySubstitution() throws Exception {
-		assertEquals(System.getProperty("file.separator"), testItemReader.readerPropertyName1);
-	}
-
-	@Test
-	public void testJobPropertySubstitution() throws Exception {
-		assertEquals("jobPropertyValue1", testItemWriter.writerPropertyName1);
-	}
-
-	@Test
-	public void testJobParameterSubstitution() throws Exception {
+	public void testPropertySubstitutionSimple() throws Exception {
 		JobExecution jobExecution = jobLauncher.run(job,
 			new JobParametersBuilder().addString("testParam", "testParamValue").toJobParameters());
 		assertEquals(ExitStatus.COMPLETED, jobExecution.getExitStatus());
@@ -85,7 +69,7 @@ public class JobPropertySubstitutionTests {
 
 		@Override
 		public void open(Serializable serializable) throws Exception {
-
+			assertEquals(System.getProperty("file.separator"), readerPropertyName1);
 		}
 
 		@Override
@@ -115,7 +99,7 @@ public class JobPropertySubstitutionTests {
 
 		@Override
 		public void open(Serializable serializable) throws Exception {
-
+			assertEquals("jobPropertyValue1", writerPropertyName1);
 		}
 
 		@Override

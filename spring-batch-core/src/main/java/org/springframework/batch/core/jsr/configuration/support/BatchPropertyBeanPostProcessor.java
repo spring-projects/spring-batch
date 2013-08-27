@@ -50,6 +50,8 @@ import javax.batch.api.partition.PartitionReducer;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.batch.core.scope.StepScope;
+import org.springframework.batch.core.scope.context.StepContext;
+import org.springframework.batch.core.scope.context.StepSynchronizationManager;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.BeanFactory;
 import org.springframework.beans.factory.BeanFactoryAware;
@@ -89,7 +91,9 @@ public class BatchPropertyBeanPostProcessor implements BeanPostProcessor, BeanFa
 			return bean;
 		}
 
-		final Properties artifactProperties = batchPropertyContext.getBatchProperties(beanName);
+		String beanPropertyName = getBeanPropertyName(beanName);
+
+		final Properties artifactProperties = batchPropertyContext.getBatchProperties(beanPropertyName);
 
 		if (artifactProperties.isEmpty()) {
 			return bean;
@@ -98,6 +102,18 @@ public class BatchPropertyBeanPostProcessor implements BeanPostProcessor, BeanFa
 		injectBatchProperties(bean, artifactProperties);
 
 		return bean;
+	}
+
+	private String getBeanPropertyName(String beanName) {
+		StepContext stepContext = StepSynchronizationManager.getContext();
+
+		if(stepContext != null) {
+			String stepName = stepContext.getStepName();
+			String jobName = stepContext.getStepExecution().getJobExecution().getJobInstance().getJobName();
+			return jobName + "." + stepName + "." + beanName.substring("scopedTarget.".length());
+		}
+
+		return beanName;
 	}
 
 	@SuppressWarnings("unchecked")

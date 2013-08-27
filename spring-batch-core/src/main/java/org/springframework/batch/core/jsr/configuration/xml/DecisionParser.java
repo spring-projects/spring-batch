@@ -50,6 +50,8 @@ public class DecisionParser {
 
 		String idAttribute = element.getAttribute(ID_ATTRIBUTE);
 
+		PropertyParser.pushPath(idAttribute);
+
 		parserContext.registerBeanComponent(new BeanComponentDefinition(factoryDefinition, idAttribute));
 		stateBuilder.addConstructorArgReference(idAttribute);
 
@@ -63,6 +65,10 @@ public class DecisionParser {
 
 		new PropertyParser(refAttribute, parserContext).parseProperties(element);
 
-		return FlowParser.getNextElements(parserContext, stateBuilder.getBeanDefinition(), element);
+		Collection<BeanDefinition> nextElements = FlowParser.getNextElements(parserContext, stateBuilder.getBeanDefinition(), element);
+
+		PropertyParser.popPath();
+
+		return nextElements;
 	}
 }

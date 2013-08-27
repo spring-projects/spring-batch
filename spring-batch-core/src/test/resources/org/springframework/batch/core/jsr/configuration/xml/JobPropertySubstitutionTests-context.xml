@@ -41,9 +41,11 @@
 
     <bean id="jobRepository" class="org.springframework.batch.core.repository.support.MapJobRepositoryFactoryBean"/>
 
-    <bean id="testReader" class="org.springframework.batch.core.jsr.configuration.xml.JobPropertySubstitutionTests$TestItemReader"/>
+    <bean id="testReader" class="org.springframework.batch.core.jsr.configuration.xml.JobPropertySubstitutionTests$TestItemReader"
+        scope="step"/>
 
-    <bean id="testWriter" class="org.springframework.batch.core.jsr.configuration.xml.JobPropertySubstitutionTests$TestItemWriter"/>
+    <bean id="testWriter" class="org.springframework.batch.core.jsr.configuration.xml.JobPropertySubstitutionTests$TestItemWriter"
+        scope="step"/>
 
     <bean id="testProcessor" class="org.springframework.batch.core.jsr.configuration.xml.JobPropertySubstitutionTests$TestItemProcessor"
         scope="step"/>

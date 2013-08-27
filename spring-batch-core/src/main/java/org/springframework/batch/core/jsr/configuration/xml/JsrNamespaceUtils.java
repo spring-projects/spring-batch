@@ -17,7 +17,6 @@ package org.springframework.batch.core.jsr.configuration.xml;
 
 import org.springframework.batch.core.jsr.configuration.support.BatchPropertyBeanPostProcessor;
 import org.springframework.batch.core.jsr.configuration.support.JsrAutowiredAnnotationBeanPostProcessor;
-import org.springframework.batch.core.jsr.configuration.support.ThreadLocalClassloaderBeanPostProcessor;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.support.AbstractBeanDefinition;
 import org.springframework.beans.factory.support.BeanDefinitionBuilder;
@@ -28,20 +27,15 @@ import org.springframework.context.annotation.AnnotationConfigUtils;
  * Utility methods used in parsing of the JSR-352 batch namespace
  *
  * @author Michael Minella
+ * @author Chris Schaefer
  * @since 3.0
  */
 class JsrNamespaceUtils {
 	private static final String BATCH_PROPERTY_POST_PROCESSOR_BEAN_NAME = "batchPropertyPostProcessor";
-	private static final String THREAD_LOCAL_CLASSLOASER_BEAN_POST_PROCESSOR_BEAN_NAME = "threadLocalClassloaderBeanPostProcessor";
 
 	static void autoregisterJsrBeansForNamespace(ParserContext parserContext) {
 		autoRegisterBatchPostProcessor(parserContext);
 		autoRegisterJsrAutowiredAnnotationBeanPostProcessor(parserContext);
-		autoRegisterThreadLocalClassloaderBeanPostProcessor(parserContext);
-	}
-
-	private static void autoRegisterThreadLocalClassloaderBeanPostProcessor(ParserContext parserContext) {
-		registerPostProcessor(parserContext, ThreadLocalClassloaderBeanPostProcessor.class, BeanDefinition.ROLE_INFRASTRUCTURE, THREAD_LOCAL_CLASSLOASER_BEAN_POST_PROCESSOR_BEAN_NAME);
 	}
 
 	private static void autoRegisterBatchPostProcessor(ParserContext parserContext) {
@@ -53,15 +47,11 @@ class JsrNamespaceUtils {
 	}
 
 	private static void registerPostProcessor(ParserContext parserContext, Class<?> clazz, int role, String beanName) {
-		BeanDefinitionBuilder jsrAutowiredAnnotationBeanPostProcessor =
-				BeanDefinitionBuilder.genericBeanDefinition(clazz);
+		BeanDefinitionBuilder beanDefinitionBuilder = BeanDefinitionBuilder.genericBeanDefinition(clazz);
 
-		AbstractBeanDefinition jsrAutowiredAnnotationBeanPostProcessorDefinition =
-				jsrAutowiredAnnotationBeanPostProcessor.getBeanDefinition();
+		AbstractBeanDefinition beanDefinition = beanDefinitionBuilder.getBeanDefinition();
+		beanDefinition.setRole(role);
 
-		jsrAutowiredAnnotationBeanPostProcessorDefinition.setRole(role);
-
-		parserContext.getRegistry().registerBeanDefinition(beanName,
-				jsrAutowiredAnnotationBeanPostProcessorDefinition);
+		parserContext.getRegistry().registerBeanDefinition(beanName, beanDefinition);
 	}
 }
