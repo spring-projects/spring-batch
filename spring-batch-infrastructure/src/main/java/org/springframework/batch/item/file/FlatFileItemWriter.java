@@ -393,17 +393,6 @@ InitializingBean {
 	}
 
 	/**
-	 * The name of the component which will be used as a stem for keys in the
-	 * {@link ExecutionContext}. Subclasses should provide a default value, e.g.
-	 * the short form of the class name.
-	 * 
-	 * @param name the name for the component
-	 */
-	public void setName(String name) {
-		this.setExecutionContextName(name);
-	}
-
-	/**
 	 * Encapsulates the runtime state of the writer. All state changing
 	 * operations on the writer go through this class.
 	 */
