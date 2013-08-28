@@ -13,11 +13,13 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import javax.xml.namespace.QName;
 import javax.xml.stream.FactoryConfigurationError;
 import javax.xml.stream.XMLEventReader;
 import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.events.EndElement;
+import javax.xml.stream.events.StartElement;
 import javax.xml.stream.events.XMLEvent;
 import javax.xml.transform.Source;
 
@@ -51,6 +53,9 @@ public class StaxEventItemReaderTests {
 
 	// test xml input
 	private String xmlMultiFragment = "<root> <fragmentA> <misc1/> </fragmentA> <misc2/> <fragmentB> testString </fragmentB> <fragmentA xmlns=\"urn:org.test.bar\"> testString </fragmentA></root>";
+
+	// test xml input
+	private String xmlMultiFragmentNested = "<root> <fragmentA> <misc1/> <fragmentB> nested</fragmentB> <fragmentB> nested </fragmentB></fragmentA> <misc2/> <fragmentB> testString </fragmentB> <fragmentA xmlns=\"urn:org.test.bar\"> testString </fragmentA></root>";
 
 	// test xml input
 	private String emptyXml = "<root></root>";
@@ -236,6 +241,50 @@ public class StaxEventItemReaderTests {
 	public void testMultiFragmentRestart() throws Exception {
 
 		source.setResource(new ByteArrayResource(xmlMultiFragment.getBytes()));
+		source.setFragmentRootElementNames(MULTI_FRAGMENT_ROOT_ELEMENTS);
+		source.afterPropertiesSet();
+		source.open(executionContext);
+		// see asserts in the mock unmarshaller
+		assertNotNull(source.read());
+		assertNotNull(source.read());
+		
+		source.update(executionContext);		
+		assertEquals(2, executionContext.getInt(ClassUtils.getShortName(StaxEventItemReader.class) + ".read.count"));
+		
+		source.close();
+		
+		source = createNewInputSouce();
+		source.setResource(new ByteArrayResource(xmlMultiFragment.getBytes()));
+		source.setFragmentRootElementNames(MULTI_FRAGMENT_ROOT_ELEMENTS);
+		source.afterPropertiesSet();
+		source.open(executionContext);
+		
+		assertNotNull(source.read());
+		assertNull(source.read()); // there are only three fragments
+
+		source.close();
+	}	
+
+	@Test
+	public void testMultiFragmentNested() throws Exception {
+
+		source.setResource(new ByteArrayResource(xmlMultiFragmentNested.getBytes()));
+		source.setFragmentRootElementNames(MULTI_FRAGMENT_ROOT_ELEMENTS);
+		source.afterPropertiesSet();
+		source.open(executionContext);
+		// see asserts in the mock unmarshaller
+		assertNotNull(source.read());
+		assertNotNull(source.read());
+		assertNotNull(source.read());
+		assertNull(source.read()); // there are only three fragments
+
+		source.close();
+	}
+	
+	@Test
+	public void testMultiFragmentNestedRestart() throws Exception {
+
+		source.setResource(new ByteArrayResource(xmlMultiFragmentNested.getBytes()));
 		source.setFragmentRootElementNames(MULTI_FRAGMENT_ROOT_ELEMENTS);
 		source.afterPropertiesSet();
 		source.open(executionContext);
@@ -569,13 +618,13 @@ public class StaxEventItemReaderTests {
 		/**
 		 * Skips the XML fragment contents.
 		 */
-		private List<XMLEvent> readRecordsInsideFragment(XMLEventReader eventReader) throws XMLStreamException {
+		private List<XMLEvent> readRecordsInsideFragment(XMLEventReader eventReader, QName fragmentName) throws XMLStreamException {
 			XMLEvent eventInsideFragment;
 			List<XMLEvent> events = new ArrayList<XMLEvent>();
 			do {
 				eventInsideFragment = eventReader.peek();
 				if (eventInsideFragment instanceof EndElement
-						&& isFragmentRootElement(((EndElement) eventInsideFragment).getName().getLocalPart())) {
+						&& fragmentName.equals(((EndElement) eventInsideFragment).getName())) {
 					break;
 				}
 				events.add(eventReader.nextEvent());
@@ -611,9 +660,10 @@ public class StaxEventItemReaderTests {
 				XMLEvent event2 = eventReader.nextEvent();
 				assertTrue(event2.isStartElement());
 				assertTrue(isFragmentRootElement(EventHelper.startElementName(event2)));
+				QName fragmentName = ((StartElement) event2).getName();
 
 				// jump before the end of fragment
-				fragmentContent = readRecordsInsideFragment(eventReader);
+				fragmentContent = readRecordsInsideFragment(eventReader, fragmentName);
 
 				// end of fragment
 				XMLEvent event3 = eventReader.nextEvent();

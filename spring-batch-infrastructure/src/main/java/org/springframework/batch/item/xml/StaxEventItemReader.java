@@ -257,8 +257,8 @@ ResourceAwareItemReaderItemStream<T>, InitializingBean {
 	protected void jumpToItem(int itemIndex) throws Exception {
 		for (int i = 0; i < itemIndex; i++) {
 			try {
-				readToStartFragment();
-				readToEndFragment();
+				QName fragmentName = readToStartFragment();
+				readToEndFragment(fragmentName);
 			} catch (NoSuchElementException e) {
 				if (itemIndex == (i + 1)) {
 					// we can presume a NoSuchElementException on the last item means the EOF was reached on the last run
@@ -276,26 +276,26 @@ ResourceAwareItemReaderItemStream<T>, InitializingBean {
 	 * number of tags in between where the reader is now and the fragment start, this is done in a loop until the
 	 * element type and name match.
 	 */
-	private void readToStartFragment() throws XMLStreamException {
+	private QName readToStartFragment() throws XMLStreamException {
 		while (true) {
 			XMLEvent nextEvent = eventReader.nextEvent();
 			if (nextEvent.isStartElement()
 					&& isFragmentRootElementName(((StartElement) nextEvent).getName())) {
-				return;
+				return ((StartElement) nextEvent).getName();
 			}
 		}
 	}
 
 	/*
-	 * Read until the first EndElement tag that matches any of the provided fragmentRootElementNames. Because there may be any
+	 * Read until the first EndElement tag that matches the provided fragmentRootElementName. Because there may be any
 	 * number of tags in between where the reader is now and the fragment end tag, this is done in a loop until the
 	 * element type and name match
 	 */
-	private void readToEndFragment() throws XMLStreamException {
+	private void readToEndFragment(QName fragmentRootElementName) throws XMLStreamException {
 		while (true) {
 			XMLEvent nextEvent = eventReader.nextEvent();
 			if (nextEvent.isEndElement()
-					&& isFragmentRootElementName(((EndElement) nextEvent).getName())) {
+					&& fragmentRootElementName.equals(((EndElement) nextEvent).getName())) {
 				return;
 			}
 		}
