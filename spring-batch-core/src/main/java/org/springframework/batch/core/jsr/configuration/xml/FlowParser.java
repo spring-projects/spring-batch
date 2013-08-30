@@ -16,6 +16,7 @@
 package org.springframework.batch.core.jsr.configuration.xml;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -24,10 +25,13 @@ import java.util.Set;
 
 import org.springframework.batch.core.configuration.xml.AbstractFlowParser;
 import org.springframework.batch.core.configuration.xml.SimpleFlowFactoryBean;
+import org.springframework.batch.core.job.flow.FlowExecutionStatus;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.support.BeanDefinitionBuilder;
 import org.springframework.beans.factory.support.ManagedList;
 import org.springframework.beans.factory.xml.ParserContext;
+import org.springframework.util.StringUtils;
+import org.springframework.util.xml.DomUtils;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -47,6 +51,10 @@ public class FlowParser extends AbstractFlowParser {
 	private StepParser stepParser = new StepParser();
 	private String flowName;
 
+	/**
+	 * @param flowName The name of the flow
+	 * @param jobFactoryRef The bean name for the job factory
+	 */
 	public FlowParser(String flowName, String jobFactoryRef) {
 		super.setJobFactoryRef(jobFactoryRef);
 		this.flowName = flowName;
@@ -58,7 +66,6 @@ public class FlowParser extends AbstractFlowParser {
 	}
 
 	@Override
-	@SuppressWarnings({"rawtypes", "unchecked"})
 	protected void doParse(Element element, ParserContext parserContext, BeanDefinitionBuilder builder) {
 		builder.getRawBeanDefinition().setAttribute("flowName", flowName);
 		builder.addPropertyValue("name", flowName);
@@ -91,8 +98,70 @@ public class FlowParser extends AbstractFlowParser {
 			}
 		}
 
-		ManagedList managedList = new ManagedList();
+		ManagedList<BeanDefinition> managedList = new ManagedList<BeanDefinition>();
 		managedList.addAll(stateTransitions);
 		builder.addPropertyValue("stateTransitions", managedList);
 	}
-}
+
+
+	public static Collection<BeanDefinition> getNextElements(ParserContext parserContext, BeanDefinition stateDef,
+			Element element) {
+		return getNextElements(parserContext, null, stateDef, element);
+	}
+
+	public static Collection<BeanDefinition> getNextElements(ParserContext parserContext, String stepId,
+			BeanDefinition stateDef, Element element) {
+
+		Collection<BeanDefinition> list = new ArrayList<BeanDefinition>();
+
+		String shortNextAttribute = element.getAttribute("next");
+		boolean hasNextAttribute = StringUtils.hasText(shortNextAttribute);
+		if (hasNextAttribute) {
+			list.add(getStateTransitionReference(parserContext, stateDef, null, shortNextAttribute));
+		}
+
+		boolean transitionElementExists = false;
+		List<String> patterns = new ArrayList<String>();
+		for (String transitionName : new String[] { "next", "stop", "end", "fail" }) {
+			List<Element> transitionElements = DomUtils.getChildElementsByTagName(element, transitionName);
+			for (Element transitionElement : transitionElements) {
+				verifyUniquePattern(transitionElement, patterns, element, parserContext);
+				list.addAll(parseTransitionElement(transitionElement, stepId, stateDef, parserContext));
+				transitionElementExists = true;
+			}
+		}
+
+		if (!transitionElementExists) {
+			list.addAll(createTransition(FlowExecutionStatus.FAILED, FlowExecutionStatus.FAILED.getName(), null, null,
+					stateDef, parserContext, false));
+			list.addAll(createTransition(FlowExecutionStatus.UNKNOWN, FlowExecutionStatus.UNKNOWN.getName(), null, null,
+					stateDef, parserContext, false));
+			if (!hasNextAttribute) {
+				list.addAll(createTransition(FlowExecutionStatus.COMPLETED, null, null, null, stateDef, parserContext,
+						false));
+			}
+		}
+		else if (hasNextAttribute) {
+			parserContext.getReaderContext().error(
+					"The <" + element.getNodeName() + "/> may not contain a 'next"
+							+ "' attribute and a transition element", element);
+		}
+
+		return list;
+	}
+
+	protected static Collection<BeanDefinition> parseTransitionElement(Element transitionElement, String stateId,
+			BeanDefinition stateDef, ParserContext parserContext) {
+
+		FlowExecutionStatus status = getBatchStatusFromEndTransitionName(transitionElement.getNodeName());
+		String onAttribute = transitionElement.getAttribute("on");
+		String restartAttribute = transitionElement.getAttribute("restart");
+		String nextAttribute = transitionElement.getAttribute("to");
+		if (!StringUtils.hasText(nextAttribute)) {
+			nextAttribute = restartAttribute;
+		}
+		boolean abandon = stateId != null && StringUtils.hasText(restartAttribute) && !restartAttribute.equals(stateId);
+		String exitCodeAttribute = transitionElement.getAttribute("exit-status");
+
+		return createTransition(status, onAttribute, nextAttribute, exitCodeAttribute, stateDef, parserContext, abandon);
+	}}

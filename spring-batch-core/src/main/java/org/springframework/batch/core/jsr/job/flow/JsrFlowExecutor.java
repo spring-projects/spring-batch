@@ -38,6 +38,16 @@ public class JsrFlowExecutor extends JobFlowExecutor {
 	}
 
 	/* (non-Javadoc)
+	 * @see org.springframework.batch.core.job.flow.JobFlowExecutor#addExitStatus(java.lang.String)
+	 */
+	@Override
+	public void addExitStatus(String code) {
+		if((exitStatus != null && isNonDefaultExitStauts(exitStatus.getExitCode())) && !isNonDefaultExitStauts(code)) {
+			exitStatus = exitStatus.and(new ExitStatus(code));
+		}
+	}
+
+	/* (non-Javadoc)
 	 * @see org.springframework.batch.core.job.flow.JobFlowExecutor#updateJobExecutionStatus(org.springframework.batch.core.job.flow.FlowExecutionStatus)
 	 */
 	@Override
@@ -47,16 +57,23 @@ public class JsrFlowExecutor extends JobFlowExecutor {
 		execution.setStatus(findBatchStatus(status));
 
 		ExitStatus curStatus = execution.getExitStatus();
-		if(curStatus == null ||
-				curStatus.getExitCode() == null ||
-				curStatus.getExitCode().equals(ExitStatus.COMPLETED.getExitCode()) ||
-				curStatus.getExitCode().equals(ExitStatus.EXECUTING.getExitCode()) ||
-				curStatus.getExitCode().equals(ExitStatus.FAILED.getExitCode()) ||
-				curStatus.getExitCode().equals(ExitStatus.NOOP.getExitCode()) ||
-				curStatus.getExitCode().equals(ExitStatus.STOPPED.getExitCode()) ||
-				curStatus.getExitCode().equals(ExitStatus.UNKNOWN.getExitCode())) {
+		if(isNonDefaultExitStauts(curStatus.getExitCode())) {
 			exitStatus = exitStatus.and(new ExitStatus(status.getName()));
 			execution.setExitStatus(exitStatus);
 		}
+	}
+
+	/**
+	 * @param curStatus the exit code to be evaluated
+	 * @return true if the value matches a known exit code
+	 */
+	protected boolean isNonDefaultExitStauts(String curStatus) {
+		return curStatus == null ||
+				curStatus.equals(ExitStatus.COMPLETED.getExitCode()) ||
+				curStatus.equals(ExitStatus.EXECUTING.getExitCode()) ||
+				curStatus.equals(ExitStatus.FAILED.getExitCode()) ||
+				curStatus.equals(ExitStatus.NOOP.getExitCode()) ||
+				curStatus.equals(ExitStatus.STOPPED.getExitCode()) ||
+				curStatus.equals(ExitStatus.UNKNOWN.getExitCode());
 	}
 }

@@ -25,6 +25,8 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
+import javax.batch.api.Decider;
+
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.batch.core.BatchStatus;
@@ -59,7 +61,7 @@ import org.springframework.batch.core.step.StepSupport;
  */
 public class JsrFlowJobTests {
 
-	private JsrFlowJob job = new JsrFlowJob();
+	private JsrFlowJob job;
 
 	private JobExecution jobExecution;
 
@@ -71,6 +73,7 @@ public class JsrFlowJobTests {
 
 	@Before
 	public void setUp() throws Exception {
+		job = new JsrFlowJob();
 		MapJobRepositoryFactoryBean factory = new MapJobRepositoryFactoryBean();
 		factory.afterPropertiesSet();
 		jobExecutionDao = factory.getJobExecutionDao();
@@ -431,7 +434,7 @@ public class JsrFlowJobTests {
 		job.setFlow(flow);
 		job.afterPropertiesSet();
 		job.doExecute(jobExecution);
-		StepExecution stepExecution = getStepExecution(jobExecution, "step3");
+		StepExecution stepExecution = getStepExecution(jobExecution, "step2");
 		assertEquals(ExitStatus.COMPLETED, stepExecution.getExitStatus());
 		assertEquals(2, jobExecution.getStepExecutions().size());
 	}
@@ -455,19 +458,21 @@ public class JsrFlowJobTests {
 	public void testDecisionFlow() throws Throwable {
 
 		SimpleFlow flow = new SimpleFlow("job");
-		JobExecutionDecider decider = new JobExecutionDecider() {
+		Decider decider = new Decider() {
+
 			@Override
-			public FlowExecutionStatus decide(JobExecution jobExecution, StepExecution stepExecution) {
-				assertNotNull(stepExecution);
-				return new FlowExecutionStatus("SWITCH");
+			public String decide(javax.batch.runtime.StepExecution[] executions)
+					throws Exception {
+				assertNotNull(executions);
+				return "SWITCH";
 			}
 		};
 
 		List<StateTransition> transitions = new ArrayList<StateTransition>();
 		transitions.add(StateTransition.createStateTransition(new StepState(new StubStep("step1")), "decision"));
-		DecisionState decision = new DecisionState(decider, "decision");
-		transitions.add(StateTransition.createStateTransition(decision, "step2"));
+		StepState decision = new StepState(new StubDecisionStep("decision", decider));
 		transitions.add(StateTransition.createStateTransition(decision, "SWITCH", "step3"));
+		transitions.add(StateTransition.createStateTransition(decision, "step2"));
 		StepState step2 = new StepState(new StubStep("step2"));
 		transitions.add(StateTransition.createStateTransition(step2, ExitStatus.COMPLETED.getExitCode(), "end0"));
 		transitions.add(StateTransition.createStateTransition(step2, ExitStatus.FAILED.getExitCode(), "end1"));
@@ -482,13 +487,14 @@ public class JsrFlowJobTests {
 
 		job.setFlow(flow);
 		job.doExecute(jobExecution);
+
 		StepExecution stepExecution = getStepExecution(jobExecution, "step3");
 		if (!jobExecution.getAllFailureExceptions().isEmpty()) {
 			throw jobExecution.getAllFailureExceptions().get(0);
 		}
 
 		assertEquals(BatchStatus.COMPLETED, stepExecution.getStatus());
-		assertEquals(2, jobExecution.getStepExecutions().size());
+		assertEquals(3, jobExecution.getStepExecutions().size());
 
 	}
 
@@ -673,7 +679,6 @@ public class JsrFlowJobTests {
 	}
 
 	/**
-	/**
 	 * @author Dave Syer
 	 *
 	 */
@@ -690,6 +695,32 @@ public class JsrFlowJobTests {
 			jobRepository.update(stepExecution);
 		}
 
+	}
+
+	/**
+	 * @author Michael Minella
+	 *
+	 */
+	private class StubDecisionStep extends StepSupport {
+
+		private Decider decider;
+
+		private StubDecisionStep(String name, Decider decider) {
+			super(name);
+			this.decider = decider;
+		}
+
+		@Override
+		public void execute(StepExecution stepExecution) throws JobInterruptedException {
+			stepExecution.setStatus(BatchStatus.COMPLETED);
+			try {
+				stepExecution.setExitStatus(new ExitStatus(decider.decide(new javax.batch.runtime.StepExecution [] {new org.springframework.batch.core.jsr.StepExecution(stepExecution)})));
+			} catch (Exception e) {
+				throw new RuntimeException(e);
+			}
+
+			jobRepository.update(stepExecution);
+		}
 	}
 
 	/**

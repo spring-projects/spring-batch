@@ -35,6 +35,7 @@ import org.springframework.batch.core.JobInterruptedException;
 import org.springframework.batch.core.JobParameters;
 import org.springframework.batch.core.Step;
 import org.springframework.batch.core.StepExecution;
+import org.springframework.batch.core.job.flow.support.DefaultStateTransitionComparator;
 import org.springframework.batch.core.job.flow.support.SimpleFlow;
 import org.springframework.batch.core.job.flow.support.StateTransition;
 import org.springframework.batch.core.job.flow.support.state.DecisionState;
@@ -49,6 +50,7 @@ import org.springframework.batch.core.step.StepSupport;
 
 /**
  * @author Dave Syer
+ * @author Michael Minella
  *
  */
 public class FlowJobTests {
@@ -422,6 +424,7 @@ public class FlowJobTests {
 		transitions.add(StateTransition.createEndStateTransition(new EndState(FlowExecutionStatus.FAILED, "end2")));
 		transitions.add(StateTransition.createEndStateTransition(new EndState(FlowExecutionStatus.COMPLETED, "end3")));
 		flow.setStateTransitions(transitions);
+		flow.setStateTransitionComparator(new DefaultStateTransitionComparator());
 		job.setFlow(flow);
 		job.afterPropertiesSet();
 		job.doExecute(jobExecution);
@@ -473,6 +476,7 @@ public class FlowJobTests {
 		transitions.add(StateTransition.createEndStateTransition(new EndState(FlowExecutionStatus.FAILED, "end2")));
 		transitions.add(StateTransition.createEndStateTransition(new EndState(FlowExecutionStatus.COMPLETED, "end3")));
 		flow.setStateTransitions(transitions);
+		flow.setStateTransitionComparator(new DefaultStateTransitionComparator());
 
 		job.setFlow(flow);
 		job.doExecute(jobExecution);

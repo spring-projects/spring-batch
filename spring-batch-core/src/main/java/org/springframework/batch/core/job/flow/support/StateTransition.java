@@ -28,15 +28,23 @@ import org.springframework.util.StringUtils;
  * execution of the originating State.
  *
  * @author Dave Syer
+ * @author Michael Minella
  * @since 2.0
  */
-public final class StateTransition implements Comparable<StateTransition> {
+public final class StateTransition {
 
 	private final State state;
 
 	private final String pattern;
 
 	private final String next;
+
+	/**
+	 * @return the pattern the {@link ExitStatus#getExitCode()} will be compared against.
+	 */
+	public String getPattern() {
+		return this.pattern;
+	}
 
 	/**
 	 * Create a new end state {@link StateTransition} specification. This
@@ -156,38 +164,6 @@ public final class StateTransition implements Comparable<StateTransition> {
 	 */
 	public boolean isEnd() {
 		return next == null;
-	}
-
-	/**
-	 * Sorts by decreasing specificity of pattern, based on just counting
-	 * wildcards (with * taking precedence over ?). If wildcard counts are equal
-	 * then falls back to alphabetic comparison. Hence * &gt; foo* &gt; ??? &gt;
-	 * fo? > foo.
-	 * @see Comparable#compareTo(Object)
-	 */
-	@Override
-	public int compareTo(StateTransition other) {
-		String value = other.pattern;
-		if (pattern.equals(value)) {
-			return 0;
-		}
-		int patternCount = StringUtils.countOccurrencesOf(pattern, "*");
-		int valueCount = StringUtils.countOccurrencesOf(value, "*");
-		if (patternCount > valueCount) {
-			return 1;
-		}
-		if (patternCount < valueCount) {
-			return -1;
-		}
-		patternCount = StringUtils.countOccurrencesOf(pattern, "?");
-		valueCount = StringUtils.countOccurrencesOf(value, "?");
-		if (patternCount > valueCount) {
-			return 1;
-		}
-		if (patternCount < valueCount) {
-			return -1;
-		}
-		return pattern.compareTo(value);
 	}
 
 	/*

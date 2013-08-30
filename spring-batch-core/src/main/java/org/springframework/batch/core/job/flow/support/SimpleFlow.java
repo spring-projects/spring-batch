@@ -17,12 +17,13 @@ package org.springframework.batch.core.job.flow.support;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.SortedSet;
 import java.util.TreeSet;
 
 import org.apache.commons.logging.Log;
@@ -55,13 +56,19 @@ public class SimpleFlow implements Flow, InitializingBean {
 
 	private State startState;
 
-	private Map<String, SortedSet<StateTransition>> transitionMap = new HashMap<String, SortedSet<StateTransition>>();
+	private Map<String, Set<StateTransition>> transitionMap = new HashMap<String, Set<StateTransition>>();
 
 	private Map<String, State> stateMap = new HashMap<String, State>();
 
 	private List<StateTransition> stateTransitions = new ArrayList<StateTransition>();
 
 	private final String name;
+
+	private Comparator<StateTransition> stateTransitionComparator;
+
+	public void setStateTransitionComparator(Comparator<StateTransition> stateTransitionComparator) {
+		this.stateTransitionComparator = stateTransitionComparator;
+	}
 
 	/**
 	 * Create a flow with the given name.
@@ -270,9 +277,15 @@ public class SimpleFlow implements Flow, InitializingBean {
 
 			String name = state.getName();
 
-			SortedSet<StateTransition> set = transitionMap.get(name);
+			Set<StateTransition> set = transitionMap.get(name);
 			if (set == null) {
-				set = new TreeSet<StateTransition>();
+				// If no comparator is provided, we will maintain the order of insertion
+				if(stateTransitionComparator == null) {
+					set = new LinkedHashSet<StateTransition>();
+				} else {
+					set = new TreeSet<StateTransition>(stateTransitionComparator);
+				}
+
 				transitionMap.put(name, set);
 			}
 			set.add(stateTransition);
