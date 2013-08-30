@@ -18,6 +18,7 @@ package org.springframework.batch.core.configuration.xml;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 import org.springframework.batch.core.job.flow.Flow;
@@ -40,6 +41,7 @@ import org.springframework.util.Assert;
  * that form, in which case it is not modified).
  *
  * @author Dave Syer
+ * @author Michael Minella
  *
  */
 @SuppressWarnings("rawtypes")
@@ -50,6 +52,12 @@ public class SimpleFlowFactoryBean implements FactoryBean, InitializingBean {
 	private List<StateTransition> stateTransitions;
 
 	private String prefix;
+
+	private Comparator<StateTransition> stateTransitionComparator;
+
+	public void setStateTransitionComparator(Comparator<StateTransition> stateTransitionComparator) {
+		this.stateTransitionComparator = stateTransitionComparator;
+	}
 
 	/**
 	 * The name of the flow that is created by this factory.
@@ -86,6 +94,8 @@ public class SimpleFlowFactoryBean implements FactoryBean, InitializingBean {
 	public Object getObject() throws Exception {
 
 		SimpleFlow flow = new SimpleFlow(name);
+
+		flow.setStateTransitionComparator(stateTransitionComparator);
 
 		List<StateTransition> updatedTransitions = new ArrayList<StateTransition>();
 		for (StateTransition stateTransition : stateTransitions) {

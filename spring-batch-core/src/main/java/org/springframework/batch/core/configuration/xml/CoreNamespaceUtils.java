@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2009 the original author or authors.
+ * Copyright 2006-2013 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,6 +17,7 @@ package org.springframework.batch.core.configuration.xml;
 
 import java.util.Map;
 
+import org.springframework.batch.core.job.flow.support.DefaultStateTransitionComparator;
 import org.springframework.beans.PropertyValue;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.config.TypedStringValue;
@@ -32,6 +33,7 @@ import org.w3c.dom.Element;
  * Utility methods used in parsing of the batch core namespace
  *
  * @author Thomas Risberg
+ * @author Michael Minella
  */
 public class CoreNamespaceUtils {
 
@@ -51,6 +53,7 @@ public class CoreNamespaceUtils {
 		checkForStepScope(parserContext, source);
 		addRangePropertyEditor(parserContext);
 		addCoreNamespacePostProcessor(parserContext);
+		addStateTransitionComparator(parserContext);
 	}
 
 	private static void checkForStepScope(ParserContext parserContext, Object source) {
@@ -78,14 +81,31 @@ public class CoreNamespaceUtils {
 	 *
 	 * @param parserContext
 	 */
-	@SuppressWarnings("unchecked")
+	private static void addStateTransitionComparator(ParserContext parserContext) {
+		BeanDefinitionRegistry registry = parserContext.getRegistry();
+		if (!stateTransitionComparatorAlreadyDefined(registry)) {
+			AbstractBeanDefinition defaultStateTransitionComparator = BeanDefinitionBuilder.genericBeanDefinition(
+					DefaultStateTransitionComparator.class).getBeanDefinition();
+			registry.registerBeanDefinition(DefaultStateTransitionComparator.STATE_TRANSITION_COMPARATOR, defaultStateTransitionComparator);
+		}
+	}
+
+	private static boolean stateTransitionComparatorAlreadyDefined(BeanDefinitionRegistry registry) {
+		return registry.containsBeanDefinition(DefaultStateTransitionComparator.STATE_TRANSITION_COMPARATOR);
+	}
+
+	/**
+	 * Register a RangePropertyEditor if one does not already exist.
+	 *
+	 * @param parserContext
+	 */
 	private static void addRangePropertyEditor(ParserContext parserContext) {
 		BeanDefinitionRegistry registry = parserContext.getRegistry();
 		if (!rangeArrayEditorAlreadyDefined(registry)) {
 			AbstractBeanDefinition customEditorConfigurer = BeanDefinitionBuilder.genericBeanDefinition(
 					CUSTOM_EDITOR_CONFIGURER_CLASS_NAME).getBeanDefinition();
 			customEditorConfigurer.setRole(BeanDefinition.ROLE_INFRASTRUCTURE);
-			ManagedMap editors = new ManagedMap();
+			ManagedMap<String, String> editors = new ManagedMap<String, String>();
 			editors.put(RANGE_ARRAY_CLASS_NAME, RANGE_ARRAY_EDITOR_CLASS_NAME);
 			customEditorConfigurer.getPropertyValues().addPropertyValue("customEditors", editors);
 			registry.registerBeanDefinition(CUSTOM_EDITOR_CONFIGURER_CLASS_NAME, customEditorConfigurer);
@@ -176,7 +196,8 @@ public class CoreNamespaceUtils {
 
 	private static boolean matchesVersionInternal(Element element) {
 		String schemaLocation = element.getAttributeNS("http://www.w3.org/2001/XMLSchema-instance", "schemaLocation");
-		return schemaLocation.matches("(?m).*spring-batch-2.2.xsd.*")
+		return schemaLocation.matches("(?m).*spring-batch-3.0.xsd.*")
+				|| schemaLocation.matches("(?m).*spring-batch-2.2.xsd.*")
 				|| schemaLocation.matches("(?m).*spring-batch.xsd.*")
 				|| !schemaLocation.matches("(?m).*spring-batch.*");
 	}

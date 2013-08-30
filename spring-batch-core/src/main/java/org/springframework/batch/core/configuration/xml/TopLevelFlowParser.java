@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2008 the original author or authors.
+ * Copyright 2006-2013 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,6 +15,8 @@
  */
 package org.springframework.batch.core.configuration.xml;
 
+import org.springframework.batch.core.job.flow.support.DefaultStateTransitionComparator;
+import org.springframework.beans.factory.config.RuntimeBeanReference;
 import org.springframework.beans.factory.support.BeanDefinitionBuilder;
 import org.springframework.beans.factory.xml.ParserContext;
 import org.springframework.util.StringUtils;
@@ -22,7 +24,8 @@ import org.w3c.dom.Element;
 
 /**
  * @author Dave Syer
- * 
+ * @author Michael Minella
+ *
  */
 public class TopLevelFlowParser extends AbstractFlowParser {
 
@@ -40,6 +43,7 @@ public class TopLevelFlowParser extends AbstractFlowParser {
 		String flowName = element.getAttribute(ID_ATTR);
 		builder.getRawBeanDefinition().setAttribute("flowName", flowName);
 		builder.addPropertyValue("name", flowName);
+		builder.addPropertyValue("stateTransitionComparator", new RuntimeBeanReference(DefaultStateTransitionComparator.STATE_TRANSITION_COMPARATOR));
 		String abstractAttr = element.getAttribute(ABSTRACT_ATTR);
 		if (StringUtils.hasText(abstractAttr)) {
 			builder.setAbstract(abstractAttr.equals("true"));

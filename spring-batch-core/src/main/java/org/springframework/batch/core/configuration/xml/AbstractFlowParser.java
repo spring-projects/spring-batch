@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2008 the original author or authors.
+ * Copyright 2006-2013 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -39,7 +39,8 @@ import org.w3c.dom.NodeList;
 
 /**
  * @author Dave Syer
- * 
+ * @author Michael Minella
+ *
  */
 public abstract class AbstractFlowParser extends AbstractSingleBeanDefinitionParser {
 
@@ -86,7 +87,7 @@ public abstract class AbstractFlowParser extends AbstractSingleBeanDefinitionPar
 	 * Convenience method for subclasses to set the job factory reference if it
 	 * is available (null is fine, but the quality of error reports is better if
 	 * it is available).
-	 * 
+	 *
 	 * @param jobFactoryRef
 	 */
 	protected void setJobFactoryRef(String jobFactoryRef) {
@@ -95,7 +96,7 @@ public abstract class AbstractFlowParser extends AbstractSingleBeanDefinitionPar
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see AbstractSingleBeanDefinitionParser#getBeanClass(Element)
 	 */
 	@Override
@@ -168,16 +169,15 @@ public abstract class AbstractFlowParser extends AbstractSingleBeanDefinitionPar
 			}
 		}
 
-		ManagedList managedList = new ManagedList();
-		@SuppressWarnings( { "unchecked", "unused" })
-		boolean dummy = managedList.addAll(stateTransitions);
+		ManagedList<BeanDefinition> managedList = new ManagedList<BeanDefinition>();
+		managedList.addAll(stateTransitions);
 		builder.addPropertyValue("stateTransitions", managedList);
 
 	}
 
 	/**
 	 * Find all of the elements that are pointed to by this element.
-	 * 
+	 *
 	 * @param element
 	 * @return a collection of reachable element names
 	 */
@@ -206,7 +206,7 @@ public abstract class AbstractFlowParser extends AbstractSingleBeanDefinitionPar
 
 	/**
 	 * Find all of the elements reachable from the startElement.
-	 * 
+	 *
 	 * @param startElement
 	 * @param reachableElementMap
 	 * @param accumulator a collection of reachable element names
@@ -295,7 +295,7 @@ public abstract class AbstractFlowParser extends AbstractSingleBeanDefinitionPar
 	 * @param element
 	 * @param parserContext the parser context for the bean factory
 	 */
-	private static void verifyUniquePattern(Element transitionElement, List<String> patterns, Element element,
+	protected static void verifyUniquePattern(Element transitionElement, List<String> patterns, Element element,
 			ParserContext parserContext) {
 		String onAttribute = transitionElement.getAttribute(ON_ATTR);
 		if (patterns.contains(onAttribute)) {
@@ -344,7 +344,7 @@ public abstract class AbstractFlowParser extends AbstractSingleBeanDefinitionPar
 	 * {@link org.springframework.batch.core.job.flow.support.StateTransition}
 	 * references
 	 */
-	private static Collection<BeanDefinition> createTransition(FlowExecutionStatus status, String on, String next,
+	protected static Collection<BeanDefinition> createTransition(FlowExecutionStatus status, String on, String next,
 			String exitCode, BeanDefinition stateDef, ParserContext parserContext, boolean abandon) {
 
 		BeanDefinition endState = null;
@@ -389,7 +389,7 @@ public abstract class AbstractFlowParser extends AbstractSingleBeanDefinitionPar
 	 * @param elementName An end transition element name
 	 * @return the BatchStatus corresponding to the transition name
 	 */
-	private static FlowExecutionStatus getBatchStatusFromEndTransitionName(String elementName) {
+	protected static FlowExecutionStatus getBatchStatusFromEndTransitionName(String elementName) {
 		elementName = stripNamespace(elementName);
 		if (STOP_ELE.equals(elementName)) {
 			return FlowExecutionStatus.STOPPED;

@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2008 the original author or authors.
+ * Copyright 2006-2013 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,23 +15,26 @@
  */
 package org.springframework.batch.core.configuration.xml;
 
+import org.springframework.batch.core.job.flow.support.DefaultStateTransitionComparator;
 import org.springframework.beans.factory.config.BeanDefinition;
+import org.springframework.beans.factory.config.RuntimeBeanReference;
 import org.springframework.beans.factory.support.BeanDefinitionBuilder;
 import org.springframework.beans.factory.xml.ParserContext;
 import org.w3c.dom.Element;
 
 /**
  * @author Dave Syer
- * 
+ * @author Michael Minella
+ *
  */
 public class InlineFlowParser extends AbstractFlowParser {
-	
+
 	private final String flowName;
 
 	/**
 	 * Construct a {@link InlineFlowParser} with the specified name and using the
 	 * provided job repository ref.
-	 * 
+	 *
 	 * @param flowName the name of the flow
 	 * @param jobFactoryRef the reference to the {@link JobParserJobFactoryBean}
 	 * from the enclosing tag
@@ -51,6 +54,7 @@ public class InlineFlowParser extends AbstractFlowParser {
 
 		builder.getRawBeanDefinition().setAttribute("flowName", flowName);
 		builder.addPropertyValue("name", flowName);
+		builder.addPropertyValue("stateTransitionComparator", new RuntimeBeanReference(DefaultStateTransitionComparator.STATE_TRANSITION_COMPARATOR));
 		super.doParse(element, parserContext, builder);
 		builder.setRole(BeanDefinition.ROLE_INFRASTRUCTURE);
 		parserContext.popAndRegisterContainingComponent();
