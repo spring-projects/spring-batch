@@ -39,6 +39,9 @@ public final class StateTransition {
 
 	private final String next;
 
+	/**
+	 * @return the pattern the {@link ExitStatus#getExitCode()} will be compared against.
+	 */
 	public String getPattern() {
 		return this.pattern;
 	}

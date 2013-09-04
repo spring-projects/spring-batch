@@ -15,9 +15,11 @@
  */
 package org.springframework.batch.core.configuration.xml;
 
+import java.util.Comparator;
 import java.util.Map;
 
 import org.springframework.batch.core.job.flow.support.DefaultStateTransitionComparator;
+import org.springframework.batch.core.job.flow.support.StateTransition;
 import org.springframework.beans.PropertyValue;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.config.TypedStringValue;
@@ -77,7 +79,7 @@ public class CoreNamespaceUtils {
 	}
 
 	/**
-	 * Register a RangePropertyEditor if one does not already exist.
+	 * Register a {@link Comparator} to be used to sort {@link StateTransition}s
 	 *
 	 * @param parserContext
 	 */

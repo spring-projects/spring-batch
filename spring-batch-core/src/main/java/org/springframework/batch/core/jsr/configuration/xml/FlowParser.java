@@ -52,8 +52,8 @@ public class FlowParser extends AbstractFlowParser {
 	private String flowName;
 
 	/**
-	 * @param flowName
-	 * @param jobFactoryRef
+	 * @param flowName The name of the flow
+	 * @param jobFactoryRef The bean name for the job factory
 	 */
 	public FlowParser(String flowName, String jobFactoryRef) {
 		super.setJobFactoryRef(jobFactoryRef);
