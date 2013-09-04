@@ -342,6 +342,10 @@ public class JsrJobOperator implements JobOperator {
 
 		List<Long> results = new ArrayList<Long>(findRunningJobExecutions.size());
 
+		if(results.isEmpty()) {
+			throw new NoSuchJobException("Job name: " + name + " not found.");
+		}
+
 		for (org.springframework.batch.core.JobExecution jobExecution : findRunningJobExecutions) {
 			results.add(jobExecution.getId());
 		}
