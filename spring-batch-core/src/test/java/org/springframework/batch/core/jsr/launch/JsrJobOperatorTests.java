@@ -276,6 +276,15 @@ public class JsrJobOperatorTests {
 		jsrJobOperator.getParameters(5l);
 	}
 
+	@Test(expected=NoSuchJobException.class)
+	public void testGetNoRunningExecutions() {
+		Set<JobExecution> executions = new HashSet<JobExecution>();
+
+		when(jobExplorer.findRunningJobExecutions("myJob")).thenReturn(executions);
+
+		jsrJobOperator.getRunningExecutions("myJob");
+	}
+
 	@Test
 	public void testGetRunningExecutions() {
 		Set<JobExecution> executions = new HashSet<JobExecution>();

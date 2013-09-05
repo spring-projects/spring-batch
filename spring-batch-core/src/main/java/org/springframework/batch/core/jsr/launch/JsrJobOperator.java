@@ -340,11 +340,11 @@ public class JsrJobOperator implements JobOperator {
 			throws NoSuchJobException, JobSecurityException {
 		Set<org.springframework.batch.core.JobExecution> findRunningJobExecutions = jobExplorer.findRunningJobExecutions(name);
 
-		List<Long> results = new ArrayList<Long>(findRunningJobExecutions.size());
-
-		if(results.isEmpty()) {
+		if(findRunningJobExecutions.isEmpty()) {
 			throw new NoSuchJobException("Job name: " + name + " not found.");
 		}
+
+		List<Long> results = new ArrayList<Long>(findRunningJobExecutions.size());
 
 		for (org.springframework.batch.core.JobExecution jobExecution : findRunningJobExecutions) {
 			results.add(jobExecution.getId());
