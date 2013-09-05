@@ -411,4 +411,26 @@ public class JsrJobOperatorTests {
 		assertTrue(properties.getProperty("prevKey1").equals("prevVal1"));
 		assertTrue(properties.getProperty("userKey1").equals("userVal1"));
 	}
+
+	@Test
+	public void testNewJobParametersOverridePreviousRestartParameters() {
+		JsrJobOperator jobOperator = (JsrJobOperator) jsrJobOperator;
+
+		JobExecution jobExecution = new JobExecution(1L,
+				new JobParametersBuilder()
+				.addString("prevKey1", "prevVal1")
+				.addString("overrideTest", "jobExecution")
+				.toJobParameters());
+
+		Properties userProperties = new Properties();
+		userProperties.put("userKey1", "userVal1");
+		userProperties.put("overrideTest", "userProperties");
+
+		Properties properties = jobOperator.getJobRestartProperties(userProperties, jobExecution);
+
+		assertTrue(properties.size() == 3);
+		assertTrue(properties.getProperty("prevKey1").equals("prevVal1"));
+		assertTrue(properties.getProperty("userKey1").equals("userVal1"));
+		assertTrue(properties.getProperty("overrideTest").equals("userProperties"));
+	}
 }

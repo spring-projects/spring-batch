@@ -493,16 +493,16 @@ public class JsrJobOperator implements JobOperator {
 	protected Properties getJobRestartProperties(Properties params, org.springframework.batch.core.JobExecution previousJobExecution) {
 		Properties jobRestartProperties = new Properties();
 
-		if (params != null && !params.isEmpty()) {
-			jobRestartProperties.putAll(params);
-		}
-
 		if (previousJobExecution != null) {
 			JobParameters previousJobParameters = previousJobExecution.getJobParameters();
 
 			if (previousJobParameters != null && !previousJobParameters.isEmpty()) {
 				jobRestartProperties.putAll(previousJobParameters.toProperties());
 			}
+		}
+
+		if (params != null && !params.isEmpty()) {
+			jobRestartProperties.putAll(params);
 		}
 
 		return jobRestartProperties;
