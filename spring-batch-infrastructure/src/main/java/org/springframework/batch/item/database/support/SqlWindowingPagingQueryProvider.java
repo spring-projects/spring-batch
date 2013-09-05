@@ -16,7 +16,7 @@
 
 package org.springframework.batch.item.database.support;
 
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 import org.springframework.batch.item.database.Order;
@@ -122,8 +122,8 @@ public class SqlWindowingPagingQueryProvider extends AbstractSqlPagingQueryProvi
 	}
 
 	private Map<String, Order> getSortKeysReplaced(Object qualifierReplacement) {
-		String newQualifier = "" + qualifierReplacement;
-		Map<String, Order> sortKeys = new HashMap<String, Order>();
+		final String newQualifier = "" + qualifierReplacement;
+		final Map<String, Order> sortKeys = new LinkedHashMap<String, Order>();
 		for (Map.Entry<String, Order> sortKey : getSortKeys().entrySet()) {
 			sortKeys.put(sortKey.getKey().replaceFirst("^.*\\.", newQualifier), sortKey.getValue());
 		}
