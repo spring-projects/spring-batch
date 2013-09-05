@@ -41,6 +41,8 @@ import org.springframework.batch.core.jsr.JsrJobParametersConverter;
 import org.springframework.batch.core.launch.support.SimpleJobOperator;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.step.JobRepositorySupport;
+import org.springframework.core.task.SimpleAsyncTaskExecutor;
+import org.springframework.core.task.SyncTaskExecutor;
 
 public class JsrJobOperatorTests {
 
@@ -93,6 +95,23 @@ public class JsrJobOperatorTests {
 		}
 
 		new JsrJobOperator(new SimpleJobExplorer(null, null, null, null), new JobRepositorySupport(), new SimpleJobOperator(), parameterConverter);
+	}
+
+	@Test
+	public void testDefaultTaskExecutor() throws Exception {
+		JsrJobOperator jsrJobOperatorImpl = (JsrJobOperator) jsrJobOperator;
+		jsrJobOperatorImpl.afterPropertiesSet();
+		assertNotNull(jsrJobOperatorImpl.getTaskExecutor());
+		assertTrue((jsrJobOperatorImpl.getTaskExecutor() instanceof SyncTaskExecutor));
+	}
+
+	@Test
+	public void testCustomTaskExecutor() throws Exception {
+		JsrJobOperator jsrJobOperatorImpl = (JsrJobOperator) jsrJobOperator;
+		jsrJobOperatorImpl.setTaskExecutor(new SimpleAsyncTaskExecutor());
+		jsrJobOperatorImpl.afterPropertiesSet();
+		assertNotNull(jsrJobOperatorImpl.getTaskExecutor());
+		assertTrue((jsrJobOperatorImpl.getTaskExecutor() instanceof SimpleAsyncTaskExecutor));
 	}
 
 	@Test

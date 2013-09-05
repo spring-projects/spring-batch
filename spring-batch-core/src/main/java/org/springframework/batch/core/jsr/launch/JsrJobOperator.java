@@ -49,6 +49,7 @@ import org.springframework.batch.core.jsr.JsrJobParametersConverter;
 import org.springframework.batch.core.jsr.configuration.support.BatchPropertyContext;
 import org.springframework.batch.core.jsr.configuration.support.ThreadLocalClassloaderBeanPostProcessor;
 import org.springframework.batch.core.repository.JobRepository;
+import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.access.BeanFactoryLocator;
 import org.springframework.beans.factory.access.BeanFactoryReference;
 import org.springframework.beans.factory.config.AutowireCapableBeanFactory;
@@ -116,7 +117,7 @@ import org.springframework.util.Assert;
  * @author Chris Schaefer
  * @since 3.0
  */
-public class JsrJobOperator implements JobOperator {
+public class JsrJobOperator implements JobOperator, InitializingBean {
 	private static final String BATCH_PROPERTY_CONTEXT_BEAN_NAME = "batchPropertyContext";
 
 	private org.springframework.batch.core.launch.JobOperator batchJobOperator;
@@ -181,6 +182,21 @@ public class JsrJobOperator implements JobOperator {
 		Assert.notNull(jobOperator, "A JobOperator is required");
 
 		this.batchJobOperator = jobOperator;
+	}
+
+	public void setTaskExecutor(TaskExecutor taskExecutor) {
+		this.taskExecutor = taskExecutor;
+	}
+
+	protected TaskExecutor getTaskExecutor() {
+		return taskExecutor;
+	}
+
+	@Override
+	public void afterPropertiesSet() throws Exception {
+		if (this.taskExecutor == null) {
+			this.taskExecutor = new SyncTaskExecutor();
+		}
 	}
 
 	/**
