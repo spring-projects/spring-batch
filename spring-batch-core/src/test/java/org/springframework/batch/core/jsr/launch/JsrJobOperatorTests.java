@@ -17,6 +17,7 @@ import java.util.Set;
 
 import javax.batch.operations.JobExecutionIsRunningException;
 import javax.batch.operations.JobOperator;
+import javax.batch.operations.JobRestartException;
 import javax.batch.operations.NoSuchJobException;
 import javax.batch.operations.NoSuchJobExecutionException;
 import javax.batch.operations.NoSuchJobInstanceException;
@@ -373,5 +374,41 @@ public class JsrJobOperatorTests {
 		long finalExecutionId = jsrJobOperator.restart(executionId, null);
 
 		assertEquals(BatchStatus.COMPLETED, jsrJobOperator.getJobExecution(finalExecutionId).getBatchStatus());
+	}
+
+	@Test(expected = JobRestartException.class)
+	public void testRestartAbandoned() {
+		jsrJobOperator = BatchRuntime.getJobOperator();
+
+		long executionId = jsrJobOperator.start("jsrJobOperatorTestRestartAbandonJob", null);
+
+		assertEquals(BatchStatus.FAILED, jsrJobOperator.getJobExecution(executionId).getBatchStatus());
+
+		jsrJobOperator.abandon(executionId);
+		jsrJobOperator.restart(executionId, null);
+	}
+
+	@Test
+	public void testGetNoRestartJobParameters() {
+		JsrJobOperator jobOperator = (JsrJobOperator) jsrJobOperator;
+		Properties properties = jobOperator.getJobRestartProperties(null, null);
+		assertTrue(properties.isEmpty());
+	}
+
+	@Test
+	public void testGetRestartJobParameters() {
+		JsrJobOperator jobOperator = (JsrJobOperator) jsrJobOperator;
+
+		JobExecution jobExecution = new JobExecution(1L,
+			new JobParametersBuilder().addString("prevKey1", "prevVal1").toJobParameters());
+
+		Properties userProperties = new Properties();
+		userProperties.put("userKey1", "userVal1");
+
+		Properties properties = jobOperator.getJobRestartProperties(userProperties, jobExecution);
+
+		assertTrue(properties.size() == 2);
+		assertTrue(properties.getProperty("prevKey1").equals("prevVal1"));
+		assertTrue(properties.getProperty("userKey1").equals("userVal1"));
 	}
 }
