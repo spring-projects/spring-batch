@@ -414,6 +414,10 @@ public class JsrJobOperator implements JobOperator {
 			if(jobExecution.getCreateTime().compareTo(previousJobExecution.getCreateTime()) > 0) {
 				throw new JobExecutionNotMostRecentException("The requested JobExecution to restart was not the most recently run");
 			}
+
+			if(jobExecution.getStatus().equals(BatchStatus.ABANDONED)) {
+				throw new JobRestartException("JobExecution ID: " + jobExecution.getId() + " is abandoned and attempted to be restarted.");
+			}
 		}
 
 		String jobName = previousJobExecution.getJobInstance().getJobName();
@@ -445,7 +449,8 @@ public class JsrJobOperator implements JobOperator {
 		final org.springframework.batch.core.JobExecution jobExecution;
 
 		try {
-			JobParameters jobParameters = jobParametersConverter.getJobParameters(params);
+			Properties jobRestartProperties = getJobRestartProperties(params, previousJobExecution);
+			JobParameters jobParameters = jobParametersConverter.getJobParameters(jobRestartProperties);
 			jobExecution = jobRepository.createJobExecution(previousJobExecution.getJobInstance(), jobParameters, previousJobExecution.getJobConfigurationName());
 		} catch (Exception e) {
 			throw new JobRestartException(e);
@@ -483,6 +488,24 @@ public class JsrJobOperator implements JobOperator {
 		batchContext.close();
 
 		return jobExecution.getId();
+	}
+
+	protected Properties getJobRestartProperties(Properties params, org.springframework.batch.core.JobExecution previousJobExecution) {
+		Properties jobRestartProperties = new Properties();
+
+		if (params != null && !params.isEmpty()) {
+			jobRestartProperties.putAll(params);
+		}
+
+		if (previousJobExecution != null) {
+			JobParameters previousJobParameters = previousJobExecution.getJobParameters();
+
+			if (previousJobParameters != null && !previousJobParameters.isEmpty()) {
+				jobRestartProperties.putAll(previousJobParameters.toProperties());
+			}
+		}
+
+		return jobRestartProperties;
 	}
 
 	/**
