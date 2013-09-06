@@ -301,6 +301,7 @@ class StepParserStepFactoryBean<I, O> implements FactoryBean, BeanNameAware {
 		if (commitInterval != null) {
 			builder.chunk(commitInterval);
 		}
+		builder.chunk(chunkCompletionPolicy);
 		enhanceTaskletStepBuilder(builder);
 
 		builder.reader(itemReader);
