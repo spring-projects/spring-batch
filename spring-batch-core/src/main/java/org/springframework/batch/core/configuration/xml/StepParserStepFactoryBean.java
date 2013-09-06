@@ -314,6 +314,7 @@ public class StepParserStepFactoryBean<I, O> implements FactoryBean, BeanNameAwa
 		if (commitInterval != null) {
 			builder.chunk(commitInterval);
 		}
+		builder.chunk(chunkCompletionPolicy);
 		enhanceTaskletStepBuilder(builder);
 
 		builder.reader(itemReader);
