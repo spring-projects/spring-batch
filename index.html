@@ -1,0 +1,95 @@
+---
+# The name of your project
+title: Spring Batch
+
+badges:
+
+
+  # Customize your project's badges. Delete any entries that do not apply.
+  custom:
+    - name: Source (GitHub)
+      url:  https://github.com/spring-projects/spring-batch
+      icon: github
+
+    - name: Issues (JIRA)
+      url:  http://jira.springsource.org/browse/BATCH
+      icon: tracking
+
+    - name: CI (Bamboo)
+      url:  https://build.springsource.org/browse/BATCH
+      icon: ci
+
+    - name: Forum
+      url:  http://forum.spring.io/forum/spring-projects/batch
+      icon: forum
+
+    - name: StackOverflow
+      url:  http://stackoverflow.com/questions/tagged/spring-batch
+      icon: stackoverflow
+
+    - name: Metrics (SonarQube)
+      url: https://sonar.springsource.org/dashboard/index/org.springframework.batch:spring-batch
+      icon: metrics
+
+---
+<!DOCTYPE HTML>
+<html lang="en-US">
+
+{% capture billboard_description %}
+
+A lightweight, comprehensive batch framework designed to enable the development of robust batch applications vital for the daily operations of enterprise systems. 
+
+{% endcapture %}
+
+{% capture main_content %}
+
+Spring Batch provides reusable functions that are essential in processing large volumes of records, including logging/tracing, transaction management, job processing statistics, job restart, skip, and resource management. It also provides more advanced technical services and features that will enable extremely high-volume and high performance batch jobs through optimization and partitioning techniques. Simple as well as complex, high-volume batch jobs can leverage the framework in a highly scalable manner to process significant volumes of information.
+
+## Features
+
+* Transaction management
+* Chunk based processing
+* Declaritive I/O
+* Start/Stop/Restart
+* Rety/Skip
+* Web based administration interface (Spring Batch Admin)
+
+<span id="quick-start"></span>
+## Quick Start
+
+{% include download_widget.md %}
+
+The quickest way to get started with Spring Batch is to download the zip file and use one of the shell projects we provide.
+
+## XML based configuration
+1. Download the zip release from our repository: [Download](http://static.springsource.org/downloads/nightly/release-download.php?project=BATCH)
+2. After unzipping the download, copy the /samples/spring-batch-simple-cli folder to your workspace.
+3. From the root of you new project's directory, you can build the project via maven `mvn clean install`
+4. From the project's target directory, you'll be able to run your new job (pipes a file into an in memory database table) via the command `java -jar spring-batch-simple-cli-2.2.1.RELEASE.jar launch-context.xml personJob`
+
+## Java based configuration (3.0+)
+1. Download the zip release from our repository: [Download](http://static.springsource.org/downloads/nightly/milestone-download.php?project=BATCH)
+2. After unzipping the download, copy the /samples/spring-batch-simple-cli-javaconfig folder to your workspace.
+3. From the root of you new project's directory, you can build the project via maven `mvn clean install`
+4. From the project's target directory, you'll be able to run your new job (pipes a file into an in memory database table) via the command `java -jar spring-batch-simple-cli-3.0.0.M1.jar example.LaunchContext personJob`
+
+{% endcapture %}
+
+{% capture related_resources %}
+
+### Getting Started Guides
+
+* [Creating a Batch Service]({{site.main_site_url}}/guides/gs/batch-processing)
+* [Spring Batch Getting Started](http://docs.spring.io/spring-batch/getting-started.html)
+
+### Related Projects
+
+* [Spring Integration]({{site.projects_site_url}}/spring-integration/)
+* [Spring Data]({{site.projects_site_url}}/spring-data/)
+
+{% endcapture %}
+
+
+{% include project_page.html %}
+
+</html>
