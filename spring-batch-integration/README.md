@@ -14,12 +14,12 @@ Many users of [Spring Batch][] may encounter requirements that are outside the s
 	<dependency>
 	    <groupId>org.springframework.batch</groupId>
 	    <artifactId>spring-batch-integration</artifactId>
-	    <version>1.2.2.BUILD-SNAPSHOT</version>
+	    <version>1.3.0.BUILD-SNAPSHOT</version>
 	</dependency>
 
 ## Using Gradle
 
-	compile 'org.springframework.batch:spring-batch-integration:1.2.2.BUILD-SNAPSHOT'
+	compile 'org.springframework.batch:spring-batch-integration:1.3.0.BUILD-SNAPSHOT'
 
 # Documentation
 
