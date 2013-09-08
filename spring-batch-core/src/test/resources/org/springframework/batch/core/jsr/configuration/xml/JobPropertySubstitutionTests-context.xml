@@ -22,6 +22,8 @@
                 <processor ref="testProcessor">
                     <properties>
                         <property name="processorProperty1" value="#{jobParameters['testParam']}"/>
+                        <property name="processorProperty2" value="#{jobParameters['unresolving.prop']}?:myfile1.txt;"/>
+                        <property name="processorProperty3" value="#{jobParameters['unresolving.prop']}?:#{systemProperties['file.separator']};#{jobParameters['infile.name']}?:#{jobParameters['file.name.junit']};.txt" />
                     </properties>
                 </processor>
                 <writer ref="testWriter">

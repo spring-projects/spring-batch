@@ -57,7 +57,6 @@ import org.springframework.beans.factory.BeanFactory;
 import org.springframework.beans.factory.BeanFactoryAware;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.BeanExpressionContext;
-import org.springframework.beans.factory.config.BeanExpressionResolver;
 import org.springframework.beans.factory.config.BeanPostProcessor;
 import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
 import org.springframework.context.expression.StandardBeanExpressionResolver;
@@ -74,11 +73,9 @@ import org.springframework.util.ReflectionUtils;
  * @since 3.0
  */
 public class BatchPropertyBeanPostProcessor implements BeanPostProcessor, BeanFactoryAware {
+	private JsrExpressionParser jsrExpressionParser;
 	private BatchPropertyContext batchPropertyContext;
 	private Log logger = LogFactory.getLog(getClass());
-	private ConfigurableListableBeanFactory beanFactory;
-	private BeanExpressionContext beanExpressionContext;
-	private BeanExpressionResolver expressionResolver = new StandardBeanExpressionResolver();
 	private Set<Class<? extends Annotation>> requiredAnnotations = new HashSet<Class<? extends Annotation>>();
 
 	public BatchPropertyBeanPostProcessor() {
@@ -189,7 +186,7 @@ public class BatchPropertyBeanPostProcessor implements BeanPostProcessor, BeanFa
 		if (batchArtifactProperties.containsKey(propertyKey)) {
 			String propertyValue = (String) batchArtifactProperties.get(propertyKey);
 
-			return (String) expressionResolver.evaluate(propertyValue, beanExpressionContext);
+			return jsrExpressionParser.parseExpression(propertyValue);
 		}
 
 		return null;
@@ -221,8 +218,12 @@ public class BatchPropertyBeanPostProcessor implements BeanPostProcessor, BeanFa
 					"BatchPropertyBeanPostProcessor requires a ConfigurableListableBeanFactory");
 		}
 
-		this.beanFactory = (ConfigurableListableBeanFactory) beanFactory;
-		this.beanExpressionContext = new BeanExpressionContext(this.beanFactory, this.beanFactory.getBean(StepScope.class));
+		ConfigurableListableBeanFactory configurableListableBeanFactory = (ConfigurableListableBeanFactory) beanFactory;
+
+		BeanExpressionContext beanExpressionContext = new BeanExpressionContext(configurableListableBeanFactory,
+			configurableListableBeanFactory.getBean(StepScope.class));
+
+		this.jsrExpressionParser = new JsrExpressionParser(new StandardBeanExpressionResolver(), beanExpressionContext);
 	}
 
 	@Autowired
