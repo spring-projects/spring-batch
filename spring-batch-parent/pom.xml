@@ -12,7 +12,7 @@
 		<url>http://github.com/SpringSource/spring-batch</url>
 		<connection>scm:git:git://github.com/SpringSource/spring-batch.git</connection>
 		<developerConnection>scm:git:git://github.com/SpringSource/spring-batch.git</developerConnection>
-		<tag>HEAD</tag>
+		<tag>2.2.2.RELEASE</tag>
 	</scm>
 	<licenses>
 		<license>
@@ -712,7 +712,7 @@
 				<artifactId>mockito-all</artifactId>
 				<version>1.9.5</version>
 				<scope>test</scope>
-			</dependency>			
+			</dependency>
 			<dependency>
 				 <groupId>org.springframework.data</groupId>
 				 <artifactId>spring-data-commons</artifactId>
