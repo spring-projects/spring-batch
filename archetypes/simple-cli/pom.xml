@@ -15,7 +15,7 @@
     </description>
     <properties>
         <spring.framework.version>3.2.0.RELEASE</spring.framework.version>
-        <spring.batch.version>2.2.2.BUILD-SNAPSHOT</spring.batch.version>
+        <spring.batch.version>2.2.2.RELEASE</spring.batch.version>
         <dependency.locations.enabled>false</dependency.locations.enabled>
         <junit.version>4.10</junit.version>
         <compiler.target.version>1.6</compiler.target.version>
