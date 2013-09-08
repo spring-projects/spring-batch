@@ -31,7 +31,7 @@ import org.springframework.batch.item.ExecutionContext;
  *
  * @author Dave Syer
  * @author Michael Minella
- *
+ * @author Will Schipp
  * @since 2.0
  */
 public interface JobExplorer {
@@ -108,6 +108,17 @@ public interface JobExplorer {
 	 * @return the set of job names that have been executed
 	 */
 	List<String> getJobNames();
+	
+	/**
+	 * Fetch {@link JobInstance} values in descending order of creation (and
+	 * there for usually of first execution) with a 'like'/wildcard criteria.
+	 * 
+	 * @param jobName
+	 * @param start
+	 * @param count
+	 * @return
+	 */
+	List<JobInstance> getJobInstancesByJobName(String jobName, int start, int count);
 
 	/**
 	 * Query the repository for the number of unique {@link JobInstance}s

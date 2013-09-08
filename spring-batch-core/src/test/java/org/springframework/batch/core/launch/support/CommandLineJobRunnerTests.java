@@ -487,6 +487,11 @@ public class CommandLineJobRunnerTests {
 		}
 
 		@Override
+		public List<JobInstance> getJobInstancesByJobName(String jobName, int start, int count) {
+			throw new UnsupportedOperationException();
+		}
+
+		@Override
 		public int getJobInstanceCount(String jobName)
 				throws NoSuchJobException {
 			int count = 0;

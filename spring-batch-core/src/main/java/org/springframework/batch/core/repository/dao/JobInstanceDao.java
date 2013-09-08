@@ -79,6 +79,9 @@ public interface JobInstanceDao {
 	 * Fetch the last job instances with the provided name, sorted backwards by
 	 * primary key.
 	 *
+	 * if using the JdbcJobInstance, you can provide the jobName with a wildcard
+	 * (e.g. *Job) to return 'like' job names. (e.g. *Job will return 'someJob' 
+	 * and 'otherJob')
 	 *
 	 * @param jobName the job name
 	 * @param start the start index of the instances to return
@@ -93,6 +96,17 @@ public interface JobInstanceDao {
 	 * @return the names of all job instances
 	 */
 	List<String> getJobNames();
+	
+	/**
+	 * Fetch the last job instances with the provided name, sorted backwards by
+	 * primary key, using a 'like' criteria
+	 * 
+	 * @param jobName
+	 * @param start
+	 * @param count
+	 * @return
+	 */
+	List<JobInstance> findJobInstancesByName(String jobName, int start, int count);
 
 
 	/**
