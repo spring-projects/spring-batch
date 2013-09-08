@@ -56,7 +56,10 @@ public class JobPropertySubstitutionTests {
 	@Test
 	public void testPropertySubstitutionSimple() throws Exception {
 		JobExecution jobExecution = jobLauncher.run(job,
-			new JobParametersBuilder().addString("testParam", "testParamValue").toJobParameters());
+			new JobParametersBuilder()
+				.addString("testParam", "testParamValue")
+				.addString("file.name.junit", "myfile2")
+				.toJobParameters());
 		assertEquals(ExitStatus.COMPLETED, jobExecution.getExitStatus());
 	}
 
@@ -122,9 +125,19 @@ public class JobPropertySubstitutionTests {
 		@BatchProperty
 		String processorProperty1;
 
+		@Inject
+		@BatchProperty
+		String processorProperty2;
+
+		@Inject
+		@BatchProperty
+		String processorProperty3;
+
 		@Override
 		public Object processItem(Object item) throws Exception {
 			assertEquals("testParamValue", processorProperty1);
+			assertEquals("myfile1.txt", processorProperty2);
+			assertEquals("/myfile2.txt", processorProperty3);
 
 			return item;
 		}
