@@ -113,4 +113,9 @@ public class MapJobInstanceDao implements JobInstanceDao {
 		return jobExecution.getJobInstance();
 	}
 
+	@Override
+	public List<JobInstance> findJobInstancesByName(String jobName, int start, int count) {
+		return getJobInstances(jobName,start,count);
+	}
+
 }

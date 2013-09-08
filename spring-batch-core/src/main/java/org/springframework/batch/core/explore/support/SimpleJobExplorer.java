@@ -33,6 +33,7 @@ import org.springframework.batch.core.repository.dao.StepExecutionDao;
  *
  * @author Dave Syer
  * @author Lucas Ward
+ * @author Will Schipp
  *
  * @see JobExplorer
  * @see JobInstanceDao
@@ -196,6 +197,11 @@ public class SimpleJobExplorer implements JobExplorer {
 		if (stepExecution != null) {
 			stepExecution.setExecutionContext(ecDao.getExecutionContext(stepExecution));
 		}
+	}
+
+	@Override
+	public List<JobInstance> getJobInstancesByJobName(String jobName, int start, int count) {
+		return jobInstanceDao.findJobInstancesByName(jobName, start, count);
 	}
 
 }
