@@ -3,7 +3,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>org.springframework.batch</groupId>
 	<artifactId>spring-batch-admin-parent</artifactId>
-	<version>1.3.0.BUILD-SNAPSHOT</version>
+	<version>1.3.0.M1</version>
 	<name>Spring Batch Admin Parent</name>
 	<description>A set of services (Java, JSON) and a UI (webapp) for managing and launching Spring Batch jobs.</description>
 	<url>http://www.springsource.org/spring-batch-admin</url>
@@ -12,7 +12,8 @@
 		<url>http://github.com/SpringSource/spring-batch-admin</url>
 		<connection>scm:git:git://github.com/SpringSource/spring-batch-admin.git</connection>
 		<developerConnection>scm:git:git://github.com/SpringSource/spring-batch-admin.git</developerConnection>
-	</scm>
+	  <tag>1.3.0.M1</tag>
+  </scm>
 	<licenses>
 		<license>
 			<name>Apache 2.0</name>
