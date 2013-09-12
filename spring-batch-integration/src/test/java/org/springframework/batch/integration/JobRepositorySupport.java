@@ -99,4 +99,14 @@ public class JobRepositorySupport implements JobRepository {
 			}
 		}
 	}
+
+    public JobInstance createJobInstance(String jobName,
+            JobParameters jobParameters) {
+        return null;
+    }
+
+    public JobExecution createJobExecution(JobInstance jobInstance,
+            JobParameters jobParameters, String jobConfigurationLocation) {
+        return null;
+    }
 }
