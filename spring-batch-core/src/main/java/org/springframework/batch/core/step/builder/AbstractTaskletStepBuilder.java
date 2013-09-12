@@ -15,12 +15,16 @@
  */
 package org.springframework.batch.core.step.builder;
 
+import java.lang.reflect.Method;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
+import org.springframework.aop.support.AopUtils;
 import org.springframework.batch.core.ChunkListener;
 import org.springframework.batch.core.Step;
+import org.springframework.batch.core.StepContribution;
 import org.springframework.batch.core.StepExecutionListener;
+import org.springframework.batch.core.scope.context.ChunkContext;
 import org.springframework.batch.core.step.tasklet.Tasklet;
 import org.springframework.batch.core.step.tasklet.TaskletStep;
 import org.springframework.batch.item.ItemStream;
@@ -31,7 +35,9 @@ import org.springframework.batch.repeat.support.RepeatTemplate;
 import org.springframework.batch.repeat.support.TaskExecutorRepeatTemplate;
 import org.springframework.core.task.SyncTaskExecutor;
 import org.springframework.core.task.TaskExecutor;
+import org.springframework.transaction.annotation.AnnotationTransactionAttributeSource;
 import org.springframework.transaction.interceptor.TransactionAttribute;
+import org.springframework.util.ClassUtils;
 
 /**
  * Base class for step builders that want to build a {@link TaskletStep}. Handles common concerns across all tasklet
@@ -46,8 +52,12 @@ import org.springframework.transaction.interceptor.TransactionAttribute;
 public abstract class AbstractTaskletStepBuilder<B extends AbstractTaskletStepBuilder<B>> extends
 		StepBuilderHelper<AbstractTaskletStepBuilder<B>> {
 
-	protected Set<ChunkListener> chunkListeners = new LinkedHashSet<ChunkListener>();
+	private static final AnnotationTransactionAttributeSource ANNOTATION_TRANSACTION_ATTRIBUTE_SOURCE = new AnnotationTransactionAttributeSource();
+	
+	private static final Method TASKLET_EXECUTE_METHOD = ClassUtils.getMethod(Tasklet.class, "execute", StepContribution.class, ChunkContext.class);
 
+	protected Set<ChunkListener> chunkListeners = new LinkedHashSet<ChunkListener>();
+	
 	private RepeatOperations stepOperations;
 
 	private TransactionAttribute transactionAttribute;
@@ -82,10 +92,6 @@ public abstract class AbstractTaskletStepBuilder<B extends AbstractTaskletStepBu
 
 		step.setChunkListeners(chunkListeners.toArray(new ChunkListener[0]));
 
-		if (transactionAttribute != null) {
-			step.setTransactionAttribute(transactionAttribute);
-		}
-
 		if (stepOperations == null) {
 
 			stepOperations = new RepeatTemplate();
@@ -101,8 +107,15 @@ public abstract class AbstractTaskletStepBuilder<B extends AbstractTaskletStepBu
 
 		}
 		step.setStepOperations(stepOperations);
-		step.setTasklet(createTasklet());
 
+		Tasklet tasklet = createTasklet();
+		step.setTasklet(tasklet);
+		
+		TransactionAttribute transactionAttribute = getTransactionAttribute(tasklet);
+		if (transactionAttribute != null) {
+			step.setTransactionAttribute(transactionAttribute);
+		}
+		
 		step.setStreams(streams.toArray(new ItemStream[0]));
 
 		try {
@@ -114,6 +127,14 @@ public abstract class AbstractTaskletStepBuilder<B extends AbstractTaskletStepBu
 
 		return step;
 
+	}
+
+	private TransactionAttribute getTransactionAttribute(Tasklet tasklet) {
+		if (transactionAttribute != null) {
+			return transactionAttribute;
+		}
+		return ANNOTATION_TRANSACTION_ATTRIBUTE_SOURCE.getTransactionAttribute(TASKLET_EXECUTE_METHOD,
+				AopUtils.getTargetClass(tasklet));
 	}
 
 	private void registerStepListenerAsChunkListener() {
