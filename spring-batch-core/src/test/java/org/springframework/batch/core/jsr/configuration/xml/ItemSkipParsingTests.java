@@ -15,98 +15,76 @@
  */
 package org.springframework.batch.core.jsr.configuration.xml;
 
-import static org.junit.Assert.assertEquals;
-
-import java.util.ArrayList;
-import java.util.List;
-
-import org.junit.Ignore;
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.springframework.batch.core.BatchStatus;
-import org.springframework.batch.core.Job;
-import org.springframework.batch.core.JobExecution;
-import org.springframework.batch.core.JobParametersBuilder;
-import org.springframework.batch.core.SkipListener;
-import org.springframework.batch.core.launch.JobLauncher;
+import org.springframework.batch.core.jsr.JsrTestUtils;
 import org.springframework.batch.item.ItemProcessor;
 import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.ItemWriter;
-import org.springframework.batch.item.NonTransientResourceException;
-import org.springframework.batch.item.ParseException;
-import org.springframework.batch.item.UnexpectedInputException;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
-@ContextConfiguration
-@RunWith(SpringJUnit4ClassRunner.class)
+import javax.batch.api.chunk.listener.SkipProcessListener;
+import javax.batch.api.chunk.listener.SkipReadListener;
+import javax.batch.api.chunk.listener.SkipWriteListener;
+import javax.batch.operations.JobOperator;
+import javax.batch.runtime.BatchRuntime;
+import javax.batch.runtime.BatchStatus;
+import javax.batch.runtime.Metric;
+import javax.batch.runtime.StepExecution;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Properties;
+
+import static org.junit.Assert.assertEquals;
+
 public class ItemSkipParsingTests {
 
-	@Autowired
-	public Job job;
-
-	@Autowired
-	public JobLauncher jobLauncher;
-
-	@Autowired
-	public TestSkipListener skipListener;
-
 	@Test
-	@Ignore
 	public void test() throws Exception {
-		// Read skip and fail
-		JobExecution execution = jobLauncher.run(job, new JobParametersBuilder().toJobParameters());
+		javax.batch.runtime.JobExecution execution = JsrTestUtils.runJob("ItemSkipParsingTests-context", new Properties(), 10000l);
+		JobOperator jobOperator = BatchRuntime.getJobOperator();
 
-		assertEquals(BatchStatus.FAILED, execution.getStatus());
-		assertEquals(1, execution.getStepExecutions().iterator().next().getSkipCount());
-		assertEquals(1, skipListener.readSkips);
-		assertEquals(0, skipListener.processSkips);
-		assertEquals(0, skipListener.writeSkips);
-		assertEquals("read fail because of me", execution.getAllFailureExceptions().get(0).getCause().getMessage());
-
-		skipListener.resetCounts();
+		assertEquals(BatchStatus.FAILED, execution.getBatchStatus());
+		List<StepExecution> stepExecutions = jobOperator.getStepExecutions(execution.getExecutionId());
+		assertEquals(1, JsrTestUtils.getMetric(stepExecutions.get(0), Metric.MetricType.READ_SKIP_COUNT).getValue());
+		assertEquals(1, TestSkipListener.readSkips);
+		assertEquals(0, TestSkipListener.processSkips);
+		assertEquals(0, TestSkipListener.writeSkips);
 
 		// Process skip and fail
-		execution = jobLauncher.run(job, new JobParametersBuilder().toJobParameters());
+		execution = JsrTestUtils.restartJob(execution.getExecutionId(), new Properties(), 10000l);
 
-		assertEquals(BatchStatus.FAILED, execution.getStatus());
-		assertEquals(1, execution.getStepExecutions().iterator().next().getSkipCount());
-		assertEquals(0, skipListener.readSkips);
-		assertEquals(1, skipListener.processSkips);
-		assertEquals(0, skipListener.writeSkips);
-		assertEquals("process fail because of me", execution.getAllFailureExceptions().get(0).getCause().getMessage());
-
-		skipListener.resetCounts();
+		assertEquals(BatchStatus.FAILED, execution.getBatchStatus());
+		stepExecutions = jobOperator.getStepExecutions(execution.getExecutionId());
+		assertEquals(1, JsrTestUtils.getMetric(stepExecutions.get(0), Metric.MetricType.PROCESS_SKIP_COUNT).getValue());
+		assertEquals(0, TestSkipListener.readSkips);
+		assertEquals(1, TestSkipListener.processSkips);
+		assertEquals(0, TestSkipListener.writeSkips);
 
 		// Write skip and fail
-		execution = jobLauncher.run(job, new JobParametersBuilder().toJobParameters());
+		execution = JsrTestUtils.restartJob(execution.getExecutionId(), new Properties(), 10000l);
 
-		assertEquals(BatchStatus.FAILED, execution.getStatus());
-		assertEquals(1, execution.getStepExecutions().iterator().next().getSkipCount());
-		assertEquals(0, skipListener.readSkips);
-		assertEquals(0, skipListener.processSkips);
-		assertEquals(1, skipListener.writeSkips);
-		assertEquals("write fail because of me", execution.getAllFailureExceptions().get(0).getCause().getMessage());
-
-		skipListener.resetCounts();
+		assertEquals(BatchStatus.FAILED, execution.getBatchStatus());
+		stepExecutions = jobOperator.getStepExecutions(execution.getExecutionId());
+		assertEquals(1, JsrTestUtils.getMetric(stepExecutions.get(0), Metric.MetricType.WRITE_SKIP_COUNT).getValue());
+		assertEquals(0, TestSkipListener.readSkips);
+		assertEquals(0, TestSkipListener.processSkips);
+		assertEquals(1, TestSkipListener.writeSkips);
 
 		// Complete
-		execution = jobLauncher.run(job, new JobParametersBuilder().toJobParameters());
+		execution = JsrTestUtils.restartJob(execution.getExecutionId(), new Properties(), 10000l);
 
-		assertEquals(BatchStatus.COMPLETED, execution.getStatus());
-		assertEquals(0, execution.getStepExecutions().iterator().next().getSkipCount());
-		assertEquals(0, skipListener.readSkips);
-		assertEquals(0, skipListener.processSkips);
-		assertEquals(0, skipListener.writeSkips);
+		assertEquals(BatchStatus.COMPLETED, execution.getBatchStatus());
+		stepExecutions = jobOperator.getStepExecutions(execution.getExecutionId());
+		assertEquals(0, JsrTestUtils.getMetric(stepExecutions.get(0), Metric.MetricType.WRITE_SKIP_COUNT).getValue());
+		assertEquals(0, TestSkipListener.readSkips);
+		assertEquals(0, TestSkipListener.processSkips);
+		assertEquals(0, TestSkipListener.writeSkips);
 	}
 
 	public static class SkipErrorGeneratingReader implements ItemReader<String> {
-		private int count = 0;
+		private static int count = 0;
 
 		@Override
-		public String read() throws Exception, UnexpectedInputException,
-		ParseException, NonTransientResourceException {
+		public String read() throws Exception {
 			count++;
 
 			if(count == 1) {
@@ -124,7 +102,7 @@ public class ItemSkipParsingTests {
 	}
 
 	public static class SkipErrorGeneratingProcessor implements ItemProcessor<String, String> {
-		private int count = 0;
+		private static int count = 0;
 
 		@Override
 		public String process(String item) throws Exception {
@@ -143,7 +121,7 @@ public class ItemSkipParsingTests {
 	}
 
 	public static class SkipErrorGeneratingWriter implements ItemWriter<String> {
-		private int count = 0;
+		private static int count = 0;
 		protected List<String> writtenItems = new ArrayList<String>();
 		private List<String> skippedItems = new ArrayList<String>();
 
@@ -165,31 +143,31 @@ public class ItemSkipParsingTests {
 		}
 	}
 
-	public static class TestSkipListener implements SkipListener<String, String> {
+	public static class TestSkipListener implements SkipReadListener, SkipProcessListener, SkipWriteListener {
 
-		protected int readSkips = 0;
-		protected int processSkips = 0;
-		protected int writeSkips = 0;
+		protected static int readSkips = 0;
+		protected static int processSkips = 0;
+		protected static int writeSkips = 0;
+
+		public TestSkipListener() {
+			readSkips = 0;
+			processSkips = 0;
+			writeSkips = 0;
+		}
 
 		@Override
-		public void onSkipInRead(Throwable t) {
+		public void onSkipProcessItem(Object item, Exception ex) throws Exception {
+			processSkips++;
+		}
+
+		@Override
+		public void onSkipReadItem(Exception ex) throws Exception {
 			readSkips++;
 		}
 
 		@Override
-		public void onSkipInWrite(String item, Throwable t) {
+		public void onSkipWriteItem(List<Object> items, Exception ex) throws Exception {
 			writeSkips++;
-		}
-
-		@Override
-		public void onSkipInProcess(String item, Throwable t) {
-			processSkips++;
-		}
-
-		public void resetCounts() {
-			readSkips = 0;
-			processSkips = 0;
-			writeSkips = 0;
 		}
 	}
 }
