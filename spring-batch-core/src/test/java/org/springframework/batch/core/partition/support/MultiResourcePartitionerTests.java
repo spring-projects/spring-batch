@@ -35,7 +35,7 @@ public class MultiResourcePartitionerTests {
 	@Before
 	public void setUp() {
 		ResourceArrayPropertyEditor editor = new ResourceArrayPropertyEditor();
-		editor.setAsText("classpath:log4j*");
+		editor.setAsText("classpath:baseContext.xml");
 		partitioner.setResources((Resource[]) editor.getValue());
 	}
 

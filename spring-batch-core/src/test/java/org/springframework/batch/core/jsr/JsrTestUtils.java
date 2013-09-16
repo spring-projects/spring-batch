@@ -19,6 +19,8 @@ import javax.batch.operations.JobOperator;
 import javax.batch.runtime.BatchRuntime;
 import javax.batch.runtime.BatchStatus;
 import javax.batch.runtime.JobExecution;
+import javax.batch.runtime.Metric;
+import javax.batch.runtime.StepExecution;
 import java.util.Date;
 import java.util.Properties;
 import java.util.concurrent.TimeoutException;
@@ -106,6 +108,18 @@ public class JsrTestUtils {
 			curBatchStatus = execution.getBatchStatus();
 		}
 		return execution;
+	}
+
+	public static Metric getMetric(StepExecution stepExecution, Metric.MetricType type) {
+		Metric[] metrics = stepExecution.getMetrics();
+
+		for (Metric metric : metrics) {
+			if(metric.getType() == type) {
+				return metric;
+			}
+		}
+
+		return null;
 	}
 
 }

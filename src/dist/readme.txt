@@ -1,0 +1,14 @@
+Spring Batch version ${version}
+=====================================================================================
+
+To find out what has changed since earlier releases, see the 'Change Log' section at
+https://jira.springsource.org/browse/BATCH
+
+Please consult the documentation located within the 'docs/spring-batch-reference'
+directory of this release and also visit the official Spring Batch home at
+http://projects.spring.io/spring-batch/
+
+There you will find links to the forum, issue tracker, and other resources.
+
+See https://github.com/spring-projects/spring-batch#readme for additional
+information including instructions on building from source.

@@ -72,8 +72,8 @@
     batch job. A <classname>Job</classname> is an entity that encapsulates an
     entire batch process. As is common with other Spring projects, a
     <classname>Job</classname> will be wired together via an XML configuration
-    file or Java based configuration. This configuration may be referred to as 
-    the "job configuration". However, <classname>Job</classname> is just the 
+    file or Java based configuration. This configuration may be referred to as
+    the "job configuration". However, <classname>Job</classname> is just the
     top of an overall hierarchy:</para>
 
     <mediaobject>
@@ -333,7 +333,7 @@
       <table>
         <title>BATCH_JOB_EXECUTION_PARAMS</title>
 
-        <tgroup cols="4">
+        <tgroup cols="5">
           <tbody>
             <row>
               <entry>JOB_EXECUTION_ID</entry>
@@ -449,7 +449,7 @@
       <table>
         <title>BATCH_JOB_EXECUTION_PARAMS</title>
 
-        <tgroup cols="4">
+        <tgroup cols="5">
           <tbody>
             <row>
               <entry>JOB_EXECUTION_ID</entry>
@@ -983,7 +983,7 @@ ExecutionContext ecJob = jobExecution.getExecutionContext();
 
     <programlisting>public interface JobLauncher {
 
-    public JobExecution run(Job job, JobParameters jobParameters) 
+    public JobExecution run(Job job, JobParameters jobParameters)
                 throws JobExecutionAlreadyRunningException, JobRestartException;
 }</programlisting>
 
@@ -1041,13 +1041,13 @@ ExecutionContext ecJob = jobExecution.getExecutionContext();
     bean definition, a namespace has been provided for ease of
     configuration:</para>
 
-    <programlisting>&lt;beans:beans xmlns="<emphasis role="bold">http://www.springframework.org/schema/batch</emphasis>" 
-     xmlns:beans="http://www.springframework.org/schema/beans" 
+    <programlisting>&lt;beans:beans xmlns="<emphasis role="bold">http://www.springframework.org/schema/batch</emphasis>"
+     xmlns:beans="http://www.springframework.org/schema/beans"
      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
      xsi:schemaLocation="
-           http://www.springframework.org/schema/beans 
+           http://www.springframework.org/schema/beans
            http://www.springframework.org/schema/beans/spring-beans.xsd
-           <emphasis role="bold">http://www.springframework.org/schema/batch 
+           <emphasis role="bold">http://www.springframework.org/schema/batch
            http://www.springframework.org/schema/batch/spring-batch-2.2.xsd</emphasis>"&gt;
 
     &lt;job id="ioSampleJob"&gt;

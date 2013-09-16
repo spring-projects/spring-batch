@@ -1,0 +1,726 @@
+description = 'Spring Batch'
+
+apply plugin: 'base'
+apply plugin: 'idea'
+
+buildscript {
+	repositories {
+		maven { url 'http://repo.spring.io/plugins-release' }
+	}
+	dependencies {
+		classpath 'org.springframework.build.gradle:docbook-reference-plugin:0.2.6'
+		classpath 'org.springframework.build.gradle:propdeps-plugin:0.0.5'
+	}
+}
+
+ext {
+	linkHomepage = 'http://projects.spring.io/spring-batch/'
+	linkCi       = 'https://build.spring.io/browse/BATCH'
+	linkIssue    = 'https://jira.springsource.org/browse/BATCH'
+	linkScmUrl           = 'https://github.com/spring-projects/spring-batch'
+	linkScmConnection    = 'git://github.com/spring-projects/spring-batch.git'
+	linkScmDevConnection = 'git@github.com:spring-projects/spring-batch.git'
+}
+
+allprojects {
+	group = 'org.springframework.batch'
+
+	repositories {
+		maven { url 'http://repo.spring.io/libs-milestone' }
+		maven { url 'http://repo.spring.io/plugins-release' }
+
+		maven { url 'http://m2.neo4j.org/content/repositories/releases'}
+		mavenCentral()
+	}
+}
+
+subprojects { subproject ->
+
+	apply plugin: 'java'
+	apply from:   "${rootProject.projectDir}/publish-maven.gradle"
+	apply plugin: 'eclipse'
+	apply plugin: 'idea'
+	apply plugin: 'jacoco'
+
+	sourceCompatibility=1.6
+	targetCompatibility=1.6
+
+	ext {
+
+		environmentProperty = project.hasProperty('environment') ? getProperty('environment') : 'hsql'
+
+		springVersionDefault = '4.0.2.RELEASE'
+		springVersion = project.hasProperty('springVersion') ? getProperty('springVersion') : springVersionDefault
+		springRetryVersion = '1.0.2.RELEASE'
+		springAmqpVersion = '1.1.2.RELEASE'
+		springDataCommonsVersion = '1.5.0.RELEASE'
+		springDataGemfireVersion = '1.3.0.RELEASE'
+		springDataJpaVersion = '1.2.0.RELEASE'
+		springDataMongodbVersion = '1.1.0.RELEASE'
+		springDataNeo4jVersion = '2.2.0.RELEASE'
+		springDataRedisVersion = '1.0.3.RELEASE'
+		springIntegrationVersion = '4.0.0.M2'
+		springOsgiCoreVersion = '1.1.2'
+
+		activemqVersion = '5.1.0'
+		aspectjVersion = '1.5.4'
+		castorVersion = '1.3.2'
+		cglibVersion = '2.1_3'
+		commonsCollectionsVersion = '3.2'
+		commonsDdbcpVersion = '1.2.2'
+		commonsIoVersion = '1.4'
+		commonsLangVersion = '2.5'
+		derbyVersion = '10.8.2.2'
+		groovyVersion = '1.6.3'
+		h2databaseVersion = '1.2.132'
+		hamcrestVersion = '1.3'
+		hibernateAnnotationsVersion = '3.3.1.GA'
+		hibernateVersion = '4.1.9.Final'
+		hibernateValidatorVersion = '4.3.1.Final'
+		hsqldbVersion = '2.3.1'
+		ibatisVersion = '2.3.4.726'
+		jacksonVersion = '1.0.1'
+		javaMailVersion = '1.4.1'
+		javaxBatchApiVersion = '1.0'
+		javaxInjectVersion = '1'
+		jbatchTckSpi = '1.0'
+		jettisonVersion = '1.2'
+		jtdsVersion = '1.2.4'
+		junitVersion = '4.10'
+		log4jVersion = '1.2.14'
+		mysqlVersion = '5.1.6'
+		mockitoVersion = '1.9.5'
+		osgiR4CoreVersion = '1.0'
+		postgresqlVersion = '8.3-603.jdbc3'
+		quartzVersion = '1.6.1'
+		servletApiVersion = '2.5'
+		slf4jVersion = '1.6.6'
+		sqlfireclientVersion = '1.0.3'
+		sqliteVersion = '3.7.2'
+		woodstoxVersion = '4.0.6'
+		xercesVersion = '2.8.1'
+		xmlunitVersion = '1.2'
+		xstreamVersion = '1.4.4'
+	}
+
+	eclipse {
+		project {
+			natures += 'org.springframework.ide.eclipse.core.springnature'
+		}
+	}
+
+	sourceSets {
+		test {
+			resources {
+				srcDirs = ['src/test/resources', 'src/test/java']
+			}
+		}
+	}
+
+	// enable all compiler warnings; individual projects may customize further
+	ext.xLintArg = '-Xlint:all'
+	[compileJava, compileTestJava]*.options*.compilerArgs = [xLintArg]
+
+	test {
+		// suppress all console output during testing unless running `gradle -i`
+		logging.captureStandardOutput(LogLevel.INFO)
+		systemProperty "ENVIRONMENT", environmentProperty
+
+		jacoco {
+			append = false
+			destinationFile = file("$buildDir/jacoco.exec")
+		}
+	}
+
+	task sourcesJar(type: Jar) {
+		classifier = 'sources'
+		from sourceSets.main.allJava
+	}
+
+	task javadocJar(type: Jar) {
+		classifier = 'javadoc'
+		from javadoc
+	}
+
+	task checkTestConfigs << {
+		def configFiles = []
+		sourceSets.test.java.srcDirs.each {
+			fileTree(it).include('**/*.xml').exclude('**/log4j.xml').each { configFile ->
+				def configXml = new XmlParser(false, false).parse(configFile)
+
+				if (configXml.@'xsi:schemaLocation' ==~ /.*spring-[a-z-]*\d\.\d\.xsd.*/) {
+					configFiles << configFile
+				}
+			}
+		}
+		if (configFiles) {
+			throw new InvalidUserDataException('Hardcoded XSD version in the config files:\n' +
+												configFiles.collect {relativePath(it)}.join('\n') +
+			'\nPlease, use versionless schemaLocations for Spring XSDs to avoid issues with builds on different versions of dependencies.')
+		}
+	}
+
+	jar {
+		manifest.attributes["Created-By"] =
+			"${System.getProperty("java.version")} (${System.getProperty("java.specification.vendor")})"
+		manifest.attributes["Implementation-Title"] = subproject.name
+		manifest.attributes["Implementation-Version"] = subproject.version
+
+		from("${rootProject.projectDir}/src/dist") {
+			include "license.txt"
+			include "notice.txt"
+			into "META-INF"
+			expand(copyright: new Date().format("yyyy"), version: project.version)
+		}
+	}
+
+	test.dependsOn checkTestConfigs
+
+	artifacts {
+		archives sourcesJar
+		archives javadocJar
+	}
+}
+
+project('spring-batch-core') {
+	description = 'Spring Batch Core'
+	dependencies {
+		compile project(":spring-batch-infrastructure")
+
+		compile "com.ibm.jbatch:com.ibm.jbatch-tck-spi:$jbatchTckSpi"
+		compile "com.thoughtworks.xstream:xstream:$xstreamVersion"
+		compile ("org.codehaus.jettison:jettison:$jettisonVersion") {
+			exclude group: 'stax', module: 'stax-api'
+		}
+		compile "org.springframework:spring-aop:$springVersion"
+		compile "org.springframework:spring-beans:$springVersion"
+		compile "org.springframework:spring-context:$springVersion"
+		compile "org.springframework:spring-core:$springVersion"
+		compile "org.springframework:spring-tx:$springVersion"
+
+		testCompile "cglib:cglib-nodep:$cglibVersion"
+		testCompile "org.springframework:spring-test:$springVersion"
+		testCompile "org.mockito:mockito-all:$mockitoVersion"
+		testCompile "javax.inject:javax.inject:$javaxInjectVersion"
+		testCompile "org.hsqldb:hsqldb:$hsqldbVersion"
+		testCompile "com.h2database:h2:$h2databaseVersion"
+		testCompile "commons-io:commons-io:$commonsIoVersion"
+		testCompile "commons-dbcp:commons-dbcp:$commonsDdbcpVersion"
+		testCompile "junit:junit:$junitVersion"
+		//testCompile "org.hamcrest:hamcrest-all:$hamcrestVersion"
+
+		optional "org.aspectj:aspectjrt:$aspectjVersion"
+		optional "org.aspectj:aspectjweaver:$aspectjVersion"
+		optional "org.osgi:osgi_R4_core:$osgiR4CoreVersion"
+		optional "org.springframework:spring-jdbc:$springVersion"
+		optional "org.springframework.osgi:spring-osgi-core:$springOsgiCoreVersion"
+		optional "org.slf4j:slf4j-log4j12:$slf4jVersion"
+		optional "log4j:log4j:$log4jVersion"
+
+		provided "javax.batch:javax.batch-api:$javaxBatchApiVersion"
+	}
+}
+
+project('spring-batch-infrastructure') {
+	description = 'Spring Batch Infrastructure'
+	dependencies {
+
+		compile "org.springframework:spring-core:$springVersion"
+		compile "org.springframework.retry:spring-retry:$springRetryVersion"
+
+		testCompile "log4j:log4j:$log4jVersion"
+		testCompile "commons-io:commons-io:$commonsIoVersion"
+		testCompile "commons-dbcp:commons-dbcp:$commonsDdbcpVersion"
+		testCompile "org.hsqldb:hsqldb:$hsqldbVersion"
+		testCompile "com.h2database:h2:$h2databaseVersion"
+		testCompile "org.apache.derby:derby:$derbyVersion"
+		testCompile "org.springframework:spring-test:$springVersion"
+		testCompile "junit:junit:$junitVersion"
+		testCompile "org.aspectj:aspectjrt:$aspectjVersion"
+		testCompile "org.aspectj:aspectjweaver:$aspectjVersion"
+		testCompile "org.mockito:mockito-all:$mockitoVersion"
+		testCompile "org.xerial:sqlite-jdbc:$sqliteVersion"
+
+		optional "org.apache.geronimo.specs:geronimo-jms_1.1_spec:1.1"
+		optional "org.slf4j:slf4j-log4j12:$slf4jVersion"
+		optional "org.codehaus.jackson:jackson-mapper-asl:$jacksonVersion"
+		compile("org.hibernate:hibernate-core:$hibernateVersion") { dep ->
+			optional dep
+			exclude group: 'cglib', module: 'cglib'
+			exclude group: 'asm', module: 'asm'
+			exclude group: 'asm', module: 'asm-attrs'
+			exclude group: 'javax.transaction', module: 'jta'
+		}
+		compile("org.hibernate:hibernate-entitymanager:$hibernateVersion") { dep ->
+			optional dep
+			exclude group: 'edu.oswego.cs.concurrent', module: 'edu.oswego.cs.dl.util.concurrent'
+			exclude group: 'org.hibernate', module: 'hibernate'
+		}
+		compile("org.hibernate:hibernate-annotations:$hibernateAnnotationsVersion") { dep ->
+			optional dep
+			exclude group: 'org.hibernate', module: 'hibernate'
+			exclude group: 'commons-logging', module: 'commons-logging'
+		}
+		optional "org.hibernate:hibernate-validator:$hibernateValidatorVersion"
+		optional "org.apache.geronimo.specs:geronimo-jta_1.1_spec:1.1"
+		optional "org.apache.ibatis:ibatis-sqlmap:$ibatisVersion"
+		optional "javax.mail:mail:$javaMailVersion"
+		optional "javax.batch:javax.batch-api:$javaxBatchApiVersion"
+		compile("org.springframework:spring-oxm:$springVersion") { dep ->
+			optional dep
+			exclude group: 'commons-lang', module: 'commons-lang'
+		}
+		optional "org.springframework:spring-aop:$springVersion"
+		optional "org.springframework:spring-context:$springVersion"
+		compile("org.springframework:spring-context-support:$springVersion") { dep ->
+			optional dep
+			exclude group: 'quartz', module: 'quartz'
+		}
+		optional "org.springframework:spring-jdbc:$springVersion"
+		optional "org.springframework:spring-jms:$springVersion"
+		optional "org.springframework:spring-orm:$springVersion"
+		optional "cglib:cglib-nodep:$cglibVersion"
+		optional "org.springframework:spring-tx:$springVersion"
+		optional "org.springframework.data:spring-data-commons:$springDataCommonsVersion"
+		optional "org.springframework.data:spring-data-mongodb:$springDataMongodbVersion"
+		optional "org.springframework.data:spring-data-neo4j:$springDataNeo4jVersion"
+		optional "org.springframework.data:spring-data-gemfire:$springDataGemfireVersion"
+		optional "org.springframework.data:spring-data-redis:$springDataRedisVersion"
+		compile("org.codehaus.woodstox:woodstox-core-asl:$woodstoxVersion") { dep ->
+			optional dep
+			exclude group: 'stax', module: 'stax-api'
+		}
+		optional "org.springframework.amqp:spring-amqp:$springAmqpVersion"
+		optional "org.springframework.amqp:spring-rabbit:$springAmqpVersion"
+
+	}
+}
+
+project('spring-batch-core-tests') {
+	description = 'Spring Batch Core Tests'
+	dependencies {
+		compile project(":spring-batch-core")
+		compile "commons-dbcp:commons-dbcp:$commonsDdbcpVersion"
+		compile "org.springframework:spring-jdbc:$springVersion"
+		compile "org.springframework.retry:spring-retry:$springRetryVersion"
+		compile "org.springframework:spring-tx:$springVersion"
+		compile "org.springframework:spring-aop:$springVersion"
+
+		testCompile "org.hsqldb:hsqldb:$hsqldbVersion"
+		testCompile "commons-io:commons-io:$commonsIoVersion"
+		testCompile "org.apache.derby:derby:$derbyVersion"
+		testCompile "junit:junit:$junitVersion"
+		testCompile "log4j:log4j:$log4jVersion"
+		testCompile "org.springframework:spring-test:$springVersion"
+
+		runtime "mysql:mysql-connector-java:$mysqlVersion"
+		runtime "postgresql:postgresql:$postgresqlVersion"
+
+		optional "org.aspectj:aspectjrt:$aspectjVersion"
+		optional "org.aspectj:aspectjweaver:$aspectjVersion"
+		optional "cglib:cglib-nodep:$cglibVersion"
+	}
+}
+
+project('spring-batch-infrastructure-tests') {
+	description = 'Spring Batch Infrastructure Tests'
+	dependencies {
+		compile project(":spring-batch-infrastructure")
+		compile "org.apache.geronimo.specs:geronimo-jms_1.1_spec:1.1"
+		compile "commons-dbcp:commons-dbcp:$commonsDdbcpVersion"
+		compile "org.springframework:spring-tx:$springVersion"
+		compile "org.springframework:spring-aop:$springVersion"
+
+		testCompile "org.hsqldb:hsqldb:$hsqldbVersion"
+		testCompile "commons-io:commons-io:$commonsIoVersion"
+		testCompile "org.apache.derby:derby:$derbyVersion"
+		testCompile ("org.apache.activemq:activemq-core:$activemqVersion") {
+			exclude group: 'org.apache.camel', module: 'camel-core'
+			exclude group: 'commons-logging', module: 'commons-logging-api'
+		}
+		testCompile "junit:junit:$junitVersion"
+		testCompile "org.apache.geronimo.specs:geronimo-j2ee-management_1.1_spec:1.0.1"
+		testCompile "xmlunit:xmlunit:$xmlunitVersion"
+		testCompile ("org.codehaus.castor:castor-xml:$castorVersion") {
+			exclude group: 'stax', module: 'stax'
+			exclude group: 'commons-lang', module: 'commons-lang'
+		}
+		testCompile "log4j:log4j:$log4jVersion"
+		testCompile "xerces:xercesImpl:$xercesVersion"
+		testCompile "com.thoughtworks.xstream:xstream:$xstreamVersion"
+		testCompile("org.codehaus.woodstox:woodstox-core-asl:$woodstoxVersion") {
+			exclude group: 'stax', module: 'stax-api'
+		}
+		testCompile "commons-lang:commons-lang:$commonsLangVersion"
+		testCompile("org.springframework:spring-oxm:$springVersion") {
+			exclude group: 'commons-lang', module: 'commons-lang'
+		}
+		testCompile "org.springframework:spring-jdbc:$springVersion"
+		testCompile "org.springframework:spring-test:$springVersion"
+		testCompile "org.mockito:mockito-all:$mockitoVersion"
+
+		optional "org.slf4j:slf4j-log4j12:$slf4jVersion"
+		optional "org.apache.ibatis:ibatis-sqlmap:$ibatisVersion"
+		compile("org.hibernate:hibernate-core:$hibernateVersion") { dep ->
+			optional dep
+			exclude group: 'cglib', module: 'cglib'
+			exclude group: 'asm', module: 'asm'
+			exclude group: 'asm', module: 'asm-attrs'
+			exclude group: 'javax.transaction', module: 'jta'
+		}
+		compile("org.hibernate:hibernate-entitymanager:$hibernateVersion") { dep ->
+			optional dep
+			exclude group: 'edu.oswego.cs.concurrent', module: 'edu.oswego.cs.dl.util.concurrent'
+			exclude group: 'org.hibernate', module: 'hibernate'
+		}
+		compile("org.hibernate:hibernate-annotations:$hibernateAnnotationsVersion") { dep ->
+			optional dep
+			exclude group: 'org.hibernate', module: 'hibernate'
+			exclude group: 'commons-logging', module: 'commons-logging'
+		}
+		optional "org.apache.geronimo.specs:geronimo-jta_1.1_spec:1.1"
+		optional "org.springframework:spring-orm:$springVersion"
+		optional "org.springframework:spring-jms:$springVersion"
+
+		runtime "mysql:mysql-connector-java:$mysqlVersion"
+		runtime "postgresql:postgresql:$postgresqlVersion"
+
+	}
+}
+
+//Domain for batch job testing
+project('spring-batch-test') {
+	description = 'Spring Batch Test'
+
+	dependencies {
+		compile project(":spring-batch-core")
+
+		compile "junit:junit:$junitVersion"
+		compile "org.springframework:spring-test:$springVersion"
+		compile "org.springframework:spring-jdbc:$springVersion"
+		compile "commons-io:commons-io:$commonsIoVersion"
+		compile "commons-dbcp:commons-dbcp:$commonsDdbcpVersion"
+		compile "commons-collections:commons-collections:$commonsCollectionsVersion"
+
+		testCompile "org.hsqldb:hsqldb:$hsqldbVersion"
+
+		optional "org.aspectj:aspectjrt:$aspectjVersion"
+	}
+}
+
+project('spring-batch-integration') {
+	description = 'Batch Integration'
+
+	dependencies {
+		compile project(":spring-batch-core")
+
+		compile "org.springframework.retry:spring-retry:$springRetryVersion"
+		compile "org.springframework:spring-context:$springVersion"
+		compile "org.springframework:spring-messaging:$springVersion"
+		compile "org.springframework:spring-aop:$springVersion"
+		compile "org.springframework.integration:spring-integration-core:$springIntegrationVersion"
+		compile "org.springframework:spring-tx:$springVersion"
+
+		testCompile project(":spring-batch-test")
+
+		testCompile "org.apache.activemq:activemq-core:$activemqVersion"
+		testCompile "junit:junit:$junitVersion"
+		testCompile "org.aspectj:aspectjrt:$aspectjVersion"
+		testCompile "org.aspectj:aspectjweaver:$aspectjVersion"
+		testCompile "cglib:cglib-nodep:$cglibVersion"
+		testCompile "commons-dbcp:commons-dbcp:$commonsDdbcpVersion"
+		testCompile "com.h2database:h2:$h2databaseVersion"
+		testCompile "mysql:mysql-connector-java:$mysqlVersion"
+		testCompile "org.apache.derby:derby:$derbyVersion"
+		testCompile "org.hsqldb:hsqldb:$hsqldbVersion"
+		testCompile "org.springframework:spring-test:$springVersion"
+		testCompile "org.mockito:mockito-all:$mockitoVersion"
+		testCompile("org.springframework.integration:spring-integration-test:$springIntegrationVersion") {
+			exclude group: 'junit', module: 'junit-dep'
+		}
+		testCompile "org.springframework.integration:spring-integration-jdbc:$springIntegrationVersion"
+
+		optional "org.apache.geronimo.specs:geronimo-jms_1.1_spec:1.1"
+		optional "org.slf4j:slf4j-log4j12:$slf4jVersion"
+		optional "log4j:log4j:1.2.14"
+		optional "org.springframework.integration:spring-integration-jms:$springIntegrationVersion"
+		optional "org.springframework:spring-jms:$springVersion"
+	}
+}
+
+project('spring-batch-samples') {
+	description = 'Batch Batch Samples'
+
+	dependencies {
+
+		compile project(":spring-batch-core")
+		compile "org.aspectj:aspectjrt:$aspectjVersion"
+		compile "org.aspectj:aspectjweaver:$aspectjVersion"
+		compile "org.opensymphony.quartz:quartz:$quartzVersion"
+		compile "commons-io:commons-io:$commonsIoVersion"
+		compile "commons-dbcp:commons-dbcp:$commonsDdbcpVersion"
+		compile "com.thoughtworks.xstream:xstream:$xstreamVersion"
+		compile("org.codehaus.woodstox:woodstox-core-asl:$woodstoxVersion") {
+			exclude group: 'stax', module: 'stax-api'
+		}
+		compile("org.hibernate:hibernate-core:$hibernateVersion") {
+			exclude group: 'cglib', module: 'cglib'
+			exclude group: 'asm', module: 'asm'
+			exclude group: 'asm', module: 'asm-attrs'
+			exclude group: 'javax.transaction', module: 'jta'
+		}
+		compile "org.apache.geronimo.specs:geronimo-jta_1.1_spec:1.1"
+		compile "cglib:cglib-nodep:$cglibVersion"
+		compile "org.apache.ibatis:ibatis-sqlmap:$ibatisVersion"
+		compile "org.springframework:spring-aop:$springVersion"
+		compile("org.springframework:spring-oxm:$springVersion") {
+			exclude group: 'commons-lang', module: 'commons-lang'
+		}
+		compile "org.springframework:spring-core:$springVersion"
+		compile("org.springframework:spring-context-support:$springVersion") {
+			exclude group: 'quartz', module: 'quartz'
+		}
+
+		compile "org.springframework:spring-jdbc:$springVersion"
+		compile "org.springframework:spring-orm:$springVersion"
+		compile "org.springframework:spring-tx:$springVersion"
+		compile "org.springframework.data:spring-data-jpa:$springDataJpaVersion"
+		compile "javax.mail:mail:$javaMailVersion"
+
+		testCompile "xmlunit:xmlunit:$xmlunitVersion"
+		testCompile project(":spring-batch-test")
+		testCompile "junit:junit:$junitVersion"
+		testCompile "org.hsqldb:hsqldb:$hsqldbVersion"
+		testCompile "log4j:log4j:$log4jVersion"
+		testCompile "org.codehaus.groovy:groovy:$groovyVersion"
+		testCompile "org.springframework:spring-test:$springVersion"
+		testCompile "org.mockito:mockito-all:$mockitoVersion"
+
+		provided "mysql:mysql-connector-java:$mysqlVersion"
+		provided "net.sourceforge.jtds:jtds:$jtdsVersion"
+		provided "com.h2database:h2:$h2databaseVersion"
+		provided "javax.servlet:servlet-api:$servletApiVersion"
+
+		compile("org.hibernate:hibernate-entitymanager:$hibernateVersion") { dep ->
+			optional dep
+			exclude group: 'edu.oswego.cs.concurrent', module: 'edu.oswego.cs.dl.util.concurrent'
+			exclude group: 'org.hibernate', module: 'hibernate'
+		}
+		compile("org.hibernate:hibernate-annotations:$hibernateAnnotationsVersion") { dep ->
+			optional dep
+			exclude group: 'org.hibernate', module: 'hibernate'
+			exclude group: 'commons-logging', module: 'commons-logging'
+		}
+
+		optional "com.vmware.sqlfire:sqlfireclient:$sqlfireclientVersion"
+		optional "org.slf4j:slf4j-log4j12:$slf4jVersion"
+		optional "org.apache.derby:derby:$derbyVersion"
+		optional "postgresql:postgresql:$postgresqlVersion"
+		optional "org.springframework:spring-web:$springVersion"
+		optional "org.springframework.data:spring-data-commons:$springDataCommonsVersion"
+		optional "org.springframework.amqp:spring-amqp:$springAmqpVersion"
+		optional "org.springframework.amqp:spring-rabbit:$springAmqpVersion"
+
+	}
+
+	task generateSql {
+		group = "Build"
+		description = "Generates schema creation and drop scripts for supported databases."
+
+		configurations { vpp }
+		dependencies { vpp 'foundrylogic.vpp:vpp:2.2.1' }
+
+		def generatedResourcesDir = new File('target/generated-resources')
+
+		outputs.dir generatedResourcesDir
+
+		ant.typedef(resource: 'foundrylogic/vpp/typedef.properties',
+								classpath: configurations.vpp.asPath)
+		ant.taskdef(resource: 'foundrylogic/vpp/taskdef.properties',
+								classpath: configurations.vpp.asPath)
+
+		doLast {
+			['db2', 'derby', 'h2', 'hsqldb', 'mysql',
+			 'oracle10g', 'postgresql', 'sqlserver', 'sybase'].each { dbType ->
+				ant.vppcopy(todir: generatedResourcesDir, overwrite: 'true') {
+					config {
+						context {
+							property key: 'includes', value: 'src/main/sql'
+							property file: "src/main/sql/${dbType}.properties"
+						}
+						engine {
+							property key: 'velocimacro.library', value: "src/main/sql/${dbType}.vpp"
+						}
+					}
+					fileset dir: 'src/main/sql', includes: 'business-schema*.sql.vpp'
+					mapper type: 'glob', from: '*.sql.vpp', to: "*-${dbType}.sql"
+				}
+			}
+		}
+	}
+}
+
+apply plugin: 'docbook-reference'
+
+reference {
+	//sourceDir = file('src/reference/docbook')
+	sourceDir = file('src/site/docbook/reference')
+}
+
+apply plugin: 'sonar-runner'
+
+sonarRunner {
+	sonarProperties {
+		property "sonar.jacoco.reportPath", "${buildDir.name}/jacoco.exec"
+		property "sonar.links.homepage", linkHomepage
+		property "sonar.links.ci", linkCi
+		property "sonar.links.issue", linkIssue
+		property "sonar.links.scm", linkScmUrl
+		property "sonar.links.scm_dev", linkScmDevConnection
+		property "sonar.java.coveragePlugin", "jacoco"
+	}
+}
+
+task api(type: Javadoc) {
+	group = 'Documentation'
+	description = 'Generates aggregated Javadoc API documentation.'
+	title = "${rootProject.description} ${version} API"
+	options.memberLevel = org.gradle.external.javadoc.JavadocMemberLevel.PROTECTED
+	options.author = true
+	options.header = rootProject.description
+	options.overview = 'src/api/overview.html'
+	source subprojects.collect { project ->
+		project.sourceSets.main.allJava
+	}
+	destinationDir = new File(buildDir, "api")
+	classpath = files(subprojects.collect { project ->
+		project.sourceSets.main.compileClasspath
+	})
+}
+
+task schemaZip(type: Zip) {
+	group = 'Distribution'
+	classifier = 'schema'
+	description = "Builds -${classifier} archive containing all " +
+		"XSDs for deployment at static.springframework.org/schema."
+
+	subprojects.each { subproject ->
+		def Properties schemas = new Properties();
+		def shortName = subproject.name.replaceFirst("${rootProject.name}-", '')
+		if (subproject.name.endsWith("-core")) {
+			shortName = ''
+		}
+
+		subproject.sourceSets.main.resources.find {
+			it.path.endsWith('META-INF/spring.schemas')
+		}?.withInputStream { schemas.load(it) }
+
+		for (def key : schemas.keySet()) {
+			File xsdFile = subproject.sourceSets.main.resources.find {
+				it.path.endsWith(schemas.get(key))
+			}
+			assert xsdFile != null
+			into ("batch/${shortName}") {
+				from xsdFile.path
+			}
+		}
+	}
+}
+
+task docsZip(type: Zip) {
+		group = 'Distribution'
+		classifier = 'docs'
+		description = "Builds -${classifier} archive containing api and reference " +
+			"for deployment at static.springframework.org/spring-batch/reference."
+
+		from('src/dist') {
+			include 'changelog.txt'
+		}
+
+		from (api) {
+			into 'api'
+		}
+
+		from (reference) {
+			into 'reference'
+		}
+}
+
+task distZip(type: Zip, dependsOn: [docsZip, schemaZip]) {
+	group = 'Distribution'
+	classifier = 'dist'
+	description = "Builds -${classifier} archive, containing all jars and docs, " +
+		"suitable for community download page."
+
+	ext.baseDir = "${project.name}-${project.version}";
+
+	from('src/dist') {
+		include 'readme.txt'
+		include 'license.txt'
+		include 'notice.txt'
+		into "${baseDir}"
+		expand(copyright: new Date().format("yyyy"), version: project.version)
+	}
+
+	from(zipTree(docsZip.archivePath)) {
+		into "${baseDir}/docs"
+	}
+
+	from(zipTree(schemaZip.archivePath)) {
+		into "${baseDir}/schema"
+	}
+
+	subprojects.each { subproject ->
+		into ("${baseDir}/libs") {
+			from subproject.jar
+			from subproject.sourcesJar
+			from subproject.javadocJar
+		}
+	}
+}
+
+// Create an optional "with dependencies" distribution.
+// Not published by default; only for use when building from source.
+task depsZip(type: Zip, dependsOn: distZip) { zipTask ->
+	group = 'Distribution'
+	classifier = 'dist-with-deps'
+	description = "Builds -${classifier} archive, containing everything " +
+		"in the -${distZip.classifier} archive plus all dependencies."
+
+	from zipTree(distZip.archivePath)
+
+	gradle.taskGraph.whenReady { taskGraph ->
+		if (taskGraph.hasTask(":${zipTask.name}")) {
+			def projectNames = rootProject.subprojects*.name
+			def artifacts = new HashSet()
+			subprojects.each { subproject ->
+				subproject.configurations.runtime.resolvedConfiguration.resolvedArtifacts.each { artifact ->
+					def dependency = artifact.moduleVersion.id
+					if (!projectNames.contains(dependency.name)) {
+						artifacts << artifact.file
+					}
+				}
+			}
+
+			zipTask.from(artifacts) {
+				into "${distZip.baseDir}/deps"
+			}
+		}
+	}
+}
+
+artifacts {
+	archives distZip
+	archives docsZip
+	archives schemaZip
+}
+
+task dist(dependsOn: assemble) {
+	group = 'Distribution'
+	description = 'Builds -dist, -docs and -schema distribution archives.'
+}
+
+task wrapper(type: Wrapper) {
+	description = 'Generates gradlew[.bat] scripts'
+	gradleVersion = '1.11'
+}
