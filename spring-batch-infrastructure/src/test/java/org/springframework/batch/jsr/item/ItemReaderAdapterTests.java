@@ -5,6 +5,10 @@ import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
+
 import javax.batch.api.chunk.ItemReader;
 
 import org.junit.Before;
@@ -87,5 +91,80 @@ public class ItemReaderAdapterTests {
 		when(delegate.readItem()).thenReturn("item");
 
 		assertEquals("item", adapter.read());
+	}
+
+	@Test
+	@SuppressWarnings("serial")
+	public void testCheckpointChange() throws Exception {
+		ItemReaderAdapter adapter = new ItemReaderAdapter(new ItemReader() {
+
+			private CheckpointContainer container = null;
+			private List<String> items = new ArrayList<String>() {{
+				add("foo");
+				add("bar");
+				add("baz");
+			}};
+
+			@Override
+			public Object readItem() throws Exception {
+				int index = container.getCount();
+
+				if(index < items.size()) {
+					container.setCount(index + 1);
+					return items.get(index);
+				} else {
+					return null;
+				}
+			}
+
+			@Override
+			public void open(Serializable checkpoint) throws Exception {
+				container = new CheckpointContainer();
+			}
+
+			@Override
+			public void close() throws Exception {
+			}
+
+			@Override
+			public Serializable checkpointInfo() throws Exception {
+				return container;
+			}
+		});
+
+		ExecutionContext context = new ExecutionContext();
+
+		adapter.open(context);
+		adapter.read();
+		adapter.read();
+		adapter.update(context);
+		adapter.read();
+		adapter.close();
+
+		CheckpointContainer container = (CheckpointContainer) context.get("ItemReaderAdapterTests.1.reader.checkpoint");
+		assertEquals(2, container.getCount());
+
+	}
+
+	public static class CheckpointContainer implements Serializable{
+		private static final long serialVersionUID = 1L;
+		private int count;
+
+		public CheckpointContainer() {
+			count = 0;
+		}
+
+		public int getCount() {
+			return count;
+		}
+
+		public void setCount(int count) {
+			this.count = count;
+		}
+
+		@Override
+		public String toString() {
+			return "CheckpointContinaer has a count of " + count;
+		}
 	}
 }
