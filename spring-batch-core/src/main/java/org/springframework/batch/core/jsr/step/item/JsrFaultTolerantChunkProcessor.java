@@ -26,7 +26,6 @@ import org.springframework.batch.core.step.item.Chunk;
 import org.springframework.batch.core.step.item.ChunkMonitor;
 import org.springframework.batch.core.step.item.ForceRollbackForWriteSkipException;
 import org.springframework.batch.core.step.skip.LimitCheckingItemSkipPolicy;
-import org.springframework.batch.core.step.skip.NonSkippableProcessException;
 import org.springframework.batch.core.step.skip.SkipException;
 import org.springframework.batch.core.step.skip.SkipPolicy;
 import org.springframework.batch.core.step.skip.SkipPolicyFailedException;
@@ -225,6 +224,7 @@ public class JsrFaultTolerantChunkProcessor<I,O> extends JsrChunkProcessor<I, O>
 					return doTransform(item);
 				}
 				catch (Exception e) {
+					System.err.println("e has been thrown in the transform: " + e.getClass() + " and the skip count = " + contribution.getStepSkipCount() + " and should we skip it? " + skipPolicy.shouldSkip(e, contribution.getStepSkipCount()));
 					if (rollbackClassifier.classify(e)) {
 						// Default is to rollback unless the classifier
 						// allows us to continue
@@ -240,12 +240,7 @@ public class JsrFaultTolerantChunkProcessor<I,O> extends JsrChunkProcessor<I, O>
 						getListener().onSkipInProcess(item, e);
 					}
 					else {
-						// If it's not skippable that's an error in
-						// configuration - it doesn't make sense to not roll
-						// back if we are also not allowed to skip
-						throw new NonSkippableProcessException(
-								"Non-skippable exception in processor.  Make sure any exceptions that do not cause a rollback are skippable.",
-								e);
+						throw e;
 					}
 				}
 				return null;
@@ -258,6 +253,7 @@ public class JsrFaultTolerantChunkProcessor<I,O> extends JsrChunkProcessor<I, O>
 			@Override
 			public O recover(RetryContext context) throws Exception {
 				Throwable e = context.getLastThrowable();
+				System.err.println("e = " + e.getClass() + " skipCount = " + contribution.getStepSkipCount());
 				if (shouldSkip(skipPolicy, e, contribution.getStepSkipCount())) {
 					contribution.incrementProcessSkipCount();
 					logger.debug("Skipping after failed process", e);
