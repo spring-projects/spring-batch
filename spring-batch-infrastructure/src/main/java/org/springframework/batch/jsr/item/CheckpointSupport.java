@@ -15,10 +15,6 @@
  */
 package org.springframework.batch.jsr.item;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
 import java.io.Serializable;
 
 import javax.batch.api.chunk.ItemReader;
@@ -30,6 +26,7 @@ import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.item.ItemStreamException;
 import org.springframework.batch.item.ItemStreamSupport;
 import org.springframework.util.Assert;
+import org.springframework.util.SerializationUtils;
 
 /**
  * Provides support for JSR-352 checkpointing.  Checkpoint objects are copied prior
@@ -122,14 +119,7 @@ public abstract class CheckpointSupport extends ItemStreamSupport{
 		Object obj = orig;
 
 		try {
-			ByteArrayOutputStream bos = new ByteArrayOutputStream();
-			ObjectOutputStream out = new ObjectOutputStream(bos);
-			out.writeObject(orig);
-			out.flush();
-			out.close();
-
-			ObjectInputStream in = new ObjectInputStream(new ByteArrayInputStream(bos.toByteArray()));
-			obj = in.readObject();
+			obj = SerializationUtils.deserialize(SerializationUtils.serialize(orig));
 		} catch (Exception e) {
 			logger.warn("Unable to copy checkpoint object.  Updating the instance passed may cause side effects");
 		}

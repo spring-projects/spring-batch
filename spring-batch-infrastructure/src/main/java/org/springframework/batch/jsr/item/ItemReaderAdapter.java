@@ -19,9 +19,6 @@ import java.io.Serializable;
 
 import javax.batch.api.chunk.ItemReader;
 
-import org.springframework.batch.item.NonTransientResourceException;
-import org.springframework.batch.item.ParseException;
-import org.springframework.batch.item.UnexpectedInputException;
 import org.springframework.util.Assert;
 import org.springframework.util.ClassUtils;
 
@@ -53,8 +50,7 @@ public class ItemReaderAdapter extends CheckpointSupport implements org.springfr
 	 * @see org.springframework.batch.item.ItemReader#read()
 	 */
 	@Override
-	public Object read() throws Exception, UnexpectedInputException, ParseException,
-	NonTransientResourceException {
+	public Object read() throws Exception {
 		return delegate.readItem();
 	}
 
