@@ -99,19 +99,19 @@ public abstract class AbstractListenerFactoryBean implements FactoryBean, Initia
 					metaData.getParamTypes());
 			if (invoker != null) {
 				invokers.add(invoker);
-			}
-
-			invoker = getMethodInvokerByName(entry.getValue(), delegate, metaData.getParamTypes());
-			if (invoker != null) {
-				invokers.add(invoker);
-				synthetic = true;
-			}
-
-			if(metaData.getAnnotation() != null) {
-				invoker = getMethodInvokerByAnnotation(metaData.getAnnotation(), delegate, metaData.getParamTypes());
+			} else {
+				invoker = getMethodInvokerByName(entry.getValue(), delegate, metaData.getParamTypes());
 				if (invoker != null) {
 					invokers.add(invoker);
 					synthetic = true;
+				} else {
+					if(metaData.getAnnotation() != null) {
+						invoker = getMethodInvokerByAnnotation(metaData.getAnnotation(), delegate, metaData.getParamTypes());
+						if (invoker != null) {
+							invokers.add(invoker);
+							synthetic = true;
+						}
+					}
 				}
 			}
 
