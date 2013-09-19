@@ -18,6 +18,7 @@ package org.springframework.batch.core.jsr.configuration.xml;
 import java.util.Collection;
 
 import org.springframework.batch.core.job.flow.support.state.StepState;
+import org.springframework.batch.core.jsr.configuration.support.BatchArtifact;
 import org.springframework.batch.core.listener.StepListenerFactoryBean;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.parsing.BeanComponentDefinition;
@@ -55,8 +56,6 @@ public class StepParser extends AbstractSingleBeanDefinitionParser {
 		String stepName = element.getAttribute(SPLIT_ID_ATTRIBUTE);
 		builder.addPropertyValue("name", stepName);
 
-		PropertyParser.pushPath(stepName);
-
 		parserContext.registerBeanComponent(new BeanComponentDefinition(bd, stepName));
 		stateBuilder.addConstructorArgReference(stepName);
 
@@ -71,8 +70,8 @@ public class StepParser extends AbstractSingleBeanDefinitionParser {
 					allowStartIfComplete);
 		}
 
-		new ListnerParser(StepListenerFactoryBean.class, "listeners").parseListeners(element, parserContext, bd);
-		new PropertyParser(parserContext).parseProperties(element);
+		new ListnerParser(StepListenerFactoryBean.class, "listeners").parseListeners(element, parserContext, bd, stepName);
+		new PropertyParser(stepName, parserContext, BatchArtifact.BatchArtifactType.STEP).parseProperties(element);
 
 		// look at all nested elements
 		NodeList children = element.getChildNodes();
@@ -85,16 +84,14 @@ public class StepParser extends AbstractSingleBeanDefinitionParser {
 				String name = nestedElement.getLocalName();
 
 				if(name.equalsIgnoreCase(BATCHLET_ELEMENT)) {
-					new BatchletParser().parseBatchlet(nestedElement, bd, parserContext);
+					new BatchletParser().parseBatchlet(nestedElement, bd, parserContext, stepName);
 				} else if(name.equals(CHUNK_ELEMENT)) {
-					new ChunkParser().parse(nestedElement, bd, parserContext);
+					new ChunkParser().parse(nestedElement, bd, parserContext, stepName);
 				}
 			}
 		}
 
 		Collection<BeanDefinition> nextElements = FlowParser.getNextElements(parserContext, stepName, stateBuilder.getBeanDefinition(), element);
-
-		PropertyParser.popPath();
 
 		return nextElements;
 	}

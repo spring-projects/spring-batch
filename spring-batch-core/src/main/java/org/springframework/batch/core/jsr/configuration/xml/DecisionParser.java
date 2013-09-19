@@ -19,6 +19,7 @@ import java.util.Collection;
 
 import org.springframework.batch.core.job.flow.JobExecutionDecider;
 import org.springframework.batch.core.job.flow.support.state.StepState;
+import org.springframework.batch.core.jsr.configuration.support.BatchArtifact;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.config.RuntimeBeanReference;
 import org.springframework.beans.factory.parsing.BeanComponentDefinition;
@@ -50,8 +51,6 @@ public class DecisionParser {
 
 		String idAttribute = element.getAttribute(ID_ATTRIBUTE);
 
-		PropertyParser.pushPath(idAttribute);
-
 		parserContext.registerBeanComponent(new BeanComponentDefinition(factoryDefinition, idAttribute));
 		stateBuilder.addConstructorArgReference(idAttribute);
 
@@ -63,12 +62,8 @@ public class DecisionParser {
 			factoryDefinition.setAttribute("jobParserJobFactoryBeanRef", jobFactoryRef);
 		}
 
-		new PropertyParser(refAttribute, parserContext).parseProperties(element);
+		new PropertyParser(refAttribute, parserContext, BatchArtifact.BatchArtifactType.STEP_ARTIFACT, idAttribute).parseProperties(element);
 
-		Collection<BeanDefinition> nextElements = FlowParser.getNextElements(parserContext, stateBuilder.getBeanDefinition(), element);
-
-		PropertyParser.popPath();
-
-		return nextElements;
+		return FlowParser.getNextElements(parserContext, stateBuilder.getBeanDefinition(), element);
 	}
 }

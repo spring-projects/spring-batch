@@ -47,7 +47,7 @@ import org.springframework.batch.core.explore.JobExplorer;
 import org.springframework.batch.core.jsr.JobContext;
 import org.springframework.batch.core.jsr.JsrJobParametersConverter;
 import org.springframework.batch.core.jsr.configuration.support.BatchPropertyContext;
-import org.springframework.batch.core.jsr.configuration.support.ThreadLocalClassloaderBeanPostProcessor;
+import org.springframework.batch.core.jsr.configuration.support.JobParameterResolvingBeanFactoryPostProcessor;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.access.BeanFactoryLocator;
@@ -452,7 +452,7 @@ public class JsrJobOperator implements JobOperator, InitializingBean {
 			batchContext.load(jobXml);
 		}
 
-		batchContext.addBeanFactoryPostProcessor(new ThreadLocalClassloaderBeanPostProcessor(params));
+		batchContext.addBeanFactoryPostProcessor(new JobParameterResolvingBeanFactoryPostProcessor(params));
 		batchContext.setParent(baseContext);
 		batchContext.refresh();
 
@@ -476,7 +476,7 @@ public class JsrJobOperator implements JobOperator, InitializingBean {
 			ConfigurableListableBeanFactory factory = batchContext.getBeanFactory();
 
 			BatchPropertyContext batchPropertyContext = factory.getBean(BATCH_PROPERTY_CONTEXT_BEAN_NAME, BatchPropertyContext.class);
-			Properties properties = batchPropertyContext.getBatchProperties("job-" + job.getName());
+			Properties properties = batchPropertyContext.getJobProperties();
 
 			factory.registerSingleton(job.getName() + "_" + jobExecution.getId() + "_jobContext", new JobContext(jobExecution, properties));
 
@@ -553,7 +553,7 @@ public class JsrJobOperator implements JobOperator, InitializingBean {
 			batchContext.load(jobXml);
 		}
 
-		batchContext.addBeanFactoryPostProcessor(new ThreadLocalClassloaderBeanPostProcessor(params));
+		batchContext.addBeanFactoryPostProcessor(new JobParameterResolvingBeanFactoryPostProcessor(params));
 		batchContext.setParent(baseContext);
 		batchContext.refresh();
 
@@ -575,7 +575,7 @@ public class JsrJobOperator implements JobOperator, InitializingBean {
 			ConfigurableListableBeanFactory factory = batchContext.getBeanFactory();
 
 			BatchPropertyContext batchPropertyContext = factory.getBean(BATCH_PROPERTY_CONTEXT_BEAN_NAME, BatchPropertyContext.class);
-			Properties properties = batchPropertyContext.getBatchProperties("job-" + job.getName());
+			Properties properties = batchPropertyContext.getJobProperties();
 
 			factory.registerSingleton(job.getName() + "_" + jobExecution.getId() + "_jobContext", new JobContext(jobExecution, properties));
 

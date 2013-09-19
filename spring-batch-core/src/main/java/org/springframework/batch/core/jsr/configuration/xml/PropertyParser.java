@@ -15,73 +15,54 @@
  */
 package org.springframework.batch.core.jsr.configuration.xml;
 
-import java.util.Deque;
 import java.util.HashMap;
-import java.util.Iterator;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
+import org.springframework.batch.core.jsr.configuration.support.BatchArtifact;
 import org.springframework.batch.core.jsr.configuration.support.BatchPropertyContext;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.support.AbstractBeanDefinition;
 import org.springframework.beans.factory.support.BeanDefinitionBuilder;
 import org.springframework.beans.factory.support.ManagedList;
 import org.springframework.beans.factory.xml.ParserContext;
+import org.springframework.util.StringUtils;
 import org.springframework.util.xml.DomUtils;
 import org.w3c.dom.Element;
 
 /**
  * <p>
- * Parser for the &lt;properties /&gt; element defined by JSR-352. Parsed job level properties are
- * also registered as a Map similar to systemProperties. Job level properties can be obtained for
- * example through SPeL by referencing #{jobProperties['key']}.
+ * Parser for the &lt;properties /&gt; element defined by JSR-352.
  * </p>
  *
  * @author Chris Schaefer
  * @since 3.0
  */
 public class PropertyParser {
-	static final String JOB_ARTIFACT_PROPERTY_PREFIX = "job-";
 	private static final String PROPERTY_ELEMENT = "property";
 	private static final String PROPERTIES_ELEMENT = "properties";
 	private static final String PROPERTY_NAME_ATTRIBUTE = "name";
 	private static final String PROPERTY_VALUE_ATTRIBUTE = "value";
 	private static final String JOB_PROPERTIES_BEAN_NAME = "jobProperties";
-	private static final String BATCH_CONTEXT_ENTRIES_PROPERTY_NAME = "batchContextEntries";
 	private static final String BATCH_PROPERTY_CONTEXT_BEAN_CLASS_NAME = "org.springframework.batch.core.jsr.configuration.support.BatchPropertyContext";
 	private static final String BATCH_PROPERTY_CONTEXT_BEAN_NAME = "batchPropertyContext";
-	private static final Deque<String> PATH = new LinkedList<String>();
 
 	private String beanName;
+	private String stepName;
 	private ParserContext parserContext;
+	private BatchArtifact.BatchArtifactType batchArtifactType;
 
-	public PropertyParser(String beanName, ParserContext parserContext) {
+	public PropertyParser(String beanName, ParserContext parserContext, BatchArtifact.BatchArtifactType batchArtifactType) {
 		this.beanName = beanName;
 		this.parserContext = parserContext;
+		this.batchArtifactType = batchArtifactType;
 
 		registerBatchPropertyContext();
-		registerJobProperties();
 	}
 
-	public PropertyParser(ParserContext parserContext) {
-		this("", parserContext);
-	}
-
-	public static void pushPath(String pathElement) {
-		PATH.push(pathElement);
-	}
-
-	public static void popPath() {
-		PATH.pop();
-	}
-
-	public static boolean hasPath() {
-		return !PATH.isEmpty();
-	}
-
-	public static void clearPath() {
-		PATH.clear();
+	public PropertyParser(String beanName, ParserContext parserContext, BatchArtifact.BatchArtifactType batchArtifactType, String stepName) {
+		this(beanName, parserContext, batchArtifactType);
+		this.stepName = stepName;
 	}
 
 	/**
@@ -118,13 +99,17 @@ public class PropertyParser {
 
 		BatchPropertyContext batchPropertyContext = new BatchPropertyContext();
 		BatchPropertyContext.BatchPropertyContextEntry batchPropertyContextEntry =
-			batchPropertyContext.new BatchPropertyContextEntry(getContextEntryKey(), properties);
+			batchPropertyContext.new BatchPropertyContextEntry(beanName, properties, batchArtifactType);
+
+		if (StringUtils.hasText(stepName)) {
+			batchPropertyContextEntry.setStepName(stepName);
+		}
 
 		ManagedList<BatchPropertyContext.BatchPropertyContextEntry> managedList = new ManagedList<BatchPropertyContext.BatchPropertyContextEntry>();
 		managedList.setMergeEnabled(true);
 		managedList.add(batchPropertyContextEntry);
 
-		beanDefinition.getPropertyValues().addPropertyValue(BATCH_CONTEXT_ENTRIES_PROPERTY_NAME, managedList);
+		beanDefinition.getPropertyValues().addPropertyValue(batchPropertyContext.getPropertyName(batchArtifactType), managedList);
 	}
 
 	private void registerBatchPropertyContext() {
@@ -139,20 +124,25 @@ public class PropertyParser {
 		}
 	}
 
-	private void registerJobProperties() {
-		if (!parserContext.getRegistry().containsBeanDefinition(JOB_PROPERTIES_BEAN_NAME)) {
-			AbstractBeanDefinition jobPropertiesBeanDefinition = BeanDefinitionBuilder.genericBeanDefinition(HashMap.class).getBeanDefinition();
-			jobPropertiesBeanDefinition.setRole(BeanDefinition.ROLE_INFRASTRUCTURE);
+	private void setJobProperties(Properties properties) {
+		if (batchArtifactType.equals(BatchArtifact.BatchArtifactType.JOB)) {
+			BeanDefinition beanDefinition = parserContext.getRegistry().getBeanDefinition(BATCH_PROPERTY_CONTEXT_BEAN_NAME);
 
-			parserContext.getRegistry().registerBeanDefinition(JOB_PROPERTIES_BEAN_NAME, jobPropertiesBeanDefinition);
+			BatchPropertyContext batchPropertyContext = new BatchPropertyContext();
+			BatchPropertyContext.BatchPropertyContextEntry batchPropertyContextEntry =
+					batchPropertyContext.new BatchPropertyContextEntry(beanName, properties, batchArtifactType);
+
+			beanDefinition.getPropertyValues().addPropertyValue(batchPropertyContext.getPropertyName(batchArtifactType), batchPropertyContextEntry);
+
+			registerJobProperties(properties);
 		}
 	}
 
-	private void setJobProperties(Properties properties) {
-		if (beanName.startsWith(JOB_ARTIFACT_PROPERTY_PREFIX)) {
+	private void registerJobProperties(Properties properties) {
+		if (batchArtifactType.equals(BatchArtifact.BatchArtifactType.JOB)) {
 			Map<String, String> jobProperties = new HashMap<String, String>();
 
-			if (properties != null) {
+			if (properties != null && ! properties.isEmpty()) {
 				for (String param : properties.stringPropertyNames()) {
 					jobProperties.put(param, properties.getProperty(param));
 				}
@@ -161,24 +151,5 @@ public class PropertyParser {
 			BeanDefinition jobPropertiesBeanDefinition = parserContext.getRegistry().getBeanDefinition(JOB_PROPERTIES_BEAN_NAME);
 			jobPropertiesBeanDefinition.getConstructorArgumentValues().addGenericArgumentValue(jobProperties);
 		}
-	}
-
-	private String getPath() {
-		StringBuilder pathBuilder = new StringBuilder();
-		Iterator pathIterator = PATH.descendingIterator();
-
-		if (pathIterator.hasNext()) {
-			pathBuilder.append(pathIterator.next());
-
-			while (pathIterator.hasNext()) {
-				pathBuilder.append(".").append(pathIterator.next());
-			}
-		}
-
-		return pathBuilder.toString();
-	}
-
-	private String getContextEntryKey() {
-		return "".equals(beanName) ? getPath() : getPath() + "." + beanName;
 	}
 }

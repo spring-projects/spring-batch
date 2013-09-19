@@ -15,6 +15,7 @@
  */
 package org.springframework.batch.core.jsr.configuration.xml;
 
+import org.springframework.batch.core.jsr.configuration.support.BatchArtifact;
 import org.springframework.batch.core.step.tasklet.Tasklet;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.config.RuntimeBeanReference;
@@ -36,7 +37,7 @@ import org.w3c.dom.Element;
 public class BatchletParser extends AbstractSingleBeanDefinitionParser {
 	private static final String REF = "ref";
 
-	public void parseBatchlet(Element batchletElement, AbstractBeanDefinition bd, ParserContext parserContext) {
+	public void parseBatchlet(Element batchletElement, AbstractBeanDefinition bd, ParserContext parserContext, String stepName) {
 		bd.setBeanClass(StepFactoryBean.class);
 		bd.setAttribute("isNamespaceStep", false);
 
@@ -49,6 +50,6 @@ public class BatchletParser extends AbstractSingleBeanDefinitionParser {
 		bd.setRole(BeanDefinition.ROLE_SUPPORT);
 		bd.setSource(parserContext.extractSource(batchletElement));
 
-		new PropertyParser(taskletRef, parserContext).parseProperties(batchletElement);
+		new PropertyParser(taskletRef, parserContext, BatchArtifact.BatchArtifactType.STEP_ARTIFACT, stepName).parseProperties(batchletElement);
 	}
 }

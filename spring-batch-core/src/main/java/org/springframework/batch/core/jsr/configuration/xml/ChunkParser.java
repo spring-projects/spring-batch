@@ -18,6 +18,7 @@ package org.springframework.batch.core.jsr.configuration.xml;
 import java.util.List;
 
 import org.springframework.batch.core.configuration.xml.ExceptionElementParser;
+import org.springframework.batch.core.jsr.configuration.support.BatchArtifact;
 import org.springframework.batch.core.step.item.ChunkOrientedTasklet;
 import org.springframework.batch.item.ItemProcessor;
 import org.springframework.batch.item.ItemReader;
@@ -64,7 +65,7 @@ public class ChunkParser {
 	private static final String ITEM_CHECKPOINT_POLICY = "item";
 	private static final String CHECKPOINT_POLICY_ATTRIBUTE = "checkpoint-policy";
 
-	public void parse(Element element, AbstractBeanDefinition bd, ParserContext parserContext) {
+	public void parse(Element element, AbstractBeanDefinition bd, ParserContext parserContext, String stepName) {
 		MutablePropertyValues propertyValues = bd.getPropertyValues();
 		bd.setBeanClass(StepFactoryBean.class);
 		bd.setAttribute("isNamespaceStep", false);
@@ -83,7 +84,7 @@ public class ChunkParser {
 
 				parseSimpleAttribute(element, propertyValues, TIME_LIMIT_ATTRIBUTE, "timeout");
 			} else if(checkpointPolicy.equals(CUSTOM_CHECKPOINT_POLICY)) {
-				parseCustomCheckpointAlgorithm(element, parserContext, propertyValues);
+				parseCustomCheckpointAlgorithm(element, parserContext, propertyValues, stepName);
 			}
 		} else {
 			String itemCount = element.getAttribute(ITEM_COUNT_ATTRIBUTE);
@@ -103,7 +104,7 @@ public class ChunkParser {
 		for (int i = 0; i < children.getLength(); i++) {
 			Node nd = children.item(i);
 
-			parseChildElement(element, parserContext, propertyValues, nd);
+			parseChildElement(element, parserContext, propertyValues, nd, stepName);
 		}
 	}
 
@@ -117,7 +118,7 @@ public class ChunkParser {
 
 	@SuppressWarnings({"unchecked", "rawtypes"})
 	private void parseChildElement(Element element, ParserContext parserContext,
-			MutablePropertyValues propertyValues, Node nd) {
+			MutablePropertyValues propertyValues, Node nd, String stepName) {
 		if (nd instanceof Element) {
 			Element nestedElement = (Element) nd;
 			String name = nestedElement.getLocalName();
@@ -128,19 +129,19 @@ public class ChunkParser {
 					propertyValues.addPropertyValue("itemReader", new RuntimeBeanReference(artifactName));
 				}
 
-				new PropertyParser(artifactName, parserContext).parseProperties(nestedElement);
+				new PropertyParser(artifactName, parserContext, BatchArtifact.BatchArtifactType.STEP_ARTIFACT, stepName).parseProperties(nestedElement);
 			} else if(name.equals(PROCESSOR_ELEMENT)) {
 				if (StringUtils.hasText(artifactName)) {
 					propertyValues.addPropertyValue("itemProcessor", new RuntimeBeanReference(artifactName));
 				}
 
-				new PropertyParser(artifactName, parserContext).parseProperties(nestedElement);
+				new PropertyParser(artifactName, parserContext, BatchArtifact.BatchArtifactType.STEP_ARTIFACT, stepName).parseProperties(nestedElement);
 			} else if(name.equals(WRITER_ELEMENT)) {
 				if (StringUtils.hasText(artifactName)) {
 					propertyValues.addPropertyValue("itemWriter", new RuntimeBeanReference(artifactName));
 				}
 
-				new PropertyParser(artifactName, parserContext).parseProperties(nestedElement);
+				new PropertyParser(artifactName, parserContext, BatchArtifact.BatchArtifactType.STEP_ARTIFACT, stepName).parseProperties(nestedElement);
 			} else if(name.equals(SKIPPABLE_EXCEPTION_CLASSES_ELEMENT)) {
 				ManagedMap exceptionClasses = new ExceptionElementParser().parse(element, parserContext, SKIPPABLE_EXCEPTION_CLASSES_ELEMENT);
 				if(exceptionClasses != null) {
@@ -165,7 +166,7 @@ public class ChunkParser {
 		}
 	}
 
-	private void parseCustomCheckpointAlgorithm(Element element, ParserContext parserContext, MutablePropertyValues propertyValues) {
+	private void parseCustomCheckpointAlgorithm(Element element, ParserContext parserContext, MutablePropertyValues propertyValues, String stepName) {
 		List<Element> elements = DomUtils.getChildElementsByTagName(element, CHECKPOINT_ALGORITHM_ELEMENT);
 
 		if(elements.size() == 1) {
@@ -176,7 +177,7 @@ public class ChunkParser {
 				propertyValues.addPropertyValue("chunkCompletionPolicy", new RuntimeBeanReference(name));
 			}
 
-			new PropertyParser(name, parserContext).parseProperties(checkpointAlgorithmElement);
+			new PropertyParser(name, parserContext, BatchArtifact.BatchArtifactType.STEP_ARTIFACT, stepName).parseProperties(checkpointAlgorithmElement);
 		} else if(elements.size() > 1){
 			parserContext.getReaderContext().error(
 					"The <checkpoint-algorithm/> element may not appear more than once in a single <"

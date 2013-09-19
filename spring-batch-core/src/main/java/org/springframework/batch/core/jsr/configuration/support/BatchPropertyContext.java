@@ -15,16 +15,17 @@
  */
 package org.springframework.batch.core.jsr.configuration.support;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Properties;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.regex.Pattern;
+import org.springframework.util.Assert;
 
 /**
  * <p>
- * Simple context object to hold parsed JSR-352 batch properties, mapping properties
- * to beans / "batch artifacts". Used internally when parsing property tags from a batch
- * configuration file and to obtain corresponding values when injecting into batch artifacts.
+ * Context object to hold parsed JSR-352 batch properties, mapping properties to beans /
+ * "batch artifacts". Used internally when parsing property tags from a batch configuration
+ * file and to obtain corresponding values when injecting into batch artifacts.
  * </p>
  *
  * @author Chris Schaefer
@@ -32,139 +33,211 @@ import java.util.regex.Pattern;
  * @since 3.0
  */
 public class BatchPropertyContext {
-	private static final String JOB_ARTIFACT_PROPERTY_PREFIX = "job-";
-	private static final Pattern JOB_PATH_DELIMITER_PATTERN = Pattern.compile("\\.");
-
-	private ConcurrentHashMap<String, Properties> batchProperties = new ConcurrentHashMap<String, Properties>();
+	private Properties jobProperties = new Properties();
+	private Map<String, Properties> stepProperties = new HashMap<String, Properties>();
+	private Map<String, Properties> artifactProperties = new HashMap<String, Properties>();
+	private Map<String, Map<String, Properties>> stepArtifactProperties = new HashMap<String, Map<String, Properties>>();
 
 	/**
 	 * <p>
-	 * Adds each of the provided {@link BatchPropertyContext} objects to the existing property
-	 * context.
+	 * Obtains the Job level properties.
+	 * </p>
+	 *
+	 * @return the Job level properties
+	 */
+	public Properties getJobProperties() {
+		return jobProperties;
+	}
+
+	/**
+	 * <p>
+	 * Obtains the Step level properties for the provided Step name.
+	 * </p>
+	 *
+	 * @param stepName the Step name to obtain properties for
+	 * @return the {@link Properties} for the Step
+	 */
+	public Properties getStepProperties(String stepName) {
+		Properties properties = stepProperties.get(stepName);
+
+		return properties != null ? properties : new Properties();
+	}
+
+	/**
+	 * <p>
+	 * Obtains the batch {@link Properties} for the provided artifact name. The returned {@link Properties}
+	 * will also contain any job level properties that have been set. Job level properties will not override
+	 * existing lower level artifact properties.
+	 * </p>
+	 *
+	 * @param artifactName the batch artifact to obtain properties for
+	 * @return the {@link Properties} for the provided batch artifact
+	 */
+	public Properties getArtifactProperties(String artifactName) {
+		Properties properties = new Properties();
+		properties.putAll(getJobProperties());
+
+		if (artifactProperties.containsKey(artifactName)) {
+			properties.putAll(artifactProperties.get(artifactName));
+		}
+
+		return properties;
+	}
+
+	/**
+	 * <p>
+	 * Obtains the batch {@link Properties} for the provided Step and artifact name.
+	 * </p>
+	 *
+	 * @param stepName the Step name the artifact is associated with
+	 * @param artifactName the artifact name to obtain {@link Properties} for
+	 * @return the {@link Properties} for the provided Step artifact
+	 */
+	public Properties getStepArtifactProperties(String stepName, String artifactName) {
+		Properties properties = new Properties();
+		properties.putAll(getStepProperties(stepName));
+
+		Map<String, Properties> artifactProperties = stepArtifactProperties.get(stepName);
+
+		if (artifactProperties != null && artifactProperties.containsKey(artifactName)) {
+			properties.putAll(artifactProperties.get(artifactName));
+		}
+
+		return properties;
+	}
+
+	/**
+	 * <p>
+	 * Adds Job level properties to the context.
 	 * </p>
 	 *
 	 * @param batchPropertyContextEntries the {@link BatchPropertyContextEntry} objects to add
 	 */
-	public void setBatchContextEntries(List<BatchPropertyContextEntry> batchPropertyContextEntries) {
-		for (BatchPropertyContextEntry batchPropertyContextEntry : batchPropertyContextEntries) {
-			setBatchContextEntry(batchPropertyContextEntry);
-		}
-	}
+	public void setJobPropertiesContextEntry(List<BatchPropertyContextEntry> batchPropertyContextEntries) {
+		for(BatchPropertyContextEntry batchPropertyContextEntry : batchPropertyContextEntries) {
+			Properties jobProperties = batchPropertyContextEntry.getProperties();
 
-	private void setBatchContextEntry(BatchPropertyContextEntry batchPropertyContextEntry) {
-		String beanName = batchPropertyContextEntry.getBeanName();
-		Properties properties = batchPropertyContextEntry.getProperties();
-
-		if (batchProperties.containsKey(beanName)) {
-			Properties existingProperties = batchProperties.get(beanName);
-			existingProperties.putAll(properties);
-
-			batchProperties.put(beanName, existingProperties);
-		} else {
-			batchProperties.put(beanName, properties);
-		}
-	}
-
-	/**
-	 * <p>
-	 * Obtains all properties for the specific batch artifact / bean name without any job level
-	 * properties.
-	 * </p>
-	 *
-	 * @param beanName the batch artifact / bean name to obtain {@link Properties} for
-	 * @return the step level {@link Properties}
-	 */
-	public Properties getStepLevelProperties(String beanName) {
-		Properties properties = new Properties();
-
-		if (batchProperties.containsKey(beanName)) {
-			properties.putAll(batchProperties.get(beanName));
-		}
-
-		return properties;
-	}
-
-	/**
-	 * <p>
-	 * Obtains the batch {@link Properties} for the provided bean name / batch artifact. The returned
-	 * {@link Properties} will also contain any job level properties that have been set. Job level
-	 * properties will not override existing lower level artifact properties.
-	 * </p>
-	 *
-	 * @param beanName the bean name representing the batch artifact to obtain properties for
-	 * @return the {@link Properties} for the provided batch artifact
-	 */
-	public Properties getBatchProperties(String beanName) {
-		Properties properties = new Properties();
-
-		if (batchProperties.containsKey(beanName)) {
-			properties.putAll(batchProperties.get(beanName));
-		}
-
-		Properties jobLevelProperties = getJobProperties();
-
-		for (String jobLevelProperty : jobLevelProperties.stringPropertyNames()) {
-			if (!properties.containsKey(jobLevelProperty)) {
-				properties.put(jobLevelProperty, jobLevelProperties.getProperty(jobLevelProperty));
+			if (jobProperties != null && !jobProperties.isEmpty()) {
+				this.jobProperties.putAll(jobProperties);
 			}
 		}
-
-		return properties;
 	}
 
 	/**
 	 * <p>
-	 * Obtains all {@link Properties} that reside at the Job level configuration.
+	 * Adds Step level properties to the context.
 	 * </p>
 	 *
-	 * @return the job level {@link Properties}
+	 * @param batchPropertyContextEntries the {@link BatchPropertyContextEntry} objects to add
 	 */
-	public Properties getJobProperties() {
-		Properties jobProperties = new Properties();
+	public void setStepPropertiesContextEntry(List<BatchPropertyContextEntry> batchPropertyContextEntries) {
+		for (BatchPropertyContextEntry batchPropertyContextEntry : batchPropertyContextEntries) {
+			Assert.hasText(batchPropertyContextEntry.getArtifactName(), "Step name must be defined as the artifact name.");
 
-		for (String jobLevelProperty : batchProperties.keySet()) {
-			if(isJobLevelComponentPath(jobLevelProperty)) {
-				if (batchProperties.containsKey(jobLevelProperty)) {
-					jobProperties.putAll(batchProperties.get(jobLevelProperty));
-					break;
+			String stepName = batchPropertyContextEntry.getArtifactName();
+			Properties stepProperties = batchPropertyContextEntry.getProperties();
+
+			if (stepProperties != null && ! stepProperties.isEmpty()) {
+				if (this.stepProperties.containsKey(stepName)) {
+					Properties existingStepProperties = this.stepProperties.get(stepName);
+					existingStepProperties.putAll(stepProperties);
+
+					this.stepProperties.put(stepName, existingStepProperties);
+				} else {
+					this.stepProperties.put(stepName, stepProperties);
 				}
 			}
 		}
-
-		return jobProperties;
-	}
-
-	// for now we assume properties are using a path format, currently: jobName.componentName.artifactName
-	// componentName can be the step name, job name prefixed by job- etc
-	protected boolean isJobLevelComponentPath(String jobLevelProperty) {
-		if(jobLevelProperty == null || "".equals(jobLevelProperty)) {
-			return false;
-		}
-
-		String[] path = JOB_PATH_DELIMITER_PATTERN.split(jobLevelProperty);
-
-		if (path.length >= 2) {
-			String componentPath = path[1];
-
-			if (componentPath != null && componentPath.startsWith(JOB_ARTIFACT_PROPERTY_PREFIX)) {
-				return true;
-			}
-		}
-
-		return false;
 	}
 
 	/**
 	 * <p>
-	 * Simple object to encapsulate batch properties of a given bean / batch artifact.
+	 * Adds non-Step scoped artifact properties to the context.
+	 * </p>
+	 *
+	 * @param batchPropertyContextEntries the {@link BatchPropertyContextEntry} objects to add
+	 */
+	public void setArtifactPropertiesContextEntry(List<BatchPropertyContextEntry> batchPropertyContextEntries) {
+		for (BatchPropertyContextEntry batchPropertyContextEntry : batchPropertyContextEntries) {
+			Assert.hasText(batchPropertyContextEntry.getArtifactName(), "Artifact name must be defined");
+
+			Properties properties = batchPropertyContextEntry.getProperties();
+			String artifactName = batchPropertyContextEntry.getArtifactName();
+
+			if (properties != null && !properties.isEmpty()) {
+				artifactProperties.put(artifactName, properties);
+			}
+		}
+	}
+
+	/**
+	 * <p>
+	 * Adds Step scoped artifact properties to the context.
+	 * </p>
+	 *
+	 * @param batchPropertyContextEntries the {@link BatchPropertyContextEntry} objects to add
+	 */
+	public void setStepArtifactPropertiesContextEntry(List<BatchPropertyContextEntry> batchPropertyContextEntries) {
+		for (BatchPropertyContextEntry batchPropertyContextEntry : batchPropertyContextEntries) {
+			Assert.hasText(batchPropertyContextEntry.getStepName(), "Step name must be defined");
+			Assert.hasText(batchPropertyContextEntry.getArtifactName(), "Artifact name must be defined");
+
+			String stepName = batchPropertyContextEntry.getStepName();
+			final String artifactName = batchPropertyContextEntry.getArtifactName();
+
+			final Properties properties = batchPropertyContextEntry.getProperties();
+
+			if (!properties.isEmpty()) {
+				Map<String, Properties> artifactProperties = stepArtifactProperties.get(stepName);
+
+				if (artifactProperties == null) {
+					stepArtifactProperties.put(stepName, new HashMap<String, Properties>() {{
+						put(artifactName, properties);
+					}});
+				} else {
+					artifactProperties.put(artifactName, properties);
+				}
+			}
+		}
+	}
+
+	/**
+	 * <p>
+	 * Obtains the property to be used when setting data for the provided {@link BatchArtifact.BatchArtifactType}.
+	 * </p>
+	 *
+	 * @param batchArtifactType the {@link BatchArtifact.BatchArtifactType} to lookup the property name for
+	 * @return the property name for
+	 * @throws IllegalStateException if an unhandled {@link BatchArtifact.BatchArtifactType} is encountered
+	 */
+	public String getPropertyName(BatchArtifact.BatchArtifactType batchArtifactType) {
+		switch (batchArtifactType) {
+			case STEP:
+				return "stepPropertiesContextEntry";
+			case STEP_ARTIFACT:
+				return "stepArtifactPropertiesContextEntry";
+			case ARTIFACT:
+				return "artifactPropertiesContextEntry";
+			case JOB:
+				return "jobPropertiesContextEntry";
+			default:
+				throw new IllegalStateException("Unhandled BatchArtifactType of: " + batchArtifactType);
+		}
+	}
+
+	/**
+	 * <p>
+	 * Simple object to encapsulate batch properties of a given batch artifact.
 	 * </p>
 	 *
 	 * @author Chris Schaefer
 	 * @since 3.0
 	 */
 	public class BatchPropertyContextEntry {
-		private String beanName;
+		private String stepName;
+		private String artifactName;
 		private Properties properties;
+		private BatchArtifact.BatchArtifactType batchArtifactType;
 
 		/**
 		 * <p>
@@ -172,23 +245,25 @@ public class BatchPropertyContext {
 		 * and its associated {@link Properties}.
 		 * </p>
 		 *
-		 * @param beanName the bean name representing the batch artifact
+		 * @param artifactName the name representing the batch artifact
 		 * @param properties the associated {@link Properties}
+		 * @param batchArtifactType the associated {@link BatchArtifact.BatchArtifactType}
 		 */
-		public BatchPropertyContextEntry(String beanName, Properties properties) {
-			this.beanName = beanName;
-			this.properties = properties;
+		public BatchPropertyContextEntry(String artifactName, Properties properties, BatchArtifact.BatchArtifactType batchArtifactType) {
+			this.artifactName = artifactName;
+			this.batchArtifactType = batchArtifactType;
+			this.properties = properties != null ? properties : new Properties();
 		}
 
 		/**
 		 * <p>
-		 * Obtains the bean name of the batch artifact this entry is associated with.
+		 * Obtains the name of the batch artifact this entry is associated with.
 		 * </p>
 		 *
-		 * @return the bean name of the batch artifact
+		 * @return the name of the batch artifact
 		 */
-		public String getBeanName() {
-			return beanName;
+		public String getArtifactName() {
+			return artifactName;
 		}
 
 		/**
@@ -200,6 +275,39 @@ public class BatchPropertyContext {
 		 */
 		public Properties getProperties() {
 			return properties;
+		}
+
+		/**
+		 * <p>
+		 * Obtains the {@link BatchArtifact.BatchArtifactType} represented by this context entry.
+		 * </p>
+		 *
+		 * @return the {@link BatchArtifact.BatchArtifactType}
+		 */
+		public BatchArtifact.BatchArtifactType getBatchArtifactType() {
+			return batchArtifactType;
+		}
+
+		/**
+		 * <p>
+		 * Sets the Step name associated with this entry.
+		 * </p>
+		 *
+		 * @param stepName the Step name associated with this entry
+		 */
+		public void setStepName(String stepName) {
+			this.stepName = stepName;
+		}
+
+		/**
+		 * <p>
+		 * Obtains the Step name associated with this entry.
+		 * </p>
+		 *
+		 * @return the step name associated with this entry
+		 */
+		public String getStepName() {
+			return stepName;
 		}
 	}
 }

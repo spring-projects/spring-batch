@@ -17,6 +17,7 @@ package org.springframework.batch.core.jsr.configuration.xml;
 
 import org.springframework.batch.core.configuration.xml.CoreNamespaceUtils;
 import org.springframework.batch.core.jsr.StepContextFactoryBean;
+import org.springframework.batch.core.jsr.configuration.support.BatchArtifact;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.support.AbstractBeanDefinition;
 import org.springframework.beans.factory.support.BeanDefinitionBuilder;
@@ -49,19 +50,14 @@ public class JobParser extends AbstractSingleBeanDefinitionParser {
 
 		String jobName = element.getAttribute(ID_ATTRIBUTE);
 
-		if(PropertyParser.hasPath()) {
-			PropertyParser.clearPath();
-			throw new IllegalArgumentException("Job parsing started for job name: " + jobName + " and property parser path already populated.");
-		}
-
-		PropertyParser.pushPath(jobName);
-
 		builder.addConstructorArgValue(jobName);
 
 		String restartableAttribute = element.getAttribute(RESTARTABLE_ATTRIBUTE);
 		if (StringUtils.hasText(restartableAttribute)) {
 			builder.addPropertyValue("restartable", restartableAttribute);
 		}
+
+		new PropertyParser(jobName, parserContext, BatchArtifact.BatchArtifactType.JOB).parseProperties(element);
 
 		BeanDefinition flowDef = new FlowParser(jobName, jobName).parse(element, parserContext);
 		builder.addPropertyValue("flow", flowDef);
@@ -74,9 +70,5 @@ public class JobParser extends AbstractSingleBeanDefinitionParser {
 		parserContext.getRegistry().registerBeanDefinition("stepContextFactory", stepContextBeanDefinition);
 
 		new ListnerParser(JobListenerFactoryBean.class, "jobExecutionListeners").parseListeners(element, parserContext, builder);
-
-		new PropertyParser(PropertyParser.JOB_ARTIFACT_PROPERTY_PREFIX + jobName, parserContext).parseProperties(element);
-
-		PropertyParser.popPath();
 	}
 }

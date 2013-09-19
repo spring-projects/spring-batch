@@ -33,19 +33,18 @@ import org.springframework.util.Assert;
  * @since 3.0
  */
 public class JobContext implements javax.batch.runtime.context.JobContext {
-
 	private Object transientUserData;
-    private Properties properties;
-    private JobExecution jobExecution;
+	private Properties properties;
+	private JobExecution jobExecution;
 
-    /**
+	/**
 	 * @param jobExecution for the related job
 	 */
 	public JobContext(JobExecution jobExecution, Properties properties) {
 		Assert.notNull(jobExecution, "A JobExecution is required");
 
-        this.properties = properties;
-        this.jobExecution = jobExecution;
+		this.jobExecution = jobExecution;
+		this.properties = properties != null ? properties : new Properties();
 	}
 
 	/* (non-Javadoc)
@@ -93,7 +92,7 @@ public class JobContext implements javax.batch.runtime.context.JobContext {
 	 */
 	@Override
 	public Properties getProperties() {
-		return properties != null ? properties : new Properties();
+		return properties;
 	}
 
 	/* (non-Javadoc)
