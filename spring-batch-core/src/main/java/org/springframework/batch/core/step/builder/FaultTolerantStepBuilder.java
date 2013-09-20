@@ -588,6 +588,10 @@ public class FaultTolerantStepBuilder<I, O> extends SimpleStepBuilder<I, O> {
 		return this.chunkMonitor;
 	}
 
+	protected Set<SkipListener<? super I, ? super O>> getSkipListeners() {
+		return skipListeners;
+	}
+
 	/**
 	 * Wrap the provided {@link #setRetryPolicy(RetryPolicy)} so that it never retries explicitly non-retryable
 	 * exceptions.

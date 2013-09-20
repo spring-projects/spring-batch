@@ -23,6 +23,10 @@ import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Set;
 
+import javax.batch.api.chunk.listener.SkipProcessListener;
+import javax.batch.api.chunk.listener.SkipReadListener;
+import javax.batch.api.chunk.listener.SkipWriteListener;
+
 import org.springframework.batch.core.ChunkListener;
 import org.springframework.batch.core.ItemProcessListener;
 import org.springframework.batch.core.ItemReadListener;
@@ -37,6 +41,7 @@ import org.springframework.batch.core.jsr.ChunkListenerAdapter;
 import org.springframework.batch.core.jsr.ItemProcessListenerAdapter;
 import org.springframework.batch.core.jsr.ItemReadListenerAdapter;
 import org.springframework.batch.core.jsr.ItemWriteListenerAdapter;
+import org.springframework.batch.core.jsr.SkipListenerAdapter;
 import org.springframework.batch.core.jsr.StepListenerAdapter;
 import org.springframework.batch.core.launch.JobLauncher;
 import org.springframework.batch.core.partition.PartitionHandler;
@@ -738,6 +743,18 @@ public class StepParserStepFactoryBean<I, O> implements FactoryBean, BeanNameAwa
 		for (Object listener : listeners) {
 			if (listener instanceof SkipListener) {
 				SkipListener<I, O> skipListener = (SkipListener<I, O>) listener;
+				skipListeners.add(skipListener);
+			}
+			if(listener instanceof SkipReadListener) {
+				SkipListener skipListener = new SkipListenerAdapter((SkipReadListener) listener, null, null);
+				skipListeners.add(skipListener);
+			}
+			if(listener instanceof SkipProcessListener) {
+				SkipListener skipListener = new SkipListenerAdapter(null,(SkipProcessListener) listener, null);
+				skipListeners.add(skipListener);
+			}
+			if(listener instanceof SkipWriteListener) {
+				SkipListener skipListener = new SkipListenerAdapter(null, null, (SkipWriteListener) listener);
 				skipListeners.add(skipListener);
 			}
 			if (listener instanceof StepExecutionListener) {
