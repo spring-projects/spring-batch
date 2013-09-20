@@ -24,6 +24,9 @@ import javax.batch.api.chunk.listener.ChunkListener;
 import javax.batch.api.chunk.listener.ItemProcessListener;
 import javax.batch.api.chunk.listener.ItemReadListener;
 import javax.batch.api.chunk.listener.ItemWriteListener;
+import javax.batch.api.chunk.listener.SkipProcessListener;
+import javax.batch.api.chunk.listener.SkipReadListener;
+import javax.batch.api.chunk.listener.SkipWriteListener;
 import javax.batch.api.listener.StepListener;
 
 import org.springframework.batch.core.listener.ListenerMetaData;
@@ -52,7 +55,10 @@ public enum JsrStepListenerMetaData implements ListenerMetaData {
 	AFTER_PROCESS_ERROR("onProcessError", "jsr-after-process-error", ItemProcessListener.class, Object.class, Exception.class),
 	BEFORE_WRITE("beforeWrite", "jsr-before-write", ItemWriteListener.class, List.class),
 	AFTER_WRITE("afterWrite", "jsr-after-write", ItemWriteListener.class, List.class),
-	AFTER_WRITE_ERROR("onWriteError", "jsr-after-write-error", ItemWriteListener.class, List.class, Exception.class);
+	AFTER_WRITE_ERROR("onWriteError", "jsr-after-write-error", ItemWriteListener.class, List.class, Exception.class),
+	SKIP_READ("onSkipReadItem", "jsr-skip-read", SkipReadListener.class, Exception.class),
+	SKIP_PROCESS("onSkipProcessItem", "jsr-skip-process", SkipProcessListener.class, Object.class, Exception.class),
+	SKIP_WRITE("onSkipWriteItem", "jsr-skip-write", SkipWriteListener.class, List.class, Exception.class);
 
 	private final String methodName;
 	private final String propertyName;

@@ -49,7 +49,7 @@ ItemProcessListener<T, S>, ItemWriteListener<S>, SkipListener<T, S> {
 	private CompositeSkipListener<T, S> skipListener = new CompositeSkipListener<T, S>();
 
 	/**
-	 * Initialise the listener instance.
+	 * Initialize the listener instance.
 	 */
 	public MulticasterBatchListener() {
 		super();

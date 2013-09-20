@@ -71,6 +71,7 @@ public class JsrFaultTolerantStepBuilder<I, O> extends FaultTolerantStepBuilder<
 		detectStreamInReader();
 		chunkProcessor.setChunkMonitor(getChunkMonitor());
 		ArrayList<StepListener> listeners = new ArrayList<StepListener>(getItemListeners());
+		listeners.addAll(getSkipListeners());
 		chunkProcessor.setListeners(listeners);
 
 		return chunkProcessor;

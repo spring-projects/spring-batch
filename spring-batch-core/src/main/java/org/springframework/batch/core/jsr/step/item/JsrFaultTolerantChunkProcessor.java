@@ -143,6 +143,8 @@ public class JsrFaultTolerantChunkProcessor<I,O> extends JsrChunkProcessor<I, O>
 							contribution.incrementReadSkipCount();
 							chunk.skip(e);
 
+							getListener().onSkipInRead(e);
+
 							logger.debug("Skipping failed input", e);
 						}
 						else {
@@ -224,13 +226,7 @@ public class JsrFaultTolerantChunkProcessor<I,O> extends JsrChunkProcessor<I, O>
 					return doTransform(item);
 				}
 				catch (Exception e) {
-					System.err.println("e has been thrown in the transform: " + e.getClass() + " and the skip count = " + contribution.getStepSkipCount() + " and should we skip it? " + skipPolicy.shouldSkip(e, contribution.getStepSkipCount()));
-					if (rollbackClassifier.classify(e)) {
-						// Default is to rollback unless the classifier
-						// allows us to continue
-						throw e;
-					}
-					else if (shouldSkip(skipPolicy, e, contribution.getStepSkipCount())) {
+					if (shouldSkip(skipPolicy, e, contribution.getStepSkipCount())) {
 						// If we are not re-throwing then we should check if
 						// this is skippable
 						contribution.incrementProcessSkipCount();
@@ -238,6 +234,10 @@ public class JsrFaultTolerantChunkProcessor<I,O> extends JsrChunkProcessor<I, O>
 						// If not re-throwing then the listener will not be
 						// called in next chunk.
 						getListener().onSkipInProcess(item, e);
+					} else if (rollbackClassifier.classify(e)) {
+						// Default is to rollback unless the classifier
+						// allows us to continue
+						throw e;
 					}
 					else {
 						throw e;
@@ -253,7 +253,6 @@ public class JsrFaultTolerantChunkProcessor<I,O> extends JsrChunkProcessor<I, O>
 			@Override
 			public O recover(RetryContext context) throws Exception {
 				Throwable e = context.getLastThrowable();
-				System.err.println("e = " + e.getClass() + " skipCount = " + contribution.getStepSkipCount());
 				if (shouldSkip(skipPolicy, e, contribution.getStepSkipCount())) {
 					contribution.incrementProcessSkipCount();
 					logger.debug("Skipping after failed process", e);
@@ -286,6 +285,7 @@ public class JsrFaultTolerantChunkProcessor<I,O> extends JsrChunkProcessor<I, O>
 
 		RetryCallback<Object> retryCallback = new RetryCallback<Object>() {
 			@Override
+			@SuppressWarnings("unchecked")
 			public Object doWithRetry(RetryContext context) throws Exception {
 
 				chunkMonitor.setChunkSize(chunk.size());
@@ -293,7 +293,9 @@ public class JsrFaultTolerantChunkProcessor<I,O> extends JsrChunkProcessor<I, O>
 					doPersist(contribution, chunk);
 				}
 				catch (Exception e) {
-					if (rollbackClassifier.classify(e)) {
+					if(shouldSkip(skipPolicy, e, contribution.getStepSkipCount())) {
+						getListener().onSkipInWrite(chunk.getItems(), e);
+					} else if (rollbackClassifier.classify(e)) {
 						throw e;
 					}
 					/*
