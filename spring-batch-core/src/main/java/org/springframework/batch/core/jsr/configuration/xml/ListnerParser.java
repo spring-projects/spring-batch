@@ -17,6 +17,7 @@ package org.springframework.batch.core.jsr.configuration.xml;
 
 import java.util.List;
 
+import org.springframework.batch.core.jsr.configuration.support.BatchArtifact;
 import org.springframework.beans.factory.config.RuntimeBeanReference;
 import org.springframework.beans.factory.parsing.CompositeComponentDefinition;
 import org.springframework.beans.factory.support.AbstractBeanDefinition;
@@ -48,8 +49,8 @@ public class ListnerParser {
 		this.listenerType = listenerType;
 	}
 
-	public void parseListeners(Element element, ParserContext parserContext, AbstractBeanDefinition bd) {
-		ManagedList<AbstractBeanDefinition> listeners = parseListeners(element, parserContext);
+	public void parseListeners(Element element, ParserContext parserContext, AbstractBeanDefinition bd, String stepName) {
+		ManagedList<AbstractBeanDefinition> listeners = parseListeners(element, parserContext, stepName);
 
 		if(listeners.size() > 0) {
 			bd.getPropertyValues().add(propertyKey, listeners);
@@ -57,14 +58,14 @@ public class ListnerParser {
 	}
 
 	public void parseListeners(Element element, ParserContext parserContext, BeanDefinitionBuilder builder) {
-		ManagedList<AbstractBeanDefinition> listeners = parseListeners(element, parserContext);
+		ManagedList<AbstractBeanDefinition> listeners = parseListeners(element, parserContext, "");
 
 		if(listeners.size() > 0) {
 			builder.addPropertyValue(propertyKey, listeners);
 		}
 	}
 
-	private ManagedList<AbstractBeanDefinition> parseListeners(Element element, ParserContext parserContext) {
+	private ManagedList<AbstractBeanDefinition> parseListeners(Element element, ParserContext parserContext, String stepName) {
 		List<Element> listenersElements = DomUtils.getChildElementsByTagName(element, LISTENERS_ELEMENT);
 
 		ManagedList<AbstractBeanDefinition> listeners = new ManagedList<AbstractBeanDefinition>();
@@ -84,7 +85,7 @@ public class ListnerParser {
 
 				listeners.add(bd.getBeanDefinition());
 
-				new PropertyParser(beanName, parserContext).parseProperties(listenerElement);
+				new PropertyParser(beanName, parserContext, getBatchArtifactType(stepName), stepName).parseProperties(listenerElement);
 			}
 			parserContext.popAndRegisterContainingComponent();
 		}
@@ -94,5 +95,10 @@ public class ListnerParser {
 		}
 
 		return listeners;
+	}
+
+	private BatchArtifact.BatchArtifactType getBatchArtifactType(String stepName) {
+		return (stepName != null && !"".equals(stepName)) ? BatchArtifact.BatchArtifactType.STEP_ARTIFACT
+			: BatchArtifact.BatchArtifactType.ARTIFACT;
 	}
 }

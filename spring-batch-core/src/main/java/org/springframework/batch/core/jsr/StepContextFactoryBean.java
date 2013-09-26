@@ -41,9 +41,7 @@ public class StepContextFactoryBean implements FactoryBean<StepContext> {
 	public StepContext getObject() throws Exception {
 		org.springframework.batch.core.scope.context.StepContext stepContext = StepSynchronizationManager.getContext();
 
-		String stepName = stepContext.getStepName();
-		String jobName = stepContext.getStepExecution().getJobExecution().getJobInstance().getJobName();
-		Properties properties = batchPropertyContext.getStepLevelProperties(jobName + "." + stepName);
+		Properties properties = batchPropertyContext.getStepProperties(stepContext.getStepName());
 
 		return new StepContext(stepContext.getStepExecution(), properties);
 	}

@@ -24,7 +24,7 @@ import org.springframework.util.StringUtils;
 /**
  * <p>
  * Support class for parsing JSR-352 expressions. The JSR-352 expression syntax, for
- * example conditional/elvis statements need to be massaged a bit to work as SPeL expressions.
+ * example conditional/elvis statements need to be transformed a bit to be valid SPeL expressions.
  * </p>
  *
  * @author Chris Schaefer
@@ -38,7 +38,7 @@ public class JsrExpressionParser {
 	private static final String EXPRESSION_SUFFIX = "}";
 	private static final String EXPRESSION_PREFIX = "#{";
 	private static final String DEFAULT_VALUE_SEPARATOR = ";";
-	private static final Pattern CONDITIONAL_EXPRESSION = Pattern.compile("(#\\{\\w[^;]+)");
+	private static final Pattern CONDITIONAL_EXPRESSION = Pattern.compile("(((\\bnull\\b)|(#\\{\\w))[^;]+)");
 
 	private BeanExpressionContext beanExpressionContext;
 	private BeanExpressionResolver beanExpressionResolver;
@@ -67,33 +67,37 @@ public class JsrExpressionParser {
 	 */
 	public String parseExpression(String expression) {
 		if (StringUtils.countOccurrencesOf(expression, ELVIS_OPERATOR) > 0) {
-			String expressionToParse = expression;
-
-			Matcher conditionalExpressionMatcher = CONDITIONAL_EXPRESSION.matcher(expressionToParse);
-
-			while (conditionalExpressionMatcher.find()) {
-				String conditionalExpression = conditionalExpressionMatcher.group(1);
-
-				String value = conditionalExpression.split(ELVIS_LHS)[0];
-				String defaultValue = conditionalExpression.split(ELVIS_RHS)[1];
-
-				StringBuilder parsedExpression = new StringBuilder()
-						.append(EXPRESSION_PREFIX)
-						.append((String) beanExpressionResolver.evaluate(value, beanExpressionContext))
-						.append(ELVIS_OPERATOR)
-						.append(QUOTE)
-						.append((String) beanExpressionResolver.evaluate(defaultValue, beanExpressionContext))
-						.append(QUOTE)
-						.append(EXPRESSION_SUFFIX);
-
-				expressionToParse = expressionToParse.replace(conditionalExpression, parsedExpression);
-			}
-
-			expressionToParse = expressionToParse.replace(DEFAULT_VALUE_SEPARATOR, "");
-
-			return (String) beanExpressionResolver.evaluate(expressionToParse, beanExpressionContext);
+			return parseConditionalExpressions(expression);
 		}
 
 		return (String) beanExpressionResolver.evaluate(expression, beanExpressionContext);
+	}
+
+	private String parseConditionalExpressions(String expression) {
+		String expressionToParse = expression;
+
+		Matcher conditionalExpressionMatcher = CONDITIONAL_EXPRESSION.matcher(expressionToParse);
+
+		while (conditionalExpressionMatcher.find()) {
+			String conditionalExpression = conditionalExpressionMatcher.group(1);
+
+			String value = conditionalExpression.split(ELVIS_LHS)[0];
+			String defaultValue = conditionalExpression.split(ELVIS_RHS)[1];
+
+			StringBuilder parsedExpression = new StringBuilder()
+					.append(EXPRESSION_PREFIX)
+					.append((String) beanExpressionResolver.evaluate(value, beanExpressionContext))
+					.append(ELVIS_OPERATOR)
+					.append(QUOTE)
+					.append((String) beanExpressionResolver.evaluate(defaultValue, beanExpressionContext))
+					.append(QUOTE)
+					.append(EXPRESSION_SUFFIX);
+
+			expressionToParse = expressionToParse.replace(conditionalExpression, parsedExpression);
+		}
+
+		expressionToParse = expressionToParse.replace(DEFAULT_VALUE_SEPARATOR, "");
+
+		return (String) beanExpressionResolver.evaluate(expressionToParse, beanExpressionContext);
 	}
 }

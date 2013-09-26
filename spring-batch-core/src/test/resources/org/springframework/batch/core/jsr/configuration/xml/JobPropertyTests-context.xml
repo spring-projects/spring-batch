@@ -69,7 +69,7 @@
                 <property name="annotationNamedDeciderPropertyName" value="annotationNamedDeciderPropertyValue"/>
                 <property name="nonexistentDeciderPropertyName" value="nonexistentDeciderPropertyValue"/>
             </properties>
-            <next on="*" to="#{jobProperties['step2name']}"/>
+            <next on="*" to="#{jobParameters['unresolving.prop']}?:#{jobProperties['step2name']};"/>
 		</decision>
 		<step id="step2">
             <!-- JSR Section 8.2.3 -->
@@ -132,7 +132,7 @@
     <bean id="injectTestObj" class="org.springframework.batch.core.jsr.configuration.xml.JobPropertyTests$InjectTestObj"
         c:name="Chris"/>
 
-    <bean id="threadLocalClassloaderBeanPostProcessor" class="org.springframework.batch.core.jsr.configuration.support.ThreadLocalClassloaderBeanPostProcessor">
+    <bean id="jobParameterResolvingBeanFactoryPostProcessor" class="org.springframework.batch.core.jsr.configuration.support.JobParameterResolvingBeanFactoryPostProcessor">
         <constructor-arg>
             <props>
                 <prop key="allow.start.if.complete">true</prop>
