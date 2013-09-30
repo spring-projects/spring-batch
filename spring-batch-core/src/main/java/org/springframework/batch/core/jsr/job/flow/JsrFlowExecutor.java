@@ -42,7 +42,7 @@ public class JsrFlowExecutor extends JobFlowExecutor {
 	 */
 	@Override
 	public void addExitStatus(String code) {
-		if((exitStatus != null && isNonDefaultExitStauts(exitStatus.getExitCode())) && !isNonDefaultExitStauts(code)) {
+		if((exitStatus != null && isNonDefaultExitStatus(exitStatus.getExitCode())) && !isNonDefaultExitStatus(code)) {
 			exitStatus = exitStatus.and(new ExitStatus(code));
 		}
 	}
@@ -57,7 +57,7 @@ public class JsrFlowExecutor extends JobFlowExecutor {
 		execution.setStatus(findBatchStatus(status));
 
 		ExitStatus curStatus = execution.getExitStatus();
-		if(isNonDefaultExitStauts(curStatus.getExitCode())) {
+		if(isNonDefaultExitStatus(curStatus.getExitCode())) {
 			exitStatus = exitStatus.and(new ExitStatus(status.getName()));
 			execution.setExitStatus(exitStatus);
 		}
@@ -67,7 +67,7 @@ public class JsrFlowExecutor extends JobFlowExecutor {
 	 * @param curStatus the exit code to be evaluated
 	 * @return true if the value matches a known exit code
 	 */
-	protected boolean isNonDefaultExitStauts(String curStatus) {
+	protected boolean isNonDefaultExitStatus(String curStatus) {
 		return curStatus == null ||
 				curStatus.equals(ExitStatus.COMPLETED.getExitCode()) ||
 				curStatus.equals(ExitStatus.EXECUTING.getExitCode()) ||

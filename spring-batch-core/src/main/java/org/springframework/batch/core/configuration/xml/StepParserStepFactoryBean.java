@@ -23,6 +23,9 @@ import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Set;
 
+import javax.batch.api.chunk.listener.RetryProcessListener;
+import javax.batch.api.chunk.listener.RetryReadListener;
+import javax.batch.api.chunk.listener.RetryWriteListener;
 import javax.batch.api.chunk.listener.SkipProcessListener;
 import javax.batch.api.chunk.listener.SkipReadListener;
 import javax.batch.api.chunk.listener.SkipWriteListener;
@@ -41,6 +44,9 @@ import org.springframework.batch.core.jsr.ChunkListenerAdapter;
 import org.springframework.batch.core.jsr.ItemProcessListenerAdapter;
 import org.springframework.batch.core.jsr.ItemReadListenerAdapter;
 import org.springframework.batch.core.jsr.ItemWriteListenerAdapter;
+import org.springframework.batch.core.jsr.RetryProcessListenerAdapter;
+import org.springframework.batch.core.jsr.RetryReadListenerAdapter;
+import org.springframework.batch.core.jsr.RetryWriteListenerAdapter;
 import org.springframework.batch.core.jsr.SkipListenerAdapter;
 import org.springframework.batch.core.jsr.StepListenerAdapter;
 import org.springframework.batch.core.launch.JobLauncher;
@@ -96,6 +102,7 @@ import org.springframework.util.Assert;
  * @author Dan Garrette
  * @author Josh Long
  * @author Michael Minella
+ * @author Chris Schaefer
  * @see SimpleStepFactoryBean
  * @see FaultTolerantStepFactoryBean
  * @see TaskletStep
@@ -222,6 +229,8 @@ public class StepParserStepFactoryBean<I, O> implements FactoryBean, BeanNameAwa
 
 	private Set<SkipListener<I, O>> skipListeners = new LinkedHashSet<SkipListener<I, O>>();
 
+	private Set<org.springframework.batch.core.jsr.RetryListener> jsrRetryListeners = new LinkedHashSet<org.springframework.batch.core.jsr.RetryListener>();
+
 	//
 	// Additional
 	//
@@ -330,6 +339,10 @@ public class StepParserStepFactoryBean<I, O> implements FactoryBean, BeanNameAwa
 		}
 
 		for (SkipListener<I, O> listener : skipListeners) {
+			builder.listener(listener);
+		}
+
+		for (org.springframework.batch.core.jsr.RetryListener listener : jsrRetryListeners) {
 			builder.listener(listener);
 		}
 
@@ -796,6 +809,15 @@ public class StepParserStepFactoryBean<I, O> implements FactoryBean, BeanNameAwa
 			if(listener instanceof javax.batch.api.chunk.listener.ItemProcessListener) {
 				ItemProcessListener itemListener = new ItemProcessListenerAdapter((javax.batch.api.chunk.listener.ItemProcessListener) listener);
 				processListeners.add(itemListener);
+			}
+			if(listener instanceof RetryReadListener) {
+				jsrRetryListeners.add(new RetryReadListenerAdapter((RetryReadListener) listener));
+			}
+			if(listener instanceof RetryProcessListener) {
+				jsrRetryListeners.add(new RetryProcessListenerAdapter((RetryProcessListener) listener));
+			}
+			if(listener instanceof RetryWriteListener) {
+				jsrRetryListeners.add(new RetryWriteListenerAdapter((RetryWriteListener) listener));
 			}
 		}
 	}

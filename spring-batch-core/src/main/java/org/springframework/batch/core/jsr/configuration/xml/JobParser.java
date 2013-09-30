@@ -69,6 +69,6 @@ public class JobParser extends AbstractSingleBeanDefinitionParser {
 
 		parserContext.getRegistry().registerBeanDefinition("stepContextFactory", stepContextBeanDefinition);
 
-		new ListnerParser(JobListenerFactoryBean.class, "jobExecutionListeners").parseListeners(element, parserContext, builder);
+		new ListenerParser(JobListenerFactoryBean.class, "jobExecutionListeners").parseListeners(element, parserContext, builder);
 	}
 }
