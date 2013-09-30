@@ -24,6 +24,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import javax.batch.operations.BatchRuntimeException;
 import org.springframework.batch.core.ChunkListener;
 import org.springframework.batch.core.JobInterruptedException;
 import org.springframework.batch.core.SkipListener;
@@ -80,6 +81,7 @@ import org.springframework.util.Assert;
  * additional properties for retry and skip of failed items.
  *
  * @author Dave Syer
+ * @author Chris Schaefer
  *
  * @since 2.2
  */
@@ -112,6 +114,8 @@ public class FaultTolerantStepBuilder<I, O> extends SimpleStepBuilder<I, O> {
 	private Collection<Class<? extends Throwable>> nonRetryableExceptionClasses = new HashSet<Class<? extends Throwable>>();
 
 	private Set<SkipListener<? super I, ? super O>> skipListeners = new LinkedHashSet<SkipListener<? super I, ? super O>>();
+
+	private Set<org.springframework.batch.core.jsr.RetryListener> jsrRetryListeners = new LinkedHashSet<org.springframework.batch.core.jsr.RetryListener>();
 
 	private int skipLimit = 0;
 
@@ -183,6 +187,11 @@ public class FaultTolerantStepBuilder<I, O> extends SimpleStepBuilder<I, O> {
 	 */
 	public FaultTolerantStepBuilder<I, O> listener(SkipListener<? super I, ? super O> listener) {
 		skipListeners.add(listener);
+		return this;
+	}
+
+	public FaultTolerantStepBuilder<I, O> listener(org.springframework.batch.core.jsr.RetryListener listener) {
+		jsrRetryListeners.add(listener);
 		return this;
 	}
 
@@ -434,7 +443,8 @@ public class FaultTolerantStepBuilder<I, O> extends SimpleStepBuilder<I, O> {
 				JobInterruptedException.class, Error.class);
 		addNonRetryableExceptionIfMissing(SkipLimitExceededException.class, NonSkippableReadException.class,
 				TransactionException.class, FatalStepExecutionException.class, SkipListenerFailedException.class,
-				SkipPolicyFailedException.class, RetryException.class, JobInterruptedException.class, Error.class);
+				SkipPolicyFailedException.class, RetryException.class, JobInterruptedException.class, Error.class,
+				BatchRuntimeException.class);
 	}
 
 	protected void detectStreamInReader() {
@@ -590,6 +600,10 @@ public class FaultTolerantStepBuilder<I, O> extends SimpleStepBuilder<I, O> {
 
 	protected Set<SkipListener<? super I, ? super O>> getSkipListeners() {
 		return skipListeners;
+	}
+
+	protected Set<org.springframework.batch.core.jsr.RetryListener> getJsrRetryListeners() {
+		return jsrRetryListeners;
 	}
 
 	/**

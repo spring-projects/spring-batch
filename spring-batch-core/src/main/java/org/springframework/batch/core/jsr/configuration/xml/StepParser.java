@@ -70,7 +70,7 @@ public class StepParser extends AbstractSingleBeanDefinitionParser {
 					allowStartIfComplete);
 		}
 
-		new ListnerParser(StepListenerFactoryBean.class, "listeners").parseListeners(element, parserContext, bd, stepName);
+		new ListenerParser(StepListenerFactoryBean.class, "listeners").parseListeners(element, parserContext, bd, stepName);
 		new PropertyParser(stepName, parserContext, BatchArtifact.BatchArtifactType.STEP).parseProperties(element);
 
 		// look at all nested elements
@@ -91,8 +91,6 @@ public class StepParser extends AbstractSingleBeanDefinitionParser {
 			}
 		}
 
-		Collection<BeanDefinition> nextElements = FlowParser.getNextElements(parserContext, stepName, stateBuilder.getBeanDefinition(), element);
-
-		return nextElements;
+		return FlowParser.getNextElements(parserContext, stepName, stateBuilder.getBeanDefinition(), element);
 	}
 }

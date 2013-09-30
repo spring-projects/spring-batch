@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
+
+    <import resource="RetryListenerTestBase-context.xml"/>
+
+    <bean id="readRetryListener" class="org.springframework.batch.core.jsr.configuration.xml.RetryListenerTests$TestRetryReadListener"/>
+    <bean id="processRetryListener" class="org.springframework.batch.core.jsr.configuration.xml.RetryListenerTests$TestRetryProcessListener"/>
+    <bean id="writeRetryListener" class="org.springframework.batch.core.jsr.configuration.xml.RetryListenerTests$TestRetryWriteListener"/>
+
+    <bean id="reader" class="org.springframework.batch.core.jsr.configuration.xml.RetryListenerTests$FailOnceItemReader"/>
+    <bean id="writer" class="org.springframework.batch.core.jsr.configuration.xml.RetryListenerTests$FailOnceItemWriter"/>
+    <bean id="processor" class="org.springframework.batch.core.jsr.configuration.xml.RetryListenerTests$FailOnceItemProcessor"/>
+</beans>

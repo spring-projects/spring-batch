@@ -17,6 +17,7 @@ package org.springframework.batch.core.jsr.step.builder;
 
 import java.util.ArrayList;
 
+import java.util.List;
 import org.springframework.batch.core.StepListener;
 import org.springframework.batch.core.jsr.step.item.JsrChunkProvider;
 import org.springframework.batch.core.jsr.step.item.JsrFaultTolerantChunkProcessor;
@@ -33,6 +34,7 @@ import org.springframework.batch.core.step.skip.SkipPolicy;
  * pattern defined by the spec as well as skip/retry logic.
  *
  * @author Michael Minella
+ * @author Chris Schaefer
  *
  * @param <I> The input type for the step
  * @param <O> The output type for the step
@@ -70,10 +72,17 @@ public class JsrFaultTolerantStepBuilder<I, O> extends FaultTolerantStepBuilder<
 		chunkProcessor.setRollbackClassifier(getRollbackClassifier());
 		detectStreamInReader();
 		chunkProcessor.setChunkMonitor(getChunkMonitor());
-		ArrayList<StepListener> listeners = new ArrayList<StepListener>(getItemListeners());
-		listeners.addAll(getSkipListeners());
-		chunkProcessor.setListeners(listeners);
+		chunkProcessor.setListeners(getChunkListeners());
 
 		return chunkProcessor;
+	}
+
+	private List<StepListener> getChunkListeners() {
+		List<StepListener> listeners = new ArrayList<StepListener>();
+		listeners.addAll(getItemListeners());
+		listeners.addAll(getSkipListeners());
+		listeners.addAll(getJsrRetryListeners());
+
+		return listeners;
 	}
 }

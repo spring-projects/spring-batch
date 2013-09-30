@@ -33,9 +33,10 @@ import org.w3c.dom.Element;
  * and not JSR interfaces
  *
  * @author Michael Minella
+ * @author Chris Schaefer
  * @since 3.0
  */
-public class ListnerParser {
+public class ListenerParser {
 	private static final String REF_ATTRIBUTE = "ref";
 	private static final String LISTENER_ELEMENT = "listener";
 	private static final String LISTENERS_ELEMENT = "listeners";
@@ -44,7 +45,7 @@ public class ListnerParser {
 	private String propertyKey;
 
 	@SuppressWarnings("rawtypes")
-	public ListnerParser(Class listenerType, String propertyKey) {
+	public ListenerParser(Class listenerType, String propertyKey) {
 		this.propertyKey = propertyKey;
 		this.listenerType = listenerType;
 	}

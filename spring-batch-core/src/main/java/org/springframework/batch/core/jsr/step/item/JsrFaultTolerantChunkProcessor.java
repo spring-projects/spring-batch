@@ -17,6 +17,7 @@ package org.springframework.batch.core.jsr.step.item;
 
 import java.util.List;
 
+import javax.batch.operations.BatchRuntimeException;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.batch.core.StepContribution;
@@ -45,22 +46,18 @@ import org.springframework.util.Assert;
  * Extension of the {@link JsrChunkProcessor} that adds skip and retry functionality.
  *
  * @author Michael Minella
+ * @author Chris Schaefer
  *
  * @param <I> input type for the step
  * @param <O> output type for the step
  */
 public class JsrFaultTolerantChunkProcessor<I,O> extends JsrChunkProcessor<I, O> {
-
 	protected final Log logger = LogFactory.getLog(getClass());
 	private SkipPolicy skipPolicy = new LimitCheckingItemSkipPolicy();
 	private Classifier<Throwable, Boolean> rollbackClassifier = new BinaryExceptionClassifier(true);
 	private final BatchRetryTemplate batchRetryTemplate;
 	private ChunkMonitor chunkMonitor = new ChunkMonitor();
 	private boolean hasProcessor = false;
-
-	public JsrFaultTolerantChunkProcessor() {
-		this(null, null, null, null, null);
-	}
 
 	public JsrFaultTolerantChunkProcessor(ItemReader<I> reader, ItemProcessor<I,O> processor, ItemWriter<O> writer, RepeatOperations repeatTemplate, BatchRetryTemplate batchRetryTemplate) {
 		super(reader, processor, writer, repeatTemplate);
@@ -148,10 +145,14 @@ public class JsrFaultTolerantChunkProcessor<I,O> extends JsrChunkProcessor<I, O>
 							logger.debug("Skipping failed input", e);
 						}
 						else {
-							if (rollbackClassifier.classify(e)) {
+							getListener().onRetryReadException(e);
+
+							if(rollbackClassifier.classify(e)) {
 								throw e;
 							}
-							logger.debug("No-rollback for non-skippable exception (ignored)", e);
+							else {
+								throw e;
+							}
 						}
 					}
 				}
@@ -174,7 +175,8 @@ public class JsrFaultTolerantChunkProcessor<I,O> extends JsrChunkProcessor<I, O>
 						// allows us to continue
 						throw new RetryException("Non-skippable exception in recoverer while reading", e);
 					}
-					return null;
+
+					throw new BatchRuntimeException(e);
 				}
 			}
 
@@ -234,13 +236,17 @@ public class JsrFaultTolerantChunkProcessor<I,O> extends JsrChunkProcessor<I, O>
 						// If not re-throwing then the listener will not be
 						// called in next chunk.
 						getListener().onSkipInProcess(item, e);
-					} else if (rollbackClassifier.classify(e)) {
-						// Default is to rollback unless the classifier
-						// allows us to continue
-						throw e;
-					}
-					else {
-						throw e;
+					} else {
+						getListener().onRetryProcessException(item, e);
+
+						if (rollbackClassifier.classify(e)) {
+							// Default is to rollback unless the classifier
+							// allows us to continue
+							throw e;
+						}
+						else {
+							throw e;
+						}
 					}
 				}
 				return null;
@@ -249,7 +255,6 @@ public class JsrFaultTolerantChunkProcessor<I,O> extends JsrChunkProcessor<I, O>
 		};
 
 		RecoveryCallback<O> recoveryCallback = new RecoveryCallback<O>() {
-
 			@Override
 			public O recover(RetryContext context) throws Exception {
 				Throwable e = context.getLastThrowable();
@@ -264,10 +269,10 @@ public class JsrFaultTolerantChunkProcessor<I,O> extends JsrChunkProcessor<I, O>
 						// allows us to continue
 						throw new RetryException("Non-skippable exception in recoverer while processing", e);
 					}
-					return null;
+
+					throw new BatchRuntimeException(e);
 				}
 			}
-
 		};
 
 		return batchRetryTemplate.execute(retryCallback, recoveryCallback);
@@ -295,8 +300,12 @@ public class JsrFaultTolerantChunkProcessor<I,O> extends JsrChunkProcessor<I, O>
 				catch (Exception e) {
 					if(shouldSkip(skipPolicy, e, contribution.getStepSkipCount())) {
 						getListener().onSkipInWrite(chunk.getItems(), e);
-					} else if (rollbackClassifier.classify(e)) {
-						throw e;
+					} else {
+						getListener().onRetryWriteException(chunk.getItems(), e);
+
+						if (rollbackClassifier.classify(e)) {
+							throw e;
+						}
 					}
 					/*
 					 * If the exception is marked as no-rollback, we need to
