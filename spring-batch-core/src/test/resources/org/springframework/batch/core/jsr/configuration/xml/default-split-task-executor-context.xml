@@ -42,9 +42,6 @@
             <list>
                 <value>One</value>
                 <value>Two</value>
-                <value>Three</value>
-                <value>Four</value>
-                <value>Five</value>
             </list>
         </constructor-arg>
     </bean>
