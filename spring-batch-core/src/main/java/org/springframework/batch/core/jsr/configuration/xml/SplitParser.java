@@ -18,10 +18,14 @@ package org.springframework.batch.core.jsr.configuration.xml;
 import java.util.Collection;
 import java.util.List;
 
+import org.springframework.beans.PropertyValue;
 import org.springframework.beans.factory.config.BeanDefinition;
+import org.springframework.beans.factory.config.RuntimeBeanReference;
 import org.springframework.beans.factory.support.BeanDefinitionBuilder;
+import org.springframework.beans.factory.support.BeanDefinitionRegistry;
 import org.springframework.beans.factory.support.ManagedList;
 import org.springframework.beans.factory.xml.ParserContext;
+import org.springframework.core.task.SimpleAsyncTaskExecutor;
 import org.springframework.util.xml.DomUtils;
 import org.w3c.dom.Element;
 
@@ -29,9 +33,12 @@ import org.w3c.dom.Element;
  * Parses a &lt;split /&gt; element as defined in JSR-352.
  *
  * @author Michael Minella
+ * @author Chris Schaefer
  * @since 3.0
  */
 public class SplitParser {
+	private static final String TASK_EXECUTOR_PROPERTY_NAME = "taskExecutor";
+	private static final String JSR_352_SPLIT_TASK_EXECUTOR_BEAN_NAME = "jsr352splitTaskExecutor";
 
 	private String jobFactoryRef;
 
@@ -63,6 +70,25 @@ public class SplitParser {
 		stateBuilder.addConstructorArgValue(flows);
 		stateBuilder.addConstructorArgValue(idAttribute);
 
+		PropertyValue propertyValue = getSplitTaskExecutorPropertyValue(parserContext.getRegistry());
+		stateBuilder.addPropertyValue(propertyValue.getName(), propertyValue.getValue());
+
 		return FlowParser.getNextElements(parserContext, null, stateBuilder.getBeanDefinition(), element);
+	}
+
+	protected PropertyValue getSplitTaskExecutorPropertyValue(BeanDefinitionRegistry beanDefinitionRegistry) {
+		PropertyValue propertyValue;
+
+		if (hasBeanDefinition(beanDefinitionRegistry, JSR_352_SPLIT_TASK_EXECUTOR_BEAN_NAME)) {
+			propertyValue = new PropertyValue(TASK_EXECUTOR_PROPERTY_NAME, new RuntimeBeanReference(JSR_352_SPLIT_TASK_EXECUTOR_BEAN_NAME));
+		} else {
+			propertyValue = new PropertyValue(TASK_EXECUTOR_PROPERTY_NAME, new SimpleAsyncTaskExecutor());
+		}
+
+		return propertyValue;
+	}
+
+	private boolean hasBeanDefinition(BeanDefinitionRegistry beanDefinitionRegistry, String beanName) {
+		return beanDefinitionRegistry.containsBeanDefinition(beanName);
 	}
 }

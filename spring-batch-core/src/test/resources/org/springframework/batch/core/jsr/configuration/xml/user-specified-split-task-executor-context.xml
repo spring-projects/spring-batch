@@ -42,9 +42,6 @@
             <list>
                 <value>One</value>
                 <value>Two</value>
-                <value>Three</value>
-                <value>Four</value>
-                <value>Five</value>
             </list>
         </constructor-arg>
     </bean>
@@ -65,4 +62,6 @@
     <bean id="jobLauncher" class="org.springframework.batch.core.launch.support.SimpleJobLauncher">
         <property name="jobRepository" ref="jobRepository"/>
     </bean>
+
+    <bean id="jsr352splitTaskExecutor" class="org.springframework.core.task.SyncTaskExecutor"/>
 </beans>

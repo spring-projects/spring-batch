@@ -19,7 +19,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
-import org.junit.Ignore;
+import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
@@ -29,16 +29,19 @@ import org.springframework.batch.core.Job;
 import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.JobParameters;
 import org.springframework.batch.core.launch.JobLauncher;
+import org.springframework.beans.PropertyValue;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.config.RuntimeBeanReference;
 import org.springframework.beans.factory.parsing.BeanDefinitionParsingException;
+import org.springframework.beans.factory.support.BeanDefinitionRegistry;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
+import org.springframework.core.task.SimpleAsyncTaskExecutor;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
-@ContextConfiguration({"SplitParsingTests-context.xml", "jsr-base-context.xml"})
+@ContextConfiguration()
 @RunWith(SpringJUnit4ClassRunner.class)
 public class SplitParsingTests {
-
 	@Autowired
 	public Job job;
 
@@ -49,7 +52,6 @@ public class SplitParsingTests {
 	public ExpectedException expectedException = ExpectedException.none();
 
 	@Test
-	@Ignore
 	public void test() throws Exception {
 		JobExecution execution = jobLauncher.run(job, new JobParameters());
 		assertEquals(BatchStatus.COMPLETED, execution.getStatus());
@@ -57,15 +59,33 @@ public class SplitParsingTests {
 	}
 
 	@Test
-	@Ignore
 	public void testOneFlowInSplit() {
 		try {
 			new ClassPathXmlApplicationContext("/org/springframework/batch/core/jsr/configuration/xml/invalid-split-context.xml");
 		} catch (BeanDefinitionParsingException bdpe) {
-			assertTrue(bdpe.getMessage().indexOf("A <split/> must contain at least two 'flow' elements.") >= 0);
+			assertTrue(bdpe.getMessage().contains("A <split/> must contain at least two 'flow' elements."));
 			return;
 		}
 
 		fail("Expected exception was not thrown");
+	}
+
+	@Test
+	public void testUserSpecifiedTaskExecutor() {
+		ClassPathXmlApplicationContext context = new ClassPathXmlApplicationContext("/org/springframework/batch/core/jsr/configuration/xml/user-specified-split-task-executor-context.xml");
+		BeanDefinitionRegistry registry = (BeanDefinitionRegistry) context.getBeanFactory();
+		PropertyValue propertyValue = new SplitParser(null).getSplitTaskExecutorPropertyValue(registry);
+
+		RuntimeBeanReference runtimeBeanReferenceValue = (RuntimeBeanReference) propertyValue.getValue();
+
+		Assert.assertTrue("RuntimeBeanReference should have a name of jsr352splitTaskExecutor" , "jsr352splitTaskExecutor".equals(runtimeBeanReferenceValue.getBeanName()));
+	}
+
+	@Test
+	public void testDefaultTaskExecutor() {
+		ClassPathXmlApplicationContext context = new ClassPathXmlApplicationContext("/org/springframework/batch/core/jsr/configuration/xml/default-split-task-executor-context.xml");
+		BeanDefinitionRegistry registry = (BeanDefinitionRegistry) context.getBeanFactory();
+		PropertyValue propertyValue = new SplitParser(null).getSplitTaskExecutorPropertyValue(registry);
+		Assert.assertTrue("Task executor not an instance of SimpleAsyncTaskExecutor" , (propertyValue.getValue() instanceof SimpleAsyncTaskExecutor));
 	}
 }
