@@ -110,12 +110,13 @@ public class SimpleStepBuilder<I, O> extends AbstractTaskletStepBuilder<SimpleSt
 	 */
 	@Override
 	public TaskletStep build() {
+
 		registerStepListenerAsItemListener();
 		registerAsStreamsAndListeners(reader, processor, writer);
 		return super.build();
 	}
 
-	private void registerStepListenerAsItemListener() {
+	protected void registerStepListenerAsItemListener() {
 		for (StepExecutionListener stepExecutionListener: properties.getStepExecutionListeners()){
 			checkAndAddItemListener(stepExecutionListener);
 		}
@@ -326,7 +327,7 @@ public class SimpleStepBuilder<I, O> extends AbstractTaskletStepBuilder<SimpleSt
 		return new SimpleCompletionPolicy(chunkSize);
 	}
 
-	private void registerAsStreamsAndListeners(ItemReader<? extends I> itemReader,
+	protected void registerAsStreamsAndListeners(ItemReader<? extends I> itemReader,
 			ItemProcessor<? super I, ? extends O> itemProcessor, ItemWriter<? super O> itemWriter) {
 		for (Object itemHandler : new Object[] { itemReader, itemWriter, itemProcessor }) {
 			if (itemHandler instanceof ItemStream) {

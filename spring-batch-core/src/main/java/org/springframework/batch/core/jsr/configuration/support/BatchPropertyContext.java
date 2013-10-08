@@ -19,6 +19,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
+
 import org.springframework.util.Assert;
 
 /**
@@ -33,6 +34,7 @@ import org.springframework.util.Assert;
  * @since 3.0
  */
 public class BatchPropertyContext {
+	private static final String PARTITION_INDICATOR = ":partition";
 	private Properties jobProperties = new Properties();
 	private Map<String, Properties> stepProperties = new HashMap<String, Properties>();
 	private Map<String, Properties> artifactProperties = new HashMap<String, Properties>();
@@ -58,9 +60,18 @@ public class BatchPropertyContext {
 	 * @return the {@link Properties} for the Step
 	 */
 	public Properties getStepProperties(String stepName) {
-		Properties properties = stepProperties.get(stepName);
+		Properties properties = new Properties();
 
-		return properties != null ? properties : new Properties();
+		if(stepProperties.containsKey(stepName)) {
+			properties.putAll(stepProperties.get(stepName));
+		}
+
+		if(stepName.contains(PARTITION_INDICATOR)) {
+			String parentStepName = stepName.substring(0, stepName.indexOf(PARTITION_INDICATOR));
+			properties.putAll(getStepProperties(parentStepName));
+		}
+
+		return properties;
 	}
 
 	/**
@@ -101,6 +112,17 @@ public class BatchPropertyContext {
 
 		if (artifactProperties != null && artifactProperties.containsKey(artifactName)) {
 			properties.putAll(artifactProperties.get(artifactName));
+		}
+
+		if(stepName.contains(PARTITION_INDICATOR)) {
+			String parentStepName = stepName.substring(0, stepName.indexOf(PARTITION_INDICATOR));
+			properties.putAll(getStepProperties(parentStepName));
+
+			Map<String, Properties> parentArtifactProperties = stepArtifactProperties.get(parentStepName);
+
+			if (parentArtifactProperties != null && parentArtifactProperties.containsKey(artifactName)) {
+				properties.putAll(parentArtifactProperties.get(artifactName));
+			}
 		}
 
 		return properties;
@@ -177,6 +199,7 @@ public class BatchPropertyContext {
 	 *
 	 * @param batchPropertyContextEntries the {@link BatchPropertyContextEntry} objects to add
 	 */
+	@SuppressWarnings("serial")
 	public void setStepArtifactPropertiesContextEntry(List<BatchPropertyContextEntry> batchPropertyContextEntries) {
 		for (BatchPropertyContextEntry batchPropertyContextEntry : batchPropertyContextEntries) {
 			Assert.hasText(batchPropertyContextEntry.getStepName(), "Step name must be defined");
@@ -212,16 +235,16 @@ public class BatchPropertyContext {
 	 */
 	public String getPropertyName(BatchArtifact.BatchArtifactType batchArtifactType) {
 		switch (batchArtifactType) {
-			case STEP:
-				return "stepPropertiesContextEntry";
-			case STEP_ARTIFACT:
-				return "stepArtifactPropertiesContextEntry";
-			case ARTIFACT:
-				return "artifactPropertiesContextEntry";
-			case JOB:
-				return "jobPropertiesContextEntry";
-			default:
-				throw new IllegalStateException("Unhandled BatchArtifactType of: " + batchArtifactType);
+		case STEP:
+			return "stepPropertiesContextEntry";
+		case STEP_ARTIFACT:
+			return "stepArtifactPropertiesContextEntry";
+		case ARTIFACT:
+			return "artifactPropertiesContextEntry";
+		case JOB:
+			return "jobPropertiesContextEntry";
+		default:
+			throw new IllegalStateException("Unhandled BatchArtifactType of: " + batchArtifactType);
 		}
 	}
 

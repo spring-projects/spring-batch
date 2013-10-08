@@ -21,6 +21,7 @@ import org.springframework.batch.core.job.flow.support.state.StepState;
 import org.springframework.batch.core.jsr.configuration.support.BatchArtifact;
 import org.springframework.batch.core.listener.StepListenerFactoryBean;
 import org.springframework.beans.factory.config.BeanDefinition;
+import org.springframework.beans.factory.config.RuntimeBeanReference;
 import org.springframework.beans.factory.parsing.BeanComponentDefinition;
 import org.springframework.beans.factory.support.AbstractBeanDefinition;
 import org.springframework.beans.factory.support.BeanDefinitionBuilder;
@@ -45,11 +46,13 @@ public class StepParser extends AbstractSingleBeanDefinitionParser {
 	private static final String ALLOW_START_IF_COMPLETE_ATTRIBUTE = "allow-start-if-complete";
 	private static final String START_LIMIT_ATTRIBUTE = "start-limit";
 	private static final String SPLIT_ID_ATTRIBUTE = "id";
+	private static final String PARTITION_ELEMENT = "partition";
 
 	protected Collection<BeanDefinition> parse(Element element, ParserContext parserContext, BeanDefinitionBuilder builder) {
 		BeanDefinitionBuilder defBuilder = BeanDefinitionBuilder.genericBeanDefinition();
 		AbstractBeanDefinition bd = defBuilder.getRawBeanDefinition();
 		bd.setBeanClass(StepFactoryBean.class);
+		bd.getPropertyValues().addPropertyValue("batchPropertyContext", new RuntimeBeanReference("batchPropertyContext"));
 
 		BeanDefinitionBuilder stateBuilder = BeanDefinitionBuilder.genericBeanDefinition(StepState.class);
 
@@ -87,6 +90,8 @@ public class StepParser extends AbstractSingleBeanDefinitionParser {
 					new BatchletParser().parseBatchlet(nestedElement, bd, parserContext, stepName);
 				} else if(name.equals(CHUNK_ELEMENT)) {
 					new ChunkParser().parse(nestedElement, bd, parserContext, stepName);
+				} else if(name.equals(PARTITION_ELEMENT)) {
+					new PartitionParser(stepName).parse(nestedElement, bd, parserContext, stepName);
 				}
 			}
 		}

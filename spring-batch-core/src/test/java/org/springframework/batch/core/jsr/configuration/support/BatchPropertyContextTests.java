@@ -15,13 +15,15 @@
  */
 package org.springframework.batch.core.jsr.configuration.support;
 
+import static org.junit.Assert.assertEquals;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Properties;
+
 import org.junit.Before;
 import org.junit.Test;
-import static org.junit.Assert.assertEquals;
 
 /**
  * <p>
@@ -35,6 +37,7 @@ public class BatchPropertyContextTests {
 	private List<BatchPropertyContext.BatchPropertyContextEntry> stepProperties = new ArrayList<BatchPropertyContext.BatchPropertyContextEntry>();
 	private List<BatchPropertyContext.BatchPropertyContextEntry> artifactProperties = new ArrayList<BatchPropertyContext.BatchPropertyContextEntry>();
 	private List<BatchPropertyContext.BatchPropertyContextEntry> stepArtifactProperties = new ArrayList<BatchPropertyContext.BatchPropertyContextEntry>();
+	private List<BatchPropertyContext.BatchPropertyContextEntry> partitionProperties = new ArrayList<BatchPropertyContext.BatchPropertyContextEntry>();
 
 	@Before
 	public void setUp() {
@@ -69,6 +72,26 @@ public class BatchPropertyContextTests {
 		batchPropertyContextEntry.setStepName("step1");
 
 		this.stepArtifactProperties.add(batchPropertyContextEntry);
+
+		Properties partitionProperties = new Properties();
+		partitionProperties.setProperty("writerProperty1", "writerProperty1valuePartition0");
+		partitionProperties.setProperty("writerProperty2", "writerProperty2valuePartition0");
+
+		BatchPropertyContext.BatchPropertyContextEntry partitionBatchPropertyContextEntry =
+				batchPropertyContext.new BatchPropertyContextEntry("writer", partitionProperties, BatchArtifact.BatchArtifactType.STEP_ARTIFACT);
+		partitionBatchPropertyContextEntry.setStepName("step2:partition0");
+
+		this.partitionProperties.add(partitionBatchPropertyContextEntry);
+
+		Properties partitionStepProperties = new Properties();
+		partitionStepProperties.setProperty("writerProperty1Step", "writerProperty1");
+		partitionStepProperties.setProperty("writerProperty2Step", "writerProperty2");
+
+		BatchPropertyContext.BatchPropertyContextEntry partitionStepBatchPropertyContextEntry =
+				batchPropertyContext.new BatchPropertyContextEntry("writer", partitionStepProperties, BatchArtifact.BatchArtifactType.STEP_ARTIFACT);
+		partitionStepBatchPropertyContextEntry.setStepName("step2");
+
+		this.partitionProperties.add(partitionStepBatchPropertyContextEntry);
 	}
 
 	@Test
@@ -178,5 +201,24 @@ public class BatchPropertyContextTests {
 		assertEquals("decider1PropertyOverride", job.getProperty("deciderProperty1"));
 		assertEquals("jobProperty1value", job.getProperty("jobProperty1"));
 		assertEquals("jobProperty2value", job.getProperty("jobProperty2"));
+	}
+
+	@Test
+	public void testPartitionProperties() {
+		BatchPropertyContext batchPropertyContext = new BatchPropertyContext();
+		batchPropertyContext.setJobPropertiesContextEntry(jobProperties);
+		batchPropertyContext.setArtifactPropertiesContextEntry(artifactProperties);
+		batchPropertyContext.setStepPropertiesContextEntry(stepProperties);
+		batchPropertyContext.setStepArtifactPropertiesContextEntry(stepArtifactProperties);
+		batchPropertyContext.setStepArtifactPropertiesContextEntry(partitionProperties);
+
+		Properties artifactProperties = batchPropertyContext.getStepArtifactProperties("step2:partition0", "writer");
+		assertEquals(6, artifactProperties.size());
+		assertEquals("writerProperty1", artifactProperties.getProperty("writerProperty1Step"));
+		assertEquals("writerProperty2", artifactProperties.getProperty("writerProperty2Step"));
+		assertEquals("writerProperty1valuePartition0", artifactProperties.getProperty("writerProperty1"));
+		assertEquals("writerProperty2valuePartition0", artifactProperties.getProperty("writerProperty2"));
+		assertEquals("step2PropertyValue1", artifactProperties.getProperty("step2PropertyName1"));
+		assertEquals("step2PropertyValue2", artifactProperties.getProperty("step2PropertyName2"));
 	}
 }

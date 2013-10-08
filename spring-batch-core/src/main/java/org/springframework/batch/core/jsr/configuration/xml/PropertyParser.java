@@ -15,10 +15,12 @@
  */
 package org.springframework.batch.core.jsr.configuration.xml;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
+
 import org.springframework.batch.core.jsr.configuration.support.BatchArtifact;
 import org.springframework.batch.core.jsr.configuration.support.BatchPropertyContext;
 import org.springframework.beans.factory.config.BeanDefinition;
@@ -80,13 +82,7 @@ public class PropertyParser {
 		Properties properties = new Properties();
 
 		if (propertiesElements.size() == 1) {
-			List<Element> propertyElements = DomUtils.getChildElementsByTagName(propertiesElements.get(0), PROPERTY_ELEMENT);
-
-			for (Element propertyElement : propertyElements) {
-				properties.put(propertyElement.getAttribute(PROPERTY_NAME_ATTRIBUTE), propertyElement.getAttribute(PROPERTY_VALUE_ATTRIBUTE));
-			}
-
-			addProperties(properties);
+			parsePropertiesElement(propertiesElements, properties);
 		} else if (propertiesElements.size() > 1) {
 			parserContext.getReaderContext().error("The <properties> element may not appear more than once in a single <listener>.", element);
 		}
@@ -94,12 +90,32 @@ public class PropertyParser {
 		setJobProperties(properties);
 	}
 
+	public void parsePartitionProperties(Element element) {
+		Properties properties = new Properties();
+
+		List<Element> elements = new ArrayList<Element>();
+		elements.add(element);
+		parsePropertiesElement(elements, properties);
+
+		setJobProperties(properties);
+	}
+
+	private void parsePropertiesElement(List<Element> propertiesElements, Properties properties) {
+		List<Element> propertyElements = DomUtils.getChildElementsByTagName(propertiesElements.get(0), PROPERTY_ELEMENT);
+
+		for (Element propertyElement : propertyElements) {
+			properties.put(propertyElement.getAttribute(PROPERTY_NAME_ATTRIBUTE), propertyElement.getAttribute(PROPERTY_VALUE_ATTRIBUTE));
+		}
+
+		addProperties(properties);
+	}
+
 	private void addProperties(Properties properties) {
 		BeanDefinition beanDefinition = parserContext.getRegistry().getBeanDefinition(BATCH_PROPERTY_CONTEXT_BEAN_NAME);
 
 		BatchPropertyContext batchPropertyContext = new BatchPropertyContext();
 		BatchPropertyContext.BatchPropertyContextEntry batchPropertyContextEntry =
-			batchPropertyContext.new BatchPropertyContextEntry(beanName, properties, batchArtifactType);
+				batchPropertyContext.new BatchPropertyContextEntry(beanName, properties, batchArtifactType);
 
 		if (StringUtils.hasText(stepName)) {
 			batchPropertyContextEntry.setStepName(stepName);
