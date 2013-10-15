@@ -1,4 +1,4 @@
 #macro (sequence $name $value)CREATE TABLE ${name} (ID BIGINT NOT NULL) ENGINE=MYISAM;
-INSERT INTO ${name} values(0);
+INSERT INTO ${name} SELECT 0 FROM DUAL WHERE NOT EXISTS (SELECT * FROM ${name});
 #end
 #macro (notnull $name $type)MODIFY COLUMN ${name} ${type} NOT NULL#end
