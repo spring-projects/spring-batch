@@ -39,7 +39,7 @@ public abstract class StepBuilderHelper<B extends StepBuilderHelper<B>> {
 
 	protected final Log logger = LogFactory.getLog(getClass());
 
-	private final CommonStepProperties properties;
+	protected final CommonStepProperties properties;
 
 	public StepBuilderHelper(String name) {
 		this.properties = new CommonStepProperties();
