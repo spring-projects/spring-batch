@@ -49,6 +49,7 @@ import org.springframework.batch.core.jsr.JsrJobParametersConverter;
 import org.springframework.batch.core.jsr.configuration.support.BatchPropertyContext;
 import org.springframework.batch.core.jsr.configuration.support.JobParameterResolvingBeanFactoryPostProcessor;
 import org.springframework.batch.core.repository.JobRepository;
+import org.springframework.beans.factory.BeanCreationException;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.access.BeanFactoryLocator;
 import org.springframework.beans.factory.access.BeanFactoryReference;
@@ -454,7 +455,12 @@ public class JsrJobOperator implements JobOperator, InitializingBean {
 
 		batchContext.addBeanFactoryPostProcessor(new JobParameterResolvingBeanFactoryPostProcessor(params));
 		batchContext.setParent(baseContext);
-		batchContext.refresh();
+
+		try {
+			batchContext.refresh();
+		} catch (BeanCreationException e) {
+			throw new JobStartException(e);
+		}
 
 		final Job job = batchContext.getBean(Job.class);
 
@@ -555,7 +561,12 @@ public class JsrJobOperator implements JobOperator, InitializingBean {
 
 		batchContext.addBeanFactoryPostProcessor(new JobParameterResolvingBeanFactoryPostProcessor(params));
 		batchContext.setParent(baseContext);
-		batchContext.refresh();
+
+		try {
+			batchContext.refresh();
+		} catch (BeanCreationException e) {
+			throw new JobStartException(e);
+		}
 
 		final Job job = batchContext.getBean(Job.class);
 

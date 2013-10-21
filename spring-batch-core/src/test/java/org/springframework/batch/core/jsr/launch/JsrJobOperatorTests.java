@@ -5,6 +5,7 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -18,6 +19,7 @@ import java.util.Set;
 import javax.batch.operations.JobExecutionIsRunningException;
 import javax.batch.operations.JobOperator;
 import javax.batch.operations.JobRestartException;
+import javax.batch.operations.JobStartException;
 import javax.batch.operations.NoSuchJobException;
 import javax.batch.operations.NoSuchJobExecutionException;
 import javax.batch.operations.NoSuchJobInstanceException;
@@ -41,6 +43,7 @@ import org.springframework.batch.core.jsr.JsrJobParametersConverter;
 import org.springframework.batch.core.launch.support.SimpleJobOperator;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.step.JobRepositorySupport;
+import org.springframework.beans.factory.BeanCreationException;
 import org.springframework.core.task.SimpleAsyncTaskExecutor;
 import org.springframework.core.task.SyncTaskExecutor;
 
@@ -451,5 +454,34 @@ public class JsrJobOperatorTests {
 		assertTrue(properties.getProperty("prevKey1").equals("prevVal1"));
 		assertTrue(properties.getProperty("userKey1").equals("userVal1"));
 		assertTrue(properties.getProperty("overrideTest").equals("userProperties"));
+	}
+
+	@Test(expected = JobStartException.class)
+	public void testBeanCreationExceptionOnStart() throws Exception {
+		jsrJobOperator = BatchRuntime.getJobOperator();
+
+		try {
+			jsrJobOperator.start("jsrJobOperatorTestBeanCreationException", null);
+		} catch (JobStartException e) {
+			assertTrue(e.getCause() instanceof BeanCreationException);
+			throw e;
+		}
+
+		fail("Should have failed");
+	}
+
+	@Test(expected = JobStartException.class)
+	public void testBeanCreationExceptionOnRestart() throws Exception {
+		JsrJobOperator jsrJobOperator1 = mock(JsrJobOperator.class);
+		when(jsrJobOperator1.restart(0l, null)).thenThrow(new JobStartException(new BeanCreationException("Bean creation exception")));
+
+		try {
+			jsrJobOperator1.restart(0l, null);
+		} catch (JobStartException e) {
+			assertTrue(e.getCause() instanceof BeanCreationException);
+			throw e;
+		}
+
+		fail("Should have failed");
 	}
 }
