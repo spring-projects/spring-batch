@@ -106,6 +106,7 @@ public class BatchPropertyContext {
 	 */
 	public Properties getStepArtifactProperties(String stepName, String artifactName) {
 		Properties properties = new Properties();
+		properties.putAll(getJobProperties());
 		properties.putAll(getStepProperties(stepName));
 
 		Map<String, Properties> artifactProperties = stepArtifactProperties.get(stepName);

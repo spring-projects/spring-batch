@@ -18,10 +18,12 @@ package org.springframework.batch.core.jsr.configuration.xml;
 import java.util.List;
 
 import org.springframework.batch.core.jsr.configuration.support.BatchArtifact;
+import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.config.RuntimeBeanReference;
 import org.springframework.beans.factory.parsing.CompositeComponentDefinition;
 import org.springframework.beans.factory.support.AbstractBeanDefinition;
 import org.springframework.beans.factory.support.BeanDefinitionBuilder;
+import org.springframework.beans.factory.support.BeanDefinitionRegistry;
 import org.springframework.beans.factory.support.ManagedList;
 import org.springframework.beans.factory.xml.ParserContext;
 import org.springframework.util.xml.DomUtils;
@@ -84,6 +86,8 @@ public class ListenerParser {
 				BeanDefinitionBuilder bd = BeanDefinitionBuilder.genericBeanDefinition(listenerType);
 				bd.addPropertyValue("delegate", new RuntimeBeanReference(beanName));
 
+				applyListenerScope(beanName, parserContext.getRegistry());
+
 				listeners.add(bd.getBeanDefinition());
 
 				new PropertyParser(beanName, parserContext, getBatchArtifactType(stepName), stepName).parseProperties(listenerElement);
@@ -96,6 +100,15 @@ public class ListenerParser {
 		}
 
 		return listeners;
+	}
+
+	protected void applyListenerScope(String beanName, BeanDefinitionRegistry beanDefinitionRegistry) {
+		if (listenerType == JobListenerFactoryBean.class) {
+			if (beanDefinitionRegistry.containsBeanDefinition(beanName)) {
+				BeanDefinition beanDefinition = beanDefinitionRegistry.getBeanDefinition(beanName);
+				beanDefinition.setScope(BeanDefinition.SCOPE_SINGLETON);
+			}
+		}
 	}
 
 	private BatchArtifact.BatchArtifactType getBatchArtifactType(String stepName) {

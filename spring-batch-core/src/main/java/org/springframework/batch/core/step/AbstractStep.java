@@ -47,6 +47,7 @@ import org.springframework.util.ClassUtils;
  * @author Ben Hale
  * @author Robert Kasanicky
  * @author Michael Minella
+ * @author Chris Schaefer
  */
 public abstract class AbstractStep implements Step, InitializingBean, BeanNameAware {
 
@@ -114,7 +115,7 @@ public abstract class AbstractStep implements Step, InitializingBean, BeanNameAw
 	 * @param startLimit the startLimit to set
 	 */
 	public void setStartLimit(int startLimit) {
-		this.startLimit = startLimit;
+		this.startLimit = startLimit == 0 ? Integer.MAX_VALUE : startLimit;
 	}
 
 	@Override
