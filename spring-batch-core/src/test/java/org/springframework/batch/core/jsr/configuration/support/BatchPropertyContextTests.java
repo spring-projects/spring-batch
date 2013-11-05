@@ -170,11 +170,13 @@ public class BatchPropertyContextTests {
 		batchPropertyContext.setStepArtifactPropertiesContextEntry(stepArtifactProperties);
 
 		Properties artifactProperties = batchPropertyContext.getStepArtifactProperties("step1", "reader");
-		assertEquals(4, artifactProperties.size());
+		assertEquals(6, artifactProperties.size());
 		assertEquals("readerProperty1value", artifactProperties.getProperty("readerProperty1"));
 		assertEquals("readerProperty2value", artifactProperties.getProperty("readerProperty2"));
 		assertEquals("step1PropertyValue1", artifactProperties.getProperty("step1PropertyName1"));
 		assertEquals("step1PropertyValue2", artifactProperties.getProperty("step1PropertyName2"));
+		assertEquals("jobProperty1value", artifactProperties.getProperty("jobProperty1"));
+		assertEquals("jobProperty2value", artifactProperties.getProperty("jobProperty2"));
 	}
 
 	@Test
@@ -213,12 +215,14 @@ public class BatchPropertyContextTests {
 		batchPropertyContext.setStepArtifactPropertiesContextEntry(partitionProperties);
 
 		Properties artifactProperties = batchPropertyContext.getStepArtifactProperties("step2:partition0", "writer");
-		assertEquals(6, artifactProperties.size());
+		assertEquals(8, artifactProperties.size());
 		assertEquals("writerProperty1", artifactProperties.getProperty("writerProperty1Step"));
 		assertEquals("writerProperty2", artifactProperties.getProperty("writerProperty2Step"));
 		assertEquals("writerProperty1valuePartition0", artifactProperties.getProperty("writerProperty1"));
 		assertEquals("writerProperty2valuePartition0", artifactProperties.getProperty("writerProperty2"));
 		assertEquals("step2PropertyValue1", artifactProperties.getProperty("step2PropertyName1"));
 		assertEquals("step2PropertyValue2", artifactProperties.getProperty("step2PropertyName2"));
+		assertEquals("jobProperty1value", artifactProperties.getProperty("jobProperty1"));
+		assertEquals("jobProperty2value", artifactProperties.getProperty("jobProperty2"));
 	}
 }

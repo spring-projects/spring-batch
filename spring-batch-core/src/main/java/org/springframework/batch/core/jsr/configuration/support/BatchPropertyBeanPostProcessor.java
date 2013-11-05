@@ -38,6 +38,7 @@ import org.springframework.beans.factory.config.BeanPostProcessor;
 import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
 import org.springframework.context.expression.StandardBeanExpressionResolver;
 import org.springframework.util.ReflectionUtils;
+import org.springframework.util.StringUtils;
 
 /**
  * <p>
@@ -114,7 +115,7 @@ public class BatchPropertyBeanPostProcessor implements BeanPostProcessor, BeanFa
 
 					String batchProperty = getBatchPropertyFieldValue(field, artifactProperties);
 
-					if (batchProperty != null) {
+					if (StringUtils.hasText(batchProperty)) {
 						field.set(artifact, batchProperty);
 					}
 
