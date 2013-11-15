@@ -15,10 +15,9 @@
  */
 package org.springframework.batch.core.jsr.configuration.xml;
 
-import static org.junit.Assert.assertEquals;
-
 import java.io.Serializable;
 import java.util.List;
+import java.util.Properties;
 
 import javax.batch.api.BatchProperty;
 import javax.batch.api.Batchlet;
@@ -28,18 +27,15 @@ import javax.batch.api.chunk.ItemProcessor;
 import javax.batch.api.chunk.ItemReader;
 import javax.batch.api.chunk.ItemWriter;
 import javax.batch.api.listener.StepListener;
+import javax.batch.runtime.BatchStatus;
+import javax.batch.runtime.JobExecution;
+import javax.batch.runtime.context.JobContext;
 import javax.inject.Inject;
 
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.springframework.batch.core.ExitStatus;
-import org.springframework.batch.core.Job;
-import org.springframework.batch.core.JobExecution;
-import org.springframework.batch.core.JobParameters;
-import org.springframework.batch.core.launch.JobLauncher;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.springframework.batch.core.jsr.JsrTestUtils;
+
+import static junit.framework.Assert.assertEquals;
 
 /**
  * <p>
@@ -47,20 +43,18 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
  * </p>
  *
  * @author Chris Schaefer
+ * @since 3.0
  */
-@ContextConfiguration
-@RunWith(SpringJUnit4ClassRunner.class)
 public class JobPropertyTests {
-	@Autowired
-	private Job job;
-
-	@Autowired
-	private JobLauncher jobLauncher;
-
 	@Test
 	public void testJobPropertyConfiguration() throws Exception {
-		JobExecution jobExecution = jobLauncher.run(job, new JobParameters());
-		assertEquals(ExitStatus.COMPLETED, jobExecution.getExitStatus());
+		Properties jobParameters = new Properties();
+		jobParameters.setProperty("allow.start.if.complete", "true");
+		jobParameters.setProperty("deciderName", "stepDecider");
+		jobParameters.setProperty("deciderNumber", "1");
+
+		JobExecution jobExecution = JsrTestUtils.runJob("jsrJobPropertyTests", jobParameters, 5000L);
+		assertEquals(BatchStatus.COMPLETED, jobExecution.getBatchStatus());
 	}
 
 	public static final class TestItemReader implements ItemReader {
@@ -74,7 +68,7 @@ public class JobPropertyTests {
 		@Inject @BatchProperty(name = "notDefinedAnnotationNamedProperty") String notDefinedAnnotationNamedProperty;
 		@Inject @BatchProperty String jobPropertyName1;
 		@Inject @BatchProperty String jobPropertyName2;
-		@Inject InjectTestObj injectAnnotatedOnlyField;
+		@Inject JobContext injectAnnotatedOnlyField;
 		@BatchProperty String batchAnnotatedOnlyField;
 		@Inject javax.batch.runtime.context.StepContext stepContext;
 
@@ -96,7 +90,7 @@ public class JobPropertyTests {
 			org.springframework.util.Assert.isNull(notDefinedAnnotationNamedProperty);
 			org.springframework.util.Assert.isNull(batchAnnotatedOnlyField);
 			org.springframework.util.Assert.notNull(injectAnnotatedOnlyField);
-			org.springframework.util.Assert.isTrue("Chris".equals(injectAnnotatedOnlyField.getName()));
+			org.springframework.util.Assert.isTrue("job1".equals(injectAnnotatedOnlyField.getJobName()));
 			org.springframework.util.Assert.isNull(readerPropertyName3);
 		}
 
@@ -270,18 +264,6 @@ public class JobPropertyTests {
 
 		@Override
 		public void stop() throws Exception {
-		}
-	}
-
-	public static class InjectTestObj {
-		private String name;
-
-		public InjectTestObj(String name) {
-			this.name = name;
-		}
-
-		public String getName() {
-			return name;
 		}
 	}
 }

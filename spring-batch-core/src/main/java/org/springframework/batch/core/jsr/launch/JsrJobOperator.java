@@ -55,7 +55,7 @@ import org.springframework.batch.core.converter.JobParametersConverter;
 import org.springframework.batch.core.explore.JobExplorer;
 import org.springframework.batch.core.jsr.JobContextFactoryBean;
 import org.springframework.batch.core.jsr.JsrJobParametersConverter;
-import org.springframework.batch.core.jsr.configuration.support.JobParameterResolvingBeanFactoryPostProcessor;
+import org.springframework.batch.core.jsr.configuration.xml.JsrXmlApplicationContext;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.scope.context.StepSynchronizationManager;
 import org.springframework.batch.core.step.NoSuchStepException;
@@ -73,7 +73,6 @@ import org.springframework.beans.factory.support.AbstractBeanDefinition;
 import org.springframework.beans.factory.support.BeanDefinitionBuilder;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.access.ContextSingletonBeanFactoryLocator;
-import org.springframework.context.support.GenericXmlApplicationContext;
 import org.springframework.core.convert.converter.Converter;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;
@@ -450,7 +449,9 @@ public class JsrJobOperator implements JobOperator, InitializingBean {
 
 		String jobName = previousJobExecution.getJobInstance().getJobName();
 
-		final GenericXmlApplicationContext batchContext = new GenericXmlApplicationContext();
+		Properties jobRestartProperties = getJobRestartProperties(params, previousJobExecution);
+
+		final JsrXmlApplicationContext batchContext = new JsrXmlApplicationContext(jobRestartProperties);
 		batchContext.setValidating(false);
 
 		Resource batchXml = new ClassPathResource("/META-INF/batch.xml");
@@ -463,8 +464,6 @@ public class JsrJobOperator implements JobOperator, InitializingBean {
 		if(jobXml.exists()) {
 			batchContext.load(jobXml);
 		}
-
-		batchContext.addBeanFactoryPostProcessor(new JobParameterResolvingBeanFactoryPostProcessor(params));
 
 		AbstractBeanDefinition beanDefinition = BeanDefinitionBuilder.genericBeanDefinition("org.springframework.batch.core.jsr.JobContextFactoryBean").getBeanDefinition();
 		beanDefinition.setScope(BeanDefinition.SCOPE_SINGLETON);
@@ -487,7 +486,6 @@ public class JsrJobOperator implements JobOperator, InitializingBean {
 		final org.springframework.batch.core.JobExecution jobExecution;
 
 		try {
-			Properties jobRestartProperties = getJobRestartProperties(params, previousJobExecution);
 			JobParameters jobParameters = jobParametersConverter.getJobParameters(jobRestartProperties);
 			jobExecution = jobRepository.createJobExecution(previousJobExecution.getJobInstance(), jobParameters, previousJobExecution.getJobConfigurationName());
 		} catch (Exception e) {
@@ -579,7 +577,7 @@ public class JsrJobOperator implements JobOperator, InitializingBean {
 	@SuppressWarnings("resource")
 	public long start(String jobName, Properties params) throws JobStartException,
 	JobSecurityException {
-		final GenericXmlApplicationContext batchContext = new GenericXmlApplicationContext();
+		final JsrXmlApplicationContext batchContext = new JsrXmlApplicationContext(params);
 		batchContext.setValidating(false);
 
 		Resource batchXml = new ClassPathResource("/META-INF/batch.xml");
@@ -594,7 +592,6 @@ public class JsrJobOperator implements JobOperator, InitializingBean {
 			batchContext.load(jobXml);
 		}
 
-		batchContext.addBeanFactoryPostProcessor(new JobParameterResolvingBeanFactoryPostProcessor(params));
 		AbstractBeanDefinition beanDefinition = BeanDefinitionBuilder.genericBeanDefinition("org.springframework.batch.core.jsr.JobContextFactoryBean").getBeanDefinition();
 		beanDefinition.setScope(BeanDefinition.SCOPE_SINGLETON);
 		batchContext.registerBeanDefinition(JSR_JOB_CONTEXT_BEAN_NAME, beanDefinition);
