@@ -178,6 +178,7 @@ public class RepositoryItemReader<T> extends AbstractItemCountingItemStreamItemR
 			current = itemLastIndex % pageSize;
 
 			results = doPageRead();
+                        page++;
 		}
 	}
 
