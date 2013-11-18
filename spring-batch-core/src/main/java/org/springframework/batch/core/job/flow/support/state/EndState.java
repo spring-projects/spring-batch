@@ -31,11 +31,11 @@ import org.springframework.batch.core.job.flow.State;
  */
 public class EndState extends AbstractState {
 
-	private final FlowExecutionStatus status;
+	protected final FlowExecutionStatus status;
 
-	private final boolean abandon;
+	protected final boolean abandon;
 
-	private final String code;
+	protected final String code;
 
 	/**
 	 * @param status The {@link FlowExecutionStatus} to end with

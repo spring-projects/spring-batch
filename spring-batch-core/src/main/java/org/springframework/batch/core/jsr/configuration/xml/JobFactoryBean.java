@@ -20,6 +20,7 @@ import javax.batch.api.listener.JobListener;
 import org.springframework.batch.core.JobExecutionListener;
 import org.springframework.batch.core.JobParametersIncrementer;
 import org.springframework.batch.core.JobParametersValidator;
+import org.springframework.batch.core.explore.JobExplorer;
 import org.springframework.batch.core.job.flow.Flow;
 import org.springframework.batch.core.job.flow.FlowJob;
 import org.springframework.batch.core.jsr.JobListenerAdapter;
@@ -54,6 +55,8 @@ public class JobFactoryBean implements SmartFactoryBean<FlowJob> {
 
 	private Flow flow;
 
+	private JobExplorer jobExplorer;
+
 	public JobFactoryBean(String name) {
 		this.name = name;
 	}
@@ -61,7 +64,8 @@ public class JobFactoryBean implements SmartFactoryBean<FlowJob> {
 	@Override
 	public final FlowJob getObject() throws Exception {
 		Assert.isTrue(StringUtils.hasText(name), "The job must have an id.");
-		FlowJob flowJob = new JsrFlowJob(name);
+		JsrFlowJob flowJob = new JsrFlowJob(name);
+		flowJob.setJobExplorer(jobExplorer);
 
 		if (restartable != null) {
 			flowJob.setRestartable(restartable);
@@ -89,6 +93,10 @@ public class JobFactoryBean implements SmartFactoryBean<FlowJob> {
 
 		flowJob.afterPropertiesSet();
 		return flowJob;
+	}
+
+	public void setJobExplorer(JobExplorer jobExplorer) {
+		this.jobExplorer = jobExplorer;
 	}
 
 	public void setRestartable(Boolean restartable) {

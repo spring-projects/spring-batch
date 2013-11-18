@@ -203,11 +203,9 @@ public class FlowParser extends AbstractFlowParser {
 		if (!StringUtils.hasText(nextAttribute)) {
 			nextAttribute = restartAttribute;
 		}
-
-		boolean abandon = stateId != null && StringUtils.hasText(restartAttribute) && !restartAttribute.equals(stateId);
 		String exitCodeAttribute = transitionElement.getAttribute(EXIT_STATUS_ATTRIBUTE);
 
-		return createTransition(status, onAttribute, nextAttribute, exitCodeAttribute, stateDef, parserContext, abandon);
+		return createTransition(status, onAttribute, nextAttribute, restartAttribute, exitCodeAttribute, stateDef, parserContext, false);
 	}
 
 	/**
@@ -226,7 +224,7 @@ public class FlowParser extends AbstractFlowParser {
 	 * references
 	 */
 	protected static Collection<BeanDefinition> createTransition(FlowExecutionStatus status, String on, String next,
-			String exitCode, BeanDefinition stateDef, ParserContext parserContext, boolean abandon) {
+			String restart, String exitCode, BeanDefinition stateDef, ParserContext parserContext, boolean abandon) {
 
 		BeanDefinition endState = null;
 
@@ -246,7 +244,11 @@ public class FlowParser extends AbstractFlowParser {
 					+ (endCounter++);
 			endBuilder.addConstructorArgValue(endName);
 
+			endBuilder.addConstructorArgValue(restart);
+
 			endBuilder.addConstructorArgValue(abandon);
+
+			endBuilder.addConstructorArgReference("jobRepository");
 
 			String nextOnEnd = exitCodeExists ? null : next;
 			endState = getStateTransitionReference(parserContext, endBuilder.getBeanDefinition(), null, nextOnEnd);
@@ -256,6 +258,11 @@ public class FlowParser extends AbstractFlowParser {
 
 		Collection<BeanDefinition> list = new ArrayList<BeanDefinition>();
 		list.add(getStateTransitionReference(parserContext, stateDef, on, next));
+
+		if(StringUtils.hasText(restart)) {
+			list.add(getStateTransitionReference(parserContext, stateDef, on + ".RESTART", restart));
+		}
+
 		if (endState != null) {
 			//
 			// Must be added after the state to ensure that the state is the

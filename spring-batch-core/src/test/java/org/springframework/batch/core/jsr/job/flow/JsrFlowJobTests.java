@@ -37,6 +37,8 @@ import org.springframework.batch.core.JobInterruptedException;
 import org.springframework.batch.core.JobParameters;
 import org.springframework.batch.core.Step;
 import org.springframework.batch.core.StepExecution;
+import org.springframework.batch.core.explore.JobExplorer;
+import org.springframework.batch.core.explore.support.MapJobExplorerFactoryBean;
 import org.springframework.batch.core.job.flow.Flow;
 import org.springframework.batch.core.job.flow.FlowExecutionStatus;
 import org.springframework.batch.core.job.flow.FlowExecutor;
@@ -50,6 +52,7 @@ import org.springframework.batch.core.job.flow.support.state.EndState;
 import org.springframework.batch.core.job.flow.support.state.FlowState;
 import org.springframework.batch.core.job.flow.support.state.SplitState;
 import org.springframework.batch.core.job.flow.support.state.StepState;
+import org.springframework.batch.core.jsr.job.flow.support.DefaultFlow;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.repository.dao.JobExecutionDao;
 import org.springframework.batch.core.repository.support.MapJobRepositoryFactoryBean;
@@ -67,6 +70,8 @@ public class JsrFlowJobTests {
 
 	private JobRepository jobRepository;
 
+	private JobExplorer jobExplorer;
+
 	private boolean fail = false;
 
 	private JobExecutionDao jobExecutionDao;
@@ -74,17 +79,22 @@ public class JsrFlowJobTests {
 	@Before
 	public void setUp() throws Exception {
 		job = new JsrFlowJob();
-		MapJobRepositoryFactoryBean factory = new MapJobRepositoryFactoryBean();
-		factory.afterPropertiesSet();
-		jobExecutionDao = factory.getJobExecutionDao();
-		jobRepository = (JobRepository) factory.getObject();
+		MapJobRepositoryFactoryBean jobRepositoryFactory = new MapJobRepositoryFactoryBean();
+		jobRepositoryFactory.afterPropertiesSet();
+		jobExecutionDao = jobRepositoryFactory.getJobExecutionDao();
+		jobRepository = (JobRepository) jobRepositoryFactory.getObject();
 		job.setJobRepository(jobRepository);
 		jobExecution = jobRepository.createJobExecution("job", new JobParameters());
+
+		MapJobExplorerFactoryBean jobExplorerFactory = new MapJobExplorerFactoryBean(jobRepositoryFactory);
+		jobExplorerFactory.afterPropertiesSet();
+		jobExplorer = (JobExplorer) jobExplorerFactory.getObject();
+		job.setJobExplorer(jobExplorer);
 	}
 
 	@Test
 	public void testGetSteps() throws Exception {
-		SimpleFlow flow = new SimpleFlow("job");
+		SimpleFlow flow = new DefaultFlow("job");
 		List<StateTransition> transitions = new ArrayList<StateTransition>();
 		transitions.add(StateTransition.createStateTransition(new StepState(new StubStep("step1")), "step2"));
 		transitions.add(StateTransition.createStateTransition(new StepState(new StubStep("step2")), "end0"));
@@ -98,7 +108,7 @@ public class JsrFlowJobTests {
 
 	@Test
 	public void testTwoSteps() throws Exception {
-		SimpleFlow flow = new SimpleFlow("job");
+		SimpleFlow flow = new DefaultFlow("job");
 		List<StateTransition> transitions = new ArrayList<StateTransition>();
 		transitions.add(StateTransition.createStateTransition(new StepState(new StubStep("step1")), "step2"));
 		StepState step2 = new StepState(new StubStep("step2"));
@@ -117,7 +127,7 @@ public class JsrFlowJobTests {
 
 	@Test
 	public void testFailedStep() throws Exception {
-		SimpleFlow flow = new SimpleFlow("job");
+		SimpleFlow flow = new DefaultFlow("job");
 		List<StateTransition> transitions = new ArrayList<StateTransition>();
 		transitions.add(StateTransition.createStateTransition(new StateSupport("step1", FlowExecutionStatus.FAILED),
 				"step2"));
@@ -138,14 +148,15 @@ public class JsrFlowJobTests {
 
 	@Test
 	public void testFailedStepRestarted() throws Exception {
-		SimpleFlow flow = new SimpleFlow("job");
+		SimpleFlow flow = new DefaultFlow("job");
 		List<StateTransition> transitions = new ArrayList<StateTransition>();
 		transitions.add(StateTransition.createStateTransition(new StepState(new StubStep("step1")), "step2"));
 		State step2State = new StateSupport("step2") {
 			@Override
 			public FlowExecutionStatus handle(FlowExecutor executor) throws Exception {
 				JobExecution jobExecution = executor.getJobExecution();
-				jobExecution.createStepExecution(getName());
+				StepExecution stepExecution = jobExecution.createStepExecution(getName());
+				jobRepository.add(stepExecution);
 				if (fail) {
 					return FlowExecutionStatus.FAILED;
 				}
@@ -175,7 +186,7 @@ public class JsrFlowJobTests {
 
 	@Test
 	public void testStoppingStep() throws Exception {
-		SimpleFlow flow = new SimpleFlow("job");
+		SimpleFlow flow = new DefaultFlow("job");
 		List<StateTransition> transitions = new ArrayList<StateTransition>();
 		transitions.add(StateTransition.createStateTransition(new StepState(new StubStep("step1")), "step2"));
 		State state2 = new StateSupport("step2", FlowExecutionStatus.FAILED);
@@ -196,7 +207,7 @@ public class JsrFlowJobTests {
 
 	@Test
 	public void testInterrupted() throws Exception {
-		SimpleFlow flow = new SimpleFlow("job");
+		SimpleFlow flow = new DefaultFlow("job");
 		List<StateTransition> transitions = new ArrayList<StateTransition>();
 		transitions.add(StateTransition.createStateTransition(new StepState(new StubStep("step1") {
 			@Override
@@ -219,7 +230,7 @@ public class JsrFlowJobTests {
 
 	@Test
 	public void testUnknownStatusStopsJob() throws Exception {
-		SimpleFlow flow = new SimpleFlow("job");
+		SimpleFlow flow = new DefaultFlow("job");
 		List<StateTransition> transitions = new ArrayList<StateTransition>();
 		transitions.add(StateTransition.createStateTransition(new StepState(new StubStep("step1") {
 			@Override
@@ -244,9 +255,9 @@ public class JsrFlowJobTests {
 
 	@Test
 	public void testInterruptedSplit() throws Exception {
-		SimpleFlow flow = new SimpleFlow("job");
-		SimpleFlow flow1 = new SimpleFlow("flow1");
-		SimpleFlow flow2 = new SimpleFlow("flow2");
+		SimpleFlow flow = new DefaultFlow("job");
+		SimpleFlow flow1 = new DefaultFlow("flow1");
+		SimpleFlow flow2 = new DefaultFlow("flow2");
 
 		List<StateTransition> transitions = new ArrayList<StateTransition>();
 		transitions.add(StateTransition.createStateTransition(new StepState(new StubStep("step1") {
@@ -290,7 +301,7 @@ public class JsrFlowJobTests {
 
 	@Test
 	public void testInterruptedException() throws Exception {
-		SimpleFlow flow = new SimpleFlow("job");
+		SimpleFlow flow = new DefaultFlow("job");
 		List<StateTransition> transitions = new ArrayList<StateTransition>();
 		transitions.add(StateTransition.createStateTransition(new StepState(new StubStep("step1") {
 			@Override
@@ -312,9 +323,9 @@ public class JsrFlowJobTests {
 
 	@Test
 	public void testInterruptedSplitException() throws Exception {
-		SimpleFlow flow = new SimpleFlow("job");
-		SimpleFlow flow1 = new SimpleFlow("flow1");
-		SimpleFlow flow2 = new SimpleFlow("flow2");
+		SimpleFlow flow = new DefaultFlow("job");
+		SimpleFlow flow1 = new DefaultFlow("flow1");
+		SimpleFlow flow2 = new DefaultFlow("flow2");
 
 		List<StateTransition> transitions = new ArrayList<StateTransition>();
 		transitions.add(StateTransition.createStateTransition(new StepState(new StubStep("step1") {
@@ -347,7 +358,7 @@ public class JsrFlowJobTests {
 
 	@Test
 	public void testEndStateStopped() throws Exception {
-		SimpleFlow flow = new SimpleFlow("job");
+		SimpleFlow flow = new DefaultFlow("job");
 		List<StateTransition> transitions = new ArrayList<StateTransition>();
 		transitions.add(StateTransition.createStateTransition(new StepState(new StubStep("step1")), "end"));
 		transitions.add(StateTransition
@@ -366,7 +377,7 @@ public class JsrFlowJobTests {
 	}
 
 	public void testEndStateFailed() throws Exception {
-		SimpleFlow flow = new SimpleFlow("job");
+		SimpleFlow flow = new DefaultFlow("job");
 		List<StateTransition> transitions = new ArrayList<StateTransition>();
 		transitions.add(StateTransition.createStateTransition(new StepState(new StubStep("step1")), "end"));
 		transitions
@@ -387,7 +398,7 @@ public class JsrFlowJobTests {
 
 	@Test
 	public void testEndStateStoppedWithRestart() throws Exception {
-		SimpleFlow flow = new SimpleFlow("job");
+		SimpleFlow flow = new DefaultFlow("job");
 		List<StateTransition> transitions = new ArrayList<StateTransition>();
 		transitions.add(StateTransition.createStateTransition(new StepState(new StubStep("step1")), "end"));
 		transitions.add(StateTransition
@@ -415,7 +426,7 @@ public class JsrFlowJobTests {
 
 	@Test
 	public void testBranching() throws Exception {
-		SimpleFlow flow = new SimpleFlow("job");
+		SimpleFlow flow = new DefaultFlow("job");
 		List<StateTransition> transitions = new ArrayList<StateTransition>();
 		StepState step1 = new StepState(new StubStep("step1"));
 		transitions.add(StateTransition.createStateTransition(step1, "step2"));
@@ -441,7 +452,7 @@ public class JsrFlowJobTests {
 
 	@Test
 	public void testBasicFlow() throws Throwable {
-		SimpleFlow flow = new SimpleFlow("job");
+		SimpleFlow flow = new DefaultFlow("job");
 		List<StateTransition> transitions = new ArrayList<StateTransition>();
 		transitions.add(StateTransition.createStateTransition(new StepState(new StubStep("step")), "end0"));
 		transitions.add(StateTransition.createEndStateTransition(new EndState(FlowExecutionStatus.COMPLETED, "end0")));
@@ -457,7 +468,7 @@ public class JsrFlowJobTests {
 	@Test
 	public void testDecisionFlow() throws Throwable {
 
-		SimpleFlow flow = new SimpleFlow("job");
+		SimpleFlow flow = new DefaultFlow("job");
 		Decider decider = new Decider() {
 
 			@Override
@@ -501,7 +512,7 @@ public class JsrFlowJobTests {
 	@Test
 	public void testDecisionFlowWithExceptionInDecider() throws Throwable {
 
-		SimpleFlow flow = new SimpleFlow("job");
+		SimpleFlow flow = new DefaultFlow("job");
 		JobExecutionDecider decider = new JobExecutionDecider() {
 			@Override
 			public FlowExecutionStatus decide(JobExecution jobExecution, StepExecution stepExecution) {
@@ -544,7 +555,7 @@ public class JsrFlowJobTests {
 
 	@Test
 	public void testGetStepExists() throws Exception {
-		SimpleFlow flow = new SimpleFlow("job");
+		SimpleFlow flow = new DefaultFlow("job");
 		List<StateTransition> transitions = new ArrayList<StateTransition>();
 		transitions.add(StateTransition.createStateTransition(new StepState(new StubStep("step1")), "step2"));
 		transitions.add(StateTransition.createStateTransition(new StepState(new StubStep("step2")), "end0"));
@@ -561,7 +572,7 @@ public class JsrFlowJobTests {
 
 	@Test
 	public void testGetStepExistsWithPrefix() throws Exception {
-		SimpleFlow flow = new SimpleFlow("job");
+		SimpleFlow flow = new DefaultFlow("job");
 		List<StateTransition> transitions = new ArrayList<StateTransition>();
 		transitions.add(StateTransition.createStateTransition(new StepState("job.step", new StubStep("step")), "end0"));
 		transitions.add(StateTransition.createEndStateTransition(new EndState(FlowExecutionStatus.COMPLETED, "end0")));
@@ -578,7 +589,7 @@ public class JsrFlowJobTests {
 
 	@Test
 	public void testGetStepNamesWithPrefix() throws Exception {
-		SimpleFlow flow = new SimpleFlow("job");
+		SimpleFlow flow = new DefaultFlow("job");
 		List<StateTransition> transitions = new ArrayList<StateTransition>();
 		transitions.add(StateTransition.createStateTransition(new StepState("job.step", new StubStep("step")), "end0"));
 		transitions.add(StateTransition.createEndStateTransition(new EndState(FlowExecutionStatus.COMPLETED, "end0")));
@@ -593,7 +604,7 @@ public class JsrFlowJobTests {
 
 	@Test
 	public void testGetStepNotExists() throws Exception {
-		SimpleFlow flow = new SimpleFlow("job");
+		SimpleFlow flow = new DefaultFlow("job");
 		List<StateTransition> transitions = new ArrayList<StateTransition>();
 		transitions.add(StateTransition.createStateTransition(new StepState(new StubStep("step1")), "step2"));
 		transitions.add(StateTransition.createStateTransition(new StepState(new StubStep("step2")), "end0"));
@@ -609,7 +620,7 @@ public class JsrFlowJobTests {
 
 	@Test
 	public void testGetStepNotStepState() throws Exception {
-		SimpleFlow flow = new SimpleFlow("job");
+		SimpleFlow flow = new DefaultFlow("job");
 		List<StateTransition> transitions = new ArrayList<StateTransition>();
 		transitions.add(StateTransition.createStateTransition(new StepState(new StubStep("step1")), "step2"));
 		transitions.add(StateTransition.createStateTransition(new StepState(new StubStep("step2")), "end0"));
@@ -625,14 +636,14 @@ public class JsrFlowJobTests {
 
 	@Test
 	public void testGetStepNestedFlow() throws Exception {
-		SimpleFlow nested = new SimpleFlow("nested");
+		SimpleFlow nested = new DefaultFlow("nested");
 		List<StateTransition> transitions = new ArrayList<StateTransition>();
 		transitions.add(StateTransition.createStateTransition(new StepState(new StubStep("step2")), "end1"));
 		transitions.add(StateTransition.createEndStateTransition(new EndState(FlowExecutionStatus.COMPLETED, "end1")));
 		nested.setStateTransitions(transitions);
 		nested.afterPropertiesSet();
 
-		SimpleFlow flow = new SimpleFlow("job");
+		SimpleFlow flow = new DefaultFlow("job");
 		transitions = new ArrayList<StateTransition>();
 		transitions.add(StateTransition.createStateTransition(new StepState(new StubStep("step1")), "nested"));
 		transitions.add(StateTransition.createStateTransition(new FlowState(nested, "nested"), "end0"));
@@ -649,9 +660,9 @@ public class JsrFlowJobTests {
 
 	@Test
 	public void testGetStepSplitFlow() throws Exception {
-		SimpleFlow flow = new SimpleFlow("job");
-		SimpleFlow flow1 = new SimpleFlow("flow1");
-		SimpleFlow flow2 = new SimpleFlow("flow2");
+		SimpleFlow flow = new DefaultFlow("job");
+		SimpleFlow flow1 = new DefaultFlow("flow1");
+		SimpleFlow flow2 = new DefaultFlow("flow2");
 
 		List<StateTransition> transitions = new ArrayList<StateTransition>();
 		transitions.add(StateTransition.createStateTransition(new StepState(new StubStep("step1")), "end0"));

@@ -79,6 +79,7 @@ public class SplitParsingTests {
 		RuntimeBeanReference runtimeBeanReferenceValue = (RuntimeBeanReference) propertyValue.getValue();
 
 		Assert.assertTrue("RuntimeBeanReference should have a name of jsr352splitTaskExecutor" , "jsr352splitTaskExecutor".equals(runtimeBeanReferenceValue.getBeanName()));
+		context.close();
 	}
 
 	@Test
@@ -87,5 +88,6 @@ public class SplitParsingTests {
 		BeanDefinitionRegistry registry = (BeanDefinitionRegistry) context.getBeanFactory();
 		PropertyValue propertyValue = new SplitParser(null).getSplitTaskExecutorPropertyValue(registry);
 		Assert.assertTrue("Task executor not an instance of SimpleAsyncTaskExecutor" , (propertyValue.getValue() instanceof SimpleAsyncTaskExecutor));
+		context.close();
 	}
 }
