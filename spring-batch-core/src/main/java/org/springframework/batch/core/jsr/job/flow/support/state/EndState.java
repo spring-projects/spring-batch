@@ -15,11 +15,15 @@
  */
 package org.springframework.batch.core.jsr.job.flow.support.state;
 
+import org.springframework.batch.core.BatchStatus;
 import org.springframework.batch.core.ExitStatus;
+import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.StepExecution;
 import org.springframework.batch.core.job.flow.FlowExecutionStatus;
 import org.springframework.batch.core.job.flow.FlowExecutor;
 import org.springframework.batch.core.job.flow.State;
+import org.springframework.batch.core.repository.JobRepository;
+import org.springframework.batch.item.ExecutionContext;
 
 /**
  * {@link State} implementation for ending a job per JSR-352 rules if it is
@@ -29,6 +33,9 @@ import org.springframework.batch.core.job.flow.State;
  * @since 3.0
  */
 public class EndState extends org.springframework.batch.core.job.flow.support.state.EndState {
+
+	private JobRepository jobRepository;
+	private String restart;
 
 	/**
 	 * @param status The {@link FlowExecutionStatus} to end with
@@ -55,6 +62,60 @@ public class EndState extends org.springframework.batch.core.job.flow.support.st
 	 */
 	public EndState(FlowExecutionStatus status, String code, String name, boolean abandon) {
 		super(status, code, name, abandon);
+	}
+
+	public EndState(FlowExecutionStatus status, String code, String name, String restart, boolean abandon, JobRepository jobRepository) {
+		super(status, code, name, abandon);
+		this.jobRepository = jobRepository;
+		this.restart = restart;
+	}
+
+	@Override
+	public FlowExecutionStatus handle(FlowExecutor executor)
+			throws Exception {
+		synchronized (executor) {
+
+			// Special case. If the last step execution could not complete we
+			// are in an unknown state (possibly unrecoverable).
+			StepExecution stepExecution = executor.getStepExecution();
+			if (stepExecution != null && executor.getStepExecution().getStatus() == BatchStatus.UNKNOWN) {
+				return FlowExecutionStatus.UNKNOWN;
+			}
+
+			if (getStatus().isStop()) {
+				JobExecution jobExecution = stepExecution.getJobExecution();
+				ExecutionContext executionContext = jobExecution.getExecutionContext();
+				executionContext.put("batch.restartStep", restart);
+				executionContext.put("batch.stoppedStep", stepExecution.getStepName());
+				jobRepository.updateExecutionContext(jobExecution);
+
+				if (!executor.isRestart()) {
+					/*
+					 * If there are step executions, then we are not at the
+					 * beginning of a restart.
+					 */
+					if (isAbandon()) {
+						/*
+						 * Only if instructed to do so, upgrade the status of
+						 * last step execution so it is not replayed on a
+						 * restart...
+						 */
+						executor.abandonStepExecution();
+					}
+				}
+				else {
+					/*
+					 * If we are a stop state and we got this far then it must
+					 * be a restart, so return COMPLETED.
+					 */
+					return FlowExecutionStatus.COMPLETED;
+				}
+			}
+
+			setExitStatus(executor, getCode());
+
+			return getStatus();
+		}
 	}
 
 	/* (non-Javadoc)

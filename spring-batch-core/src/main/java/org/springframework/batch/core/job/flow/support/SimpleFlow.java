@@ -202,6 +202,7 @@ public class SimpleFlow implements Flow, InitializingBean {
 
 		String next = null;
 		String exitCode = status.getName();
+
 		for (StateTransition stateTransition : set) {
 			if (stateTransition.matches(exitCode) || (exitCode.equals("PENDING") && stateTransition.matches("STOPPED"))) {
 				if (stateTransition.isEnd()) {
@@ -224,7 +225,6 @@ public class SimpleFlow implements Flow, InitializingBean {
 		}
 
 		State state = stateMap.get(next);
-
 		return state;
 
 	}

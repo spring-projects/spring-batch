@@ -54,6 +54,8 @@ public class JobParser extends AbstractSingleBeanDefinitionParser {
 
 		builder.addConstructorArgValue(jobName);
 
+		builder.addPropertyReference("jobExplorer", "jobExplorer");
+
 		String restartableAttribute = element.getAttribute(RESTARTABLE_ATTRIBUTE);
 		if (StringUtils.hasText(restartableAttribute)) {
 			builder.addPropertyValue("restartable", restartableAttribute);

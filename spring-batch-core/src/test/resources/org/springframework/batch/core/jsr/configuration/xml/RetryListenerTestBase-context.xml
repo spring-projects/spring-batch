@@ -29,4 +29,8 @@
     </bean>
 
     <bean id="jobRepository" class="org.springframework.batch.core.repository.support.MapJobRepositoryFactoryBean"/>
+
+	<bean id="jobExplorer" class="org.springframework.batch.core.explore.support.MapJobExplorerFactoryBean">
+		<property name="repositoryFactory" ref="&amp;jobRepository"/>
+	</bean>
 </beans>

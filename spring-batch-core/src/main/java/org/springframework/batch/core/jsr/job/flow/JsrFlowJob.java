@@ -19,11 +19,12 @@ import org.springframework.batch.core.ExitStatus;
 import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.JobExecutionException;
 import org.springframework.batch.core.JobInterruptedException;
+import org.springframework.batch.core.explore.JobExplorer;
 import org.springframework.batch.core.job.AbstractJob;
-import org.springframework.batch.core.job.SimpleStepHandler;
 import org.springframework.batch.core.job.flow.FlowExecutionException;
 import org.springframework.batch.core.job.flow.FlowJob;
 import org.springframework.batch.core.job.flow.JobFlowExecutor;
+import org.springframework.batch.core.jsr.job.DefaultStepHandler;
 import org.springframework.batch.core.launch.NoSuchJobException;
 import org.springframework.batch.core.launch.support.ExitCodeMapper;
 
@@ -34,6 +35,8 @@ import org.springframework.batch.core.launch.support.ExitCodeMapper;
  * @since 3.0
  */
 public class JsrFlowJob extends FlowJob {
+
+	private JobExplorer jobExplorer;
 
 	/**
 	 * No arg constructor (invalid state)
@@ -51,6 +54,10 @@ public class JsrFlowJob extends FlowJob {
 		super(name);
 	}
 
+	public void setJobExplorer(JobExplorer jobExplorer) {
+		this.jobExplorer = jobExplorer;
+	}
+
 	/**
 	 * @see AbstractJob#doExecute(JobExecution)
 	 */
@@ -58,7 +65,7 @@ public class JsrFlowJob extends FlowJob {
 	protected void doExecute(final JobExecution execution) throws JobExecutionException {
 		try {
 			JobFlowExecutor executor = new JsrFlowExecutor(getJobRepository(),
-					new SimpleStepHandler(getJobRepository()), execution);
+					new DefaultStepHandler(getJobRepository(), jobExplorer), execution);
 			executor.updateJobExecutionStatus(flow.start(executor).getStatus());
 		}
 		catch (FlowExecutionException e) {

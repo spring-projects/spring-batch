@@ -26,6 +26,8 @@ import org.springframework.batch.core.job.flow.FlowExecutionStatus;
 import org.springframework.batch.core.job.flow.State;
 import org.springframework.batch.core.job.flow.support.SimpleFlow;
 import org.springframework.batch.core.job.flow.support.StateTransition;
+import org.springframework.batch.item.ExecutionContext;
+import org.springframework.util.StringUtils;
 
 /**
  * Implements JSR-352 specific logic around the execution of a flow.  Specifically, this
@@ -46,12 +48,31 @@ public class DefaultFlow extends SimpleFlow {
 		super(name);
 	}
 
+	@Override
+	protected State nextState(String stateName, FlowExecutionStatus status, StepExecution stepExecution) throws FlowExecutionException {
+		State nextState = findState(stateName, status, stepExecution);
+
+		if(stepExecution != null) {
+			ExecutionContext executionContext = stepExecution.getJobExecution().getExecutionContext();
+			if(executionContext.containsKey("batch.stoppedStep")) {
+				String stepName = executionContext.getString("batch.stoppedStep");
+
+				if(stateName.endsWith(stepName)) {
+					if(nextState != null && executionContext.containsKey("batch.restartStep") && StringUtils.hasText(executionContext.getString("batch.restartStep"))) {
+						nextState = findState(stateName, new FlowExecutionStatus(status.getName() + ".RESTART"), stepExecution);
+					}
+				}
+			}
+		}
+
+		return nextState;
+	}
+
 	/**
 	 * @return the next {@link Step} (or null if this is the end)
 	 * @throws JobExecutionException
 	 */
-	@Override
-	protected State nextState(String stateName, FlowExecutionStatus status, StepExecution stepExecution) throws FlowExecutionException {
+	private State findState(String stateName, FlowExecutionStatus status, StepExecution stepExecution) throws FlowExecutionException {
 		Set<StateTransition> set = getTransitionMap().get(stateName);
 
 		if (set == null) {
