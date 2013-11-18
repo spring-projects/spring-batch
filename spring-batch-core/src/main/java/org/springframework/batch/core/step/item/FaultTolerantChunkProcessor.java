@@ -256,7 +256,7 @@ public class FaultTolerantChunkProcessor<I, O> extends SimpleChunkProcessor<I, O
 					}
 					if (output == null) {
 						// No need to re-process filtered items
-						iterator.remove();						
+						iterator.remove();
 					}
 					return output;
 				}
@@ -313,7 +313,6 @@ public class FaultTolerantChunkProcessor<I, O> extends SimpleChunkProcessor<I, O
 	@Override
 	protected void write(final StepContribution contribution, final Chunk<I> inputs, final Chunk<O> outputs)
 			throws Exception {
-
 		@SuppressWarnings("unchecked")
 		final UserData<O> data = (UserData<O>) inputs.getUserData();
 		final AtomicReference<RetryContext> contextHolder = new AtomicReference<RetryContext>();
@@ -568,6 +567,7 @@ public class FaultTolerantChunkProcessor<I, O> extends SimpleChunkProcessor<I, O
 		if (outputs.isEmpty()) {
 			data.scanning(false);
 			inputs.setBusy(false);
+			chunkMonitor.resetOffset();
 			return;
 		}
 
