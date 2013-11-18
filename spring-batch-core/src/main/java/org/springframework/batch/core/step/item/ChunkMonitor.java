@@ -23,7 +23,6 @@ import org.springframework.batch.item.ItemStream;
 import org.springframework.batch.item.ItemStreamException;
 import org.springframework.batch.item.ItemStreamSupport;
 import org.springframework.batch.item.support.CompositeItemStream;
-import org.springframework.util.ClassUtils;
 
 /**
  * Manage the offset data between the last successful commit and updates made to
@@ -59,10 +58,10 @@ public class ChunkMonitor extends ItemStreamSupport {
 
 	private ItemReader<?> reader;
 
-        public ChunkMonitor() {
-                this.setExecutionContextName(ChunkMonitor.class.getName());
-        }
-        
+	public ChunkMonitor() {
+		this.setExecutionContextName(ChunkMonitor.class.getName());
+	}
+
 	/**
 	 * @param stream the stream to set
 	 */
@@ -101,7 +100,7 @@ public class ChunkMonitor extends ItemStreamSupport {
 
 	@Override
 	public void close() throws ItemStreamException {
-                super.close();
+		super.close();
 		holder.set(null);
 		if (streamsRegistered) {
 			stream.close();
@@ -110,7 +109,7 @@ public class ChunkMonitor extends ItemStreamSupport {
 
 	@Override
 	public void open(ExecutionContext executionContext) throws ItemStreamException {
-                super.open(executionContext);
+		super.open(executionContext);
 		if (streamsRegistered) {
 			stream.open(executionContext);
 			ChunkMonitorData data = new ChunkMonitorData(executionContext.getInt(getExecutionContextKey(OFFSET), 0), 0);
@@ -127,12 +126,14 @@ public class ChunkMonitor extends ItemStreamSupport {
 					throw new ItemStreamException("Could not position reader with offset: " + data.offset, e);
 				}
 			}
+
+			resetOffset();
 		}
 	}
 
 	@Override
 	public void update(ExecutionContext executionContext) throws ItemStreamException {
-                super.update(executionContext);
+		super.update(executionContext);
 		if (streamsRegistered) {
 			ChunkMonitorData data = getData();
 			if (data.offset == 0) {
