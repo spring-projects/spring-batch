@@ -37,9 +37,11 @@ import org.springframework.batch.item.ExecutionContext;
 public class PartitionStep extends org.springframework.batch.core.partition.support.PartitionStep {
 
 	private PartitionReducer reducer;
+	private boolean hasReducer = false;
 
 	public void setPartitionReducer(PartitionReducer reducer) {
 		this.reducer = reducer;
+		hasReducer = reducer != null;
 	}
 
 	/**
@@ -58,7 +60,7 @@ public class PartitionStep extends org.springframework.batch.core.partition.supp
 	@Override
 	protected void doExecute(StepExecution stepExecution) throws Exception {
 
-		if(reducer != null) {
+		if(hasReducer) {
 			reducer.beginPartitionedStep();
 		}
 
@@ -66,9 +68,8 @@ public class PartitionStep extends org.springframework.batch.core.partition.supp
 		getPartitionHandler().handle(getStepExecutionSplitter(), stepExecution);
 		stepExecution.upgradeStatus(BatchStatus.COMPLETED);
 
-		// If anything failed or had a problem we need to crap out
 		if (stepExecution.getStatus().isUnsuccessful()) {
-			if (reducer != null) {
+			if (hasReducer) {
 				reducer.rollbackPartitionedStep();
 				reducer.beforePartitionedStepCompletion();
 				reducer.afterPartitionedStepCompletion(PartitionStatus.ROLLBACK);
@@ -76,7 +77,7 @@ public class PartitionStep extends org.springframework.batch.core.partition.supp
 			throw new JobExecutionException("Partition handler returned an unsuccessful step");
 		}
 
-		if (reducer != null) {
+		if (hasReducer) {
 			reducer.beforePartitionedStepCompletion();
 			reducer.afterPartitionedStepCompletion(PartitionStatus.COMMIT);
 		}

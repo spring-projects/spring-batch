@@ -25,7 +25,6 @@ import java.util.Properties;
 import java.util.Queue;
 import java.util.Set;
 import java.util.concurrent.Callable;
-import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 import java.util.concurrent.FutureTask;
 import java.util.concurrent.LinkedBlockingQueue;
@@ -189,8 +188,7 @@ public class JsrPartitionHandler implements PartitionHandler, InitializingBean {
 
 	private void processFinishedPartitions(
 			final List<Future<StepExecution>> tasks,
-			final Set<StepExecution> result) throws InterruptedException,
-			ExecutionException, Exception {
+			final Set<StepExecution> result) throws Exception {
 		for(int i = 0; i < tasks.size(); i++) {
 			Future<StepExecution> curTask = tasks.get(i);
 

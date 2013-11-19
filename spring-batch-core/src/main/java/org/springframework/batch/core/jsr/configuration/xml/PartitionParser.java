@@ -75,32 +75,23 @@ public class PartitionParser {
 		MutablePropertyValues properties = partitionHandlerDefinition.getPropertyValues();
 		properties.addPropertyValue(PARTITION_CONTEXT_PROPERTY, new RuntimeBeanReference("batchPropertyContext"));
 
-		Element mapperElement = DomUtils.getChildElementByTagName(element, MAPPER_ELEMENT);
-
-		if(mapperElement != null) {
-			String mapperName = mapperElement.getAttribute(REF);
-			properties.add(PARTITION_MAPPER_PROPERTY, new RuntimeBeanReference(mapperName));
-			new PropertyParser(mapperName, parserContext, BatchArtifactType.STEP_ARTIFACT, name).parseProperties(mapperElement);
-		}
-
+		paserMapperElement(element, parserContext, properties);
 		parsePartitionPlan(element, parserContext, stepName, properties);
+		parseAnalyzerElement(element, parserContext, properties);
+		parseReducerElement(element, parserContext, factoryBeanProperties);
+		parseCollectorElement(element, parserContext, factoryBeanProperties,
+				properties);
 
-		Element analyzerElement = DomUtils.getChildElementByTagName(element, ANALYZER_ELEMENT);
+		String partitionHandlerBeanName = name + ".partitionHandler";
+		registry.registerBeanDefinition(partitionHandlerBeanName, partitionHandlerDefinition);
+		factoryBeanProperties.add("partitionHandler", new RuntimeBeanReference(partitionHandlerBeanName));
 
-		if(analyzerElement != null) {
-			String analyzerName = analyzerElement.getAttribute(REF);
-			properties.add(PARTITION_ANALYZER_PROPERTY, new RuntimeBeanReference(analyzerName));
-			new PropertyParser(analyzerName, parserContext, BatchArtifactType.STEP_ARTIFACT, name).parseProperties(analyzerElement);
-		}
+	}
 
-		Element reducerElement = DomUtils.getChildElementByTagName(element, REDUCER_ELEMENT);
-
-		if(reducerElement != null) {
-			String reducerName = reducerElement.getAttribute(REF);
-			factoryBeanProperties.add(PARTITION_REDUCER_PROPERTY, new RuntimeBeanReference(reducerName));
-			new PropertyParser(reducerName, parserContext, BatchArtifactType.STEP_ARTIFACT, name).parseProperties(reducerElement);
-		}
-
+	private void parseCollectorElement(Element element,
+			ParserContext parserContext,
+			MutablePropertyValues factoryBeanProperties,
+			MutablePropertyValues properties) {
 		Element collectorElement = DomUtils.getChildElementByTagName(element, COLLECTOR_ELEMENT);
 
 		if(collectorElement != null) {
@@ -112,11 +103,40 @@ public class PartitionParser {
 			factoryBeanProperties.add(LISTENERS_PROPERTY, new RuntimeBeanReference(collectorName));
 			new PropertyParser(collectorName, parserContext, BatchArtifactType.STEP_ARTIFACT, name).parseProperties(collectorElement);
 		}
+	}
 
-		String partitionHandlerBeanName = name + ".partitionHandler";
-		registry.registerBeanDefinition(partitionHandlerBeanName, partitionHandlerDefinition);
-		factoryBeanProperties.add("partitionHandler", new RuntimeBeanReference(partitionHandlerBeanName));
+	private void parseReducerElement(Element element,
+			ParserContext parserContext,
+			MutablePropertyValues factoryBeanProperties) {
+		Element reducerElement = DomUtils.getChildElementByTagName(element, REDUCER_ELEMENT);
 
+		if(reducerElement != null) {
+			String reducerName = reducerElement.getAttribute(REF);
+			factoryBeanProperties.add(PARTITION_REDUCER_PROPERTY, new RuntimeBeanReference(reducerName));
+			new PropertyParser(reducerName, parserContext, BatchArtifactType.STEP_ARTIFACT, name).parseProperties(reducerElement);
+		}
+	}
+
+	private void parseAnalyzerElement(Element element,
+			ParserContext parserContext, MutablePropertyValues properties) {
+		Element analyzerElement = DomUtils.getChildElementByTagName(element, ANALYZER_ELEMENT);
+
+		if(analyzerElement != null) {
+			String analyzerName = analyzerElement.getAttribute(REF);
+			properties.add(PARTITION_ANALYZER_PROPERTY, new RuntimeBeanReference(analyzerName));
+			new PropertyParser(analyzerName, parserContext, BatchArtifactType.STEP_ARTIFACT, name).parseProperties(analyzerElement);
+		}
+	}
+
+	private void paserMapperElement(Element element,
+			ParserContext parserContext, MutablePropertyValues properties) {
+		Element mapperElement = DomUtils.getChildElementByTagName(element, MAPPER_ELEMENT);
+
+		if(mapperElement != null) {
+			String mapperName = mapperElement.getAttribute(REF);
+			properties.add(PARTITION_MAPPER_PROPERTY, new RuntimeBeanReference(mapperName));
+			new PropertyParser(mapperName, parserContext, BatchArtifactType.STEP_ARTIFACT, name).parseProperties(mapperElement);
+		}
 	}
 
 	private void registerCollectorAnalyzerQueue(ParserContext parserContext) {

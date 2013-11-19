@@ -293,7 +293,7 @@ public class StepParserStepFactoryBean<I, O> implements FactoryBean, BeanNameAwa
 	}
 
 	/**
-	 * @param builder
+	 * @param builder {@link StepBuilderHelper} representing the step to be enhanced
 	 */
 	protected void enhanceCommonStep(StepBuilderHelper<?> builder) {
 		if (allowStartIfComplete != null) {
@@ -867,11 +867,8 @@ public class StepParserStepFactoryBean<I, O> implements FactoryBean, BeanNameAwa
 				jsrRetryListeners.add(new RetryWriteListenerAdapter((RetryWriteListener) listener));
 			}
 			if(listener instanceof PartitionCollector) {
-				PartitionCollectorAdapter adapter = new PartitionCollectorAdapter();
-				adapter.setPartitionCollector((PartitionCollector) listener);
-				adapter.setPartitionQueue(partitionQueue);
+				PartitionCollectorAdapter adapter = new PartitionCollectorAdapter(partitionQueue, (PartitionCollector) listener);
 				chunkListeners.add(adapter);
-				stepExecutionListeners.add(adapter);
 			}
 		}
 	}

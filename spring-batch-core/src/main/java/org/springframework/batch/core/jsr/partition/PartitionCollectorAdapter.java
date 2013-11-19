@@ -18,12 +18,11 @@ package org.springframework.batch.core.jsr.partition;
 import java.io.Serializable;
 import java.util.Queue;
 
-import javax.batch.api.partition.PartitionAnalyzer;
 import javax.batch.api.partition.PartitionCollector;
+import javax.batch.operations.BatchRuntimeException;
 
 import org.springframework.batch.core.ChunkListener;
 import org.springframework.batch.core.scope.context.ChunkContext;
-import org.springframework.beans.factory.InitializingBean;
 import org.springframework.util.Assert;
 
 /**
@@ -35,22 +34,16 @@ import org.springframework.util.Assert;
  * @author Michael Minella
  * @since 3.0
  */
-public class PartitionCollectorAdapter implements ChunkListener, InitializingBean {
+public class PartitionCollectorAdapter implements ChunkListener {
 
 	private PartitionCollector collector;
 	private Queue<Serializable> partitionQueue;
 
-	/**
-	 * @param queue destination for results of each {@link PartitionCollector#collectPartitionData()} call.
-	 */
-	public void setPartitionQueue(Queue<Serializable> queue) {
-		this.partitionQueue = queue;
-	}
+	public PartitionCollectorAdapter(Queue<Serializable> queue, PartitionCollector collector) {
+		Assert.notNull(queue, "A thread safe Queue is required");
+		Assert.notNull(collector, "A PartitionCollector is required");
 
-	/**
-	 * @param collector Provides partition specific information back to the {@link PartitionAnalyzer} as needed.
-	 */
-	public void setPartitionCollector(PartitionCollector collector) {
+		this.partitionQueue = queue;
 		this.collector = collector;
 	}
 
@@ -62,18 +55,12 @@ public class PartitionCollectorAdapter implements ChunkListener, InitializingBea
 	public void afterChunk(ChunkContext context) {
 		try {
 			partitionQueue.add(collector.collectPartitionData());
-		} catch (Exception e) {
-			throw new PartitionException(e);
+		} catch (Throwable e) {
+			throw new BatchRuntimeException("An error occured while collecting data from the PartionCollector", e);
 		}
 	}
 
 	@Override
 	public void afterChunkError(ChunkContext context) {
-	}
-
-	@Override
-	public void afterPropertiesSet() throws Exception {
-		Assert.notNull(collector, "A PartitionCollector instance is required");
-		Assert.notNull(partitionQueue, "A thread safe Queue instance is required");
 	}
 }
