@@ -388,7 +388,9 @@ public class JsrJobOperator implements JobOperator, InitializingBean {
 
 		if(executions != null) {
 			for (org.springframework.batch.core.StepExecution stepExecution : executions) {
-				batchExecutions.add(new org.springframework.batch.core.jsr.StepExecution(jobExplorer.getStepExecution(executionId, stepExecution.getId())));
+				if(!stepExecution.getStepName().contains(":partition")) {
+					batchExecutions.add(new org.springframework.batch.core.jsr.StepExecution(jobExplorer.getStepExecution(executionId, stepExecution.getId())));
+				}
 			}
 		}
 

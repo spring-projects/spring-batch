@@ -49,6 +49,7 @@ import org.springframework.util.ReflectionUtils;
  * @author Michael Minella
  * @since 3.0
  */
+@SuppressWarnings("unchecked")
 public class BatchPropertyBeanPostProcessor implements BeanPostProcessor, BeanFactoryAware {
 	private static final String SCOPED_TARGET_BEAN_PREFIX = "scopedTarget.";
 	private static final Log LOGGER = LogFactory.getLog(BatchPropertyBeanPostProcessor.class);
@@ -167,7 +168,7 @@ public class BatchPropertyBeanPostProcessor implements BeanPostProcessor, BeanFa
 		ConfigurableListableBeanFactory configurableListableBeanFactory = (ConfigurableListableBeanFactory) beanFactory;
 
 		BeanExpressionContext beanExpressionContext = new BeanExpressionContext(configurableListableBeanFactory,
-			configurableListableBeanFactory.getBean(StepScope.class));
+				configurableListableBeanFactory.getBean(StepScope.class));
 
 		this.jsrExpressionParser = new JsrExpressionParser(new StandardBeanExpressionResolver(), beanExpressionContext);
 	}

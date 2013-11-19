@@ -25,6 +25,7 @@ import java.util.Map;
 import java.util.Set;
 
 import javax.batch.operations.BatchRuntimeException;
+
 import org.springframework.batch.core.ChunkListener;
 import org.springframework.batch.core.JobInterruptedException;
 import org.springframework.batch.core.SkipListener;
@@ -148,7 +149,7 @@ public class FaultTolerantStepBuilder<I, O> extends SimpleStepBuilder<I, O> {
 	}
 
 	@SuppressWarnings("unchecked")
-	private void registerStepListenerAsSkipListener() {
+	protected void registerStepListenerAsSkipListener() {
 		for (StepExecutionListener stepExecutionListener: properties.getStepExecutionListeners()){
 			if (stepExecutionListener instanceof SkipListener){
 				listener((SkipListener<I,O>)stepExecutionListener);

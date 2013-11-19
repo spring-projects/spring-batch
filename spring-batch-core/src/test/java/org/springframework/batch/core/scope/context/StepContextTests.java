@@ -23,6 +23,8 @@ import static org.junit.Assert.fail;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.Properties;
 
 import org.junit.Test;
 import org.springframework.batch.core.JobExecution;
@@ -30,6 +32,9 @@ import org.springframework.batch.core.JobInstance;
 import org.springframework.batch.core.JobParameters;
 import org.springframework.batch.core.JobParametersBuilder;
 import org.springframework.batch.core.StepExecution;
+import org.springframework.batch.core.jsr.configuration.support.BatchArtifact.BatchArtifactType;
+import org.springframework.batch.core.jsr.configuration.support.BatchPropertyContext;
+import org.springframework.batch.core.jsr.configuration.support.BatchPropertyContext.BatchPropertyContextEntry;
 import org.springframework.batch.item.ExecutionContext;
 
 /**
@@ -43,6 +48,8 @@ public class StepContextTests {
 	private StepExecution stepExecution = new StepExecution("step", new JobExecution(new JobInstance(2L, "job"), 0L, null, null), 1L);
 
 	private StepContext context = new StepContext(stepExecution);
+
+	private BatchPropertyContext propertyContext = new BatchPropertyContext();
 
 	@Test
 	public void testGetStepExecution() {
@@ -59,6 +66,22 @@ public class StepContextTests {
 		catch (IllegalArgumentException e) {
 			// expected
 		}
+	}
+
+	@Test
+	public void testGetPartitionPlan() {
+		Properties partitionPropertyValues = new Properties();
+		partitionPropertyValues.put("key1", "value1");
+		List<BatchPropertyContextEntry> entries = new ArrayList<BatchPropertyContext.BatchPropertyContextEntry>();
+		BatchPropertyContextEntry entry = propertyContext.new BatchPropertyContextEntry(stepExecution.getStepName(), partitionPropertyValues, BatchArtifactType.STEP);
+		entries.add(entry);
+
+		propertyContext.setStepPropertiesContextEntry(entries);
+
+		context = new StepContext(stepExecution, propertyContext);
+
+		Map<String, Object> plan = context.getPartitionPlan();
+		assertEquals("value1", plan.get("key1"));
 	}
 
 	@Test

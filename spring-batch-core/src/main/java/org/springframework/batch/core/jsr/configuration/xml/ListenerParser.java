@@ -100,6 +100,6 @@ public class ListenerParser {
 
 	private BatchArtifact.BatchArtifactType getBatchArtifactType(String stepName) {
 		return (stepName != null && !"".equals(stepName)) ? BatchArtifact.BatchArtifactType.STEP_ARTIFACT
-			: BatchArtifact.BatchArtifactType.ARTIFACT;
+				: BatchArtifact.BatchArtifactType.ARTIFACT;
 	}
 }

@@ -20,22 +20,31 @@ import javax.batch.api.chunk.CheckpointAlgorithm;
 import javax.batch.api.chunk.ItemProcessor;
 import javax.batch.api.chunk.ItemReader;
 import javax.batch.api.chunk.ItemWriter;
+import javax.batch.api.partition.PartitionReducer;
 
 import org.springframework.batch.core.Step;
 import org.springframework.batch.core.configuration.xml.StepParserStepFactoryBean;
+import org.springframework.batch.core.jsr.configuration.support.BatchPropertyContext;
+import org.springframework.batch.core.jsr.partition.JsrPartitionHandler;
 import org.springframework.batch.core.jsr.step.batchlet.BatchletAdapter;
+import org.springframework.batch.core.jsr.step.builder.JsrBatchletStepBuilder;
 import org.springframework.batch.core.jsr.step.builder.JsrFaultTolerantStepBuilder;
+import org.springframework.batch.core.jsr.step.builder.JsrPartitionStepBuilder;
 import org.springframework.batch.core.jsr.step.builder.JsrSimpleStepBuilder;
+import org.springframework.batch.core.partition.JsrStepExecutionSplitter;
 import org.springframework.batch.core.step.builder.FaultTolerantStepBuilder;
 import org.springframework.batch.core.step.builder.SimpleStepBuilder;
 import org.springframework.batch.core.step.builder.StepBuilder;
+import org.springframework.batch.core.step.builder.TaskletStepBuilder;
 import org.springframework.batch.core.step.tasklet.Tasklet;
+import org.springframework.batch.core.step.tasklet.TaskletStep;
 import org.springframework.batch.jsr.item.ItemProcessorAdapter;
 import org.springframework.batch.jsr.item.ItemReaderAdapter;
 import org.springframework.batch.jsr.item.ItemWriterAdapter;
 import org.springframework.batch.jsr.repeat.CheckpointAlgorithmAdapter;
 import org.springframework.batch.repeat.CompletionPolicy;
 import org.springframework.beans.factory.FactoryBean;
+import org.springframework.util.Assert;
 
 /**
  * This {@link FactoryBean} is used by the JSR-352 namespace parser to create
@@ -47,6 +56,109 @@ import org.springframework.beans.factory.FactoryBean;
  */
 @SuppressWarnings({"rawtypes", "unchecked"})
 public class StepFactoryBean extends StepParserStepFactoryBean {
+
+	private int partitions;
+	private BatchPropertyContext batchPropertyContext;
+
+	private PartitionReducer reducer;
+
+	public void setPartitionReducer(PartitionReducer reducer) {
+		this.reducer = reducer;
+	}
+
+	public void setBatchPropertyContext(BatchPropertyContext context) {
+		this.batchPropertyContext = context;
+	}
+
+	public void setPartitions(int partitions) {
+		this.partitions = partitions;
+	}
+
+	/**
+	 * Create a {@link Step} from the configuration provided.
+	 *
+	 * @see FactoryBean#getObject()
+	 */
+	@Override
+	public Object getObject() throws Exception {
+		if(hasPartitionElement()) {
+			return createPartitionStep();
+		}
+		else if (hasChunkElement()) {
+			Assert.isTrue(!hasTasklet(), "Step [" + getName()
+					+ "] has both a <chunk/> element and a 'ref' attribute  referencing a Tasklet.");
+
+			validateFaultTolerantSettings();
+
+			if (isFaultTolerant()) {
+				return createFaultTolerantStep();
+			}
+			else {
+				return createSimpleStep();
+			}
+		}
+		else if (hasTasklet()) {
+			return createTaskletStep();
+		}
+		else {
+			return createFlowStep();
+		}
+	}
+
+	/**
+	 * @return a new {@link TaskletStep}
+	 */
+	@Override
+	protected TaskletStep createTaskletStep() {
+		JsrBatchletStepBuilder jsrBatchletStepBuilder = new JsrBatchletStepBuilder(new StepBuilder(getName()));
+		jsrBatchletStepBuilder.setBatchPropertyContext(batchPropertyContext);
+		TaskletStepBuilder builder = jsrBatchletStepBuilder.tasklet(getTasklet());
+		enhanceTaskletStepBuilder(builder);
+		return builder.build();
+	}
+
+	@Override
+	protected Step createPartitionStep() {
+		// Creating a partitioned step for the JSR needs to create two steps...the partitioned step and the step being executed.
+		Step executedStep = null;
+
+		if (hasChunkElement()) {
+			Assert.isTrue(!hasTasklet(), "Step [" + getName()
+					+ "] has both a <chunk/> element and a 'ref' attribute  referencing a Tasklet.");
+
+			validateFaultTolerantSettings();
+
+			if (isFaultTolerant()) {
+				executedStep = createFaultTolerantStep();
+			}
+			else {
+				executedStep = createSimpleStep();
+			}
+		}
+		else if (hasTasklet()) {
+			executedStep = createTaskletStep();
+		}
+
+		((JsrPartitionHandler) super.getPartitionHandler()).setStep(executedStep);
+
+		JsrPartitionStepBuilder builder = new JsrSimpleStepBuilder(new StepBuilder(executedStep.getName())).partitioner(executedStep);
+
+		enhanceCommonStep(builder);
+
+		if (getPartitionHandler() != null) {
+			builder.partitionHandler(getPartitionHandler());
+		}
+
+		if(reducer != null) {
+			builder.reducer(reducer);
+		}
+
+		builder.splitter(new JsrStepExecutionSplitter(getName(), getJobRepository()));
+
+		builder.aggregator(getStepExecutionAggergator());
+
+		return builder.build();
+	}
 
 	/**
 	 * Wraps a {@link Batchlet} in a {@link BatchletAdapter} if required for consumption
@@ -140,11 +252,15 @@ public class StepFactoryBean extends StepParserStepFactoryBean {
 
 	@Override
 	protected FaultTolerantStepBuilder getFaultTolerantStepBuilder(String stepName) {
-		return new JsrFaultTolerantStepBuilder(new StepBuilder(stepName));
+		JsrFaultTolerantStepBuilder jsrFaultTolerantStepBuilder = new JsrFaultTolerantStepBuilder(new StepBuilder(stepName));
+		jsrFaultTolerantStepBuilder.setBatchPropertyContext(batchPropertyContext);
+		return jsrFaultTolerantStepBuilder;
 	}
 
 	@Override
 	protected SimpleStepBuilder getSimpleStepBuilder(String stepName) {
-		return new JsrSimpleStepBuilder(new StepBuilder(stepName));
+		JsrSimpleStepBuilder jsrSimpleStepBuilder = new JsrSimpleStepBuilder(new StepBuilder(stepName));
+		jsrSimpleStepBuilder.setBatchPropertyContext(batchPropertyContext);
+		return jsrSimpleStepBuilder;
 	}
 }
