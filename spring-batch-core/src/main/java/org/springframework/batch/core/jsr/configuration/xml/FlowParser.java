@@ -26,7 +26,9 @@ import java.util.Set;
 import org.springframework.batch.core.configuration.xml.AbstractFlowParser;
 import org.springframework.batch.core.configuration.xml.SimpleFlowFactoryBean;
 import org.springframework.batch.core.job.flow.FlowExecutionStatus;
+import org.springframework.batch.core.job.flow.support.DefaultStateTransitionComparator;
 import org.springframework.beans.factory.config.BeanDefinition;
+import org.springframework.beans.factory.config.RuntimeBeanReference;
 import org.springframework.beans.factory.support.BeanDefinitionBuilder;
 import org.springframework.beans.factory.support.ManagedList;
 import org.springframework.beans.factory.xml.ParserContext;
@@ -100,11 +102,7 @@ public class FlowParser extends AbstractFlowParser {
 				} else if(nodeName.equals(DECISION_ELEMENT)) {
 					stateTransitions.addAll(new DecisionParser().parse(child, parserContext, flowName));
 				} else if(nodeName.equals(FLOW_ELEMENT)) {
-					org.springframework.batch.core.jsr.configuration.xml.InlineFlowParser flowParser =
-						new org.springframework.batch.core.jsr.configuration.xml.InlineFlowParser(child.getAttribute(ID_ATTRIBUTE), jobFactoryRef);
-					flowParser.parse(child, parserContext);
-
-					stateTransitions.addAll(parseFlow(child, parserContext));
+					stateTransitions.addAll(parseFlow(child, parserContext, builder));
 				}
 			}
 		}
@@ -122,7 +120,7 @@ public class FlowParser extends AbstractFlowParser {
 		builder.addPropertyValue("stateTransitions", managedList);
 	}
 
-	private Collection<BeanDefinition> parseFlow(Element element, ParserContext parserContext) {
+	private Collection<BeanDefinition> parseFlow(Element element, ParserContext parserContext, BeanDefinitionBuilder builder) {
 		String idAttribute = element.getAttribute(ID_ATTRIBUTE);
 
 		BeanDefinitionBuilder stateBuilder = BeanDefinitionBuilder
@@ -132,6 +130,12 @@ public class FlowParser extends AbstractFlowParser {
 
 		stateBuilder.addConstructorArgValue(flowParser.parse(element, parserContext));
 		stateBuilder.addConstructorArgValue(idAttribute);
+
+		builder.getRawBeanDefinition().setAttribute("flowName", idAttribute);
+		builder.addPropertyValue("name", idAttribute);
+		builder.addPropertyValue("stateTransitionComparator", new RuntimeBeanReference(DefaultStateTransitionComparator.STATE_TRANSITION_COMPARATOR));
+		doParse(element, parserContext, builder);
+		builder.setRole(BeanDefinition.ROLE_INFRASTRUCTURE);
 
 		return FlowParser.getNextElements(parserContext, null, stateBuilder.getBeanDefinition(), element);
 	}
