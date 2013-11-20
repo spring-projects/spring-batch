@@ -67,12 +67,12 @@ public class JobParameterResolvingBeanFactoryPostProcessor implements BeanFactor
 	}
 
 	/**
-	 * Sets this {@link BeanFactoryPostProcessor} to the lowest precedence so that
-	 * it is executed as late as possible in the chain of {@link BeanFactoryPostProcessor}s
+	 * Sets this {@link BeanFactoryPostProcessor} to the highest precedence so that
+	 * it is executed as early as possible in the chain of {@link BeanFactoryPostProcessor}s
 	 */
 	@Override
 	public int getOrder() {
-		return PriorityOrdered.LOWEST_PRECEDENCE;
+		return PriorityOrdered.HIGHEST_PRECEDENCE;
 	}
 
 	protected class JobParameterResolver {
@@ -98,7 +98,7 @@ public class JobParameterResolvingBeanFactoryPostProcessor implements BeanFactor
 			@Override
 			public String resolveStringValue(String value) {
 				if (value != null && ! "".equals(value)) {
-					String resolvedString = resolveJobProperties(value);
+					String resolvedString = resolveJobParameters(value);
 
 					if (!"".equals(resolvedString)) {
 						return jsrExpressionParser.parseExpression(resolvedString);
@@ -108,7 +108,7 @@ public class JobParameterResolvingBeanFactoryPostProcessor implements BeanFactor
 				return value;
 			}
 
-			private String resolveJobProperties(String value) {
+			private String resolveJobParameters(String value) {
 				StringBuffer valueBuffer = new StringBuffer();
 				Matcher jobParameterMatcher = JOB_PARAMETERS_PATTERN.matcher(value);
 
