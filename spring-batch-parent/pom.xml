@@ -36,6 +36,8 @@
 		<spring.framework.version>3.2.0.RELEASE</spring.framework.version>
 		<spring.amqp.version>1.1.2.RELEASE</spring.amqp.version>
 		<junit.version>4.10</junit.version>
+        <jxl.version>2.6.12</jxl.version>
+        <poi.version>3.9</poi.version>
 		<bundlor.version>1.0.0.RELEASE</bundlor.version>
 		<dependency.locations.enabled>false</dependency.locations.enabled>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -749,7 +751,27 @@
 				<version>1.0.3.RELEASE</version>
 				<optional>true</optional>
 			</dependency>
-		</dependencies>
+            <dependency>
+                <groupId>net.sourceforge.jexcelapi</groupId>
+                <artifactId>jxl</artifactId>
+                <version>${jxl.version}</version>
+                <scope>compile</scope>
+                <optional>true</optional>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.poi</groupId>
+                <artifactId>poi</artifactId>
+                <version>${poi.version}</version>
+                <optional>true</optional>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.poi</groupId>
+                <artifactId>poi-ooxml</artifactId>
+                <version>${poi.version}</version>
+                <optional>true</optional>
+            </dependency>
+
+        </dependencies>
 	</dependencyManagement>
 	<distributionManagement>
 		<site>
