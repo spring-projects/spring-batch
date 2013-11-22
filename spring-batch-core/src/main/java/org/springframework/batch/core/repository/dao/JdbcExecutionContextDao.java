@@ -29,6 +29,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import org.codehaus.jackson.map.ObjectMapper;
 import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.StepExecution;
 import org.springframework.batch.core.repository.ExecutionContextSerializer;
@@ -319,7 +320,7 @@ public class JdbcExecutionContextDao extends AbstractJdbcBatchMetadataDao implem
 			Map<String, Object> map;
 			try {
 				ByteArrayInputStream in = new ByteArrayInputStream(serializedContext.getBytes("ISO-8859-1"));
-				map = (Map<String, Object>) serializer.deserialize(in);
+                map =  new ObjectMapper().readValue(in, Map.class);
 			}
 			catch (IOException ioe) {
 				throw new IllegalArgumentException("Unable to deserialize the execution context", ioe);

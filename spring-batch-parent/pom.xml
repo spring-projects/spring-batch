@@ -749,6 +749,12 @@
 				<version>1.0.3.RELEASE</version>
 				<optional>true</optional>
 			</dependency>
+            <dependency>
+                <groupId>org.codehaus.jackson</groupId>
+                <artifactId>jackson-mapper-asl</artifactId>
+                <version>1.6.3</version>
+                <scope>compile</scope>
+            </dependency>
 		</dependencies>
 	</dependencyManagement>
 	<distributionManagement>
