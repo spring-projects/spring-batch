@@ -103,6 +103,21 @@ public class StepExecution extends Entity {
 	}
 
 	/**
+	 * Constructor that requires only a stepName.  Intended only to be
+	 * used via serialization libraries to address the circular
+	 * reference between {@link JobExecution} and StepExecution.
+	 *
+	 * @param stepName the name of the executed step
+	 */
+	@SuppressWarnings("unused")
+	private StepExecution(String stepName) {
+		super();
+		Assert.hasLength(stepName);
+		this.stepName = stepName;
+		this.jobExecution = null;
+	}
+
+	/**
 	 * Returns the {@link ExecutionContext} for this execution
 	 *
 	 * @return the attributes
