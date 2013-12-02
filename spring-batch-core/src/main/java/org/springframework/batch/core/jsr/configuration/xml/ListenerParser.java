@@ -107,6 +107,7 @@ public class ListenerParser {
 			if (beanDefinitionRegistry.containsBeanDefinition(beanName)) {
 				BeanDefinition beanDefinition = beanDefinitionRegistry.getBeanDefinition(beanName);
 				beanDefinition.setScope(BeanDefinition.SCOPE_SINGLETON);
+				beanDefinition.setLazyInit(true);
 			}
 		}
 	}

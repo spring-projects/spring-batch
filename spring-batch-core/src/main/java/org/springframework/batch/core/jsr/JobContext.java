@@ -16,8 +16,8 @@
 package org.springframework.batch.core.jsr;
 
 import java.util.Properties;
-
 import java.util.concurrent.atomic.AtomicBoolean;
+
 import javax.batch.runtime.BatchStatus;
 
 import org.springframework.batch.core.ExitStatus;

@@ -50,6 +50,8 @@ public class JobParser extends AbstractSingleBeanDefinitionParser {
 
 		String jobName = element.getAttribute(ID_ATTRIBUTE);
 
+		builder.setLazyInit(true);
+
 		builder.addConstructorArgValue(jobName);
 
 		String restartableAttribute = element.getAttribute(RESTARTABLE_ATTRIBUTE);
