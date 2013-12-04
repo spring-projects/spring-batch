@@ -133,6 +133,7 @@ public class OraclePagingQueryProviderTests extends AbstractSqlPagingQueryProvid
 		return pagingQueryProvider;
 	}
 
+	@Override
 	public String getFirstPageSqlWithMultipleSortKeys() {
 		return "SELECT * FROM (SELECT id, name, age FROM foo WHERE bar = 1 ORDER BY name ASC, id DESC) WHERE ROWNUM <= 100";
 	}
