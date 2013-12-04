@@ -58,10 +58,16 @@ public class OraclePagingQueryProvider extends AbstractSqlPagingQueryProvider {
 		for (Map.Entry<String, Order> sortKey : this.getSortKeys().entrySet()) {
 			sql.append(prefix);
 			prefix = ", ";
-			sql.append(sortKey.getKey());
+			sql.append(getSortKeyName(sortKey.getKey()));
 		}
 		
 		return sql.toString();
+	}
+
+	@Override
+	protected String getSortKeyName(String field) {
+		int index = field.indexOf('.');
+		return index > 0 ? field.substring(index + 1) : field;
 	}
 
 	private String buildRowNumClause(int pageSize) {

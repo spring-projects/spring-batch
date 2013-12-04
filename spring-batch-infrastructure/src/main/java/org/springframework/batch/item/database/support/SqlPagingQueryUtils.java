@@ -296,7 +296,7 @@ public class SqlPagingQueryUtils {
 				clause.append(prefix);
 				prefix = " AND ";
 				Entry<String, Order> entry = keys.get(j);
-				clause.append(entry.getKey());
+				clause.append(provider.getSortKeyName(entry.getKey()));
 				clause.append(" = ");
 				clause.append(provider.getSortKeyPlaceHolder(entry.getKey()));
 			}
@@ -304,7 +304,7 @@ public class SqlPagingQueryUtils {
 			if(clause.length() > 0) {
 				clause.append(" AND ");
 			}
-			clause.append(keys.get(i).getKey());
+			clause.append(provider.getSortKeyName(keys.get(i).getKey()));
 			
 			if(keys.get(i).getValue() != null && keys.get(i).getValue() == Order.DESCENDING) {
 				clause.append(" < ");
