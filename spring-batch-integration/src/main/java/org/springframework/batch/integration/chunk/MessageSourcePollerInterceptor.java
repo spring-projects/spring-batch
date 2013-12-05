@@ -3,11 +3,11 @@ package org.springframework.batch.integration.chunk;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.InitializingBean;
-import org.springframework.integration.Message;
-import org.springframework.integration.MessageChannel;
 import org.springframework.integration.channel.ChannelInterceptor;
 import org.springframework.integration.channel.interceptor.ChannelInterceptorAdapter;
 import org.springframework.integration.core.MessageSource;
+import org.springframework.messaging.Message;
+import org.springframework.messaging.MessageChannel;
 import org.springframework.util.Assert;
 
 
@@ -16,9 +16,9 @@ import org.springframework.util.Assert;
  * <code>receive()</code> on the channel it will delegate to a {@link MessageSource} to pull the message directly from
  * an external source. This is particularly useful in combination with a message channel in thread scope, in which case
  * the <code>receive()</code> can join a transaction which was started by the caller.
- * 
+ *
  * @author Dave Syer
- * 
+ *
  */
 public class MessageSourcePollerInterceptor extends ChannelInterceptorAdapter implements InitializingBean {
 
@@ -44,7 +44,7 @@ public class MessageSourcePollerInterceptor extends ChannelInterceptorAdapter im
 	/**
 	 * Optional MessageChannel for injecting the message received from the source (defaults to the channel intercepted
 	 * in {@link #preReceive(MessageChannel)}).
-	 * 
+	 *
 	 * @param channel the channel to set
 	 */
 	public void setChannel(MessageChannel channel) {
@@ -69,7 +69,7 @@ public class MessageSourcePollerInterceptor extends ChannelInterceptorAdapter im
 	/**
 	 * Receive from the {@link MessageSource} and send immediately to the input channel, so that the call that we are
 	 * intercepting always a message to receive.
-	 * 
+	 *
 	 * @see ChannelInterceptorAdapter#preReceive(MessageChannel)
 	 */
 	@Override

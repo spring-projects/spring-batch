@@ -34,10 +34,10 @@ import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.item.ItemStream;
 import org.springframework.batch.item.ItemStreamException;
 import org.springframework.batch.item.ItemWriter;
-import org.springframework.integration.Message;
-import org.springframework.integration.core.MessagingOperations;
-import org.springframework.integration.core.PollableChannel;
-import org.springframework.integration.message.GenericMessage;
+import org.springframework.integration.core.MessagingTemplate;
+import org.springframework.messaging.Message;
+import org.springframework.messaging.PollableChannel;
+import org.springframework.messaging.support.GenericMessage;
 import org.springframework.util.Assert;
 
 public class ChunkMessageChannelItemWriter<T> extends StepExecutionListenerSupport implements ItemWriter<T>,
@@ -51,13 +51,13 @@ public class ChunkMessageChannelItemWriter<T> extends StepExecutionListenerSuppo
 
 	private static final long DEFAULT_THROTTLE_LIMIT = 6;
 
-	private MessagingOperations messagingGateway;
+	private MessagingTemplate messagingGateway;
 
-	private LocalState localState = new LocalState();
+	private final LocalState localState = new LocalState();
 
 	private long throttleLimit = DEFAULT_THROTTLE_LIMIT;
 
-	private int DEFAULT_MAX_WAIT_TIMEOUTS = 40;
+	private final int DEFAULT_MAX_WAIT_TIMEOUTS = 40;
 
 	private int maxWaitTimeouts = DEFAULT_MAX_WAIT_TIMEOUTS;
 
@@ -67,7 +67,7 @@ public class ChunkMessageChannelItemWriter<T> extends StepExecutionListenerSuppo
 	 * The maximum number of times to wait at the end of a step for a non-null result from the remote workers. This is a
 	 * multiplier on the receive timeout set separately on the gateway. The ideal value is a compromise between allowing
 	 * slow workers time to finish, and responsiveness if there is a dead worker. Defaults to 40.
-	 * 
+	 *
 	 * @param maxWaitTimeouts the maximum number of wait timeouts
 	 */
 	public void setMaxWaitTimeouts(int maxWaitTimeouts) {
@@ -83,7 +83,7 @@ public class ChunkMessageChannelItemWriter<T> extends StepExecutionListenerSuppo
 		this.throttleLimit = throttleLimit;
 	}
 
-	public void setMessagingOperations(MessagingOperations messagingGateway) {
+	public void setMessagingOperations(MessagingTemplate messagingGateway) {
 		this.messagingGateway = messagingGateway;
 	}
 
@@ -184,7 +184,7 @@ public class ChunkMessageChannelItemWriter<T> extends StepExecutionListenerSuppo
 
 	/**
 	 * Wait until all the results that are in the pipeline come back to the reply channel.
-	 * 
+	 *
 	 * @return true if successfully received a result, false if timed out
 	 */
 	private boolean waitForResults() throws AsynchronousFailureException {
@@ -210,9 +210,9 @@ public class ChunkMessageChannelItemWriter<T> extends StepExecutionListenerSuppo
 
 	/**
 	 * Get the next result if it is available (within the timeout specified in the gateway), otherwise do nothing.
-	 * 
+	 *
 	 * @throws AsynchronousFailureException If there is a response and it contains a failed chunk response.
-	 * 
+	 *
 	 * @throws IllegalStateException if the result contains the wrong job instance id (maybe we are sharing a channel
 	 * and we shouldn't be)
 	 */
@@ -263,17 +263,17 @@ public class ChunkMessageChannelItemWriter<T> extends StepExecutionListenerSuppo
 
 	private static class LocalState {
 
-		private AtomicInteger current = new AtomicInteger(-1);
+		private final AtomicInteger current = new AtomicInteger(-1);
 
-		private AtomicInteger actual = new AtomicInteger();
+		private final AtomicInteger actual = new AtomicInteger();
 
-		private AtomicInteger expected = new AtomicInteger();
+		private final AtomicInteger expected = new AtomicInteger();
 
-		private AtomicInteger redelivered = new AtomicInteger();
+		private final AtomicInteger redelivered = new AtomicInteger();
 
 		private StepExecution stepExecution;
 
-		private Queue<ChunkResponse> contributions = new LinkedBlockingQueue<ChunkResponse>();
+		private final Queue<ChunkResponse> contributions = new LinkedBlockingQueue<ChunkResponse>();
 
 		public int getExpecting() {
 			return expected.get() - actual.get();

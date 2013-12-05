@@ -4,10 +4,10 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
 import org.junit.Test;
-import org.springframework.integration.Message;
 import org.springframework.integration.channel.QueueChannel;
 import org.springframework.integration.core.MessageSource;
-import org.springframework.integration.message.GenericMessage;
+import org.springframework.messaging.Message;
+import org.springframework.messaging.support.GenericMessage;
 
 public class MessageSourcePollerInterceptorTests {
 
@@ -40,7 +40,7 @@ public class MessageSourcePollerInterceptorTests {
 
 	private static class TestMessageSource implements MessageSource<String> {
 
-		private String payload;
+		private final String payload;
 
 		public TestMessageSource(String payload) {
 			super();

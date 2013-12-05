@@ -33,11 +33,11 @@ import org.springframework.batch.item.support.ListItemReader;
 import org.springframework.batch.support.transaction.ResourcelessTransactionManager;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.integration.Message;
-import org.springframework.integration.MessageChannel;
 import org.springframework.integration.core.MessagingTemplate;
-import org.springframework.integration.core.PollableChannel;
-import org.springframework.integration.message.GenericMessage;
+import org.springframework.messaging.Message;
+import org.springframework.messaging.MessageChannel;
+import org.springframework.messaging.PollableChannel;
+import org.springframework.messaging.support.GenericMessage;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.util.StringUtils;
@@ -46,7 +46,7 @@ import org.springframework.util.StringUtils;
 @RunWith(SpringJUnit4ClassRunner.class)
 public class ChunkMessageItemWriterIntegrationTests {
 
-	private ChunkMessageChannelItemWriter<Object> writer = new ChunkMessageChannelItemWriter<Object>();
+	private final ChunkMessageChannelItemWriter<Object> writer = new ChunkMessageChannelItemWriter<Object>();
 
 	@Autowired
 	@Qualifier("requests")
@@ -56,7 +56,7 @@ public class ChunkMessageItemWriterIntegrationTests {
 	@Qualifier("replies")
 	private PollableChannel replies;
 
-	private SimpleStepFactoryBean<Object, Object> factory = new SimpleStepFactoryBean<Object, Object>();
+	private final SimpleStepFactoryBean<Object, Object> factory = new SimpleStepFactoryBean<Object, Object>();
 
 	private SimpleJobRepository jobRepository;
 

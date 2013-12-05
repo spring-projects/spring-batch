@@ -36,14 +36,14 @@ import org.springframework.batch.integration.JobSupport;
 import org.springframework.batch.integration.step.TestTasklet;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.integration.Message;
-import org.springframework.integration.MessageChannel;
 import org.springframework.integration.MessageHandlingException;
-import org.springframework.integration.MessageHeaders;
-import org.springframework.integration.MessagingException;
-import org.springframework.integration.core.PollableChannel;
-import org.springframework.integration.message.GenericMessage;
 import org.springframework.integration.support.MessageBuilder;
+import org.springframework.messaging.Message;
+import org.springframework.messaging.MessageChannel;
+import org.springframework.messaging.MessageHeaders;
+import org.springframework.messaging.MessagingException;
+import org.springframework.messaging.PollableChannel;
+import org.springframework.messaging.support.GenericMessage;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
@@ -72,7 +72,7 @@ public class JobLaunchingGatewayIntegrationTests {
 	@Autowired
 	private Job testJob;
 
-	private JobSupport job = new JobSupport("testJob");
+	private final JobSupport job = new JobSupport("testJob");
 
 	@Before
 	public void setUp() {
