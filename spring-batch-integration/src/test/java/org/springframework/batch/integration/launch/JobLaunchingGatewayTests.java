@@ -27,9 +27,9 @@ import org.springframework.batch.core.JobParameters;
 import org.springframework.batch.core.JobParametersInvalidException;
 import org.springframework.batch.core.launch.JobLauncher;
 import org.springframework.batch.integration.JobSupport;
-import org.springframework.integration.Message;
 import org.springframework.integration.MessageHandlingException;
 import org.springframework.integration.support.MessageBuilder;
+import org.springframework.messaging.Message;
 
 /**
  *

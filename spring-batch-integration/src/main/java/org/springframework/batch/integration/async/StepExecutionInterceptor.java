@@ -18,11 +18,11 @@ package org.springframework.batch.integration.async;
 import org.springframework.batch.core.StepExecution;
 import org.springframework.batch.core.scope.context.StepContext;
 import org.springframework.batch.core.scope.context.StepSynchronizationManager;
-import org.springframework.integration.Message;
-import org.springframework.integration.MessageChannel;
 import org.springframework.integration.channel.ChannelInterceptor;
 import org.springframework.integration.channel.interceptor.ChannelInterceptorAdapter;
 import org.springframework.integration.support.MessageBuilder;
+import org.springframework.messaging.Message;
+import org.springframework.messaging.MessageChannel;
 
 /**
  * A {@link ChannelInterceptor} that adds the current {@link StepExecution} (if
@@ -30,9 +30,9 @@ import org.springframework.integration.support.MessageBuilder;
  * can then take advantage of the step context without needing to be step
  * scoped, which is a problem for handlers executing in another thread because
  * the scope context is not available.
- * 
+ *
  * @author Dave Syer
- * 
+ *
  */
 public class StepExecutionInterceptor extends ChannelInterceptorAdapter {
 

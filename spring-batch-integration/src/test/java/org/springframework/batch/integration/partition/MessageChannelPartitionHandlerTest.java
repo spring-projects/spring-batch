@@ -12,19 +12,19 @@ import java.util.Collections;
 import org.junit.Test;
 import org.springframework.batch.core.StepExecution;
 import org.springframework.batch.core.partition.StepExecutionSplitter;
-import org.springframework.integration.Message;
-import org.springframework.integration.core.MessagingOperations;
-import org.springframework.integration.core.PollableChannel;
+import org.springframework.integration.core.MessagingTemplate;
+import org.springframework.messaging.Message;
+import org.springframework.messaging.PollableChannel;
 
 /**
- * 
+ *
  * @author Will Schipp
  *
  */
 public class MessageChannelPartitionHandlerTest {
 
 	private MessageChannelPartitionHandler messageChannelPartitionHandler;
-	
+
 	@Test
 	public void testHandleNoReply() throws Exception {
 		//execute with no default set
@@ -32,21 +32,21 @@ public class MessageChannelPartitionHandlerTest {
 		//mock
 		StepExecution masterStepExecution = mock(StepExecution.class);
 		StepExecutionSplitter stepExecutionSplitter = mock(StepExecutionSplitter.class);
-		MessagingOperations operations = mock(MessagingOperations.class);
+		MessagingTemplate operations = mock(MessagingTemplate.class);
 		Message message = mock(Message.class);
 		//when
 		when(message.getPayload()).thenReturn(Collections.emptyList());
 		when(operations.receive((PollableChannel) anyObject())).thenReturn(message);
 		//set
 		messageChannelPartitionHandler.setMessagingOperations(operations);
-		
+
 		//execute
 		Collection<StepExecution> executions = messageChannelPartitionHandler.handle(stepExecutionSplitter, masterStepExecution);
 		//verify
 		assertNotNull(executions);
 		assertTrue(executions.isEmpty());
 	}
-	
+
 	@Test
 	public void testHandleWithReplyChannel() throws Exception {
 		//execute with no default set
@@ -54,7 +54,7 @@ public class MessageChannelPartitionHandlerTest {
 		//mock
 		StepExecution masterStepExecution = mock(StepExecution.class);
 		StepExecutionSplitter stepExecutionSplitter = mock(StepExecutionSplitter.class);
-		MessagingOperations operations = mock(MessagingOperations.class);
+		MessagingTemplate operations = mock(MessagingTemplate.class);
 		Message message = mock(Message.class);
 		PollableChannel replyChannel = mock(PollableChannel.class);
 		//when
@@ -63,13 +63,13 @@ public class MessageChannelPartitionHandlerTest {
 		//set
 		messageChannelPartitionHandler.setMessagingOperations(operations);
 		messageChannelPartitionHandler.setReplyChannel(replyChannel);
-		
+
 		//execute
 		Collection<StepExecution> executions = messageChannelPartitionHandler.handle(stepExecutionSplitter, masterStepExecution);
 		//verify
 		assertNotNull(executions);
 		assertTrue(executions.isEmpty());
-		
+
 	}
 
 }

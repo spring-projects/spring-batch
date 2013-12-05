@@ -11,15 +11,15 @@ import org.springframework.batch.core.StepExecution;
 import org.springframework.batch.core.partition.PartitionHandler;
 import org.springframework.batch.core.partition.StepExecutionSplitter;
 import org.springframework.batch.core.repository.JobRepository;
-import org.springframework.integration.Message;
-import org.springframework.integration.MessageChannel;
 import org.springframework.integration.annotation.Aggregator;
 import org.springframework.integration.annotation.MessageEndpoint;
 import org.springframework.integration.annotation.Payloads;
 import org.springframework.integration.channel.QueueChannel;
-import org.springframework.integration.core.MessagingOperations;
-import org.springframework.integration.core.PollableChannel;
+import org.springframework.integration.core.MessagingTemplate;
 import org.springframework.integration.support.MessageBuilder;
+import org.springframework.messaging.Message;
+import org.springframework.messaging.MessageChannel;
+import org.springframework.messaging.PollableChannel;
 import org.springframework.util.Assert;
 
 /**
@@ -30,10 +30,10 @@ import org.springframework.util.Assert;
  * well as a remote web service or JMS implementation. If a remote worker fails or doesn't send a reply message, the job
  * will fail and can be restarted to pick up missing messages and processing. The remote workers need access to the
  * Spring Batch {@link JobRepository} so that the shared state across those restarts can be managed centrally.
- * 
+ *
  * @author Dave Syer
  * @author Will Schipp
- * 
+ *
  */
 @MessageEndpoint
 public class MessageChannelPartitionHandler implements PartitionHandler {
@@ -42,10 +42,10 @@ public class MessageChannelPartitionHandler implements PartitionHandler {
 
 	private int gridSize = 1;
 
-	private MessagingOperations messagingGateway;
+	private MessagingTemplate messagingGateway;
 
 	private String stepName;
-	
+
 	/**
 	 * pollable channel for the replies
 	 */
@@ -62,10 +62,10 @@ public class MessageChannelPartitionHandler implements PartitionHandler {
 	 * internally: <ul> <li>request channel capable of accepting {@link StepExecutionRequest} payloads</li> <li>reply
 	 * channel that returns a list of {@link StepExecution} results</li> </ul> The timeout for the repoy should be set
 	 * sufficiently long that the remote steps have time to complete.
-	 * 
+	 *
 	 * @param messagingGateway the {@link MessagingOperations} to set
 	 */
-	public void setMessagingOperations(MessagingOperations messagingGateway) {
+	public void setMessagingOperations(MessagingTemplate messagingGateway) {
 		this.messagingGateway = messagingGateway;
 	}
 
@@ -73,7 +73,7 @@ public class MessageChannelPartitionHandler implements PartitionHandler {
 	 * Passed to the {@link StepExecutionSplitter} in the {@link #handle(StepExecutionSplitter, StepExecution)} method,
 	 * instructing it how many {@link StepExecution} instances are required, ideally. The {@link StepExecutionSplitter}
 	 * is allowed to ignore the grid size in the case of a restart, since the input data partitions must be preserved.
-	 * 
+	 *
 	 * @param gridSize the number of step executions that will be created
 	 */
 	public void setGridSize(int gridSize) {
@@ -85,7 +85,7 @@ public class MessageChannelPartitionHandler implements PartitionHandler {
 	 * regular Spring Batch step, with all the business logic required to complete an execution based on the input
 	 * parameters in its {@link StepExecution} context. The name will be translated into a {@link Step} instance by the
 	 * remote worker.
-	 * 
+	 *
 	 * @param stepName the name of the {@link Step} instance to execute business logic
 	 */
 	public void setStepName(String stepName) {
@@ -110,7 +110,7 @@ public class MessageChannelPartitionHandler implements PartitionHandler {
 	 * receives the result back as a list of {@link StepExecution} on a reply channel. Use the {@link #aggregate(List)}
 	 * method as an aggregator of the individual remote replies. The receive timeout needs to be set realistically in
 	 * the {@link MessagingOperations} <b>and</b> the aggregator, so that there is a good chance of all work being done.
-	 * 
+	 *
 	 * @see PartitionHandler#handle(StepExecutionSplitter, StepExecution)
 	 */
 	public Collection<StepExecution> handle(StepExecutionSplitter stepExecutionSplitter,
@@ -118,11 +118,11 @@ public class MessageChannelPartitionHandler implements PartitionHandler {
 
 		Set<StepExecution> split = stepExecutionSplitter.split(masterStepExecution, gridSize);
 		int count = 0;
-		
+
 		if (replyChannel == null) {
 			replyChannel = new QueueChannel();
-		}//end if 
-		
+		}//end if
+
 		for (StepExecution stepExecution : split) {
 			Message<StepExecutionRequest> request = createMessage(count++, split.size(), new StepExecutionRequest(
 					stepName, stepExecution.getJobExecutionId(), stepExecution.getId()), replyChannel);
