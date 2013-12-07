@@ -16,29 +16,19 @@
 package org.springframework.batch.core.jsr.configuration.xml;
 
 import static org.junit.Assert.assertEquals;
+import static org.springframework.batch.core.jsr.JsrTestUtils.runJob;
 
-import java.util.Properties;
-
-import javax.batch.operations.JobOperator;
-import javax.batch.runtime.BatchRuntime;
 import javax.batch.runtime.BatchStatus;
+import javax.batch.runtime.JobExecution;
 
-import org.junit.Before;
 import org.junit.Test;
 
 public class ThreadLocalClassloaderBeanPostProcessorTests {
 
-	private JobOperator jobOperator;
-
-	@Before
-	public void setUp() throws Exception {
-		jobOperator = BatchRuntime.getJobOperator();
-	}
-
 	@Test
 	public void test() throws Exception {
-		long executionId = jobOperator.start("threadLocalClassloaderBeanPostProcessorTestsJob", new Properties());
+		JobExecution execution = runJob("threadLocalClassloaderBeanPostProcessorTestsJob", null, 10000);
 
-		assertEquals(BatchStatus.COMPLETED, jobOperator.getJobExecution(executionId).getBatchStatus());
+		assertEquals(BatchStatus.COMPLETED, execution.getBatchStatus());
 	}
 }

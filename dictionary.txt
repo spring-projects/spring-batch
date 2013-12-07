@@ -99,3 +99,5 @@ accessors
 subclassing
 ajax
 javascript
+chris
+schaefer
