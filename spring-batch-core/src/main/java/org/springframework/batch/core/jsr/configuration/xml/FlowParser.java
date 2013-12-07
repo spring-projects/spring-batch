@@ -27,6 +27,7 @@ import org.springframework.batch.core.configuration.xml.AbstractFlowParser;
 import org.springframework.batch.core.configuration.xml.SimpleFlowFactoryBean;
 import org.springframework.batch.core.job.flow.FlowExecutionStatus;
 import org.springframework.batch.core.job.flow.support.DefaultStateTransitionComparator;
+import org.springframework.batch.core.jsr.job.flow.support.DefaultFlow;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.config.RuntimeBeanReference;
 import org.springframework.beans.factory.support.BeanDefinitionBuilder;
@@ -92,6 +93,7 @@ public class FlowParser extends AbstractFlowParser {
 	protected void doParse(Element element, ParserContext parserContext, BeanDefinitionBuilder builder) {
 		builder.getRawBeanDefinition().setAttribute("flowName", flowName);
 		builder.addPropertyValue("name", flowName);
+		builder.addPropertyValue("flowType", DefaultFlow.class);
 
 		List<BeanDefinition> stateTransitions = new ArrayList<BeanDefinition>();
 
@@ -179,14 +181,9 @@ public class FlowParser extends AbstractFlowParser {
 			list.addAll(createTransition(FlowExecutionStatus.UNKNOWN, FlowExecutionStatus.UNKNOWN.getName(), null, null,
 					stateDef, parserContext, false));
 			if (!hasNextAttribute) {
-				list.addAll(createTransition(FlowExecutionStatus.COMPLETED, null, null, null, stateDef, parserContext,
+				list.addAll(createTransition(FlowExecutionStatus.COMPLETED, FlowExecutionStatus.COMPLETED.getName(), null, null, stateDef, parserContext,
 						false));
 			}
-		}
-		else if (hasNextAttribute) {
-			parserContext.getReaderContext().error(
-					"The <" + element.getNodeName() + "/> may not contain a 'next"
-							+ "' attribute and a transition element", element);
 		}
 
 		return list;

@@ -22,7 +22,9 @@ import javax.batch.runtime.BatchStatus;
 import javax.batch.runtime.Metric;
 
 import org.springframework.batch.core.ExitStatus;
+import org.springframework.batch.item.util.ExecutionContextUserSupport;
 import org.springframework.util.Assert;
+import org.springframework.util.ClassUtils;
 
 /**
  * Implementation of the StepExecution as defined in JSR-352.  This implementation
@@ -34,7 +36,10 @@ import org.springframework.util.Assert;
  */
 public class StepExecution implements javax.batch.runtime.StepExecution{
 
+	private final static String PERSISTENT_USER_DATA_KEY = "batch_jsr_persistentUserData";
 	private final org.springframework.batch.core.StepExecution stepExecution;
+	// The API for the persistent user data is handled by the StepContext which is why the name here is based on the StepContext.
+	private final ExecutionContextUserSupport executionContextUserSupport = new ExecutionContextUserSupport(ClassUtils.getShortName(StepContext.class));
 
 	/**
 	 * @param stepExecution The {@link org.springframework.batch.core.StepExecution} used
@@ -105,7 +110,7 @@ public class StepExecution implements javax.batch.runtime.StepExecution{
 	 */
 	@Override
 	public Serializable getPersistentUserData() {
-		return (Serializable) stepExecution.getExecutionContext().get("batch_jsr_persistentUserData");
+		return (Serializable) stepExecution.getExecutionContext().get(executionContextUserSupport.getKey(PERSISTENT_USER_DATA_KEY));
 	}
 
 	/* (non-Javadoc)
