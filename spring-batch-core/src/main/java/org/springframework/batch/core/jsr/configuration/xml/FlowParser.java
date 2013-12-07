@@ -60,10 +60,18 @@ public class FlowParser extends AbstractFlowParser {
 	private static final String TO_ATTRIBUTE = "to";
 	private static final String RESTART_ATTRIBUTE = "restart";
 	private static final String EXIT_STATUS_ATTRIBUTE = "exit-status";
+	private static final List<String> TRANSITION_TYPES = new ArrayList<String>();
 
+	static {
+		TRANSITION_TYPES.add(NEXT_ATTRIBUTE);
+		TRANSITION_TYPES.add(STOP_ATTRIBUTE);
+		TRANSITION_TYPES.add(END_ATTRIBUTE);
+		TRANSITION_TYPES.add(FAIL_ATTRIBUTE);
+	}
+
+	private String flowName;
 	private String jobFactoryRef;
 	private StepParser stepParser = new StepParser();
-	private String flowName;
 
 	/**
 	 * @param flowName The name of the flow
@@ -157,12 +165,10 @@ public class FlowParser extends AbstractFlowParser {
 		}
 
 		boolean transitionElementExists = false;
-		List<String> patterns = new ArrayList<String>();
-		for (String transitionName : new String[] { NEXT_ATTRIBUTE, STOP_ATTRIBUTE, END_ATTRIBUTE, FAIL_ATTRIBUTE }) {
-			List<Element> transitionElements = DomUtils.getChildElementsByTagName(element, transitionName);
-			for (Element transitionElement : transitionElements) {
-				verifyUniquePattern(transitionElement, patterns, element, parserContext);
-				list.addAll(parseTransitionElement(transitionElement, stepId, stateDef, parserContext));
+		List<Element> childElements = DomUtils.getChildElements(element);
+		for(Element childElement : childElements) {
+			if(isChildElementTransitionElement(childElement)) {
+				list.addAll(parseTransitionElement(childElement, stepId, stateDef, parserContext));
 				transitionElementExists = true;
 			}
 		}
@@ -184,6 +190,17 @@ public class FlowParser extends AbstractFlowParser {
 		}
 
 		return list;
+	}
+
+	private static boolean isChildElementTransitionElement(Element childElement) {
+		boolean isTransitionElement = false;
+
+		if(TRANSITION_TYPES.contains(childElement.getLocalName())) {
+			int index = TRANSITION_TYPES.indexOf(childElement.getLocalName());
+			isTransitionElement = TRANSITION_TYPES.get(index) != null;
+		}
+
+		return isTransitionElement;
 	}
 
 	protected static Collection<BeanDefinition> parseTransitionElement(Element transitionElement, String stateId,
