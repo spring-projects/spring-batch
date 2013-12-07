@@ -171,7 +171,7 @@ public class SimpleFlow implements Flow, InitializingBean {
 
 			logger.debug("Completed state="+stateName+" with status="+status);
 
-			state = nextState(stateName, status);
+			state = nextState(stateName, status, stepExecution);
 		}
 
 		FlowExecution result = new FlowExecution(stateName, status);
@@ -180,28 +180,19 @@ public class SimpleFlow implements Flow, InitializingBean {
 
 	}
 
-	private boolean isFlowContinued(State state, FlowExecutionStatus status, StepExecution stepExecution) {
-		boolean continued = true;
+	protected Map<String, Set<StateTransition>> getTransitionMap() {
+		return transitionMap;
+	}
 
-		continued = state != null && status!=FlowExecutionStatus.STOPPED;
-
-		if(stepExecution != null) {
-			Boolean reRun = (Boolean) stepExecution.getExecutionContext().get("batch.restart");
-
-			if(reRun != null && reRun && status == FlowExecutionStatus.STOPPED && !state.getName().endsWith(stepExecution.getStepName())) {
-				continued = true;
-			}
-		}
-
-		return continued;
+	protected Map<String, State> getStateMap() {
+		return stateMap;
 	}
 
 	/**
 	 * @return the next {@link Step} (or null if this is the end)
 	 * @throws JobExecutionException
 	 */
-	private State nextState(String stateName, FlowExecutionStatus status) throws FlowExecutionException {
-
+	protected State nextState(String stateName, FlowExecutionStatus status, StepExecution stepExecution) throws FlowExecutionException {
 		Set<StateTransition> set = transitionMap.get(stateName);
 
 		if (set == null) {
@@ -236,6 +227,22 @@ public class SimpleFlow implements Flow, InitializingBean {
 
 		return state;
 
+	}
+
+	private boolean isFlowContinued(State state, FlowExecutionStatus status, StepExecution stepExecution) {
+		boolean continued = true;
+
+		continued = state != null && status!=FlowExecutionStatus.STOPPED;
+
+		if(stepExecution != null) {
+			Boolean reRun = (Boolean) stepExecution.getExecutionContext().get("batch.restart");
+
+			if(reRun != null && reRun && status == FlowExecutionStatus.STOPPED && !state.getName().endsWith(stepExecution.getStepName())) {
+				continued = true;
+			}
+		}
+
+		return continued;
 	}
 
 	/**

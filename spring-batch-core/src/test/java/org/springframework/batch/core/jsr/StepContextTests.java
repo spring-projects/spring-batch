@@ -32,12 +32,15 @@ import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.JobParametersBuilder;
 import org.springframework.batch.core.StepExecution;
 import org.springframework.batch.item.ExecutionContext;
+import org.springframework.batch.item.util.ExecutionContextUserSupport;
+import org.springframework.util.ClassUtils;
 
 public class StepContextTests {
 
 	private StepExecution stepExecution;
 	private StepContext stepContext;
 	private ExecutionContext executionContext;
+	private ExecutionContextUserSupport executionContextUserSupport = new ExecutionContextUserSupport(ClassUtils.getShortName(StepContext.class));
 
 	@Before
 	public void setUp() throws Exception {
@@ -68,6 +71,8 @@ public class StepContextTests {
 	@Test
 	public void testBasicProperties() {
 		assertEquals(javax.batch.runtime.BatchStatus.STARTED, stepContext.getBatchStatus());
+		assertEquals(null, stepContext.getExitStatus());
+		stepContext.setExitStatus("customExitStatus");
 		assertEquals("customExitStatus", stepContext.getExitStatus());
 		assertEquals(5l, stepContext.getStepExecutionId());
 		assertEquals("testStep", stepContext.getStepName());
@@ -121,7 +126,7 @@ public class StepContextTests {
 		String data = "saved data";
 		stepContext.setPersistentUserData(data);
 		assertEquals(data, stepContext.getPersistentUserData());
-		assertEquals(data, executionContext.get("batch_jsr_persistentUserData"));
+		assertEquals(data, executionContext.get(executionContextUserSupport.getKey("batch_jsr_persistentUserData")));
 	}
 
 	@Test

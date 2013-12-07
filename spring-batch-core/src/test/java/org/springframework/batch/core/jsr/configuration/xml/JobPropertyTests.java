@@ -15,6 +15,8 @@
  */
 package org.springframework.batch.core.jsr.configuration.xml;
 
+import static org.junit.Assert.assertEquals;
+
 import java.io.Serializable;
 import java.util.List;
 
@@ -38,7 +40,6 @@ import org.springframework.batch.core.launch.JobLauncher;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
-import static org.junit.Assert.assertEquals;
 
 /**
  * <p>

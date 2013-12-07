@@ -16,8 +16,10 @@
 package org.springframework.batch.core.jsr.configuration.xml;
 
 import java.util.HashMap;
+
 import org.springframework.batch.core.jsr.configuration.support.BatchPropertyBeanPostProcessor;
 import org.springframework.batch.core.jsr.configuration.support.JsrAutowiredAnnotationBeanPostProcessor;
+import org.springframework.batch.core.jsr.configuration.support.JsrBeanScopBeanFactoryPostProcessor;
 import org.springframework.batch.core.jsr.configuration.support.ThreadLocalClassloaderBeanPostProcessor;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.support.AbstractBeanDefinition;
@@ -36,12 +38,19 @@ class JsrNamespaceUtils {
 	private static final String JOB_PROPERTIES_BEAN_NAME = "jobProperties";
 	private static final String BATCH_PROPERTY_POST_PROCESSOR_BEAN_NAME = "batchPropertyPostProcessor";
 	private static final String THREAD_LOCAL_CLASS_LOADER_BEAN_POST_PROCESSOR_BEAN_NAME = "threadLocalClassloaderBeanPostProcessor";
+	private static final String BEAN_SCOPE_POST_PROCESSOR_BEAN_NAME = "beanScopeBeanPostProcessor";
 
 	static void autoregisterJsrBeansForNamespace(ParserContext parserContext) {
 		autoRegisterJobProperties(parserContext);
 		autoRegisterBatchPostProcessor(parserContext);
 		autoRegisterJsrAutowiredAnnotationBeanPostProcessor(parserContext);
 		autoRegisterThreadLocalClassloaderBeanPostProcessor(parserContext);
+		autoRegisterBeanScopeBeanFactoryPostProcessor(parserContext);
+	}
+
+	private static void autoRegisterBeanScopeBeanFactoryPostProcessor(
+			ParserContext parserContext) {
+		registerPostProcessor(parserContext, JsrBeanScopBeanFactoryPostProcessor.class, BeanDefinition.ROLE_INFRASTRUCTURE, BEAN_SCOPE_POST_PROCESSOR_BEAN_NAME);
 	}
 
 	private static void autoRegisterBatchPostProcessor(ParserContext parserContext) {
