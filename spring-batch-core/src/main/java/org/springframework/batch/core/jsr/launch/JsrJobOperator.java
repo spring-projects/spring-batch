@@ -68,6 +68,7 @@ import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.access.BeanFactoryLocator;
 import org.springframework.beans.factory.access.BeanFactoryReference;
 import org.springframework.beans.factory.config.AutowireCapableBeanFactory;
+import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.support.AbstractBeanDefinition;
 import org.springframework.beans.factory.support.BeanDefinitionBuilder;
 import org.springframework.context.ApplicationContext;
@@ -466,7 +467,7 @@ public class JsrJobOperator implements JobOperator, InitializingBean {
 		batchContext.addBeanFactoryPostProcessor(new JobParameterResolvingBeanFactoryPostProcessor(params));
 
 		AbstractBeanDefinition beanDefinition = BeanDefinitionBuilder.genericBeanDefinition("org.springframework.batch.core.jsr.JobContextFactoryBean").getBeanDefinition();
-		beanDefinition.setScope("singleton");
+		beanDefinition.setScope(BeanDefinition.SCOPE_SINGLETON);
 		batchContext.registerBeanDefinition(JSR_JOB_CONTEXT_BEAN_NAME, beanDefinition);
 
 		batchContext.setParent(baseContext);
@@ -494,23 +495,44 @@ public class JsrJobOperator implements JobOperator, InitializingBean {
 		}
 
 		try {
-			JobContextFactoryBean factoryBean = (JobContextFactoryBean) batchContext.getBean("&" + JSR_JOB_CONTEXT_BEAN_NAME);
-			factoryBean.setJobExecution(jobExecution);
+			final Semaphore semaphore = new Semaphore(1);
+			final List<Exception> exceptionHolder = Collections.synchronizedList(new ArrayList<Exception>());
+			semaphore.acquire();
 
 			taskExecutor.execute(new Runnable() {
 
 				@Override
 				public void run() {
+					JobContextFactoryBean factoryBean = null;
 					try {
+						factoryBean = (JobContextFactoryBean) batchContext.getBean("&" + JSR_JOB_CONTEXT_BEAN_NAME);
+						factoryBean.setJobExecution(jobExecution);
+						final Job job = batchContext.getBean(Job.class);
+						semaphore.release();
+						// Initialization of the JobExecution for job level dependencies
 						jobRegistry.register(job, jobExecution);
 						job.execute(jobExecution);
 						jobRegistry.remove(jobExecution);
 					}
-					catch (Throwable t) {
-						throw new JobStartException(t);
+					catch (Exception e) {
+						exceptionHolder.add(e);
+					} finally {
+						if(factoryBean != null) {
+							factoryBean.close();
+						}
+
+						if(semaphore.availablePermits() == 0) {
+							semaphore.release();
+						}
 					}
 				}
 			});
+
+			semaphore.acquire();
+			if(exceptionHolder.size() > 0) {
+				semaphore.release();
+				throw new JobRestartException(exceptionHolder.get(0));
+			}
 		}
 		catch (Exception e) {
 			jobExecution.upgradeStatus(BatchStatus.FAILED);
@@ -574,7 +596,7 @@ public class JsrJobOperator implements JobOperator, InitializingBean {
 
 		batchContext.addBeanFactoryPostProcessor(new JobParameterResolvingBeanFactoryPostProcessor(params));
 		AbstractBeanDefinition beanDefinition = BeanDefinitionBuilder.genericBeanDefinition("org.springframework.batch.core.jsr.JobContextFactoryBean").getBeanDefinition();
-		beanDefinition.setScope("singleton");
+		beanDefinition.setScope(BeanDefinition.SCOPE_SINGLETON);
 		batchContext.registerBeanDefinition(JSR_JOB_CONTEXT_BEAN_NAME, beanDefinition);
 
 		batchContext.setParent(baseContext);
@@ -612,8 +634,9 @@ public class JsrJobOperator implements JobOperator, InitializingBean {
 
 				@Override
 				public void run() {
+					JobContextFactoryBean factoryBean = null;
 					try {
-						JobContextFactoryBean factoryBean = (JobContextFactoryBean) batchContext.getBean("&" + JSR_JOB_CONTEXT_BEAN_NAME);
+						factoryBean = (JobContextFactoryBean) batchContext.getBean("&" + JSR_JOB_CONTEXT_BEAN_NAME);
 						factoryBean.setJobExecution(jobExecution);
 						final Job job = batchContext.getBean(Job.class);
 						semaphore.release();
@@ -625,6 +648,10 @@ public class JsrJobOperator implements JobOperator, InitializingBean {
 					catch (Exception e) {
 						exceptionHolder.add(e);
 					} finally {
+						if(factoryBean != null) {
+							factoryBean.close();
+						}
+
 						if(semaphore.availablePermits() == 0) {
 							semaphore.release();
 						}
@@ -635,11 +662,10 @@ public class JsrJobOperator implements JobOperator, InitializingBean {
 			semaphore.acquire();
 			if(exceptionHolder.size() > 0) {
 				semaphore.release();
-				throw exceptionHolder.get(0);
+				throw new JobStartException(exceptionHolder.get(0));
 			}
 		}
 		catch (Exception e) {
-			e.printStackTrace(System.err);
 			if(jobRegistry.exists(jobExecution.getId())) {
 				jobRegistry.remove(jobExecution);
 			}
