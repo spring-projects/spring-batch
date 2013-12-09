@@ -193,14 +193,7 @@ public class FlowParser extends AbstractFlowParser {
 	}
 
 	private static boolean isChildElementTransitionElement(Element childElement) {
-		boolean isTransitionElement = false;
-
-		if(TRANSITION_TYPES.contains(childElement.getLocalName())) {
-			int index = TRANSITION_TYPES.indexOf(childElement.getLocalName());
-			isTransitionElement = TRANSITION_TYPES.get(index) != null;
-		}
-
-		return isTransitionElement;
+		return TRANSITION_TYPES.contains(childElement.getLocalName());
 	}
 
 	protected static Collection<BeanDefinition> parseTransitionElement(Element transitionElement, String stateId,

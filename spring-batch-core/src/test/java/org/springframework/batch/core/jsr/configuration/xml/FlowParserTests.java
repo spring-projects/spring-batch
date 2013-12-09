@@ -15,19 +15,19 @@
  */
 package org.springframework.batch.core.jsr.configuration.xml;
 
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.springframework.batch.core.*;
-import org.springframework.batch.core.launch.JobLauncher;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import static org.junit.Assert.assertEquals;
+import static org.springframework.batch.core.jsr.JsrTestUtils.restartJob;
+import static org.springframework.batch.core.jsr.JsrTestUtils.runJob;
 
-import javax.batch.api.Batchlet;
+import java.util.Properties;
+
+import javax.batch.api.AbstractBatchlet;
+import javax.batch.runtime.JobExecution;
 import javax.batch.runtime.context.StepContext;
 import javax.inject.Inject;
 
-import static org.junit.Assert.assertEquals;
+import org.junit.Test;
+import org.springframework.batch.core.ExitStatus;
 
 /**
  * <p>
@@ -37,28 +37,18 @@ import static org.junit.Assert.assertEquals;
  * @author Chris Schaefer
  * @since 3.0
  */
-@ContextConfiguration
-@RunWith(SpringJUnit4ClassRunner.class)
 public class FlowParserTests {
-	@Autowired
-	private Job job;
-
-	@Autowired
-	private JobLauncher jobLauncher;
 
 	@Test
 	public void testDuplicateTransitionPatternsAllowed() throws Exception {
-		JobExecution stoppedExecution = jobLauncher.run(job, new JobParameters());
-		assertEquals(ExitStatus.STOPPED.getExitCode(), stoppedExecution.getExitStatus().getExitCode());
+		JobExecution stoppedExecution = runJob("FlowParserTests-context", new Properties(), 10000l);
+		assertEquals(ExitStatus.STOPPED.getExitCode(), stoppedExecution.getExitStatus());
 
-		JobExecution endedExecution = jobLauncher.run(job, new JobParameters());
-		assertEquals(ExitStatus.COMPLETED.getExitCode(), endedExecution.getExitStatus().getExitCode());
-
-		JobExecution failedExecution = jobLauncher.run(job, new JobParameters());
-		assertEquals(ExitStatus.FAILED.getExitCode(), failedExecution.getExitStatus().getExitCode());
+		JobExecution endedExecution = restartJob(stoppedExecution.getExecutionId(), new Properties(), 10000l);
+		assertEquals(ExitStatus.COMPLETED.getExitCode(), endedExecution.getExitStatus());
 	}
 
-	public static class TestBatchlet implements Batchlet {
+	public static class TestBatchlet extends AbstractBatchlet {
 		private static int CNT;
 
 		@Inject
@@ -75,8 +65,5 @@ public class FlowParserTests {
 
 			return exitCode;
 		}
-
-		@Override
-		public void stop() throws Exception { }
 	}
 }
