@@ -34,6 +34,7 @@ import org.springframework.util.Assert;
 public class CheckpointAlgorithmAdapter implements CompletionPolicy {
 
 	private CheckpointAlgorithm policy;
+	private boolean isComplete = false;
 
 	public CheckpointAlgorithmAdapter(CheckpointAlgorithm policy) {
 		Assert.notNull(policy, "A CheckpointAlgorithm is required");
@@ -47,7 +48,8 @@ public class CheckpointAlgorithmAdapter implements CompletionPolicy {
 	@Override
 	public boolean isComplete(RepeatContext context, RepeatStatus result) {
 		try {
-			return policy.isReadyToCheckpoint();
+			isComplete = policy.isReadyToCheckpoint();
+			return isComplete;
 		} catch (Exception e) {
 			throw new BatchRuntimeException(e);
 		}
@@ -59,7 +61,8 @@ public class CheckpointAlgorithmAdapter implements CompletionPolicy {
 	@Override
 	public boolean isComplete(RepeatContext context) {
 		try {
-			return policy.isReadyToCheckpoint();
+			isComplete = policy.isReadyToCheckpoint();
+			return isComplete;
 		} catch (Exception e) {
 			throw new BatchRuntimeException(e);
 		}
@@ -88,7 +91,7 @@ public class CheckpointAlgorithmAdapter implements CompletionPolicy {
 	@Override
 	public void update(RepeatContext context) {
 		try {
-			if(policy.isReadyToCheckpoint()) {
+			if(isComplete) {
 				policy.endCheckpoint();
 			}
 		} catch (Exception e) {
