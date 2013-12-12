@@ -55,8 +55,21 @@ public class SimpleFlowFactoryBean implements FactoryBean, InitializingBean {
 
 	private Comparator<StateTransition> stateTransitionComparator;
 
+	private Class<SimpleFlow> flowType;
+
+	/**
+	 * @param stateTransitionComparator {@link Comparator} implementation that addresses
+	 * the ordering of state evaluation
+	 */
 	public void setStateTransitionComparator(Comparator<StateTransition> stateTransitionComparator) {
 		this.stateTransitionComparator = stateTransitionComparator;
+	}
+
+	/**
+	 * @param flowType Used to inject the type of flow (regular Spring Batch or JSR-352)
+	 */
+	public void setFlowType(Class<SimpleFlow> flowType) {
+		this.flowType = flowType;
 	}
 
 	/**
@@ -88,12 +101,18 @@ public class SimpleFlowFactoryBean implements FactoryBean, InitializingBean {
 	@Override
 	public void afterPropertiesSet() throws Exception {
 		Assert.hasText(name, "The flow must have a name");
+
+		if(flowType == null) {
+			flowType = SimpleFlow.class;
+		}
 	}
 
+	/* (non-Javadoc)
+	 * @see org.springframework.beans.factory.FactoryBean#getObject()
+	 */
 	@Override
 	public Object getObject() throws Exception {
-
-		SimpleFlow flow = new SimpleFlow(name);
+		SimpleFlow flow = flowType.getConstructor(String.class).newInstance(name);
 
 		flow.setStateTransitionComparator(stateTransitionComparator);
 
