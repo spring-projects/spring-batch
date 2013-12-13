@@ -39,7 +39,7 @@ import org.springframework.beans.factory.support.AbstractBeanDefinition;
  * @author Michael Minella
  * @since 3.0
  */
-public class JsrBeanScopBeanFactoryPostProcessor implements BeanFactoryPostProcessor {
+public class JsrBeanScopeBeanFactoryPostProcessor implements BeanFactoryPostProcessor {
 
 	private JobLevelBeanLazyInitializer initializer;
 

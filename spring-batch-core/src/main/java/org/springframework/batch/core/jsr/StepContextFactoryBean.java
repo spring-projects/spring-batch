@@ -104,4 +104,10 @@ public class StepContextFactoryBean implements FactoryBean<StepContext>, Initial
 	public void afterPropertiesSet() throws Exception {
 		Assert.notNull(batchPropertyContext, "BatchPropertyContext is required");
 	}
+
+	public void remove() {
+		if(contextHolder.get() != null) {
+			contextHolder.remove();
+		}
+	}
 }

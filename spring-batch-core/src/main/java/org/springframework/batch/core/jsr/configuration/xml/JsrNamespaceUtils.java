@@ -19,7 +19,7 @@ import java.util.HashMap;
 
 import org.springframework.batch.core.jsr.configuration.support.BatchPropertyBeanPostProcessor;
 import org.springframework.batch.core.jsr.configuration.support.JsrAutowiredAnnotationBeanPostProcessor;
-import org.springframework.batch.core.jsr.configuration.support.JsrBeanScopBeanFactoryPostProcessor;
+import org.springframework.batch.core.jsr.configuration.support.JsrBeanScopeBeanFactoryPostProcessor;
 import org.springframework.batch.core.jsr.configuration.support.ThreadLocalClassloaderBeanPostProcessor;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.support.AbstractBeanDefinition;
@@ -50,7 +50,7 @@ class JsrNamespaceUtils {
 
 	private static void autoRegisterBeanScopeBeanFactoryPostProcessor(
 			ParserContext parserContext) {
-		registerPostProcessor(parserContext, JsrBeanScopBeanFactoryPostProcessor.class, BeanDefinition.ROLE_INFRASTRUCTURE, BEAN_SCOPE_POST_PROCESSOR_BEAN_NAME);
+		registerPostProcessor(parserContext, JsrBeanScopeBeanFactoryPostProcessor.class, BeanDefinition.ROLE_INFRASTRUCTURE, BEAN_SCOPE_POST_PROCESSOR_BEAN_NAME);
 	}
 
 	private static void autoRegisterBatchPostProcessor(ParserContext parserContext) {
