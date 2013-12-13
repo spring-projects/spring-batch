@@ -42,6 +42,8 @@ public class ListenerParser {
 	private static final String REF_ATTRIBUTE = "ref";
 	private static final String LISTENER_ELEMENT = "listener";
 	private static final String LISTENERS_ELEMENT = "listeners";
+	private static final String SCOPE_STEP = "step";
+
 	@SuppressWarnings("rawtypes")
 	private Class listenerType;
 	private String propertyKey;
@@ -103,13 +105,33 @@ public class ListenerParser {
 	}
 
 	protected void applyListenerScope(String beanName, BeanDefinitionRegistry beanDefinitionRegistry) {
-		if (listenerType == JobListenerFactoryBean.class) {
-			if (beanDefinitionRegistry.containsBeanDefinition(beanName)) {
-				BeanDefinition beanDefinition = beanDefinitionRegistry.getBeanDefinition(beanName);
-				beanDefinition.setScope(BeanDefinition.SCOPE_SINGLETON);
-				beanDefinition.setLazyInit(true);
-			}
+		BeanDefinition beanDefinition = getListenerBeanDefinition(beanName, beanDefinitionRegistry);
+		beanDefinition.setScope(getListenerScope());
+		beanDefinition.setLazyInit(isLazyInit());
+
+		if (!beanDefinitionRegistry.containsBeanDefinition(beanName)) {
+			beanDefinitionRegistry.registerBeanDefinition(beanName, beanDefinition);
 		}
+	}
+
+	private BeanDefinition getListenerBeanDefinition(String beanName, BeanDefinitionRegistry beanDefinitionRegistry) {
+		if (beanDefinitionRegistry.containsBeanDefinition(beanName)) {
+			return beanDefinitionRegistry.getBeanDefinition(beanName);
+		}
+
+		return BeanDefinitionBuilder.genericBeanDefinition(beanName).getBeanDefinition();
+	}
+
+	private boolean isLazyInit() {
+		return listenerType == JobListenerFactoryBean.class;
+	}
+
+	private String getListenerScope() {
+		if (listenerType == JobListenerFactoryBean.class) {
+			return BeanDefinition.SCOPE_SINGLETON;
+		}
+
+		return SCOPE_STEP;
 	}
 
 	private BatchArtifact.BatchArtifactType getBatchArtifactType(String stepName) {
