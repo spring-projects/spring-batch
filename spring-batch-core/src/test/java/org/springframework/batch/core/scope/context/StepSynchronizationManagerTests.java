@@ -19,10 +19,8 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 
-import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -35,7 +33,6 @@ import org.junit.Test;
 import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.StepExecution;
 import org.springframework.batch.core.jsr.configuration.support.BatchPropertyContext;
-import org.springframework.util.ReflectionUtils;
 
 public class StepSynchronizationManagerTests {
 
@@ -80,20 +77,6 @@ public class StepSynchronizationManagerTests {
 		StepSynchronizationManager.close();
 		assertNull(StepSynchronizationManager.getContext());
 		assertEquals(0, list.size());
-		// check for possible memory leak
-		assertEquals(0, extractStaticMap("counts").size());
-		assertEquals(0, extractStaticMap("contexts").size());
-	}
-
-	private Map<?, ?> extractStaticMap(String name) throws IllegalAccessException {
-		Field field = ReflectionUtils.findField(StepSynchronizationManager.class, "synchronizationManager");
-		ReflectionUtils.makeAccessible(field);
-		SynchronizationManagerSupport<?, ?> synchronizationManager =
-				(SynchronizationManagerSupport<?, ?>) field.get(StepSynchronizationManager.class);
-		field = ReflectionUtils.findField(SynchronizationManagerSupport.class, name);
-		ReflectionUtils.makeAccessible(field);
-		Map<?, ?> map = (Map<?, ?>) field.get(synchronizationManager);
-		return map;
 	}
 
 	@Test

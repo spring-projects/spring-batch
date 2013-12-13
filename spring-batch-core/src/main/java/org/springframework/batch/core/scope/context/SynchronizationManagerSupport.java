@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2007 the original author or authors.
+ * Copyright 2013 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,12 +20,16 @@ import java.util.Map;
 import java.util.Stack;
 import java.util.concurrent.atomic.AtomicInteger;
 
+import org.springframework.batch.core.jsr.configuration.support.BatchPropertyContext;
+
+
 /**
  * Central convenience class for framework use in managing the scope
  * context.
- * 
+ *
  * @author Dave Syer
  * @author Jimmy Praet
+ * @since 3.0
  */
 public abstract class SynchronizationManagerSupport<E, C> {
 
@@ -58,7 +62,7 @@ public abstract class SynchronizationManagerSupport<E, C> {
 
 	/**
 	 * Getter for the current context if there is one, otherwise returns null.
-	 * 
+	 *
 	 * @return the current context or null if there is none (if one
 	 *         has not been registered for this thread).
 	 */
@@ -75,7 +79,7 @@ public abstract class SynchronizationManagerSupport<E, C> {
 	 * Register a context with the current thread - always put a matching {@link #close()} call in a finally block to
 	 * ensure that the correct
 	 * context is available in the enclosing block.
-	 * 
+	 *
 	 * @param execution the execution to register
 	 * @return a new context or the current one if it has the same
 	 *         execution
@@ -89,7 +93,33 @@ public abstract class SynchronizationManagerSupport<E, C> {
 		synchronized (contexts) {
 			context = contexts.get(execution);
 			if (context == null) {
-				context = createNewContext(execution);
+				context = createNewContext(execution, null);
+				contexts.put(execution, context);
+			}
+		}
+		increment();
+		return context;
+	}
+
+	/**
+	 * Register a context with the current thread - always put a matching {@link #close()} call in a finally block to
+	 * ensure that the correct
+	 * context is available in the enclosing block.
+	 *
+	 * @param execution the execution to register
+	 * @return a new context or the current one if it has the same
+	 *         execution
+	 */
+	public C register(E execution, BatchPropertyContext propertyContext) {
+		if (execution == null) {
+			return null;
+		}
+		getCurrent().push(execution);
+		C context;
+		synchronized (contexts) {
+			context = contexts.get(execution);
+			if (context == null) {
+				context = createNewContext(execution, propertyContext);
 				contexts.put(execution, context);
 			}
 		}
@@ -99,7 +129,7 @@ public abstract class SynchronizationManagerSupport<E, C> {
 
 	/**
 	 * Method for de-registering the current context - should always and only be
-	 * used by in conjunction with a matching {@link #register(E)} to ensure that {@link #getContext()} always returns
+	 * used by in conjunction with a matching {@link #register(Object)} to ensure that {@link #getContext()} always returns
 	 * the correct value.
 	 * Does not call close on the context - that is left up to the caller
 	 * because he has a reference to the context (having registered it) and only
@@ -126,7 +156,7 @@ public abstract class SynchronizationManagerSupport<E, C> {
 		}
 	}
 
-	private void increment() {
+	public void increment() {
 		E current = getCurrent().peek();
 		if (current != null) {
 			AtomicInteger count;
@@ -141,7 +171,7 @@ public abstract class SynchronizationManagerSupport<E, C> {
 		}
 	}
 
-	private Stack<E> getCurrent() {
+	public Stack<E> getCurrent() {
 		if (executionHolder.get() == null) {
 			executionHolder.set(new Stack<E>());
 		}
@@ -151,7 +181,7 @@ public abstract class SynchronizationManagerSupport<E, C> {
 	/**
 	 * A convenient "deep" close operation. Call this instead of {@link #close()} if the execution for the current
 	 * context is ending.
-	 * Delegates to {@link context#close()} and then ensures that {@link #close()} is also called in a finally block.
+	 * Delegates to {@link #close(Object)} and then ensures that {@link #close()} is also called in a finally block.
 	 */
 	public void release() {
 		C context = getContext();
@@ -166,6 +196,6 @@ public abstract class SynchronizationManagerSupport<E, C> {
 
 	protected abstract void close(C context);
 
-	protected abstract C createNewContext(E execution);
+	protected abstract C createNewContext(E execution, BatchPropertyContext propertyContext);
 
 }

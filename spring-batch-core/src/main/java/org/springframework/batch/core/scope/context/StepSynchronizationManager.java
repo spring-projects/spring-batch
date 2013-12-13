@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2007 the original author or authors.
+ * Copyright 2006-2013 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -32,24 +32,27 @@ import org.springframework.batch.core.jsr.configuration.support.BatchPropertyCon
  */
 public class StepSynchronizationManager {
 
-	private static final SynchronizationManagerSupport<StepExecution, StepContext> synchronizationManager =
+	private static final SynchronizationManagerSupport<StepExecution, StepContext> manager =
 			new SynchronizationManagerSupport<StepExecution, StepContext>() {
 
-				@Override
-				protected StepContext createNewContext(StepExecution execution) {
-					return new StepContext(execution);
-				}
+		@Override
+		protected StepContext createNewContext(StepExecution execution, BatchPropertyContext propertyContext) {
+			StepContext context;
 
-				@Override
-				protected void close(StepContext context) {
-					context.close();
-				}
-			};
+			if(propertyContext != null) {
+				context = new StepContext(execution, propertyContext);
+			} else {
+				context = new StepContext(execution);
+			}
 
-	/*
-	 * We have to deal with single and multi-threaded execution, with a single
-	 * and with multiple step execution instances. That's 2x2 = 4 scenarios.
-	 */
+			return context;
+		}
+
+		@Override
+		protected void close(StepContext context) {
+			context.close();
+		}
+	};
 
 	/**
 	 * Getter for the current context if there is one, otherwise returns null.
@@ -58,7 +61,7 @@ public class StepSynchronizationManager {
 	 * has not been registered for this thread).
 	 */
 	public static StepContext getContext() {
-		return synchronizationManager.getContext();
+		return manager.getContext();
 	}
 
 	/**
@@ -71,7 +74,7 @@ public class StepSynchronizationManager {
 	 * {@link StepExecution}
 	 */
 	public static StepContext register(StepExecution stepExecution) {
-		return synchronizationManager.register(stepExecution);
+		return manager.register(stepExecution);
 	}
 
 	/**
@@ -84,20 +87,7 @@ public class StepSynchronizationManager {
 	 * {@link StepExecution}
 	 */
 	public static StepContext register(StepExecution stepExecution, BatchPropertyContext propertyContext) {
-		if (stepExecution == null) {
-			return null;
-		}
-		getCurrent().push(stepExecution);
-		StepContext context;
-		synchronized (contexts) {
-			context = contexts.get(stepExecution);
-			if (context == null) {
-				context = new StepContext(stepExecution, propertyContext);
-				contexts.put(stepExecution, context);
-			}
-		}
-		increment();
-		return context;
+		return manager.register(stepExecution, propertyContext);
 	}
 
 	/**
@@ -109,7 +99,7 @@ public class StepSynchronizationManager {
 	 * he has knowledge of when the step actually ended.
 	 */
 	public static void close() {
-		synchronizationManager.close();
+		manager.close();
 	}
 
 	/**
@@ -119,7 +109,6 @@ public class StepSynchronizationManager {
 	 * {@link #close()} is also called in a finally block.
 	 */
 	public static void release() {
-		synchronizationManager.release();
+		manager.release();
 	}
-
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2009 the original author or authors.
+ * Copyright 2013 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -30,10 +30,10 @@ import org.springframework.context.support.ClassPathXmlApplicationContext;
  * @author Jimmy Praet
  */
 public class AutoRegisteringJobScopeTests {
-	
+
 	@Test
 	public void testJobElement() throws Exception {
-		ConfigurableApplicationContext ctx = 
+		ConfigurableApplicationContext ctx =
 				new ClassPathXmlApplicationContext(
 						"org/springframework/batch/core/configuration/xml/AutoRegisteringJobScopeForJobElementTests-context.xml");
 		@SuppressWarnings("unchecked")
@@ -43,7 +43,7 @@ public class AutoRegisteringJobScopeTests {
 
 	@Test
 	public void testStepElement() throws Exception {
-		ConfigurableApplicationContext ctx = 
+		ConfigurableApplicationContext ctx =
 				new ClassPathXmlApplicationContext(
 						"org/springframework/batch/core/configuration/xml/AutoRegisteringJobScopeForStepElementTests-context.xml");
 		@SuppressWarnings("unchecked")

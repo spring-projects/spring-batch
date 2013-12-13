@@ -37,10 +37,10 @@ public class StepScopePerformanceTests implements ApplicationContextAware {
 	public void start() throws Exception {
 		int count = doTest("vanilla", "warmup");
 		logger.info("Item count: "+count);
+		StepSynchronizationManager.close();
 		StepSynchronizationManager.register(new StepExecution("step", new JobExecution(0L),1L));
 	}
 
-	@Before
 	@After
 	public void cleanup() {
 		StepSynchronizationManager.close();

@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2007 the original author or authors.
+ * Copyright 2006-2013 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -41,9 +41,10 @@ import org.springframework.util.Assert;
  * based on bean paths. Has public getters for the job execution and
  * convenience methods for accessing commonly used properties like the {@link ExecutionContext} associated with the job
  * execution.
- * 
+ *
  * @author Dave Syer
  * @author Jimmy Praet (create JobContext based on {@link StepContext})
+ * @since 3.0
  */
 public class JobContext extends SynchronizedAttributeAccessor {
 
@@ -59,19 +60,19 @@ public class JobContext extends SynchronizedAttributeAccessor {
 
 	/**
 	 * Convenient accessor for current job name identifier.
-	 * 
+	 *
 	 * @return the job name identifier of the enclosing {@link JobInstance} associated with the current
 	 *         {@link JobExecution}
 	 */
 	public String getJobName() {
-		Assert.state(jobExecution.getJobInstance() != null, "StepExecution does not have a JobInstance");
+		Assert.state(jobExecution.getJobInstance() != null, "JobExecution does not have a JobInstance");
 		return jobExecution.getJobInstance().getJobName();
 	}
 
 	/**
 	 * Convenient accessor for System properties to make it easy to access them
 	 * from placeholder expressions.
-	 * 
+	 *
 	 * @return the current System properties
 	 */
 	public Properties getSystemProperties() {
@@ -94,7 +95,7 @@ public class JobContext extends SynchronizedAttributeAccessor {
 	 */
 	public Map<String, Object> getJobParameters() {
 		Map<String, Object> result = new HashMap<String, Object>();
-		for (Entry<String, JobParameter> entry : jobExecution.getJobInstance().getJobParameters().getParameters()
+		for (Entry<String, JobParameter> entry : jobExecution.getJobParameters().getParameters()
 				.entrySet()) {
 			result.put(entry.getKey(), entry.getValue().getValue());
 		}
@@ -103,7 +104,7 @@ public class JobContext extends SynchronizedAttributeAccessor {
 
 	/**
 	 * Allow clients to register callbacks for clean up on close.
-	 * 
+	 *
 	 * @param name
 	 *        the callback id (unique attribute key in this context)
 	 * @param callback
@@ -129,7 +130,7 @@ public class JobContext extends SynchronizedAttributeAccessor {
 	/**
 	 * Override base class behaviour to ensure destruction callbacks are
 	 * unregistered as well as the default behaviour.
-	 * 
+	 *
 	 * @see SynchronizedAttributeAccessor#removeAttribute(String)
 	 */
 	@Override
@@ -182,7 +183,7 @@ public class JobContext extends SynchronizedAttributeAccessor {
 
 	/**
 	 * The current {@link JobExecution} that is active in this context.
-	 * 
+	 *
 	 * @return the current {@link JobExecution}
 	 */
 	public JobExecution getJobExecution() {
@@ -204,10 +205,12 @@ public class JobContext extends SynchronizedAttributeAccessor {
 	 */
 	@Override
 	public boolean equals(Object other) {
-		if (!(other instanceof JobContext))
+		if (!(other instanceof JobContext)) {
 			return false;
-		if (other == this)
+		}
+		if (other == this) {
 			return true;
+		}
 		JobContext context = (JobContext) other;
 		if (context.jobExecution == jobExecution) {
 			return true;

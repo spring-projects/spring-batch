@@ -22,6 +22,8 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 @RunWith(SpringJUnit4ClassRunner.class)
 public class JobScopeIntegrationTests {
 
+	private static final String PROXY_TO_STRING_REGEX = "class .*\\$Proxy\\d+";
+
 	@Autowired
 	@Qualifier("vanilla")
 	private Job vanilla;
@@ -64,7 +66,7 @@ public class JobScopeIntegrationTests {
 		assertNotNull(collaborator);
 		assertEquals("bar", collaborator);
 		assertTrue("Scoped proxy not created", ((String) TestJob.getContext().getAttribute("collaborator.class"))
-				.startsWith("class $Proxy"));
+				.matches(PROXY_TO_STRING_REGEX));
 	}
 
 	@Test
@@ -78,7 +80,7 @@ public class JobScopeIntegrationTests {
 		assertNotNull(parent);
 		assertEquals("bar", parent);
 		assertTrue("Scoped proxy not created", ((String) TestJob.getContext().getAttribute("parent.class"))
-				.startsWith("class $Proxy"));
+				.matches(PROXY_TO_STRING_REGEX));
 	}
 
 	@Test

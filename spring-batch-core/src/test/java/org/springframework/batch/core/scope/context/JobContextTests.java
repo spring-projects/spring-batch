@@ -24,6 +24,7 @@ import static org.junit.Assert.fail;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.junit.Before;
 import org.junit.Test;
 import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.JobInstance;
@@ -37,11 +38,20 @@ import org.springframework.batch.item.ExecutionContext;
  */
 public class JobContextTests {
 
-	private List<String> list = new ArrayList<String>();
+	private List<String> list;
 
-	private JobExecution jobExecution = new JobExecution(new JobInstance(2L, null, "job"), 1L);
+	private JobExecution jobExecution;
 
-	private JobContext context = new JobContext(jobExecution);
+	private JobContext context;
+
+	@Before
+	public void setUp() {
+		jobExecution = new JobExecution(1l);
+		JobInstance jobInstance = new JobInstance(2l, "job");
+		jobExecution.setJobInstance(jobInstance);
+		context = new JobContext(jobExecution);
+		list = new ArrayList<String>();
+	}
 
 	@Test
 	public void testGetJobExecution() {
@@ -79,6 +89,7 @@ public class JobContextTests {
 	public void testDestructionCallbackSunnyDay() throws Exception {
 		context.setAttribute("foo", "FOO");
 		context.registerDestructionCallback("foo", new Runnable() {
+			@Override
 			public void run() {
 				list.add("bar");
 			}
@@ -91,6 +102,7 @@ public class JobContextTests {
 	@Test
 	public void testDestructionCallbackMissingAttribute() throws Exception {
 		context.registerDestructionCallback("foo", new Runnable() {
+			@Override
 			public void run() {
 				list.add("bar");
 			}
@@ -106,12 +118,14 @@ public class JobContextTests {
 		context.setAttribute("foo", "FOO");
 		context.setAttribute("bar", "BAR");
 		context.registerDestructionCallback("bar", new Runnable() {
+			@Override
 			public void run() {
 				list.add("spam");
 				throw new RuntimeException("fail!");
 			}
 		});
 		context.registerDestructionCallback("foo", new Runnable() {
+			@Override
 			public void run() {
 				list.add("bar");
 				throw new RuntimeException("fail!");
@@ -152,8 +166,10 @@ public class JobContextTests {
 	@Test
 	public void testJobParameters() throws Exception {
 		JobParameters jobParameters = new JobParametersBuilder().addString("foo", "bar").toJobParameters();
-		JobInstance jobInstance = new JobInstance(0L, jobParameters, "foo");
+		JobInstance jobInstance = new JobInstance(0L, "foo");
+		jobExecution = new JobExecution(5l, jobParameters);
 		jobExecution.setJobInstance(jobInstance);
+		context = new JobContext(jobExecution);
 		assertEquals("bar", context.getJobParameters().get("foo"));
 	}
 
@@ -164,9 +180,7 @@ public class JobContextTests {
 
 	@Test(expected = IllegalStateException.class)
 	public void testIllegalContextId() throws Exception {
-		JobParameters jobParameters = new JobParametersBuilder().addString("foo", "bar").toJobParameters();
-		JobInstance jobInstance = new JobInstance(0L, jobParameters, "foo");
-		context = new JobContext(new JobExecution(jobInstance));
+		context = new JobContext(new JobExecution(null));
 		context.getId();
 	}
 

@@ -335,9 +335,9 @@ InitializingBean {
 				if (execution.getStatus().isLessThanOrEqualTo(BatchStatus.STOPPED)
 						&& execution.getStepExecutions().isEmpty()) {
 					ExitStatus exitStatus = execution.getExitStatus();
-					execution
-					.setExitStatus(exitStatus.and(ExitStatus.NOOP
-							.addExitDescription("All steps already completed or no steps configured for this job.")));
+					ExitStatus newExitStatus =
+							ExitStatus.NOOP.addExitDescription("All steps already completed or no steps configured for this job.");
+					execution.setExitStatus(exitStatus.and(newExitStatus));
 				}
 
 				execution.setEndTime(new Date());

@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2007 the original author or authors.
+ * Copyright 2006-2013 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,8 +19,6 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.batch.core.scope.context.JobContext;
 import org.springframework.batch.core.scope.context.JobSynchronizationManager;
-import org.springframework.batch.core.scope.util.ContextFactory;
-import org.springframework.batch.core.scope.util.JobContextFactory;
 import org.springframework.beans.BeanWrapper;
 import org.springframework.beans.BeanWrapperImpl;
 import org.springframework.beans.factory.ObjectFactory;
@@ -32,31 +30,34 @@ import org.springframework.beans.factory.config.Scope;
  * job. All objects in this scope are &lt;aop:scoped-proxy/&gt; (no need to
  * decorate the bean definitions).<br/>
  * <br/>
- * 
+ *
  * In addition, support is provided for late binding of references accessible
  * from the {@link JobContext} using #{..} placeholders. Using this feature,
  * bean properties can be pulled from the job or job execution context and the
  * job parameters. E.g.
- * 
+ *
  * <pre>
  * &lt;bean id=&quot;...&quot; class=&quot;...&quot; scope=&quot;job&quot;&gt;
  * 	&lt;property name=&quot;name&quot; value=&quot;#{jobParameters[input]}&quot; /&gt;
  * &lt;/bean&gt;
- * 
+ *
  * &lt;bean id=&quot;...&quot; class=&quot;...&quot; scope=&quot;job&quot;&gt;
  * 	&lt;property name=&quot;name&quot; value=&quot;#{jobExecutionContext['input.stem']}.txt&quot; /&gt;
  * &lt;/bean&gt;
  * </pre>
- * 
+ *
  * The {@link JobContext} is referenced using standard bean property paths (as
  * per {@link BeanWrapper}). The examples above all show the use of the Map
  * accessors provided as a convenience for job attributes.
- * 
+ *
  * @author Dave Syer
  * @author Jimmy Praet (create JobScope based on {@link StepScope})
- * @since 2.0
+ * @author Michael Minella
+ * @since 3.0
  */
-public class JobScope extends ScopeSupport {
+public class JobScope extends BatchScopeSupport {
+
+	private static final String TARGET_NAME_PREFIX = "jobScopedTarget.";
 
 	private Log logger = LogFactory.getLog(getClass());
 
@@ -67,20 +68,15 @@ public class JobScope extends ScopeSupport {
 	 */
 	public static final String ID_KEY = "JOB_IDENTIFIER";
 
-	/**
-	 * The ContextFactory.
-	 */
-	private static final ContextFactory CONTEXT_FACTORY = new JobContextFactory();
-
 	public JobScope() {
-		super("job", CONTEXT_FACTORY);
+		super();
+		setName("job");
 	}
 
 	/**
-	 * If Spring 3.0 is available, this will be used to resolve expressions in
-	 * job-scoped beans. This method is part of the Scope SPI in Spring 3.0,
-	 * but should just be ignored by earlier versions of Spring.
+	 * This will be used to resolve expressions in job-scoped beans.
 	 */
+	@Override
 	public Object resolveContextualObject(String key) {
 		JobContext context = getContext();
 		// TODO: support for attributes as well maybe (setters not exposed yet
@@ -91,8 +87,9 @@ public class JobScope extends ScopeSupport {
 	/**
 	 * @see Scope#get(String, ObjectFactory)
 	 */
+	@SuppressWarnings("rawtypes")
+	@Override
 	public Object get(String name, ObjectFactory objectFactory) {
-
 		JobContext context = getContext();
 		Object scopedObject = context.getAttribute(name);
 
@@ -118,6 +115,7 @@ public class JobScope extends ScopeSupport {
 	/**
 	 * @see Scope#getConversationId()
 	 */
+	@Override
 	public String getConversationId() {
 		JobContext context = getContext();
 		return context.getId();
@@ -126,6 +124,7 @@ public class JobScope extends ScopeSupport {
 	/**
 	 * @see Scope#registerDestructionCallback(String, Runnable)
 	 */
+	@Override
 	public void registerDestructionCallback(String name, Runnable callback) {
 		JobContext context = getContext();
 		logger.debug(String.format("Registered destruction callback in scope=%s, name=%s", this.getName(), name));
@@ -135,6 +134,7 @@ public class JobScope extends ScopeSupport {
 	/**
 	 * @see Scope#remove(String)
 	 */
+	@Override
 	public Object remove(String name) {
 		JobContext context = getContext();
 		logger.debug(String.format("Removing from scope=%s, name=%s", this.getName(), name));
@@ -144,7 +144,7 @@ public class JobScope extends ScopeSupport {
 	/**
 	 * Get an attribute accessor in the form of a {@link JobContext} that can
 	 * be used to store scoped bean instances.
-	 * 
+	 *
 	 * @return the current job context which we can use as a scope storage
 	 *         medium
 	 */
@@ -156,4 +156,8 @@ public class JobScope extends ScopeSupport {
 		return context;
 	}
 
+	@Override
+	public String getTargetNamePrefix() {
+		return TARGET_NAME_PREFIX;
+	}
 }
