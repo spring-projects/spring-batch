@@ -16,6 +16,7 @@
 package org.springframework.batch.core.jsr;
 
 import java.util.Properties;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import javax.batch.runtime.BatchStatus;
 
@@ -36,14 +37,14 @@ public class JobContext implements javax.batch.runtime.context.JobContext {
 	private Object transientUserData;
 	private Properties properties;
 	private JobExecution jobExecution;
+	private AtomicBoolean exitStatusSet = new AtomicBoolean();
 
-	/**
-	 * @param jobExecution for the related job
-	 */
-	public JobContext(JobExecution jobExecution, Properties properties) {
+	public void setJobExecution(JobExecution jobExecution) {
 		Assert.notNull(jobExecution, "A JobExecution is required");
-
 		this.jobExecution = jobExecution;
+	}
+
+	public void setProperties(Properties properties) {
 		this.properties = properties != null ? properties : new Properties();
 	}
 
@@ -108,7 +109,7 @@ public class JobContext implements javax.batch.runtime.context.JobContext {
 	 */
 	@Override
 	public String getExitStatus() {
-		return jobExecution.getExitStatus().getExitCode();
+		return exitStatusSet.get() ? jobExecution.getExitStatus().getExitCode() : null;
 	}
 
 	/* (non-Javadoc)
@@ -117,5 +118,6 @@ public class JobContext implements javax.batch.runtime.context.JobContext {
 	@Override
 	public void setExitStatus(String status) {
 		jobExecution.setExitStatus(new ExitStatus(status));
+		exitStatusSet.set(true);
 	}
 }

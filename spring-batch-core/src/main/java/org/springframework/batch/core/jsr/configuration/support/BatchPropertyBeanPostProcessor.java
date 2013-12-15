@@ -38,6 +38,7 @@ import org.springframework.beans.factory.config.BeanPostProcessor;
 import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
 import org.springframework.context.expression.StandardBeanExpressionResolver;
 import org.springframework.util.ReflectionUtils;
+import org.springframework.util.StringUtils;
 
 /**
  * <p>
@@ -49,6 +50,7 @@ import org.springframework.util.ReflectionUtils;
  * @author Michael Minella
  * @since 3.0
  */
+@SuppressWarnings("unchecked")
 public class BatchPropertyBeanPostProcessor implements BeanPostProcessor, BeanFactoryAware {
 	private static final String SCOPED_TARGET_BEAN_PREFIX = "scopedTarget.";
 	private static final Log LOGGER = LogFactory.getLog(BatchPropertyBeanPostProcessor.class);
@@ -113,7 +115,7 @@ public class BatchPropertyBeanPostProcessor implements BeanPostProcessor, BeanFa
 
 					String batchProperty = getBatchPropertyFieldValue(field, artifactProperties);
 
-					if (batchProperty != null) {
+					if (StringUtils.hasText(batchProperty)) {
 						field.set(artifact, batchProperty);
 					}
 
@@ -167,7 +169,7 @@ public class BatchPropertyBeanPostProcessor implements BeanPostProcessor, BeanFa
 		ConfigurableListableBeanFactory configurableListableBeanFactory = (ConfigurableListableBeanFactory) beanFactory;
 
 		BeanExpressionContext beanExpressionContext = new BeanExpressionContext(configurableListableBeanFactory,
-			configurableListableBeanFactory.getBean(StepScope.class));
+				configurableListableBeanFactory.getBean(StepScope.class));
 
 		this.jsrExpressionParser = new JsrExpressionParser(new StandardBeanExpressionResolver(), beanExpressionContext);
 	}

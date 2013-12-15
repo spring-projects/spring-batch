@@ -22,6 +22,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 import org.springframework.batch.core.Step;
 import org.springframework.batch.core.StepExecution;
+import org.springframework.batch.core.jsr.configuration.support.BatchPropertyContext;
 
 /**
  * Central convenience class for framework use in managing the step scope
@@ -29,9 +30,10 @@ import org.springframework.batch.core.StepExecution;
  * it is the responsibility of every {@link Step} implementation to ensure that
  * a {@link StepContext} is available on every thread that might be involved in
  * a step execution, including worker threads from a pool.
- * 
+ *
  * @author Dave Syer
- * 
+ * @author Michael Minella
+ *
  */
 public class StepSynchronizationManager {
 
@@ -64,7 +66,7 @@ public class StepSynchronizationManager {
 
 	/**
 	 * Getter for the current context if there is one, otherwise returns null.
-	 * 
+	 *
 	 * @return the current {@link StepContext} or null if there is none (if one
 	 * has not been registered for this thread).
 	 */
@@ -81,7 +83,7 @@ public class StepSynchronizationManager {
 	 * Register a context with the current thread - always put a matching
 	 * {@link #close()} call in a finally block to ensure that the correct
 	 * context is available in the enclosing block.
-	 * 
+	 *
 	 * @param stepExecution the step context to register
 	 * @return a new {@link StepContext} or the current one if it has the same
 	 * {@link StepExecution}
@@ -96,6 +98,32 @@ public class StepSynchronizationManager {
 			context = contexts.get(stepExecution);
 			if (context == null) {
 				context = new StepContext(stepExecution);
+				contexts.put(stepExecution, context);
+			}
+		}
+		increment();
+		return context;
+	}
+
+	/**
+	 * Register a context with the current thread - always put a matching
+	 * {@link #close()} call in a finally block to ensure that the correct
+	 * context is available in the enclosing block.
+	 *
+	 * @param stepExecution the step context to register
+	 * @return a new {@link StepContext} or the current one if it has the same
+	 * {@link StepExecution}
+	 */
+	public static StepContext register(StepExecution stepExecution, BatchPropertyContext propertyContext) {
+		if (stepExecution == null) {
+			return null;
+		}
+		getCurrent().push(stepExecution);
+		StepContext context;
+		synchronized (contexts) {
+			context = contexts.get(stepExecution);
+			if (context == null) {
+				context = new StepContext(stepExecution, propertyContext);
 				contexts.put(stepExecution, context);
 			}
 		}

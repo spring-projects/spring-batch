@@ -55,7 +55,7 @@ public class ChunkMonitorTests {
 		monitor.registerItemStream(new ItemStreamSupport() {
 			@Override
 			public void close() {
-                                super.close();
+				super.close();
 				closed = true;
 			}
 		});
@@ -98,6 +98,7 @@ public class ChunkMonitorTests {
 		executionContext.putInt(ChunkMonitor.class.getName() + ".OFFSET", 2);
 		monitor.open(executionContext);
 		assertEquals(2, count);
+		assertEquals(0, monitor.getOffset());
 	}
 
 	@Test

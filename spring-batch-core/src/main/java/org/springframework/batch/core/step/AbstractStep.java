@@ -26,6 +26,7 @@ import org.springframework.batch.core.Step;
 import org.springframework.batch.core.StepExecution;
 import org.springframework.batch.core.StepExecutionListener;
 import org.springframework.batch.core.UnexpectedJobExecutionException;
+import org.springframework.batch.core.configuration.annotation.StepScope;
 import org.springframework.batch.core.launch.NoSuchJobException;
 import org.springframework.batch.core.launch.support.ExitCodeMapper;
 import org.springframework.batch.core.listener.CompositeStepExecutionListener;
@@ -45,6 +46,8 @@ import org.springframework.util.ClassUtils;
  * @author Dave Syer
  * @author Ben Hale
  * @author Robert Kasanicky
+ * @author Michael Minella
+ * @author Chris Schaefer
  */
 public abstract class AbstractStep implements Step, InitializingBean, BeanNameAware {
 
@@ -112,7 +115,7 @@ public abstract class AbstractStep implements Step, InitializingBean, BeanNameAw
 	 * @param startLimit the startLimit to set
 	 */
 	public void setStartLimit(int startLimit) {
-		this.startLimit = startLimit;
+		this.startLimit = startLimit == 0 ? Integer.MAX_VALUE : startLimit;
 	}
 
 	@Override
@@ -185,7 +188,7 @@ public abstract class AbstractStep implements Step, InitializingBean, BeanNameAw
 		// Start with a default value that will be trumped by anything
 		ExitStatus exitStatus = ExitStatus.EXECUTING;
 
-		StepSynchronizationManager.register(stepExecution);
+		doExecutionRegistration(stepExecution);
 
 		try {
 			getCompositeListener().beforeStep(stepExecution);
@@ -268,10 +271,26 @@ public abstract class AbstractStep implements Step, InitializingBean, BeanNameAw
 				stepExecution.addFailureException(e);
 			}
 
-			StepSynchronizationManager.release();
+			doExecutionRelease();
 
 			logger.debug("Step execution complete: " + stepExecution.getSummary());
 		}
+	}
+
+	/**
+	 * Releases the most recent {@link StepExecution}
+	 */
+	protected void doExecutionRelease() {
+		StepSynchronizationManager.release();
+	}
+
+	/**
+	 * Registers the {@link StepExecution} for property resolution via {@link StepScope}
+	 *
+	 * @param stepExecution
+	 */
+	protected void doExecutionRegistration(StepExecution stepExecution) {
+		StepSynchronizationManager.register(stepExecution);
 	}
 
 	/**

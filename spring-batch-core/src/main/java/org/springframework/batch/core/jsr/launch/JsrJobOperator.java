@@ -17,11 +17,16 @@ package org.springframework.batch.core.jsr.launch;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.Semaphore;
 
+import javax.batch.operations.BatchRuntimeException;
 import javax.batch.operations.JobExecutionAlreadyCompleteException;
 import javax.batch.operations.JobExecutionIsRunningException;
 import javax.batch.operations.JobExecutionNotMostRecentException;
@@ -38,32 +43,41 @@ import javax.batch.runtime.JobExecution;
 import javax.batch.runtime.JobInstance;
 import javax.batch.runtime.StepExecution;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.springframework.batch.core.BatchStatus;
 import org.springframework.batch.core.ExitStatus;
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.JobParameters;
+import org.springframework.batch.core.Step;
+import org.springframework.batch.core.configuration.DuplicateJobException;
 import org.springframework.batch.core.converter.JobParametersConverter;
 import org.springframework.batch.core.explore.JobExplorer;
-import org.springframework.batch.core.jsr.JobContext;
+import org.springframework.batch.core.jsr.JobContextFactoryBean;
 import org.springframework.batch.core.jsr.JsrJobParametersConverter;
-import org.springframework.batch.core.jsr.configuration.support.BatchPropertyContext;
-import org.springframework.batch.core.jsr.configuration.support.JobParameterResolvingBeanFactoryPostProcessor;
+import org.springframework.batch.core.jsr.configuration.xml.JsrXmlApplicationContext;
 import org.springframework.batch.core.repository.JobRepository;
+import org.springframework.batch.core.scope.context.StepSynchronizationManager;
+import org.springframework.batch.core.step.NoSuchStepException;
+import org.springframework.batch.core.step.StepLocator;
+import org.springframework.batch.core.step.tasklet.StoppableTasklet;
+import org.springframework.batch.core.step.tasklet.Tasklet;
+import org.springframework.batch.core.step.tasklet.TaskletStep;
 import org.springframework.beans.factory.BeanCreationException;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.access.BeanFactoryLocator;
 import org.springframework.beans.factory.access.BeanFactoryReference;
 import org.springframework.beans.factory.config.AutowireCapableBeanFactory;
-import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
+import org.springframework.beans.factory.config.BeanDefinition;
+import org.springframework.beans.factory.support.AbstractBeanDefinition;
+import org.springframework.beans.factory.support.BeanDefinitionBuilder;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.access.ContextSingletonBeanFactoryLocator;
-import org.springframework.context.support.GenericXmlApplicationContext;
 import org.springframework.core.convert.converter.Converter;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;
-import org.springframework.core.task.SyncTaskExecutor;
+import org.springframework.core.task.SimpleAsyncTaskExecutor;
 import org.springframework.core.task.TaskExecutor;
-import org.springframework.core.task.TaskRejectedException;
 import org.springframework.util.Assert;
 
 /**
@@ -107,8 +121,9 @@ import org.springframework.util.Assert;
  * Calls to {@link JobOperator#start(String, Properties)} will provide a child context to the above context
  * using the job definition and batch.xml if provided.
  *
- * By default, calls to start/restart will result in synchronous execution of the batch job (via a synchronous {@link TaskExecutor}.
- * For asynchronous behavior, a different {@link TaskExecutor} implementation is required to be provided.
+ * By default, calls to start/restart will result in asynchronous execution of the batch job (via an asynchronous {@link TaskExecutor}.
+ * For synchronous behavior or customization of thread behavior, a different {@link TaskExecutor} implementation is required to
+ * be provided.
  *
  * <em>Note</em>: This class is intended to only be used for JSR-352 configured jobs. Use of
  * this {@link JobOperator} to start/stop/restart Spring Batch jobs may result in unexpected behaviors due to
@@ -119,14 +134,15 @@ import org.springframework.util.Assert;
  * @since 3.0
  */
 public class JsrJobOperator implements JobOperator, InitializingBean {
-	private static final String BATCH_PROPERTY_CONTEXT_BEAN_NAME = "batchPropertyContext";
+	private static final String JSR_JOB_CONTEXT_BEAN_NAME = "jsr_jobContext";
+	private final Log logger = LogFactory.getLog(getClass());
 
-	private org.springframework.batch.core.launch.JobOperator batchJobOperator;
 	private JobExplorer jobExplorer;
 	private JobRepository jobRepository;
 	private TaskExecutor taskExecutor;
 	private JobParametersConverter jobParametersConverter;
 	private static ApplicationContext baseContext;
+	private static ExecutingJobRegistry jobRegistry = new ExecutingJobRegistry();
 
 	/**
 	 * Public constructor used by {@link BatchRuntime#getJobOperator()}.  This will bootstrap a
@@ -142,7 +158,7 @@ public class JsrJobOperator implements JobOperator, InitializingBean {
 				AutowireCapableBeanFactory.AUTOWIRE_BY_TYPE, false);
 
 		if(taskExecutor == null) {
-			taskExecutor = new SyncTaskExecutor();
+			taskExecutor = new SimpleAsyncTaskExecutor();
 		}
 	}
 
@@ -153,17 +169,15 @@ public class JsrJobOperator implements JobOperator, InitializingBean {
 	 *
 	 * @param jobExplorer an instance of Spring Batch's {@link JobExplorer}
 	 * @param jobRepository an instance of Spring Batch's {@link JobOperator}
-	 * @param jobOperator an instance of Spring Batch's {@link org.springframework.batch.core.launch.JobOperator}
+	 * @param jobParametersConverter an instance of Spring Batch's {@link JobParametersConverter}
 	 */
-	public JsrJobOperator(JobExplorer jobExplorer, JobRepository jobRepository, org.springframework.batch.core.launch.JobOperator jobOperator, JobParametersConverter jobParametersConverter) {
+	public JsrJobOperator(JobExplorer jobExplorer, JobRepository jobRepository, JobParametersConverter jobParametersConverter) {
 		Assert.notNull(jobExplorer, "A JobExplorer is required");
 		Assert.notNull(jobRepository, "A JobRepository is required");
-		Assert.notNull(jobOperator, "A JobOperator is required");
 		Assert.notNull(jobParametersConverter, "A ParametersConverter is required");
 
 		this.jobExplorer = jobExplorer;
 		this.jobRepository = jobRepository;
-		this.batchJobOperator = jobOperator;
 		this.jobParametersConverter = jobParametersConverter;
 	}
 
@@ -179,12 +193,6 @@ public class JsrJobOperator implements JobOperator, InitializingBean {
 		this.jobRepository = jobRepository;
 	}
 
-	public void setJobOperator(org.springframework.batch.core.launch.JobOperator jobOperator) {
-		Assert.notNull(jobOperator, "A JobOperator is required");
-
-		this.batchJobOperator = jobOperator;
-	}
-
 	public void setTaskExecutor(TaskExecutor taskExecutor) {
 		this.taskExecutor = taskExecutor;
 	}
@@ -196,7 +204,7 @@ public class JsrJobOperator implements JobOperator, InitializingBean {
 	@Override
 	public void afterPropertiesSet() throws Exception {
 		if (this.taskExecutor == null) {
-			this.taskExecutor = new SyncTaskExecutor();
+			this.taskExecutor = new SimpleAsyncTaskExecutor();
 		}
 	}
 
@@ -388,7 +396,9 @@ public class JsrJobOperator implements JobOperator, InitializingBean {
 
 		if(executions != null) {
 			for (org.springframework.batch.core.StepExecution stepExecution : executions) {
-				batchExecutions.add(new org.springframework.batch.core.jsr.StepExecution(jobExplorer.getStepExecution(executionId, stepExecution.getId())));
+				if(!stepExecution.getStepName().contains(":partition")) {
+					batchExecutions.add(new org.springframework.batch.core.jsr.StepExecution(jobExplorer.getStepExecution(executionId, stepExecution.getId())));
+				}
 			}
 		}
 
@@ -439,7 +449,9 @@ public class JsrJobOperator implements JobOperator, InitializingBean {
 
 		String jobName = previousJobExecution.getJobInstance().getJobName();
 
-		GenericXmlApplicationContext batchContext = new GenericXmlApplicationContext();
+		Properties jobRestartProperties = getJobRestartProperties(params, previousJobExecution);
+
+		final JsrXmlApplicationContext batchContext = new JsrXmlApplicationContext(jobRestartProperties);
 		batchContext.setValidating(false);
 
 		Resource batchXml = new ClassPathResource("/META-INF/batch.xml");
@@ -453,13 +465,16 @@ public class JsrJobOperator implements JobOperator, InitializingBean {
 			batchContext.load(jobXml);
 		}
 
-		batchContext.addBeanFactoryPostProcessor(new JobParameterResolvingBeanFactoryPostProcessor(params));
+		AbstractBeanDefinition beanDefinition = BeanDefinitionBuilder.genericBeanDefinition("org.springframework.batch.core.jsr.JobContextFactoryBean").getBeanDefinition();
+		beanDefinition.setScope(BeanDefinition.SCOPE_SINGLETON);
+		batchContext.registerBeanDefinition(JSR_JOB_CONTEXT_BEAN_NAME, beanDefinition);
+
 		batchContext.setParent(baseContext);
 
 		try {
 			batchContext.refresh();
 		} catch (BeanCreationException e) {
-			throw new JobStartException(e);
+			throw new JobRestartException(e);
 		}
 
 		final Job job = batchContext.getBean(Job.class);
@@ -471,7 +486,6 @@ public class JsrJobOperator implements JobOperator, InitializingBean {
 		final org.springframework.batch.core.JobExecution jobExecution;
 
 		try {
-			Properties jobRestartProperties = getJobRestartProperties(params, previousJobExecution);
 			JobParameters jobParameters = jobParametersConverter.getJobParameters(jobRestartProperties);
 			jobExecution = jobRepository.createJobExecution(previousJobExecution.getJobInstance(), jobParameters, previousJobExecution.getJobConfigurationName());
 		} catch (Exception e) {
@@ -479,35 +493,54 @@ public class JsrJobOperator implements JobOperator, InitializingBean {
 		}
 
 		try {
-			ConfigurableListableBeanFactory factory = batchContext.getBeanFactory();
-
-			BatchPropertyContext batchPropertyContext = factory.getBean(BATCH_PROPERTY_CONTEXT_BEAN_NAME, BatchPropertyContext.class);
-			Properties properties = batchPropertyContext.getJobProperties();
-
-			factory.registerSingleton(job.getName() + "_" + jobExecution.getId() + "_jobContext", new JobContext(jobExecution, properties));
+			final Semaphore semaphore = new Semaphore(1);
+			final List<Exception> exceptionHolder = Collections.synchronizedList(new ArrayList<Exception>());
+			semaphore.acquire();
 
 			taskExecutor.execute(new Runnable() {
 
 				@Override
 				public void run() {
+					JobContextFactoryBean factoryBean = null;
 					try {
+						factoryBean = (JobContextFactoryBean) batchContext.getBean("&" + JSR_JOB_CONTEXT_BEAN_NAME);
+						factoryBean.setJobExecution(jobExecution);
+						final Job job = batchContext.getBean(Job.class);
+						semaphore.release();
+						// Initialization of the JobExecution for job level dependencies
+						jobRegistry.register(job, jobExecution);
 						job.execute(jobExecution);
+						jobRegistry.remove(jobExecution);
 					}
-					catch (Throwable t) {
-						throw new JobRestartException(t);
+					catch (Exception e) {
+						exceptionHolder.add(e);
+					} finally {
+						if(factoryBean != null) {
+							factoryBean.close();
+						}
+
+						if(semaphore.availablePermits() == 0) {
+							semaphore.release();
+						}
 					}
 				}
 			});
+
+			semaphore.acquire();
+			if(exceptionHolder.size() > 0) {
+				semaphore.release();
+				throw new JobRestartException(exceptionHolder.get(0));
+			}
 		}
-		catch (TaskRejectedException e) {
+		catch (Exception e) {
 			jobExecution.upgradeStatus(BatchStatus.FAILED);
 			if (jobExecution.getExitStatus().equals(ExitStatus.UNKNOWN)) {
 				jobExecution.setExitStatus(ExitStatus.FAILED.addExitDescription(e));
 			}
 			jobRepository.update(jobExecution);
+		} finally {
+			batchContext.close();
 		}
-
-		batchContext.close();
 
 		return jobExecution.getId();
 	}
@@ -544,7 +577,7 @@ public class JsrJobOperator implements JobOperator, InitializingBean {
 	@SuppressWarnings("resource")
 	public long start(String jobName, Properties params) throws JobStartException,
 	JobSecurityException {
-		GenericXmlApplicationContext batchContext = new GenericXmlApplicationContext();
+		final JsrXmlApplicationContext batchContext = new JsrXmlApplicationContext(params);
 		batchContext.setValidating(false);
 
 		Resource batchXml = new ClassPathResource("/META-INF/batch.xml");
@@ -559,7 +592,10 @@ public class JsrJobOperator implements JobOperator, InitializingBean {
 			batchContext.load(jobXml);
 		}
 
-		batchContext.addBeanFactoryPostProcessor(new JobParameterResolvingBeanFactoryPostProcessor(params));
+		AbstractBeanDefinition beanDefinition = BeanDefinitionBuilder.genericBeanDefinition("org.springframework.batch.core.jsr.JobContextFactoryBean").getBeanDefinition();
+		beanDefinition.setScope(BeanDefinition.SCOPE_SINGLETON);
+		batchContext.registerBeanDefinition(JSR_JOB_CONTEXT_BEAN_NAME, beanDefinition);
+
 		batchContext.setParent(baseContext);
 
 		try {
@@ -568,56 +604,81 @@ public class JsrJobOperator implements JobOperator, InitializingBean {
 			throw new JobStartException(e);
 		}
 
-		final Job job = batchContext.getBean(Job.class);
-
 		Assert.notNull(jobName, "The job name must not be null.");
 
 		final org.springframework.batch.core.JobExecution jobExecution;
 
 		try {
 			JobParameters jobParameters = jobParametersConverter.getJobParameters(params);
-			org.springframework.batch.core.JobInstance jobInstance = jobRepository.createJobInstance(job.getName(), jobParameters);
+			String [] jobNames = batchContext.getBeanNamesForType(Job.class);
+
+			if(jobNames == null || jobNames.length <= 0) {
+				throw new BatchRuntimeException("No Job defined in current context");
+			}
+
+			org.springframework.batch.core.JobInstance jobInstance = jobRepository.createJobInstance(jobNames[0], jobParameters);
 			jobExecution = jobRepository.createJobExecution(jobInstance, jobParameters, jobConfigurationLocation);
 		} catch (Exception e) {
 			throw new JobStartException(e);
 		}
 
 		try {
-			ConfigurableListableBeanFactory factory = batchContext.getBeanFactory();
-
-			BatchPropertyContext batchPropertyContext = factory.getBean(BATCH_PROPERTY_CONTEXT_BEAN_NAME, BatchPropertyContext.class);
-			Properties properties = batchPropertyContext.getJobProperties();
-
-			factory.registerSingleton(job.getName() + "_" + jobExecution.getId() + "_jobContext", new JobContext(jobExecution, properties));
+			final Semaphore semaphore = new Semaphore(1);
+			final List<Exception> exceptionHolder = Collections.synchronizedList(new ArrayList<Exception>());
+			semaphore.acquire();
 
 			taskExecutor.execute(new Runnable() {
 
 				@Override
 				public void run() {
+					JobContextFactoryBean factoryBean = null;
 					try {
+						factoryBean = (JobContextFactoryBean) batchContext.getBean("&" + JSR_JOB_CONTEXT_BEAN_NAME);
+						factoryBean.setJobExecution(jobExecution);
+						final Job job = batchContext.getBean(Job.class);
+						semaphore.release();
+						// Initialization of the JobExecution for job level dependencies
+						jobRegistry.register(job, jobExecution);
 						job.execute(jobExecution);
+						jobRegistry.remove(jobExecution);
 					}
-					catch (Throwable t) {
-						throw new JobStartException(t);
+					catch (Exception e) {
+						exceptionHolder.add(e);
+					} finally {
+						if(factoryBean != null) {
+							factoryBean.close();
+						}
+
+						if(semaphore.availablePermits() == 0) {
+							semaphore.release();
+						}
 					}
 				}
 			});
+
+			semaphore.acquire();
+			if(exceptionHolder.size() > 0) {
+				semaphore.release();
+				throw new JobStartException(exceptionHolder.get(0));
+			}
 		}
-		catch (TaskRejectedException e) {
+		catch (Exception e) {
+			if(jobRegistry.exists(jobExecution.getId())) {
+				jobRegistry.remove(jobExecution);
+			}
 			jobExecution.upgradeStatus(BatchStatus.FAILED);
 			if (jobExecution.getExitStatus().equals(ExitStatus.UNKNOWN)) {
 				jobExecution.setExitStatus(ExitStatus.FAILED.addExitDescription(e));
 			}
 			jobRepository.update(jobExecution);
+
+			throw new JobStartException(e);
 		}
-
-		batchContext.close();
-
 		return jobExecution.getId();
 	}
 
 	/**
-	 * Delegates to {@link org.springframework.batch.core.launch.JobOperator#stop(long)}
+	 * Stops the running job execution if it is currently running.
 	 *
 	 * @param executionId the database id for the {@link JobExecution} to be stopped.
 	 * @throws NoSuchJobExecutionException
@@ -626,12 +687,78 @@ public class JsrJobOperator implements JobOperator, InitializingBean {
 	@Override
 	public void stop(long executionId) throws NoSuchJobExecutionException,
 	JobExecutionNotRunningException, JobSecurityException {
+		org.springframework.batch.core.JobExecution jobExecution = jobExplorer.getJobExecution(executionId);
+		// Indicate the execution should be stopped by setting it's status to
+		// 'STOPPING'. It is assumed that
+		// the step implementation will check this status at chunk boundaries.
+		BatchStatus status = jobExecution.getStatus();
+		if (!(status == BatchStatus.STARTED || status == BatchStatus.STARTING)) {
+			throw new JobExecutionNotRunningException("JobExecution must be running so that it can be stopped: "+jobExecution);
+		}
+		jobExecution.setStatus(BatchStatus.STOPPING);
+		jobRepository.update(jobExecution);
+
 		try {
-			batchJobOperator.stop(executionId);
-		} catch (org.springframework.batch.core.launch.NoSuchJobExecutionException e) {
-			throw new NoSuchJobException(e);
-		} catch (org.springframework.batch.core.launch.JobExecutionNotRunningException e) {
-			throw new JobExecutionNotRunningException(e);
+			Job job = jobRegistry.getJob(jobExecution.getId());
+			if (job instanceof StepLocator) {//can only process as StepLocator is the only way to get the step object
+				//get the current stepExecution
+				for (org.springframework.batch.core.StepExecution stepExecution : jobExecution.getStepExecutions()) {
+					if (stepExecution.getStatus().isRunning()) {
+						try {
+							//have the step execution that's running -> need to 'stop' it
+							Step step = ((StepLocator)job).getStep(stepExecution.getStepName());
+							if (step instanceof TaskletStep) {
+								Tasklet tasklet = ((TaskletStep)step).getTasklet();
+								if (tasklet instanceof StoppableTasklet) {
+									StepSynchronizationManager.register(stepExecution);
+									((StoppableTasklet)tasklet).stop();
+									StepSynchronizationManager.release();
+								}
+							}
+						}
+						catch (NoSuchStepException e) {
+							logger.warn("Step not found",e);
+						}
+					}
+				}
+			}
+		}
+		catch (NoSuchJobException e) {
+			logger.warn("Cannot find Job object",e);
+		}
+	}
+
+	private static class ExecutingJobRegistry {
+
+		private Map<Long, Job> registry = new ConcurrentHashMap<Long, Job>();
+
+		public void register(Job job, org.springframework.batch.core.JobExecution jobExecution) throws DuplicateJobException {
+
+			if(registry.containsKey(jobExecution.getId())) {
+				throw new DuplicateJobException("This job execution has already been registered");
+			} else {
+				registry.put(jobExecution.getId(), job);
+			}
+		}
+
+		public void remove(org.springframework.batch.core.JobExecution jobExecution) {
+			if(!registry.containsKey(jobExecution.getId())) {
+				throw new NoSuchJobExecutionException("The job execution " + jobExecution.getId() + " was not found");
+			} else {
+				registry.remove(jobExecution.getId());
+			}
+		}
+
+		public boolean exists(long jobExecutionId) {
+			return registry.containsKey(jobExecutionId);
+		}
+
+		public Job getJob(long jobExecutionId) {
+			if(!registry.containsKey(jobExecutionId)) {
+				throw new NoSuchJobExecutionException("The job execution " + jobExecutionId + " was not found");
+			} else {
+				return registry.get(jobExecutionId);
+			}
 		}
 	}
 }

@@ -109,6 +109,29 @@ public class FileUtilsTests {
 			dir1.delete();
 		}
 	}
+	
+	/**
+	 * If the directories on the file path do not exist, they should be created
+	 * This must be true also in append mode
+	 */
+	@Test
+	public void testCreateDirectoryStructureAppendMode() {
+		File file = new File("testDirectory/testDirectory2/testFile.tmp");
+		File dir1 = new File("testDirectory");
+		File dir2 = new File("testDirectory/testDirectory2");
+
+		try {
+			FileUtils.setUpOutputFile(file, false, true, false);
+			assertTrue(file.exists());
+			assertTrue(dir1.exists());
+			assertTrue(dir2.exists());
+		}
+		finally {
+			file.delete();
+			dir2.delete();
+			dir1.delete();
+		}
+	}
 
 	@Test
 	public void testBadFile(){

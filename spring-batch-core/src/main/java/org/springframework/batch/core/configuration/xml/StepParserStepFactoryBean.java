@@ -16,11 +16,13 @@
 
 package org.springframework.batch.core.configuration.xml;
 
+import java.io.Serializable;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.Map;
+import java.util.Queue;
 import java.util.Set;
 
 import javax.batch.api.chunk.listener.RetryProcessListener;
@@ -29,6 +31,8 @@ import javax.batch.api.chunk.listener.RetryWriteListener;
 import javax.batch.api.chunk.listener.SkipProcessListener;
 import javax.batch.api.chunk.listener.SkipReadListener;
 import javax.batch.api.chunk.listener.SkipWriteListener;
+import javax.batch.api.partition.PartitionAnalyzer;
+import javax.batch.api.partition.PartitionCollector;
 
 import org.springframework.batch.core.ChunkListener;
 import org.springframework.batch.core.ItemProcessListener;
@@ -49,6 +53,7 @@ import org.springframework.batch.core.jsr.RetryReadListenerAdapter;
 import org.springframework.batch.core.jsr.RetryWriteListenerAdapter;
 import org.springframework.batch.core.jsr.SkipListenerAdapter;
 import org.springframework.batch.core.jsr.StepListenerAdapter;
+import org.springframework.batch.core.jsr.partition.PartitionCollectorAdapter;
 import org.springframework.batch.core.launch.JobLauncher;
 import org.springframework.batch.core.partition.PartitionHandler;
 import org.springframework.batch.core.partition.support.Partitioner;
@@ -158,6 +163,8 @@ public class StepParserStepFactoryBean<I, O> implements FactoryBean, BeanNameAwa
 
 	private int gridSize = DEFAULT_GRID_SIZE;
 
+	private Queue<Serializable> partitionQueue;
+
 	//
 	// Tasklet Elements
 	//
@@ -239,12 +246,19 @@ public class StepParserStepFactoryBean<I, O> implements FactoryBean, BeanNameAwa
 	private StepExecutionAggregator stepExecutionAggregator;
 
 	/**
+	 * @param queue The {@link Queue} that is used for communication between {@link PartitionCollector} and {@link PartitionAnalyzer}
+	 */
+	public void setPartitionQueue(Queue<Serializable> queue) {
+		this.partitionQueue = queue;
+	}
+
+	/**
 	 * Create a {@link Step} from the configuration provided.
 	 *
 	 * @see FactoryBean#getObject()
 	 */
 	@Override
-	public final Object getObject() throws Exception {
+	public Object getObject() throws Exception {
 		if (hasChunkElement) {
 			Assert.isNull(tasklet, "Step [" + name
 					+ "] has both a <chunk/> element and a 'ref' attribute  referencing a Tasklet.");
@@ -278,7 +292,10 @@ public class StepParserStepFactoryBean<I, O> implements FactoryBean, BeanNameAwa
 		return hasChunkElement || tasklet != null;
 	}
 
-	private void enhanceCommonStep(StepBuilderHelper<?> builder) {
+	/**
+	 * @param builder {@link StepBuilderHelper} representing the step to be enhanced
+	 */
+	protected void enhanceCommonStep(StepBuilderHelper<?> builder) {
 		if (allowStartIfComplete != null) {
 			builder.allowStartIfComplete(allowStartIfComplete);
 		}
@@ -290,13 +307,13 @@ public class StepParserStepFactoryBean<I, O> implements FactoryBean, BeanNameAwa
 		for (Object listener : stepExecutionListeners) {
 			if(listener instanceof StepExecutionListener) {
 				builder.listener((StepExecutionListener) listener);
-			} else if(listener instanceof StepListener) {
+			} else if(listener instanceof javax.batch.api.listener.StepListener) {
 				builder.listener(new StepListenerAdapter((javax.batch.api.listener.StepListener) listener));
 			}
 		}
 	}
 
-	private Step createPartitionStep() {
+	protected Step createPartitionStep() {
 
 		PartitionStepBuilder builder;
 		if (partitioner != null) {
@@ -321,13 +338,14 @@ public class StepParserStepFactoryBean<I, O> implements FactoryBean, BeanNameAwa
 
 	}
 
-	private Step createFaultTolerantStep() {
+	protected Step createFaultTolerantStep() {
 
 		FaultTolerantStepBuilder<I, O> builder = getFaultTolerantStepBuilder(this.name);
 
 		if (commitInterval != null) {
 			builder.chunk(commitInterval);
 		}
+		builder.chunk(chunkCompletionPolicy);
 		enhanceTaskletStepBuilder(builder);
 
 		builder.reader(itemReader);
@@ -417,7 +435,7 @@ public class StepParserStepFactoryBean<I, O> implements FactoryBean, BeanNameAwa
 	}
 
 	@SuppressWarnings("unchecked")
-	private Step createSimpleStep() {
+	protected Step createSimpleStep() {
 		SimpleStepBuilder builder = getSimpleStepBuilder(this.name);
 
 		if(timeout != null && commitInterval != null) {
@@ -447,14 +465,17 @@ public class StepParserStepFactoryBean<I, O> implements FactoryBean, BeanNameAwa
 		return new SimpleStepBuilder(new StepBuilder(stepName));
 	}
 
-	private TaskletStep createTaskletStep() {
+	/**
+	 * @return a new {@link TaskletStep}
+	 */
+	protected TaskletStep createTaskletStep() {
 		TaskletStepBuilder builder = new StepBuilder(name).tasklet(tasklet);
 		enhanceTaskletStepBuilder(builder);
 		return builder.build();
 	}
 
 	@SuppressWarnings("serial")
-	private void enhanceTaskletStepBuilder(AbstractTaskletStepBuilder<?> builder) {
+	protected void enhanceTaskletStepBuilder(AbstractTaskletStepBuilder<?> builder) {
 
 		enhanceCommonStep(builder);
 		for (ChunkListener listener : chunkListeners) {
@@ -496,7 +517,7 @@ public class StepParserStepFactoryBean<I, O> implements FactoryBean, BeanNameAwa
 
 	}
 
-	private Step createFlowStep() {
+	protected Step createFlowStep() {
 		FlowStepBuilder builder = new StepBuilder(name).flow(flow);
 		enhanceCommonStep(builder);
 		return builder.build();
@@ -512,7 +533,10 @@ public class StepParserStepFactoryBean<I, O> implements FactoryBean, BeanNameAwa
 
 	}
 
-	private void validateFaultTolerantSettings() {
+	/**
+	 * Validates that all components required to build a fault tolerant step are set
+	 */
+	protected void validateFaultTolerantSettings() {
 		validateDependency("skippable-exception-classes", skippableExceptionClasses, "skip-limit", skipLimit, true);
 		validateDependency("retryable-exception-classes", retryableExceptionClasses, "retry-limit", retryLimit, true);
 		validateDependency("retry-listeners", retryListeners, "retry-limit", retryLimit, false);
@@ -565,7 +589,10 @@ public class StepParserStepFactoryBean<I, O> implements FactoryBean, BeanNameAwa
 		return o != null;
 	}
 
-	private boolean isFaultTolerant() {
+	/**
+	 * @return true if the step is configured with any components that require fault tolerance
+	 */
+	protected boolean isFaultTolerant() {
 		return backOffPolicy != null || skipPolicy != null || retryPolicy != null || isPositive(skipLimit)
 				|| isPositive(retryLimit) || isPositive(cacheCapacity) || isTrue(readerTransactionalQueue);
 	}
@@ -609,6 +636,10 @@ public class StepParserStepFactoryBean<I, O> implements FactoryBean, BeanNameAwa
 	 */
 	public void setName(String name) {
 		this.name = name;
+	}
+
+	public String getName() {
+		return this.name;
 	}
 
 	// =========================================================
@@ -657,10 +688,24 @@ public class StepParserStepFactoryBean<I, O> implements FactoryBean, BeanNameAwa
 	}
 
 	/**
+	 * @return stepExecutionAggregator the current step's {@link StepExecutionAggregator}
+	 */
+	protected StepExecutionAggregator getStepExecutionAggergator() {
+		return this.stepExecutionAggregator;
+	}
+
+	/**
 	 * @param partitionHandler the partitionHandler to set
 	 */
 	public void setPartitionHandler(PartitionHandler partitionHandler) {
 		this.partitionHandler = partitionHandler;
+	}
+
+	/**
+	 * @return partitionHandler the current step's {@link PartitionHandler}
+	 */
+	protected PartitionHandler getPartitionHandler() {
+		return this.partitionHandler;
 	}
 
 	/**
@@ -726,6 +771,10 @@ public class StepParserStepFactoryBean<I, O> implements FactoryBean, BeanNameAwa
 		this.tasklet = tasklet;
 	}
 
+	protected Tasklet getTasklet() {
+		return this.tasklet;
+	}
+
 	/**
 	 * @return transactionManager
 	 */
@@ -752,7 +801,6 @@ public class StepParserStepFactoryBean<I, O> implements FactoryBean, BeanNameAwa
 	 */
 	@SuppressWarnings("unchecked")
 	public void setListeners(Object[] listeners) {
-		//		this.listeners = listeners; // useful for testing
 		for (Object listener : listeners) {
 			if (listener instanceof SkipListener) {
 				SkipListener<I, O> skipListener = (SkipListener<I, O>) listener;
@@ -818,6 +866,10 @@ public class StepParserStepFactoryBean<I, O> implements FactoryBean, BeanNameAwa
 			}
 			if(listener instanceof RetryWriteListener) {
 				jsrRetryListeners.add(new RetryWriteListenerAdapter((RetryWriteListener) listener));
+			}
+			if(listener instanceof PartitionCollector) {
+				PartitionCollectorAdapter adapter = new PartitionCollectorAdapter(partitionQueue, (PartitionCollector) listener);
+				chunkListeners.add(adapter);
 			}
 		}
 	}
@@ -1079,4 +1131,24 @@ public class StepParserStepFactoryBean<I, O> implements FactoryBean, BeanNameAwa
 		this.hasChunkElement = hasChunkElement;
 	}
 
+	/**
+	 * @return true if the defined step has a &lt;chunk&gt; element
+	 */
+	protected boolean hasChunkElement() {
+		return this.hasChunkElement;
+	}
+
+	/**
+	 * @return true if the defined step has a &lt;tasklet&gt; element
+	 */
+	protected boolean hasTasklet() {
+		return this.tasklet != null;
+	}
+
+	/**
+	 * @return true if the defined step has a &lt;partition&gt; element
+	 */
+	protected boolean hasPartitionElement() {
+		return this.partitionHandler != null;
+	}
 }

@@ -137,7 +137,7 @@ public class JobPropertySubstitutionTests {
 		public Object processItem(Object item) throws Exception {
 			assertEquals("testParamValue", processorProperty1);
 			assertEquals("myfile1.txt", processorProperty2);
-			assertEquals("/myfile2.txt", processorProperty3);
+			assertEquals(System.getProperty("file.separator") + "myfile2.txt", processorProperty3);
 
 			return item;
 		}

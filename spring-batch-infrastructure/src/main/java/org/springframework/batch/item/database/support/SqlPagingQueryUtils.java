@@ -246,10 +246,20 @@ public class SqlPagingQueryUtils {
 	 * @return a String that can be appended to an ORDER BY clause.
 	 */
 	public static String buildSortClause(AbstractSqlPagingQueryProvider provider) {
+		return buildSortClause(provider.getSortKeys());
+	}
+	
+	/**
+	 * Generates ORDER BY attributes based on the sort keys.
+	 * 
+	 * @param sortKeys
+	 * @return a String that can be appended to an ORDER BY clause.
+	 */
+	public static String buildSortClause(Map<String, Order> sortKeys) {
 		StringBuilder builder = new StringBuilder();
 		String prefix = "";
 		
-		for (Map.Entry<String, Order> sortKey : provider.getSortKeys().entrySet()) {
+		for (Map.Entry<String, Order> sortKey : sortKeys.entrySet()) {
 			builder.append(prefix);
 			
 			prefix = ", ";

@@ -36,15 +36,16 @@ import org.springframework.transaction.interceptor.TransactionAttribute;
 /**
  * Base class for step builders that want to build a {@link TaskletStep}. Handles common concerns across all tasklet
  * step variants, which are mostly to do with the type of tasklet they carry.
- * 
+ *
  * @author Dave Syer
- * 
+ * @author Michael Minella
+ *
  * @since 2.2
- * 
+ *
  * @param <B> the type of builder represented
  */
 public abstract class AbstractTaskletStepBuilder<B extends AbstractTaskletStepBuilder<B>> extends
-		StepBuilderHelper<AbstractTaskletStepBuilder<B>> {
+StepBuilderHelper<AbstractTaskletStepBuilder<B>> {
 
 	protected Set<ChunkListener> chunkListeners = new LinkedHashSet<ChunkListener>();
 
@@ -69,11 +70,11 @@ public abstract class AbstractTaskletStepBuilder<B extends AbstractTaskletStepBu
 	/**
 	 * Build the step from the components collected by the fluent setters. Delegates first to {@link #enhance(Step)} and
 	 * then to {@link #createTasklet()} in subclasses to create the actual tasklet.
-	 * 
+	 *
 	 * @return a tasklet step fully configured and read to execute
 	 */
 	public TaskletStep build() {
-		
+
 		registerStepListenerAsChunkListener();
 
 		TaskletStep step = new TaskletStep(getName());
@@ -116,7 +117,7 @@ public abstract class AbstractTaskletStepBuilder<B extends AbstractTaskletStepBu
 
 	}
 
-	private void registerStepListenerAsChunkListener() {
+	protected void registerStepListenerAsChunkListener() {
 		for (StepExecutionListener stepExecutionListener: properties.getStepExecutionListeners()){
 			if (stepExecutionListener instanceof ChunkListener){
 				listener((ChunkListener)stepExecutionListener);
@@ -126,7 +127,7 @@ public abstract class AbstractTaskletStepBuilder<B extends AbstractTaskletStepBu
 
 	/**
 	 * Register a chunk listener.
-	 * 
+	 *
 	 * @param listener the listener to register
 	 * @return this for fluent chaining
 	 */
@@ -137,7 +138,7 @@ public abstract class AbstractTaskletStepBuilder<B extends AbstractTaskletStepBu
 
 	/**
 	 * Register a stream for callbacks that manage restart data.
-	 * 
+	 *
 	 * @param stream the stream to register
 	 * @return this for fluent chaining
 	 */
@@ -149,7 +150,7 @@ public abstract class AbstractTaskletStepBuilder<B extends AbstractTaskletStepBu
 	/**
 	 * Provide a task executor to use when executing the tasklet. Default is to use a single-threaded (synchronous)
 	 * executor.
-	 * 
+	 *
 	 * @param taskExecutor the task executor to register
 	 * @return this for fluent chaining
 	 */
@@ -162,7 +163,7 @@ public abstract class AbstractTaskletStepBuilder<B extends AbstractTaskletStepBu
 	 * In the case of an asynchronous {@link #taskExecutor(TaskExecutor)} the number of concurrent tasklet executions
 	 * can be throttled (beyond any throttling provided by a thread pool). The throttle limit should be less than the
 	 * data source pool size used in the job repository for this step.
-	 * 
+	 *
 	 * @param throttleLimit maximium number of concurrent tasklet executions allowed
 	 * @return this for fluent chaining
 	 */
@@ -173,7 +174,7 @@ public abstract class AbstractTaskletStepBuilder<B extends AbstractTaskletStepBu
 
 	/**
 	 * Sets the exception handler to use in the case of tasklet failures. Default is to rethrow everything.
-	 * 
+	 *
 	 * @param exceptionHandler the exception handler
 	 * @return this for fluent chaining
 	 */
@@ -185,7 +186,7 @@ public abstract class AbstractTaskletStepBuilder<B extends AbstractTaskletStepBu
 	/**
 	 * Sets the repeat template used for iterating the tasklet execution. By default it will terminate only when the
 	 * tasklet returns FINISHED (or null).
-	 * 
+	 *
 	 * @param repeatTemplate a repeat template with rules for iterating
 	 * @return this for fluent chaining
 	 */
@@ -197,7 +198,7 @@ public abstract class AbstractTaskletStepBuilder<B extends AbstractTaskletStepBu
 	/**
 	 * Sets the transaction attributes for the tasklet execution. Defaults to the default values for the transaction
 	 * manager, but can be manipulated to provide longer timeouts for instance.
-	 * 
+	 *
 	 * @param transactionAttribute a transaction attribute set
 	 * @return this for fluent chaining
 	 */
@@ -208,7 +209,7 @@ public abstract class AbstractTaskletStepBuilder<B extends AbstractTaskletStepBu
 
 	/**
 	 * Convenience method for subclasses to access the step operations that were injected by user.
-	 * 
+	 *
 	 * @return the repeat operations used to iterate the tasklet executions
 	 */
 	protected RepeatOperations getStepOperations() {
@@ -217,7 +218,7 @@ public abstract class AbstractTaskletStepBuilder<B extends AbstractTaskletStepBu
 
 	/**
 	 * Convenience method for subclasses to access the exception handler that was injected by user.
-	 * 
+	 *
 	 * @return the exception handler
 	 */
 	protected ExceptionHandler getExceptionHandler() {
@@ -226,12 +227,28 @@ public abstract class AbstractTaskletStepBuilder<B extends AbstractTaskletStepBu
 
 	/**
 	 * Convenience method for subclasses to determine if the step is concurrent.
-	 * 
+	 *
 	 * @return true if the tasklet is going to be run in multiple threads
 	 */
 	protected boolean concurrent() {
 		boolean concurrent = taskExecutor != null && !(taskExecutor instanceof SyncTaskExecutor);
 		return concurrent;
+	}
+
+	protected TaskExecutor getTaskExecutor() {
+		return taskExecutor;
+	}
+
+	protected int getThrottleLimit() {
+		return throttleLimit;
+	}
+
+	protected TransactionAttribute getTransactionAttribute() {
+		return transactionAttribute;
+	}
+
+	protected Set<ItemStream> getStreams() {
+		return this.streams;
 	}
 
 }

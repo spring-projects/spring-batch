@@ -17,10 +17,15 @@ package org.springframework.batch.core.jsr;
 
 import java.util.Properties;
 
+import javax.batch.runtime.context.StepContext;
+
 import org.springframework.batch.core.jsr.configuration.support.BatchPropertyContext;
 import org.springframework.batch.core.scope.context.StepSynchronizationManager;
 import org.springframework.beans.factory.FactoryBean;
+import org.springframework.beans.factory.FactoryBeanNotInitializedException;
+import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.util.Assert;
 
 /**
  * {@link FactoryBean} implementation used to create {@link javax.batch.runtime.context.StepContext}
@@ -30,20 +35,53 @@ import org.springframework.beans.factory.annotation.Autowired;
  * @author Chris Schaefer
  * @since 3.0
  */
-public class StepContextFactoryBean implements FactoryBean<StepContext> {
+public class StepContextFactoryBean implements FactoryBean<StepContext>, InitializingBean {
 	@Autowired
 	private BatchPropertyContext batchPropertyContext;
+
+	private static final ThreadLocal<javax.batch.runtime.context.StepContext> contextHolder = new ThreadLocal<javax.batch.runtime.context.StepContext>();
+
+	protected void setBatchPropertyContext(BatchPropertyContext batchPropertyContext) {
+		this.batchPropertyContext = batchPropertyContext;
+	}
 
 	/* (non-Javadoc)
 	 * @see org.springframework.beans.factory.FactoryBean#getObject()
 	 */
 	@Override
 	public StepContext getObject() throws Exception {
-		org.springframework.batch.core.scope.context.StepContext stepContext = StepSynchronizationManager.getContext();
+		return getCurrent();
+	}
 
-		Properties properties = batchPropertyContext.getStepProperties(stepContext.getStepName());
+	private javax.batch.runtime.context.StepContext getCurrent() {
+		org.springframework.batch.core.StepExecution curStepExecution = null;
 
-		return new StepContext(stepContext.getStepExecution(), properties);
+		if(StepSynchronizationManager.getContext() != null) {
+			curStepExecution = StepSynchronizationManager.getContext().getStepExecution();
+		}
+
+		if(curStepExecution == null) {
+			throw new FactoryBeanNotInitializedException("A StepExecution is required");
+		}
+
+		StepContext context = contextHolder.get();
+
+		// If the current context applies to the current step, use it
+		if(context != null && context.getStepExecutionId() == curStepExecution.getId()) {
+			return context;
+		}
+
+		Properties stepProperties = batchPropertyContext.getStepProperties(curStepExecution.getStepName());
+
+		if(stepProperties != null) {
+			context = new org.springframework.batch.core.jsr.StepContext(curStepExecution, stepProperties);
+		} else {
+			context = new org.springframework.batch.core.jsr.StepContext(curStepExecution, new Properties());
+		}
+
+		contextHolder.set(context);
+
+		return context;
 	}
 
 	/* (non-Javadoc)
@@ -60,5 +98,16 @@ public class StepContextFactoryBean implements FactoryBean<StepContext> {
 	@Override
 	public boolean isSingleton() {
 		return false;
+	}
+
+	@Override
+	public void afterPropertiesSet() throws Exception {
+		Assert.notNull(batchPropertyContext, "BatchPropertyContext is required");
+	}
+
+	public void remove() {
+		if(contextHolder.get() != null) {
+			contextHolder.remove();
+		}
 	}
 }

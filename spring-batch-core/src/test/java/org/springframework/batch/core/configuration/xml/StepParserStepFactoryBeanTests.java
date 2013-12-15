@@ -248,6 +248,10 @@ public class StepParserStepFactoryBeanTests {
 		assertEquals(new Integer(10), throttleLimit);
 		Object tasklet = ReflectionTestUtils.getField(step, "tasklet");
 		assertTrue(tasklet instanceof ChunkOrientedTasklet<?>);
+		Object chunkProvider = ReflectionTestUtils.getField(tasklet, "chunkProvider");
+		Object repeatOperations = ReflectionTestUtils.getField(chunkProvider, "repeatOperations");
+		Object completionPolicy = ReflectionTestUtils.getField(repeatOperations, "completionPolicy");
+		assertTrue(completionPolicy instanceof DummyCompletionPolicy);
 	}
 
 	@Test

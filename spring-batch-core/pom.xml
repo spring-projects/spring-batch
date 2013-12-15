@@ -21,7 +21,6 @@
 		<dependency>
 		    <groupId>javax.batch</groupId>
 		    <artifactId>javax.batch-api</artifactId>
-		    <version>1.0</version>
 		</dependency>
 		<dependency>
 		    <groupId>com.ibm.jbatch</groupId>
@@ -35,7 +34,6 @@
 		<dependency>
 			<groupId>com.h2database</groupId>
 			<artifactId>h2</artifactId>
-			<version>1.2.132</version>
 		</dependency>
 		<dependency>
 			<groupId>commons-io</groupId>

@@ -110,7 +110,13 @@ public class PartitionStep extends AbstractStep {
 		if (stepExecution.getStatus().isUnsuccessful()) {
 			throw new JobExecutionException("Partition handler returned an unsuccessful step");
 		}
-
 	}
 
+	protected StepExecutionSplitter getStepExecutionSplitter() {
+		return stepExecutionSplitter;
+	}
+
+	protected PartitionHandler getPartitionHandler() {
+		return partitionHandler;
+	}
 }

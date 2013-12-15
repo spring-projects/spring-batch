@@ -26,7 +26,7 @@ import org.springframework.batch.core.job.flow.support.state.AbstractState;
  */
 public class StateSupport extends AbstractState {
 
-	private FlowExecutionStatus status;
+	protected FlowExecutionStatus status;
 
 	public StateSupport(String name) {
 		this(name, FlowExecutionStatus.COMPLETED);

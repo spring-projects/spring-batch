@@ -100,6 +100,19 @@ public class StaxEventItemWriterTests {
 		jaxbMarshaller = new Jaxb2Marshaller();
 		jaxbMarshaller.setClassesToBeBound(JAXBItem.class);
 	}
+	
+	/**
+	 * Test setting writer name.
+	 */
+	@Test
+	public void testSetName() throws Exception {
+		writer.setName("test");
+		writer.open(executionContext);
+		writer.write(items);
+		writer.update(executionContext);
+		writer.close();
+		assertTrue("execution context keys should be prefixed with writer name", executionContext.containsKey("test.position"));
+	}	
 
 	/**
 	 * Item is written to the output file only after flush.

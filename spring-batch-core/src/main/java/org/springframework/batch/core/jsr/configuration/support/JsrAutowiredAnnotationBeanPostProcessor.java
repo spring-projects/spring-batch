@@ -17,26 +17,28 @@ package org.springframework.batch.core.jsr.configuration.support;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.AccessibleObject;
+
 import javax.batch.api.BatchProperty;
+
 import org.springframework.beans.factory.annotation.InjectionMetadata;
 
 /**
  * <p>This class overrides methods in the copied {@link SpringAutowiredAnnotationBeanPostProcessor} class
- * to check for the {@link @BatchProperty} annotation before processing injection annotations. If the annotation
+ * to check for the {@link BatchProperty} annotation before processing injection annotations. If the annotation
  * is found, further injection processing for the field is skipped.</p>
  */
 public class JsrAutowiredAnnotationBeanPostProcessor extends SpringAutowiredAnnotationBeanPostProcessor {
-    @Override
-    protected InjectionMetadata findAutowiringMetadata(Class<?> clazz) {
-        return super.buildAutowiringMetadata(clazz);
-    }
+	@Override
+	protected InjectionMetadata findAutowiringMetadata(Class<?> clazz) {
+		return super.buildAutowiringMetadata(clazz);
+	}
 
-    @Override
-    protected Annotation findAutowiredAnnotation(AccessibleObject ao) {
-        if (ao.getAnnotation(BatchProperty.class) != null) {
-            return null;
-        }
+	@Override
+	protected Annotation findAutowiredAnnotation(AccessibleObject ao) {
+		if (ao.getAnnotation(BatchProperty.class) != null) {
+			return null;
+		}
 
-        return super.findAutowiredAnnotation(ao);
-    }
+		return super.findAutowiredAnnotation(ao);
+	}
 }

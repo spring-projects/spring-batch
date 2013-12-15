@@ -17,18 +17,26 @@ package org.springframework.batch.core.jsr.step.builder;
 
 import java.util.ArrayList;
 
+import org.springframework.batch.core.ChunkListener;
+import org.springframework.batch.core.Step;
 import org.springframework.batch.core.StepListener;
+import org.springframework.batch.core.jsr.configuration.support.BatchPropertyContext;
+import org.springframework.batch.core.jsr.step.BatchletStep;
 import org.springframework.batch.core.jsr.step.item.JsrChunkProcessor;
 import org.springframework.batch.core.jsr.step.item.JsrChunkProvider;
 import org.springframework.batch.core.step.builder.FaultTolerantStepBuilder;
 import org.springframework.batch.core.step.builder.SimpleStepBuilder;
 import org.springframework.batch.core.step.builder.StepBuilder;
+import org.springframework.batch.core.step.builder.StepBuilderException;
 import org.springframework.batch.core.step.item.ChunkOrientedTasklet;
 import org.springframework.batch.core.step.item.ChunkProcessor;
 import org.springframework.batch.core.step.item.ChunkProvider;
 import org.springframework.batch.core.step.tasklet.Tasklet;
+import org.springframework.batch.core.step.tasklet.TaskletStep;
+import org.springframework.batch.item.ItemStream;
 import org.springframework.batch.repeat.RepeatOperations;
 import org.springframework.batch.repeat.support.RepeatTemplate;
+import org.springframework.batch.repeat.support.TaskExecutorRepeatTemplate;
 import org.springframework.util.Assert;
 
 /**
@@ -43,8 +51,71 @@ import org.springframework.util.Assert;
  */
 public class JsrSimpleStepBuilder<I, O> extends SimpleStepBuilder<I, O> {
 
+	private BatchPropertyContext batchPropertyContext;
+
 	public JsrSimpleStepBuilder(StepBuilder parent) {
 		super(parent);
+	}
+
+	public JsrPartitionStepBuilder partitioner(Step step) {
+		return new JsrPartitionStepBuilder(this).step(step);
+	}
+
+	public void setBatchPropertyContext(BatchPropertyContext batchPropertyContext) {
+		this.batchPropertyContext = batchPropertyContext;
+	}
+
+	/**
+	 * Build the step from the components collected by the fluent setters. Delegates first to {@link #enhance(Step)} and
+	 * then to {@link #createTasklet()} in subclasses to create the actual tasklet.
+	 *
+	 * @return a tasklet step fully configured and read to execute
+	 */
+	@Override
+	public TaskletStep build() {
+		registerStepListenerAsItemListener();
+		registerAsStreamsAndListeners(getReader(), getProcessor(), getWriter());
+		registerStepListenerAsChunkListener();
+
+		BatchletStep step = new BatchletStep(getName(), batchPropertyContext);
+
+		super.enhance(step);
+
+		step.setChunkListeners(chunkListeners.toArray(new ChunkListener[0]));
+
+		if (getTransactionAttribute() != null) {
+			step.setTransactionAttribute(getTransactionAttribute());
+		}
+
+		if (getStepOperations() == null) {
+
+			stepOperations(new RepeatTemplate());
+
+			if (getTaskExecutor() != null) {
+				TaskExecutorRepeatTemplate repeatTemplate = new TaskExecutorRepeatTemplate();
+				repeatTemplate.setTaskExecutor(getTaskExecutor());
+				repeatTemplate.setThrottleLimit(getThrottleLimit());
+				stepOperations(repeatTemplate);
+			}
+
+			((RepeatTemplate) getStepOperations()).setExceptionHandler(getExceptionHandler());
+
+		}
+		step.setStepOperations(getStepOperations());
+		step.setTasklet(createTasklet());
+
+		ItemStream[] streams = getStreams().toArray(new ItemStream[0]);
+		step.setStreams(streams);
+
+		try {
+			step.afterPropertiesSet();
+		}
+		catch (Exception e) {
+			throw new StepBuilderException(e);
+		}
+
+		return step;
+
 	}
 
 	@Override

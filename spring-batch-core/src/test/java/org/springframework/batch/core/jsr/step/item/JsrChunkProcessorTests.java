@@ -31,6 +31,7 @@ import org.springframework.batch.core.JobInterruptedException;
 import org.springframework.batch.core.JobParameters;
 import org.springframework.batch.core.Step;
 import org.springframework.batch.core.StepExecution;
+import org.springframework.batch.core.jsr.configuration.support.BatchPropertyContext;
 import org.springframework.batch.core.jsr.step.builder.JsrSimpleStepBuilder;
 import org.springframework.batch.core.repository.JobExecutionAlreadyRunningException;
 import org.springframework.batch.core.repository.JobInstanceAlreadyCompleteException;
@@ -68,6 +69,7 @@ public class JsrChunkProcessorTests {
 		readListener = new CountingListener();
 
 		builder = new JsrSimpleStepBuilder<String, String>(new StepBuilder("step1"));
+		builder.setBatchPropertyContext(new BatchPropertyContext());
 		repository = new MapJobRepositoryFactoryBean().getJobRepository();
 		builder.repository(repository);
 		builder.transactionManager(new ResourcelessTransactionManager());

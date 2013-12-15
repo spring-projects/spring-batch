@@ -18,13 +18,16 @@ package org.springframework.batch.core.jsr;
 import java.io.Serializable;
 import java.util.List;
 import java.util.Properties;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import javax.batch.runtime.BatchStatus;
 import javax.batch.runtime.Metric;
 
 import org.springframework.batch.core.ExitStatus;
 import org.springframework.batch.core.StepExecution;
+import org.springframework.batch.item.util.ExecutionContextUserSupport;
 import org.springframework.util.Assert;
+import org.springframework.util.ClassUtils;
 
 /**
  * Wrapper class to provide the {@link javax.batch.runtime.context.StepContext} functionality
@@ -36,10 +39,12 @@ import org.springframework.util.Assert;
  * @since 3.0
  */
 public class StepContext implements javax.batch.runtime.context.StepContext {
-
+	private final static String PERSISTENT_USER_DATA_KEY = "batch_jsr_persistentUserData";
 	private StepExecution stepExecution;
 	private Object transientUserData;
 	private Properties properties = new Properties();
+	private AtomicBoolean exitStatusSet = new AtomicBoolean();
+	private final ExecutionContextUserSupport executionContextUserSupport = new ExecutionContextUserSupport(ClassUtils.getShortName(StepContext.class));
 
 	public StepContext(StepExecution stepExecution, Properties properties) {
 		Assert.notNull(stepExecution, "A StepExecution is required");
@@ -93,7 +98,7 @@ public class StepContext implements javax.batch.runtime.context.StepContext {
 	 */
 	@Override
 	public Serializable getPersistentUserData() {
-		return (Serializable) stepExecution.getExecutionContext().get("batch_jsr_persistentUserData");
+		return (Serializable) stepExecution.getExecutionContext().get(executionContextUserSupport.getKey(PERSISTENT_USER_DATA_KEY));
 	}
 
 	/* (non-Javadoc)
@@ -101,7 +106,7 @@ public class StepContext implements javax.batch.runtime.context.StepContext {
 	 */
 	@Override
 	public void setPersistentUserData(Serializable data) {
-		stepExecution.getExecutionContext().put("batch_jsr_persistentUserData", data);
+		stepExecution.getExecutionContext().put(executionContextUserSupport.getKey(PERSISTENT_USER_DATA_KEY), data);
 	}
 
 	/* (non-Javadoc)
@@ -117,7 +122,7 @@ public class StepContext implements javax.batch.runtime.context.StepContext {
 	 */
 	@Override
 	public String getExitStatus() {
-		return stepExecution.getExitStatus().getExitCode();
+		return exitStatusSet.get() ? stepExecution.getExitStatus().getExitCode() : null;
 	}
 
 	/* (non-Javadoc)
@@ -126,6 +131,7 @@ public class StepContext implements javax.batch.runtime.context.StepContext {
 	@Override
 	public void setExitStatus(String status) {
 		stepExecution.setExitStatus(new ExitStatus(status));
+		exitStatusSet.set(true);
 	}
 
 	/**

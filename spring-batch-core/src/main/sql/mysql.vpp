@@ -1,4 +1,6 @@
-#macro (sequence $name $value)CREATE TABLE ${name} (ID BIGINT NOT NULL) ENGINE=InnoDB;
-INSERT INTO ${name} values(0);
+#macro (sequence $name $value)CREATE TABLE ${name} (ID BIGINT NOT NULL,
+	UNIQUE_KEY CHAR(1) NOT NULL,
+	constraint ${name}_UN unique (UNIQUE_KEY)) ENGINE=MYISAM;
+INSERT INTO ${name} values(0, '0');
 #end
 #macro (notnull $name $type)MODIFY COLUMN ${name} ${type} NOT NULL#end

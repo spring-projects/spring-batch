@@ -44,16 +44,20 @@ public class JobContextTests {
 	public void setUp() throws Exception {
 		MockitoAnnotations.initMocks(this);
 
-        Properties properties = new Properties();
-        properties.put("jobLevelProperty1", "jobLevelValue1");
+		Properties properties = new Properties();
+		properties.put("jobLevelProperty1", "jobLevelValue1");
 
-		context = new JobContext(execution, properties);
+		context = new JobContext();
+		context.setProperties(properties);
+		context.setJobExecution(execution);
+
 		when(execution.getJobInstance()).thenReturn(instance);
 	}
 
 	@Test(expected=IllegalArgumentException.class)
 	public void testCreateWithNull() {
-		context = new JobContext(null, null);
+		context = new JobContext();
+		context.setJobExecution(null);
 	}
 
 	@Test
@@ -91,12 +95,12 @@ public class JobContextTests {
 
 		when(execution.getJobParameters()).thenReturn(params);
 
-        assertEquals("value1", execution.getJobParameters().getString("key1"));
+		assertEquals("value1", execution.getJobParameters().getString("key1"));
 	}
 
 	@Test
 	public void testJobProperties() {
-	    assertEquals("jobLevelValue1", context.getProperties().get("jobLevelProperty1"));
+		assertEquals("jobLevelValue1", context.getProperties().get("jobLevelProperty1"));
 	}
 
 	@Test
@@ -108,12 +112,16 @@ public class JobContextTests {
 
 	@Test
 	public void testExitStatus() {
-		when(execution.getExitStatus()).thenReturn(new ExitStatus("exit"));
-
-		assertEquals("exit", context.getExitStatus());
-
 		context.setExitStatus("my exit status");
-
 		verify(execution).setExitStatus(new ExitStatus("my exit status"));
+
+		when(execution.getExitStatus()).thenReturn(new ExitStatus("exit"));
+		assertEquals("exit", context.getExitStatus());
+	}
+
+	@Test
+	public void testInitialNullExitStatus() {
+		when(execution.getExitStatus()).thenReturn(new ExitStatus("exit"));
+		assertEquals(null, context.getExitStatus());
 	}
 }
