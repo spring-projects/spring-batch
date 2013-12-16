@@ -64,5 +64,12 @@ public class PartitionCollectorAdapter implements ChunkListener {
 
 	@Override
 	public void afterChunkError(ChunkContext context) {
+		try {
+			synchronized (partitionQueue) {
+				partitionQueue.add(collector.collectPartitionData());
+			}
+		} catch (Throwable e) {
+			throw new BatchRuntimeException("An error occured while collecting data from the PartionCollector", e);
+		}
 	}
 }

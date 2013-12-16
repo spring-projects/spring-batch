@@ -44,7 +44,7 @@ public class PartitionCollectorAdapterTests {
 		});
 
 		adapter.afterChunk(null);
-		adapter.afterChunk(null);
+		adapter.afterChunkError(null);
 		adapter.afterChunk(null);
 
 		assertEquals(3, dataQueue.size());
