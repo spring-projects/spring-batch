@@ -172,14 +172,16 @@ public class JsrPartitionHandler implements PartitionHandler, InitializingBean {
 		}
 
 		while(true) {
-			while(!partitionDataQueue.isEmpty()) {
-				analyzer.analyzeCollectorData(partitionDataQueue.remove());
-			}
+			synchronized (partitionDataQueue) {
+				while(!partitionDataQueue.isEmpty()) {
+					analyzer.analyzeCollectorData(partitionDataQueue.remove());
+				}
 
-			processFinishedPartitions(tasks, result);
+				processFinishedPartitions(tasks, result);
 
-			if(tasks.size() == 0 && partitionDataQueue.isEmpty()) {
-				break;
+				if(tasks.size() == 0) {
+					break;
+				}
 			}
 		}
 
