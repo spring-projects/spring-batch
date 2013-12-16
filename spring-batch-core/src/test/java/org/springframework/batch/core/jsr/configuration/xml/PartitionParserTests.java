@@ -39,6 +39,7 @@ import javax.batch.api.partition.PartitionPlanImpl;
 import javax.batch.runtime.BatchStatus;
 import javax.batch.runtime.JobExecution;
 import javax.batch.runtime.context.JobContext;
+import javax.batch.runtime.context.StepContext;
 import javax.inject.Inject;
 
 import org.junit.Before;
@@ -300,11 +301,20 @@ public class PartitionParserTests {
 		@BatchProperty
 		String artifactName;
 
+		@Inject
+		StepContext stepContext;
+
+		@Inject
+		JobContext jobContext;
+
 		@Override
 		public String process() throws Exception {
 			artifactNames.add(artifactName);
 			threadNames.add(Thread.currentThread().getName());
 			processed++;
+
+			stepContext.setExitStatus("bad step exit status");
+			jobContext.setExitStatus("bad job exit status");
 
 			return null;
 		}

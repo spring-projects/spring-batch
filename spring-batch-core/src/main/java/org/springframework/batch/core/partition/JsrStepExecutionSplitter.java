@@ -76,7 +76,8 @@ public class JsrStepExecutionSplitter implements StepExecutionSplitter {
 
 		for(int i = 0; i < gridSize; i++) {
 			String stepName = this.stepName + ":partition" + i;
-			StepExecution curStepExecution = jobExecution.createStepExecution(stepName);
+			JobExecution curJobExecution = new JobExecution(jobExecution);
+			StepExecution curStepExecution = new StepExecution(stepName, curJobExecution);
 			executions.add(curStepExecution);
 		}
 

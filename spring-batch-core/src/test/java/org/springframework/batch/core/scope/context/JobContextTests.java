@@ -180,7 +180,7 @@ public class JobContextTests {
 
 	@Test(expected = IllegalStateException.class)
 	public void testIllegalContextId() throws Exception {
-		context = new JobContext(new JobExecution(null));
+		context = new JobContext(new JobExecution((Long) null));
 		context.getId();
 	}
 
