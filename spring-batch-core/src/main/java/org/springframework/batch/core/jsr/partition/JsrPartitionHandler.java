@@ -178,7 +178,7 @@ public class JsrPartitionHandler implements PartitionHandler, InitializingBean {
 
 			processFinishedPartitions(tasks, result);
 
-			if(tasks.size() == 0) {
+			if(tasks.size() == 0 && partitionDataQueue.isEmpty()) {
 				break;
 			}
 		}
