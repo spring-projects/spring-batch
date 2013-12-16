@@ -97,7 +97,10 @@ public class BatchPropertyBeanPostProcessor implements BeanPostProcessor, BeanFa
 		StepContext stepContext = StepSynchronizationManager.getContext();
 
 		if (stepContext != null) {
-			String originalArtifactName = artifactName.substring(SCOPED_TARGET_BEAN_PREFIX.length());
+			String originalArtifactName = artifactName;
+			if(originalArtifactName.startsWith(SCOPED_TARGET_BEAN_PREFIX)) {
+				originalArtifactName = artifactName.substring(SCOPED_TARGET_BEAN_PREFIX.length());
+			}
 
 			return batchPropertyContext.getStepArtifactProperties(stepContext.getStepName(), originalArtifactName);
 		}

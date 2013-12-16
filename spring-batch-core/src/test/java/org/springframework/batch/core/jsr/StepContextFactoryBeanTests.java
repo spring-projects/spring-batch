@@ -14,7 +14,9 @@ import java.util.concurrent.Future;
 
 import javax.batch.runtime.context.StepContext;
 
+import org.junit.After;
 import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
@@ -32,11 +34,25 @@ public class StepContextFactoryBeanTests {
 	@Mock
 	private BatchPropertyContext propertyContext;
 
+	/**
+	 * Added to clean up left overs from other tests.
+	 * @throws Exception
+	 */
+	@BeforeClass
+	public static void setUpClass() throws Exception {
+		StepSynchronizationManager.close();
+	}
+
 	@Before
 	public void setUp() throws Exception {
 		MockitoAnnotations.initMocks(this);
 		factory = new StepContextFactoryBean();
 		factory.setBatchPropertyContext(propertyContext);
+	}
+
+	@After
+	public void tearDown() throws Exception {
+		StepSynchronizationManager.close();
 	}
 
 	@Test(expected=FactoryBeanNotInitializedException.class)
@@ -107,7 +123,7 @@ public class StepContextFactoryBeanTests {
 					} catch (Throwable ignore) {
 						return null;
 					}finally {
-						StepSynchronizationManager.release();
+						StepSynchronizationManager.close();
 					}
 				}
 			}));
@@ -148,7 +164,7 @@ public class StepContextFactoryBeanTests {
 					} catch (Throwable ignore) {
 						return null;
 					}finally {
-						StepSynchronizationManager.release();
+						StepSynchronizationManager.close();
 					}
 				}
 			}));

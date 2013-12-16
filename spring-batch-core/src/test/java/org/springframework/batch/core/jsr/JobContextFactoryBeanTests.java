@@ -53,6 +53,7 @@ public class JobContextFactoryBeanTests {
 	@After
 	public void tearDown() throws Exception {
 		factoryBean.close();
+		StepSynchronizationManager.close();
 	}
 
 	@Test
