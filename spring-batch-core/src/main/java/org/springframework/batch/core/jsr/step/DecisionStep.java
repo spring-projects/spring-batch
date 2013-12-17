@@ -71,7 +71,10 @@ public class DecisionStep extends AbstractStep {
 		executions[0] = new org.springframework.batch.core.jsr.StepExecution(lastExecution);
 
 		try {
-			stepExecution.setExitStatus(new ExitStatus(decider.decide(executions)));
+			ExitStatus exitStatus = new ExitStatus(decider.decide(executions));
+
+			stepExecution.getJobExecution().setExitStatus(exitStatus);
+			stepExecution.setExitStatus(exitStatus);
 		} catch (Exception e) {
 			stepExecution.setTerminateOnly();
 			stepExecution.addFailureException(e);
