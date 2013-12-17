@@ -80,9 +80,7 @@ import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.ItemStream;
 import org.springframework.batch.item.ItemWriter;
 import org.springframework.batch.repeat.CompletionPolicy;
-import org.springframework.batch.repeat.policy.CompositeCompletionPolicy;
 import org.springframework.batch.repeat.policy.SimpleCompletionPolicy;
-import org.springframework.batch.repeat.policy.TimeoutTerminationPolicy;
 import org.springframework.batch.repeat.support.TaskExecutorRepeatTemplate;
 import org.springframework.beans.factory.BeanNameAware;
 import org.springframework.beans.factory.FactoryBean;
@@ -214,8 +212,6 @@ public class StepParserStepFactoryBean<I, O> implements FactoryBean, BeanNameAwa
 	private ItemProcessor<? super I, ? extends O> itemProcessor;
 
 	private ItemWriter<? super O> itemWriter;
-
-	private Integer timeout;
 
 	//
 	// Chunk Elements
@@ -422,7 +418,7 @@ public class StepParserStepFactoryBean<I, O> implements FactoryBean, BeanNameAwa
 		return new FaultTolerantStepBuilder<I, O>(new StepBuilder(stepName));
 	}
 
-	private void registerItemListeners(SimpleStepBuilder<I, O> builder) {
+	protected void registerItemListeners(SimpleStepBuilder<I, O> builder) {
 		for (ItemReadListener<I> listener : readListeners) {
 			builder.listener(listener);
 		}
@@ -436,28 +432,27 @@ public class StepParserStepFactoryBean<I, O> implements FactoryBean, BeanNameAwa
 
 	@SuppressWarnings("unchecked")
 	protected Step createSimpleStep() {
-		SimpleStepBuilder builder = getSimpleStepBuilder(this.name);
+		SimpleStepBuilder builder = new SimpleStepBuilder(new StepBuilder(name));
 
-		if(timeout != null && commitInterval != null) {
-			CompositeCompletionPolicy completionPolicy = new CompositeCompletionPolicy();
-			CompletionPolicy [] policies = new CompletionPolicy[2];
-			policies[0] = new SimpleCompletionPolicy(commitInterval);
-			policies[1] = new TimeoutTerminationPolicy(timeout * 1000);
-			completionPolicy.setPolicies(policies);
-			builder.chunk(completionPolicy);
-		} else if(timeout != null) {
-			builder.chunk(new TimeoutTerminationPolicy(timeout * 1000));
-		} else if(commitInterval != null) {
-			builder.chunk(commitInterval);
-		}
+		setChunk(builder);
 
-		builder.chunk(chunkCompletionPolicy);
 		enhanceTaskletStepBuilder(builder);
 		registerItemListeners(builder);
 		builder.reader(itemReader);
 		builder.writer(itemWriter);
 		builder.processor(itemProcessor);
 		return builder.build();
+	}
+
+	protected void setChunk(SimpleStepBuilder builder) {
+		if (commitInterval != null) {
+			builder.chunk(commitInterval);
+		}
+		builder.chunk(chunkCompletionPolicy);
+	}
+
+	protected CompletionPolicy getCompletionPolicy() {
+		return this.chunkCompletionPolicy;
 	}
 
 	@SuppressWarnings("unchecked")
@@ -983,6 +978,10 @@ public class StepParserStepFactoryBean<I, O> implements FactoryBean, BeanNameAwa
 		this.commitInterval = commitInterval;
 	}
 
+	protected Integer getCommitInterval() {
+		return this.commitInterval;
+	}
+
 	/**
 	 * Flag to signal that the reader is transactional (usually a JMS consumer) so that items are re-presented after a
 	 * rollback. The default is false and readers are assumed to be forward-only.
@@ -1114,10 +1113,6 @@ public class StepParserStepFactoryBean<I, O> implements FactoryBean, BeanNameAwa
 	 */
 	public void setStreams(ItemStream[] streams) {
 		this.streams = streams;
-	}
-
-	public void setTimeout(Integer timeout) {
-		this.timeout = timeout;
 	}
 
 	// =========================================================

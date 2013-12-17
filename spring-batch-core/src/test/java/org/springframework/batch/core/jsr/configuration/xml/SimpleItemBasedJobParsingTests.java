@@ -64,7 +64,7 @@ public class SimpleItemBasedJobParsingTests {
 		assertEquals(4, execution.getStepExecutions().size());
 		assertEquals(27, processor.count);
 		assertEquals(1, policy.checkpointCount);
-		assertEquals(8, writer.writeCount);
+		assertEquals(7, writer.writeCount);
 		assertEquals(27, writer.itemCount);
 	}
 

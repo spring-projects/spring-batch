@@ -43,6 +43,9 @@ import org.springframework.batch.jsr.item.ItemReaderAdapter;
 import org.springframework.batch.jsr.item.ItemWriterAdapter;
 import org.springframework.batch.jsr.repeat.CheckpointAlgorithmAdapter;
 import org.springframework.batch.repeat.CompletionPolicy;
+import org.springframework.batch.repeat.policy.CompositeCompletionPolicy;
+import org.springframework.batch.repeat.policy.SimpleCompletionPolicy;
+import org.springframework.batch.repeat.policy.TimeoutTerminationPolicy;
 import org.springframework.beans.factory.FactoryBean;
 import org.springframework.util.Assert;
 
@@ -61,6 +64,8 @@ public class StepFactoryBean extends StepParserStepFactoryBean {
 	private BatchPropertyContext batchPropertyContext;
 
 	private PartitionReducer reducer;
+
+	private Integer timeout;
 
 	public void setPartitionReducer(PartitionReducer reducer) {
 		this.reducer = reducer;
@@ -116,6 +121,27 @@ public class StepFactoryBean extends StepParserStepFactoryBean {
 		enhanceTaskletStepBuilder(builder);
 		return builder.build();
 	}
+
+	@Override
+	protected void setChunk(SimpleStepBuilder builder) {
+		if(timeout != null && getCommitInterval() != null) {
+			CompositeCompletionPolicy completionPolicy = new CompositeCompletionPolicy();
+			CompletionPolicy [] policies = new CompletionPolicy[2];
+			policies[0] = new SimpleCompletionPolicy(getCommitInterval());
+			policies[1] = new TimeoutTerminationPolicy(timeout * 1000);
+			completionPolicy.setPolicies(policies);
+			builder.chunk(completionPolicy);
+		} else if(timeout != null) {
+			builder.chunk(new TimeoutTerminationPolicy(timeout * 1000));
+		} else if(getCommitInterval() != null) {
+			builder.chunk(getCommitInterval());
+		}
+
+		if(getCompletionPolicy() != null) {
+			builder.chunk(getCompletionPolicy());
+		}
+	}
+
 
 	@Override
 	protected Step createPartitionStep() {
@@ -262,5 +288,9 @@ public class StepFactoryBean extends StepParserStepFactoryBean {
 		JsrSimpleStepBuilder jsrSimpleStepBuilder = new JsrSimpleStepBuilder(new StepBuilder(stepName));
 		jsrSimpleStepBuilder.setBatchPropertyContext(batchPropertyContext);
 		return jsrSimpleStepBuilder;
+	}
+
+	public void setTimeout(Integer timeout) {
+		this.timeout = timeout;
 	}
 }
