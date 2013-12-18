@@ -108,10 +108,21 @@ public class EndState extends AbstractState {
 				}
 			}
 
-			executor.addExitStatus(code);
+			setExitStatus(executor, code);
+
 			return status;
 
 		}
+	}
+
+	/**
+	 * Performs any logic to update the exit status for the current flow.
+	 *
+	 * @param executor {@link FlowExecutor} for the current flow
+	 * @param code The exit status to save
+	 */
+	protected void setExitStatus(FlowExecutor executor, String code) {
+		executor.addExitStatus(code);
 	}
 
 	/*

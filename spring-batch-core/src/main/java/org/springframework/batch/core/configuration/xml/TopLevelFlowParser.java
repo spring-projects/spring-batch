@@ -29,8 +29,6 @@ import org.w3c.dom.Element;
  */
 public class TopLevelFlowParser extends AbstractFlowParser {
 
-	private static final String ID_ATTR = "id";
-
 	private static final String ABSTRACT_ATTR = "abstract";
 
 	/**
