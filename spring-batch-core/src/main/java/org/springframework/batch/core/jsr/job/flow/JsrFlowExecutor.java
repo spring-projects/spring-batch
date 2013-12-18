@@ -60,6 +60,9 @@ public class JsrFlowExecutor extends JobFlowExecutor {
 		if(isNonDefaultExitStatus(curStatus.getExitCode())) {
 			exitStatus = exitStatus.and(new ExitStatus(status.getName()));
 			execution.setExitStatus(exitStatus);
+		} else {
+			exitStatus = exitStatus.and(curStatus);
+			execution.setExitStatus(exitStatus);
 		}
 	}
 

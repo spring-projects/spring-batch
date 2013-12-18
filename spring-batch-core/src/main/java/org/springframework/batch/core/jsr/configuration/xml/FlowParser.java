@@ -26,10 +26,8 @@ import java.util.Set;
 import org.springframework.batch.core.configuration.xml.AbstractFlowParser;
 import org.springframework.batch.core.configuration.xml.SimpleFlowFactoryBean;
 import org.springframework.batch.core.job.flow.FlowExecutionStatus;
-import org.springframework.batch.core.job.flow.support.DefaultStateTransitionComparator;
 import org.springframework.batch.core.jsr.job.flow.support.DefaultFlow;
 import org.springframework.beans.factory.config.BeanDefinition;
-import org.springframework.beans.factory.config.RuntimeBeanReference;
 import org.springframework.beans.factory.support.BeanDefinitionBuilder;
 import org.springframework.beans.factory.support.ManagedList;
 import org.springframework.beans.factory.xml.ParserContext;
@@ -143,7 +141,7 @@ public class FlowParser extends AbstractFlowParser {
 
 		builder.getRawBeanDefinition().setAttribute("flowName", idAttribute);
 		builder.addPropertyValue("name", idAttribute);
-		builder.addPropertyValue("stateTransitionComparator", new RuntimeBeanReference(DefaultStateTransitionComparator.STATE_TRANSITION_COMPARATOR));
+
 		doParse(element, parserContext, builder);
 		builder.setRole(BeanDefinition.ROLE_INFRASTRUCTURE);
 

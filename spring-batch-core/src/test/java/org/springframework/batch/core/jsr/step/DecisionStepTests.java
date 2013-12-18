@@ -87,6 +87,19 @@ public class DecisionStepTests {
 	}
 
 	@Test
+	public void testDecisionCustomExitStatus() throws Exception {
+		ApplicationContext context = new GenericXmlApplicationContext("classpath:/org/springframework/batch/core/jsr/step/DecisionStepTests-decisionCustomExitStatus-context.xml");
+
+		JobLauncher launcher = context.getBean(JobLauncher.class);
+		Job job = context.getBean(Job.class);
+
+		JobExecution execution = launcher.run(job, new JobParameters());
+		assertEquals(BatchStatus.FAILED, execution.getStatus());
+		assertEquals(2, execution.getStepExecutions().size());
+		assertEquals("CustomFail", execution.getExitStatus().getExitCode());
+	}
+
+	@Test
 	@Ignore("Flows as first steps are not supported yet")
 	public void testDecisionAfterFlow() throws Exception {
 		ApplicationContext context = new GenericXmlApplicationContext("classpath:/org/springframework/batch/core/jsr/step/DecisionStepTests-decisionAfterFlow-context.xml");
@@ -108,6 +121,12 @@ public class DecisionStepTests {
 
 		@Override
 		public String decide(StepExecution[] executions) throws Exception {
+			for(StepExecution stepExecution : executions) {
+				if ("customFailTest".equals(stepExecution.getStepName())) {
+					return "CustomFail";
+				}
+			}
+
 			return "next";
 		}
 	}

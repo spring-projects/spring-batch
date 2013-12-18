@@ -237,12 +237,16 @@ public class SimpleFlow implements Flow, InitializingBean {
 		if(stepExecution != null) {
 			Boolean reRun = (Boolean) stepExecution.getExecutionContext().get("batch.restart");
 
-			if(reRun != null && reRun && status == FlowExecutionStatus.STOPPED && !state.getName().endsWith(stepExecution.getStepName())) {
+			if(reRun != null && reRun && status == FlowExecutionStatus.STOPPED && stateNameEndsWithStepName(state, stepExecution)) {
 				continued = true;
 			}
 		}
 
 		return continued;
+	}
+
+	private boolean stateNameEndsWithStepName(State state, StepExecution stepExecution) {
+		return !(stepExecution == null || state == null) && !state.getName().endsWith(stepExecution.getStepName());
 	}
 
 	/**
