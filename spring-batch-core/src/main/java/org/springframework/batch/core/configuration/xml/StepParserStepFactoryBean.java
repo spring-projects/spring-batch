@@ -432,7 +432,7 @@ public class StepParserStepFactoryBean<I, O> implements FactoryBean, BeanNameAwa
 
 	@SuppressWarnings("unchecked")
 	protected Step createSimpleStep() {
-		SimpleStepBuilder builder = new SimpleStepBuilder(new StepBuilder(name));
+		SimpleStepBuilder builder = getSimpleStepBuilder(name);
 
 		setChunk(builder);
 
