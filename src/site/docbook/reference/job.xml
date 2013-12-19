@@ -238,7 +238,7 @@ catch (JobRestartException e) {
   	<classname>@Enable*</classname> annotations in the Spring family.  In this case,
   	<classname>@EnableBatchProcessing</classname> provides a base configuration for
   	building batch jobs.  Within this base configuration, an instance of
-  	<classname>StepScope</classname> is createded in addition to a number of beans made
+  	<classname>StepScope</classname> is created in addition to a number of beans made
   	available to be autowired:
   	</para>
 
