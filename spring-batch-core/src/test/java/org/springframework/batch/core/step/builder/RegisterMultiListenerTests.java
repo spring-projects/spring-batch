@@ -46,7 +46,7 @@ import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseType;
  *
  * @author Tobias Flohre
  */
-public class RegisterMultiListenerTest {
+public class RegisterMultiListenerTests {
 
 	@Autowired
 	private JobLauncher jobLauncher;
