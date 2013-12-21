@@ -35,8 +35,8 @@
 	<properties>
 		<maven.test.failure.ignore>false</maven.test.failure.ignore>
 		<spring.batch.version>2.2.4.BUILD-SNAPSHOT</spring.batch.version>
-		<spring.framework.version>4.0.0.BUILD-SNAPSHOT</spring.framework.version>
-		<spring.integration.version>4.0.0.BUILD-SNAPSHOT</spring.integration.version>
+		<spring.framework.version>4.0.0.RELEASE</spring.framework.version>
+		<spring.integration.version>4.0.0.M2</spring.integration.version>
 		<spring.retry.version>1.0.3.RELEASE</spring.retry.version>
 	</properties>
 	<profiles>
@@ -568,6 +568,11 @@
 			<dependency>
 				<groupId>org.springframework</groupId>
 				<artifactId>spring-beans</artifactId>
+				<version>${spring.framework.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.springframework</groupId>
+				<artifactId>spring-messaging</artifactId>
 				<version>${spring.framework.version}</version>
 			</dependency>
 			<dependency>

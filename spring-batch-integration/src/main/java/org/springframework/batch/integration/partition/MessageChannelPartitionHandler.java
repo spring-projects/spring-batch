@@ -132,7 +132,8 @@ public class MessageChannelPartitionHandler implements PartitionHandler {
 			messagingGateway.send(request);
 		}
 
-		Message<Collection<StepExecution>> message = messagingGateway.receive(replyChannel);
+		@SuppressWarnings("unchecked")
+		Message<Collection<StepExecution>> message = (Message<Collection<StepExecution>>) messagingGateway.receive(replyChannel);
 		if (logger.isDebugEnabled()) {
 			logger.debug("Received replies: " + message);
 		}

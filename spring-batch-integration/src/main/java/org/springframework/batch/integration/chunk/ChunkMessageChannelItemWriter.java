@@ -217,7 +217,7 @@ public class ChunkMessageChannelItemWriter<T> extends StepExecutionListenerSuppo
 	 * and we shouldn't be)
 	 */
 	private void getNextResult() throws AsynchronousFailureException {
-		Message<ChunkResponse> message = messagingGateway.receive(replyChannel);
+		Message<ChunkResponse> message = (Message<ChunkResponse>) messagingGateway.receive(replyChannel);
 		if (message != null) {
 			ChunkResponse payload = message.getPayload();
 			if (logger.isDebugEnabled()) {
