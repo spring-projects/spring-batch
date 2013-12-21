@@ -3,11 +3,11 @@ package org.springframework.batch.integration.chunk;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.InitializingBean;
-import org.springframework.integration.channel.ChannelInterceptor;
-import org.springframework.integration.channel.interceptor.ChannelInterceptorAdapter;
 import org.springframework.integration.core.MessageSource;
 import org.springframework.messaging.Message;
 import org.springframework.messaging.MessageChannel;
+import org.springframework.messaging.support.ChannelInterceptor;
+import org.springframework.messaging.support.ChannelInterceptorAdapter;
 import org.springframework.util.Assert;
 
 
