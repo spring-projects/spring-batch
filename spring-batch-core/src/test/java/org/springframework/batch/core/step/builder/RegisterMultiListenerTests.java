@@ -1,7 +1,6 @@
 package org.springframework.batch.core.step.builder;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
 
 import java.util.List;
 
@@ -45,6 +44,7 @@ import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseType;
  * just once in java based configuration.
  *
  * @author Tobias Flohre
+ * @author Michael Minella
  */
 public class RegisterMultiListenerTests {
 
@@ -68,25 +68,32 @@ public class RegisterMultiListenerTests {
 		job = null;
 		callChecker = null;
 
-		if(dataSource != null) {
-			dataSource.shutdown();
-		}
-
 		if(context != null) {
 			context.close();
 		}
 	}
 
+	/**
+	 * The times the beforeChunkCalled occurs are:
+	 *  - Before chunk 1 (item1, item2)
+	 *  - Before the re-attempt of item1 (scanning)
+	 *  - Before the re-attempt of item2 (scanning)
+	 *  - Before the checking that scanning is complete
+	 *  - Before chunk 2 (item3, item4)
+	 *  - Before chunk 3 (null)
+	 *
+	 * @throws Exception
+	 */
 	@Test
 	public void testMultiListenerSimpleStep() throws Exception {
 		bootstrap(MultiListenerFaultTolerantTestConfiguration.class);
 
 		JobExecution execution = jobLauncher.run(job, new JobParameters());
 		assertEquals(BatchStatus.COMPLETED, execution.getStatus());
-		assertTrue("beforeStep hasn't been called",callChecker.beforeStepCalled);
-		assertTrue("beforeChunk hasn't been called",callChecker.beforeChunkCalled);
-		assertTrue("beforeWrite hasn't been called",callChecker.beforeWriteCalled);
-		assertTrue("skipInWrite hasn't been called",callChecker.skipInWriteCalled);
+		assertEquals(1, callChecker.beforeStepCalled);
+		assertEquals(6, callChecker.beforeChunkCalled);
+		assertEquals(2, callChecker.beforeWriteCalled);
+		assertEquals(1, callChecker.skipInWriteCalled);
 	}
 
 	@Test
@@ -95,9 +102,10 @@ public class RegisterMultiListenerTests {
 
 		JobExecution execution = jobLauncher.run(job, new JobParameters());
 		assertEquals(BatchStatus.FAILED, execution.getStatus());
-		assertTrue("beforeStep hasn't been called",callChecker.beforeStepCalled);
-		assertTrue("beforeChunk hasn't been called",callChecker.beforeChunkCalled);
-		assertTrue("beforeWrite hasn't been called",callChecker.beforeWriteCalled);
+		assertEquals(1, callChecker.beforeStepCalled);
+		assertEquals(1, callChecker.beforeChunkCalled);
+		assertEquals(1, callChecker.beforeWriteCalled);
+		assertEquals(0, callChecker.skipInWriteCalled);
 	}
 
 	private void bootstrap(Class<?> configurationClass) {
@@ -117,14 +125,6 @@ public class RegisterMultiListenerTests {
 		public Job testJob(){
 			return jobBuilders.get("testJob")
 					.start(step())
-					.build();
-		}
-
-		@Bean
-		public DataSource dataSource(){
-			EmbeddedDatabaseBuilder embeddedDatabaseBuilder = new EmbeddedDatabaseBuilder();
-			return embeddedDatabaseBuilder.addScript("classpath:org/springframework/batch/core/schema-hsqldb.sql")
-					.setType(EmbeddedDatabaseType.HSQL)
 					.build();
 		}
 
@@ -151,7 +151,6 @@ public class RegisterMultiListenerTests {
 					count++;
 
 					if(count < 5) {
-						System.err.println("returning item with count " + count);
 						return "item" + count;
 					} else {
 						return null;
@@ -183,6 +182,15 @@ public class RegisterMultiListenerTests {
 	@EnableBatchProcessing
 	public static class MultiListenerFaultTolerantTestConfiguration extends MultiListenerTestConfigurationSupport{
 
+		@Bean
+		public DataSource dataSource(){
+			return new EmbeddedDatabaseBuilder()
+			.addScript("classpath:org/springframework/batch/core/schema-drop-hsqldb.sql")
+			.addScript("classpath:org/springframework/batch/core/schema-hsqldb.sql")
+			.setType(EmbeddedDatabaseType.HSQL)
+			.build();
+		}
+
 		@Override
 		@Bean
 		public Step step(){
@@ -203,6 +211,15 @@ public class RegisterMultiListenerTests {
 	@EnableBatchProcessing
 	public static class MultiListenerTestConfiguration extends MultiListenerTestConfigurationSupport{
 
+		@Bean
+		public DataSource dataSource(){
+			return new EmbeddedDatabaseBuilder()
+			.addScript("classpath:org/springframework/batch/core/schema-drop-hsqldb.sql")
+			.addScript("classpath:org/springframework/batch/core/schema-hsqldb.sql")
+			.setType(EmbeddedDatabaseType.HSQL)
+			.build();
+		}
+
 		@Override
 		@Bean
 		public Step step(){
@@ -216,10 +233,10 @@ public class RegisterMultiListenerTests {
 	}
 
 	private static class CallChecker {
-		boolean beforeStepCalled = false;
-		boolean beforeChunkCalled = false;
-		boolean beforeWriteCalled = false;
-		boolean skipInWriteCalled = false;
+		int beforeStepCalled = 0;
+		int beforeChunkCalled = 0;
+		int beforeWriteCalled = 0;
+		int skipInWriteCalled = 0;
 	}
 
 	private static class MultiListener implements StepExecutionListener, ChunkListener, ItemWriteListener<String>, SkipListener<String,String>{
@@ -237,8 +254,7 @@ public class RegisterMultiListenerTests {
 
 		@Override
 		public void onSkipInWrite(String item, Throwable t) {
-			System.err.println("skipWrite was called");
-			callChecker.skipInWriteCalled = true;
+			callChecker.skipInWriteCalled++;
 		}
 
 		@Override
@@ -247,7 +263,7 @@ public class RegisterMultiListenerTests {
 
 		@Override
 		public void beforeWrite(List<? extends String> items) {
-			callChecker.beforeWriteCalled = true;
+			callChecker.beforeWriteCalled++;
 		}
 
 		@Override
@@ -257,12 +273,11 @@ public class RegisterMultiListenerTests {
 		@Override
 		public void onWriteError(Exception exception,
 				List<? extends String> items) {
-			System.err.println("write error was called");
 		}
 
 		@Override
 		public void beforeChunk(ChunkContext context) {
-			callChecker.beforeChunkCalled = true;
+			callChecker.beforeChunkCalled++;
 		}
 
 		@Override
@@ -275,7 +290,7 @@ public class RegisterMultiListenerTests {
 
 		@Override
 		public void beforeStep(StepExecution stepExecution) {
-			callChecker.beforeStepCalled = true;
+			callChecker.beforeStepCalled++;
 		}
 
 		@Override
