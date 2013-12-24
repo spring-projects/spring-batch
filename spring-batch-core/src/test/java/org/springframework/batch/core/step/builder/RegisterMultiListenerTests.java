@@ -85,7 +85,7 @@ public class RegisterMultiListenerTests {
 	 * @throws Exception
 	 */
 	@Test
-	public void testMultiListenerSimpleStep() throws Exception {
+	public void testMultiListenerFaultTolerantStep() throws Exception {
 		bootstrap(MultiListenerFaultTolerantTestConfiguration.class);
 
 		JobExecution execution = jobLauncher.run(job, new JobParameters());
@@ -97,7 +97,7 @@ public class RegisterMultiListenerTests {
 	}
 
 	@Test
-	public void testMultiListenerFaultTolerantStep() throws Exception {
+	public void testMultiListenerSimpleStep() throws Exception {
 		bootstrap(MultiListenerTestConfiguration.class);
 
 		JobExecution execution = jobLauncher.run(job, new JobParameters());
@@ -201,8 +201,9 @@ public class RegisterMultiListenerTests {
 					.writer(writer())
 					.faultTolerant()
 					.skipLimit(1)
-					.listener((SkipListener<String, String>) listener())
 					.skip(MySkippableException.class)
+					// ChunkListener registered twice for checking BATCH-2149
+					.listener((ChunkListener) listener())
 					.build();
 		}
 	}

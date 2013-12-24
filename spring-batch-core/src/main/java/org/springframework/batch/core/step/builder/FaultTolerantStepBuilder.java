@@ -699,5 +699,21 @@ public class FaultTolerantStepBuilder<I, O> extends SimpleStepBuilder<I, O> {
 				throw new FatalStepExecutionException("ChunkListener threw exception, rethrowing as fatal", t);
 			}
 		}
+
+		@Override
+		public int hashCode() {
+			return chunkListener.hashCode();
+		}
+
+		@SuppressWarnings("unchecked")
+		@Override
+		public boolean equals(Object obj) {
+			if (obj instanceof FaultTolerantStepBuilder.TerminateOnExceptionChunkListenerDelegate){
+				// unwrap the ChunkListener
+				obj = ((TerminateOnExceptionChunkListenerDelegate)obj).chunkListener;
+			}
+			return chunkListener.equals(obj);
+		}
+		
 	}
 }
