@@ -1,0 +1,15 @@
+Spring Batch 2.2.4 Release Notes
+
+* Improvement
+
+  * {{{http://jira.springsource.org/browse/BATCH-2140}[BATCH-2140]}} - Typo in second paragraph of section "4.2. Java Config" on the Reference Documentation
+
+  * {{{http://jira.springsource.org/browse/BATCH-2150}[BATCH-2150]}} - Add private constructor to the StepExecution class
+
+* Bug
+
+  * {{{http://jira.springsource.org/browse/BATCH-2148}[BATCH-2148]}} - Cannot create db for MySQL
+
+  * {{{http://jira.springsource.org/browse/BATCH-2149}[BATCH-2149]}} - JavaConfig: Registering a ChunkListener twice will result in two ChunkListeners in fault-tolerant mode
+
+  * {{{http://jira.springsource.org/browse/BATCH-2151}[BATCH-2151]}} - Skip issues on restart
