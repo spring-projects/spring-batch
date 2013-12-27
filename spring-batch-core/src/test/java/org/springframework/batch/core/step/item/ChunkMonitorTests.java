@@ -128,6 +128,10 @@ public class ChunkMonitorTests {
 		ExecutionContext executionContext = new ExecutionContext();
 		monitor.update(executionContext);
 		assertEquals(0, executionContext.size());
+
+		executionContext.put(ChunkMonitor.class.getName() + ".OFFSET", 3);
+		monitor.update(executionContext);
+		assertEquals(0, executionContext.size());
 	}
 
 	@Test
