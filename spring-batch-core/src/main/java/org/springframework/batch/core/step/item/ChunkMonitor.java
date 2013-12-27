@@ -140,6 +140,7 @@ public class ChunkMonitor extends ItemStreamSupport {
 				// Only call the underlying update method if we are on a chunk
 				// boundary
 				stream.update(executionContext);
+				executionContext.remove(getExecutionContextKey(OFFSET));
 			}
 			else {
 				executionContext.putInt(getExecutionContextKey(OFFSET), data.offset);
