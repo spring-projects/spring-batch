@@ -20,10 +20,12 @@ import static org.junit.Assert.assertEquals;
 import java.io.Serializable;
 import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.concurrent.locks.ReentrantLock;
 
 import javax.batch.api.partition.PartitionCollector;
 
 import org.junit.Test;
+import org.springframework.batch.core.scope.context.ChunkContext;
 
 public class PartitionCollectorAdapterTests {
 
@@ -43,9 +45,14 @@ public class PartitionCollectorAdapterTests {
 			}
 		});
 
-		adapter.afterChunk(null);
-		adapter.afterChunkError(null);
-		adapter.afterChunk(null);
+		adapter.setPartitionLock(new ReentrantLock());
+
+		ChunkContext context = new ChunkContext(null);
+		context.setComplete();
+
+		adapter.afterChunk(context);
+		adapter.afterChunkError(context);
+		adapter.afterChunk(context);
 
 		assertEquals(3, dataQueue.size());
 		assertEquals("0", dataQueue.remove());

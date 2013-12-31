@@ -68,9 +68,11 @@ public class StepParser extends AbstractSingleBeanDefinitionParser {
 		}
 
 		String allowStartIfComplete = element.getAttribute(ALLOW_START_IF_COMPLETE_ATTRIBUTE);
+		boolean allowStartIfCompletValue = false;
 		if(StringUtils.hasText(allowStartIfComplete)) {
 			bd.getPropertyValues().addPropertyValue("allowStartIfComplete",
 					allowStartIfComplete);
+			allowStartIfCompletValue = Boolean.valueOf(allowStartIfComplete);
 		}
 
 		new ListenerParser(StepListenerFactoryBean.class, "listeners").parseListeners(element, parserContext, bd, stepName);
@@ -91,7 +93,7 @@ public class StepParser extends AbstractSingleBeanDefinitionParser {
 				} else if(name.equals(CHUNK_ELEMENT)) {
 					new ChunkParser().parse(nestedElement, bd, parserContext, stepName);
 				} else if(name.equals(PARTITION_ELEMENT)) {
-					new PartitionParser(stepName).parse(nestedElement, bd, parserContext, stepName);
+					new PartitionParser(stepName, allowStartIfCompletValue).parse(nestedElement, bd, parserContext, stepName);
 				}
 			}
 		}

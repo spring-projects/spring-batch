@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<job id="job_partitioned_1step" xmlns="http://xmlns.jcp.org/xml/ns/javaee" version="1.0">
+	<step id="step1">
+		<batchlet ref="org.springframework.batch.core.jsr.partition.JsrPartitionHandlerTests$MyBatchlet"/>
+	    <partition>
+	    	<mapper ref="org.springframework.batch.core.jsr.partition.JsrPartitionHandlerTests$MyPartitionMapper">
+	    		<properties>
+	    			<property name="overrideString" value="#{jobParameters['mapper.override']}"/>
+	    		</properties>
+	    	</mapper>
+	    	<collector ref="org.springframework.batch.core.jsr.partition.JsrPartitionHandlerTests$CountingPartitionCollector"/>
+	    	<reducer ref="org.springframework.batch.core.jsr.partition.JsrPartitionHandlerTests$MyPartitionReducer"/>
+	    </partition>
+	</step>
+</job>

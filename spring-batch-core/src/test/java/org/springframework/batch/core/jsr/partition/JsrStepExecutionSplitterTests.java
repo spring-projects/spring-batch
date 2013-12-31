@@ -33,7 +33,7 @@ public class JsrStepExecutionSplitterTests {
 
 	@Before
 	public void setUp() throws Exception {
-		splitter = new JsrStepExecutionSplitter("step1", new JobRepositorySupport());
+		splitter = new JsrStepExecutionSplitter(new JobRepositorySupport(), false, "step1", true);
 	}
 
 	@Test

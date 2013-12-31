@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 the original author or authors.
+ * Copyright 2013-2014 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -43,11 +43,17 @@ public class BatchletAdapter implements StoppableTasklet {
 	@Override
 	public RepeatStatus execute(StepContribution contribution,
 			ChunkContext chunkContext) throws Exception {
-		String exitStatus = batchlet.process();
+		String exitStatus;
+		try {
+			exitStatus = batchlet.process();
+		} finally {
+			chunkContext.setComplete();
+		}
 
 		if(StringUtils.hasText(exitStatus)) {
 			contribution.setExitStatus(new ExitStatus(exitStatus));
 		}
+
 
 		return RepeatStatus.FINISHED;
 	}

@@ -31,7 +31,6 @@ import org.springframework.batch.core.jsr.step.builder.JsrBatchletStepBuilder;
 import org.springframework.batch.core.jsr.step.builder.JsrFaultTolerantStepBuilder;
 import org.springframework.batch.core.jsr.step.builder.JsrPartitionStepBuilder;
 import org.springframework.batch.core.jsr.step.builder.JsrSimpleStepBuilder;
-import org.springframework.batch.core.partition.JsrStepExecutionSplitter;
 import org.springframework.batch.core.step.builder.FaultTolerantStepBuilder;
 import org.springframework.batch.core.step.builder.SimpleStepBuilder;
 import org.springframework.batch.core.step.builder.StepBuilder;
@@ -178,8 +177,6 @@ public class StepFactoryBean extends StepParserStepFactoryBean {
 		if(reducer != null) {
 			builder.reducer(reducer);
 		}
-
-		builder.splitter(new JsrStepExecutionSplitter(getName(), getJobRepository()));
 
 		builder.aggregator(getStepExecutionAggergator());
 
