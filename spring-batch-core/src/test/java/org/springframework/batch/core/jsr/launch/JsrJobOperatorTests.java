@@ -32,6 +32,7 @@ import java.util.List;
 import java.util.Properties;
 import java.util.Set;
 
+import javax.batch.api.AbstractBatchlet;
 import javax.batch.api.Batchlet;
 import javax.batch.operations.JobExecutionIsRunningException;
 import javax.batch.operations.JobOperator;
@@ -425,6 +426,14 @@ public class JsrJobOperatorTests {
 	}
 
 	@Test(expected = JobRestartException.class)
+	public void testNonRestartableJob() throws Exception {
+		javax.batch.runtime.JobExecution jobExecutionStart = runJob("jsrJobOperatorTestNonRestartableJob", new Properties(), TIMEOUT);
+		assertEquals(BatchStatus.FAILED, jobExecutionStart.getBatchStatus());
+
+		restartJob(jobExecutionStart.getExecutionId(), null, TIMEOUT);
+	}
+
+	@Test(expected = JobRestartException.class)
 	public void testRestartAbandoned() throws Exception {
 		jsrJobOperator = BatchRuntime.getJobOperator();
 		javax.batch.runtime.JobExecution execution = runJob("jsrJobOperatorTestRestartAbandonJob", null, TIMEOUT);
@@ -532,6 +541,13 @@ public class JsrJobOperatorTests {
 		@Override
 		public void stop() throws Exception {
 			stopped = true;
+		}
+	}
+
+	public static class FailingBatchlet extends AbstractBatchlet {
+		@Override
+		public String process() throws Exception {
+			throw new RuntimeException("blah");
 		}
 	}
 }

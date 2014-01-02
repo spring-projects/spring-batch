@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 the original author or authors.
+ * Copyright 2013-2014 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -447,7 +447,7 @@ public class JsrJobOperator implements JobOperator, InitializingBean {
 			}
 		}
 
-		String jobName = previousJobExecution.getJobInstance().getJobName();
+		final String jobName = previousJobExecution.getJobInstance().getJobName();
 
 		Properties jobRestartProperties = getJobRestartProperties(params, previousJobExecution);
 
@@ -477,12 +477,6 @@ public class JsrJobOperator implements JobOperator, InitializingBean {
 			throw new JobRestartException(e);
 		}
 
-		final Job job = batchContext.getBean(Job.class);
-
-		if(!job.isRestartable()) {
-			throw new JobRestartException("Job " + jobName + " is not restartable");
-		}
-
 		final org.springframework.batch.core.JobExecution jobExecution;
 
 		try {
@@ -506,6 +500,11 @@ public class JsrJobOperator implements JobOperator, InitializingBean {
 						factoryBean = (JobContextFactoryBean) batchContext.getBean("&" + JSR_JOB_CONTEXT_BEAN_NAME);
 						factoryBean.setJobExecution(jobExecution);
 						final Job job = batchContext.getBean(Job.class);
+
+						if(!job.isRestartable()) {
+							throw new JobRestartException("Job " + jobName + " is not restartable");
+						}
+
 						semaphore.release();
 						// Initialization of the JobExecution for job level dependencies
 						jobRegistry.register(job, jobExecution);
@@ -537,7 +536,10 @@ public class JsrJobOperator implements JobOperator, InitializingBean {
 			if (jobExecution.getExitStatus().equals(ExitStatus.UNKNOWN)) {
 				jobExecution.setExitStatus(ExitStatus.FAILED.addExitDescription(e));
 			}
+
 			jobRepository.update(jobExecution);
+
+			throw new JobRestartException(e);
 		} finally {
 			batchContext.close();
 		}
