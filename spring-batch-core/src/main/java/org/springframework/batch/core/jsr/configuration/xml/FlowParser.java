@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 the original author or authors.
+ * Copyright 2013-2014 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -147,12 +147,6 @@ public class FlowParser extends AbstractFlowParser {
 
 		Collection<BeanDefinition> list = new ArrayList<BeanDefinition>();
 
-		String shortNextAttribute = element.getAttribute(NEXT_ATTRIBUTE);
-		boolean hasNextAttribute = StringUtils.hasText(shortNextAttribute);
-		if (hasNextAttribute) {
-			list.add(getStateTransitionReference(parserContext, stateDef, null, shortNextAttribute));
-		}
-
 		boolean transitionElementExists = false;
 		List<Element> childElements = DomUtils.getChildElements(element);
 		for(Element childElement : childElements) {
@@ -161,6 +155,9 @@ public class FlowParser extends AbstractFlowParser {
 				transitionElementExists = true;
 			}
 		}
+
+		String shortNextAttribute = element.getAttribute(NEXT_ATTRIBUTE);
+		boolean hasNextAttribute = StringUtils.hasText(shortNextAttribute);
 
 		if (!transitionElementExists) {
 			list.addAll(createTransition(FlowExecutionStatus.FAILED, FlowExecutionStatus.FAILED.getName(), null, null,
@@ -171,6 +168,10 @@ public class FlowParser extends AbstractFlowParser {
 				list.addAll(createTransition(FlowExecutionStatus.COMPLETED, FlowExecutionStatus.COMPLETED.getName(), null, null, stateDef, parserContext,
 						false));
 			}
+		}
+
+		if (hasNextAttribute) {
+			list.add(getStateTransitionReference(parserContext, stateDef, null, shortNextAttribute));
 		}
 
 		return list;

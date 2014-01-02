@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 the original author or authors.
+ * Copyright 2013-2014 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,13 +16,18 @@
 package org.springframework.batch.core.jsr.configuration.xml;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 import static org.springframework.batch.core.jsr.JsrTestUtils.restartJob;
 import static org.springframework.batch.core.jsr.JsrTestUtils.runJob;
 
+import java.util.List;
 import java.util.Properties;
 
 import javax.batch.api.AbstractBatchlet;
+import javax.batch.operations.JobOperator;
+import javax.batch.runtime.BatchRuntime;
 import javax.batch.runtime.JobExecution;
+import javax.batch.runtime.StepExecution;
 import javax.batch.runtime.context.StepContext;
 import javax.inject.Inject;
 
@@ -38,7 +43,6 @@ import org.springframework.batch.core.ExitStatus;
  * @since 3.0
  */
 public class FlowParserTests {
-
 	@Test
 	public void testDuplicateTransitionPatternsAllowed() throws Exception {
 		JobExecution stoppedExecution = runJob("FlowParserTests-context", new Properties(), 10000l);
@@ -46,6 +50,18 @@ public class FlowParserTests {
 
 		JobExecution endedExecution = restartJob(stoppedExecution.getExecutionId(), new Properties(), 10000l);
 		assertEquals(ExitStatus.COMPLETED.getExitCode(), endedExecution.getExitStatus());
+	}
+
+	@Test
+	public void testWildcardAddedLastWhenUsedWithNextAttrAndNoTransitionElements() throws Exception {
+		JobExecution jobExecution = runJob("FlowParserTestsWildcardAndNextAttrJob", new Properties(), 1000l);
+		assertEquals(ExitStatus.FAILED.getExitCode(), jobExecution.getExitStatus());
+
+		JobOperator jobOperator = BatchRuntime.getJobOperator();
+		List<StepExecution> stepExecutions = jobOperator.getStepExecutions(jobExecution.getExecutionId());
+		assertEquals(1, stepExecutions.size());
+		StepExecution failedStep = stepExecutions.get(0);
+		assertTrue("step1".equals(failedStep.getStepName()));
 	}
 
 	public static class TestBatchlet extends AbstractBatchlet {
@@ -64,6 +80,13 @@ public class FlowParserTests {
 			}
 
 			return exitCode;
+		}
+	}
+
+	public static class FailingTestBatchlet extends AbstractBatchlet {
+		@Override
+		public String process() throws Exception {
+			throw new RuntimeException("blah");
 		}
 	}
 }
