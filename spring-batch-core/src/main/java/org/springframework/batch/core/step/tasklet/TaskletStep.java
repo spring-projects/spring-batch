@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2013 the original author or authors.
+ * Copyright 2006-2014 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -496,20 +496,4 @@ public class TaskletStep extends AbstractStep {
 		}
 
 	}
-
-	/**
-	 * Convenience wrapper for a checked exception so that it can cause a
-	 * rollback and be extracted afterwards.
-	 *
-	 * @author Dave Syer
-	 *
-	 */
-	private static class UncheckedTransactionException extends RuntimeException {
-
-		public UncheckedTransactionException(Exception e) {
-			super(e);
-		}
-
-	}
-
 }
