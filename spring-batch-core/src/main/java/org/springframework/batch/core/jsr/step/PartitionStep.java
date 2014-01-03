@@ -70,7 +70,7 @@ public class PartitionStep extends org.springframework.batch.core.partition.supp
 		}
 
 		// Wait for task completion and then aggregate the results
-		Collection<StepExecution> stepExecutions = getPartitionHandler().handle(getStepExecutionSplitter(), stepExecution);
+		Collection<StepExecution> stepExecutions = getPartitionHandler().handle(null, stepExecution);
 		stepExecution.upgradeStatus(BatchStatus.COMPLETED);
 		stepExecutionAggregator.aggregate(stepExecution, stepExecutions);
 

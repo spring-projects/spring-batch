@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 the original author or authors.
+ * Copyright 2013-2014 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,19 +24,26 @@ import java.util.Properties;
 import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
+import javax.batch.api.BatchProperty;
 import javax.batch.api.partition.PartitionAnalyzer;
+import javax.batch.api.partition.PartitionCollector;
 import javax.batch.api.partition.PartitionMapper;
 import javax.batch.api.partition.PartitionPlan;
 import javax.batch.api.partition.PartitionPlanImpl;
+import javax.batch.api.partition.PartitionReducer;
 import javax.batch.runtime.BatchStatus;
+import javax.inject.Inject;
 
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.batch.core.ExitStatus;
 import org.springframework.batch.core.JobExecution;
+import org.springframework.batch.core.JobInstance;
 import org.springframework.batch.core.JobInterruptedException;
 import org.springframework.batch.core.StepExecution;
+import org.springframework.batch.core.jsr.JsrTestUtils;
 import org.springframework.batch.core.jsr.configuration.support.BatchPropertyContext;
+import org.springframework.batch.core.jsr.step.batchlet.BatchletSupport;
 import org.springframework.batch.core.partition.JsrStepExecutionSplitter;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.repository.support.MapJobRepositoryFactoryBean;
@@ -47,14 +54,17 @@ public class JsrPartitionHandlerTests {
 
 	private JsrPartitionHandler handler;
 	private JobRepository repository = new JobRepositorySupport();
-	private StepExecution stepExecution = new StepExecution("step", new JobExecution(1L));
+	private StepExecution stepExecution;
 	private int count;
 	private BatchPropertyContext propertyContext;
 	private JsrStepExecutionSplitter stepSplitter;
 
 	@Before
 	public void setUp() throws Exception {
-		stepSplitter = new JsrStepExecutionSplitter("step1", repository);
+		JobExecution jobExecution = new JobExecution(1L);
+		jobExecution.setJobInstance(new JobInstance(1l, "job"));
+		stepExecution = new StepExecution("step1", jobExecution);
+		stepSplitter = new JsrStepExecutionSplitter(repository, false, "step1", true);
 		Analyzer.collectorData = "";
 		Analyzer.status = "";
 		count = 0;
@@ -70,6 +80,9 @@ public class JsrPartitionHandlerTests {
 		propertyContext = new BatchPropertyContext();
 		handler.setPropertyContext(propertyContext);
 		repository = new MapJobRepositoryFactoryBean().getJobRepository();
+		handler.setJobRepository(repository);
+		MyPartitionReducer.reset();
+		CountingPartitionCollector.reset();
 	}
 
 	@Test
@@ -93,6 +106,15 @@ public class JsrPartitionHandlerTests {
 		}
 
 		handler.setThreads(3);
+
+		try {
+			handler.afterPropertiesSet();
+			fail("JobRepository was not checked for");
+		} catch(IllegalArgumentException iae) {
+			assertEquals("A JobRepository is required", iae.getMessage());
+		}
+
+		handler.setJobRepository(repository);
 		handler.afterPropertiesSet();
 	}
 
@@ -123,7 +145,7 @@ public class JsrPartitionHandlerTests {
 
 		handler.afterPropertiesSet();
 
-		Collection<StepExecution> executions = handler.handle(new JsrStepExecutionSplitter("step1", repository), stepExecution);
+		Collection<StepExecution> executions = handler.handle(new JsrStepExecutionSplitter(repository, false, "step1", true), stepExecution);
 
 		assertEquals(3, executions.size());
 		assertEquals(3, count);
@@ -144,7 +166,7 @@ public class JsrPartitionHandlerTests {
 
 		handler.afterPropertiesSet();
 
-		Collection<StepExecution> executions = handler.handle(new JsrStepExecutionSplitter("step1", repository), stepExecution);
+		Collection<StepExecution> executions = handler.handle(new JsrStepExecutionSplitter(repository, false, "step1", true), stepExecution);
 
 		assertEquals(3, executions.size());
 		assertEquals(3, count);
@@ -171,7 +193,7 @@ public class JsrPartitionHandlerTests {
 
 		handler.afterPropertiesSet();
 
-		Collection<StepExecution> executions = handler.handle(new JsrStepExecutionSplitter("step1", repository), stepExecution);
+		Collection<StepExecution> executions = handler.handle(new JsrStepExecutionSplitter(repository, false, "step1", true), stepExecution);
 
 		assertEquals(3, executions.size());
 		assertEquals(3, count);
@@ -191,12 +213,165 @@ public class JsrPartitionHandlerTests {
 		handler.setPartitionAnalyzer(new Analyzer());
 		handler.afterPropertiesSet();
 
-		Collection<StepExecution> executions = handler.handle(new JsrStepExecutionSplitter("step1", repository), stepExecution);
+		Collection<StepExecution> executions = handler.handle(new JsrStepExecutionSplitter(repository, false, "step1", true), stepExecution);
 
 		assertEquals(2, executions.size());
 		assertEquals(2, count);
 		assertEquals("foobar", Analyzer.collectorData);
 		assertEquals("COMPLETEDdone", Analyzer.status);
+	}
+
+	@Test
+	public void testRestartNoOverride() throws Exception {
+		javax.batch.runtime.JobExecution execution1 = JsrTestUtils.runJob("jsrPartitionHandlerRestartWithOverrideJob", null, 1000000l);
+		assertEquals(BatchStatus.FAILED, execution1.getBatchStatus());
+		assertEquals(1, MyPartitionReducer.beginCount);
+		assertEquals(0, MyPartitionReducer.beforeCount);
+		assertEquals(1, MyPartitionReducer.rollbackCount);
+		assertEquals(1, MyPartitionReducer.afterCount);
+		assertEquals(3, CountingPartitionCollector.collected);
+
+		MyPartitionReducer.reset();
+		CountingPartitionCollector.reset();
+
+		javax.batch.runtime.JobExecution execution2 = JsrTestUtils.restartJob(execution1.getExecutionId(), null, 1000000l);
+		assertEquals(BatchStatus.COMPLETED, execution2.getBatchStatus());
+		assertEquals(1, MyPartitionReducer.beginCount);
+		assertEquals(1, MyPartitionReducer.beforeCount);
+		assertEquals(0, MyPartitionReducer.rollbackCount);
+		assertEquals(1, MyPartitionReducer.afterCount);
+		assertEquals(1, CountingPartitionCollector.collected);
+	}
+
+
+	@Test
+	public void testRestartOverride() throws Exception {
+		Properties jobParameters = new Properties();
+		jobParameters.put("mapper.override", "true");
+
+		javax.batch.runtime.JobExecution execution1 = JsrTestUtils.runJob("jsrPartitionHandlerRestartWithOverrideJob", jobParameters, 1000000l);
+		assertEquals(BatchStatus.FAILED, execution1.getBatchStatus());
+		assertEquals(1, MyPartitionReducer.beginCount);
+		assertEquals(0, MyPartitionReducer.beforeCount);
+		assertEquals(1, MyPartitionReducer.rollbackCount);
+		assertEquals(1, MyPartitionReducer.afterCount);
+		assertEquals(3, CountingPartitionCollector.collected);
+
+		MyPartitionReducer.reset();
+		CountingPartitionCollector.reset();
+
+		javax.batch.runtime.JobExecution execution2 = JsrTestUtils.restartJob(execution1.getExecutionId(), jobParameters, 1000000l);
+		assertEquals(BatchStatus.COMPLETED, execution2.getBatchStatus());
+		assertEquals(1, MyPartitionReducer.beginCount);
+		assertEquals(1, MyPartitionReducer.beforeCount);
+		assertEquals(0, MyPartitionReducer.rollbackCount);
+		assertEquals(1, MyPartitionReducer.afterCount);
+		assertEquals(5, CountingPartitionCollector.collected);
+	}
+
+	public static class CountingPartitionCollector implements PartitionCollector {
+
+		public static int collected = 0;
+
+		public static void reset() {
+			collected = 0;
+		}
+
+		@Override
+		public Serializable collectPartitionData() throws Exception {
+			collected++;
+
+			return null;
+		}
+	}
+
+	public static class MyPartitionReducer implements PartitionReducer {
+
+		public static int beginCount = 0;
+		public static int beforeCount = 0;
+		public static int rollbackCount = 0;
+		public static int afterCount = 0;
+
+		public static void reset() {
+			beginCount = 0;
+			beforeCount = 0;
+			rollbackCount = 0;
+			afterCount = 0;
+		}
+
+		@Override
+		public void beginPartitionedStep() throws Exception {
+			beginCount++;
+		}
+
+		@Override
+		public void beforePartitionedStepCompletion() throws Exception {
+			beforeCount++;
+		}
+
+		@Override
+		public void rollbackPartitionedStep() throws Exception {
+			rollbackCount++;
+		}
+
+		@Override
+		public void afterPartitionedStepCompletion(PartitionStatus status)
+				throws Exception {
+			afterCount++;
+		}
+	}
+
+	public static class MyPartitionMapper implements PartitionMapper {
+
+		private static int count = 0;
+
+		@Inject
+		@BatchProperty
+		String overrideString = "false";
+
+		@Override
+		public PartitionPlan mapPartitions() throws Exception {
+			count++;
+
+			PartitionPlan plan = new PartitionPlanImpl();
+
+			if(count % 2 == 1) {
+				plan.setPartitions(3);
+				plan.setThreads(3);
+			} else {
+				plan.setPartitions(5);
+				plan.setThreads(5);
+			}
+
+			plan.setPartitionsOverride(Boolean.valueOf(overrideString));
+
+			Properties[] props = new Properties[3];
+			props[0] = new Properties();
+			props[1] = new Properties();
+			props[2] = new Properties();
+
+			if(count % 2 == 1) {
+				props[1].put("fail", "true");
+			}
+
+			plan.setPartitionProperties(props);
+			return plan;
+		}
+	}
+
+	public static class MyBatchlet extends BatchletSupport {
+		@Inject
+		@BatchProperty
+		String fail;
+
+		@Override
+		public String process() {
+			if("true".equalsIgnoreCase(fail)) {
+				throw new RuntimeException("Expected");
+			}
+
+			return null;
+		}
 	}
 
 	public static class Analyzer implements PartitionAnalyzer {

@@ -17,6 +17,7 @@ package org.springframework.batch.core.jsr.configuration.xml;
 
 import java.util.List;
 import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.concurrent.locks.ReentrantLock;
 
 import org.springframework.batch.core.jsr.configuration.support.BatchArtifact.BatchArtifactType;
 import org.springframework.batch.core.jsr.partition.JsrPartitionHandler;
@@ -55,14 +56,17 @@ public class PartitionParser {
 	private static final String LISTENERS_PROPERTY = "listeners";
 	private static final String THREADS_PROPERTY = "threads";
 	private static final String PARTITIONS_PROPERTY = "partitions";
+	private static final String PARTITION_LOCK_PROPERTY = "partitionLock";
 
 	private final String name;
+	private boolean allowStartIfComplete = false;
 
 	/**
 	 * @param stepName the name of the step that is being partitioned
 	 */
-	public PartitionParser(String stepName) {
+	public PartitionParser(String stepName, boolean allowStartIfComplete) {
 		this.name = stepName;
+		this.allowStartIfComplete = allowStartIfComplete;
 	}
 
 	public void parse(Element element, AbstractBeanDefinition bd, ParserContext parserContext, String stepName) {
@@ -74,6 +78,8 @@ public class PartitionParser {
 
 		MutablePropertyValues properties = partitionHandlerDefinition.getPropertyValues();
 		properties.addPropertyValue(PARTITION_CONTEXT_PROPERTY, new RuntimeBeanReference("batchPropertyContext"));
+		properties.addPropertyValue("jobRepository", new RuntimeBeanReference("jobRepository"));
+		properties.addPropertyValue("allowStartIfComplete", allowStartIfComplete);
 
 		paserMapperElement(element, parserContext, properties);
 		parsePartitionPlan(element, parserContext, stepName, properties);
@@ -85,7 +91,6 @@ public class PartitionParser {
 		String partitionHandlerBeanName = name + ".partitionHandler";
 		registry.registerBeanDefinition(partitionHandlerBeanName, partitionHandlerDefinition);
 		factoryBeanProperties.add("partitionHandler", new RuntimeBeanReference(partitionHandlerBeanName));
-
 	}
 
 	private void parseCollectorElement(Element element,
@@ -98,7 +103,9 @@ public class PartitionParser {
 			// Only needed if a collector is used
 			registerCollectorAnalyzerQueue(parserContext);
 			properties.add(PARTITION_QUEUE_PROPERTY, new RuntimeBeanReference(name + "PartitionQueue"));
+			properties.add(PARTITION_LOCK_PROPERTY, new RuntimeBeanReference(name + "PartitionLock"));
 			factoryBeanProperties.add("partitionQueue", new RuntimeBeanReference(name + "PartitionQueue"));
+			factoryBeanProperties.add("partitionLock", new RuntimeBeanReference(name + "PartitionLock"));
 			String collectorName = collectorElement.getAttribute(REF);
 			factoryBeanProperties.add(LISTENERS_PROPERTY, new RuntimeBeanReference(collectorName));
 			new PropertyParser(collectorName, parserContext, BatchArtifactType.STEP_ARTIFACT, name).parseProperties(collectorElement);
@@ -142,8 +149,11 @@ public class PartitionParser {
 	private void registerCollectorAnalyzerQueue(ParserContext parserContext) {
 		AbstractBeanDefinition partitionQueueDefinition = BeanDefinitionBuilder.genericBeanDefinition(ConcurrentLinkedQueue.class)
 				.getBeanDefinition();
+		AbstractBeanDefinition partitionLockDefinition = BeanDefinitionBuilder.genericBeanDefinition(ReentrantLock.class)
+				.getBeanDefinition();
 
 		parserContext.getRegistry().registerBeanDefinition(name + "PartitionQueue", partitionQueueDefinition);
+		parserContext.getRegistry().registerBeanDefinition(name + "PartitionLock", partitionLockDefinition);
 	}
 
 	protected void parsePartitionPlan(Element element,

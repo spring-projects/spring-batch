@@ -24,6 +24,7 @@ import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Queue;
 import java.util.Set;
+import java.util.concurrent.locks.ReentrantLock;
 
 import javax.batch.api.chunk.listener.RetryProcessListener;
 import javax.batch.api.chunk.listener.RetryReadListener;
@@ -163,6 +164,8 @@ public class StepParserStepFactoryBean<I, O> implements FactoryBean, BeanNameAwa
 
 	private Queue<Serializable> partitionQueue;
 
+	private ReentrantLock partitionLock;
+
 	//
 	// Tasklet Elements
 	//
@@ -246,6 +249,15 @@ public class StepParserStepFactoryBean<I, O> implements FactoryBean, BeanNameAwa
 	 */
 	public void setPartitionQueue(Queue<Serializable> queue) {
 		this.partitionQueue = queue;
+	}
+
+	/**
+	 * Used to coordinate access to the partition queue between the {@link PartitionCollector} and {@link PartitionAnalyzer}
+	 *
+	 * @param lock a lock that will be locked around accessing the partition queue
+	 */
+	public void setPartitionLock(ReentrantLock lock) {
+		this.partitionLock = lock;
 	}
 
 	/**
@@ -474,6 +486,10 @@ public class StepParserStepFactoryBean<I, O> implements FactoryBean, BeanNameAwa
 
 		enhanceCommonStep(builder);
 		for (ChunkListener listener : chunkListeners) {
+			if(listener instanceof PartitionCollectorAdapter) {
+				((PartitionCollectorAdapter) listener).setPartitionLock(partitionLock);
+			}
+
 			builder.listener(listener);
 
 		}

@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 the original author or authors.
+ * Copyright 2013-2014 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,6 +17,7 @@ package org.springframework.batch.core.jsr.partition;
 
 import java.io.Serializable;
 import java.util.Queue;
+import java.util.concurrent.locks.ReentrantLock;
 
 import javax.batch.api.partition.PartitionCollector;
 import javax.batch.operations.BatchRuntimeException;
@@ -38,6 +39,7 @@ public class PartitionCollectorAdapter implements ChunkListener {
 
 	private PartitionCollector collector;
 	private Queue<Serializable> partitionQueue;
+	private ReentrantLock lock;
 
 	public PartitionCollectorAdapter(Queue<Serializable> queue, PartitionCollector collector) {
 		Assert.notNull(queue, "A thread safe Queue is required");
@@ -47,6 +49,10 @@ public class PartitionCollectorAdapter implements ChunkListener {
 		this.collector = collector;
 	}
 
+	public void setPartitionLock(ReentrantLock lock) {
+		this.lock = lock;
+	}
+
 	@Override
 	public void beforeChunk(ChunkContext context) {
 	}
@@ -54,22 +60,40 @@ public class PartitionCollectorAdapter implements ChunkListener {
 	@Override
 	public void afterChunk(ChunkContext context) {
 		try {
-			synchronized (partitionQueue) {
-				partitionQueue.add(collector.collectPartitionData());
+			if(context.isComplete()) {
+				lock.lock();
+				Serializable collectPartitionData = collector.collectPartitionData();
+
+				if(collectPartitionData != null) {
+					partitionQueue.add(collectPartitionData);
+				}
 			}
 		} catch (Throwable e) {
 			throw new BatchRuntimeException("An error occured while collecting data from the PartionCollector", e);
+		} finally {
+			if(lock.isHeldByCurrentThread()) {
+				lock.unlock();
+			}
 		}
 	}
 
 	@Override
 	public void afterChunkError(ChunkContext context) {
 		try {
-			synchronized (partitionQueue) {
-				partitionQueue.add(collector.collectPartitionData());
+			lock.lock();
+			if(context.isComplete()) {
+				Serializable collectPartitionData = collector.collectPartitionData();
+
+				if(collectPartitionData != null) {
+					partitionQueue.add(collectPartitionData);
+				}
 			}
 		} catch (Throwable e) {
 			throw new BatchRuntimeException("An error occured while collecting data from the PartionCollector", e);
+		} finally {
+			if(lock.isHeldByCurrentThread()) {
+				lock.unlock();
+			}
 		}
 	}
 }
