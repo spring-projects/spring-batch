@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2013 the original author or authors.
+ * Copyright 2006-2014 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -322,12 +322,12 @@ InitializingBean {
 			if (logger.isDebugEnabled()) {
 				logger.debug("Full exception", e);
 			}
-			execution.setExitStatus(getDefaultExitStatusForFailure(e));
+			execution.setExitStatus(getDefaultExitStatusForFailure(e, execution));
 			execution.setStatus(BatchStatus.max(BatchStatus.STOPPED, e.getStatus()));
 			execution.addFailureException(e);
 		} catch (Throwable t) {
 			logger.error("Encountered fatal error executing job", t);
-			execution.setExitStatus(getDefaultExitStatusForFailure(t));
+			execution.setExitStatus(getDefaultExitStatusForFailure(t, execution));
 			execution.setStatus(BatchStatus.FAILED);
 			execution.addFailureException(t);
 		} finally {
@@ -394,7 +394,7 @@ InitializingBean {
 	 *            the cause of the failure
 	 * @return an {@link ExitStatus}
 	 */
-	private ExitStatus getDefaultExitStatusForFailure(Throwable ex) {
+	protected ExitStatus getDefaultExitStatusForFailure(Throwable ex, JobExecution execution) {
 		ExitStatus exitStatus;
 		if (ex instanceof JobInterruptedException
 				|| ex.getCause() instanceof JobInterruptedException) {

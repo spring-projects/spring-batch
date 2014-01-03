@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 the original author or authors.
+ * Copyright 2013-2014 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -42,8 +42,9 @@ public class JsrFlowExecutor extends JobFlowExecutor {
 	 */
 	@Override
 	public void addExitStatus(String code) {
-		if((exitStatus != null && isNonDefaultExitStatus(exitStatus.getExitCode())) && !isNonDefaultExitStatus(code)) {
-			exitStatus = exitStatus.and(new ExitStatus(code));
+		ExitStatus status = new ExitStatus(code);
+		if((exitStatus != null && ExitStatus.isNonDefaultExitStatus(exitStatus)) && !ExitStatus.isNonDefaultExitStatus(status)) {
+			exitStatus = exitStatus.and(status);
 		}
 	}
 
@@ -57,26 +58,12 @@ public class JsrFlowExecutor extends JobFlowExecutor {
 		execution.setStatus(findBatchStatus(status));
 
 		ExitStatus curStatus = execution.getExitStatus();
-		if(isNonDefaultExitStatus(curStatus.getExitCode())) {
+		if(ExitStatus.isNonDefaultExitStatus(curStatus)) {
 			exitStatus = exitStatus.and(new ExitStatus(status.getName()));
 			execution.setExitStatus(exitStatus);
 		} else {
 			exitStatus = exitStatus.and(curStatus);
 			execution.setExitStatus(exitStatus);
 		}
-	}
-
-	/**
-	 * @param curStatus the exit code to be evaluated
-	 * @return true if the value matches a known exit code
-	 */
-	protected boolean isNonDefaultExitStatus(String curStatus) {
-		return curStatus == null ||
-				curStatus.equals(ExitStatus.COMPLETED.getExitCode()) ||
-				curStatus.equals(ExitStatus.EXECUTING.getExitCode()) ||
-				curStatus.equals(ExitStatus.FAILED.getExitCode()) ||
-				curStatus.equals(ExitStatus.NOOP.getExitCode()) ||
-				curStatus.equals(ExitStatus.STOPPED.getExitCode()) ||
-				curStatus.equals(ExitStatus.UNKNOWN.getExitCode());
 	}
 }

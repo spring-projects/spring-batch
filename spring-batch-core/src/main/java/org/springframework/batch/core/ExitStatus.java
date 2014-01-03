@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2013 the original author or authors.
+ * Copyright 2006-2014 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -269,4 +269,17 @@ public class ExitStatus implements Serializable, Comparable<ExitStatus> {
 		return addExitDescription(message);
 	}
 
+	/**
+	 * @param status the exit code to be evaluated
+	 * @return true if the value matches a known exit code
+	 */
+	public static boolean isNonDefaultExitStatus(ExitStatus status) {
+		return status == null || status.getExitCode() == null ||
+				status.getExitCode().equals(ExitStatus.COMPLETED.getExitCode()) ||
+				status.getExitCode().equals(ExitStatus.EXECUTING.getExitCode()) ||
+				status.getExitCode().equals(ExitStatus.FAILED.getExitCode()) ||
+				status.getExitCode().equals(ExitStatus.NOOP.getExitCode()) ||
+				status.getExitCode().equals(ExitStatus.STOPPED.getExitCode()) ||
+				status.getExitCode().equals(ExitStatus.UNKNOWN.getExitCode());
+	}
 }
