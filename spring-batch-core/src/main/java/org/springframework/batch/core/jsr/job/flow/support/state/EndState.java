@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 the original author or authors.
+ * Copyright 2013-2014 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -64,22 +64,9 @@ public class EndState extends org.springframework.batch.core.job.flow.support.st
 	protected void setExitStatus(FlowExecutor executor, String code) {
 		StepExecution stepExecution = executor.getStepExecution();
 
-		if(!isNonDefaultExitStatus(code)) {
-			stepExecution.getJobExecution().setExitStatus(new ExitStatus(code));
+		ExitStatus status = new ExitStatus(code);
+		if(!ExitStatus.isNonDefaultExitStatus(status)) {
+			stepExecution.getJobExecution().setExitStatus(status);
 		}
-	}
-
-	/**
-	 * @param curStatus the exit code to be evaluated
-	 * @return true if the value matches a known exit code
-	 */
-	protected boolean isNonDefaultExitStatus(String curStatus) {
-		return curStatus == null ||
-				curStatus.equals(ExitStatus.COMPLETED.getExitCode()) ||
-				curStatus.equals(ExitStatus.EXECUTING.getExitCode()) ||
-				curStatus.equals(ExitStatus.FAILED.getExitCode()) ||
-				curStatus.equals(ExitStatus.NOOP.getExitCode()) ||
-				curStatus.equals(ExitStatus.STOPPED.getExitCode()) ||
-				curStatus.equals(ExitStatus.UNKNOWN.getExitCode());
 	}
 }

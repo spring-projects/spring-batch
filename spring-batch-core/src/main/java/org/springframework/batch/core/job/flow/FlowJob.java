@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2007 the original author or authors.
+ * Copyright 2006-2014 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -93,7 +93,12 @@ public class FlowJob extends AbstractJob {
 	private void findSteps(Flow flow, Map<String, Step> map) {
 
 		for (State state : flow.getStates()) {
-			if (state instanceof StepHolder) {
+			if (state instanceof StepLocator) {
+				StepLocator locator = (StepLocator) state;
+				for (String name : locator.getStepNames()) {
+					map.put(name, locator.getStep(name));
+				}
+			} else if (state instanceof StepHolder) {
 				Step step = ((StepHolder) state).getStep();
 				String name = step.getName();
 				stepMap.put(name, step);
@@ -101,12 +106,6 @@ public class FlowJob extends AbstractJob {
 			else if (state instanceof FlowHolder) {
 				for (Flow subflow : ((FlowHolder) state).getFlows()) {
 					findSteps(subflow, map);
-				}
-			}
-			else if (state instanceof StepLocator) {
-				StepLocator locator = (StepLocator) state;
-				for (String name : locator.getStepNames()) {
-					map.put(name, locator.getStep(name));
 				}
 			}
 		}

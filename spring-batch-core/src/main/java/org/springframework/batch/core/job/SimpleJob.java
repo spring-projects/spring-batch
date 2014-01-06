@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2013 the original author or authors.
+ * Copyright 2006-2014 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -28,6 +28,7 @@ import org.springframework.batch.core.StartLimitExceededException;
 import org.springframework.batch.core.Step;
 import org.springframework.batch.core.StepExecution;
 import org.springframework.batch.core.repository.JobRestartException;
+import org.springframework.batch.core.step.StepLocator;
 
 /**
  * Simple implementation of {@link Job} interface providing the ability to run a
@@ -37,6 +38,7 @@ import org.springframework.batch.core.repository.JobRestartException;
  *
  * @author Lucas Ward
  * @author Dave Syer
+ * @author Michael Minella
  */
 public class SimpleJob extends AbstractJob {
 
@@ -77,6 +79,10 @@ public class SimpleJob extends AbstractJob {
 		List<String> names = new ArrayList<String>();
 		for (Step step : steps) {
 			names.add(step.getName());
+
+			if(step instanceof StepLocator) {
+				names.addAll(((StepLocator)step).getStepNames());
+			}
 		}
 		return names;
 	}
@@ -101,6 +107,11 @@ public class SimpleJob extends AbstractJob {
 		for (Step step : this.steps) {
 			if (step.getName().equals(stepName)) {
 				return step;
+			} else if(step instanceof StepLocator) {
+				Step result = ((StepLocator)step).getStep(stepName);
+				if(result != null) {
+					return result;
+				}
 			}
 		}
 		return null;

@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2013 the original author or authors.
+ * Copyright 2006-2014 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -43,6 +43,10 @@ import org.springframework.batch.core.job.flow.support.state.EndState;
 import org.springframework.batch.core.job.flow.support.state.FlowState;
 import org.springframework.batch.core.job.flow.support.state.SplitState;
 import org.springframework.batch.core.job.flow.support.state.StepState;
+import org.springframework.batch.core.jsr.configuration.support.BatchPropertyContext;
+import org.springframework.batch.core.jsr.partition.JsrPartitionHandler;
+import org.springframework.batch.core.jsr.step.PartitionStep;
+import org.springframework.batch.core.partition.JsrStepExecutionSplitter;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.repository.dao.JobExecutionDao;
 import org.springframework.batch.core.repository.support.MapJobRepositoryFactoryBean;
@@ -549,6 +553,38 @@ public class FlowJobTests {
 		Step step = job.getStep("step2");
 		assertNotNull(step);
 		assertEquals("step2", step.getName());
+	}
+
+	@Test
+	public void testGetPartitionedStep() throws Exception {
+		SimpleFlow flow = new SimpleFlow("job");
+		List<StateTransition> transitions = new ArrayList<StateTransition>();
+		PartitionStep step = new PartitionStep();
+		step.setName("step1");
+		JsrPartitionHandler partitionHandler = new JsrPartitionHandler();
+		partitionHandler.setPropertyContext(new BatchPropertyContext());
+		partitionHandler.setPartitions(3);
+		partitionHandler.setJobRepository(jobRepository);
+		partitionHandler.setStep(new StubStep("subStep"));
+		partitionHandler.afterPropertiesSet();
+		step.setPartitionHandler(partitionHandler);
+		step.setStepExecutionSplitter(new JsrStepExecutionSplitter(jobRepository, false, "step1", true));
+		step.setJobRepository(jobRepository);
+		step.afterPropertiesSet();
+		transitions.add(StateTransition.createStateTransition(new StepState("job.step", step), "end0"));
+		transitions.add(StateTransition.createEndStateTransition(new EndState(FlowExecutionStatus.COMPLETED, "end0")));
+		flow.setStateTransitions(transitions);
+		flow.afterPropertiesSet();
+		job.setFlow(flow);
+		job.afterPropertiesSet();
+
+		job.execute(jobRepository.createJobExecution("partitionJob", new JobParameters()));
+
+		assertEquals(3, step.getStepNames().size());
+		Step subStep = job.getStep("step1:partition0");
+		assertNotNull(subStep);
+		assertEquals("subStep", subStep.getName());
+		assertNull(job.getStep("step that does not exist"));
 	}
 
 	@Test
