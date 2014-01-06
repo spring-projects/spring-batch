@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2013 the original author or authors.
+ * Copyright 2006-2014 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,20 +16,27 @@
 
 package org.springframework.batch.core.job.flow.support.state;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+
 import org.springframework.batch.core.Step;
 import org.springframework.batch.core.job.flow.FlowExecutionStatus;
 import org.springframework.batch.core.job.flow.FlowExecutor;
 import org.springframework.batch.core.job.flow.State;
+import org.springframework.batch.core.step.NoSuchStepException;
 import org.springframework.batch.core.step.StepHolder;
+import org.springframework.batch.core.step.StepLocator;
 
 /**
  * {@link State} implementation that delegates to a {@link FlowExecutor} to
  * execute the specified {@link Step}.
  *
  * @author Dave Syer
+ * @author Michael Minella
  * @since 2.0
  */
-public class StepState extends AbstractState implements StepHolder {
+public class StepState extends AbstractState implements StepLocator, StepHolder {
 
 	private final Step step;
 
@@ -61,7 +68,7 @@ public class StepState extends AbstractState implements StepHolder {
 	}
 
 	/**
-	 * @return the step
+	 * @deprecated in favor of using {@link StepLocator#getStep(String)}.
 	 */
 	@Override
 	public Step getStep() {
@@ -76,4 +83,35 @@ public class StepState extends AbstractState implements StepHolder {
 		return false;
 	}
 
+	/* (non-Javadoc)
+	 * @see org.springframework.batch.core.step.StepLocator#getStepNames()
+	 */
+	@Override
+	public Collection<String> getStepNames() {
+		List<String> names = new ArrayList<String>();
+
+		names.add(step.getName());
+
+		if(step instanceof StepLocator) {
+			names.addAll(((StepLocator)step).getStepNames());
+		}
+
+		return names;
+	}
+
+	/* (non-Javadoc)
+	 * @see org.springframework.batch.core.step.StepLocator#getStep(java.lang.String)
+	 */
+	@Override
+	public Step getStep(String stepName) throws NoSuchStepException {
+		Step result = null;
+
+		if(step.getName().equals(stepName)) {
+			result = step;
+		} else if(step instanceof StepLocator) {
+			result = ((StepLocator) step).getStep(stepName);
+		}
+
+		return result;
+	}
 }
