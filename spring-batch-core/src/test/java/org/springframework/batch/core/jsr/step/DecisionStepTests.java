@@ -2,8 +2,11 @@ package org.springframework.batch.core.jsr.step;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
+import static org.springframework.batch.core.jsr.JsrTestUtils.restartJob;
+import static org.springframework.batch.core.jsr.JsrTestUtils.runJob;
 
 import java.util.List;
+import java.util.Properties;
 
 import javax.batch.api.Decider;
 import javax.batch.runtime.StepExecution;
@@ -115,6 +118,17 @@ public class DecisionStepTests {
 	@Test
 	@Ignore("Splits are not implemented yet as part of our JSR implementation")
 	public void testDecisionAfterSplit() {
+	}
+
+	@Test
+	public void testDecisionOnRestart() throws Exception {
+		javax.batch.runtime.JobExecution jobExecution = runJob("DecisionStepTests-executeDecisionOnRestart", new Properties(), 10000l);
+		assertEquals("next", jobExecution.getExitStatus());
+		assertEquals(javax.batch.runtime.BatchStatus.FAILED, jobExecution.getBatchStatus());
+
+		javax.batch.runtime.JobExecution restartedJobExecution = restartJob(jobExecution.getExecutionId(), new Properties(), 10000l);
+		assertEquals("next", restartedJobExecution.getExitStatus());
+		assertEquals(javax.batch.runtime.BatchStatus.FAILED, jobExecution.getBatchStatus());
 	}
 
 	public static class NextDecider implements Decider {

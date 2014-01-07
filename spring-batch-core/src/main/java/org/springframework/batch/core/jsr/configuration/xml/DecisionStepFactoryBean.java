@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 the original author or authors.
+ * Copyright 2013-2014 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -28,6 +28,7 @@ import org.springframework.util.Assert;
  * {@link FactoryBean} for creating a {@link DecisionStep}.
  *
  * @author Michael Minella
+ * @author Chris Schaefer
  * @since 3.0
  */
 public class DecisionStepFactoryBean implements FactoryBean<Step>, InitializingBean {
@@ -65,10 +66,10 @@ public class DecisionStepFactoryBean implements FactoryBean<Step>, InitializingB
 	 */
 	@Override
 	public Step getObject() throws Exception {
-
 		DecisionStep decisionStep = new DecisionStep(jsrDecider);
 		decisionStep.setName(name);
 		decisionStep.setJobRepository(jobRepository);
+		decisionStep.setAllowStartIfComplete(true);
 
 		return decisionStep;
 	}
