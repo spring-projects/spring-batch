@@ -1,0 +1,135 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:beans="http://www.springframework.org/schema/beans" xmlns:integration="http://www.springframework.org/schema/integration"
+	xmlns:batch="http://www.springframework.org/schema/batch" xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:aop="http://www.springframework.org/schema/aop" xmlns:int-jdbc="http://www.springframework.org/schema/integration/jdbc"
+	xmlns:jdbc="http://www.springframework.org/schema/jdbc"
+	xsi:schemaLocation="http://www.springframework.org/schema/jdbc http://www.springframework.org/schema/jdbc/spring-jdbc.xsd
+		http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop.xsd
+		http://www.springframework.org/schema/integration http://www.springframework.org/schema/integration/spring-integration.xsd
+		http://www.springframework.org/schema/integration/jms http://www.springframework.org/schema/integration/jms/spring-integration-jms.xsd
+		http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/batch http://www.springframework.org/schema/batch/spring-batch-2.2.xsd
+		http://www.springframework.org/schema/integration/jdbc http://www.springframework.org/schema/integration/jdbc/spring-integration-jdbc.xsd
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd">
+
+	<job id="job" xmlns="http://www.springframework.org/schema/batch">
+		<step id="step">
+			<tasklet>
+				<chunk reader="reader" writer="writer" commit-interval="2" skip-limit="2" retry-limit="10">
+					<retryable-exception-classes>
+						<include class="org.springframework.dao.CannotAcquireLockException" />
+					</retryable-exception-classes>
+					<skippable-exception-classes>
+						<include class="java.lang.IllegalStateException" />
+					</skippable-exception-classes>
+				</chunk>
+			</tasklet>
+		</step>
+	</job>
+
+	<bean id="reader" class="org.springframework.batch.integration.chunk.TestItemReader" scope="step">
+		<property name="items">
+			<list>
+				<value>1</value>
+				<value>2</value>
+				<value>#{jobParameters['item.three']}</value>
+				<value>4</value>
+				<value>5</value>
+				<value>6</value>
+				<value>7</value>
+				<value>8</value>
+				<value>9</value>
+			</list>
+		</property>
+	</bean>
+
+	<bean id="writer" class="org.springframework.batch.integration.chunk.TestItemWriter" />
+
+	<bean id="chunkWriter" class="org.springframework.batch.integration.chunk.ChunkMessageChannelItemWriter" scope="step">
+		<property name="messagingOperations" ref="messagingGateway" />
+		<property name="replyChannel" ref="replies" />
+		<property name="maxWaitTimeouts" value="10" />
+	</bean>
+
+	<bean id="messagingGateway" class="org.springframework.integration.core.MessagingTemplate">
+		<property name="defaultChannel" ref="requests" />
+		<property name="receiveTimeout" value="1000" />
+	</bean>
+
+	<bean id="retryAdvice" class="org.springframework.retry.interceptor.RetryOperationsInterceptor">
+		<property name="retryOperations">
+			<bean class="org.springframework.retry.support.RetryTemplate">
+				<property name="retryPolicy">
+					<bean class="org.springframework.retry.policy.SimpleRetryPolicy">
+						<constructor-arg value="10" />
+						<constructor-arg>
+							<map key-type="java.lang.Class" value-type="java.lang.Boolean">
+								<entry key="org.springframework.dao.CannotAcquireLockException" value="true" />
+							</map>
+						</constructor-arg>
+					</bean>
+				</property>
+			</bean>
+		</property>
+	</bean>
+
+	<!--
+		The chunk writer listens for results coming back, and can fail to acquire a lock. This is especially true for
+		in-memory databases (MySql and Orackle seem to deal with locks better)
+	-->
+	<aop:config proxy-target-class="true">
+		<aop:advisor advice-ref="retryAdvice" pointcut="execution(* org.springframework.integration.core.MessagingTemplate.receive(..))" />
+	</aop:config>
+
+	<int-jdbc:message-store id="messageStore" data-source="dataSource" />
+
+	<integration:channel id="requests">
+		<integration:queue message-store="messageStore" />
+	</integration:channel>
+	<integration:channel id="replies">
+		<integration:queue message-store="messageStore" />
+	</integration:channel>
+	<integration:service-activator input-channel="requests" output-channel="replies" ref="chunkHandler">
+		<integration:poller fixed-delay="100">
+			<integration:transactional isolation="READ_COMMITTED" />
+		</integration:poller>
+	</integration:service-activator>
+
+	<bean id="chunkHandler" class="org.springframework.batch.integration.chunk.RemoteChunkHandlerFactoryBean">
+		<property name="chunkWriter" ref="chunkWriter" />
+		<property name="step" ref="step" />
+	</bean>
+
+	<bean id="dataSource" class="org.apache.commons.dbcp.BasicDataSource">
+		<property name="driverClassName" value="${batch.jdbc.driver}" />
+		<property name="url" value="${batch.jdbc.url}" />
+		<property name="username" value="${batch.jdbc.user}" />
+		<property name="password" value="${batch.jdbc.password}" />
+		<property name="testWhileIdle" value="${batch.jdbc.testWhileIdle}" />
+		<property name="validationQuery" value="${batch.jdbc.validationQuery}" />
+	</bean>
+
+	<bean id="transactionManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+		<property name="dataSource" ref="dataSource" />
+	</bean>
+
+	<context:property-placeholder location="classpath:config-${ENVIRONMENT:hsql}.properties"
+		system-properties-mode="OVERRIDE" ignore-resource-not-found="true" ignore-unresolvable="true" />
+
+	<!--  Initialise the database if enabled: -->
+	<jdbc:initialize-database data-source="dataSource" enabled="${batch.data.source.init}"
+		ignore-failures="DROPS">
+		<jdbc:script location="${batch.drop.script}" />
+		<jdbc:script location="${batch.schema.script}" />
+		<jdbc:script location="${integration.drop.script}" />
+		<jdbc:script location="${integration.schema.script}" />
+	</jdbc:initialize-database>
+
+	<batch:job-repository id="jobRepository" />
+
+	<bean id="jobLauncher" class="org.springframework.batch.core.launch.support.SimpleJobLauncher">
+		<property name="jobRepository" ref="jobRepository" />
+	</bean>
+
+</beans>

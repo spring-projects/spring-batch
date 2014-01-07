@@ -1,0 +1,2 @@
+http\://www.springframework.org/schema/batch-integration/spring-batch-integration-1.3.xsd=org/springframework/batch/integration/config/xml/spring-batch-integration-1.3.xsd
+http\://www.springframework.org/schema/batch-integration/spring-batch-integration.xsd=org/springframework/batch/integration/config/xml/spring-batch-integration-1.3.xsd
