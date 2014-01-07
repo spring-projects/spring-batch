@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:beans="http://www.springframework.org/schema/beans" xmlns:integration="http://www.springframework.org/schema/integration"
+	xmlns:batch="http://www.springframework.org/schema/batch" xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:task="http://www.springframework.org/schema/task"
+	xsi:schemaLocation="http://www.springframework.org/schema/integration http://www.springframework.org/schema/integration/spring-integration.xsd
+		http://www.springframework.org/schema/task http://www.springframework.org/schema/task/spring-task.xsd
+		http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/batch http://www.springframework.org/schema/batch/spring-batch-2.2.xsd
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd">
+
+	<job id="job" xmlns="http://www.springframework.org/schema/batch">
+		<step id="step">
+			<tasklet>
+				<chunk reader="reader" writer="writer" commit-interval="2" />
+			</tasklet>
+		</step>
+	</job>
+
+	<bean id="reader" class="org.springframework.batch.integration.chunk.TestItemReader" scope="step">
+		<property name="items">
+			<list>
+				<value>1</value>
+				<value>2</value>
+				<value>#{jobParameters['item.three']}</value>
+				<value>4</value>
+				<value>5</value>
+				<value>6</value>
+				<value>7</value>
+				<value>8</value>
+				<value>9</value>
+			</list>
+		</property>
+	</bean>
+
+	<bean id="writer" class="org.springframework.batch.integration.chunk.TestItemWriter" />
+
+	<bean id="chunkWriter" class="org.springframework.batch.integration.chunk.ChunkMessageChannelItemWriter" scope="step">
+		<property name="messagingOperations" ref="messagingGateway" />
+		<property name="replyChannel" ref="replies" />
+	</bean>
+
+	<bean id="messagingGateway" class="org.springframework.integration.core.MessagingTemplate">
+		<property name="defaultChannel" ref="requests" />
+		<property name="receiveTimeout" value="1000" />
+	</bean>
+
+	<task:executor id="poolExecutor" pool-size="5-10" queue-capacity="0" />
+
+	<!-- A pub-sub channel with task executor is a decent approximation to a JMS outbound adapter -->
+	<integration:publish-subscribe-channel id="requests" task-executor="poolExecutor" />
+	<integration:channel id="replies">
+		<integration:queue />
+	</integration:channel>
+	<integration:service-activator input-channel="requests" output-channel="replies" ref="chunkHandler" />
+
+	<bean id="chunkHandler" class="org.springframework.batch.integration.chunk.RemoteChunkHandlerFactoryBean">
+		<property name="chunkWriter" ref="chunkWriter" />
+		<property name="step" ref="step" />
+	</bean>
+
+	<bean id="transactionManager" class="org.springframework.batch.support.transaction.ResourcelessTransactionManager" />
+
+	<bean id="jobRepository" class="org.springframework.batch.core.repository.support.MapJobRepositoryFactoryBean">
+		<property name="transactionManager" ref="transactionManager" />
+	</bean>
+
+	<bean id="jobLauncher" class="org.springframework.batch.core.launch.support.SimpleJobLauncher">
+		<property name="jobRepository" ref="jobRepository" />
+	</bean>
+
+</beans>

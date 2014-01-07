@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:integration="http://www.springframework.org/schema/integration"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:batch-integration="http://www.springframework.org/schema/batch-integration"
+	xsi:schemaLocation="http://www.springframework.org/schema/batch-integration http://www.springframework.org/schema/batch-integration/spring-batch-integration.xsd
+		http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/integration http://www.springframework.org/schema/integration/spring-integration.xsd">
+		
+	<import resource="classpath:simple-job-launcher-context.xml" />
+	<integration:annotation-config/>
+	<integration:channel id="requests" />
+	<integration:channel id="response">
+		<integration:queue/>
+	</integration:channel>
+
+	<batch-integration:job-launching-gateway request-channel="requests" job-launcher="jobLauncher" />
+
+	<bean id="testJob" parent="simpleJob">
+		<property name="steps" ref="step" />
+	</bean>
+	<bean id="step" parent="taskletStep">
+		<property name="tasklet" ref="tasklet"/>
+	</bean>
+
+	<bean id="tasklet" class="org.springframework.batch.integration.step.TestTasklet" />
+</beans>

@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:integration="http://www.springframework.org/schema/integration"
+	xmlns:context="http://www.springframework.org/schema/context" xmlns:aop="http://www.springframework.org/schema/aop"
+	xmlns:tx="http://www.springframework.org/schema/tx" xmlns:p="http://www.springframework.org/schema/p" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="
+		http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.5.xsd
+		http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-2.5.xsd
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-2.5.xsd
+		http://www.springframework.org/schema/integration
+                                 http://www.springframework.org/schema/integration/spring-integration.xsd
+		http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-2.5.xsd">
+	<import resource="classpath:simple-job-launcher-context.xml" />
+	<integration:annotation-config/>
+	<integration:channel id="requests" />
+	<integration:channel id="response">
+		<integration:queue/>
+	</integration:channel>
+
+	<integration:service-activator input-channel="requests" ref="jobLaunchingHandler" method="launch" />
+
+	<bean id="jobLaunchingHandler" class="org.springframework.batch.integration.launch.JobLaunchingMessageHandler">
+		<constructor-arg ref="jobLauncher" />
+	</bean>
+	<bean id="testJob" parent="simpleJob">
+		<property name="steps" ref="step" />
+	</bean>
+	<bean id="step" parent="taskletStep">
+		<property name="tasklet">
+			<bean class="org.springframework.batch.integration.step.TestTasklet" />
+		</property>
+	</bean>
+</beans>
