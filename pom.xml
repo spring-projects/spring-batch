@@ -13,6 +13,7 @@
 		<module>spring-batch-infrastructure</module>
 		<module>spring-batch-core</module>
 		<module>spring-batch-test</module>
+		<module>spring-batch-integration</module>
 	</modules>
 	<url>http://www.springsource.org/spring-batch</url>
 	<organization>
@@ -27,13 +28,13 @@
   </scm>
 	<issueManagement>
 		<system>JIRA</system>
-		<url>http://opensource.atlassian.com/projects/spring/browse/BATCH</url>
+		<url>https://jira.springsource.org/browse/BATCH</url>
 	</issueManagement>
 	<mailingLists>
 		<mailingList>
 			<name>Spring Batch Forum</name>
-			<post>http://forum.springframework.org/forumdisplay.php?f=41</post>
-			<archive>http://forum.springframework.org/forumdisplay.php?f=41</archive>
+			<post>http://forum.spring.io/forum/spring-projects/batch</post>
+			<archive>http://forum.spring.io/forum/spring-projects/batch</archive>
 		</mailingList>
 	</mailingLists>
 	<ciManagement>

@@ -18,13 +18,13 @@ package org.springframework.batch.integration.chunk;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
-import org.apache.commons.lang.SerializationUtils;
 import org.junit.Test;
 import org.springframework.batch.test.MetaDataInstanceFactory;
+import org.springframework.util.SerializationUtils;
 
 /**
  * @author Dave Syer
- * 
+ *
  */
 public class ChunkResponseTests {
 

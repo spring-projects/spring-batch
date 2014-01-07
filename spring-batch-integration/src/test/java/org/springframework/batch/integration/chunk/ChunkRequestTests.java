@@ -20,13 +20,13 @@ import static org.junit.Assert.assertNotNull;
 
 import java.util.Arrays;
 
-import org.apache.commons.lang.SerializationUtils;
 import org.junit.Test;
 import org.springframework.batch.test.MetaDataInstanceFactory;
+import org.springframework.util.SerializationUtils;
 
 /**
  * @author Dave Syer
- * 
+ *
  */
 public class ChunkRequestTests {
 
