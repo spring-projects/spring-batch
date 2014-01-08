@@ -74,7 +74,26 @@ public class JsrPartitionHandler implements PartitionHandler, InitializingBean {
 	private BatchPropertyContext propertyContext;
 	private JobRepository jobRepository;
 	private boolean allowStartIfComplete = false;
+	private Set<String> partitionStepNames = new HashSet<String>();
 
+	/**
+	 * @return the step that will be executed by each partition
+	 */
+	public Step getStep() {
+		return step;
+	}
+
+	/**
+	 * @return the names of each partitioned step
+	 */
+	public Collection<String> getPartitionStepNames() {
+		return partitionStepNames;
+	}
+
+	/**
+	 * @param allowStartIfComplete flag stating if the step should restart if it
+	 * 	was complete in a previous run
+	 */
 	public void setAllowStartIfComplete(boolean allowStartIfComplete) {
 		this.allowStartIfComplete = allowStartIfComplete;
 	}
@@ -156,6 +175,10 @@ public class JsrPartitionHandler implements PartitionHandler, InitializingBean {
 
 		Set<StepExecution> partitionStepExecutions = splitStepExecution(stepExecution, isRestart);
 
+		for (StepExecution curStepExecution : partitionStepExecutions) {
+			partitionStepNames.add(curStepExecution.getStepName());
+		}
+
 		taskExecutor.setCorePoolSize(threads);
 		taskExecutor.setMaxPoolSize(threads);
 
@@ -186,6 +209,15 @@ public class JsrPartitionHandler implements PartitionHandler, InitializingBean {
 		return result;
 	}
 
+	/**
+	 * Blocks until all partitioned steps have completed.  As each step completes
+	 * the PartitionAnalyzer analyzes the collector data received from each
+	 * partition (if there is any).
+	 *
+	 * @param tasks The {@link Future} that contains the reference to the executing step
+	 * @param result Set of completed {@link StepExecution}s
+	 * @throws Exception
+	 */
 	private void processPartitionResults(
 			final List<Future<StepExecution>> tasks,
 			final Set<StepExecution> result) throws Exception {
@@ -209,6 +241,16 @@ public class JsrPartitionHandler implements PartitionHandler, InitializingBean {
 		}
 	}
 
+	/**
+	 * Uses either the {@link PartitionMapper} or the hard coded configuration to split
+	 * the supplied master StepExecution into the slave StepExecutions.
+	 *
+	 * @param stepExecution master {@link StepExecution}
+	 * @param isRestart true if this step is being restarted
+	 * @return a {@link Set} of {@link StepExecution}s to be executed
+	 * @throws Exception
+	 * @throws JobExecutionException
+	 */
 	private Set<StepExecution> splitStepExecution(StepExecution stepExecution,
 			boolean isRestart) throws Exception, JobExecutionException {
 		Set<StepExecution> partitionStepExecutions = new HashSet<StepExecution>();
@@ -340,7 +382,7 @@ public class JsrPartitionHandler implements PartitionHandler, InitializingBean {
 	@Override
 	public void afterPropertiesSet() throws Exception {
 		Assert.notNull(propertyContext, "A BatchPropertyContext is required");
-		Assert.isTrue(mapper != null || threads > 0, "Either a mapper implementation or the number of partitions/threads is required");
+		Assert.isTrue(mapper != null || (threads > 0 || partitions > 0), "Either a mapper implementation or the number of partitions/threads is required");
 		Assert.notNull(jobRepository, "A JobRepository is required");
 
 		if(partitionDataQueue == null) {

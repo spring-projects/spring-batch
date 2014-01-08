@@ -1,5 +1,5 @@
 /*
- * Copyright 2012-2013 the original author or authors.
+ * Copyright 2012-2014 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -151,7 +151,7 @@ public class SimpleFlowFactoryBean implements FactoryBean, InitializingBean {
 		}
 		String stateName = prefix + oldName;
 		if (state instanceof StepState) {
-			return new StepState(stateName, ((StepState) state).getStep());
+			return new StepState(stateName, ((StepState) state).getStep(oldName));
 		}
 		return new DelegateState(stateName, state);
 	}
