@@ -148,10 +148,13 @@ public class FlowParser extends AbstractFlowParser {
 		Collection<BeanDefinition> list = new ArrayList<BeanDefinition>();
 
 		boolean transitionElementExists = false;
+		boolean failedTransitionElementExists = false;
+
 		List<Element> childElements = DomUtils.getChildElements(element);
 		for(Element childElement : childElements) {
 			if(isChildElementTransitionElement(childElement)) {
 				list.addAll(parseTransitionElement(childElement, stepId, stateDef, parserContext));
+				failedTransitionElementExists = failedTransitionElementExists || hasFailedTransitionElement(childElement);
 				transitionElementExists = true;
 			}
 		}
@@ -171,6 +174,11 @@ public class FlowParser extends AbstractFlowParser {
 		}
 
 		if (hasNextAttribute) {
+			if (transitionElementExists && !failedTransitionElementExists) {
+				list.addAll(createTransition(FlowExecutionStatus.FAILED, FlowExecutionStatus.FAILED.getName(), null, null,
+						stateDef, parserContext, false));
+			}
+
 			list.add(getStateTransitionReference(parserContext, stateDef, null, shortNextAttribute));
 		}
 
@@ -179,6 +187,10 @@ public class FlowParser extends AbstractFlowParser {
 
 	private static boolean isChildElementTransitionElement(Element childElement) {
 		return TRANSITION_TYPES.contains(childElement.getLocalName());
+	}
+
+	private static boolean hasFailedTransitionElement(Element childName) {
+		return FAIL_ELE.equals(childName.getLocalName());
 	}
 
 	protected static Collection<BeanDefinition> parseTransitionElement(Element transitionElement, String stateId,
