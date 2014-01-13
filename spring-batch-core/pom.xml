@@ -279,6 +279,19 @@
 									<fileset dir="${basedir}/src/main/sql" includes="schema*.sql.vpp" />
 									<mapper type="glob" from="*.sql.vpp" to="*-sybase.sql" />
 								</vppcopy>
+								<vppcopy todir="${basedir}/target/generated-resources" overwrite="true">
+									<config>
+										<context>
+											<property key="includes" value="src/main/sql" />
+											<property file="${basedir}/src/main/sql/sqlite.properties" />
+										</context>
+										<engine>
+											<property key="velocimacro.library" value="src/main/sql/sqlite.vpp" />
+										</engine>
+									</config>
+									<fileset dir="${basedir}/src/main/sql" includes="schema*.sql.vpp" />
+									<mapper type="glob" from="*.sql.vpp" to="*-sqlite.sql" />
+								</vppcopy>
 							</tasks>
 						</configuration>
 						<goals>
