@@ -29,24 +29,26 @@ import org.springframework.jdbc.support.MetaDataAccessException;
  * Enum representing a database type, such as DB2 or oracle.  The type also
  * contains a product name, which is expected to be the same as the product name
  * provided by the database driver's metadata.
- * 
+ *
  * @author Lucas Ward
  * @since 2.0
  */
 public enum DatabaseType {
 
-	DERBY("Apache Derby"), 
-	DB2("DB2"), 
-	DB2ZOS("DB2ZOS"), 
+	DERBY("Apache Derby"),
+	DB2("DB2"),
+	DB2ZOS("DB2ZOS"),
 	HSQL("HSQL Database Engine"),
 	SQLSERVER("Microsoft SQL Server"),
 	MYSQL("MySQL"),
 	ORACLE("Oracle"),
 	POSTGRES("PostgreSQL"),
-	SYBASE("Sybase"), H2("H2");
-	
+	SYBASE("Sybase"),
+	H2("H2"),
+	SQLITE("SQLite");
+
 	private static final Map<String, DatabaseType> nameMap;
-	
+
 	static{
 		nameMap = new HashMap<String, DatabaseType>();
 		for(DatabaseType type: values()){
@@ -56,35 +58,35 @@ public enum DatabaseType {
 	//A description is necessary due to the nature of database descriptions
 	//in metadata.
 	private final String productName;
-	
+
 	private DatabaseType(String productName) {
 		this.productName = productName;
 	}
-	
+
 	public String getProductName() {
 		return productName;
 	}
-	
+
 	/**
 	 * Static method to obtain a DatabaseType from the provided product name.
-	 * 
+	 *
 	 * @param productName
 	 * @return DatabaseType for given product name.
 	 * @throws IllegalArgumentException if none is found.
 	 */
 	public static DatabaseType fromProductName(String productName){
 		if(!nameMap.containsKey(productName)){
-			throw new IllegalArgumentException("DatabaseType not found for product name: [" + 
+			throw new IllegalArgumentException("DatabaseType not found for product name: [" +
 					productName + "]");
 		}
 		else{
 			return nameMap.get(productName);
 		}
 	}
-	
+
 	/**
 	 * Convenience method that pulls a database product name from the DataSource's metadata.
-	 * 
+	 *
 	 * @param dataSource
 	 * @return DatabaseType
 	 * @throws MetaDataAccessException

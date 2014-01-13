@@ -8,6 +8,7 @@ import static org.springframework.batch.support.DatabaseType.HSQL;
 import static org.springframework.batch.support.DatabaseType.MYSQL;
 import static org.springframework.batch.support.DatabaseType.ORACLE;
 import static org.springframework.batch.support.DatabaseType.POSTGRES;
+import static org.springframework.batch.support.DatabaseType.SQLITE;
 import static org.springframework.batch.support.DatabaseType.SQLSERVER;
 import static org.springframework.batch.support.DatabaseType.SYBASE;
 import static org.springframework.batch.support.DatabaseType.fromProductName;
@@ -36,6 +37,7 @@ public class DatabaseTypeTests {
 		assertEquals(ORACLE, fromProductName("Oracle"));
 		assertEquals(POSTGRES, fromProductName("PostgreSQL"));
 		assertEquals(SYBASE, fromProductName("Sybase"));
+		assertEquals(SQLITE, fromProductName("SQLite"));
 	}
 
 	@Test(expected = IllegalArgumentException.class)

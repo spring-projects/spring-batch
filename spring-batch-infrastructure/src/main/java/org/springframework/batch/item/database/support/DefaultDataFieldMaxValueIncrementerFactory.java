@@ -23,6 +23,7 @@ import static org.springframework.batch.support.DatabaseType.HSQL;
 import static org.springframework.batch.support.DatabaseType.MYSQL;
 import static org.springframework.batch.support.DatabaseType.ORACLE;
 import static org.springframework.batch.support.DatabaseType.POSTGRES;
+import static org.springframework.batch.support.DatabaseType.SQLITE;
 import static org.springframework.batch.support.DatabaseType.SQLSERVER;
 import static org.springframework.batch.support.DatabaseType.SYBASE;
 
@@ -100,6 +101,9 @@ public class DefaultDataFieldMaxValueIncrementerFactory implements DataFieldMaxV
 		}
 		else if (databaseType == POSTGRES) {
 			return new PostgreSQLSequenceMaxValueIncrementer(dataSource, incrementerName);
+		}
+		else if (databaseType == SQLITE) {
+			return new SqliteMaxValueIncrementer(dataSource, incrementerName, incrementerColumnName);
 		}
 		else if (databaseType == SQLSERVER) {
 			return new SqlServerMaxValueIncrementer(dataSource, incrementerName, incrementerColumnName);
