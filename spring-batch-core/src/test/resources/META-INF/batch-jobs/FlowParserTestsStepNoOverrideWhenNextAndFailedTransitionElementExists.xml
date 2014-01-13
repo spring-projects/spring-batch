@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<beans xmlns="http://www.springframework.org/schema/beans"
+	   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	   xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+						http://xmlns.jcp.org/xml/ns/javaee http://xmlns.jcp.org/xml/ns/javaee/jobXML_1_0.xsd">
+	<job id="job" xmlns="http://xmlns.jcp.org/xml/ns/javaee" version="1.0">
+		<step id="failedExitStatusStepDontOverride" next="step2">
+			<batchlet ref="testBatchlet"/>
+			<fail on="CUSTOM_FAIL"/>
+		</step>
+		<step id="step2">
+			<batchlet ref="testBatchlet"/>
+		</step>
+	</job>
+
+	<bean id="testBatchlet" class="org.springframework.batch.core.jsr.configuration.xml.FlowParserTests$TestBatchlet"/>
+</beans>

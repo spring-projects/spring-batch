@@ -64,6 +64,32 @@ public class FlowParserTests {
 		assertTrue("step1".equals(failedStep.getStepName()));
 	}
 
+	@Test
+	public void testStepGetsFailedTransitionWhenNextAttributePresent() throws Exception {
+		JobExecution jobExecution = runJob("FlowParserTestsStepGetsFailedTransitionWhenNextAttributePresent", new Properties(), 10000l);
+		assertEquals(ExitStatus.FAILED.getExitCode(), jobExecution.getExitStatus());
+
+		JobOperator jobOperator = BatchRuntime.getJobOperator();
+		List<StepExecution> stepExecutions = jobOperator.getStepExecutions(jobExecution.getExecutionId());
+		assertEquals(1, stepExecutions.size());
+		StepExecution failedStep = stepExecutions.get(0);
+		assertTrue("failedExitStatusStep".equals(failedStep.getStepName()));
+		assertTrue("FAILED".equals(failedStep.getExitStatus()));
+	}
+
+	@Test
+	public void testStepNoOverrideWhenNextAndFailedTransitionElementExists() throws Exception {
+		JobExecution jobExecution = runJob("FlowParserTestsStepNoOverrideWhenNextAndFailedTransitionElementExists", new Properties(), 10000l);
+		assertEquals(ExitStatus.FAILED.getExitCode(), jobExecution.getExitStatus());
+
+		JobOperator jobOperator = BatchRuntime.getJobOperator();
+		List<StepExecution> stepExecutions = jobOperator.getStepExecutions(jobExecution.getExecutionId());
+		assertEquals(1, stepExecutions.size());
+		StepExecution failedStep = stepExecutions.get(0);
+		assertTrue("failedExitStatusStepDontOverride".equals(failedStep.getStepName()));
+		assertTrue("CUSTOM_FAIL".equals(failedStep.getExitStatus()));
+	}
+
 	public static class TestBatchlet extends AbstractBatchlet {
 		private static int CNT;
 
@@ -77,6 +103,14 @@ public class FlowParserTests {
 			if("step3".equals(stepContext.getStepName())) {
 				exitCode = CNT % 2 == 0 ? "DISTINCT" : "RESTART";
 				CNT++;
+			}
+
+			if("failedExitStatusStep".equals(stepContext.getStepName())) {
+				exitCode = "FAILED";
+			}
+
+			if("failedExitStatusStepDontOverride".equals(stepContext.getStepName())) {
+				exitCode = "CUSTOM_FAIL";
 			}
 
 			return exitCode;
