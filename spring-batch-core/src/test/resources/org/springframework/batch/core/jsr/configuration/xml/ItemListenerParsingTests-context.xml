@@ -37,15 +37,19 @@
 			</chunk>
 		</step>
 	</job>
-	                
+
 	<bean id="transactionManager" class="org.springframework.batch.support.transaction.ResourcelessTransactionManager"/>
-	
+
 	<bean id="jobLauncher" class="org.springframework.batch.core.launch.support.SimpleJobLauncher">
 		<property name="jobRepository" ref="jobRepository"/>
 	</bean>
-	
+
 	<bean id="jobRepository" class="org.springframework.batch.core.repository.support.MapJobRepositoryFactoryBean"/>
-	
+
+	<bean id="jobExplorer" class="org.springframework.batch.core.explore.support.MapJobExplorerFactoryBean">
+		<property name="repositoryFactory" ref="&amp;jobRepository"/>
+	</bean>
+
 	<bean id="generatingItemReader1" class="org.springframework.batch.item.support.ListItemReader">
 		<constructor-arg>
 			<list>
@@ -54,7 +58,7 @@
 			</list>
 		</constructor-arg>
 	</bean>
-	
+
 	<bean id="generatingItemReader2" class="org.springframework.batch.item.support.ListItemReader">
 		<constructor-arg>
 			<list>
@@ -63,7 +67,7 @@
 			</list>
 		</constructor-arg>
 	</bean>
-	
+
 	<bean id="generatingItemReader3" class="org.springframework.batch.item.support.ListItemReader">
 		<constructor-arg>
 			<list>
@@ -72,16 +76,16 @@
 			</list>
 		</constructor-arg>
 	</bean>
-	
+
 	<bean id="countingItemProcessor" class="org.springframework.batch.core.jsr.configuration.xml.CountingItemProcessor"/>
-	
+
 	<bean id="sysoutItemWriter" class="org.springframework.batch.item.adapter.ItemWriterAdapter">
 		<property name="targetObject">
 			<util:constant static-field="java.lang.System.out"/>
 		</property>
 		<property name="targetMethod" value="println"/>
 	</bean>
-	
+
 	<bean id="springItemListener" class="org.springframework.batch.core.jsr.configuration.xml.ItemListenerParsingTests.SpringItemListener"/>
 
 	<bean id="jsrItemListener" class="org.springframework.batch.core.jsr.configuration.xml.ItemListenerParsingTests.JsrItemListener"/>

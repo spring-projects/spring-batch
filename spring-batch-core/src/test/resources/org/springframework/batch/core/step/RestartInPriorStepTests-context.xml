@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<beans xmlns="http://www.springframework.org/schema/beans" 
+<beans xmlns="http://www.springframework.org/schema/beans"
 	xmlns:util="http://www.springframework.org/schema/beans"
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://www.springframework.org/schema/beans
@@ -8,7 +8,7 @@
 					http://www.springframework.org/schema/util/spring-util.xsd
 					http://www.springframework.org/schema/batch
 	                http://www.springframework.org/schema/batch/spring-batch-2.2.xsd">
-	                
+
 	<bean id="step1ItemReader" class="org.springframework.batch.item.support.ListItemReader">
 		<constructor-arg>
 			<util:list>
@@ -16,9 +16,9 @@
 			</util:list>
 		</constructor-arg>
 	</bean>
-	
+
 	<bean id="step1ItemWriter" class="org.springframework.batch.core.configuration.xml.DummyItemWriter"/>
-	                
+
 	<bean id="step2ItemReader" class="org.springframework.batch.item.support.ListItemReader">
 		<constructor-arg>
 			<util:list>
@@ -27,9 +27,9 @@
 			</util:list>
 		</constructor-arg>
 	</bean>
-	
+
 	<bean id="step2ItemWriter" class="org.springframework.batch.core.configuration.xml.DummyItemWriter"/>
-	                
+
 	<bean id="step3ItemReader" class="org.springframework.batch.item.support.ListItemReader">
 		<constructor-arg>
 			<util:list>
@@ -39,13 +39,13 @@
 			</util:list>
 		</constructor-arg>
 	</bean>
-	
+
 	<bean id="step3ItemWriter" class="org.springframework.batch.core.configuration.xml.DummyItemWriter"/>
-	
+
 	<bean id="decidingTasklet" class="org.springframework.batch.core.step.RestartInPriorStepTests$DecidingTasklet"/>
-	
+
 	<bean id="completionDecider" class="org.springframework.batch.core.step.RestartInPriorStepTests$CompletionDecider"/>
-	                
+
 	<job id="restartJob" xmlns="http://www.springframework.org/schema/batch">
 		<step id="step1" next="step2">
 			<tasklet allow-start-if-complete="true">
@@ -72,15 +72,11 @@
 			<end on="END"/>
 		</decision>
 	</job>
-	
+
 	<bean id="jobRepository" class="org.springframework.batch.core.repository.support.MapJobRepositoryFactoryBean"/>
-	
-	<bean id="jobExplorer" class="org.springframework.batch.core.explore.support.MapJobExplorerFactoryBean">
-		<property name="repositoryFactory" ref="&amp;jobRepository"/>
-	</bean>
-	
+
 	<bean id="transactionManager" class="org.springframework.batch.support.transaction.ResourcelessTransactionManager"/>
-	
+
 	<bean id="jobLauncher" class="org.springframework.batch.core.launch.support.SimpleJobLauncher">
 		<property name="jobRepository" ref="jobRepository"/>
 	</bean>

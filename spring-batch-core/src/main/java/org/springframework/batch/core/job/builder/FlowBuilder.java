@@ -366,7 +366,7 @@ public class FlowBuilder<Q> {
 		return false;
 	}
 
-	private void addTransition(String pattern, State next) {
+	protected void addTransition(String pattern, State next) {
 		tos.put(next.getName(), next);
 		transitions.add(StateTransition.createStateTransition(currentState, pattern, next.getName()));
 		if (transitions.size() == 1) {
@@ -380,11 +380,11 @@ public class FlowBuilder<Q> {
 		dirty = true;
 	}
 
-	private void stop(String pattern) {
+	protected void stop(String pattern) {
 		addTransition(pattern, stoppedState);
 	}
 
-	private void stop(String pattern, State restart) {
+	protected void stop(String pattern, State restart) {
 		EndState next = new EndState(FlowExecutionStatus.STOPPED, "STOPPED", prefix + "stop" + (endCounter++), true);
 		addTransition(pattern, next);
 		currentState = next;

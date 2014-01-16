@@ -4,7 +4,6 @@ import static org.junit.Assert.assertEquals;
 
 import java.util.Map;
 
-import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.batch.core.BatchStatus;
@@ -14,7 +13,6 @@ import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.JobParameters;
 import org.springframework.batch.core.StepContribution;
 import org.springframework.batch.core.StepExecution;
-import org.springframework.batch.core.explore.JobExplorer;
 import org.springframework.batch.core.job.flow.FlowExecutionStatus;
 import org.springframework.batch.core.job.flow.JobExecutionDecider;
 import org.springframework.batch.core.launch.JobLauncher;
@@ -38,20 +36,10 @@ public class RestartInPriorStepTests {
 	private JobRepository jobRepository;
 
 	@Autowired
-	private JobExplorer jobExplorer;
-
-	@Autowired
 	private JobLauncher jobLauncher;
 
 	@Autowired
 	private Job job;
-
-	/**
-	 * @throws java.lang.Exception
-	 */
-	@Before
-	public void setUp() throws Exception {
-	}
 
 	@Test
 	public void test() throws Exception {
