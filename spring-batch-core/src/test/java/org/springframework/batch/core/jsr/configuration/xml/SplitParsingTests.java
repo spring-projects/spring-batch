@@ -18,44 +18,40 @@ package org.springframework.batch.core.jsr.configuration.xml;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
+import static org.springframework.batch.core.jsr.JsrTestUtils.runJob;
+
+import java.util.List;
+
+import javax.batch.api.AbstractBatchlet;
+import javax.batch.runtime.BatchRuntime;
+import javax.batch.runtime.StepExecution;
+import javax.batch.runtime.context.JobContext;
+import javax.inject.Inject;
 
 import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
-import org.junit.runner.RunWith;
-import org.springframework.batch.core.BatchStatus;
-import org.springframework.batch.core.Job;
-import org.springframework.batch.core.JobExecution;
-import org.springframework.batch.core.JobParameters;
-import org.springframework.batch.core.launch.JobLauncher;
 import org.springframework.beans.PropertyValue;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.RuntimeBeanReference;
 import org.springframework.beans.factory.parsing.BeanDefinitionParsingException;
 import org.springframework.beans.factory.support.BeanDefinitionRegistry;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 import org.springframework.core.task.SimpleAsyncTaskExecutor;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
-@ContextConfiguration()
-@RunWith(SpringJUnit4ClassRunner.class)
 public class SplitParsingTests {
-	@Autowired
-	public Job job;
-
-	@Autowired
-	public JobLauncher jobLauncher;
 
 	@Rule
 	public ExpectedException expectedException = ExpectedException.none();
 
 	@Test
 	public void test() throws Exception {
-		JobExecution execution = jobLauncher.run(job, new JobParameters());
-		assertEquals(BatchStatus.COMPLETED, execution.getStatus());
-		assertEquals(5, execution.getStepExecutions().size());
+		javax.batch.runtime.JobExecution execution = runJob("SplitParsingTests-context", null, 10000l);
+		assertEquals(javax.batch.runtime.BatchStatus.COMPLETED, execution.getBatchStatus());
+		assertEquals("COMPLETED", execution.getExitStatus());
+
+		List<StepExecution> stepExecutions = BatchRuntime.getJobOperator().getStepExecutions(execution.getExecutionId());
+		assertEquals(5, stepExecutions.size());
 	}
 
 	@Test
@@ -87,5 +83,17 @@ public class SplitParsingTests {
 		BeanDefinitionRegistry registry = (BeanDefinitionRegistry) context.getBeanFactory();
 		PropertyValue propertyValue = new SplitParser(null).getSplitTaskExecutorPropertyValue(registry);
 		Assert.assertTrue("Task executor not an instance of SimpleAsyncTaskExecutor" , (propertyValue.getValue() instanceof SimpleAsyncTaskExecutor));
+	}
+
+	public static class ExitStatusSettingBatchlet extends AbstractBatchlet {
+
+		@Inject
+		JobContext jobContext;
+
+		@Override
+		public String process() throws Exception {
+			jobContext.setExitStatus("Should be ignored");
+			return null;
+		}
 	}
 }

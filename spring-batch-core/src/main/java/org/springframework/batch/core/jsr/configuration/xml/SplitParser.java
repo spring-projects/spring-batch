@@ -51,7 +51,7 @@ public class SplitParser {
 		String idAttribute = element.getAttribute("id");
 
 		BeanDefinitionBuilder stateBuilder = BeanDefinitionBuilder
-				.genericBeanDefinition("org.springframework.batch.core.job.flow.support.state.SplitState");
+				.genericBeanDefinition("org.springframework.batch.core.jsr.job.flow.support.state.SplitState");
 
 		List<Element> flowElements = DomUtils.getChildElementsByTagName(element, "flow");
 

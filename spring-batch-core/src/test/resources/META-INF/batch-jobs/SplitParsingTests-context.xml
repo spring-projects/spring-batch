@@ -9,17 +9,17 @@
 
     <job id="job1" xmlns="http://xmlns.jcp.org/xml/ns/javaee" version="1.0">
         <step id="step1" next="step2">
-            <batchlet ref="step1Ref"/>
+            <batchlet ref="org.springframework.batch.core.jsr.configuration.xml.SplitParsingTests$ExitStatusSettingBatchlet"/>
         </step>
         <split id="step2" next="step3">
             <flow id="step2a">
                 <step id="step2aStep1">
-                    <batchlet ref="step1Ref"/>
+                    <batchlet ref="org.springframework.batch.core.jsr.configuration.xml.SplitParsingTests$ExitStatusSettingBatchlet"/>
                 </step>
             </flow>
             <flow id="step2b">
                 <step id="step2bStep1" next="step2bStep2">
-                    <batchlet ref="step1Ref"/>
+                    <batchlet ref="org.springframework.batch.core.jsr.configuration.xml.SplitParsingTests$ExitStatusSettingBatchlet"/>
                 </step>
                 <step id="step2bStep2">
                     <chunk checkpoint-policy="item" item-count="3">
@@ -31,11 +31,9 @@
             </flow>
         </split>
         <step id="step3">
-            <batchlet ref="step1Ref"/>
+            <batchlet ref="org.springframework.batch.core.step.tasklet.TaskletSupport"/>
         </step>
     </job>
-
-    <bean id="step1Ref" class="org.springframework.batch.core.step.tasklet.TaskletSupport"/>
 
     <bean id="generatingItemReader1" class="org.springframework.batch.item.support.ListItemReader">
         <constructor-arg>
@@ -56,13 +54,5 @@
             <util:constant static-field="java.lang.System.out"/>
         </property>
         <property name="targetMethod" value="println"/>
-    </bean>
-
-    <bean id="jobRepository" class="org.springframework.batch.core.repository.support.MapJobRepositoryFactoryBean"/>
-
-    <bean id="transactionManager" class="org.springframework.batch.support.transaction.ResourcelessTransactionManager"/>
-
-    <bean id="jobLauncher" class="org.springframework.batch.core.launch.support.SimpleJobLauncher">
-        <property name="jobRepository" ref="jobRepository"/>
     </bean>
 </beans>
