@@ -301,9 +301,32 @@ public class TaskletStepExceptionTests {
 		jobRepository.setFailOnUpdateExecutionContext(true);
 		jobRepository.setFailInTransaction(true);
 		taskletStep.execute(stepExecution);
+		assertEquals(FAILED, stepExecution.getStatus());
+		Throwable e = stepExecution.getFailureExceptions().get(0);
+		assertEquals("JobRepository failure forcing rollback", e.getMessage());
+
+	}
+
+	@Test
+	public void testRepositoryErrorOnExecutionContextInTransactionRollbackFailed() throws Exception {
+
+		taskletStep.setTasklet(new Tasklet() {
+
+			@Override
+			public RepeatStatus execute(StepContribution contribution, ChunkContext attributes) throws Exception {
+				return RepeatStatus.FINISHED;
+			}
+
+		});
+		
+		taskletStep.setTransactionManager(new FailingRollbackTransactionManager());
+
+		jobRepository.setFailOnUpdateExecutionContext(true);
+		jobRepository.setFailInTransaction(true);
+		taskletStep.execute(stepExecution);
 		assertEquals(UNKNOWN, stepExecution.getStatus());
 		Throwable e = stepExecution.getFailureExceptions().get(0);
-		assertEquals("JobRepository failure forcing exit with unknown status", e.getMessage());
+		assertEquals("Expected exception in rollback", e.getMessage());
 
 	}
 
@@ -319,11 +342,55 @@ public class TaskletStepExceptionTests {
 
 		});
 
-		jobRepository.setFailOnUpdateStepExecution(1);
+		jobRepository.setFailOnUpdateStepExecution(2);
 		taskletStep.execute(stepExecution);
 		assertEquals(UNKNOWN, stepExecution.getStatus());
 		Throwable e = stepExecution.getFailureExceptions().get(0);
-		assertEquals("JobRepository failure forcing exit with unknown status", e.getMessage());
+		assertEquals("Expected exception in step execution persistence", e.getMessage());
+
+	}
+
+	@Test
+	public void testRepositoryErrorOnUpdateStepExecutionInTransaction() throws Exception {
+
+		taskletStep.setTasklet(new Tasklet() {
+
+			@Override
+			public RepeatStatus execute(StepContribution contribution, ChunkContext attributes) throws Exception {
+				return RepeatStatus.FINISHED;
+			}
+
+		});
+
+		jobRepository.setFailOnUpdateStepExecution(1);
+		jobRepository.setFailInTransaction(true);
+		taskletStep.execute(stepExecution);
+		assertEquals(FAILED, stepExecution.getStatus());
+		Throwable e = stepExecution.getFailureExceptions().get(0);
+		assertEquals("JobRepository failure forcing rollback", e.getMessage());
+
+	}
+
+	@Test
+	public void testRepositoryErrorOnUpdateStepExecutionInTransactionRollbackFailed() throws Exception {
+
+		taskletStep.setTasklet(new Tasklet() {
+
+			@Override
+			public RepeatStatus execute(StepContribution contribution, ChunkContext attributes) throws Exception {
+				return RepeatStatus.FINISHED;
+			}
+
+		});
+		
+		taskletStep.setTransactionManager(new FailingRollbackTransactionManager());
+
+		jobRepository.setFailOnUpdateStepExecution(1);
+		jobRepository.setFailInTransaction(true);
+		taskletStep.execute(stepExecution);
+		assertEquals(UNKNOWN, stepExecution.getStatus());
+		Throwable e = stepExecution.getFailureExceptions().get(0);
+		assertEquals("Expected exception in rollback", e.getMessage());
 
 	}
 
@@ -439,10 +506,12 @@ public class TaskletStepExceptionTests {
 
 		@Override
 		public void update(StepExecution stepExecution) {
-			if (updateCount == failOnUpdateExecution) {
-				throw new RuntimeException("Expected exception in step execution persistence");
+			if (updateCount++ == failOnUpdateExecution) {
+				if (!failInTransaction
+						|| (failInTransaction && TransactionSynchronizationManager.isActualTransactionActive())) {
+					throw new RuntimeException("Expected exception in step execution persistence");
+				}
 			}
-			updateCount++;
 		}
 
 		@Override
@@ -483,6 +552,15 @@ public class TaskletStepExceptionTests {
 				JobParameters jobParameters, String jobConfigurationLocation) {
 			return null;
 		}
+	}
+	
+	private static class FailingRollbackTransactionManager extends ResourcelessTransactionManager {
+		
+		@Override
+		protected void doRollback(DefaultTransactionStatus status) throws TransactionException {
+			super.doRollback(status);
+			throw new RuntimeException("Expected exception in rollback");
+		}		
 	}
 
 }
