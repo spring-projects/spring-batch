@@ -30,6 +30,7 @@ import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.repository.JobRestartException;
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.util.Assert;
+import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 
 /**
@@ -75,10 +76,10 @@ public class DefaultStepHandler extends SimpleStepHandler {
 	@Override
 	protected boolean shouldStart(StepExecution lastStepExecution, JobExecution jobExecution, Step step)
 			throws JobRestartException, StartLimitExceededException {
-
 		BatchStatus stepStatus;
 		String restartStep = null;
 		if (lastStepExecution == null) {
+			jobExecution.getExecutionContext().put("batch.startedStep", step.getName());
 			stepStatus = BatchStatus.STARTING;
 		}
 		else {
@@ -89,9 +90,14 @@ public class DefaultStepHandler extends SimpleStepHandler {
 			if(lastJobExecution.getExecutionContext().containsKey("batch.restartStep")) {
 				restartStep = lastJobExecution.getExecutionContext().getString("batch.restartStep");
 
-				if(lastJobExecution.getStatus() == BatchStatus.STOPPED && StringUtils.hasText(restartStep) && !restartStep.equals(step.getName())) {
-					logger.info("Job was stopped and should restart at step " + restartStep + ".  The current step is " + step.getName());
-					return false;
+				if(CollectionUtils.isEmpty(jobExecution.getStepExecutions()) && lastJobExecution.getStatus() == BatchStatus.STOPPED && StringUtils.hasText(restartStep)) {
+					if(!restartStep.equals(step.getName()) && !jobExecution.getExecutionContext().containsKey("batch.startedStep")) {
+						logger.info("Job was stopped and should restart at step " + restartStep + ".  The current step is " + step.getName());
+						return false;
+					} else {
+						// Indicates the starting point for execution evaluation per JSR-352
+						jobExecution.getExecutionContext().put("batch.startedStep", step.getName());
+					}
 				}
 			}
 		}
@@ -135,9 +141,9 @@ public class DefaultStepHandler extends SimpleStepHandler {
 		JobExecution lastJobExecution = null;
 
 		for (JobExecution curJobExecution : jobExecutions) {
-			if(lastJobExecution == null && curJobExecution.getId() != jobExecution.getId()) {
+			if(lastJobExecution == null && curJobExecution.getId().longValue() != jobExecution.getId().longValue()) {
 				lastJobExecution = curJobExecution;
-			} else if(lastJobExecution != null && curJobExecution.getId() > lastJobExecution.getId() && curJobExecution.getId() != jobExecution.getId()) {
+			} else if(curJobExecution.getId().longValue() != jobExecution.getId().longValue() && (lastJobExecution == null || curJobExecution.getId().longValue() > lastJobExecution.getId().longValue())) {
 				lastJobExecution = curJobExecution;
 			}
 		}
