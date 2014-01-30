@@ -42,7 +42,7 @@ import org.springframework.context.annotation.Configuration;
 
 /**
  * @author Dave Syer
- * 
+ *
  */
 public class JobBuilderConfigurationTests {
 
