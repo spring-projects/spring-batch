@@ -15,6 +15,7 @@ import org.springframework.batch.core.ItemWriteListener;
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.JobParameters;
+import org.springframework.batch.core.PooledEmbeddedDataSource;
 import org.springframework.batch.core.SkipListener;
 import org.springframework.batch.core.Step;
 import org.springframework.batch.core.StepExecution;
@@ -184,11 +185,11 @@ public class RegisterMultiListenerTests {
 
 		@Bean
 		public DataSource dataSource(){
-			return new EmbeddedDatabaseBuilder()
+			return new PooledEmbeddedDataSource(new EmbeddedDatabaseBuilder()
 			.addScript("classpath:org/springframework/batch/core/schema-drop-hsqldb.sql")
 			.addScript("classpath:org/springframework/batch/core/schema-hsqldb.sql")
 			.setType(EmbeddedDatabaseType.HSQL)
-			.build();
+			.build());
 		}
 
 		@Override
@@ -214,11 +215,11 @@ public class RegisterMultiListenerTests {
 
 		@Bean
 		public DataSource dataSource(){
-			return new EmbeddedDatabaseBuilder()
+			return new PooledEmbeddedDataSource(new EmbeddedDatabaseBuilder()
 			.addScript("classpath:org/springframework/batch/core/schema-drop-hsqldb.sql")
 			.addScript("classpath:org/springframework/batch/core/schema-hsqldb.sql")
 			.setType(EmbeddedDatabaseType.HSQL)
-			.build();
+			.build());
 		}
 
 		@Override

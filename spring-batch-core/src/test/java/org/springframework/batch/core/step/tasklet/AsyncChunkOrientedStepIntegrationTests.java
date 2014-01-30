@@ -53,7 +53,7 @@ import org.springframework.transaction.support.TransactionTemplate;
 
 /**
  * @author Dave Syer
- * 
+ *
  */
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(locations = "/org/springframework/batch/core/repository/dao/sql-dao-test.xml")
@@ -138,12 +138,12 @@ public class AsyncChunkOrientedStepIntegrationTests {
 		assertEquals(BatchStatus.COMPLETED, stepExecution.getStatus());
 		// Need a transaction so one connection is enough to get job execution and its parameters
 		StepExecution lastStepExecution = new TransactionTemplate(transactionManager)
-				.execute(new TransactionCallback<StepExecution>() {
-					@Override
-					public StepExecution doInTransaction(TransactionStatus status) {
-						return jobRepository.getLastStepExecution(jobExecution.getJobInstance(), step.getName());
-					}
-				});
+		.execute(new TransactionCallback<StepExecution>() {
+			@Override
+			public StepExecution doInTransaction(TransactionStatus status) {
+				return jobRepository.getLastStepExecution(jobExecution.getJobInstance(), step.getName());
+			}
+		});
 		assertEquals(lastStepExecution, stepExecution);
 		assertFalse(lastStepExecution == stepExecution);
 	}

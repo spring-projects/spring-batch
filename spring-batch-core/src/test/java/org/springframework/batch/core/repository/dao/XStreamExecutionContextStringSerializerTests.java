@@ -9,6 +9,7 @@ import java.math.BigDecimal;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Properties;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -31,6 +32,15 @@ public class XStreamExecutionContextStringSerializerTests {
 	}
 
 	@Test
+	public void testSerializePropertiesArrayContainer() throws Exception {
+		PropertiesArrayContainer container = new PropertiesArrayContainer();
+		container.setProps(new Properties[3]);
+
+		PropertiesArrayContainer result = (PropertiesArrayContainer) serializationRoundTrip(container);
+		assertEquals(3, result.getProps().length);
+	}
+
+	@Test
 	public void testSerializeAMap() throws Exception {
 		Map<String, Object> m1 = new HashMap<String, Object>();
 		m1.put("object1", Long.valueOf(12345L));
@@ -39,7 +49,7 @@ public class XStreamExecutionContextStringSerializerTests {
 		m1.put("object3", new Date(123456790123L));
 		m1.put("object4", new Double(1234567.1234D));
 
-		Map<String, Object> m2 = serializationRoundTrip(m1);
+		Map<String, Object> m2 = (Map<String, Object>) serializationRoundTrip(m1);
 
 		compareContexts(m1, m2);
 	}
@@ -61,7 +71,7 @@ public class XStreamExecutionContextStringSerializerTests {
 		o1.setObj(o2);
 		m1.put("co", o1);
 
-		Map<String, Object> m2 = serializationRoundTrip(m1);
+		Map<String, Object> m2 = (Map<String, Object>) serializationRoundTrip(m1);
 
 		compareContexts(m1, m2);
 	}
@@ -80,14 +90,14 @@ public class XStreamExecutionContextStringSerializerTests {
 	}
 
 	@SuppressWarnings("unchecked")
-	private Map<String, Object> serializationRoundTrip(Map<String, Object> m1) throws IOException {
+	private Object serializationRoundTrip(Object m1) throws IOException {
 		ByteArrayOutputStream out = new ByteArrayOutputStream();
 		serializer.serialize(m1, out);
 
 		String s = out.toString();
 
 		ByteArrayInputStream in = new ByteArrayInputStream(s.getBytes());
-		Map<String, Object> m2 = (Map<String, Object>) serializer.deserialize(in);
+		Object m2 = serializer.deserialize(in);
 		return m2;
 	}
 
@@ -133,15 +143,27 @@ public class XStreamExecutionContextStringSerializerTests {
 
 		@Override
 		public boolean equals(Object o) {
-			if (this == o) return true;
-			if (o == null || getClass() != o.getClass()) return false;
+			if (this == o) {
+				return true;
+			}
+			if (o == null || getClass() != o.getClass()) {
+				return false;
+			}
 
 			ComplexObject that = (ComplexObject) o;
 
-			if (map != null ? !map.equals(that.map) : that.map != null) return false;
-			if (name != null ? !name.equals(that.name) : that.name != null) return false;
-			if (number != null ? !number.equals(that.number) : that.number != null) return false;
-			if (obj != null ? !obj.equals(that.obj) : that.obj != null) return false;
+			if (map != null ? !map.equals(that.map) : that.map != null) {
+				return false;
+			}
+			if (name != null ? !name.equals(that.name) : that.name != null) {
+				return false;
+			}
+			if (number != null ? !number.equals(that.number) : that.number != null) {
+				return false;
+			}
+			if (obj != null ? !obj.equals(that.obj) : that.obj != null) {
+				return false;
+			}
 
 			return true;
 		}
@@ -160,6 +182,17 @@ public class XStreamExecutionContextStringSerializerTests {
 		public String toString() {
 			return "ComplexObject [name=" + name + ", number=" + number + "]";
 		}
+	}
 
+	public static class PropertiesArrayContainer {
+		private Properties[] props;
+
+		public Properties[] getProps() {
+			return props;
+		}
+
+		public void setProps(Properties[] props) {
+			this.props = props;
+		}
 	}
 }

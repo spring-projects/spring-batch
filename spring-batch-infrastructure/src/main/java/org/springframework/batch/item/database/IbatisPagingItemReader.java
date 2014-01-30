@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2013 the original author or authors.
+ * Copyright 2006-2014 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,16 +16,27 @@
 
 package org.springframework.batch.item.database;
 
+import java.sql.Connection;
+import java.sql.SQLException;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CopyOnWriteArrayList;
 
+import javax.sql.DataSource;
+
 import org.springframework.batch.item.ExecutionContext;
-import org.springframework.orm.ibatis.SqlMapClientTemplate;
+import org.springframework.jdbc.CannotGetJdbcConnectionException;
+import org.springframework.jdbc.datasource.DataSourceUtils;
+import org.springframework.jdbc.datasource.TransactionAwareDataSourceProxy;
+import org.springframework.jdbc.support.SQLErrorCodeSQLExceptionTranslator;
+import org.springframework.jdbc.support.SQLExceptionTranslator;
+import org.springframework.jdbc.support.SQLStateSQLExceptionTranslator;
 import org.springframework.util.Assert;
 import org.springframework.util.ClassUtils;
 
 import com.ibatis.sqlmap.client.SqlMapClient;
+import com.ibatis.sqlmap.client.SqlMapSession;
 
 /**
  * <p>
@@ -67,22 +78,34 @@ import com.ibatis.sqlmap.client.SqlMapClient;
  * available).
  * </p>
  *
+ * <p><em>Note:</em> This reader was refactored as part of Spring Batch 3.0 to use the iBatis
+ * APIs directly instead of using Spring's SqlMapClientTemplate as part of the upgrade to
+ * support Spring 4.</p>
+
  * @author Thomas Risberg
  * @author Dave Syer
+ * @author Michael Minella
  * @since 2.0
+ * @deprecated as of Spring Batch 3.0, in favor of the native Spring Batch support
+ * in the MyBatis follow-up project (http://mybatis.github.io/spring/)
  */
+@Deprecated
 public class IbatisPagingItemReader<T> extends AbstractPagingItemReader<T> {
 
 	private SqlMapClient sqlMapClient;
 
 	private String queryId;
 
-	private SqlMapClientTemplate sqlMapClientTemplate;
-
 	private Map<String, Object> parameterValues;
+
+	private DataSource dataSource;
 
 	public IbatisPagingItemReader() {
 		setName(ClassUtils.getShortName(IbatisPagingItemReader.class));
+	}
+
+	public void setDataSource(DataSource dataSource) {
+		this.dataSource = dataSource;
 	}
 
 	public void setSqlMapClient(SqlMapClient sqlMapClient) {
@@ -111,12 +134,10 @@ public class IbatisPagingItemReader<T> extends AbstractPagingItemReader<T> {
 	public void afterPropertiesSet() throws Exception {
 		super.afterPropertiesSet();
 		Assert.notNull(sqlMapClient);
-		sqlMapClientTemplate = new SqlMapClientTemplate(sqlMapClient);
 		Assert.notNull(queryId);
 	}
 
 	@Override
-	@SuppressWarnings("unchecked")
 	protected void doReadPage() {
 		Map<String, Object> parameters = new HashMap<String, Object>();
 		if (parameterValues != null) {
@@ -131,7 +152,89 @@ public class IbatisPagingItemReader<T> extends AbstractPagingItemReader<T> {
 		else {
 			results.clear();
 		}
-		results.addAll(sqlMapClientTemplate.queryForList(queryId, parameters));
+		results.addAll(execute(parameters));
+	}
+
+	@SuppressWarnings("unchecked")
+	private List<T> execute(Map<String, Object> parameters) {
+		// We always need to use a SqlMapSession, as we need to pass a Spring-managed
+		// Connection (potentially transactional) in. This shouldn't be necessary if
+		// we run against a TransactionAwareDataSourceProxy underneath, but unfortunately
+		// we still need it to make iBATIS batch execution work properly: If iBATIS
+		// doesn't recognize an existing transaction, it automatically executes the
+		// batch for every single statement...
+
+		SqlMapSession session = this.sqlMapClient.openSession();
+		if (logger.isDebugEnabled()) {
+			logger.debug("Opened SqlMapSession [" + session + "] for iBATIS operation");
+		}
+		Connection ibatisCon = null;
+
+		try {
+			Connection springCon = null;
+			boolean transactionAware = (dataSource instanceof TransactionAwareDataSourceProxy);
+
+			// Obtain JDBC Connection to operate on...
+			try {
+				ibatisCon = session.getCurrentConnection();
+				if (ibatisCon == null) {
+					springCon = (transactionAware ?
+							dataSource.getConnection() : DataSourceUtils.doGetConnection(dataSource));
+					session.setUserConnection(springCon);
+					if (logger.isDebugEnabled()) {
+						logger.debug("Obtained JDBC Connection [" + springCon + "] for iBATIS operation");
+					}
+				}
+				else {
+					if (logger.isDebugEnabled()) {
+						logger.debug("Reusing JDBC Connection [" + ibatisCon + "] for iBATIS operation");
+					}
+				}
+			}
+			catch (SQLException ex) {
+				throw new CannotGetJdbcConnectionException("Could not get JDBC Connection", ex);
+			}
+
+			// Execute given callback...
+			try {
+				return session.queryForList(queryId, parameters);
+			}
+			catch (SQLException ex) {
+				SQLExceptionTranslator sqlStateSQLExceptionTranslator;
+
+				if(dataSource != null) {
+					sqlStateSQLExceptionTranslator = new SQLStateSQLExceptionTranslator();
+				} else {
+					sqlStateSQLExceptionTranslator = new SQLErrorCodeSQLExceptionTranslator(dataSource);
+				}
+
+				throw sqlStateSQLExceptionTranslator.translate("SqlMapClient operation", null, ex);
+			}
+			finally {
+				try {
+					if (springCon != null) {
+						if (transactionAware) {
+							springCon.close();
+						}
+						else {
+							DataSourceUtils.doReleaseConnection(springCon, dataSource);
+						}
+					}
+				}
+				catch (Throwable ex) {
+					logger.debug("Could not close JDBC Connection", ex);
+				}
+			}
+
+			// Processing finished - potentially session still to be closed.
+		}
+		finally {
+			// Only close SqlMapSession if we know we've actually opened it
+			// at the present level.
+			if (ibatisCon == null) {
+				session.close();
+			}
+		}
 	}
 
 	@Override

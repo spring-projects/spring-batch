@@ -15,7 +15,9 @@
  */
 package org.springframework.batch.item.database;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -27,7 +29,6 @@ import javax.sql.DataSource;
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.dao.EmptyResultDataAccessException;
-import org.springframework.orm.ibatis.SqlMapClientTemplate;
 
 import com.ibatis.sqlmap.client.SqlMapClient;
 import com.ibatis.sqlmap.client.SqlMapSession;
@@ -42,11 +43,9 @@ public class IbatisBatchItemWriterTests {
 	private IbatisBatchItemWriter<Foo> writer = new IbatisBatchItemWriter<Foo>();
 
 	private DataSource ds;
-	
-	private SqlMapClientTemplate smct;
-	
+
 	private SqlMapClient smc;
-	
+
 	private String statementId = "updateFoo";
 
 	@SuppressWarnings("unused")
@@ -58,7 +57,7 @@ public class IbatisBatchItemWriterTests {
 			this.id = 1L;
 			this.bar = bar;
 		}
-		
+
 		public Long getId() {
 			return id;
 		}
@@ -91,16 +90,16 @@ public class IbatisBatchItemWriterTests {
 		public int hashCode() {
 			return bar.hashCode();
 		}
-		
+
 	}
 
 	@Before
 	public void setUp() throws Exception {
 		smc = mock(SqlMapClient.class);
 		ds = mock(DataSource.class);
-		smct = new SqlMapClientTemplate(ds, smc);
 		writer.setStatementId(statementId);
-		writer.setSqlMapClientTemplate(smct);
+		writer.setSqlMapClient(smc);
+		writer.setDataSource(ds);
 		writer.afterPropertiesSet();
 	}
 
@@ -122,7 +121,7 @@ public class IbatisBatchItemWriterTests {
 			String message = e.getMessage();
 			assertTrue("Message does not contain 'SqlMapClient'.", message.indexOf("SqlMapClient") >= 0);
 		}
-		writer.setSqlMapClientTemplate(smct);
+		writer.setSqlMapClient(smc);
 		try {
 			writer.afterPropertiesSet();
 			fail("Expected IllegalArgumentException");
@@ -138,7 +137,7 @@ public class IbatisBatchItemWriterTests {
 
 	@Test
 	public void testWriteAndFlush() throws Exception {
-		SqlMapSession sms = mock(SqlMapSession.class); 
+		SqlMapSession sms = mock(SqlMapSession.class);
 		when(smc.openSession()).thenReturn(sms);
 		sms.close();
 		when(sms.getCurrentConnection()).thenReturn(null);
@@ -153,7 +152,7 @@ public class IbatisBatchItemWriterTests {
 
 	@Test
 	public void testWriteAndFlushWithEmptyUpdate() throws Exception {
-		SqlMapSession sms = mock(SqlMapSession.class); 
+		SqlMapSession sms = mock(SqlMapSession.class);
 		when(smc.openSession()).thenReturn(sms);
 		sms.close();
 		when(sms.getCurrentConnection()).thenReturn(null);
@@ -177,7 +176,7 @@ public class IbatisBatchItemWriterTests {
 	@Test
 	public void testWriteAndFlushWithFailure() throws Exception {
 		final RuntimeException ex = new RuntimeException("ERROR");
-		SqlMapSession sms = mock(SqlMapSession.class); 
+		SqlMapSession sms = mock(SqlMapSession.class);
 		when(smc.openSession()).thenReturn(sms);
 		sms.close();
 		when(sms.getCurrentConnection()).thenReturn(null);
