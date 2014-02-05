@@ -13,6 +13,7 @@ import java.util.Collections;
 import java.util.List;
 
 import javax.xml.bind.annotation.XmlRootElement;
+import javax.xml.namespace.QName;
 import javax.xml.stream.XMLEventFactory;
 import javax.xml.stream.XMLEventWriter;
 import javax.xml.stream.XMLStreamException;
@@ -800,7 +801,7 @@ public class StaxEventItemWriterTests {
 
 		assertEquals("Wrong content: " + content,
 				"<ns:testroot xmlns:ns=\"http://www.springframework.org/test\">" +
-				"<ns:group><StaxEventItemWriter-testString/><StaxEventItemWriter-testString/></group></ns:testroot>", content);
+				"<ns:group><StaxEventItemWriter-testString/><StaxEventItemWriter-testString/></ns:group></ns:testroot>", content);
 	}
 
 	/**
@@ -824,7 +825,7 @@ public class StaxEventItemWriterTests {
 				"<ns:testroot xmlns:ns=\"http://www.springframework.org/test\">" +
 				"<preHeader>PRE-HEADER</preHeader><ns:group><subGroup><postHeader>POST-HEADER</postHeader>" +
 				"<StaxEventItemWriter-testString/><StaxEventItemWriter-testString/>" +
-				"<preFooter>PRE-FOOTER</preFooter></subGroup></group><postFooter>POST-FOOTER</postFooter>" +
+				"<preFooter>PRE-FOOTER</preFooter></subGroup></ns:group><postFooter>POST-FOOTER</postFooter>" +
 				"</ns:testroot>", content);
 	}
 	

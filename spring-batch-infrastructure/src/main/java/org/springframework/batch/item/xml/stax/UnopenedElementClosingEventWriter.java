@@ -24,7 +24,6 @@ import java.util.List;
 import javax.xml.namespace.QName;
 import javax.xml.stream.XMLEventWriter;
 import javax.xml.stream.XMLStreamException;
-import javax.xml.stream.events.EndElement;
 import javax.xml.stream.events.XMLEvent;
 
 import org.springframework.dao.DataAccessResourceFailureException;
@@ -51,18 +50,16 @@ public class UnopenedElementClosingEventWriter extends AbstractEventWriterWrappe
     @Override
 	public void add(XMLEvent event) throws XMLStreamException {
     	if (isUnopenedElementCloseEvent(event)) {
-    		EndElement endElement = event.asEndElement();
-    		QName name = endElement.getName();
-    		String nsPrefix = !StringUtils.hasText(name.getPrefix()) ? "" : name.getPrefix() + ":";    		
+    		QName element = unopenedElements.removeLast();
+    		String nsPrefix = !StringUtils.hasText(element.getPrefix()) ? "" : element.getPrefix() + ":";    		
     		try {
     			super.flush();
-    			ioWriter.write("</" + nsPrefix + name.getLocalPart() + ">");
+    			ioWriter.write("</" + nsPrefix + element.getLocalPart() + ">");
     			ioWriter.flush();
     		}
     		catch (IOException ioe) {
-    			throw new DataAccessResourceFailureException("Unable to close tag: " + name, ioe);
+    			throw new DataAccessResourceFailureException("Unable to close tag: " + element, ioe);
     		}    		
-    		unopenedElements.removeLast();
     	} else {
     		super.add(event);
     	}
