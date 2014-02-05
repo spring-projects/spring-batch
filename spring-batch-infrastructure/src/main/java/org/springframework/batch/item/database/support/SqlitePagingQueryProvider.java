@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2012 the original author or authors.
+ * Copyright 2014 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,11 +26,17 @@ import org.springframework.util.StringUtils;
  * @since 3.0.0
  */
 public class SqlitePagingQueryProvider extends AbstractSqlPagingQueryProvider {
+	/* (non-Javadoc)
+	 * @see org.springframework.batch.item.database.support.AbstractSqlPagingQueryProvider#generateFirstPageQuery(int)
+	 */
 	@Override
 	public String generateFirstPageQuery(int pageSize) {
 		return SqlPagingQueryUtils.generateLimitSqlQuery(this, false, buildLimitClause(pageSize));
 	}
 
+	/* (non-Javadoc)
+	 * @see org.springframework.batch.item.database.support.AbstractSqlPagingQueryProvider#generateRemainingPagesQuery(int)
+	 */
 	@Override
 	public String generateRemainingPagesQuery(int pageSize) {
 		if(StringUtils.hasText(getGroupClause())) {
@@ -41,6 +47,9 @@ public class SqlitePagingQueryProvider extends AbstractSqlPagingQueryProvider {
 		}
 	}
 
+	/* (non-Javadoc)
+	 * @see org.springframework.batch.item.database.support.AbstractSqlPagingQueryProvider#generateJumpToItemQuery(int, int)
+	 */
 	@Override
 	public String generateJumpToItemQuery(int itemIndex, int pageSize) {
 		int page = itemIndex / pageSize;
