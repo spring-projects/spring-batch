@@ -23,7 +23,7 @@ import org.springframework.util.StringUtils;
  * features.
  *
  * @author Luke Taylor
- * @since 2.2.5
+ * @since 3.0.0
  */
 public class SqlitePagingQueryProvider extends AbstractSqlPagingQueryProvider {
 	@Override
