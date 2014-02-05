@@ -61,6 +61,7 @@ public class DefaultDataFieldMaxValueIncrementerFactoryTests extends TestCase {
 		assertTrue(factory.isSupportedIncrementerType("hsql"));
 		assertTrue(factory.isSupportedIncrementerType("sqlserver"));
 		assertTrue(factory.isSupportedIncrementerType("sybase"));
+		assertTrue(factory.isSupportedIncrementerType("sqlite"));
 	}
 	
 	public void testUnsupportedDatabaseType(){
@@ -124,5 +125,8 @@ public class DefaultDataFieldMaxValueIncrementerFactoryTests extends TestCase {
 		assertTrue(factory.getIncrementer("sybase", "NAME") instanceof SybaseMaxValueIncrementer);
 	}
 
+	public void testSqlite(){
+		assertTrue(factory.getIncrementer("sqlite", "NAME") instanceof SqliteMaxValueIncrementer);
+	}
 
 }
