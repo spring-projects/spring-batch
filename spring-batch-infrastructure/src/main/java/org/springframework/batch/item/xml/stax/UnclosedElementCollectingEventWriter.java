@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2013 the original author or authors.
+ * Copyright 2014 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -28,27 +28,30 @@ import javax.xml.stream.events.XMLEvent;
  * Delegating XMLEventWriter, which collects the QNames of elements that were opened but not closed.
  *
  * @author Jimmy Praet
+ * @since 3.0
  */
 public class UnclosedElementCollectingEventWriter extends AbstractEventWriterWrapper {
 
 	private LinkedList<QName> unclosedElements = new LinkedList<QName>();
 
 	public UnclosedElementCollectingEventWriter(XMLEventWriter wrappedEventWriter) {
-		super(wrappedEventWriter);		
+		super(wrappedEventWriter);
 	}
-	
-    @Override
+
+	/* (non-Javadoc)
+	 * @see org.springframework.batch.item.xml.stax.AbstractEventWriterWrapper#add(javax.xml.stream.events.XMLEvent)
+	 */
+	@Override
 	public void add(XMLEvent event) throws XMLStreamException {
-    	if (event.isStartElement()) {
-    		unclosedElements.addLast(event.asStartElement().getName());
-    	} else if (event.isEndElement()) {
-    		unclosedElements.removeLast();
-    	}
-    	super.add(event);
-	}	
-    
+		if (event.isStartElement()) {
+			unclosedElements.addLast(event.asStartElement().getName());
+		} else if (event.isEndElement()) {
+			unclosedElements.removeLast();
+		}
+		super.add(event);
+	}
+
 	public List<QName> getUnclosedElements() {
 		return unclosedElements;
 	}
-
 }

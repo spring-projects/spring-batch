@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2013 the original author or authors.
+ * Copyright 2014 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -34,35 +34,39 @@ import org.springframework.util.StringUtils;
  * to the underlying java.io.Writer instead of to the delegate XMLEventWriter.
  *
  * @author Jimmy Praet
+ * @since 3.0
  */
 public class UnopenedElementClosingEventWriter extends AbstractEventWriterWrapper {
 
 	private LinkedList<QName> unopenedElements;
-	
+
 	private Writer ioWriter;
 
 	public UnopenedElementClosingEventWriter(XMLEventWriter wrappedEventWriter, Writer ioWriter, List<QName> unopenedElements) {
-		super(wrappedEventWriter);		
+		super(wrappedEventWriter);
 		this.unopenedElements = new LinkedList<QName>(unopenedElements);
 		this.ioWriter = ioWriter;
 	}
-	
-    @Override
+
+	/* (non-Javadoc)
+	 * @see org.springframework.batch.item.xml.stax.AbstractEventWriterWrapper#add(javax.xml.stream.events.XMLEvent)
+	 */
+	@Override
 	public void add(XMLEvent event) throws XMLStreamException {
-    	if (isUnopenedElementCloseEvent(event)) {
-    		QName element = unopenedElements.removeLast();
-    		String nsPrefix = !StringUtils.hasText(element.getPrefix()) ? "" : element.getPrefix() + ":";    		
-    		try {
-    			super.flush();
-    			ioWriter.write("</" + nsPrefix + element.getLocalPart() + ">");
-    			ioWriter.flush();
-    		}
-    		catch (IOException ioe) {
-    			throw new DataAccessResourceFailureException("Unable to close tag: " + element, ioe);
-    		}    		
-    	} else {
-    		super.add(event);
-    	}
+		if (isUnopenedElementCloseEvent(event)) {
+			QName element = unopenedElements.removeLast();
+			String nsPrefix = !StringUtils.hasText(element.getPrefix()) ? "" : element.getPrefix() + ":";
+			try {
+				super.flush();
+				ioWriter.write("</" + nsPrefix + element.getLocalPart() + ">");
+				ioWriter.flush();
+			}
+			catch (IOException ioe) {
+				throw new DataAccessResourceFailureException("Unable to close tag: " + element, ioe);
+			}
+		} else {
+			super.add(event);
+		}
 	}
 
 	private boolean isUnopenedElementCloseEvent(XMLEvent event) {
@@ -73,6 +77,6 @@ public class UnopenedElementClosingEventWriter extends AbstractEventWriterWrappe
 		} else {
 			return unopenedElements.getLast().equals(event.asEndElement().getName());
 		}
-	}	
+	}
 
 }
