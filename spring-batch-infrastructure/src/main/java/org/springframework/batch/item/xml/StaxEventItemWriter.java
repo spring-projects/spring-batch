@@ -24,9 +24,11 @@ import java.io.OutputStreamWriter;
 import java.io.UnsupportedEncodingException;
 import java.io.Writer;
 import java.nio.channels.FileChannel;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
+import javax.xml.namespace.QName;
 import javax.xml.stream.FactoryConfigurationError;
 import javax.xml.stream.XMLEventFactory;
 import javax.xml.stream.XMLEventWriter;
@@ -44,6 +46,8 @@ import org.springframework.batch.item.file.ResourceAwareItemWriterItemStream;
 import org.springframework.batch.item.support.AbstractItemStreamItemWriter;
 import org.springframework.batch.item.util.FileUtils;
 import org.springframework.batch.item.xml.stax.NoStartEndDocumentStreamWriter;
+import org.springframework.batch.item.xml.stax.UnclosedElementCollectingEventWriter;
+import org.springframework.batch.item.xml.stax.UnopenedElementClosingEventWriter;
 import org.springframework.batch.support.transaction.TransactionAwareBufferedWriter;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.core.io.Resource;
@@ -86,6 +90,9 @@ ResourceAwareItemWriterItemStream<T>, InitializingBean {
 	// restart data property name
 	private static final String RESTART_DATA_NAME = "position";
 
+	// unclosed header callback elements property name
+	private static final String UNCLOSED_HEADER_CALLBACK_ELEMENTS_NAME = "unclosedHeaderCallbackElements";
+	
 	// restart data property name
 	private static final String WRITE_STATISTICS_NAME = "record.count";
 
@@ -143,6 +150,11 @@ ResourceAwareItemWriterItemStream<T>, InitializingBean {
 	private boolean forceSync;
 
 	private boolean shouldDeleteIfEmpty = false;
+	
+	private boolean restarted = false;
+	
+	// List holding the QName of elements that were opened in the header callback, but not closed
+	private List<QName> unclosedHeaderCallbackElements = Collections.EMPTY_LIST;
 
 	public StaxEventItemWriter() {
 		setExecutionContextName(ClassUtils.getShortName(StaxEventItemWriter.class));
@@ -353,6 +365,7 @@ ResourceAwareItemWriterItemStream<T>, InitializingBean {
 	 * 
 	 * @see org.springframework.batch.item.ItemStream#open(ExecutionContext)
 	 */
+	@SuppressWarnings("unchecked")
 	@Override
 	public void open(ExecutionContext executionContext) {
 		super.open(executionContext);
@@ -360,13 +373,17 @@ ResourceAwareItemWriterItemStream<T>, InitializingBean {
 		Assert.notNull(resource, "The resource must be set");
 
 		long startAtPosition = 0;
-		boolean restarted = false;
-
+		
 		// if restart data is provided, restart from provided offset
 		// otherwise start from beginning
 		if (executionContext.containsKey(getExecutionContextKey(RESTART_DATA_NAME))) {
 			startAtPosition = executionContext.getLong(getExecutionContextKey(RESTART_DATA_NAME));
 			currentRecordCount = executionContext.getLong(getExecutionContextKey(WRITE_STATISTICS_NAME));
+			if (executionContext.containsKey(getExecutionContextKey(UNCLOSED_HEADER_CALLBACK_ELEMENTS_NAME))) {
+				unclosedHeaderCallbackElements = (List<QName>) executionContext
+						.get(getExecutionContextKey(UNCLOSED_HEADER_CALLBACK_ELEMENTS_NAME));
+			}
+			
 			restarted = true;
 			if (shouldDeleteIfEmpty && currentRecordCount == 0) {
 				// previous execution deleted the output file because no items were written
@@ -375,14 +392,19 @@ ResourceAwareItemWriterItemStream<T>, InitializingBean {
 			} else {
 				restarted = true;
 			}
+		} else {
+			currentRecordCount = 0;
+			restarted = false;
 		}
 
-		open(startAtPosition, restarted);
+		open(startAtPosition);
 
 		if (startAtPosition == 0) {
 			try {
 				if (headerCallback != null) {
-					headerCallback.write(delegateEventWriter);
+					UnclosedElementCollectingEventWriter headerCallbackWriter = new UnclosedElementCollectingEventWriter(delegateEventWriter);
+					headerCallback.write(headerCallbackWriter);
+					unclosedHeaderCallbackElements = headerCallbackWriter.getUnclosedElements();
 				}
 			}
 			catch (IOException e) {
@@ -395,7 +417,8 @@ ResourceAwareItemWriterItemStream<T>, InitializingBean {
 	/**
 	 * Helper method for opening output source at given file position
 	 */
-	private void open(long position, boolean restarted) {
+	@SuppressWarnings("resource")
+	private void open(long position) {
 
 		File file;
 		FileOutputStream os = null;
@@ -640,7 +663,12 @@ ResourceAwareItemWriterItemStream<T>, InitializingBean {
 
 		try {
 			if (footerCallback != null) {
-				footerCallback.write(delegateEventWriter);
+				XMLEventWriter footerCallbackWriter = delegateEventWriter;
+				if (restarted && !unclosedHeaderCallbackElements.isEmpty()) {
+					footerCallbackWriter = new UnopenedElementClosingEventWriter(
+							delegateEventWriter, bufferedWriter, unclosedHeaderCallbackElements);
+				} 
+				footerCallback.write(footerCallbackWriter);
 			}
 			delegateEventWriter.flush();
 			endDocument(delegateEventWriter);
@@ -737,6 +765,10 @@ ResourceAwareItemWriterItemStream<T>, InitializingBean {
 			Assert.notNull(executionContext, "ExecutionContext must not be null");
 			executionContext.putLong(getExecutionContextKey(RESTART_DATA_NAME), getPosition());
 			executionContext.putLong(getExecutionContextKey(WRITE_STATISTICS_NAME), currentRecordCount);
+			if (!unclosedHeaderCallbackElements.isEmpty()) {
+				executionContext.put(getExecutionContextKey(UNCLOSED_HEADER_CALLBACK_ELEMENTS_NAME),
+						unclosedHeaderCallbackElements);
+			}			
 		}
 	}
 
