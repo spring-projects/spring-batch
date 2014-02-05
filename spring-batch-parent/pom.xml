@@ -155,7 +155,7 @@
 				<repository>
 					<id>springsource-milestone</id>
 					<name>SpringSource Milestone Repository</name>
-					<url>https://repo.springsource.org/libs-milestone/</url>
+					<url>https://repo.spring.io/libs-milestone/</url>
 				</repository>
 				<repository>
 					<id>gemstone</id>
