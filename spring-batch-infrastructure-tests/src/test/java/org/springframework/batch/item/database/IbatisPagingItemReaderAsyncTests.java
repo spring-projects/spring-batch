@@ -22,15 +22,15 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.batch.item.sample.Foo;
-import org.springframework.test.jdbc.JdbcTestUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.orm.ibatis.SqlMapClientFactoryBean;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.springframework.test.jdbc.JdbcTestUtils;
 
 import com.ibatis.sqlmap.client.SqlMapClient;
+import com.ibatis.sqlmap.client.SqlMapClientBuilder;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(locations = "JdbcPagingItemReaderCommonTests-context.xml")
@@ -55,7 +55,7 @@ public class IbatisPagingItemReaderAsyncTests {
 
 	@Before
 	public void init() {
-        JdbcTemplate jdbcTemplate = new JdbcTemplate(dataSource);
+		JdbcTemplate jdbcTemplate = new JdbcTemplate(dataSource);
 		maxId = jdbcTemplate.queryForInt("SELECT MAX(ID) from T_FOOS");
 		for (int i = ITEM_COUNT; i > maxId; i--) {
 			jdbcTemplate.update("INSERT into T_FOOS (ID,NAME,VALUE) values (?, ?, ?)", i, "foo" + i, i);
@@ -65,7 +65,7 @@ public class IbatisPagingItemReaderAsyncTests {
 
 	@After
 	public void destroy() {
-        JdbcTemplate jdbcTemplate = new JdbcTemplate(dataSource);
+		JdbcTemplate jdbcTemplate = new JdbcTemplate(dataSource);
 		jdbcTemplate.update("DELETE from T_FOOS where ID>?", maxId);
 	}
 
@@ -99,6 +99,7 @@ public class IbatisPagingItemReaderAsyncTests {
 				.newFixedThreadPool(THREAD_COUNT));
 		for (int i = 0; i < THREAD_COUNT; i++) {
 			completionService.submit(new Callable<List<Foo>>() {
+				@Override
 				public List<Foo> call() throws Exception {
 					List<Foo> list = new ArrayList<Foo>();
 					Foo next = null;
@@ -130,17 +131,13 @@ public class IbatisPagingItemReaderAsyncTests {
 	}
 
 	private IbatisPagingItemReader<Foo> getItemReader() throws Exception {
-		SqlMapClientFactoryBean factory = new SqlMapClientFactoryBean();
-		factory.setConfigLocation(new ClassPathResource("ibatis-config.xml", getClass()));
-		factory.setDataSource(dataSource);
-		factory.afterPropertiesSet();
-		SqlMapClient sqlMapClient = createSqlMapClient();
+		SqlMapClient sqlMapClient = SqlMapClientBuilder.buildSqlMapClient(new ClassPathResource("ibatis-config.xml", getClass()).getInputStream());
 
 		IbatisPagingItemReader<Foo> reader = new IbatisPagingItemReader<Foo>();
 		if ("postgres".equals(System.getProperty("ENVIRONMENT"))) {
-			reader.setQueryId("getPagedFoosPostgres");			
+			reader.setQueryId("getPagedFoosPostgres");
 		} else if ("oracle".equals(System.getProperty("ENVIRONMENT"))) {
-			reader.setQueryId("getPagedFoosOracle");			
+			reader.setQueryId("getPagedFoosOracle");
 		} else {
 			reader.setQueryId("getPagedFoos");
 		}
@@ -154,11 +151,7 @@ public class IbatisPagingItemReaderAsyncTests {
 	}
 
 	private SqlMapClient createSqlMapClient() throws Exception {
-		SqlMapClientFactoryBean factory = new SqlMapClientFactoryBean();
-		factory.setConfigLocation(new ClassPathResource("ibatis-config.xml", getClass()));
-		factory.setDataSource(dataSource);
-		factory.afterPropertiesSet();
-		return (SqlMapClient) factory.getObject();
+		return SqlMapClientBuilder.buildSqlMapClient(new ClassPathResource("ibatis-config.xml", getClass()).getInputStream());
 	}
 
 }

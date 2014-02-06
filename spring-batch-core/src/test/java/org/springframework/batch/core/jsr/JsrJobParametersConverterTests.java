@@ -15,6 +15,7 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 import org.springframework.batch.core.JobParameters;
 import org.springframework.batch.core.JobParametersBuilder;
+import org.springframework.batch.core.PooledEmbeddedDataSource;
 import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseBuilder;
 
 public class JsrJobParametersConverterTests {
@@ -24,10 +25,10 @@ public class JsrJobParametersConverterTests {
 
 	@BeforeClass
 	public static void setupDatabase() {
-		dataSource = new EmbeddedDatabaseBuilder().
+		dataSource = new PooledEmbeddedDataSource(new EmbeddedDatabaseBuilder().
 				addScript("classpath:org/springframework/batch/core/schema-drop-hsqldb.sql").
 				addScript("classpath:org/springframework/batch/core/schema-hsqldb.sql").
-				build();
+				build());
 	}
 
 	@Before
