@@ -69,6 +69,7 @@ public class DecisionStepFactoryBean implements FactoryBean<Step>, InitializingB
 		DecisionStep decisionStep = new DecisionStep(jsrDecider);
 		decisionStep.setName(name);
 		decisionStep.setJobRepository(jobRepository);
+		decisionStep.setAllowStartIfComplete(true);
 
 		return decisionStep;
 	}
