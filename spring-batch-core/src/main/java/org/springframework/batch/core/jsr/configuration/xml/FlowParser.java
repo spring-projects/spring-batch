@@ -167,10 +167,6 @@ public class FlowParser extends AbstractFlowParser {
 					stateDef, parserContext, false));
 			list.addAll(createTransition(FlowExecutionStatus.UNKNOWN, FlowExecutionStatus.UNKNOWN.getName(), null, null,
 					stateDef, parserContext, false));
-			if (!hasNextAttribute) {
-				list.addAll(createTransition(FlowExecutionStatus.COMPLETED, FlowExecutionStatus.COMPLETED.getName(), null, null, stateDef, parserContext,
-						false));
-			}
 		}
 
 		if (hasNextAttribute) {
@@ -180,6 +176,9 @@ public class FlowParser extends AbstractFlowParser {
 			}
 
 			list.add(getStateTransitionReference(parserContext, stateDef, null, shortNextAttribute));
+		} else {
+			list.addAll(createTransition(FlowExecutionStatus.COMPLETED, FlowExecutionStatus.COMPLETED.getName(), null, null, stateDef, parserContext,
+					false));
 		}
 
 		return list;

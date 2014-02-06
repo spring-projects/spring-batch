@@ -71,14 +71,14 @@ public class DecisionStepTests {
 	}
 
 	@Test
-	public void testDecisionInvalidExitStatus() throws Exception {
+	public void testDecisionUnmappedExitStatus() throws Exception {
 		ApplicationContext context = new GenericXmlApplicationContext("classpath:/org/springframework/batch/core/jsr/step/DecisionStepTests-decisionInvalidExitStatus-context.xml");
 
 		JobLauncher launcher = context.getBean(JobLauncher.class);
 		Job job = context.getBean(Job.class);
 
 		JobExecution execution = launcher.run(job, new JobParameters());
-		assertEquals(BatchStatus.FAILED, execution.getStatus());
+		assertEquals(BatchStatus.COMPLETED, execution.getStatus());
 		assertEquals(2, execution.getStepExecutions().size());
 
 		for (org.springframework.batch.core.StepExecution curExecution : execution.getStepExecutions()) {
