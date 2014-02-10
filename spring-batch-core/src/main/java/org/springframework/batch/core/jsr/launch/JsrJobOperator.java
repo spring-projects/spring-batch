@@ -540,8 +540,6 @@ public class JsrJobOperator implements JobOperator, InitializingBean {
 			jobRepository.update(jobExecution);
 
 			throw new JobRestartException(e);
-		} finally {
-			batchContext.close();
 		}
 
 		return jobExecution.getId();

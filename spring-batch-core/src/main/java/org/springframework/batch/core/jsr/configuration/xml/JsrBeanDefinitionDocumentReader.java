@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 the original author or authors.
+ * Copyright 2013-2014 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,6 +24,8 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.batch.core.jsr.configuration.support.JsrExpressionParser;
 import org.springframework.beans.factory.config.BeanDefinition;
+import org.springframework.beans.factory.support.AbstractBeanDefinition;
+import org.springframework.beans.factory.support.BeanDefinitionBuilder;
 import org.springframework.beans.factory.support.BeanDefinitionRegistry;
 import org.springframework.beans.factory.xml.DefaultBeanDefinitionDocumentReader;
 import org.w3c.dom.Element;
@@ -37,11 +39,12 @@ import org.w3c.dom.traversal.NodeIterator;
 
 /**
  * <p>
- * {@link DefaultBeanDefinitionDocumentReader} extension to hook into the pre/post processing of the provided
+ * {@link DefaultBeanDefinitionDocumentReader} extension to hook into the pre processing of the provided
  * XML document, ensuring any references to property operators such as jobParameters and jobProperties are
  * resolved prior to loading the context. Since we know these initial values upfront, doing this transformation
  * allows us to ensure values are retrieved in their resolved form prior to loading the context and property
- * operators can be used on any element.
+ * operators can be used on any element. This document reader will also look for references to artifacts by
+ * the same name and create new bean definitions to provide the ability to create new instances.
  * </p>
  *
  * @author Chris Schaefer
@@ -214,17 +217,51 @@ public class JsrBeanDefinitionDocumentReader extends DefaultBeanDefinitionDocume
 		DocumentTraversal traversal = (DocumentTraversal) root.getOwnerDocument();
 		NodeIterator iterator = traversal.createNodeIterator(root, NodeFilter.SHOW_ELEMENT, null, true);
 
+		BeanDefinitionRegistry registry = getBeanDefinitionRegistry();
+		Map<String, Integer> referenceCountMap = new HashMap<String, Integer>();
+
 		for (Node n = iterator.nextNode(); n != null; n = iterator.nextNode()) {
 			NamedNodeMap map = n.getAttributes();
 
 			if (map.getLength() > 0) {
 				for (int i = 0; i < map.getLength(); i++) {
 					Node node = map.item(i);
+
+					String nodeName = node.getNodeName();
 					String nodeValue = node.getNodeValue();
 					String resolvedValue = resolveValue(nodeValue);
+					String newNodeValue = resolvedValue;
 
-					if(!nodeValue.equals(resolvedValue)) {
-						node.setNodeValue(resolvedValue);
+					if("ref".equals(nodeName)) {
+						if(!referenceCountMap.containsKey(resolvedValue)) {
+							referenceCountMap.put(resolvedValue, 0);
+						}
+
+						// possibly fully qualified class name in ref tag in the jobXML
+						if(!registry.containsBeanDefinition(resolvedValue)) {
+							AbstractBeanDefinition beanDefinition = BeanDefinitionBuilder.genericBeanDefinition(resolvedValue)
+									.getBeanDefinition();
+							beanDefinition.setScope("step");
+							registry.registerBeanDefinition(resolvedValue, beanDefinition);
+							newNodeValue = resolvedValue;
+						}
+
+						if (referenceCountMap.containsKey(resolvedValue)) {
+							Integer referenceCount = referenceCountMap.get(resolvedValue);
+							referenceCount++;
+							referenceCountMap.put(resolvedValue, referenceCount);
+
+							newNodeValue = resolvedValue + referenceCount;
+
+							if(registry.containsBeanDefinition(resolvedValue)) {
+								BeanDefinition beanDefinition = registry.getBeanDefinition(resolvedValue);
+								registry.registerBeanDefinition(newNodeValue, beanDefinition);
+							}
+						}
+					}
+
+					if(!nodeValue.equals(newNodeValue)) {
+						node.setNodeValue(newNodeValue);
 					}
 				}
 			} else {
