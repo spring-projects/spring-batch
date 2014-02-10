@@ -15,13 +15,16 @@
  */
 package org.springframework.batch.core.jsr.job.flow.support.state;
 
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 
 import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.job.flow.Flow;
 import org.springframework.batch.core.job.flow.FlowExecution;
 import org.springframework.batch.core.job.flow.FlowExecutionStatus;
 import org.springframework.batch.core.job.flow.FlowExecutor;
+import org.springframework.batch.core.jsr.job.flow.support.DefaultFlow;
 
 /**
  * JSR-352 states that artifacts cannot set the ExitStatus from within a split for a job.  Because
@@ -50,6 +53,19 @@ public class SplitState extends org.springframework.batch.core.job.flow.support.
 	 */
 	@Override
 	protected FlowExecutionStatus doAggregation(Collection<FlowExecution> results, FlowExecutor executor) {
+		List<String> stepNames = new ArrayList<String>();
+
+		for (Flow curFlow : getFlows()) {
+			DefaultFlow flow = (DefaultFlow) curFlow;
+			if(flow.getMostRecentStepName() != null) {
+				stepNames.add(flow.getMostRecentStepName());
+			}
+		}
+
+		if(!stepNames.isEmpty()) {
+			executor.getJobExecution().getExecutionContext().put("batch.splitLastSteps", stepNames);
+		}
+
 		executor.getJobExecution().setExitStatus(null);
 
 		return super.doAggregation(results, executor);

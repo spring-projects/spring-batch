@@ -15,15 +15,17 @@
  */
 package org.springframework.batch.core.jsr.step;
 
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 
 import javax.batch.api.Decider;
-import javax.batch.operations.BatchRuntimeException;
 
 import org.springframework.batch.core.ExitStatus;
 import org.springframework.batch.core.Step;
 import org.springframework.batch.core.StepExecution;
 import org.springframework.batch.core.step.AbstractStep;
+import org.springframework.batch.item.ExecutionContext;
 
 /**
  * Implements a {@link Step} to follow the rules for a decision state
@@ -47,34 +49,41 @@ public class DecisionStep extends AbstractStep {
 
 	@Override
 	protected void doExecute(StepExecution stepExecution) throws Exception {
-		Collection<StepExecution> stepExecutions = stepExecution.getJobExecution().getStepExecutions();
+		ExecutionContext executionContext = stepExecution.getJobExecution().getExecutionContext();
+		List<javax.batch.runtime.StepExecution> stepExecutions = new ArrayList<javax.batch.runtime.StepExecution>();
 
-		// Used to determine if this step is the first step in the job (not allowed)
-		if(stepExecutions.size() == 1) {
-			stepExecution.setTerminateOnly();
-			throw new BatchRuntimeException("Decision not a valid first step");
-		}
+		if(executionContext.containsKey("batch.splitLastSteps")) {
+			List<String> stepNames = (List<String>) executionContext.get("batch.splitLastSteps");
 
-		// Currently does not support splits
-		StepExecution lastExecution = null;
+			for (String stepName : stepNames) {
+				StepExecution curStepExecution = getJobRepository().getLastStepExecution(stepExecution.getJobExecution().getJobInstance(), stepName);
+				stepExecutions.add(new org.springframework.batch.core.jsr.StepExecution(curStepExecution));
+			}
+		} else {
+			Collection<StepExecution> currentRunStepExecutions = stepExecution.getJobExecution().getStepExecutions();
 
-		if(stepExecutions != null) {
-			for (StepExecution curStepExecution : stepExecutions) {
-				if(lastExecution == null || (curStepExecution.getEndTime() != null && curStepExecution.getEndTime().after(lastExecution.getEndTime()))) {
-					lastExecution = curStepExecution;
+			StepExecution lastExecution = null;
+
+			if(stepExecutions != null) {
+				for (StepExecution curStepExecution : currentRunStepExecutions) {
+					if(lastExecution == null || (curStepExecution.getEndTime() != null && curStepExecution.getEndTime().after(lastExecution.getEndTime()))) {
+						lastExecution = curStepExecution;
+					}
 				}
+
+				stepExecutions.add(new org.springframework.batch.core.jsr.StepExecution(lastExecution));
 			}
 		}
 
-		javax.batch.runtime.StepExecution [] executions = new org.springframework.batch.core.jsr.StepExecution[1];
-
-		executions[0] = new org.springframework.batch.core.jsr.StepExecution(lastExecution);
-
 		try {
-			ExitStatus exitStatus = new ExitStatus(decider.decide(executions));
+			ExitStatus exitStatus = new ExitStatus(decider.decide(stepExecutions.toArray(new javax.batch.runtime.StepExecution[0])));
 
 			stepExecution.getJobExecution().setExitStatus(exitStatus);
 			stepExecution.setExitStatus(exitStatus);
+
+			if(executionContext.containsKey("batch.splitLastSteps")) {
+				executionContext.remove("batch.splitLastSteps");
+			}
 		} catch (Exception e) {
 			stepExecution.setTerminateOnly();
 			stepExecution.addFailureException(e);

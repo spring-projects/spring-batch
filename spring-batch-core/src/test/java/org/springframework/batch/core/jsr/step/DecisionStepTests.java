@@ -1,120 +1,118 @@
 package org.springframework.batch.core.jsr.step;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.fail;
+import static org.springframework.batch.core.jsr.JsrTestUtils.runJob;
 
 import java.util.List;
+import java.util.Properties;
 
 import javax.batch.api.Decider;
+import javax.batch.runtime.BatchRuntime;
+import javax.batch.runtime.BatchStatus;
+import javax.batch.runtime.JobExecution;
 import javax.batch.runtime.StepExecution;
 
-import org.junit.Ignore;
+import org.junit.Before;
 import org.junit.Test;
-import org.springframework.batch.core.BatchStatus;
-import org.springframework.batch.core.Job;
-import org.springframework.batch.core.JobExecution;
-import org.springframework.batch.core.JobParameters;
-import org.springframework.batch.core.launch.JobLauncher;
+import org.springframework.batch.core.explore.JobExplorer;
+import org.springframework.beans.factory.access.BeanFactoryLocator;
+import org.springframework.beans.factory.access.BeanFactoryReference;
+import org.springframework.beans.factory.config.AutowireCapableBeanFactory;
 import org.springframework.context.ApplicationContext;
-import org.springframework.context.support.GenericXmlApplicationContext;
+import org.springframework.context.access.ContextSingletonBeanFactoryLocator;
 
-@SuppressWarnings("resource")
 public class DecisionStepTests {
+
+	private static ApplicationContext baseContext;
+
+	public JobExplorer jobExplorer;
+
+	@Before
+	public void setUp() {
+		StepExecutionCountingDecider.previousStepCount = 0;
+
+		if(jobExplorer == null) {
+			BeanFactoryLocator beanFactoryLocactor = ContextSingletonBeanFactoryLocator.getInstance();
+			BeanFactoryReference ref = beanFactoryLocactor.useBeanFactory("baseContext");
+			baseContext = (ApplicationContext) ref.getFactory();
+
+			baseContext.getAutowireCapableBeanFactory().autowireBeanProperties(this,
+					AutowireCapableBeanFactory.AUTOWIRE_BY_NAME, false);
+		}
+	}
+
+	public void setJobExplorer(JobExplorer jobExplorer) {
+		this.jobExplorer = jobExplorer;
+	}
 
 	@Test
 	public void testDecisionAsFirstStepOfJob() throws Exception {
-		ApplicationContext context = new GenericXmlApplicationContext("classpath:/org/springframework/batch/core/jsr/step/DecisionStepTests-decisionAsFirstStep-context.xml");
-
-		JobLauncher launcher = context.getBean(JobLauncher.class);
-		Job job = context.getBean(Job.class);
-
-		JobExecution execution = launcher.run(job, new JobParameters());
-		assertEquals(BatchStatus.FAILED, execution.getStatus());
-		assertEquals(1, execution.getStepExecutions().size());
+		JobExecution execution = runJob("DecisionStepTests-decisionAsFirstStep-context", new Properties(), 10000l);
+		assertEquals(BatchStatus.FAILED, execution.getBatchStatus());
+		assertEquals(0, BatchRuntime.getJobOperator().getStepExecutions(execution.getExecutionId()).size());
 	}
 
 	@Test
 	public void testDecisionThrowsException() throws Exception {
-		ApplicationContext context = new GenericXmlApplicationContext("classpath:/org/springframework/batch/core/jsr/step/DecisionStepTests-decisionThrowsException-context.xml");
-
-		JobLauncher launcher = context.getBean(JobLauncher.class);
-		Job job = context.getBean(Job.class);
-
-		JobExecution execution = launcher.run(job, new JobParameters());
-		assertEquals(BatchStatus.FAILED, execution.getStatus());
-		assertEquals(2, execution.getStepExecutions().size());
-		List<Throwable> allFailureExceptions = execution.getAllFailureExceptions();
-
-		boolean found = false;
-		for (Throwable throwable : allFailureExceptions) {
-			if(throwable.getMessage().equals("Expected")) {
-				found = true;
-				break;
-			}
-		}
-
-		if(!found) {
-			fail();
-		}
+		JobExecution execution = runJob("DecisionStepTests-decisionThrowsException-context", new Properties(), 10000l);
+		assertEquals(BatchStatus.FAILED, execution.getBatchStatus());
+		assertEquals(2, BatchRuntime.getJobOperator().getStepExecutions(execution.getExecutionId()).size());
 	}
 
 	@Test
 	public void testDecisionValidExitStatus() throws Exception {
-		ApplicationContext context = new GenericXmlApplicationContext("classpath:/org/springframework/batch/core/jsr/step/DecisionStepTests-decisionValidExitStatus-context.xml");
-
-		JobLauncher launcher = context.getBean(JobLauncher.class);
-		Job job = context.getBean(Job.class);
-
-		JobExecution execution = launcher.run(job, new JobParameters());
-		assertEquals(BatchStatus.COMPLETED, execution.getStatus());
-		assertEquals(3, execution.getStepExecutions().size());
+		JobExecution execution = runJob("DecisionStepTests-decisionValidExitStatus-context", new Properties(), 10000l);
+		assertEquals(BatchStatus.COMPLETED, execution.getBatchStatus());
+		assertEquals(3, BatchRuntime.getJobOperator().getStepExecutions(execution.getExecutionId()).size());
 	}
 
 	@Test
 	public void testDecisionUnmappedExitStatus() throws Exception {
-		ApplicationContext context = new GenericXmlApplicationContext("classpath:/org/springframework/batch/core/jsr/step/DecisionStepTests-decisionInvalidExitStatus-context.xml");
+		JobExecution execution = runJob("DecisionStepTests-decisionInvalidExitStatus-context", new Properties(), 10000l);
+		assertEquals(BatchStatus.COMPLETED, execution.getBatchStatus());
+		List<StepExecution> stepExecutions = BatchRuntime.getJobOperator().getStepExecutions(execution.getExecutionId());
+		assertEquals(2, stepExecutions.size());
 
-		JobLauncher launcher = context.getBean(JobLauncher.class);
-		Job job = context.getBean(Job.class);
-
-		JobExecution execution = launcher.run(job, new JobParameters());
-		assertEquals(BatchStatus.COMPLETED, execution.getStatus());
-		assertEquals(2, execution.getStepExecutions().size());
-
-		for (org.springframework.batch.core.StepExecution curExecution : execution.getStepExecutions()) {
-			assertEquals(BatchStatus.COMPLETED, curExecution.getStatus());
+		for (StepExecution curExecution : stepExecutions) {
+			assertEquals(BatchStatus.COMPLETED, curExecution.getBatchStatus());
 		}
 	}
 
 	@Test
 	public void testDecisionCustomExitStatus() throws Exception {
-		ApplicationContext context = new GenericXmlApplicationContext("classpath:/org/springframework/batch/core/jsr/step/DecisionStepTests-decisionCustomExitStatus-context.xml");
-
-		JobLauncher launcher = context.getBean(JobLauncher.class);
-		Job job = context.getBean(Job.class);
-
-		JobExecution execution = launcher.run(job, new JobParameters());
-		assertEquals(BatchStatus.FAILED, execution.getStatus());
-		assertEquals(2, execution.getStepExecutions().size());
-		assertEquals("CustomFail", execution.getExitStatus().getExitCode());
+		JobExecution execution = runJob("DecisionStepTests-decisionCustomExitStatus-context", new Properties(), 10000l);
+		assertEquals(BatchStatus.FAILED, execution.getBatchStatus());
+		assertEquals(2, BatchRuntime.getJobOperator().getStepExecutions(execution.getExecutionId()).size());
+		assertEquals("CustomFail", execution.getExitStatus());
 	}
 
 	@Test
-	@Ignore("Flows as first steps are not supported yet")
 	public void testDecisionAfterFlow() throws Exception {
-		ApplicationContext context = new GenericXmlApplicationContext("classpath:/org/springframework/batch/core/jsr/step/DecisionStepTests-decisionAfterFlow-context.xml");
-
-		JobLauncher launcher = context.getBean(JobLauncher.class);
-		Job job = context.getBean(Job.class);
-
-		JobExecution execution = launcher.run(job, new JobParameters());
-		assertEquals(BatchStatus.COMPLETED, execution.getStatus());
-		assertEquals(3, execution.getStepExecutions().size());
+		JobExecution execution = runJob("DecisionStepTests-decisionAfterFlow-context", new Properties(), 10000l);
+		assertEquals(BatchStatus.COMPLETED, execution.getBatchStatus());
+		assertEquals(3, BatchRuntime.getJobOperator().getStepExecutions(execution.getExecutionId()).size());
 	}
 
 	@Test
-	@Ignore("Splits are not implemented yet as part of our JSR implementation")
-	public void testDecisionAfterSplit() {
+	public void testDecisionAfterSplit() throws Exception {
+		JobExecution execution = runJob("DecisionStepTests-decisionAfterSplit-context", new Properties(), 10000l);
+		assertEquals(BatchStatus.COMPLETED, execution.getBatchStatus());
+		assertEquals(4, BatchRuntime.getJobOperator().getStepExecutions(execution.getExecutionId()).size());
+		assertEquals(2, StepExecutionCountingDecider.previousStepCount);
+	}
+
+	public static class StepExecutionCountingDecider implements Decider {
+
+		static int previousStepCount = 0;
+
+		@Override
+		public String decide(StepExecution[] executions) throws Exception {
+			for (StepExecution stepExecution : executions) {
+				System.err.println(stepExecution.getStepName());
+			}
+			previousStepCount = executions.length;
+			return "next";
+		}
 	}
 
 	public static class NextDecider implements Decider {

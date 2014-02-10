@@ -173,12 +173,16 @@ public class SimpleFlowFactoryBean implements FactoryBean, InitializingBean {
 	 * @author Dave Syer
 	 *
 	 */
-	private static class DelegateState extends AbstractState implements FlowHolder {
+	public static class DelegateState extends AbstractState implements FlowHolder {
 		private final State state;
 
 		private DelegateState(String name, State state) {
 			super(name);
 			this.state = state;
+		}
+
+		public State getState() {
+			return this.state;
 		}
 
 		@Override

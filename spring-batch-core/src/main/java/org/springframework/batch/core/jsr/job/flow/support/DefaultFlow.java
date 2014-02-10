@@ -20,12 +20,14 @@ import java.util.Set;
 import org.springframework.batch.core.JobExecutionException;
 import org.springframework.batch.core.Step;
 import org.springframework.batch.core.StepExecution;
+import org.springframework.batch.core.configuration.xml.SimpleFlowFactoryBean.DelegateState;
 import org.springframework.batch.core.job.flow.Flow;
 import org.springframework.batch.core.job.flow.FlowExecutionException;
 import org.springframework.batch.core.job.flow.FlowExecutionStatus;
 import org.springframework.batch.core.job.flow.State;
 import org.springframework.batch.core.job.flow.support.SimpleFlow;
 import org.springframework.batch.core.job.flow.support.StateTransition;
+import org.springframework.batch.core.job.flow.support.state.StepState;
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.util.StringUtils;
 
@@ -41,11 +43,34 @@ import org.springframework.util.StringUtils;
  */
 public class DefaultFlow extends SimpleFlow {
 
+	private StepState currentStep;
+
 	/**
 	 * @param name name of the flow
 	 */
 	public DefaultFlow(String name) {
 		super(name);
+	}
+
+	public String getMostRecentStepName() {
+		if(currentStep != null) {
+			return currentStep.getStep().getName();
+		} else {
+			return null;
+		}
+	}
+
+	@Override
+	protected boolean isFlowContinued(State state, FlowExecutionStatus status, StepExecution stepExecution) {
+		if(state instanceof DelegateState) {
+			state = ((DelegateState) state).getState();
+		}
+
+		if(state instanceof StepState) {
+			currentStep = (StepState) state;
+		}
+
+		return super.isFlowContinued(state, status, stepExecution);
 	}
 
 	@Override
