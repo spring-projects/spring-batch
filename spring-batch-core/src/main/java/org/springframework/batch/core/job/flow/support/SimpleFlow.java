@@ -79,6 +79,10 @@ public class SimpleFlow implements Flow, InitializingBean {
 		this.name = name;
 	}
 
+	public State getStartState() {
+		return this.startState;
+	}
+
 	/**
 	 * Get the name for this flow.
 	 *
@@ -229,7 +233,7 @@ public class SimpleFlow implements Flow, InitializingBean {
 
 	}
 
-	private boolean isFlowContinued(State state, FlowExecutionStatus status, StepExecution stepExecution) {
+	protected boolean isFlowContinued(State state, FlowExecutionStatus status, StepExecution stepExecution) {
 		boolean continued = true;
 
 		continued = state != null && status!=FlowExecutionStatus.STOPPED;

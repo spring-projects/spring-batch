@@ -19,12 +19,20 @@ import org.springframework.batch.core.ExitStatus;
 import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.JobExecutionException;
 import org.springframework.batch.core.JobInterruptedException;
+import org.springframework.batch.core.Step;
+import org.springframework.batch.core.configuration.xml.SimpleFlowFactoryBean.DelegateState;
 import org.springframework.batch.core.explore.JobExplorer;
 import org.springframework.batch.core.job.AbstractJob;
+import org.springframework.batch.core.job.flow.Flow;
 import org.springframework.batch.core.job.flow.FlowExecutionException;
 import org.springframework.batch.core.job.flow.FlowJob;
 import org.springframework.batch.core.job.flow.JobFlowExecutor;
+import org.springframework.batch.core.job.flow.State;
+import org.springframework.batch.core.job.flow.support.state.FlowState;
+import org.springframework.batch.core.job.flow.support.state.StepState;
 import org.springframework.batch.core.jsr.job.DefaultStepHandler;
+import org.springframework.batch.core.jsr.job.flow.support.DefaultFlow;
+import org.springframework.batch.core.jsr.step.DecisionStep;
 import org.springframework.batch.core.launch.NoSuchJobException;
 import org.springframework.batch.core.launch.support.ExitCodeMapper;
 
@@ -66,6 +74,11 @@ public class JsrFlowJob extends FlowJob {
 		try {
 			JobFlowExecutor executor = new JsrFlowExecutor(getJobRepository(),
 					new DefaultStepHandler(getJobRepository(), jobExplorer), execution);
+
+			State startState = ((DefaultFlow)flow).getStartState();
+
+			validateFirstStep(startState);
+
 			executor.updateJobExecutionStatus(flow.start(executor).getStatus());
 		}
 		catch (FlowExecutionException e) {
@@ -73,6 +86,28 @@ public class JsrFlowJob extends FlowJob {
 				throw (JobExecutionException) e.getCause();
 			}
 			throw new JobExecutionException("Flow execution ended unexpectedly", e);
+		}
+	}
+
+	private void validateFirstStep(State startState)
+			throws JobExecutionException {
+		while(true) {
+			if(startState instanceof DelegateState) {
+				startState = ((DelegateState) startState).getState();
+			} else if(startState instanceof StepState) {
+				String stepName = startState.getName().substring(startState.getName().indexOf(".") + 1, startState.getName().length());
+				Step step = ((StepState) startState).getStep(stepName);
+				if(step instanceof DecisionStep) {
+					throw new JobExecutionException("Invalid first step");
+				} else {
+					break;
+				}
+			} else if(startState instanceof FlowState){
+				Flow firstFlow = ((FlowState) startState).getFlows().iterator().next();
+				startState = firstFlow.getStates().iterator().next();
+			} else {
+				break;
+			}
 		}
 	}
 
