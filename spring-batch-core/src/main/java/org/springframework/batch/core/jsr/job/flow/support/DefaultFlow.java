@@ -27,7 +27,7 @@ import org.springframework.batch.core.job.flow.FlowExecutionStatus;
 import org.springframework.batch.core.job.flow.State;
 import org.springframework.batch.core.job.flow.support.SimpleFlow;
 import org.springframework.batch.core.job.flow.support.StateTransition;
-import org.springframework.batch.core.job.flow.support.state.StepState;
+import org.springframework.batch.core.jsr.job.flow.support.state.StepState;
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.util.StringUtils;
 

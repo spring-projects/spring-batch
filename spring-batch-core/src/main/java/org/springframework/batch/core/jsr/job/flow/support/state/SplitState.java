@@ -63,7 +63,7 @@ public class SplitState extends org.springframework.batch.core.job.flow.support.
 		}
 
 		if(!stepNames.isEmpty()) {
-			executor.getJobExecution().getExecutionContext().put("batch.splitLastSteps", stepNames);
+			executor.getJobExecution().getExecutionContext().put("batch.lastSteps", stepNames);
 		}
 
 		executor.getJobExecution().setExitStatus(null);
