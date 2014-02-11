@@ -47,13 +47,14 @@ public class DecisionStep extends AbstractStep {
 		this.decider = decider;
 	}
 
+	@SuppressWarnings("unchecked")
 	@Override
 	protected void doExecute(StepExecution stepExecution) throws Exception {
 		ExecutionContext executionContext = stepExecution.getJobExecution().getExecutionContext();
 		List<javax.batch.runtime.StepExecution> stepExecutions = new ArrayList<javax.batch.runtime.StepExecution>();
 
-		if(executionContext.containsKey("batch.splitLastSteps")) {
-			List<String> stepNames = (List<String>) executionContext.get("batch.splitLastSteps");
+		if(executionContext.containsKey("batch.lastSteps")) {
+			List<String> stepNames = (List<String>) executionContext.get("batch.lastSteps");
 
 			for (String stepName : stepNames) {
 				StepExecution curStepExecution = getJobRepository().getLastStepExecution(stepExecution.getJobExecution().getJobInstance(), stepName);
@@ -81,8 +82,8 @@ public class DecisionStep extends AbstractStep {
 			stepExecution.getJobExecution().setExitStatus(exitStatus);
 			stepExecution.setExitStatus(exitStatus);
 
-			if(executionContext.containsKey("batch.splitLastSteps")) {
-				executionContext.remove("batch.splitLastSteps");
+			if(executionContext.containsKey("batch.lastSteps")) {
+				executionContext.remove("batch.lastSteps");
 			}
 		} catch (Exception e) {
 			stepExecution.setTerminateOnly();

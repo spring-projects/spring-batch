@@ -24,7 +24,6 @@ import java.util.Map;
 import java.util.Set;
 
 import org.springframework.batch.core.configuration.xml.AbstractFlowParser;
-import org.springframework.batch.core.configuration.xml.SimpleFlowFactoryBean;
 import org.springframework.batch.core.job.flow.FlowExecutionStatus;
 import org.springframework.batch.core.jsr.job.flow.support.DefaultFlow;
 import org.springframework.beans.factory.config.BeanDefinition;
@@ -73,7 +72,7 @@ public class FlowParser extends AbstractFlowParser {
 
 	@Override
 	protected Class<?> getBeanClass(Element element) {
-		return SimpleFlowFactoryBean.class;
+		return JsrFlowFactoryBean.class;
 	}
 
 	@Override

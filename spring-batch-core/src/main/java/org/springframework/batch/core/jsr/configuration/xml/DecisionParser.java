@@ -18,8 +18,8 @@ package org.springframework.batch.core.jsr.configuration.xml;
 import java.util.Collection;
 
 import org.springframework.batch.core.job.flow.JobExecutionDecider;
-import org.springframework.batch.core.job.flow.support.state.StepState;
 import org.springframework.batch.core.jsr.configuration.support.BatchArtifact;
+import org.springframework.batch.core.jsr.job.flow.support.state.StepState;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.config.RuntimeBeanReference;
 import org.springframework.beans.factory.parsing.BeanComponentDefinition;
