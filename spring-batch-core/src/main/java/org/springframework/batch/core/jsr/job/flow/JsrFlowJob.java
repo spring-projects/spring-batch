@@ -98,7 +98,7 @@ public class JsrFlowJob extends FlowJob {
 				String stepName = startState.getName().substring(startState.getName().indexOf(".") + 1, startState.getName().length());
 				Step step = ((StepState) startState).getStep(stepName);
 				if(step instanceof DecisionStep) {
-					throw new JobExecutionException("Invalid first step");
+					throw new JobExecutionException("Decision step is an invalid first step");
 				} else {
 					break;
 				}

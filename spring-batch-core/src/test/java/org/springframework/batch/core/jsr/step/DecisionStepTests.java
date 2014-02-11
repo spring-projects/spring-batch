@@ -25,7 +25,7 @@ public class DecisionStepTests {
 
 	private static ApplicationContext baseContext;
 
-	public JobExplorer jobExplorer;
+	private JobExplorer jobExplorer;
 
 	@Before
 	public void setUp() {
@@ -107,9 +107,6 @@ public class DecisionStepTests {
 
 		@Override
 		public String decide(StepExecution[] executions) throws Exception {
-			for (StepExecution stepExecution : executions) {
-				System.err.println(stepExecution.getStepName());
-			}
 			previousStepCount = executions.length;
 			return "next";
 		}
