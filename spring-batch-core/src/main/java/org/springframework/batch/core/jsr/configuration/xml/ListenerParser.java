@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 the original author or authors.
+ * Copyright 2013-2014 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -43,6 +43,7 @@ public class ListenerParser {
 	private static final String LISTENER_ELEMENT = "listener";
 	private static final String LISTENERS_ELEMENT = "listeners";
 	private static final String SCOPE_STEP = "step";
+	private static final String SCOPE_JOB = "job";
 
 	@SuppressWarnings("rawtypes")
 	private Class listenerType;
@@ -128,7 +129,7 @@ public class ListenerParser {
 
 	private String getListenerScope() {
 		if (listenerType == JobListenerFactoryBean.class) {
-			return BeanDefinition.SCOPE_SINGLETON;
+			return SCOPE_JOB;
 		}
 
 		return SCOPE_STEP;
