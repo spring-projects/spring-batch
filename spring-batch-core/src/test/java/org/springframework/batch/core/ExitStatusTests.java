@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2007 the original author or authors.
+ * Copyright 2006-2014 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,11 +20,11 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 import org.junit.Test;
-import org.springframework.batch.support.SerializationUtils;
+import org.springframework.util.SerializationUtils;
 
 /**
  * @author Dave Syer
- * 
+ *
  */
 public class ExitStatusTests {
 
@@ -54,7 +54,7 @@ public class ExitStatusTests {
 
 	/**
 	 * Test equality of exit statuses.
-	 * 
+	 *
 	 * @throws Exception
 	 */
 	@Test
@@ -75,7 +75,7 @@ public class ExitStatusTests {
 
 	/**
 	 * Test equality of exit statuses.
-	 * 
+	 *
 	 * @throws Exception
 	 */
 	@Test
@@ -85,7 +85,7 @@ public class ExitStatusTests {
 
 	/**
 	 * Test equality of exit statuses.
-	 * 
+	 *
 	 * @throws Exception
 	 */
 	@Test
