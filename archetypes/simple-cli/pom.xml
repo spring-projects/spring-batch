@@ -14,10 +14,11 @@
         The ./bin/runJob.(sh|bat) script from the extracted deployment archive can be invoked to run the job.
     </description>
     <properties>
-        <spring.framework.version>3.2.7.RELEASE</spring.framework.version>
+        <spring.framework.version>4.0.2.RELEASE</spring.framework.version>
         <spring.batch.version>3.0.0.BUILD-SNAPSHOT</spring.batch.version>
         <dependency.locations.enabled>false</dependency.locations.enabled>
         <junit.version>4.10</junit.version>
+        <maven.compiler.plugin>3.1</maven.compiler.plugin>
         <compiler.target.version>1.6</compiler.target.version>
         <compiler.source.version>1.6</compiler.source.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -185,7 +186,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
-                <version>2.3.2</version>
+                <version>${maven.compiler.plugin}</version>
                 <configuration>
                     <source>${compiler.source.version}</source>
                     <target>${compiler.target.version}</target>

@@ -11,8 +11,8 @@
 		<relativePath>../spring-batch-parent</relativePath>
 	</parent>
 	<properties>
-		<spring.framework.version>4.0.0.RELEASE</spring.framework.version>
 		<spring.integration.version>4.0.0.M2</spring.integration.version>
+		<maven.compiler.plugin>3.1</maven.compiler.plugin>
 	</properties>
 	<dependencies>
 		<dependency>
@@ -161,14 +161,6 @@
 	</dependencies>
 	<build>
 		<plugins>
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-compiler-plugin</artifactId>
-				<configuration>
-					<source>1.6</source>
-					<target>1.6</target>
-				</configuration>
-			</plugin>
 			<plugin>
 				<groupId>com.springsource.bundlor</groupId>
 				<artifactId>com.springsource.bundlor.maven</artifactId>

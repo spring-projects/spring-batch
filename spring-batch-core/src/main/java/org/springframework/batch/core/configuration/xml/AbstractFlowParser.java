@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2013 the original author or authors.
+ * Copyright 2006-2014 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,6 +20,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -40,6 +41,7 @@ import org.w3c.dom.NodeList;
 /**
  * @author Dave Syer
  * @author Michael Minella
+ * @author Chris Schaefer
  *
  */
 public abstract class AbstractFlowParser extends AbstractSingleBeanDefinitionParser {
@@ -119,7 +121,7 @@ public abstract class AbstractFlowParser extends AbstractSingleBeanDefinitionPar
 		parserContext.pushContainingComponent(compositeDef);
 
 		boolean stepExists = false;
-		Map<String, Set<String>> reachableElementMap = new HashMap<String, Set<String>>();
+		Map<String, Set<String>> reachableElementMap = new LinkedHashMap<String, Set<String>>();
 		String startElement = null;
 		NodeList children = element.getChildNodes();
 		for (int i = 0; i < children.getLength(); i++) {

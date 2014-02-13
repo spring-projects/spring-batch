@@ -31,14 +31,22 @@
 			<name>Michael Minella</name>
 			<email>mminella@vmware.com</email>
 		</developer>
+		<developer>
+			<id>cschaefer</id>
+			<name>Chris Schaefer</name>
+			<email>cschaefer@gopivotal.com</email>
+		</developer>
 	</developers>
 	<properties>
-		<spring.framework.version>3.2.7.RELEASE</spring.framework.version>
+		<spring.framework.version>4.0.2.RELEASE</spring.framework.version>
 		<spring.amqp.version>1.1.2.RELEASE</spring.amqp.version>
 		<junit.version>4.10</junit.version>
 		<bundlor.version>1.0.0.RELEASE</bundlor.version>
+		<maven.compiler.plugin>3.1</maven.compiler.plugin>
 		<dependency.locations.enabled>false</dependency.locations.enabled>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+		<compiler.target.version>1.6</compiler.target.version>
+		<compiler.source.version>1.6</compiler.source.version>
 	</properties>
 	<profiles>
 		<profile>
@@ -279,10 +287,10 @@
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-compiler-plugin</artifactId>
-				<version>2.5.1</version>
+				<version>${maven.compiler.plugin}</version>
 				<configuration>
-					<source>1.6</source>
-					<target>1.6</target>
+					<source>${compiler.source.version}</source>
+					<target>${compiler.target.version}</target>
 				</configuration>
 			</plugin>
 			<plugin>
