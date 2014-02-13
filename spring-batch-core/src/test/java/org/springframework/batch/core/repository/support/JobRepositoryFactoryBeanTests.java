@@ -23,6 +23,7 @@ import static org.mockito.Mockito.when;
 
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
+import java.sql.Types;
 import java.util.Map;
 
 import javax.sql.DataSource;
@@ -311,6 +312,26 @@ public class JobRepositoryFactoryBeanTests {
 		}
 
 	}
+	
+	@Test
+	public void testCreateRepositoryForExtraDbms() throws Exception {
+		String databaseType = "CUBRID";
+		JobRepositoryFactoryBean extFactory = new ExtendJobRepositoryJobFactoryBean();
+		extFactory.setDatabaseType(databaseType);
+		extFactory.setDataSource(dataSource);
+		extFactory.setTransactionManager(transactionManager);
+		extFactory.setIncrementerFactory(incrementerFactory);
+		extFactory.setTablePrefix(tablePrefix);
+
+		when(incrementerFactory.isSupportedIncrementerType(databaseType)).thenReturn(true);
+		when(incrementerFactory.getSupportedIncrementerTypes()).thenReturn(new String[0]);
+		when(incrementerFactory.getIncrementer(databaseType, tablePrefix + "JOB_SEQ")).thenReturn(new StubIncrementer());
+		when(incrementerFactory.getIncrementer(databaseType, tablePrefix + "JOB_EXECUTION_SEQ")).thenReturn(new StubIncrementer());
+		when(incrementerFactory.getIncrementer(databaseType, tablePrefix + "STEP_EXECUTION_SEQ")).thenReturn(new StubIncrementer());
+		
+		extFactory.afterPropertiesSet();
+		extFactory.getObject();
+	}
 
 	private static class StubIncrementer implements DataFieldMaxValueIncrementer {
 
@@ -329,6 +350,12 @@ public class JobRepositoryFactoryBeanTests {
 			return null;
 		}
 
+	}
+
+	private static class ExtendJobRepositoryJobFactoryBean extends JobRepositoryFactoryBean {
+		protected int determineClobTypeToUse(String databaseType) {
+			return Types.CLOB;
+		}
 	}
 
 }
