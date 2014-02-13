@@ -15,11 +15,13 @@
  */
 package org.springframework.batch.core.jsr.configuration.xml;
 
+import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.batch.core.jsr.configuration.support.JsrExpressionParser;
@@ -121,7 +123,12 @@ public class JsrBeanDefinitionDocumentReader extends DefaultBeanDefinitionDocume
 				return new Properties();
 			}
 
-			jobParameters.putAll(properties);
+			Enumeration<?> propertyNames = properties.propertyNames();
+
+			while(propertyNames.hasMoreElements()) {
+				String curName = (String) propertyNames.nextElement();
+				jobParameters.put(curName, properties.getProperty(curName));
+			}
 		}
 
 		return jobParameters;

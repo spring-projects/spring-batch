@@ -469,6 +469,24 @@ public class JsrJobOperatorTests {
 	}
 
 	@Test
+	public void testGetRestartJobParametersWithDefaults() {
+		JsrJobOperator jobOperator = (JsrJobOperator) jsrJobOperator;
+
+		JobExecution jobExecution = new JobExecution(1L,
+				new JobParametersBuilder().addString("prevKey1", "prevVal1").addString("prevKey2", "prevVal2").toJobParameters());
+
+		Properties defaultProperties = new Properties();
+		defaultProperties.setProperty("prevKey2", "not value 2");
+		Properties userProperties = new Properties(defaultProperties);
+
+		Properties properties = jobOperator.getJobRestartProperties(userProperties, jobExecution);
+
+		assertTrue(properties.size() == 2);
+		assertTrue(properties.getProperty("prevKey1").equals("prevVal1"));
+		assertTrue("prevKey2 = " + properties.getProperty("prevKey2"), properties.getProperty("prevKey2").equals("not value 2"));
+	}
+
+	@Test
 	public void testNewJobParametersOverridePreviousRestartParameters() {
 		JsrJobOperator jobOperator = (JsrJobOperator) jsrJobOperator;
 

@@ -18,6 +18,7 @@ package org.springframework.batch.core.jsr.launch;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Enumeration;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -426,7 +427,6 @@ public class JsrJobOperator implements JobOperator, InitializingBean {
 			throws JobExecutionAlreadyCompleteException,
 			NoSuchJobExecutionException, JobExecutionNotMostRecentException,
 			JobRestartException, JobSecurityException {
-
 		org.springframework.batch.core.JobExecution previousJobExecution = jobExplorer.getJobExecution(executionId);
 
 		if (previousJobExecution == null) {
@@ -556,8 +556,13 @@ public class JsrJobOperator implements JobOperator, InitializingBean {
 			}
 		}
 
-		if (params != null && !params.isEmpty()) {
-			jobRestartProperties.putAll(params);
+		if (params != null) {
+			Enumeration<?> propertyNames = params.propertyNames();
+
+			while(propertyNames.hasMoreElements()) {
+				String curName = (String) propertyNames.nextElement();
+				jobRestartProperties.setProperty(curName, params.getProperty(curName));
+			}
 		}
 
 		return jobRestartProperties;
