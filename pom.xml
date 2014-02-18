@@ -16,13 +16,13 @@
 	</modules>
 	<url>http://www.springsource.org/spring-batch</url>
 	<organization>
-		<name>SpringSource</name>
-		<url>http://www.springsource.com</url>
+		<name>Pivotal</name>
+		<url>http://spring.io</url>
 	</organization>
 	<scm>
-		<url>http://github.com/SpringSource/spring-batch</url>
-		<connection>scm:git:git://github.com/SpringSource/spring-batch.git</connection>
-		<developerConnection>scm:git:ssh://git@github.com/SpringSource/spring-batch.git</developerConnection>
+		<url>http://github.com/spring-projects/spring-batch</url>
+		<connection>scm:git:git://github.com/spring-projects/spring-batch.git</connection>
+		<developerConnection>scm:git:ssh://git@github.com/spring-projects/spring-batch.git</developerConnection>
 	  <tag>HEAD</tag>
   </scm>
 	<issueManagement>
@@ -627,7 +627,7 @@
 		</developer>
 	</developers>
 	<pluginRepositories>
-		<pluginRepository>
+<!-- 		<pluginRepository>
 			<id>com.springsource.repository.bundles.milestone</id>
 			<name> SpringSource Enterprise Bundle Repository - SpringSource Bundle Milestones</name>
 			<url>http://repository.springsource.com/maven/bundles/milestone</url>
@@ -635,7 +635,7 @@
 				<enabled>false</enabled>
 			</snapshots>
 		</pluginRepository>
-		<pluginRepository>
+ -->		<pluginRepository>
 			<id>com.springsource.repository.bundles.snapshot</id>
 			<name>SpringSource Enterprise Bundle Repository - SpringSource Bundle Snapshots</name>
 			<url>http://repository.springsource.com/maven/bundles/snapshot</url>

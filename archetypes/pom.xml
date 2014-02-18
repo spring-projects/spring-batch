@@ -4,7 +4,7 @@
   <artifactId>spring-batch-archetype</artifactId>
   <packaging>pom</packaging>
   <name>Archetypes</name>
-  <url>http://static.springframework.org/spring-batch/${artifactId}</url>
+  <url>http://docs.spring.io/spring-batch/${artifactId}</url>
   <description>Spring Batch archetypes are simple project templates containing just enough code	to get you started running a job. For more detailed examples of using particular features of the framework, look at the Spring Batch Samples project. Currently the archetypes are deployed as regular Maven projects (not archetypes), because of limitations in the archetype plugin (or our understanding of how it works). For most effective use, copy one into Eclipse and use Q4E to manage the dependencies.</description>
   <parent>
     <groupId>org.springframework.batch</groupId>
