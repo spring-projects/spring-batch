@@ -4,7 +4,7 @@
 	<artifactId>spring-batch-samples</artifactId>
 	<packaging>jar</packaging>
 	<name>Samples</name>
-	<url>http://static.springframework.org/spring-batch/${artifactId}</url>
+	<url>http://docs.spring.io/spring-batch/${artifactId}</url>
 	<description>Example batch jobs using Spring Batch Core and Execution.</description>
 	<parent>
 		<groupId>org.springframework.batch</groupId>
@@ -422,7 +422,7 @@
 		</pluginManagement>
 	</build>
 	<repositories>
-		<repository>
+<!-- 		<repository>
 			<id>com.springsource.repository.bundles.external</id>
 			<name>SpringSource Enterprise Bundle Repository - SpringSource Bundle External</name>
 			<url>http://repository.springsource.com/maven/bundles/external</url>
@@ -430,7 +430,7 @@
 				<enabled>false</enabled>
 			</snapshots>
 		</repository>
-		<repository>
+ -->		<repository>
 			<id>gemstone</id>
 			<name>Release bundles for SQLFire and GemFire</name>
 			<url>http://dist.gemstone.com.s3.amazonaws.com/maven/release</url>
