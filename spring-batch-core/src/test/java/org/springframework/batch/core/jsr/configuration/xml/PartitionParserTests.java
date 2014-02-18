@@ -132,7 +132,6 @@ public class PartitionParserTests {
 		assertTrue(PartitionCollector.artifactNames.contains("collector1"));
 		assertTrue(PartitionCollector.artifactNames.contains("collector2"));
 
-		assertEquals(PartitionMapper.name, "mapper");
 		assertEquals(PartitionAnalyzer.name, "analyzer");
 		assertEquals(PartitionReducer.name, "reducer");
 	}
