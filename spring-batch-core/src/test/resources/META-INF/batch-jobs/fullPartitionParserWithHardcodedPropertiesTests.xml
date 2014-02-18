@@ -36,6 +36,11 @@
 					<property name="artifactName" value="reducer"/>
 				</properties>
 	    	</reducer>
+            <mapper ref="org.springframework.batch.core.jsr.configuration.xml.PartitionParserTests$PartitionMapper">
+                <properties>
+                    <property name="artifactName" value="mapper"/>
+                </properties>
+            </mapper>
 	    </partition>
 	</step>
 </job>
