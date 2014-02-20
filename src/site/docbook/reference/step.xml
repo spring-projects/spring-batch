@@ -305,7 +305,7 @@ itemWriter.write(items);</programlisting>
         successful the first time. An example might be a validation step, or a
         <classname>Step</classname> that cleans up resources before
         processing. During normal processing of a restarted job, any step with
-        a status of 'COMPLETED', meaning it has already been completed
+        a status of 'FINISHED', meaning it has already been completed
         successfully, will be skipped. Setting allow-start-if-complete to
         "true" overrides this so that the step will always run:</para>
 
