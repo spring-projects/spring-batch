@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2013 the original author or authors.
+ * Copyright 2006-2014 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -277,6 +277,22 @@ public class DefaultJobParametersConverterTests {
 		assertNotNull(props);
 		assertEquals("myKey", props.getProperty("job.key"));
 		assertEquals("33243243", props.getProperty("vendor.id(long)"));
+		assertEquals("2008/01/23", props.getProperty("schedule.date(date)"));
+		assertEquals("1.23", props.getProperty("double.key(double)"));
+	}
+
+	@Test
+	public void testRoundTripWithIdentifyingAndNonIdentifying() throws Exception {
+
+		String[] args = new String[] { "schedule.date(date)=2008/01/23", "+job.key=myKey", "-vendor.id(long)=33243243",
+		"double.key(double)=1.23" };
+
+		JobParameters parameters = factory.getJobParameters(StringUtils.splitArrayElementsIntoProperties(args, "="));
+
+		Properties props = factory.getProperties(parameters);
+		assertNotNull(props);
+		assertEquals("myKey", props.getProperty("job.key"));
+		assertEquals("33243243", props.getProperty("-vendor.id(long)"));
 		assertEquals("2008/01/23", props.getProperty("schedule.date(date)"));
 		assertEquals("1.23", props.getProperty("double.key(double)"));
 	}

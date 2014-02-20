@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2013 the original author or authors.
+ * Copyright 2006-2014 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -180,7 +180,10 @@ public class DefaultJobParametersConverter implements JobParametersConverter {
 
 	/**
 	 * Use the same suffixes to create properties (omitting the string suffix
-	 * because it is the default).
+	 * because it is the default).  Non-identifying parameters will be prefixed
+	 * with the {@link #NON_IDENTIFYING_FLAG}.  However, since parameters are
+	 * identifying by default, they will <em>not</em> be prefixed with the
+	 * {@link #IDENTIFYING_FLAG}.
 	 *
 	 * @see org.springframework.batch.core.converter.JobParametersConverter#getProperties(org.springframework.batch.core.JobParameters)
 	 */
@@ -199,6 +202,7 @@ public class DefaultJobParametersConverter implements JobParametersConverter {
 			JobParameter jobParameter = entry.getValue();
 			Object value = jobParameter.getValue();
 			if (value != null) {
+				key = (!jobParameter.isIdentifying()? NON_IDENTIFYING_FLAG : "") + key;
 				if (jobParameter.getType() == ParameterType.DATE) {
 					synchronized (dateFormat) {
 						result.setProperty(key + DATE_TYPE, dateFormat.format(value));
