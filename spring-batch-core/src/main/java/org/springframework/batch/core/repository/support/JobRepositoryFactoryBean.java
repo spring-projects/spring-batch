@@ -235,7 +235,7 @@ public class JobRepositoryFactoryBean extends AbstractJobRepositoryFactoryBean i
 		return dao;
 	}
 
-	private int determineClobTypeToUse(String databaseType) {
+	protected int determineClobTypeToUse(String databaseType) {
 		if (SYBASE == DatabaseType.valueOf(databaseType.toUpperCase())) {
 			return Types.LONGVARCHAR;
 		}
