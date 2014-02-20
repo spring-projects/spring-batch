@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2007 the original author or authors.
+ * Copyright 2002-2014 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,6 +18,7 @@ package org.springframework.batch.core.repository.support;
 
 import static org.springframework.batch.support.DatabaseType.SYBASE;
 
+import java.lang.reflect.Field;
 import java.sql.Types;
 
 import javax.sql.DataSource;
@@ -77,6 +78,15 @@ public class JobRepositoryFactoryBean extends AbstractJobRepositoryFactoryBean i
 	private LobHandler lobHandler;
 
 	private ExecutionContextSerializer serializer;
+
+	private Integer lobType;
+
+	/**
+	 * @param type a value from the {@link java.sql.Types} class to indicate the type to use for a CLOB
+	 */
+	public void setClobType(int type) {
+		this.lobType = type;
+	}
 
 	/**
 	 * A custom implementation of the {@link ExecutionContextSerializer}.
@@ -178,6 +188,10 @@ public class JobRepositoryFactoryBean extends AbstractJobRepositoryFactoryBean i
 				+ "' is an unsupported database type.  The supported database types are "
 				+ StringUtils.arrayToCommaDelimitedString(incrementerFactory.getSupportedIncrementerTypes()));
 
+		if(lobType != null) {
+			Assert.isTrue(isValidTypes(lobType), "lobType must be a value from the java.sql.Types class");
+		}
+
 		super.afterPropertiesSet();
 	}
 
@@ -235,13 +249,31 @@ public class JobRepositoryFactoryBean extends AbstractJobRepositoryFactoryBean i
 		return dao;
 	}
 
-	private int determineClobTypeToUse(String databaseType) {
-		if (SYBASE == DatabaseType.valueOf(databaseType.toUpperCase())) {
-			return Types.LONGVARCHAR;
+	private int determineClobTypeToUse(String databaseType) throws Exception {
+		if(lobType != null) {
+			return lobType;
+		} else {
+			if (SYBASE == DatabaseType.valueOf(databaseType.toUpperCase())) {
+				return Types.LONGVARCHAR;
+			}
+			else {
+				return Types.CLOB;
+			}
 		}
-		else {
-			return Types.CLOB;
+	}
+
+	private boolean isValidTypes(int value) throws Exception {
+		boolean result = false;
+
+		for (Field field : Types.class.getFields()) {
+			int curValue = field.getInt(null);
+			if(curValue == value) {
+				result = true;
+				break;
+			}
 		}
+
+		return result;
 	}
 
 }

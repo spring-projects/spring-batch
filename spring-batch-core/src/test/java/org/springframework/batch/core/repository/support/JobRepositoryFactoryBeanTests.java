@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2013 the original author or authors.
+ * Copyright 2006-2014 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,6 +16,7 @@
 package org.springframework.batch.core.repository.support;
 
 import static junit.framework.Assert.assertEquals;
+import static junit.framework.Assert.assertNotNull;
 import static junit.framework.Assert.assertTrue;
 import static junit.framework.Assert.fail;
 import static org.mockito.Mockito.mock;
@@ -23,6 +24,7 @@ import static org.mockito.Mockito.when;
 
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
+import java.sql.Types;
 import java.util.Map;
 
 import javax.sql.DataSource;
@@ -241,7 +243,7 @@ public class JobRepositoryFactoryBeanTests {
 		factory.getObject();
 	}
 
-	@Ignore //TODO - fix this test
+	@Ignore
 	@Test
 	public void testTransactionAttributesForCreateMethodNullHypothesis() throws Exception {
 		testCreateRepository();
@@ -309,7 +311,20 @@ public class JobRepositoryFactoryBeanTests {
 			// expected exception from DataSourceUtils
 			assertEquals("No Statement specified", e.getMessage());
 		}
+	}
 
+	@Test(expected=IllegalArgumentException.class)
+	public void testInvalidCustomLobType() throws Exception {
+		factory.setClobType(Integer.MAX_VALUE);
+		testCreateRepository();
+	}
+
+	@Test
+	public void testCustomLobType() throws Exception {
+		factory.setClobType(Types.ARRAY);
+		testCreateRepository();
+		JobRepository repository = (JobRepository) factory.getObject();
+		assertNotNull(repository);
 	}
 
 	private static class StubIncrementer implements DataFieldMaxValueIncrementer {
