@@ -65,6 +65,8 @@ public class JobRepositoryParser extends AbstractSingleBeanDefinitionParser {
 		CoreNamespaceUtils.autoregisterBeansForNamespace(parserContext, element);
 
 		String dataSource = element.getAttribute("data-source");
+		
+		String jdbcOperations = element.getAttribute("jdbc-operations");
 
 		String transactionManager = element.getAttribute("transaction-manager");
 
@@ -82,6 +84,9 @@ public class JobRepositoryParser extends AbstractSingleBeanDefinitionParser {
 		builder.addPropertyValue("dataSource", ds);
 		RuntimeBeanReference tx = new RuntimeBeanReference(transactionManager);
 		builder.addPropertyValue("transactionManager", tx);
+		if (StringUtils.hasText(jdbcOperations)) {
+			builder.addPropertyReference("jdbcOperations", jdbcOperations);
+		}
 		if (StringUtils.hasText(isolationLevelForCreate)) {
 			builder.addPropertyValue("isolationLevelForCreate", DefaultTransactionDefinition.PREFIX_ISOLATION
 					+ isolationLevelForCreate);
