@@ -194,7 +194,7 @@ public class BarWriter implements ItemWriter&lt;Bar&gt;{
     <programlisting>&lt;job id="ioSampleJob"&gt;
     &lt;step name="step1"&gt;
         &lt;tasklet&gt;
-            &lt;chunk reader="fooReader" processor="fooProcessor" writer="barWriter" 
+            &lt;chunk reader="fooReader" processor="fooProcessor" writer="barWriter"
                    commit-interval="2"/&gt;
         &lt;/tasklet&gt;
     &lt;/step&gt;
@@ -244,7 +244,7 @@ public class FoobarWriter implements ItemWriter&lt;FooBar&gt;{
       <classname>BarProcessor</classname> can be 'chained' together to give
       the resultant <classname>Foobar</classname>:</para>
 
-      <programlisting>CompositeItemProcessor&lt;Foo,Foobar&gt; compositeProcessor = 
+      <programlisting>CompositeItemProcessor&lt;Foo,Foobar&gt; compositeProcessor =
                                       new CompositeItemProcessor&lt;Foo,Foobar&gt;();
 List itemProcessors = new ArrayList();
 itemProcessors.add(new FooTransformer());
@@ -257,13 +257,13 @@ compositeProcessor.setDelegates(itemProcessors);</programlisting>
       <programlisting>&lt;job id="ioSampleJob"&gt;
     &lt;step name="step1"&gt;
         &lt;tasklet&gt;
-            &lt;chunk reader="fooReader" processor="compositeProcessor" writer="foobarWriter" 
+            &lt;chunk reader="fooReader" processor="compositeProcessor" writer="foobarWriter"
                    commit-interval="2"/&gt;
         &lt;/tasklet&gt;
     &lt;/step&gt;
 &lt;/job&gt;
 
-&lt;bean id="compositeItemProcessor" 
+&lt;bean id="compositeItemProcessor"
       class="org.springframework.batch.item.support.CompositeItemProcessor"&gt;
     &lt;property name="delegates"&gt;
         &lt;list&gt;
@@ -316,7 +316,7 @@ compositeProcessor.setDelegates(itemProcessors);</programlisting>
     void open(ExecutionContext executionContext) throws ItemStreamException;
 
     void update(ExecutionContext executionContext) throws ItemStreamException;
-  
+
     void close() throws ItemStreamException;
 }</programlisting>
 
@@ -355,8 +355,7 @@ compositeProcessor.setDelegates(itemProcessors);</programlisting>
 
     <para>Note that the <classname>CompositeItemWriter</classname> is an
     example of the delegation pattern, which is common in Spring Batch. The
-    delegates themselves might implement callback interfaces like
-    <classname>ItemStream</classname> or <classname>StepListener</classname>.
+    delegates themselves might implement callback interfaces <classname>StepListener</classname>.
     If they do, and they are being used in conjunction with Spring Batch Core
     as part of a <classname>Step</classname> in a <classname>Job</classname>,
     then they almost certainly need to be registered manually with the
@@ -370,7 +369,7 @@ compositeProcessor.setDelegates(itemProcessors);</programlisting>
     <programlisting>&lt;job id="ioSampleJob"&gt;
     &lt;step name="step1"&gt;
         &lt;tasklet&gt;
-            &lt;chunk reader="fooReader" processor="fooProcessor" writer="compositeItemWriter" 
+            &lt;chunk reader="fooReader" processor="fooProcessor" writer="compositeItemWriter"
                    commit-interval="2"&gt;
                     &lt;streams&gt;
                     &lt;stream ref="barWriter" /&gt;
@@ -380,7 +379,7 @@ compositeProcessor.setDelegates(itemProcessors);</programlisting>
     &lt;/step&gt;
 &lt;/job&gt;
 
-&lt;bean id="compositeItemWriter" class="...CompositeItemWriter"&gt;
+&lt;bean id="compositeItemWriter" class="...CustomCompositeItemWriter"&gt;
     &lt;property name="delegate" ref="barWriter" /&gt;
 &lt;/bean&gt;
 
@@ -600,7 +599,7 @@ boolean booleanValue = fs.readBoolean(2);</programlisting>
         the <classname>LineTokenizer</classname>:</para>
 
         <programlisting>public interface LineTokenizer {
-  
+
     FieldSet tokenize(String line);
 
 }</programlisting>
@@ -649,7 +648,7 @@ boolean booleanValue = fs.readBoolean(2);</programlisting>
         a resource into an object of the desired type:</para>
 
         <programlisting>public interface FieldSetMapper&lt;T&gt; {
-  
+
     T mapFieldSet(FieldSet fieldSet);
 
 }</programlisting>
@@ -709,7 +708,7 @@ boolean booleanValue = fs.readBoolean(2);</programlisting>
         this.tokenizer = tokenizer;
     }
 
-    public void setFieldSetMapper(FieldSetMapper&lt;T&gt; fieldSetMapper) { 
+    public void setFieldSetMapper(FieldSetMapper&lt;T&gt; fieldSetMapper) {
         this.fieldSetMapper = fieldSetMapper;
     }
 }</programlisting>
@@ -736,21 +735,21 @@ boolean booleanValue = fs.readBoolean(2);</programlisting>
 
         <para>The contents of this file will be mapped to the following
         <classname>Player</classname> domain object: <programlisting>public class Player implements Serializable {
-        
-    private String ID; 
-    private String lastName; 
-    private String firstName; 
-    private String position; 
-    private int birthYear; 
+
+    private String ID;
+    private String lastName;
+    private String firstName;
+    private String position;
+    private int birthYear;
     private int debutYear;
-        
+
     public String toString() {
-        return "PLAYER:ID=" + ID + ",Last Name=" + lastName + 
-            ",First Name=" + firstName + ",Position=" + position + 
-            ",Birth Year=" + birthYear + ",DebutYear=" + 
+        return "PLAYER:ID=" + ID + ",Last Name=" + lastName +
+            ",First Name=" + firstName + ",Position=" + position +
+            ",Birth Year=" + birthYear + ",DebutYear=" +
             debutYear;
     }
-   
+
     // setters and getters...
 }
           </programlisting></para>
@@ -766,7 +765,7 @@ boolean booleanValue = fs.readBoolean(2);</programlisting>
 
         player.setID(fieldSet.readString(0));
         player.setLastName(fieldSet.readString(1));
-        player.setFirstName(fieldSet.readString(2)); 
+        player.setFirstName(fieldSet.readString(2));
         player.setPosition(fieldSet.readString(3));
         player.setBirthYear(fieldSet.readInt(4));
         player.setDebutYear(fieldSet.readInt(5));
@@ -813,11 +812,11 @@ Player player = itemReader.read();</programlisting>
 
         <para><programlisting>public class PlayerMapper implements FieldSetMapper&lt;Player&gt; {
     public Player mapFieldSet(FieldSet fs) {
-                        
+
        if(fs == null){
            return null;
        }
-                        
+
        Player player = new Player();
        player.setID(fs.readString(<emphasis role="bold">"ID"</emphasis>));
        player.setLastName(fs.readString(<emphasis role="bold">"lastName"</emphasis>));
@@ -825,7 +824,7 @@ Player player = itemReader.read();</programlisting>
        player.setPosition(fs.readString(<emphasis role="bold">"position"</emphasis>));
        player.setDebutYear(fs.readInt(<emphasis role="bold">"debutYear"</emphasis>));
        player.setBirthYear(fs.readInt(<emphasis role="bold">"birthYear"</emphasis>));
-                       
+
        return player;
    }
 }</programlisting></para>
@@ -1041,7 +1040,7 @@ LINEB;2134776319DEF422.99M005LI</programlisting>
           expected:</para>
 
           <programlisting>tokenizer.setNames(new String[] {"A", "B", "C", "D"});
-  
+
 try{
     tokenizer.tokenize("a,b,c");
 }
@@ -1065,8 +1064,8 @@ catch(IncorrectTokenCountException e){
           line length doesn't add up to the widest value of this column, an
           exception is thrown:</para>
 
-          <programlisting>tokenizer.setColumns(new Range[] { new Range(1, 5), 
-                                   new Range(6, 10), 
+          <programlisting>tokenizer.setColumns(new Range[] { new Range(1, 5),
+                                   new Range(6, 10),
                                    new Range(11, 15) });
 try {
     tokenizer.tokenize("12345");
@@ -1545,7 +1544,7 @@ assertEquals(born, values[2]);</programlisting>
       the map. In the configuration file we can use a Spring configuration
       utility to describe the required alias as follows:</para>
 
-      <para><programlisting>&lt;bean id="tradeMarshaller" 
+      <para><programlisting>&lt;bean id="tradeMarshaller"
       class="org.springframework.oxm.xstream.XStreamMarshaller"&gt;
     &lt;property name="aliases"&gt;
 <emphasis role="bold">        &lt;util:map id="aliases"&gt;
@@ -1570,7 +1569,7 @@ assertEquals(born, values[2]);</programlisting>
       configuration:</para>
 
       <para><programlisting>StaxEventItemReader xmlStaxEventItemReader = new StaxEventItemReader()
-Resource resource = new ByteArrayResource(xmlResource.getBytes()) 
+Resource resource = new ByteArrayResource(xmlResource.getBytes())
 
 Map aliases = new HashMap();
 aliases.put("trade","org.springframework.batch.sample.domain.Trade");
@@ -1626,7 +1625,7 @@ while (hasNext) {
       should be noted the marshaller used for the writer is the exact same as
       the one used in the reading example from earlier in the chapter:</para>
 
-      <programlisting>&lt;bean id="customerCreditMarshaller" 
+      <programlisting>&lt;bean id="customerCreditMarshaller"
       class="org.springframework.oxm.xstream.XStreamMarshaller"&gt;
     &lt;property name="aliases"&gt;
         &lt;util:map id="aliases"&gt;
@@ -1660,7 +1659,7 @@ staxItemWriter.setOverwriteOutput(true);
 ExecutionContext executionContext = new ExecutionContext();
 staxItemWriter.open(executionContext);
 CustomerCredit Credit = new CustomerCredit();
-trade.setPrice(11.39); 
+trade.setPrice(11.39);
 credit.setName("Customer1");
 staxItemWriter.write(trade);</programlisting>
     </section>
@@ -1766,7 +1765,7 @@ staxItemWriter.write(trade);</programlisting>
         be used as an example:</para>
 
         <programlisting>CREATE TABLE CUSTOMER (
-   ID BIGINT IDENTITY PRIMARY KEY,  
+   ID BIGINT IDENTITY PRIMARY KEY,
    NAME VARCHAR(45),
    CREDIT FLOAT
 );</programlisting>
@@ -1804,7 +1803,7 @@ staxItemWriter.write(trade);</programlisting>
 
         <programlisting>//For simplicity sake, assume a dataSource has already been obtained
 JdbcTemplate jdbcTemplate = new JdbcTemplate(dataSource);
-List customerCredits = jdbcTemplate.query("SELECT ID, NAME, CREDIT from CUSTOMER", 
+List customerCredits = jdbcTemplate.query("SELECT ID, NAME, CREDIT from CUSTOMER",
                                           new CustomerCreditRowMapper());</programlisting>
 
         <para>After running this code snippet the customerCredits list will
@@ -2440,7 +2439,7 @@ itemReader.close(executionContext);</programlisting>
     number of frameworks:</para>
 
     <programlisting>public interface Validator {
-  
+
     void validate(Object value) throws ValidationException;
 
 }</programlisting>
@@ -2463,13 +2462,13 @@ itemReader.close(executionContext);</programlisting>
                 &lt;value&gt;
                     &lt;![CDATA[
            { orderId : ? &gt; 0 AND ? &lt;= 9999999999 : 'Incorrect order ID' : 'error.order.id' }
-           { totalLines : ? = size(lineItems) : 'Bad count of order lines' 
+           { totalLines : ? = size(lineItems) : 'Bad count of order lines'
                                               : 'error.order.lines.badcount'}
-           { customer.registered : customer.businessCustomer = FALSE OR ? = TRUE 
-                                 : 'Business customer must be registered' 
+           { customer.registered : customer.businessCustomer = FALSE OR ? = TRUE
+                                 : 'Business customer must be registered'
                                  : 'error.customer.registration'}
-           { customer.companyName : customer.businessCustomer = FALSE OR ? HAS TEXT 
-                                  : 'Company name for business customer is mandatory' 
+           { customer.companyName : customer.businessCustomer = FALSE OR ? HAS TEXT
+                                  : 'Company name for business customer is mandatory'
                                   :'error.customer.companyname'}
                     ]]&gt;
                 &lt;/value&gt;
@@ -2619,7 +2618,7 @@ assertNull(itemReader.read());</programlisting>
         if (currentIndex &lt; items.size()) {
             return items.get(currentIndex++);
         }
-      
+
         return null;
     }
 
