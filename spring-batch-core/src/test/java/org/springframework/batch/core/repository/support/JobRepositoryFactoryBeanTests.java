@@ -40,6 +40,8 @@ import org.springframework.batch.core.repository.dao.XStreamExecutionContextStri
 import org.springframework.batch.item.database.support.DataFieldMaxValueIncrementerFactory;
 import org.springframework.core.serializer.Serializer;
 import org.springframework.dao.DataAccessException;
+import org.springframework.jdbc.core.JdbcOperations;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.incrementer.DataFieldMaxValueIncrementer;
 import org.springframework.jdbc.support.lob.DefaultLobHandler;
 import org.springframework.jdbc.support.lob.LobHandler;
@@ -173,7 +175,45 @@ public class JobRepositoryFactoryBeanTests {
 		factory.afterPropertiesSet();
 		assertEquals(customSerializer, ReflectionTestUtils.getField(factory, "serializer"));
 	}
+	
+	@Test
+	public void testDefaultJdbcOperations() throws Exception {
 
+		factory.setDatabaseType("ORACLE");
+
+		incrementerFactory = mock(DataFieldMaxValueIncrementerFactory.class);
+		when(incrementerFactory.isSupportedIncrementerType("ORACLE")).thenReturn(true);
+		when(incrementerFactory.getIncrementer("ORACLE", tablePrefix + "JOB_SEQ")).thenReturn(new StubIncrementer());
+		when(incrementerFactory.getIncrementer("ORACLE", tablePrefix + "JOB_EXECUTION_SEQ")).thenReturn(new StubIncrementer());
+		when(incrementerFactory.getIncrementer("ORACLE", tablePrefix + "STEP_EXECUTION_SEQ")).thenReturn(new StubIncrementer());
+		factory.setIncrementerFactory(incrementerFactory);
+
+		factory.afterPropertiesSet();
+		
+		JdbcOperations jdbcOperations = (JdbcOperations) ReflectionTestUtils.getField(factory, "jdbcOperations");
+		assertTrue(jdbcOperations instanceof JdbcTemplate);
+	}	
+
+	@Test
+	public void testCustomJdbcOperations() throws Exception {
+
+		factory.setDatabaseType("ORACLE");
+
+		incrementerFactory = mock(DataFieldMaxValueIncrementerFactory.class);
+		when(incrementerFactory.isSupportedIncrementerType("ORACLE")).thenReturn(true);
+		when(incrementerFactory.getIncrementer("ORACLE", tablePrefix + "JOB_SEQ")).thenReturn(new StubIncrementer());
+		when(incrementerFactory.getIncrementer("ORACLE", tablePrefix + "JOB_EXECUTION_SEQ")).thenReturn(new StubIncrementer());
+		when(incrementerFactory.getIncrementer("ORACLE", tablePrefix + "STEP_EXECUTION_SEQ")).thenReturn(new StubIncrementer());
+		factory.setIncrementerFactory(incrementerFactory);
+		
+		JdbcOperations customJdbcOperations = mock(JdbcOperations.class);
+		factory.setJdbcOperations(customJdbcOperations);
+		
+		factory.afterPropertiesSet();
+		
+		assertEquals(customJdbcOperations, ReflectionTestUtils.getField(factory, "jdbcOperations"));
+	}	
+	
 	@Test
 	public void testMissingDataSource() throws Exception {
 

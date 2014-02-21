@@ -65,7 +65,7 @@ public class JobRepositoryFactoryBean extends AbstractJobRepositoryFactoryBean i
 
 	private DataSource dataSource;
 
-	private JdbcOperations jdbcTemplate;
+	private JdbcOperations jdbcOperations;
 
 	private String databaseType;
 
@@ -135,6 +135,15 @@ public class JobRepositoryFactoryBean extends AbstractJobRepositoryFactoryBean i
 	public void setDataSource(DataSource dataSource) {
 		this.dataSource = dataSource;
 	}
+	
+	/**
+	 * Public setter for the {@link JdbcOperations}. If this property is not set explicitly,
+	 * a new {@link JdbcTemplate} will be created for the configured DataSource by default.
+	 * @param jdbcOperations a {@link JdbcOperations}
+	 */
+	public void setJdbcOperations(JdbcOperations jdbcOperations) {
+		this.jdbcOperations = jdbcOperations;
+	}
 
 	/**
 	 * Sets the database type.
@@ -162,7 +171,9 @@ public class JobRepositoryFactoryBean extends AbstractJobRepositoryFactoryBean i
 
 		Assert.notNull(dataSource, "DataSource must not be null.");
 
-		jdbcTemplate = new JdbcTemplate(dataSource);
+		if (jdbcOperations == null) {
+			jdbcOperations = new JdbcTemplate(dataSource);	
+		}		
 
 		if (incrementerFactory == null) {
 			incrementerFactory = new DefaultDataFieldMaxValueIncrementerFactory(dataSource);
@@ -198,7 +209,7 @@ public class JobRepositoryFactoryBean extends AbstractJobRepositoryFactoryBean i
 	@Override
 	protected JobInstanceDao createJobInstanceDao() throws Exception {
 		JdbcJobInstanceDao dao = new JdbcJobInstanceDao();
-		dao.setJdbcTemplate(jdbcTemplate);
+		dao.setJdbcTemplate(jdbcOperations);
 		dao.setJobIncrementer(incrementerFactory.getIncrementer(databaseType, tablePrefix + "JOB_SEQ"));
 		dao.setTablePrefix(tablePrefix);
 		dao.afterPropertiesSet();
@@ -208,7 +219,7 @@ public class JobRepositoryFactoryBean extends AbstractJobRepositoryFactoryBean i
 	@Override
 	protected JobExecutionDao createJobExecutionDao() throws Exception {
 		JdbcJobExecutionDao dao = new JdbcJobExecutionDao();
-		dao.setJdbcTemplate(jdbcTemplate);
+		dao.setJdbcTemplate(jdbcOperations);
 		dao.setJobExecutionIncrementer(incrementerFactory.getIncrementer(databaseType, tablePrefix
 				+ "JOB_EXECUTION_SEQ"));
 		dao.setTablePrefix(tablePrefix);
@@ -221,7 +232,7 @@ public class JobRepositoryFactoryBean extends AbstractJobRepositoryFactoryBean i
 	@Override
 	protected StepExecutionDao createStepExecutionDao() throws Exception {
 		JdbcStepExecutionDao dao = new JdbcStepExecutionDao();
-		dao.setJdbcTemplate(jdbcTemplate);
+		dao.setJdbcTemplate(jdbcOperations);
 		dao.setStepExecutionIncrementer(incrementerFactory.getIncrementer(databaseType, tablePrefix
 				+ "STEP_EXECUTION_SEQ"));
 		dao.setTablePrefix(tablePrefix);
@@ -234,7 +245,7 @@ public class JobRepositoryFactoryBean extends AbstractJobRepositoryFactoryBean i
 	@Override
 	protected ExecutionContextDao createExecutionContextDao() throws Exception {
 		JdbcExecutionContextDao dao = new JdbcExecutionContextDao();
-		dao.setJdbcTemplate(jdbcTemplate);
+		dao.setJdbcTemplate(jdbcOperations);
 		dao.setTablePrefix(tablePrefix);
 		dao.setClobTypeToUse(determineClobTypeToUse(this.databaseType));
 		dao.setSerializer(serializer);

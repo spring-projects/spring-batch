@@ -52,7 +52,7 @@ implements InitializingBean {
 
 	private DataSource dataSource;
 
-	private JdbcOperations jdbcTemplate;
+	private JdbcOperations jdbcOperations;
 
 	private String tablePrefix = AbstractJdbcBatchMetadataDao.DEFAULT_TABLE_PREFIX;
 
@@ -87,6 +87,15 @@ implements InitializingBean {
 	public void setDataSource(DataSource dataSource) {
 		this.dataSource = dataSource;
 	}
+	
+	/**
+	 * Public setter for the {@link JdbcOperations}. If this property is not set explicitly,
+	 * a new {@link JdbcTemplate} will be created for the configured DataSource by default.
+	 * @param jdbcOperations a {@link JdbcOperations}
+	 */
+	public void setJdbcOperations(JdbcOperations jdbcOperations) {
+		this.jdbcOperations = jdbcOperations;
+	}	
 
 	/**
 	 * Sets the table prefix for all the batch meta-data tables.
@@ -112,7 +121,9 @@ implements InitializingBean {
 
 		Assert.notNull(dataSource, "DataSource must not be null.");
 
-		jdbcTemplate = new JdbcTemplate(dataSource);
+		if (jdbcOperations == null) {
+			jdbcOperations = new JdbcTemplate(dataSource);	
+		}	
 
 		if(serializer == null) {
 			XStreamExecutionContextStringSerializer defaultSerializer = new XStreamExecutionContextStringSerializer();
@@ -131,7 +142,7 @@ implements InitializingBean {
 	@Override
 	protected ExecutionContextDao createExecutionContextDao() throws Exception {
 		JdbcExecutionContextDao dao = new JdbcExecutionContextDao();
-		dao.setJdbcTemplate(jdbcTemplate);
+		dao.setJdbcTemplate(jdbcOperations);
 		dao.setLobHandler(lobHandler);
 		dao.setTablePrefix(tablePrefix);
 		dao.setSerializer(serializer);
@@ -142,7 +153,7 @@ implements InitializingBean {
 	@Override
 	protected JobInstanceDao createJobInstanceDao() throws Exception {
 		JdbcJobInstanceDao dao = new JdbcJobInstanceDao();
-		dao.setJdbcTemplate(jdbcTemplate);
+		dao.setJdbcTemplate(jdbcOperations);
 		dao.setJobIncrementer(incrementer);
 		dao.setTablePrefix(tablePrefix);
 		dao.afterPropertiesSet();
@@ -152,7 +163,7 @@ implements InitializingBean {
 	@Override
 	protected JobExecutionDao createJobExecutionDao() throws Exception {
 		JdbcJobExecutionDao dao = new JdbcJobExecutionDao();
-		dao.setJdbcTemplate(jdbcTemplate);
+		dao.setJdbcTemplate(jdbcOperations);
 		dao.setJobExecutionIncrementer(incrementer);
 		dao.setTablePrefix(tablePrefix);
 		dao.afterPropertiesSet();
@@ -162,7 +173,7 @@ implements InitializingBean {
 	@Override
 	protected StepExecutionDao createStepExecutionDao() throws Exception {
 		JdbcStepExecutionDao dao = new JdbcStepExecutionDao();
-		dao.setJdbcTemplate(jdbcTemplate);
+		dao.setJdbcTemplate(jdbcOperations);
 		dao.setStepExecutionIncrementer(incrementer);
 		dao.setTablePrefix(tablePrefix);
 		dao.afterPropertiesSet();
