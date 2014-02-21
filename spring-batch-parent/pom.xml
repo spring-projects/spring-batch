@@ -12,7 +12,7 @@
 		<url>https://github.com/spring-projects/spring-batch</url>
 		<connection>scm:git:git://github.com/spring-projects/spring-batch.git</connection>
 		<developerConnection>scm:git:git://github.com/spring-projects/spring-batch.git</developerConnection>
-		<tag>HEAD</tag>
+		<tag>2.2.5.RELEASE</tag>
 	</scm>
 	<licenses>
 		<license>
