@@ -15,9 +15,9 @@
  */
 package org.springframework.batch.core.scope.context;
 
-import java.util.HashMap;
 import java.util.Map;
 import java.util.Stack;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import org.springframework.batch.core.Step;
@@ -29,9 +29,9 @@ import org.springframework.batch.core.StepExecution;
  * it is the responsibility of every {@link Step} implementation to ensure that
  * a {@link StepContext} is available on every thread that might be involved in
  * a step execution, including worker threads from a pool.
- * 
+ *
  * @author Dave Syer
- * 
+ *
  */
 public class StepSynchronizationManager {
 
@@ -55,16 +55,16 @@ public class StepSynchronizationManager {
 	 * Reference counter for each step execution: how many threads are using the
 	 * same one?
 	 */
-	private static final Map<StepExecution, AtomicInteger> counts = new HashMap<StepExecution, AtomicInteger>();
+	private static final Map<StepExecution, AtomicInteger> counts = new ConcurrentHashMap<StepExecution, AtomicInteger>();
 
 	/**
 	 * Simple map from a running step execution to the associated context.
 	 */
-	private static final Map<StepExecution, StepContext> contexts = new HashMap<StepExecution, StepContext>();
+	private static final Map<StepExecution, StepContext> contexts = new ConcurrentHashMap<StepExecution, StepContext>();
 
 	/**
 	 * Getter for the current context if there is one, otherwise returns null.
-	 * 
+	 *
 	 * @return the current {@link StepContext} or null if there is none (if one
 	 * has not been registered for this thread).
 	 */
@@ -81,7 +81,7 @@ public class StepSynchronizationManager {
 	 * Register a context with the current thread - always put a matching
 	 * {@link #close()} call in a finally block to ensure that the correct
 	 * context is available in the enclosing block.
-	 * 
+	 *
 	 * @param stepExecution the step context to register
 	 * @return a new {@link StepContext} or the current one if it has the same
 	 * {@link StepExecution}
