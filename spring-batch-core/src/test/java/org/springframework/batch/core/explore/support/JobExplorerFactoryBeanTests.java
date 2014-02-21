@@ -15,6 +15,7 @@
  */
 package org.springframework.batch.core.explore.support;
 
+import static junit.framework.Assert.assertEquals;
 import static junit.framework.Assert.assertTrue;
 import static junit.framework.Assert.fail;
 import static org.mockito.Mockito.mock;
@@ -26,6 +27,9 @@ import org.junit.Before;
 import org.junit.Test;
 import org.springframework.batch.core.explore.JobExplorer;
 import org.springframework.batch.core.explore.support.JobExplorerFactoryBean;
+import org.springframework.jdbc.core.JdbcOperations;
+import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.test.util.ReflectionTestUtils;
 
 /**
  * @author Dave Syer
@@ -49,6 +53,24 @@ public class JobExplorerFactoryBeanTests {
 		factory.setTablePrefix(tablePrefix);
 
 	}
+	
+	
+	@Test
+	public void testDefaultJdbcOperations() throws Exception {
+		
+		factory.afterPropertiesSet();
+		JdbcOperations jdbcOperations = (JdbcOperations) ReflectionTestUtils.getField(factory, "jdbcOperations");
+		assertTrue(jdbcOperations instanceof JdbcTemplate);
+	}	
+
+	@Test
+	public void testCustomJdbcOperations() throws Exception {
+		
+		JdbcOperations customJdbcOperations = mock(JdbcOperations.class);
+		factory.setJdbcOperations(customJdbcOperations);
+		factory.afterPropertiesSet();
+		assertEquals(customJdbcOperations, ReflectionTestUtils.getField(factory, "jdbcOperations"));
+	}		
 
 	@Test
 	public void testMissingDataSource() throws Exception {
