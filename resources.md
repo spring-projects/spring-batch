@@ -20,6 +20,10 @@ layout: documentation_page
 
 <iframe width="560" height="315" src="//www.youtube.com/embed/LLOxLQ_ztcg" frameborder="0" allowfullscreen></iframe>
 
+### JSR-352, Spring Batch, And You
+
+<iframe width="560" height="315" src="//www.youtube.com/embed/yKs4yPs-5yU?list=PLgGXSWYM2FpPWhlsFCsrTt_C90U3OL-vy" frameborder="0" allowfullscreen></iframe>
+
 ### Integrating Spring Batch and Spring Integration
 
 <iframe src="//player.vimeo.com/video/73164179?title=0&amp;byline=0&amp;portrait=0" width="560" height="315" frameborder="0" webkitallowfullscreen mozallowfullscreen allowfullscreen></iframe>
