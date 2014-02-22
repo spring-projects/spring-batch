@@ -1,0 +1,45 @@
+Spring Batch 3.0.0.M3 Release Notes
+
+* Bug
+
+  * {{{http://jira.springsource.org/browse/BATCH-2080}[BATCH-2080]}} - Clean up "Invalid JavaBean property 'itemWriter' being accessed" warnings
+
+  * {{{http://jira.springsource.org/browse/BATCH-2126}[BATCH-2126]}} - DefaultJobParametersConverter is not thread-safe and the SimpleJobOperator either
+
+  * {{{http://jira.springsource.org/browse/BATCH-2179}[BATCH-2179]}} - DefaultJobParametersConverter#getProperties ignores NON_IDENTIFYING_FLAG
+
+* Improvement
+
+  * {{{http://jira.springsource.org/browse/BATCH-2046}[BATCH-2046]}} - StaxEventItemWriter item grouping tag
+
+  * {{{http://jira.springsource.org/browse/BATCH-2175}[BATCH-2175]}} - Support DBMS not declared in DatabaseType enum.
+
+* Task
+
+  * {{{http://jira.springsource.org/browse/BATCH-2066}[BATCH-2066]}} - Bump Spring version to 3.2.7.RELEASE
+
+  * {{{http://jira.springsource.org/browse/BATCH-2110}[BATCH-2110]}} - Spring 4
+
+  * {{{http://jira.springsource.org/browse/BATCH-2111}[BATCH-2111]}} - Java 8 / Upgrade to Spring 4
+
+  * {{{http://jira.springsource.org/browse/BATCH-2112}[BATCH-2112]}} - Remove Spring Batch's SerializationUtils in favor of the core version.
+
+  * {{{http://jira.springsource.org/browse/BATCH-2129}[BATCH-2129]}} - Update iBatis support for Spring 4
+
+  * {{{http://jira.springsource.org/browse/BATCH-2130}[BATCH-2130]}} - Fix XStream error when using Spring 4.
+
+  * {{{http://jira.springsource.org/browse/BATCH-2142}[BATCH-2142]}} - Refactor JsrJobOperator to stop/start/restart jobs asynchronously only
+
+  * {{{http://jira.springsource.org/browse/BATCH-2174}[BATCH-2174]}} - Execute JSR sigtest
+
+* New Feature
+
+  * {{{http://jira.springsource.org/browse/BATCH-1701}[BATCH-1701]}} - Introduce job scope
+
+  * {{{http://jira.springsource.org/browse/BATCH-2003}[BATCH-2003]}} - Tasklet Partitioning
+
+  * {{{http://jira.springsource.org/browse/BATCH-2014}[BATCH-2014]}} - Implement JSR Partition Model
+
+  * {{{http://jira.springsource.org/browse/BATCH-2063}[BATCH-2063]}} - Implement JSR-352 SkipListener interface
+
+  * {{{http://jira.springsource.org/browse/BATCH-2163}[BATCH-2163]}} - Add support for SQLite

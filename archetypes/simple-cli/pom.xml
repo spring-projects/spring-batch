@@ -14,7 +14,7 @@
     </description>
     <properties>
         <spring.framework.version>4.0.2.RELEASE</spring.framework.version>
-        <spring.batch.version>3.0.0.BUILD-SNAPSHOT</spring.batch.version>
+        <spring.batch.version>3.0.0.M3</spring.batch.version>
         <dependency.locations.enabled>false</dependency.locations.enabled>
         <junit.version>4.10</junit.version>
         <maven.compiler.plugin>3.1</maven.compiler.plugin>
