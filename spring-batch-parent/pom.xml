@@ -3,7 +3,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>org.springframework.batch</groupId>
 	<artifactId>spring-batch-parent</artifactId>
-	<version>3.0.0.M3</version>
+	<version>3.0.0.BUILD-SNAPSHOT</version>
 	<name>Spring Batch Parent</name>
 	<description>Spring Batch parent project.  Defines dependencies and common configuration for the build process.</description>
 	<url>http://docs.spring.io/spring-batch/${project.artifactId}</url>
@@ -12,7 +12,7 @@
 		<url>https://github.com/spring-projects/spring-batch</url>
 		<connection>scm:git:git://github.com/spring-projects/spring-batch.git</connection>
 		<developerConnection>scm:git:git://github.com/spring-projects/spring-batch.git</developerConnection>
-		<tag>3.0.0.M3</tag>
+		<tag>HEAD</tag>
 	</scm>
 	<licenses>
 		<license>
