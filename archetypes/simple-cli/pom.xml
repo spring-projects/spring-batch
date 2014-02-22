@@ -3,7 +3,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>org.springframework.batch</groupId>
     <artifactId>spring-batch-simple-cli</artifactId>
-    <version>3.0.0.BUILD-SNAPSHOT</version>
+    <version>3.0.0.M3</version>
     <packaging>jar</packaging>
     <name>Commandline</name>
     <description>This project is a command line batch sample from Spring Batch demonstrating a typical batch job.
