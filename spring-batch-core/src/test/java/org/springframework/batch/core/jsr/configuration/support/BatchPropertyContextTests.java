@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 the original author or authors.
+ * Copyright 2013-2014 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,9 +17,8 @@ package org.springframework.batch.core.jsr.configuration.support;
 
 import static org.junit.Assert.assertEquals;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Properties;
 
 import org.junit.Before;
@@ -33,72 +32,64 @@ import org.junit.Test;
  * @author Chris Schaefer
  */
 public class BatchPropertyContextTests {
-	private List<BatchPropertyContext.BatchPropertyContextEntry> jobProperties = new ArrayList<BatchPropertyContext.BatchPropertyContextEntry>();
-	private List<BatchPropertyContext.BatchPropertyContextEntry> stepProperties = new ArrayList<BatchPropertyContext.BatchPropertyContextEntry>();
-	private List<BatchPropertyContext.BatchPropertyContextEntry> artifactProperties = new ArrayList<BatchPropertyContext.BatchPropertyContextEntry>();
-	private List<BatchPropertyContext.BatchPropertyContextEntry> stepArtifactProperties = new ArrayList<BatchPropertyContext.BatchPropertyContextEntry>();
-	private List<BatchPropertyContext.BatchPropertyContextEntry> partitionProperties = new ArrayList<BatchPropertyContext.BatchPropertyContextEntry>();
+	private Properties jobProperties = new Properties();
+	private Map<String, Properties> stepProperties = new HashMap<String, Properties>();
+	private Map<String, Properties> artifactProperties = new HashMap<String, Properties>();
+	private Map<String, Map<String, Properties>> partitionProperties = new HashMap<String, Map<String, Properties>>();
+	private Map<String, Map<String, Properties>> stepArtifactProperties = new HashMap<String, Map<String, Properties>>();
 
 	@Before
 	public void setUp() {
-		BatchPropertyContext batchPropertyContext = new BatchPropertyContext();
-
 		Properties step1Properties = new Properties();
 		step1Properties.setProperty("step1PropertyName1", "step1PropertyValue1");
 		step1Properties.setProperty("step1PropertyName2", "step1PropertyValue2");
-		stepProperties.add(batchPropertyContext.new BatchPropertyContextEntry("step1", step1Properties, BatchArtifact.BatchArtifactType.STEP));
+		this.stepProperties.put("step1", step1Properties);
 
 		Properties step2Properties = new Properties();
 		step2Properties.setProperty("step2PropertyName1", "step2PropertyValue1");
 		step2Properties.setProperty("step2PropertyName2", "step2PropertyValue2");
-		stepProperties.add(batchPropertyContext.new BatchPropertyContextEntry("step2", step2Properties, BatchArtifact.BatchArtifactType.STEP));
+		this.stepProperties.put("step2", step2Properties);
 
 		Properties jobProperties = new Properties();
 		jobProperties.setProperty("jobProperty1", "jobProperty1value");
 		jobProperties.setProperty("jobProperty2", "jobProperty2value");
-		this.jobProperties.add(batchPropertyContext.new BatchPropertyContextEntry("job1", jobProperties, BatchArtifact.BatchArtifactType.JOB));
+		this.jobProperties.putAll(jobProperties);
 
 		Properties artifactProperties = new Properties();
 		artifactProperties.setProperty("deciderProperty1", "deciderProperty1value");
 		artifactProperties.setProperty("deciderProperty2", "deciderProperty2value");
-		this.artifactProperties.add(batchPropertyContext.new BatchPropertyContextEntry("decider1", artifactProperties, BatchArtifact.BatchArtifactType.ARTIFACT));
+		this.artifactProperties.put("decider1", artifactProperties);
 
-		Properties stepArtifactProperties = new Properties();
+		final Properties stepArtifactProperties = new Properties();
 		stepArtifactProperties.setProperty("readerProperty1", "readerProperty1value");
 		stepArtifactProperties.setProperty("readerProperty2", "readerProperty2value");
 
-		BatchPropertyContext.BatchPropertyContextEntry batchPropertyContextEntry =
-				batchPropertyContext.new BatchPropertyContextEntry("reader", stepArtifactProperties, BatchArtifact.BatchArtifactType.STEP_ARTIFACT);
-		batchPropertyContextEntry.setStepName("step1");
+		this.stepArtifactProperties.put("step1", new HashMap<String, Properties>() {{
+			put("reader", stepArtifactProperties);
+		}});
 
-		this.stepArtifactProperties.add(batchPropertyContextEntry);
-
-		Properties partitionProperties = new Properties();
+		final Properties partitionProperties = new Properties();
 		partitionProperties.setProperty("writerProperty1", "writerProperty1valuePartition0");
 		partitionProperties.setProperty("writerProperty2", "writerProperty2valuePartition0");
 
-		BatchPropertyContext.BatchPropertyContextEntry partitionBatchPropertyContextEntry =
-				batchPropertyContext.new BatchPropertyContextEntry("writer", partitionProperties, BatchArtifact.BatchArtifactType.STEP_ARTIFACT);
-		partitionBatchPropertyContextEntry.setStepName("step2:partition0");
+		this.partitionProperties.put("step2:partition0", new HashMap<String, Properties>() {{
+			put("writer", partitionProperties);
+		}});
 
-		this.partitionProperties.add(partitionBatchPropertyContextEntry);
-
-		Properties partitionStepProperties = new Properties();
+		final Properties partitionStepProperties = new Properties();
 		partitionStepProperties.setProperty("writerProperty1Step", "writerProperty1");
 		partitionStepProperties.setProperty("writerProperty2Step", "writerProperty2");
 
-		BatchPropertyContext.BatchPropertyContextEntry partitionStepBatchPropertyContextEntry =
-				batchPropertyContext.new BatchPropertyContextEntry("writer", partitionStepProperties, BatchArtifact.BatchArtifactType.STEP_ARTIFACT);
-		partitionStepBatchPropertyContextEntry.setStepName("step2");
-
-		this.partitionProperties.add(partitionStepBatchPropertyContextEntry);
+		this.partitionProperties.put("step2", new HashMap<String, Properties>() {{
+			put("writer", partitionStepProperties);
+		}});
 	}
 
 	@Test
 	public void testStepLevelProperties() {
 		BatchPropertyContext batchPropertyContext = new BatchPropertyContext();
-		batchPropertyContext.setJobPropertiesContextEntry(jobProperties);
-		batchPropertyContext.setStepPropertiesContextEntry(stepProperties);
+		batchPropertyContext.setJobProperties(jobProperties);
+		batchPropertyContext.setStepProperties(stepProperties);
 
 		Properties step1Properties = batchPropertyContext.getStepProperties("step1");
 		assertEquals(2, step1Properties.size());
@@ -114,7 +105,7 @@ public class BatchPropertyContextTests {
 	@Test
 	public void testJobLevelProperties() {
 		BatchPropertyContext batchPropertyContext = new BatchPropertyContext();
-		batchPropertyContext.setJobPropertiesContextEntry(jobProperties);
+		batchPropertyContext.setJobProperties(jobProperties);
 
 		Properties jobProperties = batchPropertyContext.getJobProperties();
 		assertEquals(2, jobProperties.size());
@@ -125,8 +116,8 @@ public class BatchPropertyContextTests {
 	@Test
 	public void testAddPropertiesToExistingStep() {
 		BatchPropertyContext batchPropertyContext = new BatchPropertyContext();
-		batchPropertyContext.setJobPropertiesContextEntry(jobProperties);
-		batchPropertyContext.setStepPropertiesContextEntry(stepProperties);
+		batchPropertyContext.setJobProperties(jobProperties);
+		batchPropertyContext.setStepProperties(stepProperties);
 
 		Properties step1 = batchPropertyContext.getStepProperties("step1");
 		assertEquals(2, step1.size());
@@ -136,8 +127,7 @@ public class BatchPropertyContextTests {
 		Properties step1properties = new Properties();
 		step1properties.setProperty("newStep1PropertyName", "newStep1PropertyValue");
 
-		batchPropertyContext.setStepPropertiesContextEntry(
-				Collections.singletonList(batchPropertyContext.new BatchPropertyContextEntry("step1", step1properties, BatchArtifact.BatchArtifactType.STEP)));
+		batchPropertyContext.setStepProperties("step1", step1properties);
 
 		Properties step1updated = batchPropertyContext.getStepProperties("step1");
 		assertEquals(3, step1updated.size());
@@ -149,9 +139,9 @@ public class BatchPropertyContextTests {
 	@Test
 	public void testNonStepLevelArtifactProperties() {
 		BatchPropertyContext batchPropertyContext = new BatchPropertyContext();
-		batchPropertyContext.setJobPropertiesContextEntry(jobProperties);
-		batchPropertyContext.setArtifactPropertiesContextEntry(artifactProperties);
-		batchPropertyContext.setStepPropertiesContextEntry(stepProperties);
+		batchPropertyContext.setJobProperties(jobProperties);
+		batchPropertyContext.setArtifactProperties(artifactProperties);
+		batchPropertyContext.setStepProperties(stepProperties);
 
 		Properties artifactProperties = batchPropertyContext.getArtifactProperties("decider1");
 		assertEquals(4, artifactProperties.size());
@@ -164,10 +154,10 @@ public class BatchPropertyContextTests {
 	@Test
 	public void testStepLevelArtifactProperties() {
 		BatchPropertyContext batchPropertyContext = new BatchPropertyContext();
-		batchPropertyContext.setJobPropertiesContextEntry(jobProperties);
-		batchPropertyContext.setArtifactPropertiesContextEntry(artifactProperties);
-		batchPropertyContext.setStepPropertiesContextEntry(stepProperties);
-		batchPropertyContext.setStepArtifactPropertiesContextEntry(stepArtifactProperties);
+		batchPropertyContext.setJobProperties(jobProperties);
+		batchPropertyContext.setArtifactProperties(artifactProperties);
+		batchPropertyContext.setStepProperties(stepProperties);
+		batchPropertyContext.setStepArtifactProperties(stepArtifactProperties);
 
 		Properties artifactProperties = batchPropertyContext.getStepArtifactProperties("step1", "reader");
 		assertEquals(6, artifactProperties.size());
@@ -182,14 +172,13 @@ public class BatchPropertyContextTests {
 	@Test
 	public void testArtifactNonOverridingJobProperties() {
 		BatchPropertyContext batchPropertyContext = new BatchPropertyContext();
-		batchPropertyContext.setJobPropertiesContextEntry(jobProperties);
-		batchPropertyContext.setArtifactPropertiesContextEntry(artifactProperties);
+		batchPropertyContext.setJobProperties(jobProperties);
+		batchPropertyContext.setArtifactProperties(artifactProperties);
 
 		Properties jobProperties = new Properties();
 		jobProperties.setProperty("deciderProperty1", "decider1PropertyOverride");
 
-		batchPropertyContext.setJobPropertiesContextEntry(
-				Collections.singletonList(batchPropertyContext.new BatchPropertyContextEntry("job1", jobProperties, BatchArtifact.BatchArtifactType.JOB)));
+		batchPropertyContext.setJobProperties(jobProperties);
 
 		Properties step1 = batchPropertyContext.getArtifactProperties("decider1");
 		assertEquals(4, step1.size());
@@ -208,11 +197,11 @@ public class BatchPropertyContextTests {
 	@Test
 	public void testPartitionProperties() {
 		BatchPropertyContext batchPropertyContext = new BatchPropertyContext();
-		batchPropertyContext.setJobPropertiesContextEntry(jobProperties);
-		batchPropertyContext.setArtifactPropertiesContextEntry(artifactProperties);
-		batchPropertyContext.setStepPropertiesContextEntry(stepProperties);
-		batchPropertyContext.setStepArtifactPropertiesContextEntry(stepArtifactProperties);
-		batchPropertyContext.setStepArtifactPropertiesContextEntry(partitionProperties);
+		batchPropertyContext.setJobProperties(jobProperties);
+		batchPropertyContext.setArtifactProperties(artifactProperties);
+		batchPropertyContext.setStepProperties(stepProperties);
+		batchPropertyContext.setStepArtifactProperties(stepArtifactProperties);
+		batchPropertyContext.setStepArtifactProperties(partitionProperties);
 
 		Properties artifactProperties = batchPropertyContext.getStepArtifactProperties("step2:partition0", "writer");
 		assertEquals(8, artifactProperties.size());

@@ -217,8 +217,6 @@ public class JsrBeanDefinitionDocumentReaderTests {
 		JobExecution jobExecution = JsrTestUtils.runJob("jsrSpringInstanceTests", new Properties(), 10000L);
 		String exitStatus = jobExecution.getExitStatus();
 
-		assertEquals("listener1listener1listener4listener4", exitStatus);
-
 		assertTrue("Exit status must contain listener1", exitStatus.contains("listener1"));
 		assertTrue("exitStatus must contain 2 listener1 values", StringUtils.countOccurrencesOf(exitStatus, "listener1") == 2);
 

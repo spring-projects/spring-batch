@@ -40,9 +40,7 @@ import org.springframework.batch.core.ExitStatus;
 import org.springframework.batch.core.JobExecutionException;
 import org.springframework.batch.core.Step;
 import org.springframework.batch.core.StepExecution;
-import org.springframework.batch.core.jsr.configuration.support.BatchArtifact.BatchArtifactType;
 import org.springframework.batch.core.jsr.configuration.support.BatchPropertyContext;
-import org.springframework.batch.core.jsr.configuration.support.BatchPropertyContext.BatchPropertyContextEntry;
 import org.springframework.batch.core.partition.JsrStepExecutionSplitter;
 import org.springframework.batch.core.partition.PartitionHandler;
 import org.springframework.batch.core.partition.StepExecutionSplitter;
@@ -343,11 +341,7 @@ public class JsrPartitionHandler implements PartitionHandler, InitializingBean {
 				if(i < partitionProperties.length) {
 					Properties partitionPropertyValues = partitionProperties[i];
 					if(partitionPropertyValues != null) {
-						List<BatchPropertyContextEntry> entries = new ArrayList<BatchPropertyContext.BatchPropertyContextEntry>();
-						BatchPropertyContextEntry entry = propertyContext.new BatchPropertyContextEntry(curExecution.getStepName(), partitionPropertyValues, BatchArtifactType.STEP);
-						entries.add(entry);
-
-						propertyContext.setStepPropertiesContextEntry(entries);
+						propertyContext.setStepProperties(curExecution.getStepName(), partitionPropertyValues);
 					}
 
 					i++;

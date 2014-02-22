@@ -76,7 +76,7 @@ public class StepParser extends AbstractSingleBeanDefinitionParser {
 		}
 
 		new ListenerParser(StepListenerFactoryBean.class, "listeners").parseListeners(element, parserContext, bd, stepName);
-		new PropertyParser(stepName, parserContext, BatchArtifact.BatchArtifactType.STEP).parseProperties(element);
+		new PropertyParser(stepName, parserContext, BatchArtifact.BatchArtifactType.STEP, stepName).parseProperties(element);
 
 		// look at all nested elements
 		NodeList children = element.getChildNodes();
