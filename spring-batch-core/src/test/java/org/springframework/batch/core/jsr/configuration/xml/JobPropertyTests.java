@@ -81,8 +81,6 @@ public class JobPropertyTests {
 			org.springframework.util.Assert.isTrue(stepContext.getProperties().get("step1PropertyName2").equals("step1PropertyValue2"));
 			org.springframework.util.Assert.isTrue(stepContext.getProperties().get("jobPropertyName1") == null);
 			org.springframework.util.Assert.isTrue(stepContext.getProperties().get("jobPropertyName2") == null);
-			org.springframework.util.Assert.isTrue("jobPropertyValue1".equals(jobPropertyName1));
-			org.springframework.util.Assert.isTrue("jobPropertyValue2".equals(jobPropertyName2));
 			org.springframework.util.Assert.isTrue("readerPropertyValue1".equals(readerPropertyName1));
 			org.springframework.util.Assert.isTrue("readerPropertyValue2".equals(readerPropertyName2));
 			org.springframework.util.Assert.isTrue("annotationNamedReaderPropertyValue".equals(annotationNamedProperty));
@@ -92,6 +90,14 @@ public class JobPropertyTests {
 			org.springframework.util.Assert.notNull(injectAnnotatedOnlyField);
 			org.springframework.util.Assert.isTrue("job1".equals(injectAnnotatedOnlyField.getJobName()));
 			org.springframework.util.Assert.isNull(readerPropertyName3);
+
+			Properties jobProperties = injectAnnotatedOnlyField.getProperties();
+			org.springframework.util.Assert.isTrue(jobProperties.size() == 5);
+			org.springframework.util.Assert.isTrue(jobProperties.get("jobPropertyName1").equals("jobPropertyValue1"));
+			org.springframework.util.Assert.isTrue(jobProperties.get("jobPropertyName2").equals("jobPropertyValue2"));
+			org.springframework.util.Assert.isTrue(jobProperties.get("step2name").equals("step2"));
+			org.springframework.util.Assert.isTrue(jobProperties.get("filestem").equals("postings"));
+			org.springframework.util.Assert.isTrue(jobProperties.get("x").equals("xVal"));
 		}
 
 		@Override
@@ -242,6 +248,9 @@ public class JobPropertyTests {
 		@Inject @BatchProperty String notDefinedProperty;
 		@Inject @BatchProperty(name = "notDefinedAnnotationNamedProperty") String notDefinedAnnotationNamedProperty;
 		@Inject javax.batch.runtime.context.StepContext stepContext;
+		@Inject @BatchProperty(name = "infile.name") String infile;
+		@Inject @BatchProperty(name = "y") String y;
+		@Inject @BatchProperty(name = "x") String x;
 
 		@Override
 		public String process() throws Exception {
@@ -256,8 +265,11 @@ public class JobPropertyTests {
 			org.springframework.util.Assert.isTrue("batchletPropertyValue1".equals(batchletPropertyName1));
 			org.springframework.util.Assert.isTrue("batchletPropertyValue2".equals(batchletPropertyName2));
 			org.springframework.util.Assert.isTrue("annotationNamedBatchletPropertyValue".equals(annotationNamedProperty));
+			org.springframework.util.Assert.isTrue("postings.txt".equals(infile));
+			org.springframework.util.Assert.isTrue("xVal".equals(y));
 			org.springframework.util.Assert.isNull(notDefinedProperty);
 			org.springframework.util.Assert.isNull(notDefinedAnnotationNamedProperty);
+			org.springframework.util.Assert.isNull(x);
 
 			return null;
 		}

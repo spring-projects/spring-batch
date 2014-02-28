@@ -15,6 +15,7 @@
  */
 package org.springframework.batch.core.jsr.configuration.support;
 
+import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
@@ -99,11 +100,18 @@ public class BatchPropertyContext {
 
 		for(Map.Entry<String, Properties> propertiesEntry : properties.entrySet()) {
 			String stepName = propertiesEntry.getKey();
+			Properties stepProperties = propertiesEntry.getValue();
 
-			if (!propertiesEntry.getValue().isEmpty()) {
+			if (!stepProperties.isEmpty()) {
 				if (this.stepProperties.containsKey(stepName)) {
 					Properties existingStepProperties = this.stepProperties.get(stepName);
-					existingStepProperties.putAll(propertiesEntry.getValue());
+
+					Enumeration<?> stepPropertyNames = stepProperties.propertyNames();
+
+					while(stepPropertyNames.hasMoreElements()) {
+						String propertyEntryName = (String) stepPropertyNames.nextElement();
+						existingStepProperties.put(propertyEntryName, stepProperties.getProperty(propertyEntryName));
+					}
 
 					this.stepProperties.put(stepName, existingStepProperties);
 				} else {
@@ -134,9 +142,7 @@ public class BatchPropertyContext {
 
 	/**
 	 * <p>
-	 * Obtains the batch {@link Properties} for the provided artifact name. The returned {@link Properties}
-	 * will also contain any job level properties that have been set. Job level properties will not override
-	 * existing lower level artifact properties.
+	 * Obtains the batch {@link Properties} for the provided artifact name.
 	 * </p>
 	 *
 	 * @param artifactName the batch artifact to obtain properties for
@@ -144,7 +150,6 @@ public class BatchPropertyContext {
 	 */
 	public Properties getArtifactProperties(String artifactName) {
 		Properties properties = new Properties();
-		properties.putAll(getJobProperties());
 
 		if (artifactProperties.containsKey(artifactName)) {
 			properties.putAll(artifactProperties.get(artifactName));
@@ -184,7 +189,6 @@ public class BatchPropertyContext {
 	 */
 	public Properties getStepArtifactProperties(String stepName, String artifactName) {
 		Properties properties = new Properties();
-		properties.putAll(getJobProperties());
 		properties.putAll(getStepProperties(stepName));
 
 		Map<String, Properties> artifactProperties = stepArtifactProperties.get(stepName);
