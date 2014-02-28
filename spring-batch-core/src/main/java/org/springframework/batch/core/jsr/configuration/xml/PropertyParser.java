@@ -36,18 +36,18 @@ import org.w3c.dom.Element;
  * @since 3.0
  */
 public class PropertyParser {
-    private static final String PROPERTY_ELEMENT = "property";
-    private static final String PROPERTIES_ELEMENT = "properties";
-    private static final String PROPERTY_NAME_ATTRIBUTE = "name";
-    private static final String PROPERTY_VALUE_ATTRIBUTE = "value";
-    private static final String JOB_PROPERTIES_BEAN_NAME = "jobProperties";
-    private static final String BATCH_PROPERTY_CONTEXT_BEAN_NAME = "batchPropertyContext";
-    private static final String JOB_PROPERTIES_PROPERTY_NAME = "jobProperties";
-    private static final String STEP_PROPERTIES_PROPERTY_NAME = "stepProperties";
-    private static final String ARTIFACT_PROPERTIES_PROPERTY_NAME = "artifactProperties";
-    private static final String STEP_ARTIFACT_PROPERTIES_PROPERTY_NAME = "stepArtifactProperties";
+	private static final String PROPERTY_ELEMENT = "property";
+	private static final String PROPERTIES_ELEMENT = "properties";
+	private static final String PROPERTY_NAME_ATTRIBUTE = "name";
+	private static final String PROPERTY_VALUE_ATTRIBUTE = "value";
+	private static final String JOB_PROPERTIES_BEAN_NAME = "jobProperties";
+	private static final String BATCH_PROPERTY_CONTEXT_BEAN_NAME = "batchPropertyContext";
+	private static final String JOB_PROPERTIES_PROPERTY_NAME = "jobProperties";
+	private static final String STEP_PROPERTIES_PROPERTY_NAME = "stepProperties";
+	private static final String ARTIFACT_PROPERTIES_PROPERTY_NAME = "artifactProperties";
+	private static final String STEP_ARTIFACT_PROPERTIES_PROPERTY_NAME = "stepArtifactProperties";
 
-    private String beanName;
+	private String beanName;
 	private String stepName;
 	private ParserContext parserContext;
 	private BatchArtifact.BatchArtifactType batchArtifactType;

@@ -6,6 +6,8 @@
 		<property name="jobPropertyName1" value="jobPropertyValue1"/>
 		<property name="jobPropertyName2" value="jobPropertyValue2"/>
 		<property name="step2name" value="step2"/>
+		<property name="filestem" value="postings"/>
+		<property name="x" value="xVal"/>
 	</properties>
 
 	<step id="step1" allow-start-if-complete="#{jobParameters['allow.start.if.complete']}">
@@ -92,6 +94,8 @@
 				<property name="batchletPropertyName2" value="batchletPropertyValue2"/>
 				<property name="annotationNamedBatchletPropertyName" value="annotationNamedBatchletPropertyValue"/>
 				<property name="nonexistentBatchletPropertyName" value="nonexistentBatchletPropertyValue"/>
+				<property name="infile.name" value="#{jobProperties['filestem']}.txt"/>
+				<property name="y" value="#{jobProperties['x']}"/>
 			</properties>
 		</batchlet>
 	</step>
