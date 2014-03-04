@@ -28,9 +28,9 @@ import org.springframework.beans.factory.FactoryBeanNotInitializedException;
 import org.springframework.core.task.AsyncTaskExecutor;
 import org.springframework.core.task.SimpleAsyncTaskExecutor;
 
-public class StepContextFactoryBeanTests {
+public class JsrStepContextFactoryBeanTests {
 
-	private StepContextFactoryBean factory;
+	private JsrStepContextFactoryBean factory;
 	@Mock
 	private BatchPropertyContext propertyContext;
 
@@ -46,7 +46,7 @@ public class StepContextFactoryBeanTests {
 	@Before
 	public void setUp() throws Exception {
 		MockitoAnnotations.initMocks(this);
-		factory = new StepContextFactoryBean();
+		factory = new JsrStepContextFactoryBean();
 		factory.setBatchPropertyContext(propertyContext);
 	}
 

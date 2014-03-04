@@ -17,10 +17,10 @@ package org.springframework.batch.core.jsr.configuration.xml;
 
 import org.springframework.batch.core.configuration.xml.SimpleFlowFactoryBean;
 import org.springframework.batch.core.job.flow.State;
-import org.springframework.batch.core.jsr.job.flow.support.state.StepState;
+import org.springframework.batch.core.jsr.job.flow.support.state.JsrStepState;
 
 /**
- * Extension to the {@link SimpleFlowFactoryBean} that provides {@link StepState}
+ * Extension to the {@link SimpleFlowFactoryBean} that provides {@link org.springframework.batch.core.jsr.job.flow.support.state.JsrStepState}
  * implementations for JSR-352 based jobs.
  *
  * @author Michael Minella
@@ -34,6 +34,6 @@ public class JsrFlowFactoryBean extends SimpleFlowFactoryBean {
 	@Override
 	protected State createNewStepState(State state, String oldName,
 			String stateName) {
-		return new StepState(stateName, ((StepState) state).getStep(oldName));
+		return new JsrStepState(stateName, ((JsrStepState) state).getStep(oldName));
 	}
 }

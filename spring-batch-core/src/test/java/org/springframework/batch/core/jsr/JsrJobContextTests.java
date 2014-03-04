@@ -32,9 +32,9 @@ import org.springframework.batch.core.JobInstance;
 import org.springframework.batch.core.JobParameters;
 import org.springframework.batch.core.JobParametersBuilder;
 
-public class JobContextTests {
+public class JsrJobContextTests {
 
-	private JobContext context;
+	private JsrJobContext context;
 	@Mock
 	private JobExecution execution;
 	@Mock
@@ -47,7 +47,7 @@ public class JobContextTests {
 		Properties properties = new Properties();
 		properties.put("jobLevelProperty1", "jobLevelValue1");
 
-		context = new JobContext();
+		context = new JsrJobContext();
 		context.setProperties(properties);
 		context.setJobExecution(execution);
 
@@ -56,7 +56,7 @@ public class JobContextTests {
 
 	@Test(expected=IllegalArgumentException.class)
 	public void testCreateWithNull() {
-		context = new JobContext();
+		context = new JsrJobContext();
 		context.setJobExecution(null);
 	}
 

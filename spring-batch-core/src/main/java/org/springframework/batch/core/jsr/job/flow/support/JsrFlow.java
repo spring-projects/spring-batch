@@ -27,7 +27,7 @@ import org.springframework.batch.core.job.flow.FlowExecutionStatus;
 import org.springframework.batch.core.job.flow.State;
 import org.springframework.batch.core.job.flow.support.SimpleFlow;
 import org.springframework.batch.core.job.flow.support.StateTransition;
-import org.springframework.batch.core.jsr.job.flow.support.state.StepState;
+import org.springframework.batch.core.jsr.job.flow.support.state.JsrStepState;
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.util.StringUtils;
 
@@ -41,14 +41,14 @@ import org.springframework.util.StringUtils;
  * @author Michael Minella
  * @since 3.0
  */
-public class DefaultFlow extends SimpleFlow {
+public class JsrFlow extends SimpleFlow {
 
-	private StepState currentStep;
+	private JsrStepState currentStep;
 
 	/**
 	 * @param name name of the flow
 	 */
-	public DefaultFlow(String name) {
+	public JsrFlow(String name) {
 		super(name);
 	}
 
@@ -66,8 +66,8 @@ public class DefaultFlow extends SimpleFlow {
 			state = ((DelegateState) state).getState();
 		}
 
-		if(state instanceof StepState) {
-			currentStep = (StepState) state;
+		if(state instanceof JsrStepState) {
+			currentStep = (JsrStepState) state;
 		}
 
 		return super.isFlowContinued(state, status, stepExecution);

@@ -19,7 +19,7 @@ import java.util.Collection;
 
 import org.springframework.batch.core.job.flow.JobExecutionDecider;
 import org.springframework.batch.core.jsr.configuration.support.BatchArtifact;
-import org.springframework.batch.core.jsr.job.flow.support.state.StepState;
+import org.springframework.batch.core.jsr.job.flow.support.state.JsrStepState;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.config.RuntimeBeanReference;
 import org.springframework.beans.factory.parsing.BeanComponentDefinition;
@@ -37,7 +37,7 @@ import org.w3c.dom.Element;
  * @author Chris Schaefer
  * @since 3.0
  */
-public class DecisionParser {
+public class JsrDecisionParser {
 
 	private static final String ID_ATTRIBUTE = "id";
 	private static final String REF_ATTRIBUTE = "ref";
@@ -47,7 +47,7 @@ public class DecisionParser {
 		AbstractBeanDefinition factoryDefinition = factoryBuilder.getRawBeanDefinition();
 		factoryDefinition.setBeanClass(DecisionStepFactoryBean.class);
 
-		BeanDefinitionBuilder stateBuilder = BeanDefinitionBuilder.genericBeanDefinition(StepState.class);
+		BeanDefinitionBuilder stateBuilder = BeanDefinitionBuilder.genericBeanDefinition(JsrStepState.class);
 
 		String idAttribute = element.getAttribute(ID_ATTRIBUTE);
 

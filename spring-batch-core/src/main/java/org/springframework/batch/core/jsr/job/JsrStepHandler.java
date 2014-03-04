@@ -40,16 +40,16 @@ import org.springframework.util.StringUtils;
  * @author Michael Minella
  * @since 3.0
  */
-public class DefaultStepHandler extends SimpleStepHandler {
+public class JsrStepHandler extends SimpleStepHandler {
 
-	private static final Log logger = LogFactory.getLog(DefaultStepHandler.class);
+	private static final Log logger = LogFactory.getLog(JsrStepHandler.class);
 
 	private JobExplorer jobExplorer;
 
 	/**
 	 * @param jobRepository
 	 */
-	public DefaultStepHandler(JobRepository jobRepository, JobExplorer jobExplorer) {
+	public JsrStepHandler(JobRepository jobRepository, JobExplorer jobExplorer) {
 		super(jobRepository, new ExecutionContext());
 		this.jobExplorer = jobExplorer;
 	}

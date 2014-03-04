@@ -9,17 +9,17 @@
 
     <job id="job1" xmlns="http://xmlns.jcp.org/xml/ns/javaee" version="1.0">
         <step id="step1" next="step2">
-            <batchlet ref="org.springframework.batch.core.jsr.configuration.xml.SplitParsingTests$ExitStatusSettingBatchlet"/>
+            <batchlet ref="org.springframework.batch.core.jsr.configuration.xml.JsrSplitParsingTests$ExitStatusSettingBatchlet"/>
         </step>
         <split id="step2" next="step3">
             <flow id="step2a">
                 <step id="step2aStep1">
-                    <batchlet ref="org.springframework.batch.core.jsr.configuration.xml.SplitParsingTests$ExitStatusSettingBatchlet"/>
+                    <batchlet ref="org.springframework.batch.core.jsr.configuration.xml.JsrSplitParsingTests$ExitStatusSettingBatchlet"/>
                 </step>
             </flow>
             <flow id="step2b">
                 <step id="step2bStep1" next="step2bStep2">
-                    <batchlet ref="org.springframework.batch.core.jsr.configuration.xml.SplitParsingTests$ExitStatusSettingBatchlet"/>
+                    <batchlet ref="org.springframework.batch.core.jsr.configuration.xml.JsrSplitParsingTests$ExitStatusSettingBatchlet"/>
                 </step>
                 <step id="step2bStep2">
                     <chunk checkpoint-policy="item" item-count="3">

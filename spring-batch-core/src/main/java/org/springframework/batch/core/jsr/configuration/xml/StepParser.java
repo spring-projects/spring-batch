@@ -18,7 +18,7 @@ package org.springframework.batch.core.jsr.configuration.xml;
 import java.util.Collection;
 
 import org.springframework.batch.core.jsr.configuration.support.BatchArtifact;
-import org.springframework.batch.core.jsr.job.flow.support.state.StepState;
+import org.springframework.batch.core.jsr.job.flow.support.state.JsrStepState;
 import org.springframework.batch.core.listener.StepListenerFactoryBean;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.config.RuntimeBeanReference;
@@ -54,7 +54,7 @@ public class StepParser extends AbstractSingleBeanDefinitionParser {
 		bd.setBeanClass(StepFactoryBean.class);
 		bd.getPropertyValues().addPropertyValue("batchPropertyContext", new RuntimeBeanReference("batchPropertyContext"));
 
-		BeanDefinitionBuilder stateBuilder = BeanDefinitionBuilder.genericBeanDefinition(StepState.class);
+		BeanDefinitionBuilder stateBuilder = BeanDefinitionBuilder.genericBeanDefinition(JsrStepState.class);
 
 		String stepName = element.getAttribute(SPLIT_ID_ATTRIBUTE);
 		builder.addPropertyValue("name", stepName);

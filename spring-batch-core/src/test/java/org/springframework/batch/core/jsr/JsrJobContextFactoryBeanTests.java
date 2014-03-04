@@ -39,15 +39,15 @@ import org.springframework.beans.factory.FactoryBeanNotInitializedException;
 import org.springframework.core.task.AsyncTaskExecutor;
 import org.springframework.core.task.SimpleAsyncTaskExecutor;
 
-public class JobContextFactoryBeanTests {
+public class JsrJobContextFactoryBeanTests {
 
-	private JobContextFactoryBean factoryBean;
+	private JsrJobContextFactoryBean factoryBean;
 	private BatchPropertyContext propertyContext;
 
 	@Before
 	public void setUp() throws Exception {
 		propertyContext = new BatchPropertyContext();
-		factoryBean = new JobContextFactoryBean();
+		factoryBean = new JsrJobContextFactoryBean();
 	}
 
 	@After

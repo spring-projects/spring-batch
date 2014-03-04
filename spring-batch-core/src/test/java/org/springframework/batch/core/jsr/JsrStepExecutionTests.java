@@ -18,12 +18,12 @@ import org.springframework.batch.core.StepExecution;
 import org.springframework.batch.item.util.ExecutionContextUserSupport;
 import org.springframework.util.ClassUtils;
 
-public class StepExecutionTests {
+public class JsrStepExecutionTests {
 
 	private StepExecution stepExecution;
 	private javax.batch.runtime.StepExecution jsrStepExecution;
-	//The API that sets the persisted user data is on the StepContext so the key within the ExecutionContext is StepContext
-	private ExecutionContextUserSupport executionContextUserSupport = new ExecutionContextUserSupport(ClassUtils.getShortName(StepContext.class));
+	//The API that sets the persisted user data is on the JsrStepContext so the key within the ExecutionContext is JsrStepContext
+	private ExecutionContextUserSupport executionContextUserSupport = new ExecutionContextUserSupport(ClassUtils.getShortName(JsrStepContext.class));
 
 	@Before
 	public void setUp() throws Exception {
@@ -45,12 +45,12 @@ public class StepExecutionTests {
 		stepExecution.setEndTime(new Date(10000000));
 		stepExecution.getExecutionContext().put(executionContextUserSupport.getKey("batch_jsr_persistentUserData"), "persisted data");
 
-		jsrStepExecution = new org.springframework.batch.core.jsr.StepExecution(stepExecution);
+		jsrStepExecution = new JsrStepExecution(stepExecution);
 	}
 
 	@Test(expected=IllegalArgumentException.class)
 	public void testWithNullStepExecution() {
-		new org.springframework.batch.core.jsr.StepExecution(null);
+		new JsrStepExecution(null);
 	}
 
 	@Test

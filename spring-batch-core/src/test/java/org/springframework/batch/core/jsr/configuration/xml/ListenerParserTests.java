@@ -56,7 +56,7 @@ public class ListenerParserTests {
 
 		applicationContext.registerBeanDefinition("jobListener", newBeanDefinition);
 
-		ListenerParser listenerParser = new ListenerParser(JobListenerFactoryBean.class, "jobExecutionListeners");
+		ListenerParser listenerParser = new ListenerParser(JsrJobListenerFactoryBean.class, "jobExecutionListeners");
 		listenerParser.applyListenerScope("jobListener", applicationContext);
 
 		BeanDefinition beanDefinition = applicationContext.getBeanDefinition("jobListener");

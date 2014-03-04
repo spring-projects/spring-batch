@@ -25,7 +25,7 @@ import java.util.Set;
 
 import org.springframework.batch.core.configuration.xml.AbstractFlowParser;
 import org.springframework.batch.core.job.flow.FlowExecutionStatus;
-import org.springframework.batch.core.jsr.job.flow.support.DefaultFlow;
+import org.springframework.batch.core.jsr.job.flow.support.JsrFlow;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.support.BeanDefinitionBuilder;
 import org.springframework.beans.factory.support.ManagedList;
@@ -79,7 +79,7 @@ public class FlowParser extends AbstractFlowParser {
 	protected void doParse(Element element, ParserContext parserContext, BeanDefinitionBuilder builder) {
 		builder.getRawBeanDefinition().setAttribute("flowName", flowName);
 		builder.addPropertyValue("name", flowName);
-		builder.addPropertyValue("flowType", DefaultFlow.class);
+		builder.addPropertyValue("flowType", JsrFlow.class);
 
 		List<BeanDefinition> stateTransitions = new ArrayList<BeanDefinition>();
 
@@ -94,9 +94,9 @@ public class FlowParser extends AbstractFlowParser {
 				if (nodeName.equals(STEP_ELE)) {
 					stateTransitions.addAll(stepParser.parse(child, parserContext, builder));
 				} else if(nodeName.equals(SPLIT_ELE)) {
-					stateTransitions.addAll(new SplitParser(flowName).parse(child, parserContext));
+					stateTransitions.addAll(new JsrSplitParser(flowName).parse(child, parserContext));
 				} else if(nodeName.equals(DECISION_ELE)) {
-					stateTransitions.addAll(new DecisionParser().parse(child, parserContext, flowName));
+					stateTransitions.addAll(new JsrDecisionParser().parse(child, parserContext, flowName));
 				} else if(nodeName.equals(FLOW_ELE)) {
 					stateTransitions.addAll(parseFlow(child, parserContext, builder));
 				}
@@ -229,7 +229,7 @@ public class FlowParser extends AbstractFlowParser {
 		if (status.isEnd()) {
 
 			BeanDefinitionBuilder endBuilder = BeanDefinitionBuilder
-					.genericBeanDefinition("org.springframework.batch.core.jsr.job.flow.support.state.EndState");
+					.genericBeanDefinition("org.springframework.batch.core.jsr.job.flow.support.state.JsrEndState");
 
 			boolean exitCodeExists = StringUtils.hasText(exitCode);
 

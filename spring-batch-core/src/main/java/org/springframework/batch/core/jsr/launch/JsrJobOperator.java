@@ -54,8 +54,10 @@ import org.springframework.batch.core.Step;
 import org.springframework.batch.core.configuration.DuplicateJobException;
 import org.springframework.batch.core.converter.JobParametersConverter;
 import org.springframework.batch.core.explore.JobExplorer;
-import org.springframework.batch.core.jsr.JobContextFactoryBean;
+import org.springframework.batch.core.jsr.JsrJobContextFactoryBean;
+import org.springframework.batch.core.jsr.JsrJobExecution;
 import org.springframework.batch.core.jsr.JsrJobParametersConverter;
+import org.springframework.batch.core.jsr.JsrStepExecution;
 import org.springframework.batch.core.jsr.configuration.xml.JsrXmlApplicationContext;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.scope.context.StepSynchronizationManager;
@@ -255,7 +257,7 @@ public class JsrJobOperator implements JobOperator, InitializingBean {
 			throw new NoSuchJobExecutionException("No execution was found for executionId " + executionId);
 		}
 
-		return new org.springframework.batch.core.jsr.JobExecution(jobExecution, jobParametersConverter);
+		return new JsrJobExecution(jobExecution, jobParametersConverter);
 	}
 
 	/* (non-Javadoc)
@@ -277,7 +279,7 @@ public class JsrJobOperator implements JobOperator, InitializingBean {
 
 		List<JobExecution> results = new ArrayList<JobExecution>(batchExecutions.size());
 		for (org.springframework.batch.core.JobExecution jobExecution : batchExecutions) {
-			results.add(new org.springframework.batch.core.jsr.JobExecution(jobExecution, jobParametersConverter));
+			results.add(new JsrJobExecution(jobExecution, jobParametersConverter));
 		}
 
 		return results;
@@ -398,7 +400,7 @@ public class JsrJobOperator implements JobOperator, InitializingBean {
 		if(executions != null) {
 			for (org.springframework.batch.core.StepExecution stepExecution : executions) {
 				if(!stepExecution.getStepName().contains(":partition")) {
-					batchExecutions.add(new org.springframework.batch.core.jsr.StepExecution(jobExplorer.getStepExecution(executionId, stepExecution.getId())));
+					batchExecutions.add(new JsrStepExecution(jobExplorer.getStepExecution(executionId, stepExecution.getId())));
 				}
 			}
 		}
@@ -465,7 +467,7 @@ public class JsrJobOperator implements JobOperator, InitializingBean {
 			batchContext.load(jobXml);
 		}
 
-		AbstractBeanDefinition beanDefinition = BeanDefinitionBuilder.genericBeanDefinition("org.springframework.batch.core.jsr.JobContextFactoryBean").getBeanDefinition();
+		AbstractBeanDefinition beanDefinition = BeanDefinitionBuilder.genericBeanDefinition("org.springframework.batch.core.jsr.JsrJobContextFactoryBean").getBeanDefinition();
 		beanDefinition.setScope(BeanDefinition.SCOPE_SINGLETON);
 		batchContext.registerBeanDefinition(JSR_JOB_CONTEXT_BEAN_NAME, beanDefinition);
 
@@ -495,9 +497,9 @@ public class JsrJobOperator implements JobOperator, InitializingBean {
 
 				@Override
 				public void run() {
-					JobContextFactoryBean factoryBean = null;
+					JsrJobContextFactoryBean factoryBean = null;
 					try {
-						factoryBean = (JobContextFactoryBean) batchContext.getBean("&" + JSR_JOB_CONTEXT_BEAN_NAME);
+						factoryBean = (JsrJobContextFactoryBean) batchContext.getBean("&" + JSR_JOB_CONTEXT_BEAN_NAME);
 						factoryBean.setJobExecution(jobExecution);
 						final Job job = batchContext.getBean(Job.class);
 
@@ -597,7 +599,7 @@ public class JsrJobOperator implements JobOperator, InitializingBean {
 			batchContext.load(jobXml);
 		}
 
-		AbstractBeanDefinition beanDefinition = BeanDefinitionBuilder.genericBeanDefinition("org.springframework.batch.core.jsr.JobContextFactoryBean").getBeanDefinition();
+		AbstractBeanDefinition beanDefinition = BeanDefinitionBuilder.genericBeanDefinition("org.springframework.batch.core.jsr.JsrJobContextFactoryBean").getBeanDefinition();
 		beanDefinition.setScope(BeanDefinition.SCOPE_SINGLETON);
 		batchContext.registerBeanDefinition(JSR_JOB_CONTEXT_BEAN_NAME, beanDefinition);
 
@@ -636,9 +638,9 @@ public class JsrJobOperator implements JobOperator, InitializingBean {
 
 				@Override
 				public void run() {
-					JobContextFactoryBean factoryBean = null;
+					JsrJobContextFactoryBean factoryBean = null;
 					try {
-						factoryBean = (JobContextFactoryBean) batchContext.getBean("&" + JSR_JOB_CONTEXT_BEAN_NAME);
+						factoryBean = (JsrJobContextFactoryBean) batchContext.getBean("&" + JSR_JOB_CONTEXT_BEAN_NAME);
 						factoryBean.setJobExecution(jobExecution);
 						final Job job = batchContext.getBean(Job.class);
 						semaphore.release();

@@ -27,32 +27,32 @@ import org.springframework.util.Assert;
 import org.springframework.util.ClassUtils;
 
 /**
- * Implementation of the StepExecution as defined in JSR-352.  This implementation
+ * Implementation of the JsrStepExecution as defined in JSR-352.  This implementation
  * wraps a {@link org.springframework.batch.core.StepExecution} as it's source of
  * data.
  *
  * @author Michael Minella
  * @since 3.0
  */
-public class StepExecution implements javax.batch.runtime.StepExecution{
+public class JsrStepExecution implements javax.batch.runtime.StepExecution{
 
 	private final static String PERSISTENT_USER_DATA_KEY = "batch_jsr_persistentUserData";
 	private final org.springframework.batch.core.StepExecution stepExecution;
-	// The API for the persistent user data is handled by the StepContext which is why the name here is based on the StepContext.
-	private final ExecutionContextUserSupport executionContextUserSupport = new ExecutionContextUserSupport(ClassUtils.getShortName(StepContext.class));
+	// The API for the persistent user data is handled by the JsrStepContext which is why the name here is based on the JsrStepContext.
+	private final ExecutionContextUserSupport executionContextUserSupport = new ExecutionContextUserSupport(ClassUtils.getShortName(JsrStepContext.class));
 
 	/**
 	 * @param stepExecution The {@link org.springframework.batch.core.StepExecution} used
 	 * as the basis for the data.
 	 */
-	public StepExecution(org.springframework.batch.core.StepExecution stepExecution) {
+	public JsrStepExecution(org.springframework.batch.core.StepExecution stepExecution) {
 		Assert.notNull(stepExecution, "A StepExecution is required");
 
 		this.stepExecution = stepExecution;
 	}
 
 	/* (non-Javadoc)
-	 * @see javax.batch.runtime.StepExecution#getStepExecutionId()
+	 * @see javax.batch.runtime.JsrStepExecution#getStepExecutionId()
 	 */
 	@Override
 	public long getStepExecutionId() {
@@ -60,7 +60,7 @@ public class StepExecution implements javax.batch.runtime.StepExecution{
 	}
 
 	/* (non-Javadoc)
-	 * @see javax.batch.runtime.StepExecution#getStepName()
+	 * @see javax.batch.runtime.JsrStepExecution#getStepName()
 	 */
 	@Override
 	public String getStepName() {
@@ -68,7 +68,7 @@ public class StepExecution implements javax.batch.runtime.StepExecution{
 	}
 
 	/* (non-Javadoc)
-	 * @see javax.batch.runtime.StepExecution#getBatchStatus()
+	 * @see javax.batch.runtime.JsrStepExecution#getBatchStatus()
 	 */
 	@Override
 	public BatchStatus getBatchStatus() {
@@ -76,7 +76,7 @@ public class StepExecution implements javax.batch.runtime.StepExecution{
 	}
 
 	/* (non-Javadoc)
-	 * @see javax.batch.runtime.StepExecution#getStartTime()
+	 * @see javax.batch.runtime.JsrStepExecution#getStartTime()
 	 */
 	@Override
 	public Date getStartTime() {
@@ -84,7 +84,7 @@ public class StepExecution implements javax.batch.runtime.StepExecution{
 	}
 
 	/* (non-Javadoc)
-	 * @see javax.batch.runtime.StepExecution#getEndTime()
+	 * @see javax.batch.runtime.JsrStepExecution#getEndTime()
 	 */
 	@Override
 	public Date getEndTime() {
@@ -92,7 +92,7 @@ public class StepExecution implements javax.batch.runtime.StepExecution{
 	}
 
 	/* (non-Javadoc)
-	 * @see javax.batch.runtime.StepExecution#getExitStatus()
+	 * @see javax.batch.runtime.JsrStepExecution#getExitStatus()
 	 */
 	@Override
 	public String getExitStatus() {
@@ -106,7 +106,7 @@ public class StepExecution implements javax.batch.runtime.StepExecution{
 	}
 
 	/* (non-Javadoc)
-	 * @see javax.batch.runtime.StepExecution#getPersistentUserData()
+	 * @see javax.batch.runtime.JsrStepExecution#getPersistentUserData()
 	 */
 	@Override
 	public Serializable getPersistentUserData() {
@@ -114,7 +114,7 @@ public class StepExecution implements javax.batch.runtime.StepExecution{
 	}
 
 	/* (non-Javadoc)
-	 * @see javax.batch.runtime.StepExecution#getMetrics()
+	 * @see javax.batch.runtime.JsrStepExecution#getMetrics()
 	 */
 	@Override
 	public Metric[] getMetrics() {

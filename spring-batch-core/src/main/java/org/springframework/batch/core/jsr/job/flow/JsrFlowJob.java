@@ -29,9 +29,9 @@ import org.springframework.batch.core.job.flow.FlowJob;
 import org.springframework.batch.core.job.flow.JobFlowExecutor;
 import org.springframework.batch.core.job.flow.State;
 import org.springframework.batch.core.job.flow.support.state.FlowState;
-import org.springframework.batch.core.jsr.job.DefaultStepHandler;
-import org.springframework.batch.core.jsr.job.flow.support.DefaultFlow;
-import org.springframework.batch.core.jsr.job.flow.support.state.StepState;
+import org.springframework.batch.core.jsr.job.JsrStepHandler;
+import org.springframework.batch.core.jsr.job.flow.support.JsrFlow;
+import org.springframework.batch.core.jsr.job.flow.support.state.JsrStepState;
 import org.springframework.batch.core.jsr.step.DecisionStep;
 import org.springframework.batch.core.launch.NoSuchJobException;
 import org.springframework.batch.core.launch.support.ExitCodeMapper;
@@ -73,9 +73,9 @@ public class JsrFlowJob extends FlowJob {
 	protected void doExecute(final JobExecution execution) throws JobExecutionException {
 		try {
 			JobFlowExecutor executor = new JsrFlowExecutor(getJobRepository(),
-					new DefaultStepHandler(getJobRepository(), jobExplorer), execution);
+					new JsrStepHandler(getJobRepository(), jobExplorer), execution);
 
-			State startState = ((DefaultFlow)flow).getStartState();
+			State startState = ((JsrFlow)flow).getStartState();
 
 			validateFirstStep(startState);
 
@@ -94,9 +94,9 @@ public class JsrFlowJob extends FlowJob {
 		while(true) {
 			if(startState instanceof DelegateState) {
 				startState = ((DelegateState) startState).getState();
-			} else if(startState instanceof StepState) {
+			} else if(startState instanceof JsrStepState) {
 				String stepName = startState.getName().substring(startState.getName().indexOf(".") + 1, startState.getName().length());
-				Step step = ((StepState) startState).getStep(stepName);
+				Step step = ((JsrStepState) startState).getStep(stepName);
 				if(step instanceof DecisionStep) {
 					throw new JobExecutionException("Decision step is an invalid first step");
 				} else {

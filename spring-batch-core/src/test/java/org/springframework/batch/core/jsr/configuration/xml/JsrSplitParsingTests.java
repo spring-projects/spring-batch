@@ -39,14 +39,14 @@ import org.springframework.beans.factory.support.BeanDefinitionRegistry;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 import org.springframework.core.task.SimpleAsyncTaskExecutor;
 
-public class SplitParsingTests {
+public class JsrSplitParsingTests {
 
 	@Rule
 	public ExpectedException expectedException = ExpectedException.none();
 
 	@Test
 	public void test() throws Exception {
-		javax.batch.runtime.JobExecution execution = runJob("SplitParsingTests-context", null, 10000l);
+		javax.batch.runtime.JobExecution execution = runJob("JsrSplitParsingTests-context", null, 10000l);
 		assertEquals(javax.batch.runtime.BatchStatus.COMPLETED, execution.getBatchStatus());
 		assertEquals("COMPLETED", execution.getExitStatus());
 
@@ -70,7 +70,7 @@ public class SplitParsingTests {
 	public void testUserSpecifiedTaskExecutor() {
 		ClassPathXmlApplicationContext context = new ClassPathXmlApplicationContext("/org/springframework/batch/core/jsr/configuration/xml/user-specified-split-task-executor-context.xml");
 		BeanDefinitionRegistry registry = (BeanDefinitionRegistry) context.getBeanFactory();
-		PropertyValue propertyValue = new SplitParser(null).getSplitTaskExecutorPropertyValue(registry);
+		PropertyValue propertyValue = new JsrSplitParser(null).getSplitTaskExecutorPropertyValue(registry);
 
 		RuntimeBeanReference runtimeBeanReferenceValue = (RuntimeBeanReference) propertyValue.getValue();
 
@@ -82,7 +82,7 @@ public class SplitParsingTests {
 	public void testDefaultTaskExecutor() {
 		ClassPathXmlApplicationContext context = new ClassPathXmlApplicationContext("/org/springframework/batch/core/jsr/configuration/xml/default-split-task-executor-context.xml");
 		BeanDefinitionRegistry registry = (BeanDefinitionRegistry) context.getBeanFactory();
-		PropertyValue propertyValue = new SplitParser(null).getSplitTaskExecutorPropertyValue(registry);
+		PropertyValue propertyValue = new JsrSplitParser(null).getSplitTaskExecutorPropertyValue(registry);
 		Assert.assertTrue("Task executor not an instance of SimpleAsyncTaskExecutor" , (propertyValue.getValue() instanceof SimpleAsyncTaskExecutor));
 		context.close();
 	}

@@ -25,12 +25,12 @@ import org.springframework.util.Assert;
 
 /**
  * Wrapper class to adapt the {@link javax.batch.runtime.JobExecution} to
- * a {@link JobExecution}.
+ * a {@link org.springframework.batch.core.JobExecution}.
  *
  * @author Michael Minella
  * @since 3.0
  */
-public class JobExecution implements javax.batch.runtime.JobExecution {
+public class JsrJobExecution implements javax.batch.runtime.JobExecution {
 
 	private org.springframework.batch.core.JobExecution execution;
 	private JobParametersConverter parametersConverter;
@@ -38,7 +38,7 @@ public class JobExecution implements javax.batch.runtime.JobExecution {
 	/**
 	 * @param execution for all information to be delegated from
 	 */
-	public JobExecution(org.springframework.batch.core.JobExecution execution, JobParametersConverter parametersConverter) {
+	public JsrJobExecution(org.springframework.batch.core.JobExecution execution, JobParametersConverter parametersConverter) {
 		Assert.notNull(execution, "A JobExecution is required");
 		this.execution = execution;
 
