@@ -26,11 +26,11 @@ import org.junit.Test;
 import org.springframework.batch.core.jsr.JsrTestUtils;
 
 /**
- * Tests for the JSR-352 version of {@link EndState}
+ * Tests for the JSR-352 version of {@link JsrEndState}
  *
  * @author Michael Minella
  */
-public class EndStateTests {
+public class JsrEndStateTests {
 
 	@Test
 	public void test() throws Exception {

@@ -34,7 +34,7 @@ import org.springframework.beans.factory.FactoryBean;
  * @author Michael Minella
  * @since 3.0
  */
-public class JobListenerFactoryBean extends org.springframework.batch.core.listener.JobListenerFactoryBean {
+public class JsrJobListenerFactoryBean extends org.springframework.batch.core.listener.JobListenerFactoryBean {
 
 	@Override
 	public Class<?> getObjectType() {

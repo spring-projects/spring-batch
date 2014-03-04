@@ -124,11 +124,11 @@ public class ListenerParser {
 	}
 
 	private boolean isLazyInit() {
-		return listenerType == JobListenerFactoryBean.class;
+		return listenerType == JsrJobListenerFactoryBean.class;
 	}
 
 	private String getListenerScope() {
-		if (listenerType == JobListenerFactoryBean.class) {
+		if (listenerType == JsrJobListenerFactoryBean.class) {
 			return SCOPE_JOB;
 		}
 

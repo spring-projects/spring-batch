@@ -24,6 +24,7 @@ import javax.batch.api.Decider;
 import org.springframework.batch.core.ExitStatus;
 import org.springframework.batch.core.Step;
 import org.springframework.batch.core.StepExecution;
+import org.springframework.batch.core.jsr.JsrStepExecution;
 import org.springframework.batch.core.step.AbstractStep;
 import org.springframework.batch.item.ExecutionContext;
 
@@ -58,7 +59,7 @@ public class DecisionStep extends AbstractStep {
 
 			for (String stepName : stepNames) {
 				StepExecution curStepExecution = getJobRepository().getLastStepExecution(stepExecution.getJobExecution().getJobInstance(), stepName);
-				stepExecutions.add(new org.springframework.batch.core.jsr.StepExecution(curStepExecution));
+				stepExecutions.add(new JsrStepExecution(curStepExecution));
 			}
 		} else {
 			Collection<StepExecution> currentRunStepExecutions = stepExecution.getJobExecution().getStepExecutions();
@@ -72,7 +73,7 @@ public class DecisionStep extends AbstractStep {
 					}
 				}
 
-				stepExecutions.add(new org.springframework.batch.core.jsr.StepExecution(lastExecution));
+				stepExecutions.add(new JsrStepExecution(lastExecution));
 			}
 		}
 

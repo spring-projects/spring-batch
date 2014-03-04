@@ -38,15 +38,15 @@ import org.springframework.util.ClassUtils;
  * @author Chris Schaefer
  * @since 3.0
  */
-public class StepContext implements javax.batch.runtime.context.StepContext {
+public class JsrStepContext implements javax.batch.runtime.context.StepContext {
 	private final static String PERSISTENT_USER_DATA_KEY = "batch_jsr_persistentUserData";
 	private StepExecution stepExecution;
 	private Object transientUserData;
 	private Properties properties = new Properties();
 	private AtomicBoolean exitStatusSet = new AtomicBoolean();
-	private final ExecutionContextUserSupport executionContextUserSupport = new ExecutionContextUserSupport(ClassUtils.getShortName(StepContext.class));
+	private final ExecutionContextUserSupport executionContextUserSupport = new ExecutionContextUserSupport(ClassUtils.getShortName(JsrStepContext.class));
 
-	public StepContext(StepExecution stepExecution, Properties properties) {
+	public JsrStepContext(StepExecution stepExecution, Properties properties) {
 		Assert.notNull(stepExecution, "A StepExecution is required");
 
 		this.stepExecution = stepExecution;

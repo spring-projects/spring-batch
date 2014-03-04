@@ -31,12 +31,12 @@ import org.springframework.batch.core.job.flow.support.JobFlowExecutorSupport;
 import org.springframework.batch.core.job.flow.support.SimpleFlowTests;
 import org.springframework.batch.core.job.flow.support.StateTransition;
 
-public class DefaultFlowTests extends SimpleFlowTests {
+public class JsrFlowTests extends SimpleFlowTests {
 
 	@Override
 	@Before
 	public void setUp() {
-		flow = new DefaultFlow("flow1");
+		flow = new JsrFlow("flow1");
 	}
 
 	@Test

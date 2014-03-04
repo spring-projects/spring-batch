@@ -35,7 +35,7 @@ import org.springframework.util.Assert;
  * @author Chris Schaefer
  * @since 3.0
  */
-public class StepContextFactoryBean implements FactoryBean<StepContext>, InitializingBean {
+public class JsrStepContextFactoryBean implements FactoryBean<StepContext>, InitializingBean {
 	@Autowired
 	private BatchPropertyContext batchPropertyContext;
 
@@ -74,9 +74,9 @@ public class StepContextFactoryBean implements FactoryBean<StepContext>, Initial
 		Properties stepProperties = batchPropertyContext.getStepProperties(curStepExecution.getStepName());
 
 		if(stepProperties != null) {
-			context = new org.springframework.batch.core.jsr.StepContext(curStepExecution, stepProperties);
+			context = new JsrStepContext(curStepExecution, stepProperties);
 		} else {
-			context = new org.springframework.batch.core.jsr.StepContext(curStepExecution, new Properties());
+			context = new JsrStepContext(curStepExecution, new Properties());
 		}
 
 		contextHolder.set(context);

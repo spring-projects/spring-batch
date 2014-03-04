@@ -33,7 +33,7 @@ import org.springframework.util.Assert;
  * @author Chris Schaefer
  * @since 3.0
  */
-public class JobContext implements javax.batch.runtime.context.JobContext {
+public class JsrJobContext implements javax.batch.runtime.context.JobContext {
 	private Object transientUserData;
 	private Properties properties;
 	private JobExecution jobExecution;

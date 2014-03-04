@@ -23,6 +23,7 @@ import static org.junit.Assert.fail;
 import java.util.Properties;
 
 import javax.batch.runtime.Metric;
+import javax.batch.runtime.context.StepContext;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -35,12 +36,12 @@ import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.item.util.ExecutionContextUserSupport;
 import org.springframework.util.ClassUtils;
 
-public class StepContextTests {
+public class JsrStepContextTests {
 
 	private StepExecution stepExecution;
 	private StepContext stepContext;
 	private ExecutionContext executionContext;
-	private ExecutionContextUserSupport executionContextUserSupport = new ExecutionContextUserSupport(ClassUtils.getShortName(StepContext.class));
+	private ExecutionContextUserSupport executionContextUserSupport = new ExecutionContextUserSupport(ClassUtils.getShortName(JsrStepContext.class));
 
 	@Before
 	public void setUp() throws Exception {
@@ -64,7 +65,7 @@ public class StepContextTests {
 		Properties properties = new Properties();
 		properties.put("key", "value");
 
-		stepContext = new StepContext(stepExecution, properties);
+		stepContext = new JsrStepContext(stepExecution, properties);
 		stepContext.setTransientUserData("This is my transient data");
 	}
 

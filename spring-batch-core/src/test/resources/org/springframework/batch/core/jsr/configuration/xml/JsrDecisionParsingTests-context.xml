@@ -29,7 +29,7 @@
 		<property name="repositoryFactory" ref="&amp;jobRepository"/>
 	</bean>
 
-	<bean id="jsrDecider" class="org.springframework.batch.core.jsr.configuration.xml.DecisionParsingTests.JsrDecider"/>
+	<bean id="jsrDecider" class="org.springframework.batch.core.jsr.configuration.xml.JsrDecisionParsingTests.JsrDecider"/>
 
 	<bean id="step1Ref" class="org.springframework.batch.core.step.tasklet.TaskletSupport"/>
 </beans>

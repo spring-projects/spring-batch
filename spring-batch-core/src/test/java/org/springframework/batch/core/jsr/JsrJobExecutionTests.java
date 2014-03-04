@@ -15,9 +15,9 @@ import org.springframework.batch.core.JobParameters;
 import org.springframework.batch.core.JobParametersBuilder;
 import org.springframework.batch.core.converter.JobParametersConverterSupport;
 
-public class JobExecutionTests {
+public class JsrJobExecutionTests {
 
-	private JobExecution adapter;
+	private JsrJobExecution adapter;
 
 	@Before
 	public void setUp() throws Exception {
@@ -36,12 +36,12 @@ public class JobExecutionTests {
 		execution.setStatus(BatchStatus.FAILED);
 		execution.setVersion(21);
 
-		adapter = new JobExecution(execution, new JobParametersConverterSupport());
+		adapter = new JsrJobExecution(execution, new JobParametersConverterSupport());
 	}
 
 	@Test(expected=IllegalArgumentException.class)
 	public void testCreateWithNull() {
-		adapter = new JobExecution(null, new JobParametersConverterSupport());
+		adapter = new JsrJobExecution(null, new JobParametersConverterSupport());
 	}
 
 	@Test

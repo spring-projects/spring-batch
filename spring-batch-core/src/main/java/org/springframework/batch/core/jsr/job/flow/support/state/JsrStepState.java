@@ -28,12 +28,12 @@ import org.springframework.batch.core.job.flow.FlowExecutor;
  * @author Michael Minella
  * @since 3.0
  */
-public class StepState extends org.springframework.batch.core.job.flow.support.state.StepState {
+public class JsrStepState extends org.springframework.batch.core.job.flow.support.state.StepState {
 
 	/**
 	 * @param step the step that will be executed
 	 */
-	public StepState(Step step) {
+	public JsrStepState(Step step) {
 		super(step);
 	}
 
@@ -41,7 +41,7 @@ public class StepState extends org.springframework.batch.core.job.flow.support.s
 	 * @param name for the step that will be executed
 	 * @param step the step that will be executed
 	 */
-	public StepState(String name, Step step) {
+	public JsrStepState(String name, Step step) {
 		super(name, step);
 	}
 

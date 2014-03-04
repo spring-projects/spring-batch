@@ -16,7 +16,7 @@
 package org.springframework.batch.core.jsr.configuration.xml;
 
 import org.springframework.batch.core.configuration.xml.CoreNamespaceUtils;
-import org.springframework.batch.core.jsr.StepContextFactoryBean;
+import org.springframework.batch.core.jsr.JsrStepContextFactoryBean;
 import org.springframework.batch.core.jsr.configuration.support.BatchArtifact;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.support.AbstractBeanDefinition;
@@ -34,7 +34,7 @@ import org.w3c.dom.Element;
  * @author Chris Schaefer
  * @since 3.0
  */
-public class JobParser extends AbstractSingleBeanDefinitionParser {
+public class JsrJobParser extends AbstractSingleBeanDefinitionParser {
 	private static final String ID_ATTRIBUTE = "id";
 	private static final String RESTARTABLE_ATTRIBUTE = "restartable";
 
@@ -66,13 +66,13 @@ public class JobParser extends AbstractSingleBeanDefinitionParser {
 		BeanDefinition flowDef = new FlowParser(jobName, jobName).parse(element, parserContext);
 		builder.addPropertyValue("flow", flowDef);
 
-		AbstractBeanDefinition stepContextBeanDefinition = BeanDefinitionBuilder.genericBeanDefinition(StepContextFactoryBean.class)
+		AbstractBeanDefinition stepContextBeanDefinition = BeanDefinitionBuilder.genericBeanDefinition(JsrStepContextFactoryBean.class)
 				.getBeanDefinition();
 
 		stepContextBeanDefinition.setScope("step");
 
 		parserContext.getRegistry().registerBeanDefinition("stepContextFactory", stepContextBeanDefinition);
 
-		new ListenerParser(JobListenerFactoryBean.class, "jobExecutionListeners").parseListeners(element, parserContext, builder);
+		new ListenerParser(JsrJobListenerFactoryBean.class, "jobExecutionListeners").parseListeners(element, parserContext, builder);
 	}
 }

@@ -24,7 +24,7 @@ import org.springframework.batch.core.job.flow.Flow;
 import org.springframework.batch.core.job.flow.FlowExecution;
 import org.springframework.batch.core.job.flow.FlowExecutionStatus;
 import org.springframework.batch.core.job.flow.FlowExecutor;
-import org.springframework.batch.core.jsr.job.flow.support.DefaultFlow;
+import org.springframework.batch.core.jsr.job.flow.support.JsrFlow;
 
 /**
  * JSR-352 states that artifacts cannot set the ExitStatus from within a split for a job.  Because
@@ -34,13 +34,13 @@ import org.springframework.batch.core.jsr.job.flow.support.DefaultFlow;
  * @author Michael Minella
  * @since 3.0
  */
-public class SplitState extends org.springframework.batch.core.job.flow.support.state.SplitState {
+public class JsrSplitState extends org.springframework.batch.core.job.flow.support.state.SplitState {
 
 	/**
 	 * @param flows {@link Flow}s to be executed in parallel
 	 * @param name
 	 */
-	public SplitState(Collection<Flow> flows, String name) {
+	public JsrSplitState(Collection<Flow> flows, String name) {
 		super(flows, name);
 	}
 
@@ -56,7 +56,7 @@ public class SplitState extends org.springframework.batch.core.job.flow.support.
 		List<String> stepNames = new ArrayList<String>();
 
 		for (Flow curFlow : getFlows()) {
-			DefaultFlow flow = (DefaultFlow) curFlow;
+			JsrFlow flow = (JsrFlow) curFlow;
 			if(flow.getMostRecentStepName() != null) {
 				stepNames.add(flow.getMostRecentStepName());
 			}

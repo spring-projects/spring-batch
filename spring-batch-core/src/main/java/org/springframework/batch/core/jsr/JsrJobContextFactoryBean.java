@@ -40,7 +40,7 @@ import org.springframework.util.Assert;
  * @author Michael Minella
  * @since 3.0
  */
-public class JobContextFactoryBean implements FactoryBean<JobContext> {
+public class JsrJobContextFactoryBean implements FactoryBean<JobContext> {
 
 	private JobExecution jobExecution;
 	@Autowired
@@ -116,7 +116,7 @@ public class JobContextFactoryBean implements FactoryBean<JobContext> {
 				throw new FactoryBeanNotInitializedException("A JobExecution is required");
 			}
 
-			org.springframework.batch.core.jsr.JobContext jobContext = new org.springframework.batch.core.jsr.JobContext();
+			JsrJobContext jobContext = new JsrJobContext();
 			jobContext.setJobExecution(jobExecution);
 
 			if(propertyContext != null) {

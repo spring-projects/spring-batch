@@ -32,7 +32,7 @@ import org.springframework.batch.item.ExecutionContext;
  * @author Michael Minella
  * @since 3.0
  */
-public class EndState extends org.springframework.batch.core.job.flow.support.state.EndState {
+public class JsrEndState extends org.springframework.batch.core.job.flow.support.state.EndState {
 
 	private JobRepository jobRepository;
 	private String restart;
@@ -41,7 +41,7 @@ public class EndState extends org.springframework.batch.core.job.flow.support.st
 	 * @param status The {@link FlowExecutionStatus} to end with
 	 * @param name The name of the state
 	 */
-	public EndState(FlowExecutionStatus status, String name) {
+	public JsrEndState(FlowExecutionStatus status, String name) {
 		super(status, status.getName(), name);
 	}
 
@@ -49,7 +49,7 @@ public class EndState extends org.springframework.batch.core.job.flow.support.st
 	 * @param status The {@link FlowExecutionStatus} to end with
 	 * @param name The name of the state
 	 */
-	public EndState(FlowExecutionStatus status, String code, String name) {
+	public JsrEndState(FlowExecutionStatus status, String code, String name) {
 		super(status, code, name, false);
 	}
 
@@ -60,11 +60,11 @@ public class EndState extends org.springframework.batch.core.job.flow.support.st
 	 * marked as abandoned (if there is one)
 	 *
 	 */
-	public EndState(FlowExecutionStatus status, String code, String name, boolean abandon) {
+	public JsrEndState(FlowExecutionStatus status, String code, String name, boolean abandon) {
 		super(status, code, name, abandon);
 	}
 
-	public EndState(FlowExecutionStatus status, String code, String name, String restart, boolean abandon, JobRepository jobRepository) {
+	public JsrEndState(FlowExecutionStatus status, String code, String name, String restart, boolean abandon, JobRepository jobRepository) {
 		super(status, code, name, abandon);
 		this.jobRepository = jobRepository;
 		this.restart = restart;

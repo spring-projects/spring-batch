@@ -36,13 +36,13 @@ import org.w3c.dom.Element;
  * @author Chris Schaefer
  * @since 3.0
  */
-public class SplitParser {
+public class JsrSplitParser {
 	private static final String TASK_EXECUTOR_PROPERTY_NAME = "taskExecutor";
 	private static final String JSR_352_SPLIT_TASK_EXECUTOR_BEAN_NAME = "jsr352splitTaskExecutor";
 
 	private String jobFactoryRef;
 
-	public SplitParser(String jobFactoryRef) {
+	public JsrSplitParser(String jobFactoryRef) {
 		this.jobFactoryRef = jobFactoryRef;
 	}
 
@@ -51,7 +51,7 @@ public class SplitParser {
 		String idAttribute = element.getAttribute("id");
 
 		BeanDefinitionBuilder stateBuilder = BeanDefinitionBuilder
-				.genericBeanDefinition("org.springframework.batch.core.jsr.job.flow.support.state.SplitState");
+				.genericBeanDefinition("org.springframework.batch.core.jsr.job.flow.support.state.JsrSplitState");
 
 		List<Element> flowElements = DomUtils.getChildElementsByTagName(element, "flow");
 
