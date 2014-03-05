@@ -46,6 +46,7 @@ public class JsrJobContextFactoryBeanTests {
 
 	@Before
 	public void setUp() throws Exception {
+		StepSynchronizationManager.close();
 		propertyContext = new BatchPropertyContext();
 		factoryBean = new JsrJobContextFactoryBean();
 	}
