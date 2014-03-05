@@ -520,6 +520,8 @@ public class JsrJobOperator implements JobOperator, InitializingBean {
 							factoryBean.close();
 						}
 
+						batchContext.close();
+
 						if(semaphore.availablePermits() == 0) {
 							semaphore.release();
 						}
@@ -540,6 +542,10 @@ public class JsrJobOperator implements JobOperator, InitializingBean {
 			}
 
 			jobRepository.update(jobExecution);
+
+			if(batchContext.isActive()) {
+				batchContext.close();
+			}
 
 			throw new JobRestartException(e);
 		}
@@ -656,6 +662,8 @@ public class JsrJobOperator implements JobOperator, InitializingBean {
 							factoryBean.close();
 						}
 
+						batchContext.close();
+
 						if(semaphore.availablePermits() == 0) {
 							semaphore.release();
 						}
@@ -678,6 +686,10 @@ public class JsrJobOperator implements JobOperator, InitializingBean {
 				jobExecution.setExitStatus(ExitStatus.FAILED.addExitDescription(e));
 			}
 			jobRepository.update(jobExecution);
+
+			if(batchContext.isActive()) {
+				batchContext.close();
+			}
 
 			throw new JobStartException(e);
 		}

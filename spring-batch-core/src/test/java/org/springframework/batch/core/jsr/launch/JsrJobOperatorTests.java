@@ -544,6 +544,15 @@ public class JsrJobOperatorTests {
 
 	}
 
+	@Test
+	public void testApplicationContextClosingAfterJobSuccessful() throws Exception {
+		for(int i = 0; i < 3; i++) {
+			javax.batch.runtime.JobExecution execution = runJob("contextClosingTests", new Properties(), TIMEOUT);
+
+			assertEquals(BatchStatus.COMPLETED, execution.getBatchStatus());
+		}
+	}
+
 	public static class LongRunningBatchlet implements Batchlet {
 
 		private boolean stopped = false;
@@ -566,6 +575,27 @@ public class JsrJobOperatorTests {
 		@Override
 		public String process() throws Exception {
 			throw new RuntimeException("blah");
+		}
+	}
+
+	public static class MustBeClosedBatchlet extends AbstractBatchlet {
+
+		public static boolean closed = true;
+
+		public MustBeClosedBatchlet() {
+			if(!closed) {
+				throw new RuntimeException("Batchlet wasn't closed last time");
+			}
+		}
+
+		public void close() {
+			closed = true;
+		}
+
+		@Override
+		public String process() throws Exception {
+			closed = false;
+			return null;
 		}
 	}
 }
