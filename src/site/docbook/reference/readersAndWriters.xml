@@ -299,6 +299,18 @@ compositeProcessor.setDelegates(itemProcessors);</programlisting>
       exception thrown from the <classname>ItemProcessor</classname> will
       result in a skip.</para>
     </section>
+
+      <section id="faultTolerant">
+          <title>Fault Tolerance</title>
+
+          <para>When a chunk is rolled back, items that have been cached
+          during reading may be reprocessed.  If a step is configured to
+          be fault tolerant (uses skip or retry processing typically),
+          any ItemProcessor used should be implemented in a way that is
+          idempotent.  Typically that would consist of performing no changes
+          on the input item for the ItemProcessor and only updating the
+          instance that is the result.</para>
+      </section>
   </section>
 
   <section id="itemStream">
