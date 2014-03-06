@@ -138,7 +138,8 @@ public class ExitStatus implements Serializable, Comparable<ExitStatus> {
 
 	/**
 	 * @param status an {@link ExitStatus} to compare
-	 * @return 1,0,-1 according to the severity and exit code
+	 * @return greater than zero, 0, less than zero according to the severity and exit code
+	 * @see java.lang.Comparable
 	 */
 	@Override
 	public int compareTo(ExitStatus status) {
