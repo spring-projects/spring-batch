@@ -124,7 +124,6 @@ public class HibernateItemWriter<T> implements ItemWriter<T>, InitializingBean {
 	 *
 	 * @param items
 	 *            the list of items to use for the write
-	 * @deprecated As of 2.2 in favor of using Hibernate's session management APIs directly
 	 */
 	protected void doWrite(SessionFactory sessionFactory, List<? extends T> items) {
 		if (logger.isDebugEnabled()) {
