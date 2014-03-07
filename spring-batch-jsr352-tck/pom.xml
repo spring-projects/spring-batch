@@ -94,9 +94,9 @@
 			<version>${project.version}</version>
 		</dependency>
 		<dependency>
-			<groupId>org.apache</groupId>
+			<groupId>ant-contrib</groupId>
 			<artifactId>ant-contrib</artifactId>
-			<version>0.6</version>
+			<version>1.0b3</version>
 		</dependency>
 	</dependencies>
 	<build>
@@ -155,7 +155,7 @@
 								<property name="batch.impl.classes" value="${env.JSR_352_BATCH_IMPL_CLASSES}"/>
 								<taskdef resource="net/sf/antcontrib/antcontrib.properties">
 									<classpath>
-										<pathelement location="${jsr352.tck.libs.dir}/ant-contrib-0.6.jar"/>
+										<pathelement location="${jsr352.tck.libs.dir}/ant-contrib-1.0b3.jar"/>
 									</classpath>
 								</taskdef>
 								<trycatch>
