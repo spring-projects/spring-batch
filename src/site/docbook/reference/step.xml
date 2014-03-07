@@ -1727,5 +1727,17 @@ itemWriter.write(items);</programlisting>
 
       <programlisting>&lt;bean class="org.springframework.batch.core.scope.StepScope" /&gt;</programlisting>
     </section>
+
+	<section id="job-scope">
+		<title>Job Scope</title>
+
+		<para>Job scope, introduced in Spring Batch 3.0 is similar to Step scope in configuration but is a scope for the job context and ensures there is only one instance of a particular bean for the entire Job. To Job scope your beans set the scope to "job":
+		<programlisting>
+			&lt;bean id=&quot;jobScopedBean&quot; scope=&quot;step&quot; class=&quot;com.test.MyJobScopedBean&quot;/&gt;
+		</programlisting>
+		</para>
+
+
+	</section>
   </section>
 </chapter>

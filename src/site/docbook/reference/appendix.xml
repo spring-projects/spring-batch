@@ -78,7 +78,8 @@
 
             <entry align="left">Reads via iBATIS based on a query. Pages
             through the rows so that large datasets can be read without
-            running out of memory. See HOWTO - Read from a Database</entry>
+            running out of memory. See HOWTO - Read from a Database. This
+            ItemReader is now deprecated as of Spring Batch 3.0.</entry>
           </row>
 
           <row>
@@ -238,8 +239,8 @@
           <row>
             <entry align="left">IbatisBatchItemWriter</entry>
 
-            <entry align="left">Writes items in a batch using the SqlMapClientTemplate
-            execute() method</entry>
+            <entry align="left">Writes items in a batch using the iBatis API's
+            directly. This ItemWriter is deprecated as of Spring Batch 3.0.</entry>
           </row>
 
           <row>
