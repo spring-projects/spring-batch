@@ -12,6 +12,12 @@
 		<version>2.2.6.BUILD-SNAPSHOT</version>
 		<relativePath>../spring-batch-parent</relativePath>
 	</parent>
+    <scm>
+        <url>https://github.com/spring-projects/spring-batch</url>
+        <connection>scm:git:git://github.com/spring-projects/spring-batch.git</connection>
+        <developerConnection>scm:git:git://github.com/spring-projects/spring-batch.git</developerConnection>
+        <tag>HEAD</tag>
+    </scm>
 	<properties>
 		<!-- Override this with -Denvironment=XXXX to change database type -->
 		<environment>hsql</environment>
