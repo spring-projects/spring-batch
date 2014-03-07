@@ -42,11 +42,10 @@
 				<surname>Minella</surname>
 			</author>
 
-            <author>
-                <firstname>Chris</firstname>
-                <surname>Schaefer</surname>
-            </author>
-
+			<author>
+				<firstname>Chris</firstname>
+				<surname>Schaefer</surname>
+			</author>
 		</authorgroup>
 
 		<legalnotice>
@@ -78,6 +77,10 @@
 	<xi:include href="testing.xml" />
 
 	<xi:include href="common-patterns.xml" />
+
+	<xi:include href="jsr-352.xml" />
+
+	<xi:include href="spring-batch-integration.xml" />
 
 	<xi:include href="appendix.xml" />
 

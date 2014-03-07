@@ -1,0 +1,433 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE chapter PUBLIC "-//OASIS//DTD DocBook XML V4.4//EN"
+		"http://www.oasis-open.org/docbook/xml/4.4/docbookx.dtd">
+<chapter id="springBatchIntegration" xreflabel="Spring Batch Integration">
+	<title>Spring Batch Integration</title>
+
+	<section>
+		<title>Overview of the Spring Integration Batch Module</title>
+		<para>Many use cases in Spring Batch look like they might be efficiently and concisely implemented in Spring
+			Integration. Here is a list. These are features that can extend Spring Batch, or use Spring batch features
+			in the context of Spring Integration. Work in progress waiting for community feedback. Many issues to do
+			with transactionality and synchronous execution have been raised and fixed in Spring Integration as a result
+			of these use cases being prototyped.
+		</para>
+		<informaltable frame="all" rowsep="1" colsep="1">
+			<tgroup cols="5">
+				<colspec align="left"/>
+				<colspec align="left"/>
+				<colspec align="left"/>
+				<colspec align="left"/>
+				<colspec align="left"/>
+				<tbody>
+					<row>
+						<entry>
+							<emphasis role="bold">ID</emphasis>
+						</entry>
+						<entry>
+							<emphasis role="bold">Description</emphasis>
+						</entry>
+						<entry>
+							<emphasis role="bold">Status</emphasis>
+						</entry>
+						<entry>
+							<emphasis role="bold">Sub-package</emphasis>
+						</entry>
+						<entry>
+							<emphasis role="bold">Comments</emphasis>
+						</entry>
+					</row>
+					<row>
+						<entry>1</entry>
+						<entry>
+							<link linkend="Triggers">Message triggers job</link>
+						</entry>
+						<entry>Complete</entry>
+						<entry>launch</entry>
+						<entry>Complete. Also lots of opportunities with monitoring progress.</entry>
+					</row>
+					<row>
+						<entry>2</entry>
+						<entry>
+							<link linkend="Chunking">Chunking and multi-VM job execution</link>
+						</entry>
+						<entry>Complete</entry>
+						<entry>chunk</entry>
+						<entry>Failures might need some analysis. Use of stateful StepExecutionListener requires use of
+							step scope.
+						</entry>
+					</row>
+					<row>
+						<entry>3</entry>
+						<entry>
+							<link linkend="Aggregator">Asynchronous Aggregator</link>
+						</entry>
+						<entry>Unstarted</entry>
+						<entry></entry>
+						<entry></entry>
+					</row>
+					<row>
+						<entry>4</entry>
+						<entry>
+							<link linkend="jobs">Stateful and non-linear jobs</link>
+							-&gt; job = flow
+						</entry>
+						<entry>Complete</entry>
+						<entry>job</entry>
+						<entry>Simple use cases work well with Spring Batch 2.0 and no Integration features.</entry>
+					</row>
+					<row>
+						<entry>5</entry>
+						<entry>
+							<link linkend="Flexible">Flexible item processing model</link>
+							(as message flow) -&gt; step = flow
+						</entry>
+						<entry>Complete</entry>
+						<entry>item</entry>
+						<entry>Complete (v. simple using MessagingGateway). Unit tests only.</entry>
+					</row>
+					<row>
+						<entry>6</entry>
+						<entry>
+							<link linkend="automaticRepeat">Automatic repeat / retry</link>
+						</entry>
+						<entry>Complete</entry>
+						<entry>retry (unit test)</entry>
+						<entry>Unit tests only, since it just uses existing features.</entry>
+					</row>
+					<row>
+						<entry>7</entry>
+						<entry>
+							<link linkend="files">Restartable file processing</link>
+						</entry>
+						<entry>Complete</entry>
+						<entry>file</entry>
+						<entry>Seems to hang together. Not tested thoroughly, but apparently someone is using it.
+						</entry>
+					</row>
+					<row>
+						<entry>8</entry>
+						<entry>
+							<link linkend="async">Asynchronous item processing</link>
+						</entry>
+						<entry>Complete</entry>
+						<entry>async</entry>
+						<entry>A general purpose ItemProcesor that returns a Future.</entry>
+					</row>
+				</tbody>
+			</tgroup>
+		</informaltable>
+		<para>Numbers 2, 4, 5 have also been identified as high level Spring Batch 2.0 Features or themes. If we
+			implement 1, then we also don&apos;t need to do any more scheduling and triggering in Spring Batch.
+		</para>
+		<para>Number 6 from the list (repeat/retry) is more of a Spring Integration pattern than a Spring Batch one. We
+			implemented it in Spring Batch first, with an eye to seeing about pushing it out into Spring Integration
+			later (with probably a split of repeat/retry out of Batch at that time).
+		</para>
+		<section>
+			<title>Message<anchor id="Triggers"/>Triggers<!-- anchor_end --> Job
+			</title>
+			<para>Description:</para>
+			<orderedlist numeration="arabic">
+				<listitem>
+					<para>User sends message to channel (maybe through a scheduler)</para>
+				</listitem>
+				<listitem>
+					<para>System interprets message payload as parameters for JobLauncher</para>
+				</listitem>
+				<listitem>
+					<para>System launches job execution</para>
+				</listitem>
+				<listitem>
+					<para>If message had a replyTo, System acknowledges with JobExecution</para>
+				</listitem>
+				<listitem>
+					<para>User accepts response and uses it to monitor progress</para>
+				</listitem>
+			</orderedlist>
+			<para>Variation:</para>
+			<orderedlist numeration="arabic">
+				<listitem>
+					<para>System waits for job to finish and replies when it is over</para>
+				</listitem>
+				<listitem>
+					<para>User polls for replies and gets notification about end of execution</para>
+				</listitem>
+			</orderedlist>
+			<para>Variation:</para>
+			<orderedlist numeration="arabic">
+				<listitem>
+					<para>User wants to block on send and only receive response when job is done</para>
+				</listitem>
+			</orderedlist>
+		</section>
+		<section>
+			<title><anchor id="Chunking"/>Chunking<!-- anchor_end --> and Multi-VM
+			</title>
+			<para>Description:</para>
+			<orderedlist numeration="arabic">
+				<listitem>
+					<para>Step flushes chunk as message to outgoing channel (repeat up to throttle limit)</para>
+				</listitem>
+				<listitem>
+					<para>Worker thread picks up chunk and processes it</para>
+				</listitem>
+				<listitem>
+					<para>Worker thread replies to response channel</para>
+				</listitem>
+				<listitem>
+					<para>Step picks up reply and aggregates the counts</para>
+				</listitem>
+				<listitem>
+					<para>Step blocks until all the requests are satisfied</para>
+				</listitem>
+			</orderedlist>
+			<para>TODO: failure modes</para>
+		</section>
+		<section>
+			<title>Asynchronous<anchor id="Aggregator"/>Aggregator<!-- anchor_end -->
+			</title>
+			<para>Job is executed over long period. Many jobs can be executing concurrently.</para>
+			<para>Description:</para>
+			<orderedlist numeration="arabic">
+				<listitem>
+					<para>Input stage for each job: System reads all items and marks with the job instance id in a
+						durable repository (staging table)
+					</para>
+				</listitem>
+				<listitem>
+					<para>System sends each item (or chunks of items that can be processed together as appropriate) to a
+						channel
+					</para>
+				</listitem>
+				<listitem>
+					<para>Items flow through message pipeline, occasionally pausing until certain conditions are met,
+						possibly for days at a time
+					</para>
+				</listitem>
+				<listitem>
+					<para>Aggregator sits and waits for all items in a job to be finished and then wraps up</para>
+				</listitem>
+			</orderedlist>
+		</section>
+		<section>
+			<title>Stateful and non-linear<anchor id="jobs"/>jobs<!-- anchor_end -->
+			</title>
+			<para>Dependencies beyween steps and conditional flow between steps. Each handler node in a message flow is
+				a step execution, with all the robustness guarantees from the Spring Batch meta data.
+			</para>
+			<para>Description:</para>
+			<orderedlist numeration="arabic">
+				<listitem>
+					<para>User launches job</para>
+				</listitem>
+				<listitem>
+					<para>System sends message to channel containing job execution</para>
+				</listitem>
+				<listitem>
+					<para>Handler accepts message and executes a step</para>
+				</listitem>
+				<listitem>
+					<para>Handler translates result of step execution into the same form that it accepted the original
+						request
+					</para>
+				</listitem>
+				<listitem>
+					<para>System routes message to next handler, possibly dynamically based on data in the message
+					</para>
+				</listitem>
+				<listitem>
+					<para>Next handler does the same... until one of the routing decisions leads to a reply channel
+					</para>
+				</listitem>
+				<listitem>
+					<para>System receives reply and transfers information to job execution (e.g. status) as necessary
+					</para>
+				</listitem>
+			</orderedlist>
+			<para>Variation: failure in one of the handlers</para>
+			<para>Variation: restart after failure</para>
+		</section>
+		<section>
+			<title><anchor id="Flexible"/>Flexible<!-- anchor_end --> item processing model
+			</title>
+			<para>Description:</para>
+			<orderedlist numeration="arabic">
+				<listitem>
+					<para>Step hands item to ItemWriter</para>
+				</listitem>
+				<listitem>
+					<para>Item is converted to message and sent to synchronous flow</para>
+				</listitem>
+				<listitem>
+					<para>Handler accepts message and does something with item</para>
+				</listitem>
+				<listitem>
+					<para>System routes result to next handler, possibly dynamically</para>
+				</listitem>
+			</orderedlist>
+			<para>Variation: failure</para>
+			<orderedlist numeration="arabic">
+				<listitem>
+					<para>Handler throws exception</para>
+				</listitem>
+				<listitem>
+					<para>System propagates exception up to ItemWriter (forces rollback under normal circs - hence
+						synchronous flow)
+					</para>
+				</listitem>
+			</orderedlist>
+		</section>
+		<section>
+			<title>Automatic repeat / retry</title>
+			<para>Description (<anchor id="automaticRepeat"/>repeat<!-- anchor_end -->):
+			</para>
+			<orderedlist numeration="arabic">
+				<listitem>
+					<para>User sends message to channel</para>
+				</listitem>
+				<listitem>
+					<para>System start a transaction and reseives message, then processes it</para>
+				</listitem>
+				<listitem>
+					<para>User sends another message</para>
+				</listitem>
+				<listitem>
+					<para>System receives and processes it in the same transaction</para>
+				</listitem>
+				<listitem>
+					<para>... repeat ...</para>
+				</listitem>
+				<listitem>
+					<para>System determines that batch is complete and commits transaction</para>
+				</listitem>
+			</orderedlist>
+		</section>
+		<section>
+			<title>Restartable file processing</title>
+			<para>Large<anchor id="files"/>files<!-- anchor_end --> need to be processed, so message payload of file
+				contents is not practical. One line or XML event per message with failover and restartability from
+				Spring Batch.
+			</para>
+			<para>Description:</para>
+			<orderedlist numeration="arabic">
+				<listitem>
+					<para>User triggers file processing (sends message, copies file to directory, etc.)</para>
+				</listitem>
+				<listitem>
+					<para>System starts new job</para>
+				</listitem>
+				<listitem>
+					<para>System processes file line by line (or even by event), wrapping each one as a message and
+						sending it to a synchronous flow
+					</para>
+				</listitem>
+				<listitem>
+					<para>System commits periodically (as determined by Spring Batch step configuration)</para>
+				</listitem>
+			</orderedlist>
+			<para>Variation: failure and restart</para>
+			<orderedlist numeration="arabic">
+				<listitem>
+					<para>Item processing fails</para>
+				</listitem>
+				<listitem>
+					<para>System aborts job and sends message to failure channel (or failure message to normal reply
+						channel)
+					</para>
+				</listitem>
+				<listitem>
+					<para>Operator fixes problem and triggers restart (another message channel?)</para>
+				</listitem>
+				<listitem>
+					<para>System restarts job for same file at point where it left off</para>
+				</listitem>
+				<listitem>
+					<para>System completes processing</para>
+				</listitem>
+				<listitem>
+					<para>System sends sucess message to reply channel</para>
+				</listitem>
+			</orderedlist>
+			<para>Variation: send to asynchronous flow. Same as main use case but item message is sent to asynchronous
+				flow. Not as robust because if the lights go out then meesages will be lost, but at least a large file
+				can be split into smaller chunks.
+			</para>
+		</section>
+		<section>
+			<title>Asynchronous item processing</title>
+			<para>This is actually a variation on<link linkend="Flexible">flexible item processing model</link>.
+			</para>
+			<para>Description (<anchor id="async"/>async<!-- anchor_end -->):
+			</para>
+			<orderedlist numeration="arabic">
+				<listitem>
+					<para>ItemProcessor executes in background (non-transactionally)</para>
+				</listitem>
+				<listitem>
+					<para>ItemWriter collects outputs from futures before phyically writing data</para>
+				</listitem>
+			</orderedlist>
+		</section>
+	</section>
+	<section>
+		<title>Remote Chunking Implementation</title>
+		<section>
+			<title>Basic Use Case</title>
+			<para>Description:</para>
+			<orderedlist numeration="arabic">
+				<listitem>
+					<para>Step flushes chunk as message to outgoing channel (repeat up to throttle limit)</para>
+				</listitem>
+				<listitem>
+					<para>Worker thread picks up chunk and processes it</para>
+				</listitem>
+				<listitem>
+					<para>Worker thread replies to response channel</para>
+				</listitem>
+				<listitem>
+					<para>Step picks up reply if there is one and aggregates the counts</para>
+				</listitem>
+				<listitem>
+					<para>Step reapeats until no more input data</para>
+				</listitem>
+				<listitem>
+					<para>Step blocks until all the outstanding requests are satisfied</para>
+				</listitem>
+			</orderedlist>
+		</section>
+		<section>
+			<title>Implementation</title>
+			<para>A ChunkProcessor acts as a kind of Throttling Asynchronous Messaging Gateway, which isn&apos;t a
+				pattern that is supported out of the box with Spring Integration. There is a SimpleMessagingGateway that
+				provides programmatic access to send and receive payloads (instead of messages), so the pattern can be
+				manually implemented in the ChunkProcessor.
+			</para>
+			<para>The current implementation is in the form of an ItemWriter (ChunkMessageChannelItemWriter) which is a
+				StepExecutionListener (blocks and waits for the outstanding responses in the afterStep). The
+				ChunkProcessor can then simply be a vanilla implementation from Spring Batch.
+			</para>
+			<para>The ChunkMessageChannelItemWriter implements the Throttling part of the pattern by keeping track of
+				the number of outstanding requests (which it has to do anyway) and blocking until a response arrives if
+				the number is above a configurable limit. It wouldn&apos;t be necessary to do this manually in the
+				writer if the messages were only going over local MessageChannels: the requests would either be
+				processed serially in a single thread, or else there would be a thread pool with limited size
+				controlling the workers. But since the messages are going to JMS we need to either explicitly throttle
+				in the writer (or else rely on vendor features for producer flow control), otherwise the JMS Queue could
+				easily be overwhelmed and start barfing (which happened in one of the early prototypes on an Accenture
+				project).
+			</para>
+			<para>Throttling MessageChannel.send() might be something Spring Integration could do, but it only makes
+				sense really in the context of this gateway pattern (because you need something to react against to
+				decide when to release another send).
+			</para>
+			<para>The gateway is used to send requests to the workers, and then to receive responses in the same thread,
+				but only waiting for a response when the step is complete. To implement this with JMS backed channels we
+				need a Spring Integration inbound adapter that translates PollableChannel.receive() into
+				JmsTemplate.receiveAndConvert(). In the unlikely event of a problem in the receiver the JMS message
+				should roll back. JmsDestinationPollingAdapter actually almost does what we need but there is no support
+				for configuring it without a scheduled poller.
+			</para>
+		</section>
+	</section>
+</chapter>

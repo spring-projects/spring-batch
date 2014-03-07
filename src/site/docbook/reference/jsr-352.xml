@@ -1,0 +1,368 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE chapter PUBLIC "-//OASIS//DTD DocBook XML V4.4//EN"
+		"http://www.oasis-open.org/docbook/xml/4.4/docbookx.dtd">
+<chapter id="jsr-352" xreflabel="JSR-352 Support">
+	<title>JSR-352 Support</title>
+
+	<para>As of Spring Batch 3.0 support for JSR-352 has been fully implemented. This section will briefly describe high level JSR-352 specific concepts. It is encouraged to read the full JSR-352 spec, located at the JSR-352 home page: https://jcp.org/en/jsr/detail?id=352</para>
+
+	<section id="jsrBatchContexts">
+		<title id="jsrBatchContexts">Batch Contexts</title>
+
+		<para>JSR-352 Batch Contexts provide information about the batch job and interaction with the batch runtime. Context objects can be injected into fields of batch artifact classes using the @Inject annotation.</para>
+
+		<section id="jsrJobContext">
+			<title>JobContext</title>
+
+			<para>The JobContext represents the entire batch job. There is one JobContext per job execution and exists for the life of the Job.</para>
+		</section>
+
+		<section id="jsrStepContext">
+			<title>StepContext</title>
+
+			<para>The StepContext represents the current executing step. There is one StepContext per step execution and exists for the life of the Step.</para>
+		</section>
+	</section>
+	<section id="jsrConfiguringAndRunningAJob">
+		<title id="jsrConfiguringAndRunningAJob">Configuring and Running a Job</title>
+
+		<section id="jsrConfiguringAJob">
+			<title>Configuring a Job</title>
+
+			<section id="jsrNamespace">
+				<title>JSR-352 namespace</title>
+
+				<para>JSR-352 API classes reside in the package namespace of javax.batch. The XML namespace also known as the Job Specification Language (JSL) in the language in which Jobs are defined in. The JSL is represented by an XML schema. Refer to the JSR-352 spec document or the XSD itself for more details.</para>
+			</section>
+			<section id="jsrBatchXMLConfiguration">
+				<title>batch.xml configuration</title>
+
+				<para>The batch.xml file contains a mapping of batch artifacts to be loaded and used by the runtime. Batch artifact definitions consist of a reference identifier and a fully qualified class name. The batch.xml file resides in the META-INF directory.</para>
+			</section>
+			<section id="jsrSpringConfiguration">
+				<title>Spring configuration</title>
+
+				<para>In addition to configuring batch artifacts in the batch.xml file, Spring Batch allows you to configure batch artifacts in the typical Spring bean fashion. To utilize this configuration method simply define your JSR-352 job inside a Spring configuration file and reference your Spring beans via the ref tag as shown in the snippet below.</para>
+
+				<para><programlisting>&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;
+&lt;beans xmlns=&quot;http://www.springframework.org/schema/beans&quot;
+  xmlns:xsi=&quot;http://www.w3.org/2001/XMLSchema-instance&quot;
+  xsi:schemaLocation=&quot;http://www.springframework.org/schema/beans
+  http://www.springframework.org/schema/beans/spring-beans.xsd
+  http://xmlns.jcp.org/xml/ns/javaee
+  http://xmlns.jcp.org/xml/ns/javaee/jobXML_1_0.xsd&quot;&gt;
+
+  &lt;job id=&quot;job1&quot; xmlns=&quot;http://xmlns.jcp.org/xml/ns/javaee&quot; version=&quot;1.0&quot;&gt;
+    &lt;step id=&quot;step1&quot;&gt;
+      &lt;chunk&gt;
+        &lt;reader ref=&quot;testReader&quot;/&gt;
+      &lt;/chunk&gt;
+    &lt;/step&gt;
+    ...
+    &lt;/job&gt;
+
+    &lt;bean id=&quot;testReader&quot; class=&quot;TestItemReader&quot; scope=&quot;step&quot;/&gt;
+&lt;/beans&gt;</programlisting></para>
+			</section>
+		</section>
+		<section id="jsrRunningAJob">
+			<title>Running a Job</title>
+
+			<section id="jsrJobOperator">
+				<title>JsrJobOperator</title>
+
+				<para>The JsrJobOperator is a javax.batch.operations.JobOperator implementation which supports various operations for dealing with batch jobs. Job XML files are expected to reside in the META-INF/batch-jobs directory.</para>
+
+				<para>Typically used JobOperator methods for operating a job include:</para>
+
+				<para>
+				<programlisting>start(String jobXMLName, Properties jobParameters)
+restart(long executionId, Properties restartParameters)
+stop(long executionId)
+abandon(long executionId)</programlisting></para>
+
+				<note>When providing the jobXMLname to the start method of JobOperator, the META-INF/batch-jobs prefix nor the .xml file extension should be added.</note>
+			</section>
+		</section>
+		<section id="jsrInterceptingJobExecution">
+			<title>Intercepting Job Execution</title>
+
+			<section id="jsrJobListener">
+				<title>JobListener</title>
+
+				<para>As with Spring Batch, JSR-352 allows for Job level listeners. Job listeners are configured as a child element of the Job in the JSL and implement the javax.batch.api.listener.JobListener interface.</para>
+			</section>
+		</section>
+	</section>
+	<section id="jsrJobProperties">
+		<title id="jsrJobProperties">Job Properties</title>
+
+		<section id="jsrPropertySupport">
+			<title>Property Support</title>
+
+			<para>JSR-352 allows for properties to be defined at the Job, Step and batch artifact level by way of configuration in the JSL. Batch properties are configured at each level in the following way:</para>
+
+			<para>
+		    <programlisting>&lt;properties&gt;
+  &lt;property name=&quot;propertyName1&quot; value=&quot;propertyValue1&quot;/&gt;
+  &lt;property name=&quot;propertyName2&quot; value=&quot;propertyValue2&quot;/&gt;
+&lt;/properties&gt;</programlisting>
+
+			Properties may be configured on any batch artifact.</para>
+		</section>
+		<section id="jsrBatchPropertyAnnotation">
+			<title>@BatchProperty annotation</title>
+
+			<para>Properties are referenced in batch artifacts by annotating class fields with the @BatchProperty and @Inject annotations. As defined by JSR-352, fields for properties must be String typed. Any type conversion is up to the implementing developer to perform.</para>
+
+			<para>An ItemReader artifact could be configured with a properties block such as the one described above and accessed as such:
+			<programlisting>public class MyItemReader implements ItemReader {
+    @Inject
+    @BatchProperty
+    private String propertyName1;
+
+    ...
+}</programlisting>
+
+			The value of the field "propertyName1" will be "propertyValue1"</para>
+		</section>
+		<section id="jsrPropertySubstitution">
+			<title>Property Substitution</title>
+
+			<para>Property substitution is provided by way of operators and simple conditional expressions. The general usage is #{operator['key']}.</para>
+			<para>Supported operators:</para>
+			<para>
+			<itemizedlist>
+				<listitem>
+					<para>jobParameters - access job parameter values that the job was started/restarted with.</para>
+				</listitem>
+				<listitem>
+					<para>jobProperties - access properties configured at the job level of the JSL.</para>
+				</listitem>
+				<listitem>
+					<para>systemProperties - access named system properties.</para>
+				</listitem>
+				<listitem>
+					<para>partitionPlan - access named property from the parition plan of a partitioned step.</para>
+				</listitem>
+			</itemizedlist>
+			</para>
+			<para>
+			<programlisting>#{jobParameters['unresolving.prop']}?:#{systemProperties['file.separator']}</programlisting>
+			The left hand side of the assignment is the expected value, the right hand side is the default value. In this example, the result will resolve to a value of the system property file.separator as #{jobParameters['unresolving.prop']} is assumed to not be resolvable. If neither expressions can be resolved, an empty String will be returned. Multiple conditions can be used, which are separated by a ';'.
+			</para>
+		</section>
+	</section>
+	<section id="jsrRetry">
+		<title id="jsrRetry">Retry</title>
+
+		<para>JSR-352 provides support for retry by way of listeners for chunk level artifacts. Listeners are configured at the step level contained in a listeners block.</para>
+
+		<section id="jsrRetrylisteners">
+			<title>Retry Listeners</title>
+
+			<para>JSR-352 provides listener interfaces for various cases of retry handling:</para>
+
+			<informaltable frame="all" rowsep="1" colsep="1">
+			  <tgroup cols="2">
+			    <colspec align="left"/>
+			    <colspec align="left"/>
+			    <tbody>
+					<row>
+						<entry>
+							<emphasis role="bold">Artifact Interface</emphasis>
+						</entry>
+						<entry>
+							<emphasis role="bold">Listener Interface</emphasis>
+						</entry>
+					</row>
+					<row>
+						<entry>javax.batch.api.chunk.ItemReader</entry>
+						<entry>javax.batch.api.chunk.listener.RetryReadListener</entry>
+					</row>
+					<row>
+						<entry>javax.batch.api.chunk.ItemProcessor</entry>
+						<entry>javax.batch.api.chunk.listener.RetryProcessListener</entry>
+					</row>
+					<row>
+						<entry>javax.batch.api.chunk.ItemWriter</entry>
+						<entry>javax.batch.api.chunk.listener.RetryWriteListener</entry>
+					</row>
+			    </tbody>
+			  </tgroup>
+			</informaltable>
+		</section>
+	</section>
+	<section id="jsrConfiguringAStep">
+		<title id="jsrConfiguringAStep">Configuring a Step</title>
+
+		<section id="jsrBatchlet">
+			<title>Batchlet</title>
+
+			<para>Task oriented step's in the JSR-352 implementation are backed by implementations of javax.batch.api.Batchlet. A Batchlet is analogous to a Spring Batch Tasklet.</para>
+		</section>
+		<section id="jsrControllingStepFlow">
+			<title>Controlling Step Flow</title>
+
+			<section id="jsrDecider">
+				<title>Decider</title>
+
+				<para>JSR-352 decision support for steps, splits and flows are implemented via implementations of the javax.batch.api.Decider interface.</para>
+			</section>
+			<section id="jsrConditionalFlow">
+				<title>Conditional Flow</title>
+
+				<para>JSR-352 allows for both the next attribute and a next element to be present as transition elements. If both are present, the next value specified in the Step attribute will be preferred.</para>
+			</section>
+			<section id="jsrConfiguringForStop">
+				<title>Configuring For Stop</title>
+
+				<para>JSR-352 transition elements are matched against in the order they are defined in the JSL.</para>
+			</section>
+		</section>
+		<section id="jsrInterceptingStepExecution">
+			<title>Intercepting Step Execution</title>
+
+			<para>JSR-352 provides support for intercepting Step execution by way of listeners. Listeners are configured at the step level contained in a listeners block.</para>
+
+			<informaltable frame="all" rowsep="1" colsep="1">
+				<tgroup cols="2">
+					<colspec align="left"/>
+					<colspec align="left"/>
+					<tbody>
+						<row>
+							<entry>
+								<emphasis role="bold">Interception Point</emphasis>
+							</entry>
+							<entry>
+								<emphasis role="bold">Listener Interface</emphasis>
+							</entry>
+						</row>
+						<row>
+							<entry>Step</entry>
+							<entry>javax.batch.api.listener.StepListener</entry>
+						</row>
+						<row>
+							<entry>Chunk</entry>
+							<entry>javax.batch.api.chunk.listener.ChunkListener</entry>
+						</row>
+						<row>
+							<entry>Item Reading</entry>
+							<entry>javax.batch.api.chunk.listener.ItemReadListener</entry>
+						</row>
+						<row>
+							<entry>Item Processing</entry>
+							<entry>javax.batch.api.chunk.listener.ItemProcessListener</entry>
+						</row>
+						<row>
+							<entry>Item Writing</entry>
+							<entry>javax.batch.api.chunk.listener.ItemWriteListener</entry>
+						</row>
+						<row>
+							<entry>Skip Read</entry>
+							<entry>javax.batch.api.chunk.listener.SkipReadListener</entry>
+						</row>
+						<row>
+							<entry>Skip Process</entry>
+							<entry>javax.batch.api.chunk.listener.SkipProcessListener</entry>
+						</row>
+						<row>
+							<entry>Skip Write</entry>
+							<entry>javax.batch.api.chunk.listener.SkipWriteListener</entry>
+						</row>
+					</tbody>
+				</tgroup>
+			</informaltable>
+		</section>
+		<section id="jsrCompletionPolicies">
+			<title>Completion Policies</title>
+
+			<section id="jsrCheckpointAlgorithm">
+				<title>Checkpoint Algorithm</title>
+
+				<para>By default, completion is based on reaching the end of the chunk dictated by its specified (or default) size. A custom algorithm can be created by implementing the javax.batch.api.chunk.CheckpointAlgorithm interface and referencing it via the chunk attribute "checkpoint-policy".</para>
+			</section>
+		</section>
+	</section>
+	<section id="jsrItemReadersAndWriters">
+		<title id="jsrItemReadersAndWriters">ItemReaders and ItemWriters</title>
+
+		<para>JSR-352 provides interfaces to read, process and write data.</para>
+
+		<informaltable frame="all" rowsep="1" colsep="1">
+			<tgroup cols="2">
+				<colspec align="left"/>
+				<colspec align="left"/>
+				<tbody>
+					<row>
+						<entry>
+							<emphasis role="bold">Role</emphasis>
+						</entry>
+						<entry>
+							<emphasis role="bold">Interface</emphasis>
+						</entry>
+					</row>
+					<row>
+						<entry>Reading</entry>
+						<entry>javax.batch.api.chunk.ItemReader</entry>
+					</row>
+					<row>
+						<entry>Processing</entry>
+						<entry>javax.batch.api.chunk.ItemProcessor</entry>
+					</row>
+					<row>
+						<entry>Writing</entry>
+						<entry>javax.batch.api.chunk.ItemProcessor</entry>
+					</row>
+				</tbody>
+			</tgroup>
+		</informaltable>
+	</section>
+	<section id="jsrScaling">
+		<title id="jsrScaling">Scaling</title>
+
+		<section id="jsrPartitioning">
+			<title>Partitioning</title>
+
+			<section id="jsrPartitionPlan">
+				<title>Partition Plan</title>
+
+				<para>A partition plan defines the attributes of a partitioned step. Both chunk oriented and task oriented Step's may be partitioned. Some of these items include the number of partitions, threads and the partitions properties. For example consider the following partitioned Step sample:
+				<programlisting>...
+&lt;step&gt;
+  ...
+  &lt;partition&gt;
+    &lt;plan partitions=&quot;10&quot; threads=&quot;2&quot;&gt;
+      &lt;properties&gt;
+        &lt;property name=&quot;partitionProperty1&quot; value=&quot;value1&quot;/&gt;
+      &lt;/properties&gt;
+    &lt;/plan&gt;
+  &lt;/partition&gt;
+  ...
+&lt;/step&gt;
+...</programlisting>
+				</para>
+			</section>
+			<section id="jsrPartitionMapper">
+				<title>Partition Mapper</title>
+
+				<para>The Partition Mapper provides a way to programmatically calculate the number of partitions and threads for a partitioned Step. The Partition Mapper is a child element of partition and implementations should implement the javax.batch.api.partition.PartitionMapper interface.</para>
+			</section>
+			<section id="jsrPartitionReducer">
+				<title>Partition Reducer</title>
+
+				<para>The Partition Reducer provides a way to programmatically intercept the partitioned Step's lifecycle. The Partition Reducer is a child element of partition and implementations should implement the javax.batch.api.partition.PartitionReducer interface.</para>
+			</section>
+			<section id="jsrPartitionCollector">
+				<title>Partition Collector</title>
+
+				<para>The Partition Collector sends results from each partition to the Partition Analyzer at the end of each checkpoint and again at the end of the partition. The Partition Collector is a child element of partition and implementations should implement the javax.batch.api.partition.PartitionCollector interface.</para>
+			</section>
+			<section id="jsrPartitionAnalyzer">
+				<title>Partition Analyzer</title>
+
+				<para>The Partition Analyzer is a collection point for data returned by the Partition Collector's and can be used to implement custom exit status handling for the individual partitions. The Partition Analyzer is a child element of a partition and implements should implement the javax.batch.api.partition.PartitionAnalyzer interface.</para>
+			</section>
+		</section>
+	</section>
+</chapter>

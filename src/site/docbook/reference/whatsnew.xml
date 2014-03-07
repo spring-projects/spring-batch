@@ -1,130 +1,60 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE chapter PUBLIC "-//OASIS//DTD DocBook XML V4.4//EN"
-"http://www.oasis-open.org/docbook/xml/4.4/docbookx.dtd">
+		"http://www.oasis-open.org/docbook/xml/4.4/docbookx.dtd">
 <chapter id="whatsNew">
-  <title>What's New in Spring Batch 2.2</title>
+  <title>What's New in Spring Batch 3.0</title>
 
-  <para>The Spring Batch 2.2 release has six major themes:</para>
+  <para>The Spring Batch 3.0 release has five major themes:</para>
 
   <itemizedlist>
     <listitem>
-      <para>Spring Data Integration</para>
+      <para>JSR-352 Support</para>
     </listitem>
 
     <listitem>
-      <para>Java Configuration</para>
+      <para>Promote Spring Batch Integration to Spring Batch</para>
     </listitem>
 
     <listitem>
-      <para>Spring Retry</para>
+      <para>Upgrade to Support Spring 4 and Java 8</para>
     </listitem>
 
     <listitem>
-      <para>Job Parameters</para>
+      <para>JobScope Support</para>
+    </listitem>
+
+    <listitem>
+      <para>SQLite Support</para>
     </listitem>
   </itemizedlist>
 
-  <section id="whatsNewSpringData">
-    <title id="s.2.1.6">Spring Data Integration</title>
+  <section id="whatsNewJSR-352Support">
+    <title>JSR-352 Support</title>
 
-    <para>Since the 2.0 release of Spring Batch, the Spring Data project has brought
-    support for the NoSQL movement to Spring.  The 2.2 release of Spring Batch has added
-    support for MongoDB, Neo4j and Gemfire natively through the Spring Data abstractions.</para>
-
-    <para>This release has also added support for writing to any custom Spring Data Repository a
-    user may write.  The <classname>RepositoryItemReader</classname> and
-    <classname>RepositoryItemWriter</classname> each wrap a repository implementation (
-    <classname>PagingAndSortingRepository</classname> and <classname>CrudRepository</classname>
-    respectively) to retrieve data from and persist data to.</para>
+    <para>The JSR-352 (Batch Applications for the Java Platform) specification has been fully implemented. See <xref linkend="jsr-352"/> for more details.</para>
   </section>
 
-  <section id="whatsNewJavaConfiguration">
-    <title>Java Configuration</title>
+  <section id="whatsNewPromoteSpringBatchIntegrationToSpringBatch">
+    <title>Promote Spring Batch Integration to Spring Batch</title>
 
-    <para>Until 2.2.0 the only option for configuring a job was via XML (either through the batch DSL or
-    by hand).  However, in 2.2.0, Java based configuration has been added as a way to define Spring Batch
-    Jobs.  To support this new configuration option, an annotation and builder classes have been added.  What
-    was previously defined as this:</para>
-
-    <programlisting>&lt;batch&gt;
-    &lt;job-repository/&gt;
-
-    &lt;job id="myJob"&gt;
-        &lt;step id="step1".../&gt;
-        &lt;step id="step2".../&gt;
-    &lt;/job&gt;
-
-    &lt;beans:bean id="transactionManager".../&gt;
-
-    &lt;beans:bean id="jobLauncher" class="org.springframework.batch.core.launch.support.SimpleJobLauncher"&gt;
-        &lt;beans:property name="jobRepository" ref="jobRepository"/&gt;
-    &lt;/beans:bean&gt;
-&lt;/batch&gt;
-    </programlisting>
-
-    <para>Can now be configured using the <classname>@EnableBatchProcessing</classname> annotation and the
-    provided <classname>JobBuilderFactory</classname> and <classname>StepBuilderFactory</classname> as show below:</para>
-
-    <programlisting> &#064;Configuration
- &#064;EnableBatchProcessing
- &#064;Import(DataSourceCnfiguration.class)
- public class AppConfig {
-
-     &#064;Autowired
-      private JobBuilderFactory jobs;
-
-     &#064;Bean
-     public Job job() {
-          return jobs.get(&quot;myJob&quot;).start(step1()).next(step2()).build();
-     }
-
-     &#064;Bean
-     protected Step step1() {
-          ...
-     }
-
-     &#064;Bean
-     protected Step step2() {
-          ...
-     }
-}</programlisting>
-
-    <para>The <classname>@EnableBatchProcessing</classname> annotation makes a number
-    of common dependencies available for autowiring by default.  This list includes a
-    <classname>JobRepsitory</classname>, <classname>JobLauncher</classname>,
-    <classname>JobRegistry</classname>, <classname>PlatformTransactionManager</classname>,
-    <classname>JobBuilderFactory</classname>, and a <classname>StepBuilderFactory</classname>.
-    More information on how to configure Jobs and Steps with the new
-    Java config can be found in <xref linkend="javaConfig" /></para>
+    <para>The Spring Batch Integration project has been merged into the main Spring Batch code base. Spring Batch Integration provides support for Remote Chunking, Asynchronous handing and so on. See <xref linkend="springBatchIntegration"/> for more details.</para>
   </section>
 
-    <section id="whatsNewSpringRetry">
-      <title>Spring Retry</title>
+  <section id="whatsNewUpgradeToSupportSpring4andJava8">
+    <title>Upgrade to Support Spring 4 and Java 8</title>
 
-      <para>The ability to retry an operation via the <classname>RetryTemplate</classname>
-      has always been a feature of Spring Batch.  That ability has been identified as a
-      useful feature for other frameworks (Spring Integration for example).  With the 2.2.0
-      release, the retry logic has been extracted from Spring Batch into it's own library
-      called Spring Retry.  With this change, there are two main impacts.  The first is
-      that the majority of the <literal>org.springframework.batch.retry</literal> package
-      has been moved into this new library.  With that move, the package name has also
-      dropped the batch to become <literal>org.springframework.retry</literal>.</para>
+    <para>Spring Batch now depends on Spring 4.0 and has been tested for compatibility against Java 8. Java 6 still remains the default source/target version for the Spring Batch distribution.</para>
   </section>
 
-  <section id="whatsNewJobParameters">
-    <title>Job Parameters</title>
+  <section id="whatsNewJobScopeSupport">
+    <title>JobScope Support</title>
 
-    <para>Prior to the 2.2.0 release of Spring Batch, all parameters pass to a job execution
-    were used as part of the identity of the job.  This limited the ability to change job
-    parameters during a rerun of a job.  To accommodate this use case, 2.2.0 introduced the
-    idea of non-identifying job parameters.</para>
-
-    <para>By default, job parameters in 2.2.0 are still identifying.  However, Spring Batch
-    now allows a user to specify a parameter not be used in the identity of a job instance.
-    In order to support this change, the domain model for batch changed.  Before 2.2.0, job
-    parameters were associated with a <classname>JobInstance</classname>.  2.2.0 and beyond,
-    they are associated with a <classname>JobExecution</classname>.  This also required the
-    underlying database schema for the job repository to change.</para>
+    <para>A new "job" scope has been added, see section <xref linkend="job-scope"/> for more details.</para>
   </section>
 
+  <section id="whatsNewSQLiteSupport">
+    <title>SQLite Support</title>
+
+    <para>SQLite support has been added along with database schema scripts.</para>
+  </section>
 </chapter>

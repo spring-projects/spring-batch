@@ -2255,6 +2255,8 @@ itemReader.close(executionContext);</programlisting>
       <section id="IbatisPagingItemReader">
         <title>IbatisPagingItemReader</title>
 
+        <note>This reader is deprecated as of Spring Batch 3.0.</note>
+
         <para>If you use IBATIS for your data access then you can use the
         <classname>IbatisPagingItemReader</classname> which, as the name
         indicates, is an implementation of a paging
