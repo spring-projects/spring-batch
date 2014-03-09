@@ -99,10 +99,6 @@ public class JdbcPagingItemReader<T> extends AbstractPagingItemReader<T> impleme
 
 	private int fetchSize = VALUE_NOT_SET;
 
-	public JdbcPagingItemReader() {
-		setName(ClassUtils.getShortName(JdbcPagingItemReader.class));
-	}
-
 	public void setDataSource(DataSource dataSource) {
 		this.dataSource = dataSource;
 	}

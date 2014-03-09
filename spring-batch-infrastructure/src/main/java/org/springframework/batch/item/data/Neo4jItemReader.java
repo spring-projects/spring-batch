@@ -81,10 +81,6 @@ InitializingBean {
 
 	private ResultConverter resultConverter;
 
-	public Neo4jItemReader() {
-		setName(ClassUtils.getShortName(Neo4jItemReader.class));
-	}
-
 	/**
 	 * The start segment of the cypher query.  START is prepended
 	 * to the statement provided and should <em>not</em> be

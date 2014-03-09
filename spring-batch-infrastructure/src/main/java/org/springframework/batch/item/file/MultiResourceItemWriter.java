@@ -19,13 +19,13 @@ package org.springframework.batch.item.file;
 import java.io.File;
 import java.io.IOException;
 import java.util.List;
+
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.item.ItemStreamException;
 import org.springframework.batch.item.support.AbstractItemStreamItemWriter;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
 import org.springframework.util.Assert;
-import org.springframework.util.ClassUtils;
 
 /**
  * Wraps a {@link ResourceAwareItemWriterItemStream} and creates a new output
@@ -62,10 +62,6 @@ public class MultiResourceItemWriter<T> extends AbstractItemStreamItemWriter<T> 
 	private boolean saveState = true;
 
 	private boolean opened = false;
-
-	public MultiResourceItemWriter() {
-		this.setExecutionContextName(ClassUtils.getShortName(MultiResourceItemWriter.class));
-	}
 
     @Override
 	public void write(List<? extends T> items) throws Exception {

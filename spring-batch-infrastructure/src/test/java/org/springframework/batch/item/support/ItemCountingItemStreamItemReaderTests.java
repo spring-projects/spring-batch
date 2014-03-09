@@ -26,6 +26,7 @@ import java.util.Iterator;
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.batch.item.ExecutionContext;
+import org.springframework.util.StringUtils;
 
 /**
  * @author Dave Syer
@@ -61,11 +62,13 @@ public class ItemCountingItemStreamItemReaderTests {
 		assertTrue(reader.closeCalled);
 	}
 
-	@Test(expected=IllegalArgumentException.class)
-	public void testOpenWithoutName() {
+	@Test
+	public void testOpenWithDefaultName() {
 		reader = new ItemCountingItemStreamItemReader();
 		reader.open(new ExecutionContext());
-		assertFalse(reader.openCalled);
+		assertTrue(reader.openCalled);
+		assertEquals("ItemCountingItemStreamItemReaderTests.ItemCountingItemStreamItemReader.foo", 
+				reader.getExecutionContextKey("foo"));
 	}
 
 	@Test
@@ -151,7 +154,7 @@ public class ItemCountingItemStreamItemReaderTests {
 			}
 			return items.next();
 		}
-
+		
 	}
 
 }

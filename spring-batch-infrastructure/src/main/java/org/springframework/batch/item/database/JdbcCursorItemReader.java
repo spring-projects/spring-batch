@@ -61,11 +61,6 @@ public class JdbcCursorItemReader<T> extends AbstractCursorItemReader<T> {
 
 	RowMapper rowMapper;
 
-	public JdbcCursorItemReader() {
-		super();
-		setName(ClassUtils.getShortName(JdbcCursorItemReader.class));
-	}
-
 	/**
 	 * Set the RowMapper to be used for all calls to read().
 	 *

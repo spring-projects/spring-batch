@@ -74,11 +74,6 @@ public class StoredProcedureItemReader<T> extends AbstractCursorItemReader<T> {
 
 	private int refCursorPosition = 0;
 
-	public StoredProcedureItemReader() {
-		super();
-		setName(ClassUtils.getShortName(StoredProcedureItemReader.class));
-	}
-
 	/**
 	 * Set the RowMapper to be used for all calls to read().
 	 *

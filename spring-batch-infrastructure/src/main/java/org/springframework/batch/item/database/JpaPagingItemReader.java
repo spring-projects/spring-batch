@@ -99,10 +99,6 @@ public class JpaPagingItemReader<T> extends AbstractPagingItemReader<T> {
 	
 	private boolean transacted = true;//default value
 
-	public JpaPagingItemReader() {
-		setName(ClassUtils.getShortName(JpaPagingItemReader.class));
-	}
-
 	/**
 	 * Create a query using an appropriate query provider (entityManager OR
 	 * queryProvider).

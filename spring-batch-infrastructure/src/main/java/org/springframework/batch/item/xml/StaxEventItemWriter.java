@@ -55,7 +55,6 @@ import org.springframework.dao.DataAccessResourceFailureException;
 import org.springframework.oxm.Marshaller;
 import org.springframework.oxm.XmlMappingException;
 import org.springframework.util.Assert;
-import org.springframework.util.ClassUtils;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 
@@ -155,10 +154,6 @@ ResourceAwareItemWriterItemStream<T>, InitializingBean {
 	
 	// List holding the QName of elements that were opened in the header callback, but not closed
 	private List<QName> unclosedHeaderCallbackElements = Collections.EMPTY_LIST;
-
-	public StaxEventItemWriter() {
-		setExecutionContextName(ClassUtils.getShortName(StaxEventItemWriter.class));
-	}
 
 	/**
 	 * Set output file.

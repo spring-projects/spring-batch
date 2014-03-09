@@ -16,6 +16,8 @@
 package org.springframework.batch.item;
 
 import org.springframework.batch.item.util.ExecutionContextUserSupport;
+import org.springframework.beans.factory.BeanNameAware;
+import org.springframework.util.ClassUtils;
 
 /**
  * Empty method implementation of {@link ItemStream}.
@@ -24,9 +26,17 @@ import org.springframework.batch.item.util.ExecutionContextUserSupport;
  * @author Dean de Bree
  *
  */
-public abstract class ItemStreamSupport implements ItemStream {
+public abstract class ItemStreamSupport implements ItemStream, BeanNameAware {
 
 	private final ExecutionContextUserSupport executionContextUserSupport = new ExecutionContextUserSupport();
+	
+	private final String defaultName = ClassUtils.getShortName(getClass());
+	
+	private String name;
+	
+	public ItemStreamSupport() {
+		setName(defaultName);
+	}
 
 	/**
 	 * No-op.
@@ -54,21 +64,38 @@ public abstract class ItemStreamSupport implements ItemStream {
 	
 	/**
 	 * The name of the component which will be used as a stem for keys in the
-	 * {@link ExecutionContext}. Subclasses should provide a default value, e.g.
-	 * the short form of the class name.
+	 * {@link ExecutionContext}. By default, the short form of the class name is used.
+	 * If this component is a spring bean, the name of the bean will be used as default.
+	 * Setting this property explicitly overrides this default behavior.
 	 * 
 	 * @param name the name for the component
 	 */
 	public void setName(String name) {
 		this.setExecutionContextName(name);
 	}
+	
+	/**
+	 * Set the name of the bean in the bean factory that created this bean.
+	 * The bean name will only be used as name of the component in case it hasn't 
+	 * already been explicitly set to a value other than the default. 
+	 * 
+	 * {@link #setName(String)}
+	 * @see BeanNameAware#setBeanName(String)
+	 */
+	@Override
+	public void setBeanName(String name) {
+		if (defaultName.equals(this.name)) { 			
+			setName(name);
+		}
+	}
 
 	protected void setExecutionContextName(String name) {
+		this.name = name;
 		executionContextUserSupport.setName(name);
 	}
 
 	public String getExecutionContextKey(String key) {
 		return executionContextUserSupport.getKey(key);
 	}
-
+		
 }

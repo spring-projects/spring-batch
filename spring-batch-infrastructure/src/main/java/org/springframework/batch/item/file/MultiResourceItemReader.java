@@ -30,7 +30,6 @@ import org.springframework.batch.item.UnexpectedInputException;
 import org.springframework.batch.item.support.AbstractItemStreamItemReader;
 import org.springframework.core.io.Resource;
 import org.springframework.util.Assert;
-import org.springframework.util.ClassUtils;
 
 /**
  * Reads items from multiple resources sequentially - resource list is given by {@link #setResources(Resource[])}, the
@@ -82,10 +81,6 @@ public class MultiResourceItemReader<T> extends AbstractItemStreamItemReader<T> 
 		}
 
 	};
-
-	public MultiResourceItemReader() {
-		this.setExecutionContextName(ClassUtils.getShortName(MultiResourceItemReader.class));
-	}
 
 	/**
 	 * Reads the next item, jumping to next resource if necessary.

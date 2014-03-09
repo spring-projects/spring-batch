@@ -59,10 +59,6 @@ public class HibernateCursorItemReader<T> extends AbstractItemCountingItemStream
 
 	private HibernateItemReaderHelper<T> helper = new HibernateItemReaderHelper<T>();
 
-	public HibernateCursorItemReader() {
-		setName(ClassUtils.getShortName(HibernateCursorItemReader.class));
-	}
-
 	private ScrollableResults cursor;
 
 	private boolean initialized = false;
