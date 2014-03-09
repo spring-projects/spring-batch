@@ -541,12 +541,8 @@ public class DefaultFieldSet implements FieldSet {
 	 */
     @Override
 	public Date readDate(int index, Date defaultValue) {
-		try {
-			return readDate(index);
-		}
-		catch (IllegalArgumentException e) {
-			return defaultValue;
-		}
+		String candidate = readAndTrim(index);
+		return StringUtils.hasText(candidate) ? parseDate(candidate, dateFormat) : defaultValue;
 	}
 
 	/*
@@ -575,10 +571,10 @@ public class DefaultFieldSet implements FieldSet {
     @Override
 	public Date readDate(String name, Date defaultValue) {
 		try {
-			return readDate(name);
+			return readDate(indexOf(name), defaultValue);
 		}
 		catch (IllegalArgumentException e) {
-			return defaultValue;
+			throw new IllegalArgumentException(e.getMessage() + ", name: [" + name + "]");
 		}
 	}
 
@@ -603,12 +599,8 @@ public class DefaultFieldSet implements FieldSet {
 	 */
     @Override
 	public Date readDate(int index, String pattern, Date defaultValue) {
-		try {
-			return readDate(index, pattern);
-		}
-		catch (IllegalArgumentException e) {
-			return defaultValue;
-		}
+		String candidate = readAndTrim(index);
+		return StringUtils.hasText(candidate) ? readDate(index, pattern) : defaultValue;
 	}
 
 	/*
@@ -637,10 +629,10 @@ public class DefaultFieldSet implements FieldSet {
     @Override
 	public Date readDate(String name, String pattern, Date defaultValue) {
 		try {
-			return readDate(name, pattern);
+			return readDate(indexOf(name), pattern, defaultValue);
 		}
 		catch (IllegalArgumentException e) {
-			return defaultValue;
+			throw new IllegalArgumentException(e.getMessage() + ", name: [" + name + "]");
 		}
 	}
 
