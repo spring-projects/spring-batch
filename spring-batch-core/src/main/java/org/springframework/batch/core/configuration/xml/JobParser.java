@@ -69,8 +69,9 @@ public class JobParser extends AbstractSingleBeanDefinitionParser {
 
 		if (!CoreNamespaceUtils.namespaceMatchesVersion(element)) {
 			parserContext.getReaderContext().error(
-					"You cannot use spring-batch-2.0.xsd with Spring Batch 2.1.  Please upgrade your schema declarations "
-							+ "(or use the spring-batch.xsd alias if you are feeling lucky).", element);
+				"You are using a version of the spring-batch XSD that is not compatible with Spring Batch 3.0." +
+				"  Please upgrade your schema declarations (or use the spring-batch.xsd alias if you are " +
+				"feeling lucky).", element);
 			return;
 		}
 
