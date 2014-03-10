@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2012 the original author or authors.
+ * Copyright 2006-2014 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -81,6 +81,7 @@ public class DelimitedLineTokenizerTests {
 		catch (IncorrectTokenCountException e) {
 			assertEquals(2, e.getExpectedCount());
 			assertEquals(3, e.getActualCount());
+			assertEquals("a,b,c", e.getInput());
 		}
 	}
 
@@ -104,6 +105,7 @@ public class DelimitedLineTokenizerTests {
 		catch(IncorrectTokenCountException e){
 			assertEquals(4, e.getExpectedCount());
 			assertEquals(3, e.getActualCount());
+			assertEquals("a,b,c", e.getInput());
 		}
 
 	}
@@ -279,6 +281,7 @@ public class DelimitedLineTokenizerTests {
 		catch(IncorrectTokenCountException ex){
 			assertEquals(2, ex.getExpectedCount());
 			assertEquals(0, ex.getActualCount());
+			assertEquals("", ex.getInput());
 		}
 	}
 
