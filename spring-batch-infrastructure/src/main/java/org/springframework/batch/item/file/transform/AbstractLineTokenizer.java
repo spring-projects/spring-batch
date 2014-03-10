@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2007 the original author or authors.
+ * Copyright 2006-2014 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -28,6 +28,7 @@ import java.util.List;
  * @author Dave Syer
  * @author Robert Kasanicky
  * @author Lucas Ward
+ * @author Michael Minella
  */
 public abstract class AbstractLineTokenizer implements LineTokenizer {
 
@@ -121,7 +122,7 @@ public abstract class AbstractLineTokenizer implements LineTokenizer {
 			return fieldSetFactory.create(values);
 		}
 		else if (values.length != names.length) {
-			throw new IncorrectTokenCountException(names.length, values.length);
+			throw new IncorrectTokenCountException(names.length, values.length, line);
 		}
 		return fieldSetFactory.create(values, names);
 	}

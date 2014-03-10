@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2008 the original author or authors.
+ * Copyright 2006-2014 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,11 +22,23 @@ package org.springframework.batch.item.file.transform;
  * attempting to parse a line of input into tokens.
  * 
  * @author Lucas Ward
+ * @author Michael Minella
  *
  */
 @SuppressWarnings("serial")
 public class FlatFileFormatException extends RuntimeException {
 
+	private String input;
+
+	/**
+	 * Create a new {@link FlatFileFormatException} based on a message.
+	 *
+	 * @param message the message for this exception
+	 */
+	public FlatFileFormatException(String message, String input) {
+		super(message);
+		this.input = input;
+	}
 	/**
 	 * Create a new {@link FlatFileFormatException} based on a message.
 	 * 
@@ -45,4 +57,6 @@ public class FlatFileFormatException extends RuntimeException {
 	public FlatFileFormatException(String message, Throwable cause) {
 		super(message, cause);
 	}
+
+	public String getInput() { return input; }
 }

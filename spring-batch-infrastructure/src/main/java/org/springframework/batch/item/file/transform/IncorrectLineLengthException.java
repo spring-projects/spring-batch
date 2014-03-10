@@ -20,6 +20,7 @@ package org.springframework.batch.item.file.transform;
  * is expected.
  * 
  * @author Lucas Ward
+ * @author Michael Minella
  * @since 1.1
  */
 @SuppressWarnings("serial")
@@ -27,13 +28,31 @@ public class IncorrectLineLengthException extends FlatFileFormatException {
 
 	private int actualLength;
 	private int expectedLength;
-	
+
+	/**
+	 * @since 2.2.6
+	 */
+	public IncorrectLineLengthException(String message, int expectedLength, int actualLength, String input) {
+		super(message, input);
+		this.expectedLength = expectedLength;
+		this.actualLength = actualLength;
+	}
+
 	public IncorrectLineLengthException(String message, int expectedLength, int actualLength) {
 		super(message);
 		this.expectedLength = expectedLength;
 		this.actualLength = actualLength;
 	}
-	
+
+	/**
+	 * @since 2.2.6
+	 */
+	public IncorrectLineLengthException(int expectedLength, int actualLength, String input) {
+		super("Incorrect line length in record: expected " + expectedLength + " actual " + actualLength, input);
+		this.actualLength = actualLength;
+		this.expectedLength = expectedLength;
+	}
+
 	public IncorrectLineLengthException(int expectedLength, int actualLength) {
 		super("Incorrect line length in record: expected " + expectedLength + " actual " + actualLength);
 		this.actualLength = actualLength;

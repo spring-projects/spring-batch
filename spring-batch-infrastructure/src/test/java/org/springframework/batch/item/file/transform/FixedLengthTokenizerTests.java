@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2007 the original author or authors.
+ * Copyright 2006-2014 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -41,6 +41,7 @@ public class FixedLengthTokenizerTests {
 		catch (IncorrectLineLengthException ex) {
 			assertEquals(15, ex.getExpectedLength());
 			assertEquals(0, ex.getActualLength());
+			assertEquals("", ex.getInput());
 		}
 	}
 
@@ -60,6 +61,7 @@ public class FixedLengthTokenizerTests {
 		catch (IncorrectLineLengthException ex) {
 			assertEquals(15, ex.getExpectedLength());
 			assertEquals(5, ex.getActualLength());
+			assertEquals("12345", ex.getInput());
 		}
 
 	}
@@ -97,6 +99,7 @@ public class FixedLengthTokenizerTests {
 			fail("Expected IncorrectLineLengthException");
 		}
 		catch (IncorrectLineLengthException ex) {
+			assertEquals("", ex.getInput());
 		}
 	}
 
@@ -135,6 +138,7 @@ public class FixedLengthTokenizerTests {
 		catch (IncorrectLineLengthException ex) {
 			assertEquals(30, ex.getExpectedLength());
 			assertEquals(35, ex.getActualLength());
+			assertEquals(line, ex.getInput());
 		}
 	}
 

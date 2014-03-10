@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2008 the original author or authors.
+ * Copyright 2006-2014 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,6 +20,7 @@ package org.springframework.batch.item.file.transform;
  * while parsing a file.
  * 
  * @author Lucas Ward
+ * @author "Michael Minella"
  * @since 1.1
  */
 @SuppressWarnings("serial")
@@ -27,13 +28,28 @@ public class IncorrectTokenCountException extends FlatFileFormatException {
 
 	private int actualCount;
 	private int expectedCount;
-	
+	private String input;
+
+	public IncorrectTokenCountException(String message, int expectedCount, int actualCount, String input) {
+		super(message);
+		this.expectedCount = expectedCount;
+		this.actualCount = actualCount;
+		this.input = input;
+	}
+
 	public IncorrectTokenCountException(String message, int expectedCount, int actualCount) {
 		super(message);
 		this.expectedCount = expectedCount;
 		this.actualCount = actualCount;
 	}
-	
+
+	public IncorrectTokenCountException(int expectedCount, int actualCount, String input) {
+		super("Incorrect number of tokens found in record: expected " + expectedCount + " actual " + actualCount);
+		this.expectedCount = expectedCount;
+		this.actualCount = actualCount;
+		this.input = input;
+	}
+
 	public IncorrectTokenCountException(int expectedCount, int actualCount) {
 		super("Incorrect number of tokens found in record: expected " + expectedCount + " actual " + actualCount);
 		this.actualCount = actualCount;
@@ -47,4 +63,10 @@ public class IncorrectTokenCountException extends FlatFileFormatException {
 	public int getExpectedCount() {
 		return expectedCount;
 	}
+
+	/**
+	 * @return the line that caused the exception
+	 * @since 2.2.6
+	 */
+	public String getInput() { return input; }
 }
