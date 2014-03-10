@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2013 the original author or authors.
+ * Copyright 2006-2014 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -54,15 +54,15 @@ public class SimpleStepHandler implements StepHandler, InitializingBean {
 	}
 
 	/**
-	 * @param jobRepository
+	 * @param jobRepository a {@link org.springframework.batch.core.repository.JobRepository}
 	 */
 	public SimpleStepHandler(JobRepository jobRepository) {
 		this(jobRepository, new ExecutionContext());
 	}
 
 	/**
-	 * @param jobRepository
-	 * @param executionContext
+	 * @param jobRepository a {@link org.springframework.batch.core.repository.JobRepository}
+	 * @param executionContext the {@link org.springframework.batch.item.ExecutionContext} for the current Step
 	 */
 	public SimpleStepHandler(JobRepository jobRepository, ExecutionContext executionContext) {
 		this.jobRepository = jobRepository;
@@ -132,6 +132,10 @@ public class SimpleStepHandler implements StepHandler, InitializingBean {
 
 			if (isRestart) {
 				currentStepExecution.setExecutionContext(lastStepExecution.getExecutionContext());
+
+				if(lastStepExecution.getExecutionContext().containsKey("batch.executed")) {
+					currentStepExecution.getExecutionContext().remove("batch.executed");
+				}
 			}
 			else {
 				currentStepExecution.setExecutionContext(new ExecutionContext(executionContext));
@@ -142,6 +146,7 @@ public class SimpleStepHandler implements StepHandler, InitializingBean {
 			logger.info("Executing step: [" + step.getName() + "]");
 			try {
 				step.execute(currentStepExecution);
+				currentStepExecution.getExecutionContext().put("batch.executed", true);
 			}
 			catch (JobInterruptedException e) {
 				// Ensure that the job gets the message that it is stopping
@@ -161,9 +166,6 @@ public class SimpleStepHandler implements StepHandler, InitializingBean {
 			}
 
 		}
-		else {
-			// currentStepExecution.setExitStatus(ExitStatus.NOOP);
-		}
 
 		return currentStepExecution;
 	}
@@ -172,7 +174,7 @@ public class SimpleStepHandler implements StepHandler, InitializingBean {
 	 * Detect whether a step execution belongs to this job execution.
 	 * @param jobExecution the current job execution
 	 * @param stepExecution an existing step execution
-	 * @return
+	 * @return true if the {@link org.springframework.batch.core.StepExecution} is part of the {@link org.springframework.batch.core.JobExecution}
 	 */
 	private boolean stepExecutionPartOfExistingJobExecution(JobExecution jobExecution, StepExecution stepExecution) {
 		return stepExecution != null && stepExecution.getJobExecutionId() != null
@@ -208,7 +210,7 @@ public class SimpleStepHandler implements StepHandler, InitializingBean {
 					+ "so it may be dangerous to proceed. Manual intervention is probably necessary.");
 		}
 
-		if ((stepStatus == BatchStatus.COMPLETED && step.isAllowStartIfComplete() == false)
+		if ((stepStatus == BatchStatus.COMPLETED && !step.isAllowStartIfComplete())
 				|| stepStatus == BatchStatus.ABANDONED) {
 			// step is complete, false should be returned, indicating that the
 			// step should not be started

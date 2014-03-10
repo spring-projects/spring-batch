@@ -89,11 +89,8 @@ import java.util.Set;
  * additional properties for retry and skip of failed items.
  *
  * @author Dave Syer
-<<<<<<< HEAD
  * @author Chris Schaefer
-=======
  * @author Michael Minella
->>>>>>> 2c62f20... BATCH-2185: Updated to support annotation based listener configuration via javaconfig
  *
  * @since 2.2
  */
