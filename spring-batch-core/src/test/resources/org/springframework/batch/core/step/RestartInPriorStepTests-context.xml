@@ -4,8 +4,6 @@
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://www.springframework.org/schema/beans
                     http://www.springframework.org/schema/beans/spring-beans.xsd
-					http://www.springframework.org/schema/util
-					http://www.springframework.org/schema/util/spring-util.xsd
 					http://www.springframework.org/schema/batch
 	                http://www.springframework.org/schema/batch/spring-batch-2.2.xsd">
 	                
@@ -54,7 +52,9 @@
 		</step>
 		<step id="step2">
 			<tasklet ref="decidingTasklet"/>
+            <!-- Second Run -->
 			<next on="ES3" to="step3"/>
+            <!-- First Run -->
 			<stop on="ES4" restart="step4"/>
 		</step>
 		<step id="step3" next="step4">
@@ -62,12 +62,12 @@
 				<chunk reader="step2ItemReader" writer="step2ItemWriter" commit-interval="10" />
 			</tasklet>
 		</step>
-		<step id="step4" next="completionDecider">
+		<step id="step4" next="completionDeciderStep">
 			<tasklet>
 				<chunk reader="step3ItemReader" writer="step3ItemWriter" commit-interval="10" />
 			</tasklet>
 		</step>
-		<decision decider="completionDecider" id="completionDecider">
+		<decision decider="completionDecider" id="completionDeciderStep">
 			<next on="CONTINUE" to="step3"/>
 			<end on="END"/>
 		</decision>
