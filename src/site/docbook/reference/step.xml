@@ -1541,7 +1541,7 @@ itemWriter.write(items);</programlisting>
       Jobs</title>
 
       <para>Part of the flow in a job can be externalized as a separate bean
-      definition, and then re-used. There are three ways to do this, and the
+      definition, and then re-used. There are two ways to do this, and the
       first is to simply declare the flow as a reference to one defined
       elsewhere:</para>
 
@@ -1562,29 +1562,7 @@ itemWriter.write(items);</programlisting>
       also a good way to separate the integration testing of the individual
       flows.</para>
 
-      <para>The second form of an externalized flow is to use a
-      <classname>FlowStep</classname>. A <classname>FlowStep</classname> is an
-      implementation of the <classname>Step</classname> interface that
-      delegates processing to a flow defined as above with a
-      <literal>&lt;flow/&gt;</literal> element in XML. There is also support
-      for creating a FlowStep in XML directly:</para>
-
-      <para><programlisting>&lt;job id="job"&gt;
-    &lt;step id="job1.flow1" flow="flow1" next="step3"/&gt;
-    &lt;step id="step3" parent="s3"/&gt;
-&lt;/job&gt;
-
-&lt;flow id="flow1"&gt;
-    &lt;step id="step1" parent="s1" next="step2"/&gt;
-    &lt;step id="step2" parent="s2"/&gt;
-&lt;/flow&gt;</programlisting>The logic of execution of this job is the same
-      as the previous example, but the data stored in the job repository is
-      different: the <classname>Step</classname> "job1.flow1" gets its own
-      entry in the repository. This can be useful for monitoring and reporting
-      purposes, and moreover it can be used to give more structure to a <link
-      linkend="partitioning">partitioned step</link>.</para>
-
-      <para>The third form of an externalized flow is to use a
+      <para>The other form of an externalized flow is to use a
       <classname>JobStep</classname>. A <classname>JobStep</classname> is
       similar to a <classname>FlowStep</classname>, but actually creates and
       launches a separate job execution for the steps in the flow specified.
