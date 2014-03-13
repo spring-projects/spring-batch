@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2011 the original author or authors.
+ * Copyright 2006-2014 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,24 +15,32 @@
  */
 package org.springframework.batch.core.step.builder;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.batch.core.Step;
 import org.springframework.batch.core.StepExecutionListener;
+import org.springframework.batch.core.annotation.AfterStep;
+import org.springframework.batch.core.annotation.BeforeStep;
+import org.springframework.batch.core.listener.StepListenerFactoryBean;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.step.AbstractStep;
 import org.springframework.batch.core.step.tasklet.TaskletStep;
+import org.springframework.batch.support.ReflectionUtils;
 import org.springframework.transaction.PlatformTransactionManager;
+
+import java.lang.reflect.Method;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 /**
  * A base class and utility for other step builders providing access to common properties like job repository and
  * transaction manager.
  * 
  * @author Dave Syer
- * 
+ * @author Michael Minella
+ *
  * @since 2.2
  */
 public abstract class StepBuilderHelper<B extends StepBuilderHelper<B>> {
@@ -71,6 +79,28 @@ public abstract class StepBuilderHelper<B extends StepBuilderHelper<B>> {
 
 	public B startLimit(int startLimit) {
 		properties.startLimit = startLimit;
+		@SuppressWarnings("unchecked")
+		B result = (B) this;
+		return result;
+	}
+
+	/**
+	 * Registers objects using the annotation based listener configuration.
+	 *
+	 * @param listener the object that has a method configured with listener annotation
+	 * @return this for fluent chaining
+	 */
+	public B listener(Object listener) {
+		Set<Method> stepExecutionListenerMethods = new HashSet<Method>();
+		stepExecutionListenerMethods.addAll(ReflectionUtils.findMethod(listener.getClass(), BeforeStep.class));
+		stepExecutionListenerMethods.addAll(ReflectionUtils.findMethod(listener.getClass(), AfterStep.class));
+
+		if(stepExecutionListenerMethods.size() > 0) {
+			StepListenerFactoryBean factory = new StepListenerFactoryBean();
+			factory.setDelegate(listener);
+			properties.addStepExecutionListener((StepExecutionListener) factory.getObject());
+		}
+
 		@SuppressWarnings("unchecked")
 		B result = (B) this;
 		return result;

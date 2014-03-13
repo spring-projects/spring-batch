@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2013 the original author or authors.
+ * Copyright 2006-2014 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,16 +15,21 @@
  */
 package org.springframework.batch.core.step.builder;
 
-import java.util.ArrayList;
-import java.util.LinkedHashSet;
-import java.util.Set;
-
 import org.springframework.batch.core.ChunkListener;
 import org.springframework.batch.core.ItemProcessListener;
 import org.springframework.batch.core.ItemReadListener;
 import org.springframework.batch.core.ItemWriteListener;
 import org.springframework.batch.core.StepExecutionListener;
 import org.springframework.batch.core.StepListener;
+import org.springframework.batch.core.annotation.AfterProcess;
+import org.springframework.batch.core.annotation.AfterRead;
+import org.springframework.batch.core.annotation.AfterWrite;
+import org.springframework.batch.core.annotation.BeforeProcess;
+import org.springframework.batch.core.annotation.BeforeRead;
+import org.springframework.batch.core.annotation.BeforeWrite;
+import org.springframework.batch.core.annotation.OnProcessError;
+import org.springframework.batch.core.annotation.OnReadError;
+import org.springframework.batch.core.annotation.OnWriteError;
 import org.springframework.batch.core.listener.StepListenerFactoryBean;
 import org.springframework.batch.core.step.item.ChunkOrientedTasklet;
 import org.springframework.batch.core.step.item.SimpleChunkProcessor;
@@ -39,7 +44,14 @@ import org.springframework.batch.repeat.CompletionPolicy;
 import org.springframework.batch.repeat.RepeatOperations;
 import org.springframework.batch.repeat.policy.SimpleCompletionPolicy;
 import org.springframework.batch.repeat.support.RepeatTemplate;
+import org.springframework.batch.support.ReflectionUtils;
 import org.springframework.util.Assert;
+
+import java.lang.reflect.Method;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.LinkedHashSet;
+import java.util.Set;
 
 /**
  * Step builder for simple item processing (chunk oriented) steps. Items are read and cached in chunks, and then
@@ -229,6 +241,39 @@ public class SimpleStepBuilder<I, O> extends AbstractTaskletStepBuilder<SimpleSt
 		this.readerTransactionalQueue = true;
 		return this;
 	}
+
+	/**
+	 * Registers objects using the annotation based listener configuration.
+	 *
+	 * @param listener the object that has a method configured with listener annotation
+	 * @return this for fluent chaining
+	 */
+	@Override
+	public SimpleStepBuilder listener(Object listener) {
+		super.listener(listener);
+
+		Set<Method> itemListenerMethods = new HashSet<Method>();
+		itemListenerMethods.addAll(ReflectionUtils.findMethod(listener.getClass(), BeforeRead.class));
+		itemListenerMethods.addAll(ReflectionUtils.findMethod(listener.getClass(), AfterRead.class));
+		itemListenerMethods.addAll(ReflectionUtils.findMethod(listener.getClass(), BeforeProcess.class));
+		itemListenerMethods.addAll(ReflectionUtils.findMethod(listener.getClass(), AfterProcess.class));
+		itemListenerMethods.addAll(ReflectionUtils.findMethod(listener.getClass(), BeforeWrite.class));
+		itemListenerMethods.addAll(ReflectionUtils.findMethod(listener.getClass(), AfterWrite.class));
+		itemListenerMethods.addAll(ReflectionUtils.findMethod(listener.getClass(), OnReadError.class));
+		itemListenerMethods.addAll(ReflectionUtils.findMethod(listener.getClass(), OnProcessError.class));
+		itemListenerMethods.addAll(ReflectionUtils.findMethod(listener.getClass(), OnWriteError.class));
+
+		if(itemListenerMethods.size() > 0) {
+			StepListenerFactoryBean factory = new StepListenerFactoryBean();
+			factory.setDelegate(listener);
+			itemListeners.add((StepListener) factory.getObject());
+		}
+
+		@SuppressWarnings("unchecked")
+		SimpleStepBuilder result = this;
+		return result;
+	}
+
 
 	/**
 	 * Register an item reader listener.
