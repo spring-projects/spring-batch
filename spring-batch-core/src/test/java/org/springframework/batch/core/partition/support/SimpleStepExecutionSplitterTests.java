@@ -1,16 +1,5 @@
 package org.springframework.batch.core.partition.support;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
-
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Date;
-import java.util.Map;
-import java.util.Set;
-
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.batch.core.BatchStatus;
@@ -25,6 +14,17 @@ import org.springframework.batch.core.repository.support.MapJobRepositoryFactory
 import org.springframework.batch.core.step.tasklet.TaskletStep;
 import org.springframework.batch.item.ExecutionContext;
 
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Date;
+import java.util.Map;
+import java.util.Set;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
 public class SimpleStepExecutionSplitterTests {
 
 	private Step step;
@@ -37,7 +37,7 @@ public class SimpleStepExecutionSplitterTests {
 	public void setUp() throws Exception {
 		step = new TaskletStep("step");
 		MapJobRepositoryFactoryBean factory = new MapJobRepositoryFactoryBean();
-		jobRepository = (JobRepository) factory.getObject();
+		jobRepository = factory.getObject();
 		stepExecution = jobRepository.createJobExecution("job", new JobParameters()).createStepExecution("bar");
 		jobRepository.add(stepExecution);
 	}

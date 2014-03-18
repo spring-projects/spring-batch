@@ -22,7 +22,7 @@ public class MapJobExplorerFactoryBeanTests {
 	public void testCreateExplorer() throws Exception {
 
 		MapJobRepositoryFactoryBean repositoryFactory = new MapJobRepositoryFactoryBean();
-		((JobRepository)repositoryFactory.getObject()).createJobExecution("foo", new JobParameters());
+		(repositoryFactory.getObject()).createJobExecution("foo", new JobParameters());
 		
 		MapJobExplorerFactoryBean tested = new MapJobExplorerFactoryBean(repositoryFactory);
 		tested.afterPropertiesSet();

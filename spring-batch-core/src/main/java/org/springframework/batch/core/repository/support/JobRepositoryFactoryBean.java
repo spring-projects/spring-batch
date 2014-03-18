@@ -16,13 +16,6 @@
 
 package org.springframework.batch.core.repository.support;
 
-import static org.springframework.batch.support.DatabaseType.SYBASE;
-
-import java.lang.reflect.Field;
-import java.sql.Types;
-
-import javax.sql.DataSource;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.batch.core.repository.ExecutionContextSerializer;
@@ -47,6 +40,12 @@ import org.springframework.jdbc.support.lob.LobHandler;
 import org.springframework.jdbc.support.lob.OracleLobHandler;
 import org.springframework.util.Assert;
 import org.springframework.util.StringUtils;
+
+import javax.sql.DataSource;
+import java.lang.reflect.Field;
+import java.sql.Types;
+
+import static org.springframework.batch.support.DatabaseType.SYBASE;
 
 /**
  * A {@link FactoryBean} that automates the creation of a
@@ -92,7 +91,7 @@ public class JobRepositoryFactoryBean extends AbstractJobRepositoryFactoryBean i
 	 * A custom implementation of the {@link ExecutionContextSerializer}.
 	 * The default, if not injected, is the {@link XStreamExecutionContextStringSerializer}.
 	 *
-	 * @param serializer
+	 * @param serializer used to serialize/deserialize {@link org.springframework.batch.item.ExecutionContext}
 	 * @see ExecutionContextSerializer
 	 */
 	public void setSerializer(ExecutionContextSerializer serializer) {
@@ -156,7 +155,7 @@ public class JobRepositoryFactoryBean extends AbstractJobRepositoryFactoryBean i
 
 	/**
 	 * Sets the table prefix for all the batch meta-data tables.
-	 * @param tablePrefix
+	 * @param tablePrefix prefix prepended to batch meta-data tables
 	 */
 	public void setTablePrefix(String tablePrefix) {
 		this.tablePrefix = tablePrefix;

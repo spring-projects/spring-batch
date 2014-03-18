@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2010 the original author or authors.
+ * Copyright 2006-2014 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,11 +15,6 @@
  */
 package org.springframework.batch.core.step.job;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
-
-import java.util.Date;
-
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.batch.core.BatchStatus;
@@ -32,6 +27,11 @@ import org.springframework.batch.core.launch.support.SimpleJobLauncher;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.repository.support.MapJobRepositoryFactoryBean;
 import org.springframework.batch.item.ExecutionContext;
+
+import java.util.Date;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 /**
  * @author Dave Syer
@@ -49,7 +49,7 @@ public class JobStepTests {
 	public void setUp() throws Exception {
 		step.setName("step");
 		MapJobRepositoryFactoryBean factory = new MapJobRepositoryFactoryBean();
-		jobRepository = (JobRepository) factory.getObject();
+		jobRepository = factory.getObject();
 		step.setJobRepository(jobRepository);
 		JobExecution jobExecution = jobRepository.createJobExecution("job", new JobParameters());
 		stepExecution = jobExecution.createStepExecution("step");

@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2013 the original author or authors.
+ * Copyright 2006-2014 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,14 +15,6 @@
  */
 package org.springframework.batch.core.partition.support;
 
-import static org.junit.Assert.assertEquals;
-
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Date;
-import java.util.Set;
-import java.util.concurrent.atomic.AtomicBoolean;
-
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.batch.core.BatchStatus;
@@ -34,6 +26,14 @@ import org.springframework.batch.core.partition.PartitionHandler;
 import org.springframework.batch.core.partition.StepExecutionSplitter;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.repository.support.MapJobRepositoryFactoryBean;
+
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Date;
+import java.util.Set;
+import java.util.concurrent.atomic.AtomicBoolean;
+
+import static org.junit.Assert.assertEquals;
 
 /**
  * @author Dave Syer
@@ -48,7 +48,7 @@ public class PartitionStepTests {
 	@Before
 	public void setUp() throws Exception {
 		MapJobRepositoryFactoryBean factory = new MapJobRepositoryFactoryBean();
-		jobRepository = (JobRepository) factory.getObject();
+		jobRepository = factory.getObject();
 		step.setJobRepository(jobRepository);
 		step.setName("partitioned");
 	}

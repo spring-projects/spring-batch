@@ -80,7 +80,7 @@ public class DefaultBatchConfigurer implements BatchConfigurer {
 		factory.setDataSource(dataSource);
 		factory.setTransactionManager(transactionManager);
 		factory.afterPropertiesSet();
-		return  (JobRepository) factory.getObject();
+		return  factory.getObject();
 	}
 
 }

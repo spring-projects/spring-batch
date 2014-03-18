@@ -1,11 +1,5 @@
 package org.springframework.batch.core.step.item;
 
-import static org.junit.Assert.assertEquals;
-
-import java.util.Arrays;
-
-import javax.sql.DataSource;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.junit.Test;
@@ -27,6 +21,11 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.transaction.TransactionException;
 import org.springframework.transaction.UnexpectedRollbackException;
 import org.springframework.transaction.support.DefaultTransactionStatus;
+
+import javax.sql.DataSource;
+import java.util.Arrays;
+
+import static org.junit.Assert.assertEquals;
 
 /**
  * Tests for {@link FaultTolerantStepFactoryBean} with unexpected rollback.
@@ -74,7 +73,7 @@ public class FaultTolerantStepFactoryBeanUnexpectedRollbackTests {
 		repositoryFactory.setDataSource(dataSource);
 		repositoryFactory.setTransactionManager(transactionManager);
 		repositoryFactory.afterPropertiesSet();
-		JobRepository repository = (JobRepository) repositoryFactory.getObject();
+		JobRepository repository = repositoryFactory.getObject();
 		factory.setJobRepository(repository);
 
 		JobExecution jobExecution = repository.createJobExecution("job", new JobParameters());

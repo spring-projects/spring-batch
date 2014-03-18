@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2007 the original author or authors.
+ * Copyright 2006-2014 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -60,7 +60,7 @@ public class MapJobRepositoryFactoryBean extends AbstractJobRepositoryFactoryBea
 	/**
 	 * Create a new instance with the provided transaction manager.
 	 * 
-	 * @param transactionManager
+	 * @param transactionManager {@link org.springframework.transaction.PlatformTransactionManager}
 	 */
 	public MapJobRepositoryFactoryBean(PlatformTransactionManager transactionManager) {
 		setTransactionManager(transactionManager);

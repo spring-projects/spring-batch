@@ -1,16 +1,5 @@
 package org.springframework.batch.core.step.item;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
-
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
 import org.aopalliance.intercept.MethodInterceptor;
 import org.aopalliance.intercept.MethodInvocation;
 import org.apache.commons.logging.Log;
@@ -55,6 +44,17 @@ import org.springframework.beans.factory.FactoryBean;
 import org.springframework.scheduling.concurrent.ConcurrentTaskExecutor;
 import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.util.StringUtils;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 /**
  * Tests for {@link FaultTolerantStepFactoryBean}.
@@ -111,7 +111,7 @@ public class FaultTolerantStepFactoryBeanTests {
 
 		MapJobRepositoryFactoryBean repositoryFactory = new MapJobRepositoryFactoryBean();
 		repositoryFactory.afterPropertiesSet();
-		repository = (JobRepository) repositoryFactory.getObject();
+		repository = repositoryFactory.getObject();
 		factory.setJobRepository(repository);
 
 		jobExecution = repository.createJobExecution("skipJob", new JobParameters());

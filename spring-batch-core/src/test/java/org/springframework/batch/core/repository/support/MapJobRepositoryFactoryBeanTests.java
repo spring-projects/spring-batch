@@ -1,13 +1,13 @@
 package org.springframework.batch.core.repository.support;
 
-import static org.junit.Assert.fail;
-
 import org.junit.Test;
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.JobParameters;
 import org.springframework.batch.core.job.JobSupport;
 import org.springframework.batch.core.repository.JobExecutionAlreadyRunningException;
 import org.springframework.batch.core.repository.JobRepository;
+
+import static org.junit.Assert.fail;
 
 /**
  * Tests for {@link MapJobRepositoryFactoryBean}.
@@ -23,7 +23,7 @@ public class MapJobRepositoryFactoryBeanTests {
 	@Test
 	public void testCreateRepository() throws Exception {
 		tested.afterPropertiesSet();
-		JobRepository repository = (JobRepository) tested.getObject();
+		JobRepository repository = tested.getObject();
 		Job job = new JobSupport("jobName");
 		JobParameters jobParameters = new JobParameters();
 

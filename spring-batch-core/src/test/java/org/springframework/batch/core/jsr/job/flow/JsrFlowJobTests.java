@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2013 the original author or authors.
+ * Copyright 2006-2014 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,18 +14,6 @@
  * limitations under the License.
  */
 package org.springframework.batch.core.jsr.job.flow;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.fail;
-
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
-
-import javax.batch.api.Decider;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -59,6 +47,17 @@ import org.springframework.batch.core.repository.dao.JobExecutionDao;
 import org.springframework.batch.core.repository.support.MapJobRepositoryFactoryBean;
 import org.springframework.batch.core.step.StepSupport;
 
+import javax.batch.api.Decider;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.fail;
+
 /**
  * @author Dave Syer
  * @author Michael Minella
@@ -83,7 +82,7 @@ public class JsrFlowJobTests {
 		MapJobRepositoryFactoryBean jobRepositoryFactory = new MapJobRepositoryFactoryBean();
 		jobRepositoryFactory.afterPropertiesSet();
 		jobExecutionDao = jobRepositoryFactory.getJobExecutionDao();
-		jobRepository = (JobRepository) jobRepositoryFactory.getObject();
+		jobRepository = jobRepositoryFactory.getObject();
 		job.setJobRepository(jobRepository);
 		jobExecution = jobRepository.createJobExecution("job", new JobParameters());
 

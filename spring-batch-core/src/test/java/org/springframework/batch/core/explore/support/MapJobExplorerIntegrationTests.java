@@ -15,10 +15,6 @@
  */
 package org.springframework.batch.core.explore.support;
 
-import static org.junit.Assert.assertEquals;
-
-import java.util.Set;
-
 import org.junit.Test;
 import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.JobParametersBuilder;
@@ -34,6 +30,10 @@ import org.springframework.batch.core.step.tasklet.TaskletStep;
 import org.springframework.batch.repeat.RepeatStatus;
 import org.springframework.core.task.SimpleAsyncTaskExecutor;
 
+import java.util.Set;
+
+import static org.junit.Assert.assertEquals;
+
 /**
  * @author Dave Syer
  *
@@ -48,7 +48,7 @@ public class MapJobExplorerIntegrationTests {
 		SimpleJobLauncher jobLauncher = new SimpleJobLauncher();
 		MapJobRepositoryFactoryBean repositoryFactory = new MapJobRepositoryFactoryBean();
 		repositoryFactory.afterPropertiesSet();
-		JobRepository jobRepository = (JobRepository) repositoryFactory.getObject();
+		JobRepository jobRepository = repositoryFactory.getObject();
 		jobLauncher.setJobRepository(jobRepository);
 		jobLauncher.setTaskExecutor(new SimpleAsyncTaskExecutor());
 		jobLauncher.afterPropertiesSet();
