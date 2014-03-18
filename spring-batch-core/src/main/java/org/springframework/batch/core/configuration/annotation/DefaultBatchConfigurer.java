@@ -18,6 +18,7 @@ package org.springframework.batch.core.configuration.annotation;
 import javax.annotation.PostConstruct;
 import javax.sql.DataSource;
 
+import org.springframework.batch.core.configuration.BatchConfigurationException;
 import org.springframework.batch.core.launch.JobLauncher;
 import org.springframework.batch.core.launch.support.SimpleJobLauncher;
 import org.springframework.batch.core.repository.JobRepository;
@@ -63,9 +64,13 @@ public class DefaultBatchConfigurer implements BatchConfigurer {
 	}
 
 	@PostConstruct
-	public void initialize() throws Exception {
-		this.jobRepository = createJobRepository();
-		this.jobLauncher = createJobLauncher();
+	public void initialize() throws BatchConfigurationException {
+		try {
+			this.jobRepository = createJobRepository();
+			this.jobLauncher = createJobLauncher();
+		} catch (Exception e) {
+			throw new BatchConfigurationException(e);
+		}
 	}
 
 	private JobLauncher createJobLauncher() throws Exception {
