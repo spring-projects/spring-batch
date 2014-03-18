@@ -15,17 +15,16 @@
  */
 package org.springframework.batch.core.explore.support;
 
-import static junit.framework.Assert.assertTrue;
-import static junit.framework.Assert.fail;
-import static org.mockito.Mockito.mock;
-import static org.junit.Assert.assertNotNull;
-
-import javax.sql.DataSource;
-
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.batch.core.explore.JobExplorer;
-import org.springframework.batch.core.explore.support.JobExplorerFactoryBean;
+
+import javax.sql.DataSource;
+
+import static junit.framework.Assert.assertTrue;
+import static junit.framework.Assert.fail;
+import static org.junit.Assert.assertNotNull;
+import static org.mockito.Mockito.mock;
 
 /**
  * @author Dave Syer
@@ -70,7 +69,7 @@ public class JobExplorerFactoryBeanTests {
 	public void testCreateExplorer() throws Exception {
 
 		factory.afterPropertiesSet();
-		JobExplorer explorer = (JobExplorer) factory.getObject();
+		JobExplorer explorer = factory.getObject();
 		assertNotNull(explorer);
 
 	}

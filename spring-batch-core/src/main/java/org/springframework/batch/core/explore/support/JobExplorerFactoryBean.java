@@ -16,8 +16,7 @@
 
 package org.springframework.batch.core.explore.support;
 
-import javax.sql.DataSource;
-
+import org.springframework.batch.core.explore.JobExplorer;
 import org.springframework.batch.core.repository.ExecutionContextSerializer;
 import org.springframework.batch.core.repository.dao.AbstractJdbcBatchMetadataDao;
 import org.springframework.batch.core.repository.dao.ExecutionContextDao;
@@ -38,6 +37,8 @@ import org.springframework.jdbc.support.incrementer.AbstractDataFieldMaxValueInc
 import org.springframework.jdbc.support.incrementer.DataFieldMaxValueIncrementer;
 import org.springframework.jdbc.support.lob.LobHandler;
 import org.springframework.util.Assert;
+
+import javax.sql.DataSource;
 
 /**
  * A {@link FactoryBean} that automates the creation of a
@@ -71,7 +72,7 @@ implements InitializingBean {
 	 * A custom implementation of the {@link ExecutionContextSerializer}.
 	 * The default, if not injected, is the {@link XStreamExecutionContextStringSerializer}.
 	 *
-	 * @param serializer
+	 * @param serializer used to serialize/deserialize an {@link org.springframework.batch.item.ExecutionContext}
 	 * @see ExecutionContextSerializer
 	 */
 	public void setSerializer(ExecutionContextSerializer serializer) {
@@ -91,7 +92,7 @@ implements InitializingBean {
 	/**
 	 * Sets the table prefix for all the batch meta-data tables.
 	 *
-	 * @param tablePrefix
+	 * @param tablePrefix prefix for the batch meta-data tables
 	 */
 	public void setTablePrefix(String tablePrefix) {
 		this.tablePrefix = tablePrefix;
@@ -101,7 +102,7 @@ implements InitializingBean {
 	 * The lob handler to use when saving {@link ExecutionContext} instances.
 	 * Defaults to null which works for most databases.
 	 *
-	 * @param lobHandler
+	 * @param lobHandler Large object handler for saving {@link org.springframework.batch.item.ExecutionContext}
 	 */
 	public void setLobHandler(LobHandler lobHandler) {
 		this.lobHandler = lobHandler;
@@ -122,7 +123,7 @@ implements InitializingBean {
 		}
 	}
 
-	private Object getTarget() throws Exception {
+	private JobExplorer getTarget() throws Exception {
 		return new SimpleJobExplorer(createJobInstanceDao(),
 				createJobExecutionDao(), createStepExecutionDao(),
 				createExecutionContextDao());
@@ -170,7 +171,7 @@ implements InitializingBean {
 	}
 
 	@Override
-	public Object getObject() throws Exception {
+	public JobExplorer getObject() throws Exception {
 		return getTarget();
 	}
 }
