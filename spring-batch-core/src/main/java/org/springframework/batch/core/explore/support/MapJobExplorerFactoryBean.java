@@ -39,8 +39,8 @@ public class MapJobExplorerFactoryBean extends AbstractJobExplorerFactoryBean im
 
 	/**
 	 * Create an instance with the provided {@link MapJobRepositoryFactoryBean}
-	 * as a source of DAO instances.
-	 * @param repositoryFactory
+	 * as a source of Dao instances.
+	 * @param repositoryFactory provides the used {@link org.springframework.batch.core.repository.JobRepository}
 	 */
 	public MapJobExplorerFactoryBean(MapJobRepositoryFactoryBean repositoryFactory) {
 		this.repositoryFactory = repositoryFactory;
