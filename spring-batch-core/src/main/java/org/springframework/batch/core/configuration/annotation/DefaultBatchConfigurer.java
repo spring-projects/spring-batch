@@ -17,6 +17,12 @@ package org.springframework.batch.core.configuration.annotation;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.springframework.batch.core.configuration.BatchConfigurationException;
+import org.springframework.stereotype.Component;
+
+import javax.annotation.PostConstruct;
+import javax.sql.DataSource;
+
 import org.springframework.batch.core.launch.JobLauncher;
 import org.springframework.batch.core.launch.support.SimpleJobLauncher;
 import org.springframework.batch.core.repository.JobRepository;
@@ -25,11 +31,7 @@ import org.springframework.batch.core.repository.support.MapJobRepositoryFactory
 import org.springframework.batch.support.transaction.ResourcelessTransactionManager;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.datasource.DataSourceTransactionManager;
-import org.springframework.stereotype.Component;
 import org.springframework.transaction.PlatformTransactionManager;
-
-import javax.annotation.PostConstruct;
-import javax.sql.DataSource;
 
 @Component
 public class DefaultBatchConfigurer implements BatchConfigurer {
@@ -68,6 +70,7 @@ public class DefaultBatchConfigurer implements BatchConfigurer {
 	}
 
 	@PostConstruct
+<<<<<<< HEAD
 	public void initialize() throws Exception {
 		if(dataSource == null) {
 			logger.warn("No datasource was provided...using a Map based JobRepository");
@@ -84,6 +87,15 @@ public class DefaultBatchConfigurer implements BatchConfigurer {
 		}
 
 		this.jobLauncher = createJobLauncher();
+=======
+	public void initialize() throws BatchConfigurationException {
+		try {
+			this.jobRepository = createJobRepository();
+			this.jobLauncher = createJobLauncher();
+		} catch (Exception e) {
+			throw new BatchConfigurationException(e);
+		}
+>>>>>>> 3a2cac3... BATCH-2189: Wrapped checked exception with a custom RuntimeException to follow rules for @PostConstruct
 	}
 
 	private JobLauncher createJobLauncher() throws Exception {

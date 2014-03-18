@@ -183,25 +183,9 @@ public class SimpleFlow implements Flow, InitializingBean {
 
 	}
 
-<<<<<<< HEAD
 	protected Map<String, Set<StateTransition>> getTransitionMap() {
 		return transitionMap;
 	}
-=======
-	private boolean isFlowContinued(State state, FlowExecutionStatus status, StepExecution stepExecution) {
-		boolean continued = true;
-
-		continued = state != null && status!=FlowExecutionStatus.STOPPED;
-
-		if(stepExecution != null) {
-			Boolean reRun = (Boolean) stepExecution.getExecutionContext().get("batch.restart");
-			Boolean executed = (Boolean) stepExecution.getExecutionContext().get("batch.executed");
-
-			if((executed == null || !executed) && reRun != null && reRun && status == FlowExecutionStatus.STOPPED && !state.getName().endsWith(stepExecution.getStepName())) {
-				continued = true;
-			}
-		}
->>>>>>> 4e5b4c1... BATCH-2016: Added new flag to indicate if the step is being executed on
 
 	protected Map<String, State> getStateMap() {
 		return stateMap;
