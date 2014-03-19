@@ -1,0 +1,4 @@
+# Tooling related information for the Spring Batch Integration namespace
+http\://www.springframework.org/schema/integration/spring-batch-integration@name=Spring Batch Integration Namespace
+http\://www.springframework.org/schema/integration/spring-batch-integration@prefix=batch-int
+http\://www.springframework.org/schema/integration/spring-batch-integration@icon=org/springframework/batch/integration/config/xml/spring-batch-integration.gif

@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 the original author or authors.
+ * Copyright 2013-2014 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -42,6 +42,9 @@ public class ListenerParser {
 	private static final String REF_ATTRIBUTE = "ref";
 	private static final String LISTENER_ELEMENT = "listener";
 	private static final String LISTENERS_ELEMENT = "listeners";
+	private static final String SCOPE_STEP = "step";
+	private static final String SCOPE_JOB = "job";
+
 	@SuppressWarnings("rawtypes")
 	private Class listenerType;
 	private String propertyKey;
@@ -103,12 +106,33 @@ public class ListenerParser {
 	}
 
 	protected void applyListenerScope(String beanName, BeanDefinitionRegistry beanDefinitionRegistry) {
-		if (listenerType == JobListenerFactoryBean.class) {
-			if (beanDefinitionRegistry.containsBeanDefinition(beanName)) {
-				BeanDefinition beanDefinition = beanDefinitionRegistry.getBeanDefinition(beanName);
-				beanDefinition.setScope(BeanDefinition.SCOPE_SINGLETON);
-			}
+		BeanDefinition beanDefinition = getListenerBeanDefinition(beanName, beanDefinitionRegistry);
+		beanDefinition.setScope(getListenerScope());
+		beanDefinition.setLazyInit(isLazyInit());
+
+		if (!beanDefinitionRegistry.containsBeanDefinition(beanName)) {
+			beanDefinitionRegistry.registerBeanDefinition(beanName, beanDefinition);
 		}
+	}
+
+	private BeanDefinition getListenerBeanDefinition(String beanName, BeanDefinitionRegistry beanDefinitionRegistry) {
+		if (beanDefinitionRegistry.containsBeanDefinition(beanName)) {
+			return beanDefinitionRegistry.getBeanDefinition(beanName);
+		}
+
+		return BeanDefinitionBuilder.genericBeanDefinition(beanName).getBeanDefinition();
+	}
+
+	private boolean isLazyInit() {
+		return listenerType == JsrJobListenerFactoryBean.class;
+	}
+
+	private String getListenerScope() {
+		if (listenerType == JsrJobListenerFactoryBean.class) {
+			return SCOPE_JOB;
+		}
+
+		return SCOPE_STEP;
 	}
 
 	private BatchArtifact.BatchArtifactType getBatchArtifactType(String stepName) {

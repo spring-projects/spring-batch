@@ -23,6 +23,7 @@ import javax.sql.DataSource;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
+import org.springframework.batch.core.PooledEmbeddedDataSource;
 import org.springframework.batch.core.configuration.annotation.DefaultBatchConfigurer;
 import org.springframework.batch.core.configuration.annotation.EnableBatchProcessing;
 import org.springframework.batch.core.configuration.xml.DummyItemProcessor;
@@ -101,10 +102,10 @@ public class BatchParserTests {
 
 		@Bean
 		DataSource dataSource() {
-			return new EmbeddedDatabaseBuilder().
+			return new PooledEmbeddedDataSource(new EmbeddedDatabaseBuilder().
 					addScript("classpath:org/springframework/batch/core/schema-drop-hsqldb.sql").
 					addScript("classpath:org/springframework/batch/core/schema-hsqldb.sql").
-					build();
+					build());
 		}
 	}
 }

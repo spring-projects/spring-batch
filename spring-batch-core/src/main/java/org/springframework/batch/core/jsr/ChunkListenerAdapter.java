@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 the original author or authors.
+ * Copyright 2013-2014 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,6 +19,7 @@ import javax.batch.operations.BatchRuntimeException;
 
 import org.springframework.batch.core.ChunkListener;
 import org.springframework.batch.core.scope.context.ChunkContext;
+import org.springframework.batch.core.step.tasklet.UncheckedTransactionException;
 import org.springframework.util.Assert;
 
 /**
@@ -45,7 +46,7 @@ public class ChunkListenerAdapter implements ChunkListener {
 		try {
 			delegate.beforeChunk();
 		} catch (Exception e) {
-			throw new BatchRuntimeException(e);
+			throw new UncheckedTransactionException(e);
 		}
 	}
 
@@ -54,7 +55,7 @@ public class ChunkListenerAdapter implements ChunkListener {
 		try {
 			delegate.afterChunk();
 		} catch (Exception e) {
-			throw new BatchRuntimeException(e);
+			throw new UncheckedTransactionException(e);
 		}
 	}
 
@@ -64,7 +65,7 @@ public class ChunkListenerAdapter implements ChunkListener {
 			try {
 				delegate.onError((Exception) context.getAttribute(ChunkListener.ROLLBACK_EXCEPTION_KEY));
 			} catch (Exception e) {
-				throw new BatchRuntimeException(e);
+				throw new UncheckedTransactionException(e);
 			}
 		} else {
 			throw new BatchRuntimeException("Unable to retrieve causing exception due to null ChunkContext");

@@ -63,7 +63,7 @@ import org.springframework.util.Assert;
  * then you must wrap the DataSource in a {@link ExtendedConnectionDataSourceProxy} to prevent the
  * connection from being closed and released after each commit performed as part of the step processing.
  * You must also use a JDBC driver supporting JDBC 3.0 or later since the cursor will be opened with the
- * additional option of 'HOLD_CUSORS_OVER_COMMIT' enabled.
+ * additional option of 'HOLD_CURSORS_OVER_COMMIT' enabled.
  * </p>
  *
  * <p>
@@ -338,7 +338,7 @@ implements InitializingBean {
 	 * connection from being closed and released after each commit.
 	 *
 	 * When you set this option to <code>true</code> then the statement used to open the cursor
-	 * will be created with both 'READ_ONLY' and 'HOLD_CUSORS_OVER_COMMIT' options. This allows
+	 * will be created with both 'READ_ONLY' and 'HOLD_CURSORS_OVER_COMMIT' options. This allows
 	 * holding the cursor open over transaction start and commits performed in the step processing.
 	 * To use this feature you need a database that supports this and a JDBC driver supporting
 	 * JDBC 3.0 or later.

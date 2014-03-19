@@ -29,7 +29,7 @@ public class StepScopeProxyTargetClassOverrideIntegrationTests implements BeanFa
 	
 	private static final String JDK_PROXY_TO_STRING_REGEX = "class .*\\$Proxy\\d+";	
 	
-	private static final String CGLIB_PROXY_TO_STRING_REGEX = "class .*\\$EnhancerByCGLIB.*";
+	private static final String CGLIB_PROXY_TO_STRING_REGEX = "class .*\\$EnhancerBySpringCGLIB.*";
 
 	@Autowired
 	@Qualifier("simple")

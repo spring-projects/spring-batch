@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2013 the original author or authors.
+ * Copyright 2006-2014 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -47,7 +47,7 @@ import org.springframework.util.Assert;
  * @author Robert Kasanicky
  */
 @SuppressWarnings("rawtypes")
-public abstract class AbstractJobRepositoryFactoryBean implements FactoryBean, InitializingBean {
+public abstract class AbstractJobRepositoryFactoryBean implements FactoryBean<JobRepository>, InitializingBean {
 
 	private PlatformTransactionManager transactionManager;
 
@@ -148,9 +148,10 @@ public abstract class AbstractJobRepositoryFactoryBean implements FactoryBean, I
 	 * a cast.
 	 * @return the {@link JobRepository} from {@link #getObject()}
 	 * @throws Exception if the repository could not be created
+	 * @deprecated use {@link #getObject()} instead
 	 */
 	public JobRepository getJobRepository() throws Exception {
-		return (JobRepository) getObject();
+		return getObject();
 	}
 
 	private void initializeProxy() throws Exception {
@@ -197,11 +198,11 @@ public abstract class AbstractJobRepositoryFactoryBean implements FactoryBean, I
 	}
 
 	@Override
-	public Object getObject() throws Exception {
+	public JobRepository getObject() throws Exception {
 		if (proxyFactory == null) {
 			afterPropertiesSet();
 		}
-		return proxyFactory.getProxy();
+		return (JobRepository) proxyFactory.getProxy();
 	}
 
 }

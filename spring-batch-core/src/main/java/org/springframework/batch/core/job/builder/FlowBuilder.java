@@ -380,11 +380,11 @@ public class FlowBuilder<Q> {
 		dirty = true;
 	}
 
-	private void stop(String pattern) {
+	protected void stop(String pattern) {
 		addTransition(pattern, stoppedState);
 	}
 
-	private void stop(String pattern, State restart) {
+	protected void stop(String pattern, State restart) {
 		EndState next = new EndState(FlowExecutionStatus.STOPPED, "STOPPED", prefix + "stop" + (endCounter++), true);
 		addTransition(pattern, next);
 		currentState = next;

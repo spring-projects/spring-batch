@@ -20,9 +20,10 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
-import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static org.springframework.batch.core.jsr.JsrTestUtils.restartJob;
+import static org.springframework.batch.core.jsr.JsrTestUtils.runJob;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -31,6 +32,8 @@ import java.util.List;
 import java.util.Properties;
 import java.util.Set;
 
+import javax.batch.api.AbstractBatchlet;
+import javax.batch.api.Batchlet;
 import javax.batch.operations.JobExecutionIsRunningException;
 import javax.batch.operations.JobOperator;
 import javax.batch.operations.JobRestartException;
@@ -55,29 +58,27 @@ import org.springframework.batch.core.converter.JobParametersConverterSupport;
 import org.springframework.batch.core.explore.JobExplorer;
 import org.springframework.batch.core.explore.support.SimpleJobExplorer;
 import org.springframework.batch.core.jsr.JsrJobParametersConverter;
-import org.springframework.batch.core.launch.support.SimpleJobOperator;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.step.JobRepositorySupport;
 import org.springframework.beans.factory.BeanCreationException;
-import org.springframework.core.task.SimpleAsyncTaskExecutor;
+import org.springframework.core.task.AsyncTaskExecutor;
 import org.springframework.core.task.SyncTaskExecutor;
 
 public class JsrJobOperatorTests {
 
 	private JobOperator jsrJobOperator;
 	@Mock
-	private org.springframework.batch.core.launch.JobOperator jobOperator;
-	@Mock
 	private JobExplorer jobExplorer;
 	@Mock
 	private JobRepository jobRepository;
 	private JobParametersConverter parameterConverter;
+	private static final long TIMEOUT = 10000l;
 
 	@Before
 	public void setup() {
 		MockitoAnnotations.initMocks(this);
 		parameterConverter = new JobParametersConverterSupport();
-		jsrJobOperator = new JsrJobOperator(jobExplorer, jobRepository, jobOperator, parameterConverter);
+		jsrJobOperator = new JsrJobOperator(jobExplorer, jobRepository, parameterConverter);
 	}
 
 	@Test
@@ -89,30 +90,24 @@ public class JsrJobOperatorTests {
 	@Test
 	public void testNullsInConstructor() {
 		try {
-			new JsrJobOperator(null, new JobRepositorySupport(), new SimpleJobOperator(), parameterConverter);
+			new JsrJobOperator(null, new JobRepositorySupport(), parameterConverter);
 			fail("JobExplorer should be required");
 		} catch (IllegalArgumentException correct) {
 		}
 
 		try {
-			new JsrJobOperator(new SimpleJobExplorer(null, null, null, null), null, new SimpleJobOperator(), parameterConverter);
+			new JsrJobOperator(new SimpleJobExplorer(null, null, null, null), null, parameterConverter);
 			fail("JobRepository should be required");
 		} catch (IllegalArgumentException correct) {
 		}
 
 		try {
-			new JsrJobOperator(new SimpleJobExplorer(null, null, null, null), new JobRepositorySupport(), null, parameterConverter);
-			fail("JobOperator should be required");
-		} catch (IllegalArgumentException correct) {
-		}
-
-		try {
-			new JsrJobOperator(new SimpleJobExplorer(null, null, null, null), new JobRepositorySupport(), new SimpleJobOperator(), null);
+			new JsrJobOperator(new SimpleJobExplorer(null, null, null, null), new JobRepositorySupport(), null);
 			fail("ParameterConverter should be required");
 		} catch (IllegalArgumentException correct) {
 		}
 
-		new JsrJobOperator(new SimpleJobExplorer(null, null, null, null), new JobRepositorySupport(), new SimpleJobOperator(), parameterConverter);
+		new JsrJobOperator(new SimpleJobExplorer(null, null, null, null), new JobRepositorySupport(), parameterConverter);
 	}
 
 	@Test
@@ -120,16 +115,16 @@ public class JsrJobOperatorTests {
 		JsrJobOperator jsrJobOperatorImpl = (JsrJobOperator) jsrJobOperator;
 		jsrJobOperatorImpl.afterPropertiesSet();
 		assertNotNull(jsrJobOperatorImpl.getTaskExecutor());
-		assertTrue((jsrJobOperatorImpl.getTaskExecutor() instanceof SyncTaskExecutor));
+		assertTrue((jsrJobOperatorImpl.getTaskExecutor() instanceof AsyncTaskExecutor));
 	}
 
 	@Test
 	public void testCustomTaskExecutor() throws Exception {
 		JsrJobOperator jsrJobOperatorImpl = (JsrJobOperator) jsrJobOperator;
-		jsrJobOperatorImpl.setTaskExecutor(new SimpleAsyncTaskExecutor());
+		jsrJobOperatorImpl.setTaskExecutor(new SyncTaskExecutor());
 		jsrJobOperatorImpl.afterPropertiesSet();
 		assertNotNull(jsrJobOperatorImpl.getTaskExecutor());
-		assertTrue((jsrJobOperatorImpl.getTaskExecutor() instanceof SimpleAsyncTaskExecutor));
+		assertTrue((jsrJobOperatorImpl.getTaskExecutor() instanceof SyncTaskExecutor));
 	}
 
 	@Test
@@ -389,12 +384,10 @@ public class JsrJobOperatorTests {
 	}
 
 	@Test
-	public void testStartRoseyScenario() {
-		jsrJobOperator = BatchRuntime.getJobOperator();
+	public void testStartRoseyScenario() throws Exception {
+		javax.batch.runtime.JobExecution execution = runJob("jsrJobOperatorTestJob", new Properties(), TIMEOUT);
 
-		long executionId = jsrJobOperator.start("jsrJobOperatorTestJob", null);
-
-		assertEquals(BatchStatus.COMPLETED, jsrJobOperator.getJobExecution(executionId).getBatchStatus());
+		assertEquals(BatchStatus.COMPLETED, execution.getBatchStatus());
 	}
 
 	@Test
@@ -408,13 +401,13 @@ public class JsrJobOperatorTests {
 		} catch (NoSuchJobException ignore) {
 		}
 
-		long run1 = jsrJobOperator.start("jsrJobOperatorTestJob", null);
-		long run2 = jsrJobOperator.start("jsrJobOperatorTestJob", null);
-		long run3 = jsrJobOperator.start("jsrJobOperatorTestJob", null);
+		javax.batch.runtime.JobExecution execution1 = runJob("jsrJobOperatorTestJob", new Properties(), TIMEOUT);
+		javax.batch.runtime.JobExecution execution2 = runJob("jsrJobOperatorTestJob", new Properties(), TIMEOUT);
+		javax.batch.runtime.JobExecution execution3 = runJob("jsrJobOperatorTestJob", new Properties(), TIMEOUT);
 
-		assertEquals(BatchStatus.COMPLETED, jsrJobOperator.getJobExecution(run1).getBatchStatus());
-		assertEquals(BatchStatus.COMPLETED, jsrJobOperator.getJobExecution(run2).getBatchStatus());
-		assertEquals(BatchStatus.COMPLETED, jsrJobOperator.getJobExecution(run3).getBatchStatus());
+		assertEquals(BatchStatus.COMPLETED, execution1.getBatchStatus());
+		assertEquals(BatchStatus.COMPLETED, execution2.getBatchStatus());
+		assertEquals(BatchStatus.COMPLETED, execution3.getBatchStatus());
 
 		int jobInstanceCountAfter = jsrJobOperator.getJobInstanceCount("myJob3");
 
@@ -422,28 +415,33 @@ public class JsrJobOperatorTests {
 	}
 
 	@Test
-	public void testRestartRoseyScenario() {
-		jsrJobOperator = BatchRuntime.getJobOperator();
+	public void testRestartRoseyScenario() throws Exception {
+		javax.batch.runtime.JobExecution execution = runJob("jsrJobOperatorTestRestartJob", new Properties(), TIMEOUT);
 
-		long executionId = jsrJobOperator.start("jsrJobOperatorTestRestartJob", null);
+		assertEquals(BatchStatus.FAILED, execution.getBatchStatus());
 
-		assertEquals(BatchStatus.FAILED, jsrJobOperator.getJobExecution(executionId).getBatchStatus());
+		execution = restartJob(execution.getExecutionId(), null, TIMEOUT);
 
-		long finalExecutionId = jsrJobOperator.restart(executionId, null);
-
-		assertEquals(BatchStatus.COMPLETED, jsrJobOperator.getJobExecution(finalExecutionId).getBatchStatus());
+		assertEquals(BatchStatus.COMPLETED, execution.getBatchStatus());
 	}
 
 	@Test(expected = JobRestartException.class)
-	public void testRestartAbandoned() {
+	public void testNonRestartableJob() throws Exception {
+		javax.batch.runtime.JobExecution jobExecutionStart = runJob("jsrJobOperatorTestNonRestartableJob", new Properties(), TIMEOUT);
+		assertEquals(BatchStatus.FAILED, jobExecutionStart.getBatchStatus());
+
+		restartJob(jobExecutionStart.getExecutionId(), null, TIMEOUT);
+	}
+
+	@Test(expected = JobRestartException.class)
+	public void testRestartAbandoned() throws Exception {
 		jsrJobOperator = BatchRuntime.getJobOperator();
+		javax.batch.runtime.JobExecution execution = runJob("jsrJobOperatorTestRestartAbandonJob", null, TIMEOUT);
 
-		long executionId = jsrJobOperator.start("jsrJobOperatorTestRestartAbandonJob", null);
+		assertEquals(BatchStatus.FAILED, execution.getBatchStatus());
 
-		assertEquals(BatchStatus.FAILED, jsrJobOperator.getJobExecution(executionId).getBatchStatus());
-
-		jsrJobOperator.abandon(executionId);
-		jsrJobOperator.restart(executionId, null);
+		jsrJobOperator.abandon(execution.getExecutionId());
+		jsrJobOperator.restart(execution.getExecutionId(), null);
 	}
 
 	@Test
@@ -468,6 +466,24 @@ public class JsrJobOperatorTests {
 		assertTrue(properties.size() == 2);
 		assertTrue(properties.getProperty("prevKey1").equals("prevVal1"));
 		assertTrue(properties.getProperty("userKey1").equals("userVal1"));
+	}
+
+	@Test
+	public void testGetRestartJobParametersWithDefaults() {
+		JsrJobOperator jobOperator = (JsrJobOperator) jsrJobOperator;
+
+		JobExecution jobExecution = new JobExecution(1L,
+				new JobParametersBuilder().addString("prevKey1", "prevVal1").addString("prevKey2", "prevVal2").toJobParameters());
+
+		Properties defaultProperties = new Properties();
+		defaultProperties.setProperty("prevKey2", "not value 2");
+		Properties userProperties = new Properties(defaultProperties);
+
+		Properties properties = jobOperator.getJobRestartProperties(userProperties, jobExecution);
+
+		assertTrue(properties.size() == 2);
+		assertTrue(properties.getProperty("prevKey1").equals("prevVal1"));
+		assertTrue("prevKey2 = " + properties.getProperty("prevKey2"), properties.getProperty("prevKey2").equals("not value 2"));
 	}
 
 	@Test
@@ -506,18 +522,80 @@ public class JsrJobOperatorTests {
 		fail("Should have failed");
 	}
 
-	@Test(expected = JobStartException.class)
-	public void testBeanCreationExceptionOnRestart() throws Exception {
-		JsrJobOperator jsrJobOperator1 = mock(JsrJobOperator.class);
-		when(jsrJobOperator1.restart(0l, null)).thenThrow(new JobStartException(new BeanCreationException("Bean creation exception")));
+	@SuppressWarnings("unchecked")
+	@Test(expected=JobStartException.class)
+	public void testStartUnableToCreateJobExecution() throws Exception {
+		when(jobRepository.createJobExecution("myJob", null)).thenThrow(RuntimeException.class);
 
-		try {
-			jsrJobOperator1.restart(0l, null);
-		} catch (JobStartException e) {
-			assertTrue(e.getCause() instanceof BeanCreationException);
-			throw e;
+		jsrJobOperator.start("myJob", null);
+	}
+
+	@Test
+	public void testJobStopRoseyScenario() throws Exception {
+		jsrJobOperator = BatchRuntime.getJobOperator();
+		long executionId = jsrJobOperator.start("longRunningJob", null);
+		// Give the job a chance to get started
+		Thread.sleep(1000l);
+		jsrJobOperator.stop(executionId);
+		// Give the job the chance to finish stopping
+		Thread.sleep(1000l);
+
+		assertEquals(BatchStatus.STOPPED, jsrJobOperator.getJobExecution(executionId).getBatchStatus());
+
+	}
+
+	@Test
+	public void testApplicationContextClosingAfterJobSuccessful() throws Exception {
+		for(int i = 0; i < 3; i++) {
+			javax.batch.runtime.JobExecution execution = runJob("contextClosingTests", new Properties(), TIMEOUT);
+
+			assertEquals(BatchStatus.COMPLETED, execution.getBatchStatus());
+		}
+	}
+
+	public static class LongRunningBatchlet implements Batchlet {
+
+		private boolean stopped = false;
+
+		@Override
+		public String process() throws Exception {
+			while(!stopped) {
+				Thread.sleep(250);
+			}
+			return null;
 		}
 
-		fail("Should have failed");
+		@Override
+		public void stop() throws Exception {
+			stopped = true;
+		}
+	}
+
+	public static class FailingBatchlet extends AbstractBatchlet {
+		@Override
+		public String process() throws Exception {
+			throw new RuntimeException("blah");
+		}
+	}
+
+	public static class MustBeClosedBatchlet extends AbstractBatchlet {
+
+		public static boolean closed = true;
+
+		public MustBeClosedBatchlet() {
+			if(!closed) {
+				throw new RuntimeException("Batchlet wasn't closed last time");
+			}
+		}
+
+		public void close() {
+			closed = true;
+		}
+
+		@Override
+		public String process() throws Exception {
+			closed = false;
+			return null;
+		}
 	}
 }

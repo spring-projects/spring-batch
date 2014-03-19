@@ -53,6 +53,7 @@ import org.springframework.batch.core.repository.JobExecutionAlreadyRunningExcep
 import org.springframework.batch.core.repository.JobInstanceAlreadyCompleteException;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.repository.JobRestartException;
+import org.springframework.batch.core.scope.context.StepSynchronizationManager;
 import org.springframework.batch.core.step.NoSuchStepException;
 import org.springframework.batch.core.step.StepLocator;
 import org.springframework.batch.core.step.tasklet.StoppableTasklet;
@@ -413,7 +414,9 @@ public class SimpleJobOperator implements JobOperator, InitializingBean {
 							if (step instanceof TaskletStep) {
 								Tasklet tasklet = ((TaskletStep)step).getTasklet();
 								if (tasklet instanceof StoppableTasklet) {
+									StepSynchronizationManager.register(stepExecution);
 									((StoppableTasklet)tasklet).stop();
+									StepSynchronizationManager.release();
 								}
 							}
 						}

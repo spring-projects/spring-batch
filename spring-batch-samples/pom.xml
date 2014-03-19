@@ -4,7 +4,7 @@
 	<artifactId>spring-batch-samples</artifactId>
 	<packaging>jar</packaging>
 	<name>Samples</name>
-	<url>http://static.springframework.org/spring-batch/${artifactId}</url>
+	<url>http://docs.spring.io/spring-batch/${artifactId}</url>
 	<description>Example batch jobs using Spring Batch Core and Execution.</description>
 	<parent>
 		<groupId>org.springframework.batch</groupId>
@@ -46,45 +46,6 @@
 			<artifactId>junit</artifactId>
 		</dependency>
 		<dependency>
-			<groupId>org.springmodules</groupId>
-			<artifactId>spring-modules-validation</artifactId>
-			<version>0.8</version>
-			<exclusions>
-				<exclusion>
-					<groupId>rhino</groupId>
-					<artifactId>js</artifactId>
-				</exclusion>
-				<exclusion>
-					<groupId>commons-validator</groupId>
-					<artifactId>commons-validator</artifactId>
-				</exclusion>
-				<exclusion>
-					<groupId>commons-lang</groupId>
-					<artifactId>commons-lang</artifactId>
-				</exclusion>
-				<exclusion>
-					<groupId>commons-logging</groupId>
-					<artifactId>commons-logging</artifactId>
-				</exclusion>
-				<exclusion>
-					<groupId>commons-beanutils</groupId>
-					<artifactId>commons-beanutils</artifactId>
-				</exclusion>
-				<exclusion>
-					<groupId>commons-digester</groupId>
-					<artifactId>commons-digester</artifactId>
-				</exclusion>
-				<exclusion>
-					<groupId>antlr</groupId>
-					<artifactId>antlr</artifactId>
-				</exclusion>
-				<exclusion>
-					<groupId>org.springframework</groupId>
-					<artifactId>spring</artifactId>
-				</exclusion>
-			</exclusions>
-		</dependency>
-		<dependency>
 			<groupId>org.opensymphony.quartz</groupId>
 			<artifactId>quartz</artifactId>
 			<version>1.6.1</version>
@@ -119,7 +80,7 @@
 			<groupId>commons-dbcp</groupId>
 			<artifactId>commons-dbcp</artifactId>
 		</dependency>
-		<dependency>
+ 		<dependency>
 			<groupId>com.thoughtworks.xstream</groupId>
 			<artifactId>xstream</artifactId>
 		</dependency>
@@ -422,7 +383,7 @@
 		</pluginManagement>
 	</build>
 	<repositories>
-		<repository>
+<!-- 		<repository>
 			<id>com.springsource.repository.bundles.external</id>
 			<name>SpringSource Enterprise Bundle Repository - SpringSource Bundle External</name>
 			<url>http://repository.springsource.com/maven/bundles/external</url>
@@ -430,7 +391,7 @@
 				<enabled>false</enabled>
 			</snapshots>
 		</repository>
-		<repository>
+ -->		<repository>
 			<id>gemstone</id>
 			<name>Release bundles for SQLFire and GemFire</name>
 			<url>http://dist.gemstone.com.s3.amazonaws.com/maven/release</url>

@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 the original author or authors.
+ * Copyright 2013-2014 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -94,15 +94,19 @@ public class BatchPropertyBeanPostProcessor implements BeanPostProcessor, BeanFa
 	}
 
 	private Properties getArtifactProperties(String artifactName) {
+		String originalArtifactName = artifactName;
+
+		if(originalArtifactName.startsWith(SCOPED_TARGET_BEAN_PREFIX)) {
+			originalArtifactName = artifactName.substring(SCOPED_TARGET_BEAN_PREFIX.length());
+		}
+
 		StepContext stepContext = StepSynchronizationManager.getContext();
 
 		if (stepContext != null) {
-			String originalArtifactName = artifactName.substring(SCOPED_TARGET_BEAN_PREFIX.length());
-
 			return batchPropertyContext.getStepArtifactProperties(stepContext.getStepName(), originalArtifactName);
 		}
 
-		return batchPropertyContext.getArtifactProperties(artifactName);
+		return batchPropertyContext.getArtifactProperties(originalArtifactName);
 	}
 
 	private void injectBatchProperties(final Object artifact, final Properties artifactProperties) {

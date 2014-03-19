@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2007 the original author or authors.
+ * Copyright 2002-2014 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,12 +15,6 @@
  */
 
 package org.springframework.batch.core.repository.support;
-
-import static org.springframework.batch.support.DatabaseType.SYBASE;
-
-import java.sql.Types;
-
-import javax.sql.DataSource;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -47,6 +41,12 @@ import org.springframework.jdbc.support.lob.OracleLobHandler;
 import org.springframework.util.Assert;
 import org.springframework.util.StringUtils;
 
+import javax.sql.DataSource;
+import java.lang.reflect.Field;
+import java.sql.Types;
+
+import static org.springframework.batch.support.DatabaseType.SYBASE;
+
 /**
  * A {@link FactoryBean} that automates the creation of a
  * {@link SimpleJobRepository} using JDBC DAO implementations which persist
@@ -64,7 +64,7 @@ public class JobRepositoryFactoryBean extends AbstractJobRepositoryFactoryBean i
 
 	private DataSource dataSource;
 
-	private JdbcOperations jdbcTemplate;
+	private JdbcOperations jdbcOperations;
 
 	private String databaseType;
 
@@ -78,11 +78,20 @@ public class JobRepositoryFactoryBean extends AbstractJobRepositoryFactoryBean i
 
 	private ExecutionContextSerializer serializer;
 
+	private Integer lobType;
+
+	/**
+	 * @param type a value from the {@link java.sql.Types} class to indicate the type to use for a CLOB
+	 */
+	public void setClobType(int type) {
+		this.lobType = type;
+	}
+
 	/**
 	 * A custom implementation of the {@link ExecutionContextSerializer}.
 	 * The default, if not injected, is the {@link XStreamExecutionContextStringSerializer}.
 	 *
-	 * @param serializer
+	 * @param serializer used to serialize/deserialize {@link org.springframework.batch.item.ExecutionContext}
 	 * @see ExecutionContextSerializer
 	 */
 	public void setSerializer(ExecutionContextSerializer serializer) {
@@ -125,6 +134,15 @@ public class JobRepositoryFactoryBean extends AbstractJobRepositoryFactoryBean i
 	public void setDataSource(DataSource dataSource) {
 		this.dataSource = dataSource;
 	}
+	
+	/**
+	 * Public setter for the {@link JdbcOperations}. If this property is not set explicitly,
+	 * a new {@link JdbcTemplate} will be created for the configured DataSource by default.
+	 * @param jdbcOperations a {@link JdbcOperations}
+	 */
+	public void setJdbcOperations(JdbcOperations jdbcOperations) {
+		this.jdbcOperations = jdbcOperations;
+	}
 
 	/**
 	 * Sets the database type.
@@ -137,7 +155,7 @@ public class JobRepositoryFactoryBean extends AbstractJobRepositoryFactoryBean i
 
 	/**
 	 * Sets the table prefix for all the batch meta-data tables.
-	 * @param tablePrefix
+	 * @param tablePrefix prefix prepended to batch meta-data tables
 	 */
 	public void setTablePrefix(String tablePrefix) {
 		this.tablePrefix = tablePrefix;
@@ -152,7 +170,9 @@ public class JobRepositoryFactoryBean extends AbstractJobRepositoryFactoryBean i
 
 		Assert.notNull(dataSource, "DataSource must not be null.");
 
-		jdbcTemplate = new JdbcTemplate(dataSource);
+		if (jdbcOperations == null) {
+			jdbcOperations = new JdbcTemplate(dataSource);	
+		}		
 
 		if (incrementerFactory == null) {
 			incrementerFactory = new DefaultDataFieldMaxValueIncrementerFactory(dataSource);
@@ -178,13 +198,17 @@ public class JobRepositoryFactoryBean extends AbstractJobRepositoryFactoryBean i
 				+ "' is an unsupported database type.  The supported database types are "
 				+ StringUtils.arrayToCommaDelimitedString(incrementerFactory.getSupportedIncrementerTypes()));
 
+		if(lobType != null) {
+			Assert.isTrue(isValidTypes(lobType), "lobType must be a value from the java.sql.Types class");
+		}
+
 		super.afterPropertiesSet();
 	}
 
 	@Override
 	protected JobInstanceDao createJobInstanceDao() throws Exception {
 		JdbcJobInstanceDao dao = new JdbcJobInstanceDao();
-		dao.setJdbcTemplate(jdbcTemplate);
+		dao.setJdbcTemplate(jdbcOperations);
 		dao.setJobIncrementer(incrementerFactory.getIncrementer(databaseType, tablePrefix + "JOB_SEQ"));
 		dao.setTablePrefix(tablePrefix);
 		dao.afterPropertiesSet();
@@ -194,7 +218,7 @@ public class JobRepositoryFactoryBean extends AbstractJobRepositoryFactoryBean i
 	@Override
 	protected JobExecutionDao createJobExecutionDao() throws Exception {
 		JdbcJobExecutionDao dao = new JdbcJobExecutionDao();
-		dao.setJdbcTemplate(jdbcTemplate);
+		dao.setJdbcTemplate(jdbcOperations);
 		dao.setJobExecutionIncrementer(incrementerFactory.getIncrementer(databaseType, tablePrefix
 				+ "JOB_EXECUTION_SEQ"));
 		dao.setTablePrefix(tablePrefix);
@@ -207,7 +231,7 @@ public class JobRepositoryFactoryBean extends AbstractJobRepositoryFactoryBean i
 	@Override
 	protected StepExecutionDao createStepExecutionDao() throws Exception {
 		JdbcStepExecutionDao dao = new JdbcStepExecutionDao();
-		dao.setJdbcTemplate(jdbcTemplate);
+		dao.setJdbcTemplate(jdbcOperations);
 		dao.setStepExecutionIncrementer(incrementerFactory.getIncrementer(databaseType, tablePrefix
 				+ "STEP_EXECUTION_SEQ"));
 		dao.setTablePrefix(tablePrefix);
@@ -220,7 +244,7 @@ public class JobRepositoryFactoryBean extends AbstractJobRepositoryFactoryBean i
 	@Override
 	protected ExecutionContextDao createExecutionContextDao() throws Exception {
 		JdbcExecutionContextDao dao = new JdbcExecutionContextDao();
-		dao.setJdbcTemplate(jdbcTemplate);
+		dao.setJdbcTemplate(jdbcOperations);
 		dao.setTablePrefix(tablePrefix);
 		dao.setClobTypeToUse(determineClobTypeToUse(this.databaseType));
 		dao.setSerializer(serializer);
@@ -235,13 +259,31 @@ public class JobRepositoryFactoryBean extends AbstractJobRepositoryFactoryBean i
 		return dao;
 	}
 
-	private int determineClobTypeToUse(String databaseType) {
-		if (SYBASE == DatabaseType.valueOf(databaseType.toUpperCase())) {
-			return Types.LONGVARCHAR;
+	private int determineClobTypeToUse(String databaseType) throws Exception {
+		if(lobType != null) {
+			return lobType;
+		} else {
+			if (SYBASE == DatabaseType.valueOf(databaseType.toUpperCase())) {
+				return Types.LONGVARCHAR;
+			}
+			else {
+				return Types.CLOB;
+			}
 		}
-		else {
-			return Types.CLOB;
+	}
+
+	private boolean isValidTypes(int value) throws Exception {
+		boolean result = false;
+
+		for (Field field : Types.class.getFields()) {
+			int curValue = field.getInt(null);
+			if(curValue == value) {
+				result = true;
+				break;
+			}
 		}
+
+		return result;
 	}
 
 }

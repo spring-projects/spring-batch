@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2013 the original author or authors.
+ * Copyright 2006-2014 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -32,9 +32,7 @@ import org.springframework.batch.core.JobInstance;
 import org.springframework.batch.core.JobParameters;
 import org.springframework.batch.core.JobParametersBuilder;
 import org.springframework.batch.core.StepExecution;
-import org.springframework.batch.core.jsr.configuration.support.BatchArtifact.BatchArtifactType;
 import org.springframework.batch.core.jsr.configuration.support.BatchPropertyContext;
-import org.springframework.batch.core.jsr.configuration.support.BatchPropertyContext.BatchPropertyContextEntry;
 import org.springframework.batch.item.ExecutionContext;
 
 /**
@@ -72,11 +70,8 @@ public class StepContextTests {
 	public void testGetPartitionPlan() {
 		Properties partitionPropertyValues = new Properties();
 		partitionPropertyValues.put("key1", "value1");
-		List<BatchPropertyContextEntry> entries = new ArrayList<BatchPropertyContext.BatchPropertyContextEntry>();
-		BatchPropertyContextEntry entry = propertyContext.new BatchPropertyContextEntry(stepExecution.getStepName(), partitionPropertyValues, BatchArtifactType.STEP);
-		entries.add(entry);
 
-		propertyContext.setStepPropertiesContextEntry(entries);
+		propertyContext.setStepProperties(stepExecution.getStepName(), partitionPropertyValues);
 
 		context = new StepContext(stepExecution, propertyContext);
 

@@ -190,7 +190,7 @@ public class SimpleStepExecutionSplitter implements StepExecutionSplitter, Initi
 				set.add(currentStepExecution);
 			}
 		}
-		
+
 		jobRepository.addAll(set);
 
 		return set;
@@ -235,7 +235,7 @@ public class SimpleStepExecutionSplitter implements StepExecutionSplitter, Initi
 		return result;
 	}
 
-	private boolean getStartable(StepExecution stepExecution, ExecutionContext context) throws JobExecutionException {
+	protected boolean getStartable(StepExecution stepExecution, ExecutionContext context) throws JobExecutionException {
 
 		JobInstance jobInstance = stepExecution.getJobExecution().getJobInstance();
 		String stepName = stepExecution.getStepName();

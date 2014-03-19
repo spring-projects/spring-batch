@@ -15,25 +15,35 @@
  */
 package org.springframework.batch.sample.domain.trade.internal;
 
+import java.sql.SQLException;
+
 import org.springframework.batch.sample.domain.trade.CustomerCredit;
 import org.springframework.batch.sample.domain.trade.CustomerCreditDao;
-import org.springframework.orm.ibatis.support.SqlMapClientDaoSupport;
+import org.springframework.jdbc.support.SQLStateSQLExceptionTranslator;
+
+import com.ibatis.sqlmap.client.SqlMapClient;
 
 /**
  * @author Lucas Ward
  *
  */
-public class IbatisCustomerCreditDao extends SqlMapClientDaoSupport
-		implements CustomerCreditDao {
+public class IbatisCustomerCreditDao implements CustomerCreditDao {
+
+	SqlMapClient sqlMapClient;
 
 	String statementId;
 
 	/* (non-Javadoc)
 	 * @see org.springframework.batch.sample.domain.trade.internal.CustomerCreditWriter#write(org.springframework.batch.sample.domain.CustomerCredit)
 	 */
+	@Override
 	public void writeCredit(CustomerCredit customerCredit) {
 
-		getSqlMapClientTemplate().update(statementId, customerCredit);
+		try {
+			sqlMapClient.update(statementId, customerCredit);
+		} catch (SQLException e) {
+			throw new SQLStateSQLExceptionTranslator().translate("SqlMapClient operation", null, e);
+		}
 	}
 
 	/* (non-Javadoc)

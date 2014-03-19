@@ -58,7 +58,7 @@ public class JobParserExceptionTests {
 		}
 		catch (BeanDefinitionParsingException e) {
 			String message = e.getMessage();
-			assertTrue("Wrong message: "+message, message.matches("(?s).*You cannot use spring-batch-2.0.xsd.*"));
+			assertTrue("Wrong message: "+message, message.startsWith("Configuration problem: You are using a version of the spring-batch XSD"));
 		} catch (BeanDefinitionStoreException e) {
 			// Probably the internet is not available and the schema validation failed.
 			fail("Wrong exception when schema didn't match: " + e.getMessage());

@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2013 the original author or authors.
+ * Copyright 2006-2014 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -38,6 +38,7 @@ import org.springframework.batch.core.launch.support.ExitCodeMapper;
 import org.springframework.batch.core.listener.CompositeJobExecutionListener;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.repository.JobRestartException;
+import org.springframework.batch.core.scope.context.JobSynchronizationManager;
 import org.springframework.batch.core.step.StepLocator;
 import org.springframework.batch.repeat.RepeatException;
 import org.springframework.beans.factory.BeanNameAware;
@@ -286,6 +287,8 @@ InitializingBean {
 
 		logger.debug("Job execution starting: " + execution);
 
+		JobSynchronizationManager.register(execution);
+
 		try {
 
 			jobParametersValidator.validate(execution.getJobParameters());
@@ -319,33 +322,36 @@ InitializingBean {
 			if (logger.isDebugEnabled()) {
 				logger.debug("Full exception", e);
 			}
-			execution.setExitStatus(getDefaultExitStatusForFailure(e));
+			execution.setExitStatus(getDefaultExitStatusForFailure(e, execution));
 			execution.setStatus(BatchStatus.max(BatchStatus.STOPPED, e.getStatus()));
 			execution.addFailureException(e);
 		} catch (Throwable t) {
 			logger.error("Encountered fatal error executing job", t);
-			execution.setExitStatus(getDefaultExitStatusForFailure(t));
+			execution.setExitStatus(getDefaultExitStatusForFailure(t, execution));
 			execution.setStatus(BatchStatus.FAILED);
 			execution.addFailureException(t);
 		} finally {
-
-			if (execution.getStatus().isLessThanOrEqualTo(BatchStatus.STOPPED)
-					&& execution.getStepExecutions().isEmpty()) {
-				ExitStatus exitStatus = execution.getExitStatus();
-				execution
-				.setExitStatus(exitStatus.and(ExitStatus.NOOP
-						.addExitDescription("All steps already completed or no steps configured for this job.")));
-			}
-
-			execution.setEndTime(new Date());
-
 			try {
-				listener.afterJob(execution);
-			} catch (Exception e) {
-				logger.error("Exception encountered in afterStep callback", e);
-			}
+				if (execution.getStatus().isLessThanOrEqualTo(BatchStatus.STOPPED)
+						&& execution.getStepExecutions().isEmpty()) {
+					ExitStatus exitStatus = execution.getExitStatus();
+					ExitStatus newExitStatus =
+							ExitStatus.NOOP.addExitDescription("All steps already completed or no steps configured for this job.");
+					execution.setExitStatus(exitStatus.and(newExitStatus));
+				}
 
-			jobRepository.update(execution);
+				execution.setEndTime(new Date());
+
+				try {
+					listener.afterJob(execution);
+				} catch (Exception e) {
+					logger.error("Exception encountered in afterStep callback", e);
+				}
+
+				jobRepository.update(execution);
+			} finally {
+				JobSynchronizationManager.release();
+			}
 
 		}
 
@@ -388,7 +394,7 @@ InitializingBean {
 	 *            the cause of the failure
 	 * @return an {@link ExitStatus}
 	 */
-	private ExitStatus getDefaultExitStatusForFailure(Throwable ex) {
+	protected ExitStatus getDefaultExitStatusForFailure(Throwable ex, JobExecution execution) {
 		ExitStatus exitStatus;
 		if (ex instanceof JobInterruptedException
 				|| ex.getCause() instanceof JobInterruptedException) {

@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans:beans xmlns="http://www.springframework.org/schema/integration" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:beans="http://www.springframework.org/schema/beans"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans
+                                 http://www.springframework.org/schema/beans/spring-beans-2.5.xsd
+                                 http://www.springframework.org/schema/integration
+                                 http://www.springframework.org/schema/integration/spring-integration.xsd">
+	<annotation-config />
+	<channel id="requests"/>
+	<channel id="replies">
+		<queue />
+	</channel>
+	<gateway service-interface="org.springframework.batch.item.ItemProcessor" id="processor" default-reply-timeout="1000"
+		default-request-channel="requests" default-reply-channel="replies" />
+	<service-activator input-channel="requests" output-channel="replies" ref="doubler"/>
+	<beans:bean id="doubler" class="org.springframework.batch.integration.async.AsyncItemProcessorMessagingGatewayTests$Doubler"
+		scope="step">
+		<beans:property name="factor" value="#{jobParameters['factor']}" />
+	</beans:bean>
+	<beans:bean class="org.springframework.batch.core.scope.StepScope">
+		<beans:property name="proxyTargetClass" value="true"/>
+	</beans:bean>
+</beans:beans>

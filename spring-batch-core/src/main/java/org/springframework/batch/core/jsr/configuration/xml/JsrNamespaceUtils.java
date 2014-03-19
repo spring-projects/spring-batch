@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 the original author or authors.
+ * Copyright 2013-2014 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,8 +16,10 @@
 package org.springframework.batch.core.jsr.configuration.xml;
 
 import java.util.HashMap;
+
 import org.springframework.batch.core.jsr.configuration.support.BatchPropertyBeanPostProcessor;
 import org.springframework.batch.core.jsr.configuration.support.JsrAutowiredAnnotationBeanPostProcessor;
+import org.springframework.batch.core.jsr.configuration.support.JsrBeanScopeBeanFactoryPostProcessor;
 import org.springframework.batch.core.jsr.configuration.support.ThreadLocalClassloaderBeanPostProcessor;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.support.AbstractBeanDefinition;
@@ -36,12 +38,22 @@ class JsrNamespaceUtils {
 	private static final String JOB_PROPERTIES_BEAN_NAME = "jobProperties";
 	private static final String BATCH_PROPERTY_POST_PROCESSOR_BEAN_NAME = "batchPropertyPostProcessor";
 	private static final String THREAD_LOCAL_CLASS_LOADER_BEAN_POST_PROCESSOR_BEAN_NAME = "threadLocalClassloaderBeanPostProcessor";
+	private static final String BEAN_SCOPE_POST_PROCESSOR_BEAN_NAME = "beanScopeBeanPostProcessor";
+	private static final String BATCH_PROPERTY_CONTEXT_BEAN_CLASS_NAME = "org.springframework.batch.core.jsr.configuration.support.BatchPropertyContext";
+	private static final String BATCH_PROPERTY_CONTEXT_BEAN_NAME = "batchPropertyContext";
 
 	static void autoregisterJsrBeansForNamespace(ParserContext parserContext) {
 		autoRegisterJobProperties(parserContext);
 		autoRegisterBatchPostProcessor(parserContext);
 		autoRegisterJsrAutowiredAnnotationBeanPostProcessor(parserContext);
 		autoRegisterThreadLocalClassloaderBeanPostProcessor(parserContext);
+		autoRegisterBeanScopeBeanFactoryPostProcessor(parserContext);
+		autoRegisterBatchPropertyContext(parserContext);
+	}
+
+	private static void autoRegisterBeanScopeBeanFactoryPostProcessor(
+			ParserContext parserContext) {
+		registerPostProcessor(parserContext, JsrBeanScopeBeanFactoryPostProcessor.class, BeanDefinition.ROLE_INFRASTRUCTURE, BEAN_SCOPE_POST_PROCESSOR_BEAN_NAME);
 	}
 
 	private static void autoRegisterBatchPostProcessor(ParserContext parserContext) {
@@ -73,6 +85,18 @@ class JsrNamespaceUtils {
 			jobPropertiesBeanDefinition.setRole(BeanDefinition.ROLE_INFRASTRUCTURE);
 
 			parserContext.getRegistry().registerBeanDefinition(JOB_PROPERTIES_BEAN_NAME, jobPropertiesBeanDefinition);
+		}
+	}
+
+	private static void autoRegisterBatchPropertyContext(ParserContext parserContext) {
+		if (!parserContext.getRegistry().containsBeanDefinition(BATCH_PROPERTY_CONTEXT_BEAN_NAME)) {
+			AbstractBeanDefinition batchPropertyContextBeanDefinition =
+					BeanDefinitionBuilder.genericBeanDefinition(BATCH_PROPERTY_CONTEXT_BEAN_CLASS_NAME)
+					.getBeanDefinition();
+
+			batchPropertyContextBeanDefinition.setRole(BeanDefinition.ROLE_INFRASTRUCTURE);
+
+			parserContext.getRegistry().registerBeanDefinition(BATCH_PROPERTY_CONTEXT_BEAN_NAME, batchPropertyContextBeanDefinition);
 		}
 	}
 }

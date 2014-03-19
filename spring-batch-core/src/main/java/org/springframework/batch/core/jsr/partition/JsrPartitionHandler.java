@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 the original author or authors.
+ * Copyright 2013-2014 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -28,6 +28,7 @@ import java.util.concurrent.Callable;
 import java.util.concurrent.Future;
 import java.util.concurrent.FutureTask;
 import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.locks.ReentrantLock;
 
 import javax.batch.api.partition.PartitionAnalyzer;
 import javax.batch.api.partition.PartitionCollector;
@@ -36,13 +37,15 @@ import javax.batch.api.partition.PartitionPlan;
 
 import org.springframework.batch.core.BatchStatus;
 import org.springframework.batch.core.ExitStatus;
+import org.springframework.batch.core.JobExecutionException;
 import org.springframework.batch.core.Step;
 import org.springframework.batch.core.StepExecution;
-import org.springframework.batch.core.jsr.configuration.support.BatchArtifact.BatchArtifactType;
 import org.springframework.batch.core.jsr.configuration.support.BatchPropertyContext;
-import org.springframework.batch.core.jsr.configuration.support.BatchPropertyContext.BatchPropertyContextEntry;
+import org.springframework.batch.core.partition.JsrStepExecutionSplitter;
 import org.springframework.batch.core.partition.PartitionHandler;
 import org.springframework.batch.core.partition.StepExecutionSplitter;
+import org.springframework.batch.core.repository.JobRepository;
+import org.springframework.batch.item.ExecutionContext;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.core.task.TaskRejectedException;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
@@ -60,18 +63,48 @@ public class JsrPartitionHandler implements PartitionHandler, InitializingBean {
 
 	// TODO: Replace with proper Channel and Messages once minimum support level for Spring is 4
 	private Queue<Serializable> partitionDataQueue;
+	private ReentrantLock lock;
 	private Step step;
 	private int partitions;
 	private PartitionAnalyzer analyzer;
 	private PartitionMapper mapper;
 	private int threads;
 	private BatchPropertyContext propertyContext;
+	private JobRepository jobRepository;
+	private boolean allowStartIfComplete = false;
+	private Set<String> partitionStepNames = new HashSet<String>();
+
+	/**
+	 * @return the step that will be executed by each partition
+	 */
+	public Step getStep() {
+		return step;
+	}
+
+	/**
+	 * @return the names of each partitioned step
+	 */
+	public Collection<String> getPartitionStepNames() {
+		return partitionStepNames;
+	}
+
+	/**
+	 * @param allowStartIfComplete flag stating if the step should restart if it
+	 * 	was complete in a previous run
+	 */
+	public void setAllowStartIfComplete(boolean allowStartIfComplete) {
+		this.allowStartIfComplete = allowStartIfComplete;
+	}
 
 	/**
 	 * @param queue {@link Queue} to receive the output of the {@link PartitionCollector}
 	 */
 	public void setPartitionDataQueue(Queue<Serializable> queue) {
 		this.partitionDataQueue = queue;
+	}
+
+	public void setPartitionLock(ReentrantLock lock) {
+		this.lock = lock;
 	}
 
 	/**
@@ -117,6 +150,13 @@ public class JsrPartitionHandler implements PartitionHandler, InitializingBean {
 		this.partitions = partitions;
 	}
 
+	/**
+	 * @param jobRepository {@link JobRepository}
+	 */
+	public void setJobRepository(JobRepository jobRepository) {
+		this.jobRepository = jobRepository;
+	}
+
 	/* (non-Javadoc)
 	 * @see org.springframework.batch.core.partition.PartitionHandler#handle(org.springframework.batch.core.partition.StepExecutionSplitter, org.springframework.batch.core.StepExecution)
 	 */
@@ -127,23 +167,14 @@ public class JsrPartitionHandler implements PartitionHandler, InitializingBean {
 		final Set<StepExecution> result = new HashSet<StepExecution>();
 		final ThreadPoolTaskExecutor taskExecutor = new ThreadPoolTaskExecutor();
 
-		Set<StepExecution> partitionStepExecutions;
+		int stepExecutionCount = jobRepository.getStepExecutionCount(stepExecution.getJobExecution().getJobInstance(), stepExecution.getStepName());
 
-		if(mapper != null) {
-			PartitionPlan plan = mapper.mapPartitions();
-			if(plan.getThreads() > 0) {
-				threads = plan.getThreads();
-			} else if(plan.getPartitions() > 0) {
-				threads = plan.getPartitions();
-			} else {
-				throw new IllegalArgumentException("Either a number of threads or partitions are required");
-			}
+		boolean isRestart = stepExecutionCount > 1;
 
-			partitionStepExecutions = stepSplitter.split(stepExecution, plan.getPartitions());
-			registerPartitionProperties(partitionStepExecutions, plan);
+		Set<StepExecution> partitionStepExecutions = splitStepExecution(stepExecution, isRestart);
 
-		} else {
-			partitionStepExecutions = stepSplitter.split(stepExecution, partitions);
+		for (StepExecution curStepExecution : partitionStepExecutions) {
+			partitionStepNames.add(curStepExecution.getStepName());
 		}
 
 		taskExecutor.setCorePoolSize(threads);
@@ -171,19 +202,109 @@ public class JsrPartitionHandler implements PartitionHandler, InitializingBean {
 			}
 		}
 
-		while(true) {
-			while(!partitionDataQueue.isEmpty()) {
-				analyzer.analyzeCollectorData(partitionDataQueue.remove());
-			}
-
-			processFinishedPartitions(tasks, result);
-
-			if(tasks.size() == 0) {
-				break;
-			}
-		}
+		processPartitionResults(tasks, result);
 
 		return result;
+	}
+
+	/**
+	 * Blocks until all partitioned steps have completed.  As each step completes
+	 * the PartitionAnalyzer analyzes the collector data received from each
+	 * partition (if there is any).
+	 *
+	 * @param tasks The {@link Future} that contains the reference to the executing step
+	 * @param result Set of completed {@link StepExecution}s
+	 * @throws Exception
+	 */
+	private void processPartitionResults(
+			final List<Future<StepExecution>> tasks,
+			final Set<StepExecution> result) throws Exception {
+		while(true) {
+			try {
+				lock.lock();
+				while(!partitionDataQueue.isEmpty()) {
+					analyzer.analyzeCollectorData(partitionDataQueue.remove());
+				}
+
+				processFinishedPartitions(tasks, result);
+
+				if(tasks.size() == 0) {
+					break;
+				}
+			} finally {
+				if(lock.isHeldByCurrentThread()) {
+					lock.unlock();
+				}
+			}
+		}
+	}
+
+	/**
+	 * Uses either the {@link PartitionMapper} or the hard coded configuration to split
+	 * the supplied master StepExecution into the slave StepExecutions.
+	 *
+	 * @param stepExecution master {@link StepExecution}
+	 * @param isRestart true if this step is being restarted
+	 * @return a {@link Set} of {@link StepExecution}s to be executed
+	 * @throws Exception
+	 * @throws JobExecutionException
+	 */
+	private Set<StepExecution> splitStepExecution(StepExecution stepExecution,
+			boolean isRestart) throws Exception, JobExecutionException {
+		Set<StepExecution> partitionStepExecutions = new HashSet<StepExecution>();
+		if(isRestart) {
+			if(mapper != null) {
+				PartitionPlan plan = mapper.mapPartitions();
+
+				if(plan.getPartitionsOverride()) {
+					partitionStepExecutions = applyPartitionPlan(stepExecution, plan, false);
+
+					for (StepExecution curStepExecution : partitionStepExecutions) {
+						curStepExecution.setExecutionContext(new ExecutionContext());
+					}
+				} else {
+					Properties[] partitionProps = plan.getPartitionProperties();
+
+					plan = (PartitionPlanState) stepExecution.getExecutionContext().get("partitionPlanState");
+					plan.setPartitionProperties(partitionProps);
+
+					partitionStepExecutions = applyPartitionPlan(stepExecution, plan, true);
+				}
+
+			} else {
+				StepExecutionSplitter stepSplitter = new JsrStepExecutionSplitter(jobRepository, allowStartIfComplete, stepExecution.getStepName(), true);
+				partitionStepExecutions = stepSplitter.split(stepExecution, partitions);
+			}
+		} else {
+			if(mapper != null) {
+				PartitionPlan plan = mapper.mapPartitions();
+				partitionStepExecutions = applyPartitionPlan(stepExecution, plan, true);
+			} else {
+				StepExecutionSplitter stepSplitter = new JsrStepExecutionSplitter(jobRepository, allowStartIfComplete, stepExecution.getStepName(), true);
+				partitionStepExecutions = stepSplitter.split(stepExecution, partitions);
+			}
+		}
+		return partitionStepExecutions;
+	}
+
+	private Set<StepExecution> applyPartitionPlan(StepExecution stepExecution,
+			PartitionPlan plan, boolean restoreState) throws JobExecutionException {
+		StepExecutionSplitter stepSplitter;
+		Set<StepExecution> partitionStepExecutions;
+		if(plan.getThreads() > 0) {
+			threads = plan.getThreads();
+		} else if(plan.getPartitions() > 0) {
+			threads = plan.getPartitions();
+		} else {
+			throw new IllegalArgumentException("Either a number of threads or partitions are required");
+		}
+
+		stepExecution.getExecutionContext().put("partitionPlanState", new PartitionPlanState(plan));
+
+		stepSplitter = new JsrStepExecutionSplitter(jobRepository, allowStartIfComplete, stepExecution.getStepName(), restoreState);
+		partitionStepExecutions = stepSplitter.split(stepExecution, plan.getPartitions());
+		registerPartitionProperties(partitionStepExecutions, plan);
+		return partitionStepExecutions;
 	}
 
 	private void processFinishedPartitions(
@@ -220,11 +341,7 @@ public class JsrPartitionHandler implements PartitionHandler, InitializingBean {
 				if(i < partitionProperties.length) {
 					Properties partitionPropertyValues = partitionProperties[i];
 					if(partitionPropertyValues != null) {
-						List<BatchPropertyContextEntry> entries = new ArrayList<BatchPropertyContext.BatchPropertyContextEntry>();
-						BatchPropertyContextEntry entry = propertyContext.new BatchPropertyContextEntry(curExecution.getStepName(), partitionPropertyValues, BatchArtifactType.STEP);
-						entries.add(entry);
-
-						propertyContext.setStepPropertiesContextEntry(entries);
+						propertyContext.setStepProperties(curExecution.getStepName(), partitionPropertyValues);
 					}
 
 					i++;
@@ -253,13 +370,110 @@ public class JsrPartitionHandler implements PartitionHandler, InitializingBean {
 		});
 	}
 
+	/* (non-Javadoc)
+	 * @see org.springframework.beans.factory.InitializingBean#afterPropertiesSet()
+	 */
 	@Override
 	public void afterPropertiesSet() throws Exception {
 		Assert.notNull(propertyContext, "A BatchPropertyContext is required");
-		Assert.isTrue(mapper != null || threads > 0, "Either a mapper implementation or the number of partitions/threads is required");
+		Assert.isTrue(mapper != null || (threads > 0 || partitions > 0), "Either a mapper implementation or the number of partitions/threads is required");
+		Assert.notNull(jobRepository, "A JobRepository is required");
 
 		if(partitionDataQueue == null) {
 			partitionDataQueue = new LinkedBlockingQueue<Serializable>();
+		}
+
+		if(lock == null) {
+			lock = new ReentrantLock();
+		}
+	}
+
+	/**
+	 * Since a {@link PartitionPlan} could provide dynamic data (different results from run to run),
+	 * the batch runtime needs to save off the results for restarts.  This class serves as a container
+	 * used to save off that state.
+	 *
+	 * @author Michael Minella
+	 * @since 3.0
+	 */
+	public static class PartitionPlanState implements PartitionPlan, Serializable {
+
+		private static final long serialVersionUID = 1L;
+		private Properties[] partitionProperties;
+		private int partitions;
+		private int threads;
+
+		/**
+		 * @param plan the {@link PartitionPlan} that is the source of the state
+		 */
+		public PartitionPlanState(PartitionPlan plan) {
+			partitionProperties = plan.getPartitionProperties();
+			partitions = plan.getPartitions();
+			threads = plan.getThreads();
+		}
+
+		/* (non-Javadoc)
+		 * @see javax.batch.api.partition.PartitionPlan#getPartitionProperties()
+		 */
+		@Override
+		public Properties[] getPartitionProperties() {
+			return partitionProperties;
+		}
+
+		/* (non-Javadoc)
+		 * @see javax.batch.api.partition.PartitionPlan#getPartitions()
+		 */
+		@Override
+		public int getPartitions() {
+			return partitions;
+		}
+
+		/* (non-Javadoc)
+		 * @see javax.batch.api.partition.PartitionPlan#getThreads()
+		 */
+		@Override
+		public int getThreads() {
+			return threads;
+		}
+
+		/* (non-Javadoc)
+		 * @see javax.batch.api.partition.PartitionPlan#setPartitions(int)
+		 */
+		@Override
+		public void setPartitions(int count) {
+			this.partitions = count;
+		}
+
+		/* (non-Javadoc)
+		 * @see javax.batch.api.partition.PartitionPlan#setPartitionsOverride(boolean)
+		 */
+		@Override
+		public void setPartitionsOverride(boolean override) {
+			// Intentional No-op
+		}
+
+		/* (non-Javadoc)
+		 * @see javax.batch.api.partition.PartitionPlan#getPartitionsOverride()
+		 */
+		@Override
+		public boolean getPartitionsOverride() {
+			return false;
+		}
+
+		/* (non-Javadoc)
+		 * @see javax.batch.api.partition.PartitionPlan#setThreads(int)
+		 */
+		@Override
+		public void setThreads(int count) {
+			this.threads = count;
+		}
+
+		/* (non-Javadoc)
+		 * @see javax.batch.api.partition.PartitionPlan#setPartitionProperties(java.util.Properties[])
+		 */
+		@Override
+		public void setPartitionProperties(Properties[] props) {
+			this.partitionProperties = props;
 		}
 	}
 }

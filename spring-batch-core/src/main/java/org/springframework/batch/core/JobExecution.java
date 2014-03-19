@@ -64,6 +64,23 @@ public class JobExecution extends Entity {
 
 	private final String jobConfigurationName;
 
+	public JobExecution(JobExecution original) {
+		this.jobParameters = original.getJobParameters();
+		this.jobInstance = original.getJobInstance();
+		this.stepExecutions = original.getStepExecutions();
+		this.status = original.getStatus();
+		this.startTime = original.getStartTime();
+		this.createTime = original.getCreateTime();
+		this.endTime = original.getEndTime();
+		this.lastUpdated = original.getLastUpdated();
+		this.exitStatus = original.getExitStatus();
+		this.executionContext = original.getExecutionContext();
+		this.failureExceptions = original.getFailureExceptions();
+		this.jobConfigurationName = original.getJobConfigurationName();
+		this.setId(original.getId());
+		this.setVersion(original.getVersion());
+	}
+
 	/**
 	 * Because a JobExecution isn't valid unless the job is set, this
 	 * constructor is the only valid one from a modeling point of view.

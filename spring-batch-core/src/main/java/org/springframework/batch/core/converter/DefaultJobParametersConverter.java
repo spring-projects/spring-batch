@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2013 the original author or authors.
+ * Copyright 2006-2014 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -51,7 +51,7 @@ import org.springframework.util.StringUtils;
  * strategies, augmented if necessary by the custom editors provided.
  *
  * <br/>
- * 
+ *
  * If you need to be able to parse and format local-specific dates and numbers,
  * you can inject formatters ({@link #setDateFormat(DateFormat)} and
  * {@link #setNumberFormat(NumberFormat)}).
@@ -114,13 +114,15 @@ public class DefaultJobParametersConverter implements JobParametersConverter {
 
 			if (key.endsWith(DATE_TYPE)) {
 				Date date;
-				try {
-					date = dateFormat.parse(value);
-				}
-				catch (ParseException ex) {
-					String suffix = (dateFormat instanceof SimpleDateFormat) ? ", use "
-							+ ((SimpleDateFormat) dateFormat).toPattern() : "";
-							throw new IllegalArgumentException("Date format is invalid: [" + value + "]" + suffix);
+				synchronized (dateFormat) {
+					try {
+						date = dateFormat.parse(value);
+					}
+					catch (ParseException ex) {
+						String suffix = (dateFormat instanceof SimpleDateFormat) ? ", use "
+								+ ((SimpleDateFormat) dateFormat).toPattern() : "";
+								throw new IllegalArgumentException("Date format is invalid: [" + value + "]" + suffix);
+					}
 				}
 				propertiesBuilder.addDate(StringUtils.replace(key, DATE_TYPE, ""), date, identifying);
 			}
@@ -164,19 +166,24 @@ public class DefaultJobParametersConverter implements JobParametersConverter {
 	 * Delegate to {@link NumberFormat} to parse the value
 	 */
 	private Number parseNumber(String value) {
-		try {
-			return numberFormat.parse(value);
-		}
-		catch (ParseException ex) {
-			String suffix = (numberFormat instanceof DecimalFormat) ? ", use "
-					+ ((DecimalFormat) numberFormat).toPattern() : "";
-					throw new IllegalArgumentException("Number format is invalid: [" + value + "], use " + suffix);
+		synchronized (numberFormat) {
+			try {
+				return numberFormat.parse(value);
+			}
+			catch (ParseException ex) {
+				String suffix = (numberFormat instanceof DecimalFormat) ? ", use "
+						+ ((DecimalFormat) numberFormat).toPattern() : "";
+						throw new IllegalArgumentException("Number format is invalid: [" + value + "], use " + suffix);
+			}
 		}
 	}
 
 	/**
 	 * Use the same suffixes to create properties (omitting the string suffix
-	 * because it is the default).
+	 * because it is the default).  Non-identifying parameters will be prefixed
+	 * with the {@link #NON_IDENTIFYING_FLAG}.  However, since parameters are
+	 * identifying by default, they will <em>not</em> be prefixed with the
+	 * {@link #IDENTIFYING_FLAG}.
 	 *
 	 * @see org.springframework.batch.core.converter.JobParametersConverter#getProperties(org.springframework.batch.core.JobParameters)
 	 */
@@ -195,11 +202,16 @@ public class DefaultJobParametersConverter implements JobParametersConverter {
 			JobParameter jobParameter = entry.getValue();
 			Object value = jobParameter.getValue();
 			if (value != null) {
+				key = (!jobParameter.isIdentifying()? NON_IDENTIFYING_FLAG : "") + key;
 				if (jobParameter.getType() == ParameterType.DATE) {
-					result.setProperty(key + DATE_TYPE, dateFormat.format(value));
+					synchronized (dateFormat) {
+						result.setProperty(key + DATE_TYPE, dateFormat.format(value));
+					}
 				}
 				else if (jobParameter.getType() == ParameterType.LONG) {
-					result.setProperty(key + LONG_TYPE, longNumberFormat.format(value));
+					synchronized (longNumberFormat) {
+						result.setProperty(key + LONG_TYPE, longNumberFormat.format(value));
+					}
 				}
 				else if (jobParameter.getType() == ParameterType.DOUBLE) {
 					result.setProperty(key + DOUBLE_TYPE, decimalFormat((Double)value));
@@ -218,7 +230,9 @@ public class DefaultJobParametersConverter implements JobParametersConverter {
 	 */
 	private String decimalFormat(double value) {
 		if (numberFormat != DEFAULT_NUMBER_FORMAT) {
-			return numberFormat.format(value);
+			synchronized (numberFormat) {
+				return numberFormat.format(value);
+			}
 		}
 		return Double.toString(value);
 	}

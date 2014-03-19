@@ -11,7 +11,7 @@
 
 	<context:annotation-config />
 
-	<bean class="org.springframework.batch.core.scope.JobStartupRunner">
+	<bean class="org.springframework.batch.core.scope.StepStartupRunner">
 		<property name="step" ref="proxied" />
 	</bean>
 

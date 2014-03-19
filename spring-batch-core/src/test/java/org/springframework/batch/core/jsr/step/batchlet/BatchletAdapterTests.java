@@ -14,6 +14,7 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.springframework.batch.core.ExitStatus;
 import org.springframework.batch.core.StepContribution;
+import org.springframework.batch.core.scope.context.ChunkContext;
 import org.springframework.batch.repeat.RepeatStatus;
 
 public class BatchletAdapterTests {
@@ -38,7 +39,7 @@ public class BatchletAdapterTests {
 
 	@Test
 	public void testExecuteNoExitStatus() throws Exception {
-		assertEquals(RepeatStatus.FINISHED, adapter.execute(contribution, null));
+		assertEquals(RepeatStatus.FINISHED, adapter.execute(contribution, new ChunkContext(null)));
 
 		verify(delegate).process();
 	}
@@ -47,7 +48,7 @@ public class BatchletAdapterTests {
 	public void testExecuteWithExitStatus() throws Exception {
 		when(delegate.process()).thenReturn("my exit status");
 
-		assertEquals(RepeatStatus.FINISHED, adapter.execute(contribution, null));
+		assertEquals(RepeatStatus.FINISHED, adapter.execute(contribution, new ChunkContext(null)));
 
 		verify(delegate).process();
 		verify(contribution).setExitStatus(new ExitStatus("my exit status"));

@@ -13,7 +13,7 @@ import java.util.Map.Entry;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.springframework.batch.support.SerializationUtils;
+import org.springframework.util.SerializationUtils;
 
 /**
  * @author Lucas Ward

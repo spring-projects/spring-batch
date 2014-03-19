@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+						http://xmlns.jcp.org/xml/ns/javaee http://xmlns.jcp.org/xml/ns/javaee/jobXML_1_0.xsd">
+	<job id="job1" xmlns="http://xmlns.jcp.org/xml/ns/javaee" version="1.0">
+		<flow id="flow1" next="decision1">
+			<step id="flow1.step1">
+				<batchlet ref="doSomethingBatchlet"/>
+			</step>
+		</flow>
+		<decision ref="nextDecider" id="decision1">
+			<next on="next" to="step1"/>
+			<end on="*"/>
+		</decision>
+		<step id="step1">
+			<batchlet ref="doSomethingBatchlet"/>
+		</step>
+	</job>
+
+	<bean id="nextDecider" class="org.springframework.batch.core.jsr.step.DecisionStepTests$NextDecider"/>
+
+	<bean id="doSomethingBatchlet" class="org.springframework.batch.core.jsr.step.batchlet.BatchletSupport"/>
+
+</beans>

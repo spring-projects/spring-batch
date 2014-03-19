@@ -10,22 +10,22 @@ public class JdbcExecutionContextDaoTests extends AbstractExecutionContextDaoTes
 
 	@Override
 	protected JobInstanceDao getJobInstanceDao() {
-		return (JobInstanceDao) applicationContext.getBean("jobInstanceDao", JobInstanceDao.class);
+		return applicationContext.getBean("jobInstanceDao", JobInstanceDao.class);
 	}
 
 	@Override
 	protected JobExecutionDao getJobExecutionDao() {
-		return (JobExecutionDao) applicationContext.getBean("jobExecutionDao", JdbcJobExecutionDao.class);
+		return applicationContext.getBean("jobExecutionDao", JdbcJobExecutionDao.class);
 	}
 
 	@Override
 	protected StepExecutionDao getStepExecutionDao() {
-		return (StepExecutionDao) applicationContext.getBean("stepExecutionDao", StepExecutionDao.class);
+		return applicationContext.getBean("stepExecutionDao", StepExecutionDao.class);
 	}
 
 	@Override
 	protected ExecutionContextDao getExecutionContextDao() {
-		return (ExecutionContextDao) applicationContext.getBean("executionContextDao", JdbcExecutionContextDao.class);
+		return applicationContext.getBean("executionContextDao", JdbcExecutionContextDao.class);
 	}
 
 }

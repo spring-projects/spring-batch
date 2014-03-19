@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<job id="jsrJobOperatorTestNonRestartableJob" xmlns="http://xmlns.jcp.org/xml/ns/javaee" version="1.0" restartable="false">
+	<step id="step1">
+		<batchlet ref="org.springframework.batch.core.jsr.launch.JsrJobOperatorTests$FailingBatchlet" />
+	</step>
+</job>

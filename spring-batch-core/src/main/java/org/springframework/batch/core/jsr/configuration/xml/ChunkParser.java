@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 the original author or authors.
+ * Copyright 2013-2014 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -126,19 +126,19 @@ public class ChunkParser {
 
 			if(name.equals(READER_ELEMENT)) {
 				if (StringUtils.hasText(artifactName)) {
-					propertyValues.addPropertyValue("itemReader", new RuntimeBeanReference(artifactName));
+					propertyValues.addPropertyValue("stepItemReader", new RuntimeBeanReference(artifactName));
 				}
 
 				new PropertyParser(artifactName, parserContext, BatchArtifact.BatchArtifactType.STEP_ARTIFACT, stepName).parseProperties(nestedElement);
 			} else if(name.equals(PROCESSOR_ELEMENT)) {
 				if (StringUtils.hasText(artifactName)) {
-					propertyValues.addPropertyValue("itemProcessor", new RuntimeBeanReference(artifactName));
+					propertyValues.addPropertyValue("stepItemProcessor", new RuntimeBeanReference(artifactName));
 				}
 
 				new PropertyParser(artifactName, parserContext, BatchArtifact.BatchArtifactType.STEP_ARTIFACT, stepName).parseProperties(nestedElement);
 			} else if(name.equals(WRITER_ELEMENT)) {
 				if (StringUtils.hasText(artifactName)) {
-					propertyValues.addPropertyValue("itemWriter", new RuntimeBeanReference(artifactName));
+					propertyValues.addPropertyValue("stepItemWriter", new RuntimeBeanReference(artifactName));
 				}
 
 				new PropertyParser(artifactName, parserContext, BatchArtifact.BatchArtifactType.STEP_ARTIFACT, stepName).parseProperties(nestedElement);
@@ -174,7 +174,7 @@ public class ChunkParser {
 
 			String name = checkpointAlgorithmElement.getAttribute(REF_ATTRIBUTE);
 			if(StringUtils.hasText(name)) {
-				propertyValues.addPropertyValue("chunkCompletionPolicy", new RuntimeBeanReference(name));
+				propertyValues.addPropertyValue("stepChunkCompletionPolicy", new RuntimeBeanReference(name));
 			}
 
 			new PropertyParser(name, parserContext, BatchArtifact.BatchArtifactType.STEP_ARTIFACT, stepName).parseProperties(checkpointAlgorithmElement);

@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 the original author or authors.
+ * Copyright 2013-2014 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,8 +17,8 @@ package org.springframework.batch.core.jsr.configuration.xml;
 
 import java.util.Collection;
 
-import org.springframework.batch.core.job.flow.support.state.StepState;
 import org.springframework.batch.core.jsr.configuration.support.BatchArtifact;
+import org.springframework.batch.core.jsr.job.flow.support.state.JsrStepState;
 import org.springframework.batch.core.listener.StepListenerFactoryBean;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.config.RuntimeBeanReference;
@@ -54,7 +54,7 @@ public class StepParser extends AbstractSingleBeanDefinitionParser {
 		bd.setBeanClass(StepFactoryBean.class);
 		bd.getPropertyValues().addPropertyValue("batchPropertyContext", new RuntimeBeanReference("batchPropertyContext"));
 
-		BeanDefinitionBuilder stateBuilder = BeanDefinitionBuilder.genericBeanDefinition(StepState.class);
+		BeanDefinitionBuilder stateBuilder = BeanDefinitionBuilder.genericBeanDefinition(JsrStepState.class);
 
 		String stepName = element.getAttribute(SPLIT_ID_ATTRIBUTE);
 		builder.addPropertyValue("name", stepName);
@@ -68,13 +68,15 @@ public class StepParser extends AbstractSingleBeanDefinitionParser {
 		}
 
 		String allowStartIfComplete = element.getAttribute(ALLOW_START_IF_COMPLETE_ATTRIBUTE);
+		boolean allowStartIfCompletValue = false;
 		if(StringUtils.hasText(allowStartIfComplete)) {
 			bd.getPropertyValues().addPropertyValue("allowStartIfComplete",
 					allowStartIfComplete);
+			allowStartIfCompletValue = Boolean.valueOf(allowStartIfComplete);
 		}
 
 		new ListenerParser(StepListenerFactoryBean.class, "listeners").parseListeners(element, parserContext, bd, stepName);
-		new PropertyParser(stepName, parserContext, BatchArtifact.BatchArtifactType.STEP).parseProperties(element);
+		new PropertyParser(stepName, parserContext, BatchArtifact.BatchArtifactType.STEP, stepName).parseProperties(element);
 
 		// look at all nested elements
 		NodeList children = element.getChildNodes();
@@ -91,7 +93,7 @@ public class StepParser extends AbstractSingleBeanDefinitionParser {
 				} else if(name.equals(CHUNK_ELEMENT)) {
 					new ChunkParser().parse(nestedElement, bd, parserContext, stepName);
 				} else if(name.equals(PARTITION_ELEMENT)) {
-					new PartitionParser(stepName).parse(nestedElement, bd, parserContext, stepName);
+					new PartitionParser(stepName, allowStartIfCompletValue).parse(nestedElement, bd, parserContext, stepName);
 				}
 			}
 		}

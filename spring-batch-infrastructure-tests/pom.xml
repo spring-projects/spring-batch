@@ -140,7 +140,7 @@
 			<version>2.8.1</version>
 			<scope>test</scope>
 		</dependency>
-		<dependency>
+ 		<dependency>
 			<groupId>com.thoughtworks.xstream</groupId>
 			<artifactId>xstream</artifactId>
 			<scope>test</scope>

@@ -5,7 +5,7 @@
 	<packaging>jar</packaging>
 	<name>Core</name>
 	<description>Core domain for batch processing, expressing a domain of Jobs, Steps, Chunks, etc.</description>
-	<url>http://static.springframework.org/spring-batch/${project.artifactId}</url>
+	<url>http://docs.spring.io/spring-batch/${project.artifactId}</url>
 	<parent>
 		<groupId>org.springframework.batch</groupId>
 		<artifactId>spring-batch-parent</artifactId>
@@ -21,7 +21,6 @@
 		<dependency>
 		    <groupId>javax.batch</groupId>
 		    <artifactId>javax.batch-api</artifactId>
-		    <version>1.0</version>
 		</dependency>
 		<dependency>
 		    <groupId>com.ibm.jbatch</groupId>
@@ -35,7 +34,6 @@
 		<dependency>
 			<groupId>com.h2database</groupId>
 			<artifactId>h2</artifactId>
-			<version>1.2.132</version>
 		</dependency>
 		<dependency>
 			<groupId>commons-io</groupId>
@@ -280,6 +278,19 @@
 									</config>
 									<fileset dir="${basedir}/src/main/sql" includes="schema*.sql.vpp" />
 									<mapper type="glob" from="*.sql.vpp" to="*-sybase.sql" />
+								</vppcopy>
+								<vppcopy todir="${basedir}/target/generated-resources" overwrite="true">
+									<config>
+										<context>
+											<property key="includes" value="src/main/sql" />
+											<property file="${basedir}/src/main/sql/sqlite.properties" />
+										</context>
+										<engine>
+											<property key="velocimacro.library" value="src/main/sql/sqlite.vpp" />
+										</engine>
+									</config>
+									<fileset dir="${basedir}/src/main/sql" includes="schema*.sql.vpp" />
+									<mapper type="glob" from="*.sql.vpp" to="*-sqlite.sql" />
 								</vppcopy>
 							</tasks>
 						</configuration>

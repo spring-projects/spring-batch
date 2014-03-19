@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2013 the original author or authors.
+ * Copyright 2006-2014 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,18 +15,6 @@
  */
 package org.springframework.batch.core.repository.support;
 
-import static junit.framework.Assert.assertEquals;
-import static junit.framework.Assert.assertTrue;
-import static junit.framework.Assert.fail;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
-
-import java.sql.Connection;
-import java.sql.DatabaseMetaData;
-import java.util.Map;
-
-import javax.sql.DataSource;
-
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
@@ -38,6 +26,8 @@ import org.springframework.batch.core.repository.dao.XStreamExecutionContextStri
 import org.springframework.batch.item.database.support.DataFieldMaxValueIncrementerFactory;
 import org.springframework.core.serializer.Serializer;
 import org.springframework.dao.DataAccessException;
+import org.springframework.jdbc.core.JdbcOperations;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.incrementer.DataFieldMaxValueIncrementer;
 import org.springframework.jdbc.support.lob.DefaultLobHandler;
 import org.springframework.jdbc.support.lob.LobHandler;
@@ -45,6 +35,19 @@ import org.springframework.jdbc.support.lob.OracleLobHandler;
 import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.support.DefaultTransactionDefinition;
+
+import javax.sql.DataSource;
+import java.sql.Connection;
+import java.sql.DatabaseMetaData;
+import java.sql.Types;
+import java.util.Map;
+
+import static junit.framework.Assert.assertEquals;
+import static junit.framework.Assert.assertNotNull;
+import static junit.framework.Assert.assertTrue;
+import static junit.framework.Assert.fail;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 /**
  * @author Lucas Ward
@@ -171,7 +174,45 @@ public class JobRepositoryFactoryBeanTests {
 		factory.afterPropertiesSet();
 		assertEquals(customSerializer, ReflectionTestUtils.getField(factory, "serializer"));
 	}
+	
+	@Test
+	public void testDefaultJdbcOperations() throws Exception {
 
+		factory.setDatabaseType("ORACLE");
+
+		incrementerFactory = mock(DataFieldMaxValueIncrementerFactory.class);
+		when(incrementerFactory.isSupportedIncrementerType("ORACLE")).thenReturn(true);
+		when(incrementerFactory.getIncrementer("ORACLE", tablePrefix + "JOB_SEQ")).thenReturn(new StubIncrementer());
+		when(incrementerFactory.getIncrementer("ORACLE", tablePrefix + "JOB_EXECUTION_SEQ")).thenReturn(new StubIncrementer());
+		when(incrementerFactory.getIncrementer("ORACLE", tablePrefix + "STEP_EXECUTION_SEQ")).thenReturn(new StubIncrementer());
+		factory.setIncrementerFactory(incrementerFactory);
+
+		factory.afterPropertiesSet();
+		
+		JdbcOperations jdbcOperations = (JdbcOperations) ReflectionTestUtils.getField(factory, "jdbcOperations");
+		assertTrue(jdbcOperations instanceof JdbcTemplate);
+	}	
+
+	@Test
+	public void testCustomJdbcOperations() throws Exception {
+
+		factory.setDatabaseType("ORACLE");
+
+		incrementerFactory = mock(DataFieldMaxValueIncrementerFactory.class);
+		when(incrementerFactory.isSupportedIncrementerType("ORACLE")).thenReturn(true);
+		when(incrementerFactory.getIncrementer("ORACLE", tablePrefix + "JOB_SEQ")).thenReturn(new StubIncrementer());
+		when(incrementerFactory.getIncrementer("ORACLE", tablePrefix + "JOB_EXECUTION_SEQ")).thenReturn(new StubIncrementer());
+		when(incrementerFactory.getIncrementer("ORACLE", tablePrefix + "STEP_EXECUTION_SEQ")).thenReturn(new StubIncrementer());
+		factory.setIncrementerFactory(incrementerFactory);
+		
+		JdbcOperations customJdbcOperations = mock(JdbcOperations.class);
+		factory.setJdbcOperations(customJdbcOperations);
+		
+		factory.afterPropertiesSet();
+		
+		assertEquals(customJdbcOperations, ReflectionTestUtils.getField(factory, "jdbcOperations"));
+	}	
+	
 	@Test
 	public void testMissingDataSource() throws Exception {
 
@@ -183,7 +224,7 @@ public class JobRepositoryFactoryBeanTests {
 		catch (IllegalArgumentException ex) {
 			// expected
 			String message = ex.getMessage();
-			assertTrue("Wrong message: " + message, message.indexOf("DataSource") >= 0);
+			assertTrue("Wrong message: " + message, message.contains("DataSource"));
 		}
 
 	}
@@ -203,7 +244,7 @@ public class JobRepositoryFactoryBeanTests {
 		catch (IllegalArgumentException ex) {
 			// expected
 			String message = ex.getMessage();
-			assertTrue("Wrong message: " + message, message.indexOf("TransactionManager") >= 0);
+			assertTrue("Wrong message: " + message, message.contains("TransactionManager"));
 		}
 
 	}
@@ -221,7 +262,7 @@ public class JobRepositoryFactoryBeanTests {
 		catch (IllegalArgumentException ex) {
 			// expected
 			String message = ex.getMessage();
-			assertTrue("Wrong message: " + message, message.indexOf("foo") >= 0);
+			assertTrue("Wrong message: " + message, message.contains("foo"));
 		}
 
 	}
@@ -241,11 +282,11 @@ public class JobRepositoryFactoryBeanTests {
 		factory.getObject();
 	}
 
-	@Ignore //TODO - fix this test
+	@Ignore
 	@Test
 	public void testTransactionAttributesForCreateMethodNullHypothesis() throws Exception {
 		testCreateRepository();
-		JobRepository repository = (JobRepository) factory.getObject();
+		JobRepository repository = factory.getObject();
 		DefaultTransactionDefinition transactionDefinition = new DefaultTransactionDefinition(
 				DefaultTransactionDefinition.PROPAGATION_REQUIRES_NEW);
 		when(transactionManager.getTransaction(transactionDefinition)).thenReturn(null);
@@ -267,7 +308,7 @@ public class JobRepositoryFactoryBeanTests {
 	public void testTransactionAttributesForCreateMethod() throws Exception {
 
 		testCreateRepository();
-		JobRepository repository = (JobRepository) factory.getObject();
+		JobRepository repository = factory.getObject();
 		DefaultTransactionDefinition transactionDefinition = new DefaultTransactionDefinition(
 				DefaultTransactionDefinition.PROPAGATION_REQUIRES_NEW);
 		transactionDefinition.setIsolationLevel(DefaultTransactionDefinition.ISOLATION_SERIALIZABLE);
@@ -292,7 +333,7 @@ public class JobRepositoryFactoryBeanTests {
 
 		factory.setIsolationLevelForCreate("ISOLATION_READ_UNCOMMITTED");
 		testCreateRepository();
-		JobRepository repository = (JobRepository) factory.getObject();
+		JobRepository repository = factory.getObject();
 		DefaultTransactionDefinition transactionDefinition = new DefaultTransactionDefinition(
 				DefaultTransactionDefinition.PROPAGATION_REQUIRES_NEW);
 		transactionDefinition.setIsolationLevel(DefaultTransactionDefinition.ISOLATION_READ_UNCOMMITTED);
@@ -309,7 +350,20 @@ public class JobRepositoryFactoryBeanTests {
 			// expected exception from DataSourceUtils
 			assertEquals("No Statement specified", e.getMessage());
 		}
+	}
 
+	@Test(expected=IllegalArgumentException.class)
+	public void testInvalidCustomLobType() throws Exception {
+		factory.setClobType(Integer.MAX_VALUE);
+		testCreateRepository();
+	}
+
+	@Test
+	public void testCustomLobType() throws Exception {
+		factory.setClobType(Types.ARRAY);
+		testCreateRepository();
+		JobRepository repository = factory.getObject();
+		assertNotNull(repository);
 	}
 
 	private static class StubIncrementer implements DataFieldMaxValueIncrementer {

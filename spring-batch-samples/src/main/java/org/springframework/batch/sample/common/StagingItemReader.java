@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2012 the original author or authors.
+ * Copyright 2006-2014 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -30,7 +30,6 @@ import org.springframework.batch.core.StepExecution;
 import org.springframework.batch.core.StepExecutionListener;
 import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.ReaderNotOpenException;
-import org.springframework.batch.support.SerializationUtils;
 import org.springframework.beans.factory.DisposableBean;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.dao.DataAccessException;
@@ -38,6 +37,7 @@ import org.springframework.jdbc.core.JdbcOperations;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.simple.ParameterizedRowMapper;
 import org.springframework.util.Assert;
+import org.springframework.util.SerializationUtils;
 
 /**
  * Thread-safe database {@link ItemReader} implementing the process indicator
@@ -46,7 +46,7 @@ import org.springframework.util.Assert;
  * To achieve restartability use together with {@link StagingItemProcessor}.
  */
 public class StagingItemReader<T> implements ItemReader<ProcessIndicatorItemWrapper<T>>, StepExecutionListener,
-		InitializingBean, DisposableBean {
+InitializingBean, DisposableBean {
 
 	private static Log logger = LogFactory.getLog(StagingItemReader.class);
 
@@ -64,11 +64,13 @@ public class StagingItemReader<T> implements ItemReader<ProcessIndicatorItemWrap
 		jdbcTemplate = new JdbcTemplate(dataSource);
 	}
 
+	@Override
 	public void destroy() throws Exception {
 		initialized = false;
 		keys = null;
 	}
 
+	@Override
 	public final void afterPropertiesSet() throws Exception {
 		Assert.notNull(jdbcTemplate, "You must provide a DataSource.");
 	}
@@ -79,20 +81,22 @@ public class StagingItemReader<T> implements ItemReader<ProcessIndicatorItemWrap
 
 			return jdbcTemplate.query(
 
-			"SELECT ID FROM BATCH_STAGING WHERE JOB_ID=? AND PROCESSED=? ORDER BY ID",
+					"SELECT ID FROM BATCH_STAGING WHERE JOB_ID=? AND PROCESSED=? ORDER BY ID",
 
-			new ParameterizedRowMapper<Long>() {
-				public Long mapRow(ResultSet rs, int rowNum) throws SQLException {
-					return rs.getLong(1);
-				}
-			},
+					new ParameterizedRowMapper<Long>() {
+						@Override
+						public Long mapRow(ResultSet rs, int rowNum) throws SQLException {
+							return rs.getLong(1);
+						}
+					},
 
-			stepExecution.getJobExecution().getJobId(), StagingItemWriter.NEW);
+					stepExecution.getJobExecution().getJobId(), StagingItemWriter.NEW);
 
 		}
 
 	}
 
+	@Override
 	public ProcessIndicatorItemWrapper<T> read() throws DataAccessException {
 
 		if (!initialized) {
@@ -113,20 +117,23 @@ public class StagingItemReader<T> implements ItemReader<ProcessIndicatorItemWrap
 		@SuppressWarnings("unchecked")
 		T result = (T) jdbcTemplate.queryForObject("SELECT VALUE FROM BATCH_STAGING WHERE ID=?",
 				new ParameterizedRowMapper<Object>() {
-					public Object mapRow(ResultSet rs, int rowNum) throws SQLException {
-						byte[] blob = rs.getBytes(1);
-						return SerializationUtils.deserialize(blob);
-					}
-				}, id);
+			@Override
+			public Object mapRow(ResultSet rs, int rowNum) throws SQLException {
+				byte[] blob = rs.getBytes(1);
+				return SerializationUtils.deserialize(blob);
+			}
+		}, id);
 
 		return new ProcessIndicatorItemWrapper<T>(id, result);
 
 	}
 
+	@Override
 	public ExitStatus afterStep(StepExecution stepExecution) {
 		return null;
 	}
 
+	@Override
 	public void beforeStep(StepExecution stepExecution) {
 		this.stepExecution = stepExecution;
 		synchronized (lock) {

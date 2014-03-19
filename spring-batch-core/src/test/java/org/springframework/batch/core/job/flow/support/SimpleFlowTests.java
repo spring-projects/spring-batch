@@ -25,6 +25,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import org.junit.Before;
 import org.junit.Test;
 import org.springframework.batch.core.ExitStatus;
 import org.springframework.batch.core.job.flow.FlowExecution;
@@ -41,9 +42,14 @@ import org.springframework.batch.core.job.flow.StateSupport;
  */
 public class SimpleFlowTests {
 
-	private SimpleFlow flow = new SimpleFlow("job");
+	protected SimpleFlow flow;
 
-	private FlowExecutor executor = new JobFlowExecutorSupport();
+	protected FlowExecutor executor = new JobFlowExecutorSupport();
+
+	@Before
+	public void setUp() {
+		flow = new SimpleFlow("job");
+	}
 
 	@Test(expected = IllegalArgumentException.class)
 	public void testEmptySteps() throws Exception {
@@ -205,22 +211,13 @@ public class SimpleFlowTests {
 		assertNull(state);
 	}
 
-	private List<StateTransition> collect(StateTransition s1, StateTransition s2) {
+	protected List<StateTransition> collect(StateTransition... states) {
 		List<StateTransition> list = new ArrayList<StateTransition>();
-		list.add(s1);
-		list.add(s2);
-		return list;
-	}
 
-	private List<StateTransition> collect(StateTransition s1, StateTransition s2, StateTransition s3) {
-		List<StateTransition> list = collect(s1, s2);
-		list.add(s3);
-		return list;
-	}
+		for (StateTransition stateTransition : states) {
+			list.add(stateTransition);
+		}
 
-	private List<StateTransition> collect(StateTransition s1, StateTransition s2, StateTransition s3, StateTransition s4) {
-		List<StateTransition> list = collect(s1, s2, s3);
-		list.add(s4);
 		return list;
 	}
 
@@ -228,7 +225,7 @@ public class SimpleFlowTests {
 	 * @author Dave Syer
 	 *
 	 */
-	private static class StubState extends StateSupport {
+	protected static class StubState extends StateSupport {
 
 		/**
 		 * @param string

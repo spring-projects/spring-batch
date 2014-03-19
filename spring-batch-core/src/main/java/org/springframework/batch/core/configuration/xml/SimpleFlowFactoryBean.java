@@ -1,5 +1,5 @@
 /*
- * Copyright 2012-2013 the original author or authors.
+ * Copyright 2012-2014 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -55,8 +55,21 @@ public class SimpleFlowFactoryBean implements FactoryBean, InitializingBean {
 
 	private Comparator<StateTransition> stateTransitionComparator;
 
+	private Class<SimpleFlow> flowType;
+
+	/**
+	 * @param stateTransitionComparator {@link Comparator} implementation that addresses
+	 * the ordering of state evaluation
+	 */
 	public void setStateTransitionComparator(Comparator<StateTransition> stateTransitionComparator) {
 		this.stateTransitionComparator = stateTransitionComparator;
+	}
+
+	/**
+	 * @param flowType Used to inject the type of flow (regular Spring Batch or JSR-352)
+	 */
+	public void setFlowType(Class<SimpleFlow> flowType) {
+		this.flowType = flowType;
 	}
 
 	/**
@@ -88,12 +101,18 @@ public class SimpleFlowFactoryBean implements FactoryBean, InitializingBean {
 	@Override
 	public void afterPropertiesSet() throws Exception {
 		Assert.hasText(name, "The flow must have a name");
+
+		if(flowType == null) {
+			flowType = SimpleFlow.class;
+		}
 	}
 
+	/* (non-Javadoc)
+	 * @see org.springframework.beans.factory.FactoryBean#getObject()
+	 */
 	@Override
 	public Object getObject() throws Exception {
-
-		SimpleFlow flow = new SimpleFlow(name);
+		SimpleFlow flow = flowType.getConstructor(String.class).newInstance(name);
 
 		flow.setStateTransitionComparator(stateTransitionComparator);
 
@@ -132,9 +151,23 @@ public class SimpleFlowFactoryBean implements FactoryBean, InitializingBean {
 		}
 		String stateName = prefix + oldName;
 		if (state instanceof StepState) {
-			return new StepState(stateName, ((StepState) state).getStep());
+			return createNewStepState(state, oldName, stateName);
 		}
 		return new DelegateState(stateName, state);
+	}
+
+	/**
+	 * Provides an extension point to provide alternative {@link StepState}
+	 * implementations within a {@link SimpleFlow}
+	 *
+	 * @param state The state that will be used to create the StepState
+	 * @param oldName The name to be replaced
+	 * @param stateName The name for the new State
+	 * @return
+	 */
+	protected State createNewStepState(State state, String oldName,
+			String stateName) {
+		return new StepState(stateName, ((StepState) state).getStep(oldName));
 	}
 
 	@Override
@@ -154,12 +187,16 @@ public class SimpleFlowFactoryBean implements FactoryBean, InitializingBean {
 	 * @author Dave Syer
 	 *
 	 */
-	private static class DelegateState extends AbstractState implements FlowHolder {
+	public static class DelegateState extends AbstractState implements FlowHolder {
 		private final State state;
 
 		private DelegateState(String name, State state) {
 			super(name);
 			this.state = state;
+		}
+
+		public State getState() {
+			return this.state;
 		}
 
 		@Override

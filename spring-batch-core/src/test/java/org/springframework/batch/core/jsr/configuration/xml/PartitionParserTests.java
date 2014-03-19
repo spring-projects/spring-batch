@@ -17,6 +17,7 @@ package org.springframework.batch.core.jsr.configuration.xml;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
+import static org.springframework.batch.core.jsr.JsrTestUtils.runJob;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -35,28 +36,20 @@ import javax.batch.api.chunk.AbstractItemReader;
 import javax.batch.api.chunk.AbstractItemWriter;
 import javax.batch.api.partition.PartitionPlan;
 import javax.batch.api.partition.PartitionPlanImpl;
-import javax.batch.operations.JobOperator;
-import javax.batch.runtime.BatchRuntime;
 import javax.batch.runtime.BatchStatus;
 import javax.batch.runtime.JobExecution;
 import javax.batch.runtime.context.JobContext;
+import javax.batch.runtime.context.StepContext;
 import javax.inject.Inject;
 
 import org.junit.Before;
-import org.junit.BeforeClass;
 import org.junit.Test;
 import org.springframework.util.Assert;
 
 public class PartitionParserTests {
-
-	private static JobOperator operator;
 	private Pattern caPattern = Pattern.compile("ca");
 	private Pattern asPattern = Pattern.compile("AS");
-
-	@BeforeClass
-	public static void beforeClass() {
-		operator = BatchRuntime.getJobOperator();
-	}
+	private static final long TIMEOUT = 10000l;
 
 	@Before
 	public void before() {
@@ -67,17 +60,17 @@ public class PartitionParserTests {
 	}
 
 	@Test
-	public void testBatchletNoProperties() {
-		JobExecution execution = operator.getJobExecution(operator.start("partitionParserTestsBatchlet", new Properties()));
+	public void testBatchletNoProperties() throws Exception {
+		BatchStatus curBatchStatus = runJob("partitionParserTestsBatchlet", new Properties(), TIMEOUT).getBatchStatus();
 
-		assertEquals(BatchStatus.COMPLETED, execution.getBatchStatus());
+		assertEquals(BatchStatus.COMPLETED, curBatchStatus);
 		assertEquals(10, MyBatchlet.processed);
 		assertEquals(10, MyBatchlet.threadNames.size());
 	}
 
 	@Test
-	public void testChunkNoProperties() {
-		JobExecution execution = operator.getJobExecution(operator.start("partitionParserTestsChunk", new Properties()));
+	public void testChunkNoProperties() throws Exception {
+		JobExecution execution = runJob("partitionParserTestsChunk", new Properties(), TIMEOUT);
 
 		assertEquals(BatchStatus.COMPLETED, execution.getBatchStatus());
 		assertEquals(30, ItemReader.processedItems.size());
@@ -87,8 +80,8 @@ public class PartitionParserTests {
 	}
 
 	@Test
-	public void testFullPartitionConfiguration() {
-		JobExecution execution = operator.getJobExecution(operator.start("fullPartitionParserTests", new Properties()));
+	public void testFullPartitionConfiguration() throws Exception {
+		JobExecution execution = runJob("fullPartitionParserTests", new Properties(), TIMEOUT);
 
 		assertEquals(BatchStatus.COMPLETED, execution.getBatchStatus());
 		assertTrue(execution.getExitStatus().startsWith("BPS_"));
@@ -100,8 +93,8 @@ public class PartitionParserTests {
 	}
 
 	@Test
-	public void testFullPartitionConfigurationWithProperties() {
-		JobExecution execution = operator.getJobExecution(operator.start("fullPartitionParserWithPropertiesTests", new Properties()));
+	public void testFullPartitionConfigurationWithProperties() throws Exception {
+		JobExecution execution = runJob("fullPartitionParserWithPropertiesTests", new Properties(), TIMEOUT);
 
 		assertEquals(BatchStatus.COMPLETED, execution.getBatchStatus());
 		assertTrue(execution.getExitStatus().startsWith("BPS_"));
@@ -119,8 +112,8 @@ public class PartitionParserTests {
 	}
 
 	@Test
-	public void testFullPartitionConfigurationWithMapperSuppliedProperties() {
-		JobExecution execution = operator.getJobExecution(operator.start("fullPartitionParserWithMapperPropertiesTests", new Properties()));
+	public void testFullPartitionConfigurationWithMapperSuppliedProperties() throws Exception {
+		JobExecution execution = runJob("fullPartitionParserWithMapperPropertiesTests", new Properties(), TIMEOUT);
 
 		assertEquals(BatchStatus.COMPLETED, execution.getBatchStatus());
 		assertTrue(execution.getExitStatus().startsWith("BPS_"));
@@ -139,14 +132,13 @@ public class PartitionParserTests {
 		assertTrue(PartitionCollector.artifactNames.contains("collector1"));
 		assertTrue(PartitionCollector.artifactNames.contains("collector2"));
 
-		assertEquals(PartitionMapper.name, "mapper");
 		assertEquals(PartitionAnalyzer.name, "analyzer");
 		assertEquals(PartitionReducer.name, "reducer");
 	}
 
 	@Test
-	public void testFullPartitionConfigurationWithHardcodedProperties() {
-		JobExecution execution = operator.getJobExecution(operator.start("fullPartitionParserWithHardcodedPropertiesTests", new Properties()));
+	public void testFullPartitionConfigurationWithHardcodedProperties() throws Exception {
+		JobExecution execution = runJob("fullPartitionParserWithHardcodedPropertiesTests", new Properties(), TIMEOUT);
 
 		assertEquals(BatchStatus.COMPLETED, execution.getBatchStatus());
 		assertTrue(execution.getExitStatus().startsWith("BPS_"));
@@ -308,11 +300,20 @@ public class PartitionParserTests {
 		@BatchProperty
 		String artifactName;
 
+		@Inject
+		StepContext stepContext;
+
+		@Inject
+		JobContext jobContext;
+
 		@Override
 		public String process() throws Exception {
 			artifactNames.add(artifactName);
 			threadNames.add(Thread.currentThread().getName());
 			processed++;
+
+			stepContext.setExitStatus("bad step exit status");
+			jobContext.setExitStatus("bad job exit status");
 
 			return null;
 		}

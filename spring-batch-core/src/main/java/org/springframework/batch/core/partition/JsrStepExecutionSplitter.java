@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 the original author or authors.
+ * Copyright 2013-2014 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,7 +23,9 @@ import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.JobExecutionException;
 import org.springframework.batch.core.StepExecution;
 import org.springframework.batch.core.jsr.launch.JsrJobOperator;
+import org.springframework.batch.core.partition.support.SimpleStepExecutionSplitter;
 import org.springframework.batch.core.repository.JobRepository;
+import org.springframework.batch.item.ExecutionContext;
 
 /**
  * Provides JSR-352 specific behavior for the splitting of {@link StepExecution}s.
@@ -31,14 +33,17 @@ import org.springframework.batch.core.repository.JobRepository;
  * @author Michael Minella
  * @since 3.0
  */
-public class JsrStepExecutionSplitter implements StepExecutionSplitter {
+public class JsrStepExecutionSplitter extends SimpleStepExecutionSplitter {
 
 	private String stepName;
 	private JobRepository jobRepository;
+	private boolean restoreState;
 
-	public JsrStepExecutionSplitter(String stepName, JobRepository jobRepository) {
+	public JsrStepExecutionSplitter(JobRepository jobRepository, boolean allowStartIfComplete, String stepName, boolean restoreState) {
+		super(jobRepository, allowStartIfComplete, stepName, null);
 		this.stepName = stepName;
 		this.jobRepository = jobRepository;
+		this.restoreState = restoreState;
 	}
 
 	@Override
@@ -76,8 +81,12 @@ public class JsrStepExecutionSplitter implements StepExecutionSplitter {
 
 		for(int i = 0; i < gridSize; i++) {
 			String stepName = this.stepName + ":partition" + i;
-			StepExecution curStepExecution = jobExecution.createStepExecution(stepName);
-			executions.add(curStepExecution);
+			JobExecution curJobExecution = new JobExecution(jobExecution);
+			StepExecution curStepExecution = new StepExecution(stepName, curJobExecution);
+
+			if(!restoreState || getStartable(curStepExecution, new ExecutionContext())) {
+				executions.add(curStepExecution);
+			}
 		}
 
 		jobRepository.addAll(executions);

@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+						http://xmlns.jcp.org/xml/ns/javaee http://xmlns.jcp.org/xml/ns/javaee/jobXML_1_0.xsd">
+	<job id="job1" xmlns="http://xmlns.jcp.org/xml/ns/javaee" version="1.0">
+		<decision ref="org.springframework.batch.core.jsr.step.DecisionStepTests$NextDecider" id="decision1">
+			<next on="*" to="step2"/>
+		</decision>
+		<step id="step2">
+			<batchlet ref="org.springframework.batch.core.jsr.step.batchlet.BatchletSupport"/>
+		</step>
+	</job>
+</beans>

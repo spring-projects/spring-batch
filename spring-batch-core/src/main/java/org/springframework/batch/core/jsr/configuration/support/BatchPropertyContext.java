@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 the original author or authors.
+ * Copyright 2013-2014 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,8 +15,8 @@
  */
 package org.springframework.batch.core.jsr.configuration.support;
 
+import java.util.Enumeration;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 
@@ -35,6 +35,7 @@ import org.springframework.util.Assert;
  */
 public class BatchPropertyContext {
 	private static final String PARTITION_INDICATOR = ":partition";
+
 	private Properties jobProperties = new Properties();
 	private Map<String, Properties> stepProperties = new HashMap<String, Properties>();
 	private Map<String, Properties> artifactProperties = new HashMap<String, Properties>();
@@ -53,6 +54,18 @@ public class BatchPropertyContext {
 
 	/**
 	 * <p>
+	 * Adds Job level properties to the context.
+	 * </p>
+	 *
+	 * @param properties the job {@link Properties} to add
+	 */
+	public void setJobProperties(Properties properties) {
+		Assert.notNull(properties, "Job properties cannot be null");
+		this.jobProperties.putAll(properties);
+	}
+
+	/**
+	 * <p>
 	 * Obtains the Step level properties for the provided Step name.
 	 * </p>
 	 *
@@ -60,6 +73,7 @@ public class BatchPropertyContext {
 	 * @return the {@link Properties} for the Step
 	 */
 	public Properties getStepProperties(String stepName) {
+		Assert.hasText(stepName, "Step name must be provided");
 		Properties properties = new Properties();
 
 		if(stepProperties.containsKey(stepName)) {
@@ -76,9 +90,59 @@ public class BatchPropertyContext {
 
 	/**
 	 * <p>
-	 * Obtains the batch {@link Properties} for the provided artifact name. The returned {@link Properties}
-	 * will also contain any job level properties that have been set. Job level properties will not override
-	 * existing lower level artifact properties.
+	 * Adds Step level properties to the context.
+	 * </p>
+	 *
+	 * @param properties the step {@link Properties} to add
+	 */
+	public void setStepProperties(Map<String, Properties> properties) {
+		Assert.notNull(properties, "Step properties cannot be null");
+
+		for(Map.Entry<String, Properties> propertiesEntry : properties.entrySet()) {
+			String stepName = propertiesEntry.getKey();
+			Properties stepProperties = propertiesEntry.getValue();
+
+			if (!stepProperties.isEmpty()) {
+				if (this.stepProperties.containsKey(stepName)) {
+					Properties existingStepProperties = this.stepProperties.get(stepName);
+
+					Enumeration<?> stepPropertyNames = stepProperties.propertyNames();
+
+					while(stepPropertyNames.hasMoreElements()) {
+						String propertyEntryName = (String) stepPropertyNames.nextElement();
+						existingStepProperties.put(propertyEntryName, stepProperties.getProperty(propertyEntryName));
+					}
+
+					this.stepProperties.put(stepName, existingStepProperties);
+				} else {
+					this.stepProperties.put(stepName, propertiesEntry.getValue());
+				}
+			}
+		}
+	}
+
+	/**
+	 * <p>
+	 * Convenience method to set step level properties. Simply wraps the provided parameters
+	 * and delegates to {@link #setStepProperties(java.util.Map)}.
+	 * </p>
+	 *
+	 * @param stepName the step name to set {@link Properties} for
+	 * @param properties the {@link Properties} to set
+	 */
+	public void setStepProperties(String stepName, Properties properties) {
+		Assert.hasText(stepName, "Step name must be provided");
+		Assert.notNull(properties, "Step properties must not be null");
+
+		Map<String, Properties> stepProperties = new HashMap<String, Properties>();
+		stepProperties.put(stepName, properties);
+
+		setStepProperties(stepProperties);
+	}
+
+	/**
+	 * <p>
+	 * Obtains the batch {@link Properties} for the provided artifact name.
 	 * </p>
 	 *
 	 * @param artifactName the batch artifact to obtain properties for
@@ -86,13 +150,32 @@ public class BatchPropertyContext {
 	 */
 	public Properties getArtifactProperties(String artifactName) {
 		Properties properties = new Properties();
-		properties.putAll(getJobProperties());
 
 		if (artifactProperties.containsKey(artifactName)) {
 			properties.putAll(artifactProperties.get(artifactName));
 		}
 
 		return properties;
+	}
+
+	/**
+	 * <p>
+	 * Adds non-step artifact properties to the context.
+	 * </p>
+	 *
+	 * @param properties the artifact {@link Properties} to add
+	 */
+	public void setArtifactProperties(Map<String, Properties> properties) {
+		Assert.notNull(properties, "Step properties cannot be null");
+
+		for(Map.Entry<String, Properties> propertiesEntry : properties.entrySet()) {
+			String artifactName = propertiesEntry.getKey();
+			Properties artifactProperties = propertiesEntry.getValue();
+
+			if(!artifactProperties.isEmpty()) {
+				this.artifactProperties.put(artifactName, artifactProperties);
+			}
+		}
 	}
 
 	/**
@@ -106,7 +189,6 @@ public class BatchPropertyContext {
 	 */
 	public Properties getStepArtifactProperties(String stepName, String artifactName) {
 		Properties properties = new Properties();
-		properties.putAll(getJobProperties());
 		properties.putAll(getStepProperties(stepName));
 
 		Map<String, Properties> artifactProperties = stepArtifactProperties.get(stepName);
@@ -131,207 +213,31 @@ public class BatchPropertyContext {
 
 	/**
 	 * <p>
-	 * Adds Job level properties to the context.
+	 * Adds Step artifact properties to the context.
 	 * </p>
 	 *
-	 * @param batchPropertyContextEntries the {@link BatchPropertyContextEntry} objects to add
+	 * @param properties the step artifact {@link Properties} to add
 	 */
-	public void setJobPropertiesContextEntry(List<BatchPropertyContextEntry> batchPropertyContextEntries) {
-		for(BatchPropertyContextEntry batchPropertyContextEntry : batchPropertyContextEntries) {
-			Properties jobProperties = batchPropertyContextEntry.getProperties();
+	public void setStepArtifactProperties(Map<String, Map<String, Properties>> properties) {
+		Assert.notNull(properties, "Step artifact properties cannot be null");
 
-			if (jobProperties != null && !jobProperties.isEmpty()) {
-				this.jobProperties.putAll(jobProperties);
-			}
-		}
-	}
+		for(Map.Entry<String, Map<String, Properties>> propertyEntries : properties.entrySet()) {
+			String stepName = propertyEntries.getKey();
 
-	/**
-	 * <p>
-	 * Adds Step level properties to the context.
-	 * </p>
-	 *
-	 * @param batchPropertyContextEntries the {@link BatchPropertyContextEntry} objects to add
-	 */
-	public void setStepPropertiesContextEntry(List<BatchPropertyContextEntry> batchPropertyContextEntries) {
-		for (BatchPropertyContextEntry batchPropertyContextEntry : batchPropertyContextEntries) {
-			Assert.hasText(batchPropertyContextEntry.getArtifactName(), "Step name must be defined as the artifact name.");
+			for(Map.Entry<String, Properties> artifactEntries : propertyEntries.getValue().entrySet()) {
+				final String artifactName = artifactEntries.getKey();
+				final Properties props = artifactEntries.getValue();
 
-			String stepName = batchPropertyContextEntry.getArtifactName();
-			Properties stepProperties = batchPropertyContextEntry.getProperties();
-
-			if (stepProperties != null && ! stepProperties.isEmpty()) {
-				if (this.stepProperties.containsKey(stepName)) {
-					Properties existingStepProperties = this.stepProperties.get(stepName);
-					existingStepProperties.putAll(stepProperties);
-
-					this.stepProperties.put(stepName, existingStepProperties);
-				} else {
-					this.stepProperties.put(stepName, stepProperties);
-				}
-			}
-		}
-	}
-
-	/**
-	 * <p>
-	 * Adds non-Step scoped artifact properties to the context.
-	 * </p>
-	 *
-	 * @param batchPropertyContextEntries the {@link BatchPropertyContextEntry} objects to add
-	 */
-	public void setArtifactPropertiesContextEntry(List<BatchPropertyContextEntry> batchPropertyContextEntries) {
-		for (BatchPropertyContextEntry batchPropertyContextEntry : batchPropertyContextEntries) {
-			Assert.hasText(batchPropertyContextEntry.getArtifactName(), "Artifact name must be defined");
-
-			Properties properties = batchPropertyContextEntry.getProperties();
-			String artifactName = batchPropertyContextEntry.getArtifactName();
-
-			if (properties != null && !properties.isEmpty()) {
-				artifactProperties.put(artifactName, properties);
-			}
-		}
-	}
-
-	/**
-	 * <p>
-	 * Adds Step scoped artifact properties to the context.
-	 * </p>
-	 *
-	 * @param batchPropertyContextEntries the {@link BatchPropertyContextEntry} objects to add
-	 */
-	@SuppressWarnings("serial")
-	public void setStepArtifactPropertiesContextEntry(List<BatchPropertyContextEntry> batchPropertyContextEntries) {
-		for (BatchPropertyContextEntry batchPropertyContextEntry : batchPropertyContextEntries) {
-			Assert.hasText(batchPropertyContextEntry.getStepName(), "Step name must be defined");
-			Assert.hasText(batchPropertyContextEntry.getArtifactName(), "Artifact name must be defined");
-
-			String stepName = batchPropertyContextEntry.getStepName();
-			final String artifactName = batchPropertyContextEntry.getArtifactName();
-
-			final Properties properties = batchPropertyContextEntry.getProperties();
-
-			if (!properties.isEmpty()) {
 				Map<String, Properties> artifactProperties = stepArtifactProperties.get(stepName);
 
 				if (artifactProperties == null) {
 					stepArtifactProperties.put(stepName, new HashMap<String, Properties>() {{
-						put(artifactName, properties);
+						put(artifactName, props);
 					}});
 				} else {
-					artifactProperties.put(artifactName, properties);
+					artifactProperties.put(artifactName, props);
 				}
 			}
-		}
-	}
-
-	/**
-	 * <p>
-	 * Obtains the property to be used when setting data for the provided {@link BatchArtifact.BatchArtifactType}.
-	 * </p>
-	 *
-	 * @param batchArtifactType the {@link BatchArtifact.BatchArtifactType} to lookup the property name for
-	 * @return the property name for
-	 * @throws IllegalStateException if an unhandled {@link BatchArtifact.BatchArtifactType} is encountered
-	 */
-	public String getPropertyName(BatchArtifact.BatchArtifactType batchArtifactType) {
-		switch (batchArtifactType) {
-		case STEP:
-			return "stepPropertiesContextEntry";
-		case STEP_ARTIFACT:
-			return "stepArtifactPropertiesContextEntry";
-		case ARTIFACT:
-			return "artifactPropertiesContextEntry";
-		case JOB:
-			return "jobPropertiesContextEntry";
-		default:
-			throw new IllegalStateException("Unhandled BatchArtifactType of: " + batchArtifactType);
-		}
-	}
-
-	/**
-	 * <p>
-	 * Simple object to encapsulate batch properties of a given batch artifact.
-	 * </p>
-	 *
-	 * @author Chris Schaefer
-	 * @since 3.0
-	 */
-	public class BatchPropertyContextEntry {
-		private String stepName;
-		private String artifactName;
-		private Properties properties;
-		private BatchArtifact.BatchArtifactType batchArtifactType;
-
-		/**
-		 * <p>
-		 * Creates a new entry instance using the provided bean name representing batch artifact
-		 * and its associated {@link Properties}.
-		 * </p>
-		 *
-		 * @param artifactName the name representing the batch artifact
-		 * @param properties the associated {@link Properties}
-		 * @param batchArtifactType the associated {@link BatchArtifact.BatchArtifactType}
-		 */
-		public BatchPropertyContextEntry(String artifactName, Properties properties, BatchArtifact.BatchArtifactType batchArtifactType) {
-			this.artifactName = artifactName;
-			this.batchArtifactType = batchArtifactType;
-			this.properties = properties != null ? properties : new Properties();
-		}
-
-		/**
-		 * <p>
-		 * Obtains the name of the batch artifact this entry is associated with.
-		 * </p>
-		 *
-		 * @return the name of the batch artifact
-		 */
-		public String getArtifactName() {
-			return artifactName;
-		}
-
-		/**
-		 * <p>
-		 * Obtains the batch {@link Properties} that are associated with this entry.
-		 * </p>
-		 *
-		 * @return the batch {@link Properties}
-		 */
-		public Properties getProperties() {
-			return properties;
-		}
-
-		/**
-		 * <p>
-		 * Obtains the {@link BatchArtifact.BatchArtifactType} represented by this context entry.
-		 * </p>
-		 *
-		 * @return the {@link BatchArtifact.BatchArtifactType}
-		 */
-		public BatchArtifact.BatchArtifactType getBatchArtifactType() {
-			return batchArtifactType;
-		}
-
-		/**
-		 * <p>
-		 * Sets the Step name associated with this entry.
-		 * </p>
-		 *
-		 * @param stepName the Step name associated with this entry
-		 */
-		public void setStepName(String stepName) {
-			this.stepName = stepName;
-		}
-
-		/**
-		 * <p>
-		 * Obtains the Step name associated with this entry.
-		 * </p>
-		 *
-		 * @return the step name associated with this entry
-		 */
-		public String getStepName() {
-			return stepName;
 		}
 	}
 }

@@ -31,7 +31,8 @@ import org.springframework.util.StringUtils;
  * @since 3.0
  */
 public class JsrExpressionParser {
-	public static final String QUOTE = "'";
+	private static final String QUOTE = "'";
+	private static final String NULL = "null";
 	private static final String ELVIS_RHS = ":";
 	private static final String ELVIS_LHS = "\\?";
 	private static final String ELVIS_OPERATOR = "?:";
@@ -42,6 +43,15 @@ public class JsrExpressionParser {
 
 	private BeanExpressionContext beanExpressionContext;
 	private BeanExpressionResolver beanExpressionResolver;
+
+	/**
+	 * <p>
+	 * Creates a new instance of this expression parser without and expression resolver. Creating
+	 * an instance via this constructor will still parse expressions but no resolution of operators
+	 * will occur as its expected the caller will.
+	 * </p>
+	 */
+	public JsrExpressionParser() { }
 
 	/**
 	 * <p>
@@ -66,11 +76,13 @@ public class JsrExpressionParser {
 	 * @return a JSR-352 transformed expression that can be evaluated by a SPeL parser
 	 */
 	public String parseExpression(String expression) {
-		if (StringUtils.countOccurrencesOf(expression, ELVIS_OPERATOR) > 0) {
-			return parseConditionalExpressions(expression);
+		String expressionToParse = expression;
+
+		if (StringUtils.countOccurrencesOf(expressionToParse, ELVIS_OPERATOR) > 0) {
+			expressionToParse = parseConditionalExpressions(expressionToParse);
 		}
 
-		return (String) beanExpressionResolver.evaluate(expression, beanExpressionContext);
+		return evaluateExpression(expressionToParse);
 	}
 
 	private String parseConditionalExpressions(String expression) {
@@ -84,20 +96,35 @@ public class JsrExpressionParser {
 			String value = conditionalExpression.split(ELVIS_LHS)[0];
 			String defaultValue = conditionalExpression.split(ELVIS_RHS)[1];
 
-			StringBuilder parsedExpression = new StringBuilder()
-					.append(EXPRESSION_PREFIX)
-					.append((String) beanExpressionResolver.evaluate(value, beanExpressionContext))
-					.append(ELVIS_OPERATOR)
-					.append(QUOTE)
-					.append((String) beanExpressionResolver.evaluate(defaultValue, beanExpressionContext))
-					.append(QUOTE)
-					.append(EXPRESSION_SUFFIX);
+			StringBuilder parsedExpression = new StringBuilder();
+
+			if(beanExpressionResolver != null) {
+						parsedExpression.append(EXPRESSION_PREFIX)
+						.append(evaluateExpression(value))
+						.append(ELVIS_OPERATOR)
+						.append(QUOTE)
+						.append(evaluateExpression(defaultValue))
+						.append(QUOTE)
+						.append(EXPRESSION_SUFFIX);
+			} else {
+				if(NULL.equals(value)) {
+					parsedExpression.append(defaultValue);
+				} else {
+					parsedExpression.append(value);
+				}
+			}
 
 			expressionToParse = expressionToParse.replace(conditionalExpression, parsedExpression);
 		}
 
-		expressionToParse = expressionToParse.replace(DEFAULT_VALUE_SEPARATOR, "");
+		return expressionToParse.replace(DEFAULT_VALUE_SEPARATOR, "");
+	}
 
-		return (String) beanExpressionResolver.evaluate(expressionToParse, beanExpressionContext);
+	private String evaluateExpression(String expression) {
+		if(beanExpressionResolver != null) {
+			return (String) beanExpressionResolver.evaluate(expression, beanExpressionContext);
+		}
+
+		return expression;
 	}
 }

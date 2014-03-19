@@ -15,16 +15,6 @@
  */
 package org.springframework.batch.core.job;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
-
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Date;
-
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.batch.core.BatchStatus;
@@ -39,6 +29,16 @@ import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.repository.support.MapJobRepositoryFactoryBean;
 import org.springframework.batch.core.step.StepSupport;
 
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Date;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
 /**
  * @author Dave Syer
  *
@@ -51,7 +51,7 @@ public class ExtendedAbstractJobTests {
 	@Before
 	public void setUp() throws Exception {
 		MapJobRepositoryFactoryBean factory = new MapJobRepositoryFactoryBean();
-		jobRepository = (JobRepository) factory.getObject();
+		jobRepository = factory.getObject();
 		job = new StubJob("job", jobRepository);
 	}
 
@@ -166,7 +166,7 @@ public class ExtendedAbstractJobTests {
 
 		MapJobRepositoryFactoryBean factory = new MapJobRepositoryFactoryBean();
 		factory.afterPropertiesSet();
-		JobRepository repository = (JobRepository) factory.getObject();
+		JobRepository repository = factory.getObject();
 		job.setJobRepository(repository);
 		job.setRestartable(true);
 

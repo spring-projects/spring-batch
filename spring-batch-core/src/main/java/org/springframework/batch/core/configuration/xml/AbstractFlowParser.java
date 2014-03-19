@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2013 the original author or authors.
+ * Copyright 2006-2014 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,6 +20,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -40,37 +41,38 @@ import org.w3c.dom.NodeList;
 /**
  * @author Dave Syer
  * @author Michael Minella
+ * @author Chris Schaefer
  *
  */
 public abstract class AbstractFlowParser extends AbstractSingleBeanDefinitionParser {
 
-	private static final String ID_ATTR = "id";
+	protected static final String ID_ATTR = "id";
 
-	private static final String STEP_ELE = "step";
+	protected static final String STEP_ELE = "step";
 
-	private static final String FLOW_ELE = "flow";
+	protected static final String FLOW_ELE = "flow";
 
-	private static final String DECISION_ELE = "decision";
+	protected static final String DECISION_ELE = "decision";
 
-	private static final String SPLIT_ELE = "split";
+	protected static final String SPLIT_ELE = "split";
 
-	private static final String NEXT_ATTR = "next";
+	protected static final String NEXT_ATTR = "next";
 
-	private static final String NEXT_ELE = "next";
+	protected static final String NEXT_ELE = "next";
 
-	private static final String END_ELE = "end";
+	protected static final String END_ELE = "end";
 
-	private static final String FAIL_ELE = "fail";
+	protected static final String FAIL_ELE = "fail";
 
-	private static final String STOP_ELE = "stop";
+	protected static final String STOP_ELE = "stop";
 
-	private static final String ON_ATTR = "on";
+	protected static final String ON_ATTR = "on";
 
-	private static final String TO_ATTR = "to";
+	protected static final String TO_ATTR = "to";
 
-	private static final String RESTART_ATTR = "restart";
+	protected static final String RESTART_ATTR = "restart";
 
-	private static final String EXIT_CODE_ATTR = "exit-code";
+	protected static final String EXIT_CODE_ATTR = "exit-code";
 
 	private static final InlineStepParser stepParser = new InlineStepParser();
 
@@ -79,7 +81,7 @@ public abstract class AbstractFlowParser extends AbstractSingleBeanDefinitionPar
 	private static final DecisionParser decisionParser = new DecisionParser();
 
 	// For generating unique state names for end transitions
-	private static int endCounter = 0;
+	protected static int endCounter = 0;
 
 	private String jobFactoryRef;
 
@@ -119,7 +121,7 @@ public abstract class AbstractFlowParser extends AbstractSingleBeanDefinitionPar
 		parserContext.pushContainingComponent(compositeDef);
 
 		boolean stepExists = false;
-		Map<String, Set<String>> reachableElementMap = new HashMap<String, Set<String>>();
+		Map<String, Set<String>> reachableElementMap = new LinkedHashMap<String, Set<String>>();
 		String startElement = null;
 		NodeList children = element.getChildNodes();
 		for (int i = 0; i < children.getLength(); i++) {

@@ -6,7 +6,6 @@
     <version>3.0.0.BUILD-SNAPSHOT</version>
     <packaging>jar</packaging>
     <name>Commandline</name>
-    <url>http://www.springframework.org/spring-batch/archetypes/simple-cli-archetype</url>
     <description>This project is a command line batch sample from Spring Batch demonstrating a typical batch job.
         The job can be invoked via "mvn exec:java" to see the job run from the command line.
         During an "mvn package", a distribution archive in the format defined in src/main/assembly/descriptor.xml will
@@ -14,10 +13,11 @@
         The ./bin/runJob.(sh|bat) script from the extracted deployment archive can be invoked to run the job.
     </description>
     <properties>
-        <spring.framework.version>3.2.0.RELEASE</spring.framework.version>
+        <spring.framework.version>4.0.2.RELEASE</spring.framework.version>
         <spring.batch.version>3.0.0.BUILD-SNAPSHOT</spring.batch.version>
         <dependency.locations.enabled>false</dependency.locations.enabled>
         <junit.version>4.10</junit.version>
+        <maven.compiler.plugin>3.1</maven.compiler.plugin>
         <compiler.target.version>1.6</compiler.target.version>
         <compiler.source.version>1.6</compiler.source.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -46,7 +46,7 @@
                         <enabled>false</enabled>
                     </snapshots>
                 </pluginRepository>
-                <pluginRepository>
+<!--                 <pluginRepository>
                     <id>com.springsource.repository.bundles.release</id>
                     <name>SpringSource Enterprise Bundle Repository - SpringSource Bundle Releases</name>
                     <url>http://repository.springsource.com/maven/bundles/release</url>
@@ -54,7 +54,7 @@
                         <enabled>false</enabled>
                     </snapshots>
                 </pluginRepository>
-            </pluginRepositories>
+ -->            </pluginRepositories>
         </profile>
     </profiles>
     <dependencies>
@@ -185,7 +185,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
-                <version>2.3.2</version>
+                <version>${maven.compiler.plugin}</version>
                 <configuration>
                     <source>${compiler.source.version}</source>
                     <target>${compiler.target.version}</target>

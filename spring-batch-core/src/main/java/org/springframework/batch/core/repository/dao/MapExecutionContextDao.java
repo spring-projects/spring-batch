@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2013 the original author or authors.
+ * Copyright 2006-2014 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,9 +23,9 @@ import java.util.concurrent.ConcurrentMap;
 import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.StepExecution;
 import org.springframework.batch.item.ExecutionContext;
-import org.springframework.batch.support.SerializationUtils;
 import org.springframework.batch.support.transaction.TransactionAwareProxyFactory;
 import org.springframework.util.Assert;
+import org.springframework.util.SerializationUtils;
 
 /**
  * In-memory implementation of {@link ExecutionContextDao} backed by maps.

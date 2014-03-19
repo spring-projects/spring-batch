@@ -431,6 +431,37 @@ public class DefaultFieldSetTests {
 	}
 
 	@Test
+	public void testReadDateInvalidWithDefault() throws Exception {
+		Date defaultDate = new Date();
+		try {
+			fieldSet.readDate(1, defaultDate);
+			fail("Should throw IllegalArgumentException");
+		} catch (IllegalArgumentException e) {
+			assertTrue(e.getMessage().indexOf("yyyy-MM-dd") > 0);
+		}
+		try {
+			fieldSet.readDate("String", defaultDate);
+			fail("Should throw IllegalArgumentException");
+		} catch (IllegalArgumentException e) {
+			assertTrue(e.getMessage().indexOf("yyyy-MM-dd") > 0);
+			assertTrue(e.getMessage().indexOf("name: [String]") > 0);
+		}
+		try {
+			fieldSet.readDate(1, "dd-MM-yyyy", defaultDate);
+			fail("Should throw IllegalArgumentException");
+		} catch (IllegalArgumentException e) {
+			assertTrue(e.getMessage().indexOf("dd-MM-yyyy") > 0);
+		}
+		try {
+			fieldSet.readDate("String", "dd-MM-yyyy", defaultDate);
+			fail("Should throw IllegalArgumentException");
+		} catch (IllegalArgumentException e) {
+			assertTrue(e.getMessage().indexOf("dd-MM-yyyy") > 0);
+			assertTrue(e.getMessage().indexOf("name: [String]") > 0);
+		}
+	}
+	
+	@Test
 	public void testStrictReadDateWithPattern() throws Exception {
 
 		fieldSet = new DefaultFieldSet(new String[] {"50-2-13"});

@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 the original author or authors.
+ * Copyright 2013-2014 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,6 +15,8 @@
  */
 package org.springframework.batch.core.jsr.step;
 
+import java.util.Collection;
+
 import javax.batch.api.partition.PartitionReducer;
 import javax.batch.api.partition.PartitionReducer.PartitionStatus;
 
@@ -22,8 +24,13 @@ import org.springframework.batch.core.BatchStatus;
 import org.springframework.batch.core.JobExecutionException;
 import org.springframework.batch.core.Step;
 import org.springframework.batch.core.StepExecution;
+import org.springframework.batch.core.jsr.partition.JsrPartitionHandler;
+import org.springframework.batch.core.jsr.partition.support.JsrStepExecutionAggregator;
 import org.springframework.batch.core.partition.PartitionHandler;
 import org.springframework.batch.core.partition.StepExecutionSplitter;
+import org.springframework.batch.core.partition.support.StepExecutionAggregator;
+import org.springframework.batch.core.step.NoSuchStepException;
+import org.springframework.batch.core.step.StepLocator;
 import org.springframework.batch.item.ExecutionContext;
 
 /**
@@ -34,10 +41,11 @@ import org.springframework.batch.item.ExecutionContext;
  * @author Michael Minella
  * @since 3.0
  */
-public class PartitionStep extends org.springframework.batch.core.partition.support.PartitionStep {
+public class PartitionStep extends org.springframework.batch.core.partition.support.PartitionStep implements StepLocator {
 
 	private PartitionReducer reducer;
 	private boolean hasReducer = false;
+	private StepExecutionAggregator stepExecutionAggregator = new JsrStepExecutionAggregator();
 
 	public void setPartitionReducer(PartitionReducer reducer) {
 		this.reducer = reducer;
@@ -65,13 +73,13 @@ public class PartitionStep extends org.springframework.batch.core.partition.supp
 		}
 
 		// Wait for task completion and then aggregate the results
-		getPartitionHandler().handle(getStepExecutionSplitter(), stepExecution);
+		Collection<StepExecution> stepExecutions = getPartitionHandler().handle(null, stepExecution);
 		stepExecution.upgradeStatus(BatchStatus.COMPLETED);
+		stepExecutionAggregator.aggregate(stepExecution, stepExecutions);
 
 		if (stepExecution.getStatus().isUnsuccessful()) {
 			if (hasReducer) {
 				reducer.rollbackPartitionedStep();
-				reducer.beforePartitionedStepCompletion();
 				reducer.afterPartitionedStepCompletion(PartitionStatus.ROLLBACK);
 			}
 			throw new JobExecutionException("Partition handler returned an unsuccessful step");
@@ -80,6 +88,29 @@ public class PartitionStep extends org.springframework.batch.core.partition.supp
 		if (hasReducer) {
 			reducer.beforePartitionedStepCompletion();
 			reducer.afterPartitionedStepCompletion(PartitionStatus.COMMIT);
+		}
+	}
+
+	/* (non-Javadoc)
+	 * @see org.springframework.batch.core.step.StepLocator#getStepNames()
+	 */
+	@Override
+	public Collection<String> getStepNames() {
+		return ((JsrPartitionHandler) getPartitionHandler()).getPartitionStepNames();
+	}
+
+	/* (non-Javadoc)
+	 * @see org.springframework.batch.core.step.StepLocator#getStep(java.lang.String)
+	 */
+	@Override
+	public Step getStep(String stepName) throws NoSuchStepException {
+		JsrPartitionHandler partitionHandler =  (JsrPartitionHandler) getPartitionHandler();
+		Collection<String> names = partitionHandler.getPartitionStepNames();
+
+		if(names.contains(stepName)) {
+			return partitionHandler.getStep();
+		} else {
+			throw new NoSuchStepException(stepName + " was not found");
 		}
 	}
 }

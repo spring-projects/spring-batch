@@ -322,19 +322,19 @@ itemWriter.write(items);</programlisting>
         <programlisting>&lt;job id="footballJob" restartable="true"&gt;
     &lt;step id="playerload" next="gameLoad"&gt;
         &lt;tasklet&gt;
-            &lt;chunk reader="playerFileItemReader" writer="playerWriter" 
+            &lt;chunk reader="playerFileItemReader" writer="playerWriter"
                    commit-interval="10" /&gt;
         &lt;/tasklet&gt;
     &lt;/step&gt;
     &lt;step id="gameLoad" next="playerSummarization"&gt;
         &lt;tasklet allow-start-if-complete="true"&gt;
-            &lt;chunk reader="gameFileItemReader" writer="gameWriter" 
+            &lt;chunk reader="gameFileItemReader" writer="gameWriter"
                    commit-interval="10"/&gt;
         &lt;/tasklet&gt;
     &lt;/step&gt;
     &lt;step id="playerSummarization"&gt;
         &lt;tasklet start-limit="3"&gt;
-            &lt;chunk reader="playerSummarizationSource" writer="summaryWriter" 
+            &lt;chunk reader="playerSummarizationSource" writer="summaryWriter"
                    commit-interval="10"/&gt;
         &lt;/tasklet&gt;
     &lt;/step&gt;
@@ -453,7 +453,7 @@ itemWriter.write(items);</programlisting>
       records are logged as well, which will be covered later when discussing
       listeners.<programlisting>&lt;step id="step1"&gt;
    &lt;tasklet&gt;
-      &lt;chunk reader="flatFileItemReader" writer="itemWriter" 
+      &lt;chunk reader="flatFileItemReader" writer="itemWriter"
              commit-interval="10" <emphasis role="bold">skip-limit="10"</emphasis>&gt;
          <emphasis role="bold">&lt;skippable-exception-classes&gt;
             &lt;include class="org.springframework.batch.item.file.FlatFileParseException"/&gt;
@@ -477,7 +477,7 @@ itemWriter.write(items);</programlisting>
       identify which exceptions should cause failure and skip everything
       else:<programlisting>&lt;step id="step1"&gt;
     &lt;tasklet&gt;
-        &lt;chunk reader="flatFileItemReader" writer="itemWriter" 
+        &lt;chunk reader="flatFileItemReader" writer="itemWriter"
                commit-interval="10" <emphasis role="bold">skip-limit="10"</emphasis>&gt;
 <emphasis role="bold">            &lt;skippable-exception-classes&gt;
                 &lt;include class="java.lang.Exception"/&gt;
@@ -519,7 +519,7 @@ itemWriter.write(items);</programlisting>
 
       <programlisting>&lt;step id="step1"&gt;
    &lt;tasklet&gt;
-      &lt;chunk reader="itemReader" writer="itemWriter" 
+      &lt;chunk reader="itemReader" writer="itemWriter"
              commit-interval="2" <emphasis role="bold">retry-limit="3"</emphasis>&gt;
          <emphasis role="bold">&lt;retryable-exception-classes&gt;
             &lt;include class="org.springframework.dao.DeadlockLoserDataAccessException"/&gt;
@@ -590,8 +590,8 @@ itemWriter.write(items);</programlisting>
       <programlisting>&lt;step id="step1"&gt;
     &lt;tasklet&gt;
         &lt;chunk reader="itemReader" writer="itemWriter" commit-interval="2"/&gt;
-        &lt;transaction-attributes isolation="DEFAULT" 
-                                propagation="REQUIRED" 
+        &lt;transaction-attributes isolation="DEFAULT"
+                                propagation="REQUIRED"
                                 timeout="30"/&gt;
     &lt;/tasklet&gt;
 &lt;/step&gt;</programlisting>
@@ -629,7 +629,7 @@ itemWriter.write(items);</programlisting>
     &lt;/tasklet&gt;
 &lt;/step&gt;
 
-&lt;beans:bean id="compositeWriter" 
+&lt;beans:bean id="compositeWriter"
             class="org.springframework.batch.item.support.CompositeItemWriter"&gt;
     &lt;beans:property name="delegates"&gt;
         &lt;beans:list&gt;
@@ -791,11 +791,11 @@ itemWriter.write(items);</programlisting>
         be beneficial to log the skipped records, so that they can be deal
         with later. In the case of read errors, this can be done with an
         <classname>ItemReaderListener:</classname><programlisting>public interface ItemReadListener&lt;T&gt; extends StepListener {
-  
+
     void beforeRead();
 
     void afterRead(T item);
-    
+
     void onReadError(Exception ex);
 
 }</programlisting></para>
@@ -1058,20 +1058,20 @@ itemWriter.write(items);</programlisting>
 
     private Resource directory;
 
-    public RepeatStatus execute(StepContribution contribution, 
+    public RepeatStatus execute(StepContribution contribution,
                                 ChunkContext chunkContext) throws Exception {
         File dir = directory.getFile();
         Assert.state(dir.isDirectory());
-    
+
         File[] files = dir.listFiles();
         for (int i = 0; i &lt; files.length; i++) {
             boolean deleted = files[i].delete();
             if (!deleted) {
-                throw new UnexpectedJobExecutionException("Could not delete file " + 
+                throw new UnexpectedJobExecutionException("Could not delete file " +
                                                           files[i].getPath());
             }
         }
-        return RepeatStatus.COMPLETED;
+        return RepeatStatus.FINISHED;
     }
 
     public void setDirectoryResource(Resource directory) {
@@ -1095,10 +1095,10 @@ itemWriter.write(items);</programlisting>
     &lt;/step&gt;
 &lt;/job&gt;
 
-&lt;beans:bean id="fileDeletingTasklet" 
+&lt;beans:bean id="fileDeletingTasklet"
             class="org.springframework.batch.sample.tasklet.FileDeletingTasklet"&gt;
     &lt;beans:property name="directoryResource"&gt;
-        &lt;beans:bean id="directory" 
+        &lt;beans:bean id="directory"
                     class="org.springframework.core.io.FileSystemResource"&gt;
             &lt;beans:constructor-arg value="target/test-outputs/test-dir" /&gt;
         &lt;/beans:bean&gt;
@@ -1237,7 +1237,7 @@ itemWriter.write(items);</programlisting>
       <classname>Step</classname>, if the <classname>Step</classname>'s
       execution results in an <classname>ExitStatus</classname> that is not
       covered by an element, then the framework will throw an exception and
-      the <classname>Job</classname> will fail. The framework will 
+      the <classname>Job</classname> will fail. The framework will
 	  automatically order transitions from most specific to
       least specific. This means that even if the elements were swapped for
       "stepA" in the example above, an <classname>ExitStatus</classname> of
@@ -1312,7 +1312,7 @@ itemWriter.write(items);</programlisting>
 
     public ExitStatus afterStep(StepExecution stepExecution) {
         String exitCode = stepExecution.getExitStatus().getExitCode();
-        if (!exitCode.equals(ExitStatus.FAILED.getExitCode()) &amp;&amp; 
+        if (!exitCode.equals(ExitStatus.FAILED.getExitCode()) &amp;&amp;
               stepExecution.getSkipCount() &gt; 0) {
             return new ExitStatus("COMPLETED WITH SKIPS");
         }
@@ -1497,7 +1497,7 @@ itemWriter.write(items);</programlisting>
 
       <para><programlisting>&lt;job id="job"&gt;
     &lt;step id="step1" parent="s1" next="decision" /&gt;
-    
+
     &lt;decision id="decision" decider="decider"&gt;
         &lt;next on="FAILED" to="step2" /&gt;
         &lt;next on="COMPLETED" to="step3" /&gt;
@@ -1592,7 +1592,7 @@ itemWriter.write(items);</programlisting>
 
       <para><programlisting>&lt;job id="jobStepJob" restartable="true"&gt;
    &lt;step id="jobStepJob.step1"&gt;
-      &lt;job ref="<emphasis role="bold">job</emphasis>" job-launcher="jobLauncher" 
+      &lt;job ref="<emphasis role="bold">job</emphasis>" job-launcher="jobLauncher"
           job-parameters-extractor="jobParametersExtractor"/&gt;
    &lt;/step&gt;
 &lt;/job&gt;
@@ -1714,8 +1714,8 @@ itemWriter.write(items);</programlisting>
       scope must be added explicitly, either by using the
       <literal>batch</literal> namespace:</para>
 
-      <programlisting>&lt;beans xmlns="http://www.springframework.org/schema/beans" 
-       xmlns:batch="http://www.springframework.org/schema/batch" 
+      <programlisting>&lt;beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:batch="http://www.springframework.org/schema/batch"
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
        xsi:schemaLocation="..."&gt;
 &lt;batch:job .../&gt;

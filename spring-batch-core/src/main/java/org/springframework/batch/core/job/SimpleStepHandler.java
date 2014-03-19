@@ -80,6 +80,13 @@ public class SimpleStepHandler implements StepHandler, InitializingBean {
 	}
 
 	/**
+	 * @return the used jobRepository
+	 */
+	protected JobRepository getJobRepository() {
+		return this.jobRepository;
+	}
+
+	/**
 	 * @param jobRepository the jobRepository to set
 	 */
 	public void setJobRepository(JobRepository jobRepository) {
@@ -116,7 +123,7 @@ public class SimpleStepHandler implements StepHandler, InitializingBean {
 		}
 		StepExecution currentStepExecution = lastStepExecution;
 
-		if (shouldStart(lastStepExecution, jobInstance, step)) {
+		if (shouldStart(lastStepExecution, execution, step)) {
 
 			currentStepExecution = execution.createStepExecution(step.getName());
 
@@ -184,7 +191,7 @@ public class SimpleStepHandler implements StepHandler, InitializingBean {
 	 * @throws JobRestartException if the job is in an inconsistent state from
 	 * an earlier failure
 	 */
-	private boolean shouldStart(StepExecution lastStepExecution, JobInstance jobInstance, Step step)
+	protected boolean shouldStart(StepExecution lastStepExecution, JobExecution jobExecution, Step step)
 			throws JobRestartException, StartLimitExceededException {
 
 		BatchStatus stepStatus;
@@ -209,7 +216,7 @@ public class SimpleStepHandler implements StepHandler, InitializingBean {
 			return false;
 		}
 
-		if (jobRepository.getStepExecutionCount(jobInstance, step.getName()) < step.getStartLimit()) {
+		if (jobRepository.getStepExecutionCount(jobExecution.getJobInstance(), step.getName()) < step.getStartLimit()) {
 			// step start count is less than start max, return true
 			return true;
 		}

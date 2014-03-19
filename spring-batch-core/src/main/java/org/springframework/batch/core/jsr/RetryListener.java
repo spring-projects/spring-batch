@@ -19,8 +19,8 @@ import org.springframework.batch.core.StepListener;
 
 /**
  * <p>
- * Marker interface to be implemented by JSR-352 retry listeners. Extends {@link StepListener}
- * to allow registration with existing listener methods.
+ * Interface used internally by RetryListener adapters to provide consistent naming.
+ * Extends {@link StepListener} to allow registration with existing listener methods.
  * </p>
  *
  * @author Chris Schaefer
