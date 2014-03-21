@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2007 the original author or authors.
+ * Copyright 2006-2014 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -27,7 +27,7 @@ import java.math.BigDecimal;
 public class Trade implements Serializable {
     private String isin = "";
     private long quantity = 0;
-    private BigDecimal price = new BigDecimal(0);
+    private BigDecimal price = BigDecimal.ZERO;
     private String customer = "";
 	private Long id;
 	private long version = 0;
@@ -116,36 +116,46 @@ public class Trade implements Serializable {
 
 	@Override
 	public boolean equals(Object obj) {
-		if (this == obj)
+		if (this == obj) {
 			return true;
-		if (obj == null)
+		}
+		if (obj == null) {
 			return false;
-		if (getClass() != obj.getClass())
+		}
+		if (getClass() != obj.getClass()) {
 			return false;
+		}
 		Trade other = (Trade) obj;
 		if (customer == null) {
-			if (other.customer != null)
+			if (other.customer != null) {
 				return false;
+			}
 		}
-		else if (!customer.equals(other.customer))
+		else if (!customer.equals(other.customer)) {
 			return false;
+		}
 		if (isin == null) {
-			if (other.isin != null)
+			if (other.isin != null) {
 				return false;
+			}
 		}
-		else if (!isin.equals(other.isin))
+		else if (!isin.equals(other.isin)) {
 			return false;
+		}
 		if (price == null) {
-			if (other.price != null)
+			if (other.price != null) {
 				return false;
+			}
 		}
-		else if (!price.equals(other.price))
+		else if (!price.equals(other.price)) {
 			return false;
-		if (quantity != other.quantity)
+		}
+		if (quantity != other.quantity) {
 			return false;
-		if (version != other.version)
+		}
+		if (version != other.version) {
 			return false;
+		}
 		return true;
 	}
-    
  }

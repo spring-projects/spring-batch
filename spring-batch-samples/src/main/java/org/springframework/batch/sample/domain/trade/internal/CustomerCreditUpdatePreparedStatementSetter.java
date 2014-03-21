@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2007 the original author or authors.
+ * Copyright 2006-2014 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -27,17 +27,15 @@ import org.springframework.batch.sample.domain.trade.CustomerCredit;
  *
  */
 public class CustomerCreditUpdatePreparedStatementSetter implements ItemPreparedStatementSetter<CustomerCredit> {
-
 	public static final BigDecimal FIXED_AMOUNT = new BigDecimal(1000);
-	
 	public static final String QUERY = "UPDATE CUSTOMER SET CREDIT=? WHERE ID=?";
 
 	/* (non-Javadoc)
 	 * @see org.springframework.batch.io.support.ItemPreparedStatementSetter#setValues(java.lang.Object, java.sql.PreparedStatement)
 	 */
+	@Override
 	public void setValues(CustomerCredit customerCredit, PreparedStatement ps) throws SQLException {
 		ps.setBigDecimal(1, customerCredit.getCredit().add(FIXED_AMOUNT));
 		ps.setLong(2, customerCredit.getId());
 	}
-
 }

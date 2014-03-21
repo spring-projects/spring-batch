@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2007 the original author or authors.
+ * Copyright 2006-2014 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,7 +21,6 @@ import java.util.List;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.batch.core.StepExecution;
-import org.springframework.batch.core.StepExecutionListener;
 import org.springframework.batch.core.listener.StepExecutionListenerSupport;
 import org.springframework.batch.item.ItemWriter;
 
@@ -34,24 +33,19 @@ import org.springframework.batch.item.ItemWriter;
  * 
  */
 public class InfiniteLoopWriter extends StepExecutionListenerSupport implements ItemWriter<Object> {
+	private static final Log LOG = LogFactory.getLog(InfiniteLoopWriter.class);
 
 	private StepExecution stepExecution;
-
 	private int count = 0;
 
-	private static final Log logger = LogFactory.getLog(InfiniteLoopWriter.class);
-
 	/**
-	 * @see StepExecutionListener#beforeStep(StepExecution)
+	 * @see org.springframework.batch.core.StepExecutionListener#beforeStep(StepExecution)
 	 */
 	@Override
 	public void beforeStep(StepExecution stepExecution) {
 		this.stepExecution = stepExecution;
 	}
 
-	/**
-	 * 
-	 */
 	public InfiniteLoopWriter() {
 		super();
 	}
@@ -62,9 +56,10 @@ public class InfiniteLoopWriter extends StepExecutionListenerSupport implements 
 		}
 		catch (InterruptedException e) {
 			Thread.currentThread().interrupt();
-			throw new RuntimeException("Job interrupted.");
+			throw new IllegalStateException("Job interrupted.", e);
 		}
+
 		stepExecution.setWriteCount(++count);
-		logger.info("Executing infinite loop, at count=" + count);
+		LOG.info("Executing infinite loop, at count=" + count);
 	}
 }

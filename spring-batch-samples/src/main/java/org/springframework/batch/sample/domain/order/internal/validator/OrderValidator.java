@@ -21,11 +21,11 @@ public class OrderValidator implements Validator {
 	private static final List<String> SHIPPER_IDS = new ArrayList<String>();
 	private static final List<String> SHIPPER_TYPES = new ArrayList<String>();
 	private static final long MAX_ID = 9999999999L;
-	private static final BigDecimal BD_MIN = new BigDecimal(0.0);
-	private static final BigDecimal BD_MAX = new BigDecimal(99999999.99);
-	private static final BigDecimal BD_PERC_MAX = new BigDecimal(100.0);
+	private static final BigDecimal BD_MIN = new BigDecimal("0.0");
+	private static final BigDecimal BD_MAX = new BigDecimal("99999999.99");
+	private static final BigDecimal BD_PERC_MAX = new BigDecimal("100.0");
 	private static final int MAX_QUANTITY = 9999;
-	private static final BigDecimal BD_100 = new BigDecimal(100.00);
+	private static final BigDecimal BD_100 = new BigDecimal("100.00");
 
 	static {
 		CARD_TYPES.add("VISA");
@@ -147,32 +147,34 @@ public class OrderValidator implements Validator {
 			}
 		}
 
+		String lineItemsFieldName = "lineItems";
+
 		if(!ids) {
-			errors.rejectValue("lineItems", "error.lineitems.id");
+			errors.rejectValue(lineItemsFieldName, "error.lineitems.id");
 		}
 
 		if(!prices) {
-			errors.rejectValue("lineItems", "error.lineitems.price");
+			errors.rejectValue(lineItemsFieldName, "error.lineitems.price");
 		}
 
 		if(!discounts) {
-			errors.rejectValue("lineItems", "error.lineitems.discount");
+			errors.rejectValue(lineItemsFieldName, "error.lineitems.discount");
 		}
 
 		if(!shippingPrices) {
-			errors.rejectValue("lineItems", "error.lineitems.shipping");
+			errors.rejectValue(lineItemsFieldName, "error.lineitems.shipping");
 		}
 
 		if(!handlingPrices) {
-			errors.rejectValue("lineItems", "error.lineitems.handling");
+			errors.rejectValue(lineItemsFieldName, "error.lineitems.handling");
 		}
 
 		if(!quantities) {
-			errors.rejectValue("lineItems", "error.lineitems.quantity");
+			errors.rejectValue(lineItemsFieldName, "error.lineitems.quantity");
 		}
 
 		if(!totalPrices) {
-			errors.rejectValue("lineItems", "error.lineitems.totalprice");
+			errors.rejectValue(lineItemsFieldName, "error.lineitems.totalprice");
 		}
 	}
 

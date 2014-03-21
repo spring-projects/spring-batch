@@ -37,11 +37,9 @@ import org.springframework.util.SerializationUtils;
  */
 public class StagingItemWriter<T> extends JdbcDaoSupport implements StepExecutionListener, ItemWriter<T> {
 
-	public static final String NEW = "N";
+	protected static final String NEW = "N";
 
-	public static final String DONE = "Y";
-
-	public static final Object WORKING = "W";
+	protected static final String DONE = "Y";
 
 	private DataFieldMaxValueIncrementer incrementer;
 
@@ -75,11 +73,10 @@ public class StagingItemWriter<T> extends JdbcDaoSupport implements StepExecutio
 	 */
 	@Override
 	public void write(final List<? extends T> items) {
-
 		final ListIterator<? extends T> itemIterator = items.listIterator();
+
 		getJdbcTemplate().batchUpdate("INSERT into BATCH_STAGING (ID, JOB_ID, VALUE, PROCESSED) values (?,?,?,?)",
 				new BatchPreparedStatementSetter() {
-
 			@Override
 			public int getBatchSize() {
 				return items.size();
@@ -87,22 +84,14 @@ public class StagingItemWriter<T> extends JdbcDaoSupport implements StepExecutio
 
 			@Override
 			public void setValues(PreparedStatement ps, int i) throws SQLException {
+				Assert.state(itemIterator.nextIndex() == i, "Item ordering must be preserved in batch sql update");
 
-				long id = incrementer.nextLongValue();
-				long jobId = stepExecution.getJobExecution().getJobId();
-
-				Assert.state(itemIterator.nextIndex() == i,
-						"Item ordering must be preserved in batch sql update");
-
-				byte[] blob = SerializationUtils.serialize(itemIterator.next());
-
-				ps.setLong(1, id);
-				ps.setLong(2, jobId);
-				ps.setBytes(3, blob);
+				ps.setLong(1, incrementer.nextLongValue());
+				ps.setLong(2, stepExecution.getJobExecution().getJobId());
+				ps.setBytes(3, SerializationUtils.serialize(itemIterator.next()));
 				ps.setString(4, NEW);
 			}
 		});
-
 	}
 
 	/*
@@ -127,5 +116,4 @@ public class StagingItemWriter<T> extends JdbcDaoSupport implements StepExecutio
 	public void beforeStep(StepExecution stepExecution) {
 		this.stepExecution = stepExecution;
 	}
-
 }

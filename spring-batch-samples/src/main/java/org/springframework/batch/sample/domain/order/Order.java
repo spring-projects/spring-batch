@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2007 the original author or authors.
+ * Copyright 2006-2014 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -164,68 +164,90 @@ public class Order {
 
 	@Override
 	public boolean equals(Object obj) {
-		if (this == obj)
+		if (this == obj) {
 			return true;
-		if (obj == null)
+		}
+		if (obj == null) {
 			return false;
-		if (getClass() != obj.getClass())
+		}
+		if (getClass() != obj.getClass()) {
 			return false;
+		}
 		Order other = (Order) obj;
 		if (billing == null) {
-			if (other.billing != null)
+			if (other.billing != null) {
 				return false;
+			}
 		}
-		else if (!billing.equals(other.billing))
+		else if (!billing.equals(other.billing)) {
 			return false;
+		}
 		if (billingAddress == null) {
-			if (other.billingAddress != null)
+			if (other.billingAddress != null) {
 				return false;
+			}
 		}
-		else if (!billingAddress.equals(other.billingAddress))
+		else if (!billingAddress.equals(other.billingAddress)) {
 			return false;
+		}
 		if (customer == null) {
-			if (other.customer != null)
+			if (other.customer != null) {
 				return false;
+			}
 		}
-		else if (!customer.equals(other.customer))
+		else if (!customer.equals(other.customer)) {
 			return false;
+		}
 		if (lineItems == null) {
-			if (other.lineItems != null)
+			if (other.lineItems != null) {
 				return false;
+			}
 		}
-		else if (!lineItems.equals(other.lineItems))
+		else if (!lineItems.equals(other.lineItems)) {
 			return false;
+		}
 		if (orderDate == null) {
-			if (other.orderDate != null)
+			if (other.orderDate != null) {
 				return false;
+			}
 		}
-		else if (!orderDate.equals(other.orderDate))
+		else if (!orderDate.equals(other.orderDate)) {
 			return false;
-		if (orderId != other.orderId)
+		}
+		if (orderId != other.orderId) {
 			return false;
+		}
 		if (shipping == null) {
-			if (other.shipping != null)
+			if (other.shipping != null) {
 				return false;
+			}
 		}
-		else if (!shipping.equals(other.shipping))
+		else if (!shipping.equals(other.shipping)) {
 			return false;
+		}
 		if (shippingAddress == null) {
-			if (other.shippingAddress != null)
+			if (other.shippingAddress != null) {
 				return false;
+			}
 		}
-		else if (!shippingAddress.equals(other.shippingAddress))
+		else if (!shippingAddress.equals(other.shippingAddress)) {
 			return false;
-		if (totalItems != other.totalItems)
+		}
+		if (totalItems != other.totalItems) {
 			return false;
-		if (totalLines != other.totalLines)
+		}
+		if (totalLines != other.totalLines) {
 			return false;
+		}
 		if (totalPrice == null) {
-			if (other.totalPrice != null)
+			if (other.totalPrice != null) {
 				return false;
+			}
 		}
-		else if (!totalPrice.equals(other.totalPrice))
+		else if (!totalPrice.equals(other.totalPrice)) {
 			return false;
+		}
+
 		return true;
 	}
-
 }

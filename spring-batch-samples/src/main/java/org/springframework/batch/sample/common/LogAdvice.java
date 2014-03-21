@@ -18,8 +18,6 @@ package org.springframework.batch.sample.common;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.aspectj.lang.JoinPoint;
-
 
 /**
  * Wraps calls for 'Processing' methods which output a single Object to write
@@ -28,29 +26,9 @@ import org.aspectj.lang.JoinPoint;
  * @author Lucas Ward
  */
 public class LogAdvice {
-    
     private static Log log = LogFactory.getLog(LogAdvice.class);
 
-    /*
-     * Wraps original method and adds logging both before and after method
-     */
-    public void doBasicLogging(JoinPoint pjp) throws Throwable {
-    	Object[] args = pjp.getArgs();
-    	StringBuffer output = new StringBuffer();
-
-		output.append(pjp.getTarget().getClass().getName()).append(": ");
-		output.append(pjp.toShortString()).append(": ");
-
-		for (Object arg : args) {
-			output.append(arg).append(" ");
-		}
-
-
-		log.info("Basic: " + output.toString());
-    }
-    
     public void doStronglyTypedLogging(Object item){
     	log.info("Processed: " + item);
     }
-
 }

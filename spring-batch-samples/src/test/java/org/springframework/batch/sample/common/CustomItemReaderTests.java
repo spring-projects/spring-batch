@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2008 the original author or authors.
+ * Copyright 2006-2014 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -27,8 +27,6 @@ import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.ItemStream;
 import org.springframework.batch.item.ItemStreamException;
-import org.springframework.batch.item.ParseException;
-import org.springframework.batch.item.UnexpectedInputException;
 
 /**
  * Unit test class that was used as part of the Reference Documentation.  I'm only including it in the
@@ -38,15 +36,13 @@ import org.springframework.batch.item.UnexpectedInputException;
  *
  */
 public class CustomItemReaderTests {
-
-	ItemReader<String> itemReader;
+	private ItemReader<String> itemReader;
 	
 	/* (non-Javadoc)
 	 * @see junit.framework.TestCase#setUp()
 	 */
 	@Before
 	public void setUp() throws Exception {
-		
 		List<String> items = new ArrayList<String>();
 		items.add("1");
 		items.add("2");
@@ -57,7 +53,6 @@ public class CustomItemReaderTests {
 	
 	@Test
 	public void testRead() throws Exception{
-	
 		assertEquals("1", itemReader.read());
 		assertEquals("2", itemReader.read());
 		assertEquals("3", itemReader.read());
@@ -66,7 +61,6 @@ public class CustomItemReaderTests {
 	
 	@Test
 	public void testRestart() throws Exception{
-		
 		ExecutionContext executionContext = new ExecutionContext();
 		((ItemStream)itemReader).open(executionContext);
 		assertEquals("1", itemReader.read());
@@ -82,24 +76,24 @@ public class CustomItemReaderTests {
 	}
 
 	public static class CustomItemReader<T> implements ItemReader<T>, ItemStream {
-
-		List<T> items;
-		int currentIndex = 0;
 		private static final String CURRENT_INDEX = "current.index";
-		
+
+		private List<T> items;
+		private int currentIndex = 0;
+
 		public CustomItemReader(List<T> items) {
 			this.items = items;
 		}
 
-		public T read() throws Exception, UnexpectedInputException,
-			 ParseException {
-			
+		@Override
+		public T read() throws Exception {
 			if (currentIndex < items.size()) {
 				return items.get(currentIndex++);
 			}
 			return null;
 		}
-		
+
+		@Override
 		public void open(ExecutionContext executionContext) throws ItemStreamException {
 			if(executionContext.containsKey(CURRENT_INDEX)){
 				currentIndex = executionContext.getInt(CURRENT_INDEX);
@@ -109,11 +103,12 @@ public class CustomItemReaderTests {
 			}
 		}
 
+		@Override
 		public void close() throws ItemStreamException {}
 
+		@Override
 		public void update(ExecutionContext executionContext) throws ItemStreamException {
 			executionContext.putInt(CURRENT_INDEX, currentIndex);
-		};
-		
+		}
 	}
 }

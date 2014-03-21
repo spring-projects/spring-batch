@@ -30,7 +30,6 @@ import org.springframework.transaction.support.TransactionTemplate;
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration()
 public class StagingItemReaderTests {
-
 	private JdbcOperations jdbcTemplate;
 
 	@Autowired
@@ -54,7 +53,7 @@ public class StagingItemReaderTests {
 		StepExecution stepExecution = new StepExecution("stepName", new JobExecution(new JobInstance(jobId,
 				"testJob"), new JobParameters()));
 		writer.beforeStep(stepExecution);
-		writer.write(Arrays.asList(new String[] { "FOO", "BAR", "SPAM", "BUCKET" }));
+		writer.write(Arrays.asList("FOO", "BAR", "SPAM", "BUCKET"));
 		reader.beforeStep(stepExecution);
 	}
 
@@ -67,8 +66,7 @@ public class StagingItemReaderTests {
 	@Transactional
 	@Test
 	public void testReaderWithProcessorUpdatesProcessIndicator() throws Exception {
-
-		long id = jdbcTemplate.queryForLong("SELECT MIN(ID) from BATCH_STAGING where JOB_ID=?", jobId);
+		long id = jdbcTemplate.queryForObject("SELECT MIN(ID) from BATCH_STAGING where JOB_ID=?", Long.class, jobId);
 		String before = jdbcTemplate.queryForObject("SELECT PROCESSED from BATCH_STAGING where ID=?",
 				String.class, id);
 		assertEquals(StagingItemWriter.NEW, before);
@@ -84,7 +82,6 @@ public class StagingItemReaderTests {
 		String after = jdbcTemplate.queryForObject("SELECT PROCESSED from BATCH_STAGING where ID=?",
 				String.class, id);
 		assertEquals(StagingItemWriter.DONE, after);
-
 	}
 
 	@Transactional
@@ -103,7 +100,7 @@ public class StagingItemReaderTests {
 				return null;
 			}
 		});
-		long id = jdbcTemplate.queryForLong("SELECT MIN(ID) from BATCH_STAGING where JOB_ID=?", jobId);
+		long id = jdbcTemplate.queryForObject("SELECT MIN(ID) from BATCH_STAGING where JOB_ID=?", Long.class, jobId);
 		String before = jdbcTemplate.queryForObject("SELECT PROCESSED from BATCH_STAGING where ID=?",
 				String.class, id);
 		assertEquals(StagingItemWriter.DONE, before);
@@ -112,14 +109,13 @@ public class StagingItemReaderTests {
 	@Transactional
 	@Test
 	public void testReaderRollsBackProcessIndicator() throws Exception {
-
 		TransactionTemplate txTemplate = new TransactionTemplate(transactionManager);
 		txTemplate.setPropagationBehavior(TransactionDefinition.PROPAGATION_REQUIRES_NEW);
 
 		final Long idToUse = (Long) txTemplate.execute(new TransactionCallback() {
 			public Object doInTransaction(TransactionStatus transactionStatus) {
 
-				long id = jdbcTemplate.queryForLong("SELECT MIN(ID) from BATCH_STAGING where JOB_ID=?", jobId);
+				long id = jdbcTemplate.queryForObject("SELECT MIN(ID) from BATCH_STAGING where JOB_ID=?", Long.class, jobId);
 				String before = jdbcTemplate.queryForObject("SELECT PROCESSED from BATCH_STAGING where ID=?",
 						String.class, id);
 				assertEquals(StagingItemWriter.NEW, before);
@@ -136,6 +132,5 @@ public class StagingItemReaderTests {
 		String after = jdbcTemplate.queryForObject("SELECT PROCESSED from BATCH_STAGING where ID=?",
 				String.class, idToUse);
 		assertEquals(StagingItemWriter.NEW, after);
-
 	}
 }

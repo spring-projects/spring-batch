@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2007 the original author or authors.
+ * Copyright 2006-2014 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,13 +25,12 @@ import org.springframework.batch.sample.domain.trade.CustomerCredit;
  * @since 2.0
  */
 public class CustomerCreditFieldSetMapper implements FieldSetMapper<CustomerCredit> {
-
 	public static final int ID_COLUMN = 0;
 	public static final int NAME_COLUMN = 1;
 	public static final int CREDIT_COLUMN = 2;
 
+	@Override
 	public CustomerCredit mapFieldSet(FieldSet fieldSet) {
-
 		CustomerCredit trade = new CustomerCredit();
 		trade.setId(fieldSet.readInt(ID_COLUMN));
 		trade.setName(fieldSet.readString(NAME_COLUMN));

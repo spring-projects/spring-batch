@@ -11,9 +11,11 @@ import org.springframework.context.support.ClassPathXmlApplicationContext;
  * Simple producer class that sends {@link String} messages to the configured queue to be processed.
  * </p>
  */
-public class AmqpMessageProducer {
-    public static final int SEND_MESSAGE_COUNT = 10;
-    public static final String[] BEAN_CONFIG = { "classpath:/META-INF/spring/jobs/messaging/rabbitmq-beans.xml",
+public final class AmqpMessageProducer {
+	private AmqpMessageProducer() {}
+
+    private static final int SEND_MESSAGE_COUNT = 10;
+    private static final String[] BEAN_CONFIG = { "classpath:/META-INF/spring/jobs/messaging/rabbitmq-beans.xml",
             "classpath:/META-INF/spring/config-beans.xml" };
 
     public static void main(String[] args) {

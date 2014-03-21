@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2007 the original author or authors.
+ * Copyright 2006-2014 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,7 +24,6 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-import javax.management.MBeanServerConnection;
 import javax.management.MalformedObjectNameException;
 
 import org.apache.commons.logging.Log;
@@ -44,23 +43,20 @@ import org.springframework.jmx.support.MBeanServerConnectionFactoryBean;
  * 
  */
 public class RemoteLauncherTests {
-
 	private static Log logger = LogFactory.getLog(RemoteLauncherTests.class);
-
 	private static List<Exception> errors = new ArrayList<Exception>();
-
 	private static JobOperator launcher;
-
 	private static JobLoader loader;
-
 	static private Thread thread;
 
 	@Test
 	public void testConnect() throws Exception {
 		String message = errors.isEmpty() ? "" : errors.get(0).getMessage();
+
 		if (!errors.isEmpty()) {
 			fail(message);
 		}
+
 		assertTrue(isConnected());
 	}
 
@@ -68,12 +64,12 @@ public class RemoteLauncherTests {
 	public void testLaunchBadJob() throws Exception {
 		assertEquals(0, errors.size());
 		assertTrue(isConnected());
+
 		try {
 			launcher.start("foo", "time=" + (new Date().getTime()));
 			fail("Expected RuntimeException");
 		}
 		catch (RuntimeException e) {
-			// expected;
 			String message = e.getMessage();
 			assertTrue("Wrong message: " + message, message.contains("NoSuchJobException"));
 		}
@@ -89,18 +85,20 @@ public class RemoteLauncherTests {
 	@Test
 	public void testPauseJob() throws Exception {
 		final int SLEEP_INTERVAL = 600;
+
 		assertTrue(isConnected());
 		assertTrue(launcher.getJobNames().contains("loopJob"));
+
 		long executionId = launcher.start("loopJob", "");
 
 		// sleep long enough to avoid race conditions (serializable tx isolation
 		// doesn't work with HSQL)
 		Thread.sleep(SLEEP_INTERVAL);
-		// assertEquals(1, launcher.getRunningExecutions("loopJob").size());
+
 		launcher.stop(executionId);
 
 		Thread.sleep(SLEEP_INTERVAL);
-		// assertEquals(0, launcher.getRunningExecutions("loopJob").size());
+
 		logger.debug(launcher.getSummary(executionId));
 		long resumedId = launcher.restart(executionId);
 		assertNotSame("Picked up the same execution after pause and resume", executionId, resumedId);
@@ -109,14 +107,12 @@ public class RemoteLauncherTests {
 		launcher.stop(resumedId);
 		Thread.sleep(SLEEP_INTERVAL);
 
-		// assertEquals(0, launcher.getRunningExecutions("loopJob").size());
 		logger.debug(launcher.getSummary(resumedId));
 		long resumeId2 = launcher.restart(resumedId);
 		assertNotSame("Picked up the same execution after pause and resume", executionId, resumeId2);
 
 		Thread.sleep(SLEEP_INTERVAL);
 		launcher.stop(resumeId2);
-
 	}
 
 	/*
@@ -127,20 +123,23 @@ public class RemoteLauncherTests {
 	@BeforeClass
 	public static void setUp() throws Exception {
 		System.setProperty("com.sun.management.jmxremote", "");
+
 		thread = new Thread(new Runnable() {
+			@Override
 			public void run() {
 				try {
 					JobRegistryBackgroundJobRunner.main("adhoc-job-launcher-context.xml", "jobs/adhocLoopJob.xml");
 				}
 				catch (Exception e) {
-					// e.printStackTrace();
 					logger.error(e);
 					errors.add(e);
 				}
 			}
 		});
+
 		thread.start();
 		int count = 0;
+
 		while (!isConnected() && count++ < 10) {
 			Thread.sleep(1000);
 		}
@@ -153,21 +152,24 @@ public class RemoteLauncherTests {
 
 	private static boolean isConnected() throws Exception {
 		boolean connected = false;
+
 		if (!JobRegistryBackgroundJobRunner.getErrors().isEmpty()) {
 			throw JobRegistryBackgroundJobRunner.getErrors().get(0);
 		}
+
 		if (launcher == null) {
 			MBeanServerConnectionFactoryBean connectionFactory = new MBeanServerConnectionFactoryBean();
+
 			try {
 				launcher = (JobOperator) getMBean(connectionFactory, "spring:service=batch,bean=jobOperator",
 						JobOperator.class);
 				loader = (JobLoader) getMBean(connectionFactory, "spring:service=batch,bean=jobLoader", JobLoader.class);
 			}
 			catch (MBeanServerNotFoundException e) {
-				// ignore
 				return false;
 			}
 		}
+
 		try {
 			launcher.getJobNames();
 			connected = loader.getConfigurations().size() > 0;
@@ -184,9 +186,8 @@ public class RemoteLauncherTests {
 		MBeanProxyFactoryBean factory = new MBeanProxyFactoryBean();
 		factory.setObjectName(objectName);
 		factory.setProxyInterface(interfaceType);
-		factory.setServer((MBeanServerConnection) connectionFactory.getObject());
+		factory.setServer(connectionFactory.getObject());
 		factory.afterPropertiesSet();
 		return factory.getObject();
 	}
-
 }

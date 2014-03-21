@@ -3,7 +3,6 @@
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
 
-
 	<bean id="itemReader"
 		class="org.springframework.batch.item.database.IbatisPagingItemReader">
 		<property name="queryId" value="getAllCustomerCredits" />
@@ -21,5 +20,4 @@
 	<bean id="sqlMapClient" class="com.ibatis.sqlmap.client.SqlMapClientBuilder" factory-method="buildSqlMapClient">
 		<constructor-arg value="ibatis-config.xml"/>
 	</bean>
-
 </beans>

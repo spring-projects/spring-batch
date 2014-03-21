@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2007 the original author or authors.
+ * Copyright 2006-2014 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,18 +20,15 @@ import java.io.IOException;
 import java.io.Writer;
 
 import org.springframework.batch.item.file.FlatFileHeaderCallback;
-import org.springframework.batch.item.file.FlatFileItemReader;
-import org.springframework.batch.item.file.FlatFileItemWriter;
 import org.springframework.batch.item.file.LineCallbackHandler;
 import org.springframework.util.Assert;
 
 /**
- * Designed to be registered with both {@link FlatFileItemReader} and
- * {@link FlatFileItemWriter} and copy header line from input file to output
- * file.
+ * Designed to be registered with both {@link org.springframework.batch.item.file.FlatFileItemReader}
+ * and {@link org.springframework.batch.item.file.FlatFileItemWriter} and copy header line from input
+ * file to output file.
  */
 public class HeaderCopyCallback implements LineCallbackHandler, FlatFileHeaderCallback {
-
 	private String header = "";
 	
 	public void handleLine(String line) {
@@ -41,7 +38,5 @@ public class HeaderCopyCallback implements LineCallbackHandler, FlatFileHeaderCa
 
 	public void writeHeader(Writer writer) throws IOException {
 		writer.write("header from input: " + header);
-		
 	}
-
 }

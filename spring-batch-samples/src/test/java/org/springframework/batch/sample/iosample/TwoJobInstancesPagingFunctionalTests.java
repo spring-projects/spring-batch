@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2012 the original author or authors.
+ * Copyright 2006-2014 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -45,7 +45,6 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 @ContextConfiguration(locations = { "/simple-job-launcher-context.xml", "/jobs/ioSampleJob.xml",
 		"/jobs/iosample/jdbcPaging.xml" })
 public class TwoJobInstancesPagingFunctionalTests {
-
 	@Autowired
 	private JobLauncher launcher;
 
@@ -61,11 +60,11 @@ public class TwoJobInstancesPagingFunctionalTests {
 
 	@Test
 	public void testLaunchJobTwice() throws Exception {
-		int first = jdbcTemplate.queryForInt("select count(0) from CUSTOMER where credit>1000");
+		int first = jdbcTemplate.queryForObject("select count(0) from CUSTOMER where credit>1000", Integer.class);
 		JobExecution jobExecution = launcher.run(this.job, getJobParameters(1000.));
 		assertEquals(BatchStatus.COMPLETED, jobExecution.getStatus());
 		assertEquals(first, jobExecution.getStepExecutions().iterator().next().getWriteCount());
-		int second = jdbcTemplate.queryForInt("select count(0) from CUSTOMER where credit>1000000");
+		int second = jdbcTemplate.queryForObject("select count(0) from CUSTOMER where credit>1000000", Integer.class);
 		assertNotSame("The number of records above the threshold did not change", first, second);
 		jobExecution = launcher.run(this.job, getJobParameters(1000000.));
 		assertEquals(BatchStatus.COMPLETED, jobExecution.getStatus());
@@ -76,5 +75,4 @@ public class TwoJobInstancesPagingFunctionalTests {
 		return new JobParametersBuilder().addLong("timestamp", new Date().getTime()).addDouble("credit", amount)
 				.toJobParameters();
 	}
-
 }

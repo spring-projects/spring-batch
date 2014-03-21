@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2012 the original author or authors.
+ * Copyright 2006-2014 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -43,12 +43,9 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(locations = { "/simple-job-launcher-context.xml", "/jobs/customerFilterJob.xml", "/job-runner-context.xml" })
 public class CustomerFilterJobFunctionalTests {
-
 	private static final String GET_CUSTOMERS = "select NAME, CREDIT from CUSTOMER order by NAME";
-
 	private List<Customer> customers;
 	private int activeRow = 0;
-
 	private JdbcOperations jdbcTemplate;
 	private Map<String, Double> credits = new HashMap<String, Double>();
 
@@ -65,7 +62,9 @@ public class CustomerFilterJobFunctionalTests {
         jdbcTemplate.update("delete from TRADE");
         jdbcTemplate.update("delete from CUSTOMER where ID > 4");
         jdbcTemplate.update("update CUSTOMER set credit=100000");
+
 		List<Map<String, Object>> list = jdbcTemplate.queryForList("select name, CREDIT from CUSTOMER");
+
 		for (Map<String, Object> map : list) {
 			credits.put((String) map.get("NAME"), ((Number) map.get("CREDIT")).doubleValue());
 		}
@@ -79,17 +78,15 @@ public class CustomerFilterJobFunctionalTests {
 
 	@Test
 	public void testFilterJob() throws Exception {
-
 		JobExecution jobExecution = jobLauncherTestUtils.launchJob();
 
 		customers = Arrays.asList(new Customer("customer1", (credits.get("customer1"))), new Customer("customer2",
 				(credits.get("customer2"))), new Customer("customer3", 100500), new Customer("customer4", credits
 				.get("customer4")), new Customer("customer5", 32345), new Customer("customer6", 123456));
 
-		// check content of the customer table
 		activeRow = 0;
         jdbcTemplate.query(GET_CUSTOMERS, new RowCallbackHandler() {
-
+			@Override
 			public void processRow(ResultSet rs) throws SQLException {
 				Customer customer = customers.get(activeRow++);
 				assertEquals(customer.getName(), rs.getString(1));
@@ -101,7 +98,6 @@ public class CustomerFilterJobFunctionalTests {
 		assertEquals("4", step1Execution.get("READ_COUNT").toString());
 		assertEquals("1", step1Execution.get("FILTER_COUNT").toString());
 		assertEquals("3", step1Execution.get("WRITE_COUNT").toString());
-
 	}
 
 	private Map<String, Object> getStepExecution(JobExecution jobExecution, String stepName) {
@@ -174,7 +170,5 @@ public class CustomerFilterJobFunctionalTests {
 				return false;
 			return true;
 		}
-
 	}
-
 }

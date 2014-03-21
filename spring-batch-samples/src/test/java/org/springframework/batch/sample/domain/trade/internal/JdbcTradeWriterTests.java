@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2012 the original author or authors.
+ * Copyright 2006-2014 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -40,11 +40,8 @@ import org.springframework.transaction.annotation.Transactional;
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(locations = {"/data-source-context.xml"})
 public class JdbcTradeWriterTests implements InitializingBean {
-
 	private JdbcOperations jdbcTemplate;
-
 	private JdbcTradeDao writer;
-
 	private AbstractDataFieldMaxValueIncrementer incrementer;
 
 	@Autowired
@@ -52,7 +49,6 @@ public class JdbcTradeWriterTests implements InitializingBean {
 		this.jdbcTemplate = new JdbcTemplate(dataSource);
 		this.writer = new JdbcTradeDao();
 		this.writer.setDataSource(dataSource);
-
 	}
 
 	@Autowired
@@ -61,13 +57,13 @@ public class JdbcTradeWriterTests implements InitializingBean {
 		this.incrementer = incrementer;
 	}
 
-	@Transactional @Test
+	@Test
+	@Transactional
 	public void testWrite() {
-
 		Trade trade = new Trade();
 		trade.setCustomer("testCustomer");
 		trade.setIsin("5647238492");
-		trade.setPrice(new BigDecimal(Double.toString(99.69)));
+		trade.setPrice(new BigDecimal("99.69"));
 		trade.setQuantity(5);
 
 		writer.writeTrade(trade);

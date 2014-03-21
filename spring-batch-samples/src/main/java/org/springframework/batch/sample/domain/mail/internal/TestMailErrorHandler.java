@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2010 the original author or authors.
+ * Copyright 2006-2014 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,6 +19,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.springframework.batch.item.mail.MailErrorHandler;
 import org.springframework.mail.MailMessage;
 
@@ -33,13 +35,13 @@ import org.springframework.mail.MailMessage;
  * @since 2.1
  */
 public class TestMailErrorHandler implements MailErrorHandler {
+	private static final Log LOGGER = LogFactory.getLog(TestMailErrorHandler.class);
 
 	private List<MailMessage> failedMessages = new ArrayList<MailMessage>();
 
 	public void handle(MailMessage failedMessage, Exception ex) {
 		this.failedMessages.add(failedMessage);
-		System.out.println("Mail message failed: " + failedMessage);
-		System.out.println(ex);
+		LOGGER.error("Mail message failed: " + failedMessage, ex);
 	}
 
 	public List<MailMessage> getFailedMessages() {

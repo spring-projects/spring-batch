@@ -26,8 +26,7 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(locations = { "/simple-job-launcher-context.xml", "/jobs/infiniteLoopJob.xml" })
 public class JobOperatorFunctionalTests {
-
-	private static final Log logger = LogFactory.getLog(JobOperatorFunctionalTests.class);
+	private static final Log LOG = LogFactory.getLog(JobOperatorFunctionalTests.class);
 
 	@Autowired
 	private JobOperator operator;
@@ -47,7 +46,6 @@ public class JobOperatorFunctionalTests {
 
 	@Test
 	public void testStartStopResumeJob() throws Exception {
-
 		String params = new JobParametersBuilder().addLong("jobOperatorTestParam", 7L).toJobParameters().toString();
 
 		long executionId = operator.start(job.getName(), params);
@@ -67,14 +65,12 @@ public class JobOperatorFunctionalTests {
 		// latest execution is the first in the returned list
 		assertEquals(resumedExecutionId, executions.get(0).longValue());
 		assertEquals(executionId, executions.get(1).longValue());
-
 	}
 
 	/**
 	 * @param executionId id of running job execution
 	 */
 	private void stopAndCheckStatus(long executionId) throws Exception {
-
 		// wait to the job to get up and running
 		Thread.sleep(1000);
 
@@ -88,7 +84,7 @@ public class JobOperatorFunctionalTests {
 
 		int count = 0;
 		while (operator.getRunningExecutions(job.getName()).contains(executionId) && count <= 10) {
-			logger.info("Checking for running JobExecution: count=" + count);
+			LOG.info("Checking for running JobExecution: count=" + count);
 			Thread.sleep(100);
 			count++;
 		}
@@ -101,7 +97,7 @@ public class JobOperatorFunctionalTests {
 
 		// there is just a single step in the test job
 		Map<Long, String> summaries = operator.getStepExecutionSummaries(executionId);
-		System.err.println(summaries);
+		LOG.info(summaries);
 		assertTrue(summaries.values().toString().contains(BatchStatus.STOPPED.toString()));
 	}
 
@@ -117,24 +113,25 @@ public class JobOperatorFunctionalTests {
 		long exec2 = operator.startNextInstance(jobName);
 
 		assertTrue(exec1 != exec2);
-		assertTrue(operator.getParameters(exec1) != operator.getParameters(exec2));
+		assertTrue(!operator.getParameters(exec1).equals(operator.getParameters(exec2)));
 
 		Set<Long> executions = operator.getRunningExecutions(jobName);
 		assertTrue(executions.contains(exec1));
 		assertTrue(executions.contains(exec2));
+
 		int count = 0;
 		boolean running = operator.getSummary(exec1).contains("STARTED")
 				&& operator.getSummary(exec2).contains("STARTED");
+
 		while (count++ < 10 && !running) {
 			Thread.sleep(100L);
 			running = operator.getSummary(exec1).contains("STARTED") && operator.getSummary(exec2).contains("STARTED");
 		}
+
 		assertTrue(String.format("Jobs not started: [%s] and [%s]", operator.getSummary(exec1), operator
 				.getSummary(exec1)), running);
 
 		operator.stop(exec1);
 		operator.stop(exec2);
-
 	}
-
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2012 the original author or authors.
+ * Copyright 2006-2014 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -44,12 +44,10 @@ import org.springframework.test.context.transaction.BeforeTransaction;
 @ContextConfiguration(locations = { "/simple-job-launcher-context.xml", "/jobs/restartSample.xml",
 		"/job-runner-context.xml" })
 public class RestartFunctionalTests {
+	private JdbcOperations jdbcTemplate;
 
 	@Autowired
 	private JobLauncherTestUtils jobLauncherTestUtils;
-
-	// auto-injected attributes
-	private JdbcOperations jdbcTemplate;
 
 	@Autowired
 	public void setDataSource(DataSource dataSource) {
@@ -72,8 +70,7 @@ public class RestartFunctionalTests {
 	 */
 	@Test
 	public void testLaunchJob() throws Exception {
-
-		int before = jdbcTemplate.queryForInt("SELECT COUNT(*) FROM TRADE");
+		int before = jdbcTemplate.queryForObject("SELECT COUNT(*) FROM TRADE", Integer.class);
 
 		JobExecution jobExecution = runJobForRestartTest();
 		assertEquals(BatchStatus.FAILED, jobExecution.getStatus());
@@ -86,14 +83,14 @@ public class RestartFunctionalTests {
 			throw new RuntimeException(ex);
 		}
 
-		int medium = jdbcTemplate.queryForInt("SELECT COUNT(*) FROM TRADE");
+		int medium = jdbcTemplate.queryForObject("SELECT COUNT(*) FROM TRADE", Integer.class);
 		// assert based on commit interval = 2
 		assertEquals(before + 2, medium);
 
 		jobExecution = runJobForRestartTest();
 		assertEquals(BatchStatus.COMPLETED, jobExecution.getStatus());
 
-		int after = jdbcTemplate.queryForInt("SELECT COUNT(*) FROM TRADE");
+		int after = jdbcTemplate.queryForObject("SELECT COUNT(*) FROM TRADE", Integer.class);
 
 		assertEquals(before + 5, after);
 	}
@@ -105,5 +102,4 @@ public class RestartFunctionalTests {
 						.getJobParameters(PropertiesConverter
 								.stringToProperties("run.id(long)=1,parameter=true,run.date=20070122,input.file=classpath:data/fixedLengthImportJob/input/20070122.teststream.ImportTradeDataStep.txt")));
 	}
-
 }

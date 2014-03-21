@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2007 the original author or authors.
+ * Copyright 2006-2014 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,9 +18,9 @@ package org.springframework.batch.sample.domain.order;
 
 import java.math.BigDecimal;
 
-
 public class LineItem {
     public static final String LINE_ID_ITEM = "LIT";
+
     private long itemId;
     private BigDecimal price;
     private BigDecimal discountPerc;
@@ -110,18 +110,28 @@ public class LineItem {
 
 	@Override
 	public boolean equals(Object obj) {
-		if (this == obj)
+		if (this == obj) {
 			return true;
-		if (obj == null)
+		}
+
+		if (obj == null) {
 			return false;
-		if (getClass() != obj.getClass())
+		}
+
+		if (getClass() != obj.getClass()) {
 			return false;
+		}
+
 		LineItem other = (LineItem) obj;
-		if (itemId != other.itemId)
+
+		if (itemId != other.itemId) {
 			return false;
-		if (quantity != other.quantity)
+		}
+
+		if (quantity != other.quantity) {
 			return false;
+		}
+
 		return true;
 	}
-        
 }

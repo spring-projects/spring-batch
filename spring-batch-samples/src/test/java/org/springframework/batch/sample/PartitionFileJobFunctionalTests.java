@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2007 the original author or authors.
+ * Copyright 2006-2014 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -46,16 +46,15 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 @ContextConfiguration(locations = { "/simple-job-launcher-context.xml", "/jobs/partitionFileJob.xml",
 		"/job-runner-context.xml" })
 public class PartitionFileJobFunctionalTests implements ApplicationContextAware {
-
 	@Autowired
 	@Qualifier("inputTestReader")
 	private ItemReader<CustomerCredit> inputReader;
 
 	@Autowired
 	private JobLauncherTestUtils jobLauncherTestUtils;
-
 	private ApplicationContext applicationContext;
 
+	@Override
 	public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
 		this.applicationContext = applicationContext;
 	}
@@ -66,7 +65,6 @@ public class PartitionFileJobFunctionalTests implements ApplicationContextAware 
 	 */
 	@Test
 	public void testUpdateCredit() throws Exception {
-
 		assertTrue("Define a prototype bean called 'outputTestReader' to check the output", applicationContext
 				.containsBeanDefinition("outputTestReader"));
 
@@ -93,7 +91,6 @@ public class PartitionFileJobFunctionalTests implements ApplicationContextAware 
 			assertEquals(inputs.get(i).getCredit().add(CustomerCreditIncreaseProcessor.FIXED_AMOUNT).intValue(),
 					outputs.get(i).getCredit().intValue());
 		}
-
 	}
 
 	/**
@@ -102,11 +99,12 @@ public class PartitionFileJobFunctionalTests implements ApplicationContextAware 
 	private Set<CustomerCredit> getCredits(ItemReader<CustomerCredit> reader) throws Exception {
 		CustomerCredit credit;
 		Set<CustomerCredit> result = new LinkedHashSet<CustomerCredit>();
+
 		while ((credit = reader.read()) != null) {
 			result.add(credit);
 		}
-		return result;
 
+		return result;
 	}
 
 	/**
@@ -126,5 +124,4 @@ public class PartitionFileJobFunctionalTests implements ApplicationContextAware 
 			((ItemStream) reader).close();
 		}
 	}
-
 }

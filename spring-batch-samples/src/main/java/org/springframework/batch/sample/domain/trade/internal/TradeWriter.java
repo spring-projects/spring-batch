@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2007 the original author or authors.
+ * Copyright 2006-2014 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,7 +24,6 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.batch.core.annotation.AfterWrite;
 import org.springframework.batch.item.ExecutionContext;
-import org.springframework.batch.item.ItemStreamException;
 import org.springframework.batch.item.ItemStreamSupport;
 import org.springframework.batch.item.ItemWriter;
 import org.springframework.batch.item.WriteFailedException;
@@ -73,7 +72,7 @@ public class TradeWriter extends ItemStreamSupport implements ItemWriter<Trade> 
 	}
 
 	@Override
-	public void open(ExecutionContext executionContext) throws ItemStreamException {
+	public void open(ExecutionContext executionContext) {
 		if (executionContext.containsKey(TOTAL_AMOUNT_KEY)) {
 			this.totalPrice = (BigDecimal) executionContext.get(TOTAL_AMOUNT_KEY);
 		}

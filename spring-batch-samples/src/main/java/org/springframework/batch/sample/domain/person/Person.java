@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2007 the original author or authors.
+ * Copyright 2006-2014 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,17 +22,11 @@ import java.util.List;
 import org.springframework.batch.sample.domain.order.Address;
 
 public class Person {
-
 	private String title = "";
-
 	private String firstName = "";
-
 	private String last_name = "";
-
 	private int age = 0;
-
 	private Address address = new Address();
-
 	private List<Child> children = new ArrayList<Child>();
 
 	public Person() {
@@ -147,46 +141,69 @@ public class Person {
 
 	@Override
 	public boolean equals(Object obj) {
-		if (this == obj)
+		if (this == obj) {
 			return true;
-		if (obj == null)
+		}
+
+		if (obj == null) {
 			return false;
-		if (getClass() != obj.getClass())
+		}
+
+		if (getClass() != obj.getClass()) {
 			return false;
+		}
+
 		Person other = (Person) obj;
+
 		if (address == null) {
-			if (other.address != null)
+			if (other.address != null) {
 				return false;
+			}
 		}
-		else if (!address.equals(other.address))
+		else if (!address.equals(other.address)) {
 			return false;
-		if (age != other.age)
+		}
+
+		if (age != other.age) {
 			return false;
+		}
+
 		if (children == null) {
-			if (other.children != null)
+			if (other.children != null) {
 				return false;
+			}
 		}
-		else if (!children.equals(other.children))
+		else if (!children.equals(other.children)) {
 			return false;
+		}
+
 		if (firstName == null) {
-			if (other.firstName != null)
+			if (other.firstName != null) {
 				return false;
+			}
 		}
-		else if (!firstName.equals(other.firstName))
+		else if (!firstName.equals(other.firstName)) {
 			return false;
+		}
+
 		if (last_name == null) {
-			if (other.last_name != null)
+			if (other.last_name != null) {
 				return false;
+			}
 		}
-		else if (!last_name.equals(other.last_name))
+		else if (!last_name.equals(other.last_name)) {
 			return false;
+		}
+
 		if (title == null) {
-			if (other.title != null)
+			if (other.title != null) {
 				return false;
+			}
 		}
-		else if (!title.equals(other.title))
+		else if (!title.equals(other.title)) {
 			return false;
+		}
+
 		return true;
 	}
-
 }

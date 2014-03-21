@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2007 the original author or authors.
+ * Copyright 2006-2014 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -30,22 +30,22 @@ public enum CustomerOperation {
 	ADD('A'), UPDATE('U'), DELETE('D');
 	
 	private final char code;
-	private static final Map<Character,CustomerOperation> codeMap;
+	private static final Map<Character,CustomerOperation> CODE_MAP;
 	
 	private CustomerOperation(char code) {
 		this.code = code;
 	}
 	
 	static{
-		codeMap = new HashMap<Character,CustomerOperation>();
+		CODE_MAP = new HashMap<Character,CustomerOperation>();
 		for(CustomerOperation operation:values()){
-			codeMap.put(operation.getCode(), operation);
+			CODE_MAP.put(operation.getCode(), operation);
 		}
 	}
 	
 	public static CustomerOperation fromCode(char code){
-		if(codeMap.containsKey(code)){
-			return codeMap.get(code);
+		if(CODE_MAP.containsKey(code)){
+			return CODE_MAP.get(code);
 		}
 		else{
 			throw new IllegalArgumentException("Invalid code: [" + code + "]");

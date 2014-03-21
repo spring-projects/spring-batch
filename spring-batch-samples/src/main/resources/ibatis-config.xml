@@ -3,7 +3,5 @@
 	"http://ibatis.apache.org/dtd/sql-map-config-2.dtd">
 
 <sqlMapConfig>
-
   <sqlMap resource="ibatis-customer-credit.xml"/>
-
 </sqlMapConfig>

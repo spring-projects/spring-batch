@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2008 the original author or authors.
+ * Copyright 2006-2014 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -34,21 +34,19 @@ import org.springframework.batch.support.transaction.TransactionAwareProxyFactor
  * 
  */
 public class CustomItemWriterTests {
-
 	@Test
 	public void testFlush() throws Exception {
-
 		CustomItemWriter<String> itemWriter = new CustomItemWriter<String>();
 		itemWriter.write(Collections.singletonList("1"));
 		assertEquals(1, itemWriter.getOutput().size());
-		itemWriter.write(Arrays.asList(new String[] {"2","3"}));
+		itemWriter.write(Arrays.asList("2","3"));
 		assertEquals(3, itemWriter.getOutput().size());
 	}
 
 	public static class CustomItemWriter<T> implements ItemWriter<T> {
+		private List<T> output = TransactionAwareProxyFactory.createTransactionalList();
 
-		List<T> output = TransactionAwareProxyFactory.createTransactionalList();
-
+		@Override
 		public void write(List<? extends T> items) throws Exception {
 			output.addAll(items);
 		}

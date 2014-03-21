@@ -8,12 +8,11 @@ import org.junit.Test;
 import org.springframework.batch.sample.domain.trade.CustomerCredit;
 
 /**
- * Tests for {@link CustomerCreditItemWriter}.
+ * Tests for {@link CustomerCreditIncreaseProcessor}.
  * 
  * @author Robert Kasanicky
  */
 public class CustomerCreditIncreaseProcessorTests {
-
 	private CustomerCreditIncreaseProcessor tested = new CustomerCreditIncreaseProcessor();
 
 	/*
@@ -21,8 +20,7 @@ public class CustomerCreditIncreaseProcessorTests {
 	 */
 	@Test
 	public void testProcess() throws Exception {
-		
-		final BigDecimal oldCredit = new BigDecimal(10.54);
+		final BigDecimal oldCredit = new BigDecimal("10.54");
 		CustomerCredit customerCredit = new CustomerCredit();
 		customerCredit.setCredit(oldCredit);
 		

@@ -42,29 +42,21 @@ import org.springframework.transaction.support.TransactionTemplate;
 @ContextConfiguration(locations = { "/simple-job-launcher-context.xml", "/hibernate-context.xml", "/jobs/hibernateJob.xml",
 		"/job-runner-context.xml" })
 public class HibernateFailureJobFunctionalTests {
-
-	@Autowired
-	private HibernateCreditDao writer;
-
-	private JdbcOperations jdbcTemplate;
-
-	private PlatformTransactionManager transactionManager;
-
 	private static final BigDecimal CREDIT_INCREASE = CustomerCreditIncreaseProcessor.FIXED_AMOUNT;
-
-	private static String[] customers = { "INSERT INTO CUSTOMER (id, version, name, credit) VALUES (1, 0, 'customer1', 100000)",
-		"INSERT INTO CUSTOMER (id, version, name, credit) VALUES (2, 0, 'customer2', 100000)",
-		"INSERT INTO CUSTOMER (id, version, name, credit) VALUES (3, 0, 'customer3', 100000)",
-		"INSERT INTO CUSTOMER (id, version, name, credit) VALUES (4, 0, 'customer4', 100000)"};
-
-	private static String DELETE_CUSTOMERS = "DELETE FROM CUSTOMER";
-
+	private static final String DELETE_CUSTOMERS = "DELETE FROM CUSTOMER";
 	private static final String ALL_CUSTOMERS = "select * from CUSTOMER order by ID";
-
 	private static final String CREDIT_COLUMN = "CREDIT";
+	private static String[] customers = { "INSERT INTO CUSTOMER (id, version, name, credit) VALUES (1, 0, 'customer1', 100000)",
+			"INSERT INTO CUSTOMER (id, version, name, credit) VALUES (2, 0, 'customer2', 100000)",
+			"INSERT INTO CUSTOMER (id, version, name, credit) VALUES (3, 0, 'customer3', 100000)",
+			"INSERT INTO CUSTOMER (id, version, name, credit) VALUES (4, 0, 'customer4', 100000)"};
 
 	protected static final String ID_COLUMN = "ID";
 
+	@Autowired
+	private HibernateCreditDao writer;
+	private JdbcOperations jdbcTemplate;
+	private PlatformTransactionManager transactionManager;
 	private List<BigDecimal> creditsBeforeUpdate;
 
 	@Autowired
@@ -82,7 +74,6 @@ public class HibernateFailureJobFunctionalTests {
 
 	@Test
 	public void testLaunchJob() throws Exception {
-
 		validatePreConditions();
 
 		JobParameters params = new JobParametersBuilder().addString("key", "failureJob").toJobParameters();
@@ -100,11 +91,11 @@ public class HibernateFailureJobFunctionalTests {
 			// assertEquals(1, writer.getErrors().size());
 			throw e;
 		}
-		int after = jdbcTemplate.queryForInt("SELECT COUNT(*) from CUSTOMER");
+
+		int after = jdbcTemplate.queryForObject("SELECT COUNT(*) from CUSTOMER", Integer.class);
 		assertEquals(4, after);
 
 		validatePostConditions();
-
 	}
 
 	/**
@@ -114,8 +105,10 @@ public class HibernateFailureJobFunctionalTests {
 	protected void validatePreConditions() throws Exception {
 		ensureState();
 		creditsBeforeUpdate = (List<BigDecimal>) new TransactionTemplate(transactionManager).execute(new TransactionCallback() {
+			@Override
 			public Object doInTransaction(TransactionStatus status) {
 				return jdbcTemplate.query(ALL_CUSTOMERS, new ParameterizedRowMapper<BigDecimal>() {
+					@Override
 					public BigDecimal mapRow(ResultSet rs, int rowNum) throws SQLException {
 						return rs.getBigDecimal(CREDIT_COLUMN);
 					}
@@ -129,32 +122,31 @@ public class HibernateFailureJobFunctionalTests {
 	 * customer table and reading the expected defaults.
 	 */
 	private void ensureState(){
-		new TransactionTemplate(transactionManager).execute(new TransactionCallback(){
-
+		new TransactionTemplate(transactionManager).execute(new TransactionCallback() {
+			@Override
 			public Object doInTransaction(TransactionStatus status) {
-                jdbcTemplate.update(DELETE_CUSTOMERS);
+				jdbcTemplate.update(DELETE_CUSTOMERS);
 				for (String customer : customers) {
-                    jdbcTemplate.update(customer);
+					jdbcTemplate.update(customer);
 				}
 				return null;
 			}
-			});
-
+		});
 	}
 
 	/**
 	 * Credit was increased by CREDIT_INCREASE
 	 */
 	protected void validatePostConditions() throws Exception {
-
 		final List<BigDecimal> matches = new ArrayList<BigDecimal>();
 
 		new TransactionTemplate(transactionManager).execute(new TransactionCallback() {
+			@Override
 			public Object doInTransaction(TransactionStatus status) {
                 jdbcTemplate.query(ALL_CUSTOMERS, new RowCallbackHandler() {
-
 					private int i = 0;
 
+					@Override
 					public void processRow(ResultSet rs) throws SQLException {
 						final BigDecimal creditBeforeUpdate = creditsBeforeUpdate.get(i++);
 						final BigDecimal expectedCredit = creditBeforeUpdate.add(CREDIT_INCREASE);
@@ -164,6 +156,7 @@ public class HibernateFailureJobFunctionalTests {
 					}
 
 				});
+
 				return null;
 			}
 		});

@@ -383,15 +383,7 @@
 		</pluginManagement>
 	</build>
 	<repositories>
-<!-- 		<repository>
-			<id>com.springsource.repository.bundles.external</id>
-			<name>SpringSource Enterprise Bundle Repository - SpringSource Bundle External</name>
-			<url>http://repository.springsource.com/maven/bundles/external</url>
-			<snapshots>
-				<enabled>false</enabled>
-			</snapshots>
-		</repository>
- -->		<repository>
+		<repository>
 			<id>gemstone</id>
 			<name>Release bundles for SQLFire and GemFire</name>
 			<url>http://dist.gemstone.com.s3.amazonaws.com/maven/release</url>

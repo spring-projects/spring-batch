@@ -61,5 +61,4 @@
 	<bean id="itemLineTokenizer" parent="parentLineTokenizer">
 		<property name="names" value="LINE_ID,ITEM_ID,PRICE,DISCOUNT_PERC,DISCOUNT_AMOUNT,SHIPPING_PRICE,HANDLING_PRICE,QUANTITY,TOTAL_PRICE" />
 	</bean>
-
 </beans>

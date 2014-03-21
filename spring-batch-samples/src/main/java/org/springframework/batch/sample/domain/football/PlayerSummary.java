@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2007 the original author or authors.
+ * Copyright 2006-2014 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,19 +13,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package org.springframework.batch.sample.domain.football;
-
 
 /**
  * Domain object representing the summary of a given Player's 
  * year.
  * 
  * @author Lucas Ward
- *
  */
 public class PlayerSummary {
-
 	private String id;
 	private int year;
 	private int completes;
@@ -111,13 +107,14 @@ public class PlayerSummary {
 	public void setTotalTd(int totalTd) {
 		this.totalTd = totalTd;
 	}
-	
-	
+
+	@Override
 	public String toString() {
 		return "Player Summary: ID=" + id + " Year=" + year + "[" + completes + ";" + attempts + ";" + passingYards +
 				";" + passingTd + ";" + interceptions + ";" + rushes + ";" + rushYards + ";" + receptions +
 				";" + receptionYards + ";" + totalTd;
 	}
+
 	@Override
 	public int hashCode() {
 		final int prime = 31;
@@ -125,22 +122,28 @@ public class PlayerSummary {
 		result = prime * result + ((id == null) ? 0 : id.hashCode());
 		return result;
 	}
+
 	@Override
 	public boolean equals(Object obj) {
-		if (this == obj)
+		if (this == obj) {
 			return true;
-		if (obj == null)
+		}
+		if (obj == null) {
 			return false;
-		if (getClass() != obj.getClass())
+		}
+		if (getClass() != obj.getClass()) {
 			return false;
+		}
 		PlayerSummary other = (PlayerSummary) obj;
 		if (id == null) {
-			if (other.id != null)
+			if (other.id != null) {
 				return false;
+			}
 		}
-		else if (!id.equals(other.id))
+		else if (!id.equals(other.id)) {
 			return false;
+		}
+
 		return true;
 	}
-		
 }

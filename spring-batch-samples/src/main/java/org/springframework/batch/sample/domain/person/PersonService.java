@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2007 the original author or authors.
+ * Copyright 2006-2014 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,28 +19,26 @@ package org.springframework.batch.sample.domain.person;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.springframework.batch.item.ItemReader;
-import org.springframework.batch.item.ItemWriter;
 import org.springframework.batch.sample.domain.order.Address;
 
 /**
  * Custom class that contains logic that would normally be be contained in
- * {@link ItemReader} and {@link ItemWriter}.
+ * {@link org.springframework.batch.item.ItemReader} and
+ * {@link javax.batch.api.chunk.ItemWriter}.
  * 
  * @author tomas.slanina
  * @author Robert Kasanicky
  */
 public class PersonService {
-
 	private static final int GENERATION_LIMIT = 10;
 
 	private int generatedCounter = 0;
-
 	private int processedCounter = 0;
 
 	public Person getData() {
-		if (generatedCounter >= GENERATION_LIMIT)
+		if (generatedCounter >= GENERATION_LIMIT) {
 			return null;
+		}
 
 		Person person = new Person();
 		Address address = new Address();

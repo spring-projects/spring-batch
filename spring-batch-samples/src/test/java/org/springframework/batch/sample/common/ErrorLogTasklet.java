@@ -20,15 +20,9 @@ import org.springframework.util.Assert;
  * @since 2.0
  */
 public class ErrorLogTasklet implements Tasklet, StepExecutionListener {
-
-	protected final Log logger = LogFactory.getLog(getClass());
-
 	private JdbcOperations jdbcTemplate;
-
 	private String jobName;
-
 	private StepExecution stepExecution;
-
 	private String stepName;
 
 	public RepeatStatus execute(StepContribution contribution, ChunkContext chunkContext) throws Exception {
@@ -58,6 +52,7 @@ public class ErrorLogTasklet implements Tasklet, StepExecutionListener {
 		this.jdbcTemplate = new JdbcTemplate(dataSource);
 	}
 
+	@Override
 	public void beforeStep(StepExecution stepExecution) {
 		this.jobName = stepExecution.getJobExecution().getJobInstance().getJobName().trim();
 		this.stepName = (String) stepExecution.getJobExecution().getExecutionContext().get("stepName");
@@ -65,8 +60,8 @@ public class ErrorLogTasklet implements Tasklet, StepExecutionListener {
 		stepExecution.getJobExecution().getExecutionContext().remove("stepName");
 	}
 
+	@Override
 	public ExitStatus afterStep(StepExecution stepExecution) {
 		return null;
 	}
-
 }

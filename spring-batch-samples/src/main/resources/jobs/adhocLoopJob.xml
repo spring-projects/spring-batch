@@ -6,7 +6,7 @@
 	xsi:schemaLocation="http://www.springframework.org/schema/beans
        	http://www.springframework.org/schema/beans/spring-beans.xsd
       	http://www.springframework.org/schema/batch
-      	http://www.springframework.org/schema/batch/spring-batch-2.2.xsd
+      	http://www.springframework.org/schema/batch/spring-batch.xsd
        	http://www.springframework.org/schema/aop
  		http://www.springframework.org/schema/aop/spring-aop.xsd">
 
@@ -40,5 +40,4 @@
 				method="onError" />
 		</aop:aspect>
 	</aop:config>
-
 </beans>

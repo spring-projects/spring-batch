@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2007 the original author or authors.
+ * Copyright 2006-2014 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -30,16 +30,16 @@ import org.springframework.util.Assert;
  * @since 2.0
  */
 public class MultiLineTradeItemReader implements ItemReader<Trade>, ItemStream {
-
 	private FlatFileItemReader<FieldSet> delegate;
 
 	/**
 	 * @see org.springframework.batch.item.ItemReader#read()
 	 */
+	@Override
 	public Trade read() throws Exception {
 		Trade t = null;
 
-		for (FieldSet line = null; (line = this.delegate.read()) != null;) {
+		for (FieldSet line; (line = this.delegate.read()) != null;) {
 			String prefix = line.readString(0);
 			if (prefix.equals("BEGIN")) {
 				t = new Trade(); // Record must start with 'BEGIN'
@@ -66,14 +66,17 @@ public class MultiLineTradeItemReader implements ItemReader<Trade>, ItemStream {
 		this.delegate = delegate;
 	}
 
+	@Override
 	public void close() throws ItemStreamException {
 		this.delegate.close();
 	}
 
+	@Override
 	public void open(ExecutionContext executionContext) throws ItemStreamException {
 		this.delegate.open(executionContext);
 	}
 
+	@Override
 	public void update(ExecutionContext executionContext) throws ItemStreamException {
 		this.delegate.update(executionContext);
 	}
