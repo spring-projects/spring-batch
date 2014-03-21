@@ -15,27 +15,32 @@
  */
 package org.springframework.batch.core.configuration.annotation;
 
-import javax.annotation.PostConstruct;
-import javax.sql.DataSource;
-
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.springframework.batch.core.launch.JobLauncher;
 import org.springframework.batch.core.launch.support.SimpleJobLauncher;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.repository.support.JobRepositoryFactoryBean;
+import org.springframework.batch.core.repository.support.MapJobRepositoryFactoryBean;
+import org.springframework.batch.support.transaction.ResourcelessTransactionManager;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.datasource.DataSourceTransactionManager;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.PlatformTransactionManager;
 
+import javax.annotation.PostConstruct;
+import javax.sql.DataSource;
+
 @Component
 public class DefaultBatchConfigurer implements BatchConfigurer {
+	private static final Log logger = LogFactory.getLog(DefaultBatchConfigurer.class);
 
 	private DataSource dataSource;
 	private PlatformTransactionManager transactionManager;
 	private JobRepository jobRepository;
 	private JobLauncher jobLauncher;
 
-	@Autowired
+	@Autowired(required = false)
 	public void setDataSource(DataSource dataSource) {
 		this.dataSource = dataSource;
 		this.transactionManager = new DataSourceTransactionManager(dataSource);
@@ -64,7 +69,20 @@ public class DefaultBatchConfigurer implements BatchConfigurer {
 
 	@PostConstruct
 	public void initialize() throws Exception {
-		this.jobRepository = createJobRepository();
+		if(dataSource == null) {
+			logger.warn("No datasource was provided...using a Map based JobRepository");
+
+			if(this.transactionManager == null) {
+				this.transactionManager = new ResourcelessTransactionManager();
+			}
+
+			MapJobRepositoryFactoryBean factory = new MapJobRepositoryFactoryBean(this.transactionManager);
+			factory.afterPropertiesSet();
+			this.jobRepository = factory.getObject();
+		} else {
+			this.jobRepository = createJobRepository();
+		}
+
 		this.jobLauncher = createJobLauncher();
 	}
 
@@ -82,5 +100,4 @@ public class DefaultBatchConfigurer implements BatchConfigurer {
 		factory.afterPropertiesSet();
 		return  factory.getObject();
 	}
-
 }

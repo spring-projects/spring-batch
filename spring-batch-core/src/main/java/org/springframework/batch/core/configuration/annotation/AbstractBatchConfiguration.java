@@ -15,10 +15,6 @@
  */
 package org.springframework.batch.core.configuration.annotation;
 
-import java.util.Collection;
-
-import javax.sql.DataSource;
-
 import org.springframework.batch.core.configuration.JobRegistry;
 import org.springframework.batch.core.configuration.support.MapJobRegistry;
 import org.springframework.batch.core.launch.JobLauncher;
@@ -34,6 +30,9 @@ import org.springframework.core.annotation.AnnotationAttributes;
 import org.springframework.core.type.AnnotationMetadata;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.util.Assert;
+
+import javax.sql.DataSource;
+import java.util.Collection;
 
 /**
  * Base {@code Configuration} class providing common structure for enabling and using Spring Batch. Customization is
@@ -92,16 +91,21 @@ public abstract class AbstractBatchConfiguration implements ImportAware {
 			return this.configurer;
 		}
 		if (configurers == null || configurers.isEmpty()) {
-			if (dataSources == null || dataSources.isEmpty() || dataSources.size() > 1) {
-				throw new IllegalStateException(
-						"To use the default BatchConfigurer the context must contain precisely one DataSource, found "
-								+ (dataSources == null ? 0 : dataSources.size()));
+			if (dataSources == null || dataSources.isEmpty()) {
+				DefaultBatchConfigurer configurer = new DefaultBatchConfigurer();
+				configurer.initialize();
+				this.configurer = configurer;
+				return configurer;
+			} else if(dataSources != null && dataSources.size() == 1) {
+				DataSource dataSource = dataSources.iterator().next();
+				DefaultBatchConfigurer configurer = new DefaultBatchConfigurer(dataSource);
+				configurer.initialize();
+				this.configurer = configurer;
+				return configurer;
+			} else {
+				throw new IllegalStateException("To use the default BatchConfigurer the context must contain no more than" +
+														"one DataSource, found " + dataSources.size());
 			}
-			DataSource dataSource = dataSources.iterator().next();
-			DefaultBatchConfigurer configurer = new DefaultBatchConfigurer(dataSource);
-			configurer.initialize();
-			this.configurer = configurer;
-			return configurer;
 		}
 		if (configurers.size() > 1) {
 			throw new IllegalStateException(

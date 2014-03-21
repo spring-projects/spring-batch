@@ -1,5 +1,5 @@
 /*
- * Copyright 2012-2013 the original author or authors.
+ * Copyright 2012-2014 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,14 +15,6 @@
  */
 package org.springframework.batch.core.configuration.annotation;
 
-import java.lang.annotation.Documented;
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
-
-import javax.sql.DataSource;
-
 import org.springframework.batch.core.configuration.JobRegistry;
 import org.springframework.batch.core.configuration.support.ApplicationContextFactory;
 import org.springframework.batch.core.configuration.support.AutomaticJobRegistrar;
@@ -30,6 +22,13 @@ import org.springframework.batch.core.launch.JobLauncher;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.context.annotation.Import;
 import org.springframework.transaction.PlatformTransactionManager;
+
+import javax.sql.DataSource;
+import java.lang.annotation.Documented;
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
 
 /**
  * <p>
@@ -62,7 +61,7 @@ import org.springframework.transaction.PlatformTransactionManager;
  * }
  * </pre>
  *
- * The user has to provide a {@link DataSource} as a bean in the context, or else implement {@link BatchConfigurer} in
+ * The user should to provide a {@link DataSource} as a bean in the context, or else implement {@link BatchConfigurer} in
  * the configuration class itself, e.g.
  *
  * <pre class="code">
@@ -84,6 +83,9 @@ import org.springframework.transaction.PlatformTransactionManager;
  *
  * }
  * </pre>
+ *
+ * If a user does not provide a {@link javax.sql.DataSource} within the context, a Map based
+ * {@link org.springframework.batch.core.repository.JobRepository} will be used.
  *
  * Note that only one of your configuration classes needs to have the <code>&#064;EnableBatchProcessing</code>
  * annotation. Once you have an <code>&#064;EnableBatchProcessing</code> class in your configuration you will have an
