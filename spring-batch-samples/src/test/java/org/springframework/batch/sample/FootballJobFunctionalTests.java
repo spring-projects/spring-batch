@@ -16,10 +16,8 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(locations = { "/simple-job-launcher-context.xml", "/jobs/footballJob.xml", "/job-runner-context.xml" })
 public class FootballJobFunctionalTests {
-
 	@Autowired
 	private JobLauncherTestUtils jobLauncherTestUtils;
-
 	private JdbcOperations jdbcTemplate;
 
 	@Autowired
@@ -29,16 +27,13 @@ public class FootballJobFunctionalTests {
 
 	@Test
 	public void testLaunchJob() throws Exception {
-
         jdbcTemplate.update("DELETE FROM PLAYERS");
         jdbcTemplate.update("DELETE FROM GAMES");
         jdbcTemplate.update("DELETE FROM PLAYER_SUMMARY");
 
 		jobLauncherTestUtils.launchJob();
 
-		int count = jdbcTemplate.queryForInt("SELECT COUNT(*) from PLAYER_SUMMARY");
+		int count = jdbcTemplate.queryForObject("SELECT COUNT(*) from PLAYER_SUMMARY", Integer.class);
 		assertTrue(count > 0);
-
 	}
-
 }

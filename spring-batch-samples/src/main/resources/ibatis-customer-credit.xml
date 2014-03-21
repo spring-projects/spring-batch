@@ -3,7 +3,6 @@
 	"http://ibatis.apache.org/dtd/sql-map-2.dtd">
 
 <sqlMap namespace="Customer">
-
   <resultMap id="result" class="org.springframework.batch.sample.domain.trade.CustomerCredit">
     <result property="name" column="NAME" />
     <result property="credit" column="CREDIT" />
@@ -24,5 +23,4 @@
   <update id="updateCredit" parameterClass="org.springframework.batch.sample.domain.trade.CustomerCredit" >
   	update CUSTOMER set CREDIT = #credit# where NAME = #name#
   </update>
-
 </sqlMap>

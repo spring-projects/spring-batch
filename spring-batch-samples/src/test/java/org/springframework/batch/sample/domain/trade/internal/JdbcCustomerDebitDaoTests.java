@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2012 the original author or authors.
+ * Copyright 2006-2014 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -37,7 +37,6 @@ import org.springframework.transaction.annotation.Transactional;
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration()
 public class JdbcCustomerDebitDaoTests {
-
 	private JdbcOperations jdbcTemplate;
 
 	@Autowired
@@ -48,27 +47,23 @@ public class JdbcCustomerDebitDaoTests {
 		this.jdbcTemplate = new JdbcTemplate(dataSource);
 	}
 
-	@Transactional @Test
+	@Test
+	@Transactional
 	public void testWrite() {
-
-		//insert customer credit
         jdbcTemplate.execute("INSERT INTO CUSTOMER VALUES (99, 0, 'testName', 100)");
 
-		//create customer debit
 		CustomerDebit customerDebit = new CustomerDebit();
 		customerDebit.setName("testName");
 		customerDebit.setDebit(BigDecimal.valueOf(5));
 
-		//call writer
 		writer.write(customerDebit);
 
-		//verify customer credit
         jdbcTemplate.query("SELECT name, credit FROM CUSTOMER WHERE name = 'testName'",
 				new RowCallbackHandler() {
+					@Override
 					public void processRow(ResultSet rs) throws SQLException {
 						assertEquals(95, rs.getLong("credit"));
 					}
 				});
-
 	}
 }

@@ -7,11 +7,11 @@ import org.springframework.batch.sample.domain.order.internal.mapper.ShippingFie
 import org.springframework.batch.sample.support.AbstractFieldSetMapperTests;
 
 public class ShippingFieldSetMapperTests extends AbstractFieldSetMapperTests {
-
 	private static final String SHIPPER_ID = "1";
 	private static final String SHIPPING_INFO = "most interesting and informative shipping info ever";
 	private static final String SHIPPING_TYPE_ID = "X";
 
+	@Override
 	protected Object expectedDomainObject() {
 		ShippingInfo info = new ShippingInfo();
 		info.setShipperId(SHIPPER_ID);
@@ -20,6 +20,7 @@ public class ShippingFieldSetMapperTests extends AbstractFieldSetMapperTests {
 		return info;
 	}
 
+	@Override
 	protected FieldSet fieldSet() {
 		String[] tokens = new String[] { SHIPPER_ID, SHIPPING_INFO, SHIPPING_TYPE_ID };
 		String[] columnNames = new String[] { ShippingFieldSetMapper.SHIPPER_ID_COLUMN,
@@ -27,8 +28,8 @@ public class ShippingFieldSetMapperTests extends AbstractFieldSetMapperTests {
 		return new DefaultFieldSet(tokens, columnNames);
 	}
 
+	@Override
 	protected FieldSetMapper<ShippingInfo> fieldSetMapper() {
 		return new ShippingFieldSetMapper();
 	}
-
 }

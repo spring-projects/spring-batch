@@ -9,10 +9,8 @@ import org.junit.Test;
 import org.springframework.batch.item.file.mapping.FieldSetMapper;
 import org.springframework.batch.item.file.transform.DefaultFieldSet;
 import org.springframework.batch.item.file.transform.FieldSet;
-import org.springframework.batch.sample.domain.multiline.AggregateItemFieldSetMapper;
 
 public class AggregateItemFieldSetMapperTests {
-
 	private AggregateItemFieldSetMapper<String> mapper = new AggregateItemFieldSetMapper<String>();
 
 	@Test
@@ -59,6 +57,4 @@ public class AggregateItemFieldSetMapperTests {
 		});
 		assertEquals("foo", mapper.mapFieldSet(new DefaultFieldSet(new String[] { "FOO" })).getItem());
 	}
-
-
 }

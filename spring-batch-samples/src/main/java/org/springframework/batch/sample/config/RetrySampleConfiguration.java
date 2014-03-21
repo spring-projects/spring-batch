@@ -1,5 +1,5 @@
 /*
- * Copyright 2012-2013 the original author or authors.
+ * Copyright 2012-2014 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -42,12 +42,12 @@ public class RetrySampleConfiguration {
 	private StepBuilderFactory steps;
 
 	@Bean
-	public Job retrySample() throws Exception {
+	public Job retrySample() {
 		return jobs.get("retrySample").start(step()).build();
 	}
 
 	@Bean
-	protected Step step() throws Exception {
+	protected Step step() {
 		return steps.get("step").<Trade, Object> chunk(1).reader(reader()).writer(writer()).faultTolerant()
 				.retry(Exception.class).retryLimit(3).build();
 	}
@@ -63,5 +63,4 @@ public class RetrySampleConfiguration {
 	protected ItemWriter<Object> writer() {
 		return new RetrySampleItemWriter<Object>();
 	}
-
 }

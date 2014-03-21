@@ -7,7 +7,6 @@ import org.springframework.batch.sample.domain.order.internal.mapper.AddressFiel
 import org.springframework.batch.sample.support.AbstractFieldSetMapperTests;
 
 public class AddressFieldSetMapperTests extends AbstractFieldSetMapperTests {
-
 	private static final String ADDRESSEE = "Jan Hrach";
 	private static final String ADDRESS_LINE_1 = "Plynarenska 7c";
 	private static final String ADDRESS_LINE_2 = "";
@@ -16,6 +15,7 @@ public class AddressFieldSetMapperTests extends AbstractFieldSetMapperTests {
 	private static final String COUNTRY = "Slovakia";
 	private static final String ZIP_CODE = "80000";
 
+	@Override
 	protected Object expectedDomainObject() {
 		Address address = new Address();
 		address.setAddressee(ADDRESSEE);
@@ -28,6 +28,7 @@ public class AddressFieldSetMapperTests extends AbstractFieldSetMapperTests {
 		return address;
 	}
 
+	@Override
 	protected FieldSet fieldSet() {
 		String[] tokens = new String[] { ADDRESSEE, ADDRESS_LINE_1, ADDRESS_LINE_2, CITY, STATE, COUNTRY, ZIP_CODE };
 		String[] columnNames = new String[] { AddressFieldSetMapper.ADDRESSEE_COLUMN,
@@ -38,6 +39,7 @@ public class AddressFieldSetMapperTests extends AbstractFieldSetMapperTests {
 		return new DefaultFieldSet(tokens, columnNames);
 	}
 
+	@Override
 	protected FieldSetMapper<Address> fieldSetMapper() {
 		return new AddressFieldSetMapper();
 	}

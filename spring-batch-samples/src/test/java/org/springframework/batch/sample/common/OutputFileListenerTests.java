@@ -7,7 +7,6 @@ import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.StepExecution;
 
 public class OutputFileListenerTests {
-
 	private OutputFileListener listener = new OutputFileListener();
 	private StepExecution stepExecution = new StepExecution("foo", new JobExecution(0L), 1L);
 	
@@ -40,5 +39,4 @@ public class OutputFileListenerTests {
 		listener.createOutputNameFromInput(stepExecution);
 		assertEquals("bar.csv", stepExecution.getExecutionContext().getString("outputFile"));
 	}
-
 }

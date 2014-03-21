@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2007 the original author or authors.
+ * Copyright 2006-2014 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -109,32 +109,41 @@ public class Address {
 
 	@Override
 	public boolean equals(Object obj) {
-		if (this == obj)
+		if (this == obj) {
 			return true;
-		if (obj == null)
+		}
+		if (obj == null) {
 			return false;
-		if (getClass() != obj.getClass())
+		}
+		if (getClass() != obj.getClass()) {
 			return false;
+		}
 		Address other = (Address) obj;
 		if (addressee == null) {
-			if (other.addressee != null)
+			if (other.addressee != null) {
 				return false;
+			}
 		}
-		else if (!addressee.equals(other.addressee))
+		else if (!addressee.equals(other.addressee)) {
 			return false;
+		}
 		if (country == null) {
-			if (other.country != null)
+			if (other.country != null) {
 				return false;
+			}
 		}
-		else if (!country.equals(other.country))
+		else if (!country.equals(other.country)) {
 			return false;
+		}
 		if (zipCode == null) {
-			if (other.zipCode != null)
+			if (other.zipCode != null) {
 				return false;
+			}
 		}
-		else if (!zipCode.equals(other.zipCode))
+		else if (!zipCode.equals(other.zipCode)) {
 			return false;
+		}
+
 		return true;
 	}
-
 }

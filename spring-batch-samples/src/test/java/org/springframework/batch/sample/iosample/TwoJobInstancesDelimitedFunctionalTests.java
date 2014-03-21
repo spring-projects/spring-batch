@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2007 the original author or authors.
+ * Copyright 2006-2014 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -49,7 +49,6 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 @ContextConfiguration(locations = { "/simple-job-launcher-context.xml", "/jobs/ioSampleJob.xml",
 		"/jobs/iosample/delimited.xml" })
 public class TwoJobInstancesDelimitedFunctionalTests {
-
 	@Autowired
 	private JobLauncher launcher;
 
@@ -74,15 +73,13 @@ public class TwoJobInstancesDelimitedFunctionalTests {
 	}
 
 	private void verifyOutput(int expected) throws Exception {
-
 		JobParameters jobParameters = new JobParametersBuilder().addString("inputFile",
 				"file:./target/test-outputs/delimitedOutput.csv").toJobParameters();
 		StepExecution stepExecution = MetaDataInstanceFactory.createStepExecution(jobParameters);
 
 		int count = StepScopeTestUtils.doInStepScope(stepExecution, new Callable<Integer>() {
-
+			@Override
 			public Integer call() throws Exception {
-
 				int count = 0;
 
 				readerStream.open(new ExecutionContext());
@@ -96,18 +93,14 @@ public class TwoJobInstancesDelimitedFunctionalTests {
 					readerStream.close();
 				}
 				return count;
-
 			}
-
 		});
 
 		assertEquals(expected, count);
-
 	}
 
 	protected JobParameters getJobParameters(String fileName) {
 		return new JobParametersBuilder().addLong("timestamp", new Date().getTime()).addString("inputFile", fileName)
 				.addString("outputFile", "file:./target/test-outputs/delimitedOutput.csv").toJobParameters();
 	}
-
 }

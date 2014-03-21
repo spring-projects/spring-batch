@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2012 the original author or authors.
+ * Copyright 2006-2014 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -38,7 +38,6 @@ import org.springframework.transaction.annotation.Transactional;
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration
 public class StagingItemWriterTests {
-
 	private JdbcOperations jdbcTemplate;
 
 	@Autowired
@@ -59,10 +58,10 @@ public class StagingItemWriterTests {
 	@Transactional
 	@Test
 	public void testProcessInsertsNewItem() throws Exception {
-		int before = jdbcTemplate.queryForInt("SELECT COUNT(*) from BATCH_STAGING");
+		int before = jdbcTemplate.queryForObject("SELECT COUNT(*) from BATCH_STAGING", Integer.class);
 		writer.write(Collections.singletonList("FOO"));
-		int after = jdbcTemplate.queryForInt("SELECT COUNT(*) from BATCH_STAGING");
+
+		int after = jdbcTemplate.queryForObject("SELECT COUNT(*) from BATCH_STAGING", Integer.class);
 		assertEquals(before + 1, after);
 	}
-
 }

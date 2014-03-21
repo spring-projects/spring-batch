@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2007 the original author or authors.
+ * Copyright 2006-2014 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -62,32 +62,41 @@ public class ShippingInfo {
 
 	@Override
 	public boolean equals(Object obj) {
-		if (this == obj)
+		if (this == obj) {
 			return true;
-		if (obj == null)
+		}
+		if (obj == null) {
 			return false;
-		if (getClass() != obj.getClass())
+		}
+		if (getClass() != obj.getClass()) {
 			return false;
+		}
 		ShippingInfo other = (ShippingInfo) obj;
 		if (shipperId == null) {
-			if (other.shipperId != null)
+			if (other.shipperId != null) {
 				return false;
+			}
 		}
-		else if (!shipperId.equals(other.shipperId))
+		else if (!shipperId.equals(other.shipperId)) {
 			return false;
+		}
 		if (shippingInfo == null) {
-			if (other.shippingInfo != null)
+			if (other.shippingInfo != null) {
 				return false;
+			}
 		}
-		else if (!shippingInfo.equals(other.shippingInfo))
+		else if (!shippingInfo.equals(other.shippingInfo)) {
 			return false;
+		}
 		if (shippingTypeId == null) {
-			if (other.shippingTypeId != null)
+			if (other.shippingTypeId != null) {
 				return false;
+			}
 		}
-		else if (!shippingTypeId.equals(other.shippingTypeId))
+		else if (!shippingTypeId.equals(other.shippingTypeId)) {
 			return false;
+		}
+
 		return true;
 	}
-
 }

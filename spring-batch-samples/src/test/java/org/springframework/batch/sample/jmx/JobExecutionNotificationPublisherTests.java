@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2008 the original author or authors.
+ * Copyright 2006-2014 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -33,21 +33,22 @@ import org.springframework.jmx.export.notification.UnableToSendNotificationExcep
  *
  */
 public class JobExecutionNotificationPublisherTests {
-
 	JobExecutionNotificationPublisher publisher = new JobExecutionNotificationPublisher();
 
 	@Test
 	public void testRepeatOperationsOpenUsed() throws Exception {
 		final List<Notification> list = new ArrayList<Notification>();
+
 		publisher.setNotificationPublisher(new NotificationPublisher() {
+			@Override
 			public void sendNotification(Notification notification) throws UnableToSendNotificationException {
 				list.add(notification);
 			}
 		});
+
 		publisher.onApplicationEvent(new SimpleMessageApplicationEvent(this, "foo"));
 		assertEquals(1, list.size());
 		String message = list.get(0).getMessage();
 		assertTrue("Message does not contain 'foo': ", message.indexOf("foo") > 0);
 	}
-
 }

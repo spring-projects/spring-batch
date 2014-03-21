@@ -32,7 +32,6 @@ import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.ReaderNotOpenException;
 import org.springframework.beans.factory.DisposableBean;
 import org.springframework.beans.factory.InitializingBean;
-import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.JdbcOperations;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.simple.ParameterizedRowMapper;
@@ -97,8 +96,7 @@ InitializingBean, DisposableBean {
 	}
 
 	@Override
-	public ProcessIndicatorItemWrapper<T> read() throws DataAccessException {
-
+	public ProcessIndicatorItemWrapper<T> read() {
 		if (!initialized) {
 			throw new ReaderNotOpenException("Reader must be open before it can be used.");
 		}
@@ -125,7 +123,6 @@ InitializingBean, DisposableBean {
 		}, id);
 
 		return new ProcessIndicatorItemWrapper<T>(id, result);
-
 	}
 
 	@Override

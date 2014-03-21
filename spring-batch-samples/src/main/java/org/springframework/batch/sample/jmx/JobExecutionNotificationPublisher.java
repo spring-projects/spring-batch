@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2007 the original author or authors.
+ * Copyright 2006-2014 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -32,8 +32,7 @@ import org.springframework.jmx.export.notification.NotificationPublisherAware;
  * @since 1.0
  */
 public class JobExecutionNotificationPublisher implements ApplicationListener, NotificationPublisherAware {
-
-	protected static final Log logger = LogFactory.getLog(JobExecutionNotificationPublisher.class);
+	private static final Log LOG = LogFactory.getLog(JobExecutionNotificationPublisher.class);
 
 	private NotificationPublisher notificationPublisher;
 
@@ -58,7 +57,7 @@ public class JobExecutionNotificationPublisher implements ApplicationListener, N
 	public void onApplicationEvent(ApplicationEvent applicationEvent) {
 		if (applicationEvent instanceof SimpleMessageApplicationEvent) {
 			String message = applicationEvent.toString();
-			logger.info(message);
+			LOG.info(message);
 			publish(message);
 		}
 	}
@@ -82,5 +81,4 @@ public class JobExecutionNotificationPublisher implements ApplicationListener, N
 			notificationPublisher.sendNotification(notification);
 		}
 	}
-
 }

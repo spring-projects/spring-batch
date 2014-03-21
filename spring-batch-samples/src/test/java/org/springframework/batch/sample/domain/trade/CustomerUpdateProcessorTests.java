@@ -1,6 +1,3 @@
-/**
- * 
- */
 package org.springframework.batch.sample.domain.trade;
 
 import static org.junit.Assert.assertEquals;
@@ -21,10 +18,9 @@ import org.junit.Test;
  *
  */
 public class CustomerUpdateProcessorTests {
-
-	CustomerDao customerDao;
-	InvalidCustomerLogger logger;
-	CustomerUpdateProcessor processor;
+	private CustomerDao customerDao;
+	private InvalidCustomerLogger logger;
+	private CustomerUpdateProcessor processor;
 	
 	@Before
 	public void init(){
@@ -37,16 +33,14 @@ public class CustomerUpdateProcessorTests {
 	
 	@Test
 	public void testSuccessfulAdd() throws Exception{
-		
-		CustomerUpdate customerUpdate = new CustomerUpdate(ADD, "test customer", new BigDecimal(232.2));
+		CustomerUpdate customerUpdate = new CustomerUpdate(ADD, "test customer", new BigDecimal("232.2"));
 		when(customerDao.getCustomerByName("test customer")).thenReturn(null);
 		assertEquals(customerUpdate, processor.process(customerUpdate));
 	}
 	
 	@Test
 	public void testInvalidAdd() throws Exception{
-		
-		CustomerUpdate customerUpdate = new CustomerUpdate(ADD, "test customer", new BigDecimal(232.2));
+		CustomerUpdate customerUpdate = new CustomerUpdate(ADD, "test customer", new BigDecimal("232.2"));
 		when(customerDao.getCustomerByName("test customer")).thenReturn(new CustomerCredit());
 		logger.log(customerUpdate);
 		assertNull("Processor should return null", processor.process(customerUpdate));
@@ -54,27 +48,23 @@ public class CustomerUpdateProcessorTests {
 	
 	@Test
 	public void testDelete() throws Exception{
-		//delete should never work, therefore, ensure it fails fast.
-		CustomerUpdate customerUpdate = new CustomerUpdate(DELETE, "test customer", new BigDecimal(232.2));
+		CustomerUpdate customerUpdate = new CustomerUpdate(DELETE, "test customer", new BigDecimal("232.2"));
 		logger.log(customerUpdate);
 		assertNull("Processor should return null", processor.process(customerUpdate));
 	}
 	
 	@Test
 	public void testSuccessfulUpdate() throws Exception{
-		
-		CustomerUpdate customerUpdate = new CustomerUpdate(UPDATE, "test customer", new BigDecimal(232.2));
+		CustomerUpdate customerUpdate = new CustomerUpdate(UPDATE, "test customer", new BigDecimal("232.2"));
 		when(customerDao.getCustomerByName("test customer")).thenReturn(new CustomerCredit());
 		assertEquals(customerUpdate, processor.process(customerUpdate));
 	}
 	
 	@Test
 	public void testInvalidUpdate() throws Exception{
-		
-		CustomerUpdate customerUpdate = new CustomerUpdate(UPDATE, "test customer", new BigDecimal(232.2));
+		CustomerUpdate customerUpdate = new CustomerUpdate(UPDATE, "test customer", new BigDecimal("232.2"));
 		when(customerDao.getCustomerByName("test customer")).thenReturn(null);
 		logger.log(customerUpdate);
 		assertNull("Processor should return null", processor.process(customerUpdate));
 	}
-	
 }

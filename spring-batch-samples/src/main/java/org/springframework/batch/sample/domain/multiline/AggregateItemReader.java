@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2007 the original author or authors.
+ * Copyright 2006-2014 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -42,8 +42,7 @@ import org.springframework.batch.item.ItemReader;
  * 
  */
 public class AggregateItemReader<T> implements ItemReader<List<T>> {
-
-	private static final Log log = LogFactory.getLog(AggregateItemReader.class);
+	private static final Log LOG = LogFactory.getLog(AggregateItemReader.class);
 
 	private ItemReader<AggregateItem<T>> itemReader;
 
@@ -60,8 +59,8 @@ public class AggregateItemReader<T> implements ItemReader<List<T>> {
 			continue;
 		}
 
-		if (!holder.exhausted) {
-			return holder.records;
+		if (!holder.isExhausted()) {
+			return holder.getRecords();
 		}
 		else {
 			return null;
@@ -71,26 +70,26 @@ public class AggregateItemReader<T> implements ItemReader<List<T>> {
 	private boolean process(AggregateItem<T> value, ResultHolder holder) {
 		// finish processing if we hit the end of file
 		if (value == null) {
-			log.debug("Exhausted ItemReader");
-			holder.exhausted = true;
+			LOG.debug("Exhausted ItemReader");
+			holder.setExhausted(true);
 			return false;
 		}
 
 		// start a new collection
 		if (value.isHeader()) {
-			log.debug("Start of new record detected");
+			LOG.debug("Start of new record detected");
 			return true;
 		}
 
 		// mark we are finished with current collection
 		if (value.isFooter()) {
-			log.debug("End of record detected");
+			LOG.debug("End of record detected");
 			return false;
 		}
 
 		// add a simple record to the current collection
-		log.debug("Mapping: " + value);
-		holder.records.add(value.getItem());
+		LOG.debug("Mapping: " + value);
+		holder.addRecord(value.getItem());
 		return true;
 	}
 
@@ -106,9 +105,23 @@ public class AggregateItemReader<T> implements ItemReader<List<T>> {
 	 * 
 	 */
 	private class ResultHolder {
-		List<T> records = new ArrayList<T>();
+		private List<T> records = new ArrayList<T>();
+		private boolean exhausted = false;
 
-		boolean exhausted = false;
+		public List<T> getRecords() {
+			return records;
+		}
+
+		public boolean isExhausted() {
+			return exhausted;
+		}
+
+		public void addRecord(T record) {
+			records.add(record);
+		}
+
+		public void setExhausted(boolean exhausted) {
+			this.exhausted = exhausted;
+		}
 	}
-
 }

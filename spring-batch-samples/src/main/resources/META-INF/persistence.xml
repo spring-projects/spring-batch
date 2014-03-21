@@ -4,10 +4,7 @@
 		version="1.0">
 
 	<persistence-unit name="customerCredit" transaction-type="RESOURCE_LOCAL">
-
         <class>org.springframework.batch.sample.domain.trade.CustomerCredit</class>
 		<exclude-unlisted-classes>true</exclude-unlisted-classes>
-
 	</persistence-unit>
-
-</persistence>
+</persistence>

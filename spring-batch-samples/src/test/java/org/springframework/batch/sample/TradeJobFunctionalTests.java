@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2012 the original author or authors.
+ * Copyright 2006-2014 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -46,14 +46,12 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 @ContextConfiguration(locations = { "/simple-job-launcher-context.xml", "/jobs/tradeJob.xml",
 		"/job-runner-context.xml" })
 public class TradeJobFunctionalTests {
-
 	private static final String GET_TRADES = "select ISIN, QUANTITY, PRICE, CUSTOMER, ID, VERSION from TRADE order by ISIN";
 	private static final String GET_CUSTOMERS = "select NAME, CREDIT from CUSTOMER order by NAME";
 
 	private List<Customer> customers;
 	private List<Trade> trades;
 	private int activeRow = 0;
-
 	private JdbcOperations jdbcTemplate;
 	private Map<String, Double> credits = new HashMap<String, Double>();
 
@@ -69,6 +67,7 @@ public class TradeJobFunctionalTests {
 	public void onSetUp() throws Exception {
         jdbcTemplate.update("delete from TRADE");
 		List<Map<String, Object>> list = jdbcTemplate.queryForList("select NAME, CREDIT from CUSTOMER");
+
 		for (Map<String, Object> map : list) {
 			credits.put((String) map.get("NAME"), ((Number) map.get("CREDIT")).doubleValue());
 		}
@@ -81,7 +80,6 @@ public class TradeJobFunctionalTests {
 
 	@Test
 	public void testLaunchJob() throws Exception {
-
 		jobLauncherTestUtils.launchJob();
 
 		customers = Arrays.asList(new Customer("customer1", (credits.get("customer1") - 98.34)),
@@ -95,9 +93,8 @@ public class TradeJobFunctionalTests {
 				new Trade("UK21341EAH48", 108, new BigDecimal("109.25"), "customer3"),
 				new Trade("UK21341EAH49", 854, new BigDecimal("123.39"), "customer4"));
 
-		// check content of the trade table
         jdbcTemplate.query(GET_TRADES, new RowCallbackHandler() {
-
+			@Override
 			public void processRow(ResultSet rs) throws SQLException {
 				Trade trade = trades.get(activeRow++);
 
@@ -110,10 +107,9 @@ public class TradeJobFunctionalTests {
 
 		assertEquals(activeRow, trades.size());
 
-		// check content of the customer table
 		activeRow = 0;
         jdbcTemplate.query(GET_CUSTOMERS, new RowCallbackHandler() {
-
+			@Override
 			public void processRow(ResultSet rs) throws SQLException {
 				Customer customer = customers.get(activeRow++);
 
@@ -123,8 +119,6 @@ public class TradeJobFunctionalTests {
 		});
 
 		assertEquals(customers.size(), activeRow);
-
-		// check content of the output file
 	}
 
 	private static class Customer {
@@ -179,9 +173,5 @@ public class TradeJobFunctionalTests {
 				return false;
 			return true;
 		}
-
-
 	}
-
-
 }

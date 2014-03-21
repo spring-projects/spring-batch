@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2012 the original author or authors.
+ * Copyright 2006-2014 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -42,11 +42,8 @@ import org.springframework.transaction.annotation.Transactional;
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(locations = {"/data-source-context.xml"})
 public class JdbcGameDaoIntegrationTests {
-
 	private JdbcGameDao gameDao;
-
 	private Game game = new Game();
-
 	private JdbcOperations jdbcTemplate;
 
 	@Autowired
@@ -59,7 +56,6 @@ public class JdbcGameDaoIntegrationTests {
 
 	@Before
 	public void onSetUpBeforeTransaction() throws Exception {
-
 		game.setId("XXXXX00");
 		game.setYear(1996);
 		game.setTeam("mia");
@@ -75,12 +71,10 @@ public class JdbcGameDaoIntegrationTests {
 		game.setReceptions(1);
 		game.setReceptionYards(16);
 		game.setTotalTd(2);
-
 	}
 
 	@Transactional @Test
 	public void testWrite() {
-
 		gameDao.write(Collections.singletonList(game));
 
 		Game tempGame = jdbcTemplate.queryForObject("SELECT * FROM GAMES where PLAYER_ID=? AND YEAR_NO=?",
@@ -89,9 +83,8 @@ public class JdbcGameDaoIntegrationTests {
 	}
 
 	private static class GameRowMapper implements ParameterizedRowMapper<Game> {
-
+		@Override
 		public Game mapRow(ResultSet rs, int arg1) throws SQLException {
-
 			if (rs == null) {
 				return null;
 			}

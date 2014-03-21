@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2007 the original author or authors.
+ * Copyright 2006-2014 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,13 +23,11 @@ import org.apache.commons.logging.LogFactory;
 import org.springframework.batch.item.ItemWriter;
 import org.springframework.batch.sample.domain.person.Person;
 
-
-
 public class PersonWriter implements ItemWriter<Person> {
     private static Log log = LogFactory.getLog(PersonWriter.class);
- 
+
+	@Override
     public void write(List<? extends Person> data) {
         log.debug("Processing: " + data);
     }
-
 }

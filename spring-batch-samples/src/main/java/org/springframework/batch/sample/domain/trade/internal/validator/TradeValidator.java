@@ -15,7 +15,6 @@
  */
 package org.springframework.batch.sample.domain.trade.internal.validator;
 
-import org.springframework.batch.item.validator.ValidationException;
 import org.springframework.validation.Errors;
 import org.springframework.validation.Validator;
 import org.springframework.batch.sample.domain.trade.Trade;

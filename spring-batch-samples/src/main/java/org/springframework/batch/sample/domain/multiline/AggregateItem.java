@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2007 the original author or authors.
+ * Copyright 2006-2014 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,8 +15,6 @@
  */
 package org.springframework.batch.sample.domain.multiline;
 
-import org.springframework.batch.item.ItemReaderException;
-
 /**
  * A wrapper type for an item that is used by {@link AggregateItemReader} to
  * identify the start and end of an aggregate record.
@@ -27,11 +25,10 @@ import org.springframework.batch.item.ItemReaderException;
  * 
  */
 public class AggregateItem<T> {
-
 	@SuppressWarnings("rawtypes")
 	private static final AggregateItem FOOTER = new AggregateItem<Object>(false, true) {
 		@Override
-		public Object getItem() throws ItemReaderException {
+		public Object getItem() {
 			throw new IllegalStateException("Footer record has no item.");
 		}
 	};
@@ -41,14 +38,14 @@ public class AggregateItem<T> {
 	 * @return a static {@link AggregateItem} that is a footer.
 	 */
 	@SuppressWarnings("unchecked")
-	public static final <T> AggregateItem<T> getFooter() {
+	public static <T> AggregateItem<T> getFooter() {
 		return FOOTER;
 	}
 
 	@SuppressWarnings("rawtypes")
 	private static final AggregateItem HEADER = new AggregateItem<Object>(true, false) {
 		@Override
-		public Object getItem() throws ItemReaderException {
+		public Object getItem() {
 			throw new IllegalStateException("Header record has no item.");
 		}
 	};
@@ -58,7 +55,7 @@ public class AggregateItem<T> {
 	 * @return a static {@link AggregateItem} that is a header.
 	 */
 	@SuppressWarnings("unchecked")
-	public static final <T> AggregateItem<T> getHeader() {
+	public static <T> AggregateItem<T> getHeader() {
 		return HEADER;
 	}
 
@@ -89,7 +86,7 @@ public class AggregateItem<T> {
 	 * @throws IllegalStateException if called on a record for which either
 	 * {@link #isHeader()} or {@link #isFooter()} answers true.
 	 */
-	public T getItem() throws IllegalStateException {
+	public T getItem() {
 		return item;
 	}
 

@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2007 the original author or authors.
+ * Copyright 2006-2014 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,12 +13,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package org.springframework.batch.sample.domain.person;
 
-
 public class Child {
-
 	private String name;
 	
 	public void setName(String name){
@@ -44,20 +41,29 @@ public class Child {
 
 	@Override
 	public boolean equals(Object obj) {
-		if (this == obj)
+		if (this == obj) {
 			return true;
-		if (obj == null)
-			return false;
-		if (getClass() != obj.getClass())
-			return false;
-		Child other = (Child) obj;
-		if (name == null) {
-			if (other.name != null)
-				return false;
 		}
-		else if (!name.equals(other.name))
+
+		if (obj == null) {
 			return false;
+		}
+
+		if (getClass() != obj.getClass()) {
+			return false;
+		}
+
+		Child other = (Child) obj;
+
+		if (name == null) {
+			if (other.name != null) {
+				return false;
+			}
+		}
+		else if (!name.equals(other.name)) {
+			return false;
+		}
+
 		return true;
 	}
-		
 }

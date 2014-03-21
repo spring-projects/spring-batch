@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2007 the original author or authors.
+ * Copyright 2006-2014 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -126,45 +126,60 @@ public class Customer {
 
 	@Override
 	public boolean equals(Object obj) {
-		if (this == obj)
+		if (this == obj) {
 			return true;
-		if (obj == null)
+		}
+		if (obj == null) {
 			return false;
-		if (getClass() != obj.getClass())
+		}
+		if (getClass() != obj.getClass()) {
 			return false;
+		}
 		Customer other = (Customer) obj;
-		if (businessCustomer != other.businessCustomer)
+		if (businessCustomer != other.businessCustomer) {
 			return false;
+		}
 		if (companyName == null) {
-			if (other.companyName != null)
+			if (other.companyName != null) {
 				return false;
+			}
 		}
-		else if (!companyName.equals(other.companyName))
+		else if (!companyName.equals(other.companyName)) {
 			return false;
+		}
 		if (firstName == null) {
-			if (other.firstName != null)
+			if (other.firstName != null) {
 				return false;
+			}
 		}
-		else if (!firstName.equals(other.firstName))
+		else if (!firstName.equals(other.firstName)) {
 			return false;
+		}
 		if (lastName == null) {
-			if (other.lastName != null)
+			if (other.lastName != null) {
 				return false;
+			}
 		}
-		else if (!lastName.equals(other.lastName))
+		else if (!lastName.equals(other.lastName)) {
 			return false;
+		}
 		if (middleName == null) {
-			if (other.middleName != null)
+			if (other.middleName != null) {
 				return false;
+			}
 		}
-		else if (!middleName.equals(other.middleName))
+		else if (!middleName.equals(other.middleName)) {
 			return false;
-		if (registered != other.registered)
+		}
+		if (registered != other.registered) {
 			return false;
-		if (registrationId != other.registrationId)
+		}
+		if (registrationId != other.registrationId) {
 			return false;
-		if (vip != other.vip)
+		}
+		if (vip != other.vip) {
 			return false;
+		}
 		return true;
 	}
 
