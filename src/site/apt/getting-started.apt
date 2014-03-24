@@ -9,11 +9,11 @@ Spring Batch Getting Started
 
   A convenient way to get started quickly with Spring Batch is to run the samples which are packaged in the samples module.  There is also a simple command line sample (or "archetype") which has a bare bones but complete implementation of a simpel job.  The source code for the samples (and the other modules) is available either from the {{{./downloads.html}.Zip assembly}} or from {{{source-repository.html}Git}}.
 
-* Using SpringSource Tool Suite (STS)
+* Using Spring Tool Suite (STS)
 
   This is the quickest way to get started.  It requires an internet connection for download, and access to a Maven repository (remote or local).
 
-    * Download STS version 2.3.2.* from the {{{http://www.springsource.com/products/sts}SpringSource website}}.  STS is a free Eclipse bundle with many features useful for Spring developers.
+    * Download STS version 3.4.* (or better) from the {{{http://spring.io/tools/sts/}Spring website}}.  STS is a free Eclipse bundle with many features useful for Spring developers.
 
     * Go to <<<New->Other...>>> and select <<<SpringSource Tool Suite->Template Project>>> from the wizard chooser.
 
