@@ -111,7 +111,7 @@ Spring Batch Features and Roadmap
   case, but each chunk is passed on to the remote processes.  The
   remote execution is an asynchronous listener of some sort
   (e.g. message-driven component or web service).  Implemented using
-  {{{http://www.springsource.org/spring-integration}Spring
+  {{{http://projects.spring.io/spring-integration/}Spring
   Integration}} in a Batch sub-project (spring-batch-integration).
 
   * Partitioning - steps execute concurrently and optionally in
@@ -123,8 +123,7 @@ Spring Batch Features and Roadmap
   * OSGi support.  Deploy the Spring Batch framework as a set of OSGi
   services.  Deploy individual jobs or groups of jobs as additional
   bundles that depend on the core.  Spring Batch JAR files are also
-  OSGi bundles, and can be deployed easily in
-  {{{http://www.springsource.com/dmserver}SpringSource dm Server}}.
+  OSGi bundles.
 
   * Non-sequential models for Job configuration (branching and
   descision support).
@@ -149,9 +148,9 @@ Spring Batch Features and Roadmap
 
 * SpringSource Enterprise Batch
 
-  * The plan is for {{{http://www.springsource.com}SpringSource}} to
+  * The plan is for {{{http://www.sping.io}Spring}} to
   provide an enterprise product that deals with runtime concerns, as
   opposed to programming and configuration.
 
-  * Triggering.  Other runtime concerns, like monitoring and managemtn
+  * Triggering.  Other runtime concerns, like monitoring and management
   of jobs and historical executions.

@@ -15,7 +15,7 @@
 		<module>spring-batch-test</module>
 		<module>spring-batch-integration</module>
 	</modules>
-	<url>http://www.springsource.org/spring-batch</url>
+	<url>http://projects.spring.io/spring-batch/</url>
 	<organization>
 		<name>Pivotal</name>
 		<url>http://spring.io</url>
@@ -28,7 +28,7 @@
   </scm>
 	<issueManagement>
 		<system>JIRA</system>
-		<url>https://jira.springsource.org/browse/BATCH</url>
+		<url>https://jira.spring.io/browse/BATCH</url>
 	</issueManagement>
 	<mailingLists>
 		<mailingList>
@@ -39,7 +39,7 @@
 	</mailingLists>
 	<ciManagement>
 		<system>Bamboo</system>
-		<url>https://build.springframework.org/bamboo/browse/BATCH</url>
+		<url>https://build.spring.io/browse/BATCH</url>
 	</ciManagement>
 	<licenses>
 		<license>
@@ -581,9 +581,9 @@
 						<link>http://logging.apache.org/log4j/docs/api/</link>
 						<link>http://jakarta.apache.org/regexp/apidocs/</link>
 						<link>http://jakarta.apache.org/velocity/api/</link>
-						<link>http://static.springsource.org/spring/docs/3.1.2.RELEASE/javadoc-api/</link>
-						<link>http://static.springframework.org/spring-batch/apidocs/</link>
-						<link>http://static.springframework.org/spring-ws/site/apidocs/</link>
+						<link>http://docs.spring.io/spring/docs/3.2.0.RELEASE/javadoc-api/</link>
+						<link>http://docs.spring.io/spring-batch/apidocs/</link>
+						<link>http://docs.spring.io/spring-ws/site/apidocs/</link>
 					</links>
 					<excludePackageNames>test.*:*.example:*.sample</excludePackageNames>
 				</configuration>

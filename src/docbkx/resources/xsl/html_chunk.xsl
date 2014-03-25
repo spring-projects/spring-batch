@@ -73,11 +73,11 @@
     <!-- let's have a Spring and I21 banner across the top of each page -->
     <xsl:template name="user.header.navigation">
         <div style="background-color:white;border:none;height:73px;border:1px solid black;">
-            <a style="border:none;" href="http://static.springframework.org/spring-batch/"
+            <a style="border:none;" href="http://docs.spring.io/spring-batch/"
                title="The Spring Framework - Spring Batch">
                 <img style="border:none;" src="images/xdev-spring_logo.jpg"/>
             </a>
-            <a style="border:none;" href="http://www.springsource.com/" title="SpringSource - Spring from the Source">
+            <a style="border:none;" href="http://www.spring.io/" title="Spring from the Source">
                 <img style="border:none;position:absolute;padding-top:0px;right:2em;" src="images/banner.png"/>
             </a>
         </div>
@@ -187,8 +187,8 @@
                                 </td>
                                 <td width="20%" align="center">
                                     <span style="color:white;font-size:90%;">
-                                        <a href="http://www.springsource.com/"
-                                           title="SpringSource - Spring from the Source">Sponsored by SpringSource
+                                        <a href="http://www.spring.io/"
+                                           title="Spring from the Source">Sponsored by Pivotal
                                         </a>
                                     </span>
                                 </td>

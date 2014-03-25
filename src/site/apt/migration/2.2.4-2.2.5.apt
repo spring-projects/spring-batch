@@ -2,18 +2,18 @@ Spring Batch 2.2.5 Release Notes
 
 * Improvement
 
-  * {{{http://jira.springsource.org/browse/BATCH-1980}[BATCH-1980]}} - Transaction timeout results in step execution status UNKNOWN
+  * {{{http://jira.spring.io/browse/BATCH-1980}[BATCH-1980]}} - Transaction timeout results in step execution status UNKNOWN
 
 * Bug
 
-  * {{{http://jira.springsource.org/browse/BATCH-2153}[BATCH-2153]}} - StepSynchronizationManager uses static HashMap - NullPointerException with multiple Threads
+  * {{{http://jira.spring.io/browse/BATCH-2153}[BATCH-2153]}} - StepSynchronizationManager uses static HashMap - NullPointerException with multiple Threads
 
-  * {{{http://jira.springsource.org/browse/BATCH-2169}[BATCH-2169]}} - @BeforeStep doesn't work when using @StepScope
+  * {{{http://jira.spring.io/browse/BATCH-2169}[BATCH-2169]}} - @BeforeStep doesn't work when using @StepScope
 
 * Task
 
-  * {{{http://jira.springsource.org/browse/BATCH-2173}[BATCH-2173]}} - Update POM files to reference new repository URLs
+  * {{{http://jira.spring.io/browse/BATCH-2173}[BATCH-2173]}} - Update POM files to reference new repository URLs
 
-  * {{{http://jira.springsource.org/browse/BATCH-2180}[BATCH-2180]}} - Clarify: CompositeItemWriter and the need to register streams
+  * {{{http://jira.spring.io/browse/BATCH-2180}[BATCH-2180]}} - Clarify: CompositeItemWriter and the need to register streams
 
-  * {{{http://jira.springsource.org/browse/BATCH-2181}[BATCH-2181]}} - Backport BATCH-2175 to the 2.2.x branch
+  * {{{http://jira.spring.io/browse/BATCH-2181}[BATCH-2181]}} - Backport BATCH-2175 to the 2.2.x branch

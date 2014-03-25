@@ -276,6 +276,6 @@ public void testAfterStep() {
     <classname>StepExecution</classname> is just one convenience method
     available within the factory. A full method listing can be found in its
     <ulink
-    url="http://static.springframework.org/spring-batch/apidocs/org/springframework/batch/test/MetaDataInstanceFactory.html">Javadoc</ulink>.</para>
+    url="http://docs.spring.io/spring-batch/apidocs/org/springframework/batch/test/MetaDataInstanceFactory.html">Javadoc</ulink>.</para>
   </section>
 </chapter>

@@ -6,7 +6,7 @@
     <version>3.0.0.BUILD-SNAPSHOT</version>
     <packaging>jar</packaging>
     <name>Commandline</name>
-    <url>http://www.springframework.org/spring-batch/archetypes/simple-cli-archetype</url>
+    <url>http://projects.spring.io/spring-batch/</url>
     <description>This project is a command line batch sample from Spring Batch demonstrating a typical batch job.
         The job can be invoked via "mvn exec:java" to see the job run from the command line.
         During an "mvn package", a distribution archive in the format defined in src/main/assembly/descriptor.xml will
@@ -268,7 +268,7 @@
         </plugins>
     </build>
     <distributionManagement>
-        <downloadUrl>http://www.springframework.org/download</downloadUrl>
+        <downloadUrl>http://projects.spring.io/spring-batch/</downloadUrl>
         <site>
             <id>staging</id>
             <url>file:///${user.dir}/target/staging/org.springframework.batch.archetype/${project.artifactId}</url>

@@ -2,6 +2,6 @@ Spring Batch 2.2.0 Release Notes
 
 * Bug
 
-  * {{{http://jira.springsource.org/browse/BATCH-2031}[BATCH-2031]}} - Incorrect delimiter detection in DelimitedLineTokenizer 
+  * {{{http://jira.spring.io/browse/BATCH-2031}[BATCH-2031]}} - Incorrect delimiter detection in DelimitedLineTokenizer
 
-  * {{{http://jira.springsource.org/browse/BATCH-2028}[BATCH-2028]}} - Update downloads documentation
+  * {{{http://jira.spring.io/browse/BATCH-2028}[BATCH-2028]}} - Update downloads documentation

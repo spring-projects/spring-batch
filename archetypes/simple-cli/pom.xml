@@ -267,7 +267,7 @@
         </plugins>
     </build>
     <distributionManagement>
-        <downloadUrl>http://www.springframework.org/download</downloadUrl>
+        <downloadUrl>http://projects.spring.io/spring-batch/</downloadUrl>
         <site>
             <id>staging</id>
             <url>file:///${user.dir}/target/staging/org.springframework.batch.archetype/${project.artifactId}</url>

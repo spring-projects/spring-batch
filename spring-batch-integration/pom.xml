@@ -3,7 +3,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<artifactId>spring-batch-integration</artifactId>
 	<name>Batch Integration</name>
-	<url>http://static.springframework.org/spring-batch/${project.artifactId}</url>
+	<url>http://docs.spring.io/spring-batch/</url>
 	<parent>
 		<groupId>org.springframework.batch</groupId>
 		<artifactId>spring-batch-parent</artifactId>
