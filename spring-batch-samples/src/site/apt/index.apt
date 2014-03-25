@@ -4,11 +4,11 @@ Spring Batch Samples
 
   There is a ZIP artifact containing the release JARs called  <<<spring-batch-*-no-dependencies.zip>>>.  This file contains the JAR files for the release, including source code and the samples.
 
-  * Full releases: {{{http://static.springframework.org/downloads/nightly/release-download.php?project=BATCH}here}}.  
+  * Full releases: {{{http://docs.spring.io/downloads/nightly/release-download.php?project=BATCH}here}}.
 
-  * Milestones: {{{http://static.springframework.org/downloads/nightly/milestone-download.php?project=BATCH}here}}.
+  * Milestones: {{{http://docs.spring.io/downloads/nightly/milestone-download.php?project=BATCH}here}}.
 
-Source code can also be browsed and downloaded at {{{http://github.com/SpringSource/spring-batch}Github}}.
+Source code can also be browsed and downloaded at {{{http://github.com/spring-projects/spring-batch}Github}}.
 
 * Overview
 
@@ -902,7 +902,7 @@ SELECT ID FROM BATCH_STAGING WHERE JOB_ID=? AND PROCESSED=? ORDER BY ID
 
   The format for the transaction attribute specification is given in
   the Spring Core documentation (e.g. see the Javadocs for
-  {{{http://static.springframework.org/spring/docs/2.5.x/api/org/springframework/transaction/interceptor/TransactionAttributeEditor.html}TransactionAttributeEditor}}).
+  {{{http://docs.spring.io/spring/docs/3.2.0.RELEASE/javadoc-api/org/springframework/transaction/interceptor/TransactionAttributeEditor.html}TransactionAttributeEditor}}).
 
 * Tasklet Job ({tasklet})
 
@@ -984,5 +984,5 @@ SELECT ID FROM BATCH_STAGING WHERE JOB_ID=? AND PROCESSED=? ORDER BY ID
   file to another.  It uses XStream for the object XML conversion,
   because this is simple to configure for basic use cases like this
   one.  See
-  {{{http://static.springframework.org/spring-ws/sites/1.5/reference/html/oxm.html}Spring
+  {{{http://docs.spring.io/spring-ws/sites/2.0/reference/html/oxm.html}Spring
   OXM documentation}} for details of other options.

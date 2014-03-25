@@ -208,5 +208,5 @@ See the [checking out and building][] section of the README for instructions. Ma
 Add a comment to the associated JIRA issue(s) linking to your new pull request.
 
 [help documentation]: http://help.github.com/send-pull-requests
-[JIRA issue tracker]: https://jira.springsource.org/browse/BATCH
+[JIRA issue tracker]: https://jira.spring.io/browse/BATCH
 [checking out and building]: https://github.com/spring-projects/spring-batch#building-from-source

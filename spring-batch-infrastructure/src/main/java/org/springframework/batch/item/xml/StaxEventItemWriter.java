@@ -444,13 +444,13 @@ ResourceAwareItemWriterItemStream<T>, InitializingBean {
 			// Woodstox >= 3.2.9 we want to disable its
 			// automatic end element feature (see:
 			// http://jira.codehaus.org/browse/WSTX-165) per
-			// http://jira.springframework.org/browse/BATCH-761).
+			// http://jira.spring.io/browse/BATCH-761).
 			outputFactory.setProperty("com.ctc.wstx.automaticEndElements", Boolean.FALSE);
 		}
 		if (outputFactory.isPropertySupported("com.ctc.wstx.outputValidateStructure")) {
 			// On restart we don't write the root element so we have to disable
 			// structural validation (see:
-			// http://jira.springframework.org/browse/BATCH-1681).
+			// http://jira.spring.io/browse/BATCH-1681).
 			outputFactory.setProperty("com.ctc.wstx.outputValidateStructure", Boolean.FALSE);
 		}
 

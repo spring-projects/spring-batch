@@ -126,7 +126,7 @@ public interface Tasklet {
 
 ** Remote Chunking
 
-  Remote chunking is a technique for dividing up the work of a step without any explicit knowledge of the structure of the data.  Any input source can be split up dynamically by reading it in a single process (as per normal in 1.x) and sending the items as a chunk to a remote worker process.  The remote process implements a listener pattern, responding to the request, processing the data and sending an asynchronous reply.  The transport for the request and reply has to be durable with guaranteed delivery and a single consumer, and those features are readily available with any JMS implementation.  But Spring Batch is building the remote chunking feature on top of {{{http://www.springframework.org/spring-integration}Spring Integration}}, so actually it is agnostic to the actual implementation of the message middleware.
+  Remote chunking is a technique for dividing up the work of a step without any explicit knowledge of the structure of the data.  Any input source can be split up dynamically by reading it in a single process (as per normal in 1.x) and sending the items as a chunk to a remote worker process.  The remote process implements a listener pattern, responding to the request, processing the data and sending an asynchronous reply.  The transport for the request and reply has to be durable with guaranteed delivery and a single consumer, and those features are readily available with any JMS implementation.  But Spring Batch is building the remote chunking feature on top of {{{http://projects.spring.io/spring-integration/}Spring Integration}}, so actually it is agnostic to the actual implementation of the message middleware.
 
 ** Partitioning
 

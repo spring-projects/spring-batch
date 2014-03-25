@@ -2,10 +2,10 @@ Spring Batch 2.2.2 Release Notes
 
 * Bug
 
-  * {{{http://jira.springsource.org/browse/BATCH-2040}[BATCH-2040]}} - Db2PagingQueryProvider creates erroneous Statement in generateJumpToItemQuery
+  * {{{http://jira.spring.io/browse/BATCH-2040}[BATCH-2040]}} - Db2PagingQueryProvider creates erroneous Statement in generateJumpToItemQuery
 
-  * {{{http://jira.springsource.org/browse/BATCH-2076}[BATCH-2076]}} - FileUtils throws an exception when append is true
+  * {{{http://jira.spring.io/browse/BATCH-2076}[BATCH-2076]}} - FileUtils throws an exception when append is true
 
-  * {{{http://jira.springsource.org/browse/BATCH-2086}[BATCH-2086]}} - default writer implementations need public setter for name
+  * {{{http://jira.spring.io/browse/BATCH-2086}[BATCH-2086]}} - default writer implementations need public setter for name
 
-  * {{{http://jira.springsource.org/browse/BATCH-2096}[BATCH-2096]}} - 'chunk-completion-policy' or 'commit-interval' with '#{jobParameters[...]}' is ignored when 'retry-limit' exists.
+  * {{{http://jira.spring.io/browse/BATCH-2096}[BATCH-2096]}} - 'chunk-completion-policy' or 'commit-interval' with '#{jobParameters[...]}' is ignored when 'retry-limit' exists.

@@ -9,7 +9,7 @@ Spring Batch Downloads
 
   The current GA release is <<2.2.5.RELEASE>>, the latest snapshots are <<3.0.0.BUILD-SNAPSHOT>>.  The version 2.1.x, 2.0.x and 1.x branches are now in maintenance (the last release was <<2.1.9.RELEASE>>).
 
-For runtime concerns and a container for running a Job as a service see the {{{http://static.springframework.org/spring-batch-admin}Spring Batch Admin}} project and the {{{http://static.springframework.org/spring-batch-admin/getting-started.html}getting started}} link there.
+For runtime concerns and a container for running a Job as a service see the {{{http://docs.spring.io/spring-batch-admin/}Spring Batch Admin}} project and the {{{http://docs.spring.io/spring-batch-admin/getting-started.html}getting started}} link there.
 
 * Zip Downloads
 

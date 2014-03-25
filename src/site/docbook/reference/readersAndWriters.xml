@@ -445,7 +445,7 @@ boolean booleanValue = fs.readBoolean(2);</programlisting>
       explored more in the next sections. The resource property represents a
       Spring Core <classname>Resource</classname>. Documentation explaining
       how to create beans of this type can be found in <ulink
-      url="http://static.springsource.org/spring/docs/3.1.x/spring-framework-reference/html/resources.html"><citetitle>Spring
+      url="http://docs.spring.io/spring/docs/3.2.x/spring-framework-reference/html/resources.html"><citetitle>Spring
       Framework, Chapter 5.Resources</citetitle></ulink>. Therefore, this
       guide will not go into the details of creating
       <classname>Resource</classname> objects. However, a simple example of a
@@ -461,7 +461,7 @@ boolean booleanValue = fs.readBoolean(2);</programlisting>
       how to locate the files to be processed. Spring Batch begins the process
       of feeding the data into the pipe from this starting point. However,
       <ulink
-      url="http://www.springsource.org/spring-integration"><citetitle>Spring
+      url="http://projects.spring.io/spring-integration/"><citetitle>Spring
       Integration</citetitle></ulink> provides many of these types of
       services.</para>
 
@@ -1454,7 +1454,7 @@ assertEquals(born, values[2]);</programlisting>
     considered one 'fragment'. Spring Batch uses Object/XML Mapping (OXM) to
     bind fragments to objects. However, Spring Batch is not tied to any
     particular XML binding technology. Typical use is to delegate to <ulink
-    url="http://static.springframework.org/spring-ws/site/reference/html/oxm.html"><citetitle>Spring
+    url="http://docs.spring.io/spring-ws/site/reference/html/oxm.html"><citetitle>Spring
     OXM</citetitle></ulink>, which provides uniform abstraction for the most
     popular OXM technologies. The dependency on Spring OXM is optional and you
     can choose to implement Spring Batch specific interfaces if desired. The
