@@ -1731,13 +1731,37 @@ itemWriter.write(items);</programlisting>
 	<section id="job-scope">
 		<title>Job Scope</title>
 
-		<para>Job scope, introduced in Spring Batch 3.0 is similar to Step scope in configuration but is a scope for the job context and ensures there is only one instance of a particular bean for the entire Job. To Job scope your beans set the scope to "job":
-		<programlisting>
-			&lt;bean id=&quot;jobScopedBean&quot; scope=&quot;step&quot; class=&quot;com.test.MyJobScopedBean&quot;/&gt;
+		<para>Job scope, introduced in Spring Batch 3.0 is similar to Step scope
+		in configuration but is a Scope for the Job context so there is only one
+		instance of such a bean per executing job. Additionally, support is provided
+		for late binding of references accessible from the JobContext using
+		#{..} placeholders. Using this feature, bean properties can be pulled from
+		the job or job execution context and the job parameters. E.g.
+
+		<programlisting>&lt;bean id=&quot;...&quot; class=&quot;...&quot; <emphasis role="bold">scope=&quot;job&quot;</emphasis>&gt;
+    &lt;property name=&quot;name&quot; value=&quot;#{jobParameters[input]}&quot; /&gt;
+&lt;/bean&gt;
 		</programlisting>
-		</para>
+		<programlisting>&lt;bean id=&quot;...&quot; class=&quot;...&quot; <emphasis role="bold">scope=&quot;job&quot;</emphasis>&gt;
+    &lt;property name=&quot;name&quot; value=&quot;#{jobExecutionContext['input.name']}.txt&quot; /&gt;
+&lt;/bean&gt;
+		</programlisting></para>
 
+		<para>Because it is not part of the Spring container by default, the scope
+		must be added explicitly, either by using the <literal>batch</literal> namespace:</para>
 
+	    <programlisting>&lt;beans xmlns="http://www.springframework.org/schema/beans"
+		  xmlns:batch="http://www.springframework.org/schema/batch"
+		  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+		  xsi:schemaLocation="..."&gt;
+
+		  &lt;batch:job .../&gt;
+		  ...
+		  &lt;/beans&gt;</programlisting>
+
+	  <para>Or by including a bean definition explicitly for the <classname>JobScope</classname> (but not both):</para>
+
+	  <programlisting>&lt;bean class="org.springframework.batch.core.scope.JobScope" /&gt;</programlisting>
 	</section>
   </section>
 </chapter>
