@@ -148,15 +148,18 @@ public class JdbcExecutionContextDao extends AbstractJdbcBatchMetadataDao implem
 
 	@Override
 	public void updateExecutionContext(final StepExecution stepExecution) {
+		// Attempt to prevent concurrent modification errors by blocking here if
+		// someone is already trying to do it.
+		synchronized (stepExecution) {
+			Long executionId = stepExecution.getId();
+			ExecutionContext executionContext = stepExecution.getExecutionContext();
+			Assert.notNull(executionId, "ExecutionId must not be null.");
+			Assert.notNull(executionContext, "The ExecutionContext must not be null.");
 
-		Long executionId = stepExecution.getId();
-		ExecutionContext executionContext = stepExecution.getExecutionContext();
-		Assert.notNull(executionId, "ExecutionId must not be null.");
-		Assert.notNull(executionContext, "The ExecutionContext must not be null.");
+			String serializedContext = serializeContext(executionContext);
 
-		String serializedContext = serializeContext(executionContext);
-
-		persistSerializedContext(executionId, serializedContext, UPDATE_STEP_EXECUTION_CONTEXT);
+			persistSerializedContext(executionId, serializedContext, UPDATE_STEP_EXECUTION_CONTEXT);
+		}
 	}
 
 	@Override
