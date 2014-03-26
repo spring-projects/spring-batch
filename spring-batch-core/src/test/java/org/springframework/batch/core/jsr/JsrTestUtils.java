@@ -15,15 +15,21 @@
  */
 package org.springframework.batch.core.jsr;
 
-import java.util.Date;
-import java.util.Properties;
-import java.util.concurrent.TimeoutException;
-
 import javax.batch.operations.JobOperator;
 import javax.batch.runtime.BatchRuntime;
 import javax.batch.runtime.BatchStatus;
 import javax.batch.runtime.JobExecution;
+import java.util.Date;
+import java.util.Properties;
+import java.util.concurrent.TimeoutException;
 
+/**
+ * Provides testing utilities to execute JSR-352 jobs and block until they are complete (since all JSR-352 based jobs
+ * are executed asynchronously).
+ *
+ * @author Michael Minella
+ * @since 3.0
+ */
 public class JsrTestUtils {
 
 	private static JobOperator operator;
