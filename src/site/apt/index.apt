@@ -1,9 +1,9 @@
                                     ------
                                     Spring Batch
                                     ------
-                                    Dave Syer, Scott Wintermute
+                                    Dave Syer, Scott Wintermute, Michael Minella
                                     ------
-                                    March 2007, May 2007
+                                    March 2007, May 2007, March 2014
 
 Introduction
 
@@ -39,11 +39,13 @@ Introduction
 
   The framework is oriented around application developers not needing to know any details of the framework - there are a few application developer interfaces that can be used for convenient construction of data processing pipelines, but apart from that we support as close to a POJO programming model as is practical.  This is similar to the approach taken in Spring Core in the area of DAO implementation.
 
-  Spring Batch version 1.x was targeted at Java 1.4 and single-process, possibly multi-threaded execution.  Spring Batch 2.0 is a Java 5 only release, using all available language features with no compromises for backward compatibility with Java 2.  We think this will provide a significantly improved programming model for batch application developers.
+  Spring Batch version 2.2.x was targeted at Java 6 with no compromises made to support earlier versions of Java.  Spring Batch 3.0 also targets Java 6, however it has been developed to support language features through Java 8.
 
-  Framework tools for scaling to multiple processes are available in Spring Batch 2.0.  These provide advanced technical services and features to enable extremely high-volume and high performance batch jobs though proven optimization and clustering techniques.  An SPI is provided with a simple implementation that works in a single process (multi-threaded).  Various remoting and grid technologies can be used to implement the same SPI in a multi-process, clustered environment.
+  Standardization of batch processing in the java space has occurred via {{{https://jcp.org/en/jsr/detail?id=352}JSR-352}}.  Spring was a major contributor to this JSR and has since implemented this specification in Spring Batch.
 
-  Matt Welsh's work shows that {{{http://www.eecs.harvard.edu/~mdw/proj/seda/}SEDA}} has enormous benefits over more rigid processing architectures, and messaging environments give us a lot of resilience out of the box.  So we also want to enable a more SEDA flavoured execution environments, as well as supporting the more traditional ETL style approach.  The key to unlocking the programming model is {{{http://projects.spring.io/spring-integration/}Spring Integration}}, where the choice of transport and distribution strategy can be made as late as possible. The same application code could be used in principle for a standalone tool processing a small amount of data, and a massive enterprise-scale bulk-processing engine.
+  Framework tools for scaling to multiple processes have been available since Spring Batch 2.0, however additional components that help facilitate multi-process scalability previously found in Spring Batch Admin have been moved into Spring Batch as part of the 3.0 release.
+
+  Future work in Spring Batch will focus on simplification of it's use as well as research into new use cases including pipelining and big data.
 
 * Background
 

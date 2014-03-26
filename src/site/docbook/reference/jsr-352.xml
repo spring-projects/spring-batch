@@ -56,10 +56,12 @@
         <para><programlisting>&lt;?xml version="1.0" encoding="UTF-8"?&gt;
 &lt;beans xmlns="http://www.springframework.org/schema/beans"
           xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-          xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
-                              http://xmlns.jcp.org/xml/ns/javaee http://xmlns.jcp.org/xml/ns/javaee/jobXML_1_0.xsd"&gt;
+          xsi:schemaLocation="http://www.springframework.org/schema/beans
+                              http://www.springframework.org/schema/beans/spring-beans.xsd
+                              http://xmlns.jcp.org/xml/ns/javaee
+                              http://xmlns.jcp.org/xml/ns/javaee/jobXML_1_0.xsd"&gt;
 
-    &lt;!-- Bean defined that references an implementation of the javax.batch.api.Batchlet interface --&gt;
+    &lt;!-- javax.batch.api.Batchlet implementation --&gt;
     &lt;bean id="fooBatchlet" class="io.spring.FooBatchlet"&gt;
             &lt;property name="prop" value="bar"/&gt;
     &lt;/bean&gt;
@@ -75,7 +77,7 @@
 
         <para>The assembly of Spring contexts (imports, etc) works with JSR-352 jobs just as it would with any other
             Spring based application.  The only difference with a JSR-352 based job is that the entry point for the
-            context definition will be the job definition found in /META-INF/batch-jobs/</para>
+            context definition will be the job definition found in /META-INF/batch-jobs/.</para>
 
         <para>To use the thread context class loader approach, all you need to do is provide the fully qualified class
             name as the ref.  It is important to note that when using this approach or the batch.xml approach, the class
@@ -165,13 +167,13 @@
     <section id="jsrProcessingModels">
         <title>Processing Models</title>
 
-        <para>JSR-352 provides the same two basic processing models that Spring Batch does</para>
+        <para>JSR-352 provides the same two basic processing models that Spring Batch does:</para>
         <para>
             <itemizedlist>
                 <listitem>
                     <para>Item based processing - Using an <classname>javax.batch.api.chunk.ItemReader</classname>, an
                         optional <classname>javax.batch.api.chunk.ItemProcessor</classname>, and an
-                        <classname>javax.batch.api.chunk.ItemWriter</classname></para>
+                        <classname>javax.batch.api.chunk.ItemWriter</classname>.</para>
                 </listitem>
                 <listitem>
                     <para>Task based processing - Using a <classname>javax.batch.api.Batchlet</classname>
@@ -186,8 +188,8 @@
             <title>Item based processing</title>
             <para>Item based processing in this context is a chunk size being set by the number of items read by an
                 <classname>ItemReader</classname>.  To configure a step this way, specify the
-                <classname>item-count</classname> and optionally configure the <classname>checkpoint-policy</classname>
-                as item (this is the default).
+                <classname>item-count</classname> (which defaults to 10) and optionally configure the
+                <classname>checkpoint-policy</classname> as item (this is the default).
                 <programlisting>...
 &lt;step id="step1"&gt;
     &lt;chunk checkpoint-policy="item" item-count="3"&gt;
