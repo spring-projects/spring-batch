@@ -92,7 +92,7 @@ public class JobExplorerFactoryBeanTests {
 	public void testCreateExplorer() throws Exception {
 
 		factory.afterPropertiesSet();
-		JobExplorer explorer = (JobExplorer) factory.getObject();
+		JobExplorer explorer = factory.getObject();
 		assertNotNull(explorer);
 
 	}

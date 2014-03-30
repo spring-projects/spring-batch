@@ -180,7 +180,7 @@ public class RepeatContextSupport extends SynchronizedAttributeAccessor implemen
 			return;
 		}
 
-		throw (RuntimeException) errors.get(0);
+		throw errors.get(0);
 	}
 
 }

@@ -247,7 +247,6 @@ public class BeanWrapperFieldSetMapper<T> extends DefaultPropertyEditorRegistrar
 	 * @param properties
 	 * @return
 	 */
-	@SuppressWarnings({ "unchecked", "rawtypes" })
 	private Properties getBeanProperties(Object bean, Properties properties) {
 
 		Class<?> cls = bean.getClass();
@@ -259,6 +258,7 @@ public class BeanWrapperFieldSetMapper<T> extends DefaultPropertyEditorRegistrar
 		}
 		Map<String, String> matches = new HashMap<String, String>(propertiesMatched.get(distanceKey));
 
+		@SuppressWarnings({ "unchecked", "rawtypes" })
 		Set<String> keys = new HashSet(properties.keySet());
 		for (String key : keys) {
 

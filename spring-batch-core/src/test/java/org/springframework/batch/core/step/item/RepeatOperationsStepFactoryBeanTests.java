@@ -59,6 +59,7 @@ public class RepeatOperationsStepFactoryBeanTests extends TestCase {
 		assertTrue(Step.class.isAssignableFrom(factory.getObjectType()));
 	}
 
+	@SuppressWarnings("cast")
 	public void testDefaultValue() throws Exception {
 		assertTrue(factory.getObject() instanceof Step);
 	}
@@ -80,7 +81,7 @@ public class RepeatOperationsStepFactoryBeanTests extends TestCase {
 			}
 		});
 
-		Step step = (Step) factory.getObject();
+		Step step = factory.getObject();
 		step.execute(new StepExecution(step.getName(), jobExecution));
 
 		assertEquals(1, list.size());

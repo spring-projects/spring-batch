@@ -34,7 +34,7 @@ import org.springframework.batch.item.UnexpectedInputException;
  * </p>
  * 
  * <p>
- * Intentionally not thread safe: it wouldn't be possible to honour the peek in
+ * Intentionally <b>not</b> thread-safe: it wouldn't be possible to honour the peek in
  * multiple threads because only one of the threads that peeked would get that
  * item in the next call to read.
  * </p>

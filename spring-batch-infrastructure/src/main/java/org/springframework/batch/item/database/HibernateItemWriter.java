@@ -35,7 +35,7 @@ import org.springframework.util.Assert;
  * default (see {@link #setClearSession(boolean) clearSession} property).<br/>
  * <br/>
  *
- * The writer is thread safe once properties are set (normal singleton behavior)
+ * The writer is thread-safe once properties are set (normal singleton behavior)
  * if a {@link CurrentSessionContext} that uses only one session per thread is
  * used.
  *

@@ -35,7 +35,7 @@ import org.springframework.batch.repeat.context.RepeatContextSupport;
 public class TimeoutTerminationPolicy extends CompletionPolicySupport {
 
 	/**
-	 * Default timeout value in millisecs (the value equivalent to 30 seconds).
+	 * Default timeout value in milliseconds (the value equivalent to 30 seconds).
 	 */
 	public static final long DEFAULT_TIMEOUT = 30000L;
 

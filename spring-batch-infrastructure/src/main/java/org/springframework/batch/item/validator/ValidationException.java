@@ -23,6 +23,7 @@ import org.springframework.batch.item.ItemReaderException;
  * 
  * @author Ben Hale
  */
+@SuppressWarnings("serial")
 public class ValidationException extends ItemReaderException {
 
 	/**

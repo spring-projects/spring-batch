@@ -1,3 +1,18 @@
+/*
+ * Copyright 2013-2014 the original author or authors.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package org.springframework.batch.core.scope;
 
 import static org.junit.Assert.assertEquals;
@@ -44,6 +59,7 @@ public class AsyncJobScopeIntegrationTests implements BeanFactoryAware {
 
 	private int beanCount;
 
+	@Override
 	public void setBeanFactory(BeanFactory beanFactory) throws BeansException {
 		this.beanFactory = (ListableBeanFactory) beanFactory;
 	}
@@ -79,6 +95,7 @@ public class AsyncJobScopeIntegrationTests implements BeanFactoryAware {
 			final String value = "foo" + i;
 			final Long id = 123L + i;
 			FutureTask<String> task = new FutureTask<String>(new Callable<String>() {
+				@Override
 				public String call() throws Exception {
 					JobExecution jobExecution = new JobExecution(id);
 					ExecutionContext executionContext = jobExecution.getExecutionContext();
@@ -118,6 +135,7 @@ public class AsyncJobScopeIntegrationTests implements BeanFactoryAware {
 		for (int i = 0; i < 12; i++) {
 			final String value = "foo" + i;
 			FutureTask<String> task = new FutureTask<String>(new Callable<String>() {
+				@Override
 				public String call() throws Exception {
 					ExecutionContext executionContext = jobExecution.getExecutionContext();
 					executionContext.put("foo", value);
@@ -135,10 +153,8 @@ public class AsyncJobScopeIntegrationTests implements BeanFactoryAware {
 			taskExecutor.execute(task);
 		}
 
-		int i = 0;
 		for (FutureTask<String> task : tasks) {
 			assertEquals("foo", task.get());
-			i++;
 		}
 
 		// Don't close the outer scope until all tasks are finished. This should

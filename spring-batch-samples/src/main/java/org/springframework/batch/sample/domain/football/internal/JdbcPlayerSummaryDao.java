@@ -35,6 +35,7 @@ public class JdbcPlayerSummaryDao implements ItemWriter<PlayerSummary> {
 
     private NamedParameterJdbcOperations namedParameterJdbcTemplate;
 
+	@Override
 	public void write(List<? extends PlayerSummary> summaries) {
 
 		for (PlayerSummary summary : summaries) {

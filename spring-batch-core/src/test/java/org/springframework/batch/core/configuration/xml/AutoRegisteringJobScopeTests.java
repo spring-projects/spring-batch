@@ -32,21 +32,21 @@ import org.springframework.context.support.ClassPathXmlApplicationContext;
 public class AutoRegisteringJobScopeTests {
 
 	@Test
+	@SuppressWarnings("resource")
 	public void testJobElement() throws Exception {
 		ConfigurableApplicationContext ctx =
 				new ClassPathXmlApplicationContext(
 						"org/springframework/batch/core/configuration/xml/AutoRegisteringJobScopeForJobElementTests-context.xml");
-		@SuppressWarnings("unchecked")
 		Map<String, JobScope> beans = ctx.getBeansOfType(JobScope.class);
 		assertTrue("JobScope not defined properly", beans.size() == 1);
 	}
 
 	@Test
+	@SuppressWarnings("resource")
 	public void testStepElement() throws Exception {
 		ConfigurableApplicationContext ctx =
 				new ClassPathXmlApplicationContext(
 						"org/springframework/batch/core/configuration/xml/AutoRegisteringJobScopeForStepElementTests-context.xml");
-		@SuppressWarnings("unchecked")
 		Map<String, JobScope> beans = ctx.getBeansOfType(JobScope.class);
 		assertTrue("JobScope not defined properly", beans.size() == 1);
 	}

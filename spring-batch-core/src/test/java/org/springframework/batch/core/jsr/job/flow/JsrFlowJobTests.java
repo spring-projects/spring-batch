@@ -88,7 +88,7 @@ public class JsrFlowJobTests {
 
 		MapJobExplorerFactoryBean jobExplorerFactory = new MapJobExplorerFactoryBean(jobRepositoryFactory);
 		jobExplorerFactory.afterPropertiesSet();
-		jobExplorer = (JobExplorer) jobExplorerFactory.getObject();
+		jobExplorer = jobExplorerFactory.getObject();
 		job.setJobExplorer(jobExplorer);
 	}
 
@@ -750,7 +750,7 @@ public class JsrFlowJobTests {
 	}
 
 	private void checkRepository(BatchStatus status, ExitStatus exitStatus) {
-		// because map dao stores in memory, it can be checked directly
+		// because map DAO stores in memory, it can be checked directly
 		JobInstance jobInstance = jobExecution.getJobInstance();
 		JobExecution other = jobExecutionDao.findJobExecutions(jobInstance).get(0);
 		assertEquals(jobInstance.getId(), other.getJobId());

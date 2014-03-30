@@ -44,9 +44,6 @@ import org.w3c.dom.Element;
  */
 public class SplitParser {
 
-	/**
-	 * 
-	 */
 	private static final String PARENT_ATTR = "parent";
 
 	private final String jobFactoryRef;
@@ -90,8 +87,7 @@ public class SplitParser {
 			parserContext.getReaderContext().error("A <split/> must contain at least two 'flow' elements.", element);
 		}
 
-		@SuppressWarnings({"rawtypes", "unchecked"})
-		Collection<Object> flows = new ManagedList();
+		Collection<BeanDefinition> flows = new ManagedList<BeanDefinition>();
 		int i = 0;
 		String prefix = idAttribute;
 		for (Element nextElement : flowElements) {

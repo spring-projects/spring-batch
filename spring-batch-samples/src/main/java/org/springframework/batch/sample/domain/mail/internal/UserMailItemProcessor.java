@@ -33,7 +33,8 @@ public class UserMailItemProcessor implements
     /**
      * @see org.springframework.batch.item.ItemProcessor#process(java.lang.Object)
      */
-    public SimpleMailMessage process( User user ) throws Exception {
+    @Override
+	public SimpleMailMessage process( User user ) throws Exception {
         SimpleMailMessage message = new SimpleMailMessage();
         message.setTo( user.getEmail() );
         message.setFrom( "communications@thecompany.com" );

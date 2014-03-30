@@ -80,7 +80,7 @@ JobInstanceDao, InitializingBean {
 	private JobKeyGenerator<JobParameters> jobKeyGenerator = new DefaultJobKeyGenerator();
 
 	/**
-	 * In this jdbc implementation a job id is obtained by asking the
+	 * In this JDBC implementation a job id is obtained by asking the
 	 * jobIncrementer (which is likely a sequence) for the next long value, and
 	 * then passing the Id and parameter values into an INSERT statement.
 	 *
@@ -196,16 +196,15 @@ JobInstanceDao, InitializingBean {
 	 * getLastJobInstances(java.lang.String, int)
 	 */
 	@Override
-	@SuppressWarnings("rawtypes")
 	public List<JobInstance> getJobInstances(String jobName, final int start,
 			final int count) {
 
-		ResultSetExtractor extractor = new ResultSetExtractor() {
+		ResultSetExtractor<List<JobInstance>> extractor = new ResultSetExtractor<List<JobInstance>>() {
 
 			private List<JobInstance> list = new ArrayList<JobInstance>();
 
 			@Override
-			public Object extractData(ResultSet rs) throws SQLException,
+			public List<JobInstance> extractData(ResultSet rs) throws SQLException,
 			DataAccessException {
 				int rowNum = 0;
 				while (rowNum < start && rs.next()) {
@@ -221,8 +220,7 @@ JobInstanceDao, InitializingBean {
 
 		};
 
-		@SuppressWarnings("unchecked")
-		List<JobInstance> result = (List<JobInstance>) getJdbcTemplate().query(getQuery(FIND_LAST_JOBS_BY_NAME),
+		List<JobInstance> result = getJdbcTemplate().query(getQuery(FIND_LAST_JOBS_BY_NAME),
 				new Object[] { jobName }, extractor);
 
 		return result;
@@ -254,8 +252,9 @@ JobInstanceDao, InitializingBean {
 	public int getJobInstanceCount(String jobName) throws NoSuchJobException {
 
 		try {
-			return getJdbcTemplate().queryForInt(
+			return getJdbcTemplate().queryForObject(
 					getQuery(COUNT_JOBS_WITH_NAME),
+					Integer.class,
 					jobName);
 		} catch (EmptyResultDataAccessException e) {
 			throw new NoSuchJobException("No job instances were found for job name " + jobName);

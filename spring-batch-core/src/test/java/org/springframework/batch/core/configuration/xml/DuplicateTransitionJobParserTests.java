@@ -28,12 +28,14 @@ import org.springframework.util.ClassUtils;
 public class DuplicateTransitionJobParserTests {
 
 	@Test(expected = BeanDefinitionStoreException.class)
+	@SuppressWarnings("resource")
 	public void testNextAttributeWithNestedElement() throws Exception {
 		new ClassPathXmlApplicationContext(ClassUtils.addResourcePathToPackagePath(getClass(),
 				"NextAttributeMultipleFinalJobParserTests-context.xml"));
 	}
 
 	@Test(expected = BeanDefinitionStoreException.class)
+	@SuppressWarnings("resource")
 	public void testDuplicateTransition() throws Exception {
 		new ClassPathXmlApplicationContext(ClassUtils.addResourcePathToPackagePath(getClass(),
 				"DuplicateTransitionJobParserTests-context.xml"));

@@ -22,6 +22,7 @@ package org.springframework.batch.item.file.transform;
  * @author Lucas Ward
  * @since 1.1
  */
+@SuppressWarnings("serial")
 public class IncorrectTokenCountException extends FlatFileFormatException {
 
 	private int actualCount;

@@ -45,7 +45,7 @@ public class SimpleStepHandlerTests {
 	@Before
 	public void setUp() throws Exception {
 		MapJobRepositoryFactoryBean jobRepositoryFactoryBean = new MapJobRepositoryFactoryBean();
-		jobRepository = jobRepositoryFactoryBean.getJobRepository();
+		jobRepository = jobRepositoryFactoryBean.getObject();
 		jobExecution = jobRepository.createJobExecution("job", new JobParameters());
 		stepHandler = new SimpleStepHandler(jobRepository);
 		stepHandler.afterPropertiesSet();

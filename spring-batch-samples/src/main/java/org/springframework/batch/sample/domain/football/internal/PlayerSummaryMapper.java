@@ -32,6 +32,7 @@ public class PlayerSummaryMapper implements ParameterizedRowMapper<PlayerSummary
 	/* (non-Javadoc)
 	 * @see org.springframework.jdbc.core.RowMapper#mapRow(java.sql.ResultSet, int)
 	 */
+	@Override
 	public PlayerSummary mapRow(ResultSet rs, int rowNum) throws SQLException {
 		
 		PlayerSummary summary = new PlayerSummary();

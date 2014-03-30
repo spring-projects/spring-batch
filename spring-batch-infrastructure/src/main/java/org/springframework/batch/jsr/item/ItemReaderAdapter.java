@@ -29,8 +29,7 @@ import org.springframework.util.ClassUtils;
  * @author Michael Minella
  * @since 3.0
  */
-@SuppressWarnings("rawtypes")
-public class ItemReaderAdapter extends CheckpointSupport implements org.springframework.batch.item.ItemReader {
+public class ItemReaderAdapter<T> extends CheckpointSupport implements org.springframework.batch.item.ItemReader<T> {
 
 	private static final String CHECKPOINT_KEY = "reader.checkpoint";
 
@@ -49,9 +48,10 @@ public class ItemReaderAdapter extends CheckpointSupport implements org.springfr
 	/* (non-Javadoc)
 	 * @see org.springframework.batch.item.ItemReader#read()
 	 */
+	@SuppressWarnings("unchecked")
 	@Override
-	public Object read() throws Exception {
-		return delegate.readItem();
+	public T read() throws Exception {
+		return (T) delegate.readItem();
 	}
 
 	/* (non-Javadoc)

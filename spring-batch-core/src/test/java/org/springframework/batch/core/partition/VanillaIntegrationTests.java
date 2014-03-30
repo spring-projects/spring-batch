@@ -58,11 +58,11 @@ public class VanillaIntegrationTests {
 
 	@Test
 	public void testLaunchJob() throws Exception {
-		int beforeMaster = jdbcTemplate.queryForInt("SELECT COUNT(*) from BATCH_STEP_EXECUTION where STEP_NAME='step1:master'");
-		int beforePartition = jdbcTemplate.queryForInt("SELECT COUNT(*) from BATCH_STEP_EXECUTION where STEP_NAME like 'step1:partition%'");
+		int beforeMaster = jdbcTemplate.queryForObject("SELECT COUNT(*) from BATCH_STEP_EXECUTION where STEP_NAME='step1:master'", Integer.class);
+		int beforePartition = jdbcTemplate.queryForObject("SELECT COUNT(*) from BATCH_STEP_EXECUTION where STEP_NAME like 'step1:partition%'", Integer.class);
 		assertNotNull(jobLauncher.run(job, new JobParameters()));
-		int afterMaster = jdbcTemplate.queryForInt("SELECT COUNT(*) from BATCH_STEP_EXECUTION where STEP_NAME='step1:master'");
-		int afterPartition = jdbcTemplate.queryForInt("SELECT COUNT(*) from BATCH_STEP_EXECUTION where STEP_NAME like 'step1:partition%'");
+		int afterMaster = jdbcTemplate.queryForObject("SELECT COUNT(*) from BATCH_STEP_EXECUTION where STEP_NAME='step1:master'", Integer.class);
+		int afterPartition = jdbcTemplate.queryForObject("SELECT COUNT(*) from BATCH_STEP_EXECUTION where STEP_NAME like 'step1:partition%'", Integer.class);
 		assertEquals(1, afterMaster-beforeMaster);
 		// Should be same as grid size in step splitter
 		assertEquals(2, afterPartition-beforePartition);

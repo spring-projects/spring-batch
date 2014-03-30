@@ -267,7 +267,7 @@ public class SimpleStepBuilder<I, O> extends AbstractTaskletStepBuilder<SimpleSt
 	 * Instead of a {@link #chunk(int) chunk size} or {@link #chunk(CompletionPolicy) completion policy} you can provide
 	 * a complete repeat operations instance that handles the iteration over the item reader.
 	 *
-	 * @param repeatTemplate a cmplete repeat template for the chunk
+	 * @param repeatTemplate a complete repeat template for the chunk
 	 * @return this for fluent chaining
 	 */
 	public SimpleStepBuilder<I, O> chunkOperations(RepeatOperations repeatTemplate) {

@@ -68,12 +68,11 @@ public enum JsrStepListenerMetaData implements ListenerMetaData {
 
 	private final String methodName;
 	private final String propertyName;
-	private final Class<? extends javax.batch.api.listener.StepListener> listenerInterface;
+	private final Class<?> listenerInterface;
 	private static final Map<String, JsrStepListenerMetaData> propertyMap;
 	private final Class<?>[] paramTypes;
 
-	@SuppressWarnings({"rawtypes", "unchecked"})
-	JsrStepListenerMetaData(String methodName, String propertyName, Class listenerInterface, Class<?>... paramTypes) {
+	JsrStepListenerMetaData(String methodName, String propertyName, Class<?> listenerInterface, Class<?>... paramTypes) {
 		this.propertyName = propertyName;
 		this.methodName = methodName;
 		this.listenerInterface = listenerInterface;

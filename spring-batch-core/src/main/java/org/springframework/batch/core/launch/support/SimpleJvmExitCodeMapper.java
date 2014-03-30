@@ -62,8 +62,8 @@ public class SimpleJvmExitCodeMapper implements ExitCodeMapper {
 
 	/**
 	 * Get the operating system exit status that matches a certain Batch
-	 * Framework Exitcode
-	 * @param exitCode The exitcode of the Batch Job as known by the Batch
+	 * Framework exit code
+	 * @param exitCode The exit code of the Batch Job as known by the Batch
 	 * Framework
 	 * @return The exitCode of the Batch Job as known by the JVM
 	 */

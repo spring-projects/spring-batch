@@ -33,6 +33,7 @@ public class CustomerUpdateWriter implements ItemWriter<Trade> {
 
 	private CustomerDebitDao dao;
 
+	@Override
 	public void write(List<? extends Trade> trades) {
 		for (Trade trade : trades) {
 			CustomerDebit customerDebit = new CustomerDebit();

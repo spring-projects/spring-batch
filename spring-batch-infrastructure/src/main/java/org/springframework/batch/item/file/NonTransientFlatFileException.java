@@ -22,6 +22,7 @@ import org.springframework.batch.item.NonTransientResourceException;
  * 
  * @author Dave Syer
  */
+@SuppressWarnings("serial")
 public class NonTransientFlatFileException extends NonTransientResourceException {
 
 	private String input;

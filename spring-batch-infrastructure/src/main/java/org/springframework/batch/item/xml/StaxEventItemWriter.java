@@ -66,7 +66,7 @@ import org.springframework.util.StringUtils;
  * This item writer also provides restart, statistics and transaction features
  * by implementing corresponding interfaces.
  * 
- * The implementation is *not* thread-safe.
+ * The implementation is <b>not</b> thread-safe.
  * 
  * @author Peter Zozom
  * @author Robert Kasanicky
@@ -154,7 +154,7 @@ ResourceAwareItemWriterItemStream<T>, InitializingBean {
 	private boolean restarted = false;
 	
 	// List holding the QName of elements that were opened in the header callback, but not closed
-	private List<QName> unclosedHeaderCallbackElements = Collections.EMPTY_LIST;
+	private List<QName> unclosedHeaderCallbackElements = Collections.emptyList();
 
 	public StaxEventItemWriter() {
 		setExecutionContextName(ClassUtils.getShortName(StaxEventItemWriter.class));
@@ -417,7 +417,6 @@ ResourceAwareItemWriterItemStream<T>, InitializingBean {
 	/**
 	 * Helper method for opening output source at given file position
 	 */
-	@SuppressWarnings("resource")
 	private void open(long position) {
 
 		File file;
@@ -525,7 +524,7 @@ ResourceAwareItemWriterItemStream<T>, InitializingBean {
 	}
 
 	/**
-	 * Subclasses can override to customize the stax result.
+	 * Subclasses can override to customize the STAX result.
 	 * @return a result for writing to
 	 * @throws Exception
 	 */

@@ -20,6 +20,7 @@ package org.springframework.batch.item;
  * 
  * @author Ben Hale
  */
+@SuppressWarnings("serial")
 public class ReaderNotOpenException extends ItemReaderException {
 
 	/**

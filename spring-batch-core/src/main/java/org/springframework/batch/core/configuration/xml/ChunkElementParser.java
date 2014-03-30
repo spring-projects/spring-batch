@@ -19,10 +19,12 @@ import java.util.List;
 
 import org.springframework.batch.core.listener.StepListenerMetaData;
 import org.springframework.batch.repeat.policy.SimpleCompletionPolicy;
+import org.springframework.beans.BeanMetadataElement;
 import org.springframework.beans.MutablePropertyValues;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.config.BeanDefinitionHolder;
 import org.springframework.beans.factory.config.RuntimeBeanReference;
+import org.springframework.beans.factory.config.TypedStringValue;
 import org.springframework.beans.factory.parsing.CompositeComponentDefinition;
 import org.springframework.beans.factory.support.AbstractBeanDefinition;
 import org.springframework.beans.factory.support.BeanDefinitionBuilder;
@@ -118,10 +120,11 @@ public class ChunkElementParser {
 		}
 
 		String skipLimit = element.getAttribute("skip-limit");
-		ManagedMap skippableExceptions = new ExceptionElementParser().parse(element, parserContext, "skippable-exception-classes");
+		ManagedMap<TypedStringValue, Boolean> skippableExceptions = 
+				new ExceptionElementParser().parse(element, parserContext, "skippable-exception-classes");
 		if (StringUtils.hasText(skipLimit)) {
 			if (skippableExceptions == null) {
-				skippableExceptions = new ManagedMap();
+				skippableExceptions = new ManagedMap<TypedStringValue, Boolean>();
 				skippableExceptions.setMergeEnabled(true);
 			}
 			propertyValues.addPropertyValue("skipLimit", skipLimit);
@@ -142,10 +145,11 @@ public class ChunkElementParser {
 				underspecified);
 
 		String retryLimit = element.getAttribute("retry-limit");
-		ManagedMap retryableExceptions = new ExceptionElementParser().parse(element, parserContext, "retryable-exception-classes");
+		ManagedMap<TypedStringValue, Boolean> retryableExceptions = 
+				new ExceptionElementParser().parse(element, parserContext, "retryable-exception-classes");
 		if (StringUtils.hasText(retryLimit)) {
 			if (retryableExceptions == null) {
-				retryableExceptions = new ManagedMap();
+				retryableExceptions = new ManagedMap<TypedStringValue, Boolean>();
 				retryableExceptions.setMergeEnabled(true);
 			}
 			propertyValues.addPropertyValue("retryLimit", retryLimit);
@@ -194,7 +198,6 @@ public class ChunkElementParser {
 	private void handleItemHandler(AbstractBeanDefinition enclosing, String handlerName, String propertyName, String adapterClassName, boolean required,
 			Element element, ParserContext parserContext, MutablePropertyValues propertyValues, boolean underspecified) {
 		String refName = element.getAttribute(handlerName);
-		@SuppressWarnings("unchecked")
 		List<Element> children = DomUtils.getChildElementsByTagName(element, handlerName);
 		if (children.size() == 1) {
 			if (StringUtils.hasText(refName)) {
@@ -223,7 +226,6 @@ public class ChunkElementParser {
 	 * Handle the &lt;reader/&gt;, &lt;processor/&gt;, or &lt;writer/&gt; that
 	 * is defined within the item handler.
 	 */
-	@SuppressWarnings("unchecked")
 	private void handleItemHandlerElement(AbstractBeanDefinition enclosing, String propertyName, String adapterClassName,
 			MutablePropertyValues propertyValues, Element element, ParserContext parserContext) {
 		List<Element> beanElements = DomUtils.getChildElementsByTagName(element, BEAN_ELE);
@@ -281,7 +283,7 @@ public class ChunkElementParser {
 			CompositeComponentDefinition compositeDef = new CompositeComponentDefinition(listenersElement.getTagName(),
 					parserContext.extractSource(element));
 			parserContext.pushContainingComponent(compositeDef);
-			ManagedList retryListenerBeans = new ManagedList();
+			ManagedList<BeanMetadataElement> retryListenerBeans = new ManagedList<BeanMetadataElement>();
 			retryListenerBeans.setMergeEnabled(listenersElement.hasAttribute(MERGE_ATTR)
 					&& Boolean.valueOf(listenersElement.getAttribute(MERGE_ATTR)));
 			handleRetryListenerElements(parserContext, listenersElement, retryListenerBeans, enclosing);
@@ -290,8 +292,7 @@ public class ChunkElementParser {
 		}
 	}
 
-	@SuppressWarnings("unchecked")
-	private void handleRetryListenerElements(ParserContext parserContext, Element element, ManagedList beans,
+	private void handleRetryListenerElements(ParserContext parserContext, Element element, ManagedList<BeanMetadataElement> beans,
 			BeanDefinition enclosing) {
 		List<Element> listenerElements = DomUtils.getChildElementsByTagName(element, "listener");
 		if (listenerElements != null) {
@@ -301,11 +302,10 @@ public class ChunkElementParser {
 		}
 	}
 
-	@SuppressWarnings("unchecked")
 	private void handleStreamsElement(Element element, MutablePropertyValues propertyValues, ParserContext parserContext) {
 		Element streamsElement = DomUtils.getChildElementByTagName(element, "streams");
 		if (streamsElement != null) {
-			ManagedList streamBeans = new ManagedList();
+			ManagedList<RuntimeBeanReference> streamBeans = new ManagedList<RuntimeBeanReference>();
 			streamBeans.setMergeEnabled(streamsElement.hasAttribute(MERGE_ATTR)
 					&& Boolean.valueOf(streamsElement.getAttribute(MERGE_ATTR)));
 			List<Element> streamElements = DomUtils.getChildElementsByTagName(streamsElement, "stream");
@@ -324,35 +324,5 @@ public class ChunkElementParser {
 			propertyValues.addPropertyValue("streams", streamBeans);
 		}
 	}
-	//
-	//	@SuppressWarnings("unchecked")
-	//	private ManagedMap handleExceptionElement(Element element, ParserContext parserContext, String exceptionListName) {
-	//		List<Element> children = DomUtils.getChildElementsByTagName(element, exceptionListName);
-	//		if (children.size() == 1) {
-	//			ManagedMap map = new ManagedMap();
-	//			Element exceptionClassesElement = children.get(0);
-	//			map.setMergeEnabled(exceptionClassesElement.hasAttribute(MERGE_ATTR)
-	//					&& Boolean.valueOf(exceptionClassesElement.getAttribute(MERGE_ATTR)));
-	//			addExceptionClasses("include", true, exceptionClassesElement, map, parserContext);
-	//			addExceptionClasses("exclude", false, exceptionClassesElement, map, parserContext);
-	//			map.put(ForceRollbackForWriteSkipException.class, true);
-	//			return map;
-	//		}
-	//		else if (children.size() > 1) {
-	//			parserContext.getReaderContext().error(
-	//					"The <" + exceptionListName + "/> element may not appear more than once in a single <"
-	//							+ element.getNodeName() + "/>.", element);
-	//		}
-	//		return null;
-	//	}
-	//
-	//	@SuppressWarnings("unchecked")
-	//	private void addExceptionClasses(String elementName, boolean include, Element exceptionClassesElement,
-	//			ManagedMap map, ParserContext parserContext) {
-	//		for (Element child : (List<Element>) DomUtils.getChildElementsByTagName(exceptionClassesElement, elementName)) {
-	//			String className = child.getAttribute("class");
-	//			map.put(new TypedStringValue(className, Class.class), include);
-	//		}
-	//	}
-	//
+
 }

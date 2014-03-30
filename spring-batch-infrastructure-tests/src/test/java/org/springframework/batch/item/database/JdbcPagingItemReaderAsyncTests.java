@@ -84,7 +84,7 @@ public class JdbcPagingItemReaderAsyncTests {
 	@Before
 	public void init() {
         JdbcTemplate jdbcTemplate = new JdbcTemplate(dataSource);
-		maxId = jdbcTemplate.queryForInt("SELECT MAX(ID) from T_FOOS");
+		maxId = jdbcTemplate.queryForObject("SELECT MAX(ID) from T_FOOS", Integer.class);
 		for (int i = ITEM_COUNT; i > maxId; i--) {
 			jdbcTemplate.update("INSERT into T_FOOS (ID,NAME,VALUE) values (?, ?, ?)", i, "foo" + i, i);
 		}
@@ -126,6 +126,7 @@ public class JdbcPagingItemReaderAsyncTests {
 				.newFixedThreadPool(THREAD_COUNT));
 		for (int i = 0; i < THREAD_COUNT; i++) {
 			completionService.submit(new Callable<List<Foo>>() {
+				@Override
 				public List<Foo> call() throws Exception {
 					List<Foo> list = new ArrayList<Foo>();
 					Foo next = null;
@@ -166,8 +167,9 @@ public class JdbcPagingItemReaderAsyncTests {
 		Map<String, Order> sortKeys = new LinkedHashMap<String, Order>();
 		sortKeys.put("VALUE", Order.ASCENDING);
 		factory.setSortKeys(sortKeys);
-		reader.setQueryProvider((PagingQueryProvider) factory.getObject());
+		reader.setQueryProvider(factory.getObject());
 		reader.setRowMapper(new ParameterizedRowMapper<Foo>() {
+			@Override
 			public Foo mapRow(ResultSet rs, int i) throws SQLException {
 				Foo foo = new Foo();
 				foo.setId(rs.getInt(1));

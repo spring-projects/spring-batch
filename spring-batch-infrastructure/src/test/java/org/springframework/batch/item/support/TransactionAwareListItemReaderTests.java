@@ -51,9 +51,9 @@ public class TransactionAwareListItemReaderTests extends TestCase {
 		PlatformTransactionManager transactionManager = new ResourcelessTransactionManager();
 		final List<Object> taken = new ArrayList<Object>();
 		try {
-			new TransactionTemplate(transactionManager).execute(new TransactionCallback() {
+			new TransactionTemplate(transactionManager).execute(new TransactionCallback<Void>() {
                 @Override
-				public Object doInTransaction(TransactionStatus status) {
+				public Void doInTransaction(TransactionStatus status) {
 					taken.add(reader.read());
 					return null;
 				}
@@ -78,9 +78,9 @@ public class TransactionAwareListItemReaderTests extends TestCase {
 	public void testTransactionalExhausted() throws Exception {
 		PlatformTransactionManager transactionManager = new ResourcelessTransactionManager();
 		final List<Object> taken = new ArrayList<Object>();
-		new TransactionTemplate(transactionManager).execute(new TransactionCallback() {
+		new TransactionTemplate(transactionManager).execute(new TransactionCallback<Void>() {
             @Override
-			public Object doInTransaction(TransactionStatus status) {
+			public Void doInTransaction(TransactionStatus status) {
 				Object next = reader.read();
 				while (next != null) {
 					taken.add(next);
@@ -97,9 +97,9 @@ public class TransactionAwareListItemReaderTests extends TestCase {
 		PlatformTransactionManager transactionManager = new ResourcelessTransactionManager();
 		final List<Object> taken = new ArrayList<Object>();
 		try {
-			new TransactionTemplate(transactionManager).execute(new TransactionCallback() {
+			new TransactionTemplate(transactionManager).execute(new TransactionCallback<Void>() {
                 @Override
-				public Object doInTransaction(TransactionStatus status) {
+				public Void doInTransaction(TransactionStatus status) {
 					taken.add(reader.read());
 					throw new RuntimeException("Rollback!");
 				}

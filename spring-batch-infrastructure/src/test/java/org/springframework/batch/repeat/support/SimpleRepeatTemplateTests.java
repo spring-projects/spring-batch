@@ -437,6 +437,7 @@ public class SimpleRepeatTemplateTests extends AbstractTradeBatchTests {
 	@Test
 	public void testExceptionUnwrapping() {
 
+		@SuppressWarnings("serial")
 		class TestException extends Exception {
 			TestException(String msg) {
 				super(msg);

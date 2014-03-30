@@ -29,7 +29,7 @@ import org.springframework.util.Assert;
  * item count in the {@link ExecutionContext} (therefore requires item ordering
  * to be preserved between runs).
  * 
- * Subclasses are inherently *not* thread-safe.
+ * Subclasses are inherently <b>not</b> thread-safe.
  * 
  * @author Robert Kasanicky
  */

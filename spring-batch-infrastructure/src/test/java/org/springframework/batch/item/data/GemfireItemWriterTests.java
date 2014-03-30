@@ -1,3 +1,18 @@
+/*
+ * Copyright 2013-2014 the original author or authors.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package org.springframework.batch.item.data;
 
 import static org.junit.Assert.fail;
@@ -15,10 +30,10 @@ import org.springframework.batch.item.SpELItemKeyMapper;
 import org.springframework.data.gemfire.GemfireTemplate;
 import org.springframework.core.convert.converter.Converter;
 
-@SuppressWarnings({ "rawtypes", "serial", "unchecked" })
+@SuppressWarnings("serial")
 public class GemfireItemWriterTests {
 
-	private GemfireItemWriter writer;
+	private GemfireItemWriter<String, Foo> writer;
 	@Mock
 	private GemfireTemplate template;
 
@@ -27,7 +42,7 @@ public class GemfireItemWriterTests {
 	@Before
 	public void setUp() throws Exception {
 		MockitoAnnotations.initMocks(this);
-		writer = new GemfireItemWriter();
+		writer = new GemfireItemWriter<String, Foo>();
 		writer.setTemplate(template);
 		writer.setItemKeyMapper(new SpELItemKeyMapper<String, Foo>("bar.val"));
 		writer.afterPropertiesSet();
@@ -35,7 +50,7 @@ public class GemfireItemWriterTests {
 
 	@Test
 	public void testAfterPropertiesSet() throws Exception {
-		writer = new GemfireItemWriter();
+		writer = new GemfireItemWriter<String, Foo>();
 
 		try {
 			writer.afterPropertiesSet();
@@ -50,7 +65,7 @@ public class GemfireItemWriterTests {
 		} catch (IllegalArgumentException iae) {
 		}
 
-		writer.setItemKeyMapper(new SpELItemKeyMapper<Object, Object>("foo"));
+		writer.setItemKeyMapper(new SpELItemKeyMapper<String, Foo>("foo"));
 		writer.afterPropertiesSet();
 	}
 
@@ -92,7 +107,7 @@ public class GemfireItemWriterTests {
 				add(new Foo(new Bar("val2")));
 			}
 		};
-		writer = new GemfireItemWriter();
+		writer = new GemfireItemWriter<String, Foo>();
 		writer.setTemplate(template);
 		writer.setItemKeyMapper(new Converter<Foo, String>() {
 

@@ -40,7 +40,7 @@ public enum Alignment {
 		this.label = label;
 	}
 
-    public Comparable getCode() {
+    public Comparable<String> getCode() {
         return code;
     }
 

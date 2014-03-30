@@ -144,6 +144,7 @@ public class RepeatOperationsInterceptor implements MethodInterceptor {
 	 * @author Dave Syer
 	 * 
 	 */
+	@SuppressWarnings("serial")
 	private static class RepeatOperationsInterceptorException extends RepeatException {
 		/**
 		 * @param message

@@ -32,6 +32,7 @@ import org.springframework.test.util.ReflectionTestUtils;
 public class ParentStepFactoryBeanParserTests {
 
 	@Test
+	@SuppressWarnings("resource")
 	public void testSimpleAttributes() throws Exception {
 		ConfigurableApplicationContext context = new ClassPathXmlApplicationContext(
 				"org/springframework/batch/core/configuration/xml/ParentStepFactoryBeanParserTests-context.xml");
@@ -43,6 +44,7 @@ public class ParentStepFactoryBeanParserTests {
 	}
 
 	@Test
+	@SuppressWarnings("resource")
 	public void testSkippableAttributes() throws Exception {
 		ConfigurableApplicationContext context = new ClassPathXmlApplicationContext(
 				"org/springframework/batch/core/configuration/xml/ParentSkippableStepFactoryBeanParserTests-context.xml");
@@ -54,6 +56,7 @@ public class ParentStepFactoryBeanParserTests {
 	}
 
 	@Test
+	@SuppressWarnings("resource")
 	public void testRetryableAttributes() throws Exception {
 		ConfigurableApplicationContext context = new ClassPathXmlApplicationContext(
 				"org/springframework/batch/core/configuration/xml/ParentRetryableStepFactoryBeanParserTests-context.xml");
@@ -66,6 +69,7 @@ public class ParentStepFactoryBeanParserTests {
 
 	// BATCH-1396
 	@Test
+	@SuppressWarnings("resource")
 	public void testRetryableLateBindingAttributes() throws Exception {
 		ConfigurableApplicationContext context = new ClassPathXmlApplicationContext(
 				"org/springframework/batch/core/configuration/xml/ParentRetryableLateBindingStepFactoryBeanParserTests-context.xml");
@@ -78,6 +82,7 @@ public class ParentStepFactoryBeanParserTests {
 
 	// BATCH-1396
 	@Test
+	@SuppressWarnings("resource")
 	public void testSkippableLateBindingAttributes() throws Exception {
 		ConfigurableApplicationContext context = new ClassPathXmlApplicationContext(
 				"org/springframework/batch/core/configuration/xml/ParentSkippableLateBindingStepFactoryBeanParserTests-context.xml");

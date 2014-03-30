@@ -33,7 +33,7 @@ import org.springframework.util.CollectionUtils;
  * </p>
  *
  * <p>
- * This writer is thread safe once all properties are set (normal singleton
+ * This writer is thread-safe once all properties are set (normal singleton
  * behavior) so it can be used in multiple concurrent transactions.
  * </p>
  *
@@ -67,6 +67,7 @@ public class Neo4jItemWriter<T> implements ItemWriter<T>, InitializingBean {
 	 *
 	 * @see InitializingBean#afterPropertiesSet()
 	 */
+	@Override
 	public void afterPropertiesSet() throws Exception {
 		Assert.state(template != null, "A Neo4JOperations implementation is required");
 	}
@@ -76,6 +77,7 @@ public class Neo4jItemWriter<T> implements ItemWriter<T>, InitializingBean {
 	 *
 	 * @see org.springframework.batch.item.ItemWriter#write(java.util.List)
 	 */
+	@Override
 	public void write(List<? extends T> items) throws Exception {
 		if(!CollectionUtils.isEmpty(items)) {
 			doWrite(items);

@@ -147,7 +147,7 @@ public interface JobRepository {
 	 *
 	 * Preconditions: {@link StepExecution} must have a valid {@link Step}.
 	 *
-	 * @param stepExecution
+	 * @param stepExecutions
 	 */
 	void addAll(Collection<StepExecution> stepExecutions);
 

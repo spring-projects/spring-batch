@@ -424,7 +424,6 @@ public class JsrJobOperator implements JobOperator, InitializingBean {
 	 * @throws JobRestartException thrown for any general errors during the job restart process
 	 */
 	@Override
-	@SuppressWarnings("resource")
 	public long restart(long executionId, Properties params)
 			throws JobExecutionAlreadyCompleteException,
 			NoSuchJobExecutionException, JobExecutionNotMostRecentException,
@@ -587,7 +586,6 @@ public class JsrJobOperator implements JobOperator, InitializingBean {
 	 * @param params any job parameters to be used during the execution of this job.
 	 */
 	@Override
-	@SuppressWarnings("resource")
 	public long start(String jobName, Properties params) throws JobStartException,
 	JobSecurityException {
 		final JsrXmlApplicationContext batchContext = new JsrXmlApplicationContext(params);

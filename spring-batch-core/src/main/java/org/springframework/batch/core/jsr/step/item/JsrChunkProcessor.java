@@ -48,8 +48,7 @@ public class JsrChunkProcessor<I,O> implements ChunkProcessor<I> {
 
 	private final Log logger = LogFactory.getLog(getClass());
 	private ItemReader<? extends I> itemReader;
-	@SuppressWarnings("rawtypes")
-	private final MulticasterBatchListener listener = new MulticasterBatchListener();
+	private final MulticasterBatchListener<I, O> listener = new MulticasterBatchListener<I, O>();
 	private RepeatOperations repeatTemplate;
 	private ItemProcessor<? super I, ? extends O> itemProcessor;
 	private ItemWriter<? super O> itemWriter;
@@ -58,15 +57,14 @@ public class JsrChunkProcessor<I,O> implements ChunkProcessor<I> {
 		this(null, null, null, null);
 	}
 
-	public JsrChunkProcessor(ItemReader<I> reader, ItemProcessor<I,O> processor, ItemWriter<O> writer, RepeatOperations repeatTemplate) {
+	public JsrChunkProcessor(ItemReader<? extends I> reader, ItemProcessor<? super I, ? extends O> processor, ItemWriter<? super O> writer, RepeatOperations repeatTemplate) {
 		this.itemReader = reader;
 		this.itemProcessor = processor;
 		this.itemWriter = writer;
 		this.repeatTemplate = repeatTemplate;
 	}
 
-	@SuppressWarnings("rawtypes")
-	protected MulticasterBatchListener getListener() {
+	protected MulticasterBatchListener<I, O> getListener() {
 		return listener;
 	}
 
@@ -159,7 +157,6 @@ public class JsrChunkProcessor<I,O> implements ChunkProcessor<I> {
 	 * @return an item
 	 * @throws Exception
 	 */
-	@SuppressWarnings("unchecked")
 	protected final I doProvide(final StepContribution contribution, final Chunk<I> chunk) throws Exception {
 		try {
 			listener.beforeRead();
@@ -184,7 +181,7 @@ public class JsrChunkProcessor<I,O> implements ChunkProcessor<I> {
 	 * {@link #doTransform(Object)} if a processor is available (returns the item unmodified if it is not)
 	 *
 	 * @param contribution a {@link StepContribution}
-	 * @param chunk a {@link Chunk}
+	 * @param item an item
 	 * @return a processed item if a processor is present (the unmodified item if it is not)
 	 * @throws Exception
 	 */
@@ -205,7 +202,6 @@ public class JsrChunkProcessor<I,O> implements ChunkProcessor<I> {
 	 * @return the processed item
 	 * @throws Exception
 	 */
-	@SuppressWarnings("unchecked")
 	protected final O doTransform(I item) throws Exception {
 		try {
 			listener.beforeProcess(item);
@@ -240,7 +236,6 @@ public class JsrChunkProcessor<I,O> implements ChunkProcessor<I> {
 	 * @param chunk a {@link Chunk}
 	 * @throws Exception
 	 */
-	@SuppressWarnings("unchecked")
 	protected final void doPersist(final StepContribution contribution, final Chunk<O> chunk) throws Exception {
 		try {
 			List<O> items = chunk.getItems();

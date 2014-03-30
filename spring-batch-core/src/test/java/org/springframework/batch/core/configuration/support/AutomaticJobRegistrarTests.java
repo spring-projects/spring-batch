@@ -1,3 +1,18 @@
+/*
+ * Copyright 2010-2014 the original author or authors.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package org.springframework.batch.core.configuration.support;
 
 import static org.junit.Assert.assertEquals;
@@ -40,6 +55,7 @@ public class AutomaticJobRegistrarTests {
 		registrar.setJobLoader(jobLoader);
 	}
 
+	@SuppressWarnings("cast")
 	@Test
 	public void testOrderedImplemented() throws Exception {
 		
@@ -57,6 +73,7 @@ public class AutomaticJobRegistrarTests {
 				new ClassPathResource("org/springframework/batch/core/launch/support/job.xml"),
 				new ClassPathResource("org/springframework/batch/core/launch/support/job2.xml") };
 
+		@SuppressWarnings("resource")
 		GenericApplicationContext applicationContext = new GenericApplicationContext();
 		applicationContext.refresh();
 		setUpApplicationContextFactories(jobPaths, applicationContext);
@@ -79,6 +96,7 @@ public class AutomaticJobRegistrarTests {
 
 		Resource[] jobPaths = new Resource[] { new ClassPathResource(
 				"org/springframework/batch/core/launch/support/test-environment.xml") };
+		@SuppressWarnings("resource")
 		GenericApplicationContext applicationContext = new GenericApplicationContext();
 		applicationContext.refresh();
 		setUpApplicationContextFactories(jobPaths, applicationContext);
@@ -91,6 +109,7 @@ public class AutomaticJobRegistrarTests {
 
 		Resource[] jobPaths = new Resource[] { new ClassPathResource(
 				"org/springframework/batch/core/launch/support/2jobs.xml") };
+		@SuppressWarnings("resource")
 		GenericApplicationContext applicationContext = new GenericApplicationContext();
 		applicationContext.refresh();
 		setUpApplicationContextFactories(jobPaths, applicationContext);
@@ -104,6 +123,7 @@ public class AutomaticJobRegistrarTests {
 
 		Resource[] jobPaths = new Resource[] { new ClassPathResource(
 				"org/springframework/batch/core/launch/support/2jobs.xml") };
+		@SuppressWarnings("resource")
 		ClassPathXmlApplicationContext applicationContext = new ClassPathXmlApplicationContext(
 				"/org/springframework/batch/core/launch/support/test-environment-with-registry-and-auto-register.xml");
 		registrar.setApplicationContext(applicationContext);
@@ -156,6 +176,7 @@ public class AutomaticJobRegistrarTests {
 
 	}
 
+	@SuppressWarnings("resource")
 	@Test
 	public void testInitCalledOnContextRefreshed() throws Exception {
 
@@ -176,6 +197,7 @@ public class AutomaticJobRegistrarTests {
 
 		Resource[] jobPaths = new Resource[] { new ClassPathResource(
 				"org/springframework/batch/core/launch/support/2jobs.xml") };
+		@SuppressWarnings("resource")
 		GenericApplicationContext applicationContext = new GenericApplicationContext();
 		applicationContext.refresh();
 		setUpApplicationContextFactories(jobPaths, applicationContext);

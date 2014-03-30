@@ -285,7 +285,7 @@ public class FaultTolerantStepBuilder<I, O> extends SimpleStepBuilder<I, O> {
 	}
 
 	/**
-	 * Sets the maximium number of failed items to skip before the step fails. Ignored if an explicit
+	 * Sets the maximum number of failed items to skip before the step fails. Ignored if an explicit
 	 * {@link #skipPolicy(SkipPolicy)} is provided.
 	 *
 	 * @param skipLimit the skip limit to set
@@ -576,7 +576,7 @@ public class FaultTolerantStepBuilder<I, O> extends SimpleStepBuilder<I, O> {
 		}
 		batchRetryTemplate.setRetryPolicy(retryPolicyWrapper);
 
-		// Co-ordinate the retry policy with the exception handler:
+		// Coordinate the retry policy with the exception handler:
 		RepeatOperations stepOperations = getStepOperations();
 		if (stepOperations instanceof RepeatTemplate) {
 			SimpleRetryExceptionHandler exceptionHandler = new SimpleRetryExceptionHandler(retryPolicyWrapper,
@@ -608,7 +608,7 @@ public class FaultTolerantStepBuilder<I, O> extends SimpleStepBuilder<I, O> {
 	}
 
 	/**
-	 * Wrap the provided {@link #setRetryPolicy(RetryPolicy)} so that it never retries explicitly non-retryable
+	 * Wrap the provided {@link RetryPolicy} so that it never retries explicitly non-retryable
 	 * exceptions.
 	 */
 	private RetryPolicy getFatalExceptionAwareProxy(RetryPolicy retryPolicy) {

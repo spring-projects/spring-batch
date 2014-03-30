@@ -40,7 +40,7 @@ import org.springframework.util.Assert;
  * {@link javax.persistence.EntityManagerFactory} that is capable of
  * participating in Spring managed transactions.
  *
- * The writer is thread safe after its properties are set (normal singleton
+ * The writer is thread-safe after its properties are set (normal singleton
  * behaviour), so it can be used to write in multiple concurrent transactions.
  *
  * @author Thomas Risberg

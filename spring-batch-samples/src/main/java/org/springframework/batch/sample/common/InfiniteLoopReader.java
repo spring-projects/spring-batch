@@ -26,6 +26,8 @@ import org.springframework.batch.item.ItemReader;
  * 
  */
 public class InfiniteLoopReader implements ItemReader<Object> {
+
+	@Override
 	public Object read() throws Exception {
 		return new Object();
 	}

@@ -116,7 +116,6 @@ public class ChunkParser {
 		}
 	}
 
-	@SuppressWarnings({"unchecked", "rawtypes"})
 	private void parseChildElement(Element element, ParserContext parserContext,
 			MutablePropertyValues propertyValues, Node nd, String stepName) {
 		if (nd instanceof Element) {
@@ -143,18 +142,18 @@ public class ChunkParser {
 
 				new PropertyParser(artifactName, parserContext, BatchArtifact.BatchArtifactType.STEP_ARTIFACT, stepName).parseProperties(nestedElement);
 			} else if(name.equals(SKIPPABLE_EXCEPTION_CLASSES_ELEMENT)) {
-				ManagedMap exceptionClasses = new ExceptionElementParser().parse(element, parserContext, SKIPPABLE_EXCEPTION_CLASSES_ELEMENT);
+				ManagedMap<TypedStringValue, Boolean> exceptionClasses = new ExceptionElementParser().parse(element, parserContext, SKIPPABLE_EXCEPTION_CLASSES_ELEMENT);
 				if(exceptionClasses != null) {
 					propertyValues.addPropertyValue("skippableExceptionClasses", exceptionClasses);
 				}
 			} else if(name.equals(RETRYABLE_EXCEPTION_CLASSES_ELEMENT)) {
-				ManagedMap exceptionClasses = new ExceptionElementParser().parse(element, parserContext, RETRYABLE_EXCEPTION_CLASSES_ELEMENT);
+				ManagedMap<TypedStringValue, Boolean> exceptionClasses = new ExceptionElementParser().parse(element, parserContext, RETRYABLE_EXCEPTION_CLASSES_ELEMENT);
 				if(exceptionClasses != null) {
 					propertyValues.addPropertyValue("retryableExceptionClasses", exceptionClasses);
 				}
 			} else if(name.equals(NO_ROLLBACK_EXCEPTION_CLASSES_ELEMENT)) {
 				//TODO: Update to support excludes
-				ManagedList list = new ManagedList();
+				ManagedList<TypedStringValue> list = new ManagedList<TypedStringValue>();
 
 				for (Element child : DomUtils.getChildElementsByTagName(nestedElement, INCLUDE_ELEMENT)) {
 					String className = child.getAttribute(CLASS_ATTRIBUTE);

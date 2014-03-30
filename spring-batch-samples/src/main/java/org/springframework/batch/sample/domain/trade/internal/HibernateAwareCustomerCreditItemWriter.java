@@ -38,6 +38,7 @@ public class HibernateAwareCustomerCreditItemWriter implements ItemWriter<Custom
 
 	private SessionFactory sessionFactory;
 
+	@Override
 	public void write(List<? extends CustomerCredit> items) throws Exception {
 		for (CustomerCredit credit : items) {
 			dao.writeCredit(credit);
@@ -61,6 +62,7 @@ public class HibernateAwareCustomerCreditItemWriter implements ItemWriter<Custom
 		this.sessionFactory = sessionFactory;
 	}
 
+	@Override
 	public void afterPropertiesSet() throws Exception {
 		Assert.state(sessionFactory != null, "Hibernate SessionFactory is required");
 		Assert.notNull(dao, "Delegate DAO must be set");

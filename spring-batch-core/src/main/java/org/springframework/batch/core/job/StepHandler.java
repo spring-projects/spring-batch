@@ -36,7 +36,7 @@ public interface StepHandler {
 	 * Handle a step and return the execution for it. Does not save the
 	 * {@link JobExecution}, but should manage the persistence of the
 	 * {@link StepExecution} if required (e.g. at least it needs to be added to
-	 * a repository before the step can eb executed).
+	 * a repository before the step can be executed).
 	 * 
 	 * @param step a {@link Step}
 	 * @param jobExecution a {@link JobExecution}

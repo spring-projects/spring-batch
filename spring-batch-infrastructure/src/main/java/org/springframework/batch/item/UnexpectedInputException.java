@@ -23,6 +23,7 @@ package org.springframework.batch.item;
  * @author Dave Syer
  * @author Ben Hale
  */
+@SuppressWarnings("serial")
 public class UnexpectedInputException extends ItemReaderException {
 	
 	/**

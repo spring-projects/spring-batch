@@ -38,6 +38,7 @@ import com.ibatis.sqlmap.engine.execution.BatchResult;
  * @author Thomas Risberg
  * @author Will Schipp
  */
+@SuppressWarnings("deprecation")
 public class IbatisBatchItemWriterTests {
 
 	private IbatisBatchItemWriter<Foo> writer = new IbatisBatchItemWriter<Foo>();

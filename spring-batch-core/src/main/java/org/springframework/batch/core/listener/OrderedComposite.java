@@ -36,7 +36,6 @@ class OrderedComposite<S> {
 
 	private List<S> ordered = new ArrayList<S>();
 	
-	@SuppressWarnings("unchecked")
 	private Comparator<? super S> comparator = new AnnotationAwareOrderComparator();
 
 	private List<S> list = new ArrayList<S>();

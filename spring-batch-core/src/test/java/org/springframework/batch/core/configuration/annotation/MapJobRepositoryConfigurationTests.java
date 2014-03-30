@@ -60,7 +60,7 @@ public class MapJobRepositoryConfigurationTests {
 		testConfigurationClass(InvalidBatchConfiguration.class);
 	}
 
-	private void testConfigurationClass(Class clazz) throws Exception {
+	private void testConfigurationClass(Class<?> clazz) throws Exception {
 		GenericApplicationContext context = new AnnotationConfigApplicationContext(clazz);
 		this.jobLauncher = context.getBean(JobLauncher.class);
 		this.jobRepository = context.getBean(JobRepository.class);

@@ -18,7 +18,6 @@ package org.springframework.batch.core.configuration.xml;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -311,7 +310,7 @@ public abstract class AbstractFlowParser extends AbstractSingleBeanDefinitionPar
 	 * @param transitionElement The element to parse
 	 * @param stateDef The bean definition for the current state
 	 * @param parserContext the parser context for the bean factory
-	 * @param a collection of
+	 * @return a collection of
 	 * {@link org.springframework.batch.core.job.flow.support.StateTransition}
 	 * references
 	 */
@@ -342,7 +341,7 @@ public abstract class AbstractFlowParser extends AbstractSingleBeanDefinitionPar
 	 * default to batchStatus.
 	 * @param stateDef The bean definition for the current state
 	 * @param parserContext the parser context for the bean factory
-	 * @param a collection of
+	 * @return a collection of
 	 * {@link org.springframework.batch.core.job.flow.support.StateTransition}
 	 * references
 	 */

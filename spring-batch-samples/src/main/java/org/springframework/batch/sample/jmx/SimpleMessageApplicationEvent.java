@@ -22,6 +22,7 @@ import org.springframework.context.ApplicationEvent;
  * @author Dave Syer
  * 
  */
+@SuppressWarnings("serial")
 public class SimpleMessageApplicationEvent extends ApplicationEvent {
 
 	private String message;
@@ -34,6 +35,7 @@ public class SimpleMessageApplicationEvent extends ApplicationEvent {
 	/* (non-Javadoc)
 	 * @see java.util.EventObject#toString()
 	 */
+	@Override
 	public String toString() {
 		return "message=["+message+"], " + super.toString();
 	}

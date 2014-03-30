@@ -279,6 +279,7 @@ public class CommandLineJobRunner {
 	 * job paths. If a JobLocator has been set, then use it to obtain an actual
 	 * job, if not ask the context for it.
 	 */
+	@SuppressWarnings("resource")
 	int start(String jobPath, String jobIdentifier, String[] parameters, Set<String> opts) {
 
 		ConfigurableApplicationContext context = null;
@@ -509,7 +510,7 @@ public class CommandLineJobRunner {
 	 * <ul>
 	 * <li>-restart: (optional) if the job has failed or stopped and the most
 	 * should be restarted. If specified then the jobIdentifier parameter can be
-	 * interpreted either as the name of the job or the id of teh job execution
+	 * interpreted either as the name of the job or the id of the job execution
 	 * that failed.</li>
 	 * <li>-next: (optional) if the job has a {@link JobParametersIncrementer}
 	 * that can be used to launch the next in a sequence</li>

@@ -45,12 +45,10 @@ public class ListenerParser {
 	private static final String SCOPE_STEP = "step";
 	private static final String SCOPE_JOB = "job";
 
-	@SuppressWarnings("rawtypes")
-	private Class listenerType;
+	private Class<?> listenerType;
 	private String propertyKey;
 
-	@SuppressWarnings("rawtypes")
-	public ListenerParser(Class listenerType, String propertyKey) {
+	public ListenerParser(Class<?> listenerType, String propertyKey) {
 		this.propertyKey = propertyKey;
 		this.listenerType = listenerType;
 	}

@@ -52,7 +52,7 @@ public class MethodInvokerUtils {
 		Method method = ClassUtils.getMethodIfAvailable(object.getClass(), methodName, paramTypes);
 		if (method == null) {
 			String errorMsg = "no method found with name [" + methodName + "] on class ["
-					+ object.getClass().getSimpleName() + "] compatable with the signature ["
+					+ object.getClass().getSimpleName() + "] compatible with the signature ["
 					+ getParamTypesString(paramTypes) + "].";
 			Assert.isTrue(!paramsRequired, errorMsg);
 			// if no method was found for the given parameters, and the
@@ -124,7 +124,7 @@ public class MethodInvokerUtils {
 						Class<?>[] paramTypes = method.getParameterTypes();
 						if (paramTypes.length > 0) {
 							String errorMsg = "The method [" + method.getName() + "] on target class ["
-									+ targetClass.getSimpleName() + "] is incompatable with the signature ["
+									+ targetClass.getSimpleName() + "] is incompatible with the signature ["
 									+ getParamTypesString(expectedParamTypes) + "] expected for the annotation ["
 									+ annotationType.getSimpleName() + "].";
 

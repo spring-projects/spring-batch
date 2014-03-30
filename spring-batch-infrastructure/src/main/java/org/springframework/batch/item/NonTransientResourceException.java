@@ -21,6 +21,7 @@ package org.springframework.batch.item;
  * 
  * @author Dave Syer
  */
+@SuppressWarnings("serial")
 public class NonTransientResourceException extends ItemReaderException {
 
 	/**

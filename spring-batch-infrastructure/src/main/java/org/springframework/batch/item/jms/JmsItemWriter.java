@@ -31,7 +31,7 @@ import org.springframework.util.Assert;
  * {@link #write(List)}.<br/>
  * <br/>
  * 
- * The implementation is thread safe after its properties are set (normal
+ * The implementation is thread-safe after its properties are set (normal
  * singleton behavior).
  * 
  * @author Dave Syer
@@ -61,7 +61,7 @@ public class JmsItemWriter<T> implements ItemWriter<T> {
 	}
 
 	/**
-	 * Send the items one-by-one to the default destination of the jms template.
+	 * Send the items one-by-one to the default destination of the JMS template.
 	 * 
 	 * @see org.springframework.batch.item.ItemWriter#write(java.util.List)
 	 */

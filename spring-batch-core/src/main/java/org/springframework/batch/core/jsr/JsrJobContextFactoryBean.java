@@ -17,6 +17,7 @@ package org.springframework.batch.core.jsr;
 
 import java.util.Properties;
 
+import javax.batch.runtime.StepExecution;
 import javax.batch.runtime.context.JobContext;
 
 import org.springframework.batch.core.JobExecution;

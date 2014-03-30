@@ -33,9 +33,6 @@ import org.springframework.batch.item.UnexpectedInputException;
  */
 public class ChunkMonitorTests {
 
-	/**
-	 *
-	 */
 	private static final int CHUNK_SIZE = 5;
 
 	private ChunkMonitor monitor = new ChunkMonitor();

@@ -21,6 +21,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
+import java.util.Map;
 
 import org.springframework.batch.core.repository.ExecutionContextSerializer;
 import org.springframework.beans.factory.InitializingBean;
@@ -82,7 +83,7 @@ public class XStreamExecutionContextStringSerializer implements ExecutionContext
 	 * @see Serializer#serialize(Object, OutputStream)
 	 */
 	@Override
-	public void serialize(Object context, OutputStream out) throws IOException {
+	public void serialize(Map<String, Object> context, OutputStream out) throws IOException {
 		Assert.notNull(context);
 		Assert.notNull(out);
 
@@ -96,8 +97,9 @@ public class XStreamExecutionContextStringSerializer implements ExecutionContext
 	 * @return a reconstructed execution context
 	 * @see Deserializer#deserialize(InputStream)
 	 */
+	@SuppressWarnings("unchecked")
 	@Override
-	public Object deserialize(InputStream in) throws IOException {
+	public Map<String, Object> deserialize(InputStream in) throws IOException {
 		BufferedReader br = new BufferedReader(new InputStreamReader(in));
 
 		StringBuilder sb = new StringBuilder();
@@ -107,6 +109,6 @@ public class XStreamExecutionContextStringSerializer implements ExecutionContext
 			sb.append(line);
 		}
 
-		return xstream.fromXML(sb.toString());
+		return (Map<String, Object>) xstream.fromXML(sb.toString());
 	}
 }

@@ -217,7 +217,7 @@ public class FlowParser extends AbstractFlowParser {
 	 * default to batchStatus.
 	 * @param stateDef The bean definition for the current state
 	 * @param parserContext the parser context for the bean factory
-	 * @param a collection of
+	 * @return a collection of
 	 * {@link org.springframework.batch.core.job.flow.support.StateTransition}
 	 * references
 	 */

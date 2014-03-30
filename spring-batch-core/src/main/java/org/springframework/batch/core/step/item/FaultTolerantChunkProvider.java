@@ -71,7 +71,7 @@ public class FaultTolerantChunkProvider<I> extends SimpleChunkProvider<I> {
 
 	/**
 	 * Classifier to determine whether exceptions have been marked as
-	 * no-rollback (as opposed to skippable). If ecnounterd they are simply
+	 * no-rollback (as opposed to skippable). If encountered they are simply
 	 * ignored, unless also skippable.
 	 * 
 	 * @param rollbackClassifier the rollback classifier to set

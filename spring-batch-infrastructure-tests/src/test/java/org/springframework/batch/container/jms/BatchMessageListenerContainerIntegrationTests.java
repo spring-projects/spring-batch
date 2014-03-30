@@ -86,6 +86,7 @@ public class BatchMessageListenerContainerIntegrationTests {
 	@Test
 	public void testSendAndReceive() throws Exception {
 		container.setMessageListener(new MessageListener() {
+			@Override
 			public void onMessage(Message msg) {
 				try {
 					processed.add(((TextMessage) msg).getText());
@@ -109,6 +110,7 @@ public class BatchMessageListenerContainerIntegrationTests {
 	@Test
 	public void testFailureAndRepresent() throws Exception {
 		container.setMessageListener(new MessageListener() {
+			@Override
 			public void onMessage(Message msg) {
 				try {
 					processed.add(((TextMessage) msg).getText());
@@ -132,9 +134,11 @@ public class BatchMessageListenerContainerIntegrationTests {
 		final RetryTemplate retryTemplate = new RetryTemplate();
 		retryTemplate.setRetryPolicy(new NeverRetryPolicy());
 		container.setMessageListener(new MessageListener() {
+			@Override
 			public void onMessage(final Message msg) {
 				try {
 					RetryCallback<Message> callback = new RetryCallback<Message>() {
+						@Override
 						public Message doWithRetry(RetryContext context) throws Exception {
 							try {
 								processed.add(((TextMessage) msg).getText());
@@ -146,6 +150,7 @@ public class BatchMessageListenerContainerIntegrationTests {
 						}
 					};
 					RecoveryCallback<Message> recoveryCallback = new RecoveryCallback<Message>() {
+						@Override
 						public Message recover(RetryContext context) {
 							try {
 								recovered.add(((TextMessage) msg).getText());

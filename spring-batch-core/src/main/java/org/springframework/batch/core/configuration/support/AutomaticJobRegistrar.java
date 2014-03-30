@@ -43,7 +43,7 @@ import org.springframework.util.Assert;
  *
  * @since 2.1
  */
-public class AutomaticJobRegistrar implements Ordered, Lifecycle, ApplicationListener, ApplicationContextAware,
+public class AutomaticJobRegistrar implements Ordered, Lifecycle, ApplicationListener<ApplicationEvent>, ApplicationContextAware,
 		InitializingBean {
 
 	private Collection<ApplicationContextFactory> applicationContextFactories = new ArrayList<ApplicationContextFactory>();

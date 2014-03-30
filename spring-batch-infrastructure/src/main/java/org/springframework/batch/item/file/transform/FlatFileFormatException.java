@@ -18,12 +18,13 @@ package org.springframework.batch.item.file.transform;
 
 
 /**
- * Exception indicating that some type of error has occured while
+ * Exception indicating that some type of error has occurred while
  * attempting to parse a line of input into tokens.
  * 
  * @author Lucas Ward
  *
  */
+@SuppressWarnings("serial")
 public class FlatFileFormatException extends RuntimeException {
 
 	/**

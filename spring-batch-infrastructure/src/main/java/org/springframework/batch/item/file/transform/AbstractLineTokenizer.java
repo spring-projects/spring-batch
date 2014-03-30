@@ -97,7 +97,7 @@ public abstract class AbstractLineTokenizer implements LineTokenizer {
 	 * Yields the tokens resulting from the splitting of the supplied
 	 * <code>line</code>.
 	 * 
-	 * @param line the line to be tokenised (can be <code>null</code>)
+	 * @param line the line to be tokenized (can be <code>null</code>)
 	 * 
 	 * @return the resulting tokens
 	 */
@@ -115,7 +115,7 @@ public abstract class AbstractLineTokenizer implements LineTokenizer {
 			adjustTokenCountIfNecessary( tokens );
 		}
 		
-		String[] values = (String[]) tokens.toArray(new String[tokens.size()]);
+		String[] values = tokens.toArray(new String[tokens.size()]);
 
 		if (names.length == 0) {
 			return fieldSetFactory.create(values);

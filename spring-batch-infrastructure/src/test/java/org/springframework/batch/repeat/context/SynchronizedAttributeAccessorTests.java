@@ -76,6 +76,7 @@ public class SynchronizedAttributeAccessorTests extends TestCase {
 	}
 
 	public void testEqualsSupport() {
+		@SuppressWarnings("serial")
 		AttributeAccessorSupport another = new AttributeAccessorSupport() {
 		};
 		accessor.setAttribute("foo", "bar");

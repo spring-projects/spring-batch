@@ -1,3 +1,18 @@
+/*
+ * Copyright 2009-2014 the original author or authors.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package org.springframework.batch.item.database;
 
 import static org.mockito.Mockito.mock;
@@ -113,7 +128,6 @@ public class ExtendedConnectionDataSourceProxyTests {
 	}
 
 	@Test
-	@SuppressWarnings({"unchecked", "rawtypes"})
 	public void testSupressOfCloseWithJdbcTemplate() throws Exception {
 
 		Connection con = mock(Connection.class);
@@ -181,21 +195,21 @@ public class ExtendedConnectionDataSourceProxyTests {
 
 		Connection connection = DataSourceUtils.getConnection(csds);
 		csds.startCloseSuppression(connection);
-		tt.execute(new TransactionCallback() {
+		tt.execute(new TransactionCallback<Void>() {
 			@Override
-			public Object doInTransaction(TransactionStatus status) {
+			public Void doInTransaction(TransactionStatus status) {
 				template.queryForList("select baz from bar");
 				template.queryForList("select foo from bar");
 				return null;
 			}
 		});
-		tt.execute(new TransactionCallback() {
+		tt.execute(new TransactionCallback<Void>() {
 			@Override
-			public Object doInTransaction(TransactionStatus status) {
+			public Void doInTransaction(TransactionStatus status) {
 				template.queryForList("select ham from foo");
-				tt2.execute(new TransactionCallback() {
+				tt2.execute(new TransactionCallback<Void>() {
 					@Override
-					public Object doInTransaction(TransactionStatus status) {
+					public Void doInTransaction(TransactionStatus status) {
 						template.queryForList("select 1 from eggs");
 						return null;
 					}
@@ -204,9 +218,9 @@ public class ExtendedConnectionDataSourceProxyTests {
 				return null;
 			}
 		});
-		tt.execute(new TransactionCallback() {
+		tt.execute(new TransactionCallback<Void>() {
 			@Override
-			public Object doInTransaction(TransactionStatus status) {
+			public Void doInTransaction(TransactionStatus status) {
 				template.queryForList("select spam from ham");
 				return null;
 			}
@@ -335,6 +349,7 @@ public class ExtendedConnectionDataSourceProxyTests {
 		/**
 		 * Added due to JDK 7.
 		 */
+		@SuppressWarnings("unused")
 		public Logger getParentLogger() throws SQLFeatureNotSupportedException {
 			throw new SQLFeatureNotSupportedException();
 		}

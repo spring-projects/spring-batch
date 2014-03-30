@@ -87,7 +87,7 @@ public class FlowJobBuilderTests {
 
 	@Before
 	public void init() throws Exception {
-		jobRepository = new MapJobRepositoryFactoryBean().getJobRepository();
+		jobRepository = new MapJobRepositoryFactoryBean().getObject();
 		execution = jobRepository.createJobExecution("flow", new JobParameters());
 	}
 

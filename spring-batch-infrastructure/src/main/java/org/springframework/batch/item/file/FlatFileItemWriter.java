@@ -49,7 +49,7 @@ import org.springframework.util.ClassUtils;
  * 
  * Uses buffered writer to improve performance.<br/>
  * 
- * The implementation is *not* thread-safe.
+ * The implementation is <b>not</b> thread-safe.
  * 
  * @author Waseem Malik
  * @author Tomas Slanina

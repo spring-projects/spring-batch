@@ -28,6 +28,7 @@ public class CustomerUpdateWriter implements ItemWriter<CustomerUpdate> {
 
 	private CustomerDao customerDao;
 	
+	@Override
 	public void write(List<? extends CustomerUpdate> items) throws Exception {
 		for(CustomerUpdate customerUpdate : items){
 			if(customerUpdate.getOperation() == CustomerOperation.ADD){

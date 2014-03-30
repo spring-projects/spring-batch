@@ -25,6 +25,7 @@ public class BillingFieldSetMapper implements FieldSetMapper<BillingInfo> {
 	public static final String PAYMENT_TYPE_ID_COLUMN = "PAYMENT_TYPE_ID";
 	public static final String PAYMENT_DESC_COLUMN = "PAYMENT_DESC";
 
+	@Override
 	public BillingInfo mapFieldSet(FieldSet fieldSet) {
 		BillingInfo info = new BillingInfo();
 

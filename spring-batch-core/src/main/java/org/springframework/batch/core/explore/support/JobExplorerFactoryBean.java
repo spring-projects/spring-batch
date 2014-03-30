@@ -18,6 +18,7 @@ package org.springframework.batch.core.explore.support;
 
 import javax.sql.DataSource;
 
+import org.springframework.batch.core.explore.JobExplorer;
 import org.springframework.batch.core.repository.ExecutionContextSerializer;
 import org.springframework.batch.core.repository.dao.AbstractJdbcBatchMetadataDao;
 import org.springframework.batch.core.repository.dao.ExecutionContextDao;
@@ -133,7 +134,7 @@ implements InitializingBean {
 		}
 	}
 
-	private Object getTarget() throws Exception {
+	private JobExplorer getTarget() throws Exception {
 		return new SimpleJobExplorer(createJobInstanceDao(),
 				createJobExecutionDao(), createStepExecutionDao(),
 				createExecutionContextDao());
@@ -181,7 +182,7 @@ implements InitializingBean {
 	}
 
 	@Override
-	public Object getObject() throws Exception {
+	public JobExplorer getObject() throws Exception {
 		return getTarget();
 	}
 }

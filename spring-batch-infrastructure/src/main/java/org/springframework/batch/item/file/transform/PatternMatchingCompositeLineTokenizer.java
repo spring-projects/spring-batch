@@ -24,7 +24,7 @@ import org.springframework.util.Assert;
 
 /**
  * A {@link LineTokenizer} implementation that stores a mapping of String
- * patterns to delegate {@link LineTokenizer}s. Each line tokenizied will be
+ * patterns to delegate {@link LineTokenizer}s. Each line tokenized will be
  * checked to see if it matches a pattern. If the line matches a key in the map
  * of delegates, then the corresponding delegate {@link LineTokenizer} will be
  * used. Patterns are sorted starting with the most specific, and the first

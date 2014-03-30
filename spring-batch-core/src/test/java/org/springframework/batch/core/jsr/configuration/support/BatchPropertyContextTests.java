@@ -38,6 +38,7 @@ public class BatchPropertyContextTests {
 	private Map<String, Map<String, Properties>> partitionProperties = new HashMap<String, Map<String, Properties>>();
 	private Map<String, Map<String, Properties>> stepArtifactProperties = new HashMap<String, Map<String, Properties>>();
 
+	@SuppressWarnings("serial")
 	@Before
 	public void setUp() {
 		Properties step1Properties = new Properties();

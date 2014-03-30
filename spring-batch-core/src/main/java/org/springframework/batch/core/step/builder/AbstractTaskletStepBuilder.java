@@ -164,7 +164,7 @@ StepBuilderHelper<AbstractTaskletStepBuilder<B>> {
 	 * can be throttled (beyond any throttling provided by a thread pool). The throttle limit should be less than the
 	 * data source pool size used in the job repository for this step.
 	 *
-	 * @param throttleLimit maximium number of concurrent tasklet executions allowed
+	 * @param throttleLimit maximum number of concurrent tasklet executions allowed
 	 * @return this for fluent chaining
 	 */
 	public AbstractTaskletStepBuilder<B> throttleLimit(int throttleLimit) {

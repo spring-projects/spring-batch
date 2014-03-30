@@ -18,6 +18,7 @@ package org.springframework.batch.sample.domain.football;
 
 import java.io.Serializable;
 
+@SuppressWarnings("serial")
 public class Game implements Serializable {
 	
 	private String id;
@@ -217,6 +218,7 @@ public class Game implements Serializable {
 	}
 	
 	
+	@Override
 	public String toString() {
 
 		return "Game: ID=" + id + " " + team + " vs. " + opponent + 

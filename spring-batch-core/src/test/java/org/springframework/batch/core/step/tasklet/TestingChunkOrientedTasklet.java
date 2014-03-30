@@ -35,9 +35,6 @@ import org.springframework.batch.repeat.support.RepeatTemplate;
  */
 public class TestingChunkOrientedTasklet<T> extends ChunkOrientedTasklet<T> {
 
-	/**
-	 * 
-	 */
 	private static final RepeatTemplate repeatTemplate = new RepeatTemplate();
 
 	static {

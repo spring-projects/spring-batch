@@ -142,7 +142,7 @@ implements InitializingBean {
 	/**
 	 * Assert that mandatory properties are set.
 	 *
-	 * @throws IllegalArgumentException if either data source or sql properties
+	 * @throws IllegalArgumentException if either data source or SQL properties
 	 * not set.
 	 */
 	@Override

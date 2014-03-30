@@ -1,3 +1,18 @@
+/*
+ * Copyright 2008-2014 the original author or authors.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package org.springframework.batch.core.step.item;
 
 import org.aopalliance.intercept.MethodInterceptor;
@@ -132,7 +147,7 @@ public class FaultTolerantStepFactoryBeanTests {
 		// nothing is skippable
 		factory.setSkippableExceptionClasses(getExceptionMap(NonExistentException.class));
 
-		Step step = (Step) factory.getObject();
+		Step step = factory.getObject();
 
 		step.execute(stepExecution);
 		assertEquals(BatchStatus.FAILED, stepExecution.getStatus());
@@ -154,7 +169,7 @@ public class FaultTolerantStepFactoryBeanTests {
 		reader.setItems("1", "2", "3", "4", "5");
 		writer.setFailures("1");
 
-		Step step = (Step) factory.getObject();
+		Step step = factory.getObject();
 
 		step.execute(stepExecution);
 		assertEquals(BatchStatus.FAILED, stepExecution.getStatus());
@@ -172,7 +187,7 @@ public class FaultTolerantStepFactoryBeanTests {
 	public void testReadSkip() throws Exception {
 		reader.setFailures("2");
 
-		Step step = (Step) factory.getObject();
+		Step step = factory.getObject();
 
 		step.execute(stepExecution);
 
@@ -224,7 +239,7 @@ public class FaultTolerantStepFactoryBeanTests {
 
 		reader.setFailures("2");
 
-		Step step = (Step) factory.getObject();
+		Step step = factory.getObject();
 
 		step.execute(stepExecution);
 
@@ -252,7 +267,7 @@ public class FaultTolerantStepFactoryBeanTests {
 
 		writer.setFailures("2");
 
-		Step step = (Step) factory.getObject();
+		Step step = factory.getObject();
 
 		step.execute(stepExecution);
 
@@ -275,7 +290,7 @@ public class FaultTolerantStepFactoryBeanTests {
 		map.put(ItemStreamException.class, true);
 		factory.setSkippableExceptionClasses(map);
 
-		Step step = (Step) factory.getObject();
+		Step step = factory.getObject();
 
 		step.execute(stepExecution);
 
@@ -305,7 +320,7 @@ public class FaultTolerantStepFactoryBeanTests {
 		processor.setFailures("4");
 		writer.setFailures("4");
 
-		Step step = (Step) factory.getObject();
+		Step step = factory.getObject();
 
 		step.execute(stepExecution);
 
@@ -333,7 +348,7 @@ public class FaultTolerantStepFactoryBeanTests {
 		processor.setFilter(true);
 		ItemProcessListenerStub<String, String> listenerStub = new ItemProcessListenerStub<String, String>();
 		factory.setListeners(new StepListener[] { listenerStub });
-		Step step = (Step) factory.getObject();
+		Step step = factory.getObject();
 
 		step.execute(stepExecution);
 
@@ -360,7 +375,7 @@ public class FaultTolerantStepFactoryBeanTests {
 	public void testNullWriter() throws Exception {
 
 		factory.setItemWriter(null);
-		Step step = (Step) factory.getObject();
+		Step step = factory.getObject();
 
 		step.execute(stepExecution);
 
@@ -387,7 +402,7 @@ public class FaultTolerantStepFactoryBeanTests {
 	public void testWriteSkip() throws Exception {
 		writer.setFailures("4");
 
-		Step step = (Step) factory.getObject();
+		Step step = factory.getObject();
 
 		step.execute(stepExecution);
 
@@ -430,7 +445,7 @@ public class FaultTolerantStepFactoryBeanTests {
 			}
 		});
 
-		Step step = (Step) factory.getObject();
+		Step step = factory.getObject();
 
 		step.execute(stepExecution);
 		String message = stepExecution.getFailureExceptions().get(0).getCause().getMessage();
@@ -449,7 +464,7 @@ public class FaultTolerantStepFactoryBeanTests {
 
 		factory.setSkipLimit(1);
 
-		Step step = (Step) factory.getObject();
+		Step step = factory.getObject();
 
 		step.execute(stepExecution);
 
@@ -480,7 +495,7 @@ public class FaultTolerantStepFactoryBeanTests {
 		factory.setSkipLimit(3);
 		factory.setSkippableExceptionClasses(getExceptionMap(Exception.class));
 
-		Step step = (Step) factory.getObject();
+		Step step = factory.getObject();
 
 		step.execute(stepExecution);
 		assertEquals(BatchStatus.FAILED, stepExecution.getStatus());
@@ -520,7 +535,7 @@ public class FaultTolerantStepFactoryBeanTests {
 		factory.setCommitInterval(2);
 		factory.setSkipLimit(2);
 
-		Step step = (Step) factory.getObject();
+		Step step = factory.getObject();
 
 		step.execute(stepExecution);
 
@@ -554,7 +569,7 @@ public class FaultTolerantStepFactoryBeanTests {
 		} });
 		factory.setSkippableExceptionClasses(getExceptionMap(Exception.class));
 
-		Step step = (Step) factory.getObject();
+		Step step = factory.getObject();
 
 		step.execute(stepExecution);
 		assertEquals(BatchStatus.FAILED, stepExecution.getStatus());
@@ -589,7 +604,7 @@ public class FaultTolerantStepFactoryBeanTests {
 		} });
 		factory.setSkippableExceptionClasses(getExceptionMap(Exception.class));
 
-		Step step = (Step) factory.getObject();
+		Step step = factory.getObject();
 
 		step.execute(stepExecution);
 		assertEquals(BatchStatus.FAILED, stepExecution.getStatus());
@@ -613,7 +628,7 @@ public class FaultTolerantStepFactoryBeanTests {
 
 		factory.setSkipLimit(4);
 
-		Step step = (Step) factory.getObject();
+		Step step = factory.getObject();
 
 		step.execute(stepExecution);
 		assertEquals(4, stepExecution.getSkipCount());
@@ -644,7 +659,7 @@ public class FaultTolerantStepFactoryBeanTests {
 		factory.setSkipLimit(4);
 		factory.setCommitInterval(3); // includes all expected skips
 
-		Step step = (Step) factory.getObject();
+		Step step = factory.getObject();
 
 		step.execute(stepExecution);
 		assertEquals(4, stepExecution.getSkipCount());
@@ -667,7 +682,7 @@ public class FaultTolerantStepFactoryBeanTests {
 		factory.setSkippableExceptionClasses(getExceptionMap(Exception.class));
 		factory.setSkipLimit(1);
 
-		Step step = (Step) factory.getObject();
+		Step step = factory.getObject();
 
 		step.execute(stepExecution);
 
@@ -692,7 +707,7 @@ public class FaultTolerantStepFactoryBeanTests {
 		factory.setSkipLimit(3);
 		factory.setSkippableExceptionClasses(getExceptionMap(Exception.class));
 
-		Step step = (Step) factory.getObject();
+		Step step = factory.getObject();
 
 		step.execute(stepExecution);
 		assertEquals(BatchStatus.FAILED, stepExecution.getStatus());
@@ -717,7 +732,7 @@ public class FaultTolerantStepFactoryBeanTests {
 
 		writer.setFailures("4");
 
-		Step step = (Step) factory.getObject();
+		Step step = factory.getObject();
 		step.execute(stepExecution);
 
 		assertEquals(1, stepExecution.getSkipCount());
@@ -815,7 +830,7 @@ public class FaultTolerantStepFactoryBeanTests {
 
 		factory.setItemWriter(new TestItemListenerWriter());
 
-		Step step = (Step) factory.getObject();
+		Step step = factory.getObject();
 		step.execute(stepExecution);
 
 		assertEquals(BatchStatus.COMPLETED, stepExecution.getStatus());
@@ -853,7 +868,7 @@ public class FaultTolerantStepFactoryBeanTests {
 		factory.setItemReader(reader);
 		factory.setTaskExecutor(new ConcurrentTaskExecutor());
 
-		Step step = (Step) factory.getObject();
+		Step step = factory.getObject();
 
 		step.execute(stepExecution);
 
@@ -912,7 +927,7 @@ public class FaultTolerantStepFactoryBeanTests {
 		factory.setItemReader(reader);
 		factory.setStreams(new ItemStream[] { stream, reader });
 
-		Step step = (Step) factory.getObject();
+		Step step = factory.getObject();
 
 		step.execute(stepExecution);
 
@@ -964,7 +979,7 @@ public class FaultTolerantStepFactoryBeanTests {
 		factory.setItemReader((ItemReader<? extends String>) advised);
 		factory.setStreams(new ItemStream[] { (ItemStream) advised });
 
-		Step step = (Step) factory.getObject();
+		Step step = factory.getObject();
 
 		step.execute(stepExecution);
 
@@ -1094,8 +1109,7 @@ public class FaultTolerantStepFactoryBeanTests {
 		return getSkipPolicy(factory);
 	}
 
-	@SuppressWarnings("rawtypes")
-	private SkipPolicy getSkipPolicy(FactoryBean factory) throws Exception {
+	private SkipPolicy getSkipPolicy(FactoryBean<Step> factory) throws Exception {
 		Object step = factory.getObject();
 		Object tasklet = ReflectionTestUtils.getField(step, "tasklet");
 		Object chunkProvider = ReflectionTestUtils.getField(tasklet, "chunkProvider");

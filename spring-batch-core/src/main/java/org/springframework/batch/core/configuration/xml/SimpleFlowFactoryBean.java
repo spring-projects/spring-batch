@@ -42,10 +42,8 @@ import org.springframework.util.Assert;
  *
  * @author Dave Syer
  * @author Michael Minella
- *
  */
-@SuppressWarnings("rawtypes")
-public class SimpleFlowFactoryBean implements FactoryBean, InitializingBean {
+public class SimpleFlowFactoryBean implements FactoryBean<SimpleFlow>, InitializingBean {
 
 	private String name;
 
@@ -111,7 +109,7 @@ public class SimpleFlowFactoryBean implements FactoryBean, InitializingBean {
 	 * @see org.springframework.beans.factory.FactoryBean#getObject()
 	 */
 	@Override
-	public Object getObject() throws Exception {
+	public SimpleFlow getObject() throws Exception {
 		SimpleFlow flow = flowType.getConstructor(String.class).newInstance(name);
 
 		flow.setStateTransitionComparator(stateTransitionComparator);

@@ -97,15 +97,15 @@ public abstract class AbstractJobDaoTests {
 
 	@Transactional @Test
 	public void testVersionIsNotNullForJob() throws Exception {
-		int version = jdbcTemplate.queryForInt("select version from BATCH_JOB_INSTANCE where JOB_INSTANCE_ID="
-				+ jobInstance.getId());
+		int version = jdbcTemplate.queryForObject("select version from BATCH_JOB_INSTANCE where JOB_INSTANCE_ID="
+				+ jobInstance.getId(), Integer.class);
 		assertEquals(0, version);
 	}
 
 	@Transactional @Test
 	public void testVersionIsNotNullForJobExecution() throws Exception {
-		int version = jdbcTemplate.queryForInt("select version from BATCH_JOB_EXECUTION where JOB_EXECUTION_ID="
-				+ jobExecution.getId());
+		int version = jdbcTemplate.queryForObject("select version from BATCH_JOB_EXECUTION where JOB_EXECUTION_ID="
+				+ jobExecution.getId(), Integer.class);
 		assertEquals(0, version);
 	}
 

@@ -74,7 +74,6 @@ public class AnnotationMethodResolverTests {
 	}
 
 
-	@SuppressWarnings("unused")
 	private static class MultipleAnnotationTestBean {
 
 		@TestAnnotation

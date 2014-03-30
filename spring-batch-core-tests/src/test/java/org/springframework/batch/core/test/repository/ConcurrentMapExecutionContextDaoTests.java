@@ -60,8 +60,9 @@ public class ConcurrentMapExecutionContextDaoTests {
 	public void testTransactionalSaveUpdate() throws Exception {
 		final StepExecution stepExecution = new StepExecution("step", new JobExecution(11L));
 		stepExecution.setId(123L);
-		new TransactionTemplate(transactionManager).execute(new TransactionCallback() {
-			public Object doInTransaction(TransactionStatus status) {
+		new TransactionTemplate(transactionManager).execute(new TransactionCallback<Void>() {
+			@Override
+			public Void doInTransaction(TransactionStatus status) {
 				stepExecution.getExecutionContext().put("foo", "bar");
 				dao.saveExecutionContext(stepExecution);
 				return null;
@@ -89,6 +90,7 @@ public class ConcurrentMapExecutionContextDaoTests {
 			stepExecution2.setId(1234L + i);
 
 			completionService.submit(new Callable<StepExecution>() {
+				@Override
 				public StepExecution call() throws Exception {
 					for (int i = 0; i < innerMax; i++) {
 						String value = "bar" + i;
@@ -99,6 +101,7 @@ public class ConcurrentMapExecutionContextDaoTests {
 			});
 
 			completionService.submit(new Callable<StepExecution>() {
+				@Override
 				public StepExecution call() throws Exception {
 					for (int i = 0; i < innerMax; i++) {
 						String value = "spam" + i;
@@ -119,8 +122,9 @@ public class ConcurrentMapExecutionContextDaoTests {
 
 	private void saveAndAssert(final StepExecution stepExecution, final String value) {
 
-		new TransactionTemplate(transactionManager).execute(new TransactionCallback() {
-			public Object doInTransaction(TransactionStatus status) {
+		new TransactionTemplate(transactionManager).execute(new TransactionCallback<Void>() {
+			@Override
+			public Void doInTransaction(TransactionStatus status) {
 				stepExecution.getExecutionContext().put("foo", value);
 				dao.saveExecutionContext(stepExecution);
 				return null;

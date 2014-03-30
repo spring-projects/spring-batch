@@ -63,6 +63,7 @@ public class CompositeItemReadListenerTests {
 		compositeListener.onReadError(ex);
 	}
 
+	@SuppressWarnings("serial")
 	@Test
 	public void testSetListeners() throws Exception {
 		compositeListener.setListeners(new ArrayList<ItemReadListener<? super Object>>() {

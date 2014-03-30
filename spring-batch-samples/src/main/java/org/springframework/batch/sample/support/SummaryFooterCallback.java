@@ -30,6 +30,7 @@ public class SummaryFooterCallback extends StepExecutionListenerSupport implemen
 
 	private StepExecution stepExecution;
 	
+	@Override
 	public void writeFooter(Writer writer) throws IOException {
 		writer.write("footer - number of items written: " + stepExecution.getWriteCount());
 	}

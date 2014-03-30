@@ -1,3 +1,18 @@
+/*
+ * Copyright 2013-2014 the original author or authors.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package org.springframework.batch.item.data;
 
 import static org.junit.Assert.assertEquals;
@@ -6,12 +21,8 @@ import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyZeroInteractions;
-import static org.mockito.Mockito.when;
 import static org.mockito.Mockito.doAnswer;
 
-import java.io.IOException;
-import java.nio.ByteBuffer;
-import java.nio.channels.FileChannel;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -23,17 +34,16 @@ import org.mockito.MockitoAnnotations;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
 import org.springframework.batch.support.transaction.ResourcelessTransactionManager;
-import org.springframework.batch.support.transaction.TransactionAwareBufferedWriter;
 import org.springframework.data.mongodb.core.MongoOperations;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.TransactionStatus;
 import org.springframework.transaction.support.TransactionCallback;
 import org.springframework.transaction.support.TransactionTemplate;
 
-@SuppressWarnings({"rawtypes", "serial", "unchecked"})
+@SuppressWarnings("serial")
 public class MongoItemWriterTests {
 
-	private MongoItemWriter writer;
+	private MongoItemWriter<Object> writer;
 	@Mock
 	private MongoOperations template;
 	private PlatformTransactionManager transactionManager = new ResourcelessTransactionManager();
@@ -41,14 +51,14 @@ public class MongoItemWriterTests {
 	@Before
 	public void setUp() throws Exception {
 		MockitoAnnotations.initMocks(this);
-		writer = new MongoItemWriter();
+		writer = new MongoItemWriter<Object>();
 		writer.setTemplate(template);
 		writer.afterPropertiesSet();
 	}
 
 	@Test
 	public void testAfterPropertiesSet() throws Exception {
-		writer = new MongoItemWriter();
+		writer = new MongoItemWriter<Object>();
 
 		try {
 			writer.afterPropertiesSet();
@@ -102,10 +112,10 @@ public class MongoItemWriterTests {
 			add(new Object());
 		}};
 
-		new TransactionTemplate(transactionManager).execute(new TransactionCallback() {
+		new TransactionTemplate(transactionManager).execute(new TransactionCallback<Void>() {
 
 			@Override
-			public Object doInTransaction(TransactionStatus status) {
+			public Void doInTransaction(TransactionStatus status) {
 				try {
 					writer.write(items);
 				} catch (Exception e) {
@@ -129,10 +139,10 @@ public class MongoItemWriterTests {
 
 		writer.setCollection("collection");
 
-		new TransactionTemplate(transactionManager).execute(new TransactionCallback() {
+		new TransactionTemplate(transactionManager).execute(new TransactionCallback<Void>() {
 
 			@Override
-			public Object doInTransaction(TransactionStatus status) {
+			public Void doInTransaction(TransactionStatus status) {
 				try {
 					writer.write(items);
 				} catch (Exception e) {
@@ -157,10 +167,10 @@ public class MongoItemWriterTests {
 		writer.setCollection("collection");
 
 		try {
-			new TransactionTemplate(transactionManager).execute(new TransactionCallback() {
+			new TransactionTemplate(transactionManager).execute(new TransactionCallback<Void>() {
 
 				@Override
-				public Object doInTransaction(TransactionStatus status) {
+				public Void doInTransaction(TransactionStatus status) {
 					try {
 						writer.write(items);
 					} catch (Exception ignore) {
@@ -195,10 +205,10 @@ public class MongoItemWriterTests {
 		try {
 			TransactionTemplate transactionTemplate = new TransactionTemplate(transactionManager);
 			transactionTemplate.setReadOnly(true);
-			transactionTemplate.execute(new TransactionCallback() {
+			transactionTemplate.execute(new TransactionCallback<Void>() {
 
 				@Override
-				public Object doInTransaction(TransactionStatus status) {
+				public Void doInTransaction(TransactionStatus status) {
 					try {
 						writer.write(items);
 					} catch (Exception ignore) {
@@ -248,6 +258,7 @@ public class MongoItemWriterTests {
 	@Test
 	public void testResourceKeyCollision() throws Exception {
 		final int limit = 5000;
+		@SuppressWarnings("unchecked")
 		final MongoItemWriter<String>[] writers = new MongoItemWriter[limit];
 		final String[] results = new String[limit];
 		for(int i = 0; i< limit; i++) {
@@ -271,9 +282,9 @@ public class MongoItemWriterTests {
 			writers[i].setTemplate(mongoOperations);
 		}
 		
-		new TransactionTemplate(transactionManager).execute(new TransactionCallback() {
+		new TransactionTemplate(transactionManager).execute(new TransactionCallback<Void>() {
             @Override
-			public Object doInTransaction(TransactionStatus status) {
+			public Void doInTransaction(TransactionStatus status) {
 				try {
 					for(int i=0; i< limit; i++) {
 						writers[i].write(Collections.singletonList(String.valueOf(i)));

@@ -265,7 +265,7 @@ public class SimpleChunkProcessor<I, O> implements ChunkProcessor<I>, Initializi
 	 * skipped they should be removed from the inputs as well.
 	 *
 	 * @param contribution the current step contribution
-	 * @param inputs the inputs that gave rise to the ouputs
+	 * @param inputs the inputs that gave rise to the outputs
 	 * @param outputs the outputs to write
 	 * @throws Exception if there is a problem
 	 */

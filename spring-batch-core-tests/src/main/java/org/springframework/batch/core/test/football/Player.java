@@ -18,6 +18,7 @@ package org.springframework.batch.core.test.football;
 
 import java.io.Serializable;
 
+@SuppressWarnings("serial")
 public class Player implements Serializable {
 	
 	private String id; 
@@ -27,6 +28,7 @@ public class Player implements Serializable {
 	private int birthYear; 
 	private int debutYear;
 	
+	@Override
 	public String toString() {
 		
 		return "PLAYER:id=" + id + ",Last Name=" + lastName +

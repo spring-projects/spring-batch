@@ -22,6 +22,7 @@ import org.springframework.batch.item.file.transform.FieldSet;
 
 public class GameFieldSetMapper implements FieldSetMapper<Game> {
 
+	@Override
 	public Game mapFieldSet(FieldSet fs) {
 		
 		if(fs == null){

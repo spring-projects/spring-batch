@@ -112,8 +112,7 @@ import org.springframework.util.Assert;
  * @see TaskletStep
  * @since 2.0
  */
-@SuppressWarnings("rawtypes")
-public class StepParserStepFactoryBean<I, O> implements FactoryBean, BeanNameAware {
+public class StepParserStepFactoryBean<I, O> implements FactoryBean<Step>, BeanNameAware {
 
 	//
 	// Step Attributes
@@ -266,7 +265,7 @@ public class StepParserStepFactoryBean<I, O> implements FactoryBean, BeanNameAwa
 	 * @see FactoryBean#getObject()
 	 */
 	@Override
-	public Object getObject() throws Exception {
+	public Step getObject() throws Exception {
 		if (hasChunkElement) {
 			Assert.isNull(tasklet, "Step [" + name
 					+ "] has both a <chunk/> element and a 'ref' attribute  referencing a Tasklet.");
@@ -442,9 +441,8 @@ public class StepParserStepFactoryBean<I, O> implements FactoryBean, BeanNameAwa
 		}
 	}
 
-	@SuppressWarnings("unchecked")
 	protected Step createSimpleStep() {
-		SimpleStepBuilder builder = getSimpleStepBuilder(name);
+		SimpleStepBuilder<I, O> builder = getSimpleStepBuilder(name);
 
 		setChunk(builder);
 
@@ -456,7 +454,7 @@ public class StepParserStepFactoryBean<I, O> implements FactoryBean, BeanNameAwa
 		return builder.build();
 	}
 
-	protected void setChunk(SimpleStepBuilder builder) {
+	protected void setChunk(SimpleStepBuilder<I, O> builder) {
 		if (commitInterval != null) {
 			builder.chunk(commitInterval);
 		}
@@ -467,9 +465,8 @@ public class StepParserStepFactoryBean<I, O> implements FactoryBean, BeanNameAwa
 		return this.chunkCompletionPolicy;
 	}
 
-	@SuppressWarnings("unchecked")
-	protected SimpleStepBuilder getSimpleStepBuilder(String stepName) {
-		return new SimpleStepBuilder(new StepBuilder(stepName));
+	protected SimpleStepBuilder<I, O> getSimpleStepBuilder(String stepName) {
+		return new SimpleStepBuilder<I, O>(new StepBuilder(stepName));
 	}
 
 	/**
@@ -818,15 +815,15 @@ public class StepParserStepFactoryBean<I, O> implements FactoryBean, BeanNameAwa
 				skipListeners.add(skipListener);
 			}
 			if(listener instanceof SkipReadListener) {
-				SkipListener skipListener = new SkipListenerAdapter((SkipReadListener) listener, null, null);
+				SkipListener<I, O> skipListener = new SkipListenerAdapter<I, O>((SkipReadListener) listener, null, null);
 				skipListeners.add(skipListener);
 			}
 			if(listener instanceof SkipProcessListener) {
-				SkipListener skipListener = new SkipListenerAdapter(null,(SkipProcessListener) listener, null);
+				SkipListener<I, O> skipListener = new SkipListenerAdapter<I, O>(null,(SkipProcessListener) listener, null);
 				skipListeners.add(skipListener);
 			}
 			if(listener instanceof SkipWriteListener) {
-				SkipListener skipListener = new SkipListenerAdapter(null, null, (SkipWriteListener) listener);
+				SkipListener<I, O> skipListener = new SkipListenerAdapter<I, O>(null, null, (SkipWriteListener) listener);
 				skipListeners.add(skipListener);
 			}
 			if (listener instanceof StepExecutionListener) {
@@ -850,7 +847,7 @@ public class StepParserStepFactoryBean<I, O> implements FactoryBean, BeanNameAwa
 				readListeners.add(readListener);
 			}
 			if(listener instanceof javax.batch.api.chunk.listener.ItemReadListener) {
-				ItemReadListener itemListener = new ItemReadListenerAdapter((javax.batch.api.chunk.listener.ItemReadListener) listener);
+				ItemReadListener<I> itemListener = new ItemReadListenerAdapter<I>((javax.batch.api.chunk.listener.ItemReadListener) listener);
 				readListeners.add(itemListener);
 			}
 			if (listener instanceof ItemWriteListener) {
@@ -858,7 +855,7 @@ public class StepParserStepFactoryBean<I, O> implements FactoryBean, BeanNameAwa
 				writeListeners.add(writeListener);
 			}
 			if(listener instanceof javax.batch.api.chunk.listener.ItemWriteListener) {
-				ItemWriteListener itemListener = new ItemWriteListenerAdapter((javax.batch.api.chunk.listener.ItemWriteListener) listener);
+				ItemWriteListener<O> itemListener = new ItemWriteListenerAdapter<O>((javax.batch.api.chunk.listener.ItemWriteListener) listener);
 				writeListeners.add(itemListener);
 			}
 			if (listener instanceof ItemProcessListener) {
@@ -866,7 +863,7 @@ public class StepParserStepFactoryBean<I, O> implements FactoryBean, BeanNameAwa
 				processListeners.add(processListener);
 			}
 			if(listener instanceof javax.batch.api.chunk.listener.ItemProcessListener) {
-				ItemProcessListener itemListener = new ItemProcessListenerAdapter((javax.batch.api.chunk.listener.ItemProcessListener) listener);
+				ItemProcessListener<I,O> itemListener = new ItemProcessListenerAdapter<I, O>((javax.batch.api.chunk.listener.ItemProcessListener) listener);
 				processListeners.add(itemListener);
 			}
 			if(listener instanceof RetryReadListener) {

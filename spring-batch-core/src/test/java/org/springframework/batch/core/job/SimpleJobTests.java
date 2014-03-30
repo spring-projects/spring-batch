@@ -17,7 +17,6 @@
 package org.springframework.batch.core.job;
 
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
@@ -529,7 +528,7 @@ public class SimpleJobTests {
 	 */
 	private void checkRepository(BatchStatus status, ExitStatus exitStatus) {
 		assertEquals(jobInstance, jobInstanceDao.getJobInstance(job.getName(), jobParameters));
-		// because map dao stores in memory, it can be checked directly
+		// because map DAO stores in memory, it can be checked directly
 		JobExecution jobExecution = jobExecutionDao.findJobExecutions(jobInstance).get(0);
 		assertEquals(jobInstance.getId(), jobExecution.getJobId());
 		assertEquals(status, jobExecution.getStatus());

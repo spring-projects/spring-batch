@@ -70,7 +70,7 @@ public class JsrChunkProcessorTests {
 
 		builder = new JsrSimpleStepBuilder<String, String>(new StepBuilder("step1"));
 		builder.setBatchPropertyContext(new BatchPropertyContext());
-		repository = new MapJobRepositoryFactoryBean().getJobRepository();
+		repository = new MapJobRepositoryFactoryBean().getObject();
 		builder.repository(repository);
 		builder.transactionManager(new ResourcelessTransactionManager());
 		stepExecution = null;

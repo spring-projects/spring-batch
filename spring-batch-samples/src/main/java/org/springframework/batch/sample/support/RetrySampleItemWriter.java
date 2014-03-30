@@ -30,6 +30,7 @@ public class RetrySampleItemWriter<T> implements ItemWriter<T> {
 
 	private int counter = 0;
 
+	@Override
 	public void write(List<? extends T> items) throws Exception {
 		int current = counter;
 		counter += items.size();

@@ -150,7 +150,6 @@ public class ChunkedRepeatTests extends AbstractTradeBatchTests {
 				count++;
 			}
 		}
-		;
 
 		final Chunker chunker = new Chunker();
 

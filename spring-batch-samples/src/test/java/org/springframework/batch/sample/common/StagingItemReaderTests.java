@@ -1,3 +1,18 @@
+/*
+ * Copyright 2008-2014 the original author or authors.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package org.springframework.batch.sample.common;
 
 import static org.junit.Assert.assertEquals;
@@ -89,13 +104,14 @@ public class StagingItemReaderTests {
 	public void testUpdateProcessIndicatorAfterCommit() throws Exception {
 		TransactionTemplate txTemplate = new TransactionTemplate(transactionManager);
 		txTemplate.setPropagationBehavior(TransactionDefinition.PROPAGATION_REQUIRES_NEW);
-		txTemplate.execute(new TransactionCallback() {
-			public Object doInTransaction(TransactionStatus transactionStatus) {
+		txTemplate.execute(new TransactionCallback<Void>() {
+			@Override
+			public Void doInTransaction(TransactionStatus transactionStatus) {
 				try {
 					testReaderWithProcessorUpdatesProcessIndicator();
 				}
 				catch (Exception e) {
-					fail("Unxpected Exception: " + e);
+					fail("Unexpected Exception: " + e);
 				}
 				return null;
 			}
@@ -112,8 +128,9 @@ public class StagingItemReaderTests {
 		TransactionTemplate txTemplate = new TransactionTemplate(transactionManager);
 		txTemplate.setPropagationBehavior(TransactionDefinition.PROPAGATION_REQUIRES_NEW);
 
-		final Long idToUse = (Long) txTemplate.execute(new TransactionCallback() {
-			public Object doInTransaction(TransactionStatus transactionStatus) {
+		final Long idToUse = txTemplate.execute(new TransactionCallback<Long>() {
+			@Override
+			public Long doInTransaction(TransactionStatus transactionStatus) {
 
 				long id = jdbcTemplate.queryForObject("SELECT MIN(ID) from BATCH_STAGING where JOB_ID=?", Long.class, jobId);
 				String before = jdbcTemplate.queryForObject("SELECT PROCESSED from BATCH_STAGING where ID=?",

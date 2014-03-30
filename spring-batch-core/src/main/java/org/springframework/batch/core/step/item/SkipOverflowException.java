@@ -22,6 +22,7 @@ import org.springframework.batch.core.step.skip.SkipException;
  * @author Dave Syer
  *
  */
+@SuppressWarnings("serial")
 public class SkipOverflowException extends SkipException {
 
 	/**

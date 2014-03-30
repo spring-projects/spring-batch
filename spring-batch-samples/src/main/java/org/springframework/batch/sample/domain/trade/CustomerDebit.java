@@ -47,7 +47,8 @@ public class CustomerDebit {
         this.name = name;
     }
 
-    public String toString() {
+    @Override
+	public String toString() {
         return "CustomerDebit [name=" + name + ", debit=" + debit + "]";
     }
 

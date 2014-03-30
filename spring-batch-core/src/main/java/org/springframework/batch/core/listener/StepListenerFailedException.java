@@ -23,6 +23,7 @@ package org.springframework.batch.core.listener;
  * @author Michael Minella
  *
  */
+@SuppressWarnings("serial")
 public class StepListenerFailedException extends RuntimeException {
 
 	/**

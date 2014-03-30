@@ -29,6 +29,7 @@ public class CustomerUpdateProcessor implements ItemProcessor<CustomerUpdate, Cu
 	private CustomerDao customerDao;
 	private InvalidCustomerLogger invalidCustomerLogger;
 	
+	@Override
 	public CustomerUpdate process(CustomerUpdate item) throws Exception {
 		
 		if(item.getOperation() == DELETE){

@@ -27,7 +27,7 @@ import org.springframework.util.StringUtils;
 import org.w3c.dom.Element;
 
 /**
- * Parser for the lt;job-repository/gt; element in the Batch namespace. Sets up
+ * Parser for the &lt;job-repository/&gt; element in the Batch namespace. Sets up
  * and returns a JobRepositoryFactoryBean.
  *
  * @author Thomas Risberg

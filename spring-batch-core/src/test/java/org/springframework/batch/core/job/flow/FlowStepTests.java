@@ -49,7 +49,7 @@ public class FlowStepTests {
 
 	@Before
 	public void setUp() throws Exception {
-		jobRepository = new MapJobRepositoryFactoryBean().getJobRepository();
+		jobRepository = new MapJobRepositoryFactoryBean().getObject();
 		jobExecution = jobRepository.createJobExecution("job", new JobParameters());
 	}
 

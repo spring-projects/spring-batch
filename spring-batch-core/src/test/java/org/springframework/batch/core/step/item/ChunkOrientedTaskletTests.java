@@ -46,7 +46,7 @@ public class ChunkOrientedTaskletTests {
 				return chunk;
 			}
 			@Override
-			public void postProcess(StepContribution contribution, Chunk<String> chunk) {};
+			public void postProcess(StepContribution contribution, Chunk<String> chunk) {}
 		}, new ChunkProcessor<String>() {
 			@Override
 			public void process(StepContribution contribution, Chunk<String> chunk) {
@@ -69,7 +69,7 @@ public class ChunkOrientedTaskletTests {
 				throw new RuntimeException("Foo!");
 			}
 			@Override
-			public void postProcess(StepContribution contribution, Chunk<String> chunk) {};
+			public void postProcess(StepContribution contribution, Chunk<String> chunk) {}
 		}, new ChunkProcessor<String>() {
 			@Override
 			public void process(StepContribution contribution, Chunk<String> chunk) {
@@ -100,7 +100,7 @@ public class ChunkOrientedTaskletTests {
 				return chunk;
 			}
 			@Override
-			public void postProcess(StepContribution contribution, Chunk<String> chunk) {};
+			public void postProcess(StepContribution contribution, Chunk<String> chunk) {}
 		}, new ChunkProcessor<String>() {
 			@Override
 			public void process(StepContribution contribution, Chunk<String> chunk) {

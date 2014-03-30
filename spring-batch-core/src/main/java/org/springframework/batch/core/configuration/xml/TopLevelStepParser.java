@@ -21,7 +21,7 @@ import org.springframework.beans.factory.xml.ParserContext;
 import org.w3c.dom.Element;
 
 /**
- * Parser for the lt;step/gt; top level element in the Batch namespace. Sets up
+ * Parser for the &lt;step/&gt; top level element in the Batch namespace. Sets up
  * and returns a bean definition for a
  * {@link org.springframework.batch.core.Step}.
  * 

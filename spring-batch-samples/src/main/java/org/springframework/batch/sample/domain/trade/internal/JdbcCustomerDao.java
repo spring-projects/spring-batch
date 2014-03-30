@@ -43,14 +43,15 @@ public class JdbcCustomerDao extends JdbcDaoSupport implements CustomerDao{
 		this.incrementer = incrementer;
 	}
 	
+	@Override
 	public CustomerCredit getCustomerByName(String name) {
 		
-		@SuppressWarnings("unchecked")
-		List<CustomerCredit> customers = (List<CustomerCredit>) getJdbcTemplate().query(GET_CUSTOMER_BY_NAME, new Object[]{name}, 
+		List<CustomerCredit> customers = getJdbcTemplate().query(GET_CUSTOMER_BY_NAME, new Object[]{name}, 
 				
-				new RowMapper(){
+				new RowMapper<CustomerCredit>(){
 
-			public Object mapRow(ResultSet rs, int rowNum) throws SQLException {
+			@Override
+			public CustomerCredit mapRow(ResultSet rs, int rowNum) throws SQLException {
 				CustomerCredit customer = new CustomerCredit();
 				customer.setName(rs.getString("NAME"));
 				customer.setId(rs.getInt("ID"));
@@ -69,11 +70,13 @@ public class JdbcCustomerDao extends JdbcDaoSupport implements CustomerDao{
 		
 	}
 
+	@Override
 	public void insertCustomer(String name, BigDecimal credit) {
 		
 		getJdbcTemplate().update(INSERT_CUSTOMER, new Object[]{incrementer.nextIntValue(), name, credit});
 	}
 
+	@Override
 	public void updateCustomer(String name, BigDecimal credit) {
 		getJdbcTemplate().update(UPDATE_CUSTOMER, new Object[]{credit, name});
 	}

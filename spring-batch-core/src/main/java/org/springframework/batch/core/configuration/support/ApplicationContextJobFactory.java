@@ -38,6 +38,7 @@ public class ApplicationContextJobFactory implements JobFactory {
 	 * containing a job with the job name provided
 	 */
 	public ApplicationContextJobFactory(String jobName, ApplicationContextFactory applicationContextFactory) {
+		@SuppressWarnings("resource")
 		ConfigurableApplicationContext context = applicationContextFactory.createApplicationContext();
 		this.job = context.getBean(jobName, Job.class);
 	}

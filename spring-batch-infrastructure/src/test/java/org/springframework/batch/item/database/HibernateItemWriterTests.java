@@ -79,12 +79,14 @@ public class HibernateItemWriterTests {
 	 *
 	 * @throws Exception
 	 */
+	@SuppressWarnings("deprecation")
 	@Test
 	public void testAfterPropertiesSetWithDelegate() throws Exception {
 		writer.setHibernateTemplate(ht);
 		writer.afterPropertiesSet();
 	}
 
+	@SuppressWarnings("deprecation")
 	@Test
 	public void testWriteAndFlushSunnyDayHibernate3() throws Exception {
 		writer.setHibernateTemplate(ht);
@@ -99,6 +101,7 @@ public class HibernateItemWriterTests {
 
 	}
 
+	@SuppressWarnings("deprecation")
 	@Test
 	public void testWriteAndFlushWithFailureHibernate3() throws Exception {
 		writer.setHibernateTemplate(ht);

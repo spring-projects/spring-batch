@@ -83,7 +83,7 @@ public class MapJobRepositoryFactoryBean extends AbstractJobRepositoryFactoryBea
 	}
 
 	/**
-	 * Convenience method to clear all the map daos globally, removing all
+	 * Convenience method to clear all the map DAOs globally, removing all
 	 * entities.
 	 */
 	public void clear() {

@@ -29,6 +29,7 @@ import org.springframework.core.AttributeAccessorSupport;
  * @author Dave Syer
  * 
  */
+@SuppressWarnings("serial")
 public class ChunkContext extends AttributeAccessorSupport {
 
 	private final StepContext stepContext;

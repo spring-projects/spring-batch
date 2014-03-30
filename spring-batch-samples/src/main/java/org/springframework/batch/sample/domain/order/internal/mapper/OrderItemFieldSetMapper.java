@@ -31,6 +31,7 @@ public class OrderItemFieldSetMapper implements FieldSetMapper<LineItem> {
 	public static final String PRICE_COLUMN = "PRICE";
 	public static final String ITEM_ID_COLUMN = "ITEM_ID";
 
+	@Override
 	public LineItem mapFieldSet(FieldSet fieldSet) {
 		LineItem item = new LineItem();
 

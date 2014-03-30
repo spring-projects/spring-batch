@@ -19,7 +19,7 @@ import javax.batch.api.Batchlet;
 
 /**
  * <p>
- * Test batchlet that always fails..
+ * Test batchlet that always fails.
  * </p>
  *
  * @author Chris Schaefer

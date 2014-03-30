@@ -129,13 +129,13 @@ public class JsrFaultTolerantStepBuilder<I, O> extends FaultTolerantStepBuilder<
 	 * within the {@link ChunkOrientedTasklet}
 	 *
 	 * @return a JSR-352 implementation of the {@link ChunkProcessor}
-	 * @see {@link JsrFaultTolerantChunkProcessor}
+	 * @see JsrFaultTolerantChunkProcessor
 	 */
 	@Override
-	@SuppressWarnings({"unchecked", "rawtypes"})
 	protected ChunkProcessor<I> createChunkProcessor() {
 		SkipPolicy skipPolicy = getFatalExceptionAwareProxy(createSkipPolicy());
-		JsrFaultTolerantChunkProcessor chunkProcessor = new JsrFaultTolerantChunkProcessor(getReader(), getProcessor(),
+		JsrFaultTolerantChunkProcessor<I, O> chunkProcessor = 
+				new JsrFaultTolerantChunkProcessor<I, O>(getReader(), getProcessor(),
 				getWriter(), createChunkOperations(), createRetryOperations());
 		chunkProcessor.setSkipPolicy(skipPolicy);
 		chunkProcessor.setRollbackClassifier(getRollbackClassifier());

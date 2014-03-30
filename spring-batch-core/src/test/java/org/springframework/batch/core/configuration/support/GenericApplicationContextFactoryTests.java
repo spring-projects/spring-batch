@@ -38,6 +38,7 @@ public class GenericApplicationContextFactoryTests {
 	public void testCreateJob() {
 		GenericApplicationContextFactory factory = new GenericApplicationContextFactory(
 				new ClassPathResource(ClassUtils.addResourcePathToPackagePath(getClass(), "trivial-context.xml")));
+		@SuppressWarnings("resource")
 		ConfigurableApplicationContext context = factory.createApplicationContext();
 		assertNotNull(context);
 		assertTrue("Wrong id: " + context, context.getId().contains("trivial-context.xml"));
@@ -50,6 +51,7 @@ public class GenericApplicationContextFactoryTests {
 		assertEquals("test-job", factory.createApplicationContext().getBeanNamesForType(Job.class)[0]);
 	}
 
+	@SuppressWarnings("resource")
 	@Test
 	public void testParentConfigurationInherited() {
 		GenericApplicationContextFactory factory = new GenericApplicationContextFactory(
@@ -62,6 +64,7 @@ public class GenericApplicationContextFactoryTests {
 		assertEquals(4, context.getBean("foo", Foo.class).values[1], 0.01);
 	}
 
+	@SuppressWarnings("resource")
 	@Test
 	public void testBeanFactoryPostProcessorOrderRespected() {
 		GenericApplicationContextFactory factory = new GenericApplicationContextFactory(
@@ -77,15 +80,18 @@ public class GenericApplicationContextFactoryTests {
 	public void testBeanFactoryProfileRespected() {
 		GenericApplicationContextFactory factory = new GenericApplicationContextFactory(
 				new ClassPathResource(ClassUtils.addResourcePathToPackagePath(getClass(), "profiles.xml")));
+		@SuppressWarnings("resource")
 		ClassPathXmlApplicationContext parentContext = new ClassPathXmlApplicationContext(ClassUtils.addResourcePathToPackagePath(
 				getClass(), "parent-context.xml"));
 		parentContext.getEnvironment().setActiveProfiles("preferred");
 		factory.setApplicationContext(parentContext);
+		@SuppressWarnings("resource")
 		ConfigurableApplicationContext context = factory.createApplicationContext();
 		assertEquals("test-job", context.getBeanNamesForType(Job.class)[0]);
 		assertEquals("spam", context.getBean("test-job", Job.class).getName());
 	}
 
+	@SuppressWarnings("resource")
 	@Test
 	public void testBeanFactoryPostProcessorsNotCopied() {
 		GenericApplicationContextFactory factory = new GenericApplicationContextFactory(
@@ -101,6 +107,7 @@ public class GenericApplicationContextFactoryTests {
 		assertEquals(4, context.getBean("foo", Foo.class).values[1], 0.01);
 	}
 
+	@SuppressWarnings("resource")
 	@Test
 	public void testBeanFactoryConfigurationNotCopied() {
 		GenericApplicationContextFactory factory = new GenericApplicationContextFactory(new ClassPathResource(ClassUtils.addResourcePathToPackagePath(getClass(),

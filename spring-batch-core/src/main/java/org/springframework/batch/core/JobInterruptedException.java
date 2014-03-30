@@ -28,6 +28,7 @@ package org.springframework.batch.core;
  * @author Dave Syer
  * 
  */
+@SuppressWarnings("serial")
 public class JobInterruptedException extends JobExecutionException {
 	
 	private BatchStatus status = BatchStatus.STOPPED;

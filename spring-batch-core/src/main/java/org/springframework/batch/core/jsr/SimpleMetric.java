@@ -32,10 +32,10 @@ public class SimpleMetric implements Metric {
 
 	/**
 	 * Basic constructor.  The attributes are immutable so this class is
-	 * threadsafe.
+	 * thread-safe.
 	 *
 	 * @param type as defined by JSR-352
-	 * @param value the count of the times the related type has occured.
+	 * @param value the count of the times the related type has occurred.
 	 */
 	public SimpleMetric(MetricType type, long value) {
 		Assert.notNull(type, "A MetricType is required");

@@ -163,7 +163,7 @@ public class ExecutionContext implements Serializable {
 	 *
 	 * @param key The key to get a value for
 	 * @param defaultString Default to return if key is not represented
-	 * @return The <code>String</code> value if key is repreesnted, specified
+	 * @return The <code>String</code> value if key is represented, specified
 	 * default otherwise
 	 */
 	public String getString(String key, String defaultString) {

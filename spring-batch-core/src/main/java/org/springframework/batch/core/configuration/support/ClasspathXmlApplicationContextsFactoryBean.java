@@ -37,7 +37,7 @@ import org.springframework.core.io.Resource;
  * @author Dave Syer
  *
  */
-public class ClasspathXmlApplicationContextsFactoryBean implements FactoryBean, ApplicationContextAware {
+public class ClasspathXmlApplicationContextsFactoryBean implements FactoryBean<ApplicationContextFactory[]>, ApplicationContextAware {
 
 	private List<Resource> resources = new ArrayList<Resource>();
 
@@ -109,7 +109,7 @@ public class ClasspathXmlApplicationContextsFactoryBean implements FactoryBean, 
 	 * @see org.springframework.beans.factory.FactoryBean#getObject()
 	 */
 	@Override
-	public Object getObject() throws Exception {
+	public ApplicationContextFactory[] getObject() throws Exception {
 
 		if (resources == null) {
 			return new ApplicationContextFactory[0];

@@ -50,7 +50,7 @@ import com.ibatis.sqlmap.engine.execution.BatchResult;
  *
  * It is expected that {@link #write(List)} is called inside a transaction.<br/>
  *
- * The writer is thread safe after its properties are set (normal singleton
+ * The writer is thread-safe after its properties are set (normal singleton
  * behavior), so it can be used to write in multiple concurrent transactions.<br/>
  *
  * <em>Note:</em> This reader was refactored as part of Spring Batch 3.0 to use the iBatis

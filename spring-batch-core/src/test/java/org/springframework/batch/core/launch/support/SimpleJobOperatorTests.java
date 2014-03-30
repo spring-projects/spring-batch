@@ -111,10 +111,9 @@ public class SimpleJobOperatorTests {
 				throw new NoSuchJobException("foo");
 			}
 
-			@SuppressWarnings({ "unchecked", "rawtypes" })
 			@Override
 			public Set<String> getJobNames() {
-				return new HashSet(Arrays.asList(new String[] { "foo", "bar" }));
+				return new HashSet<String>(Arrays.asList(new String[] { "foo", "bar" }));
 			}
 		});
 
@@ -202,7 +201,7 @@ public class SimpleJobOperatorTests {
 	@Test
 	public void testResumeSunnyDay() throws Exception {
 		jobParameters = new JobParameters();
-		when(jobExplorer.getJobExecution(111l)).thenReturn(new JobExecution(new JobInstance(123L, job.getName()), 111L, jobParameters, null));
+		when(jobExplorer.getJobExecution(111L)).thenReturn(new JobExecution(new JobInstance(123L, job.getName()), 111L, jobParameters, null));
 		jobExplorer.getJobExecution(111L);
 		Long value = jobOperator.restart(111L);
 		assertEquals(999, value.longValue());

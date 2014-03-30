@@ -21,6 +21,7 @@ package org.springframework.batch.core.job.builder;
  * @since 2.2
  *
  */
+@SuppressWarnings("serial")
 public class FlowBuilderException extends RuntimeException {
 
 	public FlowBuilderException(String msg, Exception e) {

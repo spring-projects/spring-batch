@@ -40,19 +40,20 @@ public class JdbcTradeDao implements TradeDao {
     private static final String INSERT_TRADE_RECORD = "INSERT INTO TRADE (id, version, isin, quantity, price, customer) VALUES (?, 0, ?, ? ,?, ?)";
 
     /**
-     * handles the processing of sql query
+     * handles the processing of SQL query
      */
     private JdbcOperations jdbcTemplate;
 
     /**
-     * database is not expected to be setup for autoincrement
+     * database is not expected to be setup for auto increment
      */
     private DataFieldMaxValueIncrementer incrementer;
 
     /**
      * @see TradeDao
      */
-    public void writeTrade(Trade trade) {
+    @Override
+	public void writeTrade(Trade trade) {
         Long id = incrementer.nextLongValue();
         log.debug("Processing: " + trade);
         jdbcTemplate.update(INSERT_TRADE_RECORD,

@@ -218,6 +218,7 @@ public class BatchPropertyContext {
 	 *
 	 * @param properties the step artifact {@link Properties} to add
 	 */
+	@SuppressWarnings("serial")
 	public void setStepArtifactProperties(Map<String, Map<String, Properties>> properties) {
 		Assert.notNull(properties, "Step artifact properties cannot be null");
 

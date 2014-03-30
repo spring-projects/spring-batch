@@ -59,7 +59,7 @@ public class JsrJobContextFactoryBeanTests {
 
 	@Test
 	public void testIntialCreationSingleThread() throws Exception {
-		factoryBean.setJobExecution(new JobExecution(5l));
+		factoryBean.setJobExecution(new JobExecution(5L));
 		factoryBean.setBatchPropertyContext(propertyContext);
 
 		assertTrue(factoryBean.getObjectType().isAssignableFrom(JobContext.class));
@@ -68,8 +68,8 @@ public class JsrJobContextFactoryBeanTests {
 		JobContext jobContext1 = factoryBean.getObject();
 		JobContext jobContext2 = factoryBean.getObject();
 
-		assertEquals(5l, jobContext1.getExecutionId());
-		assertEquals(5l, jobContext2.getExecutionId());
+		assertEquals(5L, jobContext1.getExecutionId());
+		assertEquals(5L, jobContext2.getExecutionId());
 		assertTrue(jobContext1 == jobContext2);
 	}
 
@@ -77,11 +77,11 @@ public class JsrJobContextFactoryBeanTests {
 	public void testInitialCreationSingleThreadUsingStepScope() throws Exception {
 		factoryBean.setBatchPropertyContext(propertyContext);
 
-		StepSynchronizationManager.register(new StepExecution("step1", new JobExecution(5l)));
+		StepSynchronizationManager.register(new StepExecution("step1", new JobExecution(5L)));
 
 		JobContext jobContext = factoryBean.getObject();
 
-		assertEquals(5l, jobContext.getExecutionId());
+		assertEquals(5L, jobContext.getExecutionId());
 		StepSynchronizationManager.close();
 	}
 
@@ -105,7 +105,7 @@ public class JsrJobContextFactoryBeanTests {
 					try {
 						StepSynchronizationManager.register(new StepExecution("step" + count, new JobExecution(count)));
 						JobContext context = factoryBean.getObject();
-						Thread.sleep(1000l);
+						Thread.sleep(1000L);
 						return context;
 					} catch (Throwable ignore) {
 						return null;

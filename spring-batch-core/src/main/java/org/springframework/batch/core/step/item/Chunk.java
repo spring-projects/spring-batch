@@ -96,7 +96,7 @@ public class Chunk<W> implements Iterable<W> {
 	}
 
 	/**
-	 * @return a copy of the anonymous errros as an unmodifiable list
+	 * @return a copy of the anonymous errors as an unmodifiable list
 	 */
 	public List<Exception> getErrors() {
 		return Collections.unmodifiableList(errors);

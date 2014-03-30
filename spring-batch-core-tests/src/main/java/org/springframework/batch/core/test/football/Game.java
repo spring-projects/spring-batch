@@ -18,6 +18,7 @@ package org.springframework.batch.core.test.football;
 
 import java.io.Serializable;
 
+@SuppressWarnings("serial")
 public class Game implements Serializable {
 
 	private String id;
@@ -260,6 +261,7 @@ public class Game implements Serializable {
 		this.totalTd = totalTd;
 	}
 
+	@Override
 	public String toString() {
 
 		return "Game: ID=" + id + " " + team + " vs. " + opponent + " - " + year;

@@ -1,3 +1,18 @@
+/*
+ * Copyright 2009-2014 the original author or authors.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package org.springframework.batch.core.configuration.xml;
 
 import java.util.ArrayList;
@@ -39,11 +54,10 @@ public abstract class AbstractListenerParser {
 		return builder.getBeanDefinition();
 	}
 
-	@SuppressWarnings("unchecked")
 	public void doParse(Element element, ParserContext parserContext, BeanDefinitionBuilder builder) {
 		builder.addPropertyValue("delegate", parseListenerElement(element, parserContext, builder.getRawBeanDefinition()));
 
-		ManagedMap metaDataMap = new ManagedMap();
+		ManagedMap<String, String> metaDataMap = new ManagedMap<String, String>();
 		for (String metaDataPropertyName : getMethodNameAttributes()) {
 			String listenerMethod = element.getAttribute(metaDataPropertyName);
 			if (StringUtils.hasText(listenerMethod)) {
@@ -53,7 +67,6 @@ public abstract class AbstractListenerParser {
 		builder.addPropertyValue("metaDataMap", metaDataMap);
 	}
 
-	@SuppressWarnings("unchecked")
 	public static BeanMetadataElement parseListenerElement(Element element, ParserContext parserContext, BeanDefinition enclosing) {
 		String listenerRef = element.getAttribute(REF_ATTR);
 		List<Element> beanElements = DomUtils.getChildElementsByTagName(element, BEAN_ELE);
@@ -119,7 +132,7 @@ public abstract class AbstractListenerParser {
 		return methodNameAttributes;
 	}
 
-	protected abstract Class<? extends AbstractListenerFactoryBean> getBeanClass();
+	protected abstract Class<? extends AbstractListenerFactoryBean<?>> getBeanClass();
 
 	protected abstract ListenerMetaData[] getMetaDataValues();
 

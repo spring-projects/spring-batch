@@ -45,7 +45,7 @@ public class JsrBatchletStepBuilder extends TaskletStepBuilder {
 		this.batchPropertyContext = context;
 	}
 
-	public JsrBatchletStepBuilder(StepBuilderHelper<? extends StepBuilderHelper> parent) {
+	public JsrBatchletStepBuilder(StepBuilderHelper<? extends StepBuilderHelper<?>> parent) {
 		super(parent);
 	}
 

@@ -46,7 +46,7 @@ public class JsrSplitParsingTests {
 
 	@Test
 	public void test() throws Exception {
-		javax.batch.runtime.JobExecution execution = runJob("JsrSplitParsingTests-context", null, 10000l);
+		javax.batch.runtime.JobExecution execution = runJob("JsrSplitParsingTests-context", null, 10000L);
 		assertEquals(javax.batch.runtime.BatchStatus.COMPLETED, execution.getBatchStatus());
 		assertEquals("COMPLETED", execution.getExitStatus());
 

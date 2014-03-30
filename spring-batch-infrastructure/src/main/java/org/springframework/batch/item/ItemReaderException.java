@@ -21,6 +21,7 @@ package org.springframework.batch.item;
  * 
  * @author Ben Hale
  */
+@SuppressWarnings("serial")
 public abstract class ItemReaderException extends RuntimeException {
 
 	/**

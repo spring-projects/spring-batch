@@ -32,7 +32,7 @@ import org.springframework.batch.core.listener.ListenerMetaData;
 public class JobExecutionListenerParser extends AbstractListenerParser {
 
 	@Override
-	protected Class<? extends AbstractListenerFactoryBean> getBeanClass() {
+	protected Class<? extends AbstractListenerFactoryBean<?>> getBeanClass() {
 		return JobListenerFactoryBean.class;
 	}
 

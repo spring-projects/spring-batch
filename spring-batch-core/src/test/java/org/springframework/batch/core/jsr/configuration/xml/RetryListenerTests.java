@@ -53,6 +53,7 @@ public class RetryListenerTests {
 	private static final Log LOG = LogFactory.getLog(RetryListenerTests.class);
 
 	@Test
+	@SuppressWarnings("resource")
 	public void testReadRetryExhausted() throws Exception {
 		ApplicationContext context = new ClassPathXmlApplicationContext("org/springframework/batch/core/jsr/configuration/xml/RetryReadListenerExhausted.xml");
 
@@ -68,6 +69,7 @@ public class RetryListenerTests {
 	}
 
 	@Test
+	@SuppressWarnings("resource")
 	public void testReadRetryOnce() throws Exception {
 		ApplicationContext context = new ClassPathXmlApplicationContext("org/springframework/batch/core/jsr/configuration/xml/RetryReadListenerRetryOnce.xml");
 
@@ -85,6 +87,7 @@ public class RetryListenerTests {
 	}
 
 	@Test
+	@SuppressWarnings("resource")
 	public void testReadRetryExceptionInListener() throws Exception {
 		ApplicationContext context = new ClassPathXmlApplicationContext("org/springframework/batch/core/jsr/configuration/xml/RetryReadListenerListenerException.xml");
 
@@ -222,7 +225,7 @@ public class RetryListenerTests {
 
 		@Override
 		public void writeItems(List<Object> items) throws Exception {
-			for(Object item : items) {
+			for(@SuppressWarnings("unused") Object item : items) {
 				if(cnt == 0) {
 					cnt++;
 					LOG.info("one");

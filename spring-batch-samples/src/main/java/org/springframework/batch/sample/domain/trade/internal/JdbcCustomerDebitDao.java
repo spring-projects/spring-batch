@@ -36,7 +36,8 @@ public class JdbcCustomerDebitDao implements CustomerDebitDao {
 
     private JdbcOperations jdbcTemplate;
 
-    public void write(CustomerDebit customerDebit) {
+    @Override
+	public void write(CustomerDebit customerDebit) {
         jdbcTemplate.update(UPDATE_CREDIT, customerDebit.getDebit(), customerDebit.getName());
     }
 

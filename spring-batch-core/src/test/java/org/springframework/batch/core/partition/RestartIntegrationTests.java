@@ -74,8 +74,8 @@ public class RestartIntegrationTests {
 		ExampleItemReader.fail = true;
 		JobParameters jobParameters = new JobParametersBuilder().addString("restart", "yes").toJobParameters();
 
-		int beforeMaster = jdbcTemplate.queryForInt("SELECT COUNT(*) from BATCH_STEP_EXECUTION where STEP_NAME='step1:master'");
-		int beforePartition = jdbcTemplate.queryForInt("SELECT COUNT(*) from BATCH_STEP_EXECUTION where STEP_NAME like 'step1:partition%'");
+		int beforeMaster = jdbcTemplate.queryForObject("SELECT COUNT(*) from BATCH_STEP_EXECUTION where STEP_NAME='step1:master'", Integer.class);
+		int beforePartition = jdbcTemplate.queryForObject("SELECT COUNT(*) from BATCH_STEP_EXECUTION where STEP_NAME like 'step1:partition%'", Integer.class);
 
 		ExampleItemWriter.clear();
 		JobExecution execution = jobLauncher.run(job, jobParameters);
@@ -88,8 +88,8 @@ public class RestartIntegrationTests {
 		// Only 4 because the others were processed in the first attempt
 		assertEquals(4, ExampleItemWriter.getItems().size());
 
-		int afterMaster = jdbcTemplate.queryForInt("SELECT COUNT(*) from BATCH_STEP_EXECUTION where STEP_NAME='step1:master'");
-		int afterPartition = jdbcTemplate.queryForInt("SELECT COUNT(*) from BATCH_STEP_EXECUTION where STEP_NAME like 'step1:partition%'");
+		int afterMaster = jdbcTemplate.queryForObject("SELECT COUNT(*) from BATCH_STEP_EXECUTION where STEP_NAME='step1:master'", Integer.class);
+		int afterPartition = jdbcTemplate.queryForObject("SELECT COUNT(*) from BATCH_STEP_EXECUTION where STEP_NAME like 'step1:partition%'", Integer.class);
 
 		// Two attempts
 		assertEquals(2, afterMaster-beforeMaster);

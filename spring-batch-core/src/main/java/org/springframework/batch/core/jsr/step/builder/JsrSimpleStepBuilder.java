@@ -119,13 +119,12 @@ public class JsrSimpleStepBuilder<I, O> extends SimpleStepBuilder<I, O> {
 	}
 
 	@Override
-	@SuppressWarnings({"unchecked", "rawtypes"})
 	protected Tasklet createTasklet() {
 		Assert.state(getReader() != null, "ItemReader must be provided");
 		Assert.state(getProcessor() != null || getWriter() != null, "ItemWriter or ItemProcessor must be provided");
 		RepeatOperations repeatOperations = createRepeatOperations();
 		ChunkProvider<I> chunkProvider = new JsrChunkProvider<I>();
-		JsrChunkProcessor<I, O> chunkProcessor = new JsrChunkProcessor(getReader(), getProcessor(), getWriter(), repeatOperations);
+		JsrChunkProcessor<I, O> chunkProcessor = new JsrChunkProcessor<I, O>(getReader(), getProcessor(), getWriter(), repeatOperations);
 		chunkProcessor.setListeners(new ArrayList<StepListener>(getItemListeners()));
 		ChunkOrientedTasklet<I> tasklet = new ChunkOrientedTasklet<I>(chunkProvider, chunkProcessor);
 		tasklet.setBuffering(!isReaderTransactionalQueue());

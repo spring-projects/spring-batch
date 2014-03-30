@@ -22,6 +22,7 @@ package org.springframework.batch.core.step;
  * @author Dave Syer
  * 
  */
+@SuppressWarnings("serial")
 public class NoSuchStepException extends RuntimeException {
 
 	/**

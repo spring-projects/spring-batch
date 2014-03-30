@@ -19,6 +19,7 @@ package org.springframework.batch.core.step.item;
  * @author Dan Garrette
  * @since 2.0.1
  */
+@SuppressWarnings("serial")
 public class SkippableException extends Exception {
 	public SkippableException(String message) {
 		super(message);

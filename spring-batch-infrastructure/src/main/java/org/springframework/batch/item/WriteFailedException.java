@@ -22,6 +22,7 @@ package org.springframework.batch.item;
  * @author Lucas Ward
  * @author Ben Hale
  */
+@SuppressWarnings("serial")
 public class WriteFailedException extends ItemWriterException {
 
 	/**

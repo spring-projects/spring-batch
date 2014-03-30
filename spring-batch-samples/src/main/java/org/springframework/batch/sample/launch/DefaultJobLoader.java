@@ -38,6 +38,7 @@ public class DefaultJobLoader implements JobLoader, ApplicationContextAware {
 
 	private Map<String, String> configurations = new HashMap<String, String>();
 
+	@Override
 	public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
 		this.applicationContext = applicationContext;
 	}
@@ -46,6 +47,7 @@ public class DefaultJobLoader implements JobLoader, ApplicationContextAware {
 		this.registry = registry;
 	}
 
+	@Override
 	public Map<String, String> getConfigurations() {
 		Map<String, String> result = new HashMap<String, String>(configurations);
 		for (String jobName : registry.getJobNames()) {
@@ -63,6 +65,8 @@ public class DefaultJobLoader implements JobLoader, ApplicationContextAware {
 		return result;
 	}
 
+	@Override
+	@SuppressWarnings("resource")
 	public void loadResource(String path) {
 		ClassPathXmlApplicationContext context = new ClassPathXmlApplicationContext(new String[] { path },
 				applicationContext);
@@ -72,6 +76,7 @@ public class DefaultJobLoader implements JobLoader, ApplicationContextAware {
 		}
 	}
 
+	@Override
 	public Object getJobConfiguration(String name) {
 		try {
 			return registry.getJob(name);
@@ -81,6 +86,7 @@ public class DefaultJobLoader implements JobLoader, ApplicationContextAware {
 		}
 	}
 
+	@Override
 	public Object getProperty(String path) {
 		int index = PropertyAccessorUtils.getFirstNestedPropertySeparatorIndex(path);
 		BeanWrapperImpl wrapper = createBeanWrapper(path, index);
@@ -88,6 +94,7 @@ public class DefaultJobLoader implements JobLoader, ApplicationContextAware {
 		return wrapper.getPropertyValue(key);
 	}
 
+	@Override
 	public void setProperty(String path, String value) {
 		int index = PropertyAccessorUtils.getFirstNestedPropertySeparatorIndex(path);
 		BeanWrapperImpl wrapper = createBeanWrapper(path, index);

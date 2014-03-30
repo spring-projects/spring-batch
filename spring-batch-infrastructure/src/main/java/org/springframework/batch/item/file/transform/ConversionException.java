@@ -19,6 +19,7 @@ package org.springframework.batch.item.file.transform;
  * @author Dave Syer
  *
  */
+@SuppressWarnings("serial")
 public class ConversionException extends RuntimeException {
 
 	/**

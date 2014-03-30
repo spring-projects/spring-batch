@@ -22,6 +22,7 @@ package org.springframework.batch.support.transaction;
  * @author Lucas Ward
  * @author Ben Hale
  */
+@SuppressWarnings("serial")
 public class FlushFailedException extends RuntimeException {
 
 	/**

@@ -226,10 +226,10 @@ public class DelimitedLineTokenizer extends AbstractLineTokenizer {
 	/**
 	 * Is the supplied character the delimiter character?
 	 *
-	 * @param c the character to be checked
+	 * @param chars the characters to be checked
 	 * @return <code>true</code> if the supplied character is the delimiter
 	 * character
-	 * @see DelimitedLineTokenizer#DelimitedLineTokenizer(char)
+	 * @see DelimitedLineTokenizer#DelimitedLineTokenizer(String)
 	 */
 	private boolean isDelimiter(char[] chars, int i, String token, int endIndexLastDelimiter) {
 		boolean result = false;

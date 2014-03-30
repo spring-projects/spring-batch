@@ -29,6 +29,7 @@ public class JdbcGameDao extends JdbcDaoSupport implements ItemWriter<Game> {
 
 	private SimpleJdbcInsert insertGame;
 
+	@Override
 	protected void initDao() throws Exception {
 		super.initDao();
 		insertGame = new SimpleJdbcInsert(getDataSource()).withTableName("GAMES").usingColumns("player_id", "year_no",
@@ -36,6 +37,7 @@ public class JdbcGameDao extends JdbcDaoSupport implements ItemWriter<Game> {
 				"rushes", "rush_yards", "receptions", "receptions_yards", "total_td");
 	}
 
+	@Override
 	public void write(List<? extends Game> games) {
 
 		for (Game game : games) {

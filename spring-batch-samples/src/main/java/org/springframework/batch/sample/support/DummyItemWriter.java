@@ -25,6 +25,7 @@ import org.springframework.batch.item.ItemWriter;
  */
 public class DummyItemWriter implements ItemWriter<Object> {
 
+	@Override
 	public void write(List<? extends Object> item) throws Exception {
 		// NO-OP
 		Thread.sleep(500);

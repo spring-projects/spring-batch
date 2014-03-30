@@ -49,8 +49,7 @@ import org.springframework.util.StringUtils;
  * @author Dave Syer
  * @author Michael Minella
  */
-@SuppressWarnings("rawtypes")
-public class SqlPagingQueryProviderFactoryBean implements FactoryBean {
+public class SqlPagingQueryProviderFactoryBean implements FactoryBean<PagingQueryProvider> {
 
 	private DataSource dataSource;
 
@@ -148,7 +147,7 @@ public class SqlPagingQueryProviderFactoryBean implements FactoryBean {
 	 * @see FactoryBean#getObject()
 	 */
     @Override
-	public Object getObject() throws Exception {
+	public PagingQueryProvider getObject() throws Exception {
 
 		DatabaseType type;
 		try {

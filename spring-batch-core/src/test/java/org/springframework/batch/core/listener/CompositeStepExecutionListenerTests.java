@@ -41,7 +41,7 @@ public class CompositeStepExecutionListenerTests extends TestCase {
 	 * .
 	 */
 	public void testSetListeners() {
-		JobExecution jobExecution = new JobExecution(1l);
+		JobExecution jobExecution = new JobExecution(1L);
 		StepExecution stepExecution = new StepExecution("s1", jobExecution);
 		listener.setListeners(new StepExecutionListener[] { new StepExecutionListenerSupport() {
 			@Override
@@ -67,7 +67,7 @@ public class CompositeStepExecutionListenerTests extends TestCase {
 	 * .
 	 */
 	public void testSetListener() {
-		JobExecution jobExecution = new JobExecution(1l);
+		JobExecution jobExecution = new JobExecution(1L);
 		StepExecution stepExecution = new StepExecution("s1", jobExecution);
 		listener.register(new StepExecutionListenerSupport() {
 			@Override

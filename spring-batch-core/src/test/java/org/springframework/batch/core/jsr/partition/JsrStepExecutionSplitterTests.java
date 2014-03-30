@@ -38,7 +38,7 @@ public class JsrStepExecutionSplitterTests {
 
 	@Test
 	public void test() throws Exception {
-		Set<StepExecution> executions = splitter.split(new StepExecution("step1", new JobExecution(5l)), 3);
+		Set<StepExecution> executions = splitter.split(new StepExecution("step1", new JobExecution(5L)), 3);
 
 		assertEquals(3, executions.size());
 

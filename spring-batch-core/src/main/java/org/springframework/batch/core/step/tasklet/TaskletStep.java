@@ -241,7 +241,6 @@ public class TaskletStep extends AbstractStep {
 	 *
 	 */
 	@Override
-	@SuppressWarnings("unchecked")
 	protected void doExecute(StepExecution stepExecution) throws Exception {
 
 		stream.update(stepExecution.getExecutionContext());
@@ -265,7 +264,7 @@ public class TaskletStep extends AbstractStep {
 
 				RepeatStatus result;
 				try {
-					result = (RepeatStatus) new TransactionTemplate(transactionManager, transactionAttribute)
+					result = new TransactionTemplate(transactionManager, transactionAttribute)
 					.execute(new ChunkTransactionCallback(chunkContext, semaphore));
 				}
 				catch (UncheckedTransactionException e) {
@@ -324,8 +323,7 @@ public class TaskletStep extends AbstractStep {
 	 * @author Dave Syer
 	 *
 	 */
-	@SuppressWarnings("rawtypes")
-	private class ChunkTransactionCallback extends TransactionSynchronizationAdapter implements TransactionCallback {
+	private class ChunkTransactionCallback extends TransactionSynchronizationAdapter implements TransactionCallback<RepeatStatus> {
 
 		private final StepExecution stepExecution;
 
@@ -383,7 +381,7 @@ public class TaskletStep extends AbstractStep {
 		}
 
 		@Override
-		public Object doInTransaction(TransactionStatus status) {
+		public RepeatStatus doInTransaction(TransactionStatus status) {
 			TransactionSynchronizationManager.registerSynchronization(this);
 
 			RepeatStatus result = RepeatStatus.CONTINUABLE;

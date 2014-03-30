@@ -33,6 +33,7 @@ public class GeneratingTradeResettingListener extends StepExecutionListenerSuppo
 
 	private GeneratingTradeItemReader reader;
 
+	@Override
 	public ExitStatus afterStep(StepExecution stepExecution) {
 		this.reader.resetCounter();
 		return null;
@@ -42,6 +43,7 @@ public class GeneratingTradeResettingListener extends StepExecutionListenerSuppo
 		this.reader = reader;
 	}
 
+	@Override
 	public void afterPropertiesSet() throws Exception {
 		Assert.notNull(this.reader, "The 'reader' must be set.");
 	}

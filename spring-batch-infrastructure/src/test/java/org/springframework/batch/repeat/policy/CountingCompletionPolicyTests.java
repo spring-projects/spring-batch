@@ -29,7 +29,7 @@ public class CountingCompletionPolicyTests extends TestCase {
             @Override
 			protected int getCount(RepeatContext context) {
 				return 1;
-			};
+			}
 		};
 		RepeatContext context = policy.start(null);
 		assertTrue(policy.isComplete(context));
@@ -40,7 +40,7 @@ public class CountingCompletionPolicyTests extends TestCase {
             @Override
 			protected int getCount(RepeatContext context) {
 				return 1;
-			};
+			}
 		};
 		policy.setMaxCount(10);
 		RepeatContext context = policy.start(null);
@@ -52,7 +52,7 @@ public class CountingCompletionPolicyTests extends TestCase {
             @Override
 			protected int getCount(RepeatContext context) {
 				return 1;
-			};
+			}
 		};
 		policy.setMaxCount(10);
 		RepeatContext context = policy.start(null);
@@ -66,7 +66,7 @@ public class CountingCompletionPolicyTests extends TestCase {
             @Override
 			protected int getCount(RepeatContext context) {
 				return count;
-			};
+			}
 
             @Override
 			protected int doUpdate(RepeatContext context) {
@@ -89,7 +89,7 @@ public class CountingCompletionPolicyTests extends TestCase {
             @Override
 			protected int getCount(RepeatContext context) {
 				return count;
-			};
+			}
 
             @Override
 			protected int doUpdate(RepeatContext context) {
@@ -121,7 +121,7 @@ public class CountingCompletionPolicyTests extends TestCase {
             @Override
 			protected int getCount(RepeatContext context) {
 				return count;
-			};
+			}
 
             @Override
 			protected int doUpdate(RepeatContext context) {

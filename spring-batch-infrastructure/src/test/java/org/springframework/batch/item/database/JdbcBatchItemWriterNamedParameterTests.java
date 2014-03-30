@@ -42,10 +42,9 @@ import org.springframework.jdbc.core.namedparam.SqlParameterSource;
  * @author Will Schipp
  * @author Michael Minella
  */
-@SuppressWarnings({"rawtypes", "serial", "unchecked"})
 public class JdbcBatchItemWriterNamedParameterTests {
 
-	private JdbcBatchItemWriter writer = new JdbcBatchItemWriter<Foo>();
+	private JdbcBatchItemWriter<Foo> writer = new JdbcBatchItemWriter<Foo>();
 
 	private NamedParameterJdbcOperations namedParameterJdbcOperations;
 
@@ -124,25 +123,31 @@ public class JdbcBatchItemWriterNamedParameterTests {
 
 	@Test
 	public void testWriteAndFlush() throws Exception {
-		writer.setItemSqlParameterSourceProvider(null);
+		when(namedParameterJdbcOperations.batchUpdate(eq(sql),
+				eqSqlParameterSourceArray(new SqlParameterSource[] {new BeanPropertySqlParameterSource(new Foo("bar"))})))
+				.thenReturn(new int[] {1});
+		writer.write(Collections.singletonList(new Foo("bar")));
+	}
+
+	@SuppressWarnings({ "rawtypes", "serial", "unchecked" })
+	@Test
+	public void testWriteAndFlushMap() throws Exception {
+		JdbcBatchItemWriter<Map<String, Object>> mapWriter = new JdbcBatchItemWriter<Map<String,Object>>();
+		
+		mapWriter.setSql(sql);
+		mapWriter.setJdbcTemplate(namedParameterJdbcOperations);
+		mapWriter.afterPropertiesSet();
+		
 		ArgumentCaptor<Map []> captor = ArgumentCaptor.forClass(Map[].class);
 
 		when(namedParameterJdbcOperations.batchUpdate(eq(sql),
 				captor.capture()))
 				.thenReturn(new int[] {1});
-		writer.write(Collections.singletonList(new HashMap<String, Object>() {{put("foo", "bar");}}));
+		mapWriter.write(Collections.singletonList(new HashMap<String, Object>() {{put("foo", "bar");}}));
 
 		assertEquals(1, captor.getValue().length);
 		Map<String, Object> results = captor.getValue()[0];
 		assertEquals("bar", results.get("foo"));
-	}
-
-	@Test
-	public void testWriteAndFlushMap() throws Exception {
-		when(namedParameterJdbcOperations.batchUpdate(eq(sql),
-				eqSqlParameterSourceArray(new SqlParameterSource[] {new BeanPropertySqlParameterSource(new Foo("bar"))})))
-				.thenReturn(new int[] {1});
-		writer.write(Collections.singletonList(new Foo("bar")));
 	}
 
 	@Test

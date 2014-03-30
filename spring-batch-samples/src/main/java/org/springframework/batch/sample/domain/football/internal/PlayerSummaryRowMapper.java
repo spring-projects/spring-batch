@@ -27,12 +27,13 @@ import org.springframework.jdbc.core.RowMapper;
  * @author Lucas Ward
  *
  */
-public class PlayerSummaryRowMapper implements RowMapper {
+public class PlayerSummaryRowMapper implements RowMapper<PlayerSummary> {
 
 	/* (non-Javadoc)
 	 * @see org.springframework.jdbc.core.RowMapper#mapRow(java.sql.ResultSet, int)
 	 */
-	public Object mapRow(ResultSet rs, int rowNum) throws SQLException {
+	@Override
+	public PlayerSummary mapRow(ResultSet rs, int rowNum) throws SQLException {
 		
 		PlayerSummary summary = new PlayerSummary();
 		

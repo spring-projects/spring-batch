@@ -102,6 +102,7 @@ public class BeanWrapperFieldSetMapperTests {
 	@Test
 	public void testMapperWithSingleton() throws Exception {
 		BeanWrapperFieldSetMapper<TestObject> mapper = new BeanWrapperFieldSetMapper<TestObject>();
+		@SuppressWarnings("resource")
 		StaticApplicationContext context = new StaticApplicationContext();
 		mapper.setBeanFactory(context);
 		context.getBeanFactory().registerSingleton("bean", new TestObject());
@@ -118,6 +119,7 @@ public class BeanWrapperFieldSetMapperTests {
 	@Test
 	public void testPropertyNameMatching() throws Exception {
 		BeanWrapperFieldSetMapper<TestObject> mapper = new BeanWrapperFieldSetMapper<TestObject>();
+		@SuppressWarnings("resource")
 		StaticApplicationContext context = new StaticApplicationContext();
 		mapper.setBeanFactory(context);
 		mapper.setDistanceLimit(2);
@@ -133,7 +135,7 @@ public class BeanWrapperFieldSetMapperTests {
 	}
 
 	@Test
-	@SuppressWarnings("unchecked")
+	@SuppressWarnings({"unchecked", "resource"})
 	public void testMapperWithPrototype() throws Exception {
 		ApplicationContext context = new ClassPathXmlApplicationContext("bean-wrapper.xml", getClass());
 
@@ -157,6 +159,7 @@ public class BeanWrapperFieldSetMapperTests {
 		testNestedB.setTestObjectC(new TestNestedC());
 
 		BeanWrapperFieldSetMapper<TestNestedA> mapper = new BeanWrapperFieldSetMapper<TestNestedA>();
+		@SuppressWarnings("resource")
 		StaticApplicationContext context = new StaticApplicationContext();
 		mapper.setBeanFactory(context);
 		context.getBeanFactory().registerSingleton("bean", testNestedA);
@@ -179,6 +182,7 @@ public class BeanWrapperFieldSetMapperTests {
 		TestNestedA testNestedA = new TestNestedA();
 
 		BeanWrapperFieldSetMapper<TestNestedA> mapper = new BeanWrapperFieldSetMapper<TestNestedA>();
+		@SuppressWarnings("resource")
 		StaticApplicationContext context = new StaticApplicationContext();
 		mapper.setBeanFactory(context);
 		mapper.setDistanceLimit(2);
@@ -188,7 +192,7 @@ public class BeanWrapperFieldSetMapperTests {
 		FieldSet fieldSet = new DefaultFieldSet(new String[] { "This is some dummy string", "1" }, new String[] {
 				"VALUE_A", "VALUE_B" });
 
-		TestNestedA result = (TestNestedA) mapper.mapFieldSet(fieldSet);
+		TestNestedA result = mapper.mapFieldSet(fieldSet);
 
 		assertEquals("This is some dummy string", result.getValueA());
 		assertEquals(1, result.getValueB());
@@ -199,6 +203,7 @@ public class BeanWrapperFieldSetMapperTests {
 		TestNestedC testNestedC = new TestNestedC();
 
 		BeanWrapperFieldSetMapper<TestNestedC> mapper = new BeanWrapperFieldSetMapper<TestNestedC>();
+		@SuppressWarnings("resource")
 		StaticApplicationContext context = new StaticApplicationContext();
 		mapper.setBeanFactory(context);
 		context.getBeanFactory().registerSingleton("bean", testNestedC);
@@ -221,6 +226,7 @@ public class BeanWrapperFieldSetMapperTests {
 		testNestedB.setTestObjectC(new TestNestedC());
 
 		BeanWrapperFieldSetMapper<TestNestedA> mapper = new BeanWrapperFieldSetMapper<TestNestedA>();
+		@SuppressWarnings("resource")
 		StaticApplicationContext context = new StaticApplicationContext();
 		mapper.setBeanFactory(context);
 		context.getBeanFactory().registerSingleton("bean", testNestedA);
@@ -243,6 +249,7 @@ public class BeanWrapperFieldSetMapperTests {
 		testNestedA.setTestObjectB(testNestedB);
 
 		BeanWrapperFieldSetMapper<?> mapper = new BeanWrapperFieldSetMapper<Object>();
+		@SuppressWarnings("resource")
 		StaticApplicationContext context = new StaticApplicationContext();
 		mapper.setBeanFactory(context);
 		context.getBeanFactory().registerSingleton("bean", testNestedA);
@@ -266,6 +273,7 @@ public class BeanWrapperFieldSetMapperTests {
 		testNestedA.setTestObjectB(testNestedB);
 
 		BeanWrapperFieldSetMapper<?> mapper = new BeanWrapperFieldSetMapper<Object>();
+		@SuppressWarnings("resource")
 		StaticApplicationContext context = new StaticApplicationContext();
 		mapper.setBeanFactory(context);
 		context.getBeanFactory().registerSingleton("bean", testNestedA);
@@ -306,6 +314,7 @@ public class BeanWrapperFieldSetMapperTests {
 		nestedList.setNestedC(nestedC);
 
 		BeanWrapperFieldSetMapper<?> mapper = new BeanWrapperFieldSetMapper<Object>();
+		@SuppressWarnings("resource")
 		StaticApplicationContext context = new StaticApplicationContext();
 		mapper.setBeanFactory(context);
 		context.getBeanFactory().registerSingleton("bean", nestedList);
@@ -333,6 +342,7 @@ public class BeanWrapperFieldSetMapperTests {
 				ReflectionTestUtils.setField(binder, "autoGrowNestedPaths", true);
 			}
 		};
+		@SuppressWarnings("resource")
 		StaticApplicationContext context = new StaticApplicationContext();
 		mapper.setBeanFactory(context);
 		context.getBeanFactory().registerSingleton("bean", nestedList);
@@ -356,7 +366,7 @@ public class BeanWrapperFieldSetMapperTests {
 		mapper.setTargetType(TestObject.class);
 
 		FieldSet fieldSet = new DefaultFieldSet(new String[] { "00009" }, new String[] { "varLong" });
-		TestObject bean = (TestObject) mapper.mapFieldSet(fieldSet);
+		TestObject bean = mapper.mapFieldSet(fieldSet);
 		// since Spring 2.5.5 this is OK (before that BATCH-261)
 		assertEquals(9, bean.getVarLong());
 	}
@@ -371,7 +381,7 @@ public class BeanWrapperFieldSetMapperTests {
 
 		mapper.setCustomEditors(Collections.singletonMap(Long.TYPE, new CustomNumberEditor(Long.class, NumberFormat
 				.getNumberInstance(), true)));
-		TestObject bean = (TestObject) mapper.mapFieldSet(fieldSet);
+		TestObject bean = mapper.mapFieldSet(fieldSet);
 
 		assertEquals(9, bean.getVarLong());
 	}
@@ -386,7 +396,7 @@ public class BeanWrapperFieldSetMapperTests {
 
 		mapper.setCustomEditors(Collections.singletonMap(Long.TYPE, new CustomNumberEditor(Long.class, NumberFormat
 				.getNumberInstance(), true)));
-		TestObject bean = (TestObject) mapper.mapFieldSet(fieldSet);
+		TestObject bean = mapper.mapFieldSet(fieldSet);
 
 		assertEquals(9, bean.getVarLong());
 		assertEquals(78, bean.getVarInt());
@@ -406,7 +416,7 @@ public class BeanWrapperFieldSetMapperTests {
 		editors.put(Float.TYPE, new CustomNumberEditor(Float.class, NumberFormat.getInstance(Locale.UK), true));
 		mapper.setCustomEditors(editors);
 
-		TestObject bean = (TestObject) mapper.mapFieldSet(fieldSet);
+		TestObject bean = mapper.mapFieldSet(fieldSet);
 
 		assertEquals(9876.1, bean.getVarDouble(), 0.01);
 		assertEquals(7890.1, bean.getVarFloat(), 0.01);

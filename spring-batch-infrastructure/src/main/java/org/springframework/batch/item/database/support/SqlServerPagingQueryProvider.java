@@ -19,7 +19,7 @@ package org.springframework.batch.item.database.support;
 import org.springframework.util.StringUtils;
 
 /**
- * Sql Server implementation of a
+ * SQL Server implementation of a
  * {@link org.springframework.batch.item.database.PagingQueryProvider} using
  * database specific features.
  * 

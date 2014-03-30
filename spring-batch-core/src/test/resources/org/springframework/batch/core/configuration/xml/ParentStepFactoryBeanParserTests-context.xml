@@ -5,7 +5,7 @@
 
 	<import resource="common-context.xml" />
 
-	<bean id="stepParent" class="org.springframework.batch.core.step.item.FaultTolerantStepFactoryBean" abstract="true">
+	<bean id="stepParent" class="org.springframework.batch.core.step.factory.FaultTolerantStepFactoryBean" abstract="true">
 		<property name="backOffPolicy">
 			<bean class="org.springframework.retry.backoff.FixedBackOffPolicy" />
 		</property>

@@ -64,8 +64,7 @@ import org.springframework.util.Assert;
  * @since 2.0
  * @see ListenerMetaData
  */
-@SuppressWarnings("rawtypes")
-public abstract class AbstractListenerFactoryBean implements FactoryBean, InitializingBean {
+public abstract class AbstractListenerFactoryBean<T> implements FactoryBean<Object>, InitializingBean {
 
 	private static final Log logger = LogFactory.getLog(AbstractListenerFactoryBean.class);
 

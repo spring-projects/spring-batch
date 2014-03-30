@@ -18,6 +18,7 @@ package org.springframework.batch.repeat;
 
 import org.springframework.core.NestedRuntimeException;
 
+@SuppressWarnings("serial")
 public class RepeatException extends NestedRuntimeException {
 
 	public RepeatException(String msg) {

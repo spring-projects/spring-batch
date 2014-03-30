@@ -42,9 +42,6 @@ import org.w3c.dom.Element;
  */
 public class TaskletParser {
 
-	/**
-	 * 
-	 */
 	private static final String TRANSACTION_MANAGER_ATTR = "transaction-manager";
 
 	private static final String TASKLET_REF_ATTR = "ref";
@@ -76,11 +73,8 @@ public class TaskletParser {
 
 		String taskletRef = taskletElement.getAttribute(TASKLET_REF_ATTR);
 		String taskletMethod = taskletElement.getAttribute(TASKLET_METHOD_ATTR);
-		@SuppressWarnings("unchecked")
 		List<Element> chunkElements = DomUtils.getChildElementsByTagName(taskletElement, CHUNK_ELE);
-		@SuppressWarnings("unchecked")
 		List<Element> beanElements = DomUtils.getChildElementsByTagName(taskletElement, BEAN_ELE);
-		@SuppressWarnings("unchecked")
 		List<Element> refElements = DomUtils.getChildElementsByTagName(taskletElement, REF_ELE);
 
 		validateTaskletAttributesAndSubelements(taskletElement, parserContext, stepUnderspecified, taskletRef,
@@ -193,7 +187,6 @@ public class TaskletParser {
 	}
 
 	private void handleTransactionAttributesElement(Element stepElement, MutablePropertyValues propertyValues) {
-		@SuppressWarnings("unchecked")
 		List<Element> txAttrElements = DomUtils.getChildElementsByTagName(stepElement, TX_ATTRIBUTES_ELE);
 		if (txAttrElements.size() == 1) {
 			Element txAttrElement = txAttrElements.get(0);
@@ -212,13 +205,12 @@ public class TaskletParser {
 		}
 	}
 
-	@SuppressWarnings("unchecked")
 	private void handleExceptionElement(Element element, ParserContext parserContext,
 			MutablePropertyValues propertyValues, String exceptionListName, String propertyName) {
 		List<Element> children = DomUtils.getChildElementsByTagName(element, exceptionListName);
 		if (children.size() == 1) {
 			Element exceptionClassesElement = children.get(0);
-			ManagedList list = new ManagedList();
+			ManagedList<TypedStringValue> list = new ManagedList<TypedStringValue>();
 			list.setMergeEnabled(exceptionClassesElement.hasAttribute(MERGE_ATTR)
 					&& Boolean.valueOf(exceptionClassesElement.getAttribute(MERGE_ATTR)));
 			addExceptionClasses("include", exceptionClassesElement, list, parserContext);
@@ -231,10 +223,9 @@ public class TaskletParser {
 		}
 	}
 
-	@SuppressWarnings("unchecked")
-	private void addExceptionClasses(String elementName, Element exceptionClassesElement, ManagedList list,
+	private void addExceptionClasses(String elementName, Element exceptionClassesElement, ManagedList<TypedStringValue> list,
 			ParserContext parserContext) {
-		for (Element child : (List<Element>) DomUtils.getChildElementsByTagName(exceptionClassesElement, elementName)) {
+		for (Element child : DomUtils.getChildElementsByTagName(exceptionClassesElement, elementName)) {
 			String className = child.getAttribute("class");
 			list.add(new TypedStringValue(className, Class.class));
 		}
