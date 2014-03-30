@@ -60,7 +60,7 @@ public abstract class AbstractJobParserTests {
 	 */
 	protected JobExecution createJobExecution() throws JobInstanceAlreadyCompleteException, JobRestartException,
 	JobExecutionAlreadyRunningException {
-		return jobRepository.createJobExecution(job.getName(), new JobParametersBuilder().addLong("key1", 1l).toJobParameters());
+		return jobRepository.createJobExecution(job.getName(), new JobParametersBuilder().addLong("key1", 1L).toJobParameters());
 	}
 
 	/**

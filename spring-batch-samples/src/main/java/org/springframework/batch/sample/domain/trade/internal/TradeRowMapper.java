@@ -22,7 +22,7 @@ import java.sql.SQLException;
 import org.springframework.batch.sample.domain.trade.Trade;
 import org.springframework.jdbc.core.RowMapper;
 
-public class TradeRowMapper implements RowMapper {
+public class TradeRowMapper implements RowMapper<Trade> {
 	
 	public static final int ISIN_COLUMN = 1;
 	public static final int QUANTITY_COLUMN = 2;
@@ -31,7 +31,8 @@ public class TradeRowMapper implements RowMapper {
 	public static final int ID_COLUMN = 5;
 	public static final int VERSION_COLUMN = 6;
 
-	public Object mapRow(ResultSet rs, int rowNum) throws SQLException {
+	@Override
+	public Trade mapRow(ResultSet rs, int rowNum) throws SQLException {
 		Trade trade = new Trade(rs.getLong(ID_COLUMN));
 		
 		trade.setIsin(rs.getString(ISIN_COLUMN));

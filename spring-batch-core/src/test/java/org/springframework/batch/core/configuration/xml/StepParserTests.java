@@ -77,10 +77,11 @@ public class StepParserTests {
 	}
 
 	@Test
+	@SuppressWarnings("resource")
 	public void testTaskletStepAttributes() throws Exception {
 		ConfigurableApplicationContext ctx = new ClassPathXmlApplicationContext(
 				"org/springframework/batch/core/configuration/xml/StepParserTaskletAttributesTests-context.xml");
-		@SuppressWarnings({ "unchecked", "rawtypes" })
+		@SuppressWarnings({ "rawtypes" })
 		Map<String, StepParserStepFactoryBean> beans = ctx.getBeansOfType(StepParserStepFactoryBean.class);
 		String factoryName = (String) beans.keySet().toArray()[0];
 		@SuppressWarnings("unchecked")
@@ -92,10 +93,10 @@ public class StepParserTests {
 	}
 
 	@Test
+	@SuppressWarnings("resource")
 	public void testStepParserBeanName() throws Exception {
 		ConfigurableApplicationContext ctx = new ClassPathXmlApplicationContext(
 				"org/springframework/batch/core/configuration/xml/StepParserBeanNameTests-context.xml");
-		@SuppressWarnings("unchecked")
 		Map<String, Step> beans = ctx.getBeansOfType(Step.class);
 		assertTrue("'s1' bean not found", beans.containsKey("s1"));
 		Step s1 = (Step) ctx.getBean("s1");
@@ -103,16 +104,17 @@ public class StepParserTests {
 	}
 
 	@Test(expected = BeanDefinitionParsingException.class)
+	@SuppressWarnings("resource")
 	public void testStepParserCommitIntervalCompletionPolicy() throws Exception {
 		new ClassPathXmlApplicationContext(
 				"org/springframework/batch/core/configuration/xml/StepParserCommitIntervalCompletionPolicyTests-context.xml");
 	}
 
 	@Test
+	@SuppressWarnings("resource")
 	public void testStepParserCommitInterval() throws Exception {
 		ConfigurableApplicationContext ctx = new ClassPathXmlApplicationContext(
 				"org/springframework/batch/core/configuration/xml/StepParserCommitIntervalTests-context.xml");
-		@SuppressWarnings("unchecked")
 		Map<String, Step> beans = ctx.getBeansOfType(Step.class);
 		assertTrue("'s1' bean not found", beans.containsKey("s1"));
 		Step s1 = (Step) ctx.getBean("s1");
@@ -122,10 +124,10 @@ public class StepParserTests {
 	}
 
 	@Test
+	@SuppressWarnings("resource")
 	public void testStepParserCompletionPolicy() throws Exception {
 		ConfigurableApplicationContext ctx = new ClassPathXmlApplicationContext(
 				"org/springframework/batch/core/configuration/xml/StepParserCompletionPolicyTests-context.xml");
-		@SuppressWarnings("unchecked")
 		Map<String, Step> beans = ctx.getBeansOfType(Step.class);
 		assertTrue("'s1' bean not found", beans.containsKey("s1"));
 		Step s1 = (Step) ctx.getBean("s1");
@@ -141,18 +143,21 @@ public class StepParserTests {
 	}
 
 	@Test(expected = BeanDefinitionParsingException.class)
+	@SuppressWarnings("resource")
 	public void testStepParserNoCommitIntervalOrCompletionPolicy() throws Exception {
 		new ClassPathXmlApplicationContext(
 				"org/springframework/batch/core/configuration/xml/StepParserNoCommitIntervalOrCompletionPolicyTests-context.xml");
 	}
 
 	@Test(expected = BeanDefinitionParsingException.class)
+	@SuppressWarnings("resource")
 	public void testTaskletStepWithBadStepListener() throws Exception {
 		new ClassPathXmlApplicationContext(
 				"org/springframework/batch/core/configuration/xml/StepParserBadStepListenerTests-context.xml");
 	}
 
 	@Test(expected = BeanDefinitionParsingException.class)
+	@SuppressWarnings("resource")
 	public void testTaskletStepWithBadRetryListener() throws Exception {
 		new ClassPathXmlApplicationContext(
 				"org/springframework/batch/core/configuration/xml/StepParserBadRetryListenerTests-context.xml");

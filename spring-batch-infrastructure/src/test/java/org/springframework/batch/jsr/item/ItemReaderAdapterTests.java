@@ -1,3 +1,18 @@
+/*
+ * Copyright 2013-2014 the original author or authors.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package org.springframework.batch.jsr.item;
 
 import static org.junit.Assert.assertEquals;
@@ -20,7 +35,7 @@ import org.springframework.batch.item.ItemStreamException;
 
 public class ItemReaderAdapterTests {
 
-	private ItemReaderAdapter adapter;
+	private ItemReaderAdapter<String> adapter;
 	@Mock
 	private ItemReader delegate;
 	@Mock
@@ -30,12 +45,12 @@ public class ItemReaderAdapterTests {
 	public void setUp() throws Exception {
 		MockitoAnnotations.initMocks(this);
 
-		adapter = new ItemReaderAdapter(delegate);
+		adapter = new ItemReaderAdapter<String>(delegate);
 	}
 
 	@Test(expected=IllegalArgumentException.class)
 	public void testCreateWithNull() {
-		adapter = new ItemReaderAdapter(null);
+		adapter = new ItemReaderAdapter<String>(null);
 	}
 
 	@Test
@@ -96,7 +111,7 @@ public class ItemReaderAdapterTests {
 	@Test
 	@SuppressWarnings("serial")
 	public void testCheckpointChange() throws Exception {
-		ItemReaderAdapter adapter = new ItemReaderAdapter(new ItemReader() {
+		ItemReaderAdapter<String> adapter = new ItemReaderAdapter<String>(new ItemReader() {
 
 			private CheckpointContainer container = null;
 			private List<String> items = new ArrayList<String>() {{

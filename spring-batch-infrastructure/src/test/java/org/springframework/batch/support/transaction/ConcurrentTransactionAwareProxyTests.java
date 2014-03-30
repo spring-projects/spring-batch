@@ -125,9 +125,9 @@ public class ConcurrentTransactionAwareProxyTests {
 	@Test
 	public void testTransactionalContains() throws Exception {
 		final Map<Long, Map<String, String>> map = TransactionAwareProxyFactory.createAppendOnlyTransactionalMap();
-		boolean result = (Boolean) new TransactionTemplate(transactionManager).execute(new TransactionCallback() {
+		boolean result = new TransactionTemplate(transactionManager).execute(new TransactionCallback<Boolean>() {
             @Override
-			public Object doInTransaction(TransactionStatus status) {
+			public Boolean doInTransaction(TransactionStatus status) {
 				return map.containsKey("foo");
 			}
 		});
@@ -230,9 +230,9 @@ public class ConcurrentTransactionAwareProxyTests {
 
 	private String saveInSetAndAssert(final Set<String> set, final String value) {
 
-		new TransactionTemplate(transactionManager).execute(new TransactionCallback() {
+		new TransactionTemplate(transactionManager).execute(new TransactionCallback<Void>() {
             @Override
-			public Object doInTransaction(TransactionStatus status) {
+			public Void doInTransaction(TransactionStatus status) {
 				set.add(value);
 				return null;
 			}
@@ -246,9 +246,9 @@ public class ConcurrentTransactionAwareProxyTests {
 
 	private String saveInListAndAssert(final List<String> list, final String value) {
 
-		new TransactionTemplate(transactionManager).execute(new TransactionCallback() {
+		new TransactionTemplate(transactionManager).execute(new TransactionCallback<Void>() {
             @Override
-			public Object doInTransaction(TransactionStatus status) {
+			public Void doInTransaction(TransactionStatus status) {
 				list.add(value);
 				return null;
 			}
@@ -263,9 +263,9 @@ public class ConcurrentTransactionAwareProxyTests {
 	private Map<String, String> saveInMapAndAssert(final Map<Long, Map<String, String>> map, final Long id,
 			final String value) {
 
-		new TransactionTemplate(transactionManager).execute(new TransactionCallback() {
+		new TransactionTemplate(transactionManager).execute(new TransactionCallback<Void>() {
             @Override
-			public Object doInTransaction(TransactionStatus status) {
+			public Void doInTransaction(TransactionStatus status) {
 				if (!map.containsKey(id)) {
 					map.put(id, new HashMap<String, String>());
 				}

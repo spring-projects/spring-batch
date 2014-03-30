@@ -74,7 +74,7 @@ public class MapJobExplorerIntegrationTests {
 		jobLauncher.run(job, new JobParametersBuilder().addString("test", getClass().getName()).toJobParameters());
 
 		Thread.sleep(500L);
-		JobExplorer explorer = (JobExplorer) new MapJobExplorerFactoryBean(repositoryFactory).getObject();
+		JobExplorer explorer = new MapJobExplorerFactoryBean(repositoryFactory).getObject();
 		Set<JobExecution> executions = explorer.findRunningJobExecutions("job");
 		assertEquals(1, executions.size());
 		assertEquals(1, executions.iterator().next().getStepExecutions().size());

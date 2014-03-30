@@ -45,16 +45,16 @@ import org.springframework.batch.core.ExitStatus;
 public class FlowParserTests {
 	@Test
 	public void testDuplicateTransitionPatternsAllowed() throws Exception {
-		JobExecution stoppedExecution = runJob("FlowParserTests-context", new Properties(), 10000l);
+		JobExecution stoppedExecution = runJob("FlowParserTests-context", new Properties(), 10000L);
 		assertEquals(ExitStatus.STOPPED.getExitCode(), stoppedExecution.getExitStatus());
 
-		JobExecution endedExecution = restartJob(stoppedExecution.getExecutionId(), new Properties(), 10000l);
+		JobExecution endedExecution = restartJob(stoppedExecution.getExecutionId(), new Properties(), 10000L);
 		assertEquals(ExitStatus.COMPLETED.getExitCode(), endedExecution.getExitStatus());
 	}
 
 	@Test
 	public void testWildcardAddedLastWhenUsedWithNextAttrAndNoTransitionElements() throws Exception {
-		JobExecution jobExecution = runJob("FlowParserTestsWildcardAndNextAttrJob", new Properties(), 1000l);
+		JobExecution jobExecution = runJob("FlowParserTestsWildcardAndNextAttrJob", new Properties(), 1000L);
 		assertEquals(ExitStatus.FAILED.getExitCode(), jobExecution.getExitStatus());
 
 		JobOperator jobOperator = BatchRuntime.getJobOperator();
@@ -66,7 +66,7 @@ public class FlowParserTests {
 
 	@Test
 	public void testStepGetsFailedTransitionWhenNextAttributePresent() throws Exception {
-		JobExecution jobExecution = runJob("FlowParserTestsStepGetsFailedTransitionWhenNextAttributePresent", new Properties(), 10000l);
+		JobExecution jobExecution = runJob("FlowParserTestsStepGetsFailedTransitionWhenNextAttributePresent", new Properties(), 10000L);
 		assertEquals(ExitStatus.FAILED.getExitCode(), jobExecution.getExitStatus());
 
 		JobOperator jobOperator = BatchRuntime.getJobOperator();
@@ -79,7 +79,7 @@ public class FlowParserTests {
 
 	@Test
 	public void testStepNoOverrideWhenNextAndFailedTransitionElementExists() throws Exception {
-		JobExecution jobExecution = runJob("FlowParserTestsStepNoOverrideWhenNextAndFailedTransitionElementExists", new Properties(), 10000l);
+		JobExecution jobExecution = runJob("FlowParserTestsStepNoOverrideWhenNextAndFailedTransitionElementExists", new Properties(), 10000L);
 		assertEquals(ExitStatus.FAILED.getExitCode(), jobExecution.getExitStatus());
 
 		JobOperator jobOperator = BatchRuntime.getJobOperator();

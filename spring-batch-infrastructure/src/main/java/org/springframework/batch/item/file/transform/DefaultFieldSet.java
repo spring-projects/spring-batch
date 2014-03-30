@@ -108,7 +108,7 @@ public class DefaultFieldSet implements FieldSet {
 			throw new IllegalArgumentException("Field names must be same length as values: names="
 					+ Arrays.asList(names) + ", values=" + Arrays.asList(tokens));
 		}
-		this.tokens = (String[]) tokens.clone();
+		this.tokens = tokens.clone();
 		this.names = Arrays.asList(names);
 		setNumberFormat(NumberFormat.getInstance(Locale.US));
 	}
@@ -437,7 +437,7 @@ public class DefaultFieldSet implements FieldSet {
 	 */
     @Override
 	public double readDouble(int index) {
-		return (Double) parseNumber(readAndTrim(index)).doubleValue();
+		return parseNumber(readAndTrim(index)).doubleValue();
 	}
 
 	/*
@@ -740,7 +740,7 @@ public class DefaultFieldSet implements FieldSet {
 		for (int i = 0; i < tokens.length; i++) {
 			String value = readAndTrim(i);
 			if (value != null) {
-				props.setProperty((String) names.get(i), value);
+				props.setProperty(names.get(i), value);
 			}
 		}
 		return props;

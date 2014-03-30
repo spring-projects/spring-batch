@@ -51,7 +51,7 @@ import org.springframework.util.Assert;
  *
  * It is expected that {@link #write(List)} is called inside a transaction.<br/>
  *
- * The writer is thread safe after its properties are set (normal singleton
+ * The writer is thread-safe after its properties are set (normal singleton
  * behavior), so it can be used to write in multiple concurrent transactions.
  *
  * @author Dave Syer
@@ -158,8 +158,8 @@ public class JdbcBatchItemWriter<T> implements ItemWriter<T>, InitializingBean {
 	/* (non-Javadoc)
 	 * @see org.springframework.batch.item.ItemWriter#write(java.util.List)
 	 */
+	@SuppressWarnings("unchecked")
 	@Override
-	@SuppressWarnings({"unchecked", "rawtypes"})
 	public void write(final List<? extends T> items) throws Exception {
 
 		if (!items.isEmpty()) {
@@ -183,9 +183,9 @@ public class JdbcBatchItemWriter<T> implements ItemWriter<T>, InitializingBean {
 				}
 			}
 			else {
-				updateCounts = (int[]) namedParameterJdbcTemplate.getJdbcOperations().execute(sql, new PreparedStatementCallback() {
+				updateCounts = namedParameterJdbcTemplate.getJdbcOperations().execute(sql, new PreparedStatementCallback<int[]>() {
 					@Override
-					public Object doInPreparedStatement(PreparedStatement ps) throws SQLException, DataAccessException {
+					public int[] doInPreparedStatement(PreparedStatement ps) throws SQLException, DataAccessException {
 						for (T item : items) {
 							itemPreparedStatementSetter.setValues(item, ps);
 							ps.addBatch();

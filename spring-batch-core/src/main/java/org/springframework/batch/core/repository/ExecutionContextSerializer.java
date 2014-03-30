@@ -15,6 +15,8 @@
  */
 package org.springframework.batch.core.repository;
 
+import java.util.Map;
+
 import org.springframework.core.serializer.Deserializer;
 import org.springframework.core.serializer.Serializer;
 
@@ -29,6 +31,6 @@ import org.springframework.core.serializer.Serializer;
  * @see Serializer
  * @see Deserializer
  */
-public interface ExecutionContextSerializer extends Serializer, Deserializer {
+public interface ExecutionContextSerializer extends Serializer<Map<String, Object>>, Deserializer<Map<String, Object>> {
 
 }

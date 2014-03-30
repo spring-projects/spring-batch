@@ -795,7 +795,7 @@ public class TaskletStepTests {
 
 	/**
 	 * Execution context must not be left empty even if job failed before
-	 * commiting first chunk - otherwise ItemStreams won't recognize it is
+	 * committing first chunk - otherwise ItemStreams won't recognize it is
 	 * restart scenario on next run.
 	 */
 	@Test

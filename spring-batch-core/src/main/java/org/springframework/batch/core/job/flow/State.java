@@ -35,7 +35,7 @@ public interface State {
 	 * {@link FlowExecution}. The context can be used by implementations to do
 	 * whatever they need to do. The same context will be passed to all
 	 * {@link State} instances, so implementations should be careful that the
-	 * context is thread safe, or used in a thread safe manner.
+	 * context is thread-safe, or used in a thread-safe manner.
 	 * 
 	 * @param executor the context passed in by the caller
 	 * @return a status for the execution

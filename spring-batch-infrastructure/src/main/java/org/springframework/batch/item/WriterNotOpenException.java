@@ -17,10 +17,11 @@ package org.springframework.batch.item;
 
 /**
  * Exception indicating that an {@link ItemWriter} needed to be opened before being
- * written to..
+ * written to.
  * 
  * @author Lucas Ward
  */
+@SuppressWarnings("serial")
 public class WriterNotOpenException extends ItemWriterException {
 
 	/**

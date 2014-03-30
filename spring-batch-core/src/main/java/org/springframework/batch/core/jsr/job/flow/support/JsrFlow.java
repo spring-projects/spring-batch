@@ -17,7 +17,6 @@ package org.springframework.batch.core.jsr.job.flow.support;
 
 import java.util.Set;
 
-import org.springframework.batch.core.JobExecutionException;
 import org.springframework.batch.core.Step;
 import org.springframework.batch.core.StepExecution;
 import org.springframework.batch.core.configuration.xml.SimpleFlowFactoryBean.DelegateState;
@@ -95,7 +94,7 @@ public class JsrFlow extends SimpleFlow {
 
 	/**
 	 * @return the next {@link Step} (or null if this is the end)
-	 * @throws JobExecutionException
+	 * @throws FlowExecutionException
 	 */
 	private State findState(String stateName, FlowExecutionStatus status, StepExecution stepExecution) throws FlowExecutionException {
 		Set<StateTransition> set = getTransitionMap().get(stateName);

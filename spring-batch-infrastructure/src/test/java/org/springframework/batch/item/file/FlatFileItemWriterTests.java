@@ -355,9 +355,9 @@ public class FlatFileItemWriterTests {
 		PlatformTransactionManager transactionManager = new ResourcelessTransactionManager();
 
 		writer.open(executionContext);
-		new TransactionTemplate(transactionManager).execute(new TransactionCallback() {
+		new TransactionTemplate(transactionManager).execute(new TransactionCallback<Void>() {
 			@Override
-			public Object doInTransaction(TransactionStatus status) {
+			public Void doInTransaction(TransactionStatus status) {
 				try {
 					writer.write(Collections.singletonList(TEST_STRING));
 					assertEquals(expectedInTransaction, readLine());
@@ -388,9 +388,9 @@ public class FlatFileItemWriterTests {
 
 		PlatformTransactionManager transactionManager = new ResourcelessTransactionManager();
 
-		new TransactionTemplate(transactionManager).execute(new TransactionCallback() {
+		new TransactionTemplate(transactionManager).execute(new TransactionCallback<Void>() {
 			@Override
-			public Object doInTransaction(TransactionStatus status) {
+			public Void doInTransaction(TransactionStatus status) {
 				try {
 					// write some lines
 					writer.write(Arrays.asList(new String[] { "testLine1", "testLine2", "testLine3" }));
@@ -411,9 +411,9 @@ public class FlatFileItemWriterTests {
 		// init with correct data
 		writer.open(executionContext);
 
-		new TransactionTemplate(transactionManager).execute(new TransactionCallback() {
+		new TransactionTemplate(transactionManager).execute(new TransactionCallback<Void>() {
 			@Override
-			public Object doInTransaction(TransactionStatus status) {
+			public Void doInTransaction(TransactionStatus status) {
 				try {
 					// write more lines
 					writer.write(Arrays.asList(new String[] { "testLine6", "testLine7", "testLine8" }));
@@ -468,9 +468,9 @@ public class FlatFileItemWriterTests {
 
 		PlatformTransactionManager transactionManager = new ResourcelessTransactionManager();
 
-		new TransactionTemplate(transactionManager).execute(new TransactionCallback() {
+		new TransactionTemplate(transactionManager).execute(new TransactionCallback<Void>() {
 			@Override
-			public Object doInTransaction(TransactionStatus status) {
+			public Void doInTransaction(TransactionStatus status) {
 				try {
 					// write some lines
 					writer.write(Arrays.asList(new String[] { "téstLine1", "téstLine2", "téstLine3" }));
@@ -491,9 +491,9 @@ public class FlatFileItemWriterTests {
 		// init with correct data
 		writer.open(executionContext);
 
-		new TransactionTemplate(transactionManager).execute(new TransactionCallback() {
+		new TransactionTemplate(transactionManager).execute(new TransactionCallback<Void>() {
 			@Override
-			public Object doInTransaction(TransactionStatus status) {
+			public Void doInTransaction(TransactionStatus status) {
 				try {
 					// write more lines
 					writer.write(Arrays.asList(new String[] { "téstLine6", "téstLine7", "téstLine8" }));
@@ -808,6 +808,7 @@ public class FlatFileItemWriterTests {
 				return item;
 			}
 		});
+		@SuppressWarnings("serial")
 		List<String> items = new ArrayList<String>() {
 			{
 				add("1");

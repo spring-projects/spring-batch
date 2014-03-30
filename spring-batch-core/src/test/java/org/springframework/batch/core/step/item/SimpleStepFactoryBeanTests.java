@@ -153,7 +153,7 @@ public class SimpleStepFactoryBeanTests {
 			}
 		} });
 
-		Step step = (Step) factory.getObject();
+		Step step = factory.getObject();
 
 		job.setSteps(Collections.singletonList(step));
 
@@ -417,7 +417,7 @@ public class SimpleStepFactoryBeanTests {
 		factory.setItemWriter(itemWriter);
 		factory.setItemProcessor(itemWriter);
 
-		Step step = (Step) factory.getObject();
+		Step step = factory.getObject();
 
 		job.setSteps(Collections.singletonList(step));
 
@@ -462,7 +462,7 @@ public class SimpleStepFactoryBeanTests {
 		factory.setListeners(new StepListener[] { itemWriter });
 		factory.setItemWriter(itemWriter);
 
-		Step step = (Step) factory.getObject();
+		Step step = factory.getObject();
 
 		job.setSteps(Collections.singletonList(step));
 
@@ -488,7 +488,7 @@ public class SimpleStepFactoryBeanTests {
 			}
 		});
 
-		Step step = (Step) factory.getObject();
+		Step step = factory.getObject();
 
 		job.setSteps(Collections.singletonList(step));
 

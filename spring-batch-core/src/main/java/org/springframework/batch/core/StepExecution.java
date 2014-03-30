@@ -499,7 +499,7 @@ public class StepExecution extends Entity {
 	}
 
 	/**
-	 * Deserialise and ensure transient fields are re-instantiated when read
+	 * Deserialize and ensure transient fields are re-instantiated when read
 	 * back
 	 */
 	private void readObject(ObjectInputStream stream) throws IOException, ClassNotFoundException {

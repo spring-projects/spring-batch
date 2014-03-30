@@ -24,6 +24,7 @@ package org.springframework.batch.core;
  * @author Dave Syer
  * 
  */
+@SuppressWarnings("serial")
 public class JobExecutionException extends Exception {
 
 	/**

@@ -62,7 +62,7 @@ public class JsrPartitionHandlerTests {
 	@Before
 	public void setUp() throws Exception {
 		JobExecution jobExecution = new JobExecution(1L);
-		jobExecution.setJobInstance(new JobInstance(1l, "job"));
+		jobExecution.setJobInstance(new JobInstance(1L, "job"));
 		stepExecution = new StepExecution("step1", jobExecution);
 		stepSplitter = new JsrStepExecutionSplitter(repository, false, "step1", true);
 		Analyzer.collectorData = "";
@@ -79,7 +79,7 @@ public class JsrPartitionHandlerTests {
 		});
 		propertyContext = new BatchPropertyContext();
 		handler.setPropertyContext(propertyContext);
-		repository = new MapJobRepositoryFactoryBean().getJobRepository();
+		repository = new MapJobRepositoryFactoryBean().getObject();
 		handler.setJobRepository(repository);
 		MyPartitionReducer.reset();
 		CountingPartitionCollector.reset();
@@ -223,7 +223,7 @@ public class JsrPartitionHandlerTests {
 
 	@Test
 	public void testRestartNoOverride() throws Exception {
-		javax.batch.runtime.JobExecution execution1 = JsrTestUtils.runJob("jsrPartitionHandlerRestartWithOverrideJob", null, 1000000l);
+		javax.batch.runtime.JobExecution execution1 = JsrTestUtils.runJob("jsrPartitionHandlerRestartWithOverrideJob", null, 1000000L);
 		assertEquals(BatchStatus.FAILED, execution1.getBatchStatus());
 		assertEquals(1, MyPartitionReducer.beginCount);
 		assertEquals(0, MyPartitionReducer.beforeCount);
@@ -234,7 +234,7 @@ public class JsrPartitionHandlerTests {
 		MyPartitionReducer.reset();
 		CountingPartitionCollector.reset();
 
-		javax.batch.runtime.JobExecution execution2 = JsrTestUtils.restartJob(execution1.getExecutionId(), null, 1000000l);
+		javax.batch.runtime.JobExecution execution2 = JsrTestUtils.restartJob(execution1.getExecutionId(), null, 1000000L);
 		assertEquals(BatchStatus.COMPLETED, execution2.getBatchStatus());
 		assertEquals(1, MyPartitionReducer.beginCount);
 		assertEquals(1, MyPartitionReducer.beforeCount);
@@ -249,7 +249,7 @@ public class JsrPartitionHandlerTests {
 		Properties jobParameters = new Properties();
 		jobParameters.put("mapper.override", "true");
 
-		javax.batch.runtime.JobExecution execution1 = JsrTestUtils.runJob("jsrPartitionHandlerRestartWithOverrideJob", jobParameters, 1000000l);
+		javax.batch.runtime.JobExecution execution1 = JsrTestUtils.runJob("jsrPartitionHandlerRestartWithOverrideJob", jobParameters, 1000000L);
 		assertEquals(BatchStatus.FAILED, execution1.getBatchStatus());
 		assertEquals(1, MyPartitionReducer.beginCount);
 		assertEquals(0, MyPartitionReducer.beforeCount);
@@ -260,7 +260,7 @@ public class JsrPartitionHandlerTests {
 		MyPartitionReducer.reset();
 		CountingPartitionCollector.reset();
 
-		javax.batch.runtime.JobExecution execution2 = JsrTestUtils.restartJob(execution1.getExecutionId(), jobParameters, 1000000l);
+		javax.batch.runtime.JobExecution execution2 = JsrTestUtils.restartJob(execution1.getExecutionId(), jobParameters, 1000000L);
 		assertEquals(BatchStatus.COMPLETED, execution2.getBatchStatus());
 		assertEquals(1, MyPartitionReducer.beginCount);
 		assertEquals(1, MyPartitionReducer.beforeCount);

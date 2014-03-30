@@ -20,7 +20,7 @@ import java.math.BigDecimal;
 
 /**
  * Immutable Value Object representing an update to the customer as stored in the database. 
- * This object has the customer name, credit ammount, and the operation to be performed
+ * This object has the customer name, credit amount, and the operation to be performed
  * on them.  In the case of an add, a new customer will be entered with the appropriate 
  * credit.  In the case of an update, the customer's credit is considered an absolute update.
  * Deletes are currently not supported, but can still be read in from a file.

@@ -90,7 +90,7 @@ public class RepeatTemplate implements RepeatOperations {
 	public void registerListener(RepeatListener listener) {
 		List<RepeatListener> list = new ArrayList<RepeatListener>(Arrays.asList(listeners));
 		list.add(listener);
-		listeners = (RepeatListener[]) list.toArray(new RepeatListener[list.size()]);
+		listeners = list.toArray(new RepeatListener[list.size()]);
 	}
 
 	/**
@@ -159,7 +159,7 @@ public class RepeatTemplate implements RepeatOperations {
 	 * 
 	 * @param callback the callback to process each element of the loop.
 	 * 
-	 * @return the aggregate of {@link ContinuationPolicy#canContinue(Object)}
+	 * @return the aggregate of {@link RepeatTemplate#canContinue(RepeatStatus)}
 	 * for all the results from the callback.
 	 * 
 	 */
@@ -248,7 +248,7 @@ public class RepeatTemplate implements RepeatOperations {
 			try {
 
 				if (!deferred.isEmpty()) {
-					Throwable throwable = (Throwable) deferred.iterator().next();
+					Throwable throwable = deferred.iterator().next();
 					logger.debug("Handling fatal exception explicitly (rethrowing first of " + deferred.size() + "): "
 							+ throwable.getClass().getName() + ": " + throwable.getMessage());
 					rethrow(throwable);
@@ -389,7 +389,7 @@ public class RepeatTemplate implements RepeatOperations {
 	 * @return true if the value is {@link RepeatStatus#CONTINUABLE}.
 	 */
 	protected final boolean canContinue(RepeatStatus value) {
-		return ((RepeatStatus) value).isContinuable();
+		return value.isContinuable();
 	}
 
 	private boolean isMarkedComplete(RepeatContext context) {

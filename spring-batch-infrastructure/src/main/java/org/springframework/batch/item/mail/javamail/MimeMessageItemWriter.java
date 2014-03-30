@@ -105,7 +105,6 @@ public class MimeMessageItemWriter implements ItemWriter<MimeMessage> {
 			mailSender.send(items.toArray(new MimeMessage[items.size()]));
 		}
 		catch (MailSendException e) {
-			@SuppressWarnings("unchecked")
 			Map<Object, Exception> failedMessages = e.getFailedMessages();
 			for (Entry<Object, Exception> entry : failedMessages.entrySet()) {
 				mailErrorHandler.handle(new MimeMailMessage((MimeMessage)entry.getKey()), entry.getValue());

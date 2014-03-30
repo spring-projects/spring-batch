@@ -23,7 +23,6 @@ import org.hibernate.SessionFactory;
 import org.hibernate.StatelessSession;
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.item.ItemReader;
-import org.springframework.batch.item.ItemStream;
 import org.springframework.batch.item.database.orm.HibernateQueryProvider;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.util.Assert;

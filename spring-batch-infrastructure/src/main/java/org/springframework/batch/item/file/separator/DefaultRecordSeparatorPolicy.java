@@ -113,7 +113,7 @@ public class DefaultRecordSeparatorPolicy extends SimpleRecordSeparatorPolicy {
 	 * contains an unterminated quote, indicating that the record is continuing
 	 * onto the next line.
 	 * 
-	 * @param result
+	 * @param line
 	 * @return
 	 */
 	private boolean isQuoteUnterminated(String line) {
@@ -125,7 +125,7 @@ public class DefaultRecordSeparatorPolicy extends SimpleRecordSeparatorPolicy {
 	 * with the continuation marker, indicating that the record is continuing
 	 * onto the next line.
 	 * 
-	 * @param result
+	 * @param line
 	 * @return
 	 */
 	private boolean isContinued(String line) {

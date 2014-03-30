@@ -24,6 +24,7 @@ package org.springframework.batch.core.step.skip;
  * @author Lucas Ward
  * @author Dave Syer
  */
+@SuppressWarnings("serial")
 public class SkipLimitExceededException extends SkipException {
 
 	private final int skipLimit;

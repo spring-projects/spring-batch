@@ -92,17 +92,17 @@ public class DataSourceInitializer implements InitializingBean {
 		}
 	}
 
-	@SuppressWarnings({ "unchecked", "rawtypes" })
+	@SuppressWarnings({ "unchecked" })
 	private void doExecuteScript(final Resource scriptResource) {
 		if (scriptResource == null || !scriptResource.exists()) {
 			throw new IllegalArgumentException("Script resource is null or does not exist");
 		}
 
 		TransactionTemplate transactionTemplate = new TransactionTemplate(new DataSourceTransactionManager(dataSource));
-		transactionTemplate.execute(new TransactionCallback() {
+		transactionTemplate.execute(new TransactionCallback<Void>() {
 
 			@Override
-			public Object doInTransaction(TransactionStatus status) {
+			public Void doInTransaction(TransactionStatus status) {
 				JdbcTemplate jdbcTemplate = new JdbcTemplate(dataSource);
 				String[] scripts;
 				try {

@@ -113,6 +113,7 @@ public class PlayerSummary {
 	}
 	
 	
+	@Override
 	public String toString() {
 		return "Player Summary: ID=" + id + " Year=" + year + "[" + completes + ";" + attempts + ";" + passingYards +
 				";" + passingTd + ";" + interceptions + ";" + rushes + ";" + rushYards + ";" + receptions +

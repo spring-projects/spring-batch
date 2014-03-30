@@ -65,7 +65,7 @@ public class JsrStepHandler extends SimpleStepHandler {
 	 * Given a step and configuration, return true if the step should start,
 	 * false if it should not, and throw an exception if the job should finish.
 	 * @param lastStepExecution the last step execution
-	 * @param jobInstance
+	 * @param jobExecution
 	 * @param step
 	 *
 	 * @throws StartLimitExceededException if the start limit has been exceeded

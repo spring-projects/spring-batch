@@ -94,9 +94,8 @@ public class StepScope extends BatchScopeSupport {
 	/**
 	 * @see Scope#get(String, ObjectFactory)
 	 */
-	@SuppressWarnings("rawtypes")
 	@Override
-	public Object get(String name, ObjectFactory objectFactory) {
+	public Object get(String name, ObjectFactory<?> objectFactory) {
 		StepContext context = getContext();
 		Object scopedObject = context.getAttribute(name);
 

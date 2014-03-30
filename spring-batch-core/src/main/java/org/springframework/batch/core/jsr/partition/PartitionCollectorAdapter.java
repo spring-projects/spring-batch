@@ -28,7 +28,7 @@ import org.springframework.util.Assert;
 
 /**
  * Adapter class used to wrap a {@link PartitionCollector} so that it can be consumed
- * as a {@link ChunkListener}.  A thread safe {@link Queue} is required along with the
+ * as a {@link ChunkListener}.  A thread-safe {@link Queue} is required along with the
  * {@link PartitionCollector}.  The {@link Queue} is where the result of the call to
  * the PartitionCollector will be placed.
  *
@@ -42,7 +42,7 @@ public class PartitionCollectorAdapter implements ChunkListener {
 	private ReentrantLock lock;
 
 	public PartitionCollectorAdapter(Queue<Serializable> queue, PartitionCollector collector) {
-		Assert.notNull(queue, "A thread safe Queue is required");
+		Assert.notNull(queue, "A thread-safe Queue is required");
 		Assert.notNull(collector, "A PartitionCollector is required");
 
 		this.partitionQueue = queue;

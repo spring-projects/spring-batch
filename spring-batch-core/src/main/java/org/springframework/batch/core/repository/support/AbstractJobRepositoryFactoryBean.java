@@ -46,7 +46,6 @@ import org.springframework.util.Assert;
  * @author Lucas Ward
  * @author Robert Kasanicky
  */
-@SuppressWarnings("rawtypes")
 public abstract class AbstractJobRepositoryFactoryBean implements FactoryBean<JobRepository>, InitializingBean {
 
 	private PlatformTransactionManager transactionManager;

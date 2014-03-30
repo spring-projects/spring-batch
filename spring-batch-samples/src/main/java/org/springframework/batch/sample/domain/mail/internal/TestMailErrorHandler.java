@@ -39,6 +39,7 @@ public class TestMailErrorHandler implements MailErrorHandler {
 
 	private List<MailMessage> failedMessages = new ArrayList<MailMessage>();
 
+	@Override
 	public void handle(MailMessage failedMessage, Exception ex) {
 		this.failedMessages.add(failedMessage);
 		LOGGER.error("Mail message failed: " + failedMessage, ex);

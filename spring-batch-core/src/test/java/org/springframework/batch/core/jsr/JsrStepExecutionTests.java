@@ -1,3 +1,18 @@
+/*
+ * Copyright 2014 the original author or authors.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package org.springframework.batch.core.jsr;
 
 import static org.junit.Assert.assertEquals;
@@ -27,10 +42,10 @@ public class JsrStepExecutionTests {
 
 	@Before
 	public void setUp() throws Exception {
-		JobExecution jobExecution = new JobExecution(1l, new JobParametersBuilder().addString("key", "value").toJobParameters());
+		JobExecution jobExecution = new JobExecution(1L, new JobParametersBuilder().addString("key", "value").toJobParameters());
 
 		stepExecution = new StepExecution("testStep", jobExecution);
-		stepExecution.setId(5l);
+		stepExecution.setId(5L);
 		stepExecution.setStatus(BatchStatus.STARTED);
 		stepExecution.setExitStatus(new ExitStatus("customExitStatus"));
 		stepExecution.setCommitCount(1);
@@ -62,7 +77,7 @@ public class JsrStepExecutionTests {
 
 	@Test
 	public void testBaseValues() {
-		assertEquals(5l, jsrStepExecution.getStepExecutionId());
+		assertEquals(5L, jsrStepExecution.getStepExecutionId());
 		assertEquals("testStep", jsrStepExecution.getStepName());
 		assertEquals(javax.batch.runtime.BatchStatus.STARTED, jsrStepExecution.getBatchStatus());
 		assertEquals(new Date(0), jsrStepExecution.getStartTime());

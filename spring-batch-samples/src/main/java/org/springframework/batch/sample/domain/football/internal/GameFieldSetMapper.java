@@ -22,6 +22,7 @@ import org.springframework.batch.sample.domain.football.Game;
 
 public class GameFieldSetMapper implements FieldSetMapper<Game> {
 
+	@Override
 	public Game mapFieldSet(FieldSet fs) {
 		
 		if(fs == null){

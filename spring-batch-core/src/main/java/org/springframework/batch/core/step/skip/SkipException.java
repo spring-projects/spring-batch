@@ -22,6 +22,7 @@ import org.springframework.batch.core.UnexpectedJobExecutionException;
  * 
  * @author Dave Syer
  */
+@SuppressWarnings("serial")
 public abstract class SkipException extends UnexpectedJobExecutionException {
 
 	/**

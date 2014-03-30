@@ -24,6 +24,7 @@ import java.math.BigDecimal;
  * @author Rob Harrop
  * @author Dave Syer
  */
+@SuppressWarnings("serial")
 public class Trade implements Serializable {
     private String isin = "";
     private long quantity = 0;
@@ -97,7 +98,8 @@ public class Trade implements Serializable {
         return customer;
     }
 
-    public String toString() {
+    @Override
+	public String toString() {
         return "Trade: [isin=" + this.isin + ",quantity=" + this.quantity + ",price="
             + this.price + ",customer=" + this.customer + "]";
     }

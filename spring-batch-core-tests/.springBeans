@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <beansProjectDescription>
 	<version>1</version>
-	<pluginVersion><![CDATA[2.3.0.200912170948-RELEASE]]></pluginVersion>
+	<pluginVersion><![CDATA[3.3.0.201307091516-RELEASE]]></pluginVersion>
 	<configSuffixes>
 		<configSuffix><![CDATA[xml]]></configSuffix>
 	</configSuffixes>
@@ -10,6 +10,10 @@
 		<config>src/test/resources/data-source-context.xml</config>
 		<config>src/test/resources/simple-job-launcher-context.xml</config>
 		<config>src/test/resources/org/springframework/batch/core/test/step/SplitJobMapRepositoryIntegrationTests-context.xml</config>
+		<config>src/main/resources/META-INF/batch/footballJob.xml</config>
+		<config>src/main/resources/META-INF/batch/footballSkipJob.xml</config>
+		<config>src/main/resources/META-INF/batch/parallelJob.xml</config>
+		<config>src/main/resources/META-INF/batch/timeoutJob.xml</config>
 	</configs>
 	<configSets>
 		<configSet>
@@ -18,6 +22,8 @@
 			<incomplete>false</incomplete>
 			<configs>
 			</configs>
+			<profiles>
+			</profiles>
 		</configSet>
 		<configSet>
 			<name><![CDATA[beanWrapper]]></name>
@@ -25,6 +31,8 @@
 			<incomplete>false</incomplete>
 			<configs>
 			</configs>
+			<profiles>
+			</profiles>
 		</configSet>
 		<configSet>
 			<name><![CDATA[delegating]]></name>
@@ -32,6 +40,8 @@
 			<incomplete>false</incomplete>
 			<configs>
 			</configs>
+			<profiles>
+			</profiles>
 		</configSet>
 		<configSet>
 			<name><![CDATA[football]]></name>
@@ -39,6 +49,8 @@
 			<incomplete>false</incomplete>
 			<configs>
 			</configs>
+			<profiles>
+			</profiles>
 		</configSet>
 		<configSet>
 			<name><![CDATA[infiniteLoop]]></name>
@@ -46,6 +58,8 @@
 			<incomplete>false</incomplete>
 			<configs>
 			</configs>
+			<profiles>
+			</profiles>
 		</configSet>
 		<configSet>
 			<name><![CDATA[multiline]]></name>
@@ -53,6 +67,8 @@
 			<incomplete>false</incomplete>
 			<configs>
 			</configs>
+			<profiles>
+			</profiles>
 		</configSet>
 		<configSet>
 			<name><![CDATA[parallel]]></name>
@@ -60,6 +76,8 @@
 			<incomplete>false</incomplete>
 			<configs>
 			</configs>
+			<profiles>
+			</profiles>
 		</configSet>
 		<configSet>
 			<name><![CDATA[restart]]></name>
@@ -67,6 +85,8 @@
 			<incomplete>false</incomplete>
 			<configs>
 			</configs>
+			<profiles>
+			</profiles>
 		</configSet>
 		<configSet>
 			<name><![CDATA[retry]]></name>
@@ -74,6 +94,8 @@
 			<incomplete>false</incomplete>
 			<configs>
 			</configs>
+			<profiles>
+			</profiles>
 		</configSet>
 		<configSet>
 			<name><![CDATA[trade]]></name>
@@ -81,6 +103,8 @@
 			<incomplete>false</incomplete>
 			<configs>
 			</configs>
+			<profiles>
+			</profiles>
 		</configSet>
 		<configSet>
 			<name><![CDATA[batchUpdate]]></name>
@@ -88,6 +112,8 @@
 			<incomplete>false</incomplete>
 			<configs>
 			</configs>
+			<profiles>
+			</profiles>
 		</configSet>
 		<configSet>
 			<name><![CDATA[quartzLauncher]]></name>
@@ -95,6 +121,8 @@
 			<incomplete>false</incomplete>
 			<configs>
 			</configs>
+			<profiles>
+			</profiles>
 		</configSet>
 		<configSet>
 			<name><![CDATA[compositeItemWriter]]></name>
@@ -102,6 +130,8 @@
 			<incomplete>false</incomplete>
 			<configs>
 			</configs>
+			<profiles>
+			</profiles>
 		</configSet>
 		<configSet>
 			<name><![CDATA[adhocLoop]]></name>
@@ -109,6 +139,8 @@
 			<incomplete>false</incomplete>
 			<configs>
 			</configs>
+			<profiles>
+			</profiles>
 		</configSet>
 		<configSet>
 			<name><![CDATA[staging]]></name>
@@ -116,6 +148,8 @@
 			<incomplete>false</incomplete>
 			<configs>
 			</configs>
+			<profiles>
+			</profiles>
 		</configSet>
 		<configSet>
 			<name><![CDATA[common]]></name>
@@ -123,6 +157,8 @@
 			<incomplete>false</incomplete>
 			<configs>
 			</configs>
+			<profiles>
+			</profiles>
 		</configSet>
 		<configSet>
 			<name><![CDATA[jmxLauncher]]></name>
@@ -130,6 +166,8 @@
 			<incomplete>false</incomplete>
 			<configs>
 			</configs>
+			<profiles>
+			</profiles>
 		</configSet>
 		<configSet>
 			<name><![CDATA[headerFooter]]></name>
@@ -137,6 +175,8 @@
 			<incomplete>false</incomplete>
 			<configs>
 			</configs>
+			<profiles>
+			</profiles>
 		</configSet>
 		<configSet>
 			<name><![CDATA[customerFilterJob]]></name>
@@ -144,6 +184,8 @@
 			<incomplete>false</incomplete>
 			<configs>
 			</configs>
+			<profiles>
+			</profiles>
 		</configSet>
 		<configSet>
 			<name><![CDATA[hibernate]]></name>
@@ -151,6 +193,8 @@
 			<incomplete>false</incomplete>
 			<configs>
 			</configs>
+			<profiles>
+			</profiles>
 		</configSet>
 		<configSet>
 			<name><![CDATA[multiResourceJob]]></name>
@@ -158,6 +202,8 @@
 			<incomplete>false</incomplete>
 			<configs>
 			</configs>
+			<profiles>
+			</profiles>
 		</configSet>
 		<configSet>
 			<name><![CDATA[skipSample]]></name>
@@ -165,6 +211,8 @@
 			<incomplete>false</incomplete>
 			<configs>
 			</configs>
+			<profiles>
+			</profiles>
 		</configSet>
 		<configSet>
 			<name><![CDATA[iosample-hibernate]]></name>
@@ -172,6 +220,8 @@
 			<incomplete>false</incomplete>
 			<configs>
 			</configs>
+			<profiles>
+			</profiles>
 		</configSet>
 		<configSet>
 			<name><![CDATA[iosample-jdbc]]></name>
@@ -179,6 +229,8 @@
 			<incomplete>false</incomplete>
 			<configs>
 			</configs>
+			<profiles>
+			</profiles>
 		</configSet>
 		<configSet>
 			<name><![CDATA[iosample-multiline]]></name>
@@ -186,6 +238,8 @@
 			<incomplete>false</incomplete>
 			<configs>
 			</configs>
+			<profiles>
+			</profiles>
 		</configSet>
 		<configSet>
 			<name><![CDATA[iosample-multiRecordType]]></name>
@@ -193,6 +247,8 @@
 			<incomplete>false</incomplete>
 			<configs>
 			</configs>
+			<profiles>
+			</profiles>
 		</configSet>
 		<configSet>
 			<name><![CDATA[iosample-jpa]]></name>
@@ -200,6 +256,8 @@
 			<incomplete>false</incomplete>
 			<configs>
 			</configs>
+			<profiles>
+			</profiles>
 		</configSet>
 		<configSet>
 			<name><![CDATA[data-source-contex]]></name>
@@ -207,6 +265,8 @@
 			<incomplete>false</incomplete>
 			<configs>
 			</configs>
+			<profiles>
+			</profiles>
 		</configSet>
 		<configSet>
 			<name><![CDATA[ibatis]]></name>
@@ -214,6 +274,8 @@
 			<incomplete>false</incomplete>
 			<configs>
 			</configs>
+			<profiles>
+			</profiles>
 		</configSet>
 		<configSet>
 			<name><![CDATA[partition]]></name>
@@ -221,6 +283,8 @@
 			<incomplete>false</incomplete>
 			<configs>
 			</configs>
+			<profiles>
+			</profiles>
 		</configSet>
 		<configSet>
 			<name><![CDATA[multilineOrder]]></name>
@@ -228,6 +292,8 @@
 			<incomplete>false</incomplete>
 			<configs>
 			</configs>
+			<profiles>
+			</profiles>
 		</configSet>
 		<configSet>
 			<name><![CDATA[restartFile]]></name>
@@ -235,6 +301,8 @@
 			<incomplete>false</incomplete>
 			<configs>
 			</configs>
+			<profiles>
+			</profiles>
 		</configSet>
 	</configSets>
 </beansProjectDescription>

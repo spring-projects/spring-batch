@@ -1,3 +1,18 @@
+/*
+ * Copyright 2013-2014 the original author or authors.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package org.springframework.batch.core.jsr.configuration.xml;
 
 import java.io.IOException;
@@ -40,6 +55,7 @@ public class JsrBeanDefinitionDocumentReaderTests {
 	private ErrorHandler errorHandler = new SimpleSaxErrorHandler(logger);
 
 	@Test
+	@SuppressWarnings("resource")
 	public void testGetJobParameters() {
 		Properties jobParameters = new Properties();
 		jobParameters.setProperty("jobParameter1", "jobParameter1Value");
@@ -65,6 +81,7 @@ public class JsrBeanDefinitionDocumentReaderTests {
 	public void testGetJobProperties() {
 		Document document = getDocument("/META-INF/batch-jobs/jsrPropertyPreparseTestJob.xml");
 
+		@SuppressWarnings("resource")
 		JsrXmlApplicationContext applicationContext = new JsrXmlApplicationContext();
 		JsrBeanDefinitionDocumentReader documentReader = new JsrBeanDefinitionDocumentReader(applicationContext);
 		documentReader.initProperties(document.getDocumentElement());
@@ -84,6 +101,7 @@ public class JsrBeanDefinitionDocumentReaderTests {
 		jobParameters.setProperty("jobParameter2", "#{jobProperties['jobProperty2']}");
 		jobParameters.setProperty("jobParameter3", "#{jobParameters['jobParameter1']}");
 
+		@SuppressWarnings("resource")
 		JsrXmlApplicationContext applicationContext = new JsrXmlApplicationContext(jobParameters);
 		applicationContext.setValidating(false);
 		applicationContext.load(new ClassPathResource("baseContext.xml"),
@@ -110,6 +128,7 @@ public class JsrBeanDefinitionDocumentReaderTests {
 		Properties jobParameters = new Properties();
 		jobParameters.setProperty("file.name", "myfile.txt");
 
+		@SuppressWarnings("resource")
 		JsrXmlApplicationContext applicationContext = new JsrXmlApplicationContext(jobParameters);
 		applicationContext.setValidating(false);
 		applicationContext.load(new ClassPathResource("baseContext.xml"),
@@ -130,6 +149,7 @@ public class JsrBeanDefinitionDocumentReaderTests {
 		assertEquals("myfile.txt", resolvedProperties.getProperty("jobProperty3"));
 	}
 
+	@SuppressWarnings("resource")
 	@Test
 	public void testGenerationOfBeanDefinitionsForMultipleReferences() throws Exception {
 		JsrXmlApplicationContext applicationContext = new JsrXmlApplicationContext(new Properties());
@@ -184,6 +204,7 @@ public class JsrBeanDefinitionDocumentReaderTests {
 	}
 
 	@Test
+	@SuppressWarnings("resource")
 	public void testGenerationOfSpringBeanDefinitionsForMultipleReferences() {
 		JsrXmlApplicationContext applicationContext = new JsrXmlApplicationContext(new Properties());
 		applicationContext.setValidating(false);

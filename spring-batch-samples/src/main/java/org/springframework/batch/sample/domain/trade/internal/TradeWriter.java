@@ -47,6 +47,7 @@ public class TradeWriter extends ItemStreamSupport implements ItemWriter<Trade> 
 
 	private BigDecimal totalPrice = BigDecimal.ZERO;
 
+	@Override
 	public void write(List<? extends Trade> trades) {
 
 		for (Trade trade : trades) {

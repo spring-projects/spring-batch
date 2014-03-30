@@ -1,3 +1,18 @@
+/*
+ * Copyright 2007-2014 the original author or authors.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package org.springframework.batch.sample;
 
 import static org.junit.Assert.assertEquals;
@@ -101,12 +116,11 @@ public class HibernateFailureJobFunctionalTests {
 	/**
 	 * All customers have the same credit
 	 */
-	@SuppressWarnings("unchecked")
 	protected void validatePreConditions() throws Exception {
 		ensureState();
-		creditsBeforeUpdate = (List<BigDecimal>) new TransactionTemplate(transactionManager).execute(new TransactionCallback() {
+		creditsBeforeUpdate = new TransactionTemplate(transactionManager).execute(new TransactionCallback<List<BigDecimal>>() {
 			@Override
-			public Object doInTransaction(TransactionStatus status) {
+			public List<BigDecimal> doInTransaction(TransactionStatus status) {
 				return jdbcTemplate.query(ALL_CUSTOMERS, new ParameterizedRowMapper<BigDecimal>() {
 					@Override
 					public BigDecimal mapRow(ResultSet rs, int rowNum) throws SQLException {
@@ -122,10 +136,11 @@ public class HibernateFailureJobFunctionalTests {
 	 * customer table and reading the expected defaults.
 	 */
 	private void ensureState(){
-		new TransactionTemplate(transactionManager).execute(new TransactionCallback() {
+		new TransactionTemplate(transactionManager).execute(new TransactionCallback<Void>(){
+
 			@Override
-			public Object doInTransaction(TransactionStatus status) {
-				jdbcTemplate.update(DELETE_CUSTOMERS);
+			public Void doInTransaction(TransactionStatus status) {
+                jdbcTemplate.update(DELETE_CUSTOMERS);
 				for (String customer : customers) {
 					jdbcTemplate.update(customer);
 				}
@@ -140,9 +155,9 @@ public class HibernateFailureJobFunctionalTests {
 	protected void validatePostConditions() throws Exception {
 		final List<BigDecimal> matches = new ArrayList<BigDecimal>();
 
-		new TransactionTemplate(transactionManager).execute(new TransactionCallback() {
+		new TransactionTemplate(transactionManager).execute(new TransactionCallback<Void>() {
 			@Override
-			public Object doInTransaction(TransactionStatus status) {
+			public Void doInTransaction(TransactionStatus status) {
                 jdbcTemplate.query(ALL_CUSTOMERS, new RowCallbackHandler() {
 					private int i = 0;
 

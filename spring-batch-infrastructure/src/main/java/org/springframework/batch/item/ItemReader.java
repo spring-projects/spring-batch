@@ -23,7 +23,7 @@ package org.springframework.batch.item;
  * for each batch, with each call to {@link #read()} returning a different value
  * and finally returning <code>null</code> when all input data is exhausted.<br/>
  * 
- * Implementations need *not* be thread safe and clients of a {@link ItemReader}
+ * Implementations need <b>not</b> be thread-safe and clients of a {@link ItemReader}
  * need to be aware that this is the case.<br/>
  * 
  * A richer interface (e.g. with a look ahead or peek) is not feasible because

@@ -41,7 +41,7 @@ public class JsrFlowTests extends SimpleFlowTests {
 
 	@Test
 	public void testNextBasedOnBatchStatus() throws Exception {
-		StepExecution stepExecution = new StepExecution("step1", new JobExecution(5l));
+		StepExecution stepExecution = new StepExecution("step1", new JobExecution(5L));
 		stepExecution.setExitStatus(new ExitStatus("unmapped exit code"));
 		stepExecution.setStatus(BatchStatus.FAILED);
 		executor = new FlowExecutor(stepExecution);

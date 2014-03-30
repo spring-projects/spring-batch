@@ -60,7 +60,7 @@ import com.mongodb.util.JSON;
  * <p>
  * The implementation is thread-safe between calls to
  * {@link #open(ExecutionContext)}, but remember to use <code>saveState=false</code>
- * if used in a multi-threaded client (no restart available.
+ * if used in a multi-threaded client (no restart available).
  * </p>
  *
  *
@@ -127,7 +127,7 @@ public class MongoItemReader<T> extends AbstractPaginatedDataItemReader<T> imple
 	 * JSON defining the fields to be returned from the matching documents
 	 * by MongoDB.
 	 *
-	 * @param fields JSON string that identifies the fields to sorty by.
+	 * @param fields JSON string that identifies the fields to sort by.
 	 */
 	public void setFields(String fields) {
 		this.fields = fields;
@@ -183,6 +183,7 @@ public class MongoItemReader<T> extends AbstractPaginatedDataItemReader<T> imple
 	 *
 	 * @see InitializingBean#afterPropertiesSet()
 	 */
+	@Override
 	public void afterPropertiesSet() throws Exception {
 		Assert.state(template != null, "An implementation of MongoOperations is required.");
 		Assert.state(type != null, "A type to convert the input into is required.");

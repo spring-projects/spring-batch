@@ -32,7 +32,7 @@ import org.springframework.util.xml.DomUtils;
 import org.w3c.dom.Element;
 
 /**
- * Parser for the lt;job/gt; element in the Batch namespace. Sets up and returns
+ * Parser for the &lt;job/&gt; element in the Batch namespace. Sets up and returns
  * a bean definition for a {@link org.springframework.batch.core.Job}.
  * 
  * @author Dave Syer
@@ -63,7 +63,6 @@ public class JobParser extends AbstractSingleBeanDefinitionParser {
 	 * @see AbstractSingleBeanDefinitionParser#doParse(Element, ParserContext,
 	 * BeanDefinitionBuilder)
 	 */
-	@SuppressWarnings("unchecked")
 	@Override
 	protected void doParse(Element element, ParserContext parserContext, BeanDefinitionBuilder builder) {
 
@@ -134,7 +133,7 @@ public class JobParser extends AbstractSingleBeanDefinitionParser {
 			CompositeComponentDefinition compositeDef = new CompositeComponentDefinition(listenersElement.getTagName(),
 					parserContext.extractSource(element));
 			parserContext.pushContainingComponent(compositeDef);
-			ManagedList listeners = new ManagedList();
+			ManagedList<BeanDefinition> listeners = new ManagedList<BeanDefinition>();
 			listeners.setMergeEnabled(listenersElement.hasAttribute(MERGE_ATTR)
 					&& Boolean.valueOf(listenersElement.getAttribute(MERGE_ATTR)));
 			List<Element> listenerElements = DomUtils.getChildElementsByTagName(listenersElement, "listener");

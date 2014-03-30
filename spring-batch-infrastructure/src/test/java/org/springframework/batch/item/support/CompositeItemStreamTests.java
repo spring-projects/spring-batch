@@ -22,7 +22,6 @@ import junit.framework.TestCase;
 
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.item.ItemStream;
-import org.springframework.batch.item.ItemStreamException;
 import org.springframework.batch.item.ItemStreamSupport;
 import org.springframework.batch.item.support.CompositeItemStream;
 

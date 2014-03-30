@@ -213,7 +213,7 @@ public class JdbcJobExecutionDao extends AbstractJdbcBatchMetadataDao implements
 			// it
 			// is invalid and
 			// an exception should be thrown.
-			if (getJdbcTemplate().queryForInt(getQuery(CHECK_JOB_EXECUTION_EXISTS),
+			if (getJdbcTemplate().queryForObject(getQuery(CHECK_JOB_EXECUTION_EXISTS), Integer.class,
 					new Object[] { jobExecution.getId() }) != 1) {
 				throw new NoSuchObjectException("Invalid JobExecution, ID " + jobExecution.getId() + " not found.");
 			}
@@ -226,7 +226,7 @@ public class JdbcJobExecutionDao extends AbstractJdbcBatchMetadataDao implements
 
 			// Avoid concurrent modifications...
 			if (count == 0) {
-				int curentVersion = getJdbcTemplate().queryForInt(getQuery(CURRENT_VERSION_JOB_EXECUTION),
+				int curentVersion = getJdbcTemplate().queryForObject(getQuery(CURRENT_VERSION_JOB_EXECUTION), Integer.class,
 						new Object[] { jobExecution.getId() });
 				throw new OptimisticLockingFailureException("Attempt to update job execution id="
 						+ jobExecution.getId() + " with wrong version (" + jobExecution.getVersion()
@@ -297,7 +297,7 @@ public class JdbcJobExecutionDao extends AbstractJdbcBatchMetadataDao implements
 
 	@Override
 	public void synchronizeStatus(JobExecution jobExecution) {
-		int currentVersion = getJdbcTemplate().queryForInt(getQuery(CURRENT_VERSION_JOB_EXECUTION),
+		int currentVersion = getJdbcTemplate().queryForObject(getQuery(CURRENT_VERSION_JOB_EXECUTION), Integer.class,
 				jobExecution.getId());
 
 		if (currentVersion != jobExecution.getVersion().intValue()) {

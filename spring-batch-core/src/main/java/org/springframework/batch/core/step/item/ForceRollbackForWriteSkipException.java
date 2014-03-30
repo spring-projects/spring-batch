@@ -23,6 +23,7 @@ package org.springframework.batch.core.step.item;
  * @author Dave Syer
  * 
  */
+@SuppressWarnings("serial")
 public class ForceRollbackForWriteSkipException extends RuntimeException {
 
 	public ForceRollbackForWriteSkipException(String msg, Throwable cause) {

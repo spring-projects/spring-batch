@@ -33,6 +33,7 @@ import static org.junit.Assert.assertEquals;
 public class ListenerParserTests {
 	@Test
 	public void testStepListenerStepScoped() {
+		@SuppressWarnings("resource")
 		GenericApplicationContext applicationContext = new GenericApplicationContext();
 
 		AbstractBeanDefinition newBeanDefinition = BeanDefinitionBuilder.genericBeanDefinition("stepListener").getBeanDefinition();
@@ -49,6 +50,7 @@ public class ListenerParserTests {
 
 	@Test
 	public void testJobListenerSingletonScoped() {
+		@SuppressWarnings("resource")
 		GenericApplicationContext applicationContext = new GenericApplicationContext();
 
 		AbstractBeanDefinition newBeanDefinition = BeanDefinitionBuilder.genericBeanDefinition("jobListener").getBeanDefinition();

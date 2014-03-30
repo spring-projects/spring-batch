@@ -21,6 +21,7 @@ package org.springframework.batch.core.job.builder;
  * @since 2.2
  *
  */
+@SuppressWarnings("serial")
 public class JobBuilderException extends RuntimeException {
 
 	public JobBuilderException(Exception e) {

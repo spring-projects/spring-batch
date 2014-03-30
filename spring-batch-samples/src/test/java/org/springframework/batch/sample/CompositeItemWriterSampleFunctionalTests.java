@@ -1,3 +1,18 @@
+/*
+ * Copyright 2008-2014 the original author or authors.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package org.springframework.batch.sample;
 
 import static org.junit.Assert.assertEquals;
@@ -57,6 +72,7 @@ public class CompositeItemWriterSampleFunctionalTests {
 	}
 
 	private void checkOutputTable(int before) {
+		@SuppressWarnings("serial")
 		final List<Trade> trades = new ArrayList<Trade>() {
 			{
 				add(new Trade("UK21341EAH41", 211, new BigDecimal("31.11"), "customer1"));
@@ -88,7 +104,7 @@ public class CompositeItemWriterSampleFunctionalTests {
 	}
 
 	private void checkOutputFile(String fileName) throws IOException {
-		@SuppressWarnings("unchecked")
+		@SuppressWarnings({ "unchecked", "resource" })
 		List<String> outputLines = IOUtils.readLines(new FileInputStream(fileName));
 
 		String output = "";

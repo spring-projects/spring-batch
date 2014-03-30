@@ -34,12 +34,12 @@ import org.springframework.util.Assert;
  * or for the whole batch by making the execute method transactional (but only
  * then if the task executor is synchronous).<br/>
  * 
- * This class is thread safe if its collaborators are thread safe (interceptors,
+ * This class is thread-safe if its collaborators are thread-safe (interceptors,
  * terminationPolicy, callback). Normally this will be the case, but clients
  * need to be aware that if the task executor is asynchronous, then the other
  * collaborators should be also. In particular the {@link RepeatCallback} that
- * is wrapped in the execute method must be thread safe - often it is based on
- * some form of data source, which itself should be both thread safe and
+ * is wrapped in the execute method must be thread-safe - often it is based on
+ * some form of data source, which itself should be both thread-safe and
  * transactional (multiple threads could be accessing it at any given time, and
  * each thread would have its own transaction).<br/>
  * 

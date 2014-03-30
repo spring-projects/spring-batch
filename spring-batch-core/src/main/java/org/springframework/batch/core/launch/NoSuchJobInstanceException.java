@@ -25,6 +25,7 @@ import org.springframework.batch.core.JobInstance;
  * @author Dave Syer
  * 
  */
+@SuppressWarnings("serial")
 public class NoSuchJobInstanceException extends JobExecutionException {
 
 	/**

@@ -70,6 +70,7 @@ public class AggregateItemFieldSetMapper<T> implements FieldSetMapper<AggregateI
 	 * Check mandatory properties (delegate).
 	 * @see org.springframework.beans.factory.InitializingBean#afterPropertiesSet()
 	 */
+	@Override
 	public void afterPropertiesSet() throws Exception {
 		Assert.notNull(delegate, "A FieldSetMapper delegate must be provided.");
 	}
@@ -85,6 +86,7 @@ public class AggregateItemFieldSetMapper<T> implements FieldSetMapper<AggregateI
 	 * delegate
 	 * @throws BindException if one of the delegates does
 	 */
+	@Override
 	public AggregateItem<T> mapFieldSet(FieldSet fieldSet) throws BindException {
 
 		if (fieldSet.readString(0).equals(begin)) {

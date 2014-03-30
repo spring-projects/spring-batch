@@ -153,6 +153,7 @@ public class JobLauncherDetailsTests {
 		assertEquals(0, parameters.getParameters().size());
 	}
 
+	@SuppressWarnings("serial")
 	private final class StubJobExecutionContext extends JobExecutionContext {
 		private StubJobExecutionContext() {
 			super(mock(Scheduler.class), firedBundle, mock(Job.class));

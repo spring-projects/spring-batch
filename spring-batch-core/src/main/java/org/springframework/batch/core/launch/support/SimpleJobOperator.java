@@ -83,9 +83,6 @@ import org.springframework.util.Assert;
  */
 public class SimpleJobOperator implements JobOperator, InitializingBean {
 
-	/**
-	 *
-	 */
 	private static final String ILLEGAL_STATE_MSG = "Illegal state (only happens on a race condition): "
 			+ "%s with name=%s and parameters=%s";
 

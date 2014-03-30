@@ -18,6 +18,7 @@ package org.springframework.batch.core.repository.dao;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.Map;
 
 import org.springframework.batch.core.repository.ExecutionContextSerializer;
 import org.springframework.core.serializer.DefaultDeserializer;
@@ -49,7 +50,7 @@ public class DefaultExecutionContextSerializer implements ExecutionContextSerial
 	 */
 	@Override
 	@SuppressWarnings("unchecked")
-	public void serialize(Object context, OutputStream out) throws IOException {
+	public void serialize(Map<String, Object> context, OutputStream out) throws IOException {
 		Assert.notNull(context);
 		Assert.notNull(out);
 
@@ -62,9 +63,10 @@ public class DefaultExecutionContextSerializer implements ExecutionContextSerial
 	 * @param inputStream
 	 * @return the object serialized in the provided {@link InputStream}
 	 */
+	@SuppressWarnings("unchecked")
 	@Override
-	public Object deserialize(InputStream inputStream) throws IOException {
-		return deserializer.deserialize(inputStream);
+	public Map<String, Object> deserialize(InputStream inputStream) throws IOException {
+		return (Map<String, Object>) deserializer.deserialize(inputStream);
 	}
 
 }

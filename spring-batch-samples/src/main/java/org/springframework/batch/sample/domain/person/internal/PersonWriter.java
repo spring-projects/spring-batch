@@ -25,9 +25,9 @@ import org.springframework.batch.sample.domain.person.Person;
 
 public class PersonWriter implements ItemWriter<Person> {
     private static Log log = LogFactory.getLog(PersonWriter.class);
-
-	@Override
-    public void write(List<? extends Person> data) {
+ 
+    @Override
+	public void write(List<? extends Person> data) {
         log.debug("Processing: " + data);
     }
 }

@@ -98,7 +98,7 @@ public class AsynchronousTests {
 	private volatile List<String> list = new ArrayList<String>();
 
 	private void assertInitialState() {
-		int count = jdbcTemplate.queryForInt("select count(*) from T_BARS");
+		int count = jdbcTemplate.queryForObject("select count(*) from T_BARS", Integer.class);
 		assertEquals(0, count);
 	}
 
@@ -107,7 +107,8 @@ public class AsynchronousTests {
 
 		assertInitialState();
 
-		container.setMessageListener(new SessionAwareMessageListener() {
+		container.setMessageListener(new SessionAwareMessageListener<Message>() {
+			@Override
 			public void onMessage(Message message, Session session) throws JMSException {
 				list.add(message.toString());
 				String text = ((TextMessage) message).getText();
@@ -129,7 +130,7 @@ public class AsynchronousTests {
 		String foo = (String) jmsTemplate.receiveAndConvert("queue");
 		assertEquals(null, foo);
 
-		int count = jdbcTemplate.queryForInt("select count(*) from T_BARS");
+		int count = jdbcTemplate.queryForObject("select count(*) from T_BARS", Integer.class);
 		assertEquals(2, count);
 
 	}
@@ -142,7 +143,8 @@ public class AsynchronousTests {
 		// Prevent us from being overwhelmed after rollback
 		container.setRecoveryInterval(500);
 
-		container.setMessageListener(new SessionAwareMessageListener() {
+		container.setMessageListener(new SessionAwareMessageListener<Message>() {
+			@Override
 			public void onMessage(Message message, Session session) throws JMSException {
 				list.add(message.toString());
 				final String text = ((TextMessage) message).getText();
@@ -175,7 +177,7 @@ public class AsynchronousTests {
 			msgs.add(text);
 		}
 
-		int count = jdbcTemplate.queryForInt("select count(*) from T_BARS");
+		int count = jdbcTemplate.queryForObject("select count(*) from T_BARS", Integer.class);
 		assertEquals(0, count);
 
 		assertTrue("Foo not on queue", msgs.contains("foo"));

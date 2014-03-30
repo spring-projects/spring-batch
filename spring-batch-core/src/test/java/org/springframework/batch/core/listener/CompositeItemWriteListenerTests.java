@@ -66,6 +66,7 @@ public class CompositeItemWriteListenerTests {
 		compositeListener.onWriteError(ex, item);
 	}
 
+	@SuppressWarnings("serial")
 	@Test
 	public void testSetListeners() throws Exception {
 		compositeListener.setListeners(new ArrayList<ItemWriteListener<? super Object>>() {

@@ -34,8 +34,7 @@ import org.springframework.beans.factory.FactoryBean;
  * @author Dave Syer
  * @since 2.0
  */
-@SuppressWarnings("rawtypes")
-public abstract class AbstractJobExplorerFactoryBean implements FactoryBean {
+public abstract class AbstractJobExplorerFactoryBean implements FactoryBean<JobExplorer> {
 
 	/**
 	 * @return fully configured {@link JobInstanceDao} implementation.

@@ -30,8 +30,7 @@ import org.springframework.util.ClassUtils;
  * @author Michael Minella
  * @since 3.0
  */
-@SuppressWarnings("rawtypes")
-public class ItemWriterAdapter extends CheckpointSupport implements org.springframework.batch.item.ItemWriter {
+public class ItemWriterAdapter<T> extends CheckpointSupport implements org.springframework.batch.item.ItemWriter<T> {
 
 	private static final String CHECKPOINT_KEY = "writer.checkpoint";
 
@@ -50,10 +49,10 @@ public class ItemWriterAdapter extends CheckpointSupport implements org.springfr
 	/* (non-Javadoc)
 	 * @see org.springframework.batch.item.ItemWriter#write(java.util.List)
 	 */
-	@Override
 	@SuppressWarnings("unchecked")
-	public void write(List items) throws Exception {
-		delegate.writeItems(items);
+	@Override
+	public void write(List<? extends T> items) throws Exception {
+		delegate.writeItems((List<Object>) items);
 	}
 
 	/* (non-Javadoc)

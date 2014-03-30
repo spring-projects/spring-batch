@@ -54,7 +54,7 @@ public class StepListenerParser extends AbstractListenerParser {
 	}
 
 	@Override
-	protected Class<? extends AbstractListenerFactoryBean> getBeanClass() {
+	protected Class<? extends AbstractListenerFactoryBean<?>> getBeanClass() {
 		return StepListenerFactoryBean.class;
 	}
 
@@ -63,7 +63,7 @@ public class StepListenerParser extends AbstractListenerParser {
 		return listenerMetaData;
 	}
 
-	@SuppressWarnings({"unchecked", "rawtypes"})
+	@SuppressWarnings("unchecked")
 	public void handleListenersElement(Element stepElement, BeanDefinition beanDefinition,
 			ParserContext parserContext) {
 		MutablePropertyValues propertyValues = beanDefinition.getPropertyValues();
@@ -73,9 +73,9 @@ public class StepListenerParser extends AbstractListenerParser {
 			CompositeComponentDefinition compositeDef = new CompositeComponentDefinition(listenersElement.getTagName(),
 					parserContext.extractSource(stepElement));
 			parserContext.pushContainingComponent(compositeDef);
-			ManagedList listenerBeans = new ManagedList();
+			ManagedList<BeanDefinition> listenerBeans = new ManagedList<BeanDefinition>();
 			if (propertyValues.contains("listeners")) {
-				listenerBeans = (ManagedList) propertyValues.getPropertyValue("listeners").getValue();
+				listenerBeans = (ManagedList<BeanDefinition>) propertyValues.getPropertyValue("listeners").getValue();
 			}
 			listenerBeans.setMergeEnabled(listenersElement.hasAttribute(MERGE_ATTR)
 					&& Boolean.valueOf(listenersElement.getAttribute(MERGE_ATTR)));

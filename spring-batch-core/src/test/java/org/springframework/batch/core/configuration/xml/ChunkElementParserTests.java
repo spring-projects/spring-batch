@@ -58,6 +58,7 @@ import org.springframework.util.StringUtils;
 public class ChunkElementParserTests {
 
 	@Test
+	@SuppressWarnings("resource")
 	public void testSimpleAttributes() throws Exception {
 		ConfigurableApplicationContext context = new ClassPathXmlApplicationContext(
 				"org/springframework/batch/core/configuration/xml/ChunkElementSimpleAttributeParserTests-context.xml");
@@ -69,27 +70,30 @@ public class ChunkElementParserTests {
 	}
 
 	@Test
+	@SuppressWarnings("resource")
 	public void testCommitIntervalLateBinding() throws Exception {
 		ConfigurableApplicationContext context = new ClassPathXmlApplicationContext(
 				"org/springframework/batch/core/configuration/xml/ChunkElementLateBindingParserTests-context.xml");
-		Step step = (Step) context.getBean("s1", Step.class);
+		Step step = context.getBean("s1", Step.class);
 		assertNotNull("Step not parsed", step);
 	}
 
 	@Test
+	@SuppressWarnings("resource")
 	public void testSkipAndRetryAttributes() throws Exception {
 		ConfigurableApplicationContext context = new ClassPathXmlApplicationContext(
 				"org/springframework/batch/core/configuration/xml/ChunkElementSkipAndRetryAttributeParserTests-context.xml");
-		Step step = (Step) context.getBean("s1", Step.class);
+		Step step = context.getBean("s1", Step.class);
 		assertNotNull("Step not parsed", step);
 	}
 
 	@Test
+	@SuppressWarnings("resource")
 	public void testIllegalSkipAndRetryAttributes() throws Exception {
 		try {
 			ConfigurableApplicationContext context = new ClassPathXmlApplicationContext(
 				"org/springframework/batch/core/configuration/xml/ChunkElementIllegalSkipAndRetryAttributeParserTests-context.xml");
-		Step step = (Step) context.getBean("s1", Step.class);
+		Step step = context.getBean("s1", Step.class);
 		assertNotNull("Step not parsed", step);
 		fail("Expected BeanCreationException");
 		} catch (BeanCreationException e) {
@@ -99,6 +103,7 @@ public class ChunkElementParserTests {
 
 	@Test
 	public void testRetryPolicyAttribute() throws Exception {
+		@SuppressWarnings("resource")
 		ConfigurableApplicationContext context = new ClassPathXmlApplicationContext(
 				"org/springframework/batch/core/configuration/xml/ChunkElementRetryPolicyParserTests-context.xml");
 		Map<Class<? extends Throwable>, Boolean> retryable = getNestedExceptionMap("s1", context,
@@ -111,6 +116,7 @@ public class ChunkElementParserTests {
 
 	@Test
 	public void testRetryPolicyElement() throws Exception {
+		@SuppressWarnings("resource")
 		ConfigurableApplicationContext context = new ClassPathXmlApplicationContext(
 				"org/springframework/batch/core/configuration/xml/ChunkElementRetryPolicyParserTests-context.xml");
 		SimpleRetryPolicy policy = (SimpleRetryPolicy) getPolicy("s2", context,
@@ -120,6 +126,7 @@ public class ChunkElementParserTests {
 
 	@Test
 	public void testSkipPolicyAttribute() throws Exception {
+		@SuppressWarnings("resource")
 		ConfigurableApplicationContext context = new ClassPathXmlApplicationContext(
 				"org/springframework/batch/core/configuration/xml/ChunkElementSkipPolicyParserTests-context.xml");
 		SkipPolicy policy = getSkipPolicy("s1", context);
@@ -129,6 +136,7 @@ public class ChunkElementParserTests {
 
 	@Test
 	public void testSkipPolicyElement() throws Exception {
+		@SuppressWarnings("resource")
 		ConfigurableApplicationContext context = new ClassPathXmlApplicationContext(
 				"org/springframework/batch/core/configuration/xml/ChunkElementSkipPolicyParserTests-context.xml");
 		SkipPolicy policy = getSkipPolicy("s2", context);
@@ -137,6 +145,7 @@ public class ChunkElementParserTests {
 	}
 
 	@Test
+	@SuppressWarnings("resource")
 	public void testProcessorTransactionalAttributes() throws Exception {
 		ConfigurableApplicationContext context = new ClassPathXmlApplicationContext(
 				"org/springframework/batch/core/configuration/xml/ChunkElementTransactionalAttributeParserTests-context.xml");
@@ -150,6 +159,7 @@ public class ChunkElementParserTests {
 	}
 
 	@Test
+	@SuppressWarnings("resource")
 	public void testProcessorTransactionalNotAllowedOnSimpleProcessor() throws Exception {
 		ConfigurableApplicationContext context = new ClassPathXmlApplicationContext(
 				"org/springframework/batch/core/configuration/xml/ChunkElementIllegalAttributeParserTests-context.xml");

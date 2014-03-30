@@ -35,7 +35,7 @@ import org.springframework.util.StringUtils;
  * @author Dave Syer
  * @since 2.0.1
  */
-public class JobParserJobFactoryBean implements SmartFactoryBean {
+public class JobParserJobFactoryBean implements SmartFactoryBean<FlowJob> {
 
 	private String name;
 
@@ -56,7 +56,7 @@ public class JobParserJobFactoryBean implements SmartFactoryBean {
 	}
 
 	@Override
-	public final Object getObject() throws Exception {
+	public final FlowJob getObject() throws Exception {
 		Assert.isTrue(StringUtils.hasText(name), "The job must have an id.");
 		FlowJob flowJob = new FlowJob(name);
 

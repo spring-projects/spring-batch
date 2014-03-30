@@ -32,6 +32,7 @@ public class CustomerFieldSetMapper implements FieldSetMapper<Customer> {
 	public static final String REG_ID_COLUMN = "REG_ID";
 	public static final String VIP_COLUMN = "VIP";
 
+	@Override
 	public Customer mapFieldSet(FieldSet fieldSet) {
 		Customer customer = new Customer();
 

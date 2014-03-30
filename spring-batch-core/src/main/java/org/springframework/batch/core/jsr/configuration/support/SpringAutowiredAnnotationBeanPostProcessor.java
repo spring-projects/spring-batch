@@ -168,11 +168,13 @@ class SpringAutowiredAnnotationBeanPostProcessor extends InstantiationAwareBeanP
         this.order = order;
     }
 
-    public int getOrder() {
+    @Override
+	public int getOrder() {
         return this.order;
     }
 
-    public void setBeanFactory(BeanFactory beanFactory) throws BeansException {
+    @Override
+	public void setBeanFactory(BeanFactory beanFactory) throws BeansException {
         if (!(beanFactory instanceof ConfigurableListableBeanFactory)) {
             throw new IllegalArgumentException(
                     "AutowiredAnnotationBeanPostProcessor requires a ConfigurableListableBeanFactory");
@@ -181,7 +183,8 @@ class SpringAutowiredAnnotationBeanPostProcessor extends InstantiationAwareBeanP
     }
 
 
-    public void postProcessMergedBeanDefinition(RootBeanDefinition beanDefinition, Class<?> beanType, String beanName) {
+    @Override
+	public void postProcessMergedBeanDefinition(RootBeanDefinition beanDefinition, Class<?> beanType, String beanName) {
         if (beanType != null) {
             InjectionMetadata metadata = findAutowiringMetadata(beanType);
             metadata.checkConfigMembers(beanDefinition);

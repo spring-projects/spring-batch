@@ -105,7 +105,6 @@ public class PropertyParser {
 		setJobPropertiesBean(properties);
 	}
 
-	@SuppressWarnings("unchecked")
 	private void setProperties(Properties properties) {
 		Object propertyValue;
 		BeanDefinition beanDefinition = parserContext.getRegistry().getBeanDefinition(BATCH_PROPERTY_CONTEXT_BEAN_NAME);

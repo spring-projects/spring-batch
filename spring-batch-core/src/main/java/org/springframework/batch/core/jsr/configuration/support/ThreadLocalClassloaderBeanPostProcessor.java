@@ -64,7 +64,7 @@ public class ThreadLocalClassloaderBeanPostProcessor implements BeanFactoryPostP
 	}
 
 	/**
-	 * Sets this {@link BeanFactoryPostProcessor} to the lowest precdenece so that
+	 * Sets this {@link BeanFactoryPostProcessor} to the lowest precedence so that
 	 * it is executed as late as possible in the chain of {@link BeanFactoryPostProcessor}s
 	 */
 	@Override

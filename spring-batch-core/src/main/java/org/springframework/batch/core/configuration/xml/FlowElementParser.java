@@ -26,7 +26,7 @@ import org.springframework.beans.factory.xml.ParserContext;
 import org.w3c.dom.Element;
 
 /**
- * Internal parser for the &lt;flow/&gt; elements inside a job..
+ * Internal parser for the &lt;flow/&gt; elements inside a job.
  * 
  * @see JobParser
  * 

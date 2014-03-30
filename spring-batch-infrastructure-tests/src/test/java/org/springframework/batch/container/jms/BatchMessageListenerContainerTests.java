@@ -51,6 +51,7 @@ public class BatchMessageListenerContainerTests {
 		container = getContainer(template);
 
 		container.setMessageListener(new MessageListener() {
+			@Override
 			public void onMessage(Message arg0) {
 			}
 		});
@@ -135,8 +136,10 @@ public class BatchMessageListenerContainerTests {
 		// Yuck: we need to turn these method in base class to no-ops because the invoker is a private class
 		// we can't create for test purposes...
 		BatchMessageListenerContainer container = new BatchMessageListenerContainer() {
+			@Override
 			protected void messageReceived(Object invoker, Session session) {
 			}
+			@Override
 			protected void noMessageReceived(Object invoker, Session session) {
 			}
 		};
@@ -153,6 +156,7 @@ public class BatchMessageListenerContainerTests {
 			throws JMSException, IllegalAccessException {
 		container.setAcceptMessagesWhileStopping(true);
 		container.setMessageListener(new MessageListener() {
+			@Override
 			public void onMessage(Message arg0) {
 				if (t instanceof RuntimeException)
 					throw (RuntimeException) t;

@@ -40,6 +40,7 @@ public class TradeProcessor implements ItemProcessor<Trade, Trade> {
 		this.failure = failure;
 	}
 
+	@Override
 	public Trade process(Trade item) throws Exception {
 		if ((failedItem == null && index++ == failure) || (failedItem != null && failedItem.equals(item))) {
 			failedItem = item;

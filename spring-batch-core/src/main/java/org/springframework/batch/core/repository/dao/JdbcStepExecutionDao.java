@@ -115,7 +115,7 @@ public class JdbcStepExecutionDao extends AbstractJdbcBatchMetadataDao implement
 	@Override
 	public void saveStepExecution(StepExecution stepExecution) {
 		List<Object[]> parameters = buildStepExecutionParameters(stepExecution);
-		Object[] parameterValues = (Object[])parameters.get(0);
+		Object[] parameterValues = parameters.get(0);
 
 		//Template expects an int array fails with Integer
 		int[] parameterTypes = new int[parameters.get(1).length];
@@ -147,7 +147,7 @@ public class JdbcStepExecutionDao extends AbstractJdbcBatchMetadataDao implement
                 public void setValues(PreparedStatement ps, int i) throws SQLException {
                     StepExecution stepExecution = iterator.next();
                     List<Object[]> parameters = buildStepExecutionParameters(stepExecution);
-                    Object[] parameterValues = (Object[]) parameters.get(0);
+                    Object[] parameterValues = parameters.get(0);
                     Integer[] parameterTypes = (Integer[]) parameters.get(1);
                     for (int indx = 0; indx < parameterValues.length; indx++) {
                         switch (parameterTypes[indx]) {
@@ -250,8 +250,8 @@ public class JdbcStepExecutionDao extends AbstractJdbcBatchMetadataDao implement
 
 			// Avoid concurrent modifications...
 			if (count == 0) {
-				int curentVersion = getJdbcTemplate().queryForInt(getQuery(CURRENT_VERSION_STEP_EXECUTION),
-						new Object[] { stepExecution.getId() });
+				int curentVersion = getJdbcTemplate().queryForObject(getQuery(CURRENT_VERSION_STEP_EXECUTION),
+						new Object[] { stepExecution.getId() }, Integer.class);
 				throw new OptimisticLockingFailureException("Attempt to update step execution id="
 						+ stepExecution.getId() + " with wrong version (" + stepExecution.getVersion()
 						+ "), where current version is " + curentVersion);

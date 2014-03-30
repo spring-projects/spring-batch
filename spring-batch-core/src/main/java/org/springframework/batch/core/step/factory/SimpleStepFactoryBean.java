@@ -60,8 +60,7 @@ import org.springframework.transaction.interceptor.TransactionAttribute;
  * @author Robert Kasanicky
  *
  */
-@SuppressWarnings("rawtypes")
-public class SimpleStepFactoryBean<T, S> implements FactoryBean, BeanNameAware {
+public class SimpleStepFactoryBean<T, S> implements FactoryBean<Step>, BeanNameAware {
 
 	private String name;
 
@@ -317,7 +316,7 @@ public class SimpleStepFactoryBean<T, S> implements FactoryBean, BeanNameAware {
 	 * @see FactoryBean#getObject()
 	 */
 	@Override
-	public final Object getObject() throws Exception {
+	public final Step getObject() throws Exception {
 		SimpleStepBuilder<T, S> builder = createBuilder(getName());
 		applyConfiguration(builder);
 		TaskletStep step = builder.build();
@@ -334,7 +333,7 @@ public class SimpleStepFactoryBean<T, S> implements FactoryBean, BeanNameAware {
 	}
 
 	/**
-	 * Returns true by default, but in most cases a {@link Step} should not be treated as thread safe. Clients are
+	 * Returns true by default, but in most cases a {@link Step} should <b>not</b> be treated as thread-safe. Clients are
 	 * recommended to create a new step for each job execution.
 	 *
 	 * @see org.springframework.beans.factory.FactoryBean#isSingleton()
@@ -431,7 +430,7 @@ public class SimpleStepFactoryBean<T, S> implements FactoryBean, BeanNameAware {
 	}
 
 	/**
-	 * Mkae the {@link TaskExecutor} available to subclasses
+	 * Make the {@link TaskExecutor} available to subclasses
 	 * @return the taskExecutor to be used to execute chunks
 	 */
 	protected TaskExecutor getTaskExecutor() {

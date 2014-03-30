@@ -28,7 +28,6 @@ import java.util.TreeSet;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.springframework.batch.core.JobExecutionException;
 import org.springframework.batch.core.Step;
 import org.springframework.batch.core.StepExecution;
 import org.springframework.batch.core.job.flow.Flow;
@@ -194,7 +193,7 @@ public class SimpleFlow implements Flow, InitializingBean {
 
 	/**
 	 * @return the next {@link Step} (or null if this is the end)
-	 * @throws JobExecutionException
+	 * @throws FlowExecutionException
 	 */
 	protected State nextState(String stateName, FlowExecutionStatus status, StepExecution stepExecution) throws FlowExecutionException {
 		Set<StateTransition> set = transitionMap.get(stateName);

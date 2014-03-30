@@ -55,7 +55,7 @@ public class DatasourceTests {
 	public void testTemplate() throws Exception {
 		System.err.println(System.getProperty("java.class.path"));
 		jdbcTemplate.execute("delete from T_BARS");
-		int count = jdbcTemplate.queryForInt("select count(*) from T_BARS");
+		int count = jdbcTemplate.queryForObject("select count(*) from T_BARS", Integer.class);
 		assertEquals(0, count);
 
 		jdbcTemplate.update("INSERT into T_BARS (id,name,foo_date) values (?,?,null)", 0, "foo");

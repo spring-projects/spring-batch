@@ -40,7 +40,7 @@ public class SqlPagingQueryUtils {
 	 * 
 	 * @param provider {@link AbstractSqlPagingQueryProvider} providing the
 	 * implementation specifics
-	 * @param remainingPageQuery is this query for the ramining pages (true) as
+	 * @param remainingPageQuery is this query for the remaining pages (true) as
 	 * opposed to the first page (false)
 	 * @param limitClause the implementation specific limit clause to be used
 	 * @return the generated query
@@ -63,7 +63,7 @@ public class SqlPagingQueryUtils {
 	 * 
 	 * @param provider {@link AbstractSqlPagingQueryProvider} providing the
 	 * implementation specifics
-	 * @param remainingPageQuery is this query for the ramining pages (true) as
+	 * @param remainingPageQuery is this query for the remaining pages (true) as
 	 * opposed to the first page (false)
 	 * @param limitClause the implementation specific limit clause to be used
 	 * @return the generated query
@@ -91,7 +91,7 @@ public class SqlPagingQueryUtils {
 	 * 
 	 * @param provider {@link AbstractSqlPagingQueryProvider} providing the
 	 * implementation specifics
-	 * @param remainingPageQuery is this query for the ramining pages (true) as
+	 * @param remainingPageQuery is this query for the remaining pages (true) as
 	 * opposed to the first page (false)
 	 * @param topClause the implementation specific top clause to be used
 	 * @return the generated query
@@ -113,7 +113,7 @@ public class SqlPagingQueryUtils {
 	 * 
 	 * @param provider {@link AbstractSqlPagingQueryProvider} providing the
 	 * implementation specifics
-	 * @param remainingPageQuery is this query for the ramining pages (true) as
+	 * @param remainingPageQuery is this query for the remaining pages (true) as
 	 * opposed to the first page (false)
 	 * @param topClause the implementation specific top clause to be used
 	 * @return the generated query

@@ -48,25 +48,25 @@ public class ExceptionHandlingParsingTests {
 	@Test
 	@Ignore
 	public void testSkippable() throws Exception {
-		JobExecution execution1 = jobLauncher.run(job, new JobParametersBuilder().addLong("run", 1l).toJobParameters());
+		JobExecution execution1 = jobLauncher.run(job, new JobParametersBuilder().addLong("run", 1L).toJobParameters());
 		assertEquals(BatchStatus.FAILED, execution1.getStatus());
 		assertEquals(1, execution1.getStepExecutions().size());
 		assertEquals(1, execution1.getStepExecutions().iterator().next().getSkipCount());
 		assertTrue(execution1.getAllFailureExceptions().get(0).getMessage().contains("But don't skip me"));
 
-		JobExecution execution2 = jobLauncher.run(job, new JobParametersBuilder().addLong("run", 2l).toJobParameters());
+		JobExecution execution2 = jobLauncher.run(job, new JobParametersBuilder().addLong("run", 2L).toJobParameters());
 		assertEquals(BatchStatus.FAILED, execution2.getStatus());
 		assertEquals(2, execution2.getStepExecutions().size());
 		assertTrue(execution2.getAllFailureExceptions().get(0).getMessage().contains("But don't retry me"));
 
-		JobExecution execution3 = jobLauncher.run(job, new JobParametersBuilder().addLong("run", 3l).toJobParameters());
+		JobExecution execution3 = jobLauncher.run(job, new JobParametersBuilder().addLong("run", 3L).toJobParameters());
 		assertEquals(BatchStatus.COMPLETED, execution3.getStatus());
 		assertEquals(3, execution3.getStepExecutions().size());
 
 		List<StepExecution> stepExecutions = new ArrayList<StepExecution>(execution3.getStepExecutions());
 		assertEquals(0, stepExecutions.get(2).getRollbackCount());
 
-		JobExecution execution4 = jobLauncher.run(job, new JobParametersBuilder().addLong("run", 4l).toJobParameters());
+		JobExecution execution4 = jobLauncher.run(job, new JobParametersBuilder().addLong("run", 4L).toJobParameters());
 		assertEquals(BatchStatus.COMPLETED, execution4.getStatus());
 		assertEquals(3, execution4.getStepExecutions().size());
 	}

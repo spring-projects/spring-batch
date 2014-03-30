@@ -35,7 +35,7 @@ public class DefaultJobKeyGeneratorTests {
 				"foo", "bar").addString("bar", "foo").toJobParameters();
 		JobParameters jobParameters2 = new JobParametersBuilder().addString(
 				"foo", "bar", true).addString("bar", "foo", true)
-				.addString("ignoreMe", "irrelivant", false).toJobParameters();
+				.addString("ignoreMe", "irrelevant", false).toJobParameters();
 		String key1 = jobKeyGenerator.generateKey(jobParameters1);
 		String key2 = jobKeyGenerator.generateKey(jobParameters2);
 		assertEquals(key1, key2);

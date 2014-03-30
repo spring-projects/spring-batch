@@ -50,7 +50,6 @@ import org.springframework.util.ClassUtils;
  * @author Robert Kasanicky
  * @author Thomas Risberg
  */
-@SuppressWarnings("rawtypes")
 public class JdbcCursorItemReader<T> extends AbstractCursorItemReader<T> {
 
 	PreparedStatement preparedStatement;
@@ -59,7 +58,7 @@ public class JdbcCursorItemReader<T> extends AbstractCursorItemReader<T> {
 
 	String sql;
 
-	RowMapper rowMapper;
+	RowMapper<T> rowMapper;
 
 	public JdbcCursorItemReader() {
 		super();
@@ -71,7 +70,7 @@ public class JdbcCursorItemReader<T> extends AbstractCursorItemReader<T> {
 	 *
 	 * @param rowMapper
 	 */
-	public void setRowMapper(RowMapper rowMapper) {
+	public void setRowMapper(RowMapper<T> rowMapper) {
 		this.rowMapper = rowMapper;
 	}
 
@@ -99,7 +98,7 @@ public class JdbcCursorItemReader<T> extends AbstractCursorItemReader<T> {
 	/**
 	 * Assert that mandatory properties are set.
 	 *
-	 * @throws IllegalArgumentException if either data source or sql properties
+	 * @throws IllegalArgumentException if either data source or SQL properties
 	 * not set.
 	 */
 	@Override
@@ -136,9 +135,8 @@ public class JdbcCursorItemReader<T> extends AbstractCursorItemReader<T> {
 
 
 	@Override
-	@SuppressWarnings("unchecked")
 	protected T readCursor(ResultSet rs, int currentRow) throws SQLException {
-		return (T) rowMapper.mapRow(rs, currentRow);
+		return rowMapper.mapRow(rs, currentRow);
 	}
 
 	/**

@@ -26,6 +26,7 @@ import org.springframework.batch.core.JobParametersIncrementer;
  * @author Dave Syer
  * 
  */
+@SuppressWarnings("serial")
 public class JobParametersNotFoundException extends JobExecutionException {
 
 	/**

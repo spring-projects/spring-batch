@@ -68,8 +68,7 @@ public class ItemListenerParsingTests {
 		assertEquals(2, jsrListener.afterWriteCount);
 	}
 
-	@SuppressWarnings("rawtypes")
-	public static class SpringItemListener implements ItemReadListener, ItemProcessListener, ItemWriteListener {
+	public static class SpringItemListener implements ItemReadListener<Object>, ItemProcessListener<Object, Object>, ItemWriteListener<Object> {
 
 		protected int beforeReadCount = 0;
 		protected int afterReadCount = 0;
@@ -97,17 +96,17 @@ public class ItemListenerParsingTests {
 		}
 
 		@Override
-		public void beforeWrite(List items) {
+		public void beforeWrite(List<? extends Object> items) {
 			beforeWriteCount++;
 		}
 
 		@Override
-		public void afterWrite(List items) {
+		public void afterWrite(List<? extends Object> items) {
 			afterWriteCount++;
 		}
 
 		@Override
-		public void onWriteError(Exception exception, List items) {
+		public void onWriteError(Exception exception, List<? extends Object> items) {
 			onWriteErrorCount++;
 		}
 

@@ -49,7 +49,7 @@ import org.springframework.util.Assert;
 public class PartitionParserTests {
 	private Pattern caPattern = Pattern.compile("ca");
 	private Pattern asPattern = Pattern.compile("AS");
-	private static final long TIMEOUT = 10000l;
+	private static final long TIMEOUT = 10000L;
 
 	@Before
 	public void before() {

@@ -91,7 +91,7 @@ public class StepSynchronizationManager {
 	}
 
 	/**
-	 * Method for de-registering the current context - should always and only be
+	 * Method for unregistering the current context - should always and only be
 	 * used by in conjunction with a matching {@link #register(StepExecution)}
 	 * to ensure that {@link #getContext()} always returns the correct value.
 	 * Does not call {@link StepContext#close()} - that is left up to the caller

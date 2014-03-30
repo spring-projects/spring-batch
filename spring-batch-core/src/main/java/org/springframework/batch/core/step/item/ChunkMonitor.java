@@ -27,7 +27,7 @@ import org.springframework.batch.item.support.CompositeItemStream;
 /**
  * Manage the offset data between the last successful commit and updates made to
  * an input chunk. Only works with single threaded steps because it has to use a
- * {@link ThreadLocal} to manage the state and co-ordinate between the caller
+ * {@link ThreadLocal} to manage the state and coordinate between the caller
  * and the wrapped {@link ItemStream}.
  *
  * @author Dave Syer

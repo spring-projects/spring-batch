@@ -65,7 +65,7 @@ public abstract class AbstractStepExecutionDaoTests extends AbstractTransactiona
 	protected abstract StepExecutionDao getStepExecutionDao();
 
 	/**
-	 * @return {@link JobRepository} that uses the stepExecution dao.
+	 * @return {@link JobRepository} that uses the stepExecution DAO.
 	 */
 	protected abstract JobRepository getJobRepository();
 

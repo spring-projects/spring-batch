@@ -29,8 +29,6 @@ import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.channels.FileChannel;
 
-import javax.validation.constraints.AssertTrue;
-
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
@@ -143,13 +141,12 @@ public class TransactionAwareBufferedWriterTests {
 	}
 
 	@Test
-	@SuppressWarnings({"unchecked", "rawtypes"})
 	public void testFlushInTransaction() throws Exception {
 		when(fileChannel.write((ByteBuffer)anyObject())).thenReturn(3);
 
-		new TransactionTemplate(transactionManager).execute(new TransactionCallback() {
+		new TransactionTemplate(transactionManager).execute(new TransactionCallback<Void>() {
 			@Override
-			public Object doInTransaction(TransactionStatus status) {
+			public Void doInTransaction(TransactionStatus status) {
 				try {
 					writer.write("foo");
 					writer.flush();
@@ -166,14 +163,13 @@ public class TransactionAwareBufferedWriterTests {
 	}
 
 	@Test
-	@SuppressWarnings({"unchecked", "rawtypes"})
 	public void testFlushInTransactionForceSync() throws Exception {
 		writer.setForceSync(true);
 		when(fileChannel.write((ByteBuffer)anyObject())).thenReturn(3);
 
-		new TransactionTemplate(transactionManager).execute(new TransactionCallback() {
+		new TransactionTemplate(transactionManager).execute(new TransactionCallback<Void>() {
 			@Override
-			public Object doInTransaction(TransactionStatus status) {
+			public Void doInTransaction(TransactionStatus status) {
 				try {
 					writer.write("foo");
 					writer.flush();
@@ -190,14 +186,13 @@ public class TransactionAwareBufferedWriterTests {
 	}
 
 	@Test
-	@SuppressWarnings({"unchecked", "rawtypes"})
 	public void testWriteWithCommit() throws Exception {
 		ArgumentCaptor<ByteBuffer> bb = ArgumentCaptor.forClass(ByteBuffer.class);
 		when(fileChannel.write(bb.capture())).thenReturn(3);
 
-		new TransactionTemplate(transactionManager).execute(new TransactionCallback() {
+		new TransactionTemplate(transactionManager).execute(new TransactionCallback<Void>() {
 			@Override
-			public Object doInTransaction(TransactionStatus status) {
+			public Void doInTransaction(TransactionStatus status) {
 				try {
 					writer.write("foo");
 				}
@@ -213,14 +208,13 @@ public class TransactionAwareBufferedWriterTests {
 	}
 
 	@Test
-	@SuppressWarnings({"unchecked", "rawtypes"})
 	public void testBufferSizeInTransaction() throws Exception {
 		ArgumentCaptor<ByteBuffer> bb = ArgumentCaptor.forClass(ByteBuffer.class);
 		when(fileChannel.write(bb.capture())).thenReturn(3);
 
-		new TransactionTemplate(transactionManager).execute(new TransactionCallback() {
+		new TransactionTemplate(transactionManager).execute(new TransactionCallback<Void>() {
 			@Override
-			public Object doInTransaction(TransactionStatus status) {
+			public Void doInTransaction(TransactionStatus status) {
 				try {
 					writer.write("foo");
 				}
@@ -236,15 +230,14 @@ public class TransactionAwareBufferedWriterTests {
 	}
 
 	@Test
-	@SuppressWarnings({"unchecked", "rawtypes"})
 	// BATCH-1959
 	public void testBufferSizeInTransactionWithMultiByteCharacterUTF8() throws Exception {
 		ArgumentCaptor<ByteBuffer> bb = ArgumentCaptor.forClass(ByteBuffer.class);
 		when(fileChannel.write(bb.capture())).thenReturn(5);
 
-		new TransactionTemplate(transactionManager).execute(new TransactionCallback() {
+		new TransactionTemplate(transactionManager).execute(new TransactionCallback<Void>() {
 			@Override
-			public Object doInTransaction(TransactionStatus status) {
+			public Void doInTransaction(TransactionStatus status) {
 				try {
 					writer.write("fóó");
 				}
@@ -260,7 +253,6 @@ public class TransactionAwareBufferedWriterTests {
 	}
 
 	@Test
-	@SuppressWarnings({"unchecked", "rawtypes"})
 	// BATCH-1959
 	public void testBufferSizeInTransactionWithMultiByteCharacterUTF16BE() throws Exception {
 		writer.setEncoding("UTF-16BE");
@@ -268,9 +260,9 @@ public class TransactionAwareBufferedWriterTests {
 		ArgumentCaptor<ByteBuffer> bb = ArgumentCaptor.forClass(ByteBuffer.class);
 		when(fileChannel.write(bb.capture())).thenReturn(6);
 
-		new TransactionTemplate(transactionManager).execute(new TransactionCallback() {
+		new TransactionTemplate(transactionManager).execute(new TransactionCallback<Void>() {
 			@Override
-			public Object doInTransaction(TransactionStatus status) {
+			public Void doInTransaction(TransactionStatus status) {
 				try {
 					writer.write("fóó");
 				}
@@ -286,12 +278,11 @@ public class TransactionAwareBufferedWriterTests {
 	}
 
 	@Test
-	@SuppressWarnings({"unchecked", "rawtypes"})
 	public void testWriteWithRollback() throws Exception {
 		try {
-			new TransactionTemplate(transactionManager).execute(new TransactionCallback() {
+			new TransactionTemplate(transactionManager).execute(new TransactionCallback<Void>() {
 				@Override
-				public Object doInTransaction(TransactionStatus status) {
+				public Void doInTransaction(TransactionStatus status) {
 					try {
 						writer.write("foo");
 					}
@@ -318,7 +309,6 @@ public class TransactionAwareBufferedWriterTests {
 	}
 
 	@Test
-	@SuppressWarnings({"unchecked", "rawtypes"})
 	public void testExceptionOnFlush() throws Exception {
 		writer = new TransactionAwareBufferedWriter(fileChannel, new Runnable() {
 			@Override
@@ -327,9 +317,9 @@ public class TransactionAwareBufferedWriterTests {
 		});
 
 		try {
-			new TransactionTemplate(transactionManager).execute(new TransactionCallback() {
+			new TransactionTemplate(transactionManager).execute(new TransactionCallback<Void>() {
 				@Override
-				public Object doInTransaction(TransactionStatus status) {
+				public Void doInTransaction(TransactionStatus status) {
 					try {
 						writer.write("foo");
 					}
@@ -348,13 +338,13 @@ public class TransactionAwareBufferedWriterTests {
 	
 	// BATCH-2018
 	@Test
-	@SuppressWarnings({"unchecked", "rawtypes"})
 	public void testResourceKeyCollision() throws Exception {
 		final int limit = 5000;
 		final TransactionAwareBufferedWriter[] writers = new TransactionAwareBufferedWriter[limit];
 		final String[] results = new String[limit];
 		for(int i = 0; i< limit; i++) {
 			final int index = i;
+			@SuppressWarnings("resource")
 			FileChannel fileChannel = mock(FileChannel.class);
 			when(fileChannel.write(any(ByteBuffer.class))).thenAnswer(new Answer<Integer>() {
 				@Override
@@ -373,9 +363,9 @@ public class TransactionAwareBufferedWriterTests {
 			writers[i] = new TransactionAwareBufferedWriter(fileChannel, null);
 		}
 		
-		new TransactionTemplate(transactionManager).execute(new TransactionCallback() {
+		new TransactionTemplate(transactionManager).execute(new TransactionCallback<Void>() {
             @Override
-			public Object doInTransaction(TransactionStatus status) {
+			public Void doInTransaction(TransactionStatus status) {
 				try {
 					for(int i=0; i< limit; i++) {
 						writers[i].write(String.valueOf(i));

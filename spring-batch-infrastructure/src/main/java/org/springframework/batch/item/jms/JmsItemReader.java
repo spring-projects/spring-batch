@@ -32,7 +32,7 @@ import org.springframework.util.Assert;
  * {@link #read()}.<br/>
  * <br/>
  * 
- * The implementation is thread safe after its properties are set (normal
+ * The implementation is thread-safe after its properties are set (normal
  * singleton behavior).
  * 
  * @author Dave Syer
@@ -47,7 +47,7 @@ public class JmsItemReader<T> implements ItemReader<T>, InitializingBean {
 	protected JmsOperations jmsTemplate;
 
 	/**
-	 * Setter for jms template.
+	 * Setter for JMS template.
 	 * 
 	 * @param jmsTemplate a {@link JmsOperations} instance
 	 */

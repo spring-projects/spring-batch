@@ -138,7 +138,7 @@ public class SimpleJobRepositoryTests {
 	public void testUpdateValidJobExecution() throws Exception {
 
 		JobExecution jobExecution = new JobExecution(new JobInstance(1L, job.getName()), 1L, jobParameters, null);
-		// new execution - call update on job dao
+		// new execution - call update on job DAO
 		jobExecutionDao.updateJobExecution(jobExecution);
 		jobRepository.update(jobExecution);
 		assertNotNull(jobExecution.getLastUpdated());

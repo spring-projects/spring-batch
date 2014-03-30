@@ -218,6 +218,7 @@ public abstract class AbstractMethodInvokingDelegator<T> implements Initializing
 	 *
 	 * @author Robert Kasanicky
 	 */
+	@SuppressWarnings("serial")
 	public static class InvocationTargetThrowableWrapper extends RuntimeException {
 
 		public InvocationTargetThrowableWrapper(Throwable cause) {

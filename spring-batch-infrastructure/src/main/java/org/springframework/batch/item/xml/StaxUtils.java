@@ -36,12 +36,11 @@ import org.springframework.util.ClassUtils;
  * The returned object determines whether the environment has Spring OXM as included in the Spring 3.x series of relies
  * or whether it has Spring OXM from Spring WS 1.5x and factories a StaxSource instance appropriately.
  * <p/>
- * As the only class state maintained is to cache java reflection metadata, which is thread safe, this class is thread-safe.
+ * As the only class state maintained is to cache java reflection metadata, which is thread-safe, this class is thread-safe.
  *
  * @author Josh Long
  *
  */
-@SuppressWarnings("restriction")
 public abstract class StaxUtils {
 
 	private static final Log logger = LogFactory.getLog(StaxUtils.class);
@@ -61,8 +60,7 @@ public abstract class StaxUtils {
 
 	private static Method staxUtilsSourceMethodOnSpring30, staxUtilsResultMethodOnSpring30;
 
-	@SuppressWarnings("rawtypes")
-	private static Constructor staxSourceClassCtorOnSpringWs15, staxResultClassCtorOnSpringWs15;
+	private static Constructor<?> staxSourceClassCtorOnSpringWs15, staxResultClassCtorOnSpringWs15;
 
 	static {
 		try {

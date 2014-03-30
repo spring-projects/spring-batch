@@ -75,11 +75,11 @@ InitializingBean {
 	private String whereStatement;
 	private String orderByStatement;
 
-	private Class targetType;
+	private Class<T> targetType;
 
 	private Map<String, Object> parameterValues;
 
-	private ResultConverter resultConverter;
+	private ResultConverter<Map<String, Object>, T> resultConverter;
 
 	public Neo4jItemReader() {
 		setName(ClassUtils.getShortName(Neo4jItemReader.class));
@@ -119,7 +119,7 @@ InitializingBean {
 	}
 
 	/**
-	 * An optional where fragement of the cypher query.  WHERE is
+	 * An optional where fragment of the cypher query.  WHERE is
 	 * prepended to the statement provided and should <em>not</em>
 	 * be included.
 	 *
@@ -156,7 +156,7 @@ InitializingBean {
 	 *
 	 * @param targetType the type of object to return.
 	 */
-	public void setTargetType(Class targetType) {
+	public void setTargetType(Class<T> targetType) {
 		this.targetType = targetType;
 	}
 
@@ -166,12 +166,11 @@ InitializingBean {
 	 *
 	 * @param resultConverter the converter to use.
 	 */
-	public void setResultConverter(ResultConverter resultConverter) {
+	public void setResultConverter(ResultConverter<Map<String, Object>, T> resultConverter) {
 		this.resultConverter = resultConverter;
 	}
 
 	@Override
-	@SuppressWarnings({"unchecked", "rawtypes"})
 	protected Iterator<T> doPageRead() {
 		Result<Map<String, Object>> queryResults = template.query(
 				generateLimitCypherQuery(), parameterValues);
@@ -185,7 +184,7 @@ InitializingBean {
 			}
 		}
 		else {
-			return new ArrayList().iterator();
+			return new ArrayList<T>().iterator();
 		}
 	}
 

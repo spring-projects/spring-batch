@@ -110,6 +110,7 @@ public class JobRegistryBeanPostProcessorTests {
 	}
 
 	@Test
+	@SuppressWarnings("resource")
 	public void testExecutionWithApplicationContext() throws Exception {
 		ClassPathXmlApplicationContext context = new ClassPathXmlApplicationContext("test-context.xml", getClass());
 		MapJobRegistry registry = (MapJobRegistry) context.getBean("registry");

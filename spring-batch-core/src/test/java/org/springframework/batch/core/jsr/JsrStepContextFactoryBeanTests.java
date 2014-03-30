@@ -1,3 +1,18 @@
+/*
+ * Copyright 2014 the original author or authors.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package org.springframework.batch.core.jsr;
 
 import static org.junit.Assert.assertEquals;
@@ -62,24 +77,24 @@ public class JsrStepContextFactoryBeanTests {
 
 	@Test
 	public void getObjectSingleThread() throws Exception {
-		StepSynchronizationManager.register(new StepExecution("step1", new JobExecution(5l), 3l));
+		StepSynchronizationManager.register(new StepExecution("step1", new JobExecution(5L), 3L));
 
 		StepContext context1 = factory.getObject();
 		StepContext context2 = factory.getObject();
 
 		assertTrue(context1 == context2);
-		assertEquals(3l, context1.getStepExecutionId());
+		assertEquals(3L, context1.getStepExecutionId());
 
 		StepSynchronizationManager.close();
 
-		StepSynchronizationManager.register(new StepExecution("step2", new JobExecution(5l), 2l));
+		StepSynchronizationManager.register(new StepExecution("step2", new JobExecution(5L), 2L));
 
 		StepContext context3 = factory.getObject();
 		StepContext context4 = factory.getObject();
 
 		assertTrue(context3 == context4);
 		assertTrue(context3 != context2);
-		assertEquals(2l, context3.getStepExecutionId());
+		assertEquals(2L, context3.getStepExecutionId());
 
 		StepSynchronizationManager.close();
 	}
@@ -91,13 +106,13 @@ public class JsrStepContextFactoryBeanTests {
 
 		when(propertyContext.getStepProperties("step3")).thenReturn(props);
 
-		StepSynchronizationManager.register(new StepExecution("step3", new JobExecution(5l), 3l));
+		StepSynchronizationManager.register(new StepExecution("step3", new JobExecution(5L), 3L));
 
 		StepContext context1 = factory.getObject();
 		StepContext context2 = factory.getObject();
 
 		assertTrue(context1 == context2);
-		assertEquals(3l, context1.getStepExecutionId());
+		assertEquals(3L, context1.getStepExecutionId());
 		assertEquals("value1", context1.getProperties().get("key1"));
 
 		StepSynchronizationManager.close();
@@ -118,7 +133,7 @@ public class JsrStepContextFactoryBeanTests {
 					try {
 						StepSynchronizationManager.register(new StepExecution("step" + count, new JobExecution(count)));
 						StepContext context = factory.getObject();
-						Thread.sleep(1000l);
+						Thread.sleep(1000L);
 						return context;
 					} catch (Throwable ignore) {
 						return null;
@@ -159,7 +174,7 @@ public class JsrStepContextFactoryBeanTests {
 					try {
 						StepSynchronizationManager.register(new StepExecution("step" + count, new JobExecution(count)));
 						StepContext context = factory.getObject();
-						Thread.sleep(1000l);
+						Thread.sleep(1000L);
 						return context;
 					} catch (Throwable ignore) {
 						return null;

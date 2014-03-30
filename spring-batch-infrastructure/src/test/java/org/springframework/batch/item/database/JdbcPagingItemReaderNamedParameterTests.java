@@ -21,12 +21,14 @@ import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
+import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.batch.item.database.support.HsqlPagingQueryProvider;
 import org.springframework.batch.item.sample.Foo;
 import org.springframework.jdbc.core.simple.ParameterizedRowMapper;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.springframework.test.util.ReflectionTestUtils;
 
 /**
  * @author Dave Syer
@@ -35,12 +37,22 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
  */
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(locations = "/org/springframework/batch/item/database/JdbcPagingItemReaderParameterTests-context.xml")
-public class JdbcPagingItemReaderNamedParameterTests extends AbstractPagingItemReaderParameterTests {
+public class JdbcPagingItemReaderNamedParameterTests extends AbstractJdbcPagingItemReaderParameterTests {
+
+	// force jumpToItemQuery in JdbcPagingItemReader.doJumpToPage(int)
+	private static boolean forceJumpToItemQuery = false;
 
     @Override
 	protected AbstractPagingItemReader<Foo> getItemReader() throws Exception {
-
-		JdbcPagingItemReader<Foo> reader = new JdbcPagingItemReader<Foo>();
+		JdbcPagingItemReader<Foo> reader = new JdbcPagingItemReader<Foo>() {
+			@Override
+			protected void doJumpToPage(int itemIndex) {
+				if (forceJumpToItemQuery) {
+					ReflectionTestUtils.setField(this, "startAfterValues", null);
+				}
+				super.doJumpToPage(itemIndex);
+			}
+		};
 		reader.setDataSource(dataSource);
 		HsqlPagingQueryProvider queryProvider = new HsqlPagingQueryProvider();
 		queryProvider.setSelectClause("select ID, NAME, VALUE");
@@ -49,7 +61,7 @@ public class JdbcPagingItemReaderNamedParameterTests extends AbstractPagingItemR
 		Map<String, Order> sortKeys = new LinkedHashMap<String, Order>();
 		sortKeys.put("ID", Order.ASCENDING);
 		queryProvider.setSortKeys(sortKeys);
-		reader.setParameterValues(Collections.<String, Object>singletonMap("limit", 3));
+		reader.setParameterValues(Collections.<String, Object>singletonMap("limit", 2));
 		reader.setQueryProvider(queryProvider);
 		reader.setRowMapper(
 				new ParameterizedRowMapper<Foo>() {
@@ -68,7 +80,22 @@ public class JdbcPagingItemReaderNamedParameterTests extends AbstractPagingItemR
 		reader.setSaveState(true);
 
 		return reader;
-
+		
 	}
+    
+	@Test
+	public void testReadAfterJumpSecondPageWithJumpToItemQuery() throws Exception {		
+		try {
+			forceJumpToItemQuery = true;
+			super.testReadAfterJumpSecondPage();
+		} finally {
+			forceJumpToItemQuery = false;	
+		}
+	}
+    
+    @Override
+    protected String getName() {
+    	return "JdbcPagingItemReader";
+    }
 
 }

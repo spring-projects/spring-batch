@@ -34,7 +34,7 @@ public class JsrEndStateTests {
 
 	@Test
 	public void test() throws Exception {
-		JobExecution jobExecution = JsrTestUtils.runJob("jobWithEndTransition", null, 10000l);
+		JobExecution jobExecution = JsrTestUtils.runJob("jobWithEndTransition", null, 10000L);
 
 		assertEquals(BatchStatus.COMPLETED, jobExecution.getBatchStatus());
 		assertEquals("SUCCESS", jobExecution.getExitStatus());

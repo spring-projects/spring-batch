@@ -189,6 +189,7 @@ public class ExecutionContextTests {
 	/**
 	 * Value object for testing serialization
 	 */
+	@SuppressWarnings("serial")
 	private static class TestSerializable implements Serializable {
 
 		int value;

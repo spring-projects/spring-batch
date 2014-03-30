@@ -27,7 +27,7 @@ import org.springframework.batch.core.JobExecutionListener;
  * @see AbstractListenerFactoryBean
  * @see JobListenerMetaData
  */
-public class JobListenerFactoryBean extends AbstractListenerFactoryBean {
+public class JobListenerFactoryBean extends AbstractListenerFactoryBean<JobExecutionListener> {
 
 	@Override
 	protected ListenerMetaData getMetaDataFromPropertyName(String propertyName) {

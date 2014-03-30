@@ -37,7 +37,7 @@ import org.springframework.util.StringUtils;
  * </p>
  *
  * <p>
- * This writer is thread safe once all properties are set (normal singleton behavior) so it can be used in multiple
+ * This writer is thread-safe once all properties are set (normal singleton behavior) so it can be used in multiple
  * concurrent transactions.
  * </p>
  *
@@ -91,13 +91,14 @@ public class MongoItemWriter<T> implements ItemWriter<T>, InitializingBean {
 	 *
 	 * @see org.springframework.batch.item.ItemWriter#write(List)
 	 */
+	@Override
 	public void write(List<? extends T> items) throws Exception {
 		if(!transactionActive()) {
 			doWrite(items);
 			return;
 		}
 
-		List bufferedItems = getCurrentBuffer();
+		List<T> bufferedItems = getCurrentBuffer();
 		bufferedItems.addAll(items);
 	}
 
@@ -140,14 +141,15 @@ public class MongoItemWriter<T> implements ItemWriter<T>, InitializingBean {
 		return TransactionSynchronizationManager.isActualTransactionActive();
 	}
 
-	private List<? extends T> getCurrentBuffer() {
+	@SuppressWarnings("unchecked")
+	private List<T> getCurrentBuffer() {
 		if(!TransactionSynchronizationManager.hasResource(bufferKey)) {
-			TransactionSynchronizationManager.bindResource(bufferKey, new ArrayList());
+			TransactionSynchronizationManager.bindResource(bufferKey, new ArrayList<T>());
 
 			TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronizationAdapter() {
 				@Override
 				public void beforeCommit(boolean readOnly) {
-					List items = (List) TransactionSynchronizationManager.getResource(bufferKey);
+					List<T> items = (List<T>) TransactionSynchronizationManager.getResource(bufferKey);
 
 					if(!CollectionUtils.isEmpty(items)) {
 						if(!readOnly) {
@@ -165,9 +167,10 @@ public class MongoItemWriter<T> implements ItemWriter<T>, InitializingBean {
 			});
 		}
 
-		return (List) TransactionSynchronizationManager.getResource(bufferKey);
+		return (List<T>) TransactionSynchronizationManager.getResource(bufferKey);
 	}
 
+	@Override
 	public void afterPropertiesSet() throws Exception {
 		Assert.state(template != null, "A MongoOperations implementation is required.");
 	}

@@ -129,7 +129,7 @@ public class AlmostStatefulRetryChunkTests {
 	}
 
 	/**
-	 * @param chunk
+	 * @param items
 	 * @throws Exception
 	 */
 	private void doWrite(List<String> items) throws Exception {

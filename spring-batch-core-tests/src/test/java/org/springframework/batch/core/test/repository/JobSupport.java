@@ -77,6 +77,7 @@ public class JobSupport implements BeanNameAware, Job {
 	 * 
 	 * @see org.springframework.beans.factory.BeanNameAware#setBeanName(java.lang.String)
 	 */
+	@Override
 	public void setBeanName(String name) {
 		if (this.name == null) {
 			this.name = name;
@@ -97,6 +98,7 @@ public class JobSupport implements BeanNameAware, Job {
 	/* (non-Javadoc)
 	 * @see org.springframework.batch.core.domain.IJob#getName()
 	 */
+	@Override
 	public String getName() {
 		return name;
 	}
@@ -139,6 +141,7 @@ public class JobSupport implements BeanNameAware, Job {
 	/* (non-Javadoc)
 	 * @see org.springframework.batch.core.domain.IJob#isRestartable()
 	 */
+	@Override
 	public boolean isRestartable() {
 		return restartable;
 	}
@@ -146,10 +149,12 @@ public class JobSupport implements BeanNameAware, Job {
 	/* (non-Javadoc)
 	 * @see org.springframework.batch.core.Job#getJobParametersIncrementer()
 	 */
+	@Override
 	public JobParametersIncrementer getJobParametersIncrementer() {
 		return null;
 	}
 	
+	@Override
 	public JobParametersValidator getJobParametersValidator() {
 		return jobParametersValidator;
 	}
@@ -157,10 +162,12 @@ public class JobSupport implements BeanNameAware, Job {
 	/* (non-Javadoc)
 	 * @see org.springframework.batch.core.domain.Job#run(org.springframework.batch.core.domain.JobExecution)
 	 */
+	@Override
 	public void execute(JobExecution execution) throws UnexpectedJobExecutionException {
 		throw new UnsupportedOperationException("JobSupport does not provide an implementation of run().  Use a smarter subclass.");
 	}
 
+	@Override
 	public String toString() {
 		return ClassUtils.getShortName(getClass()) + ": [name=" + name + "]";
 	}

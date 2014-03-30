@@ -22,6 +22,7 @@ package org.springframework.batch.core.step.builder;
  * 
  * @since 2.2
  */
+@SuppressWarnings("serial")
 public class StepBuilderException extends RuntimeException {
 
 	public StepBuilderException(Exception e) {

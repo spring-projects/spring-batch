@@ -31,6 +31,7 @@ public class DefaultBufferedReaderFactoryTests {
 	@Test
 	public void testCreate() throws Exception {
 		DefaultBufferedReaderFactory factory = new DefaultBufferedReaderFactory();
+		@SuppressWarnings("resource")
 		BufferedReader reader = factory.create(new ByteArrayResource("a\nb\nc".getBytes()), "UTF-8");
 		assertEquals("a", reader.readLine());
 	}

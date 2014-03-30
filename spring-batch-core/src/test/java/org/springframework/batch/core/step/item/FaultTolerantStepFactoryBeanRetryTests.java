@@ -125,6 +125,7 @@ public class FaultTolerantStepFactoryBeanRetryTests {
 		assertTrue(Step.class.isAssignableFrom(factory.getObjectType()));
 	}
 
+	@SuppressWarnings("cast")
 	@Test
 	public void testDefaultValue() throws Exception {
 		assertTrue(factory.getObject() instanceof Step);
@@ -172,7 +173,7 @@ public class FaultTolerantStepFactoryBeanRetryTests {
 		factory.setItemReader(reader);
 		factory.setItemProcessor(processor);
 		factory.setItemWriter(failingWriter);
-		Step step = (Step) factory.getObject();
+		Step step = factory.getObject();
 
 		StepExecution stepExecution = new StepExecution(step.getName(),
 				jobExecution);
@@ -180,7 +181,7 @@ public class FaultTolerantStepFactoryBeanRetryTests {
 		step.execute(stepExecution);
 		/*
 		 * Each chunk tried up to RETRY_LIMIT, then the scan processes each item
-		 * once, identfiying the skip as it goes
+		 * once, identifying the skip as it goes
 		 */
 		assertEquals((RETRY_LIMIT +1) * ITEM_LIST.size(), processed.size());
 	}
@@ -219,7 +220,7 @@ public class FaultTolerantStepFactoryBeanRetryTests {
 		factory.setItemReader(reader);
 		factory.setItemProcessor(processor);
 		factory.setItemWriter(failingWriter);
-		Step step = (Step) factory.getObject();
+		Step step = factory.getObject();
 
 		StepExecution stepExecution = new StepExecution(step.getName(),
 				jobExecution);
@@ -229,7 +230,7 @@ public class FaultTolerantStepFactoryBeanRetryTests {
 				.getExitStatus().getExitCode());
 		/*
 		 * Each chunk tried up to RETRY_LIMIT, then the scan processes each item
-		 * once, identfiying the skip as it goes
+		 * once, identifying the skip as it goes
 		 */
 		assertEquals((RETRY_LIMIT +1) * ITEM_LIST.size(), processed.size());
 	}
@@ -266,7 +267,7 @@ public class FaultTolerantStepFactoryBeanRetryTests {
 		factory.setItemReader(reader);
 		factory.setItemProcessor(processor);
 		factory.setItemWriter(failingWriter);
-		Step step = (Step) factory.getObject();
+		Step step = factory.getObject();
 
 		StepExecution stepExecution = new StepExecution(step.getName(),
 				jobExecution);
@@ -303,7 +304,7 @@ public class FaultTolerantStepFactoryBeanRetryTests {
 		factory.setItemReader(provider);
 		factory.setRetryLimit(10);
 		factory.setSkippableExceptionClasses(getExceptionMap());
-		Step step = (Step) factory.getObject();
+		Step step = factory.getObject();
 
 		StepExecution stepExecution = new StepExecution(step.getName(),
 				jobExecution);
@@ -362,7 +363,7 @@ public class FaultTolerantStepFactoryBeanRetryTests {
 			}
 		});
 		factory.setRetryLimit(0);
-		Step step = (Step) factory.getObject();
+		Step step = factory.getObject();
 
 		fail = true;
 		StepExecution stepExecution = new StepExecution(step.getName(),
@@ -405,7 +406,7 @@ public class FaultTolerantStepFactoryBeanRetryTests {
 		};
 		factory.setItemReader(provider);
 		factory.setRetryLimit(10);
-		Step step = (Step) factory.getObject();
+		Step step = factory.getObject();
 
 		StepExecution stepExecution = new StepExecution(step.getName(),
 				jobExecution);
@@ -575,7 +576,7 @@ public class FaultTolerantStepFactoryBeanRetryTests {
 		};
 		factory.setItemReader(provider);
 		factory.setItemWriter(itemWriter);
-		Step step = (Step) factory.getObject();
+		Step step = factory.getObject();
 
 		StepExecution stepExecution = new StepExecution(step.getName(),
 				jobExecution);
@@ -630,7 +631,7 @@ public class FaultTolerantStepFactoryBeanRetryTests {
 		};
 		factory.setItemReader(provider);
 		factory.setItemWriter(itemWriter);
-		Step step = (Step) factory.getObject();
+		Step step = factory.getObject();
 
 		StepExecution stepExecution = new StepExecution(step.getName(),
 				jobExecution);

@@ -61,8 +61,9 @@ public class JobScopeTests {
 		final String foo = "bar";
 		JobSynchronizationManager.release();
 		try {
-			scope.get("foo", new ObjectFactory() {
-				public Object getObject() throws BeansException {
+			scope.get("foo", new ObjectFactory<String>() {
+				@Override
+				public String getObject() throws BeansException {
 					return foo;
 				}
 			});
@@ -77,8 +78,9 @@ public class JobScopeTests {
 	@Test
 	public void testGetWithNothingAlreadyThere() {
 		final String foo = "bar";
-		Object value = scope.get("foo", new ObjectFactory() {
-			public Object getObject() throws BeansException {
+		Object value = scope.get("foo", new ObjectFactory<String>() {
+			@Override
+			public String getObject() throws BeansException {
 				return foo;
 			}
 		});
@@ -89,8 +91,9 @@ public class JobScopeTests {
 	@Test
 	public void testGetWithSomethingAlreadyThere() {
 		context.setAttribute("foo", "bar");
-		Object value = scope.get("foo", new ObjectFactory() {
-			public Object getObject() throws BeansException {
+		Object value = scope.get("foo", new ObjectFactory<String>() {
+			@Override
+			public String getObject() throws BeansException {
 				return null;
 			}
 		});
@@ -109,6 +112,7 @@ public class JobScopeTests {
 		final List<String> list = new ArrayList<String>();
 		context.setAttribute("foo", "bar");
 		scope.registerDestructionCallback("foo", new Runnable() {
+			@Override
 			public void run() {
 				list.add("foo");
 			}
@@ -125,11 +129,13 @@ public class JobScopeTests {
 		final List<String> list = new ArrayList<String>();
 		context.setAttribute("foo", "bar");
 		scope.registerDestructionCallback("foo", new Runnable() {
+			@Override
 			public void run() {
 				list.add("foo");
 			}
 		});
 		scope.registerDestructionCallback("foo", new Runnable() {
+			@Override
 			public void run() {
 				list.add("bar");
 			}
@@ -156,6 +162,7 @@ public class JobScopeTests {
 	}
 
 	@Test
+	@SuppressWarnings("resource")
 	public void testName() throws Exception {
 		scope.setName("foo");
 		StaticApplicationContext beanFactory = new StaticApplicationContext();

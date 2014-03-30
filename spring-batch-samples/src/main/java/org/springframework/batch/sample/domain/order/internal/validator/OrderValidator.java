@@ -1,3 +1,18 @@
+/*
+ * Copyright 2014 the original author or authors.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package org.springframework.batch.sample.domain.order.internal.validator;
 
 import java.math.BigDecimal;
@@ -123,11 +138,11 @@ public class OrderValidator implements Validator {
 
 			//calculate total price
 
-			//discount coeficient = (100.00 - discountPerc) / 100.00
+			//discount coefficient = (100.00 - discountPerc) / 100.00
 			BigDecimal coef = BD_100.subtract(lineItem.getDiscountPerc())
 					.divide(BD_100, 4, BigDecimal.ROUND_HALF_UP);
 
-			//discountedPrice = (price * coef) - discountAmount
+			//discountedPrice = (price * coefficient) - discountAmount
 			//at least one of discountPerc and discountAmount is 0 - this is validated by ValidateDiscountsFunction
 			BigDecimal discountedPrice = lineItem.getPrice().multiply(coef)
 					.subtract(lineItem.getDiscountAmount());
@@ -253,13 +268,13 @@ public class OrderValidator implements Validator {
 			errors.rejectValue("customer.lastName", "error.customer.lastname");
 		}
 
-		if(customer.isRegistered() && (customer.getRegistrationId() < 0 || customer.getRegistrationId() >= 99999999l)) {
+		if(customer.isRegistered() && (customer.getRegistrationId() < 0 || customer.getRegistrationId() >= 99999999L)) {
 			errors.rejectValue("customer.registrationId", "error.customer.registrationid");
 		}
 	}
 
 	protected void validateOrder(Order item, Errors errors) {
-		if(item.getOrderId() < 0 || item.getOrderId() > 9999999999l) {
+		if(item.getOrderId() < 0 || item.getOrderId() > 9999999999L) {
 			errors.rejectValue("orderId", "error.order.id");
 		}
 

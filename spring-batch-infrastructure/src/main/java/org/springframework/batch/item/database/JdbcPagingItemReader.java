@@ -86,8 +86,7 @@ public class JdbcPagingItemReader<T> extends AbstractPagingItemReader<T> impleme
 
 	private NamedParameterJdbcTemplate namedParameterJdbcTemplate;
 
-	@SuppressWarnings("rawtypes")
-	private RowMapper rowMapper;
+	private RowMapper<T> rowMapper;
 
 	private String firstPageSql;
 
@@ -139,8 +138,7 @@ public class JdbcPagingItemReader<T> extends AbstractPagingItemReader<T> impleme
 	 * {@link org.springframework.jdbc.core.simple.ParameterizedRowMapper}
 	 * implementation
 	 */
-	@SuppressWarnings("rawtypes")
-	public void setRowMapper(RowMapper rowMapper) {
+	public void setRowMapper(RowMapper<T> rowMapper) {
 		this.rowMapper = rowMapper;
 	}
 
@@ -263,34 +261,25 @@ public class JdbcPagingItemReader<T> extends AbstractPagingItemReader<T> impleme
 	}
 
 	@Override
-	@SuppressWarnings({"unchecked", "rawtypes"})
 	protected void doJumpToPage(int itemIndex) {
 		/*
 		 * Normally this would be false (the startAfterValue is enough
 		 * information to restart from.
 		 */
+		// TODO: this is dead code, startAfterValues is never null - see #open(ExecutionContext)
 		if (startAfterValues == null && getPage() > 0) {
 
-			String jumpToItemSql;
-			jumpToItemSql = queryProvider.generateJumpToItemQuery(itemIndex, getPageSize());
+			String jumpToItemSql = queryProvider.generateJumpToItemQuery(itemIndex, getPageSize());
 
 			if (logger.isDebugEnabled()) {
 				logger.debug("SQL used for jumping: [" + jumpToItemSql + "]");
 			}
-
-			RowMapper startMapper = new RowMapper() {
-				@Override
-				public Object mapRow(ResultSet rs, int i) throws SQLException {
-					return rs.getObject(1);
-				}
-			};
+			
 			if (this.queryProvider.isUsingNamedParameters()) {
-				startAfterValues = (Map<String, Object>) namedParameterJdbcTemplate.queryForObject(jumpToItemSql,
-						getParameterMap(parameterValues, startAfterValues), startMapper);
+				startAfterValues = namedParameterJdbcTemplate.queryForMap(jumpToItemSql, getParameterMap(parameterValues, null));
 			}
 			else {
-				startAfterValues = (Map<String, Object>) getJdbcTemplate().queryForObject(jumpToItemSql,
-						getParameterList(parameterValues, startAfterValues).toArray(), startMapper);
+				startAfterValues = getJdbcTemplate().queryForMap(jumpToItemSql, getParameterList(parameterValues, null).toArray());
 			}
 		}
 	}
@@ -336,10 +325,9 @@ public class JdbcPagingItemReader<T> extends AbstractPagingItemReader<T> impleme
 		return parameterList;
 	}
 
-	@SuppressWarnings("rawtypes")
-	private class PagingRowMapper implements RowMapper {
+	private class PagingRowMapper implements RowMapper<T> {
 		@Override
-		public Object mapRow(ResultSet rs, int rowNum) throws SQLException {
+		public T mapRow(ResultSet rs, int rowNum) throws SQLException {
 			startAfterValues = new LinkedHashMap<String, Object>();
 			for (Map.Entry<String, Order> sortKey : queryProvider.getSortKeys().entrySet()) {
 				startAfterValues.put(sortKey.getKey(), rs.getObject(sortKey.getKey()));

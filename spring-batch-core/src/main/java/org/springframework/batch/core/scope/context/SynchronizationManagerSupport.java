@@ -128,7 +128,7 @@ public abstract class SynchronizationManagerSupport<E, C> {
 	}
 
 	/**
-	 * Method for de-registering the current context - should always and only be
+	 * Method for unregistering the current context - should always and only be
 	 * used by in conjunction with a matching {@link #register(Object)} to ensure that {@link #getContext()} always returns
 	 * the correct value.
 	 * Does not call close on the context - that is left up to the caller

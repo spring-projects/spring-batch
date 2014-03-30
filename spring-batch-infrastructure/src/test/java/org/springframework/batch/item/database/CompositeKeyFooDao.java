@@ -44,9 +44,9 @@ public class CompositeKeyFooDao extends JdbcDaoSupport implements FooDao {
 		Map<?,?> keys = (Map<?,?>)key;
 		Object[] args = keys.values().toArray();
 
-		RowMapper fooMapper = new RowMapper(){
+		RowMapper<Foo> fooMapper = new RowMapper<Foo>(){
             @Override
-			public Object mapRow(ResultSet rs, int rowNum) throws SQLException {
+			public Foo mapRow(ResultSet rs, int rowNum) throws SQLException {
 				Foo foo = new Foo();
 				foo.setId(rs.getInt(1));
 				foo.setName(rs.getString(2));
@@ -55,7 +55,7 @@ public class CompositeKeyFooDao extends JdbcDaoSupport implements FooDao {
 			}
 		};
 
-		return (Foo)getJdbcTemplate().query("SELECT ID, NAME, VALUE from T_FOOS where ID = ? and VALUE = ?",
+		return getJdbcTemplate().query("SELECT ID, NAME, VALUE from T_FOOS where ID = ? and VALUE = ?",
 				args, fooMapper).get(0);
 	}
 

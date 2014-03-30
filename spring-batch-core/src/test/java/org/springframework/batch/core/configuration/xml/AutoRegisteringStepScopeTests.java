@@ -31,19 +31,19 @@ import org.springframework.context.support.ClassPathXmlApplicationContext;
 public class AutoRegisteringStepScopeTests {
 	
 	@Test
+	@SuppressWarnings("resource")
 	public void testJobElement() throws Exception {
 		ConfigurableApplicationContext ctx = 
 			new ClassPathXmlApplicationContext("org/springframework/batch/core/configuration/xml/AutoRegisteringStepScopeForJobElementTests-context.xml");
-		@SuppressWarnings("unchecked")
 		Map<String, StepScope> beans = ctx.getBeansOfType(StepScope.class);
 		assertTrue("StepScope not defined properly", beans.size() == 1);
 	}
 
 	@Test
+	@SuppressWarnings("resource")
 	public void testStepElement() throws Exception {
 		ConfigurableApplicationContext ctx = 
 			new ClassPathXmlApplicationContext("org/springframework/batch/core/configuration/xml/AutoRegisteringStepScopeForStepElementTests-context.xml");
-		@SuppressWarnings("unchecked")
 		Map<String, StepScope> beans = ctx.getBeansOfType(StepScope.class);
 		assertTrue("StepScope not defined properly", beans.size() == 1);
 	}

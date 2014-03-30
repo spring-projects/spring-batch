@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <beansProjectDescription>
 	<version>1</version>
-	<pluginVersion><![CDATA[2.3.0.200912170948-RELEASE]]></pluginVersion>
+	<pluginVersion><![CDATA[3.3.0.201307091516-RELEASE]]></pluginVersion>
 	<configSuffixes>
 		<configSuffix><![CDATA[xml]]></configSuffix>
 	</configSuffixes>
@@ -18,7 +18,6 @@
 		<config>src/test/resources/org/springframework/batch/item/database/JpaPagingItemReaderCommonTests-context.xml</config>
 		<config>src/test/resources/org/springframework/batch/item/database/JpaPagingItemReaderParameterTests-context.xml</config>
 		<config>src/test/resources/org/springframework/batch/item/adapter/pe-delegating-item-writer.xml</config>
-		<config>src/test/resources/org/springframework/batch/retry/interceptor/retry-transaction-test.xml</config>
 		<config>src/test/resources/org/springframework/batch/item/database/stored-procedure-context.xml</config>
 	</configs>
 	<configSets>

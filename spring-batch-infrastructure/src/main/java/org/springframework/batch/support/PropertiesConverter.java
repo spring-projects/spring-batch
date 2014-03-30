@@ -49,7 +49,7 @@ public final class PropertiesConverter {
 
 	// prevents the class from being instantiated
 	private PropertiesConverter() {
-	};
+	}
 
 	/**
 	 * Parse a String to a Properties object. If string is null, an empty

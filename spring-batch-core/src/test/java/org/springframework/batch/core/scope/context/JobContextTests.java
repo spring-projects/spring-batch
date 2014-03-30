@@ -46,8 +46,8 @@ public class JobContextTests {
 
 	@Before
 	public void setUp() {
-		jobExecution = new JobExecution(1l);
-		JobInstance jobInstance = new JobInstance(2l, "job");
+		jobExecution = new JobExecution(1L);
+		JobInstance jobInstance = new JobInstance(2L, "job");
 		jobExecution.setJobInstance(jobInstance);
 		context = new JobContext(jobExecution);
 		list = new ArrayList<String>();
@@ -167,7 +167,7 @@ public class JobContextTests {
 	public void testJobParameters() throws Exception {
 		JobParameters jobParameters = new JobParametersBuilder().addString("foo", "bar").toJobParameters();
 		JobInstance jobInstance = new JobInstance(0L, "foo");
-		jobExecution = new JobExecution(5l, jobParameters);
+		jobExecution = new JobExecution(5L, jobParameters);
 		jobExecution.setJobInstance(jobInstance);
 		context = new JobContext(jobExecution);
 		assertEquals("bar", context.getJobParameters().get("foo"));

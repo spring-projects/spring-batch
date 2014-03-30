@@ -27,6 +27,7 @@ import org.springframework.batch.item.ParseException;
  * @author Lucas Ward
  * @author Ben Hale
  */
+@SuppressWarnings("serial")
 public class FlatFileParseException extends ParseException {
 
 	private String input;

@@ -16,11 +16,12 @@
 package org.springframework.batch.item;
 
 /**
- * Exception indicating that an error has been encountered parsing io, typically from a file.
+ * Exception indicating that an error has been encountered parsing IO, typically from a file.
  * 
  * @author Lucas Ward
  * @author Ben Hale
  */
+@SuppressWarnings("serial")
 public class ParseException extends ItemReaderException {
 
 	/**

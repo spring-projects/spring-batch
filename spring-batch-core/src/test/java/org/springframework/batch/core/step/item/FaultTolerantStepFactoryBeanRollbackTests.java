@@ -1,3 +1,18 @@
+/*
+ * Copyright 2009-2014 the original author or authors.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package org.springframework.batch.core.step.item;
 
 import org.apache.commons.logging.Log;
@@ -112,7 +127,7 @@ public class FaultTolerantStepFactoryBeanRollbackTests {
 	@Test
 	public void testBeforeChunkListenerException() throws Exception{
 		factory.setListeners(new StepListener []{new ExceptionThrowingChunkListener(1)});
-		Step step = (Step) factory.getObject();
+		Step step = factory.getObject();
 		step.execute(stepExecution);
 		assertEquals(FAILED, stepExecution.getStatus());
 		assertEquals(FAILED.toString(), stepExecution.getExitStatus().getExitCode());
@@ -125,7 +140,7 @@ public class FaultTolerantStepFactoryBeanRollbackTests {
 	@Test
 	public void testAfterChunkListenerException() throws Exception{
 		factory.setListeners(new StepListener []{new ExceptionThrowingChunkListener(2)});
-		Step step = (Step) factory.getObject();
+		Step step = factory.getObject();
 		step.execute(stepExecution);
 		assertEquals(FAILED, stepExecution.getStatus());
 		assertEquals(FAILED.toString(), stepExecution.getExitStatus().getExitCode());
@@ -173,7 +188,7 @@ public class FaultTolerantStepFactoryBeanRollbackTests {
 		reader.setFailures("2", "3");
 		reader.setExceptionType(SkippableException.class);
 
-		Step step = (Step) factory.getObject();
+		Step step = factory.getObject();
 
 		step.execute(stepExecution);
 		assertEquals(BatchStatus.COMPLETED, stepExecution.getStatus());
@@ -196,7 +211,7 @@ public class FaultTolerantStepFactoryBeanRollbackTests {
 		// But this one is explicit in the tx-attrs so it should be skipped
 		factory.setNoRollbackExceptionClasses(getExceptionList(SkippableException.class));
 
-		Step step = (Step) factory.getObject();
+		Step step = factory.getObject();
 
 		step.execute(stepExecution);
 		assertEquals(BatchStatus.COMPLETED, stepExecution.getStatus());
@@ -215,7 +230,7 @@ public class FaultTolerantStepFactoryBeanRollbackTests {
 		processor.setFailures("1", "3");
 		processor.setExceptionType(SkippableException.class);
 
-		Step step = (Step) factory.getObject();
+		Step step = factory.getObject();
 
 		step.execute(stepExecution);
 		assertEquals(BatchStatus.COMPLETED, stepExecution.getStatus());
@@ -233,7 +248,7 @@ public class FaultTolerantStepFactoryBeanRollbackTests {
 		processor.setFailures("1", "3");
 		processor.setExceptionType(SkippableRuntimeException.class);
 
-		Step step = (Step) factory.getObject();
+		Step step = factory.getObject();
 
 		step.execute(stepExecution);
 		assertEquals(BatchStatus.COMPLETED, stepExecution.getStatus());
@@ -265,7 +280,7 @@ public class FaultTolerantStepFactoryBeanRollbackTests {
 
 		processor.setFailures("2");
 
-		Step step = (Step) factory.getObject();
+		Step step = factory.getObject();
 
 		stepExecution = jobExecution.createStepExecution(factory.getName());
 		repository.add(stepExecution);
@@ -289,7 +304,7 @@ public class FaultTolerantStepFactoryBeanRollbackTests {
 
 		factory.setNoRollbackExceptionClasses(getExceptionList(SkippableException.class));
 
-		Step step = (Step) factory.getObject();
+		Step step = factory.getObject();
 
 		step.execute(stepExecution);
 
@@ -317,7 +332,7 @@ public class FaultTolerantStepFactoryBeanRollbackTests {
 		writer.setFailures("2", "3");
 		writer.setExceptionType(SkippableException.class);
 
-		Step step = (Step) factory.getObject();
+		Step step = factory.getObject();
 
 		step.execute(stepExecution);
 		assertEquals(BatchStatus.COMPLETED, stepExecution.getStatus());
@@ -333,7 +348,7 @@ public class FaultTolerantStepFactoryBeanRollbackTests {
 		writer.setFailures("2", "3");
 		writer.setExceptionType(AssertionError.class);
 
-		Step step = (Step) factory.getObject();
+		Step step = factory.getObject();
 
 		step.execute(stepExecution);
 		assertEquals(BatchStatus.FAILED, stepExecution.getStatus());
@@ -349,7 +364,7 @@ public class FaultTolerantStepFactoryBeanRollbackTests {
 		writer.setFailures("2", "3");
 		writer.setExceptionType(SkippableRuntimeException.class);
 
-		Step step = (Step) factory.getObject();
+		Step step = factory.getObject();
 
 		step.execute(stepExecution);
 		assertEquals(BatchStatus.COMPLETED, stepExecution.getStatus());
@@ -369,7 +384,7 @@ public class FaultTolerantStepFactoryBeanRollbackTests {
 
 		factory.setNoRollbackExceptionClasses(getExceptionList(SkippableRuntimeException.class));
 
-		Step step = (Step) factory.getObject();
+		Step step = factory.getObject();
 
 		step.execute(stepExecution);
 		assertEquals(BatchStatus.COMPLETED, stepExecution.getStatus());
@@ -390,7 +405,7 @@ public class FaultTolerantStepFactoryBeanRollbackTests {
 
 		factory.setNoRollbackExceptionClasses(getExceptionList(SkippableException.class));
 
-		Step step = (Step) factory.getObject();
+		Step step = factory.getObject();
 
 		step.execute(stepExecution);
 		assertEquals(BatchStatus.COMPLETED, stepExecution.getStatus());
@@ -405,7 +420,7 @@ public class FaultTolerantStepFactoryBeanRollbackTests {
 		processor.setFailures("4");
 		factory.setCommitInterval(30);
 
-		Step step = (Step) factory.getObject();
+		Step step = factory.getObject();
 
 		step.execute(stepExecution);
 		assertEquals(BatchStatus.COMPLETED, stepExecution.getStatus());
@@ -421,7 +436,7 @@ public class FaultTolerantStepFactoryBeanRollbackTests {
 		processor.setFailures("2", "4");
 		factory.setCommitInterval(30);
 
-		Step step = (Step) factory.getObject();
+		Step step = factory.getObject();
 
 		step.execute(stepExecution);
 		assertEquals(BatchStatus.COMPLETED, stepExecution.getStatus());
@@ -438,7 +453,7 @@ public class FaultTolerantStepFactoryBeanRollbackTests {
 		factory.setCommitInterval(30);
 		factory.setProcessorTransactional(false);
 
-		Step step = (Step) factory.getObject();
+		Step step = factory.getObject();
 
 		step.execute(stepExecution);
 		assertEquals(BatchStatus.COMPLETED, stepExecution.getStatus());
@@ -455,7 +470,7 @@ public class FaultTolerantStepFactoryBeanRollbackTests {
 		processor.setFilter(true);
 		factory.setCommitInterval(30);
 
-		Step step = (Step) factory.getObject();
+		Step step = factory.getObject();
 
 		step.execute(stepExecution);
 		assertEquals(BatchStatus.COMPLETED, stepExecution.getStatus());
@@ -471,7 +486,7 @@ public class FaultTolerantStepFactoryBeanRollbackTests {
 		writer.setFailures("4");
 		factory.setCommitInterval(30);
 
-		Step step = (Step) factory.getObject();
+		Step step = factory.getObject();
 
 		step.execute(stepExecution);
 		assertEquals(BatchStatus.COMPLETED, stepExecution.getStatus());
@@ -493,7 +508,7 @@ public class FaultTolerantStepFactoryBeanRollbackTests {
 		factory.setCommitInterval(30);
 		factory.setProcessorTransactional(false);
 
-		Step step = (Step) factory.getObject();
+		Step step = factory.getObject();
 
 		step.execute(stepExecution);
 		assertEquals(BatchStatus.COMPLETED, stepExecution.getStatus());
@@ -512,7 +527,7 @@ public class FaultTolerantStepFactoryBeanRollbackTests {
 		factory.setSkipLimit(10);
 		factory.setIsReaderTransactionalQueue(true);
 
-		Step step = (Step) factory.getObject();
+		Step step = factory.getObject();
 
 		step.execute(stepExecution);
 		assertEquals(BatchStatus.COMPLETED, stepExecution.getStatus());
@@ -529,7 +544,7 @@ public class FaultTolerantStepFactoryBeanRollbackTests {
 		factory.setSkipLimit(10);
 		factory.setTaskExecutor(new SimpleAsyncTaskExecutor());
 
-		Step step = (Step) factory.getObject();
+		Step step = factory.getObject();
 
 		step.execute(stepExecution);
 		assertEquals(BatchStatus.COMPLETED, stepExecution.getStatus());
@@ -544,7 +559,7 @@ public class FaultTolerantStepFactoryBeanRollbackTests {
 		writer.setFailures("2", "4");
 		factory.setCommitInterval(30);
 
-		Step step = (Step) factory.getObject();
+		Step step = factory.getObject();
 
 		step.execute(stepExecution);
 		assertEquals(BatchStatus.COMPLETED, stepExecution.getStatus());
@@ -566,7 +581,7 @@ public class FaultTolerantStepFactoryBeanRollbackTests {
 		factory.setCommitInterval(30);
 		factory.setProcessorTransactional(false);
 
-		Step step = (Step) factory.getObject();
+		Step step = factory.getObject();
 
 		step.execute(stepExecution);
 		assertEquals(BatchStatus.COMPLETED, stepExecution.getStatus());

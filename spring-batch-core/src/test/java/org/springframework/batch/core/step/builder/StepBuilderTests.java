@@ -35,7 +35,7 @@ public class StepBuilderTests {
 
 	@Test
 	public void test() throws Exception {
-		JobRepository jobRepository = new MapJobRepositoryFactoryBean().getJobRepository();
+		JobRepository jobRepository = new MapJobRepositoryFactoryBean().getObject();
 		StepExecution execution = jobRepository.createJobExecution("foo", new JobParameters()).createStepExecution(
 				"step");
 		jobRepository.add(execution);

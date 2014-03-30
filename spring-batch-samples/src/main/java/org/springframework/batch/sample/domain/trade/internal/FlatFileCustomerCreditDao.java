@@ -40,6 +40,7 @@ public class FlatFileCustomerCreditDao implements CustomerCreditDao,
 
 	private volatile boolean opened = false;
 
+	@Override
 	public void writeCredit(CustomerCredit customerCredit) throws Exception {
 
 		if (!opened) {
@@ -78,6 +79,7 @@ public class FlatFileCustomerCreditDao implements CustomerCreditDao,
 	 *
 	 * @see org.springframework.beans.factory.DisposableBean#destroy()
 	 */
+	@Override
 	public void destroy() throws Exception {
 		close();
 	}

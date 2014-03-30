@@ -106,7 +106,7 @@ DisposableBean {
 	}
 
 	/**
-	 * De-register all the {@link Job} instances that were regsistered by this
+	 * Unregister all the {@link Job} instances that were registered by this
 	 * post processor.
 	 * @see org.springframework.beans.factory.DisposableBean#destroy()
 	 */

@@ -50,12 +50,11 @@ import org.springframework.util.MethodInvoker;
  * @author Michael Minella
  * @since 2.2
  */
-@SuppressWarnings("rawtypes")
-public class RepositoryItemWriter implements ItemWriter, InitializingBean {
+public class RepositoryItemWriter<T> implements ItemWriter<T>, InitializingBean {
 
 	protected static final Log logger = LogFactory.getLog(RepositoryItemWriter.class);
 
-	private CrudRepository repository;
+	private CrudRepository<T, ?> repository;
 
 	private String methodName;
 
@@ -75,7 +74,7 @@ public class RepositoryItemWriter implements ItemWriter, InitializingBean {
 	 *
 	 * @param repository the Spring Data repository to be set
 	 */
-	public void setRepository(CrudRepository repository) {
+	public void setRepository(CrudRepository<T, ?> repository) {
 		this.repository = repository;
 	}
 
@@ -85,7 +84,7 @@ public class RepositoryItemWriter implements ItemWriter, InitializingBean {
 	 * @see org.springframework.batch.item.ItemWriter#write(java.util.List)
 	 */
 	@Override
-	public void write(List items) throws Exception {
+	public void write(List<? extends T> items) throws Exception {
 		if(!CollectionUtils.isEmpty(items)) {
 			doWrite(items);
 		}
@@ -97,14 +96,14 @@ public class RepositoryItemWriter implements ItemWriter, InitializingBean {
 	 *
 	 * @param items the list of items to be persisted.
 	 */
-	protected void doWrite(List items) throws Exception {
+	protected void doWrite(List<? extends T> items) throws Exception {
 		if (logger.isDebugEnabled()) {
 			logger.debug("Writing to the repository with " + items.size() + " items.");
 		}
 
 		MethodInvoker invoker = createMethodInvoker(repository, methodName);
 
-		for (Object object : items) {
+		for (T object : items) {
 			invoker.setArguments(new Object [] {object});
 			doInvoke(invoker);
 		}

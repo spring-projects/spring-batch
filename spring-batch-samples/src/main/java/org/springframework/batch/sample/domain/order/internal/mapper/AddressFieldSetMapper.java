@@ -30,6 +30,7 @@ public class AddressFieldSetMapper implements FieldSetMapper<Address> {
 	public static final String STATE_COLUMN = "STATE";
 	public static final String COUNTRY_COLUMN = "COUNTRY";
 
+	@Override
 	public Address mapFieldSet(FieldSet fieldSet) {
 		Address address = new Address();
 

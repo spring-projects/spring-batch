@@ -1,3 +1,18 @@
+/*
+ * Copyright 2008-2014 the original author or authors.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package org.springframework.batch.sample;
 
 import static org.junit.Assert.assertEquals;
@@ -172,7 +187,7 @@ public class SkipSampleFunctionalTests {
 		// Step2: 7 input records, 1 skipped on process, 1 on write => 5 written
 		// to output
 		// System.err.println(jdbcTemplate.queryForList("SELECT * FROM TRADE"));
-		assertEquals(5, jdbcTemplate.queryForInt("SELECT COUNT(*) from TRADE where VERSION=?", 1));
+		assertEquals(5, jdbcTemplate.queryForObject("SELECT COUNT(*) from TRADE where VERSION=?", Integer.class, 1).intValue());
 
 		// 1 record skipped in processing second step
 		assertEquals(1, SkipCheckingListener.getProcessSkips());
@@ -200,7 +215,7 @@ public class SkipSampleFunctionalTests {
 		assertEquals(5, JdbcTestUtils.countRowsInTable((JdbcTemplate) jdbcTemplate, "TRADE"));
 
 		// Step2: 5 input records => 5 written to output
-		assertEquals(5, jdbcTemplate.queryForInt("SELECT COUNT(*) from TRADE where VERSION=?", 1));
+		assertEquals(5, jdbcTemplate.queryForObject("SELECT COUNT(*) from TRADE where VERSION=?", Integer.class, 1).intValue());
 
 		// Neither step contained skips
 		assertEquals(0, JdbcTestUtils.countRowsInTable((JdbcTemplate) jdbcTemplate, "ERROR_LOG"));

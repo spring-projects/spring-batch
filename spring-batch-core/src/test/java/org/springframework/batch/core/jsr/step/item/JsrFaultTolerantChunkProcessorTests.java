@@ -30,6 +30,7 @@ import org.springframework.batch.core.ItemWriteListener;
 import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.JobInterruptedException;
 import org.springframework.batch.core.JobParameters;
+import org.springframework.batch.core.SkipListener;
 import org.springframework.batch.core.Step;
 import org.springframework.batch.core.StepExecution;
 import org.springframework.batch.core.jsr.configuration.support.BatchPropertyContext;
@@ -50,7 +51,7 @@ public class JsrFaultTolerantChunkProcessorTests {
 	private FailingListItemReader reader;
 	private FailingCountingItemProcessor processor;
 	private StoringItemWriter writer;
-	private CountingListener readListener;
+	private CountingListener listener;
 	private JsrFaultTolerantStepBuilder<String, String> builder;
 	private JobRepository repository;
 	private StepExecution stepExecution;
@@ -67,11 +68,11 @@ public class JsrFaultTolerantChunkProcessorTests {
 		reader = new FailingListItemReader(items);
 		processor = new FailingCountingItemProcessor();
 		writer = new StoringItemWriter();
-		readListener = new CountingListener();
+		listener = new CountingListener();
 
 		builder = new JsrFaultTolerantStepBuilder<String, String>(new StepBuilder("step1"));
 		builder.setBatchPropertyContext(new BatchPropertyContext());
-		repository = new MapJobRepositoryFactoryBean().getJobRepository();
+		repository = new MapJobRepositoryFactoryBean().getObject();
 		builder.repository(repository);
 		builder.transactionManager(new ResourcelessTransactionManager());
 		stepExecution = null;
@@ -80,7 +81,7 @@ public class JsrFaultTolerantChunkProcessorTests {
 	@Test
 	public void testNoInputNoListeners() throws Exception{
 		reader = new FailingListItemReader(new ArrayList<String>());
-		Step step = builder.chunk(25).reader(reader).processor(processor).writer(writer).listener((ItemReadListener<String>) readListener).build();
+		Step step = builder.chunk(25).reader(reader).processor(processor).writer(writer).listener((ItemReadListener<String>) listener).build();
 
 		runStep(step);
 
@@ -122,7 +123,7 @@ public class JsrFaultTolerantChunkProcessorTests {
 
 	@Test
 	public void testSimpleScenarioNoProcessor() throws Exception{
-		Step step = builder.chunk(25).reader(reader).writer(writer).listener((ItemReadListener<String>) readListener).build();
+		Step step = builder.chunk(25).reader(reader).writer(writer).listener((ItemReadListener<String>) listener).build();
 
 		runStep(step);
 
@@ -134,15 +135,15 @@ public class JsrFaultTolerantChunkProcessorTests {
 		assertEquals(25, stepExecution.getWriteCount());
 		assertEquals(0, stepExecution.getFilterCount());
 		assertEquals(0, stepExecution.getWriteSkipCount());
-		assertEquals(0, readListener.afterProcess);
-		assertEquals(25, readListener.afterRead);
-		assertEquals(1, readListener.afterWrite);
-		assertEquals(0, readListener.beforeProcess);
-		assertEquals(26, readListener.beforeRead);
-		assertEquals(1, readListener.beforeWriteCount);
-		assertEquals(0, readListener.onProcessError);
-		assertEquals(0, readListener.onReadError);
-		assertEquals(0, readListener.onWriteError);
+		assertEquals(0, listener.afterProcess);
+		assertEquals(25, listener.afterRead);
+		assertEquals(1, listener.afterWrite);
+		assertEquals(0, listener.beforeProcess);
+		assertEquals(26, listener.beforeRead);
+		assertEquals(1, listener.beforeWriteCount);
+		assertEquals(0, listener.onProcessError);
+		assertEquals(0, listener.onReadError);
+		assertEquals(0, listener.onWriteError);
 		assertEquals(0, processor.count);
 
 		int count = 0;
@@ -155,7 +156,7 @@ public class JsrFaultTolerantChunkProcessorTests {
 	@Test
 	public void testProcessorFilteringNoListeners() throws Exception{
 		processor.filter = true;
-		Step step = builder.chunk(25).reader(reader).processor(processor).writer(writer).listener((ItemReadListener<String>) readListener).build();
+		Step step = builder.chunk(25).reader(reader).processor(processor).writer(writer).listener((ItemReadListener<String>) listener).build();
 
 		runStep(step);
 
@@ -180,7 +181,7 @@ public class JsrFaultTolerantChunkProcessorTests {
 	public void testSkipReadError() throws Exception{
 		reader.failCount = 10;
 
-		Step step = builder.faultTolerant().skip(RuntimeException.class).skipLimit(20).chunk(25).reader(reader).processor(processor).writer(writer).listener((ItemReadListener<String>) readListener).build();
+		Step step = builder.faultTolerant().skip(RuntimeException.class).skipLimit(20).chunk(25).reader(reader).processor(processor).writer(writer).listener((ItemReadListener<String>) listener).build();
 
 		runStep(step);
 
@@ -196,22 +197,22 @@ public class JsrFaultTolerantChunkProcessorTests {
 		assertEquals(0, stepExecution.getFilterCount());
 		assertEquals(0, stepExecution.getWriteSkipCount());
 		assertEquals(0,	stepExecution.getFailureExceptions().size());
-		assertEquals(25, readListener.afterProcess);
-		assertEquals(25, readListener.afterRead);
-		assertEquals(1, readListener.afterWrite);
-		assertEquals(25, readListener.beforeProcess);
-		assertEquals(27, readListener.beforeRead);
-		assertEquals(1, readListener.beforeWriteCount);
-		assertEquals(0, readListener.onProcessError);
-		assertEquals(1, readListener.onReadError);
-		assertEquals(0, readListener.onWriteError);
+		assertEquals(25, listener.afterProcess);
+		assertEquals(25, listener.afterRead);
+		assertEquals(1, listener.afterWrite);
+		assertEquals(25, listener.beforeProcess);
+		assertEquals(27, listener.beforeRead);
+		assertEquals(1, listener.beforeWriteCount);
+		assertEquals(0, listener.onProcessError);
+		assertEquals(1, listener.onReadError);
+		assertEquals(0, listener.onWriteError);
 	}
 
 	@Test
 	public void testRetryReadError() throws Exception{
 		reader.failCount = 10;
 
-		Step step = builder.faultTolerant().retry(RuntimeException.class).retryLimit(20).chunk(25).reader(reader).processor(processor).writer(writer).listener((ItemReadListener<String>) readListener).build();
+		Step step = builder.faultTolerant().retry(RuntimeException.class).retryLimit(20).chunk(25).reader(reader).processor(processor).writer(writer).listener((ItemReadListener<String>) listener).build();
 
 		runStep(step);
 
@@ -226,22 +227,22 @@ public class JsrFaultTolerantChunkProcessorTests {
 		assertEquals(0, stepExecution.getFilterCount());
 		assertEquals(0, stepExecution.getWriteSkipCount());
 		assertEquals(0,	stepExecution.getFailureExceptions().size());
-		assertEquals(25, readListener.afterProcess);
-		assertEquals(25, readListener.afterRead);
-		assertEquals(1, readListener.afterWrite);
-		assertEquals(25, readListener.beforeProcess);
-		assertEquals(27, readListener.beforeRead);
-		assertEquals(1, readListener.beforeWriteCount);
-		assertEquals(0, readListener.onProcessError);
-		assertEquals(1, readListener.onReadError);
-		assertEquals(0, readListener.onWriteError);
+		assertEquals(25, listener.afterProcess);
+		assertEquals(25, listener.afterRead);
+		assertEquals(1, listener.afterWrite);
+		assertEquals(25, listener.beforeProcess);
+		assertEquals(27, listener.beforeRead);
+		assertEquals(1, listener.beforeWriteCount);
+		assertEquals(0, listener.onProcessError);
+		assertEquals(1, listener.onReadError);
+		assertEquals(0, listener.onWriteError);
 	}
 
 	@Test
 	public void testReadError() throws Exception{
 		reader.failCount = 10;
 
-		Step step = builder.chunk(25).reader(reader).processor(processor).writer(writer).listener((ItemReadListener<String>) readListener).build();
+		Step step = builder.chunk(25).reader(reader).processor(processor).writer(writer).listener((ItemReadListener<String>) listener).build();
 
 		runStep(step);
 
@@ -258,22 +259,22 @@ public class JsrFaultTolerantChunkProcessorTests {
 		assertEquals(0, stepExecution.getWriteSkipCount());
 		assertEquals(1,	stepExecution.getFailureExceptions().size());
 		assertEquals("expected at read index 10", stepExecution.getFailureExceptions().get(0).getCause().getMessage());
-		assertEquals(9, readListener.afterProcess);
-		assertEquals(9, readListener.afterRead);
-		assertEquals(0, readListener.afterWrite);
-		assertEquals(9, readListener.beforeProcess);
-		assertEquals(10, readListener.beforeRead);
-		assertEquals(0, readListener.beforeWriteCount);
-		assertEquals(0, readListener.onProcessError);
-		assertEquals(1, readListener.onReadError);
-		assertEquals(0, readListener.onWriteError);
+		assertEquals(9, listener.afterProcess);
+		assertEquals(9, listener.afterRead);
+		assertEquals(0, listener.afterWrite);
+		assertEquals(9, listener.beforeProcess);
+		assertEquals(10, listener.beforeRead);
+		assertEquals(0, listener.beforeWriteCount);
+		assertEquals(0, listener.onProcessError);
+		assertEquals(1, listener.onReadError);
+		assertEquals(0, listener.onWriteError);
 	}
 
 	@Test
 	public void testProcessError() throws Exception{
 		processor.failCount = 10;
 
-		Step step = builder.chunk(25).reader(reader).processor(processor).writer(writer).listener((ItemReadListener<String>) readListener).build();
+		Step step = builder.chunk(25).reader(reader).processor(processor).writer(writer).listener((ItemReadListener<String>) listener).build();
 
 		runStep(step);
 
@@ -288,22 +289,22 @@ public class JsrFaultTolerantChunkProcessorTests {
 		assertEquals(0, stepExecution.getFilterCount());
 		assertEquals(0, stepExecution.getWriteSkipCount());
 		assertEquals("expected at process index 10", stepExecution.getFailureExceptions().get(0).getCause().getMessage());
-		assertEquals(9, readListener.afterProcess);
-		assertEquals(10, readListener.afterRead);
-		assertEquals(0, readListener.afterWrite);
-		assertEquals(10, readListener.beforeProcess);
-		assertEquals(10, readListener.beforeRead);
-		assertEquals(0, readListener.beforeWriteCount);
-		assertEquals(1, readListener.onProcessError);
-		assertEquals(0, readListener.onReadError);
-		assertEquals(0, readListener.onWriteError);
+		assertEquals(9, listener.afterProcess);
+		assertEquals(10, listener.afterRead);
+		assertEquals(0, listener.afterWrite);
+		assertEquals(10, listener.beforeProcess);
+		assertEquals(10, listener.beforeRead);
+		assertEquals(0, listener.beforeWriteCount);
+		assertEquals(1, listener.onProcessError);
+		assertEquals(0, listener.onReadError);
+		assertEquals(0, listener.onWriteError);
 	}
 
 	@Test
 	public void testSkipProcessError() throws Exception{
 		processor.failCount = 10;
 
-		Step step = builder.faultTolerant().skip(RuntimeException.class).skipLimit(20).chunk(25).reader(reader).processor(processor).writer(writer).listener((ItemReadListener<String>) readListener).build();
+		Step step = builder.faultTolerant().skip(RuntimeException.class).skipLimit(20).chunk(25).reader(reader).processor(processor).writer(writer).listener((ItemReadListener<String>) listener).build();
 
 		runStep(step);
 
@@ -319,22 +320,22 @@ public class JsrFaultTolerantChunkProcessorTests {
 		assertEquals(1, stepExecution.getFilterCount());
 		assertEquals(0, stepExecution.getWriteSkipCount());
 		assertEquals(0,	stepExecution.getFailureExceptions().size());
-		assertEquals(24, readListener.afterProcess);
-		assertEquals(25, readListener.afterRead);
-		assertEquals(1, readListener.afterWrite);
-		assertEquals(25, readListener.beforeProcess);
-		assertEquals(26, readListener.beforeRead);
-		assertEquals(1, readListener.beforeWriteCount);
-		assertEquals(1, readListener.onProcessError);
-		assertEquals(0, readListener.onReadError);
-		assertEquals(0, readListener.onWriteError);
+		assertEquals(24, listener.afterProcess);
+		assertEquals(25, listener.afterRead);
+		assertEquals(1, listener.afterWrite);
+		assertEquals(25, listener.beforeProcess);
+		assertEquals(26, listener.beforeRead);
+		assertEquals(1, listener.beforeWriteCount);
+		assertEquals(1, listener.onProcessError);
+		assertEquals(0, listener.onReadError);
+		assertEquals(0, listener.onWriteError);
 	}
 
 	@Test
 	public void testRetryProcessError() throws Exception{
 		processor.failCount = 10;
 
-		Step step = builder.faultTolerant().retry(RuntimeException.class).retryLimit(20).chunk(25).reader(reader).processor(processor).writer(writer).listener((ItemReadListener<String>) readListener).build();
+		Step step = builder.faultTolerant().retry(RuntimeException.class).retryLimit(20).chunk(25).reader(reader).processor(processor).writer(writer).listener((ItemReadListener<String>) listener).build();
 
 		runStep(step);
 
@@ -350,22 +351,22 @@ public class JsrFaultTolerantChunkProcessorTests {
 		assertEquals(0, stepExecution.getFilterCount());
 		assertEquals(0, stepExecution.getWriteSkipCount());
 		assertEquals(0,	stepExecution.getFailureExceptions().size());
-		assertEquals(25, readListener.afterProcess);
-		assertEquals(25, readListener.afterRead);
-		assertEquals(1, readListener.afterWrite);
-		assertEquals(26, readListener.beforeProcess);
-		assertEquals(26, readListener.beforeRead);
-		assertEquals(1, readListener.beforeWriteCount);
-		assertEquals(1, readListener.onProcessError);
-		assertEquals(0, readListener.onReadError);
-		assertEquals(0, readListener.onWriteError);
+		assertEquals(25, listener.afterProcess);
+		assertEquals(25, listener.afterRead);
+		assertEquals(1, listener.afterWrite);
+		assertEquals(26, listener.beforeProcess);
+		assertEquals(26, listener.beforeRead);
+		assertEquals(1, listener.beforeWriteCount);
+		assertEquals(1, listener.onProcessError);
+		assertEquals(0, listener.onReadError);
+		assertEquals(0, listener.onWriteError);
 	}
 
 	@Test
 	public void testWriteError() throws Exception{
 		writer.fail = true;
 
-		Step step = builder.chunk(25).reader(reader).processor(processor).writer(writer).listener((ItemReadListener<String>) readListener).build();
+		Step step = builder.chunk(25).reader(reader).processor(processor).writer(writer).listener((ItemReadListener<String>) listener).build();
 
 		runStep(step);
 
@@ -379,22 +380,22 @@ public class JsrFaultTolerantChunkProcessorTests {
 		assertEquals(0, stepExecution.getWriteCount());
 		assertEquals(0, stepExecution.getFilterCount());
 		assertEquals(0, stepExecution.getWriteSkipCount());
-		assertEquals(25, readListener.afterProcess);
-		assertEquals(25, readListener.afterRead);
-		assertEquals(0, readListener.afterWrite);
-		assertEquals(25, readListener.beforeProcess);
-		assertEquals(25, readListener.beforeRead);
-		assertEquals(1, readListener.beforeWriteCount);
-		assertEquals(0, readListener.onProcessError);
-		assertEquals(0, readListener.onReadError);
-		assertEquals(1, readListener.onWriteError);
+		assertEquals(25, listener.afterProcess);
+		assertEquals(25, listener.afterRead);
+		assertEquals(0, listener.afterWrite);
+		assertEquals(25, listener.beforeProcess);
+		assertEquals(25, listener.beforeRead);
+		assertEquals(1, listener.beforeWriteCount);
+		assertEquals(0, listener.onProcessError);
+		assertEquals(0, listener.onReadError);
+		assertEquals(1, listener.onWriteError);
 	}
 
 	@Test
 	public void testRetryWriteError() throws Exception{
 		writer.fail = true;
 
-		Step step = builder.faultTolerant().retry(RuntimeException.class).retryLimit(25).chunk(25).reader(reader).processor(processor).writer(writer).listener((ItemReadListener<String>) readListener).build();
+		Step step = builder.faultTolerant().retry(RuntimeException.class).retryLimit(25).chunk(25).reader(reader).processor(processor).writer(writer).listener((ItemReadListener<String>) listener).build();
 
 		runStep(step);
 
@@ -408,22 +409,22 @@ public class JsrFaultTolerantChunkProcessorTests {
 		assertEquals(25, stepExecution.getWriteCount());
 		assertEquals(0, stepExecution.getFilterCount());
 		assertEquals(0, stepExecution.getWriteSkipCount());
-		assertEquals(25, readListener.afterProcess);
-		assertEquals(25, readListener.afterRead);
-		assertEquals(1, readListener.afterWrite);
-		assertEquals(25, readListener.beforeProcess);
-		assertEquals(26, readListener.beforeRead);
-		assertEquals(2, readListener.beforeWriteCount);
-		assertEquals(0, readListener.onProcessError);
-		assertEquals(0, readListener.onReadError);
-		assertEquals(1, readListener.onWriteError);
+		assertEquals(25, listener.afterProcess);
+		assertEquals(25, listener.afterRead);
+		assertEquals(1, listener.afterWrite);
+		assertEquals(25, listener.beforeProcess);
+		assertEquals(26, listener.beforeRead);
+		assertEquals(2, listener.beforeWriteCount);
+		assertEquals(0, listener.onProcessError);
+		assertEquals(0, listener.onReadError);
+		assertEquals(1, listener.onWriteError);
 	}
 
 	@Test
 	public void testSkipWriteError() throws Exception{
 		writer.fail = true;
 
-		Step step = builder.faultTolerant().skip(RuntimeException.class).skipLimit(25).chunk(7).reader(reader).processor(processor).writer(writer).listener((ItemReadListener<String>) readListener).build();
+		Step step = builder.faultTolerant().skip(RuntimeException.class).skipLimit(25).chunk(7).reader(reader).processor(processor).writer(writer).listener((ItemReadListener<String>) listener).build();
 
 		runStep(step);
 
@@ -437,21 +438,24 @@ public class JsrFaultTolerantChunkProcessorTests {
 		assertEquals(18, stepExecution.getWriteCount());
 		assertEquals(0, stepExecution.getFilterCount());
 		assertEquals(1, stepExecution.getWriteSkipCount());
-		assertEquals(25, readListener.afterProcess);
-		assertEquals(25, readListener.afterRead);
-		assertEquals(3, readListener.afterWrite);
-		assertEquals(25, readListener.beforeProcess);
-		assertEquals(26, readListener.beforeRead);
-		assertEquals(4, readListener.beforeWriteCount);
-		assertEquals(0, readListener.onProcessError);
-		assertEquals(0, readListener.onReadError);
-		assertEquals(1, readListener.onWriteError);
+		assertEquals(25, listener.afterProcess);
+		assertEquals(25, listener.afterRead);
+		assertEquals(3, listener.afterWrite);
+		assertEquals(25, listener.beforeProcess);
+		assertEquals(26, listener.beforeRead);
+		assertEquals(4, listener.beforeWriteCount);
+		assertEquals(0, listener.onProcessError);
+		assertEquals(0, listener.onReadError);
+		assertEquals(1, listener.onWriteError);
+		assertEquals(0, listener.onSkipInRead);
+		assertEquals(0, listener.onSkipInProcess);
+		assertEquals(1, listener.onSkipInWrite);
 	}
-
+	
 	@Test
 	public void testMultipleChunks() throws Exception{
 
-		Step step = builder.chunk(10).reader(reader).processor(processor).writer(writer).listener((ItemReadListener<String>) readListener).build();
+		Step step = builder.chunk(10).reader(reader).processor(processor).writer(writer).listener((ItemReadListener<String>) listener).build();
 
 		runStep(step);
 
@@ -465,15 +469,15 @@ public class JsrFaultTolerantChunkProcessorTests {
 		assertEquals(25, stepExecution.getWriteCount());
 		assertEquals(0, stepExecution.getFilterCount());
 		assertEquals(0, stepExecution.getWriteSkipCount());
-		assertEquals(25, readListener.afterProcess);
-		assertEquals(25, readListener.afterRead);
-		assertEquals(3, readListener.afterWrite);
-		assertEquals(25, readListener.beforeProcess);
-		assertEquals(26, readListener.beforeRead);
-		assertEquals(3, readListener.beforeWriteCount);
-		assertEquals(0, readListener.onProcessError);
-		assertEquals(0, readListener.onReadError);
-		assertEquals(0, readListener.onWriteError);
+		assertEquals(25, listener.afterProcess);
+		assertEquals(25, listener.afterRead);
+		assertEquals(3, listener.afterWrite);
+		assertEquals(25, listener.beforeProcess);
+		assertEquals(26, listener.beforeRead);
+		assertEquals(3, listener.beforeWriteCount);
+		assertEquals(0, listener.onProcessError);
+		assertEquals(0, listener.onReadError);
+		assertEquals(0, listener.onWriteError);
 	}
 
 	protected void runStep(Step step)
@@ -542,7 +546,7 @@ public class JsrFaultTolerantChunkProcessorTests {
 		}
 	}
 
-	public static class CountingListener implements ItemReadListener<String>, ItemProcessListener<String, String>, ItemWriteListener<String> {
+	public static class CountingListener implements ItemReadListener<String>, ItemProcessListener<String, String>, ItemWriteListener<String>, SkipListener<String, List<Object>> {
 
 		protected int beforeWriteCount = 0;
 		protected int afterWrite = 0;
@@ -553,6 +557,9 @@ public class JsrFaultTolerantChunkProcessorTests {
 		protected int beforeRead = 0;
 		protected int afterRead = 0;
 		protected int onReadError = 0;
+		protected int onSkipInRead = 0;
+		protected int onSkipInProcess = 0;
+		protected int onSkipInWrite = 0;
 
 		@Override
 		public void beforeWrite(List<? extends String> items) {
@@ -598,6 +605,21 @@ public class JsrFaultTolerantChunkProcessorTests {
 		@Override
 		public void onReadError(Exception ex) {
 			onReadError++;
+		}
+
+		@Override
+		public void onSkipInRead(Throwable t) {
+			onSkipInRead++;
+		}
+
+		@Override
+		public void onSkipInWrite(List<Object> items, Throwable t) {
+			onSkipInWrite++;			
+		}
+
+		@Override
+		public void onSkipInProcess(String item, Throwable t) {
+			onSkipInProcess++;
 		}
 	}
 }

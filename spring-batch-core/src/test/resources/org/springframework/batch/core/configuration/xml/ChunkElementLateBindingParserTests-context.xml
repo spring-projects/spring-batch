@@ -21,12 +21,12 @@
 
 	<bean id="retryPolicy" class="org.springframework.retry.policy.SimpleRetryPolicy" xmlns="http://www.springframework.org/schema/beans"
 		scope="step">
-		<property name="maxAttempts" value="#{jobParameters['retry.interval']}" />
-		<property name="retryableExceptions">
+		<constructor-arg name="maxAttempts" value="#{jobParameters['retry.interval']}" />
+		<constructor-arg name="retryableExceptions">
 			<map key-type="java.lang.Class">
 				<entry key="java.lang.Exception" value="true" />
 			</map>
-		</property>
+		</constructor-arg>
 	</bean>
 
 </beans:beans>

@@ -61,7 +61,7 @@ public class FlowExecutionStatus implements Comparable<FlowExecutionStatus> {
 			return COMPLETED;
 		}
 
-	};
+	}
 
 	/**
 	 * @param status

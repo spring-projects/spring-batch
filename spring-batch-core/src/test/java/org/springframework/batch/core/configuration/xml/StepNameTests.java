@@ -55,7 +55,6 @@ public class StepNameTests {
 		catch (BeanCreationException e) {
 			return;
 		}
-		@SuppressWarnings("unchecked")
 		Map<String, StepLocator> stepLocators = context.getBeansOfType(StepLocator.class);
 		this.stepLocators = stepLocators;
 	}

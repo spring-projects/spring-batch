@@ -45,12 +45,13 @@ public class SplitJobMapRepositoryIntegrationTests {
 	/** Logger */
 	private final Log logger = LogFactory.getLog(getClass());
 
+	@SuppressWarnings("resource")	
 	@Test
 	public void testMultithreadedSplit() throws Throwable {
 
 		JobLauncher jobLauncher = null;
 		Job job = null;
-
+		
 		ClassPathXmlApplicationContext context = null;
 
 		for (int i = 0; i < MAX_COUNT; i++) {
@@ -62,8 +63,8 @@ public class SplitJobMapRepositoryIntegrationTests {
 				logger.info("Starting job: " + i);
 				context = new ClassPathXmlApplicationContext(getClass().getSimpleName()
 						+ "-context.xml", getClass());
-				jobLauncher = (JobLauncher) context.getBean("jobLauncher", JobLauncher.class);
-				job = (Job) context.getBean("job", Job.class);
+				jobLauncher = context.getBean("jobLauncher", JobLauncher.class);
+				job = context.getBean("job", Job.class);
 			}
 
 			try {
@@ -86,6 +87,7 @@ public class SplitJobMapRepositoryIntegrationTests {
 
 		private AtomicInteger count = new AtomicInteger(0);
 
+		@Override
 		public RepeatStatus execute(StepContribution contribution, ChunkContext chunkContext) throws Exception {
 			contribution.incrementReadCount();
 			contribution.incrementWriteCount(1);

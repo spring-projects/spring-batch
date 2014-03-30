@@ -59,6 +59,7 @@ public class OrderItemReader implements ItemReader<Order> {
 	 * @throws Exception
 	 * @see org.springframework.batch.item.ItemReader#read()
 	 */
+	@Override
 	public Order read() throws Exception {
 		recordFinished = false;
 

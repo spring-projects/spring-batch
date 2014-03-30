@@ -1,3 +1,18 @@
+/*
+ * Copyright 2013-2014 the original author or authors.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package org.springframework.batch.core.configuration.xml;
 
 import java.util.List;
@@ -11,15 +26,14 @@ import org.w3c.dom.Element;
 
 public class ExceptionElementParser {
 
-	@SuppressWarnings("unchecked")
-	public ManagedMap parse(Element element, ParserContext parserContext, String exceptionListName) {
+	public ManagedMap<TypedStringValue, Boolean> parse(Element element, ParserContext parserContext, String exceptionListName) {
 		List<Element> children = DomUtils.getChildElementsByTagName(element, exceptionListName);
 		if (children.size() == 1) {
-			ManagedMap map = new ManagedMap();
+			ManagedMap<TypedStringValue, Boolean> map = new ManagedMap<TypedStringValue, Boolean>();
 			Element exceptionClassesElement = children.get(0);
 			addExceptionClasses("include", true, exceptionClassesElement, map, parserContext);
 			addExceptionClasses("exclude", false, exceptionClassesElement, map, parserContext);
-			map.put(ForceRollbackForWriteSkipException.class, true);
+			map.put(new TypedStringValue(ForceRollbackForWriteSkipException.class.getName(), Class.class), true);
 			return map;
 		}
 		else if (children.size() > 1) {
@@ -30,9 +44,8 @@ public class ExceptionElementParser {
 		return null;
 	}
 
-	@SuppressWarnings("unchecked")
 	private void addExceptionClasses(String elementName, boolean include, Element exceptionClassesElement,
-			ManagedMap map, ParserContext parserContext) {
+			ManagedMap<TypedStringValue, Boolean> map, ParserContext parserContext) {
 		for (Element child : DomUtils.getChildElementsByTagName(exceptionClassesElement, elementName)) {
 			String className = child.getAttribute("class");
 			map.put(new TypedStringValue(className, Class.class), include);

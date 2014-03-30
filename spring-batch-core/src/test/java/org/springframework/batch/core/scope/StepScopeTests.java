@@ -40,7 +40,6 @@ import org.springframework.context.support.StaticApplicationContext;
  * @author Dave Syer
  *
  */
-@SuppressWarnings("rawtypes")
 public class StepScopeTests {
 
 	private StepScope scope = new StepScope();
@@ -65,7 +64,7 @@ public class StepScopeTests {
 		final String foo = "bar";
 		StepSynchronizationManager.close();
 		try {
-			scope.get("foo", new ObjectFactory() {
+			scope.get("foo", new ObjectFactory<Object>() {
 				@Override
 				public Object getObject() throws BeansException {
 					return foo;
@@ -82,7 +81,7 @@ public class StepScopeTests {
 	@Test
 	public void testGetWithNothingAlreadyThere() {
 		final String foo = "bar";
-		Object value = scope.get("foo", new ObjectFactory() {
+		Object value = scope.get("foo", new ObjectFactory<Object>() {
 			@Override
 			public Object getObject() throws BeansException {
 				return foo;
@@ -95,7 +94,7 @@ public class StepScopeTests {
 	@Test
 	public void testGetWithSomethingAlreadyThere() {
 		context.setAttribute("foo", "bar");
-		Object value = scope.get("foo", new ObjectFactory() {
+		Object value = scope.get("foo", new ObjectFactory<Object>() {
 			@Override
 			public Object getObject() throws BeansException {
 				return null;
@@ -109,7 +108,7 @@ public class StepScopeTests {
 	public void testGetWithSomethingAlreadyInParentContext() {
 		context.setAttribute("foo", "bar");
 		StepContext context = StepSynchronizationManager.register(new StepExecution("bar", new JobExecution(0L)));
-		Object value = scope.get("foo", new ObjectFactory() {
+		Object value = scope.get("foo", new ObjectFactory<Object>() {
 			@Override
 			public Object getObject() throws BeansException {
 				return "spam";

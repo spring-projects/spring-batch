@@ -88,6 +88,7 @@ public class TaskExecutorRepeatTemplateBulkAsynchronousTests {
 
 			private volatile AtomicInteger count = new AtomicInteger(0);
 
+			@Override
 			public RepeatStatus doInIteration(RepeatContext context)
 					throws Exception {
 				int position = count.incrementAndGet();
@@ -240,6 +241,7 @@ public class TaskExecutorRepeatTemplateBulkAsynchronousTests {
 
 			private volatile AtomicInteger count = new AtomicInteger(0);
 
+			@Override
 			public RepeatStatus doInIteration(RepeatContext context)
 					throws Exception {
 				int position = count.incrementAndGet();

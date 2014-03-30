@@ -32,7 +32,7 @@ import org.springframework.batch.core.jsr.JsrStepListenerMetaData;
  * @see AbstractListenerFactoryBean
  * @see StepListenerMetaData
  */
-public class StepListenerFactoryBean extends AbstractListenerFactoryBean {
+public class StepListenerFactoryBean extends AbstractListenerFactoryBean<StepListener> {
 
 	@Override
 	protected ListenerMetaData getMetaDataFromPropertyName(String propertyName) {
@@ -60,8 +60,7 @@ public class StepListenerFactoryBean extends AbstractListenerFactoryBean {
 	}
 
 	@Override
-	@SuppressWarnings("rawtypes")
-	public Class getObjectType() {
+	public Class<StepListener> getObjectType() {
 		return StepListener.class;
 	}
 

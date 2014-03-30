@@ -147,6 +147,7 @@ public class DefaultJobLoader implements JobLoader, InitializingBean {
 		return doLoad(factory, false);
 	}
 
+	@SuppressWarnings("resource")
 	private Collection<Job> doLoad(ApplicationContextFactory factory, boolean unregister) throws DuplicateJobException {
 
 		Collection<String> jobNamesBefore = jobRegistry.getJobNames();
@@ -226,7 +227,6 @@ public class DefaultJobLoader implements JobLoader, InitializingBean {
 		// Because some steps are referenced by name, we need to look in the context to see if there
 		// are more Step instances defined. Right now they are registered as being available in the
 		// context of the job but we have no idea if they are linked to that Job or not.
-		@SuppressWarnings("unchecked")
 		final Map<String, Step> allSteps = jobApplicationContext.getBeansOfType(Step.class);
 		for (Map.Entry<String, Step> entry : allSteps.entrySet()) {
 			if (!stepNames.contains(entry.getKey())) {

@@ -112,8 +112,7 @@ public class SpringValidatorTests {
 		public static final TestBean REJECT_MULTI_VALUE = new TestBean("foo", "bar");
 
         @Override
-		@SuppressWarnings({ "rawtypes", "unchecked" })
-		public boolean supports(Class clazz) {
+		public boolean supports(Class<?> clazz) {
 			return clazz.isAssignableFrom(TestBean.class);
 		}
 

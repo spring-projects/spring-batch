@@ -42,7 +42,7 @@ public interface LineMapper<T> {
 	 * @param line to be mapped
 	 * @param lineNumber of the current line
 	 * @return mapped object of type T
-	 * @throws Exception if error occured while parsing.
+	 * @throws Exception if error occurred while parsing.
 	 */
 	T mapLine(String line, int lineNumber) throws Exception;
 }

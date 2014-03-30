@@ -43,14 +43,16 @@ public class TestMailSender implements MailSender {
 		received.clear();
 	}
 
+	@Override
 	public void send(SimpleMailMessage simpleMessage) throws MailException {
-		throw new UnsupportedOperationException("Not implememted.  Use send(SimpleMailMessage[]).");
+		throw new UnsupportedOperationException("Not implemented.  Use send(SimpleMailMessage[]).");
 	}
 
 	public void setSubjectsToFail(List<String> subjectsToFail) {
 		this.subjectsToFail = subjectsToFail;
 	}
 
+	@Override
 	public void send(SimpleMailMessage[] simpleMessages) throws MailException {
 		Map<Object, Exception> failedMessages = new LinkedHashMap<Object, Exception>();
 		for (SimpleMailMessage simpleMessage : simpleMessages) {

@@ -55,6 +55,7 @@ public class HibernateCreditDao implements
 	 *
 	 * @see org.springframework.batch.sample.domain.trade.internal.CustomerCreditWriter#write(org.springframework.batch.sample.domain.CustomerCredit)
 	 */
+	@Override
 	public void writeCredit(CustomerCredit customerCredit) {
 		if (customerCredit.getId() == failOnFlush) {
 			// try to insert one with a duplicate ID
@@ -87,6 +88,7 @@ public class HibernateCreditDao implements
 		this.failOnFlush = failOnFlush;
 	}
 
+	@Override
 	public void onError(RepeatContext context, Throwable e) {
 		errors.add(e);
 	}
@@ -94,24 +96,28 @@ public class HibernateCreditDao implements
 	/* (non-Javadoc)
 	 * @see org.springframework.batch.repeat.RepeatInterceptor#after(org.springframework.batch.repeat.RepeatContext, org.springframework.batch.repeat.ExitStatus)
 	 */
+	@Override
 	public void after(RepeatContext context, RepeatStatus result) {
 	}
 
 	/* (non-Javadoc)
 	 * @see org.springframework.batch.repeat.RepeatInterceptor#before(org.springframework.batch.repeat.RepeatContext)
 	 */
+	@Override
 	public void before(RepeatContext context) {
 	}
 
 	/* (non-Javadoc)
 	 * @see org.springframework.batch.repeat.RepeatInterceptor#close(org.springframework.batch.repeat.RepeatContext)
 	 */
+	@Override
 	public void close(RepeatContext context) {
 	}
 
 	/* (non-Javadoc)
 	 * @see org.springframework.batch.repeat.RepeatInterceptor#open(org.springframework.batch.repeat.RepeatContext)
 	 */
+	@Override
 	public void open(RepeatContext context) {
 	}
 

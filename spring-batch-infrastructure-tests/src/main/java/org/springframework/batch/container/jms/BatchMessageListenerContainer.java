@@ -64,6 +64,7 @@ public class BatchMessageListenerContainer extends DefaultMessageListenerContain
 	private Advice[] advices = new Advice[0];
 
 	private ContainerDelegate delegate = new ContainerDelegate() {
+		@Override
 		public boolean receiveAndExecute(Object invoker, Session session, MessageConsumer consumer) throws JMSException {
 			return BatchMessageListenerContainer.super.receiveAndExecute(invoker, session, consumer);
 		}
@@ -85,6 +86,7 @@ public class BatchMessageListenerContainer extends DefaultMessageListenerContain
 	 * 
 	 * @see org.springframework.jms.listener.AbstractJmsListeningContainer#afterPropertiesSet()
 	 */
+	@Override
 	public void afterPropertiesSet() {
 		super.afterPropertiesSet();
 		initializeProxy();
@@ -96,6 +98,7 @@ public class BatchMessageListenerContainer extends DefaultMessageListenerContain
 	 * 
 	 * @see org.springframework.jms.listener.AbstractMessageListenerContainer#handleListenerException(java.lang.Throwable)
 	 */
+	@Override
 	protected void handleListenerException(Throwable ex) {
 		if (!isSessionTransacted()) {
 			// Log the exceptions in base class if not transactional anyway
@@ -120,6 +123,7 @@ public class BatchMessageListenerContainer extends DefaultMessageListenerContain
 	 * @see org.springframework.jms.listener.AbstractPollingMessageListenerContainer#receiveAndExecute(Object,
 	 * javax.jms.Session, javax.jms.MessageConsumer)
 	 */
+	@Override
 	protected boolean receiveAndExecute(final Object invoker, final Session session, final MessageConsumer consumer)
 			throws JMSException {
 		return proxy.receiveAndExecute(invoker, session, consumer);

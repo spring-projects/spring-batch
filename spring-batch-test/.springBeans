@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <beansProjectDescription>
 	<version>1</version>
-	<pluginVersion><![CDATA[2.3.0.200912170948-RELEASE]]></pluginVersion>
+	<pluginVersion><![CDATA[3.3.0.201307091516-RELEASE]]></pluginVersion>
 	<configSuffixes>
 		<configSuffix><![CDATA[xml]]></configSuffix>
 	</configSuffixes>
@@ -15,6 +15,10 @@
 		<config>src/test/resources/jobs/sample-steps.xml</config>
 		<config>src/test/resources/job-runner-context.xml</config>
 		<config>src/test/resources/org/springframework/batch/test/StepScopeTestExecutionListenerIntegrationTests-context.xml</config>
+		<config>src/test/resources/org/springframework/batch/test/JobScopeTestExecutionListenerIntegrationTests-context.xml</config>
+		<config>src/test/resources/org/springframework/batch/test/JobScopeTestExecutionListenerTests-context.xml</config>
+		<config>src/test/resources/org/springframework/batch/test/StepScopeTestExecutionListenerTests-context.xml</config>
+		<config>java:org.springframework.batch.test.StepScopeAnnotatedListenerIntegrationTests$TestConfig</config>
 	</configs>
 	<configSets>
 		<configSet>
@@ -28,6 +32,8 @@
 				<config>src/test/resources/jobs/sampleSimpleJob.xml</config>
 				<config>src/test/resources/jobs/sample-steps.xml</config>
 			</configs>
+			<profiles>
+			</profiles>
 		</configSet>
 		<configSet>
 			<name><![CDATA[SampleFlowJob]]></name>
@@ -39,6 +45,8 @@
 				<config>src/test/resources/org/springframework/batch/sample/config/common-context.xml</config>
 				<config>src/test/resources/simple-job-launcher-context.xml</config>
 			</configs>
+			<profiles>
+			</profiles>
 		</configSet>
 	</configSets>
 </beansProjectDescription>

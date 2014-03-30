@@ -45,7 +45,7 @@ public class StepBuilderFactory {
 	 * @return a step builder
 	 */
 	public StepBuilder get(String name) {
-		StepBuilder builder = (StepBuilder) new StepBuilder(name).repository(jobRepository).transactionManager(
+		StepBuilder builder = new StepBuilder(name).repository(jobRepository).transactionManager(
 				transactionManager);
 		return builder;
 	}

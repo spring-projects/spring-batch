@@ -195,7 +195,7 @@ public interface FieldSet {
 	 * using the supplied <code>defaultValue</code> if the field value is
 	 * blank.
 	 * 
-	 * @param index the field index..
+	 * @param index the field index.
 	 * @throws IndexOutOfBoundsException if the index is out of bounds.
 	 */
 	int readInt(int index, int defaultValue);
@@ -233,7 +233,7 @@ public interface FieldSet {
 	 * using the supplied <code>defaultValue</code> if the field value is
 	 * blank.
 	 * 
-	 * @param index the field index..
+	 * @param index the field index.
 	 * @throws IndexOutOfBoundsException if the index is out of bounds.
 	 */
 	long readLong(int index, long defaultValue);

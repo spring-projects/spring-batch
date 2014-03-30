@@ -194,6 +194,7 @@ public class SimpleLimitExceptionHandlerTests {
 		handler.setLimit(EXCEPTION_LIMIT);
 		handler.afterPropertiesSet();
 
+		@SuppressWarnings("serial")
 		List<Throwable> throwables = new ArrayList<Throwable>() {
 			{
 				for (int i = 0; i < (EXCEPTION_LIMIT); i++) {
@@ -230,6 +231,7 @@ public class SimpleLimitExceptionHandlerTests {
 		handler.setLimit(EXCEPTION_LIMIT);
 		handler.afterPropertiesSet();
 
+		@SuppressWarnings("serial")
 		List<Throwable> throwables = new ArrayList<Throwable>() {
 			{
 				for (int i = 0; i < (EXCEPTION_LIMIT); i++) {

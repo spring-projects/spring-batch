@@ -87,9 +87,8 @@ public class JobScope extends BatchScopeSupport {
 	/**
 	 * @see Scope#get(String, ObjectFactory)
 	 */
-	@SuppressWarnings("rawtypes")
 	@Override
-	public Object get(String name, ObjectFactory objectFactory) {
+	public Object get(String name, ObjectFactory<?> objectFactory) {
 		JobContext context = getContext();
 		Object scopedObject = context.getAttribute(name);
 

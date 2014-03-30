@@ -27,7 +27,7 @@ import org.springframework.batch.repeat.context.RepeatContextSupport;
 
 /**
  * Composite policy that loops through a list of delegate policies and answers
- * calls by a concensus.
+ * calls by a consensus.
  * 
  * @author Dave Syer
  * 

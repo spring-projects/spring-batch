@@ -24,6 +24,7 @@ import org.springframework.transaction.support.AbstractPlatformTransactionManage
 import org.springframework.transaction.support.DefaultTransactionStatus;
 import org.springframework.transaction.support.TransactionSynchronizationManager;
 
+@SuppressWarnings("serial")
 public class ResourcelessTransactionManager extends AbstractPlatformTransactionManager {
 
     @Override

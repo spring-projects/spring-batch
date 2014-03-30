@@ -42,6 +42,7 @@ public class CustomerCredit {
 		this.credit = credit;
 	}
 
+	@Override
 	public String toString() {
 		return "CustomerCredit [id=" + id + ",name=" + name + ", credit=" + credit + "]";
 	}
@@ -78,10 +79,12 @@ public class CustomerCredit {
 		return newCredit;
 	}
 
+	@Override
 	public boolean equals(Object o) {
 		return (o instanceof CustomerCredit) && ((CustomerCredit) o).id == id;
 	}
 
+	@Override
 	public int hashCode() {
 		return id;
 	}

@@ -132,7 +132,6 @@ public class JdbcPagingQueryIntegrationTests {
 		queryProvider.setSelectClause("select NAME, CODE, sum(VALUE)");
 		queryProvider.setGroupClause("NAME, CODE");
 
-		int pages = 3;
 		int count = 0;
 		int total = 5;
 
@@ -176,7 +175,7 @@ public class JdbcPagingQueryIntegrationTests {
 
 		PagingQueryProvider queryProvider = getPagingQueryProvider();
 
-		int minId = jdbcTemplate.queryForInt("SELECT MIN(VALUE) FROM T_FOOS");
+		int minId = jdbcTemplate.queryForObject("SELECT MIN(VALUE) FROM T_FOOS", Integer.class);
 
 		String query = queryProvider.generateJumpToItemQuery(pageSize, pageSize);
 		List<Map<String, Object>> list = jdbcTemplate.queryForList(query);
@@ -200,7 +199,7 @@ public class JdbcPagingQueryIntegrationTests {
 		Map<String, Order> sortKeys = new LinkedHashMap<String, Order>();
 		sortKeys.put("VALUE", Order.ASCENDING);
 		factory.setSortKeys(sortKeys);
-		return (PagingQueryProvider) factory.getObject();
+		return factory.getObject();
 
 	}
 	

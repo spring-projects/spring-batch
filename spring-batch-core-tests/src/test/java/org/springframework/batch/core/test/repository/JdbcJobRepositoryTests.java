@@ -92,8 +92,8 @@ public class JdbcJobRepositoryTests {
 			jdbcTemplate.update("DELETE FROM BATCH_JOB_INSTANCE where JOB_INSTANCE_ID=?", id);
 		}
 		for (Long id : jobIds) {
-			int count = jdbcTemplate.queryForInt(
-					"SELECT COUNT(*) FROM BATCH_JOB_INSTANCE where JOB_INSTANCE_ID=?", id);
+			int count = jdbcTemplate.queryForObject(
+					"SELECT COUNT(*) FROM BATCH_JOB_INSTANCE where JOB_INSTANCE_ID=?", Integer.class, id);
 			assertEquals(0, count);
 		}
 	}
@@ -103,7 +103,7 @@ public class JdbcJobRepositoryTests {
 		job.setName("foo");
 		int before = 0;
 		JobExecution execution = repository.createJobExecution(job.getName(), new JobParameters());
-		int after = jdbcTemplate.queryForInt("SELECT COUNT(*) FROM BATCH_JOB_INSTANCE");
+		int after = jdbcTemplate.queryForObject("SELECT COUNT(*) FROM BATCH_JOB_INSTANCE", Integer.class);
 		assertEquals(before + 1, after);
 		assertNotNull(execution.getId());
 	}
@@ -115,7 +115,7 @@ public class JdbcJobRepositoryTests {
 		JobExecution execution = repository.createJobExecution(job.getName(), new JobParameters());
 		execution.getExecutionContext().put("foo", "bar");
 		repository.updateExecutionContext(execution);
-		int after = jdbcTemplate.queryForInt("SELECT COUNT(*) FROM BATCH_JOB_EXECUTION_CONTEXT");
+		int after = jdbcTemplate.queryForObject("SELECT COUNT(*) FROM BATCH_JOB_EXECUTION_CONTEXT", Integer.class);
 		assertEquals(before + 1, after);
 		assertNotNull(execution.getId());
 		JobExecution last = repository.getLastJobExecution(job.getName(), new JobParameters());
@@ -145,7 +145,7 @@ public class JdbcJobRepositoryTests {
 
 		assertNotNull(execution);
 
-		int after = jdbcTemplate.queryForInt("SELECT COUNT(*) FROM BATCH_JOB_INSTANCE");
+		int after = jdbcTemplate.queryForObject("SELECT COUNT(*) FROM BATCH_JOB_INSTANCE", Integer.class);
 		assertNotNull(execution.getId());
 		assertEquals(before + 1, after);
 
@@ -166,7 +166,7 @@ public class JdbcJobRepositoryTests {
 		repository.update(execution);
 		execution.setStatus(BatchStatus.FAILED);
 
-		int before = jdbcTemplate.queryForInt("SELECT COUNT(*) FROM BATCH_JOB_INSTANCE");
+		int before = jdbcTemplate.queryForObject("SELECT COUNT(*) FROM BATCH_JOB_INSTANCE", Integer.class);
 		assertEquals(1, before);
 
 		long t0 = System.currentTimeMillis();
@@ -179,7 +179,7 @@ public class JdbcJobRepositoryTests {
 		}
 		long t1 = System.currentTimeMillis();
 
-		int after = jdbcTemplate.queryForInt("SELECT COUNT(*) FROM BATCH_JOB_INSTANCE");
+		int after = jdbcTemplate.queryForObject("SELECT COUNT(*) FROM BATCH_JOB_INSTANCE", Integer.class);
 		assertNotNull(execution.getId());
 		assertEquals(before, after);
 
@@ -197,6 +197,7 @@ public class JdbcJobRepositoryTests {
 
 	private JobExecution doConcurrentStart() throws Exception {
 		new Thread(new Runnable() {
+			@Override
 			public void run() {
 
 				try {

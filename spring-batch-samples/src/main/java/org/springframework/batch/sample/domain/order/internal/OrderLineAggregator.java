@@ -34,6 +34,7 @@ public class OrderLineAggregator implements LineAggregator<Order> {
 
 	private Map<String, LineAggregator<Object>> aggregators;
 
+	@Override
 	public String aggregate(Order order) {
 		StringBuilder result = new StringBuilder();
 

@@ -19,9 +19,6 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
-
 import java.util.LinkedHashMap;
 import java.util.Map;
 
@@ -55,7 +52,7 @@ public class SqlPagingQueryProviderFactoryBeanTests {
 
 	@Test
 	public void testFactory() throws Exception {
-		PagingQueryProvider provider = (PagingQueryProvider) factory.getObject();
+		PagingQueryProvider provider = factory.getObject();
 		assertNotNull(provider);
 	}
 
@@ -72,28 +69,28 @@ public class SqlPagingQueryProviderFactoryBeanTests {
 	@Test(expected=IllegalArgumentException.class)
 	public void testNoDataSource() throws Exception {
 		factory.setDataSource(null);
-		PagingQueryProvider provider = (PagingQueryProvider) factory.getObject();
+		PagingQueryProvider provider = factory.getObject();
 		assertNotNull(provider);
 	}
 
 	@Test(expected=IllegalArgumentException.class)
 	public void testNoSortKey() throws Exception {
 		factory.setSortKeys(null);
-		PagingQueryProvider provider = (PagingQueryProvider) factory.getObject();
+		PagingQueryProvider provider = factory.getObject();
 		assertNotNull(provider);
 	}
 
 	@Test
 	public void testWhereClause() throws Exception {
 		factory.setWhereClause("x=y");
-		PagingQueryProvider provider = (PagingQueryProvider) factory.getObject();
+		PagingQueryProvider provider = factory.getObject();
 		String query = provider.generateFirstPageQuery(100);
 		assertTrue("Wrong query: "+query, query.contains("x=y"));
 	}
 
 	@Test
 	public void testAscending() throws Exception {
-		PagingQueryProvider provider = (PagingQueryProvider) factory.getObject();
+		PagingQueryProvider provider = factory.getObject();
 		String query = provider.generateFirstPageQuery(100);
 		assertTrue("Wrong query: "+query, query.contains("ASC"));
 	}
@@ -101,14 +98,14 @@ public class SqlPagingQueryProviderFactoryBeanTests {
 	@Test(expected=IllegalArgumentException.class)
 	public void testWrongDatabaseType() throws Exception {
 		factory.setDatabaseType("NoSuchDb");
-		PagingQueryProvider provider = (PagingQueryProvider) factory.getObject();
+		PagingQueryProvider provider = factory.getObject();
 		assertNotNull(provider);
 	}
 
 	@Test(expected=IllegalArgumentException.class)
 	public void testMissingMetaData() throws Exception {
 		factory.setDataSource(DatabaseTypeTestUtils.getMockDataSource(new MetaDataAccessException("foo")));
-		PagingQueryProvider provider = (PagingQueryProvider) factory.getObject();
+		PagingQueryProvider provider = factory.getObject();
 		assertNotNull(provider);
 	}
 
@@ -116,7 +113,7 @@ public class SqlPagingQueryProviderFactoryBeanTests {
 	public void testAllDatabaseTypes() throws Exception {
 		for (DatabaseType type : DatabaseType.values()) {
 			factory.setDatabaseType(type.name());
-			PagingQueryProvider provider = (PagingQueryProvider) factory.getObject();
+			PagingQueryProvider provider = factory.getObject();
 			assertNotNull(provider);			
 		}
 	}

@@ -32,7 +32,6 @@ import org.springframework.util.Assert;
  * @param <S> type to be written by the associated {@link ItemWriter}
  * @since 3.0
  */
-@SuppressWarnings({"rawtypes", "unchecked"})
 public class ItemWriteListenerAdapter<S> implements ItemWriteListener<S> {
 
 	private javax.batch.api.chunk.listener.ItemWriteListener delegate;
@@ -42,28 +41,31 @@ public class ItemWriteListenerAdapter<S> implements ItemWriteListener<S> {
 		this.delegate = delegate;
 	}
 
+	@SuppressWarnings("unchecked")
 	@Override
-	public void beforeWrite(List items) {
+	public void beforeWrite(List<? extends S> items) {
 		try {
-			delegate.beforeWrite(items);
+			delegate.beforeWrite((List<Object>) items);
 		} catch (Exception e) {
 			throw new BatchRuntimeException(e);
 		}
 	}
 
+	@SuppressWarnings("unchecked")
 	@Override
-	public void afterWrite(List items) {
+	public void afterWrite(List<? extends S> items) {
 		try {
-			delegate.afterWrite(items);
+			delegate.afterWrite((List<Object>) items);
 		} catch (Exception e) {
 			throw new BatchRuntimeException(e);
 		}
 	}
 
+	@SuppressWarnings("unchecked")
 	@Override
-	public void onWriteError(Exception exception, List items) {
+	public void onWriteError(Exception exception, List<? extends S> items) {
 		try {
-			delegate.onWriteError(items, exception);
+			delegate.onWriteError((List<Object>) items, exception);
 		} catch (Exception e) {
 			throw new BatchRuntimeException(e);
 		}

@@ -1,3 +1,18 @@
+/*
+ * Copyright 2010-2014 the original author or authors.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package org.springframework.batch.item.database;
 
 import static org.junit.Assert.assertEquals;
@@ -59,7 +74,7 @@ public class JpaPagingItemReaderAsyncTests {
 	@Before
 	public void init() {
 		JdbcTemplate jdbcTemplate = new JdbcTemplate(dataSource);
-		maxId = jdbcTemplate.queryForInt("SELECT MAX(ID) from T_FOOS");
+		maxId = jdbcTemplate.queryForObject("SELECT MAX(ID) from T_FOOS", Integer.class);
 		for (int i = ITEM_COUNT; i > maxId; i--) {
 			jdbcTemplate.update("INSERT into T_FOOS (ID,NAME,VALUE) values (?, ?, ?)", i, "foo" + i, i);
 		}
@@ -101,6 +116,7 @@ public class JpaPagingItemReaderAsyncTests {
 				.newFixedThreadPool(THREAD_COUNT));
 		for (int i = 0; i < THREAD_COUNT; i++) {
 			completionService.submit(new Callable<List<Foo>>() {
+				@Override
 				public List<Foo> call() throws Exception {
 					List<Foo> list = new ArrayList<Foo>();
 					Foo next = null;

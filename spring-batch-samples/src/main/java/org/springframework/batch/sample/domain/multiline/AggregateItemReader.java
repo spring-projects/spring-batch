@@ -32,8 +32,8 @@ import org.springframework.batch.item.ItemReader;
  * {@link AggregateItem} which responds true to its query methods
  * <code>is*()</code>.<br/><br/>
  * 
- * This class is thread safe (it can be used concurrently by multiple threads)
- * as long as the {@link ItemReader} is also thread safe.
+ * This class is thread-safe (it can be used concurrently by multiple threads)
+ * as long as the {@link ItemReader} is also thread-safe.
  * 
  * @see AggregateItem#isHeader()
  * @see AggregateItem#isFooter()
@@ -52,6 +52,7 @@ public class AggregateItemReader<T> implements ItemReader<List<T>> {
 	 * 
 	 * @see org.springframework.batch.item.ItemReader#read()
 	 */
+	@Override
 	public List<T> read() throws Exception {
 		ResultHolder holder = new ResultHolder();
 

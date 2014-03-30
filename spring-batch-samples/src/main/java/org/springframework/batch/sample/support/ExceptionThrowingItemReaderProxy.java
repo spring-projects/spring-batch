@@ -43,6 +43,7 @@ public class ExceptionThrowingItemReaderProxy<T> implements ItemReader<T> {
 		this.throwExceptionOnRecordNumber = throwExceptionOnRecordNumber;
 	}
 
+	@Override
 	public T read() throws Exception {
 
 		counter++;

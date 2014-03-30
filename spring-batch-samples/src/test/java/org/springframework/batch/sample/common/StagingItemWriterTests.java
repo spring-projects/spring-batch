@@ -60,7 +60,6 @@ public class StagingItemWriterTests {
 	public void testProcessInsertsNewItem() throws Exception {
 		int before = jdbcTemplate.queryForObject("SELECT COUNT(*) from BATCH_STAGING", Integer.class);
 		writer.write(Collections.singletonList("FOO"));
-
 		int after = jdbcTemplate.queryForObject("SELECT COUNT(*) from BATCH_STAGING", Integer.class);
 		assertEquals(before + 1, after);
 	}

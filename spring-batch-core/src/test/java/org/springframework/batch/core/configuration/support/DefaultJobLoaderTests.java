@@ -28,7 +28,6 @@ import org.springframework.batch.core.JobParametersIncrementer;
 import org.springframework.batch.core.JobParametersValidator;
 import org.springframework.batch.core.Step;
 import org.springframework.batch.core.configuration.DuplicateJobException;
-import org.springframework.batch.core.configuration.JobFactory;
 import org.springframework.batch.core.configuration.JobRegistry;
 import org.springframework.batch.core.configuration.StepRegistry;
 import org.springframework.batch.core.launch.NoSuchJobException;
@@ -257,25 +256,4 @@ public class DefaultJobLoaderTests {
         }
     }
 
-    private static class JobRegistryMock implements JobRegistry {
-        @Override
-		public void register(JobFactory jobFactory) throws DuplicateJobException {
-            // dummy
-        }
-
-        @Override
-		public void unregister(String jobName) {
-            // dummy
-        }
-
-        @Override
-		public Collection<String> getJobNames() {
-            return Collections.emptyList();
-        }
-
-        @Override
-		public Job getJob(String name) throws NoSuchJobException {
-            throw new NoSuchJobException("Mock implementation does not hold any job.");
-        }
-    }
 }

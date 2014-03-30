@@ -66,6 +66,7 @@ public class SynchronousTests implements ApplicationContextAware {
 
 	private ApplicationContext applicationContext;
 
+	@Override
 	public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
 		this.applicationContext = applicationContext;
 	}
@@ -89,7 +90,7 @@ public class SynchronousTests implements ApplicationContextAware {
 	}
 
 	private void assertInitialState() {
-		int count = jdbcTemplate.queryForInt("select count(*) from T_BARS");
+		int count = jdbcTemplate.queryForObject("select count(*) from T_BARS", Integer.class);
 		assertEquals(0, count);
 	}
 
@@ -102,6 +103,7 @@ public class SynchronousTests implements ApplicationContextAware {
 		assertInitialState();
 
 		repeatTemplate.iterate(new RepeatCallback() {
+			@Override
 			public RepeatStatus doInIteration(RepeatContext context) throws Exception {
 				String text = (String) jmsTemplate.receiveAndConvert("queue");
 				list.add(text);
@@ -110,7 +112,7 @@ public class SynchronousTests implements ApplicationContextAware {
 			}
 		});
 
-		int count = jdbcTemplate.queryForInt("select count(*) from T_BARS");
+		int count = jdbcTemplate.queryForObject("select count(*) from T_BARS", Integer.class);
 		assertEquals(2, count);
 
 		String text = (String) jmsTemplate.receiveAndConvert("queue");
@@ -123,9 +125,11 @@ public class SynchronousTests implements ApplicationContextAware {
 
 		assertInitialState();
 
-		new TransactionTemplate(transactionManager).execute(new TransactionCallback() {
-			public Object doInTransaction(org.springframework.transaction.TransactionStatus status) {
+		new TransactionTemplate(transactionManager).execute(new TransactionCallback<Void>() {
+			@Override
+			public Void doInTransaction(org.springframework.transaction.TransactionStatus status) {
 				repeatTemplate.iterate(new RepeatCallback() {
+					@Override
 					public RepeatStatus doInIteration(RepeatContext context) throws Exception {
 						String text = (String) jmsTemplate.receiveAndConvert("queue");
 						list.add(text);
@@ -147,7 +151,7 @@ public class SynchronousTests implements ApplicationContextAware {
 		}
 
 		// The database portion rolled back...
-		int count = jdbcTemplate.queryForInt("select count(*) from T_BARS");
+		int count = jdbcTemplate.queryForObject("select count(*) from T_BARS", Integer.class);
 		assertEquals(0, count);
 
 		// ... and so did the message session. The rollback should have restored
@@ -167,10 +171,12 @@ public class SynchronousTests implements ApplicationContextAware {
 
 		assertInitialState();
 
-		new TransactionTemplate(transactionManager).execute(new TransactionCallback() {
-			public Object doInTransaction(org.springframework.transaction.TransactionStatus status) {
+		new TransactionTemplate(transactionManager).execute(new TransactionCallback<Void>() {
+			@Override
+			public Void doInTransaction(org.springframework.transaction.TransactionStatus status) {
 
 				repeatTemplate.iterate(new RepeatCallback() {
+					@Override
 					public RepeatStatus doInIteration(RepeatContext context) throws Exception {
 						String text = (String) txJmsTemplate.receiveAndConvert("queue");
 						list.add(text);
@@ -181,8 +187,9 @@ public class SynchronousTests implements ApplicationContextAware {
 
 				// Simulate a message system failure before the main transaction
 				// commits...
-				txJmsTemplate.execute(new SessionCallback() {
-					public Object doInJms(Session session) throws JMSException {
+				txJmsTemplate.execute(new SessionCallback<Void>() {
+					@Override
+					public Void doInJms(Session session) throws JMSException {
 						try {
 							assertTrue("Not a SessionProxy - wrong spring version?", session instanceof SessionProxy);
 							((SessionProxy) session).getTargetSession().rollback();
@@ -210,7 +217,7 @@ public class SynchronousTests implements ApplicationContextAware {
 		}
 
 		// The database portion committed...
-		int count = jdbcTemplate.queryForInt("select count(*) from T_BARS");
+		int count = jdbcTemplate.queryForObject("select count(*) from T_BARS", Integer.class);
 		assertEquals(2, count);
 
 		// ...but the JMS session rolled back, so the message is still there

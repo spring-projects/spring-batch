@@ -24,6 +24,7 @@ import org.springframework.batch.core.JobExecutionException;
  * @author Dave Syer
  * @since 2.0
  */
+@SuppressWarnings("serial")
 public class JobExecutionNotRunningException extends JobExecutionException {
 
 	/**

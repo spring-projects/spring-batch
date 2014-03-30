@@ -32,6 +32,7 @@ public class GeneratingTradeItemReader implements ItemReader<Trade> {
 	
 	private int counter = 0;
 
+	@Override
 	public Trade read() throws Exception {
 		if (counter < limit) {
 			counter++;

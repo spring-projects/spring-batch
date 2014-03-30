@@ -21,6 +21,7 @@ package org.springframework.batch.item;
  * @author Dave Syer
  * @author Lucas Ward
  */
+@SuppressWarnings("serial")
 public class ItemStreamException extends RuntimeException {
 
 	/**

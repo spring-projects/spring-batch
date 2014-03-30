@@ -74,6 +74,7 @@ public class JobScopeTestExecutionListener implements TestExecutionListener {
 	 * @throws Exception if there is a problem
 	 * @see TestExecutionListener#prepareTestInstance(TestContext)
 	 */
+	@Override
 	public void prepareTestInstance(TestContext testContext) throws Exception {
 		JobExecution jobExecution = getJobExecution(testContext);
 		if (jobExecution != null) {
@@ -86,6 +87,7 @@ public class JobScopeTestExecutionListener implements TestExecutionListener {
 	 * @throws Exception if there is a problem
 	 * @see TestExecutionListener#beforeTestMethod(TestContext)
 	 */
+	@Override
 	public void beforeTestMethod(org.springframework.test.context.TestContext testContext) throws Exception {
 		if (testContext.hasAttribute(JOB_EXECUTION)) {
 			JobExecution jobExecution = (JobExecution) testContext.getAttribute(JOB_EXECUTION);
@@ -99,6 +101,7 @@ public class JobScopeTestExecutionListener implements TestExecutionListener {
 	 * @throws Exception if there is a problem
 	 * @see TestExecutionListener#afterTestMethod(TestContext)
 	 */
+	@Override
 	public void afterTestMethod(TestContext testContext) throws Exception {
 		if (testContext.hasAttribute(JOB_EXECUTION)) {
 			JobSynchronizationManager.close();
@@ -108,12 +111,14 @@ public class JobScopeTestExecutionListener implements TestExecutionListener {
 	/*
 	 * Support for Spring 3.0 (empty).
 	 */
+	@Override
 	public void afterTestClass(TestContext testContext) throws Exception {
 	}
 
 	/*
 	 * Support for Spring 3.0 (empty).
 	 */
+	@Override
 	public void beforeTestClass(TestContext testContext) throws Exception {
 	}
 	
@@ -168,6 +173,7 @@ public class JobScopeTestExecutionListener implements TestExecutionListener {
 			return result == null ? null : result.getName();
 		}
 
+		@Override
 		public void doWith(Method method) throws IllegalArgumentException, IllegalAccessException {
 			Class<?> type = method.getReturnType();
 			if (preferredType.isAssignableFrom(type)) {

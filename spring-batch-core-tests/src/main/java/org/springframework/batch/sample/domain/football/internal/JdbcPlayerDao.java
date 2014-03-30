@@ -35,7 +35,8 @@ public class JdbcPlayerDao implements PlayerDao  {
 
     private NamedParameterJdbcTemplate namedParameterJdbcTemplate;
 
-    public void savePlayer(Player player) {
+    @Override
+	public void savePlayer(Player player) {
         namedParameterJdbcTemplate.update(INSERT_PLAYER, new BeanPropertySqlParameterSource(player));
 	}
 
