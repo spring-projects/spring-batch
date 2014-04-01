@@ -20,7 +20,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 
-import org.springframework.batch.core.jsr.configuration.support.BatchArtifact;
+import org.springframework.batch.core.jsr.configuration.support.BatchArtifactType;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.support.ManagedMap;
 import org.springframework.beans.factory.xml.ParserContext;
@@ -50,15 +50,15 @@ public class PropertyParser {
 	private String beanName;
 	private String stepName;
 	private ParserContext parserContext;
-	private BatchArtifact.BatchArtifactType batchArtifactType;
+	private BatchArtifactType batchArtifactType;
 
-	public PropertyParser(String beanName, ParserContext parserContext, BatchArtifact.BatchArtifactType batchArtifactType) {
+	public PropertyParser(String beanName, ParserContext parserContext, BatchArtifactType batchArtifactType) {
 		this.beanName = beanName;
 		this.parserContext = parserContext;
 		this.batchArtifactType = batchArtifactType;
 	}
 
-	public PropertyParser(String beanName, ParserContext parserContext, BatchArtifact.BatchArtifactType batchArtifactType, String stepName) {
+	public PropertyParser(String beanName, ParserContext parserContext, BatchArtifactType batchArtifactType, String stepName) {
 		this(beanName, parserContext, batchArtifactType);
 		this.stepName = stepName;
 	}
@@ -110,13 +110,13 @@ public class PropertyParser {
 		Object propertyValue;
 		BeanDefinition beanDefinition = parserContext.getRegistry().getBeanDefinition(BATCH_PROPERTY_CONTEXT_BEAN_NAME);
 
-		if(batchArtifactType.equals(BatchArtifact.BatchArtifactType.JOB)) {
+		if(batchArtifactType.equals(BatchArtifactType.JOB)) {
 			propertyValue = getJobProperties(properties);
-		} else if (batchArtifactType.equals(BatchArtifact.BatchArtifactType.STEP)) {
+		} else if (batchArtifactType.equals(BatchArtifactType.STEP)) {
 			propertyValue = getProperties(stepName, properties);
-		} else if (batchArtifactType.equals(BatchArtifact.BatchArtifactType.ARTIFACT)) {
+		} else if (batchArtifactType.equals(BatchArtifactType.ARTIFACT)) {
 			propertyValue = getProperties(beanName, properties);
-		} else if (batchArtifactType.equals(BatchArtifact.BatchArtifactType.STEP_ARTIFACT)) {
+		} else if (batchArtifactType.equals(BatchArtifactType.STEP_ARTIFACT)) {
 			propertyValue = getStepArtifactProperties(beanDefinition, properties);
 		} else {
 			throw new IllegalStateException("Unhandled BatchArtifactType of: " + batchArtifactType);
@@ -163,7 +163,7 @@ public class PropertyParser {
 	}
 
 	private void setJobPropertiesBean(Properties properties) {
-		if (batchArtifactType.equals(BatchArtifact.BatchArtifactType.JOB)) {
+		if (batchArtifactType.equals(BatchArtifactType.JOB)) {
 			Map<String, String> jobProperties = new HashMap<String, String>();
 
 			if (properties != null && !properties.isEmpty()) {
@@ -177,14 +177,14 @@ public class PropertyParser {
 		}
 	}
 
-	private String getPropertyName(BatchArtifact.BatchArtifactType batchArtifactType) {
-		if(batchArtifactType.equals(BatchArtifact.BatchArtifactType.JOB)) {
+	private String getPropertyName(BatchArtifactType batchArtifactType) {
+		if(batchArtifactType.equals(BatchArtifactType.JOB)) {
 			return JOB_PROPERTIES_PROPERTY_NAME;
-		} else if (batchArtifactType.equals(BatchArtifact.BatchArtifactType.STEP)) {
+		} else if (batchArtifactType.equals(BatchArtifactType.STEP)) {
 			return STEP_PROPERTIES_PROPERTY_NAME;
-		} else if (batchArtifactType.equals(BatchArtifact.BatchArtifactType.ARTIFACT)) {
+		} else if (batchArtifactType.equals(BatchArtifactType.ARTIFACT)) {
 			return ARTIFACT_PROPERTIES_PROPERTY_NAME;
-		} else if (batchArtifactType.equals(BatchArtifact.BatchArtifactType.STEP_ARTIFACT)) {
+		} else if (batchArtifactType.equals(BatchArtifactType.STEP_ARTIFACT)) {
 			return STEP_ARTIFACT_PROPERTIES_PROPERTY_NAME;
 		} else {
 			throw new IllegalStateException("Unhandled BatchArtifactType of: " + batchArtifactType);

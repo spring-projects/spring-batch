@@ -17,7 +17,7 @@ package org.springframework.batch.core.jsr.configuration.xml;
 
 import java.util.List;
 
-import org.springframework.batch.core.jsr.configuration.support.BatchArtifact;
+import org.springframework.batch.core.jsr.configuration.support.BatchArtifactType;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.config.RuntimeBeanReference;
 import org.springframework.beans.factory.parsing.CompositeComponentDefinition;
@@ -135,8 +135,8 @@ public class ListenerParser {
 		return SCOPE_STEP;
 	}
 
-	private BatchArtifact.BatchArtifactType getBatchArtifactType(String stepName) {
-		return (stepName != null && !"".equals(stepName)) ? BatchArtifact.BatchArtifactType.STEP_ARTIFACT
-				: BatchArtifact.BatchArtifactType.ARTIFACT;
+	private BatchArtifactType getBatchArtifactType(String stepName) {
+		return (stepName != null && !"".equals(stepName)) ? BatchArtifactType.STEP_ARTIFACT
+				: BatchArtifactType.ARTIFACT;
 	}
 }

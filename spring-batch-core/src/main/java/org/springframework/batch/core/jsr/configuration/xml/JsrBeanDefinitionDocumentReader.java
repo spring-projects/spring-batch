@@ -30,6 +30,7 @@ import org.springframework.beans.factory.support.AbstractBeanDefinition;
 import org.springframework.beans.factory.support.BeanDefinitionBuilder;
 import org.springframework.beans.factory.support.BeanDefinitionRegistry;
 import org.springframework.beans.factory.xml.DefaultBeanDefinitionDocumentReader;
+import org.springframework.util.ClassUtils;
 import org.w3c.dom.Element;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
@@ -244,23 +245,24 @@ public class JsrBeanDefinitionDocumentReader extends DefaultBeanDefinitionDocume
 							referenceCountMap.put(resolvedValue, 0);
 						}
 
-						// possibly fully qualified class name in ref tag in the jobXML
-						if(!registry.containsBeanDefinition(resolvedValue)) {
+						boolean isClass = isClass(resolvedValue);
+						Integer referenceCount = referenceCountMap.get(resolvedValue);
+
+						// possibly fully qualified class name in ref tag in the JSL or pointer to bean/artifact ref.
+						if(isClass && !registry.containsBeanDefinition(resolvedValue)) {
 							AbstractBeanDefinition beanDefinition = BeanDefinitionBuilder.genericBeanDefinition(resolvedValue)
 									.getBeanDefinition();
 							beanDefinition.setScope("step");
 							registry.registerBeanDefinition(resolvedValue, beanDefinition);
+
 							newNodeValue = resolvedValue;
-						}
-
-						if (referenceCountMap.containsKey(resolvedValue)) {
-							Integer referenceCount = referenceCountMap.get(resolvedValue);
-							referenceCount++;
-							referenceCountMap.put(resolvedValue, referenceCount);
-
-							newNodeValue = resolvedValue + referenceCount;
-
+						} else {
 							if(registry.containsBeanDefinition(resolvedValue)) {
+								referenceCount++;
+								referenceCountMap.put(resolvedValue, referenceCount);
+
+								newNodeValue = resolvedValue + referenceCount;
+
 								BeanDefinition beanDefinition = registry.getBeanDefinition(resolvedValue);
 								registry.registerBeanDefinition(newNodeValue, beanDefinition);
 							}
@@ -280,6 +282,16 @@ public class JsrBeanDefinitionDocumentReader extends DefaultBeanDefinitionDocume
 				}
 			}
 		}
+	}
+
+	private boolean isClass(String className) {
+		try {
+			Class.forName(className, false, ClassUtils.getDefaultClassLoader());
+		} catch (ClassNotFoundException e) {
+			return false;
+		}
+
+		return true;
 	}
 
 	protected Properties getJobParameters() {

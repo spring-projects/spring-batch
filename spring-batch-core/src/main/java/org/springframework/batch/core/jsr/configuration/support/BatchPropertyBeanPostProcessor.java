@@ -73,10 +73,6 @@ public class BatchPropertyBeanPostProcessor implements BeanPostProcessor, BeanFa
 
 	@Override
 	public Object postProcessBeforeInitialization(final Object artifact, String artifactName) throws BeansException {
-		if (! BatchArtifact.isBatchArtifact(artifact)) {
-			return artifact;
-		}
-
 		Properties artifactProperties = getArtifactProperties(artifactName);
 
 		if (artifactProperties.isEmpty()) {
