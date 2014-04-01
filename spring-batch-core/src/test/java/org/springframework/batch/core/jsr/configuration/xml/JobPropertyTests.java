@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 the original author or authors.
+ * Copyright 2013-2014 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -33,7 +33,11 @@ import javax.batch.runtime.context.JobContext;
 import javax.inject.Inject;
 
 import org.junit.Test;
+import org.springframework.batch.core.StepContribution;
 import org.springframework.batch.core.jsr.JsrTestUtils;
+import org.springframework.batch.core.scope.context.ChunkContext;
+import org.springframework.batch.core.step.tasklet.Tasklet;
+import org.springframework.batch.repeat.RepeatStatus;
 
 import static junit.framework.Assert.assertEquals;
 
@@ -53,7 +57,7 @@ public class JobPropertyTests {
 		jobParameters.setProperty("deciderName", "stepDecider");
 		jobParameters.setProperty("deciderNumber", "1");
 
-		JobExecution jobExecution = JsrTestUtils.runJob("jsrJobPropertyTests", jobParameters, 5000L);
+		JobExecution jobExecution = JsrTestUtils.runJob("jsrJobPropertyTestsContext", jobParameters, 5000L);
 		assertEquals(BatchStatus.COMPLETED, jobExecution.getBatchStatus());
 	}
 
@@ -276,6 +280,19 @@ public class JobPropertyTests {
 
 		@Override
 		public void stop() throws Exception {
+		}
+	}
+
+	public static class TestTasklet implements Tasklet {
+		@Inject
+		@BatchProperty
+		private String p1;
+
+		@Override
+		public RepeatStatus execute(StepContribution contribution, ChunkContext chunkContext) throws Exception {
+			org.springframework.util.Assert.isTrue("p1val".equals(p1));
+
+			return RepeatStatus.FINISHED;
 		}
 	}
 }

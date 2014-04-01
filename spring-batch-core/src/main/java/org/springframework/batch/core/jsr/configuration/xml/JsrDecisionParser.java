@@ -18,7 +18,7 @@ package org.springframework.batch.core.jsr.configuration.xml;
 import java.util.Collection;
 
 import org.springframework.batch.core.job.flow.JobExecutionDecider;
-import org.springframework.batch.core.jsr.configuration.support.BatchArtifact;
+import org.springframework.batch.core.jsr.configuration.support.BatchArtifactType;
 import org.springframework.batch.core.jsr.job.flow.support.state.JsrStepState;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.config.RuntimeBeanReference;
@@ -62,7 +62,7 @@ public class JsrDecisionParser {
 			factoryDefinition.setAttribute("jobParserJobFactoryBeanRef", jobFactoryRef);
 		}
 
-		new PropertyParser(refAttribute, parserContext, BatchArtifact.BatchArtifactType.STEP_ARTIFACT, idAttribute).parseProperties(element);
+		new PropertyParser(refAttribute, parserContext, BatchArtifactType.STEP_ARTIFACT, idAttribute).parseProperties(element);
 
 		return FlowParser.getNextElements(parserContext, stateBuilder.getBeanDefinition(), element);
 	}

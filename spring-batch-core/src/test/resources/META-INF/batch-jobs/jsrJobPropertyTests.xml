@@ -69,7 +69,7 @@
 		</properties>
 		<next on="*" to="#{jobParameters['unresolving.prop']}?:#{jobProperties['step2name']};"/>
 	</decision>
-	<step id="step2">
+	<step id="step2" next="step3">
 		<!-- JSR Section 8.2.3 -->
 		<properties>
 			<property name="step2PropertyName1" value="step2PropertyValue1"/>
@@ -96,6 +96,13 @@
 				<property name="nonexistentBatchletPropertyName" value="nonexistentBatchletPropertyValue"/>
 				<property name="infile.name" value="#{jobProperties['filestem']}.txt"/>
 				<property name="y" value="#{jobProperties['x']}"/>
+			</properties>
+		</batchlet>
+	</step>
+	<step id="step3">
+		<batchlet ref="testSpringTasklet">
+			<properties>
+				<property name="p1" value="p1val"/>
 			</properties>
 		</batchlet>
 	</step>

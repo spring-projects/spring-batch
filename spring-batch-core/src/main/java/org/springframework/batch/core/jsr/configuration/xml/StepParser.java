@@ -17,7 +17,7 @@ package org.springframework.batch.core.jsr.configuration.xml;
 
 import java.util.Collection;
 
-import org.springframework.batch.core.jsr.configuration.support.BatchArtifact;
+import org.springframework.batch.core.jsr.configuration.support.BatchArtifactType;
 import org.springframework.batch.core.jsr.job.flow.support.state.JsrStepState;
 import org.springframework.batch.core.listener.StepListenerFactoryBean;
 import org.springframework.beans.factory.config.BeanDefinition;
@@ -76,7 +76,7 @@ public class StepParser extends AbstractSingleBeanDefinitionParser {
 		}
 
 		new ListenerParser(StepListenerFactoryBean.class, "listeners").parseListeners(element, parserContext, bd, stepName);
-		new PropertyParser(stepName, parserContext, BatchArtifact.BatchArtifactType.STEP, stepName).parseProperties(element);
+		new PropertyParser(stepName, parserContext, BatchArtifactType.STEP, stepName).parseProperties(element);
 
 		// look at all nested elements
 		NodeList children = element.getChildNodes();

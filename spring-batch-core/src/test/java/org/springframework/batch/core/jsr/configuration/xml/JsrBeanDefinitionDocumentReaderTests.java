@@ -149,7 +149,6 @@ public class JsrBeanDefinitionDocumentReaderTests {
 		assertTrue("exitStatusSettingStepListener3ClassBeanDefinition bean definition not found", applicationContext.containsBeanDefinition("org.springframework.batch.core.jsr.step.listener.ExitStatusSettingStepListener3"));
 		assertTrue("testBatchlet bean definition not found", applicationContext.containsBeanDefinition("testBatchlet"));
 		assertTrue("testBatchlet1 bean definition not found", applicationContext.containsBeanDefinition("testBatchlet1"));
-		assertTrue("testBatchlet2 bean definition not found", applicationContext.containsBeanDefinition("testBatchlet2"));
 	}
 
 	@Test

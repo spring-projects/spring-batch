@@ -15,7 +15,7 @@
  */
 package org.springframework.batch.core.jsr.configuration.xml;
 
-import org.springframework.batch.core.jsr.configuration.support.BatchArtifact;
+import org.springframework.batch.core.jsr.configuration.support.BatchArtifactType;
 import org.springframework.batch.core.step.tasklet.Tasklet;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.config.RuntimeBeanReference;
@@ -50,6 +50,6 @@ public class BatchletParser extends AbstractSingleBeanDefinitionParser {
 		bd.setRole(BeanDefinition.ROLE_SUPPORT);
 		bd.setSource(parserContext.extractSource(batchletElement));
 
-		new PropertyParser(taskletRef, parserContext, BatchArtifact.BatchArtifactType.STEP_ARTIFACT, stepName).parseProperties(batchletElement);
+		new PropertyParser(taskletRef, parserContext, BatchArtifactType.STEP_ARTIFACT, stepName).parseProperties(batchletElement);
 	}
 }

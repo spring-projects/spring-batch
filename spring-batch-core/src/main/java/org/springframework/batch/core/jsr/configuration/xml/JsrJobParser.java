@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 the original author or authors.
+ * Copyright 2013-2014 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,7 +17,7 @@ package org.springframework.batch.core.jsr.configuration.xml;
 
 import org.springframework.batch.core.configuration.xml.CoreNamespaceUtils;
 import org.springframework.batch.core.jsr.JsrStepContextFactoryBean;
-import org.springframework.batch.core.jsr.configuration.support.BatchArtifact;
+import org.springframework.batch.core.jsr.configuration.support.BatchArtifactType;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.support.AbstractBeanDefinition;
 import org.springframework.beans.factory.support.BeanDefinitionBuilder;
@@ -61,7 +61,7 @@ public class JsrJobParser extends AbstractSingleBeanDefinitionParser {
 			builder.addPropertyValue("restartable", restartableAttribute);
 		}
 
-		new PropertyParser(jobName, parserContext, BatchArtifact.BatchArtifactType.JOB).parseProperties(element);
+		new PropertyParser(jobName, parserContext, BatchArtifactType.JOB).parseProperties(element);
 
 		BeanDefinition flowDef = new FlowParser(jobName, jobName).parse(element, parserContext);
 		builder.addPropertyValue("flow", flowDef);
