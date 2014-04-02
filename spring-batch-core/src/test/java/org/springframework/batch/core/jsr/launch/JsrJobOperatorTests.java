@@ -15,35 +15,6 @@
  */
 package org.springframework.batch.core.jsr.launch;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
-import static org.springframework.batch.core.jsr.JsrTestUtils.restartJob;
-import static org.springframework.batch.core.jsr.JsrTestUtils.runJob;
-
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Properties;
-import java.util.Set;
-
-import javax.batch.api.AbstractBatchlet;
-import javax.batch.api.Batchlet;
-import javax.batch.operations.JobExecutionIsRunningException;
-import javax.batch.operations.JobOperator;
-import javax.batch.operations.JobRestartException;
-import javax.batch.operations.JobStartException;
-import javax.batch.operations.NoSuchJobException;
-import javax.batch.operations.NoSuchJobExecutionException;
-import javax.batch.operations.NoSuchJobInstanceException;
-import javax.batch.runtime.BatchRuntime;
-import javax.batch.runtime.BatchStatus;
-
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
@@ -63,6 +34,34 @@ import org.springframework.batch.core.step.JobRepositorySupport;
 import org.springframework.beans.factory.BeanCreationException;
 import org.springframework.core.task.AsyncTaskExecutor;
 import org.springframework.core.task.SyncTaskExecutor;
+
+import javax.batch.api.AbstractBatchlet;
+import javax.batch.api.Batchlet;
+import javax.batch.operations.JobExecutionIsRunningException;
+import javax.batch.operations.JobOperator;
+import javax.batch.operations.JobRestartException;
+import javax.batch.operations.JobStartException;
+import javax.batch.operations.NoSuchJobException;
+import javax.batch.operations.NoSuchJobExecutionException;
+import javax.batch.operations.NoSuchJobInstanceException;
+import javax.batch.runtime.BatchRuntime;
+import javax.batch.runtime.BatchStatus;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Properties;
+import java.util.Set;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+import static org.springframework.batch.core.jsr.JsrTestUtils.restartJob;
+import static org.springframework.batch.core.jsr.JsrTestUtils.runJob;
 
 public class JsrJobOperatorTests {
 
@@ -550,6 +549,9 @@ public class JsrJobOperatorTests {
 			javax.batch.runtime.JobExecution execution = runJob("contextClosingTests", new Properties(), TIMEOUT);
 
 			assertEquals(BatchStatus.COMPLETED, execution.getBatchStatus());
+
+			// Added to allow time for the context to finish closing before running the job again
+			Thread.sleep(1000l);
 		}
 	}
 
