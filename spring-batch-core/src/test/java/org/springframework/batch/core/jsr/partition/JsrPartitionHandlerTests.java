@@ -44,7 +44,6 @@ import org.springframework.batch.core.StepExecution;
 import org.springframework.batch.core.jsr.JsrTestUtils;
 import org.springframework.batch.core.jsr.configuration.support.BatchPropertyContext;
 import org.springframework.batch.core.jsr.step.batchlet.BatchletSupport;
-import org.springframework.batch.core.partition.JsrStepExecutionSplitter;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.repository.support.MapJobRepositoryFactoryBean;
 import org.springframework.batch.core.step.JobRepositorySupport;

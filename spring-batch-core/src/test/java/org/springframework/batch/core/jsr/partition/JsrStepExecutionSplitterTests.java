@@ -24,7 +24,6 @@ import org.junit.Before;
 import org.junit.Test;
 import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.StepExecution;
-import org.springframework.batch.core.partition.JsrStepExecutionSplitter;
 import org.springframework.batch.core.step.JobRepositorySupport;
 
 public class JsrStepExecutionSplitterTests {

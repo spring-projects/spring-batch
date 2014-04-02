@@ -41,7 +41,6 @@ import org.springframework.batch.core.JobExecutionException;
 import org.springframework.batch.core.Step;
 import org.springframework.batch.core.StepExecution;
 import org.springframework.batch.core.jsr.configuration.support.BatchPropertyContext;
-import org.springframework.batch.core.partition.JsrStepExecutionSplitter;
 import org.springframework.batch.core.partition.PartitionHandler;
 import org.springframework.batch.core.partition.StepExecutionSplitter;
 import org.springframework.batch.core.repository.JobRepository;

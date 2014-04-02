@@ -36,7 +36,7 @@ import org.springframework.batch.core.job.flow.support.state.StepState;
 import org.springframework.batch.core.jsr.configuration.support.BatchPropertyContext;
 import org.springframework.batch.core.jsr.partition.JsrPartitionHandler;
 import org.springframework.batch.core.jsr.step.PartitionStep;
-import org.springframework.batch.core.partition.JsrStepExecutionSplitter;
+import org.springframework.batch.core.jsr.partition.JsrStepExecutionSplitter;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.repository.dao.JobExecutionDao;
 import org.springframework.batch.core.repository.support.MapJobRepositoryFactoryBean;
