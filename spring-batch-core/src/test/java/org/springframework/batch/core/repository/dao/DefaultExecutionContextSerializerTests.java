@@ -48,6 +48,14 @@ public class DefaultExecutionContextSerializerTests {
 		compareContexts(m1, m2);
 	}
 
+	@Test(expected = IllegalArgumentException.class)
+	public void testSerializeNonSerializable() throws Exception {
+		Map<String, Object> m1 = new HashMap<String, Object>();
+		m1.put("object1", new Object());
+
+		serializer.serialize(m1, new ByteArrayOutputStream());
+	}
+
 	@Test
 	public void testComplexObject() throws Exception {
 		Map<String, Object> m1 = new HashMap<String, Object>();

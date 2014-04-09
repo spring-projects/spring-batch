@@ -124,18 +124,6 @@ public class ExecutionContextTests {
 		assertTrue(tempContext.equals(context));
 	}
 
-	@Test
-	public void testSerializationCheck() {
-		// adding a non serializable object should cause an error.
-		try {
-			context.put("1", new Object());
-			fail();
-		}
-		catch (IllegalArgumentException ex) {
-			// expected
-		}
-	}
-
 	/**
 	 * Putting null value is equivalent to removing the entry for the given key.
 	 */
