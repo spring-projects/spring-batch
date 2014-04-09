@@ -18,6 +18,7 @@ package org.springframework.batch.core.repository.dao;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.io.Serializable;
 import java.util.Map;
 
 import org.springframework.batch.core.repository.ExecutionContextSerializer;
@@ -54,6 +55,9 @@ public class DefaultExecutionContextSerializer implements ExecutionContextSerial
 		Assert.notNull(context);
 		Assert.notNull(out);
 
+		for(Object value : context.values()) {
+			Assert.isInstanceOf(Serializable.class, value, "Value: [ " + value + "must be serializable.");
+		}
 		serializer.serialize(context, out);
 	}
 

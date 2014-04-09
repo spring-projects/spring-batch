@@ -117,15 +117,14 @@ public class ExecutionContext implements Serializable {
 	}
 
 	/**
-	 * Add an Object value to the context (must be Serializable). Putting
-	 * <code>null</code> value for a given key removes the key.
+	 * Add an Object value to the context. Putting <code>null</code>
+	 * value for a given key removes the key.
 	 *
 	 * @param key Key to add to context
 	 * @param value Value to associate with key
 	 */
 	public void put(String key, Object value) {
 		if (value != null) {
-			Assert.isInstanceOf(Serializable.class, value, "Value: [ " + value + "must be serializable.");
 			Object result = map.put(key, value);
 			dirty = result==null || result!=null && !result.equals(value);
 		}
