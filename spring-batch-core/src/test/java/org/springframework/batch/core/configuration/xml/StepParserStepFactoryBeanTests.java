@@ -16,12 +16,6 @@
 
 package org.springframework.batch.core.configuration.xml;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
-
-import java.util.HashMap;
-import java.util.Map;
-
 import org.junit.Test;
 import org.springframework.aop.framework.Advised;
 import org.springframework.aop.framework.ProxyFactory;
@@ -49,6 +43,13 @@ import org.springframework.retry.listener.RetryListenerSupport;
 import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Propagation;
+
+import java.util.HashMap;
+import java.util.Map;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.assertFalse;
 
 /**
  * @author Dan Garrette
@@ -248,6 +249,7 @@ public class StepParserStepFactoryBeanTests {
 		assertEquals(new Integer(10), throttleLimit);
 		Object tasklet = ReflectionTestUtils.getField(step, "tasklet");
 		assertTrue(tasklet instanceof ChunkOrientedTasklet<?>);
+		assertFalse((Boolean) ReflectionTestUtils.getField(tasklet, "buffering"));
 		Object chunkProvider = ReflectionTestUtils.getField(tasklet, "chunkProvider");
 		Object repeatOperations = ReflectionTestUtils.getField(chunkProvider, "repeatOperations");
 		Object completionPolicy = ReflectionTestUtils.getField(repeatOperations, "completionPolicy");

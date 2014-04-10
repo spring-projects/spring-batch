@@ -16,25 +16,6 @@
 
 package org.springframework.batch.core.configuration.xml;
 
-import java.io.Serializable;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.LinkedHashSet;
-import java.util.Map;
-import java.util.Queue;
-import java.util.Set;
-import java.util.concurrent.locks.ReentrantLock;
-
-import javax.batch.api.chunk.listener.RetryProcessListener;
-import javax.batch.api.chunk.listener.RetryReadListener;
-import javax.batch.api.chunk.listener.RetryWriteListener;
-import javax.batch.api.chunk.listener.SkipProcessListener;
-import javax.batch.api.chunk.listener.SkipReadListener;
-import javax.batch.api.chunk.listener.SkipWriteListener;
-import javax.batch.api.partition.PartitionAnalyzer;
-import javax.batch.api.partition.PartitionCollector;
-
 import org.springframework.batch.core.ChunkListener;
 import org.springframework.batch.core.ItemProcessListener;
 import org.springframework.batch.core.ItemReadListener;
@@ -97,6 +78,23 @@ import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.interceptor.DefaultTransactionAttribute;
 import org.springframework.util.Assert;
+
+import javax.batch.api.chunk.listener.RetryProcessListener;
+import javax.batch.api.chunk.listener.RetryReadListener;
+import javax.batch.api.chunk.listener.RetryWriteListener;
+import javax.batch.api.chunk.listener.SkipProcessListener;
+import javax.batch.api.chunk.listener.SkipReadListener;
+import javax.batch.api.chunk.listener.SkipWriteListener;
+import javax.batch.api.partition.PartitionCollector;
+import java.io.Serializable;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.LinkedHashSet;
+import java.util.Map;
+import java.util.Queue;
+import java.util.Set;
+import java.util.concurrent.locks.ReentrantLock;
 
 /**
  * This {@link FactoryBean} is used by the batch namespace parser to create {@link Step} objects. Stores all of the
@@ -244,14 +242,14 @@ public class StepParserStepFactoryBean<I, O> implements FactoryBean<Step>, BeanN
 	private StepExecutionAggregator stepExecutionAggregator;
 
 	/**
-	 * @param queue The {@link Queue} that is used for communication between {@link PartitionCollector} and {@link PartitionAnalyzer}
+	 * @param queue The {@link Queue} that is used for communication between {@link javax.batch.api.partition.PartitionCollector} and {@link javax.batch.api.partition.PartitionAnalyzer}
 	 */
 	public void setPartitionQueue(Queue<Serializable> queue) {
 		this.partitionQueue = queue;
 	}
 
 	/**
-	 * Used to coordinate access to the partition queue between the {@link PartitionCollector} and {@link PartitionAnalyzer}
+	 * Used to coordinate access to the partition queue between the {@link javax.batch.api.partition.PartitionCollector} and {@link javax.batch.api.partition.AbstractPartitionAnalyzer}
 	 *
 	 * @param lock a lock that will be locked around accessing the partition queue
 	 */
@@ -361,6 +359,10 @@ public class StepParserStepFactoryBean<I, O> implements FactoryBean<Step>, BeanN
 
 		if (processorTransactional != null && !processorTransactional) {
 			builder.processorNonTransactional();
+		}
+
+		if (readerTransactionalQueue!=null && readerTransactionalQueue==true) {
+			builder.readerIsTransactionalQueue();
 		}
 
 		for (SkipListener<I, O> listener : skipListeners) {
