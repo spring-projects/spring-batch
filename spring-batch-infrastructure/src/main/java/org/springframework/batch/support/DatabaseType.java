@@ -16,13 +16,13 @@
 
 package org.springframework.batch.support;
 
-import java.util.HashMap;
-import java.util.Map;
-
-import javax.sql.DataSource;
-
 import org.springframework.jdbc.support.JdbcUtils;
 import org.springframework.jdbc.support.MetaDataAccessException;
+import org.springframework.util.StringUtils;
+
+import javax.sql.DataSource;
+import java.util.HashMap;
+import java.util.Map;
 
 
 /**
@@ -94,7 +94,7 @@ public enum DatabaseType {
 	public static DatabaseType fromMetaData(DataSource dataSource) throws MetaDataAccessException {
 		String databaseProductName =
 				JdbcUtils.extractDatabaseMetaData(dataSource, "getDatabaseProductName").toString();
-		if ("DB2".equals(databaseProductName)) {
+		if (StringUtils.hasText(databaseProductName) && !databaseProductName.equals("DB2/Linux") && databaseProductName.startsWith("DB2")) {
 			String databaseProductVersion =
 					JdbcUtils.extractDatabaseMetaData(dataSource, "getDatabaseProductVersion").toString();
 			if (!databaseProductVersion.startsWith("SQL")) {

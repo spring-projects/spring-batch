@@ -15,6 +15,11 @@
  */
 package org.springframework.batch.support;
 
+import org.junit.Test;
+import org.springframework.jdbc.support.MetaDataAccessException;
+
+import javax.sql.DataSource;
+
 import static org.junit.Assert.assertEquals;
 import static org.springframework.batch.support.DatabaseType.DB2;
 import static org.springframework.batch.support.DatabaseType.DB2ZOS;
@@ -27,11 +32,6 @@ import static org.springframework.batch.support.DatabaseType.SQLITE;
 import static org.springframework.batch.support.DatabaseType.SQLSERVER;
 import static org.springframework.batch.support.DatabaseType.SYBASE;
 import static org.springframework.batch.support.DatabaseType.fromProductName;
-
-import javax.sql.DataSource;
-
-import org.junit.Test;
-import org.springframework.jdbc.support.MetaDataAccessException;
 
 /**
  * 
@@ -75,8 +75,11 @@ public class DatabaseTypeTests {
 
 	@Test
 	public void testFromMetaDataForDB2ZOS() throws Exception {
-		DataSource ds = DatabaseTypeTestUtils.getMockDataSource("DB2", "DSN08015");
-		assertEquals(DB2ZOS, DatabaseType.fromMetaData(ds));
+		DataSource oldDs = DatabaseTypeTestUtils.getMockDataSource("DB2", "DSN08015");
+		assertEquals(DB2ZOS, DatabaseType.fromMetaData(oldDs));
+
+		DataSource newDs = DatabaseTypeTestUtils.getMockDataSource("DB2 for DB2 UDB for z/OS", "DSN08015");
+		assertEquals(DB2ZOS, DatabaseType.fromMetaData(newDs));
 	}
 
 	@Test
