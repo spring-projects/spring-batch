@@ -16,13 +16,6 @@
 
 package org.springframework.batch.core.configuration.xml;
 
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.LinkedHashSet;
-import java.util.Map;
-import java.util.Set;
-
 import org.springframework.batch.core.ChunkListener;
 import org.springframework.batch.core.ItemProcessListener;
 import org.springframework.batch.core.ItemReadListener;
@@ -75,6 +68,13 @@ import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.interceptor.DefaultTransactionAttribute;
 import org.springframework.util.Assert;
+
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.LinkedHashSet;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * This {@link FactoryBean} is used by the batch namespace parser to create {@link Step} objects. Stores all of the
@@ -310,6 +310,10 @@ class StepParserStepFactoryBean<I, O> implements FactoryBean, BeanNameAware {
 
 		if (processorTransactional != null && !processorTransactional) {
 			builder.processorNonTransactional();
+		}
+
+		if (readerTransactionalQueue!=null && readerTransactionalQueue==true) {
+			builder.readerIsTransactionalQueue();
 		}
 
 		for (SkipListener<I, O> listener : skipListeners) {
