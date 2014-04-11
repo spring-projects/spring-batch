@@ -182,11 +182,6 @@
     single consumer for each message. JMS is the obvious candidate, but other
     options exist in the grid computing and shared memory product space (e.g.
     Java Spaces).</para>
-
-    <para>Spring Batch has a sister project Spring Batch Admin, which
-    provides(amongst other things) implementations of various patterns
-    like this one using Spring Integration. These are implemented in a
-    module called Spring Batch Integration.</para>
   </section>
 
   <section id="partitioning">
