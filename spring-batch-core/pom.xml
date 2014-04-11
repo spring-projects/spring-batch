@@ -16,7 +16,7 @@
         <url>https://github.com/spring-projects/spring-batch</url>
         <connection>scm:git:git://github.com/spring-projects/spring-batch.git</connection>
         <developerConnection>scm:git:git://github.com/spring-projects/spring-batch.git</developerConnection>
-        <tag>2.2.6.RELEASE</tag>
+        <tag>HEAD</tag>
     </scm>
 	<dependencies>
 		<dependency>
