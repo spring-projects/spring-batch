@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<job id="springConfigSample" xmlns="http://xmlns.jcp.org/xml/ns/javaee" version="1.0">
+	<step id="step1" next="step2">
+		<chunk>
+			<reader ref="itemReader"/>
+			<processor ref="itemProcessor"/>
+			<writer ref="itemWriter"/>
+		</chunk>
+	</step>
+	<step id="step2">
+		<batchlet ref="serviceBatchet">
+			<properties>
+				<property name="remoteServiceURL" value="#{jobParameters['remoteServiceURL']}"/>
+			</properties>
+		</batchlet>
+	</step>
+</job>

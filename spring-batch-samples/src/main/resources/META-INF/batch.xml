@@ -1,0 +1,6 @@
+<batch-artifacts xmlns="http://xmlns.jcp.org/xml/ns/javaee">
+	<ref id="reader" class="org.springframework.batch.sample.jsr352.JsrSampleItemReader"/>
+	<ref id="processor" class="org.springframework.batch.sample.jsr352.JsrSampleItemProcessor"/>
+	<ref id="writer" class="org.springframework.batch.sample.jsr352.JsrSampleItemWriter"/>
+	<ref id="batchlet" class="org.springframework.batch.sample.jsr352.JsrSampleBatchlet"/>
+</batch-artifacts>
