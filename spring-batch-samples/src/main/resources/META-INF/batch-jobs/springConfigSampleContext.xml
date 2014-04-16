@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	   xsi:schemaLocation="http://www.springframework.org/schema/beans
+	   http://www.springframework.org/schema/beans/spring-beans.xsd">
+
+	<!-- Use different ref names to avoid picking up ref's with the same name from batch.xml if desired -->
+
+	<import resource="springConfigSample.xml"/>
+
+	<!-- Plug in an existing Spring Batch ItemReader component as your JSR-352 ItemReader -->
+	<bean id="itemReader" class="org.springframework.batch.item.support.ListItemReader" scope="step">
+		<constructor-arg>
+			<list>
+				<value>John</value>
+				<value>Joe</value>
+				<value>Mark</value>
+				<value>Jane</value>
+			</list>
+		</constructor-arg>
+	</bean>
+
+	<!-- Mix in JSR-352 ItemProcessor and ItemWriter implementations -->
+	<bean id="itemProcessor" class="org.springframework.batch.sample.jsr352.JsrSampleItemProcessor" scope="step"/>
+	<bean id="itemWriter" class="org.springframework.batch.sample.jsr352.JsrSampleItemWriter" scope="step"/>
+
+	<!-- Plug in an existing Spring Batch Tasklet to use for your JSR-352 Batchlet -->
+	<bean id="serviceBatchet" class="org.springframework.batch.sample.jsr352.JsrSampleTasklet" scope="step"/>
+</beans>
