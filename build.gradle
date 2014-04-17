@@ -130,6 +130,9 @@ subprojects { subproject ->
 			append = false
 			destinationFile = file("$buildDir/jacoco.exec")
 		}
+
+		include '**/*Tests.class'
+		exclude '**/Abstract*.class'
 	}
 
 	task sourcesJar(type: Jar) {
