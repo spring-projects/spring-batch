@@ -8,7 +8,7 @@ buildscript {
 		maven { url 'http://repo.spring.io/plugins-release' }
 	}
 	dependencies {
-		classpath 'org.springframework.build.gradle:docbook-reference-plugin:0.2.6'
+		classpath 'org.springframework.build.gradle:docbook-reference-plugin:0.2.8'
 		classpath 'org.springframework.build.gradle:propdeps-plugin:0.0.5'
 	}
 }
@@ -16,7 +16,7 @@ buildscript {
 ext {
 	linkHomepage = 'http://projects.spring.io/spring-batch/'
 	linkCi       = 'https://build.spring.io/browse/BATCH'
-	linkIssue    = 'https://jira.springsource.org/browse/BATCH'
+	linkIssue    = 'https://jira.spring.io/browse/BATCH'
 	linkScmUrl           = 'https://github.com/spring-projects/spring-batch'
 	linkScmConnection    = 'git://github.com/spring-projects/spring-batch.git'
 	linkScmDevConnection = 'git@github.com:spring-projects/spring-batch.git'
@@ -59,7 +59,7 @@ subprojects { subproject ->
 		springDataMongodbVersion = '1.1.0.RELEASE'
 		springDataNeo4jVersion = '2.2.0.RELEASE'
 		springDataRedisVersion = '1.0.3.RELEASE'
-		springIntegrationVersion = '4.0.0.M2'
+		springIntegrationVersion = '4.0.0.RC1'
 		springOsgiCoreVersion = '1.1.2'
 
 		activemqVersion = '5.1.0'
@@ -67,7 +67,7 @@ subprojects { subproject ->
 		castorVersion = '1.3.2'
 		cglibVersion = '2.1_3'
 		commonsCollectionsVersion = '3.2'
-		commonsDdbcpVersion = '1.2.2'
+		commonsDdbcpVersion = '1.4'
 		commonsIoVersion = '1.4'
 		commonsLangVersion = '2.5'
 		derbyVersion = '10.8.2.2'
