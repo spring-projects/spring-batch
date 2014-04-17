@@ -4,7 +4,7 @@
 <book xmlns:xi="http://www.w3.org/2001/XInclude">
 	<bookinfo>
 		<title>Spring Batch - Reference Documentation</title>
-
+		<productname>Spring Batch</productname>
 		<releaseinfo>Spring Batch 3.0.0.M3</releaseinfo>
 
 		<authorgroup>
