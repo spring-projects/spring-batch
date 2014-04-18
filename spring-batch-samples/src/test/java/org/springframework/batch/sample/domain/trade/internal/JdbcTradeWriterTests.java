@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2012 the original author or authors.
+ * Copyright 2006-2014 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,6 +26,7 @@ import javax.sql.DataSource;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.batch.sample.domain.trade.Trade;
+import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.jdbc.core.JdbcOperations;
@@ -38,43 +39,47 @@ import org.springframework.transaction.annotation.Transactional;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(locations = {"/data-source-context.xml"})
-public class JdbcTradeWriterTests {
-
+public class JdbcTradeWriterTests implements InitializingBean {
 	private JdbcOperations jdbcTemplate;
-
 	private JdbcTradeDao writer;
+	private AbstractDataFieldMaxValueIncrementer incrementer;
 
 	@Autowired
 	public void setDataSource(DataSource dataSource) {
 		this.jdbcTemplate = new JdbcTemplate(dataSource);
 		this.writer = new JdbcTradeDao();
 		this.writer.setDataSource(dataSource);
-
 	}
 
 	@Autowired
 	public void setIncrementer(@Qualifier("incrementerParent") AbstractDataFieldMaxValueIncrementer incrementer) {
 		incrementer.setIncrementerName("TRADE_SEQ");
-		this.writer.setIncrementer(incrementer);
+		this.incrementer = incrementer;
 	}
 
-	@Transactional @Test
+	@Test
+	@Transactional
 	public void testWrite() {
-
 		Trade trade = new Trade();
 		trade.setCustomer("testCustomer");
 		trade.setIsin("5647238492");
-		trade.setPrice(new BigDecimal(Double.toString(99.69)));
+		trade.setPrice(new BigDecimal("99.69"));
 		trade.setQuantity(5);
 
 		writer.writeTrade(trade);
 
-        jdbcTemplate.query("SELECT * FROM TRADE WHERE ISIN = '5647238492'", new RowCallbackHandler() {
+		jdbcTemplate.query("SELECT * FROM TRADE WHERE ISIN = '5647238492'", new RowCallbackHandler() {
+			@Override
 			public void processRow(ResultSet rs) throws SQLException {
 				assertEquals("testCustomer", rs.getString("CUSTOMER"));
 				assertEquals(new BigDecimal(Double.toString(99.69)), rs.getBigDecimal("PRICE"));
 				assertEquals(5,rs.getLong("QUANTITY"));
 			}
 		});
+	}
+
+	@Override
+	public void afterPropertiesSet() throws Exception {
+		this.writer.setIncrementer(incrementer);
 	}
 }
