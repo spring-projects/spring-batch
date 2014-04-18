@@ -13,7 +13,7 @@
         The ./bin/runJob.(sh|bat) script from the extracted deployment archive can be invoked to run the job.
     </description>
     <properties>
-        <spring.framework.version>3.2.0.RELEASE</spring.framework.version>
+        <spring.framework.version>3.2.7.RELEASE</spring.framework.version>
         <spring.batch.version>2.2.7.BUILD-SNAPSHOT</spring.batch.version>
         <dependency.locations.enabled>false</dependency.locations.enabled>
         <junit.version>4.10</junit.version>

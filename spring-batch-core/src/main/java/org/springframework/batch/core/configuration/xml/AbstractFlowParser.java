@@ -20,6 +20,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -118,7 +119,7 @@ public abstract class AbstractFlowParser extends AbstractSingleBeanDefinitionPar
 		parserContext.pushContainingComponent(compositeDef);
 
 		boolean stepExists = false;
-		Map<String, Set<String>> reachableElementMap = new HashMap<String, Set<String>>();
+		Map<String, Set<String>> reachableElementMap = new LinkedHashMap<String, Set<String>>();
 		String startElement = null;
 		NodeList children = element.getChildNodes();
 		for (int i = 0; i < children.getLength(); i++) {
