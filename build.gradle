@@ -187,6 +187,7 @@ subprojects { subproject ->
 
 project('spring-batch-core') {
 	description = 'Spring Batch Core'
+
 	dependencies {
 		compile project(":spring-batch-infrastructure")
 
@@ -323,6 +324,9 @@ project('spring-batch-core-tests') {
 		optional "org.aspectj:aspectjweaver:$aspectjVersion"
 		optional "cglib:cglib-nodep:$cglibVersion"
 	}
+	test {
+		enabled = project.hasProperty('alltests') ? true : false
+	}
 }
 
 project('spring-batch-infrastructure-tests') {
@@ -387,7 +391,9 @@ project('spring-batch-infrastructure-tests') {
 
 		runtime "mysql:mysql-connector-java:$mysqlVersion"
 		runtime "postgresql:postgresql:$postgresqlVersion"
-
+	}
+	test {
+		enabled = project.hasProperty('alltests') ? true : false
 	}
 }
 
