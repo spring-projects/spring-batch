@@ -18,7 +18,7 @@ package org.springframework.batch.item.ldif;
 import org.springframework.ldap.core.LdapAttributes;
 
 /**
- * This interface can be used to operate on skipped records in the {@link LdifReader LdifReader} and the
+ * This interface can be used to operate on skipped records during open in the {@link LdifReader LdifReader} and the
  * {@link MappingLdifReader MappingLdifReader}.
  *
  * @author Keith Barlow

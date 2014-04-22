@@ -33,7 +33,7 @@
 	<bean id="itemWriter" class="org.springframework.batch.item.file.FlatFileItemWriter">
 		<property name="resource" value="file:target/test-outputs/output.ldif" />
 		<property name="lineAggregator">
-			<bean class="org.springframework.ldap.ldif.batch.LdifAggregator" />
+			<bean class="org.springframework.batch.item.file.transform.PassThroughLineAggregator" />
 		</property>
 	</bean>
 </beans>
