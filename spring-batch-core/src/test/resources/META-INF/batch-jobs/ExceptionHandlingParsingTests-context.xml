@@ -8,7 +8,11 @@
 		<step id="step1" next="step2">
 			<chunk item-count="5" skip-limit="2">
 				<reader ref="generatingItemReader1" />
-				<processor ref="problemProcessor" />
+				<processor ref="problemProcessor" >
+                    <properties>
+                        <property name="runId" value="#{jobParameters['run']}"/>
+                    </properties>
+                </processor>
 				<writer ref="sysoutItemWriter" />
 				<skippable-exception-classes>
 					<include class="java.lang.Exception" />
@@ -19,7 +23,11 @@
 		<step id="step2" next="step3">
 			<chunk item-count="5" retry-limit="2">
 				<reader ref="generatingItemReader2" />
-				<processor ref="problemProcessor" />
+                <processor ref="problemProcessor" >
+                    <properties>
+                        <property name="runId" value="#{jobParameters['run']}"/>
+                    </properties>
+                </processor>
 				<writer ref="sysoutItemWriter" />
 				<retryable-exception-classes>
 					<include class="java.lang.Exception" />
@@ -30,7 +38,11 @@
 		<step id="step3">
 			<chunk item-count="5">
 				<reader ref="generatingItemReader3" />
-				<processor ref="problemProcessor" />
+                <processor ref="problemProcessor" >
+                    <properties>
+                        <property name="runId" value="#{jobParameters['run']}"/>
+                    </properties>
+                </processor>
 				<writer ref="sysoutItemWriter" />
 				<no-rollback-exception-classes>
 					<include class="java.lang.Exception" />
@@ -39,14 +51,6 @@
 		</step>
 	</job>
 	                
-	<bean id="transactionManager" class="org.springframework.batch.support.transaction.ResourcelessTransactionManager"/>
-	
-	<bean id="jobLauncher" class="org.springframework.batch.core.launch.support.SimpleJobLauncher">
-		<property name="jobRepository" ref="jobRepository"/>
-	</bean>
-	
-	<bean id="jobRepository" class="org.springframework.batch.core.repository.support.MapJobRepositoryFactoryBean"/>
-	
 	<bean id="generatingItemReader1" class="org.springframework.batch.item.support.ListItemReader">
 		<constructor-arg>
 			<list>
@@ -74,11 +78,9 @@
 		</constructor-arg>
 	</bean>
 
-	<bean id="problemProcessor" class="org.springframework.batch.core.jsr.configuration.xml.ExceptionHandlingParsingTests.ProblemProcessor" scope="step">
-		<property name="runId" value="#{jobParameters[run]}"/>
-	</bean>
-	
-	<bean id="sysoutItemWriter" class="org.springframework.batch.item.adapter.ItemWriterAdapter">
+	<bean id="problemProcessor" class="org.springframework.batch.core.jsr.configuration.xml.ExceptionHandlingParsingTests$ProblemProcessor" scope="step"/>
+
+    <bean id="sysoutItemWriter" class="org.springframework.batch.item.adapter.ItemWriterAdapter">
 		<property name="targetObject">
 			<util:constant static-field="java.lang.System.out"/>
 		</property>

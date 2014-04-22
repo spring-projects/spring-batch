@@ -15,78 +15,75 @@
  */
 package org.springframework.batch.core.jsr.configuration.xml;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import org.junit.Test;
+import org.springframework.batch.core.JobParametersBuilder;
+import org.springframework.batch.core.jsr.JsrTestUtils;
 
+import javax.batch.api.BatchProperty;
+import javax.batch.api.chunk.ItemProcessor;
+import javax.batch.operations.JobOperator;
+import javax.batch.runtime.BatchRuntime;
+import javax.batch.runtime.BatchStatus;
+import javax.batch.runtime.JobExecution;
+import javax.batch.runtime.Metric;
+import javax.batch.runtime.StepExecution;
+import javax.inject.Inject;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Properties;
 
-import org.junit.Ignore;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.springframework.batch.core.BatchStatus;
-import org.springframework.batch.core.Job;
-import org.springframework.batch.core.JobExecution;
-import org.springframework.batch.core.JobParametersBuilder;
-import org.springframework.batch.core.StepExecution;
-import org.springframework.batch.core.launch.JobLauncher;
-import org.springframework.batch.item.ItemProcessor;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import static org.junit.Assert.assertEquals;
 
-@ContextConfiguration
-@RunWith(SpringJUnit4ClassRunner.class)
 public class ExceptionHandlingParsingTests {
 
-	@Autowired
-	public Job job;
-
-	@Autowired
-	public JobLauncher jobLauncher;
-
 	@Test
-	@Ignore
 	public void testSkippable() throws Exception {
-		JobExecution execution1 = jobLauncher.run(job, new JobParametersBuilder().addLong("run", 1L).toJobParameters());
-		assertEquals(BatchStatus.FAILED, execution1.getStatus());
-		assertEquals(1, execution1.getStepExecutions().size());
-		assertEquals(1, execution1.getStepExecutions().iterator().next().getSkipCount());
-		assertTrue(execution1.getAllFailureExceptions().get(0).getMessage().contains("But don't skip me"));
+		JobOperator jobOperator = BatchRuntime.getJobOperator();
 
-		JobExecution execution2 = jobLauncher.run(job, new JobParametersBuilder().addLong("run", 2L).toJobParameters());
-		assertEquals(BatchStatus.FAILED, execution2.getStatus());
-		assertEquals(2, execution2.getStepExecutions().size());
-		assertTrue(execution2.getAllFailureExceptions().get(0).getMessage().contains("But don't retry me"));
+		Properties jobParameters = new Properties();
+		jobParameters.setProperty("run", "1");
+		JobExecution execution1 = JsrTestUtils.runJob("ExceptionHandlingParsingTests-context", jobParameters, 10000l);
 
-		JobExecution execution3 = jobLauncher.run(job, new JobParametersBuilder().addLong("run", 3L).toJobParameters());
-		assertEquals(BatchStatus.COMPLETED, execution3.getStatus());
-		assertEquals(3, execution3.getStepExecutions().size());
+		List<StepExecution> stepExecutions = jobOperator.getStepExecutions(execution1.getExecutionId());
+		assertEquals(BatchStatus.FAILED, execution1.getBatchStatus());
+		assertEquals(1, stepExecutions.size());
+		assertEquals(1, JsrTestUtils.getMetric(stepExecutions.get(0), Metric.MetricType.PROCESS_SKIP_COUNT).getValue());
 
-		List<StepExecution> stepExecutions = new ArrayList<StepExecution>(execution3.getStepExecutions());
-		assertEquals(0, stepExecutions.get(2).getRollbackCount());
+		jobParameters = new Properties();
+		jobParameters.setProperty("run", "2");
+		JobExecution execution2 = JsrTestUtils.restartJob(execution1.getExecutionId(), jobParameters, 10000l);
+		stepExecutions = jobOperator.getStepExecutions(execution2.getExecutionId());
+		assertEquals(BatchStatus.FAILED, execution2.getBatchStatus());
+		assertEquals(2, stepExecutions.size());
 
-		JobExecution execution4 = jobLauncher.run(job, new JobParametersBuilder().addLong("run", 4L).toJobParameters());
-		assertEquals(BatchStatus.COMPLETED, execution4.getStatus());
-		assertEquals(3, execution4.getStepExecutions().size());
+		jobParameters = new Properties();
+		jobParameters.setProperty("run", "3");
+		JobExecution execution3 = JsrTestUtils.restartJob(execution2.getExecutionId(), jobParameters, 10000l);
+		stepExecutions = jobOperator.getStepExecutions(execution3.getExecutionId());
+		assertEquals(BatchStatus.COMPLETED, execution3.getBatchStatus());
+		assertEquals(2, stepExecutions.size());
+
+		assertEquals(0, JsrTestUtils.getMetric(stepExecutions.get(1), Metric.MetricType.ROLLBACK_COUNT).getValue());
+
+		jobParameters = new Properties();
+		jobParameters.setProperty("run", "4");
+		JobExecution execution4 = JsrTestUtils.runJob("ExceptionHandlingParsingTests-context", jobParameters, 10000l);
+		stepExecutions = jobOperator.getStepExecutions(execution4.getExecutionId());
+		assertEquals(BatchStatus.COMPLETED, execution4.getBatchStatus());
+		assertEquals(3, stepExecutions.size());
 	}
 
-	public static class ProblemProcessor implements ItemProcessor<String, String> {
+	public static class ProblemProcessor implements ItemProcessor {
 
-		private long runId = 0;
+		@Inject
+		@BatchProperty
+		private String runId = "0";
+
 		private boolean hasRetried = false;
 
-		public void setRunId(long id) {
-			this.runId = id;
-		}
+		private void throwException(Object item) throws Exception {
+			int runId = Integer.parseInt(this.runId);
 
-		@Override
-		public String process(String item) throws Exception {
-			throwException(item);
-			return item;
-		}
-
-		private void throwException(String item) throws Exception {
 			if(runId == 1) {
 				if(item.equals("One")) {
 					throw new Exception("skip me");
@@ -105,6 +102,12 @@ public class ExceptionHandlingParsingTests {
 					throw new Exception("Don't rollback on my account");
 				}
 			}
+		}
+
+		@Override
+		public Object processItem(Object item) throws Exception {
+			throwException(item);
+			return item;
 		}
 	}
 }

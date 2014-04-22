@@ -15,97 +15,86 @@
  */
 package org.springframework.batch.core.jsr.configuration.xml;
 
+import org.junit.Test;
+import org.springframework.batch.core.JobExecution;
+import org.springframework.batch.core.StepExecution;
+import org.springframework.batch.core.configuration.xml.DummyItemProcessor;
+import org.springframework.batch.core.scope.StepScope;
+import org.springframework.batch.core.scope.context.StepSynchronizationManager;
+import org.springframework.batch.item.ItemProcessor;
+import org.springframework.beans.factory.annotation.AutowiredAnnotationBeanPostProcessor;
+import org.springframework.beans.factory.support.GenericBeanDefinition;
+import org.springframework.core.io.ClassPathResource;
+import org.springframework.core.io.Resource;
+
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
-import javax.sql.DataSource;
-
-import org.junit.Before;
-import org.junit.Ignore;
-import org.junit.Test;
-import org.springframework.batch.core.PooledEmbeddedDataSource;
-import org.springframework.batch.core.configuration.annotation.DefaultBatchConfigurer;
-import org.springframework.batch.core.configuration.annotation.EnableBatchProcessing;
-import org.springframework.batch.core.configuration.xml.DummyItemProcessor;
-import org.springframework.batch.item.ItemProcessor;
-import org.springframework.batch.item.support.PassThroughItemProcessor;
-import org.springframework.beans.factory.annotation.AutowiredAnnotationBeanPostProcessor;
-import org.springframework.beans.factory.support.GenericBeanDefinition;
-import org.springframework.context.ApplicationContext;
-import org.springframework.context.annotation.AnnotationConfigApplicationContext;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.context.support.AbstractApplicationContext;
-import org.springframework.context.support.ClassPathXmlApplicationContext;
-import org.springframework.context.support.GenericXmlApplicationContext;
-import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseBuilder;
-
 public class BatchParserTests {
 
-	private ApplicationContext baseContext;
-
-	@Before
-	public void setUp() {
-		baseContext = new AnnotationConfigApplicationContext(BaseConfiguration.class);
-	}
-
 	@Test
-	@Ignore
-	public void testRoseyScenario() {
-		GenericXmlApplicationContext batchContext = new GenericXmlApplicationContext();
-		batchContext.setValidating(false);
-		batchContext.load(new String[] {"classpath:/org/springframework/batch/core/jsr/configuration/xml/batch.xml"});
-		System.out.println("baseContext = " + baseContext);
-		batchContext.setParent(baseContext);
+	public void testRoseyScenario() throws Exception {
+		JsrXmlApplicationContext context = new JsrXmlApplicationContext();
+		Resource batchXml = new ClassPathResource("/org/springframework/batch/core/jsr/configuration/xml/batch.xml");
+		context.setValidating(false);
+		context.load(batchXml);
+
+		GenericBeanDefinition stepScope = new GenericBeanDefinition();
+		stepScope.setBeanClass(StepScope.class);
+		context.registerBeanDefinition("stepScope", stepScope);
+
 		GenericBeanDefinition bd = new GenericBeanDefinition();
 		bd.setBeanClass(AutowiredAnnotationBeanPostProcessor.class);
-		batchContext.registerBeanDefinition("postProcessor", bd);
-		batchContext.refresh();
+		context.registerBeanDefinition("postProcessor", bd);
+		context.refresh();
 
-		Object itemProcessor = batchContext.getBean(ItemProcessor.class);
+		ItemProcessor itemProcessor = context.getBean(ItemProcessor.class);
 
 		assertNotNull(itemProcessor);
-		assertTrue(itemProcessor instanceof PassThroughItemProcessor);
+		StepSynchronizationManager.register(new StepExecution("step1", new JobExecution(5l)));
+		assertEquals("Test", itemProcessor.process("Test"));
+		StepSynchronizationManager.close();
 
-		batchContext.close();
+		context.close();
 	}
 
 	@Test
-	@Ignore
 	@SuppressWarnings({"resource", "rawtypes"})
-	public void testOverrideBeansFirst() {
-		AbstractApplicationContext context = new ClassPathXmlApplicationContext("/org/springframework/batch/core/jsr/configuration/xml/override_batch.xml",
-				"/org/springframework/batch/core/jsr/configuration/xml/batch.xml");
+	public void testOverrideBeansFirst() throws Exception {
+		JsrXmlApplicationContext context = new JsrXmlApplicationContext();
+		Resource overrideXml = new ClassPathResource("/org/springframework/batch/core/jsr/configuration/xml/override_batch.xml");
+		Resource batchXml = new ClassPathResource("/org/springframework/batch/core/jsr/configuration/xml/batch.xml");
 
-		ItemProcessor processor = (ItemProcessor) context.getBean("itemProcessor");
+		context.setValidating(false);
+		context.load(overrideXml, batchXml);
+		context.refresh();
 
-		assertNotNull(processor);
-		assertTrue(processor instanceof DummyItemProcessor);
+		ItemProcessor itemProcessor = (ItemProcessor) context.getBean("itemProcessor");
+
+		assertNotNull(itemProcessor);
+		StepSynchronizationManager.register(new StepExecution("step1", new JobExecution(5l)));
+		assertEquals("Test", itemProcessor.process("Test"));
+		StepSynchronizationManager.close();
+
+		context.close();
 	}
 
 	@Test
-	@Ignore
 	@SuppressWarnings({"resource", "rawtypes"})
 	public void testOverrideBeansLast() {
-		AbstractApplicationContext context = new ClassPathXmlApplicationContext("/org/springframework/batch/core/jsr/configuration/xml/batch.xml",
-				"/org/springframework/batch/core/jsr/configuration/xml/override_batch.xml");
+		JsrXmlApplicationContext context = new JsrXmlApplicationContext();
+		Resource overrideXml = new ClassPathResource("/org/springframework/batch/core/jsr/configuration/xml/override_batch.xml");
+		Resource batchXml = new ClassPathResource("/org/springframework/batch/core/jsr/configuration/xml/batch.xml");
+
+		context.setValidating(false);
+		context.load(batchXml, overrideXml);
+		context.refresh();
 
 		ItemProcessor processor = (ItemProcessor) context.getBean("itemProcessor");
 
 		assertNotNull(processor);
 		assertTrue(processor instanceof DummyItemProcessor);
-	}
-
-	@Configuration
-	@EnableBatchProcessing
-	public static class BaseConfiguration extends DefaultBatchConfigurer {
-
-		@Bean
-		DataSource dataSource() {
-			return new PooledEmbeddedDataSource(new EmbeddedDatabaseBuilder().
-					addScript("classpath:org/springframework/batch/core/schema-drop-hsqldb.sql").
-					addScript("classpath:org/springframework/batch/core/schema-hsqldb.sql").
-					build());
-		}
+		context.close();
 	}
 }

@@ -43,6 +43,7 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.jdbc.JdbcTestUtils;
+import org.springframework.util.Assert;
 
 import com.ibatis.sqlmap.client.SqlMapClient;
 import com.ibatis.sqlmap.client.SqlMapClientBuilder;
@@ -71,6 +72,7 @@ public class IbatisPagingItemReaderAsyncTests {
 
 	@Before
 	public void init() {
+		Assert.notNull(dataSource);
 		JdbcTemplate jdbcTemplate = new JdbcTemplate(dataSource);
 		maxId = jdbcTemplate.queryForObject("SELECT MAX(ID) from T_FOOS", Integer.class);
 		for (int i = ITEM_COUNT; i > maxId; i--) {
@@ -111,6 +113,7 @@ public class IbatisPagingItemReaderAsyncTests {
 	 */
 	private void doTest() throws Exception, InterruptedException, ExecutionException {		
 		final IbatisPagingItemReader<Foo> reader = getItemReader();
+		reader.setDataSource(dataSource);
 		CompletionService<List<Foo>> completionService = new ExecutorCompletionService<List<Foo>>(Executors
 				.newFixedThreadPool(THREAD_COUNT));
 		for (int i = 0; i < THREAD_COUNT; i++) {
