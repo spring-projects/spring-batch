@@ -245,7 +245,22 @@
             <artifactId>spring-rabbit</artifactId>
             <optional>true</optional>
         </dependency>
-        <dependency>
+		<dependency>
+			<groupId>org.springframework.ldap</groupId>
+			<artifactId>spring-ldap-core</artifactId>
+			<optional>true</optional>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework.ldap</groupId>
+			<artifactId>spring-ldap-core-tiger</artifactId>
+			<optional>true</optional>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework.ldap</groupId>
+			<artifactId>spring-ldap-ldif-core</artifactId>
+			<optional>true</optional>
+		</dependency>
+		<dependency>
         	<groupId>org.mockito</groupId>
         	<artifactId>mockito-all</artifactId>
         	<scope>test</scope>

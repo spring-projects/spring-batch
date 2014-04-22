@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	   xmlns:batch="http://www.springframework.org/schema/batch"
+	   xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/batch http://www.springframework.org/schema/batch/spring-batch.xsd">
+
+	<batch:job id="job">
+		<batch:step id="step1" next="step2">
+			<batch:tasklet transaction-manager="transactionManager">
+				<batch:chunk reader="itemReader1" writer="itemWriter" commit-interval="2" skip-limit="1">
+					<batch:skippable-exception-classes>
+						<batch:include class="org.springframework.ldap.ldif.InvalidAttributeFormatException"/>
+					</batch:skippable-exception-classes>
+				</batch:chunk>
+			</batch:tasklet>
+		</batch:step>
+		<batch:step id="step2">
+			<batch:tasklet transaction-manager="transactionManager">
+				<batch:chunk reader="itemReader2" writer="itemWriter" commit-interval="2" />
+			</batch:tasklet>
+		</batch:step>
+	</batch:job>
+
+	<bean id="itemReader1" class="org.springframework.batch.item.ldif.MappingLdifReader">
+		<property name="resource" value="file:src/test/resources/test.ldif" />
+		<property name="recordsToSkip" value="1" />
+		<property name="recordMapper" ref="recordMapper" />
+	</bean>
+
+	<bean id="itemReader2" class="org.springframework.batch.item.ldif.MappingLdifReader">
+		<property name="resource" value="file:src/test/resources/missing.ldif" />
+		<property name="recordsToSkip" value="1" />
+		<property name="recordMapper" ref="recordMapper" />
+	</bean>
+
+	<bean id="recordMapper" class="org.springframework.batch.core.test.ldif.MyMapper" />
+
+	<bean id="itemWriter" class="org.springframework.batch.item.file.FlatFileItemWriter">
+		<property name="resource" value="file:target/test-outputs/output.ldif" />
+		<property name="lineAggregator">
+			<bean class="org.springframework.batch.item.file.transform.PassThroughLineAggregator" />
+		</property>
+	</bean>
+
+	<bean id="jobLauncher" class="org.springframework.batch.core.launch.support.SimpleJobLauncher">
+		<property name="jobRepository" ref="jobRepository" />
+		<property name="taskExecutor" ref="taskExecutor" />
+	</bean>
+
+	<bean id="jobRepository" class="org.springframework.batch.core.repository.support.MapJobRepositoryFactoryBean">
+		<property name="transactionManager" ref="transactionManager"/>
+	</bean>
+
+	<bean id="transactionManager" class="org.springframework.batch.support.transaction.ResourcelessTransactionManager" />
+
+	<bean id="taskExecutor" class="org.springframework.core.task.SyncTaskExecutor" />
+
+</beans>
