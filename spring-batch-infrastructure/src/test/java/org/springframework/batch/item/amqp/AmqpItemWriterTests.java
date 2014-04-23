@@ -30,11 +30,22 @@ import java.util.Arrays;
  *
  * @author Chris Schaefer
  * @author Will Schipp
+ * @author Anand Hemmige
  */
 public class AmqpItemWriterTests {
     @Test(expected = IllegalArgumentException.class)
     public void testNullAmqpTemplate() {
         new AmqpItemWriter<String>(null);
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void testNullRoutingKey() {
+         new AmqpItemWriter<String>(mock(AmqpTemplate.class), null);
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void testNullExchange() {
+        new AmqpItemWriter<String>(mock(AmqpTemplate.class), "foo", null);
     }
 
     @Test
@@ -49,4 +60,5 @@ public class AmqpItemWriterTests {
         amqpItemWriter.write(Arrays.asList("foo", "bar"));
 
     }
+
 }
