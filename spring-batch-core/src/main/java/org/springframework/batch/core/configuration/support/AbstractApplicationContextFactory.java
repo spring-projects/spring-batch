@@ -17,6 +17,7 @@
 package org.springframework.batch.core.configuration.support;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 
@@ -49,7 +50,7 @@ public abstract class AbstractApplicationContextFactory implements ApplicationCo
 
 	private static final Log logger = LogFactory.getLog(AbstractApplicationContextFactory.class);
 
-	private Object resource;
+	private Object[] resources;
 
 	private ConfigurableApplicationContext parent;
 
@@ -63,9 +64,9 @@ public abstract class AbstractApplicationContextFactory implements ApplicationCo
 	 * Create a factory instance with the resource specified. The resource is a Spring configuration file or java
 	 * package containing configuration files.
 	 */
-	public AbstractApplicationContextFactory(Object resource) {
+	public AbstractApplicationContextFactory(Object[] resources) {
 
-		this.resource = resource;
+		this.resources = resources;
 		beanFactoryPostProcessorClasses = new ArrayList<Class<? extends BeanFactoryPostProcessor>>();
 		beanFactoryPostProcessorClasses.add(PropertyPlaceholderConfigurer.class);
 		beanFactoryPostProcessorClasses.add(PropertySourcesPlaceholderConfigurer.class);
@@ -162,16 +163,16 @@ public abstract class AbstractApplicationContextFactory implements ApplicationCo
 	@Override
 	public ConfigurableApplicationContext createApplicationContext() {
 
-		if (resource == null) {
+		if (resources == null || resources.length == 0) {
 			return parent;
 		}
 
-		return createApplicationContext(parent, resource);
+		return createApplicationContext(parent, resources);
 
 	}
 
 	protected abstract ConfigurableApplicationContext createApplicationContext(ConfigurableApplicationContext parent,
-			Object resource);
+			Object[] resources);
 
 	/**
 	 * Extension point for special subclasses that want to do more complex things with the context prior to refresh. The
@@ -215,7 +216,7 @@ public abstract class AbstractApplicationContextFactory implements ApplicationCo
 
 	@Override
 	public String toString() {
-		return "ApplicationContextFactory [resource=" + resource + "]";
+		return "ApplicationContextFactory [resources=" + Arrays.toString(resources) + "]";
 	}
 
 	@Override
