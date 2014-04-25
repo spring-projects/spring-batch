@@ -55,16 +55,15 @@ subprojects { subproject ->
 
 		springVersionDefault = '4.0.2.RELEASE'
 		springVersion = project.hasProperty('springVersion') ? getProperty('springVersion') : springVersionDefault
-		springRetryVersion = '1.0.2.RELEASE'
+		springRetryVersion = '1.0.3.RELEASE'
 		springAmqpVersion = '1.1.2.RELEASE'
 		springDataCommonsVersion = '1.5.0.RELEASE'
 		springDataGemfireVersion = '1.3.0.RELEASE'
 		springDataJpaVersion = '1.2.0.RELEASE'
 		springDataMongodbVersion = '1.1.0.RELEASE'
 		springDataNeo4jVersion = '2.2.0.RELEASE'
-		springDataRedisVersion = '1.0.3.RELEASE'
 		springIntegrationVersion = '4.0.0.RC1'
-		springOsgiCoreVersion = '1.1.2'
+        springLdapVersion = '2.0.1.RELEASE'
 
 		activemqVersion = '5.1.0'
 		aspectjVersion = '1.5.4'
@@ -77,7 +76,6 @@ subprojects { subproject ->
 		derbyVersion = '10.8.2.2'
 		groovyVersion = '1.6.3'
 		h2databaseVersion = '1.2.132'
-		hamcrestVersion = '1.3'
 		hibernateAnnotationsVersion = '3.3.1.GA'
 		hibernateVersion = '4.1.9.Final'
 		hibernateValidatorVersion = '4.3.1.Final'
@@ -94,7 +92,6 @@ subprojects { subproject ->
 		log4jVersion = '1.2.14'
 		mysqlVersion = '5.1.6'
 		mockitoVersion = '1.9.5'
-		osgiR4CoreVersion = '1.0'
 		postgresqlVersion = '8.3-603.jdbc3'
 		quartzVersion = '1.6.1'
 		servletApiVersion = '2.5'
@@ -215,13 +212,10 @@ project('spring-batch-core') {
 		testCompile "commons-io:commons-io:$commonsIoVersion"
 		testCompile "commons-dbcp:commons-dbcp:$commonsDdbcpVersion"
 		testCompile "junit:junit:$junitVersion"
-		//testCompile "org.hamcrest:hamcrest-all:$hamcrestVersion"
 
 		optional "org.aspectj:aspectjrt:$aspectjVersion"
 		optional "org.aspectj:aspectjweaver:$aspectjVersion"
-		optional "org.osgi:osgi_R4_core:$osgiR4CoreVersion"
 		optional "org.springframework:spring-jdbc:$springVersion"
-		optional "org.springframework.osgi:spring-osgi-core:$springOsgiCoreVersion"
 		optional "org.slf4j:slf4j-log4j12:$slf4jVersion"
 		optional "log4j:log4j:$log4jVersion"
 
@@ -293,13 +287,15 @@ project('spring-batch-infrastructure') {
 		optional "org.springframework.data:spring-data-mongodb:$springDataMongodbVersion"
 		optional "org.springframework.data:spring-data-neo4j:$springDataNeo4jVersion"
 		optional "org.springframework.data:spring-data-gemfire:$springDataGemfireVersion"
-		optional "org.springframework.data:spring-data-redis:$springDataRedisVersion"
 		compile("org.codehaus.woodstox:woodstox-core-asl:$woodstoxVersion") { dep ->
 			optional dep
 			exclude group: 'stax', module: 'stax-api'
 		}
 		optional "org.springframework.amqp:spring-amqp:$springAmqpVersion"
 		optional "org.springframework.amqp:spring-rabbit:$springAmqpVersion"
+        optional "org.springframework.ldap:spring-ldap-core:$springLdapVersion"
+        optional "org.springframework.ldap:spring-ldap-core-tiger:$springLdapVersion"
+        optional "org.springframework.ldap:spring-ldap-ldif-core:$springLdapVersion"
 
 	}
 }
@@ -327,6 +323,9 @@ project('spring-batch-core-tests') {
 		optional "org.aspectj:aspectjrt:$aspectjVersion"
 		optional "org.aspectj:aspectjweaver:$aspectjVersion"
 		optional "cglib:cglib-nodep:$cglibVersion"
+        optional "org.springframework.ldap:spring-ldap-core:$springLdapVersion"
+        optional "org.springframework.ldap:spring-ldap-core-tiger:$springLdapVersion"
+        optional "org.springframework.ldap:spring-ldap-ldif-core:$springLdapVersion"
 	}
 	test {
 		enabled = project.hasProperty('alltests') ? true : false
@@ -412,9 +411,9 @@ project('spring-batch-test') {
 		compile "org.springframework:spring-test:$springVersion"
 		compile "org.springframework:spring-jdbc:$springVersion"
 		compile "commons-io:commons-io:$commonsIoVersion"
-		compile "commons-dbcp:commons-dbcp:$commonsDdbcpVersion"
 		compile "commons-collections:commons-collections:$commonsCollectionsVersion"
 
+        testCompile "commons-dbcp:commons-dbcp:$commonsDdbcpVersion"
 		testCompile "org.hsqldb:hsqldb:$hsqldbVersion"
 
 		optional "org.aspectj:aspectjrt:$aspectjVersion"
@@ -533,6 +532,7 @@ project('spring-batch-samples') {
 		optional "org.springframework.data:spring-data-commons:$springDataCommonsVersion"
 		optional "org.springframework.amqp:spring-amqp:$springAmqpVersion"
 		optional "org.springframework.amqp:spring-rabbit:$springAmqpVersion"
+        optional "javax.inject:javax.inject:1"
 
 	}
 }
