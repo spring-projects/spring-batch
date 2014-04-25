@@ -32,22 +32,6 @@ allprojects {
 		maven { url 'http://m2.neo4j.org/content/repositories/releases'}
 		mavenCentral()
 	}
-}
-
-subprojects { subproject ->
-
-	apply plugin: 'java'
-	apply from:   "${rootProject.projectDir}/publish-maven.gradle"
-	apply plugin: 'eclipse'
-	apply plugin: 'idea'
-	apply plugin: 'jacoco'
-
-	jacoco {
-		toolVersion = "0.7.0.201403182114"
-	}
-
-	sourceCompatibility=1.6
-	targetCompatibility=1.6
 
 	ext {
 
@@ -63,7 +47,7 @@ subprojects { subproject ->
 		springDataMongodbVersion = '1.1.0.RELEASE'
 		springDataNeo4jVersion = '2.2.0.RELEASE'
 		springIntegrationVersion = '4.0.0.RC1'
-        springLdapVersion = '2.0.1.RELEASE'
+		springLdapVersion = '2.0.1.RELEASE'
 
 		activemqVersion = '5.1.0'
 		aspectjVersion = '1.5.4'
@@ -103,6 +87,22 @@ subprojects { subproject ->
 		xmlunitVersion = '1.2'
 		xstreamVersion = '1.4.4'
 	}
+}
+
+subprojects { subproject ->
+
+	apply plugin: 'java'
+	apply from:   "${rootProject.projectDir}/publish-maven.gradle"
+	apply plugin: 'eclipse'
+	apply plugin: 'idea'
+	apply plugin: 'jacoco'
+
+	jacoco {
+		toolVersion = "0.7.0.201403182114"
+	}
+
+	sourceCompatibility=1.6
+	targetCompatibility=1.6
 
 	eclipse {
 		project {
@@ -695,6 +695,57 @@ artifacts {
 task dist(dependsOn: assemble) {
 	group = 'Distribution'
 	description = 'Builds -dist, -docs and -schema distribution archives.'
+}
+
+task runTck(dependsOn: subprojects.compileJava) {
+
+	configurations {
+		tck {
+			transitive = true
+		}
+		antcp {
+			transitive = true
+			exclude module: 'ant'
+		}
+	}
+
+	dependencies {
+		tck project(":spring-batch-core")
+
+		tck 'commons-pool:commons-pool:1.5.4'
+		tck "javax.batch:javax.batch-api:$javaxBatchApiVersion"
+		tck "org.springframework:spring-core:$springVersion"
+		tck "org.springframework:spring-context:$springVersion"
+		tck "org.springframework:spring-beans:$springVersion"
+		tck 'commons-logging:commons-logging-api:1.1'
+		tck "org.springframework:spring-aop:$springVersion"
+		tck "org.springframework:spring-tx:$springVersion"
+		tck "org.springframework.retry:spring-retry:$springRetryVersion"
+		tck "org.hsqldb:hsqldb:$hsqldbVersion"
+		tck "org.springframework:spring-jdbc:$springVersion"
+		tck "com.thoughtworks.xstream:xstream:$xstreamVersion"
+		tck "org.codehaus.jettison:jettison:$jettisonVersion"
+		tck "commons-dbcp:commons-dbcp:$commonsDdbcpVersion"
+		tck "org.apache.derby:derby:$derbyVersion"
+
+		antcp "ant-contrib:ant-contrib:1.0b3"
+	}
+
+	doLast {
+		logger.info('tck dependencies: ' + configurations.tck.asPath)
+		def tckHome = project.hasProperty('TCK_HOME') ? getProperty('TCK_HOME') : System.getenv("JSR_352_TCK_HOME")
+
+		assert tckHome : '''\
+tckHome is not set. Please set either the environment variable 'JSR_352_TCK_HOME'
+or specify the Gradle property `TCK_HOME`, e.g: ./gradlew runTck -PTCK_HOME=/path/to/tck'''
+
+		println "Using the JSR 352 TCK at: '$tckHome'"
+
+		ant.taskdef resource: "net/sf/antcontrib/antcontrib.properties",
+			classpath: configurations.antcp.asPath
+		ant.properties['batch.impl.classes'] = configurations.tck.asPath
+		ant.ant antfile: "$tckHome/build.xml", target: "run", dir: "$tckHome"
+	}
 }
 
 task wrapper(type: Wrapper) {
