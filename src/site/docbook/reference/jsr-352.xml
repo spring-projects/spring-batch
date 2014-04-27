@@ -53,7 +53,7 @@
         <para>To use Spring dependency injection within a JSR-352 based batch job consists of configuring batch
             artifacts using a Spring application context as beans.  Once the beans have been defined, a job can refer to
             them as it would any bean defined within the batch.xml.</para>
-        <para><programlisting>&lt;?xml version="1.0" encoding="UTF-8"?&gt;
+        <programlisting language="xml">&lt;?xml version="1.0" encoding="UTF-8"?&gt;
 &lt;beans xmlns="http://www.springframework.org/schema/beans"
           xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
           xsi:schemaLocation="http://www.springframework.org/schema/beans
@@ -73,7 +73,7 @@
         &lt;/step&gt;
     &lt;/job&gt;
 &lt;/beans&gt;
-        </programlisting></para>
+        </programlisting>
 
         <para>The assembly of Spring contexts (imports, etc) works with JSR-352 jobs just as it would with any other
             Spring based application.  The only difference with a JSR-352 based job is that the entry point for the
@@ -82,13 +82,13 @@
         <para>To use the thread context class loader approach, all you need to do is provide the fully qualified class
             name as the ref.  It is important to note that when using this approach or the batch.xml approach, the class
             referenced requires a no argument constructor which will be used to create the bean.</para>
-        <para><programlisting>&lt;?xml version="1.0" encoding="UTF-8"?&gt;
+        <programlisting language="xml">&lt;?xml version="1.0" encoding="UTF-8"?&gt;
 &lt;job id="fooJob" xmlns="http://xmlns.jcp.org/xml/ns/javaee" version="1.0"&gt;
     &lt;step id="step1" &gt;
         &lt;batchlet ref="io.spring.FooBatchlet" /&gt;
     &lt;/step&gt;
 &lt;/job&gt;
-        </programlisting></para>
+        </programlisting>
 
     </section>
 
@@ -101,12 +101,11 @@
             <para>JSR-352 allows for properties to be defined at the Job, Step and batch artifact level by way of
                 configuration in the JSL. Batch properties are configured at each level in the following way:</para>
 
-            <para>
-                <programlisting>&lt;properties&gt;
+            <programlisting language="xml">&lt;properties&gt;
     &lt;property name=&quot;propertyName1&quot; value=&quot;propertyValue1&quot;/&gt;
     &lt;property name=&quot;propertyName2&quot; value=&quot;propertyValue2&quot;/&gt;
 &lt;/properties&gt;</programlisting>
-
+            <para>
                 Properties may be configured on any batch artifact.</para>
         </section>
         <section id="jsrBatchPropertyAnnotation">
@@ -118,15 +117,15 @@
                 conversion is up to the implementing developer to perform.</para>
 
             <para>An <classname>javax.batch.api.chunk.ItemReader</classname> artifact could be configured with a
-                properties block such as the one described above and accessed as such:
-                <programlisting>public class MyItemReader extends AbstractItemReader {
+                properties block such as the one described above and accessed as such:</para>
+                <programlisting language="java">public class MyItemReader extends AbstractItemReader {
     @Inject
     @BatchProperty
     private String propertyName1;
 
     ...
 }</programlisting>
-
+            <para>
                 The value of the field "propertyName1" will be "propertyValue1"</para>
         </section>
         <section id="jsrPropertySubstitution">
@@ -153,8 +152,8 @@
                     </listitem>
                 </itemizedlist>
             </para>
+            <programlisting>#{jobParameters['unresolving.prop']}?:#{systemProperties['file.separator']}</programlisting>
             <para>
-                <programlisting>#{jobParameters['unresolving.prop']}?:#{systemProperties['file.separator']}</programlisting>
                 The left hand side of the assignment is the expected value, the right hand side is the default value. In
                 this example, the result will resolve to a value of the system property file.separator as
                 #{jobParameters['unresolving.prop']} is assumed to not be resolvable. If neither expressions can be
@@ -190,7 +189,8 @@
                 <classname>ItemReader</classname>.  To configure a step this way, specify the
                 <classname>item-count</classname> (which defaults to 10) and optionally configure the
                 <classname>checkpoint-policy</classname> as item (this is the default).
-                <programlisting>...
+            </para>
+            <programlisting language="xml">...
 &lt;step id="step1"&gt;
     &lt;chunk checkpoint-policy="item" item-count="3"&gt;
         &lt;reader ref="fooReader"/&gt;
@@ -199,6 +199,7 @@
     &lt;/chunk&gt;
 &lt;/step&gt;
 ...</programlisting>
+            <para>
                 If item based checkpointing is chosen, an additional attribute <classname>time-limit</classname> is
                 supported.  This sets a time limit for how long the number of items specified has to be processed.  If
                 the timeout is reached, the chunk will complete with however many items have been read by then
@@ -216,7 +217,8 @@
                 implementation of <classname>CheckpointAlgorithm</classname>, configure your step with the custom
                 <classname>checkpoint-policy</classname> as shown below where fooCheckpointer refers to an
                 implementation of <classname>CheckpointAlgorithm</classname>.
-                <programlisting>...
+            </para>
+            <programlisting language="xml">...
 &lt;step id="step1"&gt;
     &lt;chunk checkpoint-policy="custom"&gt;
         &lt;checkpoint-algorithm ref="fooCheckpointer"/&gt;
@@ -226,7 +228,6 @@
     &lt;/chunk&gt;
 &lt;/step&gt;
 ...</programlisting>
-            </para>
         </section>
     </section>
 
@@ -239,10 +240,10 @@
             implementation is loaded via the <classname>javax.batch.runtime.BatchRuntime</classname>.  Launching a
             JSR-352 based batch job is implemented as follows:</para>
 
-        <para><programlisting>
+        <programlisting language="java">
 JobOperator jobOperator = BatchRuntime.getJobOperator();
 long jobExecutionId = jobOperator.start("fooJob", new Properties());
-        </programlisting></para>
+        </programlisting>
 
         <para>The above code does the following:</para>
 
@@ -291,9 +292,9 @@ long jobExecutionId = jobOperator.start("fooJob", new Properties());
         <para>To obtain a reference to the <classname>JobContext</classname> or <classname>StepContext</classname>
             within the current scope, simply use the <classname>@Inject</classname> annotation:</para>
 
-        <para><programlisting>@Inject
+        <programlisting language="java">@Inject
 JobContext jobContext;
-        </programlisting></para>
+        </programlisting>
 
         <note>
             <title>@Autowire for JSR-352 contexts</title>
@@ -371,7 +372,7 @@ JobContext jobContext;
         <section id="jsrPartitioning">
             <title>Partitioning</title>
             <para>Conceptually, partitioning in JSR-352 is the same as it is in Spring Batch.  Meta-data is provided
-                to each slave to identify the input to be processed with the slaves reporting back to the master the 
+                to each slave to identify the input to be processed with the slaves reporting back to the master the
                 results upon completion.  However, there are some important differences:
                 <itemizedlist>
                     <listitem>
