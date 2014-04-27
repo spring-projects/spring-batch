@@ -79,14 +79,14 @@
       requiring it, sequences were used. Each variation of the schema will
       contain some form of the following:</para>
 
-      <programlisting>CREATE SEQUENCE BATCH_STEP_EXECUTION_SEQ;
+      <programlisting language="sql">CREATE SEQUENCE BATCH_STEP_EXECUTION_SEQ;
 CREATE SEQUENCE BATCH_JOB_EXECUTION_SEQ;
 CREATE SEQUENCE BATCH_JOB_SEQ;</programlisting>
 
       <para>Many database vendors don't support sequences. In these cases,
       work-arounds are used, such as the following for MySQL:</para>
 
-      <programlisting>CREATE TABLE BATCH_STEP_EXECUTION_SEQ (ID BIGINT NOT NULL) type=MYISAM;
+      <programlisting language="sql">CREATE TABLE BATCH_STEP_EXECUTION_SEQ (ID BIGINT NOT NULL) type=MYISAM;
 INSERT INTO BATCH_STEP_EXECUTION_SEQ values(0);
 CREATE TABLE BATCH_JOB_EXECUTION_SEQ (ID BIGINT NOT NULL) type=MYISAM;
 INSERT INTO BATCH_JOB_EXECUTION_SEQ values(0);
@@ -108,10 +108,10 @@ INSERT INTO BATCH_JOB_SEQ values(0);</programlisting>
     hierarchy. The following generic DDL statement is used to create
     it:</para>
 
-    <programlisting>CREATE TABLE BATCH_JOB_INSTANCE  (
-  JOB_INSTANCE_ID BIGINT  PRIMARY KEY ,  
-  VERSION BIGINT,  
-  JOB_NAME VARCHAR(100) NOT NULL , 
+    <programlisting language="sql">CREATE TABLE BATCH_JOB_INSTANCE  (
+  JOB_INSTANCE_ID BIGINT  PRIMARY KEY ,
+  VERSION BIGINT,
+  JOB_NAME VARCHAR(100) NOT NULL ,
   JOB_KEY VARCHAR(2500)
 );</programlisting>
 
@@ -152,12 +152,12 @@ INSERT INTO BATCH_JOB_SEQ values(0);</programlisting>
     <para>The BATCH_JOB_EXECUTION_PARAMS table holds all information relevant to the
     <classname>JobParameters</classname> object. It contains 0 or more
     key/value pairs passed to a <classname>Job</classname> and serve as a record of the parameters
-    a job was run with. For each parameter that contributes to the generation of a job's identity, 
+    a job was run with. For each parameter that contributes to the generation of a job's identity,
     the IDENTIFYING flag is set to true.  It should be noted that the table has been
     denormalized. Rather than creating a separate table for each type, there
     is one table with a column indicating the type:</para>
 
-    <programlisting>CREATE TABLE BATCH_JOB_EXECUTION_PARAMS  (
+    <programlisting language="sql">CREATE TABLE BATCH_JOB_EXECUTION_PARAMS  (
 	JOB_EXECUTION_ID BIGINT NOT NULL ,
 	TYPE_CD VARCHAR(6) NOT NULL ,
 	KEY_NAME VARCHAR(100) NOT NULL ,
@@ -225,12 +225,12 @@ INSERT INTO BATCH_JOB_SEQ values(0);</programlisting>
     <classname>Job</classname> is run there will always be a new
     <classname>JobExecution</classname>, and a new row in this table:</para>
 
-    <programlisting>CREATE TABLE BATCH_JOB_EXECUTION  (
+    <programlisting language="sql">CREATE TABLE BATCH_JOB_EXECUTION  (
   JOB_EXECUTION_ID BIGINT  PRIMARY KEY ,
-  VERSION BIGINT,  
+  VERSION BIGINT,
   JOB_INSTANCE_ID BIGINT NOT NULL,
   CREATE_TIME TIMESTAMP NOT NULL,
-  START_TIME TIMESTAMP DEFAULT NULL, 
+  START_TIME TIMESTAMP DEFAULT NULL,
   END_TIME TIMESTAMP DEFAULT NULL,
   STATUS VARCHAR(10),
   EXIT_CODE VARCHAR(20),
@@ -313,22 +313,22 @@ INSERT INTO BATCH_JOB_SEQ values(0);</programlisting>
     least one entry per <classname>Step</classname> for each
     <classname>JobExecution</classname> created:</para>
 
-    <programlisting>CREATE TABLE BATCH_STEP_EXECUTION  (
+    <programlisting language="sql">CREATE TABLE BATCH_STEP_EXECUTION  (
   STEP_EXECUTION_ID BIGINT  PRIMARY KEY ,
-  VERSION BIGINT NOT NULL,  
+  VERSION BIGINT NOT NULL,
   STEP_NAME VARCHAR(100) NOT NULL,
   JOB_EXECUTION_ID BIGINT NOT NULL,
-  START_TIME TIMESTAMP NOT NULL , 
-  END_TIME TIMESTAMP DEFAULT NULL,  
+  START_TIME TIMESTAMP NOT NULL ,
+  END_TIME TIMESTAMP DEFAULT NULL,
   STATUS VARCHAR(10),
-  COMMIT_COUNT BIGINT , 
+  COMMIT_COUNT BIGINT ,
   READ_COUNT BIGINT ,
   FILTER_COUNT BIGINT ,
   WRITE_COUNT BIGINT ,
   READ_SKIP_COUNT BIGINT ,
   WRITE_SKIP_COUNT BIGINT ,
   PROCESS_SKIP_COUNT BIGINT ,
-  ROLLBACK_COUNT BIGINT , 
+  ROLLBACK_COUNT BIGINT ,
   EXIT_CODE VARCHAR(20) ,
   EXIT_MESSAGE VARCHAR(2500) ,
   LAST_UPDATED TIMESTAMP,
@@ -456,7 +456,7 @@ INSERT INTO BATCH_JOB_SEQ values(0);</programlisting>
     <classname>JobInstance</classname> can 'start from where it left
     off'.</para>
 
-    <programlisting>CREATE TABLE BATCH_JOB_EXECUTION_CONTEXT  (
+    <programlisting language="sql">CREATE TABLE BATCH_JOB_EXECUTION_CONTEXT  (
   JOB_EXECUTION_ID BIGINT PRIMARY KEY,
   SHORT_CONTEXT VARCHAR(2500) NOT NULL,
   SERIALIZED_CONTEXT CLOB,
@@ -497,7 +497,7 @@ INSERT INTO BATCH_JOB_SEQ values(0);</programlisting>
     <classname>JobInstance</classname> can 'start from where it left
     off'.</para>
 
-    <programlisting>CREATE TABLE BATCH_STEP_EXECUTION_CONTEXT  (
+    <programlisting language="sql">CREATE TABLE BATCH_STEP_EXECUTION_CONTEXT  (
   STEP_EXECUTION_ID BIGINT PRIMARY KEY,
   SHORT_CONTEXT VARCHAR(2500) NOT NULL,
   SERIALIZED_CONTEXT CLOB,
@@ -562,8 +562,8 @@ INSERT INTO BATCH_JOB_SEQ values(0);</programlisting>
 
     <para>If you are using multi-byte character sets (e.g. Chines or Cyrillic)
 	  in your business processing, then those characters might need to be
-	  persisted in the Spring Batch schema.  Many users find that 
-	  simply changing the schema to double the length of the <literal>VARCHAR</literal> 
+	  persisted in the Spring Batch schema.  Many users find that
+	  simply changing the schema to double the length of the <literal>VARCHAR</literal>
 	  columns is enough.  Others prefer to configure the <link
     linkend="configuringJobRepository"><classname>JobRepository</classname></link> with <literal>max-varchar-length</literal> half the value of the <literal>VARCHAR</literal> column length is enough.  Some users have also reported that
 	they use <literal>NVARCHAR</literal> in place of <literal>VARCHAR</literal>

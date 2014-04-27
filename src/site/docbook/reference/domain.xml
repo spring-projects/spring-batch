@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE chapter PUBLIC "-//OASIS//DTD DocBook XML V4.4//EN"
-"http://www.oasis-open.org/docbook/xml/4.4/docbookx.dtd">
-<chapter id="domain" xreflabel="Batch Domain Language">
+<chapter xmlns="http://docbook.org/ns/docbook" version="5.0" xml:id="domain"
+    xmlns:xlink="http://www.w3.org/1999/xlink" xreflabel="Batch Domain Language">
   <title>The Domain Language of Batch</title>
 
   <para>To any experienced batch architect, the overall concepts of batch
@@ -114,7 +113,7 @@
     namespace abstracts away the need to instantiate it directly. Instead, the
     <code>&lt;job&gt;</code> tag can be used:</para>
 
-    <programlisting>&lt;job id="footballJob"&gt;
+    <programlisting language="xml">&lt;job id="footballJob"&gt;
     &lt;step id="playerload" next="gameLoad"/&gt;
     &lt;step id="gameLoad" next="playerSummarization"/&gt;
     &lt;step id="playerSummarization"/&gt;
@@ -748,7 +747,7 @@
     is to put the current number of lines read into the context, and the
     framework will do the rest:</para>
 
-    <programlisting>executionContext.putLong(getKey(LINES_READ_COUNT), reader.getPosition());</programlisting>
+    <programlisting language="java">executionContext.putLong(getKey(LINES_READ_COUNT), reader.getPosition());</programlisting>
 
     <para>Using the EndOfDay example from the Job Stereotypes section as an
     example, assume there's one step: 'loadData', that loads a file into the
@@ -895,7 +894,7 @@
     <classname>ItemReader</classname> is opened, it can check to see if it has
     any stored state in the context, and initialize itself from there:</para>
 
-    <programlisting>if (executionContext.containsKey(getKey(LINES_READ_COUNT))) {
+    <programlisting language="java">if (executionContext.containsKey(getKey(LINES_READ_COUNT))) {
     log.debug("Initializing for restart. Restart data is: " + executionContext);
 
     long lineCount = executionContext.getLong(getKey(LINES_READ_COUNT));
@@ -946,7 +945,7 @@
     <classname>StepExecution</classname>. For example, consider the following
     code snippet:</para>
 
-    <programlisting>ExecutionContext ecStep = stepExecution.getExecutionContext();
+    <programlisting language="java">ExecutionContext ecStep = stepExecution.getExecutionContext();
 ExecutionContext ecJob = jobExecution.getExecutionContext();
 //ecStep does not equal ecJob</programlisting>
 
@@ -971,7 +970,7 @@ ExecutionContext ecJob = jobExecution.getExecutionContext();
     <classname>JobExecution</classname> implementations are persisted by
     passing them to the repository:</para>
 
-    <programlisting>&lt;job-repository id="jobRepository"/&gt;</programlisting>
+    <programlisting language="xml">&lt;job-repository id="jobRepository"/&gt;</programlisting>
   </section>
 
   <section id="domainJobLauncher">
@@ -981,7 +980,7 @@ ExecutionContext ecJob = jobExecution.getExecutionContext();
     launching a <classname>Job</classname> with a given set of
     <classname>JobParameters</classname>:</para>
 
-    <programlisting>public interface JobLauncher {
+    <programlisting language="java">public interface JobLauncher {
 
     public JobExecution run(Job job, JobParameters jobParameters)
                 throws JobExecutionAlreadyRunningException, JobRestartException;
@@ -1041,7 +1040,7 @@ ExecutionContext ecJob = jobExecution.getExecutionContext();
     bean definition, a namespace has been provided for ease of
     configuration:</para>
 
-    <programlisting>&lt;beans:beans xmlns="<emphasis role="bold">http://www.springframework.org/schema/batch</emphasis>"
+    <programlisting language="xml">&lt;beans:beans xmlns="<emphasis role="bold">http://www.springframework.org/schema/batch</emphasis>"
      xmlns:beans="http://www.springframework.org/schema/beans"
      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
      xsi:schemaLocation="

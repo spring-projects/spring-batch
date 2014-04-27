@@ -31,8 +31,8 @@
       </listitem>
     </itemizedlist>
 
-    <programlisting>@RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(locations = { "/simple-job-launcher-context.xml", 
+    <programlisting language="java">@RunWith(SpringJUnit4ClassRunner.class)
+@ContextConfiguration(locations = { "/simple-job-launcher-context.xml",
                                     "/jobs/skipSampleJob.xml" })
 public class SkipSampleFunctionalTests extends AbstractJobTests { ... }</programlisting>
   </section>
@@ -59,8 +59,8 @@ public class SkipSampleFunctionalTests extends AbstractJobTests { ... }</program
     case below, the test verifies that the <classname>Job</classname> ended
     with status "COMPLETED".</para>
 
-    <programlisting>@RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(locations = { "/simple-job-launcher-context.xml", 
+    <programlisting language="java">@RunWith(SpringJUnit4ClassRunner.class)
+@ContextConfiguration(locations = { "/simple-job-launcher-context.xml",
                                     "/jobs/skipSampleJob.xml" })
 public class SkipSampleFunctionalTests {
 
@@ -78,7 +78,7 @@ public class SkipSampleFunctionalTests {
     public void testJob() throws Exception {
         simpleJdbcTemplate.update("delete from CUSTOMER");
         for (int i = 1; i &lt;= 10; i++) {
-            simpleJdbcTemplate.update("insert into CUSTOMER values (?, 0, ?, 100000)", 
+            simpleJdbcTemplate.update("insert into CUSTOMER values (?, 0, ?, 100000)",
                                       i, "customer" + i);
         }
 
@@ -102,7 +102,7 @@ public class SkipSampleFunctionalTests {
     targeted tests by allowing the test to set up data for just that step and
     to validate its results directly.</para>
 
-    <programlisting>JobExecution jobExecution = jobLauncherTestUtils.launchStep("loadFileStep");</programlisting>
+    <programlisting language="java">JobExecution jobExecution = jobLauncherTestUtils.launchStep("loadFileStep");</programlisting>
   </section>
 
   <section>
@@ -119,8 +119,8 @@ public class SkipSampleFunctionalTests {
     <para>The listener is declared at the class level, and its job is to
     create a step execution context for each test method. For example:</para>
 
-    <programlisting>@ContextConfiguration
-@TestExecutionListeners( { DependencyInjectionTestExecutionListener.class, 
+    <programlisting language="java">@ContextConfiguration
+@TestExecutionListeners( { DependencyInjectionTestExecutionListener.class,
     StepScopeTestExecutionListener.class })
 @RunWith(SpringJUnit4ClassRunner.class)
 public class StepScopeTestExecutionListenerIntegrationTests {
@@ -141,7 +141,7 @@ public class StepScopeTestExecutionListenerIntegrationTests {
         // The reader is initialized and bound to the input data
         assertNotNull(reader.read());
     }
-    
+
 }</programlisting>
 
     <para>There are two <classname>TestExecutionListeners</classname>, one
@@ -162,9 +162,8 @@ public class StepScopeTestExecutionListenerIntegrationTests {
     <classname>StepScopeTestUtils</classname>. For example, to count the
     number of items available in the reader above:</para>
 
-    <programlisting>int count = StepScopeTestUtils.doInStepScope(stepExecution, 
+    <programlisting language="java">int count = StepScopeTestUtils.doInStepScope(stepExecution,
     new Callable&lt;Integer&gt;() {
-
       public Integer call() throws Exception {
 
         int count = 0;
@@ -172,9 +171,7 @@ public class StepScopeTestExecutionListenerIntegrationTests {
         while (reader.read() != null) {
            count++;
         }
-
         return count;
-
     }
 });</programlisting>
   </section>
@@ -194,10 +191,10 @@ public class StepScopeTestExecutionListenerIntegrationTests {
     file with the expected output and to compare it to the actual
     result:</para>
 
-    <programlisting>private static final String EXPECTED_FILE = "src/main/resources/data/input.txt";
+    <programlisting language="java">private static final String EXPECTED_FILE = "src/main/resources/data/input.txt";
 private static final String OUTPUT_FILE = "target/test-outputs/output.txt";
 
-AssertFile.assertFileEquals(new FileSystemResource(EXPECTED_FILE), 
+AssertFile.assertFileEquals(new FileSystemResource(EXPECTED_FILE),
                             new FileSystemResource(OUTPUT_FILE));</programlisting>
   </section>
 
@@ -209,9 +206,9 @@ AssertFile.assertFileEquals(new FileSystemResource(EXPECTED_FILE),
     example is a <classname>StepExecutionListener</classname>, as illustrated
     below:</para>
 
-    <programlisting>public class NoWorkFoundStepExecutionListener extends StepExecutionListenerSupport {
+    <programlisting language="java">public class NoWorkFoundStepExecutionListener extends StepExecutionListenerSupport {
 
-    public ExitStatus afterStep(StepExecution stepExecution) {  
+    public ExitStatus afterStep(StepExecution stepExecution) {
         if (stepExecution.getReadCount() == 0) {
             throw new NoWorkFoundException("Step has not processed any items");
         }
@@ -226,12 +223,12 @@ AssertFile.assertFileEquals(new FileSystemResource(EXPECTED_FILE),
     attempting to unit test classes that implement interfaces requiring Spring
     Batch domain objects. Consider the above listener's unit test:</para>
 
-    <programlisting>private NoWorkFoundStepExecutionListener tested = new NoWorkFoundStepExecutionListener();
+    <programlisting language="java">private NoWorkFoundStepExecutionListener tested = new NoWorkFoundStepExecutionListener();
 
 @Test
 public void testAfterStep() {
     <emphasis role="bold">StepExecution stepExecution = new StepExecution("NoProcessingStep",
-                new JobExecution(new JobInstance(1L, new JobParameters(), 
+                new JobExecution(new JobInstance(1L, new JobParameters(),
                                  "NoProcessingJob")));</emphasis>
 
     stepExecution.setReadCount(0);
@@ -256,7 +253,7 @@ public void testAfterStep() {
     Given this factory, the unit test can be updated to be more
     concise:</para>
 
-    <programlisting>private NoWorkFoundStepExecutionListener tested = new NoWorkFoundStepExecutionListener();
+    <programlisting language="java">private NoWorkFoundStepExecutionListener tested = new NoWorkFoundStepExecutionListener();
 
 @Test
 public void testAfterStep() {

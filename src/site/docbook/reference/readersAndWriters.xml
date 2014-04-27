@@ -46,7 +46,7 @@
     <para><classname>ItemReader</classname> is a basic interface for generic
     input operations:</para>
 
-    <programlisting>public interface ItemReader&lt;T&gt; {
+    <programlisting language="java">public interface ItemReader&lt;T&gt; {
 
     T read() throws Exception, UnexpectedInputException, ParseException;
 
@@ -84,7 +84,7 @@
     <para>As with <classname>ItemReader</classname>,
     <classname>ItemWriter</classname> is a fairly generic interface:</para>
 
-    <programlisting>public interface ItemWriter&lt;T&gt; {
+    <programlisting language="java">public interface ItemWriter&lt;T&gt; {
 
     void write(List&lt;? extends T&gt; items) throws Exception;
 
@@ -115,7 +115,7 @@
     that contains another <classname>ItemReader</classname>. For
     example:</para>
 
-    <programlisting>public class CompositeItemWriter&lt;T&gt; implements ItemWriter&lt;T&gt; {
+    <programlisting language="java">public class CompositeItemWriter&lt;T&gt; implements ItemWriter&lt;T&gt; {
 
     ItemWriter&lt;T&gt; itemWriter;
 
@@ -145,7 +145,7 @@
     For this scenario, Spring Batch provides the
     <classname>ItemProcessor</classname> interface:</para>
 
-    <programlisting>public interface ItemProcessor&lt;I, O&gt; {
+    <programlisting language="java">public interface ItemProcessor&lt;I, O&gt; {
 
     O process(I item) throws Exception;
 }</programlisting>
@@ -160,7 +160,7 @@
     written out. An <classname>ItemProcessor</classname> can be written that
     performs the conversion:</para>
 
-    <programlisting>public class Foo {}
+    <programlisting language="java">public class Foo {}
 
 public class Bar {
     public Bar(Foo foo) {}
@@ -191,7 +191,7 @@ public class BarWriter implements ItemWriter&lt;Bar&gt;{
     provided. The <classname>FooProcessor</classname> can then be injected
     into a <classname>Step</classname>:</para>
 
-    <programlisting>&lt;job id="ioSampleJob"&gt;
+    <programlisting language="xml">&lt;job id="ioSampleJob"&gt;
     &lt;step name="step1"&gt;
         &lt;tasklet&gt;
             &lt;chunk reader="fooReader" processor="fooProcessor" writer="barWriter"
@@ -211,7 +211,7 @@ public class BarWriter implements ItemWriter&lt;Bar&gt;{
       transformed to <classname>Bar</classname>, which will be transformed to
       <classname>Foobar</classname> and written out:</para>
 
-      <programlisting>public class Foo {}
+      <programlisting language="java">public class Foo {}
 
 public class Bar {
     public Bar(Foo foo) {}
@@ -244,7 +244,7 @@ public class FoobarWriter implements ItemWriter&lt;FooBar&gt;{
       <classname>BarProcessor</classname> can be 'chained' together to give
       the resultant <classname>Foobar</classname>:</para>
 
-      <programlisting>CompositeItemProcessor&lt;Foo,Foobar&gt; compositeProcessor =
+      <programlisting language="java">CompositeItemProcessor&lt;Foo,Foobar&gt; compositeProcessor =
                                       new CompositeItemProcessor&lt;Foo,Foobar&gt;();
 List itemProcessors = new ArrayList();
 itemProcessors.add(new FooTransformer());
@@ -254,7 +254,7 @@ compositeProcessor.setDelegates(itemProcessors);</programlisting>
       <para>Just as with the previous example, the composite processor can be
       configured into the <classname>Step</classname>:</para>
 
-      <programlisting>&lt;job id="ioSampleJob"&gt;
+      <programlisting language="xml">&lt;job id="ioSampleJob"&gt;
     &lt;step name="step1"&gt;
         &lt;tasklet&gt;
             &lt;chunk reader="fooReader" processor="compositeProcessor" writer="foobarWriter"
@@ -323,7 +323,7 @@ compositeProcessor.setDelegates(itemProcessors);</programlisting>
     writers need to be opened, closed, and require a mechanism for persisting
     state:</para>
 
-    <programlisting>public interface ItemStream {
+    <programlisting language="java">public interface ItemStream {
 
     void open(ExecutionContext executionContext) throws ItemStreamException;
 
@@ -378,7 +378,7 @@ compositeProcessor.setDelegates(itemProcessors);</programlisting>
     are not known to the <classname>Step</classname>, they need to be injected
     as listeners or streams (or both if appropriate):</para>
 
-    <programlisting>&lt;job id="ioSampleJob"&gt;
+    <programlisting language="xml">&lt;job id="ioSampleJob"&gt;
     &lt;step name="step1"&gt;
         &lt;tasklet&gt;
             &lt;chunk reader="fooReader" processor="fooProcessor" writer="compositeItemWriter"
@@ -427,7 +427,7 @@ compositeProcessor.setDelegates(itemProcessors);</programlisting>
       fields so that the fields may be accessed either by index or name as
       patterned after <classname>ResultSet</classname>:</para>
 
-      <programlisting>String[] tokens = new String[]{"foo", "1", "true"};
+      <programlisting language="java">String[] tokens = new String[]{"foo", "1", "true"};
 FieldSet fs = new DefaultFieldSet(tokens);
 String name = fs.readString(0);
 int value = fs.readInt(1);
@@ -461,7 +461,9 @@ boolean booleanValue = fs.readBoolean(2);</programlisting>
       Framework, Chapter 5.Resources</citetitle></ulink>. Therefore, this
       guide will not go into the details of creating
       <classname>Resource</classname> objects. However, a simple example of a
-      file system resource can be found below: <programlisting>Resource resource = new FileSystemResource("resources/trades.csv");</programlisting></para>
+      file system resource can be found below:
+      </para>
+      <programlisting language="java">Resource resource = new FileSystemResource("resources/trades.csv");</programlisting>
 
       <para>In complex batch environments the directory structures are often
       managed by the EAI infrastructure where drop zones for external
@@ -580,11 +582,13 @@ boolean booleanValue = fs.readBoolean(2);</programlisting>
         level construct such as <classname>ResultSet</classname> and returns
         an <classname>Object</classname>, flat file processing requires the
         same construct to convert a <classname>String</classname> line into an
-        <classname>Object</classname>:<programlisting>public interface LineMapper&lt;T&gt; {
+        <classname>Object</classname>:
+        </para>
+        <programlisting language="java">public interface LineMapper&lt;T&gt; {
 
     T mapLine(String line, int lineNumber) throws Exception;
 
-}</programlisting></para>
+}</programlisting>
 
         <para>The basic contract is that, given the current line and the line
         number with which it is associated, the mapper should return a
@@ -610,7 +614,7 @@ boolean booleanValue = fs.readBoolean(2);</programlisting>
         <classname>FieldSet</classname>. In Spring Batch, this interface is
         the <classname>LineTokenizer</classname>:</para>
 
-        <programlisting>public interface LineTokenizer {
+        <programlisting language="java">public interface LineTokenizer {
 
     FieldSet tokenize(String line);
 
@@ -659,7 +663,7 @@ boolean booleanValue = fs.readBoolean(2);</programlisting>
         <classname>LineTokenizer</classname> to translate a line of data from
         a resource into an object of the desired type:</para>
 
-        <programlisting>public interface FieldSetMapper&lt;T&gt; {
+        <programlisting language="java">public interface FieldSetMapper&lt;T&gt; {
 
     T mapFieldSet(FieldSet fieldSet);
 
@@ -706,7 +710,7 @@ boolean booleanValue = fs.readBoolean(2);</programlisting>
         <classname>DefaultLineMapper</classname> represents the behavior most
         users will need:</para>
 
-        <programlisting>public class DefaultLineMapper&lt;T&gt; implements LineMapper&lt;T&gt;, InitializingBean {
+        <programlisting language="java">public class DefaultLineMapper&lt;T&gt; implements LineMapper&lt;T&gt;, InitializingBean {
 
     private LineTokenizer tokenizer;
 
@@ -737,16 +741,20 @@ boolean booleanValue = fs.readBoolean(2);</programlisting>
 
         <para>The following example will be used to illustrate this using an
         actual domain scenario. This particular batch job reads in football
-        players from the following file:<programlisting>ID,lastName,firstName,position,birthYear,debutYear
+        players from the following file:
+        </para>
+        <programlisting>ID,lastName,firstName,position,birthYear,debutYear
 "AbduKa00,Abdul-Jabbar,Karim,rb,1974,1996",
 "AbduRa00,Abdullah,Rabih,rb,1975,1999",
 "AberWa00,Abercrombie,Walter,rb,1959,1982",
 "AbraDa00,Abramowicz,Danny,wr,1945,1967",
 "AdamBo00,Adams,Bob,te,1946,1969",
-"AdamCh00,Adams,Charlie,wr,1979,2003"        </programlisting></para>
+"AdamCh00,Adams,Charlie,wr,1979,2003"        </programlisting>
 
         <para>The contents of this file will be mapped to the following
-        <classname>Player</classname> domain object: <programlisting>public class Player implements Serializable {
+        <classname>Player</classname> domain object:
+        </para>
+        <programlisting language="java">public class Player implements Serializable {
 
     private String ID;
     private String lastName;
@@ -763,15 +771,14 @@ boolean booleanValue = fs.readBoolean(2);</programlisting>
     }
 
     // setters and getters...
-}
-          </programlisting></para>
+}</programlisting>
 
         <para>In order to map a <classname>FieldSet</classname> into a
         <classname>Player</classname> object, a
         <classname>FieldSetMapper</classname> that returns players needs to be
         defined:</para>
 
-        <para><programlisting>protected static class PlayerFieldSetMapper implements FieldSetMapper&lt;Player&gt; {
+        <programlisting language="java">protected static class PlayerFieldSetMapper implements FieldSetMapper&lt;Player&gt; {
     public Player mapFieldSet(FieldSet fieldSet) {
         Player player = new Player();
 
@@ -784,13 +791,13 @@ boolean booleanValue = fs.readBoolean(2);</programlisting>
 
         return player;
     }
-}   </programlisting></para>
+}</programlisting>
 
         <para>The file can then be read by correctly constructing a
         <classname>FlatFileItemReader</classname> and calling
         <methodname>read</methodname>:</para>
 
-        <programlisting>FlatFileItemReader&lt;Player&gt; itemReader = new FlatFileItemReader&lt;Player&gt;();
+        <programlisting language="java">FlatFileItemReader&lt;Player&gt; itemReader = new FlatFileItemReader&lt;Player&gt;();
 itemReader.setResource(new FileSystemResource("resources/players.csv"));
 //DelimitedLineTokenizer defaults to comma as its delimiter
 LineMapper&lt;Player&gt; lineMapper = new DefaultLineMapper&lt;Player&gt;();
@@ -817,12 +824,12 @@ Player player = itemReader.read();</programlisting>
         readability of the mapping function. First, the column names of all
         fields in the flat file are injected into the tokenizer:</para>
 
-        <para><programlisting>tokenizer.setNames(new String[] {"ID", "lastName","firstName","position","birthYear","debutYear"});          </programlisting></para>
+        <programlisting language="java">tokenizer.setNames(new String[] {"ID", "lastName","firstName","position","birthYear","debutYear"});          </programlisting>
 
         <para>A <classname>FieldSetMapper</classname> can use this information
         as follows:</para>
 
-        <para><programlisting>public class PlayerMapper implements FieldSetMapper&lt;Player&gt; {
+        <programlisting language="java">public class PlayerMapper implements FieldSetMapper&lt;Player&gt; {
     public Player mapFieldSet(FieldSet fs) {
 
        if(fs == null){
@@ -839,7 +846,7 @@ Player player = itemReader.read();</programlisting>
 
        return player;
    }
-}</programlisting></para>
+}</programlisting>
       </section>
 
       <section id="beanWrapperFieldSetMapper">
@@ -855,7 +862,7 @@ Player player = itemReader.read();</programlisting>
         <classname>BeanWrapperFieldSetMapper</classname> configuration looks
         like the following:</para>
 
-        <programlisting>&lt;bean id="fieldSetMapper"
+        <programlisting language="xml">&lt;bean id="fieldSetMapper"
       class="org.springframework.batch.item.file.mapping.BeanWrapperFieldSetMapper"&gt;
     &lt;property name="prototypeBeanName" value="player" /&gt;
 &lt;/bean&gt;
@@ -916,7 +923,7 @@ UK21341EAH4521535.11customer5</programlisting>
         <classname>FixedLengthLineTokenizer</classname>, each of these lengths
         must be provided in the form of ranges:</para>
 
-        <programlisting>&lt;bean id="fixedLengthLineTokenizer"
+        <programlisting language="xml">&lt;bean id="fixedLengthLineTokenizer"
       class="org.springframework.batch.io.file.transform.FixedLengthTokenizer"&gt;
     &lt;property name="names" value="ISIN,Quantity,Price,Customer" /&gt;
     &lt;property name="columns" value="1-12, 13-15, 16-20, 21-29" /&gt;
@@ -969,7 +976,7 @@ LINEB;2134776319DEF422.99M005LI</programlisting>
         <classname>LineTokenizer</classname>s and patterns to
         <classname>FieldSetMapper</classname>s to be configured:</para>
 
-        <programlisting>&lt;bean id="orderFileLineMapper"
+        <programlisting language="xml">&lt;bean id="orderFileLineMapper"
       class="org.spr...PatternMatchingCompositeLineMapper"&gt;
     &lt;property name="tokenizers"&gt;
         &lt;map&gt;
@@ -1006,7 +1013,7 @@ LINEB;2134776319DEF422.99M005LI</programlisting>
         ("*") can serve as a default by matching any line not matched by any
         other pattern.</para>
 
-        <programlisting>&lt;entry key="*" value-ref="defaultLineTokenizer" /&gt;</programlisting>
+        <programlisting language="xml">&lt;entry key="*" value-ref="defaultLineTokenizer" /&gt;</programlisting>
 
         <para>There is also a
         <classname>PatternMatchingCompositeLineTokenizer</classname> that can
@@ -1051,9 +1058,9 @@ LINEB;2134776319DEF422.99M005LI</programlisting>
           contains the number of tokens encountered, and the number
           expected:</para>
 
-          <programlisting>tokenizer.setNames(new String[] {"A", "B", "C", "D"});
+          <programlisting language="java">tokenizer.setNames(new String[] {"A", "B", "C", "D"});
 
-try{
+try {
     tokenizer.tokenize("a,b,c");
 }
 catch(IncorrectTokenCountException e){
@@ -1076,7 +1083,7 @@ catch(IncorrectTokenCountException e){
           line length doesn't add up to the widest value of this column, an
           exception is thrown:</para>
 
-          <programlisting>tokenizer.setColumns(new Range[] { new Range(1, 5),
+          <programlisting language="java">tokenizer.setColumns(new Range[] { new Range(1, 5),
                                    new Range(6, 10),
                                    new Range(11, 15) });
 try {
@@ -1100,7 +1107,7 @@ catch (IncorrectLineLengthException ex) {
           For this reason, validation of line length can be turned off via the
           'strict' property:</para>
 
-          <programlisting>tokenizer.setColumns(new Range[] { new Range(1, 5), new Range(6, 10) });
+          <programlisting language="java">tokenizer.setColumns(new Range[] { new Range(1, 5), new Range(6, 10) });
 <emphasis role="bold">tokenizer.setStrict(false);</emphasis>
 FieldSet tokens = tokenizer.tokenize("12345");
 assertEquals("12345", tokens.readString(0));
@@ -1134,7 +1141,7 @@ assertEquals("", tokens.readString(1));</programlisting>
         In Spring Batch this is the
         <classname>LineAggregator</classname>:</para>
 
-        <programlisting>public interface LineAggregator&lt;T&gt; {
+        <programlisting language="java">public interface LineAggregator&lt;T&gt; {
 
     public String aggregate(T item);
 
@@ -1157,7 +1164,7 @@ assertEquals("", tokens.readString(1));</programlisting>
           simply assumes that the object is already a string, or that its
           string representation is acceptable for writing:</para>
 
-          <programlisting>public class PassThroughLineAggregator&lt;T&gt; implements LineAggregator&lt;T&gt; {
+          <programlisting language="java">public class PassThroughLineAggregator&lt;T&gt; implements LineAggregator&lt;T&gt; {
 
     public String aggregate(T item) {
         return item.toString();
@@ -1196,13 +1203,13 @@ assertEquals("", tokens.readString(1));</programlisting>
         <classname>FlatFileItemWriter</classname> expresses this in
         code:</para>
 
-        <programlisting>public void write(T item) throws Exception {
+        <programlisting language="java">public void write(T item) throws Exception {
     write(lineAggregator.aggregate(item) + LINE_SEPARATOR);
 }</programlisting>
 
         <para>A simple configuration would look like the following:</para>
 
-        <programlisting>&lt;bean id="itemWriter" class="org.spr...FlatFileItemWriter"&gt;
+        <programlisting language="xml">&lt;bean id="itemWriter" class="org.spr...FlatFileItemWriter"&gt;
     &lt;property name="resource" value="file:target/test-outputs/output.txt" /&gt;
     &lt;property name="lineAggregator"&gt;
         &lt;bean class="org.spr...PassThroughLineAggregator"/&gt;
@@ -1257,7 +1264,7 @@ assertEquals("", tokens.readString(1));</programlisting>
         <classname>FieldExtractor</classname> must be written to accomplish
         the task of turning the item into an array:</para>
 
-        <programlisting>public interface FieldExtractor&lt;T&gt; {
+        <programlisting language="java">public interface FieldExtractor&lt;T&gt; {
 
     Object[] extract(T item);
 
@@ -1293,7 +1300,7 @@ assertEquals("", tokens.readString(1));</programlisting>
           <classname>BeanWrapperFieldExtractor</classname> provides just this
           type of functionality:</para>
 
-          <programlisting>BeanWrapperFieldExtractor&lt;Name&gt; extractor = new BeanWrapperFieldExtractor&lt;Name&gt;();
+          <programlisting language="java">BeanWrapperFieldExtractor&lt;Name&gt; extractor = new BeanWrapperFieldExtractor&lt;Name&gt;();
 extractor.setNames(new String[] { "first", "last", "born" });
 
 String first = "Alan";
@@ -1328,7 +1335,7 @@ assertEquals(born, values[2]);</programlisting>
         writes out a simple domain object that represents a credit to a
         customer account:</para>
 
-        <programlisting>public class CustomerCredit {
+        <programlisting language="java">public class CustomerCredit {
 
     private int id;
     private String name;
@@ -1341,7 +1348,7 @@ assertEquals(born, values[2]);</programlisting>
         FieldExtractor interface must be provided, along with the delimiter to
         use:</para>
 
-        <programlisting>&lt;bean id="itemWriter" class="org.springframework.batch.item.file.FlatFileItemWriter"&gt;
+        <programlisting language="xml">&lt;bean id="itemWriter" class="org.springframework.batch.item.file.FlatFileItemWriter"&gt;
     &lt;property name="resource" ref="outputResource" /&gt;
     &lt;property name="lineAggregator"&gt;
         &lt;bean class="org.spr...DelimitedLineAggregator"&gt;
@@ -1372,7 +1379,7 @@ assertEquals(born, values[2]);</programlisting>
         Using the same <classname>CustomerCredit</classname> domain object
         described above, it can be configured as follows:</para>
 
-        <programlisting>&lt;bean id="itemWriter" class="org.springframework.batch.item.file.FlatFileItemWriter"&gt;
+        <programlisting language="xml">&lt;bean id="itemWriter" class="org.springframework.batch.item.file.FlatFileItemWriter"&gt;
     &lt;property name="resource" ref="outputResource" /&gt;
     &lt;property name="lineAggregator"&gt;
         &lt;bean class="org.spr...FormatterLineAggregator"&gt;
@@ -1389,7 +1396,7 @@ assertEquals(born, values[2]);</programlisting>
         <para>Most of the above example should look familiar. However, the
         value of the format property is new:</para>
 
-        <programlisting>&lt;property name="format" value="%-9s%-2.0f" /&gt;</programlisting>
+        <programlisting language="xml">&lt;property name="format" value="%-9s%-2.0f" /&gt;</programlisting>
 
         <para>The underlying implementation is built using the same
         <classname>Formatter</classname> added as part of Java 5. The Java
@@ -1498,7 +1505,7 @@ assertEquals(born, values[2]);</programlisting>
       stream. First, lets examine a set of XML records that the
       <classname>StaxEventItemReader</classname> can process.</para>
 
-      <para><programlisting>&lt;?xml version="1.0" encoding="UTF-8"?&gt;
+      <programlisting language="xml">&lt;?xml version="1.0" encoding="UTF-8"?&gt;
 &lt;records&gt;
     &lt;trade xmlns="http://springframework.org/batch/sample/io/oxm/domain"&gt;
         &lt;isin&gt;XYZ0001&lt;/isin&gt;
@@ -1518,7 +1525,7 @@ assertEquals(born, values[2]);</programlisting>
         &lt;price&gt;99.99&lt;/price&gt;
         &lt;customer&gt;Customer3&lt;/customer&gt;
     &lt;/trade&gt;
-&lt;/records&gt;</programlisting></para>
+&lt;/records&gt;</programlisting>
 
       <para>To be able to process the XML records the following is needed:
       <itemizedlist>
@@ -1540,12 +1547,11 @@ assertEquals(born, values[2]);</programlisting>
           </listitem>
         </itemizedlist></para>
 
-      <para><programlisting>&lt;bean id="itemReader" class="org.springframework.batch.item.xml.StaxEventItemReader"&gt;
+      <programlisting language="xml">&lt;bean id="itemReader" class="org.springframework.batch.item.xml.StaxEventItemReader"&gt;
     &lt;property name="fragmentRootElementName" value="trade" /&gt;
     &lt;property name="resource" value="data/iosample/input/input.xml" /&gt;
     &lt;property name="unmarshaller" ref="tradeMarshaller" /&gt;
-&lt;/bean&gt;
-</programlisting></para>
+&lt;/bean&gt;</programlisting>
 
       <para>Notice that in this example we have chosen to use an
       <classname>XStreamMarshaller</classname> which accepts an alias passed
@@ -1556,7 +1562,7 @@ assertEquals(born, values[2]);</programlisting>
       the map. In the configuration file we can use a Spring configuration
       utility to describe the required alias as follows:</para>
 
-      <para><programlisting>&lt;bean id="tradeMarshaller"
+      <programlisting language="xml">&lt;bean id="tradeMarshaller"
       class="org.springframework.oxm.xstream.XStreamMarshaller"&gt;
     &lt;property name="aliases"&gt;
 <emphasis role="bold">        &lt;util:map id="aliases"&gt;
@@ -1566,7 +1572,7 @@ assertEquals(born, values[2]);</programlisting>
             &lt;entry key="name" value="java.lang.String" /&gt;
         &lt;/util:map&gt;</emphasis>
     &lt;/property&gt;
-&lt;/bean&gt;</programlisting></para>
+&lt;/bean&gt;</programlisting>
 
       <para>On input the reader reads the XML resource until it recognizes
       that a new fragment is about to start (by matching the tag name by
@@ -1580,7 +1586,7 @@ assertEquals(born, values[2]);</programlisting>
       Java code which uses the injection provided by the Spring
       configuration:</para>
 
-      <para><programlisting>StaxEventItemReader xmlStaxEventItemReader = new StaxEventItemReader()
+      <programlisting language="java">StaxEventItemReader xmlStaxEventItemReader = new StaxEventItemReader()
 Resource resource = new ByteArrayResource(xmlResource.getBytes())
 
 Map aliases = new HashMap();
@@ -1606,7 +1612,7 @@ while (hasNext) {
     else {
         System.out.println(credit);
     }
-}</programlisting></para>
+}</programlisting>
     </section>
 
     <section id="StaxEventItemWriter">
@@ -1624,7 +1630,7 @@ while (hasNext) {
       <classname>MarshallingEventWriterSerializer</classname>. The Spring
       configuration for this setup looks as follows:</para>
 
-      <programlisting>&lt;bean id="itemWriter" class="org.springframework.batch.item.xml.StaxEventItemWriter"&gt;
+      <programlisting language="xml">&lt;bean id="itemWriter" class="org.springframework.batch.item.xml.StaxEventItemWriter"&gt;
     &lt;property name="resource" ref="outputResource" /&gt;
     &lt;property name="marshaller" ref="customerCreditMarshaller" /&gt;
     &lt;property name="rootTagName" value="customers" /&gt;
@@ -1637,7 +1643,7 @@ while (hasNext) {
       should be noted the marshaller used for the writer is the exact same as
       the one used in the reading example from earlier in the chapter:</para>
 
-      <programlisting>&lt;bean id="customerCreditMarshaller"
+      <programlisting language="xml">&lt;bean id="customerCreditMarshaller"
       class="org.springframework.oxm.xstream.XStreamMarshaller"&gt;
     &lt;property name="aliases"&gt;
         &lt;util:map id="aliases"&gt;
@@ -1653,7 +1659,7 @@ while (hasNext) {
       all of the points discussed, demonstrating the programmatic setup of the
       required properties:</para>
 
-      <programlisting>StaxEventItemWriter staxItemWriter = new StaxEventItemWriter()
+      <programlisting language="java">StaxEventItemWriter staxItemWriter = new StaxEventItemWriter()
 FileSystemResource resource = new FileSystemResource("data/outputFile.xml")
 
 Map aliases = new HashMap();
@@ -1693,7 +1699,7 @@ staxItemWriter.write(trade);</programlisting>
     <classname>MuliResourceItemReader</classname> can be used to read in both
     files by using wildcards:</para>
 
-    <programlisting>&lt;bean id="multiResourceReader" class="org.spr...MultiResourceItemReader"&gt;
+    <programlisting language="xml">&lt;bean id="multiResourceReader" class="org.spr...MultiResourceItemReader"&gt;
     &lt;property name="resources" value="classpath:data/input/file-*.txt" /&gt;
     &lt;property name="delegate" ref="flatFileItemReader" /&gt;
 &lt;/bean&gt;</programlisting>
@@ -1776,7 +1782,7 @@ staxItemWriter.write(trade);</programlisting>
         <classname>DataSource</classname>. The following database schema will
         be used as an example:</para>
 
-        <programlisting>CREATE TABLE CUSTOMER (
+        <programlisting language="sql">CREATE TABLE CUSTOMER (
    ID BIGINT IDENTITY PRIMARY KEY,
    NAME VARCHAR(45),
    CREDIT FLOAT
@@ -1787,7 +1793,7 @@ staxItemWriter.write(trade);</programlisting>
         interface to map a <classname>CustomerCredit</classname>
         object:</para>
 
-        <programlisting>public class CustomerCreditRowMapper implements RowMapper {
+        <programlisting language="java">public class CustomerCreditRowMapper implements RowMapper {
 
     public static final String ID_COLUMN = "id";
     public static final String NAME_COLUMN = "name";
@@ -1813,7 +1819,7 @@ staxItemWriter.write(trade);</programlisting>
         CUSTOMER database. The first example will be using
         <classname>JdbcTemplate</classname>:</para>
 
-        <programlisting>//For simplicity sake, assume a dataSource has already been obtained
+        <programlisting language="java">//For simplicity sake, assume a dataSource has already been obtained
 JdbcTemplate jdbcTemplate = new JdbcTemplate(dataSource);
 List customerCredits = jdbcTemplate.query("SELECT ID, NAME, CREDIT from CUSTOMER",
                                           new CustomerCreditRowMapper());</programlisting>
@@ -1827,7 +1833,7 @@ List customerCredits = jdbcTemplate.query("SELECT ID, NAME, CREDIT from CUSTOMER
         contrast this with the approach of the
         <classname>JdbcCursorItemReader</classname>:</para>
 
-        <programlisting>JdbcCursorItemReader itemReader = new JdbcCursorItemReader();
+        <programlisting language="java">JdbcCursorItemReader itemReader = new JdbcCursorItemReader();
 itemReader.setDataSource(dataSource);
 itemReader.setSql("SELECT ID, NAME, CREDIT from CUSTOMER");
 itemReader.setRowMapper(new CustomerCreditRowMapper());
@@ -1855,7 +1861,7 @@ itemReader.close(executionContext);</programlisting>
         configured for injection into a Spring Batch
         <classname>Step</classname>:</para>
 
-        <programlisting>&lt;bean id="itemReader" class="org.spr...JdbcCursorItemReader"&gt;
+        <programlisting language="xml">&lt;bean id="itemReader" class="org.spr...JdbcCursorItemReader"&gt;
     &lt;property name="dataSource" ref="dataSource"/&gt;
     &lt;property name="sql" value="select ID, NAME, CREDIT from CUSTOMER"/&gt;
     &lt;property name="rowMapper"&gt;
@@ -2000,7 +2006,7 @@ itemReader.close(executionContext);</programlisting>
         configuration using the same 'customer credit' example as the JDBC
         reader:</para>
 
-        <programlisting>HibernateCursorItemReader itemReader = new HibernateCursorItemReader();
+        <programlisting language="java">HibernateCursorItemReader itemReader = new HibernateCursorItemReader();
 itemReader.setQueryString("from CustomerCredit");
 //For simplicity sake, assume sessionFactory already obtained.
 itemReader.setSessionFactory(sessionFactory);
@@ -2026,7 +2032,7 @@ itemReader.close(executionContext);</programlisting>
         <classname>JdbcCursorItemReader</classname>, configuration is
         straightforward:</para>
 
-        <programlisting>&lt;bean id="itemReader"
+        <programlisting language="xml">&lt;bean id="itemReader"
       class="org.springframework.batch.item.database.HibernateCursorItemReader"&gt;
     &lt;property name="sessionFactory" ref="sessionFactory" /&gt;
     &lt;property name="queryString" value="from CustomerCredit" /&gt;
@@ -2062,7 +2068,7 @@ itemReader.close(executionContext);</programlisting>
         <para>Below is a basic example configuration using the same 'customer
         credit' example as earlier:</para>
 
-        <programlisting>&lt;bean id="reader" class="org.springframework.batch.item.database.StoredProcedureItemReader"&gt;
+        <programlisting language="xml">&lt;bean id="reader" class="o.s.batch.item.database.StoredProcedureItemReader"&gt;
     &lt;property name="dataSource" ref="dataSource"/&gt;
     &lt;property name="procedureName" value="sp_customer_credit"/&gt;
     &lt;property name="rowMapper"&gt;
@@ -2079,7 +2085,7 @@ itemReader.close(executionContext);</programlisting>
         returned ref-cursor. Here is an example where the first parameter is
         the returned ref-cursor:</para>
 
-        <programlisting>&lt;bean id="reader" class="org.springframework.batch.item.database.StoredProcedureItemReader"&gt;
+        <programlisting language="xml">&lt;bean id="reader" class="o.s.batch.item.database.StoredProcedureItemReader"&gt;
     &lt;property name="dataSource" ref="dataSource"/&gt;
     &lt;property name="procedureName" value="sp_customer_credit"/&gt;
     &lt;property name="refCursorPosition" value="1"/&gt;
@@ -2094,7 +2100,7 @@ itemReader.close(executionContext);</programlisting>
         <literal>true</literal>. It defaults to <literal>false</literal>. Here
         is what that would look like:</para>
 
-        <programlisting>&lt;bean id="reader" class="org.springframework.batch.item.database.StoredProcedureItemReader"&gt;
+        <programlisting language="xml">&lt;bean id="reader" class="o.s.batch.item.database.StoredProcedureItemReader"&gt;
     &lt;property name="dataSource" ref="dataSource"/&gt;
     &lt;property name="procedureName" value="sp_customer_credit"/&gt;
     &lt;property name="function" value="true"/&gt;
@@ -2115,7 +2121,7 @@ itemReader.close(executionContext);</programlisting>
         the out parameter that returns the ref-cursor, the second and third
         are in parameters that takes a value of type INTEGER:</para>
 
-        <programlisting>&lt;bean id="reader" class="org.springframework.batch.item.database.StoredProcedureItemReader"&gt;
+        <programlisting language="xml">&lt;bean id="reader" class="o.s.batch.item.database.StoredProcedureItemReader"&gt;
     &lt;property name="dataSource" ref="dataSource"/&gt;
     &lt;property name="procedureName" value="spring.cursor_func"/&gt;
     &lt;property name="parameters"&gt;
@@ -2194,7 +2200,7 @@ itemReader.close(executionContext);</programlisting>
         <para>Below is an example configuration using a similar 'customer
         credit' example as the cursor based ItemReaders above:</para>
 
-        <programlisting>&lt;bean id="itemReader" class="org.spr...JdbcPagingItemReader"&gt;
+        <programlisting language="xml">&lt;bean id="itemReader" class="org.spr...JdbcPagingItemReader"&gt;
     &lt;property name="dataSource" ref="dataSource"/&gt;
     &lt;property name="queryProvider"&gt;
         &lt;bean class="org.spr...SqlPagingQueryProviderFactoryBean"&gt;
@@ -2250,7 +2256,7 @@ itemReader.close(executionContext);</programlisting>
         is an example configuration using the same 'customer credit' example
         as the JDBC reader above:</para>
 
-        <programlisting>&lt;bean id="itemReader" class="org.spr...JpaPagingItemReader"&gt;
+        <programlisting language="xml">&lt;bean id="itemReader" class="org.spr...JpaPagingItemReader"&gt;
     &lt;property name="entityManagerFactory" ref="entityManagerFactory"/&gt;
     &lt;property name="queryString" value="select c from CustomerCredit c"/&gt;
     &lt;property name="pageSize" value="1000"/&gt;
@@ -2280,7 +2286,7 @@ itemReader.close(executionContext);</programlisting>
         <classname>IbatisPagingItemReader</classname> reading CustomerCredits
         as in the examples above:</para>
 
-        <programlisting>&lt;bean id="itemReader" class="org.spr...IbatisPagingItemReader"&gt;
+        <programlisting language="xml">&lt;bean id="itemReader" class="org.spr...IbatisPagingItemReader"&gt;
     &lt;property name="sqlMapClient" ref="sqlMapClient"/&gt;
     &lt;property name="queryId" value="getPagedCustomerCredits"/&gt;
     &lt;property name="pageSize" value="1000"/&gt;
@@ -2291,7 +2297,7 @@ itemReader.close(executionContext);</programlisting>
         Here is an example of what that query should look like for
         MySQL.</para>
 
-        <programlisting>&lt;select id="getPagedCustomerCredits" resultMap="customerCreditResult"&gt;
+        <programlisting language="xml">&lt;select id="getPagedCustomerCredits" resultMap="customerCreditResult"&gt;
     select id, name, credit from customer order by id asc LIMIT #_skiprows#, #_pagesize#
 &lt;/select&gt;</programlisting>
 
@@ -2303,14 +2309,13 @@ itemReader.close(executionContext);</programlisting>
         is an example for Oracle (unfortunately we need to use CDATA for some
         operators since this belongs in an XML document):</para>
 
-        <programlisting>&lt;select id="getPagedCustomerCredits" resultMap="customerCreditResult"&gt;
+        <programlisting language="xml">&lt;select id="getPagedCustomerCredits" resultMap="customerCreditResult"&gt;
     select * from (
       select * from (
         select t.id, t.name, t.credit, ROWNUM ROWNUM_ from customer t order by id
        )) where ROWNUM_ &lt;![CDATA[ &gt; ]]&gt; ( #_page# * #_pagesize# )
     ) where ROWNUM &lt;![CDATA[ &lt;= ]]&gt; #_pagesize#
-  &lt;/select&gt;
-</programlisting>
+&lt;/select&gt;</programlisting>
       </section>
     </section>
 
@@ -2407,7 +2412,7 @@ itemReader.close(executionContext);</programlisting>
     standard Spring method invoking the delegate pattern and are fairly simple
     to set up. Below is an example of the reader:</para>
 
-    <programlisting>&lt;bean id="itemReader" class="org.springframework.batch.item.adapter.ItemReaderAdapter"&gt;
+    <programlisting language="xml">&lt;bean id="itemReader" class="org.springframework.batch.item.adapter.ItemReaderAdapter"&gt;
     &lt;property name="targetObject" ref="fooService" /&gt;
     &lt;property name="targetMethod" value="generateFoo" /&gt;
 &lt;/bean&gt;
@@ -2423,7 +2428,7 @@ itemReader.close(executionContext);</programlisting>
     <classname>ItemWriter</classname>. The <classname>ItemWriter</classname>
     implementation is equally as simple:</para>
 
-    <programlisting>&lt;bean id="itemWriter" class="org.springframework.batch.item.adapter.ItemWriterAdapter"&gt;
+    <programlisting language="xml">&lt;bean id="itemWriter" class="org.springframework.batch.item.adapter.ItemWriterAdapter"&gt;
     &lt;property name="targetObject" ref="fooService" /&gt;
     &lt;property name="targetMethod" value="processFoo" /&gt;
 &lt;/bean&gt;
@@ -2452,7 +2457,7 @@ itemReader.close(executionContext);</programlisting>
     rather provides a very simple interface that can be implemented by any
     number of frameworks:</para>
 
-    <programlisting>public interface Validator {
+    <programlisting language="java">public interface Validator {
 
     void validate(Object value) throws ValidationException;
 
@@ -2463,7 +2468,7 @@ itemReader.close(executionContext);</programlisting>
     it is valid. Spring Batch provides an out of the box
     <classname>ItemProcessor:</classname></para>
 
-    <programlisting>&lt;bean class="org.springframework.batch.item.validator.ValidatingItemProcessor"&gt;
+    <programlisting language="xml">&lt;bean class="org.springframework.batch.item.validator.ValidatingItemProcessor"&gt;
     &lt;property name="validator" ref="validator" /&gt;
 &lt;/bean&gt;
 
@@ -2516,7 +2521,7 @@ itemReader.close(executionContext);</programlisting>
     restart. For this reason, all readers and writers include the 'saveState'
     property:</para>
 
-    <programlisting>&lt;bean id="playerSummarizationSource" class="org.spr...JdbcCursorItemReader"&gt;
+    <programlisting language="xml">&lt;bean id="playerSummarizationSource" class="org.spr...JdbcCursorItemReader"&gt;
     &lt;property name="dataSource" ref="dataSource" /&gt;
     &lt;property name="rowMapper"&gt;
         &lt;bean class="org.springframework.batch.sample.PlayerSummaryMapper" /&gt;
@@ -2563,7 +2568,7 @@ itemReader.close(executionContext);</programlisting>
       basic contract of <classname>ItemReader</classname>,
       <methodname>read</methodname>:</para>
 
-      <programlisting>public class CustomItemReader&lt;T&gt; implements ItemReader&lt;T&gt;{
+      <programlisting language="java">public class CustomItemReader&lt;T&gt; implements ItemReader&lt;T&gt;{
 
     List&lt;T&gt; items;
 
@@ -2586,7 +2591,7 @@ itemReader.close(executionContext);</programlisting>
       returns null, thus satisfying the most basic requirements of an
       <classname>ItemReader</classname>, as illustrated below:</para>
 
-      <programlisting>List&lt;String&gt; items = new ArrayList&lt;String&gt;();
+      <programlisting language="java">List&lt;String&gt; items = new ArrayList&lt;String&gt;();
 items.add("1");
 items.add("2");
 items.add("3");
@@ -2616,7 +2621,7 @@ assertNull(itemReader.read());</programlisting>
         <para>If you do need to store state, then the
         <classname>ItemStream</classname> interface should be used:</para>
 
-        <programlisting>public class CustomItemReader&lt;T&gt; implements ItemReader&lt;T&gt;, ItemStream {
+        <programlisting language="java">public class CustomItemReader&lt;T&gt; implements ItemReader&lt;T&gt;, ItemStream {
 
     List&lt;T&gt; items;
     int currentIndex = 0;
@@ -2663,7 +2668,7 @@ assertNull(itemReader.read());</programlisting>
         fairly trivial example, but it still meets the general
         contract:</para>
 
-        <programlisting>ExecutionContext executionContext = new ExecutionContext();
+        <programlisting language="java">ExecutionContext executionContext = new ExecutionContext();
 ((ItemStream)itemReader).open(executionContext);
 assertEquals("1", itemReader.read());
 ((ItemStream)itemReader).update(executionContext);
@@ -2709,7 +2714,7 @@ assertEquals("2", itemReader.read());</programlisting>
       <classname>List</classname> will be used in order to keep the example as
       simple as possible:</para>
 
-      <programlisting>public class CustomItemWriter&lt;T&gt; implements ItemWriter&lt;T&gt; {
+      <programlisting language="java">public class CustomItemWriter&lt;T&gt; implements ItemWriter&lt;T&gt; {
 
     List&lt;T&gt; output = TransactionAwareProxyFactory.createTransactionalList();
 

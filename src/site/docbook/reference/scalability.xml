@@ -46,7 +46,7 @@
     <classname>TaskExecutor</classname> to your Step configuration, e.g. as an
     attribute of the <literal>tasklet</literal>:</para>
 
-    <programlisting>&lt;step id="loading"&gt;
+    <programlisting language="xml">&lt;step id="loading"&gt;
     &lt;tasklet task-executor="taskExecutor"&gt;...&lt;/tasklet&gt;
 &lt;/step&gt;</programlisting>
 
@@ -69,10 +69,10 @@
     configuration which defaults to 4.  You may need to increase this
     to ensure that a thread pool is fully utilised, e.g.</para>
 
-    <programlisting>&lt;step id="loading"&gt; &lt;tasklet
+    <programlisting language="xml">&lt;step id="loading"&gt; &lt;tasklet
     task-executor="taskExecutor"
     throttle-limit="20"&gt;...&lt;/tasklet&gt;
-    &lt;/step&gt;</programlisting>
+&lt;/step&gt;</programlisting>
 
     <para>Note also that there may be limits placed on concurrency by
     any pooled resources used in your step, such as
@@ -91,7 +91,7 @@
     indicator (see <xref linkend="process-indicator" xreflabel="" />) to keep
     track of items that have been processed in a database input table.</para>
 
-	<para>Spring Batch provides some implementations of 
+	<para>Spring Batch provides some implementations of
 	  <classname>ItemWriter</classname> and
 	<classname>ItemReader</classname>.  Usually they say in the
 	Javadocs if they are thread safe or not, or what you have to do to
@@ -117,7 +117,7 @@
     <literal>(step1,step2)</literal> in parallel with
     <literal>step3</literal>, you could configure a flow like this:</para>
 
-    <para><programlisting>&lt;job id="job1"&gt;
+    <programlisting language="xml">&lt;job id="job1"&gt;
     &lt;split id="split1" task-executor="taskExecutor" next="step4"&gt;
         &lt;flow&gt;
             &lt;step id="step1" parent="s1" next="step2"/&gt;
@@ -130,7 +130,7 @@
     &lt;step id="step4" parent="s4"/&gt;
 &lt;/job&gt;
 
-&lt;beans:bean id="taskExecutor" class="org.spr...SimpleAsyncTaskExecutor"/&gt;</programlisting></para>
+&lt;beans:bean id="taskExecutor" class="org.spr...SimpleAsyncTaskExecutor"/&gt;</programlisting>
 
     <para>The configurable "task-executor" attribute is used to specify which
     TaskExecutor implementation should be used to execute the individual
@@ -228,11 +228,11 @@
     the PartitionStep is shown driving the execution. The PartitionStep
     configuration looks like this:</para>
 
-    <para><programlisting>&lt;step id="step1.master"&gt;
+    <programlisting language="xml">&lt;step id="step1.master"&gt;
     &lt;partition step="step1" partitioner="partitioner"&gt;
         &lt;handler grid-size="10" task-executor="taskExecutor"/&gt;
     &lt;/partition&gt;
-&lt;/step&gt;</programlisting></para>
+&lt;/step&gt;</programlisting>
 
     <para>Similar to the multi-threaded step's throttle-limit
     attribute, the grid-size attribute prevents the task executor from
@@ -279,7 +279,7 @@
       default for a step configured with the XML namespace as above. It can
       also be configured explicitly like this:</para>
 
-      <para><programlisting>&lt;step id="step1.master"&gt;
+      <programlisting language="xml">&lt;step id="step1.master"&gt;
     &lt;partition step="step1" handler="handler"/&gt;
 &lt;/step&gt;
 
@@ -287,7 +287,7 @@
     &lt;property name="taskExecutor" ref="taskExecutor"/&gt;
     &lt;property name="step" ref="step1" /&gt;
     &lt;property name="gridSize" value="10" /&gt;
-&lt;/bean&gt;</programlisting></para>
+&lt;/bean&gt;</programlisting>
 
       <para>The <literal>gridSize</literal> determines the number of separate
       step executions to create, so it can be matched to the size of the
@@ -309,7 +309,7 @@
       execution contexts as input parameters for new step executions only (no
       need to worry about restarts). It has a single method:</para>
 
-      <programlisting>public interface Partitioner {
+      <programlisting language="java">public interface Partitioner {
     Map&lt;String, ExecutionContext&gt; partition(int gridSize);
 }</programlisting>
 
@@ -400,7 +400,7 @@
       <para>Then the file name can be bound to a step using late binding to
       the execution context:</para>
 
-      <programlisting>&lt;bean id="itemReader" scope="step"
+      <programlisting language="xml">&lt;bean id="itemReader" scope="step"
       class="org.spr...MultiResourceItemReader"&gt;
     &lt;property name="resource" value="<emphasis role="bold">#{stepExecutionContext[fileName]}/*</emphasis>"/&gt;
 &lt;/bean&gt;</programlisting>
