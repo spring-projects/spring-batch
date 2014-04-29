@@ -86,6 +86,8 @@
 
 	<xi:include href="schema-appendix.xml" />
 
+	<xi:include href="transaction-appendix.xml" />
+
 	<xi:include href="glossary.xml" />
 
 </book>
