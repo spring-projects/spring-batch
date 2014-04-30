@@ -64,7 +64,6 @@
 			<id>all</id>
 			<modules>
 				<module>spring-batch-samples</module>
-				<module>archetypes</module>
 				<module>spring-batch-infrastructure-tests</module>
 				<module>spring-batch-core-tests</module>
 			</modules>
@@ -73,7 +72,6 @@
 			<id>release</id>
 			<modules>
 				<module>spring-batch-samples</module>
-				<module>archetypes</module>
 			</modules>
 			<build>
 				<plugins>
@@ -354,7 +352,6 @@
 			<id>samples</id>
 			<modules>
 				<module>spring-batch-samples</module>
-				<module>archetypes</module>
 			</modules>
 		</profile>
 		<profile>
