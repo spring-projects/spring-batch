@@ -63,63 +63,63 @@ The quickest way to get started with Spring Batch is to use Spring Boot.
 
 1. Once your build process is setup (using either Maven or Gradle), add the batch starter dependency
 
-````xml
-<!-- Maven -->
-<dependency>
-    <groupId>org.springframework.boot</groupId>
-    <artifactId>spring-boot-starter-batch</artifactId>
-</dependency>
-````
+    ````xml
+    <!-- Maven -->
+    <dependency>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-starter-batch</artifactId>
+    </dependency>
+    ````
 
-````groovy
+    ````groovy
     // Gradle
     compile("org.springframework.boot:spring-boot-starter-batch")
-````
+    ````
 2. Create a configuration class to configure your job
 
-````java
-@Configuration
-@EnableBatchProcessing
-public class BatchConfiguration {
+    ````java
+    @Configuration
+    @EnableBatchProcessing
+    public class BatchConfiguration {
 
-  @Autowired
-  private JobBuilderFactory jobBuilderFactory;
+      @Autowired
+      private JobBuilderFactory jobBuilderFactory;
 
-  @Autowired
-  private StepBuilderFactory stepBuilderFactory;
+      @Autowired
+      private StepBuilderFactory stepBuilderFactory;
 
-  @Bean
-  public Step step1() {
-    return stepBuilderFactory.get("step1")
-        .tasklet(new Tasklet() {
-          public RepeatStatus execute(StepContribution contribution, ChunkContext chunkContext)
-            return null;
-          }
-        )
-        .build();
-  }
+      @Bean
+      public Step step1() {
+        return stepBuilderFactory.get("step1")
+            .tasklet(new Tasklet() {
+              public RepeatStatus execute(StepContribution contribution, ChunkContext chunkContext)
+                return null;
+              }
+            )
+            .build();
+      }
 
-  @Bean
-  public Job job(Step step1) throws Exception {
-    return jobBuilderFactory.get("job1")
-        .incrementer(new RunIdIncrementer())
-        .start(step1)
-        .end()
-        .build();
-  }
-}
-````
+      @Bean
+      public Job job(Step step1) throws Exception {
+        return jobBuilderFactory.get("job1")
+            .incrementer(new RunIdIncrementer())
+            .start(step1)
+            .end()
+            .build();
+      }
+    }
+    ````
 3. Create a main class to run your batch job from
 
-````java
-public class Main {
-  public static void main(String [] args) {
-    System.exit(SpringApplication.exit(SpringApplication.run(
-        BatchConfiguration.class, args)));
-  }
-}
-````
-4. From there, you can build your project and run it via java -jar &lt;JAR_NAME&gt; where &lt;JAR_NAME&gt; is the name of the jar your build system generates.
+    ````java
+    public class Main {
+      public static void main(String [] args) {
+        System.exit(SpringApplication.exit(SpringApplication.run(
+            BatchConfiguration.class, args)));
+      }
+    }
+    ````
+4. You can now build your project and run it via java -jar &lt;JAR_NAME&gt; where &lt;JAR_NAME&gt; is the name of the jar your build system generates.
 
 You can read more about using Spring Boot with Spring Batch in the Getting Started Guide: [Creating a Batch Service]({{site.main_site_url}}/guides/gs/batch-processing).
 
