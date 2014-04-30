@@ -59,19 +59,64 @@ Spring Batch provides reusable functions that are essential in processing large 
 
 {% include download_widget.md %}
 
-The quickest way to get started with Spring Batch is to download the zip file and use one of the shell projects we provide.
+The quickest way to get started with Spring Batch is to use Spring Boot.
 
-## XML based configuration
-1. Download the zip release from our repository: [Download](http://static.springsource.org/downloads/nightly/release-download.php?project=BATCH)
-2. After unzipping the download, copy the /samples/spring-batch-simple-cli folder to your workspace.
-3. From the root of you new project's directory, you can build the project via maven `mvn clean install`
-4. From the project's target directory, you'll be able to run your new job (pipes a file into an in memory database table) via the command `java -jar spring-batch-simple-cli-2.2.6.RELEASE.jar launch-context.xml personJob`
+1. Once your build process is setup (using either Maven or Gradle), add the batch starter dependency
+````xml
+<!-- Maven -->
+<dependency>
+    <groupId>org.springframework.boot</groupId>
+    <artifactId>spring-boot-starter-batch</artifactId>
+</dependency>
+````
+````groovy
+    compile("org.springframework.boot:spring-boot-starter-batch")
+````
+2. Create a configuration class to configure your job
+````java
+@Configuration
+@EnableBatchProcessing
+public class BatchConfiguration {
 
-## Java based configuration (3.0+)
-1. Download the zip release from our repository: [Download](http://static.springsource.org/downloads/nightly/milestone-download.php?project=BATCH)
-2. After unzipping the download, copy the /samples/spring-batch-simple-cli-javaconfig folder to your workspace.
-3. From the root of you new project's directory, you can build the project via maven `mvn clean install`
-4. From the project's target directory, you'll be able to run your new job (pipes a file into an in memory database table) via the command `java -jar spring-batch-simple-cli-3.0.0.M3.jar example.LaunchContext personJob`
+  @Autowired
+  private JobBuilderFactory jobBuilderFactory;
+
+  @Autowired
+  private StepBuilderFactory stepBuilderFactory;
+
+  @Bean
+  public Step step1() {
+    return stepBuilderFactory.get("step1")
+        .tasklet(new Tasklet() {
+          public RepeatStatus execute(StepContribution contribution, ChunkContext chunkContext)
+            return null;
+          }
+        )
+        .build();
+  }
+
+  @Bean
+  public Job job(Step step1) throws Exception {
+    return jobBuilderFactory.get("job1")
+        .incrementer(new RunIdIncrementer())
+        .start(step1)
+        .end()
+        .build();
+  }
+}
+````
+3. Create a main class to run your batch job from
+````java
+public class Main {
+  public static void main(String [] args) {
+    System.exit(SpringApplication.exit(SpringApplication.run(
+        BatchConfiguration.class, args)));
+  }
+}
+````
+4. From there, you can build your project and run it via java -jar <JAR_NAME> where <JAR_NAME> is the name of the jar your build system generates.
+
+You can read more about using Spring Boot with Spring Batch in the Getting Started Guide: [Creating a Batch Service]({{site.main_site_url}}/guides/gs/batch-processing).
 
 {% endcapture %}
 
