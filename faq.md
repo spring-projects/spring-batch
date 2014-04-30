@@ -1,3 +1,6 @@
+---
+layout: documentation_page
+---
 # Frequently Asked Questions
 
 1. [What's the current release and what are the plans for future releases?](#release)
