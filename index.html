@@ -62,6 +62,7 @@ Spring Batch provides reusable functions that are essential in processing large 
 The quickest way to get started with Spring Batch is to use Spring Boot.
 
 1. Once your build process is setup (using either Maven or Gradle), add the batch starter dependency
+
 ````xml
 <!-- Maven -->
 <dependency>
@@ -69,10 +70,13 @@ The quickest way to get started with Spring Batch is to use Spring Boot.
     <artifactId>spring-boot-starter-batch</artifactId>
 </dependency>
 ````
+
 ````groovy
     compile("org.springframework.boot:spring-boot-starter-batch")
 ````
+
 2. Create a configuration class to configure your job
+
 ````java
 @Configuration
 @EnableBatchProcessing
@@ -105,7 +109,9 @@ public class BatchConfiguration {
   }
 }
 ````
+
 3. Create a main class to run your batch job from
+
 ````java
 public class Main {
   public static void main(String [] args) {
@@ -114,7 +120,8 @@ public class Main {
   }
 }
 ````
-4. From there, you can build your project and run it via java -jar <JAR_NAME> where <JAR_NAME> is the name of the jar your build system generates.
+
+4. From there, you can build your project and run it via java -jar &lt;JAR_NAME&gt; where &lt;JAR_NAME&gt; is the name of the jar your build system generates.
 
 You can read more about using Spring Boot with Spring Batch in the Getting Started Guide: [Creating a Batch Service]({{site.main_site_url}}/guides/gs/batch-processing).
 
