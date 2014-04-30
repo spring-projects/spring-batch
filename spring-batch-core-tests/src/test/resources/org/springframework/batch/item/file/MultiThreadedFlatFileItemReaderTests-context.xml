@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:batch="http://www.springframework.org/schema/batch"
+	xmlns:util="http://www.springframework.org/schema/util"
+	xmlns:p="http://www.springframework.org/schema/p"
+	xmlns:task="http://www.springframework.org/schema/task"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xsi:schemaLocation="http://www.springframework.org/schema/task http://www.springframework.org/schema/task/spring-task-3.2.xsd
+		http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-3.2.xsd
+		http://www.springframework.org/schema/batch http://www.springframework.org/schema/batch/spring-batch.xsd
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-3.2.xsd">
+
+	<context:property-placeholder properties-ref="props"/>		
+	<util:properties id="props">
+		<prop key="processor.delay">0</prop>
+		<prop key="grid.size">8</prop>
+	</util:properties>
+
+    <batch:job id="job1">
+        <batch:step id="step">
+            <batch:partition step="step1" partitioner="partitioner">
+                <batch:handler grid-size="${grid.size}" task-executor="taskExecutor"/>
+            </batch:partition>
+        </batch:step>
+    </batch:job>
+
+    <batch:step id="step1">
+        <batch:tasklet start-limit="100">
+            <batch:chunk reader="lottoReader" writer="lottoWriter" processor="delayingProcessor"
+                         commit-interval="10" skip-limit="20">
+                <batch:skippable-exception-classes>
+                    <batch:include class="org.springframework.batch.item.file.FlatFileParseException"/>
+                </batch:skippable-exception-classes>
+            </batch:chunk>
+        </batch:tasklet>
+    </batch:step>
+
+    <bean id="delayingProcessor" 
+    	class="org.springframework.batch.item.file.MultiThreadedFlatFileItemReaderTests$DelayingProcessor"/>
+
+    <bean id="partitioner" class="org.springframework.batch.core.partition.support.FlatFilePartitioner" scope="step"
+          p:resource="#{jobParameters['input.file']}" />
+
+    <task:executor id="taskExecutor" pool-size="${grid.size}"/>
+
+    <bean id="drawing" scope="prototype"
+    	class="org.springframework.batch.item.file.MultiThreadedFlatFileItemReaderTests$Draw" />
+    
+    <bean id="lottoReader" class="org.springframework.batch.item.file.MultiThreadedFlatFileItemReader" scope="step">
+        <property name="lineMapper">
+            <bean class="org.springframework.batch.item.file.mapping.DefaultLineMapper">
+                <property name="lineTokenizer">
+                    <bean class="org.springframework.batch.item.file.transform.DelimitedLineTokenizer">
+                        <property name="names" value="id, numbers"/>
+                        <property name="strict" value="false"/>
+                    </bean>
+                </property>
+                <property name="fieldSetMapper">
+                    <bean class="org.springframework.batch.item.file.mapping.BeanWrapperFieldSetMapper">
+                        <property name="prototypeBeanName" value="drawing"/>
+                    </bean>
+                </property>
+            </bean>
+        </property>
+        <property name="resource" value="#{stepExecutionContext['resource']}"/>
+		<property name="maxItemCount" value="#{stepExecutionContext['itemsCount']}" />
+        <property name="startAt" value="#{stepExecutionContext['startAt']}"/>
+    </bean>
+
+    <bean id="lottoWriter" class="org.springframework.batch.item.file.MultiThreadedFlatFileItemReaderTests$DummyWriter" />
+
+	<bean id="jobRepository"
+		class="org.springframework.batch.core.repository.support.MapJobRepositoryFactoryBean" />
+	
+	<bean id="transactionManager" class="org.springframework.batch.support.transaction.ResourcelessTransactionManager" />		
+
+	<bean class="org.springframework.batch.test.JobLauncherTestUtils" />		
+	
+	<bean id="jobLauncher" class="org.springframework.batch.core.launch.support.SimpleJobLauncher">
+		<property name="jobRepository" ref="jobRepository" />
+	</bean>	
+</beans>

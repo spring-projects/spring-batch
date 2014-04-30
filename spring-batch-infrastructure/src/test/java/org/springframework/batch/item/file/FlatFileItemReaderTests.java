@@ -51,21 +51,29 @@ public class FlatFileItemReaderTests {
 	private FlatFileItemReader<Item> itemReader = new FlatFileItemReader<Item>();
 
 	private ExecutionContext executionContext = new ExecutionContext();
+	
+	protected FlatFileItemReader<String> getReader() {
+		return reader;
+	}
+
+	protected FlatFileItemReader<Item> getItemReader() {
+		return itemReader;
+	}
 
 	@Before
 	public void setUp() {
 
-		reader.setResource(getInputResource("testLine1\ntestLine2\ntestLine3\ntestLine4\ntestLine5\ntestLine6"));
-		reader.setLineMapper(new PassThroughLineMapper());
+		getReader().setResource(getInputResource("testLine1\ntestLine2\ntestLine3\ntestLine4\ntestLine5\ntestLine6"));
+		getReader().setLineMapper(new PassThroughLineMapper());
 
-		itemReader.setResource(getInputResource("testLine1\ntestLine2\ntestLine3\ntestLine4\ntestLine5\ntestLine6"));
-		itemReader.setLineMapper(new ItemLineMapper());
+		getItemReader().setResource(getInputResource("testLine1\ntestLine2\ntestLine3\ntestLine4\ntestLine5\ntestLine6"));
+		getItemReader().setLineMapper(new ItemLineMapper());
 	}
 
 	@Test
 	public void testRestartWithCustomRecordSeparatorPolicy() throws Exception {
 
-		reader.setRecordSeparatorPolicy(new RecordSeparatorPolicy() {
+		getReader().setRecordSeparatorPolicy(new RecordSeparatorPolicy() {
 			// 1 record = 2 lines
 			boolean pair = true;
 
@@ -86,24 +94,24 @@ public class FlatFileItemReaderTests {
 			}
 		});
 
-		reader.open(executionContext);
+		getReader().open(executionContext);
 
-		assertEquals("testLine1testLine2", reader.read());
-		assertEquals("testLine3testLine4", reader.read());
+		assertEquals("testLine1testLine2", getReader().read());
+		assertEquals("testLine3testLine4", getReader().read());
 
-		reader.update(executionContext);
+		getReader().update(executionContext);
 
-		reader.close();
+		getReader().close();
 
-		reader.open(executionContext);
+		getReader().open(executionContext);
 
-		assertEquals("testLine5testLine6", reader.read());
+		assertEquals("testLine5testLine6", getReader().read());
 	}
 
 	@Test
 	public void testCustomRecordSeparatorPolicyEndOfFile() throws Exception {
 
-		reader.setRecordSeparatorPolicy(new RecordSeparatorPolicy() {
+		getReader().setRecordSeparatorPolicy(new RecordSeparatorPolicy() {
 			// 1 record = 2 lines
 			boolean pair = true;
 
@@ -124,13 +132,13 @@ public class FlatFileItemReaderTests {
 			}
 		});
 
-		reader.setResource(getInputResource("testLine1\ntestLine2\ntestLine3\n"));
-		reader.open(executionContext);
+		getReader().setResource(getInputResource("testLine1\ntestLine2\ntestLine3\n"));
+		getReader().open(executionContext);
 
-		assertEquals("testLine1testLine2", reader.read());
+		assertEquals("testLine1testLine2", getReader().read());
 
 		try {
-			reader.read();
+			getReader().read();
 			fail("Expected Exception");
 		}
 		catch (FlatFileParseException e) {
@@ -144,7 +152,7 @@ public class FlatFileItemReaderTests {
 	@Test
 	public void testCustomRecordSeparatorBlankLine() throws Exception {
 
-		reader.setRecordSeparatorPolicy(new RecordSeparatorPolicy() {
+		getReader().setRecordSeparatorPolicy(new RecordSeparatorPolicy() {
 
 			@Override
 			public boolean isEndOfRecord(String line) {
@@ -162,20 +170,20 @@ public class FlatFileItemReaderTests {
 			}
 		});
 
-		reader.setResource(getInputResource("testLine1\ntestLine2\ntestLine3\n\n"));
-		reader.open(executionContext);
+		getReader().setResource(getInputResource("testLine1\ntestLine2\ntestLine3\n\n"));
+		getReader().open(executionContext);
 
-		assertEquals("testLine1", reader.read());
-		assertEquals("testLine2", reader.read());
-		assertEquals("testLine3", reader.read());
-		assertEquals(null, reader.read());
+		assertEquals("testLine1", getReader().read());
+		assertEquals("testLine2", getReader().read());
+		assertEquals("testLine3", getReader().read());
+		assertEquals(null, getReader().read());
 
 	}
 
 	@Test
 	public void testCustomRecordSeparatorMultilineBlankLineAfterEnd() throws Exception {
 
-		reader.setRecordSeparatorPolicy(new RecordSeparatorPolicy() {
+		getReader().setRecordSeparatorPolicy(new RecordSeparatorPolicy() {
 
 			// 1 record = 2 lines
 			boolean pair = true;
@@ -199,121 +207,121 @@ public class FlatFileItemReaderTests {
 			}
 		});
 
-		reader.setResource(getInputResource("testLine1\ntestLine2\n\n"));
-		reader.open(executionContext);
+		getReader().setResource(getInputResource("testLine1\ntestLine2\n\n"));
+		getReader().open(executionContext);
 
-		assertEquals("testLine1testLine2", reader.read());
-		assertEquals(null, reader.read());
+		assertEquals("testLine1testLine2", getReader().read());
+		assertEquals(null, getReader().read());
 
 	}
 
 	@Test
 	public void testRestartWithSkippedLines() throws Exception {
 
-		reader.setLinesToSkip(2);
-		reader.open(executionContext);
+		getReader().setLinesToSkip(2);
+		getReader().open(executionContext);
 
 		// read some records
-		reader.read();
-		reader.read();
+		getReader().read();
+		getReader().read();
 		// get restart data
-		reader.update(executionContext);
+		getReader().update(executionContext);
 		// read next two records
-		reader.read();
-		reader.read();
+		getReader().read();
+		getReader().read();
 
-		assertEquals(2, executionContext.getInt(ClassUtils.getShortName(FlatFileItemReader.class) + ".read.count"));
+		assertEquals(2, executionContext.getInt(ClassUtils.getShortName(getReader().getClass()) + ".read.count"));
 		// close input
-		reader.close();
+		getReader().close();
 
-		reader.setResource(getInputResource("header\nignoreme\ntestLine1\ntestLine2\ntestLine3\ntestLine4\ntestLine5\ntestLine6"));
+		getReader().setResource(getInputResource("header\nignoreme\ntestLine1\ntestLine2\ntestLine3\ntestLine4\ntestLine5\ntestLine6"));
 
 		// init for restart
-		reader.open(executionContext);
+		getReader().open(executionContext);
 
 		// read remaining records
-		assertEquals("testLine3", reader.read());
-		assertEquals("testLine4", reader.read());
+		assertEquals("testLine3", getReader().read());
+		assertEquals("testLine4", getReader().read());
 
-		reader.update(executionContext);
-		assertEquals(4, executionContext.getInt(ClassUtils.getShortName(FlatFileItemReader.class) + ".read.count"));
+		getReader().update(executionContext);
+		assertEquals(4, executionContext.getInt(ClassUtils.getShortName(getReader().getClass()) + ".read.count"));
 	}
 
 	@Test
 	public void testCurrentItemCount() throws Exception {
 
-		reader.setCurrentItemCount(2);
-		reader.open(executionContext);
+		getReader().setCurrentItemCount(2);
+		getReader().open(executionContext);
 
 		// read some records
-		reader.read();
-		reader.read();
+		getReader().read();
+		getReader().read();
 		// get restart data
-		reader.update(executionContext);
+		getReader().update(executionContext);
 
-		assertEquals(4, executionContext.getInt(ClassUtils.getShortName(FlatFileItemReader.class) + ".read.count"));
+		assertEquals(4, executionContext.getInt(ClassUtils.getShortName(getReader().getClass()) + ".read.count"));
 		// close input
-		reader.close();
+		getReader().close();
 
 	}
 
 	@Test
 	public void testMaxItemCount() throws Exception {
 
-		reader.setMaxItemCount(2);
-		reader.open(executionContext);
+		getReader().setMaxItemCount(2);
+		getReader().open(executionContext);
 
 		// read some records
-		reader.read();
-		reader.read();
+		getReader().read();
+		getReader().read();
 		// get restart data
-		reader.update(executionContext);
-		assertNull(reader.read());
+		getReader().update(executionContext);
+		assertNull(getReader().read());
 
-		assertEquals(2, executionContext.getInt(ClassUtils.getShortName(FlatFileItemReader.class) + ".read.count"));
+		assertEquals(2, executionContext.getInt(ClassUtils.getShortName(getReader().getClass()) + ".read.count"));
 		// close input
-		reader.close();
+		getReader().close();
 
 	}
 
 	@Test
 	public void testMaxItemCountFromContext() throws Exception {
 
-		reader.setMaxItemCount(2);
-		executionContext.putInt(reader.getClass().getSimpleName() + ".read.count.max", Integer.MAX_VALUE);
-		reader.open(executionContext);
+		getReader().setMaxItemCount(2);
+		executionContext.putInt(getReader().getClass().getSimpleName() + ".read.count.max", Integer.MAX_VALUE);
+		getReader().open(executionContext);
 		// read some records
-		reader.read();
-		reader.read();
-		assertNotNull(reader.read());
+		getReader().read();
+		getReader().read();
+		assertNotNull(getReader().read());
 		// close input
-		reader.close();
+		getReader().close();
 
 	}
 
 	@Test
 	public void testCurrentItemCountFromContext() throws Exception {
 
-		reader.setCurrentItemCount(2);
-		executionContext.putInt(reader.getClass().getSimpleName() + ".read.count", 3);
-		reader.open(executionContext);
+		getReader().setCurrentItemCount(2);
+		executionContext.putInt(getReader().getClass().getSimpleName() + ".read.count", 3);
+		getReader().open(executionContext);
 		// read some records
-		assertEquals("testLine4", reader.read());
+		assertEquals("testLine4", getReader().read());
 		// close input
-		reader.close();
+		getReader().close();
 
 	}
 
 	@Test
 	public void testMaxAndCurrentItemCount() throws Exception {
 
-		reader.setMaxItemCount(2);
-		reader.setCurrentItemCount(2);
-		reader.open(executionContext);
+		getReader().setMaxItemCount(2);
+		getReader().setCurrentItemCount(2);
+		getReader().open(executionContext);
 		// read some records
-		assertNull(reader.read());
+		assertNull(getReader().read());
 		// close input
-		reader.close();
+		getReader().close();
 
 	}
 
@@ -322,22 +330,22 @@ public class FlatFileItemReaderTests {
 
 		Resource resource = new NonExistentResource();
 
-		reader.setResource(resource);
+		getReader().setResource(resource);
 
 		// afterPropertiesSet should only throw an exception if the Resource is
 		// null
-		reader.afterPropertiesSet();
+		getReader().afterPropertiesSet();
 
-		reader.setStrict(false);
-		reader.open(executionContext);
-		assertNull(reader.read());
-		reader.close();
+		getReader().setStrict(false);
+		getReader().open(executionContext);
+		assertNull(getReader().read());
+		getReader().close();
 	}
 
 	@Test
 	public void testOpenBadIOInput() throws Exception {
 
-		reader.setResource(new AbstractResource() {
+		getReader().setResource(new AbstractResource() {
 			@Override
 			public String getDescription() {
 				return null;
@@ -355,7 +363,7 @@ public class FlatFileItemReaderTests {
 		});
 
 		try {
-			reader.open(executionContext);
+			getReader().open(executionContext);
 			fail();
 		}
 		catch (ItemStreamException ex) {
@@ -363,8 +371,8 @@ public class FlatFileItemReaderTests {
 		}
 
 		// read() should then return a null
-		assertNull(reader.read());
-		reader.close();
+		assertNull(getReader().read());
+		getReader().close();
 
 	}
 
@@ -374,12 +382,12 @@ public class FlatFileItemReaderTests {
 		FileSystemResource resource = new FileSystemResource("target/data");
 		resource.getFile().mkdirs();
 		assertTrue(resource.getFile().isDirectory());
-		reader.setResource(resource);
-		reader.afterPropertiesSet();
+		getReader().setResource(resource);
+		getReader().afterPropertiesSet();
 
-		reader.setStrict(false);
-		reader.open(executionContext);
-		assertNull(reader.read());
+		getReader().setStrict(false);
+		getReader().open(executionContext);
+		assertNull(getReader().read());
 
 	}
 
@@ -388,16 +396,16 @@ public class FlatFileItemReaderTests {
 
 		Resource resource = new NonExistentResource();
 
-		reader.setResource(resource);
+		getReader().setResource(resource);
 
 		// afterPropertiesSet should only throw an exception if the Resource is
 		// null
-		reader.afterPropertiesSet();
+		getReader().afterPropertiesSet();
 
 		// replace the resource to simulate runtime resource creation
-		reader.setResource(getInputResource(TEST_STRING));
-		reader.open(executionContext);
-		assertEquals(TEST_STRING, reader.read());
+		getReader().setResource(getInputResource(TEST_STRING));
+		getReader().open(executionContext);
+		assertEquals(TEST_STRING, getReader().read());
 	}
 
 	/**
@@ -408,12 +416,12 @@ public class FlatFileItemReaderTests {
 
 		Resource resource = new NonExistentResource();
 
-		reader.setResource(resource);
-		reader.setStrict(true);
+		getReader().setResource(resource);
+		getReader().setStrict(true);
 
-		reader.afterPropertiesSet();
+		getReader().afterPropertiesSet();
 
-		reader.open(executionContext);
+		getReader().open(executionContext);
 	}
 
 	/**
@@ -431,14 +439,14 @@ public class FlatFileItemReaderTests {
 				return line;
 			}
 		};
-		reader.setLineMapper(exceptionLineMapper);
-		reader.afterPropertiesSet();
+		getReader().setLineMapper(exceptionLineMapper);
+		getReader().afterPropertiesSet();
 
-		reader.open(executionContext);
-		assertNotNull(reader.read());
+		getReader().open(executionContext);
+		assertNotNull(getReader().read());
 
 		try {
-			reader.read();
+			getReader().read();
 			fail();
 		}
 		catch (FlatFileParseException expected) {
@@ -451,25 +459,25 @@ public class FlatFileItemReaderTests {
 
 	@Test
 	public void testItemCountAware() throws Exception {
-		itemReader.open(executionContext);
-		Item item1 = itemReader.read();
+		getItemReader().open(executionContext);
+		Item item1 = getItemReader().read();
 		assertEquals("testLine1", item1.getValue());
 		assertEquals(1, item1.getItemCount());
-		Item item2 = itemReader.read();
+		Item item2 = getItemReader().read();
 		assertEquals("testLine2", item2.getValue());
 		assertEquals(2, item2.getItemCount());
-		itemReader.update(executionContext);
-		itemReader.close();
+		getItemReader().update(executionContext);
+		getItemReader().close();
 
-		itemReader.open(executionContext);
-		Item item3 = itemReader.read();
+		getItemReader().open(executionContext);
+		Item item3 = getItemReader().read();
 		assertEquals("testLine3", item3.getValue());
 		assertEquals(3, item3.getItemCount());
 	}
 
 	@Test
 	public void testItemCountAwareMultiLine() throws Exception {
-		itemReader.setRecordSeparatorPolicy(new RecordSeparatorPolicy() {
+		getItemReader().setRecordSeparatorPolicy(new RecordSeparatorPolicy() {
 
 			// 1 record = 2 lines
 			boolean pair = true;
@@ -493,18 +501,18 @@ public class FlatFileItemReaderTests {
 			}
 		});
 
-		itemReader.open(executionContext);
-		Item item1 = itemReader.read();
+		getItemReader().open(executionContext);
+		Item item1 = getItemReader().read();
 		assertEquals("testLine1testLine2", item1.getValue());
 		assertEquals(1, item1.getItemCount());
-		Item item2 = itemReader.read();
+		Item item2 = getItemReader().read();
 		assertEquals("testLine3testLine4", item2.getValue());
 		assertEquals(2, item2.getItemCount());
-		itemReader.update(executionContext);
-		itemReader.close();
+		getItemReader().update(executionContext);
+		getItemReader().close();
 
-		itemReader.open(executionContext);
-		Item item3 = itemReader.read();
+		getItemReader().open(executionContext);
+		Item item3 = getItemReader().read();
 		assertEquals("testLine5testLine6", item3.getValue());
 		assertEquals(3, item3.getItemCount());
 	}
@@ -534,7 +542,7 @@ public class FlatFileItemReaderTests {
 		}
 	}
 
-	private static class Item implements ItemCountAware {
+	protected static class Item implements ItemCountAware {
 
 		private String value;
 
