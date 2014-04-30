@@ -23,7 +23,7 @@
     strategy. The <classname>RetryOperations</classname> interface looks like
     this:</para>
 
-    <para><programlisting>public interface RetryOperations {
+    <programlisting language="java">public interface RetryOperations {
 
     &lt;T&gt; T execute(RetryCallback&lt;T&gt; retryCallback) throws Exception;
 
@@ -36,14 +36,16 @@
     &lt;T&gt; T execute(RetryCallback&lt;T&gt; retryCallback, RecoveryCallback&lt;T&gt; recoveryCallback,
         RetryState retryState) throws Exception;
 
-}</programlisting>The basic callback is a simple interface that allows you to
+}</programlisting>
+    <para>The basic callback is a simple interface that allows you to
     insert some business logic to be retried:</para>
 
-    <para><programlisting>public interface RetryCallback&lt;T&gt; {
+    <programlisting language="java">public interface RetryCallback&lt;T&gt; {
 
     T doWithRetry(RetryContext context) throws Throwable;
 
-}</programlisting>The callback is executed and if it fails (by throwing an
+}</programlisting>
+    <para>The callback is executed and if it fails (by throwing an
     <classname>Exception</classname>), it will be retried until either it is
     successful, or the implementation decides to abort. There are a number of
     overloaded <methodname>execute</methodname> methods in the
@@ -56,7 +58,7 @@
     <classname>RetryOperations</classname> is
     <classname>RetryTemplate</classname>. It could be used like this</para>
 
-    <programlisting>RetryTemplate template = new RetryTemplate();
+    <programlisting  language="java">RetryTemplate template = new RetryTemplate();
 
 TimeoutRetryPolicy policy = new TimeoutRetryPolicy();
 policy.setTimeout(30000L);
@@ -99,7 +101,7 @@ Foo result = template.execute(new RetryCallback&lt;Foo&gt;() {
       feature clients just pass in the callbacks together to the same method,
       for example:</para>
 
-      <para><programlisting>Foo foo = template.execute(new RetryCallback&lt;Foo&gt;() {
+      <programlisting language="java">Foo foo = template.execute(new RetryCallback&lt;Foo&gt;() {
     public Foo doWithRetry(RetryContext context) {
         // business logic here
     },
@@ -107,7 +109,8 @@ Foo result = template.execute(new RetryCallback&lt;Foo&gt;() {
     Foo recover(RetryContext context) throws Exception {
           // recover logic here
     }
-});</programlisting>If the business logic does not succeed before the template
+});</programlisting>
+      <para>If the business logic does not succeed before the template
       decides to abort, then the client is given the chance to do some
       alternate processing through the recovery callback.</para>
     </section>
@@ -235,7 +238,7 @@ Foo result = template.execute(new RetryCallback&lt;Foo&gt;() {
     this list overrides the retryable list so that it can be used to give
     finer control over the retry behavior:</para>
 
-    <programlisting>SimpleRetryPolicy policy = new SimpleRetryPolicy();
+    <programlisting language="java">SimpleRetryPolicy policy = new SimpleRetryPolicy();
 // Set the max retry attempts
 policy.setMaxAttempts(5);
 // Retry on all exceptions (this is the default)
@@ -277,14 +280,15 @@ template.execute(new RetryCallback&lt;Foo&gt;() {
     <classname>RetryTemplate</classname> can pause execution according to the
     <classname>BackoffPolicy</classname> in place.</para>
 
-    <para><programlisting>public interface BackoffPolicy {
+    <programlisting language="java">public interface BackoffPolicy {
 
     BackOffContext start(RetryContext context);
 
     void backOff(BackOffContext backOffContext)
         throws BackOffInterruptedException;
 
-}</programlisting>A <classname>BackoffPolicy</classname> is free to implement
+}</programlisting>
+    <para>A <classname>BackoffPolicy</classname> is free to implement
     the backOff in any way it chooses. The policies provided by Spring Batch
     out of the box all use <code>Object.wait()</code>. A common use case is to
     backoff with an exponentially increasing wait period, to avoid two retries
@@ -307,14 +311,15 @@ template.execute(new RetryCallback&lt;Foo&gt;() {
 
     <para>The interface looks like this:</para>
 
-    <para><programlisting>public interface RetryListener {
+    <programlisting language="java">public interface RetryListener {
 
     void open(RetryContext context, RetryCallback&lt;T&gt; callback);
 
     void onError(RetryContext context, RetryCallback&lt;T&gt; callback, Throwable e);
 
     void close(RetryContext context, RetryCallback&lt;T&gt; callback, Throwable e);
-}</programlisting>The <methodname>open</methodname> and
+}</programlisting>
+    <para>The <methodname>open</methodname> and
     <methodname>close</methodname> callbacks come before and after the entire
     retry in the simplest case and <methodname>onError</methodname> applies to
     the individual <classname>RetryCallback</classname> calls. The
@@ -345,7 +350,7 @@ template.execute(new RetryCallback&lt;Foo&gt;() {
     <methodname>remoteCall</methodname> (for more detail on how to configure
     AOP interceptors see the Spring User Guide):</para>
 
-    <programlisting>&lt;aop:config&gt;
+    <programlisting language="xml">&lt;aop:config&gt;
     &lt;aop:pointcut id="transactional"
         expression="execution(* com..*Service.remoteCall(..))" /&gt;
     &lt;aop:advisor pointcut-ref="transactional"

@@ -14,18 +14,20 @@
     The <classname>RepeatOperations</classname> interface looks like
     this:</para>
 
-    <para><programlisting>public interface RepeatOperations {
+    <programlisting language="java">public interface RepeatOperations {
 
     RepeatStatus iterate(RepeatCallback callback) throws RepeatException;
 
-}</programlisting>The callback is a simple interface that allows you to insert
+}</programlisting>
+    <para>The callback is a simple interface that allows you to insert
     some business logic to be repeated:</para>
 
-    <para><programlisting>public interface RepeatCallback {
+    <programlisting language="java">public interface RepeatCallback {
 
     RepeatStatus doInIteration(RepeatContext context) throws Exception;
 
-}</programlisting>The callback is executed repeatedly until the implementation
+}</programlisting>
+    <para>The callback is executed repeatedly until the implementation
     decides that the iteration should end. The return value in these
     interfaces is an enumeration that can either be
     <code>RepeatStatus.CONTINUABLE</code> or
@@ -42,7 +44,7 @@
     <classname>RepeatOperations</classname> is
     <classname>RepeatTemplate</classname>. It could be used like this:</para>
 
-    <programlisting>RepeatTemplate template = new RepeatTemplate();
+    <programlisting language="java">RepeatTemplate template = new RepeatTemplate();
 
 template.setCompletionPolicy(new FixedChunkSizeCompletionPolicy(2));
 
@@ -162,12 +164,13 @@ template.iterate(new RepeatCallback() {
     <classname>ExceptionHandler</classname> which can decide whether or not to
     re-throw the exception.</para>
 
-    <para><programlisting>public interface ExceptionHandler {
+    <programlisting language="java">public interface ExceptionHandler {
 
     void handleException(RepeatContext context, Throwable throwable)
         throws RuntimeException;
 
-}</programlisting>A common use case is to count the number of exceptions of a
+}</programlisting>
+    <para>A common use case is to count the number of exceptions of a
     given type, and fail when a limit is reached. For this purpose Spring
     Batch provides the <classname>SimpleLimitExceptionHandler</classname> and
     slightly more flexible
@@ -200,17 +203,14 @@ template.iterate(new RepeatCallback() {
 
     <para>The interface looks like this:</para>
 
-    <para><programlisting>public interface RepeatListener {
+    <programlisting language="java">public interface RepeatListener {
     void before(RepeatContext context);
-
     void after(RepeatContext context, RepeatStatus result);
-
     void open(RepeatContext context);
-
     void onError(RepeatContext context, Throwable e);
-
     void close(RepeatContext context);
-}</programlisting>The <methodname>open</methodname> and
+}</programlisting>
+    <para>The <methodname>open</methodname> and
     <methodname>close</methodname> callbacks come before and after the entire
     iteration. <methodname>before</methodname>, <methodname>after</methodname>
     and <methodname>onError</methodname> apply to the individual
@@ -258,7 +258,7 @@ template.iterate(new RepeatCallback() {
     <methodname>processMessage</methodname> (for more detail on how to
     configure AOP interceptors see the Spring User Guide):</para>
 
-    <programlisting>&lt;aop:config&gt;
+    <programlisting language="xml">&lt;aop:config&gt;
     &lt;aop:pointcut id="transactional"
         expression="execution(* com..*Service.processMessage(..))" /&gt;
     &lt;aop:advisor pointcut-ref="transactional"

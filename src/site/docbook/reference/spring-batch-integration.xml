@@ -77,8 +77,7 @@
 				namespace declarations to your Spring XML Application Context
 				file:
 			</para>
-			<programlisting>
-&lt;beans xmlns=&quot;http://www.springframework.org/schema/beans&quot;
+			<programlisting language="xml">&lt;beans xmlns=&quot;http://www.springframework.org/schema/beans&quot;
   xmlns:xsi=&quot;http://www.w3.org/2001/XMLSchema-instance&quot;
   xmlns:batch-int=&quot;http://www.springframework.org/schema/batch-integration&quot;
   xsi:schemaLocation=&quot;
@@ -87,14 +86,12 @@
 
     ...
 
-&lt;/beans&gt;
-			</programlisting>
+&lt;/beans&gt;</programlisting>
 			<para>
 				A fully configured Spring XML Application Context file for Spring
 				Batch Integration may look like the following:
 			</para>
-			<programlisting>
-&lt;beans xmlns=&quot;http://www.springframework.org/schema/beans&quot;
+			<programlisting language="xml">&lt;beans xmlns=&quot;http://www.springframework.org/schema/beans&quot;
   xmlns:xsi=&quot;http://www.w3.org/2001/XMLSchema-instance&quot;
   xmlns:int=&quot;http://www.springframework.org/schema/integration&quot;
   xmlns:batch=&quot;http://www.springframework.org/schema/batch&quot;
@@ -111,8 +108,7 @@
 
     ...
 
-&lt;/beans&gt;
-			</programlisting>
+&lt;/beans&gt;</programlisting>
 			<para>
 				Appending version numbers to the referenced XSD file is also
 				allowed but, as a version-less declaration will always use the
@@ -194,15 +190,14 @@
 				</imageobject>
 				<imageobject role="fo">
 					<imagedata align="center"
-							   fileref="src/site/docbook/reference/images/launch-batch-job.png"
+							   fileref="images/launch-batch-job.png"
 							   format="PNG" scale="60"/>
 				</imageobject>
 			</mediaobject>
 
 			<sect3 id="transforming-a-file-into-a-joblaunchrequest">
 				<title>Transforming a file into a JobLaunchRequest</title>
-				<programlisting>
-package io.spring.sbi;
+				<programlisting language="java">package io.spring.sbi;
 
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.JobParametersBuilder;
@@ -234,8 +229,7 @@ public class FileMessageToJobRequest {
 
         return new JobLaunchRequest(job, jobParametersBuilder.toJobParameters());
     }
-}
-				</programlisting>
+}</programlisting>
 			</sect3>
 			<sect3 id="the-jobexecution-response">
 				<title>The JobExecution Response</title>
@@ -281,8 +275,7 @@ public class FileMessageToJobRequest {
 			</sect3>
 			<sect3 id="spring-batch-integration-configuration">
 				<title>Spring Batch Integration Configuration</title>
-				<programlisting>
-&lt;int:channel id=&quot;inboundFileChannel&quot;/&gt;
+				<programlisting language="xml">&lt;int:channel id=&quot;inboundFileChannel&quot;/&gt;
 &lt;int:channel id=&quot;outboundJobRequestChannel&quot;/&gt;
 &lt;int:channel id=&quot;jobLaunchReplyChannel&quot;/&gt;
 
@@ -304,8 +297,7 @@ public class FileMessageToJobRequest {
 &lt;batch-int:job-launching-gateway request-channel=&quot;outboundJobRequestChannel&quot;
     reply-channel=&quot;jobLaunchReplyChannel&quot;/&gt;
 
-&lt;int:logging-channel-adapter channel=&quot;jobLaunchReplyChannel&quot;/&gt;
-				</programlisting>
+&lt;int:logging-channel-adapter channel=&quot;jobLaunchReplyChannel&quot;/&gt;</programlisting>
 				<para>
 					Now that we are polling for files and launching jobs, we need to
 					configure for example our Spring Batch
@@ -315,13 +307,11 @@ public class FileMessageToJobRequest {
 			</sect3>
 			<sect3 id="example-itemreader-configuration">
 				<title>Example ItemReader Configuration</title>
-				<programlisting>
-&lt;bean id=&quot;itemReader&quot; class=&quot;org.springframework.batch.item.file.FlatFileItemReader&quot;
+				<programlisting language="xml">&lt;bean id=&quot;itemReader&quot; class=&quot;org.springframework.batch.item.file.FlatFileItemReader&quot;
     scope=&quot;step&quot;&gt;
   &lt;property name=&quot;resource&quot; value=&quot;file://#{jobParameters['input.file.name']}&quot;/&gt;
     ...
-&lt;/bean&gt;
-				</programlisting>
+&lt;/bean&gt;</programlisting>
 				<para>
 					The main points of interest here are injecting the value of
 					<classname role="strong">#{jobParameters['input.file.name']}</classname>
@@ -439,12 +429,10 @@ public class FileMessageToJobRequest {
 						a global default Poller or provide a Poller sub-element to the
 						<classname>Job Launching Gateway</classname>:
 					</para>
-					<programlisting>
-&lt;batch-int:job-launching-gateway request-channel=&quot;queueChannel&quot;
+					<programlisting language="xml">&lt;batch-int:job-launching-gateway request-channel=&quot;queueChannel&quot;
     reply-channel=&quot;replyChannel&quot; job-launcher=&quot;jobLauncher&quot;&gt;
   &lt;int:poller fixed-rate=&quot;1000&quot;/&gt;
-&lt;/batch-int:job-launching-gateway&gt;
-					</programlisting>
+&lt;/batch-int:job-launching-gateway&gt;</programlisting>
 				</sect4>
 			</sect3>
 		</sect2>
@@ -519,7 +507,7 @@ public class FileMessageToJobRequest {
 				</imageobject>
 				<imageobject role="fo">
 					<imagedata align="center"
-							   fileref="src/site/docbook/reference/images/handling-informational-messages.png"
+							   fileref="images/handling-informational-messages.png"
 							   format="PNG" scale="60"/>
 				</imageobject>
 			</mediaobject>
@@ -532,20 +520,17 @@ public class FileMessageToJobRequest {
 			<para>
 				First create the notifications integration beans:
 			</para>
-			<programlisting>
-&lt;int:channel id=&quot;stepExecutionsChannel&quot;/&gt;
+			<programlisting language="xml">&lt;int:channel id=&quot;stepExecutionsChannel&quot;/&gt;
 
 &lt;int:gateway id=&quot;notificationExecutionsListener&quot;
     service-interface=&quot;org.springframework.batch.core.StepExecutionListener&quot;
     default-request-channel=&quot;stepExecutionsChannel&quot;/&gt;
 
-&lt;int:logging-channel-adapter channel=&quot;stepExecutionsChannel&quot;/&gt;
-			</programlisting>
+&lt;int:logging-channel-adapter channel=&quot;stepExecutionsChannel&quot;/&gt;</programlisting>
 			<para>
 				Then modify your job to add a step level listener:
 			</para>
-			<programlisting>
-&lt;job id=&quot;importPayments&quot;&gt;
+			<programlisting language="xml">&lt;job id=&quot;importPayments&quot;&gt;
     &lt;step id=&quot;step1&quot;&gt;
         &lt;tasklet ../&gt;
             &lt;chunk ../&gt;
@@ -555,8 +540,7 @@ public class FileMessageToJobRequest {
         &lt;/tasklet&gt;
         ...
     &lt;/step&gt;
-&lt;/job&gt;
-			</programlisting>
+&lt;/job&gt;</programlisting>
 		</sect2>
 		<sect2 id="asynchronous-processors">
 			<title>Asynchronous Processors</title>
@@ -581,8 +565,7 @@ public class FileMessageToJobRequest {
 				and <classname>AsyncItemWriter</classname> are simple, first the
 				<classname>AsyncItemProcessor</classname>:
 			</para>
-			<programlisting>
-&lt;bean id=&quot;processor&quot;
+			<programlisting language="xml">&lt;bean id=&quot;processor&quot;
     class=&quot;org.springframework.batch.integration.async.AsyncItemProcessor&quot;&gt;
   &lt;property name=&quot;delegate&quot;&gt;
     &lt;bean class=&quot;your.ItemProcessor&quot;/&gt;
@@ -590,8 +573,7 @@ public class FileMessageToJobRequest {
   &lt;property name=&quot;taskExecutor&quot;&gt;
     &lt;bean class=&quot;org.springframework.core.task.SimpleAsyncTaskExecutor&quot;/&gt;
   &lt;/property&gt;
-&lt;/bean&gt;
-			</programlisting>
+&lt;/bean&gt;</programlisting>
 			<para>
 				The property &quot;<classname>delegate</classname>&quot; is actually
 				a reference to your <classname>ItemProcessor</classname> bean and
@@ -601,14 +583,12 @@ public class FileMessageToJobRequest {
 			<para>
 				Then we configure the <classname>AsyncItemWriter</classname>:
 			</para>
-			<programlisting>
-&lt;bean id=&quot;itemWriter&quot;
+			<programlisting language="xml">&lt;bean id=&quot;itemWriter&quot;
     class=&quot;org.springframework.batch.integration.async.AsyncItemWriter&quot;&gt;
   &lt;property name=&quot;delegate&quot;&gt;
     &lt;bean id=&quot;itemWriter&quot; class=&quot;your.ItemWriter&quot;/&gt;
   &lt;/property&gt;
-&lt;/bean&gt;
-			</programlisting>
+&lt;/bean&gt;</programlisting>
 			<para>
 				Again, the property &quot;<classname>delegate</classname>&quot; is
 				actually a reference to your <classname>ItemWriter</classname> bean.
@@ -647,7 +627,7 @@ public class FileMessageToJobRequest {
 					</imageobject>
 					<imageobject role="fo">
 						<imagedata align="center"
-								   fileref="src/site/docbook/reference/images/remote-chunking-sbi.png"
+								   fileref="images/remote-chunking-sbi.png"
 								   format="PNG" scale="60"/>
 					</imageobject>
 				</mediaobject>
@@ -674,16 +654,14 @@ public class FileMessageToJobRequest {
 					A simple job with a step to be remotely chunked would have a
 					configuration similar to the following:
 				</para>
-				<programlisting>
-&lt;job id=&quot;personJob&quot;&gt;
+				<programlisting language="xml">&lt;job id=&quot;personJob&quot;&gt;
   &lt;step id=&quot;step1&quot;&gt;
     &lt;tasklet&gt;
       &lt;chunk reader=&quot;itemReader&quot; writer=&quot;itemWriter&quot; commit-interval=&quot;200&quot;/&gt;
     &lt;/tasklet&gt;
     ...
   &lt;/step&gt;
-&lt;/job&gt;
-				</programlisting>
+&lt;/job&gt;</programlisting>
 				<para>
 					The ItemReader reference would point to the bean you would like
 					to use for reading data on the master. The ItemWriter reference
@@ -695,8 +673,7 @@ public class FileMessageToJobRequest {
 					advised to check any additional component properties such as
 					throttle limits and so on when implementing your use case.
 				</para>
-				<programlisting>
-&lt;bean id=&quot;connectionFactory&quot; class=&quot;org.apache.activemq.ActiveMQConnectionFactory&quot;&gt;
+				<programlisting language="xml">&lt;bean id=&quot;connectionFactory&quot; class=&quot;org.apache.activemq.ActiveMQConnectionFactory&quot;&gt;
   &lt;property name=&quot;brokerURL&quot; value=&quot;tcp://localhost:61616&quot;/&gt;
 &lt;/bean&gt;
 
@@ -727,8 +704,7 @@ public class FileMessageToJobRequest {
 
 &lt;int-jms:message-driven-channel-adapter id=&quot;jmsReplies&quot;
     destination-name=&quot;replies&quot;
-    channel=&quot;replies&quot;/&gt;
-				</programlisting>
+    channel=&quot;replies&quot;/&gt;</programlisting>
 				<para>
 					This configuration provides us with a number of beans. We
 					configure our messaging middleware using ActiveMQ and
@@ -741,8 +717,7 @@ public class FileMessageToJobRequest {
 				<para>
 					Now lets move on to the slave configuration:
 				</para>
-				<programlisting>
-&lt;bean id=&quot;connectionFactory&quot; class=&quot;org.apache.activemq.ActiveMQConnectionFactory&quot;&gt;
+				<programlisting language="xml">&lt;bean id=&quot;connectionFactory&quot; class=&quot;org.apache.activemq.ActiveMQConnectionFactory&quot;&gt;
   &lt;property name=&quot;brokerURL&quot; value=&quot;tcp://localhost:61616&quot;/&gt;
 &lt;/bean&gt;
 
@@ -776,8 +751,7 @@ public class FileMessageToJobRequest {
       &lt;/property&gt;
     &lt;/bean&gt;
   &lt;/property&gt;
-&lt;/bean&gt;
-				</programlisting>
+&lt;/bean&gt;</programlisting>
 				<para>
 					Most of these configuration items should look familiar from the
 					master configuration. Slaves do not need access to things like
@@ -810,7 +784,7 @@ public class FileMessageToJobRequest {
 					</imageobject>
 					<imageobject role="fo">
 						<imagedata align="center"
-								   fileref="src/site/docbook/reference/images/remote-partitioning.png"
+								   fileref="images/remote-partitioning.png"
 								   format="PNG" scale="60"/>
 					</imageobject>
 				</mediaobject>
@@ -865,8 +839,7 @@ public class FileMessageToJobRequest {
 					the <classname>MessageChannelPartitionHandler</classname> and JMS
 					configuration:
 				</para>
-				<programlisting>
-&lt;bean id=&quot;partitionHandler&quot;
+				<programlisting language="xml">&lt;bean id=&quot;partitionHandler&quot;
    class=&quot;org.springframework.batch.integration.partition.MessageChannelPartitionHandler&quot;&gt;
   &lt;property name=&quot;stepName&quot; value=&quot;step1&quot;/&gt;
   &lt;property name=&quot;gridSize&quot; value=&quot;3&quot;/&gt;
@@ -912,20 +885,17 @@ public class FileMessageToJobRequest {
 &lt;/int:channel&gt;
 
 &lt;bean id=&quot;stepLocator&quot;
-    class=&quot;org.springframework.batch.integration.partition.BeanFactoryStepLocator&quot; /&gt;
-				</programlisting>
+    class=&quot;org.springframework.batch.integration.partition.BeanFactoryStepLocator&quot; /&gt;</programlisting>
 				<para>
 					Also ensure the partition <classname>handler</classname> attribute
 					maps to the <classname>partitionHandler</classname> bean:
 				</para>
-				<programlisting>
-&lt;job id=&quot;personJob&quot;&gt;
+				<programlisting language="xml">&lt;job id=&quot;personJob&quot;&gt;
   &lt;step id=&quot;step1.master&quot;&gt;
     &lt;partition partitioner=&quot;partitioner&quot; handler=&quot;partitionHandler&quot;/&gt;
     ...
   &lt;/step&gt;
-&lt;/job&gt;
-				</programlisting>
+&lt;/job&gt;</programlisting>
 			</sect3>
 		</sect2>
 	</sect1>

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE chapter PUBLIC "-//OASIS//DTD DocBook XML V4.4//EN"
-"http://www.oasis-open.org/docbook/xml/4.4/docbookx.dtd">
-<chapter id="patterns">
+<chapter xmlns="http://docbook.org/ns/docbook" version="5.0" xml:id="patterns"
+    xmlns:xlink="http://www.w3.org/1999/xlink">
+
   <title>Common Batch Patterns</title>
 
   <para>Some batch jobs can be assembled purely from off-the-shelf components
@@ -36,9 +36,9 @@
     write. The below code snippets illustrate a listener that logs both read
     and write failures:</para>
 
-    <programlisting>public class ItemFailureLoggerListener extends ItemListenerSupport {
+    <programlisting language="java">public class ItemFailureLoggerListener extends ItemListenerSupport {
 
-    private static Log logger = LogFactory.getLog("item.error");    
+    private static Log logger = LogFactory.getLog("item.error");
 
     public void onReadError(Exception ex) {
         logger.error("Encountered error on read", e);
@@ -53,7 +53,7 @@
     <para>Having implemented this listener it must be registered with the
     step:</para>
 
-    <programlisting>&lt;step id="simpleStep"&gt;
+    <programlisting language="xml">&lt;step id="simpleStep"&gt;
     ...
     &lt;listeners&gt;
         &lt;listener&gt;
@@ -85,8 +85,8 @@
     indefinitely or skipped). For example, a custom exception type could be
     used, as in the example below:</para>
 
-    <programlisting>public class PoisonPillItemWriter implements ItemWriter&lt;T&gt; {
-    
+    <programlisting language="java">public class PoisonPillItemWriter implements ItemWriter&lt;T&gt; {
+
     public void write(T item) throws Exception {
         if (isPoisonPill(item)) {
             throw new PoisonPillException("Posion pill detected: " + item);
@@ -98,12 +98,12 @@
     <para>Another simple way to stop a step from executing is to simply return
     <code>null</code> from the <classname>ItemReader</classname>:</para>
 
-    <programlisting>public class EarlyCompletionItemReader implements ItemReader&lt;T&gt; {
+    <programlisting language="java">public class EarlyCompletionItemReader implements ItemReader&lt;T&gt; {
 
     private ItemReader&lt;T&gt; delegate;
 
     public void setDelegate(ItemReader&lt;T&gt; delegate) { ... }
-    
+
     public T read() throws Exception {
         T item = delegate.read();
         if (isEndItem(item)) {
@@ -121,9 +121,9 @@
     injected into the <classname>Step</classname> through the
     <classname>SimpleStepFactoryBean</classname>:</para>
 
-    <programlisting>&lt;step id="simpleStep"&gt;
+    <programlisting language="xml">&lt;step id="simpleStep"&gt;
     &lt;tasklet&gt;
-        &lt;chunk reader="reader" writer="writer" commit-interval="10" 
+        &lt;chunk reader="reader" writer="writer" commit-interval="10"
                <emphasis role="bold">chunk-completion-policy="completionPolicy"</emphasis>/&gt;
     &lt;/tasklet&gt;
 &lt;/step&gt;
@@ -139,9 +139,9 @@
     the <classname>Step</classname>. Here is an example of a listener that
     sets the flag:</para>
 
-    <programlisting>public class CustomItemWriter extends ItemListenerSupport implements StepListener {
+    <programlisting language="java">public class CustomItemWriter extends ItemListenerSupport implements StepListener {
 
-    private StepExecution stepExecution;    
+    private StepExecution stepExecution;
 
     public void beforeStep(StepExecution stepExecution) {
         this.stepExecution = stepExecution;
@@ -173,7 +173,7 @@
     <classname>FlatFileHeaderCallback</classname>) are optional properties of
     the <classname>FlatFileItemWriter</classname>:</para>
 
-    <programlisting>&lt;bean id="itemWriter" class="org.spr...FlatFileItemWriter"&gt;
+    <programlisting language="java">&lt;bean id="itemWriter" class="org.spr...FlatFileItemWriter"&gt;
     &lt;property name="resource" ref="outputResource" /&gt;
     &lt;property name="lineAggregator" ref="lineAggregator"/&gt;
     <emphasis role="bold">&lt;property name="headerCallback" ref="headerCallback" /&gt;</emphasis>
@@ -183,7 +183,7 @@
     <para>The footer callback interface is very simple. It has just one method
     that is called when the footer must be written:</para>
 
-    <programlisting>public interface FlatFileFooterCallback {
+    <programlisting language="java">public interface FlatFileFooterCallback {
 
     void writeFooter(Writer writer) throws IOException;
 
@@ -203,7 +203,7 @@
       <classname>Trade</classname>s is placed in a footer, then the following
       <classname>ItemWriter</classname> implementation can be used:</para>
 
-      <programlisting>public class TradeItemWriter implements ItemWriter&lt;Trade&gt;, 
+      <programlisting language="java">public class TradeItemWriter implements ItemWriter&lt;Trade&gt;,
                                         FlatFileFooterCallback {
 
     private ItemWriter&lt;Trade&gt; delegate;
@@ -250,7 +250,7 @@
       <classname>FlatFileItemWriter</classname> as the
       <code>footerCallback</code>:</para>
 
-      <programlisting>&lt;bean id="tradeItemWriter" class="..TradeItemWriter"&gt;
+      <programlisting language="xml">&lt;bean id="tradeItemWriter" class="..TradeItemWriter"&gt;
     &lt;property name="delegate" ref="flatFileItemWriter" /&gt;
 &lt;/bean&gt;
 
@@ -270,7 +270,7 @@
       with the methods <methodname>open</methodname> and
       <methodname>update</methodname>:</para>
 
-      <programlisting>public void open(ExecutionContext executionContext) {
+      <programlisting language="java">public void open(ExecutionContext executionContext) {
     if (executionContext.containsKey("total.amount") {
         totalAmount = (BigDecimal) executionContext.get("total.amount");
     }
@@ -378,7 +378,7 @@ FOT;2;2;267.34</programlisting>
     <classname>ItemReader</classname> should be implemented as a wrapper for
     the <classname>FlatFileItemReader</classname>.</para>
 
-    <programlisting>&lt;bean id="itemReader" class="org.spr...MultiLineTradeItemReader"&gt;
+    <programlisting language="xml">&lt;bean id="itemReader" class="org.spr...MultiLineTradeItemReader"&gt;
     &lt;property name="delegate"&gt;
         &lt;bean class="org.springframework.batch.item.file.FlatFileItemReader"&gt;
             &lt;property name="resource" value="data/iosample/input/multiLine.txt" /&gt;
@@ -403,7 +403,7 @@ FOT;2;2;267.34</programlisting>
     deliver a <classname>FieldSet</classname> for each line back to the
     wrapping <classname>ItemReader</classname>.</para>
 
-    <programlisting>&lt;bean id="orderFileTokenizer" class="org.spr...PatternMatchingCompositeLineTokenizer"&gt;
+    <programlisting language="xml">&lt;bean id="orderFileTokenizer" class="org.spr...PatternMatchingCompositeLineTokenizer"&gt;
     &lt;property name="tokenizers"&gt;
         &lt;map&gt;
             &lt;entry key="HEA*" value-ref="headerRecordTokenizer" /&gt;
@@ -422,7 +422,7 @@ FOT;2;2;267.34</programlisting>
     <classname>ItemProcessor</classname> and
     <classname>ItemWriter</classname>.</para>
 
-    <programlisting>private FlatFileItemReader&lt;FieldSet&gt; delegate;
+    <programlisting language="java">private FlatFileItemReader&lt;FieldSet&gt; delegate;
 
 public Trade read() throws Exception {
     Trade t = null;
@@ -466,7 +466,7 @@ public Trade read() throws Exception {
     <classname>Tasklet</classname> implementation for calling system
     commands:</para>
 
-    <programlisting>&lt;bean class="org.springframework.batch.core.step.tasklet.SystemCommandTasklet"&gt;
+    <programlisting language="xml">&lt;bean class="org.springframework.batch.core.step.tasklet.SystemCommandTasklet"&gt;
     &lt;property name="command" value="echo hello" /&gt;
     &lt;!-- 5 second timeout for the command to complete --&gt;
     &lt;property name="timeout" value="5000" /&gt;
@@ -490,7 +490,7 @@ public Trade read() throws Exception {
     a common use case, a listener is provided with just this
     functionality:</para>
 
-    <programlisting>public class NoWorkFoundStepExecutionListener extends StepExecutionListenerSupport {
+    <programlisting language="java">public class NoWorkFoundStepExecutionListener extends StepExecutionListenerSupport {
 
     public ExitStatus afterStep(StepExecution stepExecution) {
         if (stepExecution.getReadCount() == 0) {
@@ -536,7 +536,7 @@ public Trade read() throws Exception {
     during <classname>Step</classname> execution and if the
     <classname>Step</classname> fails, that data will be lost.</para>
 
-    <programlisting>public class SavingItemWriter implements ItemWriter&lt;Object&gt; {
+    <programlisting language="java">public class SavingItemWriter implements ItemWriter&lt;Object&gt; {
     private StepExecution stepExecution;
 
     public void write(List&lt;? extends Object&gt; items) throws Exception {
@@ -564,7 +564,7 @@ public Trade read() throws Exception {
     listeners, it must be registered on the
     <classname>Step</classname>.</para>
 
-    <programlisting>&lt;job id="job1"&gt;
+    <programlisting language="xml">&lt;job id="job1"&gt;
     &lt;step id="step1"&gt;
         &lt;tasklet&gt;
             &lt;chunk reader="reader" writer="savingWriter" commit-interval="10"/&gt;
@@ -586,7 +586,7 @@ public Trade read() throws Exception {
     <para>Finally, the saved values must be retrieved from the
     <classname>Job</classname> <classname>ExeuctionContext</classname>:</para>
 
-    <programlisting>public class RetrievingItemWriter implements ItemWriter&lt;Object&gt; {
+    <programlisting language="java">public class RetrievingItemWriter implements ItemWriter&lt;Object&gt; {
     private Object someObject;
 
     public void write(List&lt;? extends Object&gt; items) throws Exception {

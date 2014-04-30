@@ -54,7 +54,7 @@
     <para>Below is a code representation of the same concepts shown
     above:</para>
 
-    <programlisting>List items = new Arraylist();
+    <programlisting  language="java">List items = new Arraylist();
 for(int i = 0; i &lt; commitInterval; i++){
     Object item = itemReader.read()
     Object processedItem = itemProcessor.process(item);
@@ -70,7 +70,7 @@ itemWriter.write(items);</programlisting>
       potentially contain many collaborators. In order to ease configuration,
       the Spring Batch namespace can be used:</para>
 
-      <programlisting>&lt;job id="sampleJob" job-repository="jobRepository"&gt;
+      <programlisting language="xml">&lt;job id="sampleJob" job-repository="jobRepository"&gt;
     &lt;step id="step1"&gt;
         &lt;tasklet transaction-manager="transactionManager"&gt;
             &lt;chunk reader="itemReader" writer="itemWriter" commit-interval="10"/&gt;
@@ -138,7 +138,7 @@ itemWriter.write(items);</programlisting>
       allowStartIfComplete=true. Additionally, the commitInterval will be '5'
       since it is overridden by the "concreteStep1":</para>
 
-      <programlisting>&lt;step id="parentStep"&gt;
+      <programlisting language="xml">&lt;step id="parentStep"&gt;
     &lt;tasklet allow-start-if-complete="true"&gt;
         &lt;chunk reader="itemReader" writer="itemWriter" commit-interval="10"/&gt;
     &lt;/tasklet&gt;
@@ -183,7 +183,7 @@ itemWriter.write(items);</programlisting>
         be abstract. The <classname>Step</classname> "concreteStep2" will have
         'itemReader', 'itemWriter', and commitInterval=10.</para>
 
-        <programlisting>&lt;step id="abstractParentStep" abstract="true"&gt;
+        <programlisting language="xml">&lt;step id="abstractParentStep" abstract="true"&gt;
     &lt;tasklet&gt;
         &lt;chunk commit-interval="10"/&gt;
     &lt;/tasklet&gt;
@@ -214,7 +214,7 @@ itemWriter.write(items);</programlisting>
         <classname>listenerOne</classname> and
         <classname>listenerTwo</classname>:</para>
 
-        <programlisting>&lt;step id="listenersParentStep" abstract="true"&gt;
+        <programlisting language="xml">&lt;step id="listenersParentStep" abstract="true"&gt;
     &lt;listeners&gt;
         &lt;listener ref="listenerOne"/&gt;
     &lt;listeners&gt;
@@ -246,7 +246,7 @@ itemWriter.write(items);</programlisting>
       number of items that are processed within a commit can be
       configured.</para>
 
-      <programlisting>&lt;job id="sampleJob"&gt;
+      <programlisting language="xml">&lt;job id="sampleJob"&gt;
     &lt;step id="step1"&gt;
         &lt;tasklet&gt;
             &lt;chunk reader="itemReader" writer="itemWriter" <emphasis
@@ -285,8 +285,8 @@ itemWriter.write(items);</programlisting>
         as a <classname>Step</classname> that can be run infinitely. Below is
         an example start limit configuration:</para>
 
-        <programlisting>&lt;step id="step1"&gt;
-    &lt;tasklet <emphasis role="bold">start-limit="1"</emphasis>&gt;
+        <programlisting language="xml">&lt;step id="step1"&gt;
+    &lt;tasklet start-limit="1"&gt;
         &lt;chunk reader="itemReader" writer="itemWriter" commit-interval="10"/&gt;
     &lt;/tasklet&gt;
 &lt;/step&gt;</programlisting>
@@ -309,8 +309,8 @@ itemWriter.write(items);</programlisting>
         successfully, will be skipped. Setting allow-start-if-complete to
         "true" overrides this so that the step will always run:</para>
 
-        <programlisting>&lt;step id="step1"&gt;
-    &lt;tasklet <emphasis role="bold">allow-start-if-complete="true"</emphasis>&gt;
+        <programlisting language="xml">&lt;step id="step1"&gt;
+    &lt;tasklet allow-start-if-complete="true"&gt;
         &lt;chunk reader="itemReader" writer="itemWriter" commit-interval="10"/&gt;
     &lt;/tasklet&gt;
 &lt;/step&gt;</programlisting>
@@ -319,7 +319,7 @@ itemWriter.write(items);</programlisting>
       <section id="stepRestartExample">
         <title>Step Restart Configuration Example</title>
 
-        <programlisting>&lt;job id="footballJob" restartable="true"&gt;
+        <programlisting language="xml">&lt;job id="footballJob" restartable="true"&gt;
     &lt;step id="playerload" next="gameLoad"&gt;
         &lt;tasklet&gt;
             &lt;chunk reader="playerFileItemReader" writer="playerWriter"
@@ -451,7 +451,9 @@ itemWriter.write(items);</programlisting>
       loaded because it was formatted incorrectly or was missing necessary
       information, then there probably won't be issues. Usually these bad
       records are logged as well, which will be covered later when discussing
-      listeners.<programlisting>&lt;step id="step1"&gt;
+      listeners.
+      </para>
+      <programlisting language="xml">&lt;step id="step1"&gt;
    &lt;tasklet&gt;
       &lt;chunk reader="flatFileItemReader" writer="itemWriter"
              commit-interval="10" <emphasis role="bold">skip-limit="10"</emphasis>&gt;
@@ -460,7 +462,7 @@ itemWriter.write(items);</programlisting>
          &lt;/skippable-exception-classes&gt;</emphasis>
       &lt;/chunk&gt;
    &lt;/tasklet&gt;
-&lt;/step&gt;</programlisting></para>
+&lt;/step&gt;</programlisting>
 
       <para>In this example, a <classname>FlatFileItemReader</classname> is
       used, and if at any point a
@@ -475,7 +477,9 @@ itemWriter.write(items);</programlisting>
       <classname>Job</classname> to fail. In certain scenarios this may be the
       correct behavior. However, in other scenarios it may be easier to
       identify which exceptions should cause failure and skip everything
-      else:<programlisting>&lt;step id="step1"&gt;
+      else:
+      </para>
+      <programlisting language="xml">&lt;step id="step1"&gt;
     &lt;tasklet&gt;
         &lt;chunk reader="flatFileItemReader" writer="itemWriter"
                commit-interval="10" <emphasis role="bold">skip-limit="10"</emphasis>&gt;
@@ -485,7 +489,7 @@ itemWriter.write(items);</programlisting>
             &lt;/skippable-exception-classes&gt;
 </emphasis>        &lt;/chunk&gt;
     &lt;/tasklet&gt;
-&lt;/step&gt;</programlisting></para>
+&lt;/step&gt;</programlisting>
 
       <para>By 'including' <classname>java.lang.Exception</classname> as a
       skippable exception class, the configuration indicates that all
@@ -517,7 +521,7 @@ itemWriter.write(items);</programlisting>
       process holds a lock on, waiting and trying again might result in
       success. In this case, retry should be configured:</para>
 
-      <programlisting>&lt;step id="step1"&gt;
+      <programlisting language="xml">&lt;step id="step1"&gt;
    &lt;tasklet&gt;
       &lt;chunk reader="itemReader" writer="itemWriter"
              commit-interval="2" <emphasis role="bold">retry-limit="3"</emphasis>&gt;
@@ -548,7 +552,7 @@ itemWriter.write(items);</programlisting>
       the <classname>Step</classname> can be configured with a list of
       exceptions that should not cause rollback.</para>
 
-      <programlisting>&lt;step id="step1"&gt;
+      <programlisting language="xml">&lt;step id="step1"&gt;
    &lt;tasklet&gt;
       &lt;chunk reader="itemReader" writer="itemWriter" commit-interval="2"/&gt;
       &lt;no-rollback-exception-classes&gt;
@@ -570,7 +574,7 @@ itemWriter.write(items);</programlisting>
         this reason, the step can be configured to not buffer the
         items:</para>
 
-        <programlisting>&lt;step id="step1"&gt;
+        <programlisting language="xml">&lt;step id="step1"&gt;
     &lt;tasklet&gt;
         &lt;chunk reader="itemReader" writer="itemWriter" commit-interval="2"
            <emphasis role="bold">    is-reader-transactional-queue="true"</emphasis>/&gt;
@@ -587,7 +591,7 @@ itemWriter.write(items);</programlisting>
       transaction attributes can be found in the spring core
       documentation.</para>
 
-      <programlisting>&lt;step id="step1"&gt;
+      <programlisting language="xml">&lt;step id="step1"&gt;
     &lt;tasklet&gt;
         &lt;chunk reader="itemReader" writer="itemWriter" commit-interval="2"/&gt;
         &lt;transaction-attributes isolation="DEFAULT"
@@ -618,7 +622,7 @@ itemWriter.write(items);</programlisting>
       can be registered on the <classname>Step</classname> through the
       'streams' element, as illustrated below:</para>
 
-      <programlisting>&lt;step id="step1"&gt;
+      <programlisting language="xml">&lt;step id="step1"&gt;
     &lt;tasklet&gt;
         &lt;chunk reader="itemReader" writer="compositeWriter" commit-interval="2"&gt;
             <emphasis role="bold">&lt;streams&gt;
@@ -675,7 +679,7 @@ itemWriter.write(items);</programlisting>
 	  the most granular level that it applies (chunk in the example
 	  given).</para>
 
-      <programlisting>&lt;step id="step1"&gt;
+      <programlisting language="xml">&lt;step id="step1"&gt;
     &lt;tasklet&gt;
         &lt;chunk reader="reader" writer="writer" commit-interval="10"/&gt;
         &lt;listeners&gt;
@@ -714,7 +718,7 @@ itemWriter.write(items);</programlisting>
         for notification before a <classname>Step</classname> is started and
         after it has ends, whether it ended normally or failed:</para>
 
-        <programlisting>public interface StepExecutionListener extends StepListener {
+        <programlisting language="java">public interface StepExecutionListener extends StepListener {
 
     void beforeStep(StepExecution stepExecution);
 
@@ -749,10 +753,9 @@ itemWriter.write(items);</programlisting>
         useful to perform logic before a chunk begins processing or after a
         chunk has completed successfully:</para>
 
-        <programlisting>public interface ChunkListener extends StepListener {
+        <programlisting language="java">public interface ChunkListener extends StepListener {
 
     void beforeChunk();
-
     void afterChunk();
 
 }</programlisting>
@@ -790,15 +793,15 @@ itemWriter.write(items);</programlisting>
         <para>When discussing skip logic above, it was mentioned that it may
         be beneficial to log the skipped records, so that they can be deal
         with later. In the case of read errors, this can be done with an
-        <classname>ItemReaderListener:</classname><programlisting>public interface ItemReadListener&lt;T&gt; extends StepListener {
+        <classname>ItemReaderListener:</classname>
+        </para>
+        <programlisting language="java">public interface ItemReadListener&lt;T&gt; extends StepListener {
 
     void beforeRead();
-
     void afterRead(T item);
-
     void onReadError(Exception ex);
 
-}</programlisting></para>
+}</programlisting>
 
         <para>The <methodname>beforeRead</methodname> method will be called
         before each call to <methodname>read</methodname> on the
@@ -833,12 +836,10 @@ itemWriter.write(items);</programlisting>
         <para>Just as with the <classname>ItemReadListener</classname>, the
         processing of an item can be 'listened' to:</para>
 
-        <programlisting>public interface ItemProcessListener&lt;T, S&gt; extends StepListener {
+        <programlisting language="java">public interface ItemProcessListener&lt;T, S&gt; extends StepListener {
 
     void beforeProcess(T item);
-
     void afterProcess(T item, S result);
-
     void onProcessError(T item, Exception e);
 
 }</programlisting>
@@ -876,12 +877,10 @@ itemWriter.write(items);</programlisting>
         <para>The writing of an item can be 'listened' to with the
         <classname>ItemWriteListener</classname>:</para>
 
-        <programlisting>  public interface ItemWriteListener&lt;S&gt; extends StepListener {
+        <programlisting language="java">public interface ItemWriteListener&lt;S&gt; extends StepListener {
 
     void beforeWrite(List&lt;? extends S&gt; items);
-
     void afterWrite(List&lt;? extends S&gt; items);
-
     void onWriteError(Exception exception, List&lt;? extends S&gt; items);
 
 }</programlisting>
@@ -924,13 +923,10 @@ itemWriter.write(items);</programlisting>
         this reason, there is a separate interface for tracking skipped
         items:</para>
 
-        <programlisting>
-  public interface SkipListener&lt;T,S&gt; extends StepListener {
+        <programlisting language="java">public interface SkipListener&lt;T,S&gt; extends StepListener {
 
     void onSkipInRead(Throwable t);
-
     void onSkipInProcess(T item, Throwable t);
-
     void onSkipInWrite(S item, Throwable t);
 
 }</programlisting>
@@ -1011,8 +1007,8 @@ itemWriter.write(items);</programlisting>
     <classname>Tasklet</classname> object; no &lt;chunk/&gt; element should be
     used within the &lt;tasklet/&gt;:</para>
 
-    <programlisting>&lt;step id="step1"&gt;
-    &lt;tasklet <classname>ref="myTasklet"</classname>/&gt;
+    <programlisting language="xml">&lt;step id="step1"&gt;
+    &lt;tasklet ref="myTasklet"/&gt;
 &lt;/step&gt;</programlisting>
 
     <note>
@@ -1034,7 +1030,7 @@ itemWriter.write(items);</programlisting>
       this class without having to write an adapter for the
       <classname>Tasklet</classname> interface:</para>
 
-      <programlisting>&lt;bean id="myTasklet" class="org.springframework.batch.core.step.tasklet.MethodInvokingTaskletAdapter"&gt;
+      <programlisting language="xml">&lt;bean id="myTasklet" class="o.s.b.core.step.tasklet.MethodInvokingTaskletAdapter"&gt;
     &lt;property name="targetObject"&gt;
         &lt;bean class="org.mycompany.FooDao"/&gt;
     &lt;/property&gt;
@@ -1054,7 +1050,7 @@ itemWriter.write(items);</programlisting>
       project, is a <classname>Tasklet</classname> implementation with just
       such a responsibility:</para>
 
-      <programlisting>public class FileDeletingTasklet implements Tasklet, InitializingBean {
+      <programlisting language="java">public class FileDeletingTasklet implements Tasklet, InitializingBean {
 
     private Resource directory;
 
@@ -1089,7 +1085,7 @@ itemWriter.write(items);</programlisting>
       that is left is to reference the <classname>Tasklet</classname> from the
       <classname>Step</classname>:</para>
 
-      <programlisting>&lt;job id="taskletJob"&gt;
+      <programlisting language="xml">&lt;job id="taskletJob"&gt;
     &lt;step id="deleteFilesInDir"&gt;
        &lt;tasklet ref="fileDeletingTasklet"/&gt;
     &lt;/step&gt;
@@ -1140,11 +1136,13 @@ itemWriter.write(items);</programlisting>
       <para>This can be achieved using the 'next' attribute of the step
       element:</para>
 
-      <para><programlisting>&lt;job id="job"&gt;
+      <programlisting language="xml">&lt;job id="job"&gt;
     &lt;step id="stepA" parent="s1" next="stepB" /&gt;
     &lt;step id="stepB" parent="s2" next="stepC"/&gt;
     &lt;step id="stepC" parent="s3" /&gt;
-&lt;/job&gt;</programlisting>In the scenario above, 'step A' will execute
+&lt;/job&gt;</programlisting>
+
+      <para>In the scenario above, 'step A' will execute
       first because it is the first <classname>Step</classname> listed. If
       'step A' completes normally, then 'step B' will execute, and so on.
       However, if 'step A' fails, then the entire <classname>Job</classname>
@@ -1206,14 +1204,14 @@ itemWriter.write(items);</programlisting>
       <para>The next element specifies a pattern to match and the step to
       execute next:</para>
 
-      <para><programlisting>&lt;job id="job"&gt;
+      <programlisting language="xml">&lt;job id="job"&gt;
     &lt;step id="stepA" parent="s1"&gt;
         &lt;next on="*" to="stepB" /&gt;
         &lt;next on="FAILED" to="stepC" /&gt;
     &lt;/step&gt;
     &lt;step id="stepB" parent="s2" next="stepC" /&gt;
     &lt;step id="stepC" parent="s3" /&gt;
-&lt;/job&gt;</programlisting></para>
+&lt;/job&gt;</programlisting>
 
       <para>The "on" attribute of a transition element uses a simple
       pattern-matching scheme to match the <classname>ExitStatus</classname>
@@ -1261,7 +1259,7 @@ itemWriter.write(items);</programlisting>
         it fails, and so on. The example above contains the following 'next'
         element:</para>
 
-        <programlisting>&lt;next on="FAILED" to="stepB" /&gt;</programlisting>
+        <programlisting language="xml">&lt;next on="FAILED" to="stepB" /&gt;</programlisting>
 
         <para>At first glance, it would appear that the 'on' attribute
         references the <classname>BatchStatus</classname> of the
@@ -1278,7 +1276,7 @@ itemWriter.write(items);</programlisting>
         code needs to be different? A good example comes from the skip sample
         job within the samples project:</para>
 
-        <programlisting>&lt;step id="step1" parent="s1"&gt;
+        <programlisting language="xml">&lt;step id="step1" parent="s1"&gt;
     &lt;end on="FAILED" /&gt;
     &lt;next on="COMPLETED WITH SKIPS" to="errorPrint1" /&gt;
     &lt;next on="*" to="step2" /&gt;
@@ -1308,8 +1306,7 @@ itemWriter.write(items);</programlisting>
         change the exit code based on the condition of the execution having
         skipped records:</para>
 
-        <programlisting>public class SkipCheckingListener extends StepExecutionListenerSupport {
-
+        <programlisting language="java">public class SkipCheckingListener extends StepExecutionListenerSupport {
     public ExitStatus afterStep(StepExecution stepExecution) {
         String exitCode = stepExecution.getExitStatus().getExitCode();
         if (!exitCode.equals(ExitStatus.FAILED.getExitCode()) &amp;&amp;
@@ -1320,7 +1317,6 @@ itemWriter.write(items);</programlisting>
             return null;
         }
     }
-
 }</programlisting>
 
         <para>The above code is a <classname>StepExecutionListener</classname>
@@ -1349,7 +1345,7 @@ itemWriter.write(items);</programlisting>
       after the following step executes, the <classname>Job</classname> will
       end:</para>
 
-      <para><programlisting>&lt;step id="stepC" parent="s3"/&gt;</programlisting></para>
+      <programlisting language="xml">&lt;step id="stepC" parent="s3"/&gt;</programlisting>
 
       <para>If no transitions are defined for a <classname>Step</classname>,
       then the <classname>Job</classname>'s statuses will be defined as
@@ -1408,7 +1404,7 @@ itemWriter.write(items);</programlisting>
         fails, the <classname>Job</classname> will not be restartable (because
         the status is COMPLETED).</para>
 
-        <programlisting>&lt;step id="step1" parent="s1" next="step2"&gt;
+        <programlisting language="xml">&lt;step id="step1" parent="s1" next="step2"&gt;
 
 &lt;step id="step2" parent="s2"&gt;
     &lt;end on="FAILED"/&gt;
@@ -1439,7 +1435,7 @@ itemWriter.write(items);</programlisting>
         Additionally, if step2 fails, and the <classname>Job</classname> is
         restarted, then execution will begin again on step2.</para>
 
-        <programlisting>&lt;step id="step1" parent="s1" next="step2"&gt;
+        <programlisting language="xml">&lt;step id="step1" parent="s1" next="step2"&gt;
 
 &lt;step id="step2" parent="s2"&gt;
     &lt;fail on="FAILED" exit-code="EARLY TERMINATION"/&gt;
@@ -1464,11 +1460,11 @@ itemWriter.write(items);</programlisting>
         the job will then stop. Once it is restarted, execution will begin on
         step2.</para>
 
-        <para><programlisting>&lt;step id="step1" parent="s1"&gt;
+        <programlisting language="xml">&lt;step id="step1" parent="s1"&gt;
     &lt;stop on="COMPLETED" restart="step2"/&gt;
 &lt;/step&gt;
 
-&lt;step id="step2" parent="s2"/&gt;</programlisting></para>
+&lt;step id="step2" parent="s2"/&gt;</programlisting>
       </section>
     </section>
 
@@ -1481,7 +1477,7 @@ itemWriter.write(items);</programlisting>
       <classname>JobExecutionDecider</classname> can be used to assist in the
       decision.</para>
 
-      <para><programlisting>public class MyDecider implements JobExecutionDecider {
+      <programlisting language="java">public class MyDecider implements JobExecutionDecider {
     public FlowExecutionStatus decide(JobExecution jobExecution, StepExecution stepExecution) {
         if (someCondition) {
             return "FAILED";
@@ -1490,12 +1486,12 @@ itemWriter.write(items);</programlisting>
             return "COMPLETED";
         }
     }
-}</programlisting></para>
+}</programlisting>
 
       <para>In the job configuration, a "decision" tag will specify the
       decider to use as well as all of the transitions.</para>
 
-      <para><programlisting>&lt;job id="job"&gt;
+      <programlisting language="xml">&lt;job id="job"&gt;
     &lt;step id="step1" parent="s1" next="decision" /&gt;
 
     &lt;decision id="decision" decider="decider"&gt;
@@ -1507,7 +1503,7 @@ itemWriter.write(items);</programlisting>
     &lt;step id="step3" parent="s3" /&gt;
 &lt;/job&gt;
 
-&lt;beans:bean id="decider" class="com.MyDecider"/&gt;</programlisting></para>
+&lt;beans:bean id="decider" class="com.MyDecider"/&gt;</programlisting>
     </section>
 
     <section id="split-flows">
@@ -1524,7 +1520,7 @@ itemWriter.write(items);</programlisting>
       elements such as the 'next' attribute or the 'next', 'end', 'fail', or
       'pause' elements.</para>
 
-      <programlisting>&lt;split id="split1" next="step4"&gt;
+      <programlisting language="xml">&lt;split id="split1" next="step4"&gt;
     &lt;flow&gt;
         &lt;step id="step1" parent="s1" next="step2"/&gt;
         &lt;step id="step2" parent="s2"/&gt;
@@ -1545,7 +1541,7 @@ itemWriter.write(items);</programlisting>
       first is to simply declare the flow as a reference to one defined
       elsewhere:</para>
 
-      <programlisting>&lt;job id="job"&gt;
+      <programlisting language="xml">&lt;job id="job"&gt;
     &lt;flow id="job1.flow1" parent="flow1" next="step3"/&gt;
     &lt;step id="step3" parent="s3"/&gt;
 &lt;/job&gt;
@@ -1568,7 +1564,7 @@ itemWriter.write(items);</programlisting>
       launches a separate job execution for the steps in the flow specified.
       Here is an example:</para>
 
-      <para><programlisting>&lt;job id="jobStepJob" restartable="true"&gt;
+      <programlisting language="xml">&lt;job id="jobStepJob" restartable="true"&gt;
    &lt;step id="jobStepJob.step1"&gt;
       &lt;job ref="<emphasis role="bold">job</emphasis>" job-launcher="jobLauncher"
           job-parameters-extractor="jobParametersExtractor"/&gt;
@@ -1579,7 +1575,7 @@ itemWriter.write(items);</programlisting>
 
 &lt;bean id="jobParametersExtractor" class="org.spr...DefaultJobParametersExtractor"&gt;
    &lt;property name="keys" value="input.file"/&gt;
-&lt;/bean&gt;</programlisting></para>
+&lt;/bean&gt;</programlisting>
 
       <para>The job parameters extractor is a strategy that determines how a
       the <classname>ExecutionContext</classname> for the
@@ -1604,7 +1600,7 @@ itemWriter.write(items);</programlisting>
     Flat File resources can be configured using standard Spring
     constructs:</para>
 
-    <programlisting>&lt;bean id="flatFileItemReader"
+    <programlisting language="xml">&lt;bean id="flatFileItemReader"
       class="org.springframework.batch.item.file.FlatFileItemReader"&gt;
     &lt;property name="resource"
               value="file://outputs/20070122.testStream.CustomerReportStep.TEMP.txt" /&gt;
@@ -1618,7 +1614,7 @@ itemWriter.write(items);</programlisting>
     at runtime as a parameter to the job. This could be solved using '-D'
     parameters, i.e. a system property:</para>
 
-    <programlisting>&lt;bean id="flatFileItemReader"
+    <programlisting language="xml">&lt;bean id="flatFileItemReader"
       class="org.springframework.batch.item.file.FlatFileItemReader"&gt;
     &lt;property name="resource" value="${input.file.name}" /&gt;
 &lt;/bean&gt;</programlisting>
@@ -1637,7 +1633,7 @@ itemWriter.write(items);</programlisting>
     accomplish this, Spring Batch allows for the late binding of various Job
     and Step attributes:</para>
 
-    <programlisting>&lt;bean id="flatFileItemReader" scope="step"
+    <programlisting language="xml">&lt;bean id="flatFileItemReader" scope="step"
       class="org.springframework.batch.item.file.FlatFileItemReader"&gt;
     &lt;property name="resource" value="<emphasis role="bold">#{jobParameters['input.file.name']}</emphasis>" /&gt;
 &lt;/bean&gt;</programlisting>
@@ -1647,12 +1643,12 @@ itemWriter.write(items);</programlisting>
     <classname>ExecutionContext</classname> can be accessed in the same
     way:</para>
 
-    <programlisting>&lt;bean id="flatFileItemReader" scope="step"
+    <programlisting language="xml">&lt;bean id="flatFileItemReader" scope="step"
       class="org.springframework.batch.item.file.FlatFileItemReader"&gt;
     &lt;property name="resource" value="<emphasis role="bold">#{jobExecutionContext['input.file.name']}</emphasis>" /&gt;
 &lt;/bean&gt;</programlisting>
 
-    <programlisting>&lt;bean id="flatFileItemReader" scope="step"
+    <programlisting language="xml">&lt;bean id="flatFileItemReader" scope="step"
       class="org.springframework.batch.item.file.FlatFileItemReader"&gt;
     &lt;property name="resource" value="<emphasis role="bold">#{stepExecutionContext['input.file.name']}</emphasis>" /&gt;
 &lt;/bean&gt;</programlisting>
@@ -1680,7 +1676,7 @@ itemWriter.write(items);</programlisting>
       <para>All of the late binding examples from above have a scope of "step"
       declared on the bean definition:</para>
 
-      <programlisting>&lt;bean id="flatFileItemReader" <emphasis role="bold">scope="step"</emphasis>
+      <programlisting language="xml">&lt;bean id="flatFileItemReader" <emphasis role="bold">scope="step"</emphasis>
       class="org.springframework.batch.item.file.FlatFileItemReader"&gt;
     &lt;property name="resource" value="#{jobParameters[input.file.name]}" /&gt;
 &lt;/bean&gt;</programlisting>
@@ -1692,7 +1688,7 @@ itemWriter.write(items);</programlisting>
       scope must be added explicitly, either by using the
       <literal>batch</literal> namespace:</para>
 
-      <programlisting>&lt;beans xmlns="http://www.springframework.org/schema/beans"
+      <programlisting language="xml">&lt;beans xmlns="http://www.springframework.org/schema/beans"
        xmlns:batch="http://www.springframework.org/schema/batch"
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
        xsi:schemaLocation="..."&gt;
@@ -1703,7 +1699,7 @@ itemWriter.write(items);</programlisting>
       <para>or by including a bean definition explicitly for the<classname>
       StepScope</classname> (but not both):</para>
 
-      <programlisting>&lt;bean class="org.springframework.batch.core.scope.StepScope" /&gt;</programlisting>
+      <programlisting language="xml">&lt;bean class="org.springframework.batch.core.scope.StepScope" /&gt;</programlisting>
     </section>
 
 	<section id="job-scope">
@@ -1715,20 +1711,20 @@ itemWriter.write(items);</programlisting>
 		for late binding of references accessible from the JobContext using
 		#{..} placeholders. Using this feature, bean properties can be pulled from
 		the job or job execution context and the job parameters. E.g.
-
-		<programlisting>&lt;bean id=&quot;...&quot; class=&quot;...&quot; <emphasis role="bold">scope=&quot;job&quot;</emphasis>&gt;
+		</para>
+		<programlisting language="xml">&lt;bean id=&quot;...&quot; class=&quot;...&quot; <emphasis role="bold">scope=&quot;job&quot;</emphasis>&gt;
     &lt;property name=&quot;name&quot; value=&quot;#{jobParameters[input]}&quot; /&gt;
 &lt;/bean&gt;
 		</programlisting>
-		<programlisting>&lt;bean id=&quot;...&quot; class=&quot;...&quot; <emphasis role="bold">scope=&quot;job&quot;</emphasis>&gt;
+		<programlisting language="xml">&lt;bean id=&quot;...&quot; class=&quot;...&quot; <emphasis role="bold">scope=&quot;job&quot;</emphasis>&gt;
     &lt;property name=&quot;name&quot; value=&quot;#{jobExecutionContext['input.name']}.txt&quot; /&gt;
 &lt;/bean&gt;
-		</programlisting></para>
+		</programlisting>
 
 		<para>Because it is not part of the Spring container by default, the scope
 		must be added explicitly, either by using the <literal>batch</literal> namespace:</para>
 
-	    <programlisting>&lt;beans xmlns="http://www.springframework.org/schema/beans"
+	    <programlisting language="xml">&lt;beans xmlns="http://www.springframework.org/schema/beans"
 		  xmlns:batch="http://www.springframework.org/schema/batch"
 		  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 		  xsi:schemaLocation="..."&gt;
@@ -1739,7 +1735,7 @@ itemWriter.write(items);</programlisting>
 
 	  <para>Or by including a bean definition explicitly for the <classname>JobScope</classname> (but not both):</para>
 
-	  <programlisting>&lt;bean class="org.springframework.batch.core.scope.JobScope" /&gt;</programlisting>
+	  <programlisting language="xml">&lt;bean class="org.springframework.batch.core.scope.JobScope" /&gt;</programlisting>
 	</section>
   </section>
 </chapter>
