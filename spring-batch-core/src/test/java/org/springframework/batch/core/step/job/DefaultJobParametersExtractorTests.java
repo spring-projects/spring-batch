@@ -22,6 +22,7 @@ import java.util.Date;
 import org.junit.Test;
 import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.JobParameters;
+import org.springframework.batch.core.JobParametersBuilder;
 import org.springframework.batch.core.StepExecution;
 
 /**
@@ -88,4 +89,39 @@ public class DefaultJobParametersExtractorTests {
 		assertEquals("{foo="+date.getTime()+"}", jobParameters.toString());
 	}
 
+	@Test
+	public void testUseParentParameters() throws Exception {
+		JobExecution jobExecution = new JobExecution(0L, new JobParametersBuilder()
+				.addString("parentParam", "val")
+				.toJobParameters());
+
+		StepExecution stepExecution = new StepExecution("step", jobExecution);
+
+		stepExecution.getExecutionContext().putDouble("foo", 11.1);
+		extractor.setKeys(new String[] {"foo(double)"});
+		JobParameters jobParameters = extractor.getJobParameters(null, stepExecution);
+
+		String jobParams = jobParameters.toString();
+
+		assertTrue("Job parameters must contain parentParam=val", jobParams.contains("parentParam=val"));
+		assertTrue("Job parameters must contain foo=11.1", jobParams.contains("foo=11.1"));
+	}
+
+	@Test
+	public void testDontUseParentParameters() throws Exception {
+		DefaultJobParametersExtractor extractor = new DefaultJobParametersExtractor();
+		extractor.setUseAllParentParameters(false);
+
+		JobExecution jobExecution = new JobExecution(0L, new JobParametersBuilder()
+				.addString("parentParam", "val")
+				.toJobParameters());
+
+		StepExecution stepExecution = new StepExecution("step", jobExecution);
+
+		stepExecution.getExecutionContext().putDouble("foo", 11.1);
+		extractor.setKeys(new String[] {"foo(double)"});
+		JobParameters jobParameters = extractor.getJobParameters(null, stepExecution);
+
+		assertEquals("{foo=11.1}", jobParameters.toString());
+	}
 }
