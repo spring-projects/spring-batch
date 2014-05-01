@@ -11,6 +11,7 @@ import org.springframework.batch.core.StepExecution;
 import org.springframework.batch.core.partition.PartitionHandler;
 import org.springframework.batch.core.partition.StepExecutionSplitter;
 import org.springframework.batch.core.repository.JobRepository;
+import org.springframework.integration.MessageTimeoutException;
 import org.springframework.integration.annotation.Aggregator;
 import org.springframework.integration.annotation.MessageEndpoint;
 import org.springframework.integration.annotation.Payloads;
@@ -33,6 +34,7 @@ import org.springframework.util.Assert;
  *
  * @author Dave Syer
  * @author Will Schipp
+ * @author Michael Minella
  *
  */
 @MessageEndpoint
@@ -106,10 +108,10 @@ public class MessageChannelPartitionHandler implements PartitionHandler {
 	}
 
 	/**
-	 * Sends {@link StepExecutionRequest} objects to the request channel of the {@link MessagingOperations}, and then
+	 * Sends {@link StepExecutionRequest} objects to the request channel of the {@link MessagingTemplate}, and then
 	 * receives the result back as a list of {@link StepExecution} on a reply channel. Use the {@link #aggregate(List)}
 	 * method as an aggregator of the individual remote replies. The receive timeout needs to be set realistically in
-	 * the {@link MessagingOperations} <b>and</b> the aggregator, so that there is a good chance of all work being done.
+	 * the {@link MessagingTemplate} <b>and</b> the aggregator, so that there is a good chance of all work being done.
 	 *
 	 * @see PartitionHandler#handle(StepExecutionSplitter, StepExecution)
 	 */
@@ -134,9 +136,13 @@ public class MessageChannelPartitionHandler implements PartitionHandler {
 
 		@SuppressWarnings("unchecked")
 		Message<Collection<StepExecution>> message = (Message<Collection<StepExecution>>) messagingGateway.receive(replyChannel);
-		if (logger.isDebugEnabled()) {
+
+		if(message == null) {
+			throw new MessageTimeoutException("Timeout occurred before all partitions returned");
+		} else if (logger.isDebugEnabled()) {
 			logger.debug("Received replies: " + message);
 		}
+
 		Collection<StepExecution> result = message.getPayload();
 		return result;
 
