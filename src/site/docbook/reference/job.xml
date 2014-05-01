@@ -184,7 +184,7 @@ catch (JobRestartException e) {
       <classname>Job</classname> with two listeners and one
       <classname>Step</classname>, "step1".</para>
 
-      <programlisting language="java"><![CDATA[<job id="baseJob" abstract="true">
+      <programlisting language="xml"><![CDATA[<job id="baseJob" abstract="true">
     <listeners>
         <listener ref="listenerOne"/>
     <listeners>

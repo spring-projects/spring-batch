@@ -173,7 +173,7 @@
     <classname>FlatFileHeaderCallback</classname>) are optional properties of
     the <classname>FlatFileItemWriter</classname>:</para>
 
-    <programlisting language="java">&lt;bean id="itemWriter" class="org.spr...FlatFileItemWriter"&gt;
+    <programlisting language="xml">&lt;bean id="itemWriter" class="org.spr...FlatFileItemWriter"&gt;
     &lt;property name="resource" ref="outputResource" /&gt;
     &lt;property name="lineAggregator" ref="lineAggregator"/&gt;
     <emphasis role="bold">&lt;property name="headerCallback" ref="headerCallback" /&gt;</emphasis>
