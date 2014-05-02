@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.springframework.batch.core.jsr.configuration.support;
+package org.springframework.batch.core.jsr.launch.support;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
@@ -26,6 +26,8 @@ import javax.batch.api.BatchProperty;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.springframework.batch.core.jsr.configuration.support.BatchPropertyContext;
+import org.springframework.batch.core.jsr.configuration.support.JsrExpressionParser;
 import org.springframework.batch.core.scope.StepScope;
 import org.springframework.batch.core.scope.context.StepContext;
 import org.springframework.batch.core.scope.context.StepSynchronizationManager;

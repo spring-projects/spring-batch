@@ -15,17 +15,17 @@
  */
 package org.springframework.batch.core.jsr.configuration.xml;
 
-import java.util.HashMap;
-
-import org.springframework.batch.core.jsr.configuration.support.BatchPropertyBeanPostProcessor;
+import org.springframework.batch.core.jsr.launch.support.BatchPropertyBeanPostProcessor;
 import org.springframework.batch.core.jsr.configuration.support.JsrAutowiredAnnotationBeanPostProcessor;
-import org.springframework.batch.core.jsr.configuration.support.JsrBeanScopeBeanFactoryPostProcessor;
+import org.springframework.batch.core.jsr.partition.support.JsrBeanScopeBeanFactoryPostProcessor;
 import org.springframework.batch.core.jsr.configuration.support.ThreadLocalClassloaderBeanPostProcessor;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.support.AbstractBeanDefinition;
 import org.springframework.beans.factory.support.BeanDefinitionBuilder;
 import org.springframework.beans.factory.xml.ParserContext;
 import org.springframework.context.annotation.AnnotationConfigUtils;
+
+import java.util.HashMap;
 
 /**
  * Utility methods used in parsing of the JSR-352 batch namespace and related helpers.
@@ -41,6 +41,7 @@ class JsrNamespaceUtils {
 	private static final String BEAN_SCOPE_POST_PROCESSOR_BEAN_NAME = "beanScopeBeanPostProcessor";
 	private static final String BATCH_PROPERTY_CONTEXT_BEAN_CLASS_NAME = "org.springframework.batch.core.jsr.configuration.support.BatchPropertyContext";
 	private static final String BATCH_PROPERTY_CONTEXT_BEAN_NAME = "batchPropertyContext";
+	private static final String JSR_NAMESPACE_POST_PROCESSOR = "jsrNamespacePostProcessor";
 
 	static void autoregisterJsrBeansForNamespace(ParserContext parserContext) {
 		autoRegisterJobProperties(parserContext);
@@ -49,6 +50,11 @@ class JsrNamespaceUtils {
 		autoRegisterThreadLocalClassloaderBeanPostProcessor(parserContext);
 		autoRegisterBeanScopeBeanFactoryPostProcessor(parserContext);
 		autoRegisterBatchPropertyContext(parserContext);
+		autoRegisterNamespacePostProcessor(parserContext);
+	}
+
+	private static void autoRegisterNamespacePostProcessor(ParserContext parserContext) {
+		registerPostProcessor(parserContext, JsrNamespacePostProcessor.class, BeanDefinition.ROLE_INFRASTRUCTURE, JSR_NAMESPACE_POST_PROCESSOR);
 	}
 
 	private static void autoRegisterBeanScopeBeanFactoryPostProcessor(

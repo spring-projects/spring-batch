@@ -13,11 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.springframework.batch.core.jsr.configuration.support;
-
-import javax.batch.api.partition.PartitionAnalyzer;
-import javax.batch.api.partition.PartitionMapper;
-import javax.batch.api.partition.PartitionReducer;
+package org.springframework.batch.core.jsr.partition.support;
 
 import org.springframework.batch.core.jsr.configuration.xml.StepFactoryBean;
 import org.springframework.batch.core.jsr.partition.JsrPartitionHandler;
@@ -28,6 +24,10 @@ import org.springframework.beans.factory.config.BeanFactoryPostProcessor;
 import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
 import org.springframework.beans.factory.config.RuntimeBeanReference;
 import org.springframework.beans.factory.support.AbstractBeanDefinition;
+
+import javax.batch.api.partition.PartitionAnalyzer;
+import javax.batch.api.partition.PartitionMapper;
+import javax.batch.api.partition.PartitionReducer;
 
 /**
  * In order for property resolution to occur correctly within the scope of a JSR-352
