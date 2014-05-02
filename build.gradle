@@ -37,55 +37,55 @@ allprojects {
 
 		environmentProperty = project.hasProperty('environment') ? getProperty('environment') : 'hsql'
 
-		springVersionDefault = '4.0.2.RELEASE'
+		springVersionDefault = '4.0.4.RELEASE'
 		springVersion = project.hasProperty('springVersion') ? getProperty('springVersion') : springVersionDefault
+		
 		springRetryVersion = '1.1.0.RC1'
-		springAmqpVersion = '1.1.2.RELEASE'
-		springDataCommonsVersion = '1.5.0.RELEASE'
-		springDataGemfireVersion = '1.3.0.RELEASE'
-		springDataJpaVersion = '1.2.0.RELEASE'
-		springDataMongodbVersion = '1.1.0.RELEASE'
-		springDataNeo4jVersion = '2.2.0.RELEASE'
-		springIntegrationVersion = '4.0.0.RC1'
+		springAmqpVersion = '1.3.2.RELEASE'
+		springDataCommonsVersion = '1.7.2.RELEASE'
+		springDataGemfireVersion = '1.3.4.RELEASE'
+		springDataJpaVersion = '1.5.2.RELEASE'
+		springDataMongodbVersion = '1.4.2.RELEASE'
+		springDataNeo4jVersion = '3.0.2.RELEASE'
+		springIntegrationVersion = '4.0.0.RELEASE'
 		springLdapVersion = '2.0.1.RELEASE'
 
-		activemqVersion = '5.1.0'
-		aspectjVersion = '1.5.4'
+		activemqVersion = '5.9.1'
+		aspectjVersion = '1.8.0'
 		castorVersion = '1.3.2'
-		cglibVersion = '2.1_3'
-		commonsCollectionsVersion = '3.2'
+		commonsCollectionsVersion = '3.2.1'
 		commonsDdbcpVersion = '1.4'
-		commonsIoVersion = '1.4'
-		commonsLangVersion = '2.5'
-		derbyVersion = '10.8.2.2'
-		groovyVersion = '1.6.3'
-		h2databaseVersion = '1.2.132'
+		commonsIoVersion = '2.4'
+		commonsLangVersion = '2.6'
+		derbyVersion = '10.10.1.1'
+		groovyVersion = '2.2.2'
+		h2databaseVersion = '1.3.175'
 		hibernateAnnotationsVersion = '3.3.1.GA'
-		hibernateVersion = '4.1.9.Final'
+		hibernateVersion = '4.2.12.Final'
 		hibernateValidatorVersion = '4.3.1.Final'
-		hsqldbVersion = '2.3.1'
+		hsqldbVersion = '2.3.2'
 		ibatisVersion = '2.3.4.726'
-		jacksonVersion = '1.0.1'
-		javaMailVersion = '1.4.1'
+		jacksonVersion = '1.9.13'
+		javaMailVersion = '1.4.7'
 		javaxBatchApiVersion = '1.0'
 		javaxInjectVersion = '1'
 		jbatchTckSpi = '1.0'
 		jettisonVersion = '1.2'
 		jtdsVersion = '1.2.4'
 		junitVersion = '4.10'
-		log4jVersion = '1.2.14'
-		mysqlVersion = '5.1.6'
+		log4jVersion = '1.2.17'
+		mysqlVersion = '5.1.29'
 		mockitoVersion = '1.9.5'
-		postgresqlVersion = '8.3-603.jdbc3'
-		quartzVersion = '1.6.1'
-		servletApiVersion = '2.5'
-		slf4jVersion = '1.6.6'
+		postgresqlVersion = '9.0-801.jdbc4'
+		quartzVersion = '2.2.1'
+		servletApiVersion = '3.0.1'
+		slf4jVersion = '1.7.6'
 		sqlfireclientVersion = '1.0.3'
 		sqliteVersion = '3.7.2'
-		woodstoxVersion = '4.0.6'
+		woodstoxVersion = '4.2.0'
 		xercesVersion = '2.8.1'
-		xmlunitVersion = '1.2'
-		xstreamVersion = '1.4.4'
+		xmlunitVersion = '1.5'
+		xstreamVersion = '1.4.7'
 	}
 }
 
@@ -203,7 +203,6 @@ project('spring-batch-core') {
 		compile "org.springframework:spring-core:$springVersion"
 		compile "org.springframework:spring-tx:$springVersion"
 
-		testCompile "cglib:cglib-nodep:$cglibVersion"
 		testCompile "org.springframework:spring-test:$springVersion"
 		testCompile "org.mockito:mockito-all:$mockitoVersion"
 		testCompile "javax.inject:javax.inject:$javaxInjectVersion"
@@ -243,30 +242,27 @@ project('spring-batch-infrastructure') {
 		testCompile "org.mockito:mockito-all:$mockitoVersion"
 		testCompile "org.xerial:sqlite-jdbc:$sqliteVersion"
 
-		optional "org.apache.geronimo.specs:geronimo-jms_1.1_spec:1.1"
+		testRuntime "com.sun.mail:javax.mail:$javaMailVersion"
+
+		optional "javax.jms:jms-api:1.1-rev-1"
 		optional "org.slf4j:slf4j-log4j12:$slf4jVersion"
 		optional "org.codehaus.jackson:jackson-mapper-asl:$jacksonVersion"
 		compile("org.hibernate:hibernate-core:$hibernateVersion") { dep ->
 			optional dep
-			exclude group: 'cglib', module: 'cglib'
-			exclude group: 'asm', module: 'asm'
-			exclude group: 'asm', module: 'asm-attrs'
-			exclude group: 'javax.transaction', module: 'jta'
+			exclude group: 'org.jboss.spec.javax.transaction', module: 'jboss-transaction-api_1.1_spec'
 		}
 		compile("org.hibernate:hibernate-entitymanager:$hibernateVersion") { dep ->
 			optional dep
-			exclude group: 'edu.oswego.cs.concurrent', module: 'edu.oswego.cs.dl.util.concurrent'
-			exclude group: 'org.hibernate', module: 'hibernate'
+			exclude group: 'org.jboss.spec.javax.transaction', module: 'jboss-transaction-api_1.1_spec'
 		}
 		compile("org.hibernate:hibernate-annotations:$hibernateAnnotationsVersion") { dep ->
 			optional dep
-			exclude group: 'org.hibernate', module: 'hibernate'
-			exclude group: 'commons-logging', module: 'commons-logging'
+			exclude group: 'org.hibernate', module: 'hibernate-core'
 		}
 		optional "org.hibernate:hibernate-validator:$hibernateValidatorVersion"
-		optional "org.apache.geronimo.specs:geronimo-jta_1.1_spec:1.1"
+		optional "javax.transaction:javax.transaction-api:1.2"
 		optional "org.apache.ibatis:ibatis-sqlmap:$ibatisVersion"
-		optional "javax.mail:mail:$javaMailVersion"
+		optional "javax.mail:javax.mail-api:$javaMailVersion"
 		optional "javax.batch:javax.batch-api:$javaxBatchApiVersion"
 		compile("org.springframework:spring-oxm:$springVersion") { dep ->
 			optional dep
@@ -276,12 +272,10 @@ project('spring-batch-infrastructure') {
 		optional "org.springframework:spring-context:$springVersion"
 		compile("org.springframework:spring-context-support:$springVersion") { dep ->
 			optional dep
-			exclude group: 'quartz', module: 'quartz'
 		}
 		optional "org.springframework:spring-jdbc:$springVersion"
 		optional "org.springframework:spring-jms:$springVersion"
 		optional "org.springframework:spring-orm:$springVersion"
-		optional "cglib:cglib-nodep:$cglibVersion"
 		optional "org.springframework:spring-tx:$springVersion"
 		optional "org.springframework.data:spring-data-commons:$springDataCommonsVersion"
 		optional "org.springframework.data:spring-data-mongodb:$springDataMongodbVersion"
@@ -322,7 +316,6 @@ project('spring-batch-core-tests') {
 
 		optional "org.aspectj:aspectjrt:$aspectjVersion"
 		optional "org.aspectj:aspectjweaver:$aspectjVersion"
-		optional "cglib:cglib-nodep:$cglibVersion"
         optional "org.springframework.ldap:spring-ldap-core:$springLdapVersion"
         optional "org.springframework.ldap:spring-ldap-core-tiger:$springLdapVersion"
         optional "org.springframework.ldap:spring-ldap-ldif-core:$springLdapVersion"
@@ -336,7 +329,7 @@ project('spring-batch-infrastructure-tests') {
 	description = 'Spring Batch Infrastructure Tests'
 	dependencies {
 		compile project(":spring-batch-infrastructure")
-		compile "org.apache.geronimo.specs:geronimo-jms_1.1_spec:1.1"
+		compile "javax.jms:jms-api:1.1-rev-1"
 		compile "commons-dbcp:commons-dbcp:$commonsDdbcpVersion"
 		compile "org.springframework:spring-tx:$springVersion"
 		compile "org.springframework:spring-aop:$springVersion"
@@ -344,10 +337,8 @@ project('spring-batch-infrastructure-tests') {
 		testCompile "org.hsqldb:hsqldb:$hsqldbVersion"
 		testCompile "commons-io:commons-io:$commonsIoVersion"
 		testCompile "org.apache.derby:derby:$derbyVersion"
-		testCompile ("org.apache.activemq:activemq-core:$activemqVersion") {
-			exclude group: 'org.apache.camel', module: 'camel-core'
-			exclude group: 'commons-logging', module: 'commons-logging-api'
-		}
+		testCompile "org.apache.activemq:activemq-broker:$activemqVersion"
+		testCompile "org.apache.activemq:activemq-kahadb-store:$activemqVersion"
 		testCompile "junit:junit:$junitVersion"
 		testCompile "org.apache.geronimo.specs:geronimo-j2ee-management_1.1_spec:1.0.1"
 		testCompile "xmlunit:xmlunit:$xmlunitVersion"
@@ -373,22 +364,17 @@ project('spring-batch-infrastructure-tests') {
 		optional "org.apache.ibatis:ibatis-sqlmap:$ibatisVersion"
 		compile("org.hibernate:hibernate-core:$hibernateVersion") { dep ->
 			optional dep
-			exclude group: 'cglib', module: 'cglib'
-			exclude group: 'asm', module: 'asm'
-			exclude group: 'asm', module: 'asm-attrs'
-			exclude group: 'javax.transaction', module: 'jta'
+			exclude group: 'org.jboss.spec.javax.transaction', module: 'jboss-transaction-api_1.1_spec'
 		}
 		compile("org.hibernate:hibernate-entitymanager:$hibernateVersion") { dep ->
 			optional dep
-			exclude group: 'edu.oswego.cs.concurrent', module: 'edu.oswego.cs.dl.util.concurrent'
-			exclude group: 'org.hibernate', module: 'hibernate'
+			exclude group: 'org.jboss.spec.javax.transaction', module: 'jboss-transaction-api_1.1_spec'
 		}
 		compile("org.hibernate:hibernate-annotations:$hibernateAnnotationsVersion") { dep ->
 			optional dep
-			exclude group: 'org.hibernate', module: 'hibernate'
-			exclude group: 'commons-logging', module: 'commons-logging'
+			exclude group: 'org.hibernate', module: 'hibernate-core'
 		}
-		optional "org.apache.geronimo.specs:geronimo-jta_1.1_spec:1.1"
+		optional "javax.transaction:javax.transaction-api:1.2"
 		optional "org.springframework:spring-orm:$springVersion"
 		optional "org.springframework:spring-jms:$springVersion"
 
@@ -435,11 +421,11 @@ project('spring-batch-integration') {
 
 		testCompile project(":spring-batch-test")
 
-		testCompile "org.apache.activemq:activemq-core:$activemqVersion"
+		testCompile "org.apache.activemq:activemq-broker:$activemqVersion"
+		testCompile "org.apache.activemq:activemq-kahadb-store:$activemqVersion"
 		testCompile "junit:junit:$junitVersion"
 		testCompile "org.aspectj:aspectjrt:$aspectjVersion"
 		testCompile "org.aspectj:aspectjweaver:$aspectjVersion"
-		testCompile "cglib:cglib-nodep:$cglibVersion"
 		testCompile "commons-dbcp:commons-dbcp:$commonsDdbcpVersion"
 		testCompile "com.h2database:h2:$h2databaseVersion"
 		testCompile "mysql:mysql-connector-java:$mysqlVersion"
@@ -452,7 +438,7 @@ project('spring-batch-integration') {
 		}
 		testCompile "org.springframework.integration:spring-integration-jdbc:$springIntegrationVersion"
 
-		optional "org.apache.geronimo.specs:geronimo-jms_1.1_spec:1.1"
+		optional "javax.jms:jms-api:1.1-rev-1"
 		optional "org.slf4j:slf4j-log4j12:$slf4jVersion"
 		optional "log4j:log4j:1.2.14"
 		optional "org.springframework.integration:spring-integration-jms:$springIntegrationVersion"
@@ -468,36 +454,38 @@ project('spring-batch-samples') {
 		compile project(":spring-batch-core")
 		compile "org.aspectj:aspectjrt:$aspectjVersion"
 		compile "org.aspectj:aspectjweaver:$aspectjVersion"
-		compile "org.opensymphony.quartz:quartz:$quartzVersion"
+		compile "org.quartz-scheduler:quartz:$quartzVersion"
 		compile "commons-io:commons-io:$commonsIoVersion"
 		compile "commons-dbcp:commons-dbcp:$commonsDdbcpVersion"
 		compile "com.thoughtworks.xstream:xstream:$xstreamVersion"
 		compile("org.codehaus.woodstox:woodstox-core-asl:$woodstoxVersion") {
 			exclude group: 'stax', module: 'stax-api'
 		}
-		compile("org.hibernate:hibernate-core:$hibernateVersion") {
-			exclude group: 'cglib', module: 'cglib'
-			exclude group: 'asm', module: 'asm'
-			exclude group: 'asm', module: 'asm-attrs'
-			exclude group: 'javax.transaction', module: 'jta'
+		compile("org.hibernate:hibernate-core:$hibernateVersion") { dep ->
+			optional dep
+			exclude group: 'org.jboss.spec.javax.transaction', module: 'jboss-transaction-api_1.1_spec'
 		}
-		compile "org.apache.geronimo.specs:geronimo-jta_1.1_spec:1.1"
-		compile "cglib:cglib-nodep:$cglibVersion"
+		compile("org.hibernate:hibernate-entitymanager:$hibernateVersion") { dep ->
+			optional dep
+			exclude group: 'org.jboss.spec.javax.transaction', module: 'jboss-transaction-api_1.1_spec'
+		}
+		compile("org.hibernate:hibernate-annotations:$hibernateAnnotationsVersion") { dep ->
+			optional dep
+			exclude group: 'org.hibernate', module: 'hibernate-core'
+		}
+		compile "javax.transaction:javax.transaction-api:1.2"
 		compile "org.apache.ibatis:ibatis-sqlmap:$ibatisVersion"
 		compile "org.springframework:spring-aop:$springVersion"
 		compile("org.springframework:spring-oxm:$springVersion") {
 			exclude group: 'commons-lang', module: 'commons-lang'
 		}
 		compile "org.springframework:spring-core:$springVersion"
-		compile("org.springframework:spring-context-support:$springVersion") {
-			exclude group: 'quartz', module: 'quartz'
-		}
-
+		compile "org.springframework:spring-context-support:$springVersion"
 		compile "org.springframework:spring-jdbc:$springVersion"
 		compile "org.springframework:spring-orm:$springVersion"
 		compile "org.springframework:spring-tx:$springVersion"
 		compile "org.springframework.data:spring-data-jpa:$springDataJpaVersion"
-		compile "javax.mail:mail:$javaMailVersion"
+		compile "javax.mail:javax.mail-api:$javaMailVersion"
 
 		testCompile "xmlunit:xmlunit:$xmlunitVersion"
 		testCompile project(":spring-batch-test")
@@ -505,24 +493,16 @@ project('spring-batch-samples') {
 		testCompile "org.hsqldb:hsqldb:$hsqldbVersion"
 		testCompile "log4j:log4j:$log4jVersion"
 		testCompile "org.codehaus.groovy:groovy:$groovyVersion"
+		testCompile "org.codehaus.groovy:groovy-ant:$groovyVersion"
 		testCompile "org.springframework:spring-test:$springVersion"
 		testCompile "org.mockito:mockito-all:$mockitoVersion"
+
+		testRuntime "com.sun.mail:javax.mail:$javaMailVersion"
 
 		provided "mysql:mysql-connector-java:$mysqlVersion"
 		provided "net.sourceforge.jtds:jtds:$jtdsVersion"
 		provided "com.h2database:h2:$h2databaseVersion"
-		provided "javax.servlet:servlet-api:$servletApiVersion"
-
-		compile("org.hibernate:hibernate-entitymanager:$hibernateVersion") { dep ->
-			optional dep
-			exclude group: 'edu.oswego.cs.concurrent', module: 'edu.oswego.cs.dl.util.concurrent'
-			exclude group: 'org.hibernate', module: 'hibernate'
-		}
-		compile("org.hibernate:hibernate-annotations:$hibernateAnnotationsVersion") { dep ->
-			optional dep
-			exclude group: 'org.hibernate', module: 'hibernate'
-			exclude group: 'commons-logging', module: 'commons-logging'
-		}
+		provided "javax.servlet:javax.servlet-api:$servletApiVersion"
 
 		optional "com.vmware.sqlfire:sqlfireclient:$sqlfireclientVersion"
 		optional "org.slf4j:slf4j-log4j12:$slf4jVersion"
