@@ -16,14 +16,6 @@
 
 package org.springframework.batch.jms;
 
-import static org.junit.Assert.assertEquals;
-
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-
-import javax.sql.DataSource;
-
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -50,6 +42,13 @@ import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.TransactionStatus;
 import org.springframework.transaction.support.TransactionCallback;
 import org.springframework.transaction.support.TransactionTemplate;
+
+import javax.sql.DataSource;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+
+import static org.junit.Assert.assertEquals;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(locations = "/org/springframework/batch/jms/jms-context.xml")
@@ -136,7 +135,7 @@ public class ExternalRetryInBatchTests {
 										return RepeatStatus.FINISHED;
 									}
 									
-									RetryCallback<String> callback = new RetryCallback<String>() {
+									RetryCallback<String, Exception> callback = new RetryCallback<String, Exception>() {
 										@Override
 										public String doWithRetry(RetryContext context) throws Exception {
 											// No need for transaction here: the whole batch will roll

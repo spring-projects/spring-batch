@@ -16,13 +16,6 @@
 
 package org.springframework.batch.core.step.item;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Iterator;
-import java.util.List;
-import java.util.concurrent.atomic.AtomicInteger;
-import java.util.concurrent.atomic.AtomicReference;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.batch.core.StepContribution;
@@ -41,6 +34,13 @@ import org.springframework.retry.RetryCallback;
 import org.springframework.retry.RetryContext;
 import org.springframework.retry.RetryException;
 import org.springframework.retry.support.DefaultRetryState;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Iterator;
+import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicReference;
 
 /**
  * FaultTolerant implementation of the {@link ChunkProcessor} interface, that
@@ -96,14 +96,14 @@ public class FaultTolerantChunkProcessor<I, O> extends SimpleChunkProcessor<I, O
 	 * A classifier that can distinguish between exceptions that cause rollback
 	 * (return true) or not (return false).
 	 *
-	 * @param rollbackClassifier
+	 * @param rollbackClassifier classifier
 	 */
 	public void setRollbackClassifier(Classifier<Throwable, Boolean> rollbackClassifier) {
 		this.rollbackClassifier = rollbackClassifier;
 	}
 
 	/**
-	 * @param chunkMonitor
+	 * @param chunkMonitor monitor
 	 */
 	public void setChunkMonitor(ChunkMonitor chunkMonitor) {
 		this.chunkMonitor = chunkMonitor;
@@ -115,7 +115,7 @@ public class FaultTolerantChunkProcessor<I, O> extends SimpleChunkProcessor<I, O
 	 * complicated because after a rollback the new chunk might or might not
 	 * contain items from the previous failed chunk.
 	 *
-	 * @param buffering
+	 * @param buffering true if items will be buffered
 	 */
 	public void setBuffering(boolean buffering) {
 		this.buffering = buffering;
@@ -210,7 +210,7 @@ public class FaultTolerantChunkProcessor<I, O> extends SimpleChunkProcessor<I, O
 
 			final I item = iterator.next();
 
-			RetryCallback<O> retryCallback = new RetryCallback<O>() {
+			RetryCallback<O, Exception> retryCallback = new RetryCallback<O, Exception>() {
 
 				@Override
 				public O doWithRetry(RetryContext context) throws Exception {
@@ -317,7 +317,7 @@ public class FaultTolerantChunkProcessor<I, O> extends SimpleChunkProcessor<I, O
 		final UserData<O> data = (UserData<O>) inputs.getUserData();
 		final AtomicReference<RetryContext> contextHolder = new AtomicReference<RetryContext>();
 
-		RetryCallback<Object> retryCallback = new RetryCallback<Object>() {
+		RetryCallback<Object, Exception> retryCallback = new RetryCallback<Object, Exception>() {
 			@Override
 			public Object doWithRetry(RetryContext context) throws Exception {
 

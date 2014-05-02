@@ -15,9 +15,6 @@
  */
 package org.springframework.batch.core.jsr.step.item;
 
-import java.util.List;
-
-import javax.batch.operations.BatchRuntimeException;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.batch.core.StepContribution;
@@ -42,6 +39,9 @@ import org.springframework.retry.RetryCallback;
 import org.springframework.retry.RetryContext;
 import org.springframework.retry.RetryException;
 import org.springframework.util.Assert;
+
+import javax.batch.operations.BatchRuntimeException;
+import java.util.List;
 
 /**
  * Extension of the {@link JsrChunkProcessor} that adds skip and retry functionality.
@@ -97,7 +97,7 @@ public class JsrFaultTolerantChunkProcessor<I,O> extends JsrChunkProcessor<I, O>
 	 * Register some {@link StepListener}s with the handler. Each will get the
 	 * callbacks in the order specified at the correct stage.
 	 *
-	 * @param listeners
+	 * @param listeners listeners to be registered
 	 */
 	@Override
 	public void setListeners(List<? extends StepListener> listeners) {
@@ -126,7 +126,7 @@ public class JsrFaultTolerantChunkProcessor<I,O> extends JsrChunkProcessor<I, O>
 	 */
 	@Override
 	protected I provide(final StepContribution contribution, final Chunk<I> chunk) throws Exception {
-		RetryCallback<I> retryCallback = new RetryCallback<I>() {
+		RetryCallback<I, Exception> retryCallback = new RetryCallback<I, Exception>() {
 
 			@Override
 			public I doWithRetry(RetryContext arg0) throws Exception {
@@ -217,11 +217,10 @@ public class JsrFaultTolerantChunkProcessor<I,O> extends JsrChunkProcessor<I, O>
 	@SuppressWarnings("unchecked")
 	protected O transform(final StepContribution contribution, final I item) throws Exception {
 		if (!hasProcessor) {
-			O result = (O) item;
-			return result;
+			return (O) item;
 		}
 
-		RetryCallback<O> retryCallback = new RetryCallback<O>() {
+		RetryCallback<O, Exception> retryCallback = new RetryCallback<O, Exception>() {
 
 			@Override
 			public O doWithRetry(RetryContext context) throws Exception {
@@ -289,7 +288,7 @@ public class JsrFaultTolerantChunkProcessor<I,O> extends JsrChunkProcessor<I, O>
 	@Override
 	protected void persist(final StepContribution contribution, final Chunk<O> chunk) throws Exception {
 
-		RetryCallback<Object> retryCallback = new RetryCallback<Object>() {
+		RetryCallback<Object, Exception> retryCallback = new RetryCallback<Object, Exception>() {
 			@Override
 			@SuppressWarnings({ "unchecked", "rawtypes" })
 			public Object doWithRetry(RetryContext context) throws Exception {

@@ -16,15 +16,6 @@
 
 package org.springframework.batch.retry.jms;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.fail;
-
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-
-import javax.sql.DataSource;
-
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -44,6 +35,14 @@ import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.TransactionStatus;
 import org.springframework.transaction.support.TransactionCallback;
 import org.springframework.transaction.support.TransactionTemplate;
+
+import javax.sql.DataSource;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(locations = "/org/springframework/batch/jms/jms-context.xml")
@@ -102,7 +101,7 @@ public class ExternalRetryTests {
 
 		final ItemWriter<Object> writer = new ItemWriter<Object>() {
 			@Override
-			public void write(final List<? extends Object> texts) {
+			public void write(final List<?> texts) {
 
 				for (Object text : texts) {
 
@@ -123,7 +122,7 @@ public class ExternalRetryTests {
 				public Object doInTransaction(TransactionStatus status) {
 					try {
 						final Object item = provider.read();
-						RetryCallback<Object> callback = new RetryCallback<Object>() {
+						RetryCallback<Object, Exception> callback = new RetryCallback<Object, Exception>() {
 							@Override
 							public Object doWithRetry(RetryContext context) throws Exception {
 								writer.write(Collections.singletonList(item));
@@ -153,7 +152,7 @@ public class ExternalRetryTests {
 			public Object doInTransaction(TransactionStatus status) {
 				try {
 					final String item = provider.read();
-					RetryCallback<Object> callback = new RetryCallback<Object>() {
+					RetryCallback<Object, Exception> callback = new RetryCallback<Object, Exception>() {
 						@Override
 						public Object doWithRetry(RetryContext context) throws Exception {
 							writer.write(Collections.singletonList(item));
@@ -187,7 +186,7 @@ public class ExternalRetryTests {
 		assertInitialState();
 
 		final String item = provider.read();
-		final RetryCallback<String> callback = new RetryCallback<String>() {
+		final RetryCallback<String, Exception> callback = new RetryCallback<String, Exception>() {
 			@Override
 			public String doWithRetry(RetryContext context) throws Exception {
 				jdbcTemplate.update("INSERT into T_BARS (id,name,foo_date) values (?,?,null)", list.size(), item);

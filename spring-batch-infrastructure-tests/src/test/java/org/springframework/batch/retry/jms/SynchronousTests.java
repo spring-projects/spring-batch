@@ -16,16 +16,6 @@
 
 package org.springframework.batch.retry.jms;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
-
-import java.util.ArrayList;
-import java.util.List;
-
-import javax.sql.DataSource;
-
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -47,6 +37,15 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.support.TransactionCallback;
 import org.springframework.transaction.support.TransactionTemplate;
 import org.springframework.util.ClassUtils;
+
+import javax.sql.DataSource;
+import java.util.ArrayList;
+import java.util.List;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(locations = "/org/springframework/batch/jms/jms-context.xml")
@@ -124,7 +123,7 @@ public class SynchronousTests {
 		final String text = (String) jmsTemplate.receiveAndConvert("queue");
 		assertNotNull(text);
 
-		retryTemplate.execute(new RetryCallback<String>() {
+		retryTemplate.execute(new RetryCallback<String, Exception>() {
 			@Override
 			public String doWithRetry(RetryContext status) throws Exception {
 
@@ -176,7 +175,7 @@ public class SynchronousTests {
 
 		final String item = (String) provider.read();
 
-		retryTemplate.execute(new RetryCallback<String>() {
+		retryTemplate.execute(new RetryCallback<String, Exception>() {
 			@Override
 			public String doWithRetry(RetryContext context) throws Exception {
 
@@ -240,7 +239,7 @@ public class SynchronousTests {
 				final String text = (String) jmsTemplate.receiveAndConvert("queue");
 
 				try {
-					retryTemplate.execute(new RetryCallback<String>() {
+					retryTemplate.execute(new RetryCallback<String, Exception>() {
 						@Override
 						public String doWithRetry(RetryContext status) throws Exception {
 
@@ -297,7 +296,7 @@ public class SynchronousTests {
 
 		assertInitialState();
 
-		retryTemplate.execute(new RetryCallback<String>() {
+		retryTemplate.execute(new RetryCallback<String, Exception>() {
 			@Override
 			public String doWithRetry(RetryContext status) throws Exception {
 
@@ -347,7 +346,7 @@ public class SynchronousTests {
 
 		try {
 
-			retryTemplate.execute(new RetryCallback<String>() {
+			retryTemplate.execute(new RetryCallback<String, Exception>() {
 				@Override
 				public String doWithRetry(RetryContext status) throws Exception {
 

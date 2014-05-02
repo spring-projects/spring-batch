@@ -39,7 +39,7 @@ allprojects {
 
 		springVersionDefault = '4.0.2.RELEASE'
 		springVersion = project.hasProperty('springVersion') ? getProperty('springVersion') : springVersionDefault
-		springRetryVersion = '1.0.3.RELEASE'
+		springRetryVersion = '1.1.0.RC1'
 		springAmqpVersion = '1.1.2.RELEASE'
 		springDataCommonsVersion = '1.5.0.RELEASE'
 		springDataGemfireVersion = '1.3.0.RELEASE'

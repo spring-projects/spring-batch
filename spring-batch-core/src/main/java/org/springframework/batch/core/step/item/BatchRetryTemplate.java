@@ -16,11 +16,6 @@
 
 package org.springframework.batch.core.step.item;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Iterator;
-import java.util.List;
-
 import org.springframework.classify.Classifier;
 import org.springframework.retry.ExhaustedRetryException;
 import org.springframework.retry.RecoveryCallback;
@@ -36,6 +31,11 @@ import org.springframework.retry.policy.RetryContextCache;
 import org.springframework.retry.support.DefaultRetryState;
 import org.springframework.retry.support.RetrySynchronizationManager;
 import org.springframework.retry.support.RetryTemplate;
+
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Iterator;
+import java.util.List;
 
 /**
  * A special purpose retry template that deals specifically with multi-valued
@@ -153,13 +153,13 @@ public class BatchRetryTemplate implements RetryOperations {
 
 		@Override
 		protected <T> T handleRetryExhausted(RecoveryCallback<T> recoveryCallback, RetryContext context,
-				RetryState state) throws Exception {
+				RetryState state) throws Throwable {
 
 			BatchRetryState batchState = (BatchRetryState) state;
 			BatchRetryContext batchContext = (BatchRetryContext) context;
 
 			// Accumulate exceptions to be thrown so all the keys get a crack
-			Exception rethrowable = null;
+			Throwable rethrowable = null;
 			ExhaustedRetryException exhausted = null;
 
 			Iterator<RetryContext> contextIterator = batchContext.contexts.iterator();
@@ -173,7 +173,7 @@ public class BatchRetryTemplate implements RetryOperations {
 				catch (ExhaustedRetryException e) {
 					exhausted = e;
 				}
-				catch (Exception e) {
+				catch (Throwable e) {
 					rethrowable = e;
 				}
 
@@ -199,37 +199,37 @@ public class BatchRetryTemplate implements RetryOperations {
 
 	private RetryPolicy retryPolicy;
 
-	public <T> T execute(RetryCallback<T> retryCallback, Collection<RetryState> states) throws ExhaustedRetryException,
+	public <T, E extends Throwable> T execute(RetryCallback<T, E> retryCallback, Collection<RetryState> states) throws E,
 	Exception {
 		RetryState batchState = new BatchRetryState(states);
 		return delegate.execute(retryCallback, batchState);
 	}
 
-	public <T> T execute(RetryCallback<T> retryCallback, RecoveryCallback<T> recoveryCallback,
-			Collection<RetryState> states) throws ExhaustedRetryException, Exception {
+	public <T, E extends Throwable> T execute(RetryCallback<T, E> retryCallback, RecoveryCallback<T> recoveryCallback,
+			Collection<RetryState> states) throws E, Exception {
 		RetryState batchState = new BatchRetryState(states);
 		return delegate.execute(retryCallback, recoveryCallback, batchState);
 	}
 
 	@Override
-	public final <T> T execute(RetryCallback<T> retryCallback, RecoveryCallback<T> recoveryCallback,
-			RetryState retryState) throws Exception, ExhaustedRetryException {
+	public final <T, E extends Throwable> T execute(RetryCallback<T, E> retryCallback, RecoveryCallback<T> recoveryCallback,
+			RetryState retryState) throws E {
 		return regular.execute(retryCallback, recoveryCallback, retryState);
 	}
 
 	@Override
-	public final <T> T execute(RetryCallback<T> retryCallback, RecoveryCallback<T> recoveryCallback) throws Exception {
+	public final <T, E extends Throwable> T execute(RetryCallback<T, E> retryCallback, RecoveryCallback<T> recoveryCallback) throws E {
 		return regular.execute(retryCallback, recoveryCallback);
 	}
 
 	@Override
-	public final <T> T execute(RetryCallback<T> retryCallback, RetryState retryState) throws Exception,
+	public final <T, E extends Throwable> T execute(RetryCallback<T, E> retryCallback, RetryState retryState) throws E,
 	ExhaustedRetryException {
 		return regular.execute(retryCallback, retryState);
 	}
 
 	@Override
-	public final <T> T execute(RetryCallback<T> retryCallback) throws Exception {
+	public final <T, E extends Throwable> T execute(RetryCallback<T, E> retryCallback) throws E {
 		return regular.execute(retryCallback);
 	}
 

@@ -15,15 +15,6 @@
  */
 package org.springframework.batch.core.step.item;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
-
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
-
 import org.junit.Test;
 import org.springframework.retry.ExhaustedRetryException;
 import org.springframework.retry.RecoveryCallback;
@@ -32,6 +23,15 @@ import org.springframework.retry.RetryContext;
 import org.springframework.retry.RetryState;
 import org.springframework.retry.policy.SimpleRetryPolicy;
 import org.springframework.retry.support.DefaultRetryState;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 public class BatchRetryTemplateTests {
 
@@ -53,7 +53,7 @@ public class BatchRetryTemplateTests {
 
 		BatchRetryTemplate template = new BatchRetryTemplate();
 
-		String result = template.execute(new RetryCallback<String>() {
+		String result = template.execute(new RetryCallback<String, Exception>() {
 			@Override
 			public String doWithRetry(RetryContext context) throws Exception {
 				assertTrue("Wrong context type: " + context.getClass().getSimpleName(), context.getClass()
@@ -71,7 +71,7 @@ public class BatchRetryTemplateTests {
 
 		BatchRetryTemplate template = new BatchRetryTemplate();
 
-		RetryCallback<String[]> retryCallback = new RetryCallback<String[]>() {
+		RetryCallback<String[], Exception> retryCallback = new RetryCallback<String[], Exception>() {
 			@Override
 			public String[] doWithRetry(RetryContext context) throws Exception {
 				assertEquals(count, context.getRetryCount());
@@ -103,7 +103,7 @@ public class BatchRetryTemplateTests {
 		template.setRetryPolicy(new SimpleRetryPolicy(1, Collections
 				.<Class<? extends Throwable>, Boolean> singletonMap(Exception.class, true)));
 
-		RetryCallback<String[]> retryCallback = new RetryCallback<String[]>() {
+		RetryCallback<String[], Exception> retryCallback = new RetryCallback<String[], Exception>() {
 			@Override
 			public String[] doWithRetry(RetryContext context) throws Exception {
 				if (count++ < 2) {
@@ -133,7 +133,7 @@ public class BatchRetryTemplateTests {
 		template.setRetryPolicy(new SimpleRetryPolicy(1, Collections
 				.<Class<? extends Throwable>, Boolean> singletonMap(Exception.class, true)));
 
-		RetryCallback<String[]> retryCallback = new RetryCallback<String[]>() {
+		RetryCallback<String[], Exception> retryCallback = new RetryCallback<String[], Exception>() {
 			@Override
 			public String[] doWithRetry(RetryContext context) throws Exception {
 				if (count++ < 1) {
@@ -188,7 +188,7 @@ public class BatchRetryTemplateTests {
 		template.setRetryPolicy(new SimpleRetryPolicy(1, Collections
 				.<Class<? extends Throwable>, Boolean> singletonMap(Exception.class, true)));
 
-		RetryCallback<String[]> retryCallback = new RetryCallback<String[]>() {
+		RetryCallback<String[], Exception> retryCallback = new RetryCallback<String[], Exception>() {
 			@Override
 			public String[] doWithRetry(RetryContext context) throws Exception {
 				if (count++ < 2) {

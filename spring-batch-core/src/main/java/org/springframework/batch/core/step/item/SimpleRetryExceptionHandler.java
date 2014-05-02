@@ -15,8 +15,6 @@
  */
 package org.springframework.batch.core.step.item;
 
-import java.util.Collection;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.batch.repeat.RepeatContext;
@@ -27,6 +25,8 @@ import org.springframework.retry.RetryCallback;
 import org.springframework.retry.RetryContext;
 import org.springframework.retry.RetryPolicy;
 import org.springframework.retry.listener.RetryListenerSupport;
+
+import java.util.Collection;
 
 /**
  * An {@link ExceptionHandler} that is aware of the retry context so that it can
@@ -58,7 +58,7 @@ public class SimpleRetryExceptionHandler extends RetryListenerSupport implements
 	 * exception is encountered
 	 * @param exceptionHandler the delegate to use if an exception actually
 	 * needs to be handled
-	 * @param fatalExceptionClasses
+	 * @param fatalExceptionClasses exceptions
 	 */
 	public SimpleRetryExceptionHandler(RetryPolicy retryPolicy, ExceptionHandler exceptionHandler, Collection<Class<? extends Throwable>> fatalExceptionClasses) {
 		this.retryPolicy = retryPolicy;
@@ -95,7 +95,7 @@ public class SimpleRetryExceptionHandler extends RetryListenerSupport implements
 	 * org.springframework.retry.RetryCallback, java.lang.Throwable)
 	 */
 	@Override
-	public <T> void close(RetryContext context, RetryCallback<T> callback, Throwable throwable) {
+	public <T, E extends Throwable> void close(RetryContext context, RetryCallback<T, E> callback, Throwable throwable) {
 		if (!retryPolicy.canRetry(context)) {
 			logger.debug("Marking retry as exhausted: "+context);
 			getRepeatContext().setAttribute(EXHAUSTED, "true");
