@@ -29,7 +29,9 @@ import org.quartz.Job;
 import org.quartz.JobDetail;
 import org.quartz.JobExecutionContext;
 import org.quartz.Scheduler;
-import org.quartz.SimpleTrigger;
+import org.quartz.impl.JobDetailImpl;
+import org.quartz.impl.JobExecutionContextImpl;
+import org.quartz.impl.triggers.SimpleTriggerImpl;
 import org.quartz.spi.TriggerFiredBundle;
 import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.JobParameters;
@@ -71,7 +73,7 @@ public class JobLauncherDetailsTests {
 	}
 
 	private JobExecutionContext createContext(JobDetail jobDetail) {
-		firedBundle = new TriggerFiredBundle(jobDetail, new SimpleTrigger(), null, false, new Date(), new Date(), new Date(), new Date());
+		firedBundle = new TriggerFiredBundle(jobDetail, new SimpleTriggerImpl(), null, false, new Date(), new Date(), new Date(), new Date());
 		return new StubJobExecutionContext();
 	}
 
@@ -81,7 +83,7 @@ public class JobLauncherDetailsTests {
 	 */
 	@Test
 	public void testExecuteWithNoJobParameters() {
-		JobDetail jobDetail = new JobDetail();
+		JobDetail jobDetail = new JobDetailImpl();
 		JobExecutionContext context = createContext(jobDetail);
 		details.executeInternal(context);
 		assertEquals(2, list.size());
@@ -95,7 +97,7 @@ public class JobLauncherDetailsTests {
 	 */
 	@Test
 	public void testExecuteWithJobName() {
-		JobDetail jobDetail = new JobDetail();
+		JobDetail jobDetail = new JobDetailImpl();
 		jobDetail.getJobDataMap().put(JobLauncherDetails.JOB_NAME, "FOO");
 		JobExecutionContext context = createContext(jobDetail);
 		details.executeInternal(context);
@@ -109,7 +111,7 @@ public class JobLauncherDetailsTests {
 	 */
 	@Test
 	public void testExecuteWithSomeJobParameters() {
-		JobDetail jobDetail = new JobDetail();
+		JobDetail jobDetail = new JobDetailImpl();
 		jobDetail.getJobDataMap().put("foo", "bar");
 		JobExecutionContext context = createContext(jobDetail);
 		details.executeInternal(context);
@@ -124,7 +126,7 @@ public class JobLauncherDetailsTests {
 	 */
 	@Test
 	public void testExecuteWithJobNameAndParameters() {
-		JobDetail jobDetail = new JobDetail();
+		JobDetail jobDetail = new JobDetailImpl();
 		jobDetail.getJobDataMap().put(JobLauncherDetails.JOB_NAME, "FOO");
 		jobDetail.getJobDataMap().put("foo", "bar");
 		JobExecutionContext context = createContext(jobDetail);
@@ -141,7 +143,7 @@ public class JobLauncherDetailsTests {
 	 */
 	@Test
 	public void testExecuteWithJobNameAndComplexParameters() {
-		JobDetail jobDetail = new JobDetail();
+		JobDetail jobDetail = new JobDetailImpl();
 		jobDetail.getJobDataMap().put(JobLauncherDetails.JOB_NAME, "FOO");
 		jobDetail.getJobDataMap().put("foo", this);
 		JobExecutionContext context = createContext(jobDetail);
@@ -154,7 +156,7 @@ public class JobLauncherDetailsTests {
 	}
 
 	@SuppressWarnings("serial")
-	private final class StubJobExecutionContext extends JobExecutionContext {
+	private final class StubJobExecutionContext extends JobExecutionContextImpl {
 		private StubJobExecutionContext() {
 			super(mock(Scheduler.class), firedBundle, mock(Job.class));
 		}

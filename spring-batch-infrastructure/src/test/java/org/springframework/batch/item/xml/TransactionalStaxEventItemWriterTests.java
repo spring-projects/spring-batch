@@ -228,7 +228,7 @@ public class TransactionalStaxEventItemWriterTests {
 	 * @return output file content as String
 	 */
 	private String outputFileContent() throws IOException {
-		return FileUtils.readFileToString(resource.getFile(), null);
+		return FileUtils.readFileToString(resource.getFile(), (String)null);
 	}
 
 	/**
