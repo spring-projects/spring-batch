@@ -32,16 +32,42 @@ import java.util.List;
  * </p>
  *
  * @author Chris Schaefer
+ * @author Anand Hemmige
  */
 public class AmqpItemWriter<T> implements ItemWriter<T> {
     private final AmqpTemplate amqpTemplate;
+    private final String routingKey;
+    private final String exchange;
+
     private final Log log = LogFactory.getLog(getClass());
 
     public AmqpItemWriter(final AmqpTemplate amqpTemplate) {
         Assert.notNull(amqpTemplate, "AmpqTemplate must not be null");
 
         this.amqpTemplate = amqpTemplate;
+        this.routingKey = null;
+        this.exchange = null;
     }
+
+    public AmqpItemWriter(final AmqpTemplate amqpTemplate, final String routingKey) {
+        Assert.notNull(amqpTemplate, "AmpqTemplate must not be null");
+        Assert.notNull(routingKey, "routingKey must not be null");
+
+        this.amqpTemplate = amqpTemplate;
+        this.routingKey = routingKey;
+        this.exchange = null;
+    }
+
+    public AmqpItemWriter(final AmqpTemplate amqpTemplate, final String routingKey, final String exchange) {
+        Assert.notNull(amqpTemplate, "AmpqTemplate must not be null");
+        Assert.notNull(routingKey, "routingKey must not be null");
+        Assert.notNull(exchange, "exchange must not be null");
+
+        this.amqpTemplate = amqpTemplate;
+        this.routingKey = routingKey;
+        this.exchange = exchange;
+    }
+
 
     @Override
     public void write(final List<? extends T> items) throws Exception {
@@ -50,7 +76,13 @@ public class AmqpItemWriter<T> implements ItemWriter<T> {
         }
 
         for (T item : items) {
-            amqpTemplate.convertAndSend(item);
+            if (routingKey != null && exchange != null) {
+                amqpTemplate.convertAndSend(exchange, routingKey, item);
+            } else if (routingKey != null) {
+                amqpTemplate.convertAndSend(routingKey, item);
+            } else {
+                amqpTemplate.convertAndSend(item);
+            }
         }
     }
 }
