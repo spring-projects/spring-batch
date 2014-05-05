@@ -30,7 +30,7 @@
 
 	<bean id="dataSource" class="org.apache.commons.dbcp.BasicDataSource">
 		<property name="driverClassName" value="org.hsqldb.jdbcDriver" />
-		<property name="url" value="jdbc:hsqldb:mem:testdb;sql.enforce_strict_size=true" />
+		<property name="url" value="jdbc:hsqldb:mem:testdb;sql.enforce_strict_size=true;hsqldb.tx=mvcc" />
 		<property name="username" value="sa" />
 		<property name="password" value="" />
 	</bean>
