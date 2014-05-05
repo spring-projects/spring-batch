@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2013 the original author or authors.
+ * Copyright 2006-2014 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -36,6 +36,8 @@ import org.springframework.util.Assert;
  * In-memory implementation of {@link JobInstanceDao}.
  */
 public class MapJobInstanceDao implements JobInstanceDao {
+	private static final String STAR_WILDCARD = "\\*";
+	private static final String STAR_WILDCARD_PATTERN = ".*";
 
 	// JDK6 Make a ConcurrentSkipListSet: tends to add on end
 	private final Map<String, JobInstance> jobInstances = new ConcurrentHashMap<String, JobInstance>();
@@ -95,17 +97,10 @@ public class MapJobInstanceDao implements JobInstanceDao {
 				result.add(instance);
 			}
 		}
-		Collections.sort(result, new Comparator<JobInstance>() {
-			// sort by ID descending
-			@Override
-			public int compare(JobInstance o1, JobInstance o2) {
-				return Long.signum(o2.getId() - o1.getId());
-			}
-		});
 
-		int startIndex = Math.min(start, result.size());
-		int endIndex = Math.min(start + count, result.size());
-		return result.subList(startIndex, endIndex);
+		sortDescending(result);
+
+		return subset(result, start, count);
 	}
 
 	@Override
@@ -135,6 +130,35 @@ public class MapJobInstanceDao implements JobInstanceDao {
 
 	@Override
 	public List<JobInstance> findJobInstancesByName(String jobName, int start, int count) {
-		return getJobInstances(jobName,start,count);
+		List<JobInstance> result = new ArrayList<JobInstance>();
+		String convertedJobName = jobName.replaceAll(STAR_WILDCARD, STAR_WILDCARD_PATTERN);
+
+		for (Map.Entry<String, JobInstance> instanceEntry : jobInstances.entrySet()) {
+			JobInstance instance = instanceEntry.getValue();
+
+			if(instance.getJobName().matches(convertedJobName)) {
+				result.add(instance);
+			}
+		}
+
+		sortDescending(result);
+
+		return subset(result, start, count);
+	}
+
+	private void sortDescending(List<JobInstance> result) {
+		Collections.sort(result, new Comparator<JobInstance>() {
+			@Override
+			public int compare(JobInstance o1, JobInstance o2) {
+				return Long.signum(o2.getId() - o1.getId());
+			}
+		});
+	}
+
+	private List<JobInstance> subset(List<JobInstance> jobInstances, int start, int count) {
+		int startIndex = Math.min(start, jobInstances.size());
+		int endIndex = Math.min(start + count, jobInstances.size());
+
+		return jobInstances.subList(startIndex, endIndex);
 	}
 }

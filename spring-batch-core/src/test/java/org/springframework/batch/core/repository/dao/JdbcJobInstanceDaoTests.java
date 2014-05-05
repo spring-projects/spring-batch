@@ -1,5 +1,5 @@
 /*
- * Copyright 2008-2013 the original author or authors.
+ * Copyright 2008-2014 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -91,18 +91,16 @@ public class JdbcJobInstanceDaoTests extends AbstractJobInstanceDaoTests {
 	
 	@Test
 	public void testJobInstanceWildcard() {
-		//look up a job using a wildcard (* substituted to %)
-		// unrelated job instance that should be ignored by the query
 		dao.createJobInstance("anotherJob", new JobParameters());
-		// we need two instances of the same job to check ordering
 		dao.createJobInstance("someJob", new JobParameters());
-		//now look for them
+
 		List<JobInstance> jobInstances = dao.findJobInstancesByName("*Job", 0, 2);
 		assertEquals(2, jobInstances.size());
+
 		for (JobInstance instance : jobInstances) {
 			assertTrue(instance.getJobName().contains("Job"));
-		}//end for
-		//try with after wildcards
+		}
+
 		jobInstances = dao.getJobInstances("Job*", 0, 2);
 		assertTrue(jobInstances.isEmpty());
 	}	

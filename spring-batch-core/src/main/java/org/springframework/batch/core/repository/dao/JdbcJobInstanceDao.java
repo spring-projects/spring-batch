@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2013 the original author or authors.
+ * Copyright 2006-2014 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -305,11 +305,9 @@ JobInstanceDao, InitializingBean {
 	}
 
 	@Override
-	public List<JobInstance> findJobInstancesByName(String jobName,final int start,
-			final int count) {
+	public List<JobInstance> findJobInstancesByName(String jobName, final int start, final int count) {
 		@SuppressWarnings("rawtypes")
 		ResultSetExtractor extractor = new ResultSetExtractor() {
-
 			private List<JobInstance> list = new ArrayList<JobInstance>();
 
 			@Override
@@ -326,14 +324,11 @@ JobInstanceDao, InitializingBean {
 				}
 				return list;
 			}
-
 		};
 
-		//check if the name contains a wildcard
 		if (jobName.contains(STAR_WILDCARD)) {
-			//swap for sql wildcard
 			jobName = jobName.replaceAll("\\" + STAR_WILDCARD, SQL_WILDCARD);
-		}//end if		
+		}
 		
 		@SuppressWarnings("unchecked")
 		List<JobInstance> result = (List<JobInstance>) getJdbcTemplate().query(getQuery(FIND_LAST_JOBS_LIKE_NAME),
