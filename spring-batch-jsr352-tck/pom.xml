@@ -15,7 +15,6 @@
 	</parent>
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-		<spring.framework.version>4.0.2.RELEASE</spring.framework.version>
 		<jsr352.tck.libs.dir>${env.JSR_352_TCK_LIBS}</jsr352.tck.libs.dir>
 		<jsr352.tck.home.dir>${env.JSR_352_TCK_HOME}</jsr352.tck.home.dir>
 	</properties>
