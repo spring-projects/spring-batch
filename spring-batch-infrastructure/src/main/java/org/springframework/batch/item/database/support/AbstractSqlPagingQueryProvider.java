@@ -249,4 +249,8 @@ public abstract class AbstractSqlPagingQueryProvider implements PagingQueryProvi
 		}
 	}
 
+	protected Object getSortKeyName(String key) {
+		return key;
+	}
+
 }
