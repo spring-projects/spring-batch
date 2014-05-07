@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2007 the original author or authors.
+ * Copyright 2006-2014 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -64,7 +64,7 @@ public abstract class AbstractApplicationContextFactory implements ApplicationCo
 	 * Create a factory instance with the resource specified. The resource is a Spring configuration file or java
 	 * package containing configuration files.
 	 */
-	public AbstractApplicationContextFactory(Object[] resources) {
+	public AbstractApplicationContextFactory(Object... resources) {
 
 		this.resources = resources;
 		beanFactoryPostProcessorClasses = new ArrayList<Class<? extends BeanFactoryPostProcessor>>();
