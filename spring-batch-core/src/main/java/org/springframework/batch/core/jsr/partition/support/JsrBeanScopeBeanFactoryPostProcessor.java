@@ -23,7 +23,6 @@ import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.config.BeanFactoryPostProcessor;
 import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
 import org.springframework.beans.factory.config.RuntimeBeanReference;
-import org.springframework.beans.factory.support.AbstractBeanDefinition;
 
 import javax.batch.api.partition.PartitionAnalyzer;
 import javax.batch.api.partition.PartitionMapper;
@@ -79,7 +78,7 @@ public class JsrBeanScopeBeanFactoryPostProcessor implements BeanFactoryPostProc
 			String beanClassName = beanDefinition.getBeanClassName();
 
 			if(StepFactoryBean.class.getName().equals(beanClassName)) {
-				PropertyValue [] values = ((AbstractBeanDefinition) beanDefinition).getPropertyValues().getPropertyValues();
+				PropertyValue [] values = beanDefinition.getPropertyValues().getPropertyValues();
 				for (PropertyValue propertyValue : values) {
 					if(propertyValue.getName().equalsIgnoreCase("partitionReducer")) {
 						RuntimeBeanReference ref = (RuntimeBeanReference) propertyValue.getValue();
@@ -89,7 +88,7 @@ public class JsrBeanScopeBeanFactoryPostProcessor implements BeanFactoryPostProc
 			}
 
 			if(JsrPartitionHandler.class.getName().equals(beanClassName)) {
-				PropertyValue [] values = ((AbstractBeanDefinition) beanDefinition).getPropertyValues().getPropertyValues();
+				PropertyValue [] values = beanDefinition.getPropertyValues().getPropertyValues();
 				for (PropertyValue propertyValue : values) {
 					String propertyName = propertyValue.getName();
 					if(propertyName.equalsIgnoreCase("partitionMapper") || propertyName.equalsIgnoreCase("partitionAnalyzer")) {
