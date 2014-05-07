@@ -53,11 +53,11 @@ public class GenericApplicationContextFactory extends AbstractApplicationContext
 	}
 
 	/**
-	 * @see AbstractApplicationContextFactory#createApplicationContext(ConfigurableApplicationContext, Object)
+	 * @see AbstractApplicationContextFactory#createApplicationContext(ConfigurableApplicationContext, Object...)
 	 */
 	@Override
 	protected ConfigurableApplicationContext createApplicationContext(ConfigurableApplicationContext parent,
-			Object[] resources) {
+			Object... resources) {
 		if (allObjectsOfType(resources, Resource.class)) {
 			return new ResourceXmlApplicationContext(parent, resources);
 		}
@@ -91,7 +91,7 @@ public class GenericApplicationContextFactory extends AbstractApplicationContext
 		private final ConfigurableApplicationContext parent;
 
 		public ApplicationContextHelper(ConfigurableApplicationContext parent, GenericApplicationContext context,
-				Object[] configs) {
+				Object... configs) {
 			this.parent = parent;
 			if (parent != null) {
 				Assert.isTrue(parent.getBeanFactory() instanceof DefaultListableBeanFactory,
@@ -107,9 +107,9 @@ public class GenericApplicationContextFactory extends AbstractApplicationContext
 			prepareContext(parent, context);
 		}
 
-		protected abstract String generateId(Object[] configs);
+		protected abstract String generateId(Object... configs);
 
-		protected abstract void loadConfiguration(Object[] configs);
+		protected abstract void loadConfiguration(Object... configs);
 
 		protected void prepareBeanFactory(ConfigurableListableBeanFactory beanFactory) {
 			if (parentBeanFactory != null) {
@@ -131,15 +131,15 @@ public class GenericApplicationContextFactory extends AbstractApplicationContext
 		/**
 		 * @param parent
 		 */
-		public ResourceXmlApplicationContext(ConfigurableApplicationContext parent, Object[] resources) {
+		public ResourceXmlApplicationContext(ConfigurableApplicationContext parent, Object... resources) {
 			helper = new ApplicationContextHelper(parent, this, resources) {
 				@Override
-				protected String generateId(Object[] configs) {
+				protected String generateId(Object... configs) {
 					Resource[] resources = Arrays.copyOfRange(configs, 0, configs.length, Resource[].class);
 					try {
 						List<String> uris = new ArrayList<String>();
-						for (Resource rsrc : resources) {
-							uris.add(rsrc.getURI().toString());
+						for (Resource resource : resources) {
+							uris.add(resource.getURI().toString());
 						}
 						return StringUtils.collectionToCommaDelimitedString(uris);
 					}
@@ -148,7 +148,7 @@ public class GenericApplicationContextFactory extends AbstractApplicationContext
 					}
 				}
 				@Override
-				protected void loadConfiguration(Object[] configs) {
+				protected void loadConfiguration(Object... configs) {
 					Resource[] resources = Arrays.copyOfRange(configs, 0, configs.length, Resource[].class);
 					load(resources);
 				}
@@ -173,10 +173,10 @@ public class GenericApplicationContextFactory extends AbstractApplicationContext
 
 		private final ApplicationContextHelper helper;
 
-		public ResourceAnnotationApplicationContext(ConfigurableApplicationContext parent, Object[] resources) {
+		public ResourceAnnotationApplicationContext(ConfigurableApplicationContext parent, Object... resources) {
 			helper = new ApplicationContextHelper(parent, this, resources) {
 				@Override
-				protected String generateId(Object[] configs) {
+				protected String generateId(Object... configs) {
 					if (allObjectsOfType(configs, Class.class)) {
 						Class<?>[] types = Arrays.copyOfRange(configs, 0, configs.length, Class[].class);
 						List<String> names = new ArrayList<String>();
@@ -190,7 +190,7 @@ public class GenericApplicationContextFactory extends AbstractApplicationContext
 					}
 				}
 				@Override
-				protected void loadConfiguration(Object[] configs) {
+				protected void loadConfiguration(Object... configs) {
 					if (allObjectsOfType(configs, Class.class)) {
 						Class<?>[] types = Arrays.copyOfRange(configs, 0, configs.length, Class[].class);
 						register(types);

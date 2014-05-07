@@ -172,7 +172,7 @@ public abstract class AbstractApplicationContextFactory implements ApplicationCo
 	}
 
 	protected abstract ConfigurableApplicationContext createApplicationContext(ConfigurableApplicationContext parent,
-			Object[] resources);
+			Object... resources);
 
 	/**
 	 * Extension point for special subclasses that want to do more complex things with the context prior to refresh. The
