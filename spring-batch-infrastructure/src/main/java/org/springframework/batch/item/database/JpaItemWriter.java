@@ -16,11 +16,6 @@
 
 package org.springframework.batch.item.database;
 
-import java.util.List;
-
-import javax.persistence.EntityManager;
-import javax.persistence.EntityManagerFactory;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.batch.item.ItemWriter;
@@ -29,12 +24,16 @@ import org.springframework.dao.DataAccessResourceFailureException;
 import org.springframework.orm.jpa.EntityManagerFactoryUtils;
 import org.springframework.util.Assert;
 
+import javax.persistence.EntityManager;
+import javax.persistence.EntityManagerFactory;
+import java.util.List;
+
 /**
  * {@link org.springframework.batch.item.ItemWriter} that is using a JPA
  * EntityManagerFactory to merge any Entities that aren't part of the
  * persistence context.
  *
- * It is required that {@link #write(List)} is called inside a transaction.<br/>
+ * It is required that {@link #write(List)} is called inside a transaction.<br>
  *
  * The reader must be configured with an
  * {@link javax.persistence.EntityManagerFactory} that is capable of

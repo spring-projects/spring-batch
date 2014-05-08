@@ -27,12 +27,12 @@ import org.springframework.util.Assert;
 
 /**
  * Provides {@link RepeatOperations} support including interceptors that can be
- * used to modify or monitor the behaviour at run time.<br/>
+ * used to modify or monitor the behaviour at run time.<br>
  * 
  * This implementation is sufficient to be used to configure transactional
  * behaviour for each item by making the {@link RepeatCallback} transactional,
  * or for the whole batch by making the execute method transactional (but only
- * then if the task executor is synchronous).<br/>
+ * then if the task executor is synchronous).<br>
  * 
  * This class is thread-safe if its collaborators are thread-safe (interceptors,
  * terminationPolicy, callback). Normally this will be the case, but clients
@@ -41,7 +41,7 @@ import org.springframework.util.Assert;
  * is wrapped in the execute method must be thread-safe - often it is based on
  * some form of data source, which itself should be both thread-safe and
  * transactional (multiple threads could be accessing it at any given time, and
- * each thread would have its own transaction).<br/>
+ * each thread would have its own transaction).<br>
  * 
  * @author Dave Syer
  * 

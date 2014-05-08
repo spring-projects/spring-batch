@@ -16,8 +16,6 @@
 
 package org.springframework.batch.item.jms;
 
-import javax.jms.Message;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.batch.item.ItemReader;
@@ -26,11 +24,13 @@ import org.springframework.jms.core.JmsOperations;
 import org.springframework.jms.core.JmsTemplate;
 import org.springframework.util.Assert;
 
+import javax.jms.Message;
+
 /**
  * An {@link ItemReader} for JMS using a {@link JmsTemplate}. The template
  * should have a default destination, which will be used to provide items in
- * {@link #read()}.<br/>
- * <br/>
+ * {@link #read()}.<br>
+ * <br>
  * 
  * The implementation is thread-safe after its properties are set (normal
  * singleton behavior).

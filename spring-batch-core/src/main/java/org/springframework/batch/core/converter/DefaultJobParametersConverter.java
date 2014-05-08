@@ -15,6 +15,13 @@
  */
 package org.springframework.batch.core.converter;
 
+import org.springframework.batch.core.JobInstance;
+import org.springframework.batch.core.JobParameter;
+import org.springframework.batch.core.JobParameter.ParameterType;
+import org.springframework.batch.core.JobParameters;
+import org.springframework.batch.core.JobParametersBuilder;
+import org.springframework.util.StringUtils;
+
 import java.text.DateFormat;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
@@ -26,13 +33,6 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Properties;
-
-import org.springframework.batch.core.JobInstance;
-import org.springframework.batch.core.JobParameter;
-import org.springframework.batch.core.JobParameter.ParameterType;
-import org.springframework.batch.core.JobParameters;
-import org.springframework.batch.core.JobParametersBuilder;
-import org.springframework.util.StringUtils;
 
 /**
  * Converter for {@link JobParameters} instances using a simple naming
@@ -50,7 +50,7 @@ import org.springframework.util.StringUtils;
  * The literal values are converted to the correct type using the default Spring
  * strategies, augmented if necessary by the custom editors provided.
  *
- * <br/>
+ * <br>
  *
  * If you need to be able to parse and format local-specific dates and numbers,
  * you can inject formatters ({@link #setDateFormat(DateFormat)} and

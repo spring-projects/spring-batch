@@ -15,15 +15,15 @@
  */
 package org.springframework.batch.core.job.flow.support;
 
-import java.util.Comparator;
-
 import org.springframework.util.StringUtils;
+
+import java.util.Comparator;
 
 /**
  * Sorts by decreasing specificity of pattern, based on just counting
  * wildcards (with * taking precedence over ?). If wildcard counts are equal
  * then falls back to alphabetic comparison. Hence * &gt; foo* &gt; ??? &gt;
- * fo? > foo.
+ * fo? &gt; foo.
  *
  * @see Comparator
  * @author Michael Minella

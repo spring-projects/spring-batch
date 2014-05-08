@@ -15,8 +15,6 @@
  */
 package org.springframework.batch.core.step.tasklet;
 
-import java.util.concurrent.Semaphore;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.batch.core.BatchStatus;
@@ -53,13 +51,15 @@ import org.springframework.transaction.support.TransactionSynchronizationManager
 import org.springframework.transaction.support.TransactionTemplate;
 import org.springframework.util.Assert;
 
+import java.util.concurrent.Semaphore;
+
 /**
  * Simple implementation of executing the step as a call to a {@link Tasklet},
  * possibly repeated, and each call surrounded by a transaction. The structure
  * is therefore that of a loop with transaction boundary inside the loop. The
  * loop is controlled by the step operations (
- * {@link #setStepOperations(RepeatOperations)}).<br/>
- * <br/>
+ * {@link #setStepOperations(RepeatOperations)}).<br>
+ * <br>
  *
  * Clients can use interceptors in the step operations to intercept or listen to
  * the iteration on a step-wide basis, for instance to get a callback when the
@@ -233,7 +233,7 @@ public class TaskletStep extends AbstractStep {
 	 * given an up to date {@link BatchStatus}, and the {@link JobRepository} is
 	 * used to store the result. Various reporting information are also added to
 	 * the current context governing the step execution, which would normally be
-	 * available to the caller through the step's {@link ExecutionContext}.<br/>
+	 * available to the caller through the step's {@link ExecutionContext}.<br>
 	 *
 	 * @throws JobInterruptedException if the step or a chunk is interrupted
 	 * @throws RuntimeException if there is an exception during a chunk

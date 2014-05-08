@@ -16,26 +16,25 @@
 
 package org.springframework.batch.item.xml;
 
-import java.lang.reflect.Constructor;
-import java.lang.reflect.Method;
-
-import javax.xml.stream.XMLEventReader;
-import javax.xml.stream.XMLEventWriter;
-import javax.xml.transform.Result;
-import javax.xml.transform.Source;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.util.Assert;
 import org.springframework.util.ClassUtils;
 
+import javax.xml.stream.XMLEventReader;
+import javax.xml.stream.XMLEventWriter;
+import javax.xml.transform.Result;
+import javax.xml.transform.Source;
+import java.lang.reflect.Constructor;
+import java.lang.reflect.Method;
+
 /**
  * This class provides a little bit of indirection to avoid ugly conditional object creation. It is unfortunately
  * a bit redundant assuming a Spring 3.0 environment, but is necessary to work with Spring WS 1.5.x.
- * <p/>
+ * <br>
  * The returned object determines whether the environment has Spring OXM as included in the Spring 3.x series of relies
  * or whether it has Spring OXM from Spring WS 1.5x and factories a StaxSource instance appropriately.
- * <p/>
+ * <br>
  * As the only class state maintained is to cache java reflection metadata, which is thread-safe, this class is thread-safe.
  *
  * @author Josh Long

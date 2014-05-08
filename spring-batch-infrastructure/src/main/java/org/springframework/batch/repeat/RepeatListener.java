@@ -59,7 +59,7 @@ public interface RepeatListener {
 	/**
 	 * Called when a repeat callback fails by throwing an exception. There will
 	 * be one call to this method for each exception thrown during a repeat
-	 * operation (e.g. a chunk).<br/>
+	 * operation (e.g. a chunk).<br>
 	 * 
 	 * There is no need to re-throw the exception here - that will be done by
 	 * the enclosing framework.

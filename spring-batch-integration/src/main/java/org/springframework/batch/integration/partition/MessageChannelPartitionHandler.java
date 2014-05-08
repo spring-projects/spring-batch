@@ -1,9 +1,5 @@
 package org.springframework.batch.integration.partition;
 
-import java.util.Collection;
-import java.util.List;
-import java.util.Set;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.batch.core.Step;
@@ -22,6 +18,10 @@ import org.springframework.messaging.Message;
 import org.springframework.messaging.MessageChannel;
 import org.springframework.messaging.PollableChannel;
 import org.springframework.util.Assert;
+
+import java.util.Collection;
+import java.util.List;
+import java.util.Set;
 
 /**
  * A {@link PartitionHandler} that uses {@link MessageChannel} instances to send instructions to remote workers and
@@ -65,7 +65,7 @@ public class MessageChannelPartitionHandler implements PartitionHandler {
 	 * channel that returns a list of {@link StepExecution} results</li> </ul> The timeout for the repoy should be set
 	 * sufficiently long that the remote steps have time to complete.
 	 *
-	 * @param messagingGateway the {@link MessagingOperations} to set
+	 * @param messagingGateway the {@link org.springframework.integration.core.MessagingTemplate} to set
 	 */
 	public void setMessagingOperations(MessagingTemplate messagingGateway) {
 		this.messagingGateway = messagingGateway;

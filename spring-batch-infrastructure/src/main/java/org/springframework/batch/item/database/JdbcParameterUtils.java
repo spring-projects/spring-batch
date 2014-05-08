@@ -36,7 +36,7 @@ public class JdbcParameterUtils {
 	 * <code>sql</code>. The character placeholder is not counted if it appears
 	 * within a literal, that is, surrounded by single or double quotes. This method will
 	 * count traditional placeholders in the form of a question mark ('?') as well as
-	 * named parameters indicated with a leading ':' or '&'.
+	 * named parameters indicated with a leading ':' or '&amp;'.
 	 *
 	 * The code for this method is taken from an early version of the
 	 * {@link org.springframework.jdbc.core.namedparam.NamedParameterUtils}

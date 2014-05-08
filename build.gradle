@@ -100,8 +100,15 @@ subprojects { subproject ->
 		toolVersion = "0.7.0.201403182114"
 	}
 
-	sourceCompatibility=1.7
-	targetCompatibility=1.7
+    compileJava {
+        sourceCompatibility=1.6
+        targetCompatibility=1.6
+    }
+
+    compileTestJava {
+        sourceCompatibility=1.7
+        targetCompatibility=1.7
+    }
 
 	eclipse {
 		project {
@@ -545,6 +552,10 @@ task api(type: Javadoc) {
 	options.author = true
 	options.header = rootProject.description
 	options.overview = 'src/api/overview.html'
+    if (JavaVersion.current().isJava8Compatible()) {
+        options.addStringOption('Xdoclint:none', '-quiet')
+    }
+
 	source subprojects.collect { project ->
 		project.sourceSets.main.allJava
 	}
@@ -626,7 +637,7 @@ task distZip(type: Zip, dependsOn: [docsZip, schemaZip]) {
 		into "${baseDir}/schema"
 	}
 
-	subprojects.each { subproject ->
+	[project(':spring-batch-core'), project(':spring-batch-infrastructure'), project(':spring-batch-test'), project(':spring-batch-integration')].each { subproject ->
 		into ("${baseDir}/libs") {
 			from subproject.jar
 			from subproject.sourcesJar

@@ -53,7 +53,7 @@ import org.springframework.util.Assert;
  * Repository can reliably recreate it.
  *
  * @author Lucas Ward
- * @Author Dave Syer
+ * @author Dave Syer
  * @author Will Schipp
  * @author Michael Minella
  *

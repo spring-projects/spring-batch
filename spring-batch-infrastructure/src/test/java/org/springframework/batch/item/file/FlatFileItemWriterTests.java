@@ -16,25 +16,6 @@
 
 package org.springframework.batch.item.file;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
-
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.Writer;
-import java.nio.charset.UnsupportedCharsetException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
-
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -51,6 +32,25 @@ import org.springframework.transaction.TransactionStatus;
 import org.springframework.transaction.support.TransactionCallback;
 import org.springframework.transaction.support.TransactionTemplate;
 import org.springframework.util.ClassUtils;
+
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.Writer;
+import java.nio.charset.UnsupportedCharsetException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 /**
  * Tests of regular usage for {@link FlatFileItemWriter} Exception cases will be in separate TestCase classes with
@@ -524,7 +524,7 @@ public class FlatFileItemWriterTests {
 	public void testOpenWithNonWritableFile() throws Exception {
 		writer = new FlatFileItemWriter<String>();
 		writer.setLineAggregator(new PassThroughLineAggregator<String>());
-		FileSystemResource file = new FileSystemResource("target/no-such-file.foo");
+		FileSystemResource file = new FileSystemResource("build/no-such-file.foo");
 		writer.setResource(file);
 		new File(file.getFile().getParent()).mkdirs();
 		file.getFile().createNewFile();
@@ -835,7 +835,7 @@ public class FlatFileItemWriterTests {
 	 * If append=true a new output file should still be created on the first run (not restart).
 	 */
 	public void testAppendToNotYetExistingFile() throws Exception {
-		Resource toBeCreated = new FileSystemResource("target/FlatFileItemWriterTests.out");
+		Resource toBeCreated = new FileSystemResource("build/FlatFileItemWriterTests.out");
 
 		outputFile = toBeCreated.getFile(); //enable easy content reading and auto-delete the file
 

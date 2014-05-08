@@ -15,11 +15,11 @@
  */
 package org.springframework.batch.core;
 
+import org.springframework.util.StringUtils;
+
 import java.io.PrintWriter;
 import java.io.Serializable;
 import java.io.StringWriter;
-
-import org.springframework.util.StringUtils;
 
 /**
  * Value object used to carry information about the status of a
@@ -105,8 +105,8 @@ public class ExitStatus implements Serializable, Comparable<ExitStatus> {
 	 * code, and a concatenation of the descriptions. If either value has a
 	 * higher severity then its exit code will be used in the result. In the
 	 * case of equal severity, the exit code is replaced if the new value is
-	 * alphabetically greater.<br/>
-	 * <br/>
+	 * alphabetically greater.<br>
+	 * <br>
 	 *
 	 * Severity is defined by the exit code:
 	 * <ul>
@@ -117,7 +117,7 @@ public class ExitStatus implements Serializable, Comparable<ExitStatus> {
 	 * <li>Codes beginning with FAILED have severity 5</li>
 	 * <li>Codes beginning with UNKNOWN have severity 6</li>
 	 * </ul>
-	 * Others have severity 7, so custom exit codes always win.<br/>
+	 * Others have severity 7, so custom exit codes always win.<br>
 	 *
 	 * If the input is null just return this.
 	 *

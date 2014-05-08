@@ -16,16 +16,6 @@
 
 package org.springframework.batch.item.file;
 
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.Writer;
-import java.nio.channels.Channels;
-import java.nio.channels.FileChannel;
-import java.nio.charset.UnsupportedCharsetException;
-import java.util.List;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.batch.item.ExecutionContext;
@@ -42,12 +32,22 @@ import org.springframework.core.io.Resource;
 import org.springframework.util.Assert;
 import org.springframework.util.ClassUtils;
 
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.Writer;
+import java.nio.channels.Channels;
+import java.nio.channels.FileChannel;
+import java.nio.charset.UnsupportedCharsetException;
+import java.util.List;
+
 /**
  * This class is an item writer that writes data to a file or stream. The writer
  * also provides restart. The location of the output file is defined by a
- * {@link Resource} and must represent a writable file.<br/>
+ * {@link Resource} and must represent a writable file.<br>
  * 
- * Uses buffered writer to improve performance.<br/>
+ * Uses buffered writer to improve performance.<br>
  * 
  * The implementation is <b>not</b> thread-safe.
  * 
@@ -242,7 +242,7 @@ InitializingBean {
 	 * applied and then this method recursively called with the result. If the
 	 * input is an array or collection each value will be written to a separate
 	 * line (recursively calling this method for each value). If no converter is
-	 * supplied the input object's toString method will be used.<br/>
+	 * supplied the input object's toString method will be used.<br>
 	 * 
 	 * @param items list of items to be written to output stream
 	 * @throws Exception if the transformer or file output fail,

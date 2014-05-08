@@ -16,6 +16,15 @@
 
 package org.springframework.batch.item.database;
 
+import org.springframework.beans.factory.InitializingBean;
+import org.springframework.jdbc.datasource.ConnectionProxy;
+import org.springframework.jdbc.datasource.DataSourceUtils;
+import org.springframework.jdbc.datasource.SmartDataSource;
+import org.springframework.transaction.support.TransactionSynchronizationManager;
+import org.springframework.util.Assert;
+import org.springframework.util.MethodInvoker;
+
+import javax.sql.DataSource;
 import java.io.PrintWriter;
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.InvocationTargetException;
@@ -25,16 +34,6 @@ import java.sql.Connection;
 import java.sql.SQLException;
 import java.sql.SQLFeatureNotSupportedException;
 import java.util.logging.Logger;
-
-import javax.sql.DataSource;
-
-import org.springframework.beans.factory.InitializingBean;
-import org.springframework.jdbc.datasource.ConnectionProxy;
-import org.springframework.jdbc.datasource.DataSourceUtils;
-import org.springframework.jdbc.datasource.SmartDataSource;
-import org.springframework.transaction.support.TransactionSynchronizationManager;
-import org.springframework.util.Assert;
-import org.springframework.util.MethodInvoker;
 
 /**
  * Implementation of {@link SmartDataSource} that is capable of keeping a single
@@ -104,7 +103,7 @@ public class ExtendedConnectionDataSourceProxy implements SmartDataSource, Initi
 	}
 
 	/**
-	 * Constructor that takes as a parameter with the {&link DataSource} to be
+	 * Constructor that takes as a parameter with the {@link DataSource} to be
 	 * wrapped.
 	 */
 	public ExtendedConnectionDataSourceProxy(DataSource dataSource) {
@@ -112,7 +111,7 @@ public class ExtendedConnectionDataSourceProxy implements SmartDataSource, Initi
 	}
 
 	/**
-	 * Setter for the {&link DataSource} that is to be wrapped.
+	 * Setter for the {@link DataSource} that is to be wrapped.
 	 *
 	 * @param dataSource the DataSource
 	 */

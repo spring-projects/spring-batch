@@ -16,19 +16,18 @@
 
 package org.springframework.batch.item.database.support;
 
-import java.util.ArrayList;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-
-import javax.sql.DataSource;
-
 import org.springframework.batch.item.database.JdbcParameterUtils;
 import org.springframework.batch.item.database.Order;
 import org.springframework.batch.item.database.PagingQueryProvider;
 import org.springframework.dao.InvalidDataAccessApiUsageException;
 import org.springframework.util.Assert;
 import org.springframework.util.StringUtils;
+
+import javax.sql.DataSource;
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Abstract SQL Paging Query Provider to serve as a base class for all provided
@@ -147,7 +146,7 @@ public abstract class AbstractSqlPagingQueryProvider implements PagingQueryProvi
 	}
 
 	/**
-	 * A Map<String, Boolean> of sort columns as the key and boolean for ascending/descending (ascending = true).
+	 * A Map&lt;String, Boolean&gt; of sort columns as the key and boolean for ascending/descending (ascending = true).
 	 * 
 	 * @return sortKey key to use to sort and limit page content
 	 */

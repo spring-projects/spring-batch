@@ -15,15 +15,6 @@
  */
 package org.springframework.batch.test;
 
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
-
-import javax.sql.DataSource;
-
 import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.JobInstance;
 import org.springframework.batch.core.JobParameter;
@@ -41,6 +32,14 @@ import org.springframework.jdbc.core.JdbcOperations;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.simple.ParameterizedRowMapper;
 import org.springframework.util.Assert;
+
+import javax.sql.DataSource;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
 
 /**
  * Convenience class for creating and removing {@link JobExecution} instances
@@ -123,7 +122,6 @@ public class JobRepositoryTestUtils extends AbstractJdbcBatchMetadataDao impleme
 	 * @param count the required number of instances of {@link JobExecution} to
 	 * create
 	 * @return a collection of {@link JobExecution}
-	 * @throws Exception if there is a problem in the {@link JobRepository}
 	 */
 	public List<JobExecution> createJobExecutions(String jobName, String[] stepNames, int count)
 			throws JobExecutionAlreadyRunningException, JobRestartException, JobInstanceAlreadyCompleteException {
@@ -147,7 +145,6 @@ public class JobRepositoryTestUtils extends AbstractJdbcBatchMetadataDao impleme
 	 * @param count the required number of instances of {@link JobExecution} to
 	 * create
 	 * @return a collection of {@link JobExecution}
-	 * @throws Exception if there is a problem in the {@link JobRepository}
 	 */
 	public List<JobExecution> createJobExecutions(int count) throws JobExecutionAlreadyRunningException,
 	JobRestartException, JobInstanceAlreadyCompleteException {

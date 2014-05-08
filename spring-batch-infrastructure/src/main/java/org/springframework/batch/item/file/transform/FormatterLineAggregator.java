@@ -23,7 +23,7 @@ import org.springframework.util.Assert;
 
 /**
  * A {@link LineAggregator} implementation which produces a String by
- * aggregating the provided item via the {@link Formatter} syntax.</br>
+ * aggregating the provided item via the {@link Formatter} syntax.<br>
  * 
  * @see Formatter
  * 

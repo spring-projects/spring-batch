@@ -42,7 +42,7 @@ public interface Step {
 	/**
 	 * Process the step and assign progress and status meta information to the {@link StepExecution} provided. The
 	 * {@link Step} is responsible for setting the meta information and also saving it if required by the
-	 * implementation.<br/>
+	 * implementation.<br>
 	 * 
 	 * It is not safe to re-use an instance of {@link Step} to process multiple concurrent executions.
 	 * 

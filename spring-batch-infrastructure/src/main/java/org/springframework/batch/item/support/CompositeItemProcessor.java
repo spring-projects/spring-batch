@@ -16,17 +16,17 @@
 
 package org.springframework.batch.item.support;
 
-import java.util.List;
-
 import org.springframework.batch.item.ItemProcessor;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.util.Assert;
 
+import java.util.List;
+
 /**
  * Composite {@link ItemProcessor} that passes the item through a sequence of
  * injected <code>ItemTransformer</code>s (return value of previous
- * transformation is the entry value of the next).<br/>
- * <br/>
+ * transformation is the entry value of the next).<br>
+ * <br>
  * 
  * Note the user is responsible for injecting a chain of {@link ItemProcessor}s
  * that conforms to declared input and output types.

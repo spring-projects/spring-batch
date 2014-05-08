@@ -15,21 +15,23 @@
  */
 package org.springframework.batch.support;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import org.apache.commons.io.FileUtils;
+import org.junit.Test;
+import org.springframework.core.io.FileSystemResource;
 
 import java.io.File;
 import java.io.IOException;
 
-import org.apache.commons.io.FileUtils;
-import org.junit.Test;
-import org.springframework.core.io.FileSystemResource;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 /**
  * @author Dave Syer
  * 
  */
 public class LastModifiedResourceComparatorTests {
+
+	public static final String FILE_PATH = "src/test/resources/org/springframework/batch/support/existing.txt";
 
 	private LastModifiedResourceComparator comparator = new LastModifiedResourceComparator();
 
@@ -40,12 +42,12 @@ public class LastModifiedResourceComparatorTests {
 
 	@Test(expected = IllegalArgumentException.class)
 	public void testCompareOneNonExistent() {
-		comparator.compare(new FileSystemResource("pom.xml"), new FileSystemResource("crap"));
+		comparator.compare(new FileSystemResource(FILE_PATH), new FileSystemResource("crap"));
 	}
 
 	@Test
 	public void testCompareSame() {
-		assertEquals(0, comparator.compare(new FileSystemResource("pom.xml"), new FileSystemResource("pom.xml")));
+		assertEquals(0, comparator.compare(new FileSystemResource(FILE_PATH), new FileSystemResource(FILE_PATH)));
 	}
 
 	@Test
@@ -53,13 +55,13 @@ public class LastModifiedResourceComparatorTests {
 		File temp = File.createTempFile(getClass().getSimpleName(), ".txt");
 		temp.deleteOnExit();
 		assertTrue(temp.exists());
-		assertEquals(1, comparator.compare(new FileSystemResource(temp), new FileSystemResource("pom.xml")));
+		assertEquals(1, comparator.compare(new FileSystemResource(temp), new FileSystemResource(FILE_PATH)));
 	}
 
 	@Test
 	public void testCompareNewWithOldAfterCopy() throws Exception {
-		File temp1 = new File("target/temp1.txt");
-		File temp2 = new File("target/temp2.txt");
+		File temp1 = new File("build/temp1.txt");
+		File temp2 = new File("build/temp2.txt");
 		if (temp1.exists()) temp1.delete();
 		if (temp2.exists()) temp2.delete();
 		temp1.getParentFile().mkdirs();
@@ -70,7 +72,8 @@ public class LastModifiedResourceComparatorTests {
 		Thread.sleep(1000);
 		// Need to explicitly ask not to preserve the last modified date when we
 		// copy...
-		FileUtils.copyFile(new File("pom.xml"), temp1, false);
+
+		FileUtils.copyFile(new FileSystemResource(FILE_PATH).getFile(), temp1, false);
 		assertEquals(1, comparator.compare(new FileSystemResource(temp1), new FileSystemResource(temp2)));
 	}
 

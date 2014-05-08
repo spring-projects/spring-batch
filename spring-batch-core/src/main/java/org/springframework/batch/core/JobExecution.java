@@ -16,6 +16,8 @@
 
 package org.springframework.batch.core;
 
+import org.springframework.batch.item.ExecutionContext;
+
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.util.ArrayList;
@@ -27,8 +29,6 @@ import java.util.List;
 import java.util.Set;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.CopyOnWriteArraySet;
-
-import org.springframework.batch.item.ExecutionContext;
 
 /**
  * Batch domain object representing the execution of a job.
@@ -333,7 +333,7 @@ public class JobExecution extends Entity {
 	 * Return all failure causing exceptions for this JobExecution, including
 	 * step executions.
 	 *
-	 * @return List<Throwable> containing all exceptions causing failure for
+	 * @return List&lt;Throwable&gt; containing all exceptions causing failure for
 	 * this JobExecution.
 	 */
 	public synchronized List<Throwable> getAllFailureExceptions() {

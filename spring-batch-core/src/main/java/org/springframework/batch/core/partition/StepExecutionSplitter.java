@@ -16,11 +16,11 @@
 
 package org.springframework.batch.core.partition;
 
-import java.util.Set;
-
 import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.JobExecutionException;
 import org.springframework.batch.core.StepExecution;
+
+import java.util.Set;
 
 /**
  * Strategy interface for generating input contexts for a partitioned step
@@ -44,8 +44,8 @@ public interface StepExecutionSplitter {
 	 * executable instances with the same parent {@link JobExecution}. The grid
 	 * size will be treated as a hint for the size of the collection to be
 	 * returned. It may or may not correspond to the physical size of an
-	 * execution grid.<br/>
-	 * <br/>
+	 * execution grid.<br>
+	 * <br>
 	 * 
 	 * On a restart clients of the {@link StepExecutionSplitter} should expect
 	 * it to reconstitute the state of the last failed execution and only return

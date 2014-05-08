@@ -15,18 +15,20 @@
  */
 package org.springframework.batch.item.util;
 
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
-
-import static org.junit.Assert.*;
-
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.batch.item.ItemStreamException;
 import org.springframework.util.Assert;
+
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 /**
  * Tests for {@link FileUtils}
@@ -35,7 +37,7 @@ import org.springframework.util.Assert;
  */
 public class FileUtilsTests {
 
-	private File file = new File("target/FileUtilsTests.tmp");
+	private File file = new File("build/FileUtilsTests.tmp");
 
 	/**
 	 * No restart + file should not be overwritten => file is created if it does

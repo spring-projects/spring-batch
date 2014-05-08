@@ -15,11 +15,11 @@
  */
 package org.springframework.batch.item.data;
 
-import java.util.Iterator;
-
 import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.ItemStreamReader;
 import org.springframework.batch.item.support.AbstractItemCountingItemStreamItemReader;
+
+import java.util.Iterator;
 
 /**
  * A base class that handles basic reading logic based on the paginated
@@ -80,7 +80,7 @@ AbstractItemCountingItemStreamItemReader<T> {
 	 * for the actual work of reading a page.  Each time
 	 * this method is called, the resulting {@link Iterator}
 	 * should contain the items read within the next page.
-	 * <br/><br/>
+	 * <br><br>
 	 * If the {@link Iterator} is empty or null when it is
 	 * returned, this {@link ItemReader} will assume that the
 	 * input has been exhausted.

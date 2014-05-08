@@ -15,9 +15,6 @@
  */
 package org.springframework.batch.item.file;
 
-import java.util.Arrays;
-import java.util.concurrent.atomic.AtomicInteger;
-
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.ItemStreamException;
@@ -25,14 +22,17 @@ import org.springframework.batch.item.support.AbstractItemStreamItemReader;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.support.ResourceArrayPropertyEditor;
 
+import java.util.Arrays;
+import java.util.concurrent.atomic.AtomicInteger;
+
 /**
  * {@link ItemReader} which produces {@link Resource} instances from an array.
  * This can be used conveniently with a configuration entry that injects a
  * pattern (e.g. <code>mydir/*.txt</code>, which can then be converted by Spring
  * to an array of Resources by the ApplicationContext.
  * 
- * <br/>
- * <br/>
+ * <br>
+ * <br>
  * 
  * Thread-safe between calls to {@link #open(ExecutionContext)}. The
  * {@link ExecutionContext} is not accurate in a multi-threaded environment, so

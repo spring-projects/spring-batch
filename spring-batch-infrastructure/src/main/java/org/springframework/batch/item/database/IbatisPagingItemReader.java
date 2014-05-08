@@ -16,15 +16,8 @@
 
 package org.springframework.batch.item.database;
 
-import java.sql.Connection;
-import java.sql.SQLException;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.concurrent.CopyOnWriteArrayList;
-
-import javax.sql.DataSource;
-
+import com.ibatis.sqlmap.client.SqlMapClient;
+import com.ibatis.sqlmap.client.SqlMapSession;
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.jdbc.CannotGetJdbcConnectionException;
 import org.springframework.jdbc.datasource.DataSourceUtils;
@@ -35,8 +28,13 @@ import org.springframework.jdbc.support.SQLStateSQLExceptionTranslator;
 import org.springframework.util.Assert;
 import org.springframework.util.ClassUtils;
 
-import com.ibatis.sqlmap.client.SqlMapClient;
-import com.ibatis.sqlmap.client.SqlMapSession;
+import javax.sql.DataSource;
+import java.sql.Connection;
+import java.sql.SQLException;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 /**
  * <p>
@@ -52,7 +50,7 @@ import com.ibatis.sqlmap.client.SqlMapSession;
  * to current position. Some standard query parameters are provided by the
  * reader and the SQL in the named query must use some or all of these parameters
  * (depending on the SQL variant) to construct a result set of the required
- * size. The parameters are:
+ * size. The parameters are:</p>
  * <ul>
  * <li><code>_page</code>: the page number to be read (starting at 0)</li>
  * <li><code>_pagesize</code>: the size of the pages, i.e. the number of rows to
@@ -60,6 +58,7 @@ import com.ibatis.sqlmap.client.SqlMapSession;
  * <li><code>_skiprows</code>: the product of <code>_page</code> and
  * <code>_pagesize</code></li>
  * </ul>
+ * <p>
  * Failure to write the correct platform-specific SQL often results in an
  * infinite loop in the reader because it keeps asking for the next page and
  * gets the same result set over and over.

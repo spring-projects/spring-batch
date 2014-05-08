@@ -16,11 +16,6 @@
 
 package test.jdbc.datasource;
 
-import java.io.IOException;
-import java.util.List;
-
-import javax.sql.DataSource;
-
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -38,9 +33,13 @@ import org.springframework.util.Assert;
 import org.springframework.util.ClassUtils;
 import org.springframework.util.StringUtils;
 
+import javax.sql.DataSource;
+import java.io.IOException;
+import java.util.List;
+
 /**
  * Wrapper for a {@link DataSource} that can run scripts on start up and shut
- * down.  Us as a bean definition <br/><br/>
+ * down.  Us as a bean definition <br><br>
  *
  * Run this class to initialize a database in a running server process.
  * Make sure the server is running first by launching the "hsql-server" from the

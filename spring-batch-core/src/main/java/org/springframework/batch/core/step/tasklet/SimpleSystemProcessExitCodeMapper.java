@@ -21,8 +21,8 @@ import org.springframework.batch.core.ExitStatus;
 /**
  * Simple {@link SystemProcessExitCodeMapper} implementation that performs following mapping:
  *
- * 0 	-> ExitStatus.FINISHED
- * else	-> ExitStatus.FAILED
+ * 0 	-&gt; ExitStatus.FINISHED
+ * else	-&gt; ExitStatus.FAILED
  *
  * @author Robert Kasanicky
  */

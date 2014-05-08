@@ -28,8 +28,8 @@ import org.springframework.beans.factory.config.Scope;
  * Scope for job context. Objects in this scope use the Spring container as an
  * object factory, so there is only one instance of such a bean per executing
  * job. All objects in this scope are &lt;aop:scoped-proxy/&gt; (no need to
- * decorate the bean definitions).<br/>
- * <br/>
+ * decorate the bean definitions).<br>
+ * <br>
  *
  * In addition, support is provided for late binding of references accessible
  * from the {@link JobContext} using #{..} placeholders. Using this feature,
