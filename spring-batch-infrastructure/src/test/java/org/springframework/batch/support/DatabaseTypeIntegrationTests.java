@@ -16,11 +16,11 @@
 
 package org.springframework.batch.support;
 
-import static org.junit.Assert.assertEquals;
+import org.junit.Test;
 
 import javax.sql.DataSource;
 
-import org.junit.Test;
+import static org.junit.Assert.assertEquals;
 
 /**
  * @author Dave Syer
@@ -31,7 +31,7 @@ public class DatabaseTypeIntegrationTests {
 	@Test
 	public void testH2() throws Exception {
 		DataSource dataSource = DatabaseTypeTestUtils.getDataSource(org.h2.Driver.class,
-				"jdbc:h2:file:target/data/sample");
+				"jdbc:h2:file:build/data/sample");
 		assertEquals(DatabaseType.H2, DatabaseType.fromMetaData(dataSource));
 		dataSource.getConnection();
 	}

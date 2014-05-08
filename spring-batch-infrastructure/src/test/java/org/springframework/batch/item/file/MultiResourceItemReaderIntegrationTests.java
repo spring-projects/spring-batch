@@ -15,16 +15,6 @@
  */
 package org.springframework.batch.item.file;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertSame;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
-
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.Comparator;
-
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.batch.item.ExecutionContext;
@@ -35,6 +25,16 @@ import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
 import org.springframework.test.util.ReflectionTestUtils;
+
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.Comparator;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertSame;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 /**
  * Tests for {@link MultiResourceItemReader}.
@@ -294,7 +294,7 @@ public class MultiResourceItemReaderIntegrationTests {
 	 */
 	@Test
 	public void testDirectoryResources() throws Exception {
-		FileSystemResource resource = new FileSystemResource("target/data");
+		FileSystemResource resource = new FileSystemResource("build/data");
 		resource.getFile().mkdirs();
 		assertTrue(resource.getFile().isDirectory());
 		tested.setResources(new Resource[] { resource });

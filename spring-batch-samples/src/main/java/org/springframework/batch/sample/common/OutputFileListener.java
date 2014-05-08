@@ -30,7 +30,7 @@ public class OutputFileListener {
 
 	private String inputKeyName = "fileName";
 
-	private String path = "file:./target/output/";
+	private String path = "file:./build/output/";
 	
 	public void setPath(String path) {
 		this.path = path;

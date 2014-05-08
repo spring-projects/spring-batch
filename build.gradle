@@ -626,7 +626,7 @@ task distZip(type: Zip, dependsOn: [docsZip, schemaZip]) {
 		into "${baseDir}/schema"
 	}
 
-	subprojects.each { subproject ->
+	[project(':spring-batch-core'), project(':spring-batch-infrastructure'), project(':spring-batch-test'), project(':spring-batch-integration')].each { subproject ->
 		into ("${baseDir}/libs") {
 			from subproject.jar
 			from subproject.sourcesJar

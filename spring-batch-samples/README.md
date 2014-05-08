@@ -839,7 +839,7 @@ source view of the configuration is as follows:
 
     <bean id="directory"
         class="org.springframework.core.io.FileSystemResource">
-        <constructor-arg value="target/test-outputs/test-dir" />
+        <constructor-arg value="build/test-outputs/test-dir" />
     </bean>
 
 For simplicity we are only displaying the job configuration itself
