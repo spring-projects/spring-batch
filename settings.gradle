@@ -1,9 +1,0 @@
-rootProject.name = 'spring-batch'
-
-include 'spring-batch-core'
-include 'spring-batch-core-tests'
-include 'spring-batch-infrastructure'
-include 'spring-batch-infrastructure-tests'
-include 'spring-batch-test'
-include 'spring-batch-integration'
-include 'spring-batch-samples'
