@@ -46,7 +46,7 @@ public class GenericApplicationContextFactory extends AbstractApplicationContext
 	 * Create an application context factory for the resource specified. The resource can be an actual {@link Resource},
 	 * in which case it will be interpreted as an XML file, or it can be a &#64;Configuration class, or a package name.
 	 * 
-	 * @param resources a resource (XML configuration file, &#064;Configuration class or java package to scan)
+	 * @param resources some resources (XML configuration files, &#064;Configuration classes or java packages to scan)
 	 */
 	public GenericApplicationContextFactory(Object... resources) {
 		super(resources);
@@ -59,13 +59,13 @@ public class GenericApplicationContextFactory extends AbstractApplicationContext
 	protected ConfigurableApplicationContext createApplicationContext(ConfigurableApplicationContext parent,
 			Object... resources) {
 		if (allObjectsOfType(resources, Resource.class)) {
-			return new ResourceXmlApplicationContext(parent, resources);
+			 return new ResourceXmlApplicationContext(parent, resources);
 		}
 		if (allObjectsOfType(resources, Class.class)) {
-			return new ResourceAnnotationApplicationContext(parent, resources);
+			 return new ResourceAnnotationApplicationContext(parent, resources);
 		}
 		if (allObjectsOfType(resources, String.class)) {
-			return new ResourceAnnotationApplicationContext(parent, resources);
+			 return new ResourceAnnotationApplicationContext(parent, resources);
 		}
 		List<Class<?>> types = new ArrayList<Class<?>>();
 		for (Object resource : resources) {
@@ -91,7 +91,7 @@ public class GenericApplicationContextFactory extends AbstractApplicationContext
 		private final ConfigurableApplicationContext parent;
 
 		public ApplicationContextHelper(ConfigurableApplicationContext parent, GenericApplicationContext context,
-				Object... configs) {
+				Object... config) {
 			this.parent = parent;
 			if (parent != null) {
 				Assert.isTrue(parent.getBeanFactory() instanceof DefaultListableBeanFactory,
@@ -102,8 +102,8 @@ public class GenericApplicationContextFactory extends AbstractApplicationContext
 				parentBeanFactory = null;
 			}
 			context.setParent(parent);
-			context.setId(generateId(configs));
-			loadConfiguration(configs);
+			context.setId(generateId(config));
+			loadConfiguration(config);
 			prepareContext(parent, context);
 		}
 
@@ -136,21 +136,21 @@ public class GenericApplicationContextFactory extends AbstractApplicationContext
 				@Override
 				protected String generateId(Object... configs) {
 					Resource[] resources = Arrays.copyOfRange(configs, 0, configs.length, Resource[].class);
-					try {
-						List<String> uris = new ArrayList<String>();
-						for (Resource resource : resources) {
-							uris.add(resource.getURI().toString());
-						}
-						return StringUtils.collectionToCommaDelimitedString(uris);
-					}
-					catch (IOException e) {
-						return Arrays.toString(resources);
-					}
+  					try {
+ 						List<String> uris = new ArrayList<String>();
+ 						for (Resource resource : resources) {
+ 							uris.add(resource.getURI().toString());
+ 						}
+ 						return StringUtils.collectionToCommaDelimitedString(uris);
+  					}
+  					catch (IOException e) {
+ 						return Arrays.toString(resources);
+  					}
 				}
 				@Override
 				protected void loadConfiguration(Object... configs) {
 					Resource[] resources = Arrays.copyOfRange(configs, 0, configs.length, Resource[].class);
-					load(resources);
+ 					load(resources);
 				}
 			};
 			refresh();

@@ -16,11 +16,6 @@
 
 package org.springframework.batch.core.configuration.support;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.List;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.BeansException;
@@ -38,6 +33,11 @@ import org.springframework.context.ApplicationContextAware;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.support.PropertySourcesPlaceholderConfigurer;
 import org.springframework.util.Assert;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.List;
 
 /**
  * {@link ApplicationContextFactory} implementation that takes a parent context and a path to the context to create.
@@ -61,12 +61,12 @@ public abstract class AbstractApplicationContextFactory implements ApplicationCo
 	private Collection<Class<?>> beanPostProcessorExcludeClasses;
 
 	/**
-	 * Create a factory instance with the resource specified. The resource is a Spring configuration file or java
-	 * package containing configuration files.
+	 * Create a factory instance with the resource specified. The resources are Spring configuration files or java
+	 * packages containing configuration files.
 	 */
-	public AbstractApplicationContextFactory(Object... resources) {
+	public AbstractApplicationContextFactory(Object... resource) {
 
-		this.resources = resources;
+		this.resources = resource;
 		beanFactoryPostProcessorClasses = new ArrayList<Class<? extends BeanFactoryPostProcessor>>();
 		beanFactoryPostProcessorClasses.add(PropertyPlaceholderConfigurer.class);
 		beanFactoryPostProcessorClasses.add(PropertySourcesPlaceholderConfigurer.class);

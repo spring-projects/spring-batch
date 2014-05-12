@@ -136,6 +136,40 @@ public class GenericApplicationContextFactoryTests {
 		assertEquals(other, factory);
 		assertEquals(other.hashCode(), factory.hashCode());
 	}
+	
+	@Test
+	public void testEqualsMultileConfigs() throws Exception {
+		Resource resource1 = new ClassPathResource(ClassUtils.addResourcePathToPackagePath(getClass(),
+				"abstract-context.xml"));
+		Resource resource2 = new ClassPathResource(ClassUtils.addResourcePathToPackagePath(getClass(),
+				"child-context-with-abstract-job.xml"));
+		GenericApplicationContextFactory factory = new GenericApplicationContextFactory(resource1, resource2);
+		GenericApplicationContextFactory other = new GenericApplicationContextFactory(resource1, resource2);
+		assertEquals(other, factory);
+		assertEquals(other.hashCode(), factory.hashCode());
+	}
+
+	@Test
+	public void testParentConfigurationInheritedMultipleConfigs() {
+		Resource resource1 = new ClassPathResource(ClassUtils.addResourcePathToPackagePath(getClass(),
+				"abstract-context.xml"));
+		Resource resource2 = new ClassPathResource(ClassUtils.addResourcePathToPackagePath(getClass(),
+				"child-context-with-abstract-job.xml"));
+		GenericApplicationContextFactory factory = new GenericApplicationContextFactory(resource1, resource2);
+		ConfigurableApplicationContext context = factory.createApplicationContext();
+		assertEquals("concrete-job", context.getBeanNamesForType(Job.class)[0]);
+		assertEquals("bar", context.getBean("concrete-job", Job.class).getName());
+		assertEquals(4, context.getBean("foo", Foo.class).values[1], 0.01);
+		assertNotNull(context.getBean("concrete-job", JobSupport.class).getStep("step31"));
+		assertNotNull(context.getBean("concrete-job", JobSupport.class).getStep("step32"));
+		boolean autowiredFound = false;
+		for (BeanPostProcessor postProcessor : ((AbstractBeanFactory) context.getBeanFactory()).getBeanPostProcessors()) {
+			if (postProcessor instanceof AutowiredAnnotationBeanPostProcessor) {
+				autowiredFound = true;
+			}
+		}
+		assertTrue(autowiredFound);
+	}
 
 	@Test
 	public void testEqualsMultipleConfigs() throws Exception {

@@ -21,7 +21,7 @@
 	<bean id="foo" class="org.springframework.batch.core.configuration.support.GenericApplicationContextFactoryTests$Foo">
 		<property name="values" value="1,4" />
 	</bean>
-	
+
 	<bean class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
 		<property name="properties" value="foo=bar" />
 		<property name="order" value="1"/>
