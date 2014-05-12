@@ -15,12 +15,10 @@
  */
 package org.springframework.batch.item.database;
 
-import java.sql.Connection;
-import java.sql.SQLException;
-import java.util.List;
-
-import javax.sql.DataSource;
-
+import com.ibatis.sqlmap.client.SqlMapClient;
+import com.ibatis.sqlmap.client.SqlMapSession;
+import com.ibatis.sqlmap.engine.execution.BatchException;
+import com.ibatis.sqlmap.engine.execution.BatchResult;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.batch.item.ItemWriter;
@@ -35,23 +33,23 @@ import org.springframework.jdbc.support.SQLExceptionTranslator;
 import org.springframework.jdbc.support.SQLStateSQLExceptionTranslator;
 import org.springframework.util.Assert;
 
-import com.ibatis.sqlmap.client.SqlMapClient;
-import com.ibatis.sqlmap.client.SqlMapSession;
-import com.ibatis.sqlmap.engine.execution.BatchException;
-import com.ibatis.sqlmap.engine.execution.BatchResult;
+import javax.sql.DataSource;
+import java.sql.Connection;
+import java.sql.SQLException;
+import java.util.List;
 
 /**
  * {@link ItemWriter} that uses the batching features from
  * SqlMapClient to execute a batch of statements for all items
- * provided.<br/>
+ * provided.<br>
  *
  * The user must provide an iBATIS statement id that points to the SQL statement defined
- * in the iBATIS SqlMap configuration.<br/>
+ * in the iBATIS SqlMap configuration.<br>
  *
- * It is expected that {@link #write(List)} is called inside a transaction.<br/>
+ * It is expected that {@link #write(List)} is called inside a transaction.<br>
  *
  * The writer is thread-safe after its properties are set (normal singleton
- * behavior), so it can be used to write in multiple concurrent transactions.<br/>
+ * behavior), so it can be used to write in multiple concurrent transactions.<br>
  *
  * <em>Note:</em> This reader was refactored as part of Spring Batch 3.0 to use the iBatis
  * APIs directly instead of using Spring's SqlMapClientTemplate as part of the upgrade to

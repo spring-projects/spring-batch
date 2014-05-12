@@ -16,18 +16,18 @@
 
 package org.springframework.batch.item.database.support;
 
-import java.sql.PreparedStatement;
-import java.sql.SQLException;
-import java.util.Map;
-
 import org.springframework.batch.item.database.ItemPreparedStatementSetter;
 import org.springframework.jdbc.core.ColumnMapRowMapper;
 import org.springframework.jdbc.core.SqlTypeValue;
 import org.springframework.jdbc.core.StatementCreatorUtils;
 import org.springframework.util.Assert;
 
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
+import java.util.Map;
+
 /**
- * </p>Implementation of the {@link ItemPreparedStatementSetter} interface that assumes all
+ * <p>Implementation of the {@link ItemPreparedStatementSetter} interface that assumes all
  * keys are contained within a {@link Map} with the column name as the key.  It assumes nothing 
  * about ordering, and assumes that the order the entry set can be iterated over is the same as
  * the PreparedStatement should be set.</p>

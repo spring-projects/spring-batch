@@ -16,8 +16,6 @@
 
 package org.springframework.batch.item.support;
 
-import java.util.List;
-
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.item.ItemStream;
 import org.springframework.batch.item.ItemStreamException;
@@ -26,9 +24,11 @@ import org.springframework.batch.item.ItemWriter;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.util.Assert;
 
+import java.util.List;
+
 /**
- * Calls a collection of {@link ItemWriter}s in fixed-order sequence.<br/>
- * <br/>
+ * Calls a collection of {@link ItemWriter}s in fixed-order sequence.<br>
+ * <br>
  * 
  * The implementation is thread-safe if all delegates are thread-safe.
  * 

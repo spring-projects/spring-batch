@@ -22,7 +22,7 @@ import org.springframework.batch.repeat.context.RepeatContextSupport;
 /**
  * Termination policy that times out after a fixed period. Allows graceful exit
  * from a batch if the latest result comes in after the timeout expires (i.e.
- * does not throw a timeout exception).<br/>
+ * does not throw a timeout exception).<br>
  * 
  * N.B. It may often be the case that the batch governed by this policy will be
  * transactional, and the transaction might have its own timeout. In this case

@@ -41,7 +41,7 @@ import org.springframework.util.StringUtils;
 
 /**
  * Wrapper for a {@link DataSource} that can run scripts on start up and shut
- * down.  Us as a bean definition <br/><br/>
+ * down.  Us as a bean definition <br><br>
  * 
  * Run this class to initialize a database in a running server process.
  * Make sure the server is running first by launching the "hsql-server" from the

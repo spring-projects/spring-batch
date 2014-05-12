@@ -16,15 +16,6 @@
 
 package org.springframework.batch.item.file.mapping;
 
-import java.beans.PropertyEditor;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Properties;
-import java.util.Set;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ConcurrentMap;
-
 import org.springframework.batch.item.file.transform.FieldSet;
 import org.springframework.batch.support.DefaultPropertyEditorRegistrar;
 import org.springframework.beans.BeanWrapperImpl;
@@ -41,30 +32,39 @@ import org.springframework.util.ReflectionUtils;
 import org.springframework.validation.BindException;
 import org.springframework.validation.DataBinder;
 
+import java.beans.PropertyEditor;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Properties;
+import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
+
 /**
  * {@link FieldSetMapper} implementation based on bean property paths. The
  * {@link FieldSet} to be mapped should have field name meta data corresponding
  * to bean property paths in an instance of the desired type. The instance is
  * created and initialized either by referring to to a prototype object by bean
  * name in the enclosing BeanFactory, or by providing a class to instantiate
- * reflectively.<br/>
- * <br/>
+ * reflectively.<br>
+ * <br>
  * 
  * Nested property paths, including indexed properties in maps and collections,
  * can be referenced by the {@link FieldSet} names. They will be converted to
  * nested bean properties inside the prototype. The {@link FieldSet} and the
  * prototype are thus tightly coupled by the fields that are available and those
  * that can be initialized. If some of the nested properties are optional (e.g.
- * collection members) they need to be removed by a post processor.<br/>
- * <br/>
+ * collection members) they need to be removed by a post processor.<br>
+ * <br>
  * 
  * To customize the way that {@link FieldSet} values are converted to the
  * desired type for injecting into the prototype there are several choices. You
  * can inject {@link PropertyEditor} instances directly through the
  * {@link #setCustomEditors(Map) customEditors} property, or you can override
  * the {@link #createBinder(Object)} and {@link #initBinder(DataBinder)}
- * methods, or you can provide a custom {@link FieldSet} implementation.<br/>
- * <br/>
+ * methods, or you can provide a custom {@link FieldSet} implementation.<br>
+ * <br>
  * 
  * Property name matching is "fuzzy" in the sense that it tolerates close
  * matches, as long as the match is unique. For instance:
@@ -143,7 +143,7 @@ public class BeanWrapperFieldSetMapper<T> extends DefaultPropertyEditorRegistrar
 	/**
 	 * Public setter for the type of bean to create instead of using a prototype
 	 * bean. An object of this type will be created from its default constructor
-	 * for every call to {@link #mapFieldSet(FieldSet)}.<br/>
+	 * for every call to {@link #mapFieldSet(FieldSet)}.<br>
 	 * 
 	 * Either this property or the prototype bean name must be specified, but
 	 * not both.

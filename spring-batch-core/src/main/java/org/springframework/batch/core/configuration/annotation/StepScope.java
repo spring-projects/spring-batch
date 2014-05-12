@@ -15,12 +15,12 @@
  */
 package org.springframework.batch.core.configuration.annotation;
 
+import org.springframework.context.annotation.Scope;
+import org.springframework.context.annotation.ScopedProxyMode;
+
 import java.lang.annotation.Documented;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
-
-import org.springframework.context.annotation.Scope;
-import org.springframework.context.annotation.ScopedProxyMode;
 
 /**
  * <p>
@@ -42,7 +42,7 @@ import org.springframework.context.annotation.ScopedProxyMode;
  *
  * @author Dave Syer
  *
- * @Since 2.2
+ * @since 2.2
  *
  */
 @Scope(value = "step", proxyMode = ScopedProxyMode.TARGET_CLASS)

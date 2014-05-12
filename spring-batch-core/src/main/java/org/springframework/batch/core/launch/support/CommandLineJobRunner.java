@@ -15,19 +15,6 @@
  */
 package org.springframework.batch.core.launch.support;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Properties;
-import java.util.Set;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.batch.core.BatchStatus;
@@ -57,6 +44,19 @@ import org.springframework.context.annotation.AnnotationConfigApplicationContext
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 import org.springframework.util.Assert;
 import org.springframework.util.StringUtils;
+
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Properties;
+import java.util.Set;
 
 /**
  * <p>
@@ -101,11 +101,12 @@ import org.springframework.util.StringUtils;
  * </p>
  *
  * <code>
- * jobPath <options> jobIdentifier (jobParameters)*
+ * jobPath &lt;options&gt; jobIdentifier (jobParameters)*
  * </code>
  *
  * <p>
  * The command line options are as follows
+ * </p>
  * <ul>
  * <li>jobPath: the xml application context containing a {@link Job}
  * <li>-restart: (optional) to restart the last failed execution</li>
@@ -118,7 +119,6 @@ import org.springframework.util.StringUtils;
  * <li>jobParameters: 0 to many parameters that will be used to launch a job
  * specified in the form of <code>key=value</code> pairs.
  * </ul>
- * </p>
  *
  * <p>
  * If the <code>-next</code> option is used the parameters on the command line
@@ -135,18 +135,18 @@ import org.springframework.util.StringUtils;
  * {@link JobParameters} using a {@link JobParametersConverter} from the
  * application context (if there is one, or a
  * {@link DefaultJobParametersConverter} otherwise). Below is an example
- * arguments list: "
+ * arguments list: "</p>
  *
  * <p>
  * <code>
  * java org.springframework.batch.core.launch.support.CommandLineJobRunner testJob.xml
  * testJob schedule.date=2008/01/24 vendor.id=3902483920
- * <code>
+ * </code>
  * </p>
  *
  * <p>
  * Once arguments have been successfully parsed, autowiring will be used to set
- * various dependencies. The {@JobLauncher} for example, will be
+ * various dependencies. The {@link JobLauncher} for example, will be
  * loaded this way. If none is contained in the bean factory (it searches by
  * type) then a {@link BeanDefinitionStoreException} will be thrown. The same
  * exception will also be thrown if there is more than one present. Assuming the
@@ -502,11 +502,11 @@ public class CommandLineJobRunner {
 	 * such contexts. No exception are thrown from this method, rather
 	 * exceptions are logged and an integer returned through the exit status in
 	 * a {@link JvmSystemExiter} (which can be overridden by defining one in the
-	 * Spring context).<br/>
+	 * Spring context).<br>
 	 * Parameters can be provided in the form key=value, and will be converted
 	 * using the injected {@link JobParametersConverter}.
 	 *
-	 * @param args <p>
+	 * @param args
 	 * <ul>
 	 * <li>-restart: (optional) if the job has failed or stopped and the most
 	 * should be restarted. If specified then the jobIdentifier parameter can be
@@ -520,6 +520,7 @@ public class CommandLineJobRunner {
 	 * <li>jobParameters: 0 to many parameters that will be used to launch a
 	 * job.
 	 * </ul>
+	 * <p>
 	 * The options (<code>-restart, -next</code>) can occur anywhere in the
 	 * command line.
 	 * </p>

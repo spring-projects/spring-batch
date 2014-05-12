@@ -16,12 +16,12 @@
 
 package org.springframework.batch.core;
 
+import org.springframework.util.Assert;
+
 import java.util.Date;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Properties;
-
-import org.springframework.util.Assert;
 
 /**
  * Helper class for creating {@link JobParameters}. Useful because all
@@ -29,8 +29,8 @@ import org.springframework.util.Assert;
  * to ensure typesafety. Once created, it can be used in the
  * same was a java.lang.StringBuilder (except, order is irrelevant), by adding
  * various parameter types and creating a valid {@link JobParameters} once
- * finished.<br/>
- * <br/>
+ * finished.<br>
+ * <br>
  * Using the identifying flag indicates if the parameter will be used
  * in the identification of a JobInstance.  That flag defaults to true.
  *

@@ -16,17 +16,6 @@
 
 package org.springframework.batch.core.repository.dao;
 
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Timestamp;
-import java.sql.Types;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Iterator;
-import java.util.List;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.batch.core.BatchStatus;
@@ -40,18 +29,29 @@ import org.springframework.jdbc.core.simple.ParameterizedRowMapper;
 import org.springframework.jdbc.support.incrementer.DataFieldMaxValueIncrementer;
 import org.springframework.util.Assert;
 
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Timestamp;
+import java.sql.Types;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Iterator;
+import java.util.List;
+
 /**
- * JDBC implementation of {@link StepExecutionDao}.<br/>
+ * JDBC implementation of {@link StepExecutionDao}.<br>
  *
  * Allows customization of the tables names used by Spring Batch for step meta
- * data via a prefix property.<br/>
+ * data via a prefix property.<br>
  *
  * Uses sequences or tables (via Spring's {@link DataFieldMaxValueIncrementer}
  * abstraction) to create all primary keys before inserting a new row. All
  * objects are checked to ensure all fields to be stored are not null. If any
  * are found to be null, an IllegalArgumentException will be thrown. This could
  * be left to JdbcTemplate, however, the exception will be fairly vague, and
- * fails to highlight which field caused the exception.<br/>
+ * fails to highlight which field caused the exception.<br>
  *
  * @author Lucas Ward
  * @author Dave Syer

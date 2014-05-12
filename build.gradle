@@ -100,8 +100,15 @@ subprojects { subproject ->
 		toolVersion = "0.7.0.201403182114"
 	}
 
-	sourceCompatibility=1.7
-	targetCompatibility=1.7
+    compileJava {
+        sourceCompatibility=1.6
+        targetCompatibility=1.6
+    }
+
+    compileTestJava {
+        sourceCompatibility=1.7
+        targetCompatibility=1.7
+    }
 
 	eclipse {
 		project {

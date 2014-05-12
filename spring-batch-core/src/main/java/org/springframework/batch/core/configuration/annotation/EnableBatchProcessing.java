@@ -33,7 +33,7 @@ import java.lang.annotation.Target;
 /**
  * <p>
  * Enable Spring Batch features and provide a base configuration for setting up batch jobs in an &#064;Configuration
- * class, roughly equivalent to using the {@code <batch:*>} XML namespace.
+ * class, roughly equivalent to using the {@code <batch:*>} XML namespace.</p>
  *
  * <pre class="code">
  * &#064;Configuration
@@ -133,8 +133,6 @@ import java.lang.annotation.Target;
  * Note that a modular parent context in general should <em>not</em> itself contain &#64;Bean definitions for job,
  * especially if a {@link BatchConfigurer} is provided, because cyclic configuration dependencies are otherwise likely
  * to develop.
- *
- * </p>
  *
  * <p>
  * For reference, the first example above can be compared to the following Spring XML configuration:

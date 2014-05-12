@@ -16,11 +16,6 @@
 
 package org.springframework.batch.repeat.support;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.List;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.batch.repeat.CompletionPolicy;
@@ -35,18 +30,23 @@ import org.springframework.batch.repeat.exception.ExceptionHandler;
 import org.springframework.batch.repeat.policy.DefaultResultCompletionPolicy;
 import org.springframework.util.Assert;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.List;
+
 /**
  * Simple implementation and base class for batch templates implementing
  * {@link RepeatOperations}. Provides a framework including interceptors and
  * policies. Subclasses just need to provide a method that gets the next result
  * and one that waits for all the results to be returned from concurrent
- * processes or threads.<br/>
+ * processes or threads.<br>
  * 
  * N.B. the template accumulates thrown exceptions during the iteration, and
  * they are all processed together when the main loop ends (i.e. finished
  * processing the items). Clients that do not want to stop execution when an
  * exception is thrown can use a specific {@link CompletionPolicy} that does not
- * finish when exceptions are received. This is not the default behaviour.<br/>
+ * finish when exceptions are received. This is not the default behaviour.<br>
  * 
  * Clients that want to take some business action when an exception is thrown by
  * the {@link RepeatCallback} can consider using a custom {@link RepeatListener}

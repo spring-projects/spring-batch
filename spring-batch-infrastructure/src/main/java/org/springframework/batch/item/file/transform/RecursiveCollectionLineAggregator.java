@@ -35,7 +35,7 @@ public class RecursiveCollectionLineAggregator<T> implements LineAggregator<Coll
 	/**
 	 * Public setter for the {@link LineAggregator} to use on single items, that
 	 * are not Strings. This can be used to strategise the conversion of
-	 * collection and array elements to a String.<br/>
+	 * collection and array elements to a String.<br>
 	 * 
 	 * @param delegate the line aggregator to set. Defaults to a pass through.
 	 */

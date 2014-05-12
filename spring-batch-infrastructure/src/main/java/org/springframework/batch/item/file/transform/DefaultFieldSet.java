@@ -16,6 +16,9 @@
 
 package org.springframework.batch.item.file.transform;
 
+import org.springframework.util.Assert;
+import org.springframework.util.StringUtils;
+
 import java.math.BigDecimal;
 import java.text.DateFormat;
 import java.text.DecimalFormat;
@@ -27,9 +30,6 @@ import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 import java.util.Properties;
-
-import org.springframework.util.Assert;
-import org.springframework.util.StringUtils;
 
 /**
  * Default implementation of {@link FieldSet} using Java using Java primitive
@@ -650,7 +650,7 @@ public class DefaultFieldSet implements FieldSet {
 	/**
 	 * Read and trim the {@link String} value at '<code>index</code>'.
 	 * 
-	 * @returns null if the field value is <code>null</code>.
+	 * @return null if the field value is <code>null</code>.
 	 */
 	protected String readAndTrim(int index) {
 		String value = tokens[index];

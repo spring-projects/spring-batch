@@ -16,8 +16,6 @@
 
 package org.springframework.batch.core.repository;
 
-import java.util.Collection;
-
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.JobInstance;
@@ -28,6 +26,8 @@ import org.springframework.batch.core.repository.dao.JobExecutionDao;
 import org.springframework.batch.core.repository.dao.JobInstanceDao;
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.transaction.annotation.Isolation;
+
+import java.util.Collection;
 
 /**
  * <p>
@@ -100,7 +100,7 @@ public interface JobRepository {
 	 * support the higher isolation levels).
 	 * </p>
 	 *
-	 * @param jobName the name of the job that is to be executed </p>
+	 * @param jobName the name of the job that is to be executed
 	 *
 	 * @param jobParameters the runtime parameters for the job
 	 *

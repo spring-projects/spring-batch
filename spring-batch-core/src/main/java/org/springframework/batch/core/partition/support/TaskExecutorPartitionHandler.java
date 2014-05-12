@@ -16,12 +16,6 @@
 
 package org.springframework.batch.core.partition.support;
 
-import java.util.HashSet;
-import java.util.Set;
-import java.util.concurrent.Callable;
-import java.util.concurrent.Future;
-import java.util.concurrent.FutureTask;
-
 import org.springframework.batch.core.BatchStatus;
 import org.springframework.batch.core.ExitStatus;
 import org.springframework.batch.core.Step;
@@ -35,12 +29,18 @@ import org.springframework.core.task.TaskExecutor;
 import org.springframework.core.task.TaskRejectedException;
 import org.springframework.util.Assert;
 
+import java.util.HashSet;
+import java.util.Set;
+import java.util.concurrent.Callable;
+import java.util.concurrent.Future;
+import java.util.concurrent.FutureTask;
+
 /**
  * A {@link PartitionHandler} that uses a {@link TaskExecutor} to execute the
  * partitioned {@link Step} locally in multiple threads. This can be an
  * effective approach for scaling batch steps that are IO intensive, like
  * directory and filesystem scanning and copying.
- * <p/>
+ * <br>
  * By default, the thread pool is synchronous.
  *
  * @author Sebastien Gerard

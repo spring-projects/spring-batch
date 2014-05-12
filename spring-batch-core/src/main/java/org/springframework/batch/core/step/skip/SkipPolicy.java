@@ -26,9 +26,9 @@ public interface SkipPolicy {
 	/**
 	 * Returns true or false, indicating whether or not processing should
 	 * continue with the given throwable. Clients may use
-	 * <code>skipCount<0</code> to probe for exception types that are skippable,
+	 * {@code skipCount&lt;0} to probe for exception types that are skippable,
 	 * so implementations should be able to handle gracefully the case where
-	 * <code>skipCount<0</code>. Implementations should avoid throwing any
+	 * {@code skipCount&lt;0}. Implementations should avoid throwing any
 	 * undeclared exceptions.
 	 * 
 	 * @param t exception encountered while reading

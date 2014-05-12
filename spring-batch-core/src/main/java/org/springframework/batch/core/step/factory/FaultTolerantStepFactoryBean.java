@@ -109,11 +109,11 @@ public class FaultTolerantStepFactoryBean<T, S> extends SimpleStepFactoryBean<T,
 	/**
 	 * Public setter for the capacity of the cache in the retry policy. If more items than this fail without being
 	 * skipped or recovered an exception will be thrown. This is to guard against inadvertent infinite loops generated
-	 * by item identity problems.<br/>
+	 * by item identity problems.<br>
 	 *
 	 * The default value should be high enough and more for most purposes. To breach the limit in a single-threaded step
 	 * typically you have to have this many failures in a single transaction. Defaults to the value in the
-	 * {@link MapRetryContextCache}.<br/>
+	 * {@link MapRetryContextCache}.<br>
 	 *
 	 * This property is ignored if the {@link #setRetryContextCache(RetryContextCache)} is set directly.
 	 *
@@ -186,7 +186,7 @@ public class FaultTolerantStepFactoryBean<T, S> extends SimpleStepFactoryBean<T,
 	 * Exception classes that when raised won't crash the job but will result in the item which handling caused the
 	 * exception being skipped. Any exception which is marked for "no rollback" is also skippable, but not vice versa.
 	 * Remember to set the {@link #setSkipLimit(int) skip limit} as well.
-	 * <p/>
+	 * <br>
 	 * Defaults to all no exception.
 	 *
 	 * @param exceptionClasses defaults to <code>Exception</code>
@@ -199,7 +199,7 @@ public class FaultTolerantStepFactoryBean<T, S> extends SimpleStepFactoryBean<T,
 	 * Exception classes that are candidates for no rollback. The {@link Step} can not honour the no rollback hint in
 	 * all circumstances, but any exception on this list is counted as skippable, so even if there has to be a rollback,
 	 * then the step will not fail as long as the skip limit is not breached.
-	 * <p/>
+	 * <br>
 	 * Defaults is empty.
 	 *
 	 * @param noRollbackExceptionClasses the exception classes to set

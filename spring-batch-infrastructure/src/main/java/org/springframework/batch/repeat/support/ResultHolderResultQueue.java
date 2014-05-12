@@ -16,13 +16,13 @@
 
 package org.springframework.batch.repeat.support;
 
+import org.springframework.batch.repeat.RepeatStatus;
+
 import java.util.Comparator;
 import java.util.NoSuchElementException;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.PriorityBlockingQueue;
 import java.util.concurrent.Semaphore;
-
-import org.springframework.batch.repeat.RepeatStatus;
 
 /**
  * An implementation of the {@link ResultQueue} that throttles the number of
@@ -100,8 +100,8 @@ public class ResultHolderResultQueue implements ResultQueue<ResultHolder> {
 	}
 
 	/**
-	 * Get the next result as soon as it becomes available. <br/>
-	 * <br/>
+	 * Get the next result as soon as it becomes available. <br>
+	 * <br>
 	 * Release result immediately if:
 	 * <ul>
 	 * <li>There is a result that is continuable.</li>

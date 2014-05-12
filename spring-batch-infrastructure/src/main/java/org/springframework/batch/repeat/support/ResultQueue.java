@@ -16,10 +16,10 @@
 
 package org.springframework.batch.repeat.support;
 
+import org.springframework.core.task.TaskExecutor;
+
 import java.util.NoSuchElementException;
 import java.util.concurrent.BlockingQueue;
-
-import org.springframework.core.task.TaskExecutor;
 
 /**
  * Abstraction for queue of {@link ResultHolder} objects. Acts a bit likeT a
@@ -40,7 +40,7 @@ interface ResultQueue<T> {
 	 * for processing in another thread, at which point the master uses this
 	 * method to keep track of the number of expected results. It has the
 	 * personality of an counter increment, rather than a work queue, which is
-	 * usually managed elsewhere, e.g. by a {@link TaskExecutor}.<br/><br/>
+	 * usually managed elsewhere, e.g. by a {@link TaskExecutor}.<br><br>
 	 * Implementations may choose to block here, if they need to limit the
 	 * number or rate of tasks being submitted.
 	 * 

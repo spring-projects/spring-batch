@@ -53,7 +53,7 @@ public class ResourceSplitterIntegrationTests {
 	private PollableChannel requests;
 
 	/*
-	 * This is so cool (but see INT-190)...<br/>
+	 * This is so cool (but see INT-190)...
 	 *
 	 * The incoming message is a Resource pattern, and it is converted to the
 	 * correct payload type with Spring's default strategy

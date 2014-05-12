@@ -30,7 +30,7 @@ import org.springframework.batch.item.ItemReader;
  * {@link ItemReader} that can identify the record boundaries. The custom reader
  * should mark the beginning and end of records by returning an
  * {@link AggregateItem} which responds true to its query methods
- * <code>is*()</code>.<br/><br/>
+ * <code>is*()</code>.<br><br>
  * 
  * This class is thread-safe (it can be used concurrently by multiple threads)
  * as long as the {@link ItemReader} is also thread-safe.

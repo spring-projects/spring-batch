@@ -16,20 +16,20 @@
 
 package org.springframework.batch.item.file.transform;
 
+import org.springframework.util.Assert;
+import org.springframework.util.StringUtils;
+
 import java.beans.PropertyEditorSupport;
 import java.util.Arrays;
 import java.util.Comparator;
 
-import org.springframework.util.Assert;
-import org.springframework.util.StringUtils;
-
 /**
  * Property editor implementation which parses string and creates array of
- * ranges. Ranges can be provided in any order. </br> Input string should be
+ * ranges. Ranges can be provided in any order. <br> Input string should be
  * provided in following format: 'range1, range2, range3,...' where range is
  * specified as:
  * <ul>
- * <li>'X-Y', where X is minimum value and Y is maximum value (condition X<=Y
+ * <li>'X-Y', where X is minimum value and Y is maximum value (condition X&lt;=Y
  * is verified)</li>
  * <li>or 'Z', where Z is minimum and maximum is calculated as (minimum of
  * adjacent range - 1). Maximum of the last range is never calculated. Range
@@ -37,8 +37,8 @@ import org.springframework.util.StringUtils;
  * </ul>
  * Minimum and maximum values can be from interval &lt;1, Integer.MAX_VALUE-1&gt;
  * <p>
- * Examples:</br> 
- * '1, 15, 25, 38, 55-60' is equal to '1-14, 15-24, 25-37, 38-54, 55-60' </br> 
+ * Examples:<br>
+ * '1, 15, 25, 38, 55-60' is equal to '1-14, 15-24, 25-37, 38-54, 55-60' <br>
  * '36, 14, 1-10, 15, 49-57' is equal to '36-48, 14-14, 1-10, 15-35, 49-57'
  * <p>
  * Property editor also allows to validate whether ranges are disjoint. Validation

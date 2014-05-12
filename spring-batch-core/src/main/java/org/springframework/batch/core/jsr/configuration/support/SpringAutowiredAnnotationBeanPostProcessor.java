@@ -67,9 +67,11 @@ import org.springframework.util.ReflectionUtils;
  * <p>This class is considered a quick work around and needs to be refactored / removed.</p>
  *
  * <p>The in addition to making this class package private, the following methods were modified to be protected:</p>
- * <li>findAutowiringMetadata(Class<?> clazz)</li>
- * <li>buildAutowiringMetadata(Class<?> clazz)</li>
+ * <ul>
+ * <li>findAutowiringMetadata(Class&lt;?&gt; clazz)</li>
+ * <li>buildAutowiringMetadata(Class&lt;?&gt; clazz)</li>
  * <li>findAutowiredAnnotation(AccessibleObject ao)</li>
+ * </ul>
  */
 class SpringAutowiredAnnotationBeanPostProcessor extends InstantiationAwareBeanPostProcessorAdapter
         implements MergedBeanDefinitionPostProcessor, PriorityOrdered, BeanFactoryAware {

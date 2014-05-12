@@ -15,10 +15,6 @@
  */
 package org.springframework.batch.core.launch;
 
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.JobInstance;
@@ -30,6 +26,10 @@ import org.springframework.batch.core.UnexpectedJobExecutionException;
 import org.springframework.batch.core.repository.JobExecutionAlreadyRunningException;
 import org.springframework.batch.core.repository.JobInstanceAlreadyCompleteException;
 import org.springframework.batch.core.repository.JobRestartException;
+
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * Low level interface for inspecting and controlling jobs with access only to
@@ -130,8 +130,8 @@ public interface JobOperator {
 	 * {@link JobParametersIncrementer} attached to the specified job. If the
 	 * previous instance is still in a failed state, this method should still
 	 * create a new instance and run it with different parameters (as long as
-	 * the {@link JobParametersIncrementer} is working).<br/>
-	 * <br/>
+	 * the {@link JobParametersIncrementer} is working).<br>
+	 * <br>
 	 * 
 	 * The last three exception described below should be extremely unlikely,
 	 * but cannot be ruled out entirely. It points to some other thread or

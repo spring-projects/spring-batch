@@ -16,10 +16,6 @@
 
 package org.springframework.batch.container.jms;
 
-import javax.jms.JMSException;
-import javax.jms.MessageConsumer;
-import javax.jms.Session;
-
 import org.aopalliance.aop.Advice;
 import org.springframework.aop.framework.ProxyFactory;
 import org.springframework.aop.support.DefaultPointcutAdvisor;
@@ -30,9 +26,13 @@ import org.springframework.jms.connection.TransactionAwareConnectionFactoryProxy
 import org.springframework.jms.listener.DefaultMessageListenerContainer;
 import org.springframework.transaction.interceptor.TransactionInterceptor;
 
+import javax.jms.JMSException;
+import javax.jms.MessageConsumer;
+import javax.jms.Session;
+
 /**
  * Message listener container adapted for intercepting the message reception
- * with advice provided through configuration.<br/>
+ * with advice provided through configuration.<br>
  * 
  * To enable batching of messages in a single transaction, use the
  * {@link TransactionInterceptor} and the {@link RepeatOperationsInterceptor} in
