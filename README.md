@@ -12,24 +12,20 @@ Clone the git repository using the URL on the Github home page:
     $ cd spring-batch
 
 ## Command Line
-Use Maven 2.2 or 3.0, then on the command line:
+Gradle is the build tool used for Spring Batch.  You can perform a full build of Spring Batch via the command:
 
-    $ mvn install
-
-or, the first time (to download the stuff that isn't in the Maven Central repository):
-
-    $ mvn install -P bootstrap
-    
-To perform a full build of all modules (required prior to issuing a pull request) execute the all profile
-
-    $ mvn install -P all
+    $ ./gradlew build
 
 ## Spring Tool Suite (STS)
 In STS (or any Eclipse distro or other IDE with Maven support), import the module directories as existing projects.  They should compile and the tests should run with no additional steps.
 
+# Getting Started Using Spring Boot
+This is the quickest way to get started with a new Spring Batch project.  You find the Getting Started Guide for Spring
+Batch on Spring.io: [Creating a Batch Service](http://spring.io/guides/gs/batch-processing/)
+
 # Getting Started Using Spring Tool Suite (STS)
 
-  This is the quickest way to get started.  It requires an internet connection for download, and access to a Maven repository (remote or local).
+It requires an internet connection for download, and access to a Maven repository (remote or local).
 
 * Download STS version 3.4.* (or better) from the [Spring website](http://spring.io/tools/sts/).  STS is a free Eclipse bundle with many features useful for Spring developers.
 * Go to `File->New->Spring Template Project` from the menu bar (in the Spring perspective).
@@ -50,53 +46,3 @@ Here are some ways for you to get involved in the community:
 * Watch for upcoming articles on Spring by [subscribing](feed://assets.spring.io/drupal/node/feed.xml) to spring.io
 
 Before we accept a non-trivial patch or pull request we will need you to sign the [contributor's agreement](https://support.springsource.com/spring_committer_signup).  Signing the contributor's agreement does not grant anyone commit rights to the main repository, but it does mean that we can accept your contributions, and you will get an author credit if we do.  Active contributors might be asked to join the core team, and given the ability to merge pull requests.
-
-
-# Getting Started Using the Samples
-
-A convenient way to get started quickly with Spring Batch is to run the samples which are packaged in the samples module.  There is also a simple command line sample (or "archetype") which has a bare bones but complete implementation of a simpel job.  The source code for the samples (and the other modules) is available either from the [Zip assembly](http://docs.spring.io/spring-batch/downloads.html) or from [Git](http://github.com/spring-projects/spring-batch).
-
-## Using the .Zip Distribution
-
-### With Maven and Eclipse
-
-* Download the "no-dependencies" version of the distribution and unzip to create a directory `org.springframework.batch-<versionId`>.
-* Get the [m2eclipse plugin](http://m2eclipse.sonatype.org/update)
-  (installed in STS out of the box).  If you can't or don't want to
-  install this plugin, you can use the [Maven Eclipse
-  Plugin](http://maven.apache.org/plugins/maven-eclipse-plugin) to
-  create the classpath entries you need.
-* Open Eclipse and create a workspace as for the non-Mavenized version.
-* Import the samples and archetype projects from the samples sub-directory in the directory you just unpacked.
-* The project should build cleanly without having to fix the dependencies.  If it doesn't, make sure you are online, and maybe try building on the command line first to make sure all the dependencies are downloaded.  See the [build instructions](http://docs.spring.io/spring-batch/building.html) if you run into difficulty.
-
-(N.B. the "archetype" is not a real Maven archetype, just a template project that can be used as a starting point for a self-contained batch job.  It is the same project that can be imported into STS using the Project Template wizard.)
-
-### With Maven on the Command Line
-
-* Download the distribution as above.
-* Then run Maven in the spring-batch-samples directory, e.g.
-
-            $ cd spring-batch-samples
-            $ mvn test
-            ...
-
-### With Eclipse and without Maven
-
-Similar instructions would apply to other IDEs.
-
-* Download the "no-dependencies" package and unzip to create a directory `spring-batch-<versionId`>.
-* Open Eclipse and make a workspace in the directory you just created.
-* Import the `org.springframework.batch.samples` project from the samples directory.
-* Find all the compile scope and non-optional runtime jar files listed in the [core dependencies report](http://docs.spring.io/spring-batch/spring-batch-core/dependencies.html) and [infrastructure dependencies](http://docs.spring.io/spring-batch/spring-batch-infrastructure/dependencies.html), and import them into the project.
-* Force the workspace to build (e.g. Project -> Clean...)
-* Run the unit tests in your project under src/test/java.  N.B. the FootbalJobFunctionTests takes quite a long time to run.
-
-You can get a pretty good idea about how to set up a job by examining the unit tests in the `org.springframework.batch.sample` package (in `src/main/java`) and the configuration in `src/main/resources/jobs`.
-
-To launch a job from the command line instead of a unit test use the `CommandLineJobRunner.main()` method (see Javadocs included in that class).
-
-## Using Maven and Git
-
-* Check out the Spring Batch project from Git (instructions are available [here](https://github.com/spring-projects/spring-batch)).
-* Run Maven from the command line in the samples directory.  There are additional building instructions and suggestions about what to do if it goes wrong [here](http://docs.spring.io/spring-batch/building.html).
