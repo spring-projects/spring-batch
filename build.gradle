@@ -3,6 +3,14 @@ description = 'Spring Batch'
 apply plugin: 'base'
 apply plugin: 'idea'
 
+if (JavaVersion.current().isJava8Compatible()) {
+    allprojects {
+        tasks.withType(Javadoc) {
+            options.addStringOption('Xdoclint:none', '-quiet')
+        }
+    }
+}
+
 buildscript {
 	repositories {
 		maven { url 'http://repo.spring.io/plugins-release' }
