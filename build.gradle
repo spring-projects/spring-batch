@@ -10,6 +10,7 @@ buildscript {
 	dependencies {
 		classpath 'org.springframework.build.gradle:docbook-reference-plugin:0.2.8'
 		classpath 'org.springframework.build.gradle:propdeps-plugin:0.0.5'
+        classpath 'org.springframework.build.gradle:spring-io-plugin:0.0.3.RELEASE'
 	}
 }
 
@@ -28,6 +29,7 @@ allprojects {
 	repositories {
 		maven { url 'http://repo.spring.io/libs-milestone' }
 		maven { url 'http://repo.spring.io/plugins-release' }
+        maven { url "https://repo.spring.io/libs-snapshot" }
 
 		maven { url 'http://m2.neo4j.org/content/repositories/releases'}
 		mavenCentral()
@@ -39,7 +41,7 @@ allprojects {
 
 		springVersionDefault = '4.0.4.RELEASE'
 		springVersion = project.hasProperty('springVersion') ? getProperty('springVersion') : springVersionDefault
-		springRetryVersion = '1.1.0.RC2'
+		springRetryVersion = '1.1.0.RC3'
 		springAmqpVersion = '1.3.2.RELEASE'
 		springDataCommonsVersion = '1.7.2.RELEASE'
 		springDataGemfireVersion = '1.3.4.RELEASE'
@@ -48,6 +50,7 @@ allprojects {
 		springDataNeo4jVersion = '3.0.2.RELEASE'
 		springIntegrationVersion = '4.0.0.RELEASE'
 		springLdapVersion = '2.0.1.RELEASE'
+        springIoVersion = '1.0.0.BUILD-SNAPSHOT'
 
 		activemqVersion = '5.9.1'
 		aspectjVersion = '1.8.0'
@@ -58,6 +61,7 @@ allprojects {
 		commonsLangVersion = '2.6'
 		derbyVersion = '10.10.1.1'
 		groovyVersion = '2.2.2'
+        hamcrestVersion = '1.3'
 		h2databaseVersion = '1.3.175'
 		hibernateVersion = '4.2.12.Final'
 		hibernateValidatorVersion = '4.3.1.Final'
@@ -192,6 +196,7 @@ subprojects { subproject ->
 }
 
 project('spring-batch-core') {
+    apply plugin: 'spring-io'
 	description = 'Spring Batch Core'
 
 	dependencies {
@@ -209,14 +214,18 @@ project('spring-batch-core') {
 		compile "org.springframework:spring-tx:$springVersion"
 
 		testCompile "org.springframework:spring-test:$springVersion"
-		testCompile "org.mockito:mockito-all:$mockitoVersion"
+        testCompile("org.mockito:mockito-core:$mockitoVersion") {
+            exclude group:'org.hamcrest', module:'hamcrest-core'
+        }
 		testCompile "javax.inject:javax.inject:$javaxInjectVersion"
 		testCompile "org.hsqldb:hsqldb:$hsqldbVersion"
 		testCompile "com.h2database:h2:$h2databaseVersion"
 		testCompile "commons-io:commons-io:$commonsIoVersion"
 		testCompile "commons-dbcp:commons-dbcp:$commonsDdbcpVersion"
-		testCompile "junit:junit:$junitVersion"
-
+        testCompile("junit:junit:${junitVersion}") {
+            exclude group:'org.hamcrest', module:'hamcrest-core'
+        }
+        testCompile("org.hamcrest:hamcrest-all:$hamcrestVersion")
 		optional "org.aspectj:aspectjrt:$aspectjVersion"
 		optional "org.aspectj:aspectjweaver:$aspectjVersion"
 		optional "org.springframework:spring-jdbc:$springVersion"
@@ -224,11 +233,14 @@ project('spring-batch-core') {
 		optional "log4j:log4j:$log4jVersion"
 
 		provided "javax.batch:javax.batch-api:$javaxBatchApiVersion"
+
+        springIoVersions "io.spring.platform:platform-versions:$springIoVersion@properties"
 	}
 }
 
 project('spring-batch-infrastructure') {
-	description = 'Spring Batch Infrastructure'
+    apply plugin: 'spring-io'
+    description = 'Spring Batch Infrastructure'
 	dependencies {
 
 		compile "org.springframework:spring-core:$springVersion"
@@ -241,10 +253,15 @@ project('spring-batch-infrastructure') {
 		testCompile "com.h2database:h2:$h2databaseVersion"
 		testCompile "org.apache.derby:derby:$derbyVersion"
 		testCompile "org.springframework:spring-test:$springVersion"
-		testCompile "junit:junit:$junitVersion"
+        testCompile("junit:junit:${junitVersion}") {
+            exclude group:'org.hamcrest', module:'hamcrest-core'
+        }
+        testCompile("org.hamcrest:hamcrest-all:$hamcrestVersion")
 		testCompile "org.aspectj:aspectjrt:$aspectjVersion"
 		testCompile "org.aspectj:aspectjweaver:$aspectjVersion"
-		testCompile "org.mockito:mockito-all:$mockitoVersion"
+        testCompile("org.mockito:mockito-core:$mockitoVersion") {
+            exclude group:'org.hamcrest', module:'hamcrest-core'
+        }
 		testCompile "org.xerial:sqlite-jdbc:$sqliteVersion"
 
 		testRuntime "com.sun.mail:javax.mail:$javaMailVersion"
@@ -292,6 +309,7 @@ project('spring-batch-infrastructure') {
         optional "org.springframework.ldap:spring-ldap-core-tiger:$springLdapVersion"
         optional "org.springframework.ldap:spring-ldap-ldif-core:$springLdapVersion"
 
+        springIoVersions "io.spring.platform:platform-versions:$springIoVersion@properties"
 	}
 }
 
@@ -308,7 +326,10 @@ project('spring-batch-core-tests') {
 		testCompile "org.hsqldb:hsqldb:$hsqldbVersion"
 		testCompile "commons-io:commons-io:$commonsIoVersion"
 		testCompile "org.apache.derby:derby:$derbyVersion"
-		testCompile "junit:junit:$junitVersion"
+        testCompile("junit:junit:${junitVersion}") {
+            exclude group:'org.hamcrest', module:'hamcrest-core'
+        }
+        testCompile("org.hamcrest:hamcrest-all:$hamcrestVersion")
 		testCompile "log4j:log4j:$log4jVersion"
 		testCompile "org.springframework:spring-test:$springVersion"
 
@@ -340,7 +361,10 @@ project('spring-batch-infrastructure-tests') {
 		testCompile "org.apache.derby:derby:$derbyVersion"
 		testCompile "org.apache.activemq:activemq-broker:$activemqVersion"
 		testCompile "org.apache.activemq:activemq-kahadb-store:$activemqVersion"
-		testCompile "junit:junit:$junitVersion"
+        testCompile("junit:junit:${junitVersion}") {
+            exclude group:'org.hamcrest', module:'hamcrest-core'
+        }
+        testCompile("org.hamcrest:hamcrest-all:$hamcrestVersion")
 		testCompile "org.apache.geronimo.specs:geronimo-j2ee-management_1.1_spec:1.0.1"
 		testCompile "xmlunit:xmlunit:$xmlunitVersion"
 		testCompile ("org.codehaus.castor:castor-xml:$castorVersion") {
@@ -359,7 +383,9 @@ project('spring-batch-infrastructure-tests') {
 		}
 		testCompile "org.springframework:spring-jdbc:$springVersion"
 		testCompile "org.springframework:spring-test:$springVersion"
-		testCompile "org.mockito:mockito-all:$mockitoVersion"
+        testCompile("org.mockito:mockito-core:$mockitoVersion") {
+            exclude group:'org.hamcrest', module:'hamcrest-core'
+        }
 
 		optional "org.slf4j:slf4j-log4j12:$slf4jVersion"
 		optional "org.apache.ibatis:ibatis-sqlmap:$ibatisVersion"
@@ -385,12 +411,16 @@ project('spring-batch-infrastructure-tests') {
 
 //Domain for batch job testing
 project('spring-batch-test') {
-	description = 'Spring Batch Test'
+    apply plugin: 'spring-io'
+    description = 'Spring Batch Test'
 
 	dependencies {
 		compile project(":spring-batch-core")
 
-		compile "junit:junit:$junitVersion"
+        compile("junit:junit:${junitVersion}") {
+            exclude group:'org.hamcrest', module:'hamcrest-core'
+        }
+        compile("org.hamcrest:hamcrest-all:$hamcrestVersion")
 		compile "org.springframework:spring-test:$springVersion"
 		compile "org.springframework:spring-jdbc:$springVersion"
 		compile "commons-io:commons-io:$commonsIoVersion"
@@ -400,11 +430,14 @@ project('spring-batch-test') {
 		testCompile "org.hsqldb:hsqldb:$hsqldbVersion"
 
 		optional "org.aspectj:aspectjrt:$aspectjVersion"
+
+        springIoVersions "io.spring.platform:platform-versions:$springIoVersion@properties"
 	}
 }
 
 project('spring-batch-integration') {
-	description = 'Batch Integration'
+    apply plugin: 'spring-io'
+    description = 'Batch Integration'
 
 	dependencies {
 		compile project(":spring-batch-core")
@@ -420,7 +453,10 @@ project('spring-batch-integration') {
 
 		testCompile "org.apache.activemq:activemq-broker:$activemqVersion"
 		testCompile "org.apache.activemq:activemq-kahadb-store:$activemqVersion"
-		testCompile "junit:junit:$junitVersion"
+        testCompile("junit:junit:${junitVersion}") {
+            exclude group:'org.hamcrest', module:'hamcrest-core'
+        }
+        testCompile("org.hamcrest:hamcrest-all:$hamcrestVersion")
 		testCompile "org.aspectj:aspectjrt:$aspectjVersion"
 		testCompile "org.aspectj:aspectjweaver:$aspectjVersion"
 		testCompile "commons-dbcp:commons-dbcp:$commonsDdbcpVersion"
@@ -429,7 +465,9 @@ project('spring-batch-integration') {
 		testCompile "org.apache.derby:derby:$derbyVersion"
 		testCompile "org.hsqldb:hsqldb:$hsqldbVersion"
 		testCompile "org.springframework:spring-test:$springVersion"
-		testCompile "org.mockito:mockito-all:$mockitoVersion"
+        testCompile("org.mockito:mockito-core:$mockitoVersion") {
+            exclude group:'org.hamcrest', module:'hamcrest-core'
+        }
 		testCompile("org.springframework.integration:spring-integration-test:$springIntegrationVersion") {
 			exclude group: 'junit', module: 'junit-dep'
 		}
@@ -440,6 +478,8 @@ project('spring-batch-integration') {
 		optional "log4j:log4j:1.2.14"
 		optional "org.springframework.integration:spring-integration-jms:$springIntegrationVersion"
 		optional "org.springframework:spring-jms:$springVersion"
+
+        springIoVersions "io.spring.platform:platform-versions:$springIoVersion@properties"
 	}
 }
 
@@ -482,13 +522,18 @@ project('spring-batch-samples') {
 
 		testCompile "xmlunit:xmlunit:$xmlunitVersion"
 		testCompile project(":spring-batch-test")
-		testCompile "junit:junit:$junitVersion"
+        testCompile("junit:junit:${junitVersion}") {
+            exclude group:'org.hamcrest', module:'hamcrest-core'
+        }
+        testCompile("org.hamcrest:hamcrest-all:$hamcrestVersion")
 		testCompile "org.hsqldb:hsqldb:$hsqldbVersion"
 		testCompile "log4j:log4j:$log4jVersion"
 		testCompile "org.codehaus.groovy:groovy:$groovyVersion"
 		testCompile "org.codehaus.groovy:groovy-ant:$groovyVersion"
 		testCompile "org.springframework:spring-test:$springVersion"
-		testCompile "org.mockito:mockito-all:$mockitoVersion"
+        testCompile("org.mockito:mockito-core:$mockitoVersion") {
+            exclude group:'org.hamcrest', module:'hamcrest-core'
+        }
 
 		testRuntime "com.sun.mail:javax.mail:$javaMailVersion"
 
