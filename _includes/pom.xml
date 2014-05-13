@@ -5,14 +5,3 @@
         <version>{@= version @}</version>
     </dependency>
 </dependencies>
-{@ if (repository) { @}
-<repositories>
-    <repository>
-        <id>{@= repository.id @}</id>
-        <name>{@= repository.name @}</name>
-        <url>{@= repository.url @}</url>
-        <snapshots>
-            <enabled>{@= repository.snapshotsEnabled @}</enabled>
-        </snapshots>
-    </repository>
-</repositories>{@ } @}
