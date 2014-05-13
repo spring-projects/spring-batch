@@ -315,6 +315,7 @@ project('spring-batch-infrastructure') {
 
 project('spring-batch-core-tests') {
 	description = 'Spring Batch Core Tests'
+    project.tasks.findByPath("artifactoryPublish")?.enabled = false
 	dependencies {
 		compile project(":spring-batch-core")
 		compile "commons-dbcp:commons-dbcp:$commonsDdbcpVersion"
@@ -349,6 +350,7 @@ project('spring-batch-core-tests') {
 
 project('spring-batch-infrastructure-tests') {
 	description = 'Spring Batch Infrastructure Tests'
+    project.tasks.findByPath("artifactoryPublish")?.enabled = false
 	dependencies {
 		compile project(":spring-batch-infrastructure")
 		compile "javax.jms:jms-api:1.1-rev-1"
@@ -485,6 +487,7 @@ project('spring-batch-integration') {
 
 project('spring-batch-samples') {
 	description = 'Batch Batch Samples'
+    project.tasks.findByPath("artifactoryPublish")?.enabled = false
 
 	dependencies {
 
