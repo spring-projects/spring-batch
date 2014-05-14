@@ -15,26 +15,25 @@
  */
 package org.springframework.batch.item.data;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
-import static org.mockito.Matchers.isNull;
-import static org.mockito.Mockito.when;
-
-import java.util.ArrayList;
-import java.util.Map;
-
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.springframework.data.neo4j.conversion.DefaultConverter;
-import org.springframework.data.neo4j.conversion.EndResult;
 import org.springframework.data.neo4j.conversion.Result;
 import org.springframework.data.neo4j.conversion.ResultConverter;
 import org.springframework.data.neo4j.template.Neo4jOperations;
+
+import java.util.ArrayList;
+import java.util.Map;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+import static org.mockito.Matchers.isNull;
+import static org.mockito.Mockito.when;
 
 public class Neo4jItemReaderTests {
 
@@ -44,7 +43,7 @@ public class Neo4jItemReaderTests {
 	@Mock
 	private Result<Map<String, Object>> result;
 	@Mock
-	private EndResult<String> endResult;
+	private Result<String> endResult;
 
 	@Before
 	public void setUp() throws Exception {
