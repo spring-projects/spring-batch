@@ -10,7 +10,7 @@ buildscript {
 	dependencies {
 		classpath 'org.springframework.build.gradle:docbook-reference-plugin:0.2.8'
 		classpath 'org.springframework.build.gradle:propdeps-plugin:0.0.5'
-        classpath 'org.springframework.build.gradle:spring-io-plugin:0.0.3.RELEASE'
+		classpath 'org.springframework.build.gradle:spring-io-plugin:0.0.3.RELEASE'
 	}
 }
 
@@ -21,6 +21,8 @@ ext {
 	linkScmUrl           = 'https://github.com/spring-projects/spring-batch'
 	linkScmConnection    = 'git://github.com/spring-projects/spring-batch.git'
 	linkScmDevConnection = 'git@github.com:spring-projects/spring-batch.git'
+
+	mainProjects = subprojects.findAll { !it.name.endsWith('tests') && !it.name.endsWith('samples') }
 }
 
 allprojects {
@@ -50,7 +52,6 @@ allprojects {
 		springDataNeo4jVersion = '3.1.0.RC1'
 		springIntegrationVersion = '4.0.0.RELEASE'
 		springLdapVersion = '2.0.1.RELEASE'
-        springIoVersion = '1.0.0.BUILD-SNAPSHOT'
 
 		activemqVersion = '5.9.1'
 		aspectjVersion = '1.8.0'
@@ -131,7 +132,7 @@ subprojects { subproject ->
 	ext.xLintArg = '-Xlint:all'
 	[compileJava, compileTestJava]*.options*.compilerArgs = [xLintArg]
 
-	test {
+	tasks.withType(Test).all {
 		// suppress all console output during testing unless running `gradle -i`
 		logging.captureStandardOutput(LogLevel.INFO)
 		systemProperty "ENVIRONMENT", environmentProperty
@@ -143,6 +144,13 @@ subprojects { subproject ->
 
 		include '**/*Tests.class'
 		exclude '**/Abstract*.class'
+	}
+
+	test {
+		jacoco {
+			append = false
+			destinationFile = file("$buildDir/jacoco.exec")
+		}
 	}
 
 	task sourcesJar(type: Jar) {
@@ -195,8 +203,21 @@ subprojects { subproject ->
 	}
 }
 
+configure(mainProjects) {
+	if (project.hasProperty('platformVersion')) {
+		apply plugin: 'spring-io'
+
+		repositories {
+			maven { url "https://repo.spring.io/libs-snapshot" }
+		}
+
+		dependencies {
+			springIoVersions "io.spring.platform:platform-versions:${platformVersion}@properties"
+		}
+	}
+}
+
 project('spring-batch-core') {
-    apply plugin: 'spring-io'
 	description = 'Spring Batch Core'
 
 	dependencies {
@@ -233,13 +254,10 @@ project('spring-batch-core') {
 		optional "log4j:log4j:$log4jVersion"
 
 		provided "javax.batch:javax.batch-api:$javaxBatchApiVersion"
-
-        springIoVersions "io.spring.platform:platform-versions:$springIoVersion@properties"
 	}
 }
 
 project('spring-batch-infrastructure') {
-    apply plugin: 'spring-io'
     description = 'Spring Batch Infrastructure'
 	dependencies {
 
@@ -308,8 +326,6 @@ project('spring-batch-infrastructure') {
         optional "org.springframework.ldap:spring-ldap-core:$springLdapVersion"
         optional "org.springframework.ldap:spring-ldap-core-tiger:$springLdapVersion"
         optional "org.springframework.ldap:spring-ldap-ldif-core:$springLdapVersion"
-
-        springIoVersions "io.spring.platform:platform-versions:$springIoVersion@properties"
 	}
 }
 
@@ -413,7 +429,6 @@ project('spring-batch-infrastructure-tests') {
 
 //Domain for batch job testing
 project('spring-batch-test') {
-    apply plugin: 'spring-io'
     description = 'Spring Batch Test'
 
 	dependencies {
@@ -432,13 +447,10 @@ project('spring-batch-test') {
 		testCompile "org.hsqldb:hsqldb:$hsqldbVersion"
 
 		optional "org.aspectj:aspectjrt:$aspectjVersion"
-
-        springIoVersions "io.spring.platform:platform-versions:$springIoVersion@properties"
 	}
 }
 
 project('spring-batch-integration') {
-    apply plugin: 'spring-io'
     description = 'Batch Integration'
 
 	dependencies {
@@ -480,8 +492,6 @@ project('spring-batch-integration') {
 		optional "log4j:log4j:1.2.14"
 		optional "org.springframework.integration:spring-integration-jms:$springIntegrationVersion"
 		optional "org.springframework:spring-jms:$springVersion"
-
-        springIoVersions "io.spring.platform:platform-versions:$springIoVersion@properties"
 	}
 }
 
