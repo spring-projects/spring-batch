@@ -15,13 +15,9 @@
  */
 package org.springframework.batch.core.jsr.configuration.xml;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
-import static org.springframework.batch.core.jsr.JsrTestUtils.restartJob;
-import static org.springframework.batch.core.jsr.JsrTestUtils.runJob;
-
-import java.util.List;
-import java.util.Properties;
+import org.junit.Test;
+import org.springframework.batch.core.ExitStatus;
+import org.springframework.batch.core.jsr.AbstractJsrTestCase;
 
 import javax.batch.api.AbstractBatchlet;
 import javax.batch.operations.JobOperator;
@@ -30,9 +26,11 @@ import javax.batch.runtime.JobExecution;
 import javax.batch.runtime.StepExecution;
 import javax.batch.runtime.context.StepContext;
 import javax.inject.Inject;
+import java.util.List;
+import java.util.Properties;
 
-import org.junit.Test;
-import org.springframework.batch.core.ExitStatus;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 /**
  * <p>
@@ -42,7 +40,7 @@ import org.springframework.batch.core.ExitStatus;
  * @author Chris Schaefer
  * @since 3.0
  */
-public class FlowParserTests {
+public class FlowParserTests extends AbstractJsrTestCase {
 	@Test
 	public void testDuplicateTransitionPatternsAllowed() throws Exception {
 		JobExecution stoppedExecution = runJob("FlowParserTests-context", new Properties(), 10000L);

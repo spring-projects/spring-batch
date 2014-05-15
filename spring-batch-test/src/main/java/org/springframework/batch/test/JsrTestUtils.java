@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.springframework.batch.core.jsr;
+package org.springframework.batch.test;
 
 import javax.batch.operations.JobOperator;
 import javax.batch.runtime.BatchRuntime;
@@ -45,14 +45,14 @@ public class JsrTestUtils {
 	/**
 	 * Executes a job and waits for it's status to be any of {@link BatchStatus#STOPPED},
 	 * {@link BatchStatus#COMPLETED}, or {@link BatchStatus#FAILED}.  If the job does not
-	 * reach one of those statuses within the given timeout, a {@link TimeoutException} is
+	 * reach one of those statuses within the given timeout, a {@link java.util.concurrent.TimeoutException} is
 	 * thrown.
 	 *
 	 * @param jobName
 	 * @param properties
 	 * @param timeout
 	 * @return the {@link JobExecution} for the final state of the job
-	 * @throws TimeoutException if the timeout occurs
+	 * @throws java.util.concurrent.TimeoutException if the timeout occurs
 	 */
 	public static JobExecution runJob(String jobName, Properties properties, long timeout) throws TimeoutException{
 		long executionId = operator.start(jobName, properties);
@@ -79,14 +79,14 @@ public class JsrTestUtils {
 	/**
 	 * Restarts a job and waits for it's status to be any of {@link BatchStatus#STOPPED},
 	 * {@link BatchStatus#COMPLETED}, or {@link BatchStatus#FAILED}.  If the job does not
-	 * reach one of those statuses within the given timeout, a {@link TimeoutException} is
+	 * reach one of those statuses within the given timeout, a {@link java.util.concurrent.TimeoutException} is
 	 * thrown.
 	 *
 	 * @param executionId
 	 * @param properties
 	 * @param timeout
 	 * @return the {@link JobExecution} for the final state of the job
-	 * @throws TimeoutException if the timeout occurs
+	 * @throws java.util.concurrent.TimeoutException if the timeout occurs
 	 */
 	public static JobExecution restartJob(long executionId, Properties properties, long timeout) throws TimeoutException {
 		long restartId = operator.restart(executionId, properties);

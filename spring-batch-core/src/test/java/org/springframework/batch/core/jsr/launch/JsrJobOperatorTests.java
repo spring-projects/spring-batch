@@ -28,6 +28,7 @@ import org.springframework.batch.core.converter.JobParametersConverter;
 import org.springframework.batch.core.converter.JobParametersConverterSupport;
 import org.springframework.batch.core.explore.JobExplorer;
 import org.springframework.batch.core.explore.support.SimpleJobExplorer;
+import org.springframework.batch.core.jsr.AbstractJsrTestCase;
 import org.springframework.batch.core.jsr.JsrJobParametersConverter;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.step.JobRepositorySupport;
@@ -60,10 +61,8 @@ import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import static org.springframework.batch.core.jsr.JsrTestUtils.restartJob;
-import static org.springframework.batch.core.jsr.JsrTestUtils.runJob;
 
-public class JsrJobOperatorTests {
+public class JsrJobOperatorTests extends AbstractJsrTestCase {
 
 	private JobOperator jsrJobOperator;
 	@Mock

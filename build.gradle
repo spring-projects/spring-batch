@@ -447,6 +447,7 @@ project('spring-batch-test') {
 		testCompile "org.hsqldb:hsqldb:$hsqldbVersion"
 
 		optional "org.aspectj:aspectjrt:$aspectjVersion"
+        optional "javax.batch:javax.batch-api:$javaxBatchApiVersion"
 	}
 }
 

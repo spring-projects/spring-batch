@@ -16,7 +16,7 @@
 package org.springframework.batch.core.jsr.configuration.xml;
 
 import org.junit.Test;
-import org.springframework.batch.core.jsr.JsrTestUtils;
+import org.springframework.batch.core.jsr.AbstractJsrTestCase;
 import org.springframework.batch.item.ItemProcessor;
 import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.ItemWriter;
@@ -35,46 +35,46 @@ import java.util.Properties;
 
 import static org.junit.Assert.assertEquals;
 
-public class ItemSkipParsingTests {
+public class ItemSkipParsingTests extends AbstractJsrTestCase {
 
 	@Test
 	public void test() throws Exception {
-		javax.batch.runtime.JobExecution execution = JsrTestUtils.runJob("ItemSkipParsingTests-context", new Properties(), 10000l);
+		javax.batch.runtime.JobExecution execution = runJob("ItemSkipParsingTests-context", new Properties(), 10000l);
 		JobOperator jobOperator = BatchRuntime.getJobOperator();
 
 		assertEquals(BatchStatus.FAILED, execution.getBatchStatus());
 		List<StepExecution> stepExecutions = jobOperator.getStepExecutions(execution.getExecutionId());
-		assertEquals(1, JsrTestUtils.getMetric(stepExecutions.get(0), Metric.MetricType.READ_SKIP_COUNT).getValue());
+		assertEquals(1, getMetric(stepExecutions.get(0), Metric.MetricType.READ_SKIP_COUNT).getValue());
 		assertEquals(1, TestSkipListener.readSkips);
 		assertEquals(0, TestSkipListener.processSkips);
 		assertEquals(0, TestSkipListener.writeSkips);
 
 		// Process skip and fail
-		execution = JsrTestUtils.restartJob(execution.getExecutionId(), new Properties(), 10000l);
+		execution = restartJob(execution.getExecutionId(), new Properties(), 10000l);
 
 		assertEquals(BatchStatus.FAILED, execution.getBatchStatus());
 		stepExecutions = jobOperator.getStepExecutions(execution.getExecutionId());
-		assertEquals(1, JsrTestUtils.getMetric(stepExecutions.get(0), Metric.MetricType.PROCESS_SKIP_COUNT).getValue());
+		assertEquals(1, getMetric(stepExecutions.get(0), Metric.MetricType.PROCESS_SKIP_COUNT).getValue());
 		assertEquals(0, TestSkipListener.readSkips);
 		assertEquals(1, TestSkipListener.processSkips);
 		assertEquals(0, TestSkipListener.writeSkips);
 
 		// Write skip and fail
-		execution = JsrTestUtils.restartJob(execution.getExecutionId(), new Properties(), 10000l);
+		execution = restartJob(execution.getExecutionId(), new Properties(), 10000l);
 
 		assertEquals(BatchStatus.FAILED, execution.getBatchStatus());
 		stepExecutions = jobOperator.getStepExecutions(execution.getExecutionId());
-		assertEquals(1, JsrTestUtils.getMetric(stepExecutions.get(0), Metric.MetricType.WRITE_SKIP_COUNT).getValue());
+		assertEquals(1, getMetric(stepExecutions.get(0), Metric.MetricType.WRITE_SKIP_COUNT).getValue());
 		assertEquals(0, TestSkipListener.readSkips);
 		assertEquals(0, TestSkipListener.processSkips);
 		assertEquals(1, TestSkipListener.writeSkips);
 
 		// Complete
-		execution = JsrTestUtils.restartJob(execution.getExecutionId(), new Properties(), 10000l);
+		execution = restartJob(execution.getExecutionId(), new Properties(), 10000l);
 
 		assertEquals(BatchStatus.COMPLETED, execution.getBatchStatus());
 		stepExecutions = jobOperator.getStepExecutions(execution.getExecutionId());
-		assertEquals(0, JsrTestUtils.getMetric(stepExecutions.get(0), Metric.MetricType.WRITE_SKIP_COUNT).getValue());
+		assertEquals(0, getMetric(stepExecutions.get(0), Metric.MetricType.WRITE_SKIP_COUNT).getValue());
 		assertEquals(0, TestSkipListener.readSkips);
 		assertEquals(0, TestSkipListener.processSkips);
 		assertEquals(0, TestSkipListener.writeSkips);

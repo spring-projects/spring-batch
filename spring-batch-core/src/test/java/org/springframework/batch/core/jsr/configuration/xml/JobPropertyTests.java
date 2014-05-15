@@ -15,9 +15,12 @@
  */
 package org.springframework.batch.core.jsr.configuration.xml;
 
-import java.io.Serializable;
-import java.util.List;
-import java.util.Properties;
+import org.junit.Test;
+import org.springframework.batch.core.StepContribution;
+import org.springframework.batch.core.jsr.AbstractJsrTestCase;
+import org.springframework.batch.core.scope.context.ChunkContext;
+import org.springframework.batch.core.step.tasklet.Tasklet;
+import org.springframework.batch.repeat.RepeatStatus;
 
 import javax.batch.api.BatchProperty;
 import javax.batch.api.Batchlet;
@@ -31,13 +34,9 @@ import javax.batch.runtime.BatchStatus;
 import javax.batch.runtime.JobExecution;
 import javax.batch.runtime.context.JobContext;
 import javax.inject.Inject;
-
-import org.junit.Test;
-import org.springframework.batch.core.StepContribution;
-import org.springframework.batch.core.jsr.JsrTestUtils;
-import org.springframework.batch.core.scope.context.ChunkContext;
-import org.springframework.batch.core.step.tasklet.Tasklet;
-import org.springframework.batch.repeat.RepeatStatus;
+import java.io.Serializable;
+import java.util.List;
+import java.util.Properties;
 
 import static junit.framework.Assert.assertEquals;
 
@@ -49,7 +48,7 @@ import static junit.framework.Assert.assertEquals;
  * @author Chris Schaefer
  * @since 3.0
  */
-public class JobPropertyTests {
+public class JobPropertyTests extends AbstractJsrTestCase {
 	@Test
 	public void testJobPropertyConfiguration() throws Exception {
 		Properties jobParameters = new Properties();
@@ -57,7 +56,7 @@ public class JobPropertyTests {
 		jobParameters.setProperty("deciderName", "stepDecider");
 		jobParameters.setProperty("deciderNumber", "1");
 
-		JobExecution jobExecution = JsrTestUtils.runJob("jsrJobPropertyTestsContext", jobParameters, 5000L);
+		JobExecution jobExecution = runJob("jsrJobPropertyTestsContext", jobParameters, 5000L);
 		assertEquals(BatchStatus.COMPLETED, jobExecution.getBatchStatus());
 	}
 

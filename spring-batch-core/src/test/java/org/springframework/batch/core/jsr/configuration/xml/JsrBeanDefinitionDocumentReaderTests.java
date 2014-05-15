@@ -15,13 +15,10 @@
  */
 package org.springframework.batch.core.jsr.configuration.xml;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.Properties;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.junit.Test;
-import org.springframework.batch.core.jsr.JsrTestUtils;
+import org.springframework.batch.core.jsr.AbstractJsrTestCase;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.xml.DefaultDocumentLoader;
 import org.springframework.beans.factory.xml.DelegatingEntityResolver;
@@ -35,6 +32,9 @@ import org.xml.sax.InputSource;
 
 import javax.batch.api.Batchlet;
 import javax.batch.runtime.JobExecution;
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.Properties;
 
 import static junit.framework.Assert.assertEquals;
 import static junit.framework.Assert.assertNotNull;
@@ -47,7 +47,7 @@ import static junit.framework.Assert.assertTrue;
  *
  * @author Chris Schaefer
  */
-public class JsrBeanDefinitionDocumentReaderTests {
+public class JsrBeanDefinitionDocumentReaderTests extends AbstractJsrTestCase {
 	private static final String JOB_PARAMETERS_BEAN_DEFINITION_NAME = "jsr_jobParameters";
 
 	private Log logger = LogFactory.getLog(getClass());
@@ -173,7 +173,7 @@ public class JsrBeanDefinitionDocumentReaderTests {
 
 	@Test
 	public void testArtifactUniqueness() throws Exception {
-		JobExecution jobExecution = JsrTestUtils.runJob("jsrUniqueInstanceTests", new Properties(), 10000L);
+		JobExecution jobExecution = runJob("jsrUniqueInstanceTests", new Properties(), 10000L);
 		String exitStatus = jobExecution.getExitStatus();
 
 		assertTrue("Exit status must contain listener3", exitStatus.contains("listener3"));
@@ -234,7 +234,7 @@ public class JsrBeanDefinitionDocumentReaderTests {
 
 	@Test
 	public void testSpringArtifactUniqueness() throws Exception {
-		JobExecution jobExecution = JsrTestUtils.runJob("jsrSpringInstanceTests", new Properties(), 10000L);
+		JobExecution jobExecution = runJob("jsrSpringInstanceTests", new Properties(), 10000L);
 		String exitStatus = jobExecution.getExitStatus();
 
 		assertTrue("Exit status must contain listener1", exitStatus.contains("listener1"));

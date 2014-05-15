@@ -15,22 +15,10 @@
  */
 package org.springframework.batch.core.jsr.step;
 
-import static org.junit.Assert.assertEquals;
-import static org.springframework.batch.core.jsr.JsrTestUtils.restartJob;
-import static org.springframework.batch.core.jsr.JsrTestUtils.runJob;
-
-import java.util.List;
-import java.util.Properties;
-
-import javax.batch.api.Decider;
-import javax.batch.runtime.BatchRuntime;
-import javax.batch.runtime.BatchStatus;
-import javax.batch.runtime.JobExecution;
-import javax.batch.runtime.StepExecution;
-
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.batch.core.explore.JobExplorer;
+import org.springframework.batch.core.jsr.AbstractJsrTestCase;
 import org.springframework.beans.factory.access.BeanFactoryLocator;
 import org.springframework.beans.factory.access.BeanFactoryReference;
 import org.springframework.beans.factory.config.AutowireCapableBeanFactory;
@@ -38,7 +26,17 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.context.access.ContextSingletonBeanFactoryLocator;
 import org.springframework.util.Assert;
 
-public class DecisionStepTests {
+import javax.batch.api.Decider;
+import javax.batch.runtime.BatchRuntime;
+import javax.batch.runtime.BatchStatus;
+import javax.batch.runtime.JobExecution;
+import javax.batch.runtime.StepExecution;
+import java.util.List;
+import java.util.Properties;
+
+import static org.junit.Assert.assertEquals;
+
+public class DecisionStepTests extends AbstractJsrTestCase {
 
 	private static ApplicationContext baseContext;
 

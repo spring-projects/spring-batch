@@ -16,8 +16,7 @@
 package org.springframework.batch.core.jsr.configuration.xml;
 
 import org.junit.Test;
-import org.springframework.batch.core.JobParametersBuilder;
-import org.springframework.batch.core.jsr.JsrTestUtils;
+import org.springframework.batch.core.jsr.AbstractJsrTestCase;
 
 import javax.batch.api.BatchProperty;
 import javax.batch.api.chunk.ItemProcessor;
@@ -28,13 +27,12 @@ import javax.batch.runtime.JobExecution;
 import javax.batch.runtime.Metric;
 import javax.batch.runtime.StepExecution;
 import javax.inject.Inject;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
 
 import static org.junit.Assert.assertEquals;
 
-public class ExceptionHandlingParsingTests {
+public class ExceptionHandlingParsingTests extends AbstractJsrTestCase {
 
 	@Test
 	public void testSkippable() throws Exception {
@@ -42,32 +40,32 @@ public class ExceptionHandlingParsingTests {
 
 		Properties jobParameters = new Properties();
 		jobParameters.setProperty("run", "1");
-		JobExecution execution1 = JsrTestUtils.runJob("ExceptionHandlingParsingTests-context", jobParameters, 10000l);
+		JobExecution execution1 = runJob("ExceptionHandlingParsingTests-context", jobParameters, 10000l);
 
 		List<StepExecution> stepExecutions = jobOperator.getStepExecutions(execution1.getExecutionId());
 		assertEquals(BatchStatus.FAILED, execution1.getBatchStatus());
 		assertEquals(1, stepExecutions.size());
-		assertEquals(1, JsrTestUtils.getMetric(stepExecutions.get(0), Metric.MetricType.PROCESS_SKIP_COUNT).getValue());
+		assertEquals(1, getMetric(stepExecutions.get(0), Metric.MetricType.PROCESS_SKIP_COUNT).getValue());
 
 		jobParameters = new Properties();
 		jobParameters.setProperty("run", "2");
-		JobExecution execution2 = JsrTestUtils.restartJob(execution1.getExecutionId(), jobParameters, 10000l);
+		JobExecution execution2 = restartJob(execution1.getExecutionId(), jobParameters, 10000l);
 		stepExecutions = jobOperator.getStepExecutions(execution2.getExecutionId());
 		assertEquals(BatchStatus.FAILED, execution2.getBatchStatus());
 		assertEquals(2, stepExecutions.size());
 
 		jobParameters = new Properties();
 		jobParameters.setProperty("run", "3");
-		JobExecution execution3 = JsrTestUtils.restartJob(execution2.getExecutionId(), jobParameters, 10000l);
+		JobExecution execution3 = restartJob(execution2.getExecutionId(), jobParameters, 10000l);
 		stepExecutions = jobOperator.getStepExecutions(execution3.getExecutionId());
 		assertEquals(BatchStatus.COMPLETED, execution3.getBatchStatus());
 		assertEquals(2, stepExecutions.size());
 
-		assertEquals(0, JsrTestUtils.getMetric(stepExecutions.get(1), Metric.MetricType.ROLLBACK_COUNT).getValue());
+		assertEquals(0, getMetric(stepExecutions.get(1), Metric.MetricType.ROLLBACK_COUNT).getValue());
 
 		jobParameters = new Properties();
 		jobParameters.setProperty("run", "4");
-		JobExecution execution4 = JsrTestUtils.runJob("ExceptionHandlingParsingTests-context", jobParameters, 10000l);
+		JobExecution execution4 = runJob("ExceptionHandlingParsingTests-context", jobParameters, 10000l);
 		stepExecutions = jobOperator.getStepExecutions(execution4.getExecutionId());
 		assertEquals(BatchStatus.COMPLETED, execution4.getBatchStatus());
 		assertEquals(3, stepExecutions.size());

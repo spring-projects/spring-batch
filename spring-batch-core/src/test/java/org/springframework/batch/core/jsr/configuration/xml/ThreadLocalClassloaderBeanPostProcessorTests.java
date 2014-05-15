@@ -15,15 +15,15 @@
  */
 package org.springframework.batch.core.jsr.configuration.xml;
 
-import static org.junit.Assert.assertEquals;
-import static org.springframework.batch.core.jsr.JsrTestUtils.runJob;
+import org.junit.Test;
+import org.springframework.batch.core.jsr.AbstractJsrTestCase;
 
 import javax.batch.runtime.BatchStatus;
 import javax.batch.runtime.JobExecution;
 
-import org.junit.Test;
+import static org.junit.Assert.assertEquals;
 
-public class ThreadLocalClassloaderBeanPostProcessorTests {
+public class ThreadLocalClassloaderBeanPostProcessorTests extends AbstractJsrTestCase {
 
 	@Test
 	public void test() throws Exception {
