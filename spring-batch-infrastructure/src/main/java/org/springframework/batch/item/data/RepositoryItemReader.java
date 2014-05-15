@@ -15,11 +15,6 @@
  */
 package org.springframework.batch.item.data;
 
-import java.lang.reflect.InvocationTargetException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.batch.item.ExecutionContext;
@@ -35,6 +30,11 @@ import org.springframework.data.repository.PagingAndSortingRepository;
 import org.springframework.util.Assert;
 import org.springframework.util.ClassUtils;
 import org.springframework.util.MethodInvoker;
+
+import java.lang.reflect.InvocationTargetException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 
 /**
  * <p>
@@ -65,7 +65,7 @@ public class RepositoryItemReader<T> extends AbstractItemCountingItemStreamItemR
 
 	protected Log logger = LogFactory.getLog(getClass());
 
-	private PagingAndSortingRepository<T, ?> repository;
+	private PagingAndSortingRepository<?, ?> repository;
 
 	private Sort sort;
 
@@ -118,7 +118,7 @@ public class RepositoryItemReader<T> extends AbstractItemCountingItemStreamItemR
 	 *
 	 * @param repository underlying repository for input to be read from.
 	 */
-	public void setRepository(PagingAndSortingRepository<T, ?> repository) {
+	public void setRepository(PagingAndSortingRepository<?, ?> repository) {
 		this.repository = repository;
 	}
 

@@ -15,29 +15,31 @@
  */
 package org.springframework.batch.item.data;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
-import static org.mockito.Mockito.when;
-
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
-
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.springframework.batch.item.adapter.DynamicMethodInvocationException;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.domain.Sort.Direction;
 import org.springframework.data.repository.PagingAndSortingRepository;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.mock;
 
 public class RepositoryItemReaderTests {
 
@@ -204,5 +206,34 @@ public class RepositoryItemReaderTests {
 		} catch (DynamicMethodInvocationException dmie) {
 			assertTrue(dmie.getCause() instanceof NoSuchMethodException);
 		}
+	}
+
+	@Test
+	public void testDifferentTypes() throws Exception {
+		TestRepository differentRepository = mock(TestRepository.class);
+		RepositoryItemReader<String> reader = new RepositoryItemReader<String>();
+		sorts = new HashMap<String, Sort.Direction>();
+		sorts.put("id", Direction.ASC);
+		reader.setRepository(differentRepository);
+		reader.setPageSize(1);
+		reader.setSort(sorts);
+		reader.setMethodName("findFirstNames");
+
+		ArgumentCaptor<PageRequest> pageRequestContainer = ArgumentCaptor.forClass(PageRequest.class);
+		when(differentRepository.findFirstNames(pageRequestContainer.capture())).thenReturn(new PageImpl<String>(new ArrayList<String>(){{
+			add("result");
+		}}));
+
+		assertEquals("result", reader.doRead());
+
+		Pageable pageRequest = pageRequestContainer.getValue();
+		assertEquals(0, pageRequest.getOffset());
+		assertEquals(0, pageRequest.getPageNumber());
+		assertEquals(1, pageRequest.getPageSize());
+		assertEquals("id: ASC", pageRequest.getSort().toString());
+	}
+
+	public static interface TestRepository extends PagingAndSortingRepository<Map, Long> {
+		Page<String> findFirstNames(Pageable pageable);
 	}
 }
