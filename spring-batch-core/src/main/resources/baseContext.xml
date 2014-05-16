@@ -11,7 +11,7 @@
 					http://www.springframework.org/schema/jdbc/spring-jdbc.xsd">
 
 	<batch:job-repository data-source="dataSource" id="jobRepository"
-		transaction-manager="transactionManager" table-prefix="BATCH_"/>
+		transaction-manager="transactionManager" table-prefix="${batch.table.prefix}"/>
 
  	<bean id="jobLauncher" class="org.springframework.batch.core.launch.support.SimpleJobLauncher">
  		<property name="jobRepository" ref="jobRepository"/>
@@ -28,8 +28,7 @@
 		<property name="dataSource" ref="dataSource"/>
 	</bean>
 
-	<bean id="dataSource"
-		class="org.apache.commons.dbcp.BasicDataSource">
+	<bean id="dataSource" class="org.apache.commons.dbcp.BasicDataSource">
 		<property name="driverClassName" value="${batch.jdbc.driver}" />
 		<property name="url" value="${batch.jdbc.url}" />
 		<property name="username" value="${batch.jdbc.user}" />
