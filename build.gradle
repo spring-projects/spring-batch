@@ -107,11 +107,13 @@ subprojects { subproject ->
     compileJava {
         sourceCompatibility=1.6
         targetCompatibility=1.6
+        options.encoding='UTF-8'
     }
 
     compileTestJava {
         sourceCompatibility=1.7
         targetCompatibility=1.7
+        options.encoding='UTF-8'
     }
 
 	eclipse {
