@@ -103,6 +103,8 @@ public class JobStep extends AbstractStep {
 
 		ExecutionContext executionContext = stepExecution.getExecutionContext();
 
+		executionContext.put(STEP_TYPE_KEY, this.getClass().getName());
+
 		JobParameters jobParameters;
 		if (executionContext.containsKey(JOB_PARAMETERS_KEY)) {
 			jobParameters = (JobParameters) executionContext.get(JOB_PARAMETERS_KEY);

@@ -15,16 +15,6 @@
  */
 package org.springframework.batch.core.step.item;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
-import static org.springframework.batch.core.BatchStatus.COMPLETED;
-import static org.springframework.batch.core.BatchStatus.FAILED;
-import static org.springframework.batch.core.BatchStatus.STOPPED;
-import static org.springframework.batch.core.BatchStatus.UNKNOWN;
-
-import java.util.Collection;
-
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.batch.core.ExitStatus;
@@ -32,6 +22,7 @@ import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.JobInstance;
 import org.springframework.batch.core.JobInterruptedException;
 import org.springframework.batch.core.JobParameters;
+import org.springframework.batch.core.Step;
 import org.springframework.batch.core.StepContribution;
 import org.springframework.batch.core.StepExecution;
 import org.springframework.batch.core.StepExecutionListener;
@@ -53,6 +44,16 @@ import org.springframework.transaction.TransactionException;
 import org.springframework.transaction.UnexpectedRollbackException;
 import org.springframework.transaction.support.DefaultTransactionStatus;
 import org.springframework.transaction.support.TransactionSynchronizationManager;
+
+import java.util.Collection;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+import static org.springframework.batch.core.BatchStatus.COMPLETED;
+import static org.springframework.batch.core.BatchStatus.FAILED;
+import static org.springframework.batch.core.BatchStatus.STOPPED;
+import static org.springframework.batch.core.BatchStatus.UNKNOWN;
 
 /**
  * Tests for the behavior of TaskletStep in a failure scenario.
@@ -245,7 +246,9 @@ public class TaskletStepExceptionTests {
 		assertEquals(1, stepExecution.getRollbackCount()); // Failed transaction
 		// counts as
 		// rollback
-		assertEquals(0, stepExecution.getExecutionContext().size());
+		assertEquals(2, stepExecution.getExecutionContext().size());
+		assertTrue(stepExecution.getExecutionContext().containsKey(Step.STEP_TYPE_KEY));
+		assertTrue(stepExecution.getExecutionContext().containsKey(TaskletStep.TASKLET_TYPE_KEY));
 	}
 
 	@SuppressWarnings("serial")
@@ -278,7 +281,9 @@ public class TaskletStepExceptionTests {
 		assertEquals(1, stepExecution.getRollbackCount()); // Failed transaction
 		// counts as
 		// rollback
-		assertEquals(0, stepExecution.getExecutionContext().size());
+		assertEquals(2, stepExecution.getExecutionContext().size());
+		assertTrue(stepExecution.getExecutionContext().containsKey(Step.STEP_TYPE_KEY));
+		assertTrue(stepExecution.getExecutionContext().containsKey(TaskletStep.TASKLET_TYPE_KEY));
 	}
 
 	@Test

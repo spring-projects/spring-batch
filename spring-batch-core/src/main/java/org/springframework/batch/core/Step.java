@@ -24,6 +24,7 @@ package org.springframework.batch.core;
  */
 public interface Step {
 
+	static final String STEP_TYPE_KEY = "batch.stepType";
 	/**
 	 * @return the name of this step.
 	 */
