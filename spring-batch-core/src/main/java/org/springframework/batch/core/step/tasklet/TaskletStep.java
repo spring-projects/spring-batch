@@ -100,6 +100,8 @@ public class TaskletStep extends AbstractStep {
 
 	private Tasklet tasklet;
 
+	public static final String TASKLET_TYPE_KEY = "batch.taskletType";
+
 	/**
 	 * Default constructor.
 	 */
@@ -242,6 +244,8 @@ public class TaskletStep extends AbstractStep {
 	 */
 	@Override
 	protected void doExecute(StepExecution stepExecution) throws Exception {
+		stepExecution.getExecutionContext().put(TASKLET_TYPE_KEY, tasklet.getClass().getName());
+		stepExecution.getExecutionContext().put(STEP_TYPE_KEY, this.getClass().getName());
 
 		stream.update(stepExecution.getExecutionContext());
 		getJobRepository().updateExecutionContext(stepExecution);

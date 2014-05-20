@@ -16,8 +16,6 @@
 
 package org.springframework.batch.core.partition.support;
 
-import java.util.Collection;
-
 import org.springframework.batch.core.BatchStatus;
 import org.springframework.batch.core.JobExecutionException;
 import org.springframework.batch.core.Step;
@@ -27,6 +25,8 @@ import org.springframework.batch.core.partition.StepExecutionSplitter;
 import org.springframework.batch.core.step.AbstractStep;
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.util.Assert;
+
+import java.util.Collection;
 
 /**
  * Implementation of {@link Step} which partitions the execution and spreads the
@@ -100,6 +100,7 @@ public class PartitionStep extends AbstractStep {
 	 */
 	@Override
 	protected void doExecute(StepExecution stepExecution) throws Exception {
+		stepExecution.getExecutionContext().put(STEP_TYPE_KEY, this.getClass().getName());
 
 		// Wait for task completion and then aggregate the results
 		Collection<StepExecution> executions = partitionHandler.handle(stepExecutionSplitter, stepExecution);

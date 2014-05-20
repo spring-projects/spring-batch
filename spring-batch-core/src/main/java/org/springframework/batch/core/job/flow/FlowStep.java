@@ -84,6 +84,7 @@ public class FlowStep extends AbstractStep {
 	@Override
 	protected void doExecute(StepExecution stepExecution) throws Exception {
 		try {
+			stepExecution.getExecutionContext().put(STEP_TYPE_KEY, this.getClass().getName());
 			StepHandler stepHandler = new SimpleStepHandler(getJobRepository(), stepExecution.getExecutionContext());
 			FlowExecutor executor = new JobFlowExecutor(getJobRepository(), stepHandler, stepExecution.getJobExecution());
 			executor.updateJobExecutionStatus(flow.start(executor).getStatus());
