@@ -15,18 +15,6 @@
  */
 package org.springframework.batch.core.launch.support;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
-
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.List;
-import java.util.Properties;
-import java.util.Set;
-
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -46,6 +34,18 @@ import org.springframework.batch.core.launch.NoSuchJobException;
 import org.springframework.batch.core.repository.JobExecutionAlreadyRunningException;
 import org.springframework.batch.core.step.JobRepositorySupport;
 import org.springframework.util.ClassUtils;
+
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Date;
+import java.util.List;
+import java.util.Properties;
+import java.util.Set;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 /**
  * @author Lucas Ward
@@ -487,7 +487,7 @@ public class CommandLineJobRunnerTests {
 		}
 
 		@Override
-		public List<JobInstance> getJobInstancesByJobName(String jobName, int start, int count) {
+		public List<JobInstance> findJobInstancesByJobName(String jobName, int start, int count) {
 			throw new UnsupportedOperationException();
 		}
 

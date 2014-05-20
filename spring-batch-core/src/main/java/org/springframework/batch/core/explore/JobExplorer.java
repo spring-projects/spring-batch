@@ -15,14 +15,14 @@
  */
 package org.springframework.batch.core.explore;
 
-import java.util.List;
-import java.util.Set;
-
 import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.JobInstance;
 import org.springframework.batch.core.StepExecution;
 import org.springframework.batch.core.launch.NoSuchJobException;
 import org.springframework.batch.item.ExecutionContext;
+
+import java.util.List;
+import java.util.Set;
 
 /**
  * Entry point for browsing executions of running or historical jobs and steps.
@@ -118,7 +118,7 @@ public interface JobExplorer {
 	 * @param count
 	 * @return
 	 */
-	List<JobInstance> getJobInstancesByJobName(String jobName, int start, int count);
+	List<JobInstance> findJobInstancesByJobName(String jobName, int start, int count);
 
 	/**
 	 * Query the repository for the number of unique {@link JobInstance}s
