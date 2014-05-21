@@ -36,7 +36,6 @@ import org.springframework.batch.core.launch.JobLauncher;
 import org.springframework.batch.core.launch.JobParametersNotFoundException;
 import org.springframework.batch.core.launch.NoSuchJobException;
 import org.springframework.batch.core.repository.JobRepository;
-import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.BeanDefinitionStoreException;
 import org.springframework.beans.factory.config.AutowireCapableBeanFactory;
 import org.springframework.context.ConfigurableApplicationContext;
@@ -286,11 +285,11 @@ public class CommandLineJobRunner {
 
 		try {
 			try {
-				context = new ClassPathXmlApplicationContext(jobPath);
-			} catch (BeansException e) {
-				logger.info("No XML-based context named " + jobPath + ". Trying class-based configuration.");
 				context = new AnnotationConfigApplicationContext(Class.forName(jobPath));
+			} catch (ClassNotFoundException cnfe) {
+				context = new ClassPathXmlApplicationContext(jobPath);
 			}
+
 			context.getAutowireCapableBeanFactory().autowireBeanProperties(this,
 					AutowireCapableBeanFactory.AUTOWIRE_BY_TYPE, false);
 
@@ -583,6 +582,7 @@ public class CommandLineJobRunner {
 			logger.error(message);
 			CommandLineJobRunner.message = message;
 			command.exit(1);
+			return;
 		}
 
 		String[] parameters = params.toArray(new String[params.size()]);
