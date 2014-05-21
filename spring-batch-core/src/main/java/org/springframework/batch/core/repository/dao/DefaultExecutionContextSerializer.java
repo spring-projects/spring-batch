@@ -15,16 +15,18 @@
  */
 package org.springframework.batch.core.repository.dao;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-
 import org.springframework.batch.core.repository.ExecutionContextSerializer;
 import org.springframework.core.serializer.DefaultDeserializer;
 import org.springframework.core.serializer.DefaultSerializer;
 import org.springframework.core.serializer.Deserializer;
 import org.springframework.core.serializer.Serializer;
 import org.springframework.util.Assert;
+
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.io.Serializable;
+import java.util.Map;
 
 /**
  * An implementation of the {@link ExecutionContextSerializer} using the default
@@ -52,6 +54,9 @@ public class DefaultExecutionContextSerializer implements ExecutionContextSerial
 	public void serialize(Object context, OutputStream out) throws IOException {
 		Assert.notNull(context);
 		Assert.notNull(out);
+		for(Object value : ((Map)context).values()) {
+			Assert.isInstanceOf(Serializable.class, value, "Value: [ " + value + "must be serializable.");
+		}
 
 		serializer.serialize(context, out);
 	}
