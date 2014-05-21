@@ -15,11 +15,11 @@
  */
 package org.springframework.batch.core;
 
+import org.springframework.util.StringUtils;
+
 import java.io.PrintWriter;
 import java.io.Serializable;
 import java.io.StringWriter;
-
-import org.springframework.util.StringUtils;
 
 /**
  * Value object used to carry information about the status of a
@@ -226,10 +226,10 @@ public class ExitStatus implements Serializable, Comparable<ExitStatus> {
 	/**
 	 * Check if this status represents a running process.
 	 *
-	 * @return true if the exit code is "RUNNING" or "UNKNOWN"
+	 * @return true if the exit code is "EXECUTING" or "UNKNOWN"
 	 */
 	public boolean isRunning() {
-		return "RUNNING".equals(this.exitCode) || "UNKNOWN".equals(this.exitCode);
+		return "EXECUTING".equals(this.exitCode) || "UNKNOWN".equals(this.exitCode);
 	}
 
 	/**
