@@ -15,10 +15,6 @@
  */
 package org.springframework.batch.core.configuration.support;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
-
 import org.junit.Test;
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.job.JobSupport;
@@ -27,10 +23,16 @@ import org.springframework.beans.factory.config.BeanFactoryPostProcessor;
 import org.springframework.beans.factory.config.BeanPostProcessor;
 import org.springframework.beans.factory.support.AbstractBeanFactory;
 import org.springframework.context.ConfigurableApplicationContext;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;
 import org.springframework.util.ClassUtils;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 /**
  * @author Dave Syer
@@ -171,38 +173,34 @@ public class GenericApplicationContextFactoryTests {
 		assertTrue(autowiredFound);
 	}
 
-	@Test
-	public void testEqualsMultipleConfigs() throws Exception {
+	@Test(expected = IllegalArgumentException.class)
+	public void testDifferentResourceTypes() throws Exception {
 		Resource resource1 = new ClassPathResource(ClassUtils.addResourcePathToPackagePath(getClass(),
-				"abstract-context.xml"));
-		Resource resource2 = new ClassPathResource(ClassUtils.addResourcePathToPackagePath(getClass(),
-				"child-context-with-abstract-job.xml"));
-		GenericApplicationContextFactory factory = new GenericApplicationContextFactory(resource1, resource2);
-		GenericApplicationContextFactory other = new GenericApplicationContextFactory(resource1, resource2);
-		assertEquals(other, factory);
-		assertEquals(other.hashCode(), factory.hashCode());
+			"abstract-context.xml"));
+		GenericApplicationContextFactory factory = new GenericApplicationContextFactory(resource1, Configuration1.class);
+		factory.createApplicationContext();
 	}
 
 	@Test
-	public void testParentConfigurationInheritedMultipleConfigs() {
-		Resource resource1 = new ClassPathResource(ClassUtils.addResourcePathToPackagePath(getClass(),
-				"abstract-context.xml"));
-		Resource resource2 = new ClassPathResource(ClassUtils.addResourcePathToPackagePath(getClass(),
-				"child-context-with-abstract-job.xml"));
-		GenericApplicationContextFactory factory = new GenericApplicationContextFactory(resource1, resource2);
+	public void testPackageScanning() throws Exception {
+		GenericApplicationContextFactory factory = new GenericApplicationContextFactory("org.springframework.batch.core.configuration.support");
 		ConfigurableApplicationContext context = factory.createApplicationContext();
-		assertEquals("concrete-job", context.getBeanNamesForType(Job.class)[0]);
-		assertEquals("bar", context.getBean("concrete-job", Job.class).getName());
-		assertEquals(4, context.getBean("foo", Foo.class).values[1], 0.01);
-		assertNotNull(context.getBean("concrete-job", JobSupport.class).getStep("step31"));
-		assertNotNull(context.getBean("concrete-job", JobSupport.class).getStep("step32"));
-		boolean autowiredFound = false;
-		for (BeanPostProcessor postProcessor : ((AbstractBeanFactory)context.getBeanFactory()).getBeanPostProcessors()) {
-			if (postProcessor instanceof AutowiredAnnotationBeanPostProcessor) {
-				autowiredFound = true;
-			}
-		}
-		assertTrue(autowiredFound);
+
+		assertEquals(context.getBean("bean1"), "bean1");
+		assertEquals(context.getBean("bean2"), "bean2");
+		assertEquals(context.getBean("bean3"), "bean3");
+		assertEquals(context.getBean("bean4"), "bean4");
+	}
+
+	@Test
+	public void testMultipleConfigurationClasses() throws Exception {
+		GenericApplicationContextFactory factory = new GenericApplicationContextFactory(Configuration1.class, Configuration2.class);
+		ConfigurableApplicationContext context = factory.createApplicationContext();
+
+		assertEquals(context.getBean("bean1"), "bean1");
+		assertEquals(context.getBean("bean2"), "bean2");
+		assertEquals(context.getBean("bean3"), "bean3");
+		assertEquals(context.getBean("bean4"), "bean4");
 	}
 
 	public static class Foo {
@@ -210,6 +208,32 @@ public class GenericApplicationContextFactoryTests {
 
 		public void setValues(double[] values) {
 			this.values = values;
+		}
+	}
+
+	@Configuration
+	public static class Configuration1 {
+		@Bean
+		public String bean1() {
+			return "bean1";
+		}
+
+		@Bean
+		public String bean2() {
+			return "bean2";
+		}
+	}
+
+	@Configuration
+	public static class Configuration2 {
+		@Bean
+		public String bean3() {
+			return "bean3";
+		}
+
+		@Bean
+		public String bean4() {
+			return "bean4";
 		}
 	}
 }

@@ -16,11 +16,6 @@
 
 package org.springframework.batch.core.configuration.support;
 
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-
 import org.springframework.beans.factory.config.BeanFactoryPostProcessor;
 import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
 import org.springframework.beans.factory.support.DefaultListableBeanFactory;
@@ -32,6 +27,11 @@ import org.springframework.context.support.GenericXmlApplicationContext;
 import org.springframework.core.io.Resource;
 import org.springframework.util.Assert;
 import org.springframework.util.StringUtils;
+
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 /**
  * {@link ApplicationContextFactory} implementation that takes a parent context and a path to the context to create.
@@ -45,6 +45,8 @@ public class GenericApplicationContextFactory extends AbstractApplicationContext
 	/**
 	 * Create an application context factory for the resource specified. The resource can be an actual {@link Resource},
 	 * in which case it will be interpreted as an XML file, or it can be a &#64;Configuration class, or a package name.
+	 * All types must be the same (mixing XML with a java package for example is not allowed and will result in an
+	 * {@link java.lang.IllegalArgumentException}).
 	 * 
 	 * @param resources some resources (XML configuration files, &#064;Configuration classes or java packages to scan)
 	 */
@@ -58,21 +60,24 @@ public class GenericApplicationContextFactory extends AbstractApplicationContext
 	@Override
 	protected ConfigurableApplicationContext createApplicationContext(ConfigurableApplicationContext parent,
 			Object... resources) {
+		ConfigurableApplicationContext context;
+
 		if (allObjectsOfType(resources, Resource.class)) {
-			 return new ResourceXmlApplicationContext(parent, resources);
+			 context = new ResourceXmlApplicationContext(parent, resources);
+		} else if (allObjectsOfType(resources, Class.class)) {
+			 context =  new ResourceAnnotationApplicationContext(parent, resources);
+		} else if (allObjectsOfType(resources, String.class)) {
+			 context = new ResourceAnnotationApplicationContext(parent, resources);
+		} else {
+			List<Class<?>> types = new ArrayList<Class<?>>();
+			for (Object resource : resources) {
+				types.add(resource.getClass());
+			}
+			throw new IllegalArgumentException("No application context could be created for resource types: "
+													   + Arrays.toString(types.toArray()));
 		}
-		if (allObjectsOfType(resources, Class.class)) {
-			 return new ResourceAnnotationApplicationContext(parent, resources);
-		}
-		if (allObjectsOfType(resources, String.class)) {
-			 return new ResourceAnnotationApplicationContext(parent, resources);
-		}
-		List<Class<?>> types = new ArrayList<Class<?>>();
-		for (Object resource : resources) {
-			types.add(resource.getClass());
-		}
-		throw new IllegalArgumentException("No application context could be created for resource types: "
-				+ Arrays.toString(types.toArray()));
+
+		return context;
 	}
 	
 	private boolean allObjectsOfType(Object[] objects, Class<?> type) {
