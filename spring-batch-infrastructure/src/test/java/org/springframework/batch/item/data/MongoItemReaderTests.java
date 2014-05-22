@@ -1,16 +1,5 @@
 package org.springframework.batch.item.data;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.fail;
-import static org.mockito.Matchers.eq;
-import static org.mockito.Mockito.when;
-
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
-
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
@@ -19,6 +8,17 @@ import org.mockito.MockitoAnnotations;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.MongoOperations;
 import org.springframework.data.mongodb.core.query.Query;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.fail;
+import static org.mockito.Matchers.eq;
+import static org.mockito.Mockito.when;
 
 public class MongoItemReaderTests {
 
@@ -179,5 +179,29 @@ public class MongoItemReaderTests {
 		assertEquals(0, query.getSkip());
 		assertEquals("{ \"name\" : \"foo\"}", query.getQueryObject().toString());
 		assertEquals("{ \"name\" : -1}", query.getSortObject().toString());
+	}
+
+	@SuppressWarnings("serial")
+	@Test
+	public void testQueryWithCollection() {
+		reader.setParameterValues(new ArrayList<Object>(){{
+			add("foo");
+		}});
+
+		reader.setQuery("{ name : ?0 }");
+		reader.setCollection("collection");
+		ArgumentCaptor<Query> queryContainer = ArgumentCaptor.forClass(Query.class);
+		ArgumentCaptor<String> collectionContainer = ArgumentCaptor.forClass(String.class);
+
+		when(template.find(queryContainer.capture(), eq(String.class), collectionContainer.capture())).thenReturn(new ArrayList<String>());
+
+		assertFalse(reader.doPageRead().hasNext());
+
+		Query query = queryContainer.getValue();
+		assertEquals(50, query.getLimit());
+		assertEquals(0, query.getSkip());
+		assertEquals("{ \"name\" : \"foo\"}", query.getQueryObject().toString());
+		assertEquals("{ \"name\" : -1}", query.getSortObject().toString());
+		assertEquals("collection", collectionContainer.getValue());
 	}
 }

@@ -16,13 +16,7 @@
 
 package org.springframework.batch.item.data;
 
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
+import com.mongodb.util.JSON;
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.item.ItemReader;
 import org.springframework.beans.factory.InitializingBean;
@@ -36,7 +30,12 @@ import org.springframework.util.Assert;
 import org.springframework.util.ClassUtils;
 import org.springframework.util.StringUtils;
 
-import com.mongodb.util.JSON;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * <p>
@@ -75,6 +74,7 @@ public class MongoItemReader<T> extends AbstractPaginatedDataItemReader<T> imple
 	private Sort sort;
 	private String hint;
 	private String fields;
+	private String collection;
 	private List<Object> parameterValues;
 
 	public MongoItemReader() {
@@ -144,6 +144,13 @@ public class MongoItemReader<T> extends AbstractPaginatedDataItemReader<T> imple
 	}
 
 	/**
+	 * @param collection Mongo collection to be queried.
+	 */
+	public void setCollection(String collection) {
+		this.collection = collection;
+	}
+
+	/**
 	 * JSON String telling MongoDB what index to use.
 	 *
 	 * @param hint string indicating what index to use.
@@ -175,7 +182,11 @@ public class MongoItemReader<T> extends AbstractPaginatedDataItemReader<T> imple
 			mongoQuery.withHint(hint);
 		}
 
-		return (Iterator<T>) template.find(mongoQuery, type).iterator();
+		if(StringUtils.hasText(collection)) {
+			return (Iterator<T>) template.find(mongoQuery, type, collection).iterator();
+		} else {
+			return (Iterator<T>) template.find(mongoQuery, type).iterator();
+		}
 	}
 
 	/**
