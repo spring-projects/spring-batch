@@ -1,0 +1,15 @@
+Spring Batch 2.2.7 Release Notes
+
+* Bug
+
+  * {{{http://jira.springsource.org/browse/BATCH-2206}[BATCH-2206]}} - MongoItemReader needs property to set collection
+
+  * {{{http://jira.springsource.org/browse/BATCH-2208}[BATCH-2208]}} - ExecutionContext entries should not necessarily be Serializable
+
+  * {{{http://jira.springsource.org/browse/BATCH-2214}[BATCH-2214]}} - Allow compilation w/ JDK 8 on 2.2
+
+  * {{{http://jira.springsource.org/browse/BATCH-2235}[BATCH-2235]}} - ExitStatus.EXECUTING.isRunning() does not return true
+
+* Improvement
+
+  * {{{http://jira.springsource.org/browse/BATCH-2238}[BATCH-2238]}} - Allow multiple configs (xmls, java-files, packages) to be loaded
