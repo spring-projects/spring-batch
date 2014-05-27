@@ -16,11 +16,6 @@
 
 package org.springframework.batch.core.repository.support;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Date;
-import java.util.List;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.batch.core.BatchStatus;
@@ -38,6 +33,11 @@ import org.springframework.batch.core.repository.dao.JobInstanceDao;
 import org.springframework.batch.core.repository.dao.StepExecutionDao;
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.util.Assert;
+
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Date;
+import java.util.List;
 
 /**
  *
@@ -287,6 +287,7 @@ public class SimpleJobRepository implements JobRepository {
 
 		if (jobExecution != null) {
 			jobExecution.setExecutionContext(ecDao.getExecutionContext(jobExecution));
+			stepExecutionDao.addStepExecutions(jobExecution);
 		}
 		return jobExecution;
 

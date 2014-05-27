@@ -15,12 +15,6 @@
  */
 package org.springframework.batch.core.repository.support;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.fail;
-
-import java.util.Date;
-
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.batch.core.BatchStatus;
@@ -37,6 +31,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.Arrays;
+import java.util.Date;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.fail;
 
 /**
  * Repository tests using JDBC DAOs (rather than mocks).
@@ -199,7 +200,11 @@ public class SimpleJobRepositoryIntegrationTests {
 		jobRepository.update(jobExecution);
 		Thread.sleep(10);
 		jobExecution = jobRepository.createJobExecution(job.getName(), jobParameters);
+		StepExecution stepExecution = new StepExecution("step1", jobExecution);
+		jobRepository.add(stepExecution);
+		jobExecution.addStepExecutions(Arrays.asList(stepExecution));
 		assertEquals(jobExecution, jobRepository.getLastJobExecution(job.getName(), jobParameters));
+		assertEquals(stepExecution, jobExecution.getStepExecutions().iterator().next());
 	}
 
 }
