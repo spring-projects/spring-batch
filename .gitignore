@@ -23,4 +23,5 @@ s3.properties
 build
 .gradle
 pom.xml
+out
 
