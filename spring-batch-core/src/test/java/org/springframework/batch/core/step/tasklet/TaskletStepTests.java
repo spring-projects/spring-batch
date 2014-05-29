@@ -66,6 +66,7 @@ import org.springframework.dao.DataAccessResourceFailureException;
 import org.springframework.transaction.TransactionException;
 import org.springframework.transaction.interceptor.DefaultTransactionAttribute;
 import org.springframework.transaction.support.DefaultTransactionStatus;
+import org.springframework.transaction.support.TransactionSynchronizationManager;
 
 public class TaskletStepTests {
 
@@ -715,12 +716,20 @@ public class TaskletStepTests {
 		step.setTransactionManager(new ResourcelessTransactionManager() {
 			@Override
 			protected void doCommit(DefaultTransactionStatus status) throws TransactionException {
-				// Simulate failure on commit
-				throw new RuntimeException("Foo");
+				if ("chunk".equals(TransactionSynchronizationManager.getCurrentTransactionName())) {
+					// Simulate failure on commit
+					throw new RuntimeException("Foo");
+				} else {
+					super.doCommit(status);
+				}
 			}
 			@Override
 			protected void doRollback(DefaultTransactionStatus status) throws TransactionException {
-				throw new RuntimeException("Bar");
+				if ("chunk".equals(TransactionSynchronizationManager.getCurrentTransactionName())) {
+					throw new RuntimeException("Bar");	
+				} else {
+					super.doRollback(status);
+				}
 			}
 		});
 
@@ -897,7 +906,36 @@ public class TaskletStepTests {
 		step.execute(stepExecution);
 		assertEquals(BatchStatus.COMPLETED, stepExecution.getStatus());
 	}
+	
+	@Test
+	public void testStreamsAreOpenedInTransaction() throws Exception {
+		step.setStreams(new ItemStream[] { new ItemStreamSupport() {
+			@Override
+			public void open(ExecutionContext executionContext) throws ItemStreamException {
+				executionContext.put("isActualTransactionActive", TransactionSynchronizationManager.isActualTransactionActive());
+			}
+		} });
+		ExecutionContext executionContext = new ExecutionContext();
+		step.open(executionContext);
+		
+		assertEquals(Boolean.TRUE, executionContext.get("isActualTransactionActive"));
+	}
 
+	@Test
+	public void testStreamsAreClosedInTransaction() throws Exception {
+		final ExecutionContext executionContext = new ExecutionContext();
+		step.setStreams(new ItemStream[] { new ItemStreamSupport() {
+			@Override
+			public void close() throws ItemStreamException {
+				executionContext.put("isActualTransactionActive", TransactionSynchronizationManager.isActualTransactionActive());
+			}
+		} });
+		
+		step.close(executionContext);
+		
+		assertEquals(Boolean.TRUE, executionContext.get("isActualTransactionActive"));
+	}
+	
 	private static class JobRepositoryStub extends JobRepositorySupport {
 
 		private int updateCount = 0;

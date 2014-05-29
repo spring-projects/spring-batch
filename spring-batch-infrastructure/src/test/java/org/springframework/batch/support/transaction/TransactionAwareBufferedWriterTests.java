@@ -139,6 +139,64 @@ public class TransactionAwareBufferedWriterTests {
 		assertEquals("foo", getStringFromByteBuffer(byteBufferCaptor.getAllValues().get(0)));
 		assertEquals("c", getStringFromByteBuffer(byteBufferCaptor.getAllValues().get(1)));
 	}
+	
+	@Test
+	public void testCloseInTransaction() throws Exception {
+		ArgumentCaptor<ByteBuffer> byteBufferCaptor = ArgumentCaptor.forClass(ByteBuffer.class);
+
+		when(fileChannel.write(byteBufferCaptor.capture())).thenAnswer(new Answer<Integer>() {
+			@Override
+			public Integer answer(InvocationOnMock invocation) throws Throwable {
+				return ((ByteBuffer) invocation.getArguments()[0]).remaining();
+			}
+		});
+
+		new TransactionTemplate(transactionManager).execute(new TransactionCallback<Void>() {
+			@Override
+			public Void doInTransaction(TransactionStatus status) {
+				try {
+					writer.write("foo");
+					writer.close();
+				}
+				catch (IOException e) {
+					throw new IllegalStateException("Unexpected IOException", e);
+				}
+				assertEquals(3, writer.getBufferSize());
+				return null;
+			}
+		});
+
+		assertEquals("foo", getStringFromByteBuffer(byteBufferCaptor.getAllValues().get(0)));
+		assertEquals("c", getStringFromByteBuffer(byteBufferCaptor.getAllValues().get(1)));
+	}	
+	
+	@Test
+	public void testCloseInTransactionEmptyBuffer() throws Exception {
+		ArgumentCaptor<ByteBuffer> byteBufferCaptor = ArgumentCaptor.forClass(ByteBuffer.class);
+
+		when(fileChannel.write(byteBufferCaptor.capture())).thenAnswer(new Answer<Integer>() {
+			@Override
+			public Integer answer(InvocationOnMock invocation) throws Throwable {
+				return ((ByteBuffer) invocation.getArguments()[0]).remaining();
+			}
+		});
+
+		new TransactionTemplate(transactionManager).execute(new TransactionCallback<Void>() {
+			@Override
+			public Void doInTransaction(TransactionStatus status) {
+				try {
+					writer.close();
+				}
+				catch (IOException e) {
+					throw new IllegalStateException("Unexpected IOException", e);
+				}
+				assertEquals(0, writer.getBufferSize());
+				return null;
+			}
+		});
+
+		assertEquals("c", getStringFromByteBuffer(byteBufferCaptor.getAllValues().get(0)));
+	}		
 
 	@Test
 	public void testFlushInTransaction() throws Exception {
