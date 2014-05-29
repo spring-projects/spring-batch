@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<beans xmlns="http://www.springframework.org/schema/beans"
+	   xmlns:batch="http://www.springframework.org/schema/batch"
+	   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	   xsi:schemaLocation="http://www.springframework.org/schema/beans
+	     http://www.springframework.org/schema/beans/spring-beans.xsd
+	     http://www.springframework.org/schema/batch
+	     http://www.springframework.org/schema/batch/spring-batch.xsd">
+
+	<import resource="classpath:/org/springframework/batch/core/repository/dao/data-source-context.xml" />
+
+	<batch:job id="locking">
+		<batch:step id="step1" next="step2">
+			<batch:tasklet ref="tasklet"/>
+		</batch:step>
+		<batch:step id="step2">
+			<batch:tasklet>
+				<batch:chunk reader="itemReader" writer="itemWriter" commit-interval="5"/>
+			</batch:tasklet>
+		</batch:step>
+	</batch:job>
+
+	<batch:job-repository/>
+
+	<bean id="tasklet" class="org.springframework.batch.core.configuration.xml.NoopTasklet"/>
+
+	<bean id="itemReader" class="org.springframework.batch.item.support.ListItemReader">
+		<constructor-arg>
+			<list>
+				<value>1</value>
+				<value>2</value>
+				<value>3</value>
+				<value>4</value>
+				<value>5</value>
+			</list>
+		</constructor-arg>
+	</bean>
+
+	<bean id="itemWriter" class="org.springframework.batch.core.repository.dao.OptimisticLockingFailureTests$Writer"/>
+
+	<bean id="jobLauncher" class="org.springframework.batch.core.launch.support.SimpleJobLauncher">
+		<property name="jobRepository" ref="jobRepository"/>
+		<property name="taskExecutor">
+			<bean class="org.springframework.core.task.SimpleAsyncTaskExecutor"/>
+		</property>
+	</bean>
+
+	<bean id="transactionManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+		<property name="dataSource" ref="dataSource" />
+	</bean>
+
+	<bean id="jobExplorer" class="org.springframework.batch.core.explore.support.JobExplorerFactoryBean">
+		<property name="dataSource" ref="dataSource"/>
+	</bean>
+
+	<bean id="jobRegistry" class="org.springframework.batch.core.configuration.support.MapJobRegistry"/>
+
+	<bean id="jobOperator" class="org.springframework.batch.core.launch.support.SimpleJobOperator">
+		<property name="jobLauncher" ref="jobLauncher"/>
+		<property name="jobRepository" ref="jobRepository"/>
+		<property name="jobExplorer" ref="jobExplorer"/>
+		<property name="jobRegistry" ref="jobRegistry"/>
+	</bean>
+</beans>
