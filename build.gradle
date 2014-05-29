@@ -96,9 +96,9 @@ subprojects { subproject ->
 
 	apply plugin: 'java'
 	apply from:   "${rootProject.projectDir}/publish-maven.gradle"
-	apply plugin: 'eclipse'
-	apply plugin: 'idea'
 	apply plugin: 'jacoco'
+	apply plugin: 'propdeps-idea'
+	apply plugin: 'propdeps-eclipse'
 
 	jacoco {
 		toolVersion = "0.7.0.201403182114"
