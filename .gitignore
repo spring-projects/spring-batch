@@ -19,4 +19,7 @@ s3.properties
 *.iws
 .*.swp
 .DS_Store
+.gradle
+out
+build
 
