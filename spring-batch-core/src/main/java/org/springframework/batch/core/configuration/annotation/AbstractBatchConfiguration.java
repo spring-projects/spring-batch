@@ -17,6 +17,7 @@ package org.springframework.batch.core.configuration.annotation;
 
 import org.springframework.batch.core.configuration.JobRegistry;
 import org.springframework.batch.core.configuration.support.MapJobRegistry;
+import org.springframework.batch.core.explore.JobExplorer;
 import org.springframework.batch.core.launch.JobLauncher;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.scope.StepScope;
@@ -69,6 +70,9 @@ public abstract class AbstractBatchConfiguration implements ImportAware {
 
 	@Bean
 	public abstract JobLauncher jobLauncher() throws Exception;
+
+	@Bean
+	public abstract JobExplorer jobExplorer() throws Exception;
 
 	@Bean
 	public JobRegistry jobRegistry() throws Exception {

@@ -15,10 +15,6 @@
  */
 package org.springframework.batch.core.configuration.annotation;
 
-import javax.annotation.PostConstruct;
-import javax.sql.DataSource;
-
-import org.springframework.batch.core.PooledEmbeddedDataSource;
 import org.springframework.batch.core.Step;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
@@ -29,6 +25,9 @@ import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseFactory;
 import org.springframework.jdbc.datasource.init.DatabasePopulatorUtils;
 import org.springframework.jdbc.datasource.init.ResourceDatabasePopulator;
 import org.springframework.util.ClassUtils;
+
+import javax.annotation.PostConstruct;
+import javax.sql.DataSource;
 
 @Configuration
 public class DataSourceConfiguration {
@@ -49,7 +48,7 @@ public class DataSourceConfiguration {
 
 	@Bean
 	public DataSource dataSource() {
-		return new PooledEmbeddedDataSource(new EmbeddedDatabaseFactory().getDatabase());
+		return new EmbeddedDatabaseFactory().getDatabase();
 	}
 
 }
