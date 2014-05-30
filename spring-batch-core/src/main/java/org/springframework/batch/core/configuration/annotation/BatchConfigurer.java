@@ -15,6 +15,7 @@
  */
 package org.springframework.batch.core.configuration.annotation;
 
+import org.springframework.batch.core.explore.JobExplorer;
 import org.springframework.batch.core.launch.JobLauncher;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.transaction.PlatformTransactionManager;
@@ -33,4 +34,5 @@ public interface BatchConfigurer {
 
 	JobLauncher getJobLauncher() throws Exception;
 
+	JobExplorer getJobExplorer() throws Exception;
 }
