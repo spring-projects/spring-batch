@@ -16,6 +16,7 @@
 
 package org.springframework.batch.core.repository.dao;
 
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.batch.core.BatchStatus;
@@ -34,6 +35,7 @@ import java.util.List;
 
 import static org.junit.Assert.assertTrue;
 
+@Ignore
 @ContextConfiguration
 @RunWith(SpringJUnit4ClassRunner.class)
 public class OptimisticLockingFailureTests {
