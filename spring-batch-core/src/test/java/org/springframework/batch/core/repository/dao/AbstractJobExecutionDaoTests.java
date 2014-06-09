@@ -27,9 +27,7 @@ import java.util.List;
 import java.util.Set;
 
 import org.junit.Before;
-import org.junit.FixMethodOrder;
 import org.junit.Test;
-import org.junit.runners.MethodSorters;
 import org.springframework.batch.core.BatchStatus;
 import org.springframework.batch.core.ExitStatus;
 import org.springframework.batch.core.JobExecution;
@@ -40,7 +38,6 @@ import org.springframework.dao.OptimisticLockingFailureException;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.Assert;
 
-@FixMethodOrder(MethodSorters.JVM)
 public abstract class AbstractJobExecutionDaoTests {
 
 	protected JobExecutionDao dao;
