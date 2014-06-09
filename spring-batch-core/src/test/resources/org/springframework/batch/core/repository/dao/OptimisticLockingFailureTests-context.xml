@@ -23,7 +23,7 @@
 
 	<batch:job-repository/>
 
-	<bean id="tasklet" class="org.springframework.batch.core.configuration.xml.NoopTasklet"/>
+	<bean id="tasklet" class="org.springframework.batch.core.repository.dao.OptimisticLockingFailureTests$SleepingTasklet"/>
 
 	<bean id="itemReader" class="org.springframework.batch.item.support.ListItemReader">
 		<constructor-arg>

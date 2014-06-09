@@ -16,17 +16,20 @@
 
 package org.springframework.batch.core.repository.dao;
 
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.batch.core.BatchStatus;
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.JobParametersBuilder;
+import org.springframework.batch.core.StepContribution;
 import org.springframework.batch.core.StepExecution;
 import org.springframework.batch.core.launch.JobLauncher;
 import org.springframework.batch.core.launch.JobOperator;
+import org.springframework.batch.core.scope.context.ChunkContext;
+import org.springframework.batch.core.step.tasklet.Tasklet;
 import org.springframework.batch.item.ItemWriter;
+import org.springframework.batch.repeat.RepeatStatus;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
@@ -35,7 +38,6 @@ import java.util.List;
 
 import static org.junit.Assert.assertTrue;
 
-@Ignore
 @ContextConfiguration
 @RunWith(SpringJUnit4ClassRunner.class)
 public class OptimisticLockingFailureTests {
@@ -53,6 +55,8 @@ public class OptimisticLockingFailureTests {
 		JobExecution jobExecution = jobLauncher.run(job, new JobParametersBuilder()
 				.addLong("test", 1L)
 				.toJobParameters());
+
+		Thread.sleep(1000);
 
 		jobOperator.stop(jobExecution.getId());
 
@@ -100,6 +104,14 @@ public class OptimisticLockingFailureTests {
 			for(String item : items) {
 				System.out.println(item);
 			}
+		}
+	}
+
+	public static class SleepingTasklet implements Tasklet {
+		@Override
+		public RepeatStatus execute(StepContribution contribution, ChunkContext chunkContext) throws Exception {
+			Thread.sleep(2000L);
+			return RepeatStatus.FINISHED;
 		}
 	}
 }
