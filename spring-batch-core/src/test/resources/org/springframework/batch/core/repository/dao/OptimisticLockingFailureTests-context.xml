@@ -8,8 +8,6 @@
 	     http://www.springframework.org/schema/batch
 	     http://www.springframework.org/schema/batch/spring-batch.xsd">
 
-	<import resource="classpath:/org/springframework/batch/core/repository/dao/data-source-context.xml" />
-
 	<batch:job id="locking">
 		<batch:step id="step1" next="step2">
 			<batch:tasklet ref="tasklet"/>
@@ -61,5 +59,22 @@
 		<property name="jobRepository" ref="jobRepository"/>
 		<property name="jobExplorer" ref="jobExplorer"/>
 		<property name="jobRegistry" ref="jobRegistry"/>
+	</bean>
+
+	<bean class="test.jdbc.datasource.DataSourceInitializer">
+		<property name="dataSource" ref="dataSource" />
+		<property name="initScripts">
+			<list>
+				<value>org/springframework/batch/core/schema-drop-hsqldb.sql</value>
+				<value>org/springframework/batch/core/schema-hsqldb.sql</value>
+			</list>
+		</property>
+	</bean>
+
+	<bean id="dataSource" class="org.apache.commons.dbcp.BasicDataSource">
+		<property name="driverClassName" value="org.hsqldb.jdbcDriver" />
+		<property name="url" value="jdbc:hsqldb:mem:testd;sql.enforce_strict_size=true;hsqldb.tx=mvcc" />
+		<property name="username" value="sa" />
+		<property name="password" value="" />
 	</bean>
 </beans>

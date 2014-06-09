@@ -16,9 +16,7 @@
 
 package org.springframework.batch.core.repository.dao;
 
-import org.junit.Ignore;
 import org.junit.Test;
-import org.junit.runner.RunWith;
 import org.springframework.batch.core.BatchStatus;
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.JobExecution;
@@ -31,29 +29,22 @@ import org.springframework.batch.core.scope.context.ChunkContext;
 import org.springframework.batch.core.step.tasklet.Tasklet;
 import org.springframework.batch.item.ItemWriter;
 import org.springframework.batch.repeat.RepeatStatus;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.support.ClassPathXmlApplicationContext;
 
 import java.util.List;
 
 import static org.junit.Assert.assertTrue;
 
-@Ignore
-@ContextConfiguration
-@RunWith(SpringJUnit4ClassRunner.class)
 public class OptimisticLockingFailureTests {
-	@Autowired
-	private Job job;
-
-	@Autowired
-	private JobLauncher jobLauncher;
-
-	@Autowired
-	private JobOperator jobOperator;
-
 	@Test
 	public void testAsyncStopOfStartingJob() throws Exception {
+		ApplicationContext applicationContext =
+				new ClassPathXmlApplicationContext("org/springframework/batch/core/repository/dao/OptimisticLockingFailureTests-context.xml");
+		Job job = applicationContext.getBean(Job.class);
+		JobLauncher jobLauncher = applicationContext.getBean(JobLauncher.class);
+		JobOperator jobOperator = applicationContext.getBean(JobOperator.class);
+
 		JobExecution jobExecution = jobLauncher.run(job, new JobParametersBuilder()
 				.addLong("test", 1L)
 				.toJobParameters());
