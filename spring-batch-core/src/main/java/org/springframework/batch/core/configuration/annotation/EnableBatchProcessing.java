@@ -89,7 +89,8 @@ import java.lang.annotation.Target;
  *
  * Note that only one of your configuration classes needs to have the <code>&#064;EnableBatchProcessing</code>
  * annotation. Once you have an <code>&#064;EnableBatchProcessing</code> class in your configuration you will have an
- * instance of {@link StepScope} so your beans inside steps can have <code>&#064;Scope("step")</code>. You will also be
+ * instance of {@link StepScope} and {@link org.springframework.batch.core.scope.JobScope} so your beans inside steps
+ * can have <code>&#064;Scope("step")</code> and <code>&#064;Scope("job")</code> respectively. You will also be
  * able to <code>&#064;Autowired</code> some useful stuff into your context:
  *
  * <ul>

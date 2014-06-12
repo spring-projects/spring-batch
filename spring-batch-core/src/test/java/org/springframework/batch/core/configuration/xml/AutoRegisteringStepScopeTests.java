@@ -15,14 +15,14 @@
  */
 package org.springframework.batch.core.configuration.xml;
 
-import static org.junit.Assert.assertTrue;
-
-import java.util.Map;
-
 import org.junit.Test;
 import org.springframework.batch.core.scope.StepScope;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
+
+import java.util.Map;
+
+import static org.junit.Assert.assertTrue;
 
 
 /**

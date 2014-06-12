@@ -20,7 +20,6 @@ import org.springframework.batch.core.configuration.support.MapJobRegistry;
 import org.springframework.batch.core.explore.JobExplorer;
 import org.springframework.batch.core.launch.JobLauncher;
 import org.springframework.batch.core.repository.JobRepository;
-import org.springframework.batch.core.scope.StepScope;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
@@ -31,6 +30,8 @@ import org.springframework.core.annotation.AnnotationAttributes;
 import org.springframework.core.type.AnnotationMetadata;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.util.Assert;
+import org.springframework.batch.core.scope.JobScope;
+import org.springframework.batch.core.scope.StepScope;
 
 import javax.sql.DataSource;
 import java.util.Collection;
@@ -44,7 +45,7 @@ import java.util.Collection;
  * @see EnableBatchProcessing
  */
 @Configuration
-@Import(StepScopeConfiguration.class)
+@Import(ScopeConfiguration.class)
 public abstract class AbstractBatchConfiguration implements ImportAware {
 
 	@Autowired
@@ -129,9 +130,11 @@ public abstract class AbstractBatchConfiguration implements ImportAware {
  * 
  */
 @Configuration
-class StepScopeConfiguration {
+class ScopeConfiguration {
 
 	private StepScope stepScope = new StepScope();
+
+	private JobScope jobScope = new JobScope();
 
 	@Bean
 	public StepScope stepScope() {
@@ -139,4 +142,9 @@ class StepScopeConfiguration {
 		return stepScope;
 	}
 
+	@Bean
+	public JobScope jobScope() {
+		jobScope.setAutoProxy(false);
+		return jobScope;
+	}
 }
