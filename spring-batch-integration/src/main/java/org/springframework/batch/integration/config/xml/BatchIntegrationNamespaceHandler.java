@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2013 the original author or authors.
+ * Copyright 2002-2014 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,15 +21,16 @@ import org.springframework.integration.config.xml.AbstractIntegrationNamespaceHa
  * The namespace handler for the Spring Batch Integration namespace.
  *
  * @author Gunnar Hillert
+ * @author Chris Schaefer
  * @since 1.3
- *
  */
 public class BatchIntegrationNamespaceHandler extends AbstractIntegrationNamespaceHandler {
-
 	/* (non-Javadoc)
 	 * @see org.springframework.beans.factory.xml.NamespaceHandler#init()
 	 */
 	public void init() {
 		this.registerBeanDefinitionParser("job-launching-gateway",  new JobLaunchingGatewayParser());
+		this.registerBeanDefinitionParser("remote-chunking-master", new RemoteChunkingMasterParser());
+		this.registerBeanDefinitionParser("remote-chunking-slave", new RemoteChunkingSlaveParser());
 	}
 }
