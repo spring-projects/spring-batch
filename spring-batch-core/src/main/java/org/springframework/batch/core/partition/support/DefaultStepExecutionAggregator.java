@@ -57,6 +57,7 @@ public class DefaultStepExecutionAggregator implements StepExecutionAggregator {
 			result.setRollbackCount(result.getRollbackCount() + stepExecution.getRollbackCount());
 			result.setReadCount(result.getReadCount() + stepExecution.getReadCount());
 			result.setReadSkipCount(result.getReadSkipCount() + stepExecution.getReadSkipCount());
+			result.setProcessSkipCount(result.getProcessSkipCount() + stepExecution.getProcessSkipCount());
 			result.setWriteCount(result.getWriteCount() + stepExecution.getWriteCount());
 			result.setWriteSkipCount(result.getWriteSkipCount() + stepExecution.getWriteSkipCount());
 		}
