@@ -93,4 +93,12 @@ public class DefaultStepExecutionAggregatorTests {
 		aggregator.aggregate(result, Arrays.<StepExecution> asList(stepExecution1, stepExecution2));
 		assertEquals(15, result.getCommitCount());
 	}
+        
+	@Test
+	public void testAggregateProcessSkipCountSunnyDay() {
+		stepExecution1.setProcessSkipCount(9);
+		stepExecution2.setProcessSkipCount(4);
+		aggregator.aggregate(result, Arrays.<StepExecution> asList(stepExecution1, stepExecution2));
+		assertEquals(13, result.getProcessSkipCount());
+	}
 }

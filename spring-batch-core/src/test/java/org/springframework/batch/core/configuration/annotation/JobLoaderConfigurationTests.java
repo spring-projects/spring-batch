@@ -15,10 +15,6 @@
  */
 package org.springframework.batch.core.configuration.annotation;
 
-import static org.junit.Assert.assertEquals;
-
-import javax.annotation.PostConstruct;
-
 import org.junit.Test;
 import org.springframework.batch.core.BatchStatus;
 import org.springframework.batch.core.Job;
@@ -30,6 +26,7 @@ import org.springframework.batch.core.configuration.JobLocator;
 import org.springframework.batch.core.configuration.support.ApplicationContextFactory;
 import org.springframework.batch.core.configuration.support.AutomaticJobRegistrar;
 import org.springframework.batch.core.configuration.support.GenericApplicationContextFactory;
+import org.springframework.batch.core.explore.JobExplorer;
 import org.springframework.batch.core.job.builder.SimpleJobBuilder;
 import org.springframework.batch.core.launch.JobLauncher;
 import org.springframework.batch.core.scope.context.ChunkContext;
@@ -39,6 +36,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+
+import javax.annotation.PostConstruct;
+
+import static org.junit.Assert.assertEquals;
 
 /**
  * @author Dave Syer
@@ -72,6 +73,8 @@ public class JobLoaderConfigurationTests {
 						.toJobParameters());
 		assertEquals(status, execution.getStatus());
 		assertEquals(stepExecutionCount, execution.getStepExecutions().size());
+		JobExplorer jobExplorer = context.getBean(JobExplorer.class);
+		assertEquals(1, jobExplorer.getJobInstanceCount(jobName));
 		context.close();
 
 	}

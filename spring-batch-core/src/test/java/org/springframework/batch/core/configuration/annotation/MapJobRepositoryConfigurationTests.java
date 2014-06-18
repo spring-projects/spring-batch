@@ -23,6 +23,7 @@ import org.springframework.batch.core.JobParameters;
 import org.springframework.batch.core.PooledEmbeddedDataSource;
 import org.springframework.batch.core.Step;
 import org.springframework.batch.core.StepContribution;
+import org.springframework.batch.core.explore.JobExplorer;
 import org.springframework.batch.core.launch.JobLauncher;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.scope.context.ChunkContext;
@@ -44,6 +45,7 @@ public class MapJobRepositoryConfigurationTests {
 	JobLauncher jobLauncher;
 	JobRepository jobRepository;
 	Job job;
+	JobExplorer jobExplorer;
 
 	@Test
 	public void testRoseyScenario() throws Exception {
@@ -65,11 +67,13 @@ public class MapJobRepositoryConfigurationTests {
 		this.jobLauncher = context.getBean(JobLauncher.class);
 		this.jobRepository = context.getBean(JobRepository.class);
 		this.job = context.getBean(Job.class);
+		this.jobExplorer = context.getBean(JobExplorer.class);
 
 		JobExecution jobExecution = jobLauncher.run(job, new JobParameters());
 		assertEquals(BatchStatus.COMPLETED, jobExecution.getStatus());
 		JobExecution repositoryJobExecution = jobRepository.getLastJobExecution(job.getName(), new JobParameters());
 		assertEquals(jobExecution.getId(), repositoryJobExecution.getId());
+		assertEquals("job", jobExplorer.getJobNames().iterator().next());
 		context.close();
 	}
 

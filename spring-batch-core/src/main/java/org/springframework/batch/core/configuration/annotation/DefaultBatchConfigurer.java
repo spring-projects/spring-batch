@@ -17,12 +17,9 @@ package org.springframework.batch.core.configuration.annotation;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.springframework.batch.core.configuration.BatchConfigurationException;
-import org.springframework.stereotype.Component;
-
-import javax.annotation.PostConstruct;
-import javax.sql.DataSource;
-
+import org.springframework.batch.core.explore.JobExplorer;
+import org.springframework.batch.core.explore.support.JobExplorerFactoryBean;
+import org.springframework.batch.core.explore.support.MapJobExplorerFactoryBean;
 import org.springframework.batch.core.launch.JobLauncher;
 import org.springframework.batch.core.launch.support.SimpleJobLauncher;
 import org.springframework.batch.core.repository.JobRepository;
@@ -31,7 +28,11 @@ import org.springframework.batch.core.repository.support.MapJobRepositoryFactory
 import org.springframework.batch.support.transaction.ResourcelessTransactionManager;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.datasource.DataSourceTransactionManager;
+import org.springframework.stereotype.Component;
 import org.springframework.transaction.PlatformTransactionManager;
+
+import javax.annotation.PostConstruct;
+import javax.sql.DataSource;
 
 @Component
 public class DefaultBatchConfigurer implements BatchConfigurer {
@@ -41,6 +42,7 @@ public class DefaultBatchConfigurer implements BatchConfigurer {
 	private PlatformTransactionManager transactionManager;
 	private JobRepository jobRepository;
 	private JobLauncher jobLauncher;
+	private JobExplorer jobExplorer;
 
 	@Autowired(required = false)
 	public void setDataSource(DataSource dataSource) {
@@ -69,6 +71,11 @@ public class DefaultBatchConfigurer implements BatchConfigurer {
 		return jobLauncher;
 	}
 
+	@Override
+	public JobExplorer getJobExplorer() {
+		return jobExplorer;
+	}
+
 	@PostConstruct
 	public void initialize() throws Exception {
 		if(dataSource == null) {
@@ -78,11 +85,20 @@ public class DefaultBatchConfigurer implements BatchConfigurer {
 				this.transactionManager = new ResourcelessTransactionManager();
 			}
 
-			MapJobRepositoryFactoryBean factory = new MapJobRepositoryFactoryBean(this.transactionManager);
-			factory.afterPropertiesSet();
-			this.jobRepository = factory.getObject();
+			MapJobRepositoryFactoryBean jobRepositoryFactory = new MapJobRepositoryFactoryBean(this.transactionManager);
+			jobRepositoryFactory.afterPropertiesSet();
+			this.jobRepository = jobRepositoryFactory.getObject();
+
+			MapJobExplorerFactoryBean jobExplorerFactory = new MapJobExplorerFactoryBean(jobRepositoryFactory);
+			jobExplorerFactory.afterPropertiesSet();
+			this.jobExplorer = jobExplorerFactory.getObject();
 		} else {
 			this.jobRepository = createJobRepository();
+
+			JobExplorerFactoryBean jobExplorerFactoryBean = new JobExplorerFactoryBean();
+			jobExplorerFactoryBean.setDataSource(this.dataSource);
+			jobExplorerFactoryBean.afterPropertiesSet();
+			this.jobExplorer = jobExplorerFactoryBean.getObject();
 		}
 
 		this.jobLauncher = createJobLauncher();

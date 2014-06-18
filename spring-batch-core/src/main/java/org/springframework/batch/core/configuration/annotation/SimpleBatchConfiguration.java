@@ -15,14 +15,13 @@
  */
 package org.springframework.batch.core.configuration.annotation;
 
-import java.util.concurrent.atomic.AtomicReference;
-
 import org.aopalliance.intercept.MethodInterceptor;
 import org.aopalliance.intercept.MethodInvocation;
 import org.springframework.aop.framework.ProxyFactory;
 import org.springframework.aop.target.AbstractLazyCreationTargetSource;
 import org.springframework.batch.core.configuration.JobRegistry;
 import org.springframework.batch.core.configuration.support.MapJobRegistry;
+import org.springframework.batch.core.explore.JobExplorer;
 import org.springframework.batch.core.launch.JobLauncher;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,6 +29,8 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.transaction.PlatformTransactionManager;
+
+import java.util.concurrent.atomic.AtomicReference;
 
 /**
  * Base {@code Configuration} class providing common structure for enabling and using Spring Batch. Customization is
@@ -58,6 +59,8 @@ public class SimpleBatchConfiguration extends AbstractBatchConfiguration {
 
 	private AtomicReference<PlatformTransactionManager> transactionManager = new AtomicReference<PlatformTransactionManager>();
 
+	private AtomicReference<JobExplorer> jobExplorer = new AtomicReference<JobExplorer>();
+
 	@Override
 	@Bean
 	public JobRepository jobRepository() throws Exception {
@@ -74,6 +77,12 @@ public class SimpleBatchConfiguration extends AbstractBatchConfiguration {
 	@Bean
 	public JobRegistry jobRegistry() throws Exception {
 		return createLazyProxy(jobRegistry, JobRegistry.class);
+	}
+
+	@Override
+	@Bean
+	public JobExplorer jobExplorer() {
+		return createLazyProxy(jobExplorer, JobExplorer.class);
 	}
 
 	@Override
@@ -107,6 +116,7 @@ public class SimpleBatchConfiguration extends AbstractBatchConfiguration {
 		jobLauncher.set(configurer.getJobLauncher());
 		transactionManager.set(configurer.getTransactionManager());
 		jobRegistry.set(new MapJobRegistry());
+		jobExplorer.set(configurer.getJobExplorer());
 		initialized = true;
 	}
 
