@@ -15,6 +15,18 @@
  */
 package org.springframework.batch.core.step.builder;
 
+import java.lang.reflect.Method;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
+import javax.batch.operations.BatchRuntimeException;
+
 import org.springframework.batch.core.ChunkListener;
 import org.springframework.batch.core.JobInterruptedException;
 import org.springframework.batch.core.SkipListener;
@@ -55,6 +67,7 @@ import org.springframework.batch.item.ItemStream;
 import org.springframework.batch.repeat.RepeatOperations;
 import org.springframework.batch.repeat.support.RepeatTemplate;
 import org.springframework.batch.support.ReflectionUtils;
+import org.springframework.beans.factory.BeanCreationException;
 import org.springframework.classify.BinaryExceptionClassifier;
 import org.springframework.classify.Classifier;
 import org.springframework.classify.SubclassClassifier;
@@ -72,17 +85,6 @@ import org.springframework.transaction.TransactionException;
 import org.springframework.transaction.interceptor.DefaultTransactionAttribute;
 import org.springframework.transaction.interceptor.TransactionAttribute;
 import org.springframework.util.Assert;
-
-import javax.batch.operations.BatchRuntimeException;
-import java.lang.reflect.Method;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
 
 /**
  * A step builder for fully fault tolerant chunk-oriented item processing steps. Extends {@link SimpleStepBuilder} with
@@ -488,11 +490,11 @@ public class FaultTolerantStepBuilder<I, O> extends SimpleStepBuilder<I, O> {
 	private void addSpecialExceptions() {
 		addNonSkippableExceptionIfMissing(SkipLimitExceededException.class, NonSkippableReadException.class,
 				SkipListenerFailedException.class, SkipPolicyFailedException.class, RetryException.class,
-				JobInterruptedException.class, Error.class);
+				JobInterruptedException.class, Error.class, BeanCreationException.class);
 		addNonRetryableExceptionIfMissing(SkipLimitExceededException.class, NonSkippableReadException.class,
 				TransactionException.class, FatalStepExecutionException.class, SkipListenerFailedException.class,
 				SkipPolicyFailedException.class, RetryException.class, JobInterruptedException.class, Error.class,
-				BatchRuntimeException.class);
+				BatchRuntimeException.class, BeanCreationException.class);
 	}
 
 	protected void detectStreamInReader() {
