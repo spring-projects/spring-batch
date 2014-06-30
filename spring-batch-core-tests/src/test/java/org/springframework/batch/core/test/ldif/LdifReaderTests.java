@@ -26,6 +26,8 @@ import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.JobParameters;
 import org.springframework.batch.core.launch.JobLauncher;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.UrlResource;
 import org.springframework.test.context.ContextConfiguration;
@@ -34,8 +36,7 @@ import org.springframework.util.Assert;
 
 import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.InputStreamReader;
+import java.io.FileReader;
 import java.net.MalformedURLException;
 
 @RunWith(SpringJUnit4ClassRunner.class)
@@ -50,15 +51,16 @@ public class LdifReaderTests {
 	private JobLauncher jobLauncher;
 
 	@Autowired
-	private Job job;
+	@Qualifier("job1")
+	private Job job1;
 
-	public LdifReaderTests() {
-		try {
-			expected = new UrlResource("file:src/test/resources/expectedOutput.ldif");
-			actual = new UrlResource("file:target/test-outputs/output.ldif");
-		} catch (MalformedURLException e) {
-			log.error("Unexpected error", e);
-		}
+	@Autowired
+	@Qualifier("job2")
+	private Job job2;
+
+	public LdifReaderTests() throws MalformedURLException {
+		expected = new ClassPathResource("/expectedOutput.ldif");
+		actual = new UrlResource("file:target/test-outputs/output.ldif");
 	}
 
 	@Before
@@ -68,48 +70,41 @@ public class LdifReaderTests {
 
 	@Test
 	public void testValidRun() throws Exception {
-		JobExecution jobExecution = jobLauncher.run(job, new JobParameters());
+		JobExecution jobExecution = jobLauncher.run(job1, new JobParameters());
 
 		//Ensure job completed successfully.
 		Assert.isTrue(jobExecution.getExitStatus().equals(ExitStatus.COMPLETED), "Step Execution did not complete normally: " + jobExecution.getExitStatus());
 
 		//Check output.
 		Assert.isTrue(actual.exists(), "Actual does not exist.");
-		Assert.isTrue(compareFiles(expected.getFile(), actual.getFile()));
+		compareFiles(expected.getFile(), actual.getFile());
 	}
 
 	@Test
 	public void testResourceNotExists() throws Exception {
-		JobExecution jobExecution = jobLauncher.run(job, new JobParameters());
+		JobExecution jobExecution = jobLauncher.run(job2, new JobParameters());
 
 		Assert.isTrue(jobExecution.getExitStatus().getExitCode().equals("FAILED"), "The job exit status is not FAILED.");
-		Assert.isTrue(jobExecution.getExitStatus().getExitDescription().contains("Failed to initialize the reader"), "The job failed for the wrong reason.");
+		Assert.isTrue(jobExecution.getAllFailureExceptions().get(0).getMessage().contains("Failed to initialize the reader"), "The job failed for the wrong reason.");
 	}
 
-	private boolean compareFiles(File expected, File actual) throws Exception {
-		boolean equal = true;
-
-		FileInputStream expectedStream = new FileInputStream(expected);
-		FileInputStream actualStream = new FileInputStream(actual);
-
-		//Construct BufferedReader from InputStreamReader
-		BufferedReader expectedReader = new BufferedReader(new InputStreamReader(expectedStream));
-		BufferedReader actualReader = new BufferedReader(new InputStreamReader(actualStream));
-
-		String line = null;
-		while ((line = expectedReader.readLine()) != null) {
-			if(!line.equals(actualReader.readLine())) {
-				equal = false;
-				break;
+	private void compareFiles(File expected, File actual) throws Exception {
+		BufferedReader expectedReader = new BufferedReader(new FileReader(expected));
+		BufferedReader actualReader = new BufferedReader(new FileReader(actual));
+		try {
+			int lineNum = 1;
+			for (String expectedLine = null; (expectedLine = expectedReader.readLine()) != null; lineNum++) {
+				String actualLine = actualReader.readLine();
+				junit.framework.Assert.assertEquals("Line number " + lineNum + " does not match.", expectedLine, actualLine);
 			}
+
+			String actualLine = actualReader.readLine();
+			junit.framework.Assert.assertEquals("More lines than expected.  There should not be a line number " + lineNum + ".", null,
+													   actualLine);
 		}
-
-		if(actualReader.readLine() != null) {
-			equal = false;
+		finally {
+			expectedReader.close();
+			actualReader.close();
 		}
-
-		expectedReader.close();
-
-		return equal;
 	}
 }

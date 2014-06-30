@@ -26,6 +26,8 @@ import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.JobParameters;
 import org.springframework.batch.core.launch.JobLauncher;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.UrlResource;
 import org.springframework.test.context.ContextConfiguration;
@@ -50,15 +52,16 @@ public class MappingLdifReaderTests {
 	private JobLauncher launcher;
 
 	@Autowired
-	private Job job;
+	@Qualifier("job1")
+	private Job job1;
 
-	public MappingLdifReaderTests() {
-		try {
-			expected = new UrlResource("file:src/test/resources/expectedOutput.ldif");
-			actual = new UrlResource("file:target/test-outputs/output.ldif");
-		} catch (MalformedURLException e) {
-			log.error("Unexpected error", e);
-		}
+	@Autowired
+	@Qualifier("job2")
+	private Job job2;
+
+	public MappingLdifReaderTests() throws MalformedURLException {
+		expected = new ClassPathResource("/expectedOutput.ldif");
+		actual = new UrlResource("file:target/test-outputs/output.ldif");
 	}
 
 	@Before
@@ -68,7 +71,7 @@ public class MappingLdifReaderTests {
 
 	@Test
 	public void testValidRun() throws Exception {
-		JobExecution jobExecution = launcher.run(job, new JobParameters());
+		JobExecution jobExecution = launcher.run(job1, new JobParameters());
 
 		//Ensure job completed successfully.
 		Assert.isTrue(jobExecution.getExitStatus().equals(ExitStatus.COMPLETED), "Step Execution did not complete normally: " + jobExecution.getExitStatus());
@@ -80,10 +83,10 @@ public class MappingLdifReaderTests {
 
 	@Test
 	public void testResourceNotExists() throws Exception {
-		JobExecution jobExecution = launcher.run(job, new JobParameters());
+		JobExecution jobExecution = launcher.run(job2, new JobParameters());
 
 		Assert.isTrue(jobExecution.getExitStatus().getExitCode().equals("FAILED"), "The job exit status is not FAILED.");
-		Assert.isTrue(jobExecution.getExitStatus().getExitDescription().contains("Failed to initialize the reader"), "The job failed for the wrong reason.");
+		Assert.isTrue(jobExecution.getAllFailureExceptions().get(0).getMessage().contains("Failed to initialize the reader"), "The job failed for the wrong reason.");
 	}
 
 
