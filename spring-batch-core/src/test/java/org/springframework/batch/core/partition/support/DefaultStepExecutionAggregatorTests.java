@@ -15,17 +15,17 @@
  */
 package org.springframework.batch.core.partition.support;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-
-import java.util.Arrays;
-import java.util.Collections;
-
 import org.junit.Test;
 import org.springframework.batch.core.BatchStatus;
 import org.springframework.batch.core.ExitStatus;
 import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.StepExecution;
+
+import java.util.Arrays;
+import java.util.Collections;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 
 public class DefaultStepExecutionAggregatorTests {
 
@@ -87,10 +87,31 @@ public class DefaultStepExecutionAggregatorTests {
 	}
 
 	@Test
-	public void testAggregateCommitCountSunnyDay() {
-		stepExecution1.setCommitCount(10);
-		stepExecution2.setCommitCount(5);
+	public void testAggregateCountsSunnyDay() {
+		stepExecution1.setCommitCount(1);
+		stepExecution1.setFilterCount(2);
+		stepExecution1.setProcessSkipCount(3);
+		stepExecution1.setReadCount(4);
+		stepExecution1.setReadSkipCount(5);
+		stepExecution1.setRollbackCount(6);
+		stepExecution1.setWriteCount(7);
+		stepExecution1.setWriteSkipCount(8);
+		stepExecution2.setCommitCount(11);
+		stepExecution2.setFilterCount(12);
+		stepExecution2.setProcessSkipCount(13);
+		stepExecution2.setReadCount(14);
+		stepExecution2.setReadSkipCount(15);
+		stepExecution2.setRollbackCount(16);
+		stepExecution2.setWriteCount(17);
+		stepExecution2.setWriteSkipCount(18);
 		aggregator.aggregate(result, Arrays.<StepExecution> asList(stepExecution1, stepExecution2));
-		assertEquals(15, result.getCommitCount());
+		assertEquals(12, result.getCommitCount());
+		assertEquals(14, result.getFilterCount());
+		assertEquals(16, result.getProcessSkipCount());
+		assertEquals(18, result.getReadCount());
+		assertEquals(20, result.getReadSkipCount());
+		assertEquals(22, result.getRollbackCount());
+		assertEquals(24, result.getWriteCount());
+		assertEquals(26, result.getWriteSkipCount());
 	}
 }

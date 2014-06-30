@@ -16,12 +16,12 @@
 
 package org.springframework.batch.core.partition.support;
 
-import java.util.Collection;
-
 import org.springframework.batch.core.BatchStatus;
 import org.springframework.batch.core.ExitStatus;
 import org.springframework.batch.core.StepExecution;
 import org.springframework.util.Assert;
+
+import java.util.Collection;
 
 /**
  * Convenience class for aggregating a set of {@link StepExecution} instances
@@ -53,6 +53,8 @@ public class DefaultStepExecutionAggregator implements StepExecutionAggregator {
 			BatchStatus status = stepExecution.getStatus();
 			result.setStatus(BatchStatus.max(result.getStatus(), status));
 			result.setExitStatus(result.getExitStatus().and(stepExecution.getExitStatus()));
+			result.setFilterCount(result.getFilterCount() + stepExecution.getFilterCount());
+			result.setProcessSkipCount(result.getProcessSkipCount() + stepExecution.getProcessSkipCount());
 			result.setCommitCount(result.getCommitCount() + stepExecution.getCommitCount());
 			result.setRollbackCount(result.getRollbackCount() + stepExecution.getRollbackCount());
 			result.setReadCount(result.getReadCount() + stepExecution.getReadCount());
