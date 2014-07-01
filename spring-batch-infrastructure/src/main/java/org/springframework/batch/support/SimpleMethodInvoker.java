@@ -37,6 +37,7 @@ import java.util.Arrays;
 import org.springframework.aop.framework.Advised;
 import org.springframework.util.Assert;
 import org.springframework.util.ClassUtils;
+import org.springframework.util.ReflectionUtils;
 
 /**
  * Simple implementation of the {@link MethodInvoker} interface that invokes a
@@ -81,7 +82,6 @@ public class SimpleMethodInvoker implements MethodInvoker {
 	 * org.springframework.batch.core.configuration.util.MethodInvoker#invokeMethod
 	 * (java.lang.Object[])
 	 */
-    @Override
 	public Object invokeMethod(Object... args) {
 
 		Class<?>[] parameterTypes = method.getParameterTypes();
@@ -106,9 +106,9 @@ public class SimpleMethodInvoker implements MethodInvoker {
 			return method.invoke(target, invokeArgs);
 		}
 		catch (Exception e) {
-			throw new IllegalArgumentException("Unable to invoke method: [" + method + "] on object: [" + object
-					+ "] with arguments: [" + Arrays.toString(args) + "]", e);
+			ReflectionUtils.handleReflectionException(e);
 		}
+		return null;
 	}
 
 	private Object extractTarget(Object target, Method method) {
