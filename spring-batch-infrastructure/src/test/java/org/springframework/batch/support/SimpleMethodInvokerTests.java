@@ -118,7 +118,13 @@ public class SimpleMethodInvokerTests {
 		assertEquals(methodInvoker, methodInvoker2);
 	}
 	
-	@SuppressWarnings("unused")
+	@Test(expected=RuntimeException.class)
+	public void testMethodWithLogicalException() throws Exception{
+		MethodInvoker methodInvoker = new SimpleMethodInvoker(testClass, "logicalExceptionTest");
+		methodInvoker.invokeMethod(new Object());
+		assertTrue(testClass.argumentTestCalled);
+	}
+	
 	private class TestClass{
 		
 		boolean beforeCalled = false;
@@ -139,6 +145,10 @@ public class SimpleMethodInvokerTests {
 		public void argumentTest(Object object){
 			Assert.notNull(object);
 			argumentTestCalled = true;
+		}
+		
+		public void logicalExceptionTest(){
+			throw new RuntimeException("Logical Exception.");
 		}
 	}
 }
