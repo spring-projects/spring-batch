@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans:beans xmlns="http://www.springframework.org/schema/batch"
+			 xmlns:beans="http://www.springframework.org/schema/beans"
+			 xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+			 xmlns:p="http://www.springframework.org/schema/p"
+			 xsi:schemaLocation="http://www.springframework.org/schema/batch
+			 http://www.springframework.org/schema/batch/spring-batch.xsd
+			 http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
+
+	<job id="scriptProcessorJob">
+		<step id="step1">
+			<tasklet>
+				<chunk reader="reader" processor="processor" writer="writer" commit-interval="1"/>
+			</tasklet>
+		</step>
+	</job>
+
+	<beans:bean id="transactionManager"
+				class="org.springframework.batch.support.transaction.ResourcelessTransactionManager"/>
+
+	<beans:bean id="jobRepository" class="org.springframework.batch.core.repository.support.MapJobRepositoryFactoryBean"
+				p:transactionManager-ref="transactionManager"/>
+
+	<beans:bean id="jobLauncher" class="org.springframework.batch.core.launch.support.SimpleJobLauncher"
+				p:jobRepository-ref="jobRepository"/>
+
+	<beans:bean id="reader" class="org.springframework.batch.item.support.ListItemReader">
+		<beans:constructor-arg>
+			<beans:list>
+				<beans:value>blah</beans:value>
+			</beans:list>
+		</beans:constructor-arg>
+	</beans:bean>
+
+	<beans:bean id="processor" class="org.springframework.batch.item.support.ScriptItemProcessor"
+				p:script="org/springframework/batch/core/step/item/processor-test-simple.js"/>
+
+	<beans:bean id="writer" class="org.springframework.batch.core.step.item.ScriptItemProcessorTest$TestItemWriter"/>
+</beans:beans>
