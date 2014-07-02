@@ -89,6 +89,8 @@ allprojects {
 		xercesVersion = '2.8.1'
 		xmlunitVersion = '1.5'
 		xstreamVersion = '1.4.7'
+		jrubyVersion = '1.1.7'
+		beanshellVersion = '2.0b5'
 	}
 }
 
@@ -261,6 +263,16 @@ project('spring-batch-core') {
 
 project('spring-batch-infrastructure') {
     description = 'Spring Batch Infrastructure'
+	test {
+		// permsize settings not passed down from GRADLE_OPTS nor JAVA_OPTS
+		// when running certain tests causing permgen OOM when using JDK7
+		// compilation is not performed with JDK6 and permgen is removed
+		// starting with JDK8.. 
+		if (JavaVersion.current().isJava7Compatible()) {
+			jvmArgs '-XX:MaxPermSize=256m'
+		}
+	}
+
 	dependencies {
 
 		compile "org.springframework:spring-core:$springVersion"
@@ -285,6 +297,9 @@ project('spring-batch-infrastructure') {
 		testCompile "org.xerial:sqlite-jdbc:$sqliteVersion"
 
 		testRuntime "com.sun.mail:javax.mail:$javaMailVersion"
+		testRuntime "org.codehaus.groovy:groovy-jsr223:$groovyVersion"
+		testRuntime "com.sun.script.jruby:jruby-engine:$jrubyVersion"
+		testRuntime "org.beanshell:bsh:$beanshellVersion"
 
 		optional "javax.jms:jms-api:1.1-rev-1"
 		optional "org.slf4j:slf4j-log4j12:$slf4jVersion"
