@@ -53,7 +53,7 @@ public class ElasticsearchItemWriterTests {
 		}
 	}
 	
-	private ElasticsearchItemWriter<IndexQuery> writer;
+	private ElasticsearchItemWriter writer;
 	
 	@Mock
 	private ElasticsearchOperations elasticsearchOperations;
@@ -66,7 +66,7 @@ public class ElasticsearchItemWriterTests {
 	public void setUp() throws Exception {
 		initMocks(this);
 		transactionTemplate = new TransactionTemplate(new ResourcelessTransactionManager());
-		writer = new ElasticsearchItemWriter<IndexQuery>(elasticsearchOperations);
+		writer = new ElasticsearchItemWriter(elasticsearchOperations);
 		writer.afterPropertiesSet();
 		dummyDocument = new DummyDocument();
 	}
@@ -81,7 +81,7 @@ public class ElasticsearchItemWriterTests {
 	@Test(expected=IllegalStateException.class)
 	public void shouldFailAssertion() throws Exception {
 		
-		new ElasticsearchItemWriter<>(null).afterPropertiesSet();
+		new ElasticsearchItemWriter(null).afterPropertiesSet();
 		fail("Assertion shold have thrown exception on null ElasticsearchOperations");
 	}
 	
