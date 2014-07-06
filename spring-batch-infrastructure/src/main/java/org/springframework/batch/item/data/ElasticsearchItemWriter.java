@@ -53,7 +53,7 @@ import org.springframework.transaction.support.TransactionSynchronizationAdapter
  * @since  3.1.0
  *
  */
-public class ElasticsearchItemWriter<IndexQuer> implements ItemWriter<IndexQuery>, InitializingBean {
+public class ElasticsearchItemWriter implements ItemWriter<IndexQuery>, InitializingBean {
 	
 	private final String dataKey;
 	private final Logger logger;
