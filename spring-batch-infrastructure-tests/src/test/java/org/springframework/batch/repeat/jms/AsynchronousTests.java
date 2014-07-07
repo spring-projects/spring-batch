@@ -16,7 +16,9 @@
 
 package org.springframework.batch.repeat.jms;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -27,22 +29,25 @@ import javax.jms.Session;
 import javax.jms.TextMessage;
 import javax.sql.DataSource;
 
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+
 import org.springframework.batch.container.jms.BatchMessageListenerContainer;
 import org.springframework.batch.jms.ExternalRetryInBatchTests;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jms.core.JmsTemplate;
 import org.springframework.jms.listener.SessionAwareMessageListener;
-import org.springframework.util.ClassUtils;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ContextConfiguration;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.junit.runner.RunWith;
-import org.junit.Before;
-import org.junit.After;
-import org.junit.Test;
+import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.springframework.util.ClassUtils;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(locations = "/org/springframework/batch/jms/jms-context.xml")
+@DirtiesContext
 public class AsynchronousTests {
 
 	protected String[] getConfigLocations() {
@@ -117,7 +122,7 @@ public class AsynchronousTests {
 		});
 
 		container.initializeProxy();
-		
+
 		container.start();
 
 		// Need to sleep for at least a second here...
@@ -139,7 +144,7 @@ public class AsynchronousTests {
 	public void testRollback() throws Exception {
 
 		assertInitialState();
-		
+
 		// Prevent us from being overwhelmed after rollback
 		container.setRecoveryInterval(500);
 
@@ -155,7 +160,7 @@ public class AsynchronousTests {
 				}
 			}
 		});
-		
+
 		container.initializeProxy();
 
 		container.start();
