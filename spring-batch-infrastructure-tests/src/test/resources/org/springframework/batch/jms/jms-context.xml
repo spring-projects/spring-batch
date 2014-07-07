@@ -17,10 +17,13 @@
 		<property name="dataSource" ref="dataSource" />
 	</bean>
 
-	<bean id="connectionFactory" class="org.apache.activemq.ActiveMQConnectionFactory" depends-on="brokerService">
-		<property name="brokerURL">
-			<value>vm://localhost</value>
-		</property>
+	<bean id="connectionFactory" class="org.springframework.jms.connection.CachingConnectionFactory">
+		<property name="targetConnectionFactory" ref="targetConnectionFactory"/>
+		<property name="sessionCacheSize" value="5"/>
+	</bean>
+
+	<bean id="targetConnectionFactory" class="org.apache.activemq.ActiveMQConnectionFactory" depends-on="brokerService">
+		<property name="brokerURL" value="vm://localhost?jms.prefetchPolicy.all=0"/>
 	</bean>
 
 	<bean id="txAwareConnectionFactory"
@@ -70,11 +73,9 @@
 	<bean id="transactionalBatchTemplate"
 		class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
 		<property name="transactionManager" ref="transactionManager" />
-		<property name="proxyInterfaces">
-			<value>org.springframework.batch.repeat.RepeatOperations</value>
-		</property>
+		<property name="proxyInterfaces" value="org.springframework.batch.repeat.RepeatOperations"/>
 		<property name="proxyTargetClass" value="false" />
-		<property name="transactionAttributes" value="*=PROPAGATION_REQUIRED"></property>
+		<property name="transactionAttributes" value="*=PROPAGATION_REQUIRED"/>
 		<property name="target">
 			<bean class="org.springframework.batch.repeat.support.RepeatTemplate">
 				<property name="completionPolicy">
@@ -92,7 +93,7 @@
 		<property name="useJmx" value="false"/>
 		<property name="transportConnectorURIs">
 			<list>
-				<value>vm://localhost</value>
+				<value>vm://localhost?jms.prefetchPolicy.all=0</value>
 			</list>
 		</property>
 		<property name="persistenceAdapter">
