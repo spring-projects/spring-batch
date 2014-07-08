@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2013 the original author or authors.
+ * Copyright 2006-2014 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -28,7 +28,6 @@ import org.w3c.dom.Element;
  *
  */
 public class InlineFlowParser extends AbstractFlowParser {
-
 	private final String flowName;
 
 	/**
@@ -45,13 +44,17 @@ public class InlineFlowParser extends AbstractFlowParser {
 
 	}
 
+	@Override
+	protected boolean shouldGenerateId() {
+		return true;
+	}
+
 	/**
 	 * @param element the top level element containing a flow definition
 	 * @param parserContext the {@link ParserContext}
 	 */
 	@Override
 	protected void doParse(Element element, ParserContext parserContext, BeanDefinitionBuilder builder) {
-
 		builder.getRawBeanDefinition().setAttribute("flowName", flowName);
 		builder.addPropertyValue("name", flowName);
 		builder.addPropertyValue("stateTransitionComparator", new RuntimeBeanReference(DefaultStateTransitionComparator.STATE_TRANSITION_COMPARATOR));
@@ -60,5 +63,4 @@ public class InlineFlowParser extends AbstractFlowParser {
 		parserContext.popAndRegisterContainingComponent();
 
 	}
-
 }
