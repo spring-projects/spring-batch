@@ -106,9 +106,24 @@ public class ScriptItemProcessor<I, O> implements ItemProcessor<I, O>, Initializ
 		this.itemBindingVariableName = itemBindingVariableName;
 	}
 
+	/**
+	 * <p>
+	 * Provides the ability to set a custom {@link org.springframework.scripting.ScriptEvaluator}
+	 * implementation. If not set, a {@link org.springframework.scripting.support.StandardScriptEvaluator}
+	 * will be used by default.
+	 * </p>
+	 *
+	 * @param scriptEvaluator the {@link org.springframework.scripting.ScriptEvaluator} to use
+	 */
+	public void setScriptEvaluator(ScriptEvaluator scriptEvaluator) {
+		this.scriptEvaluator = scriptEvaluator;
+	}
+
 	@Override
 	public void afterPropertiesSet() throws Exception {
-		scriptEvaluator = new StandardScriptEvaluator();
+		if(scriptEvaluator == null) {
+			scriptEvaluator = new StandardScriptEvaluator();
+		}
 
 		Assert.state(scriptSource != null || script != null,
 				"Either the script source or script file must be provided");
@@ -116,9 +131,9 @@ public class ScriptItemProcessor<I, O> implements ItemProcessor<I, O>, Initializ
 		Assert.state(scriptSource == null || script == null,
 				"Either a script source or script file must be provided, not both");
 
-		if (scriptSource != null) {
+		if (scriptSource != null && scriptEvaluator instanceof StandardScriptEvaluator) {
 			Assert.isTrue(!StringUtils.isEmpty(language),
-					"Language must be provided when using script source");
+					"Language must be provided when using the default ScriptEvaluator and raw source code");
 
 			((StandardScriptEvaluator) scriptEvaluator).setLanguage(language);
 		}
