@@ -19,6 +19,8 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;
+import org.springframework.scripting.bsh.BshScriptEvaluator;
+import org.springframework.scripting.groovy.GroovyScriptEvaluator;
 
 import javax.script.ScriptEngineFactory;
 import javax.script.ScriptEngineManager;
@@ -195,6 +197,30 @@ public class ScriptItemProcessorTests {
 		ScriptItemProcessor<String, Object> scriptItemProcessor = new ScriptItemProcessor<>();
 		scriptItemProcessor.setItemBindingVariableName("someOtherVarName");
 		scriptItemProcessor.setScriptSource("function process(param) { return param.toUpperCase(); } process(someOtherVarName);", "javascript");
+		scriptItemProcessor.afterPropertiesSet();
+
+		assertEquals("Incorrect transformed value", "SS", scriptItemProcessor.process("ss"));
+	}
+
+	@Test
+	public void testBshScriptEvaluator() throws Exception {
+		assumeTrue(languageExists("bsh"));
+
+		ScriptItemProcessor<String, Object> scriptItemProcessor = new ScriptItemProcessor<String, Object>();
+		scriptItemProcessor.setScriptEvaluator(new BshScriptEvaluator());
+		scriptItemProcessor.setScriptSource("String process(String item) { return item.toUpperCase(); } process(item);", "bsh");
+		scriptItemProcessor.afterPropertiesSet();
+
+		assertEquals("Incorrect transformed value", "SS", scriptItemProcessor.process("ss"));
+	}
+
+	@Test
+	public void testGroovyScriptEvaluator() throws Exception {
+		assumeTrue(languageExists("groovy"));
+
+		ScriptItemProcessor<String, Object> scriptItemProcessor = new ScriptItemProcessor<String, Object>();
+		scriptItemProcessor.setScriptEvaluator(new GroovyScriptEvaluator());
+		scriptItemProcessor.setScriptSource("def process(item) { return item.toUpperCase() } \n process(item)", "groovy");
 		scriptItemProcessor.afterPropertiesSet();
 
 		assertEquals("Incorrect transformed value", "SS", scriptItemProcessor.process("ss"));
