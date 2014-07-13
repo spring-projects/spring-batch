@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2007 the original author or authors.
+ * Copyright 2006-2014 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -34,6 +34,8 @@ public class CompositeItemStreamTests extends TestCase {
 	private CompositeItemStream manager = new CompositeItemStream();
 
 	private List<String> list = new ArrayList<String>();
+	
+	private ExecutionContext executionContext = new ExecutionContext();
 
 	public void testRegisterAndOpen() {
 		ItemStreamSupport stream = new ItemStreamSupport() {
@@ -44,7 +46,7 @@ public class CompositeItemStreamTests extends TestCase {
 			}
 		};
 		manager.register(stream);
-		manager.open(null);
+		manager.open(executionContext);
 		assertEquals(1, list.size());
 	}
 
@@ -58,7 +60,7 @@ public class CompositeItemStreamTests extends TestCase {
 		};
 		manager.register(stream);
 		manager.register(stream);
-		manager.open(null);
+		manager.open(executionContext);
 		assertEquals(1, list.size());
 	}
 
@@ -70,7 +72,7 @@ public class CompositeItemStreamTests extends TestCase {
 				list.add("bar");
 			}
 		});
-		manager.update(null);
+		manager.update(executionContext);
 		assertEquals(1, list.size());
 	}
 
@@ -94,9 +96,9 @@ public class CompositeItemStreamTests extends TestCase {
 				list.add("bar");
 			}
 		} });
-		manager.open(null);
+		manager.open(executionContext);
 		manager.close();
-		manager.open(null);
+		manager.open(executionContext);
 		assertEquals(2, list.size());
 	}
 

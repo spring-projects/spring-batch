@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2007 the original author or authors.
+ * Copyright 2006-2014 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -123,7 +123,7 @@ public class ItemCountingItemStreamItemReaderTests {
 		context.putInt("foo.read.count.max", 1);
 		reader.open(context);
 		reader.update(context);
-		assertEquals(2, context.size());
+		assertEquals(3, context.size());
 	}
 
 	private static class ItemCountingItemStreamItemReader extends AbstractItemCountingItemStreamItemReader<String> {
