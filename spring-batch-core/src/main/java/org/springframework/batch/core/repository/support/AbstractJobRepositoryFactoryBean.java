@@ -191,7 +191,7 @@ public abstract class AbstractJobRepositoryFactoryBean implements FactoryBean<Jo
 		initializeProxy();
 	}
 
-	private Object getTarget() throws Exception {
+	protected Object getTarget() throws Exception {
 		return new SimpleJobRepository(createJobInstanceDao(), createJobExecutionDao(), createStepExecutionDao(),
 				createExecutionContextDao());
 	}
