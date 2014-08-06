@@ -35,7 +35,7 @@ public class JobLaunchingMessageHandler implements JobLaunchRequestHandler {
 	private final JobLauncher jobLauncher;
 
 	/**
-	 * @param jobLauncher
+	 * @param jobLauncher {@link org.springframework.batch.core.launch.JobLauncher} used to execute Spring Batch jobs
 	 */
 	public JobLaunchingMessageHandler(JobLauncher jobLauncher) {
 		super();

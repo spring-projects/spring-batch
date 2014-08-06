@@ -32,7 +32,7 @@ public class AsyncItemWriter<T> implements ItemWriter<Future<T>>, InitializingBe
 	}
 	
 	/**
-	 * @param delegate
+	 * @param delegate ItemWriter that does the actual writing of the Future results
 	 */
 	public void setDelegate(ItemWriter<T> delegate) {
 		this.delegate = delegate;

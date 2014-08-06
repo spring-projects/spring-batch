@@ -31,8 +31,8 @@ public class JobLaunchRequest {
 	private final JobParameters jobParameters;
 
 	/**
-	 * @param job
-	 * @param jobParameters
+	 * @param job job to be launched
+	 * @param jobParameters parameters to run the job with
 	 */
 	public JobLaunchRequest(Job job, JobParameters jobParameters) {
 		super();
