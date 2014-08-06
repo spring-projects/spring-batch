@@ -117,7 +117,7 @@ public class ChunkMessageItemWriterIntegrationTests {
 		factory.setItemReader(new ListItemReader<String>(Arrays.asList(StringUtils
 				.commaDelimitedListToStringArray("1,2,3,4,5,6"))));
 
-		Step step = (Step) factory.getObject();
+		Step step = factory.getObject();
 
 		StepExecution stepExecution = getStepExecution(step);
 		step.execute(stepExecution);
@@ -135,7 +135,7 @@ public class ChunkMessageItemWriterIntegrationTests {
 		factory.setItemReader(new ListItemReader<String>(Arrays.asList(StringUtils
 				.commaDelimitedListToStringArray("1,2,3,4,5,6"))));
 
-		Step step = (Step) factory.getObject();
+		Step step = factory.getObject();
 
 		StepExecution stepExecution = getStepExecution(step);
 
@@ -160,7 +160,7 @@ public class ChunkMessageItemWriterIntegrationTests {
 		factory.setItemReader(new ListItemReader<String>(Arrays.asList(StringUtils
 				.commaDelimitedListToStringArray("1,2,3,4,5,6"))));
 
-		Step step = (Step) factory.getObject();
+		Step step = factory.getObject();
 
 		StepExecution stepExecution = getStepExecution(step);
 
@@ -207,7 +207,7 @@ public class ChunkMessageItemWriterIntegrationTests {
 				.commaDelimitedListToStringArray("1,fail,3,4,5,6"))));
 		factory.setCommitInterval(2);
 
-		Step step = (Step) factory.getObject();
+		Step step = factory.getObject();
 
 		StepExecution stepExecution = getStepExecution(step);
 		step.execute(stepExecution);
@@ -233,7 +233,7 @@ public class ChunkMessageItemWriterIntegrationTests {
 		factory.setItemReader(new ListItemReader<String>(Arrays.asList(StringUtils
 				.commaDelimitedListToStringArray("1,2,3,4,5,6"))));
 
-		Step step = (Step) factory.getObject();
+		Step step = factory.getObject();
 
 		StepExecution stepExecution = getStepExecution(step);
 
@@ -271,7 +271,7 @@ public class ChunkMessageItemWriterIntegrationTests {
 		factory.setItemReader(new ListItemReader<String>(Arrays.asList(StringUtils
 				.commaDelimitedListToStringArray("wait,fail,3,4,5,6"))));
 
-		Step step = (Step) factory.getObject();
+		Step step = factory.getObject();
 
 		StepExecution stepExecution = getStepExecution(step);
 		step.execute(stepExecution);

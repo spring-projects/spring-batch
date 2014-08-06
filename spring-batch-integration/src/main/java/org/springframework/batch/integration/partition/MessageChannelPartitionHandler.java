@@ -18,6 +18,7 @@ import org.springframework.messaging.Message;
 import org.springframework.messaging.MessageChannel;
 import org.springframework.messaging.PollableChannel;
 import org.springframework.util.Assert;
+import org.springframework.util.CollectionUtils;
 
 import java.util.Collection;
 import java.util.List;
@@ -119,6 +120,11 @@ public class MessageChannelPartitionHandler implements PartitionHandler {
 			StepExecution masterStepExecution) throws Exception {
 
 		Set<StepExecution> split = stepExecutionSplitter.split(masterStepExecution, gridSize);
+
+		if(CollectionUtils.isEmpty(split)) {
+			return null;
+		}
+
 		int count = 0;
 
 		if (replyChannel == null) {
