@@ -22,8 +22,6 @@ import java.util.Map.Entry;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
-import org.springframework.util.Assert;
-
 /**
  * Object representing a context for an {@link ItemStream}. It is a thin wrapper
  * for a map that allows optionally for type safety on reads. It also allows for
