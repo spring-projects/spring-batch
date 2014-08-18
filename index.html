@@ -101,7 +101,6 @@ The quickest way to get started with Spring Batch is to use Spring Boot.
         return jobBuilderFactory.get("job1")
             .incrementer(new RunIdIncrementer())
             .start(step1)
-            .end()
             .build();
       }
     }
