@@ -24,6 +24,7 @@ import java.util.List;
 
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.util.Assert;
+import org.springframework.util.ClassUtils;
 import org.springframework.util.MethodInvoker;
 
 /**
@@ -167,7 +168,7 @@ public abstract class AbstractMethodInvokingDelegator<T> implements Initializing
 						if (arguments[j] == null) {
 							continue;
 						}
-						if (!(params[j].isAssignableFrom(arguments[j].getClass()))) {
+						if (!(ClassUtils.isAssignableValue(params[j], arguments[j]))) {
 							argumentsMatchParameters = false;
 						}
 					}
