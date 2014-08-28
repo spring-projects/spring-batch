@@ -27,6 +27,13 @@
 		class="org.springframework.batch.core.step.tasklet.MethodInvokingTaskletAdapter">
 		<property name="targetObject" ref="value" />
 		<property name="targetMethod" value="execute" />
+		<property name="arguments">
+			<list>
+      			<value>foo2</value>
+      			<value type="int">3</value>
+      			<value type="double">3.14</value>
+   			</list>
+		</property>
 	</bean>
 
 	<bean id="value"
