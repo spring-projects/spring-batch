@@ -50,8 +50,11 @@ public class TaskletJobFunctionalTests {
 			this.value = value;
 		}
 
-		public void execute() {
+		public void execute(String strValue, Integer integerValue, double doubleValue) {
 			assertEquals("foo", value);
+			assertEquals("foo2", strValue);
+			assertEquals(3, integerValue.intValue());
+			assertEquals(3.14, doubleValue, 0.01);
 		}
 	}
 
