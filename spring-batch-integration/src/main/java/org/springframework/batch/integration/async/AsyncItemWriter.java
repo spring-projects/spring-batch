@@ -15,18 +15,18 @@
  */
 package org.springframework.batch.integration.async;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.concurrent.Future;
-
 import org.springframework.batch.item.ItemWriter;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.util.Assert;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.concurrent.Future;
+
 public class AsyncItemWriter<T> implements ItemWriter<Future<T>>, InitializingBean {
 	
 	private ItemWriter<T> delegate;
-	
+
 	public void afterPropertiesSet() throws Exception {
 		Assert.notNull(delegate, "A delegate ItemWriter must be provided.");
 	}
@@ -38,12 +38,23 @@ public class AsyncItemWriter<T> implements ItemWriter<Future<T>>, InitializingBe
 		this.delegate = delegate;
 	}
 
+	/**
+	 * In the processing of the {@link java.util.concurrent.Future}s passed, nulls are <em>not</em> passed to the
+	 * delegate since they are considered filtered out by the {@link org.springframework.batch.integration.async.AsyncItemProcessor}'s
+	 * delegated {@link org.springframework.batch.item.ItemProcessor}.
+	 *
+	 * @param items {@link java.util.concurrent.Future}s to be upwrapped and passed to the delegate
+	 * @throws Exception
+	 */
 	public void write(List<? extends Future<T>> items) throws Exception {
 		List<T> list = new ArrayList<T>();
 		for (Future<T> future : items) {
-			list.add(future.get());
+			T item = future.get();
+
+			if(item != null) {
+				list.add(future.get());
+			}
 		}
 		delegate.write(list);
 	}
-
 }
