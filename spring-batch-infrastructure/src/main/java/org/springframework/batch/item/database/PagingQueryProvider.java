@@ -16,9 +16,8 @@
 
 package org.springframework.batch.item.database;
 
-import java.util.Map;
-
 import javax.sql.DataSource;
+import java.util.Map;
 
 
 /**
@@ -95,4 +94,11 @@ public interface PagingQueryProvider {
 	 * @return The string to be used for a parameterized query.
 	 */
 	String getSortKeyPlaceHolder(String keyName);
+
+	/**
+	 * The sort key (unique single column name) without alias.
+	 *
+	 * @return the sort key used to order the query (without alias)
+	 */
+	Map<String, Order> getSortKeysWithoutAliases();
 }
