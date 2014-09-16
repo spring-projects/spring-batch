@@ -248,4 +248,27 @@ public abstract class AbstractSqlPagingQueryProvider implements PagingQueryProvi
 		}
 	}
 
+	/**
+	 *
+	 * @return sortKey key to use to sort and limit page content (without alias)
+	 */
+	@Override
+	public Map<String, Order> getSortKeysWithoutAliases() {
+		Map<String, Order> sortKeysWithoutAliases = new LinkedHashMap<String, Order>();
+
+		for (Map.Entry<String, Order> sortKeyEntry : sortKeys.entrySet()) {
+			String key = sortKeyEntry.getKey();
+			int separator = key.indexOf('.');
+			if (separator > 0) {
+				int columnIndex = separator + 1;
+				if (columnIndex < key.length()) {
+					sortKeysWithoutAliases.put(key.substring(columnIndex), sortKeyEntry.getValue());
+				}
+			} else {
+				sortKeysWithoutAliases.put(sortKeyEntry.getKey(), sortKeyEntry.getValue());
+			}
+		}
+
+		return sortKeysWithoutAliases;
+	}
 }
