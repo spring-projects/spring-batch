@@ -16,13 +16,13 @@
 
 package org.springframework.batch.item.database.support;
 
+import org.springframework.batch.item.database.Order;
+import org.springframework.util.StringUtils;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-
-import org.springframework.batch.item.database.Order;
-import org.springframework.util.StringUtils;
 
 /**
  * Utility class that generates the actual SQL statements used by query
@@ -246,7 +246,7 @@ public class SqlPagingQueryUtils {
 	 * @return a String that can be appended to an ORDER BY clause.
 	 */
 	public static String buildSortClause(AbstractSqlPagingQueryProvider provider) {
-		return buildSortClause(provider.getSortKeys());
+		return buildSortClause(provider.getSortKeysWithoutAliases());
 	}
 	
 	/**
@@ -285,7 +285,7 @@ public class SqlPagingQueryUtils {
 	 */
 	public static void buildSortConditions(
 			AbstractSqlPagingQueryProvider provider, StringBuilder sql) {
-		List<Map.Entry<String, Order>> keys = new ArrayList<Map.Entry<String,Order>>(provider.getSortKeys().entrySet());
+		List<Map.Entry<String, Order>> keys = new ArrayList<Map.Entry<String,Order>>(provider.getSortKeysWithoutAliases().entrySet());
 		List<String> clauses = new ArrayList<String>();
 		
 		for(int i = 0; i < keys.size(); i++) {
@@ -336,7 +336,7 @@ public class SqlPagingQueryUtils {
 		
 		String prefix = "";
 		
-		for (Map.Entry<String, Order> sortKey : provider.getSortKeys().entrySet()) {
+		for (Map.Entry<String, Order> sortKey : provider.getSortKeysWithoutAliases().entrySet()) {
 			select.append(prefix);
 			
 			prefix = ", ";

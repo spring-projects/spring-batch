@@ -15,14 +15,14 @@
  */
 package org.springframework.batch.item.database.support;
 
-import static org.junit.Assert.assertEquals;
+import org.junit.Assert;
+import org.junit.Test;
+import org.springframework.batch.item.database.Order;
 
 import java.util.HashMap;
 import java.util.Map;
 
-import org.junit.Assert;
-import org.junit.Test;
-import org.springframework.batch.item.database.Order;
+import static org.junit.Assert.assertEquals;
 
 /**
  * @author Thomas Risberg
@@ -111,7 +111,7 @@ public class SqlWindowingPagingQueryProviderTests extends AbstractSqlPagingQuery
 		sortKeys.put("E.id", Order.DESCENDING);		
 		pagingQueryProvider.setSortKeys(sortKeys);
 		
-		String sql="SELECT TMP_SUB.id FROM ( SELECT E.id, ROW_NUMBER() OVER ( ORDER BY E.id DESC) AS ROW_NUMBER FROM foo_e E, foo_i I WHERE E.id=I.id) AS TMP_SUB WHERE TMP_SUB.ROW_NUMBER = 1 ORDER BY TMP_SUB.id DESC";
+		String sql="SELECT TMP_SUB.id FROM ( SELECT E.id, ROW_NUMBER() OVER ( ORDER BY id DESC) AS ROW_NUMBER FROM foo_e E, foo_i I WHERE E.id=I.id) AS TMP_SUB WHERE TMP_SUB.ROW_NUMBER = 1 ORDER BY TMP_SUB.id DESC";
 		String s = pagingQueryProvider.generateJumpToItemQuery(45, pageSize);
 		assertEquals(sql, s);
 	}
