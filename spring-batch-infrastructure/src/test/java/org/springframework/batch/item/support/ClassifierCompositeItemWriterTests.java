@@ -55,9 +55,9 @@ public class ClassifierCompositeItemWriterTests {
 		map.put("foo", fooWriter );
 		map.put("*", defaultWriter);
 		writer.setClassifier(new PatternMatchingClassifier<ItemWriter<? super String>>(map));
-		writer.write(Arrays.asList("foo", "foo", "bar"));
+		writer.write(Arrays.asList("foo", "foo", "one", "two", "three"));
 		assertEquals("[foo, foo]", foos.toString());
-		assertEquals("[bar]", defaults.toString());
+		assertEquals("[one, two, three]", defaults.toString());
 	}
 
 }
