@@ -17,7 +17,7 @@
 package org.springframework.batch.item.support;
 
 import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -52,7 +52,7 @@ public class ClassifierCompositeItemWriter<T> implements ItemWriter<T> {
     @Override
 	public void write(List<? extends T> items) throws Exception {
 
-		Map<ItemWriter<? super T>, List<T>> map = new HashMap<ItemWriter<? super T>, List<T>>();
+		Map<ItemWriter<? super T>, List<T>> map = new LinkedHashMap<ItemWriter<? super T>, List<T>>();
 
 		for (T item : items) {
 			ItemWriter<? super T> key = classifier.classify(item);
