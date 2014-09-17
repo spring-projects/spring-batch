@@ -115,6 +115,8 @@ public class LdifReader extends AbstractItemCountingItemStreamItemReader<LdapAtt
 		if (resource == null)
 			throw new IllegalStateException("A resource has not been set.");
 
+		System.out.println("Resource = " + resource.toString());
+
 		if (!resource.exists()) {
 			if (strict) {
 				throw new IllegalStateException("Input resource must exist (reader is in 'strict' mode): "+resource);
