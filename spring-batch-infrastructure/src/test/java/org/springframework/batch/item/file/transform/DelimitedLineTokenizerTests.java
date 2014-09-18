@@ -16,11 +16,11 @@
 
 package org.springframework.batch.item.file.transform;
 
+import org.junit.Test;
+
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
-
-import org.junit.Test;
 
 
 public class DelimitedLineTokenizerTests {
@@ -363,6 +363,14 @@ public class DelimitedLineTokenizerTests {
 		FieldSet line = tokenizer.tokenize("\"a\",\"b\",\"c\",\"d\"");
 		assertEquals(2, line.getFieldCount());
 		assertEquals("c", line.readString("bar"));
+	}
+
+	@Test
+	public void testTokenizeOverMultipleLines() {
+		tokenizer = new DelimitedLineTokenizer(";");
+		FieldSet line = tokenizer.tokenize("value1;\"value2\nvalue2cont\";value3;value4");
+		assertEquals(4, line.getFieldCount());
+		assertEquals("value2\nvalue2cont", line.readString(1));
 	}
 
 }
