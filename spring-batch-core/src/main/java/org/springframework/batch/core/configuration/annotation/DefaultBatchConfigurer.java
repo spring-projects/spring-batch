@@ -17,6 +17,7 @@ package org.springframework.batch.core.configuration.annotation;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.springframework.batch.core.configuration.BatchConfigurationException;
 import org.springframework.batch.core.explore.JobExplorer;
 import org.springframework.batch.core.explore.support.JobExplorerFactoryBean;
 import org.springframework.batch.core.explore.support.MapJobExplorerFactoryBean;
@@ -77,31 +78,35 @@ public class DefaultBatchConfigurer implements BatchConfigurer {
 	}
 
 	@PostConstruct
-	public void initialize() throws Exception {
-		if(dataSource == null) {
-			logger.warn("No datasource was provided...using a Map based JobRepository");
+	public void initialize() {
+		try {
+			if(dataSource == null) {
+				logger.warn("No datasource was provided...using a Map based JobRepository");
 
-			if(this.transactionManager == null) {
-				this.transactionManager = new ResourcelessTransactionManager();
+				if(this.transactionManager == null) {
+					this.transactionManager = new ResourcelessTransactionManager();
+				}
+
+				MapJobRepositoryFactoryBean jobRepositoryFactory = new MapJobRepositoryFactoryBean(this.transactionManager);
+				jobRepositoryFactory.afterPropertiesSet();
+				this.jobRepository = jobRepositoryFactory.getObject();
+
+				MapJobExplorerFactoryBean jobExplorerFactory = new MapJobExplorerFactoryBean(jobRepositoryFactory);
+				jobExplorerFactory.afterPropertiesSet();
+				this.jobExplorer = jobExplorerFactory.getObject();
+			} else {
+				this.jobRepository = createJobRepository();
+
+				JobExplorerFactoryBean jobExplorerFactoryBean = new JobExplorerFactoryBean();
+				jobExplorerFactoryBean.setDataSource(this.dataSource);
+				jobExplorerFactoryBean.afterPropertiesSet();
+				this.jobExplorer = jobExplorerFactoryBean.getObject();
 			}
 
-			MapJobRepositoryFactoryBean jobRepositoryFactory = new MapJobRepositoryFactoryBean(this.transactionManager);
-			jobRepositoryFactory.afterPropertiesSet();
-			this.jobRepository = jobRepositoryFactory.getObject();
-
-			MapJobExplorerFactoryBean jobExplorerFactory = new MapJobExplorerFactoryBean(jobRepositoryFactory);
-			jobExplorerFactory.afterPropertiesSet();
-			this.jobExplorer = jobExplorerFactory.getObject();
-		} else {
-			this.jobRepository = createJobRepository();
-
-			JobExplorerFactoryBean jobExplorerFactoryBean = new JobExplorerFactoryBean();
-			jobExplorerFactoryBean.setDataSource(this.dataSource);
-			jobExplorerFactoryBean.afterPropertiesSet();
-			this.jobExplorer = jobExplorerFactoryBean.getObject();
+			this.jobLauncher = createJobLauncher();
+		} catch (Exception e) {
+			throw new BatchConfigurationException(e);
 		}
-
-		this.jobLauncher = createJobLauncher();
 	}
 
 	private JobLauncher createJobLauncher() throws Exception {
