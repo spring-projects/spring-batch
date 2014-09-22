@@ -23,7 +23,10 @@ import org.springframework.batch.core.launch.JobOperator;
  * as to how the stop will behave.  The only guarantee provided by the
  * framework is that a call to {@link JobOperator#stop(long)} will
  * attempt to call the stop method on any currently running
- * StoppableTasklet.
+ * StoppableTasklet.  The call to {@link StoppableTasklet#stop()} will
+ * be from a thread other than the thread executing {@link org.springframework.batch.core.step.tasklet.Tasklet#execute(org.springframework.batch.core.StepContribution, org.springframework.batch.core.scope.context.ChunkContext)}
+ * so the appropriate thread safety and visibility controls should be
+ * put in place.
  *
  * @author Will Schipp
  * @since 3.0
