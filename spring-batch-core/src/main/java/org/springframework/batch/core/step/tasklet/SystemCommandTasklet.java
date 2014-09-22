@@ -16,10 +16,6 @@
 
 package org.springframework.batch.core.step.tasklet;
 
-import java.io.File;
-import java.util.concurrent.Callable;
-import java.util.concurrent.FutureTask;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.batch.core.ExitStatus;
@@ -33,6 +29,10 @@ import org.springframework.beans.factory.InitializingBean;
 import org.springframework.core.task.SimpleAsyncTaskExecutor;
 import org.springframework.core.task.TaskExecutor;
 import org.springframework.util.Assert;
+
+import java.io.File;
+import java.util.concurrent.Callable;
+import java.util.concurrent.FutureTask;
 
 /**
  * {@link Tasklet} that executes a system command.
@@ -78,7 +78,7 @@ public class SystemCommandTasklet extends StepExecutionListenerSupport implement
 
 	private boolean interruptOnCancel = false;
 
-	private boolean stopped = false;
+	private volatile boolean stopped = false;
 
 	/**
 	 * Execute system command and map its exit code to {@link ExitStatus} using
