@@ -16,29 +16,35 @@
 
 package org.springframework.batch.core.configuration.annotation;
 
-import static org.junit.Assert.assertEquals;
-
-import java.util.concurrent.Callable;
-
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
+import org.springframework.batch.core.StepContribution;
 import org.springframework.batch.core.StepExecution;
+import org.springframework.batch.core.scope.context.ChunkContext;
 import org.springframework.batch.core.scope.context.StepSynchronizationManager;
+import org.springframework.batch.core.step.tasklet.Tasklet;
+import org.springframework.batch.repeat.RepeatStatus;
 import org.springframework.beans.factory.BeanCreationException;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.ImportResource;
 import org.springframework.context.annotation.Scope;
 import org.springframework.context.annotation.ScopedProxyMode;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
+import java.util.concurrent.Callable;
+
+import static org.junit.Assert.assertEquals;
+
 /**
  * @author Dave Syer
+ * @author Michael Minella
  *
  */
 public class StepScopeConfigurationTests {
@@ -82,6 +88,16 @@ public class StepScopeConfigurationTests {
 	public void testStepScopeWithProxyTargetClass() throws Exception {
 		init(StepScopeConfigurationRequiringProxyTargetClass.class);
 		SimpleHolder value = context.getBean(SimpleHolder.class);
+		assertEquals("STEP", value.call());
+	}
+
+	@Test
+	public void testStepScopeXmlImportUsingNamespace() throws Exception {
+		init(StepScopeConfigurationXmlImportUsingNamespace.class);
+
+		SimpleHolder value = (SimpleHolder) context.getBean("xmlValue");
+		assertEquals("STEP", value.call());
+		value = (SimpleHolder) context.getBean("javaValue");
 		assertEquals("STEP", value.call());
 	}
 
@@ -200,6 +216,20 @@ public class StepScopeConfigurationTests {
 	}
 
 	@Configuration
+	@ImportResource("org/springframework/batch/core/configuration/annotation/StepScopeConfigurationTestsXmlImportUsingNamespace-context.xml")
+	@EnableBatchProcessing
+	public static class StepScopeConfigurationXmlImportUsingNamespace {
+
+		@Bean
+		@StepScope
+		protected SimpleHolder javaValue(@Value("#{stepExecution.stepName}")
+										 final String value) {
+			return new SimpleHolder(value);
+		}
+
+	}
+
+	@Configuration
 	@EnableBatchProcessing
 	public static class StepScopeConfigurationInjectingProxy {
 
@@ -256,4 +286,11 @@ public class StepScopeConfigurationTests {
 
 	}
 
+	public static class TaskletSupport implements Tasklet {
+
+		@Override
+		public RepeatStatus execute(StepContribution contribution, ChunkContext chunkContext) throws Exception {
+			return RepeatStatus.FINISHED;
+		}
+	}
 }

@@ -15,9 +15,6 @@
  */
 package org.springframework.batch.core.configuration.xml;
 
-import java.util.Comparator;
-import java.util.Map;
-
 import org.springframework.batch.core.job.flow.support.DefaultStateTransitionComparator;
 import org.springframework.batch.core.job.flow.support.StateTransition;
 import org.springframework.beans.PropertyValue;
@@ -31,6 +28,9 @@ import org.springframework.beans.factory.xml.ParserContext;
 import org.springframework.util.StringUtils;
 import org.w3c.dom.Element;
 
+import java.util.Comparator;
+import java.util.Map;
+
 /**
  * Utility methods used in parsing of the batch core namespace
  *
@@ -41,7 +41,9 @@ public class CoreNamespaceUtils {
 
 	private static final String STEP_SCOPE_PROCESSOR_BEAN_NAME = "org.springframework.batch.core.scope.internalStepScope";
 
-	private static final String STEP_SCOPE_PROCESSOR_CLASS_NAME = "org.springframework.batch.core.scope.StepScope";
+	private static final String XML_CONFIG_STEP_SCOPE_PROCESSOR_CLASS_NAME = "org.springframework.batch.core.scope.StepScope";
+
+	private static final String JAVA_CONFIG_SCOPE_CLASS_NAME = "org.springframework.batch.core.configuration.annotation.ScopeConfiguration";
 
 	private static final String JOB_SCOPE_PROCESSOR_BEAN_NAME = "org.springframework.batch.core.scope.internalJobScope";
 
@@ -56,6 +58,7 @@ public class CoreNamespaceUtils {
 	private static final String CORE_NAMESPACE_POST_PROCESSOR_CLASS_NAME = "org.springframework.batch.core.configuration.xml.CoreNamespacePostProcessor";
 
 	public static void autoregisterBeansForNamespace(ParserContext parserContext, Object source) {
+		System.out.println("******** CoreNamespaceUtils is called");
 		checkForStepScope(parserContext, source);
 		checkForJobScope(parserContext, source);
 		addRangePropertyEditor(parserContext);
@@ -64,7 +67,7 @@ public class CoreNamespaceUtils {
 	}
 
 	private static void checkForStepScope(ParserContext parserContext, Object source) {
-		checkForScope(parserContext, source, STEP_SCOPE_PROCESSOR_CLASS_NAME, STEP_SCOPE_PROCESSOR_BEAN_NAME);
+		checkForScope(parserContext, source, XML_CONFIG_STEP_SCOPE_PROCESSOR_CLASS_NAME, STEP_SCOPE_PROCESSOR_BEAN_NAME);
 	}
 
 	private static void checkForJobScope(ParserContext parserContext, Object source) {
@@ -77,7 +80,7 @@ public class CoreNamespaceUtils {
 		String[] beanNames = parserContext.getRegistry().getBeanDefinitionNames();
 		for (String beanName : beanNames) {
 			BeanDefinition bd = parserContext.getRegistry().getBeanDefinition(beanName);
-			if (scopeClassName.equals(bd.getBeanClassName())) {
+			if (scopeClassName.equals(bd.getBeanClassName()) || JAVA_CONFIG_SCOPE_CLASS_NAME.equals(bd.getBeanClassName())) {
 				foundScope = true;
 				break;
 			}

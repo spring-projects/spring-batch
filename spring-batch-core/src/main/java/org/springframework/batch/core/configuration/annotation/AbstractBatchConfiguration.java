@@ -20,8 +20,9 @@ import org.springframework.batch.core.configuration.support.MapJobRegistry;
 import org.springframework.batch.core.explore.JobExplorer;
 import org.springframework.batch.core.launch.JobLauncher;
 import org.springframework.batch.core.repository.JobRepository;
+import org.springframework.batch.core.scope.JobScope;
+import org.springframework.batch.core.scope.StepScope;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
@@ -30,8 +31,6 @@ import org.springframework.core.annotation.AnnotationAttributes;
 import org.springframework.core.type.AnnotationMetadata;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.util.Assert;
-import org.springframework.batch.core.scope.JobScope;
-import org.springframework.batch.core.scope.StepScope;
 
 import javax.sql.DataSource;
 import java.util.Collection;
@@ -41,15 +40,13 @@ import java.util.Collection;
  * available by implementing the {@link BatchConfigurer} interface. {@link BatchConfigurer}.
  * 
  * @author Dave Syer
+ * @author Michael Minella
  * @since 2.2
  * @see EnableBatchProcessing
  */
 @Configuration
 @Import(ScopeConfiguration.class)
 public abstract class AbstractBatchConfiguration implements ImportAware {
-
-	@Autowired
-	private ApplicationContext context;
 
 	@Autowired(required = false)
 	private Collection<DataSource> dataSources;
