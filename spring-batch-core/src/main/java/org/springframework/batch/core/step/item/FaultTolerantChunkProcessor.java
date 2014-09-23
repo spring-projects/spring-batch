@@ -320,7 +320,6 @@ public class FaultTolerantChunkProcessor<I, O> extends SimpleChunkProcessor<I, O
 		RetryCallback<Object, Exception> retryCallback = new RetryCallback<Object, Exception>() {
 			@Override
 			public Object doWithRetry(RetryContext context) throws Exception {
-
 				contextHolder.set(context);
 
 				if (!data.scanning()) {
@@ -395,7 +394,6 @@ public class FaultTolerantChunkProcessor<I, O> extends SimpleChunkProcessor<I, O
 
 				@Override
 				public Object recover(RetryContext context) throws Exception {
-
 					/*
 					 * If the last exception was not skippable we don't need to
 					 * do any scanning. We can just bomb out with a retry
@@ -564,7 +562,7 @@ public class FaultTolerantChunkProcessor<I, O> extends SimpleChunkProcessor<I, O
 				logger.debug("Scanning for failed item on write: " + inputs);
 			}
 		}
-		if (outputs.isEmpty()) {
+		if (outputs.isEmpty() || inputs.isEmpty()) {
 			data.scanning(false);
 			inputs.setBusy(false);
 			chunkMonitor.resetOffset();

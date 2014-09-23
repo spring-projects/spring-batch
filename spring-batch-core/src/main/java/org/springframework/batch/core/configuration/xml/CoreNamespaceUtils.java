@@ -58,7 +58,6 @@ public class CoreNamespaceUtils {
 	private static final String CORE_NAMESPACE_POST_PROCESSOR_CLASS_NAME = "org.springframework.batch.core.configuration.xml.CoreNamespacePostProcessor";
 
 	public static void autoregisterBeansForNamespace(ParserContext parserContext, Object source) {
-		System.out.println("******** CoreNamespaceUtils is called");
 		checkForStepScope(parserContext, source);
 		checkForJobScope(parserContext, source);
 		addRangePropertyEditor(parserContext);
