@@ -52,6 +52,7 @@ public interface ItemReader<T> {
 	 * with the input data. Assume potentially transient, so subsequent calls to
 	 * read might succeed.
 	 * @throws Exception if an there is a non-specific error.
+	 * @return T the item to be processed
 	 */
 	T read() throws Exception, UnexpectedInputException, ParseException, NonTransientResourceException;
 

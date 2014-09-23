@@ -15,12 +15,6 @@
  */
 package org.springframework.batch.item.mail.javamail;
 
-import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
-
-import javax.mail.internet.MimeMessage;
-
 import org.springframework.batch.item.ItemWriter;
 import org.springframework.batch.item.mail.DefaultMailErrorHandler;
 import org.springframework.batch.item.mail.MailErrorHandler;
@@ -30,6 +24,11 @@ import org.springframework.mail.MailSendException;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMailMessage;
 import org.springframework.util.Assert;
+
+import javax.mail.internet.MimeMessage;
+import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
 
 /**
  * <p>
@@ -68,7 +67,7 @@ public class MimeMessageItemWriter implements ItemWriter<MimeMessage> {
 	/**
 	 * A {@link JavaMailSender} to be used to send messages in {@link #write(List)}.
 	 * 
-	 * @param mailSender
+	 * @param mailSender service for doing the work of sending a MIME message
 	 */
 	public void setJavaMailSender(JavaMailSender mailSender) {
 		this.mailSender = mailSender;

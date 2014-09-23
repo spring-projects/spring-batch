@@ -49,17 +49,19 @@ public abstract class AbstractItemCountingItemStreamItemReader<T> extends Abstra
 	 * Read next item from input.
 	 * 
 	 * @return item
-	 * @throws Exception
+	 * @throws Exception Allows subclasses to throw checked exceptions for interpretation by the framework
 	 */
 	protected abstract T doRead() throws Exception;
 
 	/**
 	 * Open resources necessary to start reading input.
+	 * @throws Exception Allows subclasses to throw checked exceptions for interpretation by the framework
 	 */
 	protected abstract void doOpen() throws Exception;
 
 	/**
 	 * Close the resources opened in {@link #doOpen()}.
+	 * @throws Exception Allows subclasses to throw checked exceptions for interpretation by the framework
 	 */
 	protected abstract void doClose() throws Exception;
 
@@ -67,6 +69,9 @@ public abstract class AbstractItemCountingItemStreamItemReader<T> extends Abstra
 	 * Move to the given item index. Subclasses should override this method if
 	 * there is a more efficient way of moving to given index than re-reading
 	 * the input using {@link #doRead()}.
+	 *
+	 * @param itemIndex index of item (0 based) to jump to.
+	 * @throws Exception Allows subclasses to throw checked exceptions for interpretation by the framework
 	 */
 	protected void jumpToItem(int itemIndex) throws Exception {
 		for (int i = 0; i < itemIndex; i++) {
