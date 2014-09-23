@@ -16,7 +16,6 @@
 package org.springframework.batch.core.step.tasklet;
 
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.batch.core.BatchStatus;
@@ -90,7 +89,6 @@ public class ChunkOrientedStepIntegrationTests {
 
 	@SuppressWarnings("serial")
 	@Test
-	@Ignore //FIXME
 	public void testStatusForCommitFailedException() throws Exception {
 
 		step.setTasklet(new TestingChunkOrientedTasklet<String>(getReader(new String[] { "a", "b", "c" }),
