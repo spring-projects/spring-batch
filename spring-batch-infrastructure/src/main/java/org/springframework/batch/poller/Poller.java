@@ -50,7 +50,7 @@ public interface Poller<T> {
 	 * 
 	 * @param callable a {@link Callable} to use to retrieve a result
 	 * @return a future which itself can be used to get the result
-	 * 
+	 * @throws java.lang.Exception
 	 */
 	Future<T> poll(Callable<T> callable) throws Exception;
 

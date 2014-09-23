@@ -117,7 +117,7 @@ public class JdbcBatchItemWriter<T> implements ItemWriter<T>, InitializingBean {
 	/**
 	 * Public setter for the data source for injection purposes.
 	 *
-	 * @param dataSource
+	 * @param dataSource {@link javax.sql.DataSource} to use for querying against
 	 */
 	public void setDataSource(DataSource dataSource) {
 		if (namedParameterJdbcTemplate == null) {

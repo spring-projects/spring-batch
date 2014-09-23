@@ -29,7 +29,7 @@ public interface RecordCallbackHandler {
 	/**
 	 * Execute operations on the supplied record.
 	 *
-	 * @param attributes
+	 * @param attributes represents the record
 	 */
 	void handleRecord(LdapAttributes attributes);
 

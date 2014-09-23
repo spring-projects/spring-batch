@@ -30,7 +30,9 @@ public interface ItemStream {
 
 	/**
 	 * Open the stream for the provided {@link ExecutionContext}.
-	 * 
+	 *
+	 * @param executionContext current step's {@link org.springframework.batch.item.ExecutionContext}.  Will be the
+	 *                            executionContext from the last run of the step on a restart.
 	 * @throws IllegalArgumentException if context is null
 	 */
 	void open(ExecutionContext executionContext) throws ItemStreamException;
