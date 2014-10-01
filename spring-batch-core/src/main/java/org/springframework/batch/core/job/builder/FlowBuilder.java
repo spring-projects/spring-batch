@@ -613,7 +613,7 @@ public class FlowBuilder<Q> {
 			int counter = 0;
 			State one = parent.currentState;
 			Flow flow = null;
-			if (!(one instanceof FlowState)) {
+			if (!(one == null || one instanceof FlowState)) {
 				FlowBuilder<Flow> stateBuilder = new FlowBuilder<Flow>(name + "_" + (counter++));
 				stateBuilder.currentState = one;
 				flow = stateBuilder.build();
