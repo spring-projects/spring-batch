@@ -15,22 +15,58 @@
  */
 package org.springframework.batch.item.file.transform;
 
-import org.springframework.util.StringUtils;
+import org.springframework.util.ObjectUtils;
 
 /**
- * A {@link LineAggregator} implementation that converts an object into a
- * delimited list of strings. The default delimiter is a comma.
+ * A {@link LineAggregator} implementation that converts an array of object into
+ * a quoted delimited list of strings. The default delimiter is a comma, default
+ * quote character a quote.
+ * 
+ * The aggregator adheres to RFC 4180 and will wrap strings that contain the
+ * delimiter, quote or new line character in quotes. Quotes in the string are
+ * replaced with double quotes.
  * 
  * @author Dave Syer
+ * 
+ * @author M.P. Korstanje
  * 
  */
 public class DelimitedLineAggregator<T> extends ExtractorLineAggregator<T> {
 
-	private String delimiter = ",";
+	public static final char DEFAULT_QUOTE = '"';
+	public static final String DEFAULT_DELIMITER = ",";
+	public static final char DEFAULT_NEWLINE = '\n';
+
+	private String delimiter = DEFAULT_DELIMITER;
+	private String quoteString = "" + DEFAULT_QUOTE;
+	private String newLine = "" + DEFAULT_NEWLINE;
+
+	/**
+	 * Public setter for quote character
+	 * 
+	 * @param newLine
+	 *            the quote to set
+	 */
+	public void setQoute(char quote) {
+		this.quoteString = "" + quote;
+	}
+
+	/**
+	 * Public setter for the new line.
+	 * 
+	 * @param newLine
+	 *            the newLine to set
+	 */
+
+	public void setNewLine(char newLine) {
+		this.newLine = "" + newLine;
+	}
 
 	/**
 	 * Public setter for the delimiter.
-	 * @param delimiter the delimiter to set
+	 * 
+	 * @param delimiter
+	 *            the delimiter to set
 	 */
 	public void setDelimiter(String delimiter) {
 		this.delimiter = delimiter;
@@ -38,7 +74,41 @@ public class DelimitedLineAggregator<T> extends ExtractorLineAggregator<T> {
 
 	@Override
 	public String doAggregate(Object[] fields) {
-		return StringUtils.arrayToDelimitedString(fields, this.delimiter);
+
+		if (ObjectUtils.isEmpty(fields)) {
+			return "";
+		}
+		if (fields.length == 1) {
+			return wrapQoutes(fields[0]);
+		}
+
+		StringBuilder sb = new StringBuilder();
+		for (int i = 0; i < fields.length; i++) {
+			if (i > 0) {
+				sb.append(delimiter);
+			}
+			sb.append(wrapQoutes(fields[i]));
+
+		}
+		return sb.toString();
+	}
+
+	private String wrapQoutes(Object object) {
+
+		String string = ObjectUtils.nullSafeToString(object);
+
+		if (isQouteNeeded(string)) {
+			return quoteString + string.replaceAll(quoteString, quoteString+quoteString)
+					+ quoteString;
+		}
+
+		return string;
+
+	}
+
+	private boolean isQouteNeeded(String string) {
+		return string.contains(quoteString) || string.contains(delimiter)
+				|| string.contains(newLine);
 	}
 
 }
