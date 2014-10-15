@@ -18,6 +18,7 @@ package org.springframework.batch.core.job.builder;
 import org.springframework.batch.core.Step;
 import org.springframework.batch.core.job.flow.Flow;
 import org.springframework.batch.core.job.flow.JobExecutionDecider;
+import org.springframework.beans.factory.InitializingBean;
 
 /**
  * @author Dave Syer
@@ -59,6 +60,16 @@ public class JobFlowBuilder extends FlowBuilder<FlowJobBuilder> {
 	@Override
 	public FlowJobBuilder build() {
 		Flow flow = flow();
+
+		if(flow instanceof InitializingBean) {
+			try {
+				((InitializingBean) flow).afterPropertiesSet();
+			}
+			catch (Exception e) {
+				throw new FlowBuilderException(e);
+			}
+		}
+
 		parent.flow(flow);
 		return parent;
 	}
