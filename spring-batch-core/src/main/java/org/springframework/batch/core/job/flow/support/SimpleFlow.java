@@ -15,18 +15,6 @@
  */
 package org.springframework.batch.core.job.flow.support;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-import org.springframework.batch.core.Step;
-import org.springframework.batch.core.StepExecution;
-import org.springframework.batch.core.job.flow.Flow;
-import org.springframework.batch.core.job.flow.FlowExecution;
-import org.springframework.batch.core.job.flow.FlowExecutionException;
-import org.springframework.batch.core.job.flow.FlowExecutionStatus;
-import org.springframework.batch.core.job.flow.FlowExecutor;
-import org.springframework.batch.core.job.flow.State;
-import org.springframework.beans.factory.InitializingBean;
-
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Comparator;
@@ -37,6 +25,19 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
+import org.springframework.batch.core.Step;
+import org.springframework.batch.core.StepExecution;
+import org.springframework.batch.core.job.flow.Flow;
+import org.springframework.batch.core.job.flow.FlowExecution;
+import org.springframework.batch.core.job.flow.FlowExecutionException;
+import org.springframework.batch.core.job.flow.FlowExecutionStatus;
+import org.springframework.batch.core.job.flow.FlowExecutor;
+import org.springframework.batch.core.job.flow.State;
+import org.springframework.beans.factory.InitializingBean;
 
 /**
  * A {@link Flow} that branches conditionally depending on the exit status of
@@ -125,7 +126,9 @@ public class SimpleFlow implements Flow, InitializingBean {
 	 */
 	@Override
 	public void afterPropertiesSet() throws Exception {
-		initializeTransitions();
+		if (startState == null) {
+			initializeTransitions();
+		}
 	}
 
 	/**
