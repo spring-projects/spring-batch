@@ -122,8 +122,8 @@ public class HibernateItemWriter<T> implements ItemWriter<T>, InitializingBean {
 	 * Do perform the actual write operation using Hibernate's API.
 	 * This can be overridden in a subclass if necessary.
 	 *
-	 * @param items
-	 *            the list of items to use for the write
+	 * @param sessionFactory Hibernate SessionFactory to be used
+	 * @param items the list of items to use for the write
 	 */
 	protected void doWrite(SessionFactory sessionFactory, List<? extends T> items) {
 		if (logger.isDebugEnabled()) {

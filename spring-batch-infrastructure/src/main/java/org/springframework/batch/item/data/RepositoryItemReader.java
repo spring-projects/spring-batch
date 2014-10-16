@@ -15,8 +15,14 @@
  */
 package org.springframework.batch.item.data;
 
+import java.lang.reflect.InvocationTargetException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.item.adapter.AbstractMethodInvokingDelegator.InvocationTargetThrowableWrapper;
 import org.springframework.batch.item.adapter.DynamicMethodInvocationException;
@@ -30,11 +36,6 @@ import org.springframework.data.repository.PagingAndSortingRepository;
 import org.springframework.util.Assert;
 import org.springframework.util.ClassUtils;
 import org.springframework.util.MethodInvoker;
-
-import java.lang.reflect.InvocationTargetException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
 
 /**
  * <p>
@@ -173,8 +174,8 @@ public class RepositoryItemReader<T> extends AbstractItemCountingItemStreamItemR
 	@Override
 	protected void jumpToItem(int itemLastIndex) throws Exception {
 		synchronized (lock) {
-			page = itemLastIndex / pageSize;
-			current = itemLastIndex % pageSize;
+			page = (itemLastIndex - 1) / pageSize;
+			current = (itemLastIndex - 1) % pageSize;
 
 			results = doPageRead();
 			page++;

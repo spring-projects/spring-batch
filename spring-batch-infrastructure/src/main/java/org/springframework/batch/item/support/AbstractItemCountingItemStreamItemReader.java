@@ -154,20 +154,24 @@ public abstract class AbstractItemCountingItemStreamItemReader<T> extends Abstra
 			maxItemCount = executionContext.getInt(getExecutionContextKey(READ_COUNT_MAX));
 		}
 
+		int itemCount = 0;
 		if (executionContext.containsKey(getExecutionContextKey(READ_COUNT))) {
-			int itemCount = executionContext.getInt(getExecutionContextKey(READ_COUNT));
-
-			if (itemCount < maxItemCount) {
-				try {
-					jumpToItem(itemCount);
-				}
-				catch (Exception e) {
-					throw new ItemStreamException("Could not move to stored position on restart", e);
-				}
-			}
-			currentItemCount = itemCount;
-
+			itemCount = executionContext.getInt(getExecutionContextKey(READ_COUNT));
 		}
+		else if(currentItemCount > 0) {
+			itemCount = currentItemCount;
+		}
+
+		if (itemCount > 0 && itemCount < maxItemCount) {
+			try {
+				jumpToItem(itemCount);
+			}
+			catch (Exception e) {
+				throw new ItemStreamException("Could not move to stored position on restart", e);
+			}
+		}
+
+		currentItemCount = itemCount;
 
 	}
 

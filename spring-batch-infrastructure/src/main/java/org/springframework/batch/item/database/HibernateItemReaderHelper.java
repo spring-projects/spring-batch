@@ -129,6 +129,8 @@ public class HibernateItemReaderHelper<T> implements InitializingBean {
 
 	/**
 	 * Open appropriate type of hibernate session and create the query.
+	 *
+	 * @return a Hibernate Query
 	 */
 	public Query createQuery() {
 
@@ -174,6 +176,8 @@ public class HibernateItemReaderHelper<T> implements InitializingBean {
 	 * Scroll through the results up to the item specified.
 	 *
 	 * @param cursor the results to scroll over
+	 * @param itemIndex index to scroll to
+	 * @param flushInterval the number of items to scroll past before flushing
 	 */
 	public void jumpToItem(ScrollableResults cursor, int itemIndex, int flushInterval) {
 		for (int i = 0; i < itemIndex; i++) {

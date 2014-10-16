@@ -29,6 +29,7 @@ public interface ItemSqlParameterSourceProvider<T> {
 	 * Provide parameter values in an {@link SqlParameterSource} based on values from  
 	 * the provided item.
 	 * @param item the item to use for parameter values
+	 * @return parameters extracted from the item
 	 */
 	SqlParameterSource createSqlParameterSource(T item);
 
