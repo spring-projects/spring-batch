@@ -23,14 +23,14 @@ import org.springframework.ldap.core.LdapAttributes;
  *
  * @author Keith Barlow
  *
- * @param <T>
+ * @param <T> type the record will be mapped to
  */
 public interface RecordMapper<T> {
 
 	/**
 	 * Maps an {@link LdapAttributes LdapAttributes} object to the specified type.
 	 *
-	 * @param attributes
+	 * @param attributes attributes
 	 * @return object of type T
 	 */
 	T mapRecord(LdapAttributes attributes);

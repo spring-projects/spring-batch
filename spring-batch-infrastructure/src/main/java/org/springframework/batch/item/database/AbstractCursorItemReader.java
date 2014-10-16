@@ -153,7 +153,7 @@ implements InitializingBean {
 	/**
 	 * Public setter for the data source for injection purposes.
 	 *
-	 * @param dataSource
+	 * @param dataSource {@link javax.sql.DataSource} to be used
 	 */
 	public void setDataSource(DataSource dataSource) {
 		this.dataSource = dataSource;
@@ -172,7 +172,10 @@ implements InitializingBean {
 	 * Prepare the given JDBC Statement (or PreparedStatement or
 	 * CallableStatement), applying statement settings such as fetch size, max
 	 * rows, and query timeout. @param stmt the JDBC Statement to prepare
-	 * @throws SQLException
+	 *
+	 * @param stmt {@link java.sql.PreparedStatement} to be configured
+	 *
+	 * @throws SQLException if interactions with provided stmt fail
 	 *
 	 * @see #setFetchSize
 	 * @see #setMaxRows
@@ -192,10 +195,10 @@ implements InitializingBean {
 	}
 
 	/**
-	 * Return the exception translator for this instance.
-	 *
 	 * Creates a default SQLErrorCodeSQLExceptionTranslator for the specified
 	 * DataSource if none is set.
+	 *
+	 * @return the exception translator for this instance.
 	 */
 	protected SQLExceptionTranslator getExceptionTranslator() {
 		synchronized(this) {
@@ -216,7 +219,7 @@ implements InitializingBean {
 	 * warnings (at debug level).
 	 *
 	 * @param statement the current statement to obtain the warnings from, if there are any.
-	 * @throws SQLException
+	 * @throws SQLException if interaction with provided statement fails.
 	 *
 	 * @see org.springframework.jdbc.SQLWarningException
 	 */
@@ -461,7 +464,7 @@ implements InitializingBean {
 	 * @param rs The current result set
 	 * @param currentRow Current position of the result set
 	 * @return the mapped object at the cursor position
-	 * @throws SQLException
+	 * @throws SQLException if interactions with the current result set fail
 	 */
 	protected abstract T readCursor(ResultSet rs, int currentRow) throws SQLException;
 
