@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2007 the original author or authors.
+ * Copyright 2006-2014 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,6 +25,8 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Date;
 import java.util.List;
 
 import org.junit.Before;
@@ -37,6 +39,9 @@ import org.springframework.batch.core.JobParametersBuilder;
 import org.springframework.batch.core.Step;
 import org.springframework.batch.core.StepExecution;
 import org.springframework.batch.core.job.JobSupport;
+import org.springframework.batch.core.repository.JobExecutionAlreadyRunningException;
+import org.springframework.batch.core.repository.JobInstanceAlreadyCompleteException;
+import org.springframework.batch.core.repository.JobRestartException;
 import org.springframework.batch.core.repository.dao.ExecutionContextDao;
 import org.springframework.batch.core.repository.dao.JobExecutionDao;
 import org.springframework.batch.core.repository.dao.JobInstanceDao;
@@ -92,7 +97,7 @@ public class SimpleJobRepositoryTests {
 
 		jobRepository = new SimpleJobRepository(jobInstanceDao, jobExecutionDao, stepExecutionDao, ecDao);
 
-		jobParameters = new JobParametersBuilder().toJobParameters();
+		jobParameters = new JobParametersBuilder().addString("bar", "test").toJobParameters();
 
 		job = new JobSupport();
 		job.setBeanName("RepositoryTest");
@@ -230,6 +235,39 @@ public class SimpleJobRepositoryTests {
 		when(jobInstanceDao.getJobInstance("foo", new JobParameters())).thenReturn(jobInstance);
 		jobInstanceDao.getJobInstance("foo", new JobParameters());
 		assertTrue(jobRepository.isJobInstanceExists("foo", new JobParameters()));
+	}
+
+	@Test(expected = JobExecutionAlreadyRunningException.class)
+	public void testCreateJobExecutionAlreadyRunning() throws Exception {
+		jobExecution.setStatus(BatchStatus.STARTED);
+		jobExecution.setEndTime(null);
+
+		when(jobInstanceDao.getJobInstance("foo", new JobParameters())).thenReturn(jobInstance);
+		when(jobExecutionDao.findJobExecutions(jobInstance)).thenReturn(Arrays.asList(jobExecution));
+
+		jobRepository.createJobExecution("foo", new JobParameters());
+	}
+
+	@Test(expected = JobRestartException.class)
+	public void testCreateJobExecutionStatusUnknown() throws Exception {
+		jobExecution.setStatus(BatchStatus.UNKNOWN);
+		jobExecution.setEndTime(new Date());
+
+		when(jobInstanceDao.getJobInstance("foo", new JobParameters())).thenReturn(jobInstance);
+		when(jobExecutionDao.findJobExecutions(jobInstance)).thenReturn(Arrays.asList(jobExecution));
+
+		jobRepository.createJobExecution("foo", new JobParameters());
+	}
+
+	@Test(expected = JobInstanceAlreadyCompleteException.class)
+	public void testCreateJobExecutionAlreadyComplete() throws Exception {
+		jobExecution.setStatus(BatchStatus.COMPLETED);
+		jobExecution.setEndTime(new Date());
+
+		when(jobInstanceDao.getJobInstance("foo", new JobParameters())).thenReturn(jobInstance);
+		when(jobExecutionDao.findJobExecutions(jobInstance)).thenReturn(Arrays.asList(jobExecution));
+
+		jobRepository.createJobExecution("foo", new JobParameters());
 	}
 
 }
