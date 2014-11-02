@@ -116,12 +116,16 @@ public class SimpleJobRepository implements JobRepository {
 
 			// check for running executions and find the last started
 			for (JobExecution execution : executions) {
-				if (execution.isRunning()) {
+				if (execution.isRunning() || execution.isStopping()) {
 					throw new JobExecutionAlreadyRunningException("A job execution for this job is already running: "
 							+ jobInstance);
 				}
-
 				BatchStatus status = execution.getStatus();
+				if (status == BatchStatus.UNKNOWN) {
+					throw new JobRestartException("Cannot restart job from UNKNOWN status. "
+							+ "The last execution ended with a failure that could not be rolled back, "
+							+ "so it may be dangerous to proceed. Manual intervention is probably necessary.");
+				}
 				if (execution.getJobParameters().getParameters().size() > 0 && (status == BatchStatus.COMPLETED || status == BatchStatus.ABANDONED)) {
 					throw new JobInstanceAlreadyCompleteException(
 							"A job instance already exists and is complete for parameters=" + jobParameters

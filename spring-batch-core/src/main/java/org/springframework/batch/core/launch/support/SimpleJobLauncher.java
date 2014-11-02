@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2013 the original author or authors.
+ * Copyright 2006-2014 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -101,15 +101,21 @@ public class SimpleJobLauncher implements JobLauncher, InitializingBean {
 				throw new JobRestartException("JobInstance already exists and is not restartable");
 			}
 			/*
-			 * validate here if it has stepExecutions that are UNKNOWN
+			 * validate here if it has stepExecutions that are UNKNOWN, STARTING, STARTED and STOPPING
 			 * retrieve the previous execution and check
 			 */
 			for (StepExecution execution : lastExecution.getStepExecutions()) {
-				if (execution.getStatus() == BatchStatus.UNKNOWN) {
-					//throw
-					throw new JobRestartException("Step [" + execution.getStepName() + "] is of status UNKNOWN");
-				}//end if
-			}//end for
+				BatchStatus status = execution.getStatus();
+				if (status.isRunning() || status == BatchStatus.STOPPING) {
+					throw new JobExecutionAlreadyRunningException("A job execution for this job is already running: "
+							+ lastExecution);
+				} else if (status == BatchStatus.UNKNOWN) {
+					throw new JobRestartException(
+							"Cannot restart step [" + execution.getStepName() + "] from UNKNOWN status. "
+								+ "The last execution ended with a failure that could not be rolled back, "
+								+ "so it may be dangerous to proceed. Manual intervention is probably necessary.");
+				}
+			}
 		}
 
 		// Check the validity of the parameters before doing creating anything

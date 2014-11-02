@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2013 the original author or authors.
+ * Copyright 2006-2014 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -41,6 +41,7 @@ import org.springframework.batch.core.StepExecution;
 import org.springframework.batch.core.job.DefaultJobParametersValidator;
 import org.springframework.batch.core.job.JobSupport;
 import org.springframework.batch.core.launch.support.SimpleJobLauncher;
+import org.springframework.batch.core.repository.JobExecutionAlreadyRunningException;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.repository.JobRestartException;
 import org.springframework.core.task.TaskExecutor;
@@ -274,8 +275,25 @@ public class SimpleJobLauncherTests {
 	 */
 	@Test(expected=JobRestartException.class)
 	public void testRunStepStatusUnknown() throws Exception {
-		//try and restart a job where the step execution is UNKNOWN
-		//setup
+		testRestartStepExecutionInvalidStatus(BatchStatus.UNKNOWN);
+	}
+
+	@Test(expected = JobExecutionAlreadyRunningException.class)
+	public void testRunStepStatusStarting() throws Exception {
+		testRestartStepExecutionInvalidStatus(BatchStatus.STARTING);
+	}
+
+	@Test(expected = JobExecutionAlreadyRunningException.class)
+	public void testRunStepStatusStarted() throws Exception {
+		testRestartStepExecutionInvalidStatus(BatchStatus.STARTED);
+	}
+
+	@Test(expected = JobExecutionAlreadyRunningException.class)
+	public void testRunStepStatusStopping() throws Exception {
+		testRestartStepExecutionInvalidStatus(BatchStatus.STOPPING);
+	}
+
+	private void testRestartStepExecutionInvalidStatus(BatchStatus status) throws Exception {
 		String jobName = "test_job";
 		JobRepository jobRepository = mock(JobRepository.class);
 		JobParameters parameters = new JobParametersBuilder().addLong("runtime", System.currentTimeMillis()).toJobParameters();
@@ -288,7 +306,7 @@ public class SimpleJobLauncherTests {
 		when(job.isRestartable()).thenReturn(true);
 		when(job.getJobParametersValidator()).thenReturn(validator);
 		when(jobRepository.getLastJobExecution(jobName, parameters)).thenReturn(jobExecution);
-		when(stepExecution.getStatus()).thenReturn(BatchStatus.UNKNOWN);
+		when(stepExecution.getStatus()).thenReturn(status);
 		when(jobExecution.getStepExecutions()).thenReturn(Arrays.asList(stepExecution));
 
 		//setup launcher
@@ -297,6 +315,5 @@ public class SimpleJobLauncherTests {
 
 		//run
 		jobLauncher.run(job, parameters);
-
 	}
 }
