@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 the original author or authors.
+ * Copyright 2012-2014 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,6 +22,7 @@ import java.util.Map;
 
 import javax.sql.DataSource;
 
+import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.batch.item.AbstractItemStreamItemReaderTests;
 import org.springframework.batch.item.ExecutionContext;
@@ -93,5 +94,31 @@ public class JdbcPagingItemReaderCommonTests extends AbstractItemStreamItemReade
 		reader.afterPropertiesSet();
 		reader.open(new ExecutionContext());
 	}
+    
+    @Test(expected = IllegalArgumentException.class)
+    public void sortKeysMustBeSetWhenSaveStateIsTrue() throws Exception {
+		JdbcPagingItemReader<Foo> reader = new JdbcPagingItemReader<Foo>();
+		reader.setDataSource(dataSource);
+		HsqlPagingQueryProvider queryProvider = new HsqlPagingQueryProvider();
+		queryProvider.setSelectClause("select ID, NAME, VALUE");
+		queryProvider.setFromClause("from T_FOOS");
+		reader.setQueryProvider(queryProvider);
+		reader.setRowMapper(
+				new ParameterizedRowMapper<Foo>() {
+                    @Override
+					public Foo mapRow(ResultSet rs, int i) throws SQLException {
+						Foo foo = new Foo();
+						foo.setId(rs.getInt(1));
+						foo.setName(rs.getString(2));
+						foo.setValue(rs.getInt(3));
+						return foo;
+					}
+				}
+		);
+		reader.setPageSize(3);
+		reader.setSaveState(true);
+		
+		reader.afterPropertiesSet();
+    }
 
 }

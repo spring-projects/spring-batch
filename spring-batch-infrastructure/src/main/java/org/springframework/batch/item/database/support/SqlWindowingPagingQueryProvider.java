@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2012 the original author or authors.
+ * Copyright 2006-2014 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,6 +20,7 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 
 import org.springframework.batch.item.database.Order;
+import org.springframework.util.Assert;
 import org.springframework.util.StringUtils;
 
 /**
@@ -47,7 +48,9 @@ public class SqlWindowingPagingQueryProvider extends AbstractSqlPagingQueryProvi
 		sql.append(getOverSubstituteClauseEnd());
 		sql.append(") ").append(getSubQueryAlias()).append("WHERE ").append(extractTableAlias()).append(
 				"ROW_NUMBER <= ").append(pageSize);
-		sql.append(" ORDER BY ").append(SqlPagingQueryUtils.buildSortClause(this));
+		if (hasSortKeys()) {
+			sql.append(" ORDER BY ").append(SqlPagingQueryUtils.buildSortClause(this));	
+		}
 		
 		return sql.toString();
 	}
@@ -70,6 +73,9 @@ public class SqlWindowingPagingQueryProvider extends AbstractSqlPagingQueryProvi
 
 	@Override
 	public String generateRemainingPagesQuery(int pageSize) {
+		if (!hasSortKeys()) {
+			return generateFirstPageQuery(pageSize);
+		}
 		StringBuilder sql = new StringBuilder();
 		sql.append("SELECT * FROM ( ");
 		sql.append("SELECT ").append(StringUtils.hasText(getOrderedQueryAlias()) ? getOrderedQueryAlias() + ".*, " : "*, ");
@@ -95,6 +101,8 @@ public class SqlWindowingPagingQueryProvider extends AbstractSqlPagingQueryProvi
 
 	@Override
 	public String generateJumpToItemQuery(int itemIndex, int pageSize) {
+		Assert.notEmpty(getSortKeys(), "sortKeys must be specified for generating jumpToItem queries");
+		
 		int page = itemIndex / pageSize;
 		int lastRowNum = (page * pageSize);
 		if (lastRowNum <= 0) {
@@ -147,6 +155,9 @@ public class SqlWindowingPagingQueryProvider extends AbstractSqlPagingQueryProvi
 	}
 
 	protected String getOverClause() {
+		if (!hasSortKeys()) {
+			return "";
+		}
 		StringBuilder sql = new StringBuilder();
 		
 		sql.append(" ORDER BY ").append(SqlPagingQueryUtils.buildSortClause(this));

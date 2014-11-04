@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2012 the original author or authors.
+ * Copyright 2006-2014 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,6 +17,7 @@
 package org.springframework.batch.item.database.support;
 
 import org.springframework.batch.item.database.Order;
+import org.springframework.util.Assert;
 import org.springframework.util.StringUtils;
 
 import java.util.ArrayList;
@@ -52,7 +53,9 @@ public class SqlPagingQueryUtils {
 		sql.append(" FROM ").append(provider.getFromClause());
 		buildWhereClause(provider, remainingPageQuery, sql);
 		buildGroupByClause(provider, sql);
-		sql.append(" ORDER BY ").append(buildSortClause(provider));
+		if (provider.hasSortKeys()) {
+			sql.append(" ORDER BY ").append(buildSortClause(provider));
+		}
 		sql.append(" " + limitClause);
 
 		return sql.toString();
@@ -70,6 +73,9 @@ public class SqlPagingQueryUtils {
 	 */
 	public static String generateLimitGroupedSqlQuery(AbstractSqlPagingQueryProvider provider, boolean remainingPageQuery,
 			String limitClause) {
+		if (!provider.hasSortKeys()) {
+			return generateLimitSqlQuery(provider, remainingPageQuery, limitClause);
+		}
 		StringBuilder sql = new StringBuilder();
 		sql.append("SELECT * ");
 		sql.append(" FROM (");
@@ -103,8 +109,9 @@ public class SqlPagingQueryUtils {
 		sql.append(" FROM ").append(provider.getFromClause());
 		buildWhereClause(provider, remainingPageQuery, sql);
 		buildGroupByClause(provider, sql);
-		sql.append(" ORDER BY ").append(buildSortClause(provider));
-
+		if (provider.hasSortKeys()) {
+			sql.append(" ORDER BY ").append(buildSortClause(provider));
+		}
 		return sql.toString();
 	}
 
@@ -120,6 +127,9 @@ public class SqlPagingQueryUtils {
 	 */
 	public static String generateGroupedTopSqlQuery(AbstractSqlPagingQueryProvider provider, boolean remainingPageQuery,
 			String topClause) {
+		if (!provider.hasSortKeys()) {
+			return generateTopSqlQuery(provider, remainingPageQuery, topClause);
+		}
 		StringBuilder sql = new StringBuilder();
 		sql.append("SELECT ").append(topClause).append(" * FROM (");
 		sql.append("SELECT ").append(provider.getSelectClause());
@@ -168,9 +178,11 @@ public class SqlPagingQueryUtils {
 		sql.append(" FROM ").append(provider.getFromClause());
 		sql.append(provider.getWhereClause() == null ? "" : " WHERE " + provider.getWhereClause());
 		buildGroupByClause(provider, sql);
-		sql.append(" ORDER BY ").append(buildSortClause(provider));
+		if (provider.hasSortKeys()) {
+			sql.append(" ORDER BY ").append(buildSortClause(provider));
+		}
 		sql.append(") WHERE ").append(rowNumClause);
-		if(remainingPageQuery) {
+		if (remainingPageQuery && provider.hasSortKeys()) {
 			sql.append(" AND ");
 			buildSortConditions(provider, sql);
 		}
@@ -186,7 +198,7 @@ public class SqlPagingQueryUtils {
 
 	public static String generateRowNumSqlQueryWithNesting(AbstractSqlPagingQueryProvider provider,
 			String innerSelectClause, String outerSelectClause, boolean remainingPageQuery, String rowNumClause) {
-
+		Assert.notEmpty(provider.getSortKeys(), "sortKeys must be specified for generating jumpToItem queries");
 		StringBuilder sql = new StringBuilder();
 		sql.append("SELECT ").append(outerSelectClause).append(" FROM (SELECT ").append(outerSelectClause)
 				.append(", ").append(StringUtils.hasText(provider.getGroupClause()) ? "MIN(ROWNUM) as TMP_ROW_NUM" : "ROWNUM as TMP_ROW_NUM");
@@ -209,6 +221,7 @@ public class SqlPagingQueryUtils {
 	 * @return the generated query
 	 */
 	public static String generateLimitJumpToQuery(AbstractSqlPagingQueryProvider provider, String limitClause) {
+		Assert.notEmpty(provider.getSortKeys(), "sortKeys must be specified for generating jumpToItem queries");
 		StringBuilder sql = new StringBuilder();
 		sql.append("SELECT ").append(buildSortKeySelect(provider));
 		sql.append(" FROM ").append(provider.getFromClause());
@@ -229,6 +242,7 @@ public class SqlPagingQueryUtils {
 	 * @return the generated query
 	 */
 	public static String generateTopJumpToQuery(AbstractSqlPagingQueryProvider provider, String topClause) {
+		Assert.notEmpty(provider.getSortKeys(), "sortKeys must be specified for generating jumpToItem queries");
 		StringBuilder sql = new StringBuilder();
 		sql.append("SELECT ").append(topClause).append(" ").append(buildSortKeySelect(provider));
 		sql.append(" FROM ").append(provider.getFromClause());
@@ -353,10 +367,14 @@ public class SqlPagingQueryUtils {
 			sql.append(" WHERE ");
 			if (provider.getWhereClause() != null) {
 				sql.append(provider.getWhereClause());
-				sql.append(" AND ");
+				if (provider.hasSortKeys()) {
+					sql.append(" AND ");	
+				}
 			}
 
-			buildSortConditions(provider, sql);
+			if (provider.hasSortKeys()) {
+				buildSortConditions(provider, sql);
+			}
 		}
 		else {
 			sql.append(provider.getWhereClause() == null ? "" : " WHERE " + provider.getWhereClause());

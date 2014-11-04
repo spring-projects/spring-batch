@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 the original author or authors.
+ * Copyright 2012-2014 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -112,5 +112,10 @@ public class PostgresPagingQueryProviderTests extends AbstractSqlPagingQueryProv
 	@Override
 	public String getJumpToItemQueryForFirstPageWithMultipleSortKeys() {
 		return "SELECT name, id FROM foo WHERE bar = 1 ORDER BY name ASC, id DESC LIMIT 1 OFFSET 0";
+	}
+
+	@Override
+	public String getFirstPageSqlWithoutSortKeys() {
+		return "SELECT id, name, age FROM foo WHERE bar = 1 LIMIT 100";
 	}
 }
