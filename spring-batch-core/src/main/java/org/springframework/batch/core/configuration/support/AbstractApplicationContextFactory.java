@@ -16,8 +16,14 @@
 
 package org.springframework.batch.core.configuration.support;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.List;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.BeanFactoryAware;
 import org.springframework.beans.factory.config.BeanFactoryPostProcessor;
@@ -33,11 +39,7 @@ import org.springframework.context.ApplicationContextAware;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.support.PropertySourcesPlaceholderConfigurer;
 import org.springframework.util.Assert;
-
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.List;
+import org.springframework.util.ClassUtils;
 
 /**
  * {@link ApplicationContextFactory} implementation that takes a parent context and a path to the context to create.
@@ -200,17 +202,50 @@ public abstract class AbstractApplicationContextFactory implements ApplicationCo
 	protected void prepareBeanFactory(ConfigurableListableBeanFactory parent,
 			ConfigurableListableBeanFactory beanFactory) {
 		if (copyConfiguration && parent != null) {
+			List<BeanPostProcessor> parentPostProcessors = new ArrayList<BeanPostProcessor>();
+			List<BeanPostProcessor> childPostProcessors = new ArrayList<BeanPostProcessor>();
+
+			childPostProcessors.addAll(beanFactory instanceof AbstractBeanFactory ? ((AbstractBeanFactory) beanFactory)
+					.getBeanPostProcessors() : new ArrayList<BeanPostProcessor>());
+			parentPostProcessors.addAll(parent instanceof AbstractBeanFactory ? ((AbstractBeanFactory) parent)
+					.getBeanPostProcessors() : new ArrayList<BeanPostProcessor>());
+
+			try {
+				Class<?> applicationContextAwareProcessorClass =
+						ClassUtils.forName("org.springframework.context.support.ApplicationContextAwareProcessor",
+								parent.getBeanClassLoader());
+
+				for (BeanPostProcessor beanPostProcessor : new ArrayList<BeanPostProcessor>(parentPostProcessors)) {
+					if (applicationContextAwareProcessorClass.isAssignableFrom(beanPostProcessor.getClass())) {
+						logger.debug("Removing parent ApplicationContextAwareProcessor");
+						parentPostProcessors.remove(beanPostProcessor);
+					}
+				}
+			}
+			catch (ClassNotFoundException e) {
+				throw new IllegalStateException(e);
+			}
+
+			List<BeanPostProcessor> aggregatedPostProcessors = new ArrayList<BeanPostProcessor>();
+			aggregatedPostProcessors.addAll(childPostProcessors);
+			aggregatedPostProcessors.addAll(parentPostProcessors);
+
+			for (BeanPostProcessor beanPostProcessor : new ArrayList<BeanPostProcessor>(aggregatedPostProcessors)) {
+				for (Class<?> cls : beanPostProcessorExcludeClasses) {
+					if (cls.isAssignableFrom(beanPostProcessor.getClass())) {
+						logger.debug("Removing bean post processor: " + beanPostProcessor + " of type " + cls);
+						aggregatedPostProcessors.remove(beanPostProcessor);
+					}
+				}
+			}
+
 			beanFactory.copyConfigurationFrom(parent);
+
 			List<BeanPostProcessor> beanPostProcessors = beanFactory instanceof AbstractBeanFactory ? ((AbstractBeanFactory) beanFactory)
 					.getBeanPostProcessors() : new ArrayList<BeanPostProcessor>();
-					for (BeanPostProcessor beanPostProcessor : new ArrayList<BeanPostProcessor>(beanPostProcessors)) {
-						for (Class<?> cls : beanPostProcessorExcludeClasses) {
-							if (cls.isAssignableFrom(beanPostProcessor.getClass())) {
-								logger.debug("Removing bean post processor: " + beanPostProcessor + " of type " + cls);
-								beanPostProcessors.remove(beanPostProcessor);
-							}
-						}
-					}
+
+			beanPostProcessors.clear();
+			beanPostProcessors.addAll(aggregatedPostProcessors);
 		}
 	}
 

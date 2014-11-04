@@ -15,7 +15,12 @@
  */
 package org.springframework.batch.core.configuration.annotation;
 
+import static org.junit.Assert.assertEquals;
+
+import javax.annotation.PostConstruct;
+
 import org.junit.Test;
+
 import org.springframework.batch.core.BatchStatus;
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.JobExecution;
@@ -36,10 +41,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-
-import javax.annotation.PostConstruct;
-
-import static org.junit.Assert.assertEquals;
+import org.springframework.context.support.ApplicationObjectSupport;
 
 /**
  * @author Dave Syer
@@ -113,6 +115,11 @@ public class JobLoaderConfigurationTests {
 
 	@Configuration
 	public static class TestConfiguration {
+
+		@Bean
+		public ApplicationObjectSupport fakeApplicationObjectSupport() {
+			return new ApplicationObjectSupport() {};
+		}
 
 		@Autowired
 		private JobBuilderFactory jobs;
