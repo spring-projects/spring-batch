@@ -35,7 +35,9 @@ import org.springframework.batch.item.mail.MailErrorHandler;
 import org.springframework.mail.MailException;
 import org.springframework.mail.MailMessage;
 import org.springframework.mail.MailSendException;
+import org.springframework.mail.MailSender;
 import org.springframework.mail.javamail.JavaMailSender;
+import org.springframework.util.ReflectionUtils;
 
 /**
  * @author Dave Syer
@@ -78,12 +80,17 @@ public class MimeMessageItemWriterTests {
 		MimeMessage bar = new MimeMessage(session);
 		MimeMessage[] items = new MimeMessage[] { foo, bar };
 
-		mailSender.send(aryEq(items));
+		// Spring 4.1 changed the send method to be vargs instead of an array
+		if(ReflectionUtils.findMethod(MailSender.class, "send", MimeMessage[].class) != null) {
+			mailSender.send(aryEq(items));
+		}
+		else {
+			mailSender.send(items);
+		}
+
 		when(mailSender).thenThrow(new MailSendException(Collections.singletonMap((Object)foo, (Exception)new MessagingException("FOO"))));
 
 		writer.write(Arrays.asList(items));
-
-
 	}
 
 	@Test
@@ -101,7 +108,15 @@ public class MimeMessageItemWriterTests {
 		MimeMessage bar = new MimeMessage(session);
 		MimeMessage[] items = new MimeMessage[] { foo, bar };
 
-		mailSender.send(aryEq(items));
+
+		// Spring 4.1 changed the send method to be vargs instead of an array
+		if(ReflectionUtils.findMethod(MailSender.class, "send", MimeMessage[].class) != null) {
+			mailSender.send(aryEq(items));
+		}
+		else {
+			mailSender.send(items);
+		}
+
 		when(mailSender).thenThrow(new MailSendException(Collections.singletonMap((Object)foo, (Exception)new MessagingException("FOO"))));
 
 		writer.write(Arrays.asList(items));
