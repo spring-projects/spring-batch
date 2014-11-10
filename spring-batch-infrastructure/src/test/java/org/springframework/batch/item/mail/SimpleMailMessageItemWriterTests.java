@@ -17,6 +17,7 @@ package org.springframework.batch.item.mail;
 
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.mockito.AdditionalMatchers.aryEq;
 
@@ -28,11 +29,13 @@ import javax.mail.MessagingException;
 
 import org.junit.Before;
 import org.junit.Test;
+
 import org.springframework.mail.MailException;
 import org.springframework.mail.MailMessage;
 import org.springframework.mail.MailSendException;
 import org.springframework.mail.MailSender;
 import org.springframework.mail.SimpleMailMessage;
+import org.springframework.util.ReflectionUtils;
 
 /**
  * @author Dave Syer
@@ -59,11 +62,15 @@ public class SimpleMailMessageItemWriterTests {
 		SimpleMailMessage bar = new SimpleMailMessage();
 		SimpleMailMessage[] items = new SimpleMailMessage[] { foo, bar };
 
-		mailSender.send(aryEq(items));
-
 		writer.write(Arrays.asList(items));
 
-
+		// Spring 4.1 changed the send method to be vargs instead of an array
+		if(ReflectionUtils.findMethod(SimpleMailMessage.class, "send", SimpleMailMessage[].class) != null) {
+			verify(mailSender).send(aryEq(items));
+		}
+		else {
+			verify(mailSender).send(items);
+		}
 	}
 
 	@Test(expected = MailSendException.class)
@@ -73,11 +80,17 @@ public class SimpleMailMessageItemWriterTests {
 		SimpleMailMessage bar = new SimpleMailMessage();
 		SimpleMailMessage[] items = new SimpleMailMessage[] { foo, bar };
 
-		mailSender.send(aryEq(items));
+		// Spring 4.1 changed the send method to be vargs instead of an array
+		if(ReflectionUtils.findMethod(SimpleMailMessage.class, "send", SimpleMailMessage[].class) != null) {
+			mailSender.send(aryEq(items));
+		}
+		else {
+			mailSender.send(items);
+		}
+
 		when(mailSender).thenThrow(new MailSendException(Collections.singletonMap((Object)foo, (Exception)new MessagingException("FOO"))));
 
 		writer.write(Arrays.asList(items));
-
 	}
 
 	@Test
@@ -95,14 +108,19 @@ public class SimpleMailMessageItemWriterTests {
 		SimpleMailMessage bar = new SimpleMailMessage();
 		SimpleMailMessage[] items = new SimpleMailMessage[] { foo, bar };
 
-		mailSender.send(aryEq(items));
+		// Spring 4.1 changed the send method to be vargs instead of an array
+		if(ReflectionUtils.findMethod(SimpleMailMessage.class, "send", SimpleMailMessage[].class) != null) {
+			mailSender.send(aryEq(items));
+		}
+		else {
+			mailSender.send(items);
+		}
+
 		when(mailSender).thenThrow(new MailSendException(Collections.singletonMap((Object)foo, (Exception)new MessagingException("FOO"))));
 
 		writer.write(Arrays.asList(items));
 
 		assertEquals("FOO", content.get());
-
-
 	}
 
 }
