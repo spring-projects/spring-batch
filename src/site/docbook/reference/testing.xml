@@ -34,7 +34,7 @@
     <programlisting language="java">@RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(locations = { "/simple-job-launcher-context.xml",
                                     "/jobs/skipSampleJob.xml" })
-public class SkipSampleFunctionalTests extends AbstractJobTests { ... }</programlisting>
+public class SkipSampleFunctionalTests { ... }</programlisting>
   </section>
 
   <section id="endToEndTesting">
@@ -50,8 +50,8 @@ public class SkipSampleFunctionalTests extends AbstractJobTests { ... }</program
     records. The test then launches the <classname>Job </classname>using the
     <methodname>launchJob()</methodname> method. The
     <methodname>launchJob</methodname>() method is provided by the
-    <classname>AbstractJobTests</classname> parent class. Also provided by the
-    super class is <classname>launchJob(JobParameters)</classname>, which
+    <classname>JobLauncherTestUtils</classname> class. Also provided by the
+    utils class is <classname>launchJob(JobParameters)</classname>, which
     allows the test to give particular parameters. The
     <methodname>launchJob()</methodname> method returns the
     <classname>JobExecution</classname> object which is useful for asserting
