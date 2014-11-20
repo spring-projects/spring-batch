@@ -5,7 +5,7 @@ apply plugin: 'idea'
 
 buildscript {
 	repositories {
-		maven { url 'http://repo.spring.io/plugins-release' }
+		maven { url 'https://repo.spring.io/plugins-release' }
 	}
 	dependencies {
 		classpath 'org.springframework.build.gradle:docbook-reference-plugin:0.2.8'
@@ -29,11 +29,11 @@ allprojects {
 	group = 'org.springframework.batch'
 
 	repositories {
-		maven { url 'http://repo.spring.io/libs-milestone' }
-		maven { url 'http://repo.spring.io/plugins-release' }
+		maven { url 'https://repo.spring.io/libs-milestone' }
+		maven { url 'https://repo.spring.io/plugins-release' }
         maven { url "https://repo.spring.io/libs-snapshot" }
 
-		maven { url 'http://m2.neo4j.org/content/repositories/releases'}
+		maven { url 'https://m2.neo4j.org/content/repositories/releases'}
 		mavenCentral()
 	}
 
