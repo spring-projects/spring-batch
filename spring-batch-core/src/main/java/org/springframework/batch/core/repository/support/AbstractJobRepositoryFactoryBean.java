@@ -201,7 +201,7 @@ public abstract class AbstractJobRepositoryFactoryBean implements FactoryBean<Jo
 		if (proxyFactory == null) {
 			afterPropertiesSet();
 		}
-		return (JobRepository) proxyFactory.getProxy();
+		return (JobRepository) proxyFactory.getProxy(getClass().getClassLoader());
 	}
 
 }
