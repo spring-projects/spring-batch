@@ -16,27 +16,33 @@
 
 package org.springframework.batch.core.configuration.annotation;
 
+import static org.junit.Assert.assertEquals;
+
+import java.util.concurrent.Callable;
+
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
+
 import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.JobInstance;
+import org.springframework.batch.core.StepContribution;
+import org.springframework.batch.core.scope.context.ChunkContext;
 import org.springframework.batch.core.scope.context.JobSynchronizationManager;
+import org.springframework.batch.core.step.tasklet.Tasklet;
+import org.springframework.batch.repeat.RepeatStatus;
 import org.springframework.beans.factory.BeanCreationException;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.ImportResource;
 import org.springframework.context.annotation.Scope;
 import org.springframework.context.annotation.ScopedProxyMode;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
-
-import java.util.concurrent.Callable;
-
-import static org.junit.Assert.assertEquals;
 
 /**
  * @author Dave Syer
@@ -84,6 +90,16 @@ public class JobScopeConfigurationTests {
 	public void testJobScopeWithProxyTargetClass() throws Exception {
 		init(JobScopeConfigurationRequiringProxyTargetClass.class);
 		SimpleHolder value = context.getBean(SimpleHolder.class);
+		assertEquals("JOB", value.call());
+	}
+
+	@Test
+	public void testStepScopeXmlImportUsingNamespace() throws Exception {
+		init(JobScopeConfigurationXmlImportUsingNamespace.class);
+
+		SimpleHolder value = (SimpleHolder) context.getBean("xmlValue");
+		assertEquals("JOB", value.call());
+		value = (SimpleHolder) context.getBean("javaValue");
 		assertEquals("JOB", value.call());
 	}
 
@@ -197,6 +213,27 @@ public class JobScopeConfigurationTests {
 
 		public SimpleHolder getValue() {
 			return value;
+		}
+
+	}
+
+	public static class TaskletSupport implements Tasklet {
+
+		@Override
+		public RepeatStatus execute(StepContribution contribution, ChunkContext chunkContext) throws Exception {
+			return RepeatStatus.FINISHED;
+		}
+	}
+
+	@Configuration
+	@ImportResource("org/springframework/batch/core/configuration/annotation/JobScopeConfigurationTestsXmlImportUsingNamespace-context.xml")
+	@EnableBatchProcessing
+	public static class JobScopeConfigurationXmlImportUsingNamespace {
+
+		@Bean
+		@JobScope
+		protected SimpleHolder javaValue(@Value("#{jobName}") final String value) {
+			return new SimpleHolder(value);
 		}
 
 	}
