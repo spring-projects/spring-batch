@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	   xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
+
+	<bean id="transactionManager" class="org.springframework.batch.support.transaction.ResourcelessTransactionManager"/>
+
+	<bean id="jobRepository" class="org.springframework.batch.core.repository.support.MapJobRepositoryFactoryBean">
+		<property name="transactionManager" ref="transactionManager"/>
+	</bean>
+
+	<bean id="jobExplorer" class="org.springframework.batch.core.explore.support.MapJobExplorerFactoryBean">
+		<property name="repositoryFactory" ref="&amp;jobRepository"/>
+	</bean>
+
+	<bean id="jobParametersConverter" class="org.springframework.batch.core.converter.DefaultJobParametersConverter"/>
+
+	<bean id="jsrJobOperator" class="org.springframework.batch.core.jsr.launch.JsrJobOperator">
+		<constructor-arg ref="jobExplorer"/>
+		<constructor-arg ref="jobRepository"/>
+		<constructor-arg ref="jobParametersConverter"/>
+		<constructor-arg ref="transactionManager"/>
+	</bean>
+
+</beans>
