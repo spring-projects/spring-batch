@@ -81,6 +81,7 @@ import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;
 import org.springframework.core.task.SimpleAsyncTaskExecutor;
 import org.springframework.core.task.TaskExecutor;
+import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.util.Assert;
 
 /**
@@ -144,7 +145,8 @@ public class JsrJobOperator implements JobOperator, InitializingBean {
 	private JobRepository jobRepository;
 	private TaskExecutor taskExecutor;
 	private JobParametersConverter jobParametersConverter;
-	private static ApplicationContext baseContext;
+	private ApplicationContext baseContext;
+	private PlatformTransactionManager transactionManager;
 	private static ExecutingJobRegistry jobRegistry = new ExecutingJobRegistry();
 
 	/**
@@ -174,14 +176,16 @@ public class JsrJobOperator implements JobOperator, InitializingBean {
 	 * @param jobRepository an instance of Spring Batch's {@link JobOperator}
 	 * @param jobParametersConverter an instance of Spring Batch's {@link JobParametersConverter}
 	 */
-	public JsrJobOperator(JobExplorer jobExplorer, JobRepository jobRepository, JobParametersConverter jobParametersConverter) {
+	public JsrJobOperator(JobExplorer jobExplorer, JobRepository jobRepository, JobParametersConverter jobParametersConverter, PlatformTransactionManager transactionManager) {
 		Assert.notNull(jobExplorer, "A JobExplorer is required");
 		Assert.notNull(jobRepository, "A JobRepository is required");
 		Assert.notNull(jobParametersConverter, "A ParametersConverter is required");
+		Assert.notNull(transactionManager, "A PlatformTransactionManager is required");
 
 		this.jobExplorer = jobExplorer;
 		this.jobRepository = jobRepository;
 		this.jobParametersConverter = jobParametersConverter;
+		this.transactionManager = transactionManager;
 	}
 
 	public void setJobExplorer(JobExplorer jobExplorer) {
@@ -607,7 +611,14 @@ public class JsrJobOperator implements JobOperator, InitializingBean {
 		beanDefinition.setScope(BeanDefinition.SCOPE_SINGLETON);
 		batchContext.registerBeanDefinition(JSR_JOB_CONTEXT_BEAN_NAME, beanDefinition);
 
-		batchContext.setParent(baseContext);
+		if(baseContext != null) {
+			batchContext.setParent(baseContext);
+		} else {
+			batchContext.getBeanFactory().registerSingleton("jobExplorer", jobExplorer);
+			batchContext.getBeanFactory().registerSingleton("jobRepository", jobRepository);
+			batchContext.getBeanFactory().registerSingleton("jobParametersConverter", jobParametersConverter);
+			batchContext.getBeanFactory().registerSingleton("transactionManager", transactionManager);
+		}
 
 		try {
 			batchContext.refresh();

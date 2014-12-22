@@ -15,26 +15,20 @@
  */
 package org.springframework.batch.core.jsr.launch;
 
-import org.junit.Before;
-import org.junit.Test;
-import org.mockito.ArgumentCaptor;
-import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
-import org.springframework.batch.core.JobExecution;
-import org.springframework.batch.core.JobInstance;
-import org.springframework.batch.core.JobParametersBuilder;
-import org.springframework.batch.core.StepExecution;
-import org.springframework.batch.core.converter.JobParametersConverter;
-import org.springframework.batch.core.converter.JobParametersConverterSupport;
-import org.springframework.batch.core.explore.JobExplorer;
-import org.springframework.batch.core.explore.support.SimpleJobExplorer;
-import org.springframework.batch.core.jsr.AbstractJsrTestCase;
-import org.springframework.batch.core.jsr.JsrJobParametersConverter;
-import org.springframework.batch.core.repository.JobRepository;
-import org.springframework.batch.core.step.JobRepositorySupport;
-import org.springframework.beans.factory.BeanCreationException;
-import org.springframework.core.task.AsyncTaskExecutor;
-import org.springframework.core.task.SyncTaskExecutor;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Properties;
+import java.util.Set;
 
 import javax.batch.api.AbstractBatchlet;
 import javax.batch.api.Batchlet;
@@ -47,20 +41,29 @@ import javax.batch.operations.NoSuchJobExecutionException;
 import javax.batch.operations.NoSuchJobInstanceException;
 import javax.batch.runtime.BatchRuntime;
 import javax.batch.runtime.BatchStatus;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Properties;
-import java.util.Set;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import org.junit.Before;
+import org.junit.Test;
+import org.mockito.ArgumentCaptor;
+import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
+
+import org.springframework.batch.core.JobExecution;
+import org.springframework.batch.core.JobInstance;
+import org.springframework.batch.core.JobParametersBuilder;
+import org.springframework.batch.core.StepExecution;
+import org.springframework.batch.core.converter.JobParametersConverter;
+import org.springframework.batch.core.converter.JobParametersConverterSupport;
+import org.springframework.batch.core.explore.JobExplorer;
+import org.springframework.batch.core.explore.support.SimpleJobExplorer;
+import org.springframework.batch.core.jsr.AbstractJsrTestCase;
+import org.springframework.batch.core.jsr.JsrJobParametersConverter;
+import org.springframework.batch.core.repository.JobRepository;
+import org.springframework.batch.core.step.JobRepositorySupport;
+import org.springframework.batch.support.transaction.ResourcelessTransactionManager;
+import org.springframework.beans.factory.BeanCreationException;
+import org.springframework.core.task.AsyncTaskExecutor;
+import org.springframework.core.task.SyncTaskExecutor;
 
 public class JsrJobOperatorTests extends AbstractJsrTestCase {
 
@@ -76,7 +79,7 @@ public class JsrJobOperatorTests extends AbstractJsrTestCase {
 	public void setup() {
 		MockitoAnnotations.initMocks(this);
 		parameterConverter = new JobParametersConverterSupport();
-		jsrJobOperator = new JsrJobOperator(jobExplorer, jobRepository, parameterConverter);
+		jsrJobOperator = new JsrJobOperator(jobExplorer, jobRepository, parameterConverter, new ResourcelessTransactionManager());
 	}
 
 	@Test
@@ -88,24 +91,30 @@ public class JsrJobOperatorTests extends AbstractJsrTestCase {
 	@Test
 	public void testNullsInConstructor() {
 		try {
-			new JsrJobOperator(null, new JobRepositorySupport(), parameterConverter);
+			new JsrJobOperator(null, new JobRepositorySupport(), parameterConverter, null);
 			fail("JobExplorer should be required");
 		} catch (IllegalArgumentException correct) {
 		}
 
 		try {
-			new JsrJobOperator(new SimpleJobExplorer(null, null, null, null), null, parameterConverter);
+			new JsrJobOperator(new SimpleJobExplorer(null, null, null, null), null, parameterConverter, null);
 			fail("JobRepository should be required");
 		} catch (IllegalArgumentException correct) {
 		}
 
 		try {
-			new JsrJobOperator(new SimpleJobExplorer(null, null, null, null), new JobRepositorySupport(), null);
+			new JsrJobOperator(new SimpleJobExplorer(null, null, null, null), new JobRepositorySupport(), null, null);
 			fail("ParameterConverter should be required");
 		} catch (IllegalArgumentException correct) {
 		}
 
-		new JsrJobOperator(new SimpleJobExplorer(null, null, null, null), new JobRepositorySupport(), parameterConverter);
+		try {
+			new JsrJobOperator(new SimpleJobExplorer(null, null, null, null), new JobRepositorySupport(), parameterConverter, null);
+		}
+		catch (IllegalArgumentException correct) {
+		}
+
+		new JsrJobOperator(new SimpleJobExplorer(null, null, null, null), new JobRepositorySupport(), parameterConverter, new ResourcelessTransactionManager());
 	}
 
 	@Test
