@@ -1,12 +1,29 @@
 package org.springframework.batch.integration.partition;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Set;
+import java.util.concurrent.Callable;
+import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
+
+import javax.sql.DataSource;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+
 import org.springframework.batch.core.Step;
 import org.springframework.batch.core.StepExecution;
+import org.springframework.batch.core.explore.JobExplorer;
+import org.springframework.batch.core.explore.support.JobExplorerFactoryBean;
 import org.springframework.batch.core.partition.PartitionHandler;
 import org.springframework.batch.core.partition.StepExecutionSplitter;
 import org.springframework.batch.core.repository.JobRepository;
+import org.springframework.batch.poller.DirectPoller;
+import org.springframework.batch.poller.Poller;
+import org.springframework.beans.factory.InitializingBean;
 import org.springframework.integration.MessageTimeoutException;
 import org.springframework.integration.annotation.Aggregator;
 import org.springframework.integration.annotation.MessageEndpoint;
@@ -20,18 +37,22 @@ import org.springframework.messaging.PollableChannel;
 import org.springframework.util.Assert;
 import org.springframework.util.CollectionUtils;
 
-import java.util.Collection;
-import java.util.List;
-import java.util.Set;
-
 /**
  * A {@link PartitionHandler} that uses {@link MessageChannel} instances to send instructions to remote workers and
  * receive their responses. The {@link MessageChannel} provides a nice abstraction so that the location of the workers
  * and the transport used to communicate with them can be changed at run time. The communication with the remote workers
  * does not need to be transactional or have guaranteed delivery, so a local thread pool based implementation works as
- * well as a remote web service or JMS implementation. If a remote worker fails or doesn't send a reply message, the job
- * will fail and can be restarted to pick up missing messages and processing. The remote workers need access to the
- * Spring Batch {@link JobRepository} so that the shared state across those restarts can be managed centrally.
+ * well as a remote web service or JMS implementation. If a remote worker fails, the job will fail and can be restarted
+ * to pick up missing messages and processing. The remote workers need access to the Spring Batch {@link JobRepository}
+ * so that the shared state across those restarts can be managed centrally.
+ *
+ * While a {@link org.springframework.messaging.MessageChannel} is used for sending the requests to the workers, the
+ * worker's responses can be obtained in one of two ways:
+ * <ul>
+ *     <li>A reply channel - Slaves will respond with messages that will be aggregated via this component.</li>
+ *     <li>Polling the job repository - Since the state of each slave is maintained independently within the job
+ *     repository, we can poll the store to determine the state without the need of the slaves to formally respond.</li>
+ * </ul>
  *
  * @author Dave Syer
  * @author Will Schipp
@@ -39,7 +60,7 @@ import java.util.Set;
  *
  */
 @MessageEndpoint
-public class MessageChannelPartitionHandler implements PartitionHandler {
+public class MessageChannelPartitionHandler implements PartitionHandler, InitializingBean {
 
 	private static Log logger = LogFactory.getLog(MessageChannelPartitionHandler.class);
 
@@ -49,14 +70,75 @@ public class MessageChannelPartitionHandler implements PartitionHandler {
 
 	private String stepName;
 
+	private long pollInterval = 10000;
+
+	private JobExplorer jobExplorer;
+
+	private boolean pollRepositoryForResults = false;
+
+	private long timeout = -1;
+
+	private DataSource dataSource;
+
 	/**
 	 * pollable channel for the replies
 	 */
 	private PollableChannel replyChannel;
 
+	@Override
 	public void afterPropertiesSet() throws Exception {
 		Assert.notNull(stepName, "A step name must be provided for the remote workers.");
 		Assert.state(messagingGateway != null, "The MessagingOperations must be set");
+
+		pollRepositoryForResults = !(dataSource == null && jobExplorer == null);
+
+		if(pollRepositoryForResults) {
+			logger.debug("MessageChannelPartitionHandler is configured to poll the job repository for slave results");
+		}
+
+		if(dataSource != null && jobExplorer == null) {
+			JobExplorerFactoryBean jobExplorerFactoryBean = new JobExplorerFactoryBean();
+			jobExplorerFactoryBean.setDataSource(dataSource);
+			jobExplorerFactoryBean.afterPropertiesSet();
+			jobExplorer = jobExplorerFactoryBean.getObject();
+		}
+	}
+
+	/**
+	 * When using job repository polling, the time limit to wait.
+	 *
+	 * @param timeout millisconds to wait, defaults to -1 (no timeout).
+	 */
+	public void setTimeout(long timeout) {
+		this.timeout = timeout;
+	}
+
+	/**
+	 * {@link org.springframework.batch.core.explore.JobExplorer} to use to query the job repository.  Either this or
+	 * a {@link javax.sql.DataSource} is required when using job repository polling.
+	 *
+	 * @param jobExplorer {@link org.springframework.batch.core.explore.JobExplorer} to use for lookups
+	 */
+	public void setJobExplorer(JobExplorer jobExplorer) {
+		this.jobExplorer = jobExplorer;
+	}
+
+	/**
+	 * How often to poll the job repository for the status of the slaves.
+	 *
+	 * @param pollInterval milliseconds between polls, defaults to 10000 (10 seconds).
+	 */
+	public void setPollInterval(long pollInterval) {
+		this.pollInterval = pollInterval;
+	}
+
+	/**
+	 * {@link javax.sql.DataSource} pointing to the job repository
+	 *
+	 * @param dataSource {@link javax.sql.DataSource} that points to the job repository's store
+	 */
+	public void setDataSource(DataSource dataSource) {
+		this.dataSource = dataSource;
 	}
 
 	/**
@@ -117,9 +199,9 @@ public class MessageChannelPartitionHandler implements PartitionHandler {
 	 * @see PartitionHandler#handle(StepExecutionSplitter, StepExecution)
 	 */
 	public Collection<StepExecution> handle(StepExecutionSplitter stepExecutionSplitter,
-			StepExecution masterStepExecution) throws Exception {
+			final StepExecution masterStepExecution) throws Exception {
 
-		Set<StepExecution> split = stepExecutionSplitter.split(masterStepExecution, gridSize);
+		final Set<StepExecution> split = stepExecutionSplitter.split(masterStepExecution, gridSize);
 
 		if(CollectionUtils.isEmpty(split)) {
 			return null;
@@ -127,21 +209,76 @@ public class MessageChannelPartitionHandler implements PartitionHandler {
 
 		int count = 0;
 
-		if (replyChannel == null) {
-			replyChannel = new QueueChannel();
+		PollableChannel currentReplyChannel = replyChannel;
+
+		if (!pollRepositoryForResults && currentReplyChannel == null) {
+			currentReplyChannel = new QueueChannel();
 		}//end if
 
 		for (StepExecution stepExecution : split) {
 			Message<StepExecutionRequest> request = createMessage(count++, split.size(), new StepExecutionRequest(
-					stepName, stepExecution.getJobExecutionId(), stepExecution.getId()), replyChannel);
+					stepName, stepExecution.getJobExecutionId(), stepExecution.getId()), currentReplyChannel);
 			if (logger.isDebugEnabled()) {
 				logger.debug("Sending request: " + request);
 			}
 			messagingGateway.send(request);
 		}
 
+		if(!pollRepositoryForResults) {
+			return receiveReplies(currentReplyChannel);
+		}
+		else {
+			return pollReplies(masterStepExecution, split);
+		}
+	}
+
+	private Collection<StepExecution> pollReplies(final StepExecution masterStepExecution, final Set<StepExecution> split) throws Exception {
+		final Collection<StepExecution> result = new ArrayList<StepExecution>(split.size());
+
+		Callable<Collection<StepExecution>> callback = new Callable<Collection<StepExecution>>() {
+			@Override
+			public Collection<StepExecution> call() throws Exception {
+
+				for(Iterator<StepExecution> stepExecutionIterator = split.iterator(); stepExecutionIterator.hasNext(); ) {
+					StepExecution curStepExecution = stepExecutionIterator.next();
+
+					if(!result.contains(curStepExecution)) {
+						StepExecution partitionStepExecution =
+								jobExplorer.getStepExecution(masterStepExecution.getJobExecutionId(), curStepExecution.getId());
+
+						if(!partitionStepExecution.getStatus().isRunning()) {
+							result.add(partitionStepExecution);
+						}
+					}
+				}
+
+				if(logger.isDebugEnabled()) {
+					logger.debug(String.format("Currently waiting on %s partitions to finish", split.size()));
+				}
+
+				if(result.size() == split.size()) {
+					return result;
+				}
+				else {
+					return null;
+				}
+			}
+		};
+
+		Poller<Collection<StepExecution>> poller = new DirectPoller<Collection<StepExecution>>(pollInterval);
+		Future<Collection<StepExecution>> resultsFuture = poller.poll(callback);
+
+		if(timeout >= 0) {
+			return resultsFuture.get(timeout, TimeUnit.MILLISECONDS);
+		}
+		else {
+			return resultsFuture.get();
+		}
+	}
+
+	private Collection<StepExecution> receiveReplies(PollableChannel currentReplyChannel) {
 		@SuppressWarnings("unchecked")
-		Message<Collection<StepExecution>> message = (Message<Collection<StepExecution>>) messagingGateway.receive(replyChannel);
+		Message<Collection<StepExecution>> message = (Message<Collection<StepExecution>>) messagingGateway.receive(currentReplyChannel);
 
 		if(message == null) {
 			throw new MessageTimeoutException("Timeout occurred before all partitions returned");
@@ -149,9 +286,7 @@ public class MessageChannelPartitionHandler implements PartitionHandler {
 			logger.debug("Received replies: " + message);
 		}
 
-		Collection<StepExecution> result = message.getPayload();
-		return result;
-
+		return message.getPayload();
 	}
 
 	private Message<StepExecutionRequest> createMessage(int sequenceNumber, int sequenceSize,
