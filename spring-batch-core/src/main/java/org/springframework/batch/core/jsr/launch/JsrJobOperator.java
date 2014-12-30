@@ -122,6 +122,9 @@ import org.springframework.util.Assert;
  * 	&lt;/bean&gt;
  * &lt;/beans&gt;
  *
+ * A custom configuration of the above components can be specified by providing a system property JSR-352-BASE-CONTEXT.
+ * The location that is provided by this system property will override any beans as defined in baseContext.xml.
+ *
  * Calls to {@link JobOperator#start(String, Properties)} will provide a child context to the above context
  * using the job definition and batch.xml if provided.
  *
@@ -198,6 +201,12 @@ public class JsrJobOperator implements JobOperator, InitializingBean {
 		Assert.notNull(jobRepository, "A JobRepository is required");
 
 		this.jobRepository = jobRepository;
+	}
+
+	public void setTransactionManager(PlatformTransactionManager transactionManager) {
+		Assert.notNull(transactionManager, "A PlatformTransactionManager is required");
+
+		this.transactionManager = transactionManager;
 	}
 
 	public void setTaskExecutor(TaskExecutor taskExecutor) {
