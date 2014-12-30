@@ -23,8 +23,11 @@ import static org.junit.Assert.fail;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import java.lang.reflect.Field;
+import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Properties;
@@ -62,8 +65,10 @@ import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.step.JobRepositorySupport;
 import org.springframework.batch.support.transaction.ResourcelessTransactionManager;
 import org.springframework.beans.factory.BeanCreationException;
+import org.springframework.context.access.ContextSingletonBeanFactoryLocator;
 import org.springframework.core.task.AsyncTaskExecutor;
 import org.springframework.core.task.SyncTaskExecutor;
+import org.springframework.test.util.ReflectionTestUtils;
 
 public class JsrJobOperatorTests extends AbstractJsrTestCase {
 
@@ -76,7 +81,9 @@ public class JsrJobOperatorTests extends AbstractJsrTestCase {
 	private static final long TIMEOUT = 10000L;
 
 	@Before
-	public void setup() {
+	public void setup() throws Exception {
+		resetBaseContext();
+
 		MockitoAnnotations.initMocks(this);
 		parameterConverter = new JobParametersConverterSupport();
 		jsrJobOperator = new JsrJobOperator(jobExplorer, jobRepository, parameterConverter, new ResourcelessTransactionManager());
@@ -115,6 +122,38 @@ public class JsrJobOperatorTests extends AbstractJsrTestCase {
 		}
 
 		new JsrJobOperator(new SimpleJobExplorer(null, null, null, null), new JobRepositorySupport(), parameterConverter, new ResourcelessTransactionManager());
+	}
+
+	@Test
+	public void testCustomBaseContext() throws Exception {
+		System.setProperty("JSR-352-BASE-CONTEXT", "META-INF/alternativeJsrBaseContext.xml");
+
+		JobOperator jobOperator = BatchRuntime.getJobOperator();
+
+		Object transactionManager = ReflectionTestUtils.getField(jobOperator, "transactionManager");
+		assertTrue(transactionManager instanceof ResourcelessTransactionManager);
+
+		long executionId = jobOperator.start("longRunningJob", null);
+		// Give the job a chance to get started
+		Thread.sleep(1000L);
+		jobOperator.stop(executionId);
+		// Give the job the chance to finish stopping
+		Thread.sleep(1000L);
+
+		assertEquals(BatchStatus.STOPPED, jobOperator.getJobExecution(executionId).getBatchStatus());
+
+		System.getProperties().remove("JSR-352-BASE-CONTEXT");
+	}
+
+	private void resetBaseContext() throws NoSuchFieldException, IllegalAccessException {
+		Field instancesField = ContextSingletonBeanFactoryLocator.class.getDeclaredField("instances");
+		instancesField.setAccessible(true);
+
+		Field instancesModifiers = Field.class.getDeclaredField("modifiers");
+		instancesModifiers.setAccessible(true);
+		instancesModifiers.setInt(instancesField, instancesField.getModifiers() & ~Modifier.FINAL);
+
+		instancesField.set(null, new HashMap());
 	}
 
 	@Test
