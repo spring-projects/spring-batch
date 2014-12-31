@@ -16,12 +16,19 @@
 
 package org.springframework.batch.core.step.tasklet;
 
+import java.io.File;
+import java.util.concurrent.Callable;
+import java.util.concurrent.FutureTask;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+
 import org.springframework.batch.core.ExitStatus;
+import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.JobInterruptedException;
 import org.springframework.batch.core.StepContribution;
 import org.springframework.batch.core.StepExecution;
+import org.springframework.batch.core.explore.JobExplorer;
 import org.springframework.batch.core.listener.StepExecutionListenerSupport;
 import org.springframework.batch.core.scope.context.ChunkContext;
 import org.springframework.batch.repeat.RepeatStatus;
@@ -29,10 +36,6 @@ import org.springframework.beans.factory.InitializingBean;
 import org.springframework.core.task.SimpleAsyncTaskExecutor;
 import org.springframework.core.task.TaskExecutor;
 import org.springframework.util.Assert;
-
-import java.io.File;
-import java.util.concurrent.Callable;
-import java.util.concurrent.FutureTask;
 
 /**
  * {@link Tasklet} that executes a system command.
@@ -80,6 +83,10 @@ public class SystemCommandTasklet extends StepExecutionListenerSupport implement
 
 	private volatile boolean stopped = false;
 
+	private JobExplorer jobExplorer;
+
+	private boolean stoppable = false;
+
 	/**
 	 * Execute system command and map its exit code to {@link ExitStatus} using
 	 * {@link SystemProcessExitCodeMapper}.
@@ -103,6 +110,16 @@ public class SystemCommandTasklet extends StepExecutionListenerSupport implement
 
 		while (true) {
 			Thread.sleep(checkInterval);//moved to the end of the logic
+
+			if(stoppable) {
+				JobExecution jobExecution =
+						jobExplorer.getJobExecution(chunkContext.getStepContext().getStepExecution().getJobExecutionId());
+
+				if(jobExecution.isStopping()) {
+					stopped = true;
+				}
+			}
+
 			if (systemCommandTask.isDone()) {
 				contribution.setExitStatus(systemProcessExitCodeMapper.getExitStatus(systemCommandTask.get()));
 				return RepeatStatus.FINISHED;
@@ -159,6 +176,11 @@ public class SystemCommandTasklet extends StepExecutionListenerSupport implement
 		Assert.notNull(systemProcessExitCodeMapper, "SystemProcessExitCodeMapper must be set");
 		Assert.isTrue(timeout > 0, "timeout value must be greater than zero");
 		Assert.notNull(taskExecutor, "taskExecutor is required");
+		stoppable = jobExplorer != null;
+	}
+
+	public void setJobExplorer(JobExplorer jobExplorer) {
+		this.jobExplorer = jobExplorer;
 	}
 
 	/**
