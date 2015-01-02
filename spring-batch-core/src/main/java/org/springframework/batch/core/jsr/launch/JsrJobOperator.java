@@ -66,6 +66,7 @@ import org.springframework.batch.core.step.StepLocator;
 import org.springframework.batch.core.step.tasklet.StoppableTasklet;
 import org.springframework.batch.core.step.tasklet.Tasklet;
 import org.springframework.batch.core.step.tasklet.TaskletStep;
+import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.BeanCreationException;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.access.BeanFactoryLocator;
@@ -75,6 +76,7 @@ import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.support.AbstractBeanDefinition;
 import org.springframework.beans.factory.support.BeanDefinitionBuilder;
 import org.springframework.context.ApplicationContext;
+import org.springframework.context.ApplicationContextAware;
 import org.springframework.context.access.ContextSingletonBeanFactoryLocator;
 import org.springframework.core.convert.converter.Converter;
 import org.springframework.core.io.ClassPathResource;
@@ -140,7 +142,7 @@ import org.springframework.util.Assert;
  * @author Chris Schaefer
  * @since 3.0
  */
-public class JsrJobOperator implements JobOperator, InitializingBean {
+public class JsrJobOperator implements JobOperator, ApplicationContextAware, InitializingBean {
 	private static final String JSR_JOB_CONTEXT_BEAN_NAME = "jsr_jobContext";
 	private final Log logger = LogFactory.getLog(getClass());
 
@@ -763,6 +765,11 @@ public class JsrJobOperator implements JobOperator, InitializingBean {
 		catch (NoSuchJobException e) {
 			logger.warn("Cannot find Job object",e);
 		}
+	}
+
+	@Override
+	public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
+		baseContext = applicationContext;
 	}
 
 	private static class ExecutingJobRegistry {

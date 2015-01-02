@@ -44,6 +44,7 @@ import javax.batch.operations.NoSuchJobExecutionException;
 import javax.batch.operations.NoSuchJobInstanceException;
 import javax.batch.runtime.BatchRuntime;
 import javax.batch.runtime.BatchStatus;
+import javax.sql.DataSource;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -55,6 +56,8 @@ import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.JobInstance;
 import org.springframework.batch.core.JobParametersBuilder;
 import org.springframework.batch.core.StepExecution;
+import org.springframework.batch.core.configuration.annotation.DataSourceConfiguration;
+import org.springframework.batch.core.configuration.annotation.EnableBatchProcessing;
 import org.springframework.batch.core.converter.JobParametersConverter;
 import org.springframework.batch.core.converter.JobParametersConverterSupport;
 import org.springframework.batch.core.explore.JobExplorer;
@@ -66,9 +69,15 @@ import org.springframework.batch.core.step.JobRepositorySupport;
 import org.springframework.batch.support.transaction.ResourcelessTransactionManager;
 import org.springframework.beans.factory.BeanCreationException;
 import org.springframework.context.access.ContextSingletonBeanFactoryLocator;
+import org.springframework.context.annotation.AnnotationConfigApplicationContext;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Import;
+import org.springframework.context.support.GenericApplicationContext;
 import org.springframework.core.task.AsyncTaskExecutor;
 import org.springframework.core.task.SyncTaskExecutor;
 import org.springframework.test.util.ReflectionTestUtils;
+import org.springframework.transaction.PlatformTransactionManager;
 
 public class JsrJobOperatorTests extends AbstractJsrTestCase {
 
@@ -125,13 +134,34 @@ public class JsrJobOperatorTests extends AbstractJsrTestCase {
 	}
 
 	@Test
-	public void testCustomBaseContext() throws Exception {
+	public void testCustomBaseContextJsrCompliant() throws Exception {
 		System.setProperty("JSR-352-BASE-CONTEXT", "META-INF/alternativeJsrBaseContext.xml");
 
 		JobOperator jobOperator = BatchRuntime.getJobOperator();
 
 		Object transactionManager = ReflectionTestUtils.getField(jobOperator, "transactionManager");
 		assertTrue(transactionManager instanceof ResourcelessTransactionManager);
+
+		long executionId = jobOperator.start("longRunningJob", null);
+		// Give the job a chance to get started
+		Thread.sleep(1000L);
+		jobOperator.stop(executionId);
+		// Give the job the chance to finish stopping
+		Thread.sleep(1000L);
+
+		assertEquals(BatchStatus.STOPPED, jobOperator.getJobExecution(executionId).getBatchStatus());
+
+		System.getProperties().remove("JSR-352-BASE-CONTEXT");
+	}
+
+	@Test
+	public void testCustomBaseContextCustomWired() throws Exception {
+
+		GenericApplicationContext context = new AnnotationConfigApplicationContext(BatchConfgiuration.class);
+
+		JobOperator jobOperator = (JobOperator) context.getBean("jobOperator");
+
+		assertEquals(context, ReflectionTestUtils.getField(jobOperator, "baseContext"));
 
 		long executionId = jobOperator.start("longRunningJob", null);
 		// Give the job a chance to get started
@@ -645,6 +675,21 @@ public class JsrJobOperatorTests extends AbstractJsrTestCase {
 		public String process() throws Exception {
 			closed = false;
 			return null;
+		}
+	}
+
+	@Configuration
+	@Import(DataSourceConfiguration.class)
+	@EnableBatchProcessing
+	public static class BatchConfgiuration {
+
+		@Bean
+		public JsrJobOperator jobOperator(JobExplorer jobExplorer, JobRepository jobrepository, DataSource dataSource,
+				PlatformTransactionManager transactionManager) throws Exception{
+
+			JsrJobParametersConverter jobParametersConverter = new JsrJobParametersConverter(dataSource);
+			jobParametersConverter.afterPropertiesSet();
+			return new JsrJobOperator(jobExplorer, jobrepository, jobParametersConverter, transactionManager);
 		}
 	}
 }
