@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2012 the original author or authors.
+ * Copyright 2006-2014 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -105,6 +105,27 @@ public abstract class AbstractSqlPagingQueryProviderTests {
 	}
 	
 	@Test
+	public void testGenerateFirstPageQueryWithoutSortKeys() {
+		pagingQueryProvider.setSortKeys(null);
+		String s = pagingQueryProvider.generateFirstPageQuery(pageSize);
+		assertEquals(getFirstPageSqlWithoutSortKeys(), s);
+	}
+
+	@Test
+	public void testGenerateRemainingPagesQueryWithoutSortKeys() {
+		pagingQueryProvider.setSortKeys(null);
+		String s = pagingQueryProvider.generateRemainingPagesQuery(pageSize);
+		// without sort keys, remainingPagesQuery = firstPageQuery 
+		assertEquals(getFirstPageSqlWithoutSortKeys(), s);
+	}
+	
+	@Test(expected = IllegalArgumentException.class)
+	public void testJumpToItemQueryWithoutSortKeys() {
+		pagingQueryProvider.setSortKeys(null);
+		pagingQueryProvider.generateJumpToItemQuery(45, pageSize);
+	}
+
+	@Test
 	public abstract void testGenerateFirstPageQuery();
 
 	@Test
@@ -127,6 +148,8 @@ public abstract class AbstractSqlPagingQueryProviderTests {
 	
 	@Test
 	public abstract void testGenerateJumpToItemQueryForFirstPageWithGroupBy();
+	
+	public abstract String getFirstPageSqlWithoutSortKeys();
 
 	public abstract String getFirstPageSqlWithMultipleSortKeys();
 	

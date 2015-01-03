@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2012 the original author or authors.
+ * Copyright 2006-2014 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -34,15 +34,19 @@ import java.util.Map;
  * SQL paging query providers.
  * 
  * Any implementation must provide a way to specify the select clause, from
- * clause and optionally a where clause. In addition a way to specify a single
- * column sort key must also be provided. This sort key will be used to provide
+ * clause and optionally a where clause. In addition a way to specify
+ * column sort keys must also be provided. These sort keys will be used to provide
  * the paging functionality. It is recommended that there should be an index for
- * the sort key to provide better performance.
+ * the sort keys to provide better performance.
  * 
  * Provides properties and preparation for the mandatory "selectClause" and
  * "fromClause" as well as for the optional "whereClause". Also provides
- * property for the mandatory "sortKeys".  <b>Note:</b> The columns that make up 
- * the sort key must be a true key and not just a column to order by.
+ * property for the "sortKeys".  <b>Note:</b> The columns that make up 
+ * the sort keys must be a true key and not just a column to order by.
+ * 
+ * In the case where this PagingQueryProvider is used in combination with a 
+ * process-indicator pattern and PagingItemReader.saveState=false, the sort keys
+ * can be optional.
  * 
  * @author Thomas Risberg
  * @author Dave Syer
@@ -142,7 +146,11 @@ public abstract class AbstractSqlPagingQueryProvider implements PagingQueryProvi
 	 * @param sortKeys key to use to sort and limit page content
 	 */
 	public void setSortKeys(Map<String, Order> sortKeys) {
-		this.sortKeys = sortKeys;
+		if (sortKeys == null) {
+			this.sortKeys = new LinkedHashMap<String, Order>();
+		} else {
+			this.sortKeys = sortKeys;	
+		}
 	}
 
 	/**
@@ -154,6 +162,13 @@ public abstract class AbstractSqlPagingQueryProvider implements PagingQueryProvi
 	public Map<String, Order> getSortKeys() {
 		return sortKeys;
 	}
+    
+    /**
+     * @return whether or not this PagingQueryProvider has been configured with sort keys
+     */
+    public boolean hasSortKeys() {
+    	return !sortKeys.isEmpty();
+    }
 
     @Override
 	public int getParameterCount() {
@@ -185,7 +200,6 @@ public abstract class AbstractSqlPagingQueryProvider implements PagingQueryProvi
 		Assert.notNull(dataSource);
 		Assert.hasLength(selectClause, "selectClause must be specified");
 		Assert.hasLength(fromClause, "fromClause must be specified");
-		Assert.notEmpty(sortKeys, "sortKey must be specified");
 		StringBuilder sql = new StringBuilder();
 		sql.append("SELECT ").append(selectClause);
 		sql.append(" FROM ").append(fromClause);

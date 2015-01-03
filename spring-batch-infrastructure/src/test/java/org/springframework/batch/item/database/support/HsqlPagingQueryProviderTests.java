@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2012 the original author or authors.
+ * Copyright 2006-2014 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -112,5 +112,10 @@ public class HsqlPagingQueryProviderTests extends AbstractSqlPagingQueryProvider
 	@Override
 	public String getJumpToItemQueryForFirstPageWithMultipleSortKeys() {
 		return "SELECT LIMIT 0 1 name, id FROM foo WHERE bar = 1 ORDER BY name ASC, id DESC";
+	}
+
+	@Override
+	public String getFirstPageSqlWithoutSortKeys() {
+		return "SELECT TOP 100 id, name, age FROM foo WHERE bar = 1";
 	}
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 the original author or authors.
+ * Copyright 2012-2014 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -116,5 +116,10 @@ public class OraclePagingQueryProviderTests extends AbstractSqlPagingQueryProvid
 	@Override
 	public String getJumpToItemQueryForFirstPageWithMultipleSortKeys() {
 		return "SELECT name, id FROM (SELECT name, id, ROWNUM as TMP_ROW_NUM FROM (SELECT name, id FROM foo WHERE bar = 1 ORDER BY name ASC, id DESC)) WHERE TMP_ROW_NUM = 1";
+	}
+
+	@Override
+	public String getFirstPageSqlWithoutSortKeys() {
+		return "SELECT * FROM (SELECT id, name, age FROM foo WHERE bar = 1) WHERE ROWNUM <= 100";
 	}
 }
