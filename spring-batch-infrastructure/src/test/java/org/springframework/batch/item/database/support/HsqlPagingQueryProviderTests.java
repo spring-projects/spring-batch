@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2012 the original author or authors.
+ * Copyright 2006-2015 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -39,7 +39,7 @@ public class HsqlPagingQueryProviderTests extends AbstractSqlPagingQueryProvider
 
 	@Test @Override
 	public void testGenerateRemainingPagesQuery() {
-		String sql = "SELECT TOP 100 id, name, age FROM foo WHERE bar = 1 AND ((id > ?)) ORDER BY id ASC";
+		String sql = "SELECT TOP 100 id, name, age FROM foo WHERE (bar = 1) AND ((id > ?)) ORDER BY id ASC";
 		String s = pagingQueryProvider.generateRemainingPagesQuery(pageSize);
 		assertEquals(sql, s);
 	}
@@ -101,7 +101,7 @@ public class HsqlPagingQueryProviderTests extends AbstractSqlPagingQueryProvider
 
 	@Override
 	public String getRemainingSqlWithMultipleSortKeys() {
-		return "SELECT TOP 100 id, name, age FROM foo WHERE bar = 1 AND ((name > ?) OR (name = ? AND id < ?)) ORDER BY name ASC, id DESC";
+		return "SELECT TOP 100 id, name, age FROM foo WHERE (bar = 1) AND ((name > ?) OR (name = ? AND id < ?)) ORDER BY name ASC, id DESC";
 	}
 
 	@Override

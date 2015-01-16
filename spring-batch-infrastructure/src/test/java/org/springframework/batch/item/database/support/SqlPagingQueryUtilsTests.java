@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2012 the original author or authors.
+ * Copyright 2006-2015 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -53,7 +53,7 @@ public class SqlPagingQueryUtilsTests {
 		qp.setWhereClause("BAZ IS NOT NULL");
 		assertEquals("SELECT FOO FROM BAR WHERE BAZ IS NOT NULL ORDER BY ID ASC LIMIT 100", SqlPagingQueryUtils
 				.generateLimitSqlQuery(qp, false, "LIMIT 100"));
-		assertEquals("SELECT FOO FROM BAR WHERE BAZ IS NOT NULL AND ((ID > ?)) ORDER BY ID ASC LIMIT 100",
+		assertEquals("SELECT FOO FROM BAR WHERE (BAZ IS NOT NULL) AND ((ID > ?)) ORDER BY ID ASC LIMIT 100",
 				SqlPagingQueryUtils.generateLimitSqlQuery(qp, true, "LIMIT 100"));
 	}
 
@@ -67,7 +67,7 @@ public class SqlPagingQueryUtilsTests {
 		qp.setWhereClause("BAZ IS NOT NULL");
 		assertEquals("SELECT TOP 100 FOO FROM BAR WHERE BAZ IS NOT NULL ORDER BY ID ASC", SqlPagingQueryUtils
 				.generateTopSqlQuery(qp, false, "TOP 100"));
-		assertEquals("SELECT TOP 100 FOO FROM BAR WHERE BAZ IS NOT NULL AND ((ID > ?)) ORDER BY ID ASC",
+		assertEquals("SELECT TOP 100 FOO FROM BAR WHERE (BAZ IS NOT NULL) AND ((ID > ?)) ORDER BY ID ASC",
 				SqlPagingQueryUtils.generateTopSqlQuery(qp, true, "TOP 100"));
 	}
 
@@ -108,7 +108,7 @@ public class SqlPagingQueryUtilsTests {
 		qp.setWhereClause("BAZ IS NOT NULL");
 		assertEquals("SELECT TOP 100 FOO FROM BAR WHERE BAZ IS NOT NULL ORDER BY ID DESC", SqlPagingQueryUtils
 				.generateTopSqlQuery(qp, false, "TOP 100"));
-		assertEquals("SELECT TOP 100 FOO FROM BAR WHERE BAZ IS NOT NULL AND ((ID < ?)) ORDER BY ID DESC",
+		assertEquals("SELECT TOP 100 FOO FROM BAR WHERE (BAZ IS NOT NULL) AND ((ID < ?)) ORDER BY ID DESC",
 				SqlPagingQueryUtils.generateTopSqlQuery(qp, true, "TOP 100"));
 	}
 
