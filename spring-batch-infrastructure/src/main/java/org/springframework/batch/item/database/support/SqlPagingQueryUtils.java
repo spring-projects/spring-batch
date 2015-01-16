@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2012 the original author or authors.
+ * Copyright 2006-2015 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -352,8 +352,9 @@ public class SqlPagingQueryUtils {
 		if (remainingPageQuery) {
 			sql.append(" WHERE ");
 			if (provider.getWhereClause() != null) {
+				sql.append("(");
 				sql.append(provider.getWhereClause());
-				sql.append(" AND ");
+				sql.append(") AND ");
 			}
 
 			buildSortConditions(provider, sql);

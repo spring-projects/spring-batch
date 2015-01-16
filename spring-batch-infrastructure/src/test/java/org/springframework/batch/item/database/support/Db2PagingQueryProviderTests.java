@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 the original author or authors.
+ * Copyright 2012-2015 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -40,7 +40,7 @@ public class Db2PagingQueryProviderTests extends AbstractSqlPagingQueryProviderT
 	@Test 
 	@Override
 	public void testGenerateRemainingPagesQuery() {
-		String sql = "SELECT id, name, age FROM foo WHERE bar = 1 AND ((id > ?)) ORDER BY id ASC FETCH FIRST 100 ROWS ONLY";
+		String sql = "SELECT id, name, age FROM foo WHERE (bar = 1) AND ((id > ?)) ORDER BY id ASC FETCH FIRST 100 ROWS ONLY";
 		String s = pagingQueryProvider.generateRemainingPagesQuery(pageSize);
 		assertEquals(sql, s);
 	}
@@ -104,7 +104,7 @@ public class Db2PagingQueryProviderTests extends AbstractSqlPagingQueryProviderT
 
 	@Override
 	public String getRemainingSqlWithMultipleSortKeys() {
-		return "SELECT id, name, age FROM foo WHERE bar = 1 AND ((name > ?) OR (name = ? AND id < ?)) ORDER BY name ASC, id DESC FETCH FIRST 100 ROWS ONLY";
+		return "SELECT id, name, age FROM foo WHERE (bar = 1) AND ((name > ?) OR (name = ? AND id < ?)) ORDER BY name ASC, id DESC FETCH FIRST 100 ROWS ONLY";
 	}
 
 	@Override
