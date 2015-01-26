@@ -109,7 +109,7 @@ public class DefaultBatchConfigurer implements BatchConfigurer {
 		}
 	}
 
-	private JobLauncher createJobLauncher() throws Exception {
+	protected JobLauncher createJobLauncher() throws Exception {
 		SimpleJobLauncher jobLauncher = new SimpleJobLauncher();
 		jobLauncher.setJobRepository(jobRepository);
 		jobLauncher.afterPropertiesSet();
