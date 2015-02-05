@@ -582,7 +582,34 @@ public class FlowBuilder<Q> {
 	 *
 	 * In this example, a flow consisting of <code>step1</code> will be executed in parallel with <code>flow</code>.
 	 *
+	 * <em>Note:</em> Adding a split to a chain of states is not supported.  For example, the following configuration
+	 * is not supported.  Instead, the configuration would need to create a flow3 that was the split flow and assemble
+	 * them separately.
+	 *
+	 * <pre>
+	 * // instead of this
+	 * Flow complexFlow = new FlowBuilder&lt;SimpleFlow&gt;("ComplexParallelFlow")
+	 *                       .start(flow1)
+	 *                       .next(flow2)
+	 *                       .split(new SimpleAsyncTaskExecutor())
+	 *                       .add(flow3, flow4)
+	 *                       .build();
+	 *
+	 * // do this
+	 * Flow splitFlow = new FlowBuilder&lt;SimpleFlow&gt;("parallelFlow")
+	 *                       .start(flow3)
+	 *                       .split(new SimpleAsyncTaskExecutor())
+	 *                       .add(flow4).build();
+	 *
+	 * Flow complexFlow = new FlowBuilder&lt;SimpleFlow&gt;("ComplexParallelFlow")
+	 *                       .start(flow1)
+	 *                       .next(flow2)
+	 *                       .next(splitFlow)
+	 *                       .build();
+	 * </pre>
+	 *
 	 * @author Dave Syer
+	 * @author Michael Minella
 	 *
 	 * @param <Q> the result of the parent builder's build()
 	 */
@@ -617,7 +644,10 @@ public class FlowBuilder<Q> {
 				FlowBuilder<Flow> stateBuilder = new FlowBuilder<Flow>(name + "_" + (counter++));
 				stateBuilder.currentState = one;
 				flow = stateBuilder.build();
+			} else if (one instanceof FlowState && parent.states.size() == 1) {
+				list.add(((FlowState) one).getFlows().iterator().next());
 			}
+
 			if (flow != null) {
 				list.add(flow);
 			}
