@@ -15,25 +15,27 @@
  */
 package org.springframework.batch.item.data;
 
-import org.junit.Before;
-import org.junit.Test;
-import org.mockito.ArgumentCaptor;
-import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
-import org.springframework.data.neo4j.conversion.DefaultConverter;
-import org.springframework.data.neo4j.conversion.Result;
-import org.springframework.data.neo4j.conversion.ResultConverter;
-import org.springframework.data.neo4j.template.Neo4jOperations;
-
-import java.util.ArrayList;
-import java.util.Map;
-
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 import static org.mockito.Matchers.isNull;
 import static org.mockito.Mockito.when;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
+
+import org.junit.Before;
+import org.junit.Test;
+import org.mockito.ArgumentCaptor;
+import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
+
+import org.springframework.data.neo4j.conversion.DefaultConverter;
+import org.springframework.data.neo4j.conversion.Result;
+import org.springframework.data.neo4j.conversion.ResultConverter;
+import org.springframework.data.neo4j.template.Neo4jOperations;
 
 public class Neo4jItemReaderTests {
 
@@ -172,6 +174,25 @@ public class Neo4jItemReaderTests {
 		reader.setReturnStatement("m");
 		reader.afterPropertiesSet();
 		when(template.query("START n=node(*) MATCH n -- m WHERE has(n.name) RETURN m ORDER BY n.age SKIP 0 LIMIT 50", null)).thenReturn(result);
+		when(result.to(String.class)).thenReturn(endResult);
+		when(endResult.iterator()).thenReturn(new ArrayList<String>() {{
+			add(new String());
+		}}.iterator());
+
+		assertTrue(reader.doPageRead().hasNext());
+	}
+
+	@SuppressWarnings("serial")
+	@Test
+	public void testResultsWithMatchAndWhereWithParameters() throws Exception {
+		Map<String, Object> params = new HashMap<String, Object>();
+		params.put("foo", "bar");
+		reader.setParameterValues(params);
+		reader.setMatchStatement("n -- m");
+		reader.setWhereStatement("has(n.name)");
+		reader.setReturnStatement("m");
+		reader.afterPropertiesSet();
+		when(template.query("START n=node(*) MATCH n -- m WHERE has(n.name) RETURN m ORDER BY n.age SKIP 0 LIMIT 50", params)).thenReturn(result);
 		when(result.to(String.class)).thenReturn(endResult);
 		when(endResult.iterator()).thenReturn(new ArrayList<String>(){{
 			add(new String());
