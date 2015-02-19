@@ -86,6 +86,15 @@ InitializingBean {
 	}
 
 	/**
+	 * Optional parameters to be used in the cypher query.
+	 *
+	 * @param parameterValues the parameter values to be used in the cypher query
+	 */
+	public void setParameterValues(Map<String, Object> parameterValues) {
+		this.parameterValues = parameterValues;
+	}
+
+	/**
 	 * The start segment of the cypher query.  START is prepended
 	 * to the statement provided and should <em>not</em> be
 	 * included.
