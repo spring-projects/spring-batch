@@ -15,22 +15,23 @@
  */
 package org.springframework.batch.core.jsr;
 
+import java.util.Date;
+import java.util.Properties;
+import java.util.concurrent.TimeoutException;
+
 import javax.batch.operations.JobOperator;
 import javax.batch.runtime.BatchRuntime;
 import javax.batch.runtime.BatchStatus;
 import javax.batch.runtime.JobExecution;
 import javax.batch.runtime.Metric;
 import javax.batch.runtime.StepExecution;
-import java.util.Date;
-import java.util.Properties;
-import java.util.concurrent.TimeoutException;
 
 /**
  * @author mminella
  */
 public abstract class AbstractJsrTestCase {
 
-	private static JobOperator operator;
+	protected static JobOperator operator;
 
 	static {
 		operator = BatchRuntime.getJobOperator();
@@ -49,6 +50,7 @@ public abstract class AbstractJsrTestCase {
 	 * @throws java.util.concurrent.TimeoutException if the timeout occurs
 	 */
 	public static JobExecution runJob(String jobName, Properties properties, long timeout) throws TimeoutException {
+		System.out.println("Operator = " + operator);
 		long executionId = operator.start(jobName, properties);
 		JobExecution execution = operator.getJobExecution(executionId);
 

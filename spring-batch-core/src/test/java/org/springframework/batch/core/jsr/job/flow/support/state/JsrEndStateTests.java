@@ -15,15 +15,15 @@
  */
 package org.springframework.batch.core.jsr.job.flow.support.state;
 
-import org.junit.Test;
-import org.springframework.batch.core.jsr.AbstractJsrTestCase;
+import static org.junit.Assert.assertEquals;
 
 import javax.batch.api.AbstractBatchlet;
-import javax.batch.runtime.BatchRuntime;
 import javax.batch.runtime.BatchStatus;
 import javax.batch.runtime.JobExecution;
 
-import static org.junit.Assert.assertEquals;
+import org.junit.Test;
+
+import org.springframework.batch.core.jsr.AbstractJsrTestCase;
 
 /**
  * Tests for the JSR-352 version of {@link JsrEndState}
@@ -38,7 +38,7 @@ public class JsrEndStateTests extends AbstractJsrTestCase {
 
 		assertEquals(BatchStatus.COMPLETED, jobExecution.getBatchStatus());
 		assertEquals("SUCCESS", jobExecution.getExitStatus());
-		assertEquals(1, BatchRuntime.getJobOperator().getStepExecutions(jobExecution.getExecutionId()).size());
+		assertEquals(1, operator.getStepExecutions(jobExecution.getExecutionId()).size());
 	}
 
 	public static class EndStateBatchlet extends AbstractBatchlet {
