@@ -45,7 +45,7 @@
     }
 
     public void onWriteError(Exception ex, Object item) {
-        logger.error("Encountered error on write", e);
+        logger.error("Encountered error on write", ex);
     }
 
 }</programlisting>
