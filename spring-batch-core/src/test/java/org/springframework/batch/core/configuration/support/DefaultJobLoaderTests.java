@@ -20,6 +20,7 @@ import static org.junit.Assert.fail;
 
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Map;
 
 import org.junit.Test;
 import org.springframework.batch.core.Job;
@@ -35,6 +36,7 @@ import org.springframework.batch.core.step.NoSuchStepException;
 import org.springframework.batch.core.step.StepLocator;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.ClassPathResource;
+import org.springframework.test.util.ReflectionTestUtils;
 
 /**
  * @author Dave Syer
@@ -56,6 +58,18 @@ public class DefaultJobLoaderTests {
     private StepRegistry stepRegistry = new MapStepRegistry();
 
     private DefaultJobLoader jobLoader = new DefaultJobLoader(jobRegistry, stepRegistry);
+
+	@Test
+	public void testClear() throws Exception {
+		GenericApplicationContextFactory factory = new GenericApplicationContextFactory(new ByteArrayResource(
+				JOB_XML.getBytes()));
+		jobLoader.load(factory);
+		assertEquals(1, ((Map) ReflectionTestUtils.getField(jobLoader, "contexts")).size());
+		assertEquals(1, ((Map) ReflectionTestUtils.getField(jobLoader, "contextToJobNames")).size());
+		jobLoader.clear();
+		assertEquals(0, ((Map) ReflectionTestUtils.getField(jobLoader, "contexts")).size());
+		assertEquals(0, ((Map) ReflectionTestUtils.getField(jobLoader, "contextToJobNames")).size());
+	}
 
 	@Test
 	public void testLoadWithExplicitName() throws Exception {
