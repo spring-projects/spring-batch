@@ -21,9 +21,21 @@ import org.springframework.batch.core.scope.context.ChunkContext;
 import org.springframework.batch.item.ItemWriter;
 
 /**
+ * <p>
  * Listener interface for the writing of items.  Implementations
  * of this interface will be notified before, after, and in case
  * of any exception thrown while writing a list of items.
+ * </p>
+ *
+ * <p>
+ * <em>Note: </em> This listener is designed to work around the
+ * lifecycle of an item.  This means that each method should be
+ * called once within the lifecycle of an item and in fault
+ * tolerant scenarios, any transactional work that is done in
+ * one of these methods would be rolled back and not re-applied.
+ * Because of this, it is recommended to not perform any logic
+ * using this listener that participates in a transaction.
+ *</p>
  *
  * @author Lucas Ward
  *
