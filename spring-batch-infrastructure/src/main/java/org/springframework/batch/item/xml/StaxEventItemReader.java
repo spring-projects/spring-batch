@@ -128,10 +128,9 @@ ResourceAwareItemReaderItemStream<T>, InitializingBean {
 	@Override
 	public void afterPropertiesSet() throws Exception {
 		Assert.notNull(unmarshaller, "The Unmarshaller must not be null.");
-		Assert.notNull(fragmentRootElementNames, "The FragmentRootElementNames must not be null");
-		Assert.notNull(fragmentRootElementNames, "The FragmentRootElementNames must not be empty");
+		Assert.notEmpty(fragmentRootElementNames, "The FragmentRootElementNames must not be empty");
 		for (QName fragmentRootElementName : fragmentRootElementNames) {
-			Assert.hasText(fragmentRootElementName.getLocalPart(), "The FragmentRootElementNames must contain empty elements");
+			Assert.hasText(fragmentRootElementName.getLocalPart(), "The FragmentRootElementNames must not contain empty elements");
 		}		
 	}
 
