@@ -376,10 +376,27 @@
 		<para><emphasis role="bold">4. Partitioning</emphasis>
 		Using partitioning allows multiple versions of large batch applications to run concurrently. The purpose of this is to reduce the elapsed time required to process long batch jobs. Processes which can be successfully partitioned are those where the input file can be split and/or the main database tables partitioned to allow the application to run against different sets of data.</para>
 
-		<para>In addition, processes which are partitioned must be designed to only process their assigned data set. A partitioning architecture has to be closely tied to the database design and the database partitioning strategy. Please note, that the database partitioning doesn't necessarily mean physical partitioning of the database, although in most cases this is advisable. The following picture illustrates the partitioning approach:</para>
+		<para>In addition, processes which are partitioned must be designed to only process their assigned data set. A partitioning architecture has to be closely tied to the database design and the database partitioning strategy. Please note, that the database partitioning doesn't necessarily mean physical partitioning of the database, although in most cases this is advisable. The following picture illustrates the partitioning approach:
 
-		<!--[images/partitioned.png]-->
+		<mediaobject>
+			<imageobject role="fo">
+				<imagedata align="center" fileref="images/partitioned.png"
+						   format="PNG" scale="40" />
+			</imageobject>
 
+			<imageobject role="html">
+				<imagedata align="center" fileref="images/partitioned.png"
+						   format="PNG" scale="40" />
+			</imageobject>
+
+			<caption><para>Figure 1.2: Partitioned Process</para></caption>
+		</mediaobject>
+
+		<imageobject role="fo">
+			<imagedata align="center" fileref=""
+					   format="PNG" scale="40" />
+		</imageobject>
+		</para>
 
 		<para>The architecture should be flexible enough to allow dynamic configuration of the number of partitions. Both automatic and user controlled configuration should be considered. Automatic configuration may be based on parameters such as the input file size and/or the number of input records.</para>
 
