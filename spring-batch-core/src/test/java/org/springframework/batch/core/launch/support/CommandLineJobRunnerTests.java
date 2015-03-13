@@ -15,9 +15,22 @@
  */
 package org.springframework.batch.core.launch.support;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Date;
+import java.util.List;
+import java.util.Properties;
+import java.util.Set;
+
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+
 import org.springframework.batch.core.BatchStatus;
 import org.springframework.batch.core.ExitStatus;
 import org.springframework.batch.core.Job;
@@ -36,18 +49,6 @@ import org.springframework.batch.core.step.JobRepositorySupport;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.util.ClassUtils;
-
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.List;
-import java.util.Properties;
-import java.util.Set;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
 
 /**
  * @author Lucas Ward
@@ -163,6 +164,28 @@ public class CommandLineJobRunnerTests {
 	public void testWithStdinCommandLine() throws Throwable {
 		System.setIn(new InputStream() {
 			char[] input = (jobPath+"\n"+jobName+"\nfoo=bar\nspam=bucket").toCharArray();
+
+			int index = 0;
+
+			@Override
+			public int available() {
+				return input.length - index;
+			}
+
+			@Override
+			public int read() {
+				return index<input.length-1 ? (int) input[index++] : -1;
+			}
+		});
+		CommandLineJobRunner.main(new String[0]);
+		assertEquals(0, StubSystemExiter.status);
+		assertEquals(2, StubJobLauncher.jobParameters.getParameters().size());
+	}
+        
+	@Test
+	public void testWithStdinCommandLineWithEmptyLines() throws Throwable {
+		System.setIn(new InputStream() {
+			char[] input = (jobPath+"\n"+jobName+"\nfoo=bar\n\nspam=bucket\n\n").toCharArray();
 
 			int index = 0;
 
