@@ -180,6 +180,28 @@ public class CommandLineJobRunnerTests {
 		assertEquals(0, StubSystemExiter.status);
 		assertEquals(2, StubJobLauncher.jobParameters.getParameters().size());
 	}
+        
+        @Test
+	public void testWithStdinCommandLineWithEmptyLines() throws Throwable {
+		System.setIn(new InputStream() {
+			char[] input = (jobPath+"\n"+jobName+"\nfoo=bar\n\nspam=bucket\n\n").toCharArray();
+
+			int index = 0;
+
+			@Override
+			public int available() {
+				return input.length - index;
+			}
+
+			@Override
+			public int read() {
+				return index<input.length-1 ? (int) input[index++] : -1;
+			}
+		});
+		CommandLineJobRunner.main(new String[0]);
+		assertEquals(0, StubSystemExiter.status);
+		assertEquals(2, StubJobLauncher.jobParameters.getParameters().size());
+	}
 
 	@Test
 	public void testWithStdinParameters() throws Throwable {
