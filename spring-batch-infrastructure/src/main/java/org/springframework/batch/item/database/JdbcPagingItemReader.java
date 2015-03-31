@@ -135,7 +135,7 @@ public class JdbcPagingItemReader<T> extends AbstractPagingItemReader<T> impleme
 	 * by the reader.
 	 * 
 	 * @param rowMapper a
-	 * {@link org.springframework.jdbc.core.simple.ParameterizedRowMapper}
+	 * {@link RowMapper}
 	 * implementation
 	 */
 	public void setRowMapper(RowMapper<T> rowMapper) {

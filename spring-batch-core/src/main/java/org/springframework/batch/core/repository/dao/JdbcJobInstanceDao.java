@@ -32,6 +32,7 @@ import org.springframework.beans.factory.InitializingBean;
 import org.springframework.dao.DataAccessException;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.ResultSetExtractor;
+import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.simple.ParameterizedRowMapper;
 import org.springframework.jdbc.support.incrementer.DataFieldMaxValueIncrementer;
 import org.springframework.util.Assert;
@@ -138,7 +139,7 @@ JobInstanceDao, InitializingBean {
 
 		String jobKey = jobKeyGenerator.generateKey(jobParameters);
 
-		ParameterizedRowMapper<JobInstance> rowMapper = new JobInstanceRowMapper();
+		RowMapper<JobInstance> rowMapper = new JobInstanceRowMapper();
 
 		List<JobInstance> instances;
 		if (StringUtils.hasLength(jobKey)) {
@@ -218,7 +219,7 @@ JobInstanceDao, InitializingBean {
 					rowNum++;
 				}
 				while (rowNum < start + count && rs.next()) {
-					ParameterizedRowMapper<JobInstance> rowMapper = new JobInstanceRowMapper();
+					RowMapper<JobInstance> rowMapper = new JobInstanceRowMapper();
 					list.add(rowMapper.mapRow(rs, rowNum));
 					rowNum++;
 				}
@@ -289,8 +290,7 @@ JobInstanceDao, InitializingBean {
 	 * @author Dave Syer
 	 *
 	 */
-	private final class JobInstanceRowMapper implements
-	ParameterizedRowMapper<JobInstance> {
+	private final class JobInstanceRowMapper implements RowMapper<JobInstance> {
 
 		public JobInstanceRowMapper() {
 		}
@@ -318,7 +318,7 @@ JobInstanceDao, InitializingBean {
 					rowNum++;
 				}
 				while (rowNum < start + count && rs.next()) {
-					ParameterizedRowMapper<JobInstance> rowMapper = new JobInstanceRowMapper();
+					RowMapper<JobInstance> rowMapper = new JobInstanceRowMapper();
 					list.add(rowMapper.mapRow(rs, rowNum));
 					rowNum++;
 				}

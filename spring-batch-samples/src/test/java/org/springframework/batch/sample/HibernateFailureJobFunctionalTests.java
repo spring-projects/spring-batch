@@ -28,6 +28,7 @@ import javax.sql.DataSource;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
+
 import org.springframework.batch.core.JobParameters;
 import org.springframework.batch.core.JobParametersBuilder;
 import org.springframework.batch.sample.domain.trade.internal.CustomerCreditIncreaseProcessor;
@@ -38,7 +39,7 @@ import org.springframework.jdbc.UncategorizedSQLException;
 import org.springframework.jdbc.core.JdbcOperations;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowCallbackHandler;
-import org.springframework.jdbc.core.simple.ParameterizedRowMapper;
+import org.springframework.jdbc.core.RowMapper;
 import org.springframework.orm.hibernate3.HibernateJdbcException;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
@@ -121,7 +122,7 @@ public class HibernateFailureJobFunctionalTests {
 		creditsBeforeUpdate = new TransactionTemplate(transactionManager).execute(new TransactionCallback<List<BigDecimal>>() {
 			@Override
 			public List<BigDecimal> doInTransaction(TransactionStatus status) {
-				return jdbcTemplate.query(ALL_CUSTOMERS, new ParameterizedRowMapper<BigDecimal>() {
+				return jdbcTemplate.query(ALL_CUSTOMERS, new RowMapper<BigDecimal>() {
 					@Override
 					public BigDecimal mapRow(ResultSet rs, int rowNum) throws SQLException {
 						return rs.getBigDecimal(CREDIT_COLUMN);

@@ -23,7 +23,7 @@ import java.util.Map;
 import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.database.support.HsqlPagingQueryProvider;
 import org.springframework.batch.item.sample.Foo;
-import org.springframework.jdbc.core.simple.ParameterizedRowMapper;
+import org.springframework.jdbc.core.RowMapper;
 
 /**
  * Tests for {@link JpaPagingItemReader} with sort key not equal to ID.
@@ -47,7 +47,7 @@ public class JdbcPagingItemReaderOrderIntegrationTests extends AbstractGenericDa
 		queryProvider.setSortKeys(sortKeys);
 		inputSource.setQueryProvider(queryProvider);
 		inputSource.setRowMapper(
-				new ParameterizedRowMapper<Foo>() {
+				new RowMapper<Foo>() {
                     @Override
 					public Foo mapRow(ResultSet rs, int i) throws SQLException {
 						Foo foo = new Foo();

@@ -23,13 +23,14 @@ import java.util.Map;
 import javax.sql.DataSource;
 
 import org.junit.runner.RunWith;
+
 import org.springframework.batch.item.AbstractItemStreamItemReaderTests;
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.database.support.HsqlPagingQueryProvider;
 import org.springframework.batch.item.sample.Foo;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.jdbc.core.simple.ParameterizedRowMapper;
+import org.springframework.jdbc.core.RowMapper;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
@@ -58,7 +59,7 @@ public class JdbcPagingItemReaderCommonTests extends AbstractItemStreamItemReade
 		queryProvider.setSortKeys(sortKeys);
 		reader.setQueryProvider(queryProvider);
 		reader.setRowMapper(
-				new ParameterizedRowMapper<Foo>() {
+				new RowMapper<Foo>() {
                     @Override
 					public Foo mapRow(ResultSet rs, int i) throws SQLException {
 						Foo foo = new Foo();
