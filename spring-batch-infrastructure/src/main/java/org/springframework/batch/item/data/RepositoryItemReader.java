@@ -216,6 +216,11 @@ public class RepositoryItemReader<T> extends AbstractItemCountingItemStreamItemR
 
 	@Override
 	protected void doClose() throws Exception {
+		synchronized (lock) {
+			current = 0;
+			page = 0;
+			results = null;
+		}
 	}
 
 	private Sort convertToSort(Map<String, Sort.Direction> sorts) {

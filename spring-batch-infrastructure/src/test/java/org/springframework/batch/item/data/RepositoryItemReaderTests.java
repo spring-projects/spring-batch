@@ -185,7 +185,7 @@ public class RepositoryItemReaderTests {
 	public void testJumpToItem() throws Exception {
 		reader.setPageSize(100);
 		ArgumentCaptor<PageRequest> pageRequestContainer = ArgumentCaptor.forClass(PageRequest.class);
-		when(repository.findAll(pageRequestContainer.capture())).thenReturn(new PageImpl<Object>(new ArrayList<Object>(){{
+		when(repository.findAll(pageRequestContainer.capture())).thenReturn(new PageImpl<Object>(new ArrayList<Object>() {{
 			add(new Object());
 		}}));
 
@@ -241,7 +241,7 @@ public class RepositoryItemReaderTests {
 		reader.setPageSize(2);
 
 		PageRequest request = new PageRequest(1, 2, new Sort(Direction.ASC, "id"));
-		when(repository.findAll(request)).thenReturn(new PageImpl<Object>(new ArrayList<Object>(){{
+		when(repository.findAll(request)).thenReturn(new PageImpl<Object>(new ArrayList<Object>() {{
 			add("3");
 			add("4");
 		}}));
@@ -274,7 +274,7 @@ public class RepositoryItemReaderTests {
 		}}));
 
 		request = new PageRequest(2, 2, new Sort(Direction.ASC, "id"));
-		when(repository.findAll(request)).thenReturn(new PageImpl<Object>(new ArrayList<Object>(){{
+		when(repository.findAll(request)).thenReturn(new PageImpl<Object>(new ArrayList<Object>() {{
 			add("5");
 			add("6");
 		}}));
@@ -292,6 +292,36 @@ public class RepositoryItemReaderTests {
 		assertEquals("4", reader.read());
 		assertEquals("5", reader.read());
 		assertEquals("6", reader.read());
+	}
+
+	@Test
+	public void testResetOfPage() throws Exception {
+		reader.setPageSize(2);
+
+		PageRequest request = new PageRequest(0, 2, new Sort(Direction.ASC, "id"));
+		when(repository.findAll(request)).thenReturn(new PageImpl<Object>(new ArrayList<Object>(){{
+			add("1");
+			add("2");
+		}}));
+
+		request = new PageRequest(1, 2, new Sort(Direction.ASC, "id"));
+		when(repository.findAll(request)).thenReturn(new PageImpl<Object>(new ArrayList<Object>() {{
+			add("3");
+			add("4");
+		}}));
+
+		ExecutionContext executionContext = new ExecutionContext();
+		reader.open(executionContext);
+
+		Object result = reader.read();
+		reader.close();
+
+		assertEquals("1", result);
+
+		reader.open(executionContext);
+		assertEquals("1", reader.read());
+		assertEquals("2", reader.read());
+		assertEquals("3", reader.read());
 	}
 
 	public static interface TestRepository extends PagingAndSortingRepository<Map, Long> {
