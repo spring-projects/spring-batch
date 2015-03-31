@@ -26,11 +26,12 @@ import javax.sql.DataSource;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+
 import org.springframework.batch.sample.domain.football.Game;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcOperations;
 import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.jdbc.core.simple.ParameterizedRowMapper;
+import org.springframework.jdbc.core.RowMapper;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.transaction.annotation.Transactional;
@@ -82,7 +83,7 @@ public class JdbcGameDaoIntegrationTests {
 		assertEquals(tempGame, game);
 	}
 
-	private static class GameRowMapper implements ParameterizedRowMapper<Game> {
+	private static class GameRowMapper implements RowMapper<Game> {
 		@Override
 		public Game mapRow(ResultSet rs, int arg1) throws SQLException {
 			if (rs == null) {

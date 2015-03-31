@@ -36,7 +36,7 @@ import org.springframework.batch.item.ExecutionContext;
 import org.springframework.core.serializer.Serializer;
 import org.springframework.jdbc.core.BatchPreparedStatementSetter;
 import org.springframework.jdbc.core.PreparedStatementSetter;
-import org.springframework.jdbc.core.simple.ParameterizedRowMapper;
+import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.support.lob.DefaultLobHandler;
 import org.springframework.jdbc.support.lob.LobHandler;
 import org.springframework.util.Assert;
@@ -306,7 +306,7 @@ public class JdbcExecutionContextDao extends AbstractJdbcBatchMetadataDao implem
 		return results;
 	}
 
-	private class ExecutionContextRowMapper implements ParameterizedRowMapper<ExecutionContext> {
+	private class ExecutionContextRowMapper implements RowMapper<ExecutionContext> {
 
 		@Override
 		public ExecutionContext mapRow(ResultSet rs, int i) throws SQLException {

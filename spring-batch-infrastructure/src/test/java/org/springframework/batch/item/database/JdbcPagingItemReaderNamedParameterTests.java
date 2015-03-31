@@ -23,9 +23,10 @@ import java.util.Map;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
+
 import org.springframework.batch.item.database.support.HsqlPagingQueryProvider;
 import org.springframework.batch.item.sample.Foo;
-import org.springframework.jdbc.core.simple.ParameterizedRowMapper;
+import org.springframework.jdbc.core.RowMapper;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.util.ReflectionTestUtils;
@@ -64,7 +65,7 @@ public class JdbcPagingItemReaderNamedParameterTests extends AbstractJdbcPagingI
 		reader.setParameterValues(Collections.<String, Object>singletonMap("limit", 2));
 		reader.setQueryProvider(queryProvider);
 		reader.setRowMapper(
-				new ParameterizedRowMapper<Foo>() {
+				new RowMapper<Foo>() {
                     @Override
 					public Foo mapRow(ResultSet rs, int i) throws SQLException {
 						Foo foo = new Foo();

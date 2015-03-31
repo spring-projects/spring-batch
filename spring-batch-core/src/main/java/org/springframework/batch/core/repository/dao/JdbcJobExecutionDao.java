@@ -29,6 +29,7 @@ import java.util.Set;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+
 import org.springframework.batch.core.BatchStatus;
 import org.springframework.batch.core.ExitStatus;
 import org.springframework.batch.core.JobExecution;
@@ -40,7 +41,7 @@ import org.springframework.beans.factory.InitializingBean;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.dao.OptimisticLockingFailureException;
 import org.springframework.jdbc.core.RowCallbackHandler;
-import org.springframework.jdbc.core.simple.ParameterizedRowMapper;
+import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.support.incrementer.DataFieldMaxValueIncrementer;
 import org.springframework.util.Assert;
 
@@ -390,7 +391,7 @@ public class JdbcJobExecutionDao extends AbstractJdbcBatchMetadataDao implements
 	 * @author Dave Syer
 	 *
 	 */
-	private final class JobExecutionRowMapper implements ParameterizedRowMapper<JobExecution> {
+	private final class JobExecutionRowMapper implements RowMapper<JobExecution> {
 
 		private JobInstance jobInstance;
 

@@ -35,6 +35,7 @@ import org.apache.commons.logging.LogFactory;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+
 import org.springframework.batch.core.BatchStatus;
 import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.JobParameters;
@@ -48,8 +49,9 @@ import org.springframework.batch.item.ItemWriter;
 import org.springframework.batch.item.ParseException;
 import org.springframework.batch.item.UnexpectedInputException;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.jdbc.core.simple.ParameterizedRowMapper;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.RowMapper;
+import org.springframework.jdbc.core.simple.ParameterizedRowMapper;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
@@ -238,7 +240,7 @@ public class FaultTolerantStepFactoryBeanRollbackIntegrationTests {
 
 		public List<String> getCommitted() {
 			return jdbcTemplate.query("SELECT MESSAGE from ERROR_LOG where STEP_NAME='written'",
-					new ParameterizedRowMapper<String>() {
+					new RowMapper<String>() {
 						@Override
 						public String mapRow(ResultSet rs, int rowNum) throws SQLException {
 							return rs.getString(1);
@@ -291,7 +293,7 @@ public class FaultTolerantStepFactoryBeanRollbackIntegrationTests {
 
 		public List<String> getCommitted() {
 			return jdbcTemplate.query("SELECT MESSAGE from ERROR_LOG where STEP_NAME='processed'",
-					new ParameterizedRowMapper<String>() {
+					new RowMapper<String>() {
 						@Override
 						public String mapRow(ResultSet rs, int rowNum) throws SQLException {
 							return rs.getString(1);

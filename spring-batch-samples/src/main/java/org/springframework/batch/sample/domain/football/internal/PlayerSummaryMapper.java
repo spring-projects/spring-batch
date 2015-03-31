@@ -19,7 +19,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 
 import org.springframework.batch.sample.domain.football.PlayerSummary;
-import org.springframework.jdbc.core.simple.ParameterizedRowMapper;
+import org.springframework.jdbc.core.RowMapper;
 
 /**
  * RowMapper used to map a ResultSet to a {@link PlayerSummary}
@@ -27,7 +27,7 @@ import org.springframework.jdbc.core.simple.ParameterizedRowMapper;
  * @author Lucas Ward
  *
  */
-public class PlayerSummaryMapper implements ParameterizedRowMapper<PlayerSummary> {
+public class PlayerSummaryMapper implements RowMapper<PlayerSummary> {
 
 	/* (non-Javadoc)
 	 * @see org.springframework.jdbc.core.RowMapper#mapRow(java.sql.ResultSet, int)

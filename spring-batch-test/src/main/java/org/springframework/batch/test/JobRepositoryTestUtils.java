@@ -15,6 +15,15 @@
  */
 package org.springframework.batch.test;
 
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
+
+import javax.sql.DataSource;
+
 import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.JobInstance;
 import org.springframework.batch.core.JobParameter;
@@ -30,16 +39,8 @@ import org.springframework.beans.factory.InitializingBean;
 import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.JdbcOperations;
 import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.jdbc.core.simple.ParameterizedRowMapper;
+import org.springframework.jdbc.core.RowMapper;
 import org.springframework.util.Assert;
-
-import javax.sql.DataSource;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
 
 /**
  * Convenience class for creating and removing {@link JobExecution} instances
@@ -163,7 +164,7 @@ public class JobRepositoryTestUtils extends AbstractJdbcBatchMetadataDao impleme
 		for (JobExecution jobExecution : list) {
 			List<Long> stepExecutionIds = jdbcTemplate.query(
 					getQuery("select STEP_EXECUTION_ID from %PREFIX%STEP_EXECUTION where JOB_EXECUTION_ID=?"),
-					new ParameterizedRowMapper<Long>() {
+					new RowMapper<Long>() {
 						@Override
 						public Long mapRow(ResultSet rs, int rowNum) throws SQLException {
 							return rs.getLong(1);

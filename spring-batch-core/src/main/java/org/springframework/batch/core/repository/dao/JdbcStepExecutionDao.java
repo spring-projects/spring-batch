@@ -16,19 +16,6 @@
 
 package org.springframework.batch.core.repository.dao;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-import org.springframework.batch.core.BatchStatus;
-import org.springframework.batch.core.ExitStatus;
-import org.springframework.batch.core.JobExecution;
-import org.springframework.batch.core.StepExecution;
-import org.springframework.beans.factory.InitializingBean;
-import org.springframework.dao.OptimisticLockingFailureException;
-import org.springframework.jdbc.core.BatchPreparedStatementSetter;
-import org.springframework.jdbc.core.simple.ParameterizedRowMapper;
-import org.springframework.jdbc.support.incrementer.DataFieldMaxValueIncrementer;
-import org.springframework.util.Assert;
-
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -39,6 +26,20 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
+import org.springframework.batch.core.BatchStatus;
+import org.springframework.batch.core.ExitStatus;
+import org.springframework.batch.core.JobExecution;
+import org.springframework.batch.core.StepExecution;
+import org.springframework.beans.factory.InitializingBean;
+import org.springframework.dao.OptimisticLockingFailureException;
+import org.springframework.jdbc.core.BatchPreparedStatementSetter;
+import org.springframework.jdbc.core.RowMapper;
+import org.springframework.jdbc.support.incrementer.DataFieldMaxValueIncrementer;
+import org.springframework.util.Assert;
 
 /**
  * JDBC implementation of {@link StepExecutionDao}.<br>
@@ -297,7 +298,7 @@ public class JdbcStepExecutionDao extends AbstractJdbcBatchMetadataDao implement
 				jobExecution.getId());
 	}
 
-	private static class StepExecutionRowMapper implements ParameterizedRowMapper<StepExecution> {
+	private static class StepExecutionRowMapper implements RowMapper<StepExecution> {
 
 		private final JobExecution jobExecution;
 
