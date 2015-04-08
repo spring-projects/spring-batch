@@ -89,10 +89,10 @@ The quickest way to get started with Spring Batch is to use Spring Boot.
       public Step step1() {
         return stepBuilderFactory.get("step1")
             .tasklet(new Tasklet() {
-              public RepeatStatus execute(StepContribution contribution, ChunkContext chunkContext)
+              public RepeatStatus execute(StepContribution contribution, ChunkContext chunkContext) {
                 return null;
               }
-            )
+            })
             .build();
       }
 
