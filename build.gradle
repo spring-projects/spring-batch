@@ -155,6 +155,10 @@ subprojects { subproject ->
 			append = false
 			destinationFile = file("$buildDir/jacoco.exec")
 		}
+		
+		testLogging {
+			showStandardStreams = true
+		}
 	}
 
 	task sourcesJar(type: Jar) {
