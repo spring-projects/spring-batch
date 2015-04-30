@@ -76,6 +76,7 @@ public class DelimitedLineTokenizer extends AbstractLineTokenizer {
 	 * @param delimiter the desired delimiter
 	 */
 	public DelimitedLineTokenizer(String delimiter) {
+		Assert.notNull(delimiter);
 		Assert.state(!delimiter.equals(String.valueOf(DEFAULT_QUOTE_CHARACTER)), "[" + DEFAULT_QUOTE_CHARACTER
 				+ "] is not allowed as delimiter for tokenizers.");
 
@@ -132,6 +133,8 @@ public class DelimitedLineTokenizer extends AbstractLineTokenizer {
 	 */
 	@Override
 	protected List<String> doTokenize(String line) {
+
+		Assert.state(null != delimiter && 0 != delimiter.length());
 
 		List<String> tokens = new ArrayList<String>();
 
