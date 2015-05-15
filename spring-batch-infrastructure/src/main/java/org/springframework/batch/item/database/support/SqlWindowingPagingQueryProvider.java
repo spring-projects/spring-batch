@@ -149,7 +149,7 @@ public class SqlWindowingPagingQueryProvider extends AbstractSqlPagingQueryProvi
 	protected String getOverClause() {
 		StringBuilder sql = new StringBuilder();
 		
-		sql.append(" ORDER BY ").append(SqlPagingQueryUtils.buildSortClause(this));
+		sql.append(" ORDER BY ").append(buildSortClause(this));
 		
 		return sql.toString();
 	}
@@ -161,4 +161,16 @@ public class SqlWindowingPagingQueryProvider extends AbstractSqlPagingQueryProvi
 	protected String getOverSubstituteClauseEnd() {
 		return "";
 	}
+
+
+	/**
+	 * Generates ORDER BY attributes based on the sort keys.
+	 *
+	 * @param provider
+	 * @return a String that can be appended to an ORDER BY clause.
+	 */
+	private String buildSortClause(AbstractSqlPagingQueryProvider provider) {
+		return SqlPagingQueryUtils.buildSortClause(provider.getSortKeysWithoutAliases());
+	}
+
 }
