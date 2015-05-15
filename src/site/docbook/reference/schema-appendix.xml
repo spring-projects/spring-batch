@@ -86,11 +86,11 @@ CREATE SEQUENCE BATCH_JOB_SEQ;</programlisting>
       <para>Many database vendors don't support sequences. In these cases,
       work-arounds are used, such as the following for MySQL:</para>
 
-      <programlisting language="sql">CREATE TABLE BATCH_STEP_EXECUTION_SEQ (ID BIGINT NOT NULL) type=MYISAM;
+      <programlisting language="sql">CREATE TABLE BATCH_STEP_EXECUTION_SEQ (ID BIGINT NOT NULL) type=InnoDB;
 INSERT INTO BATCH_STEP_EXECUTION_SEQ values(0);
-CREATE TABLE BATCH_JOB_EXECUTION_SEQ (ID BIGINT NOT NULL) type=MYISAM;
+CREATE TABLE BATCH_JOB_EXECUTION_SEQ (ID BIGINT NOT NULL) type=InnoDB;
 INSERT INTO BATCH_JOB_EXECUTION_SEQ values(0);
-CREATE TABLE BATCH_JOB_SEQ (ID BIGINT NOT NULL) type=MYISAM;
+CREATE TABLE BATCH_JOB_SEQ (ID BIGINT NOT NULL) type=InnoDB;
 INSERT INTO BATCH_JOB_SEQ values(0);</programlisting>
 
       <para>In the above case, a table is used in place of each sequence. The
