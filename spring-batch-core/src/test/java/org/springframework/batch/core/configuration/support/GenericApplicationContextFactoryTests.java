@@ -15,24 +15,31 @@
  */
 package org.springframework.batch.core.configuration.support;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
 import org.junit.Test;
+
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.job.JobSupport;
+import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.annotation.AutowiredAnnotationBeanPostProcessor;
 import org.springframework.beans.factory.config.BeanFactoryPostProcessor;
 import org.springframework.beans.factory.config.BeanPostProcessor;
 import org.springframework.beans.factory.support.AbstractBeanFactory;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.ApplicationContextAware;
 import org.springframework.context.ConfigurableApplicationContext;
+import org.springframework.context.EnvironmentAware;
+import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
+import org.springframework.core.env.Environment;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;
 import org.springframework.util.ClassUtils;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
 
 /**
  * @author Dave Syer
@@ -203,6 +210,19 @@ public class GenericApplicationContextFactoryTests {
 		assertEquals(context.getBean("bean4"), "bean4");
 	}
 
+	@Test
+	public void testParentChildLifecycleEvents() throws InterruptedException {
+		AnnotationConfigApplicationContext parent = new AnnotationConfigApplicationContext(ParentContext.class);
+		GenericApplicationContextFactory child = new GenericApplicationContextFactory(ChildContextConfiguration.class);
+		child.setApplicationContext(parent);
+		ApplicationContext context = child.createApplicationContext();
+		ChildBean bean = context.getBean(ChildBean.class);
+		assertEquals(1, bean.counter1);
+		assertEquals(1, bean.counter2);
+	}
+
+
+
 	public static class Foo {
 		private double[] values;
 
@@ -236,4 +256,39 @@ public class GenericApplicationContextFactoryTests {
 			return "bean4";
 		}
 	}
+
+	@Configuration
+	public static class ParentContext implements ApplicationContextAware {
+		@Override
+		public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
+		}
+	}
+
+
+	@Configuration
+	public static class ChildContextConfiguration  {
+		@Bean
+		public ChildBean childBean() {
+			return new ChildBean();
+		}
+	}
+
+	public static class ChildBean implements ApplicationContextAware, EnvironmentAware {
+
+		private int counter1 = 0;
+
+		private int counter2 = 0;
+
+		@Override
+		public void setEnvironment(Environment environment) {
+			counter2++;
+		}
+
+		@Override
+		public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
+			counter1++;
+		}
+	}
+
+
 }
