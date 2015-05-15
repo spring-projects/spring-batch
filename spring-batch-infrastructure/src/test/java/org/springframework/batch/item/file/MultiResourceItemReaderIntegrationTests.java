@@ -15,26 +15,30 @@
  */
 package org.springframework.batch.item.file;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.*;
+import static org.junit.Assert.assertSame;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.Comparator;
+
 import org.junit.Before;
 import org.junit.Test;
+
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.item.ItemStreamException;
+import org.springframework.batch.item.NonTransientResourceException;
+import org.springframework.batch.item.ParseException;
+import org.springframework.batch.item.UnexpectedInputException;
 import org.springframework.batch.item.file.mapping.PassThroughLineMapper;
 import org.springframework.core.io.AbstractResource;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
 import org.springframework.test.util.ReflectionTestUtils;
-
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.Comparator;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertSame;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
 
 /**
  * Tests for {@link MultiResourceItemReader}.
@@ -290,6 +294,25 @@ public class MultiResourceItemReaderIntegrationTests {
 	}
 
 	/**
+	 * Test {@link org.springframework.batch.item.ItemStream} lifecycle symmetry
+	 */
+	@Test
+	public void testNonExistentResourcesItemStreamLifecycle() throws Exception {
+		ItemStreamReaderImpl delegate = new ItemStreamReaderImpl();
+		tested.setDelegate(delegate);
+		tested.setResources(new Resource[] { });
+		itemReader.setStrict(false);
+		tested.open(new ExecutionContext());
+
+		assertNull(tested.read());
+		assertFalse(delegate.openCalled);
+		assertFalse(delegate.closeCalled);
+		assertFalse(delegate.updateCalled);
+
+		tested.close();
+	}
+
+	/**
 	 * Directory resource behaves as if it was empty.
 	 */
 	@Test
@@ -456,4 +479,34 @@ public class MultiResourceItemReaderIntegrationTests {
 		assertEquals("1", tested.read());
 	}
 
+	private static class ItemStreamReaderImpl implements ResourceAwareItemReaderItemStream<String> {
+
+		private boolean openCalled = false;
+		private boolean updateCalled = false;
+		private boolean closeCalled = false;
+
+		@Override
+		public String read() throws Exception, UnexpectedInputException, ParseException, NonTransientResourceException {
+			return null;
+		}
+
+		@Override
+		public void open(ExecutionContext executionContext) throws ItemStreamException {
+			openCalled = true;
+		}
+
+		@Override
+		public void update(ExecutionContext executionContext) throws ItemStreamException {
+			updateCalled = true;
+		}
+
+		@Override
+		public void close() throws ItemStreamException {
+			closeCalled = true;
+		}
+
+		@Override
+		public void setResource(Resource resource) {
+		}
+	}
 }
