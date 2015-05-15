@@ -150,7 +150,11 @@ public class MultiResourceItemReader<T> extends AbstractItemStreamItemReader<T> 
 	@Override
 	public void close() throws ItemStreamException {
 		super.close();
-		delegate.close();
+
+		if(!this.noInput) {
+			delegate.close();
+		}
+
 		noInput = false;
 	}
 
