@@ -17,7 +17,11 @@ package org.springframework.batch.item.database.support;
 
 import static org.junit.Assert.assertEquals;
 
+import java.util.HashMap;
+
 import org.junit.Test;
+
+import org.springframework.batch.item.database.Order;
 
 /**
  * @author Thomas Risberg
@@ -92,6 +96,24 @@ public class MySqlPagingQueryProviderTests extends AbstractSqlPagingQueryProvide
 		String sql = "SELECT id FROM foo WHERE bar = 1 GROUP BY dep ORDER BY id ASC LIMIT 0, 1";
 		String s = pagingQueryProvider.generateJumpToItemQuery(45, pageSize);
 		assertEquals(sql, s);
+	}
+
+	@Test
+	public void testFirstPageSqlWithAliases() {
+		this.pagingQueryProvider = new MySqlPagingQueryProvider();
+		this.pagingQueryProvider.setSelectClause("SELECT owner.id as ownerid, first_name, last_name, dog_name ");
+		this.pagingQueryProvider.setFromClause("FROM dog_owner owner INNER JOIN dog ON owner.id = dog.id ");
+		this.pagingQueryProvider.setSortKeys(new HashMap<String, Order>() {{
+			put("owner.id", Order.ASCENDING);
+		}});
+
+		String firstPage = this.pagingQueryProvider.generateFirstPageQuery(5);
+		String jumpToItemQuery = this.pagingQueryProvider.generateJumpToItemQuery(7, 5);
+		String remainingPagesQuery = this.pagingQueryProvider.generateRemainingPagesQuery(5);
+
+		assertEquals("SELECT owner.id as ownerid, first_name, last_name, dog_name FROM dog_owner owner INNER JOIN dog ON owner.id = dog.id ORDER BY owner.id ASC LIMIT 5", firstPage);
+		assertEquals("SELECT owner.id FROM dog_owner owner INNER JOIN dog ON owner.id = dog.id ORDER BY owner.id ASC LIMIT 4, 1", jumpToItemQuery);
+		assertEquals("SELECT owner.id as ownerid, first_name, last_name, dog_name FROM dog_owner owner INNER JOIN dog ON owner.id = dog.id WHERE ((owner.id > ?)) ORDER BY owner.id ASC LIMIT 5", remainingPagesQuery);
 	}
 
 	@Override
