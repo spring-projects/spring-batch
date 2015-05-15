@@ -23,6 +23,7 @@ import org.springframework.batch.core.StepExecution;
 import org.springframework.batch.core.scope.context.StepContext;
 import org.springframework.batch.core.scope.context.StepSynchronizationManager;
 import org.springframework.batch.item.ItemProcessor;
+import org.springframework.batch.item.ItemWriter;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.core.task.SyncTaskExecutor;
 import org.springframework.core.task.TaskExecutor;
@@ -33,11 +34,19 @@ import org.springframework.util.Assert;
  * background. To allow for background processing the return value from the
  * processor is a {@link Future} which needs to be unpacked before the item can
  * be used by a client.
+ *
+ * Because the {@link Future} is typically unwrapped in the {@link ItemWriter},
+ * there are lifecycle and stats limitations (since the framework doesn't know
+ * what the result of the processor is).  While not an exhaustive list, things like
+ * {@link StepExecution#filterCount} will not reflect the number of filtered items
+ * and {@link org.springframework.batch.core.ItemProcessListener#onProcessError(Object, Exception)}
+ * will not be called.
  * 
  * @author Dave Syer
  * 
  * @param <I> the input object type
  * @param <O> the output object type (will be wrapped in a Future)
+ * @see AsyncItemWriter
  */
 public class AsyncItemProcessor<I, O> implements ItemProcessor<I, Future<O>>, InitializingBean {
 
