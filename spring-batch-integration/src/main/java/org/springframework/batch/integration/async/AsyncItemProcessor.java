@@ -53,6 +53,8 @@ public class AsyncItemProcessor<I, O> implements ItemProcessor<I, Future<O>>, In
 	private ItemProcessor<I, O> delegate;
 
 	private TaskExecutor taskExecutor = new SyncTaskExecutor();
+	
+	private ProcessErrorListener<I> processErrorListener;
 
 	/**
 	 * Check mandatory properties (the {@link #setDelegate(ItemProcessor)}).
@@ -72,7 +74,7 @@ public class AsyncItemProcessor<I, O> implements ItemProcessor<I, Future<O>>, In
 	public void setDelegate(ItemProcessor<I, O> delegate) {
 		this.delegate = delegate;
 	}
-
+	
 	/**
 	 * The {@link TaskExecutor} to use to allow the item processing to proceed
 	 * in the background. Defaults to a {@link SyncTaskExecutor} so no threads
@@ -82,6 +84,15 @@ public class AsyncItemProcessor<I, O> implements ItemProcessor<I, Future<O>>, In
 	 */
 	public void setTaskExecutor(TaskExecutor taskExecutor) {
 		this.taskExecutor = taskExecutor;
+	}
+	
+	/**
+	 * The {@link ProcessErrorListener} to be called in case of an exception.
+	 * 
+	 * @param processErrorListener a {@link ProcessErrorListener} to be notified about exceptions.
+	 */
+	public void setProcessErrorListener(ProcessErrorListener<I> processErrorListener) {
+		this.processErrorListener = processErrorListener;
 	}
 
 	/**
@@ -100,6 +111,12 @@ public class AsyncItemProcessor<I, O> implements ItemProcessor<I, Future<O>>, In
 				}
 				try {
 					return delegate.process(item);
+				}
+				catch (Exception e) {
+					if (processErrorListener != null) {
+						processErrorListener.onProcessError(item, e);
+					}
+					throw e;
 				}
 				finally {
 					if (stepExecution != null) {
