@@ -23,11 +23,11 @@ import java.util.HashSet;
 import java.util.Set;
 
 import org.junit.Test;
+
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.item.ItemStreamReader;
 import org.springframework.batch.item.NonTransientResourceException;
 import org.springframework.batch.item.ParseException;
-import org.springframework.batch.item.UnexpectedInputException;
 
 /**
  * 
@@ -52,8 +52,7 @@ public class SynchronizedItemStreamReaderTests {
 		public static final String HAS_BEEN_OPENED = "hasBeenOpened";
 		public static final String UPDATE_COUNT_KEY = "updateCount";
 
-		public Integer read() throws Exception, UnexpectedInputException, ParseException, 
-			NonTransientResourceException {
+		public Integer read() throws Exception, ParseException, NonTransientResourceException {
 			cursor = cursor + 1;
 			return cursor;
 		}
@@ -92,7 +91,7 @@ public class SynchronizedItemStreamReaderTests {
 
 		final TestItemReader testItemReader = new TestItemReader();
 		final SynchronizedItemStreamReader<Integer> synchronizedItemStreamReader = new SynchronizedItemStreamReader<Integer>();
-		synchronizedItemStreamReader.setItemStreamReader(testItemReader);
+		synchronizedItemStreamReader.setDelegate(testItemReader);
 
 		// Open the ItemReader and make sure it's initialized properly.
 		synchronizedItemStreamReader.open(executionContext);
@@ -111,8 +110,8 @@ public class SynchronizedItemStreamReaderTests {
 					try {
 						ecSet.add(synchronizedItemStreamReader.read());
 						synchronizedItemStreamReader.update(executionContext);
-					} catch (Exception e) {
-					} finally {
+					} catch (Exception ignore) {
+						ignore.printStackTrace();
 					}
 				}
 			};
