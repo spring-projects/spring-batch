@@ -16,55 +16,59 @@
 package org.springframework.batch.item.support;
 
 import org.springframework.batch.item.ExecutionContext;
-import org.springframework.batch.item.ItemReader;
-import org.springframework.batch.item.ItemStream;
 import org.springframework.batch.item.ItemStreamReader;
 import org.springframework.batch.item.NonTransientResourceException;
 import org.springframework.batch.item.ParseException;
 import org.springframework.batch.item.UnexpectedInputException;
+import org.springframework.beans.factory.InitializingBean;
+import org.springframework.util.Assert;
 
 /**
  * 
  * This is a simple ItemStreamReader decorator with a synchronized ItemReader.read() 
  * method - which makes a non-thread-safe ItemReader thread-safe.
  * 
- * However, if reprocessing an item is problematic then using this will make a job not 
- * restartable.  If a restartable job is desired in that case, then further co-ordination 
- * between the read and close methods needs to be implemented.
+ * However, if reprocessing an item is problematic then using this will make a job not
+ * restartable.
  * 
  * Here are some links about the motivation behind this class:
  * - http://projects.spring.io/spring-batch/faq.html#threading-reader}
  * - http://stackoverflow.com/a/20002493/2910265}
  * 
  * @author Matthew Ouyang
- * @since 3.0
+ * @since 3.0.4
  *
- * @param <T>
+ * @param <T> type of object being read
  */
-public class SynchronizedItemStreamReader<T> implements ItemStream, ItemReader<T> {
+public class SynchronizedItemStreamReader<T> implements ItemStreamReader<T>, InitializingBean {
 
-	ItemStreamReader<T> itemStreamReader;
+	private ItemStreamReader<T> delegate;
 
-	public void setItemStreamReader(ItemStreamReader<T> itemStreamReader) {
-		this.itemStreamReader = itemStreamReader;
+	public void setDelegate(ItemStreamReader<T> delegate) {
+		this.delegate = delegate;
 	}
 
 	/**
-	 * This delegates to the read method of the <code>itemStreamReader</code>
+	 * This delegates to the read method of the <code>delegate</code>
 	 */
 	public synchronized T read() throws Exception, UnexpectedInputException, ParseException, NonTransientResourceException {
-		return this.itemStreamReader.read();
+		return this.delegate.read();
 	}
 
 	public void close() {
-		this.itemStreamReader.close();
+		this.delegate.close();
 	}
 
 	public void open(ExecutionContext executionContext) {
-		this.itemStreamReader.open(executionContext);
+		this.delegate.open(executionContext);
 	}
 
 	public void update(ExecutionContext executionContext) {
-		this.itemStreamReader.update(executionContext);
+		this.delegate.update(executionContext);
+	}
+
+	@Override
+	public void afterPropertiesSet() throws Exception {
+		Assert.notNull(this.delegate, "A delegate item reader is required");
 	}
 }
