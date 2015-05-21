@@ -84,19 +84,13 @@ public class JdbcPagingItemReaderAsyncTests {
 
 	@Before
 	public void init() {
-		System.out.println("********* dataSource = " + dataSource);
-		System.out.println("********* maxId = " + maxId);
 		JdbcTemplate jdbcTemplate = new JdbcTemplate(dataSource);
-		System.out.println("********* jdbcTemplate = " + jdbcTemplate);
-		maxId = jdbcTemplate.queryForObject("SELECT MAX(ID) from T_FOOS", Integer.class);
-		System.out.println("********* maxId after = " + maxId);
+		Integer tempMaxId = jdbcTemplate.queryForObject("SELECT MAX(ID) from T_FOOS", Integer.class);
+		maxId = tempMaxId != null? tempMaxId : 0;
 		for (int i = ITEM_COUNT; i > maxId; i--) {
-			System.out.println("********* inserting a foo");
 			jdbcTemplate.update("INSERT into T_FOOS (ID,NAME,VALUE) values (?, ?, ?)", i, "foo" + i, i);
-			System.out.println("********* a foo was inserted");
 		}
 		assertEquals(ITEM_COUNT, JdbcTestUtils.countRowsInTable(jdbcTemplate, "T_FOOS"));
-		System.out.println("******** init is complete");
 	}
 
 	@After
