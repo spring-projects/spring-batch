@@ -21,6 +21,7 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 
+import org.springframework.beans.factory.InitializingBean;
 import org.springframework.util.Assert;
 import org.springframework.util.StringUtils;
 
@@ -33,7 +34,8 @@ import org.springframework.util.StringUtils;
  * @author Dave Syer
  * @author Michael Minella
  */
-public class DelimitedLineTokenizer extends AbstractLineTokenizer {
+public class DelimitedLineTokenizer extends AbstractLineTokenizer 
+	implements InitializingBean {
 	/**
 	 * Convenient constant for the common case of a tab delimiter.
 	 */
@@ -76,6 +78,7 @@ public class DelimitedLineTokenizer extends AbstractLineTokenizer {
 	 * @param delimiter the desired delimiter
 	 */
 	public DelimitedLineTokenizer(String delimiter) {
+		Assert.notNull(delimiter);
 		Assert.state(!delimiter.equals(String.valueOf(DEFAULT_QUOTE_CHARACTER)), "[" + DEFAULT_QUOTE_CHARACTER
 				+ "] is not allowed as delimiter for tokenizers.");
 
@@ -255,5 +258,10 @@ public class DelimitedLineTokenizer extends AbstractLineTokenizer {
 	 */
 	protected boolean isQuoteCharacter(char c) {
 		return c == quoteCharacter;
+	}
+
+	@Override
+	public void afterPropertiesSet() throws Exception {
+		Assert.state(null != delimiter && 0 != delimiter.length());		
 	}
 }
