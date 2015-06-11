@@ -19,6 +19,8 @@ import java.util.concurrent.Callable;
 import java.util.concurrent.Future;
 import java.util.concurrent.FutureTask;
 
+import org.springframework.batch.core.ItemProcessListenerSupport;
+import org.springframework.batch.core.ItemProcessListener;
 import org.springframework.batch.core.StepExecution;
 import org.springframework.batch.core.scope.context.StepContext;
 import org.springframework.batch.core.scope.context.StepSynchronizationManager;
@@ -48,13 +50,13 @@ import org.springframework.util.Assert;
  * @param <O> the output object type (will be wrapped in a Future)
  * @see AsyncItemWriter
  */
-public class AsyncItemProcessor<I, O> implements ItemProcessor<I, Future<O>>, InitializingBean {
+public class AsyncItemProcessor<I, O> implements ItemProcessor<I, Future<O>>, InitializingBean, ItemProcessListenerSupport<I, O> {
 
 	private ItemProcessor<I, O> delegate;
 
 	private TaskExecutor taskExecutor = new SyncTaskExecutor();
 	
-	private ProcessErrorListener<I> processErrorListener;
+	private ItemProcessListener<I, O> itemProcessListener;
 
 	/**
 	 * Check mandatory properties (the {@link #setDelegate(ItemProcessor)}).
@@ -87,14 +89,14 @@ public class AsyncItemProcessor<I, O> implements ItemProcessor<I, Future<O>>, In
 	}
 	
 	/**
-	 * The {@link ProcessErrorListener} to be called in case of an exception.
+	 * The {@link ItemProcessListener} to be called in case of an exception.
 	 * 
-	 * @param processErrorListener a {@link ProcessErrorListener} to be notified about exceptions.
+	 * @param itemProcessListener a {@link ItemProcessListener} to be notified about exceptions.
 	 */
-	public void setProcessErrorListener(ProcessErrorListener<I> processErrorListener) {
-		this.processErrorListener = processErrorListener;
+	public void setItemProcessListener(ItemProcessListener<I, O> itemProcessListener) {
+		this.itemProcessListener = itemProcessListener;
 	}
-
+	
 	/**
 	 * Transform the input by delegating to the provided item processor. The
 	 * return value is wrapped in a {@link Future} so that clients can unpack it
@@ -113,8 +115,8 @@ public class AsyncItemProcessor<I, O> implements ItemProcessor<I, Future<O>>, In
 					return delegate.process(item);
 				}
 				catch (Exception e) {
-					if (processErrorListener != null) {
-						processErrorListener.onProcessError(item, e);
+					if (itemProcessListener != null) {
+						itemProcessListener.onProcessError(item, e);
 					}
 					throw e;
 				}

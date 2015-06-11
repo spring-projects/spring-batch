@@ -18,6 +18,8 @@ package org.springframework.batch.core.step.item;
 
 import java.util.List;
 
+import org.springframework.batch.core.ItemProcessListenerSupport;
+import org.springframework.batch.core.ItemProcessListener;
 import org.springframework.batch.core.StepContribution;
 import org.springframework.batch.core.StepListener;
 import org.springframework.batch.core.listener.MulticasterBatchListener;
@@ -99,6 +101,9 @@ public class SimpleChunkProcessor<I, O> implements ChunkProcessor<I>, Initializi
 	 */
 	public void registerListener(StepListener listener) {
 		this.listener.register(listener);
+		if((itemProcessor instanceof ItemProcessListenerSupport) && (listener instanceof ItemProcessListener)){
+			((ItemProcessListenerSupport)itemProcessor).setItemProcessListener((ItemProcessListener)listener);
+		}
 	}
 
 	/**

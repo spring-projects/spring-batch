@@ -13,23 +13,18 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.springframework.batch.integration.async;
+package org.springframework.batch.core;
 
+import org.springframework.batch.item.ItemProcessor;
 
 /**
- * Implementations of this interface will be notified in the event of any
- * exceptions thrown by the async processor.
+ * Interface to mark {@link ItemProcessor} which support injection of a {@link ItemProcessListener}.
  * 
  * @author Dominik Bartholdi
  *
  */
-public interface ProcessErrorListener<I> {
+public interface ItemProcessListenerSupport<I, O> {
 
-	/**
-	 * Called if an exception was thrown from {@link AsyncItemProcessor#process(Object)}.
-	 * 
-	 * @param item attempted to be processed
-	 * @param e - exception thrown during processing.
-	 */
-	void onProcessError(I item, Exception e);
+	public void setItemProcessListener(ItemProcessListener<I, O> itemProcessListener);
+
 }
