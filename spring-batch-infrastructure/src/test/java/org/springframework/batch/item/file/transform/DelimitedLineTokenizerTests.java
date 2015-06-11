@@ -138,8 +138,9 @@ public class DelimitedLineTokenizerTests {
 	}
 	
 	@Test(expected=IllegalStateException.class)
-	public void testDelimitedLineTokenizerEmptyString() {
-		AbstractLineTokenizer tokenizer = new DelimitedLineTokenizer("");
+	public void testDelimitedLineTokenizerEmptyString() throws Exception {
+		DelimitedLineTokenizer tokenizer = new DelimitedLineTokenizer("");
+		tokenizer.afterPropertiesSet();
 		tokenizer.tokenize("a b c");
 	}
 	
