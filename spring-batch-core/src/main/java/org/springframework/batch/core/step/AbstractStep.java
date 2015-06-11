@@ -234,8 +234,11 @@ public abstract class AbstractStep implements Step, InitializingBean, BeanNameAw
 				stepExecution.setExitStatus(exitStatus);
 				exitStatus = exitStatus.and(getCompositeListener().afterStep(stepExecution));
 			}
-			catch (Exception e) {
-				logger.error(String.format("Exception in afterStep callback in step %s in job %s", name, stepExecution.getJobExecution().getJobInstance().getJobName()), e);
+			catch (Throwable t) {
+				logger.error(String.format("Exception in afterStep callback in step %s in job %s", name, stepExecution.getJobExecution().getJobInstance().getJobName()), t);
+				stepExecution.upgradeStatus(determineBatchStatus(t));
+				exitStatus = exitStatus.and(getDefaultExitStatusForFailure(t));
+				stepExecution.addFailureException(t);
 			}
 
 			try {
