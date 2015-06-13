@@ -83,7 +83,7 @@ public class JacksonUnmarshallerTest {
 	@Test
 	public void simpleObject() throws Exception {
 		String json = "{'stringValue' : '123'}";
-		JacksonUnmarshaller<SimpleObject> unmarshaller = new JacksonUnmarshaller<SimpleObject>();
+		JacksonUnmarshaller unmarshaller = new JacksonUnmarshaller();
 		SimpleObject simpleObject = unmarshaller.unmarshal(new ByteArrayInputStream(json.getBytes()), SimpleObject.class);
 		assertThat(simpleObject.getStringValue(), equals("123"));
 	}
@@ -91,7 +91,7 @@ public class JacksonUnmarshallerTest {
 	@Test
 	public void compositeObject() throws Exception {
 		String json = "'stringValue' : '321', 'arrayOfIntegers' : [1, 2], 'simpleObject' : {'stringValue' : '123'}";
-		JacksonUnmarshaller<CompositeObject> unmarshaller = new JacksonUnmarshaller<CompositeObject>();
+		JacksonUnmarshaller unmarshaller = new JacksonUnmarshaller();
 		CompositeObject simpleObject = unmarshaller.unmarshal(new ByteArrayInputStream(json.getBytes()), CompositeObject.class);
 		assertThat(simpleObject.getStringValue(), equals("321"));
 		assertThat(simpleObject.getArrayOfIntegers(), hasItems(1, 2));

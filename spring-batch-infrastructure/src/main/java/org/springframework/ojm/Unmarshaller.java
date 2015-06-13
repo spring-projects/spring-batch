@@ -17,7 +17,7 @@ package org.springframework.ojm;
 
 import java.io.InputStream;
 
-public interface Unmarshaller<T> {
+public interface Unmarshaller {
 
-	public T unmarshal(InputStream inputStream, Class<T> _class) throws Exception;
+	public <T> T unmarshal(InputStream inputStream, Class<T> _class) throws Exception;
 }

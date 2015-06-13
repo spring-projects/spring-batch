@@ -20,7 +20,7 @@ import java.io.InputStream;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.springframework.ojm.Unmarshaller;
 
-public class JacksonUnmarshaller<T> implements Unmarshaller<T> {
+public class JacksonUnmarshaller implements Unmarshaller {
 
 	private ObjectMapper objectMapper;
 
@@ -29,7 +29,7 @@ public class JacksonUnmarshaller<T> implements Unmarshaller<T> {
 	}
 
 	@Override
-	public T unmarshal(InputStream inputStream, Class<T> _class) throws Exception {
+	public <T> T unmarshal(InputStream inputStream, Class<T> _class) throws Exception {
 		return objectMapper.readValue(inputStream, _class);
 	}
 }
