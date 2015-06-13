@@ -130,7 +130,20 @@ public class DelimitedLineTokenizerTests {
 		FieldSet line = tokenizer.tokenize("a b c");
 		assertEquals(3, line.getFieldCount());
 	}
-
+	
+	@Test(expected=IllegalArgumentException.class)
+	public void testDelimitedLineTokenizerNullDelimiter() {
+		AbstractLineTokenizer tokenizer = new DelimitedLineTokenizer(null);
+		tokenizer.tokenize("a b c");
+	}
+	
+	@Test(expected=IllegalStateException.class)
+	public void testDelimitedLineTokenizerEmptyString() throws Exception {
+		DelimitedLineTokenizer tokenizer = new DelimitedLineTokenizer("");
+		tokenizer.afterPropertiesSet();
+		tokenizer.tokenize("a b c");
+	}
+	
 	@Test
 	public void testDelimitedLineTokenizerString() {
 		AbstractLineTokenizer tokenizer = new DelimitedLineTokenizer(" b ");
