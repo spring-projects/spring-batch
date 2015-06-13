@@ -60,7 +60,7 @@ public class JsonStreamItemReaderTests {
 	}
 
 	private void testTemplate(String resourceString, String keyName) throws Exception {
-		JacksonUnmarshaller<JsonStreamItemReaderTests.TestObject> unmarshaller = new JacksonUnmarshaller<JsonStreamItemReaderTests.TestObject>();
+		JacksonUnmarshaller unmarshaller = new JacksonUnmarshaller();
 		unmarshaller.setObjectMapper(new ObjectMapper());
 		JsonStreamItemReader<JsonStreamItemReaderTests.TestObject> itemReader = new JsonStreamItemReader<JsonStreamItemReaderTests.TestObject>();
 		itemReader.setResource(new InputStreamResource(

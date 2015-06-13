@@ -43,14 +43,14 @@ public class JsonStreamItemReader<T> extends AbstractItemCountingItemStreamItemR
 
 	private String keyName;
 	
-	private Unmarshaller<T> unmarshaller;
+	private Unmarshaller unmarshaller;
 	private Class<T> targetClass;
 
 	public void setKeyName(String keyName) {
 		this.keyName = keyName;
 	}
 
-	public void setUnmarshaller(Unmarshaller<T> unmarshaller) {
+	public void setUnmarshaller(Unmarshaller unmarshaller) {
 		this.unmarshaller = unmarshaller;
 	}
 
