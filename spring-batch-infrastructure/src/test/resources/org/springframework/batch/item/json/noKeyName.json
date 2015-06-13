@@ -1,0 +1,13 @@
+[{
+        "id" : 1, 
+        "string" : "a", 
+        "doubleValue" : 0.012, 
+        "booleanValue" : true, 
+        "nestedTestObjectList" : [{
+            "string" : "nested-a"
+        }]
+    },{
+        "string" : "\"b", 
+        "booleanValue" : false
+    },{
+    }]

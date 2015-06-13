@@ -61,7 +61,6 @@ public class JsonStreamItemReader<T> extends AbstractItemCountingItemStreamItemR
 	@Override
 	public void afterPropertiesSet() throws Exception {
 		Assert.notNull(unmarshaller, "The Unmarshaller must not be null.");
-		Assert.notNull(keyName, "The keyName may be empty, but it cannot be null.");
 	}
 
 	@Override
@@ -193,17 +192,20 @@ public class JsonStreamItemReader<T> extends AbstractItemCountingItemStreamItemR
 		noInput = false;
 
 		// move the cursor to the start of the input.  ignore everything before that.
-		while (jsonParser.hasNext()) {
-			JsonParser.Event nextEvent = jsonParser.next();
-			if (JsonParser.Event.KEY_NAME == nextEvent && jsonParser.getString().equals(keyName)) {
-				// A JSON array is expected, otherwise it's a format error.
+		JsonParser.Event nextEvent;
+		if (null != keyName && !"".equals(keyName)) {
+			while (jsonParser.hasNext()) {
 				nextEvent = jsonParser.next();
-				Assert.isTrue(JsonParser.Event.START_ARRAY == nextEvent
-					, "Value at element with key '" + keyName + "' must be an array."
-				);
-				return;
+				if (JsonParser.Event.KEY_NAME == nextEvent && jsonParser.getString().equals(keyName)) {
+					break;
+				}
 			}
 		}
+		// A JSON array is expected, otherwise it's a format error.
+		nextEvent = jsonParser.next();
+		Assert.isTrue(JsonParser.Event.START_ARRAY == nextEvent
+			, "Value at element with key '" + keyName + "' must be an array."
+		);		
 	}
 
 	@Override

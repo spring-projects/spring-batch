@@ -59,17 +59,16 @@ public class JsonStreamItemReaderTests {
 		}
 	}
 
-	@Test
-	public void keyName() throws Exception {
+	private void testTemplate(String resourceString, String keyName) throws Exception {
 		JacksonUnmarshaller<JsonStreamItemReaderTests.TestObject> unmarshaller = new JacksonUnmarshaller<JsonStreamItemReaderTests.TestObject>();
 		unmarshaller.setObjectMapper(new ObjectMapper());
 		JsonStreamItemReader<JsonStreamItemReaderTests.TestObject> itemReader = new JsonStreamItemReader<JsonStreamItemReaderTests.TestObject>();
 		itemReader.setResource(new InputStreamResource(
-			ClassLoader.class.getResourceAsStream("/org/springframework/batch/item/json/keyName.json")
+			ClassLoader.class.getResourceAsStream(resourceString)
 		));
 		itemReader.setTargetClass(JsonStreamItemReaderTests.TestObject.class);
 		itemReader.setUnmarshaller(unmarshaller);
-		itemReader.setKeyName("arrayOfObjects");
+		itemReader.setKeyName(keyName);
 		itemReader.afterPropertiesSet();
 		itemReader.doOpen();
 
@@ -94,5 +93,20 @@ public class JsonStreamItemReaderTests {
 		testObject = itemReader.read();
 		assertEquals(null, testObject.getBooleanValue());
 		assertEquals(null, testObject.getNestedTestObjectList());
+	}
+
+	@Test
+	public void keyName() throws Exception {
+		testTemplate("/org/springframework/batch/item/json/keyName.json", "arrayOfObjects");
+	}
+
+	@Test
+	public void noKeyName() throws Exception {
+		testTemplate("/org/springframework/batch/item/json/noKeyName.json", null);		
+	}
+
+	@Test
+	public void emptyKeyName() throws Exception {
+		testTemplate("/org/springframework/batch/item/json/noKeyName.json", "");		
 	}
 }
