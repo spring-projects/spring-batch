@@ -75,7 +75,7 @@ public class DelimitedLineTokenizer extends AbstractLineTokenizer
 	/**
 	 * Create a new instance of the {@link DelimitedLineTokenizer} class.
 	 *
-	 * @param delimiter the desired delimiter
+	 * @param delimiter the desired delimiter.  This is required
 	 */
 	public DelimitedLineTokenizer(String delimiter) {
 		Assert.notNull(delimiter);
