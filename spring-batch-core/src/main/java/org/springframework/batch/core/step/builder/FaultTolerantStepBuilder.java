@@ -134,6 +134,8 @@ public class FaultTolerantStepBuilder<I, O> extends SimpleStepBuilder<I, O> {
 
 	private boolean processorTransactional = true;
 
+	private boolean traverseCauses = false;
+
 	/**
 	 * Create a new builder initialized with any properties in the parent. The parent is copied, so it can be re-used.
 	 *
@@ -415,6 +417,28 @@ public class FaultTolerantStepBuilder<I, O> extends SimpleStepBuilder<I, O> {
 	}
 
 	/**
+	 * If traverseCauses is true, the exception causes will be traversed until
+	 * a match with the configured retryable exceptions is found.
+	 * 
+	 * @param traverseCauses value to be set
+	 * @return this for fluent chaining
+	 */
+	public FaultTolerantStepBuilder<I, O> traverseCauses(boolean traverseCauses) {
+		this.traverseCauses = traverseCauses;
+		return this;
+	}
+
+	/**
+	 * Sets traverseCauses to {@code true}. If traverseCauses is true, the exception causes will be traversed until
+	 * a match with the configured retryable exceptions is found.
+	 * 
+	 * @return this for fluent chaining
+	 */
+	public FaultTolerantStepBuilder<I, O> traverseCauses() {
+		return traverseCauses(true);
+	}
+
+	/**
 	 * Mark the item processor as non-transactional (default is the opposite). If this flag is set the results of item
 	 * processing are cached across transactions in between retries and during skip processing, otherwise the processor
 	 * will be called in every transaction.
@@ -604,7 +628,7 @@ public class FaultTolerantStepBuilder<I, O> extends SimpleStepBuilder<I, O> {
 		Map<Class<? extends Throwable>, Boolean> map = new HashMap<Class<? extends Throwable>, Boolean>(
 				retryableExceptionClasses);
 		map.put(ForceRollbackForWriteSkipException.class, true);
-		simpleRetryPolicy = new SimpleRetryPolicy(retryLimit, map);
+		simpleRetryPolicy = new SimpleRetryPolicy(retryLimit, map, traverseCauses);
 
 		if (retryPolicy == null) {
 			Assert.state(!(retryableExceptionClasses.isEmpty() && retryLimit > 0),
