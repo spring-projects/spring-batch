@@ -34,7 +34,7 @@ import org.springframework.util.StringUtils;
  * @author Dave Syer
  * @author Michael Minella
  */
-public class DelimitedLineTokenizer extends AbstractLineTokenizer 
+public class DelimitedLineTokenizer extends AbstractLineTokenizer
 	implements InitializingBean {
 	/**
 	 * Convenient constant for the common case of a tab delimiter.
@@ -58,6 +58,8 @@ public class DelimitedLineTokenizer extends AbstractLineTokenizer
 	private char quoteCharacter = DEFAULT_QUOTE_CHARACTER;
 
 	private String quoteString;
+
+    private String escapedQuoteString;
 
 	private Collection<Integer> includedFields = null;
 
@@ -123,6 +125,7 @@ public class DelimitedLineTokenizer extends AbstractLineTokenizer
 	public void setQuoteCharacter(char quoteCharacter) {
 		this.quoteCharacter = quoteCharacter;
 		this.quoteString = "" + quoteCharacter;
+        this.escapedQuoteString = "" + quoteCharacter + quoteCharacter;
 	}
 
 	/**
@@ -151,7 +154,7 @@ public class DelimitedLineTokenizer extends AbstractLineTokenizer
 			char currentChar = chars[i];
 			boolean isEnd = (i == (length - 1));
 
-			boolean isDelimiter = isDelimiter(chars, i, delimiter, endIndexLastDelimiter);
+            boolean isDelimiter = endsWithDelimiter(chars, i, endIndexLastDelimiter);
 
 			if ((isDelimiter && !inQuoted) || isEnd) {
 				endIndexLastDelimiter = i;
@@ -165,7 +168,8 @@ public class DelimitedLineTokenizer extends AbstractLineTokenizer
 				}
 
 				if (includedFields == null || includedFields.contains(fieldCount)) {
-					String value = maybeStripQuotes(new String(chars, lastCut, endPosition));
+                    String value =
+                            substringWithTrimmedWhitespaceAndQuotesIfQuotesPresent(chars, lastCut, endPosition);
 					tokens.add(value);
 				}
 
@@ -189,65 +193,80 @@ public class DelimitedLineTokenizer extends AbstractLineTokenizer
 		return tokens;
 	}
 
-	/**
-	 * If the string is quoted strip (possibly with whitespace outside the
-	 * quotes (which will be stripped), replace escaped quotes inside the
-	 * string. Quotes are escaped with double instances of the quote character.
-	 *
-	 * @param string
-	 * @return the same string but stripped and unescaped if necessary
-	 */
-	private String maybeStripQuotes(String string) {
-		String value = string.trim();
-		if (isQuoted(value)) {
-			value = StringUtils.replace(value, "" + quoteCharacter + quoteCharacter, "" + quoteCharacter);
-			int endLength = value.length() - 1;
-			// used to deal with empty quoted values
-			if (endLength == 0) {
-				endLength = 1;
-			}
-			value = value.substring(1, endLength);
-			return value;
-		}
-		return string;
-	}
+    /**
+     * Trim and leading or trailing quotes (and any leading or trailing
+     * whitespace before or after the quotes) from within the specified character
+     * array beginning at the specified offset index for the specified count.
+     * <p/>
+     * Quotes are escaped with double instances of the quote character.
+     *
+     * @param chars  the character array
+     * @param offset index from which to begin extracting substring
+     * @param count  length of substring
+     * @return a substring from the specified offset within the character array
+     * with any leading or trailing whitespace trimmed.
+     * @see String#trim()
+     */
+    private String substringWithTrimmedWhitespaceAndQuotesIfQuotesPresent(char chars[], int offset, int count) {
+        int start = offset;
+        int len = count;
 
-	/**
-	 * Is this string surrounded by quote characters?
-	 *
-	 * @param value
-	 * @return true if the value starts and ends with the
-	 * {@link #quoteCharacter}
-	 */
-	private boolean isQuoted(String value) {
-		if (value.startsWith(quoteString) && value.endsWith(quoteString)) {
-			return true;
-		}
-		return false;
-	}
+        while ((start < (start + len)) && (chars[start] <= ' ')) {
+            start++;
+            len--;
+        }
 
-	/**
-	 * Is the supplied character the delimiter character?
-	 *
-	 * @param chars the character array to be checked
-	 * @return <code>true</code> if the supplied character is the delimiter
-	 * character
-	 * @see DelimitedLineTokenizer#DelimitedLineTokenizer(String)
-	 */
-	private boolean isDelimiter(char[] chars, int i, String token, int endIndexLastDelimiter) {
-		boolean result = false;
+        while ((start < (start + len)) && ((start + len - 1 < chars.length) && (chars[start + len - 1] <= ' '))) {
+            len--;
+        }
 
-		if(i-endIndexLastDelimiter >= delimiter.length()) {
-			if(i >= token.length() - 1) {
-				String end = new String(chars, (i-token.length()) + 1, token.length());
-				if(token.equals(end)) {
-					result = true;
-				}
-			}
-		}
+        String value;
 
-		return result;
-	}
+        if ((chars.length > 2) && (chars[start] == quoteCharacter) && (chars[start + len - 1] == quoteCharacter)) {
+            value = new String(chars, start + 1, len - 2);
+            if (value.contains(escapedQuoteString)) {
+                value = StringUtils.replace(value, escapedQuoteString, quoteString);
+            }
+        }
+        else {
+            value = new String(chars, offset, count);
+        }
+
+        return value;
+    }
+
+    /**
+     * Do the character(s) in the specified array end, at the specified end
+     * index, with the delimiter character(s)?
+     * <p/>
+     * Checks that the specified end index is sufficiently greater than the
+     * specified previous delimiter end index to warrant trying to match
+     * another delimiter.  Also checks that the specified end index is
+     * sufficiently large to be able to match the length of a delimiter.
+     *
+     * @param chars    the character array
+     * @param end      the index in up to which the delimiter should be matched
+     * @param previous the index of the end of the last delimiter
+     * @return <code>true</code> if the character(s) from the specified end
+     * match the delimiter character(s), otherwise false
+     * @see DelimitedLineTokenizer#DelimitedLineTokenizer(String)
+     */
+    private boolean endsWithDelimiter(char[] chars, int end, int previous) {
+        boolean result = false;
+
+        if (end - previous >= delimiter.length()) {
+            if (end >= delimiter.length() - 1) {
+                result = true;
+                for (int j = 0; j < delimiter.length() && (((end - delimiter.length() + 1) + j) < chars.length); j++) {
+                    if (delimiter.charAt(j) != chars[(end - delimiter.length() + 1) + j]) {
+                        result = false;
+                    }
+                }
+            }
+        }
+
+        return result;
+    }
 
 	/**
 	 * Is the supplied character a quote character?
@@ -262,6 +281,6 @@ public class DelimitedLineTokenizer extends AbstractLineTokenizer
 
 	@Override
 	public void afterPropertiesSet() throws Exception {
-		Assert.state(null != delimiter && 0 != delimiter.length());		
+		Assert.state(null != delimiter && 0 != delimiter.length());
 	}
 }
