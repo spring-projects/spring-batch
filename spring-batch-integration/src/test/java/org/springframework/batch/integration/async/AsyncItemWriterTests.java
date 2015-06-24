@@ -1,5 +1,5 @@
 /*
- * Copyright 2014 the original author or authors.
+ * Copyright 2014-2015 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,6 +17,9 @@ package org.springframework.batch.integration.async;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.springframework.batch.item.ExecutionContext;
+import org.springframework.batch.item.ItemStreamException;
+import org.springframework.batch.item.ItemStreamWriter;
 import org.springframework.batch.item.ItemWriter;
 import org.springframework.core.task.SimpleAsyncTaskExecutor;
 import org.springframework.core.task.TaskExecutor;
@@ -27,6 +30,7 @@ import java.util.concurrent.Callable;
 import java.util.concurrent.FutureTask;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 /**
@@ -43,11 +47,11 @@ public class AsyncItemWriterTests {
 		taskExecutor = new SimpleAsyncTaskExecutor();
 		writtenItems = new ArrayList<String>();
 		writer = new AsyncItemWriter<String>();
-		writer.setDelegate(new ListItemWriter(writtenItems));
 	}
 
 	@Test
 	public void testRoseyScenario() throws Exception {
+		writer.setDelegate(new ListItemWriter(writtenItems));
 		List<FutureTask<String>> processedItems = new ArrayList<FutureTask<String>>();
 
 		processedItems.add(new FutureTask<String>(new Callable<String>() {
@@ -77,6 +81,7 @@ public class AsyncItemWriterTests {
 
 	@Test
 	public void testFilteredItem() throws Exception {
+		writer.setDelegate(new ListItemWriter(writtenItems));
 		List<FutureTask<String>> processedItems = new ArrayList<FutureTask<String>>();
 
 		processedItems.add(new FutureTask<String>(new Callable<String>() {
@@ -103,9 +108,48 @@ public class AsyncItemWriterTests {
 		assertTrue(writtenItems.contains("foo"));
 	}
 
+	@Test
+	public void testStreamDelegate() throws Exception {
+		ListItemStreamWriter itemWriter = new ListItemStreamWriter(writtenItems);
+		writer.setDelegate(itemWriter);
+
+		List<FutureTask<String>> processedItems = new ArrayList<FutureTask<String>>();
+
+		ExecutionContext executionContext = new ExecutionContext();
+		writer.open(executionContext);
+		writer.write(processedItems);
+		writer.update(executionContext);
+		writer.close();
+
+		assertTrue(itemWriter.isOpened);
+		assertTrue(itemWriter.isUpdated);
+		assertTrue(itemWriter.isClosed);
+	}
+
+	@Test
+	public void testNonStreamDelegate() throws Exception {
+		ListItemWriter itemWriter = new ListItemWriter(writtenItems);
+		writer.setDelegate(itemWriter);
+
+		List<FutureTask<String>> processedItems = new ArrayList<FutureTask<String>>();
+
+		ExecutionContext executionContext = new ExecutionContext();
+		writer.open(executionContext);
+		writer.write(processedItems);
+		writer.update(executionContext);
+		writer.close();
+
+		assertFalse(itemWriter.isOpened);
+		assertFalse(itemWriter.isUpdated);
+		assertFalse(itemWriter.isClosed);
+	}
+
 	private class ListItemWriter implements ItemWriter<String> {
 
 		protected List<String> items;
+		public boolean isOpened = false;
+		public boolean isUpdated = false;
+		public boolean isClosed = false;
 
 		public ListItemWriter(List<String> items) {
 			this.items = items;
@@ -114,6 +158,37 @@ public class AsyncItemWriterTests {
 		@Override
 		public void write(List<? extends String> items) throws Exception {
 			this.items.addAll(items);
+		}
+	}
+
+	private class ListItemStreamWriter implements ItemStreamWriter<String> {
+		public boolean isOpened = false;
+		public boolean isUpdated = false;
+		public boolean isClosed = false;
+		protected List<String> items;
+
+		public ListItemStreamWriter(List<String> items) {
+			this.items = items;
+		}
+
+		@Override
+		public void write(List<? extends String> items) throws Exception {
+			this.items.addAll(items);
+		}
+
+		@Override
+		public void open(ExecutionContext executionContext) throws ItemStreamException {
+			isOpened = true;
+		}
+
+		@Override
+		public void update(ExecutionContext executionContext) throws ItemStreamException {
+			isUpdated = true;
+		}
+
+		@Override
+		public void close() throws ItemStreamException {
+			isClosed = true;
 		}
 	}
 }
