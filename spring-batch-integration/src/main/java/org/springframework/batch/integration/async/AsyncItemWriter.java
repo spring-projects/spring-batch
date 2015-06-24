@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2007 the original author or authors.
+ * Copyright 2006-2015 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,7 +15,7 @@
  */
 package org.springframework.batch.integration.async;
 
-import org.springframework.batch.item.ItemWriter;
+import org.springframework.batch.item.*;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.util.Assert;
 
@@ -23,14 +23,20 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.Future;
 
-public class AsyncItemWriter<T> implements ItemWriter<Future<T>>, InitializingBean {
-	
+public class AsyncItemWriter<T> implements ItemStreamWriter<Future<T>>, InitializingBean {
+
 	private ItemWriter<T> delegate;
+
+	private boolean ignoreItemStream = false;
+
+	public void setIgnoreItemStream(boolean ignoreItemStream) {
+		this.ignoreItemStream = ignoreItemStream;
+	}
 
 	public void afterPropertiesSet() throws Exception {
 		Assert.notNull(delegate, "A delegate ItemWriter must be provided.");
 	}
-	
+
 	/**
 	 * @param delegate ItemWriter that does the actual writing of the Future results
 	 */
@@ -56,5 +62,26 @@ public class AsyncItemWriter<T> implements ItemWriter<Future<T>>, InitializingBe
 			}
 		}
 		delegate.write(list);
+	}
+
+	@Override
+	public void open(ExecutionContext executionContext) throws ItemStreamException {
+		if (!ignoreItemStream && delegate instanceof ItemStream) {
+			((ItemStream) delegate).open(executionContext);
+		}
+	}
+
+	@Override
+	public void update(ExecutionContext executionContext) throws ItemStreamException {
+		if (!ignoreItemStream && delegate instanceof ItemStream) {
+			((ItemStream) delegate).update(executionContext);
+		}
+	}
+
+	@Override
+	public void close() throws ItemStreamException {
+		if (!ignoreItemStream && delegate instanceof ItemStream) {
+			((ItemStream) delegate).close();
+		}
 	}
 }
