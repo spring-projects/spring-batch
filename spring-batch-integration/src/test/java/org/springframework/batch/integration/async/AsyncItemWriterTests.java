@@ -144,25 +144,6 @@ public class AsyncItemWriterTests {
 		assertFalse(itemWriter.isClosed);
 	}
 
-	@Test
-	public void testIgnoreStream() throws Exception {
-		ListItemStreamWriter itemWriter = new ListItemStreamWriter(writtenItems);
-		writer.setDelegate(itemWriter);
-		writer.setIgnoreItemStream(true);
-
-		List<FutureTask<String>> processedItems = new ArrayList<FutureTask<String>>();
-
-		ExecutionContext executionContext = new ExecutionContext();
-		writer.open(executionContext);
-		writer.write(processedItems);
-		writer.update(executionContext);
-		writer.close();
-
-		assertFalse(itemWriter.isOpened);
-		assertFalse(itemWriter.isUpdated);
-		assertFalse(itemWriter.isClosed);
-	}
-
 	private class ListItemWriter implements ItemWriter<String> {
 
 		protected List<String> items;

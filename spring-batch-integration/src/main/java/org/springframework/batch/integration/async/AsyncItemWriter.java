@@ -27,12 +27,6 @@ public class AsyncItemWriter<T> implements ItemStreamWriter<Future<T>>, Initiali
 
 	private ItemWriter<T> delegate;
 
-	private boolean ignoreItemStream = false;
-
-	public void setIgnoreItemStream(boolean ignoreItemStream) {
-		this.ignoreItemStream = ignoreItemStream;
-	}
-
 	public void afterPropertiesSet() throws Exception {
 		Assert.notNull(delegate, "A delegate ItemWriter must be provided.");
 	}
@@ -66,21 +60,21 @@ public class AsyncItemWriter<T> implements ItemStreamWriter<Future<T>>, Initiali
 
 	@Override
 	public void open(ExecutionContext executionContext) throws ItemStreamException {
-		if (!ignoreItemStream && delegate instanceof ItemStream) {
+		if (delegate instanceof ItemStream) {
 			((ItemStream) delegate).open(executionContext);
 		}
 	}
 
 	@Override
 	public void update(ExecutionContext executionContext) throws ItemStreamException {
-		if (!ignoreItemStream && delegate instanceof ItemStream) {
+		if (delegate instanceof ItemStream) {
 			((ItemStream) delegate).update(executionContext);
 		}
 	}
 
 	@Override
 	public void close() throws ItemStreamException {
-		if (!ignoreItemStream && delegate instanceof ItemStream) {
+		if (delegate instanceof ItemStream) {
 			((ItemStream) delegate).close();
 		}
 	}
