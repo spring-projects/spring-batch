@@ -597,16 +597,23 @@ public class DefaultFieldSetTests {
 		}
 	}
 
-	@Test
-	public void testPropertiesWithWhiteSpace() throws Exception {
+    @Test
+    public void testPropertiesAllowWhiteSpace() throws Exception {
+        DefaultFieldSet defaultFieldSet = new DefaultFieldSet(new String[] { "foo", "bar   ", "blah\t" }, new String[] { "Foo", "Bar", "Blah" });
+        defaultFieldSet.setAllowRawString(true);
+        assertEquals("bar   ", defaultFieldSet.getProperties().getProperty("Bar"));
+        assertEquals("blah\t", defaultFieldSet.getProperties().getProperty("Blah"));
+    }
 
-		assertEquals("bar", new DefaultFieldSet(new String[] { "foo", "bar   " }, new String[] { "Foo", "Bar" })
-				.getProperties().getProperty("Bar"));
+	@Test
+	public void testPropertiesDisallowWhiteSpace() throws Exception {
+        DefaultFieldSet defaultFieldSet = new DefaultFieldSet(new String[] { "foo", "bar   ", "blah\t" }, new String[] { "Foo", "Bar", "Blah" });
+		assertEquals("bar", defaultFieldSet.getProperties().getProperty("Bar"));
+        assertEquals("blah", defaultFieldSet.getProperties().getProperty("Blah"));
 	}
 
 	@Test
 	public void testPropertiesWithNullValues() throws Exception {
-
 		fieldSet = new DefaultFieldSet(new String[] { null, "bar" }, new String[] { "Foo", "Bar" });
 		assertEquals("bar", fieldSet.getProperties().getProperty("Bar"));
 		assertEquals(null, fieldSet.getProperties().getProperty("Foo"));
@@ -643,10 +650,15 @@ public class DefaultFieldSetTests {
 	@Test
 	public void testReadRawString() {
 		String name = "fieldName";
-		String value = " string with trailing whitespace   ";
-		FieldSet fs = new DefaultFieldSet(new String[] { value }, new String[] { name });
+		String valueWithWhiteSpace = " string with trailing whitespace   ";
+        String valueWithTab = " string with trailing tab\t";
 
-		assertEquals(value, fs.readRawString(0));
-		assertEquals(value, fs.readRawString(name));
+        FieldSet fs = new DefaultFieldSet(new String[] { valueWithWhiteSpace }, new String[] { name });
+		assertEquals(valueWithWhiteSpace, fs.readRawString(0));
+		assertEquals(valueWithWhiteSpace, fs.readRawString(name));
+
+        FieldSet fs2 = new DefaultFieldSet(new String[] { valueWithTab }, new String[] { name });
+        assertEquals(valueWithTab, fs2.readRawString(0));
+        assertEquals(valueWithTab, fs2.readRawString(name));
 	}
 }

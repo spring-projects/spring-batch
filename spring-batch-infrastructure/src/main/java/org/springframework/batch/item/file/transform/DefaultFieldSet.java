@@ -54,6 +54,8 @@ public class DefaultFieldSet implements FieldSet {
 
 	private String decimal = ".";
 
+    private boolean allowRawString = false;
+
 	/**
 	 * The fields wrapped by this '<code>FieldSet</code>' instance.
 	 */
@@ -126,6 +128,14 @@ public class DefaultFieldSet implements FieldSet {
 		return names.toArray(new String[names.size()]);
 	}
 
+    /**
+     * Sets the behavior for reading String values. When true, keep trailing spaces and tabs in strings.
+     * @param allowRawString whether trailing tabs / spaces are to be kept in strings
+     */
+    public void setAllowRawString(boolean allowRawString){
+        this.allowRawString = allowRawString;
+    }
+
 	/*
 	 * (non-Javadoc)
 	 * 
@@ -141,6 +151,9 @@ public class DefaultFieldSet implements FieldSet {
 	 * 
 	 * @see org.springframework.batch.item.file.mapping.IFieldSet#getValues()
 	 */
+
+
+
     @Override
 	public String[] getValues() {
 		return tokens.clone();
@@ -738,7 +751,7 @@ public class DefaultFieldSet implements FieldSet {
 		}
 		Properties props = new Properties();
 		for (int i = 0; i < tokens.length; i++) {
-			String value = readAndTrim(i);
+            String value = this.allowRawString ? this.readRawString(i) : this.readAndTrim(i);
 			if (value != null) {
 				props.setProperty(names.get(i), value);
 			}
