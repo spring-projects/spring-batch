@@ -10,7 +10,7 @@ buildscript {
 	dependencies {
 		classpath 'org.springframework.build.gradle:docbook-reference-plugin:0.2.8'
 		classpath 'org.springframework.build.gradle:propdeps-plugin:0.0.5'
-		classpath 'org.springframework.build.gradle:spring-io-plugin:0.0.3.RELEASE'
+		classpath 'io.spring.gradle:spring-io-plugin:0.0.4.RELEASE'
 	}
 }
 
@@ -219,8 +219,12 @@ configure(mainProjects) {
 			maven { url "https://repo.spring.io/libs-snapshot" }
 		}
 
-		dependencies {
-			springIoVersions "io.spring.platform:platform-versions:${platformVersion}@properties"
+		dependencyManagement {
+			springIoTestRuntime {
+				imports {
+					mavenBom "io.spring.platform:platform-bom:${platformVersion}"
+				}
+			}
 		}
 	}
 }
@@ -271,7 +275,7 @@ project('spring-batch-infrastructure') {
 		// permsize settings not passed down from GRADLE_OPTS nor JAVA_OPTS
 		// when running certain tests causing permgen OOM when using JDK7
 		// compilation is not performed with JDK6 and permgen is removed
-		// starting with JDK8.. 
+		// starting with JDK8..
 		if (JavaVersion.current().isJava7Compatible()) {
 			jvmArgs '-XX:MaxPermSize=256m'
 		}
