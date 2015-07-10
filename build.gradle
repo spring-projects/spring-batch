@@ -72,6 +72,7 @@ allprojects {
 		javaMailVersion = '1.4.7'
 		javaxBatchApiVersion = '1.0'
 		javaxInjectVersion = '1'
+		javaxJson = '1.0.4'
 		jbatchTckSpi = '1.0'
 		jettisonVersion = '1.2'
 		jtdsVersion = '1.2.4'
@@ -351,6 +352,7 @@ project('spring-batch-infrastructure') {
         optional "org.springframework.ldap:spring-ldap-core:$springLdapVersion"
         optional "org.springframework.ldap:spring-ldap-core-tiger:$springLdapVersion"
         optional "org.springframework.ldap:spring-ldap-ldif-core:$springLdapVersion"
+        optional "org.glassfish:javax.json:$javaxJson"
 	}
 }
 
