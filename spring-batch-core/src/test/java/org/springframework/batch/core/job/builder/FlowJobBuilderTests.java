@@ -139,6 +139,19 @@ public class FlowJobBuilderTests {
 		assertEquals(2, execution.getStepExecutions().size());
 	}
 
+	@Test
+	public void testBuildSplitUsingStartAndAdd_BATCH_2346() throws Exception {
+		Flow subflow1 = new FlowBuilder<Flow>("subflow1").from(step2).end();
+		Flow subflow2 = new FlowBuilder<Flow>("subflow2").from(step3).end();
+		Flow splitflow = new FlowBuilder<Flow>("splitflow").start(subflow1).split(new SimpleAsyncTaskExecutor())
+				.add(subflow2).build();
+
+		FlowJobBuilder builder = new JobBuilder("flow").repository(jobRepository).start(splitflow).end();
+		builder.preventRestart().build().execute(execution);
+		assertEquals(BatchStatus.COMPLETED, execution.getStatus());
+		assertEquals(2, execution.getStepExecutions().size());
+	}
+
     @Test
     public void testBuildSplit_BATCH_2282() throws Exception {
         Flow flow1 = new FlowBuilder<Flow>("subflow1").from(step1).end();
