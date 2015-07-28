@@ -19,7 +19,7 @@ package org.springframework.batch.integration.chunk;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-import java.util.Queue;
+import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -273,7 +273,7 @@ public class ChunkMessageChannelItemWriter<T> extends StepExecutionListenerSuppo
 
 		private StepExecution stepExecution;
 
-		private final Queue<ChunkResponse> contributions = new LinkedBlockingQueue<ChunkResponse>();
+		private final BlockingQueue<ChunkResponse> contributions = new LinkedBlockingQueue<ChunkResponse>();
 
 		public int getExpecting() {
 			return expected.get() - actual.get();
@@ -289,21 +289,13 @@ public class ChunkMessageChannelItemWriter<T> extends StepExecutionListenerSuppo
 		}
 
 		public Collection<ChunkResponse> pollChunkResponses() {
-			Collection<ChunkResponse> set = new ArrayList<ChunkResponse>();
-			synchronized (contributions) {
-				ChunkResponse item = contributions.poll();
-				while (item != null) {
-					set.add(item);
-					item = contributions.poll();
-				}
-			}
+			Collection<ChunkResponse> set = new ArrayList<ChunkResponse>(contributions.size());
+			contributions.drainTo(set);
 			return set;
 		}
 
 		public void pushResponse(ChunkResponse stepContribution) {
-			synchronized (contributions) {
-				contributions.add(stepContribution);
-			}
+			contributions.add(stepContribution);
 		}
 
 		public void incrementRedelivered() {
