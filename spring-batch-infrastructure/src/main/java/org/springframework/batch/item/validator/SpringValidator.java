@@ -59,7 +59,7 @@ public class SpringValidator<T> implements Validator<T>, InitializingBean {
 	 * @return string of field errors followed by global errors.
 	 */
 	private String errorsToString(Errors errors) {
-		StringBuffer builder = new StringBuffer();
+		StringBuilder builder = new StringBuilder();
 
 		appendCollection(errors.getFieldErrors(), builder);
 		appendCollection(errors.getGlobalErrors(), builder);
@@ -71,7 +71,7 @@ public class SpringValidator<T> implements Validator<T>, InitializingBean {
 	 * Append the string representation of elements of the collection (separated
 	 * by new lines) to the given StringBuilder.
 	 */
-	private void appendCollection(Collection<?> collection, StringBuffer builder) {
+	private void appendCollection(Collection<?> collection, StringBuilder builder) {
 		for (Object value : collection) {
 			builder.append("\n");
 			builder.append(value.toString());

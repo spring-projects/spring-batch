@@ -88,11 +88,11 @@ public class TransactionAwareBufferedWriter extends Writer {
 	/**
 	 * @return
 	 */
-	private StringBuffer getCurrentBuffer() {
+	private StringBuilder getCurrentBuffer() {
 
 		if (!TransactionSynchronizationManager.hasResource(bufferKey)) {
 
-			TransactionSynchronizationManager.bindResource(bufferKey, new StringBuffer());
+			TransactionSynchronizationManager.bindResource(bufferKey, new StringBuilder());
 
 			TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronizationAdapter() {
 				@Override
@@ -113,7 +113,7 @@ public class TransactionAwareBufferedWriter extends Writer {
 				}
 
 				private void complete() throws IOException {
-					StringBuffer buffer = (StringBuffer) TransactionSynchronizationManager.getResource(bufferKey);
+					StringBuilder buffer = (StringBuilder) TransactionSynchronizationManager.getResource(bufferKey);
 					if (buffer != null) {
 						String string = buffer.toString();
 						byte[] bytes = string.getBytes(encoding);
@@ -145,7 +145,7 @@ public class TransactionAwareBufferedWriter extends Writer {
 
 		}
 
-		return (StringBuffer) TransactionSynchronizationManager.getResource(bufferKey);
+		return (StringBuilder) TransactionSynchronizationManager.getResource(bufferKey);
 
 	}
 
@@ -222,7 +222,7 @@ public class TransactionAwareBufferedWriter extends Writer {
 			return;
 		}
 
-		StringBuffer buffer = getCurrentBuffer();
+		StringBuilder buffer = getCurrentBuffer();
 		buffer.append(cbuf, off, len);
 	}
 }

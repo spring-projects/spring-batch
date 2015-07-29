@@ -157,9 +157,9 @@ public class JobParametersTests {
 	public void testToStringOrder() {
 
 		Map<String, JobParameter> props = parameters.getParameters();
-		StringBuffer stringBuilder = new StringBuffer();
+		StringBuilder stringBuilder = new StringBuilder();
 		for (Entry<String, JobParameter> entry : props.entrySet()) {
-			stringBuilder.append(entry.toString() + ";");
+			stringBuilder.append(entry.toString()).append(";");
 		}
 
 		String string1 = stringBuilder.toString();
@@ -177,9 +177,9 @@ public class JobParametersTests {
 		JobParameters testProps = new JobParameters(parameterMap);
 
 		props = testProps.getParameters();
-		stringBuilder = new StringBuffer();
+		stringBuilder = new StringBuilder();
 		for (Entry<String, JobParameter> entry : props.entrySet()) {
-			stringBuilder.append(entry.toString() + ";");
+			stringBuilder.append(entry.toString()).append(";");
 		}
 		String string2 = stringBuilder.toString();
 
