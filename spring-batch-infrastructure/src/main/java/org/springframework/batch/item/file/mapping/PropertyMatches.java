@@ -99,7 +99,7 @@ final class PropertyMatches {
 	 * indicating the possible property matches.
 	 */
 	public String buildErrorMessage() {
-		StringBuffer buf = new StringBuffer();
+		StringBuilder buf = new StringBuilder();
 		buf.append("Bean property '");
 		buf.append(this.propertyName);
 		buf.append("' is not writable or has an invalid setter method. ");

@@ -36,7 +36,7 @@ public class LogAdvice {
      */
     public void doBasicLogging(JoinPoint pjp) throws Throwable {
     	Object[] args = pjp.getArgs();
-    	StringBuffer output = new StringBuffer();
+    	StringBuilder output = new StringBuilder();
 
 		output.append(pjp.getTarget().getClass().getName()).append(": ");
 		output.append(pjp.toShortString()).append(": ");

@@ -135,10 +135,10 @@ public class DataSourceInitializer implements InitializingBean {
 	}
 
 	private String stripComments(List<String> list) {
-		StringBuffer buffer = new StringBuffer();
+		StringBuilder buffer = new StringBuilder();
 		for (String line : list) {
 			if (!line.startsWith("//") && !line.startsWith("--")) {
-				buffer.append(line + "\n");
+				buffer.append(line).append("\n");
 			}
 		}
 		return buffer.toString();

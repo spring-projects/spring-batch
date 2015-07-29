@@ -79,7 +79,7 @@ public class JdbcJobInstanceDaoTests extends AbstractJobInstanceDaoTests {
 	public void testHexing() throws Exception {
 		MessageDigest digest = MessageDigest.getInstance("MD5");
 		byte[] bytes = digest.digest("f78spx".getBytes("UTF-8"));
-		StringBuffer output = new StringBuffer();
+		StringBuilder output = new StringBuilder();
 		for (byte bite : bytes) {
 			output.append(String.format("%02x", bite));
 		}

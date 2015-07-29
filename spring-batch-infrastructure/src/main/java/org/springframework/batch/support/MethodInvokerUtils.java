@@ -70,7 +70,7 @@ public class MethodInvokerUtils {
 	 * @return String
 	 */
 	public static String getParamTypesString(Class<?>... paramTypes) {
-		StringBuffer paramTypesList = new StringBuffer("(");
+		StringBuilder paramTypesList = new StringBuilder("(");
 		for (int i = 0; i < paramTypes.length; i++) {
 			paramTypesList.append(paramTypes[i].getSimpleName());
 			if (i + 1 < paramTypes.length) {
