@@ -242,7 +242,7 @@ public class ExitStatus implements Serializable, Comparable<ExitStatus> {
 	 * description
 	 */
 	public ExitStatus addExitDescription(String description) {
-		StringBuffer buffer = new StringBuffer();
+		StringBuilder buffer = new StringBuilder();
 		boolean changed = StringUtils.hasText(description) && !exitDescription.equals(description);
 		if (StringUtils.hasText(exitDescription)) {
 			buffer.append(exitDescription);

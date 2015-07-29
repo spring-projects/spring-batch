@@ -98,7 +98,7 @@ public class RangeArrayPropertyEditor extends PropertyEditorSupport {
 	public String getAsText() {
 		Range[] ranges = (Range[])getValue();
 		
-		StringBuffer sb = new StringBuffer();
+		StringBuilder sb = new StringBuilder();
 
 		for (int i = 0; i < ranges.length; i++) {
 			if(i>0) {

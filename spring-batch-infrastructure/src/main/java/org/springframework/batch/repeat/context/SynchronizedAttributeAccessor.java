@@ -151,7 +151,7 @@ public class SynchronizedAttributeAccessor implements AttributeAccessor {
 	 */
     @Override
 	public String toString() {
-		StringBuffer buffer = new StringBuffer("SynchronizedAttributeAccessor: [");
+		StringBuilder buffer = new StringBuilder("SynchronizedAttributeAccessor: [");
 		synchronized (support) {
 			String[] names = attributeNames();
 			for (int i = 0; i < names.length; i++) {

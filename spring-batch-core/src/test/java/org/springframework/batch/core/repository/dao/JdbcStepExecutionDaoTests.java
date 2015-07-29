@@ -49,7 +49,7 @@ public class JdbcStepExecutionDaoTests extends AbstractStepExecutionDaoTests {
 	@Test
 	public void testTruncateExitDescription() {
 
-		StringBuffer sb = new StringBuffer();
+		StringBuilder sb = new StringBuilder();
 		for (int i = 0; i < 100; i++) {
 			sb.append("too long exit description");
 		}

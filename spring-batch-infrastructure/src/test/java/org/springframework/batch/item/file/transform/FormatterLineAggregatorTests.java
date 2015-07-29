@@ -132,7 +132,7 @@ public class FormatterLineAggregatorTests {
 				for (int i = 0; i < strings.length; i++) {
 					strings[i] = item[i];
 					if (item[i].length() < widths[i]) {
-						StringBuffer buffer = new StringBuffer(strings[i]);
+						StringBuilder buffer = new StringBuilder(strings[i]);
 						for (int j = 0; j < (widths[i] - item[i].length() + 1) / 2; j++) {
 							buffer.append(" ");
 						}
@@ -167,7 +167,7 @@ public class FormatterLineAggregatorTests {
 				for (int i = 0; i < strings.length; i++) {
 					strings[i] = item[i];
 					if (item[i].length() < widths[i]) {
-						StringBuffer buffer = new StringBuffer(strings[i]);
+						StringBuilder buffer = new StringBuilder(strings[i]);
 						for (int j = 0; j < widths[i] - item[i].length(); j++) {
 							buffer.append(".");
 						}
