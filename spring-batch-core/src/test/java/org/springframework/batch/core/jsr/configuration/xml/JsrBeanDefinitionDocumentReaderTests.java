@@ -15,6 +15,17 @@
  */
 package org.springframework.batch.core.jsr.configuration.xml;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.Properties;
+
+import javax.batch.api.Batchlet;
+import javax.batch.runtime.JobExecution;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.junit.Test;
@@ -29,16 +40,6 @@ import org.springframework.util.xml.SimpleSaxErrorHandler;
 import org.w3c.dom.Document;
 import org.xml.sax.ErrorHandler;
 import org.xml.sax.InputSource;
-
-import javax.batch.api.Batchlet;
-import javax.batch.runtime.JobExecution;
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.Properties;
-
-import static junit.framework.Assert.assertEquals;
-import static junit.framework.Assert.assertNotNull;
-import static junit.framework.Assert.assertTrue;
 
 /**
  * <p>

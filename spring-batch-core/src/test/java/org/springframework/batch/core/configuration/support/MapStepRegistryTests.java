@@ -15,6 +15,12 @@
  */
 package org.springframework.batch.core.configuration.support;
 
+import static org.junit.Assert.fail;
+
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.HashSet;
+
 import org.junit.Assert;
 import org.junit.Test;
 import org.springframework.batch.core.Step;
@@ -23,12 +29,6 @@ import org.springframework.batch.core.configuration.StepRegistry;
 import org.springframework.batch.core.launch.NoSuchJobException;
 import org.springframework.batch.core.step.NoSuchStepException;
 import org.springframework.batch.core.step.tasklet.TaskletStep;
-
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.HashSet;
-
-import static junit.framework.Assert.fail;
 
 /**
  * @author Sebastien Gerard

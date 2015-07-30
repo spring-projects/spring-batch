@@ -16,7 +16,7 @@
 
 package org.springframework.batch.item.file.mapping;
 
-import static junit.framework.Assert.assertEquals;
+import static org.junit.Assert.assertEquals;
 
 import java.util.Collections;
 import java.util.HashMap;

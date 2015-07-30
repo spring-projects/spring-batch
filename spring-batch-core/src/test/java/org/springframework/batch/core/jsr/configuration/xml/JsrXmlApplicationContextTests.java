@@ -15,13 +15,15 @@
  */
 package org.springframework.batch.core.jsr.configuration.xml;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
 import java.util.Properties;
+
 import org.junit.Test;
 import org.springframework.beans.factory.config.BeanDefinition;
-import static junit.framework.Assert.assertEquals;
-import static junit.framework.Assert.assertFalse;
-import static junit.framework.Assert.assertNotNull;
-import static junit.framework.Assert.assertTrue;
 
 /**
  * <p>

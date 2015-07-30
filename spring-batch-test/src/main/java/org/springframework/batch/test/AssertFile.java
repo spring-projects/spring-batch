@@ -16,11 +16,11 @@
 
 package org.springframework.batch.test;
 
+import static org.junit.Assert.assertEquals;
+
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
-
-import junit.framework.Assert;
 
 import org.springframework.core.io.Resource;
 
@@ -39,11 +39,11 @@ public abstract class AssertFile {
 			int lineNum = 1;
 			for (String expectedLine = null; (expectedLine = expectedReader.readLine()) != null; lineNum++) {
 				String actualLine = actualReader.readLine();
-				Assert.assertEquals("Line number " + lineNum + " does not match.", expectedLine, actualLine);
+				assertEquals("Line number " + lineNum + " does not match.", expectedLine, actualLine);
 			}
 
 			String actualLine = actualReader.readLine();
-			Assert.assertEquals("More lines than expected.  There should not be a line number " + lineNum + ".", null,
+			assertEquals("More lines than expected.  There should not be a line number " + lineNum + ".", null,
 					actualLine);
 		}
 		finally {
@@ -53,7 +53,7 @@ public abstract class AssertFile {
 	}
 
 	public static void assertFileEquals(Resource expected, Resource actual) throws Exception {
-		AssertFile.assertFileEquals(expected.getFile(), actual.getFile());
+		assertFileEquals(expected.getFile(), actual.getFile());
 	}
 
 	public static void assertLineCount(int expectedLineCount, File file) throws Exception {
@@ -63,7 +63,7 @@ public abstract class AssertFile {
 			while (expectedReader.readLine() != null) {
 				lineCount++;
 			}
-			Assert.assertEquals(expectedLineCount, lineCount);
+			assertEquals(expectedLineCount, lineCount);
 		}
 		finally {
 			expectedReader.close();
@@ -71,6 +71,6 @@ public abstract class AssertFile {
 	}
 
 	public static void assertLineCount(int expectedLineCount, Resource resource) throws Exception {
-		AssertFile.assertLineCount(expectedLineCount, resource.getFile());
+		assertLineCount(expectedLineCount, resource.getFile());
 	}
 }

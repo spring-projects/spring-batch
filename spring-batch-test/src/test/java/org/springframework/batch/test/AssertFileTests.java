@@ -15,10 +15,10 @@
  */
 package org.springframework.batch.test;
 
-import static junit.framework.Assert.assertTrue;
-import static junit.framework.Assert.fail;
-import junit.framework.AssertionFailedError;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
+import org.junit.ComparisonFailure;
 import org.junit.Test;
 import org.springframework.core.io.FileSystemResource;
 
@@ -42,7 +42,7 @@ public class AssertFileTests {
 			executeAssertEquals("input1.txt", "input2.txt");
 			fail();
 		}
-		catch (AssertionFailedError e) {
+		catch (ComparisonFailure e) {
 			assertTrue(e.getMessage().startsWith("Line number 3 does not match."));
 		}
 	}
@@ -53,7 +53,7 @@ public class AssertFileTests {
 			executeAssertEquals("input3.txt", "input1.txt");
 			fail();
 		}
-		catch (AssertionFailedError e) {
+		catch (AssertionError e) {
 			assertTrue(e.getMessage().startsWith("More lines than expected.  There should not be a line number 4."));
 		}
 	}
@@ -64,7 +64,7 @@ public class AssertFileTests {
 			executeAssertEquals("input1.txt", "input3.txt");
 			fail();
 		}
-		catch (AssertionFailedError e) {
+		catch (AssertionError e) {
 			assertTrue(e.getMessage().startsWith("Line number 4 does not match."));
 		}
 	}
@@ -80,7 +80,7 @@ public class AssertFileTests {
 			executeAssertEquals("blank.txt", "input1.txt");
 			fail();
 		}
-		catch (AssertionFailedError e) {
+		catch (AssertionError e) {
 			assertTrue(e.getMessage().startsWith("More lines than expected.  There should not be a line number 1."));
 		}
 	}
@@ -91,7 +91,7 @@ public class AssertFileTests {
 			executeAssertEquals("input1.txt", "blank.txt");
 			fail();
 		}
-		catch (AssertionFailedError e) {
+		catch (AssertionError e) {
 			assertTrue(e.getMessage().startsWith("Line number 1 does not match."));
 		}
 	}

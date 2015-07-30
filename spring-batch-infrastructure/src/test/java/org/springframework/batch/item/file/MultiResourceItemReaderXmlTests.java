@@ -15,6 +15,8 @@
  */
 package org.springframework.batch.item.file;
 
+import static org.junit.Assert.assertTrue;
+
 import java.io.IOException;
 import java.util.Comparator;
 
@@ -23,10 +25,8 @@ import javax.xml.stream.events.Attribute;
 import javax.xml.stream.events.StartElement;
 import javax.xml.transform.Source;
 
-import junit.framework.Assert;
-
-import org.junit.runners.JUnit4;
 import org.junit.runner.RunWith;
+import org.junit.runners.JUnit4;
 import org.springframework.batch.item.AbstractItemStreamItemReaderTests;
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.item.ItemReader;
@@ -56,7 +56,7 @@ public class MultiResourceItemReaderXmlTests extends AbstractItemStreamItemReade
 				Attribute attr;
 				try {
 					XMLEventReader eventReader = StaxUtils.getXmlEventReader(source );
-					Assert.assertTrue(eventReader.nextEvent().isStartDocument());
+					assertTrue(eventReader.nextEvent().isStartDocument());
 					StartElement event = eventReader.nextEvent().asStartElement();
 					attr = (Attribute) event.getAttributes().next();
 				}

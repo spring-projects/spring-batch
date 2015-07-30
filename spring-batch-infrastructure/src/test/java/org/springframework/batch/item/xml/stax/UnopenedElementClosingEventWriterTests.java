@@ -15,6 +15,7 @@
  */
 package org.springframework.batch.item.xml.stax;
 
+import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 
@@ -29,8 +30,6 @@ import javax.xml.stream.XMLEventWriter;
 import javax.xml.stream.events.EndElement;
 import javax.xml.stream.events.StartElement;
 import javax.xml.stream.events.XMLEvent;
-
-import junit.framework.Assert;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -104,7 +103,7 @@ public class UnopenedElementClosingEventWriterTests {
     	verify(wrappedWriter).add(endElement);
     	
     	// only internal list should be modified
-    	Assert.assertEquals(2, unopenedElements.size());    	
+    	assertEquals(2, unopenedElements.size());    	
     }    
     
     @Test
