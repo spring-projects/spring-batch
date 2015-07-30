@@ -15,11 +15,16 @@
  */
 package org.springframework.batch.core.test.ldif;
 
+import static org.junit.Assert.assertEquals;
+
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileReader;
+import java.net.MalformedURLException;
+
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.batch.core.ExitStatus;
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.JobExecution;
@@ -34,15 +39,9 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.util.Assert;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileReader;
-import java.net.MalformedURLException;
-
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(locations = { "/simple-job-launcher-context.xml", "/applicationContext-test1.xml"})
 public class LdifReaderTests {
-	private static Logger log = LoggerFactory.getLogger(LdifReaderTests.class);
 
 	private Resource expected;
 	private Resource actual;
@@ -95,12 +94,11 @@ public class LdifReaderTests {
 			int lineNum = 1;
 			for (String expectedLine = null; (expectedLine = expectedReader.readLine()) != null; lineNum++) {
 				String actualLine = actualReader.readLine();
-				junit.framework.Assert.assertEquals("Line number " + lineNum + " does not match.", expectedLine, actualLine);
+				assertEquals("Line number " + lineNum + " does not match.", expectedLine, actualLine);
 			}
 
 			String actualLine = actualReader.readLine();
-			junit.framework.Assert.assertEquals("More lines than expected.  There should not be a line number " + lineNum + ".", null,
-					actualLine);
+			assertEquals("More lines than expected.  There should not be a line number " + lineNum + ".", null, actualLine);
 		}
 		finally {
 			expectedReader.close();

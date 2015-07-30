@@ -15,9 +15,9 @@
  */
 package org.springframework.batch.core.listener;
 
-import static junit.framework.Assert.assertTrue;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 import static org.springframework.batch.core.listener.StepListenerMetaData.AFTER_STEP;
 import static org.springframework.batch.core.listener.StepListenerMetaData.AFTER_WRITE;
 
