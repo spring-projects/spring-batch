@@ -16,7 +16,8 @@
 
 package org.springframework.batch.support.transaction;
 
-import java.util.Stack;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.springframework.transaction.TransactionDefinition;
 import org.springframework.transaction.TransactionException;
@@ -40,17 +41,17 @@ public class ResourcelessTransactionManager extends AbstractPlatformTransactionM
     @Override
 	protected Object doGetTransaction() throws TransactionException {
 		Object transaction = new ResourcelessTransaction();
-		Stack<Object> resources;
+		List<Object> resources;
 		if (!TransactionSynchronizationManager.hasResource(this)) {
-			resources = new Stack<Object>();
+			resources = new ArrayList<Object>();
 			TransactionSynchronizationManager.bindResource(this, resources);
 		}
 		else {
 			@SuppressWarnings("unchecked")
-			Stack<Object> stack = (Stack<Object>) TransactionSynchronizationManager.getResource(this);
+			List<Object> stack = (List<Object>) TransactionSynchronizationManager.getResource(this);
 			resources = stack;
 		}
-		resources.push(transaction);
+		resources.add(transaction);
 		return transaction;
 	}
 
@@ -62,8 +63,7 @@ public class ResourcelessTransactionManager extends AbstractPlatformTransactionM
     @Override
 	protected boolean isExistingTransaction(Object transaction) throws TransactionException {
 		if (TransactionSynchronizationManager.hasResource(this)) {
-			@SuppressWarnings("unchecked")
-			Stack<Object> stack = (Stack<Object>) TransactionSynchronizationManager.getResource(this);
+			List<?> stack = (List<?>) TransactionSynchronizationManager.getResource(this);
 			return stack.size() > 1;
 		}
 		return ((ResourcelessTransaction) transaction).isActive();
@@ -75,9 +75,7 @@ public class ResourcelessTransactionManager extends AbstractPlatformTransactionM
 
     @Override
 	protected void doCleanupAfterCompletion(Object transaction) {
-		@SuppressWarnings("unchecked")
-		Stack<Object> list = (Stack<Object>) TransactionSynchronizationManager.getResource(this);
-		Stack<Object> resources = list;
+		List<?> resources = (List<?>) TransactionSynchronizationManager.getResource(this);
 		resources.clear();
 		TransactionSynchronizationManager.unbindResource(this);
 		((ResourcelessTransaction) transaction).clear();
