@@ -15,6 +15,20 @@
  */
 package org.springframework.batch.core.repository.support;
 
+import static junit.framework.Assert.assertEquals;
+import static junit.framework.Assert.assertNotNull;
+import static junit.framework.Assert.assertTrue;
+import static junit.framework.Assert.fail;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
+
+import java.sql.Connection;
+import java.sql.DatabaseMetaData;
+import java.sql.Types;
+import java.util.Map;
+
+import javax.sql.DataSource;
+
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
@@ -31,23 +45,9 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.incrementer.DataFieldMaxValueIncrementer;
 import org.springframework.jdbc.support.lob.DefaultLobHandler;
 import org.springframework.jdbc.support.lob.LobHandler;
-import org.springframework.jdbc.support.lob.OracleLobHandler;
 import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.support.DefaultTransactionDefinition;
-
-import javax.sql.DataSource;
-import java.sql.Connection;
-import java.sql.DatabaseMetaData;
-import java.sql.Types;
-import java.util.Map;
-
-import static junit.framework.Assert.assertEquals;
-import static junit.framework.Assert.assertNotNull;
-import static junit.framework.Assert.assertTrue;
-import static junit.framework.Assert.fail;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
 
 /**
  * @author Lucas Ward
@@ -97,24 +97,6 @@ public class JobRepositoryFactoryBeanTests {
 
 		factory.afterPropertiesSet();
 		factory.getObject();
-
-	}
-
-	@Test
-	public void testOracleLobHandler() throws Exception {
-
-		factory.setDatabaseType("ORACLE");
-
-		incrementerFactory = mock(DataFieldMaxValueIncrementerFactory.class);
-		when(incrementerFactory.isSupportedIncrementerType("ORACLE")).thenReturn(true);
-		when(incrementerFactory.getIncrementer("ORACLE", tablePrefix + "JOB_SEQ")).thenReturn(new StubIncrementer());
-		when(incrementerFactory.getIncrementer("ORACLE", tablePrefix + "JOB_EXECUTION_SEQ")).thenReturn(new StubIncrementer());
-		when(incrementerFactory.getIncrementer("ORACLE", tablePrefix + "STEP_EXECUTION_SEQ")).thenReturn(new StubIncrementer());
-		factory.setIncrementerFactory(incrementerFactory);
-
-		factory.afterPropertiesSet();
-		LobHandler lobHandler = (LobHandler) ReflectionTestUtils.getField(factory, "lobHandler");
-		assertTrue(lobHandler instanceof OracleLobHandler);
 
 	}
 

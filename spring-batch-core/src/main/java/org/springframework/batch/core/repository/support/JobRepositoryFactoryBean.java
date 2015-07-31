@@ -37,7 +37,6 @@ import org.springframework.beans.factory.InitializingBean;
 import org.springframework.jdbc.core.JdbcOperations;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.lob.LobHandler;
-import org.springframework.jdbc.support.lob.OracleLobHandler;
 import org.springframework.util.Assert;
 import org.springframework.util.StringUtils;
 
@@ -181,10 +180,6 @@ public class JobRepositoryFactoryBean extends AbstractJobRepositoryFactoryBean i
 		if (databaseType == null) {
 			databaseType = DatabaseType.fromMetaData(dataSource).name();
 			logger.info("No database type set, using meta data indicating: " + databaseType);
-		}
-
-		if (lobHandler == null && databaseType.equalsIgnoreCase(DatabaseType.ORACLE.toString())) {
-			lobHandler = new OracleLobHandler();
 		}
 
 		if(serializer == null) {
