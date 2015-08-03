@@ -104,7 +104,7 @@ public class CompositeItemWriterSampleFunctionalTests {
 	}
 
 	private void checkOutputFile(String fileName) throws IOException {
-		@SuppressWarnings({ "unchecked", "resource" })
+		@SuppressWarnings("resource")
 		List<String> outputLines = IOUtils.readLines(new FileInputStream(fileName));
 
 		String output = "";

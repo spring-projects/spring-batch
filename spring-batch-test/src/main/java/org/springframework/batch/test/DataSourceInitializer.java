@@ -122,7 +122,6 @@ public class DataSourceInitializer implements InitializingBean, DisposableBean {
 		transactionTemplate.execute(new TransactionCallback<Void>() {
 
             @Override
-			@SuppressWarnings("unchecked")
 			public Void doInTransaction(TransactionStatus status) {
 				JdbcTemplate jdbcTemplate = new JdbcTemplate(dataSource);
 				String[] scripts;

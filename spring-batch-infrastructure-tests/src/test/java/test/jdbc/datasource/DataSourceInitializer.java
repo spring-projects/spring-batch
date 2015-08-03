@@ -105,7 +105,6 @@ public class DataSourceInitializer implements InitializingBean, DisposableBean {
 		final JdbcTemplate jdbcTemplate = new JdbcTemplate(dataSource);
 		String[] scripts;
 		try {
-			@SuppressWarnings("unchecked")
 			String[] list = StringUtils.delimitedListToStringArray(stripComments(IOUtils.readLines(scriptResource
 					.getInputStream())), ";");
 			scripts = list;
