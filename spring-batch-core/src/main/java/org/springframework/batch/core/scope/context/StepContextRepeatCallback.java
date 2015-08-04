@@ -65,7 +65,9 @@ public abstract class StepContextRepeatCallback implements RepeatCallback {
 		// The StepContext has to be the same for all chunks,
 		// otherwise step-scoped beans will be re-initialised for each chunk.
 		StepContext stepContext = StepSynchronizationManager.register(stepExecution);
-		logger.debug("Preparing chunk execution for StepContext: "+ObjectUtils.identityToString(stepContext));
+		if (logger.isDebugEnabled()) {
+			logger.debug("Preparing chunk execution for StepContext: "+ObjectUtils.identityToString(stepContext));
+		}
 
 		ChunkContext chunkContext = attributeQueue.poll();
 		if (chunkContext == null) {
@@ -73,7 +75,9 @@ public abstract class StepContextRepeatCallback implements RepeatCallback {
 		}
 
 		try {
-			logger.debug("Chunk execution starting: queue size="+attributeQueue.size());
+			if (logger.isDebugEnabled()) {
+				logger.debug("Chunk execution starting: queue size="+attributeQueue.size());
+			}
 			return doInChunkContext(context, chunkContext);
 		}
 		finally {

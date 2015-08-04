@@ -153,7 +153,9 @@ public class SimpleFlow implements Flow, InitializingBean {
 		FlowExecutionStatus status = FlowExecutionStatus.UNKNOWN;
 		State state = stateMap.get(stateName);
 
-		logger.debug("Resuming state="+stateName+" with status="+status);
+		if (logger.isDebugEnabled()) {
+			logger.debug("Resuming state="+stateName+" with status="+status);
+		}
 		StepExecution stepExecution = null;
 
 		// Terminate if there are no more states
@@ -161,7 +163,9 @@ public class SimpleFlow implements Flow, InitializingBean {
 			stateName = state.getName();
 
 			try {
-				logger.debug("Handling state="+stateName);
+				if (logger.isDebugEnabled()) {
+					logger.debug("Handling state="+stateName);
+				}
 				status = state.handle(executor);
 				stepExecution = executor.getStepExecution();
 			}
@@ -175,7 +179,9 @@ public class SimpleFlow implements Flow, InitializingBean {
 																	  stateName), e);
 			}
 
-			logger.debug("Completed state="+stateName+" with status="+status);
+			if (logger.isDebugEnabled()) {
+				logger.debug("Completed state="+stateName+" with status="+status);
+			}
 
 			state = nextState(stateName, status, stepExecution);
 		}

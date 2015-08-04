@@ -169,7 +169,10 @@ public class StoredProcedureItemReader<T> extends AbstractCursorItemReader<T> {
 		SqlParameter cursorParameter = callContext.createReturnResultSetParameter("cursor", rowMapper);
 		this.callString = callContext.createCallString();
 
-		log.debug("Call string is: " + callString);
+
+		if (log.isDebugEnabled()) {
+			log.debug("Call string is: " + callString);
+		}
 
 		int cursorSqlType = Types.OTHER;
 		if (function) {

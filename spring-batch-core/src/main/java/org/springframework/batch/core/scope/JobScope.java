@@ -98,7 +98,9 @@ public class JobScope extends BatchScopeSupport {
 				scopedObject = context.getAttribute(name);
 				if (scopedObject == null) {
 
-					logger.debug(String.format("Creating object in scope=%s, name=%s", this.getName(), name));
+					if (logger.isDebugEnabled()) {
+						logger.debug(String.format("Creating object in scope=%s, name=%s", this.getName(), name));
+					}
 
 					scopedObject = objectFactory.getObject();
 					context.setAttribute(name, scopedObject);
@@ -126,7 +128,9 @@ public class JobScope extends BatchScopeSupport {
 	@Override
 	public void registerDestructionCallback(String name, Runnable callback) {
 		JobContext context = getContext();
-		logger.debug(String.format("Registered destruction callback in scope=%s, name=%s", this.getName(), name));
+		if (logger.isDebugEnabled()) {
+			logger.debug(String.format("Registered destruction callback in scope=%s, name=%s", this.getName(), name));
+		}
 		context.registerDestructionCallback(name, callback);
 	}
 
@@ -136,7 +140,9 @@ public class JobScope extends BatchScopeSupport {
 	@Override
 	public Object remove(String name) {
 		JobContext context = getContext();
-		logger.debug(String.format("Removing from scope=%s, name=%s", this.getName(), name));
+		if (logger.isDebugEnabled()) {
+			logger.debug(String.format("Removing from scope=%s, name=%s", this.getName(), name));
+		}
 		return context.removeAttribute(name);
 	}
 

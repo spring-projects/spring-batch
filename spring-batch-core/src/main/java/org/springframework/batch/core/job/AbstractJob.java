@@ -285,7 +285,9 @@ InitializingBean {
 	@Override
 	public final void execute(JobExecution execution) {
 
-		logger.debug("Job execution starting: " + execution);
+		if (logger.isDebugEnabled()) {
+			logger.debug("Job execution starting: " + execution);
+		}
 
 		JobSynchronizationManager.register(execution);
 
@@ -302,7 +304,9 @@ InitializingBean {
 
 				try {
 					doExecute(execution);
-					logger.debug("Job execution complete: " + execution);
+					if (logger.isDebugEnabled()) {
+						logger.debug("Job execution complete: " + execution);
+					}
 				} catch (RepeatException e) {
 					throw e.getCause();
 				}
@@ -312,7 +316,9 @@ InitializingBean {
 				// with it in the same way as any other interruption.
 				execution.setStatus(BatchStatus.STOPPED);
 				execution.setExitStatus(ExitStatus.COMPLETED);
-				logger.debug("Job execution was stopped: " + execution);
+				if (logger.isDebugEnabled()) {
+					logger.debug("Job execution was stopped: " + execution);
+				}
 
 			}
 

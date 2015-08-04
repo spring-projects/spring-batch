@@ -170,7 +170,9 @@ public class JsrChunkProcessor<I,O> implements ChunkProcessor<I> {
 			return item;
 		}
 		catch (Exception e) {
-			logger.debug(e.getMessage() + " : " + e.getClass().getName());
+			if (logger.isDebugEnabled()) {
+				logger.debug(e.getMessage() + " : " + e.getClass().getName());
+			}
 			listener.onReadError(e);
 			throw e;
 		}

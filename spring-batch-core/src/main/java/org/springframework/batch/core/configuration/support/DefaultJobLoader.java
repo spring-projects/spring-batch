@@ -129,7 +129,9 @@ public class DefaultJobLoader implements JobLoader, InitializingBean {
 		if (contexts.containsKey(factory)) {
 			ConfigurableApplicationContext context = contexts.get(factory);
 			for (String name : contextToJobNames.get(context)) {
-				logger.debug("Unregistering job: " + name + " from context: " + context.getDisplayName());
+				if (logger.isDebugEnabled()) {
+					logger.debug("Unregistering job: " + name + " from context: " + context.getDisplayName());
+				}
 				doUnregister(name);
 			}
 			context.close();
@@ -179,11 +181,15 @@ public class DefaultJobLoader implements JobLoader, InitializingBean {
 
 				// On reload try to unregister first
 				if (unregister) {
-					logger.debug("Unregistering job: " + jobName + " from context: " + context.getDisplayName());
+					if (logger.isDebugEnabled()) {
+						logger.debug("Unregistering job: " + jobName + " from context: " + context.getDisplayName());
+					}
 					doUnregister(jobName);
 				}
 
-				logger.debug("Registering job: " + jobName + " from context: " + context.getDisplayName());
+				if (logger.isDebugEnabled()) {
+					logger.debug("Registering job: " + jobName + " from context: " + context.getDisplayName());
+				}
 				doRegister(context, job);
 				jobsRegistered.add(jobName);
 			}

@@ -29,7 +29,9 @@ public class JmsRedeliveredExtractor {
 	private static final Log logger = LogFactory.getLog(JmsRedeliveredExtractor.class);
 	
 	public ChunkResponse extract(ChunkResponse input, @Header(JmsHeaders.REDELIVERED) boolean redelivered) {
-		logger.debug("Extracted redelivered flag for response, value="+redelivered);
+		if (logger.isDebugEnabled()) {
+			logger.debug("Extracted redelivered flag for response, value="+redelivered);
+		}
 		return new ChunkResponse(input, redelivered);
 	}
 

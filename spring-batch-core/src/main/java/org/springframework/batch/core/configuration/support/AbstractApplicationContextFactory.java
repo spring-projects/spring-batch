@@ -233,7 +233,9 @@ public abstract class AbstractApplicationContextFactory implements ApplicationCo
 			for (BeanPostProcessor beanPostProcessor : new ArrayList<BeanPostProcessor>(aggregatedPostProcessors)) {
 				for (Class<?> cls : beanPostProcessorExcludeClasses) {
 					if (cls.isAssignableFrom(beanPostProcessor.getClass())) {
-						logger.debug("Removing bean post processor: " + beanPostProcessor + " of type " + cls);
+						if (logger.isDebugEnabled()) {
+							logger.debug("Removing bean post processor: " + beanPostProcessor + " of type " + cls);
+						}
 						aggregatedPostProcessors.remove(beanPostProcessor);
 					}
 				}

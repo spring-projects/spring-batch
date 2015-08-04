@@ -97,7 +97,9 @@ public class SimpleRetryExceptionHandler extends RetryListenerSupport implements
 	@Override
 	public <T, E extends Throwable> void close(RetryContext context, RetryCallback<T, E> callback, Throwable throwable) {
 		if (!retryPolicy.canRetry(context)) {
-			logger.debug("Marking retry as exhausted: "+context);
+			if (logger.isDebugEnabled()) {
+				logger.debug("Marking retry as exhausted: "+context);
+			}
 			getRepeatContext().setAttribute(EXHAUSTED, "true");
 		}
 	}

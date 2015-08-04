@@ -84,9 +84,11 @@ public abstract class StaxUtils {
 				staxResultClassCtorOnSpringWs15 = staxResultClassOnSpringWs15.getConstructor(XMLEventWriter.class);
 			} else {
 
-				logger.debug("'StaxSource' was not detected in Spring 3.0's OXM support or Spring WS 1.5's OXM support. " +
-						"This is a problem if you intend to use the " +StaxEventItemWriter.class.getName() + " or " +
-						StaxEventItemReader.class.getName()+". Please add the appropriate dependencies.");
+				if (logger.isDebugEnabled()) {
+					logger.debug("'StaxSource' was not detected in Spring 3.0's OXM support or Spring WS 1.5's OXM support. " +
+							"This is a problem if you intend to use the " +StaxEventItemWriter.class.getName() + " or " +
+							StaxEventItemReader.class.getName()+". Please add the appropriate dependencies.");
+				}
 
 			}
 		} catch (Exception ex) {
