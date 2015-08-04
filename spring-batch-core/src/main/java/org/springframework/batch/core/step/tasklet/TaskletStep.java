@@ -434,7 +434,9 @@ public class TaskletStep extends AbstractStep {
 
 					// Apply the contribution to the step
 					// even if unsuccessful
-					logger.debug("Applying contribution: " + contribution);
+					if (logger.isDebugEnabled()) {
+						logger.debug("Applying contribution: " + contribution);
+					}
 					stepExecution.apply(contribution);
 
 				}
@@ -448,7 +450,9 @@ public class TaskletStep extends AbstractStep {
 					// stay false and we can use that later.
 					getJobRepository().updateExecutionContext(stepExecution);
 					stepExecution.incrementCommitCount();
-					logger.debug("Saving step execution before commit: " + stepExecution);
+					if (logger.isDebugEnabled()) {
+						logger.debug("Saving step execution before commit: " + stepExecution);
+					}
 					getJobRepository().update(stepExecution);
 				}
 				catch (Exception e) {
@@ -460,17 +464,23 @@ public class TaskletStep extends AbstractStep {
 				}
 			}
 			catch (Error e) {
-				logger.debug("Rollback for Error: " + e.getClass().getName() + ": " + e.getMessage());
+				if (logger.isDebugEnabled()) {
+					logger.debug("Rollback for Error: " + e.getClass().getName() + ": " + e.getMessage());
+				}
 				rollback(stepExecution);
 				throw e;
 			}
 			catch (RuntimeException e) {
-				logger.debug("Rollback for RuntimeException: " + e.getClass().getName() + ": " + e.getMessage());
+				if (logger.isDebugEnabled()) {
+					logger.debug("Rollback for RuntimeException: " + e.getClass().getName() + ": " + e.getMessage());
+				}
 				rollback(stepExecution);
 				throw e;
 			}
 			catch (Exception e) {
-				logger.debug("Rollback for Exception: " + e.getClass().getName() + ": " + e.getMessage());
+				if (logger.isDebugEnabled()) {
+					logger.debug("Rollback for Exception: " + e.getClass().getName() + ": " + e.getMessage());
+				}
 				rollback(stepExecution);
 				// Allow checked exceptions
 				throw new UncheckedTransactionException(e);

@@ -34,7 +34,9 @@ public class ResourcelessTransactionManager extends AbstractPlatformTransactionM
 
     @Override
 	protected void doCommit(DefaultTransactionStatus status) throws TransactionException {
-		logger.debug("Committing resourceless transaction on [" + status.getTransaction() + "]");
+		if (logger.isDebugEnabled()) {
+			logger.debug("Committing resourceless transaction on [" + status.getTransaction() + "]");
+		}
 	}
 
     @Override
@@ -56,7 +58,9 @@ public class ResourcelessTransactionManager extends AbstractPlatformTransactionM
 
     @Override
 	protected void doRollback(DefaultTransactionStatus status) throws TransactionException {
-		logger.debug("Rolling back resourceless transaction on [" + status.getTransaction() + "]");
+		if (logger.isDebugEnabled()) {
+			logger.debug("Rolling back resourceless transaction on [" + status.getTransaction() + "]");
+		}
 	}
 
     @Override

@@ -203,7 +203,9 @@ public class JdbcJobExecutionDao extends AbstractJdbcBatchMetadataDao implements
 			String exitDescription = jobExecution.getExitStatus().getExitDescription();
 			if (exitDescription != null && exitDescription.length() > exitMessageLength) {
 				exitDescription = exitDescription.substring(0, exitMessageLength);
-				logger.debug("Truncating long message before update of JobExecution: " + jobExecution);
+				if (logger.isDebugEnabled()) {
+					logger.debug("Truncating long message before update of JobExecution: " + jobExecution);
+				}
 			}
 			Object[] parameters = new Object[] { jobExecution.getStartTime(), jobExecution.getEndTime(),
 					jobExecution.getStatus().toString(), jobExecution.getExitStatus().getExitCode(), exitDescription,

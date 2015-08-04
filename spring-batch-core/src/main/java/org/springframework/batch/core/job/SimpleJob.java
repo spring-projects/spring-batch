@@ -145,7 +145,9 @@ public class SimpleJob extends AbstractJob {
 		// Update the job status to be the same as the last step
 		//
 		if (stepExecution != null) {
-			logger.debug("Upgrading JobExecution status: " + stepExecution);
+			if (logger.isDebugEnabled()) {
+				logger.debug("Upgrading JobExecution status: " + stepExecution);
+			}
 			execution.upgradeStatus(stepExecution.getStatus());
 			execution.setExitStatus(stepExecution.getExitStatus());
 		}

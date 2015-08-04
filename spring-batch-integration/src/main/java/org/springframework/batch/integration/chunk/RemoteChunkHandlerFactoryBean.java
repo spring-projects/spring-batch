@@ -118,7 +118,9 @@ public class RemoteChunkHandlerFactoryBean<T> implements FactoryBean<ChunkHandle
 		}
 
 		Assert.state(step instanceof TaskletStep, "Step [" + step.getName() + "] must be a TaskletStep");
-		logger.debug("Converting TaskletStep with name=" + step.getName());
+		if (logger.isDebugEnabled()) {
+			logger.debug("Converting TaskletStep with name=" + step.getName());
+		}
 
 		Tasklet tasklet = getTasklet((TaskletStep) step);
 		Assert.state(tasklet instanceof ChunkOrientedTasklet<?>, "Tasklet must be ChunkOrientedTasklet in step="
@@ -233,7 +235,9 @@ public class RemoteChunkHandlerFactoryBean<T> implements FactoryBean<ChunkHandle
 		Assert.notNull(target, "Target object must not be null");
 		Field field = ReflectionUtils.findField(target.getClass(), name);
 		if (field == null) {
-			logger.debug("Could not find field [" + name + "] on target [" + target + "]");
+			if (logger.isDebugEnabled()) {
+				logger.debug("Could not find field [" + name + "] on target [" + target + "]");
+			}
 			return null;
 		}
 

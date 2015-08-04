@@ -74,7 +74,9 @@ public class ChunkProcessorChunkHandler<S> implements ChunkHandler<S>, Initializ
 	@ServiceActivator
 	public ChunkResponse handleChunk(ChunkRequest<S> chunkRequest) throws Exception {
 
-		logger.debug("Handling chunk: " + chunkRequest);
+		if (logger.isDebugEnabled()) {
+			logger.debug("Handling chunk: " + chunkRequest);
+		}
 
 		StepContribution stepContribution = chunkRequest.getStepContribution();
 
@@ -85,7 +87,9 @@ public class ChunkProcessorChunkHandler<S> implements ChunkHandler<S>, Initializ
 					+ ": " + failure.getMessage());
 		}
 
-		logger.debug("Completed chunk handling with " + stepContribution);
+		if (logger.isDebugEnabled()) {
+			logger.debug("Completed chunk handling with " + stepContribution);
+		}
 		return new ChunkResponse(true, chunkRequest.getSequence(), chunkRequest.getJobId(), stepContribution);
 
 	}

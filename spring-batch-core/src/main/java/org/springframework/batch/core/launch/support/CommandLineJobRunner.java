@@ -536,7 +536,9 @@ public class CommandLineJobRunner {
 				String line = " ";
 				while (line != null) {
 					if (!line.startsWith("#") && StringUtils.hasText(line)) {
-						logger.debug("Stdin arg: " + line);
+						if (logger.isDebugEnabled()) {
+							logger.debug("Stdin arg: " + line);
+						}
 						newargs.add(line);
 					}
 					line = reader.readLine();

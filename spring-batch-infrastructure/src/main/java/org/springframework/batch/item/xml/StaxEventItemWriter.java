@@ -558,7 +558,9 @@ ResourceAwareItemWriterItemStream<T>, InitializingBean {
 					if (key.contains(":")) {
 						prefix = key.substring(key.indexOf(":") + 1);
 					}
-					log.debug("registering prefix: " +prefix + "=" + entry.getValue());
+					if (log.isDebugEnabled()) {
+						log.debug("registering prefix: " +prefix + "=" + entry.getValue());
+					}
 					writer.setPrefix(prefix, entry.getValue());
 				}
 			}

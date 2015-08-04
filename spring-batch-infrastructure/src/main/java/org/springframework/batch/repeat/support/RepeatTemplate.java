@@ -249,8 +249,10 @@ public class RepeatTemplate implements RepeatOperations {
 
 				if (!deferred.isEmpty()) {
 					Throwable throwable = deferred.iterator().next();
-					logger.debug("Handling fatal exception explicitly (rethrowing first of " + deferred.size() + "): "
-							+ throwable.getClass().getName() + ": " + throwable.getMessage());
+					if (logger.isDebugEnabled()) {
+						logger.debug("Handling fatal exception explicitly (rethrowing first of " + deferred.size() + "): "
+								+ throwable.getClass().getName() + ": " + throwable.getMessage());
+					}
 					rethrow(throwable);
 				}
 
@@ -285,12 +287,16 @@ public class RepeatTemplate implements RepeatOperations {
 				RepeatListener interceptor = listeners[i];
 				// This is not an error - only log at debug
 				// level.
-				logger.debug("Exception intercepted (" + (i + 1) + " of " + listeners.length + ")", unwrappedThrowable);
+				if (logger.isDebugEnabled()) {
+					logger.debug("Exception intercepted (" + (i + 1) + " of " + listeners.length + ")", unwrappedThrowable);
+				}
 				interceptor.onError(context, unwrappedThrowable);
 			}
 
-			logger.debug("Handling exception: " + throwable.getClass().getName() + ", caused by: "
-					+ unwrappedThrowable.getClass().getName() + ": " + unwrappedThrowable.getMessage());
+			if (logger.isDebugEnabled()) {
+				logger.debug("Handling exception: " + throwable.getClass().getName() + ", caused by: "
+						+ unwrappedThrowable.getClass().getName() + ": " + unwrappedThrowable.getMessage());
+			}
 			exceptionHandler.handleException(context, unwrappedThrowable);
 
 		}

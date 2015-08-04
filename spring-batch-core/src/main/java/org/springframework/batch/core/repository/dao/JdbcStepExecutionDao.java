@@ -271,7 +271,9 @@ public class JdbcStepExecutionDao extends AbstractJdbcBatchMetadataDao implement
 	 */
 	private String truncateExitDescription(String description) {
 		if (description != null && description.length() > exitMessageLength) {
-			logger.debug("Truncating long message before update of StepExecution, original message is: " + description);
+			if (logger.isDebugEnabled()) {
+				logger.debug("Truncating long message before update of StepExecution, original message is: " + description);
+			}
 			return description.substring(0, exitMessageLength);
 		} else {
 			return description;
