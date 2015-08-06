@@ -33,7 +33,6 @@ import org.springframework.dao.DataAccessException;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.ResultSetExtractor;
 import org.springframework.jdbc.core.RowMapper;
-import org.springframework.jdbc.core.simple.ParameterizedRowMapper;
 import org.springframework.jdbc.support.incrementer.DataFieldMaxValueIncrementer;
 import org.springframework.util.Assert;
 import org.springframework.util.StringUtils;
@@ -188,7 +187,7 @@ JobInstanceDao, InitializingBean {
 	@Override
 	public List<String> getJobNames() {
 		return getJdbcTemplate().query(getQuery(FIND_JOB_NAMES),
-				new ParameterizedRowMapper<String>() {
+				new RowMapper<String>() {
 			@Override
 			public String mapRow(ResultSet rs, int rowNum)
 					throws SQLException {
