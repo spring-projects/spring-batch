@@ -546,10 +546,8 @@ ResourceAwareItemWriterItemStream<T>, InitializingBean {
 	 * Subclasses can override to customize the STAX result.
 	 *
 	 * @return a result for writing to
-	 *
-	 * @throws Exception thrown if an error occurs curing the creation of the result.
 	 */
-	protected Result createStaxResult() throws Exception {
+	protected Result createStaxResult() {
 		return StaxUtils.getResult(eventWriter);
 	}
 
@@ -757,7 +755,7 @@ ResourceAwareItemWriterItemStream<T>, InitializingBean {
 	 * @throws XmlMappingException thrown if error occurs during XML Mapping.
 	 */
 	@Override
-	public void write(List<? extends T> items) throws XmlMappingException, Exception {
+	public void write(List<? extends T> items) throws XmlMappingException, IOException {
 
 		if(!this.initialized) {
 			throw new WriterNotOpenException("Writer must be open before it can be written to");

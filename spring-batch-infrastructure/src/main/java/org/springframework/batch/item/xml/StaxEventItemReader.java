@@ -16,6 +16,7 @@
 
 package org.springframework.batch.item.xml;
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
@@ -217,7 +218,7 @@ ResourceAwareItemReaderItemStream<T>, InitializingBean {
 	 * Move to next fragment and map it to item.
 	 */
 	@Override
-	protected T doRead() throws Exception {
+	protected T doRead() throws IOException, XMLStreamException {
 
 		if (noInput) {
 			return null;
