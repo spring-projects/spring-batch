@@ -49,7 +49,7 @@ public class StaxEventItemReaderCommonTests extends AbstractItemStreamItemReader
 			public Object unmarshal(Source source) throws XmlMappingException, IOException {
 				Attribute attr = null ;
 				try {
-					XMLEventReader eventReader = StaxUtils.getXmlEventReader( source);
+					XMLEventReader eventReader = StaxTestUtils.getXmlEventReader( source);
 					assertTrue(eventReader.nextEvent().isStartDocument());
 					StartElement event = eventReader.nextEvent().asStartElement();
 					attr = (Attribute) event.getAttributes().next();

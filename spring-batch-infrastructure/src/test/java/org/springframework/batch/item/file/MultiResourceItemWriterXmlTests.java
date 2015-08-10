@@ -28,7 +28,7 @@ import javax.xml.transform.Result;
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.batch.item.xml.StaxEventItemWriter;
-import org.springframework.batch.item.xml.StaxUtils;
+import org.springframework.batch.item.xml.StaxTestUtils;
 import org.springframework.oxm.Marshaller;
 import org.springframework.oxm.XmlMappingException;
 import org.springframework.util.Assert;
@@ -62,7 +62,7 @@ public class MultiResourceItemWriterXmlTests extends AbstractMultiResourceItemWr
 
 			try {
 				XMLEventFactory factory = XMLEventFactory.newInstance();
-				XMLEventWriter writer = StaxUtils.getXmlEventWriter(result);
+				XMLEventWriter writer = StaxTestUtils.getXmlEventWriter(result);
 				writer.add(factory.createStartDocument("UTF-8"));
 				writer.add(factory.createStartElement("prefix", "namespace", graph.toString()));
 				writer.add(factory.createEndElement("prefix", "namespace", graph.toString()));

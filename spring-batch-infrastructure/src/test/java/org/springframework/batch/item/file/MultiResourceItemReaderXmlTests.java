@@ -32,7 +32,7 @@ import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.sample.Foo;
 import org.springframework.batch.item.xml.StaxEventItemReader;
-import org.springframework.batch.item.xml.StaxUtils;
+import org.springframework.batch.item.xml.StaxTestUtils;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.Resource;
 import org.springframework.oxm.Unmarshaller;
@@ -55,7 +55,7 @@ public class MultiResourceItemReaderXmlTests extends AbstractItemStreamItemReade
 
 				Attribute attr;
 				try {
-					XMLEventReader eventReader = StaxUtils.getXmlEventReader(source );
+					XMLEventReader eventReader = StaxTestUtils.getXmlEventReader(source );
 					assertTrue(eventReader.nextEvent().isStartDocument());
 					StartElement event = eventReader.nextEvent().asStartElement();
 					attr = (Attribute) event.getAttributes().next();
