@@ -136,11 +136,12 @@ public class SimpleJobLauncher implements JobLauncher, InitializingBean {
 				@Override
 				public void run() {
 					try {
+						long start = System.currentTimeMillis();
 						logger.info("Job: [" + job + "] launched with the following parameters: [" + jobParameters
 								+ "]");
 						job.execute(jobExecution);
 						logger.info("Job: [" + job + "] completed with the following parameters: [" + jobParameters
-								+ "] and the following status: [" + jobExecution.getStatus() + "]");
+								+ "] and the following status: [" + jobExecution.getStatus() + "] in " + (System.currentTimeMillis() - start) + " ms.");
 					}
 					catch (Throwable t) {
 						logger.info("Job: [" + job
