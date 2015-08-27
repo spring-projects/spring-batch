@@ -129,19 +129,18 @@ public abstract class AbstractBatchConfiguration implements ImportAware {
 @Configuration
 class ScopeConfiguration {
 
-	private StepScope stepScope = new StepScope();
-
-	private JobScope jobScope = new JobScope();
-
 	@Bean
-	public StepScope stepScope() {
+	public static StepScope stepScope() {
+		StepScope stepScope = new StepScope();
 		stepScope.setAutoProxy(false);
 		return stepScope;
 	}
 
 	@Bean
-	public JobScope jobScope() {
+	public static JobScope jobScope() {
+		JobScope jobScope = new JobScope();
 		jobScope.setAutoProxy(false);
 		return jobScope;
 	}
+
 }
