@@ -48,7 +48,6 @@ import java.util.List;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
@@ -826,8 +825,9 @@ public class FlatFileItemWriterTests {
 			assertEquals("aggregation failed on 2", expected.getMessage());
 		}
 
-		// nothing was written to output
-		assertNull(readLine());
+		// "1" was written to output, on "2" there was an exception
+		// transactions are handled by TransactionAwareBufferedWriter, not FlatFileItemWriter
+		assertEquals("1", readLine());
 	}
 
 	@Test

@@ -261,14 +261,14 @@ InitializingBean {
 
 		OutputState state = getOutputState();
 
-		StringBuilder lines = new StringBuilder();
 		int lineCount = 0;
-		for (T item : items) {
-			lines.append(lineAggregator.aggregate(item) + lineSeparator);
-			lineCount++;
-		}
 		try {
-			state.write(lines.toString());
+			for (T item : items) {
+				state.write(lineAggregator.aggregate(item));
+				state.write(lineSeparator);
+				lineCount++;
+			}
+			state.flush();
 		}
 		catch (IOException e) {
 			throw new WriteFailedException("Could not write data.  The file may be corrupt.", e);
@@ -340,6 +340,7 @@ InitializingBean {
 				try {
 					headerCallback.writeHeader(outputState.outputBufferedWriter);
 					outputState.write(lineSeparator);
+					outputState.flush();
 				}
 				catch (IOException e) {
 					throw new ItemStreamException("Could not write headers.  The file may be corrupt.", e);
@@ -535,6 +536,17 @@ InitializingBean {
 			}
 
 			outputBufferedWriter.write(line);
+		}
+
+		/**
+		 * @param line
+		 * @throws IOException
+		 */
+		public void flush() throws IOException {
+			if (!initialized) {
+				initializeBufferedWriter();
+			}
+
 			outputBufferedWriter.flush();
 		}
 
