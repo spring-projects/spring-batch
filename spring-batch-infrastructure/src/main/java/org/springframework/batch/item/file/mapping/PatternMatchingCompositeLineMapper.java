@@ -71,7 +71,7 @@ public class PatternMatchingCompositeLineMapper<T> implements LineMapper<T>, Ini
     @Override
 	public void afterPropertiesSet() throws Exception {
 		this.tokenizer.afterPropertiesSet();
-		Assert.isTrue(this.patternMatcher != null, "The 'fieldSetMappers' property must be non-empty");
+		Assert.isTrue(this.patternMatcher != null, "The 'patternMatcher' property must be non-null");
 	}
 
 	public void setTokenizers(Map<String, LineTokenizer> tokenizers) {
