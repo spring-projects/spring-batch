@@ -394,11 +394,7 @@ public class TaskletStep extends AbstractStep {
 
 			chunkListener.beforeChunk(chunkContext);
 
-			// In case we need to push it back to its old value
-			// after a commit fails...
-			oldVersion = new StepExecution(stepExecution.getStepName(), stepExecution.getJobExecution());
-			copy(stepExecution, oldVersion);
-
+		
 			try {
 
 				try {
@@ -431,6 +427,10 @@ public class TaskletStep extends AbstractStep {
 						stepExecution.setTerminateOnly();
 						Thread.currentThread().interrupt();
 					}
+			// In case we need to push it back to its old value
+			// after a commit fails...
+			oldVersion = new StepExecution(stepExecution.getStepName(), stepExecution.getJobExecution());
+			copy(stepExecution, oldVersion);
 
 					// Apply the contribution to the step
 					// even if unsuccessful
