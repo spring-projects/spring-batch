@@ -181,27 +181,32 @@ public class JsrPartitionHandler implements PartitionHandler, InitializingBean {
 
 		taskExecutor.initialize();
 
-		for (final StepExecution curStepExecution : partitionStepExecutions) {
-			final FutureTask<StepExecution> task = createTask(step, curStepExecution);
+		try {
+			for (final StepExecution curStepExecution : partitionStepExecutions) {
+				final FutureTask<StepExecution> task = createTask(step, curStepExecution);
 
-			try {
-				taskExecutor.execute(task);
-				tasks.add(task);
-			} catch (TaskRejectedException e) {
-				// couldn't execute one of the tasks
-				ExitStatus exitStatus = ExitStatus.FAILED
-						.addExitDescription("TaskExecutor rejected the task for this step.");
+				try {
+					taskExecutor.execute(task);
+					tasks.add(task);
+				} catch (TaskRejectedException e) {
+					// couldn't execute one of the tasks
+					ExitStatus exitStatus = ExitStatus.FAILED
+							.addExitDescription("TaskExecutor rejected the task for this step.");
 				/*
 				 * Set the status in case the caller is tracking it through the
 				 * JobExecution.
 				 */
-				curStepExecution.setStatus(BatchStatus.FAILED);
-				curStepExecution.setExitStatus(exitStatus);
-				result.add(stepExecution);
+					curStepExecution.setStatus(BatchStatus.FAILED);
+					curStepExecution.setExitStatus(exitStatus);
+					result.add(stepExecution);
+				}
 			}
-		}
 
-		processPartitionResults(tasks, result);
+			processPartitionResults(tasks, result);
+		}
+		finally {
+			taskExecutor.shutdown();
+		}
 
 		return result;
 	}
