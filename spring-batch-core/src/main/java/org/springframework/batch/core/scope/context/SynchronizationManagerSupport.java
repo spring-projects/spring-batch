@@ -15,9 +15,9 @@
  */
 package org.springframework.batch.core.scope.context;
 
-import java.util.HashMap;
 import java.util.Map;
 import java.util.Stack;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import org.springframework.batch.core.jsr.configuration.support.BatchPropertyContext;
@@ -53,12 +53,12 @@ public abstract class SynchronizationManagerSupport<E, C> {
 	 * Reference counter for each execution: how many threads are using the
 	 * same one?
 	 */
-	private final Map<E, AtomicInteger> counts = new HashMap<E, AtomicInteger>();
+	private final Map<E, AtomicInteger> counts = new ConcurrentHashMap<E, AtomicInteger>();
 
 	/**
 	 * Simple map from a running execution to the associated context.
 	 */
-	private final Map<E, C> contexts = new HashMap<E, C>();
+	private final Map<E, C> contexts = new ConcurrentHashMap<E, C>();
 
 	/**
 	 * Getter for the current context if there is one, otherwise returns null.
