@@ -89,7 +89,7 @@ allprojects {
 		xercesVersion = '2.8.1'
 		xmlunitVersion = '1.5'
 		xstreamVersion = '1.4.7'
-		jrubyVersion = '1.1.7'
+		jrubyVersion = '1.7.22'
 		beanshellVersion = '2.0b5'
 	}
 }
@@ -306,7 +306,8 @@ project('spring-batch-infrastructure') {
 
 		testRuntime "com.sun.mail:javax.mail:$javaMailVersion"
 		testRuntime "org.codehaus.groovy:groovy-jsr223:$groovyVersion"
-		testRuntime "com.sun.script.jruby:jruby-engine:$jrubyVersion"
+		testRuntime "org.jruby:jruby:$jrubyVersion"
+
 		testRuntime "org.beanshell:bsh:$beanshellVersion"
 
 		optional "javax.jms:jms-api:1.1-rev-1"
