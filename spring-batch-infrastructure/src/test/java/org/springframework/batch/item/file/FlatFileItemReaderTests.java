@@ -37,6 +37,9 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
+import static org.junit.Assert.assertThat;
+import static org.hamcrest.Matchers.startsWith;
+import static org.hamcrest.Matchers.endsWith;
 
 /**
  * Tests for {@link FlatFileItemReader}.
@@ -445,7 +448,8 @@ public class FlatFileItemReaderTests {
 			assertEquals(2, expected.getLineNumber());
 			assertEquals("testLine2", expected.getInput());
 			assertEquals("Couldn't map line 2", expected.getCause().getMessage());
-			assertEquals("Parsing error at line: 2 in resource=[resource loaded from byte array], input=[testLine2]", expected.getMessage());
+			assertThat(expected.getMessage(), startsWith("Parsing error at line: 2 in resource=["));
+			assertThat(expected.getMessage(), endsWith("], input=[testLine2]"));
 		}
 	}
 
