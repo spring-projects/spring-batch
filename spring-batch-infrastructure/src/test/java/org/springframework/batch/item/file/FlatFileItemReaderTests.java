@@ -15,14 +15,19 @@
  */
 package org.springframework.batch.item.file;
 
+import static org.hamcrest.Matchers.endsWith;
+import static org.hamcrest.Matchers.startsWith;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
 import java.io.IOException;
 import java.io.InputStream;
+
+import javax.swing.Spring;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -450,7 +455,8 @@ public class FlatFileItemReaderTests {
 			assertEquals(2, expected.getLineNumber());
 			assertEquals("testLine2", expected.getInput());
 			assertEquals("Couldn't map line 2", expected.getCause().getMessage());
-			assertEquals(String.format("Parsing error at line: 2 in resource=[%s], input=[testLine2]", inputResource1.toString()), expected.getMessage());
+			assertThat(expected.getMessage(), startsWith("Parsing error at line: 2 in resource=["));
+			assertThat(expected.getMessage(), endsWith("], input=[testLine2]"));
 		}
 	}
 
