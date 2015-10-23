@@ -12,6 +12,7 @@
                                  http://www.springframework.org/schema/tx/spring-tx-2.5.xsd">
                         
 	<annotation-config/>
+	<beans:bean class="org.springframework.batch.integration.SmokeTests.AnnotatedEndpoint"/>
 	<channel id="smokein"/>
 	<channel id="smokeout">
 		<queue/>
