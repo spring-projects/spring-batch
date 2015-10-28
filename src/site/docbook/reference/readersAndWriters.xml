@@ -800,7 +800,7 @@ boolean booleanValue = fs.readBoolean(2);</programlisting>
         <programlisting language="java">FlatFileItemReader&lt;Player&gt; itemReader = new FlatFileItemReader&lt;Player&gt;();
 itemReader.setResource(new FileSystemResource("resources/players.csv"));
 //DelimitedLineTokenizer defaults to comma as its delimiter
-LineMapper&lt;Player&gt; lineMapper = new DefaultLineMapper&lt;Player&gt;();
+DefaultLineMapper&lt;Player&gt; lineMapper = new DefaultLineMapper&lt;Player&gt;();
 lineMapper.setLineTokenizer(new DelimitedLineTokenizer());
 lineMapper.setFieldSetMapper(new PlayerFieldSetMapper());
 itemReader.setLineMapper(lineMapper);
