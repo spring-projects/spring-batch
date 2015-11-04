@@ -16,7 +16,7 @@
 		<property name="resources" value="classpath:data/iosample/input/delimited*.csv" />
 	</bean>
 
-	<bean id="taskExecutor" class="org.springframework.core.task.SyncTaskExecutor" />
+	<bean id="taskExecutor" class="org.springframework.core.task.SimpleAsyncTaskExecutor" />
 
 	<step id="step1" xmlns="http://www.springframework.org/schema/batch">
 		<tasklet transaction-manager="transactionManager">
