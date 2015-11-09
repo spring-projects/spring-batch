@@ -359,6 +359,7 @@ project('spring-batch-core-tests') {
     project.tasks.findByPath("artifactoryPublish")?.enabled = false
 	dependencies {
 		compile project(":spring-batch-core")
+		compile project(":spring-batch-infrastructure")
 		compile "commons-dbcp:commons-dbcp:$commonsDdbcpVersion"
 		compile "org.springframework:spring-jdbc:$springVersion"
 		compile "org.springframework.retry:spring-retry:$springRetryVersion"
@@ -368,12 +369,13 @@ project('spring-batch-core-tests') {
 		testCompile "org.hsqldb:hsqldb:$hsqldbVersion"
 		testCompile "commons-io:commons-io:$commonsIoVersion"
 		testCompile "org.apache.derby:derby:$derbyVersion"
-        testCompile("junit:junit:${junitVersion}") {
-            exclude group:'org.hamcrest', module:'hamcrest-core'
-        }
-        testCompile("org.hamcrest:hamcrest-all:$hamcrestVersion")
+		testCompile("junit:junit:${junitVersion}") {
+			exclude group:'org.hamcrest', module:'hamcrest-core'
+		}
+		testCompile("org.hamcrest:hamcrest-all:$hamcrestVersion")
 		testCompile "log4j:log4j:$log4jVersion"
 		testCompile "org.springframework:spring-test:$springVersion"
+		testCompile "org.springframework:spring-jdbc:$springVersion"
 
 		runtime "mysql:mysql-connector-java:$mysqlVersion"
 		runtime "postgresql:postgresql:$postgresqlVersion"
