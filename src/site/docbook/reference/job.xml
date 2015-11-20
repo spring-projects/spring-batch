@@ -281,7 +281,7 @@ catch (JobRestartException e) {
 
     <programlisting language="java">&#064;Configuration
 &#064;EnableBatchProcessing
-&#064;Import(DataSourceCnfiguration.class)
+&#064;Import(DataSourceConfiguration.class)
 public class AppConfig {
 
     &#064;Autowired
