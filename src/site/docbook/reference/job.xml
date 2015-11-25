@@ -291,8 +291,8 @@ public class AppConfig {
     private StepBuilderFactory steps;
 
     &#064;Bean
-    public Job job() {
-        return jobs.get(&quot;myJob&quot;).start(step1()).next(step2()).build();
+    public Job job(&#064;Qualifier("step1") Step step1, &#064;Qualifier("step2") Step step2) {
+        return jobs.get(&quot;myJob&quot;).start(step1).next(step2).build();
     }
 
     &#064;Bean
