@@ -202,7 +202,7 @@ public class JsrPartitionHandler implements PartitionHandler, InitializingBean {
 		}
 
 		processPartitionResults(tasks, result);
-
+		taskExecutor.shutdown();
 		return result;
 	}
 
