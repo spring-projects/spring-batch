@@ -46,3 +46,7 @@ Here are some ways for you to get involved in the community:
 * Watch for upcoming articles on Spring by [subscribing](feed://assets.spring.io/drupal/node/feed.xml) to spring.io
 
 Before we accept a non-trivial patch or pull request we will need you to sign the [contributor's agreement](https://support.springsource.com/spring_committer_signup).  Signing the contributor's agreement does not grant anyone commit rights to the main repository, but it does mean that we can accept your contributions, and you will get an author credit if we do.  Active contributors might be asked to join the core team, and given the ability to merge pull requests.
+
+# Code of Conduct
+ This project adheres to the Contributor Covenant link:CODE_OF_CONDUCT.adoc[code of conduct]. By participating, you  are expected to uphold this code. Please report unacceptable behavior to spring-code-of-conduct@pivotal.io.
+ 
