@@ -17,10 +17,14 @@
 package org.springframework.batch.item.file.transform;
 
 import org.junit.Test;
+import org.springframework.batch.support.ReflectionUtils;
+import org.springframework.beans.PropertyAccessorUtils;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
+import java.lang.reflect.Field;
+import java.util.Arrays;
+import java.util.concurrent.atomic.AtomicReference;
+
+import static org.junit.Assert.*;
 
 
 public class DelimitedLineTokenizerTests {
@@ -130,20 +134,29 @@ public class DelimitedLineTokenizerTests {
 		FieldSet line = tokenizer.tokenize("a b c");
 		assertEquals(3, line.getFieldCount());
 	}
-	
+
+	@Test
+	public void testDelimitedLineTokenizerCharAndNames () throws IllegalAccessException {
+		DelimitedLineTokenizer tokenizer = new DelimitedLineTokenizer(" " , new String[]{ "a", "b" , "c" });
+		assertTrue(tokenizer.hasNames());
+		Field storedDelimiter = org.springframework.util.ReflectionUtils.findField( DelimitedLineTokenizer.class , "delimiter");
+		storedDelimiter.setAccessible(true);
+		assertEquals( " ", String.class.cast(storedDelimiter.get( tokenizer)));
+	}
+
 	@Test(expected=IllegalArgumentException.class)
 	public void testDelimitedLineTokenizerNullDelimiter() {
-		AbstractLineTokenizer tokenizer = new DelimitedLineTokenizer(null);
+		AbstractLineTokenizer tokenizer = new DelimitedLineTokenizer((String)null);
 		tokenizer.tokenize("a b c");
 	}
-	
+
 	@Test(expected=IllegalStateException.class)
 	public void testDelimitedLineTokenizerEmptyString() throws Exception {
 		DelimitedLineTokenizer tokenizer = new DelimitedLineTokenizer("");
 		tokenizer.afterPropertiesSet();
 		tokenizer.tokenize("a b c");
 	}
-	
+
 	@Test
 	public void testDelimitedLineTokenizerString() {
 		AbstractLineTokenizer tokenizer = new DelimitedLineTokenizer(" b ");

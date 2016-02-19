@@ -89,7 +89,7 @@ public class DelimitedLineTokenizer extends AbstractLineTokenizer
 	}
 
 	public DelimitedLineTokenizer (String delimiter, String [] names){
-		this (delimiter );
+		this(delimiter);
 		setNames(names);
 	}
 
