@@ -22,7 +22,9 @@ import javax.sql.DataSource;
 
 import static org.junit.Assert.assertEquals;
 import static org.springframework.batch.support.DatabaseType.DB2;
+import static org.springframework.batch.support.DatabaseType.DB2VSE;
 import static org.springframework.batch.support.DatabaseType.DB2ZOS;
+import static org.springframework.batch.support.DatabaseType.DB2AS400;
 import static org.springframework.batch.support.DatabaseType.DERBY;
 import static org.springframework.batch.support.DatabaseType.HSQL;
 import static org.springframework.batch.support.DatabaseType.MYSQL;
@@ -45,7 +47,9 @@ public class DatabaseTypeTests {
 	public void testFromProductName() {
 		assertEquals(DERBY, fromProductName("Apache Derby"));
 		assertEquals(DB2, fromProductName("DB2"));
+		assertEquals(DB2VSE, fromProductName("DB2VSE"));
 		assertEquals(DB2ZOS, fromProductName("DB2ZOS"));
+		assertEquals(DB2AS400, fromProductName("DB2AS400"));
 		assertEquals(HSQL, fromProductName("HSQL Database Engine"));
 		assertEquals(SQLSERVER, fromProductName("Microsoft SQL Server"));
 		assertEquals(MYSQL, fromProductName("MySQL"));
@@ -69,8 +73,17 @@ public class DatabaseTypeTests {
 
 	@Test
 	public void testFromMetaDataForDB2() throws Exception {
-		DataSource ds = DatabaseTypeTestUtils.getMockDataSource("DB2/Linux");
-		assertEquals(DB2, DatabaseType.fromMetaData(ds));
+		DataSource oldDs = DatabaseTypeTestUtils.getMockDataSource("DB2/Linux", "SQL0901");
+		assertEquals(DB2, DatabaseType.fromMetaData(oldDs));
+
+		DataSource newDs = DatabaseTypeTestUtils.getMockDataSource("DB2/NT", "SQL0901");
+		assertEquals(DB2, DatabaseType.fromMetaData(newDs));
+	}
+
+	@Test
+	public void testFromMetaDataForDB2VSE() throws Exception {
+		DataSource ds = DatabaseTypeTestUtils.getMockDataSource("DB2 for DB2 for z/OS VUE", "ARI08015");
+		assertEquals(DB2VSE, DatabaseType.fromMetaData(ds));
 	}
 
 	@Test
@@ -80,6 +93,18 @@ public class DatabaseTypeTests {
 
 		DataSource newDs = DatabaseTypeTestUtils.getMockDataSource("DB2 for DB2 UDB for z/OS", "DSN08015");
 		assertEquals(DB2ZOS, DatabaseType.fromMetaData(newDs));
+	}
+
+	@Test
+	public void testFromMetaDataForDB2AS400() throws Exception {
+		DataSource toolboxDs = DatabaseTypeTestUtils.getMockDataSource("DB2 UDB for AS/400", "07.01.0000 V7R1m0");
+		assertEquals(DB2AS400, DatabaseType.fromMetaData(toolboxDs));
+
+		DataSource nativeDs = DatabaseTypeTestUtils.getMockDataSource("DB2 UDB for AS/400", "V7R1M0");
+		assertEquals(DB2AS400, DatabaseType.fromMetaData(nativeDs));
+
+		DataSource prdidDs = DatabaseTypeTestUtils.getMockDataSource("DB2 UDB for AS/400", "QSQ07010");
+		assertEquals(DB2AS400, DatabaseType.fromMetaData(prdidDs));
 	}
 
 	@Test
