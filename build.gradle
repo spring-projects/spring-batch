@@ -70,6 +70,7 @@ allprojects {
 		hsqldbVersion = '2.3.2'
 		ibatisVersion = '2.3.4.726'
 		jacksonVersion = '1.9.13'
+		jackson2Version = "2.3.3"
 		javaMailVersion = '1.4.7'
 		javaxBatchApiVersion = '1.0'
 		javaxInjectVersion = '1'
@@ -276,6 +277,7 @@ project('spring-batch-core') {
 		optional "org.springframework:spring-jdbc:$springVersion"
 		optional "org.slf4j:slf4j-log4j12:$slf4jVersion"
 		optional "log4j:log4j:$log4jVersion"
+		optional "com.fasterxml.jackson.core:jackson-databind:${jackson2Version}"
 
 		optional "javax.batch:javax.batch-api:$javaxBatchApiVersion"
 	}
