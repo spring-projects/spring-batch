@@ -19,17 +19,15 @@ import org.junit.Before;
 import org.springframework.batch.core.repository.ExecutionContextSerializer;
 
 /**
- * @author Thomas Risberg
- * @author Michael Minella
+ * @author Marten Deinum
  */
-public class XStreamExecutionContextStringSerializerTests extends AbstractExecutionContextSerializerTests {
+public class Jackson2ExecutionContextStringSerializerTests extends AbstractExecutionContextSerializerTests {
 
 	ExecutionContextSerializer serializer;
 
 	@Before
 	public void onSetUp() throws Exception {
-		XStreamExecutionContextStringSerializer serializerDeserializer = new XStreamExecutionContextStringSerializer();
-		(serializerDeserializer).afterPropertiesSet();
+		Jackson2ExecutionContextStringSerializer serializerDeserializer = new Jackson2ExecutionContextStringSerializer();
 
 		serializer = serializerDeserializer;
 	}
