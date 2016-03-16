@@ -247,18 +247,14 @@ project('spring-batch-core') {
 		compile "org.springframework:spring-tx:$springVersion"
 
 		testCompile "org.springframework:spring-test:$springVersion"
-        testCompile("org.mockito:mockito-core:$mockitoVersion") {
-            exclude group:'org.hamcrest', module:'hamcrest-core'
-        }
+		testCompile "org.mockito:mockito-core:$mockitoVersion"
 		testCompile "javax.inject:javax.inject:$javaxInjectVersion"
 		testCompile "org.hsqldb:hsqldb:$hsqldbVersion"
 		testCompile "com.h2database:h2:$h2databaseVersion"
 		testCompile "commons-io:commons-io:$commonsIoVersion"
 		testCompile "commons-dbcp:commons-dbcp:$commonsDdbcpVersion"
-        testCompile("junit:junit:${junitVersion}") {
-            exclude group:'org.hamcrest', module:'hamcrest-core'
-        }
-        testCompile("org.hamcrest:hamcrest-all:$hamcrestVersion")
+		testCompile "junit:junit:${junitVersion}"
+		testCompile "org.hamcrest:hamcrest-library:$hamcrestVersion"
 		optional "org.aspectj:aspectjrt:$aspectjVersion"
 		optional "org.aspectj:aspectjweaver:$aspectjVersion"
 		optional "org.springframework:spring-jdbc:$springVersion"
@@ -293,15 +289,11 @@ project('spring-batch-infrastructure') {
 		testCompile "com.h2database:h2:$h2databaseVersion"
 		testCompile "org.apache.derby:derby:$derbyVersion"
 		testCompile "org.springframework:spring-test:$springVersion"
-        testCompile("junit:junit:${junitVersion}") {
-            exclude group:'org.hamcrest', module:'hamcrest-core'
-        }
-        testCompile("org.hamcrest:hamcrest-all:$hamcrestVersion")
+		testCompile "junit:junit:${junitVersion}"
+		testCompile "org.hamcrest:hamcrest-library:$hamcrestVersion"
 		testCompile "org.aspectj:aspectjrt:$aspectjVersion"
 		testCompile "org.aspectj:aspectjweaver:$aspectjVersion"
-        testCompile("org.mockito:mockito-core:$mockitoVersion") {
-            exclude group:'org.hamcrest', module:'hamcrest-core'
-        }
+		testCompile "org.mockito:mockito-core:$mockitoVersion"
 		testCompile "org.xerial:sqlite-jdbc:$sqliteVersion"
 
 		testRuntime "com.sun.mail:javax.mail:$javaMailVersion"
@@ -370,10 +362,8 @@ project('spring-batch-core-tests') {
 		testCompile "org.hsqldb:hsqldb:$hsqldbVersion"
 		testCompile "commons-io:commons-io:$commonsIoVersion"
 		testCompile "org.apache.derby:derby:$derbyVersion"
-		testCompile("junit:junit:${junitVersion}") {
-			exclude group:'org.hamcrest', module:'hamcrest-core'
-		}
-		testCompile("org.hamcrest:hamcrest-all:$hamcrestVersion")
+		testCompile "junit:junit:${junitVersion}"
+		testCompile "org.hamcrest:hamcrest-library:$hamcrestVersion"
 		testCompile "log4j:log4j:$log4jVersion"
 		testCompile "org.springframework:spring-test:$springVersion"
 		testCompile "org.springframework:spring-jdbc:$springVersion"
@@ -407,10 +397,8 @@ project('spring-batch-infrastructure-tests') {
 		testCompile "org.apache.derby:derby:$derbyVersion"
 		testCompile "org.apache.activemq:activemq-broker:$activemqVersion"
 		testCompile "org.apache.activemq:activemq-kahadb-store:$activemqVersion"
-        testCompile("junit:junit:${junitVersion}") {
-            exclude group:'org.hamcrest', module:'hamcrest-core'
-        }
-        testCompile("org.hamcrest:hamcrest-all:$hamcrestVersion")
+		testCompile "junit:junit:${junitVersion}"
+		testCompile "org.hamcrest:hamcrest-library:$hamcrestVersion"
 		testCompile "org.apache.geronimo.specs:geronimo-j2ee-management_1.1_spec:1.0.1"
 		testCompile "xmlunit:xmlunit:$xmlunitVersion"
 		testCompile ("org.codehaus.castor:castor-xml:$castorVersion") {
@@ -429,9 +417,7 @@ project('spring-batch-infrastructure-tests') {
 		}
 		testCompile "org.springframework:spring-jdbc:$springVersion"
 		testCompile "org.springframework:spring-test:$springVersion"
-        testCompile("org.mockito:mockito-core:$mockitoVersion") {
-            exclude group:'org.hamcrest', module:'hamcrest-core'
-        }
+		testCompile "org.mockito:mockito-core:$mockitoVersion"
 
 		optional "org.slf4j:slf4j-log4j12:$slf4jVersion"
 		optional "org.apache.ibatis:ibatis-sqlmap:$ibatisVersion"
@@ -462,10 +448,8 @@ project('spring-batch-test') {
 	dependencies {
 		compile project(":spring-batch-core")
 
-        compile("junit:junit:${junitVersion}") {
-            exclude group:'org.hamcrest', module:'hamcrest-core'
-        }
-        compile("org.hamcrest:hamcrest-all:$hamcrestVersion")
+		compile "junit:junit:${junitVersion}" 
+		compile "org.hamcrest:hamcrest-library:$hamcrestVersion" 
 		compile "org.springframework:spring-test:$springVersion"
 		compile "org.springframework:spring-jdbc:$springVersion"
 		compile "commons-io:commons-io:$commonsIoVersion"
@@ -496,10 +480,8 @@ project('spring-batch-integration') {
 
 		testCompile "org.apache.activemq:activemq-broker:$activemqVersion"
 		testCompile "org.apache.activemq:activemq-kahadb-store:$activemqVersion"
-        testCompile("junit:junit:${junitVersion}") {
-            exclude group:'org.hamcrest', module:'hamcrest-core'
-        }
-        testCompile("org.hamcrest:hamcrest-all:$hamcrestVersion")
+		testCompile "junit:junit:${junitVersion}"
+		testCompile "org.hamcrest:hamcrest-library:$hamcrestVersion"
 		testCompile "org.aspectj:aspectjrt:$aspectjVersion"
 		testCompile "org.aspectj:aspectjweaver:$aspectjVersion"
 		testCompile "commons-dbcp:commons-dbcp:$commonsDdbcpVersion"
@@ -508,11 +490,10 @@ project('spring-batch-integration') {
 		testCompile "org.apache.derby:derby:$derbyVersion"
 		testCompile "org.hsqldb:hsqldb:$hsqldbVersion"
 		testCompile "org.springframework:spring-test:$springVersion"
-        testCompile("org.mockito:mockito-core:$mockitoVersion") {
-            exclude group:'org.hamcrest', module:'hamcrest-core'
-        }
+		testCompile "org.mockito:mockito-core:$mockitoVersion"
 		testCompile("org.springframework.integration:spring-integration-test:$springIntegrationVersion") {
 			exclude group: 'junit', module: 'junit-dep'
+			exclude group:'org.hamcrest', module:'hamcrest-all'
 		}
 		testCompile "org.springframework.integration:spring-integration-jdbc:$springIntegrationVersion"
 
@@ -564,18 +545,14 @@ project('spring-batch-samples') {
 
 		testCompile "xmlunit:xmlunit:$xmlunitVersion"
 		testCompile project(":spring-batch-test")
-        testCompile("junit:junit:${junitVersion}") {
-            exclude group:'org.hamcrest', module:'hamcrest-core'
-        }
-        testCompile("org.hamcrest:hamcrest-all:$hamcrestVersion")
+		testCompile "junit:junit:${junitVersion}"
+		testCompile "org.hamcrest:hamcrest-library:$hamcrestVersion"
 		testCompile "org.hsqldb:hsqldb:$hsqldbVersion"
 		testCompile "log4j:log4j:$log4jVersion"
 		testCompile "org.codehaus.groovy:groovy:$groovyVersion"
 		testCompile "org.codehaus.groovy:groovy-ant:$groovyVersion"
 		testCompile "org.springframework:spring-test:$springVersion"
-        testCompile("org.mockito:mockito-core:$mockitoVersion") {
-            exclude group:'org.hamcrest', module:'hamcrest-core'
-        }
+		testCompile "org.mockito:mockito-core:$mockitoVersion"
 
 		testRuntime "com.sun.mail:javax.mail:$javaMailVersion"
 
