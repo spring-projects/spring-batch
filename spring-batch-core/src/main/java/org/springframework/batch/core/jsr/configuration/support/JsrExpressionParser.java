@@ -39,7 +39,7 @@ public class JsrExpressionParser {
 	private static final String EXPRESSION_SUFFIX = "}";
 	private static final String EXPRESSION_PREFIX = "#{";
 	private static final String DEFAULT_VALUE_SEPARATOR = ";";
-	private static final Pattern CONDITIONAL_EXPRESSION = Pattern.compile("(((\\bnull\\b)|(#\\{\\w))[^;]+)");
+	private static final Pattern CONDITIONAL_EXPRESSION = Pattern.compile("(((\\bnull\\b)|(\\w))[^;]+)");
 
 	private BeanExpressionContext beanExpressionContext;
 	private BeanExpressionResolver beanExpressionResolver;
