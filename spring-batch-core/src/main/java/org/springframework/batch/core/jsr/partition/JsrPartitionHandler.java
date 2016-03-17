@@ -29,8 +29,6 @@ import java.util.concurrent.Future;
 import java.util.concurrent.FutureTask;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.locks.ReentrantLock;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import javax.batch.api.partition.PartitionAnalyzer;
 import javax.batch.api.partition.PartitionCollector;
@@ -74,10 +72,6 @@ public class JsrPartitionHandler implements PartitionHandler, InitializingBean {
 	private JobRepository jobRepository;
 	private boolean allowStartIfComplete = false;
 	private Set<String> partitionStepNames = new HashSet<String>();
-
-	private static final String STEP_NAME_SEPARATOR = ":";
-	private static final String PARTITION_KEY = "partition";
-	private static final Pattern PARTITION_STEP_NAME_PATTERN = Pattern.compile(STEP_NAME_SEPARATOR + PARTITION_KEY + "(\\d+)$");
 
 	/**
 	 * @return the step that will be executed by each partition
@@ -198,10 +192,10 @@ public class JsrPartitionHandler implements PartitionHandler, InitializingBean {
 					// couldn't execute one of the tasks
 					ExitStatus exitStatus = ExitStatus.FAILED
 							.addExitDescription("TaskExecutor rejected the task for this step.");
-					/*
-					 * Set the status in case the caller is tracking it through the
-					 * JobExecution.
-					 */
+				/*
+				 * Set the status in case the caller is tracking it through the
+				 * JobExecution.
+				 */
 					curStepExecution.setStatus(BatchStatus.FAILED);
 					curStepExecution.setExitStatus(exitStatus);
 					result.add(stepExecution);
@@ -344,17 +338,19 @@ public class JsrPartitionHandler implements PartitionHandler, InitializingBean {
 		if(partitionProperties != null) {
 			Iterator<StepExecution> executions = partitionStepExecutions.iterator();
 
+			int i = 0;
 			while(executions.hasNext()) {
 				StepExecution curExecution = executions.next();
 
-				Matcher partitionStepNameMatcher = PARTITION_STEP_NAME_PATTERN.matcher(curExecution.getStepName());
-				Properties partitionPropertyValues = null;
-				if (partitionStepNameMatcher.find()) {
-					int partitionNumber = Integer.parseInt(partitionStepNameMatcher.group(1));
-					partitionPropertyValues = partitionProperties[partitionNumber];
-				}
-				if(partitionPropertyValues != null) {
-					propertyContext.setStepProperties(curExecution.getStepName(), partitionPropertyValues);
+				if(i < partitionProperties.length) {
+					Properties partitionPropertyValues = partitionProperties[i];
+					if(partitionPropertyValues != null) {
+						propertyContext.setStepProperties(curExecution.getStepName(), partitionPropertyValues);
+					}
+
+					i++;
+				} else {
+					break;
 				}
 			}
 		}
