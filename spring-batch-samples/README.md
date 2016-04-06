@@ -29,7 +29,7 @@ Job/Feature                                       | skip | retry | restart | aut
 [compositeItemWriterSample](#compositeItemWriter) |      |       |         |                   |               |            |     X      |              |                |                |           
 [customerFilter](#customerFilter)                 |      |       |         |                   |               |            |            |              |                |                |     X     
 [delegating](#delegating)                         |      |       |         |                   |               |            |     X      |              |                |                |           
-[football](#football)                             |      |       |         |                   |               |            |            |              |                |                |           
+[football](#football-job)                             |      |       |         |                   |               |            |            |              |                |                |           
 [headerFooter](#headerFooter)                     |      |       |         |                   |               |            |            |              |                |                |           
 [hibernate](#hibernate)                           |      |   X   |         |                   |               |            |            |      X       |                |                |           
 [ioSample](#ioSample)                             |      |       |         |                   |               |     X      |            |      X       |                |                |           
