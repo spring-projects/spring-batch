@@ -10,7 +10,7 @@ buildscript {
 	dependencies {
 		classpath 'org.springframework.build.gradle:docbook-reference-plugin:0.2.8'
 		classpath 'org.springframework.build.gradle:propdeps-plugin:0.0.5'
-		classpath 'org.springframework.build.gradle:spring-io-plugin:0.0.3.RELEASE'
+		classpath 'io.spring.gradle:spring-io-plugin:0.0.5.RELEASE'
 	}
 }
 
@@ -216,7 +216,13 @@ configure(mainProjects) {
 		}
 
 		dependencies {
-			springIoVersions "io.spring.platform:platform-versions:${platformVersion}@properties"
+			dependencyManagement {
+				springIoTestRuntime {
+					imports {
+						mavenBom "io.spring.platform:platform-bom:${platformVersion}"
+					}
+				}
+			}
 		}
 	}
 }
