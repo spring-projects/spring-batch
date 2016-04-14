@@ -8,8 +8,8 @@ buildscript {
 		maven { url 'https://repo.spring.io/plugins-release' }
 	}
 	dependencies {
-		classpath 'org.springframework.build.gradle:docbook-reference-plugin:0.2.8'
-		classpath 'org.springframework.build.gradle:propdeps-plugin:0.0.5'
+		classpath 'io.spring.gradle:docbook-reference-plugin:0.3.1'
+		classpath 'org.springframework.build.gradle:propdeps-plugin:0.0.7'
 		classpath 'io.spring.gradle:spring-io-plugin:0.0.5.RELEASE'
 	}
 }
@@ -50,6 +50,7 @@ allprojects {
 		springDataJpaVersion = '1.6.0.RELEASE'
 		springDataMongodbVersion = '1.5.0.RELEASE'
 		springDataNeo4jVersion = '3.1.0.RELEASE'
+		springDataNeo4j4Version = '4.1.1.RELEASE'
 		springIntegrationVersion = '4.0.1.RELEASE'
 		springLdapVersion = '2.0.2.RELEASE'
 
@@ -62,7 +63,7 @@ allprojects {
 		commonsLangVersion = '2.6'
 		derbyVersion = '10.10.1.1'
 		groovyVersion = '2.3.0'
-        hamcrestVersion = '1.3'
+		hamcrestVersion = '1.3'
 		h2databaseVersion = '1.3.175'
 		hibernateVersion = '4.2.12.Final'
 		hibernateValidatorVersion = '4.3.1.Final'
@@ -94,13 +95,14 @@ allprojects {
 	}
 }
 
-subprojects { subproject ->
+configure(subprojects - project(":spring-build-src")) { subproject ->
 
 	apply plugin: 'java'
 	apply from:   "${rootProject.projectDir}/publish-maven.gradle"
 	apply plugin: 'jacoco'
 	apply plugin: 'propdeps-idea'
 	apply plugin: 'propdeps-eclipse'
+	apply plugin: 'merge'
 
 	jacoco {
 		toolVersion = "0.7.0.201403182114"
@@ -231,6 +233,18 @@ configure(mainProjects) {
 	}
 }
 
+project("spring-build-src") {
+	description = "Exposes gradle buildSrc for IDE support"
+	apply plugin: "groovy"
+
+	dependencies {
+		compile gradleApi()
+		compile localGroovy()
+	}
+
+	configurations.archives.artifacts.clear()
+}
+
 project('spring-batch-core') {
 	description = 'Spring Batch Core'
 
@@ -263,7 +277,7 @@ project('spring-batch-core') {
 		optional "org.slf4j:slf4j-log4j12:$slf4jVersion"
 		optional "log4j:log4j:$log4jVersion"
 
-		provided "javax.batch:javax.batch-api:$javaxBatchApiVersion"
+		optional "javax.batch:javax.batch-api:$javaxBatchApiVersion"
 	}
 }
 
@@ -346,6 +360,17 @@ project('spring-batch-infrastructure') {
         optional "org.springframework.ldap:spring-ldap-core:$springLdapVersion"
         optional "org.springframework.ldap:spring-ldap-core-tiger:$springLdapVersion"
         optional "org.springframework.ldap:spring-ldap-ldif-core:$springLdapVersion"
+	}
+}
+
+project('spring-batch-infrastructure-neo4j4') {
+
+	merge.into = project(':spring-batch-infrastructure')
+
+	dependencies {
+		optional "org.springframework.data:spring-data-neo4j:$springDataNeo4j4Version"
+		testCompile "org.mockito:mockito-core:$mockitoVersion"
+		testCompile "junit:junit:${junitVersion}"
 	}
 }
 
@@ -504,6 +529,8 @@ project('spring-batch-integration') {
 		optional "log4j:log4j:1.2.14"
 		optional "org.springframework.integration:spring-integration-jms:$springIntegrationVersion"
 		optional "org.springframework:spring-jms:$springVersion"
+
+		optional "javax.batch:javax.batch-api:$javaxBatchApiVersion"
 	}
 }
 
@@ -573,13 +600,13 @@ project('spring-batch-samples') {
 		optional "org.springframework.amqp:spring-rabbit:$springAmqpVersion"
         optional "javax.inject:javax.inject:1"
 
+		optional "javax.batch:javax.batch-api:$javaxBatchApiVersion"
 	}
 }
 
 apply plugin: 'docbook-reference'
 
 reference {
-	//sourceDir = file('src/reference/docbook')
 	sourceDir = file('src/site/docbook/reference')
 }
 
@@ -793,5 +820,5 @@ or specify the Gradle property `TCK_HOME`, e.g: ./gradlew runTck -PTCK_HOME=/pat
 
 task wrapper(type: Wrapper) {
 	description = 'Generates gradlew[.bat] scripts'
-	gradleVersion = '1.11'
+	gradleVersion = '2.12'
 }
