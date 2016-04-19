@@ -15,15 +15,16 @@
  */
 package org.springframework.batch.item.database;
 
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
-
 import org.hibernate.Query;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.junit.Test;
+
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.item.sample.Foo;
+
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 /**
  * Tests for {@link HibernateCursorItemReader} using standard hibernate {@link Session}.
@@ -53,7 +54,6 @@ public class HibernateCursorItemReaderStatefulIntegrationTests extends AbstractH
 		when(sessionFactory.openSession()).thenReturn(session);
 		when(session.createQuery("testQuery")).thenReturn(scrollableResults);
 		when(scrollableResults.setFetchSize(0)).thenReturn(scrollableResults);
-		when(session.close()).thenReturn(null);
 
 		itemReader.open(new ExecutionContext());
 		itemReader.close();
