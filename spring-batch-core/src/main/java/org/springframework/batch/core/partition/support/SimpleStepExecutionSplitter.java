@@ -193,7 +193,10 @@ public class SimpleStepExecutionSplitter implements StepExecutionSplitter, Initi
 
 		jobRepository.addAll(set);
 
-		return set;
+		Set<StepExecution> executions = new HashSet<StepExecution>(set.size());
+		executions.addAll(set);
+
+		return executions;
 
 	}
 
