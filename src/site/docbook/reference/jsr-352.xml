@@ -30,157 +30,177 @@
 	<section id="jsrSetup">
 		<title>Setup</title>
 
-		<para>JSR-352 requires a very simple path to executing a batch job.  The following code is all that is needed to
-			execute your first batch job:
-		</para>
+		<section id="jsrSetupContexts">
+			<title>Application Contexts</title>
+			
+			<para>All JSR-352 based jobs within Spring Batch consist of two application contexts.  A parent context, that
+			contains beans related to the infrastructure of Spring Batch such as the <classname>JobRepository</classname>,
+			<classname>PlatformTransactionManager</classname>, etc and a child context that consists of the configuration
+			of the job to be run.  The parent context is defined via the <classname>baseContext.xml</classname> provided
+			by the framework.  This context may be overridden via the <classname>JSR-352-BASE-CONTEXT</classname> system
+			property.</para>
 
-		<programlisting language="java">JobOperator operator = BatchRuntime.getJobOperator();
-jobOperator.start("myJob", new Properties());</programlisting>
+			<note><para>The base context is not processed by the JSR-352 processors for things like property injection so
+				no components requiring that additional processing should be configured there.
+			</para></note>
+		</section>
 
-		<para>While that is convenient for developers, the devil is in the details.  Spring Batch bootstraps a bit of
-			infrastructure behind the scenes that a developer may want to override.  The following is bootstrapped the
-			first time <code>BatchRuntime.getJobOperator()</code> is called:
-			<informaltable frame="all" rowsep="1" colsep="1">
-				<tgroup cols="3">
-					<colspec align="left"/>
-					<colspec align="left"/>
-					<colspec align="left"/>
-					<tbody>
-						<row>
-							<entry>
-								<emphasis role="bold">Bean Name</emphasis>
-							</entry>
-							<entry>
-								<emphasis role="bold">Default Configuration</emphasis>
-							</entry>
-							<entry>
-								<emphasis role="bold">Notes</emphasis>
-							</entry>
-						</row>
-						<row>
-							<entry>
-								dataSource
-							</entry>
-							<entry>
-								Apache DBCP BasicDataSource with configured values.
-							</entry>
-							<entry>
-								By default, HSQLDB is bootstrapped.
-							</entry>
-						</row>
-						<row>
-							<entry>
-								<code>transactionManager</code>
-							</entry>
-							<entry>
-								<code>org.springframework.jdbc.datasource.DataSourceTransactionManager</code>
-							</entry>
-							<entry>
-								References the dataSource bean defined above.
-							</entry>
-						</row>
-						<row>
-							<entry>
-								A Datasource initializer
-							</entry>
-							<entry>
-							</entry>
-							<entry>
-								This is configured to execute the scripts configured via the
-								<code>batch.drop.script</code> and <code>batch.schema.script</code> properties.  By
-								default, the schema scripts for HSQLDB are executed.  This behavior can be disabled via
-								<code>batch.data.source.init</code> property.
-							</entry>
-						</row>
-						<row>
-							<entry>
-								jobRepository
-							</entry>
-							<entry>
-								A JDBC based <code>SimpleJobRepository</code>.
-							</entry>
-							<entry>
-								This <code>JobRepository</code> uses the previously mentioned data source and transaction
-								manager.  The schema's table prefix is configurable (defaults to BATCH_) via the
-								<code>batch.table.prefix</code> property.
-							</entry>
-						</row>
-						<row>
-							<entry>
-								jobLauncher
-							</entry>
-							<entry>
-								<code>org.springframework.batch.core.launch.support.SimpleJobLauncher</code>
-							</entry>
-							<entry>
-								Used to launch jobs.
-							</entry>
-						</row>
-						<row>
-							<entry>
-								batchJobOperator
-							</entry>
-							<entry>
-								<code>org.springframework.batch.core.launch.support.SimpleJobOperator</code>
-							</entry>
-							<entry>
-								The <code>JsrJobOperator</code> wraps this to provide most of it's functionality.
-							</entry>
-						</row>
-						<row>
-							<entry>
-								jobExplorer
-							</entry>
-							<entry>
-								<code>org.springframework.batch.core.explore.support.JobExplorerFactoryBean</code>
-							</entry>
-							<entry>
-								Used to address lookup functionality provided by the <code>JsrJobOperator</code>.
-							</entry>
-						</row>
-						<row>
-							<entry>
-								jobParametersConverter
-							</entry>
-							<entry>
-								<code>org.springframework.batch.core.jsr.JsrJobParametersConverter</code>
-							</entry>
-							<entry>
-								JSR-352 specific implementation of the <code>JobParametersConverter</code>.
-							</entry>
-						</row>
-						<row>
-							<entry>
-								jobRegistry
-							</entry>
-							<entry>
-								<code>org.springframework.batch.core.configuration.support.MapJobRegistry</code>
-							</entry>
-							<entry>
-								Used by the <code>SimpleJobOperator</code>.
-							</entry>
-						</row>
-						<row>
-							<entry>
-								placeholderProperties
-							</entry>
-							<entry>
-								<code>org.springframework.beans.factory.config.PropertyPlaceholderConfigure</code>
-							</entry>
-							<entry>
-								Loads the properties file <code>batch-${ENVIRONMENT:hsql}.properties</code> to configure
-								the properties mentioned above.  ENVIRONMENT is a System property (defaults to hsql)
-								that can be used to specify any of the supported databases Spring Batch currently
-								supports.
-							</entry>
-						</row>
-					</tbody>
-				</tgroup>
-			</informaltable>
-		</para>
-		<note><para>None of the above beans are optional for executing JSR-352 based jobs.  All may be overriden to
-			provide customized functionality as needed.
-		</para></note>
+		<section id="jsrSetupLaunching">
+			<title>Launching a JSR-352 based job</title>
+
+			<para>JSR-352 requires a very simple path to executing a batch job.  The following code is all that is needed to
+				execute your first batch job:
+			</para>
+
+			<programlisting language="java">JobOperator operator = BatchRuntime.getJobOperator();
+				jobOperator.start("myJob", new Properties());</programlisting>
+
+			<para>While that is convenient for developers, the devil is in the details.  Spring Batch bootstraps a bit of
+				infrastructure behind the scenes that a developer may want to override.  The following is bootstrapped the
+				first time <code>BatchRuntime.getJobOperator()</code> is called:
+				<informaltable frame="all" rowsep="1" colsep="1">
+					<tgroup cols="3">
+						<colspec align="left"/>
+						<colspec align="left"/>
+						<colspec align="left"/>
+						<tbody>
+							<row>
+								<entry>
+									<emphasis role="bold">Bean Name</emphasis>
+								</entry>
+								<entry>
+									<emphasis role="bold">Default Configuration</emphasis>
+								</entry>
+								<entry>
+									<emphasis role="bold">Notes</emphasis>
+								</entry>
+							</row>
+							<row>
+								<entry>
+									dataSource
+								</entry>
+								<entry>
+									Apache DBCP BasicDataSource with configured values.
+								</entry>
+								<entry>
+									By default, HSQLDB is bootstrapped.
+								</entry>
+							</row>
+							<row>
+								<entry>
+									<code>transactionManager</code>
+								</entry>
+								<entry>
+									<code>org.springframework.jdbc.datasource.DataSourceTransactionManager</code>
+								</entry>
+								<entry>
+									References the dataSource bean defined above.
+								</entry>
+							</row>
+							<row>
+								<entry>
+									A Datasource initializer
+								</entry>
+								<entry>
+								</entry>
+								<entry>
+									This is configured to execute the scripts configured via the
+									<code>batch.drop.script</code> and <code>batch.schema.script</code> properties.  By
+									default, the schema scripts for HSQLDB are executed.  This behavior can be disabled via
+									<code>batch.data.source.init</code> property.
+								</entry>
+							</row>
+							<row>
+								<entry>
+									jobRepository
+								</entry>
+								<entry>
+									A JDBC based <code>SimpleJobRepository</code>.
+								</entry>
+								<entry>
+									This <code>JobRepository</code> uses the previously mentioned data source and transaction
+									manager.  The schema's table prefix is configurable (defaults to BATCH_) via the
+									<code>batch.table.prefix</code> property.
+								</entry>
+							</row>
+							<row>
+								<entry>
+									jobLauncher
+								</entry>
+								<entry>
+									<code>org.springframework.batch.core.launch.support.SimpleJobLauncher</code>
+								</entry>
+								<entry>
+									Used to launch jobs.
+								</entry>
+							</row>
+							<row>
+								<entry>
+									batchJobOperator
+								</entry>
+								<entry>
+									<code>org.springframework.batch.core.launch.support.SimpleJobOperator</code>
+								</entry>
+								<entry>
+									The <code>JsrJobOperator</code> wraps this to provide most of it's functionality.
+								</entry>
+							</row>
+							<row>
+								<entry>
+									jobExplorer
+								</entry>
+								<entry>
+									<code>org.springframework.batch.core.explore.support.JobExplorerFactoryBean</code>
+								</entry>
+								<entry>
+									Used to address lookup functionality provided by the <code>JsrJobOperator</code>.
+								</entry>
+							</row>
+							<row>
+								<entry>
+									jobParametersConverter
+								</entry>
+								<entry>
+									<code>org.springframework.batch.core.jsr.JsrJobParametersConverter</code>
+								</entry>
+								<entry>
+									JSR-352 specific implementation of the <code>JobParametersConverter</code>.
+								</entry>
+							</row>
+							<row>
+								<entry>
+									jobRegistry
+								</entry>
+								<entry>
+									<code>org.springframework.batch.core.configuration.support.MapJobRegistry</code>
+								</entry>
+								<entry>
+									Used by the <code>SimpleJobOperator</code>.
+								</entry>
+							</row>
+							<row>
+								<entry>
+									placeholderProperties
+								</entry>
+								<entry>
+									<code>org.springframework.beans.factory.config.PropertyPlaceholderConfigure</code>
+								</entry>
+								<entry>
+									Loads the properties file <code>batch-${ENVIRONMENT:hsql}.properties</code> to configure
+									the properties mentioned above.  ENVIRONMENT is a System property (defaults to hsql)
+									that can be used to specify any of the supported databases Spring Batch currently
+									supports.
+								</entry>
+							</row>
+						</tbody>
+					</tgroup>
+				</informaltable>
+			</para>
+			<note><para>None of the above beans are optional for executing JSR-352 based jobs.  All may be overriden to
+				provide customized functionality as needed.
+			</para></note>
+		</section>
+
 	</section>
 
     <section id="dependencyInjection">
