@@ -15,8 +15,16 @@
  */
 package org.springframework.batch.core.partition.support;
 
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Date;
+import java.util.Map;
+import java.util.Set;
+
 import org.junit.Before;
 import org.junit.Test;
+
 import org.springframework.batch.core.BatchStatus;
 import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.JobExecutionException;
@@ -28,13 +36,6 @@ import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.repository.support.MapJobRepositoryFactoryBean;
 import org.springframework.batch.core.step.tasklet.TaskletStep;
 import org.springframework.batch.item.ExecutionContext;
-
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Date;
-import java.util.Map;
-import java.util.Set;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
@@ -67,6 +68,22 @@ public class SimpleStepExecutionSplitterTests {
 		for (StepExecution execution : execs) {
 			assertNotNull("step execution partition is saved", execution.getId());
 		}
+	}
+
+	/**
+	 * Tests the results of BATCH-2490
+	 * @throws Exception
+	 */
+	@Test
+	public void testAddressabilityOfSetResults() throws Exception {
+		SimpleStepExecutionSplitter splitter = new SimpleStepExecutionSplitter(jobRepository, true, step.getName(),
+				new SimplePartitioner());
+		Set<StepExecution> execs = splitter.split(stepExecution, 2);
+		assertEquals(2, execs.size());
+
+		StepExecution execution = execs.iterator().next();
+		execs.remove(execution);
+		assertEquals(1, execs.size());
 	}
 
 	@Test
