@@ -362,6 +362,15 @@ project('spring-batch-infrastructure') {
         optional "org.springframework.ldap:spring-ldap-core-tiger:$springLdapVersion"
         optional "org.springframework.ldap:spring-ldap-ldif-core:$springLdapVersion"
 	}
+
+	if (project.hasProperty('platformVersion')) {
+		def dataNeo4jVersion = dependencyManagement.springIoTestRuntime.managedVersions['org.springframework.data:spring-data-neo4j']
+		if (dataNeo4jVersion?.startsWith('4.')) {
+			tasks.withType(Test).matching { it.name =~ "springIoJdk.Test" }.all {
+				exclude '**/Neo4jItemReaderTests.class'
+			}
+		}
+	}
 }
 
 project('spring-batch-infrastructure-neo4j4') {
