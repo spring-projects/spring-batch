@@ -16,7 +16,9 @@
 package org.springframework.batch.item.database.support;
 
 import static org.springframework.batch.support.DatabaseType.DB2;
+import static org.springframework.batch.support.DatabaseType.DB2VSE;
 import static org.springframework.batch.support.DatabaseType.DB2ZOS;
+import static org.springframework.batch.support.DatabaseType.DB2AS400;
 import static org.springframework.batch.support.DatabaseType.DERBY;
 import static org.springframework.batch.support.DatabaseType.H2;
 import static org.springframework.batch.support.DatabaseType.HSQL;
@@ -70,7 +72,9 @@ public class SqlPagingQueryProviderFactoryBean implements FactoryBean<PagingQuer
 
 	{
 		providers.put(DB2, new Db2PagingQueryProvider());
+		providers.put(DB2VSE, new Db2PagingQueryProvider());
 		providers.put(DB2ZOS, new Db2PagingQueryProvider());
+		providers.put(DB2AS400, new Db2PagingQueryProvider());
 		providers.put(DERBY,new DerbyPagingQueryProvider());
 		providers.put(HSQL,new HsqlPagingQueryProvider());
 		providers.put(H2,new H2PagingQueryProvider());
