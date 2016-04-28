@@ -377,6 +377,15 @@ project('spring-batch-infrastructure-neo4j4') {
 		testCompile "org.mockito:mockito-core:$mockitoVersion"
 		testCompile "junit:junit:${junitVersion}"
 	}
+
+	if (project.hasProperty('platformVersion')) {
+		def dataNeo4jVersion = dependencyManagement.springIoTestRuntime.managedVersions['org.springframework.data:spring-data-neo4j']
+		if (dataNeo4jVersion?.startsWith('3.')) {
+			tasks.withType(Test).matching { it.name =~ "springIoJdk.Test" }.all {
+				enabled false
+			}
+		}
+	}
 }
 
 project('spring-batch-core-tests') {
