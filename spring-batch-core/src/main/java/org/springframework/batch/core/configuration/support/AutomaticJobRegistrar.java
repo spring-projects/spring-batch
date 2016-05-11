@@ -25,9 +25,9 @@ import org.springframework.batch.core.configuration.JobRegistry;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
-import org.springframework.context.ApplicationEvent;
 import org.springframework.context.ApplicationListener;
 import org.springframework.context.Lifecycle;
+import org.springframework.context.event.ApplicationContextEvent;
 import org.springframework.context.event.ContextClosedEvent;
 import org.springframework.context.event.ContextRefreshedEvent;
 import org.springframework.core.Ordered;
@@ -43,7 +43,7 @@ import org.springframework.util.Assert;
  *
  * @since 2.1
  */
-public class AutomaticJobRegistrar implements Ordered, Lifecycle, ApplicationListener<ApplicationEvent>, ApplicationContextAware,
+public class AutomaticJobRegistrar implements Ordered, Lifecycle, ApplicationListener<ApplicationContextEvent>, ApplicationContextAware,
 		InitializingBean {
 
 	private Collection<ApplicationContextFactory> applicationContextFactories = new ArrayList<ApplicationContextFactory>();
@@ -59,8 +59,8 @@ public class AutomaticJobRegistrar implements Ordered, Lifecycle, ApplicationLis
 	private int order = Ordered.LOWEST_PRECEDENCE;
 
 	/**
-	 * The enclosing application context, which can be used to check if {@link ApplicationEvent events} come from the
-	 * expected source.
+	 * The enclosing application context, which can be used to check if {@link ApplicationContextEvent events} come
+	 * from the expected source.
 	 *
 	 * @param applicationContext the enclosing application context if there is one
 	 * @see ApplicationContextAware#setApplicationContext(ApplicationContext)
@@ -132,7 +132,7 @@ public class AutomaticJobRegistrar implements Ordered, Lifecycle, ApplicationLis
 	 * @see InitializingBean#afterPropertiesSet()
 	 */
 	@Override
-	public final void onApplicationEvent(ApplicationEvent event) {
+	public final void onApplicationEvent(ApplicationContextEvent event) {
 		// TODO: With Spring 3 a SmartLifecycle is started automatically
 		if (event.getSource() == applicationContext) {
 			if (event instanceof ContextRefreshedEvent) {
