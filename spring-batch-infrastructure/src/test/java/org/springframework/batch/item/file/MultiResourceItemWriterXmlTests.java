@@ -1,5 +1,5 @@
 /*
- * Copyright 2009-2014 the original author or authors.
+ * Copyright 2009-2016 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -47,6 +47,7 @@ public class MultiResourceItemWriterXmlTests extends AbstractMultiResourceItemWr
 
 	@Before
 	public void setUp() throws Exception {
+		super.createFile();
 		delegate = new StaxEventItemWriter<String>();
 		delegate.setMarshaller(new SimpleMarshaller());
 	}
@@ -88,8 +89,9 @@ public class MultiResourceItemWriterXmlTests extends AbstractMultiResourceItemWr
 
 	@Test
 	public void multiResourceWritingWithRestart() throws Exception {
-		
-		setUp(delegate);
+
+		super.setUp(delegate);
+		tested.open(executionContext);
 
 		tested.write(Arrays.asList("1", "2", "3"));
 
@@ -103,10 +105,12 @@ public class MultiResourceItemWriterXmlTests extends AbstractMultiResourceItemWr
 		tested.update(executionContext);
 		tested.close();
 
+
 		assertEquals(xmlDocStart + "<prefix:4/>" + xmlDocEnd, readFile(part2));
 		assertEquals(xmlDocStart + "<prefix:1/><prefix:2/><prefix:3/>" + xmlDocEnd,
 				readFile(part1));
 
+		super.setUp(delegate);
 		tested.open(executionContext);
 
 		tested.write(Arrays.asList("5"));
