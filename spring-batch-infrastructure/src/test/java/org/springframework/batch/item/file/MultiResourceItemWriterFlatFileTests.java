@@ -1,5 +1,5 @@
 /*
- * Copyright 2008-2014 the original author or authors.
+ * Copyright 2008-2017 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -66,6 +66,7 @@ public class MultiResourceItemWriterFlatFileTests extends AbstractMultiResourceI
 
 	@Before
 	public void setUp() throws Exception {
+		super.createFile();
 		delegate = new FlatFileItemWriter<String>();
 		delegate.setLineAggregator(new PassThroughLineAggregator<String>());
 	}
@@ -74,6 +75,7 @@ public class MultiResourceItemWriterFlatFileTests extends AbstractMultiResourceI
 	public void testBasicMultiResourceWriteScenario() throws Exception {
 
 		super.setUp(delegate);
+		tested.open(executionContext);
 
 		tested.write(Arrays.asList("1", "2", "3"));
 
@@ -99,6 +101,7 @@ public class MultiResourceItemWriterFlatFileTests extends AbstractMultiResourceI
 	public void testUpdateAfterDelegateClose() throws Exception {
 
 		super.setUp(delegate);
+		tested.open(executionContext);
 
 		tested.update(executionContext);
 		assertEquals(0, executionContext.getInt(tested.getExecutionContextKey("resource.item.count")));
@@ -120,6 +123,7 @@ public class MultiResourceItemWriterFlatFileTests extends AbstractMultiResourceI
 			}
 		});
 		super.setUp(delegate);
+		tested.open(executionContext);
 
 		tested.write(Arrays.asList("1", "2", "3"));
 
@@ -129,7 +133,7 @@ public class MultiResourceItemWriterFlatFileTests extends AbstractMultiResourceI
 		tested.write(Arrays.asList("4"));
 		File part2 = new File(file.getAbsolutePath() + suffixCreator.getSuffix(2));
 		assertTrue(part2.exists());
-		
+
 		tested.close();
 
 		assertEquals("123f", readFile(part1));
@@ -147,9 +151,10 @@ public class MultiResourceItemWriterFlatFileTests extends AbstractMultiResourceI
 			}
 		});
 		super.setUp(delegate);
-		
+		tested.open(executionContext);
+
 		ResourcelessTransactionManager transactionManager = new ResourcelessTransactionManager();
-		
+
 		new TransactionTemplate(transactionManager).execute(new WriterCallback(Arrays.asList("1", "2", "3")));
 
 		File part1 = new File(file.getAbsolutePath() + suffixCreator.getSuffix(1));
@@ -158,7 +163,7 @@ public class MultiResourceItemWriterFlatFileTests extends AbstractMultiResourceI
 		new TransactionTemplate(transactionManager).execute(new WriterCallback(Arrays.asList("4")));
 		File part2 = new File(file.getAbsolutePath() + suffixCreator.getSuffix(2));
 		assertTrue(part2.exists());
-		
+
 		tested.close();
 
 		assertEquals("123f", readFile(part1));
@@ -170,6 +175,7 @@ public class MultiResourceItemWriterFlatFileTests extends AbstractMultiResourceI
 	public void testRestart() throws Exception {
 
 		super.setUp(delegate);
+		tested.open(executionContext);
 
 		tested.write(Arrays.asList("1", "2", "3"));
 
@@ -184,6 +190,7 @@ public class MultiResourceItemWriterFlatFileTests extends AbstractMultiResourceI
 
 		tested.update(executionContext);
 		tested.close();
+
 		tested.open(executionContext);
 
 		tested.write(Arrays.asList("5"));
@@ -199,12 +206,14 @@ public class MultiResourceItemWriterFlatFileTests extends AbstractMultiResourceI
 	public void testRestartWithFooter() throws Exception {
 
 		delegate.setFooterCallback(new FlatFileFooterCallback() {
-            @Override
+			@Override
 			public void writeFooter(Writer writer) throws IOException {
 				writer.write("f");
 			}
 		});
+
 		super.setUp(delegate);
+		tested.open(executionContext);
 
 		tested.write(Arrays.asList("1", "2", "3"));
 
@@ -219,6 +228,7 @@ public class MultiResourceItemWriterFlatFileTests extends AbstractMultiResourceI
 
 		tested.update(executionContext);
 		tested.close();
+
 		tested.open(executionContext);
 
 		tested.write(Arrays.asList("5"));
@@ -234,15 +244,16 @@ public class MultiResourceItemWriterFlatFileTests extends AbstractMultiResourceI
 	public void testTransactionalRestartWithFooter() throws Exception {
 
 		delegate.setFooterCallback(new FlatFileFooterCallback() {
-            @Override
+			@Override
 			public void writeFooter(Writer writer) throws IOException {
 				writer.write("f");
 			}
 		});
 		super.setUp(delegate);
+		tested.open(executionContext);
 
 		ResourcelessTransactionManager transactionManager = new ResourcelessTransactionManager();
-		
+
 		new TransactionTemplate(transactionManager).execute(new WriterCallback(Arrays.asList("1", "2", "3")));
 
 		File part1 = new File(file.getAbsolutePath() + suffixCreator.getSuffix(1));
@@ -256,6 +267,7 @@ public class MultiResourceItemWriterFlatFileTests extends AbstractMultiResourceI
 
 		tested.update(executionContext);
 		tested.close();
+
 		tested.open(executionContext);
 
 		new TransactionTemplate(transactionManager).execute(new WriterCallback(Arrays.asList("5")));
