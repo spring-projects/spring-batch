@@ -672,12 +672,12 @@ task schemaZip(type: Zip) {
 		}
 
 		subproject.sourceSets.main.resources.find {
-			it.path.endsWith('META-INF/spring.schemas')
+			it.path.endsWith("META-INF${File.separator}spring.schemas")
 		}?.withInputStream { schemas.load(it) }
 
 		for (def key : schemas.keySet()) {
 			File xsdFile = subproject.sourceSets.main.resources.find {
-				it.path.endsWith(schemas.get(key))
+				it.path.replaceAll('\\\\', '/').endsWith(schemas.get(key))
 			}
 			assert xsdFile != null
 			into ("batch/${shortName}") {
