@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2012 the original author or authors.
+ * Copyright 2006-2016 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -85,54 +85,19 @@ public abstract class AbstractSqlPagingQueryProviderTests {
 	}
 
 	@Test
-	public void testGenerateJumpToItemQueryWithMultipleSortKeys() {
-		Map<String, Order> sortKeys = new LinkedHashMap<String, Order>();
-		sortKeys.put("name", Order.ASCENDING);
-		sortKeys.put("id", Order.DESCENDING);
-		pagingQueryProvider.setSortKeys(sortKeys);
-		String s = pagingQueryProvider.generateJumpToItemQuery(145, pageSize);
-		assertEquals(getJumpToItemQueryWithMultipleSortKeys(), s);
-	}
-
-	@Test
-	public void testGenerateJumpToItemQueryForFirstPageWithMultipleSortKeys() {
-		Map<String, Order> sortKeys = new LinkedHashMap<String, Order>();
-		sortKeys.put("name", Order.ASCENDING);
-		sortKeys.put("id", Order.DESCENDING);
-		pagingQueryProvider.setSortKeys(sortKeys);
-		String s = pagingQueryProvider.generateJumpToItemQuery(45, pageSize);
-		assertEquals(getJumpToItemQueryForFirstPageWithMultipleSortKeys(), s);
-	}
-	
-	@Test
 	public abstract void testGenerateFirstPageQuery();
 
 	@Test
 	public abstract void testGenerateRemainingPagesQuery();
 
 	@Test
-	public abstract void testGenerateJumpToItemQuery();
-
-	@Test
-	public abstract void testGenerateJumpToItemQueryForFirstPage();
-	
-	@Test
 	public abstract void testGenerateFirstPageQueryWithGroupBy();
 	
 	@Test
 	public abstract void testGenerateRemainingPagesQueryWithGroupBy();
 	
-	@Test
-	public abstract void testGenerateJumpToItemQueryWithGroupBy();
-	
-	@Test
-	public abstract void testGenerateJumpToItemQueryForFirstPageWithGroupBy();
-
 	public abstract String getFirstPageSqlWithMultipleSortKeys();
 	
 	public abstract String getRemainingSqlWithMultipleSortKeys();
 	
-	public abstract String getJumpToItemQueryWithMultipleSortKeys();
-	
-	public abstract String getJumpToItemQueryForFirstPageWithMultipleSortKeys();
 }

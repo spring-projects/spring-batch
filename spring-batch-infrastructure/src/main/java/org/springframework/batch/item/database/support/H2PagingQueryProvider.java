@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2008 the original author or authors.
+ * Copyright 2006-2016 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -36,16 +36,6 @@ public class H2PagingQueryProvider extends AbstractSqlPagingQueryProvider {
 
 	private String buildTopClause(int pageSize) {
 		return new StringBuilder().append("TOP ").append(pageSize).toString();
-	}
-
-	@Override
-	public String generateJumpToItemQuery(int itemIndex, int pageSize) {
-		int page = itemIndex / pageSize;
-		int offset = (page * pageSize) - 1;
-		offset = offset<0 ? 0 : offset;
-
-		String topClause = new StringBuilder().append("LIMIT ").append(offset).append(" 1").toString();
-		return SqlPagingQueryUtils.generateTopJumpToQuery(this, topClause);
 	}
 
 }

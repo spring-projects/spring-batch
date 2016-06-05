@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 the original author or authors.
+ * Copyright 2012-2016 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,7 +21,6 @@ import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-import org.junit.Test;
 import org.junit.runner.RunWith;
 
 import org.springframework.batch.item.database.support.HsqlPagingQueryProvider;
@@ -29,7 +28,6 @@ import org.springframework.batch.item.sample.Foo;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
-import org.springframework.test.util.ReflectionTestUtils;
 
 /**
  * @author Dave Syer
@@ -40,21 +38,10 @@ import org.springframework.test.util.ReflectionTestUtils;
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(locations = "/org/springframework/batch/item/database/JdbcPagingItemReaderParameterTests-context.xml")
 public class JdbcPagingItemReaderClassicParameterTests extends AbstractJdbcPagingItemReaderParameterTests {
-
-	// force jumpToItemQuery in JdbcPagingItemReader.doJumpToPage(int)
-	private static boolean forceJumpToItemQuery = false;
 	
     @Override
 	protected AbstractPagingItemReader<Foo> getItemReader() throws Exception {
-		JdbcPagingItemReader<Foo> reader = new JdbcPagingItemReader<Foo>() {
-			@Override
-			protected void doJumpToPage(int itemIndex) {
-				if (forceJumpToItemQuery) {
-					ReflectionTestUtils.setField(this, "startAfterValues", null);
-				}
-				super.doJumpToPage(itemIndex);
-			}
-		};
+		JdbcPagingItemReader<Foo> reader = new JdbcPagingItemReader<Foo>();
 		reader.setDataSource(dataSource);
 		HsqlPagingQueryProvider queryProvider = new HsqlPagingQueryProvider();
 		queryProvider.setSelectClause("select ID, NAME, VALUE");
@@ -84,17 +71,7 @@ public class JdbcPagingItemReaderClassicParameterTests extends AbstractJdbcPagin
 		return reader;
 
 	}
-    
-	@Test
-	public void testReadAfterJumpSecondPageWithJumpToItemQuery() throws Exception {		
-		try {
-			forceJumpToItemQuery = true;
-			super.testReadAfterJumpSecondPage();
-		} finally {
-			forceJumpToItemQuery = false;	
-		}
-	}
-    
+        
     @Override
     protected String getName() {
     	return "JdbcPagingItemReader";

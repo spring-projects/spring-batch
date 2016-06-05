@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2012 the original author or authors.
+ * Copyright 2006-2016 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -33,7 +33,6 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.junit.After;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.batch.item.database.support.AbstractSqlPagingQueryProvider;
@@ -167,27 +166,6 @@ public class JdbcPagingQueryIntegrationTests {
 			startAfterValues.put(sortKey.getKey(), list.get(list.size() - 1).get(sortKey.getKey()));
 		}
 		return startAfterValues;
-	}
-
-	@Test
-	@Ignore
-	public void testJumpToItem() throws Exception {
-
-		PagingQueryProvider queryProvider = getPagingQueryProvider();
-
-		int minId = jdbcTemplate.queryForObject("SELECT MIN(VALUE) FROM T_FOOS", Integer.class);
-
-		String query = queryProvider.generateJumpToItemQuery(pageSize, pageSize);
-		List<Map<String, Object>> list = jdbcTemplate.queryForList(query);
-		logger.debug("Jump to page result: " + list);
-		assertEquals(1, list.size());
-		System.err.println(list);
-		String expected = "[{value=" + (minId + pageSize - 1);
-		assertEquals(expected, list.toString().toLowerCase().substring(0, expected.length()));
-		Object startAfterValue = list.get(0).entrySet().iterator().next().getValue();
-		list = jdbcTemplate.queryForList(queryProvider.generateRemainingPagesQuery(pageSize), startAfterValue);
-		assertEquals(pageSize, list.size());
-		expected = "[{id=" + (minId + pageSize);
 	}
 
 	protected PagingQueryProvider getPagingQueryProvider() throws Exception {

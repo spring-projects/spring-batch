@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2012 the original author or authors.
+ * Copyright 2006-2016 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -47,15 +47,6 @@ public class PostgresPagingQueryProvider extends AbstractSqlPagingQueryProvider 
 
 	private String buildLimitClause(int pageSize) {
 		return new StringBuilder().append("LIMIT ").append(pageSize).toString();
-	}
-	
-	@Override
-	public String generateJumpToItemQuery(int itemIndex, int pageSize) {
-		int page = itemIndex / pageSize;
-		int offset = (page * pageSize) - 1;
-		offset = offset<0 ? 0 : offset;
-		String limitClause = new StringBuilder().append("LIMIT 1 OFFSET ").append(offset).toString();
-		return SqlPagingQueryUtils.generateLimitJumpToQuery(this, limitClause);
 	}
 
 }
