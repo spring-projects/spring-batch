@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2014 the original author or authors.
+ * Copyright 2013-2016 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -144,6 +144,7 @@ import org.springframework.util.Assert;
  */
 public class JsrJobOperator implements JobOperator, ApplicationContextAware, InitializingBean {
 	private static final String JSR_JOB_CONTEXT_BEAN_NAME = "jsr_jobContext";
+	private static final String JSR_BEAN_REF_CONTEXT = "JSR-352-beanRefContext.xml";
 	private final Log logger = LogFactory.getLog(getClass());
 
 	private JobExplorer jobExplorer;
@@ -160,7 +161,7 @@ public class JsrJobOperator implements JobOperator, ApplicationContextAware, Ini
 	 * one if it has) to populate itself.
 	 */
 	public JsrJobOperator() {
-		BeanFactoryLocator beanFactoryLocactor = ContextSingletonBeanFactoryLocator.getInstance();
+		BeanFactoryLocator beanFactoryLocactor = ContextSingletonBeanFactoryLocator.getInstance(JSR_BEAN_REF_CONTEXT);
 		BeanFactoryReference ref = beanFactoryLocactor.useBeanFactory("baseContext");
 		baseContext = (ApplicationContext) ref.getFactory();
 
