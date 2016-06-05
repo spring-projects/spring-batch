@@ -1,5 +1,5 @@
 /*
- * Copyright 2009-2012 the original author or authors.
+ * Copyright 2009-2016 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -37,8 +37,8 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.transaction.UnexpectedRollbackException;
 
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
+import java.util.UUID;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
@@ -343,8 +343,8 @@ public class FaultTolerantExceptionClassesTests implements ApplicationContextAwa
 		stepsToExecute.add((Step) applicationContext.getBean(stepName));
 		job.setSteps(stepsToExecute);
 
-		JobExecution jobExecution = jobLauncher.run(job, new JobParametersBuilder().addLong("timestamp",
-				new Date().getTime()).toJobParameters());
+		JobExecution jobExecution = jobLauncher.run(job, new JobParametersBuilder().addString("uuid",
+				UUID.randomUUID().toString()).toJobParameters());
 		return jobExecution.getStepExecutions().iterator().next();
 	}
 
