@@ -219,7 +219,7 @@ public abstract class AbstractListenerFactoryBean<T> implements FactoryBean<Obje
 			}
 
 			if(targetSource != null && targetSource.getTargetClass() != null && targetSource.getTargetClass().isInterface()) {
-				logger.warn(String.format("%s is an interface.  The implementing class will not be queried for annotation based listener configurations.  If using @StepScope on a @Bean method, be sure to return the implementing class so listner annotations can be used.", targetSource.getTargetClass().getName()));
+				logger.warn(String.format("%s is an interface.  The implementing class will not be queried for annotation based listener configurations.  If using @StepScope on a @Bean method, be sure to return the implementing class so listener annotations can be used.", targetSource.getTargetClass().getName()));
 			}
 		}
 		for (ListenerMetaData metaData : metaDataValues) {
