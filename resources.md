@@ -10,6 +10,12 @@ layout: documentation_page
 * **Arnaud Cogoluegnes, Thierry Templier, Gary Gregory, Olivier Bazoud**: [Spring Batch in Action](http://www.amazon.com/dp/1935182951)
 
 <span id="videos"></span>
+
+## Video Training
+
+* **Michael T. Minella**: [Learning Spring Batch](http://shop.oreilly.com/product/0636920044673.do) O'Reilly Publishing
+
+
 ## Videos
 
 ### Spring Batch (Michael Minella)
