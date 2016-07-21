@@ -15,16 +15,8 @@ Is there already an issue that addresses your concern?  Do a bit of searching in
 
 ## Sign the contributor license agreement
 
-Very important, before we can accept any *Spring Batch contributions*, we will need you to sign the contributor license agreement (CLA). Signing the CLA does not grant anyone commit rights to the main repository, but it does mean that we can accept your contributions, and you will get an author credit if we do. In order to read and sign the CLA, please go to:
-
-* [https://support.springsource.com/spring_committer_signup](https://support.springsource.com/spring_committer_signup)
-
-For **Project**, please select **Spring Batch**. The **Project Lead** is **Michael Minella**.
-
-Once you've completed the web form, simply add the following in a comment on your pull request:
-
-    I have signed and agree to the terms of the SpringSource Individual
-    Contributor License Agreement.
+If you have not previously done so, please fill out and
+submit the [Contributor License Agreement](https://cla.pivotal.io/sign/spring).
 
 ## Fork the Repository
 
