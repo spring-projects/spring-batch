@@ -409,6 +409,7 @@ project('spring-batch-core-tests') {
 
 		runtime "mysql:mysql-connector-java:$mysqlVersion"
 		runtime "postgresql:postgresql:$postgresqlVersion"
+		runtime "javax.batch:javax.batch-api:$javaxBatchApiVersion"
 
 		optional "org.aspectj:aspectjrt:$aspectjVersion"
 		optional "org.aspectj:aspectjweaver:$aspectjVersion"
