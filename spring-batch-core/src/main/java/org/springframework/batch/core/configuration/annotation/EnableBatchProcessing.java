@@ -97,6 +97,8 @@ import java.lang.annotation.Target;
  * <li>a {@link JobRepository} (bean name "jobRepository")</li>
  * <li>a {@link JobLauncher} (bean name "jobLauncher")</li>
  * <li>a {@link JobRegistry} (bean name "jobRegistry")</li>
+ * <li>a {@link JobOperator} (bean name "jobOperator")</li>
+ * <li>a {@link JobExplorer} (bean name "jobExplorer")</li>
  * <li>a {@link PlatformTransactionManager} (bean name "transactionManager")</li>
  * <li>a {@link JobBuilderFactory} (bean name "jobBuilders") as a convenience to prevent you from having to inject the
  * job repository into every job, as in the examples above</li>
