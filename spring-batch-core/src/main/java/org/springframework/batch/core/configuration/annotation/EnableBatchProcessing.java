@@ -15,6 +15,13 @@
  */
 package org.springframework.batch.core.configuration.annotation;
 
+import java.lang.annotation.Documented;
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
+import javax.sql.DataSource;
+
 import org.springframework.batch.core.configuration.JobRegistry;
 import org.springframework.batch.core.configuration.support.ApplicationContextFactory;
 import org.springframework.batch.core.configuration.support.AutomaticJobRegistrar;
@@ -22,13 +29,6 @@ import org.springframework.batch.core.launch.JobLauncher;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.context.annotation.Import;
 import org.springframework.transaction.PlatformTransactionManager;
-
-import javax.sql.DataSource;
-import java.lang.annotation.Documented;
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
 
 /**
  * <p>
@@ -97,8 +97,8 @@ import java.lang.annotation.Target;
  * <li>a {@link JobRepository} (bean name "jobRepository")</li>
  * <li>a {@link JobLauncher} (bean name "jobLauncher")</li>
  * <li>a {@link JobRegistry} (bean name "jobRegistry")</li>
- * <li>a {@link JobOperator} (bean name "jobOperator")</li>
- * <li>a {@link JobExplorer} (bean name "jobExplorer")</li>
+ * <li>a {@link org.springframework.batch.core.launch.JobOperator} (bean name "jobOperator")</li>
+ * <li>a {@link org.springframework.batch.core.explore.JobExplorer} (bean name "jobExplorer")</li>
  * <li>a {@link PlatformTransactionManager} (bean name "transactionManager")</li>
  * <li>a {@link JobBuilderFactory} (bean name "jobBuilders") as a convenience to prevent you from having to inject the
  * job repository into every job, as in the examples above</li>
