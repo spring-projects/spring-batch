@@ -17,7 +17,7 @@ package org.springframework.batch.integration.chunk;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.springframework.integration.annotation.Header;
+import org.springframework.messaging.handler.annotation.Header;
 import org.springframework.integration.jms.JmsHeaders;
 
 /**

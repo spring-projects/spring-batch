@@ -15,6 +15,12 @@
  */
 package org.springframework.batch.core.step.builder;
 
+import java.lang.reflect.Method;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.LinkedHashSet;
+import java.util.Set;
+
 import org.springframework.batch.core.ChunkListener;
 import org.springframework.batch.core.ItemProcessListener;
 import org.springframework.batch.core.ItemReadListener;
@@ -46,12 +52,6 @@ import org.springframework.batch.repeat.policy.SimpleCompletionPolicy;
 import org.springframework.batch.repeat.support.RepeatTemplate;
 import org.springframework.batch.support.ReflectionUtils;
 import org.springframework.util.Assert;
-
-import java.lang.reflect.Method;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.LinkedHashSet;
-import java.util.Set;
 
 /**
  * Step builder for simple item processing (chunk oriented) steps. Items are read and cached in chunks, and then
@@ -111,8 +111,7 @@ public class SimpleStepBuilder<I, O> extends AbstractTaskletStepBuilder<SimpleSt
 	}
 
 	public FaultTolerantStepBuilder<I, O> faultTolerant() {
-		FaultTolerantStepBuilder<I, O> builder = new FaultTolerantStepBuilder<I, O>(this);
-		return builder;
+		return new FaultTolerantStepBuilder<I, O>(this);
 	}
 
 	/**
@@ -248,6 +247,7 @@ public class SimpleStepBuilder<I, O> extends AbstractTaskletStepBuilder<SimpleSt
 	 * @param listener the object that has a method configured with listener annotation
 	 * @return this for fluent chaining
 	 */
+	@SuppressWarnings("unchecked")
 	@Override
 	public SimpleStepBuilder listener(Object listener) {
 		super.listener(listener);

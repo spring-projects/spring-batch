@@ -104,7 +104,7 @@ public interface JobInstanceDao {
 	 * @param jobName
 	 * @param start
 	 * @param count
-	 * @return
+	 * @return a list of {@link JobInstance} for the job name requested.
 	 */
 	List<JobInstance> findJobInstancesByName(String jobName, int start, int count);
 

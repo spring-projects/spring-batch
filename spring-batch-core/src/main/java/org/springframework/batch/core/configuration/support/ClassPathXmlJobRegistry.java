@@ -22,6 +22,7 @@ package org.springframework.batch.core.configuration.support;
  *
  * @deprecated in version 2.1, please us {@link AutomaticJobRegistrar} instead
  */
+@Deprecated
 public abstract class ClassPathXmlJobRegistry {
 
 }

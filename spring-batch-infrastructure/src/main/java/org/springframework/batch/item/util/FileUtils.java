@@ -97,6 +97,7 @@ public final class FileUtils {
 	/**
 	 * @deprecated use the version with explicit append parameter instead. Here append=false is assumed.
 	 */
+	@Deprecated
 	public static void setUpOutputFile(File file, boolean restarted, boolean overwriteOutputFile) {
 		setUpOutputFile(file, restarted, false, overwriteOutputFile);
 	}

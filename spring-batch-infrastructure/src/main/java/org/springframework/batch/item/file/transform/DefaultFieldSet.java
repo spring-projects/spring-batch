@@ -16,9 +16,6 @@
 
 package org.springframework.batch.item.file.transform;
 
-import org.springframework.util.Assert;
-import org.springframework.util.StringUtils;
-
 import java.math.BigDecimal;
 import java.text.DateFormat;
 import java.text.DecimalFormat;
@@ -30,6 +27,9 @@ import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 import java.util.Properties;
+
+import org.springframework.util.Assert;
+import org.springframework.util.StringUtils;
 
 /**
  * Default implementation of {@link FieldSet} using Java using Java primitive
@@ -90,7 +90,7 @@ public class DefaultFieldSet implements FieldSet {
 	 * @see FieldSet#readString(int)
 	 */
 	public DefaultFieldSet(String[] tokens) {
-		this.tokens = tokens == null ? null : (String[]) tokens.clone();
+		this.tokens = tokens == null ? null : tokens.clone();
 		setNumberFormat(NumberFormat.getInstance(Locale.US));
 	}
 
@@ -228,7 +228,7 @@ public class DefaultFieldSet implements FieldSet {
 
 		String value = readAndTrim(index);
 
-		return trueValue.equals(value) ? true : false;
+		return trueValue.equals(value);
 	}
 
 	/*
@@ -718,8 +718,8 @@ public class DefaultFieldSet implements FieldSet {
 
 		int result = 1;
 
-		for (int i = 0; i < tokens.length; i++) {
-			result = 31 * result + (tokens[i] == null ? 0 : tokens[i].hashCode());
+		for (String token : tokens) {
+			result = 31 * result + (token == null ? 0 : token.hashCode());
 		}
 
 		return result;

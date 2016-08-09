@@ -11,7 +11,7 @@ buildscript {
 		classpath 'io.spring.gradle:docbook-reference-plugin:0.3.1'
 		classpath 'org.springframework.build.gradle:propdeps-plugin:0.0.7'
 		classpath 'io.spring.gradle:spring-io-plugin:0.0.5.RELEASE'
-		classpath "io.spring.gradle:dependency-management-plugin:0.5.1.RELEASE"
+		classpath "io.spring.gradle:dependency-management-plugin:0.6.0.RELEASE"
 	}
 }
 
@@ -42,57 +42,57 @@ allprojects {
 
 		environmentProperty = project.hasProperty('environment') ? getProperty('environment') : 'hsql'
 
-		springVersionDefault = '4.0.5.RELEASE'
+		springVersionDefault = '4.1.9.RELEASE'
 		springVersion = project.hasProperty('springVersion') ? getProperty('springVersion') : springVersionDefault
-		springRetryVersion = '1.1.0.RELEASE'
-		springAmqpVersion = '1.3.3.RELEASE'
-		springDataCommonsVersion = '1.8.0.RELEASE'
-		springDataGemfireVersion = '1.4.0.RELEASE'
-		springDataJpaVersion = '1.6.0.RELEASE'
-		springDataMongodbVersion = '1.5.0.RELEASE'
-		springDataNeo4jVersion = '3.1.0.RELEASE'
-		springDataNeo4j4Version = '4.1.1.RELEASE'
-		springIntegrationVersion = '4.0.1.RELEASE'
-		springLdapVersion = '2.0.2.RELEASE'
+		springRetryVersion = '1.1.2.RELEASE'
+		springAmqpVersion = '1.4.6.RELEASE'
+		springDataCommonsVersion = '1.9.4.RELEASE'
+		springDataGemfireVersion = '1.5.4.RELEASE'
+		springDataJpaVersion = '1.7.4.RELEASE'
+		springDataMongodbVersion = '1.6.4.RELEASE'
+		springDataNeo4jVersion = '3.2.4.RELEASE'
+		springDataNeo4j4Version = '4.1.2.RELEASE'
+		springIntegrationVersion = '4.1.8.RELEASE'
+		springLdapVersion = '2.0.4.RELEASE'
 
 		activemqVersion = '5.13.2'
-		aspectjVersion = '1.8.0'
-		castorVersion = '1.3.2'
-		commonsCollectionsVersion = '3.2.1'
+		aspectjVersion = '1.8.8'
+		castorVersion = '1.3.3'
+		commonsCollectionsVersion = '3.2.2'
 		commonsDdbcpVersion = '1.4'
 		commonsIoVersion = '2.4'
 		commonsLangVersion = '2.6'
-		derbyVersion = '10.10.1.1'
-		groovyVersion = '2.3.0'
+		derbyVersion = '10.10.2.0'
+		groovyVersion = '2.4.4'
 		hamcrestVersion = '1.3'
-		h2databaseVersion = '1.3.175'
-		hibernateVersion = '4.2.12.Final'
-		hibernateValidatorVersion = '4.3.1.Final'
-		hsqldbVersion = '2.3.2'
+		h2databaseVersion = '1.4.190'
+		hibernateVersion = '4.3.11.Final'
+		hibernateValidatorVersion = '5.1.3.Final'
+		hsqldbVersion = '2.3.3'
 		ibatisVersion = '2.3.4.726'
 		jacksonVersion = '1.9.13'
-		jackson2Version = "2.3.3"
-		javaMailVersion = '1.4.7'
+		jackson2Version = "2.4.6"
+		javaMailVersion = '1.5.5'
 		javaxBatchApiVersion = '1.0'
 		javaxInjectVersion = '1'
 		jbatchTckSpi = '1.0'
 		jettisonVersion = '1.2'
-		jtdsVersion = '1.2.4'
+		jtdsVersion = '1.3.1'
 		junitVersion = '4.11'
 		log4jVersion = '1.2.17'
-		mysqlVersion = '5.1.29'
-		mockitoVersion = '1.9.5'
-		postgresqlVersion = '9.0-801.jdbc4'
-		quartzVersion = '2.2.1'
+		mysqlVersion = '5.1.38'
+		mockitoVersion = '1.10.19'
+		postgresqlVersion = '9.4.1209.jre6'
+		quartzVersion = '2.2.2'
 		servletApiVersion = '3.0.1'
-		slf4jVersion = '1.7.7'
+		slf4jVersion = '1.7.21'
 		sqlfireclientVersion = '1.0.3'
-		sqliteVersion = '3.7.2'
-		woodstoxVersion = '4.2.0'
-		xercesVersion = '2.8.1'
+		sqliteVersion = '3.8.11.2'
+		woodstoxVersion = '4.2.1'
+		xercesVersion = '2.11.0'
 		xmlunitVersion = '1.5'
-		xstreamVersion = '1.4.7'
-		jrubyVersion = '1.7.22'
+		xstreamVersion = '1.4.9'
+		jrubyVersion = '1.7.23'
 		beanshellVersion = '2.0b5'
 	}
 }
@@ -415,7 +415,7 @@ project('spring-batch-core-tests') {
 		testCompile "org.springframework:spring-jdbc:$springVersion"
 
 		runtime "mysql:mysql-connector-java:$mysqlVersion"
-		runtime "postgresql:postgresql:$postgresqlVersion"
+		runtime "org.postgresql:postgresql:$postgresqlVersion"
 		runtime "javax.batch:javax.batch-api:$javaxBatchApiVersion"
 
 		optional "org.aspectj:aspectjrt:$aspectjVersion"
@@ -481,7 +481,7 @@ project('spring-batch-infrastructure-tests') {
 		optional "org.springframework:spring-jms:$springVersion"
 
 		runtime "mysql:mysql-connector-java:$mysqlVersion"
-		runtime "postgresql:postgresql:$postgresqlVersion"
+		runtime "org.postgresql:postgresql:$postgresqlVersion"
 	}
 	test {
 		enabled = project.hasProperty('alltests') ? true : false
@@ -546,7 +546,7 @@ project('spring-batch-integration') {
 
 		optional "javax.jms:jms-api:1.1-rev-1"
 		optional "org.slf4j:slf4j-log4j12:$slf4jVersion"
-		optional "log4j:log4j:1.2.14"
+		optional "log4j:log4j:$log4jVersion"
 		optional "org.springframework.integration:spring-integration-jms:$springIntegrationVersion"
 		optional "org.springframework:spring-jms:$springVersion"
 
@@ -613,7 +613,7 @@ project('spring-batch-samples') {
 		optional "com.vmware.sqlfire:sqlfireclient:$sqlfireclientVersion"
 		optional "org.slf4j:slf4j-log4j12:$slf4jVersion"
 		optional "org.apache.derby:derby:$derbyVersion"
-		optional "postgresql:postgresql:$postgresqlVersion"
+		optional "org.postgresql:postgresql:$postgresqlVersion"
 		optional "org.springframework:spring-web:$springVersion"
 		optional "org.springframework.data:spring-data-commons:$springDataCommonsVersion"
 		optional "org.springframework.amqp:spring-amqp:$springAmqpVersion"
@@ -840,5 +840,5 @@ or specify the Gradle property `TCK_HOME`, e.g: ./gradlew runTck -PTCK_HOME=/pat
 
 task wrapper(type: Wrapper) {
 	description = 'Generates gradlew[.bat] scripts'
-	gradleVersion = '2.12'
+	gradleVersion = '2.14.1'
 }

@@ -15,9 +15,27 @@
  */
 package org.springframework.batch.core.step.builder;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.junit.Test;
-import org.springframework.batch.core.*;
-import org.springframework.batch.core.annotation.*;
+
+import org.springframework.batch.core.BatchStatus;
+import org.springframework.batch.core.ExitStatus;
+import org.springframework.batch.core.JobParameters;
+import org.springframework.batch.core.StepContribution;
+import org.springframework.batch.core.StepExecution;
+import org.springframework.batch.core.StepExecutionListener;
+import org.springframework.batch.core.annotation.AfterChunk;
+import org.springframework.batch.core.annotation.AfterProcess;
+import org.springframework.batch.core.annotation.AfterRead;
+import org.springframework.batch.core.annotation.AfterStep;
+import org.springframework.batch.core.annotation.AfterWrite;
+import org.springframework.batch.core.annotation.BeforeChunk;
+import org.springframework.batch.core.annotation.BeforeProcess;
+import org.springframework.batch.core.annotation.BeforeRead;
+import org.springframework.batch.core.annotation.BeforeStep;
+import org.springframework.batch.core.annotation.BeforeWrite;
 import org.springframework.batch.core.configuration.xml.DummyItemWriter;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.repository.support.MapJobRepositoryFactoryBean;
@@ -29,9 +47,6 @@ import org.springframework.batch.item.support.PassThroughItemProcessor;
 import org.springframework.batch.repeat.RepeatStatus;
 import org.springframework.batch.support.transaction.ResourcelessTransactionManager;
 import org.springframework.transaction.PlatformTransactionManager;
-
-import java.util.ArrayList;
-import java.util.List;
 
 import static org.junit.Assert.assertEquals;
 
@@ -63,7 +78,7 @@ public class StepBuilderTests {
 
 	@Test
 	public void testListeners() throws Exception {
-		JobRepository jobRepository = new MapJobRepositoryFactoryBean().getJobRepository();
+		JobRepository jobRepository = new MapJobRepositoryFactoryBean().getObject();
 		StepExecution execution = jobRepository.createJobExecution("foo", new JobParameters()).createStepExecution("step");
 		jobRepository.add(execution);
 		PlatformTransactionManager transactionManager = new ResourcelessTransactionManager();
@@ -89,7 +104,7 @@ public class StepBuilderTests {
 
 	@Test
 	public void testItemListeners() throws Exception {
-		JobRepository jobRepository = new MapJobRepositoryFactoryBean().getJobRepository();
+		JobRepository jobRepository = new MapJobRepositoryFactoryBean().getObject();
 		StepExecution execution = jobRepository.createJobExecution("foo", new JobParameters()).createStepExecution("step");
 		jobRepository.add(execution);
 		PlatformTransactionManager transactionManager = new ResourcelessTransactionManager();

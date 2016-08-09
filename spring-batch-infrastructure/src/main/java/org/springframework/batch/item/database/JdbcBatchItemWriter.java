@@ -15,8 +15,16 @@
  */
 package org.springframework.batch.item.database;
 
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import javax.sql.DataSource;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+
 import org.springframework.batch.item.ItemWriter;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.dao.DataAccessException;
@@ -27,13 +35,6 @@ import org.springframework.jdbc.core.namedparam.NamedParameterJdbcOperations;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.jdbc.core.namedparam.SqlParameterSource;
 import org.springframework.util.Assert;
-
-import javax.sql.DataSource;
-import java.sql.PreparedStatement;
-import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
 
 /**
  * <p>{@link ItemWriter} that uses the batching features from
@@ -167,11 +168,11 @@ public class JdbcBatchItemWriter<T> implements ItemWriter<T>, InitializingBean {
 				logger.debug("Executing batch with " + items.size() + " items.");
 			}
 
-			int[] updateCounts = null;
+			int[] updateCounts;
 
 			if (usingNamedParameters) {
 				if(items.get(0) instanceof Map) {
-					updateCounts = namedParameterJdbcTemplate.batchUpdate(sql, items.toArray(new Map[0]));
+					updateCounts = namedParameterJdbcTemplate.batchUpdate(sql, items.toArray(new Map[items.size()]));
 				} else {
 					SqlParameterSource[] batchArgs = new SqlParameterSource[items.size()];
 					int i = 0;

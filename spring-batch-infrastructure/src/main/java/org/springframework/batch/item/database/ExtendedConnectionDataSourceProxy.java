@@ -146,7 +146,7 @@ public class ExtendedConnectionDataSourceProxy implements SmartDataSource, Initi
 		if (connection == null) {
 			return false;
 		}
-		return connection.equals(closeSuppressedConnection) ? true : false;
+		return connection.equals(closeSuppressedConnection);
 	}
 
 	/**
@@ -210,8 +210,8 @@ public class ExtendedConnectionDataSourceProxy implements SmartDataSource, Initi
 		else {
 			target = dataSource.getConnection();
 		}
-		Connection connection = getCloseSuppressingConnectionProxy(target);
-		return connection;
+
+		return getCloseSuppressingConnectionProxy(target);
 	}
 
 	@Override

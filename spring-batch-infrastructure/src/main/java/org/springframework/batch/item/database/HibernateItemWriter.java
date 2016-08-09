@@ -72,6 +72,7 @@ public class HibernateItemWriter<T> implements ItemWriter<T>, InitializingBean {
 	 *            the hibernateTemplate to set
 	 * @deprecated As of 2.2 in favor of using Hibernate's session management APIs directly
 	 */
+	@Deprecated
 	public void setHibernateTemplate(HibernateOperations hibernateTemplate) {
 		this.hibernateTemplate = hibernateTemplate;
 	}
@@ -159,6 +160,7 @@ public class HibernateItemWriter<T> implements ItemWriter<T>, InitializingBean {
 	 *            the list of items to use for the write
 	 * @deprecated As of 2.2 in favor of using Hibernate's session management APIs directly
 	 */
+	@Deprecated
 	protected void doWrite(HibernateOperations hibernateTemplate,
 			List<? extends T> items) {
 

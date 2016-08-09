@@ -71,6 +71,7 @@ public class StepState extends AbstractState implements StepLocator, StepHolder 
 	 * @deprecated in favor of using {@link StepLocator#getStep(String)}.
 	 */
 	@Override
+	@Deprecated
 	public Step getStep() {
 		return step;
 	}

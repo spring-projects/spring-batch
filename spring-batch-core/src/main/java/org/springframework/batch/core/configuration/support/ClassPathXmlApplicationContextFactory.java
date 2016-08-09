@@ -29,6 +29,7 @@ import org.springframework.core.io.Resource;
  * 
  * @deprecated use {@link GenericApplicationContextFactory} instead
  */
+@Deprecated
 public class ClassPathXmlApplicationContextFactory extends GenericApplicationContextFactory {
 
 	/**

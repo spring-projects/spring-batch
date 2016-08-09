@@ -161,7 +161,7 @@ public class SimpleFlowFactoryBean implements FactoryBean<SimpleFlow>, Initializ
 	 * @param state The state that will be used to create the StepState
 	 * @param oldName The name to be replaced
 	 * @param stateName The name for the new State
-	 * @return
+	 * @return a state for the requested data
 	 */
 	protected State createNewStepState(State state, String oldName,
 			String stateName) {

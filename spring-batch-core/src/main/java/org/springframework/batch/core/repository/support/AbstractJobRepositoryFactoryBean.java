@@ -149,6 +149,7 @@ public abstract class AbstractJobRepositoryFactoryBean implements FactoryBean<Jo
 	 * @throws Exception if the repository could not be created
 	 * @deprecated use {@link #getObject()} instead
 	 */
+	@Deprecated
 	public JobRepository getJobRepository() throws Exception {
 		return getObject();
 	}

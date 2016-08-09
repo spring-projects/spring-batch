@@ -135,7 +135,7 @@ public class JobFlowExecutor implements FlowExecutor {
 
 	/**
 	 * @param status
-	 * @return
+	 * @return A {@link BatchStatus} appropriate for the {@link FlowExecutionStatus} provided
 	 */
 	protected BatchStatus findBatchStatus(FlowExecutionStatus status) {
 		for (BatchStatus batchStatus : BatchStatus.values()) {
