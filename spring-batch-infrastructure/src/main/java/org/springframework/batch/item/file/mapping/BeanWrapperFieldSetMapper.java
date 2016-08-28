@@ -27,6 +27,7 @@ import org.springframework.beans.PropertyEditorRegistry;
 import org.springframework.beans.factory.BeanFactory;
 import org.springframework.beans.factory.BeanFactoryAware;
 import org.springframework.beans.factory.InitializingBean;
+import org.springframework.core.convert.ConversionService;
 import org.springframework.util.Assert;
 import org.springframework.util.ReflectionUtils;
 import org.springframework.validation.BindException;
@@ -101,6 +102,8 @@ public class BeanWrapperFieldSetMapper<T> extends DefaultPropertyEditorRegistrar
 	private int distanceLimit = 5;
 
 	private boolean strict = true;
+	
+	private ConversionService conversionService;
 
 	/*
 	 * (non-Javadoc)
@@ -207,6 +210,8 @@ public class BeanWrapperFieldSetMapper<T> extends DefaultPropertyEditorRegistrar
 		binder.setIgnoreUnknownFields(!this.strict);
 		initBinder(binder);
 		registerCustomEditors(binder);
+		if(this.conversionService != null)
+			binder.setConversionService(this.conversionService);
 		return binder;
 	}
 
@@ -382,6 +387,16 @@ public class BeanWrapperFieldSetMapper<T> extends DefaultPropertyEditorRegistrar
 	 */
 	public void setStrict(boolean strict) {
 		this.strict = strict;
+	}
+	
+	/**
+	 * Public setter for the 'conversionService' property.
+	 * {@link #createBinder(Object)} will use it if not null.
+	 * 
+	 * @param conversionService
+	 */
+	public void setConversionService(ConversionService conversionService) {
+		this.conversionService = conversionService;
 	}
 
 	private static class DistanceHolder {
