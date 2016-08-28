@@ -46,20 +46,20 @@
 
     <programlisting language="java">RepeatTemplate template = new RepeatTemplate();
 
-template.setCompletionPolicy(new FixedChunkSizeCompletionPolicy(2));
+template.setCompletionPolicy(new SimpleCompletionPolicy(2));
 
 template.iterate(new RepeatCallback() {
 
-    public ExitStatus doInIteration(RepeatContext context) {
+    public RepeatStatus doInIteration(RepeatContext context) {
         // Do stuff in batch...
-        return ExitStatus.CONTINUABLE;
+        return RepeatStatus.CONTINUABLE;
     }
 
 });</programlisting>
 
     <para>In the example we return <code>RepeatStatus.CONTINUABLE</code> to
     show that there is more work to do. The callback can also return
-    <code>ExitStatus.FINISHED</code> if it wants to signal to the caller that
+    <code>RepeatStatus.FINISHED</code> if it wants to signal to the caller that
     there is no more work to do. Some iterations can be terminated by
     considerations intrinsic to the work being done in the callback, others
     are effectively infinite loops as far as the callback is concerned and the
@@ -92,7 +92,7 @@ template.iterate(new RepeatCallback() {
       possible <classname>RepeatStatus</classname> values:</para>
 
       <table>
-        <title>ExitStatus Properties</title>
+        <title>RepeatStatus Properties</title>
 
         <tgroup cols="2">
           <tbody>
@@ -273,12 +273,12 @@ template.iterate(new RepeatCallback() {
     <classname>RepeatTemplate</classname> into the interceptor.</para>
 
     <para>If the intercepted method returns <code>void</code> then the
-    interceptor always returns ExitStatus.CONTINUABLE (so there is a danger of
+    interceptor always returns RepeatStatus.CONTINUABLE (so there is a danger of
     an infinite loop if the <classname>CompletionPolicy</classname> does not
     have a finite end point). Otherwise it returns
-    <code>ExitStatus.CONTINUABLE</code> until the return value from the
+    <code>RepeatStatus.CONTINUABLE</code> until the return value from the
     intercepted method is null, at which point it returns
-    <code>ExitStatus.FINISHED</code>. So the business logic inside the target
+    <code>RepeatStatus.FINISHED</code>. So the business logic inside the target
     method can signal that there is no more work to do by returning
     <code>null</code>, or by throwing an exception that is re-thrown by the
     <classname>ExceptionHandler</classname> in the provided
