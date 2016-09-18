@@ -497,7 +497,7 @@ public class FileMessageToJobRequest {
 				<classname>Router</classname>. Based on the results of that
 				inspection, various things can occur for example routing a message
 				to a Mail Outbound Channel Adapter, so that an Email notification
-				can be send out based on some condition.
+				can be sent out based on some condition.
 			</para>
 			<mediaobject>
 				<imageobject role="html">
