@@ -364,7 +364,7 @@ public class FileMessageToJobRequest {
 							<para>
 								<classname role="strong">auto-startup</classname>
 								Boolean flag to indicate that the endpoint should start automatically on
-								startup. The default is<emphasis>true</emphasis>.
+								startup. The default is <emphasis>true</emphasis>.
 							</para>
 						</listitem>
 						<listitem>
