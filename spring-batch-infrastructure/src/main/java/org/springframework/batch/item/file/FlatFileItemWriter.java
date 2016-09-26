@@ -374,7 +374,7 @@ InitializingBean {
 	}
 
 	// Returns object representing state.
-	private OutputState getOutputState() {
+	protected OutputState getOutputState() {
 		if (state == null) {
 			File file;
 			try {
@@ -396,7 +396,7 @@ InitializingBean {
 	 * Encapsulates the runtime state of the writer. All state changing
 	 * operations on the writer go through this class.
 	 */
-	private class OutputState {
+	protected class OutputState {
 		// default encoding for writing to output files - set to UTF-8.
 		private static final String DEFAULT_CHARSET = "UTF-8";
 
