@@ -21,7 +21,7 @@ import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.sample.Foo;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;
-import org.springframework.orm.hibernate4.LocalSessionFactoryBean;
+import org.springframework.orm.hibernate5.LocalSessionFactoryBean;
 
 public class HibernateCursorItemReaderCommonTests extends AbstractDatabaseItemStreamItemReaderTests {
 

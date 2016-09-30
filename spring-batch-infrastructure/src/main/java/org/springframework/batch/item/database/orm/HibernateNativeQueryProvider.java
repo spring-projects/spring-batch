@@ -48,10 +48,10 @@ public class HibernateNativeQueryProvider<E> extends AbstractHibernateQueryProvi
 	public SQLQuery createQuery() {
 
 		if (isStatelessSession()) {
-			return getStatelessSession().createSQLQuery(sqlQuery).addEntity(entityClass);
+			return getStatelessSession().createNativeQuery(sqlQuery).addEntity(entityClass);
 		}
 		else {
-			return getStatefulSession().createSQLQuery(sqlQuery).addEntity(entityClass);
+			return getStatefulSession().createNativeQuery(sqlQuery).addEntity(entityClass);
 		}
 	}
 
