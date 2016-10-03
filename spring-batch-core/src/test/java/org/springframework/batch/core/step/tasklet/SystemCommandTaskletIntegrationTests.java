@@ -15,11 +15,6 @@
  */
 package org.springframework.batch.core.step.tasklet;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
-import static org.mockito.Mockito.when;
-
 import java.io.File;
 
 import org.apache.commons.logging.Log;
@@ -43,6 +38,11 @@ import org.springframework.batch.core.scope.context.StepContext;
 import org.springframework.batch.repeat.RepeatStatus;
 import org.springframework.core.task.SimpleAsyncTaskExecutor;
 import org.springframework.util.Assert;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+import static org.mockito.Mockito.when;
 
 /**
  * Tests for {@link SystemCommandTasklet}.
@@ -86,7 +86,7 @@ public class SystemCommandTaskletIntegrationTests {
 	 */
 	@Test
 	public void testExecute() throws Exception {
-		String command = "java -version";
+		String command = getJavaCommand() + " --version";
 		tasklet.setCommand(command);
 		tasklet.afterPropertiesSet();
 
@@ -101,7 +101,7 @@ public class SystemCommandTaskletIntegrationTests {
 	 */
 	@Test
 	public void testExecuteFailure() throws Exception {
-		String command = "java org.springframework.batch.sample.tasklet.UnknownClass";
+		String command = getJavaCommand() + " org.springframework.batch.sample.tasklet.UnknownClass";
 		tasklet.setCommand(command);
 		tasklet.setTimeout(200L);
 		tasklet.afterPropertiesSet();
@@ -136,7 +136,7 @@ public class SystemCommandTaskletIntegrationTests {
 	 */
 	@Test
 	public void testExecuteTimeout() throws Exception {
-		String command = System.getProperty("os.name").toLowerCase().indexOf("win") >= 0 ?
+		String command = System.getProperty("os.name").toLowerCase().contains("win") ?
 				"ping 1.1.1.1 -n 1 -w 3000" :
 					"sleep 3";
 		tasklet.setCommand(command);
@@ -158,7 +158,7 @@ public class SystemCommandTaskletIntegrationTests {
 	 */
 	@Test
 	public void testInterruption() throws Exception {
-		String command = System.getProperty("os.name").toLowerCase().indexOf("win") >= 0 ?
+		String command = System.getProperty("os.name").toLowerCase().contains("win") ?
 				"ping 1.1.1.1 -n 1 -w 5000" :
 					"sleep 5";
 		tasklet.setCommand(command);
@@ -269,7 +269,7 @@ public class SystemCommandTaskletIntegrationTests {
 
 		when(jobExplorer.getJobExecution(1L)).thenReturn(stepExecution.getJobExecution(), stepExecution.getJobExecution(), stoppedJobExecution);
 
-		String command = System.getProperty("os.name").toLowerCase().indexOf("win") >= 0 ?
+		String command = System.getProperty("os.name").toLowerCase().contains("win") ?
 				"ping 1.1.1.1 -n 1 -w 5000" :
 					"sleep 15";
 		tasklet.setCommand(command);
@@ -282,6 +282,23 @@ public class SystemCommandTaskletIntegrationTests {
 		tasklet.execute(contribution, chunkContext);
 
 		assertEquals(contribution.getExitStatus().getExitCode(),ExitStatus.STOPPED.getExitCode());
+	}
+
+	private String getJavaCommand() {
+		String javaHome = System.getProperty("java.home");
+		String fileSeparator = System.getProperty("file.separator");
+		StringBuilder command = new StringBuilder();
+		command.append(javaHome);
+		command.append(fileSeparator);
+		command.append("bin");
+		command.append(fileSeparator);
+		command.append("java");
+
+		if(System.getProperty("os.name").toLowerCase().indexOf("win") >= 0) {
+			command.append(".exe");
+		}
+
+		return command.toString();
 	}
 
 	/**
