@@ -16,8 +16,19 @@
 
 package org.springframework.batch.item.file;
 
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.Writer;
+import java.nio.channels.Channels;
+import java.nio.channels.FileChannel;
+import java.nio.charset.UnsupportedCharsetException;
+import java.util.List;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.item.ItemStream;
 import org.springframework.batch.item.ItemStreamException;
@@ -31,16 +42,6 @@ import org.springframework.beans.factory.InitializingBean;
 import org.springframework.core.io.Resource;
 import org.springframework.util.Assert;
 import org.springframework.util.ClassUtils;
-
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.Writer;
-import java.nio.channels.Channels;
-import java.nio.channels.FileChannel;
-import java.nio.charset.UnsupportedCharsetException;
-import java.util.List;
 
 /**
  * This class is an item writer that writes data to a file or stream. The writer
@@ -186,7 +187,6 @@ InitializingBean {
 	 */
 	public void setAppendAllowed(boolean append) {
 		this.append = append;
-		this.shouldDeleteIfExists = false;
 	}
 
 	/**
