@@ -2,6 +2,14 @@
 
 //apply plugin: 'base'
 
+if (JavaVersion.current().isJava8Compatible()) {
+    allprojects {
+        tasks.withType(Javadoc) {
+            options.addStringOption('Xdoclint:none', '-quiet')
+        }
+    }
+}
+
 buildscript {
 	repositories {
 		maven { url 'https://repo.spring.io/plugins-release' }
