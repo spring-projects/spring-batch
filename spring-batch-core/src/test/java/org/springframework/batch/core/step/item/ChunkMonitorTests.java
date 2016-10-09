@@ -92,7 +92,7 @@ public class ChunkMonitorTests {
 	@Test
 	public void testOpen() {
 		ExecutionContext executionContext = new ExecutionContext();
-		executionContext.putInt(ChunkMonitor.class.getName() + ".OFFSET", 2);
+		executionContext.putInt(monitor.getExecutionContextKey("OFFSET"), 2);
 		monitor.open(executionContext);
 		assertEquals(2, count);
 		assertEquals(0, monitor.getOffset());
@@ -115,7 +115,7 @@ public class ChunkMonitorTests {
 			}
 		});
 		ExecutionContext executionContext = new ExecutionContext();
-		executionContext.putInt(ChunkMonitor.class.getName() + ".OFFSET", 2);
+		executionContext.putInt(monitor.getExecutionContextKey("OFFSET"), 2);
 		monitor.open(executionContext);
 	}
 
@@ -126,7 +126,7 @@ public class ChunkMonitorTests {
 		monitor.update(executionContext);
 		assertEquals(0, executionContext.size());
 
-		executionContext.put(ChunkMonitor.class.getName() + ".OFFSET", 3);
+		executionContext.put(monitor.getExecutionContextKey("OFFSET"), 3);
 		monitor.update(executionContext);
 		assertEquals(0, executionContext.size());
 	}

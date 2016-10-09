@@ -73,10 +73,6 @@ public class FlatFileItemReader<T> extends AbstractItemCountingItemStreamItemRea
 
 	private BufferedReaderFactory bufferedReaderFactory = new DefaultBufferedReaderFactory();
 
-	public FlatFileItemReader() {
-		setName(ClassUtils.getShortName(FlatFileItemReader.class));
-	}
-
 	/**
 	 * In strict mode the reader will throw an exception on
 	 * {@link #open(org.springframework.batch.item.ExecutionContext)} if the input resource does not exist.

@@ -84,10 +84,6 @@ public class RepositoryItemReader<T> extends AbstractItemCountingItemStreamItemR
 
 	private String methodName;
 
-	public RepositoryItemReader() {
-		setName(ClassUtils.getShortName(RepositoryItemReader.class));
-	}
-
 	/**
 	 * Arguments to be passed to the data providing method.
 	 *

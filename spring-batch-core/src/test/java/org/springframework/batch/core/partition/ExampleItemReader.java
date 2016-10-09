@@ -21,7 +21,6 @@ import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.item.ItemStreamException;
 import org.springframework.batch.item.ItemStreamReader;
 import org.springframework.batch.item.support.AbstractItemStreamItemReader;
-import org.springframework.util.ClassUtils;
 
 /**
  * {@link ItemStreamReader} with hard-coded input data.
@@ -39,11 +38,7 @@ public class ExampleItemReader extends AbstractItemStreamItemReader<String> {
 	private int max = Integer.MAX_VALUE;
 
 	public static volatile boolean fail = false;
-
-        public ExampleItemReader() {
-                this.setExecutionContextName(ClassUtils.getShortName(this.getClass()));
-        }
-        
+      
 	/**
 	 * @param min the min to set
 	 */

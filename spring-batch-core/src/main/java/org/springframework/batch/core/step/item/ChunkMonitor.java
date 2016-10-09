@@ -58,10 +58,6 @@ public class ChunkMonitor extends ItemStreamSupport {
 
 	private ItemReader<?> reader;
 
-	public ChunkMonitor() {
-		this.setExecutionContextName(ChunkMonitor.class.getName());
-	}
-
 	/**
 	 * @param stream the stream to set
 	 */

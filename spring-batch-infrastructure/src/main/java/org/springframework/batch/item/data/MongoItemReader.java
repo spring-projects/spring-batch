@@ -77,11 +77,6 @@ public class MongoItemReader<T> extends AbstractPaginatedDataItemReader<T> imple
 	private String collection;
 	private List<Object> parameterValues;
 
-	public MongoItemReader() {
-		super();
-		setName(ClassUtils.getShortName(MongoItemReader.class));
-	}
-
 	/**
 	 * Used to perform operations against the MongoDB instance.  Also
 	 * handles the mapping of documents to objects.

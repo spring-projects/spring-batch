@@ -44,10 +44,6 @@ public class Neo4jItemReader<T> extends AbstractNeo4jItemReader {
 
 	private ResultConverter<Map<String, Object>, T> resultConverter;
 
-	public Neo4jItemReader() {
-		setName(ClassUtils.getShortName(Neo4jItemReader.class));
-	}
-
 	/**
 	 * Set the converter used to convert node to the targetType.  By
 	 * default, {@link DefaultConverter} is used.

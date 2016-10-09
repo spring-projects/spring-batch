@@ -75,10 +75,6 @@ ResourceAwareItemReaderItemStream<T>, InitializingBean {
 
 	private boolean strict = true;
 
-	public StaxEventItemReader() {
-		setName(ClassUtils.getShortName(StaxEventItemReader.class));
-	}
-
 	/**
 	 * In strict mode the reader will throw an exception on
 	 * {@link #open(org.springframework.batch.item.ExecutionContext)} if the input resource does not exist.

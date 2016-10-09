@@ -65,11 +65,7 @@ public class HibernatePagingItemReader<T> extends AbstractPagingItemReader<T>
 	private Map<String, Object> parameterValues;
 
 	private int fetchSize;
-
-	public HibernatePagingItemReader() {
-		setName(ClassUtils.getShortName(HibernatePagingItemReader.class));
-	}
-
+	
 	/**
 	 * The parameter values to apply to a query (map of name:value).
 	 *

@@ -99,10 +99,6 @@ public class IbatisPagingItemReader<T> extends AbstractPagingItemReader<T> {
 
 	private DataSource dataSource;
 
-	public IbatisPagingItemReader() {
-		setName(ClassUtils.getShortName(IbatisPagingItemReader.class));
-	}
-
 	public void setDataSource(DataSource dataSource) {
 		this.dataSource = dataSource;
 	}

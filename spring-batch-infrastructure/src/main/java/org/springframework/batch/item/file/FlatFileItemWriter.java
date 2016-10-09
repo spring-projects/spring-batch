@@ -97,10 +97,6 @@ InitializingBean {
 
 	private boolean append = false;
 
-	public FlatFileItemWriter() {
-		this.setExecutionContextName(ClassUtils.getShortName(FlatFileItemWriter.class));
-	}
-
 	/**
 	 * Assert that mandatory properties (lineAggregator) are set.
 	 * 

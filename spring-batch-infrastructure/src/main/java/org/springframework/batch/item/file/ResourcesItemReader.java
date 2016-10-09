@@ -50,13 +50,6 @@ public class ResourcesItemReader extends AbstractItemStreamItemReader<Resource> 
 
 	private AtomicInteger counter = new AtomicInteger(0);
 
-        public ResourcesItemReader() {
-		/*
-		 * Initialize the name for the key in the execution context.
-		 */
-		this.setExecutionContextName(getClass().getName());
-	}
-
 	/**
 	 * The resources to serve up as items. Hint: use a pattern to configure.
 	 * 

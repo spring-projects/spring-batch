@@ -56,10 +56,6 @@ public abstract class AbstractPagingItemReader<T> extends AbstractItemCountingIt
 
 	private Object lock = new Object();
 
-	public AbstractPagingItemReader() {
-		setName(ClassUtils.getShortName(AbstractPagingItemReader.class));
-	}
-
 	/**
 	 * The current page number.
 	 * @return the current page
