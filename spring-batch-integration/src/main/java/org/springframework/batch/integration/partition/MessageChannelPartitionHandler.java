@@ -54,6 +54,10 @@ import org.springframework.util.CollectionUtils;
  *     repository, we can poll the store to determine the state without the need of the slaves to formally respond.</li>
  * </ul>
  *
+ * Note: The reply channel for this is instance based.  Sharing this component across
+ * multiple step instances may result in the crossing of messages.  It's recommended that
+ * this component be step or job scoped.
+ *
  * @author Dave Syer
  * @author Will Schipp
  * @author Michael Minella
@@ -102,6 +106,11 @@ public class MessageChannelPartitionHandler implements PartitionHandler, Initial
 			jobExplorerFactoryBean.afterPropertiesSet();
 			jobExplorer = jobExplorerFactoryBean.getObject();
 		}
+
+		if (!pollRepositoryForResults && replyChannel == null) {
+			replyChannel = new QueueChannel();
+		}//end if
+
 	}
 
 	/**
@@ -209,15 +218,9 @@ public class MessageChannelPartitionHandler implements PartitionHandler, Initial
 
 		int count = 0;
 
-		PollableChannel currentReplyChannel = replyChannel;
-
-		if (!pollRepositoryForResults && currentReplyChannel == null) {
-			currentReplyChannel = new QueueChannel();
-		}//end if
-
 		for (StepExecution stepExecution : split) {
 			Message<StepExecutionRequest> request = createMessage(count++, split.size(), new StepExecutionRequest(
-					stepName, stepExecution.getJobExecutionId(), stepExecution.getId()), currentReplyChannel);
+					stepName, stepExecution.getJobExecutionId(), stepExecution.getId()), replyChannel);
 			if (logger.isDebugEnabled()) {
 				logger.debug("Sending request: " + request);
 			}
@@ -225,7 +228,7 @@ public class MessageChannelPartitionHandler implements PartitionHandler, Initial
 		}
 
 		if(!pollRepositoryForResults) {
-			return receiveReplies(currentReplyChannel);
+			return receiveReplies(replyChannel);
 		}
 		else {
 			return pollReplies(masterStepExecution, split);
