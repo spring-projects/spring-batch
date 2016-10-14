@@ -15,6 +15,7 @@
  */
 package org.springframework.batch.core.step.job;
 
+import org.springframework.batch.core.BatchStatus;
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.JobParameters;
@@ -118,6 +119,9 @@ public class JobStep extends AbstractStep {
 		if (jobExecution.getStatus().isUnsuccessful()) {
 			// AbstractStep will take care of the step execution status
 			throw new UnexpectedJobExecutionException("Step failure: the delegate Job failed in JobStep.");
+		}
+		else if(jobExecution.getStatus().equals(BatchStatus.STOPPED)) {
+			stepExecution.setStatus(BatchStatus.STOPPED);
 		}
 
 	}

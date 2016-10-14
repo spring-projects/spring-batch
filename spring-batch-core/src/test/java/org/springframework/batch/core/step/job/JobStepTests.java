@@ -15,8 +15,11 @@
  */
 package org.springframework.batch.core.step.job;
 
+import java.util.Date;
+
 import org.junit.Before;
 import org.junit.Test;
+
 import org.springframework.batch.core.BatchStatus;
 import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.JobParameters;
@@ -27,8 +30,6 @@ import org.springframework.batch.core.launch.support.SimpleJobLauncher;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.repository.support.MapJobRepositoryFactoryBean;
 import org.springframework.batch.item.ExecutionContext;
-
-import java.util.Date;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
@@ -171,4 +172,35 @@ public class JobStepTests {
 
 	}
 
+	@Test
+	public void testStoppedChild() throws Exception {
+
+		DefaultJobParametersExtractor jobParametersExtractor = new DefaultJobParametersExtractor();
+		jobParametersExtractor.setKeys(new String[] {"foo"});
+		ExecutionContext executionContext = stepExecution.getExecutionContext();
+		executionContext.put("foo", "bar");
+		step.setJobParametersExtractor(jobParametersExtractor);
+
+		step.setJob(new JobSupport("child") {
+			@Override
+			public void execute(JobExecution execution)  {
+				assertEquals(1, execution.getJobParameters().getParameters().size());
+				execution.setStatus(BatchStatus.STOPPED);
+				execution.setEndTime(new Date());
+				jobRepository.update(execution);
+			}
+			@Override
+			public boolean isRestartable() {
+				return true;
+			}
+		});
+
+		step.afterPropertiesSet();
+		step.execute(stepExecution);
+		JobExecution jobExecution = stepExecution.getJobExecution();
+		jobExecution.setEndTime(new Date());
+		jobRepository.update(jobExecution);
+
+		assertEquals(BatchStatus.STOPPED, stepExecution.getStatus());
+	}
 }
