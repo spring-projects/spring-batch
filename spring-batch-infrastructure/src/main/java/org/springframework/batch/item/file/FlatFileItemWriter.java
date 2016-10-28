@@ -61,11 +61,14 @@ import org.springframework.util.ClassUtils;
 public class FlatFileItemWriter<T> extends AbstractItemStreamItemWriter<T> implements ResourceAwareItemWriterItemStream<T>,
 InitializingBean {
 
-	private static final boolean DEFAULT_TRANSACTIONAL = true;
+	public static final boolean DEFAULT_TRANSACTIONAL = true;
 
 	protected static final Log logger = LogFactory.getLog(FlatFileItemWriter.class);
 
-	private static final String DEFAULT_LINE_SEPARATOR = System.getProperty("line.separator");
+	public static final String DEFAULT_LINE_SEPARATOR = System.getProperty("line.separator");
+
+	// default encoding for writing to output files - set to UTF-8.
+	public static final String DEFAULT_CHARSET = "UTF-8";
 
 	private static final String WRITTEN_STATISTICS_NAME = "written";
 
@@ -85,7 +88,7 @@ InitializingBean {
 
 	private boolean shouldDeleteIfEmpty = false;
 
-	private String encoding = OutputState.DEFAULT_CHARSET;
+	private String encoding = DEFAULT_CHARSET;
 
 	private FlatFileHeaderCallback headerCallback;
 
@@ -397,8 +400,6 @@ InitializingBean {
 	 * operations on the writer go through this class.
 	 */
 	private class OutputState {
-		// default encoding for writing to output files - set to UTF-8.
-		private static final String DEFAULT_CHARSET = "UTF-8";
 
 		private FileOutputStream os;
 
