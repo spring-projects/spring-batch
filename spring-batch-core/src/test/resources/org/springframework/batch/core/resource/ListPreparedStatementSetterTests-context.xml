@@ -30,7 +30,7 @@
 		</property>
 	</bean>
 
-	<bean id="pss" class="org.springframework.batch.core.resource.ListPreparedStatementSetter" scope="step">
+	<bean id="pss" class="org.springframework.batch.item.database.support.ListPreparedStatementSetter" scope="step">
 		<property name="parameters">
 			<list>
 				<value>#{jobParameters['min.id']}</value>

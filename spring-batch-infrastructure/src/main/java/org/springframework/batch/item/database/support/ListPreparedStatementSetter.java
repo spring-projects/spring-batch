@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.springframework.batch.core.resource;
+package org.springframework.batch.item.database.support;
 
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
@@ -43,6 +43,12 @@ PreparedStatementSetter, InitializingBean {
 
 	private List<?> parameters;
 
+	public ListPreparedStatementSetter() {}
+
+	public ListPreparedStatementSetter(List<?> parameters) {
+		this.parameters = parameters;
+	}
+
 	@Override
 	public void setValues(PreparedStatement ps) throws SQLException {
 		for (int i = 0; i < parameters.size(); i++) {
@@ -54,7 +60,10 @@ PreparedStatementSetter, InitializingBean {
 	 * The parameter values that will be set on the PreparedStatement.
 	 * It is assumed that their order in the List is the order of the parameters
 	 * in the PreparedStatement.
+	 *
+	 * @deprecated In favor of the constructor
 	 */
+	@Deprecated
 	public void setParameters(List<?> parameters) {
 		this.parameters = parameters;
 	}
