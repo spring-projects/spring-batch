@@ -15,9 +15,6 @@
  */
 package org.springframework.batch.core.launch.support;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
-
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
@@ -49,6 +46,9 @@ import org.springframework.batch.core.step.JobRepositorySupport;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.util.ClassUtils;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 /**
  * @author Lucas Ward
@@ -130,8 +130,9 @@ public class CommandLineJobRunnerTests {
 		CommandLineJobRunner.main(args);
 		assertEquals(1, StubSystemExiter.status);
 		String errorMessage = CommandLineJobRunner.getErrorMessage();
-		assertTrue("Wrong error message: " + errorMessage, errorMessage
-				.contains("No bean named 'no-such-job' is defined"));
+		assertTrue("Wrong error message: " + errorMessage, (errorMessage
+				.contains("No bean named 'no-such-job' is defined") || (errorMessage
+				.contains("No bean named 'no-such-job' available"))));
 	}
 
 	@Test
