@@ -43,9 +43,9 @@ public class JpaPagingItemReaderIntegrationTests extends AbstractGenericDataSour
 
 		String jpqlQuery = "select f from Foo f where name like :name";
 
-		JpaPagingItemReader<Foo> inputSource = new JpaPagingItemReader<Foo>();
+		JpaPagingItemReader<Foo> inputSource = new JpaPagingItemReader<>();
 		inputSource.setQueryString(jpqlQuery);
-		inputSource.setParameterValues(Collections.singletonMap("name", (Object)"bar%"));
+		inputSource.setParameterValues(Collections.singletonMap("name", "bar%"));
 		inputSource.setEntityManagerFactory(entityManagerFactory);
 		inputSource.setPageSize(3);
 		inputSource.afterPropertiesSet();
