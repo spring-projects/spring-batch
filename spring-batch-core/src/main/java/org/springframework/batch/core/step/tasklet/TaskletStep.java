@@ -394,11 +394,6 @@ public class TaskletStep extends AbstractStep {
 
 			chunkListener.beforeChunk(chunkContext);
 
-			// In case we need to push it back to its old value
-			// after a commit fails...
-			oldVersion = new StepExecution(stepExecution.getStepName(), stepExecution.getJobExecution());
-			copy(stepExecution, oldVersion);
-
 			try {
 
 				try {
@@ -424,6 +419,13 @@ public class TaskletStep extends AbstractStep {
 					try {
 						semaphore.acquire();
 						locked = true;
+			                        // In case we need to push it back to its old value
+						// after a commit fails...
+			                        // Here we are sure we get the most up to date version since
+			                        // semaphore acquisition garantees that no other thread has modified it
+                      				oldVersion = new StepExecution(stepExecution.getStepName(), stepExecution.getJobExecution());
+                        			copy(stepExecution, oldVersion);
+
 					}
 					catch (InterruptedException e) {
 						logger.error("Thread interrupted while locking for repository update");
