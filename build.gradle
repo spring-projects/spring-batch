@@ -51,12 +51,12 @@ allprojects {
 		springVersion = project.hasProperty('springVersion') ? getProperty('springVersion') : springVersionDefault
 		springRetryVersion = '1.1.3.RELEASE'
 		springAmqpVersion = '1.5.6.RELEASE'
-		springDataCommonsVersion = '1.11.5.RELEASE'
-		springDataGemfireVersion = '1.7.5.RELEASE'
-		springDataJpaVersion = '1.9.5.RELEASE'
-		springDataMongodbVersion = '1.8.5.RELEASE'
+		springDataCommonsVersion = '2.0.0.BUILD-SNAPSHOT'
+		springDataGemfireVersion = '2.0.0.BUILD-SNAPSHOT'
+		springDataJpaVersion = '2.0.0.BUILD-SNAPSHOT'
+		springDataMongodbVersion = '2.0.0.BUILD-SNAPSHOT'
 		springDataNeo4jVersion = '3.4.5.RELEASE'
-		springDataNeo4j4Version = '4.1.3.RELEASE' //?
+		springDataNeo4j4Version = '5.0.0.BUILD-SNAPSHOT' //?
 		springIntegrationVersion = '5.0.0.BUILD-SNAPSHOT'
 		springLdapVersion = '2.0.4.RELEASE'
 
