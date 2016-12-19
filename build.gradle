@@ -478,6 +478,7 @@ project('spring-batch-infrastructure-tests') {
 		testCompile("org.springframework:spring-oxm:$springVersion") {
 			exclude group: 'commons-lang', module: 'commons-lang'
 		}
+		testCompile "org.springframework.data:spring-data-jpa:$springDataJpaVersion"
 		testCompile "org.springframework:spring-jdbc:$springVersion"
 		testCompile "org.springframework:spring-test:$springVersion"
 		testCompile "org.mockito:mockito-core:$mockitoVersion"
