@@ -1,5 +1,5 @@
 /*
- * Copyright 2012-2019 the original author or authors.
+ * Copyright 2012-2020 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -71,6 +71,7 @@ import org.springframework.util.MethodInvoker;
  * </p>
  *
  * @author Michael Minella
+ * @author Antoine Kapps
  * @since 2.2
  */
 public class RepositoryItemReader<T> extends AbstractItemCountingItemStreamItemReader<T> implements InitializingBean {
@@ -91,7 +92,7 @@ public class RepositoryItemReader<T> extends AbstractItemCountingItemStreamItemR
 
 	private volatile List<T> results;
 
-	private Object lock = new Object();
+	private final Object lock = new Object();
 
 	private String methodName;
 
@@ -156,19 +157,23 @@ public class RepositoryItemReader<T> extends AbstractItemCountingItemStreamItemR
 	protected T doRead() throws Exception {
 
 		synchronized (lock) {
-			if(results == null || current >= results.size()) {
+			boolean nextPageNeeded = (results != null && current >= results.size());
+
+			if (results == null || nextPageNeeded) {
 
 				if (logger.isDebugEnabled()) {
 					logger.debug("Reading page " + page);
 				}
 
 				results = doPageRead();
-
-				current = 0;
 				page ++;
 
 				if(results.size() <= 0) {
 					return null;
+				}
+
+				if (nextPageNeeded) {
+					current = 0;
 				}
 			}
 
@@ -186,11 +191,8 @@ public class RepositoryItemReader<T> extends AbstractItemCountingItemStreamItemR
 	@Override
 	protected void jumpToItem(int itemLastIndex) throws Exception {
 		synchronized (lock) {
-			page = (itemLastIndex - 1) / pageSize;
-			current = (itemLastIndex - 1) % pageSize;
-
-			results = doPageRead();
-			page++;
+			page = itemLastIndex / pageSize;
+			current = itemLastIndex % pageSize;
 		}
 	}
 
