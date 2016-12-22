@@ -15,14 +15,8 @@
  */
 package org.springframework.batch.item.data;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
-import static org.mockito.Matchers.isNull;
-import static org.mockito.Mockito.when;
-
-import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -32,10 +26,15 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
-import org.springframework.data.neo4j.conversion.DefaultConverter;
-import org.springframework.data.neo4j.conversion.Result;
-import org.springframework.data.neo4j.conversion.ResultConverter;
 import org.springframework.data.neo4j.template.Neo4jOperations;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+import static org.mockito.Matchers.eq;
+import static org.mockito.Matchers.isNull;
+import static org.mockito.Mockito.when;
 
 public class Neo4jItemReaderTests {
 
@@ -43,9 +42,7 @@ public class Neo4jItemReaderTests {
 	@Mock
 	private Neo4jOperations template;
 	@Mock
-	private Result<Map<String, Object>> result;
-	@Mock
-	private Result<String> endResult;
+	private Iterable<String> result;
 
 	@Before
 	public void setUp() throws Exception {
@@ -64,7 +61,7 @@ public class Neo4jItemReaderTests {
 
 	@Test
 	public void testAfterPropertiesSet() throws Exception {
-		reader = new Neo4jItemReader<String>();
+		reader = new Neo4jItemReader<>();
 
 		try {
 			reader.afterPropertiesSet();
@@ -129,7 +126,7 @@ public class Neo4jItemReaderTests {
 	public void testNullResults() {
 		ArgumentCaptor<String> query = ArgumentCaptor.forClass(String.class);
 
-		when(template.query(query.capture(), (Map<String, Object>) isNull())).thenReturn(null);
+		when(template.queryForObjects(eq(String.class), query.capture(), (Map<String, Object>) isNull())).thenReturn(null);
 
 		assertFalse(reader.doPageRead().hasNext());
 		assertEquals("START n=node(*) RETURN * ORDER BY n.age SKIP 0 LIMIT 50", query.getValue());
@@ -140,29 +137,10 @@ public class Neo4jItemReaderTests {
 	public void testNoResults() {
 		ArgumentCaptor<String> query = ArgumentCaptor.forClass(String.class);
 
-		when(template.query(query.capture(), (Map<String, Object>) isNull())).thenReturn(result);
-		when(result.to(String.class)).thenReturn(endResult);
-		when(endResult.iterator()).thenReturn(new ArrayList<String>().iterator());
+		when(template.queryForObjects(eq(String.class), query.capture(), (Map<String, Object>) isNull())).thenReturn(result);
+		when(result.iterator()).thenReturn(Collections.<String>emptyIterator());
 
 		assertFalse(reader.doPageRead().hasNext());
-		assertEquals("START n=node(*) RETURN * ORDER BY n.age SKIP 0 LIMIT 50", query.getValue());
-	}
-
-	@SuppressWarnings({ "unchecked", "serial" })
-	@Test
-	public void testResultsWithConverter() {
-		ResultConverter<Map<String, Object>, String> converter = new DefaultConverter<Map<String, Object>, String>();
-
-		reader.setResultConverter(converter);
-		ArgumentCaptor<String> query = ArgumentCaptor.forClass(String.class);
-
-		when(template.query(query.capture(), (Map<String, Object>) isNull())).thenReturn(result);
-		when(result.to(String.class, converter)).thenReturn(endResult);
-		when(endResult.iterator()).thenReturn(new ArrayList<String>(){{
-			add(new String());
-		}}.iterator());
-
-		assertTrue(reader.doPageRead().hasNext());
 		assertEquals("START n=node(*) RETURN * ORDER BY n.age SKIP 0 LIMIT 50", query.getValue());
 	}
 
@@ -173,11 +151,8 @@ public class Neo4jItemReaderTests {
 		reader.setWhereStatement("has(n.name)");
 		reader.setReturnStatement("m");
 		reader.afterPropertiesSet();
-		when(template.query("START n=node(*) MATCH n -- m WHERE has(n.name) RETURN m ORDER BY n.age SKIP 0 LIMIT 50", null)).thenReturn(result);
-		when(result.to(String.class)).thenReturn(endResult);
-		when(endResult.iterator()).thenReturn(new ArrayList<String>() {{
-			add(new String());
-		}}.iterator());
+		when(template.queryForObjects(String.class, "START n=node(*) MATCH n -- m WHERE has(n.name) RETURN m ORDER BY n.age SKIP 0 LIMIT 50", null)).thenReturn(result);
+		when(result.iterator()).thenReturn(Arrays.asList("foo", "bar", "baz").iterator());
 
 		assertTrue(reader.doPageRead().hasNext());
 	}
@@ -192,11 +167,8 @@ public class Neo4jItemReaderTests {
 		reader.setWhereStatement("has(n.name)");
 		reader.setReturnStatement("m");
 		reader.afterPropertiesSet();
-		when(template.query("START n=node(*) MATCH n -- m WHERE has(n.name) RETURN m ORDER BY n.age SKIP 0 LIMIT 50", params)).thenReturn(result);
-		when(result.to(String.class)).thenReturn(endResult);
-		when(endResult.iterator()).thenReturn(new ArrayList<String>(){{
-			add(new String());
-		}}.iterator());
+		when(template.queryForObjects(String.class, "START n=node(*) MATCH n -- m WHERE has(n.name) RETURN m ORDER BY n.age SKIP 0 LIMIT 50", params)).thenReturn(result);
+		when(result.iterator()).thenReturn(Arrays.asList("foo", "bar", "baz").iterator());
 
 		assertTrue(reader.doPageRead().hasNext());
 	}

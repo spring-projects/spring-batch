@@ -18,58 +18,25 @@ package org.springframework.batch.item.data;
 
 import java.util.ArrayList;
 import java.util.Iterator;
-import java.util.Map;
-
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-
-import org.springframework.data.neo4j.conversion.DefaultConverter;
-import org.springframework.data.neo4j.conversion.Result;
-import org.springframework.data.neo4j.conversion.ResultConverter;
-import org.springframework.util.ClassUtils;
+//
+//import org.springframework.data.neo4j.conversion.ResultConverter;
 
 /**
  * <p>
- * Extensions of the {@link AbstractNeo4jItemReader} intended for use with versions of
- * Spring Data Neo4J &lt; 4.  Conversions of the results are done using an external
- * {@link ResultConverter}.
+ * Extensions of the {@link AbstractNeo4jItemReader}.
  * </p>
  *
  * @author Michael Minella
- * @see org.springframework.batch.item.data.Neo4j4ItemReader
  */
 public class Neo4jItemReader<T> extends AbstractNeo4jItemReader {
 
-	protected Log logger = LogFactory.getLog(getClass());
-
-	private ResultConverter<Map<String, Object>, T> resultConverter;
-
-	public Neo4jItemReader() {
-		setName(ClassUtils.getShortName(Neo4jItemReader.class));
-	}
-
-	/**
-	 * Set the converter used to convert node to the targetType.  By
-	 * default, {@link DefaultConverter} is used.
-	 *
-	 * @param resultConverter the converter to use.
-	 */
-	public void setResultConverter(ResultConverter<Map<String, Object>, T> resultConverter) {
-		this.resultConverter = resultConverter;
-	}
-
 	@Override
 	protected Iterator<T> doPageRead() {
-		Result<Map<String, Object>> queryResults = getTemplate().query(
-				generateLimitCypherQuery(), getParameterValues());
+		Iterable queryResults = getTemplate().queryForObjects(
+				getTargetType(), generateLimitCypherQuery(), getParameterValues());
 
 		if(queryResults != null) {
-			if (resultConverter != null) {
-				return queryResults.to(getTargetType(), resultConverter).iterator();
-			}
-			else {
-				return queryResults.to(getTargetType()).iterator();
-			}
+			return queryResults.iterator();
 		}
 		else {
 			return new ArrayList<T>().iterator();

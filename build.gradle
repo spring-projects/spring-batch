@@ -39,6 +39,7 @@ allprojects {
 		maven { url 'https://repo.spring.io/plugins-release' }
         maven { url "https://repo.spring.io/libs-snapshot" }
 
+		maven { url 'https://m2.neo4j.org/content/repositories/snapshots' }
 		maven { url 'https://m2.neo4j.org/content/repositories/releases'}
 		mavenCentral()
 	}
@@ -55,8 +56,7 @@ allprojects {
 		springDataGemfireVersion = '2.0.0.BUILD-SNAPSHOT'
 		springDataJpaVersion = '2.0.0.BUILD-SNAPSHOT'
 		springDataMongodbVersion = '2.0.0.BUILD-SNAPSHOT'
-		springDataNeo4jVersion = '3.4.5.RELEASE'
-		springDataNeo4j4Version = '5.0.0.BUILD-SNAPSHOT' //?
+		springDataNeo4jVersion = '5.0.0.BUILD-SNAPSHOT'
 		springIntegrationVersion = '5.0.0.BUILD-SNAPSHOT'
 		springLdapVersion = '2.0.4.RELEASE'
 
@@ -84,7 +84,7 @@ allprojects {
 		javaxTransactionVersion = '1.2'
 		jbatchTckSpi = '1.0'
 		jettisonVersion = '1.2'
-		jmsVersion = '1.1-rev-1'
+		jmsVersion = '2.0.1'
 		jtdsVersion = '1.3.1' //?
 		junitVersion = '4.12'
 		log4jVersion = '1.2.17'
@@ -333,7 +333,7 @@ project('spring-batch-infrastructure') {
 
 		testRuntime "org.beanshell:bsh:$beanshellVersion"
 
-		optional "javax.jms:jms-api:$jmsVersion"
+		optional "javax.jms:javax.jms-api:$jmsVersion"
 		optional "org.slf4j:slf4j-log4j12:$slf4jVersion"
 		optional "org.codehaus.jackson:jackson-mapper-asl:$jacksonVersion"
 		compile("org.hibernate:hibernate-core:$hibernateVersion") { dep ->
@@ -392,43 +392,6 @@ project('spring-batch-infrastructure') {
 	}
 }
 
-project('spring-batch-infrastructure-neo4j4') {
-
-	merge.into = project(':spring-batch-infrastructure')
-
-	dependencies {
-		optional ("org.springframework.data:spring-data-neo4j:$springDataNeo4j4Version") {
-			exclude group: 'org.springframework', module: 'spring-core'
-			exclude group: 'org.springframework', module: 'spring-aspects'
-			exclude group: 'org.springframework', module: 'spring-web'
-			exclude group: 'org.springframework', module: 'spring-context'
-			exclude group: 'org.springframework', module: 'spring-tx'
-			exclude group: 'org.springframework', module: 'spring-beans'
-			exclude group: 'org.springframework', module: 'spring-aop'
-			exclude group: 'org.springframework', module: 'spring-expression'
-		}
-		optional "org.springframework:spring-core:$springVersion"
-		optional "org.springframework:spring-context:$springVersion"
-		optional "org.springframework:spring-aspects:$springVersion"
-		optional "org.springframework:spring-web:$springVersion"
-		optional "org.springframework:spring-tx:$springVersion"
-		optional "org.springframework:spring-beans:$springVersion"
-		optional "org.springframework:spring-aop:$springVersion"
-		optional "org.springframework:spring-expression:$springVersion"
-		testCompile "org.mockito:mockito-core:$mockitoVersion"
-		testCompile "junit:junit:${junitVersion}"
-	}
-
-	if (project.hasProperty('platformVersion')) {
-		def dataNeo4jVersion = dependencyManagement.springIoTestRuntime.managedVersions['org.springframework.data:spring-data-neo4j']
-		if (dataNeo4jVersion?.startsWith('3.')) {
-			tasks.withType(Test).matching { it.name =~ "springIoJdk.Test" }.all {
-				enabled false
-			}
-		}
-	}
-}
-
 project('spring-batch-core-tests') {
 	description = 'Spring Batch Core Tests'
     project.tasks.findByPath("artifactoryPublish")?.enabled = false
@@ -470,7 +433,7 @@ project('spring-batch-infrastructure-tests') {
     project.tasks.findByPath("artifactoryPublish")?.enabled = false
 	dependencies {
 		compile project(":spring-batch-infrastructure")
-		compile "javax.jms:jms-api:1.1-rev-1"
+		compile "javax.jms:javax.jms-api:$jmsVersion"
 		compile "commons-dbcp:commons-dbcp:$commonsDdbcpVersion"
 		compile "org.springframework:spring-tx:$springVersion"
 		compile "org.springframework:spring-aop:$springVersion"
@@ -580,7 +543,7 @@ project('spring-batch-integration') {
 		}
 		testCompile "org.springframework.integration:spring-integration-jdbc:$springIntegrationVersion"
 
-		optional "javax.jms:jms-api:$jmsVersion"
+		optional "javax.jms:javax.jms-api:$jmsVersion"
 		optional "org.slf4j:slf4j-log4j12:$slf4jVersion"
 		optional "log4j:log4j:$log4jVersion"
 		optional "org.springframework.integration:spring-integration-jms:$springIntegrationVersion"
