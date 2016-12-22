@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2014 the original author or authors.
+ * Copyright 2013-2016 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,7 +22,10 @@ import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
+import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.util.ArrayList;
@@ -194,7 +197,10 @@ public class RepositoryItemReaderTests {
 		));
 
 		reader.jumpToItem(485);
+		// no page requested at this stage
+		verify(repository, never()).findAll(any(Pageable.class));
 
+		// the page must only actually be fetched on the next "doRead()" call
 		final Object o = reader.doRead();
 		assertSame("Fetched object should be at index 85 in the current page", o, objectList.get(85));
 
@@ -215,6 +221,7 @@ public class RepositoryItemReaderTests {
 		));
 
 		reader.jumpToItem(150);
+		verify(repository, never()).findAll(any(Pageable.class));
 
 		assertSame("Fetched object should be the first one in the current page", objectList.get(0), reader.doRead());
 
