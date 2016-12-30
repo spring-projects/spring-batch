@@ -20,6 +20,7 @@ import java.util.Map;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.neo4j.ogm.session.SessionFactory;
 
 import org.springframework.batch.item.ItemReader;
 import org.springframework.beans.factory.InitializingBean;
@@ -63,6 +64,7 @@ public abstract class AbstractNeo4jItemReader<T> extends
 	protected Log logger = LogFactory.getLog(getClass());
 
 	private Neo4jOperations template;
+	private SessionFactory sessionFactory;
 
 	private String startStatement;
 	private String returnStatement;
@@ -143,16 +145,31 @@ public abstract class AbstractNeo4jItemReader<T> extends
 		this.orderByStatement = orderByStatement;
 	}
 
+	protected SessionFactory getSessionFactory() {
+		return sessionFactory;
+	}
+
+	public void setSessionFactory(SessionFactory sessionFactory) {
+		this.sessionFactory = sessionFactory;
+	}
+
 	/**
 	 * Used to perform operations against the Neo4J database.
 	 *
 	 * @param template the Neo4jOperations instance to use
 	 * @see Neo4jOperations
+	 * @deprecated Use {@link #setSessionFactory(SessionFactory)}
 	 */
+	@Deprecated
 	public void setTemplate(Neo4jOperations template) {
 		this.template = template;
 	}
 
+	/**
+	 * @return the {@link Neo4jOperations}
+	 * @deprecated Use {@link #getSessionFactory()}
+	 */
+	@Deprecated
 	protected final Neo4jOperations getTemplate() {
 		return this.template;
 	}
@@ -197,7 +214,8 @@ public abstract class AbstractNeo4jItemReader<T> extends
 	 */
 	@Override
 	public void afterPropertiesSet() throws Exception {
-		Assert.state(template != null, "A Neo4JOperations implementation is required");
+		Assert.state(template != null || sessionFactory != null,
+				"A Neo4JOperations implementation or SessionFactory is required");
 		Assert.state(targetType != null, "The type to be returned is required");
 		Assert.state(StringUtils.hasText(startStatement), "A START statement is required");
 		Assert.state(StringUtils.hasText(returnStatement), "A RETURN statement is required");

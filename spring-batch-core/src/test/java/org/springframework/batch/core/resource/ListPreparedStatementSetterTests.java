@@ -75,11 +75,10 @@ public class ListPreparedStatementSetterTests {
 	@Before
 	public void onSetUpInTransaction() throws Exception {
 
-		pss = new ListPreparedStatementSetter();
 		List<Long> parameters = new ArrayList<Long>();
 		parameters.add(1L);
 		parameters.add(4L);
-		pss.setParameters(parameters);
+		pss = new ListPreparedStatementSetter(parameters);
 	}
 
 	@Transactional
@@ -103,7 +102,7 @@ public class ListPreparedStatementSetterTests {
 	@Transactional
 	@Test(expected = IllegalArgumentException.class)
 	public void testAfterPropertiesSet() throws Exception {
-		pss.setParameters(null);
+		pss = new ListPreparedStatementSetter(null);
 		pss.afterPropertiesSet();
 	}
 
@@ -133,7 +132,7 @@ public class ListPreparedStatementSetterTests {
 	}
 
 	public static class FooStoringItemWriter implements ItemWriter<Foo> {
-		private List<Foo> foos = new ArrayList<Foo>();
+		private List<Foo> foos = new ArrayList<>();
 
 		@Override
 		public void write(List<? extends Foo> items) throws Exception {

@@ -23,7 +23,7 @@ import java.util.List;
 
 import javax.sql.DataSource;
 
-import org.hibernate.Query;
+import org.hibernate.query.Query;
 import org.hibernate.SessionFactory;
 import org.junit.Before;
 import org.junit.Test;
@@ -86,7 +86,7 @@ public class HibernateNativeQueryProviderIntegrationTests {
 
 		Query query = hibernateQueryProvider.createQuery();
 
-		List<Foo> expectedFoos = new ArrayList<Foo>();
+		List<Foo> expectedFoos = new ArrayList<>();
 
 		expectedFoos.add(new Foo(1, "bar1", 1));
 		expectedFoos.add(new Foo(2, "bar2", 2));

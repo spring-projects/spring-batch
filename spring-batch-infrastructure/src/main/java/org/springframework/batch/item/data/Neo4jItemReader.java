@@ -18,6 +18,9 @@ package org.springframework.batch.item.data;
 
 import java.util.ArrayList;
 import java.util.Iterator;
+
+import org.neo4j.ogm.session.Session;
+import org.neo4j.ogm.session.SessionFactory;
 //
 //import org.springframework.data.neo4j.conversion.ResultConverter;
 
@@ -32,8 +35,22 @@ public class Neo4jItemReader<T> extends AbstractNeo4jItemReader {
 
 	@Override
 	protected Iterator<T> doPageRead() {
-		Iterable queryResults = getTemplate().queryForObjects(
-				getTargetType(), generateLimitCypherQuery(), getParameterValues());
+		SessionFactory factory = getSessionFactory();
+
+		Iterable<T> queryResults;
+
+		if(factory != null) {
+			Session session = factory.openSession();
+
+			queryResults = session.query(getTargetType(),
+					generateLimitCypherQuery(),
+					getParameterValues());
+		}
+		else {
+			queryResults = getTemplate().queryForObjects(
+					getTargetType(), generateLimitCypherQuery(), getParameterValues());
+
+		}
 
 		if(queryResults != null) {
 			return queryResults.iterator();

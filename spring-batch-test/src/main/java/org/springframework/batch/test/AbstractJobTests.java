@@ -67,6 +67,7 @@ import org.springframework.context.ApplicationContextAware;
  * 
  * @deprecated (from 2.1) use {@link JobLauncherTestUtils} instead
  */
+@Deprecated
 public abstract class AbstractJobTests implements ApplicationContextAware {
 
 	/** Logger */

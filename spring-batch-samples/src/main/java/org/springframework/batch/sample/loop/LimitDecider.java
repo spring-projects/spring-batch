@@ -44,7 +44,7 @@ public class LimitDecider implements JobExecutionDecider {
 	}
 
 	/**
-	 * @param limit
+	 * @param limit number of times to return "CONTINUE"
 	 */
 	public void setLimit(int limit) {
 		this.limit = limit;
