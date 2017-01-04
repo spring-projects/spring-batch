@@ -1,0 +1,84 @@
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:energie="http://energie.aramice.fr/schema/web-config" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:batch="http://www.springframework.org/schema/batch" xmlns:util="http://www.springframework.org/schema/util"
+	xsi:schemaLocation="
+		http://www.springframework.org/schema/beans	http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/batch http://www.springframework.org/schema/batch/spring-batch.xsd
+		http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util.xsd">
+
+	<batch:job id="testFileWriteRestart" restartable="true">
+		<batch:step id="step">
+			<batch:tasklet>
+				<batch:chunk reader="reader" processor="processor"
+					writer="writer" commit-interval="5" skip-limit="3">
+					<batch:skippable-exception-classes>
+						<batch:include class="java.lang.Exception" />
+					</batch:skippable-exception-classes>
+					<batch:listeners>
+						<batch:listener>
+							<bean
+								class="org.springframework.batch.core.test.infinite_loop_on_retry.Listener" />
+						</batch:listener>
+					</batch:listeners>
+				</batch:chunk>
+			</batch:tasklet>
+		</batch:step>
+	</batch:job>
+
+	<bean id="reader" class="org.springframework.batch.item.support.ListItemReader"
+		scope="step">
+		<constructor-arg>
+			<list>
+				<bean id="item1"
+					class="org.springframework.batch.core.test.infinite_loop_on_retry.Item">
+					<constructor-arg type="java.lang.String" value="1" />
+				</bean>
+				<bean id="item2"
+					class="org.springframework.batch.core.test.infinite_loop_on_retry.Item">
+					<constructor-arg type="java.lang.String" value="2" />
+				</bean>
+				<bean id="item3"
+					class="org.springframework.batch.core.test.infinite_loop_on_retry.Item">
+					<constructor-arg type="java.lang.String" value="3" />
+				</bean>
+				<bean id="item4"
+					class="org.springframework.batch.core.test.infinite_loop_on_retry.Item">
+					<constructor-arg type="java.lang.String" value="4" />
+				</bean>
+				<bean id="item5"
+					class="org.springframework.batch.core.test.infinite_loop_on_retry.Item">
+					<constructor-arg type="java.lang.String" value="5" />
+				</bean>
+				<bean id="item6"
+					class="org.springframework.batch.core.test.infinite_loop_on_retry.Item">
+					<constructor-arg type="java.lang.String" value="6" />
+				</bean>
+				<bean id="item7"
+					class="org.springframework.batch.core.test.infinite_loop_on_retry.Item">
+					<constructor-arg type="java.lang.String" value="7" />
+				</bean>
+			</list>
+		</constructor-arg>
+	</bean>
+
+	<bean id="processor"
+		class="org.springframework.batch.core.test.infinite_loop_on_retry.Processor"
+		scope="step" />
+
+	<bean id="writer"
+		class="org.springframework.batch.core.test.infinite_loop_on_retry.Writer"
+		scope="step">
+		<property name="delegate" ref="ffWriter" />
+	</bean>
+
+	<bean id="ffWriter" class="org.springframework.batch.item.file.FlatFileItemWriter"
+		scope="step">
+		<property name="lineAggregator">
+			<bean
+				class="org.springframework.batch.item.file.transform.PassThroughLineAggregator" />
+		</property>
+		<property name="resource" value="file:#{JobParameters['outputFilePath']}" />
+	</bean>
+
+
+</beans>
