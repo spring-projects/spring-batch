@@ -298,6 +298,15 @@ public class FaultTolerantChunkProcessor<I, O> extends SimpleChunkProcessor<I, O
 			 * failed item.
 			 */
 			if (data.scanning()) {
+
+				// BATCH-2565 : on scanning processed item is skipped - remove matching cached output
+				if (output == null) {
+					if (cacheIterator != null && cacheIterator.hasNext()) {
+						cacheIterator.next();
+						cacheIterator.remove();
+					}
+				}
+
 				while (cacheIterator != null && cacheIterator.hasNext()) {
 					outputs.add(cacheIterator.next());
 				}
@@ -562,6 +571,18 @@ public class FaultTolerantChunkProcessor<I, O> extends SimpleChunkProcessor<I, O
 				logger.debug("Scanning for failed item on write: " + inputs);
 			}
 		}
+
+		//BATCH-2565 : on scanning write item only if not skipped during process
+		if (inputs.getSkips().size() > 0) {
+			logger.debug("Scan skipped because item was skipped during process");
+			if (outputs.isEmpty()) {
+				data.scanning(false);
+				inputs.setBusy(false);
+				chunkMonitor.resetOffset();
+			}
+			return;
+		}
+
 		if (outputs.isEmpty() || inputs.isEmpty()) {
 			data.scanning(false);
 			inputs.setBusy(false);

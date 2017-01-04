@@ -1,0 +1,5 @@
+Item:id=3,nbProcessed=2,nbWritten=2
+Item:id=4,nbProcessed=2,nbWritten=2
+Item:id=5,nbProcessed=2,nbWritten=2
+Item:id=6,nbProcessed=1,nbWritten=1
+Item:id=7,nbProcessed=1,nbWritten=1
