@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2013 the original author or authors.
+ * Copyright 2006-2017 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -134,6 +134,9 @@ implements InitializingBean {
 
 	private boolean useSharedExtendedConnection = false;
 
+	private Boolean connectionAutoCommit;
+
+	private Boolean initialConnectionAutoCommit;
 
 	public AbstractCursorItemReader() {
 		super();
@@ -356,6 +359,25 @@ implements InitializingBean {
 		return useSharedExtendedConnection;
 	}
 
+	/**
+	 * Set whether "autoCommit" should be overridden for the connection used by the cursor. If not set, defaults to
+	 * Connection / Datasource default configuration.
+	 *
+	 * @param autoCommit value used for {@link Connection#setAutoCommit(boolean)}.
+	 */
+	public void setConnectionAutoCommit(boolean autoCommit) {
+		this.connectionAutoCommit = autoCommit;
+	}
+
+	/**
+	 * Return whether "autoCommit" should be overridden for the connection used by the cursor.
+	 *
+	 * @return the "autoCommit" value, or {@code null} if none to be applied.
+	 */
+	public Boolean getConnectionAutoCommit() {
+		return this.connectionAutoCommit;
+	}
+
 	public abstract String getSql();
 
 	/**
@@ -380,6 +402,9 @@ implements InitializingBean {
 		JdbcUtils.closeResultSet(this.rs);
 		rs = null;
 		cleanupOnClose();
+		if (this.initialConnectionAutoCommit != null) {
+			this.con.setAutoCommit(initialConnectionAutoCommit);
+		}
 		if (useSharedExtendedConnection && dataSource instanceof ExtendedConnectionDataSourceProxy) {
 			((ExtendedConnectionDataSourceProxy)dataSource).stopCloseSuppression(this.con);
 			if (!TransactionSynchronizationManager.isActualTransactionActive()) {
@@ -423,6 +448,10 @@ implements InitializingBean {
 			}
 			else {
 				this.con = dataSource.getConnection();
+			}
+			if (this.connectionAutoCommit != null && this.con.getAutoCommit() != this.connectionAutoCommit) {
+				this.initialConnectionAutoCommit = this.con.getAutoCommit();
+				this.con.setAutoCommit(this.connectionAutoCommit);
 			}
 		}
 		catch (SQLException se) {
