@@ -132,7 +132,7 @@
             <entry align="left">MongoItemReader</entry>
 
             <entry align="left">Given a MongoOperations object and JSON based MongoDB
-            query, proides items received from the MongoOperations find method</entry>
+            query, provides items received from the MongoOperations find method</entry>
           </row>
 
           <row>
