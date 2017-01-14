@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 the original author or authors.
+ * Copyright 2012-2017 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,6 +25,8 @@ import java.util.regex.Pattern;
 
 import com.mongodb.util.JSON;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.item.ItemReader;
 import org.springframework.beans.factory.InitializingBean;
@@ -45,14 +47,23 @@ import org.springframework.util.StringUtils;
  * </p>
  *
  * <p>
- * It executes the JSON {@link #setQuery(String)} to retrieve the requested
- * documents.  The query is executed using paged requests specified in the
+ * If you set JSON String query {@link #setQuery(String)} then
+ * it executes the JSON to retrieve the requested documents.
+ * </p>
+ * 
+ * <p>
+ * If you set Query object {@link #setQuery(Query)} then
+ * it executes the Query to retrieve the requested documents.
+ * </p>
+ * 
+ * <p>
+ * The query is executed using paged requests specified in the
  * {@link #setPageSize(int)}.  Additional pages are requested as needed to
  * provide data when the {@link #read()} method is called.
  * </p>
  *
  * <p>
- * The JSON query provided supports parameter substitution via ?&lt;index&gt;
+ * The JSON String query provided supports parameter substitution via ?&lt;index&gt;
  * placeholders where the &lt;index&gt; indicates the index of the
  * parameterValue to substitute.
  * </p>
@@ -65,12 +76,16 @@ import org.springframework.util.StringUtils;
  *
  *
  * @author Michael Minella
+ * @author Takaaki Iida
  */
 public class MongoItemReader<T> extends AbstractPaginatedDataItemReader<T> implements InitializingBean {
-
+	
+	private static final Logger log = LoggerFactory.getLogger(MongoItemReader.class);
+	
 	private static final Pattern PLACEHOLDER = Pattern.compile("\\?(\\d+)");
 	private MongoOperations template;
-	private String query;
+	private Query query;
+	private String queryString;
 	private Class<? extends T> type;
 	private Sort sort;
 	private String hint;
@@ -81,6 +96,15 @@ public class MongoItemReader<T> extends AbstractPaginatedDataItemReader<T> imple
 	public MongoItemReader() {
 		super();
 		setName(ClassUtils.getShortName(MongoItemReader.class));
+	}
+	
+	/**
+	 * A Mongo Query to be used.
+	 *
+	 * @param query Mongo Query to be used.
+	 */
+	public void setQuery(Query query) {
+		this.query = query;
 	}
 
 	/**
@@ -99,10 +123,10 @@ public class MongoItemReader<T> extends AbstractPaginatedDataItemReader<T> imple
 	 * via ?&lt;index&gt; placeholders where the &lt;index&gt; indicates the index of the
 	 * parameterValue to substitute.
 	 *
-	 * @param query JSON formatted Mongo query
+	 * @param queryString JSON formatted Mongo query
 	 */
-	public void setQuery(String query) {
-		this.query = query;
+	public void setQuery(String queryString) {
+		this.queryString = queryString;
 	}
 
 	/**
@@ -163,30 +187,41 @@ public class MongoItemReader<T> extends AbstractPaginatedDataItemReader<T> imple
 	@Override
 	@SuppressWarnings("unchecked")
 	protected Iterator<T> doPageRead() {
-
-		Pageable pageRequest = PageRequest.of(page, pageSize, sort);
-
-		String populatedQuery = replacePlaceholders(query, parameterValues);
-
-		Query mongoQuery;
-
-		if(StringUtils.hasText(fields)) {
-			mongoQuery = new BasicQuery(populatedQuery, fields);
-		}
-		else {
-			mongoQuery = new BasicQuery(populatedQuery);
-		}
-
-		mongoQuery.with(pageRequest);
-
-		if(StringUtils.hasText(hint)) {
-			mongoQuery.withHint(hint);
-		}
-
-		if(StringUtils.hasText(collection)) {
-			return (Iterator<T>) template.find(mongoQuery, type, collection).iterator();
+		if (queryString != null) {
+			Pageable pageRequest = new PageRequest(page, pageSize, sort);
+	
+			String populatedQuery = replacePlaceholders(queryString, parameterValues);
+	
+			Query mongoQuery = null;
+	
+			if(StringUtils.hasText(fields)) {
+				mongoQuery = new BasicQuery(populatedQuery, fields);
+			}
+			else {
+				mongoQuery = new BasicQuery(populatedQuery);
+			}
+	
+			mongoQuery.with(pageRequest);
+	
+			if(StringUtils.hasText(hint)) {
+				mongoQuery.withHint(hint);
+			}
+	
+			if(StringUtils.hasText(collection)) {
+				return (Iterator<T>) template.find(mongoQuery, type, collection).iterator();
+			} else {
+				return (Iterator<T>) template.find(mongoQuery, type).iterator();
+			}
+			
 		} else {
-			return (Iterator<T>) template.find(mongoQuery, type).iterator();
+			Pageable pageRequest = new PageRequest(page, pageSize);
+			query.with(pageRequest);
+			
+			if(StringUtils.hasText(collection)) {
+				return (Iterator<T>) template.find(query, type, collection).iterator();
+			} else {
+				return (Iterator<T>) template.find(query, type).iterator();
+			}
 		}
 	}
 
@@ -199,8 +234,18 @@ public class MongoItemReader<T> extends AbstractPaginatedDataItemReader<T> imple
 	public void afterPropertiesSet() throws Exception {
 		Assert.state(template != null, "An implementation of MongoOperations is required.");
 		Assert.state(type != null, "A type to convert the input into is required.");
-		Assert.state(query != null, "A query is required.");
-		Assert.state(sort != null, "A sort is required.");
+		Assert.state(queryString != null || query != null, "A query is required.");
+		
+		if (queryString != null) {
+			Assert.state(sort != null, "A sort is required.");
+		}
+		if (query != null) {
+			Assert.state(query.getSortObject() != null, "A Sort in Query object is required.");
+		}
+		
+		if (query != null && query.getLimit() != 0) {
+			log.warn("PageSize in Query object was ignored. Please set it by MongoItemReader.setPageSize().");
+		}
 	}
 
 	// Copied from StringBasedMongoQuery...is there a place where this type of logic is already exposed?
