@@ -399,7 +399,6 @@ InitializingBean {
 	 * Encapsulates the runtime state of the writer. All state changing
 	 * operations on the writer go through this class.
 	 */
-
 	protected class OutputState {
 
 		private FileOutputStream os;
