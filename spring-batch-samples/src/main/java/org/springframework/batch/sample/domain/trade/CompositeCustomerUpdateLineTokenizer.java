@@ -75,8 +75,8 @@ public class CompositeCustomerUpdateLineTokenizer extends StepExecutionListenerS
 	/**
 	 * Set the {@link LineTokenizer} that will be used to tokenize any lines that begin with
 	 * A, U, or D, and are thus a customer operation.
-	 * 
-	 * @param customerTokenizer
+	 *
+	 * @param customerTokenizer tokenizer to delegate to for customer operation records
 	 */
 	public void setCustomerTokenizer(LineTokenizer customerTokenizer) {
 		this.customerTokenizer = customerTokenizer;
@@ -86,7 +86,7 @@ public class CompositeCustomerUpdateLineTokenizer extends StepExecutionListenerS
 	 * Set the {@link LineTokenizer} that will be used to tokenize any lines that being with
 	 * F and is thus a footer record.
 	 * 
-	 * @param footerTokenizer
+	 * @param footerTokenizer tokenizer to delegate to for footer records
 	 */
 	public void setFooterTokenizer(LineTokenizer footerTokenizer) {
 		this.footerTokenizer = footerTokenizer;

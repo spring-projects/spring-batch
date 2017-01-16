@@ -48,8 +48,7 @@ public class AggregateItemReader<T> implements ItemReader<List<T>> {
 
 	/**
 	 * Get the next list of records.
-	 * @throws Exception
-	 * 
+	 *
 	 * @see org.springframework.batch.item.ItemReader#read()
 	 */
 	@Override

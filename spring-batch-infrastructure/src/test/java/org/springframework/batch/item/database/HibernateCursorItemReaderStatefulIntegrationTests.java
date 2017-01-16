@@ -15,9 +15,9 @@
  */
 package org.springframework.batch.item.database;
 
-import org.hibernate.Query;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
+import org.hibernate.query.Query;
 import org.junit.Test;
 
 import org.springframework.batch.item.ExecutionContext;
@@ -46,7 +46,7 @@ public class HibernateCursorItemReaderStatefulIntegrationTests extends AbstractH
 		SessionFactory sessionFactory = mock(SessionFactory.class);
 		Session session = mock(Session.class);
 		Query scrollableResults = mock(Query.class);
-		HibernateCursorItemReader<Foo> itemReader = new HibernateCursorItemReader<Foo>();
+		HibernateCursorItemReader<Foo> itemReader = new HibernateCursorItemReader<>();
 		itemReader.setSessionFactory(sessionFactory);
 		itemReader.setQueryString("testQuery");
 		itemReader.setUseStatelessSession(false);

@@ -15,14 +15,12 @@
  */
 package org.springframework.batch.core.step.builder;
 
-import static org.junit.Assert.assertEquals;
-
 import java.util.List;
-
 import javax.sql.DataSource;
 
 import org.junit.After;
 import org.junit.Test;
+
 import org.springframework.batch.core.BatchStatus;
 import org.springframework.batch.core.ChunkListener;
 import org.springframework.batch.core.ExitStatus;
@@ -54,6 +52,8 @@ import org.springframework.context.support.GenericApplicationContext;
 import org.springframework.jdbc.datasource.embedded.EmbeddedDatabase;
 import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseBuilder;
 import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseType;
+
+import static org.junit.Assert.assertEquals;
 
 /**
  * Test for registering a listener class that implements different listeners interfaces

@@ -15,19 +15,24 @@
  */
 package org.springframework.batch.integration.async;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Future;
+import java.util.concurrent.FutureTask;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
+
 import org.junit.Before;
 import org.junit.Test;
+
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.item.ItemStreamException;
 import org.springframework.batch.item.ItemStreamWriter;
 import org.springframework.batch.item.ItemWriter;
 import org.springframework.core.task.SimpleAsyncTaskExecutor;
 import org.springframework.core.task.TaskExecutor;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.concurrent.Callable;
-import java.util.concurrent.FutureTask;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -106,6 +111,82 @@ public class AsyncItemWriterTests {
 
 		assertEquals(1, writtenItems.size());
 		assertTrue(writtenItems.contains("foo"));
+	}
+
+	@Test
+	public void testException() throws Exception {
+		writer.setDelegate(new ListItemWriter(writtenItems));
+		List<FutureTask<String>> processedItems = new ArrayList<FutureTask<String>>();
+
+		processedItems.add(new FutureTask<String>(new Callable<String>() {
+			@Override
+			public String call() throws Exception {
+				return "foo";
+			}
+		}));
+
+		processedItems.add(new FutureTask<String>(new Callable<String>() {
+			@Override
+			public String call() throws Exception {
+				throw new RuntimeException("This was expected");
+			}
+		}));
+
+		for (FutureTask<String> processedItem : processedItems) {
+			taskExecutor.execute(processedItem);
+		}
+
+		try {
+			writer.write(processedItems);
+		}
+		catch (Exception e) {
+			assertTrue(e instanceof RuntimeException);
+			assertEquals("This was expected", e.getMessage());
+		}
+	}
+
+	@Test
+	public void testExecutionException() {
+		ListItemWriter delegate = new ListItemWriter(writtenItems);
+		writer.setDelegate(delegate);
+		List<Future<String>> processedItems = new ArrayList<Future<String>>();
+
+		processedItems.add(new Future<String>() {
+
+			@Override
+			public boolean cancel(boolean mayInterruptIfRunning) {
+				return false;
+			}
+
+			@Override
+			public boolean isCancelled() {
+				return false;
+			}
+
+			@Override
+			public boolean isDone() {
+				return false;
+			}
+
+			@Override
+			public String get() throws InterruptedException, ExecutionException {
+				throw new InterruptedException("expected");
+			}
+
+			@Override
+			public String get(long timeout, TimeUnit unit) throws InterruptedException, ExecutionException, TimeoutException {
+				return null;
+			}
+		});
+
+		try {
+			writer.write(processedItems);
+		}
+		catch (Exception e) {
+			assertFalse(e instanceof ExecutionException);
+		}
+
+		assertEquals(0, writtenItems.size());
 	}
 
 	@Test

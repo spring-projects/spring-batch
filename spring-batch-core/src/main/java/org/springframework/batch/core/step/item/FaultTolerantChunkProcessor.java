@@ -16,9 +16,18 @@
 
 package org.springframework.batch.core.step.item;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Iterator;
+import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicReference;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+
 import org.springframework.batch.core.StepContribution;
+import org.springframework.batch.core.listener.StepListenerFailedException;
 import org.springframework.batch.core.step.skip.LimitCheckingItemSkipPolicy;
 import org.springframework.batch.core.step.skip.NonSkippableProcessException;
 import org.springframework.batch.core.step.skip.SkipLimitExceededException;
@@ -34,13 +43,6 @@ import org.springframework.retry.RetryCallback;
 import org.springframework.retry.RetryContext;
 import org.springframework.retry.RetryException;
 import org.springframework.retry.support.DefaultRetryState;
-
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Iterator;
-import java.util.List;
-import java.util.concurrent.atomic.AtomicInteger;
-import java.util.concurrent.atomic.AtomicReference;
 
 /**
  * FaultTolerant implementation of the {@link ChunkProcessor} interface, that
@@ -584,16 +586,25 @@ public class FaultTolerantChunkProcessor<I, O> extends SimpleChunkProcessor<I, O
 			outputIterator.remove();
 		}
 		catch (Exception e) {
-			doOnWriteError(e, items);
-			if (!shouldSkip(itemWriteSkipPolicy, e, -1) && !rollbackClassifier.classify(e)) {
-				inputIterator.remove();
-				outputIterator.remove();
+			try {
+				doOnWriteError(e, items);
 			}
-			else {
-				checkSkipPolicy(inputIterator, outputIterator, e, contribution, recovery);
-			}
-			if (rollbackClassifier.classify(e)) {
-				throw e;
+			finally {
+				Throwable cause = e;
+				if(e instanceof StepListenerFailedException) {
+					cause = e.getCause();
+				}
+
+				if (!shouldSkip(itemWriteSkipPolicy, cause, -1) && !rollbackClassifier.classify(cause)) {
+					inputIterator.remove();
+					outputIterator.remove();
+				}
+				else {
+					checkSkipPolicy(inputIterator, outputIterator, cause, contribution, recovery);
+				}
+				if (rollbackClassifier.classify(cause)) {
+					throw (Exception) cause;
+				}
 			}
 		}
 		chunkMonitor.incrementOffset();

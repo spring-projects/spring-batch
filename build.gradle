@@ -1,18 +1,23 @@
-description = 'Spring Batch'
+//description = 'Spring Batch'
 
-apply plugin: 'base'
-apply plugin: 'idea'
+//apply plugin: 'base'
 
 buildscript {
 	repositories {
 		maven { url 'https://repo.spring.io/plugins-release' }
+		maven { url 'https://plugins.gradle.org/m2/' }
 	}
 	dependencies {
 		classpath 'io.spring.gradle:docbook-reference-plugin:0.3.1'
 		classpath 'org.springframework.build.gradle:propdeps-plugin:0.0.7'
 		classpath 'io.spring.gradle:spring-io-plugin:0.0.5.RELEASE'
 		classpath "io.spring.gradle:dependency-management-plugin:0.6.0.RELEASE"
+		classpath "org.sonarsource.scanner.gradle:sonarqube-gradle-plugin:2.1"
 	}
+}
+
+plugins {
+	id 'org.sonarqube' version '2.1'
 }
 
 ext {
@@ -34,6 +39,7 @@ allprojects {
 		maven { url 'https://repo.spring.io/plugins-release' }
         maven { url "https://repo.spring.io/libs-snapshot" }
 
+		maven { url 'https://m2.neo4j.org/content/repositories/snapshots' }
 		maven { url 'https://m2.neo4j.org/content/repositories/releases'}
 		mavenCentral()
 	}
@@ -42,59 +48,62 @@ allprojects {
 
 		environmentProperty = project.hasProperty('environment') ? getProperty('environment') : 'hsql'
 
-		springVersionDefault = '4.1.9.RELEASE'
+		springVersionDefault = '5.0.0.M4'
 		springVersion = project.hasProperty('springVersion') ? getProperty('springVersion') : springVersionDefault
-		springRetryVersion = '1.1.2.RELEASE'
-		springAmqpVersion = '1.4.6.RELEASE'
-		springDataCommonsVersion = '1.9.4.RELEASE'
-		springDataGemfireVersion = '1.5.4.RELEASE'
-		springDataJpaVersion = '1.7.4.RELEASE'
-		springDataMongodbVersion = '1.6.4.RELEASE'
-		springDataNeo4jVersion = '3.2.4.RELEASE'
-		springDataNeo4j4Version = '4.1.2.RELEASE'
-		springIntegrationVersion = '4.1.8.RELEASE'
+		springRetryVersion = '1.1.3.RELEASE'
+		springAmqpVersion = '1.5.6.RELEASE'
+		springDataCommonsVersion = '2.0.0.M1'
+		springDataGemfireVersion = '2.0.0.M1'
+		springDataJpaVersion = '2.0.0.M1'
+		springDataMongodbVersion = '2.0.0.M1'
+		springDataNeo4jVersion = '5.0.0.M1'
+		springIntegrationVersion = '5.0.0.M1'
 		springLdapVersion = '2.0.4.RELEASE'
 
 		activemqVersion = '5.13.2'
-		aspectjVersion = '1.8.8'
+		aspectjVersion = '1.8.9'
 		castorVersion = '1.3.3'
 		commonsCollectionsVersion = '3.2.2'
 		commonsDdbcpVersion = '1.4'
 		commonsIoVersion = '2.4'
 		commonsLangVersion = '2.6'
-		derbyVersion = '10.10.2.0'
-		groovyVersion = '2.4.4'
+		commonsPoolVersion = '1.6'
+		derbyVersion = '10.12.1.1'
+		groovyVersion = '2.4.7'
 		hamcrestVersion = '1.3'
-		h2databaseVersion = '1.4.190'
-		hibernateVersion = '4.3.11.Final'
-		hibernateValidatorVersion = '5.1.3.Final'
+		h2databaseVersion = '1.4.192'
+		hibernateVersion = '5.2.2.Final'
+		hibernateValidatorVersion = '5.3.0.CR1'
 		hsqldbVersion = '2.3.3'
 		ibatisVersion = '2.3.4.726'
-		jacksonVersion = '1.9.13'
-		jackson2Version = "2.4.6"
-		javaMailVersion = '1.5.5'
+		jackson2Version = "2.8.6" //?
+		javaMailVersion = '1.5.6'
 		javaxBatchApiVersion = '1.0'
 		javaxInjectVersion = '1'
+		javaxTransactionVersion = '1.2'
 		jbatchTckSpi = '1.0'
 		jettisonVersion = '1.2'
-		jtdsVersion = '1.3.1'
-		junitVersion = '4.11'
+		jmsVersion = '2.0.1'
+		jtdsVersion = '1.3.1' //?
+		junitVersion = '4.12'
 		log4jVersion = '1.2.17'
-		mysqlVersion = '5.1.38'
+		mysqlVersion = '5.1.39'
 		mockitoVersion = '1.10.19'
-		postgresqlVersion = '9.4.1209.jre6'
-		quartzVersion = '2.2.2'
-		servletApiVersion = '3.0.1'
+		postgresqlVersion = '9.4.1211.jre7'
+		quartzVersion = '2.2.3'
+		servletApiVersion = '3.1.0'
 		slf4jVersion = '1.7.21'
-		sqlfireclientVersion = '1.0.3'
-		sqliteVersion = '3.8.11.2'
+		sqlfireclientVersion = '1.0.3' //?
+		sqliteVersion = '3.8.11.2' //?
 		woodstoxVersion = '4.2.1'
-		xercesVersion = '2.11.0'
+		xercesVersion = '2.11.0' //?
 		xmlunitVersion = '1.5'
 		xstreamVersion = '1.4.9'
-		jrubyVersion = '1.7.23'
+		jrubyVersion = '1.7.26'
 		beanshellVersion = '2.0b5'
 	}
+
+	apply plugin: 'idea'
 }
 
 configure(subprojects - project(":spring-build-src")) { subproject ->
@@ -107,18 +116,18 @@ configure(subprojects - project(":spring-build-src")) { subproject ->
 	apply plugin: 'merge'
 
 	jacoco {
-		toolVersion = "0.7.0.201403182114"
+		toolVersion = "0.7.6.201602180812"
 	}
 
     compileJava {
-        sourceCompatibility=1.6
-        targetCompatibility=1.6
+        sourceCompatibility=1.8
+        targetCompatibility=1.8
         options.encoding='UTF-8'
     }
 
     compileTestJava {
-        sourceCompatibility=1.7
-        targetCompatibility=1.7
+        sourceCompatibility=1.8
+        targetCompatibility=1.8
         options.encoding='UTF-8'
     }
 
@@ -213,6 +222,10 @@ configure(subprojects - project(":spring-build-src")) { subproject ->
 		archives sourcesJar
 		archives javadocJar
 	}
+}
+
+subprojects {
+	task allDeps(type: DependencyReportTask) {}
 }
 
 configure(mainProjects) {
@@ -319,9 +332,9 @@ project('spring-batch-infrastructure') {
 
 		testRuntime "org.beanshell:bsh:$beanshellVersion"
 
-		optional "javax.jms:jms-api:1.1-rev-1"
+		optional "javax.jms:javax.jms-api:$jmsVersion"
 		optional "org.slf4j:slf4j-log4j12:$slf4jVersion"
-		optional "org.codehaus.jackson:jackson-mapper-asl:$jacksonVersion"
+		optional "com.fasterxml.jackson.core:jackson-databind:${jackson2Version}"
 		compile("org.hibernate:hibernate-core:$hibernateVersion") { dep ->
 			optional dep
 			exclude group: 'org.jboss.spec.javax.transaction', module: 'jboss-transaction-api_1.1_spec'
@@ -331,7 +344,7 @@ project('spring-batch-infrastructure') {
 			exclude group: 'org.jboss.spec.javax.transaction', module: 'jboss-transaction-api_1.1_spec'
 		}
 		optional "org.hibernate:hibernate-validator:$hibernateValidatorVersion"
-		optional "javax.transaction:javax.transaction-api:1.2"
+		optional "javax.transaction:javax.transaction-api:$javaxTransactionVersion"
 		optional "org.apache.ibatis:ibatis-sqlmap:$ibatisVersion"
 		optional "javax.mail:javax.mail-api:$javaMailVersion"
 		optional "javax.batch:javax.batch-api:$javaxBatchApiVersion"
@@ -350,14 +363,19 @@ project('spring-batch-infrastructure') {
 		optional "org.springframework:spring-tx:$springVersion"
 		optional "org.springframework.data:spring-data-commons:$springDataCommonsVersion"
 		optional "org.springframework.data:spring-data-mongodb:$springDataMongodbVersion"
-		optional "org.springframework.data:spring-data-neo4j:$springDataNeo4jVersion"
+		optional ("org.springframework.data:spring-data-neo4j:$springDataNeo4jVersion") {
+			exclude group: "org.springframework", module: "spring-aspects"
+		}
 		optional "org.springframework.data:spring-data-gemfire:$springDataGemfireVersion"
 		compile("org.codehaus.woodstox:woodstox-core-asl:$woodstoxVersion") { dep ->
 			optional dep
 			exclude group: 'stax', module: 'stax-api'
 		}
 		optional "org.springframework.amqp:spring-amqp:$springAmqpVersion"
-		optional "org.springframework.amqp:spring-rabbit:$springAmqpVersion"
+		optional ("org.springframework.amqp:spring-rabbit:$springAmqpVersion") {
+			exclude group: "org.springframework", module: "spring-messaging"
+			exclude group: "org.springframework", module: "spring-web"
+		}
         optional "org.springframework.ldap:spring-ldap-core:$springLdapVersion"
         optional "org.springframework.ldap:spring-ldap-core-tiger:$springLdapVersion"
         optional "org.springframework.ldap:spring-ldap-ldif-core:$springLdapVersion"
@@ -368,26 +386,6 @@ project('spring-batch-infrastructure') {
 		if (dataNeo4jVersion?.startsWith('4.')) {
 			tasks.withType(Test).matching { it.name =~ "springIoJdk.Test" }.all {
 				exclude '**/Neo4jItemReaderTests.class'
-			}
-		}
-	}
-}
-
-project('spring-batch-infrastructure-neo4j4') {
-
-	merge.into = project(':spring-batch-infrastructure')
-
-	dependencies {
-		optional "org.springframework.data:spring-data-neo4j:$springDataNeo4j4Version"
-		testCompile "org.mockito:mockito-core:$mockitoVersion"
-		testCompile "junit:junit:${junitVersion}"
-	}
-
-	if (project.hasProperty('platformVersion')) {
-		def dataNeo4jVersion = dependencyManagement.springIoTestRuntime.managedVersions['org.springframework.data:spring-data-neo4j']
-		if (dataNeo4jVersion?.startsWith('3.')) {
-			tasks.withType(Test).matching { it.name =~ "springIoJdk.Test" }.all {
-				enabled false
 			}
 		}
 	}
@@ -434,7 +432,7 @@ project('spring-batch-infrastructure-tests') {
     project.tasks.findByPath("artifactoryPublish")?.enabled = false
 	dependencies {
 		compile project(":spring-batch-infrastructure")
-		compile "javax.jms:jms-api:1.1-rev-1"
+		compile "javax.jms:javax.jms-api:$jmsVersion"
 		compile "commons-dbcp:commons-dbcp:$commonsDdbcpVersion"
 		compile "org.springframework:spring-tx:$springVersion"
 		compile "org.springframework:spring-aop:$springVersion"
@@ -544,7 +542,7 @@ project('spring-batch-integration') {
 		}
 		testCompile "org.springframework.integration:spring-integration-jdbc:$springIntegrationVersion"
 
-		optional "javax.jms:jms-api:1.1-rev-1"
+		optional "javax.jms:javax.jms-api:$jmsVersion"
 		optional "org.slf4j:slf4j-log4j12:$slf4jVersion"
 		optional "log4j:log4j:$log4jVersion"
 		optional "org.springframework.integration:spring-integration-jms:$springIntegrationVersion"
@@ -578,7 +576,7 @@ project('spring-batch-samples') {
 			optional dep
 			exclude group: 'org.jboss.spec.javax.transaction', module: 'jboss-transaction-api_1.1_spec'
 		}
-		compile "javax.transaction:javax.transaction-api:1.2"
+		compile "javax.transaction:javax.transaction-api:$javaxTransactionVersion"
 		compile "org.apache.ibatis:ibatis-sqlmap:$ibatisVersion"
 		compile "org.springframework:spring-aop:$springVersion"
 		compile("org.springframework:spring-oxm:$springVersion") {
@@ -617,7 +615,10 @@ project('spring-batch-samples') {
 		optional "org.springframework:spring-web:$springVersion"
 		optional "org.springframework.data:spring-data-commons:$springDataCommonsVersion"
 		optional "org.springframework.amqp:spring-amqp:$springAmqpVersion"
-		optional "org.springframework.amqp:spring-rabbit:$springAmqpVersion"
+		optional ("org.springframework.amqp:spring-rabbit:$springAmqpVersion") {
+			exclude group: "org.springframework", module: "spring-messaging"
+			exclude group: "org.springframework", module: "spring-web"
+		}
         optional "javax.inject:javax.inject:1"
 
 		optional "javax.batch:javax.batch-api:$javaxBatchApiVersion"
@@ -630,10 +631,11 @@ reference {
 	sourceDir = file('src/site/docbook/reference')
 }
 
-apply plugin: 'sonar-runner'
+apply plugin: 'org.sonarqube'
 
-sonarRunner {
-	sonarProperties {
+sonarqube {
+	properties {
+		property "sonar.projectName", "Spring Batch"
 		property "sonar.jacoco.reportPath", "${buildDir.name}/jacoco.exec"
 		property "sonar.links.homepage", linkHomepage
 		property "sonar.links.ci", linkCi
@@ -802,7 +804,7 @@ task runTck(dependsOn: subprojects.compileJava) {
 	dependencies {
 		tck project(":spring-batch-core")
 
-		tck 'commons-pool:commons-pool:1.5.4'
+		tck "commons-pool:commons-pool:$commonsPoolVersion"
 		tck "javax.batch:javax.batch-api:$javaxBatchApiVersion"
 		tck "org.springframework:spring-core:$springVersion"
 		tck "org.springframework:spring-context:$springVersion"
@@ -840,5 +842,5 @@ or specify the Gradle property `TCK_HOME`, e.g: ./gradlew runTck -PTCK_HOME=/pat
 
 task wrapper(type: Wrapper) {
 	description = 'Generates gradlew[.bat] scripts'
-	gradleVersion = '2.14.1'
+	gradleVersion = '3.0'
 }

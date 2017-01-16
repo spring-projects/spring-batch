@@ -16,8 +16,19 @@
 
 package org.springframework.batch.item.file;
 
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.Writer;
+import java.nio.channels.Channels;
+import java.nio.channels.FileChannel;
+import java.nio.charset.UnsupportedCharsetException;
+import java.util.List;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.item.ItemStream;
 import org.springframework.batch.item.ItemStreamException;
@@ -31,16 +42,6 @@ import org.springframework.beans.factory.InitializingBean;
 import org.springframework.core.io.Resource;
 import org.springframework.util.Assert;
 import org.springframework.util.ClassUtils;
-
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.Writer;
-import java.nio.channels.Channels;
-import java.nio.channels.FileChannel;
-import java.nio.charset.UnsupportedCharsetException;
-import java.util.List;
 
 /**
  * This class is an item writer that writes data to a file or stream. The writer
@@ -60,11 +61,14 @@ import java.util.List;
 public class FlatFileItemWriter<T> extends AbstractItemStreamItemWriter<T> implements ResourceAwareItemWriterItemStream<T>,
 InitializingBean {
 
-	private static final boolean DEFAULT_TRANSACTIONAL = true;
+	public static final boolean DEFAULT_TRANSACTIONAL = true;
 
 	protected static final Log logger = LogFactory.getLog(FlatFileItemWriter.class);
 
-	private static final String DEFAULT_LINE_SEPARATOR = System.getProperty("line.separator");
+	public static final String DEFAULT_LINE_SEPARATOR = System.getProperty("line.separator");
+
+	// default encoding for writing to output files - set to UTF-8.
+	public static final String DEFAULT_CHARSET = "UTF-8";
 
 	private static final String WRITTEN_STATISTICS_NAME = "written";
 
@@ -84,7 +88,7 @@ InitializingBean {
 
 	private boolean shouldDeleteIfEmpty = false;
 
-	private String encoding = OutputState.DEFAULT_CHARSET;
+	private String encoding = DEFAULT_CHARSET;
 
 	private FlatFileHeaderCallback headerCallback;
 
@@ -186,7 +190,6 @@ InitializingBean {
 	 */
 	public void setAppendAllowed(boolean append) {
 		this.append = append;
-		this.shouldDeleteIfExists = false;
 	}
 
 	/**
@@ -396,9 +399,8 @@ InitializingBean {
 	 * Encapsulates the runtime state of the writer. All state changing
 	 * operations on the writer go through this class.
 	 */
+
 	protected class OutputState {
-		// default encoding for writing to output files - set to UTF-8.
-		private static final String DEFAULT_CHARSET = "UTF-8";
 
 		private FileOutputStream os;
 

@@ -22,9 +22,10 @@ import org.apache.commons.logging.LogFactory;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.context.spi.CurrentSessionContext;
+
 import org.springframework.batch.item.ItemWriter;
 import org.springframework.beans.factory.InitializingBean;
-import org.springframework.orm.hibernate3.HibernateOperations;
+import org.springframework.orm.hibernate5.HibernateOperations;
 import org.springframework.util.Assert;
 
 /**

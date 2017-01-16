@@ -20,6 +20,9 @@ import java.util.List;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.neo4j.ogm.session.Session;
+import org.neo4j.ogm.session.SessionFactory;
+
 import org.springframework.batch.item.ItemWriter;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.data.neo4j.template.Neo4jOperations;
@@ -28,8 +31,7 @@ import org.springframework.util.CollectionUtils;
 
 /**
  * <p>
- * A {@link ItemWriter} implementation that writes to a Neo4j database using an
- * implementation of Spring Data's {@link Neo4jOperations}.
+ * A {@link ItemWriter} implementation that writes to a Neo4j database.
  * </p>
  *
  * <p>
@@ -49,6 +51,10 @@ public class Neo4jItemWriter<T> implements ItemWriter<T>, InitializingBean {
 
 	private Neo4jOperations template;
 
+	private SessionFactory sessionFactory;
+
+	private boolean useSession = false;
+
 	public void setDelete(boolean delete) {
 		this.delete = delete;
 	}
@@ -57,9 +63,15 @@ public class Neo4jItemWriter<T> implements ItemWriter<T>, InitializingBean {
 	 * Set the {@link Neo4jOperations} to be used to save items
 	 *
 	 * @param template the template implementation to be used
+	 * @deprecated Use {@link #setSessionFactory(SessionFactory)}
 	 */
+	@Deprecated
 	public void setTemplate(Neo4jOperations template) {
 		this.template = template;
+	}
+
+	public void setSessionFactory(SessionFactory sessionFactory) {
+		this.sessionFactory = sessionFactory;
 	}
 
 	/**
@@ -69,7 +81,10 @@ public class Neo4jItemWriter<T> implements ItemWriter<T>, InitializingBean {
 	 */
 	@Override
 	public void afterPropertiesSet() throws Exception {
-		Assert.state(template != null, "A Neo4JOperations implementation is required");
+		Assert.state(template != null || this.sessionFactory != null,
+				"A Neo4JOperations implementation or a SessionFactory is required");
+
+		this.useSession = this.sessionFactory != null;
 	}
 
 	/**
@@ -92,13 +107,35 @@ public class Neo4jItemWriter<T> implements ItemWriter<T>, InitializingBean {
 	 */
 	protected void doWrite(List<? extends T> items) {
 		if(delete) {
-			for (T t : items) {
-				template.delete(t);
-			}
+			delete(items);
 		}
 		else {
-			for (T t : items) {
-				template.save(t);
+			save(items);
+		}
+	}
+
+	private void delete(List<? extends T> items) {
+		if(this.useSession) {
+			Session session = this.sessionFactory.openSession();
+
+			items.forEach(session::delete);
+		}
+		else {
+			for (T item : items) {
+				this.template.delete(item);
+			}
+		}
+	}
+
+	private void save(List<? extends T> items) {
+		if(this.useSession) {
+			Session session = this.sessionFactory.openSession();
+
+			items.forEach(session::save);
+		}
+		else {
+			for (T item : items) {
+				this.template.save(item);
 			}
 		}
 	}

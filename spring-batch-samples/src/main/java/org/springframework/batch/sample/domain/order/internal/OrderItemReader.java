@@ -56,7 +56,6 @@ public class OrderItemReader implements ItemReader<Order> {
 	private ItemReader<FieldSet> fieldSetReader;
 
 	/**
-	 * @throws Exception
 	 * @see org.springframework.batch.item.ItemReader#read()
 	 */
 	@Override

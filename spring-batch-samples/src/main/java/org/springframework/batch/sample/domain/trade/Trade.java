@@ -44,7 +44,7 @@ public class Trade implements Serializable {
     }
 
     /**
-	 * @param id
+	 * @param id id of the trade
 	 */
 	public Trade(long id) {
 		this.id = id;

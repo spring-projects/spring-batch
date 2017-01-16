@@ -55,7 +55,8 @@ public class OrderLineAggregator implements LineAggregator<Order> {
 	/**
 	 * Set aggregators for all types of lines in the output file
 	 * 
-	 * @param aggregators
+	 * @param aggregators Map of LineAggregators used to map the various record types for
+	 * 					each order
 	 */
 	public void setAggregators(Map<String, LineAggregator<Object>> aggregators) {
 		this.aggregators = aggregators;

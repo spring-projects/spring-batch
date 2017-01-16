@@ -16,15 +16,16 @@
 
 package org.springframework.batch.item.database.support;
 
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
-
-import org.hibernate.SQLQuery;
 import org.hibernate.Session;
 import org.hibernate.StatelessSession;
+import org.hibernate.query.NativeQuery;
 import org.junit.Test;
+
 import org.springframework.batch.item.database.orm.HibernateNativeQueryProvider;
 import org.springframework.util.Assert;
+
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 /**
  * @author Anatoly Polinsky
@@ -46,9 +47,9 @@ public class HibernateNativeQueryProviderTests {
 		hibernateQueryProvider.setSqlQuery(sqlQuery);
 
 		StatelessSession session = mock(StatelessSession.class);
-		SQLQuery query = mock(SQLQuery.class);
+		NativeQuery query = mock(NativeQuery.class);
 
-		when(session.createSQLQuery(sqlQuery)).thenReturn(query);
+		when(session.createNativeQuery(sqlQuery)).thenReturn(query);
 		when(query.addEntity(Foo.class)).thenReturn(query);
 
 		hibernateQueryProvider.setStatelessSession(session);
@@ -62,9 +63,9 @@ public class HibernateNativeQueryProviderTests {
 		hibernateQueryProvider.setSqlQuery(sqlQuery);
 
 		Session session = mock(Session.class);
-		SQLQuery query = mock(SQLQuery.class);
+		NativeQuery query = mock(NativeQuery.class);
 
-		when(session.createSQLQuery(sqlQuery)).thenReturn(query);
+		when(session.createNativeQuery(sqlQuery)).thenReturn(query);
 		when(query.addEntity(Foo.class)).thenReturn(query);
 
 		hibernateQueryProvider.setSession(session);

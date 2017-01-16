@@ -66,7 +66,7 @@ public class AggregateItem<T> {
 	private boolean header = false;
 
 	/**
-	 * @param item
+	 * @param item the item to wrap
 	 */
 	public AggregateItem(T item) {
 		super();

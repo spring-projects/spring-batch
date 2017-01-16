@@ -15,18 +15,12 @@
  */
 package org.springframework.batch.core.test.repository;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
-
 import java.io.Serializable;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-
 import javax.sql.DataSource;
 
 import org.apache.commons.logging.Log;
@@ -35,6 +29,7 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+
 import org.springframework.batch.core.BatchStatus;
 import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.JobParameters;
@@ -44,6 +39,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(locations = { "/simple-job-launcher-context.xml" })
@@ -74,28 +74,30 @@ public class JdbcJobRepositoryTests {
 	public void onSetUpInTransaction() throws Exception {
 		job = new JobSupport("test-job");
 		job.setRestartable(true);
+	}
+
+	@After
+	public void onTearDownAfterTransaction() throws Exception {
+
 		jdbcTemplate.update("DELETE FROM BATCH_STEP_EXECUTION_CONTEXT");
 		jdbcTemplate.update("DELETE FROM BATCH_JOB_EXECUTION_CONTEXT");
 		jdbcTemplate.update("DELETE FROM BATCH_STEP_EXECUTION");
 		jdbcTemplate.update("DELETE FROM BATCH_JOB_EXECUTION_PARAMS");
 		jdbcTemplate.update("DELETE FROM BATCH_JOB_EXECUTION");
 		jdbcTemplate.update("DELETE FROM BATCH_JOB_INSTANCE");
-	}
 
-	@After
-	public void onTearDownAfterTransaction() throws Exception {
-		for (Long id : jobExecutionIds) {
-			jdbcTemplate.update("DELETE FROM BATCH_JOB_EXECUTION_CONTEXT where JOB_EXECUTION_ID=?", id);
-			jdbcTemplate.update("DELETE FROM BATCH_JOB_EXECUTION where JOB_EXECUTION_ID=?", id);
-		}
-		for (Long id : jobIds) {
-			jdbcTemplate.update("DELETE FROM BATCH_JOB_INSTANCE where JOB_INSTANCE_ID=?", id);
-		}
-		for (Long id : jobIds) {
-			int count = jdbcTemplate.queryForObject(
-					"SELECT COUNT(*) FROM BATCH_JOB_INSTANCE where JOB_INSTANCE_ID=?", Integer.class, id);
-			assertEquals(0, count);
-		}
+//		for (Long id : jobExecutionIds) {
+//			jdbcTemplate.update("DELETE FROM BATCH_JOB_EXECUTION_CONTEXT where JOB_EXECUTION_ID=?", id);
+//			jdbcTemplate.update("DELETE FROM BATCH_JOB_EXECUTION where JOB_EXECUTION_ID=?", id);
+//		}
+//		for (Long id : jobIds) {
+//			jdbcTemplate.update("DELETE FROM BATCH_JOB_INSTANCE where JOB_INSTANCE_ID=?", id);
+//		}
+//		for (Long id : jobIds) {
+//			int count = jdbcTemplate.queryForObject(
+//					"SELECT COUNT(*) FROM BATCH_JOB_INSTANCE where JOB_INSTANCE_ID=?", Integer.class, id);
+//			assertEquals(0, count);
+//		}
 	}
 
 	@Test
