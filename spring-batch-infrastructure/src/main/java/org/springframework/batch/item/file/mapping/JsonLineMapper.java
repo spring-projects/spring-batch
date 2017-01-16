@@ -17,8 +17,9 @@ package org.springframework.batch.item.file.mapping;
 
 import java.util.Map;
 
-import org.codehaus.jackson.JsonParser;
-import org.codehaus.jackson.map.MappingJsonFactory;
+import com.fasterxml.jackson.core.JsonParser;
+import com.fasterxml.jackson.databind.MappingJsonFactory;
+
 import org.springframework.batch.item.file.LineMapper;
 
 /**
@@ -51,7 +52,7 @@ public class JsonLineMapper implements LineMapper<Map<String, Object>> {
     @Override
 	public Map<String, Object> mapLine(String line, int lineNumber) throws Exception {
 		Map<String, Object> result;
-		JsonParser parser = factory.createJsonParser(line);
+		JsonParser parser = factory.createParser(line);
 		@SuppressWarnings("unchecked")
 		Map<String, Object> token = parser.readValueAs(Map.class);
 		result = token;

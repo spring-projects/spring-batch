@@ -76,8 +76,7 @@ allprojects {
 		hibernateValidatorVersion = '5.3.0.CR1'
 		hsqldbVersion = '2.3.3'
 		ibatisVersion = '2.3.4.726'
-		jacksonVersion = '1.9.13'
-		jackson2Version = "2.4.6" //?
+		jackson2Version = "2.8.6" //?
 		javaMailVersion = '1.5.6'
 		javaxBatchApiVersion = '1.0'
 		javaxInjectVersion = '1'
@@ -335,7 +334,7 @@ project('spring-batch-infrastructure') {
 
 		optional "javax.jms:javax.jms-api:$jmsVersion"
 		optional "org.slf4j:slf4j-log4j12:$slf4jVersion"
-		optional "org.codehaus.jackson:jackson-mapper-asl:$jacksonVersion"
+		optional "com.fasterxml.jackson.core:jackson-databind:${jackson2Version}"
 		compile("org.hibernate:hibernate-core:$hibernateVersion") { dep ->
 			optional dep
 			exclude group: 'org.jboss.spec.javax.transaction', module: 'jboss-transaction-api_1.1_spec'
