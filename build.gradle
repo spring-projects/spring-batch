@@ -241,6 +241,9 @@ configure(mainProjects) {
 				imports {
 					mavenBom "io.spring.platform:platform-bom:${platformVersion}"
 				}
+				dependencies {
+					dependency "org.mockito:mockito-core:$mockitoVersion"
+				}
 			}
 		}
 	}
