@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2014 the original author or authors.
+ * Copyright 2013-2017 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -34,8 +34,8 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
-import static org.mockito.Matchers.eq;
-import static org.mockito.Matchers.isNull;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.ArgumentMatchers.isNull;
 import static org.mockito.Mockito.when;
 
 public class Neo4jItemReaderTests {
@@ -160,7 +160,7 @@ public class Neo4jItemReaderTests {
 
 		ArgumentCaptor<String> query = ArgumentCaptor.forClass(String.class);
 
-		when(template.queryForObjects(eq(String.class), query.capture(), (Map<String, Object>) isNull())).thenReturn(null);
+		when(template.queryForObjects(eq(String.class), query.capture(), isNull())).thenReturn(null);
 
 		assertFalse(itemReader.doPageRead().hasNext());
 		assertEquals("START n=node(*) RETURN * ORDER BY n.age SKIP 0 LIMIT 50", query.getValue());
@@ -174,7 +174,7 @@ public class Neo4jItemReaderTests {
 		ArgumentCaptor<String> query = ArgumentCaptor.forClass(String.class);
 
 		when(this.sessionFactory.openSession()).thenReturn(this.session);
-		when(this.session.query(eq(String.class), query.capture(), (Map<String, Object>) isNull())).thenReturn(null);
+		when(this.session.query(eq(String.class), query.capture(), isNull())).thenReturn(null);
 
 		assertFalse(itemReader.doPageRead().hasNext());
 		assertEquals("START n=node(*) RETURN * ORDER BY n.age SKIP 0 LIMIT 50", query.getValue());
@@ -186,8 +186,8 @@ public class Neo4jItemReaderTests {
 		Neo4jItemReader<String> itemReader = buildTemplateBasedReader();
 		ArgumentCaptor<String> query = ArgumentCaptor.forClass(String.class);
 
-		when(template.queryForObjects(eq(String.class), query.capture(), (Map<String, Object>) isNull())).thenReturn(result);
-		when(result.iterator()).thenReturn(Collections.<String>emptyIterator());
+		when(template.queryForObjects(eq(String.class), query.capture(), isNull())).thenReturn(result);
+		when(result.iterator()).thenReturn(Collections.emptyIterator());
 
 		assertFalse(itemReader.doPageRead().hasNext());
 		assertEquals("START n=node(*) RETURN * ORDER BY n.age SKIP 0 LIMIT 50", query.getValue());
@@ -200,7 +200,7 @@ public class Neo4jItemReaderTests {
 		ArgumentCaptor<String> query = ArgumentCaptor.forClass(String.class);
 
 		when(this.sessionFactory.openSession()).thenReturn(this.session);
-		when(this.session.query(eq(String.class), query.capture(), (Map<String, Object>) isNull())).thenReturn(result);
+		when(this.session.query(eq(String.class), query.capture(), isNull())).thenReturn(result);
 		when(result.iterator()).thenReturn(Collections.emptyIterator());
 
 		assertFalse(itemReader.doPageRead().hasNext());
@@ -241,7 +241,7 @@ public class Neo4jItemReaderTests {
 	@Test
 	public void testResultsWithMatchAndWhereWithParameters() throws Exception {
 		Neo4jItemReader<String> itemReader = buildTemplateBasedReader();
-		Map<String, Object> params = new HashMap<String, Object>();
+		Map<String, Object> params = new HashMap<>();
 		params.put("foo", "bar");
 		itemReader.setParameterValues(params);
 		itemReader.setMatchStatement("n -- m");

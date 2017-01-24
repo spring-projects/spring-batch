@@ -60,7 +60,9 @@ public abstract class CheckpointSupport extends ItemStreamSupport{
 	public void open(ExecutionContext executionContext)
 			throws ItemStreamException {
 		try {
-			doOpen((Serializable) executionContext.get(getExecutionContextKey(checkpointKey)));
+			String executionContextKey = getExecutionContextKey(checkpointKey);
+			Serializable checkpoint = (Serializable) executionContext.get(executionContextKey);
+			doOpen(checkpoint);
 		} catch (Exception e) {
 			throw new ItemStreamException(e);
 		}
