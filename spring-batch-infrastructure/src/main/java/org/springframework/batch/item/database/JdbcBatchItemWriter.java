@@ -171,7 +171,7 @@ public class JdbcBatchItemWriter<T> implements ItemWriter<T>, InitializingBean {
 			int[] updateCounts;
 
 			if (usingNamedParameters) {
-				if(items.get(0) instanceof Map) {
+				if(items.get(0) instanceof Map && this.itemSqlParameterSourceProvider == null) {
 					updateCounts = namedParameterJdbcTemplate.batchUpdate(sql, items.toArray(new Map[items.size()]));
 				} else {
 					SqlParameterSource[] batchArgs = new SqlParameterSource[items.size()];

@@ -27,6 +27,7 @@ import org.mockito.ArgumentCaptor;
 
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.namedparam.BeanPropertySqlParameterSource;
+import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcOperations;
 import org.springframework.jdbc.core.namedparam.SqlParameterSource;
 
@@ -34,6 +35,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.mockito.hamcrest.MockitoHamcrest.argThat;
@@ -148,6 +150,33 @@ public class JdbcBatchItemWriterNamedParameterTests {
 		assertEquals(1, captor.getValue().length);
 		Map<String, Object> results = captor.getValue()[0];
 		assertEquals("bar", results.get("foo"));
+	}
+
+	@SuppressWarnings({ "rawtypes", "serial", "unchecked" })
+	@Test
+	public void testWriteAndFlushMapWithItemSqlParameterSourceProvider() throws Exception {
+		JdbcBatchItemWriter<Map<String, Object>> mapWriter = new JdbcBatchItemWriter<>();
+
+		mapWriter.setSql(sql);
+		mapWriter.setJdbcTemplate(namedParameterJdbcOperations);
+		mapWriter.setItemSqlParameterSourceProvider(new ItemSqlParameterSourceProvider<Map<String, Object>>() {
+			@Override
+			public SqlParameterSource createSqlParameterSource(Map<String, Object> item) {
+				return new MapSqlParameterSource(item);
+			}
+		});
+		mapWriter.afterPropertiesSet();
+
+		ArgumentCaptor<SqlParameterSource []> captor = ArgumentCaptor.forClass(SqlParameterSource[].class);
+
+		when(namedParameterJdbcOperations.batchUpdate(any(String.class),
+				captor.capture()))
+				.thenReturn(new int[] {1});
+		mapWriter.write(Collections.singletonList(new HashMap<String, Object>() {{put("foo", "bar");}}));
+
+		assertEquals(1, captor.getValue().length);
+		SqlParameterSource results = captor.getValue()[0];
+		assertEquals("bar", results.getValue("foo"));
 	}
 
 	@Test
