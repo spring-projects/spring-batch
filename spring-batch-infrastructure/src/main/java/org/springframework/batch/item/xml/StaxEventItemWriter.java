@@ -27,7 +27,6 @@ import java.nio.channels.FileChannel;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
-
 import javax.xml.namespace.QName;
 import javax.xml.stream.FactoryConfigurationError;
 import javax.xml.stream.XMLEventFactory;
@@ -38,10 +37,12 @@ import javax.xml.transform.Result;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.item.ItemStreamException;
 import org.springframework.batch.item.ItemWriter;
 import org.springframework.batch.item.WriteFailedException;
+import org.springframework.batch.item.WriterNotOpenException;
 import org.springframework.batch.item.file.ResourceAwareItemWriterItemStream;
 import org.springframework.batch.item.support.AbstractItemStreamItemWriter;
 import org.springframework.batch.item.util.FileUtils;
@@ -152,6 +153,8 @@ ResourceAwareItemWriterItemStream<T>, InitializingBean {
 	private boolean shouldDeleteIfEmpty = false;
 	
 	private boolean restarted = false;
+
+	private boolean initialized = false;
 	
 	// List holding the QName of elements that were opened in the header callback, but not closed
 	private List<QName> unclosedHeaderCallbackElements = Collections.emptyList();
@@ -411,6 +414,8 @@ ResourceAwareItemWriterItemStream<T>, InitializingBean {
 				throw new ItemStreamException("Failed to write headerItems", e);
 			}
 		}
+
+		this.initialized = true;
 
 	}
 
@@ -710,6 +715,8 @@ ResourceAwareItemWriterItemStream<T>, InitializingBean {
 				}
 			}
 		}
+
+		this.initialized = false;
 	}
 
 	private void closeStream() {
@@ -730,6 +737,10 @@ ResourceAwareItemWriterItemStream<T>, InitializingBean {
 	 */
 	@Override
 	public void write(List<? extends T> items) throws XmlMappingException, Exception {
+
+		if(!this.initialized) {
+			throw new WriterNotOpenException("Writer must be open before it can be written to");
+		}
 
 		currentRecordCount += items.size();
 
