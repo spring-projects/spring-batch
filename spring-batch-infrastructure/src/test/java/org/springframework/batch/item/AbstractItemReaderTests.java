@@ -71,8 +71,9 @@ public abstract class AbstractItemReaderTests {
 	@Test
 	public void testEmptyInput() throws Exception {
 		pointToEmptyInput(tested);
-		tested.read();
-		assertNull(tested.read());
+
+		final Foo nullFoo = tested.read();
+		assertNull(nullFoo);
 	}
 
 	/**
