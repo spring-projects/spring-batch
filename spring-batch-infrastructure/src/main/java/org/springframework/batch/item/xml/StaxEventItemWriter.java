@@ -80,13 +80,13 @@ ResourceAwareItemWriterItemStream<T>, InitializingBean {
 	private static final Log log = LogFactory.getLog(StaxEventItemWriter.class);
 
 	// default encoding
-	private static final String DEFAULT_ENCODING = "UTF-8";
+	public static final String DEFAULT_ENCODING = "UTF-8";
 
 	// default encoding
-	private static final String DEFAULT_XML_VERSION = "1.0";
+	public static final String DEFAULT_XML_VERSION = "1.0";
 
 	// default root tag name
-	private static final String DEFAULT_ROOT_TAG_NAME = "root";
+	public static final String DEFAULT_ROOT_TAG_NAME = "root";
 
 	// restart data property name
 	private static final String RESTART_DATA_NAME = "position";
