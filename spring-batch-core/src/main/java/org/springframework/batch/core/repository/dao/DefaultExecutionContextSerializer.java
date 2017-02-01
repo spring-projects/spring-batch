@@ -1,5 +1,5 @@
 /*
- * Copyright 2012-2013 the original author or authors.
+ * Copyright 2012-2016 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -56,7 +56,13 @@ public class DefaultExecutionContextSerializer implements ExecutionContextSerial
 		Assert.notNull(out);
 
 		for(Object value : context.values()) {
-			Assert.isInstanceOf(Serializable.class, value, "Value: [ " + value + "must be serializable.");
+			Assert.notNull(value);
+			if (!(value instanceof Serializable)) {
+				throw new IllegalArgumentException(
+						"Value: [ " + value + "must be serializable."
+						+ "Object of class [" + value.getClass().getName()
+						+ "] must be an instance of " + Serializable.class);
+			}
 		}
 		serializer.serialize(context, out);
 	}
