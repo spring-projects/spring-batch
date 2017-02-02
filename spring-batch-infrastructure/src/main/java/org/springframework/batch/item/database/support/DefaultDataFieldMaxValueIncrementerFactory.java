@@ -16,6 +16,7 @@
 package org.springframework.batch.item.database.support;
 
 import static org.springframework.batch.support.DatabaseType.DB2;
+import static org.springframework.batch.support.DatabaseType.DB2AS400;
 import static org.springframework.batch.support.DatabaseType.DB2ZOS;
 import static org.springframework.batch.support.DatabaseType.DERBY;
 import static org.springframework.batch.support.DatabaseType.H2;
@@ -62,9 +63,9 @@ public class DefaultDataFieldMaxValueIncrementerFactory implements DataFieldMaxV
 	private String incrementerColumnName = "ID";
 
 	/**
-	 * Public setter for the column name (defaults to "ID") in the incrementer.
-	 * Only used by some platforms (Derby, HSQL, MySQL, SQL Server and Sybase),
-	 * and should be fine for use with Spring Batch meta data as long as the
+-	 * Public setter for the column name (defaults to "ID") in the incrementer.
+-	 * Only used by some platforms (Derby, HSQL, MySQL, SQL Server and Sybase),
+-	 * and should be fine for use with Spring Batch meta data as long as the
 	 * default batch schema hasn't been changed.
 	 * 
 	 * @param incrementerColumnName the primary key column name to set
@@ -77,11 +78,11 @@ public class DefaultDataFieldMaxValueIncrementerFactory implements DataFieldMaxV
 		this.dataSource = dataSource;
 	}
 
-    @Override
+	@Override
 	public DataFieldMaxValueIncrementer getIncrementer(String incrementerType, String incrementerName) {
 		DatabaseType databaseType = DatabaseType.valueOf(incrementerType.toUpperCase());
 
-		if (databaseType == DB2) {
+		if (databaseType == DB2 || databaseType == DB2AS400) {
 			return new DB2SequenceMaxValueIncrementer(dataSource, incrementerName);
 		}
 		else if (databaseType == DB2ZOS) {
@@ -122,9 +123,8 @@ public class DefaultDataFieldMaxValueIncrementerFactory implements DataFieldMaxV
 			return new SybaseMaxValueIncrementer(dataSource, incrementerName, incrementerColumnName);
 		}
 		throw new IllegalArgumentException("databaseType argument was not on the approved list");
-
 	}
-
+	
     @Override
 	public boolean isSupportedIncrementerType(String incrementerType) {
 		for (DatabaseType type : DatabaseType.values()) {
