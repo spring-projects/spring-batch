@@ -103,7 +103,25 @@ public abstract class AbstractSqlPagingQueryProviderTests {
 		String s = pagingQueryProvider.generateJumpToItemQuery(45, pageSize);
 		assertEquals(getJumpToItemQueryForFirstPageWithMultipleSortKeys(), s);
 	}
-	
+
+	@Test
+	public void testGetSortKeyResultNameWithoutMap() {
+		assertEquals("id", pagingQueryProvider.getSortKeyResultName("id"));
+		assertEquals("column", pagingQueryProvider.getSortKeyResultName("table.column"));
+		assertEquals("column", pagingQueryProvider.getSortKeyResultName("schema.table.column"));
+	}
+
+	@Test
+	public void testGetSortKeyResultNameWithMap() {
+		Map<String, String> sortKeyResultNames = new LinkedHashMap<>();
+		sortKeyResultNames.put("foo.id", "foo_id");
+		pagingQueryProvider.setSortKeyResultNames(sortKeyResultNames);
+
+		assertEquals("foo_id", pagingQueryProvider.getSortKeyResultName("foo.id"));
+		assertEquals("column", pagingQueryProvider.getSortKeyResultName("column"));
+		assertEquals("id", pagingQueryProvider.getSortKeyResultName("bar.id"));
+	}
+
 	@Test
 	public abstract void testGenerateFirstPageQuery();
 
