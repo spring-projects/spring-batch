@@ -49,35 +49,40 @@ public class CompositeChunkListener implements ChunkListener {
 	}
 
 	/**
-	 * Call the registered listeners in order, respecting and prioritizing those
-	 * that implement {@link Ordered}.
+	 * Call the registered listeners in reverse order.
 	 *
 	 * @see org.springframework.batch.core.ChunkListener#afterChunk(ChunkContext context)
 	 */
 	@Override
 	public void afterChunk(ChunkContext context) {
-		for (Iterator<ChunkListener> iterator = listeners.iterator(); iterator.hasNext();) {
+		for (Iterator<ChunkListener> iterator = listeners.reverse(); iterator.hasNext();) {
 			ChunkListener listener = iterator.next();
 			listener.afterChunk(context);
 		}
 	}
 
 	/**
-	 * Call the registered listeners in reverse order.
+	 * Call the registered listeners in order, respecting and prioritizing those
+	 * that implement {@link Ordered}.
 	 *
 	 * @see org.springframework.batch.core.ChunkListener#beforeChunk(ChunkContext context)
 	 */
 	@Override
 	public void beforeChunk(ChunkContext context) {
-		for (Iterator<ChunkListener> iterator = listeners.reverse(); iterator.hasNext();) {
+		for (Iterator<ChunkListener> iterator = listeners.iterator(); iterator.hasNext();) {
 			ChunkListener listener = iterator.next();
 			listener.beforeChunk(context);
 		}
 	}
 
+	/**
+	 * Call the registered listeners in reverse order.
+	 *
+	 * @see org.springframework.batch.core.ChunkListener#afterChunkError(ChunkContext context)
+	 */
 	@Override
 	public void afterChunkError(ChunkContext context) {
-		for (Iterator<ChunkListener> iterator = listeners.iterator(); iterator.hasNext();) {
+		for (Iterator<ChunkListener> iterator = listeners.reverse(); iterator.hasNext();) {
 			ChunkListener listener = iterator.next();
 			listener.afterChunkError(context);
 		}
