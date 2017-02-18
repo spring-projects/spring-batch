@@ -174,6 +174,21 @@ public class SqlPagingQueryUtilsTests {
 		qp.setWhereClause("BAZ IS NOT NULL");
 		assertTrue("Wrong query: " + query, query.contains("ID DESC"));
 	}
+	
+	@Test
+    public void testGenerateLimitSqlQueryWithSortAlias() {
+	    sortKeys.put("FOO.ANOTHERID", Order.ASCENDING);
+	    AbstractSqlPagingQueryProvider qp = new TestSqlPagingQueryProvider("FOO", "BAR", sortKeys);
+        assertEquals("SELECT FOO FROM BAR ORDER BY ID ASC, ANOTHERID ASC LIMIT 100", SqlPagingQueryUtils.generateLimitSqlQuery(qp,
+                false, "LIMIT 100"));
+        assertEquals("SELECT FOO FROM BAR WHERE ((ID > ?) OR (ID = ? AND FOO.ANOTHERID > ?)) ORDER BY ID ASC, ANOTHERID ASC LIMIT 100", SqlPagingQueryUtils
+                .generateLimitSqlQuery(qp, true, "LIMIT 100"));
+        qp.setWhereClause("BAZ IS NOT NULL");
+        assertEquals("SELECT FOO FROM BAR WHERE BAZ IS NOT NULL ORDER BY ID ASC, ANOTHERID ASC LIMIT 100", SqlPagingQueryUtils
+                .generateLimitSqlQuery(qp, false, "LIMIT 100"));
+        assertEquals("SELECT FOO FROM BAR WHERE (BAZ IS NOT NULL) AND ((ID > ?) OR (ID = ? AND FOO.ANOTHERID > ?)) ORDER BY ID ASC, ANOTHERID ASC LIMIT 100",
+                SqlPagingQueryUtils.generateLimitSqlQuery(qp, true, "LIMIT 100"));
+    }
 
 	private static class TestSqlPagingQueryProvider extends AbstractSqlPagingQueryProvider {
 
