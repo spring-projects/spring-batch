@@ -246,7 +246,7 @@ public class SqlPagingQueryUtils {
 	 * @return a String that can be appended to an ORDER BY clause.
 	 */
 	public static String buildSortClause(AbstractSqlPagingQueryProvider provider) {
-		return buildSortClause(provider.getSortKeys());
+		return buildSortClause(provider.getSortKeysWithoutAliases());
 	}
 	
 	/**
