@@ -101,7 +101,7 @@ public class MySqlPagingQueryProviderTests extends AbstractSqlPagingQueryProvide
 	@Test
 	public void testFirstPageSqlWithAliases() {
 		this.pagingQueryProvider = new MySqlPagingQueryProvider();
-		this.pagingQueryProvider.setSelectClause("SELECT owner.id as ownerid, first_name, last_name, dog_name ");
+		this.pagingQueryProvider.setSelectClause("SELECT owner.id as id, first_name, last_name, dog_name ");
 		this.pagingQueryProvider.setFromClause("FROM dog_owner owner INNER JOIN dog ON owner.id = dog.id ");
 		this.pagingQueryProvider.setSortKeys(new HashMap<String, Order>() {{
 			put("owner.id", Order.ASCENDING);
@@ -111,9 +111,9 @@ public class MySqlPagingQueryProviderTests extends AbstractSqlPagingQueryProvide
 		String jumpToItemQuery = this.pagingQueryProvider.generateJumpToItemQuery(7, 5);
 		String remainingPagesQuery = this.pagingQueryProvider.generateRemainingPagesQuery(5);
 
-		assertEquals("SELECT owner.id as ownerid, first_name, last_name, dog_name FROM dog_owner owner INNER JOIN dog ON owner.id = dog.id ORDER BY owner.id ASC LIMIT 5", firstPage);
-		assertEquals("SELECT owner.id FROM dog_owner owner INNER JOIN dog ON owner.id = dog.id ORDER BY owner.id ASC LIMIT 4, 1", jumpToItemQuery);
-		assertEquals("SELECT owner.id as ownerid, first_name, last_name, dog_name FROM dog_owner owner INNER JOIN dog ON owner.id = dog.id WHERE ((owner.id > ?)) ORDER BY owner.id ASC LIMIT 5", remainingPagesQuery);
+		assertEquals("SELECT owner.id as id, first_name, last_name, dog_name FROM dog_owner owner INNER JOIN dog ON owner.id = dog.id ORDER BY id ASC LIMIT 5", firstPage);
+		assertEquals("SELECT owner.id FROM dog_owner owner INNER JOIN dog ON owner.id = dog.id ORDER BY id ASC LIMIT 4, 1", jumpToItemQuery);
+		assertEquals("SELECT owner.id as id, first_name, last_name, dog_name FROM dog_owner owner INNER JOIN dog ON owner.id = dog.id WHERE ((owner.id > ?)) ORDER BY id ASC LIMIT 5", remainingPagesQuery);
 	}
 
 	@Override
