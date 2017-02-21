@@ -93,7 +93,9 @@ public class JobExplorerFactoryBeanTests {
 		factory.afterPropertiesSet();
 		JobExplorer explorer = factory.getObject();
 		assertNotNull(explorer);
-
+		
+		explorer = factory.getJobExplorer();
+		assertNotNull(explorer);
 	}
 
 }

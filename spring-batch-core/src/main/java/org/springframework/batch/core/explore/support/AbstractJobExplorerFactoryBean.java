@@ -65,5 +65,15 @@ public abstract class AbstractJobExplorerFactoryBean implements FactoryBean<JobE
 	public boolean isSingleton() {
 		return true;
 	}
+	
+	/**
+	 * Convenience method for clients to grab the {@link JobExplorer} without
+	 * a cast.
+	 * @return the {@link JobExplorer} from {@link #getObject()}
+	 * @throws Exception if the repository could not be created
+	 */
+	public JobExplorer getJobExplorer() throws Exception {
+		return (JobExplorer) getObject();
+	}	
 
 }
