@@ -219,12 +219,20 @@ public class TaskletStepExceptionTests {
 		taskletStep.setTransactionManager(new ResourcelessTransactionManager() {
 			@Override
 			protected void doCommit(DefaultTransactionStatus status) throws TransactionException {
-				throw new RuntimeException("bar");
+				if ("chunk".equals(TransactionSynchronizationManager.getCurrentTransactionName())) {
+					throw new RuntimeException("bar");
+				} else {
+					super.doCommit(status);
+				}
 			}
 
 			@Override
 			protected void doRollback(DefaultTransactionStatus status) throws TransactionException {
-				throw new RuntimeException("foo");
+				if ("chunk".equals(TransactionSynchronizationManager.getCurrentTransactionName())) {
+					throw new RuntimeException("foo");
+				} else {
+					super.doRollback(status);
+				}
 			}
 		});
 
@@ -258,8 +266,12 @@ public class TaskletStepExceptionTests {
 		taskletStep.setTransactionManager(new ResourcelessTransactionManager() {
 			@Override
 			protected void doCommit(DefaultTransactionStatus status) throws TransactionException {
-				super.doRollback(status);
-				throw new UnexpectedRollbackException("bar");
+				if ("chunk".equals(TransactionSynchronizationManager.getCurrentTransactionName())) {
+					super.doRollback(status);
+					throw new UnexpectedRollbackException("bar");
+				} else {
+					super.doCommit(status);
+				}
 			}
 		});
 

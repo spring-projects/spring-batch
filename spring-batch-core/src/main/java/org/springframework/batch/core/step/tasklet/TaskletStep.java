@@ -41,9 +41,11 @@ import org.springframework.batch.repeat.RepeatOperations;
 import org.springframework.batch.repeat.RepeatStatus;
 import org.springframework.batch.repeat.support.RepeatTemplate;
 import org.springframework.transaction.PlatformTransactionManager;
+import org.springframework.transaction.TransactionDefinition;
 import org.springframework.transaction.TransactionStatus;
 import org.springframework.transaction.interceptor.DefaultTransactionAttribute;
 import org.springframework.transaction.interceptor.TransactionAttribute;
+import org.springframework.transaction.support.DefaultTransactionDefinition;
 import org.springframework.transaction.support.TransactionCallback;
 import org.springframework.transaction.support.TransactionSynchronization;
 import org.springframework.transaction.support.TransactionSynchronizationAdapter;
@@ -268,8 +270,9 @@ public class TaskletStep extends AbstractStep {
 
 				RepeatStatus result;
 				try {
-					result = new TransactionTemplate(transactionManager, transactionAttribute)
-					.execute(new ChunkTransactionCallback(chunkContext, semaphore));
+					TransactionTemplate chunkTransactionTemplate = new TransactionTemplate(transactionManager, transactionAttribute);
+					chunkTransactionTemplate.setName("chunk");
+					result = chunkTransactionTemplate.execute(new ChunkTransactionCallback(chunkContext, semaphore));
 				}
 				catch (UncheckedTransactionException e) {
 					// Allow checked exceptions to be thrown inside callback
@@ -302,12 +305,28 @@ public class TaskletStep extends AbstractStep {
 
 	@Override
 	protected void close(ExecutionContext ctx) throws Exception {
-		stream.close();
+		TransactionTemplate closeTransactionTemplate = new TransactionTemplate(transactionManager);
+		closeTransactionTemplate.setName("close");
+		closeTransactionTemplate.execute(new TransactionCallback<Void>() {
+			@Override
+			public Void doInTransaction(TransactionStatus status) {
+				stream.close();
+				return null;
+			}
+		});
 	}
 
 	@Override
-	protected void open(ExecutionContext ctx) throws Exception {
-		stream.open(ctx);
+	protected void open(final ExecutionContext ctx) throws Exception {
+		TransactionTemplate openTransactionTemplate = new TransactionTemplate(transactionManager);
+		openTransactionTemplate.setName("open");
+		openTransactionTemplate.execute(new TransactionCallback<Void>() {
+			@Override
+			public Void doInTransaction(TransactionStatus status) {
+				stream.open(ctx);
+				return null;
+			}
+		});
 	}
 
 	/**

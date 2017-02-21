@@ -180,10 +180,8 @@ public class TransactionAwareBufferedWriter extends Writer {
 	 */
 	@Override
 	public void close() throws IOException {
-		if (transactionActive()) {
-			if (getCurrentBuffer().length() > 0) {
-				TransactionSynchronizationManager.bindResource(closeKey, Boolean.TRUE);
-			}
+		if (transactionActive() && getCurrentBuffer().length() > 0) {
+			TransactionSynchronizationManager.bindResource(closeKey, Boolean.TRUE);
 			return;
 		}
 		closeCallback.run();
