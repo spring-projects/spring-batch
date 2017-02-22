@@ -26,6 +26,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 import org.springframework.batch.item.file.FlatFileItemReader;
 import org.springframework.batch.item.file.LineCallbackHandler;
 import org.springframework.batch.item.file.LineMapper;
@@ -53,6 +56,8 @@ import org.springframework.util.StringUtils;
  * @see FlatFileItemReader
  */
 public class FlatFileItemReaderBuilder<T> {
+
+	protected Log logger = LogFactory.getLog(getClass());
 
 	private String name;
 
@@ -382,7 +387,12 @@ public class FlatFileItemReaderBuilder<T> {
 			Assert.state(StringUtils.hasText(this.name),
 					"A name is required when saveSate is set to true.");
 		}
-		Assert.notNull(this.resource, "A resource is required.");
+
+		if(this.resource == null) {
+			logger.debug("The resource is null.  This is only a valid scenario when " +
+					"injecting it later as in when using the MultiResourceItemReader");
+		}
+
 		Assert.notNull(this.recordSeparatorPolicy, "A RecordSeparatorPolicy is required.");
 		int validatorValue = this.tokenizerValidator.intValue();
 		Assert.state(validatorValue == 1 || validatorValue == 2 || validatorValue == 4,
