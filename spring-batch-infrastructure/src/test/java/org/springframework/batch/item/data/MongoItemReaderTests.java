@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2014 the original author or authors.
+ * Copyright 2013-2017 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -33,7 +33,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.fail;
-import static org.mockito.Matchers.eq;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
 
 public class MongoItemReaderTests {
@@ -46,9 +46,9 @@ public class MongoItemReaderTests {
 	@Before
 	public void setUp() throws Exception {
 		MockitoAnnotations.initMocks(this);
-		reader = new MongoItemReader<String>();
+		reader = new MongoItemReader<>();
 
-		sortOptions = new HashMap<String, Sort.Direction>();
+		sortOptions = new HashMap<>();
 		sortOptions.put("name", Sort.Direction.DESC);
 
 		reader.setTemplate(template);
@@ -61,7 +61,7 @@ public class MongoItemReaderTests {
 
 	@Test
 	public void testAfterPropertiesSet() throws Exception{
-		reader = new MongoItemReader<String>();
+		reader = new MongoItemReader<>();
 
 		try {
 			reader.afterPropertiesSet();
@@ -114,7 +114,7 @@ public class MongoItemReaderTests {
 	public void testBasicQueryFirstPage() {
 		ArgumentCaptor<Query> queryContainer = ArgumentCaptor.forClass(Query.class);
 
-		when(template.find(queryContainer.capture(), eq(String.class))).thenReturn(new ArrayList<String>());
+		when(template.find(queryContainer.capture(), eq(String.class))).thenReturn(new ArrayList<>());
 
 		assertFalse(reader.doPageRead().hasNext());
 
@@ -130,7 +130,7 @@ public class MongoItemReaderTests {
 		reader.page = 2;
 		ArgumentCaptor<Query> queryContainer = ArgumentCaptor.forClass(Query.class);
 
-		when(template.find(queryContainer.capture(), eq(String.class))).thenReturn(new ArrayList<String>());
+		when(template.find(queryContainer.capture(), eq(String.class))).thenReturn(new ArrayList<>());
 
 		assertFalse(reader.doPageRead().hasNext());
 
@@ -148,7 +148,7 @@ public class MongoItemReaderTests {
 		reader.setFields("{name : 1, age : 1, _id: 0}");
 		ArgumentCaptor<Query> queryContainer = ArgumentCaptor.forClass(Query.class);
 
-		when(template.find(queryContainer.capture(), eq(String.class))).thenReturn(new ArrayList<String>());
+		when(template.find(queryContainer.capture(), eq(String.class))).thenReturn(new ArrayList<>());
 
 		assertFalse(reader.doPageRead().hasNext());
 
@@ -167,7 +167,7 @@ public class MongoItemReaderTests {
 		reader.setHint("{ $natural : 1}");
 		ArgumentCaptor<Query> queryContainer = ArgumentCaptor.forClass(Query.class);
 
-		when(template.find(queryContainer.capture(), eq(String.class))).thenReturn(new ArrayList<String>());
+		when(template.find(queryContainer.capture(), eq(String.class))).thenReturn(new ArrayList<>());
 
 		assertFalse(reader.doPageRead().hasNext());
 
@@ -189,7 +189,7 @@ public class MongoItemReaderTests {
 		reader.setQuery("{ name : ?0 }");
 		ArgumentCaptor<Query> queryContainer = ArgumentCaptor.forClass(Query.class);
 
-		when(template.find(queryContainer.capture(), eq(String.class))).thenReturn(new ArrayList<String>());
+		when(template.find(queryContainer.capture(), eq(String.class))).thenReturn(new ArrayList<>());
 
 		assertFalse(reader.doPageRead().hasNext());
 
@@ -212,7 +212,7 @@ public class MongoItemReaderTests {
 		ArgumentCaptor<Query> queryContainer = ArgumentCaptor.forClass(Query.class);
 		ArgumentCaptor<String> collectionContainer = ArgumentCaptor.forClass(String.class);
 
-		when(template.find(queryContainer.capture(), eq(String.class), collectionContainer.capture())).thenReturn(new ArrayList<String>());
+		when(template.find(queryContainer.capture(), eq(String.class), collectionContainer.capture())).thenReturn(new ArrayList<>());
 
 		assertFalse(reader.doPageRead().hasNext());
 

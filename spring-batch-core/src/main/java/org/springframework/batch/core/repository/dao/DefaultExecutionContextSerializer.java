@@ -1,5 +1,5 @@
 /*
- * Copyright 2012-2013 the original author or authors.
+ * Copyright 2012-2017 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,18 +15,18 @@
  */
 package org.springframework.batch.core.repository.dao;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.io.Serializable;
+import java.util.Map;
+
 import org.springframework.batch.core.repository.ExecutionContextSerializer;
 import org.springframework.core.serializer.DefaultDeserializer;
 import org.springframework.core.serializer.DefaultSerializer;
 import org.springframework.core.serializer.Deserializer;
 import org.springframework.core.serializer.Serializer;
 import org.springframework.util.Assert;
-
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.io.Serializable;
-import java.util.Map;
 
 /**
  * An implementation of the {@link ExecutionContextSerializer} using the default
@@ -56,7 +56,13 @@ public class DefaultExecutionContextSerializer implements ExecutionContextSerial
 		Assert.notNull(out);
 
 		for(Object value : context.values()) {
-			Assert.isInstanceOf(Serializable.class, value, "Value: [ " + value + "must be serializable.");
+			Assert.notNull(value);
+			if (!(value instanceof Serializable)) {
+				throw new IllegalArgumentException(
+						"Value: [ " + value + "must be serializable."
+						+ "Object of class [" + value.getClass().getName()
+						+ "] must be an instance of " + Serializable.class);
+			}
 		}
 		serializer.serialize(context, out);
 	}

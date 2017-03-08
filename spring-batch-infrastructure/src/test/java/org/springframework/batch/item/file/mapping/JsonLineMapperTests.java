@@ -15,12 +15,12 @@
  */
 package org.springframework.batch.item.file.mapping;
 
-import static org.junit.Assert.assertEquals;
-
 import java.util.Map;
 
-import org.codehaus.jackson.JsonParseException;
+import com.fasterxml.jackson.core.JsonParseException;
 import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
 
 public class JsonLineMapperTests {
 	

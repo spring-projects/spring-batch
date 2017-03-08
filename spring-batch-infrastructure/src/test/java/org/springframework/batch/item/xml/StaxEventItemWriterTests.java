@@ -15,11 +15,23 @@
  */
 package org.springframework.batch.item.xml;
 
+import java.io.File;
+import java.io.IOException;
+import java.util.Collections;
+import java.util.List;
+import javax.xml.bind.annotation.XmlRootElement;
+import javax.xml.stream.XMLEventFactory;
+import javax.xml.stream.XMLEventWriter;
+import javax.xml.stream.XMLStreamException;
+import javax.xml.transform.Result;
+
 import org.apache.commons.io.FileUtils;
 import org.junit.Before;
 import org.junit.Test;
+
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.item.UnexpectedInputException;
+import org.springframework.batch.item.WriterNotOpenException;
 import org.springframework.batch.support.transaction.ResourcelessTransactionManager;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
@@ -33,16 +45,6 @@ import org.springframework.transaction.support.TransactionTemplate;
 import org.springframework.util.Assert;
 import org.springframework.util.ClassUtils;
 import org.springframework.util.StringUtils;
-
-import javax.xml.bind.annotation.XmlRootElement;
-import javax.xml.stream.XMLEventFactory;
-import javax.xml.stream.XMLEventWriter;
-import javax.xml.stream.XMLStreamException;
-import javax.xml.transform.Result;
-import java.io.File;
-import java.io.IOException;
-import java.util.Collections;
-import java.util.List;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -127,6 +129,13 @@ public class StaxEventItemWriterTests {
 		writer.close();
 		assertTrue("execution context keys should be prefixed with writer name", executionContext.containsKey("test.position"));
 	}	
+
+	@Test(expected = WriterNotOpenException.class)
+	public void testAssertWriterIsInitialized() throws Exception {
+		StaxEventItemWriter writer = new StaxEventItemWriter();
+
+		writer.write(Collections.singletonList("foo"));
+	}
 
 	/**
 	 * Item is written to the output file only after flush.

@@ -15,21 +15,8 @@
  */
 package org.springframework.batch.item.database.support;
 
-import static org.springframework.batch.support.DatabaseType.DB2;
-import static org.springframework.batch.support.DatabaseType.DB2ZOS;
-import static org.springframework.batch.support.DatabaseType.DERBY;
-import static org.springframework.batch.support.DatabaseType.H2;
-import static org.springframework.batch.support.DatabaseType.HSQL;
-import static org.springframework.batch.support.DatabaseType.MYSQL;
-import static org.springframework.batch.support.DatabaseType.ORACLE;
-import static org.springframework.batch.support.DatabaseType.POSTGRES;
-import static org.springframework.batch.support.DatabaseType.SQLITE;
-import static org.springframework.batch.support.DatabaseType.SQLSERVER;
-import static org.springframework.batch.support.DatabaseType.SYBASE;
-
 import java.util.ArrayList;
 import java.util.List;
-
 import javax.sql.DataSource;
 
 import org.springframework.batch.support.DatabaseType;
@@ -45,11 +32,27 @@ import org.springframework.jdbc.support.incrementer.PostgreSQLSequenceMaxValueIn
 import org.springframework.jdbc.support.incrementer.SqlServerMaxValueIncrementer;
 import org.springframework.jdbc.support.incrementer.SybaseMaxValueIncrementer;
 
+import static org.springframework.batch.support.DatabaseType.DB2;
+import static org.springframework.batch.support.DatabaseType.DB2ZOS;
+import static org.springframework.batch.support.DatabaseType.DERBY;
+import static org.springframework.batch.support.DatabaseType.H2;
+import static org.springframework.batch.support.DatabaseType.HSQL;
+import static org.springframework.batch.support.DatabaseType.MYSQL;
+import static org.springframework.batch.support.DatabaseType.ORACLE;
+import static org.springframework.batch.support.DatabaseType.POSTGRES;
+import static org.springframework.batch.support.DatabaseType.SQLITE;
+import static org.springframework.batch.support.DatabaseType.SQLSERVER;
+import static org.springframework.batch.support.DatabaseType.SYBASE;
+
 /**
  * Default implementation of the {@link DataFieldMaxValueIncrementerFactory}
  * interface. Valid database types are given by the {@link DatabaseType} enum.
+ *
+ * Note: For MySql databases, the
+ * {@link MySQLMaxValueIncrementer#setUseNewConnection(boolean)} will be set to true.
  * 
  * @author Lucas Ward
+ * @author Michael Minella
  * @see DatabaseType
  */
 public class DefaultDataFieldMaxValueIncrementerFactory implements DataFieldMaxValueIncrementerFactory {
@@ -94,7 +97,9 @@ public class DefaultDataFieldMaxValueIncrementerFactory implements DataFieldMaxV
 			return new H2SequenceMaxValueIncrementer(dataSource, incrementerName);
 		}
 		else if (databaseType == MYSQL) {
-			return new MySQLMaxValueIncrementer(dataSource, incrementerName, incrementerColumnName);
+			MySQLMaxValueIncrementer mySQLMaxValueIncrementer = new MySQLMaxValueIncrementer(dataSource, incrementerName, incrementerColumnName);
+			mySQLMaxValueIncrementer.setUseNewConnection(true);
+			return mySQLMaxValueIncrementer;
 		}
 		else if (databaseType == ORACLE) {
 			return new OracleSequenceMaxValueIncrementer(dataSource, incrementerName);

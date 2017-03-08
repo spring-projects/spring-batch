@@ -15,16 +15,6 @@
  */
 package org.springframework.batch.support.transaction;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.fail;
-import static org.mockito.Matchers.anyObject;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
-import static org.mockito.Mockito.any;
-
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.channels.FileChannel;
@@ -32,12 +22,19 @@ import java.nio.channels.FileChannel;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
-import org.mockito.invocation.InvocationOnMock;
-import org.mockito.stubbing.Answer;
+
 import org.springframework.transaction.PlatformTransactionManager;
-import org.springframework.transaction.TransactionStatus;
 import org.springframework.transaction.support.TransactionCallback;
 import org.springframework.transaction.support.TransactionTemplate;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
+import static org.mockito.Mockito.any;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 /**
  * @author Dave Syer
@@ -55,16 +52,13 @@ public class TransactionAwareBufferedWriterTests {
 	public void init() {
 		fileChannel = mock(FileChannel.class);
 
-		writer = new TransactionAwareBufferedWriter(fileChannel, new Runnable() {
-			@Override
-			public void run() {
-				try {
-					ByteBuffer bb = ByteBuffer.wrap("c".getBytes());
-					fileChannel.write(bb);
-				}
-				catch (IOException e) {
-					throw new IllegalStateException(e);
-				}
+		writer = new TransactionAwareBufferedWriter(fileChannel, () -> {
+			try {
+				ByteBuffer bb = ByteBuffer.wrap("c".getBytes());
+				fileChannel.write(bb);
+			}
+			catch (IOException e) {
+				throw new IllegalStateException(e);
 			}
 		});
 
@@ -77,7 +71,6 @@ public class TransactionAwareBufferedWriterTests {
 	 * Test method for
 	 * {@link org.springframework.batch.support.transaction.TransactionAwareBufferedWriter#write(java.lang.String)}
 	 * .
-	 * @throws Exception
 	 */
 	@Test
 	public void testWriteOutsideTransaction() throws Exception {
@@ -126,12 +119,7 @@ public class TransactionAwareBufferedWriterTests {
 	public void testCloseOutsideTransaction() throws Exception {
 		ArgumentCaptor<ByteBuffer> byteBufferCaptor = ArgumentCaptor.forClass(ByteBuffer.class);
 
-		when(fileChannel.write(byteBufferCaptor.capture())).thenAnswer(new Answer<Integer>() {
-			@Override
-			public Integer answer(InvocationOnMock invocation) throws Throwable {
-				return ((ByteBuffer) invocation.getArguments()[0]).remaining();
-			}
-		});
+		when(fileChannel.write(byteBufferCaptor.capture())).thenAnswer(invocation -> ((ByteBuffer) invocation.getArguments()[0]).remaining());
 
 		writer.write("foo");
 		writer.close();
@@ -142,21 +130,18 @@ public class TransactionAwareBufferedWriterTests {
 
 	@Test
 	public void testFlushInTransaction() throws Exception {
-		when(fileChannel.write((ByteBuffer)anyObject())).thenReturn(3);
+		when(fileChannel.write(any(ByteBuffer.class))).thenReturn(3);
 
-		new TransactionTemplate(transactionManager).execute(new TransactionCallback<Void>() {
-			@Override
-			public Void doInTransaction(TransactionStatus status) {
-				try {
-					writer.write("foo");
-					writer.flush();
-				}
-				catch (IOException e) {
-					throw new IllegalStateException("Unexpected IOException", e);
-				}
-				assertEquals(3, writer.getBufferSize());
-				return null;
+		new TransactionTemplate(transactionManager).execute((TransactionCallback<Void>) status -> {
+			try {
+				writer.write("foo");
+				writer.flush();
 			}
+			catch (IOException e) {
+				throw new IllegalStateException("Unexpected IOException", e);
+			}
+			assertEquals(3, writer.getBufferSize());
+			return null;
 		});
 
 		verify(fileChannel, never()).force(false);
@@ -165,21 +150,18 @@ public class TransactionAwareBufferedWriterTests {
 	@Test
 	public void testFlushInTransactionForceSync() throws Exception {
 		writer.setForceSync(true);
-		when(fileChannel.write((ByteBuffer)anyObject())).thenReturn(3);
+		when(fileChannel.write(any(ByteBuffer.class))).thenReturn(3);
 
-		new TransactionTemplate(transactionManager).execute(new TransactionCallback<Void>() {
-			@Override
-			public Void doInTransaction(TransactionStatus status) {
-				try {
-					writer.write("foo");
-					writer.flush();
-				}
-				catch (IOException e) {
-					throw new IllegalStateException("Unexpected IOException", e);
-				}
-				assertEquals(3, writer.getBufferSize());
-				return null;
+		new TransactionTemplate(transactionManager).execute((TransactionCallback<Void>) status -> {
+			try {
+				writer.write("foo");
+				writer.flush();
 			}
+			catch (IOException e) {
+				throw new IllegalStateException("Unexpected IOException", e);
+			}
+			assertEquals(3, writer.getBufferSize());
+			return null;
 		});
 
 		verify(fileChannel, times(1)).force(false);
@@ -190,18 +172,15 @@ public class TransactionAwareBufferedWriterTests {
 		ArgumentCaptor<ByteBuffer> bb = ArgumentCaptor.forClass(ByteBuffer.class);
 		when(fileChannel.write(bb.capture())).thenReturn(3);
 
-		new TransactionTemplate(transactionManager).execute(new TransactionCallback<Void>() {
-			@Override
-			public Void doInTransaction(TransactionStatus status) {
-				try {
-					writer.write("foo");
-				}
-				catch (IOException e) {
-					throw new IllegalStateException("Unexpected IOException", e);
-				}
-				assertEquals(3, writer.getBufferSize());
-				return null;
+		new TransactionTemplate(transactionManager).execute((TransactionCallback<Void>) status -> {
+			try {
+				writer.write("foo");
 			}
+			catch (IOException e) {
+				throw new IllegalStateException("Unexpected IOException", e);
+			}
+			assertEquals(3, writer.getBufferSize());
+			return null;
 		});
 
 		assertEquals(0, writer.getBufferSize());
@@ -212,18 +191,15 @@ public class TransactionAwareBufferedWriterTests {
 		ArgumentCaptor<ByteBuffer> bb = ArgumentCaptor.forClass(ByteBuffer.class);
 		when(fileChannel.write(bb.capture())).thenReturn(3);
 
-		new TransactionTemplate(transactionManager).execute(new TransactionCallback<Void>() {
-			@Override
-			public Void doInTransaction(TransactionStatus status) {
-				try {
-					writer.write("foo");
-				}
-				catch (IOException e) {
-					throw new IllegalStateException("Unexpected IOException", e);
-				}
-				assertEquals(3, writer.getBufferSize());
-				return null;
+		new TransactionTemplate(transactionManager).execute((TransactionCallback<Void>) status -> {
+			try {
+				writer.write("foo");
 			}
+			catch (IOException e) {
+				throw new IllegalStateException("Unexpected IOException", e);
+			}
+			assertEquals(3, writer.getBufferSize());
+			return null;
 		});
 
 		assertEquals(0, writer.getBufferSize());
@@ -235,18 +211,15 @@ public class TransactionAwareBufferedWriterTests {
 		ArgumentCaptor<ByteBuffer> bb = ArgumentCaptor.forClass(ByteBuffer.class);
 		when(fileChannel.write(bb.capture())).thenReturn(5);
 
-		new TransactionTemplate(transactionManager).execute(new TransactionCallback<Void>() {
-			@Override
-			public Void doInTransaction(TransactionStatus status) {
-				try {
-					writer.write("fóó");
-				}
-				catch (IOException e) {
-					throw new IllegalStateException("Unexpected IOException", e);
-				}
-				assertEquals(5, writer.getBufferSize());
-				return null;
+		new TransactionTemplate(transactionManager).execute((TransactionCallback<Void>) status -> {
+			try {
+				writer.write("fóó");
 			}
+			catch (IOException e) {
+				throw new IllegalStateException("Unexpected IOException", e);
+			}
+			assertEquals(5, writer.getBufferSize());
+			return null;
 		});
 
 		assertEquals(0, writer.getBufferSize());
@@ -260,18 +233,15 @@ public class TransactionAwareBufferedWriterTests {
 		ArgumentCaptor<ByteBuffer> bb = ArgumentCaptor.forClass(ByteBuffer.class);
 		when(fileChannel.write(bb.capture())).thenReturn(6);
 
-		new TransactionTemplate(transactionManager).execute(new TransactionCallback<Void>() {
-			@Override
-			public Void doInTransaction(TransactionStatus status) {
-				try {
-					writer.write("fóó");
-				}
-				catch (IOException e) {
-					throw new IllegalStateException("Unexpected IOException", e);
-				}
-				assertEquals(6, writer.getBufferSize());
-				return null;
+		new TransactionTemplate(transactionManager).execute((TransactionCallback<Void>) status -> {
+			try {
+				writer.write("fóó");
 			}
+			catch (IOException e) {
+				throw new IllegalStateException("Unexpected IOException", e);
+			}
+			assertEquals(6, writer.getBufferSize());
+			return null;
 		});
 
 		assertEquals(0, writer.getBufferSize());
@@ -280,17 +250,14 @@ public class TransactionAwareBufferedWriterTests {
 	@Test
 	public void testWriteWithRollback() throws Exception {
 		try {
-			new TransactionTemplate(transactionManager).execute(new TransactionCallback<Void>() {
-				@Override
-				public Void doInTransaction(TransactionStatus status) {
-					try {
-						writer.write("foo");
-					}
-					catch (IOException e) {
-						throw new IllegalStateException("Unexpected IOException", e);
-					}
-					throw new RuntimeException("Planned failure");
+			new TransactionTemplate(transactionManager).execute((TransactionCallback<Void>) status -> {
+				try {
+					writer.write("foo");
 				}
+				catch (IOException e) {
+					throw new IllegalStateException("Unexpected IOException", e);
+				}
+				throw new RuntimeException("Planned failure");
 			});
 			fail("Exception was not thrown");
 		}
@@ -310,24 +277,18 @@ public class TransactionAwareBufferedWriterTests {
 
 	@Test
 	public void testExceptionOnFlush() throws Exception {
-		writer = new TransactionAwareBufferedWriter(fileChannel, new Runnable() {
-			@Override
-			public void run() {
-			}
+		writer = new TransactionAwareBufferedWriter(fileChannel, () -> {
 		});
 
 		try {
-			new TransactionTemplate(transactionManager).execute(new TransactionCallback<Void>() {
-				@Override
-				public Void doInTransaction(TransactionStatus status) {
-					try {
-						writer.write("foo");
-					}
-					catch (IOException e) {
-						throw new IllegalStateException("Unexpected IOException", e);
-					}
-					return null;
+			new TransactionTemplate(transactionManager).execute((TransactionCallback<Void>) status -> {
+				try {
+					writer.write("foo");
 				}
+				catch (IOException e) {
+					throw new IllegalStateException("Unexpected IOException", e);
+				}
+				return null;
 			});
 
 			fail("Exception was not thrown");
@@ -346,37 +307,30 @@ public class TransactionAwareBufferedWriterTests {
 			final int index = i;
 			@SuppressWarnings("resource")
 			FileChannel fileChannel = mock(FileChannel.class);
-			when(fileChannel.write(any(ByteBuffer.class))).thenAnswer(new Answer<Integer>() {
-				@Override
-				public Integer answer(InvocationOnMock invocation)
-						throws Throwable {
-					ByteBuffer buffer = (ByteBuffer) invocation.getArguments()[0];
-					String val = new String(buffer.array(), "UTF-8");
-					if(results[index] == null) {
-						results[index] = val;
-					} else {
-						results[index] += val;
-					}
-					return buffer.limit();
+			when(fileChannel.write(any(ByteBuffer.class))).thenAnswer(invocation -> {
+				ByteBuffer buffer = (ByteBuffer) invocation.getArguments()[0];
+				String val = new String(buffer.array(), "UTF-8");
+				if(results[index] == null) {
+					results[index] = val;
+				} else {
+					results[index] += val;
 				}
+				return buffer.limit();
 			});
 			writers[i] = new TransactionAwareBufferedWriter(fileChannel, null);
 		}
 		
-		new TransactionTemplate(transactionManager).execute(new TransactionCallback<Void>() {
-            @Override
-			public Void doInTransaction(TransactionStatus status) {
-				try {
-					for(int i=0; i< limit; i++) {
-						writers[i].write(String.valueOf(i));
-					}
+		new TransactionTemplate(transactionManager).execute((TransactionCallback<Void>) status -> {
+			try {
+				for(int i=0; i< limit; i++) {
+					writers[i].write(String.valueOf(i));
 				}
-				catch (IOException e) {
-					throw new IllegalStateException("Unexpected IOException", e);
-				}
-				return null;
 			}
-		});		
+			catch (IOException e) {
+				throw new IllegalStateException("Unexpected IOException", e);
+			}
+			return null;
+		});
 		
 		for(int i=0; i< limit; i++) {
 			assertEquals(String.valueOf(i), results[i]);
@@ -386,7 +340,6 @@ public class TransactionAwareBufferedWriterTests {
 	private String getStringFromByteBuffer(ByteBuffer bb) {
 		byte[] bytearr = new byte[bb.remaining()];
 		bb.get(bytearr);
-		String s = new String(bytearr);
-		return s;
+		return new String(bytearr);
 	}
 }
