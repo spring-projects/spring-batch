@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2013 the original author or authors.
+ * Copyright 2002-2017 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with
  * the License. You may obtain a copy of the License at
@@ -77,7 +77,7 @@ public class JobLaunchingGatewayParserTests {
 			setUp("JobLaunchingGatewayParserTestsNoJobLauncher-context.xml", getClass());
 		}
 		catch(BeanCreationException e) {
-			assertEquals("No bean named 'jobLauncher' is defined", e.getCause().getMessage());
+			assertTrue(e.getCause().getMessage().contains("No bean named 'jobLauncher'"));
 			return;
 		}
 		fail("Expected a NoSuchBeanDefinitionException to be thrown.");

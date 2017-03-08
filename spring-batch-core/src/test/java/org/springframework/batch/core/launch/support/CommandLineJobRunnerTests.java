@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2013 the original author or authors.
+ * Copyright 2006-2017 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -131,7 +131,7 @@ public class CommandLineJobRunnerTests {
 		assertEquals(1, StubSystemExiter.status);
 		String errorMessage = CommandLineJobRunner.getErrorMessage();
 		assertTrue("Wrong error message: " + errorMessage, errorMessage
-				.contains("No bean named 'no-such-job' is defined"));
+				.contains("No bean named 'no-such-job'"));
 	}
 
 	@Test

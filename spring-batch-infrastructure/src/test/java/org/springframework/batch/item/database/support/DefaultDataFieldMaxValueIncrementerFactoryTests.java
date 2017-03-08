@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2008 the original author or authors.
+ * Copyright 2006-2017 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,7 +21,11 @@ import junit.framework.TestCase;
 
 import static org.mockito.Mockito.mock;
 
+import java.lang.reflect.Field;
+
+import org.springframework.core.SpringVersion;
 import org.springframework.jdbc.support.incrementer.DB2SequenceMaxValueIncrementer;
+import org.springframework.jdbc.support.incrementer.DataFieldMaxValueIncrementer;
 import org.springframework.jdbc.support.incrementer.DerbyMaxValueIncrementer;
 import org.springframework.jdbc.support.incrementer.HsqlMaxValueIncrementer;
 import org.springframework.jdbc.support.incrementer.MySQLMaxValueIncrementer;
@@ -30,10 +34,12 @@ import org.springframework.jdbc.support.incrementer.PostgreSQLSequenceMaxValueIn
 import org.springframework.jdbc.support.incrementer.SqlServerMaxValueIncrementer;
 import org.springframework.jdbc.support.incrementer.SybaseMaxValueIncrementer;
 import org.springframework.jdbc.support.incrementer.DB2MainframeSequenceMaxValueIncrementer;
+import org.springframework.util.ReflectionUtils;
 
 /**
  * @author Lucas Ward
  * @author Will Schipp
+ * @author Thomas Risberg
  *
  */
 public class DefaultDataFieldMaxValueIncrementerFactoryTests extends TestCase {
@@ -98,6 +104,17 @@ public class DefaultDataFieldMaxValueIncrementerFactoryTests extends TestCase {
 
 	public void testMysql(){
 		assertTrue(factory.getIncrementer("mysql", "NAME") instanceof MySQLMaxValueIncrementer);
+		if (SpringVersion.getVersion().compareTo("4.3.6.RELEASE") >= 0) {
+			DataFieldMaxValueIncrementer incr = factory.getIncrementer("mysql", "NAME");
+			Field field = ReflectionUtils.findField(incr.getClass(), "useNewConnection", boolean.class);
+			Object value = null;
+			if (field != null) {
+				field.setAccessible(true);
+				value = ReflectionUtils.getField(field, incr);
+			}
+			assertNotNull(value);
+			assertEquals(true, value);
+		}
 	}
 
 	public void testOracle(){

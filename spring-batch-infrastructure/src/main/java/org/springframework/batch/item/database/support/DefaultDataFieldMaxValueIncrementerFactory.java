@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2008 the original author or authors.
+ * Copyright 2006-2017 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -27,6 +27,7 @@ import static org.springframework.batch.support.DatabaseType.SQLITE;
 import static org.springframework.batch.support.DatabaseType.SQLSERVER;
 import static org.springframework.batch.support.DatabaseType.SYBASE;
 
+import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -44,12 +45,14 @@ import org.springframework.jdbc.support.incrementer.OracleSequenceMaxValueIncrem
 import org.springframework.jdbc.support.incrementer.PostgreSQLSequenceMaxValueIncrementer;
 import org.springframework.jdbc.support.incrementer.SqlServerMaxValueIncrementer;
 import org.springframework.jdbc.support.incrementer.SybaseMaxValueIncrementer;
+import org.springframework.util.ReflectionUtils;
 
 /**
  * Default implementation of the {@link DataFieldMaxValueIncrementerFactory}
  * interface. Valid database types are given by the {@link DatabaseType} enum.
  * 
  * @author Lucas Ward
+ * @author Thomas Risberg
  * @see DatabaseType
  */
 public class DefaultDataFieldMaxValueIncrementerFactory implements DataFieldMaxValueIncrementerFactory {
@@ -94,7 +97,14 @@ public class DefaultDataFieldMaxValueIncrementerFactory implements DataFieldMaxV
 			return new H2SequenceMaxValueIncrementer(dataSource, incrementerName);
 		}
 		else if (databaseType == MYSQL) {
-			return new MySQLMaxValueIncrementer(dataSource, incrementerName, incrementerColumnName);
+			DataFieldMaxValueIncrementer incr = new MySQLMaxValueIncrementer(dataSource, incrementerName, incrementerColumnName);
+			// set MySQLMaxValueIncrementer#setUseNewConnection to true for Spring 4.3.6 and later
+			Method m = ReflectionUtils.findMethod(incr.getClass(), "setUseNewConnection", boolean.class);
+			if (m != null) {
+				ReflectionUtils.makeAccessible(m);
+				ReflectionUtils.invokeMethod(m, incr, true);
+			}
+			return incr;
 		}
 		else if (databaseType == ORACLE) {
 			return new OracleSequenceMaxValueIncrementer(dataSource, incrementerName);
