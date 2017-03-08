@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 the original author or authors.
+ * Copyright 2013-2017 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,24 +15,12 @@
  */
 package org.springframework.batch.core.jsr.launch;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
-
-import java.lang.reflect.Field;
-import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Properties;
 import java.util.Set;
-
 import javax.batch.api.AbstractBatchlet;
 import javax.batch.api.Batchlet;
 import javax.batch.operations.JobExecutionIsRunningException;
@@ -68,7 +56,6 @@ import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.step.JobRepositorySupport;
 import org.springframework.batch.support.transaction.ResourcelessTransactionManager;
 import org.springframework.beans.factory.BeanCreationException;
-import org.springframework.context.access.ContextSingletonBeanFactoryLocator;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -78,6 +65,14 @@ import org.springframework.core.task.AsyncTaskExecutor;
 import org.springframework.core.task.SyncTaskExecutor;
 import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.transaction.PlatformTransactionManager;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 public class JsrJobOperatorTests extends AbstractJsrTestCase {
 
@@ -91,7 +86,6 @@ public class JsrJobOperatorTests extends AbstractJsrTestCase {
 
 	@Before
 	public void setup() throws Exception {
-		resetBaseContext();
 
 		MockitoAnnotations.initMocks(this);
 		parameterConverter = new JobParametersConverterSupport();
@@ -137,6 +131,8 @@ public class JsrJobOperatorTests extends AbstractJsrTestCase {
 	public void testCustomBaseContextJsrCompliant() throws Exception {
 		System.setProperty("JSR-352-BASE-CONTEXT", "META-INF/alternativeJsrBaseContext.xml");
 
+		ReflectionTestUtils.setField(JsrJobOperator.BaseContextHolder.class, "instance", null);
+
 		JobOperator jobOperator = BatchRuntime.getJobOperator();
 
 		Object transactionManager = ReflectionTestUtils.getField(jobOperator, "transactionManager");
@@ -173,17 +169,6 @@ public class JsrJobOperatorTests extends AbstractJsrTestCase {
 		assertEquals(BatchStatus.STOPPED, jobOperator.getJobExecution(executionId).getBatchStatus());
 
 		System.getProperties().remove("JSR-352-BASE-CONTEXT");
-	}
-
-	private void resetBaseContext() throws NoSuchFieldException, IllegalAccessException {
-		Field instancesField = ContextSingletonBeanFactoryLocator.class.getDeclaredField("instances");
-		instancesField.setAccessible(true);
-
-		Field instancesModifiers = Field.class.getDeclaredField("modifiers");
-		instancesModifiers.setAccessible(true);
-		instancesModifiers.setInt(instancesField, instancesField.getModifiers() & ~Modifier.FINAL);
-
-		instancesField.set(null, new HashMap());
 	}
 
 	@Test

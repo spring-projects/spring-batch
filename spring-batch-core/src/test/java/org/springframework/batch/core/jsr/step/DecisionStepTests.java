@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2014 the original author or authors.
+ * Copyright 2013-2017 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,24 +15,23 @@
  */
 package org.springframework.batch.core.jsr.step;
 
-import org.junit.Before;
-import org.junit.Test;
-import org.springframework.batch.core.explore.JobExplorer;
-import org.springframework.batch.core.jsr.AbstractJsrTestCase;
-import org.springframework.beans.factory.access.BeanFactoryLocator;
-import org.springframework.beans.factory.access.BeanFactoryReference;
-import org.springframework.beans.factory.config.AutowireCapableBeanFactory;
-import org.springframework.context.ApplicationContext;
-import org.springframework.context.access.ContextSingletonBeanFactoryLocator;
-import org.springframework.util.Assert;
-
+import java.util.List;
+import java.util.Properties;
 import javax.batch.api.Decider;
 import javax.batch.runtime.BatchRuntime;
 import javax.batch.runtime.BatchStatus;
 import javax.batch.runtime.JobExecution;
 import javax.batch.runtime.StepExecution;
-import java.util.List;
-import java.util.Properties;
+
+import org.junit.Before;
+import org.junit.Test;
+
+import org.springframework.batch.core.explore.JobExplorer;
+import org.springframework.batch.core.jsr.AbstractJsrTestCase;
+import org.springframework.beans.factory.config.AutowireCapableBeanFactory;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.support.GenericXmlApplicationContext;
+import org.springframework.util.Assert;
 
 import static org.junit.Assert.assertEquals;
 
@@ -47,9 +46,7 @@ public class DecisionStepTests extends AbstractJsrTestCase {
 		StepExecutionCountingDecider.previousStepCount = 0;
 
 		if(jobExplorer == null) {
-			BeanFactoryLocator beanFactoryLocactor = ContextSingletonBeanFactoryLocator.getInstance();
-			BeanFactoryReference ref = beanFactoryLocactor.useBeanFactory("baseContext");
-			baseContext = (ApplicationContext) ref.getFactory();
+			baseContext = new GenericXmlApplicationContext("jsrBaseContext.xml");
 
 			baseContext.getAutowireCapableBeanFactory().autowireBeanProperties(this,
 					AutowireCapableBeanFactory.AUTOWIRE_BY_NAME, false);

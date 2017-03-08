@@ -48,7 +48,7 @@ allprojects {
 
 		environmentProperty = project.hasProperty('environment') ? getProperty('environment') : 'hsql'
 
-		springVersionDefault = '4.3.6.RELEASE'
+		springVersionDefault = '5.0.0.M5'
 		springVersion = project.hasProperty('springVersion') ? getProperty('springVersion') : springVersionDefault
 		springRetryVersion = '1.2.0.RELEASE'
 		springAmqpVersion = '1.5.6.RELEASE'
@@ -842,5 +842,5 @@ or specify the Gradle property `TCK_HOME`, e.g: ./gradlew runTck -PTCK_HOME=/pat
 
 task wrapper(type: Wrapper) {
 	description = 'Generates gradlew[.bat] scripts'
-	gradleVersion = '3.0'
+	gradleVersion = '3.4'
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2013 the original author or authors.
+ * Copyright 2002-2017 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -73,14 +73,14 @@ import org.springframework.util.MethodInvoker;
  * <p>
  * The connection returned will be a close-suppressing proxy instead of the
  * physical {@link Connection}. Be aware that you will not be able to cast this
- * to a native <code>OracleConnection</code> or the like anymore; you need to
- * use a {@link org.springframework.jdbc.support.nativejdbc.NativeJdbcExtractor}.
+ * to a native <code>OracleConnection</code> or the like anymore; you'd be required to use
+ * {@link java.sql.Connection#unwrap(Class)}.
  *
  * @author Thomas Risberg
  * @see #getConnection()
  * @see java.sql.Connection#close()
  * @see DataSourceUtils#releaseConnection
- * @see org.springframework.jdbc.support.nativejdbc.NativeJdbcExtractor
+ * @see java.sql.Connection#unwrap(Class)
  * @since 2.0
  */
 public class ExtendedConnectionDataSourceProxy implements SmartDataSource, InitializingBean {

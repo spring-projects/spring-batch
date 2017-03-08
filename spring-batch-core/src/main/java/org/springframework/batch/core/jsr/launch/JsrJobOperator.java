@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2014 the original author or authors.
+ * Copyright 2013-2017 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,7 +26,6 @@ import java.util.Properties;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Semaphore;
-
 import javax.batch.operations.BatchRuntimeException;
 import javax.batch.operations.JobExecutionAlreadyCompleteException;
 import javax.batch.operations.JobExecutionIsRunningException;
@@ -46,6 +45,7 @@ import javax.batch.runtime.StepExecution;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+
 import org.springframework.batch.core.BatchStatus;
 import org.springframework.batch.core.ExitStatus;
 import org.springframework.batch.core.Job;
@@ -69,15 +69,13 @@ import org.springframework.batch.core.step.tasklet.TaskletStep;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.BeanCreationException;
 import org.springframework.beans.factory.InitializingBean;
-import org.springframework.beans.factory.access.BeanFactoryLocator;
-import org.springframework.beans.factory.access.BeanFactoryReference;
 import org.springframework.beans.factory.config.AutowireCapableBeanFactory;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.support.AbstractBeanDefinition;
 import org.springframework.beans.factory.support.BeanDefinitionBuilder;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
-import org.springframework.context.access.ContextSingletonBeanFactoryLocator;
+import org.springframework.context.support.GenericXmlApplicationContext;
 import org.springframework.core.convert.converter.Converter;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;
@@ -160,9 +158,8 @@ public class JsrJobOperator implements JobOperator, ApplicationContextAware, Ini
 	 * one if it has) to populate itself.
 	 */
 	public JsrJobOperator() {
-		BeanFactoryLocator beanFactoryLocactor = ContextSingletonBeanFactoryLocator.getInstance();
-		BeanFactoryReference ref = beanFactoryLocactor.useBeanFactory("baseContext");
-		baseContext = (ApplicationContext) ref.getFactory();
+
+		this.baseContext = BaseContextHolder.getInstance().getContext();
 
 		baseContext.getAutowireCapableBeanFactory().autowireBeanProperties(this,
 				AutowireCapableBeanFactory.AUTOWIRE_BY_TYPE, false);
@@ -803,6 +800,49 @@ public class JsrJobOperator implements JobOperator, ApplicationContextAware, Ini
 			} else {
 				return registry.get(jobExecutionId);
 			}
+		}
+	}
+
+	/**
+	 * A singleton holder used to lazily bootstrap the base context used in JSR-352.
+	 */
+	protected static class BaseContextHolder {
+
+		private ApplicationContext context;
+
+		private static BaseContextHolder instance;
+
+		private BaseContextHolder() {
+			synchronized (BaseContextHolder.class) {
+				if(this.context == null) {
+					String overrideContextLocation = System.getProperty("JSR-352-BASE-CONTEXT");
+
+					List<String> contextLocations = new ArrayList<>();
+
+					contextLocations.add("jsrBaseContext.xml");
+
+					if(overrideContextLocation != null) {
+						contextLocations.add(overrideContextLocation);
+					}
+
+					this.context = new GenericXmlApplicationContext(
+							contextLocations.toArray(new String[contextLocations.size()]));
+				}
+			}
+		}
+
+		public static BaseContextHolder getInstance() {
+			synchronized (BaseContextHolder.class) {
+				if(instance == null) {
+					instance = new BaseContextHolder();
+				}
+			}
+
+			return instance;
+		}
+
+		public ApplicationContext getContext() {
+			return this.context;
 		}
 	}
 }
