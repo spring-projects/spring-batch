@@ -29,7 +29,7 @@ import org.springframework.batch.core.JobParameters;
 import org.springframework.batch.core.repository.ExecutionContextSerializer;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.repository.dao.DefaultExecutionContextSerializer;
-import org.springframework.batch.core.repository.dao.XStreamExecutionContextStringSerializer;
+import org.springframework.batch.core.repository.dao.Jackson2ExecutionContextStringSerializer;
 import org.springframework.batch.item.database.support.DataFieldMaxValueIncrementerFactory;
 import org.springframework.core.serializer.Serializer;
 import org.springframework.dao.DataAccessException;
@@ -153,7 +153,7 @@ public class JobRepositoryFactoryBeanTests {
 
 		factory.afterPropertiesSet();
 		Serializer<Map<String, Object>> serializer = (Serializer<Map<String,Object>>) ReflectionTestUtils.getField(factory, "serializer");
-		assertTrue(serializer instanceof XStreamExecutionContextStringSerializer);
+		assertTrue(serializer instanceof Jackson2ExecutionContextStringSerializer);
 	}
 
 	@Test

@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2013 the original author or authors.
+ * Copyright 2006-2017 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,16 +23,16 @@ import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.util.Map;
 
+import com.thoughtworks.xstream.XStream;
+import com.thoughtworks.xstream.converters.reflection.ReflectionProvider;
+import com.thoughtworks.xstream.io.HierarchicalStreamDriver;
+import com.thoughtworks.xstream.io.json.JettisonMappedXmlDriver;
+
 import org.springframework.batch.core.repository.ExecutionContextSerializer;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.core.serializer.Deserializer;
 import org.springframework.core.serializer.Serializer;
 import org.springframework.util.Assert;
-
-import com.thoughtworks.xstream.XStream;
-import com.thoughtworks.xstream.converters.reflection.ReflectionProvider;
-import com.thoughtworks.xstream.io.HierarchicalStreamDriver;
-import com.thoughtworks.xstream.io.json.JettisonMappedXmlDriver;
 
 /**
  * Implementation that uses XStream and Jettison to provide serialization.
@@ -41,6 +41,9 @@ import com.thoughtworks.xstream.io.json.JettisonMappedXmlDriver;
  * @author Michael Minella
  * @since 2.0
  * @see ExecutionContextSerializer
+ * @deprecated Due to the incompattabilities between current Jettison versions and XStream
+ * 		versions, this serializer is depricated in favor of
+ * 		{@link Jackson2ExecutionContextStringSerializer}
  */
 public class XStreamExecutionContextStringSerializer implements ExecutionContextSerializer, InitializingBean {
 

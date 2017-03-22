@@ -303,7 +303,10 @@ public class JsrPartitionHandler implements PartitionHandler, InitializingBean {
 			throw new IllegalArgumentException("Either a number of threads or partitions are required");
 		}
 
-		stepExecution.getExecutionContext().put("partitionPlanState", new PartitionPlanState(plan));
+		PartitionPlanState partitionPlanState = new PartitionPlanState();
+		partitionPlanState.setPartitionPlan(plan);
+
+		stepExecution.getExecutionContext().put("partitionPlanState", partitionPlanState);
 
 		stepSplitter = new JsrStepExecutionSplitter(jobRepository, allowStartIfComplete, stepExecution.getStepName(), restoreState);
 		partitionStepExecutions = stepSplitter.split(stepExecution, plan.getPartitions());
@@ -414,6 +417,15 @@ public class JsrPartitionHandler implements PartitionHandler, InitializingBean {
 			partitionProperties = plan.getPartitionProperties();
 			partitions = plan.getPartitions();
 			threads = plan.getThreads();
+		}
+
+		public PartitionPlanState() {
+		}
+
+		public void setPartitionPlan(PartitionPlan plan) {
+			this.partitionProperties = plan.getPartitionProperties();
+			this.partitions = plan.getPartitions();
+			this.threads = plan.getThreads();
 		}
 
 		/* (non-Javadoc)

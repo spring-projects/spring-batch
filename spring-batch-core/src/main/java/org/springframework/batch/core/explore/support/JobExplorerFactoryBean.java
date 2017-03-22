@@ -16,10 +16,13 @@
 
 package org.springframework.batch.core.explore.support;
 
+import javax.sql.DataSource;
+
 import org.springframework.batch.core.explore.JobExplorer;
 import org.springframework.batch.core.repository.ExecutionContextSerializer;
 import org.springframework.batch.core.repository.dao.AbstractJdbcBatchMetadataDao;
 import org.springframework.batch.core.repository.dao.ExecutionContextDao;
+import org.springframework.batch.core.repository.dao.Jackson2ExecutionContextStringSerializer;
 import org.springframework.batch.core.repository.dao.JdbcExecutionContextDao;
 import org.springframework.batch.core.repository.dao.JdbcJobExecutionDao;
 import org.springframework.batch.core.repository.dao.JdbcJobInstanceDao;
@@ -37,8 +40,6 @@ import org.springframework.jdbc.support.incrementer.AbstractDataFieldMaxValueInc
 import org.springframework.jdbc.support.incrementer.DataFieldMaxValueIncrementer;
 import org.springframework.jdbc.support.lob.LobHandler;
 import org.springframework.util.Assert;
-
-import javax.sql.DataSource;
 
 /**
  * A {@link FactoryBean} that automates the creation of a
@@ -127,10 +128,7 @@ implements InitializingBean {
 		}	
 
 		if(serializer == null) {
-			XStreamExecutionContextStringSerializer defaultSerializer = new XStreamExecutionContextStringSerializer();
-			defaultSerializer.afterPropertiesSet();
-
-			serializer = defaultSerializer;
+			serializer = new Jackson2ExecutionContextStringSerializer();
 		}
 	}
 
