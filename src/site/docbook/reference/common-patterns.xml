@@ -584,7 +584,7 @@ public Trade read() throws Exception {
 &lt;/beans:bean&gt;</emphasis></programlisting>
 
     <para>Finally, the saved values must be retrieved from the
-    <classname>Job</classname> <classname>ExeuctionContext</classname>:</para>
+    <classname>Job</classname> <classname>ExecutionContext</classname>:</para>
 
     <programlisting language="java">public class RetrievingItemWriter implements ItemWriter&lt;Object&gt; {
     private Object someObject;
