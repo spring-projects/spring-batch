@@ -32,7 +32,7 @@ public class HibernateCursorItemReaderCommonTests extends AbstractDatabaseItemSt
 
 		String hsqlQuery = "from Foo";
 
-		HibernateCursorItemReader<Foo> reader = new HibernateCursorItemReader<Foo>();
+		HibernateCursorItemReader<Foo> reader = new HibernateCursorItemReader<>();
 		reader.setQueryString(hsqlQuery);
 		reader.setSessionFactory(sessionFactory);
 		reader.setUseStatelessSession(true);
