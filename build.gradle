@@ -265,7 +265,7 @@ project('spring-batch-core') {
 		compile project(":spring-batch-infrastructure")
 
 		compile "com.ibm.jbatch:com.ibm.jbatch-tck-spi:$jbatchTckSpi"
-		compile "com.thoughtworks.xstream:xstream:$xstreamVersion"
+		compile "com.fasterxml.jackson.core:jackson-databind:${jackson2Version}"
 		compile ("org.codehaus.jettison:jettison:$jettisonVersion") {
 			exclude group: 'stax', module: 'stax-api'
 		}
@@ -284,12 +284,12 @@ project('spring-batch-core') {
 		testCompile "commons-dbcp:commons-dbcp:$commonsDdbcpVersion"
 		testCompile "junit:junit:${junitVersion}"
 		testCompile "org.hamcrest:hamcrest-library:$hamcrestVersion"
+		optional "com.thoughtworks.xstream:xstream:$xstreamVersion"
 		optional "org.aspectj:aspectjrt:$aspectjVersion"
 		optional "org.aspectj:aspectjweaver:$aspectjVersion"
 		optional "org.springframework:spring-jdbc:$springVersion"
 		optional "org.slf4j:slf4j-log4j12:$slf4jVersion"
 		optional "log4j:log4j:$log4jVersion"
-		optional "com.fasterxml.jackson.core:jackson-databind:${jackson2Version}"
 
 		optional "javax.batch:javax.batch-api:$javaxBatchApiVersion"
 	}
